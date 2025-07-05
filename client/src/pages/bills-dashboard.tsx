@@ -155,27 +155,27 @@ export default function BillsDashboard() {
     category: category === 'all' ? undefined : category, 
     status: status === 'all' ? undefined : status 
   });
-  
+
   const { data: categories } = useBillCategories();
   const { data: statuses } = useBillStatuses();
 
   // Enhanced filtering with useMemo for performance
   const filteredBills = useMemo(() => {
     if (!bills) return [];
-    
+
     return bills.filter((b: any) => {
       const matchesSearch = !search || 
         b.title.toLowerCase().includes(search.toLowerCase()) ||
         b.description.toLowerCase().includes(search.toLowerCase()) ||
         b.billNumber.toLowerCase().includes(search.toLowerCase());
-      
+
       const matchesCategory = category === 'all' || b.category === category;
       const matchesStatus = status === 'all' || b.status === status;
       const matchesTab = activeTab === 'all' || 
         (activeTab === 'urgent' && b.complexityScore >= 8) ||
         (activeTab === 'tracked' && b.isTracked) ||
         (activeTab === 'recent' && new Date(b.introducedDate) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
-      
+
       return matchesSearch && matchesCategory && matchesStatus && matchesTab;
     });
   }, [bills, search, category, status, activeTab]);
@@ -183,7 +183,7 @@ export default function BillsDashboard() {
   // Enhanced statistics
   const stats = useMemo(() => {
     if (!bills) return { total: 0, active: 0, urgent: 0, passed: 0 };
-    
+
     return {
       total: bills.length,
       active: bills.filter((b: any) => ['introduced', 'committee'].includes(b.status)).length,
@@ -277,7 +277,7 @@ export default function BillsDashboard() {
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
-              
+
               <select 
                 className="chanuka-select"
                 value={category} 

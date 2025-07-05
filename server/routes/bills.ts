@@ -226,4 +226,39 @@ app.get("/:id", async (c) => {
   }
 });
 
+app.get('/api/bills/categories', async (req, res) => {
+    try {
+      // Sample categories for now
+      const categories = [
+        { id: 'finance', name: 'Finance & Budget' },
+        { id: 'health', name: 'Health & Welfare' },
+        { id: 'education', name: 'Education' },
+        { id: 'environment', name: 'Environment' },
+        { id: 'governance', name: 'Governance & Rights' }
+      ];
+      res.json(categories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      res.status(500).json({ error: 'Failed to fetch categories' });
+    }
+  });
+
+  app.get('/api/bills/statuses', async (req, res) => {
+    try {
+      // Sample statuses for now
+      const statuses = [
+        { id: 'draft', name: 'Draft' },
+        { id: 'committee', name: 'In Committee' },
+        { id: 'second_reading', name: 'Second Reading' },
+        { id: 'third_reading', name: 'Third Reading' },
+        { id: 'passed', name: 'Passed' },
+        { id: 'assented', name: 'Assented' }
+      ];
+      res.json(statuses);
+    } catch (error) {
+      console.error('Error fetching statuses:', error);
+      res.status(500).json({ error: 'Failed to fetch statuses' });
+    }
+  });
+
 export default app;

@@ -1,7 +1,7 @@
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-serverless';
 import ws from "ws";
-import * as schema from "@shared/schema";
+import * as schema from "../shared/schema";
 import {
   bills,
   users,
@@ -33,6 +33,11 @@ export const db = drizzle({ client: pool, schema });
 // Test database connection on startup with proper async handling
 async function initializeDatabase() {
   try {
+    if (!connectionString) {
+      console.log('⚠️  No DATABASE_URL provided, using sample data mode');
+      return false;
+    }
+    
     const client = await pool.connect();
     await client.query('SELECT 1');
     client.release();
@@ -40,13 +45,20 @@ async function initializeDatabase() {
     return true;
   } catch (error) {
     console.error('❌ Database connection failed:', error);
-    console.log('Falling back to sample data mode');
+    console.log('🔄 Falling back to sample data mode');
     return false;
   }
 }
 
-// Initialize database connection
-export const isDatabaseConnected = await initializeDatabase();
+// Initialize database connection with proper promise handling
+let isDatabaseConnected = false;
+initializeDatabase().then(result => {
+  isDatabaseConnected = result;
+}).catch(() => {
+  isDatabaseConnected = false;
+});
+
+export { isDatabaseConnected };
 
 export { 
   bills, 
