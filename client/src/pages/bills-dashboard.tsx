@@ -123,13 +123,13 @@ function BillCard({ bill }: BillCardProps) {
 
 export default function BillsDashboard() {
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
+  const [category, setCategory] = useState<string>('all');
+  const [status, setStatus] = useState<string>('all');
 
   const { data: bills, isLoading: billsLoading } = useBills({ 
     search: search || undefined, 
-    category: category || undefined, 
-    status: status || undefined 
+    category: category === 'all' ? undefined : category, 
+    status: status === 'all' ? undefined : status 
   });
   
   const { data: categories } = useBillCategories();
@@ -191,7 +191,7 @@ export default function BillsDashboard() {
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
                 {categories?.map((cat) => (
                   <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                 ))}
@@ -202,7 +202,7 @@ export default function BillsDashboard() {
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 {statuses?.map((stat) => (
                   <SelectItem key={stat} value={stat}>
                     {stat.charAt(0).toUpperCase() + stat.slice(1)}
