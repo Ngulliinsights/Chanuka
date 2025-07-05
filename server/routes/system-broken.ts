@@ -2,13 +2,11 @@
 import express from 'express';
 import { db } from '../db';
 import { sql } from 'drizzle-orm';
-import { asyncHandler } from '../utils/errors';
-
-const router = express.Router();
 
 export function setupSystemRoutes(app: express.Router) {
   // Schema information
-  app.get('/schema', asyncHandler(async (req, res) => {
+  app.get('/schema', async (req: express.Request, res: express.Response) => {
+    try {
     const tableInfo = await db.execute(sql`
       SELECT table_name, column_name, data_type, is_nullable, column_default
       FROM information_schema.columns
@@ -29,12 +27,16 @@ export function setupSystemRoutes(app: express.Router) {
       });
     });
 
-    res.json({
-      tables,
-      tableCount: Object.keys(tables).length,
-      analyzed: new Date().toISOString()
-    });
-  }));
+      res.json({
+        tables,
+        tableCount: Object.keys(tables).length,
+        analyzed: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('Schema analysis failed:', error);
+      res.status(500).json({ error: 'Failed to analyze database schema' });
+    }
+  });
 
   // Environment status
   app.get('/environment', (req, res) => {
