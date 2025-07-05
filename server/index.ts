@@ -12,7 +12,7 @@ import { router as sponsorsRouter } from './routes/sponsors.js';
 import { router as authRouter } from './routes/auth.js';
 import { router as usersRouter } from './routes/users.js';
 import { router as verificationRouter } from './routes/verification.js';
-import { router as healthRouter } from './routes/health.js';
+import { setupHealthRoutes } from './routes/health.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { requestLogger } from './middleware/request-logger.js';
 
@@ -37,6 +37,9 @@ app.use('/api/sponsors', sponsorsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/verification', verificationRouter);
+// Create a router for health routes
+const healthRouter = express.Router();
+setupHealthRoutes(healthRouter);
 app.use('/api/health', healthRouter);
 
 // Serve static files from client dist directory
