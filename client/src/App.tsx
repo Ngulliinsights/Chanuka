@@ -1,49 +1,55 @@
-import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
-import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import ErrorBoundary from "@/components/error-boundary";
-import HomePage from './pages/home';
-import Dashboard from "@/pages/dashboard";
-import BillsDashboard from "@/pages/bills-dashboard";
-import BillDetail from "@/pages/bill-detail";
-import BillAnalysis from "@/pages/bill-analysis";
-import BillSponsorshipAnalysis from "@/pages/bill-sponsorship-analysis";
-import DatabaseManager from "@/pages/database-manager";
-import ExpertVerification from "@/pages/expert-verification";
-import AuthPage from "@/pages/auth-page";
-import Profile from "@/pages/profile";
-import Onboarding from "@/pages/onboarding";
-import NotFound from "@/pages/not-found";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from './components/ui/toaster';
+import ErrorBoundary from './components/error-boundary';
 
-function Router() {
-  return (
-    <Switch>
-      <Route path="/" component={HomePage} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/bills" component={BillsDashboard} />
-      <Route path="/bills/:id" component={BillDetail} />
-      <Route path="/bills/:id/analysis" component={BillAnalysis} />
-      <Route path="/bills/:id/sponsorship" component={BillSponsorshipAnalysis} />
-      <Route path="/database" component={DatabaseManager} />
-      <Route path="/verification" component={ExpertVerification} />
-      <Route path="/auth" component={AuthPage} />
-      <Route path="/profile" component={Profile} />
-      <Route path="/onboarding" component={Onboarding} />
-      <Route component={NotFound} />
-    </Switch>
-  );
-}
+// Layout components
+import AppLayout from './components/layout/app-layout';
+
+// Page components
+import Home from './pages/home';
+import BillsDashboard from './pages/bills-dashboard';
+import CommunityInput from './pages/community-input';
+import Dashboard from './pages/dashboard';
+
+// Import CSS
+import './index.css';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function App() {
+  console.log('Rendering React application...');
+
+  React.useEffect(() => {
+    console.log('React render complete');
+  }, []);
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
+        <Router>
+          <div className="min-h-screen bg-background">
+            <AppLayout>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/bills" element={<BillsDashboard />} />
+                <Route path="/community-input" element={<CommunityInput />} />
+                <Route path="*" element={<Home />} />
+              </Routes>
+            </AppLayout>
+          </div>
           <Toaster />
-          <Router />
-        </TooltipProvider>
+        </Router>
       </QueryClientProvider>
     </ErrorBoundary>
   );

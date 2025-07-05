@@ -104,8 +104,10 @@ async function startupInitialization() {
   }
 }
 
-// Run initialization
-await startupInitialization();
+// Run initialization without blocking
+startupInitialization().catch(err => {
+  console.log('Startup initialization error (non-blocking):', err.message);
+});
 
 const server = app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
