@@ -136,7 +136,15 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm install"
+args = "cd client && npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd .. && npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run db:migrate"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
