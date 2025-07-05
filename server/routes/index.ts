@@ -6,6 +6,9 @@ import { setupAnalysisRoutes } from "./analysis";
 import { setupSponsorshipRoutes } from "./sponsorship";
 import { setupSystemRoutes } from "./system";
 import { setupHealthRoutes } from "./health";
+import { setupAuthRoutes } from "./auth";
+import { setupUserRoutes } from "./users";
+import { setupVerificationRoutes } from "./verification";
 
 export async function registerRoutes(app: express.Express) {
   const server = createServer(app);
@@ -20,6 +23,9 @@ export async function registerRoutes(app: express.Express) {
   setupSponsorshipRoutes(apiRouter);
   setupSystemRoutes(apiRouter);
   setupHealthRoutes(apiRouter);
+  setupAuthRoutes(apiRouter);
+  setupUserRoutes(apiRouter);
+  setupVerificationRoutes(apiRouter);
 
   // Mount API router
   app.use("/api", apiRouter);
@@ -35,7 +41,10 @@ export async function registerRoutes(app: express.Express) {
         analysis: "/api/analysis",
         sponsorship: "/api/sponsorship",
         system: "/api/system",
-        health: "/api/health"
+        health: "/api/health",
+        auth: "/api/auth",
+        users: "/api/users",
+        verification: "/api/verification"
       }
     });
   });
