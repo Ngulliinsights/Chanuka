@@ -6,7 +6,7 @@ import { router as analysisRouter } from "./analysis.js";
 import { setupSponsorshipRoutes } from "./sponsorship";
 import { setupSystemRoutes } from "./system";
 import { setupHealthRoutes } from "./health";
-import { setupAuthRoutes } from "./auth";
+import { router as authRouter } from "./auth.js";
 import { setupUserRoutes } from "./users";
 import { setupVerificationRoutes } from "./verification";
 
@@ -23,7 +23,7 @@ export async function registerRoutes(app: express.Express) {
   setupSponsorshipRoutes(apiRouter);
   setupSystemRoutes(apiRouter);
   setupHealthRoutes(apiRouter);
-  setupAuthRoutes(apiRouter);
+  apiRouter.use("/auth", authRouter);
   setupUserRoutes(apiRouter);
   setupVerificationRoutes(apiRouter);
 

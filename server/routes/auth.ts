@@ -3,12 +3,12 @@ import { Router } from "express";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { db } from "../db";
-import { users, type User } from "../../shared/schema";
+import { db } from "../db.js";
+import { users, type User } from "../../shared/schema.js";
 
-export function setupAuthRoutes(router: Router) {
+export const router = Router();
   // Login endpoint
-  router.post("/auth/login", async (req, res) => {
+  router.post("/login", async (req, res) => {
     try {
       const { email, password } = req.body;
 
@@ -63,7 +63,7 @@ export function setupAuthRoutes(router: Router) {
   });
 
   // Register endpoint
-  router.post("/auth/register", async (req, res) => {
+  router.post("/register", async (req, res) => {
     try {
       const { email, password, firstName, lastName } = req.body;
 
@@ -125,13 +125,13 @@ export function setupAuthRoutes(router: Router) {
   });
 
   // Logout endpoint
-  router.post("/auth/logout", (req, res) => {
+  router.post("/logout", (req, res) => {
     // Since we're using JWT, logout is handled client-side
     res.json({ message: "Logged out successfully" });
   });
 
   // Verify token endpoint
-  router.get("/auth/verify", async (req, res) => {
+  router.get("/verify", async (req, res) => {
     try {
       const token = req.headers.authorization?.replace("Bearer ", "");
 
@@ -166,4 +166,3 @@ export function setupAuthRoutes(router: Router) {
       res.status(401).json({ error: "Invalid token" });
     }
   });
-}
