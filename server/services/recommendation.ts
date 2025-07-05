@@ -135,7 +135,7 @@ export class RecommendationService {
    * This method combines content-based filtering (interests) with popularity signals
    *
    * @param userId - The ID of the user to get recommendations for
-   * @param limit - Maximum number of recommendations to return (default: 10)
+   * @param limit - Maximum number of recommendations to return
    * @returns Promise resolving to an array of recommended bills with scores
    */
   async getPersonalizedRecommendations(
@@ -144,8 +144,8 @@ export class RecommendationService {
   ): Promise<Array<Bill & { score: number }>> {
     try {
       // Input validation
-      if (userId <= 0 || limit <= 0) {
-        throw new Error('Invalid parameters: userId and limit must be positive numbers');
+      if (!userId || limit <= 0) {
+        throw new Error('Invalid parameters: userId must be provided and limit must be positive');
       }
 
       // Get user's interests and engagement history in parallel for efficiency
@@ -207,7 +207,7 @@ export class RecommendationService {
    * This method uses tag overlap and engagement metrics to find content similarity
    *
    * @param billId - The ID of the bill to find similar bills for
-   * @param limit - Maximum number of similar bills to return (default: 5)
+   * @param limit - Maximum number of similar bills to return
    * @returns Promise resolving to an array of similar bills with similarity scores
    */
   async getSimilarBills(
@@ -216,8 +216,8 @@ export class RecommendationService {
   ): Promise<Array<Bill & { similarityScore: number }>> {
     try {
       // Input validation
-      if (billId <= 0 || limit <= 0) {
-        throw new Error('Invalid parameters: billId and limit must be positive numbers');
+      if (!billId || limit <= 0) {
+        throw new Error('Invalid parameters: billId must be provided and limit must be positive');
       }
 
       // Get the target bill's tags with caching
@@ -282,8 +282,8 @@ export class RecommendationService {
    * Get trending bills based on recent engagement metrics
    * This method identifies bills with high recent activity across multiple engagement types
    *
-   * @param days - Number of days to consider for trending calculation (default: 7)
-   * @param limit - Maximum number of trending bills to return (default: 10)
+   * @param days - Number of days to consider for trending calculation
+   * @param limit - Maximum number of trending bills to return
    * @returns Promise resolving to an array of trending bills with trend scores
    */
   async getTrendingBills(
@@ -295,8 +295,8 @@ export class RecommendationService {
       if (days <= 0 || days > 365) {
         throw new Error('Days parameter must be between 1 and 365');
       }
-      if (limit <= 0) {
-        throw new Error('Limit must be a positive number');
+      if (!limit) {
+        throw new Error('Limit must be provided');
       }
 
       const dateThreshold = new Date();
@@ -374,8 +374,8 @@ export class RecommendationService {
   ): Promise<any> {
     try {
       // Input validation
-      if (userId <= 0 || billId <= 0) {
-        throw new Error('Invalid parameters: userId and billId must be positive numbers');
+      if (!userId || !billId) {
+        throw new Error('Invalid parameters: userId and billId must be provided');
       }
       if (!['view', 'comment', 'share'].includes(engagementType)) {
         throw new Error('Invalid engagement type');
@@ -489,7 +489,7 @@ export class RecommendationService {
    * This method uses user-based collaborative filtering to suggest bills
    *
    * @param userId - The ID of the user to get recommendations for
-   * @param limit - Maximum number of recommendations to return (default: 10)
+   * @param limit - Maximum number of recommendations to return
    * @returns Promise resolving to an array of recommended bills with scores
    */
   async getCollaborativeRecommendations(
@@ -498,8 +498,8 @@ export class RecommendationService {
   ): Promise<Array<Bill & { score: number }>> {
     try {
       // Input validation
-      if (userId <= 0 || limit <= 0) {
-        throw new Error('Invalid parameters: userId and limit must be positive numbers');
+      if (!userId || limit <= 0) {
+        throw new Error('Invalid parameters: userId and limit must be positive');
       }
 
       // Get user's interests efficiently
