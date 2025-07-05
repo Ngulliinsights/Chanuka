@@ -30,6 +30,14 @@ if (!connectionString) {
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 export const db = drizzle({ client: pool, schema });
 
+// Test database connection on startup
+try {
+  await pool.query('SELECT 1');
+  console.log('Database connection established successfully');
+} catch (error) {
+  console.warn('Database connection failed, using fallback mode:', error);
+}
+
 export { 
   bills, 
   users, 

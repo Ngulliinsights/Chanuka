@@ -9,10 +9,10 @@ import { setupHealthRoutes } from "./health";
 
 export async function registerRoutes(app: express.Express) {
   const server = createServer(app);
-  
+
   // Set up API routes
   const apiRouter = express.Router();
-  
+
   // Register all route handlers
   setupBillRoutes(apiRouter);
   setupSponsorRoutes(apiRouter);
@@ -20,10 +20,10 @@ export async function registerRoutes(app: express.Express) {
   setupSponsorshipRoutes(apiRouter);
   setupSystemRoutes(apiRouter);
   setupHealthRoutes(apiRouter);
-  
+
   // Mount API router
   app.use("/api", apiRouter);
-  
+
   // Root endpoint
   app.get("/", (req, res) => {
     res.json({ 

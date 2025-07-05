@@ -1,6 +1,6 @@
 import express from 'express';
-import { db } from '../db';
 import { sql } from 'drizzle-orm';
+import { db } from '../db.js';
 
 export function setupSystemRoutes(app: express.Router) {
   // Database schema information
@@ -83,7 +83,7 @@ export function setupSystemRoutes(app: express.Router) {
     try {
       // Test database connection
       await db.execute(sql`SELECT 1`);
-      
+
       res.json({
         status: 'healthy',
         database: 'connected',

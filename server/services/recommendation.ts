@@ -160,7 +160,7 @@ export class RecommendationService {
 
       // Always exclude bills the user has already engaged with
       if (engagedBillIds.length > 0) {
-        whereConditions.push(sql`${bills.id} NOT IN (${sql.raw(engagedBillIds.map(() => '?').join(','))})`);
+        whereConditions.push(sql`${bills.id} NOT IN (${sql.join(engagedBillIds.map(id => sql`${id}`), sql`, `)})`);
         queryParams.engagedBills = engagedBillIds;
       }
 
@@ -244,7 +244,7 @@ export class RecommendationService {
             -- Tag overlap score (primary factor)
             (SELECT COUNT(DISTINCT bt.tag) FROM bill_tags bt
              WHERE bt.bill_id = ${bills.id}
-             AND bt.tag IN (${sql.raw(tags.map(() => '?').join(','))}))
+             AND bt.tag IN (${sql.join(tags.map(tag => sql`${tag}`), sql`, `)}))
             * 1.0 / ${tags.length} * 0.7 +
             -- Engagement similarity score (secondary factor)
             LEAST(
@@ -260,7 +260,7 @@ export class RecommendationService {
             sql`${bills.id} != ${billId}`,
             sql`EXISTS (SELECT 1 FROM bill_tags bt
                        WHERE bt.bill_id = ${bills.id}
-                       AND bt.tag IN (${sql.raw(tags.map(() => '?').join(','))}))`
+                       AND bt.tag IN (${sql.join(tags.map(tag => sql`${tag}`), sql`, `)}))`
           )
         )
         .orderBy(desc(sql`similarity_score`))
@@ -553,7 +553,7 @@ export class RecommendationService {
                 WHEN EXISTS (
                   SELECT 1 FROM user_interests ui 
                   WHERE ui.user_id = ${billEngagement.userId} 
-                  AND ui.interest IN (${sql.raw(interests.map(() => '?').join(','))})
+                  AND ui.interest IN (${sql.join(interests.map(interest => sql`${interest}`), sql`, `)})
                   GROUP BY ui.user_id
                   HAVING COUNT(DISTINCT ui.interest) >= ${Math.floor(interests.length * 0.6)}
                 ) THEN 1.0
