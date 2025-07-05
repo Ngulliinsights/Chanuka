@@ -141,54 +141,54 @@ export const AppLayout = ({ children }: AppLayoutProps) => {
           onToggleLanguage={toggleLanguage}
         />
 
-        {/* Desktop header with language toggle and context help */}
-        <div className="hidden md:flex justify-between items-center px-6 py-3 bg-white border-b border-slate-200 shadow-sm">
-          <div>
-            <h1 className="text-xl font-semibold text-slate-800">{currentPageTitle}</h1>
-            {pageTagline && (
-              <p className="text-sm text-slate-500 mt-1">{pageTagline}</p>
-            )}
+        {/* Chanuka Desktop Header */}
+        <header className="chanuka-header hidden md:block">
+          <div className="chanuka-nav">
+            <div>
+              <h1 className="text-xl font-semibold text-white">{currentPageTitle}</h1>
+              {pageTagline && (
+                <p className="text-sm text-white/80 mt-1">{pageTagline}</p>
+              )}
+            </div>
+
+            <div className="flex items-center space-x-3">
+              {/* Language Toggle */}
+              <button
+                onClick={toggleLanguage}
+                className="chanuka-btn chanuka-btn-outline text-xs text-white border-white/30 hover:bg-white/10"
+              >
+                {language === 'en' ? 'Badilisha Lugha: Kiswahili' : 'Change Language: English'}
+              </button>
+
+              {/* Help Button with Page Context */}
+              <TooltipProvider>
+                <Tooltip delayDuration={300}>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <TooltipTrigger asChild>
+                        <button className="chanuka-btn chanuka-btn-outline text-white border-white/30 hover:bg-white/10 rounded-full w-10 h-10 p-0">
+                          <HelpCircle className="h-5 w-5" />
+                        </button>
+                      </TooltipTrigger>
+                    </PopoverTrigger>
+                    <TooltipContent>
+                      <p>{language === 'en' ? 'Get help for this page' : 'Pata usaidizi kwa ukurasa huu'}</p>
+                    </TooltipContent>
+
+                    <PopoverContent className="w-80">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold" style={{color: 'var(--primary)'}}>{helpContent.title[language]}</h3>
+                        <p className="text-sm" style={{color: 'var(--text-light)'}}>
+                          {helpContent.description[language]}
+                        </p>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
           </div>
-
-          <div className="flex items-center space-x-3">
-            {/* Language Toggle */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={toggleLanguage}
-              className="text-xs"
-            >
-              {language === 'en' ? 'Badilisha Lugha: Kiswahili' : 'Change Language: English'}
-            </Button>
-
-            {/* Help Button with Page Context */}
-            <TooltipProvider>
-              <Tooltip delayDuration={300}>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <TooltipTrigger asChild>
-                      <Button variant="outline" size="icon" className="rounded-full">
-                        <HelpCircle className="h-5 w-5 text-slate-600" />
-                      </Button>
-                    </TooltipTrigger>
-                  </PopoverTrigger>
-                  <TooltipContent>
-                    <p>{language === 'en' ? 'Get help for this page' : 'Pata usaidizi kwa ukurasa huu'}</p>
-                  </TooltipContent>
-
-                  <PopoverContent className="w-80">
-                    <div className="space-y-2">
-                      <h3 className="font-semibold">{helpContent.title[language]}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {helpContent.description[language]}
-                      </p>
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        </div>
+        </header>
 
         {/* Desktop-only toggle button that appears when collapsed */}
         {sidebarCollapsed && (
