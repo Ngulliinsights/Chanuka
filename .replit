@@ -15,7 +15,7 @@ localPort = 5000
 externalPort = 80
 
 [workflows]
-runButton = "Fix Critical Issues"
+runButton = "Development with Fallbacks"
 
 [[workflows.workflow]]
 name = "Project"
@@ -166,6 +166,23 @@ args = "cd .. && npm install"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run db:migrate || echo \"Database migration failed, continuing...\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+
+[[workflows.workflow]]
+name = "Development with Fallbacks"
+author = 40484346
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run db:migrate || echo \"Database migration failed, continuing with fallback mode...\""
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
