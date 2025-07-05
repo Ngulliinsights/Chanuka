@@ -15,7 +15,7 @@ localPort = 5000
 externalPort = 80
 
 [workflows]
-runButton = "Start Development"
+runButton = "Fix Critical Issues"
 
 [[workflows.workflow]]
 name = "Project"
@@ -145,6 +145,27 @@ args = "cd .. && npm install"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run db:migrate"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+
+[[workflows.workflow]]
+name = "Fix Critical Issues"
+author = 40484346
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd client && npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd .. && npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run db:migrate || echo \"Database migration failed, continuing...\""
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"

@@ -28,37 +28,29 @@ if (!connectionString) {
 }
 
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle({ client: pool, schema });
+// Enhanced database connection with better error handling
+let db: any;
+let isDatabaseConnected = false;
 
-// Test database connection on startup with proper async handling
 async function initializeDatabase() {
   try {
-    if (!connectionString) {
-      console.log('⚠️  No DATABASE_URL provided, using sample data mode');
-      return false;
-    }
-    
-    const client = await pool.connect();
-    await client.query('SELECT 1');
-    client.release();
+    db = drizzle({ client: pool, schema });
+
+    // Test the connection
+    await db.select().from(schema.bills).limit(1);
+    isDatabaseConnected = true;
     console.log('✅ Database connection established successfully');
-    return true;
   } catch (error) {
     console.error('❌ Database connection failed:', error);
-    console.log('🔄 Falling back to sample data mode');
-    return false;
+    console.log('🔄 Application will continue with fallback mode');
+    isDatabaseConnected = false;
   }
 }
 
-// Initialize database connection with proper promise handling
-let isDatabaseConnected = false;
-initializeDatabase().then(result => {
-  isDatabaseConnected = result;
-}).catch(() => {
-  isDatabaseConnected = false;
-});
+// Initialize database connection
+initializeDatabase().catch(console.error);
 
-export { isDatabaseConnected };
+export { isDatabaseConnected, db };
 
 export { 
   bills, 

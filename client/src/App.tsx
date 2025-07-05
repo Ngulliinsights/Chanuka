@@ -1,26 +1,24 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from './components/ui/toaster';
-import ErrorBoundary from './components/error-boundary';
+import { Toaster } from '@/components/ui/toaster';
+import ErrorBoundary from '@/components/error-boundary';
 
-// Layout components
-import AppLayout from './components/layout/app-layout';
+// Layout
+import AppLayout from '@/components/layout/app-layout';
 
-// Page components
-import Home from './pages/home';
-import BillsDashboard from './pages/bills-dashboard';
-import CommunityInput from './pages/community-input';
-import Dashboard from './pages/dashboard';
-
-// Import CSS
-import './index.css';
+// Pages
+import HomePage from '@/pages/home';
+import BillsDashboard from '@/pages/bills-dashboard';
+import Dashboard from '@/pages/dashboard';
+import CommunityInputPage from '@/pages/community-input';
+import NotFoundPage from '@/pages/not-found';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
       retry: 1,
-      staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
     },
   },
@@ -37,17 +35,15 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <Router>
-          <div className="min-h-screen bg-background">
-            <AppLayout>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/bills" element={<BillsDashboard />} />
-                <Route path="/community-input" element={<CommunityInput />} />
-                <Route path="*" element={<Home />} />
-              </Routes>
-            </AppLayout>
-          </div>
+          <AppLayout>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/bills" element={<BillsDashboard />} />
+              <Route path="/community" element={<CommunityInputPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </AppLayout>
           <Toaster />
         </Router>
       </QueryClientProvider>
