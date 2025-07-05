@@ -106,17 +106,58 @@ const CommunityInputPage: React.FC = () => {
     }
   ];
 
-  const handleSubmitComment = () => {
+  const handleSubmitComment = async () => {
     if (!newComment.trim()) return;
 
-    // Submit comment logic here
-    console.log('Submitting comment:', {
-      content: newComment,
-      category: commentCategory,
-      bill: selectedBill
-    });
+    try {
+      // Implement citizen verification
+      const citizenData = await verifyCitizenStatus();
+      
+      const comment = {
+        content: newComment,
+        category: commentCategory,
+        bill: selectedBill,
+        citizenId: citizenData.id,
+        verificationLevel: citizenData.verificationLevel,
+        demographics: {
+          constituency: citizenData.constituency,
+          ageGroup: citizenData.ageGroup,
+          economicStatus: citizenData.economicStatus
+        },
+        timestamp: new Date().toISOString()
+      };
 
-    setNewComment('');
+      const response = await fetch('/api/community/comments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(comment)
+      });
+
+      if (response.ok) {
+        setNewComment('');
+        // Update local state with new comment
+        // Trigger re-fetch of comments
+      } else {
+        throw new Error('Failed to submit comment');
+      }
+    } catch (error) {
+      console.error('Comment submission failed:', error);
+      alert('Unable to submit comment. Please try again.');
+    }
+  };
+
+  const verifyCitizenStatus = async () => {
+    // This would integrate with Kenya's identity verification systems
+    // For demo purposes, return mock data
+    return {
+      id: 'citizen-' + Math.random().toString(36).substr(2, 9),
+      verificationLevel: 'verified',
+      constituency: 'Nairobi Central',
+      ageGroup: '25-34',
+      economicStatus: 'middle-income'
+    };
   };
 
   const getCategoryColor = (category: string) => {
