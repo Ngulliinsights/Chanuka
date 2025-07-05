@@ -4,9 +4,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import ErrorBoundary from "@/components/error-boundary";
+import HomePage from './pages/home';
 import BillsDashboard from "@/pages/bills-dashboard";
-import Dashboard from "@/pages/dashboard";
-import DatabaseManager from "@/pages/database-manager";
 import BillDetail from "@/pages/bill-detail";
 import BillAnalysis from "@/pages/bill-analysis";
 import BillSponsorshipAnalysis from "@/pages/bill-sponsorship-analysis";
@@ -19,7 +18,7 @@ import NotFound from "@/pages/not-found";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
+      <Route path="/" component={HomePage} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/bills" component={BillsDashboard} />
       <Route path="/bills/:id" component={BillDetail} />

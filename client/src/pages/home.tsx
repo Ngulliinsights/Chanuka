@@ -1,396 +1,298 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { 
-  BarChart3, 
-  FileText, 
-  Users, 
-  Shield, 
-  TrendingUp, 
-  AlertCircle,
-  Eye,
-  Search,
-  Gavel
-} from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ArrowRight, Users, FileText, TrendingUp, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { Link } from 'wouter';
 
-export function HomePage() {
-  // Centralized data with enhanced properties for better maintainability
-  const featuredBills = [
+const HomePage: React.FC = () => {
+  const recentBills = [
     {
-      id: 1,
-      title: "Kenya Finance Bill 2024",
-      status: "rejected",
-      conflict_level: "high",
-      sponsor_count: 204,
-      summary: "Comprehensive tax reform bill that was rejected following public protests.",
-      // Enhanced accessibility with aria-label
-      statusAriaLabel: "Bill status: rejected due to public opposition"
+      id: '1',
+      title: 'Digital Economy Enhancement Act 2024',
+      status: 'Committee Review',
+      category: 'Technology',
+      urgency: 'high',
+      lastUpdate: '2 days ago'
     },
     {
-      id: 2,
-      title: "National Healthcare Reform Act",
-      status: "committee",
-      conflict_level: "medium", 
-      sponsor_count: 13,
-      summary: "Healthcare policy changes with pharmaceutical industry implications.",
-      statusAriaLabel: "Bill status: currently in committee review"
+      id: '2',
+      title: 'Healthcare Accessibility Reform Bill',
+      status: 'Second Reading',
+      category: 'Healthcare',
+      urgency: 'medium',
+      lastUpdate: '1 week ago'
     },
+    {
+      id: '3',
+      title: 'Environmental Protection Amendment',
+      status: 'Public Participation',
+      category: 'Environment',
+      urgency: 'high',
+      lastUpdate: '3 days ago'
+    }
   ];
 
   const stats = [
-    { 
-      label: "Bills Tracked", 
-      value: "2,847", 
-      icon: FileText, 
-      color: "text-primary",
-      description: "Total legislative bills monitored across all sessions"
+    {
+      title: 'Active Bills',
+      value: '47',
+      change: '+12%',
+      trend: 'up',
+      icon: FileText
     },
-    { 
-      label: "Conflicts Identified", 
-      value: "342", 
-      icon: AlertCircle, 
-      color: "text-warning",
-      description: "Potential conflicts of interest flagged in bill sponsorships"
+    {
+      title: 'Public Participation',
+      value: '89%',
+      change: '+5%',
+      trend: 'up',
+      icon: Users
     },
-    { 
-      label: "Verified Sources", 
-      value: "1,204", 
-      icon: Shield, 
-      color: "text-success",
-      description: "Authenticated data sources ensuring information reliability"
+    {
+      title: 'Bills Passed',
+      value: '23',
+      change: '+8%',
+      trend: 'up',
+      icon: CheckCircle
     },
-    { 
-      label: "Active Users", 
-      value: "15,673", 
-      icon: Users, 
-      color: "text-info",
-      description: "Citizens actively engaging with the transparency platform"
-    },
+    {
+      title: 'Pending Review',
+      value: '15',
+      change: '-3%',
+      trend: 'down',
+      icon: Clock
+    }
   ];
 
-  // Helper function to determine status styling with consistent logic
-  const getStatusBadgeClass = (status) => {
-    const statusClasses = {
-      rejected: 'bg-red-100 text-red-800 border-red-200',
-      committee: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      passed: 'bg-green-100 text-green-800 border-green-200',
-      proposed: 'bg-blue-100 text-blue-800 border-blue-200'
-    };
-    return statusClasses[status] || 'bg-gray-100 text-gray-800 border-gray-200';
-  };
-
-  // Helper function for risk level styling
-  const getRiskBadgeClass = (riskLevel) => {
-    const riskClasses = {
-      high: 'risk-high bg-red-50 text-red-700 border-red-200',
-      medium: 'risk-medium bg-orange-50 text-orange-700 border-orange-200',
-      low: 'risk-low bg-green-50 text-green-700 border-green-200'
-    };
-    return riskClasses[riskLevel] || 'bg-gray-50 text-gray-700 border-gray-200';
+  const getUrgencyColor = (urgency: string) => {
+    switch (urgency) {
+      case 'high': return 'bg-red-100 text-red-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      case 'low': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Enhanced header with better semantic structure */}
-      <header className="bg-primary text-primary-foreground" role="banner">
-        <div className="container mx-auto px-6 py-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-foreground p-2">
-                <img 
-                  src="/Chanuka_logo.svg" 
-                  alt="Chanuka Logo - Legislative Transparency Platform" 
-                  className="h-full w-full object-contain"
-                  // Enhanced error handling for logo loading
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                    console.warn('Chanuka logo failed to load');
-                  }}
-                />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold">Chanuka</h1>
-                <p className="text-primary-foreground/80">Legislative Transparency Platform</p>
-              </div>
-            </div>
-            <nav className="flex gap-3" role="navigation" aria-label="Main navigation">
-              <Link to="/bills">
-                <Button 
-                  variant="secondary" 
-                  className="btn-enhanced focus:ring-2 focus:ring-primary-foreground/50"
-                  aria-label="Search and explore legislative bills"
-                >
-                  <Search className="h-4 w-4 mr-2" aria-hidden="true" />
-                  Explore Bills
-                </Button>
-              </Link>
-              <Link to="/dashboard">
-                <Button 
-                  variant="outline" 
-                  className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary focus:ring-2 focus:ring-primary-foreground/50 transition-all duration-200"
-                  aria-label="Access your personal dashboard"
-                >
-                  Dashboard
-                </Button>
-              </Link>
-            </nav>
-          </div>
+    <div className="space-y-8 p-6">
+      {/* Hero Section */}
+      <div className="text-center space-y-4">
+        <h1 className="text-4xl font-bold tracking-tight">
+          Welcome to Chanuka Legislative Platform
+        </h1>
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          Promoting transparency, accountability, and democratic participation in Kenya's legislative process
+        </p>
+        <div className="flex justify-center gap-4 mt-6">
+          <Link href="/bills">
+            <Button size="lg">
+              Explore Bills
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </Link>
+          <Link href="/community-input">
+            <Button variant="outline" size="lg">
+              Join Discussion
+            </Button>
+          </Link>
         </div>
-      </header>
+      </div>
 
-      <main className="container mx-auto px-6 py-12" role="main">
-        {/* Enhanced mission statement with better typography hierarchy */}
-        <section className="text-center mb-12" aria-labelledby="mission-heading">
-          <h2 id="mission-heading" className="text-4xl font-bold text-foreground mb-4">
-            Transparency in Legislative Processes
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Chanuka provides comprehensive analysis of bill sponsors, their potential conflicts of interest, 
-            and the networks that influence legislation in Kenya. Our mission is to ensure transparency 
-            and accountability in the democratic process.
-          </p>
-        </section>
-
-        {/* Enhanced stats grid with improved accessibility */}
-        <section className="mb-12" aria-labelledby="platform-stats">
-          <h2 id="platform-stats" className="sr-only">Platform Statistics</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
-              <Card 
-                key={index} 
-                className="card-enhanced hover:shadow-lg transition-shadow duration-300"
-                role="group"
-                aria-label={`${stat.label}: ${stat.value}`}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground" id={`stat-label-${index}`}>
-                        {stat.label}
-                      </p>
-                      <p 
-                        className="text-2xl font-bold text-foreground" 
-                        aria-labelledby={`stat-label-${index}`}
-                      >
-                        {stat.value}
-                      </p>
-                      {/* Enhanced with descriptive text for better context */}
-                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                        {stat.description}
-                      </p>
-                    </div>
-                    <div className={`p-3 rounded-lg bg-muted ${stat.color} transition-colors duration-200`}>
-                      <stat.icon className="h-6 w-6" aria-hidden="true" />
-                    </div>
+      {/* Key Statistics */}
+      <div className="grid md:grid-cols-4 gap-6">
+        {stats.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={index}>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {stat.title}
+                    </p>
+                    <p className="text-2xl font-bold">{stat.value}</p>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
+                  <Icon className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <div className="flex items-center mt-2">
+                  <TrendingUp className={`w-4 h-4 mr-1 ${
+                    stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                  }`} />
+                  <span className={`text-sm font-medium ${
+                    stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                  }`}>
+                    {stat.change}
+                  </span>
+                  <span className="text-sm text-muted-foreground ml-1">
+                    from last month
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
 
-        {/* Enhanced featured bills section */}
-        <section className="mb-12" aria-labelledby="featured-bills">
-          <div className="flex items-center justify-between mb-6">
-            <h3 id="featured-bills" className="text-2xl font-bold text-foreground">
-              Featured Bills
-            </h3>
-            <Link to="/bills">
-              <Button 
-                variant="outline" 
-                className="btn-enhanced focus:ring-2 focus:ring-primary/50 transition-all duration-200"
-                aria-label="View all legislative bills"
-              >
+      <div className="grid md:grid-cols-2 gap-6">
+        {/* Recent Activity */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              Recent Legislative Activity
+            </CardTitle>
+            <CardDescription>
+              Latest updates on bills and legislative proceedings
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {recentBills.map((bill) => (
+              <div key={bill.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex-1">
+                  <h4 className="font-medium text-sm">{bill.title}</h4>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge variant="outline" className="text-xs">
+                      {bill.status}
+                    </Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      {bill.category}
+                    </Badge>
+                    <Badge className={`text-xs ${getUrgencyColor(bill.urgency)}`}>
+                      {bill.urgency} priority
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Updated {bill.lastUpdate}
+                  </p>
+                </div>
+                <Link href={`/bills/${bill.id}`}>
+                  <Button size="sm" variant="ghost">
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </Link>
+              </div>
+            ))}
+            <Link href="/bills">
+              <Button variant="outline" className="w-full">
                 View All Bills
               </Button>
             </Link>
-          </div>
+          </CardContent>
+        </Card>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {featuredBills.map((bill) => (
-              <Card 
-                key={bill.id} 
-                className="card-enhanced card-hover focus-within:ring-2 focus-within:ring-primary/20 transition-all duration-300"
-                role="article"
-                aria-labelledby={`bill-title-${bill.id}`}
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between gap-4">
-                    <CardTitle className="text-lg font-semibold">
-                      <Link 
-                        to={`/bills/${bill.id}`} 
-                        className="hover:text-primary transition-colors duration-200 focus:outline-none focus:underline"
-                        id={`bill-title-${bill.id}`}
-                      >
-                        {bill.title}
-                      </Link>
-                    </CardTitle>
-                    <div className="flex gap-2 flex-wrap">
-                      <Badge 
-                        className={`status-badge border ${getStatusBadgeClass(bill.status)} transition-colors duration-200`}
-                        aria-label={bill.statusAriaLabel}
-                      >
-                        {bill.status.charAt(0).toUpperCase() + bill.status.slice(1)}
-                      </Badge>
-                      <Badge 
-                        className={`status-indicator border ${getRiskBadgeClass(bill.conflict_level)}`}
-                        aria-label={`Conflict of interest risk level: ${bill.conflict_level}`}
-                      >
-                        <AlertCircle className="h-3 w-3 mr-1" aria-hidden="true" />
-                        {bill.conflict_level.charAt(0).toUpperCase() + bill.conflict_level.slice(1)} Risk
-                      </Badge>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-4 leading-relaxed">
-                    {bill.summary}
+        {/* Public Participation */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Public Participation
+            </CardTitle>
+            <CardDescription>
+              Get involved in the democratic process
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                <AlertCircle className="w-5 h-5 text-blue-600" />
+                <div>
+                  <h4 className="font-medium text-sm">Open for Comment</h4>
+                  <p className="text-xs text-muted-foreground">
+                    3 bills currently seeking public input
                   </p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <Users className="h-4 w-4" aria-hidden="true" />
-                      <span aria-label={`${bill.sponsor_count} bill sponsors`}>
-                        {bill.sponsor_count} sponsors
-                      </span>
-                    </div>
-                    <Link to={`/bills/${bill.id}`}>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-primary hover:text-primary-dark hover:bg-primary/10 transition-all duration-200 focus:ring-2 focus:ring-primary/50"
-                        aria-label={`Analyze ${bill.title} in detail`}
-                      >
-                        <Eye className="h-4 w-4 mr-1" aria-hidden="true" />
-                        Analyze
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-
-        {/* Enhanced features grid with improved interaction states */}
-        <section className="mb-12" aria-labelledby="platform-features">
-          <h2 id="platform-features" className="sr-only">Platform Features</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="card-enhanced hover:shadow-lg transition-all duration-300 group">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors duration-300">
-                    <FileText className="h-6 w-6" aria-hidden="true" />
-                  </div>
-                  <CardTitle className="text-lg">Legislative Tracking</CardTitle>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4 leading-relaxed">
-                  Track bills from introduction to final vote. Get alerts on bills that matter to you 
-                  and understand their real-world impact on your community.
-                </p>
-                <Link to="/bills">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="btn-enhanced focus:ring-2 focus:ring-primary/50 transition-all duration-200"
-                    aria-label="Browse all legislative bills"
-                  >
-                    Browse Bills
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+              </div>
 
-            <Card className="card-enhanced hover:shadow-lg transition-all duration-300 group">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-accent/10 text-accent group-hover:bg-accent/20 transition-colors duration-300">
-                    <BarChart3 className="h-6 w-6" aria-hidden="true" />
-                  </div>
-                  <CardTitle className="text-lg">Impact Analysis</CardTitle>
+              <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                <CheckCircle className="w-5 h-5 text-green-600" />
+                <div>
+                  <h4 className="font-medium text-sm">Recent Submissions</h4>
+                  <p className="text-xs text-muted-foreground">
+                    127 public comments submitted this week
+                  </p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4 leading-relaxed">
-                  Understand how proposed laws will affect different groups, sectors, and regions. 
-                  Get clear explanations of complex legislation in plain language.
-                </p>
-                <Link to="/analysis">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="btn-enhanced focus:ring-2 focus:ring-accent/50 transition-all duration-200"
-                    aria-label="Explore detailed impact analysis"
-                  >
-                    Explore Analysis
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+              </div>
 
-            <Card className="card-enhanced hover:shadow-lg transition-all duration-300 group">
-              <CardHeader>
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-success/10 text-success group-hover:bg-success/20 transition-colors duration-300">
-                    <Users className="h-6 w-6" aria-hidden="true" />
-                  </div>
-                  <CardTitle className="text-lg">Transparency Network</CardTitle>
+              <div className="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
+                <Clock className="w-5 h-5 text-yellow-600" />
+                <div>
+                  <h4 className="font-medium text-sm">Closing Soon</h4>
+                  <p className="text-xs text-muted-foreground">
+                    2 bills closing for comments in 3 days
+                  </p>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4 leading-relaxed">
-                  See who sponsors bills, their connections, and potential conflicts of interest. 
-                  Join a community of citizens working for legislative transparency.
-                </p>
-                <Link to="/bill-sponsorship-analysis">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="btn-enhanced focus:ring-2 focus:ring-success/50 transition-all duration-200"
-                    aria-label="View transparency network analysis"
-                  >
-                    View Network
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
+              </div>
+            </div>
 
-        {/* Enhanced call to action with better visual hierarchy */}
-        <section className="text-center bg-muted rounded-xl p-8 border border-border/50" aria-labelledby="cta-heading">
-          <h3 id="cta-heading" className="text-2xl font-bold text-foreground mb-4">
-            Stay Informed About Legislative Transparency
-          </h3>
-          <p className="text-muted-foreground mb-6 max-w-2xl mx-auto leading-relaxed">
-            Join thousands of citizens, journalists, and civil society organizations using Chanuka 
-            to track legislative processes and ensure accountability in governance.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/dashboard">
-              <Button 
-                className="btn-primary focus:ring-2 focus:ring-primary/50 transition-all duration-200 min-w-[140px]"
-                aria-label="Get started with your personal dashboard"
-              >
-                <TrendingUp className="h-4 w-4 mr-2" aria-hidden="true" />
-                Get Started
-              </Button>
-            </Link>
-            <Link to="/bills">
-              <Button 
-                variant="outline" 
-                className="btn-enhanced focus:ring-2 focus:ring-primary/50 transition-all duration-200 min-w-[140px]"
-                aria-label="Browse all legislative bills"
-              >
-                Browse Bills
-              </Button>
-            </Link>
+            <div className="grid grid-cols-2 gap-2">
+              <Link href="/community-input">
+                <Button className="w-full">
+                  Submit Input
+                </Button>
+              </Link>
+              <Link href="/expert-verification">
+                <Button variant="outline" className="w-full">
+                  Expert Review
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Platform Features */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Platform Features</CardTitle>
+          <CardDescription>
+            Explore the tools available for civic engagement and transparency
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="text-center space-y-2">
+              <FileText className="w-12 h-12 mx-auto text-blue-600" />
+              <h3 className="font-semibold">Bill Tracking</h3>
+              <p className="text-sm text-muted-foreground">
+                Follow legislation through every stage of the parliamentary process
+              </p>
+              <Link href="/bills">
+                <Button variant="outline" size="sm">
+                  Explore Bills
+                </Button>
+              </Link>
+            </div>
+
+            <div className="text-center space-y-2">
+              <Users className="w-12 h-12 mx-auto text-green-600" />
+              <h3 className="font-semibold">Community Input</h3>
+              <p className="text-sm text-muted-foreground">
+                Participate in public consultations and share your views
+              </p>
+              <Link href="/community-input">
+                <Button variant="outline" size="sm">
+                  Join Discussion
+                </Button>
+              </Link>
+            </div>
+
+            <div className="text-center space-y-2">
+              <TrendingUp className="w-12 h-12 mx-auto text-purple-600" />
+              <h3 className="font-semibold">Analysis Tools</h3>
+              <p className="text-sm text-muted-foreground">
+                Access expert analysis and transparency reports
+              </p>
+              <Link href="/bill-sponsorship-analysis">
+                <Button variant="outline" size="sm">
+                  View Analysis
+                </Button>
+              </Link>
+            </div>
           </div>
-        </section>
-      </main>
+        </CardContent>
+      </Card>
     </div>
   );
-}
+};
+
+export default HomePage;
