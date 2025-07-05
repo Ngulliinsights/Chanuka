@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import { db } from './db.js';
 import { router as indexRouter } from './routes/index.js';
 import { router as systemRouter } from './routes/system.js';
-import { router as billsRouter } from './routes/bills.js';
+import { setupBillRoutes } from './routes/bills.js';
 import { router as sponsorshipRouter } from './routes/sponsorship.js';
 import { router as analysisRouter } from './routes/analysis.js';
 import { router as sponsorsRouter } from './routes/sponsors.js';
@@ -30,7 +30,7 @@ app.use(requestLogger);
 // API Routes
 app.use('/api', indexRouter);
 app.use('/api/system', systemRouter);
-app.use('/api/bills', billsRouter);
+app.use('/api/bills', setupBillRoutes);
 app.use('/api/sponsorship', sponsorshipRouter);
 app.use('/api/analysis', analysisRouter);
 app.use('/api/sponsors', sponsorsRouter);
