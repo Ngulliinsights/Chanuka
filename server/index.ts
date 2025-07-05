@@ -1,70 +1,72 @@
-import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import express from 'express';
+import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { db } from './db.js';
+import { router as indexRouter } from './routes/index.js';
+import { router as systemRouter } from './routes/system.js';
+import { router as billsRouter } from './routes/bills.js';
+import { router as sponsorshipRouter } from './routes/sponsorship.js';
+import { router as analysisRouter } from './routes/analysis.js';
+import { router as sponsorsRouter } from './routes/sponsors.js';
+import { router as authRouter } from './routes/auth.js';
+import { router as usersRouter } from './routes/users.js';
+import { router as verificationRouter } from './routes/verification.js';
+import { router as healthRouter } from './routes/health.js';
+import { errorHandler } from './middleware/error-handler.js';
+import { requestLogger } from './middleware/request-logger.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
+const PORT = process.env.PORT || 5000;
+
+// Middleware
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(requestLogger);
 
-app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+// API Routes
+app.use('/api', indexRouter);
+app.use('/api/system', systemRouter);
+app.use('/api/bills', billsRouter);
+app.use('/api/sponsorship', sponsorshipRouter);
+app.use('/api/analysis', analysisRouter);
+app.use('/api/sponsors', sponsorsRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/verification', verificationRouter);
+app.use('/api/health', healthRouter);
 
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
+// Serve static files from client dist directory
+const clientDistPath = path.join(__dirname, '../client/dist');
+app.use(express.static(clientDistPath));
 
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
-    }
-  });
-
-  next();
+// Handle SPA routing - serve index.html for all non-API routes
+app.get('*', (req, res) => {
+  if (req.path.startsWith('/api/')) {
+    res.status(404).json({ error: 'API endpoint not found' });
+  } else {
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  }
 });
 
-(async () => {
-  const server = await registerRoutes(app);
+// Error handling
+app.use(errorHandler);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    console.error('Server error:', err);
-    res.status(status).json({ message });
-  });
-
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+// Test database connection
+async function testConnection() {
+  try {
+    await db.execute('SELECT 1');
+    console.log('Database connection established successfully');
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    process.exit(1);
   }
+}
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
-})();
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
+  testConnection();
+});
