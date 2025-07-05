@@ -7,10 +7,14 @@ export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
   name: text("name").notNull(),
   role: text("role").notNull().default("citizen"), // citizen, expert, admin, journalist, advocate
   verificationStatus: text("verification_status").notNull().default("pending"), // pending, verified, rejected
+  preferences: jsonb("preferences"),
   isActive: boolean("is_active").default(true),
+  lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -41,6 +45,8 @@ export const bills = pgTable("bills", {
   sponsorId: uuid("sponsor_id"),
   category: text("category"), // healthcare, education, etc.
   tags: text("tags").array(),
+  viewCount: integer("view_count").default(0),
+  shareCount: integer("share_count").default(0),
   complexityScore: integer("complexity_score"), // 1-10 scale
   constitutionalConcerns: jsonb("constitutional_concerns"),
   stakeholderAnalysis: jsonb("stakeholder_analysis"),
@@ -70,9 +76,13 @@ export const billEngagement = pgTable("bill_engagement", {
   id: serial("id").primaryKey(),
   billId: integer("bill_id").notNull(),
   userId: uuid("user_id").notNull(),
-  engagementType: text("engagement_type").notNull(), // view, bookmark, share, comment, vote
-  metadata: jsonb("metadata"), // additional data like share platform, vote type
+  viewCount: integer("view_count").default(0),
+  commentCount: integer("comment_count").default(0),
+  shareCount: integer("share_count").default(0),
+  engagementScore: numeric("engagement_score", { precision: 10, scale: 2 }).default("0"),
+  lastEngaged: timestamp("last_engaged").defaultNow(),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Notifications system
@@ -169,6 +179,34 @@ export const billSectionConflicts = pgTable("bill_section_conflicts", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Expert verifications table
+export const expertVerifications = pgTable("expert_verifications", {
+  id: serial("id").primaryKey(),
+  billId: integer("bill_id").notNull(),
+  expertId: uuid("expert_id").notNull(),
+  verificationStatus: text("verification_status").notNull(), // verified, disputed, pending
+  confidence: numeric("confidence", { precision: 5, scale: 4 }),
+  feedback: text("feedback"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User interests table for recommendation system
+export const userInterests = pgTable("user_interests", {
+  id: serial("id").primaryKey(),
+  userId: uuid("user_id").notNull(),
+  interest: text("interest").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Bill tags table for categorization
+export const billTags = pgTable("bill_tags", {
+  id: serial("id").primaryKey(),
+  billId: integer("bill_id").notNull(),
+  tag: text("tag").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas for legislative platform
 export const insertUserSchema = createInsertSchema(users).omit({ 
   id: true, 
@@ -222,3 +260,5 @@ export type SponsorAffiliation = typeof sponsorAffiliations.$inferSelect;
 export type BillSponsorship = typeof billSponsorships.$inferSelect;
 export type SponsorTransparency = typeof sponsorTransparency.$inferSelect;
 export type BillSectionConflict = typeof billSectionConflicts.$inferSelect;
+export type UserInterest = typeof userInterests.$inferSelect;
+export type BillTag = typeof billTags.$inferSelect;
