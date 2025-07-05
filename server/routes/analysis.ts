@@ -1,15 +1,71 @@
 
 import express from 'express';
-import { asyncHandler } from '../utils/errors';
-
-const router = express.Router();
+import { legislativeStorage } from '../storage/legislative-storage';
+import { insertAnalysisSchema } from '@shared/schema';
+import { z } from 'zod';
 
 export function setupAnalysisRoutes(app: express.Router) {
-  // Placeholder for future analysis endpoints
-  app.get('/analysis/health', asyncHandler(async (req, res) => {
+  // Get analysis for a specific bill
+  app.get('/bills/:billId/analysis', async (req, res) => {
+    try {
+      const billId = parseInt(req.params.billId);
+      if (isNaN(billId)) {
+        return res.status(400).json({ error: 'Invalid bill ID' });
+      }
+
+      const analysis = await legislativeStorage.getBillAnalysis(billId);
+      res.json(analysis);
+    } catch (error) {
+      console.error('Error fetching bill analysis:', error);
+      res.status(500).json({ error: 'Failed to fetch bill analysis' });
+    }
+  });
+
+  // Create new analysis for a bill
+  app.post('/bills/:billId/analysis', async (req, res) => {
+    try {
+      const billId = parseInt(req.params.billId);
+      if (isNaN(billId)) {
+        return res.status(400).json({ error: 'Invalid bill ID' });
+      }
+
+      const analysisData = insertAnalysisSchema.parse({
+        ...req.body,
+        billId
+      });
+
+      const analysis = await legislativeStorage.createAnalysis(analysisData);
+      res.status(201).json(analysis);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Invalid analysis data', details: error.errors });
+      }
+      console.error('Error creating analysis:', error);
+      res.status(500).json({ error: 'Failed to create analysis' });
+    }
+  });
+
+  // Get bill conflicts/constitutional issues
+  app.get('/bills/:billId/conflicts', async (req, res) => {
+    try {
+      const billId = parseInt(req.params.billId);
+      if (isNaN(billId)) {
+        return res.status(400).json({ error: 'Invalid bill ID' });
+      }
+
+      const conflicts = await legislativeStorage.getBillConflicts(billId);
+      res.json(conflicts);
+    } catch (error) {
+      console.error('Error fetching bill conflicts:', error);
+      res.status(500).json({ error: 'Failed to fetch bill conflicts' });
+    }
+  });
+
+  // Analysis service health check
+  app.get('/analysis/health', async (req, res) => {
     res.json({
       status: 'Analysis service healthy',
       timestamp: new Date().toISOString()
     });
-  }));
+  });
 }

@@ -1,81 +1,115 @@
 
 import express from 'express';
-import { db } from '../db';
-import { sponsors, billSponsorships } from '@shared/schema';
-import { eq } from 'drizzle-orm';
-import { authenticateToken } from '../middleware';
-import { asyncHandler } from '../utils/errors';
-import { ValidationError } from '../utils/errors';
-
-const router = express.Router();
+import { legislativeStorage } from '../storage/legislative-storage';
+import { insertSponsorSchema } from '@shared/schema';
+import { z } from 'zod';
 
 export function setupSponsorRoutes(app: express.Router) {
-  // Get all active sponsors
-  app.get('/sponsors', asyncHandler(async (req, res) => {
-    const allSponsors = await db.select().from(sponsors).where(eq(sponsors.isActive, true));
-    res.json(allSponsors);
-  }));
-
-  // Create new sponsor
-  app.post('/sponsors', authenticateToken, asyncHandler(async (req, res) => {
-    const sponsorData = req.body;
-    
-    // Validate required fields
-    if (!sponsorData.name || !sponsorData.role) {
-      throw new ValidationError('Name and role are required');
+  // Get all sponsors
+  app.get('/sponsors', async (req, res) => {
+    try {
+      const sponsors = await legislativeStorage.getSponsors();
+      res.json(sponsors);
+    } catch (error) {
+      console.error('Error fetching sponsors:', error);
+      res.status(500).json({ error: 'Failed to fetch sponsors' });
     }
-    
-    const newSponsor = await db.insert(sponsors).values(sponsorData).returning();
-    res.status(201).json(newSponsor[0]);
-  }));
+  });
 
-  // Add sponsor to bill
-  app.post('/bills/:billId/sponsors/:sponsorId', authenticateToken, asyncHandler(async (req, res) => {
-    const { billId, sponsorId } = req.params;
-    const { sponsorshipType } = req.body;
+  // Get specific sponsor with details
+  app.get('/sponsors/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid sponsor ID' });
+      }
 
-    if (!sponsorshipType) {
-      throw new ValidationError('Sponsorship type is required');
+      const sponsor = await legislativeStorage.getSponsor(id);
+      if (!sponsor) {
+        return res.status(404).json({ error: 'Sponsor not found' });
+      }
+
+      // Get additional sponsor data
+      const [affiliations, transparency] = await Promise.all([
+        legislativeStorage.getSponsorAffiliations(id),
+        legislativeStorage.getSponsorTransparency(id)
+      ]);
+
+      res.json({
+        ...sponsor,
+        affiliations,
+        transparency
+      });
+    } catch (error) {
+      console.error('Error fetching sponsor:', error);
+      res.status(500).json({ error: 'Failed to fetch sponsor' });
     }
+  });
 
-    const sponsorship = await db.insert(billSponsorships).values({
-      billId: parseInt(billId),
-      sponsorId: parseInt(sponsorId),
-      sponsorshipType,
-      sponsorshipDate: new Date(),
-      isActive: true
-    }).returning();
+  // Get sponsor affiliations
+  app.get('/sponsors/:id/affiliations', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid sponsor ID' });
+      }
 
-    res.status(201).json(sponsorship[0]);
-  }));
-
-  // Update sponsor
-  app.put('/sponsors/:sponsorId', authenticateToken, asyncHandler(async (req, res) => {
-    const { sponsorId } = req.params;
-    const updateData = req.body;
-    
-    const updatedSponsor = await db
-      .update(sponsors)
-      .set(updateData)
-      .where(eq(sponsors.id, parseInt(sponsorId)))
-      .returning();
-    
-    if (!updatedSponsor.length) {
-      throw new ValidationError('Sponsor not found');
+      const affiliations = await legislativeStorage.getSponsorAffiliations(id);
+      res.json(affiliations);
+    } catch (error) {
+      console.error('Error fetching affiliations:', error);
+      res.status(500).json({ error: 'Failed to fetch affiliations' });
     }
-    
-    res.json(updatedSponsor[0]);
-  }));
+  });
 
-  // Deactivate sponsor
-  app.delete('/sponsors/:sponsorId', authenticateToken, asyncHandler(async (req, res) => {
-    const { sponsorId } = req.params;
-    
-    await db
-      .update(sponsors)
-      .set({ isActive: false })
-      .where(eq(sponsors.id, parseInt(sponsorId)));
-    
-    res.status(204).send();
-  }));
+  // Get sponsor transparency records
+  app.get('/sponsors/:id/transparency', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid sponsor ID' });
+      }
+
+      const transparency = await legislativeStorage.getSponsorTransparency(id);
+      res.json(transparency);
+    } catch (error) {
+      console.error('Error fetching transparency records:', error);
+      res.status(500).json({ error: 'Failed to fetch transparency records' });
+    }
+  });
+
+  // Create new sponsor (admin only in real app)
+  app.post('/sponsors', async (req, res) => {
+    try {
+      const sponsorData = insertSponsorSchema.parse(req.body);
+      const sponsor = await legislativeStorage.createSponsor(sponsorData);
+      res.status(201).json(sponsor);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Invalid sponsor data', details: error.errors });
+      }
+      console.error('Error creating sponsor:', error);
+      res.status(500).json({ error: 'Failed to create sponsor' });
+    }
+  });
+
+  // Update sponsor (admin only in real app)
+  app.put('/sponsors/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid sponsor ID' });
+      }
+
+      const sponsor = await legislativeStorage.updateSponsor(id, req.body);
+      if (!sponsor) {
+        return res.status(404).json({ error: 'Sponsor not found' });
+      }
+
+      res.json(sponsor);
+    } catch (error) {
+      console.error('Error updating sponsor:', error);
+      res.status(500).json({ error: 'Failed to update sponsor' });
+    }
+  });
 }
