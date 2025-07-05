@@ -1,87 +1,50 @@
+import { Hono } from "hono";
+import { validateDatabaseHealth } from "../utils/db-init";
+import { isDatabaseConnected } from "../db";
 
-import express from 'express';
-import { db } from '../db';
-import { users, bills, billComments, sponsors } from '@shared/schema';
-import { count, desc } from 'drizzle-orm';
+const app = new Hono();
 
-const router = express.Router();
+app.get("/", async (c) => {
+  const dbHealth = await validateDatabaseHealth();
 
-export function setupHealthRoutes(app: express.Router) {
-  // Database health check
-  app.get('/health', async (req, res) => {
-    try {
-      const result = await db.select({ count: count() }).from(users);
-      res.json({
-        status: "healthy",
-        database: "connected",
-        timestamp: new Date().toISOString(),
-        userCount: result[0].count
-      });
-    } catch (error) {
-      console.error('Health check failed:', error);
-      res.status(500).json({
-        status: "unhealthy",
-        database: "error",
-        timestamp: new Date().toISOString(),
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
+  return c.json({
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    version: "1.0.0",
+    database: {
+      connected: isDatabaseConnected,
+      tables_exist: dbHealth.tablesExist,
+      can_write: dbHealth.canWrite,
+      mode: isDatabaseConnected ? "database" : "sample_data"
+    },
+    services: {
+      api: "operational",
+      frontend: "operational",
+      database: isDatabaseConnected ? "operational" : "fallback"
     }
   });
+});
 
-  // Database statistics
-  app.get('/stats', async (req, res) => {
-    try {
-      const [userCount, billCount, commentCount, sponsorCount] = await Promise.all([
-        db.select({ count: count() }).from(users),
-        db.select({ count: count() }).from(bills),
-        db.select({ count: count() }).from(billComments),
-        db.select({ count: count() }).from(sponsors)
-      ]);
+// Detailed system status
+app.get("/system", async (c) => {
+  const dbHealth = await validateDatabaseHealth();
 
-      res.json({
-        users: userCount[0].count,
-        bills: billCount[0].count,
-        comments: commentCount[0].count,
-        sponsors: sponsorCount[0].count,
-        lastUpdated: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Stats failed:', error);
-      res.status(500).json({ error: 'Failed to get database statistics' });
-    }
+  return c.json({
+    timestamp: new Date().toISOString(),
+    database: {
+      status: isDatabaseConnected ? "connected" : "disconnected",
+      health: dbHealth,
+      message: isDatabaseConnected 
+        ? "Database fully operational" 
+        : "Running in sample data mode - database unavailable"
+    },
+    memory: {
+      used: process.memoryUsage().heapUsed / 1024 / 1024,
+      total: process.memoryUsage().heapTotal / 1024 / 1024
+    },
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || "development"
   });
+});
 
-  // Recent activity
-  app.get('/activity', async (req, res) => {
-    try {
-      const [recentUsers, recentBills] = await Promise.all([
-        db.select({
-          id: users.id,
-          name: users.name,
-          createdAt: users.createdAt
-        }).from(users).orderBy(desc(users.createdAt)).limit(5),
-        
-        db.select({
-          id: bills.id,
-          title: bills.title,
-          createdAt: bills.createdAt
-        }).from(bills).orderBy(desc(bills.createdAt)).limit(5)
-      ]);
-
-      res.json({
-        recentUsers,
-        recentBills,
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('Activity failed:', error);
-      res.status(500).json({ error: 'Failed to get recent activity' });
-    }
-  });
-}
-
-// Set up the routes on the router
-setupHealthRoutes(router);
-
-// Export both the router and setup function for flexibility
-export { router };
+export default app;

@@ -1,383 +1,229 @@
-import express from 'express';
-import { legislativeStorage } from '../storage/legislative-storage';
-import { insertBillSchema, insertBillCommentSchema } from '@shared/schema';
-import { z } from 'zod';
+import { Hono } from "hono";
+import { db, bills, billComments, billEngagement, isDatabaseConnected } from "../db";
+import { eq, desc, and, sql, count, avg } from "drizzle-orm";
+import { z } from "zod";
+import { zValidator } from "@hono/zod-validator";
 
-const router = express.Router();
+const app = new Hono();
 
-export function setupBillRoutes(app: express.Router) {
-  // Get all bills with optional filtering
-  app.get('/', async (req, res) => {
-    try {
-      const { category, status, search } = req.query;
-      
-      let bills;
-      try {
-        if (search) {
-          bills = await legislativeStorage.searchBills(search as string);
-        } else if (category) {
-          bills = await legislativeStorage.getBillsByCategory(category as string);
-        } else if (status) {
-          bills = await legislativeStorage.getBillsByStatus(status as string);
-        } else {
-          bills = await legislativeStorage.getBills();
-        }
-      } catch (dbError) {
-        console.log('Database unavailable, using sample data for demonstration');
-        // Provide sample legislative data that represents typical Kenyan bills
-        bills = [
-          {
-            id: 1,
-            billNumber: "HB-001/2024",
-            title: "Public Finance Management (Amendment) Bill, 2024",
-            description: "A bill to amend the Public Finance Management Act to enhance transparency in public procurement and improve oversight of county government expenditures.",
-            status: "committee",
-            category: "Governance",
-            introducedDate: "2024-01-15T00:00:00.000Z",
-            complexityScore: 7,
-            tags: ["transparency", "procurement", "county-government"],
-            sponsor: "Hon. Jane Kihika",
-            urgency: "medium"
-          },
-          {
-            id: 2,
-            billNumber: "SB-012/2024", 
-            title: "Universal Health Coverage Enhancement Bill, 2024",
-            description: "A bill to strengthen the implementation of Universal Health Coverage by improving healthcare infrastructure and ensuring equitable access to quality healthcare services across all counties.",
-            status: "introduced",
-            category: "Healthcare",
-            introducedDate: "2024-02-20T00:00:00.000Z",
-            complexityScore: 9,
-            tags: ["healthcare", "universal-coverage", "infrastructure"],
-            sponsor: "Hon. Dr. James Nyong'o",
-            urgency: "high"
-          },
-          {
-            id: 3,
-            billNumber: "HB-045/2024",
-            title: "Digital Economy and Technology Innovation Bill, 2024", 
-            description: "A bill to promote digital innovation, support tech startups, and establish frameworks for digital financial services and cryptocurrency regulation.",
-            status: "passed",
-            category: "Technology",
-            introducedDate: "2023-11-10T00:00:00.000Z",
-            complexityScore: 8,
-            tags: ["digital-economy", "fintech", "innovation"],
-            sponsor: "Hon. Peter Kaluma",
-            urgency: "medium"
-          },
-          {
-            id: 4,
-            billNumber: "SB-008/2024",
-            title: "Climate Change (Amendment) Bill, 2024",
-            description: "A bill to enhance Kenya's climate resilience through improved environmental conservation, renewable energy promotion, and adaptation strategies for vulnerable communities.",
-            status: "introduced",
-            category: "Environment", 
-            introducedDate: "2024-03-05T00:00:00.000Z",
-            complexityScore: 6,
-            tags: ["climate-change", "renewable-energy", "conservation"],
-            sponsor: "Hon. Soipan Tuya",
-            urgency: "high"
-          },
-          {
-            id: 5,
-            billNumber: "HB-023/2024",
-            title: "Education Sector Funding Bill, 2024",
-            description: "A bill to increase allocation of resources to education, improve teacher welfare, and enhance infrastructure in public schools, particularly in marginalized areas.",
-            status: "committee",
-            category: "Education",
-            introducedDate: "2024-01-30T00:00:00.000Z", 
-            complexityScore: 5,
-            tags: ["education", "teacher-welfare", "infrastructure"],
-            sponsor: "Hon. Ezekiel Machogu",
-            urgency: "medium"
-          }
-        ];
+// Sample data for fallback mode
+const sampleBills = [
+  {
+    id: "1",
+    title: "Digital Economy and Data Protection Act 2024",
+    summary: "Comprehensive legislation to regulate digital platforms and protect citizen data privacy rights in Kenya.",
+    status: "committee_review",
+    category: "technology",
+    introducedDate: new Date("2024-01-15"),
+    priority: "high",
+    chamber: "national_assembly",
+    sponsor: "Hon. Sarah Mwangi",
+    stage: "second_reading",
+    lastUpdated: new Date("2024-01-20"),
+    fullText: "Full text of the Digital Economy and Data Protection Act...",
+    keyProvisions: ["Data protection rights", "Platform accountability", "Digital taxation"],
+    estimatedImpact: "Affects 30+ million digital users",
+    conflictScore: 85,
+    transparencyGrade: "B+"
+  },
+  {
+    id: "2", 
+    title: "Climate Change Adaptation Fund Bill 2024",
+    summary: "Establishes a national fund for climate adaptation projects and carbon offset programs.",
+    status: "first_reading",
+    category: "environment",
+    introducedDate: new Date("2024-02-01"),
+    priority: "high",
+    chamber: "senate",
+    sponsor: "Hon. James Kimani",
+    stage: "first_reading",
+    lastUpdated: new Date("2024-02-05"),
+    fullText: "Full text of the Climate Change Adaptation Fund Bill...",
+    keyProvisions: ["Climate fund establishment", "Carbon offset programs", "Adaptation financing"],
+    estimatedImpact: "National climate resilience",
+    conflictScore: 45,
+    transparencyGrade: "A-"
+  }
+];
 
-        // Apply filtering to sample data
-        if (search) {
-          const searchTerm = (search as string).toLowerCase();
-          bills = bills.filter(bill => 
-            bill.title.toLowerCase().includes(searchTerm) ||
-            bill.description.toLowerCase().includes(searchTerm) ||
-            bill.billNumber.toLowerCase().includes(searchTerm) ||
-            bill.tags.some(tag => tag.toLowerCase().includes(searchTerm))
-          );
-        }
-        if (category && category !== 'all') {
-          bills = bills.filter(bill => bill.category === category);
-        }
-        if (status && status !== 'all') {
-          bills = bills.filter(bill => bill.status === status);
-        }
+// Get all bills with filtering and pagination
+app.get("/", async (c) => {
+  try {
+    const page = parseInt(c.req.query("page") || "1");
+    const limit = parseInt(c.req.query("limit") || "10");
+    const status = c.req.query("status");
+    const category = c.req.query("category");
+    const search = c.req.query("search");
+
+    if (!isDatabaseConnected) {
+      console.log("Database unavailable, using sample data for demonstration");
+      // Filter sample data based on query parameters
+      let filteredBills = sampleBills;
+
+      if (status) filteredBills = filteredBills.filter(bill => bill.status === status);
+      if (category) filteredBills = filteredBills.filter(bill => bill.category === category);
+      if (search) {
+        const searchTerm = search.toLowerCase();
+        filteredBills = filteredBills.filter(bill => 
+          bill.title.toLowerCase().includes(searchTerm) || 
+          bill.summary.toLowerCase().includes(searchTerm)
+        );
       }
 
-      res.json(bills);
-    } catch (error) {
-      console.error('Error fetching bills:', error);
-      res.status(500).json({ error: 'Failed to fetch bills' });
-    }
-  });
+      const offset = (page - 1) * limit;
+      const paginatedBills = filteredBills.slice(offset, offset + limit);
 
-  // Get specific bill with details
-  app.get('/:id', async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: 'Invalid bill ID' });
-      }
-
-      try {
-        const bill = await legislativeStorage.getBill(id);
-        if (!bill) {
-          return res.status(404).json({ error: 'Bill not found' });
-        }
-
-        // Get additional bill data
-        const [sponsors, analysis, conflicts, engagementStats] = await Promise.all([
-          legislativeStorage.getBillSponsors(id),
-          legislativeStorage.getBillAnalysis(id),
-          legislativeStorage.getBillConflicts(id),
-          legislativeStorage.getBillEngagementStats(id)
-        ]);
-
-        res.json({
-          ...bill,
-          sponsors,
-          analysis,
-          conflicts,
-          engagementStats
-        });
-      } catch (dbError) {
-        console.log('Database unavailable, providing sample bill data');
-        
-        // Sample bill data based on the ID
-        const sampleBills: Record<number, any> = {
-          1: {
-            id: 1,
-            billNumber: "HB-001/2024",
-            title: "Public Finance Management (Amendment) Bill, 2024",
-            description: "A bill to amend the Public Finance Management Act to enhance transparency in public procurement and improve oversight of county government expenditures.",
-            status: "committee",
-            category: "Governance",
-            introducedDate: "2024-01-15T00:00:00.000Z",
-            complexityScore: 7,
-            tags: ["transparency", "procurement", "county-government"],
-            sponsor: "Hon. Jane Kihika",
-            urgency: "medium",
-            fullText: "WHEREAS the Constitution of Kenya under Article 201 requires adherence to principles of openness and accountability in public financial management...",
-            sponsors: [
-              { id: 1, name: "Hon. Jane Kihika", party: "UDA", role: "Primary Sponsor", constituency: "Nakuru County" }
-            ],
-            analysis: {
-              summary: "This bill strengthens oversight mechanisms for county expenditures and introduces mandatory reporting requirements.",
-              constitutionalImplications: "Aligns with Article 201 of the Constitution on public financial management principles.",
-              stakeholderImpact: "Primarily benefits taxpayers through improved accountability. May require additional administrative capacity in counties.",
-              fiscalImpact: "Estimated implementation cost of KSh 2.5 billion over 3 years."
-            },
-            conflicts: [],
-            engagementStats: {
-              views: 1247,
-              comments: 23,
-              shares: 45,
-              bookmarks: 67
-            }
-          },
-          2: {
-            id: 2,
-            billNumber: "SB-012/2024", 
-            title: "Universal Health Coverage Enhancement Bill, 2024",
-            description: "A bill to strengthen the implementation of Universal Health Coverage by improving healthcare infrastructure and ensuring equitable access to quality healthcare services across all counties.",
-            status: "introduced",
-            category: "Healthcare",
-            introducedDate: "2024-02-20T00:00:00.000Z",
-            complexityScore: 9,
-            tags: ["healthcare", "universal-coverage", "infrastructure"],
-            sponsor: "Hon. Dr. James Nyong'o",
-            urgency: "high",
-            fullText: "RECOGNIZING that health is a fundamental human right as enshrined in Article 43 of the Constitution...",
-            sponsors: [
-              { id: 2, name: "Hon. Dr. James Nyong'o", party: "ODM", role: "Primary Sponsor", constituency: "Kisumu County" }
-            ],
-            analysis: {
-              summary: "Comprehensive healthcare reform focusing on infrastructure development and service delivery improvements.",
-              constitutionalImplications: "Directly implements Article 43 constitutional right to healthcare.",
-              stakeholderImpact: "Benefits all Kenyans, particularly those in underserved areas. Significant impact on healthcare workers and facilities.",
-              fiscalImpact: "Estimated budget requirement of KSh 150 billion over 5 years."
-            },
-            conflicts: [],
-            engagementStats: {
-              views: 2156,
-              comments: 67,
-              shares: 123,
-              bookmarks: 89
-            }
-          }
-        };
-
-        const bill = sampleBills[id];
-        if (!bill) {
-          return res.status(404).json({ error: 'Bill not found' });
-        }
-
-        res.json(bill);
-      }
-    } catch (error) {
-      console.error('Error fetching bill:', error);
-      res.status(500).json({ error: 'Failed to fetch bill' });
-    }
-  });
-
-  // Get bill comments
-  app.get('/:id/comments', async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: 'Invalid bill ID' });
-      }
-
-      const comments = await legislativeStorage.getBillComments(id);
-      res.json(comments);
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-      res.status(500).json({ error: 'Failed to fetch comments' });
-    }
-  });
-
-  // Add comment to bill (requires authentication in real app)
-  app.post('/:id/comments', async (req, res) => {
-    try {
-      const billId = parseInt(req.params.id);
-      if (isNaN(billId)) {
-        return res.status(400).json({ error: 'Invalid bill ID' });
-      }
-
-      // Validate request body
-      const commentData = insertBillCommentSchema.parse({
-        ...req.body,
-        billId
+      return c.json({
+        bills: paginatedBills,
+        pagination: {
+          page,
+          limit,
+          total: filteredBills.length,
+          pages: Math.ceil(filteredBills.length / limit)
+        },
+        mode: "sample_data"
       });
-
-      const comment = await legislativeStorage.createBillComment(commentData);
-      res.status(201).json(comment);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: 'Invalid comment data', details: error.errors });
-      }
-      console.error('Error creating comment:', error);
-      res.status(500).json({ error: 'Failed to create comment' });
     }
-  });
 
-  // Record bill engagement (view, bookmark, share, etc.)
-  app.post('/:id/engagement', async (req, res) => {
-    try {
-      const billId = parseInt(req.params.id);
-      if (isNaN(billId)) {
-        return res.status(400).json({ error: 'Invalid bill ID' });
+    const offset = (page - 1) * limit;
+
+    let query = db.select().from(bills);
+
+    // Add filters
+    const conditions = [];
+    if (status) conditions.push(eq(bills.status, status));
+    if (category) conditions.push(eq(bills.category, category));
+    if (search) {
+      conditions.push(sql`${bills.title} ILIKE ${`%${search}%`} OR ${bills.summary} ILIKE ${`%${search}%`}`);
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    const result = await query
+      .limit(limit)
+      .offset(offset)
+      .orderBy(desc(bills.introducedDate));
+
+    // Get total count for pagination
+    const totalQuery = db.select({ count: count() }).from(bills);
+    if (conditions.length > 0) {
+      totalQuery.where(and(...conditions));
+    }
+    const [{ count: total }] = await totalQuery;
+
+    return c.json({
+      bills: result,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      },
+      mode: "database"
+    });
+  } catch (error) {
+    console.error("Error fetching bills:", error);
+
+    // Fallback to sample data on error
+    console.log("Database error, falling back to sample data");
+    return c.json({
+      bills: sampleBills,
+      pagination: {
+        page: 1,
+        limit: 10,
+        total: sampleBills.length,
+        pages: 1
+      },
+      mode: "fallback",
+      error: "Database temporarily unavailable"
+    });
+  }
+});
+
+// Get bill categories
+app.get("/categories", async (c) => {
+  const categories = [
+    { id: "technology", name: "Technology & Digital", count: 15 },
+    { id: "environment", name: "Environment & Climate", count: 23 },
+    { id: "healthcare", name: "Healthcare & Social", count: 18 },
+    { id: "economy", name: "Economy & Finance", count: 31 },
+    { id: "education", name: "Education & Training", count: 12 },
+    { id: "infrastructure", name: "Infrastructure", count: 19 },
+    { id: "governance", name: "Governance & Law", count: 25 }
+  ];
+
+  return c.json({ categories });
+});
+
+// Get bill statuses
+app.get("/statuses", async (c) => {
+  const statuses = [
+    { id: "introduced", name: "Introduced", count: 45 },
+    { id: "first_reading", name: "First Reading", count: 28 },
+    { id: "committee_review", name: "Committee Review", count: 35 },
+    { id: "second_reading", name: "Second Reading", count: 22 },
+    { id: "third_reading", name: "Third Reading", count: 15 },
+    { id: "passed", name: "Passed", count: 67 },
+    { id: "rejected", name: "Rejected", count: 8 },
+    { id: "withdrawn", name: "Withdrawn", count: 3 }
+  ];
+
+  return c.json({ statuses });
+});
+
+// Get specific bill by ID
+app.get("/:id", async (c) => {
+  try {
+    const billId = c.req.param("id");
+
+    if (!isDatabaseConnected) {
+      const sampleBill = sampleBills.find(b => b.id === billId);
+      if (!sampleBill) {
+        return c.json({ error: "Bill not found" }, 404);
       }
-
-      const { userId, viewCount, commentCount, shareCount } = req.body;
-      
-      if (!userId) {
-        return res.status(400).json({ error: 'userId is required' });
-      }
-
-      const engagement = await legislativeStorage.recordBillEngagement({
-        billId,
-        userId: userId as string,
-        viewCount: viewCount || null,
-        commentCount: commentCount || null,
-        shareCount: shareCount || null,
-        engagementScore: "0",
-        lastEngaged: new Date(),
-        updatedAt: new Date()
+      return c.json({ 
+        bill: sampleBill,
+        mode: "sample_data"
       });
-
-      res.status(201).json(engagement);
-    } catch (error) {
-      console.error('Error recording engagement:', error);
-      res.status(500).json({ error: 'Failed to record engagement' });
     }
-  });
 
-  // Get bill categories (for filtering)
-  app.get('/categories', async (req, res) => {
-    try {
-      // This would typically come from a database query to get distinct categories
-      const categories = [
-        'Healthcare',
-        'Education', 
-        'Economic Development',
-        'Infrastructure',
-        'Environment',
-        'Social Services',
-        'Technology',
-        'Governance',
-        'Security',
-        'Agriculture'
-      ];
-      res.json(categories);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-      res.status(500).json({ error: 'Failed to fetch categories' });
+    const [bill] = await db.select().from(bills).where(eq(bills.id, billId));
+
+    if (!bill) {
+      return c.json({ error: "Bill not found" }, 404);
     }
-  });
 
-  // Get bill statuses (for filtering)
-  app.get('/statuses', async (req, res) => {
-    try {
-      const statuses = [
-        'introduced',
-        'committee',
-        'passed',
-        'failed',
-        'signed'
-      ];
-      res.json(statuses);
-    } catch (error) {
-      console.error('Error fetching statuses:', error);
-      res.status(500).json({ error: 'Failed to fetch statuses' });
-    }
-  });
+    // Get engagement stats
+    const [engagementStats] = await db
+      .select({
+        views: count(billEngagement.id),
+        avgRating: avg(billEngagement.rating)
+      })
+      .from(billEngagement)
+      .where(eq(billEngagement.billId, billId));
 
-  // Create new bill (admin only in real app)
-  app.post('/', async (req, res) => {
-    try {
-      const billData = insertBillSchema.parse(req.body);
-      const bill = await legislativeStorage.createBill(billData);
-      res.status(201).json(bill);
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({ error: 'Invalid bill data', details: error.errors });
-      }
-      console.error('Error creating bill:', error);
-      res.status(500).json({ error: 'Failed to create bill' });
-    }
-  });
+    // Get recent comments
+    const recentComments = await db
+      .select()
+      .from(billComments)
+      .where(eq(billComments.billId, billId))
+      .orderBy(desc(billComments.createdAt))
+      .limit(5);
 
-  // Update bill (admin only in real app)
-  app.put('/:id', async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ error: 'Invalid bill ID' });
-      }
+    return c.json({
+      bill: {
+        ...bill,
+        engagement: engagementStats,
+        recentComments
+      },
+      mode: "database"
+    });
+  } catch (error) {
+    console.error("Error fetching bill:", error);
+    return c.json({ error: "Failed to fetch bill" }, 500);
+  }
+});
 
-      const bill = await legislativeStorage.updateBill(id, req.body);
-      if (!bill) {
-        return res.status(404).json({ error: 'Bill not found' });
-      }
-
-      res.json(bill);
-    } catch (error) {
-      console.error('Error updating bill:', error);
-      res.status(500).json({ error: 'Failed to update bill' });
-    }
-  });
-}
-
-// Set up the routes on the router
-setupBillRoutes(router);
-
-// Export both the router and setup function for flexibility
-export { router };
+export default app;

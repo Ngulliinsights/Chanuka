@@ -16,6 +16,7 @@ import { router as healthRouter } from './routes/health.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { requestLogger } from './middleware/request-logger.js';
 import { setupVite } from './vite.js';
+import { initializeDatabase, validateDatabaseHealth } from "./utils/db-init.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,9 +75,38 @@ async function testConnection() {
   }
 }
 
+// Initialize database on startup
+let databaseStatus = { connected: false, initialized: false };
+
+async function startupInitialization() {
+  console.log("🚀 Starting Chanuka Platform...");
+
+  try {
+    const dbConnected = await initializeDatabase();
+    const healthCheck = await validateDatabaseHealth();
+
+    databaseStatus = {
+      connected: dbConnected,
+      initialized: healthCheck.tablesExist
+    };
+
+    if (dbConnected && healthCheck.tablesExist) {
+      console.log("✅ Platform ready with full database functionality");
+    } else {
+      console.log("⚠️  Platform starting in demonstration mode with sample data");
+    }
+  } catch (error) {
+    console.error("❌ Startup initialization error:", error);
+    console.log("🔄 Continuing with fallback mode...");
+  }
+}
+
+// Run initialization
+await startupInitialization();
+
 const server = app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
-  
+
   // Setup Vite development server integration
   try {
     await setupVite(app, server);
@@ -84,6 +114,6 @@ const server = app.listen(PORT, '0.0.0.0', async () => {
   } catch (error) {
     console.error('Failed to setup Vite:', error);
   }
-  
+
   testConnection();
 });

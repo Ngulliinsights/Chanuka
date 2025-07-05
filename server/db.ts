@@ -30,13 +30,23 @@ if (!connectionString) {
 export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 export const db = drizzle({ client: pool, schema });
 
-// Test database connection on startup
-try {
-  await pool.query('SELECT 1');
-  console.log('Database connection established successfully');
-} catch (error) {
-  console.warn('Database connection failed, using fallback mode:', error);
+// Test database connection on startup with proper async handling
+async function initializeDatabase() {
+  try {
+    const client = await pool.connect();
+    await client.query('SELECT 1');
+    client.release();
+    console.log('✅ Database connection established successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ Database connection failed:', error);
+    console.log('Falling back to sample data mode');
+    return false;
+  }
 }
+
+// Initialize database connection
+export const isDatabaseConnected = await initializeDatabase();
 
 export { 
   bills, 
