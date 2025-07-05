@@ -179,3 +179,229 @@ export default function Dashboard() {
     </div>
   );
 }
+import { useQuery } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Activity, TrendingUp, Users, FileText, MessageSquare, AlertCircle } from "lucide-react";
+import { systemApi, billsApi } from "@/services/api";
+import { Link } from "wouter";
+
+export default function Dashboard() {
+  const { data: health } = useQuery({
+    queryKey: ['health'],
+    queryFn: () => systemApi.getHealth(),
+    refetchInterval: 30000,
+  });
+
+  const { data: bills } = useQuery({
+    queryKey: ['bills'],
+    queryFn: () => billsApi.getBills(),
+  });
+
+  const recentBills = bills?.slice(0, 5) || [];
+  const activeBills = bills?.filter(bill => bill.status === 'active')?.length || 0;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
+          <p className="text-slate-600 mt-2">
+            Monitor legislative activity and community engagement
+          </p>
+        </div>
+
+        {/* System Status */}
+        {health && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5" />
+                System Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${health.database?.connected ? "bg-green-500" : "bg-red-500"}`} />
+                  <span className="text-sm">
+                    Database: {health.database?.mode || "Unknown"}
+                  </span>
+                </div>
+                <Badge variant={health.status === 'healthy' ? 'default' : 'destructive'}>
+                  {health.status}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Bills</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{activeBills}</div>
+              <p className="text-xs text-muted-foreground">
+                Currently in review
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Bills</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{bills?.length || 0}</div>
+              <p className="text-xs text-muted-foreground">
+                All tracked legislation
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Community Input</CardTitle>
+              <MessageSquare className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">142</div>
+              <p className="text-xs text-muted-foreground">
+                Public comments this week
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">573</div>
+              <p className="text-xs text-muted-foreground">
+                +12% from last week
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Bills</CardTitle>
+              <CardDescription>
+                Latest legislative items requiring attention
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {recentBills.map((bill) => (
+                  <div key={bill.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div className="flex-1">
+                      <h4 className="font-medium text-sm">{bill.title}</h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {bill.category} • {bill.status}
+                      </p>
+                    </div>
+                    <Link href={`/bills/${bill.id}`}>
+                      <Button variant="outline" size="sm">
+                        View
+                      </Button>
+                    </Link>
+                  </div>
+                ))}
+                {recentBills.length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No bills available
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Community Engagement</CardTitle>
+              <CardDescription>
+                Public participation metrics
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">Comment Participation</span>
+                    <span className="text-sm text-muted-foreground">73%</span>
+                  </div>
+                  <Progress value={73} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">Expert Verification</span>
+                    <span className="text-sm text-muted-foreground">45%</span>
+                  </div>
+                  <Progress value={45} className="h-2" />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">Public Awareness</span>
+                    <span className="text-sm text-muted-foreground">82%</span>
+                  </div>
+                  <Progress value={82} className="h-2" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>
+              Common tasks and navigation
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Link href="/bills">
+                <Button variant="outline" className="w-full">
+                  <FileText className="h-4 w-4 mr-2" />
+                  View Bills
+                </Button>
+              </Link>
+              <Link href="/verification">
+                <Button variant="outline" className="w-full">
+                  <AlertCircle className="h-4 w-4 mr-2" />
+                  Expert Review
+                </Button>
+              </Link>
+              <Link href="/database">
+                <Button variant="outline" className="w-full">
+                  <Activity className="h-4 w-4 mr-2" />
+                  Database
+                </Button>
+              </Link>
+              <Link href="/bills">
+                <Button variant="outline" className="w-full">
+                  <MessageSquare className="h-4 w-4 mr-2" />
+                  Community
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}

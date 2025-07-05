@@ -4,10 +4,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ThumbsUp, ThumbsDown, MessageCircle, Users, TrendingUp, Filter } from 'lucide-react';
+import { 
+  MessageSquare, 
+  ThumbsUp, 
+  ThumbsDown, 
+  Users, 
+  TrendingUp,
+  Send,
+  Filter,
+  Search,
+  Heart,
+  Share2
+} from 'lucide-react';
 
 interface Comment {
   id: string;
@@ -159,7 +170,7 @@ const CommunityInputPage: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
-                    <MessageCircle className="w-4 h-4" />
+                    <MessageSquare className="w-4 h-4" />
                     {bill.comments}
                   </div>
                   <div className="flex items-center gap-1">
@@ -292,7 +303,7 @@ const CommunityInputPage: React.FC = () => {
                           {comment.dislikes}
                         </Button>
                         <Button variant="ghost" size="sm" className="gap-1">
-                          <MessageCircle className="w-4 h-4" />
+                          <MessageSquare className="w-4 h-4" />
                           {comment.replies} replies
                         </Button>
                       </div>
