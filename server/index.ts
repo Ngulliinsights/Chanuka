@@ -13,6 +13,7 @@ import { router as authRouter } from './routes/auth.js';
 import { router as usersRouter } from './routes/users.js';
 import { router as verificationRouter } from './routes/verification.js';
 import { router as healthRouter } from './routes/health.js';
+import { router as communityRouter } from './routes/community.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { requestLogger } from './middleware/request-logger.js';
 import { setupVite } from './vite.js';
@@ -45,7 +46,8 @@ app.get('/api', (req, res) => {
       health: "/api/health",
       auth: "/api/auth",
       users: "/api/users",
-      verification: "/api/verification"
+      verification: "/api/verification",
+      community: "/api/community"
     }
   });
 });
@@ -60,6 +62,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/verification', verificationRouter);
 app.use('/api/health', healthRouter);
+app.use('/api/community', communityRouter);
 
 // Error handling
 app.use(errorHandler);

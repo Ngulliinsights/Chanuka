@@ -19,3 +19,11 @@ const SelectItem = React.forwardRef<
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ))
+
+export const StatusSelect = ({ value, onChange, statuses }: SelectProps) => (
+  <Select value={value} onValueChange={onChange}>
+    <SelectTrigger className="w-full">
+      <SelectValue placeholder="Filter by status" />
+    </SelectTrigger>
+    <SelectContent>
+      <SelectItem value="all">All Statuses</SelectItem>
