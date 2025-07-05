@@ -3,15 +3,15 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { db } from './db.js';
-import { setupSystemRoutes } from './routes/system.js';
-import { setupBillRoutes } from './routes/bills.js';
-import { setupSponsorshipRoutes } from './routes/sponsorship.js';
+import { router as systemRouter } from './routes/system.js';
+import { router as billsRouter } from './routes/bills.js';
+import { router as sponsorshipRouter } from './routes/sponsorship.js';
 import { router as analysisRouter } from './routes/analysis.js';
-import { setupSponsorRoutes } from './routes/sponsors.js';
+import { router as sponsorsRouter } from './routes/sponsors.js';
 import { router as authRouter } from './routes/auth.js';
-import { setupUserRoutes } from './routes/users.js';
-import { setupVerificationRoutes } from './routes/verification.js';
-import { setupHealthRoutes } from './routes/health.js';
+import { router as usersRouter } from './routes/users.js';
+import { router as verificationRouter } from './routes/verification.js';
+import { router as healthRouter } from './routes/health.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { requestLogger } from './middleware/request-logger.js';
 
@@ -26,23 +26,7 @@ app.use(cors());
 app.use(express.json());
 app.use(requestLogger);
 
-// Create routers for each route group
-const systemRouter = express.Router();
-const billsRouter = express.Router();
-const sponsorshipRouter = express.Router();
-const sponsorsRouter = express.Router();
-const usersRouter = express.Router();
-const verificationRouter = express.Router();
-const healthRouter = express.Router();
-
-// Setup routes using setup functions
-setupSystemRoutes(systemRouter);
-setupBillRoutes(billsRouter);
-setupSponsorshipRoutes(sponsorshipRouter);
-setupSponsorRoutes(sponsorsRouter);
-setupUserRoutes(usersRouter);
-setupVerificationRoutes(verificationRouter);
-setupHealthRoutes(healthRouter);
+// All routers are now imported directly - no setup needed
 
 // Root API endpoint
 app.get('/api', (req, res) => {

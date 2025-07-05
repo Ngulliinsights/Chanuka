@@ -4,7 +4,9 @@ import { eq, desc } from "drizzle-orm";
 import { db } from "../db";
 import { expertVerifications, users } from "../../shared/schema";
 
-export function setupVerificationRoutes(router: Router) {
+const router = Router();
+
+export function setupVerificationRoutes(routerInstance: Router) {
   // Get all verifications for a bill
   router.get("/verification/bills/:billId", async (req, res) => {
     try {
@@ -138,3 +140,9 @@ export function setupVerificationRoutes(router: Router) {
     }
   });
 }
+
+// Set up the routes on the router
+setupVerificationRoutes(router);
+
+// Export both the router and setup function for flexibility
+export { router };

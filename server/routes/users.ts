@@ -4,7 +4,9 @@ import { eq } from "drizzle-orm";
 import { db } from "../db";
 import { users, userInterests } from "../../shared/schema";
 
-export function setupUserRoutes(router: Router) {
+const router = Router();
+
+export function setupUserRoutes(routerInstance: Router) {
   // Get user profile
   router.get("/users/:id", async (req, res) => {
     try {
@@ -165,3 +167,9 @@ export function setupUserRoutes(router: Router) {
     }
   });
 }
+
+// Set up the routes on the router
+setupUserRoutes(router);
+
+// Export both the router and setup function for flexibility
+export { router };

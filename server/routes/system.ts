@@ -2,6 +2,8 @@ import express from 'express';
 import { sql } from 'drizzle-orm';
 import { db } from '../db.js';
 
+const router = express.Router();
+
 export function setupSystemRoutes(app: express.Router) {
   // Database schema information
   app.get('/schema', async (req: express.Request, res: express.Response) => {
