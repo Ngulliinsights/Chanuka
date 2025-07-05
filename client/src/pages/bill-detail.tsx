@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Progress } from '../components/ui/progress';
 import { Separator } from '../components/ui/separator';
-import ImplementationWorkarounds from '../components/bills/implementation-workarounds';
+import { ImplementationWorkarounds } from '../components/bills/implementation-workarounds';
 import { 
   FileText, 
   Calendar, 

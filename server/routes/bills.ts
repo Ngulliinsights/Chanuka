@@ -3,6 +3,8 @@ import { legislativeStorage } from '../storage/legislative-storage';
 import { insertBillSchema, insertBillCommentSchema } from '@shared/schema';
 import { z } from 'zod';
 
+const router = express.Router();
+
 export function setupBillRoutes(app: express.Router) {
   // Get all bills with optional filtering
   app.get('/bills', async (req, res) => {
@@ -110,17 +112,21 @@ export function setupBillRoutes(app: express.Router) {
         return res.status(400).json({ error: 'Invalid bill ID' });
       }
 
-      const { userId, engagementType, metadata } = req.body;
+      const { userId, viewCount, commentCount, shareCount } = req.body;
       
-      if (!userId || !engagementType) {
-        return res.status(400).json({ error: 'userId and engagementType are required' });
+      if (!userId) {
+        return res.status(400).json({ error: 'userId is required' });
       }
 
       const engagement = await legislativeStorage.recordBillEngagement({
         billId,
-        userId,
-        engagementType,
-        metadata
+        userId: userId as string,
+        viewCount: viewCount || null,
+        commentCount: commentCount || null,
+        shareCount: shareCount || null,
+        engagementScore: "0",
+        lastEngaged: new Date(),
+        updatedAt: new Date()
       });
 
       res.status(201).json(engagement);
@@ -205,3 +211,9 @@ export function setupBillRoutes(app: express.Router) {
     }
   });
 }
+
+// Set up the routes on the router
+setupBillRoutes(router);
+
+// Export both the router and setup function for flexibility
+export { router };

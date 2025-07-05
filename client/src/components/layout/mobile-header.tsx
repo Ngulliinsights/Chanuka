@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'wouter';
 import { Menu, X, Search, Gavel } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -14,7 +14,7 @@ const navigation = [
 
 export function MobileHeader() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
+  const [location] = useLocation();
 
   return (
     <>
@@ -55,7 +55,7 @@ export function MobileHeader() {
         <div className="bg-card border-b border-border">
           <nav className="px-4 py-2 space-y-1">
             {navigation.map((item) => {
-              const isActive = location.pathname === item.href;
+              const isActive = location === item.href;
               return (
                 <Link
                   key={item.name}

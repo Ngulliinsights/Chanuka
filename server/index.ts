@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createServer } from 'http';
 import { db } from './db.js';
 import { router as systemRouter } from './routes/system.js';
 import { router as billsRouter } from './routes/bills.js';
@@ -14,12 +15,13 @@ import { router as verificationRouter } from './routes/verification.js';
 import { router as healthRouter } from './routes/health.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { requestLogger } from './middleware/request-logger.js';
+import { setupVite } from './vite.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT || '5000');
 
 // Middleware
 app.use(cors());
@@ -58,19 +60,6 @@ app.use('/api/users', usersRouter);
 app.use('/api/verification', verificationRouter);
 app.use('/api/health', healthRouter);
 
-// Serve static files from client dist directory
-const clientDistPath = path.join(__dirname, '../client/dist');
-app.use(express.static(clientDistPath));
-
-// Handle SPA routing - serve index.html for all non-API routes
-app.get('*', (req, res) => {
-  if (req.path.startsWith('/api/')) {
-    res.status(404).json({ error: 'API endpoint not found' });
-  } else {
-    res.sendFile(path.join(clientDistPath, 'index.html'));
-  }
-});
-
 // Error handling
 app.use(errorHandler);
 
@@ -81,11 +70,20 @@ async function testConnection() {
     console.log('Database connection established successfully');
   } catch (error) {
     console.error('Database connection failed:', error);
-    process.exit(1);
+    console.log('Server will continue in development mode without database');
   }
 }
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
+  
+  // Setup Vite development server integration
+  try {
+    await setupVite(app, server);
+    console.log('Vite development server integrated successfully');
+  } catch (error) {
+    console.error('Failed to setup Vite:', error);
+  }
+  
   testConnection();
 });

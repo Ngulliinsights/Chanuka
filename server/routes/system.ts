@@ -103,3 +103,9 @@ export function setupSystemRoutes(app: express.Router) {
     }
   });
 }
+
+// Set up the routes on the router
+setupSystemRoutes(router);
+
+// Export both the router and setup function for flexibility
+export { router };

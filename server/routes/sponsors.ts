@@ -4,6 +4,8 @@ import { legislativeStorage } from '../storage/legislative-storage';
 import { insertSponsorSchema } from '@shared/schema';
 import { z } from 'zod';
 
+const router = express.Router();
+
 export function setupSponsorRoutes(app: express.Router) {
   // Get all sponsors
   app.get('/sponsors', async (req, res) => {
@@ -113,3 +115,9 @@ export function setupSponsorRoutes(app: express.Router) {
     }
   });
 }
+
+// Set up the routes on the router
+setupSponsorRoutes(router);
+
+// Export both the router and setup function for flexibility
+export { router };

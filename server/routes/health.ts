@@ -4,6 +4,8 @@ import { db } from '../db';
 import { users, bills, billComments, sponsors } from '@shared/schema';
 import { count, desc } from 'drizzle-orm';
 
+const router = express.Router();
+
 export function setupHealthRoutes(app: express.Router) {
   // Database health check
   app.get('/health', async (req, res) => {
@@ -77,3 +79,9 @@ export function setupHealthRoutes(app: express.Router) {
     }
   });
 }
+
+// Set up the routes on the router
+setupHealthRoutes(router);
+
+// Export both the router and setup function for flexibility
+export { router };

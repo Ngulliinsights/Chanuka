@@ -50,7 +50,7 @@
 
 @layer base {
   * {
-    @apply border-custom;
+    @apply border-border;
   }
 
   body {

@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-import { ErrorBoundary } from '@/components/error-boundary';
+import ErrorBoundary from '@/components/error-boundary';
 import { LoadingSpinner } from '@/components/ui/spinner';
 import { Suspense } from 'react';
 

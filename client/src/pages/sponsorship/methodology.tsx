@@ -363,7 +363,7 @@ export default function MethodologyPage({ billId }: MethodologyProps) {
                           pharmaceutical industry white paper published in 2023.
                         </p>
                         <div className="text-xs text-blue-600">
-                          Key Evidence: 247 matching phrases, 89 identical technical terms, 12 sequential paragraphs with >90% similarity
+                          Key Evidence: 247 matching phrases, 89 identical technical terms, 12 sequential paragraphs with {'>'}90% similarity
                         </div>
                       </CardContent>
                     </Card>

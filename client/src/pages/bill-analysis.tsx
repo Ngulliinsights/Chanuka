@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { AnalysisSection } from '@/components/analysis/section';
 import { ActionTimeline } from '@/components/analysis/timeline';
-import { CommentSection } from '@/components/analysis/comments';
+import { Comments } from '@/components/analysis/comments';
 import { BillStats } from '@/components/analysis/stats';
 import { Share2, ArrowLeft } from 'lucide-react';
 import { useOnlineStatus } from '@/hooks/use-online-status';
@@ -347,7 +347,7 @@ export default function BillAnalysis() {
                 </label>
               }
             >
-              <CommentSection
+              <Comments
                 comments={comments}
                 onAddComment={handleAddComment}
                 onEndorseComment={handleEndorseComment}
