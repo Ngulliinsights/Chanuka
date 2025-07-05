@@ -2,7 +2,7 @@ import express from "express";
 import { createServer } from "http";
 import { setupBillRoutes } from "./bills";
 import { setupSponsorRoutes } from "./sponsors";
-import { setupAnalysisRoutes } from "./analysis";
+import { router as analysisRouter } from "./analysis.js";
 import { setupSponsorshipRoutes } from "./sponsorship";
 import { setupSystemRoutes } from "./system";
 import { setupHealthRoutes } from "./health";
@@ -19,7 +19,7 @@ export async function registerRoutes(app: express.Express) {
   // Register all route handlers
   setupBillRoutes(apiRouter);
   setupSponsorRoutes(apiRouter);
-  setupAnalysisRoutes(apiRouter);
+  apiRouter.use("/analysis", analysisRouter);
   setupSponsorshipRoutes(apiRouter);
   setupSystemRoutes(apiRouter);
   setupHealthRoutes(apiRouter);
