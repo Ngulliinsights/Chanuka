@@ -169,31 +169,56 @@ export const billSectionConflicts = pgTable("bill_section_conflicts", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Insert schemas
-export const insertProjectSchema = createInsertSchema(projects).omit({ id: true, createdAt: true, updatedAt: true });
-export const insertCheckpointSchema = createInsertSchema(checkpoints).omit({ id: true, createdAt: true });
-export const insertFeatureFlagSchema = createInsertSchema(featureFlags).omit({ id: true, createdAt: true });
-export const insertAnalyticsMetricSchema = createInsertSchema(analyticsMetrics).omit({ id: true, recordedAt: true });
-export const insertPivotDecisionSchema = createInsertSchema(pivotDecisions).omit({ id: true, createdAt: true });
-export const insertArchitectureComponentSchema = createInsertSchema(architectureComponents).omit({ id: true, createdAt: true });
+// Insert schemas for legislative platform
+export const insertUserSchema = createInsertSchema(users).omit({ 
+  id: true, 
+  createdAt: true, 
+  updatedAt: true 
+});
 
-// Types
+export const insertUserProfileSchema = createInsertSchema(userProfiles).omit({ 
+  id: true, 
+  createdAt: true 
+});
+
+export const insertBillSchema = createInsertSchema(bills).omit({ 
+  id: true, 
+  createdAt: true, 
+  updatedAt: true 
+});
+
+export const insertBillCommentSchema = createInsertSchema(billComments).omit({ 
+  id: true, 
+  createdAt: true, 
+  updatedAt: true 
+});
+
+export const insertSponsorSchema = createInsertSchema(sponsors).omit({ 
+  id: true, 
+  createdAt: true 
+});
+
+export const insertAnalysisSchema = createInsertSchema(analysis).omit({ 
+  id: true, 
+  createdAt: true 
+});
+
+// Types for legislative platform
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
-export type Project = typeof projects.$inferSelect;
-export type InsertProject = z.infer<typeof insertProjectSchema>;
-export type Checkpoint = typeof checkpoints.$inferSelect;
-export type InsertCheckpoint = z.infer<typeof insertCheckpointSchema>;
-export type FeatureFlag = typeof featureFlags.$inferSelect;
-export type InsertFeatureFlag = z.infer<typeof insertFeatureFlagSchema>;
-export type AnalyticsMetric = typeof analyticsMetrics.$inferSelect;
-export type InsertAnalyticsMetric = z.infer<typeof insertAnalyticsMetricSchema>;
-export type PivotDecision = typeof pivotDecisions.$inferSelect;
-export type InsertPivotDecision = z.infer<typeof insertPivotDecisionSchema>;
-export type ArchitectureComponent = typeof architectureComponents.$inferSelect;
-export type InsertArchitectureComponent = z.infer<typeof insertArchitectureComponentSchema>;
-
-export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
-});
+export type UserProfile = typeof userProfiles.$inferSelect;
+export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
+export type Bill = typeof bills.$inferSelect;
+export type InsertBill = z.infer<typeof insertBillSchema>;
+export type BillComment = typeof billComments.$inferSelect;
+export type InsertBillComment = z.infer<typeof insertBillCommentSchema>;
+export type BillEngagement = typeof billEngagement.$inferSelect;
+export type Notification = typeof notifications.$inferSelect;
+export type Analysis = typeof analysis.$inferSelect;
+export type InsertAnalysis = z.infer<typeof insertAnalysisSchema>;
+export type Sponsor = typeof sponsors.$inferSelect;
+export type InsertSponsor = z.infer<typeof insertSponsorSchema>;
+export type SponsorAffiliation = typeof sponsorAffiliations.$inferSelect;
+export type BillSponsorship = typeof billSponsorships.$inferSelect;
+export type SponsorTransparency = typeof sponsorTransparency.$inferSelect;
+export type BillSectionConflict = typeof billSectionConflicts.$inferSelect;
