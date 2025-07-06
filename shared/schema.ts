@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, numeric, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, numeric, uuid, varchar } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -262,3 +262,40 @@ export type SponsorTransparency = typeof sponsorTransparency.$inferSelect;
 export type BillSectionConflict = typeof billSectionConflicts.$inferSelect;
 export type UserInterest = typeof userInterests.$inferSelect;
 export type BillTag = typeof billTags.$inferSelect;
+
+// Citizen Verification System
+export const citizenVerifications = pgTable('citizen_verifications', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  billId: integer('bill_id').notNull().references(() => bills.id),
+  citizenId: varchar('citizen_id', { length: 255 }).notNull().references(() => users.id),
+  verificationType: varchar('verification_type', { length: 50 }).notNull(),
+  verificationStatus: varchar('verification_status', { length: 50 }).notNull().default('pending'),
+  confidence: integer('confidence').notNull().default(0),
+  evidence: jsonb('evidence').notNull().default('[]'),
+  expertise: jsonb('expertise').notNull(),
+  reasoning: text('reasoning').notNull(),
+  endorsements: integer('endorsements').notNull().default(0),
+  disputes: integer('disputes').notNull().default(0),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull()
+});
+
+// Export all tables and types
+export {
+  users,
+  bills,
+  billComments,
+  analysis,
+  expertVerifications,
+  billEngagement,
+  notifications,
+  sponsors,
+  sponsorAffiliations,
+  billSponsorships,
+  sponsorTransparency,
+  billSectionConflicts,
+  userInterests,
+  billTags,
+  userProfiles,
+  citizenVerifications
+};

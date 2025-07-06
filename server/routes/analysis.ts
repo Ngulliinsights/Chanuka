@@ -1,8 +1,11 @@
-
 import express from 'express';
 import { legislativeStorage } from '../storage/legislative-storage.js';
 import { insertAnalysisSchema } from '../../shared/schema.js';
 import { z } from 'zod';
+import { mlAnalysisService, performComprehensiveAnalysis } from '../services/ml-analysis';
+import { conflictDetectionService } from '../services/conflict-detection';
+import { realTimeBillAnalysisEngine } from '../services/real-time-analysis';
+import { citizenVerificationService } from '../services/citizen-verification';
 
 export const router = express.Router();
 
