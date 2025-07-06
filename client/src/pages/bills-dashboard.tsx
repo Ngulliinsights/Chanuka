@@ -79,6 +79,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { ImplementationWorkarounds } from '../components/implementation/workarounds';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 
 function BillsDashboard() {
   const [bills, setBills] = useState(FALLBACK_BILLS);
@@ -216,7 +217,7 @@ function BillsDashboard() {
             setSelectedBill(bill);
           }}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Select a bill" />
+              <SelectValue placeholder={selectedBill ? selectedBill.title : "Select a bill"} />
             </SelectTrigger>
             <SelectContent>
               {bills.map((bill) => (

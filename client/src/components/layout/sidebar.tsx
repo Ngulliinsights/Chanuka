@@ -1,26 +1,29 @@
 import React from 'react';
-import { Link, useLocation } from 'wouter';
-import { cn } from '../../lib/utils';
+import { Link, useLocation } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import { 
+  Home, 
   BarChart3, 
   FileText, 
-  Home, 
-  Settings, 
   Users, 
-  Bell,
-  Search,
+  Search, 
+  Settings, 
+  HelpCircle,
+  MessageSquare,
   Shield,
-  Gavel
+  TrendingUp,
+  User,
+  BookOpen
 } from 'lucide-react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: Home },
+  { name: 'Home', href: '/', icon: Home },
+  { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
   { name: 'Bills', href: '/bills', icon: FileText },
-  { name: 'Analysis', href: '/analysis', icon: BarChart3 },
-  { name: 'Sponsorship', href: '/bill-sponsorship-analysis', icon: Users },
-  { name: 'Verification', href: '/expert-verification', icon: Shield },
-  { name: 'Profile', href: '/profile', icon: Settings },
-  { name: 'Workarounds', href: '/workarounds', icon: Gavel }, // Added Workarounds navigation item
+  { name: 'Community', href: '/community', icon: Users },
+  { name: 'Expert Verification', href: '/expert-verification', icon: Shield },
+  { name: 'Sponsorship Analysis', href: '/bill-sponsorship-analysis', icon: TrendingUp },
+  { name: 'Profile', href: '/profile', icon: User },
 ];
 
 export function Sidebar() {
