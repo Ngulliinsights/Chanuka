@@ -15,7 +15,7 @@ localPort = 5000
 externalPort = 80
 
 [workflows]
-runButton = "Fixed Development"
+runButton = "Complete Development Server"
 
 [[workflows.workflow]]
 name = "Project"
@@ -200,6 +200,23 @@ args = "npm install"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run db:migrate || echo \"Database migration optional - continuing with fallback mode...\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+
+[[workflows.workflow]]
+name = "Complete Development Server"
+author = 40484346
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run db:migrate || echo \"Database migration failed - continuing with fallback data\""
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"

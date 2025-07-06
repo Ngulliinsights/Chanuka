@@ -237,46 +237,23 @@ app.get("/:id/workarounds", async (c) => {
     const mockWorkarounds = [
       {
         id: 1,
-        title: 'Phased Implementation Approach',
-        description: 'Implement the bill in phases to reduce compliance burden on small businesses while maintaining regulatory effectiveness.',
-        category: 'Compliance',
-        priority: 'high',
-        status: 'approved',
-        upvotes: 23,
+        title: "Alternative Implementation Timeline",
+        description: "Propose a phased implementation approach to reduce immediate compliance burden on small businesses.",
+        category: "Compliance",
+        priority: "high",
+        status: "under_review",
+        upvotes: 15,
         downvotes: 3,
-        implementationCost: 150000,
-        timelineEstimate: 180,
+        implementationCost: 50000,
+        timelineEstimate: 90,
         stakeholderSupport: {
-          small_business: 'strong',
-          labor_unions: 'moderate',
-          government: 'strong'
+          small_business: "strong",
+          labor_unions: "moderate"
         },
-        createdAt: new Date('2024-01-15'),
+        createdAt: new Date(),
         author: {
-          name: 'Sarah Johnson',
-          expertise: 'Policy Implementation'
-        }
-      },
-      {
-        id: 2,
-        title: 'Digital Infrastructure Support',
-        description: 'Establish digital infrastructure and training programs before full implementation to ensure smooth transition.',
-        category: 'Infrastructure',
-        priority: 'critical',
-        status: 'under_review',
-        upvotes: 45,
-        downvotes: 7,
-        implementationCost: 500000,
-        timelineEstimate: 365,
-        stakeholderSupport: {
-          tech_sector: 'strong',
-          rural_communities: 'strong',
-          government: 'moderate'
-        },
-        createdAt: new Date('2024-01-20'),
-        author: {
-          name: 'Michael Chen',
-          expertise: 'Digital Transformation'
+          name: "Sarah Chen",
+          expertise: "Business Policy Analyst"
         }
       }
     ];
