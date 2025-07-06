@@ -1,84 +1,77 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { 
-  ArrowLeft, 
-  TrendingUp, 
-  AlertTriangle, 
-  DollarSign, 
-  Users, 
-  Building,
-  BookOpen,
-  ChevronRight
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, ChevronRight, AlertTriangle, DollarSign, Users, FileText } from 'lucide-react';
 
 interface OverviewProps {
-  billId?: string;
+  billId: string;
 }
 
 interface AnalysisData {
   title: string;
+  number: string;
+  status: string;
   primarySponsor: {
     name: string;
+    party: string;
     conflictLevel: string;
     financialExposure: number;
   };
   coSponsors: Array<{
+    name: string;
     conflictLevel: string;
+    financialExposure: number;
   }>;
   totalFinancialExposure: number;
   industryAlignment: number;
   sections: Array<{
     number: string;
     title: string;
+    conflictLevel: string;
   }>;
+  analysisMetadata: {
+    sponsorCount: number;
+    conflictSections: number;
+    riskLevel: string;
+  };
 }
 
 export default function SponsorshipOverview({ billId }: OverviewProps) {
   const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Mock data for now - replace with actual API call
-    setTimeout(() => {
-      setAnalysis({
-        title: "National Healthcare Reform Act of 2025",
-        primarySponsor: {
-          name: "Hon. James Mwangi",
-          conflictLevel: "high",
-          financialExposure: 28700000
-        },
-        coSponsors: [
-          { conflictLevel: "high" },
-          { conflictLevel: "high" },
-          { conflictLevel: "high" },
-          { conflictLevel: "high" },
-          { conflictLevel: "medium" },
-          { conflictLevel: "medium" },
-          { conflictLevel: "medium" },
-          { conflictLevel: "medium" },
-          { conflictLevel: "medium" },
-          { conflictLevel: "medium" },
-          { conflictLevel: "low" },
-          { conflictLevel: "low" }
-        ],
-        totalFinancialExposure: 142800000,
-        industryAlignment: 68,
-        sections: [
-          { number: "4-7", title: "Pharmaceutical Pricing" },
-          { number: "12-14", title: "Market Access Expansion" },
-          { number: "18", title: "Insurance Requirements" }
-        ]
-      });
-      setLoading(false);
-    }, 1000);
+    const fetchAnalysisData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await fetch(`/api/bills/${billId}/sponsorship-analysis`);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch analysis: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setAnalysis(data);
+      } catch (err) {
+        console.error('Error fetching sponsorship analysis:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load analysis');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (billId) {
+      fetchAnalysisData();
+    }
   }, [billId]);
 
   const getConflictLevelColor = (level: string) => {
-    switch (level) {
+    switch (level?.toLowerCase()) {
       case 'high':
         return 'bg-red-100 text-red-800 border-red-200';
       case 'medium':
@@ -90,12 +83,35 @@ export default function SponsorshipOverview({ billId }: OverviewProps) {
     }
   };
 
+  const getRiskIcon = (level: string) => {
+    const iconClass = level === 'high' ? 'text-red-600' : 
+                     level === 'medium' ? 'text-yellow-600' : 'text-green-600';
+    return <AlertTriangle className={`h-4 w-4 ${iconClass}`} />;
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading analysis overview...</p>
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <div className="flex items-center justify-center min-h-96">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading sponsorship analysis...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <div className="text-center py-12">
+          <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Error Loading Analysis</h3>
+          <p className="text-muted-foreground mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
         </div>
       </div>
     );
@@ -103,161 +119,203 @@ export default function SponsorshipOverview({ billId }: OverviewProps) {
 
   if (!analysis) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">Analysis overview not available</p>
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <div className="text-center py-12">
+          <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No Analysis Available</h3>
+          <p className="text-muted-foreground">Sponsorship analysis data is not available for this bill.</p>
+        </div>
       </div>
     );
   }
-
-  const highRiskSponsors = analysis.coSponsors.filter(s => s.conflictLevel === 'high').length;
-  const mediumRiskSponsors = analysis.coSponsors.filter(s => s.conflictLevel === 'medium').length;
-  const lowRiskSponsors = analysis.coSponsors.filter(s => s.conflictLevel === 'low').length;
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
       {/* Navigation */}
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
-        <Link to="/" className="hover:text-primary">Home</Link>
+        <Link to="/" className="hover:text-primary transition-colors">Home</Link>
         <span>›</span>
-        <Link to={`/bills/${billId}`} className="hover:text-primary">Bills</Link>
+        <Link to={`/bills/${billId}`} className="hover:text-primary transition-colors">Bills</Link>
         <span>›</span>
-        <Link to={`/bills/${billId}/sponsorship-analysis`} className="hover:text-primary">Sponsorship Analysis</Link>
+        <Link to={`/bills/${billId}/sponsorship-analysis`} className="hover:text-primary transition-colors">Sponsorship Analysis</Link>
         <span>›</span>
         <span className="text-foreground">Overview</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6">
-        <Link to={`/bills/${billId}/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
+        <Link to={`/bills/${billId}/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Analysis Navigation
         </Link>
 
-        <h1 className="text-3xl font-bold text-foreground mb-2">Bill Analysis at a Glance</h1>
-        <p className="text-muted-foreground">Essential insights about the {analysis.title}</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          Sponsorship Overview
+        </h1>
+        <p className="text-muted-foreground">
+          {analysis.title} ({analysis.number})
+        </p>
       </div>
 
-      {/* Critical Insights */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-red-600" />
-            Key Transparency Concerns
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="border-red-200 bg-red-50">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <DollarSign className="h-8 w-8 text-red-600" />
-                  <div>
-                    <h4 className="font-semibold">KSh {(analysis.primarySponsor.financialExposure / 1000000).toFixed(1)}M Financial Exposure</h4>
-                    <p className="text-sm text-muted-foreground">Primary sponsor has significant investments directly affected by this bill</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-yellow-200 bg-yellow-50">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <Users className="h-8 w-8 text-yellow-600" />
-                  <div>
-                    <h4 className="font-semibold">{highRiskSponsors} High-Risk Co-Sponsors</h4>
-                    <p className="text-sm text-muted-foreground">Significant portion of co-sponsors have conflicts of interest</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-blue-200 bg-blue-50">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <Building className="h-8 w-8 text-blue-600" />
-                  <div>
-                    <h4 className="font-semibold">KSh {(analysis.totalFinancialExposure / 1000000).toFixed(1)}M Industry Backing</h4>
-                    <p className="text-sm text-muted-foreground">Substantial financial support from affected industries</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Quick Stats */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Quick Statistics</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl font-bold text-primary">1</div>
-              <div className="text-sm text-muted-foreground">Primary Sponsor</div>
-              <Badge className={`mt-2 ${getConflictLevelColor(analysis.primarySponsor.conflictLevel)}`}>
-                {analysis.primarySponsor.conflictLevel} Risk
+      {/* Key Metrics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Risk Level</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-2">
+              {getRiskIcon(analysis.analysisMetadata.riskLevel)}
+              <Badge className={getConflictLevelColor(analysis.analysisMetadata.riskLevel)}>
+                {analysis.analysisMetadata.riskLevel.toUpperCase()}
               </Badge>
             </div>
+          </CardContent>
+        </Card>
 
-            <div className="text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl font-bold text-primary">{analysis.coSponsors.length}</div>
-              <div className="text-sm text-muted-foreground">Co-Sponsors</div>
-              <div className="text-xs mt-2">
-                {highRiskSponsors} High, {mediumRiskSponsors} Medium, {lowRiskSponsors} Low Risk
-              </div>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total Exposure</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-2">
+              <DollarSign className="h-4 w-4 text-green-600" />
+              <span className="text-2xl font-bold">
+                ${(analysis.totalFinancialExposure / 1000000).toFixed(1)}M
+              </span>
             </div>
+          </CardContent>
+        </Card>
 
-            <div className="text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl font-bold text-primary">{analysis.industryAlignment}%</div>
-              <div className="text-sm text-muted-foreground">Industry Funding</div>
-              <div className="text-xs mt-2">Healthcare & Related</div>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Sponsors</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-2">
+              <Users className="h-4 w-4 text-blue-600" />
+              <span className="text-2xl font-bold">
+                {analysis.analysisMetadata.sponsorCount}
+              </span>
             </div>
+          </CardContent>
+        </Card>
 
-            <div className="text-center p-4 bg-muted rounded-lg">
-              <div className="text-2xl font-bold text-primary">{analysis.sections.length}</div>
-              <div className="text-sm text-muted-foreground">Affected Sections</div>
-              <div className="text-xs mt-2">Direct regulatory impact</div>
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">Conflict Sections</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-2">
+              <AlertTriangle className="h-4 w-4 text-orange-600" />
+              <span className="text-2xl font-bold">
+                {analysis.analysisMetadata.conflictSections}
+              </span>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Reading Path */}
+      {/* Primary Sponsor Card */}
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5" />
-            Recommended Reading Path
+            <Users className="h-5 w-5" />
+            Primary Sponsor
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button variant="default" size="sm" disabled>
-              1. Overview (Current)
-            </Button>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold">{analysis.primarySponsor.name}</h3>
+              <p className="text-sm text-muted-foreground">{analysis.primarySponsor.party}</p>
+              <div className="flex items-center gap-4 mt-2">
+                <Badge className={getConflictLevelColor(analysis.primarySponsor.conflictLevel)}>
+                  {analysis.primarySponsor.conflictLevel.toUpperCase()} RISK
+                </Badge>
+                <span className="text-sm text-muted-foreground">
+                  Financial Exposure: ${(analysis.primarySponsor.financialExposure / 1000000).toFixed(1)}M
+                </span>
+              </div>
+            </div>
             <Link to={`/bills/${billId}/sponsorship-analysis/primary-sponsor`}>
-              <Button variant="outline" size="sm">
-                2. Primary Sponsor
-              </Button>
-            </Link>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            <Link to={`/bills/${billId}/sponsorship-analysis/co-sponsors`}>
-              <Button variant="outline" size="sm">
-                3. Co-Sponsors
-              </Button>
-            </Link>
-            <ChevronRight className="h-4 w-4 text-muted-foreground" />
-            <Link to={`/bills/${billId}/sponsorship-analysis/financial-network`}>
-              <Button variant="outline" size="sm">
-                4. Financial Network
+              <Button variant="outline">
+                View Details
+                <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </Link>
           </div>
         </CardContent>
       </Card>
+
+      {/* Co-Sponsors Summary */}
+      {analysis.coSponsors.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Co-Sponsors ({analysis.coSponsors.length})
+              </span>
+              <Link to={`/bills/${billId}/sponsorship-analysis/co-sponsors`}>
+                <Button variant="outline" size="sm">
+                  View All
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </Link>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {analysis.coSponsors.slice(0, 3).map((sponsor, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                  <div>
+                    <span className="font-medium">{sponsor.name}</span>
+                    <Badge className={`ml-2 ${getConflictLevelColor(sponsor.conflictLevel)}`}>
+                      {sponsor.conflictLevel.toUpperCase()}
+                    </Badge>
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    ${(sponsor.financialExposure / 1000000).toFixed(1)}M
+                  </span>
+                </div>
+              ))}
+              {analysis.coSponsors.length > 3 && (
+                <p className="text-sm text-muted-foreground text-center">
+                  +{analysis.coSponsors.length - 3} more co-sponsors
+                </p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Bill Sections with Conflicts */}
+      {analysis.sections.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Sections with Potential Conflicts
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {analysis.sections.map((section, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border rounded">
+                  <div>
+                    <span className="font-medium">Section {section.number}</span>
+                    <p className="text-sm text-muted-foreground">{section.title}</p>
+                  </div>
+                  <Badge className={getConflictLevelColor(section.conflictLevel)}>
+                    {section.conflictLevel.toUpperCase()}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Navigation Actions */}
       <div className="flex justify-between items-center">

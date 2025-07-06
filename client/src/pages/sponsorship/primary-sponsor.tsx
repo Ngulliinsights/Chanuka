@@ -1,116 +1,97 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  ArrowLeft, 
-  User, 
-  DollarSign, 
-  AlertTriangle, 
-  Building,
-  TrendingUp,
-  FileText,
-  Scale,
-  ChevronRight,
-  ChevronLeft,
-  Target,
-  Network,
-  Bookmark,
-  Clock
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { ArrowLeft, ChevronLeft, ChevronRight, AlertTriangle, DollarSign, Building, Eye, TrendingUp } from 'lucide-react';
 
 interface PrimarySponsorProps {
-  billId?: string;
+  billId: string;
 }
 
 interface SponsorData {
-  name: string;
-  role: string;
-  party: string;
-  constituency: string;
-  conflictLevel: string;
-  financialExposure: number;
-  affiliations: Array<{
-    organization: string;
+  sponsor: {
+    id: string;
+    name: string;
     role: string;
-    type: string;
-    conflictType: string;
-  }>;
-  votingAlignment: number;
-  transparency: {
-    disclosure: string;
-    lastUpdated: string;
-    publicStatements: number;
+    party: string;
+    constituency: string;
+    conflictLevel: string;
+    financialExposure: number;
+    affiliations: Array<{
+      organization: string;
+      role: string;
+      type: string;
+      conflictType: string;
+    }>;
+    votingAlignment: number;
+    transparency: {
+      disclosure: string;
+      lastUpdated: string;
+      publicStatements: number;
+    };
+  };
+  conflictAnalysis: {
+    directConflicts: number;
+    indirectConflicts: number;
+    totalExposure: number;
+    riskScore: number;
+    conflictDetails: {
+      direct: Array<{
+        organization: string;
+        role: string;
+        type: string;
+      }>;
+      indirect: Array<{
+        organization: string;
+        role: string;
+        type: string;
+      }>;
+    };
+  };
+  billImpact: {
+    affectedSections: Array<{
+      section: string;
+      description: string;
+      impact: string;
+    }>;
+    benefitEstimate: number;
+    alignmentScore: number;
+    potentialInfluence: string;
+  };
+  recommendations: string[];
+  riskProfile: {
+    overall: number;
+    level: string;
+    factors: {
+      financial: string;
+      transparency: string;
+      affiliations: string;
+    };
   };
 }
 
 export default function PrimarySponsorAnalysis({ billId }: PrimarySponsorProps) {
   const [sponsor, setSponsor] = useState<SponsorData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPrimarySponsorData = async () => {
       try {
         setLoading(true);
+        setError(null);
         const response = await fetch(`/api/bills/${billId}/sponsorship-analysis/primary-sponsor`);
 
-        if (response.ok) {
-          const data = await response.json();
-          setSponsor(data.sponsor);
-        } else {
-          console.error('Failed to fetch primary sponsor data');
-          // Fallback to mock data if API fails
-          setSponsor({
-            name: "Hon. James Mwangi",
-            role: "MP - Kiambu County",
-            party: "Jubilee Party",
-            constituency: "Kiambu County",
-            conflictLevel: "high",
-            financialExposure: 28700000,
-            affiliations: [
-              {
-                organization: "East African Pharmaceuticals",
-                role: "Major Shareholder",
-                type: "financial",
-                conflictType: "direct"
-              },
-              {
-                organization: "National Healthcare Alliance",
-                role: "Board Member",
-                type: "governance",
-                conflictType: "indirect"
-              }
-            ],
-            votingAlignment: 73,
-            transparency: {
-              disclosure: "partial",
-              lastUpdated: "2024-01-15",
-              publicStatements: 3
-            }
-          });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch primary sponsor data: ${response.status}`);
         }
-      } catch (error) {
-        console.error('Error fetching primary sponsor data:', error);
-        // Fallback to mock data on error
-        setSponsor({
-          name: "Hon. James Mwangi",
-          role: "MP - Kiambu County",
-          party: "Jubilee Party",
-          constituency: "Kiambu County",
-          conflictLevel: "high",
-          financialExposure: 28700000,
-          affiliations: [],
-          votingAlignment: 73,
-          transparency: {
-            disclosure: "partial",
-            lastUpdated: "2024-01-15",
-            publicStatements: 3
-          }
-        });
+
+        const data = await response.json();
+        setSponsor(data);
+      } catch (err) {
+        console.error('Error fetching primary sponsor data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load primary sponsor data');
       } finally {
         setLoading(false);
       }
@@ -122,7 +103,7 @@ export default function PrimarySponsorAnalysis({ billId }: PrimarySponsorProps) 
   }, [billId]);
 
   const getConflictLevelColor = (level: string) => {
-    switch (level) {
+    switch (level?.toLowerCase()) {
       case 'high':
         return 'bg-red-100 text-red-800 border-red-200';
       case 'medium':
@@ -135,7 +116,7 @@ export default function PrimarySponsorAnalysis({ billId }: PrimarySponsorProps) 
   };
 
   const getRiskIndicator = (level: string) => {
-    switch (level) {
+    switch (level?.toLowerCase()) {
       case 'high':
         return <AlertTriangle className="h-4 w-4 text-red-600" />;
       case 'medium':
@@ -147,12 +128,42 @@ export default function PrimarySponsorAnalysis({ billId }: PrimarySponsorProps) 
     }
   };
 
+  const getImpactColor = (impact: string) => {
+    switch (impact?.toLowerCase()) {
+      case 'high':
+        return 'text-red-600';
+      case 'medium':
+        return 'text-yellow-600';
+      case 'low':
+        return 'text-green-600';
+      default:
+        return 'text-gray-600';
+    }
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-96">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading primary sponsor analysis...</p>
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <div className="flex items-center justify-center min-h-96">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading primary sponsor analysis...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <div className="text-center py-12">
+          <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Error Loading Analysis</h3>
+          <p className="text-muted-foreground mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
         </div>
       </div>
     );
@@ -160,8 +171,10 @@ export default function PrimarySponsorAnalysis({ billId }: PrimarySponsorProps) 
 
   if (!sponsor) {
     return (
-      <div className="text-center py-12">
-        <p className="text-muted-foreground">Primary sponsor analysis not available</p>
+      <div className="container mx-auto px-4 py-6 max-w-7xl">
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Primary sponsor analysis not available</p>
+        </div>
       </div>
     );
   }
@@ -170,435 +183,212 @@ export default function PrimarySponsorAnalysis({ billId }: PrimarySponsorProps) 
     <div className="container mx-auto px-4 py-6 max-w-7xl">
       {/* Navigation */}
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
-        <Link to="/" className="hover:text-primary">Home</Link>
+        <Link to="/" className="hover:text-primary transition-colors">Home</Link>
         <span>›</span>
-        <Link to={`/bills/${billId}`} className="hover:text-primary">Bills</Link>
+        <Link to={`/bills/${billId}`} className="hover:text-primary transition-colors">Bills</Link>
         <span>›</span>
-        <Link to={`/bills/${billId}/sponsorship-analysis`} className="hover:text-primary">Sponsorship Analysis</Link>
+        <Link to={`/bills/${billId}/sponsorship-analysis`} className="hover:text-primary transition-colors">Sponsorship Analysis</Link>
         <span>›</span>
         <span className="text-foreground">Primary Sponsor</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6">
-        <Link to={`/bills/${billId}/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
+        <Link to={`/bills/${billId}/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Analysis Navigation
         </Link>
 
         <h1 className="text-3xl font-bold text-foreground mb-2">
-          {sponsor.name} - Primary Sponsor Analysis
+          {sponsor.sponsor.name} - Primary Sponsor Analysis
         </h1>
         <p className="text-muted-foreground">Comprehensive analysis of potential conflicts and transparency measures</p>
       </div>
 
-      {/* Sponsor Header Card */}
+      {/* Sponsor Overview */}
       <Card className="mb-6">
-        <CardContent className="pt-6">
-          <div className="flex items-start gap-4 p-4 bg-muted rounded-lg">
-            <Avatar className="h-16 w-16">
-              <AvatarFallback className="text-lg">
-                {sponsor.name.split(' ').map(n => n[0]).join('')}
-              </AvatarFallback>
-            </Avatar>
-
-            <div className="flex-1">
-              <h3 className="text-xl font-semibold">{sponsor.name}</h3>
-              <p className="text-muted-foreground">{sponsor.role} | {sponsor.party}</p>
-              <p className="text-sm text-muted-foreground">{sponsor.constituency}</p>
-              <div className="flex items-center gap-4 mt-2">
-                <Badge className={getConflictLevelColor(sponsor.conflictLevel)}>
-                  {getRiskIndicator(sponsor.conflictLevel)}
-                  <span className="ml-1">{sponsor.conflictLevel} Conflict Risk</span>
+        <CardHeader>
+          <CardTitle>Sponsor Profile</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">{sponsor.sponsor.name}</h3>
+              <div className="space-y-2">
+                <p><span className="font-medium">Role:</span> {sponsor.sponsor.role}</p>
+                <p><span className="font-medium">Party:</span> {sponsor.sponsor.party}</p>
+                <p><span className="font-medium">Constituency:</span> {sponsor.sponsor.constituency}</p>
+              </div>
+            </div>
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="font-medium">Risk Level:</span>
+                {getRiskIndicator(sponsor.sponsor.conflictLevel)}
+                <Badge className={getConflictLevelColor(sponsor.sponsor.conflictLevel)}>
+                  {sponsor.sponsor.conflictLevel.toUpperCase()}
                 </Badge>
+              </div>
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-4 w-4 text-green-600" />
+                <span className="font-medium">Financial Exposure:</span>
+                <span>${(sponsor.sponsor.financialExposure / 1000000).toFixed(1)}M</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Risk Analysis */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Conflict Analysis</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span>Direct Conflicts:</span>
+                <Badge variant="destructive">{sponsor.conflictAnalysis.directConflicts}</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Indirect Conflicts:</span>
+                <Badge variant="secondary">{sponsor.conflictAnalysis.indirectConflicts}</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Risk Score:</span>
+                <Badge className={getConflictLevelColor(sponsor.riskProfile.level)}>
+                  {sponsor.conflictAnalysis.riskScore}/100
+                </Badge>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Transparency Score</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span>Disclosure Level:</span>
+                <Badge variant="outline">{sponsor.sponsor.transparency.disclosure}</Badge>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Public Statements:</span>
+                <span>{sponsor.sponsor.transparency.publicStatements}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span>Last Updated:</span>
                 <span className="text-sm text-muted-foreground">
-                  Financial Exposure: KSh {(sponsor.financialExposure / 1000000).toFixed(1)}M
+                  {new Date(sponsor.sponsor.transparency.lastUpdated).toLocaleDateString()}
                 </span>
               </div>
             </div>
+          </CardContent>
+        </Card>
+      </div>
 
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                <Bookmark className="h-4 w-4 mr-1" />
-                Bookmark
-              </Button>
+      {/* Affiliations */}
+      {sponsor.sponsor.affiliations.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building className="h-5 w-5" />
+              Professional Affiliations
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {sponsor.sponsor.affiliations.map((affiliation, index) => (
+                <div key={index} className="flex items-center justify-between p-3 border rounded">
+                  <div>
+                    <span className="font-medium">{affiliation.organization}</span>
+                    <p className="text-sm text-muted-foreground">{affiliation.role}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Badge variant="outline">{affiliation.type}</Badge>
+                    <Badge className={getConflictLevelColor(affiliation.conflictType)}>
+                      {affiliation.conflictType}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Subtabs Section */}
+      {/* Bill Impact Analysis */}
       <Card className="mb-6">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>{sponsor.name} - Primary Sponsor Analysis</CardTitle>
-            <div className="flex items-center gap-2">
-              <select className="text-sm border rounded px-2 py-1">
-                <option value="summary">Summary View</option>
-                <option value="detailed" selected>Detailed Analysis</option>
-                <option value="comprehensive">Comprehensive Report</option>
-              </select>
-            </div>
-          </div>
+          <CardTitle className="flex items-center gap-2">
+            <TrendingUp className="h-5 w-5" />
+            Bill Impact Analysis
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="summary" className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="summary" className="flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                <div className="text-left">
-                  <div className="text-xs">Quick Summary</div>
-                  <div className="text-xs text-muted-foreground">2 min</div>
-                </div>
-              </TabsTrigger>
-              <TabsTrigger value="financial" className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4" />
-                <div className="text-left">
-                  <div className="text-xs">Financial Analysis</div>
-                  <div className="text-xs text-muted-foreground">5 min</div>
-                </div>
-              </TabsTrigger>
-              <TabsTrigger value="impact" className="flex items-center gap-2">
-                <Target className="h-4 w-4" />
-                <div className="text-left">
-                  <div className="text-xs">Bill Impact</div>
-                  <div className="text-xs text-muted-foreground">4 min</div>
-                </div>
-              </TabsTrigger>
-              <TabsTrigger value="network" className="flex items-center gap-2">
-                <Network className="h-4 w-4" />
-                <div className="text-left">
-                  <div className="text-xs">Network Analysis</div>
-                  <div className="text-xs text-muted-foreground">6 min</div>
-                </div>
-              </TabsTrigger>
-              <TabsTrigger value="accountability" className="flex items-center gap-2">
-                <Scale className="h-4 w-4" />
-                <div className="text-left">
-                  <div className="text-xs">Accountability</div>
-                  <div className="text-xs text-muted-foreground">3 min</div>
-                </div>
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Quick Summary Tab */}
-            <TabsContent value="summary" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="border-red-200 bg-red-50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <DollarSign className="h-6 w-6 text-red-600" />
-                      <div>
-                        <h5 className="font-semibold">KSh {(sponsor.financialExposure / 1000000).toFixed(1)}M Financial Exposure</h5>
-                        <p className="text-sm text-muted-foreground">Direct financial interests in companies affected by this bill</p>
-                      </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 className="font-medium mb-3">Affected Sections</h4>
+              <div className="space-y-2">
+                {sponsor.billImpact.affectedSections.map((section, index) => (
+                  <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <div>
+                      <span className="font-medium">Section {section.section}</span>
+                      <p className="text-sm text-muted-foreground">{section.description}</p>
                     </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-yellow-200 bg-yellow-50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <FileText className="h-6 w-6 text-yellow-600" />
-                      <div>
-                        <h5 className="font-semibold">12 Matching Provisions</h5>
-                        <p className="text-sm text-muted-foreground">Bill sections align with industry policy recommendations</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-blue-200 bg-blue-50">
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="h-6 w-6 text-blue-600" />
-                      <div>
-                        <h5 className="font-semibold">{sponsor.votingAlignment}% Industry Alignment</h5>
-                        <p className="text-sm text-muted-foreground">Historical voting pattern favors industry interests</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    <Badge className={`${getImpactColor(section.impact)} border-current`} variant="outline">
+                      {section.impact.toUpperCase()}
+                    </Badge>
+                  </div>
+                ))}
               </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Key Conflicts Overview</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="p-3 bg-red-50 border border-red-200 rounded">
-                      <strong>East African Pharmaceuticals (KSh 15.2M)</strong>
-                      <p className="text-sm text-muted-foreground">Benefits from Section 4.2 licensing changes</p>
-                    </div>
-                    <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
-                      <strong>National Healthcare Alliance (Board Member)</strong>
-                      <p className="text-sm text-muted-foreground">Influences Section 7.1 equipment standards</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Financial Analysis Tab */}
-            <TabsContent value="financial" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5" />
-                    Financial Interest Analysis
-                  </CardTitle>
-                  <div className="text-right">
-                    <span className="text-2xl font-bold">KSh {(sponsor.financialExposure / 1000000).toFixed(1)}M</span>
-                    <p className="text-sm text-muted-foreground">Total Exposure</p>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <Card className="border-red-200">
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <h5 className="font-semibold">East African Pharmaceuticals</h5>
-                          <Badge className="bg-red-100 text-red-800">High Risk</Badge>
-                        </div>
-                        <div className="space-y-2 text-sm">
-                          <div>
-                            <strong>Amount:</strong> KSh 15.2M (53% of total exposure)
-                          </div>
-                          <div>
-                            <strong>Stake:</strong> 12% ownership
-                          </div>
-                          <div>
-                            <strong>Acquired:</strong> January 2023
-                          </div>
-                          <div className="pt-2 border-t">
-                            <strong>Bill Impact:</strong> Sections 4.2, 6.1, 7.3 directly benefit this company
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="border-yellow-200">
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <h5 className="font-semibold">National Healthcare Alliance</h5>
-                          <Badge className="bg-yellow-100 text-yellow-800">Medium Risk</Badge>
-                        </div>
-                        <div className="space-y-2 text-sm">
-                          <div>
-                            <strong>Role:</strong> Board Member (Non-Executive)
-                          </div>
-                          <div>
-                            <strong>Compensation:</strong> KSh 2.4M annually
-                          </div>
-                          <div>
-                            <strong>Appointed:</strong> March 2023
-                          </div>
-                          <div className="pt-2 border-t">
-                            <strong>Bill Impact:</strong> Equipment standards in Section 7.1
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Bill Impact Tab */}
-            <TabsContent value="impact" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5" />
-                    Direct Bill Impact Analysis
-                  </CardTitle>
-                  <div className="text-right">
-                    <span className="text-2xl font-bold">12</span>
-                    <p className="text-sm text-muted-foreground">Sections Directly Affected</p>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <Card className="border-red-200">
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <h5 className="font-semibold">Section 4.2: Healthcare Provider Licensing</h5>
-                          <Badge className="bg-red-100 text-red-800">Critical Impact</Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Reduces licensing requirements for pharmaceutical distributors
-                        </p>
-                        <div className="text-sm">
-                          <strong>Financial Benefit:</strong> East African Pharmaceuticals saves ~KSh 8.5M annually
-                        </div>
-                        <div className="flex items-center gap-2 mt-2">
-                          <AlertTriangle className="h-4 w-4 text-red-600" />
-                          <span className="text-sm text-red-600">Direct financial conflict identified</span>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="border-yellow-200">
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start mb-2">
-                          <h5 className="font-semibold">Section 7.1: Medical Equipment Standards</h5>
-                          <Badge className="bg-yellow-100 text-yellow-800">High Impact</Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-2">
-                          Streamlines equipment certification processes
-                        </p>
-                        <div className="text-sm">
-                          <strong>Organizational Benefit:</strong> Aligns with National Healthcare Alliance advocacy
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Network Analysis Tab */}
-            <TabsContent value="network" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Network className="h-5 w-5" />
-                    Organizational Network Analysis
-                  </CardTitle>
-                  <div className="text-right">
-                    <span className="text-2xl font-bold">15</span>
-                    <p className="text-sm text-muted-foreground">Key Connections</p>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">Financial Connections</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          {sponsor.affiliations.filter(a => a.type === 'financial').map((affiliation, index) => (
-                            <div key={index} className="flex items-start justify-between p-3 bg-muted rounded">
-                              <div className="flex items-start gap-3">
-                                <Building className="h-4 w-4 mt-1" />
-                                <div>
-                                  <h6 className="font-medium">{affiliation.organization}</h6>
-                                  <p className="text-sm text-muted-foreground">{affiliation.role}</p>
-                                </div>
-                              </div>
-                              <Badge className={affiliation.conflictType === 'direct' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}>
-                                {affiliation.conflictType}
-                              </Badge>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="text-base">Governance Roles</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          {sponsor.affiliations.filter(a => a.type === 'governance').map((affiliation, index) => (
-                            <div key={index} className="flex items-start justify-between p-3 bg-muted rounded">
-                              <div className="flex items-start gap-3">
-                                <Building className="h-4 w-4 mt-1" />
-                                <div>
-                                  <h6 className="font-medium">{affiliation.organization}</h6>
-                                  <p className="text-sm text-muted-foreground">{affiliation.role}</p>
-                                </div>
-                              </div>
-                              <Badge className="bg-blue-100 text-blue-800">Current</Badge>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Accountability Tab */}
-            <TabsContent value="accountability" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Scale className="h-5 w-5" />
-                    Transparency & Accountability Measures
-                  </CardTitle>
-                  <div className="text-right">
-                    <span className="text-2xl font-bold">6.2/10</span>
-                    <p className="text-sm text-muted-foreground">Transparency Score</p>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <Card>
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-base">Disclosure Status</CardTitle>
-                          <Badge className="bg-yellow-100 text-yellow-800">Partial</Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span className="text-sm">Financial interests declared in parliamentary register</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                            <span className="text-sm">Board compensation details not publicly disclosed</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                            <span className="text-sm">Voting rationale not provided for conflicted bills</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-base">Recommended Actions</CardTitle>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <div className="p-3 bg-red-50 border border-red-200 rounded">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-red-100 text-red-800">High Priority</Badge>
-                              <span className="font-medium">Recuse from voting on Sections 4.2 and 7.1</span>
-                            </div>
-                          </div>
-                          <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-yellow-100 text-yellow-800">Medium Priority</Badge>
-                              <span className="font-medium">Disclose board compensation details</span>
-                            </div>
-                          </div>
-                          <div className="p-3 bg-blue-50 border border-blue-200 rounded">
-                            <div className="flex items-center gap-2">
-                              <Badge className="bg-blue-100 text-blue-800">Medium Priority</Badge>
-                              <span className="font-medium">Establish independent ethics review process</span>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+            </div>
+            <div>
+              <h4 className="font-medium mb-3">Impact Metrics</h4>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span>Benefit Estimate:</span>
+                  <span className="font-medium">${sponsor.billImpact.benefitEstimate.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Alignment Score:</span>
+                  <span className="font-medium">{sponsor.billImpact.alignmentScore}%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Potential Influence:</span>
+                  <Badge className={getConflictLevelColor(sponsor.billImpact.potentialInfluence)}>
+                    {sponsor.billImpact.potentialInfluence.toUpperCase()}
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
+
+      {/* Recommendations */}
+      {sponsor.recommendations.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5" />
+              Transparency Recommendations
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {sponsor.recommendations.map((recommendation, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
+                  <span>{recommendation}</span>
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Navigation Actions */}
       <div className="flex justify-between items-center">
