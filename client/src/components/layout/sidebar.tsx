@@ -20,6 +20,7 @@ const navigation = [
   { name: 'Sponsorship', href: '/bill-sponsorship-analysis', icon: Users },
   { name: 'Verification', href: '/expert-verification', icon: Shield },
   { name: 'Profile', href: '/profile', icon: Settings },
+  { name: 'Workarounds', href: '/workarounds', icon: Gavel }, // Added Workarounds navigation item
 ];
 
 export function Sidebar() {

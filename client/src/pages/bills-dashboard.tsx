@@ -73,6 +73,13 @@ const FALLBACK_BILLS = [
   }
 ];
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { ImplementationWorkarounds } from '../components/implementation/workarounds';
+
 function BillsDashboard() {
   const [bills, setBills] = useState(FALLBACK_BILLS);
   const [loading, setLoading] = useState(true);
@@ -83,6 +90,7 @@ function BillsDashboard() {
   const [isUsingFallback, setIsUsingFallback] = useState(false);
   const [category, setCategory] = useState<string>('all');
   const [status, setStatus] = useState<string>('all');
+  const [selectedBill, setSelectedBill] = useState(null);
 
   useEffect(() => {
     const fetchBills = async () => {
@@ -119,9 +127,9 @@ function BillsDashboard() {
     const matchesSearch = searchTerm === '' || 
       bill.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       bill.summary.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = status === 'all' || bill.status === status;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -200,116 +208,195 @@ function BillsDashboard() {
         </div>
       </div>
 
-      {/* Bills Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {loading ? (
-          <>
-            {[1, 2, 3].map(i => (
-              <div key={i} className="bg-white rounded-lg shadow-sm border p-6 animate-pulse">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
-                <div className="h-20 bg-gray-200 rounded mb-4"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+      <Tabs defaultValue="overview" className="space-y-4">
+        {/* Bill Selection */}
+        <div>
+          <Select onValueChange={(value) => {
+            const bill = bills.find(bill => bill.id.toString() === value);
+            setSelectedBill(bill);
+          }}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select a bill" />
+            </SelectTrigger>
+            <SelectContent>
+              {bills.map((bill) => (
+                <SelectItem key={bill.id} value={bill.id.toString()}>
+                  {bill.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="analysis">Analysis</TabsTrigger>
+          <TabsTrigger value="community">Community</TabsTrigger>
+          <TabsTrigger value="workarounds">Workarounds</TabsTrigger>
+          <TabsTrigger value="tracking">Tracking</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview" className="space-y-6">
+          {/* Bills Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {loading ? (
+              <>
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="bg-white rounded-lg shadow-sm border p-6 animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+                    <div className="h-20 bg-gray-200 rounded mb-4"></div>
+                    <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                  </div>
+                ))}
+              </>
+            ) : filteredBills.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-500 text-lg">No bills found matching your criteria.</p>
               </div>
-            ))}
-          </>
-        ) : filteredBills.length === 0 ? (
-          <div className="col-span-full text-center py-12">
-            <p className="text-gray-500 text-lg">No bills found matching your criteria.</p>
-          </div>
-        ) : (
-          filteredBills.map((bill) => (
-            <div key={bill.id} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-                    {bill.title}
-                  </h3>
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                    bill.status === 'passed' 
-                      ? 'bg-green-100 text-green-800'
-                      : bill.status === 'floor_vote'
-                      ? 'bg-blue-100 text-blue-800'
-                      : bill.status === 'committee'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {bill.status.replace('_', ' ')}
-                  </span>
-                </div>
-
-                <p className="text-sm text-gray-600 mb-3">{bill.number}</p>
-                
-                <p className="text-gray-700 text-sm line-clamp-3 mb-4">
-                  {bill.summary}
-                </p>
-
-                {/* Transparency Score */}
-                <div className="mb-4">
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-gray-600">Transparency Score</span>
-                    <span className="font-medium">{bill.transparency_score}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className={`h-2 rounded-full ${
-                        bill.transparency_score >= 80 
-                          ? 'bg-green-500'
-                          : bill.transparency_score >= 60
-                          ? 'bg-yellow-500'
-                          : 'bg-red-500'
-                      }`}
-                      style={{ width: `${bill.transparency_score}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                {/* Engagement Stats */}
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                  <span className="flex items-center gap-1">
-                    👁️ {bill.views?.toLocaleString() || 0}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    💬 {bill.comments?.toLocaleString() || 0}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    📤 {bill.shares?.toLocaleString() || 0}
-                  </span>
-                </div>
-
-                {/* Tags */}
-                {bill.tags && bill.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {bill.tags.slice(0, 3).map((tag, index) => (
-                      <span 
-                        key={index}
-                        className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded"
-                      >
-                        {tag}
+            ) : (
+              filteredBills.map((bill) => (
+                <div key={bill.id} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-3">
+                      <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
+                        {bill.title}
+                      </h3>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        bill.status === 'passed' 
+                          ? 'bg-green-100 text-green-800'
+                          : bill.status === 'floor_vote'
+                          ? 'bg-blue-100 text-blue-800'
+                          : bill.status === 'committee'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {bill.status.replace('_', ' ')}
                       </span>
-                    ))}
-                    {bill.tags.length > 3 && (
-                      <span className="px-2 py-1 text-xs bg-gray-50 text-gray-600 rounded">
-                        +{bill.tags.length - 3} more
+                    </div>
+
+                    <p className="text-sm text-gray-600 mb-3">{bill.number}</p>
+
+                    <p className="text-gray-700 text-sm line-clamp-3 mb-4">
+                      {bill.summary}
+                    </p>
+
+                    {/* Transparency Score */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between text-sm mb-1">
+                        <span className="text-gray-600">Transparency Score</span>
+                        <span className="font-medium">{bill.transparency_score}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div 
+                          className={`h-2 rounded-full ${
+                            bill.transparency_score >= 80 
+                              ? 'bg-green-500'
+                              : bill.transparency_score >= 60
+                              ? 'bg-yellow-500'
+                              : 'bg-red-500'
+                          }`}
+                          style={{ width: `${bill.transparency_score}%` }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    {/* Engagement Stats */}
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                      <span className="flex items-center gap-1">
+                        👁️ {bill.views?.toLocaleString() || 0}
                       </span>
+                      <span className="flex items-center gap-1">
+                        💬 {bill.comments?.toLocaleString() || 0}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        📤 {bill.shares?.toLocaleString() || 0}
+                      </span>
+                    </div>
+
+                    {/* Tags */}
+                    {bill.tags && bill.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-4">
+                        {bill.tags.slice(0, 3).map((tag, index) => (
+                          <span 
+                            key={index}
+                            className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                        {bill.tags.length > 3 && (
+                          <span className="px-2 py-1 text-xs bg-gray-50 text-gray-600 rounded">
+                            +{bill.tags.length - 3} more
+                          </span>
+                        )}
+                      </div>
                     )}
-                  </div>
-                )}
 
-                {/* Action Buttons */}
-                <div className="flex gap-2">
-                  <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-3 rounded transition-colors">
-                    View Details
-                  </button>
-                  <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium py-2 px-3 rounded transition-colors">
-                    Analyze
-                  </button>
+                    {/* Action Buttons */}
+                    <div className="flex gap-2">
+                      <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-3 rounded transition-colors">
+                        View Details
+                      </button>
+                      <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium py-2 px-3 rounded transition-colors">
+                        Analyze
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
+              ))
+            )}
+          </div>
+        </TabsContent>
+        <TabsContent value="analysis" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Bill Analysis</CardTitle>
+              <CardDescription>Analyze the bill and its potential impact</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">Bill analysis functionality coming soon...</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="community" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Community Discussion</CardTitle>
+              <CardDescription>Discuss the bill with the community</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">Community discussion functionality coming soon...</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="workarounds" className="space-y-6">
+          {selectedBill && (
+            <ImplementationWorkarounds billId={selectedBill.id} />
+          )}
+          {!selectedBill && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Implementation Workarounds</CardTitle>
+                <CardDescription>Select a bill to view implementation workarounds</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">Choose a bill from the list to see potential implementation challenges and proposed workarounds.</p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="tracking" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Bill Tracking</CardTitle>
+              <CardDescription>Track your favorite bills and get updates</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">Bill tracking functionality coming soon...</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Summary Stats */}
       <div className="mt-8 bg-white rounded-lg shadow-sm border p-6">

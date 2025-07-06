@@ -226,6 +226,113 @@ app.get("/:id", async (c) => {
   }
 });
 
+// Get workarounds for a bill
+app.get("/:id/workarounds", async (c) => {
+  try {
+    const billId = c.req.param("id");
+    const status = c.req.query("status") || 'all';
+    const sort = c.req.query("sort") || 'popular';
 
+    // Mock data for now - replace with actual database query
+    const mockWorkarounds = [
+      {
+        id: 1,
+        title: 'Phased Implementation Approach',
+        description: 'Implement the bill in phases to reduce compliance burden on small businesses while maintaining regulatory effectiveness.',
+        category: 'Compliance',
+        priority: 'high',
+        status: 'approved',
+        upvotes: 23,
+        downvotes: 3,
+        implementationCost: 150000,
+        timelineEstimate: 180,
+        stakeholderSupport: {
+          small_business: 'strong',
+          labor_unions: 'moderate',
+          government: 'strong'
+        },
+        createdAt: new Date('2024-01-15'),
+        author: {
+          name: 'Sarah Johnson',
+          expertise: 'Policy Implementation'
+        }
+      },
+      {
+        id: 2,
+        title: 'Digital Infrastructure Support',
+        description: 'Establish digital infrastructure and training programs before full implementation to ensure smooth transition.',
+        category: 'Infrastructure',
+        priority: 'critical',
+        status: 'under_review',
+        upvotes: 45,
+        downvotes: 7,
+        implementationCost: 500000,
+        timelineEstimate: 365,
+        stakeholderSupport: {
+          tech_sector: 'strong',
+          rural_communities: 'strong',
+          government: 'moderate'
+        },
+        createdAt: new Date('2024-01-20'),
+        author: {
+          name: 'Michael Chen',
+          expertise: 'Digital Transformation'
+        }
+      }
+    ];
+
+    return c.json(mockWorkarounds);
+  } catch (error) {
+    console.error('Error fetching workarounds:', error);
+    return c.json({ error: 'Failed to fetch workarounds' }, 500);
+  }
+});
+
+// Create a new workaround
+app.post("/:id/workarounds", async (c) => {
+  try {
+    const billId = c.req.param("id");
+    const { title, description, category, priority, implementationCost, timelineEstimate } = await c.req.json();
+
+    // Mock response - replace with actual database insert
+    const newWorkaround = {
+      id: Date.now(),
+      title,
+      description,
+      category,
+      priority,
+      status: 'proposed',
+      upvotes: 0,
+      downvotes: 0,
+      implementationCost: implementationCost ? parseFloat(implementationCost) : null,
+      timelineEstimate: timelineEstimate ? parseInt(timelineEstimate) : null,
+      stakeholderSupport: {},
+      createdAt: new Date(),
+      author: {
+        name: 'Current User', // Replace with actual user data
+        expertise: 'Community Member'
+      }
+    };
+
+    return c.json(newWorkaround, 201);
+  } catch (error) {
+    console.error('Error creating workaround:', error);
+    return c.json({ error: 'Failed to create workaround' }, 500);
+  }
+});
+
+// Vote on a workaround
+app.post('/workarounds/:workaroundId/vote', async (c) => {
+  try {
+    const workaroundId = c.req.param("workaroundId");
+    const { type } = await c.req.json(); // 'up' or 'down'
+
+    // Mock response - replace with actual database update
+    return c.json({ success: true, message: `Vote ${type} recorded` });
+  } catch (error) {
+    console.error('Error voting on workaround:', error);
+    return c.json({ error: 'Failed to record vote' }, 500);
+  }
+});
 
 export default app;
