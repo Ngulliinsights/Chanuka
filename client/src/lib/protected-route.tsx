@@ -1,0 +1,35 @@
+
+import React from 'react';
+import { useAuth } from "@/hooks/use-auth";
+import { Loader2 } from "lucide-react";
+import { Navigate } from "react-router-dom";
+
+// TEMPORARY: Authentication bypass for preview purposes
+const BYPASS_AUTH = true;
+
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const { user, isLoading } = useAuth();
+
+  // Skip authentication checks when BYPASS_AUTH is true
+  if (BYPASS_AUTH) {
+    return <>{children}</>;
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-border" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  return <>{children}</>;
+}

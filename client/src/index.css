@@ -1,0 +1,466 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Chanuka Brand Colors - from design files */
+  --primary: #0d3b66;
+  --primary-dark: #0a2e50;
+  --secondary: #084c61;
+  --accent: #f38a1f;
+  --accent-hover: #d47716;
+  
+  /* Background Colors */
+  --background: #f5f7fa;
+  --foreground: #333333;
+  --light-bg: #f9fafb;
+  --card: #ffffff;
+  --card-foreground: #333333;
+  
+  /* Text Colors */
+  --text: #333333;
+  --text-light: #555555;
+  --text-muted: #6c757d;
+  --text-disabled: #9ca3af;
+  
+  /* UI Elements */
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --muted: #f9fafb;
+  --muted-foreground: #6c757d;
+  --popover: #ffffff;
+  --popover-foreground: #333333;
+  
+  /* Status Colors */
+  --success: #28a745;
+  --danger: #dc3545;
+  --warning: #e6b035;
+  --info: #17a2b8;
+  
+  /* Shadows & Effects */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md: 0 1px 4px rgba(0,0,0,0.1);
+  --shadow-lg: 0 4px 8px rgba(0,0,0,0.15);
+  --shadow-hover: 0 6px 16px rgba(0,0,0,0.12);
+  
+  /* Layout */
+  --radius: 0.5rem;
+  --radius-sm: 0.25rem;
+  --radius-lg: 0.75rem;
+  
+  /* Convert to HSL for compatibility */
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: var(--danger);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --ring: var(--accent);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--primary);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+}
+
+@layer components {
+  /* Chanuka Header Styles */
+  .chanuka-header {
+    background: var(--primary);
+    color: white;
+    padding: 1rem 2rem;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .chanuka-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .chanuka-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
+    text-decoration: none;
+  }
+  
+  .chanuka-logo-icon {
+    width: 32px;
+    height: 32px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary);
+    font-weight: bold;
+  }
+  
+  /* Chanuka Card Styles */
+  .chanuka-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .chanuka-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+  }
+  
+  .chanuka-card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--light-bg);
+  }
+  
+  .chanuka-card-content {
+    padding: 1.5rem;
+  }
+  
+  /* Chanuka Button Styles */
+  .chanuka-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    gap: 0.5rem;
+  }
+  
+  .chanuka-btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+  
+  .chanuka-btn-primary:hover {
+    background: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+  
+  .chanuka-btn-secondary {
+    background: var(--secondary);
+    color: white;
+  }
+  
+  .chanuka-btn-secondary:hover {
+    background: var(--primary-dark);
+  }
+  
+  .chanuka-btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-light);
+  }
+  
+  .chanuka-btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(243, 138, 31, 0.05);
+  }
+  
+  /* Chanuka Tab Styles */
+  .chanuka-tabs {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+  }
+  
+  .chanuka-tab-list {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .chanuka-tab {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: #e5e7eb;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    color: var(--text-light);
+    border-bottom: 3px solid transparent;
+  }
+  
+  .chanuka-tab:hover:not(.active) {
+    background: #d8dbe2;
+    color: var(--primary);
+  }
+  
+  .chanuka-tab.active {
+    background: var(--accent);
+    color: white;
+    border-bottom-color: var(--accent);
+  }
+  
+  .chanuka-tab-content {
+    padding: 1.5rem;
+  }
+  
+  /* Chanuka Form Styles */
+  .chanuka-input {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    font-size: 0.9375rem;
+    transition: all 0.2s ease;
+    background: var(--card);
+  }
+  
+  .chanuka-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(243, 138, 31, 0.2);
+  }
+  
+  .chanuka-select {
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    font-size: 0.9375rem;
+    background: var(--card);
+    cursor: pointer;
+  }
+  
+  .chanuka-select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(243, 138, 31, 0.2);
+  }
+  
+  /* Chanuka Status Badges */
+  .chanuka-status-badge {
+    padding: 0.25em 0.6em;
+    font-size: 0.85em;
+    font-weight: bold;
+    border-radius: var(--radius);
+    color: white;
+  }
+  
+  .chanuka-status-low {
+    background-color: var(--success);
+  }
+  
+  .chanuka-status-medium {
+    background-color: var(--warning);
+    color: var(--text);
+  }
+  
+  .chanuka-status-high {
+    background-color: var(--danger);
+  }
+  
+  .chanuka-status-urgent {
+    background-color: var(--danger);
+    animation: pulse 2s infinite;
+  }
+  
+  /* Chanuka Timeline */
+  .chanuka-timeline {
+    margin: 2rem 0;
+    position: relative;
+    padding-left: 2rem;
+  }
+  
+  .chanuka-timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 7px;
+    height: 100%;
+    width: 2px;
+    background-color: var(--border);
+  }
+  
+  .chanuka-timeline-item {
+    position: relative;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+  
+  .chanuka-timeline-marker {
+    position: absolute;
+    left: -2rem;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--border);
+    border: 2px solid var(--card);
+    z-index: 1;
+  }
+  
+  .chanuka-timeline-marker.active {
+    background-color: var(--success);
+  }
+  
+  .chanuka-timeline-marker.current {
+    background-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(243, 138, 31, 0.2);
+  }
+  
+  /* Chanuka Filter Bar */
+  .chanuka-filter-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  
+  .chanuka-search-box {
+    position: relative;
+    flex: 1;
+    max-width: 400px;
+  }
+  
+  .chanuka-search-box input {
+    width: 100%;
+    padding: 0.625rem 1rem 0.625rem 2.5rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--card);
+  }
+  
+  /* Chanuka Progress Indicators */
+  .chanuka-progress {
+    width: 100%;
+    height: 8px;
+    background-color: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  
+  .chanuka-progress-bar {
+    height: 100%;
+    background-color: var(--accent);
+    transition: width 0.3s ease;
+  }
+  
+  /* Chanuka Breadcrumbs */
+  .chanuka-breadcrumb {
+    padding: 0.75rem 1rem;
+    background-color: var(--card);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+  }
+  
+  .chanuka-breadcrumb a {
+    color: var(--primary);
+    text-decoration: none;
+  }
+  
+  .chanuka-breadcrumb a:hover {
+    text-decoration: underline;
+  }
+  
+  .chanuka-breadcrumb .separator {
+    color: var(--text-light);
+    margin: 0 0.5rem;
+  }
+  
+  .chanuka-breadcrumb .current {
+    color: var(--text);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .chanuka-nav {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .chanuka-filter-bar {
+      flex-direction: column;
+    }
+    
+    .chanuka-tab-list {
+      flex-direction: column;
+    }
+    
+    .chanuka-card-header,
+    .chanuka-card-content {
+      padding: 1rem;
+    }
+  }
+  
+  /* Animations */
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .chanuka-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+}
