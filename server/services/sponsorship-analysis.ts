@@ -1,5 +1,5 @@
 import { db } from '../db';
-import { bills, billSponsorships, sponsors, sponsorTransparency, sponsorAffiliations, billSectionConflicts } from '@shared/schema';
+import { bills, billSponsorships, sponsors, sponsorTransparency, sponsorAffiliations, billSectionConflicts } from '../../shared/schema.js';
 import { eq, and, sql } from 'drizzle-orm';
 import { NotFoundError } from '../utils/errors';
 
@@ -118,7 +118,7 @@ export class SponsorshipAnalysisService {
       };
     } catch (error) {
       // Enhanced error handling with context
-      throw new Error(`Failed to generate comprehensive analysis for bill ${billId}: ${error.message}`);
+      throw new Error(`Failed to generate comprehensive analysis for bill ${billId}: ${(error as any).message || 'Unknown error'}`);
     }
   }
 
@@ -148,7 +148,7 @@ export class SponsorshipAnalysisService {
         riskProfile: this.generateRiskProfile(sponsor.sponsor)
       };
     } catch (error) {
-      throw new Error(`Failed to analyze primary sponsor for bill ${billId}: ${error.message}`);
+      throw new Error(`Failed to analyze primary sponsor for bill ${billId}: ${(error as any).message || 'Unknown error'}`);
     }
   }
 
@@ -175,7 +175,7 @@ export class SponsorshipAnalysisService {
         }
       };
     } catch (error) {
-      throw new Error(`Failed to analyze co-sponsors for bill ${billId}: ${error.message}`);
+      throw new Error(`Failed to analyze co-sponsors for bill ${billId}: ${(error as any).message || 'Unknown error'}`);
     }
   }
 
@@ -199,7 +199,7 @@ export class SponsorshipAnalysisService {
         metrics
       };
     } catch (error) {
-      throw new Error(`Failed to analyze financial network for bill ${billId}: ${error.message}`);
+      throw new Error(`Failed to analyze financial network for bill ${billId}: ${(error as any).message || 'Unknown error'}`);
     }
   }
 
@@ -516,7 +516,7 @@ export class SponsorshipAnalysisService {
 
     const orgLower = organization.toLowerCase();
 
-    for (const [keyword, category] of this.industryCategories) {
+    for (const [keyword, category] of Array.from(this.industryCategories.entries())) {
       if (orgLower.includes(keyword)) {
         return category;
       }
@@ -779,27 +779,7 @@ export class SponsorshipAnalysisService {
       ];
     }
 
-    /**
-     * Safely formats a date, handling null/undefined values and invalid dates
-     * This helper method ensures consistent date formatting throughout the service
-     */
-    private formatDate(dateInput: any): string {
-      try {
-        if (!dateInput) {
-          return new Date().toISOString().split('T')[0];
-        }
 
-        const date = new Date(dateInput);
-        if (isNaN(date.getTime())) {
-          return new Date().toISOString().split('T')[0];
-        }
-
-        return date.toISOString().split('T')[0];
-      } catch (error) {
-        // Fallback to current date if any parsing error occurs
-        return new Date().toISOString().split('T')[0];
-      }
-    }
 
     private getMethodology() {
       return {
@@ -1142,7 +1122,7 @@ export class SponsorshipAnalysisService {
     private cleanupCache(): void {
       const now = Date.now();
 
-      for (const [key, value] of this.cache.entries()) {
+      for (const [key, value] of Array.from(this.cache.entries())) {
         if ((now - value.timestamp) > (value.ttl * 60 * 1000)) {
           this.cache.delete(key);
         }

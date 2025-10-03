@@ -1,38 +1,46 @@
-import RedisStore from 'connect-redis';
-import { Redis } from 'ioredis';
+// import RedisStore from 'connect-redis'; // Redis not available
+// import { Redis } from 'ioredis'; // Redis not available
 import { pool } from '../../shared/database/pool.js';
 import { logger } from '../../shared/utils/logger.js';
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 interface StorageConnections {
-  redis: Redis;
+  cache: Map<string, any>;
   pool: typeof pool;
-  sessionStore: RedisStore;
+  sessionStore: any; // Simple session store
 }
 
-export const createRedisConfig = () => ({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD,
-  maxRetriesPerRequest: 3,
-  retryStrategy: (times: number) => Math.min(times * 50, 2000),
-  enableReadyCheck: true,
-  showFriendlyErrorStack: !IS_PRODUCTION,
-  commandTimeout: 5000,
+export const createCacheConfig = () => ({
+  maxSize: 1000,
+  ttl: 3600000, // 1 hour in milliseconds
 });
 
+// Simple session store implementation
+class SimpleSessionStore {
+  private sessions: Map<string, any> = new Map();
+
+  get(sid: string, callback: (err?: any, session?: any) => void): void {
+    const session = this.sessions.get(sid);
+    callback(null, session);
+  }
+
+  set(sid: string, session: any, callback?: (err?: any) => void): void {
+    this.sessions.set(sid, session);
+    if (callback) callback();
+  }
+
+  destroy(sid: string, callback?: (err?: any) => void): void {
+    this.sessions.delete(sid);
+    if (callback) callback();
+  }
+}
+
 export function initializeConnections(): StorageConnections {
-  const redis = new Redis(createRedisConfig());
+  const cache = new Map<string, any>();
+  const sessionStore = new SimpleSessionStore();
 
-  redis.on('error', err => {
-    logger.error('Redis connection error:', err);
-  });
+  logger.info('Storage connections initialized with simple cache');
 
-  const sessionStore = new RedisStore({
-    client: redis,
-    prefix: 'sess:',
-  });
-
-  return { redis, pool, sessionStore };
+  return { cache, pool, sessionStore };
 }

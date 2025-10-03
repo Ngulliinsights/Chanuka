@@ -1,14 +1,14 @@
 import express from "express";
 import { createServer } from "http";
-import { setupBillRoutes } from "./bills";
-import { setupSponsorRoutes } from "./sponsors";
+import { router as billsRouter } from "./bills.js";
+import { router as sponsorsRouter } from "./sponsors.js";
 import { router as analysisRouter } from "./analysis.js";
-import { setupSponsorshipRoutes } from "./sponsorship";
-import { setupSystemRoutes } from "./system";
-import { setupHealthRoutes } from "./health";
+import { router as sponsorshipRouter } from "./sponsorship.js";
+import { router as systemRouter } from "./system.js";
+import { router as healthRouter } from "./health.js";
 import { router as authRouter } from "./auth.js";
-import { setupUserRoutes } from "./users";
-import { setupVerificationRoutes } from "./verification";
+import { router as usersRouter } from "./users.js";
+import { router as verificationRouter } from "./verification.js";
 
 export async function registerRoutes(app: express.Express) {
   const server = createServer(app);
@@ -17,15 +17,15 @@ export async function registerRoutes(app: express.Express) {
   const apiRouter = express.Router();
 
   // Register all route handlers
-  setupBillRoutes(apiRouter);
-  setupSponsorRoutes(apiRouter);
+  apiRouter.use("/bills", billsRouter);
+  apiRouter.use("/sponsors", sponsorsRouter);
   apiRouter.use("/analysis", analysisRouter);
-  setupSponsorshipRoutes(apiRouter);
-  setupSystemRoutes(apiRouter);
-  setupHealthRoutes(apiRouter);
+  apiRouter.use("/sponsorship", sponsorshipRouter);
+  apiRouter.use("/system", systemRouter);
+  apiRouter.use("/health", healthRouter);
   apiRouter.use("/auth", authRouter);
-  setupUserRoutes(apiRouter);
-  setupVerificationRoutes(apiRouter);
+  apiRouter.use("/users", usersRouter);
+  apiRouter.use("/verification", verificationRouter);
 
   // Mount API router
   app.use("/api", apiRouter);

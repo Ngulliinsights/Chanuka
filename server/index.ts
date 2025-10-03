@@ -14,9 +14,17 @@ import { router as usersRouter } from './routes/users.js';
 import { router as verificationRouter } from './routes/verification.js';
 import { router as healthRouter } from './routes/health.js';
 import { router as communityRouter } from './routes/community.js';
-import { router as workaroundsRouter } from './routes/workarounds.js';
+
+import { router as notificationsRouter } from './routes/notifications.js';
+import { router as searchRouter } from './routes/search.js';
+import { router as profileRouter } from './routes/profile.js';
+import { router as billTrackingRouter } from './routes/bill-tracking.js';
+import { router as adminRouter } from './routes/admin.js';
+import { router as cacheRouter } from './routes/cache.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { requestLogger } from './middleware/request-logger.js';
+import { apiRateLimit } from './middleware/rate-limiter.js';
+import { auditMiddleware } from './services/audit-log.js';
 import { setupVite } from './vite.js';
 import { initializeDatabase, validateDatabaseHealth } from "./utils/db-init.js";
 
@@ -30,6 +38,8 @@ const PORT = parseInt(process.env.PORT || '5000');
 app.use(cors());
 app.use(express.json());
 app.use(requestLogger);
+app.use(apiRateLimit);
+app.use(auditMiddleware);
 
 // All routers are now imported directly - no setup needed
 
@@ -39,7 +49,7 @@ app.get('/api', (req, res) => {
     message: "Chanuka Legislative Transparency Platform API",
     version: "1.0.0",
     endpoints: {
-      bills: "/api/bills",
+      bills: "/api/bills (includes workarounds)",
       sponsors: "/api/sponsors", 
       analysis: "/api/analysis",
       sponsorship: "/api/sponsorship",
@@ -48,8 +58,7 @@ app.get('/api', (req, res) => {
       auth: "/api/auth",
       users: "/api/users",
       verification: "/api/verification",
-      community: "/api/community",
-      workarounds: "/api/workarounds"
+      community: "/api/community"
     }
   });
 });
@@ -65,7 +74,13 @@ app.use('/api/users', usersRouter);
 app.use('/api/verification', verificationRouter);
 app.use('/api/health', healthRouter);
 app.use('/api/community', communityRouter);
-app.use('/api/workarounds', workaroundsRouter);
+
+app.use('/api/notifications', notificationsRouter);
+app.use('/api/search', searchRouter);
+app.use('/api/profile', profileRouter);
+app.use('/api/bill-tracking', billTrackingRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api/cache', cacheRouter);
 
 // Error handling
 app.use(errorHandler);

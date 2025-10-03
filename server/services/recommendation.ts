@@ -3,10 +3,10 @@ import {
   billEngagement,
   bills,
   billTags,
-  db,
   userInterests,
   type Bill,
-} from '../../../shared/schema.js';
+} from '../../shared/schema.js';
+import { db } from '../db.js';
 
 /**
  * Recommendation Service
@@ -67,7 +67,7 @@ export class RecommendationService {
    * @param userId - The ID of the user
    * @returns Promise resolving to array of interest strings
    */
-  private async getUserInterests(userId: number): Promise<string[]> {
+  private async getUserInterests(userId: string): Promise<string[]> {
     const cacheKey = `user_interests_${userId}`;
 
     return this.getCachedData(cacheKey, async () => {
@@ -90,7 +90,7 @@ export class RecommendationService {
    * @param userId - The ID of the user
    * @returns Promise resolving to array of bill IDs
    */
-  private async getUserEngagedBillIds(userId: number): Promise<number[]> {
+  private async getUserEngagedBillIds(userId: string): Promise<number[]> {
     const cacheKey = `user_engaged_bills_${userId}`;
 
     return this.getCachedData(cacheKey, async () => {
@@ -139,7 +139,7 @@ export class RecommendationService {
    * @returns Promise resolving to an array of recommended bills with scores
    */
   async getPersonalizedRecommendations(
-    userId: number,
+    userId: string,
     limit: number = 10,
   ): Promise<Array<Bill & { score: number }>> {
     try {
@@ -368,7 +368,7 @@ export class RecommendationService {
    * @returns Promise resolving to the updated engagement record
    */
   async trackEngagement(
-    userId: number,
+    userId: string,
     billId: number,
     engagementType: 'view' | 'comment' | 'share',
   ): Promise<any> {
@@ -493,7 +493,7 @@ export class RecommendationService {
    * @returns Promise resolving to an array of recommended bills with scores
    */
   async getCollaborativeRecommendations(
-    userId: number,
+    userId: string,
     limit: number = 10,
   ): Promise<Array<Bill & { score: number }>> {
     try {

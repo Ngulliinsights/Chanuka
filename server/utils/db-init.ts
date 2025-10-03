@@ -72,7 +72,23 @@ export async function validateDatabaseHealth() {
       connected: false,
       tablesExist: false,
       canWrite: false,
-      message: `Database error: ${error.message || 'Unknown error'}`
+      message: `Database error: ${(error as any).message || 'Unknown error'}`
     };
+  }
+}
+
+async function checkTablesExist(): Promise<boolean> {
+  try {
+    const tableCheck = await pool.query(`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      AND table_name IN ('bills', 'users', 'bill_comments', 'bill_engagement', 'notifications', 'analysis', 'sponsors')
+    `);
+
+    return tableCheck.rows.length >= 4; // At least the core tables should exist
+  } catch (error) {
+    console.error('Error checking table existence:', error);
+    return false;
   }
 }

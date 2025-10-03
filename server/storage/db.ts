@@ -1,17 +1,11 @@
-import { Redis } from 'ioredis';
+// import { Redis } from 'ioredis'; // Redis not available
 
 // Re-export the pool from shared module
-export { createPoolConfig, pool } from '@shared/database/pool.js';
+export { createPoolConfig, pool } from '../../shared/database/pool.js';
 
-// Centralize Redis configuration
-export const createRedis = (config = {}) =>
-  new Redis({
-    host: process.env.REDIS_HOST || 'localhost',
-    port: parseInt(process.env.REDIS_PORT || '6379'),
-    retryStrategy: (times: number) => Math.min(times * 50, 2000),
-    maxRetriesPerRequest: 3,
-    enableReadyCheck: true,
-    ...config,
-  });
+// Simple cache implementation since Redis is not available
+export const createCache = (config = {}) => {
+  return new Map<string, { data: any; expires: number }>();
+};
 
-export const redis = createRedis();
+export const cache = createCache();

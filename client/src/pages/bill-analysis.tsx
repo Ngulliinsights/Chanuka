@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, Link } from 'wouter';
-import { AppLayout } from '@/components/layout/app-layout';
+import AppLayout from '@/components/layout/app-layout';
 import DOMPurify from 'dompurify';
 import { LoadingSpinner } from '@/components/ui/spinner';
 import { useBillAnalysis } from '@/hooks/use-bill-analysis';

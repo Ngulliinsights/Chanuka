@@ -109,7 +109,8 @@ class Metrics {
 
   getMetrics() {
     const result: Record<string, MetricData & { threshold?: number }> = {};
-    for (const [key, value] of this.metrics.entries()) {
+    for (const entry of Array.from(this.metrics.entries())) {
+      const [key, value] = entry;
       result[key] = {
         ...value,
         threshold: this.thresholds.get(key),

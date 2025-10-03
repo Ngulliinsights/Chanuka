@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 import path from 'path';
-import { AnalysisResult } from '../../../shared/types/legal-analysis.js';
+import { AnalysisResult } from '../../shared/types/legal-analysis.js';
 
 // Configuration interface for better extensibility
 interface AnalysisConfig {

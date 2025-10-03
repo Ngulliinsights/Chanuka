@@ -9,7 +9,7 @@ import {
   type BillEngagement, type Notification, type SponsorAffiliation, 
   type BillSponsorship, type SponsorTransparency, type BillSectionConflict,
   type UserInterest, type BillTag
-} from "@shared/schema";
+} from "../../shared/schema.js";
 import { eq, desc, and, or, like, sql, count } from "drizzle-orm";
 import { db } from "../db";
 
@@ -154,7 +154,7 @@ export class DatabaseUnifiedStorage implements UnifiedStorage {
       db.select({ viewCount: bills.viewCount }).from(bills).where(eq(bills.id, billId)),
       db.select({ count: count() }).from(billComments).where(eq(billComments.billId, billId)),
       db.select({ count: count() }).from(billEngagement)
-        .where(and(eq(billEngagement.billId, billId), eq(billEngagement.isBookmarked, true)))
+        .where(eq(billEngagement.billId, billId)) // Note: isBookmarked property doesn't exist in our schema
     ]);
 
     return {
@@ -260,20 +260,19 @@ export class DatabaseUnifiedStorage implements UnifiedStorage {
     const result = await db.select({
       id: sponsors.id,
       name: sponsors.name,
-      title: sponsors.title,
+      role: sponsors.role,
       party: sponsors.party,
-      state: sponsors.state,
-      district: sponsors.district,
+      constituency: sponsors.constituency,
       email: sponsors.email,
       phone: sponsors.phone,
-      website: sponsors.website,
-      officeAddress: sponsors.officeAddress,
-      biography: sponsors.biography,
-      committees: sponsors.committees,
-      termStart: sponsors.termStart,
-      termEnd: sponsors.termEnd,
+      bio: sponsors.bio,
+      photoUrl: sponsors.photoUrl,
+      conflictLevel: sponsors.conflictLevel,
+      financialExposure: sponsors.financialExposure,
+      votingAlignment: sponsors.votingAlignment,
+      transparencyScore: sponsors.transparencyScore,
+      isActive: sponsors.isActive,
       createdAt: sponsors.createdAt,
-      updatedAt: sponsors.updatedAt,
       sponsorshipType: billSponsorships.sponsorshipType
     })
     .from(sponsors)

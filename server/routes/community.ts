@@ -1,11 +1,8 @@
 
-import { Hono } from "hono";
-import { zValidator } from "@hono/zod-validator";
+import { Router } from "express";
 import { z } from "zod";
-import { db, bills, billComments, users, userProfiles, isDatabaseConnected } from "../db";
-import { eq, desc, and, sql, count } from "drizzle-orm";
 
-const app = new Hono();
+export const router = Router();
 
 // Input schemas
 const createCommentSchema = z.object({
@@ -84,127 +81,131 @@ const samplePolls = [
 ];
 
 // Community input endpoints
-app.get("/comments/:billId", async (c) => {
+router.get("/comments/:billId", async (req, res) => {
   try {
-    const billId = c.req.param("billId");
-    const sort = c.req.query("sort") || "recent";
-    const expert = c.req.query("expert") === "true";
-    const section = c.req.query("section");
+    const billId = req.params.billId;
+    const sort = req.query.sort as string || "recent";
+    const expert = req.query.expert === "true";
+    const section = req.query.section as string;
 
-    if (!isDatabaseConnected) {
-      let filteredComments = sampleComments.filter(comment => comment.billId === billId);
-      
-      if (expert) {
-        filteredComments = filteredComments.filter(comment => comment.expertise);
-      }
-      
-      if (section) {
-        // In a real implementation, this would filter by section
-      }
-
-      // Sort comments
-      switch (sort) {
-        case "popular":
-          filteredComments.sort((a, b) => (b.upvotes + b.endorsements) - (a.upvotes + a.endorsements));
-          break;
-        case "verified":
-          filteredComments.sort((a, b) => b.verifiedClaims - a.verifiedClaims);
-          break;
-        default: // recent
-          filteredComments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      }
-
-      return c.json(filteredComments);
+    // Use sample data for now
+    let filteredComments = sampleComments.filter(comment => comment.billId === billId);
+    
+    if (expert) {
+      filteredComments = filteredComments.filter(comment => comment.expertise);
+    }
+    
+    if (section) {
+      // In a real implementation, this would filter by section
     }
 
-    // Database implementation would go here
-    const comments = await db.select().from(billComments)
-      .where(eq(billComments.billId, parseInt(billId)))
-      .orderBy(desc(billComments.createdAt));
+    // Sort comments
+    switch (sort) {
+      case "popular":
+        filteredComments.sort((a, b) => (b.upvotes + b.endorsements) - (a.upvotes + a.endorsements));
+        break;
+      case "verified":
+        filteredComments.sort((a, b) => b.verifiedClaims - a.verifiedClaims);
+        break;
+      default: // recent
+        filteredComments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
 
-    return c.json(comments);
+    res.json(filteredComments);
   } catch (error) {
     console.error("Error fetching comments:", error);
-    return c.json({ error: "Failed to fetch comments" }, 500);
+    res.status(500).json({ error: "Failed to fetch comments" });
   }
 });
 
-app.post("/comments", zValidator("json", createCommentSchema), async (c) => {
+router.post("/comments", async (req, res) => {
   try {
-    const data = c.req.valid("json");
+    const data = req.body;
     
-    if (!isDatabaseConnected) {
-      // In sample mode, just return success
-      return c.json({ success: true, id: Date.now().toString() });
+    // Validate input
+    const result = createCommentSchema.safeParse(data);
+    if (!result.success) {
+      return res.status(400).json({ error: "Invalid input", details: result.error });
     }
-
-    // Database implementation
-    const [comment] = await db.insert(billComments).values({
-      billId: parseInt(data.billId),
-      userId: "current-user-id", // This would come from auth
-      content: data.content,
-      commentType: data.expertise ? "expert_analysis" : "general",
-    }).returning();
-
-    return c.json({ success: true, comment });
+    
+    // In sample mode, just return success
+    res.json({ success: true, id: Date.now().toString() });
   } catch (error) {
     console.error("Error creating comment:", error);
-    return c.json({ error: "Failed to create comment" }, 500);
+    res.status(500).json({ error: "Failed to create comment" });
   }
 });
 
-app.post("/polls", zValidator("json", createPollSchema), async (c) => {
+router.post("/polls", async (req, res) => {
   try {
-    const data = c.req.valid("json");
+    const data = req.body;
+    
+    // Validate input
+    const result = createPollSchema.safeParse(data);
+    if (!result.success) {
+      return res.status(400).json({ error: "Invalid input", details: result.error });
+    }
     
     // For now, return success - real implementation would save to database
-    return c.json({ success: true, id: Date.now().toString() });
+    res.json({ success: true, id: Date.now().toString() });
   } catch (error) {
     console.error("Error creating poll:", error);
-    return c.json({ error: "Failed to create poll" }, 500);
+    res.status(500).json({ error: "Failed to create poll" });
   }
 });
 
-app.post("/comments/:id/vote", zValidator("json", voteSchema), async (c) => {
+router.post("/comments/:id/vote", async (req, res) => {
   try {
-    const commentId = c.req.param("id");
-    const { type } = c.req.valid("json");
+    const commentId = req.params.id;
+    const data = req.body;
+    
+    // Validate input
+    const result = voteSchema.safeParse(data);
+    if (!result.success) {
+      return res.status(400).json({ error: "Invalid input", details: result.error });
+    }
     
     // For now, return success - real implementation would update vote counts
-    return c.json({ success: true });
+    res.json({ success: true });
   } catch (error) {
     console.error("Error voting on comment:", error);
-    return c.json({ error: "Failed to vote" }, 500);
+    res.status(500).json({ error: "Failed to vote" });
   }
 });
 
-app.post("/comments/:id/poll-vote", zValidator("json", pollVoteSchema), async (c) => {
+router.post("/comments/:id/poll-vote", async (req, res) => {
   try {
-    const commentId = c.req.param("id");
-    const { optionIndex } = c.req.valid("json");
+    const commentId = req.params.id;
+    const data = req.body;
+    
+    // Validate input
+    const result = pollVoteSchema.safeParse(data);
+    if (!result.success) {
+      return res.status(400).json({ error: "Invalid input", details: result.error });
+    }
     
     // For now, return success - real implementation would update poll votes
-    return c.json({ success: true });
+    res.json({ success: true });
   } catch (error) {
     console.error("Error voting on poll:", error);
-    return c.json({ error: "Failed to vote on poll" }, 500);
+    res.status(500).json({ error: "Failed to vote on poll" });
   }
 });
 
-app.post("/comments/:id/highlight", async (c) => {
+router.post("/comments/:id/highlight", async (req, res) => {
   try {
-    const commentId = c.req.param("id");
+    const commentId = req.params.id;
     
     // For now, return success - real implementation would highlight comment
-    return c.json({ success: true });
+    res.json({ success: true });
   } catch (error) {
     console.error("Error highlighting comment:", error);
-    return c.json({ error: "Failed to highlight comment" }, 500);
+    res.status(500).json({ error: "Failed to highlight comment" });
   }
 });
 
 // Public participation metrics
-app.get("/participation/stats", async (c) => {
+router.get("/participation/stats", async (req, res) => {
   try {
     const stats = {
       totalComments: 1247,
@@ -215,15 +216,15 @@ app.get("/participation/stats", async (c) => {
       impactfulFeedback: 67 // Comments that led to bill amendments
     };
 
-    return c.json(stats);
+    res.json(stats);
   } catch (error) {
     console.error("Error fetching participation stats:", error);
-    return c.json({ error: "Failed to fetch stats" }, 500);
+    res.status(500).json({ error: "Failed to fetch stats" });
   }
 });
 
 // Community engagement features
-app.get("/engagement/recent", async (c) => {
+router.get("/engagement/recent", async (req, res) => {
   try {
     const recentActivity = [
       {
@@ -244,11 +245,9 @@ app.get("/engagement/recent", async (c) => {
       }
     ];
 
-    return c.json(recentActivity);
+    res.json(recentActivity);
   } catch (error) {
     console.error("Error fetching recent engagement:", error);
-    return c.json({ error: "Failed to fetch engagement data" }, 500);
+    res.status(500).json({ error: "Failed to fetch engagement data" });
   }
 });
-
-export default app;

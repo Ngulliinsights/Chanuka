@@ -1,9 +1,9 @@
 // Optimized Centralized Authorization Service
-import { db } from '@shared/database/pool.js';
-import { sessions, users, userSocialProfiles } from '@shared/schema.js';
-import type { UserProfile } from '@shared/types/auth.js';
-import bcrypt from 'bcrypt';
-import crypto from 'crypto';
+import { db } from '../../db/index.js';
+import { users, sessions, userSocialProfiles } from '../../shared/schema.js';
+import type { UserProfile } from '../../shared/types/auth.js';
+import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { and, eq, gt } from 'drizzle-orm';
 import { passwordResetService } from './passwordReset.js';
@@ -154,7 +154,7 @@ export class AuthCentralService {
    * @param userId - The ID of the user for the session
    * @returns Session token data including access and refresh tokens
    */
-  private async _createSessionTokens(userId: number): Promise<{
+  private async _createSessionTokens(userId: string): Promise<{
     accessToken: string;
     refreshToken: string;
     accessTokenHash: string;
@@ -189,7 +189,7 @@ export class AuthCentralService {
    * @param refreshTokenExpiresAt - Expiration date for refresh token
    */
   private async _insertSession(
-    userId: number,
+    userId: string,
     accessTokenHash: string,
     refreshTokenHash: string,
     refreshTokenExpiresAt: Date,
@@ -212,7 +212,7 @@ export class AuthCentralService {
    * Updates user's last login timestamp
    * @param userId - The user ID to update
    */
-  private async _updateLastLogin(userId: number): Promise<void> {
+  private async _updateLastLogin(userId: string): Promise<void> {
     await db
       .update(users)
       .set({
@@ -230,14 +230,14 @@ export class AuthCentralService {
    */
   private _mapUserToProfile(user: InferSelectModel<typeof users>): UserProfile {
     return {
-      id: user.id.toString(),
-      username: user.username,
+      id: user.id,
+      username: user.name, // Use name as username fallback
       email: user.email,
       role: user.role as UserProfile['role'],
-      displayName: user.displayName || null,
-      avatarUrl: user.avatarUrl || null,
-      expertise: user.expertise || null,
-      createdAt: user.createdAt,
+      displayName: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : user.name,
+      avatarUrl: null, // This would come from userProfiles table
+      expertise: null, // This would come from userProfiles table
+      createdAt: user.createdAt || new Date(),
       lastLoginAt: user.lastLoginAt || null,
     };
   }
@@ -247,7 +247,7 @@ export class AuthCentralService {
    * @param userId - The ID of the user
    * @returns Session response with tokens
    */
-  private async _createSession(userId: number): Promise<AuthSessionResponse> {
+  private async _createSession(userId: string): Promise<AuthSessionResponse> {
     // Generate tokens and insert session
     const { accessToken, refreshToken, accessTokenHash, refreshTokenHash, refreshTokenExpiresAt } =
       await this._createSessionTokens(userId);
@@ -291,7 +291,7 @@ export class AuthCentralService {
           and(
             // Since we've already checked these values exist, we can use non-null assertion
             eq(profiles.provider, socialProfile.provider!),
-            eq(profiles.profileId, socialProfile.profileId!),
+            eq(profiles.providerId, socialProfile.profileId!),
           ),
         with: {
           user: true,
@@ -314,8 +314,6 @@ export class AuthCentralService {
             .set({
               accessToken: socialProfile.accessToken,
               refreshToken: socialProfile.refreshToken,
-              tokenExpiresAt:
-                socialProfile.tokenExpiresAt || new Date(Date.now() + this.SESSION_EXPIRY_MS),
               updatedAt: new Date(),
             })
             // With explicit typing, existingProfile.id should now be correctly inferred
@@ -355,7 +353,7 @@ export class AuthCentralService {
         );
       }
 
-      let userId: number;
+      let userId: string;
 
       if (!user) {
         // 3. Create new user if no existing user found by email
@@ -371,14 +369,10 @@ export class AuthCentralService {
           .insert(users)
           .values({
             email: socialProfile.email,
-            username: username,
+            name: displayName,
             passwordHash: securePasswordHash,
-            displayName: displayName,
-            role: 'user',
-            avatarUrl: socialProfile.avatarUrl || socialProfile.photos?.[0]?.value || null,
+            role: 'citizen',
             isActive: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
           })
           .returning();
 
@@ -396,15 +390,11 @@ export class AuthCentralService {
       await db.insert(userSocialProfiles).values({
         userId,
         provider: socialProfile.provider,
-        profileId: socialProfile.profileId,
+        providerId: socialProfile.profileId,
         displayName: socialProfile.displayName || '',
-        email: socialProfile.email,
         avatarUrl: socialProfile.avatarUrl || socialProfile.photos?.[0]?.value || null,
         accessToken: socialProfile.accessToken,
         refreshToken: socialProfile.refreshToken,
-        tokenExpiresAt: socialProfile.tokenExpiresAt,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       });
 
       // Update last login time
@@ -513,7 +503,10 @@ export class AuthCentralService {
    * @returns User profile
    */
   async register(
-    userData: Pick<InferInsertModel<typeof users>, 'username' | 'email' | 'displayName'> & {
+    userData: { 
+      username?: string;
+      email: string;
+      displayName?: string;
       passwordPlain: string;
     },
   ): Promise<UserProfile> {
@@ -525,13 +518,12 @@ export class AuthCentralService {
 
       // Check for existing user
       const existingUser = await db.query.users.findFirst({
-        where: (dbUsers, { eq, or }) =>
-          or(eq(dbUsers.username, userData.username), eq(dbUsers.email, userData.email)),
+        where: (dbUsers, { eq }) =>
+          eq(dbUsers.email, userData.email),
       });
 
       if (existingUser) {
-        const field = existingUser.username === userData.username ? 'Username' : 'Email';
-        throw new AppError(`${field} already exists`, 409);
+        throw new AppError('Email already exists', 409);
       }
 
       // Hash password and create user
@@ -540,14 +532,11 @@ export class AuthCentralService {
       const [newUser] = await db
         .insert(users)
         .values({
-          username: userData.username,
+          name: userData.displayName || userData.username || userData.email.split('@')[0],
           email: userData.email,
           passwordHash: passwordHash,
-          displayName: userData.displayName || userData.username,
-          role: 'user',
+          role: 'citizen',
           isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date(),
         })
         .returning();
 
@@ -581,11 +570,11 @@ export class AuthCentralService {
         throw new AppError('Missing login credentials', 400);
       }
 
-      // Find user by username or email
+      // Find user by name or email
       const user = await db.query.users.findFirst({
         where: (dbUsers, { eq, or, and }) =>
           and(
-            or(eq(dbUsers.username, identifier), eq(dbUsers.email, identifier)),
+            or(eq(dbUsers.name, identifier), eq(dbUsers.email, identifier)),
             eq(dbUsers.isActive, true),
           ),
       });

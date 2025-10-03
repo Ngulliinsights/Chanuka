@@ -1,49 +1,53 @@
-import pino from 'pino';
 import { config } from '../config/index.js';
 
-// Configuration for the logger
-const loggerOptions = {
-  level: config.logging?.level || 'info',
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      colorize: true,
-      translateTime: 'SYS:standard',
-    },
-  },
+// Simple logger levels
+const LOG_LEVELS = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3,
 };
 
-// Create logger instance
-const pinoLogger = pino(loggerOptions);
+const currentLogLevel = LOG_LEVELS[config.logging?.level as keyof typeof LOG_LEVELS] ?? LOG_LEVELS.info;
 
-// Export a wrapper to ensure consistent typing
-export const logger = {
-  info: (obj: object | string, msg?: string, ...args: any[]) => {
+// Simple logger implementation
+class SimpleLogger {
+  private formatMessage(level: string, obj: object | string, msg?: string): string {
+    const timestamp = new Date().toISOString();
+    const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
+    
     if (typeof obj === 'string') {
-      pinoLogger.info(msg || obj, ...args);
+      return `${prefix} ${obj}`;
     } else {
-      pinoLogger.info(obj, msg, ...args);
+      const message = msg || '';
+      const objStr = JSON.stringify(obj, null, 2);
+      return `${prefix} ${message}\n${objStr}`;
     }
-  },
-  error: (obj: object | string, msg?: string, ...args: any[]) => {
-    if (typeof obj === 'string') {
-      pinoLogger.error(msg || obj, ...args);
-    } else {
-      pinoLogger.error(obj, msg, ...args);
+  }
+
+  info(obj: object | string, msg?: string, ...args: any[]) {
+    if (currentLogLevel <= LOG_LEVELS.info) {
+      console.log(this.formatMessage('info', obj, msg), ...args);
     }
-  },
-  warn: (obj: object | string, msg?: string, ...args: any[]) => {
-    if (typeof obj === 'string') {
-      pinoLogger.warn(msg || obj, ...args);
-    } else {
-      pinoLogger.warn(obj, msg, ...args);
+  }
+
+  error(obj: object | string, msg?: string, ...args: any[]) {
+    if (currentLogLevel <= LOG_LEVELS.error) {
+      console.error(this.formatMessage('error', obj, msg), ...args);
     }
-  },
-  debug: (obj: object | string, msg?: string, ...args: any[]) => {
-    if (typeof obj === 'string') {
-      pinoLogger.debug(msg || obj, ...args);
-    } else {
-      pinoLogger.debug(obj, msg, ...args);
+  }
+
+  warn(obj: object | string, msg?: string, ...args: any[]) {
+    if (currentLogLevel <= LOG_LEVELS.warn) {
+      console.warn(this.formatMessage('warn', obj, msg), ...args);
     }
-  },
-};
+  }
+
+  debug(obj: object | string, msg?: string, ...args: any[]) {
+    if (currentLogLevel <= LOG_LEVELS.debug) {
+      console.debug(this.formatMessage('debug', obj, msg), ...args);
+    }
+  }
+}
+
+export const logger = new SimpleLogger();

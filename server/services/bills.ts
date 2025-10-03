@@ -1,5 +1,5 @@
-import { storage } from '../../storage/index';
-import { Bill, InsertBill, BillComment, InsertBillComment } from "@shared/schema";
+import { storage } from './storage.js';
+import { Bill, InsertBill, BillComment, InsertBillComment } from "../../shared/schema.js";
 
 // Define error classes for better error handling
 export class BillNotFoundError extends Error {
@@ -164,9 +164,7 @@ class BillsServiceImpl implements BillsService {
       throw new ValidationError('Comment content must be 1000 characters or less');
     }
 
-    if (comment.endorsements !== undefined && (typeof comment.endorsements !== 'number' || comment.endorsements < 0)) {
-      throw new ValidationError('Endorsements must be a non-negative number');
-    }
+    // Note: endorsements field doesn't exist in schema, removing validation
   }
 
   /**
@@ -177,13 +175,8 @@ class BillsServiceImpl implements BillsService {
     try {
       const bills = await storage.getBills();
 
-      // Ensure consistent data structure for all bills
-      return bills.map(bill => ({
-        ...bill,
-        requiresAction: bill.requiresAction ?? false,
-        createdAt: bill.createdAt ?? new Date(),
-        updatedAt: bill.updatedAt ?? new Date()
-      }));
+      // Return bills as-is since schema fields are consistent
+      return bills;
     } catch (error) {
       console.error('Failed to get bills:', error);
       throw new Error('Failed to retrieve bills from storage');
@@ -215,13 +208,8 @@ class BillsServiceImpl implements BillsService {
         throw new BillNotFoundError(id);
       }
 
-      // Ensure consistent data structure
-      const normalizedBill: Bill = {
-        ...bill,
-        requiresAction: bill.requiresAction ?? false,
-        createdAt: bill.createdAt ?? new Date(),
-        updatedAt: bill.updatedAt ?? new Date()
-      };
+      // Return bill as-is since schema fields are consistent
+      const normalizedBill: Bill = bill;
 
       // Update cache
       this.setCachedData(this.billCache, id, normalizedBill);
@@ -250,23 +238,15 @@ class BillsServiceImpl implements BillsService {
       const billWithDefaults: InsertBill = {
         ...bill,
         title: bill.title.trim(),
-        content: bill.content.trim(),
-        description: bill.description.trim(),
-        requiresAction: bill.requiresAction ?? false,
-        status: bill.status ?? 'draft',
-        createdAt: bill.createdAt ?? new Date(),
-        updatedAt: bill.updatedAt ?? new Date()
+        content: bill.content?.trim() || '',
+        description: bill.description?.trim() || '',
+        status: bill.status ?? 'introduced'
       };
 
       const createdBill = await storage.createBill(billWithDefaults);
 
-      // Normalize the created bill structure
-      const normalizedBill: Bill = {
-        ...createdBill,
-        requiresAction: createdBill.requiresAction ?? false,
-        createdAt: createdBill.createdAt ?? new Date(),
-        updatedAt: createdBill.updatedAt ?? new Date()
-      };
+      // Return created bill as-is since schema fields are consistent
+      const normalizedBill: Bill = createdBill;
 
       // Cache the newly created bill
       this.setCachedData(this.billCache, normalizedBill.id, normalizedBill);
@@ -307,13 +287,8 @@ class BillsServiceImpl implements BillsService {
 
       const bills = await storage.getBillsByTags(validTags);
 
-      // Normalize bill structure consistency
-      return bills.map(bill => ({
-        ...bill,
-        requiresAction: bill.requiresAction ?? false,
-        createdAt: bill.createdAt ?? new Date(),
-        updatedAt: bill.updatedAt ?? new Date()
-      }));
+      // Return bills as-is since schema fields are consistent
+      return bills;
     } catch (error) {
       if (error instanceof ValidationError) {
         throw error;
@@ -409,14 +384,8 @@ class BillsServiceImpl implements BillsService {
 
       const comments = await storage.getBillComments(billId);
 
-      // Normalize comment structure
-      const normalizedComments = comments.map(comment => ({
-        ...comment,
-        endorsements: comment.endorsements ?? 0,
-        isHighlighted: comment.isHighlighted ?? false,
-        createdAt: comment.createdAt ?? new Date(),
-        updatedAt: comment.updatedAt ?? new Date()
-      }));
+      // Return comments as-is since schema fields are consistent
+      const normalizedComments = comments;
 
       // Cache the comments
       this.setCachedData(this.commentCache, billId, normalizedComments);
@@ -449,19 +418,15 @@ class BillsServiceImpl implements BillsService {
       const commentWithDefaults: InsertBillComment = {
         ...comment,
         content: comment.content.trim(),
-        endorsements: comment.endorsements ?? 0,
-        isHighlighted: comment.isHighlighted ?? false,
-        parentId: comment.parentId ?? null,
-        createdAt: comment.createdAt ?? new Date(),
-        updatedAt: comment.updatedAt ?? new Date()
+        parentCommentId: comment.parentCommentId ?? undefined
       };
 
       // If it's a reply, verify parent comment exists and belongs to the same bill
-      if (commentWithDefaults.parentId) {
+      if (commentWithDefaults.parentCommentId) {
         const existingComments = await this.getBillComments(comment.billId);
-        const parentComment = existingComments.find(c => c.id === commentWithDefaults.parentId);
+        const parentComment = existingComments.find(c => c.id === commentWithDefaults.parentCommentId);
         if (!parentComment) {
-          throw new ValidationError(`Parent comment ${commentWithDefaults.parentId} does not exist for this bill`);
+          throw new ValidationError(`Parent comment ${commentWithDefaults.parentCommentId} does not exist for this bill`);
         }
       }
 
@@ -530,21 +495,15 @@ class BillsServiceImpl implements BillsService {
       }
 
       // Validate parent comment exists
-      const parentComment = await storage.getBillComment(parentId);
+      const parentComment = await storage.getBillComments(parentId);
       if (!parentComment) {
         throw new CommentNotFoundError(parentId);
       }
 
       const replies = await storage.getCommentReplies(parentId);
 
-      // Normalize reply structure
-      return replies.map(reply => ({
-        ...reply,
-        endorsements: reply.endorsements ?? 0,
-        isHighlighted: reply.isHighlighted ?? false,
-        createdAt: reply.createdAt ?? new Date(),
-        updatedAt: reply.updatedAt ?? new Date()
-      }));
+      // Return replies as-is since schema fields are consistent
+      return replies;
     } catch (error) {
       if (error instanceof CommentNotFoundError || error instanceof ValidationError) {
         throw error;

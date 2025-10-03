@@ -1,46 +1,35 @@
-export type OAuthProvider = 'google' | 'github' | 'facebook' | 'twitter';
-
-export interface AuthResponse {
-  userId: number;
-  username: string;
-  token?: string;
-}
-
-export interface LoginCredentials {
-  username: string;
-  password: string;
-}
-
-export interface RegisterCredentials {
-  username: string;
-  email: string;
-  password: string;
-}
-
-export interface AuthState {
-  userId?: number;
-  username?: string;
-  isAuthenticated: boolean;
-  error?: string;
-  loading: boolean;
-}
-
 export interface UserProfile {
-  id: number;
-  username: string;
+  id: string;
+  username?: string | null;
   email: string;
-  expertise?: string;
+  role: 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate';
+  displayName?: string | null;
+  avatarUrl?: string | null;
+  expertise?: string[] | null;
   createdAt: Date;
-  reputation: number;
-  onboardingCompleted: boolean;
+  lastLoginAt?: Date | null;
 }
 
-export interface UserSettings {
-  darkMode: boolean;
-  emailDigest: boolean;
-  billUpdates: boolean;
-  commentResponses: boolean;
-  newFeatures: boolean;
-  publicProfile: boolean;
-  showExpertise: boolean;
+export interface OAuthProvider {
+  id: string;
+  name: string;
+  clientId: string;
+  clientSecret: string;
+  redirectUri: string;
+  scope: string[];
+}
+
+export interface SocialProfile {
+  id: string;
+  userId: string;
+  provider: string;
+  profileId: string;
+  username?: string;
+  displayName?: string;
+  avatarUrl?: string;
+  accessToken?: string;
+  refreshToken?: string;
+  tokenExpiresAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }

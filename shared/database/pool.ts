@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import pg from 'pg';
-import { schema } from '../schema.js';
+import * as pg from 'pg';
+import * as schema from '../schema.js';
 import { logger } from '../utils/logger.js';
 
 const { Pool } = pg;
@@ -22,14 +22,21 @@ export { pool };
 // Define our desired database schema type, including all tables we want to work with
 export type FullDatabaseSchema = {
   users: typeof schema.users;
-  userSocialProfiles: typeof schema.userSocialProfiles;
-  sessions: typeof schema.sessions;
+  userProfiles: typeof schema.userProfiles;
   userInterests: typeof schema.userInterests;
   bills: typeof schema.bills;
   billTags: typeof schema.billTags;
-  billAnalysis: typeof schema.billAnalysis;
-  billKeyProvisions: typeof schema.billKeyProvisions;
-  billTimeline: typeof schema.billTimeline;
+  billComments: typeof schema.billComments;
+  billEngagement: typeof schema.billEngagement;
+  notifications: typeof schema.notifications;
+  analysis: typeof schema.analysis;
+  sponsors: typeof schema.sponsors;
+  sponsorAffiliations: typeof schema.sponsorAffiliations;
+  billSponsorships: typeof schema.billSponsorships;
+  sponsorTransparency: typeof schema.sponsorTransparency;
+  billSectionConflicts: typeof schema.billSectionConflicts;
+  expertVerifications: typeof schema.expertVerifications;
+  citizenVerifications: typeof schema.citizenVerifications;
 } & typeof schema;
 
 // Get the actual schema type from the imported schema
