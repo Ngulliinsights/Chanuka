@@ -112,7 +112,7 @@ export default {
       // Font family configuration prioritizing system fonts for performance
       fontFamily: {
         sans: [
-          'Segoe UI', 
+          '"Segoe UI"', 
           'system-ui', 
           '-apple-system', 
           'BlinkMacSystemFont', 
@@ -186,29 +186,34 @@ export default {
             color: 'hsl(var(--foreground))',
 
             // Heading styles with consistent weights
-            h1: {
-              color: 'hsl(var(--foreground))',
-              fontWeight: '600',
-            },
-            h2: {
-              color: 'hsl(var(--foreground))',
-              fontWeight: '600',
-            },
-            h3: {
-              color: 'hsl(var(--foreground))',
-              fontWeight: '600',
-            },
-            h4: {
+            'h1, h2, h3, h4': {
               color: 'hsl(var(--foreground))',
               fontWeight: '600',
             },
 
-            // Link styles with hover states
+            // Link styles with hover states and better performance
             a: {
               color: 'hsl(var(--primary))',
+              textDecoration: 'underline',
+              textUnderlineOffset: '2px',
+              transition: 'color 0.2s ease-in-out',
               '&:hover': {
                 color: 'hsl(var(--primary-dark))',
               },
+            },
+
+            // Code styling for better readability
+            code: {
+              backgroundColor: 'hsl(var(--muted))',
+              padding: '0.125rem 0.25rem',
+              borderRadius: '0.25rem',
+              fontSize: '0.875em',
+            },
+
+            // Blockquote styling for better visual hierarchy
+            blockquote: {
+              borderLeftColor: 'hsl(var(--border))',
+              color: 'hsl(var(--muted-foreground))',
             },
           },
         },
@@ -225,42 +230,96 @@ export default {
     require("@tailwindcss/typography"),
 
     // Custom utility classes for common patterns
-    function({ addUtilities }: { addUtilities: any }) {
+    function({ addUtilities, theme }: { addUtilities: any; theme: any }) {
       const newUtilities = {
         // Enhanced card component with hover effects
         '.card-enhanced': {
-          '@apply bg-card border rounded-lg shadow-enhanced hover:shadow-enhanced-lg transition-all duration-200': {},
+          backgroundColor: theme('colors.card.DEFAULT'),
+          borderColor: theme('colors.border'),
+          borderWidth: '1px',
+          borderRadius: theme('borderRadius.lg'),
+          boxShadow: theme('boxShadow.enhanced'),
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            boxShadow: theme('boxShadow.enhanced-lg'),
+          },
         },
 
         // Card hover animation for interactive elements
         '.card-hover': {
-          '@apply hover:transform hover:-translate-y-1 hover:shadow-enhanced-lg transition-all duration-200': {},
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            transform: 'translateY(-2px)',
+            boxShadow: theme('boxShadow.enhanced-lg'),
+          },
         },
 
         // Enhanced button styling with focus states
         '.btn-enhanced': {
-          '@apply px-4 py-2 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2': {},
+          paddingLeft: theme('spacing.4'),
+          paddingRight: theme('spacing.4'),
+          paddingTop: theme('spacing.2'),
+          paddingBottom: theme('spacing.2'),
+          borderRadius: theme('borderRadius.md'),
+          fontWeight: '500',
+          transition: 'all 0.2s ease-in-out',
+          '&:focus': {
+            outline: 'none',
+            ringWidth: '2px',
+            ringColor: theme('colors.ring'),
+            ringOffsetWidth: '2px',
+          },
         },
 
         // Status indicator component for user feedback
         '.status-indicator': {
-          '@apply inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium': {},
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: theme('spacing.1'),
+          paddingLeft: theme('spacing.2'),
+          paddingRight: theme('spacing.2'),
+          paddingTop: theme('spacing.1'),
+          paddingBottom: theme('spacing.1'),
+          borderRadius: theme('borderRadius.DEFAULT'),
+          fontSize: theme('fontSize.xs'),
+          fontWeight: '500',
         },
 
         // Verification meter for progress displays
         '.verification-meter': {
-          '@apply flex-1 h-2 bg-border rounded-full overflow-hidden': {},
+          flex: '1',
+          height: theme('spacing.2'),
+          backgroundColor: theme('colors.border'),
+          borderRadius: theme('borderRadius.full'),
+          overflow: 'hidden',
         },
 
-        // Risk level indicators with semantic colors
+        // Risk level indicators with semantic colors (optimized for performance)
         '.risk-low': {
-          '@apply bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200': {},
+          backgroundColor: 'rgb(220 252 231)', // green-100
+          color: 'rgb(22 101 52)', // green-800
+          '@media (prefers-color-scheme: dark)': {
+            backgroundColor: 'rgb(20 83 45)', // green-900
+            color: 'rgb(187 247 208)', // green-200
+          },
         },
+        
         '.risk-medium': {
-          '@apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200': {},
+          backgroundColor: 'rgb(254 249 195)', // yellow-100
+          color: 'rgb(133 77 14)', // yellow-800
+          '@media (prefers-color-scheme: dark)': {
+            backgroundColor: 'rgb(113 63 18)', // yellow-900
+            color: 'rgb(254 240 138)', // yellow-200
+          },
         },
+        
         '.risk-high': {
-          '@apply bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200': {},
+          backgroundColor: 'rgb(254 226 226)', // red-100
+          color: 'rgb(153 27 27)', // red-800
+          '@media (prefers-color-scheme: dark)': {
+            backgroundColor: 'rgb(127 29 29)', // red-900
+            color: 'rgb(254 202 202)', // red-200
+          },
         },
       };
       addUtilities(newUtilities);

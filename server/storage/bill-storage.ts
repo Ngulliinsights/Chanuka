@@ -1,344 +1,302 @@
-import { Redis } from 'ioredis';
-import { Pool, PoolClient } from 'pg';
-import { pool } from '../../shared/database/pool.js';
-import { Bill, InsertBill } from '../../shared/schema.js';
-import { BaseStorage } from './base/BaseStorage.js';
-import { createRedisConfig } from './config.js';
-import type { StorageConfig } from './StorageTypes.js';
+import { eq, and, desc, inArray, sql } from "drizzle-orm";
+import { BaseStorage } from "./base/BaseStorage";
+import { readDatabase, writeDatabase } from "../database/connection";
+import {
+  bills,
+  billTags,
+  type Bill,
+  type InsertBill,
+} from "../database/schema";
+import type { StorageConfig } from "./StorageTypes";
 
-// Enhanced constants for better maintainability and performance
+// Enhanced cache configuration with better TTL management
 const CACHE_TTL = 3600; // 1 hour in seconds
 const CACHE_KEY = {
-  ALL_BILLS: 'bills:all',
-  BILL_BY_ID: (id: number) => `bill:${id}`,
-  BILLS_BY_TAGS: (tags: string[]) => `bills:tags:${tags.sort().join(',')}`,
-  PATTERN_ALL: 'bills:*',
-  PATTERN_BY_ID: 'bill:*',
-  PATTERN_BY_TAGS: 'bills:tags:*',
-};
+  ALL_BILLS: "bills:all",
+  BILL_BY_ID: (id: number) => `bills:id:${id}`,
+  BILLS_BY_TAGS: (tags: string[]) => `bills:tags:${tags.sort().join(",")}`,
+} as const;
 
-// Enhanced cache invalidation strategies
+// Improved cache invalidation patterns with proper type handling
 const CACHE_INVALIDATION = {
-  FULL: [CACHE_KEY.PATTERN_ALL, CACHE_KEY.PATTERN_BY_TAGS],
-  SINGLE: (id: number) => [CACHE_KEY.BILL_BY_ID(id)],
-  TAGS_ONLY: [CACHE_KEY.PATTERN_BY_TAGS],
-};
+  // Arrays are mutable to allow runtime modifications if needed
+  FULL: [CACHE_KEY.ALL_BILLS] as string[], // Full invalidation of all bills cache
+  SINGLE: (id: number) => [CACHE_KEY.BILL_BY_ID(id)] as string[], // Single bill invalidation
+  PATTERN_BY_ID: (id: number) => [`bills:id:${id}`] as string[], // Pattern-based ID invalidation
+  PATTERN_BY_TAGS: ["bills:tags:*"] as string[], // Tag-based pattern invalidation
+  PATTERN_ALL: ["bills:*"] as string[], // All bill-related pattern invalidation
+} as const;
 
-// Use Redis singleton with config
-const redis = new Redis(createRedisConfig());
-
+/**
+ * Enhanced BillStorage class with optimized Drizzle ORM operations
+ *
+ * This class provides a comprehensive storage solution for bill management with:
+ * - Efficient caching with smart invalidation strategies
+ * - Robust transaction handling with proper error recovery
+ * - Type-safe database operations using Drizzle ORM
+ * - Performance optimizations for common query patterns
+ */
 export class BillStorage extends BaseStorage<Bill> {
   private static instance: BillStorage;
 
-  constructor(redis: Redis, pool: Pool, options: StorageConfig = {}) {
-    super(redis, pool, options);
+  constructor(options: StorageConfig = {}) {
+    super(options);
   }
 
-  static getInstance(): BillStorage {
+  /**
+   * Singleton pattern implementation for consistent storage access
+   */
+  static getInstance(options?: StorageConfig): BillStorage {
     if (!BillStorage.instance) {
-      BillStorage.instance = new BillStorage(redis, pool);
+      BillStorage.instance = new BillStorage(options);
     }
     return BillStorage.instance;
   }
 
   /**
-   * Enhanced cache getter with better error handling and performance monitoring
-   * @param key - Cache key
-   * @param fetchFn - Function to fetch data if not in cache
-   * @param ttl - Optional custom TTL in seconds
-   */
-  protected async getCached<T>(
-    key: string,
-    fetchFn: () => Promise<T>,
-    ttl: number = CACHE_TTL,
-  ): Promise<T> {
-    try {
-      const cached = await redis.get(key);
-      if (cached) {
-        try {
-          return JSON.parse(cached);
-        } catch (parseError) {
-          // Log parse error and continue to fetch fresh data
-          console.warn(`Cache parse error for key ${key}:`, parseError);
-          await redis.del(key); // Remove corrupted cache entry
-        }
-      }
-
-      const data = await fetchFn();
-
-      // Enhanced caching logic with better validation
-      if (data !== undefined && data !== null) {
-        try {
-          await redis.setex(key, ttl, JSON.stringify(data));
-        } catch (cacheError) {
-          // Log cache write error but don't fail the operation
-          console.warn(`Cache write error for key ${key}:`, cacheError);
-        }
-      }
-
-      return data;
-    } catch (error) {
-      console.error(`Cache error for key ${key}:`, error);
-      // Fallback to direct fetch if cache fails
-      return fetchFn();
-    }
-  }
-
-  /**
-   * Enhanced cache invalidation with pattern-based cleanup
-   * @param patterns - Array of Redis key patterns to match
-   */
-  protected async invalidateCache(patterns: string | string[]): Promise<void> {
-    const patternArray = Array.isArray(patterns) ? patterns : [patterns];
-
-    try {
-      // Process patterns in parallel for better performance
-      const invalidationPromises = patternArray.map(async (pattern) => {
-        const keys = await redis.keys(pattern);
-        if (keys.length > 0) {
-          // Use pipeline for better performance with multiple deletions
-          const pipeline = redis.pipeline();
-          keys.forEach(key => pipeline.del(key));
-          await pipeline.exec();
-        }
-      });
-
-      await Promise.all(invalidationPromises);
-    } catch (error) {
-      console.error(`Failed to invalidate cache with patterns ${patternArray.join(', ')}:`, error);
-      // Continue execution even if cache invalidation fails
-    }
-  }
-
-  /**
-   * Enhanced transaction execution with better error context
-   * @param callback - Transaction callback function
-   */
-  private async executeTransaction<T>(callback: (client: PoolClient) => Promise<T>): Promise<T> {
-    const client = await pool.connect();
-    try {
-      await client.query('BEGIN');
-      const result = await callback(client);
-      await client.query('COMMIT');
-      return result;
-    } catch (error) {
-      await client.query('ROLLBACK');
-      // Add more context to the error for better debugging
-      const enhancedError = new Error(`Transaction failed: ${error.message}`);
-      enhancedError.stack = error.stack;
-      throw enhancedError;
-    } finally {
-      client.release();
-    }
-  }
-
-  /**
-   * Optimized query for getting all bills with improved performance
+   * Optimized method to retrieve all bills with enhanced caching
+   *
+   * Uses read replica for better performance and implements smart caching
+   * to reduce database load on frequently accessed data.
    */
   async getBills(): Promise<Bill[]> {
-    return this.getCached(CACHE_KEY.ALL_BILLS, async () => {
-      // Enhanced query with better JSON aggregation and ordering
-      const result = await pool.query(`
-        SELECT b.id,
-               b.title,
-               b.description,
-               b.status,
-               b.proposed_date,
-               b.last_updated,
-               b.content,
-               b.stakeholder_ids,
-               b.view_count,
-               b.share_count,
-               b.created_at,
-               COALESCE(
-                 json_agg(bt.tag ORDER BY bt.tag) FILTER (WHERE bt.tag IS NOT NULL),
-                 '[]'::json
-               ) as tags
-        FROM bills b
-        LEFT JOIN bill_tags bt ON b.id = bt.bill_id
-        GROUP BY b.id, b.title, b.description, b.status, b.proposed_date, 
-                 b.last_updated, b.content, b.stakeholder_ids, b.view_count, 
-                 b.share_count, b.created_at
-        ORDER BY b.created_at DESC
-      `);
+    return this.getCached(
+      CACHE_KEY.ALL_BILLS,
+      async () => {
+        const result = await readDatabase
+          .select()
+          .from(bills)
+          .orderBy(desc(bills.createdAt));
 
-      // Enhanced data processing with better type safety
-      return result.rows.map(bill => ({
-        ...bill,
-        tags: Array.isArray(bill.tags) ? bill.tags : [],
-        stakeholder_ids: Array.isArray(bill.stakeholder_ids) ? bill.stakeholder_ids : [],
-      }));
-    });
+        return result;
+      },
+      CACHE_TTL
+    );
   }
 
   /**
-   * Optimized single bill retrieval with enhanced validation
-   * @param id - Bill ID
+   * Enhanced single bill retrieval with input validation
+   *
+   * Provides optimized single bill fetching with comprehensive validation
+   * and error handling to ensure data integrity.
    */
   async getBill(id: number): Promise<Bill | undefined> {
-    // Enhanced input validation
+    // Enhanced input validation with descriptive error messages
     if (!Number.isInteger(id) || id <= 0) {
-      throw new Error('Invalid bill ID: must be a positive integer');
+      throw new Error("Invalid bill ID: must be a positive integer");
     }
 
-    return this.getCached(CACHE_KEY.BILL_BY_ID(id), async () => {
-      // Optimized query with explicit column selection
-      const result = await pool.query(
-        `
-        SELECT b.id,
-               b.title,
-               b.description,
-               b.status,
-               b.proposed_date,
-               b.last_updated,
-               b.content,
-               b.stakeholder_ids,
-               b.view_count,
-               b.share_count,
-               b.created_at,
-               COALESCE(
-                 json_agg(bt.tag ORDER BY bt.tag) FILTER (WHERE bt.tag IS NOT NULL),
-                 '[]'::json
-               ) as tags
-        FROM bills b
-        LEFT JOIN bill_tags bt ON b.id = bt.bill_id
-        WHERE b.id = $1
-        GROUP BY b.id, b.title, b.description, b.status, b.proposed_date, 
-                 b.last_updated, b.content, b.stakeholder_ids, b.view_count, 
-                 b.share_count, b.created_at
-      `,
-        [id],
-      );
+    return this.getCached(
+      CACHE_KEY.BILL_BY_ID(id),
+      async () => {
+        const result = await readDatabase
+          .select()
+          .from(bills)
+          .where(eq(bills.id, id));
 
-      if (result.rows.length === 0) return undefined;
-
-      const bill = result.rows[0];
-      return {
-        ...bill,
-        tags: Array.isArray(bill.tags) ? bill.tags : [],
-        stakeholder_ids: Array.isArray(bill.stakeholder_ids) ? bill.stakeholder_ids : [],
-      };
-    });
+        return result[0];
+      },
+      CACHE_TTL
+    );
   }
 
   /**
-   * Enhanced bill creation with better validation and error handling
-   * @param bill - Bill data to insert
+   * Optimized bill creation with enhanced validation and transaction handling
+   *
+   * Creates a new bill with comprehensive validation, proper transaction
+   * management, and intelligent cache invalidation.
    */
   async createBill(bill: InsertBill): Promise<Bill> {
-    // Enhanced validation with more specific error messages
+    // Enhanced input validation with specific error messages
     if (!bill.title?.trim()) {
-      throw new Error('Bill title is required and cannot be empty');
+      throw new Error("Bill title is required and cannot be empty");
     }
+
     if (!bill.content?.trim()) {
-      throw new Error('Bill content is required and cannot be empty');
+      throw new Error("Bill content is required and cannot be empty");
     }
 
-    return this.executeTransaction(async client => {
-      // Enhanced insert with better default handling
-      const result = await client.query(
-        `INSERT INTO bills
-         (title, description, status, proposed_date, last_updated, content,
-          stakeholder_ids, view_count, share_count, created_at)
-         VALUES ($1, $2, $3, $4, $4, $5, $6, 0, 0, CURRENT_TIMESTAMP)
-         RETURNING *`,
-        [
-          bill.title.trim(),
-          bill.description?.trim() || '',
-          bill.status || 'draft',
-          bill.proposedDate || new Date(),
-          bill.content.trim(),
-          JSON.stringify(bill.stakeholderIds || []),
-        ],
-      );
+    return this.executeTransaction(async (tx) => {
+      // Insert new bill with proper defaults and timestamp handling
+      const result = await tx
+        .insert(bills)
+        .values({
+          ...bill,
+          title: bill.title.trim(),
+          content: bill.content.trim(),
+          description: bill.description?.trim() || "",
+          status: bill.status || "draft",
+          viewCount: 0,
+          shareCount: 0,
+        })
+        .returning();
 
-      const newBill = result.rows[0];
+      const newBill = result[0];
 
-      // Enhanced cache invalidation with more targeted approach
+      // Intelligent cache invalidation - only invalidate what's necessary
       await this.invalidateCache(CACHE_INVALIDATION.FULL);
 
-      return {
-        ...newBill,
-        tags: [], // New bills start with no tags
-        stakeholder_ids: newBill.stakeholder_ids || [],
-      };
+      return newBill;
     });
   }
 
   /**
-   * Enhanced statistics update with better error handling
-   * @param billId - Bill ID
-   * @param field - Field to increment (view_count or share_count)
+   * Enhanced bill statistics increment with atomic operations
+   *
+   * Provides thread-safe increments for view and share counts using
+   * SQL atomic operations to prevent race conditions.
+   */
+  async incrementBillViews(billId: number): Promise<Bill> {
+    return this.incrementBillStat(billId, "viewCount");
+  }
+
+  async incrementBillShares(billId: number): Promise<Bill> {
+    return this.incrementBillStat(billId, "shareCount");
+  }
+
+  /**
+   * Private method for atomic statistics updates
+   *
+   * Uses SQL increment operations to ensure thread-safety and data consistency
+   * while maintaining proper cache invalidation.
    */
   private async incrementBillStat(
     billId: number,
-    field: 'view_count' | 'share_count',
+    field: "viewCount" | "shareCount"
   ): Promise<Bill> {
     // Enhanced input validation
     if (!Number.isInteger(billId) || billId <= 0) {
-      throw new Error('Invalid bill ID: must be a positive integer');
+      throw new Error("Invalid bill ID: must be a positive integer");
     }
 
-    return this.executeTransaction(async client => {
-      // First check if bill exists to provide better error message
-      const checkResult = await client.query('SELECT id FROM bills WHERE id = $1', [billId]);
-      if (checkResult.rows.length === 0) {
+    return this.executeTransaction(async (tx) => {
+      // First check if bill exists for better error messages
+      const existingBill = await tx
+        .select()
+        .from(bills)
+        .where(eq(bills.id, billId));
+
+      if (existingBill.length === 0) {
         throw new Error(`Bill with ID ${billId} not found`);
       }
 
-      // Enhanced update with better query structure
-      const result = await client.query(
-        `
-        UPDATE bills
-        SET ${field} = ${field} + 1,
-            last_updated = CURRENT_TIMESTAMP
-        WHERE id = $1
-        RETURNING *
-      `,
-        [billId],
-      );
+      // Use atomic SQL increment to prevent race conditions
+      const updateData =
+        field === "viewCount"
+          ? { viewCount: sql`${bills.viewCount} + 1`, updatedAt: new Date() }
+          : { shareCount: sql`${bills.shareCount} + 1`, updatedAt: new Date() };
 
-      const updatedBill = result.rows[0];
+      const result = await tx
+        .update(bills)
+        .set(updateData)
+        .where(eq(bills.id, billId))
+        .returning();
 
-      // Get tags in a separate query for better performance
-      const tagsResult = await client.query(
-        'SELECT json_agg(tag ORDER BY tag) as tags FROM bill_tags WHERE bill_id = $1',
-        [billId]
-      );
-
-      // Enhanced cache invalidation with more targeted approach
+      // Targeted cache invalidation for better performance
       await this.invalidateCache([
-        CACHE_KEY.BILL_BY_ID(billId),
         CACHE_KEY.ALL_BILLS,
+        CACHE_KEY.BILL_BY_ID(billId),
       ]);
 
-      return {
-        ...updatedBill,
-        tags: tagsResult.rows[0]?.tags || [],
-        stakeholder_ids: updatedBill.stakeholder_ids || [],
-      };
+      return result[0];
     });
   }
 
   /**
-   * Increments the view count for a bill
-   * @param billId - Bill ID
+   * Enhanced tag management with better validation and performance
+   *
+   * Provides comprehensive tag operations with proper validation,
+   * deduplication, and optimized database queries.
    */
-  async incrementBillViews(billId: number): Promise<Bill> {
-    return this.incrementBillStat(billId, 'view_count');
+  async addTagsToBill(billId: number, tags: string[]): Promise<Bill> {
+    // Enhanced input validation
+    if (!Number.isInteger(billId) || billId <= 0) {
+      throw new Error("Invalid bill ID: must be a positive integer");
+    }
+
+    if (!Array.isArray(tags) || tags.length === 0) {
+      throw new Error("Tags array is required and cannot be empty");
+    }
+
+    const cleanTags = this.validateAndCleanTags(tags);
+
+    return this.executeTransaction(async (tx) => {
+      // Check if bill exists first
+      const existingBill = await tx
+        .select()
+        .from(bills)
+        .where(eq(bills.id, billId));
+
+      if (existingBill.length === 0) {
+        throw new Error(`Bill with ID ${billId} not found`);
+      }
+
+      // Insert tags with conflict resolution (ignore duplicates)
+      const tagValues = cleanTags.map((tag) => ({ billId, tag }));
+      await tx.insert(billTags).values(tagValues).onConflictDoNothing();
+
+      // Update bill timestamp to reflect the change
+      await tx
+        .update(bills)
+        .set({ updatedAt: new Date() })
+        .where(eq(bills.id, billId));
+
+      // Enhanced cache invalidation including tag-based caches
+      await this.invalidateCache([
+        CACHE_KEY.ALL_BILLS,
+        CACHE_KEY.BILL_BY_ID(billId),
+        ...CACHE_INVALIDATION.PATTERN_BY_TAGS,
+      ]);
+
+      return existingBill[0];
+    });
   }
 
   /**
-   * Increments the share count for a bill
-   * @param billId - Bill ID
+   * Enhanced tag removal with proper validation
    */
-  async incrementBillShares(billId: number): Promise<Bill> {
-    return this.incrementBillStat(billId, 'share_count');
+  async removeTagsFromBill(billId: number, tags: string[]): Promise<Bill> {
+    // Enhanced input validation
+    if (!Number.isInteger(billId) || billId <= 0) {
+      throw new Error("Invalid bill ID: must be a positive integer");
+    }
+
+    if (!Array.isArray(tags) || tags.length === 0) {
+      throw new Error("Tags array is required and cannot be empty");
+    }
+
+    const cleanTags = this.validateAndCleanTags(tags);
+
+    return this.executeTransaction(async (tx) => {
+      // Remove specified tags efficiently
+      await tx
+        .delete(billTags)
+        .where(
+          and(eq(billTags.billId, billId), inArray(billTags.tag, cleanTags))
+        );
+
+      // Update bill timestamp
+      await tx
+        .update(bills)
+        .set({ updatedAt: new Date() })
+        .where(eq(bills.id, billId));
+
+      // Enhanced cache invalidation
+      await this.invalidateCache([
+        CACHE_KEY.ALL_BILLS,
+        CACHE_KEY.BILL_BY_ID(billId),
+        ...CACHE_INVALIDATION.PATTERN_BY_TAGS,
+      ]);
+
+      return this.getBill(billId);
+    });
   }
 
   /**
-   * Enhanced tag-based bill retrieval with better performance
-   * @param tags - Array of tags to filter by
+   * Optimized tag-based bill retrieval with smart caching
+   *
+   * Efficiently finds bills that contain all specified tags using
+   * optimized queries and intelligent caching strategies.
    */
   async getBillsByTags(tags: string[]): Promise<Bill[]> {
     // Enhanced input validation
@@ -346,157 +304,172 @@ export class BillStorage extends BaseStorage<Bill> {
       return [];
     }
 
-    // Clean and validate tags
-    const cleanTags = tags
-      .map(tag => tag.trim())
-      .filter(tag => tag.length > 0)
-      .map(tag => tag.toLowerCase()); // Normalize case for consistency
-
+    const cleanTags = this.validateAndCleanTags(tags);
     if (cleanTags.length === 0) {
       return [];
     }
 
-    return this.getCached(CACHE_KEY.BILLS_BY_TAGS(cleanTags), async () => {
-      // Enhanced query with better performance characteristics
-      const result = await pool.query(
-        `
-        SELECT b.id,
-               b.title,
-               b.description,
-               b.status,
-               b.proposed_date,
-               b.last_updated,
-               b.content,
-               b.stakeholder_ids,
-               b.view_count,
-               b.share_count,
-               b.created_at,
-               json_agg(bt.tag ORDER BY bt.tag) as tags
-        FROM bills b
-        INNER JOIN bill_tags bt ON b.id = bt.bill_id
-        WHERE b.id IN (
-          SELECT bill_id
-          FROM bill_tags
-          WHERE LOWER(tag) = ANY($1::varchar[])
-          GROUP BY bill_id
-          HAVING COUNT(DISTINCT LOWER(tag)) = $2
-        )
-        GROUP BY b.id, b.title, b.description, b.status, b.proposed_date, 
-                 b.last_updated, b.content, b.stakeholder_ids, b.view_count, 
-                 b.share_count, b.created_at
-        ORDER BY b.created_at DESC
-      `,
-        [cleanTags, cleanTags.length],
-      );
+    return this.getCached(
+      CACHE_KEY.BILLS_BY_TAGS(cleanTags),
+      async () => {
+        // Get bill IDs that have all the specified tags
+        const billIdsWithTags = await readDatabase
+          .select({ billId: billTags.billId })
+          .from(billTags)
+          .where(inArray(billTags.tag, cleanTags))
+          .groupBy(billTags.billId)
+          .having(sql`COUNT(DISTINCT ${billTags.tag}) = ${cleanTags.length}`);
 
-      return result.rows.map(row => ({
-        ...row,
-        tags: Array.isArray(row.tags) ? row.tags : [],
-        stakeholder_ids: Array.isArray(row.stakeholder_ids) ? row.stakeholder_ids : [],
-      }));
+        if (billIdsWithTags.length === 0) {
+          return [];
+        }
+
+        // Get the actual bills
+        const billIds = billIdsWithTags.map((row) => row.billId);
+        return await readDatabase
+          .select()
+          .from(bills)
+          .where(inArray(bills.id, billIds))
+          .orderBy(desc(bills.createdAt));
+      },
+      CACHE_TTL
+    );
+  }
+
+  /**
+   * Enhanced tag validation and cleaning utility
+   *
+   * Provides comprehensive tag validation with normalization,
+   * deduplication, and consistent formatting.
+   */
+  private validateAndCleanTags(tags: string[]): string[] {
+    const cleanTags = tags
+      .map((tag) => tag.trim().toLowerCase())
+      .filter((tag) => tag.length > 0)
+      .filter((tag, index, array) => array.indexOf(tag) === index); // Remove duplicates
+
+    if (cleanTags.length === 0) {
+      throw new Error("No valid tags provided");
+    }
+
+    return cleanTags;
+  }
+
+  /**
+   * Enhanced transaction execution with comprehensive error handling
+   *
+   * Provides robust transaction management with proper error recovery,
+   * logging, and rollback mechanisms for data integrity.
+   */
+  private async executeTransaction<T>(
+    callback: (tx: typeof writeDatabase) => Promise<T>
+  ): Promise<T> {
+    return await writeDatabase.transaction(async (tx) => {
+      try {
+        return await callback(tx);
+      } catch (error) {
+        // Enhanced error handling with context
+        const enhancedError = new Error(
+          `Transaction failed: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`
+        );
+
+        if (error instanceof Error) {
+          enhancedError.stack = error.stack;
+        }
+
+        // Log error for debugging while maintaining user-friendly messages
+        console.error("Database transaction error:", error);
+
+        throw enhancedError;
+      }
     });
   }
 
   /**
-   * Enhanced method to add tags to an existing bill
-   * @param billId - Bill ID
-   * @param tags - Array of tags to add
+   * Enhanced cache invalidation with pattern support
+   *
+   * Provides flexible cache invalidation supporting both specific keys
+   * and pattern-based invalidation for complex cache scenarios.
    */
-  async addTagsToBill(billId: number, tags: string[]): Promise<Bill> {
-    if (!Number.isInteger(billId) || billId <= 0) {
-      throw new Error('Invalid bill ID: must be a positive integer');
-    }
+  protected async invalidateCache(patterns: string | string[]): Promise<void> {
+    const patternArray = Array.isArray(patterns) ? patterns : [patterns];
 
-    if (!Array.isArray(tags) || tags.length === 0) {
-      throw new Error('Tags array is required and cannot be empty');
-    }
+    // Process patterns in parallel for better performance
+    await Promise.all(
+      patternArray.map(async (pattern) => {
+        try {
+          // Handle wildcard patterns for flexible cache invalidation
+          if (pattern.includes("*")) {
+            const keys = [...this.cache.keys()];
+            const matchingKeys = keys.filter((key) =>
+              key.includes(pattern.replace("*", ""))
+            );
 
-    const cleanTags = tags
-      .map(tag => tag.trim().toLowerCase())
-      .filter(tag => tag.length > 0);
+            await Promise.all(
+              matchingKeys.map((key) => {
+                this.cache.delete(key);
+              })
+            );
+          } else {
+            // Direct key invalidation for specific entries
+            this.cache.delete(pattern);
+          }
+        } catch (error) {
+          // Log cache invalidation errors but don't fail the operation
+          console.warn(
+            `Cache invalidation failed for pattern ${pattern}:`,
+            error
+          );
+        }
+      })
+    );
+  }
 
-    if (cleanTags.length === 0) {
-      throw new Error('No valid tags provided');
-    }
-
-    return this.executeTransaction(async client => {
-      // Check if bill exists
-      const billCheck = await client.query('SELECT id FROM bills WHERE id = $1', [billId]);
-      if (billCheck.rows.length === 0) {
-        throw new Error(`Bill with ID ${billId} not found`);
+  /**
+   * Enhanced caching with better error handling and performance monitoring
+   *
+   * Provides intelligent caching with fallback mechanisms, error recovery,
+   * and performance optimizations for high-traffic scenarios.
+   */
+  protected async getCached<T>(
+    key: string,
+    fetchFn: () => Promise<T>,
+    ttl: number = CACHE_TTL
+  ): Promise<T> {
+    try {
+      // Check cache first with proper error handling
+      const cached = this.cache.get(key);
+      if (cached && cached.expires > Date.now()) {
+        return cached.data as T;
       }
 
-      // Insert tags, ignoring duplicates
-      const values = cleanTags.map((_, index) => `($1, $${index + 2})`).join(',');
-      const params = [billId, ...cleanTags];
+      // Cache miss or expired - fetch fresh data
+      const data = await fetchFn();
 
-      await client.query(
-        `INSERT INTO bill_tags (bill_id, tag) VALUES ${values} ON CONFLICT (bill_id, tag) DO NOTHING`,
-        params
-      );
+      // Only cache if data is valid
+      if (data !== undefined && data !== null) {
+        try {
+          this.cache.set(key, {
+            data: data,
+            expires: Date.now() + ttl * 1000,
+          });
+        } catch (cacheError) {
+          // Log cache write errors but don't fail the operation
+          console.warn(`Cache write error for key ${key}:`, cacheError);
+        }
+      }
 
-      // Update bill's last_updated timestamp
-      await client.query(
-        'UPDATE bills SET last_updated = CURRENT_TIMESTAMP WHERE id = $1',
-        [billId]
-      );
-
-      // Enhanced cache invalidation
-      await this.invalidateCache([
-        CACHE_KEY.BILL_BY_ID(billId),
-        CACHE_KEY.ALL_BILLS,
-        CACHE_KEY.PATTERN_BY_TAGS,
-      ]);
-
-      // Return the updated bill
-      return this.getBill(billId);
-    });
-  }
-
-  /**
-   * Enhanced method to remove tags from a bill
-   * @param billId - Bill ID
-   * @param tags - Array of tags to remove
-   */
-  async removeTagsFromBill(billId: number, tags: string[]): Promise<Bill> {
-    if (!Number.isInteger(billId) || billId <= 0) {
-      throw new Error('Invalid bill ID: must be a positive integer');
+      return data;
+    } catch (error) {
+      // Log fetch errors and remove corrupted cache entries
+      console.error(`Cache fetch error for key ${key}:`, error);
+      this.cache.delete(key);
+      throw error;
     }
-
-    if (!Array.isArray(tags) || tags.length === 0) {
-      throw new Error('Tags array is required and cannot be empty');
-    }
-
-    const cleanTags = tags
-      .map(tag => tag.trim().toLowerCase())
-      .filter(tag => tag.length > 0);
-
-    if (cleanTags.length === 0) {
-      throw new Error('No valid tags provided');
-    }
-
-    return this.executeTransaction(async client => {
-      // Remove specified tags
-      await client.query(
-        'DELETE FROM bill_tags WHERE bill_id = $1 AND LOWER(tag) = ANY($2::varchar[])',
-        [billId, cleanTags]
-      );
-
-      // Update bill's last_updated timestamp
-      await client.query(
-        'UPDATE bills SET last_updated = CURRENT_TIMESTAMP WHERE id = $1',
-        [billId]
-      );
-
-      // Enhanced cache invalidation
-      await this.invalidateCache([
-        CACHE_KEY.BILL_BY_ID(billId),
-        CACHE_KEY.ALL_BILLS,
-        CACHE_KEY.PATTERN_BY_TAGS,
-      ]);
-
-      // Return the updated bill
-      return this.getBill(billId);
-    });
   }
 }
+
+// Export singleton instance for consistent usage across the application
+export const billStorage = BillStorage.getInstance();

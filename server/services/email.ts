@@ -1,5 +1,5 @@
 // services/email.ts
-import nodemailer from 'nodemailer';
+import * as nodemailer from 'nodemailer';
 import { config } from '../config/index.js';
 
 interface EmailOptions {
@@ -22,7 +22,7 @@ interface PasswordChangeConfirmationData {
 }
 
 class EmailService {
-  private transporter: nodemailer.Transporter;
+  private transporter!: nodemailer.Transporter;
 
   constructor() {
     this.initializeTransporter();
@@ -32,15 +32,15 @@ class EmailService {
    * Initialize email transporter based on environment
    */
   private initializeTransporter(): void {
-    if (config.server.isProduction) {
+    if (config.nodeEnv === 'production') {
       // Production email service setup (e.g., SendGrid, Mailgun, etc.)
       this.transporter = nodemailer.createTransport({
-        host: config.email.host,
-        port: config.email.port,
-        secure: config.email.secure,
+        host: config.email.smtpHost,
+        port: config.email.smtpPort,
+        secure: config.email.smtpPort === 465, // Use secure for port 465
         auth: {
-          user: config.email.user,
-          pass: config.email.password,
+          user: config.email.smtpUser,
+          pass: config.email.smtpPass,
         },
       });
     } else {
@@ -91,14 +91,14 @@ class EmailService {
    */
   async sendEmail(options: EmailOptions): Promise<any> {
     const mailOptions = {
-      from: config.email.fromAddress,
+      from: config.email.smtpUser || 'noreply@example.com',
       ...options,
     };
 
     try {
       const info = await this.transporter.sendMail(mailOptions);
 
-      if (!config.server.isProduction) {
+      if (config.nodeEnv !== 'production') {
         console.log('Email sent in development mode:');
         console.log('Preview URL:', nodemailer.getTestMessageUrl(info));
       }

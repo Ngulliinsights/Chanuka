@@ -1,25 +1,20 @@
-import type { Analysis, Expert, VerificationTask } from '../../../shared/types/expert.js';
+import type { Analysis, Expert, VerificationTask } from '../../shared/types/expert.js';
 import {
-  ExpertError,
+  ExtendedExpert,
+  ExtendedVerificationTask,
+  VerificationStatus,
+  NotificationPreferences,
   NotificationChannel,
   Stakeholder,
-  VerificationStatus,
-} from '../../../shared/types/expert.js';
-import { EnhancedLogger, logger } from '../../../shared/utils/logger.js';
+  ExpertError
+} from '../../shared/types/expert.js';
+import { EnhancedLogger, logger } from '../../shared/utils/logger.js';
 import { cache } from '../utils/cache.js';
 import { FeatureFlags } from '../utils/featureFlags.js';
 import { metrics } from '../utils/metrics.js';
 import { validate } from '../utils/validation.js';
 
-// Extended types for internal service use
-interface ExtendedVerificationTask extends VerificationTask {
-  processedAt: string | null;
-  notifyUrl?: string;
-}
-
-interface ExtendedExpert extends Expert {
-  notificationUrl?: string;
-}
+// Remove duplicate interface definitions since they're imported
 
 // Service-specific error class with error codes
 class ServiceExpertError extends ExpertError {

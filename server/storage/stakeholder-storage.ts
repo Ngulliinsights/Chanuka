@@ -1,4 +1,4 @@
-import { Stakeholder, InsertStakeholder } from "@shared/schema";
+import type { Stakeholder, InsertStakeholder } from '../../shared/schema.js';
 
 /**
  * Represents a voting record for a stakeholder
@@ -235,6 +235,7 @@ export class StakeholderStorage {
       createdAt: now,
       updatedAt: now,
       votingHistory: [],
+      influence: sanitizedStakeholder.influence ?? 0,
     };
 
     this.stakeholders.set(newStakeholder.id, newStakeholder);

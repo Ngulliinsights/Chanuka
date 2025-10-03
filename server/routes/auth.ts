@@ -16,9 +16,17 @@ export const router = Router();
         return res.status(400).json({ error: "Email and password are required" });
       }
 
-      // Find user by email
+      // Find user by email - select only needed fields for better performance
       const user = await db
-        .select()
+        .select({
+          id: users.id,
+          email: users.email,
+          passwordHash: users.passwordHash,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          role: users.role,
+          isActive: users.isActive
+        })
         .from(users)
         .where(eq(users.email, email))
         .limit(1);
@@ -71,9 +79,9 @@ export const router = Router();
         return res.status(400).json({ error: "All fields are required" });
       }
 
-      // Check if user already exists
+      // Check if user already exists - only select id for existence check
       const existingUser = await db
-        .select()
+        .select({ id: users.id })
         .from(users)
         .where(eq(users.email, email))
         .limit(1);
@@ -141,9 +149,16 @@ export const router = Router();
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET || "development-secret") as any;
 
-      // Get current user data
+      // Get current user data - select only needed fields for better performance
       const user = await db
-        .select()
+        .select({
+          id: users.id,
+          email: users.email,
+          firstName: users.firstName,
+          lastName: users.lastName,
+          role: users.role,
+          isActive: users.isActive
+        })
         .from(users)
         .where(eq(users.id, decoded.userId))
         .limit(1);

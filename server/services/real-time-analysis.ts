@@ -414,17 +414,20 @@ export class RealTimeBillAnalysisEngine {
   private calculateEconomicImpact(billContent: string): EconomicImpact {
     // Extract cost/benefit estimates from bill text
     const costMatches = billContent.match(/\$[\d,]+(?:\s*(?:million|billion|trillion))?/gi) || [];
-    const estimatedCost = costMatches.reduce((sum, match) => {
-      const value = this.parseFinancialAmount(match);
-      return sum + value;
-    }, 0);
+    let estimatedCost = 0;
+    if (costMatches.length > 0) {
+      estimatedCost = costMatches.reduce((sum: number, match: string) => {
+        const value = this.parseFinancialAmount(match);
+        return sum + value;
+      }, 0);
+    }
     
     // Estimate benefits as multiple of costs (varies by bill type)
-    const estimatedBenefit = estimatedCost * this.getBenefitMultiplier(billContent);
+    const estimatedBenefit: number = estimatedCost * this.getBenefitMultiplier(billContent);
     
     return {
-      estimatedCost,
-      estimatedBenefit,
+      estimatedCost: estimatedCost,
+      estimatedBenefit: estimatedBenefit,
       netImpact: estimatedBenefit - estimatedCost,
       timeframe: '5-10 years',
       confidence: 65

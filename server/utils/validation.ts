@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ZodError, z } from 'zod';
-import { ValidationError } from '@shared/types/errors.js';
+import { ValidationError } from '../../shared/types/errors.js';
 
 type ZodSchema<T> = z.ZodType<T>;
 
@@ -41,7 +41,7 @@ export function validateSchema<T>(schema: ZodSchema<T>) {
       next();
     } catch (err) {
       if (err instanceof ZodError) {
-        next(new ValidationError('Validation failed', { errors: err.errors }));
+        next(new ValidationError('Validation failed'));
       } else {
         next(err);
       }

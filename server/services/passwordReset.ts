@@ -1,10 +1,10 @@
 // services/passwordReset.ts
-import { db } from '@shared/database/pool.js';
+import { db } from '../../db/index.js';
 // Import specific tables and functions needed from the consolidated schema
-import { passwordResets, users } from '@shared/schema/auth.js';
-import { AppError } from '@shared/types/errors.js';
-import bcrypt from 'bcrypt';
-import crypto from 'crypto';
+import { users, passwordResets } from '../../shared/schema.js';
+import { ValidationError } from '../../shared/types/errors.js';
+import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import type { InferSelectModel } from 'drizzle-orm';
 import { and, eq, gt } from 'drizzle-orm';
 import { config } from '../config/index.js';
@@ -13,25 +13,28 @@ import { emailService } from './email.js';
 // Reset token expiration time in minutes
 const TOKEN_EXPIRY_MINUTES = 60;
 
-// Define the type for a password reset entry explicitly
-type PasswordResetEntry = InferSelectModel<typeof passwordResets>;
+interface PasswordResetEntry {
+  id: number;
+  userId: string;
+  tokenHash: string;
+  expiresAt: Date;
+  createdAt: Date;
+}
 type UserEntry = InferSelectModel<typeof users>;
 
 // Define a type for the joined result based on your actual schema structure
 interface JoinedResetResult {
   password_resets: {
     id: number;
-    userId: number;
+    userId: string;
     tokenHash: string;
     expiresAt: Date;
     createdAt: Date;
-    updatedAt: Date;
   } | null;
   users: {
-    id: number;
+    id: string;
     email: string;
-    username: string;
-    displayName?: string;
+    name: string;
     isActive: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -64,8 +67,7 @@ class PasswordResetService {
       columns: {
         id: true,
         email: true,
-        displayName: true,
-        username: true,
+        name: true,
         isActive: true,
       },
     });
@@ -87,11 +89,9 @@ class PasswordResetService {
       await tx
         .insert(passwordResets)
         .values({
-          userId: ensureNumber(user.id), // Ensure it's a number
+          userId: user.id,
           tokenHash: tokenHash,
           expiresAt: expiryDate,
-          createdAt: new Date(),
-          updatedAt: new Date(),
         })
         .onConflictDoUpdate({
           target: passwordResets.userId,
@@ -104,11 +104,11 @@ class PasswordResetService {
     });
 
     // Send email with the reset token
-    const resetUrl = `${config.server.host}/reset-password?token=${resetToken}`;
+    const resetUrl = `http://localhost:${config.port}/reset-password?token=${resetToken}`;
 
     await emailService.sendPasswordResetEmail({
       to: user.email,
-      username: user.displayName || user.username,
+      username: user.name || user.email,
       resetUrl,
       expiryMinutes: TOKEN_EXPIRY_MINUTES,
     });
@@ -137,7 +137,7 @@ class PasswordResetService {
     const result = results[0]; // Get the first result if it exists
 
     if (!result || !result.users || !result.password_resets) {
-      throw new AppError('Invalid or expired reset token', 400);
+      throw new ValidationError('Invalid or expired reset token');
     }
 
     const resetEntry = result.password_resets;
@@ -152,7 +152,7 @@ class PasswordResetService {
       await tx
         .update(users)
         .set({
-          password: hashedPassword, // Using password instead of passwordHash
+          passwordHash: hashedPassword,
           updatedAt: now,
         })
         .where(eq(users.id, userEntry.id));
@@ -166,7 +166,7 @@ class PasswordResetService {
     // Send password change confirmation email
     await emailService.sendPasswordChangeConfirmation({
       to: userEntry.email,
-      username: userEntry.displayName || userEntry.username,
+      username: userEntry.name,
     });
   }
 

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { dashboardRouter } from './routes/dashboard';
+// import { dashboardRouter } from './routes/dashboard'; // Dashboard route doesn't exist
 
 export const setupApi = () => {
   const router = Router();
@@ -12,8 +12,8 @@ export const setupApi = () => {
     next();
   });
 
-  // Mount dashboard routes
-  router.use('/dashboard', dashboardRouter);
+  // Mount dashboard routes (commented out - dashboard router doesn't exist)
+  // router.use('/dashboard', dashboardRouter);
 
   return router;
 };

@@ -53,8 +53,8 @@ interface AnalysisError {
 }
 
 export class MLAnalysisService {
-  // Private helper method for consistent error handling
-  private static handleAnalysisError(error: unknown, analysisType: string): AnalysisResult {
+  // Public helper method for consistent error handling
+  public static handleAnalysisError(error: unknown, analysisType: string): AnalysisResult {
     console.error(`Error in ${analysisType} analysis:`, error);
 
     return {
@@ -406,15 +406,15 @@ export async function performComprehensiveAnalysis(billId: string): Promise<{
     // Extract results with proper error handling
     const stakeholderInfluence = stakeholderResult.status === 'fulfilled' 
       ? stakeholderResult.value 
-      : MLAnalysisService.prototype.constructor.handleAnalysisError(stakeholderResult.reason, 'stakeholder_influence');
+      : MLAnalysisService.handleAnalysisError(stakeholderResult.reason, 'stakeholder_influence');
 
     const conflictsOfInterest = conflictsResult.status === 'fulfilled' 
       ? conflictsResult.value 
-      : MLAnalysisService.prototype.constructor.handleAnalysisError(conflictsResult.reason, 'conflict_detection');
+      : MLAnalysisService.handleAnalysisError(conflictsResult.reason, 'conflict_detection');
 
     const beneficiaryAnalysis = beneficiaryResult.status === 'fulfilled' 
       ? beneficiaryResult.value 
-      : MLAnalysisService.prototype.constructor.handleAnalysisError(beneficiaryResult.reason, 'beneficiary_analysis');
+      : MLAnalysisService.handleAnalysisError(beneficiaryResult.reason, 'beneficiary_analysis');
 
     const implementationWorkarounds = workaroundsResult.status === 'fulfilled' 
       ? workaroundsResult.value 
@@ -459,9 +459,9 @@ export async function performComprehensiveAnalysis(billId: string): Promise<{
 
     // Return fallback response with error indication
     return {
-      stakeholderInfluence: MLAnalysisService.prototype.constructor.handleAnalysisError(error, 'stakeholder_influence'),
-      conflictsOfInterest: MLAnalysisService.prototype.constructor.handleAnalysisError(error, 'conflict_detection'),
-      beneficiaryAnalysis: MLAnalysisService.prototype.constructor.handleAnalysisError(error, 'beneficiary_analysis'),
+      stakeholderInfluence: MLAnalysisService.handleAnalysisError(error, 'stakeholder_influence'),
+      conflictsOfInterest: MLAnalysisService.handleAnalysisError(error, 'conflict_detection'),
+      beneficiaryAnalysis: MLAnalysisService.handleAnalysisError(error, 'beneficiary_analysis'),
       implementationWorkarounds: [],
       overallScore: 0.0,
       recommendations: ['Analysis temporarily unavailable - please retry'],

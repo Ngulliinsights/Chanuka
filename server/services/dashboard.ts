@@ -1,4 +1,4 @@
-import { storage } from "../../storage/index";
+import { storage } from "../../storage/index.js";
 
 /**
  * Represents the structure of candidate evaluation data

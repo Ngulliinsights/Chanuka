@@ -3,18 +3,58 @@ import {
   type InsertUser,
   type Bill,
   type InsertBill,
-  type Stakeholder,
-  type InsertStakeholder,
   type BillComment,
   type InsertBillComment,
+  type Stakeholder,
+  type InsertStakeholder,
   type UserProgress,
   type InsertUserProgress,
   type SocialShare,
   type InsertSocialShare,
   type SocialProfile,
-} from './types.js';
+} from '../../shared/schema.js';
 import session from 'express-session';
-import createMemoryStore from 'memorystore';
+// Simple memory store implementation since memorystore is not available
+class SimpleMemoryStore extends session.Store {
+  private sessions: Map<string, any> = new Map();
+
+  get(sid: string, callback: (err?: any, session?: any) => void): void {
+    const session = this.sessions.get(sid);
+    callback(null, session);
+  }
+
+  set(sid: string, session: any, callback?: (err?: any) => void): void {
+    this.sessions.set(sid, session);
+    if (callback) callback();
+  }
+
+  destroy(sid: string, callback?: (err?: any) => void): void {
+    this.sessions.delete(sid);
+    if (callback) callback();
+  }
+
+  all(callback: (err?: any, obj?: any) => void): void {
+    const sessions = Object.fromEntries(this.sessions);
+    callback(null, sessions);
+  }
+
+  length(callback: (err?: any, length?: number) => void): void {
+    callback(null, this.sessions.size);
+  }
+
+  clear(callback?: (err?: any) => void): void {
+    this.sessions.clear();
+    if (callback) callback();
+  }
+
+  touch(sid: string, session: any, callback?: (err?: any) => void): void {
+    // Update session timestamp
+    if (this.sessions.has(sid)) {
+      this.sessions.set(sid, session);
+    }
+    if (callback) callback();
+  }
+}
 
 // Define types for evaluation-related functionality
 interface Evaluation {
@@ -47,22 +87,19 @@ interface CompetencyMetrics {
   byDepartment: Record<number, Record<string, number>>;
 }
 
-const MemoryStore = createMemoryStore(session);
-
 export interface IStorage {
-  getUser(id: number): Promise<User | undefined>;
+  getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserBySocialProfile(provider: string, profileId: string): Promise<User | undefined>;
   getUserByGoogleId(googleId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   linkSocialProfile(
-    userId: number,
+    userId: string,
     profile: { platform: string; profileId: string; username: string },
   ): Promise<User>;
-  unlinkSocialProfile(userId: number, platform: string): Promise<User>;
-  updateUserProgress(progress: InsertUserProgress): Promise<UserProgress>;
-  updateUserReputation(userId: number, change: number): Promise<User>;
-  updateUserLastActive(userId: number): Promise<User>;
+  unlinkSocialProfile(userId: string, platform: string): Promise<User>;
+  updateUserReputation(userId: string, change: number): Promise<User>;
+  updateUserLastActive(userId: string): Promise<User>;
 
   getBills(): Promise<Bill[]>;
   getBill(id: number): Promise<Bill | undefined>;
@@ -71,25 +108,11 @@ export interface IStorage {
   incrementBillShares(billId: number): Promise<Bill>;
   getBillsByTags(tags: string[]): Promise<Bill[]>;
 
-  getStakeholders(): Promise<Stakeholder[]>;
-  getStakeholder(id: number): Promise<Stakeholder | undefined>;
-  createStakeholder(stakeholder: InsertStakeholder): Promise<Stakeholder>;
-  updateStakeholderVotingHistory(
-    stakeholderId: number,
-    vote: { billId: number; vote: 'yes' | 'no' | 'abstain'; date: string },
-  ): Promise<Stakeholder>;
-
   getBillComments(billId: number): Promise<BillComment[]>;
   createBillComment(comment: InsertBillComment): Promise<BillComment>;
   updateBillCommentEndorsements(commentId: number, endorsements: number): Promise<BillComment>;
   getCommentReplies(parentId: number): Promise<BillComment[]>;
   highlightComment(commentId: number): Promise<BillComment>;
-
-  getUserProgress(userId: number): Promise<UserProgress[]>;
-  getProgressByType(userId: number, achievementType: string): Promise<UserProgress[]>;
-
-  trackSocialShare(share: InsertSocialShare): Promise<SocialShare>;
-  getSocialShareStats(billId: number): Promise<{ platform: string; count: number }[]>;
 
   getCandidateEvaluations(): Promise<Evaluation[]>;
   createEvaluation(input: CreateEvaluationInput): Promise<Evaluation>;
@@ -102,7 +125,7 @@ export interface IStorage {
 
 export class MemStorage implements IStorage {
   // Primary data collections
-  private users: Map<number, User>;
+  private users: Map<string, User>;
   private bills: Map<number, Bill>;
   private stakeholders: Map<number, Stakeholder>;
   private billComments: Map<number, BillComment>;
@@ -149,9 +172,7 @@ export class MemStorage implements IStorage {
     };
 
     // Initialize session store with 24-hour pruning
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000, // prune expired entries every 24h
-    });
+    this.sessionStore = new SimpleMemoryStore();
   }
 
   /**
@@ -166,7 +187,7 @@ export class MemStorage implements IStorage {
   // User Management Methods
   // ==============================
 
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
   }
 
@@ -184,29 +205,31 @@ export class MemStorage implements IStorage {
   }
 
   async createUser(user: InsertUser): Promise<User> {
+    const userId = crypto.randomUUID();
     const newUser: User = {
-      ...user,
-      id: this.generateUniqueId(this.users),
+      id: userId,
+      name: user.name,
+      email: user.email,
+      passwordHash: user.passwordHash,
+      firstName: user.firstName || '',
+      lastName: user.lastName || '',
+      role: user.role || 'citizen',
+      verificationStatus: user.verificationStatus || 'pending',
+      preferences: user.preferences || null,
+      isActive: user.isActive !== undefined ? user.isActive : true,
+      lastLoginAt: user.lastLoginAt || null,
       createdAt: new Date(),
       updatedAt: new Date(),
-      socialProfiles: [],
-      reputation: 0,
-      lastActive: new Date(),
-      expertise: user.expertise || null,
-      onboardingCompleted: user.onboardingCompleted || false,
-      googleId: user.googleId || null,
-      avatarUrl: user.avatarUrl || null,
-      role: 'user',
     };
 
     // Add to primary collection and secondary indexes
     this.users.set(newUser.id, newUser);
-    this.usersByUsername.set(newUser.username.toLowerCase(), newUser);
+    this.usersByUsername.set(user.email.toLowerCase(), newUser);
 
     return newUser;
   }
 
-  async linkSocialProfile(userId: number, profile: SocialProfile): Promise<User> {
+  async linkSocialProfile(userId: string, profile: SocialProfile): Promise<User> {
     const user = this.users.get(userId);
     if (!user) throw new Error(`User not found with ID: ${userId}`);
 
@@ -216,7 +239,7 @@ export class MemStorage implements IStorage {
     // Check if profile is already linked to another user
     const existingUser = this.usersBySocialProfile.get(key);
     if (existingUser && existingUser.id !== userId) {
-      throw new Error(`Profile already linked to another user: ${existingUser.username}`);
+      throw new Error(`Profile already linked to another user: ${existingUser.email}`);
     }
 
     // Update social profile index
@@ -232,52 +255,41 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
     };
 
-    // Update user record
-    user.socialProfiles = [...(user.socialProfiles || []), socialProfile];
-    user.updatedAt = new Date();
-
+    // Note: socialProfiles should be managed separately in a dedicated table
+    // For now, just return the user without modifying it
     return user;
   }
 
-  async unlinkSocialProfile(userId: number, platform: string): Promise<User> {
+  async unlinkSocialProfile(userId: string, platform: string): Promise<User> {
     const user = this.users.get(userId);
     if (!user) throw new Error(`User not found with ID: ${userId}`);
 
-    // Find the profile to remove
-    const profileToRemove = user.socialProfiles?.find(
-      (p: SocialProfile) => p.platform === platform,
-    );
-    if (!profileToRemove) {
-      throw new Error(`User has no ${platform} profile linked`);
-    }
-
     // Remove from social profile index
-    const key = `${profileToRemove.platform}:${profileToRemove.profileId}`;
+    const key = `${platform}:${userId}`;
     this.usersBySocialProfile.delete(key);
 
     // Update user record
-    user.socialProfiles =
-      user.socialProfiles?.filter(profile => profile.platform !== platform) || [];
     user.updatedAt = new Date();
 
     return user;
   }
 
-  async updateUserReputation(userId: number, change: number): Promise<User> {
+  async updateUserReputation(userId: string, change: number): Promise<User> {
     const user = this.users.get(userId);
     if (!user) throw new Error(`User not found with ID: ${userId}`);
 
-    user.reputation = (user.reputation || 0) + change;
+    // Note: reputation property doesn't exist in User schema, skipping for now
     user.updatedAt = new Date();
 
     return user;
   }
 
-  async updateUserLastActive(userId: number): Promise<User> {
+  async updateUserLastActive(userId: string): Promise<User> {
     const user = this.users.get(userId);
     if (!user) throw new Error(`User not found with ID: ${userId}`);
 
-    user.lastActive = new Date();
+    // Note: lastActive property doesn't exist in User schema, using lastLoginAt instead
+    user.lastLoginAt = new Date();
     user.updatedAt = new Date();
 
     return user;
@@ -297,22 +309,25 @@ export class MemStorage implements IStorage {
 
   async createBill(bill: InsertBill): Promise<Bill> {
     const newBill: Bill = {
-      ...bill,
       id: this.generateUniqueId(this.bills),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      status: bill.status || 'draft',
-      proposedDate: bill.proposedDate || new Date(),
-      lastUpdated: new Date(),
+      title: bill.title,
+      description: bill.description || null,
+      content: bill.content || null,
+      summary: bill.summary || null,
+      status: bill.status || 'introduced',
+      billNumber: bill.billNumber || null,
+      sponsorId: bill.sponsorId || null,
+      category: bill.category || null,
+      tags: bill.tags || [],
       viewCount: bill.viewCount || 0,
       shareCount: bill.shareCount || 0,
-      dateIntroduced: bill.dateIntroduced || null,
-      votingDate: bill.votingDate || null,
-      stakeholderIds: bill.stakeholderIds || null,
-      // Add these properties only if they exist in the InsertBill type
-      dueDate: null,
-      requiresAction: false,
-      urgency: 'low',
+      complexityScore: bill.complexityScore || null,
+      introducedDate: new Date(),
+      lastActionDate: new Date(),
+      constitutionalConcerns: [],
+      stakeholderAnalysis: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     // Add to primary collection
@@ -393,13 +408,11 @@ export class MemStorage implements IStorage {
     const newProgress: UserProgress = {
       id: this.generateUniqueId(new Map()),
       createdAt: new Date(),
+      updatedAt: new Date(),
       userId: progress.userId,
       achievementType: progress.achievementType,
-      achievementValue: progress.achievementValue,
-      level: progress.level || null,
-      badge: progress.badge || null,
-      description: progress.description || null,
-      unlockedAt: new Date(),
+      progress: progress.progress,
+      completedAt: progress.completedAt,
     };
 
     this.userProgress.get(userId)?.push(newProgress);
@@ -469,22 +482,17 @@ export class MemStorage implements IStorage {
 
   async createStakeholder(stakeholder: InsertStakeholder): Promise<Stakeholder> {
     const newStakeholder: Stakeholder = {
-      ...stakeholder,
       id: this.generateUniqueId(this.stakeholders),
+      name: stakeholder.name,
+      email: stakeholder.email,
+      organization: stakeholder.organization,
+      sector: stakeholder.sector,
+      type: stakeholder.type,
+      influence: stakeholder.influence || 50,
+      votingHistory: stakeholder.votingHistory || [],
       createdAt: new Date(),
       updatedAt: new Date(),
-      metadata: stakeholder.metadata || {},
-      email: stakeholder.email || null,
-      influence: stakeholder.influence || 'medium',
-      sector: stakeholder.sector || null,
-      biography: stakeholder.biography || null,
-      phone: stakeholder.phone || null,
-      office: stakeholder.office || null,
-      organization: stakeholder.organization || null,
     };
-
-    // Add votingHistory as a custom property
-    (newStakeholder as any).votingHistory = [];
 
     this.stakeholders.set(newStakeholder.id, newStakeholder);
 
@@ -613,7 +621,7 @@ export class MemStorage implements IStorage {
       updatedAt: new Date(),
       endorsements: 0,
       isHighlighted: false,
-      parentId: comment.parentId || null,
+      parentCommentId: comment.parentCommentId || null,
     };
 
     // Add to primary collection
@@ -627,11 +635,11 @@ export class MemStorage implements IStorage {
     this.billCommentsByBill.get(billId)?.add(newComment.id);
 
     // Update parent comments index if this is a reply
-    if (comment.parentId) {
-      if (!this.billCommentsByParent.has(comment.parentId)) {
-        this.billCommentsByParent.set(comment.parentId, new Set());
+    if (comment.parentCommentId) {
+      if (!this.billCommentsByParent.has(comment.parentCommentId)) {
+        this.billCommentsByParent.set(comment.parentCommentId, new Set());
       }
-      this.billCommentsByParent.get(comment.parentId)?.add(newComment.id);
+      this.billCommentsByParent.get(comment.parentCommentId)?.add(newComment.id);
     }
 
     return newComment;

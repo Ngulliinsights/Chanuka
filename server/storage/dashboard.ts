@@ -1,7 +1,7 @@
-import { db } from '../db';
+import { db } from '../../db/index.js';
 import { eq, sql, and, desc, count } from 'drizzle-orm';
-import { evaluations, departments } from '../schema';
-import type { Candidate, DepartmentStat, RadarDatum, EvaluationData } from '../../shared/schema';
+import { bills, analysis, evaluations, departments } from '../../shared/schema.js';
+import type { Candidate, DepartmentStat, RadarDatum, EvaluationData } from '../../shared/schema.js';
 
 // Enhanced cache interface with better type safety
 interface CacheEntry<T> {

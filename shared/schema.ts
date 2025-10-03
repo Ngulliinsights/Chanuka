@@ -3,7 +3,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // Users table for platform authentication
-export const users = pgTable("users", {
+const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
   passwordHash: text("password_hash").notNull(),
@@ -20,7 +20,7 @@ export const users = pgTable("users", {
 });
 
 // User profiles for expertise and reputation
-export const userProfiles = pgTable("user_profiles", {
+const userProfiles = pgTable("user_profiles", {
   id: serial("id").primaryKey(),
   userId: uuid("user_id").notNull(),
   bio: text("bio"),
@@ -34,7 +34,7 @@ export const userProfiles = pgTable("user_profiles", {
 });
 
 // Bills table for legislative documents
-export const bills = pgTable("bills", {
+const bills = pgTable("bills", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description"),
@@ -57,7 +57,7 @@ export const bills = pgTable("bills", {
 });
 
 // Comments and discussions on bills
-export const billComments = pgTable("bill_comments", {
+const billComments = pgTable("bill_comments", {
   id: serial("id").primaryKey(),
   billId: integer("bill_id").notNull(),
   userId: uuid("user_id").notNull(),
@@ -72,7 +72,7 @@ export const billComments = pgTable("bill_comments", {
 });
 
 // User engagement tracking
-export const billEngagement = pgTable("bill_engagement", {
+const billEngagement = pgTable("bill_engagement", {
   id: serial("id").primaryKey(),
   billId: integer("bill_id").notNull(),
   userId: uuid("user_id").notNull(),
@@ -86,7 +86,7 @@ export const billEngagement = pgTable("bill_engagement", {
 });
 
 // Notifications system
-export const notifications = pgTable("notifications", {
+const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),
   userId: uuid("user_id").notNull(),
   type: text("type").notNull(), // bill_update, comment_reply, verification_status
@@ -98,7 +98,7 @@ export const notifications = pgTable("notifications", {
 });
 
 // Analysis results from ML models
-export const analysis = pgTable("analysis", {
+const analysis = pgTable("analysis", {
   id: serial("id").primaryKey(),
   billId: integer("bill_id").notNull(),
   analysisType: text("analysis_type").notNull(), // constitutional, stakeholder, impact, complexity
@@ -111,7 +111,7 @@ export const analysis = pgTable("analysis", {
 });
 
 // Sponsors/legislators information
-export const sponsors = pgTable("sponsors", {
+const sponsors = pgTable("sponsors", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   role: text("role").notNull(), // MP, Senator, etc.
@@ -130,7 +130,7 @@ export const sponsors = pgTable("sponsors", {
 });
 
 // Sponsor affiliations and connections
-export const sponsorAffiliations = pgTable("sponsor_affiliations", {
+const sponsorAffiliations = pgTable("sponsor_affiliations", {
   id: serial("id").primaryKey(),
   sponsorId: integer("sponsor_id").notNull(),
   organization: text("organization").notNull(),
@@ -144,7 +144,7 @@ export const sponsorAffiliations = pgTable("sponsor_affiliations", {
 });
 
 // Bill sponsorship tracking
-export const billSponsorships = pgTable("bill_sponsorships", {
+const billSponsorships = pgTable("bill_sponsorships", {
   id: serial("id").primaryKey(),
   billId: integer("bill_id").notNull(),
   sponsorId: integer("sponsor_id").notNull(),
@@ -154,7 +154,7 @@ export const billSponsorships = pgTable("bill_sponsorships", {
 });
 
 // Sponsor transparency and disclosure
-export const sponsorTransparency = pgTable("sponsor_transparency", {
+const sponsorTransparency = pgTable("sponsor_transparency", {
   id: serial("id").primaryKey(),
   sponsorId: integer("sponsor_id").notNull(),
   disclosureType: text("disclosure_type").notNull(), // financial, business, family
@@ -167,7 +167,7 @@ export const sponsorTransparency = pgTable("sponsor_transparency", {
 });
 
 // Bill section conflicts analysis
-export const billSectionConflicts = pgTable("bill_section_conflicts", {
+const billSectionConflicts = pgTable("bill_section_conflicts", {
   id: serial("id").primaryKey(),
   billId: integer("bill_id").notNull(),
   sectionNumber: text("section_number").notNull(),
@@ -180,7 +180,7 @@ export const billSectionConflicts = pgTable("bill_section_conflicts", {
 });
 
 // Expert verifications table
-export const expertVerifications = pgTable("expert_verifications", {
+const expertVerifications = pgTable("expert_verifications", {
   id: serial("id").primaryKey(),
   billId: integer("bill_id").notNull(),
   expertId: uuid("expert_id").notNull(),
@@ -192,7 +192,7 @@ export const expertVerifications = pgTable("expert_verifications", {
 });
 
 // User interests table for recommendation system
-export const userInterests = pgTable("user_interests", {
+const userInterests = pgTable("user_interests", {
   id: serial("id").primaryKey(),
   userId: uuid("user_id").notNull(),
   interest: text("interest").notNull(),
@@ -200,45 +200,78 @@ export const userInterests = pgTable("user_interests", {
 });
 
 // Bill tags table for categorization
-export const billTags = pgTable("bill_tags", {
+const billTags = pgTable("bill_tags", {
   id: serial("id").primaryKey(),
   billId: integer("bill_id").notNull(),
   tag: text("tag").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Insert schemas for legislative platform
-export const insertUserSchema = createInsertSchema(users).omit({ 
-  id: true, 
-  createdAt: true, 
-  updatedAt: true 
+// Insert schemas for legislative platform - simplified approach
+export const insertUserSchema = z.object({
+  email: z.string().email(),
+  passwordHash: z.string(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  name: z.string(),
+  role: z.string().default("citizen"),
+  verificationStatus: z.string().default("pending"),
+  preferences: z.any().optional(),
+  isActive: z.boolean().default(true),
+  lastLoginAt: z.date().optional(),
 });
 
-export const insertUserProfileSchema = createInsertSchema(userProfiles).omit({ 
-  id: true, 
-  createdAt: true 
+export const insertUserProfileSchema = z.object({
+  userId: z.string(),
+  bio: z.string().optional(),
+  expertise: z.array(z.string()).optional(),
+  location: z.string().optional(),
+  organization: z.string().optional(),
+  verificationDocuments: z.any().optional(),
+  reputationScore: z.number().default(0),
+  isPublic: z.boolean().default(true),
 });
 
-export const insertBillSchema = createInsertSchema(bills).omit({ 
-  id: true, 
-  createdAt: true, 
-  updatedAt: true 
+export const insertBillSchema = z.object({
+  title: z.string(),
+  description: z.string().optional(),
+  content: z.string().optional(),
+  summary: z.string().optional(),
+  status: z.string().default("introduced"),
+  billNumber: z.string().optional(),
+  sponsorId: z.string().optional(),
+  category: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  viewCount: z.number().default(0),
+  shareCount: z.number().default(0),
+  complexityScore: z.number().optional(),
 });
 
-export const insertBillCommentSchema = createInsertSchema(billComments).omit({ 
-  id: true, 
-  createdAt: true, 
-  updatedAt: true 
+export const insertBillCommentSchema = z.object({
+  userId: z.string(),
+  content: z.string(),
+  billId: z.number(),
+  commentType: z.string().default("general"),
+  isVerified: z.boolean().default(false),
+  parentCommentId: z.number().optional(),
+  upvotes: z.number().default(0),
+  downvotes: z.number().default(0),
 });
 
-export const insertSponsorSchema = createInsertSchema(sponsors).omit({ 
-  id: true, 
-  createdAt: true 
+export const insertSponsorSchema = z.object({
+  name: z.string(),
+  role: z.string(),
+  party: z.string().optional(),
+  district: z.string().optional(),
+  contact: z.any().optional(),
 });
 
-export const insertAnalysisSchema = createInsertSchema(analysis).omit({ 
-  id: true, 
-  createdAt: true 
+export const insertAnalysisSchema = z.object({
+  billId: z.number(),
+  analysisType: z.string(),
+  content: z.any(),
+  confidence: z.number().optional(),
+  metadata: z.any().optional(),
 });
 
 // Types for legislative platform
@@ -263,8 +296,169 @@ export type BillSectionConflict = typeof billSectionConflicts.$inferSelect;
 export type UserInterest = typeof userInterests.$inferSelect;
 export type BillTag = typeof billTags.$inferSelect;
 
+// Additional types needed by storage services
+export type Stakeholder = {
+  id: number;
+  name: string;
+  email?: string;
+  organization?: string;
+  sector?: string;
+  type: string;
+  influence: number;
+  votingHistory: any[];
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type InsertStakeholder = {
+  name: string;
+  email?: string;
+  organization?: string;
+  sector?: string;
+  type: string;
+  influence?: number;
+  votingHistory?: any[];
+};
+
+// Update types to match actual table schemas
+export type UserProgress = typeof userProgress.$inferSelect;
+export type InsertUserProgress = typeof userProgress.$inferInsert;
+export type SocialShare = typeof socialShares.$inferSelect;
+export type InsertSocialShare = typeof socialShares.$inferInsert;
+
+export type SocialProfile = {
+  id: number;
+  userId: number;
+  platform: string;
+  profileId: string;
+  username: string;
+  accessToken?: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type Comment = typeof billComments.$inferSelect & {
+  endorsements?: number;
+  isHighlighted?: boolean;
+};
+
+// Dashboard-specific types
+export type Candidate = {
+  id: number;
+  candidateName: string;
+  departmentId: number;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type DepartmentStat = {
+  name: string;
+  relationHires: number;
+  totalHires: number;
+  score: number;
+};
+
+export type RadarDatum = {
+  subject: string;
+  candidate: number;
+  department: number;
+  expected: number;
+};
+
+export type EvaluationData = {
+  candidateName: string;
+  departmentId: number;
+  status?: string;
+};
+
+// Password reset tokens
+const passwordResets = pgTable("password_resets", {
+  id: serial("id").primaryKey(),
+  userId: uuid("user_id").notNull(),
+  tokenHash: text("token_hash").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Evaluations table for dashboard functionality
+const evaluations = pgTable("evaluations", {
+  id: serial("id").primaryKey(),
+  candidateName: text("candidate_name").notNull(),
+  departmentId: integer("department_id").notNull(),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Departments table for dashboard functionality
+const departments = pgTable("departments", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Sessions table for authentication
+const sessions = pgTable("sessions", {
+  id: text("id").primaryKey(),
+  userId: uuid("user_id").notNull(),
+  token: text("token"),
+  refreshTokenHash: text("refresh_token_hash"),
+  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+  expiresAt: timestamp("expires_at").notNull(),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User social profiles table
+const userSocialProfiles = pgTable("user_social_profiles", {
+  id: serial("id").primaryKey(),
+  userId: uuid("user_id").notNull(),
+  provider: text("provider").notNull(), // google, facebook, twitter, etc.
+  providerId: text("provider_id").notNull(),
+  username: text("username"),
+  displayName: text("display_name"),
+  avatarUrl: text("avatar_url"),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Progress tracking for gamification
+const userProgress = pgTable("user_progress", {
+  id: serial("id").primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  achievementType: text("achievement_type").notNull(),
+  achievementValue: integer("achievement_value").notNull(),
+  level: integer("level"),
+  badge: text("badge"),
+  description: text("description"),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Social sharing tracking
+const socialShares = pgTable("social_shares", {
+  id: serial("id").primaryKey(),
+  billId: integer("bill_id").notNull().references(() => bills.id),
+  platform: text("platform").notNull(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  metadata: jsonb("metadata"),
+  shareDate: timestamp("share_date").defaultNow(),
+  likes: integer("likes").default(0),
+  shares: integer("shares").default(0),
+  comments: integer("comments").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Citizen Verification System
-export const citizenVerifications = pgTable('citizen_verifications', {
+const citizenVerifications = pgTable('citizen_verifications', {
   id: varchar('id', { length: 255 }).primaryKey(),
   billId: integer('bill_id').notNull().references(() => bills.id),
   citizenId: varchar('citizen_id', { length: 255 }).notNull().references(() => users.id),
@@ -283,19 +477,26 @@ export const citizenVerifications = pgTable('citizen_verifications', {
 // Export all tables and types
 export {
   users,
+  userProfiles,
   bills,
   billComments,
-  analysis,
-  expertVerifications,
   billEngagement,
   notifications,
+  analysis,
   sponsors,
   sponsorAffiliations,
   billSponsorships,
   sponsorTransparency,
   billSectionConflicts,
+  expertVerifications,
   userInterests,
   billTags,
-  userProfiles,
+  passwordResets,
+  evaluations,
+  departments,
+  sessions,
+  userSocialProfiles,
+  userProgress,
+  socialShares,
   citizenVerifications
 };

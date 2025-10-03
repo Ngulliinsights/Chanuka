@@ -10,9 +10,9 @@ export function setupUserRoutes(routerInstance: Router) {
   // Get user profile
   router.get("/users/:id", async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       
-      if (isNaN(userId)) {
+      if (!userId) {
         return res.status(400).json({ error: "Invalid user ID" });
       }
 
@@ -20,8 +20,7 @@ export function setupUserRoutes(routerInstance: Router) {
         .select({
           id: users.id,
           email: users.email,
-          firstName: users.firstName,
-          lastName: users.lastName,
+          name: users.name,
           role: users.role,
           preferences: users.preferences,
           createdAt: users.createdAt,
@@ -54,10 +53,10 @@ export function setupUserRoutes(routerInstance: Router) {
   // Update user profile
   router.put("/users/:id", async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       const { firstName, lastName, preferences, interests } = req.body;
 
-      if (isNaN(userId)) {
+      if (!userId) {
         return res.status(400).json({ error: "Invalid user ID" });
       }
 
@@ -65,8 +64,7 @@ export function setupUserRoutes(routerInstance: Router) {
       const updatedUser = await db
         .update(users)
         .set({
-          firstName,
-          lastName,
+          name: firstName || lastName ? `${firstName || ''} ${lastName || ''}`.trim() : undefined,
           preferences,
           updatedAt: new Date(),
         })
@@ -74,8 +72,7 @@ export function setupUserRoutes(routerInstance: Router) {
         .returning({
           id: users.id,
           email: users.email,
-          firstName: users.firstName,
-          lastName: users.lastName,
+          name: users.name,
           role: users.role,
           preferences: users.preferences,
         });
@@ -114,9 +111,9 @@ export function setupUserRoutes(routerInstance: Router) {
   // Get user interests
   router.get("/users/:id/interests", async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
 
-      if (isNaN(userId)) {
+      if (!userId) {
         return res.status(400).json({ error: "Invalid user ID" });
       }
 
@@ -135,10 +132,10 @@ export function setupUserRoutes(routerInstance: Router) {
   // Update user interests
   router.put("/users/:id/interests", async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = req.params.id;
       const { interests } = req.body;
 
-      if (isNaN(userId)) {
+      if (!userId) {
         return res.status(400).json({ error: "Invalid user ID" });
       }
 

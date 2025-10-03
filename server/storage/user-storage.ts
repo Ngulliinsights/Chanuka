@@ -1,72 +1,49 @@
-import { type OAuthProvider, type SocialProfile, type UserProfile } from '@shared/types/auth.js';
-import { Redis } from 'ioredis';
-import { Pool } from 'pg';
+import { 
+  database, 
+  readDatabase, 
+  writeDatabase, 
+  pool,
+  users,
+  userProfiles,
+  userSocialProfiles,
+  type User,
+  type InsertUser,
+  type UserProfile,
+  type InsertUserProfile
+} from '../../shared/database/connection.js';
+import { eq, and, or } from 'drizzle-orm';
 import type { StorageOptions } from './base/BaseStorage.js';
 import { BaseStorage } from './base/BaseStorage.js';
 
 // Define a type for user data including the password hash
-interface UserWithPasswordHash extends UserProfile {
+interface UserWithPasswordHash extends User {
   passwordHash: string;
 }
 
 export interface CreateUserData {
-  username: string;
+  name: string;
   email: string;
   password: string; // This should be the hashed password
-  role?: 'user' | 'admin' | 'expert';
-  avatarUrl?: string | null;
-  displayName?: string | null;
-  expertise?: string | null;
-  socialProfiles?: SocialProfile[];
+  firstName?: string;
+  lastName?: string;
+  role?: 'citizen' | 'admin' | 'expert' | 'journalist' | 'advocate';
 }
 
-export class UserStorage extends BaseStorage<UserProfile> {
-  protected redis: Redis;
-  protected pool: Pool;
-
-  // Cache user SQL fields as constants to avoid repetition and ensure consistency
-  private static readonly USER_SELECT_FIELDS = 
-    'id, username, email, display_name, role, avatar_url, expertise, created_at, last_login_at';
-
-  private static readonly USER_INSERT_FIELDS = 
-    'username, email, password, role, avatar_url, display_name, expertise';
-
-  private static readonly USER_INSERT_PLACEHOLDERS = '$1, $2, $3, $4, $5, $6, $7';
-
-  constructor(redis: Redis, pool: Pool, options: StorageOptions = {}) {
-    super(redis, pool, options);
-    this.redis = redis;
-    this.pool = pool;
+export class UserStorage extends BaseStorage<User> {
+  constructor(options: StorageOptions = {}) {
+    super(pool, options);
   }
 
   /**
-   * Maps a database row to a UserProfile object
-   * Centralizes the mapping logic to ensure consistency across all methods
+   * Validates user ID format (UUID)
+   * Centralizes ID validation logic
    */
-  private mapRowToUserProfile(row: any): UserProfile {
-    return {
-      id: String(row.id), // Ensure ID is always string for consistency
-      username: row.username,
-      email: row.email,
-      displayName: row.display_name || null,
-      role: row.role || 'user',
-      avatarUrl: row.avatar_url,
-      expertise: row.expertise || null,
-      createdAt: row.created_at,
-      lastLoginAt: row.last_login_at || null, // Simplified to use consistent field name
-    };
-  }
-
-  /**
-   * Converts string ID to integer for database queries
-   * Centralizes ID conversion logic and adds validation
-   */
-  private parseUserId(id: string): number {
-    const numericId = parseInt(id, 10);
-    if (isNaN(numericId)) {
-      throw new Error(`Invalid user ID: ${id}`);
+  private validateUserId(id: string): void {
+    // UUID validation - basic check for format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      throw new Error(`Invalid user ID format: ${id}`);
     }
-    return numericId;
   }
 
   /**
@@ -88,46 +65,25 @@ export class UserStorage extends BaseStorage<UserProfile> {
     await Promise.all(cacheKeys.map(key => this.invalidateCache(key)));
   }
 
-  async getUser(id: string): Promise<UserProfile | null> {
+  async getUser(id: string): Promise<User | null> {
+    this.validateUserId(id);
     return this.getCached(`user:${id}`, async () => {
-      const result = await this.withTransaction(async client => {
-        const userResult = await client.query(
-          `SELECT ${UserStorage.USER_SELECT_FIELDS} FROM users WHERE id = $1`,
-          [this.parseUserId(id)],
-        );
-
-        if (userResult.rows.length === 0) return null;
-        return this.mapRowToUserProfile(userResult.rows[0]);
-      });
-      return result;
+      const result = await readDatabase.select().from(users).where(eq(users.id, id));
+      return result[0] || null;
     });
   }
 
-  async getUserByUsername(username: string): Promise<UserProfile | null> {
-    return this.getCached(`user:username:${username}`, async () => {
-      const result = await this.withTransaction(async client => {
-        const userResult = await client.query(
-          `SELECT ${UserStorage.USER_SELECT_FIELDS} FROM users WHERE username = $1`,
-          [username],
-        );
-        if (userResult.rows.length === 0) return null;
-        return this.mapRowToUserProfile(userResult.rows[0]);
-      });
-      return result;
+  async getUserByName(name: string): Promise<User | null> {
+    return this.getCached(`user:name:${name}`, async () => {
+      const result = await readDatabase.select().from(users).where(eq(users.name, name));
+      return result[0] || null;
     });
   }
 
-  async getUserByEmail(email: string): Promise<UserProfile | null> {
+  async getUserByEmail(email: string): Promise<User | null> {
     return this.getCached(`user:email:${email}`, async () => {
-      const result = await this.withTransaction(async client => {
-        const userResult = await client.query(
-          `SELECT ${UserStorage.USER_SELECT_FIELDS} FROM users WHERE email = $1`,
-          [email],
-        );
-        if (userResult.rows.length === 0) return null;
-        return this.mapRowToUserProfile(userResult.rows[0]);
-      });
-      return result;
+      const result = await readDatabase.select().from(users).where(eq(users.email, email));
+      return result[0] || null;
     });
   }
 
@@ -135,41 +91,27 @@ export class UserStorage extends BaseStorage<UserProfile> {
    * Retrieves user with password hash for authentication
    * Note: This method intentionally does not cache the result for security
    */
-  async getUserWithPasswordHash(username: string): Promise<UserWithPasswordHash | null> {
-    const result = await this.withTransaction(async client => {
-      const userResult = await client.query(
-        `SELECT ${UserStorage.USER_SELECT_FIELDS}, password FROM users WHERE username = $1`,
-        [username],
-      );
-
-      if (userResult.rows.length === 0) return null;
-
-      const user = userResult.rows[0];
-      const userProfile = this.mapRowToUserProfile(user);
-
-      return {
-        ...userProfile,
-        passwordHash: user.password,
-      };
-    });
-    return result;
+  async getUserWithPasswordHash(email: string): Promise<UserWithPasswordHash | null> {
+    const result = await readDatabase.select().from(users).where(eq(users.email, email));
+    if (result.length === 0) return null;
+    
+    const user = result[0];
+    return {
+      ...user,
+      passwordHash: user.passwordHash,
+    };
   }
 
-  async createUser(data: CreateUserData): Promise<UserProfile> {
-    return this.withTransaction(async client => {
-      // Insert the main user record
-      const result = await client.query(
-        `INSERT INTO users (${UserStorage.USER_INSERT_FIELDS})
-         VALUES (${UserStorage.USER_INSERT_PLACEHOLDERS})
-         RETURNING ${UserStorage.USER_SELECT_FIELDS}`,
-        [
-          data.username,
-          data.email,
-          data.password, // Already hashed
-          data.role || 'user',
-          data.avatarUrl || null,
-          data.displayName || null,
-          data.expertise || null,
+  async createUser(data: CreateUserData): Promise<User> {
+    const userData: InsertUser = {
+      name: data.name,
+      email: data.email,
+      passwordHash: data.password, // Already hashed
+      firstName: data.firstName || null,
+      lastName: data.lastName || null,
+      role: data.role || 'citizen',
+      verificationStatus: 'pending',
+      isActive: true,
         ],
       );
 
@@ -178,7 +120,7 @@ export class UserStorage extends BaseStorage<UserProfile> {
       // Handle social profiles if provided - batch insert for better performance
       if (data.socialProfiles && data.socialProfiles.length > 0) {
         const socialProfileValues = data.socialProfiles.map(profile => 
-          [user.id, profile.provider, profile.profileId, profile.username]
+          [user.id, profile.provider, profile.id, profile.name]
         );
 
         // Use a single query with multiple values for better performance
@@ -188,11 +130,14 @@ export class UserStorage extends BaseStorage<UserProfile> {
 
         const flatValues = socialProfileValues.flat();
 
-        await client.query(
-          `INSERT INTO user_social_profiles (user_id, provider, profile_id, username)
-           VALUES ${placeholders}`,
-          flatValues,
-        );
+        // Insert social profiles using Drizzle ORM
+        const socialProfileData = data.socialProfiles.map(profile => ({
+          userId: user.id,
+          provider: profile.provider,
+          providerId: profile.id,
+          username: profile.name
+        }));
+        await tx.insert(userSocialProfiles).values(socialProfileData);
       }
 
       // Invalidate relevant cache patterns
@@ -209,16 +154,17 @@ export class UserStorage extends BaseStorage<UserProfile> {
     // Consider adding caching for frequently accessed social profiles
     return this.getCached(`user:social:${provider}:${profileId}`, async () => {
       const result = await this.withTransaction(async client => {
-        const userResult = await client.query(
-          `SELECT u.id, u.username, u.email, u.display_name, u.role, u.avatar_url, u.expertise, u.created_at, u.last_login_at
-           FROM users u
-           JOIN user_social_profiles sp ON sp.user_id = u.id
-           WHERE sp.provider = $1 AND sp.profile_id = $2`,
-          [provider, profileId],
-        );
+        const result = await readDatabase
+          .select()
+          .from(users)
+          .innerJoin(userSocialProfiles, eq(users.id, userSocialProfiles.userId))
+          .where(and(
+            eq(userSocialProfiles.provider, provider),
+            eq(userSocialProfiles.providerId, profileId)
+          ));
 
-        if (userResult.rows.length === 0) return null;
-        return this.mapRowToUserProfile(userResult.rows[0]);
+        if (result.length === 0) return null;
+        return result[0].users;
       });
       return result;
     });
@@ -229,21 +175,22 @@ export class UserStorage extends BaseStorage<UserProfile> {
       const numericUserId = this.parseUserId(userId);
 
       // Use UPSERT pattern for better reliability
-      await client.query(
-        `INSERT INTO user_social_profiles (user_id, provider, profile_id, username)
-         VALUES ($1, $2, $3, $4)
-         ON CONFLICT (user_id, provider) 
-         DO UPDATE SET 
-           profile_id = EXCLUDED.profile_id, 
-           username = EXCLUDED.username`,
-        [numericUserId, profile.provider, profile.profileId, profile.username],
-      );
+      await writeDatabase.insert(userSocialProfiles).values({
+        userId: userId,
+        provider: profile.provider,
+        providerId: profile.id,
+        username: profile.name
+      }).onConflictDoUpdate({
+        target: [userSocialProfiles.userId, userSocialProfiles.provider],
+        set: {
+          providerId: profile.id,
+          username: profile.name
+        }
+      });
 
       // Fetch the updated user profile
-      const userResult = await client.query(
-        `SELECT ${UserStorage.USER_SELECT_FIELDS} FROM users WHERE id = $1`,
-        [numericUserId],
-      );
+      const userResult = await readDatabase.select().from(users)
+        .where(eq(users.id, userId));
 
       if (userResult.rows.length === 0) {
         throw new Error(`User not found: ${userId}`);
@@ -252,8 +199,8 @@ export class UserStorage extends BaseStorage<UserProfile> {
       const user = userResult.rows[0];
 
       // Invalidate cache entries for this user and social profile
-      await this.invalidateUserCache(userId, user.username, user.email);
-      await this.invalidateCache(`user:social:${profile.provider}:${profile.profileId}`);
+      await this.invalidateUserCache(userId, user.name, user.email);
+      await this.invalidateCache(`user:social:${profile.provider}:${profile.id}`);
 
       return this.mapRowToUserProfile(user);
     });
@@ -265,10 +212,9 @@ export class UserStorage extends BaseStorage<UserProfile> {
    */
   async updateLastLogin(userId: string): Promise<void> {
     await this.withTransaction(async client => {
-      await client.query(
-        'UPDATE users SET last_login_at = CURRENT_TIMESTAMP WHERE id = $1',
-        [this.parseUserId(userId)],
-      );
+      await writeDatabase.update(users)
+        .set({ lastLoginAt: new Date() })
+        .where(eq(users.id, userId));
     });
 
     // Invalidate cache for this user
@@ -276,16 +222,16 @@ export class UserStorage extends BaseStorage<UserProfile> {
   }
 
   /**
-   * Checks if a username is available
+   * Checks if a name is available
    * Useful for registration validation
    */
-  async isUsernameAvailable(username: string): Promise<boolean> {
+  async isNameAvailable(name: string): Promise<boolean> {
     const result = await this.withTransaction(async client => {
-      const userResult = await client.query(
-        'SELECT 1 FROM users WHERE username = $1 LIMIT 1',
-        [username],
-      );
-      return userResult.rows.length === 0;
+      const result = await readDatabase.select({ count: sql<number>`1` })
+        .from(users)
+        .where(eq(users.name, name))
+        .limit(1);
+      return result.length === 0;
     });
     return result;
   }
@@ -296,11 +242,11 @@ export class UserStorage extends BaseStorage<UserProfile> {
    */
   async isEmailAvailable(email: string): Promise<boolean> {
     const result = await this.withTransaction(async client => {
-      const userResult = await client.query(
-        'SELECT 1 FROM users WHERE email = $1 LIMIT 1',
-        [email],
-      );
-      return userResult.rows.length === 0;
+      const result = await readDatabase.select({ count: sql<number>`1` })
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
+      return result.length === 0;
     });
     return result;
   }

@@ -1,7 +1,15 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
-import * as schema from "../shared/schema";
+// Import unified database connections and schema
+import { 
+  database, 
+  readDatabase, 
+  writeDatabase, 
+  pool, 
+  getDatabase,
+  withTransaction 
+} from '../shared/database/connection.js';
+
+// Import all schema types and tables
+import * as schema from "../shared/schema.js";
 import {
   bills,
   users,
@@ -15,33 +23,14 @@ import {
   billSponsorships,
   sponsorTransparency,
   billSectionConflicts
-} from '../shared/schema';
+} from '../shared/schema.js';
 
-neonConfig.webSocketConstructor = ws;
-
-const connectionString = process.env.DATABASE_URL;
-
-if (!connectionString) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
-}
-
-// Configure pool with proper SSL settings
-export const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL?.includes('localhost') ? false : { rejectUnauthorized: false }
-});
-
-// Enhanced database connection with better error handling
-let db: any;
+// Use the unified database connection
+const db = database;
 let isDatabaseConnected = false;
 
 async function initializeDatabase() {
   try {
-    // Create drizzle instance
-    db = drizzle({ client: pool, schema });
-
     // Test the connection with a simple query
     await pool.query('SELECT 1');
     isDatabaseConnected = true;
@@ -71,38 +60,52 @@ async function initializeMockData() {
     const existingBills = await db.select().from(schema.bills).limit(1);
     if (existingBills.length === 0) {
       console.log('📋 Seeding initial data...');
-      // Add some initial bills for demonstration
+      // Add some initial bills for demonstration (matching actual schema)
       await db.insert(schema.bills).values([
         {
           title: "Digital Rights and Privacy Protection Act",
-          number: "HR-2024-001",
+          billNumber: "HR-2024-001",
           introducedDate: new Date('2024-01-15'),
           status: "committee",
           summary: "Comprehensive legislation to protect digital privacy rights and regulate data collection by technology companies.",
           description: "This bill establishes fundamental digital rights for citizens and creates oversight mechanisms for data protection.",
-          requiresAction: true,
+          content: "Full text of the Digital Rights and Privacy Protection Act...",
+          category: "technology",
           tags: ["privacy", "technology", "digital-rights"],
-          transparency_score: 78,
-          conflict_indicators: {
-            financial_conflicts: 2,
-            political_alignment: 85,
-            disclosure_gaps: 15
+          viewCount: 0,
+          shareCount: 0,
+          complexityScore: 7,
+          constitutionalConcerns: {
+            concerns: ["First Amendment implications", "Commerce Clause considerations"],
+            severity: "medium"
+          },
+          stakeholderAnalysis: {
+            primary_beneficiaries: ["citizens", "privacy advocates"],
+            potential_opponents: ["tech companies", "data brokers"],
+            economic_impact: "moderate"
           }
         },
         {
           title: "Climate Action and Green Energy Transition Act",
-          number: "S-2024-042",
+          billNumber: "S-2024-042",
           introducedDate: new Date('2024-02-03'),
-          status: "floor_vote",
+          status: "introduced",
           summary: "Legislation to accelerate transition to renewable energy and establish carbon pricing mechanisms.",
           description: "Comprehensive climate action bill with targets for emissions reduction and renewable energy adoption.",
-          requiresAction: true,
+          content: "Full text of the Climate Action and Green Energy Transition Act...",
+          category: "environment",
           tags: ["climate", "energy", "environment"],
-          transparency_score: 92,
-          conflict_indicators: {
-            financial_conflicts: 0,
-            political_alignment: 72,
-            disclosure_gaps: 5
+          viewCount: 0,
+          shareCount: 0,
+          complexityScore: 9,
+          constitutionalConcerns: {
+            concerns: ["Interstate Commerce regulation", "Federal vs State authority"],
+            severity: "low"
+          },
+          stakeholderAnalysis: {
+            primary_beneficiaries: ["environmental groups", "renewable energy sector"],
+            potential_opponents: ["fossil fuel industry", "traditional utilities"],
+            economic_impact: "significant"
           }
         }
       ]);

@@ -8,13 +8,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ArrowUp, ArrowDown, Plus, Clock, DollarSign, Users, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 
+// Type definitions with improved specificity
+type Priority = 'low' | 'medium' | 'high' | 'critical';
+type Status = 'proposed' | 'under_review' | 'approved' | 'implemented' | 'rejected';
+type SortOption = 'recent' | 'popular' | 'priority';
+type VoteType = 'up' | 'down';
+
 interface Workaround {
   id: number;
   title: string;
   description: string;
   category: string;
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  status: 'proposed' | 'under_review' | 'approved' | 'implemented' | 'rejected';
+  priority: Priority;
+  status: Status;
   upvotes: number;
   downvotes: number;
   implementationCost?: number;
@@ -31,15 +37,25 @@ interface ImplementationWorkaroundsProps {
   billId: number;
 }
 
-// Extracted constants for better maintainability
-const PRIORITY_COLORS = {
+// Type-safe form state interface
+interface NewWorkaroundForm {
+  title: string;
+  description: string;
+  category: string;
+  priority: Priority;
+  implementationCost: string;
+  timelineEstimate: string;
+}
+
+// Extracted constants for better maintainability and type safety
+const PRIORITY_COLORS: Record<Priority, string> = {
   critical: 'bg-red-100 text-red-800 border-red-200',
   high: 'bg-orange-100 text-orange-800 border-orange-200',
   medium: 'bg-yellow-100 text-yellow-800 border-yellow-200',
   low: 'bg-green-100 text-green-800 border-green-200',
 } as const;
 
-const STATUS_COLORS = {
+const STATUS_COLORS: Record<Status, string> = {
   implemented: 'bg-green-100 text-green-800 border-green-200',
   approved: 'bg-blue-100 text-blue-800 border-blue-200',
   under_review: 'bg-yellow-100 text-yellow-800 border-yellow-200',
@@ -47,7 +63,7 @@ const STATUS_COLORS = {
   proposed: 'bg-gray-100 text-gray-800 border-gray-200',
 } as const;
 
-const STATUS_ICONS = {
+const STATUS_ICONS: Record<Status, typeof CheckCircle2> = {
   implemented: CheckCircle2,
   approved: CheckCircle2,
   under_review: Clock,
@@ -55,21 +71,34 @@ const STATUS_ICONS = {
   proposed: Clock,
 } as const;
 
-const STAKEHOLDER_SUPPORT_COLORS = {
+const STAKEHOLDER_SUPPORT_COLORS: Record<string, string> = {
   strong: 'border-green-300 text-green-700',
   moderate: 'border-yellow-300 text-yellow-700',
   neutral: 'border-gray-300 text-gray-700',
   weak: 'border-red-300 text-red-700',
 } as const;
 
-// Initial state for new workaround form
-const INITIAL_WORKAROUND_STATE = {
+// Initial state for new workaround form with proper typing
+const INITIAL_WORKAROUND_STATE: NewWorkaroundForm = {
   title: '',
   description: '',
   category: '',
-  priority: 'medium' as const,
+  priority: 'medium',
   implementationCost: '',
   timelineEstimate: '',
+};
+
+// Type guards for runtime validation
+const isValidSortOption = (value: string): value is SortOption => {
+  return ['recent', 'popular', 'priority'].includes(value);
+};
+
+const isValidStatus = (value: string): value is Status => {
+  return ['proposed', 'under_review', 'approved', 'implemented', 'rejected'].includes(value);
+};
+
+const isValidPriority = (value: string): value is Priority => {
+  return ['low', 'medium', 'high', 'critical'].includes(value);
 };
 
 export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsProps) {
@@ -78,22 +107,38 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'priority'>('popular');
+  const [sortBy, setSortBy] = useState<SortOption>('popular');
   const [votingStates, setVotingStates] = useState<Record<number, boolean>>({});
+  const [newWorkaround, setNewWorkaround] = useState<NewWorkaroundForm>(INITIAL_WORKAROUND_STATE);
 
-  const [newWorkaround, setNewWorkaround] = useState(INITIAL_WORKAROUND_STATE);
+  // Type-safe handlers for Select components
+  const handleSortChange = useCallback((value: string) => {
+    if (isValidSortOption(value)) {
+      setSortBy(value);
+    }
+  }, []);
+
+  const handleStatusFilterChange = useCallback((value: string) => {
+    setFilterStatus(value);
+  }, []);
+
+  const handlePriorityChange = useCallback((value: string) => {
+    if (isValidPriority(value)) {
+      setNewWorkaround(prev => ({ ...prev, priority: value }));
+    }
+  }, []);
 
   // Memoized functions to prevent unnecessary re-renders
-  const getPriorityColor = useCallback((priority: string) => {
-    return PRIORITY_COLORS[priority as keyof typeof PRIORITY_COLORS] || 'bg-gray-100 text-gray-800 border-gray-200';
+  const getPriorityColor = useCallback((priority: Priority) => {
+    return PRIORITY_COLORS[priority];
   }, []);
 
-  const getStatusColor = useCallback((status: string) => {
-    return STATUS_COLORS[status as keyof typeof STATUS_COLORS] || 'bg-gray-100 text-gray-800 border-gray-200';
+  const getStatusColor = useCallback((status: Status) => {
+    return STATUS_COLORS[status];
   }, []);
 
-  const getStatusIcon = useCallback((status: string) => {
-    const IconComponent = STATUS_ICONS[status as keyof typeof STATUS_ICONS] || Clock;
+  const getStatusIcon = useCallback((status: Status) => {
+    const IconComponent = STATUS_ICONS[status];
     return <IconComponent className="w-4 h-4" />;
   }, []);
 
@@ -126,7 +171,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
     fetchWorkarounds();
   }, [fetchWorkarounds]);
 
-  // Optimized form validation
+  // Optimized form validation with better type safety
   const isFormValid = useMemo(() => {
     return newWorkaround.title.trim().length > 0 && 
            newWorkaround.description.trim().length > 0;
@@ -168,7 +213,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
   }, [isFormValid, newWorkaround, billId, fetchWorkarounds]);
 
   // Optimized voting with loading states to prevent double-clicks
-  const handleVote = useCallback(async (workaroundId: number, type: 'up' | 'down') => {
+  const handleVote = useCallback(async (workaroundId: number, type: VoteType) => {
     // Prevent multiple votes while one is in progress
     if (votingStates[workaroundId]) return;
 
@@ -193,8 +238,8 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
     }
   }, [votingStates, fetchWorkarounds]);
 
-  // Optimized form field update function
-  const updateNewWorkaround = useCallback((field: string, value: string) => {
+  // Type-safe form field update function
+  const updateNewWorkaround = useCallback((field: keyof NewWorkaroundForm, value: string) => {
     setNewWorkaround(prev => ({ ...prev, [field]: value }));
   }, []);
 
@@ -214,7 +259,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
             <Badge 
               key={stakeholder} 
               variant="outline"
-              className={STAKEHOLDER_SUPPORT_COLORS[support as keyof typeof STAKEHOLDER_SUPPORT_COLORS] || 'border-gray-300 text-gray-700'}
+              className={STAKEHOLDER_SUPPORT_COLORS[support] || 'border-gray-300 text-gray-700'}
             >
               {stakeholder.replace('_', ' ')}: {support}
             </Badge>
@@ -365,7 +410,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
 
                 <Select 
                   value={newWorkaround.priority} 
-                  onValueChange={(value) => updateNewWorkaround('priority', value)}
+                  onValueChange={handlePriorityChange}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -424,7 +469,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
 
       {/* Filters */}
       <div className="flex items-center gap-4">
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
+        <Select value={filterStatus} onValueChange={handleStatusFilterChange}>
           <SelectTrigger className="w-48">
             <SelectValue />
           </SelectTrigger>
@@ -438,7 +483,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
           </SelectContent>
         </Select>
 
-        <Select value={sortBy} onValueChange={setSortBy}>
+        <Select value={sortBy} onValueChange={handleSortChange}>
           <SelectTrigger className="w-48">
             <SelectValue />
           </SelectTrigger>

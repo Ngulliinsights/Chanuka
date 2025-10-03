@@ -7,12 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { useOnboarding } from '@/hooks/use-onboarding';
 import { useAuth } from '@/hooks/use-auth';
 import type { OnboardingData } from '@/types/onboarding';
-import {
-  INTEREST_OPTIONS,
-  DEFAULT_ONBOARDING_DATA,
-  ACHIEVEMENT_TYPES,
-  PROGRESS_MULTIPLIER,
-} from '@/config/onboarding';
+import { INTEREST_OPTIONS, DEFAULT_ONBOARDING_DATA, ACHIEVEMENT_TYPES, PROGRESS_MULTIPLIER } from '@/config/onboarding';
 
 // Enhanced interfaces with better type safety and documentation
 interface InterestsStepProps {

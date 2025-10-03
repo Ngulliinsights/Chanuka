@@ -3,7 +3,7 @@ import { db } from './index';
 import {
   users,
   bills,
-  comments,
+  billComments,
   billEngagement,
   notifications,
   userProfiles,
@@ -29,7 +29,7 @@ async function seed() {
     await db.delete(analysis);
     await db.delete(notifications);
     await db.delete(billEngagement);
-    await db.delete(comments);
+    await db.delete(billComments);
     await db.delete(bills);
     await db.delete(userProfiles);
     await db.delete(users);
@@ -39,7 +39,7 @@ async function seed() {
     const createdUsers = await db.insert(users).values([
       {
         email: 'admin@chanuka.ke',
-        password: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9',
+        passwordHash: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9',
         name: 'System Administrator',
         role: 'admin',
         verificationStatus: 'verified',
@@ -47,7 +47,7 @@ async function seed() {
       },
       {
         email: 'analyst@chanuka.ke',
-        password: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9',
+        passwordHash: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9',
         name: 'Dr. Sarah Wanjiku',
         role: 'expert',
         verificationStatus: 'verified',
@@ -55,7 +55,7 @@ async function seed() {
       },
       {
         email: 'citizen1@example.com',
-        password: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9',
+        passwordHash: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9',
         name: 'James Mwangi',
         role: 'citizen',
         verificationStatus: 'verified',
@@ -63,7 +63,7 @@ async function seed() {
       },
       {
         email: 'activist@example.com',
-        password: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9',
+        passwordHash: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9',
         name: 'Grace Akinyi',
         role: 'advocate',
         verificationStatus: 'verified',
@@ -71,7 +71,7 @@ async function seed() {
       },
       {
         email: 'journalist@example.com',
-        password: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9',
+        passwordHash: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9',
         name: 'Michael Ochieng',
         role: 'journalist',
         verificationStatus: 'verified',
@@ -383,12 +383,11 @@ PART VI – MISCELLANEOUS
         sponsorId: userIds[0],
         category: 'Technology & Innovation',
         tags: ['digital economy', 'fintech', 'cryptocurrency', 'data protection', 'infrastructure'],
-        publicationDate: new Date('2024-01-15'),
-        votingDeadline: new Date('2024-06-30'),
-        parliamentaryStage: 'Committee Review',
-        publicSupport: 72.5,
-        priority: 'high',
-        isArchived: false
+        introducedDate: new Date('2024-01-15'),
+        lastActionDate: new Date('2024-06-30'),
+        viewCount: 0,
+        shareCount: 0,
+        complexityScore: 8
       },
       {
         title: 'Agriculture Modernization and Food Security Act 2024',
@@ -445,12 +444,11 @@ PART VI – IMPLEMENTATION
         sponsorId: userIds[1],
         category: 'Agriculture & Food Security',
         tags: ['agriculture', 'food security', 'farmers', 'technology', 'sustainability'],
-        publicationDate: new Date('2024-02-01'),
-        votingDeadline: new Date('2024-08-15'),
-        parliamentaryStage: 'First Reading',
-        publicSupport: 85.3,
-        priority: 'critical',
-        isArchived: false
+        introducedDate: new Date('2024-02-01'),
+        lastActionDate: new Date('2024-08-15'),
+        viewCount: 0,
+        shareCount: 0,
+        complexityScore: 7
       },
       {
         title: 'Universal Healthcare Access Amendment Bill 2024',
@@ -504,12 +502,11 @@ PART VI – GOVERNANCE AND ACCOUNTABILITY
         sponsorId: userIds[2],
         category: 'Health & Social Services',
         tags: ['healthcare', 'universal coverage', 'health system', 'public health'],
-        publicationDate: new Date('2023-11-20'),
-        votingDeadline: new Date('2024-03-15'),
-        parliamentaryStage: 'Presidential Assent',
-        publicSupport: 91.7,
-        priority: 'critical',
-        isArchived: false
+        introducedDate: new Date('2023-11-20'),
+        lastActionDate: new Date('2024-03-15'),
+        viewCount: 0,
+        shareCount: 0,
+        complexityScore: 6
       },
       {
         title: 'Climate Change Adaptation and Resilience Act 2024',
@@ -566,12 +563,11 @@ PART VI – MONITORING AND REPORTING
         sponsorId: userIds[3],
         category: 'Environment & Climate',
         tags: ['climate change', 'adaptation', 'resilience', 'green economy', 'sustainability'],
-        publicationDate: new Date('2024-03-01'),
-        votingDeadline: new Date('2024-09-30'),
-        parliamentaryStage: 'Drafting',
-        publicSupport: 78.9,
-        priority: 'high',
-        isArchived: false
+        introducedDate: new Date('2024-03-01'),
+        lastActionDate: new Date('2024-09-30'),
+        viewCount: 0,
+        shareCount: 0,
+        complexityScore: 9
       },
       {
         title: 'Youth Economic Empowerment Act 2024',
@@ -628,12 +624,11 @@ PART VI – IMPLEMENTATION
         sponsorId: userIds[4],
         category: 'Social Development',
         tags: ['youth empowerment', 'entrepreneurship', 'employment', 'skills development'],
-        publicationDate: new Date('2024-02-15'),
-        votingDeadline: new Date('2024-07-30'),
-        parliamentaryStage: 'Committee Review',
-        publicSupport: 88.2,
-        priority: 'high',
-        isArchived: false
+        introducedDate: new Date('2024-02-15'),
+        lastActionDate: new Date('2024-07-30'),
+        viewCount: 0,
+        shareCount: 0,
+        complexityScore: 5
       }
     ]).returning();
 
@@ -731,62 +726,48 @@ PART VI – IMPLEMENTATION
     await db.insert(sponsorTransparency).values([
       {
         sponsorId: sponsorIds[0], // Catherine Wambilianga
-        disclosure: 'complete',
-        lastUpdated: new Date('2024-02-01'),
-        publicStatements: 15,
-        disclosureDocuments: [
-          { type: 'financial_disclosure', url: 'https://example.com/docs/wambilianga_financial.pdf', date: '2024-01-15' },
-          { type: 'conflict_statement', url: 'https://example.com/docs/wambilianga_conflicts.pdf', date: '2024-01-20' },
-          { type: 'voting_record', url: 'https://example.com/docs/wambilianga_voting.pdf', date: '2024-02-01' }
-        ],
-        verificationStatus: 'verified'
+        disclosureType: 'financial',
+        description: 'Complete financial disclosure including agricultural cooperative board membership',
+        amount: 2500000.00,
+        source: 'Bungoma Agricultural Cooperative',
+        dateReported: new Date('2024-02-01'),
+        isVerified: true
       },
       {
         sponsorId: sponsorIds[1], // David Sankok
-        disclosure: 'partial',
-        lastUpdated: new Date('2024-01-20'),
-        publicStatements: 8,
-        disclosureDocuments: [
-          { type: 'financial_disclosure', url: 'https://example.com/docs/sankok_financial.pdf', date: '2023-12-01' },
-          { type: 'business_interests', url: 'https://example.com/docs/sankok_business.pdf', date: '2024-01-10' }
-        ],
-        verificationStatus: 'pending'
+        disclosureType: 'business',
+        description: 'Major shareholding in livestock trading company',
+        amount: 8750000.00,
+        source: 'Narok Livestock Traders Ltd',
+        dateReported: new Date('2024-01-20'),
+        isVerified: false
       },
       {
         sponsorId: sponsorIds[2], // Beatrice Elachi
-        disclosure: 'complete',
-        lastUpdated: new Date('2024-02-15'),
-        publicStatements: 22,
-        disclosureDocuments: [
-          { type: 'financial_disclosure', url: 'https://example.com/docs/elachi_financial.pdf', date: '2024-02-01' },
-          { type: 'conflict_statement', url: 'https://example.com/docs/elachi_conflicts.pdf', date: '2024-02-05' },
-          { type: 'voting_record', url: 'https://example.com/docs/elachi_voting.pdf', date: '2024-02-15' },
-          { type: 'public_statements', url: 'https://example.com/docs/elachi_statements.pdf', date: '2024-02-15' }
-        ],
-        verificationStatus: 'verified'
+        disclosureType: 'financial',
+        description: 'Board chair compensation from governance institute',
+        amount: 890000.00,
+        source: 'Institute for Democratic Governance',
+        dateReported: new Date('2024-02-15'),
+        isVerified: true
       },
       {
         sponsorId: sponsorIds[3], // John Kiarie
-        disclosure: 'partial',
-        lastUpdated: new Date('2024-01-30'),
-        publicStatements: 12,
-        disclosureDocuments: [
-          { type: 'media_interests', url: 'https://example.com/docs/kiarie_media.pdf', date: '2024-01-15' },
-          { type: 'entertainment_business', url: 'https://example.com/docs/kiarie_entertainment.pdf', date: '2024-01-25' }
-        ],
-        verificationStatus: 'pending'
+        disclosureType: 'business',
+        description: 'Co-ownership of entertainment business',
+        amount: 3200000.00,
+        source: 'Laugh Industry Comedy Club',
+        dateReported: new Date('2024-01-30'),
+        isVerified: false
       },
       {
         sponsorId: sponsorIds[4], // Joyce Emanikor
-        disclosure: 'complete',
-        lastUpdated: new Date('2024-02-10'),
-        publicStatements: 18,
-        disclosureDocuments: [
-          { type: 'financial_disclosure', url: 'https://example.com/docs/emanikor_financial.pdf', date: '2024-02-01' },
-          { type: 'community_interests', url: 'https://example.com/docs/emanikor_community.pdf', date: '2024-02-05' },
-          { type: 'advocacy_work', url: 'https://example.com/docs/emanikor_advocacy.pdf', date: '2024-02-10' }
-        ],
-        verificationStatus: 'verified'
+        disclosureType: 'family',
+        description: 'Spouse involvement in pastoralist development organization',
+        amount: 450000.00,
+        source: 'Northern Kenya Pastoralist Forum',
+        dateReported: new Date('2024-02-10'),
+        isVerified: true
       }
     ]);
 
@@ -904,17 +885,14 @@ PART VI – IMPLEMENTATION
 
     // 10. Create diverse comments and engagement
     console.log('💬 Creating comments...');
-    await db.insert(comments).values([
+    await db.insert(billComments).values([
       {
         billId: billIds[0],
         userId: userIds[1],
         content: 'The cryptocurrency framework in Section 11 requires more robust consumer protection measures. Current provisions may not adequately address the risks associated with digital asset volatility and market manipulation.',
         upvotes: 24,
         downvotes: 3,
-        isVerified: true,
-        isExpertComment: true,
-        sentiment: 'constructive',
-        confidenceScore: 92.5
+        isVerified: true
       },
       {
         billId: billIds[0],
@@ -922,9 +900,7 @@ PART VI – IMPLEMENTATION
         content: 'As a citizen concerned about digital rights, I appreciate the data localization requirements. However, we need stronger provisions for cross-border data transfers to ensure Kenya remains competitive in the global digital economy.',
         upvotes: 18,
         downvotes: 2,
-        isVerified: true,
-        sentiment: 'supportive',
-        confidenceScore: 78.3
+        isVerified: true
       },
       {
         billId: billIds[1],
@@ -932,9 +908,7 @@ PART VI – IMPLEMENTATION
         content: 'The agricultural modernization initiatives are commendable, but we must ensure that smallholder farmers are not left behind in the technology adoption process. More support for digital literacy and affordable access to modern farming tools is needed.',
         upvotes: 31,
         downvotes: 1,
-        isVerified: true,
-        sentiment: 'constructive',
-        confidenceScore: 89.7
+        isVerified: true
       },
       {
         billId: billIds[2],
@@ -942,9 +916,7 @@ PART VI – IMPLEMENTATION
         content: 'Universal healthcare access is a fundamental right. This amendment strengthens our health system, but implementation will require significant investment in rural health infrastructure and healthcare worker training.',
         upvotes: 42,
         downvotes: 4,
-        isVerified: true,
-        sentiment: 'supportive',
-        confidenceScore: 94.1
+        isVerified: true
       },
       {
         billId: billIds[3],
@@ -952,10 +924,7 @@ PART VI – IMPLEMENTATION
         content: 'Climate adaptation measures are crucial for Kenya\'s future. The community resilience programs outlined in Part III align well with international best practices. However, funding mechanisms need clearer implementation timelines.',
         upvotes: 27,
         downvotes: 2,
-        isVerified: true,
-        isExpertComment: true,
-        sentiment: 'supportive',
-        confidenceScore: 91.2
+        isVerified: true
       }
     ]);
 
