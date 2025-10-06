@@ -1,5 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Bell, Check, X, Clock, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { 
+  Bell, 
+  Check, 
+  X, 
+  Clock, 
+  AlertCircle 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,7 +24,7 @@ interface Notification {
   createdAt: string;
 }
 
-const NotificationCenter: React.FC = () => {
+const NotificationCenter = () => {
   const [isOpen, setIsOpen] = useState(false);
   const queryClient = useQueryClient();
 

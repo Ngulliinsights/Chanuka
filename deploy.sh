@@ -69,9 +69,17 @@ print_status "Docker and Docker Compose found ✓"
 print_status "Installing dependencies..."
 npm install
 
-# Run database migrations
-print_status "Running database migrations..."
-npm run db:migrate || print_warning "Database migration failed - continuing with deployment"
+# Test database connection and run migrations
+print_status "Testing database connection..."
+if npm run db:test-connection > /dev/null 2>&1; then
+    print_status "Database connection successful ✓"
+    print_status "Running database migrations..."
+    npm run db:migrate || print_warning "Database migration failed - continuing with deployment"
+else
+    print_warning "Database connection failed - application will run in demo mode"
+    print_warning "Demo mode provides sample data for testing and development"
+    print_status "To enable full functionality, configure DATABASE_URL in .env file"
+fi
 
 # Build the application
 print_status "Building application..."

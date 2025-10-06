@@ -1,6 +1,13 @@
-import { Card, CardContent, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Bill } from '@shared/types/bill';
+import { Card, CardContent, CardTitle } from '../ui/card';
+import { Progress } from '../ui/progress';
+
+interface Bill {
+  supportPercentage?: number;
+  views?: number;
+  analyses?: number;
+  endorsements?: number;
+  verifiedClaims?: number;
+}
 
 interface BillStatsProps {
   bill: Bill;

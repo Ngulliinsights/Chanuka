@@ -22,7 +22,7 @@ export default function BillAnalysis() {
   const params = useParams<{ id: string }>();
   const id = params?.id ? parseInt(params.id) : null;
   const isOnline = useOnlineStatus();
-  const { bill, comments, isLoading, addComment, endorseComment, isAddingComment, isEndorsing } = useBillAnalysis(id || 0);
+  const { bill, analysis, comments, isLoading, addComment, endorseComment, isAddingComment, isEndorsing } = useBillAnalysis(id || 0);
   const [expandedSections, setExpandedSections] = useState<string[]>(DEFAULT_EXPANDED_SECTIONS);
   const [commentSort, setCommentSort] = useState<'newest' | 'oldest' | 'endorsed'>('newest');
 
@@ -349,6 +349,7 @@ export default function BillAnalysis() {
             >
               <Comments
                 comments={comments}
+                billId={id}
                 onAddComment={handleAddComment}
                 onEndorseComment={handleEndorseComment}
                 isAddingComment={isAddingComment}

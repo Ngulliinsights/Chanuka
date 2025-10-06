@@ -1,5 +1,12 @@
-import React, { useState } from 'react';
-import { Search, Filter, X, Calendar, Tag, User } from 'lucide-react';
+import { useState } from 'react';
+import { 
+  Search, 
+  Filter, 
+  X, 
+  Calendar, 
+  Tag, 
+  User 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -55,7 +62,7 @@ const sortOptions = [
   { value: 'status', label: 'Status' }
 ];
 
-const AdvancedSearch: React.FC<AdvancedSearchProps> = ({ onSearch, isLoading = false }) => {
+const AdvancedSearch = ({ onSearch, isLoading = false }: AdvancedSearchProps) => {
   const [filters, setFilters] = useState<SearchFilters>({
     query: '',
     category: '',

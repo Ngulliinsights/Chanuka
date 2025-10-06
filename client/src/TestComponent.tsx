@@ -1,8 +1,9 @@
 
-import React from 'react';
+
+import { useEffect } from 'react';
 
 export default function TestComponent() {
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('Simplified App mounted for debugging');
   }, []);
 

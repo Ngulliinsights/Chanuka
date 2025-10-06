@@ -1,6 +1,6 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { Logo } from '@/components/ui/logo';
 import { 
   Home, 
   BarChart3, 
@@ -32,15 +32,12 @@ export function Sidebar() {
   return (
     <div className="flex h-full w-64 flex-col bg-card border-r border-border">
       {/* Logo */}
-      <div className="flex h-16 items-center gap-3 px-6 border-b border-border">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary p-1">
-          <img 
-            src="/Chanuka_logo.svg" 
-            alt="Chanuka Logo" 
-            className="h-full w-full object-contain filter brightness-0 invert"
-          />
-        </div>
-        <span className="text-xl font-bold text-primary">Chanuka</span>
+      <div className="flex h-16 items-center px-6 border-b border-border">
+        <Logo 
+          size="md" 
+          showText={true}
+          textClassName="text-xl font-bold text-primary"
+        />
       </div>
 
       {/* Search */}

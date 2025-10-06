@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 interface DashboardStats {
   totalBills: number;
@@ -172,6 +172,7 @@ function Dashboard() {
               {quickActions.map((action, index) => (
                 <button
                   key={index}
+                  type="button"
                   onClick={action.action}
                   className="w-full flex items-start space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >

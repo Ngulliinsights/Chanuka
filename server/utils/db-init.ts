@@ -1,4 +1,4 @@
-import { pool } from "../db";
+import { pool } from "../shared/database/connection.js";
 
 export async function initializeDatabase(): Promise<boolean> {
   try {

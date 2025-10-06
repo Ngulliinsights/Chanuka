@@ -1,8 +1,15 @@
-import React from 'react';
 import { useParams, useLocation, Link } from 'wouter';
+import { Fragment } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Users, User, Network, Search, FileText } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Users, 
+  User, 
+  Network, 
+  Search, 
+  FileText 
+} from 'lucide-react';
 
 // Import the new page components
 import SponsorshipOverview from './sponsorship/overview';
@@ -208,7 +215,7 @@ export default function BillSponsorshipAnalysis() {
 
           <div className="flex flex-wrap items-center gap-3">
             {readingSequence.map((step, index) => (
-              <React.Fragment key={step.path}>
+              <Fragment key={step.path}>
                 <Link to={`/bills/${billId}/sponsorship-analysis/${step.path}`}>
                   <Button 
                     variant="outline" 
@@ -221,7 +228,7 @@ export default function BillSponsorshipAnalysis() {
                 {index < readingSequence.length - 1 && (
                   <span className="text-muted-foreground text-sm" aria-hidden="true">→</span>
                 )}
-              </React.Fragment>
+              </Fragment>
             ))}
           </div>
 

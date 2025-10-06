@@ -3,7 +3,7 @@ import {
   users, bills, sponsors, billSponsorships, billComments, 
   userProfiles, analysis, sponsorAffiliations, sponsorTransparency,
   billSectionConflicts
-} from "@shared/schema";
+} from "../shared/schema.js";
 
 async function seedLegislativeData() {
   console.log("Starting legislative data seeding...");

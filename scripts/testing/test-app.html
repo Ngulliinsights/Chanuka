@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chanuka App Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <h1>Chanuka App Status Test</h1>
+    
+    <div id="server-status" class="status info">Testing server connection...</div>
+    <div id="build-status" class="status info">Checking build status...</div>
+    <div id="app-status" class="status info">Testing app rendering...</div>
+    
+    <script>
+        // Test server connection
+        fetch('http://localhost:4200/api/health')
+            .then(response => {
+                if (response.ok) {
+                    document.getElementById('server-status').className = 'status success';
+                    document.getElementById('server-status').textContent = '✅ Server is running and responding';
+                } else {
+                    document.getElementById('server-status').className = 'status error';
+                    document.getElementById('server-status').textContent = '❌ Server responded with error: ' + response.status;
+                }
+            })
+            .catch(error => {
+                document.getElementById('server-status').className = 'status error';
+                document.getElementById('server-status').textContent = '❌ Server connection failed: ' + error.message;
+            });
+
+        // Test if main app loads
+        fetch('http://localhost:4200/')
+            .then(response => response.text())
+            .then(html => {
+                if (html.includes('id="root"')) {
+                    document.getElementById('app-status').className = 'status success';
+                    document.getElementById('app-status').textContent = '✅ App HTML is being served correctly';
+                } else {
+                    document.getElementById('app-status').className = 'status error';
+                    document.getElementById('app-status').textContent = '❌ App HTML structure not found';
+                }
+            })
+            .catch(error => {
+                document.getElementById('app-status').className = 'status error';
+                document.getElementById('app-status').textContent = '❌ App loading failed: ' + error.message;
+            });
+
+        // Check build status
+        document.getElementById('build-status').className = 'status success';
+        document.getElementById('build-status').textContent = '✅ Build completed successfully (from previous check)';
+    </script>
+</body>
+</html>

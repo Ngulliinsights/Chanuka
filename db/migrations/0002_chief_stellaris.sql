@@ -1,0 +1,1 @@
+ALTER TABLE "citizen_verifications" ALTER COLUMN "citizen_id" SET DATA TYPE uuid;

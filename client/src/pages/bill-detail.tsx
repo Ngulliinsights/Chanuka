@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+/* cspell:disable-next-line */
 import { useParams, Link } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -61,7 +62,7 @@ interface Bill {
   }>;
 }
 
-const BillDetail: React.FC = () => {
+const BillDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [bill, setBill] = useState<Bill | null>(null);
   const [loading, setLoading] = useState(true);
@@ -549,7 +550,7 @@ const BillDetail: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="workarounds" className="space-y-6">
-            <ImplementationWorkarounds billId={Number(id)} />
+            <ImplementationWorkarounds billId={id} />
           </TabsContent>
         </Tabs>
       </main>

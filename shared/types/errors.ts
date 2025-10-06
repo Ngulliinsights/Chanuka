@@ -1,3 +1,19 @@
+// Re-export enhanced error handling from utils
+export {
+  AppError,
+  ErrorType,
+  errorHandler,
+  createValidationError,
+  createAuthenticationError,
+  createAuthorizationError,
+  createNotFoundError,
+  createConflictError,
+  createDatabaseError,
+  asyncErrorHandler,
+  setupGlobalErrorHandlers
+} from '../utils/error-handler.js';
+
+// Legacy error classes for backward compatibility
 export class ValidationError extends Error {
   public readonly field?: string;
   public readonly code?: string;

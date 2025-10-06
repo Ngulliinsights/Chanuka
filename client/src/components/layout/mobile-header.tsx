@@ -1,8 +1,9 @@
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Menu, X, Search, Gavel } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { Logo } from '@/components/ui/logo';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard' },
@@ -21,16 +22,11 @@ export function MobileHeader() {
       {/* Header */}
       <header className="bg-card border-b border-border px-4 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary p-1">
-              <img 
-                src="/Chanuka_logo.svg" 
-                alt="Chanuka Logo" 
-                className="h-full w-full object-contain filter brightness-0 invert"
-              />
-            </div>
-            <span className="text-lg font-bold text-primary">Chanuka</span>
-          </div>
+          <Logo 
+            size="md" 
+            showText={true}
+            textClassName="text-lg font-bold text-primary"
+          />
           
           <div className="flex items-center gap-2">
             <button className="p-2 rounded-md hover:bg-muted transition-colors">

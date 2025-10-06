@@ -1,0 +1,102 @@
+{
+  "name": "@triplecheck/core",
+  "version": "1.0.0",
+  "description": "Core utilities for cross-cutting concerns in the TripleCheck platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "cache",
+    "logging",
+    "validation",
+    "error-handling",
+    "rate-limiting",
+    "configuration",
+    "health-monitoring",
+    "middleware"
+  ],
+  "author": "TripleCheck Team",
+  "license": "MIT",
+  "dependencies": {
+    "zod": "^3.22.4",
+    "pino": "^8.16.2",
+    "pino-pretty": "^10.2.3",
+    "ioredis": "^5.3.2",
+    "dotenv-expand": "^10.0.0",
+    "chokidar": "^3.5.3",
+    "glob": "^10.3.10"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "typescript": "^5.2.2",
+    "vitest": "^1.6.0",
+    "@vitest/coverage-v8": "^1.6.0",
+    "eslint": "^8.51.0",
+    "@typescript-eslint/eslint-plugin": "^6.7.4",
+    "@typescript-eslint/parser": "^6.7.4"
+  },
+  "peerDependencies": {
+    "express": "^4.18.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./cache": {
+      "import": "./dist/cache/index.js",
+      "require": "./dist/cache/index.js",
+      "types": "./dist/cache/index.d.ts"
+    },
+    "./logging": {
+      "import": "./dist/logging/index.js",
+      "require": "./dist/logging/index.js",
+      "types": "./dist/logging/index.d.ts"
+    },
+    "./validation": {
+      "import": "./dist/validation/index.js",
+      "require": "./dist/validation/index.js",
+      "types": "./dist/validation/index.d.ts"
+    },
+    "./error-handling": {
+      "import": "./dist/error-handling/index.js",
+      "require": "./dist/error-handling/index.js",
+      "types": "./dist/error-handling/index.d.ts"
+    },
+    "./rate-limiting": {
+      "import": "./dist/rate-limiting/index.js",
+      "require": "./dist/rate-limiting/index.js",
+      "types": "./dist/rate-limiting/index.d.ts"
+    },
+    "./health": {
+      "import": "./dist/health/index.js",
+      "require": "./dist/health/index.js",
+      "types": "./dist/health/index.d.ts"
+    },
+    "./middleware": {
+      "import": "./dist/middleware/index.js",
+      "require": "./dist/middleware/index.js",
+      "types": "./dist/middleware/index.d.ts"
+    },
+    "./modernization": {
+      "import": "./dist/modernization/index.js",
+      "require": "./dist/modernization/index.js",
+      "types": "./dist/modernization/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ]
+}

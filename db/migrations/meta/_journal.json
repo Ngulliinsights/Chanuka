@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1753337495450,
+      "tag": "0000_quick_aaron_stack",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1753373215707,
+      "tag": "0001_lowly_white_queen",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1753375482037,
+      "tag": "0002_chief_stellaris",
+      "breakpoints": true
+    }
+  ]
+}
