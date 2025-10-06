@@ -1,38 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
+ * @deprecated The focus and keyboard navigation detection parts of this hook are deprecated.
+ * Please use `use-keyboard-focus` for focus management and `isKeyboardUser` from `use-unified-navigation`.
+ */
+
+/**
  * Accessibility hook for navigation components
  * Provides ARIA labels, keyboard navigation, screen reader support, and focus management
  */
 export function useNavigationAccessibility() {
   const [announcements, setAnnouncements] = useState<string[]>([]);
   const [focusedElement, setFocusedElement] = useState<HTMLElement | null>(null);
-  const [keyboardNavigation, setKeyboardNavigation] = useState(false);
   
   const announcementTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const focusTrapRef = useRef<HTMLElement | null>(null);
   const lastFocusedElementRef = useRef<HTMLElement | null>(null);
-
-  // Detect keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Tab') {
-        setKeyboardNavigation(true);
-      }
-    };
-
-    const handleMouseDown = () => {
-      setKeyboardNavigation(false);
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('mousedown', handleMouseDown);
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('mousedown', handleMouseDown);
-    };
-  }, []);
 
   /**
    * Announce text to screen readers
@@ -391,7 +374,6 @@ export function useNavigationAccessibility() {
     // State
     announcements,
     focusedElement,
-    keyboardNavigation,
     
     // Announcement functions
     announce,
@@ -466,48 +448,4 @@ export function useNavigationKeyboardShortcuts() {
   }, [shortcuts]);
   
   return { registerShortcut };
-}
-
-/**
- * Hook for managing focus indicators and visual feedback
- */
-export function useFocusIndicator() {
-  const [showFocusIndicator, setShowFocusIndicator] = useState(false);
-  const [focusMethod, setFocusMethod] = useState<'keyboard' | 'mouse' | null>(null);
-  
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Tab') {
-        setFocusMethod('keyboard');
-        setShowFocusIndicator(true);
-      }
-    };
-    
-    const handleMouseDown = () => {
-      setFocusMethod('mouse');
-      setShowFocusIndicator(false);
-    };
-    
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('mousedown', handleMouseDown);
-    
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('mousedown', handleMouseDown);
-    };
-  }, []);
-  
-  const getFocusClasses = useCallback((baseClasses: string = '') => {
-    const focusClasses = showFocusIndicator 
-      ? 'focus:outline-2 focus:outline-blue-500 focus:outline-offset-2' 
-      : 'focus:outline-none';
-    
-    return `${baseClasses} ${focusClasses}`.trim();
-  }, [showFocusIndicator]);
-  
-  return {
-    showFocusIndicator,
-    focusMethod,
-    getFocusClasses
-  };
 }

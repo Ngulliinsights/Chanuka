@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { 
-  Heart, 
-  Bell, 
-  Eye, 
-  Share2, 
-  MessageCircle, 
-  TrendingUp, 
-  Calendar, 
-  User 
+import {
+  Heart,
+  Bell,
+  Eye,
+  Share2,
+  MessageCircle,
+  TrendingUp,
+  Calendar,
+  User
 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
@@ -15,9 +15,10 @@ import { Badge } from '../ui/badge';
 import { Switch } from '../ui/switch';
 import { Label } from '../ui/label';
 import { Separator } from '../ui/separator';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '../../hooks/use-toast';
-import { format } from 'date-fns';
+import { useSafeQuery } from '../../hooks/use-safe-query';
+import AuthenticatedAPI from '../../utils/authenticated-api';
 
 interface Bill {
   id: number;
@@ -51,45 +52,24 @@ const BillTracking = ({ billId }: BillTrackingProps) => {
   const queryClient = useQueryClient();
 
   // Check if user is tracking this bill
-  const { data: trackingStatus, isLoading: trackingLoading } = useQuery({
+  const { data: trackingStatus, isLoading: trackingLoading } = useSafeQuery({
     queryKey: ['bill-tracking', billId],
-    queryFn: async () => {
-      const response = await fetch(`/api/bill-tracking/${billId}/tracking-status`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      if (!response.ok) throw new Error('Failed to check tracking status');
-      return response.json();
-    }
+    queryFn: () => AuthenticatedAPI.get(`/api/bill-tracking/${billId}/tracking-status`)
   });
 
   // Get engagement stats
-  const { data: engagementStats } = useQuery({
+  const { data: engagementStats } = useSafeQuery({
     queryKey: ['bill-engagement', billId],
-    queryFn: async () => {
-      const response = await fetch(`/api/bill-tracking/${billId}/engagement`);
-      if (!response.ok) throw new Error('Failed to fetch engagement stats');
-      return response.json();
-    }
+    queryFn: () => AuthenticatedAPI.get(`/api/bill-tracking/${billId}/engagement`)
   });
 
   // Track bill mutation
   const trackBillMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`/api/bill-tracking/${billId}/track`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-          trackingType: 'follow',
-          alertPreferences: preferences
-        })
+      return AuthenticatedAPI.post(`/api/bill-tracking/${billId}/track`, {
+        trackingType: 'follow',
+        alertPreferences: preferences
       });
-      if (!response.ok) throw new Error('Failed to track bill');
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bill-tracking', billId] });
@@ -110,14 +90,7 @@ const BillTracking = ({ billId }: BillTrackingProps) => {
   // Untrack bill mutation
   const untrackBillMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`/api/bill-tracking/${billId}/track`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      if (!response.ok) throw new Error('Failed to untrack bill');
-      return response.json();
+      return AuthenticatedAPI.delete(`/api/bill-tracking/${billId}/track`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bill-tracking', billId] });
@@ -138,14 +111,7 @@ const BillTracking = ({ billId }: BillTrackingProps) => {
   // Record view mutation
   const recordViewMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`/api/bill-tracking/${billId}/view`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      if (!response.ok) throw new Error('Failed to record view');
-      return response.json();
+      return AuthenticatedAPI.post(`/api/bill-tracking/${billId}/view`);
     }
   });
 
@@ -155,7 +121,7 @@ const BillTracking = ({ billId }: BillTrackingProps) => {
   }, [billId]);
 
   const handleTrackingToggle = () => {
-    if (trackingStatus?.isTracking) {
+    if (trackingStatus?.data.isTracking) {
       untrackBillMutation.mutate();
     } else {
       trackBillMutation.mutate();
@@ -196,9 +162,9 @@ const BillTracking = ({ billId }: BillTrackingProps) => {
             <Button
               onClick={handleTrackingToggle}
               disabled={trackingLoading || trackBillMutation.isPending || untrackBillMutation.isPending}
-              variant={trackingStatus?.isTracking ? "default" : "outline"}
+              variant={trackingStatus?.data.isTracking ? "default" : "outline"}
             >
-              {trackingStatus?.isTracking ? (
+              {trackingStatus?.data.isTracking ? (
                 <>
                   <Heart className="h-4 w-4 mr-2 fill-current" />
                   Tracking
@@ -217,7 +183,7 @@ const BillTracking = ({ billId }: BillTrackingProps) => {
             Get notified when there are updates to this bill based on your preferences.
           </p>
           
-          {trackingStatus?.isTracking && (
+          {trackingStatus?.data.isTracking && (
             <div className="space-y-4">
               <Separator />
               <div>
@@ -275,7 +241,7 @@ const BillTracking = ({ billId }: BillTrackingProps) => {
       </Card>
 
       {/* Engagement Statistics */}
-      {engagementStats && (
+      {engagementStats?.data && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -290,35 +256,35 @@ const BillTracking = ({ billId }: BillTrackingProps) => {
                   <Eye className="h-4 w-4" />
                   <span className="text-sm">Views</span>
                 </div>
-                <p className="text-2xl font-bold">{formatNumber(engagementStats.totalViews)}</p>
+                <p className="text-2xl font-bold">{formatNumber(engagementStats.data.totalViews)}</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center space-x-1 text-muted-foreground mb-1">
                   <MessageCircle className="h-4 w-4" />
                   <span className="text-sm">Comments</span>
                 </div>
-                <p className="text-2xl font-bold">{formatNumber(engagementStats.totalComments)}</p>
+                <p className="text-2xl font-bold">{formatNumber(engagementStats.data.totalComments)}</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center space-x-1 text-muted-foreground mb-1">
                   <Share2 className="h-4 w-4" />
                   <span className="text-sm">Shares</span>
                 </div>
-                <p className="text-2xl font-bold">{formatNumber(engagementStats.totalShares)}</p>
+                <p className="text-2xl font-bold">{formatNumber(engagementStats.data.totalShares)}</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center space-x-1 text-muted-foreground mb-1">
                   <User className="h-4 w-4" />
                   <span className="text-sm">Followers</span>
                 </div>
-                <p className="text-2xl font-bold">{formatNumber(engagementStats.uniqueViewers)}</p>
+                <p className="text-2xl font-bold">{formatNumber(engagementStats.data.uniqueViewers)}</p>
               </div>
             </div>
             <Separator className="my-4" />
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Engagement Score</span>
               <Badge variant="outline" className="font-mono">
-                {engagementStats.engagementScore}
+                {engagementStats.data.engagementScore}
               </Badge>
             </div>
           </CardContent>

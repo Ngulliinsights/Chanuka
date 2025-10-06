@@ -1,7 +1,7 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, numeric, uuid, varchar, index, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, numeric, uuid, varchar, index, uniqueIndex, check } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 // ============================================================================
 // CORE USER TABLES
@@ -25,7 +25,7 @@ export const users = pgTable("users", {
   emailIdx: uniqueIndex("users_email_idx").on(table.email),
   roleIdx: index("users_role_idx").on(table.role),
   verificationStatusIdx: index("users_verification_status_idx").on(table.verificationStatus),
-  isActiveIdx: index("users_is_active_idx").on(table.isActive),
+  activeVerifiedIdx: index("users_active_verified_idx").on(table.isActive, table.verificationStatus),
 }));
 
 export const userProfiles = pgTable("user_profiles", {
@@ -43,23 +43,35 @@ export const userProfiles = pgTable("user_profiles", {
 }, (table) => ({
   userIdIdx: uniqueIndex("user_profiles_user_id_idx").on(table.userId),
   reputationIdx: index("user_profiles_reputation_idx").on(table.reputationScore),
+  reputationCheck: check("reputation_score_check", sql`${table.reputationScore} >= 0`),
 }));
 
 export const sessions = pgTable("sessions", {
   id: text("id").primaryKey(),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  token: text("token"),
-  refreshTokenHash: text("refresh_token_hash"),
-  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
   expiresAt: timestamp("expires_at").notNull(),
   isActive: boolean("is_active").notNull().default(true),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 }, (table) => ({
   userIdIdx: index("sessions_user_id_idx").on(table.userId),
-  tokenIdx: uniqueIndex("sessions_token_idx").on(table.token),
   expiresAtIdx: index("sessions_expires_at_idx").on(table.expiresAt),
   isActiveIdx: index("sessions_is_active_idx").on(table.isActive),
+}));
+
+export const refreshTokens = pgTable("refresh_tokens", {
+  id: serial("id").primaryKey(),
+  sessionId: text("session_id").notNull().references(() => sessions.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  isRevoked: boolean("is_revoked").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => ({
+  sessionIdIdx: index("refresh_tokens_session_id_idx").on(table.sessionId),
+  tokenHashIdx: uniqueIndex("refresh_tokens_token_hash_idx").on(table.tokenHash),
+  expiresAtIdx: index("refresh_tokens_expires_at_idx").on(table.expiresAt),
 }));
 
 export const passwordResets = pgTable("password_resets", {
@@ -153,457 +165,15 @@ export const bills = pgTable("bills", {
   description: text("description"),
   content: text("content"),
   summary: text("summary"),
-  status: text("status").notNull(), // passing, failing, warning, not_applicable
-  lastChecked: timestamp("last_checked").notNull().defaultNow(),
-  nextCheck: timestamp("next_check"),
-  findings: jsonb("findings").default([]),
-  remediation: text("remediation"),
-  priority: text("priority").notNull().default("medium"),
-  automated: boolean("automated").notNull().default(true),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-}, (table) => ({
-  checkTypeIdx: index("compliance_checks_check_type_idx").on(table.checkType),
-  statusIdx: index("compliance_checks_status_idx").on(table.status),
-  nextCheckIdx: index("compliance_checks_next_check_idx").on(table.nextCheck),
-}));
-
-export const threatIntelligence = pgTable("threat_intelligence", {
-  id: serial("id").primaryKey(),
-  ipAddress: text("ip_address").notNull(),
-  threatType: text("threat_type").notNull(), // malicious_ip, bot, scanner, etc.
-  severity: text("severity").notNull().default("medium"),
-  source: text("source").notNull(), // internal, external_feed, manual
-  description: text("description"),
-  firstSeen: timestamp("first_seen").notNull().defaultNow(),
-  lastSeen: timestamp("last_seen").notNull().defaultNow(),
-  occurrences: integer("occurrences").notNull().default(1),
-  blocked: boolean("blocked").notNull().default(false),
-  isActive: boolean("is_active").notNull().default(true),
-  expiresAt: timestamp("expires_at"),
-  metadata: jsonb("metadata").default({}),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-}, (table) => ({
-  ipAddressIdx: uniqueIndex("threat_intelligence_ip_address_idx").on(table.ipAddress),
-  threatTypeIdx: index("threat_intelligence_threat_type_idx").on(table.threatType),
-  severityIdx: index("threat_intelligence_severity_idx").on(table.severity),
-  isActiveIdx: index("threat_intelligence_is_active_idx").on(table.isActive),
-}));
-
-// ============================================================================
-// REGULATORY MONITORING
-// ============================================================================
-
-export const regulations = pgTable("regulations", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  title: text("title").notNull(),
-  description: text("description"),
-  content: text("content"),
-  status: text("status").notNull().default("proposed"), // proposed, enacted, repealed
-  source: text("source"),
-  sector: text("sector"),
-  tags: text("tags").array().default([]),
-  sponsorId: integer("sponsor_id").references(() => sponsors.id, { onDelete: "set null" }),
-  effectiveDate: timestamp("effective_date"),
-  complianceDeadline: timestamp("compliance_deadline"),
-  affectedStakeholders: integer("affected_stakeholders").default(0),
-  estimatedImpact: numeric("estimated_impact", { precision: 10, scale: 2 }).default("0"),
-  metadata: jsonb("metadata").default({}),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-}, (table) => ({
-  statusIdx: index("regulations_status_idx").on(table.status),
-  sectorIdx: index("regulations_sector_idx").on(table.sector),
-  effectiveDateIdx: index("regulations_effective_date_idx").on(table.effectiveDate),
-}));
-
-export const regulatoryChanges = pgTable("regulatory_changes", {
-  id: serial("id").primaryKey(),
-  regulationId: uuid("regulation_id").notNull().references(() => regulations.id, { onDelete: "cascade" }),
-  changeType: text("change_type"),
-  changesRequirements: boolean("changes_requirements").notNull().default(false),
-  shortensDeadline: boolean("shortens_deadline").notNull().default(false),
-  addsCosts: boolean("adds_costs").notNull().default(false),
-  affectsCompliance: boolean("affects_compliance").notNull().default(false),
-  details: jsonb("details").default({}),
-  changedAt: timestamp("changed_at").notNull().defaultNow(),
-  reportedBy: uuid("reported_by").references(() => users.id, { onDelete: "set null" }),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-}, (table) => ({
-  regulationIdIdx: index("regulatory_changes_regulation_id_idx").on(table.regulationId),
-  changeTypeIdx: index("regulatory_changes_change_type_idx").on(table.changeType),
-  changedAtIdx: index("regulatory_changes_changed_at_idx").on(table.changedAt),
-}));
-
-export const regulatoryImpact = pgTable("regulatory_impact", {
-  id: serial("id").primaryKey(),
-  regulationId: uuid("regulation_id").notNull().references(() => regulations.id, { onDelete: "cascade" }),
-  sector: text("sector"),
-  impactLevel: text("impact_level"),
-  affectedEntities: jsonb("affected_entities").default([]),
-  mitigation: jsonb("mitigation").default({}),
-  impactScore: numeric("impact_score", { precision: 5, scale: 2 }).default("0"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-}, (table) => ({
-  regulationIdIdx: index("regulatory_impact_regulation_id_idx").on(table.regulationId),
-  sectorIdx: index("regulatory_impact_sector_idx").on(table.sector),
-  impactLevelIdx: index("regulatory_impact_impact_level_idx").on(table.impactLevel),
-}));
-
-// ============================================================================
-// DATA SYNCHRONIZATION
-// ============================================================================
-
-export const syncJobs = pgTable("sync_jobs", {
-  id: text("id").primaryKey(),
-  dataSourceId: text("data_source_id").notNull(),
-  endpointId: text("endpoint_id").notNull(),
-  status: text("status").notNull().default("pending"), // pending, running, completed, failed, cancelled
-  startTime: timestamp("start_time"),
-  endTime: timestamp("end_time"),
-  recordsProcessed: integer("records_processed").notNull().default(0),
-  recordsUpdated: integer("records_updated").notNull().default(0),
-  recordsCreated: integer("records_created").notNull().default(0),
-  recordsSkipped: integer("records_skipped").notNull().default(0),
-  isIncremental: boolean("is_incremental").notNull().default(true),
-  lastSyncTimestamp: timestamp("last_sync_timestamp"),
-  nextRunTime: timestamp("next_run_time"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-}, (table) => ({
-  statusIdx: index("sync_jobs_status_idx").on(table.status),
-  dataSourceIdx: index("sync_jobs_data_source_idx").on(table.dataSourceId),
-  nextRunTimeIdx: index("sync_jobs_next_run_time_idx").on(table.nextRunTime),
-}));
-
-export const syncErrors = pgTable("sync_errors", {
-  id: serial("id").primaryKey(),
-  jobId: text("job_id").notNull().references(() => syncJobs.id, { onDelete: "cascade" }),
-  timestamp: timestamp("timestamp").notNull().defaultNow(),
-  level: text("level").notNull(), // warning, error, critical
-  message: text("message").notNull(),
-  details: text("details"),
-  recordId: text("record_id"),
-  endpoint: text("endpoint"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-}, (table) => ({
-  jobIdIdx: index("sync_errors_job_id_idx").on(table.jobId),
-  levelIdx: index("sync_errors_level_idx").on(table.level),
-  timestampIdx: index("sync_errors_timestamp_idx").on(table.timestamp),
-}));
-
-export const conflicts = pgTable("conflicts", {
-  id: text("id").primaryKey(),
-  dataType: text("data_type").notNull(),
-  recordId: text("record_id").notNull(),
-  resolution: text("resolution").notNull().default("pending"), // pending, automatic, manual
-  resolvedValue: text("resolved_value"),
-  resolvedBy: text("resolved_by"),
-  resolvedAt: timestamp("resolved_at"),
-  confidence: numeric("confidence", { precision: 3, scale: 2 }).notNull().default("0.00"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-}, (table) => ({
-  dataTypeRecordIdx: uniqueIndex("conflicts_data_type_record_idx").on(table.dataType, table.recordId),
-  resolutionIdx: index("conflicts_resolution_idx").on(table.resolution),
-}));
-
-export const conflictSources = pgTable("conflict_sources", {
-  id: serial("id").primaryKey(),
-  conflictId: text("conflict_id").notNull().references(() => conflicts.id, { onDelete: "cascade" }),
-  sourceId: text("source_id").notNull(),
-  sourceName: text("source_name").notNull(),
-  value: text("value").notNull(),
-  timestamp: timestamp("timestamp").notNull(),
-  priority: numeric("priority", { precision: 3, scale: 2 }).notNull(),
-  confidence: numeric("confidence", { precision: 3, scale: 2 }).notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-}, (table) => ({
-  conflictIdIdx: index("conflict_sources_conflict_id_idx").on(table.conflictId),
-  sourceIdIdx: index("conflict_sources_source_id_idx").on(table.sourceId),
-}));
-
-// ============================================================================
-// NOTIFICATIONS AND MESSAGING
-// ============================================================================
-
-export const notifications = pgTable("notifications", {
-  id: serial("id").primaryKey(),
-  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  type: text("type").notNull(), // bill_update, comment_reply, verification_status
-  title: text("title").notNull(),
-  message: text("message").notNull(),
-  relatedBillId: integer("related_bill_id").references(() => bills.id, { onDelete: "cascade" }),
-  isRead: boolean("is_read").notNull().default(false),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-}, (table) => ({
-  userIdIdx: index("notifications_user_id_idx").on(table.userId),
-  isReadIdx: index("notifications_is_read_idx").on(table.isRead),
-  typeIdx: index("notifications_type_idx").on(table.type),
-  createdAtIdx: index("notifications_created_at_idx").on(table.createdAt),
-  userReadIdx: index("notifications_user_read_idx").on(table.userId, table.isRead),
-}));
-
-// ============================================================================
-// DASHBOARD SUPPORT TABLES
-// ============================================================================
-
-export const departments = pgTable("departments", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  description: text("description"),
-  isActive: boolean("is_active").notNull().default(true),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-}, (table) => ({
-  nameIdx: uniqueIndex("departments_name_idx").on(table.name),
-  isActiveIdx: index("departments_is_active_idx").on(table.isActive),
-}));
-
-export const evaluations = pgTable("evaluations", {
-  id: serial("id").primaryKey(),
-  candidateName: text("candidate_name").notNull(),
-  departmentId: integer("department_id").notNull().references(() => departments.id, { onDelete: "cascade" }),
-  status: text("status").notNull().default("pending"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-}, (table) => ({
-  departmentIdIdx: index("evaluations_department_id_idx").on(table.departmentId),
-  statusIdx: index("evaluations_status_idx").on(table.status),
-}));
-
-// ============================================================================
-// DRIZZLE RELATIONS
-// ============================================================================
-
-export const usersRelations = relations(users, ({ one, many }) => ({
-  profile: one(userProfiles, {
-    fields: [users.id],
-    references: [userProfiles.userId],
-  }),
-  sessions: many(sessions),
-  comments: many(billComments),
-  engagements: many(billEngagement),
-  notifications: many(notifications),
-  interests: many(userInterests),
-  progress: many(userProgress),
-}));
-
-export const billsRelations = relations(bills, ({ one, many }) => ({
-  sponsor: one(sponsors, {
-    fields: [bills.sponsorId],
-    references: [sponsors.id],
-  }),
-  comments: many(billComments),
-  engagements: many(billEngagement),
-  analyses: many(analysis),
-  sponsorships: many(billSponsorships),
-  tags: many(billTags),
-}));
-
-export const sponsorsRelations = relations(sponsors, ({ many }) => ({
-  bills: many(bills),
-  sponsorships: many(billSponsorships),
-  affiliations: many(sponsorAffiliations),
-  transparency: many(sponsorTransparency),
-}));
-
-export const billCommentsRelations = relations(billComments, ({ one, many }) => ({
-  bill: one(bills, {
-    fields: [billComments.billId],
-    references: [bills.id],
-  }),
-  author: one(users, {
-    fields: [billComments.userId],
-    references: [users.id],
-  }),
-  parent: one(billComments, {
-    fields: [billComments.parentCommentId],
-    references: [billComments.id],
-  }),
-  replies: many(billComments),
-  votes: many(commentVotes),
-}));
-
-// ============================================================================
-// ZOD VALIDATION SCHEMAS
-// ============================================================================
-
-export const insertUserSchema = z.object({
-  email: z.string().email(),
-  passwordHash: z.string().min(60),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-  name: z.string().min(1),
-  role: z.enum(["citizen", "expert", "admin", "journalist", "advocate"]).default("citizen"),
-  verificationStatus: z.enum(["pending", "verified", "rejected"]).default("pending"),
-  preferences: z.any().optional(),
-  isActive: z.boolean().default(true),
-  lastLoginAt: z.date().optional(),
-});
-
-export const insertUserProfileSchema = z.object({
-  userId: z.string().uuid(),
-  bio: z.string().max(1000).optional(),
-  expertise: z.array(z.string()).optional(),
-  location: z.string().max(255).optional(),
-  organization: z.string().max(255).optional(),
-  verificationDocuments: z.any().optional(),
-  reputationScore: z.number().int().min(0).default(0),
-  isPublic: z.boolean().default(true),
-});
-
-export const insertBillSchema = z.object({
-  title: z.string().min(1).max(500),
-  description: z.string().optional(),
-  content: z.string().optional(),
-  summary: z.string().max(2000).optional(),
-  status: z.enum(["introduced", "committee", "passed", "failed", "signed"]).default("introduced"),
-  billNumber: z.string().max(50).optional(),
-  sponsorId: z.number().int().positive().optional(),
-  category: z.string().max(100).optional(),
-  tags: z.array(z.string()).optional(),
-  viewCount: z.number().int().min(0).default(0),
-  shareCount: z.number().int().min(0).default(0),
-  complexityScore: z.number().int().min(1).max(10).optional(),
-  introducedDate: z.date().optional(),
-  lastActionDate: z.date().optional(),
-});
-
-export const insertBillCommentSchema = z.object({
-  userId: z.string().uuid(),
-  content: z.string().min(1).max(5000),
-  billId: z.number().int().positive(),
-  commentType: z.enum(["general", "expert_analysis", "concern", "support"]).default("general"),
-  isVerified: z.boolean().default(false),
-  parentCommentId: z.number().int().positive().optional(),
-  upvotes: z.number().int().min(0).default(0),
-  downvotes: z.number().int().min(0).default(0),
-});
-
-export const insertSponsorSchema = z.object({
-  name: z.string().min(1).max(255),
-  role: z.string().min(1).max(100),
-  party: z.string().max(100).optional(),
-  constituency: z.string().max(255).optional(),
-  email: z.string().email().optional(),
-  phone: z.string().max(50).optional(),
-  bio: z.string().optional(),
-  photoUrl: z.string().url().optional(),
-});
-
-export const insertAnalysisSchema = z.object({
-  billId: z.number().int().positive(),
-  analysisType: z.enum(["constitutional", "stakeholder", "impact", "complexity"]),
-  results: z.any().optional(),
-  confidence: z.number().min(0).max(1).optional(),
-  modelVersion: z.string().max(50).optional(),
-  isApproved: z.boolean().default(false),
-  approvedBy: z.string().uuid().optional(),
-});
-
-export const insertStakeholderSchema = z.object({
-  name: z.string().min(1).max(255),
-  email: z.string().email().optional(),
-  organization: z.string().max(255).optional(),
-  sector: z.string().max(100).optional(),
-  type: z.enum(["business", "ngo", "agency", "individual"]),
-  influence: z.number().min(0).max(100).default(0),
-  votingHistory: z.any().optional(),
-});
-
-// ============================================================================
-// TYPESCRIPT TYPES
-// ============================================================================
-
-export type User = typeof users.$inferSelect;
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type UserProfile = typeof userProfiles.$inferSelect;
-export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
-export type Bill = typeof bills.$inferSelect;
-export type InsertBill = z.infer<typeof insertBillSchema>;
-export type BillComment = typeof billComments.$inferSelect;
-export type InsertBillComment = z.infer<typeof insertBillCommentSchema>;
-export type BillEngagement = typeof billEngagement.$inferSelect;
-export type Notification = typeof notifications.$inferSelect;
-export type Analysis = typeof analysis.$inferSelect;
-export type InsertAnalysis = z.infer<typeof insertAnalysisSchema>;
-export type Sponsor = typeof sponsors.$inferSelect;
-export type InsertSponsor = z.infer<typeof insertSponsorSchema>;
-export type SponsorAffiliation = typeof sponsorAffiliations.$inferSelect;
-export type BillSponsorship = typeof billSponsorships.$inferSelect;
-export type SponsorTransparency = typeof sponsorTransparency.$inferSelect;
-export type BillSectionConflict = typeof billSectionConflicts.$inferSelect;
-export type ExpertVerification = typeof expertVerifications.$inferSelect;
-export type UserInterest = typeof userInterests.$inferSelect;
-export type BillTag = typeof billTags.$inferSelect;
-export type UserProgress = typeof userProgress.$inferSelect;
-export type InsertUserProgress = typeof userProgress.$inferInsert;
-export type SocialShare = typeof socialShares.$inferSelect;
-export type InsertSocialShare = typeof socialShares.$inferInsert;
-export type CommentVote = typeof commentVotes.$inferSelect;
-export type ModerationFlag = typeof moderationFlags.$inferSelect;
-export type ModerationAction = typeof moderationActions.$inferSelect;
-export type ContentAnalysis = typeof contentAnalysis.$inferSelect;
-export type CitizenVerification = typeof citizenVerifications.$inferSelect;
-export type SecurityAuditLog = typeof securityAuditLogs.$inferSelect;
-export type ComplianceCheck = typeof complianceChecks.$inferSelect;
-export type ThreatIntelligence = typeof threatIntelligence.$inferSelect;
-export type Stakeholder = typeof stakeholders.$inferSelect;
-export type InsertStakeholder = z.infer<typeof insertStakeholderSchema>;
-export type Regulation = typeof regulations.$inferSelect;
-export type RegulatoryChange = typeof regulatoryChanges.$inferSelect;
-export type RegulatoryImpact = typeof regulatoryImpact.$inferSelect;
-export type SyncJob = typeof syncJobs.$inferSelect;
-export type SyncError = typeof syncErrors.$inferSelect;
-export type Conflict = typeof conflicts.$inferSelect;
-export type ConflictSource = typeof conflictSources.$inferSelect;
-export type Department = typeof departments.$inferSelect;
-export type Evaluation = typeof evaluations.$inferSelect;
-export type Session = typeof sessions.$inferSelect;
-export type PasswordReset = typeof passwordResets.$inferSelect;
-export type UserSocialProfile = typeof userSocialProfiles.$inferSelect;
-
-// Extended types with computed fields
-export type CommentWithEngagement = BillComment & {
-  endorsements?: number;
-  isHighlighted?: boolean;
-  author?: Pick<User, 'id' | 'name' | 'role'>;
-  replies?: CommentWithEngagement[];
-};
-
-export type BillWithDetails = Bill & {
-  sponsor?: Sponsor;
-  commentCount?: number;
-  engagementScore?: number;
-};
-
-export type UserWithProfile = User & {
-  profile?: UserProfile;
-};
-
-// Dashboard types
-export type DepartmentStat = {
-  name: string;
-  relationHires: number;
-  totalHires: number;
-  score: number;
-};
-
-export type RadarDatum = {
-  subject: string;
-  candidate: number;
-  department: number;
-  expected: number;
-};("status").notNull().default("introduced"), // introduced, committee, passed, failed, signed
+  status: text("status").notNull().default("introduced"), // introduced, committee, passed, failed, signed
   billNumber: text("bill_number"),
   sponsorId: integer("sponsor_id").references(() => sponsors.id, { onDelete: "set null" }),
   category: text("category"),
   tags: text("tags").array().default([]),
   viewCount: integer("view_count").notNull().default(0),
   shareCount: integer("share_count").notNull().default(0),
+  commentCount: integer("comment_count").notNull().default(0),
+  engagementScore: numeric("engagement_score", { precision: 10, scale: 2 }).notNull().default("0"),
   complexityScore: integer("complexity_score"),
   constitutionalConcerns: jsonb("constitutional_concerns").default([]),
   stakeholderAnalysis: jsonb("stakeholder_analysis").default({}),
@@ -617,8 +187,7 @@ export type RadarDatum = {
   categoryIdx: index("bills_category_idx").on(table.category),
   sponsorIdIdx: index("bills_sponsor_id_idx").on(table.sponsorId),
   introducedDateIdx: index("bills_introduced_date_idx").on(table.introducedDate),
-  viewCountIdx: index("bills_view_count_idx").on(table.viewCount),
-  statusCategoryIdx: index("bills_status_category_idx").on(table.status, table.category),
+  engagementScoreIdx: index("bills_engagement_score_idx").on(table.engagementScore),
 }));
 
 export const billTags = pgTable("bill_tags", {
@@ -663,7 +232,6 @@ export const billComments = pgTable("bill_comments", {
   userIdIdx: index("bill_comments_user_id_idx").on(table.userId),
   parentCommentIdIdx: index("bill_comments_parent_comment_id_idx").on(table.parentCommentId),
   createdAtIdx: index("bill_comments_created_at_idx").on(table.createdAt),
-  billUserIdx: index("bill_comments_bill_user_idx").on(table.billId, table.userId),
 }));
 
 export const commentVotes = pgTable("comment_votes", {
@@ -937,4 +505,613 @@ export const complianceChecks = pgTable("compliance_checks", {
   checkName: text("check_name").notNull(),
   checkType: text("check_type").notNull(), // gdpr, ccpa, sox, pci_dss, custom
   description: text("description"),
-  status: text
+  status: text("status").notNull().default("passing"), // passing, failing, warning, not_applicable
+  lastChecked: timestamp("last_checked").notNull().defaultNow(),
+  nextCheck: timestamp("next_check"),
+  findings: jsonb("findings").default([]),
+  remediation: text("remediation"),
+  priority: text("priority").notNull().default("medium"), // low, medium, high, critical
+  automated: boolean("automated").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  checkTypeIdx: index("compliance_checks_check_type_idx").on(table.checkType),
+  statusIdx: index("compliance_checks_status_idx").on(table.status),
+  nextCheckIdx: index("compliance_checks_next_check_idx").on(table.nextCheck),
+  priorityIdx: index("compliance_checks_priority_idx").on(table.priority),
+}));
+
+export const threatIntelligence = pgTable("threat_intelligence", {
+  id: serial("id").primaryKey(),
+  ipAddress: text("ip_address").notNull(),
+  threatType: text("threat_type").notNull(), // malicious_ip, bot, scanner, etc.
+  severity: text("severity").notNull().default("medium"),
+  source: text("source").notNull(), // internal, external_feed, manual
+  description: text("description"),
+  firstSeen: timestamp("first_seen").notNull().defaultNow(),
+  lastSeen: timestamp("last_seen").notNull().defaultNow(),
+  occurrences: integer("occurrences").notNull().default(1),
+  blocked: boolean("blocked").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true),
+  expiresAt: timestamp("expires_at"),
+  metadata: jsonb("metadata").default({}),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  ipAddressIdx: uniqueIndex("threat_intelligence_ip_address_idx").on(table.ipAddress),
+  threatTypeIdx: index("threat_intelligence_threat_type_idx").on(table.threatType),
+  severityIdx: index("threat_intelligence_severity_idx").on(table.severity),
+  isActiveIdx: index("threat_intelligence_is_active_idx").on(table.isActive),
+}));
+
+// ============================================================================
+// REGULATORY MONITORING
+// ============================================================================
+
+export const regulations = pgTable("regulations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title").notNull(),
+  description: text("description"),
+  content: text("content"),
+  status: text("status").notNull().default("proposed"), // proposed, enacted, repealed
+  source: text("source"),
+  sector: text("sector"),
+  tags: text("tags").array().default([]),
+  sponsorId: integer("sponsor_id").references(() => sponsors.id, { onDelete: "set null" }),
+  effectiveDate: timestamp("effective_date"),
+  complianceDeadline: timestamp("compliance_deadline"),
+  affectedStakeholders: integer("affected_stakeholders").default(0),
+  estimatedImpact: numeric("estimated_impact", { precision: 10, scale: 2 }).default("0"),
+  metadata: jsonb("metadata").default({}),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  statusIdx: index("regulations_status_idx").on(table.status),
+  sectorIdx: index("regulations_sector_idx").on(table.sector),
+  effectiveDateIdx: index("regulations_effective_date_idx").on(table.effectiveDate),
+}));
+
+export const regulatoryChanges = pgTable("regulatory_changes", {
+  id: serial("id").primaryKey(),
+  regulationId: uuid("regulation_id").notNull().references(() => regulations.id, { onDelete: "cascade" }),
+  changeType: text("change_type"),
+  changesRequirements: boolean("changes_requirements").notNull().default(false),
+  shortensDeadline: boolean("shortens_deadline").notNull().default(false),
+  addsCosts: boolean("adds_costs").notNull().default(false),
+  affectsCompliance: boolean("affects_compliance").notNull().default(false),
+  details: jsonb("details").default({}),
+  changedAt: timestamp("changed_at").notNull().defaultNow(),
+  reportedBy: uuid("reported_by").references(() => users.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => ({
+  regulationIdIdx: index("regulatory_changes_regulation_id_idx").on(table.regulationId),
+  changeTypeIdx: index("regulatory_changes_change_type_idx").on(table.changeType),
+  changedAtIdx: index("regulatory_changes_changed_at_idx").on(table.changedAt),
+}));
+
+export const regulatoryImpact = pgTable("regulatory_impact", {
+  id: serial("id").primaryKey(),
+  regulationId: uuid("regulation_id").notNull().references(() => regulations.id, { onDelete: "cascade" }),
+  sector: text("sector"),
+  impactLevel: text("impact_level"),
+  affectedEntities: jsonb("affected_entities").default([]),
+  mitigation: jsonb("mitigation").default({}),
+  impactScore: numeric("impact_score", { precision: 5, scale: 2 }).default("0"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  regulationIdIdx: index("regulatory_impact_regulation_id_idx").on(table.regulationId),
+  sectorIdx: index("regulatory_impact_sector_idx").on(table.sector),
+  impactLevelIdx: index("regulatory_impact_impact_level_idx").on(table.impactLevel),
+}));
+
+// ============================================================================
+// DATA SYNCHRONIZATION
+// ============================================================================
+
+export const syncJobs = pgTable("sync_jobs", {
+  id: text("id").primaryKey(),
+  dataSourceId: text("data_source_id").notNull(),
+  endpointId: text("endpoint_id").notNull(),
+  status: text("status").notNull().default("pending"), // pending, running, completed, failed, cancelled
+  startTime: timestamp("start_time"),
+  endTime: timestamp("end_time"),
+  recordsProcessed: integer("records_processed").notNull().default(0),
+  recordsUpdated: integer("records_updated").notNull().default(0),
+  recordsCreated: integer("records_created").notNull().default(0),
+  recordsSkipped: integer("records_skipped").notNull().default(0),
+  isIncremental: boolean("is_incremental").notNull().default(true),
+  lastSyncTimestamp: timestamp("last_sync_timestamp"),
+  nextRunTime: timestamp("next_run_time"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  statusIdx: index("sync_jobs_status_idx").on(table.status),
+  dataSourceIdx: index("sync_jobs_data_source_idx").on(table.dataSourceId),
+  nextRunTimeIdx: index("sync_jobs_next_run_time_idx").on(table.nextRunTime),
+}));
+
+export const syncErrors = pgTable("sync_errors", {
+  id: serial("id").primaryKey(),
+  jobId: text("job_id").notNull().references(() => syncJobs.id, { onDelete: "cascade" }),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  level: text("level").notNull(), // warning, error, critical
+  message: text("message").notNull(),
+  details: text("details"),
+  recordId: text("record_id"),
+  endpoint: text("endpoint"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => ({
+  jobIdIdx: index("sync_errors_job_id_idx").on(table.jobId),
+  levelIdx: index("sync_errors_level_idx").on(table.level),
+  timestampIdx: index("sync_errors_timestamp_idx").on(table.timestamp),
+}));
+
+export const conflicts = pgTable("conflicts", {
+  id: text("id").primaryKey(),
+  dataType: text("data_type").notNull(),
+  recordId: text("record_id").notNull(),
+  resolution: text("resolution").notNull().default("pending"), // pending, automatic, manual
+  resolvedValue: text("resolved_value"),
+  resolvedBy: text("resolved_by"),
+  resolvedAt: timestamp("resolved_at"),
+  confidence: numeric("confidence", { precision: 3, scale: 2 }).notNull().default("0.00"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  dataTypeRecordIdx: uniqueIndex("conflicts_data_type_record_idx").on(table.dataType, table.recordId),
+  resolutionIdx: index("conflicts_resolution_idx").on(table.resolution),
+}));
+
+export const conflictSources = pgTable("conflict_sources", {
+  id: serial("id").primaryKey(),
+  conflictId: text("conflict_id").notNull().references(() => conflicts.id, { onDelete: "cascade" }),
+  sourceId: text("source_id").notNull(),
+  sourceName: text("source_name").notNull(),
+  value: text("value").notNull(),
+  timestamp: timestamp("timestamp").notNull(),
+  priority: numeric("priority", { precision: 3, scale: 2 }).notNull(),
+  confidence: numeric("confidence", { precision: 3, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => ({
+  conflictIdIdx: index("conflict_sources_conflict_id_idx").on(table.conflictId),
+  sourceIdIdx: index("conflict_sources_source_id_idx").on(table.sourceId),
+}));
+
+// ============================================================================
+// NOTIFICATIONS AND MESSAGING
+// ============================================================================
+
+export const notifications = pgTable("notifications", {
+  id: serial("id").primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  type: text("type").notNull(), // bill_update, comment_reply, verification_status
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  relatedBillId: integer("related_bill_id").references(() => bills.id, { onDelete: "cascade" }),
+  isRead: boolean("is_read").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => ({
+  userIdIdx: index("notifications_user_id_idx").on(table.userId),
+  isReadIdx: index("notifications_is_read_idx").on(table.isRead),
+  typeIdx: index("notifications_type_idx").on(table.type),
+  createdAtIdx: index("notifications_created_at_idx").on(table.createdAt),
+  userReadIdx: index("notifications_user_read_idx").on(table.userId, table.isRead),
+}));
+
+// ============================================================================
+// DASHBOARD SUPPORT TABLES
+// ============================================================================
+
+export const departments = pgTable("departments", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  nameIdx: uniqueIndex("departments_name_idx").on(table.name),
+  isActiveIdx: index("departments_is_active_idx").on(table.isActive),
+}));
+
+export const evaluations = pgTable("evaluations", {
+  id: serial("id").primaryKey(),
+  candidateName: text("candidate_name").notNull(),
+  departmentId: integer("department_id").notNull().references(() => departments.id, { onDelete: "cascade" }),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  departmentIdIdx: index("evaluations_department_id_idx").on(table.departmentId),
+  statusIdx: index("evaluations_status_idx").on(table.status),
+}));
+
+// ============================================================================
+// DRIZZLE RELATIONS
+// ============================================================================
+
+export const usersRelations = relations(users, ({ one, many }) => ({
+  profile: one(userProfiles, {
+    fields: [users.id],
+    references: [userProfiles.userId],
+  }),
+  sessions: many(sessions),
+  comments: many(billComments),
+  engagements: many(billEngagement),
+  notifications: many(notifications),
+  interests: many(userInterests),
+  progress: many(userProgress),
+  socialProfiles: many(userSocialProfiles),
+}));
+
+export const userProfilesRelations = relations(userProfiles, ({ one }) => ({
+  user: one(users, {
+    fields: [userProfiles.userId],
+    references: [users.id],
+  }),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one, many }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
+  }),
+  refreshTokens: many(refreshTokens),
+}));
+
+export const refreshTokensRelations = relations(refreshTokens, ({ one }) => ({
+  session: one(sessions, {
+    fields: [refreshTokens.sessionId],
+    references: [sessions.id],
+  }),
+}));
+
+export const billsRelations = relations(bills, ({ one, many }) => ({
+  sponsor: one(sponsors, {
+    fields: [bills.sponsorId],
+    references: [sponsors.id],
+  }),
+  comments: many(billComments),
+  engagements: many(billEngagement),
+  analyses: many(analysis),
+  sponsorships: many(billSponsorships),
+  tags: many(billTags),
+  sectionConflicts: many(billSectionConflicts),
+  expertVerifications: many(expertVerifications),
+  citizenVerifications: many(citizenVerifications),
+  socialShares: many(socialShares),
+}));
+
+export const sponsorsRelations = relations(sponsors, ({ many }) => ({
+  bills: many(bills),
+  sponsorships: many(billSponsorships),
+  affiliations: many(sponsorAffiliations),
+  transparency: many(sponsorTransparency),
+  regulations: many(regulations),
+}));
+
+export const billCommentsRelations = relations(billComments, ({ one, many }) => ({
+  bill: one(bills, {
+    fields: [billComments.billId],
+    references: [bills.id],
+  }),
+  author: one(users, {
+    fields: [billComments.userId],
+    references: [users.id],
+  }),
+  parent: one(billComments, {
+    fields: [billComments.parentCommentId],
+    references: [billComments.id],
+  }),
+  replies: many(billComments),
+  votes: many(commentVotes),
+}));
+
+export const commentVotesRelations = relations(commentVotes, ({ one }) => ({
+  comment: one(billComments, {
+    fields: [commentVotes.commentId],
+    references: [billComments.id],
+  }),
+  user: one(users, {
+    fields: [commentVotes.userId],
+    references: [users.id],
+  }),
+}));
+
+export const billEngagementRelations = relations(billEngagement, ({ one }) => ({
+  bill: one(bills, {
+    fields: [billEngagement.billId],
+    references: [bills.id],
+  }),
+  user: one(users, {
+    fields: [billEngagement.userId],
+    references: [users.id],
+  }),
+}));
+
+export const analysisRelations = relations(analysis, ({ one }) => ({
+  bill: one(bills, {
+    fields: [analysis.billId],
+    references: [bills.id],
+  }),
+  approver: one(users, {
+    fields: [analysis.approvedBy],
+    references: [users.id],
+  }),
+}));
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id],
+  }),
+  relatedBill: one(bills, {
+    fields: [notifications.relatedBillId],
+    references: [bills.id],
+  }),
+}));
+
+export const regulationsRelations = relations(regulations, ({ one, many }) => ({
+  sponsor: one(sponsors, {
+    fields: [regulations.sponsorId],
+    references: [sponsors.id],
+  }),
+  changes: many(regulatoryChanges),
+  impacts: many(regulatoryImpact),
+}));
+
+export const syncJobsRelations = relations(syncJobs, ({ many }) => ({
+  errors: many(syncErrors),
+}));
+
+export const conflictsRelations = relations(conflicts, ({ many }) => ({
+  sources: many(conflictSources),
+}));
+
+export const evaluationsRelations = relations(evaluations, ({ one }) => ({
+  department: one(departments, {
+    fields: [evaluations.departmentId],
+    references: [departments.id],
+  }),
+}));
+
+// ============================================================================
+// ZOD VALIDATION SCHEMAS
+// ============================================================================
+
+export const insertUserSchema = z.object({
+  email: z.string().email(),
+  passwordHash: z.string().min(60),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  name: z.string().min(1),
+  role: z.enum(["citizen", "expert", "admin", "journalist", "advocate"]).default("citizen"),
+  verificationStatus: z.enum(["pending", "verified", "rejected"]).default("pending"),
+  preferences: z.any().optional(),
+  isActive: z.boolean().default(true),
+  lastLoginAt: z.date().optional(),
+});
+
+export const insertUserProfileSchema = z.object({
+  userId: z.string().uuid(),
+  bio: z.string().max(1000).optional(),
+  expertise: z.array(z.string()).optional(),
+  location: z.string().max(255).optional(),
+  organization: z.string().max(255).optional(),
+  verificationDocuments: z.any().optional(),
+  reputationScore: z.number().int().min(0).default(0),
+  isPublic: z.boolean().default(true),
+});
+
+export const insertBillSchema = z.object({
+  title: z.string().min(1).max(500),
+  description: z.string().optional(),
+  content: z.string().optional(),
+  summary: z.string().max(2000).optional(),
+  status: z.enum(["introduced", "committee", "passed", "failed", "signed"]).default("introduced"),
+  billNumber: z.string().max(50).optional(),
+  sponsorId: z.number().int().positive().optional(),
+  category: z.string().max(100).optional(),
+  tags: z.array(z.string()).optional(),
+  viewCount: z.number().int().min(0).default(0),
+  shareCount: z.number().int().min(0).default(0),
+  commentCount: z.number().int().min(0).default(0),
+  engagementScore: z.number().min(0).default(0),
+  complexityScore: z.number().int().min(1).max(10).optional(),
+  introducedDate: z.date().optional(),
+  lastActionDate: z.date().optional(),
+});
+
+export const insertBillCommentSchema = z.object({
+  userId: z.string().uuid(),
+  content: z.string().min(1).max(5000),
+  billId: z.number().int().positive(),
+  commentType: z.enum(["general", "expert_analysis", "concern", "support"]).default("general"),
+  isVerified: z.boolean().default(false),
+  parentCommentId: z.number().int().positive().optional(),
+  upvotes: z.number().int().min(0).default(0),
+  downvotes: z.number().int().min(0).default(0),
+});
+
+export const insertSponsorSchema = z.object({
+  name: z.string().min(1).max(255),
+  role: z.string().min(1).max(100),
+  party: z.string().max(100).optional(),
+  constituency: z.string().max(255).optional(),
+  email: z.string().email().optional(),
+  phone: z.string().max(50).optional(),
+  bio: z.string().optional(),
+  photoUrl: z.string().url().optional(),
+  conflictLevel: z.enum(["low", "medium", "high"]).optional(),
+});
+
+export const insertAnalysisSchema = z.object({
+  billId: z.number().int().positive(),
+  analysisType: z.enum(["constitutional", "stakeholder", "impact", "complexity"]),
+  results: z.any().optional(),
+  confidence: z.number().min(0).max(1).optional(),
+  modelVersion: z.string().max(50).optional(),
+  isApproved: z.boolean().default(false),
+  approvedBy: z.string().uuid().optional(),
+});
+
+export const insertStakeholderSchema = z.object({
+  name: z.string().min(1).max(255),
+  email: z.string().email().optional(),
+  organization: z.string().max(255).optional(),
+  sector: z.string().max(100).optional(),
+  type: z.enum(["business", "ngo", "agency", "individual"]),
+  influence: z.number().min(0).max(100).default(0),
+  votingHistory: z.any().optional(),
+});
+
+export const insertNotificationSchema = z.object({
+  userId: z.string().uuid(),
+  type: z.string().min(1),
+  title: z.string().min(1).max(255),
+  message: z.string().min(1).max(1000),
+  relatedBillId: z.number().int().positive().optional(),
+  isRead: z.boolean().default(false),
+});
+
+export const insertComplianceCheckSchema = z.object({
+  checkName: z.string().min(1).max(255),
+  checkType: z.enum(["gdpr", "ccpa", "sox", "pci_dss", "custom"]),
+  description: z.string().optional(),
+  status: z.enum(["passing", "failing", "warning", "not_applicable"]).default("passing"),
+  findings: z.any().optional(),
+  remediation: z.string().optional(),
+  priority: z.enum(["low", "medium", "high", "critical"]).default("medium"),
+  automated: z.boolean().default(true),
+});
+
+// ============================================================================
+// TYPESCRIPT TYPES
+// ============================================================================
+
+export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+export type UserProfile = typeof userProfiles.$inferSelect;
+export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
+export type Session = typeof sessions.$inferSelect;
+export type RefreshToken = typeof refreshTokens.$inferSelect;
+export type PasswordReset = typeof passwordResets.$inferSelect;
+export type UserSocialProfile = typeof userSocialProfiles.$inferSelect;
+export type UserInterest = typeof userInterests.$inferSelect;
+export type UserProgress = typeof userProgress.$inferSelect;
+
+export type Bill = typeof bills.$inferSelect;
+export type InsertBill = z.infer<typeof insertBillSchema>;
+export type BillTag = typeof billTags.$inferSelect;
+export type BillSponsorship = typeof billSponsorships.$inferSelect;
+
+export type BillComment = typeof billComments.$inferSelect;
+export type InsertBillComment = z.infer<typeof insertBillCommentSchema>;
+export type CommentVote = typeof commentVotes.$inferSelect;
+
+export type BillEngagement = typeof billEngagement.$inferSelect;
+export type SocialShare = typeof socialShares.$inferSelect;
+
+export type Sponsor = typeof sponsors.$inferSelect;
+export type InsertSponsor = z.infer<typeof insertSponsorSchema>;
+export type SponsorAffiliation = typeof sponsorAffiliations.$inferSelect;
+export type SponsorTransparency = typeof sponsorTransparency.$inferSelect;
+
+export type Analysis = typeof analysis.$inferSelect;
+export type InsertAnalysis = z.infer<typeof insertAnalysisSchema>;
+export type ContentAnalysis = typeof contentAnalysis.$inferSelect;
+export type BillSectionConflict = typeof billSectionConflicts.$inferSelect;
+export type ExpertVerification = typeof expertVerifications.$inferSelect;
+export type CitizenVerification = typeof citizenVerifications.$inferSelect;
+
+export type Stakeholder = typeof stakeholders.$inferSelect;
+export type InsertStakeholder = z.infer<typeof insertStakeholderSchema>;
+
+export type ModerationFlag = typeof moderationFlags.$inferSelect;
+export type ModerationAction = typeof moderationActions.$inferSelect;
+
+export type SecurityAuditLog = typeof securityAuditLogs.$inferSelect;
+export type ComplianceCheck = typeof complianceChecks.$inferSelect;
+export type InsertComplianceCheck = z.infer<typeof insertComplianceCheckSchema>;
+export type ThreatIntelligence = typeof threatIntelligence.$inferSelect;
+
+export type Regulation = typeof regulations.$inferSelect;
+export type RegulatoryChange = typeof regulatoryChanges.$inferSelect;
+export type RegulatoryImpact = typeof regulatoryImpact.$inferSelect;
+
+export type SyncJob = typeof syncJobs.$inferSelect;
+export type SyncError = typeof syncErrors.$inferSelect;
+export type Conflict = typeof conflicts.$inferSelect;
+export type ConflictSource = typeof conflictSources.$inferSelect;
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+
+export type Department = typeof departments.$inferSelect;
+export type Evaluation = typeof evaluations.$inferSelect;
+
+// ============================================================================
+// EXTENDED TYPES WITH COMPUTED FIELDS
+// ============================================================================
+
+export type CommentWithEngagement = BillComment & {
+  endorsements?: number;
+  isHighlighted?: boolean;
+  author?: Pick<User, 'id' | 'name' | 'role'>;
+  replies?: CommentWithEngagement[];
+  voteCount?: number;
+};
+
+export type BillWithDetails = Bill & {
+  sponsor?: Sponsor;
+  commentCount?: number;
+  engagementScore?: number;
+  tags?: BillTag[];
+  analysisData?: Analysis[];
+};
+
+export type UserWithProfile = User & {
+  profile?: UserProfile;
+  interests?: string[];
+  progressData?: UserProgress[];
+};
+
+export type SponsorWithTransparency = Sponsor & {
+  affiliations?: SponsorAffiliation[];
+  transparencyRecords?: SponsorTransparency[];
+  billCount?: number;
+};
+
+// ============================================================================
+// DASHBOARD TYPES
+// ============================================================================
+
+export type DepartmentStat = {
+  name: string;
+  relationHires: number;
+  totalHires: number;
+  score: number;
+};
+
+export type RadarDatum = {
+  subject: string;
+  candidate: number;
+  department: number;
+  expected: number;
+};
+
+export type EngagementMetrics = {
+  totalViews: number;
+  totalComments: number;
+  totalShares: number;
+  averageEngagementScore: number;
+  topBills: BillWithDetails[];
+};
+
+export type SecurityMetrics = {
+  totalThreats: number;
+  activeThreats: number;
+  blockedIps: number;
+  recentAuditLogs: SecurityAuditLog[];
+};

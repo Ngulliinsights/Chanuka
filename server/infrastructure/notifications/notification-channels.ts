@@ -1,8 +1,8 @@
-import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/user-preferences.js';
-import { emailService } from './email.js';
-import { webSocketService } from '../websocket.js';
-import { database as db } from '../../../shared/database/connection.js';
-import { users, bills, notifications } from '../../../shared/schema.js';
+import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/user-preferences.ts';
+import { getEmailService } from '../../services/email.service.ts';
+import { webSocketService } from '../websocket.ts';
+import { database as db } from '../../../shared/database/connection.ts';
+import { users, bills, notifications } from '../../../shared/schema.ts';
 import { eq } from 'drizzle-orm';
 
 export interface NotificationChannelConfig {
@@ -198,7 +198,7 @@ export class NotificationChannelService {
     
     // Create email content based on notification type
     const emailContent = await this.createEmailContent(data, name);
-    
+    const emailService = await getEmailService();
     await emailService.sendEmail({
       to: email,
       subject: this.getEmailSubject(data),
