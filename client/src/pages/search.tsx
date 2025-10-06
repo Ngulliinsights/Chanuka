@@ -1,5 +1,10 @@
-import React, { useState } from 'react';
-import { Search as SearchIcon, Filter, Grid, List } from 'lucide-react';
+import { useState } from 'react';
+import { 
+  Search as SearchIcon, 
+  Filter, 
+  Grid, 
+  List 
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

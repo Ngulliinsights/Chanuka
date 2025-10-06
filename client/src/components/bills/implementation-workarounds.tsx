@@ -1,11 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { Textarea } from '../ui/textarea';
-import { AlertTriangle, Eye, CheckCircle, XCircle, Clock, FileText, Users, Calendar, ExternalLink, Shield, Building, Gavel, Scroll } from 'lucide-react';
+import { 
+  AlertTriangle, 
+  Eye, 
+  CheckCircle, 
+  XCircle, 
+  Clock, 
+  FileText, 
+  Users, 
+  Calendar, 
+  ExternalLink, 
+  Shield, 
+  Building, 
+  Gavel, 
+  Scroll 
+} from 'lucide-react';
 
 // Enhanced interface to support multiple workaround types in Kenyan context
 interface ImplementationWorkaround {

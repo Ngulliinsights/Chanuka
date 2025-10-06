@@ -1,0 +1,122 @@
+import { Request, Response, NextFunction } from 'express';
+import { MiddlewareConfig } from './config';
+import { Logger } from '../logging';
+import { CacheService } from '../cache';
+import { ValidationService } from '../validation';
+import { RateLimitStore } from '../rate-limiting/types';
+import { HealthChecker } from '../health/health-checker';
+import { unifiedErrorHandler } from '../errors';
+import { rateLimitMiddleware } from '../rate-limiting/middleware';
+
+export class MiddlewareFactory {
+  constructor(
+    private config: MiddlewareConfig,
+    private logger: Logger,
+    private cache: CacheService,
+    private validator: ValidationService,
+    private rateLimitStore: RateLimitStore,
+    private healthChecker: HealthChecker
+  ) {}
+
+  createMiddleware(): ((app: any) => void)[] {
+    const middlewares: ((app: any) => void)[] = [];
+
+    // Sort middleware by priority
+    const sortedFeatures = Object.entries(this.config)
+      .filter(([key]) => key !== 'global')
+      .sort(([, a], [, b]) => a.priority - b.priority);
+
+    for (const [name, feature] of sortedFeatures) {
+      if (!feature.enabled) continue;
+
+      switch (name) {
+        case 'logging':
+          middlewares.push(app => app.use(this.createLoggingMiddleware()));
+          break;
+        case 'cache':
+          middlewares.push(app => app.use(this.createCacheMiddleware()));
+          break;
+        case 'validation':
+          middlewares.push(app => app.use(this.createValidationMiddleware()));
+          break;
+        case 'rateLimit':
+          middlewares.push(app => app.use(this.createRateLimitMiddleware()));
+          break;
+        case 'health':
+          middlewares.push(app => this.setupHealthEndpoint(app));
+          break;
+        case 'errorHandler':
+          middlewares.push(app => app.use(unifiedErrorHandler));
+          break;
+      }
+    }
+
+    return middlewares;
+  }
+
+  private createLoggingMiddleware() {
+    return (req: Request, res: Response, next: NextFunction) => {
+      this.logger.info('Request', {
+        method: req.method,
+        path: req.path,
+        correlationId: req.headers['x-correlation-id']
+      });
+      next();
+    };
+  }
+
+  private createCacheMiddleware() {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      if (req.method === 'GET') {
+        const key = `cache:${req.originalUrl}`;
+        try {
+          const cached = await this.cache.get(key);
+          if (cached) {
+            return res.json(JSON.parse(cached));
+          }
+        } catch (error) {
+          this.logger.error('Cache error', { error });
+        }
+      }
+      next();
+    };
+  }
+
+  private createValidationMiddleware() {
+    return (req: Request, res: Response, next: NextFunction) => {
+      const schema = this.validator.getSchema(req.path);
+      if (schema) {
+        const result = schema.safeParse(req.body);
+        if (!result.success) {
+          return res.status(400).json({
+            success: false,
+            errors: result.error.errors
+          });
+        }
+        req.body = result.data;
+      }
+      next();
+    };
+  }
+
+  private createRateLimitMiddleware() {
+    const config = {
+      limit: 100,
+      windowMs: 60000,
+      algorithm: 'sliding-window' as const,
+      burstAllowance: 0.2
+    };
+    return rateLimitMiddleware(this.rateLimitStore, config);
+  }
+
+  private setupHealthEndpoint(app: any) {
+    const config = this.config.health?.config;
+    const endpoint = config?.endpoint || '/health';
+
+    app.get(endpoint, async (req: Request, res: Response) => {
+      const health = await this.healthChecker.checkHealth();
+      const status = health.status === 'healthy' ? 200 : health.status === 'degraded' ? 503 : 500;
+      res.status(status).json(health);
+    });
+  }
+}

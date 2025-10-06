@@ -1,5 +1,15 @@
-import React, { useState } from 'react';
-import { Users, FileText, MessageCircle, TrendingUp, Shield, Settings, Database, Activity } from 'lucide-react';
+import { useState } from 'react';
+import { 
+  Users, 
+  FileText, 
+  MessageCircle, 
+  TrendingUp, 
+  Shield, 
+  Settings, 
+  Database, 
+  Activity,
+  Monitor
+} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,6 +17,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { useQuery } from '@tanstack/react-query';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { MonitoringDashboard } from '@/components/monitoring/monitoring-dashboard';
+import AuthenticatedAPI from '@/utils/authenticated-api';
 
 // Enhanced type definitions for better type safety
 interface UserRoleData {
@@ -49,63 +61,55 @@ interface SystemHealth {
   uptime: number;
 }
 
-// Custom hook for fetching admin stats with better error handling
+// Custom hook for fetching admin stats with enhanced security and race condition prevention
 const useAdminStats = () => {
   return useQuery<AdminStats>({
     queryKey: ['admin', 'stats'],
-    queryFn: async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
-      const response = await fetch('/api/admin/dashboard/stats', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
+    queryFn: async ({ signal }) => {
+      const result = await AuthenticatedAPI.adminGet<AdminStats>('/api/admin/dashboard/stats', {
+        signal, // Add AbortController support for race condition prevention
+        timeout: 15000, // 15 second timeout
+        retries: 2 // Retry failed requests
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch admin stats: ${response.status} ${response.statusText}`);
+      if (result.error) {
+        throw new Error(result.error);
       }
 
-      return response.json();
+      return result.data!;
     },
     refetchInterval: 30000, // Refresh every 30 seconds
     staleTime: 25000, // Consider data stale after 25 seconds
+    retry: 1, // Let AuthenticatedAPI handle retries
+    gcTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 };
 
-// Custom hook for system health monitoring
+// Custom hook for system health monitoring with enhanced security
 const useSystemHealth = () => {
   return useQuery<SystemHealth>({
     queryKey: ['admin', 'health'],
-    queryFn: async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
-      const response = await fetch('/api/admin/health', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
+    queryFn: async ({ signal }) => {
+      const result = await AuthenticatedAPI.adminGet<SystemHealth>('/api/admin/health', {
+        signal, // Add AbortController support for race condition prevention
+        timeout: 10000, // 10 second timeout
+        retries: 1 // Retry once for health checks
       });
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch system health: ${response.status} ${response.statusText}`);
+      if (result.error) {
+        throw new Error(result.error);
       }
 
-      return response.json();
+      return result.data!;
     },
     refetchInterval: 10000, // Refresh every 10 seconds
     staleTime: 8000, // Consider data stale after 8 seconds
+    retry: 1, // Let AuthenticatedAPI handle retries
+    gcTime: 2 * 60 * 1000, // Cache for 2 minutes
   });
 };
 
-const AdminDashboard: React.FC = () => {
+const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState<string>('overview');
 
   // Use our custom hooks for better separation of concerns
@@ -268,11 +272,12 @@ const AdminDashboard: React.FC = () => {
 
       {/* Detailed Analytics with improved type safety */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="content">Content</TabsTrigger>
           <TabsTrigger value="system">System</TabsTrigger>
+          <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -447,6 +452,10 @@ const AdminDashboard: React.FC = () => {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="monitoring" className="space-y-6">
+          <MonitoringDashboard />
         </TabsContent>
       </Tabs>
     </div>

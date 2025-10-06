@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
-import { Heart, Bell, Eye, Share2, MessageCircle, TrendingUp, Calendar, User } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
+import { useState, useEffect } from 'react';
+import { 
+  Heart, 
+  Bell, 
+  Eye, 
+  Share2, 
+  MessageCircle, 
+  TrendingUp, 
+  Calendar, 
+  User 
+} from 'lucide-react';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Switch } from '../ui/switch';
+import { Label } from '../ui/label';
+import { Separator } from '../ui/separator';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '../../hooks/use-toast';
 import { format } from 'date-fns';
 
 interface Bill {
@@ -31,7 +40,7 @@ interface TrackingPreferences {
   amendments: boolean;
 }
 
-const BillTracking: React.FC<BillTrackingProps> = ({ billId }) => {
+const BillTracking = ({ billId }: BillTrackingProps) => {
   const [preferences, setPreferences] = useState<TrackingPreferences>({
     statusChanges: true,
     newComments: false,
@@ -141,7 +150,7 @@ const BillTracking: React.FC<BillTrackingProps> = ({ billId }) => {
   });
 
   // Record view on component mount
-  React.useEffect(() => {
+  useEffect(() => {
     recordViewMutation.mutate();
   }, [billId]);
 
@@ -222,7 +231,7 @@ const BillTracking: React.FC<BillTrackingProps> = ({ billId }) => {
                     <Switch
                       id="status-changes"
                       checked={preferences.statusChanges}
-                      onCheckedChange={(checked) => handlePreferenceChange('statusChanges', checked)}
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('statusChanges', checked)}
                     />
                   </div>
                   <div className="flex items-center justify-between">
@@ -233,7 +242,7 @@ const BillTracking: React.FC<BillTrackingProps> = ({ billId }) => {
                     <Switch
                       id="new-comments"
                       checked={preferences.newComments}
-                      onCheckedChange={(checked) => handlePreferenceChange('newComments', checked)}
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('newComments', checked)}
                     />
                   </div>
                   <div className="flex items-center justify-between">
@@ -244,7 +253,7 @@ const BillTracking: React.FC<BillTrackingProps> = ({ billId }) => {
                     <Switch
                       id="voting-schedule"
                       checked={preferences.votingSchedule}
-                      onCheckedChange={(checked) => handlePreferenceChange('votingSchedule', checked)}
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('votingSchedule', checked)}
                     />
                   </div>
                   <div className="flex items-center justify-between">
@@ -255,7 +264,7 @@ const BillTracking: React.FC<BillTrackingProps> = ({ billId }) => {
                     <Switch
                       id="amendments"
                       checked={preferences.amendments}
-                      onCheckedChange={(checked) => handlePreferenceChange('amendments', checked)}
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('amendments', checked)}
                     />
                   </div>
                 </div>

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import { ReactNode } from 'react';
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { Navigate } from "react-router-dom";
@@ -8,7 +8,7 @@ import { Navigate } from "react-router-dom";
 const BYPASS_AUTH = true;
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {

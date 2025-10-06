@@ -1,0 +1,367 @@
+CHANUKA LEGISLATIVE TRANSPARENCY PLATFORM
+═══════════════════════════════════════════════════════════════
+
+PROJECT ROOT/
+│
+├── CLIENT/ (React Frontend)
+│   ├── public/
+│   │   ├── Chanuka_logo.{png,svg,webp}
+│   │   ├── manifest.json
+│   │   └── sw.js (Service Worker)
+│   │
+│   └── src/
+│       ├── components/
+│       │   ├── admin/
+│       │   │   └── admin-dashboard.tsx
+│       │   │
+│       │   ├── analysis/
+│       │   │   ├── comments.tsx
+│       │   │   ├── section.tsx
+│       │   │   ├── stats.tsx
+│       │   │   └── timeline.tsx
+│       │   │
+│       │   ├── analytics/
+│       │   │   ├── engagement-dashboard.tsx
+│       │   │   └── JourneyAnalyticsDashboard.tsx
+│       │   │
+│       │   ├── auth/
+│       │   │   └── auth-forms.tsx
+│       │   │
+│       │   ├── bills/
+│       │   │   ├── bill-card.tsx
+│       │   │   ├── bill-list.tsx
+│       │   │   ├── bill-tracking.tsx
+│       │   │   └── implementation-workarounds.tsx
+│       │   │
+│       │   ├── dashboard/
+│       │   │   ├── action-items.tsx
+│       │   │   ├── activity-summary.tsx
+│       │   │   └── tracked-topics.tsx
+│       │   │
+│       │   ├── error-handling/
+│       │   │   ├── __tests__/
+│       │   │   ├── ErrorFallback.tsx
+│       │   │   ├── PageErrorBoundary.tsx
+│       │   │   └── withErrorBoundary.tsx
+│       │   │
+│       │   ├── layout/
+│       │   │   ├── __tests__/
+│       │   │   ├── app-layout.tsx
+│       │   │   ├── mobile-header.tsx
+│       │   │   ├── mobile-navigation.tsx
+│       │   │   └── sidebar.tsx
+│       │   │
+│       │   ├── navigation/
+│       │   │   ├── __tests__/
+│       │   │   ├── DesktopSidebar.tsx
+│       │   │   ├── MobileNavigation.tsx
+│       │   │   ├── NavigationBreadcrumbs.tsx
+│       │   │   ├── ProtectedRoute.tsx
+│       │   │   ├── RelatedPages.tsx
+│       │   │   └── RoleBasedNavigation.tsx
+│       │   │
+│       │   ├── notifications/
+│       │   │   ├── enhanced-notification-preferences.tsx
+│       │   │   ├── notification-center.tsx
+│       │   │   └── notification-preferences.tsx
+│       │   │
+│       │   ├── transparency/
+│       │   │   ├── ConflictAnalysisDashboard.tsx
+│       │   │   └── ConflictNetworkVisualization.tsx
+│       │   │
+│       │   └── ui/ (Reusable UI Components)
+│       │       ├── alert.tsx
+│       │       ├── button.tsx
+│       │       ├── card.tsx
+│       │       ├── dialog.tsx
+│       │       ├── form.tsx
+│       │       ├── table.tsx
+│       │       └── [25+ other UI components]
+│       │
+│       ├── contexts/
+│       │   ├── __tests__/
+│       │   ├── NavigationContext.tsx
+│       │   └── ResponsiveNavigationContext.tsx
+│       │
+│       ├── hooks/
+│       │   ├── __tests__/
+│       │   ├── use-api-with-fallback.ts
+│       │   ├── use-auth.tsx
+│       │   ├── use-bills.tsx
+│       │   ├── use-mobile.tsx
+│       │   ├── use-navigation-preferences.tsx
+│       │   └── [15+ other custom hooks]
+│       │
+│       ├── pages/
+│       │   ├── __tests__/
+│       │   ├── bill-analysis.tsx
+│       │   ├── bill-sponsorship-analysis.tsx
+│       │   ├── bills-dashboard.tsx
+│       │   ├── community-input.tsx
+│       │   ├── dashboard.tsx
+│       │   ├── home.tsx
+│       │   │
+│       │   └── sponsorship/
+│       │       ├── co-sponsors.tsx
+│       │       ├── financial-network.tsx
+│       │       ├── methodology.tsx
+│       │       ├── overview.tsx
+│       │       └── primary-sponsor.tsx
+│       │
+│       ├── services/
+│       │   ├── __tests__/
+│       │   ├── analysis.ts
+│       │   ├── api.ts
+│       │   ├── api-error-handling.ts
+│       │   ├── PageRelationshipService.ts
+│       │   └── UserJourneyTracker.ts
+│       │
+│       ├── utils/
+│       │   ├── __tests__/
+│       │   ├── apiCache.tsx
+│       │   ├── authenticated-api.ts
+│       │   ├── performanceMonitoring.ts
+│       │   ├── route-preloading.tsx
+│       │   │
+│       │   └── navigation/
+│       │       ├── __tests__/
+│       │       ├── active-state.ts
+│       │       ├── breadcrumb-generator.ts
+│       │       ├── page-relationship-utils.ts
+│       │       └── state-persistence.ts
+│       │
+│       └── types/
+│           ├── navigation.ts
+│           └── onboarding.ts
+│
+├── SERVER/ (Node.js Backend)
+│   ├── core/
+│   │   ├── auth/
+│   │   │   ├── auth-service.ts
+│   │   │   ├── passwordReset.ts
+│   │   │   ├── secure-session-service.ts
+│   │   │   └── session-cleanup.ts
+│   │   │
+│   │   ├── errors/
+│   │   │   └── error-tracker.ts
+│   │   │
+│   │   └── validation/
+│   │       ├── data-completeness.ts
+│   │       ├── data-validation-service.ts
+│   │       └── input-validation-service.ts
+│   │
+│   ├── features/
+│   │   ├── admin/
+│   │   │   ├── admin.ts
+│   │   │   ├── content-moderation.ts
+│   │   │   └── system.ts
+│   │   │
+│   │   ├── analytics/
+│   │   │   ├── analytics.ts
+│   │   │   ├── conflict-detection.ts
+│   │   │   ├── engagement-analytics.ts
+│   │   │   ├── financial-disclosure-monitoring.ts
+│   │   │   └── transparency-dashboard.ts
+│   │   │
+│   │   ├── bills/
+│   │   │   ├── bills.ts
+│   │   │   ├── bill-service.ts
+│   │   │   ├── bill-status-monitor.ts
+│   │   │   ├── bill-tracking.ts
+│   │   │   ├── real-time-analysis.ts
+│   │   │   ├── sponsor-conflict-analysis.ts
+│   │   │   ├── sponsor-service.ts
+│   │   │   └── sponsorship-analysis.ts
+│   │   │
+│   │   ├── community/
+│   │   │   ├── comment.ts
+│   │   │   ├── comment-storage.ts
+│   │   │   ├── comment-voting.ts
+│   │   │   └── social-integration.ts
+│   │   │
+│   │   ├── security/
+│   │   │   ├── encryption-service.ts
+│   │   │   ├── intrusion-detection-service.ts
+│   │   │   ├── privacy-service.ts
+│   │   │   ├── security-audit-service.ts
+│   │   │   └── security-monitoring-service.ts
+│   │   │
+│   │   └── users/
+│   │       ├── alert-preferences.ts
+│   │       ├── citizen-verification.ts
+│   │       ├── ExpertVerificationService.ts
+│   │       ├── profile.ts
+│   │       ├── user-management.ts
+│   │       └── verification.ts
+│   │
+│   ├── infrastructure/
+│   │   ├── cache/
+│   │   │   ├── advanced-caching.ts
+│   │   │   ├── cache.ts
+│   │   │   └── cache-warming.ts
+│   │   │
+│   │   ├── database/
+│   │   │   ├── base/
+│   │   │   │   └── BaseStorage.ts
+│   │   │   ├── config.ts
+│   │   │   ├── connection-pool.ts
+│   │   │   ├── database-service.ts
+│   │   │   ├── migration-service.ts
+│   │   │   └── unified-storage.ts
+│   │   │
+│   │   ├── monitoring/
+│   │   │   ├── apm-service.ts
+│   │   │   ├── audit-log.ts
+│   │   │   ├── health.ts
+│   │   │   ├── performance-monitor.ts
+│   │   │   └── system-health.ts
+│   │   │
+│   │   └── notifications/
+│   │       ├── email-service.ts
+│   │       ├── enhanced-notifications.ts
+│   │       ├── notification-service.ts
+│   │       └── smart-notification-filter.ts
+│   │
+│   ├── middleware/
+│   │   ├── auth.ts
+│   │   ├── error-handler.ts
+│   │   ├── rate-limiter.ts
+│   │   ├── request-logger.ts
+│   │   └── security-middleware.ts
+│   │
+│   └── tests/
+│       ├── integration/
+│       │   ├── api-integration.test.ts
+│       │   ├── authentication-flow-validation.test.ts
+│       │   └── database-transaction-integrity.test.ts
+│       │
+│       ├── performance/
+│       │   ├── api-performance.test.ts
+│       │   ├── database-query-performance.test.ts
+│       │   └── memory-usage-profiling.test.ts
+│       │
+│       └── services/
+│           ├── database-fallback.integration.test.ts
+│           └── demo-data.test.ts
+│
+├── DATABASE/ (PostgreSQL Schema & Migrations)
+│   ├── drizzle/
+│   │   ├── 0000_initial_migration.sql
+│   │   ├── 0001_comprehensive_schema.sql
+│   │   ├── 0002_add_bill_engagement.sql
+│   │   ├── 0003_enhanced_comments_system.sql
+│   │   ├── 0007_add_sponsorship_tables.sql
+│   │   ├── 0009_add_citizen_verification.sql
+│   │   └── [12 total migrations]
+│   │
+│   ├── init-scripts/
+│   │   └── 01-init-database.sql
+│   │
+│   ├── legislative-seed.ts
+│   ├── seed.ts
+│   └── simple-seed.ts
+│
+├── SHARED/ (Common Code)
+│   ├── database/
+│   │   ├── connection.ts
+│   │   └── pool.ts
+│   │
+│   ├── i18n/
+│   │   └── en.ts
+│   │
+│   ├── schema.ts
+│   │
+│   ├── types/
+│   │   ├── auth.ts
+│   │   ├── bill.ts
+│   │   ├── expert.ts
+│   │   └── legal-analysis.ts
+│   │
+│   └── utils/
+│       └── logger.ts
+│
+├── SCRIPTS/ (Automation & Testing)
+│   ├── database/
+│   │   ├── check-schema.ts
+│   │   ├── generate-migration.ts
+│   │   ├── migrate.ts
+│   │   └── setup-schema.ts
+│   │
+│   └── testing/
+│       ├── test-conflict-detection.ts
+│       ├── test-financial-disclosure-integration.ts
+│       ├── test-security-monitoring.ts
+│       └── [30+ test scripts]
+│
+├── DOCUMENTATION/
+│   ├── analysis/
+│   │   ├── chanuka_comprehensive_analysis.md
+│   │   ├── dependency-audit-results.md
+│   │   └── schema-congruence-progress.md
+│   │
+│   ├── guides/
+│   │   ├── DATABASE_SETUP_GUIDE.md
+│   │   ├── DEPLOYMENT_GUIDE.md
+│   │   ├── NAVIGATION_USER_GUIDE.md
+│   │   └── TROUBLESHOOTING_GUIDE.md
+│   │
+│   └── summaries/
+│       ├── NAVIGATION_OPTIMIZATION_SUMMARY.md
+│       ├── SECURITY_MONITORING_IMPLEMENTATION_SUMMARY.md
+│       ├── TRANSPARENCY_DASHBOARD_IMPLEMENTATION_SUMMARY.md
+│       └── [15+ implementation summaries]
+│
+├── CONFIGURATION FILES/
+│   ├── components.json           (shadcn/ui config)
+│   ├── docker-compose.yml        (Container orchestration)
+│   ├── Dockerfile               (Container definition)
+│   ├── drizzle.config.ts        (Database ORM config)
+│   ├── nginx.conf               (Web server config)
+│   ├── package.json             (Dependencies & scripts)
+│   ├── tailwind.config.ts       (CSS framework config)
+│   ├── tsconfig.json            (TypeScript config)
+│   ├── vite.config.ts           (Build tool config)
+│   └── vitest.config.ts         (Test runner config)
+│
+└── DEPLOYMENT/
+    ├── deploy.sh                (Deployment script)
+    └── setup-postgres-windows.ps1 (Database setup for Windows)
+
+═══════════════════════════════════════════════════════════════
+KEY ARCHITECTURAL PATTERNS:
+
+🏗️  MODULAR ARCHITECTURE
+    ├── Feature-based organization (bills, analytics, users)
+    ├── Layered separation (components, services, utils)
+    └── Shared code isolation for reusability
+
+🔒  SECURITY-FIRST DESIGN
+    ├── Multi-layer authentication system
+    ├── Comprehensive monitoring and audit trails
+    └── Intrusion detection and privacy services
+
+📊  TRANSPARENCY & ANALYTICS
+    ├── Financial disclosure monitoring
+    ├── Conflict detection algorithms
+    ├── Real-time bill tracking
+    └── Engagement analytics dashboard
+
+🧪  COMPREHENSIVE TESTING
+    ├── Unit tests for individual components
+    ├── Integration tests for API workflows
+    ├── Performance benchmarking
+    └── End-to-end user journey validation
+
+🎨  MODERN FRONTEND STACK
+    ├── React 18+ with TypeScript
+    ├── Tailwind CSS for styling
+    ├── shadcn/ui component library
+    └── Responsive navigation system
+
+⚡  PERFORMANCE OPTIMIZATION
+    ├── Service worker for offline capabilities
+    ├── Advanced caching strategies
+    ├── Route preloading and lazy loading
+    └── Database query optimization
+
+═══════════════════════════════════════════════════════════════

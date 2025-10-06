@@ -1,19 +1,37 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 
 interface User {
   id: string;
   email: string;
   name: string;
+  username: string;
+  firstName: string | null;
+  lastName: string | null;
   role: string;
-  verificationStatus?: string;
-  avatar?: string;
+  verificationStatus: string;
+  isActive: boolean | null;
+  createdAt: string;
+  reputation: number;
+  expertise: string;
+}
+
+interface RegisterData {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role?: string;
 }
 
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  logout: () => void;
+  register: (data: RegisterData) => Promise<{ success: boolean; error?: string; requiresVerification?: boolean }>;
+  logout: () => Promise<void>;
+  refreshToken: () => Promise<{ success: boolean; error?: string }>;
+  verifyEmail: (token: string) => Promise<{ success: boolean; error?: string }>;
+  requestPasswordReset: (email: string) => Promise<{ success: boolean; error?: string }>;
+  resetPassword: (token: string, password: string) => Promise<{ success: boolean; error?: string }>;
   loading: boolean;
   isAuthenticated: boolean;
   updateUser: (userData: Partial<User>) => void;
@@ -24,44 +42,109 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const mountedRef = useRef(true);
+  const validationInProgressRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Helper function for making cancellable requests
+  const makeCancellableRequest = async (url: string, options: RequestInit = {}) => {
+    // Use the shared abort controller
+    if (!abortControllerRef.current) {
+      abortControllerRef.current = new AbortController();
+    }
+    
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: abortControllerRef.current.signal
+      });
+      return response;
+    } catch (error: any) {
+      if (error.name === 'AbortError') {
+        throw new Error('Request cancelled');
+      }
+      throw error;
+    }
+  };
 
   useEffect(() => {
+    mountedRef.current = true;
+    abortControllerRef.current = new AbortController();
+    
     const token = localStorage.getItem('token');
-    if (token) {
+    if (token && !validationInProgressRef.current) {
       validateToken(token);
-    } else {
-      setLoading(false);
+    } else if (!token) {
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
+
+    return () => {
+      mountedRef.current = false;
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, []);
 
   const validateToken = async (token: string) => {
+    // Prevent multiple simultaneous validation requests
+    if (validationInProgressRef.current) {
+      return;
+    }
+
+    validationInProgressRef.current = true;
+
     try {
-      const response = await fetch('/api/auth/validate', {
+      const response = await fetch('/api/auth/verify', {
+        signal: abortControllerRef.current?.signal,
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
       if (response.ok) {
-        const userData = await response.json();
-        setUser(userData.user || userData);
+        const result = await response.json();
+        if (result.success && result.data?.user) {
+          if (mountedRef.current) {
+            setUser(result.data.user);
+          }
+        } else {
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
+          if (mountedRef.current) {
+            setUser(null);
+          }
+        }
       } else {
         localStorage.removeItem('token');
-        setUser(null);
+        localStorage.removeItem('refreshToken');
+        if (mountedRef.current) {
+          setUser(null);
+        }
       }
     } catch (error) {
       console.error('Token validation failed:', error);
       localStorage.removeItem('token');
-      setUser(null);
+      localStorage.removeItem('refreshToken');
+      if (mountedRef.current) {
+        setUser(null);
+      }
     } finally {
-      setLoading(false);
+      validationInProgressRef.current = false;
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    setLoading(true);
+    if (mountedRef.current) {
+      setLoading(true);
+    }
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await makeCancellableRequest('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,54 +152,201 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        setUser(data.user);
+      if (response.ok && result.success) {
+        localStorage.setItem('token', result.data.token);
+        localStorage.setItem('refreshToken', result.data.refreshToken);
+        if (mountedRef.current) {
+          setUser(result.data.user);
+        }
         return { success: true };
       } else {
-        return { success: false, error: data.error || 'Login failed' };
+        return { success: false, error: result.error || 'Login failed' };
       }
     } catch (error) {
       console.error('Login failed:', error);
       return { success: false, error: 'Network error. Please try again.' };
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 
-  const register = async (name: string, email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    setLoading(true);
+  const register = async (data: RegisterData): Promise<{ success: boolean; error?: string; requiresVerification?: boolean }> => {
+    if (mountedRef.current) {
+      setLoading(true);
+    }
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await makeCancellableRequest('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify(data),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        setUser(data.user);
-        return { success: true };
+      if (response.ok && result.success) {
+        localStorage.setItem('token', result.data.token);
+        localStorage.setItem('refreshToken', result.data.refreshToken);
+        if (mountedRef.current) {
+          setUser(result.data.user);
+        }
+        return { 
+          success: true, 
+          requiresVerification: result.data.requiresVerification 
+        };
       } else {
-        return { success: false, error: data.error || 'Registration failed' };
+        return { success: false, error: result.error || 'Registration failed' };
       }
     } catch (error) {
       console.error('Registration failed:', error);
       return { success: false, error: 'Network error. Please try again.' };
     } finally {
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
+  const logout = async (): Promise<void> => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        await makeCancellableRequest('/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Logout request failed:', error);
+    } finally {
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      if (mountedRef.current) {
+        setUser(null);
+      }
+    }
+  };
+
+  const refreshToken = async (): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const refreshTokenValue = localStorage.getItem('refreshToken');
+      if (!refreshTokenValue) {
+        return { success: false, error: 'No refresh token available' };
+      }
+
+      const response = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ refreshToken: refreshTokenValue }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        localStorage.setItem('token', result.data.token);
+        localStorage.setItem('refreshToken', result.data.refreshToken);
+        if (mountedRef.current) {
+          setUser(result.data.user);
+        }
+        return { success: true };
+      } else {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+        if (mountedRef.current) {
+          setUser(null);
+        }
+        return { success: false, error: result.error || 'Token refresh failed' };
+      }
+    } catch (error) {
+      console.error('Token refresh failed:', error);
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+      if (mountedRef.current) {
+        setUser(null);
+      }
+      return { success: false, error: 'Network error during token refresh' };
+    }
+  };
+
+  const verifyEmail = async (token: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await makeCancellableRequest('/api/auth/verify-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        if (result.data?.user && mountedRef.current) {
+          setUser(result.data.user);
+        }
+        return { success: true };
+      } else {
+        return { success: false, error: result.error || 'Email verification failed' };
+      }
+    } catch (error) {
+      console.error('Email verification failed:', error);
+      return { success: false, error: 'Network error. Please try again.' };
+    }
+  };
+
+  const requestPasswordReset = async (email: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await makeCancellableRequest('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        return { success: true };
+      } else {
+        return { success: false, error: result.error || 'Password reset request failed' };
+      }
+    } catch (error) {
+      console.error('Password reset request failed:', error);
+      return { success: false, error: 'Network error. Please try again.' };
+    }
+  };
+
+  const resetPassword = async (token: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await makeCancellableRequest('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token, password }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        return { success: true };
+      } else {
+        return { success: false, error: result.error || 'Password reset failed' };
+      }
+    } catch (error) {
+      console.error('Password reset failed:', error);
+      return { success: false, error: 'Network error. Please try again.' };
+    }
   };
 
   const updateUser = (userData: Partial<User>) => {
@@ -130,6 +360,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     register,
     logout,
+    refreshToken,
+    verifyEmail,
+    requestPasswordReset,
+    resetPassword,
     loading,
     isAuthenticated: !!user,
     updateUser

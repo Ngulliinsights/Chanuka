@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback, ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLocation } from 'wouter';
 import { Card, CardContent } from '@/components/ui/card';
@@ -87,7 +87,7 @@ const InterestsStep = ({ selectedInterests, onInterestToggle, onNext }: Interest
 
 const ExpertiseStep = ({ expertise, onExpertiseChange, onBack, onNext }: ExpertiseStepProps) => {
   // Optimize textarea change handler to prevent unnecessary re-renders
-  const handleTextChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleTextChange = useCallback((e: ChangeEvent<HTMLTextAreaElement>) => {
     onExpertiseChange(e.target.value);
   }, [onExpertiseChange]);
 

@@ -46,7 +46,7 @@ export class ApiResponseWrapper {
       metadata: {
         timestamp: new Date().toISOString(),
         source: 'database',
-        version: this.version,
+        version: ApiResponseWrapper.version,
         ...metadata
       }
     };
@@ -74,7 +74,7 @@ export class ApiResponseWrapper {
       apiError = {
         code: error.name || 'UNKNOWN_ERROR',
         message: error.message,
-        ...(this.isDevelopment && { stack: error.stack })
+        ...(ApiResponseWrapper.isDevelopment && { stack: error.stack })
       };
     } else {
       apiError = error;
@@ -86,7 +86,7 @@ export class ApiResponseWrapper {
       metadata: {
         timestamp: new Date().toISOString(),
         source: 'database',
-        version: this.version,
+        version: ApiResponseWrapper.version,
         ...metadata
       }
     };
@@ -213,7 +213,7 @@ export class ApiResponseWrapper {
       timestamp: new Date().toISOString(),
       source,
       executionTime: Date.now() - startTime,
-      version: this.version,
+      version: ApiResponseWrapper.version,
       ...additional
     };
   }

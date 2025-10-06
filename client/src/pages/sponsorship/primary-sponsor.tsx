@@ -1,12 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'wouter';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ChevronLeft, ChevronRight, AlertTriangle, DollarSign, Building, Eye, TrendingUp } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  ChevronLeft, 
+  ChevronRight, 
+  AlertTriangle, 
+  DollarSign, 
+  Building, 
+  Eye, 
+  TrendingUp 
+} from 'lucide-react';
 
 interface PrimarySponsorProps {
-  billId: string;
+   billId: string | undefined;
 }
 
 interface SponsorData {

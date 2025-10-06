@@ -1,12 +1,25 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MessageSquare, ArrowUp, ArrowDown, BarChart3, Reply, Flag, Award, CheckCircle2, Users, Clock, TrendingUp, Filter } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Button } from '../ui/button';
+import { Textarea } from '../ui/textarea';
+import { Input } from '../ui/input';
+import { Card } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Separator } from '../ui/separator';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
+import { 
+  MessageSquare, 
+  ArrowUp, 
+  ArrowDown, 
+  BarChart3, 
+  Reply, 
+  Flag, 
+  Award, 
+  CheckCircle2, 
+  Users, 
+  Clock, 
+  TrendingUp, 
+  Filter 
+} from 'lucide-react';
 // Using a simple date formatting function instead of date-fns
 const formatDistanceToNow = (date: Date) => {
   const now = new Date();
@@ -21,7 +34,7 @@ const formatDistanceToNow = (date: Date) => {
   if (days < 7) return `${days}d ago`;
   return date.toLocaleDateString();
 };
-import { useBillAnalysis } from '@/hooks/use-bill-analysis';
+import { useBillAnalysis } from '../../hooks/use-bill-analysis';
 
 interface Comment {
   id: number;
@@ -32,6 +45,7 @@ interface Comment {
   content: string;
   createdAt: Date;
   endorsements: number;
+  // cspell:ignore downvotes upvotes
   downvotes: number;
   upvotes: number;
   parentId?: number;
@@ -52,47 +66,34 @@ interface Poll {
 }
 
 interface CommentsProps {
+  comments: Comment[];
+  onAddComment: (content: string, expertise?: string) => Promise<void>;
+  onEndorseComment: (commentId: number) => Promise<void>;
+  isAddingComment: boolean;
+  isEndorsing: boolean;
+  sortOrder: 'newest' | 'oldest' | 'endorsed';
   billId: number;
   billSection?: string;
 }
 
-export function Comments({ billId, billSection }: CommentsProps) {
-  const [comments, setComments] = useState<Comment[]>([]);
+export function Comments({ comments, onAddComment, onEndorseComment, isAddingComment, isEndorsing, sortOrder, billId, billSection }: CommentsProps) {
   const [newComment, setNewComment] = useState('');
   const [newExpertise, setNewExpertise] = useState('');
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [showPollDialog, setShowPollDialog] = useState(false);
   const [pollData, setPollData] = useState<Poll>({ question: '', options: ['', ''] });
-  const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'verified'>('recent');
-  const [filterExpert, setFilterExpert] = useState(false);
   const [expandedComments, setExpandedComments] = useState<Set<number>>(new Set());
   const [characterCount, setCharacterCount] = useState(0);
-  const { addComment, endorseComment, isLoading } = useBillAnalysis(billId);
 
   const maxCommentLength = 2000;
   const minQualityLength = 50;
-
-  useEffect(() => {
-    fetchComments();
-  }, [billId, sortBy, filterExpert]);
 
   // Update character count when comment changes
   useEffect(() => {
     setCharacterCount(newComment.length);
   }, [newComment]);
 
-  const fetchComments = async () => {
-    try {
-      const response = await fetch(`/api/bills/${billId}/comments?sort=${sortBy}&expert=${filterExpert}&section=${billSection || ''}`);
-      if (response.ok) {
-        const data = await response.json();
-        setComments(data);
-      }
-    } catch (error) {
-      console.error('Failed to fetch comments:', error);
-    }
-  };
 
   const toggleCommentExpansion = (commentId: number) => {
     setExpandedComments(prev => {
@@ -110,18 +111,10 @@ export function Comments({ billId, billSection }: CommentsProps) {
     if (!newComment.trim() || newComment.length < minQualityLength) return;
 
     try {
-      const commentData = {
-        content: newComment,
-        expertise: newExpertise,
-        billId,
-        section: billSection,
-      };
-
-      await addComment(commentData);
+      await onAddComment(newComment, newExpertise);
       setNewComment('');
       setNewExpertise('');
       setCharacterCount(0);
-      await fetchComments();
     } catch (error) {
       console.error('Failed to add comment:', error);
     }
@@ -144,7 +137,6 @@ export function Comments({ billId, billSection }: CommentsProps) {
       if (response.ok) {
         setShowPollDialog(false);
         setPollData({ question: '', options: ['', ''] });
-        await fetchComments();
       }
     } catch (error) {
       console.error('Failed to create poll:', error);
@@ -160,7 +152,7 @@ export function Comments({ billId, billSection }: CommentsProps) {
       });
 
       if (response.ok) {
-        await fetchComments();
+        // Comments will be updated by parent
       }
     } catch (error) {
       console.error('Failed to vote:', error);
@@ -176,7 +168,7 @@ export function Comments({ billId, billSection }: CommentsProps) {
       });
 
       if (response.ok) {
-        await fetchComments();
+        // Comments will be updated by parent
       }
     } catch (error) {
       console.error('Failed to vote on poll:', error);
@@ -200,7 +192,7 @@ export function Comments({ billId, billSection }: CommentsProps) {
       if (response.ok) {
         setReplyingTo(null);
         setReplyContent('');
-        await fetchComments();
+        // Comments will be updated by parent
       }
     } catch (error) {
       console.error('Failed to reply:', error);
@@ -214,7 +206,7 @@ export function Comments({ billId, billSection }: CommentsProps) {
       });
 
       if (response.ok) {
-        await fetchComments();
+        // Comments will be updated by parent
       }
     } catch (error) {
       console.error('Failed to highlight comment:', error);
@@ -315,7 +307,7 @@ export function Comments({ billId, billSection }: CommentsProps) {
               </div>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-sm text-gray-500">
-                  {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                  {formatDistanceToNow(new Date(comment.createdAt))}
                 </span>
                 {engagementScore > 0 && (
                   <>
@@ -438,7 +430,10 @@ export function Comments({ billId, billSection }: CommentsProps) {
             </button>
           </div>
 
-          <button className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100 transition-colors">
+          <button
+            className="text-gray-400 hover:text-gray-600 p-1 rounded hover:bg-gray-100 transition-colors"
+            aria-label="Report this comment"
+          >
             <Flag className="w-4 h-4" />
           </button>
         </div>
@@ -447,7 +442,7 @@ export function Comments({ billId, billSection }: CommentsProps) {
           <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
             <Textarea
               value={replyContent}
-              onChange={(e) => setReplyContent(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setReplyContent(e.target.value)}
               placeholder="Share your thoughtful response..."
               className="mb-3 bg-white border-blue-200 focus:border-blue-400"
             />
@@ -520,7 +515,7 @@ export function Comments({ billId, billSection }: CommentsProps) {
           <div className="relative">
             <Textarea
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewComment(e.target.value)}
               placeholder="Share your detailed legal analysis, policy concerns, potential impacts, or insights about this legislation. Quality contributions help inform public discourse..."
               className="min-h-[140px] text-base leading-relaxed border-gray-300 focus:border-blue-500 focus:ring-blue-500"
               maxLength={maxCommentLength}
@@ -540,18 +535,18 @@ export function Comments({ billId, billSection }: CommentsProps) {
 
           <Input
             value={newExpertise}
-            onChange={(e) => setNewExpertise(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewExpertise(e.target.value)}
             placeholder="Your relevant expertise (e.g., Constitutional Law, Public Policy, Healthcare Administration)"
             className="max-w-lg border-gray-300 focus:border-blue-500"
           />
 
           <div className="flex gap-3 pt-2">
-            <Button 
+            <Button
               onClick={handleSubmitComment}
-              disabled={!newComment.trim() || characterCount < minQualityLength || characterCount > maxCommentLength || isLoading}
+              disabled={!newComment.trim() || characterCount < minQualityLength || characterCount > maxCommentLength || isAddingComment}
               className="bg-blue-600 hover:bg-blue-700 px-6"
             >
-              {isLoading ? 'Posting...' : 'Post Analysis'}
+              {isAddingComment ? 'Posting...' : 'Post Analysis'}
             </Button>
 
             <Dialog open={showPollDialog} onOpenChange={setShowPollDialog}>
@@ -569,7 +564,7 @@ export function Comments({ billId, billSection }: CommentsProps) {
                 <div className="space-y-4">
                   <Input
                     value={pollData.question}
-                    onChange={(e) => setPollData(prev => ({ ...prev, question: e.target.value }))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPollData(prev => ({ ...prev, question: e.target.value }))}
                     placeholder="What specific question would you like the community to vote on?"
                     className="text-base"
                   />
@@ -583,7 +578,7 @@ export function Comments({ billId, billSection }: CommentsProps) {
                       <div key={index} className="flex gap-2">
                         <Input
                           value={option}
-                          onChange={(e) => updatePollOption(index, e.target.value)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => updatePollOption(index, e.target.value)}
                           placeholder={`Option ${index + 1}`}
                           className="flex-1"
                         />
@@ -624,64 +619,6 @@ export function Comments({ billId, billSection }: CommentsProps) {
         </div>
       </Card>
 
-      {/* Enhanced Filters and Sorting */}
-      <div className="flex items-center justify-between bg-white p-4 rounded-lg border border-gray-200">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-500" />
-            <span className="text-sm font-medium text-gray-700">Sort by:</span>
-          </div>
-          <div className="flex gap-2">
-            <Button
-              variant={sortBy === 'recent' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSortBy('recent')}
-              className="flex items-center gap-2"
-            >
-              {getSortIcon('recent')}
-              Recent
-            </Button>
-            <Button
-              variant={sortBy === 'popular' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSortBy('popular')}
-              className="flex items-center gap-2"
-            >
-              {getSortIcon('popular')}
-              Popular
-            </Button>
-            <Button
-              variant={sortBy === 'verified' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setSortBy('verified')}
-              className="flex items-center gap-2"
-            >
-              {getSortIcon('verified')}
-              Verified
-            </Button>
-          </div>
-
-          <Separator orientation="vertical" className="h-6" />
-
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input
-              type="checkbox"
-              checked={filterExpert}
-              onChange={(e) => setFilterExpert(e.target.checked)}
-              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <CheckCircle2 className="w-4 h-4 text-green-600" />
-            Expert contributors only
-          </label>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-            <Users className="w-3 h-3 mr-1" />
-            {comments.length} {comments.length === 1 ? 'contribution' : 'contributions'}
-          </Badge>
-        </div>
-      </div>
 
       {/* Enhanced Comments List */}
       <div>

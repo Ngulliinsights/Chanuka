@@ -1,6 +1,25 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+interface Bill {
+  id: number;
+  title: string;
+  description?: string;
+  aims?: string;
+  keyAreas?: Array<{ title: string; description: string }>;
+  constitutionalAnalysis?: Array<{ title: string; content: string }>;
+  constitutionalAssessment?: string;
+  actions?: Array<{ eventDate: string; event: string; importance: string; details?: string }>;
+  supportPercentage?: number;
+  views?: number;
+  analyses?: number;
+  endorsements?: number;
+  verifiedClaims?: number;
+  number?: string;
+  introduced_date?: string;
+  status?: string;
+}
+
 interface CommentPayload {
   content: string;
   expertise?: string;
@@ -104,6 +123,16 @@ export function useBillAnalysis(billId: number) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
+
+  // Fetch bill
+  const { data: billData, isLoading: billLoading } = useQuery({
+    queryKey: ['bill', billId],
+    queryFn: async () => {
+      const res = await apiRequest('GET', `/api/bills/${billId}`);
+      return res.json();
+    },
+    enabled: !!billId,
+  });
 
   // Fetch bill analysis
   const { data: analysisData, isLoading: analysisLoading } = useQuery({
@@ -214,13 +243,16 @@ export function useBillAnalysis(billId: number) {
   }, [createPollMutation]);
 
   return {
+    bill: billData,
     analysis,
     comments,
-    isLoading: isLoading || analysisLoading || commentsLoading,
+    isLoading: isLoading || billLoading || analysisLoading || commentsLoading,
     addComment,
     voteComment,
     endorseComment,
     createPoll,
+    isAddingComment: addCommentMutation.isPending,
+    isEndorsing: endorseCommentMutation.isPending,
     refetch: () => {
       queryClient.invalidateQueries({ queryKey: ['bills', billId] });
       queryClient.invalidateQueries({ queryKey: ['analysis', billId] });

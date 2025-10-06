@@ -1,5 +1,14 @@
 import { useState, FC } from "react";
-import { Edit, Save, X, MapPin, Building, Award, Eye, EyeOff } from "lucide-react";
+import { 
+  Edit, 
+  Save, 
+  X, 
+  MapPin, 
+  Building, 
+  Award, 
+  Eye, 
+  EyeOff 
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

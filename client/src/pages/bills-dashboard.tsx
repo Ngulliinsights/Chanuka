@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Search, 
   Filter, 
@@ -14,6 +14,43 @@ import {
   XCircle,
   AlertTriangle
 } from 'lucide-react';
+import {
+  ResponsiveLayoutProvider,
+  ResponsiveContainer,
+  ResponsiveGrid
+} from '../components/mobile/responsive-layout-manager';
+import {
+  ResponsivePageWrapper,
+  ResponsiveCardGrid,
+  ResponsiveSection,
+  ResponsiveStatsGrid
+} from '../components/mobile/responsive-page-wrapper';
+import {
+  MobileInput,
+  MobileSelect,
+  MobileForm
+} from '../components/mobile/mobile-optimized-forms';
+import { LazyLoadWrapper } from '../components/mobile/mobile-performance-optimizations';
+
+// Define Bill interface
+interface Bill {
+  id: number;
+  title: string;
+  number: string;
+  introduced_date: Date;
+  status: string;
+  summary: string;
+  transparency_score: number;
+  conflict_indicators: {
+    financial_conflicts: number;
+    political_alignment: number;
+    disclosure_gaps: number;
+  };
+  views: number;
+  comments: number;
+  shares: number;
+  tags: string[];
+}
 
 // Fallback data for when API is unavailable
 const FALLBACK_BILLS = [
@@ -78,7 +115,7 @@ import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { ImplementationWorkarounds } from '../components/implementation/workarounds';
+import { ImplementationWorkarounds } from '../components/bills/implementation-workarounds';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 
 function BillsDashboard() {
@@ -91,7 +128,7 @@ function BillsDashboard() {
   const [isUsingFallback, setIsUsingFallback] = useState(false);
   const [category, setCategory] = useState<string>('all');
   const [status, setStatus] = useState<string>('all');
-  const [selectedBill, setSelectedBill] = useState(null);
+  const [selectedBill, setSelectedBill] = useState<Bill | null>(null);
 
   useEffect(() => {
     const fetchBills = async () => {
@@ -112,7 +149,8 @@ function BillsDashboard() {
         }
         setError(null);
       } catch (err) {
-        console.warn('API unavailable, using fallback data:', err.message);
+        console.log('Error type:', typeof err, err);
+        console.warn('API unavailable, using fallback data:', err instanceof Error ? err.message : String(err));
         setBills(FALLBACK_BILLS);
         setIsUsingFallback(true);
         setError(null); // Don't show error for fallback mode
@@ -134,87 +172,98 @@ function BillsDashboard() {
     return matchesSearch && matchesStatus;
   });
 
+  // Convert stats for ResponsiveStatsGrid
+  const statsData = [
+    { label: 'Total Bills', value: filteredBills.length.toString() },
+    { 
+      label: 'High Transparency', 
+      value: filteredBills.filter(b => b.transparency_score >= 80).length.toString() 
+    },
+    { 
+      label: 'Pending Vote', 
+      value: filteredBills.filter(b => b.status === 'floor_vote').length.toString() 
+    },
+    { 
+      label: 'Avg Transparency', 
+      value: `${Math.round(filteredBills.reduce((acc, b) => acc + b.transparency_score, 0) / filteredBills.length) || 0}%` 
+    }
+  ];
+
+  const categoryOptions = [
+    { value: 'all', label: 'All Categories' },
+    { value: 'technology', label: 'Technology' },
+    { value: 'environment', label: 'Environment' },
+    { value: 'healthcare', label: 'Healthcare' },
+    { value: 'economy', label: 'Economy' },
+    { value: 'education', label: 'Education' },
+    { value: 'infrastructure', label: 'Infrastructure' },
+    { value: 'governance', label: 'Governance' }
+  ];
+
+  const statusOptions = [
+    { value: 'all', label: 'All Statuses' },
+    { value: 'introduced', label: 'Introduced' },
+    { value: 'committee', label: 'Committee Review' },
+    { value: 'floor_vote', label: 'Floor Vote' },
+    { value: 'passed', label: 'Passed' },
+    { value: 'rejected', label: 'Rejected' }
+  ];
+
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Bills Dashboard</h1>
-          <p className="text-gray-600">
-            Track legislative proposals and their transparency metrics
-            {isUsingFallback && (
-              <span className="ml-2 text-amber-600 text-sm">
-                (Using demo data - API unavailable)
-              </span>
-            )}
-          </p>
-        </div>
-      </div>
+    <ResponsiveLayoutProvider>
+      <ResponsivePageWrapper
+        title="Bills Dashboard"
+        subtitle={`Track legislative proposals and their transparency metrics${
+          isUsingFallback ? ' (Using demo data - API unavailable)' : ''
+        }`}
+        loading={loading}
+        error={error}
+        enablePullToRefresh={true}
+        onRefresh={async () => {
+          // Refresh logic here
+          window.location.reload();
+        }}
+      >
+        {/* Search and Filters */}
+        <ResponsiveSection background="white" spacing="md" className="rounded-lg shadow-sm border mb-6">
+          <MobileForm>
+            <ResponsiveGrid columns={{ mobile: 1, tablet: 2, desktop: 3 }} gap="md">
+              <MobileInput
+                label="Search Bills"
+                type="text"
+                value={searchTerm}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                placeholder="Search by title or summary..."
+                leftIcon={<Search className="h-4 w-4" />}
+                clearable
+                onClear={() => setSearchTerm('')}
+              />
 
-      {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
-              Search Bills
-            </label>
-            <input
-              id="search"
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by title or summary..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
+              <MobileSelect
+                label="Category"
+                value={category}
+                onChange={setCategory}
+                options={categoryOptions}
+                placeholder="Select category"
+              />
 
-          <div>
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-              Category
-            </label>
-            <select
-              id="category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Categories</option>
-              <option value="technology">Technology</option>
-              <option value="environment">Environment</option>
-              <option value="healthcare">Healthcare</option>
-              <option value="economy">Economy</option>
-              <option value="education">Education</option>
-              <option value="infrastructure">Infrastructure</option>
-              <option value="governance">Governance</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-2">
-              Status
-            </label>
-            <select
-              id="status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Statuses</option>
-              <option value="introduced">Introduced</option>
-              <option value="committee">Committee Review</option>
-              <option value="floor_vote">Floor Vote</option>
-              <option value="passed">Passed</option>
-              <option value="rejected">Rejected</option>
-            </select>
-          </div>
-        </div>
-      </div>
+              <MobileSelect
+                label="Status"
+                value={status}
+                onChange={setStatus}
+                options={statusOptions}
+                placeholder="Select status"
+              />
+            </ResponsiveGrid>
+          </MobileForm>
+        </ResponsiveSection>
 
       <Tabs defaultValue="overview" className="space-y-4">
         {/* Bill Selection */}
         <div>
           <Select onValueChange={(value) => {
             const bill = bills.find(bill => bill.id.toString() === value);
-            setSelectedBill(bill);
+            setSelectedBill(bill || null);
           }}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder={selectedBill ? selectedBill.title : "Select a bill"} />
@@ -237,115 +286,120 @@ function BillsDashboard() {
         </TabsList>
         <TabsContent value="overview" className="space-y-6">
           {/* Bills Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {loading ? (
-              <>
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="bg-white rounded-lg shadow-sm border p-6 animate-pulse">
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
-                    <div className="h-20 bg-gray-200 rounded mb-4"></div>
-                    <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-                  </div>
-                ))}
-              </>
-            ) : filteredBills.length === 0 ? (
-              <div className="col-span-full text-center py-12">
-                <p className="text-gray-500 text-lg">No bills found matching your criteria.</p>
-              </div>
-            ) : (
-              filteredBills.map((bill) => (
-                <div key={bill.id} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-3">
-                      <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
-                        {bill.title}
-                      </h3>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        bill.status === 'passed' 
-                          ? 'bg-green-100 text-green-800'
-                          : bill.status === 'floor_vote'
-                          ? 'bg-blue-100 text-blue-800'
-                          : bill.status === 'committee'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {bill.status.replace('_', ' ')}
-                      </span>
-                    </div>
-
-                    <p className="text-sm text-gray-600 mb-3">{bill.number}</p>
-
-                    <p className="text-gray-700 text-sm line-clamp-3 mb-4">
-                      {bill.summary}
-                    </p>
-
-                    {/* Transparency Score */}
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between text-sm mb-1">
-                        <span className="text-gray-600">Transparency Score</span>
-                        <span className="font-medium">{bill.transparency_score}%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className={`h-2 rounded-full ${
-                            bill.transparency_score >= 80 
-                              ? 'bg-green-500'
-                              : bill.transparency_score >= 60
-                              ? 'bg-yellow-500'
-                              : 'bg-red-500'
-                          }`}
-                          style={{ width: `${bill.transparency_score}%` }}
-                        ></div>
-                      </div>
-                    </div>
-
-                    {/* Engagement Stats */}
-                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                      <span className="flex items-center gap-1">
-                        👁️ {bill.views?.toLocaleString() || 0}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        💬 {bill.comments?.toLocaleString() || 0}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        📤 {bill.shares?.toLocaleString() || 0}
-                      </span>
-                    </div>
-
-                    {/* Tags */}
-                    {bill.tags && bill.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-4">
-                        {bill.tags.slice(0, 3).map((tag, index) => (
-                          <span 
-                            key={index}
-                            className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                        {bill.tags.length > 3 && (
-                          <span className="px-2 py-1 text-xs bg-gray-50 text-gray-600 rounded">
-                            +{bill.tags.length - 3} more
-                          </span>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Action Buttons */}
-                    <div className="flex gap-2">
-                      <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-3 rounded transition-colors">
-                        View Details
-                      </button>
-                      <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium py-2 px-3 rounded transition-colors">
-                        Analyze
-                      </button>
-                    </div>
-                  </div>
+          {loading ? (
+            <ResponsiveCardGrid minCardWidth={320} gap="md">
+              {[1, 2, 3, 4, 5, 6].map(i => (
+                <div key={i} className="bg-white rounded-lg shadow-sm border p-6 animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2 mb-2"></div>
+                  <div className="h-20 bg-gray-200 rounded mb-4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/4"></div>
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+            </ResponsiveCardGrid>
+          ) : filteredBills.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">No bills found matching your criteria.</p>
+            </div>
+          ) : (
+            <ResponsiveCardGrid minCardWidth={320} gap="md">
+              {filteredBills.map((bill) => (
+                <LazyLoadWrapper key={bill.id} height={400}>
+                  <div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow h-full">
+                    <div className="p-6 h-full flex flex-col">
+                      <div className="flex items-start justify-between mb-3">
+                        <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 flex-1">
+                          {bill.title}
+                        </h3>
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ml-2 whitespace-nowrap ${
+                          bill.status === 'passed' 
+                            ? 'bg-green-100 text-green-800'
+                            : bill.status === 'floor_vote'
+                            ? 'bg-blue-100 text-blue-800'
+                            : bill.status === 'committee'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {bill.status.replace('_', ' ')}
+                        </span>
+                      </div>
+
+                      <p className="text-sm text-gray-600 mb-3">{bill.number}</p>
+
+                      <p className="text-gray-700 text-sm line-clamp-3 mb-4 flex-1">
+                        {bill.summary}
+                      </p>
+
+                      {/* Transparency Score */}
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between text-sm mb-1">
+                          <span className="text-gray-600">Transparency Score</span>
+                          <span className="font-medium">{bill.transparency_score}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full ${
+                              bill.transparency_score >= 80 
+                                ? 'bg-green-500'
+                                : bill.transparency_score >= 60
+                                ? 'bg-yellow-500'
+                                : 'bg-red-500'
+                            }`}
+                            style={{ width: `${bill.transparency_score}%` }}
+                          ></div>
+                        </div>
+                      </div>
+
+                      {/* Engagement Stats */}
+                      <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                        <span className="flex items-center gap-1">
+                          <Eye className="h-3 w-3" />
+                          {bill.views?.toLocaleString() || 0}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MessageSquare className="h-3 w-3" />
+                          {bill.comments?.toLocaleString() || 0}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Share2 className="h-3 w-3" />
+                          {bill.shares?.toLocaleString() || 0}
+                        </span>
+                      </div>
+
+                      {/* Tags */}
+                      {bill.tags && bill.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-4">
+                          {bill.tags.slice(0, 3).map((tag, index) => (
+                            <span 
+                              key={index}
+                              className="px-2 py-1 text-xs bg-blue-50 text-blue-700 rounded"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                          {bill.tags.length > 3 && (
+                            <span className="px-2 py-1 text-xs bg-gray-50 text-gray-600 rounded">
+                              +{bill.tags.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Action Buttons */}
+                      <ResponsiveGrid columns={{ mobile: 2, tablet: 2, desktop: 2 }} gap="sm" className="mt-auto">
+                        <button className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 px-3 rounded transition-colors">
+                          View Details
+                        </button>
+                        <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium py-2 px-3 rounded transition-colors">
+                          Analyze
+                        </button>
+                      </ResponsiveGrid>
+                    </div>
+                  </div>
+                </LazyLoadWrapper>
+              ))}
+            </ResponsiveCardGrid>
+          )}
         </TabsContent>
         <TabsContent value="analysis" className="space-y-6">
           <Card>
@@ -371,7 +425,7 @@ function BillsDashboard() {
         </TabsContent>
         <TabsContent value="workarounds" className="space-y-6">
           {selectedBill && (
-            <ImplementationWorkarounds billId={selectedBill.id} />
+            <ImplementationWorkarounds billId={selectedBill.id.toString()} />
           )}
           {!selectedBill && (
             <Card>
@@ -399,35 +453,19 @@ function BillsDashboard() {
         </TabsContent>
       </Tabs>
 
-      {/* Summary Stats */}
-      <div className="mt-8 bg-white rounded-lg shadow-sm border p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Summary Statistics</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{filteredBills.length}</div>
-            <div className="text-sm text-gray-600">Total Bills</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">
-              {filteredBills.filter(b => b.transparency_score >= 80).length}
-            </div>
-            <div className="text-sm text-gray-600">High Transparency</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-yellow-600">
-              {filteredBills.filter(b => b.status === 'floor_vote').length}
-            </div>
-            <div className="text-sm text-gray-600">Pending Vote</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">
-              {Math.round(filteredBills.reduce((acc, b) => acc + b.transparency_score, 0) / filteredBills.length) || 0}%
-            </div>
-            <div className="text-sm text-gray-600">Avg Transparency</div>
-          </div>
-        </div>
-      </div>
-    </div>
+        {/* Summary Stats */}
+        <ResponsiveSection 
+          background="white" 
+          spacing="md" 
+          title="Summary Statistics"
+          className="rounded-lg shadow-sm border mt-8"
+        >
+          <LazyLoadWrapper height={150}>
+            <ResponsiveStatsGrid stats={statsData} />
+          </LazyLoadWrapper>
+        </ResponsiveSection>
+      </ResponsivePageWrapper>
+    </ResponsiveLayoutProvider>
   );
 }
 

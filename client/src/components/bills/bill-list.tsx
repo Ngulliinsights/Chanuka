@@ -1,12 +1,25 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'wouter';
-import { Button } from '@/components/ui/button';
-import { Bill } from '@shared/types/bill';
+import { Button } from '../ui/button';
 import { BillCard } from './bill-card';
 import { Loader2, AlertCircle, Filter } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from '../ui/badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
+
+interface Bill {
+  id: number;
+  title: string;
+  status: string;
+  introduced_date: string;
+  description: string;
+  sponsor: string;
+  cosponsors: number;
+  views: number;
+  analyses: number;
+  endorsements: number;
+  supportPercentage: number;
+}
 
 interface BillListProps {
   bills: Bill[];
@@ -180,7 +193,7 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
                             {bill.status}
                           </Badge>
                           <div className="text-sm text-muted-foreground">
-                            {new Date(bill.dateIntroduced).toLocaleDateString()}
+                            {new Date(bill.introduced_date).toLocaleDateString()}
                           </div>
                         </div>
                         <CardTitle className="text-xl mt-2 text-primary-700 group-hover:text-primary-800 transition-colors">

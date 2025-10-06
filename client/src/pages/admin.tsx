@@ -1,11 +1,10 @@
-import React from 'react';
 import { Shield, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import AdminDashboard from '@/components/admin/admin-dashboard';
 import { useQuery } from '@tanstack/react-query';
 
-const AdminPage: React.FC = () => {
+const AdminPage = () => {
   const { data: user, isLoading } = useQuery({
     queryKey: ['auth', 'user'],
     queryFn: async () => {

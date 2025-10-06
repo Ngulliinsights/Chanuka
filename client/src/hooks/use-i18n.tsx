@@ -1,5 +1,5 @@
 import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { en } from '@shared/i18n/en';
+import { en } from '../../../shared/i18n/en.js';
 
 type Translations = typeof en;
 
