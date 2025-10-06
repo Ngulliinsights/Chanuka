@@ -6,7 +6,7 @@ import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
 import type { ExtractTablesWithRelations } from 'drizzle-orm';
 
 // Create a more descriptive type alias for transactions to improve code readability
-export type DatabaseTransaction = PgTransaction
+export type DatabaseTransaction = PgTransaction<
   NodePgQueryResultHKT,
   typeof schema,
   ExtractTablesWithRelations<typeof schema>

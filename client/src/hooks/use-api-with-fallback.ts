@@ -1,3 +1,10 @@
+/**
+ * @deprecated This hook is deprecated and will be removed in a future version.
+ * Please use `useSafeQuery` for data fetching and `useSafeMutation` for mutations.
+ * 
+ * See `use-safe-query.ts` and `use-safe-mutation.ts` for the new, consolidated API.
+ */
+
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { 
   ApiResponse, 

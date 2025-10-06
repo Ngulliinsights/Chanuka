@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
+ * @deprecated The `useSmoothTransition` hook is deprecated. Please use `useNavigationPerformance` for transition management.
+ */
+
+/**
  * Performance optimization hook for navigation components
  * Provides utilities for smooth animations, layout shift prevention, and performance monitoring
  */
@@ -267,43 +271,6 @@ export function useNavigationPerformance() {
     resetMetrics,
     getPerformanceRecommendations
   };
-}
-
-/**
- * Hook for managing smooth transitions without layout shifts
- */
-export function useSmoothTransition(duration: number = 250) {
-  const [isActive, setIsActive] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  
-  const start = useCallback(() => {
-    setIsActive(true);
-    
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    
-    timeoutRef.current = setTimeout(() => {
-      setIsActive(false);
-    }, duration);
-  }, [duration]);
-  
-  const end = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    setIsActive(false);
-  }, []);
-  
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-  
-  return { isActive, start, end };
 }
 
 /**

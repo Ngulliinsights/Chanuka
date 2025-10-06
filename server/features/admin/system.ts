@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express';
 import { sql } from 'drizzle-orm';
 import { database as db } from '../../../shared/database/connection.js';
-import { HealthCheckResponse, createApiResponse, createErrorResponse } from '../types/api.js';
-import { ApiSuccess, ApiErrorResponse, ApiResponseWrapper } from "../../utils/api-response.js";
+import { HealthCheckResponse, createApiResponse, createErrorResponse } from '../../types/api.ts';
+import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../utils/api-response.ts";
 
 interface SchemaIssue {
   type: string;
@@ -47,7 +47,7 @@ export function setupSystemRoutes(app: express.Router) {
       }, ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
       console.error('Schema analysis failed:', error);
-      return ApiErrorResponse(res, 'Failed to analyze database schema', 500, 
+      return ApiError(res, 'Failed to analyze database schema', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   });
@@ -96,7 +96,7 @@ export function setupSystemRoutes(app: express.Router) {
       }, ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
       console.error('Database stats failed:', error);
-      return ApiErrorResponse(res, 'Failed to get database statistics', 500, 
+      return ApiError(res, 'Failed to get database statistics', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   });
@@ -184,7 +184,7 @@ export function setupSystemRoutes(app: express.Router) {
       }, ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
       console.error('Schema consistency check failed:', error);
-      return ApiErrorResponse(res, 'Failed to check schema consistency', 500, 
+      return ApiError(res, 'Failed to check schema consistency', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   });
@@ -214,7 +214,7 @@ export function setupSystemRoutes(app: express.Router) {
         timestamp: new Date().toISOString(),
         error: error instanceof Error ? error.message : 'Unknown error'
       };
-      return ApiErrorResponse(res, errorResponse, 500, 
+      return ApiError(res, errorResponse, 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   });

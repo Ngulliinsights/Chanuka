@@ -1,5 +1,6 @@
 import { useNavigation } from '@/contexts/NavigationContext';
 import { useResponsiveNavigation } from '@/contexts/ResponsiveNavigationContext';
+import { useKeyboardFocus } from './use-keyboard-focus';
 
 /**
  * Unified navigation hook that combines both navigation contexts
@@ -8,6 +9,7 @@ import { useResponsiveNavigation } from '@/contexts/ResponsiveNavigationContext'
 export function useUnifiedNavigation() {
   const navigation = useNavigation();
   const responsiveNavigation = useResponsiveNavigation();
+  const { isKeyboardUser, getFocusClasses } = useKeyboardFocus();
 
   return {
     // Navigation state
@@ -24,9 +26,8 @@ export function useUnifiedNavigation() {
     sidebarCollapsed: responsiveNavigation.sidebarCollapsed,
     mounted: responsiveNavigation.mounted,
     
-    // Legacy state (for backward compatibility)
-    sidebarOpen: navigation.sidebarOpen,
-    mobileMenuOpen: navigation.mobileMenuOpen,
+    // Accessibility state
+    isKeyboardUser,
     
     // Navigation actions
     navigateTo: navigation.navigateTo,
@@ -40,24 +41,8 @@ export function useUnifiedNavigation() {
     toggleSidebar: responsiveNavigation.toggleSidebar,
     setSidebarCollapsed: responsiveNavigation.setSidebarCollapsed,
     isActive: responsiveNavigation.isActive,
-    
-    // Legacy actions (for backward compatibility)
-    toggleMobileMenu: navigation.toggleMobileMenu,
+
+    // Accessibility actions
+    getFocusClasses,
   };
-}
-
-/**
- * Hook specifically for responsive navigation features
- * Use this when you only need responsive functionality
- */
-export function useResponsiveNavigationOnly() {
-  return useResponsiveNavigation();
-}
-
-/**
- * Hook specifically for core navigation features
- * Use this when you only need core navigation functionality
- */
-export function useNavigationOnly() {
-  return useNavigation();
 }

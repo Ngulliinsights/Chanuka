@@ -19,14 +19,6 @@ export {
   type NotificationHistory
 } from './notification-service.js';
 
-// Email service for all email operations
-export {
-  EmailService,
-  emailService,
-  type EmailConfig,
-  type EmailOptions
-} from './email-service.js';
-
 // Consolidated API routes
 export { router as notificationRoutes } from './notification-routes.js';
 
@@ -86,7 +78,7 @@ export { alertingService } from './alerting-service.js';
  * import { router as enhancedRouter } from './enhanced-notifications.js'; // ❌ DEPRECATED
  * 
  * AFTER (New imports):
- * import { notificationService, emailService, notificationRoutes } from './index.js';
+ * import { notificationService, notificationRoutes } from './index.js'; // NOTE: emailService is currently missing
  * 
  * // For advanced features:
  * import { advancedNotificationService } from './index.js';
