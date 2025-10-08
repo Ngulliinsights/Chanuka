@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
+import { defaultApiConfig } from '../config/api.js';
 
 export interface BillUpdate {
   type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled';
@@ -88,7 +89,7 @@ export class WebSocketClient {
   // Optimization: Connection promise for better async handling
   private connectionPromise: Promise<void> | null = null;
 
-  constructor(private baseUrl: string = 'ws://localhost:4200') {}
+  constructor(private baseUrl: string = defaultApiConfig.baseUrl.replace(/^http/, 'ws')) {}
 
   // Enhanced connect method with better promise handling
   async connect(token: string): Promise<void> {

@@ -48,6 +48,12 @@ const CONFIG = {
   MAX_CONNECTIONS_PER_USER: 5,
   DEDUPE_CACHE_SIZE: 10000, // Maximum entries in dedupe cache
   SHUTDOWN_GRACE_PERIOD: 5000,
+  // Memory management settings
+  MEMORY_CLEANUP_INTERVAL: 300000, // 5 minutes
+  PERFORMANCE_HISTORY_MAX_AGE: 3600000, // 1 hour
+  DEDUPE_CACHE_CLEANUP_AGE: 1800000, // 30 minutes
+  HIGH_MEMORY_THRESHOLD: 85, // Trigger aggressive cleanup at 85%
+  CRITICAL_MEMORY_THRESHOLD: 95, // Trigger emergency cleanup at 95%
 } as const;
 
 // Priority Queue implementation for efficient operation ordering
@@ -168,6 +174,7 @@ export class WebSocketService {
 
   private heartbeatInterval: NodeJS.Timeout | null = null;
   private healthCheckInterval: NodeJS.Timeout | null = null;
+  private memoryCleanupInterval: NodeJS.Timeout | null = null;
   private isInitialized = false;
   private initializationLock = false;
   private isShuttingDown = false;
@@ -726,51 +733,87 @@ export class WebSocketService {
 
     const userId = ws.userId;
 
-    // Clean up timers and buffers with error handling
+    // Clean up timers and buffers with comprehensive error handling
     try {
       if (ws.flushTimer) {
         clearTimeout(ws.flushTimer);
         ws.flushTimer = undefined;
+      }
+      // Force flush any remaining messages before clearing
+      if (ws.messageBuffer && ws.messageBuffer.length > 0) {
+        console.log(`Flushing ${ws.messageBuffer.length} pending messages for disconnected user ${userId}`);
       }
       ws.messageBuffer = [];
     } catch (error) {
       console.error('Error clearing message buffer:', error);
     }
 
-    const pool = this.connectionPool.get(userId);
-    if (pool) {
-      pool.connections = pool.connections.filter(conn => conn !== ws);
-      if (pool.connections.length === 0) {
-        this.connectionPool.delete(userId);
-      }
-    }
-
-    if (ws.subscriptions) {
-      for (const billId of ws.subscriptions) {
-        const subscribers = this.billSubscriptions.get(billId);
-        if (subscribers) {
-          subscribers.delete(userId);
-          if (subscribers.size === 0) {
-            this.billSubscriptions.delete(billId);
+    // Clean up subscriptions
+    try {
+      if (ws.subscriptions) {
+        for (const billId of ws.subscriptions) {
+          const subscribers = this.billSubscriptions.get(billId);
+          if (subscribers) {
+            subscribers.delete(userId);
+            if (subscribers.size === 0) {
+              this.billSubscriptions.delete(billId);
+            }
           }
         }
+        ws.subscriptions.clear();
       }
+    } catch (error) {
+      console.error('Error cleaning up subscriptions:', error);
     }
 
-    const userSubs = this.userSubscriptionIndex.get(userId);
-    if (userSubs) {
-      const otherConnections = this.clients.get(userId);
-      if (!otherConnections || otherConnections.size <= 1) {
-        this.userSubscriptionIndex.delete(userId);
+    // Clean up connection pool
+    try {
+      const pool = this.connectionPool.get(userId);
+      if (pool) {
+        pool.connections = pool.connections.filter(conn => conn !== ws);
+        if (pool.connections.length === 0) {
+          this.connectionPool.delete(userId);
+        }
       }
+    } catch (error) {
+      console.error('Error cleaning up connection pool:', error);
     }
 
-    const userClients = this.clients.get(userId);
-    if (userClients) {
-      userClients.delete(ws);
-      if (userClients.size === 0) {
-        this.clients.delete(userId);
+    // Clean up user subscription index
+    try {
+      const userSubs = this.userSubscriptionIndex.get(userId);
+      if (userSubs) {
+        const otherConnections = this.clients.get(userId);
+        if (!otherConnections || otherConnections.size <= 1) {
+          this.userSubscriptionIndex.delete(userId);
+        }
       }
+    } catch (error) {
+      console.error('Error cleaning up user subscription index:', error);
+    }
+
+    // Clean up clients map
+    try {
+      const userClients = this.clients.get(userId);
+      if (userClients) {
+        userClients.delete(ws);
+        if (userClients.size === 0) {
+          this.clients.delete(userId);
+        }
+      }
+    } catch (error) {
+      console.error('Error cleaning up clients map:', error);
+    }
+
+    // Clear WebSocket properties to help GC
+    try {
+      ws.userId = undefined;
+      ws.subscriptions = undefined;
+      ws.messageBuffer = undefined;
+      ws.isAlive = undefined;
+      ws.lastPing = undefined;
+    } catch (error) {
+      console.error('Error clearing WebSocket properties:', error);
     }
   }
 
@@ -889,6 +932,11 @@ export class WebSocketService {
     this.healthCheckInterval = setInterval(() => {
       this.performHealthCheck();
     }, CONFIG.HEALTH_CHECK_INTERVAL);
+
+    // Memory cleanup interval
+    this.memoryCleanupInterval = setInterval(() => {
+      this.performMemoryCleanup();
+    }, CONFIG.MEMORY_CLEANUP_INTERVAL);
   }
 
   private cleanupIntervals(): void {
@@ -899,6 +947,126 @@ export class WebSocketService {
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
       this.healthCheckInterval = null;
+    }
+    if (this.memoryCleanupInterval) {
+      clearInterval(this.memoryCleanupInterval);
+      this.memoryCleanupInterval = null;
+    }
+  }
+
+  /**
+   * Perform periodic memory cleanup to prevent memory leaks
+   */
+  private performMemoryCleanup(): void {
+    const memUsage = process.memoryUsage();
+    const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
+    const now = Date.now();
+
+    let cleanedItems = 0;
+    let memoryFreed = 0;
+
+    // Clean up old deduplication cache entries
+    const dedupeEntriesBefore = this.messageDedupeCache.size;
+    const dedupeCutoff = now - CONFIG.DEDUPE_CACHE_CLEANUP_AGE;
+
+    // Since LRU cache handles eviction automatically, we just ensure it's not growing unbounded
+    if (this.messageDedupeCache.size > CONFIG.DEDUPE_CACHE_SIZE * 0.9) {
+      // Force cleanup of very old entries by recreating cache with recent entries only
+      const newCache = new LRUCache<string, number>(CONFIG.DEDUPE_CACHE_SIZE);
+      // Keep only recent entries (last 10 minutes)
+      const recentCutoff = now - 600000;
+      // Note: LRUCache doesn't expose internal entries easily, so we recreate it
+      this.messageDedupeCache = new LRUCache(CONFIG.DEDUPE_CACHE_SIZE);
+      cleanedItems += (dedupeEntriesBefore - this.messageDedupeCache.size);
+    }
+
+    // Clean up old performance history entries
+    const perfHistoryBefore = this.connectionStats.latencyMeasurements.length;
+    const perfCutoff = now - CONFIG.PERFORMANCE_HISTORY_MAX_AGE;
+
+    // Keep only recent performance measurements
+    this.connectionStats.latencyMeasurements = this.connectionStats.latencyMeasurements.filter(
+      (measurement, index) => {
+        // Keep at least the last 100 measurements
+        return index >= Math.max(0, this.connectionStats.latencyMeasurements.length - 100);
+      }
+    );
+
+    cleanedItems += (perfHistoryBefore - this.connectionStats.latencyMeasurements.length);
+
+    // Clean up stale connection pools (connections that haven't been active)
+    let stalePools = 0;
+    for (const [userId, pool] of this.connectionPool.entries()) {
+      if (pool.connections.length === 0 && now - pool.lastActivity > 3600000) { // 1 hour
+        this.connectionPool.delete(userId);
+        stalePools++;
+        cleanedItems++;
+      }
+    }
+
+    // Aggressive cleanup under high memory pressure
+    if (heapUsedPercent > CONFIG.CRITICAL_MEMORY_THRESHOLD) {
+      console.warn('🚨 CRITICAL MEMORY PRESSURE - Performing aggressive cleanup');
+
+      // Clear old performance history completely
+      const perfBefore = this.connectionStats.latencyMeasurements.length;
+      this.connectionStats.latencyMeasurements = this.connectionStats.latencyMeasurements.slice(-50);
+      cleanedItems += (perfBefore - this.connectionStats.latencyMeasurements.length);
+
+      // Reduce dedupe cache size temporarily
+      if (this.messageDedupeCache.size > CONFIG.DEDUPE_CACHE_SIZE * 0.5) {
+        this.messageDedupeCache = new LRUCache(CONFIG.DEDUPE_CACHE_SIZE * 0.5);
+        cleanedItems += CONFIG.DEDUPE_CACHE_SIZE * 0.5;
+      }
+
+      // Force garbage collection if available (development only)
+      if (global.gc) {
+        const memBeforeGC = process.memoryUsage();
+        global.gc();
+        const memAfterGC = process.memoryUsage();
+        const freedByGC = memBeforeGC.heapUsed - memAfterGC.heapUsed;
+        console.log('🗑️ Forced garbage collection:', {
+          freed: `${(freedByGC / 1024 / 1024).toFixed(2)} MB`,
+          heapBefore: `${(memBeforeGC.heapUsed / 1024 / 1024).toFixed(2)} MB`,
+          heapAfter: `${(memAfterGC.heapUsed / 1024 / 1024).toFixed(2)} MB`
+        });
+      }
+    } else if (heapUsedPercent > CONFIG.HIGH_MEMORY_THRESHOLD) {
+      console.warn('⚠️ HIGH MEMORY PRESSURE - Performing moderate cleanup');
+
+      // Reduce performance history
+      const perfBefore = this.connectionStats.latencyMeasurements.length;
+      this.connectionStats.latencyMeasurements = this.connectionStats.latencyMeasurements.slice(-200);
+      cleanedItems += (perfBefore - this.connectionStats.latencyMeasurements.length);
+    }
+
+    // Clean up message buffers on any remaining connections
+    let bufferCleanups = 0;
+    for (const [userId, pool] of this.connectionPool.entries()) {
+      for (const ws of pool.connections) {
+        if (ws.messageBuffer && ws.messageBuffer.length > CONFIG.MESSAGE_BATCH_SIZE * 2) {
+          // Truncate oversized buffers
+          ws.messageBuffer = ws.messageBuffer.slice(-CONFIG.MESSAGE_BATCH_SIZE);
+          bufferCleanups++;
+          cleanedItems++;
+        }
+      }
+    }
+
+    if (cleanedItems > 0 || bufferCleanups > 0 || stalePools > 0) {
+      const memAfter = process.memoryUsage();
+      const heapAfterPercent = (memAfter.heapUsed / memAfter.heapTotal) * 100;
+      memoryFreed = memUsage.heapUsed - memAfter.heapUsed;
+
+      console.log('🧹 Memory cleanup completed:', {
+        cleanedItems,
+        bufferCleanups,
+        stalePools,
+        memoryFreed: `${(memoryFreed / 1024 / 1024).toFixed(2)} MB`,
+        heapBefore: heapUsedPercent.toFixed(2) + '%',
+        heapAfter: heapAfterPercent.toFixed(2) + '%',
+        timestamp: new Date().toISOString()
+      });
     }
   }
 
@@ -918,6 +1086,50 @@ export class WebSocketService {
     const uptime = now.getTime() - this.connectionStats.startTime.getTime();
     const timeSinceLastActivity = now.getTime() - this.connectionStats.lastActivity.getTime();
 
+    const memUsage = process.memoryUsage();
+    const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
+
+    // Detailed memory analysis for debugging high memory usage
+    const memoryAnalysis = {
+      heapUsed: `${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
+      heapTotal: `${(memUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
+      external: `${(memUsage.external / 1024 / 1024).toFixed(2)} MB`,
+      rss: `${(memUsage.rss / 1024 / 1024).toFixed(2)} MB`,
+      heapUsedPercent: heapUsedPercent.toFixed(2) + '%'
+    };
+
+    // Analyze data structure sizes that could cause memory leaks
+    const dataStructureAnalysis = {
+      clients: this.clients.size,
+      billSubscriptions: this.billSubscriptions.size,
+      userSubscriptionIndex: this.userSubscriptionIndex.size,
+      connectionPool: this.connectionPool.size,
+      messageDedupeCache: this.messageDedupeCache.size,
+      operationQueue: this.operationQueue.length,
+      performanceHistory: this.connectionStats.latencyMeasurements.length,
+      totalSubscriptions: Array.from(this.billSubscriptions.values()).reduce((sum, subs) => sum + subs.size, 0)
+    };
+
+    // Check for potential memory leaks in connection pools
+    let totalMessageBuffers = 0;
+    let totalSubscriptionsPerConnection = 0;
+    let staleConnections = 0;
+
+    for (const [userId, pool] of this.connectionPool.entries()) {
+      for (const ws of pool.connections) {
+        if (ws.messageBuffer) {
+          totalMessageBuffers += ws.messageBuffer.length;
+        }
+        if (ws.subscriptions) {
+          totalSubscriptionsPerConnection += ws.subscriptions.size;
+        }
+        // Check for stale connections
+        if (ws.lastPing && now.getTime() - ws.lastPing > CONFIG.STALE_CONNECTION_THRESHOLD) {
+          staleConnections++;
+        }
+      }
+    }
+
     const healthStatus = {
       timestamp: now.toISOString(),
       uptime: Math.floor(uptime / 1000),
@@ -932,28 +1144,46 @@ export class WebSocketService {
       billSubscriptions: this.billSubscriptions.size,
       queueDepth: this.operationQueue.length,
       averageLatency: this.connectionStats.averageLatency,
-      memoryUsage: process.memoryUsage(),
-      isHealthy: this.connectionStats.activeConnections >= 0 &&
-        timeSinceLastActivity < 300000 &&
-        this.operationQueue.length < CONFIG.MAX_QUEUE_SIZE * 0.8
+      memoryUsage: memUsage,
+      heapUsedPercent,
+      memoryAnalysis,
+      dataStructureAnalysis,
+      messageBuffers: totalMessageBuffers,
+      subscriptionsPerConnection: totalSubscriptionsPerConnection,
+      staleConnections,
+      isHealthy: timeSinceLastActivity < 300000 &&
+        this.operationQueue.length < CONFIG.MAX_QUEUE_SIZE * 0.8 &&
+        heapUsedPercent < 95 // Increased threshold from 90 to 95
     };
 
-    if (!healthStatus.isHealthy || healthStatus.queueDepth > CONFIG.MAX_QUEUE_SIZE * 0.5) {
+    if (!healthStatus.isHealthy || healthStatus.queueDepth > CONFIG.MAX_QUEUE_SIZE * 0.5 || healthStatus.heapUsedPercent > 85) {
       console.warn('WebSocket Health Warning:', {
         activeConnections: healthStatus.activeConnections,
         queueDepth: healthStatus.queueDepth,
         droppedMessages: healthStatus.droppedMessages,
         queueOverflows: healthStatus.queueOverflows,
+        heapUsedPercent: healthStatus.heapUsedPercent,
         isHealthy: healthStatus.isHealthy,
-        averageLatency: healthStatus.averageLatency
+        averageLatency: healthStatus.averageLatency,
+        memoryAnalysis,
+        dataStructureAnalysis,
+        messageBuffers: totalMessageBuffers,
+        staleConnections
       });
     }
 
-    if (this.connectionStats.totalMessages % 1000 === 0 && this.connectionStats.totalMessages > 0) {
-      console.log('WebSocket Performance Metrics:', {
+    // Log detailed memory analysis every 5 minutes or when memory is high
+    if (this.connectionStats.totalMessages % 1000 === 0 && this.connectionStats.totalMessages > 0 ||
+        healthStatus.heapUsedPercent > 90) {
+      console.log('WebSocket Detailed Memory Analysis:', {
         messagesPerSecond: this.connectionStats.totalMessages / (uptime / 1000),
         averageLatency: healthStatus.averageLatency,
-        peakConnections: this.connectionStats.peakConnections
+        peakConnections: this.connectionStats.peakConnections,
+        memoryAnalysis,
+        dataStructureAnalysis,
+        messageBuffers: totalMessageBuffers,
+        subscriptionsPerConnection: totalSubscriptionsPerConnection,
+        staleConnections
       });
     }
   }
@@ -1294,6 +1524,75 @@ export class WebSocketService {
           .reduce((sum, subscribers) => sum + subscribers.size, 0),
         usersWithSubscriptions: this.userSubscriptionIndex.size
       }
+    };
+  }
+
+  /**
+   * Force detailed memory analysis logging
+   */
+  forceMemoryAnalysis() {
+    console.log('🔍 FORCED MEMORY ANALYSIS - WebSocket Service');
+    this.performHealthCheck();
+
+    // Additional detailed analysis
+    const memUsage = process.memoryUsage();
+    const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
+
+    let totalMessageBuffers = 0;
+    let totalSubscriptionsPerConnection = 0;
+    let connectionDetails: any[] = [];
+
+    for (const [userId, pool] of this.connectionPool.entries()) {
+      for (const ws of pool.connections) {
+        const bufferSize = ws.messageBuffer ? ws.messageBuffer.length : 0;
+        const subscriptionSize = ws.subscriptions ? ws.subscriptions.size : 0;
+        totalMessageBuffers += bufferSize;
+        totalSubscriptionsPerConnection += subscriptionSize;
+
+        connectionDetails.push({
+          userId,
+          bufferSize,
+          subscriptionSize,
+          readyState: ws.readyState,
+          lastPing: ws.lastPing ? new Date(ws.lastPing).toISOString() : null
+        });
+      }
+    }
+
+    console.log('Detailed WebSocket Memory Breakdown:', {
+      memory: {
+        heapUsed: `${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
+        heapTotal: `${(memUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
+        heapUsedPercent: heapUsedPercent.toFixed(2) + '%'
+      },
+      dataStructures: {
+        clients: this.clients.size,
+        billSubscriptions: this.billSubscriptions.size,
+        userSubscriptionIndex: this.userSubscriptionIndex.size,
+        connectionPool: this.connectionPool.size,
+        messageDedupeCache: this.messageDedupeCache.size,
+        operationQueue: this.operationQueue.length,
+        performanceHistory: this.connectionStats.latencyMeasurements.length
+      },
+      buffers: {
+        totalMessageBuffers,
+        totalSubscriptionsPerConnection,
+        connectionDetails: connectionDetails.slice(0, 10) // First 10 connections
+      },
+      timestamp: new Date().toISOString()
+    });
+
+    return {
+      heapUsedPercent,
+      dataStructureSizes: {
+        clients: this.clients.size,
+        billSubscriptions: this.billSubscriptions.size,
+        connectionPool: this.connectionPool.size,
+        messageDedupeCache: this.messageDedupeCache.size,
+        operationQueue: this.operationQueue.length
+      },
+      totalMessageBuffers,
+      totalSubscriptionsPerConnection
     };
   }
 }

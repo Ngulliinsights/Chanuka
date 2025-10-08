@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import { databaseService } from "../services/database-service.js";
 import { cacheService } from "../infrastructure/cache/cache-service.js";
+import { demoDataService } from "../infrastructure/demo-data.js";
 import * as schema from "../../shared/schema.js";
 
 // Search index health status
@@ -86,6 +87,12 @@ export class SearchIndexManager {
    * Update search index for a specific bill
    */
   async updateBillSearchIndex(billId: number): Promise<boolean> {
+    // Check if system is in demo mode
+    if (demoDataService.isDemoMode()) {
+      console.log(`🔄 Demo mode: Skipping search index update for bill ${billId}`);
+      return true; // Demo data doesn't need index updates
+    }
+
     try {
       const result = await databaseService.withFallback(
         async () => {
@@ -135,6 +142,20 @@ export class SearchIndexManager {
     const errorDetails: string[] = [];
 
     console.log('🔄 Starting full search index rebuild...');
+
+    // Check if system is in demo mode
+    if (demoDataService.isDemoMode()) {
+      console.log('🔄 Demo mode detected - search index rebuild not needed for demo data');
+      const demoBills = demoDataService.getBills();
+      return {
+        success: true,
+        billsProcessed: demoBills.length,
+        billsUpdated: 0, // Demo data doesn't need updating
+        errors: 0,
+        duration: Date.now() - startTime,
+        errorDetails: undefined
+      };
+    }
 
     try {
       const result = await databaseService.withFallback(
@@ -215,18 +236,67 @@ export class SearchIndexManager {
    * Get comprehensive search index health status
    */
   async getIndexHealth(): Promise<SearchIndexHealth> {
+    // Check if system is in demo mode first
+    if (demoDataService.isDemoMode()) {
+      console.log('🔍 Search index health check: System in demo mode, returning demo health status');
+      const demoBills = demoDataService.getBills();
+      return {
+        status: 'healthy',
+        totalBills: demoBills.length,
+        indexedBills: demoBills.length, // All demo bills are considered indexed
+        missingIndexes: 0,
+        indexCoverage: 100, // Demo data is fully indexed
+        lastIndexUpdate: new Date(),
+        performanceMetrics: {
+          averageSearchTime: 50, // Mock performance metrics
+          indexSize: 1024 * 1024, // 1MB mock size
+          fragmentationLevel: 5 // Low fragmentation
+        },
+        recommendations: ['System operating in demo mode with sample data']
+      };
+    }
+
     try {
       const result = await databaseService.withFallback(
         async () => {
           // Get basic index statistics
-          const [indexStats] = await this.db.execute(sql`
-            SELECT 
+          console.log('🔍 Executing search index health query...');
+          const executeResult = await this.db.execute(sql`
+            SELECT
               COUNT(*) as total_bills,
               COUNT(search_vector) as indexed_bills,
               COUNT(*) - COUNT(search_vector) as missing_indexes,
               MAX(updated_at) as last_update
             FROM bills
           `);
+          console.log('🔍 Execute result type:', typeof executeResult, 'isArray:', Array.isArray(executeResult), 'length:', executeResult?.length);
+
+          if (!Array.isArray(executeResult)) {
+            console.error('❌ Database execute returned non-array result:', executeResult);
+            throw new Error(`Database execute returned non-array result: ${typeof executeResult}`);
+          }
+
+          if (executeResult.length === 0) {
+            console.warn('⚠️ Database query returned no rows');
+            // Return default values for empty result
+            return {
+              status: 'offline' as const,
+              totalBills: 0,
+              indexedBills: 0,
+              missingIndexes: 0,
+              indexCoverage: 0,
+              lastIndexUpdate: null,
+              performanceMetrics: {
+                averageSearchTime: 0,
+                indexSize: 0,
+                fragmentationLevel: 0
+              },
+              recommendations: ['Database query returned no results']
+            };
+          }
+
+          const [indexStats] = executeResult;
+          console.log('🔍 Index stats:', indexStats);
 
           const totalBills = parseInt(indexStats.total_bills as string);
           const indexedBills = parseInt(indexStats.indexed_bills as string);
@@ -355,6 +425,16 @@ export class SearchIndexManager {
     const startTime = Date.now();
     const operations: string[] = [];
 
+    // Check if system is in demo mode
+    if (demoDataService.isDemoMode()) {
+      console.log('🔄 Demo mode: Skipping search index optimization');
+      return {
+        success: true,
+        operations: ['Demo mode - no optimization needed'],
+        duration: Date.now() - startTime
+      };
+    }
+
     try {
       await databaseService.withFallback(
         async () => {
@@ -409,6 +489,21 @@ export class SearchIndexManager {
     lastVacuum: Date | null;
     lastAnalyze: Date | null;
   }> {
+    // Check if system is in demo mode
+    if (demoDataService.isDemoMode()) {
+      console.log('🔍 Search index statistics: System in demo mode, returning demo statistics');
+      const demoBills = demoDataService.getBills();
+      return {
+        indexSize: '1.0 MB',
+        indexSizeBytes: 1024 * 1024,
+        totalRows: demoBills.length,
+        indexedRows: demoBills.length,
+        indexEfficiency: 100,
+        lastVacuum: new Date(),
+        lastAnalyze: new Date()
+      };
+    }
+
     try {
       const result = await databaseService.withFallback(
         async () => {
@@ -469,11 +564,17 @@ export class SearchIndexManager {
    * Validate that search index setup is correct
    */
   private async validateSearchIndexSetup(): Promise<void> {
+    // Skip validation in demo mode
+    if (demoDataService.isDemoMode()) {
+      console.log('🔄 Demo mode: Skipping search index setup validation');
+      return;
+    }
+
     try {
       // Check if search_vector column exists
       const columnCheckResult = await this.db.execute(sql`
-        SELECT column_name 
-        FROM information_schema.columns 
+        SELECT column_name
+        FROM information_schema.columns
         WHERE table_name = 'bills' AND column_name = 'search_vector'
       `);
 
@@ -483,23 +584,23 @@ export class SearchIndexManager {
 
       // Check if GIN index exists
       const indexCheckResult = await this.db.execute(sql`
-        SELECT indexname 
-        FROM pg_indexes 
+        SELECT indexname
+        FROM pg_indexes
         WHERE tablename = 'bills' AND indexname = 'idx_bills_search_vector'
       `);
 
       if (!indexCheckResult || indexCheckResult.length === 0) {
         console.warn('⚠️ GIN index for search_vector not found, creating...');
         await this.db.execute(sql`
-          CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_bills_search_vector 
+          CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_bills_search_vector
           ON bills USING GIN(search_vector)
         `);
       }
 
       // Check if trigger exists
       const triggerCheckResult = await this.db.execute(sql`
-        SELECT trigger_name 
-        FROM information_schema.triggers 
+        SELECT trigger_name
+        FROM information_schema.triggers
         WHERE event_object_table = 'bills' AND trigger_name = 'bills_search_vector_update'
       `);
 
@@ -515,27 +616,72 @@ export class SearchIndexManager {
   }
 
   /**
-   * Start periodic health monitoring
+    * Start periodic health monitoring
+    */
+    private startHealthMonitoring(): void {
+      // Check health every 30 minutes
+      this.healthMonitoringInterval = setInterval(async () => {
+        try {
+          const health = await this.getIndexHealth();
+
+          // Only log warnings and auto-rebuild for database mode
+          if (!demoDataService.isDemoMode()) {
+            if (health.status === 'critical' || health.status === 'offline') {
+              console.warn(`⚠️ Search index health is ${health.status}:`, health.recommendations);
+            }
+
+            // Auto-rebuild if too many missing indexes
+            if (health.missingIndexes > 100) {
+              console.log('🔄 Auto-triggering index rebuild due to many missing indexes');
+              await this.rebuildAllIndexes();
+            }
+          }
+
+          // Perform memory cleanup
+          this.performMemoryCleanup();
+
+          // Log memory usage for search index manager
+          const memUsage = process.memoryUsage();
+          const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
+
+          console.log('Search Index Manager Memory Analysis:', {
+            performanceHistorySize: this.performanceHistory.length,
+            indexUpdateQueueSize: this.indexUpdateQueue.size,
+            isProcessingQueue: this.isProcessingQueue,
+            heapUsedPercent: heapUsedPercent.toFixed(2) + '%',
+            heapUsed: `${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
+            timestamp: new Date().toISOString()
+          });
+        } catch (error) {
+          console.error('Error during health monitoring:', error);
+        }
+      }, 30 * 60 * 1000); // 30 minutes
+    }
+
+  /**
+   * Perform memory cleanup for search index manager
    */
-  private startHealthMonitoring(): void {
-    // Check health every 30 minutes
-    this.healthMonitoringInterval = setInterval(async () => {
-      try {
-        const health = await this.getIndexHealth();
+  private performMemoryCleanup(): void {
+    const now = Date.now();
+    const oneHourAgo = now - (60 * 60 * 1000); // 1 hour ago
 
-        if (health.status === 'critical' || health.status === 'offline') {
-          console.warn(`⚠️ Search index health is ${health.status}:`, health.recommendations);
-        }
+    // Clean up old performance history entries
+    const perfHistoryBefore = this.performanceHistory.length;
+    this.performanceHistory = this.performanceHistory.filter(entry => {
+      // Keep entries from the last hour, or the most recent 500 entries
+      return entry.timestamp.getTime() > oneHourAgo ||
+             this.performanceHistory.indexOf(entry) >= Math.max(0, this.performanceHistory.length - 500);
+    });
 
-        // Auto-rebuild if too many missing indexes
-        if (health.missingIndexes > 100) {
-          console.log('🔄 Auto-triggering index rebuild due to many missing indexes');
-          await this.rebuildAllIndexes();
-        }
-      } catch (error) {
-        console.error('Error during health monitoring:', error);
-      }
-    }, 30 * 60 * 1000); // 30 minutes
+    const cleanedItems = perfHistoryBefore - this.performanceHistory.length;
+
+    if (cleanedItems > 0) {
+      console.log('🧹 Search Index Manager Memory Cleanup:', {
+        performanceHistoryCleaned: cleanedItems,
+        remainingHistorySize: this.performanceHistory.length,
+        timestamp: new Date().toISOString()
+      });
+    }
   }
 
   /**

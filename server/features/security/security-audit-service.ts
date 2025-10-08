@@ -1,22 +1,22 @@
 import { Request } from 'express';
 import { database as db } from '../../../shared/database/connection.js';
 import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
+import { eq, and, or, gte } from 'drizzle-orm';
 
 // Security audit log table
 const securityAuditLogs = pgTable("security_audit_logs", {
   id: serial("id").primaryKey(),
   eventType: text("event_type").notNull(), // login, logout, password_change, data_access, etc.
-  severity: text("severity").notNull(), // low, medium, high, critical
   userId: text("user_id"),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
   resource: text("resource"), // what was accessed
   action: text("action"), // what action was performed
-  success: boolean("success").notNull(),
+  result: text("result").notNull(), // outcome of the action
+  severity: text("severity").default('info').notNull(), // low, medium, high, critical
   details: jsonb("details"), // additional context
-  riskScore: integer("risk_score").default(0), // 0-100 risk assessment
   sessionId: text("session_id"),
-  timestamp: timestamp("timestamp").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Security incidents table
@@ -46,6 +46,7 @@ export interface SecurityEvent {
   userAgent?: string;
   resource?: string;
   action?: string;
+  result: string;
   success: boolean;
   details?: Record<string, any>;
   riskScore?: number;
@@ -84,16 +85,24 @@ export class SecurityAuditService {
   };
 
   /**
-   * Log security events with automatic risk assessment
-   */
-  async logSecurityEvent(event: SecurityEvent): Promise<void> {
-    try {
-      const riskScore = this.calculateRiskScore(event);
-      
-      await db.insert(securityAuditLogs).values({
-        ...event,
-        riskScore,
-      });
+    * Log security events with automatic risk assessment
+    */
+   async logSecurityEvent(event: SecurityEvent): Promise<void> {
+     try {
+       const riskScore = this.calculateRiskScore(event);
+
+       await db.insert(securityAuditLogs).values({
+         eventType: event.eventType,
+         userId: event.userId,
+         ipAddress: event.ipAddress,
+         userAgent: event.userAgent,
+         resource: event.resource,
+         action: event.action,
+         result: event.result,
+         severity: event.severity,
+         details: event.details,
+         sessionId: event.sessionId,
+       });
 
       // Check for suspicious patterns
       await this.detectSuspiciousActivity(event);
@@ -110,77 +119,80 @@ export class SecurityAuditService {
   }
 
   /**
-   * Log authentication events
-   */
-  async logAuthEvent(
-    eventType: 'login_attempt' | 'login_success' | 'login_failure' | 'logout' | 'password_change',
-    req: Request | undefined,
-    userId?: string,
-    success: boolean = true,
-    details?: Record<string, any>
-  ): Promise<void> {
-    await this.logSecurityEvent({
-      eventType,
-      severity: success ? 'low' : 'medium',
-      userId,
-      ipAddress: this.getClientIP(req),
-      userAgent: req?.get?.('User-Agent') || 'unknown',
-      success,
-      details,
-      sessionId: (req as any)?.sessionID || 'unknown',
-    });
-  }
+    * Log authentication events
+    */
+   async logAuthEvent(
+     eventType: 'login_attempt' | 'login_success' | 'login_failure' | 'logout' | 'password_change',
+     req: Request | undefined,
+     userId?: string,
+     success: boolean = true,
+     details?: Record<string, any>
+   ): Promise<void> {
+     await this.logSecurityEvent({
+       eventType,
+       severity: success ? 'low' : 'medium',
+       userId,
+       ipAddress: this.getClientIP(req),
+       userAgent: req?.get?.('User-Agent') || 'unknown',
+       result: success ? 'success' : 'failure',
+       success,
+       details,
+       sessionId: (req as any)?.sessionID || 'unknown',
+     });
+   }
 
   /**
-   * Log data access events
-   */
-  async logDataAccess(
-    resource: string,
-    action: string,
-    req: Request | undefined,
-    userId?: string,
-    recordCount?: number,
-    success: boolean = true
-  ): Promise<void> {
-    const severity = this.determineDataAccessSeverity(action, recordCount);
-    
-    await this.logSecurityEvent({
-      eventType: 'data_access',
-      severity,
-      userId,
-      ipAddress: this.getClientIP(req),
-      userAgent: req?.get?.('User-Agent') || 'unknown',
-      resource,
-      action,
-      success,
-      details: { recordCount },
-      sessionId: (req as any)?.sessionID || 'unknown',
-    });
-  }
+    * Log data access events
+    */
+   async logDataAccess(
+     resource: string,
+     action: string,
+     req: Request | undefined,
+     userId?: string,
+     recordCount?: number,
+     success: boolean = true
+   ): Promise<void> {
+     const severity = this.determineDataAccessSeverity(action, recordCount);
+
+     await this.logSecurityEvent({
+       eventType: 'data_access',
+       severity,
+       userId,
+       ipAddress: this.getClientIP(req),
+       userAgent: req?.get?.('User-Agent') || 'unknown',
+       resource,
+       action,
+       result: success ? 'allowed' : 'denied',
+       success,
+       details: { recordCount },
+       sessionId: (req as any)?.sessionID || 'unknown',
+     });
+   }
 
   /**
-   * Log administrative actions
-   */
-  async logAdminAction(
-    action: string,
-    req: Request | undefined,
-    userId: string,
-    targetResource?: string,
-    details?: Record<string, any>
-  ): Promise<void> {
-    await this.logSecurityEvent({
-      eventType: 'admin_action',
-      severity: 'high',
-      userId,
-      ipAddress: this.getClientIP(req),
-      userAgent: req?.get?.('User-Agent') || 'unknown',
-      resource: targetResource,
-      action,
-      success: true,
-      details,
-      sessionId: (req as any)?.sessionID || 'unknown',
-    });
-  }
+    * Log administrative actions
+    */
+   async logAdminAction(
+     action: string,
+     req: Request | undefined,
+     userId: string,
+     targetResource?: string,
+     details?: Record<string, any>
+   ): Promise<void> {
+     await this.logSecurityEvent({
+       eventType: 'admin_action',
+       severity: 'high',
+       userId,
+       ipAddress: this.getClientIP(req),
+       userAgent: req?.get?.('User-Agent') || 'unknown',
+       resource: targetResource,
+       action,
+       result: 'executed',
+       success: true,
+       details,
+       sessionId: (req as any)?.sessionID || 'unknown',
+     });
+   }
 
   /**
    * Create security incident
@@ -325,8 +337,11 @@ export class SecurityAuditService {
         .select({ count: securityAuditLogs.id })
         .from(securityAuditLogs)
         .where(
-          // Note: This is a simplified query - in production, use proper SQL conditions
-          // sql`event_type = 'login_failure' AND (user_id = ${userId} OR ip_address = ${ipAddress}) AND timestamp >= ${since}`
+          and(
+            eq(securityAuditLogs.eventType, 'login_failure'),
+            or(eq(securityAuditLogs.userId, userId), eq(securityAuditLogs.ipAddress, ipAddress)),
+            gte(securityAuditLogs.createdAt, since)
+          )
         );
       
       return result.length;
@@ -346,7 +361,11 @@ export class SecurityAuditService {
         .select()
         .from(securityAuditLogs)
         .where(
-          // sql`event_type = 'data_access' AND user_id = ${userId} AND timestamp >= ${since}`
+          and(
+            eq(securityAuditLogs.eventType, 'data_access'),
+            eq(securityAuditLogs.userId, userId),
+            gte(securityAuditLogs.createdAt, since)
+          )
         );
       
       return result.reduce((total, log) => {
@@ -414,7 +433,7 @@ export class SecurityAuditService {
         summary: {
           totalEvents: events.length,
           totalIncidents: incidents.length,
-          highRiskEvents: events.filter(e => (e.riskScore || 0) >= 40).length,
+          highRiskEvents: events.filter(e => e.severity === 'high' || e.severity === 'critical').length,
           criticalIncidents: incidents.filter(i => i.severity === 'critical').length,
         },
         events: events.slice(0, 50), // Latest 50 events

@@ -83,6 +83,7 @@ export class SecurityMonitoringMiddleware {
             userAgent: (req as any).securityContext.userAgent,
             resource: req.path,
             action: req.method,
+            result: 'processed',
             success: true,
             details: {
               requestId,
@@ -107,6 +108,7 @@ export class SecurityMonitoringMiddleware {
             userAgent: req.get('User-Agent'),
             resource: req.path,
             action: req.method,
+            result: 'error',
             success: false,
             details: {
               error: (error as Error).message,
@@ -159,6 +161,7 @@ export class SecurityMonitoringMiddleware {
             userAgent: securityContext.userAgent,
             resource: req.path,
             action: req.method,
+            result: statusCode < 400 ? 'success' : 'error',
             success: statusCode < 400,
             details: {
               statusCode,
@@ -342,27 +345,28 @@ export class SecurityMonitoringMiddleware {
   }
 
   /**
-   * Handle suspicious patterns
-   */
-  private async handleSuspiciousPattern(req: Request, patternType: string): Promise<void> {
-    const ipAddress = this.getClientIP(req);
-    
-    await securityAuditService.logSecurityEvent({
-      eventType: 'suspicious_pattern',
-      severity: 'medium',
-      ipAddress,
-      userAgent: req.get('User-Agent'),
-      resource: req.path,
-      action: req.method,
-      success: false,
-      details: {
-        patternType,
-        statusCode: (req as any).res?.statusCode,
-        timestamp: new Date()
-      },
-      userId: (req as any).user?.id
-    });
-  }
+    * Handle suspicious patterns
+    */
+   private async handleSuspiciousPattern(req: Request, patternType: string): Promise<void> {
+     const ipAddress = this.getClientIP(req);
+
+     await securityAuditService.logSecurityEvent({
+       eventType: 'suspicious_pattern',
+       severity: 'medium',
+       ipAddress,
+       userAgent: req.get('User-Agent'),
+       resource: req.path,
+       action: req.method,
+       result: 'detected',
+       success: false,
+       details: {
+         patternType,
+         statusCode: (req as any).res?.statusCode,
+         timestamp: new Date()
+       },
+       userId: (req as any).user?.id
+     });
+   }
 
   /**
    * Utility methods

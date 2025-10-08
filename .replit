@@ -225,3 +225,6 @@ args = "npm run db:migrate || echo \"Database migration failed - continuing with
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run dev"
+
+[agent]
+expertMode = true

@@ -54,16 +54,16 @@ const complianceChecks = pgTable("compliance_checks", {
 const securityAuditLogs = pgTable("security_audit_logs", {
   id: serial("id").primaryKey(),
   eventType: text("event_type").notNull(),
-  severity: text("severity").notNull(),
   userId: text("user_id"),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
   resource: text("resource"),
   action: text("action"),
-  success: boolean("success").notNull(),
+  result: text("result").notNull(),
+  severity: text("severity").default('info').notNull(),
   details: jsonb("details"),
-  riskScore: integer("risk_score"),
-  timestamp: timestamp("timestamp").defaultNow(),
+  sessionId: text("session_id"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Type definitions remain the same as original
@@ -295,6 +295,7 @@ export class SecurityMonitoringService {
         userAgent: requestMetadata.userAgent,
         resource: requestMetadata.path,
         action: requestMetadata.method,
+        result: threatResult.isBlocked ? 'blocked' : 'allowed',
         success: !threatResult.isBlocked,
         details: {
           threatLevel: threatResult.threatLevel,
@@ -302,7 +303,6 @@ export class SecurityMonitoringService {
           detectedThreats: threatResult.detectedThreats.length,
           processingTime: Date.now() - startTime
         },
-        riskScore: threatResult.riskScore,
         userId: requestMetadata.userId
       };
 
@@ -777,7 +777,7 @@ export class SecurityMonitoringService {
     const [eventsResult, alertsResult] = await Promise.all([
       db.select({ count: count() })
         .from(securityAuditLogs)
-        .where(gte(securityAuditLogs.timestamp, oneWeekAgo)),
+        .where(gte(securityAuditLogs.createdAt, oneWeekAgo)),
       db.select({ count: count() })
         .from(securityAlerts)
         .where(and(
@@ -1213,8 +1213,8 @@ export class SecurityMonitoringService {
         .from(securityAuditLogs)
         .where(
           and(
-            gte(securityAuditLogs.timestamp, startDate),
-            sql`${securityAuditLogs.timestamp} <= ${endDate}`,
+            gte(securityAuditLogs.createdAt, startDate),
+            sql`${securityAuditLogs.createdAt} <= ${endDate}`,
             or(
               eq(securityAuditLogs.eventType, 'user_created'),
               eq(securityAuditLogs.eventType, 'user_deleted'),
@@ -1224,13 +1224,13 @@ export class SecurityMonitoringService {
             )
           )
         )
-        .orderBy(desc(securityAuditLogs.timestamp))
+        .orderBy(desc(securityAuditLogs.createdAt))
         .limit(100);
       
       return accessEvents.map(event => ({
         eventType: event.eventType,
         userId: event.userId,
-        timestamp: event.timestamp,
+        timestamp: event.createdAt,
         details: event.details
       }));
     } catch (error) {
