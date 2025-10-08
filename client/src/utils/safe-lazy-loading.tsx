@@ -10,7 +10,7 @@ import { routePreloader } from '@/utils/route-preloading';
 
 // Enhanced safe lazy loading function with better type inference and preloading
 export function createSafeLazyPage<P extends object = {}>(
-  importFn: () => Promise<{ default: ComponentType<P> }>,
+  path: string,
   pageName: string,
   options: {
     enablePreloading?: boolean;
@@ -19,7 +19,8 @@ export function createSafeLazyPage<P extends object = {}>(
   } = {}
 ): LazyExoticComponent<ComponentType<P>> {
   const { enablePreloading = true, preloadPriority = 'medium', connectionAware = true } = options;
-  
+
+  const importFn = (() => /* @vite-ignore */ import(path as any)) as () => Promise<{ default: ComponentType<P> }>;
   const component = createSafeLazyComponent(importFn, pageName);
   
   // Register component for preloading if enabled
@@ -39,22 +40,23 @@ export function createSafeLazyPage<P extends object = {}>(
 
 // Type-safe helper for extracting named exports as default exports
 export function createNamedExportLazy<P extends object = {}>(
-  moduleImport: () => Promise<Record<string, any>>,
+  path: string,
   exportName: string,
   componentName: string
 ): LazyExoticComponent<ComponentType<P>> {
   // This wrapper ensures proper type inference by explicitly typing the return
+  const moduleImport = (() => /* @vite-ignore */ import(path as any)) as () => Promise<Record<string, any>>;
   const typedImport = async (): Promise<{ default: ComponentType<P> }> => {
     const module = await moduleImport();
     const Component = module[exportName] as ComponentType<P>;
-    
+
     if (!Component) {
       throw new Error(`Export '${exportName}' not found in module for component '${componentName}'`);
     }
-    
+
     return { default: Component };
   };
-  
+
   return createSafeLazyComponent(typedImport, componentName);
 }
 
@@ -76,108 +78,108 @@ export const SafeLazyWrapper: React.FC<SafeLazyWrapperProps> = ({
 // Pre-configured safe lazy components for common pages with optimized preloading
 export const SafeLazyPages = {
   // High priority pages - immediate preloading
-  HomePage: createSafeLazyPage(() => import('@/pages/home'), 'HomePage', { 
-    preloadPriority: 'high', 
-    enablePreloading: true 
+  HomePage: createSafeLazyPage('@/pages/home', 'HomePage', {
+    preloadPriority: 'high',
+    enablePreloading: true
   }),
-  BillsDashboard: createSafeLazyPage(() => import('@/pages/bills-dashboard'), 'BillsDashboard', { 
-    preloadPriority: 'high', 
-    enablePreloading: true 
+  BillsDashboard: createSafeLazyPage('@/pages/bills-dashboard', 'BillsDashboard', {
+    preloadPriority: 'high',
+    enablePreloading: true
   }),
-  Dashboard: createSafeLazyPage(() => import('@/pages/dashboard'), 'Dashboard', { 
-    preloadPriority: 'high', 
-    enablePreloading: true 
+  Dashboard: createSafeLazyPage('@/pages/dashboard', 'Dashboard', {
+    preloadPriority: 'high',
+    enablePreloading: true
   }),
-  
+
   // Medium priority pages - hover/idle preloading
-  BillDetail: createSafeLazyPage(() => import('@/pages/bill-detail'), 'BillDetail', { 
-    preloadPriority: 'medium', 
-    enablePreloading: true 
+  BillDetail: createSafeLazyPage('@/pages/bill-detail', 'BillDetail', {
+    preloadPriority: 'medium',
+    enablePreloading: true
   }),
-  BillAnalysis: createSafeLazyPage(() => import('@/pages/bill-analysis'), 'BillAnalysis', { 
-    preloadPriority: 'medium', 
-    enablePreloading: true 
+  BillAnalysis: createSafeLazyPage('@/pages/bill-analysis', 'BillAnalysis', {
+    preloadPriority: 'medium',
+    enablePreloading: true
   }),
-  CommunityInput: createSafeLazyPage(() => import('@/pages/community-input'), 'CommunityInput', { 
-    preloadPriority: 'medium', 
-    enablePreloading: true 
+  CommunityInput: createSafeLazyPage('@/pages/community-input', 'CommunityInput', {
+    preloadPriority: 'medium',
+    enablePreloading: true
   }),
-  ExpertVerification: createSafeLazyPage(() => import('@/pages/expert-verification'), 'ExpertVerification', { 
-    preloadPriority: 'medium', 
-    enablePreloading: true 
+  ExpertVerification: createSafeLazyPage('@/pages/expert-verification', 'ExpertVerification', {
+    preloadPriority: 'medium',
+    enablePreloading: true
   }),
-  
+
   // Low priority pages - on-demand loading
-  SearchPage: createSafeLazyPage(() => import('@/pages/search'), 'SearchPage', { 
-    preloadPriority: 'low', 
-    enablePreloading: true 
+  SearchPage: createSafeLazyPage('@/pages/search', 'SearchPage', {
+    preloadPriority: 'low',
+    enablePreloading: true
   }),
-  AuthPage: createSafeLazyPage(() => import('@/pages/auth-page'), 'AuthPage', { 
-    preloadPriority: 'low', 
-    enablePreloading: false 
+  AuthPage: createSafeLazyPage('@/pages/auth-page', 'AuthPage', {
+    preloadPriority: 'low',
+    enablePreloading: false
   }),
-  Profile: createSafeLazyPage(() => import('@/pages/profile'), 'Profile', { 
-    preloadPriority: 'low', 
-    enablePreloading: false 
+  Profile: createSafeLazyPage('@/pages/profile', 'Profile', {
+    preloadPriority: 'low',
+    enablePreloading: false
   }),
-  UserProfilePage: createSafeLazyPage(() => import('@/pages/user-profile'), 'UserProfilePage', { 
-    preloadPriority: 'low', 
-    enablePreloading: false 
+  UserProfilePage: createSafeLazyPage('@/pages/user-profile', 'UserProfilePage', {
+    preloadPriority: 'low',
+    enablePreloading: false
   }),
-  Onboarding: createSafeLazyPage(() => import('@/pages/onboarding'), 'Onboarding', { 
-    preloadPriority: 'low', 
-    enablePreloading: false 
+  Onboarding: createSafeLazyPage('@/pages/onboarding', 'Onboarding', {
+    preloadPriority: 'low',
+    enablePreloading: false
   }),
-  
+
   // Admin pages - minimal preloading
-  AdminPage: createSafeLazyPage(() => import('@/pages/admin'), 'AdminPage', { 
-    preloadPriority: 'low', 
-    enablePreloading: false 
+  AdminPage: createSafeLazyPage('@/pages/admin', 'AdminPage', {
+    preloadPriority: 'low',
+    enablePreloading: false
   }),
-  DatabaseManager: createSafeLazyPage(() => import('@/pages/database-manager'), 'DatabaseManager', { 
-    preloadPriority: 'low', 
-    enablePreloading: false 
+  DatabaseManager: createSafeLazyPage('@/pages/database-manager', 'DatabaseManager', {
+    preloadPriority: 'low',
+    enablePreloading: false
   }),
-  
+
   // Specialized pages
-  BillSponsorshipAnalysis: createSafeLazyPage(() => import('@/pages/bill-sponsorship-analysis'), 'BillSponsorshipAnalysis', { 
-    preloadPriority: 'medium', 
-    enablePreloading: true 
+  BillSponsorshipAnalysis: createSafeLazyPage('@/pages/bill-sponsorship-analysis', 'BillSponsorshipAnalysis', {
+    preloadPriority: 'medium',
+    enablePreloading: true
   }),
-  CommentsPage: createSafeLazyPage(() => import('@/pages/comments'), 'CommentsPage', { 
-    preloadPriority: 'medium', 
-    enablePreloading: true 
+  CommentsPage: createSafeLazyPage('@/pages/comments', 'CommentsPage', {
+    preloadPriority: 'medium',
+    enablePreloading: true
   }),
-  NotFound: createSafeLazyPage(() => import('@/pages/not-found'), 'NotFound', { 
-    preloadPriority: 'low', 
-    enablePreloading: false 
+  NotFound: createSafeLazyPage('@/pages/not-found', 'NotFound', {
+    preloadPriority: 'low',
+    enablePreloading: false
   }),
 } as const;
 
 // Safe lazy components for sponsorship analysis sub-pages - now with proper typing
 export const SafeLazySponsorshipPages = {
   SponsorshipOverviewWrapper: createNamedExportLazy(
-    () => import('@/pages/sponsorship-wrappers'),
+    '@/pages/sponsorship-wrappers',
     'SponsorshipOverviewWrapper',
     'SponsorshipOverviewWrapper'
   ),
   PrimarySponsorWrapper: createNamedExportLazy(
-    () => import('@/pages/sponsorship-wrappers'),
+    '@/pages/sponsorship-wrappers',
     'PrimarySponsorWrapper',
     'PrimarySponsorWrapper'
   ),
   CoSponsorsWrapper: createNamedExportLazy(
-    () => import('@/pages/sponsorship-wrappers'),
+    '@/pages/sponsorship-wrappers',
     'CoSponsorsWrapper',
     'CoSponsorsWrapper'
   ),
   FinancialNetworkWrapper: createNamedExportLazy(
-    () => import('@/pages/sponsorship-wrappers'),
+    '@/pages/sponsorship-wrappers',
     'FinancialNetworkWrapper',
     'FinancialNetworkWrapper'
   ),
   MethodologyWrapper: createNamedExportLazy(
-    () => import('@/pages/sponsorship-wrappers'),
+    '@/pages/sponsorship-wrappers',
     'MethodologyWrapper',
     'MethodologyWrapper'
   ),
@@ -267,12 +269,12 @@ export function createLazyComponentBatch<T extends Record<string, string>>(
   const { enableRetry = false, ...retryOptions } = options;
   
   return Object.entries(importMap).reduce((batch, [componentName, importPath]) => {
-    const importFn = () => import(importPath);
-    
+    const importFn = () => /* @vite-ignore */ import(importPath);
+
     const lazyComponent = enableRetry
       ? createRetryableLazyComponent(importFn, componentName, retryOptions)
-      : createSafeLazyPage(importFn, componentName);
-    
+      : createSafeLazyPage(importPath, componentName);
+
     batch[componentName as keyof T] = lazyComponent;
     return batch;
   }, {} as Record<keyof T, LazyExoticComponent<ComponentType<{}>>>);

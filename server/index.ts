@@ -78,7 +78,7 @@ app.use(helmet({
         ? ["'self'", "'unsafe-eval'", "'unsafe-inline'"] // Allow eval in development for HMR
         : ["'self'"],
       connectSrc: isDevelopment
-        ? ["'self'", "ws:", "wss:", `ws://localhost:${PORT + 1}`] // Allow WebSocket for HMR
+        ? ["'self'", "ws:", "wss:", `ws://localhost:${PORT}`, `ws://localhost:${PORT + 1}`] // Allow WebSocket for app and HMR
         : ["'self'"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,

@@ -111,6 +111,7 @@ export class WebSocketClient {
 
       try {
         const wsUrl = `${this.baseUrl}/ws?token=${encodeURIComponent(token)}`;
+        console.log('WebSocket attempting to connect to:', wsUrl);
         this.ws = new WebSocket(wsUrl);
 
         // Optimization: Add connection timeout to prevent hanging

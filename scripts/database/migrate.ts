@@ -220,6 +220,19 @@ async function executeMigration(pool, filePath, filename) {
 
 async function main() {
   console.log('Starting database migration process...');
+
+  // Diagnostic logging for SSL authentication debugging
+  console.log('🔍 Migration Script (pg.Pool) Diagnostics:');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+  console.log('DATABASE_URL starts with postgres:', process.env.DATABASE_URL?.startsWith('postgres'));
+  console.log('DATABASE_URL contains sslmode:', process.env.DATABASE_URL?.includes('sslmode'));
+  if (process.env.DATABASE_URL?.includes('sslmode')) {
+    const sslmode = process.env.DATABASE_URL.match(/sslmode=([^&\s]+)/)?.[1];
+    console.log('SSL mode in URL:', sslmode);
+  }
+  console.log('SSL config will be:', process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false);
+
   let pool = null;
 
   try {
