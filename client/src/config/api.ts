@@ -50,7 +50,7 @@ const isDevelopment = (): boolean => {
  * automatically route API requests to the correct backend port.
  */
 const isDevelopmentPort = (origin: string): boolean => {
-  const devPorts = [':5173', ':5174', ':3000', ':8080', ':8000'];
+  const devPorts = [':5173', ':5174', ':3000', ':8080', ':8000', ':4201'];
   return devPorts.some(port => origin.includes(port));
 };
 

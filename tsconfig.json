@@ -21,7 +21,6 @@
     "noUnusedParameters": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "baseUrl": ".",
     "types": ["node", "vite/client"],
     "paths": {
       "@db": ["./db/index.ts"],

@@ -78,7 +78,7 @@ app.use(helmet({
         ? ["'self'", "'unsafe-eval'", "'unsafe-inline'"] // Allow eval in development for HMR
         : ["'self'"],
       connectSrc: isDevelopment
-        ? ["'self'", "ws:", "wss:", `ws://localhost:${PORT}`, `ws://localhost:${PORT + 1}`] // Allow WebSocket for app and HMR
+        ? ["'self'", "ws:", "wss:", `ws://localhost:${PORT}`, `ws://localhost:${PORT + 1}`, `http://localhost:${PORT}`] // Allow WebSocket and HTTP for app and HMR
         : ["'self'"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
@@ -241,6 +241,61 @@ app.get('/api/frontend-health', (req, res) => {
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-CSRF-Token, X-Request-ID');
 
   res.json(healthStatus);
+});
+
+// Memory analysis endpoint for debugging high memory usage
+app.get('/api/debug/memory-analysis', (req, res) => {
+  try {
+    console.log('🔍 Triggering detailed memory analysis...');
+
+    // WebSocket memory analysis
+    const wsAnalysis = webSocketService.forceMemoryAnalysis();
+
+    // Overall memory usage
+    const memUsage = process.memoryUsage();
+    const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
+
+    // Search index manager analysis
+    const searchAnalysis = {
+      performanceHistorySize: searchIndexManager['performanceHistory']?.length || 0,
+      indexUpdateQueueSize: searchIndexManager['indexUpdateQueue']?.size || 0,
+      isProcessingQueue: searchIndexManager['isProcessingQueue'] || false
+    };
+
+    // Security monitoring analysis
+    const securityAnalysis = {
+      alertHandlers: securityMonitoringService['alertHandlers']?.size || 0,
+      complianceChecks: securityMonitoringService['complianceChecks']?.size || 0,
+      activeIntervals: securityMonitoringService['activeTimers']?.intervals?.length || 0,
+      activeTimeouts: securityMonitoringService['activeTimers']?.timeouts?.size || 0
+    };
+
+    const analysis = {
+      timestamp: new Date().toISOString(),
+      overall: {
+        heapUsed: `${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
+        heapTotal: `${(memUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
+        heapUsedPercent: heapUsedPercent.toFixed(2) + '%',
+        external: `${(memUsage.external / 1024 / 1024).toFixed(2)} MB`,
+        rss: `${(memUsage.rss / 1024 / 1024).toFixed(2)} MB`
+      },
+      webSocket: wsAnalysis,
+      searchIndex: searchAnalysis,
+      securityMonitoring: securityAnalysis
+    };
+
+    // Set CORS headers
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Credentials', 'true');
+
+    res.json(analysis);
+  } catch (error) {
+    console.error('Error in memory analysis:', error);
+    res.status(500).json({
+      error: 'Failed to perform memory analysis',
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
 });
 
 // API Routes
