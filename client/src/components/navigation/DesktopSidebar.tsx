@@ -20,7 +20,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useUnifiedNavigation } from '@/hooks/use-unified-navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { useNavigationPerformance } from '@/hooks/use-navigation-performance';
-import { useNavigationAccessibility, useFocusIndicator } from '@/hooks/use-navigation-accessibility';
+import { useNavigationAccessibility } from '@/hooks/use-navigation-accessibility';
 import { NavigationSection } from '@/types/navigation';
 import { RoleBasedNavigation, useRoleBasedNavigation } from './RoleBasedNavigation';
 
