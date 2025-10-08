@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState, useCallback, useRef } from 'react';
 import { useUnifiedNavigation } from '@/hooks/use-unified-navigation';
-import { useNavigationPerformance, useSmoothTransition } from '@/hooks/use-navigation-performance';
+import { useNavigationPerformance } from '@/hooks/use-navigation-performance';
 import { useNavigationAccessibility, useNavigationKeyboardShortcuts } from '@/hooks/use-navigation-accessibility';
 import DesktopSidebar from '@/components/navigation/DesktopSidebar';
 import MobileNavigation from '@/components/layout/mobile-navigation';
@@ -33,7 +33,6 @@ function AppLayout({ children }: AppLayoutProps) {
   } = useNavigationAccessibility();
   
   const { registerShortcut } = useNavigationKeyboardShortcuts();
-  const smoothTransition = useSmoothTransition(300);
   
   // Refs for accessibility and performance
   const layoutRef = useRef<HTMLDivElement>(null);
@@ -81,7 +80,6 @@ function AppLayout({ children }: AppLayoutProps) {
     if (mounted && previousIsMobile !== null && previousIsMobile !== isMobile) {
       // Start performance-optimized transition
       startTransition(300);
-      smoothTransition.start();
       setIsTransitioning(true);
       
       // Announce layout change to screen readers
@@ -108,7 +106,7 @@ function AppLayout({ children }: AppLayoutProps) {
     if (mounted) {
       setPreviousIsMobile(isMobile);
     }
-  }, [isMobile, mounted, previousIsMobile, startTransition, endTransition, enableGPUAcceleration, disableGPUAcceleration, announce, smoothTransition]);
+  }, [isMobile, mounted, previousIsMobile, startTransition, endTransition, enableGPUAcceleration, disableGPUAcceleration, announce]);
 
   // Register keyboard shortcuts for navigation
   useEffect(() => {
