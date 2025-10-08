@@ -102,6 +102,14 @@ Chanuka is a civic technology platform designed to democratize legislative trans
 - **Database**: Local PostgreSQL or Neon development instance
 - **Environment Variables**: `.env` file configuration
 
+### Replit Environment  
+- **PORT Configuration**: **IMPORTANT** - Replit requires the server to bind to port 5000 on 0.0.0.0
+  - Set `PORT=5000` in Replit Secrets or environment variables
+  - The server defaults to port 5000 in code, but environment variables take precedence
+  - Without PORT=5000, the Replit workflow will fail to start
+- **Database Setup**: Run `npx drizzle-kit push` to sync the database schema
+- **Server Binding**: Already configured to bind to 0.0.0.0:5000 for Replit compatibility
+
 ### Production Deployment
 - **Build Process**: Vite build for frontend, ESBuild for backend
 - **Server**: Node.js production server
@@ -116,6 +124,14 @@ Chanuka is a civic technology platform designed to democratize legislative trans
 4. **Progressive Enhancement**: Core functionality works without JavaScript, enhanced with interactive features
 
 ## Changelog
+
+- October 08, 2025: Migrated project to Replit environment
+  - ✓ Updated server to bind to 0.0.0.0:5000 for Replit compatibility
+  - ✓ Fixed frontend import errors (deprecated hooks replaced with useKeyboardFocus)
+  - ✓ Fixed MobileNavigation component to use local state
+  - ✓ Successfully pushed database schema using Drizzle Kit
+  - ✓ Database connection established and working
+  - ⚠️ Requires PORT=5000 to be set in Replit Secrets for workflow to start
 
 - July 05, 2025: Completed systematic storage and schema consistency improvements
   - ✓ Consolidated storage layer to use only legislative transparency schema
