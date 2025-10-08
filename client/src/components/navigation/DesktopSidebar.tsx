@@ -21,6 +21,7 @@ import { useUnifiedNavigation } from '@/hooks/use-unified-navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { useNavigationPerformance } from '@/hooks/use-navigation-performance';
 import { useNavigationAccessibility } from '@/hooks/use-navigation-accessibility';
+import { useKeyboardFocus } from '@/hooks/use-keyboard-focus';
 import { NavigationSection } from '@/types/navigation';
 import { RoleBasedNavigation, useRoleBasedNavigation } from './RoleBasedNavigation';
 
@@ -110,7 +111,7 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ className = '' }) => {
     getAriaLabel 
   } = useNavigationAccessibility();
   
-  const { getFocusClasses } = useFocusIndicator();
+  const { getFocusClasses } = useKeyboardFocus();
   
   // Refs with proper typing for accessibility and performance
   const sidebarRef = useRef<HTMLDivElement>(null);

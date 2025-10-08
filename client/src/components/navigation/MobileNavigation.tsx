@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useEffect, useMemo } from 'react';
+import React, { useCallback, useRef, useEffect, useMemo, useState } from 'react';
 import { 
   Menu, 
   X, 
@@ -22,7 +22,8 @@ import { Link } from 'react-router-dom';
 import { useUnifiedNavigation } from '@/hooks/use-unified-navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { useNavigationPerformance } from '@/hooks/use-navigation-performance';
-import { useNavigationAccessibility, useFocusIndicator } from '@/hooks/use-navigation-accessibility';
+import { useNavigationAccessibility } from '@/hooks/use-navigation-accessibility';
+import { useKeyboardFocus } from '@/hooks/use-keyboard-focus';
 import { NavigationSection } from '@/types/navigation';
 import { RoleBasedNavigation, useRoleBasedNavigation } from './RoleBasedNavigation';
 import { 
@@ -44,8 +45,6 @@ interface NavigationItem {
 
 const MobileNavigation: React.FC = () => {
   const { 
-    mobileMenuOpen, 
-    toggleMobileMenu, 
     currentPath, 
     currentSection,
     userRole,
@@ -53,6 +52,10 @@ const MobileNavigation: React.FC = () => {
   } = useUnifiedNavigation();
   
   const { user, logout } = useAuth();
+  
+  // Local state for mobile menu
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const toggleMobileMenu = () => setMobileMenuOpen(prev => !prev);
   
   // Performance and accessibility hooks
   const { 
@@ -69,7 +72,7 @@ const MobileNavigation: React.FC = () => {
     getAriaLabel 
   } = useNavigationAccessibility();
   
-  const { getFocusClasses } = useFocusIndicator();
+  const { getFocusClasses } = useKeyboardFocus();
   
   // Refs for accessibility and performance
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -437,7 +440,7 @@ const MobileNavigation: React.FC = () => {
                     <User className="h-6 w-6 text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm truncate text-gray-900">{user.displayName || user.email}</p>
+                    <p className="font-semibold text-sm truncate text-gray-900">{user.name || user.email}</p>
                     <p className="text-xs text-gray-600 truncate">{user.email}</p>
                     <Badge variant="outline" className="text-xs mt-2 bg-white">
                       {user.role}
