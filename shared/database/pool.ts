@@ -292,20 +292,6 @@ export const createPoolConfig = (isReadOnly = false): pg.PoolConfig => {
 
   return {
     connectionString: connectionString || process.env.DATABASE_URL,
-    ssl: CONFIG.IS_PRODUCTION ? { rejectUnauthorized: false } : false,
-    // Read pools handle more concurrent operations, so larger size
-    max: isReadOnly ? 30 : CONFIG.DEFAULT_MAX_POOL_SIZE,
-    min: isReadOnly ? 5 : 3,
-    // Read connections idle longer due to frequent access patterns
-    idleTimeoutMillis: isReadOnly ? 120000 : 30000,
-    connectionTimeoutMillis: 5000,
-    // Read queries typically faster, so shorter timeout
-    statement_timeout: isReadOnly ? 15000 : 30000,
-    application_name: appName,
-    query_timeout: isReadOnly ? 15000 : 30000,
-    keepAlive: true,
-    keepAliveInitialDelayMillis: 30000,
-    maxUses: CONFIG.MAX_CONNECTION_USES,
   };
 };
 

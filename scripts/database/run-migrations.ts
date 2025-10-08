@@ -20,6 +20,18 @@ async function runMigrations() {
     throw new Error('DATABASE_URL must be set');
   }
 
+  // Diagnostic logging for SSL authentication debugging
+  console.log('🔍 Migration Script Diagnostics:');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+  console.log('DATABASE_URL starts with postgres:', process.env.DATABASE_URL?.startsWith('postgres'));
+  console.log('DATABASE_URL contains sslmode:', process.env.DATABASE_URL?.includes('sslmode'));
+  if (process.env.DATABASE_URL?.includes('sslmode')) {
+    const sslmode = process.env.DATABASE_URL.match(/sslmode=([^&\s]+)/)?.[1];
+    console.log('SSL mode in URL:', sslmode);
+  }
+  console.log('Using Neon serverless pool');
+
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
   try {
