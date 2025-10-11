@@ -1,31 +1,31 @@
 // Test script to verify import paths are working
-console.log('🧪 Testing import paths...');
+logger.info('🧪 Testing import paths...', { component: 'SimpleTool' });
 
 try {
-  console.log('📦 Testing db.ts import...');
+  logger.info('📦 Testing db.ts import...', { component: 'SimpleTool' });
   const dbModule = await import('./db.ts');
-  console.log('✅ db.ts imported successfully');
-  console.log('📊 Available exports:', Object.keys(dbModule));
+  logger.info('✅ db.ts imported successfully', { component: 'SimpleTool' });
+  logger.info('📊 Available exports:', { component: 'SimpleTool' }, Object.keys(dbModule));
 } catch (error) {
-  console.error('❌ Failed to import db.ts:', error.message);
+  logger.error('❌ Failed to import db.ts:', { component: 'SimpleTool' }, error.message);
 }
 
 try {
-  console.log('📦 Testing fallback service import...');
+  logger.info('📦 Testing fallback service import...', { component: 'SimpleTool' });
   const fallbackModule = await import('./services/fallback-service.ts');
-  console.log('✅ fallback-service.ts imported successfully');
-  console.log('📊 Available exports:', Object.keys(fallbackModule));
+  logger.info('✅ fallback-service.ts imported successfully', { component: 'SimpleTool' });
+  logger.info('📊 Available exports:', { component: 'SimpleTool' }, Object.keys(fallbackModule));
 } catch (error) {
-  console.error('❌ Failed to import fallback-service.ts:', error.message);
+  logger.error('❌ Failed to import fallback-service.ts:', { component: 'SimpleTool' }, error.message);
 }
 
 try {
-  console.log('📦 Testing database service import...');
+  logger.info('📦 Testing database service import...', { component: 'SimpleTool' });
   const databaseModule = await import('./services/database-service.ts');
-  console.log('✅ database-service.ts imported successfully');
-  console.log('📊 Available exports:', Object.keys(databaseModule));
+  logger.info('✅ database-service.ts imported successfully', { component: 'SimpleTool' });
+  logger.info('📊 Available exports:', { component: 'SimpleTool' }, Object.keys(databaseModule));
 } catch (error) {
-  console.error('❌ Failed to import database-service.ts:', error.message);
+  logger.error('❌ Failed to import database-service.ts:', { component: 'SimpleTool' }, error.message);
 }
 
-console.log('✅ Import path test completed');
+logger.info('✅ Import path test completed', { component: 'SimpleTool' });

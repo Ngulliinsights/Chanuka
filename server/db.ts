@@ -3,6 +3,7 @@ import pg from 'pg';
 const { Pool } = pg;
 import * as schema from "../shared/schema.js";
 import { fallbackService } from './services/fallback-service.js';
+import { logger } from '../utils/logger';
 
 // Connection state management with clear separation of concerns
 interface DatabaseState {
@@ -77,7 +78,7 @@ async function seedInitialData(db: any): Promise<void> {
       return; // Data already exists, skip seeding
     }
 
-    console.log('📋 Seeding initial demonstration data...');
+    logger.info('📋 Seeding initial demonstration data...', { component: 'SimpleTool' });
     
     await db.insert(schema.bills).values([
       {
@@ -128,9 +129,9 @@ async function seedInitialData(db: any): Promise<void> {
       }
     ]);
     
-    console.log('✅ Initial data seeded successfully');
+    logger.info('✅ Initial data seeded successfully', { component: 'SimpleTool' });
   } catch (error) {
-    console.log('ℹ️ Could not seed data:', error instanceof Error ? error.message : 'Unknown error');
+    logger.info('ℹ️ Could not seed data:', { component: 'SimpleTool' }, error instanceof Error ? error.message : 'Unknown error');
   }
 }
 
@@ -139,7 +140,7 @@ async function seedInitialData(db: any): Promise<void> {
  * This ensures the application remains functional even without database access.
  */
 async function initializeFallback(): Promise<void> {
-  console.log('📋 Initializing fallback data store...');
+  logger.info('📋 Initializing fallback data store...', { component: 'SimpleTool' });
   const status = fallbackService.getStatus();
   console.log(`✅ Fallback service ready: ${status.billCount} bills, ${status.userCount} users, ${status.commentCount} comments`);
 }
@@ -162,14 +163,14 @@ async function performInitialization(): Promise<void> {
     }
     
     state.isConnected = true;
-    console.log('✅ Database connection established successfully');
+    logger.info('✅ Database connection established successfully', { component: 'SimpleTool' });
     
     // Seed data only after confirming connection
     await seedInitialData(state.db);
     
   } catch (error) {
-    console.error('❌ Database connection failed:', error instanceof Error ? error.message : 'Unknown error');
-    console.log('🔄 Application will continue with fallback mode');
+    logger.error('❌ Database connection failed:', { component: 'SimpleTool' }, error instanceof Error ? error.message : 'Unknown error');
+    logger.info('🔄 Application will continue with fallback mode', { component: 'SimpleTool' });
     
     // Clean up any partial initialization
     if (state.pool) {
@@ -265,7 +266,7 @@ export async function withFallback<T>(
     // Only mark as disconnected for connection errors, not query errors
     if (isConnectionError(error)) {
       state.isConnected = false;
-      console.log('🔌 Database marked as disconnected due to connection error');
+      logger.info('🔌 Database marked as disconnected due to connection error', { component: 'SimpleTool' });
     }
     
     return fallbackData;
@@ -303,13 +304,13 @@ export async function closeDatabase(): Promise<void> {
     state.pool = null;
     state.db = null;
     state.isConnected = false;
-    console.log('🔌 Database connections closed');
+    logger.info('🔌 Database connections closed', { component: 'SimpleTool' });
   }
 }
 
 // Start initialization asynchronously without blocking module load
 initializeDatabase().catch(error => {
-  console.error('Failed to initialize database:', error);
+  logger.error('Failed to initialize database:', { component: 'SimpleTool' }, error);
 });
 
 // Export state accessors (read-only access to internal state)
@@ -334,3 +335,9 @@ export {
   billSectionConflicts,
   userInterests
 } from '../shared/schema.js';
+
+
+
+
+
+

@@ -3,7 +3,8 @@ import { database as db, bills, analysis } from '../../../shared/database/connec
 import { eq } from 'drizzle-orm';
 import { conflictDetectionService } from './conflict-detection';
 import { legalAnalysisService } from './legal-analysis';
-import { MLAnalysisService } from './ml-analysis';
+import { MLAnalysisService } from '../analytics/services/ml.service';
+import { logger } from '../../utils/logger';
 
 export interface RealTimeBillAnalysis {
   billId: number;
@@ -755,3 +756,12 @@ export class RealTimeBillAnalysisEngine {
 }
 
 export const realTimeBillAnalysisEngine = new RealTimeBillAnalysisEngine();
+
+
+
+
+
+
+
+
+

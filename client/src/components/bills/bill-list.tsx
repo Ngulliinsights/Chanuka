@@ -6,6 +6,7 @@ import { Loader2, AlertCircle, Filter } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from '../ui/badge';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
+import { logger } from '../utils/logger.js';
 
 interface Bill {
   id: number;

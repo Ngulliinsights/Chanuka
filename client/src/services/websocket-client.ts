@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { defaultApiConfig } from '../config/api.js';
+import { logger } from '../utils/logger';
 
 export interface BillUpdate {
   type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled';
@@ -112,7 +113,7 @@ export class WebSocketClient {
 
       try {
         const wsUrl = `${this.baseUrl}/ws?token=${encodeURIComponent(token)}`;
-        console.log('WebSocket attempting to connect to:', wsUrl);
+        logger.info('WebSocket attempting to connect to:', { component: 'SimpleTool' }, wsUrl);
         this.ws = new WebSocket(wsUrl);
 
         // Optimization: Add connection timeout to prevent hanging
@@ -125,7 +126,7 @@ export class WebSocketClient {
 
         this.ws.onopen = () => {
           clearTimeout(connectionTimeout);
-          console.log('WebSocket connected successfully');
+          logger.info('WebSocket connected successfully', { component: 'SimpleTool' });
           this.connectionState = ConnectionState.CONNECTED;
           this.reconnectAttempts = 0;
           this.connectedAt = Date.now();
@@ -144,7 +145,7 @@ export class WebSocketClient {
             const message = JSON.parse(event.data);
             this.handleMessage(message);
           } catch (error) {
-            console.error('Error parsing WebSocket message:', error);
+            logger.error('Error parsing WebSocket message:', { component: 'SimpleTool' }, error);
             // Optimization: Don't crash on malformed messages
             this.emit('error', { message: 'Failed to parse message', error });
           }
@@ -152,7 +153,7 @@ export class WebSocketClient {
 
         this.ws.onclose = (event) => {
           clearTimeout(connectionTimeout);
-          console.log('WebSocket connection closed:', event.code, event.reason);
+          logger.info('WebSocket connection closed:', { component: 'SimpleTool' }, event.code, event.reason);
           
           // Optimization: Update state before emitting events
           const wasConnected = this.connectionState === ConnectionState.CONNECTED;
@@ -166,7 +167,7 @@ export class WebSocketClient {
             this.scheduleReconnect();
           } else if (this.reconnectAttempts >= this.maxReconnectAttempts) {
             this.connectionState = ConnectionState.FAILED;
-            console.error('Max reconnection attempts reached');
+            logger.error('Max reconnection attempts reached', { component: 'SimpleTool' });
             this.emit('error', { message: 'Failed to reconnect after maximum attempts' });
             reject(new Error('Max reconnection attempts reached'));
           }
@@ -174,7 +175,7 @@ export class WebSocketClient {
 
         this.ws.onerror = (error) => {
           clearTimeout(connectionTimeout);
-          console.error('WebSocket error:', error);
+          logger.error('WebSocket error:', { component: 'SimpleTool' }, error);
           this.emit('error', error);
           
           // Optimization: Only reject if we're still trying to connect initially
@@ -185,7 +186,7 @@ export class WebSocketClient {
 
       } catch (error) {
         this.connectionState = ConnectionState.DISCONNECTED;
-        console.error('Failed to connect to WebSocket:', error);
+        logger.error('Failed to connect to WebSocket:', { component: 'SimpleTool' }, error);
         reject(error);
       }
     });
@@ -219,7 +220,7 @@ export class WebSocketClient {
     if (handler) {
       handler();
     } else {
-      console.log('Unknown message type:', message.type);
+      logger.info('Unknown message type:', { component: 'SimpleTool' }, message.type);
     }
   }
 
@@ -292,7 +293,7 @@ export class WebSocketClient {
       try {
         this.send(message);
       } catch (error) {
-        console.error('Error sending queued message:', error);
+        logger.error('Error sending queued message:', { component: 'SimpleTool' }, error);
         // Re-queue failed messages
         this.queueMessage(message);
       }
@@ -341,7 +342,7 @@ export class WebSocketClient {
       }
       this.ws.send(payload);
     } catch (error) {
-      console.error('Error sending WebSocket message:', error);
+      logger.error('Error sending WebSocket message:', { component: 'SimpleTool' }, error);
       this.emit('error', { message: 'Failed to send message', error });
       throw error;
     }
@@ -409,7 +410,7 @@ export class WebSocketClient {
       this.reconnectTimeoutId = null;
       if (this.currentToken) {
         this.connect(this.currentToken).catch(error => {
-          console.error('Reconnection failed:', error);
+          logger.error('Reconnection failed:', { component: 'SimpleTool' }, error);
         });
       }
     }, delay);
@@ -547,7 +548,7 @@ export function useWebSocket() {
     const handleConnected = () => updateConnectionState();
     const handleDisconnected = () => updateConnectionState();
     const handleError = (error: any) => {
-      console.error('WebSocket error:', error);
+      logger.error('WebSocket error:', { component: 'SimpleTool' }, error);
       updateConnectionState();
     };
 
@@ -656,3 +657,9 @@ export function useBillUpdates(billId?: number) {
     clearNotifications
   }), [updates, notifications, clearUpdates, clearNotifications]);
 }
+
+
+
+
+
+

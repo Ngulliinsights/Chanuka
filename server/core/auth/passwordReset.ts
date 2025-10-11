@@ -9,6 +9,7 @@ import type { InferSelectModel } from 'drizzle-orm';
 import { and, eq, gt } from 'drizzle-orm';
 import { config } from '../config/index.js';
 import { emailService } from './email.js';
+import { logger } from '../utils/logger';
 
 // Reset token expiration time in minutes
 const TOKEN_EXPIRY_MINUTES = 60;
@@ -192,3 +193,10 @@ class PasswordResetService {
 }
 
 export const passwordResetService = new PasswordResetService();
+
+
+
+
+
+
+

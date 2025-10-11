@@ -19,3 +19,10 @@ export interface OnboardingProgress {
   percentage: number;
   lastCompletedStep: number;
 }
+
+
+
+
+
+
+

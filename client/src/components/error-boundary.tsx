@@ -1,4 +1,5 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
+import { logger } from '../utils/logger.js';
 
 interface Props {
   children: ReactNode;
@@ -21,7 +22,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('Error boundary caught an error:', error, errorInfo);
+    logger.error('Error boundary caught an error:', { component: 'SimpleTool' }, error, errorInfo);
   }
 
   componentDidMount() {
@@ -34,7 +35,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   handlePromiseRejection = (event: PromiseRejectionEvent) => {
-    console.error('Unhandled promise rejection:', event.reason);
+    logger.error('Unhandled promise rejection:', { component: 'SimpleTool' }, event.reason);
     event.preventDefault(); // Prevent default browser behavior
 
     // Don't update state for promise rejections to avoid infinite re-renders

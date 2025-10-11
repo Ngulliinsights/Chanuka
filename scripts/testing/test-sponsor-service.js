@@ -3,6 +3,7 @@
 
 import request from 'supertest';
 import express from 'express';
+import { logger } from '../utils/logger.js';
 
 // Create a simple test app
 const app = express();
@@ -117,11 +118,11 @@ app.get('/api/sponsors/:id/conflicts', (req, res) => {
 });
 
 async function testSponsorAPI() {
-  console.log('🧪 Testing Sponsor API endpoints...\n');
+  logger.info('🧪 Testing Sponsor API endpoints...\n', { component: 'SimpleTool' });
   
   try {
     // Test 1: Get all sponsors
-    console.log('1. Testing GET /api/sponsors...');
+    logger.info('1. Testing GET /api/sponsors...', { component: 'SimpleTool' });
     const sponsorsResponse = await request(app)
       .get('/api/sponsors')
       .expect(200);
@@ -130,7 +131,7 @@ async function testSponsorAPI() {
     console.log(`   First sponsor: ${sponsorsResponse.body.data[0].name}`);
     
     // Test 2: Get specific sponsor
-    console.log('\n2. Testing GET /api/sponsors/:id...');
+    logger.info('\n2. Testing GET /api/sponsors/:id...', { component: 'SimpleTool' });
     const sponsorResponse = await request(app)
       .get('/api/sponsors/1')
       .expect(200);
@@ -142,7 +143,7 @@ async function testSponsorAPI() {
     console.log(`   Bills sponsored: ${sponsor.stats.totalBillsSponsored}`);
     
     // Test 3: Get sponsor conflicts
-    console.log('\n3. Testing GET /api/sponsors/:id/conflicts...');
+    logger.info('\n3. Testing GET /api/sponsors/:id/conflicts...', { component: 'SimpleTool' });
     const conflictsResponse = await request(app)
       .get('/api/sponsors/1/conflicts')
       .expect(200);
@@ -154,7 +155,7 @@ async function testSponsorAPI() {
     console.log(`   Recommendations: ${conflicts.recommendations.length}`);
     
     // Test 4: Rate limiting (should be disabled in test mode)
-    console.log('\n4. Testing rate limiting (should be disabled)...');
+    logger.info('\n4. Testing rate limiting (should be disabled)...', { component: 'SimpleTool' });
     const rapidRequests = [];
     for (let i = 0; i < 10; i++) {
       rapidRequests.push(request(app).get('/api/sponsors'));
@@ -164,12 +165,12 @@ async function testSponsorAPI() {
     const successCount = responses.filter(r => r.status === 200).length;
     console.log(`✅ Made 10 rapid requests, ${successCount} succeeded (rate limiting disabled)`);
     
-    console.log('\n🎉 All sponsor API tests completed successfully!');
+    logger.info('\n🎉 All sponsor API tests completed successfully!', { component: 'SimpleTool' });
     
   } catch (error) {
-    console.error('❌ Test failed:', error.message);
+    logger.error('❌ Test failed:', { component: 'SimpleTool' }, error.message);
     if (error.response) {
-      console.error('Response:', error.response.body);
+      logger.error('Response:', { component: 'SimpleTool' }, error.response.body);
     }
     throw error;
   }
@@ -177,7 +178,7 @@ async function testSponsorAPI() {
 
 // Test rate limiting configuration
 function testRateLimitConfig() {
-  console.log('\n🔧 Testing rate limit configuration...');
+  logger.info('\n🔧 Testing rate limit configuration...', { component: 'SimpleTool' });
   
   // Test environment detection
   console.log(`Environment: ${process.env.NODE_ENV}`);
@@ -191,26 +192,26 @@ function testRateLimitConfig() {
     test: { max: 10000, windowMs: 15 * 60 * 1000 }
   };
   
-  console.log('Rate limit configurations:');
+  logger.info('Rate limit configurations:', { component: 'SimpleTool' });
   Object.entries(testLimits).forEach(([env, config]) => {
     console.log(`  ${env}: ${config.max} requests per ${config.windowMs/1000/60} minutes`);
   });
   
-  console.log('✅ Rate limit configuration verified');
+  logger.info('✅ Rate limit configuration verified', { component: 'SimpleTool' });
 }
 
 async function runTests() {
-  console.log('🚀 Starting Sponsor Service Tests\n');
+  logger.info('🚀 Starting Sponsor Service Tests\n', { component: 'SimpleTool' });
   
   try {
     testRateLimitConfig();
     await testSponsorAPI();
     
-    console.log('\n✨ All tests completed successfully!');
+    logger.info('\n✨ All tests completed successfully!', { component: 'SimpleTool' });
     process.exit(0);
     
   } catch (error) {
-    console.error('\n💥 Tests failed:', error.message);
+    logger.error('\n💥 Tests failed:', { component: 'SimpleTool' }, error.message);
     process.exit(1);
   }
 }

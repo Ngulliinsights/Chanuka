@@ -2,6 +2,7 @@ import { database as db } from '../../../shared/database/connection.js';
 import { bills, billSponsorships, sponsors, sponsorTransparency, sponsorAffiliations, billSectionConflicts } from '../../../shared/schema.js';
 import { eq, and, sql } from 'drizzle-orm';
 import { NotFoundError } from '../../utils/errors.js';
+import { logger } from '../../utils/logger';
 
 // Enhanced type definitions for better type safety
 interface SponsorshipData {
@@ -1129,3 +1130,11 @@ export class SponsorshipAnalysisService {
       }
     }
   }
+
+
+
+
+
+
+
+

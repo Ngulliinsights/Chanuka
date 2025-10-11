@@ -6,6 +6,7 @@
  */
 
 import { ErrorCode } from '../../../../src/shared/error-handling/constants/error-codes';
+import { logger } from '../utils/logger';
 
 /**
  * User-friendly error messages mapped to error codes
@@ -113,3 +114,9 @@ export const AUTH_ERROR_MESSAGES = {
   ACCOUNT_LOCKED: ERROR_MESSAGES[ErrorCode.ACCOUNT_LOCKED],
   TOKEN_REQUIRED: ERROR_MESSAGES[ErrorCode.TOKEN_REQUIRED],
 } as const;
+
+
+
+
+
+

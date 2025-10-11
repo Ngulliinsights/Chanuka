@@ -1,11 +1,12 @@
 import express from 'express';
 import { router as profileRouter } from '../../server/features/users/profile.js';
+import { logger } from '../utils/logger';
 
 const app = express();
 app.use(express.json());
 app.use('/api/profile', profileRouter);
 
-console.log('✅ Profile routes integrated successfully');
+logger.info('✅ Profile routes integrated successfully', { component: 'SimpleTool' });
 
 // Check that all expected routes are registered
 const routes = [];
@@ -16,9 +17,15 @@ profileRouter.stack.forEach((layer) => {
   }
 });
 
-console.log('\n📋 Available profile routes:');
+logger.info('\n📋 Available profile routes:', { component: 'SimpleTool' });
 routes.forEach(route => {
   console.log(`  ${route}`);
 });
 
-console.log('\n🎉 Profile routes verification complete!');
+logger.info('\n🎉 Profile routes verification complete!', { component: 'SimpleTool' });
+
+
+
+
+
+

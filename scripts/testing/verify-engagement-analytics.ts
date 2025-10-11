@@ -3,18 +3,19 @@ import { billService } from './services/bill-service.js';
 import { db } from './db.js';
 import { users, bills, billEngagement } from '../shared/schema.js';
 import { eq } from 'drizzle-orm';
+import { logger } from '../utils/logger';
 
 async function verifyEngagementAnalytics() {
-  console.log('🔍 Verifying Engagement Analytics System...');
+  logger.info('🔍 Verifying Engagement Analytics System...', { component: 'SimpleTool' });
   
   try {
     // Test 1: Check service initialization
-    console.log('1. Testing service initialization...');
+    logger.info('1. Testing service initialization...', { component: 'SimpleTool' });
     const initialStats = engagementAnalyticsService.getStats();
-    console.log('✅ Engagement analytics service initialized:', initialStats);
+    logger.info('✅ Engagement analytics service initialized:', { component: 'SimpleTool' }, initialStats);
 
     // Test 2: Create test data
-    console.log('2. Creating test data...');
+    logger.info('2. Creating test data...', { component: 'SimpleTool' });
     
     // Create test users
     const testUsers = await db
@@ -107,17 +108,17 @@ async function verifyEngagementAnalytics() {
     
     await db.insert(billEngagement).values(engagementData);
     
-    console.log('✅ Test data created:', {
+    logger.info('✅ Test data created:', { component: 'SimpleTool' }, {
       users: testUsers.length,
       bills: testBills.length,
       engagements: engagementData.length
     });
 
     // Test 3: Get engagement metrics
-    console.log('3. Testing engagement metrics...');
+    logger.info('3. Testing engagement metrics...', { component: 'SimpleTool' });
     
     const metrics = await engagementAnalyticsService.getEngagementMetrics();
-    console.log('✅ Engagement metrics retrieved:', {
+    logger.info('✅ Engagement metrics retrieved:', { component: 'SimpleTool' }, {
       totalViews: metrics.totalViews,
       totalComments: metrics.totalComments,
       totalShares: metrics.totalShares,
@@ -126,20 +127,20 @@ async function verifyEngagementAnalytics() {
     });
 
     // Test 4: Get user engagement patterns
-    console.log('4. Testing user engagement patterns...');
+    logger.info('4. Testing user engagement patterns...', { component: 'SimpleTool' });
     
     const patterns = await engagementAnalyticsService.getUserEngagementPatterns(undefined, 10);
-    console.log('✅ User engagement patterns retrieved:', {
+    logger.info('✅ User engagement patterns retrieved:', { component: 'SimpleTool' }, {
       patternCount: patterns.length,
       firstUserEngagements: patterns[0]?.totalEngagements,
       topUserName: patterns[0]?.userName
     });
 
     // Test 5: Get bill-specific analytics
-    console.log('5. Testing bill-specific analytics...');
+    logger.info('5. Testing bill-specific analytics...', { component: 'SimpleTool' });
     
     const billAnalytics = await engagementAnalyticsService.getBillEngagementAnalytics(testBills[0].id);
-    console.log('✅ Bill analytics retrieved:', {
+    logger.info('✅ Bill analytics retrieved:', { component: 'SimpleTool' }, {
       billTitle: billAnalytics.billTitle,
       totalViews: billAnalytics.totalEngagement.totalViews,
       topEngagersCount: billAnalytics.topEngagers.length,
@@ -147,10 +148,10 @@ async function verifyEngagementAnalytics() {
     });
 
     // Test 6: Get engagement trends
-    console.log('6. Testing engagement trends...');
+    logger.info('6. Testing engagement trends...', { component: 'SimpleTool' });
     
     const trends = await engagementAnalyticsService.getEngagementTrends('daily');
-    console.log('✅ Engagement trends retrieved:', {
+    logger.info('✅ Engagement trends retrieved:', { component: 'SimpleTool' }, {
       period: trends.period,
       dataPoints: trends.data.length,
       totalGrowth: trends.summary.totalGrowth,
@@ -158,12 +159,12 @@ async function verifyEngagementAnalytics() {
     });
 
     // Test 7: Get comparative analytics
-    console.log('7. Testing comparative analytics...');
+    logger.info('7. Testing comparative analytics...', { component: 'SimpleTool' });
     
     const comparative = await engagementAnalyticsService.getComparativeAnalytics({
       limit: 10
     });
-    console.log('✅ Comparative analytics retrieved:', {
+    logger.info('✅ Comparative analytics retrieved:', { component: 'SimpleTool' }, {
       billCount: comparative.bills.length,
       categoryCount: comparative.categoryComparison.length,
       statusCount: comparative.statusComparison.length,
@@ -171,10 +172,10 @@ async function verifyEngagementAnalytics() {
     });
 
     // Test 8: Get engagement insights
-    console.log('8. Testing engagement insights...');
+    logger.info('8. Testing engagement insights...', { component: 'SimpleTool' });
     
     const insights = await engagementAnalyticsService.getEngagementInsights();
-    console.log('✅ Engagement insights retrieved:', {
+    logger.info('✅ Engagement insights retrieved:', { component: 'SimpleTool' }, {
       peakTimesCount: insights.peakEngagementTimes.length,
       driversCount: insights.engagementDrivers.length,
       segmentsCount: insights.userSegments.length,
@@ -182,10 +183,10 @@ async function verifyEngagementAnalytics() {
     });
 
     // Test 9: Get real-time engagement stats
-    console.log('9. Testing real-time engagement stats...');
+    logger.info('9. Testing real-time engagement stats...', { component: 'SimpleTool' });
     
     const realtimeStats = await engagementAnalyticsService.getRealTimeEngagementStats();
-    console.log('✅ Real-time stats retrieved:', {
+    logger.info('✅ Real-time stats retrieved:', { component: 'SimpleTool' }, {
       activeUsers: realtimeStats.activeUsers,
       currentEngagements: realtimeStats.currentEngagements,
       topActiveBillsCount: realtimeStats.topActiveBills.length,
@@ -193,12 +194,12 @@ async function verifyEngagementAnalytics() {
     });
 
     // Test 10: Test data export functionality
-    console.log('10. Testing data export...');
+    logger.info('10. Testing data export...', { component: 'SimpleTool' });
     
     const jsonExport = await engagementAnalyticsService.exportEngagementData('json');
     const csvExport = await engagementAnalyticsService.exportEngagementData('csv');
     
-    console.log('✅ Data export completed:', {
+    logger.info('✅ Data export completed:', { component: 'SimpleTool' }, {
       jsonLength: jsonExport.length,
       csvLength: csvExport.length,
       jsonValid: jsonExport.startsWith('{'),
@@ -206,7 +207,7 @@ async function verifyEngagementAnalytics() {
     });
 
     // Test 11: Test filtered analytics
-    console.log('11. Testing filtered analytics...');
+    logger.info('11. Testing filtered analytics...', { component: 'SimpleTool' });
     
     const filteredMetrics = await engagementAnalyticsService.getEngagementMetrics(
       undefined,
@@ -217,37 +218,37 @@ async function verifyEngagementAnalytics() {
       }
     );
     
-    console.log('✅ Filtered analytics retrieved:', {
+    logger.info('✅ Filtered analytics retrieved:', { component: 'SimpleTool' }, {
       filteredViews: filteredMetrics.totalViews,
       filteredUsers: filteredMetrics.uniqueUsers
     });
 
     // Test 12: Test user-specific patterns
-    console.log('12. Testing user-specific patterns...');
+    logger.info('12. Testing user-specific patterns...', { component: 'SimpleTool' });
     
     const userSpecificPatterns = await engagementAnalyticsService.getUserEngagementPatterns(
       [testUsers[0].id, testUsers[1].id],
       5
     );
     
-    console.log('✅ User-specific patterns retrieved:', {
+    logger.info('✅ User-specific patterns retrieved:', { component: 'SimpleTool' }, {
       patternCount: userSpecificPatterns.length,
       firstUserCategories: userSpecificPatterns[0]?.preferredCategories.length
     });
 
     // Test 13: Test cache clearing
-    console.log('13. Testing cache clearing...');
+    logger.info('13. Testing cache clearing...', { component: 'SimpleTool' });
     
     await engagementAnalyticsService.clearAnalyticsCache();
-    console.log('✅ Analytics cache cleared successfully');
+    logger.info('✅ Analytics cache cleared successfully', { component: 'SimpleTool' });
 
     // Test 14: Service shutdown
-    console.log('14. Testing service shutdown...');
+    logger.info('14. Testing service shutdown...', { component: 'SimpleTool' });
     await engagementAnalyticsService.shutdown();
-    console.log('✅ Service shutdown completed');
+    logger.info('✅ Service shutdown completed', { component: 'SimpleTool' });
 
     // Cleanup test data
-    console.log('🧹 Cleaning up test data...');
+    logger.info('🧹 Cleaning up test data...', { component: 'SimpleTool' });
     await db.delete(billEngagement).where(eq(billEngagement.userId, testUsers[0].id));
     await db.delete(billEngagement).where(eq(billEngagement.userId, testUsers[1].id));
     await db.delete(billEngagement).where(eq(billEngagement.userId, testUsers[2].id));
@@ -260,37 +261,43 @@ async function verifyEngagementAnalytics() {
       await db.delete(users).where(eq(users.id, user.id));
     }
     
-    console.log('✅ Test data cleaned up');
+    logger.info('✅ Test data cleaned up', { component: 'SimpleTool' });
 
-    console.log('\n🎉 All Engagement Analytics System tests passed!');
-    console.log('\n📋 Task 5.2 Implementation Summary:');
-    console.log('✅ Comprehensive engagement statistics calculation - IMPLEMENTED');
-    console.log('✅ User engagement pattern analysis - IMPLEMENTED');
-    console.log('✅ Engagement trend reporting - IMPLEMENTED');
-    console.log('✅ Comparative engagement analytics across bills - IMPLEMENTED');
-    console.log('\n🔧 Additional Features Implemented:');
-    console.log('✅ Real-time engagement statistics monitoring');
-    console.log('✅ Bill-specific engagement analytics with rankings');
-    console.log('✅ User engagement pattern analysis with preferences');
-    console.log('✅ Engagement insights and recommendations system');
-    console.log('✅ Data export functionality (JSON and CSV formats)');
-    console.log('✅ Comparative analytics across categories and statuses');
-    console.log('✅ Engagement leaderboard functionality');
-    console.log('✅ Filtered analytics with multiple criteria support');
-    console.log('✅ Comprehensive caching system for performance');
-    console.log('✅ RESTful API endpoints for all analytics operations');
-    console.log('✅ Admin-level analytics management and cache control');
-    console.log('✅ User-specific engagement analytics');
-    console.log('✅ Peak engagement time analysis');
-    console.log('✅ Engagement driver identification and correlation');
-    console.log('✅ User segmentation based on engagement patterns');
-    console.log('\n✨ Engagement Analytics System is fully functional and production-ready!');
+    logger.info('\n🎉 All Engagement Analytics System tests passed!', { component: 'SimpleTool' });
+    logger.info('\n📋 Task 5.2 Implementation Summary:', { component: 'SimpleTool' });
+    logger.info('✅ Comprehensive engagement statistics calculation - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('✅ User engagement pattern analysis - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('✅ Engagement trend reporting - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('✅ Comparative engagement analytics across bills - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('\n🔧 Additional Features Implemented:', { component: 'SimpleTool' });
+    logger.info('✅ Real-time engagement statistics monitoring', { component: 'SimpleTool' });
+    logger.info('✅ Bill-specific engagement analytics with rankings', { component: 'SimpleTool' });
+    logger.info('✅ User engagement pattern analysis with preferences', { component: 'SimpleTool' });
+    logger.info('✅ Engagement insights and recommendations system', { component: 'SimpleTool' });
+    logger.info('✅ Data export functionality (JSON and CSV formats)', { component: 'SimpleTool' });
+    logger.info('✅ Comparative analytics across categories and statuses', { component: 'SimpleTool' });
+    logger.info('✅ Engagement leaderboard functionality', { component: 'SimpleTool' });
+    logger.info('✅ Filtered analytics with multiple criteria support', { component: 'SimpleTool' });
+    logger.info('✅ Comprehensive caching system for performance', { component: 'SimpleTool' });
+    logger.info('✅ RESTful API endpoints for all analytics operations', { component: 'SimpleTool' });
+    logger.info('✅ Admin-level analytics management and cache control', { component: 'SimpleTool' });
+    logger.info('✅ User-specific engagement analytics', { component: 'SimpleTool' });
+    logger.info('✅ Peak engagement time analysis', { component: 'SimpleTool' });
+    logger.info('✅ Engagement driver identification and correlation', { component: 'SimpleTool' });
+    logger.info('✅ User segmentation based on engagement patterns', { component: 'SimpleTool' });
+    logger.info('\n✨ Engagement Analytics System is fully functional and production-ready!', { component: 'SimpleTool' });
     
   } catch (error) {
-    console.error('❌ Error during engagement analytics verification:', error);
+    logger.error('❌ Error during engagement analytics verification:', { component: 'SimpleTool' }, error);
     throw error;
   }
 }
 
 // Run verification
 verifyEngagementAnalytics().catch(console.error);
+
+
+
+
+
+

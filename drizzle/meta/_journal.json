@@ -8,6 +8,20 @@
       "when": 1759765505282,
       "tag": "0000_clear_risque",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1760159378367,
+      "tag": "0001_strange_night_nurse",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1760159581967,
+      "tag": "0002_calm_weapon_omega",
+      "breakpoints": true
     }
   ]
 }

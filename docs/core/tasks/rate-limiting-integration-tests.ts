@@ -6,6 +6,7 @@ import Redis from 'ioredis-mock'; // Mock Redis for testing
 import { RateLimitFactory } from '../../factory/RateLimitFactory';
 import { rateLimitMiddleware } from '../../middleware/rateLimitMiddleware';
 import { RateLimitConfig } from '../../types/RateLimit';
+import { logger } from '../utils/logger';
 
 /**
  * Integration Test Philosophy:
@@ -633,3 +634,9 @@ const verifyRateLimitHeaders = (response: request.Response, expectedLimit: numbe
   expect(response.headers['ratelimit-reset']).toBeDefined();
   expect(response.headers['x-ratelimit-reset']).toBeDefined();
 };
+
+
+
+
+
+

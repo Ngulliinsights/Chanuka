@@ -36,6 +36,15 @@ export const CACHE_TTL = {
   BILL_DATA: 20 * 60 * 1000, // 20 minutes
   COMMENTS: 5 * 60 * 1000,   // 5 minutes
   SEARCH_RESULTS: 5 * 60 * 1000, // 5 minutes
+  TRANSPARENCY_DATA: 45 * 60 * 1000, // 45 minutes
+  ALERT_DATA: 10 * 60 * 1000, // 10 minutes
+  RELATIONSHIP_DATA: 30 * 60 * 1000, // 30 minutes
+  COMPLETENESS_DATA: 60 * 60 * 1000, // 1 hour
+  DASHBOARD_DATA: 15 * 60 * 1000, // 15 minutes
+  COMPREHENSIVE_ANALYSIS: 30 * 60 * 1000, // 30 minutes
+  CONFLICT_ANALYSIS: 20 * 60 * 1000, // 20 minutes
+  VOTING_ANALYSIS: 25 * 60 * 1000, // 25 minutes
+  STATIC_DATA: 60 * 60 * 1000, // 1 hour for static data like stats
 } as const;
 
 // Cache key generators with type safety
@@ -47,6 +56,11 @@ export const CACHE_KEYS = {
   USER_ENGAGEMENT: (userId: string) => `user:engagement:${userId}`,
   SEARCH_RESULTS: (query: string) => `search:${query.toLowerCase().trim()}`, // Normalize queries
   ANALYTICS: () => 'analytics',
+  SPONSOR_TRANSPARENCY: (sponsorId: number) => `sponsor:transparency:${sponsorId}`,
+  BILL_SEARCH: (query: string, params: string) => `bill:search:${query}:${params}`,
+  BILL_STATS: () => 'bill:stats',
+  BILL_CATEGORIES: () => 'bill:categories',
+  BILL_STATUSES: () => 'bill:statuses',
 } as const;
 
 export class CacheService {
@@ -461,3 +475,9 @@ export const cacheService = new CacheService({
   cleanupInterval: 5 * 60 * 1000,
   enableStats: true,
 });
+
+
+
+
+
+

@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { useBills } from '@/hooks/use-bills';
 import { useState } from 'react';
 import { PlusCircle } from 'lucide-react';
+import { logger } from '../utils/logger.js';
 
 export const TrackedTopics = () => {
   const { trackedTopics, isLoading } = useBills();

@@ -1,6 +1,7 @@
 import { apmService } from '../monitoring/apm-service.js';
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
 import { errorTracker } from '../../core/errors/error-tracker.js';
+import { logger } from '../utils/logger';
 
 export interface AlertRule {
   id: string;
@@ -335,11 +336,11 @@ class AlertingService {
       try {
         await this.checkAlertConditions();
       } catch (error) {
-        console.error('[Alerting] Error checking alert conditions:', error);
+        logger.error('[Alerting] Error checking alert conditions:', { component: 'SimpleTool' }, error);
       }
     }, 60000);
 
-    console.log('[Alerting] Started monitoring with alert rules');
+    logger.info('[Alerting] Started monitoring with alert rules', { component: 'SimpleTool' });
   }
 
   /**
@@ -498,3 +499,9 @@ class AlertingService {
 
 // Export singleton instance
 export const alertingService = new AlertingService();
+
+
+
+
+
+

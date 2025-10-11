@@ -1,5 +1,6 @@
 import { api } from '../services/api.js';
 import { API_ENDPOINTS } from '../config/api.js';
+import { logger } from '../utils/logger';
 
 export interface HealthStatus {
   api: boolean;
@@ -37,7 +38,7 @@ export async function checkApiHealth(): Promise<HealthStatus> {
       latency
     };
   } catch (error) {
-    console.error('Health check failed:', error);
+    logger.error('Health check failed:', { component: 'SimpleTool' }, error);
     
     return {
       api: false,
@@ -120,7 +121,7 @@ export async function testCorsPreflightRequest(): Promise<boolean> {
       response.headers.has('access-control-allow-methods')
     );
   } catch (error) {
-    console.error('CORS preflight test failed:', error);
+    logger.error('CORS preflight test failed:', { component: 'SimpleTool' }, error);
     return false;
   }
 }
@@ -248,7 +249,7 @@ export class ConnectionMonitor {
         this.notifyListeners(status);
       }
     } catch (error) {
-      console.error('Connection check failed:', error);
+      logger.error('Connection check failed:', { component: 'SimpleTool' }, error);
     }
   }
   
@@ -266,7 +267,7 @@ export class ConnectionMonitor {
       try {
         listener(status);
       } catch (error) {
-        console.error('Connection monitor listener error:', error);
+        logger.error('Connection monitor listener error:', { component: 'SimpleTool' }, error);
       }
     });
   }
@@ -294,3 +295,9 @@ export class ConnectionMonitor {
 
 // Export singleton instance
 export const connectionMonitor = new ConnectionMonitor();
+
+
+
+
+
+

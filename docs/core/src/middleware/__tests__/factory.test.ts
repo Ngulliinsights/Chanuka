@@ -8,6 +8,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MiddlewareFactory } from '../factory';
 import { Request, Response, NextFunction } from 'express';
+import { logger } from '../utils/logger';
 
 describe('MiddlewareFactory', () => {
   let middlewareFactory: MiddlewareFactory;
@@ -873,3 +874,9 @@ describe('MiddlewareFactory', () => {
     });
   });
 });
+
+
+
+
+
+

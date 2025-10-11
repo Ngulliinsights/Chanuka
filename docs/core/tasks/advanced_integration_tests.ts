@@ -14,6 +14,7 @@ import { RedisHealthCheck } from '../checks/redis.check';
 import { DatabaseHealthCheck } from '../checks/database.check';
 import { MemoryHealthCheck } from '../checks/memory.check';
 import { 
+import { logger } from '../utils/logger';
   LoadTester, 
   PerformanceTimer, 
   ResourceMonitor, 
@@ -120,7 +121,7 @@ describe('Health System Load Tests', () => {
         }
       );
 
-      console.log('Load test results:', loadResults);
+      logger.info('Load test results:', { component: 'SimpleTool' }, loadResults);
 
       // Performance expectations
       expect(loadResults.successfulRequests).toBeGreaterThan(0);
@@ -315,7 +316,7 @@ describe('Health System Load Tests', () => {
         loadTester.reset();
       }
 
-      console.log('Endpoint performance comparison:');
+      logger.info('Endpoint performance comparison:', { component: 'SimpleTool' });
       endpoints.forEach(endpoint => {
         const result = results[endpoint];
         console.log(`${endpoint}: ${result.requestsPerSecond.toFixed(1)} RPS, ${result.averageLatency.toFixed(1)}ms avg`);
@@ -333,3 +334,9 @@ describe('Health System Load Tests', () => {
 describe('Health System Chaos Tests', () => {
   let healthChecker: HealthChecker;
   let mock
+
+
+
+
+
+

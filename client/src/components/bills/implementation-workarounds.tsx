@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { Textarea } from '../ui/textarea';
 import { 
+import { logger } from '../utils/logger.js';
   AlertTriangle, 
   Eye, 
   CheckCircle, 
@@ -123,7 +124,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
         setWorkarounds(data);
       }
     } catch (error) {
-      console.error('Error fetching implementation workarounds:', error);
+      logger.error('Error fetching implementation workarounds:', { component: 'SimpleTool' }, error);
     } finally {
       setLoading(false);
     }
@@ -143,7 +144,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
         fetchWorkarounds(); // Refresh data
       }
     } catch (error) {
-      console.error('Error confirming workaround:', error);
+      logger.error('Error confirming workaround:', { component: 'SimpleTool' }, error);
     }
   };
 
@@ -167,7 +168,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
         fetchWorkarounds(); // Refresh data
       }
     } catch (error) {
-      console.error('Error reporting workaround:', error);
+      logger.error('Error reporting workaround:', { component: 'SimpleTool' }, error);
     }
   };
 

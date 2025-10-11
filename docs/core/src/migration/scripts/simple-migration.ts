@@ -8,6 +8,7 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
+import { logger } from '../utils/logger';
 
 interface MigrationRule {
   from: string;
@@ -88,7 +89,7 @@ const migrationRules: MigrationRule[] = [
 ];
 
 async function runMigration() {
-  console.log('🚀 Starting simple migration...\n');
+  logger.info('🚀 Starting simple migration...\n', { component: 'SimpleTool' });
 
   let totalChanges = 0;
   let modifiedFiles = 0;
@@ -126,17 +127,17 @@ async function runMigration() {
             totalChanges++;
           }
         } else {
-          console.log('   No references found');
+          logger.info('   No references found', { component: 'SimpleTool' });
         }
       } catch (error) {
         // grep returns non-zero exit code when no matches found
-        console.log('   No references found');
+        logger.info('   No references found', { component: 'SimpleTool' });
       }
     } catch (error) {
       console.warn(`   Warning: ${error}`);
     }
     
-    console.log('');
+    logger.info('', { component: 'SimpleTool' });
   }
 
   // Update package.json
@@ -196,7 +197,7 @@ async function updatePackageJson() {
       packageJson.dependencies['@triplecheck/core'] = 'workspace:*';
       
       await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
-      console.log('📦 Updated package.json with @triplecheck/core dependency');
+      logger.info('📦 Updated package.json with @triplecheck/core dependency', { component: 'SimpleTool' });
     }
   } catch (error) {
     console.warn('⚠️  Could not update package.json:', error);
@@ -204,7 +205,7 @@ async function updatePackageJson() {
 }
 
 async function validateMigration() {
-  console.log('\n🔍 Validating migration...');
+  logger.info('\n🔍 Validating migration...', { component: 'SimpleTool' });
   
   const oldPatterns = [
     'server/cache/CacheService',
@@ -232,7 +233,7 @@ async function validateMigration() {
   }
   
   if (!foundOldImports) {
-    console.log('✅ No old imports found - migration appears successful!');
+    logger.info('✅ No old imports found - migration appears successful!', { component: 'SimpleTool' });
   }
   
   // Check for new imports
@@ -247,7 +248,7 @@ async function validateMigration() {
       console.log(`✅ Found ${lines.length} new core utility imports`);
     }
   } catch (error) {
-    console.log('⚠️  No new core utility imports found');
+    logger.info('⚠️  No new core utility imports found', { component: 'SimpleTool' });
   }
 }
 
@@ -255,13 +256,19 @@ async function validateMigration() {
 if (require.main === module) {
   runMigration()
     .then(() => {
-      console.log('\n🎉 Migration completed successfully!');
+      logger.info('\n🎉 Migration completed successfully!', { component: 'SimpleTool' });
       process.exit(0);
     })
     .catch((error) => {
-      console.error('\n💥 Migration failed:', error);
+      logger.error('\n💥 Migration failed:', { component: 'SimpleTool' }, error);
       process.exit(1);
     });
 }
 
 export { runMigration };
+
+
+
+
+
+

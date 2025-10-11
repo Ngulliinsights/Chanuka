@@ -7,8 +7,9 @@
 
 import fs from 'fs';
 import path from 'path';
+import { logger } from '../utils/logger.js';
 
-console.log('🔍 Verifying Financial Disclosure Monitoring System...\n');
+logger.info('🔍 Verifying Financial Disclosure Monitoring System...\n', { component: 'SimpleTool' });
 
 async function verifySystem() {
   const results = {
@@ -260,17 +261,17 @@ async function verifySystem() {
 // Run verification
 verifySystem()
   .then(results => {
-    console.log('\n📊 Verification Results:');
+    logger.info('\n📊 Verification Results:', { component: 'SimpleTool' });
     console.log(`✅ Passed: ${results.passed}`);
     console.log(`❌ Failed: ${results.failed}`);
     console.log(`📈 Success Rate: ${((results.passed / (results.passed + results.failed)) * 100).toFixed(1)}%`);
     
     if (results.failed === 0) {
-      console.log('\n🎉 All tests passed! Financial Disclosure Monitoring System is ready.');
+      logger.info('\n🎉 All tests passed! Financial Disclosure Monitoring System is ready.', { component: 'SimpleTool' });
       process.exit(0);
     } else {
-      console.log('\n⚠️  Some tests failed. Review the errors above.');
-      console.log('\nFailed Tests:');
+      logger.info('\n⚠️  Some tests failed. Review the errors above.', { component: 'SimpleTool' });
+      logger.info('\nFailed Tests:', { component: 'SimpleTool' });
       results.tests
         .filter(test => test.status === 'FAILED')
         .forEach(test => {
@@ -280,6 +281,6 @@ verifySystem()
     }
   })
   .catch(error => {
-    console.error('\n💥 Verification failed with error:', error);
+    logger.error('\n💥 Verification failed with error:', { component: 'SimpleTool' }, error);
     process.exit(1);
   });

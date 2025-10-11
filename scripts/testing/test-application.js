@@ -7,6 +7,7 @@
 
 import http from 'http';
 import { spawn } from 'child_process';
+import { logger } from '../utils/logger.js';
 
 const BASE_URL = 'http://localhost:4200';
 const TEST_TIMEOUT = 30000;
@@ -224,11 +225,11 @@ async function testPerformance() {
 
 // Main test runner
 async function runAllTests() {
-  console.log('🚀 Starting Comprehensive Application Testing');
-  console.log('=' .repeat(60));
+  logger.info('🚀 Starting Comprehensive Application Testing', { component: 'SimpleTool' });
+  logger.info('=', { component: 'SimpleTool' }, .repeat(60));
   
   // Wait for server to be ready
-  console.log('⏳ Waiting for server to be ready...');
+  logger.info('⏳ Waiting for server to be ready...', { component: 'SimpleTool' });
   let serverReady = false;
   let attempts = 0;
   const maxAttempts = 30;
@@ -244,11 +245,11 @@ async function runAllTests() {
   }
   
   if (!serverReady) {
-    console.log('❌ Server is not ready after 30 seconds');
+    logger.info('❌ Server is not ready after 30 seconds', { component: 'SimpleTool' });
     process.exit(1);
   }
   
-  console.log('✅ Server is ready, starting tests...');
+  logger.info('✅ Server is ready, starting tests...', { component: 'SimpleTool' });
   
   // Run all tests
   await runTest('Application Startup and Health Check', testApplicationStartup);
@@ -261,15 +262,15 @@ async function runAllTests() {
   await runTest('Performance and Responsiveness', testPerformance);
   
   // Print summary
-  console.log('\n' + '=' .repeat(60));
-  console.log('📊 TEST SUMMARY');
-  console.log('=' .repeat(60));
+  logger.info('\n', { component: 'SimpleTool' }, + '=' .repeat(60));
+  logger.info('📊 TEST SUMMARY', { component: 'SimpleTool' });
+  logger.info('=', { component: 'SimpleTool' }, .repeat(60));
   console.log(`✅ Passed: ${testResults.passed}`);
   console.log(`❌ Failed: ${testResults.failed}`);
   console.log(`📈 Success Rate: ${((testResults.passed / (testResults.passed + testResults.failed)) * 100).toFixed(1)}%`);
   
   if (testResults.failed > 0) {
-    console.log('\n❌ Failed Tests:');
+    logger.info('\n❌ Failed Tests:', { component: 'SimpleTool' });
     testResults.tests
       .filter(test => test.status === 'FAILED')
       .forEach(test => {
@@ -277,30 +278,30 @@ async function runAllTests() {
       });
   }
   
-  console.log('\n🎯 Core User Flows Status:');
-  console.log('   • Application Startup: ✅ Working');
-  console.log('   • Frontend Access: ✅ Working');
-  console.log('   • API Access: ✅ Working');
-  console.log('   • Database Fallback: ✅ Working');
-  console.log('   • Error Handling: ✅ Working');
+  logger.info('\n🎯 Core User Flows Status:', { component: 'SimpleTool' });
+  logger.info('   • Application Startup: ✅ Working', { component: 'SimpleTool' });
+  logger.info('   • Frontend Access: ✅ Working', { component: 'SimpleTool' });
+  logger.info('   • API Access: ✅ Working', { component: 'SimpleTool' });
+  logger.info('   • Database Fallback: ✅ Working', { component: 'SimpleTool' });
+  logger.info('   • Error Handling: ✅ Working', { component: 'SimpleTool' });
   
-  console.log('\n📝 Notes:');
-  console.log('   • Application runs in demo mode when database is unavailable');
-  console.log('   • Some database schema issues exist but don\'t prevent core functionality');
-  console.log('   • Security monitoring is active but has some table schema issues');
-  console.log('   • Frontend is served via Vite development server');
+  logger.info('\n📝 Notes:', { component: 'SimpleTool' });
+  logger.info('   • Application runs in demo mode when database is unavailable', { component: 'SimpleTool' });
+  logger.info('   • Some database schema issues exist but don\', { component: 'SimpleTool' }, t prevent core functionality');
+  logger.info('   • Security monitoring is active but has some table schema issues', { component: 'SimpleTool' });
+  logger.info('   • Frontend is served via Vite development server', { component: 'SimpleTool' });
   
   if (testResults.failed === 0) {
-    console.log('\n🎉 All tests passed! Application is ready for deployment.');
+    logger.info('\n🎉 All tests passed! Application is ready for deployment.', { component: 'SimpleTool' });
     process.exit(0);
   } else {
-    console.log('\n⚠️  Some tests failed, but core functionality is working.');
+    logger.info('\n⚠️  Some tests failed, but core functionality is working.', { component: 'SimpleTool' });
     process.exit(1);
   }
 }
 
 // Run tests
 runAllTests().catch(error => {
-  console.error('💥 Test runner failed:', error);
+  logger.error('💥 Test runner failed:', { component: 'SimpleTool' }, error);
   process.exit(1);
 });

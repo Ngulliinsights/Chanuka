@@ -8,6 +8,7 @@ import { securityMiddleware } from '../middleware/security-middleware.js';
 import { authRateLimit, apiRateLimit } from '../middleware/rate-limiter.js';
 import https from 'https';
 import fs from 'fs';
+import { logger } from '../../utils/logger';
 
 /**
  * Security initialization service that sets up all security components
@@ -25,11 +26,11 @@ export class SecurityInitializationService {
    */
   async initializeSecurity(): Promise<void> {
     if (this.isInitialized) {
-      console.log('⚠️  Security already initialized');
+      logger.info('⚠️  Security already initialized', { component: 'SimpleTool' });
       return;
     }
 
-    console.log('🔒 Initializing comprehensive security system...');
+    logger.info('🔒 Initializing comprehensive security system...', { component: 'SimpleTool' });
 
     try {
       // 1. Initialize encryption service
@@ -57,7 +58,7 @@ export class SecurityInitializationService {
       await this.setupAutomatedSecurityTasks();
 
       this.isInitialized = true;
-      console.log('✅ Security system initialized successfully');
+      logger.info('✅ Security system initialized successfully', { component: 'SimpleTool' });
 
       // Log security initialization
       await securityAuditService.logSecurityEvent({
@@ -79,7 +80,7 @@ export class SecurityInitializationService {
       });
 
     } catch (error) {
-      console.error('❌ Security initialization failed:', error);
+      logger.error('❌ Security initialization failed:', { component: 'SimpleTool' }, error);
       throw new Error('Security system initialization failed');
     }
   }
@@ -88,7 +89,7 @@ export class SecurityInitializationService {
    * Initialize encryption service
    */
   private async initializeEncryption(): Promise<void> {
-    console.log('🔐 Initializing encryption service...');
+    logger.info('🔐 Initializing encryption service...', { component: 'SimpleTool' });
 
     // Validate encryption configuration
     const hasEncryptionKey = process.env.ENCRYPTION_KEY && process.env.KEY_DERIVATION_SALT;
@@ -108,9 +109,9 @@ export class SecurityInitializationService {
         throw new Error('Encryption test failed');
       }
       
-      console.log('✅ Encryption service initialized and tested');
+      logger.info('✅ Encryption service initialized and tested', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('❌ Encryption service test failed:', error);
+      logger.error('❌ Encryption service test failed:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -119,7 +120,7 @@ export class SecurityInitializationService {
    * Set up security middleware
    */
   private async setupSecurityMiddleware(): Promise<void> {
-    console.log('🛡️  Setting up security middleware...');
+    logger.info('🛡️  Setting up security middleware...', { component: 'SimpleTool' });
 
     // Apply all security middleware
     const middlewares = securityMiddleware.initializeAll();
@@ -134,26 +135,26 @@ export class SecurityInitializationService {
     this.app.use('/api/auth/password-reset', authRateLimit);
     this.app.use('/api', apiRateLimit);
 
-    console.log('✅ Security middleware configured');
+    logger.info('✅ Security middleware configured', { component: 'SimpleTool' });
   }
 
   /**
    * Initialize session management
    */
   private async initializeSessionManagement(): Promise<void> {
-    console.log('🎫 Initializing secure session management...');
+    logger.info('🎫 Initializing secure session management...', { component: 'SimpleTool' });
 
     // Clean up expired sessions on startup
     await secureSessionService.cleanupExpiredSessions();
 
-    console.log('✅ Session management initialized');
+    logger.info('✅ Session management initialized', { component: 'SimpleTool' });
   }
 
   /**
    * Set up input validation
    */
   private async setupInputValidation(): Promise<void> {
-    console.log('🔍 Setting up input validation...');
+    logger.info('🔍 Setting up input validation...', { component: 'SimpleTool' });
 
     // Test input validation
     try {
@@ -164,9 +165,9 @@ export class SecurityInitializationService {
         throw new Error('Input validation test failed');
       }
 
-      console.log('✅ Input validation configured and tested');
+      logger.info('✅ Input validation configured and tested', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('❌ Input validation test failed:', error);
+      logger.error('❌ Input validation test failed:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -175,7 +176,7 @@ export class SecurityInitializationService {
    * Initialize security audit logging
    */
   private async initializeSecurityAudit(): Promise<void> {
-    console.log('📋 Initializing security audit logging...');
+    logger.info('📋 Initializing security audit logging...', { component: 'SimpleTool' });
 
     // Test audit logging
     try {
@@ -186,9 +187,9 @@ export class SecurityInitializationService {
         details: { test: true }
       });
 
-      console.log('✅ Security audit logging initialized');
+      logger.info('✅ Security audit logging initialized', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('❌ Security audit logging test failed:', error);
+      logger.error('❌ Security audit logging test failed:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -197,13 +198,13 @@ export class SecurityInitializationService {
    * Set up TLS configuration
    */
   private async setupTLSConfiguration(): Promise<void> {
-    console.log('🔐 Setting up TLS configuration...');
+    logger.info('🔐 Setting up TLS configuration...', { component: 'SimpleTool' });
 
     try {
       const tlsOptions = tlsConfigService.getHTTPSServerOptions();
       
       if (tlsConfigService.validateTLSConfig(tlsOptions)) {
-        console.log('✅ TLS configuration validated');
+        logger.info('✅ TLS configuration validated', { component: 'SimpleTool' });
         
         // Store TLS options for server creation
         (this.app as any).tlsOptions = tlsOptions;
@@ -220,7 +221,7 @@ export class SecurityInitializationService {
    * Initialize security monitoring
    */
   private async initializeSecurityMonitoring(): Promise<void> {
-    console.log('👁️  Initializing security monitoring...');
+    logger.info('👁️  Initializing security monitoring...', { component: 'SimpleTool' });
 
     // Set up periodic security checks
     setInterval(async () => {
@@ -232,53 +233,53 @@ export class SecurityInitializationService {
         // This would integrate with external monitoring tools in production
         
       } catch (error) {
-        console.error('Security monitoring error:', error);
+        logger.error('Security monitoring error:', { component: 'SimpleTool' }, error);
       }
     }, 15 * 60 * 1000); // Every 15 minutes
 
-    console.log('✅ Security monitoring initialized');
+    logger.info('✅ Security monitoring initialized', { component: 'SimpleTool' });
   }
 
   /**
    * Set up automated security tasks
    */
   private async setupAutomatedSecurityTasks(): Promise<void> {
-    console.log('⚙️  Setting up automated security tasks...');
+    logger.info('⚙️  Setting up automated security tasks...', { component: 'SimpleTool' });
 
     // Daily security cleanup
     setInterval(async () => {
       try {
-        console.log('🧹 Running daily security cleanup...');
+        logger.info('🧹 Running daily security cleanup...', { component: 'SimpleTool' });
         
         // Clean up expired sessions
         await secureSessionService.cleanupExpiredSessions();
         
         // Generate security report
         const report = await this.generateSecurityReport();
-        console.log('📊 Daily security report generated:', report.summary);
+        logger.info('📊 Daily security report generated:', { component: 'SimpleTool' }, report.summary);
         
       } catch (error) {
-        console.error('Daily security cleanup error:', error);
+        logger.error('Daily security cleanup error:', { component: 'SimpleTool' }, error);
       }
     }, 24 * 60 * 60 * 1000); // Every 24 hours
 
     // Weekly security audit
     setInterval(async () => {
       try {
-        console.log('🔍 Running weekly security audit...');
+        logger.info('🔍 Running weekly security audit...', { component: 'SimpleTool' });
         
         const endDate = new Date();
         const startDate = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000);
         
         const auditReport = await securityAuditService.generateAuditReport(startDate, endDate);
-        console.log('📋 Weekly audit report:', auditReport.summary);
+        logger.info('📋 Weekly audit report:', { component: 'SimpleTool' }, auditReport.summary);
         
       } catch (error) {
-        console.error('Weekly security audit error:', error);
+        logger.error('Weekly security audit error:', { component: 'SimpleTool' }, error);
       }
     }, 7 * 24 * 60 * 60 * 1000); // Every 7 days
 
-    console.log('✅ Automated security tasks configured');
+    logger.info('✅ Automated security tasks configured', { component: 'SimpleTool' });
   }
 
   /**
@@ -326,7 +327,7 @@ export class SecurityInitializationService {
 
       return report;
     } catch (error) {
-      console.error('Security report generation failed:', error);
+      logger.error('Security report generation failed:', { component: 'SimpleTool' }, error);
       return {
         status: 'critical',
         summary: { error: 'Report generation failed' },
@@ -376,14 +377,14 @@ export class SecurityInitializationService {
           }
         });
 
-        console.log('✅ HTTPS server created with TLS configuration');
+        logger.info('✅ HTTPS server created with TLS configuration', { component: 'SimpleTool' });
         return server;
       } else {
         console.warn('⚠️  TLS configuration invalid. Cannot create HTTPS server.');
         return null;
       }
     } catch (error) {
-      console.error('❌ HTTPS server creation failed:', error);
+      logger.error('❌ HTTPS server creation failed:', { component: 'SimpleTool' }, error);
       return null;
     }
   }
@@ -437,3 +438,11 @@ export class SecurityInitializationService {
 export const createSecurityInitializationService = (app: Express) => {
   return new SecurityInitializationService(app);
 };
+
+
+
+
+
+
+
+

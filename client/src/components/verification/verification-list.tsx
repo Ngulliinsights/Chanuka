@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LoadingSpinner } from '@/components/ui/spinner';
 import { useBills } from '@/hooks/use-bills';
+import { logger } from '../utils/logger.js';
 
 interface VerificationItem {
   id: number;

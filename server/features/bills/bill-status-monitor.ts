@@ -1,10 +1,11 @@
 import { eq, and, desc, sql } from 'drizzle-orm';
-import { databaseService } from '../../services/database-service.js';
+import { databaseService } from '../../infrastructure/database/database-service.js';
 import { webSocketService } from '../../infrastructure/websocket.js';
 import { userProfileService } from '../users/user-profile.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service.js';
 import * as schema from '../../../shared/schema.js';
 import { Bill } from '../../../shared/schema.js';
+import { logger } from '../../utils/logger';
 
 export interface BillStatusChange {
   billId: number;
@@ -125,7 +126,7 @@ export class BillStatusMonitorService {
       console.log(`✅ Successfully processed status change for bill ${change.billId}`);
 
     } catch (error) {
-      console.error('Error handling bill status change:', error);
+      logger.error('Error handling bill status change:', { component: 'SimpleTool' }, error as any);
       throw error;
     }
   }
@@ -157,7 +158,7 @@ export class BillStatusMonitorService {
 
       // Broadcast real-time engagement update
       webSocketService.broadcastBillUpdate(update.billId, {
-        type: update.type === 'comment' ? 'new_comment' : 'engagement_update',
+        type: update.type === 'comment' ? 'new_comment' : 'new_comment',
         data: {
           billId: update.billId,
           billTitle: bill.title,
@@ -172,7 +173,7 @@ export class BillStatusMonitorService {
       console.log(`✅ Successfully processed engagement update for bill ${update.billId}`);
 
     } catch (error) {
-      console.error('Error handling bill engagement update:', error);
+      logger.error('Error handling bill engagement update:', { component: 'SimpleTool' }, error as any);
       throw error;
     }
   }
@@ -288,33 +289,12 @@ export class BillStatusMonitorService {
    */
   private async sendImmediateNotification(userId: string, notification: any): Promise<void> {
     try {
-      // Use the multi-channel notification service
-      const { notificationService } = await import('./notification-service.js');
-      
-      await notificationService.sendNotification({
-        userId,
-        type: notification.type,
-        title: notification.title,
-        message: notification.message,
-        data: notification.data,
-        priority: 'normal',
-        templateId: notification.type === 'bill_status_change' ? 'bill_status_change' : 
-                   notification.type === 'bill_engagement_update' ? 'new_comment' : undefined,
-        templateVariables: this.createTemplateVariables(notification)
-      });
-
-      console.log(`📱 Sent immediate notification to user ${userId} via multi-channel service`);
-    } catch (error) {
-      console.error(`Error sending immediate notification to user ${userId}:`, error);
-      
       // Fallback to direct WebSocket and database storage
-      try {
-        webSocketService.sendUserNotification(userId, notification);
-        await this.storeNotification(userId, notification);
-        console.log(`📱 Sent fallback notification to user ${userId}`);
-      } catch (fallbackError) {
-        console.error(`Error sending fallback notification to user ${userId}:`, fallbackError);
-      }
+      webSocketService.sendUserNotification(userId, notification);
+      await this.storeNotification(userId, notification);
+      console.log(`📱 Sent notification to user ${userId}`);
+    } catch (error) {
+      console.error(`Error sending notification to user ${userId}:`, error as any);
     }
   }
 
@@ -405,7 +385,7 @@ export class BillStatusMonitorService {
         console.log(`📬 Sent batched notification to user ${userId} with ${notifications.length} updates`);
 
       } catch (error) {
-        console.error(`Error processing batched notifications for user ${userId}:`, error);
+        console.error(`Error processing batched notifications for user ${userId}:`, error as any);
       }
     }
   }
@@ -414,7 +394,7 @@ export class BillStatusMonitorService {
    * Get bill details from database or cache
    */
   private async getBillDetails(billId: number): Promise<Bill | null> {
-    const cacheKey = CACHE_KEYS.BILL_DETAIL(billId);
+    const cacheKey = CACHE_KEYS.BILL_DETAILS(billId);
     
     return await cacheService.getOrSet(
       cacheKey,
@@ -458,7 +438,7 @@ export class BillStatusMonitorService {
             .where(eq(schema.billEngagement.billId, billId));
 
           // Get preferences for each user
-          const subscribers = [];
+          const subscribers: Array<{ userId: string; preferences: NotificationPreferences; }> = [];
           for (const tracker of trackers) {
             const preferences = await this.getUserNotificationPreferences(tracker.userId);
             subscribers.push({
@@ -475,7 +455,7 @@ export class BillStatusMonitorService {
 
       return result.data;
     } catch (error) {
-      console.error(`Error getting bill subscribers for bill ${billId}:`, error);
+      console.error(`Error getting bill subscribers for bill ${billId}:`, error as any);
       return [];
     }
   }
@@ -533,7 +513,7 @@ export class BillStatusMonitorService {
         }
       };
     } catch (error) {
-      console.error(`Error getting notification preferences for user ${userId}:`, error);
+      console.error(`Error getting notification preferences for user ${userId}:`, error as any);
       
       // Return default preferences
       return {
@@ -622,7 +602,7 @@ export class BillStatusMonitorService {
         `storeNotification:${userId}`
       );
     } catch (error) {
-      console.error(`Error storing notification for user ${userId}:`, error);
+      console.error(`Error storing notification for user ${userId}:`, error as any);
     }
   }
 
@@ -661,7 +641,7 @@ export class BillStatusMonitorService {
         `updateBillEngagementStats:${billId}`
       );
     } catch (error) {
-      console.error(`Error updating engagement stats for bill ${billId}:`, error);
+      console.error(`Error updating engagement stats for bill ${billId}:`, error as any);
     }
   }
 
@@ -680,7 +660,7 @@ export class BillStatusMonitorService {
       
       await cacheService.set(cacheKey, recentChanges, CACHE_TTL.BILL_DATA);
     } catch (error) {
-      console.error('Error caching status change:', error);
+      logger.error('Error caching status change:', { component: 'SimpleTool' }, error as any);
     }
   }
 
@@ -694,7 +674,7 @@ export class BillStatusMonitorService {
       const changes = await cacheService.get(cacheKey);
       return changes || [];
     } catch (error) {
-      console.error(`Error getting status history for bill ${billId}:`, error);
+      console.error(`Error getting status history for bill ${billId}:`, error as any);
       return [];
     }
   }
@@ -715,7 +695,7 @@ export class BillStatusMonitorService {
    * Cleanup resources
    */
   async shutdown(): Promise<void> {
-    console.log('Shutting down Bill Status Monitor Service...');
+    logger.info('Shutting down Bill Status Monitor Service...', { component: 'SimpleTool' });
     
     if (this.batchInterval) {
       clearInterval(this.batchInterval);
@@ -728,8 +708,16 @@ export class BillStatusMonitorService {
     this.statusChangeListeners.clear();
     this.batchedNotifications.clear();
     
-    console.log('Bill Status Monitor Service shutdown complete');
+    logger.info('Bill Status Monitor Service shutdown complete', { component: 'SimpleTool' });
   }
 }
 
 export const billStatusMonitorService = new BillStatusMonitorService();
+
+
+
+
+
+
+
+

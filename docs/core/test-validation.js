@@ -1,19 +1,19 @@
 // Simple test to check validation imports
 const { ValidationService, userRegistrationSchema } = require('./dist/validation');
 
-console.log('ValidationService:', typeof ValidationService);
-console.log('userRegistrationSchema:', typeof userRegistrationSchema);
+logger.info('ValidationService:', { component: 'SimpleTool' }, typeof ValidationService);
+logger.info('userRegistrationSchema:', { component: 'SimpleTool' }, typeof userRegistrationSchema);
 
 if (userRegistrationSchema && typeof userRegistrationSchema.extend === 'function') {
-  console.log('✅ userRegistrationSchema.extend is available');
+  logger.info('✅ userRegistrationSchema.extend is available', { component: 'SimpleTool' });
 } else {
-  console.log('❌ userRegistrationSchema.extend is not available');
-  console.log('userRegistrationSchema methods:', Object.getOwnPropertyNames(userRegistrationSchema));
+  logger.info('❌ userRegistrationSchema.extend is not available', { component: 'SimpleTool' });
+  logger.info('userRegistrationSchema methods:', { component: 'SimpleTool' }, Object.getOwnPropertyNames(userRegistrationSchema));
 }
 
 try {
   const service = new ValidationService();
-  console.log('✅ ValidationService can be instantiated');
+  logger.info('✅ ValidationService can be instantiated', { component: 'SimpleTool' });
 } catch (error) {
-  console.log('❌ ValidationService instantiation failed:', error.message);
+  logger.info('❌ ValidationService instantiation failed:', { component: 'SimpleTool' }, error.message);
 }

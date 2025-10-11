@@ -1,4 +1,5 @@
 import { NavigationSection } from '@/types/navigation';
+import { logger } from '../utils/logger';
 
 /**
  * Determines the current navigation section based on the path
@@ -88,3 +89,9 @@ export function sectionRequiresAuth(section: NavigationSection): boolean {
 export function sectionRequiresAdmin(section: NavigationSection): boolean {
   return section === 'admin';
 }
+
+
+
+
+
+

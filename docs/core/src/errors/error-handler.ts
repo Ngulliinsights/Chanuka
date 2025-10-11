@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as Sentry from '@sentry/node';
 import { BaseError, ErrorDomain, ErrorSeverity } from './base-error';
 import { Logger } from '../logging';
+import { logger } from '../utils/logger';
 
 // Define a more flexible error response type that allows additional properties
 interface ErrorResponse {
@@ -323,3 +324,9 @@ export function setupGlobalErrorHandlers(logger: Logger) {
     }
   });
 }
+
+
+
+
+
+

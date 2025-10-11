@@ -10,19 +10,20 @@
 
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../infrastructure/external-data/external-api-manager.js';
 import { APICostMonitoringService } from '../services/api-cost-monitoring.js';
+import { logger } from '../utils/logger';
 
 async function verifyExternalAPIManagement() {
-  console.log('🔍 Verifying External API Management Implementation (Task 12.3)...\n');
+  logger.info('🔍 Verifying External API Management Implementation (Task 12.3)...\n', { component: 'SimpleTool' });
 
   try {
     // Initialize services
     const apiManager = new ExternalAPIManagementService();
     const costMonitoring = new APICostMonitoringService();
 
-    console.log('✅ Services initialized successfully');
+    logger.info('✅ Services initialized successfully', { component: 'SimpleTool' });
 
     // 1. Verify API Rate Limiting and Quota Management
-    console.log('\n📊 1. API Rate Limiting and Quota Management');
+    logger.info('\n📊 1. API Rate Limiting and Quota Management', { component: 'SimpleTool' });
     const analytics = apiManager.getAPIAnalytics();
     
     console.log(`   - Total sources configured: ${analytics.sources.length}`);
@@ -33,7 +34,7 @@ async function verifyExternalAPIManagement() {
     });
 
     // 2. Verify API Health Monitoring and Failover
-    console.log('\n🏥 2. API Health Monitoring and Failover');
+    logger.info('\n🏥 2. API Health Monitoring and Failover', { component: 'SimpleTool' });
     const healthStatuses = apiManager.getHealthStatus();
     
     console.log(`   - Health monitoring active for ${healthStatuses.length} sources`);
@@ -42,7 +43,7 @@ async function verifyExternalAPIManagement() {
     });
 
     // 3. Verify API Response Caching and Optimization
-    console.log('\n💾 3. API Response Caching and Optimization');
+    logger.info('\n💾 3. API Response Caching and Optimization', { component: 'SimpleTool' });
     const cacheStats = apiManager.getCacheStatistics();
     
     console.log(`   - Cache entries: ${cacheStats.totalEntries}`);
@@ -51,7 +52,7 @@ async function verifyExternalAPIManagement() {
     console.log(`   - Top cached endpoints: ${cacheStats.topCachedEndpoints.length}`);
 
     // 4. Verify API Usage Analytics and Cost Monitoring
-    console.log('\n💰 4. API Usage Analytics and Cost Monitoring');
+    logger.info('\n💰 4. API Usage Analytics and Cost Monitoring', { component: 'SimpleTool' });
     console.log(`   - Total requests: ${analytics.totalRequests}`);
     console.log(`   - Total cost: $${analytics.totalCost.toFixed(4)}`);
     console.log(`   - Average response time: ${analytics.averageResponseTime.toFixed(2)}ms`);
@@ -67,11 +68,11 @@ async function verifyExternalAPIManagement() {
     console.log(`   - Cost optimization recommendations: ${costReport.recommendations.length}`);
 
     // 5. Verify Integration Features
-    console.log('\n🔗 5. Integration Features');
+    logger.info('\n🔗 5. Integration Features', { component: 'SimpleTool' });
     
     // Test cost recording
     costMonitoring.recordRequestCost('test-source', 5, 0.01);
-    console.log('   - Cost recording: ✅ Working');
+    logger.info('   - Cost recording: ✅ Working', { component: 'SimpleTool' });
     
     // Test cache clearing
     const clearedCount = apiManager.clearCache();
@@ -82,33 +83,33 @@ async function verifyExternalAPIManagement() {
     apiManager.on('cacheCleared', () => {
       eventHandled = true;
     });
-    console.log('   - Event handling: ✅ Working');
+    logger.info('   - Event handling: ✅ Working', { component: 'SimpleTool' });
 
     // 6. Verify Dashboard Integration
-    console.log('\n📈 6. Dashboard Integration');
-    console.log('   - External API Management Service: ✅ Available');
-    console.log('   - Cost Monitoring Service: ✅ Available');
-    console.log('   - Analytics API: ✅ Available');
-    console.log('   - Health Monitoring API: ✅ Available');
-    console.log('   - Cache Management API: ✅ Available');
-    console.log('   - Cost Reporting API: ✅ Available');
+    logger.info('\n📈 6. Dashboard Integration', { component: 'SimpleTool' });
+    logger.info('   - External API Management Service: ✅ Available', { component: 'SimpleTool' });
+    logger.info('   - Cost Monitoring Service: ✅ Available', { component: 'SimpleTool' });
+    logger.info('   - Analytics API: ✅ Available', { component: 'SimpleTool' });
+    logger.info('   - Health Monitoring API: ✅ Available', { component: 'SimpleTool' });
+    logger.info('   - Cache Management API: ✅ Available', { component: 'SimpleTool' });
+    logger.info('   - Cost Reporting API: ✅ Available', { component: 'SimpleTool' });
 
     // Summary
-    console.log('\n🎉 Task 12.3 Verification Summary:');
-    console.log('   ✅ API rate limiting and quota management - IMPLEMENTED');
-    console.log('   ✅ API health monitoring and failover mechanisms - IMPLEMENTED');
-    console.log('   ✅ API response caching and optimization - IMPLEMENTED');
-    console.log('   ✅ API usage analytics and cost monitoring - IMPLEMENTED');
-    console.log('   ✅ Dashboard and management interfaces - IMPLEMENTED');
-    console.log('   ✅ Event handling and integration - IMPLEMENTED');
+    logger.info('\n🎉 Task 12.3 Verification Summary:', { component: 'SimpleTool' });
+    logger.info('   ✅ API rate limiting and quota management - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('   ✅ API health monitoring and failover mechanisms - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('   ✅ API response caching and optimization - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('   ✅ API usage analytics and cost monitoring - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('   ✅ Dashboard and management interfaces - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('   ✅ Event handling and integration - IMPLEMENTED', { component: 'SimpleTool' });
 
-    console.log('\n🚀 All components of External API Management are successfully implemented!');
+    logger.info('\n🚀 All components of External API Management are successfully implemented!', { component: 'SimpleTool' });
 
     // Cleanup
     apiManager.shutdown();
 
   } catch (error) {
-    console.error('❌ Verification failed:', error);
+    logger.error('❌ Verification failed:', { component: 'SimpleTool' }, error);
     process.exit(1);
   }
 }
@@ -119,3 +120,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export { verifyExternalAPIManagement };
+
+
+
+
+
+

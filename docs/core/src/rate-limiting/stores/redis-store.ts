@@ -14,6 +14,7 @@
 
 import { Redis } from 'ioredis';
 import { RateLimitStore, RateLimitResult, RateLimitConfig, RateLimitMetricsInterface } from '../types';
+import { logger } from '../utils/logger';
 
 interface RedisRateLimitStoreOptions {
   /** Prefix for all Redis keys to avoid collisions */
@@ -367,7 +368,7 @@ export class RedisStore implements RateLimitStore {
         await pipeline.exec();
       }
     } catch (error) {
-      console.error('Failed to cleanup expired keys:', error);
+      logger.error('Failed to cleanup expired keys:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -403,7 +404,7 @@ export class RedisStore implements RateLimitStore {
 
       return keys.length;
     } catch (error) {
-      console.error('Failed to cleanup expired keys:', error);
+      logger.error('Failed to cleanup expired keys:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -418,7 +419,7 @@ export class RedisStore implements RateLimitStore {
       const result = await this.redis.ping();
       return result === 'PONG';
     } catch (error) {
-      console.error('Redis health check failed:', error);
+      logger.error('Redis health check failed:', { component: 'SimpleTool' }, error);
       return false;
     }
   }
@@ -599,3 +600,9 @@ export class RedisStore implements RateLimitStore {
 
 // Maintain backward compatibility with existing imports
 export { RedisStore as RedisRateLimitStore };
+
+
+
+
+
+

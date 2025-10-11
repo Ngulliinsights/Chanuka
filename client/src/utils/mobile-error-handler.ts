@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 /**
  * Mobile Error Handler
  * Provides mobile-specific error handling and fallback mechanisms
@@ -184,7 +185,7 @@ export class MobileErrorHandler {
         console.log(`Recovery strategy executed for ${type} error`);
         return;
       } catch (recoveryError) {
-        console.error('Recovery strategy failed:', recoveryError);
+        logger.error('Recovery strategy failed:', { component: 'SimpleTool' }, recoveryError);
       }
     }
 
@@ -512,3 +513,9 @@ export function useMobileErrorHandler() {
 
 // Import React for hooks
 import React from 'react';
+
+
+
+
+
+

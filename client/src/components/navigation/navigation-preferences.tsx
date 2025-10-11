@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { NavigationPreferences } from '@/types/navigation';
+import { logger } from '../utils/logger.js';
 
 interface NavigationPreferencesProps {
   onClose?: () => void;

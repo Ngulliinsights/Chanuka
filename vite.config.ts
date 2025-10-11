@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { visualizer } from 'rollup-plugin-visualizer';
 import viteCompression from 'vite-plugin-compression';
+import { logger } from '../utils/logger';
 
 export default defineConfig({
   plugins: [
@@ -149,3 +150,10 @@ export default defineConfig({
     assetsInlineLimit: 4096, // 4KB threshold for inlining assets
   },
 });
+
+
+
+
+
+
+

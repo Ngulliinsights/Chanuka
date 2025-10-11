@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import NavigationPreferencesComponent from './navigation-preferences';
+import { logger } from '../utils/logger.js';
 
 interface NavigationPreferencesDialogProps {
   trigger?: React.ReactNode;

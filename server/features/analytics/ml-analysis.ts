@@ -1,48 +1,14 @@
 import { database as db } from '../../../shared/database/connection.js';
-import { bills, analysis } from '../../shared/schema';
+import { bills, analysis } from '../../../shared/schema';
 import { eq, desc } from 'drizzle-orm';
-
-// Enhanced type definitions with more specific constraints
-export interface AnalysisResult {
-  confidence: number; // 0.0 to 1.0
-  result: any;
-  analysisType: string;
-  metadata?: {
-    processingTime?: number;
-    dataSourcesUsed?: string[];
-    modelVersion?: string;
-    [key: string]: any;
-  };
-}
-
-export interface SimilarityAnalysis {
-  textSimilarity: number; // 0.0 to 1.0
-  structuralSimilarity: number; // 0.0 to 1.0
-  intentSimilarity: number; // 0.0 to 1.0
-  overallSimilarity: number; // 0.0 to 1.0
-  concernLevel: 'low' | 'medium' | 'high';
-  // Additional context for better decision making
-  analysisBreakdown?: {
-    keyPhrasesMatched: string[];
-    structuralPatterns: string[];
-    intentIndicators: string[];
-  };
-}
-
-export interface ImplementationWorkaroundDetection {
-  workaroundId: string;
-  description: string;
-  concernLevel: 'low' | 'medium' | 'high';
-  confidence: number; // 0.0 to 1.0
-  suggestedActions: string[];
-  // Enhanced with more actionable information
-  detectionContext?: {
-    discoveredAt: Date;
-    affectedSections: string[];
-    riskFactors: string[];
-    urgencyLevel: 'low' | 'medium' | 'high' | 'critical';
-  };
-}
+import { logger } from '../../utils/logger';
+import { errorTracker } from '../../core/errors/error-tracker';
+import type {
+  AnalysisResult,
+  SimilarityAnalysis,
+  ImplementationWorkaroundDetection,
+  ComprehensiveAnalysisResult
+} from './types';
 
 // New interface for enhanced error handling and logging
 interface AnalysisError {
@@ -55,7 +21,25 @@ interface AnalysisError {
 export class MLAnalysisService {
   // Public helper method for consistent error handling
   public static handleAnalysisError(error: unknown, analysisType: string): AnalysisResult {
-    console.error(`Error in ${analysisType} analysis:`, error);
+    // Prefer centralized logger and error tracker over console.error
+    // Log error with centralized logger
+    try {
+      logger.error(`Error in ${analysisType} analysis`, { error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+    } catch (_) {
+      // If logger fails silently, do nothing to avoid throwing from the error handler
+    }
+
+    try {
+      if ((errorTracker as any)?.capture) {
+        (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), {
+          component: 'ml-analysis',
+          analysisType
+        });
+      }
+    } catch (reportErr) {
+      // Don't allow reporting failures to break analysis fallback
+      try { logger.warn('Failed to report ML analysis error to errorTracker', { reportErr }); } catch (_) { }
+    }
 
     return {
       confidence: 0.0,
@@ -321,7 +305,11 @@ export class MLAnalysisService {
         ]
       };
     } catch (error) {
-      console.error('Error in implementation workaround detection:', error);
+      logger.error('Error in implementation workaround detection:', {
+        component: 'SimpleTool',
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
       return {
         matches: [],
         overallRisk: 0.0,
@@ -367,7 +355,11 @@ export async function detectImplementationWorkarounds(billId: string): Promise<I
       }
     ];
   } catch (error) {
-    console.error('Error in detectImplementationWorkarounds:', error);
+    logger.error('Error in detectImplementationWorkarounds:', {
+      component: 'SimpleTool',
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
     return [];
   }
 }
@@ -455,7 +447,11 @@ export async function performComprehensiveAnalysis(billId: string): Promise<{
       }
     };
   } catch (error) {
-    console.error('Error in comprehensive analysis:', error);
+    logger.error('Error in comprehensive analysis:', {
+      component: 'SimpleTool',
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
 
     // Return fallback response with error indication
     return {
@@ -474,3 +470,11 @@ export async function performComprehensiveAnalysis(billId: string): Promise<{
     };
   }
 }
+
+
+
+
+
+
+
+

@@ -1,4 +1,5 @@
 import type { Stakeholder, InsertStakeholder } from '../../../shared/schema.js';
+import { logger } from '../../utils/logger';
 
 /**
  * Represents a voting record for a stakeholder
@@ -429,3 +430,11 @@ export class StakeholderStorage {
     return results;
   }
 }
+
+
+
+
+
+
+
+

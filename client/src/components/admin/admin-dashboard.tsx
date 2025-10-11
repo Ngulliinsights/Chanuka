@@ -19,6 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { MonitoringDashboard } from '@/components/monitoring/monitoring-dashboard';
 import AuthenticatedAPI from '@/utils/authenticated-api';
+import { logger } from '../utils/logger.js';
 
 // Enhanced type definitions for better type safety
 interface UserRoleData {
@@ -349,7 +350,7 @@ const AdminDashboard = () => {
                   <span>New This Week</span>
                   <Badge variant="outline">{stats?.users.newThisWeek ?? 0}</Badge>
                 </div>
-                <Button className="w-full" onClick={() => console.log('Navigate to user management')}>
+                <Button className="w-full" onClick={() => logger.info('Navigate to user management', { component: 'SimpleTool' }, )}>
                   <Users className="h-4 w-4 mr-2" />
                   Manage Users
                 </Button>
@@ -458,8 +459,7 @@ const AdminDashboard = () => {
           <MonitoringDashboard />
         </TabsContent>
       </Tabs>
-    </div>
-  );
+    </div>);
 };
 
 export default AdminDashboard;

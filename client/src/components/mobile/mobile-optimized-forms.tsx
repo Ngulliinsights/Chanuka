@@ -7,6 +7,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Eye, EyeOff, Search, X, ChevronDown } from 'lucide-react';
 import { useResponsiveLayoutContext } from './responsive-layout-manager';
 import { MobileTouchUtils } from '@/utils/mobile-touch-handler';
+import { logger } from '../utils/logger.js';
 
 interface MobileInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;

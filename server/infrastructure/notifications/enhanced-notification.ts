@@ -4,6 +4,7 @@ import { eq, and, desc, inArray, sql } from 'drizzle-orm';
 import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/user-preferences.js';
 import { getEmailService } from '../../services/email.service';
 import { webSocketService } from '../websocket.js';
+import { logger } from '../utils/logger';
 
 export interface NotificationChannel {
   type: 'email' | 'inApp' | 'push' | 'sms';
@@ -139,7 +140,7 @@ export class EnhancedNotificationService {
       }
 
     } catch (error) {
-      console.error('Error creating enhanced notification:', error);
+      logger.error('Error creating enhanced notification:', { component: 'SimpleTool' }, error);
       // Don't re-throw to prevent cascading failures
       this.logNotificationError(data, error);
     }
@@ -319,7 +320,7 @@ export class EnhancedNotificationService {
     };
 
     // In production, you'd send this to your error tracking service
-    console.error('Notification error:', errorInfo);
+    logger.error('Notification error:', { component: 'SimpleTool' }, errorInfo);
     
     // Could also store in database for analysis
     // await this.storeErrorLog(errorInfo);
@@ -362,7 +363,7 @@ export class EnhancedNotificationService {
 
       return notification[0];
     } catch (error) {
-      console.error('Failed to create in-app notification:', error);
+      logger.error('Failed to create in-app notification:', { component: 'SimpleTool' }, error);
       throw new Error(`In-app notification failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
@@ -488,7 +489,7 @@ export class EnhancedNotificationService {
 
       return true;
     } catch (error) {
-      console.error('Error in notification filtering:', error);
+      logger.error('Error in notification filtering:', { component: 'SimpleTool' }, error);
       // Default to sending notification if filtering fails
       return true;
     }
@@ -542,7 +543,7 @@ export class EnhancedNotificationService {
 
       return true;
     } catch (error) {
-      console.error('Error in smart filtering:', error);
+      logger.error('Error in smart filtering:', { component: 'SimpleTool' }, error);
       // Default to allowing notification if filtering fails
       return true;
     }
@@ -684,7 +685,7 @@ export class EnhancedNotificationService {
         await this.processBatch(batch);
       }
     } catch (error) {
-      console.error('Error adding notification to batch:', error);
+      logger.error('Error adding notification to batch:', { component: 'SimpleTool' }, error);
       // Fallback to immediate sending if batching fails
       await this.sendImmediateNotification(data, channels);
     }
@@ -719,7 +720,7 @@ export class EnhancedNotificationService {
       console.log(`Successfully processed batch ${batch.id} with ${batch.notifications.length} notifications`);
 
     } catch (error) {
-      console.error('Error processing notification batch:', error);
+      logger.error('Error processing notification batch:', { component: 'SimpleTool' }, error);
       batch.status = 'failed';
       
       // Optionally retry failed batches or send individual notifications
@@ -738,7 +739,7 @@ export class EnhancedNotificationService {
 
     this.batchProcessingInterval = setInterval(async () => {
       if (this.processingBatch) {
-        console.log('Batch processor already running, skipping...');
+        logger.info('Batch processor already running, skipping...', { component: 'SimpleTool' });
         return;
       }
       
@@ -763,20 +764,20 @@ export class EnhancedNotificationService {
         }
 
       } catch (error) {
-        console.error('Error in batch processor:', error);
+        logger.error('Error in batch processor:', { component: 'SimpleTool' }, error);
       } finally {
         this.processingBatch = false;
       }
     }, 60000); // Check every minute
 
-    console.log('✅ Batch processor started');
+    logger.info('✅ Batch processor started', { component: 'SimpleTool' });
   }
 
   /**
    * Cleanup method for graceful shutdown
    */
   async cleanup(): Promise<void> {
-    console.log('🧹 Cleaning up enhanced notification service...');
+    logger.info('🧹 Cleaning up enhanced notification service...', { component: 'SimpleTool' });
 
     try {
       // Clear all batches
@@ -796,9 +797,9 @@ export class EnhancedNotificationService {
         this.batchProcessingInterval = null;
       }
 
-      console.log('✅ Enhanced notification service cleanup completed');
+      logger.info('✅ Enhanced notification service cleanup completed', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('❌ Error during enhanced notification service cleanup:', error);
+      logger.error('❌ Error during enhanced notification service cleanup:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -1013,7 +1014,7 @@ export class EnhancedNotificationService {
 
       return results;
     } catch (error) {
-      console.error('Error in bulk notification:', error);
+      logger.error('Error in bulk notification:', { component: 'SimpleTool' }, error);
       return { success: results.success, failed: results.failed + 1, errors: [...results.errors, { userId: 'system', error: error instanceof Error ? error.message : String(error) }] };
     }
   }
@@ -1175,3 +1176,9 @@ export class EnhancedNotificationService {
 // Export singleton instance
 enhancedNotificationServiceInstance = new EnhancedNotificationService();
 export { enhancedNotificationServiceInstance as enhancedNotificationService };
+
+
+
+
+
+

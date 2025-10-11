@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { demoDataService } from '../../infrastructure/demo-data.js';
 import { DatabaseFallbackService } from '../../infrastructure/database/database-fallback.js';
+import { logger } from '../utils/logger';
 
 // Mock database connection
 const mockDatabase = {
@@ -478,3 +479,9 @@ describe('Database Fallback Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+

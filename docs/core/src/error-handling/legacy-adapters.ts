@@ -5,6 +5,7 @@
  */
 
 import { AppError } from '../errors';
+import { logger } from '../utils/logger';
 
 /**
  * Legacy error classes that need to be migrated
@@ -227,7 +228,7 @@ export class LegacyErrorHandlerAdapter {
       const response = LegacyErrorResponseFormatter.format(normalizedError);
       
       // Log error
-      console.error('Error occurred:', {
+      logger.error('Error occurred:', { component: 'SimpleTool' }, {
         error: normalizedError,
         correlationId: req.correlationId,
         url: req.url,
@@ -270,3 +271,9 @@ export function createLegacyErrorAdapters() {
     LegacyDatabaseError
   };
 }
+
+
+
+
+
+

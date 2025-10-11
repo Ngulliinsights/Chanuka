@@ -1,12 +1,13 @@
 import { db } from "../server/db";
 import { 
+import { logger } from '../utils/logger';
   users, bills, sponsors, billSponsorships, billComments, 
   userProfiles, analysis, sponsorAffiliations, sponsorTransparency,
   billSectionConflicts
 } from "../shared/schema.js";
 
 async function seedLegislativeData() {
-  console.log("Starting legislative data seeding...");
+  logger.info('Starting legislative data seeding...', { component: 'SimpleTool' });
 
   try {
     // Create sample users
@@ -286,15 +287,15 @@ async function seedLegislativeData() {
       }
     ]);
 
-    console.log("✅ Legislative data seeding completed successfully!");
-    console.log("Database now contains:");
+    logger.info('✅ Legislative data seeding completed successfully!', { component: 'SimpleTool' });
+    logger.info('Database now contains:', { component: 'SimpleTool' });
     console.log(`- ${sampleUsers.length} users`);
     console.log(`- ${sampleSponsors.length} sponsors`);
     console.log(`- ${sampleBills.length} bills`);
-    console.log("- Multiple comments, analysis records, and transparency data");
+    logger.info('- Multiple comments, analysis records, and transparency data', { component: 'SimpleTool' });
 
   } catch (error) {
-    console.error("❌ Error seeding legislative data:", error);
+    logger.error('❌ Error seeding legislative data:', { component: 'SimpleTool' }, error);
     throw error;
   }
 }
@@ -302,10 +303,16 @@ async function seedLegislativeData() {
 // Run the seed function
 seedLegislativeData()
   .then(() => {
-    console.log("Seeding process completed!");
+    logger.info('Seeding process completed!', { component: 'SimpleTool' });
     process.exit(0);
   })
   .catch((error) => {
-    console.error("Seeding failed:", error);
+    logger.error('Seeding failed:', { component: 'SimpleTool' }, error);
     process.exit(1);
   });
+
+
+
+
+
+

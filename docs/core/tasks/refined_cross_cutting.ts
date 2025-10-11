@@ -1056,7 +1056,7 @@ class ConfigManager extends EventEmitter {
       this.validateRuntimeDependencies();
       
     } catch (error) {
-      console.error('Configuration initialization failed:', error);
+      logger.error('Configuration initialization failed:', { component: 'SimpleTool' }, error);
       process.exit(1);
     }
   }
@@ -1967,6 +1967,7 @@ export function CacheInvalidate(patterns: string[]) {
 // core/logging/Logger.ts
 import pino from 'pino';
 import { AsyncLocalStorage } from 'async_hooks';
+import { logger } from '../utils/logger';
 
 const requestContext = new AsyncLocalStorage<{
   requestId: string;
@@ -2545,3 +2546,9 @@ export class MemoryAdapter implements CacheService {
   }
 
   async get<T>(key: string): Promise<T | null> {
+
+
+
+
+
+

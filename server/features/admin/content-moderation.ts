@@ -1,6 +1,7 @@
 import { database as db } from '../../../shared/database/connection.js';
 import { bills, billComments, users, moderationFlags, moderationActions } from '../../../shared/schema.js';
 import { eq, count, desc, sql, and, gte, like, or, inArray, isNull } from 'drizzle-orm';
+import { logger } from '../../utils/logger';
 
 export interface ContentModerationFilters {
   contentType?: 'bill' | 'comment';
@@ -187,7 +188,7 @@ export class ContentModerationService {
         }
       };
     } catch (error) {
-      console.error('Error fetching moderation queue:', error);
+      logger.error('Error fetching moderation queue:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -234,7 +235,7 @@ export class ContentModerationService {
 
       return { success: true, message: `Content ${action}ed successfully` };
     } catch (error) {
-      console.error('Error moderating content:', error);
+      logger.error('Error moderating content:', { component: 'SimpleTool' }, error);
       return { success: false, message: 'Failed to moderate content' };
     }
   }
@@ -264,7 +265,7 @@ export class ContentModerationService {
         processedCount
       };
     } catch (error) {
-      console.error('Error performing bulk moderation:', error);
+      logger.error('Error performing bulk moderation:', { component: 'SimpleTool' }, error);
       return {
         success: false,
         message: 'Failed to perform bulk moderation',
@@ -326,7 +327,7 @@ export class ContentModerationService {
 
       return { success: true, message: 'Content flagged successfully' };
     } catch (error) {
-      console.error('Error flagging content:', error);
+      logger.error('Error flagging content:', { component: 'SimpleTool' }, error);
       return { success: false, message: 'Failed to flag content' };
     }
   }
@@ -430,7 +431,7 @@ export class ContentModerationService {
         flagReasons
       };
     } catch (error) {
-      console.error('Error fetching content analytics:', error);
+      logger.error('Error fetching content analytics:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -519,7 +520,7 @@ export class ContentModerationService {
         }
       };
     } catch (error) {
-      console.error('Error fetching moderation history:', error);
+      logger.error('Error fetching moderation history:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -596,7 +597,7 @@ export class ContentModerationService {
         createdAt: new Date()
       };
     } catch (error) {
-      console.error('Error fetching content details:', error);
+      logger.error('Error fetching content details:', { component: 'SimpleTool' }, error);
       return {
         text: 'Error loading content',
         author: { id: '', name: 'Unknown', email: '' },
@@ -653,9 +654,17 @@ export class ContentModerationService {
       }
       // For 'approve' and 'flag', no direct action needed on content
     } catch (error) {
-      console.error('Error applying moderation action:', error);
+      logger.error('Error applying moderation action:', { component: 'SimpleTool' }, error);
     }
   }
 }
 
 export const contentModerationService = ContentModerationService.getInstance();
+
+
+
+
+
+
+
+

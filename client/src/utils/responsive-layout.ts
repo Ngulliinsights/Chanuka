@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 /**
  * Responsive Layout Utility
  * Provides utilities for responsive design and layout management
@@ -122,7 +123,7 @@ export class ResponsiveLayoutManager {
       try {
         listener(this.currentState);
       } catch (error) {
-        console.error('Error in responsive layout listener:', error);
+        logger.error('Error in responsive layout listener:', { component: 'SimpleTool' }, error);
       }
     });
   }
@@ -313,3 +314,9 @@ export function createResponsiveStyles(
 
 // Import React for hooks
 import React from 'react';
+
+
+
+
+
+

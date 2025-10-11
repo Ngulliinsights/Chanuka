@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import { Logger } from '../logging';
 import {
+import { logger } from '../utils/logger';
   BackupPlan,
   BackupScope,
   BackupStrategy,
@@ -604,3 +605,9 @@ export class BackupManager extends EventEmitter {
     this.logger.info({ backupId: backup.id }, 'Restoring from snapshot backup');
   }
 }
+
+
+
+
+
+

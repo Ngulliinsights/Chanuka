@@ -1,5 +1,5 @@
 import { eq, and, desc, inArray, sql } from "drizzle-orm";
-import { BaseStorage } from "../../infrastructure/database/base/BaseStorage.js";
+import { BaseStorage, type StorageConfig } from "../../infrastructure/database/base/BaseStorage.js";
 import { database as db } from "../../../shared/database/connection.js";
 import {
   bills,
@@ -7,24 +7,13 @@ import {
   type Bill,
   type InsertBill,
 } from "../../../shared/schema.js";
-import type { StorageConfig } from "./StorageTypes";
+import { logger } from '../../utils/logger';
 
-// Enhanced cache configuration with better TTL management
-const CACHE_TTL = 3600; // 1 hour in seconds
+// Cache key generators
 const CACHE_KEY = {
-  ALL_BILLS: "bills:all",
-  BILL_BY_ID: (id: number) => `bills:id:${id}`,
-  BILLS_BY_TAGS: (tags: string[]) => `bills:tags:${tags.sort().join(",")}`,
-} as const;
-
-// Improved cache invalidation patterns with proper type handling
-const CACHE_INVALIDATION = {
-  // Arrays are mutable to allow runtime modifications if needed
-  FULL: [CACHE_KEY.ALL_BILLS] as string[], // Full invalidation of all bills cache
-  SINGLE: (id: number) => [CACHE_KEY.BILL_BY_ID(id)] as string[], // Single bill invalidation
-  PATTERN_BY_ID: (id: number) => [`bills:id:${id}`] as string[], // Pattern-based ID invalidation
-  PATTERN_BY_TAGS: ["bills:tags:*"] as string[], // Tag-based pattern invalidation
-  PATTERN_ALL: ["bills:*"] as string[], // All bill-related pattern invalidation
+  ALL_BILLS: "all",
+  BILL_BY_ID: (id: number) => `id:${id}`,
+  BILLS_BY_TAGS: (tags: string[]) => `tags:${tags.sort().join(",")}`,
 } as const;
 
 /**
@@ -49,7 +38,7 @@ export class BillStorage extends BaseStorage<Bill> {
       await db.select().from(bills).limit(1);
       return true;
     } catch (error) {
-      console.error("BillStorage health check failed:", error);
+      logger.error('BillStorage health check failed:', { component: 'SimpleTool' }, error as any);
       return false;
     }
   }
@@ -136,6 +125,8 @@ export class BillStorage extends BaseStorage<Bill> {
           status: bill.status || "draft",
           viewCount: 0,
           shareCount: 0,
+          commentCount: 0,
+          engagementScore: "0",
         })
         .returning();
 
@@ -388,7 +379,7 @@ export class BillStorage extends BaseStorage<Bill> {
         }
 
         // Log error for debugging while maintaining user-friendly messages
-        console.error("Database transaction error:", error);
+        logger.error('Database transaction error:', { component: 'SimpleTool' }, error);
 
         throw enhancedError;
       }
@@ -481,3 +472,12 @@ export class BillStorage extends BaseStorage<Bill> {
 
 // Export singleton instance for consistent usage across the application
 export const billStorage = BillStorage.getInstance();
+
+
+
+
+
+
+
+
+

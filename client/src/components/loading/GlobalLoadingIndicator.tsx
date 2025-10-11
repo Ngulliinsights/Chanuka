@@ -6,6 +6,7 @@ import { useLoadingContext } from '@/contexts/LoadingContext';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
+import { logger } from '../utils/logger.js';
 
 export interface GlobalLoadingIndicatorProps {
   position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'center';

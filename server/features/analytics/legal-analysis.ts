@@ -1,6 +1,7 @@
 import { spawn } from 'child_process';
 import path from 'path';
-import { AnalysisResult } from '../../shared/types/legal-analysis.js';
+import { AnalysisResult } from '../../../shared/types/legal-analysis.js';
+import { logger } from '../../utils/logger';
 
 // Configuration interface for better extensibility
 interface AnalysisConfig {
@@ -248,9 +249,17 @@ export class LegalAnalysisService {
   async shutdown(): Promise<void> {
     // Currently no persistent resources to clean up
     // This method is here for future extensibility
-    console.log('LegalAnalysisService shutting down gracefully');
+    logger.info('LegalAnalysisService shutting down gracefully', { component: 'SimpleTool' });
   }
 }
 
 // Export a singleton instance with default configuration
 export const legalAnalysisService = new LegalAnalysisService();
+
+
+
+
+
+
+
+

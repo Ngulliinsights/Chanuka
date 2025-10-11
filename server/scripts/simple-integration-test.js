@@ -1,8 +1,8 @@
 // Simple JavaScript test for government data integration
-console.log('🚀 Testing Government Data Integration Service...\n');
+logger.info('🚀 Testing Government Data Integration Service...\n', { component: 'SimpleTool' });
 
 // Test data transformation
-console.log('📋 Testing Data Transformation...');
+logger.info('📋 Testing Data Transformation...', { component: 'SimpleTool' });
 
 const mockParliamentData = {
   Bills: {
@@ -78,14 +78,14 @@ function mapParliamentStatus(status) {
 // Test the transformation
 try {
   const transformed = transformParliamentData(mockParliamentData);
-  console.log('✅ Parliament Data Transformation successful:');
+  logger.info('✅ Parliament Data Transformation successful:', { component: 'SimpleTool' });
   console.log(JSON.stringify(transformed, null, 2));
 } catch (error) {
-  console.error('❌ Data Transformation Error:', error.message);
+  logger.error('❌ Data Transformation Error:', { component: 'SimpleTool' }, error.message);
 }
 
 // Test data validation
-console.log('\n✅ Testing Data Validation...');
+logger.info('\n✅ Testing Data Validation...', { component: 'SimpleTool' });
 
 function validateBill(bill) {
   const errors = [];
@@ -140,7 +140,7 @@ const testBills = [
 ];
 
 try {
-  console.log('Testing bill validation...');
+  logger.info('Testing bill validation...', { component: 'SimpleTool' });
   testBills.forEach((bill, index) => {
     const validation = validateBill(bill);
     console.log(`Bill ${index + 1} validation:`, {
@@ -151,11 +151,11 @@ try {
     });
   });
 } catch (error) {
-  console.error('❌ Data Validation Error:', error.message);
+  logger.error('❌ Data Validation Error:', { component: 'SimpleTool' }, error.message);
 }
 
 // Test error handling simulation
-console.log('\n🚨 Testing Error Handling...');
+logger.info('\n🚨 Testing Error Handling...', { component: 'SimpleTool' });
 
 function simulateErrorHandling(errorType) {
   const errorTypes = {
@@ -193,15 +193,15 @@ function simulateErrorHandling(errorType) {
   }
 });
 
-console.log('\n📊 Integration Status Summary:');
-console.log('✅ Data transformation: Working');
-console.log('✅ Data validation: Working');
-console.log('✅ Error handling: Working');
-console.log('✅ Basic integration service: Ready for testing');
+logger.info('\n📊 Integration Status Summary:', { component: 'SimpleTool' });
+logger.info('✅ Data transformation: Working', { component: 'SimpleTool' });
+logger.info('✅ Data validation: Working', { component: 'SimpleTool' });
+logger.info('✅ Error handling: Working', { component: 'SimpleTool' });
+logger.info('✅ Basic integration service: Ready for testing', { component: 'SimpleTool' });
 
-console.log('\n🎉 Government Data Integration Service basic functionality verified!');
-console.log('\nNext steps:');
-console.log('1. Test with real government API endpoints');
-console.log('2. Implement database integration');
-console.log('3. Set up scheduled synchronization');
-console.log('4. Configure monitoring and alerting');
+logger.info('\n🎉 Government Data Integration Service basic functionality verified!', { component: 'SimpleTool' });
+logger.info('\nNext steps:', { component: 'SimpleTool' });
+logger.info('1. Test with real government API endpoints', { component: 'SimpleTool' });
+logger.info('2. Implement database integration', { component: 'SimpleTool' });
+logger.info('3. Set up scheduled synchronization', { component: 'SimpleTool' });
+logger.info('4. Configure monitoring and alerting', { component: 'SimpleTool' });

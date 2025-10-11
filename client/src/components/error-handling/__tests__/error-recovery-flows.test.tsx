@@ -6,6 +6,7 @@ import { BrowserRouter } from 'react-router-dom';
 import PageErrorBoundary from '../PageErrorBoundary';
 import { useApiWithFallback } from '../../../hooks/use-api-with-fallback';
 import * as apiErrorHandling from '../../../services/api-error-handling';
+import { logger } from '../utils/logger.js';
 
 // Mock API service
 vi.mock('../../../services/api-error-handling', () => ({

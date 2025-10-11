@@ -1,0 +1,192 @@
+name: Analytics Module CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'server/features/analytics/**'
+      - 'server/utils/cache.ts'
+      - 'server/utils/db-helpers.ts'
+      - 'server/utils/analytics-controller-wrapper.ts'
+      - 'scripts/check-architecture.js'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'server/features/analytics/**'
+      - 'server/utils/cache.ts'
+      - 'server/utils/db-helpers.ts'
+      - 'server/utils/analytics-controller-wrapper.ts'
+      - 'scripts/check-architecture.js'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: analytics_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Type check
+      run: npm run type-check
+
+    - name: Lint code
+      run: npm run lint
+
+    - name: Check architecture boundaries
+      run: node scripts/check-architecture.js
+
+    - name: Run analytics tests
+      run: npm test -- --testPathPattern=analytics
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/analytics_test
+        REDIS_URL: redis://localhost:6379
+
+    - name: Run related utility tests
+      run: npm test -- --testPathPattern="(cache|db-helpers|controller-wrapper)"
+
+    - name: Generate coverage report
+      run: npm run test:coverage -- --testPathPattern=analytics --coverageDirectory=./coverage/analytics
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage/analytics/lcov.info
+        flags: analytics
+        name: analytics-coverage
+
+    - name: Check test coverage thresholds
+      run: |
+        COVERAGE=$(node -e "
+          const coverage = require('./coverage/analytics/coverage-summary.json');
+          const analyticsCoverage = coverage.total;
+          console.log('Statements:', analyticsCoverage.statements.pct + '%');
+          console.log('Branches:', analyticsCoverage.branches.pct + '%');
+          console.log('Functions:', analyticsCoverage.functions.pct + '%');
+          console.log('Lines:', analyticsCoverage.lines.pct + '%');
+
+          if (analyticsCoverage.statements.pct < 80 ||
+              analyticsCoverage.branches.pct < 70 ||
+              analyticsCoverage.functions.pct < 80 ||
+              analyticsCoverage.lines.pct < 80) {
+            console.log('Coverage below threshold!');
+            process.exit(1);
+          }
+        ")
+
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: './server/features/analytics'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: Upload Trivy scan results to GitHub Security tab
+      uses: github/codeql-action/upload-sarif@v2
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  complexity:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Install complexity analysis tools
+      run: npm install -g complexity-report
+
+    - name: Analyze code complexity
+      run: |
+        find server/features/analytics -name "*.ts" -not -name "*.d.ts" -exec complexity-report {} \; > complexity-report.txt
+
+        # Check for files with high complexity
+        if grep -q "Complexity: [5-9][0-9]" complexity-report.txt; then
+          echo "⚠️  High complexity files found:"
+          grep "Complexity: [5-9][0-9]" complexity-report.txt
+          echo ""
+          echo "Consider refactoring these files to reduce complexity."
+        fi
+
+        # Fail if any file has complexity > 50
+        if grep -q "Complexity: [5-9][0-9]" complexity-report.txt; then
+          echo "❌ Files with complexity > 50 found. Please refactor."
+          exit 1
+        fi
+
+    - name: Upload complexity report
+      uses: actions/upload-artifact@v3
+      with:
+        name: complexity-report
+        path: complexity-report.txt
+
+  deploy-staging:
+    needs: [test, security, complexity]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Deploy to staging
+      run: |
+        echo "🚀 Deploying analytics module to staging..."
+        # Add your staging deployment commands here
+        echo "✅ Staging deployment completed"
+
+  deploy-production:
+    needs: [test, security, complexity]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Deploy to production
+      run: |
+        echo "🚀 Deploying analytics module to production..."
+        # Add your production deployment commands here
+        echo "✅ Production deployment completed"

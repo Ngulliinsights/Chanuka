@@ -9,6 +9,7 @@ import { BaseCacheAdapter } from '../base-adapter';
 import { MemoryAdapter, type MemoryAdapterConfig } from './memory-adapter';
 import { RedisAdapter, type RedisAdapterConfig } from './redis-adapter';
 import type { 
+import { logger } from '../utils/logger';
   CacheOptions, 
   CacheHealthStatus, 
   CacheMetrics,
@@ -568,3 +569,9 @@ export class MultiTierAdapter extends BaseCacheAdapter {
     this.l2Cache.destroy();
   }
 }
+
+
+
+
+
+

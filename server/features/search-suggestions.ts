@@ -2,6 +2,7 @@ import { eq, desc, and, sql, count, ilike, or, inArray } from "drizzle-orm";
 import { databaseService } from "../services/database-service";
 import { cacheService, CACHE_KEYS, CACHE_TTL } from "../infrastructure/cache/cache-service";
 import * as schema from "../../shared/schema";
+import { logger } from '../../utils/logger';
 
 // Search suggestion interfaces
 export interface SearchSuggestion {
@@ -237,14 +238,14 @@ export class SearchSuggestionsService {
 
       // Log for monitoring (can be replaced with proper analytics service)
       if (process.env.NODE_ENV !== 'production') {
-        console.log('Search analytics:', {
+        logger.info('Search analytics:', { component: 'SimpleTool' }, {
           query: sanitizedQuery,
           resultCount: analytics.resultCount,
           timestamp: analytics.timestamp
         });
       }
     } catch (error) {
-      console.error('Error recording search analytics:', error);
+      logger.error('Error recording search analytics:', { component: 'SimpleTool' }, error);
       // Don't throw - analytics failures shouldn't break the app
     }
   }
@@ -813,3 +814,11 @@ export class SearchSuggestionsService {
 
 // Export singleton instance
 export const searchSuggestionsService = new SearchSuggestionsService();
+
+
+
+
+
+
+
+

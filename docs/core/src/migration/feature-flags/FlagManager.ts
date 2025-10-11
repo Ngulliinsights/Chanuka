@@ -1,4 +1,5 @@
 import { MigrationFlag, FlagConfig, FlagState } from './types';
+import { logger } from '../utils/logger';
 
 export class FlagManager {
   private static instance: FlagManager;
@@ -96,3 +97,10 @@ export class FlagManager {
     this.flags = this.initializeFlags();
   }
 }
+
+
+
+
+
+
+

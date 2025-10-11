@@ -4,6 +4,7 @@ import { eq, and, lt } from 'drizzle-orm';
 import { encryptionService } from './encryption-service.js';
 import { securityAuditService } from './security-audit-service.js';
 import { Request } from 'express';
+import { logger } from '../../utils/logger';
 
 export interface DataExportRequest {
   userId: string;
@@ -94,3 +95,11 @@ export class PrivacyService {
         const profile = await db
           .select()
           .from(userProfiles)
+
+
+
+
+
+
+
+

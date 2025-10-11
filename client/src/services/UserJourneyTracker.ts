@@ -1,4 +1,5 @@
 import { UserRole, NavigationSection } from '@/types/navigation';
+import { logger } from '../utils/logger';
 
 /**
  * Represents a single step in a user journey
@@ -696,3 +697,9 @@ export class UserJourneyTracker {
     return completedGoals.length / relevantJourneys.length;
   }
 }
+
+
+
+
+
+

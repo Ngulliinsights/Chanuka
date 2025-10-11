@@ -1,6 +1,7 @@
 
 import { describe, it, expect } from 'vitest';
 import {
+import { logger } from '../utils/logger';
   insertUserSchema,
   insertUserProfileSchema,
   insertBillSchema,
@@ -306,3 +307,9 @@ describe('insertComplianceCheckSchema', () => {
         expect(result.success).toBe(false);
     });
 });
+
+
+
+
+
+

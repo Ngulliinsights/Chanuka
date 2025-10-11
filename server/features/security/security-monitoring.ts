@@ -3,6 +3,7 @@ import { securityMonitoringService } from './security-monitoring-service.js';
 import { securityAuditService } from './security-audit-service.js';
 import { intrusionDetectionService } from './intrusion-detection-service.js';
 import { authenticateToken, requireRole } from '../../middleware/auth.js';
+import { logger } from '../../utils/logger';
 
 const router = Router();
 
@@ -31,7 +32,7 @@ router.get('/dashboard', authenticateToken, requireAdmin, async (req: Request, r
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error fetching security dashboard:', error);
+    logger.error('Error fetching security dashboard:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch security dashboard',
@@ -63,7 +64,7 @@ router.get('/alerts', authenticateToken, requireAdmin, async (req: Request, res:
       }
     });
   } catch (error) {
-    console.error('Error fetching security alerts:', error);
+    logger.error('Error fetching security alerts:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch security alerts',
@@ -103,7 +104,7 @@ router.post('/alerts/:alertId/acknowledge', authenticateToken, requireAdmin, asy
       }
     });
   } catch (error) {
-    console.error('Error acknowledging alert:', error);
+    logger.error('Error acknowledging alert:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to acknowledge alert',
@@ -144,7 +145,7 @@ router.post('/alerts/:alertId/resolve', authenticateToken, requireAdmin, async (
       }
     });
   } catch (error) {
-    console.error('Error resolving alert:', error);
+    logger.error('Error resolving alert:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to resolve alert',
@@ -171,7 +172,7 @@ router.get('/threats', authenticateToken, requireAdmin, async (req: Request, res
       period: { start, end }
     });
   } catch (error) {
-    console.error('Error fetching threat data:', error);
+    logger.error('Error fetching threat data:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch threat data',
@@ -218,7 +219,7 @@ router.post('/threats/block-ip', authenticateToken, requireAdmin, async (req: Re
       }
     });
   } catch (error) {
-    console.error('Error blocking IP:', error);
+    logger.error('Error blocking IP:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to block IP address',
@@ -264,7 +265,7 @@ router.post('/threats/unblock-ip', authenticateToken, requireAdmin, async (req: 
       }
     });
   } catch (error) {
-    console.error('Error unblocking IP:', error);
+    logger.error('Error unblocking IP:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to unblock IP address',
@@ -287,7 +288,7 @@ router.get('/compliance', authenticateToken, requireAdmin, async (req: Request, 
       lastUpdated: new Date()
     });
   } catch (error) {
-    console.error('Error fetching compliance status:', error);
+    logger.error('Error fetching compliance status:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch compliance status',
@@ -321,7 +322,7 @@ router.post('/compliance/run-checks', authenticateToken, requireAdmin, async (re
       data: dashboard.complianceStatus
     });
   } catch (error) {
-    console.error('Error running compliance checks:', error);
+    logger.error('Error running compliance checks:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to run compliance checks',
@@ -370,7 +371,7 @@ router.post('/reports/audit', authenticateToken, requireAdmin, async (req: Reque
       });
     }
   } catch (error) {
-    console.error('Error generating audit report:', error);
+    logger.error('Error generating audit report:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to generate audit report',
@@ -410,7 +411,7 @@ router.post('/reports/comprehensive', authenticateToken, requireAdmin, async (re
       }
     });
   } catch (error) {
-    console.error('Error generating security report:', error);
+    logger.error('Error generating security report:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to generate security report',
@@ -432,7 +433,7 @@ router.get('/health', authenticateToken, requireAdmin, async (req: Request, res:
       timestamp: new Date()
     });
   } catch (error) {
-    console.error('Error fetching security health:', error);
+    logger.error('Error fetching security health:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch security system health',
@@ -454,7 +455,7 @@ router.get('/recommendations', authenticateToken, requireAdmin, async (req: Requ
       timestamp: new Date()
     });
   } catch (error) {
-    console.error('Error fetching security recommendations:', error);
+    logger.error('Error fetching security recommendations:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to fetch security recommendations',
@@ -502,7 +503,7 @@ router.post('/config', authenticateToken, requireAdmin, async (req: Request, res
       }
     });
   } catch (error) {
-    console.error('Error updating security config:', error);
+    logger.error('Error updating security config:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: 'Failed to update security configuration',
@@ -512,3 +513,11 @@ router.post('/config', authenticateToken, requireAdmin, async (req: Request, res
 });
 
 export default router;
+
+
+
+
+
+
+
+

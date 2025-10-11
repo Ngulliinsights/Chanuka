@@ -1,4 +1,5 @@
 import { PageRelationshipUtils } from '../page-relationship-utils';
+import { logger } from '../utils/logger';
 
 describe('PageRelationshipUtils', () => {
   beforeEach(() => {
@@ -157,3 +158,9 @@ describe('PageRelationshipUtils', () => {
     });
   });
 });
+
+
+
+
+
+

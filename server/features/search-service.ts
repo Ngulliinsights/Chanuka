@@ -4,6 +4,7 @@ import { cacheService, CACHE_TTL } from "../infrastructure/cache/cache-service";
 import { searchSuggestionsService } from "./search-suggestions";
 import * as schema from "../../shared/schema";
 import { Bill, BillComment, Sponsor } from "../../shared/schema";
+import { logger } from '../../utils/logger';
 
 // Search interfaces and types
 export interface SearchQuery {
@@ -167,7 +168,7 @@ export class SearchService {
       resultCount: result.data.results.length,
       clickedResults: [],
       timestamp: new Date()
-    }).catch((err: Error) => console.error('Analytics recording failed:', err));
+    }).catch((err: Error) => logger.error('Analytics recording failed:', { component: 'SimpleTool' }, err));
 
     return result.data;
   }
@@ -296,7 +297,7 @@ export class SearchService {
       
       return autocompleteResult.suggestions;
     } catch (error) {
-      console.error('Error getting search suggestions:', error);
+      logger.error('Error getting search suggestions:', { component: 'SimpleTool' }, error);
       return this.getFallbackSuggestions(partialQuery, normalizedLimit);
     }
   }
@@ -345,7 +346,7 @@ export class SearchService {
         ));
 
       if (needsUpdate === 0) {
-        console.log('All search indexes are up to date');
+        logger.info('All search indexes are up to date', { component: 'SimpleTool' });
         return { updated: 0, errors: 0 };
       }
 
@@ -367,7 +368,7 @@ export class SearchService {
 
       console.log(`Search index rebuild completed: ${updated} bills updated`);
     } catch (error) {
-      console.error('Error rebuilding search indexes:', error);
+      logger.error('Error rebuilding search indexes:', { component: 'SimpleTool' }, error);
       errors = 1;
     }
 
@@ -652,7 +653,7 @@ export class SearchService {
         dateRanges: []
       };
     } catch (error) {
-      console.error('Error generating search facets:', error);
+      logger.error('Error generating search facets:', { component: 'SimpleTool' }, error);
       return this.getEmptyFacets();
     }
   }
@@ -683,7 +684,7 @@ export class SearchService {
       
       return suggestions.suggestions.map(s => s.term);
     } catch (error) {
-      console.error('Error generating suggestions:', error);
+      logger.error('Error generating suggestions:', { component: 'SimpleTool' }, error);
       return this.getFallbackSuggestionsList(query);
     }
   }
@@ -753,13 +754,13 @@ export class SearchService {
 
   private async recordSearchAnalytics(analytics: SearchAnalytics): Promise<void> {
     try {
-      console.log('Search analytics:', {
+      logger.info('Search analytics:', { component: 'SimpleTool' }, {
         query: analytics.query,
         resultCount: analytics.resultCount,
         timestamp: analytics.timestamp.toISOString()
       });
     } catch (error) {
-      console.error('Error recording search analytics:', error);
+      logger.error('Error recording search analytics:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -843,9 +844,9 @@ export class SearchService {
       
       this.queryCache.clear();
       
-      console.log('Search caches cleared successfully');
+      logger.info('Search caches cleared successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('Error clearing search caches:', error);
+      logger.error('Error clearing search caches:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -874,7 +875,7 @@ export class SearchService {
       );
     }
     
-    console.log('Search cache warmup completed');
+    logger.info('Search cache warmup completed', { component: 'SimpleTool' });
   }
 
   async getSearchMetrics(): Promise<{
@@ -894,3 +895,11 @@ export class SearchService {
 }
 
 export const searchService = new SearchService();
+
+
+
+
+
+
+
+

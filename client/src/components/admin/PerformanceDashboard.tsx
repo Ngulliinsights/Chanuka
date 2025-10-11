@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { performanceMonitor } from '../../utils/performanceMonitoring';
 import { usePerformanceOptimization } from '../../utils/performance-optimizer';
 import { cacheManager } from '../../utils/cache-strategy';
+import { logger } from '../utils/logger.js';
 
 interface PerformanceDashboardProps {
   className?: string;
@@ -83,7 +84,7 @@ export const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({
         historicalData
       });
     } catch (error) {
-      console.error('Failed to load performance metrics:', error);
+      logger.error('Failed to load performance metrics:', { component: 'SimpleTool' }, error);
     } finally {
       setIsLoading(false);
     }

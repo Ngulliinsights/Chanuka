@@ -5,55 +5,53 @@ import path from 'path';
 
 const execAsync = promisify(exec);
 
-export interface CoverageReport {
-  lines: { total: number; covered: number; percentage: number };
-  functions: { total: number; covered: number; percentage: number };
-  branches: { total: number; covered: number; percentage: number };
-  statements: { total: number; covered: number; percentage: number };
+interface CoverageMetrics {
+  total: number;
+  covered: number;
+  percentage: number;
+}
+
+interface CoverageReport {
+  lines: CoverageMetrics;
+  functions: CoverageMetrics;
+  branches: CoverageMetrics;
+  statements: CoverageMetrics;
   uncoveredFiles: string[];
   uncoveredFunctions: string[];
-  uncoveredLines: { file: string; lines: number[] }[];
+  uncoveredLines: Array<{ file: string; lines: number[] }>;
 }
 
-export interface CoverageGap {
-  type: 'function' | 'branch' | 'statement' | 'integration';
-  file: string;
-  location: string;
+interface CoverageGap {
+  type: 'function' | 'statement' | 'branch' | 'line';
   severity: 'critical' | 'high' | 'medium' | 'low';
+  file: string;
+  location?: string;
   description: string;
-  suggestedTest: string;
+  impact: string;
 }
 
-export interface ComprehensiveCoverageReport {
+interface FullCoverageReport {
   timestamp: Date;
   serverCoverage: CoverageReport;
   clientCoverage: CoverageReport;
-  integrationCoverage: CoverageReport;
-  overallCoverage: {
-    lines: number;
-    functions: number;
-    branches: number;
-    statements: number;
-  };
+  integrationCoverage?: CoverageReport;
+  overallCoverage: { lines: number; functions: number; branches: number; statements: number };
   gaps: CoverageGap[];
   recommendations: string[];
 }
 
 export class CoverageAnalyzer {
-  private readonly coverageThresholds = {
-    lines: 80,
-    functions: 70,
-    branches: 70,
-    statements: 80
-  };
+  private readonly coverageDir = 'coverage';
+  private readonly serverCoverageFile = path.join(this.coverageDir, 'coverage-server.json');
+  private readonly clientCoverageFile = path.join(this.coverageDir, 'coverage-client.json');
+  private readonly integrationCoverageFile = path.join(this.coverageDir, 'coverage-integration.json');
 
   async analyzeServerCoverage(): Promise<CoverageReport> {
     try {
-      // Run Jest with coverage for server-side code
-      const { stdout } = await execAsync('npm run test:coverage -- --silent --json');
-      const coverageData = JSON.parse(stdout);
-      
-      return this.parseCoverageData(coverageData, 'server');
+      // Run server tests with coverage
+      await execAsync('npm run test:server:coverage', { cwd: process.cwd() });
+
+      return await this.parseCoverageFile(this.serverCoverageFile);
     } catch (error) {
       console.error('Error analyzing server coverage:', error);
       return this.getEmptyCoverageReport();
@@ -62,11 +60,10 @@ export class CoverageAnalyzer {
 
   async analyzeClientCoverage(): Promise<CoverageReport> {
     try {
-      // Run Vitest with coverage for client-side code
-      const { stdout } = await execAsync('npm run test:client:coverage -- --reporter=json');
-      const coverageData = JSON.parse(stdout);
-      
-      return this.parseCoverageData(coverageData, 'client');
+      // Run client tests with coverage
+      await execAsync('npm run test:client:coverage', { cwd: process.cwd() });
+
+      return await this.parseCoverageFile(this.clientCoverageFile);
     } catch (error) {
       console.error('Error analyzing client coverage:', error);
       return this.getEmptyCoverageReport();
@@ -76,10 +73,9 @@ export class CoverageAnalyzer {
   async analyzeIntegrationCoverage(): Promise<CoverageReport> {
     try {
       // Run integration tests with coverage
-      const { stdout } = await execAsync('npm run test:integration -- --coverage --json');
-      const coverageData = JSON.parse(stdout);
-      
-      return this.parseCoverageData(coverageData, 'integration');
+      await execAsync('npm run test:integration:coverage', { cwd: process.cwd() });
+
+      return await this.parseCoverageFile(this.integrationCoverageFile);
     } catch (error) {
       console.error('Error analyzing integration coverage:', error);
       return this.getEmptyCoverageReport();
@@ -90,57 +86,57 @@ export class CoverageAnalyzer {
     const gaps: CoverageGap[] = [];
 
     for (const report of reports) {
-      // Identify uncovered functions
+      // Identify function gaps
       for (const func of report.uncoveredFunctions) {
+        const severity = this.determineSeverity(func);
         gaps.push({
           type: 'function',
-          file: this.extractFileFromFunction(func),
-          location: func,
-          severity: this.calculateSeverity('function', func),
-          description: `Function '${func}' is not covered by tests`,
-          suggestedTest: this.generateTestSuggestion('function', func)
+          severity,
+          file: func.split(':')[0],
+          location: func.split(':')[1],
+          description: `Uncovered function: ${func}`,
+          impact: this.getImpactDescription('function', severity)
         });
       }
 
-      // Identify uncovered lines
-      for (const uncoveredLine of report.uncoveredLines) {
-        for (const lineNum of uncoveredLine.lines) {
-          gaps.push({
-            type: 'statement',
-            file: uncoveredLine.file,
-            location: `${uncoveredLine.file}:${lineNum}`,
-            severity: this.calculateSeverity('statement', uncoveredLine.file),
-            description: `Line ${lineNum} in ${uncoveredLine.file} is not covered`,
-            suggestedTest: this.generateTestSuggestion('statement', uncoveredLine.file)
-          });
-        }
+      // Identify statement gaps
+      for (const lineGap of report.uncoveredLines) {
+        gaps.push({
+          type: 'statement',
+          severity: lineGap.lines.length > 10 ? 'high' : 'medium',
+          file: lineGap.file,
+          description: `Uncovered statements (${lineGap.lines.length}) in ${lineGap.file}`,
+          impact: 'Code statements not executed during tests'
+        });
       }
 
       // Identify branch coverage gaps
-      if (report.branches.percentage < this.coverageThresholds.branches) {
+      if (report.branches.percentage < 80) {
         gaps.push({
           type: 'branch',
-          file: 'multiple',
-          location: 'various',
-          severity: 'high',
-          description: `Branch coverage is ${report.branches.percentage}%, below threshold of ${this.coverageThresholds.branches}%`,
-          suggestedTest: 'Add tests for conditional logic and error handling paths'
+          severity: report.branches.percentage < 60 ? 'critical' : 'high',
+          file: 'overall',
+          description: `Low branch coverage: ${report.branches.percentage}%`,
+          impact: 'Conditional logic not fully tested'
         });
       }
     }
 
-    return gaps.sort((a, b) => this.getSeverityWeight(b.severity) - this.getSeverityWeight(a.severity));
+    return gaps;
   }
 
-  async generateCoverageReport(): Promise<ComprehensiveCoverageReport> {
-    const serverCoverage = await this.analyzeServerCoverage();
-    const clientCoverage = await this.analyzeClientCoverage();
-    const integrationCoverage = await this.analyzeIntegrationCoverage();
+  async generateCoverageReport(): Promise<FullCoverageReport> {
+    const [serverCoverage, clientCoverage, integrationCoverage] = await Promise.all([
+      this.analyzeServerCoverage(),
+      this.analyzeClientCoverage(),
+      this.analyzeIntegrationCoverage()
+    ]);
 
-    const reports = [serverCoverage, clientCoverage, integrationCoverage];
+    const reports = [serverCoverage, clientCoverage, integrationCoverage].filter(r => r.lines.total > 0);
+
+    const overallCoverage = this.calculateOverallCoverage(reports);
     const gaps = await this.identifyGaps(reports);
-
-    const overallCoverage = this.calculateOverallCoverage([serverCoverage, clientCoverage]);
+    const recommendations = this.generateRecommendations(gaps, overallCoverage);
 
     return {
       timestamp: new Date(),
@@ -149,38 +145,107 @@ export class CoverageAnalyzer {
       integrationCoverage,
       overallCoverage,
       gaps,
-      recommendations: this.generateRecommendations(gaps, overallCoverage)
+      recommendations
     };
   }
 
-  private parseCoverageData(coverageData: any, type: string): CoverageReport {
-    // Parse coverage data from Jest/Vitest output
-    const summary = coverageData.coverageMap || coverageData.summary || {};
-    
+  private async parseCoverageFile(filePath: string): Promise<CoverageReport> {
+    try {
+      await fs.access(filePath);
+      const data = await fs.readFile(filePath, 'utf-8');
+      const coverageData = JSON.parse(data);
+
+      return this.processCoverageData(coverageData);
+    } catch (error) {
+      console.warn(`Coverage file not found: ${filePath}`);
+      return this.getEmptyCoverageReport();
+    }
+  }
+
+  private processCoverageData(coverageData: any): CoverageReport {
+    let totalLines = 0, coveredLines = 0;
+    let totalFunctions = 0, coveredFunctions = 0;
+    let totalBranches = 0, coveredBranches = 0;
+    let totalStatements = 0, coveredStatements = 0;
+
+    const uncoveredFiles: string[] = [];
+    const uncoveredFunctions: string[] = [];
+    const uncoveredLines: Array<{ file: string; lines: number[] }> = [];
+
+    for (const [file, fileCoverage] of Object.entries(coverageData) as [string, any][]) {
+      if (fileCoverage.l) {
+        const lines = Object.values(fileCoverage.l) as number[];
+        totalLines += lines.length;
+        coveredLines += lines.filter(l => l > 0).length;
+
+        const uncoveredLineNumbers = Object.entries(fileCoverage.l)
+          .filter(([_, hits]) => (hits as number) === 0)
+          .map(([line]) => parseInt(line));
+
+        if (uncoveredLineNumbers.length > 0) {
+          uncoveredLines.push({ file, lines: uncoveredLineNumbers });
+        }
+      }
+
+      if (fileCoverage.f) {
+        const functions = Object.values(fileCoverage.f) as number[];
+        totalFunctions += functions.length;
+        coveredFunctions += functions.filter(f => f > 0).length;
+
+        const uncoveredFuncNames = Object.entries(fileCoverage.f)
+          .filter(([_, hits]) => (hits as number) === 0)
+          .map(([name]) => `${file}:${name}`);
+
+        uncoveredFunctions.push(...uncoveredFuncNames);
+      }
+
+      if (fileCoverage.b) {
+        for (const branch of Object.values(fileCoverage.b) as number[][]) {
+          totalBranches += branch.length;
+          coveredBranches += branch.filter(b => b > 0).length;
+        }
+      }
+
+      if (fileCoverage.s) {
+        const statements = Object.values(fileCoverage.s) as number[];
+        totalStatements += statements.length;
+        coveredStatements += statements.filter(s => s > 0).length;
+      }
+
+      // Check if file has low coverage
+      const fileLines = fileCoverage.l ? Object.values(fileCoverage.l) as number[] : [];
+      const fileCoveragePercent = fileLines.length > 0 ?
+        (fileLines.filter(l => l > 0).length / fileLines.length) * 100 : 0;
+
+      if (fileCoveragePercent < 50) {
+        uncoveredFiles.push(file);
+      }
+    }
+
     return {
       lines: {
-        total: summary.lines?.total || 0,
-        covered: summary.lines?.covered || 0,
-        percentage: summary.lines?.pct || 0
+        total: totalLines,
+        covered: coveredLines,
+        percentage: totalLines > 0 ? Math.round((coveredLines / totalLines) * 100) : 0
       },
       functions: {
-        total: summary.functions?.total || 0,
-        covered: summary.functions?.covered || 0,
-        percentage: summary.functions?.pct || 0
+        total: totalFunctions,
+        covered: coveredFunctions,
+        percentage: totalFunctions > 0 ? Math.round((coveredFunctions / totalFunctions) * 100) : 0
       },
       branches: {
-        total: summary.branches?.total || 0,
-        covered: summary.branches?.covered || 0,
-        percentage: summary.branches?.pct || 0
+        total: totalBranches,
+        covered: coveredBranches,
+        percentage: totalBranches > 0 ? Math.round((coveredBranches / totalBranches) * 100) : 0
       },
       statements: {
-        total: summary.statements?.total || 0,
-        covered: summary.statements?.covered || 0,
-        percentage: summary.statements?.pct || 0
+        total: totalStatements,
+        covered: coveredStatements,
+        percentage: totalStatements > 0 ? Math.round((coveredStatements / totalStatements) * 100) : 0
       },
-      uncoveredFiles: this.extractUncoveredFiles(coverageData),
-      uncoveredFunctions: this.extractUncoveredFunctions(coverageData),
-      uncoveredLines: this.extractUncoveredLines(coverageData)
+      uncoveredFiles,
+      uncoveredFunctions,
+      uncoveredLines
     };
   }
 
@@ -196,118 +261,22 @@ export class CoverageAnalyzer {
     };
   }
 
-  private extractUncoveredFiles(coverageData: any): string[] {
-    const files: string[] = [];
-    if (coverageData.coverageMap) {
-      Object.keys(coverageData.coverageMap).forEach(file => {
-        const fileCoverage = coverageData.coverageMap[file];
-        if (fileCoverage.lines?.pct === 0) {
-          files.push(file);
-        }
-      });
+  private calculateOverallCoverage(reports: CoverageReport[]): { lines: number; functions: number; branches: number; statements: number } {
+    if (reports.length === 0) {
+      return { lines: 0, functions: 0, branches: 0, statements: 0 };
     }
-    return files;
-  }
 
-  private extractUncoveredFunctions(coverageData: any): string[] {
-    const functions: string[] = [];
-    if (coverageData.coverageMap) {
-      Object.keys(coverageData.coverageMap).forEach(file => {
-        const fileCoverage = coverageData.coverageMap[file];
-        if (fileCoverage.functions) {
-          Object.keys(fileCoverage.functions).forEach(func => {
-            if (fileCoverage.functions[func].count === 0) {
-              functions.push(`${file}:${func}`);
-            }
-          });
-        }
-      });
-    }
-    return functions;
-  }
+    const totalLines = reports.reduce((sum, r) => sum + r.lines.total, 0);
+    const coveredLines = reports.reduce((sum, r) => sum + r.lines.covered, 0);
 
-  private extractUncoveredLines(coverageData: any): { file: string; lines: number[] }[] {
-    const uncoveredLines: { file: string; lines: number[] }[] = [];
-    if (coverageData.coverageMap) {
-      Object.keys(coverageData.coverageMap).forEach(file => {
-        const fileCoverage = coverageData.coverageMap[file];
-        const lines: number[] = [];
-        
-        if (fileCoverage.statementMap) {
-          Object.keys(fileCoverage.statementMap).forEach(stmt => {
-            if (fileCoverage.s[stmt] === 0) {
-              const line = fileCoverage.statementMap[stmt].start.line;
-              if (!lines.includes(line)) {
-                lines.push(line);
-              }
-            }
-          });
-        }
-        
-        if (lines.length > 0) {
-          uncoveredLines.push({ file, lines: lines.sort((a, b) => a - b) });
-        }
-      });
-    }
-    return uncoveredLines;
-  }
+    const totalFunctions = reports.reduce((sum, r) => sum + r.functions.total, 0);
+    const coveredFunctions = reports.reduce((sum, r) => sum + r.functions.covered, 0);
 
-  private extractFileFromFunction(func: string): string {
-    return func.split(':')[0] || 'unknown';
-  }
+    const totalBranches = reports.reduce((sum, r) => sum + r.branches.total, 0);
+    const coveredBranches = reports.reduce((sum, r) => sum + r.branches.covered, 0);
 
-  private calculateSeverity(type: string, location: string): 'critical' | 'high' | 'medium' | 'low' {
-    // Determine severity based on file importance and function criticality
-    const criticalPaths = ['/auth/', '/security/', '/payment/', '/api/'];
-    const highPaths = ['/services/', '/middleware/', '/database/'];
-    
-    if (criticalPaths.some(path => location.includes(path))) {
-      return 'critical';
-    }
-    if (highPaths.some(path => location.includes(path))) {
-      return 'high';
-    }
-    if (type === 'function') {
-      return 'medium';
-    }
-    return 'low';
-  }
-
-  private generateTestSuggestion(type: string, location: string): string {
-    switch (type) {
-      case 'function':
-        return `Create unit test for function in ${location}`;
-      case 'statement':
-        return `Add test case to cover statement in ${location}`;
-      case 'branch':
-        return `Add tests for conditional branches in ${location}`;
-      default:
-        return `Add appropriate test coverage for ${location}`;
-    }
-  }
-
-  private getSeverityWeight(severity: string): number {
-    switch (severity) {
-      case 'critical': return 4;
-      case 'high': return 3;
-      case 'medium': return 2;
-      case 'low': return 1;
-      default: return 0;
-    }
-  }
-
-  private calculateOverallCoverage(reports: CoverageReport[]) {
-    const totalLines = reports.reduce((sum, report) => sum + report.lines.total, 0);
-    const coveredLines = reports.reduce((sum, report) => sum + report.lines.covered, 0);
-    
-    const totalFunctions = reports.reduce((sum, report) => sum + report.functions.total, 0);
-    const coveredFunctions = reports.reduce((sum, report) => sum + report.functions.covered, 0);
-    
-    const totalBranches = reports.reduce((sum, report) => sum + report.branches.total, 0);
-    const coveredBranches = reports.reduce((sum, report) => sum + report.branches.covered, 0);
-    
-    const totalStatements = reports.reduce((sum, report) => sum + report.statements.total, 0);
-    const coveredStatements = reports.reduce((sum, report) => sum + report.statements.covered, 0);
+    const totalStatements = reports.reduce((sum, r) => sum + r.statements.total, 0);
+    const coveredStatements = reports.reduce((sum, r) => sum + r.statements.covered, 0);
 
     return {
       lines: totalLines > 0 ? Math.round((coveredLines / totalLines) * 100) : 0,
@@ -317,38 +286,54 @@ export class CoverageAnalyzer {
     };
   }
 
+  private determineSeverity(functionName: string): 'critical' | 'high' | 'medium' | 'low' {
+    const lowerName = functionName.toLowerCase();
+
+    if (lowerName.includes('auth') || lowerName.includes('security') || lowerName.includes('validate')) {
+      return 'critical';
+    }
+    if (lowerName.includes('api') || lowerName.includes('database') || lowerName.includes('error')) {
+      return 'high';
+    }
+    if (lowerName.includes('util') || lowerName.includes('helper')) {
+      return 'low';
+    }
+    return 'medium';
+  }
+
+  private getImpactDescription(type: string, severity: string): string {
+    switch (severity) {
+      case 'critical': return `Critical ${type} coverage gap affecting core functionality`;
+      case 'high': return `High impact ${type} coverage gap`;
+      case 'medium': return `Medium impact ${type} coverage gap`;
+      case 'low': return `Low impact ${type} coverage gap`;
+      default: return `${type} coverage gap`;
+    }
+  }
+
   private generateRecommendations(gaps: CoverageGap[], overallCoverage: any): string[] {
     const recommendations: string[] = [];
 
-    if (overallCoverage.lines < this.coverageThresholds.lines) {
-      recommendations.push(`Increase line coverage from ${overallCoverage.lines}% to ${this.coverageThresholds.lines}%`);
+    if (overallCoverage.percentage < 80) {
+      recommendations.push('Overall line coverage is below 80%. Focus on increasing test coverage.');
     }
 
-    if (overallCoverage.functions < this.coverageThresholds.functions) {
-      recommendations.push(`Increase function coverage from ${overallCoverage.functions}% to ${this.coverageThresholds.functions}%`);
+    if (overallCoverage.branches < 75) {
+      recommendations.push('Branch coverage is low. Add tests for conditional logic and edge cases.');
     }
 
-    const criticalGaps = gaps.filter(gap => gap.severity === 'critical').length;
-    if (criticalGaps > 0) {
-      recommendations.push(`Address ${criticalGaps} critical coverage gaps immediately`);
+    const criticalGaps = gaps.filter(g => g.severity === 'critical');
+    if (criticalGaps.length > 0) {
+      recommendations.push(`Address ${criticalGaps.length} critical coverage gaps, especially in authentication and security functions.`);
     }
 
-    const highGaps = gaps.filter(gap => gap.severity === 'high').length;
-    if (highGaps > 0) {
-      recommendations.push(`Address ${highGaps} high-priority coverage gaps`);
+    if (gaps.some(g => g.type === 'function' && g.severity === 'high')) {
+      recommendations.push('Prioritize testing of high-impact functions that handle API calls and data processing.');
     }
 
-    if (gaps.length > 50) {
-      recommendations.push('Consider implementing automated test generation for uncovered code paths');
-    }
+    recommendations.push('Consider adding integration tests to cover end-to-end scenarios.');
+    recommendations.push('Review and update test cases to cover recently added or modified code.');
 
     return recommendations;
-  }
-
-  async saveCoverageReport(report: ComprehensiveCoverageReport): Promise<string> {
-    const reportPath = path.join(process.cwd(), 'coverage', 'comprehensive-report.json');
-    await fs.mkdir(path.dirname(reportPath), { recursive: true });
-    await fs.writeFile(reportPath, JSON.stringify(report, null, 2));
-    return reportPath;
   }
 }

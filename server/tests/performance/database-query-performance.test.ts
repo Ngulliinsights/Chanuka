@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import { database as db, bills, billEngagement, billComments, sponsors } from '../../../shared/database/connection.js';
 import { eq, sql } from 'drizzle-orm';
+import { logger } from '../utils/logger';
 
 describe('Database Query Performance Tests', () => {
   const PERFORMANCE_THRESHOLD_MS = 200;
@@ -8,7 +9,7 @@ describe('Database Query Performance Tests', () => {
   
   beforeAll(async () => {
     // Ensure we have test data
-    console.log('Setting up performance test data...');
+    logger.info('Setting up performance test data...', { component: 'SimpleTool' });
   });
 
   afterAll(async () => {
@@ -177,3 +178,9 @@ describe('Database Query Performance Tests', () => {
     });
   });
 });
+
+
+
+
+
+

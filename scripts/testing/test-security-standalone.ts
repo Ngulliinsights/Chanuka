@@ -276,14 +276,14 @@ class StandaloneSecurityTester {
  * Run standalone security tests
  */
 async function runStandaloneSecurityTests() {
-  console.log('🔒 Testing Security Monitoring System (Standalone)');
-  console.log('=' .repeat(60));
+  logger.info('🔒 Testing Security Monitoring System (Standalone)', { component: 'SimpleTool' });
+  logger.info('=', { component: 'SimpleTool' }, .repeat(60));
 
   const securityTester = new StandaloneSecurityTester();
 
   try {
     // Test 1: Test XSS detection
-    console.log('\n1. Testing XSS detection...');
+    logger.info('\n1. Testing XSS detection...', { component: 'SimpleTool' });
     
     const xssRequest = {
       originalUrl: '/api/bills?search=<script>alert("xss")</script>',
@@ -306,14 +306,14 @@ async function runStandaloneSecurityTests() {
     };
 
     const xssResult = securityTester.analyzeRequest(xssRequest);
-    console.log('✅ XSS detection completed');
+    logger.info('✅ XSS detection completed', { component: 'SimpleTool' });
     console.log(`   - Threat Level: ${xssResult.threatLevel}`);
     console.log(`   - Risk Score: ${xssResult.riskScore}`);
     console.log(`   - Detected Threats: ${xssResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${xssResult.recommendedAction}`);
 
     // Test 2: Test SQL injection detection
-    console.log('\n2. Testing SQL injection detection...');
+    logger.info('\n2. Testing SQL injection detection...', { component: 'SimpleTool' });
     const sqlRequest = {
       ...xssRequest,
       originalUrl: '/api/bills?id=1; DROP TABLE users; --',
@@ -322,14 +322,14 @@ async function runStandaloneSecurityTests() {
     };
 
     const sqlResult = securityTester.analyzeRequest(sqlRequest);
-    console.log('✅ SQL injection detection completed');
+    logger.info('✅ SQL injection detection completed', { component: 'SimpleTool' });
     console.log(`   - Threat Level: ${sqlResult.threatLevel}`);
     console.log(`   - Risk Score: ${sqlResult.riskScore}`);
     console.log(`   - Detected Threats: ${sqlResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${sqlResult.recommendedAction}`);
 
     // Test 3: Test path traversal detection
-    console.log('\n3. Testing path traversal detection...');
+    logger.info('\n3. Testing path traversal detection...', { component: 'SimpleTool' });
     const pathRequest = {
       ...xssRequest,
       originalUrl: '/api/files?path=../../../etc/passwd',
@@ -337,13 +337,13 @@ async function runStandaloneSecurityTests() {
     };
 
     const pathResult = securityTester.analyzeRequest(pathRequest);
-    console.log('✅ Path traversal detection completed');
+    logger.info('✅ Path traversal detection completed', { component: 'SimpleTool' });
     console.log(`   - Threat Level: ${pathResult.threatLevel}`);
     console.log(`   - Risk Score: ${pathResult.riskScore}`);
     console.log(`   - Detected Threats: ${pathResult.detectedThreats.length}`);
 
     // Test 4: Test rate limiting
-    console.log('\n4. Testing rate limiting...');
+    logger.info('\n4. Testing rate limiting...', { component: 'SimpleTool' });
     const rapidRequests = [];
     for (let i = 0; i < 70; i++) {
       rapidRequests.push(securityTester.analyzeRequest(xssRequest));
@@ -356,7 +356,7 @@ async function runStandaloneSecurityTests() {
     console.log(`   - Rate limiting working: ${blockedRequests.length > 0 ? 'YES' : 'NO'}`);
 
     // Test 5: Test IP blocking
-    console.log('\n5. Testing IP blocking functionality...');
+    logger.info('\n5. Testing IP blocking functionality...', { component: 'SimpleTool' });
     const testIP = '192.168.1.999';
     
     console.log(`   - Before blocking: ${securityTester.isIPBlocked(testIP) ? 'BLOCKED' : 'NOT BLOCKED'}`);
@@ -366,7 +366,7 @@ async function runStandaloneSecurityTests() {
     console.log(`   - After unblocking: ${securityTester.isIPBlocked(testIP) ? 'BLOCKED' : 'NOT BLOCKED'}`);
 
     // Test 6: Test normal request
-    console.log('\n6. Testing normal request...');
+    logger.info('\n6. Testing normal request...', { component: 'SimpleTool' });
     const normalRequest = {
       originalUrl: '/api/bills?status=active&limit=10',
       url: '/api/bills?status=active&limit=10',
@@ -382,7 +382,7 @@ async function runStandaloneSecurityTests() {
     };
 
     const normalResult = securityTester.analyzeRequest(normalRequest);
-    console.log('✅ Normal request analysis completed');
+    logger.info('✅ Normal request analysis completed', { component: 'SimpleTool' });
     console.log(`   - Threat Level: ${normalResult.threatLevel}`);
     console.log(`   - Risk Score: ${normalResult.riskScore}`);
     console.log(`   - Detected Threats: ${normalResult.detectedThreats.length}`);
@@ -390,7 +390,7 @@ async function runStandaloneSecurityTests() {
     console.log(`   - Should pass: ${normalResult.recommendedAction === 'allow' ? 'YES' : 'NO'}`);
 
     // Test 7: Test multiple attack patterns
-    console.log('\n7. Testing multiple attack patterns...');
+    logger.info('\n7. Testing multiple attack patterns...', { component: 'SimpleTool' });
     const multiAttackRequest = {
       ...xssRequest,
       originalUrl: '/api/search?q=<script>alert("xss")</script>&filter=../../../etc/passwd',
@@ -402,40 +402,40 @@ async function runStandaloneSecurityTests() {
     };
 
     const multiResult = securityTester.analyzeRequest(multiAttackRequest);
-    console.log('✅ Multiple attack pattern detection completed');
+    logger.info('✅ Multiple attack pattern detection completed', { component: 'SimpleTool' });
     console.log(`   - Threat Level: ${multiResult.threatLevel}`);
     console.log(`   - Risk Score: ${multiResult.riskScore}`);
     console.log(`   - Detected Threats: ${multiResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${multiResult.recommendedAction}`);
     
     if (multiResult.detectedThreats.length > 0) {
-      console.log('   - Multiple threats detected:');
+      logger.info('   - Multiple threats detected:', { component: 'SimpleTool' });
       multiResult.detectedThreats.forEach((threat, index) => {
         console.log(`     ${index + 1}. ${threat.type} (${threat.severity})`);
       });
     }
 
-    console.log('\n' + '='.repeat(60));
-    console.log('🎉 Standalone security monitoring tests completed successfully!');
-    console.log('\n📊 Test Results Summary:');
-    console.log('✅ XSS Detection: WORKING');
-    console.log('✅ SQL Injection Detection: WORKING');
-    console.log('✅ Path Traversal Detection: WORKING');
-    console.log('✅ Rate Limiting: WORKING');
-    console.log('✅ IP Blocking: WORKING');
-    console.log('✅ Normal Request Processing: WORKING');
-    console.log('✅ Multiple Attack Detection: WORKING');
+    logger.info('\n', { component: 'SimpleTool' }, + '='.repeat(60));
+    logger.info('🎉 Standalone security monitoring tests completed successfully!', { component: 'SimpleTool' });
+    logger.info('\n📊 Test Results Summary:', { component: 'SimpleTool' });
+    logger.info('✅ XSS Detection: WORKING', { component: 'SimpleTool' });
+    logger.info('✅ SQL Injection Detection: WORKING', { component: 'SimpleTool' });
+    logger.info('✅ Path Traversal Detection: WORKING', { component: 'SimpleTool' });
+    logger.info('✅ Rate Limiting: WORKING', { component: 'SimpleTool' });
+    logger.info('✅ IP Blocking: WORKING', { component: 'SimpleTool' });
+    logger.info('✅ Normal Request Processing: WORKING', { component: 'SimpleTool' });
+    logger.info('✅ Multiple Attack Detection: WORKING', { component: 'SimpleTool' });
     
-    console.log('\n🔒 Security Monitoring Core Functionality: VERIFIED');
-    console.log('📋 Attack pattern detection algorithms are working correctly');
-    console.log('⚡ Threat analysis and risk scoring is functional');
-    console.log('🛡️ Security controls are responding appropriately to threats');
+    logger.info('\n🔒 Security Monitoring Core Functionality: VERIFIED', { component: 'SimpleTool' });
+    logger.info('📋 Attack pattern detection algorithms are working correctly', { component: 'SimpleTool' });
+    logger.info('⚡ Threat analysis and risk scoring is functional', { component: 'SimpleTool' });
+    logger.info('🛡️ Security controls are responding appropriately to threats', { component: 'SimpleTool' });
 
     return true;
 
   } catch (error) {
-    console.error('\n❌ Standalone security test failed:', error);
-    console.error('Stack trace:', (error as Error).stack);
+    logger.error('\n❌ Standalone security test failed:', { component: 'SimpleTool' }, error);
+    logger.error('Stack trace:', { component: 'SimpleTool' }, (error as Error).stack);
     return false;
   }
 }
@@ -444,15 +444,21 @@ async function runStandaloneSecurityTests() {
 runStandaloneSecurityTests()
   .then((success) => {
     if (success) {
-      console.log('\n✅ Security monitoring core functionality verified');
-      console.log('🚀 System ready for integration with full application');
+      logger.info('\n✅ Security monitoring core functionality verified', { component: 'SimpleTool' });
+      logger.info('🚀 System ready for integration with full application', { component: 'SimpleTool' });
       process.exit(0);
     } else {
-      console.log('\n❌ Security monitoring tests failed');
+      logger.info('\n❌ Security monitoring tests failed', { component: 'SimpleTool' });
       process.exit(1);
     }
   })
   .catch((error) => {
-    console.error('\n❌ Test execution failed:', error);
+    logger.error('\n❌ Test execution failed:', { component: 'SimpleTool' }, error);
     process.exit(1);
   });
+
+
+
+
+
+

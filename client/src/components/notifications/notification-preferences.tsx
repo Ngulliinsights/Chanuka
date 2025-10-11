@@ -22,6 +22,7 @@ import {
   X
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '../utils/logger.js';
 
 interface NotificationChannel {
   enabled: boolean;

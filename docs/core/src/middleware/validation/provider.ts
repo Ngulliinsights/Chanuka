@@ -1,6 +1,7 @@
 import { MiddlewareProvider } from '../types';
 import { ValidationService } from '../../services/validation';
 import { Request, Response, NextFunction } from 'express';
+import { logger } from '../utils/logger';
 
 export class ValidationMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'validation';
@@ -35,3 +36,10 @@ export class ValidationMiddlewareProvider implements MiddlewareProvider {
     };
   }
 }
+
+
+
+
+
+
+

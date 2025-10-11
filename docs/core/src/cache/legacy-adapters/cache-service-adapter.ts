@@ -251,6 +251,7 @@ export class LegacyCacheService {
    * Import cache data
    */
   import(data: Record<string, any>): void {
+import { logger } from '../utils/logger';
     for (const [key, entryData] of Object.entries(data)) {
       if (entryData && typeof entryData === 'object') {
         this.set(key, entryData.data, {
@@ -265,3 +266,9 @@ export class LegacyCacheService {
 // Export singleton instance for backward compatibility
 export const cacheService = LegacyCacheService.getInstance();
 export default cacheService;
+
+
+
+
+
+

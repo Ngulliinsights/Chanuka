@@ -1,5 +1,6 @@
 import { MiddlewareProvider } from '../types';
 import { Request, Response, NextFunction } from 'express';
+import { logger } from '../utils/logger';
 
 export class ErrorHandlerMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'errorHandler';
@@ -11,7 +12,7 @@ export class ErrorHandlerMiddlewareProvider implements MiddlewareProvider {
   create(options: Record<string, any>) {
     return (error: Error, req: Request, res: Response, next: NextFunction): void => {
       // Log the error
-      console.error('Unhandled error:', error);
+      logger.error('Unhandled error:', { component: 'SimpleTool' }, error);
 
       // Send error response
       res.status(500).json({
@@ -21,3 +22,10 @@ export class ErrorHandlerMiddlewareProvider implements MiddlewareProvider {
     };
   }
 }
+
+
+
+
+
+
+

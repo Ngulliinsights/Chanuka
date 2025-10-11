@@ -6,6 +6,7 @@
  */
 
 import { RateLimitStore, RateLimitResult, RateLimitMetricsInterface, RateLimitConfig } from '../types';
+import { logger } from '../utils/logger';
 
 export class MemoryStore implements RateLimitStore {
   private windows = new Map<string, any>();
@@ -214,3 +215,9 @@ export class MemoryStore implements RateLimitStore {
 }// Bac
 // Backward compatibility export
 export { MemoryStore as MemoryRateLimitStore };
+
+
+
+
+
+

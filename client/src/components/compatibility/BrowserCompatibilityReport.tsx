@@ -9,6 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { getBrowserInfo, browserDetector } from '../../utils/browser-compatibility';
 import { runBrowserCompatibilityTests, CompatibilityTestSuite } from '../../utils/browser-compatibility-tests';
 import BrowserCompatibilityTester from './BrowserCompatibilityTester';
+import { logger } from '../utils/logger.js';
 
 interface BrowserCompatibilityReportProps {
   showFullReport?: boolean;
@@ -36,7 +37,7 @@ const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
         
         onIssuesDetected?.(criticalCount, highCount);
       } catch (error) {
-        console.error('Failed to run compatibility check:', error);
+        logger.error('Failed to run compatibility check:', { component: 'SimpleTool' }, error);
       } finally {
         setIsLoading(false);
       }

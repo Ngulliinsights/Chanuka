@@ -32,3 +32,10 @@ export interface OverallHealth {
     critical_failures: number;
   };
 }
+
+
+
+
+
+
+

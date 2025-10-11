@@ -1,7 +1,8 @@
 
 import { database as db } from '../../../shared/database/connection.js';
-import { users, citizenVerifications, bills } from '../../shared/schema';
+import { users, citizenVerifications, bills } from '../../../shared/schema';
 import { eq, and, desc, count, sql } from 'drizzle-orm';
+import { logger } from '../../utils/logger';
 
 export interface CitizenVerification {
   id: string;
@@ -572,3 +573,12 @@ export class CitizenVerificationService {
 }
 
 export const citizenVerificationService = new CitizenVerificationService();
+
+
+
+
+
+
+
+
+

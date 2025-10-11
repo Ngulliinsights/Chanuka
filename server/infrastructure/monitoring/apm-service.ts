@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { performance } from 'perf_hooks';
 import { performanceMonitor } from './performance-monitor.js';
 import { errorTracker } from '../../core/errors/error-tracker.js';
+import { logger } from '../utils/logger';
 
 export interface APMMetrics {
   requestMetrics: {
@@ -390,7 +391,7 @@ class APMService {
       try {
         await this.updateBaselines();
       } catch (error) {
-        console.error('[APM] Error updating baselines:', error);
+        logger.error('[APM] Error updating baselines:', { component: 'SimpleTool' }, error);
       }
     }, 300000);
 
@@ -399,7 +400,7 @@ class APMService {
       try {
         await this.checkPerformanceRegressions();
       } catch (error) {
-        console.error('[APM] Error checking regressions:', error);
+        logger.error('[APM] Error checking regressions:', { component: 'SimpleTool' }, error);
       }
     }, 60000);
 
@@ -417,7 +418,7 @@ class APMService {
         this.systemMetricsHistory = this.systemMetricsHistory
           .filter(entry => entry.timestamp > cutoffTime);
       } catch (error) {
-        console.error('[APM] Error collecting system metrics:', error);
+        logger.error('[APM] Error collecting system metrics:', { component: 'SimpleTool' }, error);
       }
     }, 30000);
   }
@@ -543,3 +544,9 @@ class APMService {
 
 // Export singleton instance
 export const apmService = new APMService();
+
+
+
+
+
+

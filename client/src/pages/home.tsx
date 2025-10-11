@@ -13,6 +13,7 @@ import {
   ResponsiveStatsGrid
 } from '@/components/mobile/responsive-page-wrapper';
 import { LazyLoadWrapper } from '@/components/mobile/mobile-performance-optimizations';
+import { logger } from '../utils/logger.js';
 
 // Define the shape of a feature object for type safety
 // This ensures we maintain consistency across the application

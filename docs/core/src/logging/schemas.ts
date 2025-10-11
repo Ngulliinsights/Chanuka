@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { logger } from '../utils/logger';
 
 /**
  * Core event schemas for structured logging
@@ -123,3 +124,10 @@ export type SecurityEvent = z.infer<typeof securityEventSchema>;
 export type PerformanceEvent = z.infer<typeof performanceEventSchema>;
 export type ErrorEvent = z.infer<typeof errorEventSchema>;
 export type BusinessEvent = z.infer<typeof businessEventSchema>;
+
+
+
+
+
+
+

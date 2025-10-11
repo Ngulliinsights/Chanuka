@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import { BaseError, ErrorDomain, ErrorSeverity } from './base-error';
 import { loggingService } from '../logging/service';
+import { logger } from '../utils/logger';
 
 export interface CircuitBreakerMetrics {
   failures: number;
@@ -274,3 +275,10 @@ export class CircuitBreaker extends EventEmitter {
     return this.state;
   }
 }
+
+
+
+
+
+
+

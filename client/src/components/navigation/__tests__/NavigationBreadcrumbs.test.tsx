@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import NavigationBreadcrumbs from '../NavigationBreadcrumbs';
 import { NavigationProvider } from '@/contexts/NavigationContext';
+import { logger } from '../utils/logger.js';
 
 // Mock the navigation context utilities
 vi.mock('@/utils/navigation/breadcrumb-generator', () => ({

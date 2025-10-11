@@ -1,6 +1,7 @@
-import { database as db } from '../../shared/database/connection.js';
-import { bills, sponsors, billComments } from '../../shared/schema.js';
+import { database as db } from '../../../shared/database/connection.js';
+import { bills, sponsors, billComments } from '../../../shared/schema.js';
 import { sql, or, and, ilike, desc, asc } from 'drizzle-orm';
+import { logger } from '../../utils/logger';
 
 export interface SearchFilters {
   query?: string;
@@ -102,7 +103,7 @@ export class SearchService {
         facets
       };
     } catch (error) {
-      console.error('Search error:', error);
+      logger.error('Search error:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -145,7 +146,7 @@ export class SearchService {
         sponsors: [] // Could add sponsor facets
       };
     } catch (error) {
-      console.error('Error getting facets:', error);
+      logger.error('Error getting facets:', { component: 'SimpleTool' }, error);
       return {
         categories: [],
         statuses: [],
@@ -172,7 +173,7 @@ export class SearchService {
 
       return results;
     } catch (error) {
-      console.error('Sponsor search error:', error);
+      logger.error('Sponsor search error:', { component: 'SimpleTool' }, error);
       return [];
     }
   }
@@ -197,10 +198,18 @@ export class SearchService {
 
       return [...billSuggestions, ...sponsorSuggestions];
     } catch (error) {
-      console.error('Error getting search suggestions:', error);
+      logger.error('Error getting search suggestions:', { component: 'SimpleTool' }, error);
       return [];
     }
   }
 }
 
 export const searchService = new SearchService();
+
+
+
+
+
+
+
+

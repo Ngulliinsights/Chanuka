@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useBills } from '@/hooks/use-bills';
+import { logger } from '../utils/logger.js';
 
 export const ActivitySummary = () => {
   const { summary, isLoading } = useBills();

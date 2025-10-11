@@ -5,6 +5,7 @@
  */
 
 import { CacheService, CacheEntry, CacheOptions } from './types';
+import { logger } from '../utils/logger';
 
 // Re-export the new legacy adapters
 export { LegacyCacheService, cacheService } from './legacy-adapters/cache-service-adapter';
@@ -187,3 +188,9 @@ export class PropertyCacheServiceAdapter {
     return keyParts.join('');
   }
 }
+
+
+
+
+
+

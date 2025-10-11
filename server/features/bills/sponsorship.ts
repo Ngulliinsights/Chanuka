@@ -4,7 +4,8 @@ import { bills, billSponsorships, sponsors, sponsorTransparency, sponsorAffiliat
 import { eq, desc, count, sql, and } from 'drizzle-orm';
 import { asyncHandler } from '../../utils/errors';
 import { SponsorshipAnalysisService } from './sponsorship-analysis';
-import { ApiSuccess, ApiErrorResponse, ApiResponseWrapper } from "../../utils/api-response.js";
+import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../utils/api-response.js";
+import { logger } from '../../utils/logger';
 
 const router = Router();
 
@@ -21,7 +22,7 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
       return ApiSuccess(res, analysis, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error fetching sponsorship analysis:', error);
+      logger.error('Error fetching sponsorship analysis:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to fetch sponsorship analysis', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -37,7 +38,7 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
       return ApiSuccess(res, analysis, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error fetching primary sponsor analysis:', error);
+      logger.error('Error fetching primary sponsor analysis:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to fetch primary sponsor analysis', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -53,7 +54,7 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
       return ApiSuccess(res, analysis, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error fetching co-sponsors analysis:', error);
+      logger.error('Error fetching co-sponsors analysis:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to fetch co-sponsors analysis', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -69,7 +70,7 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
       return ApiSuccess(res, analysis, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error fetching financial network analysis:', error);
+      logger.error('Error fetching financial network analysis:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to fetch financial network analysis', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -81,3 +82,11 @@ setupSponsorshipRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
+
+
+
+
+
+
+

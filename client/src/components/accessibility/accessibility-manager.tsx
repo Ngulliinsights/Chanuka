@@ -4,6 +4,7 @@
  */
 
 import React, { 
+import { logger } from '../utils/logger.js';
   createContext, 
   useContext, 
   useState, 

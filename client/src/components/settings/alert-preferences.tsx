@@ -68,6 +68,7 @@ interface AlertPreferences {
       enabled: boolean;
       urgentBillsImmediate: boolean;
       importantSponsorsImmediate: boolean;
+import { logger } from '../utils/logger.js';
       highEngagementImmediate: boolean;
     };
     batchingRules: {
@@ -112,7 +113,7 @@ export function AlertPreferences({ userId }: AlertPreferencesProps) {
         setPreferences(data.data.billTracking);
       }
     } catch (error) {
-      console.error('Error loading preferences:', error);
+      logger.error('Error loading preferences:', { component: 'SimpleTool' }, error);
       setMessage({ type: 'error', text: 'Failed to load alert preferences' });
     } finally {
       setLoading(false);
@@ -132,7 +133,7 @@ export function AlertPreferences({ userId }: AlertPreferencesProps) {
         setChannels(data.data);
       }
     } catch (error) {
-      console.error('Error loading channels:', error);
+      logger.error('Error loading channels:', { component: 'SimpleTool' }, error);
     }
   };
 
@@ -149,7 +150,7 @@ export function AlertPreferences({ userId }: AlertPreferencesProps) {
         setCategories(data.data);
       }
     } catch (error) {
-      console.error('Error loading categories:', error);
+      logger.error('Error loading categories:', { component: 'SimpleTool' }, error);
     }
   };
 
@@ -166,7 +167,7 @@ export function AlertPreferences({ userId }: AlertPreferencesProps) {
         setSponsors(data.data);
       }
     } catch (error) {
-      console.error('Error loading sponsors:', error);
+      logger.error('Error loading sponsors:', { component: 'SimpleTool' }, error);
     }
   };
 
@@ -190,7 +191,7 @@ export function AlertPreferences({ userId }: AlertPreferencesProps) {
         throw new Error('Failed to save preferences');
       }
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      logger.error('Error saving preferences:', { component: 'SimpleTool' }, error);
       setMessage({ type: 'error', text: 'Failed to save alert preferences' });
     } finally {
       setSaving(false);
@@ -215,7 +216,7 @@ export function AlertPreferences({ userId }: AlertPreferencesProps) {
         throw new Error('Failed to send test notification');
       }
     } catch (error) {
-      console.error('Error sending test notification:', error);
+      logger.error('Error sending test notification:', { component: 'SimpleTool' }, error);
       setMessage({ type: 'error', text: 'Failed to send test notification' });
     } finally {
       setTestingNotification(false);

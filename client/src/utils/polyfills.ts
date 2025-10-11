@@ -6,6 +6,7 @@
  */
 
 import { featureDetector } from './browser-compatibility';
+import { logger } from '../utils/logger';
 
 // Polyfill loading status
 interface PolyfillStatus {
@@ -1028,9 +1029,9 @@ class PolyfillManager {
 
     try {
       await Promise.all(polyfillPromises);
-      console.log('All polyfills loaded successfully');
+      logger.info('All polyfills loaded successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('Some polyfills failed to load:', error);
+      logger.error('Some polyfills failed to load:', { component: 'SimpleTool' }, error);
       // Don't throw - allow app to continue with partial polyfill support
     }
   }
@@ -1078,3 +1079,9 @@ export async function loadStoragePolyfills(): Promise<void> {
 export function getPolyfillStatus(): Map<string, PolyfillStatus> {
   return polyfillManager.getPolyfillStatus();
 }
+
+
+
+
+
+

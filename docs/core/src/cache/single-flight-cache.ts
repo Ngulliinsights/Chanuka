@@ -8,6 +8,7 @@
  */
 
 import type { 
+import { logger } from '../utils/logger';
   CacheService, 
   CacheMetrics, 
   CacheHealthStatus, 
@@ -763,3 +764,9 @@ export class SingleFlightCache implements CacheService {
     }
   }
 }
+
+
+
+
+
+

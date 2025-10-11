@@ -1,5 +1,6 @@
 import { Card, CardContent, CardTitle } from '../ui/card';
 import { Progress } from '../ui/progress';
+import { logger } from '../utils/logger.js';
 
 interface Bill {
   supportPercentage?: number;

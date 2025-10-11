@@ -19,6 +19,7 @@ import {
   commonValidation,
 } from '../middleware';
 import { ValidationError } from '../types';
+import { logger } from '../utils/logger';
 
 // Mock Express request/response objects
 const createMockRequest = (overrides: Partial<Request> = {}): Request => ({
@@ -596,3 +597,9 @@ describe('Validation Middleware', () => {
     });
   });
 });
+
+
+
+
+
+

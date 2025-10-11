@@ -6,11 +6,13 @@ import { fileURLToPath } from 'url';
 import { createServer } from 'http';
 import helmet from 'helmet';
 import { database as db } from '../shared/database/connection.js';
+import { config } from './config/index.js';
 // Feature Routes
 import { router as systemRouter } from './features/admin/system.js';
 import { router as billsRouter } from './features/bills/bills-router.js';
 import { router as sponsorshipRouter } from './features/bills/sponsorship.js';
 import { router as analysisRouter } from './features/analytics/analysis.js';
+import analyticsRouter from './features/analytics/analytics.js';
 import { router as sponsorsRouter } from './features/bills/sponsors.js';
 import { router as authRouter } from './core/auth/auth.js';
 import { router as usersRouter } from './features/users/users.js';
@@ -25,14 +27,15 @@ import { router as profileRouter } from './features/users/profile.js';
 import { router as privacyRouter } from './features/privacy/privacy-routes.js';
 import governmentDataRouter from './features/government-data/routes.js';
 // import { router as billTrackingRouter } from './features/bills/bill-tracking.js'; // TODO: Implement bill tracking router
-import { router as adminRouter } from './features/admin/admin-router.js';
+import { router as adminRouter } from './features/admin/admin.js';
 import { router as cacheRouter } from './infrastructure/cache/cache.js';
+import { cacheCoordinator } from './infrastructure/cache/index.js';
 import { router as realTimeTrackingRouter } from './features/bills/real-time-tracking.js';
 import { router as alertPreferencesRouter } from './features/users/alert-preferences.js';
 // import engagementAnalyticsRouter from './features/analytics/engagement-analytics.js'; // TODO: Implement engagement analytics router
 // import { sponsorConflictAnalysisRouter } from './features/bills/sponsor-conflict-analysis.js'; // TODO: Implement sponsor conflict analysis router
 // import { votingPatternAnalysisRouter } from './features/bills/voting-pattern-analysis.js'; // TODO: Implement voting pattern analysis router
-import { router as financialDisclosureRouter } from './features/analytics/financial-disclosure.js';
+import { router as financialDisclosureRouter } from './features/analytics/financial-disclosure/index.js';
 // import financialDisclosureIntegrationRouter from './features/analytics/financial-disclosure-integration.js'; // TODO: Implement financial disclosure integration router
 // import { router as transparencyDashboardRouter } from './features/analytics/transparency-dashboard.js'; // TODO: Implement transparency dashboard router
 import { router as monitoringRouter } from './infrastructure/monitoring/monitoring.js';
@@ -58,34 +61,39 @@ import { sessionCleanupService } from './core/auth/session-cleanup.js';
 import { searchIndexManager } from './features/search-index-manager.js';
 import { securityMonitoringService } from './features/security/security-monitoring-service.js';
 import { privacySchedulerService } from './features/privacy/privacy-scheduler.js';
+import { initializeMonitoring } from './utils/performance-monitoring-utils.js';
+import { logger } from './utils/logger';
+import { serveSwagger, setupSwagger } from './features/analytics/swagger.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = parseInt(process.env.PORT || '5000');
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const PORT = config.server.port;
+const isDevelopment = config.server.nodeEnv === 'development';
 
 // Security middleware (should be early in the pipeline)
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:"],
-      scriptSrc: isDevelopment 
-        ? ["'self'", "'unsafe-eval'", "'unsafe-inline'"] // Allow eval in development for HMR
-        : ["'self'"],
-      connectSrc: isDevelopment
-        ? ["'self'", "ws:", "wss:", `ws://localhost:${PORT}`, `ws://localhost:${PORT + 1}`, `http://localhost:${PORT}`] // Allow WebSocket and HTTP for app and HMR
-        : ["'self'"],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
+if (config.security.enableHelmet) {
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: config.security.contentSecurityPolicy.defaultSrc,
+        styleSrc: config.security.contentSecurityPolicy.styleSrc,
+        fontSrc: config.security.contentSecurityPolicy.fontSrc,
+        imgSrc: config.security.contentSecurityPolicy.imgSrc,
+        scriptSrc: isDevelopment
+          ? ["'self'", "'unsafe-eval'", "'unsafe-inline'"] // Allow eval in development for HMR
+          : config.security.contentSecurityPolicy.scriptSrc,
+        connectSrc: isDevelopment
+          ? ["'self'", "ws:", "wss:", `ws://localhost:${PORT}`, `ws://localhost:${PORT + 1}`, `http://localhost:${PORT}`] // Allow WebSocket and HTTP for app and HMR
+          : config.security.contentSecurityPolicy.connectSrc,
+        objectSrc: config.security.contentSecurityPolicy.objectSrc,
+        upgradeInsecureRequests: config.security.contentSecurityPolicy.upgradeInsecureRequests ? [] : null,
+      },
     },
-  },
-  crossOriginEmbedderPolicy: false, // Disable for development compatibility
-}));
+    crossOriginEmbedderPolicy: false, // Disable for development compatibility
+  }));
+}
 
 // Enhanced CORS configuration
 const corsOptions = {
@@ -95,7 +103,7 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    const allowedOrigins = isDevelopment 
+    const allowedOrigins = isDevelopment
       ? [
           `http://localhost:${PORT}`,
           `http://127.0.0.1:${PORT}`,
@@ -105,7 +113,7 @@ const corsOptions = {
           'http://localhost:5174', // Alternative Vite dev port
           'http://localhost:4200', // Current server port for frontend
         ]
-      : process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : [origin];
+      : config.server.frontendUrl ? [config.server.frontendUrl] : [origin];
 
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
@@ -114,32 +122,11 @@ const corsOptions = {
       callback(new Error(`Not allowed by CORS policy: ${origin}`), false);
     }
   },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
-  allowedHeaders: [
-    'Origin',
-    'X-Requested-With',
-    'Content-Type',
-    'Accept',
-    'Authorization',
-    'Cache-Control',
-    'X-CSRF-Token',
-    'X-Request-ID',
-    'X-Admin-Request',
-    'If-None-Match',
-    'If-Modified-Since'
-  ],
-  exposedHeaders: [
-    'X-Total-Count', 
-    'X-Page-Count',
-    'X-RateLimit-Limit',
-    'X-RateLimit-Remaining',
-    'X-RateLimit-Reset',
-    'X-Request-ID',
-    'ETag',
-    'Last-Modified'
-  ],
-  maxAge: 86400, // 24 hours
+  credentials: config.cors.credentials,
+  methods: config.cors.allowedMethods,
+  allowedHeaders: config.cors.allowedHeaders,
+  exposedHeaders: config.cors.exposedHeaders,
+  maxAge: config.cors.maxAge,
   optionsSuccessStatus: 200, // Some legacy browsers choke on 204
   preflightContinue: false // Pass control to the next handler
 };
@@ -151,7 +138,7 @@ app.options('*', cors(corsOptions));
 
 // Body parsing middleware with error handling
 app.use(express.json({
-  limit: '10mb',
+  limit: '10mb', // TODO: Make configurable
   verify: (req, res, buf) => {
     try {
       JSON.parse(buf.toString());
@@ -166,7 +153,7 @@ app.use(express.json({
 
 app.use(express.urlencoded({
   extended: true,
-  limit: '10mb',
+  limit: '10mb', // TODO: Make configurable
   verify: (req, res, buf) => {
     // Basic validation for URL-encoded data
     if (buf.length === 0) return;
@@ -193,14 +180,14 @@ app.use(securityMonitoringMiddleware.initializeAll());
 
 // Root API endpoint
 app.get('/api', (req, res) => {
-  res.json({ 
+  res.json({
     message: "Chanuka Legislative Transparency Platform API",
     version: "1.0.0",
-    environment: process.env.NODE_ENV || 'development',
+    environment: config.server.nodeEnv,
     frontend_serving: isDevelopment ? 'vite_dev_server' : 'static_files',
     endpoints: {
       bills: "/api/bills (includes workarounds)",
-      sponsors: "/api/sponsors", 
+      sponsors: "/api/sponsors",
       analysis: "/api/analysis",
       sponsorship: "/api/sponsorship",
       system: "/api/system",
@@ -218,14 +205,14 @@ app.get('/api/frontend-health', (req, res) => {
   const healthStatus = {
     status: 'ok',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
+    environment: config.server.nodeEnv,
     serving_mode: isDevelopment ? 'development' : 'production',
     vite_integration: isDevelopment ? 'enabled' : 'disabled',
     static_serving: !isDevelopment ? 'enabled' : 'disabled',
     cors: {
       enabled: true,
       origin: req.headers.origin || 'no-origin',
-      credentials: true
+      credentials: config.cors.credentials
     },
     headers: {
       'user-agent': req.headers['user-agent'],
@@ -246,7 +233,7 @@ app.get('/api/frontend-health', (req, res) => {
 // Memory analysis endpoint for debugging high memory usage
 app.get('/api/debug/memory-analysis', (req, res) => {
   try {
-    console.log('🔍 Triggering detailed memory analysis...');
+    logger.info('🔍 Triggering detailed memory analysis...', { component: 'SimpleTool' });
 
     // WebSocket memory analysis
     const wsAnalysis = webSocketService.forceMemoryAnalysis();
@@ -290,7 +277,7 @@ app.get('/api/debug/memory-analysis', (req, res) => {
 
     res.json(analysis);
   } catch (error) {
-    console.error('Error in memory analysis:', error);
+    logger.error('Error in memory analysis:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       error: 'Failed to perform memory analysis',
       details: error instanceof Error ? error.message : String(error)
@@ -303,6 +290,7 @@ app.use('/api/system', systemRouter);
 app.use('/api/bills', billsRouter);
 app.use('/api/sponsorship', sponsorshipRouter);
 app.use('/api/analysis', analysisRouter);
+app.use('/api/analytics', analyticsRouter);
 app.use('/api/sponsors', sponsorsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
@@ -333,9 +321,12 @@ app.use('/api/admin/external-api', externalApiDashboardRouter);
 app.use('/api/security', securityMonitoringRouter);
 app.use('/api/coverage', coverageRouter);
 
+// Swagger API documentation
+app.use('/api-docs', serveSwagger, setupSwagger);
+
 // API-specific error handling middleware
 app.use('/api', (error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('API Error:', error);
+  logger.error('API Error:', { component: 'SimpleTool' }, error);
 
   // Handle CORS errors
   if (error.message && error.message.includes('CORS')) {
@@ -393,10 +384,10 @@ app.use(errorHandler);
 async function testConnection() {
   try {
     await db.execute('SELECT 1');
-    console.log('Database connection established successfully');
+    logger.info('Database connection established successfully', { component: 'SimpleTool' });
   } catch (error) {
-    console.error('Database connection failed:', error);
-    console.log('Server will continue in development mode without database');
+    logger.error('Database connection failed:', { component: 'SimpleTool' }, error);
+    logger.info('Server will continue in development mode without database', { component: 'SimpleTool' });
   }
 }
 
@@ -426,7 +417,7 @@ async function startupInitialization() {
 }
 
 async function performStartupInitialization() {
-  console.log("🚀 Starting Chanuka Platform...");
+  logger.info('🚀 Starting Chanuka Platform...', { component: 'SimpleTool' });
 
   try {
     // Use the new database fallback service
@@ -441,14 +432,14 @@ async function performStartupInitialization() {
     };
 
     if (dbConnected) {
-      console.log("✅ Platform ready with full database functionality");
+      logger.info('✅ Platform ready with full database functionality', { component: 'SimpleTool' });
     } else {
-      console.log("⚠️  Platform starting in demonstration mode with sample data");
+      logger.info('⚠️  Platform starting in demonstration mode with sample data', { component: 'SimpleTool' });
       console.log(`💡 ${healthInfo.system.message}`);
     }
   } catch (error) {
-    console.error("❌ Startup initialization error:", error);
-    console.log("🔄 Continuing with fallback mode...");
+    logger.error('❌ Startup initialization error:', { component: 'SimpleTool' }, error);
+    logger.info('🔄 Continuing with fallback mode...', { component: 'SimpleTool' });
     
     // Ensure demo mode is enabled on startup failure
     databaseFallbackService.setDemoMode(true);
@@ -457,7 +448,7 @@ async function performStartupInitialization() {
 
 // Run initialization without blocking
 startupInitialization().catch(err => {
-  console.log('Startup initialization error (non-blocking):', err.message);
+  logger.info('Startup initialization error (non-blocking):', { component: 'SimpleTool' }, err.message);
   // Ensure demo mode is enabled on startup failure
   databaseFallbackService.setDemoMode(true);
 });
@@ -470,52 +461,52 @@ const gracefulShutdown = async (signal: string) => {
   
   try {
     // 1. Stop accepting new connections first
-    console.log('🛑 Stopping new connections...');
+    logger.info('🛑 Stopping new connections...', { component: 'SimpleTool' });
     
     // 2. Clean up all services in reverse order of initialization
-    console.log('🧹 Cleaning up services...');
+    logger.info('🧹 Cleaning up services...', { component: 'SimpleTool' });
     
     // Clean up privacy scheduler
     try {
       privacySchedulerService.stop();
       privacySchedulerService.destroy();
     } catch (error) {
-      console.error('Error stopping privacy scheduler:', error);
+      logger.error('Error stopping privacy scheduler:', { component: 'SimpleTool' }, error);
     }
     
     // Clean up security monitoring
     try {
       await securityMonitoringService.shutdown();
     } catch (error) {
-      console.error('Error stopping security monitoring:', error);
+      logger.error('Error stopping security monitoring:', { component: 'SimpleTool' }, error);
     }
     
     // Clean up search index manager
     try {
       await searchIndexManager.shutdown();
     } catch (error) {
-      console.error('Error stopping search index manager:', error);
+      logger.error('Error stopping search index manager:', { component: 'SimpleTool' }, error);
     }
     
     // Clean up session cleanup service
     try {
       sessionCleanupService.stop();
     } catch (error) {
-      console.error('Error stopping session cleanup:', error);
+      logger.error('Error stopping session cleanup:', { component: 'SimpleTool' }, error);
     }
     
     // Clean up monitoring scheduler
     try {
       await monitoringScheduler.shutdown();
     } catch (error) {
-      console.error('Error stopping monitoring scheduler:', error);
+      logger.error('Error stopping monitoring scheduler:', { component: 'SimpleTool' }, error);
     }
     
     // Clean up notification scheduler
     try {
       notificationSchedulerService.cleanup();
     } catch (error) {
-      console.error('Error stopping notification scheduler:', error);
+      logger.error('Error stopping notification scheduler:', { component: 'SimpleTool' }, error);
     }
     
     // Clean up notification services
@@ -523,21 +514,28 @@ const gracefulShutdown = async (signal: string) => {
       const { notificationService } = await import('./infrastructure/notifications/notification-service.js');
       notificationService.cleanup();
     } catch (error) {
-      console.error('Error stopping notification service:', error);
+      logger.error('Error stopping notification service:', { component: 'SimpleTool' }, error);
     }
     
     try {
       const { enhancedNotificationService } = await import('./infrastructure/notifications/enhanced-notification.js');
       enhancedNotificationService.cleanup();
     } catch (error) {
-      console.error('Error stopping enhanced notification service:', error);
+      logger.error('Error stopping enhanced notification service:', { component: 'SimpleTool' }, error);
     }
     
+    // Clean up cache coordinator
+    try {
+      cacheCoordinator.stop();
+    } catch (error) {
+      logger.error('Error stopping cache coordinator:', { component: 'SimpleTool' }, error);
+    }
+
     // Clean up WebSocket service
     try {
       await webSocketService.shutdown();
     } catch (error) {
-      console.error('Error stopping WebSocket service:', error);
+      logger.error('Error stopping WebSocket service:', { component: 'SimpleTool' }, error);
     }
     
     // Close Vite dev server if running
@@ -545,28 +543,28 @@ const gracefulShutdown = async (signal: string) => {
       const { closeVite } = await import('./vite.js');
       await closeVite();
     } catch (error) {
-      console.error('Error closing Vite server:', error);
+      logger.error('Error closing Vite server:', { component: 'SimpleTool' }, error);
     }
     
-    console.log('✅ All services cleaned up');
+    logger.info('✅ All services cleaned up', { component: 'SimpleTool' });
     
   } catch (error) {
-    console.error('Error during graceful shutdown:', error);
+    logger.error('Error during graceful shutdown:', { component: 'SimpleTool' }, error);
   }
   
   // Close HTTP server
   server.close((err) => {
     if (err) {
-      console.error('Error closing server:', err);
+      logger.error('Error closing server:', { component: 'SimpleTool' }, err);
       process.exit(1);
     }
-    console.log('Server closed successfully');
+    logger.info('Server closed successfully', { component: 'SimpleTool' });
     process.exit(0);
   });
   
   // Force exit after 10 seconds
   setTimeout(() => {
-    console.error('Forced shutdown after timeout');
+    logger.error('Forced shutdown after timeout', { component: 'SimpleTool' });
     process.exit(1);
   }, 10000);
 };
@@ -577,12 +575,12 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
+  logger.error('Uncaught Exception:', { component: 'SimpleTool' }, error);
   gracefulShutdown('UNCAUGHT_EXCEPTION');
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  logger.error('Unhandled Rejection at:', { component: 'SimpleTool' }, promise, 'reason:', reason);
   gracefulShutdown('UNHANDLED_REJECTION');
 });
 
@@ -591,19 +589,26 @@ server.on('error', (error: NodeJS.ErrnoException) => {
     console.error(`❌ Port ${PORT} is already in use. Please try a different port or stop the existing process.`);
     console.log(`💡 You can try: PORT=4201 npm run dev`);
   } else {
-    console.error('❌ Server error:', error);
+    logger.error('❌ Server error:', { component: 'SimpleTool' }, error);
   }
   process.exit(1);
 });
 
-server.listen(PORT, '0.0.0.0', async () => {
-  console.log(`Server running on http://0.0.0.0:${PORT}`);
+server.listen(config.server.port, config.server.host, async () => {
+  console.log(`Server running on http://${config.server.host}:${config.server.port}`);
 
   // Ensure startup initialization is complete before initializing services
   await startupInitialization();
 
   // Initialize services in proper order with error handling
   const serviceInitializers = [
+    {
+      name: 'Performance monitoring',
+      init: () => {
+        initializeMonitoring(config.server.nodeEnv);
+        return Promise.resolve();
+      }
+    },
     {
       name: 'WebSocket service',
       init: () => {
@@ -647,6 +652,13 @@ server.listen(PORT, '0.0.0.0', async () => {
         await privacySchedulerService.initialize();
         privacySchedulerService.start();
       }
+    },
+    {
+      name: 'Cache coordinator',
+      init: () => {
+        cacheCoordinator.start();
+        return Promise.resolve();
+      }
     }
   ];
 
@@ -665,15 +677,15 @@ server.listen(PORT, '0.0.0.0', async () => {
   try {
     if (isDevelopment) {
       await setupVite(app, server);
-      console.log('✅ Vite development server integrated successfully');
+      logger.info('✅ Vite development server integrated successfully', { component: 'SimpleTool' });
     } else {
       // Import serveStatic for production
       const { serveStatic } = await import('./vite.js');
       serveStatic(app);
-      console.log('✅ Production static file serving configured');
+      logger.info('✅ Production static file serving configured', { component: 'SimpleTool' });
     }
   } catch (error) {
-    console.error('❌ Failed to setup frontend serving:', error);
+    logger.error('❌ Failed to setup frontend serving:', { component: 'SimpleTool' }, error);
     
     // Fallback error page for frontend requests
     app.use('*', (req, res, next) => {
@@ -710,3 +722,9 @@ server.listen(PORT, '0.0.0.0', async () => {
 
   testConnection();
 });
+
+
+
+
+
+

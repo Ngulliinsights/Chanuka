@@ -1,6 +1,7 @@
 import { GovernmentDataIntegrationService } from './government-data-integration.js';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../infrastructure/external-data/external-api-manager.js';
 import { ExternalAPIErrorHandler } from './external-api-error-handler.js';
+import { logger } from '../utils/logger';
 
 /**
  * Enhanced Government Data Integration Service with full API management
@@ -136,7 +137,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
     dryRun?: boolean;
   } = {}): Promise<any> {
     const startTime = Date.now();
-    console.log('🚀 Starting managed bill integration with API management...');
+    logger.info('🚀 Starting managed bill integration with API management...', { component: 'SimpleTool' });
 
     try {
       // Get initial API health status
@@ -189,7 +190,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
       };
 
     } catch (error) {
-      console.error('🔥 Managed integration failed:', error);
+      logger.error('🔥 Managed integration failed:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -203,7 +204,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
     dryRun?: boolean;
   } = {}): Promise<any> {
     const startTime = Date.now();
-    console.log('🚀 Starting managed sponsor integration with API management...');
+    logger.info('🚀 Starting managed sponsor integration with API management...', { component: 'SimpleTool' });
 
     try {
       // Get initial API health status
@@ -254,7 +255,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
       };
 
     } catch (error) {
-      console.error('🔥 Managed sponsor integration failed:', error);
+      logger.error('🔥 Managed sponsor integration failed:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -387,6 +388,12 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
    */
   shutdown(): void {
     this.apiManager.shutdown();
-    console.log('🛑 Managed Government Data Integration Service shut down');
+    logger.info('🛑 Managed Government Data Integration Service shut down', { component: 'SimpleTool' });
   }
 }
+
+
+
+
+
+

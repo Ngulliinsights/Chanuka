@@ -7,6 +7,7 @@
 
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { featureDetector } from '../../utils/browser-compatibility';
+import { logger } from '../utils/logger.js';
 
 // Intersection Observer fallback hook
 export function useIntersectionObserverFallback(

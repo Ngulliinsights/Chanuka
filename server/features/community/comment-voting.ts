@@ -3,6 +3,7 @@ import { database as db } from '../../../shared/database/connection.js';
 import { billComments, users, commentVotes } from '../../../shared/schema.js';
 import { eq, and, sql, desc } from 'drizzle-orm';
 import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../infrastructure/cache/cache-service.js';
+import { logger } from '../../utils/logger';
 
 export interface VoteResult {
   success: boolean;
@@ -451,3 +452,11 @@ export class CommentVotingService {
 }
 
 export const commentVotingService = new CommentVotingService();
+
+
+
+
+
+
+
+

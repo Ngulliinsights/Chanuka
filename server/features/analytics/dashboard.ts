@@ -2,6 +2,8 @@ import { db } from '../../db/index.js';
 import { eq, sql, and, desc, count } from 'drizzle-orm';
 import { bills, analysis, evaluations, departments } from '../../../shared/schema.js';
 import type { Candidate, DepartmentStat, RadarDatum, EvaluationData } from '../../../shared/schema.js';
+import { logger } from '../../utils/logger';
+import { errorTracker } from '../core/errors/error-tracker';
 
 // Enhanced cache interface with better type safety
 interface CacheEntry<T> {
@@ -185,7 +187,7 @@ class DashboardStorageService {
         hasMore,
       };
     } catch (error) {
-      console.error('Error fetching evaluations:', error);
+      logger.error('Error fetching evaluations:', { component: 'SimpleTool' }, error);
       // Provide more specific error information
       if (error instanceof Error) {
         throw new Error(`Failed to fetch evaluations: ${error.message}`);
@@ -237,7 +239,7 @@ class DashboardStorageService {
 
       return result[0].id;
     } catch (error) {
-      console.error('Error creating evaluation:', error);
+      logger.error('Error creating evaluation:', { component: 'SimpleTool' }, error);
       if (error instanceof Error) {
         throw new Error(`Failed to create evaluation: ${error.message}`);
       }
@@ -292,7 +294,14 @@ class DashboardStorageService {
 
       return success;
     } catch (error) {
-      console.error(`Error updating evaluation status to ${status}:`, error);
+      logger.error(`Error updating evaluation status to ${status}`, { component: 'dashboard', status, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+      try {
+        if ((errorTracker as any)?.capture) {
+          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'dashboard', operation: 'updateEvaluationStatus', status });
+        }
+      } catch (reportErr) {
+        logger.warn('Failed to report dashboard updateEvaluationStatus error to errorTracker', { reportErr });
+      }
       if (error instanceof Error) {
         throw new Error(`Failed to update evaluation status: ${error.message}`);
       }
@@ -346,10 +355,16 @@ class DashboardStorageService {
 
       return stats;
     } catch (error) {
-      console.error('Error fetching department statistics:', error);
-
+      logger.error('Error fetching department statistics:', { component: 'dashboard', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+      try {
+        if ((errorTracker as any)?.capture) {
+          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'dashboard', operation: 'getDepartmentStats' });
+        }
+      } catch (reportErr) {
+        logger.warn('Failed to report getDepartmentStats error to errorTracker', { reportErr });
+      }
       // Fallback to empty array with warning rather than throwing
-      console.warn('Returning empty department statistics due to error');
+      logger.warn('Returning empty department statistics due to error');
       return [];
     }
   }
@@ -402,7 +417,14 @@ class DashboardStorageService {
 
       return metrics;
     } catch (error) {
-      console.error(`Error fetching competency metrics for candidate ${candidateId}:`, error);
+      logger.error(`Error fetching competency metrics for candidate ${candidateId}:`, { component: 'dashboard', candidateId, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+      try {
+        if ((errorTracker as any)?.capture) {
+          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'dashboard', operation: 'getCompetencyMetrics', candidateId });
+        }
+      } catch (reportErr) {
+        logger.warn('Failed to report getCompetencyMetrics error to errorTracker', { reportErr });
+      }
       if (error instanceof Error) {
         throw new Error(`Failed to fetch competency metrics: ${error.message}`);
       }
@@ -484,3 +506,11 @@ export const getCacheStats = () => {
 export const shutdownDashboardStorage = (): void => {
   dashboardStorage.shutdown();
 };
+
+
+
+
+
+
+
+

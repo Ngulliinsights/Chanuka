@@ -1,30 +1,31 @@
 // Simple test to verify API health endpoints
 import fetch from 'node-fetch';
+import { logger } from '../utils/logger.js';
 
 async function testApiHealth() {
   try {
-    console.log('Testing API health endpoints...');
+    logger.info('Testing API health endpoints...', { component: 'SimpleTool' });
     
     // Test main API endpoint
     const apiResponse = await fetch('http://localhost:4200/api');
     if (apiResponse.ok) {
       const apiData = await apiResponse.json();
-      console.log('✅ Main API endpoint working:', apiData.message);
+      logger.info('✅ Main API endpoint working:', { component: 'SimpleTool' }, apiData.message);
     } else {
-      console.log('⚠️ Main API endpoint not accessible (server may not be running)');
+      logger.info('⚠️ Main API endpoint not accessible (server may not be running)', { component: 'SimpleTool' });
     }
     
     // Test frontend health endpoint
     const healthResponse = await fetch('http://localhost:4200/api/frontend-health');
     if (healthResponse.ok) {
       const healthData = await healthResponse.json();
-      console.log('✅ Frontend health endpoint working:', healthData.serving_mode);
+      logger.info('✅ Frontend health endpoint working:', { component: 'SimpleTool' }, healthData.serving_mode);
     } else {
-      console.log('⚠️ Frontend health endpoint not accessible');
+      logger.info('⚠️ Frontend health endpoint not accessible', { component: 'SimpleTool' });
     }
     
   } catch (error) {
-    console.log('⚠️ API health test skipped (server not running):', error.message);
+    logger.info('⚠️ API health test skipped (server not running):', { component: 'SimpleTool' }, error.message);
   }
 }
 

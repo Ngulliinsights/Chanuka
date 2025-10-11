@@ -5,22 +5,23 @@
  */
 
 import { schemaValidationService } from './schema-validation-service.js';
+import { logger } from '../utils/logger';
 
 async function testSchemaValidation() {
-  console.log('🔍 Testing Schema Validation Service...\n');
+  logger.info('🔍 Testing Schema Validation Service...\n', { component: 'SimpleTool' });
 
   try {
     // Test 1: Validate compliance_checks table specifically
-    console.log('1. Testing compliance_checks table validation...');
+    logger.info('1. Testing compliance_checks table validation...', { component: 'SimpleTool' });
     const complianceResult = await schemaValidationService.validateComplianceChecksTable();
-    console.log('   Result:', {
+    logger.info('   Result:', { component: 'SimpleTool' }, {
       isValid: complianceResult.isValid,
       missingColumns: complianceResult.missingColumns,
       recommendations: complianceResult.recommendations.slice(0, 2) // Show first 2 recommendations
     });
 
     // Test 2: Validate all security monitoring tables
-    console.log('\n2. Testing all security monitoring tables...');
+    logger.info('\n2. Testing all security monitoring tables...', { component: 'SimpleTool' });
     const allResults = await schemaValidationService.validateAllTables();
     console.log(`   Validated ${allResults.length} tables:`);
     allResults.forEach(result => {
@@ -28,9 +29,9 @@ async function testSchemaValidation() {
     });
 
     // Test 3: Generate comprehensive report
-    console.log('\n3. Generating comprehensive validation report...');
+    logger.info('\n3. Generating comprehensive validation report...', { component: 'SimpleTool' });
     const report = await schemaValidationService.generateValidationReport();
-    console.log('   Report Summary:', {
+    logger.info('   Report Summary:', { component: 'SimpleTool' }, {
       overallStatus: report.overallStatus,
       validatedTables: report.validatedTables,
       invalidTables: report.invalidTables,
@@ -39,21 +40,27 @@ async function testSchemaValidation() {
     });
 
     // Test 4: Test schema repair functionality
-    console.log('\n4. Testing schema repair functionality...');
+    logger.info('\n4. Testing schema repair functionality...', { component: 'SimpleTool' });
     const repairResult = await schemaValidationService.repairSchema();
-    console.log('   Repair Result:', {
+    logger.info('   Repair Result:', { component: 'SimpleTool' }, {
       success: repairResult.success,
       repairedTables: repairResult.repairedTables,
       errors: repairResult.errors.slice(0, 2) // Show first 2 errors if any
     });
 
-    console.log('\n✅ Schema validation service test completed successfully!');
+    logger.info('\n✅ Schema validation service test completed successfully!', { component: 'SimpleTool' });
 
   } catch (error) {
-    console.error('\n❌ Schema validation test failed:', error);
+    logger.error('\n❌ Schema validation test failed:', { component: 'SimpleTool' }, error);
     process.exit(1);
   }
 }
 
 // Run the test
 testSchemaValidation().catch(console.error);
+
+
+
+
+
+

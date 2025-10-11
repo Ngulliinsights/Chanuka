@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import {
+import { logger } from '../utils/logger.js';
   withErrorBoundary,
   CriticalSection,
   useErrorState,

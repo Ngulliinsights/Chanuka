@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { promises as fs } from 'fs';
 import { LogRotationManager, createLogRotationManager } from '../log-rotation.js';
+import { logger } from '../utils/logger';
 
 // Mock fs module
 vi.mock('fs', () => ({
@@ -136,3 +137,9 @@ describe('LogRotationManager', () => {
     });
   });
 });
+
+
+
+
+
+

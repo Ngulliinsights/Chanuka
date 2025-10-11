@@ -1,6 +1,7 @@
 import { forwardRef, ComponentProps } from "react"
 
 import { cn } from "@/lib/utils"
+import { logger } from '../utils/logger.js';
 
 const Textarea = forwardRef<
   HTMLTextAreaElement,

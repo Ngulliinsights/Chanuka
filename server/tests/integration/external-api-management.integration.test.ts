@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi, beforeAll, afterAll } 
 import request from 'supertest';
 import express from 'express';
 import { router as externalApiManagementRouter } from '../../infrastructure/monitoring/external-api-management.js';
+import { logger } from '../utils/logger';
 
 // Mock fetch globally
 global.fetch = vi.fn();
@@ -75,3 +76,9 @@ describe('External API Management Integration Tests', () => {
       expect(response.body.data).toHaveProperty('overallStatus');
       
       expect(Array.isArray(response.
+
+
+
+
+
+

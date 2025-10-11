@@ -1,4 +1,5 @@
 import { NavigationState, NavigationPreferences, RecentPage } from '@/types/navigation';
+import { logger } from '../utils/logger';
 
 // Keys for localStorage
 const STORAGE_KEYS = {
@@ -263,3 +264,9 @@ export class NavigationStatePersistence {
     // For now, it's a placeholder
   }
 }
+
+
+
+
+
+

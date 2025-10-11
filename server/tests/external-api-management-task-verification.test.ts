@@ -9,8 +9,9 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
-import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../infrastructure/external-data/external-api-manager.js';
-import { APICostMonitoringService } from '../services/api-cost-monitoring.js';
+import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../infrastructure/external-data/index';
+import { APICostMonitoringService } from '../services/api-cost-monitoring';
+import { logger } from '../utils/logger';
 
 describe('Task 12.3: External API Management Implementation', () => {
   let apiManager: ExternalAPIManagementService;
@@ -287,3 +288,9 @@ describe('Task 12.3: External API Management Implementation', () => {
     });
   });
 });
+
+
+
+
+
+

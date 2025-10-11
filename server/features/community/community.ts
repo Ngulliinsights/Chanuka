@@ -6,6 +6,7 @@ import { commentService } from "./comment.js";
 import { commentVotingService } from "./comment-voting.js";
 import { contentModerationService } from "../admin/content-moderation.js";
 import { authenticateToken as requireAuth } from "../../middleware/auth.js";
+import { logger } from '../../utils/logger';
 
 export const router = Router();
 
@@ -87,7 +88,7 @@ router.get("/comments/:billId", async (req, res) => {
     return ApiSuccess(res, result, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error fetching comments:", error);
+    logger.error('Error fetching comments:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to fetch comments", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -131,7 +132,7 @@ router.post("/comments", requireAuth, async (req, res) => {
     return ApiSuccess(res, comment, 
       ApiResponseWrapper.createMetadata(startTime, 'database'), 201);
   } catch (error) {
-    console.error("Error creating comment:", error);
+    logger.error('Error creating comment:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to create comment", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -154,7 +155,7 @@ router.post("/polls", async (req, res) => {
     return ApiSuccess(res, { success: true, id: Date.now().toString() }, 
       ApiResponseWrapper.createMetadata(startTime, 'database'), 201);
   } catch (error) {
-    console.error("Error creating poll:", error);
+    logger.error('Error creating poll:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to create poll", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -195,7 +196,7 @@ router.post("/comments/:id/vote", requireAuth, async (req, res) => {
     return ApiSuccess(res, voteResult, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error voting on comment:", error);
+    logger.error('Error voting on comment:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to vote", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -219,7 +220,7 @@ router.post("/comments/:id/poll-vote", async (req, res) => {
     return ApiSuccess(res, { success: true }, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error voting on poll:", error);
+    logger.error('Error voting on poll:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to vote on poll", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -249,7 +250,7 @@ router.get("/comments/:id/replies", async (req, res) => {
     return ApiSuccess(res, replies, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error fetching comment replies:", error);
+    logger.error('Error fetching comment replies:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to fetch replies", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -291,7 +292,7 @@ router.put("/comments/:id", requireAuth, async (req, res) => {
     return ApiSuccess(res, updatedComment, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error updating comment:", error);
+    logger.error('Error updating comment:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to update comment", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -320,7 +321,7 @@ router.delete("/comments/:id", requireAuth, async (req, res) => {
     return ApiSuccess(res, { success }, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error deleting comment:", error);
+    logger.error('Error deleting comment:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to delete comment", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -364,7 +365,7 @@ router.post("/comments/:id/flag", requireAuth, async (req, res) => {
     return ApiSuccess(res, { success: true, flagId: flag.id }, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error flagging comment:", error);
+    logger.error('Error flagging comment:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to flag comment", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -387,7 +388,7 @@ router.get("/comments/:billId/stats", async (req, res) => {
     return ApiSuccess(res, stats, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error fetching comment stats:", error);
+    logger.error('Error fetching comment stats:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to fetch comment statistics", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -416,7 +417,7 @@ router.get("/comments/:billId/trending", async (req, res) => {
     return ApiSuccess(res, trendingComments, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error fetching trending comments:", error);
+    logger.error('Error fetching trending comments:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to fetch trending comments", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -432,7 +433,7 @@ router.post("/comments/:id/highlight", async (req, res) => {
     return ApiSuccess(res, { success: true }, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error highlighting comment:", error);
+    logger.error('Error highlighting comment:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to highlight comment", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -476,7 +477,7 @@ router.get("/participation/stats", async (req, res) => {
         ApiResponseWrapper.createMetadata(startTime, 'static'));
     }
   } catch (error) {
-    console.error("Error fetching participation stats:", error);
+    logger.error('Error fetching participation stats:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to fetch stats", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -509,8 +510,17 @@ router.get("/engagement/recent", async (req, res) => {
     return ApiSuccess(res, recentActivity, 
       ApiResponseWrapper.createMetadata(startTime, 'static'));
   } catch (error) {
-    console.error("Error fetching recent engagement:", error);
+    logger.error('Error fetching recent engagement:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to fetch engagement data", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'static'));
   }
 });
+
+
+
+
+
+
+
+
+

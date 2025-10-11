@@ -1,40 +1,62 @@
-import { pool } from "../shared/database/connection.js";
+import { pool } from "@shared/database/connection.js";
+import { logger } from "./logger";
 
 export async function initializeDatabase(): Promise<boolean> {
   try {
-    console.log("🔄 Initializing database connection...");
+    logger.info("Initializing database connection", {
+      component: "database",
+      operation: "initialize"
+    });
 
     // Test basic connectivity
     const client = await pool.connect();
     await client.query('SELECT NOW()');
     client.release();
 
-    console.log("✅ Database connection successful");
+    logger.info("Database connection successful", {
+      component: "database",
+      operation: "connect"
+    });
 
     // Check if required tables exist
     const tableCheck = await pool.query(`
-      SELECT table_name 
-      FROM information_schema.tables 
-      WHERE table_schema = 'public' 
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
       AND table_name IN ('bills', 'users', 'bill_comments', 'bill_engagement')
     `);
 
     if (tableCheck.rows.length < 4) {
-      console.log("⚠️  Some required tables are missing. Running in sample data mode.");
+      logger.warn("Some required tables are missing. Running in sample data mode", {
+        component: "database",
+        operation: "table_check",
+        foundTables: tableCheck.rows.length,
+        requiredTables: 4
+      });
       return false;
     }
 
-    console.log("✅ All required tables found");
+    logger.info("All required tables found", {
+      component: "database",
+      operation: "table_check",
+      tableCount: tableCheck.rows.length
+    });
     return true;
 
   } catch (error) {
-    console.error("❌ Database initialization failed:", {
+    logger.error("Database initialization failed", {
+      component: "database",
+      operation: "initialize"
+    }, {
       message: error instanceof Error ? error.message : String(error),
       code: (error as any)?.code,
       detail: (error as any)?.detail
     });
 
-    console.log("🔄 Falling back to sample data mode");
+    logger.info("Falling back to sample data mode", {
+      component: "database",
+      operation: "fallback"
+    });
     return false;
   }
 }
@@ -67,7 +89,12 @@ export async function validateDatabaseHealth() {
       message: "Database fully operational"
     };
   } catch (error) {
-    console.error('Database health check failed:', error);
+    logger.error('Database health check failed', {
+      component: 'database',
+      operation: 'health_check'
+    }, {
+      message: (error as any).message || 'Unknown error'
+    });
     return {
       connected: false,
       tablesExist: false,
@@ -88,7 +115,18 @@ async function checkTablesExist(): Promise<boolean> {
 
     return tableCheck.rows.length >= 4; // At least the core tables should exist
   } catch (error) {
-    console.error('Error checking table existence:', error);
+    logger.error('Error checking table existence', {
+      component: 'database',
+      operation: 'table_check'
+    }, {
+      message: (error as any).message || 'Unknown error'
+    });
     return false;
   }
 }
+
+
+
+
+
+

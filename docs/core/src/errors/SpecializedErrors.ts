@@ -1,4 +1,5 @@
 import { BaseError, ErrorDomain, ErrorSeverity } from './base-error';
+import { logger } from '../utils/logger';
 
 export class ValidationError extends BaseError {
   constructor(message: string, details?: Record<string, any>) {
@@ -92,3 +93,10 @@ export class ServiceUnavailableError extends BaseError {
     });
   }
 }
+
+
+
+
+
+
+

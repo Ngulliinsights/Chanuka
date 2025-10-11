@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config';
 import { resolve } from 'path';
+import { logger } from '../utils/logger';
 
 export default defineConfig({
   test: {
@@ -35,3 +36,9 @@ export default defineConfig({
     },
   },
 });
+
+
+
+
+
+

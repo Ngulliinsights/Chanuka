@@ -19,3 +19,10 @@ export function formatETA(seconds: number): string {
   if (seconds < 3600) return `${Math.ceil(seconds / 60)}m`;
   return `${Math.ceil(seconds / 3600)}h`;
 }
+
+
+
+
+
+
+

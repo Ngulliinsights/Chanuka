@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { logger } from '../utils/logger';
 
 /**
  * Base error class for authentication related errors
@@ -94,3 +95,10 @@ export function asyncHandler(fn: Function) {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 }
+
+
+
+
+
+
+

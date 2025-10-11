@@ -6,6 +6,7 @@
  */
 
 import { HealthCheck, HealthResult, HealthStatus } from '../types';
+import { logger } from '../utils/logger';
 
 export interface MemoryHealthConfig {
   maxRssBytes?: number;
@@ -204,3 +205,9 @@ export function createMemoryHealthCheck(options: Partial<MemoryHealthConfig> = {
   
   return new MemoryHealthCheck(config);
 }
+
+
+
+
+
+

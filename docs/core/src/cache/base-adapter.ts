@@ -8,6 +8,7 @@
 import { EventEmitter } from 'events';
 import { performance } from 'perf_hooks';
 import type { 
+import { logger } from '../utils/logger';
   CacheAdapter, 
   CacheMetrics, 
   CacheEvent, 
@@ -379,3 +380,9 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
     throw new Error('Tag invalidation not supported by this adapter');
   }
 }
+
+
+
+
+
+

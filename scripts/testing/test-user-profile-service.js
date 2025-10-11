@@ -1,18 +1,19 @@
 // Simple test to verify user profile service functionality
 import { userProfileService } from '../../server/features/users/user-profile.js';
+import { logger } from '../utils/logger.js';
 
 async function testUserProfileService() {
-  console.log('🧪 Testing User Profile Service...\n');
+  logger.info('🧪 Testing User Profile Service...\n', { component: 'SimpleTool' });
 
   try {
     // Test 1: Get user profile (should handle non-existent user gracefully)
-    console.log('1. Testing getUserProfile with fallback...');
+    logger.info('1. Testing getUserProfile with fallback...', { component: 'SimpleTool' });
     const testUserId = 'test-user-123';
     const profile = await userProfileService.getUserProfile(testUserId);
-    console.log('✅ getUserProfile works:', profile ? 'Profile retrieved' : 'No profile');
+    logger.info('✅ getUserProfile works:', { component: 'SimpleTool' }, profile ? 'Profile retrieved' : 'No profile');
 
     // Test 2: Update user profile
-    console.log('\n2. Testing updateUserProfile...');
+    logger.info('\n2. Testing updateUserProfile...', { component: 'SimpleTool' });
     const profileData = {
       bio: 'Test user bio',
       expertise: ['healthcare', 'policy'],
@@ -21,15 +22,15 @@ async function testUserProfileService() {
       isPublic: true
     };
     const updatedProfile = await userProfileService.updateUserProfile(testUserId, profileData);
-    console.log('✅ updateUserProfile works:', updatedProfile ? 'Profile updated' : 'Update failed');
+    logger.info('✅ updateUserProfile works:', { component: 'SimpleTool' }, updatedProfile ? 'Profile updated' : 'Update failed');
 
     // Test 3: Get user preferences
-    console.log('\n3. Testing getUserPreferences...');
+    logger.info('\n3. Testing getUserPreferences...', { component: 'SimpleTool' });
     const preferences = await userProfileService.getUserPreferences(testUserId);
-    console.log('✅ getUserPreferences works:', preferences ? 'Preferences retrieved' : 'No preferences');
+    logger.info('✅ getUserPreferences works:', { component: 'SimpleTool' }, preferences ? 'Preferences retrieved' : 'No preferences');
 
     // Test 4: Update user preferences
-    console.log('\n4. Testing updateUserPreferences...');
+    logger.info('\n4. Testing updateUserPreferences...', { component: 'SimpleTool' });
     const newPreferences = {
       emailNotifications: false,
       pushNotifications: true,
@@ -37,54 +38,54 @@ async function testUserProfileService() {
       theme: 'dark'
     };
     const updatedPreferences = await userProfileService.updateUserPreferences(testUserId, newPreferences);
-    console.log('✅ updateUserPreferences works:', updatedPreferences ? 'Preferences updated' : 'Update failed');
+    logger.info('✅ updateUserPreferences works:', { component: 'SimpleTool' }, updatedPreferences ? 'Preferences updated' : 'Update failed');
 
     // Test 5: Get verification status
-    console.log('\n5. Testing getUserVerificationStatus...');
+    logger.info('\n5. Testing getUserVerificationStatus...', { component: 'SimpleTool' });
     const verificationStatus = await userProfileService.getUserVerificationStatus(testUserId);
-    console.log('✅ getUserVerificationStatus works:', verificationStatus ? 'Status retrieved' : 'No status');
+    logger.info('✅ getUserVerificationStatus works:', { component: 'SimpleTool' }, verificationStatus ? 'Status retrieved' : 'No status');
 
     // Test 6: Get engagement history
-    console.log('\n6. Testing getUserEngagementHistory...');
+    logger.info('\n6. Testing getUserEngagementHistory...', { component: 'SimpleTool' });
     const engagementHistory = await userProfileService.getUserEngagementHistory(testUserId);
-    console.log('✅ getUserEngagementHistory works:', engagementHistory ? 'History retrieved' : 'No history');
+    logger.info('✅ getUserEngagementHistory works:', { component: 'SimpleTool' }, engagementHistory ? 'History retrieved' : 'No history');
 
     // Test 7: Update user interests
-    console.log('\n7. Testing updateUserInterests...');
+    logger.info('\n7. Testing updateUserInterests...', { component: 'SimpleTool' });
     const interests = ['healthcare', 'education', 'environment'];
     const interestResult = await userProfileService.updateUserInterests(testUserId, interests);
-    console.log('✅ updateUserInterests works:', interestResult ? 'Interests updated' : 'Update failed');
+    logger.info('✅ updateUserInterests works:', { component: 'SimpleTool' }, interestResult ? 'Interests updated' : 'Update failed');
 
     // Test 8: Get complete user profile
-    console.log('\n8. Testing getCompleteUserProfile...');
+    logger.info('\n8. Testing getCompleteUserProfile...', { component: 'SimpleTool' });
     const completeProfile = await userProfileService.getCompleteUserProfile(testUserId);
-    console.log('✅ getCompleteUserProfile works:', completeProfile ? 'Complete profile retrieved' : 'No complete profile');
+    logger.info('✅ getCompleteUserProfile works:', { component: 'SimpleTool' }, completeProfile ? 'Complete profile retrieved' : 'No complete profile');
 
     // Test 9: Search users
-    console.log('\n9. Testing searchUsers...');
+    logger.info('\n9. Testing searchUsers...', { component: 'SimpleTool' });
     const searchResults = await userProfileService.searchUsers('test', 5);
-    console.log('✅ searchUsers works:', Array.isArray(searchResults) ? `Found ${searchResults.length} users` : 'Search failed');
+    logger.info('✅ searchUsers works:', { component: 'SimpleTool' }, Array.isArray(searchResults) ? `Found ${searchResults.length} users` : 'Search failed');
 
-    console.log('\n🎉 All User Profile Service tests completed successfully!');
-    console.log('\n📋 Summary:');
-    console.log('✅ User profile CRUD operations - Working');
-    console.log('✅ User preference management - Working');
-    console.log('✅ User verification status handling - Working');
-    console.log('✅ User engagement history tracking - Working');
-    console.log('✅ User interests management - Working');
-    console.log('✅ User search functionality - Working');
+    logger.info('\n🎉 All User Profile Service tests completed successfully!', { component: 'SimpleTool' });
+    logger.info('\n📋 Summary:', { component: 'SimpleTool' });
+    logger.info('✅ User profile CRUD operations - Working', { component: 'SimpleTool' });
+    logger.info('✅ User preference management - Working', { component: 'SimpleTool' });
+    logger.info('✅ User verification status handling - Working', { component: 'SimpleTool' });
+    logger.info('✅ User engagement history tracking - Working', { component: 'SimpleTool' });
+    logger.info('✅ User interests management - Working', { component: 'SimpleTool' });
+    logger.info('✅ User search functionality - Working', { component: 'SimpleTool' });
 
   } catch (error) {
-    console.error('❌ Test failed:', error.message);
-    console.error('Stack:', error.stack);
+    logger.error('❌ Test failed:', { component: 'SimpleTool' }, error.message);
+    logger.error('Stack:', { component: 'SimpleTool' }, error.stack);
   }
 }
 
 // Run the test
 testUserProfileService().then(() => {
-  console.log('\n✨ Test execution completed');
+  logger.info('\n✨ Test execution completed', { component: 'SimpleTool' });
   process.exit(0);
 }).catch((error) => {
-  console.error('❌ Test execution failed:', error);
+  logger.error('❌ Test execution failed:', { component: 'SimpleTool' }, error);
   process.exit(1);
 });

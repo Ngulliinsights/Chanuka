@@ -6,6 +6,7 @@
  */
 
 import {
+import { logger } from '../utils/logger';
   createRateLimitFactory as _createRateLimitFactory,
   createMemoryRateLimitFactory as _createMemoryRateLimitFactory
 } from './factory';
@@ -112,3 +113,9 @@ export function createContentRateLimit(redis?: any, type: 'upload' | 'post' = 'p
 export function createDefaultRateLimit(redis?: any) {
   return createApiRateLimit(redis);
 }
+
+
+
+
+
+

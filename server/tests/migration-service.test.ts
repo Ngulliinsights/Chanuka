@@ -1,8 +1,9 @@
 import { Pool } from 'pg';
-import { MigrationService } from '../infrastructure/database/migration-service.js';
-import { DataValidationService } from '../core/validation/data-validation-service.js';
+import { MigrationService } from '../infrastructure/database/migration-service.ts';
+import { DataValidationService } from '../core/validation/data-validation-service.ts';
 import * as fs from 'fs';
 import * as path from 'path';
+import { logger } from '../utils/logger';
 
 // Mock pool for testing
 const mockPool = {
@@ -58,7 +59,7 @@ describe('MigrationService', () => {
       const result = await migrationService.validateMigration('invalid_name.sql', content);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(
+      expect(result.errors).toContainEqual(
         expect.stringContaining('Invalid filename format')
       );
     });
@@ -67,7 +68,7 @@ describe('MigrationService', () => {
       const content = 'DROP DATABASE test; CREATE TABLE test (id SERIAL);';
       const result = await migrationService.validateMigration('0001_test.sql', content);
 
-      expect(result.warnings).toContain(
+      expect(result.warnings).toContainEqual(
         expect.stringContaining('Potentially dangerous operation detected')
       );
     });
@@ -76,7 +77,7 @@ describe('MigrationService', () => {
       const content = 'CREATE TABLE test (id SERIAL PRIMARY KEY);';
       const result = await migrationService.validateMigration('0001_test.sql', content);
 
-      expect(result.warnings).toContain(
+      expect(result.warnings).toContainEqual(
         expect.stringContaining('No rollback information found')
       );
     });
@@ -281,3 +282,9 @@ describe('DataValidationService', () => {
     });
   });
 });
+
+
+
+
+
+

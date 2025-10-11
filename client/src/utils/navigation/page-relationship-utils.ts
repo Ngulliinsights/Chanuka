@@ -1,5 +1,6 @@
 import { PageRelationshipService } from '@/services/PageRelationshipService';
 import { RelatedPage, UserRole } from '@/types/navigation';
+import { logger } from '../utils/logger';
 
 /**
  * Utility functions for working with page relationships
@@ -199,3 +200,9 @@ export class PageRelationshipUtils {
     this.service.clearUserBehaviorWeights();
   }
 }
+
+
+
+
+
+

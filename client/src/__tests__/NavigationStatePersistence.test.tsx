@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import { ResponsiveNavigationProvider } from '@/contexts/ResponsiveNavigationContext';
 import AppLayout from '@/components/layout/app-layout';
+import { logger } from '../utils/logger.js';
 
 // Mock hooks
 vi.mock('@/hooks/use-auth', () => ({

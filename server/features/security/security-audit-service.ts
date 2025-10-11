@@ -1,33 +1,20 @@
 import { Request } from 'express';
 import { database as db } from '../../../shared/database/connection.js';
-import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
+import { securityAuditLogs } from '../../../shared/schema.js';
 import { eq, and, or, gte } from 'drizzle-orm';
+import { logger } from '../../utils/logger';
 
-// Security audit log table
-const securityAuditLogs = pgTable("security_audit_logs", {
-  id: serial("id").primaryKey(),
-  eventType: text("event_type").notNull(), // login, logout, password_change, data_access, etc.
-  userId: text("user_id"),
-  ipAddress: text("ip_address"),
-  userAgent: text("user_agent"),
-  resource: text("resource"), // what was accessed
-  action: text("action"), // what action was performed
-  result: text("result").notNull(), // outcome of the action
-  severity: text("severity").default('info').notNull(), // low, medium, high, critical
-  details: jsonb("details"), // additional context
-  sessionId: text("session_id"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
+// Define securityIncidents table locally since it's not in the main schema
+import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
 
-// Security incidents table
 const securityIncidents = pgTable("security_incidents", {
   id: serial("id").primaryKey(),
   incidentType: text("incident_type").notNull(),
   severity: text("severity").notNull(),
-  status: text("status").notNull().default("open"), // open, investigating, resolved, false_positive
+  status: text("status").notNull().default("open"),
   description: text("description").notNull(),
   affectedUsers: text("affected_users").array(),
-  detectionMethod: text("detection_method"), // automated, manual, reported
+  detectionMethod: text("detection_method"),
   firstDetected: timestamp("first_detected").defaultNow(),
   lastSeen: timestamp("last_seen"),
   resolvedAt: timestamp("resolved_at"),
@@ -102,6 +89,7 @@ export class SecurityAuditService {
          severity: event.severity,
          details: event.details,
          sessionId: event.sessionId,
+         timestamp: new Date(),
        });
 
       // Check for suspicious patterns
@@ -113,7 +101,7 @@ export class SecurityAuditService {
       }
 
     } catch (error) {
-      console.error('Failed to log security event:', error);
+      logger.error('Failed to log security event:', { component: 'SimpleTool' }, error);
       // Don't throw - security logging shouldn't break the application
     }
   }
@@ -346,7 +334,7 @@ export class SecurityAuditService {
       
       return result.length;
     } catch (error) {
-      console.error('Failed to get recent failed logins:', error);
+      logger.error('Failed to get recent failed logins:', { component: 'SimpleTool' }, error);
       return 0;
     }
   }
@@ -373,7 +361,7 @@ export class SecurityAuditService {
         return total + (details?.recordCount || 0);
       }, 0);
     } catch (error) {
-      console.error('Failed to get recent data access:', error);
+      logger.error('Failed to get recent data access:', { component: 'SimpleTool' }, error);
       return 0;
     }
   }
@@ -399,7 +387,7 @@ export class SecurityAuditService {
    * Send security alert for incidents
    */
   private async sendSecurityAlert(incident: SecurityIncident, incidentId: number): Promise<void> {
-    console.error('🚨 SECURITY INCIDENT CREATED:', {
+    logger.error('🚨 SECURITY INCIDENT CREATED:', { component: 'SimpleTool' }, {
       id: incidentId,
       type: incident.incidentType,
       severity: incident.severity,
@@ -441,7 +429,7 @@ export class SecurityAuditService {
         recommendations: this.generateSecurityRecommendations(events, incidents),
       };
     } catch (error) {
-      console.error('Failed to generate audit report:', error);
+      logger.error('Failed to generate audit report:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to generate security audit report');
     }
   }
@@ -480,3 +468,11 @@ export const securityAuditService = new SecurityAuditService();
 
 // Export table definitions for migrations
 export { securityAuditLogs, securityIncidents };
+
+
+
+
+
+
+
+

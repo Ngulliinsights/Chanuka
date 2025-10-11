@@ -12,6 +12,7 @@
 import { CacheService } from './types';
 import { getDefaultCache } from './index';
 import { performance } from 'perf_hooks';
+import { logger } from '../utils/logger';
 
 export interface AICacheOptions {
   baseCache?: CacheService;
@@ -124,7 +125,7 @@ export class AICache {
 
         this.recordCacheHit(service, entry.cost, performance.now() - startTime);
         
-        console.log('AI Cache Hit', {
+        logger.info('AI Cache Hit', { component: 'SimpleTool' }, {
           service,
           operation,
           key: cacheKey,
@@ -154,7 +155,7 @@ export class AICache {
       return null;
 
     } catch (error) {
-      console.error('AI cache get error:', error);
+      logger.error('AI cache get error:', { component: 'SimpleTool' }, error);
       this.recordCacheMiss(service, performance.now() - startTime);
       return null;
     }
@@ -196,7 +197,7 @@ export class AICache {
 
       await this.baseCache.set(cacheKey, entry, ttl);
 
-      console.log('AI Cache Set', {
+      logger.info('AI Cache Set', { component: 'SimpleTool' }, {
         service,
         operation,
         key: cacheKey,
@@ -211,7 +212,7 @@ export class AICache {
       }
 
     } catch (error) {
-      console.error('AI cache set error:', error);
+      logger.error('AI cache set error:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -238,12 +239,12 @@ export class AICache {
       } else {
         // For more complex criteria, we'd need to scan all keys
         // This is a simplified implementation
-        console.log('AI cache invalidation requested', criteria);
+        logger.info('AI cache invalidation requested', { component: 'SimpleTool' }, criteria);
       }
 
       return invalidatedCount;
     } catch (error) {
-      console.error('AI cache invalidation error:', error);
+      logger.error('AI cache invalidation error:', { component: 'SimpleTool' }, error);
       return 0;
     }
   }
@@ -278,7 +279,7 @@ export class AICache {
           return;
         }
 
-        console.log('Warming AI cache', {
+        logger.info('Warming AI cache', { component: 'SimpleTool' }, {
           service: entry.service,
           operation: entry.operation,
           key: entry.key
@@ -429,7 +430,7 @@ export class AICache {
   ): void {
     // This would implement intelligent cache warming based on patterns
     // For now, just log the warming opportunity
-    console.log('Cache warming opportunity detected', {
+    logger.info('Cache warming opportunity detected', { component: 'SimpleTool' }, {
       service,
       operation,
       inputHash: this.hashInput(inputData)
@@ -501,3 +502,9 @@ export function getDefaultAICache(): AICache {
 export function setDefaultAICache(cache: AICache): void {
   defaultAICache = cache;
 }
+
+
+
+
+
+

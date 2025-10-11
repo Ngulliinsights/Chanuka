@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PageRelationshipService } from '../PageRelationshipService';
 import { RelatedPage, UserRole } from '@/types/navigation';
+import { logger } from '../utils/logger';
 
 describe('PageRelationshipService', () => {
   let service: PageRelationshipService;
@@ -428,3 +429,9 @@ describe('PageRelationshipService', () => {
     });
   });
 });
+
+
+
+
+
+

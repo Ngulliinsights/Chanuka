@@ -19,6 +19,7 @@ import {
   AICacheEntry
 } from '../ai-cache';
 import { CacheService } from '../types';
+import { logger } from '../utils/logger';
 
 describe('AI Cache', () => {
   let mockBaseCache: CacheService;
@@ -635,3 +636,9 @@ describe('AI Cache', () => {
     });
   });
 });
+
+
+
+
+
+

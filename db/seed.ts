@@ -5,6 +5,7 @@ dotenv.config();
 
 import { db } from './index';
 import {
+import { logger } from '../utils/logger';
   users,
   bills,
   billComments,
@@ -20,11 +21,11 @@ import {
 } from '../shared/schema';
 
 async function seed() {
-  console.log('🌱 Starting comprehensive seed process...');
+  logger.info('🌱 Starting comprehensive seed process...', { component: 'SimpleTool' });
 
   try {
     // Clear existing data in reverse dependency order
-    console.log('🧹 Clearing existing data...');
+    logger.info('🧹 Clearing existing data...', { component: 'SimpleTool' });
     await db.delete(billSectionConflicts);
     await db.delete(sponsorTransparency);
     await db.delete(billSponsorships);
@@ -39,7 +40,7 @@ async function seed() {
     await db.delete(users);
 
     // 1. Create diverse user base
-    console.log('👥 Creating users...');
+    logger.info('👥 Creating users...', { component: 'SimpleTool' });
     // Use raw SQL for user insertion to match the actual database schema
     const userInsertResult = await db.execute(`
       INSERT INTO users (username, password, email, expertise, onboarding_completed, reputation)
@@ -57,7 +58,7 @@ async function seed() {
     const userIds = createdUsers.rows.map(row => row.id);
 
     // 2. Create comprehensive user profiles
-    console.log('📋 Creating user profiles...');
+    logger.info('📋 Creating user profiles...', { component: 'SimpleTool' });
     await db.insert(userProfiles).values([
       {
         userId: userIds[0],
@@ -102,7 +103,7 @@ async function seed() {
     ]);
 
     // 3. Create comprehensive sponsor database
-    console.log('🏛️ Creating sponsors...');
+    logger.info('🏛️ Creating sponsors...', { component: 'SimpleTool' });
     const createdSponsors = await db.insert(sponsors).values([
       {
         name: 'Hon. Catherine Wambilianga',
@@ -184,7 +185,7 @@ async function seed() {
     const sponsorIds = createdSponsors.map(s => s.id);
 
     // 4. Create detailed sponsor affiliations
-    console.log('🔗 Creating sponsor affiliations...');
+    logger.info('🔗 Creating sponsor affiliations...', { component: 'SimpleTool' });
     await db.insert(sponsorAffiliations).values([
       // Catherine Wambilianga affiliations
       {
@@ -302,7 +303,7 @@ async function seed() {
       }
     ]);    
 // 5. Create comprehensive bills with varied complexity
-    console.log('📄 Creating bills...');
+    logger.info('📄 Creating bills...', { component: 'SimpleTool' });
     const createdBills = await db.insert(bills).values([
       {
         title: 'Digital Economy Enhancement Act 2024',
@@ -579,7 +580,7 @@ PART VI – IMPLEMENTATION
     const billIds = createdBills.map(b => b.id);
 
     // 6. Create bill sponsorships linking sponsors to bills
-    console.log('🤝 Creating bill sponsorships...');
+    logger.info('🤝 Creating bill sponsorships...', { component: 'SimpleTool' });
     await db.insert(billSponsorships).values([
       // Digital Economy Act sponsorships
       {
@@ -666,7 +667,7 @@ PART VI – IMPLEMENTATION
     ]);
 
     // 7. Create sponsor transparency records
-    console.log('🔍 Creating sponsor transparency records...');
+    logger.info('🔍 Creating sponsor transparency records...', { component: 'SimpleTool' });
     await db.insert(sponsorTransparency).values([
       {
         sponsorId: sponsorIds[0], // Catherine Wambilianga
@@ -716,10 +717,10 @@ PART VI – IMPLEMENTATION
     ]);
 
     // 8. Create bill section conflicts (skipped due to schema mismatch)
-    console.log('⚠️ Skipping bill section conflicts due to schema mismatch...');
+    logger.info('⚠️ Skipping bill section conflicts due to schema mismatch...', { component: 'SimpleTool' });
 
     // 9. Create comprehensive analysis records
-    console.log('📊 Creating analysis records...');
+    logger.info('📊 Creating analysis records...', { component: 'SimpleTool' });
     await db.insert(analysis).values([
       {
         billId: billIds[0],
@@ -787,7 +788,7 @@ PART VI – IMPLEMENTATION
     ]);
 
     // 10. Create diverse comments and engagement
-    console.log('💬 Creating comments...');
+    logger.info('💬 Creating comments...', { component: 'SimpleTool' });
     await db.insert(billComments).values([
       {
         billId: billIds[0],
@@ -916,7 +917,7 @@ PART VI – IMPLEMENTATION
     ]);
 
     // 11. Create comprehensive engagement data
-    console.log('📈 Creating engagement data...');
+    logger.info('📈 Creating engagement data...', { component: 'SimpleTool' });
     await db.insert(billEngagement).values([
       // Digital Economy Act engagement
       {
@@ -1054,7 +1055,7 @@ PART VI – IMPLEMENTATION
     ]);
 
     // 12. Create notifications for user engagement
-    console.log('🔔 Creating notifications...');
+    logger.info('🔔 Creating notifications...', { component: 'SimpleTool' });
     await db.insert(notifications).values([
       {
         userId: userIds[0],
@@ -1097,8 +1098,8 @@ PART VI – IMPLEMENTATION
       }
     ]);
 
-    console.log('✅ Comprehensive seed data creation completed successfully!');
-    console.log('📊 Database now contains:');
+    logger.info('✅ Comprehensive seed data creation completed successfully!', { component: 'SimpleTool' });
+    logger.info('📊 Database now contains:', { component: 'SimpleTool' });
     console.log(`   - ${createdUsers.length} users with diverse roles`);
     console.log(`   - ${createdSponsors.length} sponsors with detailed profiles`);
     console.log(`   - ${createdBills.length} bills with comprehensive content`);
@@ -1109,7 +1110,7 @@ PART VI – IMPLEMENTATION
     console.log(`   - Analysis records with confidence scoring`);
 
   } catch (error) {
-    console.error('❌ Error during seed data creation:', error);
+    logger.error('❌ Error during seed data creation:', { component: 'SimpleTool' }, error);
     throw error;
   }
 }
@@ -1117,10 +1118,16 @@ PART VI – IMPLEMENTATION
 // Execute the seed function
 seed()
   .then(() => {
-    console.log('🎉 Seed process completed successfully!');
+    logger.info('🎉 Seed process completed successfully!', { component: 'SimpleTool' });
     process.exit(0);
   })
   .catch((error) => {
-    console.error('💥 Seed process failed:', error);
+    logger.error('💥 Seed process failed:', { component: 'SimpleTool' }, error);
     process.exit(1);
   });
+
+
+
+
+
+

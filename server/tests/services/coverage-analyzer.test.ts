@@ -2,10 +2,12 @@ import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { CoverageAnalyzer } from '../../services/coverage-analyzer';
 import { exec } from 'child_process';
 import fs from 'fs/promises';
+import { logger } from '../../utils/logger';
 
 // Mock dependencies
 jest.mock('child_process');
 jest.mock('fs/promises');
+jest.mock('../../utils/logger');
 
 const mockExec = exec as jest.MockedFunction<typeof exec>;
 const mockFs = fs as jest.Mocked<typeof fs>;
@@ -217,3 +219,9 @@ describe('CoverageAnalyzer', () => {
     });
   });
 });
+
+
+
+
+
+

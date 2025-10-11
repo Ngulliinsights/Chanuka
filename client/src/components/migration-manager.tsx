@@ -12,6 +12,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { cn, formatRelativeTime } from "@/lib/utils";
+import { logger } from '../utils/logger.js';
 
 interface Migration {
   name: string;

@@ -1,11 +1,12 @@
 import { sponsorConflictAnalysisService } from '../features/bills/sponsor-conflict-analysis.js';
+import { logger } from '../utils/logger';
 
 async function testConflictAnalysis() {
-  console.log('🔍 Testing Sponsor Conflict Analysis Service...\n');
+  logger.info('🔍 Testing Sponsor Conflict Analysis Service...\n', { component: 'SimpleTool' });
 
   try {
     // Test 1: Severity Calculation
-    console.log('1. Testing severity calculation...');
+    logger.info('1. Testing severity calculation...', { component: 'SimpleTool' });
     const criticalSeverity = sponsorConflictAnalysisService.calculateConflictSeverity(
       'financial_direct',
       15000000,
@@ -28,7 +29,7 @@ async function testConflictAnalysis() {
     console.log(`   Low conflict severity: ${lowSeverity}\n`);
 
     // Test 2: Conflict Detection
-    console.log('2. Testing conflict detection...');
+    logger.info('2. Testing conflict detection...', { component: 'SimpleTool' });
     const conflicts = await sponsorConflictAnalysisService.detectConflicts();
     console.log(`   Detected ${conflicts.length} conflicts`);
     
@@ -48,7 +49,7 @@ async function testConflictAnalysis() {
     console.log();
 
     // Test 3: Conflict Mapping
-    console.log('3. Testing conflict mapping...');
+    logger.info('3. Testing conflict mapping...', { component: 'SimpleTool' });
     const mapping = await sponsorConflictAnalysisService.createConflictMapping();
     console.log(`   Network has ${mapping.nodes.length} nodes and ${mapping.edges.length} edges`);
     console.log(`   Network density: ${Math.round(mapping.metrics.density * 100)}%`);
@@ -62,7 +63,7 @@ async function testConflictAnalysis() {
     console.log();
 
     // Test 4: Trend Analysis
-    console.log('4. Testing trend analysis...');
+    logger.info('4. Testing trend analysis...', { component: 'SimpleTool' });
     const trends = await sponsorConflictAnalysisService.analyzeConflictTrends(undefined, 6);
     console.log(`   Analyzed trends for ${trends.length} sponsors`);
     
@@ -81,24 +82,30 @@ async function testConflictAnalysis() {
     }
     console.log();
 
-    console.log('✅ All tests completed successfully!');
-    console.log('\n📊 Summary:');
+    logger.info('✅ All tests completed successfully!', { component: 'SimpleTool' });
+    logger.info('\n📊 Summary:', { component: 'SimpleTool' });
     console.log(`   - Conflict detection: ${conflicts.length} conflicts found`);
     console.log(`   - Network analysis: ${mapping.nodes.length} entities, ${mapping.edges.length} relationships`);
     console.log(`   - Trend analysis: ${trends.length} sponsors analyzed`);
     console.log(`   - Severity calculation: Working correctly`);
 
   } catch (error) {
-    console.error('❌ Test failed:', error);
-    console.error('Stack trace:', error instanceof Error ? error.stack : 'Unknown error');
+    logger.error('❌ Test failed:', { component: 'SimpleTool' }, error);
+    logger.error('Stack trace:', { component: 'SimpleTool' }, error instanceof Error ? error.stack : 'Unknown error');
   }
 }
 
 // Run the test
 testConflictAnalysis().then(() => {
-  console.log('\n🎉 Test script completed');
+  logger.info('\n🎉 Test script completed', { component: 'SimpleTool' });
   process.exit(0);
 }).catch((error) => {
-  console.error('💥 Test script failed:', error);
+  logger.error('💥 Test script failed:', { component: 'SimpleTool' }, error);
   process.exit(1);
 });
+
+
+
+
+
+

@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import pkg from 'pg';
+import { logger } from '../utils/logger';
 const { Pool } = pkg;
 
 dotenv.config();
@@ -11,7 +12,7 @@ async function checkMigrationTable() {
   });
 
   try {
-    console.log('Checking drizzle_migrations table structure...');
+    logger.info('Checking drizzle_migrations table structure...', { component: 'SimpleTool' });
     
     // Check if table exists
     const tableExists = await pool.query(`
@@ -21,7 +22,7 @@ async function checkMigrationTable() {
       );
     `);
     
-    console.log('Table exists:', tableExists.rows[0].exists);
+    logger.info('Table exists:', { component: 'SimpleTool' }, tableExists.rows[0].exists);
     
     if (tableExists.rows[0].exists) {
       // Get column information
@@ -32,7 +33,7 @@ async function checkMigrationTable() {
         ORDER BY ordinal_position;
       `);
       
-      console.log('Current columns:');
+      logger.info('Current columns:', { component: 'SimpleTool' });
       columns.rows.forEach(col => {
         console.log(`  - ${col.column_name}: ${col.data_type} (nullable: ${col.is_nullable})`);
       });
@@ -46,10 +47,16 @@ async function checkMigrationTable() {
     }
     
   } catch (error) {
-    console.error('Error:', error.message);
+    logger.error('Error:', { component: 'SimpleTool' }, error.message);
   } finally {
     await pool.end();
   }
 }
 
 checkMigrationTable();
+
+
+
+
+
+

@@ -1,4 +1,5 @@
 import { beforeAll, afterAll, beforeEach, afterEach, jest, expect } from '@jest/globals';
+import { logger } from '../utils/logger';
 
 // Global test setup
 beforeAll(async () => {
@@ -187,3 +188,9 @@ declare global {
     error: typeof console.error;
   };
 }
+
+
+
+
+
+

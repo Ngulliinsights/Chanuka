@@ -7,6 +7,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { CircuitBreaker } from '../circuit-breaker';
+import { logger } from '../utils/logger';
 
 describe('CircuitBreaker', () => {
   let circuitBreaker: CircuitBreaker;
@@ -838,3 +839,9 @@ describe('CircuitBreaker', () => {
     });
   });
 });
+
+
+
+
+
+

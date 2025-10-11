@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
-import { database as db, users, userProfiles, userInterests, billEngagement, notifications, bills } from '../shared/database/connection.js';
-import { userProfileService } from '../features/users/user-profile.js';
+import { database as db, users, userProfiles, userInterests, billEngagement, notifications, bills } from '../../shared/database/connection.ts';
+import { userProfileService } from '../features/users/user-profile.ts';
 import { eq } from 'drizzle-orm';
+import { logger } from '../utils/logger';
 
 describe('User Profile Service', () => {
   let testUserId: string;
@@ -235,3 +236,9 @@ describe('User Profile Service', () => {
     });
   });
 });
+
+
+
+
+
+

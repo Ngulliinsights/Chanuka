@@ -87,7 +87,7 @@ export class BugDetector {
    */
   async detectBugs(): Promise<BugDetectionResult> {
     // eslint-disable-next-line no-console
-    console.log("🔍 Starting comprehensive bug detection...");
+    logger.info('🔍 Starting comprehensive bug detection...', { component: 'SimpleTool' });
 
     this.bugs = [];
     this.bugIdCounter = 1;
@@ -112,7 +112,7 @@ export class BugDetector {
    */
   private async detectImportIssues(): Promise<void> {
     // eslint-disable-next-line no-console
-    console.log("🔍 Detecting import issues...");
+    logger.info('🔍 Detecting import issues...', { component: 'SimpleTool' });
 
     const files = await this.getSourceFiles();
 
@@ -163,7 +163,7 @@ export class BugDetector {
    */
   private async detectMissingFiles(): Promise<void> {
     // eslint-disable-next-line no-console
-    console.log("🔍 Detecting missing files...");
+    logger.info('🔍 Detecting missing files...', { component: 'SimpleTool' });
 
     const files = await this.getSourceFiles();
 
@@ -210,7 +210,7 @@ export class BugDetector {
    */
   private async detectTypeScriptIssues(): Promise<void> {
     // eslint-disable-next-line no-console
-    console.log("🔍 Detecting TypeScript issues...");
+    logger.info('🔍 Detecting TypeScript issues...', { component: 'SimpleTool' });
 
     const files = await this.getSourceFiles(["**/*.ts", "**/*.tsx"]);
 
@@ -269,7 +269,7 @@ export class BugDetector {
    */
   private async detectTestConfigurationIssues(): Promise<void> {
     // eslint-disable-next-line no-console
-    console.log("🔍 Detecting test configuration issues...");
+    logger.info('🔍 Detecting test configuration issues...', { component: 'SimpleTool' });
 
     const testFiles = await this.getSourceFiles([
       "**/*.test.ts",
@@ -331,7 +331,7 @@ export class BugDetector {
    */
   private async detectDatabaseIssues(): Promise<void> {
     // eslint-disable-next-line no-console
-    console.log("🔍 Detecting database issues...");
+    logger.info('🔍 Detecting database issues...', { component: 'SimpleTool' });
 
     const files = await this.getSourceFiles();
 
@@ -415,7 +415,7 @@ export class BugDetector {
    */
   private async detectDuplicateExports(): Promise<void> {
     // eslint-disable-next-line no-console
-    console.log("🔍 Detecting duplicate exports...");
+    logger.info('🔍 Detecting duplicate exports...', { component: 'SimpleTool' });
 
     const files = await this.getSourceFiles();
 
@@ -468,7 +468,7 @@ export class BugDetector {
    */
   private async detectUnusedCode(): Promise<void> {
     // eslint-disable-next-line no-console
-    console.log("🔍 Detecting unused code...");
+    logger.info('🔍 Detecting unused code...', { component: 'SimpleTool' });
 
     // This is a simplified unused code detection
     // In a real implementation, you'd use AST parsing for more accuracy
@@ -521,7 +521,7 @@ export class BugDetector {
    */
   private async detectSecurityIssues(): Promise<void> {
     // eslint-disable-next-line no-console
-    console.log("🔍 Detecting security issues...");
+    logger.info('🔍 Detecting security issues...', { component: 'SimpleTool' });
 
     const files = await this.getSourceFiles();
 
@@ -644,7 +644,7 @@ export class BugDetector {
    */
   private async detectPerformanceIssues(): Promise<void> {
     // eslint-disable-next-line no-console
-    console.log("🔍 Detecting performance issues...");
+    logger.info('🔍 Detecting performance issues...', { component: 'SimpleTool' });
 
     const files = await this.getSourceFiles(["**/*.tsx", "**/*.jsx"]);
 
@@ -700,7 +700,7 @@ export class BugDetector {
    */
   private async detectAccessibilityIssues(): Promise<void> {
     // eslint-disable-next-line no-console
-    console.log("🔍 Detecting accessibility issues...");
+    logger.info('🔍 Detecting accessibility issues...', { component: 'SimpleTool' });
 
     const files = await this.getSourceFiles(["**/*.tsx", "**/*.jsx"]);
 
@@ -827,6 +827,7 @@ export class BugDetector {
           this.projectRoot,
           "node_modules",
           importPath
+import { logger } from '../utils/logger';
         );
         return existsSync(nodeModulesPath) ? nodeModulesPath : null;
       }
@@ -1038,3 +1039,10 @@ export class BugDetector {
 
 // Export default instance
 export const bugDetector = new BugDetector();
+
+
+
+
+
+
+

@@ -2,8 +2,9 @@ import { database as db } from '../../../shared/database/connection.js';
 import { users, userProfiles, userInterests, billEngagement, notifications, billComments, bills } from '../../../shared/schema.js';
 import { eq, and, desc, sql, count, sum } from 'drizzle-orm';
 import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../infrastructure/cache/cache-service.js';
-import { databaseService } from '../../services/database-service.js';
+import { databaseService } from '../../infrastructure/database/database-service.js';
 import { z } from 'zod';
+import { logger } from '../../utils/logger';
 
 // Data validation schemas
 const userProfileDataSchema = z.object({
@@ -401,7 +402,7 @@ export class UserProfileService {
 
       return profile;
     } catch (error) {
-      console.error('Error fetching public profile:', error);
+      logger.error('Error fetching public profile:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -434,7 +435,7 @@ export class UserProfileService {
 
       return results;
     } catch (error) {
-      console.error('Error searching users:', error);
+      logger.error('Error searching users:', { component: 'SimpleTool' }, error);
       return [];
     }
   }
@@ -884,10 +885,18 @@ export class UserProfileService {
         engagement: engagementHistory
       };
     } catch (error) {
-      console.error('Error fetching complete user profile:', error);
+      logger.error('Error fetching complete user profile:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
 }
 
 export const userProfileService = new UserProfileService();
+
+
+
+
+
+
+
+

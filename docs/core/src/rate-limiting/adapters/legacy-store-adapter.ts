@@ -1,4 +1,5 @@
 import { RateLimitStore, RateLimitConfig, RateLimitResult, RateLimitMetricsInterface } from '../types';
+import { logger } from '../utils/logger';
 
 /**
  * Legacy RateLimitStore interface from original implementation 
@@ -45,3 +46,10 @@ export class LegacyStoreAdapter implements RateLimitStore {
     return true;
   }
 }
+
+
+
+
+
+
+

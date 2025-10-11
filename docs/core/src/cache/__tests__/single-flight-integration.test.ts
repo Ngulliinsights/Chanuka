@@ -8,6 +8,7 @@
 import { SingleFlightCache } from '../single-flight-cache';
 import { MemoryAdapter } from '../adapters/memory-adapter';
 import type { CacheService } from '../types';
+import { logger } from '../utils/logger';
 
 describe('SingleFlightCache Integration', () => {
   let memoryAdapter: MemoryAdapter;
@@ -243,3 +244,9 @@ describe('SingleFlightCache Integration', () => {
     });
   });
 });
+
+
+
+
+
+

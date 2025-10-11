@@ -5,6 +5,7 @@ import { createRateLimitFactory } from '../rate-limiting';
 import { Logger } from '../logging/logger';
 import { ValidationService } from '../validation/validation-service';
 import type { BenchmarkComponents, BenchmarkConfig } from '../testing/performance-benchmarks';
+import { logger } from '../utils/logger';
 
 describe('Core Utilities Performance Benchmarks', () => {
   let benchmarks: PerformanceBenchmarks;
@@ -206,7 +207,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       expect(concurrentReadsResult!.operationsPerSecond).toBeGreaterThan(5000); // Should handle concurrent load
 
       // Log results for analysis
-      console.log('\n=== Cache Performance Results ===');
+      logger.info('\n=== Cache Performance Results ===', { component: 'SimpleTool' });
       results.forEach(result => {
         if (result.success) {
           console.log(`${result.name}: ${result.operationsPerSecond.toFixed(0)} ops/sec, avg: ${(result.averageTimeMs || 0).toFixed(2)}ms`);
@@ -229,7 +230,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       // Should not use excessive memory (less than 100MB for test data)
       expect(largestPoint.heapUsed).toBeLessThan(100 * 1024 * 1024);
 
-      console.log('\n=== Cache Memory Usage ===');
+      logger.info('\n=== Cache Memory Usage ===', { component: 'SimpleTool' });
       memoryPoints.forEach(point => {
         console.log(`${point.sizeKB}KB x ${point.entryCount}: ${(point.heapUsed / 1024 / 1024).toFixed(2)}MB heap`);
       });
@@ -252,7 +253,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       expect(burstResult).toBeDefined();
       expect(burstResult!.operationsPerSecond).toBeGreaterThan(2000); // Should handle burst traffic
 
-      console.log('\n=== Rate Limiting Performance Results ===');
+      logger.info('\n=== Rate Limiting Performance Results ===', { component: 'SimpleTool' });
       results.forEach(result => {
         if (result.success && result.operationsPerSecond) {
           console.log(`${result.name}: ${result.operationsPerSecond.toFixed(0)} ops/sec, avg: ${(result.averageTimeMs || 0).toFixed(2)}ms`);
@@ -270,7 +271,7 @@ describe('Core Utilities Performance Benchmarks', () => {
 
       const algorithmResults = algorithmResult!.customResults!.algorithmResults;
       
-      console.log('\n=== Rate Limiting Algorithm Comparison ===');
+      logger.info('\n=== Rate Limiting Algorithm Comparison ===', { component: 'SimpleTool' });
       algorithmResults.forEach((result: any) => {
         console.log(`${result.algorithm}: ${result.avgTimeMs.toFixed(2)}ms average`);
         expect(result.avgTimeMs).toBeLessThan(5); // All algorithms should be under 5ms
@@ -298,7 +299,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       expect(concurrentResult).toBeDefined();
       expect(concurrentResult!.operationsPerSecond).toBeGreaterThan(5000); // Should handle concurrent logging
 
-      console.log('\n=== Logging Performance Results ===');
+      logger.info('\n=== Logging Performance Results ===', { component: 'SimpleTool' });
       results.forEach(result => {
         if (result.success) {
           console.log(`${result.name}: ${result.operationsPerSecond.toFixed(0)} ops/sec, avg: ${(result.averageTimeMs || 0).toFixed(2)}ms`);
@@ -328,7 +329,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       expect(batchResult).toBeDefined();
       expect(batchResult!.operationsPerSecond).toBeGreaterThan(100); // Should handle batch validations
 
-      console.log('\n=== Validation Performance Results ===');
+      logger.info('\n=== Validation Performance Results ===', { component: 'SimpleTool' });
       results.forEach(result => {
         if (result.success) {
           console.log(`${result.name}: ${result.operationsPerSecond.toFixed(0)} ops/sec, avg: ${(result.averageTimeMs || 0).toFixed(2)}ms`);
@@ -357,7 +358,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       expect(rateLimitLoggingResult).toBeDefined();
       expect(rateLimitLoggingResult!.operationsPerSecond).toBeGreaterThan(3000); // Should handle rate limiting + logging efficiently
 
-      console.log('\n=== Integration Performance Results ===');
+      logger.info('\n=== Integration Performance Results ===', { component: 'SimpleTool' });
       results.forEach(result => {
         if (result.success) {
           console.log(`${result.name}: ${result.operationsPerSecond.toFixed(0)} ops/sec, avg: ${(result.averageTimeMs || 0).toFixed(2)}ms`);
@@ -388,7 +389,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       expect(suite.summary.categoryStats.validation).toBeDefined();
       expect(suite.summary.categoryStats.integration).toBeDefined();
 
-      console.log('\n=== Full Benchmark Suite Summary ===');
+      logger.info('\n=== Full Benchmark Suite Summary ===', { component: 'SimpleTool' });
       console.log(`Total Tests: ${suite.summary.totalTests}`);
       console.log(`Successful: ${suite.summary.successfulTests}`);
       console.log(`Failed: ${suite.summary.failedTests}`);
@@ -396,7 +397,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       console.log(`Environment: Node ${suite.environment.nodeVersion} on ${suite.environment.platform}`);
       console.log(`CPUs: ${suite.environment.cpuCount}, Memory: ${suite.environment.totalMemoryMB.toFixed(0)}MB`);
 
-      console.log('\n=== Category Performance Summary ===');
+      logger.info('\n=== Category Performance Summary ===', { component: 'SimpleTool' });
       Object.entries(suite.summary.categoryStats).forEach(([category, stats]) => {
         console.log(`${category}: ${stats.averageOpsPerSecond.toFixed(0)} avg ops/sec, ${stats.averageTimeMs.toFixed(2)}ms avg time`);
       });
@@ -411,7 +412,7 @@ describe('Core Utilities Performance Benchmarks', () => {
         { name: 'integration:full-pipeline', minOpsPerSecond: 1000 }
       ];
 
-      console.log('\n=== Performance Regression Check ===');
+      logger.info('\n=== Performance Regression Check ===', { component: 'SimpleTool' });
       criticalBenchmarks.forEach(({ name, minOpsPerSecond }) => {
         const result = suite.results.find(r => r.name === name);
         if (result && result.success) {
@@ -455,7 +456,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       });
 
       if (regressions.length > 0) {
-        console.log('\n=== Performance Regressions Detected ===');
+        logger.info('\n=== Performance Regressions Detected ===', { component: 'SimpleTool' });
         regressions.forEach(regression => console.log(`⚠️  ${regression}`));
       }
 
@@ -467,7 +468,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       
       const criticalOperations = ['cache:get', 'cache:set', 'rate-limit:single', 'logging:single'];
       
-      console.log('\n=== Percentile Analysis ===');
+      logger.info('\n=== Percentile Analysis ===', { component: 'SimpleTool' });
       criticalOperations.forEach(opName => {
         const result = suite.results.find(r => r.name === opName);
         if (result && result.success && result.percentiles) {
@@ -484,3 +485,9 @@ describe('Core Utilities Performance Benchmarks', () => {
     }, 120000);
   });
 });
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-import { database as db } from '../shared/database/connection.js';
+import { database as db } from '../../../shared/database/connection.js';
 import { 
   billComments,
   type BillComment as Comment, 
@@ -6,6 +6,7 @@ import {
 } from '../../../shared/schema.js';
 import { eq, desc, and } from 'drizzle-orm';
 import { BaseStorage } from './base/BaseStorage.js';
+import { logger } from '../../utils/logger';
 
 /**
  * CommentStorage handles the storage and retrieval of comments on bills.
@@ -43,7 +44,7 @@ export class CommentStorage extends BaseStorage<Comment> {
     try {
       return this.comments.size >= 0; // Simple health check for in-memory storage
     } catch (error) {
-      console.error('CommentStorage health check failed:', error);
+      logger.error('CommentStorage health check failed:', { component: 'SimpleTool' }, error);
       return false;
     }
   }
@@ -386,3 +387,11 @@ export class CommentStorage extends BaseStorage<Comment> {
     return this.comments.has(id);
   }
 }
+
+
+
+
+
+
+
+

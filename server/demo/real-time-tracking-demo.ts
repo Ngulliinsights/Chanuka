@@ -12,45 +12,46 @@ import { billStatusMonitor } from '../features/bills/bill-status-monitor.js';
 import { userPreferencesService } from '../features/users/user-preferences.js';
 import { createServer } from 'http';
 import express from 'express';
+import { logger } from '../utils/logger';
 
 async function runDemo() {
-  console.log('🚀 Starting Real-Time Bill Tracking Demo...\n');
+  logger.info('🚀 Starting Real-Time Bill Tracking Demo...\n', { component: 'SimpleTool' });
 
   try {
     // 1. Initialize the system
-    console.log('1. Initializing Bill Status Monitor...');
+    logger.info('1. Initializing Bill Status Monitor...', { component: 'SimpleTool' });
     try {
       await billStatusMonitor.initialize();
-      console.log('✅ Bill Status Monitor initialized\n');
+      logger.info('✅ Bill Status Monitor initialized\n', { component: 'SimpleTool' });
     } catch (error) {
-      console.log('⚠️ Bill Status Monitor initialization skipped (database not available)\n');
+      logger.info('⚠️ Bill Status Monitor initialization skipped (database not available)\n', { component: 'SimpleTool' });
     }
 
     // 2. Create a test HTTP server for WebSocket
-    console.log('2. Setting up WebSocket server...');
+    logger.info('2. Setting up WebSocket server...', { component: 'SimpleTool' });
     const app = express();
     const server = createServer(app);
     
     try {
       webSocketService.initialize(server);
-      console.log('✅ WebSocket service initialized');
+      logger.info('✅ WebSocket service initialized', { component: 'SimpleTool' });
     } catch (error) {
-      console.log('⚠️ WebSocket service initialization failed:', error.message);
+      logger.info('⚠️ WebSocket service initialization failed:', { component: 'SimpleTool' }, error.message);
     }
     
     server.listen(3001, () => {
-      console.log('✅ WebSocket server running on port 3001\n');
+      logger.info('✅ WebSocket server running on port 3001\n', { component: 'SimpleTool' });
     });
 
     // 3. Demonstrate WebSocket service functionality
-    console.log('3. Testing WebSocket Service Features...');
+    logger.info('3. Testing WebSocket Service Features...', { component: 'SimpleTool' });
     
     // Test WebSocket statistics
     const wsStats = webSocketService.getStats();
-    console.log('WebSocket stats:', JSON.stringify(wsStats, null, 2));
+    logger.info('WebSocket stats:', { component: 'SimpleTool' }, JSON.stringify(wsStats, null, 2));
     
     // Test broadcast functionality (simulated)
-    console.log('Testing broadcast functionality...');
+    logger.info('Testing broadcast functionality...', { component: 'SimpleTool' });
     webSocketService.broadcastBillUpdate(123, {
       type: 'status_change',
       data: {
@@ -61,81 +62,81 @@ async function runDemo() {
       },
       timestamp: new Date()
     });
-    console.log('✅ Broadcast test completed');
+    logger.info('✅ Broadcast test completed', { component: 'SimpleTool' });
     
     // Test user notification (simulated)
-    console.log('Testing user notification...');
+    logger.info('Testing user notification...', { component: 'SimpleTool' });
     webSocketService.sendUserNotification('test-user-id', {
       type: 'test',
       title: 'Test Notification',
       message: 'This is a test notification',
       data: { timestamp: new Date() }
     });
-    console.log('✅ User notification test completed\n');
+    logger.info('✅ User notification test completed\n', { component: 'SimpleTool' });
 
     // 4. Demonstrate bill status monitoring features
-    console.log('4. Testing Bill Status Monitor Features...');
+    logger.info('4. Testing Bill Status Monitor Features...', { component: 'SimpleTool' });
     
     try {
       // Get monitoring stats
       const monitorStats = billStatusMonitor.getMonitoringStats();
-      console.log('Monitoring stats:', JSON.stringify(monitorStats, null, 2));
+      logger.info('Monitoring stats:', { component: 'SimpleTool' }, JSON.stringify(monitorStats, null, 2));
       
       // Test adding bill to monitoring (simulated)
-      console.log('Testing bill monitoring addition...');
+      logger.info('Testing bill monitoring addition...', { component: 'SimpleTool' });
       await billStatusMonitor.addBillToMonitoring(123);
-      console.log('✅ Bill added to monitoring');
+      logger.info('✅ Bill added to monitoring', { component: 'SimpleTool' });
       
       // Test status retrieval
       const status = billStatusMonitor.getBillStatus(123);
       console.log(`Bill 123 status: ${status || 'not found'}`);
       
       // Test status change trigger (simulated)
-      console.log('Testing status change trigger...');
+      logger.info('Testing status change trigger...', { component: 'SimpleTool' });
       try {
         await billStatusMonitor.triggerStatusChange(123, 'committee', {
           title: 'Test Bill',
           demoMode: true
         });
-        console.log('✅ Status change triggered successfully');
+        logger.info('✅ Status change triggered successfully', { component: 'SimpleTool' });
       } catch (error) {
-        console.log('⚠️ Status change skipped (database not available)');
+        logger.info('⚠️ Status change skipped (database not available)', { component: 'SimpleTool' });
       }
       
     } catch (error) {
-      console.log('⚠️ Bill monitoring tests skipped:', error.message);
+      logger.info('⚠️ Bill monitoring tests skipped:', { component: 'SimpleTool' }, error.message);
     }
-    console.log('');
+    logger.info('', { component: 'SimpleTool' });
 
     // 5. Demonstrate user preferences functionality
-    console.log('5. Testing User Preferences Features...');
+    logger.info('5. Testing User Preferences Features...', { component: 'SimpleTool' });
     
     try {
       // Test default preferences
-      console.log('Testing default preferences...');
+      logger.info('Testing default preferences...', { component: 'SimpleTool' });
       const defaultPrefs = await userPreferencesService.getUserPreferences('test-user-id');
-      console.log('Default preferences loaded:', JSON.stringify(defaultPrefs.billTracking, null, 2));
+      logger.info('Default preferences loaded:', { component: 'SimpleTool' }, JSON.stringify(defaultPrefs.billTracking, null, 2));
       
       // Test preference updates
-      console.log('Testing preference updates...');
+      logger.info('Testing preference updates...', { component: 'SimpleTool' });
       const updatedPrefs = await userPreferencesService.updateBillTrackingPreferences('test-user-id', {
         updateFrequency: 'hourly',
         statusChanges: true,
         newComments: false
       });
-      console.log('✅ Preferences updated successfully');
+      logger.info('✅ Preferences updated successfully', { component: 'SimpleTool' });
       
       // Test notification eligibility
       const shouldNotify = await userPreferencesService.shouldNotifyUser('test-user-id', 'statusChanges');
       console.log(`Should notify user: ${shouldNotify}`);
       
     } catch (error) {
-      console.log('⚠️ User preferences tests skipped:', error.message);
+      logger.info('⚠️ User preferences tests skipped:', { component: 'SimpleTool' }, error.message);
     }
-    console.log('');
+    logger.info('', { component: 'SimpleTool' });
 
     // 6. Test error handling
-    console.log('6. Testing Error Handling...');
+    logger.info('6. Testing Error Handling...', { component: 'SimpleTool' });
     
     // Test invalid bill ID
     try {
@@ -143,49 +144,49 @@ async function runDemo() {
         title: 'Non-existent Bill'
       });
     } catch (error) {
-      console.log('✅ Properly handled invalid bill ID error');
+      logger.info('✅ Properly handled invalid bill ID error', { component: 'SimpleTool' });
     }
 
     // Test invalid user preferences
     try {
       await userPreferencesService.getUserPreferences('invalid-user-id');
-      console.log('✅ Handled invalid user gracefully (returned defaults)');
+      logger.info('✅ Handled invalid user gracefully (returned defaults)', { component: 'SimpleTool' });
     } catch (error) {
-      console.log('✅ Properly handled invalid user ID error');
+      logger.info('✅ Properly handled invalid user ID error', { component: 'SimpleTool' });
     }
-    console.log('');
+    logger.info('', { component: 'SimpleTool' });
 
     // 7. Summary
-    console.log('📊 Demo Summary:');
-    console.log('================');
-    console.log('✅ WebSocket service initialization');
-    console.log('✅ Bill status monitoring system');
-    console.log('✅ User preference management');
-    console.log('✅ Real-time notification broadcasting');
-    console.log('✅ Error handling and graceful degradation');
-    console.log('✅ Service statistics and monitoring');
-    console.log('');
+    logger.info('📊 Demo Summary:', { component: 'SimpleTool' });
+    logger.info('================', { component: 'SimpleTool' });
+    logger.info('✅ WebSocket service initialization', { component: 'SimpleTool' });
+    logger.info('✅ Bill status monitoring system', { component: 'SimpleTool' });
+    logger.info('✅ User preference management', { component: 'SimpleTool' });
+    logger.info('✅ Real-time notification broadcasting', { component: 'SimpleTool' });
+    logger.info('✅ Error handling and graceful degradation', { component: 'SimpleTool' });
+    logger.info('✅ Service statistics and monitoring', { component: 'SimpleTool' });
+    logger.info('', { component: 'SimpleTool' });
 
-    console.log('🎉 Real-Time Bill Tracking Demo Completed Successfully!');
-    console.log('');
-    console.log('Key Features Implemented for Task 7.1:');
-    console.log('- ✅ WebSocket connections for live updates');
-    console.log('- ✅ Bill status change detection system');
-    console.log('- ✅ Real-time notifications for tracked bills');
-    console.log('- ✅ User preference management for update frequency');
-    console.log('- ✅ Enhanced authentication via token in WebSocket connection');
-    console.log('- ✅ Batched notifications for non-immediate preferences');
-    console.log('- ✅ Comprehensive error handling and graceful degradation');
-    console.log('');
+    logger.info('🎉 Real-Time Bill Tracking Demo Completed Successfully!', { component: 'SimpleTool' });
+    logger.info('', { component: 'SimpleTool' });
+    logger.info('Key Features Implemented for Task 7.1:', { component: 'SimpleTool' });
+    logger.info('- ✅ WebSocket connections for live updates', { component: 'SimpleTool' });
+    logger.info('- ✅ Bill status change detection system', { component: 'SimpleTool' });
+    logger.info('- ✅ Real-time notifications for tracked bills', { component: 'SimpleTool' });
+    logger.info('- ✅ User preference management for update frequency', { component: 'SimpleTool' });
+    logger.info('- ✅ Enhanced authentication via token in WebSocket connection', { component: 'SimpleTool' });
+    logger.info('- ✅ Batched notifications for non-immediate preferences', { component: 'SimpleTool' });
+    logger.info('- ✅ Comprehensive error handling and graceful degradation', { component: 'SimpleTool' });
+    logger.info('', { component: 'SimpleTool' });
 
     // Stop services
-    console.log('🧹 Stopping services...');
+    logger.info('🧹 Stopping services...', { component: 'SimpleTool' });
     billStatusMonitor.stopMonitoring();
     server.close();
-    console.log('✅ Services stopped');
+    logger.info('✅ Services stopped', { component: 'SimpleTool' });
 
   } catch (error) {
-    console.error('❌ Demo failed:', error);
+    logger.error('❌ Demo failed:', { component: 'SimpleTool' }, error);
     process.exit(1);
   }
 }
@@ -193,12 +194,18 @@ async function runDemo() {
 // Run the demo
 if (import.meta.url === `file://${process.argv[1]}`) {
   runDemo().then(() => {
-    console.log('\n🏁 Demo finished. Exiting...');
+    logger.info('\n🏁 Demo finished. Exiting...', { component: 'SimpleTool' });
     process.exit(0);
   }).catch(error => {
-    console.error('❌ Demo error:', error);
+    logger.error('❌ Demo error:', { component: 'SimpleTool' }, error);
     process.exit(1);
   });
 }
 
 export { runDemo };
+
+
+
+
+
+

@@ -5,8 +5,9 @@ import {
   billTags,
   userInterests,
   type Bill,
-} from '../../shared/schema';
+} from '../../../shared/schema';
 import { db } from '../db';
+import { logger } from '../../utils/logger';
 
 /**
  * Recommendation Service
@@ -79,7 +80,7 @@ export class RecommendationService {
 
         return interests.map((i: { interest: string }) => i.interest);
       } catch (error) {
-        console.error('Error getting user interests:', error);
+        logger.error('Error getting user interests:', { component: 'SimpleTool' }, error);
         return [];
       }
     });
@@ -102,7 +103,7 @@ export class RecommendationService {
 
         return userEngagement.map((e: { billId: number }) => e.billId);
       } catch (error) {
-        console.error('Error getting user engagement:', error);
+        logger.error('Error getting user engagement:', { component: 'SimpleTool' }, error);
         return [];
       }
     });
@@ -196,7 +197,7 @@ export class RecommendationService {
         score: rb.score,
       }));
     } catch (error) {
-      console.error('Error getting personalized recommendations:', error);
+      logger.error('Error getting personalized recommendations:', { component: 'SimpleTool' }, error);
       // Return empty array rather than throwing to prevent cascade failures
       return [];
     }
@@ -273,7 +274,7 @@ export class RecommendationService {
         similarityScore: sb.similarityScore,
       }));
     } catch (error) {
-      console.error('Error getting similar bills:', error);
+      logger.error('Error getting similar bills:', { component: 'SimpleTool' }, error);
       return [];
     }
   }
@@ -353,7 +354,7 @@ export class RecommendationService {
         trendScore: tb.trendScore,
       }));
     } catch (error) {
-      console.error('Error getting trending bills:', error);
+      logger.error('Error getting trending bills:', { component: 'SimpleTool' }, error);
       return [];
     }
   }
@@ -458,7 +459,7 @@ export class RecommendationService {
           .returning();
       }
     } catch (error) {
-      console.error('Error tracking engagement:', error);
+      logger.error('Error tracking engagement:', { component: 'SimpleTool' }, error);
       throw error; // Re-throw to allow caller to handle
     }
   }
@@ -589,7 +590,7 @@ export class RecommendationService {
         score: eb.score,
       }));
     } catch (error) {
-      console.error('Error getting collaborative recommendations:', error);
+      logger.error('Error getting collaborative recommendations:', { component: 'SimpleTool' }, error);
       return [];
     }
   }
@@ -613,3 +614,11 @@ export class RecommendationService {
     };
   }
 }
+
+
+
+
+
+
+
+

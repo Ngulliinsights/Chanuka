@@ -14,7 +14,7 @@ export function isServiceWorkerSupported(): boolean {
 // Register service worker
 export async function registerServiceWorker(config: ServiceWorkerConfig = {}): Promise<ServiceWorkerRegistration | null> {
   if (!isServiceWorkerSupported()) {
-    console.log('Service workers are not supported in this browser');
+    logger.info('Service workers are not supported in this browser', { component: 'SimpleTool' });
     return null;
   }
 
@@ -23,7 +23,7 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
       scope: '/',
     });
 
-    console.log('Service Worker registered successfully:', registration);
+    logger.info('Service Worker registered successfully:', { component: 'SimpleTool' }, registration);
 
     // Handle updates
     registration.addEventListener('updatefound', () => {
@@ -34,11 +34,11 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
         if (newWorker.state === 'installed') {
           if (navigator.serviceWorker.controller) {
             // New content is available
-            console.log('New content is available; please refresh.');
+            logger.info('New content is available; please refresh.', { component: 'SimpleTool' });
             config.onUpdate?.(registration);
           } else {
             // Content is cached for offline use
-            console.log('Content is cached for offline use.');
+            logger.info('Content is cached for offline use.', { component: 'SimpleTool' });
             config.onSuccess?.(registration);
           }
         }
@@ -47,7 +47,7 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
 
     return registration;
   } catch (error) {
-    console.error('Service Worker registration failed:', error);
+    logger.error('Service Worker registration failed:', { component: 'SimpleTool' }, error);
     config.onError?.(error as Error);
     return null;
   }
@@ -63,12 +63,12 @@ export async function unregisterServiceWorker(): Promise<boolean> {
     const registration = await navigator.serviceWorker.getRegistration();
     if (registration) {
       const result = await registration.unregister();
-      console.log('Service Worker unregistered:', result);
+      logger.info('Service Worker unregistered:', { component: 'SimpleTool' }, result);
       return result;
     }
     return false;
   } catch (error) {
-    console.error('Service Worker unregistration failed:', error);
+    logger.error('Service Worker unregistration failed:', { component: 'SimpleTool' }, error);
     return false;
   }
 }
@@ -88,7 +88,7 @@ export async function getServiceWorkerRegistration(): Promise<ServiceWorkerRegis
   try {
     return await navigator.serviceWorker.getRegistration();
   } catch (error) {
-    console.error('Failed to get service worker registration:', error);
+    logger.error('Failed to get service worker registration:', { component: 'SimpleTool' }, error);
     return null;
   }
 }
@@ -118,9 +118,9 @@ export async function sendMessageToServiceWorker(message: any): Promise<any> {
 export async function clearAllCaches(): Promise<void> {
   try {
     await sendMessageToServiceWorker({ type: 'CLEAR_CACHE' });
-    console.log('All caches cleared');
+    logger.info('All caches cleared', { component: 'SimpleTool' });
   } catch (error) {
-    console.error('Failed to clear caches:', error);
+    logger.error('Failed to clear caches:', { component: 'SimpleTool' }, error);
     throw error;
   }
 }
@@ -133,9 +133,9 @@ export async function skipWaiting(): Promise<void> {
 
   try {
     await sendMessageToServiceWorker({ type: 'SKIP_WAITING' });
-    console.log('Service worker skip waiting triggered');
+    logger.info('Service worker skip waiting triggered', { component: 'SimpleTool' });
   } catch (error) {
-    console.error('Failed to skip waiting:', error);
+    logger.error('Failed to skip waiting:', { component: 'SimpleTool' }, error);
   }
 }
 
@@ -145,7 +145,7 @@ export async function getServiceWorkerVersion(): Promise<string | null> {
     const response = await sendMessageToServiceWorker({ type: 'GET_VERSION' });
     return response.version || null;
   } catch (error) {
-    console.error('Failed to get service worker version:', error);
+    logger.error('Failed to get service worker version:', { component: 'SimpleTool' }, error);
     return null;
   }
 }
@@ -167,7 +167,7 @@ export async function isContentCached(url: string): Promise<boolean> {
     }
     return false;
   } catch (error) {
-    console.error('Failed to check cache:', error);
+    logger.error('Failed to check cache:', { component: 'SimpleTool' }, error);
     return false;
   }
 }
@@ -241,9 +241,9 @@ export async function preloadCriticalResources(urls: string[]): Promise<void> {
       await Promise.allSettled(chunk.map(url => preloadWithRetry(url)));
     }
     
-    console.log('Critical resources preloaded with retry logic');
+    logger.info('Critical resources preloaded with retry logic', { component: 'SimpleTool' });
   } catch (error) {
-    console.error('Failed to preload critical resources:', error);
+    logger.error('Failed to preload critical resources:', { component: 'SimpleTool' }, error);
   }
 }
 
@@ -325,9 +325,15 @@ export async function registerBackgroundSync(tag: string): Promise<void> {
   if (registration && 'sync' in registration) {
     try {
       await (registration as any).sync.register(tag);
-      console.log('Background sync registered:', tag);
+      logger.info('Background sync registered:', { component: 'SimpleTool' }, tag);
     } catch (error) {
-      console.error('Background sync registration failed:', error);
+      logger.error('Background sync registration failed:', { component: 'SimpleTool' }, error);
     }
   }
 }
+
+
+
+
+
+

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PageRelationshipUtils } from '@/utils/navigation/page-relationship-utils';
 import { RelatedPage, UserRole } from '@/types/navigation';
+import { logger } from '../utils/logger.js';
 
 interface PageRelationshipDemoProps {
   currentPage?: string;

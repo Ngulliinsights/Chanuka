@@ -1,6 +1,7 @@
 import { database as db, users, userSessions, billComments, billTracking, notifications } from '../../../shared/database/connection.js';
 import { eq, count, desc, sql, and, gte, like, or, inArray } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
+import { logger } from '../../utils/logger';
 
 export interface UserManagementFilters {
   role?: string;
@@ -195,7 +196,7 @@ export class UserManagementService {
         }
       };
     } catch (error) {
-      console.error('Error fetching user list:', error);
+      logger.error('Error fetching user list:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -238,7 +239,7 @@ export class UserManagementService {
         sessions
       };
     } catch (error) {
-      console.error('Error fetching user details:', error);
+      logger.error('Error fetching user details:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -282,7 +283,7 @@ export class UserManagementService {
         message: 'User updated successfully'
       };
     } catch (error) {
-      console.error('Error updating user:', error);
+      logger.error('Error updating user:', { component: 'SimpleTool' }, error);
       return {
         success: false,
         message: 'Failed to update user'
@@ -356,7 +357,7 @@ export class UserManagementService {
         affectedCount: operation.userIds.length
       };
     } catch (error) {
-      console.error('Error performing bulk user operation:', error);
+      logger.error('Error performing bulk user operation:', { component: 'SimpleTool' }, error);
       return {
         success: false,
         message: `Failed to perform bulk operation: ${error.message}`,
@@ -396,7 +397,7 @@ export class UserManagementService {
         message: 'Password reset successfully'
       };
     } catch (error) {
-      console.error('Error resetting user password:', error);
+      logger.error('Error resetting user password:', { component: 'SimpleTool' }, error);
       return {
         success: false,
         message: 'Failed to reset password'
@@ -441,7 +442,7 @@ export class UserManagementService {
         }
       };
     } catch (error) {
-      console.error('Error fetching user activity logs:', error);
+      logger.error('Error fetching user activity logs:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -472,7 +473,7 @@ export class UserManagementService {
         }
       };
     } catch (error) {
-      console.error('Error exporting user data:', error);
+      logger.error('Error exporting user data:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -523,7 +524,7 @@ export class UserManagementService {
         lastActivity
       };
     } catch (error) {
-      console.error('Error fetching user stats:', error);
+      logger.error('Error fetching user stats:', { component: 'SimpleTool' }, error);
       return {
         commentsCount: 0,
         billsTracked: 0,
@@ -559,7 +560,7 @@ export class UserManagementService {
         lastSession: lastSession?.createdAt || null
       };
     } catch (error) {
-      console.error('Error fetching user sessions:', error);
+      logger.error('Error fetching user sessions:', { component: 'SimpleTool' }, error);
       return {
         active: 0,
         lastSession: null
@@ -602,7 +603,7 @@ export class UserManagementService {
         verified: Number(stat.verified)
       }));
     } catch (error) {
-      console.error('Error fetching user role statistics:', error);
+      logger.error('Error fetching user role statistics:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -623,10 +624,18 @@ export class UserManagementService {
         count: Number(stat.count)
       }));
     } catch (error) {
-      console.error('Error fetching user verification statistics:', error);
+      logger.error('Error fetching user verification statistics:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
 }
 
 export const userManagementService = UserManagementService.getInstance();
+
+
+
+
+
+
+
+

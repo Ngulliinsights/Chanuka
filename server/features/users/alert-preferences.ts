@@ -3,6 +3,7 @@ import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth.j
 import { alertPreferenceService } from './alert-preference.js';
 import { z } from 'zod';
 import { ApiSuccess, ApiErrorResponse, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
+import { logger } from '../../utils/logger';
 
 export const router = Router();
 
@@ -116,7 +117,7 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error creating alert preference:', error);
+    logger.error('Error creating alert preference:', { component: 'SimpleTool' }, error);
     return ApiError(res, error instanceof Error ? error.message : 'Failed to create alert preference', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -135,7 +136,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
       count: preferences.length 
     }, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching alert preferences:', error);
+    logger.error('Error fetching alert preferences:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch alert preferences', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -159,7 +160,7 @@ router.get('/:preferenceId', authenticateToken, async (req: AuthenticatedRequest
     return ApiSuccess(res, preference, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching alert preference:', error);
+    logger.error('Error fetching alert preference:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch alert preference', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -187,7 +188,7 @@ router.patch('/:preferenceId', authenticateToken, async (req: AuthenticatedReque
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error updating alert preference:', error);
+    logger.error('Error updating alert preference:', { component: 'SimpleTool' }, error);
     return ApiError(res, error instanceof Error ? error.message : 'Failed to update alert preference', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -208,7 +209,7 @@ router.delete('/:preferenceId', authenticateToken, async (req: AuthenticatedRequ
       message: 'Alert preference deleted successfully' 
     }, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error deleting alert preference:', error);
+    logger.error('Error deleting alert preference:', { component: 'SimpleTool' }, error);
     return ApiError(res, error instanceof Error ? error.message : 'Failed to delete alert preference', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -232,7 +233,7 @@ router.post('/:preferenceId/rules', authenticateToken, async (req: Authenticated
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error creating alert rule:', error);
+    logger.error('Error creating alert rule:', { component: 'SimpleTool' }, error);
     return ApiError(res, error instanceof Error ? error.message : 'Failed to create alert rule', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -263,7 +264,7 @@ router.post('/process-alert', authenticateToken, async (req: AuthenticatedReques
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error processing alert:', error);
+    logger.error('Error processing alert:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to process alert', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -293,7 +294,7 @@ router.get('/delivery-logs', authenticateToken, async (req: AuthenticatedRequest
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error fetching delivery logs:', error);
+    logger.error('Error fetching delivery logs:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch delivery logs', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -310,7 +311,7 @@ router.get('/stats', authenticateToken, async (req: AuthenticatedRequest, res) =
     return ApiSuccess(res, stats, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching alert preference stats:', error);
+    logger.error('Error fetching alert preference stats:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch alert preference stats', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -357,7 +358,7 @@ router.post('/test-filtering', authenticateToken, async (req: AuthenticatedReque
       }
     }, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error testing smart filtering:', error);
+    logger.error('Error testing smart filtering:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to test smart filtering', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -379,10 +380,18 @@ router.get('/service/stats', authenticateToken, async (req: AuthenticatedRequest
     return ApiSuccess(res, stats, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching service stats:', error);
+    logger.error('Error fetching service stats:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch service stats', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
 });
 
 export default router;
+
+
+
+
+
+
+
+

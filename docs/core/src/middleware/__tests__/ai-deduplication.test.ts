@@ -18,6 +18,7 @@ import {
   DeduplicationOptions
 } from '../ai-deduplication';
 import { getDefaultCache } from '../../cache';
+import { logger } from '../utils/logger';
 
 // Mock dependencies
 vi.mock('../../cache');
@@ -420,3 +421,9 @@ describe('AI Deduplication Middleware', () => {
     });
   });
 });
+
+
+
+
+
+

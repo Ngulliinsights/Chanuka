@@ -4,6 +4,7 @@ import { useJourneyTracker, useJourneyAnalytics } from '../use-journey-tracker';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import { UserJourneyTracker } from '@/services/UserJourneyTracker';
 import React from 'react';
+import { logger } from '../utils/logger.js';
 
 // Mock the UserJourneyTracker
 jest.mock('@/services/UserJourneyTracker');

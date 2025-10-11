@@ -1,14 +1,15 @@
 // Simple security test without TypeScript compilation issues
 import { spawn } from 'child_process';
+import { logger } from '../utils/logger.js';
 
-console.log('🔒 Running Security Implementation Test...\n');
+logger.info('🔒 Running Security Implementation Test...\n', { component: 'SimpleTool' });
 
 // Test the security components by running a simple Node.js script
 const testScript = `
 // Test encryption functionality
 const crypto = require('crypto');
 
-console.log('1. Testing Basic Crypto Functions...');
+logger.info('1. Testing Basic Crypto Functions...', { component: 'SimpleTool' });
 
 // Test 1: AES Encryption
 try {
@@ -28,12 +29,12 @@ try {
   decrypted += decipher.final('utf8');
   
   if (decrypted === plaintext) {
-    console.log('   ✅ AES-256-GCM Encryption: PASSED');
+    logger.info('   ✅ AES-256-GCM Encryption: PASSED', { component: 'SimpleTool' });
   } else {
-    console.log('   ❌ AES-256-GCM Encryption: FAILED');
+    logger.info('   ❌ AES-256-GCM Encryption: FAILED', { component: 'SimpleTool' });
   }
 } catch (error) {
-  console.log('   ❌ AES-256-GCM Encryption: ERROR -', error.message);
+  logger.info('   ❌ AES-256-GCM Encryption: ERROR -', { component: 'SimpleTool' }, error.message);
 }
 
 // Test 2: Password Hashing (bcrypt simulation)
@@ -44,12 +45,12 @@ try {
   const wrongHash = crypto.pbkdf2Sync('WrongPassword', 'salt', 100000, 64, 'sha512').toString('hex');
   
   if (hash === verifyHash && hash !== wrongHash) {
-    console.log('   ✅ Password Hashing: PASSED');
+    logger.info('   ✅ Password Hashing: PASSED', { component: 'SimpleTool' });
   } else {
-    console.log('   ❌ Password Hashing: FAILED');
+    logger.info('   ❌ Password Hashing: FAILED', { component: 'SimpleTool' });
   }
 } catch (error) {
-  console.log('   ❌ Password Hashing: ERROR -', error.message);
+  logger.info('   ❌ Password Hashing: ERROR -', { component: 'SimpleTool' }, error.message);
 }
 
 // Test 3: Token Generation
@@ -58,12 +59,12 @@ try {
   const csrfToken = crypto.randomBytes(32).toString('base64url');
   
   if (token.length === 64 && csrfToken.length > 0) {
-    console.log('   ✅ Token Generation: PASSED');
+    logger.info('   ✅ Token Generation: PASSED', { component: 'SimpleTool' });
   } else {
-    console.log('   ❌ Token Generation: FAILED');
+    logger.info('   ❌ Token Generation: FAILED', { component: 'SimpleTool' });
   }
 } catch (error) {
-  console.log('   ❌ Token Generation: ERROR -', error.message);
+  logger.info('   ❌ Token Generation: ERROR -', { component: 'SimpleTool' }, error.message);
 }
 
 // Test 4: Input Validation Patterns
@@ -78,40 +79,40 @@ try {
   const xssDetected = xssPattern.test('<script>alert("xss")</script>');
   
   if (validEmail && invalidEmail && sqlDetected && xssDetected) {
-    console.log('   ✅ Input Validation Patterns: PASSED');
+    logger.info('   ✅ Input Validation Patterns: PASSED', { component: 'SimpleTool' });
   } else {
-    console.log('   ❌ Input Validation Patterns: FAILED');
-    console.log('     - Valid email:', validEmail);
-    console.log('     - Invalid email rejected:', invalidEmail);
-    console.log('     - SQL injection detected:', sqlDetected);
-    console.log('     - XSS detected:', xssDetected);
+    logger.info('   ❌ Input Validation Patterns: FAILED', { component: 'SimpleTool' });
+    logger.info('     - Valid email:', { component: 'SimpleTool' }, validEmail);
+    logger.info('     - Invalid email rejected:', { component: 'SimpleTool' }, invalidEmail);
+    logger.info('     - SQL injection detected:', { component: 'SimpleTool' }, sqlDetected);
+    logger.info('     - XSS detected:', { component: 'SimpleTool' }, xssDetected);
   }
 } catch (error) {
-  console.log('   ❌ Input Validation Patterns: ERROR -', error.message);
+  logger.info('   ❌ Input Validation Patterns: ERROR -', { component: 'SimpleTool' }, error.message);
 }
 
-console.log('\\n📊 Security Test Summary:');
-console.log('✅ Core cryptographic functions are working');
-console.log('✅ Encryption/decryption capabilities verified');
-console.log('✅ Password hashing mechanisms functional');
-console.log('✅ Secure token generation working');
-console.log('✅ Input validation patterns configured');
+logger.info('\\n📊 Security Test Summary:', { component: 'SimpleTool' });
+logger.info('✅ Core cryptographic functions are working', { component: 'SimpleTool' });
+logger.info('✅ Encryption/decryption capabilities verified', { component: 'SimpleTool' });
+logger.info('✅ Password hashing mechanisms functional', { component: 'SimpleTool' });
+logger.info('✅ Secure token generation working', { component: 'SimpleTool' });
+logger.info('✅ Input validation patterns configured', { component: 'SimpleTool' });
 
-console.log('\\n🔐 Security Features Implemented:');
-console.log('• AES-256-GCM encryption for data at rest');
-console.log('• Strong password hashing with PBKDF2/bcrypt');
-console.log('• Secure random token generation');
-console.log('• SQL injection detection patterns');
-console.log('• XSS attack prevention patterns');
-console.log('• Email validation with security checks');
-console.log('• CSRF token generation and verification');
-console.log('• TLS 1.3 configuration support');
-console.log('• PII data encryption capabilities');
-console.log('• Input sanitization and validation');
-console.log('• Security audit logging framework');
-console.log('• Session management with fingerprinting');
+logger.info('\\n🔐 Security Features Implemented:', { component: 'SimpleTool' });
+logger.info('• AES-256-GCM encryption for data at rest', { component: 'SimpleTool' });
+logger.info('• Strong password hashing with PBKDF2/bcrypt', { component: 'SimpleTool' });
+logger.info('• Secure random token generation', { component: 'SimpleTool' });
+logger.info('• SQL injection detection patterns', { component: 'SimpleTool' });
+logger.info('• XSS attack prevention patterns', { component: 'SimpleTool' });
+logger.info('• Email validation with security checks', { component: 'SimpleTool' });
+logger.info('• CSRF token generation and verification', { component: 'SimpleTool' });
+logger.info('• TLS 1.3 configuration support', { component: 'SimpleTool' });
+logger.info('• PII data encryption capabilities', { component: 'SimpleTool' });
+logger.info('• Input sanitization and validation', { component: 'SimpleTool' });
+logger.info('• Security audit logging framework', { component: 'SimpleTool' });
+logger.info('• Session management with fingerprinting', { component: 'SimpleTool' });
 
-console.log('\\n✅ Security implementation test completed successfully!');
+logger.info('\\n✅ Security implementation test completed successfully!', { component: 'SimpleTool' });
 `;
 
 // Write and execute the test script
@@ -128,9 +129,9 @@ child.on('close', (code) => {
   }
   
   if (code === 0) {
-    console.log('\n🎉 All security tests completed successfully!');
-    console.log('🔒 Your security implementation is ready for use.');
+    logger.info('\n🎉 All security tests completed successfully!', { component: 'SimpleTool' });
+    logger.info('🔒 Your security implementation is ready for use.', { component: 'SimpleTool' });
   } else {
-    console.log('\n⚠️  Some tests may have failed. Please review the output above.');
+    logger.info('\n⚠️  Some tests may have failed. Please review the output above.', { component: 'SimpleTool' });
   }
 });

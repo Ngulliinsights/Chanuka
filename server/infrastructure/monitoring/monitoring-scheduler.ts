@@ -1,4 +1,5 @@
-import { financialDisclosureMonitoringService } from '../../features/analytics/financial-disclosure-monitoring.js';
+import { financialDisclosureMonitoringService } from '../../features/analytics/financial-disclosure/monitoring.js';
+import { logger } from '../utils/logger';
 
 /**
  * Monitoring scheduler service to manage automated background tasks
@@ -11,12 +12,12 @@ export class MonitoringScheduler {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) {
-      console.log('Monitoring scheduler already initialized');
+      logger.info('Monitoring scheduler already initialized', { component: 'SimpleTool' });
       return;
     }
 
     try {
-      console.log('Initializing monitoring scheduler...');
+      logger.info('Initializing monitoring scheduler...', { component: 'SimpleTool' });
 
       // Start financial disclosure monitoring
       financialDisclosureMonitoringService.startAutomatedMonitoring();
@@ -25,9 +26,9 @@ export class MonitoringScheduler {
       this.setupShutdownHandlers();
 
       this.isInitialized = true;
-      console.log('Monitoring scheduler initialized successfully');
+      logger.info('Monitoring scheduler initialized successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('Error initializing monitoring scheduler:', error);
+      logger.error('Error initializing monitoring scheduler:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -41,15 +42,15 @@ export class MonitoringScheduler {
     }
 
     try {
-      console.log('Shutting down monitoring scheduler...');
+      logger.info('Shutting down monitoring scheduler...', { component: 'SimpleTool' });
 
       // Stop financial disclosure monitoring
       financialDisclosureMonitoringService.stopAutomatedMonitoring();
 
       this.isInitialized = false;
-      console.log('Monitoring scheduler shut down successfully');
+      logger.info('Monitoring scheduler shut down successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('Error shutting down monitoring scheduler:', error);
+      logger.error('Error shutting down monitoring scheduler:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -86,3 +87,9 @@ export class MonitoringScheduler {
 
 // Export singleton instance
 export const monitoringScheduler = new MonitoringScheduler();
+
+
+
+
+
+

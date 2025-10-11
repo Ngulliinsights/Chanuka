@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import { privacyService } from './privacy-service.js';
 import { auditLogger } from "../../infrastructure/monitoring/audit-log.js";
+import { logger } from '../../utils/logger';
 
 class PrivacySchedulerService {
   private cleanupJob: cron.ScheduledTask | null = null;
@@ -15,7 +16,7 @@ class PrivacySchedulerService {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized || this.initializationLock) {
-      console.log('Privacy scheduler already initialized or initialization in progress');
+      logger.info('Privacy scheduler already initialized or initialization in progress', { component: 'SimpleTool' });
       return;
     }
 
@@ -25,10 +26,10 @@ class PrivacySchedulerService {
       // Schedule daily data cleanup at 2 AM
       this.cleanupJob = cron.schedule('0 2 * * *', async () => {
         if (this.cleanupInProgress) {
-          console.log('Data cleanup already in progress, skipping...');
+          logger.info('Data cleanup already in progress, skipping...', { component: 'SimpleTool' });
           return;
         }
-        console.log('Running scheduled data cleanup...');
+        logger.info('Running scheduled data cleanup...', { component: 'SimpleTool' });
         await this.runScheduledCleanup();
       }, {
         scheduled: false,
@@ -38,10 +39,10 @@ class PrivacySchedulerService {
       // Schedule weekly compliance monitoring on Sundays at 3 AM
       this.complianceReportJob = cron.schedule('0 3 * * 0', async () => {
         if (this.complianceInProgress) {
-          console.log('Compliance monitoring already in progress, skipping...');
+          logger.info('Compliance monitoring already in progress, skipping...', { component: 'SimpleTool' });
           return;
         }
-        console.log('Running scheduled compliance monitoring...');
+        logger.info('Running scheduled compliance monitoring...', { component: 'SimpleTool' });
         await this.runComplianceMonitoring();
       }, {
         scheduled: false,
@@ -49,9 +50,9 @@ class PrivacySchedulerService {
       });
 
       this.isInitialized = true;
-      console.log('✅ Privacy scheduler service initialized');
+      logger.info('✅ Privacy scheduler service initialized', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('❌ Failed to initialize privacy scheduler service:', error);
+      logger.error('❌ Failed to initialize privacy scheduler service:', { component: 'SimpleTool' }, error);
       throw error;
     } finally {
       this.initializationLock = false;
@@ -68,12 +69,12 @@ class PrivacySchedulerService {
 
     if (this.cleanupJob) {
       this.cleanupJob.start();
-      console.log('✅ Data cleanup job started (daily at 2 AM UTC)');
+      logger.info('✅ Data cleanup job started (daily at 2 AM UTC)', { component: 'SimpleTool' });
     }
 
     if (this.complianceReportJob) {
       this.complianceReportJob.start();
-      console.log('✅ Compliance monitoring job started (weekly on Sundays at 3 AM UTC)');
+      logger.info('✅ Compliance monitoring job started (weekly on Sundays at 3 AM UTC)', { component: 'SimpleTool' });
     }
   }
 
@@ -83,12 +84,12 @@ class PrivacySchedulerService {
   stop(): void {
     if (this.cleanupJob) {
       this.cleanupJob.stop();
-      console.log('🛑 Data cleanup job stopped');
+      logger.info('🛑 Data cleanup job stopped', { component: 'SimpleTool' });
     }
 
     if (this.complianceReportJob) {
       this.complianceReportJob.stop();
-      console.log('🛑 Compliance monitoring job stopped');
+      logger.info('🛑 Compliance monitoring job stopped', { component: 'SimpleTool' });
     }
   }
 
@@ -103,7 +104,7 @@ class PrivacySchedulerService {
       error?: string;
     }>;
   }> {
-    console.log('Running manual data cleanup...');
+    logger.info('Running manual data cleanup...', { component: 'SimpleTool' });
     return await this.runScheduledCleanup();
   }
 
@@ -119,7 +120,7 @@ class PrivacySchedulerService {
     }>;
   }> {
     if (this.cleanupInProgress) {
-      console.log('Data cleanup already in progress');
+      logger.info('Data cleanup already in progress', { component: 'SimpleTool' });
       return { success: false, cleanupResults: [] };
     }
     
@@ -153,12 +154,12 @@ class PrivacySchedulerService {
       if (result.success) {
         console.log(`✅ Scheduled data cleanup completed. Deleted ${totalRecordsDeleted} records.`);
       } else {
-        console.error('❌ Scheduled data cleanup completed with errors');
+        logger.error('❌ Scheduled data cleanup completed with errors', { component: 'SimpleTool' });
       }
 
       return result;
     } catch (error) {
-      console.error('❌ Error during scheduled data cleanup:', error);
+      logger.error('❌ Error during scheduled data cleanup:', { component: 'SimpleTool' }, error);
       
       // Log the error
       await auditLogger.log({
@@ -188,7 +189,7 @@ class PrivacySchedulerService {
    */
   private async runComplianceMonitoring(): Promise<void> {
     if (this.complianceInProgress) {
-      console.log('Compliance monitoring already in progress');
+      logger.info('Compliance monitoring already in progress', { component: 'SimpleTool' });
       return;
     }
     
@@ -239,11 +240,11 @@ class PrivacySchedulerService {
           console.warn(`   - ${policy.dataType}: Last cleanup ${policy.lastCleanup || 'never'}`);
         });
       } else {
-        console.log('✅ All retention policies are up to date');
+        logger.info('✅ All retention policies are up to date', { component: 'SimpleTool' });
       }
 
     } catch (error) {
-      console.error('❌ Error during compliance monitoring:', error);
+      logger.error('❌ Error during compliance monitoring:', { component: 'SimpleTool' }, error);
       
       // Log the error
       await auditLogger.log({
@@ -299,8 +300,16 @@ class PrivacySchedulerService {
     }
 
     this.isInitialized = false;
-    console.log('🧹 Privacy scheduler service destroyed');
+    logger.info('🧹 Privacy scheduler service destroyed', { component: 'SimpleTool' });
   }
 }
 
 export const privacySchedulerService = new PrivacySchedulerService();
+
+
+
+
+
+
+
+

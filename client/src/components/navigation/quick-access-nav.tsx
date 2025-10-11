@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useNavigationPreferences } from '@/hooks/use-navigation-preferences';
 import { Link, useLocation } from 'react-router-dom';
+import { logger } from '../utils/logger.js';
 
 interface QuickAccessNavProps {
   className?: string;

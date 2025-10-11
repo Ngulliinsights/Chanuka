@@ -1,5 +1,6 @@
 import { QueryResult, QueryResultRow } from 'pg';
 import { InsertUser, User, UserProgress, InsertUserProgress } from './types';
+import { logger } from '../utils/logger';
 
 export interface TransactionClient {
   query<T extends QueryResultRow>(queryText: string, values?: any[]): Promise<QueryResult<T>>;
@@ -18,20 +19,27 @@ export interface StorageConfig {
 
 export interface Storage {
   // Note: UserProgress types don't exist in our schema, commenting out for now
-  // getUserProgress(userId: number): Promise<UserProgress[]>;
+  // getUserProgress(userId: string): Promise<UserProgress[]>;
   // updateUserProgress(progress: InsertUserProgress): Promise<UserProgress>;
-  // getProgressByType(userId: number, achievementType: string): Promise<UserProgress[]>;
+  // getProgressByType(userId: string, achievementType: string): Promise<UserProgress[]>;
 
   // Additional methods from IStorage interface
-  getUser(id: number): Promise<User | undefined>;
+  getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   getUserBySocialProfile(provider: string, profileId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   linkSocialProfile(
-    userId: number,
+    userId: string,
     profile: { platform: string; profileId: string; username: string },
   ): Promise<User>;
-  unlinkSocialProfile(userId: number, platform: string): Promise<User>;
-  updateUserReputation(userId: number, change: number): Promise<User>;
-  updateUserLastActive(userId: number): Promise<User>;
+  unlinkSocialProfile(userId: string, platform: string): Promise<User>;
+  updateUserReputation(userId: string, change: number): Promise<User>;
+  updateUserLastActive(userId: string): Promise<User>;
 }
+
+
+
+
+
+
+

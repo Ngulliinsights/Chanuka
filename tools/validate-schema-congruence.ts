@@ -7,6 +7,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { logger } from '../utils/logger';
 
 // Configuration
 const SCHEMA_PATH = path.resolve('./shared/schema.ts');
@@ -26,7 +27,7 @@ interface ValidationIssue {
 }
 
 async function validateSchemaCongruence() {
-  console.log('🔍 Validating schema congruence...');
+  logger.info('🔍 Validating schema congruence...', { component: 'SimpleTool' });
   
   try {
     // 1. Check if schema file exists
@@ -62,7 +63,7 @@ async function validateSchemaCongruence() {
     reportResults(results);
     return true;
   } catch (error) {
-    console.error('❌ Error during validation:', error);
+    logger.error('❌ Error during validation:', { component: 'SimpleTool' }, error);
     return false;
   }
 }
@@ -158,7 +159,7 @@ function reportResults(results: ValidationResult[]) {
   let errorCount = 0;
   let warningCount = 0;
   
-  console.log('\\n📋 Schema Congruence Validation Results:\\n');
+  logger.info('\\n📋 Schema Congruence Validation Results:\\n', { component: 'SimpleTool' });
   
   for (const result of results) {
     const errors = result.issues.filter(i => i.type === 'error');
@@ -178,18 +179,18 @@ function reportResults(results: ValidationResult[]) {
         console.log(`  ⚠️  ${warning.message}${warning.line ? ` (line ${warning.line})` : ''}`);
       }
       
-      console.log('');
+      logger.info('', { component: 'SimpleTool' });
     }
   }
   
   console.log(`✅ ${results.length} files checked, ${errorCount} errors, ${warningCount} warnings`);
   
   if (errorCount === 0 && warningCount === 0) {
-    console.log('🎉 All storage implementations are congruent with the schema!');
+    logger.info('🎉 All storage implementations are congruent with the schema!', { component: 'SimpleTool' });
   } else if (errorCount === 0) {
-    console.log('✨ No errors found, but some warnings to consider for optimization.');
+    logger.info('✨ No errors found, but some warnings to consider for optimization.', { component: 'SimpleTool' });
   } else {
-    console.log('🔧 Found issues that should be addressed for proper schema congruence.');
+    logger.info('🔧 Found issues that should be addressed for proper schema congruence.', { component: 'SimpleTool' });
   }
 }
 
@@ -197,16 +198,22 @@ function reportResults(results: ValidationResult[]) {
 validateSchemaCongruence()
   .then(success => {
     if (success) {
-      console.log('\\n🎉 Schema congruence validation completed!');
+      logger.info('\\n🎉 Schema congruence validation completed!', { component: 'SimpleTool' });
       process.exit(0);
     } else {
-      console.error('\\n❌ Schema congruence validation failed!');
+      logger.error('\\n❌ Schema congruence validation failed!', { component: 'SimpleTool' });
       process.exit(1);
     }
   })
   .catch(error => {
-    console.error('❌ Unexpected error:', error);
+    logger.error('❌ Unexpected error:', { component: 'SimpleTool' }, error);
     process.exit(1);
   });
 
 export { validateSchemaCongruence };
+
+
+
+
+
+

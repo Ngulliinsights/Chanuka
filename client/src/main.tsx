@@ -5,6 +5,7 @@ import { registerServiceWorker } from "./utils/serviceWorker";
 import { assetLoadingManager, setupAssetPreloading } from "./utils/asset-loading";
 import { getMobileErrorHandler } from "./utils/mobile-error-handler";
 import { loadPolyfills } from "./utils/polyfills";
+import { logger } from './utils/logger';
 import { performanceMonitor } from "./utils/performanceMonitoring";
 
 /**
@@ -56,16 +57,16 @@ if (process.env.NODE_ENV === 'development') {
     import('./utils/development-error-recovery')
       .then(({ DevelopmentErrorRecovery }) => {
         DevelopmentErrorRecovery.getInstance();
-        console.log('🛡️ Development error recovery initialized');
+        logger.info('🛡️ Development error recovery initialized', { component: 'SimpleTool' });
       })
       .catch(error => console.warn('Failed to initialize development error recovery:', error)),
     
     import('./utils/development-debug')
       .then(({ default: DevelopmentDebugger }) => {
         DevelopmentDebugger.getInstance();
-        console.log('🔧 Development debug utilities initialized');
+        logger.info('🔧 Development debug utilities initialized', { component: 'SimpleTool' });
       })
-      .catch(error => console.warn('Failed to initialize development debug utilities:', error))
+      .catch(error => console.warn('Failed to initialize development debug utilities:', error));
   ]);
 }
 
@@ -196,7 +197,7 @@ async function initializeBrowserCompatibility(): Promise<void> {
       logResults: true
     });
     
-    console.log('Browser compatibility initialized:', {
+    logger.info('Browser compatibility initialized:', { component: 'SimpleTool' }, {
       browser: `${compatibilityStatus.browserInfo.name} ${compatibilityStatus.browserInfo.version}`,
       supported: compatibilityStatus.isSupported,
       polyfillsLoaded: compatibilityStatus.polyfillsLoaded,
@@ -211,7 +212,7 @@ async function initializeBrowserCompatibility(): Promise<void> {
     
     try {
       await loadPolyfills();
-      console.log('Fallback polyfills loaded successfully');
+      logger.info('Fallback polyfills loaded successfully', { component: 'SimpleTool' });
     } catch (polyfillError) {
       console.warn('Fallback polyfills also failed:', polyfillError);
     }
@@ -269,7 +270,7 @@ function validateAndConfigureRoot(): HTMLElement {
  */
 async function mountReactApp(rootElement: HTMLElement): Promise<void> {
   updateLoadingState('mounting', 'Mounting React application...', 60);
-  console.log('DOM ready, mounting React application...');
+  logger.info('DOM ready, mounting React application...', { component: 'SimpleTool' });
   
   await new Promise(resolve => setTimeout(resolve, 100));
   
@@ -282,7 +283,7 @@ async function mountReactApp(rootElement: HTMLElement): Promise<void> {
     </AssetLoadingProvider>
   );
   
-  console.log('React application mounted successfully');
+  logger.info('React application mounted successfully', { component: 'SimpleTool' });
   updateLoadingState('mounting', 'React application mounted...', 80);
 }
 
@@ -299,14 +300,14 @@ async function registerServiceWorkerIfProduction(): Promise<void> {
   try {
     await registerServiceWorker({
       onUpdate: (registration) => {
-        console.log('New content is available; please refresh.');
+        logger.info('New content is available; please refresh.', { component: 'SimpleTool' });
         showUpdateNotification();
       },
       onSuccess: (registration) => {
-        console.log('Content is cached for offline use.');
+        logger.info('Content is cached for offline use.', { component: 'SimpleTool' });
       },
       onError: (error) => {
-        console.error('Service worker registration failed:', error);
+        logger.error('Service worker registration failed:', { component: 'SimpleTool' }, error);
       },
     });
   } catch (swError) {
@@ -323,7 +324,7 @@ function initializePerformanceMonitoring(): void {
   updateLoadingState('complete', 'Initializing performance monitoring...', 95);
   
   try {
-    console.log('🚀 Performance monitoring active');
+    logger.info('🚀 Performance monitoring active', { component: 'SimpleTool' });
     
     setTimeout(() => {
       performanceMonitor.measureRouteChange('initial-load')();
@@ -339,7 +340,7 @@ function initializePerformanceMonitoring(): void {
  * Each phase updates the loading state to keep users informed
  */
 async function initializeApp(): Promise<void> {
-  console.log('Initializing Chanuka Legislative Transparency Platform...');
+  logger.info('Initializing Chanuka Legislative Transparency Platform...', { component: 'SimpleTool' });
   
   // Phase 1: Environment validation
   updateLoadingState('validating', 'Validating browser environment...', 10);
@@ -373,7 +374,7 @@ async function initializeApp(): Promise<void> {
     // Loading state will be replaced by actual app content
   }, 200);
   
-  console.log('Application initialization completed successfully');
+  logger.info('Application initialization completed successfully', { component: 'SimpleTool' });
 }
 
 /**
@@ -434,11 +435,11 @@ function reportInitializationError(error: Error): void {
     // Check storage quota asynchronously
     if ('storage' in navigator && 'estimate' in navigator.storage) {
       navigator.storage.estimate().then(estimate => {
-        console.log('Storage quota:', estimate);
+        logger.info('Storage quota:', { component: 'SimpleTool' }, estimate);
       });
     }
   } catch (reportingError) {
-    console.error('Failed to report initialization error:', reportingError);
+    logger.error('Failed to report initialization error:', { component: 'SimpleTool' }, reportingError);
   }
 }
 
@@ -527,7 +528,7 @@ Timestamp: ${new Date().toISOString()}</pre>
             window.location.reload();
           }
         } catch (e) {
-          console.error('Failed to clear storage:', e);
+          logger.error('Failed to clear storage:', { component: 'SimpleTool' }, e);
           window.location.reload();
         }
       }
@@ -579,7 +580,7 @@ async function initWithRetry(config: RetryConfig = defaultRetryConfig): Promise<
   initializationPromise = (async () => {
     try {
       await initializeApp();
-      console.log('Application initialized successfully');
+      logger.info('Application initialized successfully', { component: 'SimpleTool' });
     } catch (error) {
       const currentError = error as Error;
       initRetries++;
@@ -604,7 +605,7 @@ async function initWithRetry(config: RetryConfig = defaultRetryConfig): Promise<
         initializationPromise = null;
         return initWithRetry(config);
       } else {
-        console.error('Maximum initialization retries exceeded or non-retryable error encountered');
+        logger.error('Maximum initialization retries exceeded or non-retryable error encountered', { component: 'SimpleTool' });
         showInitializationError(currentError);
         throw currentError;
       }
@@ -637,13 +638,13 @@ async function startApplication(): Promise<void> {
     await initWithRetry();
     
   } catch (error) {
-    console.error('Fatal error during application startup:', error);
+    logger.error('Fatal error during application startup:', { component: 'SimpleTool' }, error);
     reportInitializationError(error as Error);
     
     try {
       showInitializationError(error as Error);
     } catch (fallbackError) {
-      console.error('Failed to show error message:', fallbackError);
+      logger.error('Failed to show error message:', { component: 'SimpleTool' }, fallbackError);
       
       document.body.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; 
@@ -668,14 +669,14 @@ async function startApplication(): Promise<void> {
  * Allows the retry mechanism to handle errors gracefully
  */
 window.addEventListener('error', (event) => {
-  console.error('Global error during initialization:', event.error);
+  logger.error('Global error during initialization:', { component: 'SimpleTool' }, event.error);
   if (isInitializing) {
     event.preventDefault();
   }
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-  console.error('Unhandled promise rejection during initialization:', event.reason);
+  logger.error('Unhandled promise rejection during initialization:', { component: 'SimpleTool' }, event.reason);
   if (isInitializing) {
     event.preventDefault();
   }

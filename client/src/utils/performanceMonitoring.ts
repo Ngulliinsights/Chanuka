@@ -59,7 +59,7 @@ class PerformanceMonitor {
       // Observe different types of performance entries
       this.observer.observe({ entryTypes: ['navigation', 'paint', 'largest-contentful-paint', 'first-input', 'layout-shift'] });
     } catch (error) {
-      console.error('Failed to initialize PerformanceObserver:', error);
+      logger.error('Failed to initialize PerformanceObserver:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -424,3 +424,9 @@ export function getOptimalSettings() {
     lazyLoadThreshold: 0.1,
   };
 }
+
+
+
+
+
+

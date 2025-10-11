@@ -12,6 +12,7 @@ import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 import { configSchema, type AppConfig, envMapping, defaultFeatures } from './schema';
 import type {
+import { logger } from '../utils/logger';
   ConfigLoadOptions,
   ConfigChangeEvent,
   ConfigChange,
@@ -641,3 +642,9 @@ export { configSchema, defaultFeatures };
 
 // Export default instance for convenience
 export default configManager;
+
+
+
+
+
+

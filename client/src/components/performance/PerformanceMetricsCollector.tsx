@@ -7,6 +7,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { performanceMonitor } from '../../utils/performanceMonitoring';
 import { performanceOptimizer, usePerformanceOptimization } from '../../utils/performance-optimizer';
 import { cacheManager } from '../../utils/cache-strategy';
+import { logger } from '../utils/logger.js';
 
 interface PerformanceMetricsProps {
   showDetails?: boolean;
@@ -82,7 +83,7 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
         onMetricsUpdate(newMetrics);
       }
     } catch (error) {
-      console.error('Failed to collect performance metrics:', error);
+      logger.error('Failed to collect performance metrics:', { component: 'SimpleTool' }, error);
       setMetrics(prev => ({ ...prev, isLoading: false }));
     }
   }, [getBundleMetrics, getCacheMetrics, getLatestRecommendations, onMetricsUpdate]);

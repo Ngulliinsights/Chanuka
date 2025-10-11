@@ -1,5 +1,6 @@
 import { performance } from 'perf_hooks';
 import { performanceMonitor } from './performance-monitor.js';
+import { logger } from '../utils/logger';
 
 interface QueryMetrics {
   query: string;
@@ -267,3 +268,9 @@ export async function traceDbQuery<T>(
 ): Promise<T> {
   return dbTracer.traceQuery(query, params, executor, traceId);
 }
+
+
+
+
+
+

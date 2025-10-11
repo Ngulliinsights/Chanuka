@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import * as api from '../../../services/api';
+import { logger } from '../utils/logger';
 
 // Mock fetch
 const mockFetch = vi.fn();
@@ -660,3 +661,9 @@ describe('API Service', () => {
     });
   });
 });
+
+
+
+
+
+

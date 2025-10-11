@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { logger } from '../utils/logger.js';
 
 interface Notification {
   id: number;

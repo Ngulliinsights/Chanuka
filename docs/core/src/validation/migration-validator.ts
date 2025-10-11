@@ -44,7 +44,7 @@ export class MigrationValidator {
     this.startTime = performance.now();
     this.results = [];
 
-    console.log('🔍 Starting comprehensive migration validation...\n');
+    logger.info('🔍 Starting comprehensive migration validation...\n', { component: 'SimpleTool' });
 
     // Run all validation categories
     await this.validateImports();
@@ -59,7 +59,7 @@ export class MigrationValidator {
   }
 
   private async validateImports(): Promise<void> {
-    console.log('📦 Validating import resolution...');
+    logger.info('📦 Validating import resolution...', { component: 'SimpleTool' });
 
     // Test core module imports
     await this.testImport('Core Index', () => import('../index'));
@@ -82,7 +82,7 @@ export class MigrationValidator {
   }
 
   private async validateFunctionality(): Promise<void> {
-    console.log('⚙️ Validating functionality preservation...');
+    logger.info('⚙️ Validating functionality preservation...', { component: 'SimpleTool' });
 
     // Test cache functionality
     await this.testFunctionality('Cache Service', async () => {
@@ -196,7 +196,7 @@ export class MigrationValidator {
   }
 
   private async validatePerformance(): Promise<void> {
-    console.log('🚀 Validating performance characteristics...');
+    logger.info('🚀 Validating performance characteristics...', { component: 'SimpleTool' });
 
     // Test cache performance
     await this.testPerformance('Cache Performance', async () => {
@@ -289,7 +289,7 @@ export class MigrationValidator {
   }
 
   private async validateIntegration(): Promise<void> {
-    console.log('🔗 Validating integration points...');
+    logger.info('🔗 Validating integration points...', { component: 'SimpleTool' });
 
     // Test middleware integration
     await this.testIntegration('Middleware Integration', async () => {
@@ -515,6 +515,7 @@ export class MigrationValidator {
     
     const categorizedResults = {
       imports: this.results.filter(r => r.category === 'imports'),
+import { logger } from '../utils/logger';
       functionality: this.results.filter(r => r.category === 'functionality'),
       performance: this.results.filter(r => r.category === 'performance'),
       integration: this.results.filter(r => r.category === 'integration'),
@@ -582,3 +583,9 @@ export async function validateMigration(): Promise<MigrationValidationReport> {
   const validator = new MigrationValidator();
   return await validator.validateMigration();
 }
+
+
+
+
+
+

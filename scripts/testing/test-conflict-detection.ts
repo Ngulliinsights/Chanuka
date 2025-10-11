@@ -1,33 +1,34 @@
 // Test file for conflict detection service implementation
 import { ConflictDetectionService } from './services/conflict-detection.js';
+import { logger } from '../utils/logger';
 
 async function testConflictDetection() {
   const service = new ConflictDetectionService();
   
   try {
     // Test financial conflict analysis
-    console.log('Testing financial conflict analysis...');
+    logger.info('Testing financial conflict analysis...', { component: 'SimpleTool' });
     const financialConflicts = await service.analyzeFinancialConflicts(1);
-    console.log('Financial conflicts found:', financialConflicts.length);
+    logger.info('Financial conflicts found:', { component: 'SimpleTool' }, financialConflicts.length);
     
     // Test professional conflict analysis
-    console.log('Testing professional conflict analysis...');
+    logger.info('Testing professional conflict analysis...', { component: 'SimpleTool' });
     const professionalConflicts = await service.analyzeProfessionalConflicts(1);
-    console.log('Professional conflicts found:', professionalConflicts.length);
+    logger.info('Professional conflicts found:', { component: 'SimpleTool' }, professionalConflicts.length);
     
     // Test voting pattern analysis
-    console.log('Testing voting pattern analysis...');
+    logger.info('Testing voting pattern analysis...', { component: 'SimpleTool' });
     const votingAnomalies = await service.analyzeVotingPatternInconsistencies(1);
-    console.log('Voting anomalies found:', votingAnomalies.length);
+    logger.info('Voting anomalies found:', { component: 'SimpleTool' }, votingAnomalies.length);
     
     // Test comprehensive analysis
-    console.log('Testing comprehensive analysis...');
+    logger.info('Testing comprehensive analysis...', { component: 'SimpleTool' });
     const analysis = await service.performComprehensiveConflictAnalysis(1);
-    console.log('Analysis completed:', analysis.sponsorName, 'Risk Level:', analysis.riskLevel);
+    logger.info('Analysis completed:', { component: 'SimpleTool' }, analysis.sponsorName, 'Risk Level:', analysis.riskLevel);
     
-    console.log('✅ All conflict detection tests passed!');
+    logger.info('✅ All conflict detection tests passed!', { component: 'SimpleTool' });
   } catch (error) {
-    console.error('❌ Test failed:', error);
+    logger.error('❌ Test failed:', { component: 'SimpleTool' }, error);
   }
 }
 
@@ -37,3 +38,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export { testConflictDetection };
+
+
+
+
+
+

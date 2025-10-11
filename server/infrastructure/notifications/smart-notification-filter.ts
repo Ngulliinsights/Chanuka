@@ -10,6 +10,7 @@ import {
 } from '../../../shared/schema.js';
 import { eq, and, or, sql, inArray, desc } from 'drizzle-orm';
 import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/user-preferences.js';
+import { logger } from '../utils/logger';
 
 export interface SmartFilterCriteria {
   userId: string;
@@ -83,7 +84,7 @@ export class SmartNotificationFilterService {
       return combinedResult;
 
     } catch (error) {
-      console.error('Error in smart filtering:', error);
+      logger.error('Error in smart filtering:', { component: 'SimpleTool' }, error);
       // Default to allowing notification if filtering fails
       return {
         shouldNotify: true,
@@ -675,3 +676,9 @@ export class SmartNotificationFilterService {
 }
 
 export const smartNotificationFilterService = new SmartNotificationFilterService();
+
+
+
+
+
+

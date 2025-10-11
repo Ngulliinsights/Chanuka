@@ -21,10 +21,10 @@ global.window = { localStorage: localStorageMock };
 // Import the NavigationStatePersistence utility
 const { NavigationStatePersistence } = require('./client/src/utils/navigation/state-persistence.ts');
 
-console.log('🧪 Testing Navigation State Persistence...\n');
+logger.info('🧪 Testing Navigation State Persistence...\n', { component: 'SimpleTool' });
 
 // Test 1: Basic state persistence
-console.log('1. Testing basic state persistence...');
+logger.info('1. Testing basic state persistence...', { component: 'SimpleTool' });
 const mockState = {
   currentPath: '/bills',
   previousPath: '/',
@@ -51,55 +51,55 @@ const mockState = {
 
 try {
   NavigationStatePersistence.saveNavigationState(mockState);
-  console.log('✅ State saved successfully');
+  logger.info('✅ State saved successfully', { component: 'SimpleTool' });
   
   // Wait for debounced save
   setTimeout(() => {
     const loaded = NavigationStatePersistence.loadNavigationState();
     if (loaded && loaded.preferences && loaded.sidebarOpen === true) {
-      console.log('✅ State loaded successfully');
-      console.log('   - Sidebar open:', loaded.sidebarOpen);
-      console.log('   - Favorite pages:', loaded.preferences.favoritePages.length);
-      console.log('   - Recent pages:', loaded.preferences.recentlyVisited.length);
+      logger.info('✅ State loaded successfully', { component: 'SimpleTool' });
+      logger.info('   - Sidebar open:', { component: 'SimpleTool' }, loaded.sidebarOpen);
+      logger.info('   - Favorite pages:', { component: 'SimpleTool' }, loaded.preferences.favoritePages.length);
+      logger.info('   - Recent pages:', { component: 'SimpleTool' }, loaded.preferences.recentlyVisited.length);
     } else {
-      console.log('❌ State loading failed');
+      logger.info('❌ State loading failed', { component: 'SimpleTool' });
     }
   }, 600);
 } catch (error) {
-  console.log('❌ State persistence failed:', error.message);
+  logger.info('❌ State persistence failed:', { component: 'SimpleTool' }, error.message);
 }
 
 // Test 2: Sidebar state persistence
-console.log('\n2. Testing sidebar state persistence...');
+logger.info('\n2. Testing sidebar state persistence...', { component: 'SimpleTool' });
 try {
   NavigationStatePersistence.saveSidebarState(true);
   const sidebarState = NavigationStatePersistence.loadSidebarState();
   if (sidebarState === true) {
-    console.log('✅ Sidebar state persistence works');
+    logger.info('✅ Sidebar state persistence works', { component: 'SimpleTool' });
   } else {
-    console.log('❌ Sidebar state persistence failed');
+    logger.info('❌ Sidebar state persistence failed', { component: 'SimpleTool' });
   }
 } catch (error) {
-  console.log('❌ Sidebar state persistence failed:', error.message);
+  logger.info('❌ Sidebar state persistence failed:', { component: 'SimpleTool' }, error.message);
 }
 
 // Test 3: Data validation
-console.log('\n3. Testing data validation...');
+logger.info('\n3. Testing data validation...', { component: 'SimpleTool' });
 try {
   // Set corrupted data
   localStorage.setItem('chanuka-navigation-state', 'invalid-json');
   const loaded = NavigationStatePersistence.loadNavigationState();
   if (loaded === null) {
-    console.log('✅ Corrupted data handled gracefully');
+    logger.info('✅ Corrupted data handled gracefully', { component: 'SimpleTool' });
   } else {
-    console.log('❌ Corrupted data not handled properly');
+    logger.info('❌ Corrupted data not handled properly', { component: 'SimpleTool' });
   }
 } catch (error) {
-  console.log('❌ Data validation failed:', error.message);
+  logger.info('❌ Data validation failed:', { component: 'SimpleTool' }, error.message);
 }
 
 // Test 4: User-specific state clearing
-console.log('\n4. Testing user-specific state clearing...');
+logger.info('\n4. Testing user-specific state clearing...', { component: 'SimpleTool' });
 try {
   // Set up some state first
   NavigationStatePersistence.saveNavigationState(mockState);
@@ -107,17 +107,17 @@ try {
     NavigationStatePersistence.clearUserSpecificState();
     const loaded = NavigationStatePersistence.loadNavigationState();
     if (loaded && loaded.preferences && loaded.preferences.favoritePages.length === 0) {
-      console.log('✅ User-specific state cleared successfully');
+      logger.info('✅ User-specific state cleared successfully', { component: 'SimpleTool' });
     } else {
-      console.log('❌ User-specific state clearing failed');
+      logger.info('❌ User-specific state clearing failed', { component: 'SimpleTool' });
     }
   }, 600);
 } catch (error) {
-  console.log('❌ User-specific state clearing failed:', error.message);
+  logger.info('❌ User-specific state clearing failed:', { component: 'SimpleTool' }, error.message);
 }
 
 // Test 5: Error handling
-console.log('\n5. Testing error handling...');
+logger.info('\n5. Testing error handling...', { component: 'SimpleTool' });
 try {
   // Mock localStorage to throw error
   const originalSetItem = localStorage.setItem;
@@ -127,20 +127,20 @@ try {
   
   // Should not throw error
   NavigationStatePersistence.saveNavigationState(mockState);
-  console.log('✅ Storage errors handled gracefully');
+  logger.info('✅ Storage errors handled gracefully', { component: 'SimpleTool' });
   
   // Restore localStorage
   localStorage.setItem = originalSetItem;
 } catch (error) {
-  console.log('❌ Error handling failed:', error.message);
+  logger.info('❌ Error handling failed:', { component: 'SimpleTool' }, error.message);
 }
 
-console.log('\n🎉 Navigation state persistence verification complete!');
-console.log('\nKey features implemented:');
-console.log('- ✅ State persistence across sessions');
-console.log('- ✅ Sidebar state synchronization');
-console.log('- ✅ Data validation and sanitization');
-console.log('- ✅ User-specific state management');
-console.log('- ✅ Error handling and recovery');
-console.log('- ✅ Version management for migrations');
-console.log('- ✅ Debounced saves for performance');
+logger.info('\n🎉 Navigation state persistence verification complete!', { component: 'SimpleTool' });
+logger.info('\nKey features implemented:', { component: 'SimpleTool' });
+logger.info('- ✅ State persistence across sessions', { component: 'SimpleTool' });
+logger.info('- ✅ Sidebar state synchronization', { component: 'SimpleTool' });
+logger.info('- ✅ Data validation and sanitization', { component: 'SimpleTool' });
+logger.info('- ✅ User-specific state management', { component: 'SimpleTool' });
+logger.info('- ✅ Error handling and recovery', { component: 'SimpleTool' });
+logger.info('- ✅ Version management for migrations', { component: 'SimpleTool' });
+logger.info('- ✅ Debounced saves for performance', { component: 'SimpleTool' });

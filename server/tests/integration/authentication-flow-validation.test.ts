@@ -3,13 +3,14 @@ import request from 'supertest';
 import express from 'express';
 import cors from 'cors';
 import { router as authRouter } from '../../core/auth/auth.js';
-import { router as billsRouter } from '../../features/bills/bills.js';
-import { router as sponsorsRouter } from '../../features/bills/sponsors.js';
+import { router as billsRouter } from '../../features/bills/bills-router.ts';
+import { router as sponsorsRouter } from '../../features/bills/sponsors.ts';
 import { router as profileRouter } from '../../features/users/profile.js';
 import { router as adminRouter } from '../../features/admin/admin.js';
 import { database as db, users } from '../../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
+import { logger } from '../utils/logger';
 
 describe('Authentication Flow Validation Tests', () => {
   let app: express.Application;
@@ -756,3 +757,9 @@ describe('Authentication Flow Validation Tests', () => {
     });
   });
 });
+
+
+
+
+
+

@@ -5,6 +5,7 @@ import { sponsorService } from './sponsor-service';
 import { insertSponsorSchema } from '../../../shared/schema.js';
 import { z } from 'zod';
 import { ApiSuccess, ApiErrorResponse, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
+import { logger } from '../../utils/logger';
 
 const router = express.Router();
 
@@ -60,7 +61,7 @@ export function setupSponsorRoutes(app: express.Router) {
       return ApiSuccess(res, sponsors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error fetching sponsors:', error);
+      logger.error('Error fetching sponsors:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to fetch sponsors', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -86,7 +87,7 @@ export function setupSponsorRoutes(app: express.Router) {
       return ApiSuccess(res, sponsorWithDetails, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error fetching sponsor:', error);
+      logger.error('Error fetching sponsor:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to fetch sponsor', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -112,7 +113,7 @@ export function setupSponsorRoutes(app: express.Router) {
       return ApiSuccess(res, affiliations, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error fetching affiliations:', error);
+      logger.error('Error fetching affiliations:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to fetch affiliations', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -133,7 +134,7 @@ export function setupSponsorRoutes(app: express.Router) {
       return ApiSuccess(res, transparency, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error fetching transparency records:', error);
+      logger.error('Error fetching transparency records:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to fetch transparency records', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -153,7 +154,7 @@ export function setupSponsorRoutes(app: express.Router) {
         return ApiValidationError(res, error.errors, 
           ApiResponseWrapper.createMetadata(startTime, 'database'));
       }
-      console.error('Error creating sponsor:', error);
+      logger.error('Error creating sponsor:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to create sponsor', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -179,7 +180,7 @@ export function setupSponsorRoutes(app: express.Router) {
       return ApiSuccess(res, sponsor, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error updating sponsor:', error);
+      logger.error('Error updating sponsor:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to update sponsor', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -200,7 +201,7 @@ export function setupSponsorRoutes(app: express.Router) {
       return ApiSuccess(res, conflictAnalysis, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error analyzing sponsor conflicts:', error);
+      logger.error('Error analyzing sponsor conflicts:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to analyze sponsor conflicts', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -221,7 +222,7 @@ export function setupSponsorRoutes(app: express.Router) {
       return ApiSuccess(res, votingPatterns, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error fetching voting patterns:', error);
+      logger.error('Error fetching voting patterns:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to fetch voting patterns', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -242,7 +243,7 @@ export function setupSponsorRoutes(app: express.Router) {
       return ApiSuccess(res, consistency, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error analyzing voting consistency:', error);
+      logger.error('Error analyzing voting consistency:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to analyze voting consistency', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -264,7 +265,7 @@ export function setupSponsorRoutes(app: express.Router) {
       return ApiSuccess(res, affiliation, 
         ApiResponseWrapper.createMetadata(startTime, 'database'), 201);
     } catch (error) {
-      console.error('Error adding sponsor affiliation:', error);
+      logger.error('Error adding sponsor affiliation:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to add sponsor affiliation', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -290,7 +291,7 @@ export function setupSponsorRoutes(app: express.Router) {
       return ApiSuccess(res, affiliation, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error updating sponsor affiliation:', error);
+      logger.error('Error updating sponsor affiliation:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to update sponsor affiliation', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -312,7 +313,7 @@ export function setupSponsorRoutes(app: express.Router) {
       return ApiSuccess(res, transparency, 
         ApiResponseWrapper.createMetadata(startTime, 'database'), 201);
     } catch (error) {
-      console.error('Error adding transparency record:', error);
+      logger.error('Error adding transparency record:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to add transparency record', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -338,7 +339,7 @@ export function setupSponsorRoutes(app: express.Router) {
       return ApiSuccess(res, transparency, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Error updating transparency record:', error);
+      logger.error('Error updating transparency record:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Failed to update transparency record', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -350,3 +351,12 @@ setupSponsorRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
+
+
+
+
+
+
+
+

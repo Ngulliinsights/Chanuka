@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { logger } from '../utils/logger';
 
 /**
  * @deprecated The `useSmoothTransition` hook is deprecated. Please use `useNavigationPerformance` for transition management.
@@ -304,3 +305,9 @@ export function useLayoutStable() {
   
   return { elementRef, stabilize, unstabilize };
 }
+
+
+
+
+
+

@@ -27,6 +27,7 @@ import { useKeyboardFocus } from '@/hooks/use-keyboard-focus';
 import { NavigationSection } from '@/types/navigation';
 import { RoleBasedNavigation, useRoleBasedNavigation } from './RoleBasedNavigation';
 import { 
+import { logger } from '../utils/logger.js';
   isNavigationPathActive, 
   getActiveStateClasses,
   getActiveIconClasses,

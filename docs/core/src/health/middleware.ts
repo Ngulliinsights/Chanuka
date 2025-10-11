@@ -8,6 +8,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { HealthChecker } from './health-checker';
 import { Logger } from '../logging';
+import { logger } from '../utils/logger';
 
 export interface HealthEndpointConfig {
   includeDetails?: boolean;
@@ -382,3 +383,9 @@ export function createHealthRouter(
     '/health/metrics': endpoints.metrics
   };
 }
+
+
+
+
+
+

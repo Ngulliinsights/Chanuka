@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { logger } from '../utils/logger.js';
 
 // Mock performance API
 const mockPerformance = {

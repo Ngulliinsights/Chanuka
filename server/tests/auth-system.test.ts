@@ -3,9 +3,10 @@ import request from 'supertest';
 import express from 'express';
 import { authService } from '../core/auth/auth-service.js';
 import { getEmailService } from '../services/email.service.js';
-import { database as db, users, sessions, passwordResets } from '../shared/database/connection.js';
+import { database as db, users, sessions, passwordResets } from '../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import { router as authRouter } from '../core/auth/auth.js';
+import { logger } from '../utils/logger';
 
 // Create test app
 const app = express();
@@ -474,3 +475,9 @@ describe('AuthService Unit Tests', () => {
     });
   });
 });
+
+
+
+
+
+

@@ -15,8 +15,9 @@ const generateUUID = (): string => {
     return v.toString(16);
   });
 };
-import { Logger } from './logger.js';
+import { Logger } from './logger';
 import { LogContext, RequestLogData } from './types.js';
+import { logger } from '../utils/logger';
 
 export interface RequestLoggingOptions {
   logger?: Logger;
@@ -348,3 +349,9 @@ export function createRequestLoggingPipeline(options: RequestLoggingOptions = []
     contextMiddleware(logger),
   ];
 }
+
+
+
+
+
+

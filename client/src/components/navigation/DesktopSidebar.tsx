@@ -24,6 +24,7 @@ import { useNavigationAccessibility } from '@/hooks/use-navigation-accessibility
 import { useKeyboardFocus } from '@/hooks/use-keyboard-focus';
 import { NavigationSection } from '@/types/navigation';
 import { RoleBasedNavigation, useRoleBasedNavigation } from './RoleBasedNavigation';
+import { logger } from '../utils/logger.js';
 
 // Enhanced type definitions for better type safety
 interface NavigationItem {

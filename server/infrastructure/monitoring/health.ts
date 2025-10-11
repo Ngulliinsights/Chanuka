@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { ApiSuccess, ApiErrorResponse, ApiResponseWrapper } from "../../utils/api-response.js";
 import { databaseFallbackService } from "../database/database-fallback.js";
+import { logger } from '../utils/logger';
 
 export const router = Router();
 
@@ -65,7 +66,7 @@ router.post("/database/retry", async (req, res) => {
   const startTime = Date.now();
   
   try {
-    console.log("🔄 Manual database retry requested");
+    logger.info('🔄 Manual database retry requested', { component: 'SimpleTool' });
     const success = await databaseFallbackService.forceRetry();
     
     return ApiSuccess(res, {
@@ -103,3 +104,9 @@ router.post("/demo-mode", async (req, res) => {
       ApiResponseWrapper.createMetadata(startTime, 'static'));
   }
 });
+
+
+
+
+
+

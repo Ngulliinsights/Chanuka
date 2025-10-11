@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { logger } from '../utils/logger';
 
 export default {
   // Dark mode configuration - using class strategy for manual control
@@ -326,3 +327,9 @@ export default {
     }
   ],
 } satisfies Config;
+
+
+
+
+
+

@@ -7,6 +7,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { LoadTester } from '../load-tester';
+import { logger } from '../utils/logger';
 
 describe('LoadTester', () => {
   let loadTester: LoadTester;
@@ -95,3 +96,9 @@ describe('LoadTester', () => {
         activeCalls--;
         return 'success';
       });
+
+
+
+
+
+

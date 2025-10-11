@@ -1,5 +1,6 @@
 import { Redis } from 'ioredis';
 import { Pool, PoolClient } from 'pg';
+import { logger } from '../utils/logger';
 interface StorageOptions {
     cacheTTL?: number;
     prefix?: string;
@@ -21,3 +22,10 @@ export declare abstract class BaseStorage<T> {
     shutdown(): Promise<void>;
 }
 export {};
+
+
+
+
+
+
+

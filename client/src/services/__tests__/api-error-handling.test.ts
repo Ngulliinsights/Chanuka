@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
+import { logger } from '../utils/logger';
   fetchWithFallback,
   ApiService,
   FallbackDataManager,
@@ -294,3 +295,9 @@ describe('Error utility functions', () => {
     expect(getErrorMessage(networkError)).toBe('Network error. Please check your internet connection.');
   });
 });
+
+
+
+
+
+

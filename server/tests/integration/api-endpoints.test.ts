@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
 import { app } from '../../index.js';
-import { databaseService } from '../../services/database-service.js';
+import { databaseService } from '../../../infrastructure/database/database-service.js';
+import { logger } from '../utils/logger';
 
 describe('API Endpoints Integration Tests', () => {
   let server: any;
@@ -317,7 +318,7 @@ describe('API Endpoints Integration Tests', () => {
 
     it('should create a comment on a bill', async () => {
       if (!testBillId) {
-        console.log('Skipping comment test - no bills available');
+        logger.info('Skipping comment test - no bills available', { component: 'SimpleTool' });
         return;
       }
 
@@ -340,7 +341,7 @@ describe('API Endpoints Integration Tests', () => {
 
     it('should get comments for a bill', async () => {
       if (!testBillId) {
-        console.log('Skipping comment test - no bills available');
+        logger.info('Skipping comment test - no bills available', { component: 'SimpleTool' });
         return;
       }
 
@@ -356,7 +357,7 @@ describe('API Endpoints Integration Tests', () => {
 
     it('should reject empty comments', async () => {
       if (!testBillId) {
-        console.log('Skipping comment test - no bills available');
+        logger.info('Skipping comment test - no bills available', { component: 'SimpleTool' });
         return;
       }
 
@@ -555,3 +556,9 @@ expect.extend({
     }
   },
 });
+
+
+
+
+
+

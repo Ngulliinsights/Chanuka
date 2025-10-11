@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { Alert, AlertDescription } from '../ui/alert';
 import { Loader2, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { logger } from '../utils/logger.js';
 
 interface LoginFormData {
   email: string;

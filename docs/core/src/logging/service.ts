@@ -5,6 +5,7 @@ import { LogRotationManager } from './rotation';
 import { telemetryAggregator } from './telemetry';
 import path from 'path';
 import { ZodError } from 'zod';
+import { logger } from '../utils/logger';
 
 /**
  * Unified Logging Service
@@ -251,7 +252,7 @@ class LoggingService {
       }
     } catch (error) {
       if (error instanceof ZodError) {
-        console.error('Invalid event structure:', error.errors);
+        logger.error('Invalid event structure:', { component: 'SimpleTool' }, error.errors);
       }
       // Still try to log the original message
       switch (level) {
@@ -437,3 +438,9 @@ export const startTimer = (operation: string, context?: LogContext) =>
 // Export for external configuration
 export const configureLogging = (options: LoggerOptions) => 
   LoggingService.getInstance(options);
+
+
+
+
+
+

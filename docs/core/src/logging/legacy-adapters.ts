@@ -6,6 +6,7 @@
 
 import { Logger as CoreLogger } from './logger';
 import { LogContext } from './types';
+import { logger } from '../utils/logger';
 
 /**
  * Adapter for the existing simple logger from src/shared/utils/logger.ts
@@ -217,3 +218,9 @@ export function createLegacyLoggerAdapter(legacyLogger: any, coreLogger: CoreLog
     return new SimpleLegacyLoggerAdapter(coreLogger);
   }
 }
+
+
+
+
+
+

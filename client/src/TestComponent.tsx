@@ -1,10 +1,11 @@
 
 
 import { useEffect } from 'react';
+import { logger } from '../utils/logger.js';
 
 export default function TestComponent() {
   useEffect(() => {
-    console.log('Simplified App mounted for debugging');
+    logger.info('Simplified App mounted for debugging', { component: 'SimpleTool' });
   }, []);
 
   return (

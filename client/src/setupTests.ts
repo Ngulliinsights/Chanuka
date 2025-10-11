@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import { logger } from '../utils/logger';
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -32,3 +33,9 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
 
 // Mock scrollTo
 window.scrollTo = vi.fn();
+
+
+
+
+
+

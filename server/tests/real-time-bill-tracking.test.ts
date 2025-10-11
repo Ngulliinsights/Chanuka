@@ -4,8 +4,9 @@ import jwt from 'jsonwebtoken';
 import { webSocketService } from '../infrastructure/websocket.js';
 import { billStatusMonitor } from '../features/bills/bill-status-monitor.js';
 import { userPreferencesService } from '../features/users/user-preferences.js';
-import { database as db, users, bills, billEngagement } from '../shared/database/connection.js';
+import { database as db, users, bills, billEngagement } from '../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
+import { logger } from '../utils/logger';
 
 describe('Real-Time Bill Tracking System', () => {
   let testUserId: string;
@@ -479,3 +480,9 @@ describe('Real-Time Bill Tracking System', () => {
     });
   });
 });
+
+
+
+
+
+

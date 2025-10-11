@@ -1,6 +1,7 @@
 import { database as db, users, bills, billEngagement, userInterests } from '../../../shared/database/connection.js';
 import { eq, and, inArray, sql } from 'drizzle-orm';
 import { userPreferencesService, type BillTrackingPreferences } from './user-preferences.js';
+import { logger } from '../../utils/logger';
 
 export interface GranularAlertSettings {
   billStatusChanges: {
@@ -780,3 +781,11 @@ export class AdvancedAlertPreferencesService {
 }
 
 export const advancedAlertPreferencesService = new AdvancedAlertPreferencesService();
+
+
+
+
+
+
+
+

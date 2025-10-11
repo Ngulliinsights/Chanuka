@@ -2,6 +2,7 @@ import { describe, it, expect, beforeAll } from '@jest/globals';
 import { execSync } from 'child_process';
 import { readFileSync, existsSync, statSync } from 'fs';
 import { join } from 'path';
+import { logger } from '../utils/logger';
 
 describe('Bundle Size Monitoring and Regression Tests', () => {
   const BUNDLE_SIZE_LIMITS = {
@@ -15,7 +16,7 @@ describe('Bundle Size Monitoring and Regression Tests', () => {
 
   beforeAll(async () => {
     // Build the application for testing
-    console.log('Building application for bundle analysis...');
+    logger.info('Building application for bundle analysis...', { component: 'SimpleTool' });
     try {
       execSync('npm run build:client', { stdio: 'pipe' });
     } catch (error) {
@@ -57,7 +58,7 @@ describe('Bundle Size Monitoring and Regression Tests', () => {
           }
         }
 
-        console.log('Bundle Analysis:');
+        logger.info('Bundle Analysis:', { component: 'SimpleTool' });
         bundleFiles.forEach(bundle => {
           console.log(`  ${bundle.file}: ${bundle.sizeKB}KB`);
         });
@@ -222,3 +223,9 @@ describe('Bundle Size Monitoring and Regression Tests', () => {
     };
   }
 });
+
+
+
+
+
+

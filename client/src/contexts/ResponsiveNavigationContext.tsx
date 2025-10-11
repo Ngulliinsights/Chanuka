@@ -7,6 +7,7 @@ import {
 } from '@/types/navigation';
 import { isNavigationPathActive } from '@/utils/navigation/active-state';
 import { NavigationStatePersistence } from '@/utils/navigation/state-persistence';
+import { logger } from '../utils/logger.js';
 
 // Action types
 type ResponsiveNavigationAction =

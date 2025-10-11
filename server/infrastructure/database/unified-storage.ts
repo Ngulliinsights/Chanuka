@@ -12,6 +12,7 @@ import {
 } from "../../shared/schema.js";
 import { eq, desc, and, or, like, sql, count } from "drizzle-orm";
 import { database as db } from "../../../shared/database/connection.js";
+import { logger } from '../utils/logger';
 
 export interface UnifiedStorage {
   // Bill operations
@@ -414,3 +415,9 @@ export class DatabaseUnifiedStorage implements UnifiedStorage {
 
 // Export singleton instance
 export const unifiedStorage = new DatabaseUnifiedStorage();
+
+
+
+
+
+

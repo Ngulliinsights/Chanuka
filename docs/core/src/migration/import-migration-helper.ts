@@ -245,6 +245,7 @@ export class ImportMigrationHelper {
             report.potentialMigrations.push({
               file,
               imports: fileImports
+import { logger } from '../utils/logger';
             });
           }
         } catch (error) {
@@ -270,26 +271,26 @@ const { ImportMigrationHelper } = require('./core/src/migration/import-migration
 async function main() {
   const migrationHelper = new ImportMigrationHelper();
   
-  console.log('Starting import migration...');
+  logger.info('Starting import migration...', { component: 'SimpleTool' });
   
   // Migrate server directory
-  console.log('Migrating server directory...');
+  logger.info('Migrating server directory...', { component: 'SimpleTool' });
   const serverResults = await migrationHelper.migrateDirectory('./server');
   console.log(\`Server: \${serverResults.migratedFiles}/\${serverResults.totalFiles} files migrated, \${serverResults.totalChanges} changes\`);
   
   // Migrate src directory
-  console.log('Migrating src directory...');
+  logger.info('Migrating src directory...', { component: 'SimpleTool' });
   const srcResults = await migrationHelper.migrateDirectory('./src');
   console.log(\`Src: \${srcResults.migratedFiles}/\${srcResults.totalFiles} files migrated, \${srcResults.totalChanges} changes\`);
   
   // Report errors
   const allErrors = [...serverResults.errors, ...srcResults.errors];
   if (allErrors.length > 0) {
-    console.log('\\nErrors encountered:');
+    logger.info('\\nErrors encountered:', { component: 'SimpleTool' });
     allErrors.forEach(error => console.log(\`  - \${error}\`));
   }
   
-  console.log('\\nMigration completed!');
+  logger.info('\\nMigration completed!', { component: 'SimpleTool' });
   console.log(\`Total files migrated: \${serverResults.migratedFiles + srcResults.migratedFiles}\`);
   console.log(\`Total changes made: \${serverResults.totalChanges + srcResults.totalChanges}\`);
 }
@@ -310,3 +311,9 @@ main().catch(console.error);
 
 // Export singleton instance
 export const importMigrationHelper = new ImportMigrationHelper();
+
+
+
+
+
+

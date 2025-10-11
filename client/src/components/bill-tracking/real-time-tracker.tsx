@@ -25,6 +25,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { logger } from '../utils/logger.js';
 
 interface RealTimeBillTrackerProps {
   billId?: number;
@@ -65,7 +66,7 @@ export function RealTimeBillTracker({
   useEffect(() => {
     if (userToken && !isConnected) {
       connect(userToken).catch((error) => {
-        console.error("Failed to connect to WebSocket:", error);
+        logger.error('Failed to connect to WebSocket:', { component: 'SimpleTool' }, error);
         toast.error("Failed to connect to real-time updates");
       });
     }

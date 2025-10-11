@@ -36,18 +36,18 @@ const mockApiResponse = {
 };
 
 // Mock the modules
-jest.mock('../../utils/validation.js', () => mockValidation);
-jest.mock('../../utils/crypto.js', () => mockCrypto);
-jest.mock('../../utils/logger.js', () => mockLogger);
-jest.mock('../../utils/metrics.js', () => mockMetrics);
-jest.mock('../../utils/api-response.js', () => mockApiResponse);
+jest.mock('../../utils/validation.ts', () => mockValidation);
+jest.mock('../../utils/crypto.ts', () => mockCrypto);
+jest.mock('../../utils/logger', () => mockLogger);
+jest.mock('../../utils/metrics.ts', () => mockMetrics);
+jest.mock('../../utils/api-response.ts', () => mockApiResponse);
 
 // Import the mocked modules for type safety
-import * as validation from '../../utils/validation.js';
-import * as crypto from '../../utils/crypto.js';
-import * as logger from '../../utils/logger.js';
-import * as metrics from '../../utils/metrics.js';
-import * as apiResponse from '../../utils/api-response.js';
+import * as validation from '../../utils/validation.ts';
+import * as crypto from '../../utils/crypto.ts';
+import * as logger from '../../utils/logger';
+import * as metrics from '../../utils/metrics.ts';
+import * as apiResponse from '../../utils/api-response.ts';
 
 describe('Validation Utils', () => {
   beforeEach(() => {
@@ -582,3 +582,9 @@ describe('API Response Utils', () => {
     });
   });
 });
+
+
+
+
+
+

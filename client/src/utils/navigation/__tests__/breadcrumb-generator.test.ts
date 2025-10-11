@@ -1,4 +1,5 @@
 import { generateBreadcrumbs, getPageTitle } from '../breadcrumb-generator';
+import { logger } from '../utils/logger';
 
 describe('breadcrumb-generator', () => {
   describe('generateBreadcrumbs', () => {
@@ -161,3 +162,9 @@ describe('breadcrumb-generator', () => {
     });
   });
 });
+
+
+
+
+
+

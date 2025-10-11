@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { mkdir, writeFile } from 'fs/promises';
 import { join, resolve } from 'path';
 import { Pool } from 'pg';
-import { logger } from './utils/logger.js';
+import { logger } from './utils/logger';
 
 // Polyfill AggregateError if not available
 if (typeof AggregateError === 'undefined') {
@@ -84,7 +84,7 @@ function initializeEnvironment(): { pool: Pool; db: ReturnType<typeof drizzle> }
 
   // Test the connection
   pool.on('error', err => {
-    console.error('Unexpected error on idle client', err);
+    logger.error('Unexpected error on idle client', { component: 'SimpleTool' }, err);
     process.exit(-1);
   });
 
@@ -423,7 +423,7 @@ FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
  * Generate migration file
  */
 async function generateMigrationFile(): Promise<MigrationResult> {
-  console.log('Generating SQL migration...');
+  logger.info('Generating SQL migration...', { component: 'SimpleTool' });
 
   try {
     // Ensure migrations directory exists
@@ -461,11 +461,11 @@ async function generateMigrationFile(): Promise<MigrationResult> {
  * Run the migration against the database
  */
 async function runMigration(db: ReturnType<typeof drizzle>, pool: Pool): Promise<MigrationResult> {
-  console.log('Running migration...');
+  logger.info('Running migration...', { component: 'SimpleTool' });
 
   try {
     await migrate(db, { migrationsFolder: './drizzle' });
-    console.log('Migration completed successfully');
+    logger.info('Migration completed successfully', { component: 'SimpleTool' });
 
     return {
       success: true,
@@ -473,7 +473,7 @@ async function runMigration(db: ReturnType<typeof drizzle>, pool: Pool): Promise
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('Error running migration:', errorMessage);
+    logger.error('Error running migration:', { component: 'SimpleTool' }, errorMessage);
 
     return {
       success: false,
@@ -543,12 +543,12 @@ async function main(): Promise<void> {
       const migrationResult = await runMigration(db, pool);
 
       if (!migrationResult.success) {
-        console.error('Migration execution failed.');
+        logger.error('Migration execution failed.', { component: 'SimpleTool' });
         process.exit(1);
       }
     }
   } catch (error) {
-    console.error('Fatal error:', error instanceof Error ? error.message : String(error));
+    logger.error('Fatal error:', { component: 'SimpleTool' }, error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
@@ -556,7 +556,7 @@ async function main(): Promise<void> {
 // Execute main function with proper error handling
 main()
   .then(() => {
-    console.log('Process completed successfully.');
+    logger.info('Process completed successfully.', { component: 'SimpleTool' });
     process.exit(0);
   })
   .catch(error => {
@@ -566,3 +566,10 @@ main()
     );
     process.exit(1);
   });
+
+
+
+
+
+
+

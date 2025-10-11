@@ -1,7 +1,7 @@
-import pg from 'pg';
-const { Pool } = pg;
-import type { PoolClient, PoolConfig } from 'pg';
+import type { PoolClient } from 'pg';
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
+import { logger } from '../../utils/logger';
+import { pool, executeQuery, checkPoolHealth, closePools, getPools } from '../../../shared/database/pool.js';
 
 export interface ConnectionPoolConfig {
   host: string;
@@ -39,7 +39,6 @@ export interface QueryMetrics {
 }
 
 class ConnectionPoolService {
-  private pool: Pool | null = null;
   private metrics: {
     totalAcquired: number;
     totalReleased: number;
@@ -59,84 +58,38 @@ class ConnectionPoolService {
 
   /**
    * Initialize connection pool with optimized settings
+   * Note: Now uses the shared database pool with circuit breaker and comprehensive monitoring
    */
   async initialize(config?: Partial<ConnectionPoolConfig>): Promise<void> {
-    const defaultConfig: ConnectionPoolConfig = {
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
-      database: process.env.DB_NAME || 'chanuka_db',
-      user: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASSWORD || '',
-      min: 2, // Minimum connections in pool
-      max: 20, // Maximum connections in pool
-      idleTimeoutMillis: 30000, // 30 seconds
-      connectionTimeoutMillis: 5000, // 5 seconds
-      acquireTimeoutMillis: 10000, // 10 seconds
-      ssl: process.env.NODE_ENV === 'production'
-    };
+    // The shared pool is already initialized, so we just log the configuration
+    logger.info('[Connection Pool] Using shared database pool with circuit breaker and monitoring', { component: 'SimpleTool' });
 
-    const poolConfig: PoolConfig = {
-      ...defaultConfig,
-      ...config,
-      // Additional optimizations
-      statement_timeout: 30000, // 30 seconds
-      query_timeout: 30000, // 30 seconds
-      application_name: 'chanuka_platform',
-      keepAlive: true,
-      keepAliveInitialDelayMillis: 10000
-    };
-
-    this.pool = new Pool(poolConfig);
-
-    // Set up event listeners for monitoring
-    this.setupEventListeners();
-
-    // Test the connection
+    // Test the connection using the shared pool
     await this.testConnection();
-
-    console.log('[Connection Pool] Initialized with optimized settings:', {
-      min: poolConfig.min,
-      max: poolConfig.max,
-      host: poolConfig.host,
-      database: poolConfig.database
-    });
   }
 
   /**
    * Execute a query with connection pooling and metrics
    */
   async query<T = any>(
-    text: string, 
-    params?: any[], 
+    text: string,
+    params?: any[],
     traceId?: string
   ): Promise<{ rows: T[]; rowCount: number; duration: number }> {
-    if (!this.pool) {
-      throw new Error('Connection pool not initialized');
-    }
-
     const queryId = `query_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const startTime = performance.now();
-    let client: PoolClient | null = null;
 
     try {
-      // Acquire connection from pool
-      const acquireStart = performance.now();
-      client = await this.pool.connect();
-      const acquireTime = performance.now() - acquireStart;
+      // Use the shared pool's executeQuery with circuit breaker and retry logic
+      const result = await executeQuery({
+        text,
+        params,
+        context: traceId || 'connection-pool-service'
+      });
 
-      // Track acquire time
-      this.metrics.acquireTimes.push(acquireTime);
-      if (this.metrics.acquireTimes.length > this.MAX_ACQUIRE_TIMES) {
-        this.metrics.acquireTimes = this.metrics.acquireTimes.slice(-this.MAX_ACQUIRE_TIMES / 2);
-      }
-
-      this.metrics.totalAcquired++;
-
-      // Execute query
-      const result = await client.query(text, params);
       const duration = performance.now() - startTime;
 
-      // Track query metrics
+      // Track query metrics for backward compatibility
       const queryMetric: QueryMetrics = {
         queryId,
         query: text.substring(0, 200), // Truncate long queries
@@ -154,7 +107,7 @@ class ConnectionPoolService {
       performanceMonitor.addQueryTrace(traceId || 'unknown', text, duration, params);
 
       return {
-        rows: result.rows,
+        rows: result.rows as T[],
         rowCount: result.rowCount || 0,
         duration
       };
@@ -177,20 +130,15 @@ class ConnectionPoolService {
       // Track with performance monitor
       performanceMonitor.addQueryTrace(traceId || 'unknown', text, duration, params);
 
-      console.error('[Connection Pool] Query error:', {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('[Connection Pool] Query error:', { component: 'SimpleTool' }, {
         queryId,
-        error: error.message,
+        error: errorMessage,
         duration,
         query: text.substring(0, 100)
       });
 
       throw error;
-    } finally {
-      // Always release the client back to the pool
-      if (client) {
-        client.release();
-        this.metrics.totalReleased++;
-      }
     }
   }
 
@@ -201,23 +149,20 @@ class ConnectionPoolService {
     callback: (client: PoolClient) => Promise<T>,
     traceId?: string
   ): Promise<T> {
-    if (!this.pool) {
-      throw new Error('Connection pool not initialized');
-    }
-
     const startTime = performance.now();
     let client: PoolClient | null = null;
 
     try {
-      client = await this.pool.connect();
+      // Get client from shared pool
+      client = await pool.connect();
       this.metrics.totalAcquired++;
 
       await client.query('BEGIN');
-      
+
       const result = await callback(client);
-      
+
       await client.query('COMMIT');
-      
+
       const duration = performance.now() - startTime;
       performanceMonitor.addCustomMetric(
         'database_transaction',
@@ -233,17 +178,18 @@ class ConnectionPoolService {
         try {
           await client.query('ROLLBACK');
         } catch (rollbackError) {
-          console.error('[Connection Pool] Rollback error:', rollbackError);
+          logger.error('[Connection Pool] Rollback error:', { component: 'SimpleTool' }, { error: rollbackError });
         }
       }
 
       const duration = performance.now() - startTime;
       this.metrics.totalErrors++;
 
+      const errorMessage = error instanceof Error ? error.message : String(error);
       performanceMonitor.addCustomMetric(
         'database_transaction',
         duration,
-        { success: false, error: error.message },
+        { success: false, error: errorMessage },
         traceId
       );
 
@@ -260,20 +206,16 @@ class ConnectionPoolService {
    * Get connection pool metrics
    */
   getPoolMetrics(): PoolMetrics {
-    if (!this.pool) {
-      throw new Error('Connection pool not initialized');
-    }
-
     const averageAcquireTime = this.metrics.acquireTimes.length > 0
       ? this.metrics.acquireTimes.reduce((sum, time) => sum + time, 0) / this.metrics.acquireTimes.length
       : 0;
 
     return {
-      totalConnections: this.pool.totalCount,
-      idleConnections: this.pool.idleCount,
-      waitingClients: this.pool.waitingCount,
-      maxConnections: this.pool.options.max || 0,
-      minConnections: this.pool.options.min || 0,
+      totalConnections: pool.totalCount,
+      idleConnections: pool.idleCount,
+      waitingClients: pool.waitingCount,
+      maxConnections: 20, // Default from shared pool config
+      minConnections: 2,  // Default from shared pool config
       averageAcquireTime,
       totalAcquired: this.metrics.totalAcquired,
       totalReleased: this.metrics.totalReleased,
@@ -312,27 +254,19 @@ class ConnectionPoolService {
       waitingClients: number;
     };
   } {
-    if (!this.pool) {
-      return {
-        status: 'critical',
-        details: {
-          poolUtilization: 0,
-          averageAcquireTime: 0,
-          errorRate: 0,
-          waitingClients: 0
-        }
-      };
-    }
-
     const metrics = this.getPoolMetrics();
     const poolUtilization = (metrics.totalConnections - metrics.idleConnections) / metrics.maxConnections;
-    const errorRate = metrics.totalAcquired > 0 
-      ? (metrics.totalErrors / metrics.totalAcquired) * 100 
+    const errorRate = metrics.totalAcquired > 0
+      ? (metrics.totalErrors / metrics.totalAcquired) * 100
       : 0;
+
+    // Check circuit breaker state from shared pool
+    const circuitBreakerState = pool.circuitBreaker.getState();
 
     let status: 'healthy' | 'warning' | 'critical' = 'healthy';
 
-    if (poolUtilization > 0.9 || metrics.averageAcquireTime > 1000 || errorRate > 5) {
+    // Circuit breaker open is critical
+    if (circuitBreakerState === 'OPEN' || poolUtilization > 0.9 || metrics.averageAcquireTime > 1000 || errorRate > 5) {
       status = 'critical';
     } else if (poolUtilization > 0.7 || metrics.averageAcquireTime > 500 || errorRate > 2) {
       status = 'warning';
@@ -353,59 +287,34 @@ class ConnectionPoolService {
    * Close the connection pool
    */
   async close(): Promise<void> {
-    if (this.pool) {
-      await this.pool.end();
-      this.pool = null;
-      console.log('[Connection Pool] Closed connection pool');
-    }
+    // Use shared pool's close function
+    await closePools();
+    logger.info('[Connection Pool] Closed shared database pools', { component: 'SimpleTool' });
   }
 
   /**
    * Test database connection
    */
   private async testConnection(): Promise<void> {
-    if (!this.pool) {
-      throw new Error('Connection pool not initialized');
-    }
-
     try {
       const result = await this.query('SELECT NOW() as current_time, version() as pg_version');
-      console.log('[Connection Pool] Connection test successful:', {
+      logger.info('[Connection Pool] Connection test successful:', { component: 'SimpleTool' }, {
         currentTime: result.rows[0]?.current_time,
         version: result.rows[0]?.pg_version?.substring(0, 50) + '...'
       });
     } catch (error) {
-      console.error('[Connection Pool] Connection test failed:', error);
+      logger.error('[Connection Pool] Connection test failed:', { component: 'SimpleTool' }, { error });
       throw error;
     }
   }
 
   /**
    * Set up event listeners for monitoring
+   * Note: Event listeners are already set up in the shared pool
    */
   private setupEventListeners(): void {
-    if (!this.pool) return;
-
-    this.pool.on('connect', (client) => {
-      console.log('[Connection Pool] New client connected');
-    });
-
-    this.pool.on('acquire', (client) => {
-      // Client acquired from pool
-    });
-
-    this.pool.on('release', (client) => {
-      // Client released back to pool
-    });
-
-    this.pool.on('remove', (client) => {
-      console.log('[Connection Pool] Client removed from pool');
-    });
-
-    this.pool.on('error', (error, client) => {
-      console.error('[Connection Pool] Pool error:', error);
-      this.metrics.totalErrors++;
-    });
+    // Event listeners are handled by the shared pool implementation
+    logger.debug('[Connection Pool] Using shared pool event listeners', { component: 'SimpleTool' });
   }
 
   /**
@@ -415,11 +324,16 @@ class ConnectionPoolService {
     const metrics = this.getPoolMetrics();
     const health = this.getHealthStatus();
 
-    console.log('[Connection Pool] Current metrics:', {
+    // Get detailed health status from shared pool
+    const poolHealth = await checkPoolHealth(pool, 'general');
+
+    logger.info('[Connection Pool] Current metrics:', { component: 'SimpleTool' }, {
       utilization: health.details.poolUtilization.toFixed(2) + '%',
       averageAcquireTime: health.details.averageAcquireTime.toFixed(2) + 'ms',
       errorRate: health.details.errorRate.toFixed(2) + '%',
-      status: health.status
+      status: health.status,
+      circuitBreakerState: poolHealth.circuitBreakerState,
+      circuitBreakerFailures: poolHealth.circuitBreakerFailures
     });
 
     // Suggest optimizations based on metrics
@@ -441,13 +355,27 @@ class ConnectionPoolService {
       suggestions.push('Clients waiting for connections - consider pool tuning');
     }
 
+    if (poolHealth.circuitBreakerState === 'OPEN') {
+      suggestions.push('Circuit breaker is OPEN - database may be experiencing issues');
+    }
+
+    if (poolHealth.circuitBreakerFailures > 0) {
+      suggestions.push(`Circuit breaker has ${poolHealth.circuitBreakerFailures} failures - monitor database health`);
+    }
+
     if (suggestions.length > 0) {
-      console.log('[Connection Pool] Optimization suggestions:', suggestions);
+      logger.info('[Connection Pool] Optimization suggestions:', { component: 'SimpleTool' }, suggestions);
     } else {
-      console.log('[Connection Pool] Pool performance is optimal');
+      logger.info('[Connection Pool] Pool performance is optimal', { component: 'SimpleTool' });
     }
   }
 }
 
 // Export singleton instance
 export const connectionPoolService = new ConnectionPoolService();
+
+
+
+
+
+

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { RelatedPage } from '@/types/navigation';
+import { logger } from '../utils/logger.js';
 
 interface RelatedPagesProps {
   className?: string;

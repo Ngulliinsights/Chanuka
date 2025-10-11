@@ -7,6 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { performanceOptimizer } from '../../utils/performance-optimizer';
 import { cacheManager } from '../../utils/cache-strategy';
 import { performanceMonitor } from '../../utils/performanceMonitoring';
+import { logger } from '../utils/logger';
 
 // Mock performance APIs
 const mockPerformance = {
@@ -402,3 +403,9 @@ describe('Performance Integration', () => {
     expect(parsed).toHaveProperty('timestamp');
   });
 });
+
+
+
+
+
+

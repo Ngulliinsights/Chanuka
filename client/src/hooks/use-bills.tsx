@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { billsApi } from '@/services/api';
 import { useToast } from './use-toast';
+import { logger } from '../utils/logger.js';
 
 /**
  * Type definitions for query parameters and mutation payloads.
@@ -243,7 +244,7 @@ export function useRecordBillEngagement(billId: string | number) {
     },
     
     onError: (error: Error) => {
-      console.error('Failed to record engagement:', error);
+      logger.error('Failed to record engagement:', { component: 'SimpleTool' }, error);
     },
   });
 }

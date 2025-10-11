@@ -4,6 +4,7 @@ import ws from "ws";
 import * as fs from 'fs';
 import * as path from 'path';
 import { createHash } from 'crypto';
+import { logger } from '../utils/logger';
 
 // Load environment variables
 dotenv.config();
@@ -14,23 +15,23 @@ if (typeof window === 'undefined') {
 }
 
 async function runMigrations() {
-  console.log('🚀 Starting database migrations...');
+  logger.info('🚀 Starting database migrations...', { component: 'SimpleTool' });
 
   if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL must be set');
   }
 
   // Diagnostic logging for SSL authentication debugging
-  console.log('🔍 Migration Script Diagnostics:');
-  console.log('NODE_ENV:', process.env.NODE_ENV);
-  console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
-  console.log('DATABASE_URL starts with postgres:', process.env.DATABASE_URL?.startsWith('postgres'));
-  console.log('DATABASE_URL contains sslmode:', process.env.DATABASE_URL?.includes('sslmode'));
+  logger.info('🔍 Migration Script Diagnostics:', { component: 'SimpleTool' });
+  logger.info('NODE_ENV:', { component: 'SimpleTool' }, process.env.NODE_ENV);
+  logger.info('DATABASE_URL exists:', { component: 'SimpleTool' }, !!process.env.DATABASE_URL);
+  logger.info('DATABASE_URL starts with postgres:', { component: 'SimpleTool' }, process.env.DATABASE_URL?.startsWith('postgres'));
+  logger.info('DATABASE_URL contains sslmode:', { component: 'SimpleTool' }, process.env.DATABASE_URL?.includes('sslmode'));
   if (process.env.DATABASE_URL?.includes('sslmode')) {
     const sslmode = process.env.DATABASE_URL.match(/sslmode=([^&\s]+)/)?.[1];
-    console.log('SSL mode in URL:', sslmode);
+    logger.info('SSL mode in URL:', { component: 'SimpleTool' }, sslmode);
   }
-  console.log('Using Neon serverless pool');
+  logger.info('Using Neon serverless pool', { component: 'SimpleTool' });
 
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
@@ -99,9 +100,9 @@ async function runMigrations() {
       }
     }
 
-    console.log('🎉 All migrations completed successfully!');
+    logger.info('🎉 All migrations completed successfully!', { component: 'SimpleTool' });
   } catch (error) {
-    console.error('💥 Migration failed:', error.message);
+    logger.error('💥 Migration failed:', { component: 'SimpleTool' }, error.message);
     throw error;
   } finally {
     await pool.end();
@@ -110,10 +111,16 @@ async function runMigrations() {
 
 runMigrations()
   .then(() => {
-    console.log('Migration process completed');
+    logger.info('Migration process completed', { component: 'SimpleTool' });
     process.exit(0);
   })
   .catch((error) => {
-    console.error('Migration process failed:', error);
+    logger.error('Migration process failed:', { component: 'SimpleTool' }, error);
     process.exit(1);
   });
+
+
+
+
+
+

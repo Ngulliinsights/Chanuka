@@ -4,6 +4,7 @@ import { securityAuditService, SecurityEvent, SecurityIncident } from './securit
 import { emailService } from './email-service.js';
 import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, count, desc, eq } from 'drizzle-orm';
+import { logger }from '../../utils/logger';
 
 // Threat intelligence table
 const threatIntelligence = pgTable("threat_intelligence", {
@@ -264,7 +265,7 @@ export class IntrusionDetectionService {
 
       return { isThreat: false };
     } catch (error) {
-      console.error('Error checking threat intelligence:', error);
+      logger.error('Error checking threat intelligence:', { component: 'SimpleTool' }, error);
       return { isThreat: false };
     }
   }
@@ -431,7 +432,7 @@ export class IntrusionDetectionService {
       }
 
     } catch (error) {
-      console.error('Error analyzing behavioral anomalies:', error);
+      logger.error('Error analyzing behavioral anomalies:', { component: 'SimpleTool' }, error);
     }
 
     return threats;
@@ -643,7 +644,7 @@ export class IntrusionDetectionService {
         recommendations: this.generateIntrusionRecommendations(threats)
       };
     } catch (error) {
-      console.error('Error generating intrusion report:', error);
+      logger.error('Error generating intrusion report:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to generate intrusion detection report');
     }
   }
@@ -679,3 +680,11 @@ export const intrusionDetectionService = IntrusionDetectionService.getInstance()
 
 // Export table definitions for migrations
 export { threatIntelligence, attackPatterns };
+
+
+
+
+
+
+
+

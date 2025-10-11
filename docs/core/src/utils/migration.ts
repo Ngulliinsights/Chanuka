@@ -6,6 +6,7 @@
  */
 
 import type { AppConfig } from '../config/types';
+import { logger } from '../utils/logger';
 
 /**
  * Legacy Cache Adapter
@@ -454,3 +455,9 @@ Run \`MigrationValidator.validateMigration()\` to verify all services are workin
 }
 
 // All classes are already exported above with their definitions
+
+
+
+
+
+

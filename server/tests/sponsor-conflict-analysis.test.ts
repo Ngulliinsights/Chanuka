@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { sponsorConflictAnalysisService } from '../features/bills/sponsor-conflict-analysis.js';
+import { logger } from '../utils/logger';
 
 describe('SponsorConflictAnalysisService', () => {
   describe('calculateConflictSeverity', () => {
@@ -151,3 +152,9 @@ describe('Sponsor Conflict Analysis API Integration', () => {
     expect(Array.isArray(conflicts)).toBe(true);
   });
 });
+
+
+
+
+
+

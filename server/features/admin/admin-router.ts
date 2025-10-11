@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { authenticateToken, requireRole } from '../../middleware/auth.js';
 import { billsService } from '../bills/bills.js';
-import { ApiSuccess, ApiErrorResponse, ApiForbidden } from '../../utils/api-response.js';
+import { ApiSuccess, ApiError, ApiForbidden } from '../../utils/api-response.js';
 import { database as db } from '../../../shared/database/connection.js';
+import { logger } from '../../utils/logger';
+import { securityAuditService } from '../../features/security/security-audit-service.js';
 
 const router = Router();
 
@@ -58,7 +60,7 @@ router.get('/dashboard', async (req, res) => {
         }));
 
     } catch (error) {
-      console.error('Error fetching bill stats:', error);
+      logger.error('Error fetching bill stats:', { component: 'SimpleTool' }, error);
     }
 
     try {
@@ -85,12 +87,12 @@ router.get('/dashboard', async (req, res) => {
       }));
 
     } catch (error) {
-      console.error('Error fetching user stats:', error);
+      logger.error('Error fetching user stats:', { component: 'SimpleTool' }, error);
     }
 
     return ApiSuccess(res, stats);
   } catch (error) {
-    console.error('Admin dashboard error:', error);
+    logger.error('Admin dashboard error:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch dashboard data', 500);
   }
 });
@@ -155,7 +157,7 @@ router.get('/users', async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Admin users error:', error);
+    logger.error('Admin users error:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch users', 500);
   }
 });
@@ -187,12 +189,26 @@ router.put('/users/:id/role', async (req, res) => {
       return ApiError(res, 'User not found', 404);
     }
 
+    // Log admin action
+    await securityAuditService.logAdminAction(
+      'update_user_role',
+      req,
+      req.user!.id,
+      `user:${id}`,
+      {
+        targetUserId: id,
+        oldRole: result.rows[0].role !== role ? 'unknown' : role, // We don't have old role, so log what we know
+        newRole: role,
+        adminUserId: req.user!.id
+      }
+    );
+
     return ApiSuccess(res, {
       user: result.rows[0],
       message: 'User role updated successfully'
     });
   } catch (error) {
-    console.error('Update user role error:', error);
+    logger.error('Update user role error:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to update user role', 500);
   }
 });
@@ -224,12 +240,26 @@ router.put('/users/:id/status', async (req, res) => {
       return ApiError(res, 'User not found', 404);
     }
 
+    // Log admin action
+    await securityAuditService.logAdminAction(
+      'update_user_status',
+      req,
+      req.user!.id,
+      `user:${id}`,
+      {
+        targetUserId: id,
+        oldStatus: result.rows[0].is_active !== isActive ? 'unknown' : isActive,
+        newStatus: isActive,
+        adminUserId: req.user!.id
+      }
+    );
+
     return ApiSuccess(res, {
       user: result.rows[0],
       message: `User ${isActive ? 'activated' : 'deactivated'} successfully`
     });
   } catch (error) {
-    console.error('Update user status error:', error);
+    logger.error('Update user status error:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to update user status', 500);
   }
 });
@@ -263,12 +293,12 @@ router.get('/system/health', async (req, res) => {
     } catch (error) {
       health.status = 'degraded';
       health.database.connected = false;
-      console.error('Database health check failed:', error);
+      logger.error('Database health check failed:', { component: 'SimpleTool' }, error);
     }
 
     return ApiSuccess(res, health);
   } catch (error) {
-    console.error('System health error:', error);
+    logger.error('System health error:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch system health', 500);
   }
 });
@@ -281,12 +311,24 @@ router.post('/cache/clear', async (req, res) => {
   try {
     billsService.clearCache();
 
+    // Log admin action
+    await securityAuditService.logAdminAction(
+      'clear_cache',
+      req,
+      req.user!.id,
+      'system:cache',
+      {
+        adminUserId: req.user!.id,
+        cacheType: 'application_cache'
+      }
+    );
+
     return ApiSuccess(res, {
       message: 'Cache cleared successfully',
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Cache clear error:', error);
+    logger.error('Cache clear error:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to clear cache', 500);
   }
 });
@@ -317,9 +359,17 @@ router.get('/logs', async (req, res) => {
       limit: logLimit
     });
   } catch (error) {
-    console.error('Admin logs error:', error);
+    logger.error('Admin logs error:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch logs', 500);
   }
 });
 
 export { router };
+
+
+
+
+
+
+
+

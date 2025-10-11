@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import DOMPurify from 'isomorphic-dompurify';
 import { encryptionService } from '../../features/security/encryption-service.js';
+import { logger } from '../utils/logger';
 
 /**
  * Comprehensive input validation and sanitization service
@@ -409,3 +410,9 @@ export class InputValidationService {
 
 // Singleton instance
 export const inputValidationService = new InputValidationService();
+
+
+
+
+
+

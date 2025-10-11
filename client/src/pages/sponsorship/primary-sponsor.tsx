@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
+import { logger } from '../utils/logger.js';
   ArrowLeft, 
   ChevronLeft, 
   ChevronRight, 
@@ -99,7 +100,7 @@ export default function PrimarySponsorAnalysis({ billId }: PrimarySponsorProps) 
         const data = await response.json();
         setSponsor(data);
       } catch (err) {
-        console.error('Error fetching primary sponsor data:', err);
+        logger.error('Error fetching primary sponsor data:', { component: 'SimpleTool' }, err);
         setError(err instanceof Error ? err.message : 'Failed to load primary sponsor data');
       } finally {
         setLoading(false);

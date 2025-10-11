@@ -1,5 +1,6 @@
 import { Logger } from '@/logging';
 import { MigrationMetrics } from '../monitoring/MigrationMetrics';
+import { logger } from '../utils/logger';
 
 export type DualOperationOptions = {
   preferenceLegacy?: boolean;
@@ -128,3 +129,10 @@ export abstract class BaseAdapter {
     }
   }
 }
+
+
+
+
+
+
+

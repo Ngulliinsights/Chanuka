@@ -1,10 +1,11 @@
 import { eq, and, desc, sql, inArray } from 'drizzle-orm';
-import { databaseService } from '../../services/database-service.js';
+import { databaseService } from '../../infrastructure/database/database-service.js';
 import { notificationChannelService } from '../../infrastructure/notifications/notification-channels.js';
 import { userProfileService } from './user-profile.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service.js';
 import * as schema from '../../../shared/schema.js';
 import { z } from 'zod';
+import { logger } from '../../utils/logger';
 
 // Types and interfaces
 export interface AlertChannel {
@@ -490,7 +491,7 @@ export class AlertPreferenceService {
       };
 
     } catch (error) {
-      console.error('Error processing smart filtering:', error);
+      logger.error('Error processing smart filtering:', { component: 'SimpleTool' }, error);
       // Default to sending on error
       return {
         shouldSend: true,
@@ -874,7 +875,7 @@ export class AlertPreferenceService {
       return totalChecks > 0 ? Math.min(matchScore / totalChecks, 1.0) : 0.5;
 
     } catch (error) {
-      console.error('Error calculating user interest score:', error);
+      logger.error('Error calculating user interest score:', { component: 'SimpleTool' }, error);
       return 0.5;
     }
   }
@@ -902,7 +903,7 @@ export class AlertPreferenceService {
       return engagementScore;
 
     } catch (error) {
-      console.error('Error calculating engagement history score:', error);
+      logger.error('Error calculating engagement history score:', { component: 'SimpleTool' }, error);
       return 0.5;
     }
   }
@@ -924,7 +925,7 @@ export class AlertPreferenceService {
       );
 
     } catch (error) {
-      console.error('Error checking for duplicate alert:', error);
+      logger.error('Error checking for duplicate alert:', { component: 'SimpleTool' }, error);
       return false;
     }
   }
@@ -938,7 +939,7 @@ export class AlertPreferenceService {
       return sameTypeCount > 10;
 
     } catch (error) {
-      console.error('Error checking for spam:', error);
+      logger.error('Error checking for spam:', { component: 'SimpleTool' }, error);
       return false;
     }
   }
@@ -974,7 +975,7 @@ export class AlertPreferenceService {
       return { success: true };
 
     } catch (error) {
-      console.error('Error delivering immediate alert:', error);
+      logger.error('Error delivering immediate alert:', { component: 'SimpleTool' }, error);
       return { 
         success: false, 
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -994,7 +995,7 @@ export class AlertPreferenceService {
       
       await cacheService.set(batchKey, existingBatch, CACHE_TTL.NOTIFICATIONS);
     } catch (error) {
-      console.error('Error adding to batch:', error);
+      logger.error('Error adding to batch:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -1014,7 +1015,7 @@ export class AlertPreferenceService {
         channels: ['in_app']
       });
     } catch (error) {
-      console.error('Error sending preference update notification:', error);
+      logger.error('Error sending preference update notification:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -1091,10 +1092,18 @@ export class AlertPreferenceService {
    * Shutdown service
    */
   async shutdown(): Promise<void> {
-    console.log('Shutting down Alert Preference Service...');
+    logger.info('Shutting down Alert Preference Service...', { component: 'SimpleTool' });
     // Cleanup any resources if needed
-    console.log('Alert Preference Service shutdown complete');
+    logger.info('Alert Preference Service shutdown complete', { component: 'SimpleTool' });
   }
 }
 
 export const alertPreferenceService = new AlertPreferenceService();
+
+
+
+
+
+
+
+

@@ -113,3 +113,9 @@ export function hasSchema(name: string): boolean {
 export function listAvailableSchemas(): string[] {
   return schemaRegistry.listSchemas();
 }
+
+
+
+
+
+

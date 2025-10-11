@@ -14,6 +14,7 @@ import {
   type SocialProfile,
 } from '../../shared/schema.js';
 import session from 'express-session';
+import { logger } from '../utils/logger';
 // Simple memory store implementation since memorystore is not available
 class SimpleMemoryStore extends session.Store {
   private sessions: Map<string, any> = new Map();
@@ -683,3 +684,10 @@ export class MemStorage implements IStorage {
 }
 
 export const storage = new MemStorage();
+
+
+
+
+
+
+

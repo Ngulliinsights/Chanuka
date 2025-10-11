@@ -1,4 +1,5 @@
 import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../rate-limiting/types';
+import { logger } from '../utils/logger';
 
 /**
  * Modern rate limiting service implementation that uses the new RateLimitStore interface
@@ -52,3 +53,10 @@ export class RateLimitingService {
     return await this.store.healthCheck?.() ?? true;
   }
 }
+
+
+
+
+
+
+

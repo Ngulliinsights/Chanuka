@@ -1,5 +1,6 @@
 import { UserJourneyTracker, UserJourney, JourneyStep } from '../UserJourneyTracker';
 import { UserRole, NavigationSection } from '@/types/navigation';
+import { logger } from '../utils/logger';
 
 describe('UserJourneyTracker', () => {
   let tracker: UserJourneyTracker;
@@ -399,3 +400,9 @@ describe('UserJourneyTracker Edge Cases', () => {
     expect(analytics.dropOffPoints).toHaveLength(0);
   });
 });
+
+
+
+
+
+

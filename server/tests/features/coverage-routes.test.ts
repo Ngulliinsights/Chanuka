@@ -1,25 +1,26 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
-import coverageRouter from '../../features/coverage/coverage-routes';
-import { CoverageAnalyzer } from '../../services/coverage-analyzer';
-
-// Mock the CoverageAnalyzer
+// Mock the CoverageAnalyzer (module will be imported dynamically after env is set)
 jest.mock('../../services/coverage-analyzer');
-
-const MockedCoverageAnalyzer = CoverageAnalyzer as jest.MockedClass<typeof CoverageAnalyzer>;
 
 describe('Coverage Routes', () => {
   let app: express.Application;
-  let mockCoverageAnalyzer: jest.Mocked<CoverageAnalyzer>;
+  let mockCoverageAnalyzer: any;
+  let coverageRouter: any;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     app = express();
     app.use(express.json());
-    
+
     // Reset mocks
     jest.clearAllMocks();
-    
+
+  // Ensure test environment uses 'test' and has sufficiently long secrets to pass config validation
+  process.env.NODE_ENV = 'test';
+  process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-long-jwt-secret-to-pass-validation-2025-0123456789';
+  process.env.SESSION_SECRET = process.env.SESSION_SECRET || 'test-long-session-secret-to-pass-validation-2025-0123456789';
+
     // Create mock instance
     mockCoverageAnalyzer = {
       analyzeServerCoverage: jest.fn(),
@@ -28,17 +29,21 @@ describe('Coverage Routes', () => {
       identifyGaps: jest.fn(),
       generateCoverageReport: jest.fn()
     } as any;
+    // Dynamically import the mocked CoverageAnalyzer and set the implementation
+    const imported = await import('../../services/coverage-analyzer');
+    const CoverageAnalyzer = imported.CoverageAnalyzer as unknown as jest.MockedClass<any>;
+    CoverageAnalyzer.mockImplementation(() => mockCoverageAnalyzer);
 
-    MockedCoverageAnalyzer.mockImplementation(() => mockCoverageAnalyzer);
-    
     // Import router after mocking
+    const routerModule = await import('../../features/coverage/coverage-routes');
+    coverageRouter = routerModule.default;
     app.use('/api/coverage', coverageRouter);
   });
 
   describe('GET /api/coverage/report', () => {
     it('should return comprehensive coverage report', async () => {
       const mockReport = {
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
         serverCoverage: {
           lines: { total: 100, covered: 85, percentage: 85 },
           functions: { total: 25, covered: 20, percentage: 80 },
@@ -76,11 +81,14 @@ describe('Coverage Routes', () => {
         recommendations: []
       };
 
-      mockCoverageAnalyzer.generateCoverageReport.mockResolvedValue(mockReport);
+  mockCoverageAnalyzer.generateCoverageReport.mockResolvedValue(mockReport as any);
 
       const response = await request(app)
         .get('/api/coverage/report')
         .expect(200);
+      // DEBUG: inspect returned body when tests fail
+      // eslint-disable-next-line no-console
+      console.log('DEBUG /api/coverage/report response.body:', JSON.stringify(response.body, null, 2));
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toEqual(mockReport);
@@ -159,7 +167,7 @@ describe('Coverage Routes', () => {
           location: '/server/auth.ts:validateToken',
           severity: 'critical' as const,
           description: 'Function validateToken is not covered by tests',
-          suggestedTest: 'Create unit test for function in /server/auth.ts:validateToken'
+          impact: 'Critical function coverage gap affecting core functionality'
         },
         {
           type: 'statement' as const,
@@ -167,7 +175,7 @@ describe('Coverage Routes', () => {
           location: '/client/components/test.tsx:15',
           severity: 'medium' as const,
           description: 'Line 15 in /client/components/test.tsx is not covered',
-          suggestedTest: 'Add test case to cover statement at /client/components/test.tsx:15'
+          impact: 'Code statements not executed during tests'
         }
       ];
 
@@ -231,7 +239,7 @@ describe('Coverage Routes', () => {
 
     it('should trigger comprehensive analysis by default', async () => {
       const mockReport = {
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
         serverCoverage: {},
         clientCoverage: {},
         integrationCoverage: {},
@@ -240,7 +248,7 @@ describe('Coverage Routes', () => {
         recommendations: []
       };
 
-      mockCoverageAnalyzer.generateCoverageReport.mockResolvedValue(mockReport as any);
+  mockCoverageAnalyzer.generateCoverageReport.mockResolvedValue(mockReport as any);
 
       const response = await request(app)
         .post('/api/coverage/analyze')
@@ -253,3 +261,9 @@ describe('Coverage Routes', () => {
     });
   });
 });
+
+
+
+
+
+

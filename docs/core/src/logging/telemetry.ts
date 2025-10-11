@@ -1,5 +1,6 @@
 import { Event } from './schemas';
 import { loggingService } from './service';
+import { logger } from '../utils/logger';
 
 /**
  * Telemetry Aggregator
@@ -254,3 +255,10 @@ interface SystemMetrics {
 
 // Export singleton instance
 export const telemetryAggregator = TelemetryAggregator.getInstance();
+
+
+
+
+
+
+

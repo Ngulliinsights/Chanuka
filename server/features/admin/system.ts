@@ -1,8 +1,10 @@
 import express, { Request, Response } from 'express';
 import { sql } from 'drizzle-orm';
 import { database as db } from '../../../shared/database/connection.js';
-import { HealthCheckResponse, createApiResponse, createErrorResponse } from '../../types/api.ts';
+import { HealthCheckResponse } from '../../types/api.ts';
 import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../utils/api-response.ts";
+import { errorTracker } from '../../core/errors/error-tracker.js';
+import { logger } from '../../utils/logger';
 
 interface SchemaIssue {
   type: string;
@@ -46,8 +48,13 @@ export function setupSystemRoutes(app: express.Router) {
         analyzed: new Date().toISOString()
       }, ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Schema analysis failed:', error);
-      return ApiError(res, 'Failed to analyze database schema', 500, 
+      errorTracker.trackRequestError(
+        error as Error,
+        req,
+        'medium',
+        'database'
+      );
+      return ApiError(res, 'Failed to analyze database schema', 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   });
@@ -95,8 +102,13 @@ export function setupSystemRoutes(app: express.Router) {
         }
       }, ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Database stats failed:', error);
-      return ApiError(res, 'Failed to get database statistics', 500, 
+      errorTracker.trackRequestError(
+        error as Error,
+        req,
+        'medium',
+        'database'
+      );
+      return ApiError(res, 'Failed to get database statistics', 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   });
@@ -183,8 +195,13 @@ export function setupSystemRoutes(app: express.Router) {
         checkedAt: new Date().toISOString()
       }, ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('Schema consistency check failed:', error);
-      return ApiError(res, 'Failed to check schema consistency', 500, 
+      errorTracker.trackRequestError(
+        error as Error,
+        req,
+        'medium',
+        'database'
+      );
+      return ApiError(res, 'Failed to check schema consistency', 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   });
@@ -204,17 +221,22 @@ export function setupSystemRoutes(app: express.Router) {
         uptime: process.uptime()
       };
 
-      return ApiSuccess(res, healthResponse, 
+      return ApiSuccess(res, healthResponse,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error('System health check failed:', error);
+      errorTracker.trackRequestError(
+        error as Error,
+        req,
+        'high',
+        'database'
+      );
       const errorResponse: HealthCheckResponse = {
         status: 'unhealthy',
         database: 'error',
         timestamp: new Date().toISOString(),
         error: error instanceof Error ? error.message : 'Unknown error'
       };
-      return ApiError(res, errorResponse, 500, 
+      return ApiError(res, error instanceof Error ? error : 'System health check failed', 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   });
@@ -225,3 +247,11 @@ setupSystemRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
+
+
+
+
+
+
+

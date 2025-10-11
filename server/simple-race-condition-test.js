@@ -6,11 +6,11 @@
  * This script performs basic testing to verify race condition fixes are working
  */
 
-console.log('🧪 Starting Simple Race Condition Test...\n');
+logger.info('🧪 Starting Simple Race Condition Test...\n', { component: 'SimpleTool' });
 
 // Test 1: Database service singleton behavior
 async function testDatabaseSingleton() {
-  console.log('🗄️ Test 1: Database service singleton behavior...');
+  logger.info('🗄️ Test 1: Database service singleton behavior...', { component: 'SimpleTool' });
   
   try {
     // Import the database service multiple times
@@ -18,10 +18,10 @@ async function testDatabaseSingleton() {
     const { databaseService: db2 } = await import('./services/database-service.js');
     
     if (db1 === db2) {
-      console.log('✅ Database service: Singleton pattern working correctly');
+      logger.info('✅ Database service: Singleton pattern working correctly', { component: 'SimpleTool' });
       return true;
     } else {
-      console.log('❌ Database service: Multiple instances detected');
+      logger.info('❌ Database service: Multiple instances detected', { component: 'SimpleTool' });
       return false;
     }
   } catch (error) {
@@ -32,17 +32,17 @@ async function testDatabaseSingleton() {
 
 // Test 2: WebSocket service singleton behavior
 async function testWebSocketSingleton() {
-  console.log('🔌 Test 2: WebSocket service singleton behavior...');
+  logger.info('🔌 Test 2: WebSocket service singleton behavior...', { component: 'SimpleTool' });
   
   try {
     const { webSocketService: ws1 } = await import('./infrastructure/websocket.js');
     const { webSocketService: ws2 } = await import('./infrastructure/websocket.js');
     
     if (ws1 === ws2) {
-      console.log('✅ WebSocket service: Singleton pattern working correctly');
+      logger.info('✅ WebSocket service: Singleton pattern working correctly', { component: 'SimpleTool' });
       return true;
     } else {
-      console.log('❌ WebSocket service: Multiple instances detected');
+      logger.info('❌ WebSocket service: Multiple instances detected', { component: 'SimpleTool' });
       return false;
     }
   } catch (error) {
@@ -53,7 +53,7 @@ async function testWebSocketSingleton() {
 
 // Test 3: Memory usage stability
 async function testMemoryStability() {
-  console.log('🧠 Test 3: Memory usage stability...');
+  logger.info('🧠 Test 3: Memory usage stability...', { component: 'SimpleTool' });
   
   const initialMemory = process.memoryUsage();
   
@@ -91,7 +91,7 @@ async function testMemoryStability() {
 
 // Test 4: Concurrent operations
 async function testConcurrentOperations() {
-  console.log('⚡ Test 4: Concurrent operations handling...');
+  logger.info('⚡ Test 4: Concurrent operations handling...', { component: 'SimpleTool' });
   
   const startTime = Date.now();
   const concurrentOps = [];
@@ -112,18 +112,18 @@ async function testConcurrentOperations() {
   
   // Check if all operations completed
   if (results.length === 10) {
-    console.log('✅ Concurrent operations: All completed successfully');
+    logger.info('✅ Concurrent operations: All completed successfully', { component: 'SimpleTool' });
     console.log(`   Completion times: ${results.map(r => r.completedAt + 'ms').join(', ')}`);
     return true;
   } else {
-    console.log('❌ Concurrent operations: Some operations failed');
+    logger.info('❌ Concurrent operations: Some operations failed', { component: 'SimpleTool' });
     return false;
   }
 }
 
 // Test 5: Resource cleanup
 async function testResourceCleanup() {
-  console.log('🧹 Test 5: Resource cleanup...');
+  logger.info('🧹 Test 5: Resource cleanup...', { component: 'SimpleTool' });
   
   let intervalCount = 0;
   let timeoutCount = 0;
@@ -174,7 +174,7 @@ async function testResourceCleanup() {
   global.clearTimeout = originalClearTimeout;
   
   if (intervalCount === 0 && timeoutCount <= 0) {
-    console.log('✅ Resource cleanup: All resources properly cleaned up');
+    logger.info('✅ Resource cleanup: All resources properly cleaned up', { component: 'SimpleTool' });
     return true;
   } else {
     console.log(`⚠️ Resource cleanup: ${intervalCount} intervals, ${timeoutCount} timeouts remaining`);
@@ -184,7 +184,7 @@ async function testResourceCleanup() {
 
 // Main test runner
 async function runTests() {
-  console.log('🧪 Running Simple Race Condition Tests...\n');
+  logger.info('🧪 Running Simple Race Condition Tests...\n', { component: 'SimpleTool' });
   
   const results = [];
   
@@ -198,27 +198,27 @@ async function runTests() {
     const passed = results.filter(r => r).length;
     const total = results.length;
     
-    console.log('\n📊 Test Results:');
-    console.log('='.repeat(40));
+    logger.info('\n📊 Test Results:', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(40));
     console.log(`✅ Passed: ${passed}/${total}`);
     console.log(`❌ Failed: ${total - passed}/${total}`);
-    console.log('='.repeat(40));
+    logger.info('=', { component: 'SimpleTool' }, .repeat(40));
     
     if (passed === total) {
-      console.log('\n🎉 All tests passed! Race condition fixes are working correctly.');
+      logger.info('\n🎉 All tests passed! Race condition fixes are working correctly.', { component: 'SimpleTool' });
     } else {
       console.log(`\n⚠️ ${total - passed} test(s) failed. Some issues may need attention.`);
     }
     
-    console.log('\n📋 Summary:');
-    console.log('- Database service singleton: ✅');
-    console.log('- WebSocket service singleton: ✅');
-    console.log('- Memory stability: ✅');
-    console.log('- Concurrent operations: ✅');
-    console.log('- Resource cleanup: ✅');
+    logger.info('\n📋 Summary:', { component: 'SimpleTool' });
+    logger.info('- Database service singleton: ✅', { component: 'SimpleTool' });
+    logger.info('- WebSocket service singleton: ✅', { component: 'SimpleTool' });
+    logger.info('- Memory stability: ✅', { component: 'SimpleTool' });
+    logger.info('- Concurrent operations: ✅', { component: 'SimpleTool' });
+    logger.info('- Resource cleanup: ✅', { component: 'SimpleTool' });
     
   } catch (error) {
-    console.error('❌ Test suite failed:', error);
+    logger.error('❌ Test suite failed:', { component: 'SimpleTool' }, error);
     process.exit(1);
   }
 }

@@ -6,6 +6,7 @@
  */
 
 import { logger as coreLogger } from '../logger';
+import { logger } from '../utils/logger';
 
 interface LegacyLogger {
   info: (message: string, ...args: unknown[]) => void;
@@ -57,3 +58,9 @@ const createLegacyLogger = (): LegacyLogger => {
 
 export const logger = createLegacyLogger();
 export default logger;
+
+
+
+
+
+

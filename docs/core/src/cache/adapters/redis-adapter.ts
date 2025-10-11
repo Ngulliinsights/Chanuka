@@ -10,6 +10,7 @@ import { compress, decompress } from 'zlib';
 import { promisify } from 'util';
 import { BaseCacheAdapter } from '../base-adapter';
 import type { 
+import { logger } from '../utils/logger';
   CacheOptions, 
   CacheHealthStatus, 
   CompressionOptions,
@@ -622,3 +623,9 @@ export class RedisAdapter extends BaseCacheAdapter {
     this.disconnect();
   }
 }
+
+
+
+
+
+

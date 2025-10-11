@@ -3,6 +3,7 @@ import { promises as fs } from 'fs';
 import * as path from 'path';
 import { Logger } from '../logging';
 import {
+import { logger } from '../utils/logger';
   AnalysisResult,
   AnalysisType,
   Finding,
@@ -728,3 +729,9 @@ export class AnalysisEngine extends EventEmitter {
     return [];
   }
 }
+
+
+
+
+
+

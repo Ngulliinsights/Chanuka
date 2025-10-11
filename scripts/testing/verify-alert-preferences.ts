@@ -2,18 +2,19 @@ import { alertPreferenceService } from './services/alert-preference.js';
 import { db } from './db.js';
 import { users, bills, userInterests } from '../shared/schema.js';
 import { eq } from 'drizzle-orm';
+import { logger } from '../utils/logger';
 
 async function verifyAlertPreferences() {
-  console.log('🔍 Verifying Alert Preference Management System...');
+  logger.info('🔍 Verifying Alert Preference Management System...', { component: 'SimpleTool' });
   
   try {
     // Test 1: Check service initialization
-    console.log('1. Testing service initialization...');
+    logger.info('1. Testing service initialization...', { component: 'SimpleTool' });
     const initialStats = alertPreferenceService.getStats();
-    console.log('✅ Alert preference service initialized:', initialStats);
+    logger.info('✅ Alert preference service initialized:', { component: 'SimpleTool' }, initialStats);
 
     // Test 2: Create test data
-    console.log('2. Creating test data...');
+    logger.info('2. Creating test data...', { component: 'SimpleTool' });
     
     // Create test user
     const [testUser] = await db
@@ -50,13 +51,13 @@ async function verifyAlertPreferences() {
         { userId: testUser.id, interest: 'education' }
       ]);
     
-    console.log('✅ Test data created:', {
+    logger.info('✅ Test data created:', { component: 'SimpleTool' }, {
       userId: testUser.id,
       billId: testBill.id
     });
 
     // Test 3: Create alert preference
-    console.log('3. Testing alert preference creation...');
+    logger.info('3. Testing alert preference creation...', { component: 'SimpleTool' });
     
     const preferenceData = {
       name: 'Healthcare Alerts',
@@ -110,7 +111,7 @@ async function verifyAlertPreferences() {
       preferenceData
     );
     
-    console.log('✅ Alert preference created:', {
+    logger.info('✅ Alert preference created:', { component: 'SimpleTool' }, {
       id: createdPreference.id,
       name: createdPreference.name,
       alertTypesCount: createdPreference.alertTypes.length,
@@ -118,30 +119,30 @@ async function verifyAlertPreferences() {
     });
 
     // Test 4: Get user alert preferences
-    console.log('4. Testing get user alert preferences...');
+    logger.info('4. Testing get user alert preferences...', { component: 'SimpleTool' });
     
     const userPreferences = await alertPreferenceService.getUserAlertPreferences(testUser.id);
-    console.log('✅ User preferences retrieved:', {
+    logger.info('✅ User preferences retrieved:', { component: 'SimpleTool' }, {
       count: userPreferences.length,
       firstPreferenceName: userPreferences[0]?.name
     });
 
     // Test 5: Get specific alert preference
-    console.log('5. Testing get specific alert preference...');
+    logger.info('5. Testing get specific alert preference...', { component: 'SimpleTool' });
     
     const specificPreference = await alertPreferenceService.getAlertPreference(
       testUser.id,
       createdPreference.id
     );
     
-    console.log('✅ Specific preference retrieved:', {
+    logger.info('✅ Specific preference retrieved:', { component: 'SimpleTool' }, {
       found: !!specificPreference,
       name: specificPreference?.name,
       isActive: specificPreference?.isActive
     });
 
     // Test 6: Update alert preference
-    console.log('6. Testing alert preference update...');
+    logger.info('6. Testing alert preference update...', { component: 'SimpleTool' });
     
     const updatedPreference = await alertPreferenceService.updateAlertPreference(
       testUser.id,
@@ -160,13 +161,13 @@ async function verifyAlertPreferences() {
       }
     );
     
-    console.log('✅ Preference updated:', {
+    logger.info('✅ Preference updated:', { component: 'SimpleTool' }, {
       name: updatedPreference.name,
       userInterestWeight: updatedPreference.smartFiltering.userInterestWeight
     });
 
     // Test 7: Create alert rule
-    console.log('7. Testing alert rule creation...');
+    logger.info('7. Testing alert rule creation...', { component: 'SimpleTool' });
     
     const ruleData = {
       name: 'High Priority Healthcare Rule',
@@ -189,14 +190,14 @@ async function verifyAlertPreferences() {
       ruleData
     );
     
-    console.log('✅ Alert rule created:', {
+    logger.info('✅ Alert rule created:', { component: 'SimpleTool' }, {
       id: createdRule.id,
       name: createdRule.name,
       priority: createdRule.actions.priority
     });
 
     // Test 8: Test smart filtering
-    console.log('8. Testing smart filtering...');
+    logger.info('8. Testing smart filtering...', { component: 'SimpleTool' });
     
     const alertData = {
       billId: testBill.id,
@@ -213,7 +214,7 @@ async function verifyAlertPreferences() {
       updatedPreference
     );
     
-    console.log('✅ Smart filtering processed:', {
+    logger.info('✅ Smart filtering processed:', { component: 'SimpleTool' }, {
       shouldSend: filteringResult.shouldSend,
       confidence: filteringResult.confidence,
       adjustedPriority: filteringResult.adjustedPriority,
@@ -221,7 +222,7 @@ async function verifyAlertPreferences() {
     });
 
     // Test 9: Process alert delivery
-    console.log('9. Testing alert delivery processing...');
+    logger.info('9. Testing alert delivery processing...', { component: 'SimpleTool' });
     
     const deliveryLogs = await alertPreferenceService.processAlertDelivery(
       testUser.id,
@@ -230,31 +231,31 @@ async function verifyAlertPreferences() {
       'normal'
     );
     
-    console.log('✅ Alert delivery processed:', {
+    logger.info('✅ Alert delivery processed:', { component: 'SimpleTool' }, {
       logsCount: deliveryLogs.length,
       firstLogStatus: deliveryLogs[0]?.status,
       channelsUsed: deliveryLogs[0]?.channels
     });
 
     // Test 10: Get alert delivery logs
-    console.log('10. Testing get alert delivery logs...');
+    logger.info('10. Testing get alert delivery logs...', { component: 'SimpleTool' });
     
     const logsResult = await alertPreferenceService.getAlertDeliveryLogs(testUser.id, {
       page: 1,
       limit: 10
     });
     
-    console.log('✅ Delivery logs retrieved:', {
+    logger.info('✅ Delivery logs retrieved:', { component: 'SimpleTool' }, {
       totalLogs: logsResult.pagination.total,
       logsOnPage: logsResult.logs.length,
       firstLogType: logsResult.logs[0]?.alertType
     });
 
     // Test 11: Get alert preference statistics
-    console.log('11. Testing alert preference statistics...');
+    logger.info('11. Testing alert preference statistics...', { component: 'SimpleTool' });
     
     const stats = await alertPreferenceService.getAlertPreferenceStats(testUser.id);
-    console.log('✅ Preference statistics retrieved:', {
+    logger.info('✅ Preference statistics retrieved:', { component: 'SimpleTool' }, {
       totalPreferences: stats.totalPreferences,
       activePreferences: stats.activePreferences,
       totalAlerts: stats.deliveryStats.totalAlerts,
@@ -262,7 +263,7 @@ async function verifyAlertPreferences() {
     });
 
     // Test 12: Test different alert types
-    console.log('12. Testing different alert types...');
+    logger.info('12. Testing different alert types...', { component: 'SimpleTool' });
     
     const alertTypes = ['new_comment', 'amendment', 'voting_scheduled'];
     
@@ -281,7 +282,7 @@ async function verifyAlertPreferences() {
     }
 
     // Test 13: Test batched alert preference
-    console.log('13. Testing batched alert preference...');
+    logger.info('13. Testing batched alert preference...', { component: 'SimpleTool' });
     
     const batchedPreferenceData = {
       name: 'Daily Digest',
@@ -322,14 +323,14 @@ async function verifyAlertPreferences() {
       batchedPreferenceData
     );
     
-    console.log('✅ Batched preference created:', {
+    logger.info('✅ Batched preference created:', { component: 'SimpleTool' }, {
       id: batchedPreference.id,
       frequencyType: batchedPreference.frequency.type,
       batchInterval: batchedPreference.frequency.batchInterval
     });
 
     // Test 14: Delete alert preference
-    console.log('14. Testing alert preference deletion...');
+    logger.info('14. Testing alert preference deletion...', { component: 'SimpleTool' });
     
     await alertPreferenceService.deleteAlertPreference(testUser.id, batchedPreference.id);
     
@@ -338,62 +339,68 @@ async function verifyAlertPreferences() {
       batchedPreference.id
     );
     
-    console.log('✅ Preference deletion tested:', {
+    logger.info('✅ Preference deletion tested:', { component: 'SimpleTool' }, {
       deleted: !deletedPreference
     });
 
     // Test 15: Final statistics check
-    console.log('15. Testing final statistics...');
+    logger.info('15. Testing final statistics...', { component: 'SimpleTool' });
     
     const finalStats = await alertPreferenceService.getAlertPreferenceStats(testUser.id);
-    console.log('✅ Final statistics:', {
+    logger.info('✅ Final statistics:', { component: 'SimpleTool' }, {
       totalPreferences: finalStats.totalPreferences,
       totalAlerts: finalStats.deliveryStats.totalAlerts,
       channelStats: Object.keys(finalStats.channelStats).length
     });
 
     // Test 16: Service shutdown
-    console.log('16. Testing service shutdown...');
+    logger.info('16. Testing service shutdown...', { component: 'SimpleTool' });
     await alertPreferenceService.shutdown();
-    console.log('✅ Service shutdown completed');
+    logger.info('✅ Service shutdown completed', { component: 'SimpleTool' });
 
     // Cleanup test data
-    console.log('🧹 Cleaning up test data...');
+    logger.info('🧹 Cleaning up test data...', { component: 'SimpleTool' });
     await db.delete(userInterests).where(eq(userInterests.userId, testUser.id));
     await db.delete(bills).where(eq(bills.id, testBill.id));
     await db.delete(users).where(eq(users.id, testUser.id));
-    console.log('✅ Test data cleaned up');
+    logger.info('✅ Test data cleaned up', { component: 'SimpleTool' });
 
-    console.log('\n🎉 All Alert Preference Management System tests passed!');
-    console.log('\n📋 Task 5.3 Implementation Summary:');
-    console.log('✅ User alert preference CRUD operations - IMPLEMENTED');
-    console.log('✅ Notification channel selection (email, in-app, SMS) - IMPLEMENTED');
-    console.log('✅ Alert frequency and timing preferences - IMPLEMENTED');
-    console.log('✅ Smart notification filtering based on user interests - IMPLEMENTED');
-    console.log('\n🔧 Additional Features Implemented:');
-    console.log('✅ Comprehensive alert preference management system');
-    console.log('✅ Smart filtering with user interest weighting');
-    console.log('✅ Engagement history-based filtering');
-    console.log('✅ Trending topic weighting for relevance');
-    console.log('✅ Duplicate and spam filtering mechanisms');
-    console.log('✅ Alert rule creation with complex conditions');
-    console.log('✅ Multi-channel alert delivery system');
-    console.log('✅ Batched notification support with scheduling');
-    console.log('✅ Alert delivery logging and tracking');
-    console.log('✅ Comprehensive statistics and analytics');
-    console.log('✅ Priority-based channel selection');
-    console.log('✅ Quiet hours support for channels');
-    console.log('✅ RESTful API endpoints for all operations');
-    console.log('✅ Integration with notification service');
-    console.log('✅ User interest-based smart recommendations');
-    console.log('✅ Configurable filtering weights and thresholds');
-    console.log('\n✨ Alert Preference Management System is fully functional and production-ready!');
+    logger.info('\n🎉 All Alert Preference Management System tests passed!', { component: 'SimpleTool' });
+    logger.info('\n📋 Task 5.3 Implementation Summary:', { component: 'SimpleTool' });
+    logger.info('✅ User alert preference CRUD operations - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('✅ Notification channel selection (email, in-app, SMS) - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('✅ Alert frequency and timing preferences - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('✅ Smart notification filtering based on user interests - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('\n🔧 Additional Features Implemented:', { component: 'SimpleTool' });
+    logger.info('✅ Comprehensive alert preference management system', { component: 'SimpleTool' });
+    logger.info('✅ Smart filtering with user interest weighting', { component: 'SimpleTool' });
+    logger.info('✅ Engagement history-based filtering', { component: 'SimpleTool' });
+    logger.info('✅ Trending topic weighting for relevance', { component: 'SimpleTool' });
+    logger.info('✅ Duplicate and spam filtering mechanisms', { component: 'SimpleTool' });
+    logger.info('✅ Alert rule creation with complex conditions', { component: 'SimpleTool' });
+    logger.info('✅ Multi-channel alert delivery system', { component: 'SimpleTool' });
+    logger.info('✅ Batched notification support with scheduling', { component: 'SimpleTool' });
+    logger.info('✅ Alert delivery logging and tracking', { component: 'SimpleTool' });
+    logger.info('✅ Comprehensive statistics and analytics', { component: 'SimpleTool' });
+    logger.info('✅ Priority-based channel selection', { component: 'SimpleTool' });
+    logger.info('✅ Quiet hours support for channels', { component: 'SimpleTool' });
+    logger.info('✅ RESTful API endpoints for all operations', { component: 'SimpleTool' });
+    logger.info('✅ Integration with notification service', { component: 'SimpleTool' });
+    logger.info('✅ User interest-based smart recommendations', { component: 'SimpleTool' });
+    logger.info('✅ Configurable filtering weights and thresholds', { component: 'SimpleTool' });
+    logger.info('\n✨ Alert Preference Management System is fully functional and production-ready!', { component: 'SimpleTool' });
     
   } catch (error) {
-    console.error('❌ Error during alert preference verification:', error);
+    logger.error('❌ Error during alert preference verification:', { component: 'SimpleTool' }, error);
     throw error;
   }
 }
 
 // Run verification
 verifyAlertPreferences().catch(console.error);
+
+
+
+
+
+

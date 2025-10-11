@@ -1,4 +1,5 @@
 import { defaultApiConfig, CORS_CONFIG, RETRY_CONFIG, ERROR_CONFIG } from '../config/api.js';
+import { logger } from '../utils/logger';
 
 // Request/Response interceptor types
 interface RequestInterceptor {
@@ -329,3 +330,9 @@ export const systemApi = {
     return api.get('/api/system/schema');
   }
 };
+
+
+
+
+
+

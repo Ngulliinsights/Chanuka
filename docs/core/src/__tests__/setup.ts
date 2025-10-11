@@ -5,6 +5,7 @@
  */
 
 import { beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
+import { logger } from '../utils/logger';
 
 // Mock environment variables for testing
 beforeAll(() => {
@@ -183,3 +184,9 @@ declare global {
 }
 
 globalThis.testUtils = testUtils;
+
+
+
+
+
+

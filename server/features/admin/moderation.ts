@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ApiSuccess, ApiErrorResponse, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
 import { contentModerationService } from "./content-moderation.js";
 import { authenticateToken, requireRole } from "../../middleware/auth.js";
+import { logger } from '../../utils/logger';
 
 export const router = Router();
 
@@ -42,7 +43,7 @@ router.get("/queue", async (req, res) => {
     return ApiSuccess(res, queue, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error fetching moderation queue:", error);
+    logger.error('Error fetching moderation queue:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to fetch moderation queue", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -85,7 +86,7 @@ router.post("/flags/:flagId/review", async (req, res) => {
     return ApiSuccess(res, reviewResult, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error reviewing flag:", error);
+    logger.error('Error reviewing flag:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to review flag", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -103,7 +104,7 @@ router.get("/stats", async (req, res) => {
     return ApiSuccess(res, stats, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error fetching moderation stats:", error);
+    logger.error('Error fetching moderation stats:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to fetch moderation statistics", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -130,8 +131,16 @@ router.post("/analyze", async (req, res) => {
     return ApiSuccess(res, analysis, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error("Error analyzing content:", error);
+    logger.error('Error analyzing content:', { component: 'SimpleTool' }, error);
     return ApiError(res, "Failed to analyze content", 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
 });
+
+
+
+
+
+
+
+

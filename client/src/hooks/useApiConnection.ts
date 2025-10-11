@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { 
+import { logger } from '../utils/logger';
   ConnectionInfo, 
   HealthStatus, 
   connectionMonitor, 
@@ -160,7 +161,7 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
       prevHealthRef.current = isNowHealthy;
       
     } catch (err) {
-      console.error('Health check failed:', err);
+      logger.error('Health check failed:', { component: 'SimpleTool' }, err);
       setHealthStatus({
         api: false,
         frontend: false,
@@ -462,3 +463,9 @@ export function useApiRetry<T>(
     reset
   };
 }
+
+
+
+
+
+

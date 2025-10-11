@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
+import { logger } from '../utils/logger';
   fetchWithFallback,
   ApiService,
   FallbackDataManager,
@@ -543,3 +544,9 @@ describe('API Error Handling Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+

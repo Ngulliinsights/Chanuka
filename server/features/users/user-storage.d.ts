@@ -4,6 +4,7 @@ import { UserProfile } from '../../../shared/types/auth.js';
 import { BaseStorage } from './base/BaseStorage.js';
 import { type OAuthProvider, type SocialProfile } from '../../../shared/types/auth.js';
 import type { StorageOptions } from './StorageTypes.js';
+import { logger } from '../../utils/logger';
 export interface CreateUserData {
     username: string;
     email: string;
@@ -21,3 +22,12 @@ export declare class UserStorage extends BaseStorage<UserProfile> {
     getUserBySocialProfile(provider: OAuthProvider, profileId: string): Promise<UserProfile | null>;
     linkSocialProfile(userId: number, profile: SocialProfile): Promise<UserProfile>;
 }
+
+
+
+
+
+
+
+
+

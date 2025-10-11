@@ -31,3 +31,10 @@ export function getDocumentIcon(type: DocumentType): string {
   };
   return icons[type] || icons.other;
 }
+
+
+
+
+
+
+

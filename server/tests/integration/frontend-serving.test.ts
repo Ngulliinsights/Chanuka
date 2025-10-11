@@ -5,6 +5,7 @@ import { createServer } from 'http';
 import path from 'path';
 import fs from 'fs';
 import { setupVite } from '../../vite.js';
+import { logger } from '../utils/logger';
 
 describe('Frontend Serving Integration Tests', () => {
   let app: express.Application;
@@ -599,3 +600,9 @@ describe('Frontend Serving Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+

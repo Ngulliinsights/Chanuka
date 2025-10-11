@@ -3,6 +3,7 @@ import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth.j
 import { userProfileService } from './user-profile.js';
 import { z } from 'zod';
 import { ApiSuccess, ApiErrorResponse, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
+import { logger } from '../../utils/logger';
 
 export const router = Router();
 
@@ -50,7 +51,7 @@ router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res) => {
     return ApiSuccess(res, profile, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching profile:', error);
+    logger.error('Error fetching profile:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch profile', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -72,7 +73,7 @@ router.patch('/me', authenticateToken, async (req: AuthenticatedRequest, res) =>
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error updating profile:', error);
+    logger.error('Error updating profile:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to update profile', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -94,7 +95,7 @@ router.patch('/me/basic', authenticateToken, async (req: AuthenticatedRequest, r
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error updating basic info:', error);
+    logger.error('Error updating basic info:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to update basic info', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -116,7 +117,7 @@ router.patch('/me/interests', authenticateToken, async (req: AuthenticatedReques
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error updating interests:', error);
+    logger.error('Error updating interests:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to update interests', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -132,7 +133,7 @@ router.get('/:userId', async (req, res) => {
     return ApiSuccess(res, profile, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching public profile:', error);
+    logger.error('Error fetching public profile:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch profile', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -148,7 +149,7 @@ router.get('/me/preferences', authenticateToken, async (req: AuthenticatedReques
     return ApiSuccess(res, preferences, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching preferences:', error);
+    logger.error('Error fetching preferences:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch preferences', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -170,7 +171,7 @@ router.patch('/me/preferences', authenticateToken, async (req: AuthenticatedRequ
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error updating preferences:', error);
+    logger.error('Error updating preferences:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to update preferences', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -186,7 +187,7 @@ router.get('/me/verification', authenticateToken, async (req: AuthenticatedReque
     return ApiSuccess(res, verificationStatus, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching verification status:', error);
+    logger.error('Error fetching verification status:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch verification status', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -214,7 +215,7 @@ router.patch('/me/verification', authenticateToken, async (req: AuthenticatedReq
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error updating verification status:', error);
+    logger.error('Error updating verification status:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to update verification status', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -230,7 +231,7 @@ router.get('/me/engagement', authenticateToken, async (req: AuthenticatedRequest
     return ApiSuccess(res, engagementHistory, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching engagement history:', error);
+    logger.error('Error fetching engagement history:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch engagement history', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -246,7 +247,7 @@ router.get('/me/complete', authenticateToken, async (req: AuthenticatedRequest, 
     return ApiSuccess(res, completeProfile, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching complete profile:', error);
+    logger.error('Error fetching complete profile:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch complete profile', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -270,7 +271,7 @@ router.post('/me/engagement/:billId', authenticateToken, async (req: Authenticat
     return ApiSuccess(res, result, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error updating engagement:', error);
+    logger.error('Error updating engagement:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to update engagement', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -288,8 +289,16 @@ router.get('/search/:query', async (req, res) => {
     return ApiSuccess(res, { users }, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error searching users:', error);
+    logger.error('Error searching users:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'User search failed', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
 });
+
+
+
+
+
+
+
+

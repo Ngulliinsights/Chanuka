@@ -2,6 +2,7 @@ import { promises as fs } from 'fs';
 import { join, dirname, basename } from 'path';
 import { createHash } from 'crypto';
 import { CleanupPlan, CleanupError } from './orchestrator';
+import { logger } from '../utils/logger';
 
 export interface BackupSystemConfig {
   enabled: boolean;
@@ -455,3 +456,9 @@ echo "✅ Restoration completed"
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   }
 }
+
+
+
+
+
+

@@ -15,6 +15,7 @@ import {
 } from './types.js';
 import { conflicts, conflictSources } from '../../db/schema.js';
 import { eq, and } from 'drizzle-orm';
+import { logger } from '../utils/logger';
 
 export class ConflictResolutionService {
   private autoResolveThreshold = 0.8; // 80% confidence threshold for auto-resolution
@@ -379,7 +380,7 @@ export class ConflictResolutionService {
       }
 
     } catch (error) {
-      console.error('Error storing conflict:', error);
+      logger.error('Error storing conflict:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -425,7 +426,7 @@ export class ConflictResolutionService {
 
       return results;
     } catch (error) {
-      console.error('Error getting pending conflicts:', error);
+      logger.error('Error getting pending conflicts:', { component: 'SimpleTool' }, error);
       return [];
     }
   }
@@ -451,7 +452,7 @@ export class ConflictResolutionService {
         .where(eq(conflicts.id, conflictId));
 
     } catch (error) {
-      console.error('Error manually resolving conflict:', error);
+      logger.error('Error manually resolving conflict:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -477,8 +478,14 @@ export class ConflictResolutionService {
         averageConfidence: 0
       };
     } catch (error) {
-      console.error('Error getting conflict statistics:', error);
+      logger.error('Error getting conflict statistics:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
 }
+
+
+
+
+
+

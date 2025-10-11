@@ -1,22 +1,23 @@
 import { securityMonitoringService } from './services/security-monitoring-service.js';
 import { intrusionDetectionService } from './services/intrusion-detection-service.js';
 import { securityAuditService } from './services/security-audit-service.js';
+import { logger } from '../utils/logger';
 
 /**
  * Test script to verify security monitoring and audit system functionality
  */
 async function testSecurityMonitoring() {
-  console.log('🔒 Testing Security Monitoring and Audit System');
-  console.log('=' .repeat(60));
+  logger.info('🔒 Testing Security Monitoring and Audit System', { component: 'SimpleTool' });
+  logger.info('=', { component: 'SimpleTool' }, .repeat(60));
 
   try {
     // Test 1: Initialize security monitoring
-    console.log('\n1. Initializing security monitoring system...');
+    logger.info('\n1. Initializing security monitoring system...', { component: 'SimpleTool' });
     await securityMonitoringService.initialize();
-    console.log('✅ Security monitoring initialized successfully');
+    logger.info('✅ Security monitoring initialized successfully', { component: 'SimpleTool' });
 
     // Test 2: Test security audit logging
-    console.log('\n2. Testing security audit logging...');
+    logger.info('\n2. Testing security audit logging...', { component: 'SimpleTool' });
     await securityAuditService.logSecurityEvent({
       eventType: 'test_event',
       severity: 'medium',
@@ -29,10 +30,10 @@ async function testSecurityMonitoring() {
       riskScore: 25,
       userId: 'test-user-123'
     });
-    console.log('✅ Security event logged successfully');
+    logger.info('✅ Security event logged successfully', { component: 'SimpleTool' });
 
     // Test 3: Test threat detection
-    console.log('\n3. Testing threat detection...');
+    logger.info('\n3. Testing threat detection...', { component: 'SimpleTool' });
     const mockRequest = {
       originalUrl: '/api/bills?search=<script>alert("xss")</script>',
       url: '/api/bills?search=<script>alert("xss")</script>',
@@ -54,28 +55,28 @@ async function testSecurityMonitoring() {
     } as any;
 
     const threatResult = await intrusionDetectionService.analyzeRequest(mockRequest);
-    console.log('✅ Threat detection completed');
+    logger.info('✅ Threat detection completed', { component: 'SimpleTool' });
     console.log(`   - Threat Level: ${threatResult.threatLevel}`);
     console.log(`   - Risk Score: ${threatResult.riskScore}`);
     console.log(`   - Detected Threats: ${threatResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${threatResult.recommendedAction}`);
 
     if (threatResult.detectedThreats.length > 0) {
-      console.log('   - Threat Details:');
+      logger.info('   - Threat Details:', { component: 'SimpleTool' });
       threatResult.detectedThreats.forEach((threat, index) => {
         console.log(`     ${index + 1}. ${threat.type} (${threat.severity}) - ${threat.description}`);
       });
     }
 
     // Test 4: Test compliance checks
-    console.log('\n4. Testing compliance checks...');
+    logger.info('\n4. Testing compliance checks...', { component: 'SimpleTool' });
     await securityMonitoringService.runComplianceChecks();
-    console.log('✅ Compliance checks completed');
+    logger.info('✅ Compliance checks completed', { component: 'SimpleTool' });
 
     // Test 5: Test security dashboard
-    console.log('\n5. Testing security dashboard...');
+    logger.info('\n5. Testing security dashboard...', { component: 'SimpleTool' });
     const dashboard = await securityMonitoringService.getSecurityDashboard();
-    console.log('✅ Security dashboard data retrieved');
+    logger.info('✅ Security dashboard data retrieved', { component: 'SimpleTool' });
     console.log(`   - Total Events: ${dashboard.overview.totalEvents}`);
     console.log(`   - Critical Alerts: ${dashboard.overview.criticalAlerts}`);
     console.log(`   - Risk Level: ${dashboard.overview.riskLevel}`);
@@ -84,7 +85,7 @@ async function testSecurityMonitoring() {
     console.log(`   - Recommendations: ${dashboard.recommendations.length}`);
 
     // Test 6: Test alert creation
-    console.log('\n6. Testing alert creation...');
+    logger.info('\n6. Testing alert creation...', { component: 'SimpleTool' });
     const alertId = await securityMonitoringService.createSecurityAlert({
       type: 'test_alert',
       severity: 'high',
@@ -96,7 +97,7 @@ async function testSecurityMonitoring() {
     console.log(`✅ Security alert created with ID: ${alertId}`);
 
     // Test 7: Test IP blocking
-    console.log('\n7. Testing IP blocking functionality...');
+    logger.info('\n7. Testing IP blocking functionality...', { component: 'SimpleTool' });
     const testIP = '192.168.1.999'; // Fake IP for testing
     await intrusionDetectionService.blockIP(testIP, 'Test blocking functionality', 60000); // 1 minute
     const isBlocked = intrusionDetectionService.isIPBlocked(testIP);
@@ -105,16 +106,16 @@ async function testSecurityMonitoring() {
     // Unblock the test IP
     setTimeout(async () => {
       await intrusionDetectionService.unblockIP(testIP);
-      console.log('✅ Test IP unblocked');
+      logger.info('✅ Test IP unblocked', { component: 'SimpleTool' });
     }, 2000);
 
     // Test 8: Test audit report generation
-    console.log('\n8. Testing audit report generation...');
+    logger.info('\n8. Testing audit report generation...', { component: 'SimpleTool' });
     const endDate = new Date();
     const startDate = new Date(endDate.getTime() - 24 * 60 * 60 * 1000); // 24 hours ago
     
     const auditReport = await securityAuditService.generateAuditReport(startDate, endDate);
-    console.log('✅ Audit report generated');
+    logger.info('✅ Audit report generated', { component: 'SimpleTool' });
     console.log(`   - Period: ${startDate.toISOString()} to ${endDate.toISOString()}`);
     console.log(`   - Total Events: ${auditReport.summary.totalEvents}`);
     console.log(`   - Total Incidents: ${auditReport.summary.totalIncidents}`);
@@ -122,17 +123,17 @@ async function testSecurityMonitoring() {
     console.log(`   - Recommendations: ${auditReport.recommendations.length}`);
 
     // Test 9: Test intrusion detection report
-    console.log('\n9. Testing intrusion detection report...');
+    logger.info('\n9. Testing intrusion detection report...', { component: 'SimpleTool' });
     const intrusionReport = await intrusionDetectionService.generateIntrusionReport(startDate, endDate);
-    console.log('✅ Intrusion detection report generated');
+    logger.info('✅ Intrusion detection report generated', { component: 'SimpleTool' });
     console.log(`   - Total Threats: ${intrusionReport.summary.totalThreats}`);
     console.log(`   - Blocked IPs: ${intrusionReport.summary.blockedIPs}`);
     console.log(`   - Active Threats: ${intrusionReport.summary.activeThreats}`);
 
     // Test 10: Test comprehensive security report
-    console.log('\n10. Testing comprehensive security report...');
+    logger.info('\n10. Testing comprehensive security report...', { component: 'SimpleTool' });
     const securityReport = await securityMonitoringService.generateSecurityReport(startDate, endDate);
-    console.log('✅ Comprehensive security report generated');
+    logger.info('✅ Comprehensive security report generated', { component: 'SimpleTool' });
     console.log(`   - Executive Summary:`);
     console.log(`     - Total Events: ${securityReport.executive_summary.total_events}`);
     console.log(`     - Security Incidents: ${securityReport.executive_summary.security_incidents}`);
@@ -141,7 +142,7 @@ async function testSecurityMonitoring() {
     console.log(`     - Key Findings: ${securityReport.executive_summary.key_findings.length}`);
 
     // Test 11: Test authentication event logging
-    console.log('\n11. Testing authentication event logging...');
+    logger.info('\n11. Testing authentication event logging...', { component: 'SimpleTool' });
     await securityAuditService.logAuthEvent(
       'login_attempt',
       mockRequest,
@@ -149,10 +150,10 @@ async function testSecurityMonitoring() {
       true,
       { endpoint: '/api/auth/login', method: 'POST' }
     );
-    console.log('✅ Authentication event logged');
+    logger.info('✅ Authentication event logged', { component: 'SimpleTool' });
 
     // Test 12: Test data access logging
-    console.log('\n12. Testing data access logging...');
+    logger.info('\n12. Testing data access logging...', { component: 'SimpleTool' });
     await securityAuditService.logDataAccess(
       '/api/bills',
       'GET',
@@ -161,10 +162,10 @@ async function testSecurityMonitoring() {
       25,
       true
     );
-    console.log('✅ Data access event logged');
+    logger.info('✅ Data access event logged', { component: 'SimpleTool' });
 
     // Test 13: Test admin action logging
-    console.log('\n13. Testing admin action logging...');
+    logger.info('\n13. Testing admin action logging...', { component: 'SimpleTool' });
     await securityAuditService.logAdminAction(
       'test_admin_action',
       mockRequest,
@@ -172,22 +173,22 @@ async function testSecurityMonitoring() {
       '/api/admin/users',
       { action: 'user_management', target: 'test-user-123' }
     );
-    console.log('✅ Admin action logged');
+    logger.info('✅ Admin action logged', { component: 'SimpleTool' });
 
-    console.log('\n' + '='.repeat(60));
-    console.log('🎉 All security monitoring tests completed successfully!');
-    console.log('✅ Security audit logging: WORKING');
-    console.log('✅ Intrusion detection: WORKING');
-    console.log('✅ Threat analysis: WORKING');
-    console.log('✅ Compliance monitoring: WORKING');
-    console.log('✅ Alert system: WORKING');
-    console.log('✅ IP blocking: WORKING');
-    console.log('✅ Report generation: WORKING');
-    console.log('✅ Dashboard integration: WORKING');
+    logger.info('\n', { component: 'SimpleTool' }, + '='.repeat(60));
+    logger.info('🎉 All security monitoring tests completed successfully!', { component: 'SimpleTool' });
+    logger.info('✅ Security audit logging: WORKING', { component: 'SimpleTool' });
+    logger.info('✅ Intrusion detection: WORKING', { component: 'SimpleTool' });
+    logger.info('✅ Threat analysis: WORKING', { component: 'SimpleTool' });
+    logger.info('✅ Compliance monitoring: WORKING', { component: 'SimpleTool' });
+    logger.info('✅ Alert system: WORKING', { component: 'SimpleTool' });
+    logger.info('✅ IP blocking: WORKING', { component: 'SimpleTool' });
+    logger.info('✅ Report generation: WORKING', { component: 'SimpleTool' });
+    logger.info('✅ Dashboard integration: WORKING', { component: 'SimpleTool' });
 
   } catch (error) {
-    console.error('\n❌ Security monitoring test failed:', error);
-    console.error('Stack trace:', (error as Error).stack);
+    logger.error('\n❌ Security monitoring test failed:', { component: 'SimpleTool' }, error);
+    logger.error('Stack trace:', { component: 'SimpleTool' }, (error as Error).stack);
     process.exit(1);
   }
 }
@@ -196,13 +197,19 @@ async function testSecurityMonitoring() {
 if (import.meta.url === `file://${process.argv[1]}`) {
   testSecurityMonitoring()
     .then(() => {
-      console.log('\n✅ Security monitoring system is ready for production use');
+      logger.info('\n✅ Security monitoring system is ready for production use', { component: 'SimpleTool' });
       process.exit(0);
     })
     .catch((error) => {
-      console.error('\n❌ Security monitoring system test failed:', error);
+      logger.error('\n❌ Security monitoring system test failed:', { component: 'SimpleTool' }, error);
       process.exit(1);
     });
 }
 
 export { testSecurityMonitoring };
+
+
+
+
+
+

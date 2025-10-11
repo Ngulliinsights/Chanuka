@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, jest } from '@jest/globals';
 import { database as db, withTransaction, bills, users, billComments, billEngagement, sponsors, billSponsorships } from '../../../shared/database/connection.js';
 import { eq, and } from 'drizzle-orm';
+import { logger } from '../utils/logger';
 
 describe('Database Transaction Integrity Tests', () => {
   let testUserId: string;
@@ -613,3 +614,9 @@ describe('Database Transaction Integrity Tests', () => {
     });
   });
 });
+
+
+
+
+
+

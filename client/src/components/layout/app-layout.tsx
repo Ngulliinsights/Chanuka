@@ -5,6 +5,7 @@ import { useNavigationAccessibility, useNavigationKeyboardShortcuts } from '@/ho
 import DesktopSidebar from '@/components/navigation/DesktopSidebar';
 import MobileNavigation from '@/components/layout/mobile-navigation';
 import { SkipLink, useAccessibility } from '@/components/accessibility/accessibility-manager';
+import { logger } from '../utils/logger.js';
 
 interface AppLayoutProps {
   children: ReactNode;

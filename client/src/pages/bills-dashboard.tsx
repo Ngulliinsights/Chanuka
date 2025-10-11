@@ -117,6 +117,7 @@ import { Input } from '../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { ImplementationWorkarounds } from '../components/bills/implementation-workarounds';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { logger } from '../utils/logger.js';
 
 function BillsDashboard() {
   const [bills, setBills] = useState(FALLBACK_BILLS);
@@ -149,7 +150,7 @@ function BillsDashboard() {
         }
         setError(null);
       } catch (err) {
-        console.log('Error type:', typeof err, err);
+        logger.info('Error type:', { component: 'SimpleTool' }, typeof err, err);
         console.warn('API unavailable, using fallback data:', err instanceof Error ? err.message : String(err));
         setBills(FALLBACK_BILLS);
         setIsUsingFallback(true);

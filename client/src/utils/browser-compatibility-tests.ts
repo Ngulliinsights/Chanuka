@@ -6,6 +6,7 @@
  */
 
 import { getBrowserInfo, featureDetector } from './browser-compatibility';
+import { logger } from '../utils/logger';
 
 export interface CompatibilityTestResult {
   testName: string;
@@ -572,3 +573,9 @@ export const browserCompatibilityTester = BrowserCompatibilityTester.getInstance
 export async function runBrowserCompatibilityTests(): Promise<CompatibilityTestSuite> {
   return browserCompatibilityTester.runCompatibilityTests();
 }
+
+
+
+
+
+

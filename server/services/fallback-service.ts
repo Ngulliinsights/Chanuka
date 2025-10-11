@@ -1,4 +1,5 @@
 import type { Bill, User, BillComment } from '../../shared/schema.js';
+import { logger } from '../utils/logger';
 
 /**
  * Fallback data service that provides sample data when database is unavailable
@@ -170,7 +171,7 @@ export class FallbackService {
     ];
 
     this.isInitialized = true;
-    console.log('📋 Fallback data service initialized with sample data');
+    logger.info('📋 Fallback data service initialized with sample data', { component: 'SimpleTool' });
   }
 
   // Bill operations
@@ -269,3 +270,9 @@ export class FallbackService {
 
 // Export singleton instance
 export const fallbackService = new FallbackService();
+
+
+
+
+
+

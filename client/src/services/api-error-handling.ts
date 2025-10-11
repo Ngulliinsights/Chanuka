@@ -1,4 +1,5 @@
 import { ApiErrorFallback } from '@/components/error-handling';
+import { logger } from '../utils/logger';
 
 // API Error Types - Enhanced with better type safety
 export interface ApiError extends Error {
@@ -649,3 +650,9 @@ export function cleanup(): void {
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', cleanup);
 }
+
+
+
+
+
+

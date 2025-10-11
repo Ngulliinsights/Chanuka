@@ -4,6 +4,7 @@ import { GovernmentDataIntegrationService } from '../services/government-data-in
 import { DataValidationService } from '../services/data-validation.js';
 import { DataTransformationService } from '../services/data-transformation.js';
 import { ExternalAPIErrorHandler, FallbackStrategy } from '../services/external-api-error-handler.js';
+import { logger } from '../utils/logger';
 
 // CLI tool for testing government data integration
 class GovernmentDataIntegrationCLI {
@@ -41,27 +42,27 @@ class GovernmentDataIntegrationCLI {
   }
 
   async testIntegrationStatus(): Promise<void> {
-    console.log('\n📊 Testing Integration Status...');
+    logger.info('\n📊 Testing Integration Status...', { component: 'SimpleTool' });
     try {
       const status = await this.integrationService.getIntegrationStatus();
-      console.log('✅ Integration Status:', JSON.stringify(status, null, 2));
+      logger.info('✅ Integration Status:', { component: 'SimpleTool' }, JSON.stringify(status, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('❌ Integration Status Error:', errorMessage);
+      logger.error('❌ Integration Status Error:', { component: 'SimpleTool' }, errorMessage);
     }
   }
 
   async testBillIntegration(): Promise<void> {
-    console.log('\n📋 Testing Bill Integration...');
+    logger.info('\n📋 Testing Bill Integration...', { component: 'SimpleTool' });
     try {
       const result = await this.integrationService.integrateBills({
         sources: ['parliament-ca'],
         dryRun: true
       });
-      console.log('✅ Bill Integration Result:', JSON.stringify(result, null, 2));
+      logger.info('✅ Bill Integration Result:', { component: 'SimpleTool' }, JSON.stringify(result, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('❌ Bill Integration Error:', errorMessage);
+      logger.error('❌ Bill Integration Error:', { component: 'SimpleTool' }, errorMessage);
 
       // Test error handling
       const errorToPass = error instanceof Error ? error : new Error(String(error));
@@ -70,21 +71,21 @@ class GovernmentDataIntegrationCLI {
         errorToPass,
         { operation: 'integrateBills' }
       );
-      console.log('🔄 Error Handler Result:', JSON.stringify(errorResult, null, 2));
+      logger.info('🔄 Error Handler Result:', { component: 'SimpleTool' }, JSON.stringify(errorResult, null, 2));
     }
   }
 
   async testSponsorIntegration(): Promise<void> {
-    console.log('\n👥 Testing Sponsor Integration...');
+    logger.info('\n👥 Testing Sponsor Integration...', { component: 'SimpleTool' });
     try {
       const result = await this.integrationService.integrateSponsors({
         sources: ['parliament-ca'],
         dryRun: true
       });
-      console.log('✅ Sponsor Integration Result:', JSON.stringify(result, null, 2));
+      logger.info('✅ Sponsor Integration Result:', { component: 'SimpleTool' }, JSON.stringify(result, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('❌ Sponsor Integration Error:', errorMessage);
+      logger.error('❌ Sponsor Integration Error:', { component: 'SimpleTool' }, errorMessage);
 
       // Test error handling
       const errorToPass = error instanceof Error ? error : new Error(String(error));
@@ -93,12 +94,12 @@ class GovernmentDataIntegrationCLI {
         errorToPass,
         { operation: 'integrateSponsors' }
       );
-      console.log('🔄 Error Handler Result:', JSON.stringify(errorResult, null, 2));
+      logger.info('🔄 Error Handler Result:', { component: 'SimpleTool' }, JSON.stringify(errorResult, null, 2));
     }
   }
 
   async testDataTransformation(): Promise<void> {
-    console.log('\n🔄 Testing Data Transformation...');
+    logger.info('\n🔄 Testing Data Transformation...', { component: 'SimpleTool' });
 
     // Test Parliament data transformation
     const mockParliamentData = {
@@ -124,19 +125,19 @@ class GovernmentDataIntegrationCLI {
 
     try {
       const transformed = DataTransformationService.transformParliamentData(mockParliamentData);
-      console.log('✅ Parliament Data Transformation:', JSON.stringify(transformed, null, 2));
+      logger.info('✅ Parliament Data Transformation:', { component: 'SimpleTool' }, JSON.stringify(transformed, null, 2));
 
       // Validate transformed data
       const validation = DataValidationService.validateBatch(transformed.bills || [], 'bills');
-      console.log('📋 Validation Result:', JSON.stringify(validation, null, 2));
+      logger.info('📋 Validation Result:', { component: 'SimpleTool' }, JSON.stringify(validation, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('❌ Data Transformation Error:', errorMessage);
+      logger.error('❌ Data Transformation Error:', { component: 'SimpleTool' }, errorMessage);
     }
   }
 
   async testDataValidation(): Promise<void> {
-    console.log('\n✅ Testing Data Validation...');
+    logger.info('\n✅ Testing Data Validation...', { component: 'SimpleTool' });
 
     const testBills = [
       {
@@ -159,15 +160,15 @@ class GovernmentDataIntegrationCLI {
 
     try {
       const validation = DataValidationService.validateBatch(testBills, 'bills');
-      console.log('✅ Batch Validation Result:', JSON.stringify(validation, null, 2));
+      logger.info('✅ Batch Validation Result:', { component: 'SimpleTool' }, JSON.stringify(validation, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('❌ Data Validation Error:', errorMessage);
+      logger.error('❌ Data Validation Error:', { component: 'SimpleTool' }, errorMessage);
     }
   }
 
   async testCrossValidation(): Promise<void> {
-    console.log('\n🔍 Testing Cross-Validation...');
+    logger.info('\n🔍 Testing Cross-Validation...', { component: 'SimpleTool' });
 
     const testRecords = [
       {
@@ -194,15 +195,15 @@ class GovernmentDataIntegrationCLI {
 
     try {
       const crossValidation = DataValidationService.crossValidate(testRecords, 'bills');
-      console.log('✅ Cross-Validation Result:', JSON.stringify(crossValidation, null, 2));
+      logger.info('✅ Cross-Validation Result:', { component: 'SimpleTool' }, JSON.stringify(crossValidation, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('❌ Cross-Validation Error:', errorMessage);
+      logger.error('❌ Cross-Validation Error:', { component: 'SimpleTool' }, errorMessage);
     }
   }
 
   async testErrorHandling(): Promise<void> {
-    console.log('\n🚨 Testing Error Handling...');
+    logger.info('\n🚨 Testing Error Handling...', { component: 'SimpleTool' });
 
     // Simulate different types of errors
     const errors = [
@@ -229,11 +230,11 @@ class GovernmentDataIntegrationCLI {
 
     // Test error statistics
     const stats = this.errorHandler.getErrorStatistics();
-    console.log('📊 Error Statistics:', JSON.stringify(stats, null, 2));
+    logger.info('📊 Error Statistics:', { component: 'SimpleTool' }, JSON.stringify(stats, null, 2));
   }
 
   async testCaching(): Promise<void> {
-    console.log('\n💾 Testing Caching...');
+    logger.info('\n💾 Testing Caching...', { component: 'SimpleTool' });
     
     // Cache some test data
     this.errorHandler.cacheData('test-source', { cached: 'data', timestamp: new Date() });
@@ -248,11 +249,11 @@ class GovernmentDataIntegrationCLI {
       { strategy: FallbackStrategy.CACHED_DATA }
     );
     
-    console.log('✅ Cache Fallback Result:', JSON.stringify(result, null, 2));
+    logger.info('✅ Cache Fallback Result:', { component: 'SimpleTool' }, JSON.stringify(result, null, 2));
   }
 
   async runAllTests(): Promise<void> {
-    console.log('🚀 Starting Government Data Integration Tests...\n');
+    logger.info('🚀 Starting Government Data Integration Tests...\n', { component: 'SimpleTool' });
     
     await this.testIntegrationStatus();
     await this.testDataTransformation();
@@ -263,7 +264,7 @@ class GovernmentDataIntegrationCLI {
     await this.testBillIntegration();
     await this.testSponsorIntegration();
     
-    console.log('\n✅ All tests completed!');
+    logger.info('\n✅ All tests completed!', { component: 'SimpleTool' });
   }
 }
 
@@ -335,9 +336,15 @@ Examples:
 if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(error => {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('❌ CLI Error:', errorMessage);
+    logger.error('❌ CLI Error:', { component: 'SimpleTool' }, errorMessage);
     process.exit(1);
   });
 }
 
 export { GovernmentDataIntegrationCLI };
+
+
+
+
+
+

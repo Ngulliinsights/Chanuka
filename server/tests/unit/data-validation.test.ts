@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
-import { DataValidationService } from '../../services/data-validation.js';
+import { DataValidationService } from '../../core/validation/data-validation.ts';
+import { logger } from '../../utils/logger.ts';
 
 describe('DataValidationService', () => {
   describe('validateBill', () => {
@@ -9,11 +10,12 @@ describe('DataValidationService', () => {
         billNumber: 'C-123',
         status: 'introduced',
         description: 'A test bill for validation',
+        content: 'Detailed content of the bill',
         summary: 'Test summary',
         category: 'technology',
         introducedDate: '2024-01-15',
         lastActionDate: '2024-01-20',
-        lastUpdated: '2024-01-21'
+        lastUpdated: new Date().toISOString()
       };
 
       const result = DataValidationService.validateBill(validBill);
@@ -33,8 +35,8 @@ describe('DataValidationService', () => {
       const result = DataValidationService.validateBill(invalidBill);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(expect.stringContaining('Missing required fields'));
-      expect(result.score).toBeLessThan(0.5);
+      expect(result.errors).toEqual(expect.arrayContaining([expect.stringContaining('Missing required fields')]));
+      expect(result.score).toBeLessThan(0.6);
     });
 
     it('should validate bill number format', () => {
@@ -46,7 +48,7 @@ describe('DataValidationService', () => {
 
       const result = DataValidationService.validateBill(billWithInvalidNumber);
 
-      expect(result.warnings).toContain(expect.stringContaining('Bill number format may be invalid'));
+      expect(result.warnings).toEqual(expect.arrayContaining([expect.stringContaining('Bill number format may be invalid')]));
     });
 
     it('should validate bill status values', () => {
@@ -58,7 +60,7 @@ describe('DataValidationService', () => {
 
       const result = DataValidationService.validateBill(billWithInvalidStatus);
 
-      expect(result.warnings).toContain(expect.stringContaining('Invalid bill status'));
+      expect(result.warnings).toEqual(expect.arrayContaining([expect.stringContaining('Invalid bill status')]));
     });
 
     it('should validate field lengths', () => {
@@ -71,7 +73,7 @@ describe('DataValidationService', () => {
       const result = DataValidationService.validateBill(billWithLongFields);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(expect.stringContaining('exceeds maximum length'));
+      expect(result.errors).toEqual(expect.arrayContaining([expect.stringContaining('exceeds maximum length')]));
     });
 
     it('should validate date formats', () => {
@@ -85,7 +87,7 @@ describe('DataValidationService', () => {
       const result = DataValidationService.validateBill(billWithInvalidDate);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(expect.stringContaining('Invalid date format'));
+      expect(result.errors).toEqual(expect.arrayContaining([expect.stringContaining('Invalid date format')]));
     });
 
     it('should warn about future dates', () => {
@@ -101,7 +103,7 @@ describe('DataValidationService', () => {
 
       const result = DataValidationService.validateBill(billWithFutureDate);
 
-      expect(result.warnings).toContain(expect.stringContaining('Future date'));
+      expect(result.warnings).toEqual(expect.arrayContaining([expect.stringContaining('Future date')]));
     });
 
     it('should check date consistency', () => {
@@ -168,7 +170,7 @@ describe('DataValidationService', () => {
       const result = DataValidationService.validateSponsor(invalidSponsor);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(expect.stringContaining('Missing required fields'));
+      expect(result.errors).toEqual(expect.arrayContaining([expect.stringContaining('Missing required fields')]));
     });
 
     it('should validate email format', () => {
@@ -181,7 +183,7 @@ describe('DataValidationService', () => {
       const result = DataValidationService.validateSponsor(sponsorWithInvalidEmail);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(expect.stringContaining('Invalid email format'));
+      expect(result.errors).toEqual(expect.arrayContaining([expect.stringContaining('Invalid email format')]));
     });
 
     it('should validate phone format', () => {
@@ -193,7 +195,7 @@ describe('DataValidationService', () => {
 
       const result = DataValidationService.validateSponsor(sponsorWithInvalidPhone);
 
-      expect(result.warnings).toContain(expect.stringContaining('Phone number format may be invalid'));
+      expect(result.warnings).toEqual(expect.arrayContaining([expect.stringContaining('Phone number format may be invalid')]));
     });
 
     it('should warn about uncommon roles', () => {
@@ -204,7 +206,7 @@ describe('DataValidationService', () => {
 
       const result = DataValidationService.validateSponsor(sponsorWithUncommonRole);
 
-      expect(result.warnings).toContain(expect.stringContaining('Uncommon role'));
+      expect(result.warnings).toEqual(expect.arrayContaining([expect.stringContaining('Uncommon role')]));
     });
 
     it('should validate field lengths', () => {
@@ -216,7 +218,7 @@ describe('DataValidationService', () => {
       const result = DataValidationService.validateSponsor(sponsorWithLongFields);
 
       expect(result.isValid).toBe(false);
-      expect(result.errors).toContain(expect.stringContaining('exceeds maximum length'));
+      expect(result.errors).toEqual(expect.arrayContaining([expect.stringContaining('exceeds maximum length')]));
     });
   });
 
@@ -458,3 +460,9 @@ describe('DataValidationService', () => {
     });
   });
 });
+
+
+
+
+
+

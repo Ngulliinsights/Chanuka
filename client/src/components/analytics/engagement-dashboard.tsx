@@ -22,6 +22,7 @@ import {
   Area
 } from 'recharts';
 import { 
+import { logger } from '../utils/logger.js';
   TrendingUp, 
   TrendingDown, 
   Users, 
@@ -180,7 +181,7 @@ export function EngagementDashboard() {
         document.body.removeChild(a);
       }
     } catch (err) {
-      console.error('Export failed:', err);
+      logger.error('Export failed:', { component: 'SimpleTool' }, err);
     }
   };
 

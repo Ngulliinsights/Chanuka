@@ -12,6 +12,7 @@ import React, {
   useRef 
 } from 'react';
 import { WifiOff, Wifi, CloudOff, RefreshCw } from 'lucide-react';
+import { logger } from '../utils/logger.js';
 
 interface OfflineData {
   bills: any[];
@@ -60,7 +61,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
         const request = indexedDB.open('chanuka-offline', 1);
         
         request.onerror = () => {
-          console.error('Failed to open IndexedDB');
+          logger.error('Failed to open IndexedDB', { component: 'SimpleTool' });
         };
         
         request.onsuccess = () => {
@@ -81,7 +82,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
           }
         };
       } catch (error) {
-        console.error('IndexedDB initialization failed:', error);
+        logger.error('IndexedDB initialization failed:', { component: 'SimpleTool' }, error);
       }
     };
 
@@ -93,7 +94,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
         .then((registration) => {
-          console.log('Service Worker registered:', registration);
+          logger.info('Service Worker registered:', { component: 'SimpleTool' }, registration);
           setIsServiceWorkerReady(true);
           
           // Listen for updates
@@ -103,14 +104,14 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                   // New version available
-                  console.log('New version available');
+                  logger.info('New version available', { component: 'SimpleTool' });
                 }
               });
             }
           });
         })
         .catch((error) => {
-          console.error('Service Worker registration failed:', error);
+          logger.error('Service Worker registration failed:', { component: 'SimpleTool' }, error);
         });
     }
   }, []);
@@ -159,7 +160,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
         setPendingActions(actionsRequest.result || []);
       };
     } catch (error) {
-      console.error('Failed to load offline data:', error);
+      logger.error('Failed to load offline data:', { component: 'SimpleTool' }, error);
     }
   }, []);
 
@@ -184,7 +185,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
 
       setOfflineData(newOfflineData);
     } catch (error) {
-      console.error('Failed to cache data:', error);
+      logger.error('Failed to cache data:', { component: 'SimpleTool' }, error);
     }
   }, [offlineData]);
 
@@ -212,7 +213,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
       await store.put(action);
       setPendingActions(prev => [...prev, action]);
     } catch (error) {
-      console.error('Failed to add pending action:', error);
+      logger.error('Failed to add pending action:', { component: 'SimpleTool' }, error);
     }
   }, []);
 
@@ -220,7 +221,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
   const syncPendingActions = useCallback(async () => {
     if (!isOnline || !dbRef.current || pendingActions.length === 0) return;
 
-    console.log('Syncing pending actions:', pendingActions.length);
+    logger.info('Syncing pending actions:', { component: 'SimpleTool' }, pendingActions.length);
 
     for (const action of pendingActions) {
       try {
@@ -233,7 +234,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
         
         setPendingActions(prev => prev.filter(a => a.id !== action.id));
       } catch (error) {
-        console.error('Failed to sync action:', action, error);
+        logger.error('Failed to sync action:', { component: 'SimpleTool' }, action, error);
         
         // Increment retry count
         const updatedAction = {
@@ -308,7 +309,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
       setOfflineData(null);
       setPendingActions([]);
     } catch (error) {
-      console.error('Failed to clear offline data:', error);
+      logger.error('Failed to clear offline data:', { component: 'SimpleTool' }, error);
     }
   }, []);
 

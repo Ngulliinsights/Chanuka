@@ -63,6 +63,7 @@ interface BillAnalysis {
     eventDate: string;
     event: string;
     importance: 'critical' | 'important' | 'normal';
+import { logger } from '../utils/logger.js';
     details?: string;
   }>;
   stakeholders: Array<{

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { logger } from '../utils/logger';
 
 /**
  * @deprecated The focus and keyboard navigation detection parts of this hook are deprecated.
@@ -449,3 +450,10 @@ export function useNavigationKeyboardShortcuts() {
   
   return { registerShortcut };
 }
+
+
+
+
+
+
+

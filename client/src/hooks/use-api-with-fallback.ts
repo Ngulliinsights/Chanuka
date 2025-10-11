@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { 
+import { logger } from '../utils/logger';
   ApiResponse, 
   ApiError, 
   FetchOptions, 
@@ -392,3 +393,9 @@ export function useApiDelete<TData = any>(
     options
   );
 }
+
+
+
+
+
+

@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { 
+import { logger } from '../utils/logger.js';
   MessageSquare, 
   ThumbsUp, 
   ThumbsDown, 
@@ -145,7 +146,7 @@ const CommunityInputPage: React.FC = () => {
         throw new Error('Failed to submit comment');
       }
     } catch (error) {
-      console.error('Comment submission failed:', error);
+      logger.error('Comment submission failed:', { component: 'SimpleTool' }, error);
       alert('Unable to submit comment. Please try again.');
     }
   };

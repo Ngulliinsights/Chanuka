@@ -119,7 +119,7 @@ export class BaseError extends Error {
           const recovered = await strategy.handler();
           if (recovered) return true;
         } catch (error) {
-          console.error('Recovery strategy failed:', error);
+          logger.error('Recovery strategy failed:', { component: 'SimpleTool' }, error);
         }
       }
     }
@@ -140,3 +140,10 @@ export const AUTH_ERROR_MESSAGES = {
   FORBIDDEN: 'Access forbidden',
   TOKEN_REQUIRED: 'Authentication token required'
 } as const;
+
+
+
+
+
+
+

@@ -28,6 +28,7 @@ import {
   SafeAreaWrapper 
 } from '@/components/mobile/responsive-layout-manager';
 import { 
+import { logger } from '../utils/logger.js';
   MobileTabBar, 
   SwipeableHeader 
 } from '@/components/mobile/mobile-navigation-enhancements';
@@ -103,7 +104,7 @@ const MobileNavigation: React.FC = () => {
       const data: AuthResponse = await response.json();
       return data.user;
     } catch (error) {
-      console.error('Failed to fetch user:', error);
+      logger.error('Failed to fetch user:', { component: 'SimpleTool' }, error);
       return null;
     }
   }, []);
@@ -227,7 +228,7 @@ const MobileNavigationContent: React.FC = () => {
       const data: AuthResponse = await response.json();
       return data.user;
     } catch (error) {
-      console.error('Failed to fetch user:', error);
+      logger.error('Failed to fetch user:', { component: 'SimpleTool' }, error);
       return null;
     }
   }, []);

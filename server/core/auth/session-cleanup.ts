@@ -1,4 +1,5 @@
 import { authService } from './auth-service.js';
+import { logger } from '../utils/logger';
 
 export class SessionCleanupService {
   private cleanupInterval: NodeJS.Timeout | null = null;
@@ -10,7 +11,7 @@ export class SessionCleanupService {
    */
   start(intervalMinutes: number = 60): void {
     if (this.isRunning) {
-      console.log('Session cleanup service is already running');
+      logger.info('Session cleanup service is already running', { component: 'SimpleTool' });
       return;
     }
 
@@ -37,7 +38,7 @@ export class SessionCleanupService {
       this.cleanupInterval = null;
     }
     this.isRunning = false;
-    console.log('🛑 Session cleanup service stopped');
+    logger.info('🛑 Session cleanup service stopped', { component: 'SimpleTool' });
   }
 
   /**
@@ -45,11 +46,11 @@ export class SessionCleanupService {
    */
   async runCleanup(): Promise<void> {
     try {
-      console.log('🧹 Running session cleanup...');
+      logger.info('🧹 Running session cleanup...', { component: 'SimpleTool' });
       await authService.cleanupExpiredTokens();
-      console.log('✅ Session cleanup completed');
+      logger.info('✅ Session cleanup completed', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('❌ Session cleanup failed:', error);
+      logger.error('❌ Session cleanup failed:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -65,3 +66,9 @@ export class SessionCleanupService {
 }
 
 export const sessionCleanupService = new SessionCleanupService();
+
+
+
+
+
+

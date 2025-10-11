@@ -12,6 +12,7 @@ import { Comments } from '@/components/analysis/comments';
 import { BillStats } from '@/components/analysis/stats';
 import { Share2, ArrowLeft } from 'lucide-react';
 import { useOnlineStatus } from '@/hooks/use-online-status';
+import { logger } from '../utils/logger.js';
 
 // Move constants outside component to prevent recreation on each render
 const STORAGE_KEY = 'bill-view-preferences';
@@ -102,7 +103,7 @@ export default function BillAnalysis() {
         billId: id,
       });
     } catch (error) {
-      console.error('Failed to add comment:', error);
+      logger.error('Failed to add comment:', { component: 'SimpleTool' }, error);
       // This could trigger a user notification in a real app
     }
   }, [id, addComment]);
@@ -112,7 +113,7 @@ export default function BillAnalysis() {
     try {
       await endorseComment({ commentId, endorsements: 1 });
     } catch (error) {
-      console.error('Failed to endorse comment:', error);
+      logger.error('Failed to endorse comment:', { component: 'SimpleTool' }, error);
       // This could trigger a user notification in a real app
     }
   }, [endorseComment]);
@@ -161,7 +162,7 @@ export default function BillAnalysis() {
     } catch (error) {
       // Only log if it's not a user cancellation
       if (error instanceof Error && error.name !== 'AbortError') {
-        console.error('Error sharing:', error);
+        logger.error('Error sharing:', { component: 'SimpleTool' }, error);
         alert('Unable to share or copy link');
       }
     }

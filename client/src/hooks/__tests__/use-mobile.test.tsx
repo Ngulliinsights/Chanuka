@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useMediaQuery } from '../use-mobile';
+import { logger } from '../utils/logger.js';
 
 // Mock matchMedia
 const mockMatchMedia = vi.fn();

@@ -3,6 +3,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { createHash } from "crypto";
+import { logger } from '../utils/logger';
 
 // ✅ FIXED INTERFACES - Added missing properties
 interface APICall {
@@ -233,7 +234,7 @@ export class EnhancedAPIRaceConditionDetector {
 
   async analyzeCodebase(): Promise<AnalysisReport> {
     const startTime = performance.now();
-    console.log("🔍 Starting enhanced API race condition analysis...\n");
+    logger.info('🔍 Starting enhanced API race condition analysis...\n', { component: 'SimpleTool' });
 
     try {
       const files = await this.findRelevantFiles(process.cwd());
@@ -255,7 +256,7 @@ export class EnhancedAPIRaceConditionDetector {
 
       return report;
     } catch (error) {
-      console.error("❌ Analysis failed:", error);
+      logger.error('❌ Analysis failed:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -718,7 +719,7 @@ async function main() {
   const detector = new EnhancedAPIRaceConditionDetector();
   try {
     const report = await detector.analyzeCodebase();
-    console.log("\n✅ Analysis complete!");
+    logger.info('\n✅ Analysis complete!', { component: 'SimpleTool' });
     console.log(`📊 Total API calls found: ${report.summary.totalAPICalls}`);
     await detector.saveReport(report);
   } catch (error) {
@@ -728,3 +729,10 @@ async function main() {
 
 // Always run the main function
 main();
+
+
+
+
+
+
+

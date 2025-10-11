@@ -6,6 +6,7 @@
  */
 
 import { HealthCheck, HealthResult, HealthStatus } from '../types';
+import { logger } from '../utils/logger';
 
 export interface DatabaseHealthConfig {
   testQuery?: string;
@@ -172,3 +173,9 @@ export function createDatabaseHealthCheck(
   
   return new DatabaseHealthCheck(db, config);
 }
+
+
+
+
+
+

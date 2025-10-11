@@ -4,6 +4,7 @@ import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { ProtectedRoute, useRouteAccess, withRoleProtection } from '../ProtectedRoute';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import { UserRole } from '@/types/navigation';
+import { logger } from '../utils/logger.js';
 
 // Mock the hooks
 const mockNavigateTo = jest.fn();

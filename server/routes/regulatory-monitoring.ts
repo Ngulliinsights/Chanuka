@@ -1,6 +1,9 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { regulatoryChangeMonitoringService } from '../features/analytics/regulatory-change-monitoring.js';
 import { z } from 'zod'; // For runtime validation
+import { errorTracker } from '../core/errors/error-tracker.js';
+import { ApiResponseWrapper } from '../utils/api-response.js';
+import { logger } from '../utils/logger';
 
 const router = Router();
 
@@ -365,29 +368,37 @@ router.post(
 
 /**
  * Global error handler for this router
- * 
+ *
  * This catches any errors that weren't handled by individual route handlers.
  * It provides consistent error responses and logs details for debugging.
  * In production, we hide internal error details from clients for security.
  */
 router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  // Log comprehensive error information for debugging
-  // In production, this would go to a proper logging service
-  console.error('Regulatory monitoring route error:', {
-    path: req.path,
-    method: req.method,
-    error: err.message,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-  });
-  
-  // Send a safe error response to the client
-  // Only include detailed error messages in development mode
-  res.status(500).json({
-    success: false,
-    error: 'An error occurred processing your request',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error',
-    path: req.path
-  });
+  // Track error with comprehensive context using errorTracker
+  errorTracker.trackRequestError(
+    err,
+    req,
+    'medium',
+    'business_logic'
+  );
+
+  // Send consistent error response using ApiResponseWrapper
+  ApiResponseWrapper.error(
+    res,
+    err,
+    500,
+    {
+      source: 'database',
+      requestId: (req as any).traceId,
+      executionTime: Date.now() - (req as any).startTime
+    }
+  );
 });
 
 export default router;
+
+
+
+
+
+

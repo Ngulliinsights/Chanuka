@@ -11,6 +11,7 @@ import { router as authRouter } from '../../core/auth/auth.js';
 import { database as db, users, bills, notifications, billEngagement } from '../../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
+import { logger } from '../utils/logger';
 
 describe('Real-Time Notification Delivery Tests', () => {
   let app: express.Application;
@@ -910,7 +911,7 @@ describe('Real-Time Notification Delivery Tests', () => {
         if (response.status === 201) {
           // Each user should receive appropriate notifications
           // This is complex to test without knowing the exact implementation
-          console.log('Multi-user notification created successfully');
+          logger.info('Multi-user notification created successfully', { component: 'SimpleTool' });
         }
       }
     });
@@ -964,3 +965,9 @@ describe('Real-Time Notification Delivery Tests', () => {
     });
   });
 });
+
+
+
+
+
+

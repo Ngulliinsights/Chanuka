@@ -2,9 +2,10 @@ import { webSocketService } from './services/websocket.js';
 import { createServer } from 'http';
 import WebSocket from 'ws';
 import jwt from 'jsonwebtoken';
+import { logger } from '../utils/logger';
 
 async function verifyWebSocketService() {
-  console.log('🔍 Verifying Enhanced WebSocket Service implementation...');
+  logger.info('🔍 Verifying Enhanced WebSocket Service implementation...', { component: 'SimpleTool' });
   
   try {
     // Create HTTP server for testing
@@ -23,41 +24,41 @@ async function verifyWebSocketService() {
     });
     
     // Test 1: Check initial stats
-    console.log('1. Testing initial service stats...');
+    logger.info('1. Testing initial service stats...', { component: 'SimpleTool' });
     const initialStats = webSocketService.getStats();
-    console.log('✅ Initial stats:', {
+    logger.info('✅ Initial stats:', { component: 'SimpleTool' }, {
       activeConnections: initialStats.activeConnections,
       totalConnections: initialStats.totalConnections,
       uptime: initialStats.uptime
     });
     
     // Test 2: Check health status
-    console.log('2. Testing health status monitoring...');
+    logger.info('2. Testing health status monitoring...', { component: 'SimpleTool' });
     const healthStatus = webSocketService.getHealthStatus();
-    console.log('✅ Health status:', {
+    logger.info('✅ Health status:', { component: 'SimpleTool' }, {
       isHealthy: healthStatus.isHealthy,
       uptime: healthStatus.uptime,
       activeConnections: healthStatus.stats.activeConnections
     });
     
     // Test 3: Test connection tracking (simulate with mock data)
-    console.log('3. Testing connection tracking...');
+    logger.info('3. Testing connection tracking...', { component: 'SimpleTool' });
     const mockUserId = 'test-user-123';
     
     // Check if user is connected (should be false initially)
     const isConnectedBefore = webSocketService.isUserConnected(mockUserId);
-    console.log('✅ User connection status (before):', isConnectedBefore);
+    logger.info('✅ User connection status (before):', { component: 'SimpleTool' }, isConnectedBefore);
     
     // Test 4: Test subscription management
-    console.log('4. Testing subscription management...');
+    logger.info('4. Testing subscription management...', { component: 'SimpleTool' });
     const mockBillId = 123;
     
     // Get user subscriptions (should be empty initially)
     const subscriptionsBefore = webSocketService.getUserSubscriptions(mockUserId);
-    console.log('✅ User subscriptions (before):', subscriptionsBefore);
+    logger.info('✅ User subscriptions (before):', { component: 'SimpleTool' }, subscriptionsBefore);
     
     // Test 5: Test broadcasting functionality
-    console.log('5. Testing broadcast functionality...');
+    logger.info('5. Testing broadcast functionality...', { component: 'SimpleTool' });
     
     // Test bill update broadcast (no subscribers yet)
     webSocketService.broadcastBillUpdate(mockBillId, {
@@ -65,7 +66,7 @@ async function verifyWebSocketService() {
       data: { oldStatus: 'introduced', newStatus: 'committee' },
       timestamp: new Date()
     });
-    console.log('✅ Bill update broadcast test completed');
+    logger.info('✅ Bill update broadcast test completed', { component: 'SimpleTool' });
     
     // Test user notification (no connected users yet)
     webSocketService.sendUserNotification(mockUserId, {
@@ -73,55 +74,61 @@ async function verifyWebSocketService() {
       title: 'Test Notification',
       message: 'This is a test notification'
     });
-    console.log('✅ User notification test completed');
+    logger.info('✅ User notification test completed', { component: 'SimpleTool' });
     
     // Test broadcast to all (no connected users yet)
     const deliveries = webSocketService.broadcastToAll({
       type: 'system_announcement',
       data: { message: 'System maintenance scheduled' }
     });
-    console.log('✅ Broadcast to all test completed, deliveries:', deliveries);
+    logger.info('✅ Broadcast to all test completed, deliveries:', { component: 'SimpleTool' }, deliveries);
     
     // Test 6: Check updated stats
-    console.log('6. Testing updated service stats...');
+    logger.info('6. Testing updated service stats...', { component: 'SimpleTool' });
     const updatedStats = webSocketService.getStats();
-    console.log('✅ Updated stats:', {
+    logger.info('✅ Updated stats:', { component: 'SimpleTool' }, {
       totalBroadcasts: updatedStats.totalBroadcasts,
       billsWithSubscribers: updatedStats.billsWithSubscribers,
       uniqueUsers: updatedStats.uniqueUsers
     });
     
     // Test 7: Test graceful shutdown
-    console.log('7. Testing graceful shutdown...');
+    logger.info('7. Testing graceful shutdown...', { component: 'SimpleTool' });
     await webSocketService.shutdown();
-    console.log('✅ Graceful shutdown completed');
+    logger.info('✅ Graceful shutdown completed', { component: 'SimpleTool' });
     
     // Close test server
     server.close();
-    console.log('✅ Test server closed');
+    logger.info('✅ Test server closed', { component: 'SimpleTool' });
     
-    console.log('\n🎉 All WebSocket Service enhancement tests passed!');
-    console.log('\n📋 Task 4.1 Implementation Summary:');
-    console.log('✅ User connection tracking and management - ENHANCED');
-    console.log('✅ Bill subscription and unsubscription functionality - ENHANCED');
-    console.log('✅ Real-time message broadcasting system - ENHANCED');
-    console.log('✅ WebSocket connection health monitoring - IMPLEMENTED');
-    console.log('\n🔧 Additional Enhancements Added:');
-    console.log('✅ Comprehensive connection statistics tracking');
-    console.log('✅ Detailed health status monitoring with periodic checks');
-    console.log('✅ Enhanced error handling and connection cleanup');
-    console.log('✅ Broadcast to all users functionality');
-    console.log('✅ User subscription status tracking');
-    console.log('✅ Graceful shutdown capability');
-    console.log('✅ Memory usage monitoring');
-    console.log('✅ Connection activity tracking');
-    console.log('\n✨ WebSocket Service is fully enhanced and production-ready!');
+    logger.info('\n🎉 All WebSocket Service enhancement tests passed!', { component: 'SimpleTool' });
+    logger.info('\n📋 Task 4.1 Implementation Summary:', { component: 'SimpleTool' });
+    logger.info('✅ User connection tracking and management - ENHANCED', { component: 'SimpleTool' });
+    logger.info('✅ Bill subscription and unsubscription functionality - ENHANCED', { component: 'SimpleTool' });
+    logger.info('✅ Real-time message broadcasting system - ENHANCED', { component: 'SimpleTool' });
+    logger.info('✅ WebSocket connection health monitoring - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('\n🔧 Additional Enhancements Added:', { component: 'SimpleTool' });
+    logger.info('✅ Comprehensive connection statistics tracking', { component: 'SimpleTool' });
+    logger.info('✅ Detailed health status monitoring with periodic checks', { component: 'SimpleTool' });
+    logger.info('✅ Enhanced error handling and connection cleanup', { component: 'SimpleTool' });
+    logger.info('✅ Broadcast to all users functionality', { component: 'SimpleTool' });
+    logger.info('✅ User subscription status tracking', { component: 'SimpleTool' });
+    logger.info('✅ Graceful shutdown capability', { component: 'SimpleTool' });
+    logger.info('✅ Memory usage monitoring', { component: 'SimpleTool' });
+    logger.info('✅ Connection activity tracking', { component: 'SimpleTool' });
+    logger.info('\n✨ WebSocket Service is fully enhanced and production-ready!', { component: 'SimpleTool' });
     
   } catch (error) {
-    console.error('❌ Error during WebSocket service verification:', error);
+    logger.error('❌ Error during WebSocket service verification:', { component: 'SimpleTool' }, error);
     throw error;
   }
 }
 
 // Run verification
 verifyWebSocketService().catch(console.error);
+
+
+
+
+
+

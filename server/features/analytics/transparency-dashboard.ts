@@ -4,7 +4,9 @@ import {
 import { eq, desc, and, gte, lte, count } from "drizzle-orm";
 import { readDatabase } from "../../../shared/database/connection.js";
 import { cacheService, CACHE_TTL } from "../../infrastructure/cache/cache-service.js";
-import { financialDisclosureIntegrationService } from "./financial-disclosure-integration.js";
+import { financialDisclosureAnalyticsService } from "./services/financial-disclosure.service.js";
+import { logger } from '../../utils/logger';
+import { errorTracker } from '../../core/errors/error-tracker';
 
 export interface TransparencyScoreResult {
   overallScore: number;
@@ -58,9 +60,9 @@ export class SimpleTransparencyDashboardService {
       console.log(`🔄 Calculating transparency score for sponsor ${sponsorId}...`);
 
       const [completenessReport, relationshipMapping, disclosures, sponsor] = await Promise.all([
-        financialDisclosureIntegrationService.calculateDisclosureCompletenessScore(sponsorId),
-        financialDisclosureIntegrationService.createFinancialRelationshipMapping(sponsorId),
-        financialDisclosureIntegrationService.processFinancialDisclosureData(sponsorId),
+        financialDisclosureAnalyticsService.calculateCompletenessScore(sponsorId),
+        financialDisclosureAnalyticsService.buildRelationshipMap(sponsorId),
+        financialDisclosureAnalyticsService.getDisclosureData(sponsorId),
         this.getSponsorDetails(sponsorId)
       ]);
 
@@ -106,7 +108,16 @@ export class SimpleTransparencyDashboardService {
         lastCalculated: new Date()
       };
     } catch (error) {
-      console.error(`Error calculating transparency score for sponsor ${sponsorId}:`, error);
+      logger.error(`Error calculating transparency score for sponsor ${sponsorId}`, { component: 'transparency-dashboard', sponsorId, error });
+      try {
+        if ((errorTracker as any)?.trackRequestError) {
+          (errorTracker as any).trackRequestError(error instanceof Error ? error : new Error(String(error)), undefined as any, 'medium', 'calculateTransparencyScore');
+        } else if ((errorTracker as any)?.capture) {
+          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'transparency-dashboard', sponsorId });
+        }
+      } catch (reportErr) {
+        logger.warn('Failed to report transparency dashboard error to errorTracker', { reportErr });
+      }
       throw new Error('Failed to calculate transparency score');
     }
   }
@@ -160,7 +171,7 @@ export class SimpleTransparencyDashboardService {
 
       return { trends, analysis, recommendations };
     } catch (error) {
-      console.error('Error analyzing transparency trends:', error);
+      logger.error('Error analyzing transparency trends:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to analyze transparency trends');
     }
   }
@@ -170,7 +181,7 @@ export class SimpleTransparencyDashboardService {
    */
   async getTransparencyDashboard() {
     try {
-      console.log('🔄 Loading transparency dashboard...');
+      logger.info('🔄 Loading transparency dashboard...', { component: 'SimpleTool' });
 
       // Get all active sponsors
       const allSponsors = await readDatabase
@@ -255,7 +266,7 @@ export class SimpleTransparencyDashboardService {
 
       const alertCount = dataFreshness < 70 ? 1 : 0;
 
-      console.log('✅ Transparency dashboard loaded');
+      logger.info('✅ Transparency dashboard loaded', { component: 'SimpleTool' });
 
       return {
         summary: {
@@ -286,7 +297,7 @@ export class SimpleTransparencyDashboardService {
         }
       };
     } catch (error) {
-      console.error('Error loading transparency dashboard:', error);
+      logger.error('Error loading transparency dashboard:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to load transparency dashboard');
     }
   }
@@ -490,7 +501,7 @@ export class SimpleTransparencyDashboardService {
         conflictCount
       };
     } catch (error) {
-      console.error('Error calculating period transparency:', error);
+      logger.error('Error calculating period transparency:', { component: 'SimpleTool' }, error);
       return {
         averageScore: 0,
         averageRiskLevel: 'low',
@@ -634,3 +645,11 @@ export class SimpleTransparencyDashboardService {
 }
 
 export const simpleTransparencyDashboardService = new SimpleTransparencyDashboardService();
+
+
+
+
+
+
+
+

@@ -7,15 +7,16 @@
 
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { EventEmitter } from 'events';
-import { 
-  DataSource, 
-  ApiEndpoint, 
-  ApiResponse, 
-  BillData, 
+import { logger } from '../../utils/logger';
+import {
+  DataSource,
+  ApiEndpoint,
+  ApiResponse,
+  BillData,
   SponsorData,
   DataSourceHealth,
-  HealthIssue 
-} from './types.js';
+  HealthIssue
+} from './types';
 
 export class GovernmentDataService extends EventEmitter {
   private dataSources: Map<string, DataSource> = new Map();
@@ -473,3 +474,9 @@ class RateLimiter {
     };
   }
 }
+
+
+
+
+
+

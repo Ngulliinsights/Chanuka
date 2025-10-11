@@ -2,6 +2,7 @@ import { Redis } from 'ioredis';
 import { Pool } from 'pg';
 import { type InsertUserProgress, type UserProgress } from '../../../shared/schema.js';
 import { BaseStorage } from './base/BaseStorage.js';
+import \{ logger \} from '../../utils/logger';
 export declare class ProgressStorage extends BaseStorage<UserProgress> {
     constructor(redis: Redis, pool: Pool);
     protected invalidateCache(pattern: string): Promise<void>;
@@ -17,3 +18,12 @@ export declare class ProgressStorage extends BaseStorage<UserProgress> {
     }>;
     shutdown(): Promise<void>;
 }
+
+
+
+
+
+
+
+
+

@@ -19,6 +19,7 @@ import {
 } from '../ai-rate-limiter';
 import { RateLimitStore, RateLimitResult } from '../types';
 import { MemoryStore } from '../stores/memory-store';
+import { logger } from '../utils/logger';
 
 describe('AI Rate Limiter', () => {
   let mockStore: RateLimitStore;
@@ -644,3 +645,9 @@ describe('AI Rate Limiter', () => {
     });
   });
 });
+
+
+
+
+
+

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { offlineDataManager, cacheInvalidation } from '@/utils/apiCache';
 import { addNetworkStatusListener, isOnline } from '@/utils/serviceWorker';
+import { logger } from '../utils/logger';
 
 export interface OfflineState {
   isOnline: boolean;
@@ -81,7 +82,7 @@ export function useOfflineCapabilities(): OfflineCapabilities {
           isOfflineReady: !!registration && hasCriticalData,
         }));
       } catch (error) {
-        console.error('Failed to check offline readiness:', error);
+        logger.error('Failed to check offline readiness:', { component: 'SimpleTool' }, error);
       }
     };
 
@@ -104,9 +105,9 @@ export function useOfflineCapabilities(): OfflineCapabilities {
         lastSyncTime: Date.now(),
       }));
 
-      console.log('Sync completed successfully');
+      logger.info('Sync completed successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('Sync failed:', error);
+      logger.error('Sync failed:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }, [state.isOnline, queryClient]);
@@ -127,7 +128,7 @@ export function useOfflineCapabilities(): OfflineCapabilities {
       pendingSyncCount: 0,
     }));
 
-    console.log('Offline data cleared');
+    logger.info('Offline data cleared', { component: 'SimpleTool' });
   }, [queryClient]);
 
   const enableOfflineMode = useCallback(async () => {
@@ -155,15 +156,15 @@ export function useOfflineCapabilities(): OfflineCapabilities {
       }
 
       setState(prev => ({ ...prev, isOfflineReady: true }));
-      console.log('Offline mode enabled');
+      logger.info('Offline mode enabled', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('Failed to enable offline mode:', error);
+      logger.error('Failed to enable offline mode:', { component: 'SimpleTool' }, error);
     }
   }, []);
 
   const disableOfflineMode = useCallback(() => {
     clearOfflineData();
-    console.log('Offline mode disabled');
+    logger.info('Offline mode disabled', { component: 'SimpleTool' });
   }, [clearOfflineData]);
 
   const isDataCached = useCallback((key: string): boolean => {
@@ -320,3 +321,9 @@ export function useOfflineNotifications() {
     clearNotifications,
   };
 }
+
+
+
+
+
+

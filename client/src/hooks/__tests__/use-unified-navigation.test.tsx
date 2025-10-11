@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { useUnifiedNavigation } from '../use-unified-navigation';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import React from 'react';
+import { logger } from '../utils/logger.js';
 
 // Test wrapper component
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (

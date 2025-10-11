@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ErrorType, ErrorSeverity } from './PageErrorBoundary';
+import { logger } from '../utils/logger.js';
 
 export interface RecoveryStrategy {
   type: 'retry' | 'reload' | 'redirect' | 'fallback';
@@ -57,7 +58,7 @@ export const ErrorRecoveryManager: React.FC<ErrorRecoveryManagerProps> = ({
           break;
       }
     } catch (recoveryError) {
-      console.error('Recovery strategy failed:', recoveryError);
+      logger.error('Recovery strategy failed:', { component: 'SimpleTool' }, recoveryError);
       onFailure();
     } finally {
       setIsRecovering(false);
@@ -180,7 +181,7 @@ export function useErrorRecovery(
   }, [recoveryAttempts]);
 
   const handleFailure = useCallback(() => {
-    console.error('All recovery strategies failed');
+    logger.error('All recovery strategies failed', { component: 'SimpleTool' });
     setIsRecovering(false);
   }, []);
 

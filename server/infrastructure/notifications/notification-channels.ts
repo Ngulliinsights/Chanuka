@@ -4,6 +4,7 @@ import { webSocketService } from '../websocket.ts';
 import { database as db } from '../../../shared/database/connection.ts';
 import { users, bills, notifications } from '../../../shared/schema.ts';
 import { eq } from 'drizzle-orm';
+import { logger } from '../utils/logger';
 
 export interface NotificationChannelConfig {
   type: 'email' | 'inApp' | 'sms' | 'push';
@@ -111,7 +112,7 @@ export class NotificationChannelService {
       };
 
     } catch (error) {
-      console.error('Error in multi-channel notification:', error);
+      logger.error('Error in multi-channel notification:', { component: 'SimpleTool' }, error);
       return {
         success: false,
         channels: [{ type: 'error', success: false, error: String(error) }]
@@ -401,7 +402,7 @@ export class NotificationChannelService {
       });
 
     } catch (error) {
-      console.error('Error checking bill relevance:', error);
+      logger.error('Error checking bill relevance:', { component: 'SimpleTool' }, error);
       return true; // Default to showing notification if check fails
     }
   }
@@ -633,3 +634,9 @@ Chanuka Legislative Transparency Platform
 }
 
 export const notificationChannelService = new NotificationChannelService();
+
+
+
+
+
+

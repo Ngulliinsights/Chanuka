@@ -4,6 +4,7 @@ import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth.j
 import { privacyService, PrivacyPreferences } from './privacy-service.js';
 import { ApiSuccess, ApiErrorResponse, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
 import { auditLogger } from "../../infrastructure/monitoring/audit-log.js";
+import { logger } from '../../utils/logger';
 
 export const router = Router();
 
@@ -78,7 +79,7 @@ router.get('/preferences', authenticateToken, async (req: AuthenticatedRequest, 
     return ApiSuccess(res, preferences, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching privacy preferences:', error);
+    logger.error('Error fetching privacy preferences:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch privacy preferences', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -116,7 +117,7 @@ router.patch('/preferences', authenticateToken, async (req: AuthenticatedRequest
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error updating privacy preferences:', error);
+    logger.error('Error updating privacy preferences:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to update privacy preferences', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -177,7 +178,7 @@ router.post('/data-export', authenticateToken, async (req: AuthenticatedRequest,
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error exporting user data:', error);
+    logger.error('Error exporting user data:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to export user data', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -223,7 +224,7 @@ router.post('/data-deletion', authenticateToken, async (req: AuthenticatedReques
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error deleting user data:', error);
+    logger.error('Error deleting user data:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to delete user data', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -255,7 +256,7 @@ router.get('/gdpr-report', authenticateToken, async (req: AuthenticatedRequest, 
     return ApiSuccess(res, complianceReport, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error generating GDPR report:', error);
+    logger.error('Error generating GDPR report:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to generate GDPR compliance report', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -273,7 +274,7 @@ router.get('/retention-policies', async (req, res) => {
     return ApiSuccess(res, { policies }, 
       ApiResponseWrapper.createMetadata(startTime, 'cache'));
   } catch (error) {
-    console.error('Error fetching retention policies:', error);
+    logger.error('Error fetching retention policies:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch retention policies', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'cache'));
   }
@@ -313,7 +314,7 @@ router.post('/cleanup', authenticateToken, async (req: AuthenticatedRequest, res
     return ApiSuccess(res, cleanupResult, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error running data cleanup:', error);
+    logger.error('Error running data cleanup:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to run data cleanup', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -367,7 +368,7 @@ router.patch('/retention-policies', authenticateToken, async (req: Authenticated
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error updating retention policy:', error);
+    logger.error('Error updating retention policy:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to update retention policy', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -407,7 +408,7 @@ router.get('/dashboard', authenticateToken, async (req: AuthenticatedRequest, re
     return ApiSuccess(res, dashboard, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching privacy dashboard:', error);
+    logger.error('Error fetching privacy dashboard:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch privacy dashboard', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -459,8 +460,16 @@ router.post('/withdraw-consent', authenticateToken, async (req: AuthenticatedReq
       updatedPreferences: updatedPrefs
     }, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error withdrawing consent:', error);
+    logger.error('Error withdrawing consent:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to withdraw consent', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
 });
+
+
+
+
+
+
+
+

@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import DesktopSidebar from '../DesktopSidebar';
 import { ResponsiveNavigationProvider } from '@/contexts/ResponsiveNavigationContext';
 import { NavigationProvider } from '@/contexts/NavigationContext';
+import { logger } from '../utils/logger.js';
 
 // Mock hooks
 vi.mock('@/hooks/use-auth', () => ({

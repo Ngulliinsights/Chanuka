@@ -10,7 +10,7 @@ import { database, readDatabase, writeDatabase, withTransaction } from './connec
 import { executeQuery } from './pool.js';
 import { initializeDatabaseSafety, shutdownDatabaseSafety } from './init.js';
 import { asyncErrorHandler } from '../utils/error-handler.js';
-import { logger } from '../utils/logger.js';
+import { logger } from '../utils/logger';
 
 /**
  * Example: Safe database initialization
@@ -116,3 +116,9 @@ export const examples = {
   shutdownApp,
   errorHandlingExample,
 };
+
+
+
+
+
+

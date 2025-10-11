@@ -1,9 +1,10 @@
 import { eq, desc, and, sql, count, ilike, or, asc } from "drizzle-orm";
-import { databaseService, DatabaseResult } from "./database-service.js";
-import { cacheService, CACHE_KEYS, CACHE_TTL } from "./cache.js";
-import { searchIndexManager } from "./search-index-manager.js";
+import { databaseService } from "../../infrastructure/database/database-service.js";
+import { cacheService, CACHE_KEYS, CACHE_TTL } from "../../infrastructure/cache/cache-service.js";
+import { searchIndexManager } from "../search-index-manager.js";
 import * as schema from "../../../shared/schema.js";
 import { Bill, InsertBill, BillEngagement } from "../../../shared/schema.js";
+import { logger } from '../../utils/logger';
 
 // Types for bill operations
 export interface BillFilters {
@@ -84,6 +85,8 @@ export class BillService {
         tags: ["privacy", "technology", "digital-rights"],
         viewCount: 1250,
         shareCount: 89,
+        commentCount: 45,
+        engagementScore: "156",
         complexityScore: 7,
         constitutionalConcerns: {
           concerns: ["First Amendment implications", "Commerce Clause considerations"],
@@ -119,6 +122,8 @@ export class BillService {
         tags: ["climate", "energy", "environment"],
         viewCount: 2100,
         shareCount: 156,
+        commentCount: 78,
+        engagementScore: "234",
         complexityScore: 9,
         constitutionalConcerns: {
           concerns: ["Interstate Commerce regulation", "Federal vs State authority"],
@@ -267,7 +272,7 @@ export class BillService {
    * Get a specific bill by ID with comprehensive data
    */
   async getBillById(id: number): Promise<BillWithEngagement | null> {
-    const cacheKey = CACHE_KEYS.BILL_DETAIL(id);
+    const cacheKey = CACHE_KEYS.BILL_DETAILS(id);
 
     // Try cache first
     const cachedResult = await cacheService.get(cacheKey);
@@ -326,7 +331,7 @@ export class BillService {
               party: schema.sponsors.party
             })
             .from(schema.sponsors)
-            .where(eq(schema.sponsors.id, parseInt(bill.sponsorId)));
+            .where(eq(schema.sponsors.id, bill.sponsorId));
           
           sponsorInfo = sponsor || null;
         }
@@ -369,7 +374,7 @@ export class BillService {
         // Initialize engagement tracking
         await tx.insert(schema.billEngagement).values({
           billId: newBill.id,
-          userId: billData.sponsorId || 'system',
+          userId: '00000000-0000-0000-0000-000000000000', // system user
           viewCount: 0,
           commentCount: 0,
           shareCount: 0,
@@ -485,7 +490,7 @@ export class BillService {
         }
       });
     } catch (error) {
-      console.error('Error triggering status change notification:', error);
+      logger.error('Error triggering status change notification:', { component: 'SimpleTool' }, error as any);
       // Don't fail the status update if notification fails
     }
   }
@@ -494,7 +499,7 @@ export class BillService {
    * Get bill statistics
    */
   async getBillStats(): Promise<BillStats> {
-    const cacheKey = CACHE_KEYS.BILL_STATS;
+    const cacheKey = CACHE_KEYS.BILL_STATS();
     
     // Try cache first
     const cachedResult = await cacheService.get(cacheKey);
@@ -677,7 +682,7 @@ export class BillService {
           newStats
         });
       } catch (error) {
-        console.error('Error triggering engagement notification:', error);
+        logger.error('Error triggering engagement notification:', { component: 'SimpleTool' }, error as any);
         // Don't fail the engagement recording if notification fails
       }
     }
@@ -742,7 +747,7 @@ export class BillService {
         }
       }));
     } catch (error) {
-      console.error('Error enhancing bills with engagement:', error);
+      logger.error('Error enhancing bills with engagement:', { component: 'SimpleTool' }, error as any);
       // Return bills without engagement data
       return bills.map(bill => ({ ...bill }));
     }
@@ -788,22 +793,30 @@ export class BillService {
   private async clearBillCaches(billId?: number): Promise<void> {
     try {
       // Clear general caches
-      await cacheService.delete(CACHE_KEYS.BILL_STATS);
-      await cacheService.delete(CACHE_KEYS.BILL_CATEGORIES);
-      await cacheService.delete(CACHE_KEYS.BILL_STATUSES);
+      await cacheService.delete(CACHE_KEYS.BILL_STATS());
+      await cacheService.delete(CACHE_KEYS.BILL_CATEGORIES());
+      await cacheService.delete(CACHE_KEYS.BILL_STATUSES());
 
       // Clear specific bill cache if ID provided
       if (billId) {
-        await cacheService.delete(CACHE_KEYS.BILL_DETAIL(billId));
+        await cacheService.delete(CACHE_KEYS.BILL_DETAILS(billId));
       }
 
       // Clear search result caches (pattern-based deletion would be ideal)
       // For now, we'll rely on TTL expiration
     } catch (error) {
-      console.error('Error clearing bill caches:', error);
+      logger.error('Error clearing bill caches:', { component: 'SimpleTool' }, error as any);
     }
   }
 }
 
 // Export singleton instance
 export const billService = new BillService();
+
+
+
+
+
+
+
+

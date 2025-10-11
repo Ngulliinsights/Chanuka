@@ -1,5 +1,6 @@
 import React, { Component, ReactNode, ErrorInfo } from 'react';
 import { ErrorFallback } from './ErrorFallback';
+import { logger } from '../utils/logger.js';
 
 export type ErrorType = 'javascript' | 'network' | 'chunk' | 'timeout' | 'memory' | 'security' | 'unknown';
 export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
@@ -142,10 +143,10 @@ class PageErrorBoundary extends Component<Props, State> {
 
     // Enhanced error logging with context
     console.group(`🚨 PageErrorBoundary Error [${errorType}/${errorSeverity}]`);
-    console.error('Error:', error);
-    console.error('Error Info:', errorInfo);
-    console.error('Component Stack:', errorInfo.componentStack);
-    console.error('Context:', this.props.context);
+    logger.error('Error:', { component: 'SimpleTool' }, error);
+    logger.error('Error Info:', { component: 'SimpleTool' }, errorInfo);
+    logger.error('Component Stack:', { component: 'SimpleTool' }, errorInfo.componentStack);
+    logger.error('Context:', { component: 'SimpleTool' }, this.props.context);
     console.groupEnd();
 
     // Collect enhanced error context
@@ -327,7 +328,7 @@ class PageErrorBoundary extends Component<Props, State> {
       // Page became visible again, check if we should attempt recovery
       const timeSinceError = Date.now() - this.state.lastErrorTime;
       if (timeSinceError > 30000) { // 30 seconds
-        console.log('Page became visible after error, attempting recovery');
+        logger.info('Page became visible after error, attempting recovery', { component: 'SimpleTool' });
         this.resetError();
       }
     }
@@ -335,7 +336,7 @@ class PageErrorBoundary extends Component<Props, State> {
 
   handlePromiseRejection = (event: PromiseRejectionEvent) => {
     const reason = event.reason;
-    console.error('Unhandled promise rejection:', reason);
+    logger.error('Unhandled promise rejection:', { component: 'SimpleTool' }, reason);
     
     // Create a proper error object from the rejection reason
     let error: Error;
@@ -392,7 +393,7 @@ class PageErrorBoundary extends Component<Props, State> {
   }
 
   handleGlobalError = (event: ErrorEvent) => {
-    console.error('Global error:', event.error);
+    logger.error('Global error:', { component: 'SimpleTool' }, event.error);
     
     const error = event.error || new Error(event.message);
     const errorType = PageErrorBoundary.classifyError(error);
@@ -413,7 +414,7 @@ class PageErrorBoundary extends Component<Props, State> {
     const target = event.target as HTMLElement;
     if (target && (target.tagName === 'SCRIPT' || target.tagName === 'LINK' || target.tagName === 'IMG')) {
       const resourceUrl = (target as any).src || (target as any).href;
-      console.error('Resource loading error:', resourceUrl);
+      logger.error('Resource loading error:', { component: 'SimpleTool' }, resourceUrl);
       
       this.errorReportingService.reportError(
         new Error(`Failed to load resource: ${resourceUrl}`),
@@ -610,7 +611,7 @@ class ErrorReportingService {
   }
 
   reportRecoveryAttempt(data: RecoveryAttempt) {
-    console.log('Recovery attempt:', data);
+    logger.info('Recovery attempt:', { component: 'SimpleTool' }, data);
     // In a real application, this would be sent to analytics
   }
 
@@ -644,14 +645,14 @@ ${errorReport.errorInfo?.componentStack || 'N/A'}
 
   private handleOnline = () => {
     this.isOnline = true;
-    console.log('Connection restored, flushing error queues');
+    logger.info('Connection restored, flushing error queues', { component: 'SimpleTool' });
     this.flushErrorQueue();
     this.flushPerformanceQueue();
   };
 
   private handleOffline = () => {
     this.isOnline = false;
-    console.log('Connection lost, errors will be queued');
+    logger.info('Connection lost, errors will be queued', { component: 'SimpleTool' });
   };
 
   private async flushErrorQueue() {
@@ -668,9 +669,9 @@ ${errorReport.errorInfo?.componentStack || 'N/A'}
       // Clear queue on successful send
       this.errorQueue = [];
       this.persistErrorQueue();
-      console.log('Error reports sent successfully');
+      logger.info('Error reports sent successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('Failed to send error reports:', error);
+      logger.error('Failed to send error reports:', { component: 'SimpleTool' }, error);
       // Keep errors in queue for retry
     }
   }
@@ -688,9 +689,9 @@ ${errorReport.errorInfo?.componentStack || 'N/A'}
       
       // Clear queue on successful send
       this.performanceQueue = [];
-      console.log('Performance reports sent successfully');
+      logger.info('Performance reports sent successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('Failed to send performance reports:', error);
+      logger.error('Failed to send performance reports:', { component: 'SimpleTool' }, error);
       // Keep performance issues in queue for retry
     }
   }
@@ -732,7 +733,7 @@ ${errorReport.errorInfo?.componentStack || 'N/A'}
       };
       localStorage.setItem('errorQueue', JSON.stringify(data));
     } catch (error) {
-      console.error('Failed to persist error queue:', error);
+      logger.error('Failed to persist error queue:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -757,7 +758,7 @@ ${errorReport.errorInfo?.componentStack || 'N/A'}
         }
       }
     } catch (error) {
-      console.error('Failed to load persisted errors:', error);
+      logger.error('Failed to load persisted errors:', { component: 'SimpleTool' }, error);
       // Clear corrupted data
       localStorage.removeItem('errorQueue');
     }
@@ -767,7 +768,7 @@ ${errorReport.errorInfo?.componentStack || 'N/A'}
     try {
       localStorage.removeItem('errorQueue');
     } catch (error) {
-      console.error('Failed to clear persisted errors:', error);
+      logger.error('Failed to clear persisted errors:', { component: 'SimpleTool' }, error);
     }
   }
 

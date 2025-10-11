@@ -2,6 +2,7 @@ import { pgTable, text, serial, integer, boolean, timestamp, jsonb, numeric, uui
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations, sql } from "drizzle-orm";
+import { logger } from '../server/utils/logger';
 
 // ============================================================================
 // CORE USER TABLES
@@ -49,6 +50,7 @@ export const userProfiles = pgTable("user_profiles", {
 export const sessions = pgTable("sessions", {
   id: text("id").primaryKey(),
   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  token: text("token"),
   expiresAt: timestamp("expires_at").notNull(),
   isActive: boolean("is_active").notNull().default(true),
   ipAddress: text("ip_address"),
@@ -904,6 +906,16 @@ export const insertUserProfileSchema = z.object({
   isPublic: z.boolean().default(true),
 });
 
+export const insertUserProgressSchema = z.object({
+  userId: z.string().uuid(),
+  achievementType: z.string().min(1),
+  achievementValue: z.number().int().min(0).default(0),
+  level: z.number().int().min(1).default(1),
+  badge: z.string().optional(),
+  description: z.string().optional(),
+  unlockedAt: z.date().default(() => new Date()),
+});
+
 export const insertBillSchema = z.object({
   title: z.string().min(1).max(500),
   description: z.string().optional(),
@@ -1000,6 +1012,7 @@ export type PasswordReset = typeof passwordResets.$inferSelect;
 export type UserSocialProfile = typeof userSocialProfiles.$inferSelect;
 export type UserInterest = typeof userInterests.$inferSelect;
 export type UserProgress = typeof userProgress.$inferSelect;
+export type InsertUserProgress = z.infer<typeof insertUserProgressSchema>;
 
 export type Bill = typeof bills.$inferSelect;
 export type InsertBill = z.infer<typeof insertBillSchema>;
@@ -1115,3 +1128,9 @@ export type SecurityMetrics = {
   blockedIps: number;
   recentAuditLogs: SecurityAuditLog[];
 };
+
+
+
+
+
+
