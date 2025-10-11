@@ -6,6 +6,7 @@ import { notificationChannelService } from './notification-channels.js';
 import { smartNotificationFilterService } from './smart-notification-filter.js';
 import { z } from 'zod';
 import { ApiSuccess, ApiError, ApiValidationError } from "../../utils/api-response.js";
+import { logger } from '../utils/logger';
 
 export const router = Router();
 
@@ -75,7 +76,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
     });
 
   } catch (error) {
-    console.error('Error getting notifications:', error);
+    logger.error('Error getting notifications:', { component: 'SimpleTool' }, error);
 
     if (error instanceof z.ZodError) {
       return ApiValidationError(res, error);
@@ -110,7 +111,7 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Respo
     return ApiSuccess(res, notification, {}, 201);
 
   } catch (error) {
-    console.error('Error creating notification:', error);
+    logger.error('Error creating notification:', { component: 'SimpleTool' }, error);
 
     if (error instanceof z.ZodError) {
       return ApiValidationError(res, error);
@@ -141,7 +142,7 @@ router.patch('/:id/read', authenticateToken, async (req: AuthenticatedRequest, r
     return ApiSuccess(res, { message: 'Notification marked as read' });
 
   } catch (error) {
-    console.error('Error marking notification as read:', error);
+    logger.error('Error marking notification as read:', { component: 'SimpleTool' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to mark notification as read' }, 500);
   }
 });
@@ -162,7 +163,7 @@ router.patch('/read-all', authenticateToken, async (req: AuthenticatedRequest, r
     return ApiSuccess(res, { message: 'All notifications marked as read' });
 
   } catch (error) {
-    console.error('Error marking all notifications as read:', error);
+    logger.error('Error marking all notifications as read:', { component: 'SimpleTool' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to mark all notifications as read' }, 500);
   }
 });
@@ -187,7 +188,7 @@ router.delete('/:id', authenticateToken, async (req: AuthenticatedRequest, res: 
     return ApiSuccess(res, { message: 'Notification deleted' });
 
   } catch (error) {
-    console.error('Error deleting notification:', error);
+    logger.error('Error deleting notification:', { component: 'SimpleTool' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to delete notification' }, 500);
   }
 });
@@ -207,7 +208,7 @@ router.get('/stats', authenticateToken, async (req: AuthenticatedRequest, res: R
     return ApiSuccess(res, stats);
 
   } catch (error) {
-    console.error('Error getting notification stats:', error);
+    logger.error('Error getting notification stats:', { component: 'SimpleTool' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to get notification statistics' }, 500);
   }
 });
@@ -264,7 +265,7 @@ router.get('/preferences/enhanced', authenticateToken, async (req: Authenticated
     });
 
   } catch (error) {
-    console.error('Error getting enhanced preferences:', error);
+    logger.error('Error getting enhanced preferences:', { component: 'SimpleTool' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to get enhanced preferences' }, 500);
   }
 });
@@ -288,7 +289,7 @@ router.patch('/preferences/channels', authenticateToken, async (req: Authenticat
     return ApiSuccess(res, { message: 'Channel preferences updated successfully' });
 
   } catch (error) {
-    console.error('Error updating channel preferences:', error);
+    logger.error('Error updating channel preferences:', { component: 'SimpleTool' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to update channel preferences' }, 500);
   }
 });
@@ -314,7 +315,7 @@ router.post('/test-filter', authenticateToken, async (req: AuthenticatedRequest,
     return ApiSuccess(res, filterResult);
 
   } catch (error) {
-    console.error('Error testing smart filter:', error);
+    logger.error('Error testing smart filter:', { component: 'SimpleTool' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to test smart filter' }, 500);
   }
 });
@@ -337,9 +338,15 @@ router.get('/status', async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Error getting service status:', error);
+    logger.error('Error getting service status:', { component: 'SimpleTool' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to get service status' }, 500);
   }
 });
 
 export default router;
+
+
+
+
+
+

@@ -2,6 +2,7 @@ import { forwardRef, ElementRef, ComponentPropsWithoutRef } from "react"
 import { Root } from "@radix-ui/react-separator"
 
 import { cn } from "@/lib/utils"
+import { logger } from '../utils/logger.js';
 
 const Separator = forwardRef<
   ElementRef<typeof Root>,

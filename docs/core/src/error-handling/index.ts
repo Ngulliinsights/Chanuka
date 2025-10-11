@@ -32,3 +32,9 @@ export { unifiedErrorHandler, setupGlobalErrorHandlers as setupLegacyGlobalError
 // Legacy adapters for backward compatibility
 export * from './legacy-adapters';
 export { ERROR_MESSAGES, AUTH_ERROR_MESSAGES, getErrorMessage } from './legacy-adapters/error-messages-adapter';
+
+
+
+
+
+

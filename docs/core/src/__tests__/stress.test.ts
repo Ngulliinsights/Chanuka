@@ -4,6 +4,7 @@ import { createCacheService } from '../cache';
 import { createRateLimitFactory } from '../rate-limiting';
 import { Logger } from '../logging/logger';
 import type { StressTestComponents, StressTestConfig } from '../testing/stress-tests';
+import { logger } from '../utils/logger';
 
 describe('Core Utilities Stress Tests', () => {
   let stressTests: StressTests;
@@ -99,7 +100,7 @@ describe('Core Utilities Stress Tests', () => {
       // Memory should not grow excessively (less than 500MB for test)
       expect(lastSnapshot.heapUsed).toBeLessThan(500 * 1024 * 1024);
 
-      console.log('\n=== Cache Memory Stress Results ===');
+      logger.info('\n=== Cache Memory Stress Results ===', { component: 'SimpleTool' });
       console.log(`Memory growth: ${((lastSnapshot.heapUsed - firstSnapshot.heapUsed) / 1024 / 1024).toFixed(2)}MB`);
       console.log(`Peak heap usage: ${(lastSnapshot.heapUsed / 1024 / 1024).toFixed(2)}MB`);
       
@@ -132,7 +133,7 @@ describe('Core Utilities Stress Tests', () => {
         expect(result.errorRate).toBeLessThan(0.05); // Less than 5% error rate
       });
 
-      console.log('\n=== Cache Concurrency Stress Results ===');
+      logger.info('\n=== Cache Concurrency Stress Results ===', { component: 'SimpleTool' });
       concurrencyResults.forEach(result => {
         console.log(`Concurrency ${result.concurrency}: ${result.operationsPerSecond.toFixed(0)} ops/sec, ${(result.errorRate * 100).toFixed(2)}% errors`);
       });
@@ -155,7 +156,7 @@ describe('Core Utilities Stress Tests', () => {
         expect(floodResult.errorCount).toBeLessThan(floodResult.totalRequests * 0.01); // Less than 1% errors
       });
 
-      console.log('\n=== Rate Limiting Flood Stress Results ===');
+      logger.info('\n=== Rate Limiting Flood Stress Results ===', { component: 'SimpleTool' });
       floodResults.forEach(result => {
         console.log(`${result.pattern}: ${result.requestsPerSecond.toFixed(0)} req/sec, ${(result.blockRate * 100).toFixed(1)}% blocked`);
       });
@@ -173,7 +174,7 @@ describe('Core Utilities Stress Tests', () => {
       // Memory growth should be reasonable (less than 200MB for 100k users)
       expect(memoryDelta.heapUsed).toBeLessThan(200 * 1024 * 1024);
 
-      console.log('\n=== Rate Limiting Memory Stress Results ===');
+      logger.info('\n=== Rate Limiting Memory Stress Results ===', { component: 'SimpleTool' });
       console.log(`Total memory growth: ${(memoryDelta.heapUsed / 1024 / 1024).toFixed(2)}MB`);
       console.log(`RSS growth: ${(memoryDelta.rss / 1024 / 1024).toFixed(2)}MB`);
     }, 90000);
@@ -195,7 +196,7 @@ describe('Core Utilities Stress Tests', () => {
         expect(volumeResult.errorRate).toBeLessThan(0.01); // Less than 1% error rate
       });
 
-      console.log('\n=== Logging Volume Stress Results ===');
+      logger.info('\n=== Logging Volume Stress Results ===', { component: 'SimpleTool' });
       volumeResults.forEach(result => {
         console.log(`${result.test}: ${result.actualLogsPerSecond.toFixed(0)} logs/sec (target: ${result.targetLogsPerSecond}), ${(result.errorRate * 100).toFixed(2)}% errors`);
       });
@@ -216,7 +217,7 @@ describe('Core Utilities Stress Tests', () => {
         expect(concurrencyResult.errorRate).toBeLessThan(0.05); // Less than 5% error rate
       });
 
-      console.log('\n=== Logging Concurrency Stress Results ===');
+      logger.info('\n=== Logging Concurrency Stress Results ===', { component: 'SimpleTool' });
       concurrencyResults.forEach(result => {
         console.log(`Concurrency ${result.concurrency}: ${result.operationsPerSecond.toFixed(0)} logs/sec, ${(result.errorRate * 100).toFixed(2)}% errors`);
       });
@@ -242,14 +243,14 @@ describe('Core Utilities Stress Tests', () => {
       // Memory growth should be controlled
       expect(memoryDelta.heapUsed).toBeLessThan(300 * 1024 * 1024); // Less than 300MB growth
 
-      console.log('\n=== System-Wide Stress Results ===');
+      logger.info('\n=== System-Wide Stress Results ===', { component: 'SimpleTool' });
       console.log(`Total operations: ${systemResults.totalOperations.toLocaleString()}`);
       console.log(`Operations per second: ${systemResults.operationsPerSecond.toFixed(0)}`);
       console.log(`Error rate: ${(systemResults.errorRate * 100).toFixed(2)}%`);
       console.log(`Concurrency: ${systemResults.concurrency}`);
       console.log(`Memory growth: ${(memoryDelta.heapUsed / 1024 / 1024).toFixed(2)}MB`);
       
-      console.log('\nOperation breakdown:');
+      logger.info('\nOperation breakdown:', { component: 'SimpleTool' });
       console.log(`  Cache operations: ${systemResults.breakdown.cacheOps.toLocaleString()}`);
       console.log(`  Rate limit checks: ${systemResults.breakdown.rateLimitChecks.toLocaleString()}`);
       console.log(`  Log entries: ${systemResults.breakdown.logEntries.toLocaleString()}`);
@@ -269,7 +270,7 @@ describe('Core Utilities Stress Tests', () => {
       const successRate = suite.summary.successfulTests / suite.summary.totalTests;
       expect(successRate).toBeGreaterThan(0.8);
 
-      console.log('\n=== Full Stress Test Suite Summary ===');
+      logger.info('\n=== Full Stress Test Suite Summary ===', { component: 'SimpleTool' });
       console.log(`Total Tests: ${suite.summary.totalTests}`);
       console.log(`Successful: ${suite.summary.successfulTests}`);
       console.log(`Failed: ${suite.summary.failedTests}`);
@@ -277,7 +278,7 @@ describe('Core Utilities Stress Tests', () => {
       console.log(`Success Rate: ${(successRate * 100).toFixed(1)}%`);
       console.log(`Total Duration: ${(suite.totalDurationMs / 1000).toFixed(1)}s`);
 
-      console.log('\n=== System Metrics ===');
+      logger.info('\n=== System Metrics ===', { component: 'SimpleTool' });
       const metrics = suite.systemMetrics;
       console.log(`Memory Usage: ${(metrics.memory.heapUsed / 1024 / 1024).toFixed(2)}MB heap, ${(metrics.memory.rss / 1024 / 1024).toFixed(2)}MB RSS`);
       console.log(`CPU Usage: ${metrics.cpu.user}μs user, ${metrics.cpu.system}μs system`);
@@ -288,7 +289,7 @@ describe('Core Utilities Stress Tests', () => {
       expect(metrics.memory.heapUsed).toBeLessThan(1024 * 1024 * 1024); // Less than 1GB
 
       // Log individual test results
-      console.log('\n=== Individual Test Results ===');
+      logger.info('\n=== Individual Test Results ===', { component: 'SimpleTool' });
       suite.results.forEach(result => {
         const status = result.success ? '✅' : '❌';
         const duration = (result.durationMs / 1000).toFixed(1);
@@ -321,7 +322,7 @@ describe('Core Utilities Stress Tests', () => {
         expect(lastSnapshot.heapUsed).toBeGreaterThanOrEqual(firstSnapshot.heapUsed);
       }
 
-      console.log('\n=== Resource Exhaustion Detection ===');
+      logger.info('\n=== Resource Exhaustion Detection ===', { component: 'SimpleTool' });
       console.log(`Initial memory: ${(initialMemory.heapUsed / 1024 / 1024).toFixed(2)}MB`);
       console.log(`Current memory: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB`);
       
@@ -343,7 +344,7 @@ describe('Core Utilities Stress Tests', () => {
 
       const results = systemResult.systemResults!;
       
-      console.log('\n=== Performance Insights ===');
+      logger.info('\n=== Performance Insights ===', { component: 'SimpleTool' });
       
       // Identify bottlenecks
       const { breakdown } = results;
@@ -361,15 +362,15 @@ describe('Core Utilities Stress Tests', () => {
         
         // Provide insights
         if (results.operationsPerSecond < 1000) {
-          console.log('⚠️  Low throughput detected - consider optimizing critical paths');
+          logger.info('⚠️  Low throughput detected - consider optimizing critical paths', { component: 'SimpleTool' });
         }
         
         if (results.errorRate > 0.05) {
-          console.log('⚠️  High error rate detected - investigate error handling');
+          logger.info('⚠️  High error rate detected - investigate error handling', { component: 'SimpleTool' });
         }
         
         if (systemResult.memoryDelta && systemResult.memoryDelta.heapUsed > 100 * 1024 * 1024) {
-          console.log('⚠️  High memory usage detected - check for memory leaks');
+          logger.info('⚠️  High memory usage detected - check for memory leaks', { component: 'SimpleTool' });
         }
       }
 
@@ -379,3 +380,9 @@ describe('Core Utilities Stress Tests', () => {
     }, 120000);
   });
 });
+
+
+
+
+
+

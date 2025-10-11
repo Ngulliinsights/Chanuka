@@ -5,6 +5,7 @@
  */
 
 import type { AppConfig } from './schema';
+import { logger } from '../utils/logger';
 
 // Re-export the main config type
 export type { AppConfig };
@@ -146,3 +147,9 @@ export interface ConfigTransformation {
   transformer?: (value: any) => any;
   condition?: (config: AppConfig) => boolean;
 }
+
+
+
+
+
+

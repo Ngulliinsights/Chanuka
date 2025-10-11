@@ -2,13 +2,14 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, jest } from '@je
 import request from 'supertest';
 import express from 'express';
 import cors from 'cors';
-import { router as billsRouter } from '../../features/bills/bills.js';
-import { router as sponsorsRouter } from '../../features/bills/sponsors.js';
+import { router as billsRouter } from '../../features/bills/bills-router.ts';
+import { router as sponsorsRouter } from '../../features/bills/sponsors.ts';
 import { router as authRouter } from '../../core/auth/auth.js';
 import { router as healthRouter } from '../../infrastructure/monitoring/health.js';
 import { database as db, users, bills, sponsors } from '../../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
+import { logger } from '../utils/logger';
 
 describe('Comprehensive API Integration Tests', () => {
   let app: express.Application;
@@ -332,3 +333,9 @@ describe('Comprehensive API Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+

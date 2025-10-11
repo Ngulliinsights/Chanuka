@@ -10,6 +10,7 @@ import { ApiSuccess, ApiErrorResponse, ApiResponseWrapper } from '../../utils/ap
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../../infrastructure/external-data/external-api-manager.js';
 import { performanceMonitor } from '../../infrastructure/monitoring/performance-monitor.js';
 import { advancedCachingService } from '../../infrastructure/cache/advanced-caching.js';
+import { logger } from '../../utils/logger';
 
 export const router = Router();
 
@@ -145,7 +146,7 @@ router.get('/dashboard', async (req, res) => {
 
     return ApiSuccess(res, dashboardData, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error getting external API dashboard data:', error);
+    logger.error('Error getting external API dashboard data:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to retrieve dashboard data', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'static'));
   }
@@ -199,7 +200,7 @@ router.get('/monitoring/realtime', async (req, res) => {
 
     return ApiSuccess(res, realtimeData, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error getting real-time monitoring data:', error);
+    logger.error('Error getting real-time monitoring data:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to retrieve real-time data', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'static'));
   }
@@ -268,7 +269,7 @@ router.post('/optimize', async (req, res) => {
 
     return ApiSuccess(res, result, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error performing API optimization:', error);
+    logger.error('Error performing API optimization:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to perform optimization', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'static'));
   }
@@ -391,7 +392,7 @@ router.get('/costs/report', async (req, res) => {
     const costReport = apiManagementService.getCostReport();
     return ApiSuccess(res, costReport, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error getting cost report:', error);
+    logger.error('Error getting cost report:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to retrieve cost report', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'static'));
   }
@@ -408,7 +409,7 @@ router.get('/costs/alerts', async (req, res) => {
     const alerts = costMonitoring.getActiveAlerts();
     return ApiSuccess(res, { alerts, count: alerts.length }, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error getting cost alerts:', error);
+    logger.error('Error getting cost alerts:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to retrieve cost alerts', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'static'));
   }
@@ -431,7 +432,7 @@ router.post('/costs/alerts/:alertId/acknowledge', async (req, res) => {
       return ApiError(res, 'Alert not found', 404, ApiResponseWrapper.createMetadata(startTime, 'static'));
     }
   } catch (error) {
-    console.error('Error acknowledging cost alert:', error);
+    logger.error('Error acknowledging cost alert:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to acknowledge alert', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'static'));
   }
@@ -448,7 +449,7 @@ router.get('/costs/recommendations', async (req, res) => {
     const recommendations = costMonitoring.getCostOptimizationRecommendations();
     return ApiSuccess(res, { recommendations, count: recommendations.length }, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error getting cost recommendations:', error);
+    logger.error('Error getting cost recommendations:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to retrieve cost recommendations', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'static'));
   }
@@ -473,7 +474,7 @@ router.put('/costs/budget/:source', async (req, res) => {
       config: budgetConfig 
     }, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error updating budget configuration:', error);
+    logger.error('Error updating budget configuration:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to update budget configuration', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'static'));
   }
@@ -549,7 +550,7 @@ router.get('/metrics/export', async (req, res) => {
 
     return ApiSuccess(res, metrics, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error exporting metrics:', error);
+    logger.error('Error exporting metrics:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to export metrics', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'static'));
   }
@@ -557,3 +558,11 @@ router.get('/metrics/export', async (req, res) => {
 
 // Export the service instance for use in other parts of the application
 export { apiManagementService };
+
+
+
+
+
+
+
+

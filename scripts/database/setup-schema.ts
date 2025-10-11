@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import ws from "ws";
+import { logger } from '../utils/logger';
 
 // Load environment variables
 dotenv.config();
@@ -11,7 +12,7 @@ if (typeof window === 'undefined') {
 }
 
 async function setupSchema() {
-  console.log('🔧 Setting up database schema...');
+  logger.info('🔧 Setting up database schema...', { component: 'SimpleTool' });
 
   if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL must be set');
@@ -21,7 +22,7 @@ async function setupSchema() {
 
   try {
     // Create all required tables with IF NOT EXISTS
-    console.log('📋 Creating tables...');
+    logger.info('📋 Creating tables...', { component: 'SimpleTool' });
 
     // Users table (might already exist)
     await pool.query(`
@@ -224,9 +225,9 @@ async function setupSchema() {
       );
     `);
 
-    console.log('✅ Database schema setup completed successfully!');
+    logger.info('✅ Database schema setup completed successfully!', { component: 'SimpleTool' });
   } catch (error) {
-    console.error('💥 Schema setup failed:', error.message);
+    logger.error('💥 Schema setup failed:', { component: 'SimpleTool' }, error.message);
     throw error;
   } finally {
     await pool.end();
@@ -235,10 +236,16 @@ async function setupSchema() {
 
 setupSchema()
   .then(() => {
-    console.log('Schema setup process completed');
+    logger.info('Schema setup process completed', { component: 'SimpleTool' });
     process.exit(0);
   })
   .catch((error) => {
-    console.error('Schema setup process failed:', error);
+    logger.error('Schema setup process failed:', { component: 'SimpleTool' }, error);
     process.exit(1);
   });
+
+
+
+
+
+

@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { ErrorDomain } from '../error-handling/base-error';
+import { logger } from '../utils/logger';
 
 interface ErrorResponse {
   statusCode: number;
@@ -29,3 +30,10 @@ export class ResponseHelper {
     });
   }
 }
+
+
+
+
+
+
+

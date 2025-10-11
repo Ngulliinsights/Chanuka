@@ -2,10 +2,18 @@
 // Centralized exports for administrative functionality
 
 // Routes
-export { default as adminRouter } from './admin';
-export { default as moderationRouter } from './moderation';
-export { default as systemRouter } from './system';
+export { router as adminRouter } from './admin';
+export { router as moderationRouter } from './moderation';
+export { router as systemRouter } from './system';
 
 // Services
 export { AdminService } from './admin';
 export { ContentModerationService } from './content-moderation';
+
+
+
+
+
+
+
+

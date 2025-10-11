@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import { Navigate } from "react-router-dom";
+import { logger } from '../utils/logger.js';
 
 // TEMPORARY: Authentication bypass for preview purposes
 const BYPASS_AUTH = true;

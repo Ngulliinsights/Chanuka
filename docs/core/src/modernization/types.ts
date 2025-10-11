@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { logger } from '../utils/logger';
 
 // Core modernization types
 export interface ModernizationTask {
@@ -350,3 +351,9 @@ export class ValidationError extends ModernizationError {
     this.name = 'ValidationError';
   }
 }
+
+
+
+
+
+

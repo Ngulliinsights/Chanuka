@@ -14,8 +14,9 @@
 import { EventEmitter } from 'events';
 // Note: ioredis needs to be installed: npm install ioredis @types/ioredis
 // import { Redis } from 'ioredis';
-import { ExternalAPIErrorHandler, ErrorSeverity } from '../../services/external-api-error-handler.js';
-import { APICostMonitoringService } from '../../services/api-cost-monitoring.js';
+import { ExternalAPIErrorHandler, ErrorSeverity } from '../../services/external-api-error-handler';
+import { APICostMonitoringService } from '../../services/api-cost-monitoring';
+import { logger } from '../../utils/logger';
 
 // ============================================================================
 // Core Types and Interfaces
@@ -309,7 +310,8 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
       source: config.source,
       status: 'healthy',
       responseTime: 0,
-      successRate: 100,
+      // successRate is a proportion (0-1) used throughout update logic
+      successRate: 1,
       errorRate: 0,
       lastChecked: new Date(),
       uptime: 100,
@@ -759,12 +761,27 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
 
     } catch (error) {
       this.updateHealthStatus(source, 0, false);
-      this.recordDowntimeEvent(source, `Health check failed: ${error.message}`, ErrorSeverity.HIGH);
+      this.recordDowntimeEvent(source, `Health check failed: ${error instanceof Error ? error.message : String(error)}`, ErrorSeverity.HIGH);
     }
   }
 
   private updateHealthStatus(source: string, responseTime: number, success: boolean): void {
-    const healthStatus = this.healthStatuses.get(source)!;
+    let healthStatus = this.healthStatuses.get(source);
+    if (!healthStatus) {
+      // Lazily initialize a default health status if missing to avoid runtime errors
+      healthStatus = {
+        source,
+        status: 'degraded',
+        responseTime: responseTime || 0,
+        successRate: success ? 1 : 0,
+        errorRate: success ? 0 : 1,
+        lastChecked: new Date(),
+        uptime: 0,
+        downtimeEvents: [],
+        consecutiveFailures: success ? 0 : 1
+      } as APIHealthStatus;
+      this.healthStatuses.set(source, healthStatus);
+    }
 
     if (responseTime > 0) {
       healthStatus.responseTime = healthStatus.responseTime === 0
@@ -772,7 +789,10 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
         : (healthStatus.responseTime * 0.8) + (responseTime * 0.2);
     }
 
-    const totalChecks = healthStatus.successRate + healthStatus.errorRate;
+  // Ensure numeric values
+  healthStatus.successRate = typeof healthStatus.successRate === 'number' ? healthStatus.successRate : 0;
+  healthStatus.errorRate = typeof healthStatus.errorRate === 'number' ? healthStatus.errorRate : 0;
+  const totalChecks = healthStatus.successRate + healthStatus.errorRate;
     if (success) {
       healthStatus.successRate = ((healthStatus.successRate * totalChecks) + 1) / (totalChecks + 1);
       healthStatus.errorRate = (healthStatus.errorRate * totalChecks) / (totalChecks + 1);
@@ -797,7 +817,25 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
   }
 
   private recordDowntimeEvent(source: string, reason: string, severity: ErrorSeverity): void {
-    const healthStatus = this.healthStatuses.get(source)!;
+    let healthStatus = this.healthStatuses.get(source);
+
+    // If no health status exists for the source, initialize a minimal default to avoid crashes
+    if (!healthStatus) {
+      logger.warn(`recordDowntimeEvent called for unregistered source '${source}'. Initializing default health status.`);
+      healthStatus = {
+        source,
+        status: 'down',
+        responseTime: 0,
+        successRate: 0,
+        errorRate: 1,
+        lastChecked: new Date(),
+        uptime: 0,
+        downtimeEvents: [],
+        consecutiveFailures: 1
+      } as APIHealthStatus;
+      this.healthStatuses.set(source, healthStatus);
+    }
+
     const lastEvent = healthStatus.downtimeEvents[healthStatus.downtimeEvents.length - 1];
 
     if (lastEvent && !lastEvent.endTime && lastEvent.reason === reason) {
@@ -1185,3 +1223,9 @@ export {
   APIRequestResult,
   ErrorSeverity
 };
+
+
+
+
+
+

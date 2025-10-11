@@ -558,6 +558,7 @@ describe('LegacyBridge', () => {
 
 import { MigrationHelper } from '../migration/MigrationHelper';
 import { TestUtils } from './setup';
+import { logger } from '../utils/logger';
 
 describe('MigrationHelper', () => {
   describe('gradual migration strategies', () => {
@@ -659,3 +660,9 @@ export class IntegrationTestHelpers {
     return { req, res, next };
   }
 }
+
+
+
+
+
+

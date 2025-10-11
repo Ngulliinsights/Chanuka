@@ -2,6 +2,7 @@ import React from 'react';
 import { useUnifiedNavigation } from '@/hooks/use-unified-navigation';
 import { Button } from '@/components/ui/button';
 import { NavigationStatePersistence } from '@/utils/navigation/state-persistence';
+import { logger } from '../utils/logger.js';
 
 /**
  * Debug component to help troubleshoot sidebar issues

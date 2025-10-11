@@ -3,6 +3,7 @@ import { Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigationPreferences } from '@/hooks/use-navigation-preferences';
 import { useLocation } from 'react-router-dom';
+import { logger } from '../utils/logger.js';
 
 interface FavoritePageButtonProps {
   path?: string;

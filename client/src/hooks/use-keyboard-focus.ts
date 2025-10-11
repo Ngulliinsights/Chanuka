@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { logger } from '../utils/logger';
 
 export function useKeyboardFocus() {
   const [isKeyboardUser, setIsKeyboardUser] = useState(false);
@@ -32,3 +33,10 @@ export function useKeyboardFocus() {
 
   return { isKeyboardUser, getFocusClasses };
 }
+
+
+
+
+
+
+

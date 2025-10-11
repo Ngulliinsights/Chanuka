@@ -1,8 +1,9 @@
-import { databaseService } from '../../services/database-service.js';
+import { databaseService } from '../../../infrastructure/database/database-service.js';
 import { database as db } from '../../../shared/database/connection.js';
 import { billComments, users, userProfiles, bills } from '../../../shared/schema.js';
 import { eq, and, desc, asc, sql, count, isNull, or } from 'drizzle-orm';
 import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../infrastructure/cache/cache-service.js';
+import { logger } from '../../utils/logger';
 
 // Types for comment operations
 export interface CommentWithUser {
@@ -671,3 +672,11 @@ export class CommentService {
 }
 
 export const commentService = new CommentService();
+
+
+
+
+
+
+
+

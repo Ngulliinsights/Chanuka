@@ -21,6 +21,7 @@ import { GovernmentDataService } from './government-data-service.js';
 import { ConflictResolutionService } from './conflict-resolution-service.js';
 import { bills, sponsors, billSponsors, syncJobs, syncErrors } from '../../db/schema.js';
 import { eq, and, gte, desc } from 'drizzle-orm';
+import { logger } from '../utils/logger';
 
 export class DataSynchronizationService extends EventEmitter {
   private governmentDataService: GovernmentDataService;
@@ -49,7 +50,7 @@ export class DataSynchronizationService extends EventEmitter {
 
       console.log(`✅ Initialized sync schedules for ${dataSources.length} data sources`);
     } catch (error) {
-      console.error('❌ Failed to initialize sync schedules:', error);
+      logger.error('❌ Failed to initialize sync schedules:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -362,7 +363,7 @@ export class DataSynchronizationService extends EventEmitter {
 
       return lastJob[0]?.endTime || undefined;
     } catch (error) {
-      console.error('Error getting last sync timestamp:', error);
+      logger.error('Error getting last sync timestamp:', { component: 'SimpleTool' }, error);
       return undefined;
     }
   }
@@ -486,7 +487,7 @@ export class DataSynchronizationService extends EventEmitter {
 
       return job[0] || null;
     } catch (error) {
-      console.error('Error getting sync job status:', error);
+      logger.error('Error getting sync job status:', { component: 'SimpleTool' }, error);
       return null;
     }
   }
@@ -540,3 +541,9 @@ interface SyncMetrics {
   lastSyncTime: Date;
   recordsProcessedToday: number;
 }
+
+
+
+
+
+

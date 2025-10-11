@@ -1,6 +1,7 @@
 import { MiddlewareProvider } from '../types';
 import { CacheService } from '../../services/cache';
 import { Request, Response, NextFunction } from 'express';
+import { logger } from '../utils/logger';
 
 export class CacheMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'cache';
@@ -31,7 +32,7 @@ export class CacheMiddlewareProvider implements MiddlewareProvider {
         // Override json method to cache response
         res.json = (body: any) => {
           this.cacheService.set(cacheKey, body, ttl).catch(err => {
-            console.error('Cache set error:', err);
+            logger.error('Cache set error:', { component: 'SimpleTool' }, err);
           });
           return originalJson(body);
         };
@@ -43,3 +44,10 @@ export class CacheMiddlewareProvider implements MiddlewareProvider {
     };
   }
 }
+
+
+
+
+
+
+

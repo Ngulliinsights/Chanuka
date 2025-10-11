@@ -2,11 +2,12 @@ import express from 'express';
 import { legislativeStorage } from '../bills/legislative-storage.js';
 import { insertAnalysisSchema } from '../../../shared/schema.js';
 import { z } from 'zod';
-import { mlAnalysisService, performComprehensiveAnalysis } from './ml-analysis';
+import { mlAnalysisService, performComprehensiveAnalysis } from './services/ml.service';
 import { conflictDetectionService } from './conflict-detection';
 import { realTimeBillAnalysisEngine } from '../bills/real-time-analysis';
 import { citizenVerificationService } from '../users/citizen-verification';
-import { ApiSuccess, ApiErrorResponse, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
+import { logger } from '../../utils/logger';
 
 export const router = express.Router();
 
@@ -25,7 +26,7 @@ router.get('/bills/:billId/analysis', async (req, res) => {
     return ApiSuccess(res, analysis, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching bill analysis:', error);
+    logger.error('Error fetching bill analysis:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch bill analysis', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -55,7 +56,7 @@ router.post('/bills/:billId/analysis', async (req, res) => {
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    console.error('Error creating analysis:', error);
+    logger.error('Error creating analysis:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to create analysis', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -76,7 +77,7 @@ router.get('/bills/:billId/conflicts', async (req, res) => {
     return ApiSuccess(res, conflicts, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error('Error fetching bill conflicts:', error);
+    logger.error('Error fetching bill conflicts:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch bill conflicts', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -91,3 +92,11 @@ router.get('/health', async (req, res) => {
     timestamp: new Date().toISOString()
   }, ApiResponseWrapper.createMetadata(startTime, 'static'));
 });
+
+
+
+
+
+
+
+

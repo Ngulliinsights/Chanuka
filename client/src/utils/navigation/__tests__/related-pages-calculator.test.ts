@@ -1,5 +1,6 @@
 import { calculateRelatedPages, getContextualSuggestions } from '../related-pages-calculator';
 import { UserRole } from '@/types/navigation';
+import { logger } from '../utils/logger';
 
 describe('related-pages-calculator', () => {
   describe('calculateRelatedPages', () => {
@@ -115,3 +116,9 @@ describe('related-pages-calculator', () => {
     });
   });
 });
+
+
+
+
+
+

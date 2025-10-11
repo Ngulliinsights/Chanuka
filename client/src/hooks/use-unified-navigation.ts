@@ -1,6 +1,7 @@
 import { useNavigation } from '@/contexts/NavigationContext';
 import { useResponsiveNavigation } from '@/contexts/ResponsiveNavigationContext';
 import { useKeyboardFocus } from './use-keyboard-focus';
+import { logger } from '../utils/logger';
 
 /**
  * Unified navigation hook that combines both navigation contexts
@@ -46,3 +47,10 @@ export function useUnifiedNavigation() {
     getFocusClasses,
   };
 }
+
+
+
+
+
+
+

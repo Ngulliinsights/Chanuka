@@ -1,5 +1,7 @@
 import pkg from 'pg';
+import { logger } from '../../utils/logger';
 const { Pool } = pkg;
+import type { Pool as PoolType } from 'pg';
 
 export interface ValidationRule {
   name: string;
@@ -27,9 +29,9 @@ export interface ValidationSummary {
 }
 
 export class DataValidationService {
-  private pool: Pool;
+  private pool: PoolType;
 
-  constructor(pool: Pool) {
+  constructor(pool: PoolType) {
     this.pool = pool;
   }
 
@@ -286,7 +288,7 @@ export class DataValidationService {
         rule: rule.name,
         passed: false,
         severity: 'error',
-        message: `${rule.description}: Validation failed - ${error.message}`,
+        message: `${rule.description}: Validation failed - ${error instanceof Error ? error.message : String(error)}`,
         count: 0
       };
     }
@@ -436,7 +438,7 @@ export class DataValidationService {
           }
         }
       } catch (error) {
-        const errorMsg = `Failed to fix ${fix.description}: ${error.message}`;
+        const errorMsg = `Failed to fix ${fix.description}: ${error instanceof Error ? error.message : String(error)}`;
         console.error(errorMsg);
         errors.push(errorMsg);
       }
@@ -445,3 +447,9 @@ export class DataValidationService {
     return { fixed, errors };
   }
 }
+
+
+
+
+
+

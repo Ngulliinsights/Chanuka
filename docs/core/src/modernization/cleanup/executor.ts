@@ -3,6 +3,7 @@ import { join, dirname } from 'path';
 import { CleanupPlan, CleanupResult, CleanupError, FileOperation, FileMove, FileConsolidation } from './orchestrator';
 import { ValidationResult, ValidationStatus, ValidationCheck, ValidationType } from '../types';
 import { BackupSystem, BackupSystemConfig } from './backup-system';
+import { logger } from '../utils/logger';
 
 export interface CleanupExecutorConfig {
   dryRun: boolean;
@@ -63,7 +64,7 @@ export class CleanupExecutor {
 
       // Create backup if enabled
       if (this.config.createBackups && !this.config.dryRun) {
-        console.log('🔄 Creating backup before cleanup operations...');
+        logger.info('🔄 Creating backup before cleanup operations...', { component: 'SimpleTool' });
         const backupResult = await this.backupSystem.createBackup(plan);
         
         if (!backupResult.success) {
@@ -744,3 +745,9 @@ exit 0
 
 
 }
+
+
+
+
+
+

@@ -1,5 +1,6 @@
 import { database as db } from '../../../../shared/database/connection.js';
 import { sql } from 'drizzle-orm';
+import { logger } from '../utils/logger';
 
 /**
  * Configuration interface for storage options
@@ -277,7 +278,7 @@ export abstract class BaseStorage<T> {
       );
       enhancedError.stack = errorStack;
       
-      console.error('Transaction error:', {
+      logger.error('Transaction error:', { component: 'SimpleTool' }, {
         duration,
         error: errorMessage,
         stack: errorStack
@@ -332,7 +333,7 @@ export abstract class BaseStorage<T> {
       results.readDatabase = true;
       results.writeDatabase = true;
     } catch (error) {
-      console.error('Database health check failed:', error);
+      logger.error('Database health check failed:', { component: 'SimpleTool' }, error);
     }
 
     // Test cache functionality
@@ -350,7 +351,7 @@ export abstract class BaseStorage<T> {
       // Clean up test entry
       this.cache.delete(testKey);
     } catch (error) {
-      console.error('Cache health check failed:', error);
+      logger.error('Cache health check failed:', { component: 'SimpleTool' }, error);
     }
 
     return results;
@@ -446,3 +447,9 @@ export abstract class BaseStorage<T> {
    */
   abstract isHealthy(): Promise<boolean>;
 }
+
+
+
+
+
+

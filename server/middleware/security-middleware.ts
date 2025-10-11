@@ -6,6 +6,7 @@ import { inputValidationService } from '../core/validation/input-validation-serv
 import { secureSessionService } from '../core/auth/secure-session-service.js';
 import { securityAuditService } from '../features/security/security-audit-service.js';
 import { createRateLimit } from './rate-limiter.js';
+import { logger } from '../utils/logger';
 
 export interface SecurityMiddlewareOptions {
   enableCSP: boolean;
@@ -168,7 +169,7 @@ export class SecurityMiddleware {
 
         next();
       } catch (error) {
-        console.error('Input validation failed:', error);
+        logger.error('Input validation failed:', { component: 'SimpleTool' }, error);
         
         // Log security event
         securityAuditService.logSecurityEvent({
@@ -243,7 +244,7 @@ export class SecurityMiddleware {
 
         next();
       } catch (error) {
-        console.error('Session security middleware error:', error);
+        logger.error('Session security middleware error:', { component: 'SimpleTool' }, error);
         res.status(500).json({
           error: 'Internal server error',
           code: 'INTERNAL_ERROR'
@@ -406,3 +407,9 @@ export const securityMiddleware = new SecurityMiddleware({
   enableSessionSecurity: true,
   enableSecurityHeaders: true
 });
+
+
+
+
+
+

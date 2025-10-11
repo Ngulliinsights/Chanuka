@@ -16,6 +16,7 @@ import { AnalysisEngine } from './analysis';
 import { BackupManager } from './backup';
 import { ProgressTracker } from './progress';
 import { ValidationFramework } from './validation';
+import { logger } from '../utils/logger';
 
 export interface ModernizationOrchestratorOptions {
   config?: Partial<ModernizationConfig>;
@@ -562,3 +563,9 @@ export class ModernizationOrchestrator extends EventEmitter {
     });
   }
 }
+
+
+
+
+
+

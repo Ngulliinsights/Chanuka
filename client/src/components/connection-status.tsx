@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApiConnection } from '../hooks/useApiConnection.js';
 import { AlertCircle, CheckCircle, Wifi, WifiOff, RefreshCw, Settings } from 'lucide-react';
+import { logger } from '../utils/logger.js';
 
 interface ConnectionStatusProps {
   showDetails?: boolean;
@@ -29,7 +30,7 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
       const result = await diagnose();
       setDiagnostics(result);
     } catch (error) {
-      console.error('Diagnostics failed:', error);
+      logger.error('Diagnostics failed:', { component: 'SimpleTool' }, error);
     }
   };
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { ChevronRight, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigation } from '@/contexts/NavigationContext';
+import { logger } from '../utils/logger.js';
 
 interface NavigationBreadcrumbsProps {
   className?: string;

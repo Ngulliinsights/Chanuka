@@ -3,9 +3,10 @@ import { type Redis } from 'ioredis';
 import { type Pool } from 'pg';
 import { type Bill, type Stakeholder } from '../../shared/schema.js';
 import { CommentStorage } from './comment-storage.js';
-import { ProgressStorage } from './progress-storage.js';
+import { ProgressStorage } from '../../features/analytics/storage/progress.storage.js';
 import { SocialShareStorage } from './social-share-storage.js';
 import { UserStorage } from './user-storage.js';
+import { logger } from '../utils/logger';
 export interface CacheProvider {
     get<T>(key: string): Promise<T | null>;
     set<T>(key: string, value: T, ttl: number): Promise<void>;
@@ -40,7 +41,14 @@ export interface Storage {
 }
 export declare const storage: Storage;
 export { CommentStorage } from './comment-storage.js';
-export { ProgressStorage } from './progress-storage.js';
+export { ProgressStorage } from '../../features/analytics/storage/progress.storage.js';
 export { SocialShareStorage } from './social-share-storage.js';
 export { UserStorage } from './user-storage.js';
 export declare function isError(err: unknown): err is Error;
+
+
+
+
+
+
+

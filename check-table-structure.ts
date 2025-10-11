@@ -2,6 +2,7 @@ import { config } from 'dotenv';
 config();
 
 import { executeQuery } from './shared/database/pool.js';
+import { logger } from '../utils/logger';
 
 async function checkTableStructure() {
   try {
@@ -15,13 +16,19 @@ async function checkTableStructure() {
       context: 'check security_audit_logs structure'
     });
 
-    console.log('Columns in security_audit_logs:');
+    logger.info('Columns in security_audit_logs:', { component: 'SimpleTool' });
     result.rows.forEach(row => {
       console.log(`${row.column_name}: ${row.data_type} ${row.is_nullable === 'YES' ? 'NULL' : 'NOT NULL'} ${row.column_default || ''}`);
     });
   } catch (error) {
-    console.error('Error checking table structure:', error);
+    logger.error('Error checking table structure:', { component: 'SimpleTool' }, error);
   }
 }
 
 checkTableStructure();
+
+
+
+
+
+

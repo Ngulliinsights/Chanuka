@@ -2,6 +2,7 @@ import React from 'react';
 import { Loader2, Wifi, WifiOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAssetLoading, LoadingProgress } from '@/utils/asset-loading';
+import { logger } from '../utils/logger.js';
 
 export interface AssetLoadingIndicatorProps {
   className?: string;

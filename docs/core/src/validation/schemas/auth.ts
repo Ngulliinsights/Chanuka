@@ -6,6 +6,7 @@
 
 import { z } from 'zod';
 import { emailSchema, passwordSchema, strongPasswordSchema, phoneSchema, nameSchema } from './common';
+import { logger } from '../utils/logger';
 
 /**
  * User registration schema
@@ -340,3 +341,9 @@ export const authSchemas = {
   deviceRegistration: deviceRegistrationSchema,
   biometricAuth: biometricAuthSchema,
 } as const;
+
+
+
+
+
+

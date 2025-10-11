@@ -4,6 +4,7 @@ import { Link, useLocation } from 'wouter';
 import { Menu, X, Search, Gavel } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Logo } from '@/components/ui/logo';
+import { logger } from '../utils/logger.js';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard' },

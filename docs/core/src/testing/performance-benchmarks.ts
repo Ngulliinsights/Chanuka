@@ -5,6 +5,7 @@ import type { CacheService } from '../cache/types';
 import type { RateLimitStore } from '../rate-limiting/types';
 import type { Logger } from '../logging/types';
 import type { ValidationService } from '../validation/types';
+import { logger } from '../utils/logger';
 
 /**
  * Comprehensive performance benchmarking suite for core utilities
@@ -1033,3 +1034,9 @@ interface ConcurrentBenchmarkOptions {
   concurrency: number;
   totalOperations: number;
 }
+
+
+
+
+
+

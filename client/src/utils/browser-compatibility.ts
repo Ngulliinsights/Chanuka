@@ -732,3 +732,9 @@ export function getBrowserWarnings(): string[] {
 export function getBrowserRecommendations(): string[] {
   return browserDetector.getBrowserRecommendations();
 }
+
+
+
+
+
+

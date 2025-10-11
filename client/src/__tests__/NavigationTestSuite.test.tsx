@@ -5,6 +5,7 @@ import { NavigationProvider } from '@/contexts/NavigationContext';
 import { ResponsiveNavigationProvider } from '@/contexts/ResponsiveNavigationContext';
 import AppLayout from '@/components/layout/app-layout';
 import HomePage from '@/pages/home';
+import { logger } from '../utils/logger.js';
 
 // Mock pages for testing
 function BillsPage() {

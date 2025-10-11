@@ -1,7 +1,8 @@
 import { database as db, users, bills, billComments, analysis, notifications } from '../../../shared/database/connection.js';
 import { eq, count, desc, sql, and, gte } from 'drizzle-orm';
 import { systemHealthService } from '../../infrastructure/monitoring/system-health.js';
-import { monitoringService } from '../../infrastructure/monitoring/monitoring.js';
+import { alertingService } from '../../infrastructure/notifications/alerting-service.js';
+import { logger } from '../../utils/logger';
 
 export interface AdminStats {
   users: {
@@ -95,7 +96,7 @@ export class AdminService {
         }
       };
     } catch (error) {
-      console.error('Error fetching admin stats:', error);
+      logger.error('Error fetching admin stats:', { component: 'SimpleTool' }, { error });
       // Return fallback data if system health services fail
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -132,7 +133,7 @@ export class AdminService {
           }
         };
       } catch (fallbackError) {
-        console.error('Error fetching fallback admin stats:', fallbackError);
+        logger.error('Error fetching fallback admin stats:', { component: 'SimpleTool' }, { error: fallbackError });
         throw error;
       }
     }
@@ -141,7 +142,7 @@ export class AdminService {
   async getUserManagement(page = 1, limit = 20, filters?: { role?: string; status?: string; search?: string }) {
     try {
       const offset = (page - 1) * limit;
-      const conditions = [];
+      const conditions: any[] = [];
 
       if (filters?.role) {
         conditions.push(eq(users.role, filters.role));
@@ -160,7 +161,7 @@ export class AdminService {
         );
       }
 
-      let query = db
+      let baseQuery = db
         .select({
           id: users.id,
           email: users.email,
@@ -173,11 +174,12 @@ export class AdminService {
         })
         .from(users);
 
+      // Apply conditions
       if (conditions.length > 0) {
-        query = query.where(and(...conditions));
+        baseQuery = baseQuery.where(sql`${and(...conditions)}`);
       }
 
-      const result = await query
+      const result = await baseQuery
         .orderBy(desc(users.createdAt))
         .limit(limit)
         .offset(offset);
@@ -185,7 +187,7 @@ export class AdminService {
       // Get total count
       let countQuery = db.select({ count: count() }).from(users);
       if (conditions.length > 0) {
-        countQuery = countQuery.where(and(...conditions));
+        countQuery = countQuery.where(sql`${and(...conditions)}`);
       }
       const [{ count: total }] = await countQuery;
 
@@ -199,7 +201,7 @@ export class AdminService {
         }
       };
     } catch (error) {
-      console.error('Error fetching user management data:', error);
+      logger.error('Error fetching user management data:', { component: 'SimpleTool' }, { error });
       throw error;
     }
   }
@@ -208,15 +210,12 @@ export class AdminService {
     try {
       await db
         .update(users)
-        .set({
-          ...updates,
-          updatedAt: new Date()
-        })
+        .set(updates as any)
         .where(eq(users.id, userId));
 
       return { success: true };
     } catch (error) {
-      console.error('Error updating user status:', error);
+      logger.error('Error updating user status:', { component: 'SimpleTool' }, { error });
       throw error;
     }
   }
@@ -253,7 +252,7 @@ export class AdminService {
         }
       };
     } catch (error) {
-      console.error('Error fetching system logs:', error);
+      logger.error('Error fetching system logs:', { component: 'SimpleTool' }, { error });
       throw error;
     }
   }
@@ -288,7 +287,7 @@ export class AdminService {
         }
       };
     } catch (error) {
-      console.error('Error fetching content moderation data:', error);
+      logger.error('Error fetching content moderation data:', { component: 'SimpleTool' }, { error });
       throw error;
     }
   }
@@ -299,10 +298,21 @@ export class AdminService {
       console.log(`Moderating comment ${commentId} with action: ${action}`);
       return { success: true };
     } catch (error) {
-      console.error('Error moderating comment:', error);
+      logger.error('Error moderating comment:', { component: 'SimpleTool' }, { error });
       throw error;
     }
   }
 }
 
 export const adminService = new AdminService();
+
+// Export router from admin-router
+export { router } from './admin-router';
+
+
+
+
+
+
+
+

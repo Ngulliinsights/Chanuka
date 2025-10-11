@@ -4,6 +4,7 @@ import {
   type Sponsor, type SponsorAffiliation, type SponsorTransparency 
 } from '../../../shared/schema.js';
 import { eq, and, sql, desc, gte, lte, count, avg } from 'drizzle-orm';
+import { logger } from '../../utils/logger';
 
 // Enhanced type definitions for conflict analysis
 export interface ConflictDetectionResult {
@@ -874,3 +875,11 @@ export class SponsorConflictAnalysisService {
 }
 
 export const sponsorConflictAnalysisService = new SponsorConflictAnalysisService();
+
+
+
+
+
+
+
+

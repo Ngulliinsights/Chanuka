@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
+import { logger } from '../utils/logger';
 
 describe('Unit Test Suite - Basic Functionality', () => {
   describe('String utilities', () => {
@@ -440,3 +441,9 @@ describe('Unit Test Suite - Basic Functionality', () => {
     });
   });
 });
+
+
+
+
+
+

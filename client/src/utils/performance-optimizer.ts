@@ -4,6 +4,7 @@
  */
 
 import { performanceMonitor } from './performanceMonitoring';
+import { logger } from '../utils/logger';
 
 export interface PerformanceConfig {
   enableMetrics: boolean;
@@ -66,7 +67,7 @@ class PerformanceOptimizer {
   private initialize(): void {
     // Only initialize if this session is selected for monitoring
     if (Math.random() > this.config.sampleRate) {
-      console.log('Performance monitoring disabled for this session (sampling)');
+      logger.info('Performance monitoring disabled for this session (sampling)', { component: 'SimpleTool' });
       return;
     }
 
@@ -86,7 +87,7 @@ class PerformanceOptimizer {
       this.initializeOptimizations();
     }
 
-    console.log('🚀 Performance Optimizer initialized');
+    logger.info('🚀 Performance Optimizer initialized', { component: 'SimpleTool' });
   }
 
   private initializeMetricsCollection(): void {
@@ -265,7 +266,7 @@ class PerformanceOptimizer {
     };
 
     // Log bundle analysis
-    console.log('📦 Bundle Analysis:', this.bundleMetrics);
+    logger.info('📦 Bundle Analysis:', { component: 'SimpleTool' }, this.bundleMetrics);
 
     // Check bundle size budgets
     this.checkBundleBudgets();
@@ -435,7 +436,7 @@ class PerformanceOptimizer {
   }
 
   private applySlowConnectionOptimizations(): void {
-    console.log('🐌 Applying slow connection optimizations');
+    logger.info('🐌 Applying slow connection optimizations', { component: 'SimpleTool' });
     
     // Reduce image quality
     const images = document.querySelectorAll('img[data-src]');
@@ -451,7 +452,7 @@ class PerformanceOptimizer {
   }
 
   private applyMediumConnectionOptimizations(): void {
-    console.log('📶 Applying medium connection optimizations');
+    logger.info('📶 Applying medium connection optimizations', { component: 'SimpleTool' });
     
     // Moderate image quality
     const images = document.querySelectorAll('img[data-src]');
@@ -464,7 +465,7 @@ class PerformanceOptimizer {
   }
 
   private applyFastConnectionOptimizations(): void {
-    console.log('🚀 Applying fast connection optimizations');
+    logger.info('🚀 Applying fast connection optimizations', { component: 'SimpleTool' });
     
     // Enable prefetching
     this.enableResourcePrefetching();
@@ -474,7 +475,7 @@ class PerformanceOptimizer {
   }
 
   private applyLowMemoryOptimizations(): void {
-    console.log('🧠 Applying low memory optimizations');
+    logger.info('🧠 Applying low memory optimizations', { component: 'SimpleTool' });
     
     // Reduce concurrent operations
     // Implement lazy loading more aggressively
@@ -482,7 +483,7 @@ class PerformanceOptimizer {
   }
 
   private applyBatterySavingOptimizations(): void {
-    console.log('🔋 Applying battery saving optimizations');
+    logger.info('🔋 Applying battery saving optimizations', { component: 'SimpleTool' });
     
     // Reduce animation frame rate
     // Disable non-critical background tasks
@@ -554,7 +555,7 @@ class PerformanceOptimizer {
     if (recommendations.bundleOptimizations.length > 0 || 
         recommendations.cacheOptimizations.length > 0 || 
         recommendations.performanceOptimizations.length > 0) {
-      console.log('💡 Performance Optimization Recommendations:', recommendations);
+      logger.info('💡 Performance Optimization Recommendations:', { component: 'SimpleTool' }, recommendations);
     }
   }
 
@@ -741,7 +742,7 @@ class PerformanceOptimizer {
       this.resourceObserver.disconnect();
     }
 
-    console.log('Performance Optimizer destroyed');
+    logger.info('Performance Optimizer destroyed', { component: 'SimpleTool' });
   }
 }
 
@@ -764,3 +765,9 @@ export function usePerformanceOptimization() {
     exportPerformanceReport: () => performanceOptimizer.exportPerformanceReport()
   };
 }
+
+
+
+
+
+

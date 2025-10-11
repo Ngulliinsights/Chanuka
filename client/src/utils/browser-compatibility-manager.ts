@@ -8,6 +8,7 @@
 import { getBrowserInfo, isBrowserSupported, getBrowserWarnings } from './browser-compatibility';
 import { loadPolyfills, polyfillManager } from './polyfills';
 import { runBrowserCompatibilityTests, CompatibilityTestSuite } from './browser-compatibility-tests';
+import { logger } from '../utils/logger';
 
 export interface CompatibilityManagerConfig {
   autoLoadPolyfills: boolean;
@@ -98,7 +99,7 @@ export class BrowserCompatibilityManager {
       return this.status;
 
     } catch (error) {
-      console.error('Failed to initialize browser compatibility manager:', error);
+      logger.error('Failed to initialize browser compatibility manager:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -116,7 +117,7 @@ export class BrowserCompatibilityManager {
       this.status.polyfillsLoaded = true;
       
       if (this.config.logResults) {
-        console.log('✅ Browser polyfills loaded successfully');
+        logger.info('✅ Browser polyfills loaded successfully', { component: 'SimpleTool' });
         
         // Log polyfill status
         const polyfillStatus = polyfillManager.getPolyfillStatus();
@@ -129,7 +130,7 @@ export class BrowserCompatibilityManager {
         });
       }
     } catch (error) {
-      console.error('Failed to load polyfills:', error);
+      logger.error('Failed to load polyfills:', { component: 'SimpleTool' }, error);
       this.status.polyfillsLoaded = false;
       throw error;
     }
@@ -156,7 +157,7 @@ export class BrowserCompatibilityManager {
 
       return testResults;
     } catch (error) {
-      console.error('Failed to run compatibility tests:', error);
+      logger.error('Failed to run compatibility tests:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -389,3 +390,9 @@ export function shouldBlockBrowser(): boolean {
 export function getCompatibilityWarnings(): string[] {
   return browserCompatibilityManager.getWarningsToShow();
 }
+
+
+
+
+
+

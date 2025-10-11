@@ -1,4 +1,4 @@
-import { database as db } from '../shared/database/connection.js';
+import { database as db } from '../../../shared/database/connection.js';
 import { 
   socialShares,
   bills,
@@ -6,7 +6,7 @@ import {
   type InsertSocialShare
 } from '../../../shared/schema.js';
 import { eq, desc, sql } from 'drizzle-orm';
-import { logger } from '../../shared/utils/logger.js';
+import { logger } from '../../utils/logger';
 import { BaseStorage } from './base/BaseStorage.js';
 
 const CACHE_TTL = 3600; // 1 hour in seconds
@@ -22,7 +22,7 @@ export class SocialShareStorage extends BaseStorage<SocialShare> {
       // Simple health check for in-memory storage
       return true;
     } catch (error) {
-      console.error('SocialShareStorage health check failed:', error);
+      logger.error('SocialShareStorage health check failed:', { component: 'SimpleTool' }, error);
       return false;
     }
   }
@@ -113,3 +113,12 @@ export class SocialShareStorage extends BaseStorage<SocialShare> {
     });
   }
 }
+
+
+
+
+
+
+
+
+

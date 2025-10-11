@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { AnalyticsMetric } from "@shared/schema";
 import { CheckCircle } from "lucide-react";
+import { logger } from '../utils/logger.js';
 
 interface AnalyticsDashboardProps {
   projectId: number;

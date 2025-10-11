@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
+import { logger } from '../utils/logger.js';
   ArrowLeft, 
   Network, 
   TrendingUp,
@@ -55,7 +56,7 @@ export default function FinancialNetworkAnalysis({ billId }: FinancialNetworkPro
             industryBreakdown: data.industryAnalysis?.breakdown || []
           });
         } else {
-          console.error('Failed to fetch financial network data');
+          logger.error('Failed to fetch financial network data', { component: 'SimpleTool' });
           // Fallback to mock data if API fails
           setNetworkData({
             totalEntities: 13,
@@ -70,7 +71,7 @@ export default function FinancialNetworkAnalysis({ billId }: FinancialNetworkPro
           });
         }
       } catch (error) {
-        console.error('Error fetching financial network data:', error);
+        logger.error('Error fetching financial network data:', { component: 'SimpleTool' }, error);
         // Fallback to mock data on error
         setNetworkData({
           totalEntities: 13,

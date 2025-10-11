@@ -8,6 +8,7 @@
 import { z } from 'zod';
 import { validationService as coreValidationService } from '../validation-service';
 import { ValidationError } from '../types';
+import { logger } from '../utils/logger';
 
 export interface LegacyValidationRule {
   type: 'required' | 'email' | 'phone' | 'url' | 'min' | 'max' | 'pattern' | 'custom';
@@ -294,3 +295,9 @@ export class LegacyValidationService {
 // Export singleton instance for backward compatibility
 export const validationService = LegacyValidationService.getInstance();
 export default validationService;
+
+
+
+
+
+

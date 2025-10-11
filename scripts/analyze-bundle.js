@@ -25,12 +25,12 @@ class BundleAnalyzer {
   }
 
   async analyze() {
-    console.log('🔍 Starting bundle analysis...\n');
+    logger.info('🔍 Starting bundle analysis...\n', { component: 'SimpleTool' });
 
     try {
       // Check if build exists
       if (!fs.existsSync(this.distPath)) {
-        console.error('❌ Build directory not found. Please run "npm run build" first.');
+        logger.error('❌ Build directory not found. Please run ', { component: 'SimpleTool' }, npm run build" first.');
         process.exit(1);
       }
 
@@ -55,13 +55,13 @@ class BundleAnalyzer {
       }
 
     } catch (error) {
-      console.error('❌ Analysis failed:', error.message);
+      logger.error('❌ Analysis failed:', { component: 'SimpleTool' }, error.message);
       process.exit(1);
     }
   }
 
   async analyzeFiles() {
-    console.log('📁 Analyzing files...');
+    logger.info('📁 Analyzing files...', { component: 'SimpleTool' });
 
     const analyzeDirectory = (dir, basePath = '') => {
       const files = fs.readdirSync(dir);
@@ -150,7 +150,7 @@ class BundleAnalyzer {
   }
 
   async detectDuplicates() {
-    console.log('🔍 Detecting duplicate modules...');
+    logger.info('🔍 Detecting duplicate modules...', { component: 'SimpleTool' });
 
     const moduleNames = new Map();
     const duplicates = [];
@@ -179,7 +179,7 @@ class BundleAnalyzer {
   }
 
   generateRecommendations() {
-    console.log('💡 Generating recommendations...');
+    logger.info('💡 Generating recommendations...', { component: 'SimpleTool' });
 
     const recommendations = [];
 
@@ -267,8 +267,8 @@ class BundleAnalyzer {
   }
 
   displayResults() {
-    console.log('\n📊 Bundle Analysis Results');
-    console.log('=' .repeat(50));
+    logger.info('\n📊 Bundle Analysis Results', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     // Summary
     console.log(`\n📦 Bundle Summary:`);
@@ -336,7 +336,7 @@ class BundleAnalyzer {
             console.log(`          ... and ${rec.files.length - 3} more`);
           }
         }
-        console.log('');
+        logger.info('', { component: 'SimpleTool' });
       });
     }
 
@@ -378,7 +378,7 @@ class BundleAnalyzer {
 
   openBundleAnalyzer() {
     try {
-      console.log('\n🌐 Opening bundle analyzer...');
+      logger.info('\n🌐 Opening bundle analyzer...', { component: 'SimpleTool' });
       execSync('npm run analyze:bundle', { stdio: 'inherit' });
     } catch (error) {
       console.warn('⚠️  Could not open bundle analyzer:', error.message);
@@ -398,22 +398,22 @@ class BundleAnalyzer {
 async function main() {
   const analyzer = new BundleAnalyzer();
   
-  console.log('🚀 Chanuka Platform Bundle Analyzer');
-  console.log('=====================================\n');
+  logger.info('🚀 Chanuka Platform Bundle Analyzer', { component: 'SimpleTool' });
+  logger.info('=====================================\n', { component: 'SimpleTool' });
 
   await analyzer.analyze();
 
-  console.log('\n✅ Analysis complete!');
-  console.log('\nNext steps:');
-  console.log('  • Review recommendations above');
-  console.log('  • Run with --open flag to view detailed bundle analyzer');
-  console.log('  • Check bundle-analysis.json for detailed data');
-  console.log('  • Consider implementing suggested optimizations\n');
+  logger.info('\n✅ Analysis complete!', { component: 'SimpleTool' });
+  logger.info('\nNext steps:', { component: 'SimpleTool' });
+  logger.info('  • Review recommendations above', { component: 'SimpleTool' });
+  logger.info('  • Run with --open flag to view detailed bundle analyzer', { component: 'SimpleTool' });
+  logger.info('  • Check bundle-analysis.json for detailed data', { component: 'SimpleTool' });
+  logger.info('  • Consider implementing suggested optimizations\n', { component: 'SimpleTool' });
 }
 
 if (require.main === module) {
   main().catch(error => {
-    console.error('❌ Fatal error:', error);
+    logger.error('❌ Fatal error:', { component: 'SimpleTool' }, error);
     process.exit(1);
   });
 }

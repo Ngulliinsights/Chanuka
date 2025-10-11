@@ -81,7 +81,7 @@ describe('Health System Chaos Tests', () => {
     it('should maintain overall health when one service becomes intermittently unavailable', async () => {
       // This test simulates a common production scenario where one dependency
       // becomes flaky but doesn't completely fail
-      console.log('Starting intermittent failure chaos test...');
+      logger.info('Starting intermittent failure chaos test...', { component: 'SimpleTool' });
       
       // Make Redis intermittently fail (30% failure rate)
       mockRedis.injectIntermittentFailures(0.3, 'Connection timeout');
@@ -121,7 +121,7 @@ describe('Health System Chaos Tests', () => {
 
     it('should handle cascading failures gracefully', async () => {
       // Simulate a more severe scenario where multiple services fail simultaneously
-      console.log('Starting cascading failure chaos test...');
+      logger.info('Starting cascading failure chaos test...', { component: 'SimpleTool' });
       
       resourceMonitor.start();
       
@@ -179,7 +179,7 @@ describe('Health System Chaos Tests', () => {
       resourceMonitor.stop();
       const resourceReport = resourceMonitor.getReport();
 
-      console.log('Cascading failure results:');
+      logger.info('Cascading failure results:', { component: 'SimpleTool' });
       console.log(`Requests completed: ${cascadingResults.successfulRequests + cascadingResults.failedRequests}`);
       console.log(`Success rate: ${(cascadingResults.successfulRequests / (cascadingResults.successfulRequests + cascadingResults.failedRequests) * 100).toFixed(1)}%`);
       console.log(`Peak memory usage: ${Math.round(resourceReport.memory.peak / 1024 / 1024)}MB`);
@@ -202,7 +202,7 @@ describe('Health System Chaos Tests', () => {
   describe('Network Partition Simulation', () => {
     it('should handle network partitions between health checks and dependencies', async () => {
       // This simulates network issues that are common in distributed systems
-      console.log('Starting network partition chaos test...');
+      logger.info('Starting network partition chaos test...', { component: 'SimpleTool' });
       
       // Simulate network partitions by making some requests timeout
       mockRedis.injectNetworkPartition(0.25); // 25% of requests timeout
@@ -253,13 +253,13 @@ describe('Health System Chaos Tests', () => {
   describe('Recovery and Resilience Testing', () => {
     it('should recover quickly when services come back online', async () => {
       // This test verifies that the health system can detect and report recovery
-      console.log('Starting recovery resilience test...');
+      logger.info('Starting recovery resilience test...', { component: 'SimpleTool' });
       
       // Phase 1: Introduce failures
       mockRedis.injectTotalFailure(); // Make Redis completely unavailable
       mockDatabase.injectHighLatency(2000); // Make database very slow
       
-      console.log('Phase 1: Services degraded');
+      logger.info('Phase 1: Services degraded', { component: 'SimpleTool' });
       
       // Test during degraded state
       const degradedResults = await loadTester.runLoad(
@@ -277,14 +277,14 @@ describe('Health System Chaos Tests', () => {
       loadTester.reset();
       
       // Phase 2: Restore services
-      console.log('Phase 2: Restoring services...');
+      logger.info('Phase 2: Restoring services...', { component: 'SimpleTool' });
       mockRedis.restoreNormalOperation();
       mockDatabase.restoreNormalOperation();
       
       // Wait a moment for caches to expire and recovery to be detected
       await new Promise(resolve => setTimeout(resolve, 6000)); // Wait for cache expiry
       
-      console.log('Phase 3: Testing recovery');
+      logger.info('Phase 3: Testing recovery', { component: 'SimpleTool' });
       
       // Test after recovery
       const recoveredResults = await loadTester.runLoad(
@@ -301,7 +301,7 @@ describe('Health System Chaos Tests', () => {
         }
       );
       
-      console.log('Recovery test results:');
+      logger.info('Recovery test results:', { component: 'SimpleTool' });
       console.log(`Degraded phase - Success rate: ${(degradedResults.successfulRequests / (degradedResults.successfulRequests + degradedResults.failedRequests) * 100).toFixed(1)}%`);
       console.log(`Recovery phase - Success rate: ${(recoveredResults.successfulRequests / (recoveredResults.successfulRequests + recoveredResults.failedRequests) * 100).toFixed(1)}%`);
       
@@ -318,7 +318,7 @@ describe('Health System Chaos Tests', () => {
   describe('Extreme Load with Failures', () => {
     it('should maintain some level of service even under extreme conditions', async () => {
       // This is the ultimate chaos test - high load combined with service failures
-      console.log('Starting extreme chaos load test...');
+      logger.info('Starting extreme chaos load test...', { component: 'SimpleTool' });
       
       resourceMonitor.start();
       
@@ -349,7 +349,7 @@ describe('Health System Chaos Tests', () => {
       resourceMonitor.stop();
       const resourceReport = resourceMonitor.getReport();
       
-      console.log('Extreme chaos test completed:');
+      logger.info('Extreme chaos test completed:', { component: 'SimpleTool' });
       console.log(`Total requests: ${extremeResults.successfulRequests + extremeResults.failedRequests}`);
       console.log(`Success rate: ${(extremeResults.successfulRequests / (extremeResults.successfulRequests + extremeResults.failedRequests) * 100).toFixed(1)}%`);
       console.log(`Average latency: ${extremeResults.averageLatency.toFixed(1)}ms`);
@@ -382,3 +382,9 @@ describe('Health System Chaos Tests', () => {
     });
   });
 });
+
+
+
+
+
+

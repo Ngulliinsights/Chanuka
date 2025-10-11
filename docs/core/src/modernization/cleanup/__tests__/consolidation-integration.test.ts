@@ -4,6 +4,7 @@ import { join } from 'path';
 import { CleanupOrchestrator } from '../orchestrator';
 import { CleanupExecutor } from '../executor';
 import { BackupSystem } from '../backup-system';
+import { logger } from '../utils/logger';
 
 describe('File Consolidation and Removal Integration', () => {
   const testDir = join(__dirname, 'test-workspace');
@@ -41,7 +42,7 @@ describe('File Consolidation and Removal Integration', () => {
     // Create redundant migration scripts
     await fs.writeFile(join(testDir, 'migrate-users.sh'), '#!/bin/bash\necho "Migrating users"');
     await fs.writeFile(join(testDir, 'migrate-posts.sh'), '#!/bin/bash\necho "Migrating posts"');
-    await fs.writeFile(join(testDir, 'migrate-comments.ts'), 'console.log("Migrating comments");');
+    await fs.writeFile(join(testDir, 'migrate-comments.ts'), 'logger.info('Migrating comments', { component: 'SimpleTool' });');
 
     // Create analysis documents
     await fs.writeFile(join(testDir, 'user-analysis.md'), '# User Analysis\nThis is user analysis.');
@@ -59,8 +60,8 @@ describe('File Consolidation and Removal Integration', () => {
     await fs.writeFile(join(testDir, '.env.staging.example'), 'NODE_ENV=staging\nAPI_URL=your.staging.api.com');
 
     // Create test scripts
-    await fs.writeFile(join(testDir, 'test-integration.js'), 'console.log("Integration test");');
-    await fs.writeFile(join(testDir, 'test-unit.js'), 'console.log("Unit test");');
+    await fs.writeFile(join(testDir, 'test-integration.js'), 'logger.info('Integration test', { component: 'SimpleTool' });');
+    await fs.writeFile(join(testDir, 'test-unit.js'), 'logger.info('Unit test', { component: 'SimpleTool' });');
 
     // Create debug scripts
     await fs.writeFile(join(testDir, 'debug-server.sh'), '#!/bin/bash\necho "Debug server"');
@@ -310,3 +311,9 @@ describe('File Consolidation and Removal Integration', () => {
     expect(result.errors.length).toBe(0);
   });
 });
+
+
+
+
+
+

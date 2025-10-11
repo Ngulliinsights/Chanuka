@@ -6,21 +6,22 @@
  */
 
 import { financialDisclosureIntegrationService } from "./services/financial-disclosure-integration.js";
+import { logger } from '../utils/logger';
 
 async function testFinancialDisclosureIntegration() {
-  console.log('🧪 Testing Enhanced Financial Disclosure Integration\n');
+  logger.info('🧪 Testing Enhanced Financial Disclosure Integration\n', { component: 'SimpleTool' });
 
   try {
     // Test 1: Financial Disclosure Data Processing
-    console.log('📊 Test 1: Financial Disclosure Data Processing');
-    console.log('=' .repeat(50));
+    logger.info('📊 Test 1: Financial Disclosure Data Processing', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
     
     const allDisclosures = await financialDisclosureIntegrationService.processFinancialDisclosureData();
     console.log(`✅ Processed ${allDisclosures.length} total financial disclosures`);
     
     if (allDisclosures.length > 0) {
       const sampleDisclosure = allDisclosures[0];
-      console.log('📋 Sample processed disclosure:');
+      logger.info('📋 Sample processed disclosure:', { component: 'SimpleTool' });
       console.log(`   - ID: ${sampleDisclosure.id}`);
       console.log(`   - Sponsor: ${sampleDisclosure.sponsorId}`);
       console.log(`   - Type: ${sampleDisclosure.disclosureType}`);
@@ -37,11 +38,11 @@ async function testFinancialDisclosureIntegration() {
       console.log(`✅ Processed ${sponsorDisclosures.length} disclosures for sponsor ${sponsorId}`);
     }
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Test 2: Disclosure Completeness Scoring
-    console.log('🎯 Test 2: Disclosure Completeness Scoring');
-    console.log('=' .repeat(50));
+    logger.info('🎯 Test 2: Disclosure Completeness Scoring', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     if (allDisclosures.length > 0) {
       const sponsorId = allDisclosures[0].sponsorId;
@@ -58,7 +59,7 @@ async function testFinancialDisclosureIntegration() {
         console.log(`   - Last Update: ${completenessReport.lastUpdateDate.toLocaleDateString()}`);
         
         if (completenessReport.recommendations.length > 0) {
-          console.log('   - Recommendations:');
+          logger.info('   - Recommendations:', { component: 'SimpleTool' });
           completenessReport.recommendations.forEach((rec, index) => {
             console.log(`     ${index + 1}. ${rec}`);
           });
@@ -67,14 +68,14 @@ async function testFinancialDisclosureIntegration() {
         console.log(`⚠️  Could not calculate completeness for sponsor ${sponsorId}: ${error}`);
       }
     } else {
-      console.log('⚠️  No disclosures available for completeness testing');
+      logger.info('⚠️  No disclosures available for completeness testing', { component: 'SimpleTool' });
     }
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Test 3: Financial Relationship Mapping
-    console.log('🔗 Test 3: Financial Relationship Mapping');
-    console.log('=' .repeat(50));
+    logger.info('🔗 Test 3: Financial Relationship Mapping', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     if (allDisclosures.length > 0) {
       const sponsorId = allDisclosures[0].sponsorId;
@@ -89,7 +90,7 @@ async function testFinancialDisclosureIntegration() {
         console.log(`   - Last Mapping Update: ${relationshipMapping.lastMappingUpdate.toLocaleDateString()}`);
         
         if (relationshipMapping.relationships.length > 0) {
-          console.log('   - Sample Relationships:');
+          logger.info('   - Sample Relationships:', { component: 'SimpleTool' });
           relationshipMapping.relationships.slice(0, 3).forEach((rel, index) => {
             console.log(`     ${index + 1}. ${rel.relatedEntity}`);
             console.log(`        - Type: ${rel.relationshipType}`);
@@ -107,14 +108,14 @@ async function testFinancialDisclosureIntegration() {
         console.log(`⚠️  Could not create relationship mapping for sponsor ${sponsorId}: ${error}`);
       }
     } else {
-      console.log('⚠️  No disclosures available for relationship mapping testing');
+      logger.info('⚠️  No disclosures available for relationship mapping testing', { component: 'SimpleTool' });
     }
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Test 4: Disclosure Update Monitoring and Alerts
-    console.log('🚨 Test 4: Disclosure Update Monitoring and Alerts');
-    console.log('=' .repeat(50));
+    logger.info('🚨 Test 4: Disclosure Update Monitoring and Alerts', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     try {
       const alerts = await financialDisclosureIntegrationService.monitorDisclosureUpdates();
@@ -122,7 +123,7 @@ async function testFinancialDisclosureIntegration() {
       console.log(`✅ Generated ${alerts.length} disclosure update alerts`);
       
       if (alerts.length > 0) {
-        console.log('📋 Sample alerts:');
+        logger.info('📋 Sample alerts:', { component: 'SimpleTool' });
         alerts.slice(0, 5).forEach((alert, index) => {
           console.log(`   ${index + 1}. ${alert.type.toUpperCase()}`);
           console.log(`      - Sponsor: ${alert.sponsorName}`);
@@ -143,7 +144,7 @@ async function testFinancialDisclosureIntegration() {
           critical: alerts.filter(a => a.severity === 'critical').length
         };
         
-        console.log('\n📊 Alert Statistics:');
+        logger.info('\n📊 Alert Statistics:', { component: 'SimpleTool' });
         console.log(`   - Info: ${alertStats.info}`);
         console.log(`   - Warning: ${alertStats.warning}`);
         console.log(`   - Critical: ${alertStats.critical}`);
@@ -152,18 +153,18 @@ async function testFinancialDisclosureIntegration() {
       console.log(`⚠️  Error during monitoring: ${error}`);
     }
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Test 5: Data Validation and Error Handling
-    console.log('🔍 Test 5: Data Validation and Error Handling');
-    console.log('=' .repeat(50));
+    logger.info('🔍 Test 5: Data Validation and Error Handling', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     try {
       // Test with invalid sponsor ID
       await financialDisclosureIntegrationService.calculateDisclosureCompletenessScore(99999);
-      console.log('❌ Expected error for invalid sponsor ID was not thrown');
+      logger.info('❌ Expected error for invalid sponsor ID was not thrown', { component: 'SimpleTool' });
     } catch (error) {
-      console.log('✅ Correctly handled invalid sponsor ID error');
+      logger.info('✅ Correctly handled invalid sponsor ID error', { component: 'SimpleTool' });
     }
 
     try {
@@ -174,28 +175,28 @@ async function testFinancialDisclosureIntegration() {
       console.log(`⚠️  Error with empty data source: ${error}`);
     }
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Summary
-    console.log('📋 Test Summary');
-    console.log('=' .repeat(50));
-    console.log('✅ Financial disclosure data processing - PASSED');
-    console.log('✅ Disclosure completeness scoring - PASSED');
-    console.log('✅ Financial relationship mapping - PASSED');
-    console.log('✅ Disclosure update monitoring and alerts - PASSED');
-    console.log('✅ Data validation and error handling - PASSED');
+    logger.info('📋 Test Summary', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('✅ Financial disclosure data processing - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Disclosure completeness scoring - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Financial relationship mapping - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Disclosure update monitoring and alerts - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Data validation and error handling - PASSED', { component: 'SimpleTool' });
     
-    console.log('\n🎉 All financial disclosure integration tests completed successfully!');
+    logger.info('\n🎉 All financial disclosure integration tests completed successfully!', { component: 'SimpleTool' });
     
     // Performance metrics
-    console.log('\n⚡ Performance Metrics:');
+    logger.info('\n⚡ Performance Metrics:', { component: 'SimpleTool' });
     console.log(`   - Total disclosures processed: ${allDisclosures.length}`);
     console.log(`   - Processing time: < 5 seconds (estimated)`);
     console.log(`   - Cache utilization: Active`);
     console.log(`   - Error handling: Robust`);
 
   } catch (error) {
-    console.error('❌ Test failed with error:', error);
+    logger.error('❌ Test failed with error:', { component: 'SimpleTool' }, error);
     process.exit(1);
   }
 }
@@ -204,13 +205,19 @@ async function testFinancialDisclosureIntegration() {
 if (import.meta.url === `file://${process.argv[1]}`) {
   testFinancialDisclosureIntegration()
     .then(() => {
-      console.log('\n✅ Test execution completed');
+      logger.info('\n✅ Test execution completed', { component: 'SimpleTool' });
       process.exit(0);
     })
     .catch((error) => {
-      console.error('\n❌ Test execution failed:', error);
+      logger.error('\n❌ Test execution failed:', { component: 'SimpleTool' }, error);
       process.exit(1);
     });
 }
 
 export { testFinancialDisclosureIntegration };
+
+
+
+
+
+

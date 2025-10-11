@@ -5,6 +5,7 @@ import { userPreferencesService, type BillTrackingPreferences } from '../../feat
 import nodemailer from 'nodemailer';
 import { z } from 'zod';
 import * as cron from 'node-cron';
+import { logger } from '../utils/logger';
 
 // Advanced notification interfaces
 export interface NotificationChannel {
@@ -133,9 +134,9 @@ export class AdvancedNotificationService {
             this.startNotificationProcessing();
             
             this.isInitialized = true;
-            console.log('✅ Advanced Notification Service initialized');
+            logger.info('✅ Advanced Notification Service initialized', { component: 'SimpleTool' });
         } catch (error) {
-            console.error('❌ Failed to initialize Advanced Notification Service:', error);
+            logger.error('❌ Failed to initialize Advanced Notification Service:', { component: 'SimpleTool' }, error);
         }
     }
 
@@ -145,7 +146,7 @@ export class AdvancedNotificationService {
     private async initializeEmailTransporter(): Promise<void> {
         try {
             if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-                console.log('⚠️ Email service not configured - missing SMTP settings');
+                logger.info('⚠️ Email service not configured - missing SMTP settings', { component: 'SimpleTool' });
                 return;
             }
 
@@ -166,10 +167,10 @@ export class AdvancedNotificationService {
 
             // Verify connection
             await this.emailTransporter.verify();
-            console.log('✅ Email transporter initialized and verified');
+            logger.info('✅ Email transporter initialized and verified', { component: 'SimpleTool' });
 
         } catch (error) {
-            console.error('❌ Failed to initialize email transporter:', error);
+            logger.error('❌ Failed to initialize email transporter:', { component: 'SimpleTool' }, error);
             this.emailTransporter = null;
         }
     }
@@ -245,12 +246,12 @@ export class AdvancedNotificationService {
                 await this.processNotificationQueue();
                 await this.processBatchedNotifications();
             } catch (error) {
-                console.error('Error in notification processing:', error);
+                logger.error('Error in notification processing:', { component: 'SimpleTool' }, error);
             }
         }, 30000); // Process every 30 seconds
         
         this.processingIntervals.push(interval);
-        console.log('✅ Advanced notification processing started');
+        logger.info('✅ Advanced notification processing started', { component: 'SimpleTool' });
     }
 
     /**
@@ -259,7 +260,7 @@ export class AdvancedNotificationService {
     private stopNotificationProcessing(): void {
         this.processingIntervals.forEach(interval => clearInterval(interval));
         this.processingIntervals = [];
-        console.log('🛑 Advanced notification processing stopped');
+        logger.info('🛑 Advanced notification processing stopped', { component: 'SimpleTool' });
     }
 
     /**
@@ -306,7 +307,7 @@ export class AdvancedNotificationService {
             }
 
         } catch (error) {
-            console.error('Error sending advanced notification:', error);
+            logger.error('Error sending advanced notification:', { component: 'SimpleTool' }, error);
             return {
                 success: false,
                 channels: [],
@@ -384,7 +385,7 @@ export class AdvancedNotificationService {
                 data: request.data
             });
         } catch (error) {
-            console.error('Error sending in-app notification:', error);
+            logger.error('Error sending in-app notification:', { component: 'SimpleTool' }, error);
             throw error;
         }
     }
@@ -639,7 +640,7 @@ export class AdvancedNotificationService {
             try {
                 await this.sendNotification(request);
             } catch (error) {
-                console.error('Error processing queued notification:', error);
+                logger.error('Error processing queued notification:', { component: 'SimpleTool' }, error);
             }
         }
     }
@@ -679,7 +680,7 @@ export class AdvancedNotificationService {
      * Cleanup resources
      */
     async cleanup(): Promise<void> {
-        console.log('🧹 Cleaning up Advanced Notification Service...');
+        logger.info('🧹 Cleaning up Advanced Notification Service...', { component: 'SimpleTool' });
         
         // Stop processing intervals
         this.stopNotificationProcessing();
@@ -696,7 +697,7 @@ export class AdvancedNotificationService {
         this.templates.clear();
         
         this.isInitialized = false;
-        console.log('✅ Advanced Notification Service cleanup completed');
+        logger.info('✅ Advanced Notification Service cleanup completed', { component: 'SimpleTool' });
     }
 }
 
@@ -705,3 +706,9 @@ export const advancedNotificationService = new AdvancedNotificationService();
 
 // Export for backward compatibility
 export { advancedNotificationService as notificationService };
+
+
+
+
+
+

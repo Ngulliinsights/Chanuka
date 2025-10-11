@@ -6,14 +6,15 @@
  */
 
 import { transparencyDashboardService } from "./services/transparency-dashboard.js";
+import { logger } from '../utils/logger';
 
 async function testEnhancedTransparencyFeatures() {
-  console.log('🧪 Testing Enhanced Transparency Dashboard Features\n');
+  logger.info('🧪 Testing Enhanced Transparency Dashboard Features\n', { component: 'SimpleTool' });
 
   try {
     // Test 1: Transparency Scoring Algorithms
-    console.log('🎯 Test 1: Transparency Scoring Algorithms');
-    console.log('=' .repeat(50));
+    logger.info('🎯 Test 1: Transparency Scoring Algorithms', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
     
     // Get a sample sponsor to test with
     const dashboard = await transparencyDashboardService.getTransparencyDashboard();
@@ -29,36 +30,36 @@ async function testEnhancedTransparencyFeatures() {
         console.log(`   - Risk Level: ${transparencyScore.riskLevel}`);
         console.log(`   - Last Calculated: ${transparencyScore.lastCalculated.toLocaleString()}`);
         
-        console.log('\n📊 Component Scores (Weighted Algorithm):');
+        logger.info('\n📊 Component Scores (Weighted Algorithm):', { component: 'SimpleTool' });
         Object.entries(transparencyScore.componentScores).forEach(([component, score]) => {
           const componentName = component.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
           console.log(`   - ${componentName}: ${score}%`);
         });
 
         if (transparencyScore.recommendations.length > 0) {
-          console.log('\n💡 Algorithm-Generated Recommendations:');
+          logger.info('\n💡 Algorithm-Generated Recommendations:', { component: 'SimpleTool' });
           transparencyScore.recommendations.forEach((rec, index) => {
             console.log(`   ${index + 1}. ${rec}`);
           });
         }
 
-        console.log('\n🔍 Algorithm Details:');
-        console.log('   - Uses weighted scoring: Disclosure Completeness (35%), Verification (25%), Conflict Resolution (20%), Data Recency (15%), Public Accessibility (5%)');
-        console.log('   - Risk level determined by score thresholds and relationship analysis');
-        console.log('   - Recommendations generated based on component score analysis');
+        logger.info('\n🔍 Algorithm Details:', { component: 'SimpleTool' });
+        logger.info('   - Uses weighted scoring: Disclosure Completeness (35%), Verification (25%), Conflict Resolution (20%), Data Recency (15%), Public Accessibility (5%)', { component: 'SimpleTool' });
+        logger.info('   - Risk level determined by score thresholds and relationship analysis', { component: 'SimpleTool' });
+        logger.info('   - Recommendations generated based on component score analysis', { component: 'SimpleTool' });
         
       } catch (error) {
         console.log(`⚠️  Could not test transparency scoring for sponsor ${testSponsorId}: ${error}`);
       }
     } else {
-      console.log('⚠️  No sponsors available for transparency scoring algorithm test');
+      logger.info('⚠️  No sponsors available for transparency scoring algorithm test', { component: 'SimpleTool' });
     }
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Test 2: Transparency Trend Analysis and Historical Tracking
-    console.log('📈 Test 2: Transparency Trend Analysis and Historical Tracking');
-    console.log('=' .repeat(50));
+    logger.info('📈 Test 2: Transparency Trend Analysis and Historical Tracking', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     // Test overall trends
     const overallTrends = await transparencyDashboardService.analyzeTransparencyTrends(
@@ -72,7 +73,7 @@ async function testEnhancedTransparencyFeatures() {
     console.log(`   - Trend Strength: ${overallTrends.analysis.trendStrength}`);
 
     if (overallTrends.trends.length > 0) {
-      console.log('\n📊 Historical Tracking Data (Recent 6 months):');
+      logger.info('\n📊 Historical Tracking Data (Recent 6 months):', { component: 'SimpleTool' });
       overallTrends.trends.slice(-6).forEach((trend, index) => {
         console.log(`   ${trend.period}:`);
         console.log(`      - Transparency Score: ${trend.transparencyScore}%`);
@@ -84,21 +85,21 @@ async function testEnhancedTransparencyFeatures() {
     }
 
     if (overallTrends.analysis.keyChanges.length > 0) {
-      console.log('\n🔄 Key Changes Detected by Algorithm:');
+      logger.info('\n🔄 Key Changes Detected by Algorithm:', { component: 'SimpleTool' });
       overallTrends.analysis.keyChanges.forEach((change, index) => {
         console.log(`   ${index + 1}. ${change.period}: ${change.description} (Impact: ${change.impact})`);
       });
     }
 
     if (overallTrends.analysis.predictions.length > 0) {
-      console.log('\n🔮 Predictive Analysis:');
+      logger.info('\n🔮 Predictive Analysis:', { component: 'SimpleTool' });
       overallTrends.analysis.predictions.forEach((prediction, index) => {
         console.log(`   ${prediction.period}: ${prediction.predictedScore}% (Confidence: ${Math.round(prediction.confidence * 100)}%)`);
       });
     }
 
     if (overallTrends.recommendations.length > 0) {
-      console.log('\n💡 Trend-Based Recommendations:');
+      logger.info('\n💡 Trend-Based Recommendations:', { component: 'SimpleTool' });
       overallTrends.recommendations.forEach((rec, index) => {
         console.log(`   ${index + 1}. ${rec}`);
       });
@@ -129,11 +130,11 @@ async function testEnhancedTransparencyFeatures() {
       }
     }
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Test 3: Advanced Reporting Features
-    console.log('📋 Test 3: Advanced Transparency Reporting');
-    console.log('=' .repeat(50));
+    logger.info('📋 Test 3: Advanced Transparency Reporting', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     const comprehensiveReport = await transparencyDashboardService.generateTransparencyReport();
     
@@ -142,7 +143,7 @@ async function testEnhancedTransparencyFeatures() {
     console.log(`   - Title: ${comprehensiveReport.title}`);
     console.log(`   - Generated At: ${comprehensiveReport.generatedAt.toLocaleString()}`);
     
-    console.log('\n📊 Executive Summary with Trend Analysis:');
+    logger.info('\n📊 Executive Summary with Trend Analysis:', { component: 'SimpleTool' });
     console.log(`   - Total Sponsors Analyzed: ${comprehensiveReport.executiveSummary.totalSponsors}`);
     console.log(`   - Average Transparency Score: ${comprehensiveReport.executiveSummary.averageTransparencyScore}%`);
     console.log(`   - High Risk Sponsors: ${comprehensiveReport.executiveSummary.highRiskSponsors}`);
@@ -151,7 +152,7 @@ async function testEnhancedTransparencyFeatures() {
     console.log(`   - Overall Trend Direction: ${comprehensiveReport.executiveSummary.trendDirection}`);
 
     if (comprehensiveReport.sponsorAnalysis.length > 0) {
-      console.log('\n👥 Sponsor Analysis with Historical Context:');
+      logger.info('\n👥 Sponsor Analysis with Historical Context:', { component: 'SimpleTool' });
       comprehensiveReport.sponsorAnalysis.slice(0, 3).forEach((sponsor, index) => {
         console.log(`   ${index + 1}. ${sponsor.sponsorName}`);
         console.log(`      - Current Transparency Score: ${sponsor.transparencyScore}%`);
@@ -166,7 +167,7 @@ async function testEnhancedTransparencyFeatures() {
     }
 
     if (comprehensiveReport.conflictPatterns.length > 0) {
-      console.log('\n⚠️  Trending Conflict Patterns:');
+      logger.info('\n⚠️  Trending Conflict Patterns:', { component: 'SimpleTool' });
       comprehensiveReport.conflictPatterns.forEach((pattern, index) => {
         console.log(`   ${index + 1}. ${pattern.patternType.toUpperCase()} Conflicts`);
         console.log(`      - Frequency: ${pattern.frequency} occurrences`);
@@ -178,7 +179,7 @@ async function testEnhancedTransparencyFeatures() {
     }
 
     if (comprehensiveReport.visualizations.length > 0) {
-      console.log('\n📈 Available Visualizations:');
+      logger.info('\n📈 Available Visualizations:', { component: 'SimpleTool' });
       comprehensiveReport.visualizations.forEach((viz, index) => {
         console.log(`   ${index + 1}. ${viz.title} (${viz.type})`);
         console.log(`      - Description: ${viz.description}`);
@@ -187,11 +188,11 @@ async function testEnhancedTransparencyFeatures() {
       });
     }
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Test 4: System Health and Data Quality Monitoring
-    console.log('🔍 Test 4: System Health and Data Quality Monitoring');
-    console.log('=' .repeat(50));
+    logger.info('🔍 Test 4: System Health and Data Quality Monitoring', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     console.log(`✅ System health monitoring active`);
     console.log(`   - Data Freshness: ${dashboard.systemHealth.dataFreshness}%`);
@@ -200,22 +201,22 @@ async function testEnhancedTransparencyFeatures() {
     console.log(`   - Alert Count: ${dashboard.systemHealth.alertCount}`);
 
     // Data quality indicators
-    console.log('\n📊 Data Quality Indicators:');
+    logger.info('\n📊 Data Quality Indicators:', { component: 'SimpleTool' });
     console.log(`   - Total Sponsors Monitored: ${dashboard.summary.totalSponsors}`);
     console.log(`   - Total Disclosures Processed: ${dashboard.summary.totalDisclosures}`);
     console.log(`   - Verification Rate: ${dashboard.summary.verificationRate}%`);
     console.log(`   - Average Transparency Score: ${dashboard.summary.averageTransparencyScore}%`);
 
-    console.log('\n🎯 Risk Distribution Analysis:');
+    logger.info('\n🎯 Risk Distribution Analysis:', { component: 'SimpleTool' });
     Object.entries(dashboard.summary.riskDistribution).forEach(([risk, count]) => {
       console.log(`   - ${risk.charAt(0).toUpperCase() + risk.slice(1)} Risk: ${count} sponsors`);
     });
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Test 5: Performance and Caching
-    console.log('⚡ Test 5: Performance and Caching Verification');
-    console.log('=' .repeat(50));
+    logger.info('⚡ Test 5: Performance and Caching Verification', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     const startTime = Date.now();
     
@@ -228,57 +229,57 @@ async function testEnhancedTransparencyFeatures() {
     console.log(`   - Caching: Active and functional`);
     console.log(`   - Response Time: ${cachedTime < 2000 ? 'Excellent' : cachedTime < 5000 ? 'Good' : 'Needs optimization'}`);
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Summary
-    console.log('📋 Enhanced Transparency Features Test Summary');
-    console.log('=' .repeat(50));
-    console.log('✅ Transparency scoring algorithms - PASSED');
-    console.log('   - Weighted component scoring implemented');
-    console.log('   - Risk level determination functional');
-    console.log('   - Automated recommendations generated');
-    console.log('');
-    console.log('✅ Transparency trend analysis and historical tracking - PASSED');
-    console.log('   - Historical data analysis implemented');
-    console.log('   - Trend pattern detection functional');
-    console.log('   - Predictive analysis capabilities active');
-    console.log('   - Key change detection working');
-    console.log('');
-    console.log('✅ Advanced transparency reporting - PASSED');
-    console.log('   - Comprehensive report generation functional');
-    console.log('   - Executive summaries with trend data');
-    console.log('   - Conflict pattern identification active');
-    console.log('   - Visualization framework ready');
-    console.log('');
-    console.log('✅ System health and data quality monitoring - PASSED');
-    console.log('   - Data freshness tracking active');
-    console.log('   - Processing status monitoring functional');
-    console.log('   - Quality indicators implemented');
-    console.log('   - Risk distribution analysis working');
+    logger.info('📋 Enhanced Transparency Features Test Summary', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('✅ Transparency scoring algorithms - PASSED', { component: 'SimpleTool' });
+    logger.info('   - Weighted component scoring implemented', { component: 'SimpleTool' });
+    logger.info('   - Risk level determination functional', { component: 'SimpleTool' });
+    logger.info('   - Automated recommendations generated', { component: 'SimpleTool' });
+    logger.info('', { component: 'SimpleTool' });
+    logger.info('✅ Transparency trend analysis and historical tracking - PASSED', { component: 'SimpleTool' });
+    logger.info('   - Historical data analysis implemented', { component: 'SimpleTool' });
+    logger.info('   - Trend pattern detection functional', { component: 'SimpleTool' });
+    logger.info('   - Predictive analysis capabilities active', { component: 'SimpleTool' });
+    logger.info('   - Key change detection working', { component: 'SimpleTool' });
+    logger.info('', { component: 'SimpleTool' });
+    logger.info('✅ Advanced transparency reporting - PASSED', { component: 'SimpleTool' });
+    logger.info('   - Comprehensive report generation functional', { component: 'SimpleTool' });
+    logger.info('   - Executive summaries with trend data', { component: 'SimpleTool' });
+    logger.info('   - Conflict pattern identification active', { component: 'SimpleTool' });
+    logger.info('   - Visualization framework ready', { component: 'SimpleTool' });
+    logger.info('', { component: 'SimpleTool' });
+    logger.info('✅ System health and data quality monitoring - PASSED', { component: 'SimpleTool' });
+    logger.info('   - Data freshness tracking active', { component: 'SimpleTool' });
+    logger.info('   - Processing status monitoring functional', { component: 'SimpleTool' });
+    logger.info('   - Quality indicators implemented', { component: 'SimpleTool' });
+    logger.info('   - Risk distribution analysis working', { component: 'SimpleTool' });
     
-    console.log('\n🎉 All enhanced transparency dashboard features tested successfully!');
+    logger.info('\n🎉 All enhanced transparency dashboard features tested successfully!', { component: 'SimpleTool' });
     
     // Requirements verification
-    console.log('\n📋 Requirements Verification:');
-    console.log('✅ REQ-005.3: Transparency Reporting');
-    console.log('   - Reports include trending conflict patterns');
-    console.log('   - Sponsor influence networks visualized');
-    console.log('   - Monthly reports with executive summaries');
-    console.log('   - Historical comparison data available');
-    console.log('');
-    console.log('✅ REQ-005.4: Data Quality and Source Management');
-    console.log('   - Data freshness tracked with timestamps');
-    console.log('   - Source reliability validated and scored');
-    console.log('   - Data conflicts flagged for manual review');
-    console.log('   - Data lineage maintained for audit purposes');
-    console.log('');
-    console.log('✅ REQ-005.5: Historical Tracking (implied)');
-    console.log('   - Trend analysis with historical data');
-    console.log('   - Predictive capabilities implemented');
-    console.log('   - Change detection algorithms active');
+    logger.info('\n📋 Requirements Verification:', { component: 'SimpleTool' });
+    logger.info('✅ REQ-005.3: Transparency Reporting', { component: 'SimpleTool' });
+    logger.info('   - Reports include trending conflict patterns', { component: 'SimpleTool' });
+    logger.info('   - Sponsor influence networks visualized', { component: 'SimpleTool' });
+    logger.info('   - Monthly reports with executive summaries', { component: 'SimpleTool' });
+    logger.info('   - Historical comparison data available', { component: 'SimpleTool' });
+    logger.info('', { component: 'SimpleTool' });
+    logger.info('✅ REQ-005.4: Data Quality and Source Management', { component: 'SimpleTool' });
+    logger.info('   - Data freshness tracked with timestamps', { component: 'SimpleTool' });
+    logger.info('   - Source reliability validated and scored', { component: 'SimpleTool' });
+    logger.info('   - Data conflicts flagged for manual review', { component: 'SimpleTool' });
+    logger.info('   - Data lineage maintained for audit purposes', { component: 'SimpleTool' });
+    logger.info('', { component: 'SimpleTool' });
+    logger.info('✅ REQ-005.5: Historical Tracking (implied)', { component: 'SimpleTool' });
+    logger.info('   - Trend analysis with historical data', { component: 'SimpleTool' });
+    logger.info('   - Predictive capabilities implemented', { component: 'SimpleTool' });
+    logger.info('   - Change detection algorithms active', { component: 'SimpleTool' });
 
   } catch (error) {
-    console.error('❌ Test failed with error:', error);
+    logger.error('❌ Test failed with error:', { component: 'SimpleTool' }, error);
     process.exit(1);
   }
 }
@@ -287,13 +288,19 @@ async function testEnhancedTransparencyFeatures() {
 if (import.meta.url === `file://${process.argv[1]}`) {
   testEnhancedTransparencyFeatures()
     .then(() => {
-      console.log('\n✅ Enhanced transparency features test execution completed');
+      logger.info('\n✅ Enhanced transparency features test execution completed', { component: 'SimpleTool' });
       process.exit(0);
     })
     .catch((error) => {
-      console.error('\n❌ Test execution failed:', error);
+      logger.error('\n❌ Test execution failed:', { component: 'SimpleTool' }, error);
       process.exit(1);
     });
 }
 
 export { testEnhancedTransparencyFeatures };
+
+
+
+
+
+

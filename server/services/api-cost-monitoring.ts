@@ -6,6 +6,21 @@
  */
 
 import { EventEmitter } from 'events';
+import { logger } from '../utils/logger';
+
+// Dynamic import to avoid circular dependencies
+let performanceMonitoring: any = null;
+const getPerformanceMonitoring = async () => {
+  if (!performanceMonitoring) {
+    try {
+      const { performanceMonitoring: pm } = await import('./performance-monitoring.js');
+      performanceMonitoring = pm;
+    } catch (error) {
+      // Performance monitoring not available, continue without it
+    }
+  }
+  return performanceMonitoring;
+};
 
 interface CostAlert {
   id: string;
@@ -110,7 +125,27 @@ export class APICostMonitoringService extends EventEmitter {
 
     const cost = customCost || (budget.costPerRequest * requests);
     const history = this.costHistory.get(source) || [];
-    
+
+    // Record performance metrics
+    getPerformanceMonitoring().then(pm => {
+      if (pm) {
+        pm.recordMetric('api.cost.total', cost, {
+          source,
+          component: 'api_cost_monitoring'
+        });
+        pm.recordMetric('api.requests.count', requests, {
+          source,
+          component: 'api_cost_monitoring'
+        });
+        pm.recordMetric('api.cost.per_request', budget.costPerRequest, {
+          source,
+          component: 'api_cost_monitoring'
+        });
+      }
+    }).catch(() => {
+      // Ignore performance monitoring errors
+    });
+
     // Add to history
     history.push({
       timestamp: new Date(),
@@ -121,7 +156,7 @@ export class APICostMonitoringService extends EventEmitter {
     // Keep only recent history
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - this.HISTORY_RETENTION_DAYS);
-    
+
     const filteredHistory = history.filter(entry => entry.timestamp >= cutoffDate);
     this.costHistory.set(source, filteredHistory);
 
@@ -536,3 +571,9 @@ export class APICostMonitoringService extends EventEmitter {
     };
   }
 }
+
+
+
+
+
+

@@ -4,6 +4,7 @@ import { LoadTester } from './load-tester';
 import type { CacheService } from '../cache/types';
 import type { RateLimitStore } from '../rate-limiting/types';
 import type { Logger } from '../logging/types';
+import { logger } from '../utils/logger';
 
 /**
  * Stress testing utilities for core components
@@ -969,3 +970,9 @@ export interface SystemMetrics {
   uptime: number;
   loadAverage: number[];
 }
+
+
+
+
+
+

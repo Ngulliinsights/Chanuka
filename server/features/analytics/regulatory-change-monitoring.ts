@@ -5,6 +5,8 @@ import {
 import { eq, desc, and, or, sql, count, gt, gte, lte } from "drizzle-orm";
 import { database as db } from "../../../shared/database/connection.js";
 import { cacheService, CACHE_KEYS, CACHE_TTL } from "../../infrastructure/cache/cache-service.js";
+import { logger } from '../../utils/logger';
+import { errorTracker } from '../../core/errors/error-tracker';
 
 // Extended cache keys for monitoring features
 const MONITORING_CACHE_KEYS = {
@@ -148,14 +150,14 @@ export class RegulatoryChangeMonitoringService {
    * types of changes at appropriate intervals.
    */
   startAutomatedMonitoring(): void {
-    console.log('Starting comprehensive regulatory change monitoring system...');
+    logger.info('Starting comprehensive regulatory change monitoring system...', { component: 'SimpleTool' });
 
     // Daily monitoring for immediate changes and urgent alerts
     this.monitoringTimer = setInterval(async () => {
       try {
         await this.performDailyMonitoring();
       } catch (error) {
-        console.error('Error in daily monitoring:', error);
+  logger.error('Error in daily monitoring:', { component: 'SimpleTool', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
       }
     }, this.MONITORING_INTERVALS.DAILY_CHECK);
 
@@ -164,7 +166,7 @@ export class RegulatoryChangeMonitoringService {
       try {
         await this.performWeeklyAnalysis();
       } catch (error) {
-        console.error('Error in weekly analysis:', error);
+  logger.error('Error in weekly analysis:', { component: 'SimpleTool', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
       }
     }, this.MONITORING_INTERVALS.WEEKLY_ANALYSIS);
 
@@ -173,13 +175,13 @@ export class RegulatoryChangeMonitoringService {
       try {
         await this.performMonthlyReview();
       } catch (error) {
-        console.error('Error in monthly review:', error);
+  logger.error('Error in monthly review:', { component: 'SimpleTool', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
       }
     }, this.MONITORING_INTERVALS.MONTHLY_REVIEW);
 
     // Run initial monitoring to establish baseline
     this.performDailyMonitoring().catch(error => {
-      console.error('Error in initial monitoring run:', error);
+      logger.error('Error in initial monitoring run:', { component: 'SimpleTool' }, error);
     });
   }
 
@@ -187,27 +189,27 @@ export class RegulatoryChangeMonitoringService {
    * Stop all automated monitoring processes cleanly
    */
   stopAutomatedMonitoring(): void {
-    console.log('Stopping regulatory change monitoring system...');
+    logger.info('Stopping regulatory change monitoring system...', { component: 'SimpleTool' });
 
     if (this.monitoringTimer) {
       clearInterval(this.monitoringTimer);
       this.monitoringTimer = null;
-      console.log('Daily monitoring stopped');
+      logger.info('Daily monitoring stopped', { component: 'SimpleTool' });
     }
 
     if (this.weeklyTimer) {
       clearInterval(this.weeklyTimer);
       this.weeklyTimer = null;
-      console.log('Weekly analysis stopped');
+      logger.info('Weekly analysis stopped', { component: 'SimpleTool' });
     }
 
     if (this.monthlyTimer) {
       clearInterval(this.monthlyTimer);
       this.monthlyTimer = null;
-      console.log('Monthly review stopped');
+      logger.info('Monthly review stopped', { component: 'SimpleTool' });
     }
 
-    console.log('All automated regulatory change monitoring stopped.');
+    logger.info('All automated regulatory change monitoring stopped.', { component: 'SimpleTool' });
   }
 
   // Report generation and analysis methods
@@ -348,7 +350,7 @@ export class RegulatoryChangeMonitoringService {
 
       console.log(`Stored ${report.reportType} monitoring report: ${report.id}`);
     } catch (error) {
-      console.error('Error storing monitoring report:', error);
+  logger.error('Error storing monitoring report:', { component: 'SimpleTool', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
     }
   }
 
@@ -386,7 +388,7 @@ export class RegulatoryChangeMonitoringService {
 
       return filteredAlerts;
     } catch (error) {
-      console.error('Error retrieving active alerts:', error);
+  logger.error('Error retrieving active alerts:', { component: 'SimpleTool', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
       return [];
     }
   }
@@ -410,7 +412,14 @@ export class RegulatoryChangeMonitoringService {
       console.log(`Resolved alert: ${alertId}`);
       return true;
     } catch (error) {
-      console.error(`Error resolving alert ${alertId}:`, error);
+      logger.error(`Error resolving alert ${alertId}`, { component: 'regulatory-change-monitoring', alertId, error });
+      try {
+        if ((errorTracker as any)?.capture) {
+          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'regulatory-change-monitoring', alertId });
+        }
+      } catch (reportErr) {
+        logger.warn('Failed to report resolveAlert error to errorTracker', { reportErr });
+      }
       return false;
     }
   }
@@ -474,7 +483,14 @@ export class RegulatoryChangeMonitoringService {
       await cacheService.set(cacheKey, impacts, MONITORING_CACHE_TTL.HOUR * 2);
       return impacts;
     } catch (error) {
-      console.error(`Error analyzing stakeholder impact for regulation ${regulationId}:`, error);
+      logger.error(`Error analyzing stakeholder impact for regulation ${regulationId}`, { component: 'regulatory-change-monitoring', regulationId, error });
+      try {
+        if ((errorTracker as any)?.capture) {
+          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'regulatory-change-monitoring', regulationId });
+        }
+      } catch (reportErr) {
+        logger.warn('Failed to report stakeholder impact error to errorTracker', { reportErr });
+      }
       return [];
     }
   }
@@ -493,7 +509,14 @@ export class RegulatoryChangeMonitoringService {
       await cacheService.set(cacheKey, opportunities, MONITORING_CACHE_TTL.HOUR * 4);
       return opportunities;
     } catch (error) {
-      console.error(`Error identifying strategic opportunities for regulation ${regulationId}:`, error);
+      logger.error(`Error identifying strategic opportunities for regulation ${regulationId}`, { component: 'regulatory-change-monitoring', regulationId, error });
+      try {
+        if ((errorTracker as any)?.capture) {
+          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'regulatory-change-monitoring', regulationId });
+        }
+      } catch (reportErr) {
+        logger.warn('Failed to report strategic opportunities error to errorTracker', { reportErr });
+      }
       return [];
     }
   }
@@ -502,7 +525,7 @@ export class RegulatoryChangeMonitoringService {
    * Daily monitoring performs immediate-response monitoring for urgent changes
    */
   private async performDailyMonitoring(): Promise<MonitoringReport> {
-    console.log('Performing daily regulatory change monitoring...');
+    logger.info('Performing daily regulatory change monitoring...', { component: 'SimpleTool' });
 
     const startTime = new Date();
     const cutoffTime = new Date(startTime.getTime() - this.MONITORING_INTERVALS.DAILY_CHECK);
@@ -541,7 +564,7 @@ export class RegulatoryChangeMonitoringService {
       console.log(`Daily monitoring completed. Generated ${alerts.length} alerts.`);
       return report;
     } catch (error) {
-      console.error('Error in daily monitoring:', error);
+  logger.error('Error in daily monitoring:', { component: 'SimpleTool', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
       throw error;
     }
   }
@@ -550,7 +573,7 @@ export class RegulatoryChangeMonitoringService {
    * Weekly analysis focuses on trend identification and strategic planning
    */
   private async performWeeklyAnalysis(): Promise<MonitoringReport> {
-    console.log('Performing weekly regulatory trend analysis...');
+    logger.info('Performing weekly regulatory trend analysis...', { component: 'SimpleTool' });
 
     const endTime = new Date();
     const startTime = new Date(endTime.getTime() - this.MONITORING_INTERVALS.WEEKLY_ANALYSIS);
@@ -580,7 +603,7 @@ export class RegulatoryChangeMonitoringService {
     };
 
     await this.storeMonitoringReport(report);
-    console.log('Weekly analysis completed');
+    logger.info('Weekly analysis completed', { component: 'SimpleTool' });
     return report;
   }
 
@@ -588,7 +611,7 @@ export class RegulatoryChangeMonitoringService {
    * Monthly review provides comprehensive strategic assessment
    */
   private async performMonthlyReview(): Promise<MonitoringReport> {
-    console.log('Performing monthly regulatory review...');
+    logger.info('Performing monthly regulatory review...', { component: 'SimpleTool' });
 
     const endTime = new Date();
     const startTime = new Date(endTime.getTime() - this.MONITORING_INTERVALS.MONTHLY_REVIEW);
@@ -618,7 +641,7 @@ export class RegulatoryChangeMonitoringService {
     };
 
     await this.storeMonitoringReport(report);
-    console.log('Monthly review completed');
+    logger.info('Monthly review completed', { component: 'SimpleTool' });
     return report;
   }
 
@@ -637,3 +660,11 @@ export class RegulatoryChangeMonitoringService {
 
 // Export singleton instance
 export const regulatoryChangeMonitoringService = new RegulatoryChangeMonitoringService();
+
+
+
+
+
+
+
+

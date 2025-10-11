@@ -3,6 +3,7 @@ import { databaseService } from "../services/database-service.js";
 import { cacheService } from "../infrastructure/cache/cache-service.js";
 import { demoDataService } from "../infrastructure/demo-data.js";
 import * as schema from "../../shared/schema.js";
+import { logger } from '../../utils/logger';
 
 // Search index health status
 export interface SearchIndexHealth {
@@ -56,7 +57,7 @@ export class SearchIndexManager {
    * Initialize the search index manager
    */
   async initialize(): Promise<void> {
-    console.log('Initializing Search Index Manager...');
+    logger.info('Initializing Search Index Manager...', { component: 'SimpleTool' });
     
     try {
       // Check if search vectors exist and are properly configured
@@ -68,9 +69,9 @@ export class SearchIndexManager {
       // Start queue processing
       this.startQueueProcessing();
       
-      console.log('✅ Search Index Manager initialized successfully');
+      logger.info('✅ Search Index Manager initialized successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('❌ Failed to initialize Search Index Manager:', error);
+      logger.error('❌ Failed to initialize Search Index Manager:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -141,11 +142,11 @@ export class SearchIndexManager {
     let errors = 0;
     const errorDetails: string[] = [];
 
-    console.log('🔄 Starting full search index rebuild...');
+    logger.info('🔄 Starting full search index rebuild...', { component: 'SimpleTool' });
 
     // Check if system is in demo mode
     if (demoDataService.isDemoMode()) {
-      console.log('🔄 Demo mode detected - search index rebuild not needed for demo data');
+      logger.info('🔄 Demo mode detected - search index rebuild not needed for demo data', { component: 'SimpleTool' });
       const demoBills = demoDataService.getBills();
       return {
         success: true,
@@ -219,7 +220,7 @@ export class SearchIndexManager {
       errors = 1;
       errorDetails.push(error instanceof Error ? error.message : String(error));
       
-      console.error('❌ Search index rebuild failed:', error);
+      logger.error('❌ Search index rebuild failed:', { component: 'SimpleTool' }, error);
       
       return {
         success: false,
@@ -238,7 +239,7 @@ export class SearchIndexManager {
   async getIndexHealth(): Promise<SearchIndexHealth> {
     // Check if system is in demo mode first
     if (demoDataService.isDemoMode()) {
-      console.log('🔍 Search index health check: System in demo mode, returning demo health status');
+      logger.info('🔍 Search index health check: System in demo mode, returning demo health status', { component: 'SimpleTool' });
       const demoBills = demoDataService.getBills();
       return {
         status: 'healthy',
@@ -260,7 +261,7 @@ export class SearchIndexManager {
       const result = await databaseService.withFallback(
         async () => {
           // Get basic index statistics
-          console.log('🔍 Executing search index health query...');
+          logger.info('🔍 Executing search index health query...', { component: 'SimpleTool' });
           const executeResult = await this.db.execute(sql`
             SELECT
               COUNT(*) as total_bills,
@@ -269,10 +270,10 @@ export class SearchIndexManager {
               MAX(updated_at) as last_update
             FROM bills
           `);
-          console.log('🔍 Execute result type:', typeof executeResult, 'isArray:', Array.isArray(executeResult), 'length:', executeResult?.length);
+          logger.info('🔍 Execute result type:', { component: 'SimpleTool' }, typeof executeResult, 'isArray:', Array.isArray(executeResult), 'length:', executeResult?.length);
 
           if (!Array.isArray(executeResult)) {
-            console.error('❌ Database execute returned non-array result:', executeResult);
+            logger.error('❌ Database execute returned non-array result:', { component: 'SimpleTool' }, executeResult);
             throw new Error(`Database execute returned non-array result: ${typeof executeResult}`);
           }
 
@@ -296,7 +297,7 @@ export class SearchIndexManager {
           }
 
           const [indexStats] = executeResult;
-          console.log('🔍 Index stats:', indexStats);
+          logger.info('🔍 Index stats:', { component: 'SimpleTool' }, indexStats);
 
           const totalBills = parseInt(indexStats.total_bills as string);
           const indexedBills = parseInt(indexStats.indexed_bills as string);
@@ -378,7 +379,7 @@ export class SearchIndexManager {
 
       return result.data;
     } catch (error) {
-      console.error('Error getting search index health:', error);
+      logger.error('Error getting search index health:', { component: 'SimpleTool' }, error);
       return {
         status: 'offline',
         totalBills: 0,
@@ -427,7 +428,7 @@ export class SearchIndexManager {
 
     // Check if system is in demo mode
     if (demoDataService.isDemoMode()) {
-      console.log('🔄 Demo mode: Skipping search index optimization');
+      logger.info('🔄 Demo mode: Skipping search index optimization', { component: 'SimpleTool' });
       return {
         success: true,
         operations: ['Demo mode - no optimization needed'],
@@ -468,7 +469,7 @@ export class SearchIndexManager {
 
       return { success: true, operations, duration };
     } catch (error) {
-      console.error('❌ Search index optimization failed:', error);
+      logger.error('❌ Search index optimization failed:', { component: 'SimpleTool' }, error);
       return { 
         success: false, 
         operations: [...operations, `Error: ${error instanceof Error ? error.message : String(error)}`], 
@@ -491,7 +492,7 @@ export class SearchIndexManager {
   }> {
     // Check if system is in demo mode
     if (demoDataService.isDemoMode()) {
-      console.log('🔍 Search index statistics: System in demo mode, returning demo statistics');
+      logger.info('🔍 Search index statistics: System in demo mode, returning demo statistics', { component: 'SimpleTool' });
       const demoBills = demoDataService.getBills();
       return {
         indexSize: '1.0 MB',
@@ -545,7 +546,7 @@ export class SearchIndexManager {
 
       return result.data;
     } catch (error) {
-      console.error('Error getting index statistics:', error);
+      logger.error('Error getting index statistics:', { component: 'SimpleTool' }, error);
       return {
         indexSize: 'Error',
         indexSizeBytes: 0,
@@ -566,7 +567,7 @@ export class SearchIndexManager {
   private async validateSearchIndexSetup(): Promise<void> {
     // Skip validation in demo mode
     if (demoDataService.isDemoMode()) {
-      console.log('🔄 Demo mode: Skipping search index setup validation');
+      logger.info('🔄 Demo mode: Skipping search index setup validation', { component: 'SimpleTool' });
       return;
     }
 
@@ -608,9 +609,9 @@ export class SearchIndexManager {
         console.warn('⚠️ Search vector update trigger not found');
       }
 
-      console.log('✅ Search index setup validation completed');
+      logger.info('✅ Search index setup validation completed', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('❌ Search index setup validation failed:', error);
+      logger.error('❌ Search index setup validation failed:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -632,7 +633,7 @@ export class SearchIndexManager {
 
             // Auto-rebuild if too many missing indexes
             if (health.missingIndexes > 100) {
-              console.log('🔄 Auto-triggering index rebuild due to many missing indexes');
+              logger.info('🔄 Auto-triggering index rebuild due to many missing indexes', { component: 'SimpleTool' });
               await this.rebuildAllIndexes();
             }
           }
@@ -644,7 +645,7 @@ export class SearchIndexManager {
           const memUsage = process.memoryUsage();
           const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
 
-          console.log('Search Index Manager Memory Analysis:', {
+          logger.info('Search Index Manager Memory Analysis:', { component: 'SimpleTool' }, {
             performanceHistorySize: this.performanceHistory.length,
             indexUpdateQueueSize: this.indexUpdateQueue.size,
             isProcessingQueue: this.isProcessingQueue,
@@ -653,7 +654,7 @@ export class SearchIndexManager {
             timestamp: new Date().toISOString()
           });
         } catch (error) {
-          console.error('Error during health monitoring:', error);
+          logger.error('Error during health monitoring:', { component: 'SimpleTool' }, error);
         }
       }, 30 * 60 * 1000); // 30 minutes
     }
@@ -676,7 +677,7 @@ export class SearchIndexManager {
     const cleanedItems = perfHistoryBefore - this.performanceHistory.length;
 
     if (cleanedItems > 0) {
-      console.log('🧹 Search Index Manager Memory Cleanup:', {
+      logger.info('🧹 Search Index Manager Memory Cleanup:', { component: 'SimpleTool' }, {
         performanceHistoryCleaned: cleanedItems,
         remainingHistorySize: this.performanceHistory.length,
         timestamp: new Date().toISOString()
@@ -710,7 +711,7 @@ export class SearchIndexManager {
 
         console.log(`✅ Updated search indexes for ${updated}/${billIds.length} bills`);
       } catch (error) {
-        console.error('Error processing index update queue:', error);
+        logger.error('Error processing index update queue:', { component: 'SimpleTool' }, error);
       } finally {
         this.isProcessingQueue = false;
       }
@@ -721,7 +722,7 @@ export class SearchIndexManager {
    * Shutdown the search index manager
    */
   async shutdown(): Promise<void> {
-    console.log('🛑 Shutting down search index manager...');
+    logger.info('🛑 Shutting down search index manager...', { component: 'SimpleTool' });
 
     try {
       // Stop the health monitoring interval
@@ -742,9 +743,9 @@ export class SearchIndexManager {
       // Clear caches
       await this.clearSearchCaches();
 
-      console.log('✅ Search index manager shut down successfully');
+      logger.info('✅ Search index manager shut down successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('❌ Error shutting down search index manager:', error);
+      logger.error('❌ Error shutting down search index manager:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -756,12 +757,20 @@ export class SearchIndexManager {
     try {
       await cacheService.deletePattern('search:*');
       await cacheService.deletePattern('bills:search:*');
-      console.log('🧹 Search caches cleared');
+      logger.info('🧹 Search caches cleared', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('Error clearing search caches:', error);
+      logger.error('Error clearing search caches:', { component: 'SimpleTool' }, error);
     }
   }
 }
 
 // Export singleton instance
 export const searchIndexManager = new SearchIndexManager();
+
+
+
+
+
+
+
+

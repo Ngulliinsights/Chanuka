@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { securityMonitoringService } from '../features/security/security-monitoring-service.js';
 import { intrusionDetectionService } from '../features/security/intrusion-detection-service.js';
 import { securityAuditService } from '../features/security/security-audit-service.js';
+import { logger } from '../utils/logger';
 
 export interface SecurityMonitoringOptions {
   enableThreatDetection: boolean;
@@ -97,7 +98,7 @@ export class SecurityMonitoringMiddleware {
         next();
 
       } catch (error) {
-        console.error('Security monitoring error:', error);
+        logger.error('Security monitoring error:', { component: 'SimpleTool' }, error);
         
         // Log the error but don't block the request
         if (this.options.enableAuditLogging) {
@@ -410,3 +411,9 @@ export const securityMonitoringMiddleware = new SecurityMonitoringMiddleware({
   bypassPaths: ['/health', '/metrics', '/favicon.ico', '/api/health'],
   alertThreshold: 70
 });
+
+
+
+
+
+

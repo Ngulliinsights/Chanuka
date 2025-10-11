@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { logger } from '../utils/logger';
 
 // Data transformation pipeline for different government data formats
 export class DataTransformationService {
@@ -508,3 +509,9 @@ export class DataTransformationService {
     return emailRegex.test(normalizedEmail) ? normalizedEmail : null;
   }
 }
+
+
+
+
+
+

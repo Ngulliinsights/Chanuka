@@ -1,4 +1,5 @@
 import { 
+import { logger } from '../utils/logger';
   determineNavigationSection, 
   getSectionDisplayName, 
   getSectionDescription,
@@ -94,3 +95,9 @@ describe('section-detector', () => {
     });
   });
 });
+
+
+
+
+
+

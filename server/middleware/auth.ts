@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { authService } from '../core/auth/auth-service.js';
+import { logger } from '../utils/logger';
 
 // Extend Express User type to match our auth service
 declare global {
@@ -40,7 +41,7 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
     req.user = result.user;
     next();
   } catch (error) {
-    console.error('Auth middleware error:', error);
+    logger.error('Auth middleware error:', { component: 'SimpleTool' }, error);
     return res.status(403).json({ error: 'Invalid token' });
   }
 };
@@ -58,3 +59,9 @@ export const requireRole = (roles: string[]) => {
     next();
   };
 };
+
+
+
+
+
+

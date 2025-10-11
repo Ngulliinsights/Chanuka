@@ -1,5 +1,6 @@
 import React from 'react';
 import { CoverageDashboard } from '@/components/coverage/coverage-dashboard';
+import { logger } from '../utils/logger.js';
 
 export function CoveragePage() {
   return (

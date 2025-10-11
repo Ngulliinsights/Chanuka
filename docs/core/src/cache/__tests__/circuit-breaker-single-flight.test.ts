@@ -8,6 +8,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { SingleFlightCache } from '../single-flight-cache';
 import { MemoryAdapter } from '../adapters/memory-adapter';
 import type { CacheService } from '../types';
+import { logger } from '../utils/logger';
 
 describe('Circuit Breaker and Single Flight Cache', () => {
   let mockAdapter: CacheService;
@@ -450,3 +451,9 @@ describe('Circuit Breaker and Single Flight Cache', () => {
     });
   });
 });
+
+
+
+
+
+

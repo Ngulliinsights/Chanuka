@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import { logger } from '../utils/logger';
 
 // Error types for external API failures
 export enum ExternalAPIErrorType {
@@ -613,3 +614,9 @@ interface CachedData {
 }
 
 export { ExternalAPIError, RetryConfig, CircuitBreakerConfig, FallbackConfig };
+
+
+
+
+
+

@@ -1,4 +1,5 @@
 import { database as db } from '../../../shared/database/connection.js';
+import { logger } from '../utils/logger';
 
 // Define audit log table schema (would be added to schema.ts)
 export interface AuditLogEntry {
@@ -31,7 +32,7 @@ class AuditLogger {
     }
 
     // In production, you'd store this in a database table
-    console.log('AUDIT LOG:', JSON.stringify(logEntry, null, 2));
+    logger.info('AUDIT LOG:', { component: 'SimpleTool' }, JSON.stringify(logEntry, null, 2));
 
     // For critical actions, you might also send alerts
     if (entry.severity === 'critical') {
@@ -100,7 +101,7 @@ class AuditLogger {
 
   private async sendCriticalAlert(entry: AuditLogEntry): Promise<void> {
     // In production, send email/SMS/Slack notification for critical actions
-    console.log('🚨 CRITICAL AUDIT EVENT:', entry);
+    logger.info('🚨 CRITICAL AUDIT EVENT:', { component: 'SimpleTool' }, entry);
   }
 
   // Predefined logging methods for common actions
@@ -280,3 +281,9 @@ export const auditMiddleware = (req: any, res: any, next: any) => {
 
   next();
 };
+
+
+
+
+
+

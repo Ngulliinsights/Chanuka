@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { 
+import { logger } from '../utils/logger';
   isNavigationPathActive, 
   getActiveStateClasses,
   getActiveIconClasses,
@@ -122,3 +123,9 @@ describe('Active State Utilities', () => {
     });
   });
 });
+
+
+
+
+
+

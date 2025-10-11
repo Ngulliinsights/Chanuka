@@ -1,10 +1,12 @@
 import { Response } from 'express';
+import { logger } from '../utils/logger';
 
 // Standard API response interface
 export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
   error?: ApiError;
+  pagination?: any;
   metadata: ResponseMetadata;
 }
 
@@ -28,8 +30,8 @@ export interface ResponseMetadata {
 
 // Response wrapper class for consistent API responses
 export class ApiResponseWrapper {
-  private static version = '1.0.0';
-  private static isDevelopment = process.env.NODE_ENV === 'development';
+  static readonly version = '1.0.0';
+  static readonly isDevelopment = process.env.NODE_ENV === 'development';
 
   /**
    * Send successful response
@@ -259,3 +261,65 @@ export enum HttpStatus {
   BAD_GATEWAY = 502,
   SERVICE_UNAVAILABLE = 503
 }
+
+// Functions for test compatibility
+export function success(data: any, metadata?: Partial<ResponseMetadata>): ApiResponse {
+  return {
+    success: true,
+    data,
+    metadata: {
+      timestamp: new Date().toISOString(),
+      source: 'database',
+      version: ApiResponseWrapper.version,
+      ...metadata
+    }
+  };
+}
+
+export function error(error: string | Error, code?: string, metadata?: Partial<ResponseMetadata>): ApiResponse {
+  let apiError: ApiError;
+
+  if (typeof error === 'string') {
+    apiError = {
+      code: code || 'GENERIC_ERROR',
+      message: error
+    };
+  } else {
+    apiError = {
+      code: error.name || 'UNKNOWN_ERROR',
+      message: error.message,
+      ...(ApiResponseWrapper.isDevelopment && { stack: error.stack })
+    };
+  }
+
+  return {
+    success: false,
+    error: apiError,
+    metadata: {
+      timestamp: new Date().toISOString(),
+      source: 'database',
+      version: ApiResponseWrapper.version,
+      ...metadata
+    }
+  };
+}
+
+export function paginated(data: any[], pagination: any, metadata?: Partial<ResponseMetadata>): ApiResponse {
+  return {
+    success: true,
+    data,
+    pagination,
+    metadata: {
+      timestamp: new Date().toISOString(),
+      source: 'database',
+      version: ApiResponseWrapper.version,
+      ...metadata
+    }
+  };
+}
+
+
+
+
+
+

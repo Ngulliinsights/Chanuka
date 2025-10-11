@@ -43,3 +43,10 @@ export class NumberUtils {
     return Math.abs(remainder) < 1e-10; // Account for floating point precision
   }
 }
+
+
+
+
+
+
+

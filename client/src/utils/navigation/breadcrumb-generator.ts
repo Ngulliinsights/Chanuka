@@ -1,4 +1,5 @@
 import { BreadcrumbItem } from '@/types/navigation';
+import { logger } from '../utils/logger';
 
 // Route configuration for breadcrumb generation
 const routeConfig: Record<string, { label: string; parent?: string }> = {
@@ -139,3 +140,9 @@ export function getPageTitle(path: string): string {
   
   return title;
 }
+
+
+
+
+
+

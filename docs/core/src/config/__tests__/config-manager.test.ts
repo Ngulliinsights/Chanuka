@@ -10,6 +10,7 @@ import { ConfigManager } from '../index';
 import { z } from 'zod';
 import fs from 'fs';
 import path from 'path';
+import { logger } from '../utils/logger';
 
 // Mock file system operations
 vi.mock('fs');
@@ -533,3 +534,9 @@ describe('ConfigManager', () => {
     });
   });
 });
+
+
+
+
+
+

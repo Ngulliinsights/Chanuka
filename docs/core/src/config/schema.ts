@@ -6,6 +6,7 @@
  */
 
 import { z } from 'zod';
+import { logger } from '../utils/logger';
 
 // Enhanced schema with comprehensive validation
 export const configSchema = z.object({
@@ -211,3 +212,9 @@ export const defaultFeatures = {
     enabledForUsers: [],
   },
 } as const;
+
+
+
+
+
+

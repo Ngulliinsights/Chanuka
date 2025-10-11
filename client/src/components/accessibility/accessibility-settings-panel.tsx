@@ -16,6 +16,7 @@ import {
   MousePointer
 } from 'lucide-react';
 import { useAccessibility, AccessibleButton, AccessibleFormField } from './accessibility-manager';
+import { logger } from '../utils/logger.js';
 
 interface AccessibilitySettingsPanelProps {
   isOpen: boolean;

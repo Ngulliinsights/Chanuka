@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import PageErrorBoundary from '../PageErrorBoundary';
 import { ErrorFallback } from '../ErrorFallback';
+import { logger } from '../utils/logger.js';
 
 // Mock component that throws an error
 const ThrowError = ({ shouldThrow = false }: { shouldThrow?: boolean }) => {

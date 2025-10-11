@@ -9,6 +9,7 @@ import MobileNavigation from '@/components/navigation/MobileNavigation';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import { ResponsiveNavigationProvider } from '@/contexts/ResponsiveNavigationContext';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { logger } from '../utils/logger.js';
 
 // Mock hooks
 jest.mock('@/hooks/use-navigation-performance', () => ({

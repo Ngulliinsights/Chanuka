@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
+import { logger } from '../utils/logger.js';
   ArrowLeft, 
   ChevronRight, 
   AlertTriangle, 
@@ -65,7 +66,7 @@ export default function SponsorshipOverview({ billId }: OverviewProps) {
         const data = await response.json();
         setAnalysis(data);
       } catch (err) {
-        console.error('Error fetching sponsorship analysis:', err);
+        logger.error('Error fetching sponsorship analysis:', { component: 'SimpleTool' }, err);
         setError(err instanceof Error ? err.message : 'Failed to load analysis');
       } finally {
         setLoading(false);

@@ -175,3 +175,9 @@ class CacheManager {
 
 // Export singleton instance
 export const cacheManager = new CacheManager();
+
+
+
+
+
+

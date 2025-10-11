@@ -32,16 +32,16 @@ const API_CACHE_PATTERNS = [
 
 // Install event - cache critical assets
 self.addEventListener('install', (event) => {
-  console.log('Service Worker: Installing...');
+  logger.info('Service Worker: Installing...', { component: 'SimpleTool' });
   
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Service Worker: Precaching assets');
+        logger.info('Service Worker: Precaching assets', { component: 'SimpleTool' });
         return cache.addAll(PRECACHE_ASSETS);
       })
       .then(() => {
-        console.log('Service Worker: Skip waiting');
+        logger.info('Service Worker: Skip waiting', { component: 'SimpleTool' });
         return self.skipWaiting();
       })
   );
@@ -49,7 +49,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('Service Worker: Activating...');
+  logger.info('Service Worker: Activating...', { component: 'SimpleTool' });
   
   event.waitUntil(
     caches.keys()
@@ -57,14 +57,14 @@ self.addEventListener('activate', (event) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
             if (cacheName !== CACHE_NAME) {
-              console.log('Service Worker: Deleting old cache:', cacheName);
+              logger.info('Service Worker: Deleting old cache:', { component: 'SimpleTool' }, cacheName);
               return caches.delete(cacheName);
             }
           })
         );
       })
       .then(() => {
-        console.log('Service Worker: Claiming clients');
+        logger.info('Service Worker: Claiming clients', { component: 'SimpleTool' });
         return self.clients.claim();
       })
   );
@@ -152,7 +152,7 @@ async function handleApiRequest(request) {
     return response;
 
   } catch (error) {
-    console.log('Service Worker: API request failed, checking cache:', error);
+    logger.info('Service Worker: API request failed, checking cache:', { component: 'SimpleTool' }, error);
     
     // Try to serve from cache
     const cachedResponse = await caches.match(request);
@@ -196,7 +196,7 @@ async function handleStaticAssets(request) {
     return response;
 
   } catch (error) {
-    console.log('Service Worker: Static asset request failed:', error);
+    logger.info('Service Worker: Static asset request failed:', { component: 'SimpleTool' }, error);
     
     // Try to serve from cache
     const cachedResponse = await caches.match(request);
@@ -227,7 +227,7 @@ async function handleNavigation(request) {
     return response;
 
   } catch (error) {
-    console.log('Service Worker: Navigation request failed, checking cache:', error);
+    logger.info('Service Worker: Navigation request failed, checking cache:', { component: 'SimpleTool' }, error);
     
     // Try to serve from cache
     const cachedResponse = await caches.match(request);
@@ -265,7 +265,7 @@ async function handleDefault(request) {
   try {
     return await fetch(request);
   } catch (error) {
-    console.log('Service Worker: Default request failed:', error);
+    logger.info('Service Worker: Default request failed:', { component: 'SimpleTool' }, error);
     
     // Try to serve from cache
     const cachedResponse = await caches.match(request);
@@ -283,7 +283,7 @@ async function handleDefault(request) {
 
 // Handle background sync for offline actions
 self.addEventListener('sync', (event) => {
-  console.log('Service Worker: Background sync triggered:', event.tag);
+  logger.info('Service Worker: Background sync triggered:', { component: 'SimpleTool' }, event.tag);
   
   if (event.tag === 'background-sync') {
     event.waitUntil(handleBackgroundSync());
@@ -301,11 +301,11 @@ async function handleBackgroundSync() {
         await processAction(action);
         await removePendingAction(action.id);
       } catch (error) {
-        console.log('Service Worker: Failed to process action:', error);
+        logger.info('Service Worker: Failed to process action:', { component: 'SimpleTool' }, error);
       }
     }
   } catch (error) {
-    console.log('Service Worker: Background sync failed:', error);
+    logger.info('Service Worker: Background sync failed:', { component: 'SimpleTool' }, error);
   }
 }
 
@@ -317,17 +317,17 @@ async function getPendingActions() {
 
 async function processAction(action) {
   // This would process the pending action
-  console.log('Processing action:', action);
+  logger.info('Processing action:', { component: 'SimpleTool' }, action);
 }
 
 async function removePendingAction(id) {
   // This would remove the action from IndexedDB
-  console.log('Removing action:', id);
+  logger.info('Removing action:', { component: 'SimpleTool' }, id);
 }
 
 // Handle push notifications
 self.addEventListener('push', (event) => {
-  console.log('Service Worker: Push notification received');
+  logger.info('Service Worker: Push notification received', { component: 'SimpleTool' });
   
   const options = {
     body: 'You have new updates available',
@@ -359,7 +359,7 @@ self.addEventListener('push', (event) => {
 
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {
-  console.log('Service Worker: Notification clicked');
+  logger.info('Service Worker: Notification clicked', { component: 'SimpleTool' });
   
   event.notification.close();
 
@@ -381,7 +381,7 @@ self.addEventListener('notificationclick', (event) => {
 
 // Handle messages from the main thread
 self.addEventListener('message', (event) => {
-  console.log('Service Worker: Message received:', event.data);
+  logger.info('Service Worker: Message received:', { component: 'SimpleTool' }, event.data);
   
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();

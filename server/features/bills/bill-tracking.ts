@@ -1,11 +1,12 @@
 import { eq, and, desc, sql, count, inArray, or } from 'drizzle-orm';
-import { databaseService } from '../../services/database-service.js';
+import { databaseService } from '../../infrastructure/database/database-service.js';
 import { notificationService } from '../../infrastructure/notifications/notification-service.js';
 import { billStatusMonitorService } from './bill-status-monitor.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service.js';
 import * as schema from '../../../shared/schema.js';
 import { Bill, BillEngagement } from '../../../shared/schema.js';
 import { z } from 'zod';
+import { logger } from '../../utils/logger';
 
 // Types and interfaces
 export interface BillTrackingPreference {
@@ -89,7 +90,7 @@ const trackingPreferenceSchema = z.object({
   isActive: z.boolean().default(true)
 });
 
-const bulkTrackingSchema = z.object({
+const bulkTrackingSchema2 = z.object({
   billIds: z.array(z.number()).min(1).max(100), // Limit to 100 bills at once
   operation: z.enum(['track', 'untrack']),
   preferences: trackingPreferenceSchema.partial().optional()
@@ -196,7 +197,7 @@ export class BillTrackingService {
       await this.clearUserTrackingCaches(userId);
 
       // Send confirmation notification
-      await this.sendTrackingNotification(userId, billId, 'tracked', bill.title);
+      // await this.sendTrackingNotification(userId, billId, 'tracked', bill.title);
 
       // Record analytics event
       await this.recordTrackingAnalytics(userId, billId, 'tracked');
@@ -205,7 +206,7 @@ export class BillTrackingService {
       return result.data;
 
     } catch (error) {
-      console.error(`Error tracking bill ${billId} for user ${userId}:`, error);
+      console.error(`Error tracking bill ${billId} for user ${userId}:`, error as any);
       throw error;
     }
   }
@@ -252,9 +253,9 @@ export class BillTrackingService {
       await this.clearUserTrackingCaches(userId);
 
       // Send confirmation notification
-      if (bill) {
-        await this.sendTrackingNotification(userId, billId, 'untracked', bill.title);
-      }
+      // if (bill) {
+      //   await this.sendTrackingNotification(userId, billId, 'untracked', bill.title);
+      // }
 
       // Record analytics event
       await this.recordTrackingAnalytics(userId, billId, 'untracked');
@@ -262,7 +263,7 @@ export class BillTrackingService {
       console.log(`✅ Successfully untracked bill ${billId} for user ${userId}`);
 
     } catch (error) {
-      console.error(`Error untracking bill ${billId} for user ${userId}:`, error);
+      console.error(`Error untracking bill ${billId} for user ${userId}:`, error as any);
       throw error;
     }
   }
@@ -494,7 +495,7 @@ export class BillTrackingService {
           } else {
             await this.untrackBill(operation.userId, billId);
           }
-          
+    
           result.successful.push(billId);
           result.summary.successful++;
         } catch (error) {
@@ -507,13 +508,13 @@ export class BillTrackingService {
       }
 
       // Send bulk operation notification
-      await this.sendBulkOperationNotification(operation.userId, operation.operation, result);
+      // await this.sendBulkOperationNotification(operation.userId, operation.operation, result);
 
       console.log(`✅ Bulk ${operation.operation} operation completed: ${result.summary.successful}/${result.summary.total} successful`);
       return result;
 
     } catch (error) {
-      console.error('Error performing bulk tracking operation:', error);
+      logger.error('Error performing bulk tracking operation:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -611,7 +612,7 @@ export class BillTrackingService {
 
         return result.data;
       },
-      CACHE_TTL.ANALYTICS
+      CACHE_TTL.USER_DATA
     );
   }
 
@@ -689,7 +690,7 @@ export class BillTrackingService {
 
         return result.data;
       },
-      CACHE_TTL.RECOMMENDATIONS
+      CACHE_TTL.USER_DATA
     );
   }
 
@@ -724,7 +725,7 @@ export class BillTrackingService {
       const preferences = await cacheService.get(cacheKey);
       return preferences || null;
     } catch (error) {
-      console.error('Error getting tracking preferences from cache:', error);
+      logger.error('Error getting tracking preferences from cache:', { component: 'SimpleTool' }, error);
       return null;
     }
   }
@@ -739,7 +740,7 @@ export class BillTrackingService {
     try {
       await cacheService.set(cacheKey, preferences, CACHE_TTL.USER_DATA);
     } catch (error) {
-      console.error('Error storing tracking preferences in cache:', error);
+      logger.error('Error storing tracking preferences in cache:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -749,7 +750,7 @@ export class BillTrackingService {
     try {
       await cacheService.delete(cacheKey);
     } catch (error) {
-      console.error('Error removing tracking preferences from cache:', error);
+      logger.error('Error removing tracking preferences from cache:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -802,7 +803,7 @@ export class BillTrackingService {
       const activity = await cacheService.get(cacheKey);
       return activity || [];
     } catch (error) {
-      console.error('Error getting recent tracking activity:', error);
+      logger.error('Error getting recent tracking activity:', { component: 'SimpleTool' }, error);
       return [];
     }
   }
@@ -829,9 +830,9 @@ export class BillTrackingService {
       
       const updatedActivity = [activityRecord, ...existingActivity].slice(0, 20); // Keep last 20 activities
       
-      await cacheService.set(cacheKey, updatedActivity, CACHE_TTL.ANALYTICS);
+      await cacheService.set(cacheKey, updatedActivity, CACHE_TTL.USER_DATA);
     } catch (error) {
-      console.error('Error recording tracking analytics:', error);
+      logger.error('Error recording tracking analytics:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -842,21 +843,18 @@ export class BillTrackingService {
     billTitle: string
   ): Promise<void> {
     try {
-      await notificationService.sendNotification({
+      await notificationService.createNotification({
         userId,
-        type: 'bill_tracking_update',
+        type: 'system_alert',
         title: `Bill ${action === 'tracked' ? 'Tracking Started' : 'Tracking Stopped'}`,
         message: `You are ${action === 'tracked' ? 'now tracking' : 'no longer tracking'} "${billTitle}"`,
-        data: {
-          billId,
-          billTitle,
+        relatedBillId: billId,
+        metadata: {
           action
-        },
-        priority: 'low',
-        channels: ['in_app']
+        }
       });
     } catch (error) {
-      console.error('Error sending tracking notification:', error);
+      logger.error('Error sending tracking notification:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -866,20 +864,18 @@ export class BillTrackingService {
     result: BulkTrackingResult
   ): Promise<void> {
     try {
-      await notificationService.sendNotification({
+      await notificationService.createNotification({
         userId,
-        type: 'bulk_tracking_update',
+        type: 'system_alert',
         title: `Bulk ${operation === 'track' ? 'Tracking' : 'Untracking'} Complete`,
         message: `${operation === 'track' ? 'Tracked' : 'Untracked'} ${result.summary.successful} of ${result.summary.total} bills successfully`,
-        data: {
+        metadata: {
           operation,
           result: result.summary
-        },
-        priority: 'normal',
-        channels: ['in_app']
+        }
       });
     } catch (error) {
-      console.error('Error sending bulk operation notification:', error);
+      logger.error('Error sending bulk operation notification:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -899,10 +895,220 @@ export class BillTrackingService {
    * Shutdown service
    */
   async shutdown(): Promise<void> {
-    console.log('Shutting down Bill Tracking Service...');
+    logger.info('Shutting down Bill Tracking Service...', { component: 'SimpleTool' });
     // Cleanup any resources if needed
-    console.log('Bill Tracking Service shutdown complete');
+    logger.info('Bill Tracking Service shutdown complete', { component: 'SimpleTool' });
   }
 }
 
+import { Router, Request, Response } from 'express';
+import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth.js';
+import { ApiSuccess, ApiError, ApiValidationError } from '../../utils/api-response.js';
+
+const router = Router();
+
+// Validation schemas
+const trackBillSchema = z.object({
+  preferences: z.object({
+    trackingTypes: z.array(z.enum(['status_changes', 'new_comments', 'amendments', 'voting_schedule'])).optional(),
+    alertFrequency: z.enum(['immediate', 'hourly', 'daily', 'weekly']).optional(),
+    alertChannels: z.array(z.enum(['in_app', 'email', 'push', 'sms'])).optional(),
+    isActive: z.boolean().optional()
+  }).optional()
+});
+
+const updatePreferencesSchema = z.object({
+  trackingTypes: z.array(z.enum(['status_changes', 'new_comments', 'amendments', 'voting_schedule'])).optional(),
+  alertFrequency: z.enum(['immediate', 'hourly', 'daily', 'weekly']).optional(),
+  alertChannels: z.array(z.enum(['in_app', 'email', 'push', 'sms'])).optional(),
+  isActive: z.boolean().optional()
+});
+
+const bulkTrackingSchema = z.object({
+  billIds: z.array(z.number()).min(1).max(100),
+  operation: z.enum(['track', 'untrack']),
+  preferences: z.object({
+    trackingTypes: z.array(z.enum(['status_changes', 'new_comments', 'amendments', 'voting_schedule'])).optional(),
+    alertFrequency: z.enum(['immediate', 'hourly', 'daily', 'weekly']).optional(),
+    alertChannels: z.array(z.enum(['in_app', 'email', 'push', 'sms'])).optional(),
+    isActive: z.boolean().optional()
+  }).optional()
+});
+
+// POST /api/bill-tracking/track/:billId
+router.post('/track/:billId', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const billId = parseInt(req.params.billId);
+    if (isNaN(billId)) {
+      return ApiValidationError(res, 'Invalid bill ID');
+    }
+
+    const { preferences } = trackBillSchema.parse(req.body);
+
+    const result = await billTrackingService.trackBill(req.user!.id, billId, preferences);
+
+    return ApiSuccess(res, {
+      message: 'Bill tracked successfully',
+      tracking: result
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return ApiValidationError(res, error.errors);
+    }
+    console.error('Error tracking bill:', error);
+    return ApiError(res, 'Failed to track bill', 500);
+  }
+});
+
+// DELETE /api/bill-tracking/track/:billId
+router.delete('/track/:billId', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const billId = parseInt(req.params.billId);
+    if (isNaN(billId)) {
+      return ApiValidationError(res, 'Invalid bill ID');
+    }
+
+    await billTrackingService.untrackBill(req.user!.id, billId);
+
+    return ApiSuccess(res, {
+      message: 'Bill untracked successfully'
+    });
+  } catch (error) {
+    console.error('Error untracking bill:', error);
+    return ApiError(res, 'Failed to untrack bill', 500);
+  }
+});
+
+// GET /api/bill-tracking/tracked
+router.get('/tracked', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const page = req.query.page ? parseInt(req.query.page as string) : undefined;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : undefined;
+    const category = req.query.category as string;
+    const status = req.query.status as string;
+    const sortBy = req.query.sortBy as 'date_tracked' | 'last_updated' | 'engagement';
+    const sortOrder = req.query.sortOrder as 'asc' | 'desc';
+
+    const result = await billTrackingService.getUserTrackedBills(req.user!.id, {
+      page,
+      limit,
+      category,
+      status,
+      sortBy,
+      sortOrder
+    });
+
+    return ApiSuccess(res, result);
+  } catch (error) {
+    console.error('Error getting tracked bills:', error);
+    return ApiError(res, 'Failed to get tracked bills', 500);
+  }
+});
+
+// PUT /api/bill-tracking/preferences/:billId
+router.put('/preferences/:billId', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const billId = parseInt(req.params.billId);
+    if (isNaN(billId)) {
+      return ApiValidationError(res, 'Invalid bill ID');
+    }
+
+    const preferences = updatePreferencesSchema.parse(req.body);
+
+    const result = await billTrackingService.updateBillTrackingPreferences(req.user!.id, billId, preferences);
+
+    return ApiSuccess(res, {
+      message: 'Tracking preferences updated successfully',
+      preferences: result
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return ApiValidationError(res, error.errors);
+    }
+    console.error('Error updating tracking preferences:', error);
+    return ApiError(res, 'Failed to update tracking preferences', 500);
+  }
+});
+
+// POST /api/bill-tracking/bulk
+router.post('/bulk', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { billIds, operation, preferences } = bulkTrackingSchema.parse(req.body);
+
+    const result = await billTrackingService.bulkTrackingOperation({
+      userId: req.user!.id,
+      billIds,
+      operation,
+      preferences
+    });
+
+    return ApiSuccess(res, {
+      message: `Bulk ${operation} operation completed`,
+      result
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return ApiValidationError(res, error.errors);
+    }
+    console.error('Error performing bulk tracking operation:', error);
+    return ApiError(res, 'Failed to perform bulk tracking operation', 500);
+  }
+});
+
+// GET /api/bill-tracking/analytics
+router.get('/analytics', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const analytics = await billTrackingService.getUserTrackingAnalytics(req.user!.id);
+
+    return ApiSuccess(res, analytics);
+  } catch (error) {
+    console.error('Error getting tracking analytics:', error);
+    return ApiError(res, 'Failed to get tracking analytics', 500);
+  }
+});
+
+// GET /api/bill-tracking/is-tracking/:billId
+router.get('/is-tracking/:billId', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const billId = parseInt(req.params.billId);
+    if (isNaN(billId)) {
+      return ApiValidationError(res, 'Invalid bill ID');
+    }
+
+    const isTracking = await billTrackingService.isUserTrackingBill(req.user!.id, billId);
+
+    return ApiSuccess(res, { isTracking });
+  } catch (error) {
+    console.error('Error checking tracking status:', error);
+    return ApiError(res, 'Failed to check tracking status', 500);
+  }
+});
+
+// GET /api/bill-tracking/recommended
+router.get('/recommended', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+
+    const bills = await billTrackingService.getRecommendedBillsForTracking(req.user!.id, limit);
+
+    return ApiSuccess(res, {
+      bills,
+      count: bills.length
+    });
+  } catch (error) {
+    console.error('Error getting recommended bills:', error);
+    return ApiError(res, 'Failed to get recommended bills', 500);
+  }
+});
+
+export { router };
+
 export const billTrackingService = new BillTrackingService();
+
+
+
+
+
+
+
+

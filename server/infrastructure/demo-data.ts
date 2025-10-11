@@ -1,5 +1,6 @@
 import { Bill, BillComment, Sponsor, Analysis, BillEngagement } from '../../shared/schema.js';
 import { BillAnalysis, SponsorshipAnalysis } from '../../shared/types/bill.js';
+import { logger } from '../utils/logger';
 
 // Enhanced types for demo data that match API responses
 interface DemoBill extends Omit<Bill, 'id' | 'sponsorId'> {
@@ -655,7 +656,7 @@ export class DemoDataService {
   public autoEnableDemoMode(): void {
     if (this.detectDemoMode() && !this.demoMode) {
       this.setDemoMode(true);
-      console.log('🔄 Auto-enabled demo mode due to system conditions');
+      logger.info('🔄 Auto-enabled demo mode due to system conditions', { component: 'SimpleTool' });
     }
   }
 
@@ -722,7 +723,7 @@ export class DemoDataService {
 
       return true;
     } catch (error) {
-      console.error('Data consistency validation failed:', error);
+      logger.error('Data consistency validation failed:', { component: 'SimpleTool' }, error);
       return false;
     }
   }
@@ -730,3 +731,9 @@ export class DemoDataService {
 
 // Export singleton instance
 export const demoDataService = DemoDataService.getInstance();
+
+
+
+
+
+

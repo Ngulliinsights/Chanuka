@@ -13,6 +13,7 @@ import AdvancedSearch from '@/components/search/advanced-search';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
+import { logger } from '../utils/logger.js';
 
 interface SearchFilters {
   query: string;

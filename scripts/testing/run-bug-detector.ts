@@ -1,16 +1,17 @@
 #!/usr/bin/env tsx
 
 import { BugDetector } from './scripts/testing/bug-detector.ts';
+import { logger } from '../utils/logger';
 
 async function main() {
   const detector = new BugDetector();
   
-  console.log('🔍 Starting comprehensive bug detection...');
+  logger.info('🔍 Starting comprehensive bug detection...', { component: 'SimpleTool' });
   
   try {
     const result = await detector.detectBugs();
     
-    console.log('\n📊 Bug Detection Results:');
+    logger.info('\n📊 Bug Detection Results:', { component: 'SimpleTool' });
     console.log(`Total Bugs: ${result.totalBugs}`);
     console.log(`Critical: ${result.criticalBugs}`);
     console.log(`High Priority: ${result.highPriorityBugs}`);
@@ -18,30 +19,36 @@ async function main() {
     console.log(`Test Bugs: ${result.testBugs.length}`);
     
     if (result.totalBugs > 0) {
-      console.log('\n📝 Generating detailed report...');
+      logger.info('\n📝 Generating detailed report...', { component: 'SimpleTool' });
       const markdownReport = detector.generateMarkdownReport(result);
       
       // Write report to file
       const fs = await import('fs');
       fs.writeFileSync('bug-report.md', markdownReport);
-      console.log('✅ Bug report saved to bug-report.md');
+      logger.info('✅ Bug report saved to bug-report.md', { component: 'SimpleTool' });
       
       // Show top issues
-      console.log('\n🚨 Top Issues:');
+      logger.info('\n🚨 Top Issues:', { component: 'SimpleTool' });
       result.summary.topIssues.slice(0, 5).forEach((bug, index) => {
         console.log(`${index + 1}. [${bug.severity.toUpperCase()}] ${bug.description}`);
         console.log(`   File: ${bug.location.file}${bug.location.line ? `:${bug.location.line}` : ''}`);
         console.log(`   Fix: ${bug.fixSuggestion || 'No suggestion available'}`);
-        console.log('');
+        logger.info('', { component: 'SimpleTool' });
       });
     } else {
-      console.log('🎉 No bugs detected!');
+      logger.info('🎉 No bugs detected!', { component: 'SimpleTool' });
     }
     
   } catch (error) {
-    console.error('❌ Error running bug detection:', error);
+    logger.error('❌ Error running bug detection:', { component: 'SimpleTool' }, error);
     process.exit(1);
   }
 }
 
 main();
+
+
+
+
+
+

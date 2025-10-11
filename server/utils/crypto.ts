@@ -1,5 +1,6 @@
-import { scrypt, randomBytes, timingSafeEqual } from "crypto";
+import { scrypt, randomBytes, timingSafeEqual, createCipheriv, createDecipheriv } from "crypto";
 import { promisify } from "util";
+import { logger } from '../utils/logger';
 
 const scryptAsync = promisify(scrypt);
 
@@ -15,3 +16,49 @@ export async function comparePasswords(supplied: string, stored: string) {
   const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
   return timingSafeEqual(hashedBuf, suppliedBuf);
 }
+
+/**
+ * Generate a secure random token
+ */
+export function generateSecureToken(length: number = 32): string {
+  return randomBytes(length).toString('hex');
+}
+
+/**
+ * Verify password (alias for comparePasswords)
+ */
+export const verifyPassword = comparePasswords;
+
+/**
+ * Encrypt data using AES
+ */
+export function encrypt(data: string, key?: string): string {
+  const encryptionKey = key || process.env.ENCRYPTION_KEY || 'default-key-for-testing';
+  // Ensure key is 32 bytes for AES-256
+  const keyBuffer = Buffer.from(encryptionKey.padEnd(32, '0').slice(0, 32));
+  const iv = randomBytes(16);
+  const cipher = createCipheriv('aes-256-cbc', keyBuffer, iv);
+  let encrypted = cipher.update(data, 'utf8', 'hex');
+  encrypted += cipher.final('hex');
+  return iv.toString('hex') + ':' + encrypted;
+}
+
+/**
+ * Decrypt data using AES
+ */
+export function decrypt(encryptedData: string, key?: string): string {
+  const encryptionKey = key || process.env.ENCRYPTION_KEY || 'default-key-for-testing';
+  const keyBuffer = Buffer.from(encryptionKey.padEnd(32, '0').slice(0, 32));
+  const [ivHex, encrypted] = encryptedData.split(':');
+  const iv = Buffer.from(ivHex, 'hex');
+  const decipher = createDecipheriv('aes-256-cbc', keyBuffer, iv);
+  let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+  decrypted += decipher.final('utf8');
+  return decrypted;
+}
+
+
+
+
+
+

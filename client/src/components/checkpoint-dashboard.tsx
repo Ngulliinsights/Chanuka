@@ -3,6 +3,7 @@ import { Checkpoint } from "@shared/schema";
 import { Plus, ExternalLink, Eye, AlertTriangle } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from '../utils/logger.js';
 
 interface CheckpointDashboardProps {
   projectId: number;

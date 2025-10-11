@@ -1,4 +1,5 @@
 import { BaseError, ErrorDomain, ErrorSeverity } from '@/errors';
+import { logger } from '../utils/logger';
 
 const formatFileSize = (bytes: number): string => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -140,3 +141,9 @@ export class ImageUtils {
     ].join(' • ');
   }
 }
+
+
+
+
+
+

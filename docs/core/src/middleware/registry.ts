@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { correlationIdMiddleware } from '../utils/correlation-id';
 import { MiddlewareFactory } from './factory';
+import { logger } from '../utils/logger';
 
 export class MiddlewareRegistry {
   private middlewares: ((app: any) => void)[] = [];
@@ -46,3 +47,10 @@ export const applyMiddleware = (middleware: any) => {
     return descriptor;
   };
 };
+
+
+
+
+
+
+

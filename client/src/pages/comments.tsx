@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, MessageSquare, User, Clock, Filter } from 'lucide-react';
+import { logger } from '../utils/logger.js';
 
 interface Comment {
   id: string;
@@ -35,7 +36,7 @@ export default function CommentsPage() {
         setComments(data);
       }
     } catch (error) {
-      console.error('Failed to fetch comments:', error);
+      logger.error('Failed to fetch comments:', { component: 'SimpleTool' }, error);
     } finally {
       setLoading(false);
     }
@@ -62,7 +63,7 @@ export default function CommentsPage() {
         fetchComments();
       }
     } catch (error) {
-      console.error('Failed to submit comment:', error);
+      logger.error('Failed to submit comment:', { component: 'SimpleTool' }, error);
     }
   };
 

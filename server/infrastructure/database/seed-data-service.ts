@@ -1,6 +1,7 @@
 import { databaseService } from './database-service.js';
 import * as schema from '../../../shared/schema.js';
 import bcrypt from 'bcrypt';
+import { logger } from '../utils/logger';
 
 /**
  * Comprehensive Seed Data Service
@@ -13,7 +14,7 @@ export class SeedDataService {
    * Generate comprehensive seed data
    */
   async generateSeedData(): Promise<void> {
-    console.log('🌱 Starting comprehensive seed data generation...');
+    logger.info('🌱 Starting comprehensive seed data generation...', { component: 'SimpleTool' });
 
     try {
       // Clear existing data in proper order
@@ -33,10 +34,10 @@ export class SeedDataService {
       const engagement = await this.createEngagement(bills, users);
       const notifications = await this.createNotifications(users, bills);
 
-      console.log('✅ Comprehensive seed data generation completed successfully');
+      logger.info('✅ Comprehensive seed data generation completed successfully', { component: 'SimpleTool' });
       console.log(`📊 Generated: ${users.length} users, ${bills.length} bills, ${sponsors.length} sponsors, ${comments.length} comments`);
     } catch (error) {
-      console.error('❌ Seed data generation failed:', error);
+      logger.error('❌ Seed data generation failed:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -45,7 +46,7 @@ export class SeedDataService {
    * Clear existing data in reverse dependency order
    */
   private async clearExistingData(): Promise<void> {
-    console.log('🧹 Clearing existing data...');
+    logger.info('🧹 Clearing existing data...', { component: 'SimpleTool' });
     
     const tables = [
       schema.notifications,
@@ -55,3 +56,9 @@ export class SeedDataService {
       schema.billSectionConflicts,
       schema.sponsorTransparency,
       sch
+
+
+
+
+
+

@@ -9,6 +9,7 @@ import { Progress } from '../components/ui/progress';
 import { Separator } from '../components/ui/separator';
 import { ImplementationWorkarounds } from '../components/bills/implementation-workarounds';
 import { 
+import { logger } from '../utils/logger.js';
   FileText, 
   Calendar, 
   Users, 
@@ -93,7 +94,7 @@ const BillDetail = () => {
       const billData = await response.json();
       setBill(billData);
     } catch (error) {
-      console.error('Error fetching bill:', error);
+      logger.error('Error fetching bill:', { component: 'SimpleTool' }, error);
       setError(error instanceof Error ? error.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);

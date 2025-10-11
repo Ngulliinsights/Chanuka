@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { logger } from '../utils/logger';
 
 const middlewareFeatureSchema = z.object({
   enabled: z.boolean().default(true),
@@ -41,3 +42,10 @@ export const middlewareConfigSchema = z.object({
 });
 
 export type MiddlewareConfig = z.infer<typeof middlewareConfigSchema>;
+
+
+
+
+
+
+

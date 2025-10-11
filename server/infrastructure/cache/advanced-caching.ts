@@ -1,4 +1,5 @@
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
+import { logger } from '../utils/logger';
 
 export interface CacheConfig {
   redis?: {
@@ -117,7 +118,7 @@ class AdvancedCachingService {
     this.startPeriodicCleanup();
     this.startPerformanceMonitoring();
 
-    console.log('[Advanced Caching] Initialized with config:', this.config);
+    logger.info('[Advanced Caching] Initialized with config:', { component: 'SimpleTool' }, this.config);
   }
 
   /**
@@ -159,7 +160,7 @@ class AdvancedCachingService {
       return null;
 
     } catch (error) {
-      console.error('[Advanced Caching] Error getting from cache:', error);
+      logger.error('[Advanced Caching] Error getting from cache:', { component: 'SimpleTool' }, error);
       const duration = performance.now() - startTime;
       this.trackPerformance('get', key, duration, error.message);
       return null;
@@ -198,7 +199,7 @@ class AdvancedCachingService {
       return true;
 
     } catch (error) {
-      console.error('[Advanced Caching] Error setting cache:', error);
+      logger.error('[Advanced Caching] Error setting cache:', { component: 'SimpleTool' }, error);
       const duration = performance.now() - startTime;
       this.trackPerformance('set', key, duration, error.message);
       return false;
@@ -230,7 +231,7 @@ class AdvancedCachingService {
       return memoryDeleted;
 
     } catch (error) {
-      console.error('[Advanced Caching] Error deleting from cache:', error);
+      logger.error('[Advanced Caching] Error deleting from cache:', { component: 'SimpleTool' }, error);
       return false;
     }
   }
@@ -298,7 +299,7 @@ class AdvancedCachingService {
           invalidatedCount++;
         }
       } catch (error) {
-        console.error('[Advanced Caching] Error invalidating Redis keys:', error);
+        logger.error('[Advanced Caching] Error invalidating Redis keys:', { component: 'SimpleTool' }, error);
       }
     }
 
@@ -315,7 +316,7 @@ class AdvancedCachingService {
     ttl?: number;
     priority: 'high' | 'medium' | 'low';
   }>): Promise<void> {
-    console.log('[Advanced Caching] Starting cache warming...');
+    logger.info('[Advanced Caching] Starting cache warming...', { component: 'SimpleTool' });
 
     // Sort by priority
     const sortedRules = warmingRules.sort((a, b) => {
@@ -343,7 +344,7 @@ class AdvancedCachingService {
     });
 
     await Promise.allSettled(warmingPromises);
-    console.log('[Advanced Caching] Cache warming completed');
+    logger.info('[Advanced Caching] Cache warming completed', { component: 'SimpleTool' });
   }
 
   /**
@@ -679,7 +680,7 @@ class AdvancedCachingService {
     // Log cache statistics every 10 minutes
     setInterval(() => {
       const stats = this.getCacheStats();
-      console.log('[Advanced Caching] Performance stats:', {
+      logger.info('[Advanced Caching] Performance stats:', { component: 'SimpleTool' }, {
         memoryHitRate: stats.memory.hitRate.toFixed(2) + '%',
         memoryUsage: (stats.memory.memoryUsage / 1024 / 1024).toFixed(2) + 'MB',
         entries: stats.memory.entries,
@@ -691,3 +692,9 @@ class AdvancedCachingService {
 
 // Export singleton instance
 export const advancedCachingService = new AdvancedCachingService();
+
+
+
+
+
+

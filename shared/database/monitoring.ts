@@ -1,5 +1,19 @@
-import { logger } from '../utils/logger.js';
+import { logger } from '../utils/logger';
 import { monitorPoolHealth, checkPoolHealth } from './pool.js';
+
+// Dynamic import to avoid circular dependencies
+let performanceMonitoring: any = null;
+const getPerformanceMonitoring = async () => {
+  if (!performanceMonitoring) {
+    try {
+      const { performanceMonitoring: pm } = await import('../../server/services/performance-monitoring.js');
+      performanceMonitoring = pm;
+    } catch (error) {
+      // Performance monitoring not available, continue without it
+    }
+  }
+  return performanceMonitoring;
+};
 
 /**
  * Represents the health status of a database pool with detailed metrics
@@ -183,19 +197,51 @@ class DatabaseMonitoringService {
 
     try {
       const healthStatuses = await monitorPoolHealth();
-      
+
+      // Record performance metrics
+      const pm = await getPerformanceMonitoring();
+      if (pm) {
+        // Record health check duration
+        const duration = Date.now() - checkStartTime;
+        pm.recordMetric('db.health_check.duration', duration, {
+          component: 'database_monitoring'
+        });
+
+        // Record pool health metrics
+        for (const [poolName, status] of Object.entries(healthStatuses)) {
+          pm.recordMetric('db.pool.connections.total', (status as any).totalConnections, {
+            pool: poolName,
+            component: 'database_monitoring'
+          });
+          pm.recordMetric('db.pool.connections.idle', (status as any).idleConnections, {
+            pool: poolName,
+            component: 'database_monitoring'
+          });
+          pm.recordMetric('db.pool.connections.waiting', (status as any).waitingClients, {
+            pool: poolName,
+            component: 'database_monitoring'
+          });
+
+          // Record health status
+          pm.recordMetric('db.pool.healthy', (status as any).isHealthy ? 1 : 0, {
+            pool: poolName,
+            component: 'database_monitoring'
+          });
+        }
+      }
+
       // Analyze health status and identify critical issues
-      const criticalIssues = this.analyzeHealthStatuses(healthStatuses);
+      const criticalIssues = this.analyzeHealthStatuses(healthStatuses as any);
 
       if (criticalIssues.length > 0) {
         this.handleCriticalIssues(criticalIssues);
       } else {
-        this.logHealthyStatus(healthStatuses);
+        this.logHealthyStatus(healthStatuses as any);
       }
 
       // Track health state changes for alerting
       if (this.config.alertOnHealthChange) {
-        this.detectHealthStateChanges(healthStatuses);
+        this.detectHealthStateChanges(healthStatuses as any);
       }
 
       // Track check duration for performance monitoring
@@ -203,6 +249,16 @@ class DatabaseMonitoringService {
 
     } catch (error) {
       this.metrics.failedHealthChecks++;
+
+      // Record error metrics
+      const pm = await getPerformanceMonitoring();
+      if (pm) {
+        pm.recordMetric('db.health_check.error', 1, {
+          component: 'database_monitoring',
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+
       throw error; // Re-throw to be caught by the caller
     }
   }
@@ -606,7 +662,7 @@ class DatabaseMonitoringService {
   /**
    * Performs an immediate health check without waiting for the interval
    */
-  async checkNow(): Promise<Record<string, PoolHealthStatus>> {
+  async checkNow(): Promise<Record<string, any>> {
     logger.info('Performing on-demand health check');
     await this.performHealthCheck();
     return await monitorPoolHealth();
@@ -633,3 +689,9 @@ export {
   CriticalIssue, 
   MonitoringMetrics 
 };
+
+
+
+
+
+

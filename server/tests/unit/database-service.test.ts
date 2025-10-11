@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { DatabaseService } from '../../services/database-service.js';
+import { DatabaseService } from '../../../infrastructure/database/database-service.js';
 import pg from 'pg';
+import { logger } from '../../utils/logger';
 
 // Mock pg module
 jest.mock('pg', () => ({
@@ -186,3 +187,9 @@ describe('DatabaseService', () => {
     });
   });
 });
+
+
+
+
+
+

@@ -2,6 +2,7 @@ import { describe, test, expect, beforeEach, afterEach, vi, beforeAll, afterAll 
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { createRoot } from 'react-dom/client';
 import '@testing-library/jest-dom';
+import { logger } from '../utils/logger.js';
 
 // Mock modules that are imported in main.tsx
 vi.mock('../../utils/serviceWorker', () => ({
@@ -323,7 +324,7 @@ describe('React Application Initialization Integration Tests', () => {
         }
 
         componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-          console.error('Error boundary caught error:', error, errorInfo);
+          logger.error('Error boundary caught error:', { component: 'SimpleTool' }, error, errorInfo);
         }
 
         render() {

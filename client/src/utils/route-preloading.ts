@@ -1,4 +1,5 @@
 import { LazyExoticComponent, ComponentType } from 'react';
+import { logger } from '../utils/logger';
 
 // Route preloading configuration
 export interface RoutePreloadConfig {
@@ -320,3 +321,9 @@ export function setupLinkPreloading(
     cleanupFunctions.forEach(cleanup => cleanup());
   };
 }
+
+
+
+
+
+

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { votingPatternAnalysisService } from '../features/bills/voting-pattern-analysis.js';
+import { logger } from '../utils/logger';
 
 describe('VotingPatternAnalysisService', () => {
   beforeEach(() => {
@@ -202,3 +203,9 @@ describe('VotingPatternAnalysisService', () => {
     });
   });
 });
+
+
+
+
+
+

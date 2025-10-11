@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import { logger } from '../utils/logger';
 
 describe('Memory Usage Profiling for Caching Layer', () => {
   const MEMORY_THRESHOLDS = {
@@ -18,7 +19,7 @@ describe('Memory Usage Profiling for Caching Layer', () => {
     
     // Record initial memory usage
     initialMemory = process.memoryUsage();
-    console.log('Initial memory usage:', formatMemoryUsage(initialMemory));
+    logger.info('Initial memory usage:', { component: 'SimpleTool' }, formatMemoryUsage(initialMemory));
   });
 
   beforeEach(() => {
@@ -29,7 +30,7 @@ describe('Memory Usage Profiling for Caching Layer', () => {
   afterAll(() => {
     // Final memory check
     const finalMemory = process.memoryUsage();
-    console.log('Final memory usage:', formatMemoryUsage(finalMemory));
+    logger.info('Final memory usage:', { component: 'SimpleTool' }, formatMemoryUsage(finalMemory));
     
     const heapIncrease = (finalMemory.heapUsed - initialMemory.heapUsed) / 1024 / 1024;
     console.log(`Heap usage increase: ${heapIncrease.toFixed(2)}MB`);
@@ -274,3 +275,9 @@ describe('Memory Usage Profiling for Caching Layer', () => {
     };
   }
 });
+
+
+
+
+
+

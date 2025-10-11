@@ -9,3 +9,10 @@ export interface HealthChecker {
   checkComponent(name: string): Promise<HealthStatus>;
   registerCheck(name: string, check: () => Promise<HealthStatus>): void;
 }
+
+
+
+
+
+
+

@@ -2,9 +2,9 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, jest } from '@je
 import request from 'supertest';
 import express from 'express';
 import cors from 'cors';
-import { router as billsRouter } from '../../features/bills/bills.js';
-import { router as sponsorsRouter } from '../../features/bills/sponsors.js';
-import { router as financialDisclosureRouter } from '../../features/analytics/financial-disclosure.js';
+import { router as billsRouter } from '../../features/bills/bills-router.ts';
+import { router as sponsorsRouter } from '../../features/bills/sponsors.ts';
+import { router as financialDisclosureRouter } from '../../features/analytics/financial-disclosure/index.js';
 import { router as authRouter } from '../../core/auth/auth.js';
 import { router as adminRouter } from '../../features/admin/admin.js';
 import { router as notificationsRouter } from '../../infrastructure/notifications/notifications.js';
@@ -12,6 +12,7 @@ import { router as realTimeTrackingRouter } from '../../features/bills/real-time
 import { router as engagementAnalyticsRouter } from '../../features/analytics/engagement-analytics.js';
 import { router as healthRouter } from '../../infrastructure/monitoring/health.js';
 import { database as db, withTransaction } from '../../../shared/database/connection.js';
+import { logger } from '../../utils/logger';
 
 describe('Comprehensive API Integration Tests', () => {
   let app: express.Application;
@@ -88,7 +89,7 @@ describe('Comprehensive API Integration Tests', () => {
   async function cleanupTestData() {
     // Cleanup would go here in a real implementation
     // For now, we'll just log that cleanup is happening
-    console.log('Cleaning up test data...');
+    logger.info('Cleaning up test data...', { component: 'SimpleTool' });
   }
 
   // Authentication Tests
@@ -650,3 +651,9 @@ describe('Comprehensive API Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+

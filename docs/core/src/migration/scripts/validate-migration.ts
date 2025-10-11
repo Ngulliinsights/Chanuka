@@ -10,6 +10,7 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
+import { logger } from '../utils/logger';
 
 interface ValidationCheck {
   name: string;
@@ -372,7 +373,7 @@ class MigrationValidator {
             // Test logger
             const logger = new Logger({ level: 'info' });
             
-            console.log('Core utilities test passed');
+            logger.info('Core utilities test passed', { component: 'SimpleTool' });
           `;
           
           const testFile = join(this.rootPath, 'temp-migration-test.js');
@@ -442,7 +443,7 @@ class MigrationValidator {
   ];
 
   async validateMigration(): Promise<ValidationSummary> {
-    console.log('🔍 Starting migration validation...\n');
+    logger.info('🔍 Starting migration validation...\n', { component: 'SimpleTool' });
 
     const summary: ValidationSummary = {
       totalChecks: this.validationChecks.length,
@@ -496,7 +497,7 @@ class MigrationValidator {
         });
       }
       
-      console.log(''); // Empty line for readability
+      logger.info('', { component: 'SimpleTool' }); // Empty line for readability
     }
 
     return summary;
@@ -618,20 +619,20 @@ ${summary.failed === 0
   }
 
   printSummary(summary: ValidationSummary): void {
-    console.log('📊 Validation Summary:');
+    logger.info('📊 Validation Summary:', { component: 'SimpleTool' });
     console.log(`   Total checks: ${summary.totalChecks}`);
     console.log(`   ✅ Passed: ${summary.passed}`);
     console.log(`   ❌ Failed: ${summary.failed}`);
     console.log(`   ⚠️  Warnings: ${summary.warnings}`);
     
     if (summary.failed === 0) {
-      console.log('\n🎉 Migration validation successful!');
-      console.log('✅ All critical checks passed');
-      console.log('🚀 Your migration to @triplecheck/core is complete');
+      logger.info('\n🎉 Migration validation successful!', { component: 'SimpleTool' });
+      logger.info('✅ All critical checks passed', { component: 'SimpleTool' });
+      logger.info('🚀 Your migration to @triplecheck/core is complete', { component: 'SimpleTool' });
     } else {
-      console.log('\n⚠️  Migration validation found issues');
+      logger.info('\n⚠️  Migration validation found issues', { component: 'SimpleTool' });
       console.log(`❌ ${summary.failed} critical issues need to be addressed`);
-      console.log('📋 Check the validation report for detailed information');
+      logger.info('📋 Check the validation report for detailed information', { component: 'SimpleTool' });
     }
   }
 }
@@ -650,9 +651,15 @@ if (require.main === module) {
       process.exit(summary.failed > 0 ? 1 : 0);
     })
     .catch((error) => {
-      console.error('💥 Validation failed:', error);
+      logger.error('💥 Validation failed:', { component: 'SimpleTool' }, error);
       process.exit(1);
     });
 }
 
 export { MigrationValidator };
+
+
+
+
+
+

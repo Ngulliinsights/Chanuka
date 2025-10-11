@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { AuthService, registerSchema, loginSchema } from '../../core/auth/auth-service.js';
+import { AuthService, registerSchema, loginSchema } from '../../core/auth/auth-service.ts';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
+import { logger } from '../../utils/logger';
 
 // Mock dependencies
 jest.mock('bcryptjs');
@@ -633,3 +634,9 @@ describe('AuthService', () => {
     });
   });
 });
+
+
+
+
+
+

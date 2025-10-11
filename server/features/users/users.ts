@@ -2,7 +2,9 @@
 import { Router } from "express";
 import { eq } from "drizzle-orm";
 import { database as db, users, userInterests } from "../../../shared/database/connection.js";
-import { ApiSuccess, ApiErrorResponse, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
+import { logger } from '../../utils/logger';
+import { securityAuditService } from '../../features/security/security-audit-service.js';
 
 const router = Router();
 
@@ -44,12 +46,22 @@ export function setupUserRoutes(routerInstance: Router) {
         .from(userInterests)
         .where(eq(userInterests.userId, userId));
 
+      // Log data access
+      await securityAuditService.logDataAccess(
+        `user:${userId}`,
+        'read',
+        req,
+        (req as any).user?.id,
+        1,
+        true
+      );
+
       return ApiSuccess(res, {
         ...user[0],
         interests: interests.map(i => i.interest),
       }, ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error("Error fetching user:", error);
+      logger.error('Error fetching user:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Internal server error', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -107,12 +119,22 @@ export function setupUserRoutes(routerInstance: Router) {
         }
       }
 
+      // Log data access for user profile update
+      await securityAuditService.logDataAccess(
+        `user:${userId}`,
+        'update',
+        req,
+        (req as any).user?.id,
+        1,
+        true
+      );
+
       return ApiSuccess(res, {
         ...updatedUser[0],
         interests: interests || [],
       }, ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error("Error updating user:", error);
+      logger.error('Error updating user:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Internal server error', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -138,7 +160,7 @@ export function setupUserRoutes(routerInstance: Router) {
       return ApiSuccess(res, interests.map(i => i.interest), 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error("Error fetching user interests:", error);
+      logger.error('Error fetching user interests:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Internal server error', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -179,7 +201,7 @@ export function setupUserRoutes(routerInstance: Router) {
       return ApiSuccess(res, { interests }, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error("Error updating user interests:", error);
+      logger.error('Error updating user interests:', { component: 'SimpleTool' }, error);
       return ApiError(res, 'Internal server error', 500, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
@@ -191,3 +213,12 @@ setupUserRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
+
+
+
+
+
+
+
+

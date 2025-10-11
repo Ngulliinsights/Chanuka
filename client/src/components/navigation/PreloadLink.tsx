@@ -4,6 +4,7 @@ import { LazyExoticComponent, ComponentType } from 'react';
 import { useRoutePreloader } from '@/utils/route-preloading';
 import { useAdaptiveLoading } from '@/hooks/useConnectionAware';
 import { cn } from '@/lib/utils';
+import { logger } from '../utils/logger.js';
 
 export interface PreloadLinkProps extends Omit<LinkProps, 'to'> {
   to: string;

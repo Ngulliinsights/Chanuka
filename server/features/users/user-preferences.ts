@@ -100,6 +100,7 @@ const DEFAULT_PREFERENCES: UserNotificationPreferences = {
         enabled: false,
         urgentBillsImmediate: true,
         importantSponsorsImmediate: false,
+import { logger } from '../../utils/logger';
         highEngagementImmediate: false
       },
       batchingRules: {
@@ -259,7 +260,7 @@ export class UserPreferencesService {
       await Promise.allSettled(updatePromises);
       console.log(`Batch updated preferences for ${updates.length} users`);
     } catch (error) {
-      console.error('Error in batch preference update:', error);
+      logger.error('Error in batch preference update:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -309,7 +310,7 @@ export class UserPreferencesService {
         quietHoursEnabled
       };
     } catch (error) {
-      console.error('Error getting preference stats:', error);
+      logger.error('Error getting preference stats:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -396,3 +397,11 @@ export class UserPreferencesService {
 }
 
 export const userPreferencesService = new UserPreferencesService();
+
+
+
+
+
+
+
+

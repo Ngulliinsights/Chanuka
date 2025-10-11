@@ -1,5 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { ExpertVerificationService, VerificationStatus } from '../ExpertVerificationService.ts';
+import { describe, it, expect, beforeEach } from '@jest/globals';
+import { ExpertVerificationService, VerificationStatus } from './ExpertVerificationService.ts';
+import { logger } from '../../utils/logger';
 
 describe('ExpertVerificationService', () => {
   let service: ExpertVerificationService;
@@ -14,6 +15,10 @@ describe('ExpertVerificationService', () => {
         id: 'analysis-123',
         topic: 'constitutional law',
         content: 'Test analysis content',
+        billId: 1,
+        analysisType: 'legal',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       const result = await service.submitForReview(mockAnalysis);
@@ -26,6 +31,10 @@ describe('ExpertVerificationService', () => {
         id: 'analysis-123',
         topic: 'unknown topic',
         content: 'Test analysis content',
+        billId: 1,
+        analysisType: 'legal',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       const result = await service.submitForReview(mockAnalysis);
@@ -37,6 +46,10 @@ describe('ExpertVerificationService', () => {
         id: 'analysis-123',
         topic: '',
         content: '',
+        billId: 1,
+        analysisType: 'legal',
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       await expect(service.submitForReview(mockAnalysis)).rejects.toThrow('Invalid analysis data');
@@ -75,3 +88,12 @@ describe('ExpertVerificationService', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+

@@ -4,6 +4,7 @@ import {
   type Sponsor, type SponsorAffiliation, type SponsorTransparency, type BillSponsorship 
 } from '../../../shared/schema.js';
 import { eq, and, sql, desc, gte, lte, count, avg, inArray, like, or } from 'drizzle-orm';
+import { logger } from '../../utils/logger';
 
 // Enhanced type definitions for sponsor service
 export interface SponsorWithDetails extends Sponsor {
@@ -666,3 +667,11 @@ export class SponsorService {
 }
 
 export const sponsorService = new SponsorService();
+
+
+
+
+
+
+
+

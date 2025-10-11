@@ -2,6 +2,7 @@ import { Redis } from 'ioredis';
 import { Pool } from 'pg';
 import type { InsertSocialShare, SocialShare } from '../../../shared/schema.js';
 import { BaseStorage } from './base/BaseStorage.js';
+import { logger } from '../../utils/logger';
 export declare class SocialShareStorage extends BaseStorage<SocialShare> {
     constructor(redis: Redis, pool: Pool);
     static initializeSchema(pool: Pool): Promise<void>;
@@ -16,3 +17,12 @@ export declare class SocialShareStorage extends BaseStorage<SocialShare> {
     getBillShares(billId: number): Promise<SocialShare[]>;
     getRecentShares(limit?: number): Promise<SocialShare[]>;
 }
+
+
+
+
+
+
+
+
+

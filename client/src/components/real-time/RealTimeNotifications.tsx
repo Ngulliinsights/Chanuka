@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useWebSocket } from '../../hooks/useWebSocket';
 import { Bell, CheckCircle, AlertCircle, Info, X } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { logger } from '../utils/logger.js';
 
 interface Notification {
   id: string;

@@ -3,6 +3,7 @@ import { GovernmentDataIntegrationService } from '../../services/government-data
 import { DataValidationService } from '../../services/data-validation';
 import { DataTransformationService } from '../../services/data-transformation';
 import { authenticateToken, requireRole } from '../../middleware/auth';
+import { logger } from '../../utils/logger';
 
 const router = Router();
 const integrationService = new GovernmentDataIntegrationService();
@@ -24,7 +25,7 @@ router.get('/status', authenticateToken, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error getting integration status:', error);
+    logger.error('Error getting integration status:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: {
@@ -62,7 +63,7 @@ router.post('/sync/bills', authenticateToken, requireRole(['admin']), async (req
       }
     });
   } catch (error) {
-    console.error('Error syncing bills:', error);
+    logger.error('Error syncing bills:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: {
@@ -100,7 +101,7 @@ router.post('/sync/sponsors', authenticateToken, requireRole(['admin']), async (
       }
     });
   } catch (error) {
-    console.error('Error syncing sponsors:', error);
+    logger.error('Error syncing sponsors:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: {
@@ -226,7 +227,7 @@ router.post('/validate', authenticateToken, requireRole(['admin']), async (req, 
       }
     });
   } catch (error) {
-    console.error('Error validating data:', error);
+    logger.error('Error validating data:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: {
@@ -267,7 +268,7 @@ router.post('/cross-validate', authenticateToken, requireRole(['admin']), async 
       }
     });
   } catch (error) {
-    console.error('Error cross-validating data:', error);
+    logger.error('Error cross-validating data:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: {
@@ -344,7 +345,7 @@ router.post('/transform', authenticateToken, requireRole(['admin']), async (req,
       }
     });
   } catch (error) {
-    console.error('Error transforming data:', error);
+    logger.error('Error transforming data:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: {
@@ -408,7 +409,7 @@ router.get('/sources', authenticateToken, async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Error getting sources:', error);
+    logger.error('Error getting sources:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: {
@@ -462,7 +463,7 @@ router.post('/schedule-sync', authenticateToken, requireRole(['admin']), async (
       }
     });
   } catch (error) {
-    console.error('Error scheduling sync:', error);
+    logger.error('Error scheduling sync:', { component: 'SimpleTool' }, error);
     res.status(500).json({
       success: false,
       error: {
@@ -475,3 +476,11 @@ router.post('/schedule-sync', authenticateToken, requireRole(['admin']), async (
 });
 
 export default router;
+
+
+
+
+
+
+
+

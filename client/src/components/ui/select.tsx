@@ -5,6 +5,7 @@ import { Root, Group, Value, Trigger, Icon, ScrollUpButton, ScrollDownButton, Po
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
+import { logger } from '../utils/logger.js';
 
 const Select = Root
 

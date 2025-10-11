@@ -4,6 +4,7 @@
 
 import { promises as fs } from 'fs';
 import { join, dirname } from 'path';
+import { logger } from '../utils/logger';
 
 export interface LogRotationOptions {
   maxFileSize: string; // e.g., '10MB', '100KB'
@@ -185,3 +186,9 @@ export function createLogRotationManager(options?: Partial<LogRotationOptions>):
 
   return new LogRotationManager({ ...defaultOptions, ...options });
 }
+
+
+
+
+
+

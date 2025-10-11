@@ -7,6 +7,7 @@
 import { ZodSchema, ZodError } from 'zod';
 import crypto from 'crypto';
 import {
+import { logger } from '../utils/logger';
   ValidationError,
   ValidationOptions,
   ValidationResult,
@@ -600,3 +601,9 @@ export const validationService = new ValidationService();
 export function createValidationService(config: ValidationServiceConfig): ValidationService {
   return new ValidationService(config);
 }
+
+
+
+
+
+

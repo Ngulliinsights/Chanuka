@@ -2,22 +2,29 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import { pool } from './shared/database/pool.js';
+import { logger } from '../utils/logger';
 
 async function dropAndRecreateSchema() {
   try {
-    console.log('DATABASE_URL:', process.env.DATABASE_URL);
-    console.log('Testing connection...');
+    logger.info('DATABASE_URL:', { component: 'SimpleTool' }, process.env.DATABASE_URL);
+    logger.info('Testing connection...', { component: 'SimpleTool' });
     await pool.query('SELECT 1');
-    console.log('Connection successful.');
+    logger.info('Connection successful.', { component: 'SimpleTool' });
 
-    console.log('Dropping and recreating public schema...');
+    logger.info('Dropping and recreating public schema...', { component: 'SimpleTool' });
     await pool.query('DROP SCHEMA public CASCADE');
     await pool.query('CREATE SCHEMA public');
-    console.log('Schema dropped and recreated successfully.');
+    logger.info('Schema dropped and recreated successfully.', { component: 'SimpleTool' });
   } catch (error) {
-    console.error('Error:', error);
+    logger.error('Error:', { component: 'SimpleTool' }, error);
     process.exit(1);
   }
 }
 
 dropAndRecreateSchema();
+
+
+
+
+
+

@@ -4,6 +4,7 @@ import PrimarySponsor from './sponsorship/primary-sponsor';
 import CoSponsors from './sponsorship/co-sponsors';
 import FinancialNetwork from './sponsorship/financial-network';
 import Methodology from './sponsorship/methodology';
+import { logger } from '../utils/logger.js';
 
 // Wrapper components that extract billId from URL params and pass to the actual components
 

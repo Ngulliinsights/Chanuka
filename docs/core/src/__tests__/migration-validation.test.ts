@@ -7,30 +7,31 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { MigrationValidator, validateMigration } from '../validation/migration-validator';
 import type { MigrationValidationReport } from '../validation/migration-validator';
+import { logger } from '../utils/logger';
 
 describe('Migration Validation', () => {
   let validationReport: MigrationValidationReport;
   let validator: MigrationValidator;
 
   beforeAll(async () => {
-    console.log('🚀 Starting comprehensive migration validation...');
+    logger.info('🚀 Starting comprehensive migration validation...', { component: 'SimpleTool' });
     validator = new MigrationValidator();
     validationReport = await validator.validateMigration();
   });
 
   afterAll(() => {
-    console.log('\n📊 Migration Validation Summary:');
-    console.log('================================');
+    logger.info('\n📊 Migration Validation Summary:', { component: 'SimpleTool' });
+    logger.info('================================', { component: 'SimpleTool' });
     validationReport.summary.forEach(line => console.log(line));
     
     if (validationReport.recommendations.length > 0) {
-      console.log('\n💡 Recommendations:');
-      console.log('==================');
+      logger.info('\n💡 Recommendations:', { component: 'SimpleTool' });
+      logger.info('==================', { component: 'SimpleTool' });
       validationReport.recommendations.forEach(rec => console.log(`• ${rec}`));
     }
     
-    console.log('\n📈 Detailed Results:');
-    console.log('===================');
+    logger.info('\n📈 Detailed Results:', { component: 'SimpleTool' });
+    logger.info('===================', { component: 'SimpleTool' });
     
     Object.entries(validationReport.categories).forEach(([category, results]) => {
       console.log(`\n${category.toUpperCase()}:`);
@@ -123,7 +124,7 @@ describe('Migration Validation', () => {
       const cacheResult = functionalityResults.find(r => r.test === 'Cache Service');
       
       if (cacheResult && !cacheResult.success) {
-        console.error('Cache service functionality test failed:', cacheResult.message);
+        logger.error('Cache service functionality test failed:', { component: 'SimpleTool' }, cacheResult.message);
       }
     });
 
@@ -132,7 +133,7 @@ describe('Migration Validation', () => {
       const loggingResult = functionalityResults.find(r => r.test === 'Logging Service');
       
       if (loggingResult && !loggingResult.success) {
-        console.error('Logging service functionality test failed:', loggingResult.message);
+        logger.error('Logging service functionality test failed:', { component: 'SimpleTool' }, loggingResult.message);
       }
     });
 
@@ -141,7 +142,7 @@ describe('Migration Validation', () => {
       const validationResult = functionalityResults.find(r => r.test === 'Validation Service');
       
       if (validationResult && !validationResult.success) {
-        console.error('Validation service functionality test failed:', validationResult.message);
+        logger.error('Validation service functionality test failed:', { component: 'SimpleTool' }, validationResult.message);
       }
     });
 
@@ -150,7 +151,7 @@ describe('Migration Validation', () => {
       const errorResult = functionalityResults.find(r => r.test === 'Error Handling Service');
       
       if (errorResult && !errorResult.success) {
-        console.error('Error handling functionality test failed:', errorResult.message);
+        logger.error('Error handling functionality test failed:', { component: 'SimpleTool' }, errorResult.message);
       }
     });
 
@@ -159,7 +160,7 @@ describe('Migration Validation', () => {
       const rateLimitResult = functionalityResults.find(r => r.test === 'Rate Limiting Service');
       
       if (rateLimitResult && !rateLimitResult.success) {
-        console.error('Rate limiting functionality test failed:', rateLimitResult.message);
+        logger.error('Rate limiting functionality test failed:', { component: 'SimpleTool' }, rateLimitResult.message);
       }
     });
 
@@ -168,7 +169,7 @@ describe('Migration Validation', () => {
       const healthResult = functionalityResults.find(r => r.test === 'Health Monitoring Service');
       
       if (healthResult && !healthResult.success) {
-        console.error('Health monitoring functionality test failed:', healthResult.message);
+        logger.error('Health monitoring functionality test failed:', { component: 'SimpleTool' }, healthResult.message);
       }
     });
   });
@@ -223,7 +224,7 @@ describe('Migration Validation', () => {
       const middlewareResult = integrationResults.find(r => r.test === 'Middleware Integration');
       
       if (middlewareResult && !middlewareResult.success) {
-        console.error('Middleware integration test failed:', middlewareResult.message);
+        logger.error('Middleware integration test failed:', { component: 'SimpleTool' }, middlewareResult.message);
       }
     });
 
@@ -232,7 +233,7 @@ describe('Migration Validation', () => {
       const legacyResult = integrationResults.find(r => r.test === 'Legacy Adapter Integration');
       
       if (legacyResult && !legacyResult.success) {
-        console.error('Legacy adapter integration test failed:', legacyResult.message);
+        logger.error('Legacy adapter integration test failed:', { component: 'SimpleTool' }, legacyResult.message);
       }
     });
 
@@ -241,7 +242,7 @@ describe('Migration Validation', () => {
       const crossServiceResult = integrationResults.find(r => r.test === 'Cross-Service Integration');
       
       if (crossServiceResult && !crossServiceResult.success) {
-        console.error('Cross-service integration test failed:', crossServiceResult.message);
+        logger.error('Cross-service integration test failed:', { component: 'SimpleTool' }, crossServiceResult.message);
       }
     });
   });
@@ -282,3 +283,9 @@ describe('Migration Validation', () => {
 
 // Export for standalone usage
 export { validateMigration, MigrationValidator };
+
+
+
+
+
+

@@ -9,6 +9,7 @@ import {
   ApiErrorFallback 
 } from '../ErrorFallback';
 import { withErrorBoundary, CriticalSection } from '../withErrorBoundary';
+import { logger } from '../utils/logger.js';
 
 // Mock components for testing
 const ThrowingComponent: React.FC<{ 

@@ -4,6 +4,7 @@ import path from "path";
 import { createServer as createViteServer, createLogger, type ViteDevServer } from "vite";
 import { type Server } from "http";
 import viteConfig from "../vite.config.js";
+import { logger } from '../utils/logger';
 
 const viteLogger = createLogger();
 
@@ -365,8 +366,8 @@ function enhanceTemplateForDevelopment(
       // Consolidated error handler
       const logError = (type, event) => {
         console.group(\`🚨 \${type}\`);
-        console.error('Error:', event.error || event.reason || event.message);
-        console.error('Location:', event.filename || 'unknown');
+        logger.error('Error:', { component: 'SimpleTool' }, event.error || event.reason || event.message);
+        logger.error('Location:', { component: 'SimpleTool' }, event.filename || 'unknown');
         console.groupEnd();
       };
       
@@ -661,3 +662,9 @@ export function serveStatic(app: Express) {
     throw new Error(`Static file serving setup failed: ${err.message}`);
   }
 }
+
+
+
+
+
+

@@ -2,6 +2,7 @@ import https from 'https';
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
+import { logger } from '../../utils/logger';
 
 export interface TLSOptions {
   key?: string | Buffer;
@@ -59,9 +60,9 @@ export class TLSConfigService {
         config.ca = fs.readFileSync(caPath);
       }
 
-      console.log('✅ TLS certificates loaded successfully');
+      logger.info('✅ TLS certificates loaded successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('❌ Failed to load TLS certificates:', error);
+      logger.error('❌ Failed to load TLS certificates:', { component: 'SimpleTool' }, error);
       throw new Error('TLS configuration failed');
     }
 
@@ -102,7 +103,7 @@ export class TLSConfigService {
    */
   private generateSelfSignedCertificate(certPath: string, keyPath: string): void {
     try {
-      console.log('🔧 Generating self-signed certificate for development...');
+      logger.info('🔧 Generating self-signed certificate for development...', { component: 'SimpleTool' });
 
       // Generate private key
       const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
@@ -124,9 +125,9 @@ export class TLSConfigService {
       fs.writeFileSync(keyPath, privateKey);
       fs.writeFileSync(certPath, cert);
 
-      console.log('✅ Self-signed certificate generated successfully');
+      logger.info('✅ Self-signed certificate generated successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('❌ Failed to generate self-signed certificate:', error);
+      logger.error('❌ Failed to generate self-signed certificate:', { component: 'SimpleTool' }, error);
       throw new Error('Certificate generation failed');
     }
   }
@@ -177,25 +178,25 @@ VQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC7
     try {
       // Check if certificate and key are present
       if (!options.cert || !options.key) {
-        console.error('❌ TLS certificate or key missing');
+        logger.error('❌ TLS certificate or key missing', { component: 'SimpleTool' });
         return false;
       }
 
       // Validate certificate format
       if (typeof options.cert === 'string' && !options.cert.includes('BEGIN CERTIFICATE')) {
-        console.error('❌ Invalid certificate format');
+        logger.error('❌ Invalid certificate format', { component: 'SimpleTool' });
         return false;
       }
 
       if (typeof options.key === 'string' && !options.key.includes('BEGIN PRIVATE KEY') && !options.key.includes('BEGIN RSA PRIVATE KEY')) {
-        console.error('❌ Invalid private key format');
+        logger.error('❌ Invalid private key format', { component: 'SimpleTool' });
         return false;
       }
 
-      console.log('✅ TLS configuration validated successfully');
+      logger.info('✅ TLS configuration validated successfully', { component: 'SimpleTool' });
       return true;
     } catch (error) {
-      console.error('❌ TLS configuration validation failed:', error);
+      logger.error('❌ TLS configuration validation failed:', { component: 'SimpleTool' }, error);
       return false;
     }
   }
@@ -329,3 +330,11 @@ VQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC7
 
 // Singleton instance
 export const tlsConfigService = new TLSConfigService();
+
+
+
+
+
+
+
+

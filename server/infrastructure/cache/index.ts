@@ -2,9 +2,18 @@
 // Centralized exports for caching services
 
 // Routes
-export { default as cacheRouter } from './cache';
+export { router as cacheRouter } from './cache';
 
 // Services
-export { CacheService } from './cache';
-export { CacheWarmingService } from './cache-warming';
-export { AdvancedCachingService } from './advanced-caching';
+export { CacheService, cacheService } from './cache-service';
+export { CacheWarmingService, cacheWarmingService } from './cache-warming';
+export { AdvancedCachingService, advancedCachingService } from './advanced-caching';
+
+// Coordinator
+export { CacheCoordinator, cacheCoordinator } from './cache-coordinator';
+
+
+
+
+
+

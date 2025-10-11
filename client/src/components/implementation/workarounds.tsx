@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { ArrowUp, ArrowDown, Plus, Clock, DollarSign, Users, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { logger } from '../utils/logger.js';
 
 // Type definitions with improved specificity
 type Priority = 'low' | 'medium' | 'high' | 'critical';
@@ -160,7 +161,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
       const data = await response.json();
       setWorkarounds(data);
     } catch (error) {
-      console.error('Failed to fetch workarounds:', error);
+      logger.error('Failed to fetch workarounds:', { component: 'SimpleTool' }, error);
       // In a real app, you might want to show a toast notification here
     } finally {
       setIsLoading(false);
@@ -205,7 +206,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
       // Refresh the workarounds list
       await fetchWorkarounds();
     } catch (error) {
-      console.error('Failed to create workaround:', error);
+      logger.error('Failed to create workaround:', { component: 'SimpleTool' }, error);
       // In a real app, you might want to show an error toast here
     } finally {
       setIsSubmitting(false);
@@ -232,7 +233,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
 
       await fetchWorkarounds();
     } catch (error) {
-      console.error('Failed to vote:', error);
+      logger.error('Failed to vote:', { component: 'SimpleTool' }, error);
     } finally {
       setVotingStates(prev => ({ ...prev, [workaroundId]: false }));
     }

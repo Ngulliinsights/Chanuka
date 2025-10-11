@@ -25,6 +25,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { UserRole } from '@/types/navigation';
 import { NavigationItem, useRoleBasedNavigation } from './RoleBasedNavigation';
+import { logger } from '../utils/logger.js';
 
 interface RoleBasedMenuProps {
   trigger?: React.ReactNode;

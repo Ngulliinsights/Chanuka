@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { RateLimitStore } from './types';
+import { logger } from '../utils/logger';
 
 /**
  * Enhanced rate limiting middleware matching reference implementation
@@ -87,3 +88,10 @@ export function rateLimitMiddleware(options?: {
     }
   };
 }
+
+
+
+
+
+
+

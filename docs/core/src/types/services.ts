@@ -42,3 +42,10 @@ export interface HealthStatus {
   status: 'healthy' | 'unhealthy';
   details?: Record<string, any>;
 }
+
+
+
+
+
+
+

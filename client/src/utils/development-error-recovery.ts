@@ -144,10 +144,10 @@ export class DevelopmentErrorRecovery {
 
   private handleHMRError(message: string, args: any[]): void {
     console.group('🔥 HMR Error Detected');
-    console.error('Message:', message);
-    console.error('Arguments:', args);
-    console.error('HMR Status:', window.__DEV_SERVER__?.hmrStatus?.() || 'Unknown');
-    console.error('Connection Attempts:', this.hmrConnectionAttempts);
+    logger.error('Message:', { component: 'SimpleTool' }, message);
+    logger.error('Arguments:', { component: 'SimpleTool' }, args);
+    logger.error('HMR Status:', { component: 'SimpleTool' }, window.__DEV_SERVER__?.hmrStatus?.() || 'Unknown');
+    logger.error('Connection Attempts:', { component: 'SimpleTool' }, this.hmrConnectionAttempts);
     console.groupEnd();
 
     // Attempt HMR recovery
@@ -160,7 +160,7 @@ export class DevelopmentErrorRecovery {
     this.isRecovering = true;
     
     try {
-      console.log('🔄 Attempting HMR recovery...');
+      logger.info('🔄 Attempting HMR recovery...', { component: 'SimpleTool' });
       
       // Strategy 1: Try to reconnect WebSocket
       await this.attemptHMRReconnection();
@@ -177,7 +177,7 @@ export class DevelopmentErrorRecovery {
       }
       
     } catch (error) {
-      console.error('❌ HMR recovery failed:', error);
+      logger.error('❌ HMR recovery failed:', { component: 'SimpleTool' }, error);
     } finally {
       this.isRecovering = false;
     }
@@ -200,14 +200,14 @@ export class DevelopmentErrorRecovery {
         
         ws.onopen = () => {
           clearTimeout(timeout);
-          console.log('✅ HMR reconnection successful');
+          logger.info('✅ HMR reconnection successful', { component: 'SimpleTool' });
           this.hmrConnectionAttempts = 0; // Reset on successful connection
           resolve();
         };
         
         ws.onerror = (error) => {
           clearTimeout(timeout);
-          console.error('❌ HMR reconnection failed:', error);
+          logger.error('❌ HMR reconnection failed:', { component: 'SimpleTool' }, error);
           reject(error);
         };
         
@@ -270,10 +270,10 @@ export class DevelopmentErrorRecovery {
 
     // Enhanced error logging
     console.group(`🚨 Development Error #${this.errorCount} [${errorInfo.type}]`);
-    console.error('Error Info:', errorInfo);
-    console.error('Dev Server Info:', window.__DEV_SERVER__);
-    console.error('Recovery Attempts:', this.recoveryAttempts);
-    console.error('Timestamp:', new Date().toISOString());
+    logger.error('Error Info:', { component: 'SimpleTool' }, errorInfo);
+    logger.error('Dev Server Info:', { component: 'SimpleTool' }, window.__DEV_SERVER__);
+    logger.error('Recovery Attempts:', { component: 'SimpleTool' }, this.recoveryAttempts);
+    logger.error('Timestamp:', { component: 'SimpleTool' }, new Date().toISOString());
     console.groupEnd();
 
     // Attempt automatic recovery for certain error types
@@ -318,7 +318,7 @@ export class DevelopmentErrorRecovery {
         await this.recoverFromGeneralError(errorInfo);
       }
 
-      console.log('✅ Error recovery completed');
+      logger.info('✅ Error recovery completed', { component: 'SimpleTool' });
       
       // Reset recovery attempts on successful recovery
       setTimeout(() => {
@@ -326,7 +326,7 @@ export class DevelopmentErrorRecovery {
       }, 10000);
 
     } catch (recoveryError) {
-      console.error('❌ Error recovery failed:', recoveryError);
+      logger.error('❌ Error recovery failed:', { component: 'SimpleTool' }, recoveryError);
       
       // If all recovery attempts failed, suggest manual intervention
       if (this.recoveryAttempts >= this.maxRecoveryAttempts) {
@@ -349,22 +349,22 @@ export class DevelopmentErrorRecovery {
       if (resourceType === 'script') {
         const newScript = document.createElement('script');
         newScript.src = newUrl;
-        newScript.onload = () => console.log('✅ Script reloaded successfully');
-        newScript.onerror = () => console.error('❌ Script reload failed');
+        newScript.onload = () => logger.info('✅ Script reloaded successfully', { component: 'SimpleTool' });
+        newScript.onerror = () => logger.error('❌ Script reload failed', { component: 'SimpleTool' });
         document.head.appendChild(newScript);
       } else if (resourceType === 'link') {
         const newLink = document.createElement('link');
         newLink.rel = 'stylesheet';
         newLink.href = newUrl;
-        newLink.onload = () => console.log('✅ Stylesheet reloaded successfully');
-        newLink.onerror = () => console.error('❌ Stylesheet reload failed');
+        newLink.onload = () => logger.info('✅ Stylesheet reloaded successfully', { component: 'SimpleTool' });
+        newLink.onerror = () => logger.error('❌ Stylesheet reload failed', { component: 'SimpleTool' });
         document.head.appendChild(newLink);
       }
     }
   }
 
   private async recoverFromChunkError(errorInfo: any): Promise<void> {
-    console.log('🔄 Attempting chunk error recovery');
+    logger.info('🔄 Attempting chunk error recovery', { component: 'SimpleTool' });
     
     // Clear module cache if available
     if (window.__DEV_SERVER__) {
@@ -377,7 +377,7 @@ export class DevelopmentErrorRecovery {
   }
 
   private async recoverFromGeneralError(errorInfo: any): Promise<void> {
-    console.log('🔄 Attempting general error recovery');
+    logger.info('🔄 Attempting general error recovery', { component: 'SimpleTool' });
     
     // Try to clear caches and reload
     if (window.__DEV_SERVER__) {
@@ -528,3 +528,9 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 export default DevelopmentErrorRecovery;
+
+
+
+
+
+

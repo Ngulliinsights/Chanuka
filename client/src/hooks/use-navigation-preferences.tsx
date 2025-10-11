@@ -22,7 +22,7 @@ export function useNavigationPreferences() {
           }
         }
       } catch (error) {
-        console.error('Failed to load navigation preferences:', error);
+        logger.error('Failed to load navigation preferences:', { component: 'SimpleTool' }, error);
       } finally {
         // Mark loading as complete regardless of success or failure
         setIsLoading(false);
@@ -41,7 +41,7 @@ export function useNavigationPreferences() {
       try {
         localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify(preferences));
       } catch (error) {
-        console.error('Failed to save navigation preferences:', error);
+        logger.error('Failed to save navigation preferences:', { component: 'SimpleTool' }, error);
       }
     }
   }, [preferences, isLoading]);
@@ -114,7 +114,7 @@ export function useNavigationPreferences() {
     try {
       localStorage.removeItem(PREFERENCES_STORAGE_KEY);
     } catch (error) {
-      console.error('Failed to remove preferences from storage:', error);
+      logger.error('Failed to remove preferences from storage:', { component: 'SimpleTool' }, error);
     }
   }, [updatePreferences]);
 
@@ -171,5 +171,6 @@ export function useNavigationPreferences() {
     resetPreferences,
     exportPreferences,
     importPreferences,
+import { logger } from '../utils/logger.js';
   };
 }

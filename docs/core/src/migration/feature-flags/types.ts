@@ -20,3 +20,10 @@ export type FlagValue = boolean | number | string;
 export interface FlagState {
   [key: string]: FlagConfig;
 }
+
+
+
+
+
+
+

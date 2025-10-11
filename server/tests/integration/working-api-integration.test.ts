@@ -9,6 +9,7 @@ import { router as healthRouter } from '../../infrastructure/monitoring/health';
 import { database as db, users, bills, sponsors } from '../../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
+import { logger } from '../utils/logger';
 
 describe('Working API Integration Tests', () => {
   let app: express.Application;
@@ -478,3 +479,9 @@ describe('Working API Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+

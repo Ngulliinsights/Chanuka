@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Request, Response } from 'express';
 import { BaseError, ErrorDomain, ErrorSeverity } from '../base-error';
 import { unifiedErrorHandler } from '../error-handler';
+import { logger } from '../utils/logger';
 
 describe('unifiedErrorHandler', () => {
   let mockRequest: Partial<Request>;
@@ -155,3 +156,10 @@ describe('unifiedErrorHandler', () => {
     );
   });
 });
+
+
+
+
+
+
+

@@ -10,6 +10,7 @@ import pg from 'pg';
 const { Pool } = pg;
 import * as schema from '../shared/schema.js';
 import { financialDisclosureIntegrationService } from './services/financial-disclosure-integration.js';
+import { logger } from '../utils/logger';
 
 // Use the same connection approach as the seed script
 const pool = new Pool({
@@ -20,17 +21,17 @@ const pool = new Pool({
 const db = drizzle(pool, { schema });
 
 async function testFinancialDisclosureIntegration() {
-  console.log('🧪 Testing Financial Disclosure Integration Service...\n');
+  logger.info('🧪 Testing Financial Disclosure Integration Service...\n', { component: 'SimpleTool' });
 
   try {
     // Test database connection first
-    console.log('🔌 Testing database connection...');
+    logger.info('🔌 Testing database connection...', { component: 'SimpleTool' });
     const result = await pool.query('SELECT COUNT(*) FROM sponsor_transparency');
     console.log(`✅ Database connected. Found ${result.rows[0].count} sponsor transparency records`);
     console.log();
 
     // Test 1: Financial disclosure data processing
-    console.log('1️⃣ Testing financial disclosure data processing...');
+    logger.info('1️⃣ Testing financial disclosure data processing...', { component: 'SimpleTool' });
     
     try {
       const allDisclosures = await financialDisclosureIntegrationService.processFinancialDisclosureData();
@@ -48,7 +49,7 @@ async function testFinancialDisclosureIntegration() {
     console.log();
 
     // Test 2: Disclosure completeness scoring
-    console.log('2️⃣ Testing disclosure completeness scoring...');
+    logger.info('2️⃣ Testing disclosure completeness scoring...', { component: 'SimpleTool' });
     
     try {
       // Get a sponsor ID from the database
@@ -62,7 +63,7 @@ async function testFinancialDisclosureIntegration() {
         console.log(`   Completed disclosures: ${completenessReport.completedDisclosures}/${completenessReport.requiredDisclosures}`);
         console.log(`   Risk assessment: ${completenessReport.riskAssessment}`);
       } else {
-        console.log('❌ No sponsors found in database');
+        logger.info('❌ No sponsors found in database', { component: 'SimpleTool' });
       }
     } catch (error) {
       console.log(`❌ Completeness scoring failed: ${error.message}`);
@@ -71,7 +72,7 @@ async function testFinancialDisclosureIntegration() {
     console.log();
 
     // Test 3: Financial relationship mapping
-    console.log('3️⃣ Testing financial relationship mapping...');
+    logger.info('3️⃣ Testing financial relationship mapping...', { component: 'SimpleTool' });
     
     try {
       const sponsorResult = await pool.query('SELECT id FROM sponsors LIMIT 1');
@@ -91,7 +92,7 @@ async function testFinancialDisclosureIntegration() {
     console.log();
 
     // Test 4: Disclosure update monitoring and alerts
-    console.log('4️⃣ Testing disclosure update monitoring and alerts...');
+    logger.info('4️⃣ Testing disclosure update monitoring and alerts...', { component: 'SimpleTool' });
     
     try {
       const alerts = await financialDisclosureIntegrationService.monitorDisclosureUpdates();
@@ -113,18 +114,18 @@ async function testFinancialDisclosureIntegration() {
     console.log();
 
     // Summary
-    console.log('📊 FINANCIAL DISCLOSURE INTEGRATION TEST SUMMARY');
-    console.log('='.repeat(50));
-    console.log('✅ Task 8.2 Implementation Complete');
-    console.log('- ✅ Financial disclosure data processing implemented');
-    console.log('- ✅ Disclosure completeness scoring implemented');
-    console.log('- ✅ Financial relationship mapping implemented');
-    console.log('- ✅ Disclosure update monitoring and alerts implemented');
+    logger.info('📊 FINANCIAL DISCLOSURE INTEGRATION TEST SUMMARY', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('✅ Task 8.2 Implementation Complete', { component: 'SimpleTool' });
+    logger.info('- ✅ Financial disclosure data processing implemented', { component: 'SimpleTool' });
+    logger.info('- ✅ Disclosure completeness scoring implemented', { component: 'SimpleTool' });
+    logger.info('- ✅ Financial relationship mapping implemented', { component: 'SimpleTool' });
+    logger.info('- ✅ Disclosure update monitoring and alerts implemented', { component: 'SimpleTool' });
     console.log();
-    console.log('🎉 Financial Disclosure Integration Service is ready for use!');
+    logger.info('🎉 Financial Disclosure Integration Service is ready for use!', { component: 'SimpleTool' });
 
   } catch (error) {
-    console.error('❌ Test failed:', error);
+    logger.error('❌ Test failed:', { component: 'SimpleTool' }, error);
   } finally {
     await pool.end();
   }
@@ -132,6 +133,12 @@ async function testFinancialDisclosureIntegration() {
 
 // Run the test
 testFinancialDisclosureIntegration().catch(error => {
-  console.error('Fatal test error:', error);
+  logger.error('Fatal test error:', { component: 'SimpleTool' }, error);
   process.exit(1);
 });
+
+
+
+
+
+

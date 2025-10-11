@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { performance } from 'perf_hooks';
+import { logger } from '../utils/logger';
 
 interface PerformanceMetric {
   id: string;
@@ -73,6 +74,9 @@ class PerformanceMonitor {
    * Start request tracing
    */
   startTrace(req: Request): string {
+    // Enforce traces limit before adding new trace
+    this.enforceTracesLimit();
+
     const traceId = this.generateTraceId();
     const trace: RequestTrace = {
       traceId,
@@ -87,10 +91,10 @@ class PerformanceMonitor {
     };
 
     this.traces.set(traceId, trace);
-    
+
     // Add trace ID to request for downstream use
     (req as any).traceId = traceId;
-    
+
     return traceId;
   }
 
@@ -148,10 +152,8 @@ class PerformanceMonitor {
       }
     }
 
-    // Prevent memory leaks
-    if (this.metrics.length > this.MAX_METRICS) {
-      this.metrics = this.metrics.slice(-this.MAX_METRICS / 2);
-    }
+    // Prevent memory leaks - enforce limit immediately
+    this.enforceMetricsLimit();
   }
 
   /**
@@ -363,6 +365,46 @@ class PerformanceMonitor {
   }
 
   /**
+   * Enforce metrics limit to prevent memory leaks
+   */
+  private enforceMetricsLimit(): void {
+    if (this.metrics.length > this.MAX_METRICS) {
+      // Keep most recent metrics, remove oldest ones
+      const excessCount = this.metrics.length - this.MAX_METRICS;
+      this.metrics = this.metrics.slice(excessCount);
+    }
+  }
+
+  /**
+   * Enforce traces limit to prevent memory leaks
+   */
+  private enforceTracesLimit(): void {
+    if (this.traces.size > this.MAX_TRACES) {
+      // Remove oldest completed traces first
+      const completedTraces = Array.from(this.traces.entries())
+        .filter(([_, trace]) => trace.endTime !== undefined)
+        .sort(([_, a], [__, b]) => (a.endTime || 0) - (b.endTime || 0));
+
+      const excessCount = this.traces.size - this.MAX_TRACES;
+      for (let i = 0; i < Math.min(excessCount, completedTraces.length); i++) {
+        this.traces.delete(completedTraces[i][0]);
+      }
+
+      // If still over limit, remove oldest active traces
+      if (this.traces.size > this.MAX_TRACES) {
+        const activeTraces = Array.from(this.traces.entries())
+          .filter(([_, trace]) => trace.endTime === undefined)
+          .sort(([_, a], [__, b]) => a.startTime - b.startTime);
+
+        const remainingExcess = this.traces.size - this.MAX_TRACES;
+        for (let i = 0; i < Math.min(remainingExcess, activeTraces.length); i++) {
+          this.traces.delete(activeTraces[i][0]);
+        }
+      }
+    }
+  }
+
+  /**
    * Clean up old data to prevent memory leaks
    */
   private cleanupOldData(): void {
@@ -380,6 +422,10 @@ class PerformanceMonitor {
     // Clean old metrics
     const cutoffDate = new Date(cutoffTime);
     this.metrics = this.metrics.filter(metric => metric.timestamp > cutoffDate);
+
+    // Enforce limits after cleanup
+    this.enforceTracesLimit();
+    this.enforceMetricsLimit();
   }
 }
 
@@ -453,3 +499,9 @@ export function measureSync<T>(
     throw error;
   }
 }
+
+
+
+
+
+

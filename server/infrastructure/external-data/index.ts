@@ -6,10 +6,10 @@
  * and fallback mechanisms.
  */
 
-export { GovernmentDataService } from './government-data-service.js';
-export { DataSynchronizationService } from './data-synchronization-service.js';
-export { UnifiedExternalAPIManagementService } from './external-api-manager.js';
-export { ConflictResolutionService } from './conflict-resolution-service.js';
+// export { GovernmentDataService } from './government-data-service'; // Commented out due to missing axios dependency
+// export { DataSynchronizationService } from './data-synchronization-service'; // Commented out due to missing cron and db dependencies
+export { UnifiedExternalAPIManagementService } from './external-api-manager';
+// export { ConflictResolutionService } from './conflict-resolution-service'; // Commented out due to missing db dependencies
 
 // Types and interfaces
 export type {
@@ -19,4 +19,10 @@ export type {
   DataValidationResult,
   ConflictResolution,
   ExternalDataConfig
-} from './types.js';
+} from './types';
+
+
+
+
+
+

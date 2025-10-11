@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { RoleBasedNavigation, useRoleBasedNavigation, NavigationItem } from '../RoleBasedNavigation';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import { UserRole } from '@/types/navigation';
+import { logger } from '../utils/logger.js';
 
 // Mock the hooks
 jest.mock('@/hooks/use-auth', () => ({

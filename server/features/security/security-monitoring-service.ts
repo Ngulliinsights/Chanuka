@@ -4,6 +4,21 @@ import { intrusionDetectionService, ThreatDetectionResult } from './intrusion-de
 import { database as db } from '../../../shared/database/connection.js';
 import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, count, desc, eq, or, inArray } from 'drizzle-orm';
+import { logger } from '../../utils/logger';
+
+// Dynamic import to avoid circular dependencies
+let performanceMonitoring: any = null;
+const getPerformanceMonitoring = async () => {
+  if (!performanceMonitoring) {
+    try {
+      const { performanceMonitoring: pm } = await import('../../services/performance-monitoring.js');
+      performanceMonitoring = pm;
+    } catch (error) {
+      // Performance monitoring not available, continue without it
+    }
+  }
+  return performanceMonitoring;
+};
 
 // Security monitoring configuration table
 const securityConfig = pgTable("security_config", {
@@ -255,10 +270,10 @@ export class SecurityMonitoringService {
       // Schedule compliance checks with proper timer tracking
       await this.scheduleComplianceChecks();
       
-      console.log('✅ Security monitoring system initialized');
+      logger.info('✅ Security monitoring system initialized', { component: 'SimpleTool' });
     } catch (error) {
       // Enhanced error logging with context
-      console.error('❌ Failed to initialize security monitoring:', {
+      logger.error('❌ Failed to initialize security monitoring:', { component: 'SimpleTool' }, {
         error: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined,
         timestamp: new Date().toISOString()
@@ -273,7 +288,7 @@ export class SecurityMonitoringService {
    */
   async monitorRequest(req: Request, res: Response): Promise<ThreatDetectionResult> {
     const startTime = Date.now();
-    
+
     try {
       // Extract request metadata once
       const requestMetadata = {
@@ -286,7 +301,27 @@ export class SecurityMonitoringService {
 
       // Analyze request for threats
       const threatResult = await intrusionDetectionService.analyzeRequest(req);
-      
+
+      // Record performance metrics
+      const pm = await getPerformanceMonitoring();
+      if (pm) {
+        const processingTime = Date.now() - startTime;
+        pm.recordMetric('security.request.analysis_time', processingTime, {
+          component: 'security_monitoring',
+          threat_level: threatResult.threatLevel,
+          blocked: threatResult.isBlocked.toString()
+        });
+        pm.recordMetric('security.request.risk_score', threatResult.riskScore, {
+          component: 'security_monitoring',
+          path: requestMetadata.path,
+          method: requestMetadata.method
+        });
+        pm.recordMetric('security.threats.detected', threatResult.detectedThreats.length, {
+          component: 'security_monitoring',
+          threat_level: threatResult.threatLevel
+        });
+      }
+
       // Prepare security event data
       const securityEventData = {
         eventType: 'request_analysis',
@@ -336,15 +371,25 @@ export class SecurityMonitoringService {
 
       return threatResult;
     } catch (error) {
+      // Record error metrics
+      const pm = await getPerformanceMonitoring();
+      if (pm) {
+        pm.recordMetric('security.monitoring.error', 1, {
+          component: 'security_monitoring',
+          path: req.path,
+          method: req.method
+        });
+      }
+
       // Enhanced error logging
-      console.error('Error in security monitoring:', {
+      logger.error('Error in security monitoring:', { component: 'SimpleTool' }, {
         error: error instanceof Error ? error.message : 'Unknown error',
         path: req.path,
         method: req.method,
         ip: this.getClientIP(req),
         timestamp: new Date().toISOString()
       });
-      
+
       // Don't block requests due to monitoring errors - fail open safely
       return {
         isBlocked: false,
@@ -388,7 +433,7 @@ export class SecurityMonitoringService {
         recommendations
       };
     } catch (error) {
-      console.error('Error fetching security dashboard:', {
+      logger.error('Error fetching security dashboard:', { component: 'SimpleTool' }, {
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
       });
@@ -439,7 +484,7 @@ export class SecurityMonitoringService {
 
       return alertId;
     } catch (error) {
-      console.error('Error creating security alert:', {
+      logger.error('Error creating security alert:', { component: 'SimpleTool' }, {
         error: error instanceof Error ? error.message : 'Unknown error',
         alertType: alertData.type,
         severity: alertData.severity,
@@ -453,7 +498,7 @@ export class SecurityMonitoringService {
    * Run compliance checks with better error isolation
    */
   async runComplianceChecks(): Promise<void> {
-    console.log('🔍 Running compliance checks...');
+    logger.info('🔍 Running compliance checks...', { component: 'SimpleTool' });
     
     const checkResults = await Promise.allSettled(
       Array.from(this.complianceChecks.entries()).map(async ([checkName, checkFunction]) => {
@@ -523,7 +568,7 @@ export class SecurityMonitoringService {
    * Shutdown the security monitoring service with proper cleanup
    */
   async shutdown(): Promise<void> {
-    console.log('🛑 Shutting down security monitoring service...');
+    logger.info('🛑 Shutting down security monitoring service...', { component: 'SimpleTool' });
 
     try {
       // Clear all intervals
@@ -542,9 +587,9 @@ export class SecurityMonitoringService {
       this.configCache.data = null;
       this.complianceScoreCache.score = null;
 
-      console.log('✅ Security monitoring service shut down successfully');
+      logger.info('✅ Security monitoring service shut down successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('❌ Error shutting down security monitoring service:', {
+      logger.error('❌ Error shutting down security monitoring service:', { component: 'SimpleTool' }, {
         error: error instanceof Error ? error.message : 'Unknown error',
         timestamp: new Date().toISOString()
       });
@@ -590,7 +635,7 @@ export class SecurityMonitoringService {
         }
       };
     } catch (error) {
-      console.error('Error generating security report:', {
+      logger.error('Error generating security report:', { component: 'SimpleTool' }, {
         error: error instanceof Error ? error.message : 'Unknown error',
         period: { startDate, endDate },
         timestamp: new Date().toISOString()
@@ -669,15 +714,15 @@ export class SecurityMonitoringService {
     const config = await this.getConfiguration();
     
     if (config.monitoring.real_time_analysis) {
-      console.log('✅ Real-time security analysis enabled');
+      logger.info('✅ Real-time security analysis enabled', { component: 'SimpleTool' });
     }
     
     if (config.monitoring.behavioral_analysis) {
-      console.log('✅ Behavioral analysis enabled');
+      logger.info('✅ Behavioral analysis enabled', { component: 'SimpleTool' });
     }
     
     if (config.monitoring.threat_intelligence) {
-      console.log('✅ Threat intelligence enabled');
+      logger.info('✅ Threat intelligence enabled', { component: 'SimpleTool' });
     }
   }
 
@@ -687,7 +732,7 @@ export class SecurityMonitoringService {
       try {
         await this.runComplianceChecks();
       } catch (error) {
-        console.error('Error in scheduled compliance check:', {
+        logger.error('Error in scheduled compliance check:', { component: 'SimpleTool' }, {
           error: error instanceof Error ? error.message : 'Unknown error',
           timestamp: new Date().toISOString()
         });
@@ -710,7 +755,7 @@ export class SecurityMonitoringService {
           console.log(`📧 Email alert sent: ${alert.title}`);
         }
       } catch (error) {
-        console.error('Error sending email alert:', error);
+        logger.error('Error sending email alert:', { component: 'SimpleTool' }, error);
       }
     });
 
@@ -722,7 +767,7 @@ export class SecurityMonitoringService {
           console.log(`💬 Slack alert sent: ${alert.title}`);
         }
       } catch (error) {
-        console.error('Error sending Slack alert:', error);
+        logger.error('Error sending Slack alert:', { component: 'SimpleTool' }, error);
       }
     });
   }
@@ -1030,7 +1075,7 @@ export class SecurityMonitoringService {
    */
   private logSecurityEventAsync(eventData: any): void {
     securityAuditService.logSecurityEvent(eventData).catch(error => {
-      console.error('Failed to log security event:', {
+      logger.error('Failed to log security event:', { component: 'SimpleTool' }, {
         error: error instanceof Error ? error.message : 'Unknown error',
         eventType: eventData.eventType,
         timestamp: new Date().toISOString()
@@ -1040,7 +1085,7 @@ export class SecurityMonitoringService {
 
   private handleHighRiskRequestAsync(req: Request, threatResult: ThreatDetectionResult, metadata: any): void {
     this.handleHighRiskRequest(req, threatResult).catch(error => {
-      console.error('Failed to handle high-risk request:', {
+      logger.error('Failed to handle high-risk request:', { component: 'SimpleTool' }, {
         error: error instanceof Error ? error.message : 'Unknown error',
         ip: metadata.ip,
         path: metadata.path,
@@ -1051,7 +1096,7 @@ export class SecurityMonitoringService {
 
   private createSecurityAlertAsync(alertData: any): void {
     this.createSecurityAlert(alertData).catch(error => {
-      console.error('Failed to create security alert:', {
+      logger.error('Failed to create security alert:', { component: 'SimpleTool' }, {
         error: error instanceof Error ? error.message : 'Unknown error',
         alertType: alertData.type,
         timestamp: new Date().toISOString()
@@ -1061,7 +1106,7 @@ export class SecurityMonitoringService {
 
   private sendAlertNotificationsAsync(alert: any): void {
     this.sendAlertNotifications(alert).catch(error => {
-      console.error('Failed to send alert notifications:', {
+      logger.error('Failed to send alert notifications:', { component: 'SimpleTool' }, {
         error: error instanceof Error ? error.message : 'Unknown error',
         alertId: alert.id,
         timestamp: new Date().toISOString()
@@ -1200,7 +1245,7 @@ export class SecurityMonitoringService {
         updatedAt: change.updatedAt
       }));
     } catch (error) {
-      console.error('Error fetching configuration changes:', error);
+      logger.error('Error fetching configuration changes:', { component: 'SimpleTool' }, error);
       return [];
     }
   }
@@ -1234,7 +1279,7 @@ export class SecurityMonitoringService {
         details: event.details
       }));
     } catch (error) {
-      console.error('Error fetching user access reviews:', error);
+      logger.error('Error fetching user access reviews:', { component: 'SimpleTool' }, error);
       return [];
     }
   }
@@ -1268,7 +1313,7 @@ export class SecurityMonitoringService {
         }))
       };
     } catch (error) {
-      console.error('Error generating compliance report:', error);
+      logger.error('Error generating compliance report:', { component: 'SimpleTool' }, error);
       return {
         overallScore: 0,
         failingChecks: 0,
@@ -1283,3 +1328,11 @@ export const securityMonitoringService = SecurityMonitoringService.getInstance()
 
 // Export table definitions for migrations
 export { securityConfig, securityAlerts, complianceChecks, securityAuditLogs };
+
+
+
+
+
+
+
+

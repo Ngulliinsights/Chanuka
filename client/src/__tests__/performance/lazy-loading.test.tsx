@@ -48,7 +48,7 @@ class LazyLoadErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Lazy loading error:', error, errorInfo);
+    logger.error('Lazy loading error:', { component: 'SimpleTool' }, error, errorInfo);
   }
 
   render() {
@@ -448,6 +448,7 @@ describe('Lazy Loading and Code Splitting Tests', () => {
         const handleMouseEnter = () => {
           // Trigger preload
           import('./PreloadableComponent').catch(() => {});
+import { logger } from '../utils/logger.js';
         };
 
         return (

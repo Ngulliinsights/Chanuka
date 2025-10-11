@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '../utils/logger.js';
 
 interface DashboardStats {
   totalBills: number;
@@ -58,7 +59,7 @@ function Dashboard() {
       title: 'Track New Bill',
       description: 'Add a bill to your watchlist',
       icon: '➕',
-      action: () => console.log('Track bill'),
+      action: () => logger.info('Track bill', { component: 'SimpleTool' }, ),
     },
     {
       title: 'Submit Analysis',

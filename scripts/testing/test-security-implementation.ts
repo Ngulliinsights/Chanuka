@@ -2,18 +2,19 @@ import { encryptionService } from './services/encryption-service.js';
 import { inputValidationService } from './services/input-validation-service.js';
 import { securityAuditService } from './services/security-audit-service.js';
 import { tlsConfigService } from './services/tls-config-service.js';
+import { logger } from '../utils/logger';
 
 /**
  * Test script to verify security implementation
  */
 async function testSecurityImplementation() {
-  console.log('🔒 Testing Security Implementation...\n');
+  logger.info('🔒 Testing Security Implementation...\n', { component: 'SimpleTool' });
 
   let passedTests = 0;
   let totalTests = 0;
 
   // Test 1: Encryption Service
-  console.log('1. Testing Encryption Service...');
+  logger.info('1. Testing Encryption Service...', { component: 'SimpleTool' });
   totalTests++;
   try {
     const testData = 'sensitive_user_data_12345';
@@ -21,17 +22,17 @@ async function testSecurityImplementation() {
     const decrypted = await encryptionService.decryptData(encrypted);
     
     if (decrypted === testData && encrypted !== testData) {
-      console.log('   ✅ Encryption/Decryption: PASSED');
+      logger.info('   ✅ Encryption/Decryption: PASSED', { component: 'SimpleTool' });
       passedTests++;
     } else {
-      console.log('   ❌ Encryption/Decryption: FAILED');
+      logger.info('   ❌ Encryption/Decryption: FAILED', { component: 'SimpleTool' });
     }
   } catch (error) {
-    console.log('   ❌ Encryption/Decryption: ERROR -', error.message);
+    logger.info('   ❌ Encryption/Decryption: ERROR -', { component: 'SimpleTool' }, error.message);
   }
 
   // Test 2: Password Hashing
-  console.log('2. Testing Password Hashing...');
+  logger.info('2. Testing Password Hashing...', { component: 'SimpleTool' });
   totalTests++;
   try {
     const password = 'TestPassword123!';
@@ -40,17 +41,17 @@ async function testSecurityImplementation() {
     const isInvalid = await encryptionService.verifyPassword('WrongPassword', hash);
     
     if (isValid && !isInvalid && hash !== password) {
-      console.log('   ✅ Password Hashing: PASSED');
+      logger.info('   ✅ Password Hashing: PASSED', { component: 'SimpleTool' });
       passedTests++;
     } else {
-      console.log('   ❌ Password Hashing: FAILED');
+      logger.info('   ❌ Password Hashing: FAILED', { component: 'SimpleTool' });
     }
   } catch (error) {
-    console.log('   ❌ Password Hashing: ERROR -', error.message);
+    logger.info('   ❌ Password Hashing: ERROR -', { component: 'SimpleTool' }, error.message);
   }
 
   // Test 3: Input Validation
-  console.log('3. Testing Input Validation...');
+  logger.info('3. Testing Input Validation...', { component: 'SimpleTool' });
   totalTests++;
   try {
     // Test email validation
@@ -78,21 +79,21 @@ async function testSecurityImplementation() {
     }
 
     if (validEmail.isValid && !invalidEmail.isValid && sqlInjectionDetected && xssDetected) {
-      console.log('   ✅ Input Validation: PASSED');
+      logger.info('   ✅ Input Validation: PASSED', { component: 'SimpleTool' });
       passedTests++;
     } else {
-      console.log('   ❌ Input Validation: FAILED');
-      console.log('     - Valid email:', validEmail.isValid);
-      console.log('     - Invalid email rejected:', !invalidEmail.isValid);
-      console.log('     - SQL injection detected:', sqlInjectionDetected);
-      console.log('     - XSS detected:', xssDetected);
+      logger.info('   ❌ Input Validation: FAILED', { component: 'SimpleTool' });
+      logger.info('     - Valid email:', { component: 'SimpleTool' }, validEmail.isValid);
+      logger.info('     - Invalid email rejected:', { component: 'SimpleTool' }, !invalidEmail.isValid);
+      logger.info('     - SQL injection detected:', { component: 'SimpleTool' }, sqlInjectionDetected);
+      logger.info('     - XSS detected:', { component: 'SimpleTool' }, xssDetected);
     }
   } catch (error) {
-    console.log('   ❌ Input Validation: ERROR -', error.message);
+    logger.info('   ❌ Input Validation: ERROR -', { component: 'SimpleTool' }, error.message);
   }
 
   // Test 4: Token Generation
-  console.log('4. Testing Token Generation...');
+  logger.info('4. Testing Token Generation...', { component: 'SimpleTool' });
   totalTests++;
   try {
     const token = encryptionService.generateSecureToken(32);
@@ -100,17 +101,17 @@ async function testSecurityImplementation() {
     const apiKey = encryptionService.generateAPIKey('test');
     
     if (token.length === 64 && csrfToken.length > 0 && apiKey.startsWith('test_')) {
-      console.log('   ✅ Token Generation: PASSED');
+      logger.info('   ✅ Token Generation: PASSED', { component: 'SimpleTool' });
       passedTests++;
     } else {
-      console.log('   ❌ Token Generation: FAILED');
+      logger.info('   ❌ Token Generation: FAILED', { component: 'SimpleTool' });
     }
   } catch (error) {
-    console.log('   ❌ Token Generation: ERROR -', error.message);
+    logger.info('   ❌ Token Generation: ERROR -', { component: 'SimpleTool' }, error.message);
   }
 
   // Test 5: Security Audit Logging
-  console.log('5. Testing Security Audit Logging...');
+  logger.info('5. Testing Security Audit Logging...', { component: 'SimpleTool' });
   totalTests++;
   try {
     await securityAuditService.logSecurityEvent({
@@ -120,31 +121,31 @@ async function testSecurityImplementation() {
       details: { test: true }
     });
     
-    console.log('   ✅ Security Audit Logging: PASSED');
+    logger.info('   ✅ Security Audit Logging: PASSED', { component: 'SimpleTool' });
     passedTests++;
   } catch (error) {
-    console.log('   ❌ Security Audit Logging: ERROR -', error.message);
+    logger.info('   ❌ Security Audit Logging: ERROR -', { component: 'SimpleTool' }, error.message);
   }
 
   // Test 6: TLS Configuration
-  console.log('6. Testing TLS Configuration...');
+  logger.info('6. Testing TLS Configuration...', { component: 'SimpleTool' });
   totalTests++;
   try {
     const tlsOptions = tlsConfigService.getDevelopmentTLSConfig();
     const cipherSuites = tlsConfigService.getCipherSuites('high');
     
     if (tlsOptions.key && tlsOptions.cert && cipherSuites.includes('TLS_AES_256_GCM_SHA384')) {
-      console.log('   ✅ TLS Configuration: PASSED');
+      logger.info('   ✅ TLS Configuration: PASSED', { component: 'SimpleTool' });
       passedTests++;
     } else {
-      console.log('   ❌ TLS Configuration: FAILED');
+      logger.info('   ❌ TLS Configuration: FAILED', { component: 'SimpleTool' });
     }
   } catch (error) {
-    console.log('   ❌ TLS Configuration: ERROR -', error.message);
+    logger.info('   ❌ TLS Configuration: ERROR -', { component: 'SimpleTool' }, error.message);
   }
 
   // Test 7: PII Encryption
-  console.log('7. Testing PII Encryption...');
+  logger.info('7. Testing PII Encryption...', { component: 'SimpleTool' });
   totalTests++;
   try {
     const piiData = {
@@ -164,17 +165,17 @@ async function testSecurityImplementation() {
       decrypted.email === piiData.email && // Decrypted email should match original
       decrypted.publicInfo === piiData.publicInfo
     ) {
-      console.log('   ✅ PII Encryption: PASSED');
+      logger.info('   ✅ PII Encryption: PASSED', { component: 'SimpleTool' });
       passedTests++;
     } else {
-      console.log('   ❌ PII Encryption: FAILED');
+      logger.info('   ❌ PII Encryption: FAILED', { component: 'SimpleTool' });
     }
   } catch (error) {
-    console.log('   ❌ PII Encryption: ERROR -', error.message);
+    logger.info('   ❌ PII Encryption: ERROR -', { component: 'SimpleTool' }, error.message);
   }
 
   // Test 8: Secure Schema Validation
-  console.log('8. Testing Secure Schema Validation...');
+  logger.info('8. Testing Secure Schema Validation...', { component: 'SimpleTool' });
   totalTests++;
   try {
     const schema = inputValidationService.createSecureSchema();
@@ -203,39 +204,39 @@ async function testSecurityImplementation() {
     }
 
     if (validResult.success && !invalidResult.success) {
-      console.log('   ✅ Secure Schema Validation: PASSED');
+      logger.info('   ✅ Secure Schema Validation: PASSED', { component: 'SimpleTool' });
       passedTests++;
     } else {
-      console.log('   ❌ Secure Schema Validation: FAILED');
+      logger.info('   ❌ Secure Schema Validation: FAILED', { component: 'SimpleTool' });
     }
   } catch (error) {
-    console.log('   ❌ Secure Schema Validation: ERROR -', error.message);
+    logger.info('   ❌ Secure Schema Validation: ERROR -', { component: 'SimpleTool' }, error.message);
   }
 
   // Summary
-  console.log('\n' + '='.repeat(50));
+  logger.info('\n', { component: 'SimpleTool' }, + '='.repeat(50));
   console.log(`Security Implementation Test Results:`);
   console.log(`Passed: ${passedTests}/${totalTests} tests`);
   console.log(`Success Rate: ${Math.round((passedTests / totalTests) * 100)}%`);
   
   if (passedTests === totalTests) {
-    console.log('🎉 All security tests PASSED!');
-    console.log('✅ Security implementation is working correctly.');
+    logger.info('🎉 All security tests PASSED!', { component: 'SimpleTool' });
+    logger.info('✅ Security implementation is working correctly.', { component: 'SimpleTool' });
   } else {
-    console.log('⚠️  Some security tests FAILED!');
-    console.log('🔧 Please review the failed tests and fix any issues.');
+    logger.info('⚠️  Some security tests FAILED!', { component: 'SimpleTool' });
+    logger.info('🔧 Please review the failed tests and fix any issues.', { component: 'SimpleTool' });
   }
 
   // Security recommendations
-  console.log('\n📋 Security Recommendations:');
-  console.log('1. Set strong ENCRYPTION_KEY and KEY_DERIVATION_SALT in production');
-  console.log('2. Use proper TLS certificates in production');
-  console.log('3. Configure CORS origins for your domain');
-  console.log('4. Set up proper database connection encryption');
-  console.log('5. Enable security monitoring and alerting');
-  console.log('6. Regularly update dependencies for security patches');
-  console.log('7. Implement proper backup and recovery procedures');
-  console.log('8. Set up intrusion detection and prevention systems');
+  logger.info('\n📋 Security Recommendations:', { component: 'SimpleTool' });
+  logger.info('1. Set strong ENCRYPTION_KEY and KEY_DERIVATION_SALT in production', { component: 'SimpleTool' });
+  logger.info('2. Use proper TLS certificates in production', { component: 'SimpleTool' });
+  logger.info('3. Configure CORS origins for your domain', { component: 'SimpleTool' });
+  logger.info('4. Set up proper database connection encryption', { component: 'SimpleTool' });
+  logger.info('5. Enable security monitoring and alerting', { component: 'SimpleTool' });
+  logger.info('6. Regularly update dependencies for security patches', { component: 'SimpleTool' });
+  logger.info('7. Implement proper backup and recovery procedures', { component: 'SimpleTool' });
+  logger.info('8. Set up intrusion detection and prevention systems', { component: 'SimpleTool' });
 
   return passedTests === totalTests;
 }
@@ -247,9 +248,15 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       process.exit(success ? 0 : 1);
     })
     .catch((error) => {
-      console.error('Test execution failed:', error);
+      logger.error('Test execution failed:', { component: 'SimpleTool' }, error);
       process.exit(1);
     });
 }
 
 export { testSecurityImplementation };
+
+
+
+
+
+

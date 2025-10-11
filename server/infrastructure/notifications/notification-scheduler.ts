@@ -3,6 +3,7 @@ import { eq, and, lt, gte, sql } from 'drizzle-orm';
 import * as cron from 'node-cron';
 import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/user-preferences.js';
 import { enhancedNotificationService, type EnhancedNotificationData } from './enhanced-notification.js';
+import { logger } from '../utils/logger';
 
 export interface ScheduledDigest {
   userId: string;
@@ -51,14 +52,14 @@ export class NotificationSchedulerService {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized || this.initializationLock) {
-      console.log('Notification scheduler already initialized or initialization in progress');
+      logger.info('Notification scheduler already initialized or initialization in progress', { component: 'SimpleTool' });
       return;
     }
 
     this.initializationLock = true;
     
     try {
-      console.log('Initializing notification scheduler...');
+      logger.info('Initializing notification scheduler...', { component: 'SimpleTool' });
 
     // Schedule digest notifications
     await this.scheduleDigestNotifications();
@@ -70,7 +71,7 @@ export class NotificationSchedulerService {
     this.scheduleEngagementAnalysis();
 
       this.isInitialized = true;
-      console.log('Notification scheduler initialized successfully');
+      logger.info('Notification scheduler initialized successfully', { component: 'SimpleTool' });
     } finally {
       this.initializationLock = false;
     }
@@ -90,7 +91,7 @@ export class NotificationSchedulerService {
 
       console.log(`Scheduled digest notifications for ${usersWithDigests.length} users`);
     } catch (error) {
-      console.error('Error scheduling digest notifications:', error);
+      logger.error('Error scheduling digest notifications:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -238,7 +239,7 @@ export class NotificationSchedulerService {
 
       return billUpdates.filter(bill => bill.updates.length > 0);
     } catch (error) {
-      console.error('Error getting bill updates for user:', error);
+      logger.error('Error getting bill updates for user:', { component: 'SimpleTool' }, error);
       return [];
     }
   }
@@ -271,7 +272,7 @@ export class NotificationSchedulerService {
         newBillsTracked: Number(result?.billsTracked) || 0
       };
     } catch (error) {
-      console.error('Error getting engagement summary:', error);
+      logger.error('Error getting engagement summary:', { component: 'SimpleTool' }, error);
       return {
         totalViews: 0,
         totalComments: 0,
@@ -313,7 +314,7 @@ export class NotificationSchedulerService {
         category: bill.category || 'Uncategorized'
       }));
     } catch (error) {
-      console.error('Error getting trending bills:', error);
+      logger.error('Error getting trending bills:', { component: 'SimpleTool' }, error);
       return [];
     }
   }
@@ -346,7 +347,7 @@ export class NotificationSchedulerService {
         deadline: bill.lastActionDate ? new Date(bill.lastActionDate) : undefined
       }));
     } catch (error) {
-      console.error('Error getting action items:', error);
+      logger.error('Error getting action items:', { component: 'SimpleTool' }, error);
       return [];
     }
   }
@@ -359,9 +360,9 @@ export class NotificationSchedulerService {
     const cleanupJob = cron.schedule('0 2 * * *', async () => {
       try {
         await this.cleanupOldNotifications();
-        console.log('Completed notification cleanup');
+        logger.info('Completed notification cleanup', { component: 'SimpleTool' });
       } catch (error) {
-        console.error('Error during notification cleanup:', error);
+        logger.error('Error during notification cleanup:', { component: 'SimpleTool' }, error);
       }
     });
 
@@ -376,9 +377,9 @@ export class NotificationSchedulerService {
     const analysisJob = cron.schedule('0 3 * * 0', async () => {
       try {
         await this.analyzeEngagementPatterns();
-        console.log('Completed engagement analysis');
+        logger.info('Completed engagement analysis', { component: 'SimpleTool' });
       } catch (error) {
-        console.error('Error during engagement analysis:', error);
+        logger.error('Error during engagement analysis:', { component: 'SimpleTool' }, error);
       }
     });
 
@@ -572,12 +573,12 @@ export class NotificationSchedulerService {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
     // This would typically delete old notifications
-    console.log('Cleaning up notifications older than 30 days');
+    logger.info('Cleaning up notifications older than 30 days', { component: 'SimpleTool' });
   }
 
   private async analyzeEngagementPatterns(): Promise<void> {
     // Analyze user engagement patterns to optimize notification timing
-    console.log('Analyzing engagement patterns for notification optimization');
+    logger.info('Analyzing engagement patterns for notification optimization', { component: 'SimpleTool' });
   }
 
   /**
@@ -609,14 +610,20 @@ export class NotificationSchedulerService {
       try {
         job.destroy();
       } catch (error) {
-        console.error('Error destroying scheduled job:', error);
+        logger.error('Error destroying scheduled job:', { component: 'SimpleTool' }, error);
       }
     });
     this.scheduledJobs.clear();
     this.jobUpdateLock.clear();
     this.isInitialized = false;
-    console.log('Notification scheduler cleanup completed');
+    logger.info('Notification scheduler cleanup completed', { component: 'SimpleTool' });
   }
 }
 
 export const notificationSchedulerService = new NotificationSchedulerService();
+
+
+
+
+
+

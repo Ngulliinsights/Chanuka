@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
+import { logger } from '../utils/logger.js';
 
 interface User {
   id: string;
@@ -125,7 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
     } catch (error) {
-      console.error('Token validation failed:', error);
+      logger.error('Token validation failed:', { component: 'SimpleTool' }, error);
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       if (mountedRef.current) {
@@ -165,7 +166,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: result.error || 'Login failed' };
       }
     } catch (error) {
-      console.error('Login failed:', error);
+      logger.error('Login failed:', { component: 'SimpleTool' }, error);
       return { success: false, error: 'Network error. Please try again.' };
     } finally {
       if (mountedRef.current) {
@@ -203,7 +204,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: result.error || 'Registration failed' };
       }
     } catch (error) {
-      console.error('Registration failed:', error);
+      logger.error('Registration failed:', { component: 'SimpleTool' }, error);
       return { success: false, error: 'Network error. Please try again.' };
     } finally {
       if (mountedRef.current) {
@@ -224,7 +225,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
       }
     } catch (error) {
-      console.error('Logout request failed:', error);
+      logger.error('Logout request failed:', { component: 'SimpleTool' }, error);
     } finally {
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
@@ -267,7 +268,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: result.error || 'Token refresh failed' };
       }
     } catch (error) {
-      console.error('Token refresh failed:', error);
+      logger.error('Token refresh failed:', { component: 'SimpleTool' }, error);
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       if (mountedRef.current) {
@@ -298,7 +299,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: result.error || 'Email verification failed' };
       }
     } catch (error) {
-      console.error('Email verification failed:', error);
+      logger.error('Email verification failed:', { component: 'SimpleTool' }, error);
       return { success: false, error: 'Network error. Please try again.' };
     }
   };
@@ -321,7 +322,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: result.error || 'Password reset request failed' };
       }
     } catch (error) {
-      console.error('Password reset request failed:', error);
+      logger.error('Password reset request failed:', { component: 'SimpleTool' }, error);
       return { success: false, error: 'Network error. Please try again.' };
     }
   };
@@ -344,7 +345,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: result.error || 'Password reset failed' };
       }
     } catch (error) {
-      console.error('Password reset failed:', error);
+      logger.error('Password reset failed:', { component: 'SimpleTool' }, error);
       return { success: false, error: 'Network error. Please try again.' };
     }
   };

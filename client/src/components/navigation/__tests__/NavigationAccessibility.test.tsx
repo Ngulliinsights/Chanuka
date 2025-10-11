@@ -8,6 +8,7 @@ import MobileNavigation from '../MobileNavigation';
 import AppLayout from '../../layout/app-layout';
 import { ResponsiveNavigationProvider } from '@/contexts/ResponsiveNavigationContext';
 import { NavigationProvider } from '@/contexts/NavigationContext';
+import { logger } from '../utils/logger.js';
 
 // Mock hooks
 jest.mock('@/hooks/use-auth', () => ({

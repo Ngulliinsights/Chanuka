@@ -1,6 +1,7 @@
 import { database as db } from '../../../shared/database/connection.js';
 import { sql } from 'drizzle-orm';
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
+import { logger } from '../utils/logger';
 
 export interface DatabaseIndex {
   name: string;
@@ -284,7 +285,7 @@ class DatabaseOptimizationService {
       }
     ];
 
-    console.log('[DB Optimization] Creating optimized database indexes...');
+    logger.info('[DB Optimization] Creating optimized database indexes...', { component: 'SimpleTool' });
 
     for (const index of indexes) {
       try {
@@ -298,7 +299,7 @@ class DatabaseOptimizationService {
       }
     }
 
-    console.log('[DB Optimization] Database indexing completed');
+    logger.info('[DB Optimization] Database indexing completed', { component: 'SimpleTool' });
   }
 
   /**
@@ -493,7 +494,7 @@ class DatabaseOptimizationService {
         }))
       };
     } catch (error) {
-      console.error('[DB Optimization] Error getting database metrics:', error);
+      logger.error('[DB Optimization] Error getting database metrics:', { component: 'SimpleTool' }, error);
       return {
         connectionPool: { totalConnections: 0, activeConnections: 0, idleConnections: 0, waitingConnections: 0 },
         queryPerformance: { averageQueryTime: 0, slowQueries: [] },
@@ -577,7 +578,7 @@ class DatabaseOptimizationService {
       'notifications', 'sponsors', 'bill_sponsorships'
     ];
 
-    console.log('[DB Optimization] Starting table optimization...');
+    logger.info('[DB Optimization] Starting table optimization...', { component: 'SimpleTool' });
 
     for (const table of tables) {
       try {
@@ -589,7 +590,7 @@ class DatabaseOptimizationService {
       }
     }
 
-    console.log('[DB Optimization] Table optimization completed');
+    logger.info('[DB Optimization] Table optimization completed', { component: 'SimpleTool' });
   }
 
   /**
@@ -621,7 +622,7 @@ class DatabaseOptimizationService {
 
       console.log(`[DB Optimization] Cleaned up: ${expiredSessions.length} sessions, ${expiredTokens.length} tokens, ${oldNotifications.length} notifications`);
     } catch (error) {
-      console.error('[DB Optimization] Error during cleanup:', error);
+      logger.error('[DB Optimization] Error during cleanup:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -660,20 +661,26 @@ class DatabaseOptimizationService {
     // Run table optimization daily
     setInterval(() => {
       this.optimizeTables().catch(error => {
-        console.error('[DB Optimization] Periodic table optimization failed:', error);
+        logger.error('[DB Optimization] Periodic table optimization failed:', { component: 'SimpleTool' }, error);
       });
     }, 86400000); // 24 hours
 
     // Clean up expired data every hour
     setInterval(() => {
       this.cleanupExpiredData().catch(error => {
-        console.error('[DB Optimization] Periodic cleanup failed:', error);
+        logger.error('[DB Optimization] Periodic cleanup failed:', { component: 'SimpleTool' }, error);
       });
     }, 3600000); // 1 hour
 
-    console.log('[DB Optimization] Started periodic optimization tasks');
+    logger.info('[DB Optimization] Started periodic optimization tasks', { component: 'SimpleTool' });
   }
 }
 
 // Export singleton instance
 export const databaseOptimizationService = new DatabaseOptimizationService();
+
+
+
+
+
+

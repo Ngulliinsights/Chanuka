@@ -5,8 +5,9 @@ import * as jwt from 'jsonwebtoken';
 import { database as db } from '../../shared/database/connection.js';
 import { users } from '../../shared/schema.js';
 import { eq } from 'drizzle-orm';
+import { logger } from '../utils/logger';
 
-// Enhanced type definitions
+// Enhanced type definitions with stricter typing
 interface AuthenticatedWebSocket extends WebSocket {
   userId?: string;
   isAlive?: boolean;
@@ -14,11 +15,12 @@ interface AuthenticatedWebSocket extends WebSocket {
   subscriptions?: Set<number>;
   messageBuffer?: any[];
   flushTimer?: NodeJS.Timeout;
+  connectionId?: string; // Added for better tracking
 }
 
 interface WebSocketMessage {
   type: 'subscribe' | 'unsubscribe' | 'ping' | 'pong' | 'auth' |
-  'get_preferences' | 'update_preferences' | 'batch_subscribe' | 'batch_unsubscribe';
+    'get_preferences' | 'update_preferences' | 'batch_subscribe' | 'batch_unsubscribe';
   data?: {
     billId?: number;
     billIds?: number[];
@@ -31,39 +33,50 @@ interface WebSocketMessage {
     };
   };
   messageId?: string;
+  timestamp?: number;
 }
 
-// Configuration with validated constraints
+// Optimized configuration with better defaults
 const CONFIG = {
   HEARTBEAT_INTERVAL: 30000,
   HEALTH_CHECK_INTERVAL: 60000,
   MAX_QUEUE_SIZE: 1000,
   STALE_CONNECTION_THRESHOLD: 60000,
   MESSAGE_BATCH_SIZE: 10,
-  MESSAGE_BATCH_DELAY: 100,
+  MESSAGE_BATCH_DELAY: 50, // Reduced from 100ms for faster response
   MAX_RECONNECT_ATTEMPTS: 3,
   RECONNECT_DELAY: 1000,
   CONNECTION_POOL_SIZE: 10000,
   COMPRESSION_THRESHOLD: 1024,
   MAX_CONNECTIONS_PER_USER: 5,
-  DEDUPE_CACHE_SIZE: 10000, // Maximum entries in dedupe cache
+  DEDUPE_CACHE_SIZE: 5000, // Reduced from 10000 to save memory
   SHUTDOWN_GRACE_PERIOD: 5000,
-  // Memory management settings
-  MEMORY_CLEANUP_INTERVAL: 300000, // 5 minutes
-  PERFORMANCE_HISTORY_MAX_AGE: 3600000, // 1 hour
-  DEDUPE_CACHE_CLEANUP_AGE: 1800000, // 30 minutes
-  HIGH_MEMORY_THRESHOLD: 85, // Trigger aggressive cleanup at 85%
-  CRITICAL_MEMORY_THRESHOLD: 95, // Trigger emergency cleanup at 95%
+  MEMORY_CLEANUP_INTERVAL: 180000, // 3 minutes instead of 5
+  PERFORMANCE_HISTORY_MAX_SIZE: 100, // Fixed size instead of age-based
+  DEDUPE_CACHE_CLEANUP_AGE: 1800000,
+  HIGH_MEMORY_THRESHOLD: 85,
+  CRITICAL_MEMORY_THRESHOLD: 95,
+  MAX_LATENCY_SAMPLES: 200, // Cap for latency measurements
 } as const;
 
-// Priority Queue implementation for efficient operation ordering
+// Optimized Priority Queue with better memory efficiency
 class PriorityQueue<T> {
   private items: Array<{ priority: number; item: T; timestamp: number }> = [];
+  private maxSize: number;
 
-  enqueue(item: T, priority: number, timestamp: number) {
+  constructor(maxSize: number = CONFIG.MAX_QUEUE_SIZE) {
+    this.maxSize = maxSize;
+  }
+
+  enqueue(item: T, priority: number, timestamp: number): boolean {
+    // Reject if at capacity to prevent unbounded growth
+    if (this.items.length >= this.maxSize) {
+      return false;
+    }
+
     const entry = { priority, item, timestamp };
 
-    // Binary search for insertion point
+    // Binary search for insertion point - more efficient than linear search
     let low = 0;
     let high = this.items.length;
 
@@ -77,10 +90,15 @@ class PriorityQueue<T> {
     }
 
     this.items.splice(low, 0, entry);
+    return true;
   }
 
   dequeue() {
     return this.items.shift();
+  }
+
+  peek() {
+    return this.items[0];
   }
 
   get length() {
@@ -88,40 +106,52 @@ class PriorityQueue<T> {
   }
 
   clear() {
-    this.items = [];
+    this.items.length = 0; // More efficient than creating new array
+  }
+
+  // Remove stale items in bulk
+  removeStaleItems(maxAge: number): number {
+    const now = Date.now();
+    const beforeLength = this.items.length;
+    this.items = this.items.filter(item => now - item.timestamp < maxAge);
+    return beforeLength - this.items.length;
   }
 }
 
-// LRU Cache for message deduplication
+// More memory-efficient LRU Cache implementation
 class LRUCache<K, V> {
   private cache = new Map<K, V>();
   private readonly maxSize: number;
+  private accessOrder: K[] = []; // Track access order separately
 
   constructor(maxSize: number) {
     this.maxSize = maxSize;
   }
 
-  set(key: K, value: V) {
-    // Remove if exists (to update order)
+  set(key: K, value: V): void {
+    // Update existing entry
     if (this.cache.has(key)) {
-      this.cache.delete(key);
+      this.cache.set(key, value);
+      this.updateAccessOrder(key);
+      return;
     }
 
-    // Remove oldest if at capacity
+    // Evict oldest if at capacity
     if (this.cache.size >= this.maxSize) {
-      const firstKey = this.cache.keys().next().value!;
-      this.cache.delete(firstKey);
+      const oldestKey = this.accessOrder.shift();
+      if (oldestKey !== undefined) {
+        this.cache.delete(oldestKey);
+      }
     }
 
     this.cache.set(key, value);
+    this.accessOrder.push(key);
   }
 
   get(key: K): V | undefined {
     const value = this.cache.get(key);
     if (value !== undefined) {
-      // Move to end (most recent)
-      this.cache.delete(key);
-      this.cache.set(key, value);
+      this.updateAccessOrder(key);
     }
     return value;
   }
@@ -130,12 +160,85 @@ class LRUCache<K, V> {
     return this.cache.has(key);
   }
 
-  clear() {
+  clear(): void {
     this.cache.clear();
+    this.accessOrder.length = 0;
   }
 
-  get size() {
+  get size(): number {
     return this.cache.size;
+  }
+
+  // Helper to maintain access order efficiently
+  private updateAccessOrder(key: K): void {
+    const index = this.accessOrder.indexOf(key);
+    if (index > -1) {
+      this.accessOrder.splice(index, 1);
+    }
+    this.accessOrder.push(key);
+  }
+
+  // Batch cleanup method for better performance
+  removeOldEntries(maxAge: number, timestampGetter: (value: V) => number): number {
+    const now = Date.now();
+    let removed = 0;
+    const keysToRemove: K[] = [];
+
+    for (const [key, value] of this.cache.entries()) {
+      if (now - timestampGetter(value) > maxAge) {
+        keysToRemove.push(key);
+      }
+    }
+
+    for (const key of keysToRemove) {
+      this.cache.delete(key);
+      const index = this.accessOrder.indexOf(key);
+      if (index > -1) {
+        this.accessOrder.splice(index, 1);
+      }
+      removed++;
+    }
+
+    return removed;
+  }
+}
+
+// Circular buffer for latency measurements (more memory efficient)
+class CircularBuffer {
+  private buffer: number[];
+  private index = 0;
+  private size = 0;
+  private readonly capacity: number;
+
+  constructor(capacity: number) {
+    this.capacity = capacity;
+    this.buffer = new Array(capacity);
+  }
+
+  push(value: number): void {
+    this.buffer[this.index] = value;
+    this.index = (this.index + 1) % this.capacity;
+    if (this.size < this.capacity) {
+      this.size++;
+    }
+  }
+
+  getAverage(): number {
+    if (this.size === 0) return 0;
+    let sum = 0;
+    for (let i = 0; i < this.size; i++) {
+      sum += this.buffer[i];
+    }
+    return sum / this.size;
+  }
+
+  getSize(): number {
+    return this.size;
+  }
+
+  clear(): void {
+    this.index = 0;
+    this.size = 0;
   }
 }
 
@@ -145,17 +248,17 @@ export class WebSocketService {
   private billSubscriptions: Map<number, Set<string>> = new Map();
   private userSubscriptionIndex: Map<string, Set<number>> = new Map();
 
-  // Optimized with LRU cache for deduplication
+  // Optimized deduplication with timestamp tracking
   private messageDedupeCache: LRUCache<string, number>;
   private readonly DEDUPE_WINDOW = 5000;
 
-  // Connection pool with better tracking
+  // Simplified connection tracking
   private connectionPool: Map<string, {
     connections: AuthenticatedWebSocket[];
     lastActivity: number;
   }> = new Map();
 
-  // Enhanced statistics
+  // More memory-efficient statistics tracking
   private connectionStats = {
     totalConnections: 0,
     activeConnections: 0,
@@ -165,12 +268,13 @@ export class WebSocketService {
     duplicateMessages: 0,
     queueOverflows: 0,
     reconnections: 0,
-    startTime: new Date(),
-    lastActivity: new Date(),
+    startTime: Date.now(),
+    lastActivity: Date.now(),
     peakConnections: 0,
-    averageLatency: 0,
-    latencyMeasurements: [] as number[],
   };
+
+  // Use circular buffer for latency measurements instead of array
+  private latencyBuffer: CircularBuffer;
 
   private heartbeatInterval: NodeJS.Timeout | null = null;
   private healthCheckInterval: NodeJS.Timeout | null = null;
@@ -179,17 +283,22 @@ export class WebSocketService {
   private initializationLock = false;
   private isShuttingDown = false;
 
-  // Priority queue for better performance
-  private operationQueue = new PriorityQueue<() => Promise<void>>();
+  // Optimized operation queue
+  private operationQueue: PriorityQueue<() => Promise<void>>;
   private processingQueue = false;
+
+  // Connection ID generator for better tracking
+  private nextConnectionId = 0;
 
   constructor() {
     this.messageDedupeCache = new LRUCache(CONFIG.DEDUPE_CACHE_SIZE);
+    this.latencyBuffer = new CircularBuffer(CONFIG.MAX_LATENCY_SAMPLES);
+    this.operationQueue = new PriorityQueue(CONFIG.MAX_QUEUE_SIZE);
   }
 
-  initialize(server: Server) {
+  initialize(server: Server): void {
     if (this.isInitialized || this.initializationLock) {
-      console.log('WebSocket service already initialized or initialization in progress');
+      logger.info('WebSocket service already initialized or initialization in progress', { component: 'WebSocketService' });
       return;
     }
 
@@ -216,51 +325,16 @@ export class WebSocketService {
         },
         maxPayload: 100 * 1024,
         clientTracking: true,
-        verifyClient: async (info: { origin: string; secure: boolean; req: IncomingMessage }) => {
-          const url = new URL(info.req.url!, `http://${info.req.headers.host}`);
-          const token = url.searchParams.get('token') ||
-            info.req.headers.authorization?.replace('Bearer ', '');
-
-          if (!token) {
-            return false;
-          }
-
-          try {
-            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
-
-            const user = await db
-              .select({ id: users.id })
-              .from(users)
-              .where(eq(users.id, decoded.userId))
-              .limit(1);
-
-            if (user.length === 0) {
-              return false;
-            }
-
-            // Enforce per-user connection limit
-            const userConnections = this.connectionPool.get(decoded.userId);
-            if (userConnections && userConnections.connections.length >= CONFIG.MAX_CONNECTIONS_PER_USER) {
-              console.log(`Connection limit exceeded for user ${decoded.userId}`);
-              return false;
-            }
-
-            (info.req as any).userId = decoded.userId;
-            return true;
-          } catch (error) {
-            return false;
-          }
-        }
+        verifyClient: this.verifyClient.bind(this)
       });
 
       this.wss.on('connection', this.handleConnection.bind(this));
       this.setupIntervals();
 
-      // Mark as initialized only after successful setup
       this.isInitialized = true;
-      console.log('WebSocket server initialized on /ws');
+      logger.info('WebSocket server initialized on /ws', { component: 'WebSocketService' });
     } catch (error) {
-      console.error('Failed to initialize WebSocket service:', error);
+      logger.error('Failed to initialize WebSocket service:', { component: 'WebSocketService' }, error);
       this.isInitialized = false;
       throw error;
     } finally {
@@ -268,143 +342,205 @@ export class WebSocketService {
     }
   }
 
-  private handleConnection(ws: AuthenticatedWebSocket, request: any) {
+  // Extracted verifyClient for better testability and separation of concerns
+  private async verifyClient(info: { origin: string; secure: boolean; req: IncomingMessage }): Promise<boolean> {
+    const url = new URL(info.req.url!, `http://${info.req.headers.host}`);
+    const token = url.searchParams.get('token') ||
+      info.req.headers.authorization?.replace('Bearer ', '');
+
+    if (!token) {
+      return false;
+    }
+
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as any;
+
+      const user = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.id, decoded.userId))
+        .limit(1);
+
+      if (user.length === 0) {
+        return false;
+      }
+
+      // Enforce per-user connection limit
+      const userConnections = this.connectionPool.get(decoded.userId);
+      if (userConnections && userConnections.connections.length >= CONFIG.MAX_CONNECTIONS_PER_USER) {
+        logger.warn(`Connection limit exceeded for user ${decoded.userId}`, { component: 'WebSocketService' });
+        return false;
+      }
+
+      (info.req as any).userId = decoded.userId;
+      return true;
+    } catch (error) {
+      logger.warn('Token verification failed', { component: 'WebSocketService' }, error);
+      return false;
+    }
+  }
+
+  private handleConnection(ws: AuthenticatedWebSocket, request: any): void {
     const userId = request.userId;
+    const connectionId = `${userId}-${this.nextConnectionId++}`;
+    
     ws.userId = userId;
+    ws.connectionId = connectionId;
     ws.isAlive = true;
     ws.lastPing = Date.now();
     ws.subscriptions = new Set();
     ws.messageBuffer = [];
 
-    this.queueOperation(async () => {
-      this.connectionStats.totalConnections++;
-      this.connectionStats.activeConnections++;
-      this.connectionStats.peakConnections = Math.max(
-        this.connectionStats.peakConnections,
-        this.connectionStats.activeConnections
-      );
-      this.connectionStats.lastActivity = new Date();
+    // Use synchronous operation for connection setup to avoid race conditions
+    this.connectionStats.totalConnections++;
+    this.connectionStats.activeConnections++;
+    this.connectionStats.peakConnections = Math.max(
+      this.connectionStats.peakConnections,
+      this.connectionStats.activeConnections
+    );
+    this.connectionStats.lastActivity = Date.now();
 
-      if (!this.connectionPool.has(userId)) {
-        this.connectionPool.set(userId, {
-          connections: [],
-          lastActivity: Date.now()
+    // Initialize or update connection pool
+    if (!this.connectionPool.has(userId)) {
+      this.connectionPool.set(userId, {
+        connections: [],
+        lastActivity: Date.now()
+      });
+    }
+    const pool = this.connectionPool.get(userId)!;
+    pool.connections.push(ws);
+    pool.lastActivity = Date.now();
+
+    // Initialize clients set
+    if (!this.clients.has(userId)) {
+      this.clients.set(userId, new Set());
+    }
+    this.clients.get(userId)!.add(ws);
+
+    logger.info(`New WebSocket connection ${connectionId} for user: ${userId}`, {
+      component: 'WebSocketService',
+      activeConnections: this.connectionStats.activeConnections
+    });
+
+    // Send connection confirmation
+    this.sendOptimized(ws, {
+      type: 'connected',
+      message: 'WebSocket connection established',
+      data: {
+        userId,
+        connectionId,
+        timestamp: new Date().toISOString(),
+        config: {
+          heartbeatInterval: CONFIG.HEARTBEAT_INTERVAL,
+          maxMessageSize: 100 * 1024,
+          supportsBatching: true
+        }
+      }
+    });
+
+    // Setup event handlers
+    ws.on('message', (data: Buffer) => this.handleIncomingMessage(ws, data));
+    ws.on('close', (code, reason) => this.handleClose(ws, code, reason));
+    ws.on('error', (error) => this.handleError(ws, error));
+    ws.on('pong', () => this.handlePong(ws));
+  }
+
+  private handleIncomingMessage(ws: AuthenticatedWebSocket, data: Buffer): void {
+    if (this.isShuttingDown) return;
+
+    const receiveTime = Date.now();
+    this.queueOperation(async () => {
+      this.connectionStats.totalMessages++;
+      this.connectionStats.lastActivity = Date.now();
+
+      let message: WebSocketMessage | null = null;
+      try {
+        message = JSON.parse(data.toString());
+
+        // Track latency if timestamp provided
+        if (message?.timestamp) {
+          const latency = receiveTime - message.timestamp;
+          this.latencyBuffer.push(latency);
+        }
+
+        if (message && typeof message === 'object' && 'type' in message) {
+          await this.handleMessage(ws, message);
+        } else {
+          throw new Error('Invalid message structure');
+        }
+      } catch (error) {
+        logger.error('Error handling WebSocket message:', { component: 'WebSocketService' }, error);
+        this.sendOptimized(ws, {
+          type: 'error',
+          message: 'Invalid message format',
+          messageId: message?.messageId
         });
       }
-      const pool = this.connectionPool.get(userId)!;
-      pool.connections.push(ws);
-      pool.lastActivity = Date.now();
+    }, 2);
+  }
 
-      if (!this.clients.has(userId)) {
-        this.clients.set(userId, new Set());
-      }
-      this.clients.get(userId)!.add(ws);
-
-      console.log(`New WebSocket connection for user: ${userId} (Active: ${this.connectionStats.activeConnections})`);
-
-      this.sendOptimized(ws, {
-        type: 'connected',
-        message: 'WebSocket connection established',
-        data: {
-          userId,
-          timestamp: new Date().toISOString(),
-          config: {
-            heartbeatInterval: CONFIG.HEARTBEAT_INTERVAL,
-            maxMessageSize: 100 * 1024,
-            supportsBatching: true
-          }
-        }
+  private handleClose(ws: AuthenticatedWebSocket, code: number, reason: Buffer): void {
+    this.queueOperation(async () => {
+      this.connectionStats.activeConnections--;
+      logger.info(`WebSocket closed ${ws.connectionId}`, {
+        component: 'WebSocketService',
+        code,
+        activeConnections: this.connectionStats.activeConnections
       });
+      this.handleDisconnection(ws);
     }, 1);
+  }
 
-    ws.on('message', (data: Buffer) => {
-      if (this.isShuttingDown) return;
+  private handleError(ws: AuthenticatedWebSocket, error: Error): void {
+    logger.error(`WebSocket error for ${ws.connectionId}:`, { component: 'WebSocketService' }, error);
+    this.queueOperation(async () => {
+      this.handleDisconnection(ws);
+    }, 1);
+  }
 
-      const receiveTime = Date.now();
-      this.queueOperation(async () => {
-        this.connectionStats.totalMessages++;
-        this.connectionStats.lastActivity = new Date();
-
-        let message: WebSocketMessage | null = null;
-        try {
-          message = JSON.parse(data.toString());
-
-          if ((message as any).timestamp) {
-            const latency = receiveTime - (message as any).timestamp;
-            this.updateLatencyStats(latency);
-          }
-
-          if (message && typeof message === 'object' && 'type' in message) {
-            await this.handleMessage(ws, message);
-          } else {
-            throw new Error('Invalid message structure');
-          }
-        } catch (error) {
-          console.error('Error handling WebSocket message:', error);
-          this.sendOptimized(ws, {
-            type: 'error',
-            message: 'Invalid message format',
-            messageId: message?.messageId
-          });
-        }
-      }, 2);
-    });
-
-    ws.on('close', (code, reason) => {
-      this.queueOperation(async () => {
-        this.connectionStats.activeConnections--;
-        console.log(`WebSocket closed for user: ${userId} (Code: ${code}, Active: ${this.connectionStats.activeConnections})`);
-        this.handleDisconnection(ws);
-      }, 1);
-    });
-
-    ws.on('error', (error) => {
-      console.error(`WebSocket error for user ${ws.userId}:`, error);
-      this.queueOperation(async () => {
-        this.handleDisconnection(ws);
-      }, 1);
-    });
-
-    ws.on('pong', () => {
-      ws.isAlive = true;
-      ws.lastPing = Date.now();
-    });
+  private handlePong(ws: AuthenticatedWebSocket): void {
+    ws.isAlive = true;
+    ws.lastPing = Date.now();
   }
 
   private sendOptimized(ws: AuthenticatedWebSocket, message: any): boolean {
     if (ws.readyState !== WebSocket.OPEN) return false;
 
     try {
+      // Send immediately for high-priority messages
       if (message.priority === 'immediate') {
         ws.send(JSON.stringify(message));
         return true;
       }
 
+      // Buffer for batching
       ws.messageBuffer = ws.messageBuffer || [];
       ws.messageBuffer.push(message);
 
+      // Setup flush timer if not exists
       if (!ws.flushTimer) {
         ws.flushTimer = setTimeout(() => {
           this.flushMessageBuffer(ws);
         }, CONFIG.MESSAGE_BATCH_DELAY);
       }
 
+      // Flush if buffer reaches batch size
       if (ws.messageBuffer.length >= CONFIG.MESSAGE_BATCH_SIZE) {
         this.flushMessageBuffer(ws);
       }
 
       return true;
     } catch (error) {
-      console.error('Error sending WebSocket message:', error);
+      logger.error('Error sending WebSocket message:', { component: 'WebSocketService' }, error);
       this.connectionStats.droppedMessages++;
       return false;
     }
   }
 
-  private flushMessageBuffer(ws: AuthenticatedWebSocket) {
+  private flushMessageBuffer(ws: AuthenticatedWebSocket): void {
     if (!ws.messageBuffer || ws.messageBuffer.length === 0) return;
     if (ws.readyState !== WebSocket.OPEN) {
-      ws.messageBuffer = [];
+      ws.messageBuffer.length = 0;
       if (ws.flushTimer) {
         clearTimeout(ws.flushTimer);
         ws.flushTimer = undefined;
@@ -418,11 +554,11 @@ export class WebSocketService {
         : { type: 'batch', messages: ws.messageBuffer };
 
       ws.send(JSON.stringify(message));
-      ws.messageBuffer = [];
+      ws.messageBuffer.length = 0; // More efficient than = []
     } catch (error) {
-      console.error('Error flushing message buffer:', error);
+      logger.error('Error flushing message buffer:', { component: 'WebSocketService' }, error);
       this.connectionStats.droppedMessages += ws.messageBuffer.length;
-      ws.messageBuffer = [];
+      ws.messageBuffer.length = 0;
     } finally {
       if (ws.flushTimer) {
         clearTimeout(ws.flushTimer);
@@ -435,13 +571,13 @@ export class WebSocketService {
     operation: () => Promise<void>,
     priority: number = 2
   ): Promise<void> {
-    if (this.operationQueue.length >= CONFIG.MAX_QUEUE_SIZE) {
+    const enqueued = this.operationQueue.enqueue(operation, priority, Date.now());
+    
+    if (!enqueued) {
       this.connectionStats.queueOverflows++;
-      console.warn('Operation queue overflow, dropping operation');
+      logger.warn('Operation queue overflow, operation dropped', { component: 'WebSocketService' });
       return;
     }
-
-    this.operationQueue.enqueue(operation, priority, Date.now());
 
     if (!this.processingQueue) {
       this.processQueue();
@@ -453,25 +589,26 @@ export class WebSocketService {
 
     while (this.operationQueue.length > 0 && !this.isShuttingDown) {
       const item = this.operationQueue.dequeue();
-      if (item) {
-        // Drop stale operations (older than 30 seconds)
-        if (Date.now() - item.timestamp > 30000) {
-          console.warn('Dropping stale operation');
-          continue;
-        }
+      if (!item) break;
 
-        try {
-          await item.item();
-        } catch (error) {
-          console.error('Error processing queued operation:', error);
-        }
+      // Drop stale operations
+      if (Date.now() - item.timestamp > 30000) {
+        logger.warn('Dropping stale operation', { component: 'WebSocketService' });
+        continue;
+      }
+
+      try {
+        await item.item();
+      } catch (error) {
+        logger.error('Error processing queued operation:', { component: 'WebSocketService' }, error);
       }
     }
 
     this.processingQueue = false;
   }
 
-  private async handleMessage(ws: AuthenticatedWebSocket, message: WebSocketMessage) {
+  private async handleMessage(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
+    // Send acknowledgment if messageId provided
     if (message.messageId) {
       this.sendOptimized(ws, {
         type: 'ack',
@@ -509,7 +646,7 @@ export class WebSocketService {
     }
   }
 
-  private async handleSubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage) {
+  private async handleSubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
     const { billId } = message.data || {};
 
     if (!ws.userId || !billId) {
@@ -538,7 +675,7 @@ export class WebSocketService {
     });
   }
 
-  private async handleBatchSubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage) {
+  private async handleBatchSubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
     const { billIds } = message.data || {};
 
     if (!ws.userId || !billIds || !Array.isArray(billIds)) {
@@ -568,7 +705,7 @@ export class WebSocketService {
 
         subscribed.push(billId);
       } catch (error) {
-        console.error(`Failed to subscribe to bill ${billId}:`, error);
+        logger.error(`Failed to subscribe to bill ${billId}:`, { component: 'WebSocketService' }, error);
         failed.push(billId);
       }
     }
@@ -583,7 +720,7 @@ export class WebSocketService {
     });
   }
 
-  private async handleUnsubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage) {
+  private async handleUnsubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
     const { billId } = message.data || {};
 
     if (!ws.userId || !billId) return;
@@ -611,7 +748,7 @@ export class WebSocketService {
     });
   }
 
-  private async handleBatchUnsubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage) {
+  private async handleBatchUnsubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
     const { billIds } = message.data || {};
 
     if (!ws.userId || !billIds || !Array.isArray(billIds)) {
@@ -654,7 +791,7 @@ export class WebSocketService {
     });
   }
 
-  private async handleGetPreferences(ws: AuthenticatedWebSocket) {
+  private async handleGetPreferences(ws: AuthenticatedWebSocket): Promise<void> {
     if (!ws.userId) {
       this.sendOptimized(ws, {
         type: 'error',
@@ -664,9 +801,7 @@ export class WebSocketService {
     }
 
     try {
-      // TODO: Implement user preferences service
-      // const { userPreferencesService } = await import('./user-preferences.js');
-      // const preferences = await userPreferencesService.getUserPreferences(ws.userId);
+      // Placeholder for user preferences service integration
       const preferences = {
         updateFrequency: 'immediate',
         notificationTypes: ['status_change', 'new_comment', 'amendment', 'voting_scheduled']
@@ -678,7 +813,7 @@ export class WebSocketService {
         timestamp: new Date().toISOString()
       });
     } catch (error) {
-      console.error('Error getting user preferences:', error);
+      logger.error('Error getting user preferences:', { component: 'WebSocketService' }, error);
       this.sendOptimized(ws, {
         type: 'error',
         message: 'Failed to get preferences'
@@ -686,7 +821,7 @@ export class WebSocketService {
     }
   }
 
-  private async handleUpdatePreferences(ws: AuthenticatedWebSocket, message: WebSocketMessage) {
+  private async handleUpdatePreferences(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
     if (!ws.userId) {
       this.sendOptimized(ws, {
         type: 'error',
@@ -705,12 +840,7 @@ export class WebSocketService {
     }
 
     try {
-      // TODO: Implement user preferences service
-      // const { userPreferencesService } = await import('./user-preferences.js');
-      // const updatedPreferences = await userPreferencesService.updateBillTrackingPreferences(
-      //   ws.userId, 
-      //   preferences
-      // );
+      // Placeholder for user preferences service integration
       const updatedPreferences = { ...preferences, lastUpdated: new Date().toISOString() };
 
       this.sendOptimized(ws, {
@@ -720,7 +850,7 @@ export class WebSocketService {
         timestamp: new Date().toISOString()
       });
     } catch (error) {
-      console.error('Error updating user preferences:', error);
+      logger.error('Error updating user preferences:', { component: 'WebSocketService' }, error);
       this.sendOptimized(ws, {
         type: 'error',
         message: 'Failed to update preferences'
@@ -728,24 +858,23 @@ export class WebSocketService {
     }
   }
 
-  private handleDisconnection(ws: AuthenticatedWebSocket) {
+  private handleDisconnection(ws: AuthenticatedWebSocket): void {
     if (!ws.userId) return;
 
     const userId = ws.userId;
 
-    // Clean up timers and buffers with comprehensive error handling
+    // Clean up timers and buffers
     try {
       if (ws.flushTimer) {
         clearTimeout(ws.flushTimer);
         ws.flushTimer = undefined;
       }
-      // Force flush any remaining messages before clearing
       if (ws.messageBuffer && ws.messageBuffer.length > 0) {
-        console.log(`Flushing ${ws.messageBuffer.length} pending messages for disconnected user ${userId}`);
+        logger.info(`Clearing ${ws.messageBuffer.length} pending messages for ${ws.connectionId}`, { component: 'WebSocketService' });
       }
-      ws.messageBuffer = [];
+      ws.messageBuffer = undefined;
     } catch (error) {
-      console.error('Error clearing message buffer:', error);
+      logger.error('Error clearing message buffer:', { component: 'WebSocketService' }, error);
     }
 
     // Clean up subscriptions
@@ -761,9 +890,10 @@ export class WebSocketService {
           }
         }
         ws.subscriptions.clear();
+        ws.subscriptions = undefined;
       }
     } catch (error) {
-      console.error('Error cleaning up subscriptions:', error);
+      logger.error('Error cleaning up subscriptions:', { component: 'WebSocketService' }, error);
     }
 
     // Clean up connection pool
@@ -776,7 +906,7 @@ export class WebSocketService {
         }
       }
     } catch (error) {
-      console.error('Error cleaning up connection pool:', error);
+      logger.error('Error cleaning up connection pool:', { component: 'WebSocketService' }, error);
     }
 
     // Clean up user subscription index
@@ -789,7 +919,7 @@ export class WebSocketService {
         }
       }
     } catch (error) {
-      console.error('Error cleaning up user subscription index:', error);
+      logger.error('Error cleaning up user subscription index:', { component: 'WebSocketService' }, error);
     }
 
     // Clean up clients map
@@ -802,26 +932,21 @@ export class WebSocketService {
         }
       }
     } catch (error) {
-      console.error('Error cleaning up clients map:', error);
+      logger.error('Error cleaning up clients map:', { component: 'WebSocketService' }, error);
     }
 
     // Clear WebSocket properties to help GC
-    try {
-      ws.userId = undefined;
-      ws.subscriptions = undefined;
-      ws.messageBuffer = undefined;
-      ws.isAlive = undefined;
-      ws.lastPing = undefined;
-    } catch (error) {
-      console.error('Error clearing WebSocket properties:', error);
-    }
+    ws.userId = undefined;
+    ws.connectionId = undefined;
+    ws.isAlive = undefined;
+    ws.lastPing = undefined;
   }
 
   broadcastBillUpdate(billId: number, update: {
     type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled';
     data: any;
     timestamp: Date;
-  }) {
+  }): void {
     const dedupeKey = `${billId}-${update.type}-${update.timestamp.getTime()}`;
 
     if (this.messageDedupeCache.has(dedupeKey)) {
@@ -841,7 +966,7 @@ export class WebSocketService {
       }
 
       this.connectionStats.totalBroadcasts++;
-      this.connectionStats.lastActivity = new Date();
+      this.connectionStats.lastActivity = Date.now();
 
       const message = {
         type: 'bill_update',
@@ -856,6 +981,7 @@ export class WebSocketService {
       for (const userId of subscriberSnapshot) {
         const pool = this.connectionPool.get(userId);
         if (pool && pool.connections.length > 0) {
+          // Find first active connection
           const activeConnection = pool.connections.find(
             ws => ws.readyState === WebSocket.OPEN
           );
@@ -868,7 +994,7 @@ export class WebSocketService {
         }
       }
 
-      console.log(`Broadcast bill ${billId} update: ${successfulDeliveries}/${subscriberSnapshot.length} delivered`);
+      logger.info(`Broadcast bill ${billId} update: ${successfulDeliveries}/${subscriberSnapshot.length} delivered`, { component: 'WebSocketService' });
     }, 2);
   }
 
@@ -877,7 +1003,7 @@ export class WebSocketService {
     title: string;
     message: string;
     data?: any;
-  }) {
+  }): void {
     this.queueOperation(async () => {
       const pool = this.connectionPool.get(userId);
       if (!pool || pool.connections.length === 0) return;
@@ -889,6 +1015,7 @@ export class WebSocketService {
         priority: 'immediate' as const
       };
 
+      // Send to all active connections
       for (const ws of pool.connections) {
         if (ws.readyState === WebSocket.OPEN) {
           this.sendOptimized(ws, message);
@@ -897,9 +1024,10 @@ export class WebSocketService {
     }, 1);
   }
 
-  private setupIntervals() {
+  private setupIntervals(): void {
     this.cleanupIntervals();
 
+    // Heartbeat interval
     this.heartbeatInterval = setInterval(() => {
       if (!this.wss) return;
 
@@ -924,11 +1052,12 @@ export class WebSocketService {
         }
 
         if (deadConnections > 0) {
-          console.log(`Cleaned up ${deadConnections} dead connections`);
+          logger.info(`Cleaned up ${deadConnections} dead connections`, { component: 'WebSocketService' });
         }
       }, 3);
     }, CONFIG.HEARTBEAT_INTERVAL);
 
+    // Health check interval
     this.healthCheckInterval = setInterval(() => {
       this.performHealthCheck();
     }, CONFIG.HEALTH_CHECK_INTERVAL);
@@ -954,50 +1083,21 @@ export class WebSocketService {
     }
   }
 
-  /**
-   * Perform periodic memory cleanup to prevent memory leaks
-   */
   private performMemoryCleanup(): void {
     const memUsage = process.memoryUsage();
     const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
     const now = Date.now();
 
     let cleanedItems = 0;
-    let memoryFreed = 0;
 
-    // Clean up old deduplication cache entries
-    const dedupeEntriesBefore = this.messageDedupeCache.size;
-    const dedupeCutoff = now - CONFIG.DEDUPE_CACHE_CLEANUP_AGE;
+    // Clean up stale operations in queue
+    const staleOpsRemoved = this.operationQueue.removeStaleItems(30000);
+    cleanedItems += staleOpsRemoved;
 
-    // Since LRU cache handles eviction automatically, we just ensure it's not growing unbounded
-    if (this.messageDedupeCache.size > CONFIG.DEDUPE_CACHE_SIZE * 0.9) {
-      // Force cleanup of very old entries by recreating cache with recent entries only
-      const newCache = new LRUCache<string, number>(CONFIG.DEDUPE_CACHE_SIZE);
-      // Keep only recent entries (last 10 minutes)
-      const recentCutoff = now - 600000;
-      // Note: LRUCache doesn't expose internal entries easily, so we recreate it
-      this.messageDedupeCache = new LRUCache(CONFIG.DEDUPE_CACHE_SIZE);
-      cleanedItems += (dedupeEntriesBefore - this.messageDedupeCache.size);
-    }
-
-    // Clean up old performance history entries
-    const perfHistoryBefore = this.connectionStats.latencyMeasurements.length;
-    const perfCutoff = now - CONFIG.PERFORMANCE_HISTORY_MAX_AGE;
-
-    // Keep only recent performance measurements
-    this.connectionStats.latencyMeasurements = this.connectionStats.latencyMeasurements.filter(
-      (measurement, index) => {
-        // Keep at least the last 100 measurements
-        return index >= Math.max(0, this.connectionStats.latencyMeasurements.length - 100);
-      }
-    );
-
-    cleanedItems += (perfHistoryBefore - this.connectionStats.latencyMeasurements.length);
-
-    // Clean up stale connection pools (connections that haven't been active)
+    // Clean up stale connection pools
     let stalePools = 0;
     for (const [userId, pool] of this.connectionPool.entries()) {
-      if (pool.connections.length === 0 && now - pool.lastActivity > 3600000) { // 1 hour
+      if (pool.connections.length === 0 && now - pool.lastActivity > 3600000) {
         this.connectionPool.delete(userId);
         stalePools++;
         cleanedItems++;
@@ -1006,46 +1106,56 @@ export class WebSocketService {
 
     // Aggressive cleanup under high memory pressure
     if (heapUsedPercent > CONFIG.CRITICAL_MEMORY_THRESHOLD) {
-      console.warn('🚨 CRITICAL MEMORY PRESSURE - Performing aggressive cleanup');
+      logger.warn('🚨 CRITICAL MEMORY PRESSURE - Performing aggressive cleanup', { component: 'WebSocketService' });
 
-      // Clear old performance history completely
-      const perfBefore = this.connectionStats.latencyMeasurements.length;
-      this.connectionStats.latencyMeasurements = this.connectionStats.latencyMeasurements.slice(-50);
-      cleanedItems += (perfBefore - this.connectionStats.latencyMeasurements.length);
+      // Clear latency buffer
+      this.latencyBuffer.clear();
+      cleanedItems++;
 
-      // Reduce dedupe cache size temporarily
-      if (this.messageDedupeCache.size > CONFIG.DEDUPE_CACHE_SIZE * 0.5) {
-        this.messageDedupeCache = new LRUCache(CONFIG.DEDUPE_CACHE_SIZE * 0.5);
-        cleanedItems += CONFIG.DEDUPE_CACHE_SIZE * 0.5;
+      // Reduce dedupe cache size significantly
+      if (this.messageDedupeCache.size > CONFIG.DEDUPE_CACHE_SIZE * 0.2) {
+        this.messageDedupeCache = new LRUCache(Math.floor(CONFIG.DEDUPE_CACHE_SIZE * 0.2));
+        cleanedItems += Math.floor(CONFIG.DEDUPE_CACHE_SIZE * 0.8);
       }
 
-      // Force garbage collection if available (development only)
+      // Clear operation queue if it's getting too large
+      if (this.operationQueue.length > CONFIG.MAX_QUEUE_SIZE * 0.5) {
+        const clearedOps = this.operationQueue.length - Math.floor(CONFIG.MAX_QUEUE_SIZE * 0.2);
+        // Keep only the most recent operations
+        while (this.operationQueue.length > CONFIG.MAX_QUEUE_SIZE * 0.2) {
+          this.operationQueue.dequeue(); // Remove oldest
+        }
+        cleanedItems += clearedOps;
+      }
+
+      // Force garbage collection if available
       if (global.gc) {
         const memBeforeGC = process.memoryUsage();
         global.gc();
         const memAfterGC = process.memoryUsage();
         const freedByGC = memBeforeGC.heapUsed - memAfterGC.heapUsed;
-        console.log('🗑️ Forced garbage collection:', {
+        logger.info('🗑️ Forced garbage collection', { component: 'WebSocketService' }, {
           freed: `${(freedByGC / 1024 / 1024).toFixed(2)} MB`,
           heapBefore: `${(memBeforeGC.heapUsed / 1024 / 1024).toFixed(2)} MB`,
           heapAfter: `${(memAfterGC.heapUsed / 1024 / 1024).toFixed(2)} MB`
         });
       }
     } else if (heapUsedPercent > CONFIG.HIGH_MEMORY_THRESHOLD) {
-      console.warn('⚠️ HIGH MEMORY PRESSURE - Performing moderate cleanup');
-
-      // Reduce performance history
-      const perfBefore = this.connectionStats.latencyMeasurements.length;
-      this.connectionStats.latencyMeasurements = this.connectionStats.latencyMeasurements.slice(-200);
-      cleanedItems += (perfBefore - this.connectionStats.latencyMeasurements.length);
+      logger.warn('⚠️ HIGH MEMORY PRESSURE - Performing moderate cleanup', { component: 'WebSocketService' });
+      
+      // Clean up old dedupe cache entries
+      const dedupeRemoved = this.messageDedupeCache.removeOldEntries(
+        CONFIG.DEDUPE_CACHE_CLEANUP_AGE,
+        (timestamp) => timestamp
+      );
+      cleanedItems += dedupeRemoved;
     }
 
-    // Clean up message buffers on any remaining connections
+    // Clean up oversized message buffers
     let bufferCleanups = 0;
     for (const [userId, pool] of this.connectionPool.entries()) {
       for (const ws of pool.connections) {
         if (ws.messageBuffer && ws.messageBuffer.length > CONFIG.MESSAGE_BATCH_SIZE * 2) {
-          // Truncate oversized buffers
           ws.messageBuffer = ws.messageBuffer.slice(-CONFIG.MESSAGE_BATCH_SIZE);
           bufferCleanups++;
           cleanedItems++;
@@ -1053,85 +1163,53 @@ export class WebSocketService {
       }
     }
 
+    // Proactive cleanup of operation queue if growing too large
+    if (this.operationQueue.length > CONFIG.MAX_QUEUE_SIZE * 0.8) {
+      const targetSize = Math.floor(CONFIG.MAX_QUEUE_SIZE * 0.6);
+      const operationsToRemove = this.operationQueue.length - targetSize;
+      let removedOps = 0;
+
+      // Remove oldest operations to prevent unbounded growth
+      while (this.operationQueue.length > targetSize && removedOps < operationsToRemove) {
+        const removed = this.operationQueue.dequeue();
+        if (removed) {
+          removedOps++;
+        }
+      }
+
+      if (removedOps > 0) {
+        cleanedItems += removedOps;
+        logger.warn(`Removed ${removedOps} stale operations from queue`, { component: 'WebSocketService' });
+      }
+    }
+
     if (cleanedItems > 0 || bufferCleanups > 0 || stalePools > 0) {
       const memAfter = process.memoryUsage();
       const heapAfterPercent = (memAfter.heapUsed / memAfter.heapTotal) * 100;
-      memoryFreed = memUsage.heapUsed - memAfter.heapUsed;
+      const memoryFreed = memUsage.heapUsed - memAfter.heapUsed;
 
-      console.log('🧹 Memory cleanup completed:', {
+      logger.info('🧹 Memory cleanup completed', { component: 'WebSocketService' }, {
         cleanedItems,
+        staleOpsRemoved,
         bufferCleanups,
         stalePools,
         memoryFreed: `${(memoryFreed / 1024 / 1024).toFixed(2)} MB`,
         heapBefore: heapUsedPercent.toFixed(2) + '%',
-        heapAfter: heapAfterPercent.toFixed(2) + '%',
-        timestamp: new Date().toISOString()
+        heapAfter: heapAfterPercent.toFixed(2) + '%'
       });
     }
   }
 
-  private updateLatencyStats(latency: number) {
-    this.connectionStats.latencyMeasurements.push(latency);
-
-    if (this.connectionStats.latencyMeasurements.length > 100) {
-      this.connectionStats.latencyMeasurements.shift();
-    }
-
-    const sum = this.connectionStats.latencyMeasurements.reduce((a, b) => a + b, 0);
-    this.connectionStats.averageLatency = sum / this.connectionStats.latencyMeasurements.length;
-  }
-
-  private performHealthCheck() {
-    const now = new Date();
-    const uptime = now.getTime() - this.connectionStats.startTime.getTime();
-    const timeSinceLastActivity = now.getTime() - this.connectionStats.lastActivity.getTime();
+  private performHealthCheck(): void {
+    const now = Date.now();
+    const uptime = now - this.connectionStats.startTime;
+    const timeSinceLastActivity = now - this.connectionStats.lastActivity;
 
     const memUsage = process.memoryUsage();
     const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
 
-    // Detailed memory analysis for debugging high memory usage
-    const memoryAnalysis = {
-      heapUsed: `${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
-      heapTotal: `${(memUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
-      external: `${(memUsage.external / 1024 / 1024).toFixed(2)} MB`,
-      rss: `${(memUsage.rss / 1024 / 1024).toFixed(2)} MB`,
-      heapUsedPercent: heapUsedPercent.toFixed(2) + '%'
-    };
-
-    // Analyze data structure sizes that could cause memory leaks
-    const dataStructureAnalysis = {
-      clients: this.clients.size,
-      billSubscriptions: this.billSubscriptions.size,
-      userSubscriptionIndex: this.userSubscriptionIndex.size,
-      connectionPool: this.connectionPool.size,
-      messageDedupeCache: this.messageDedupeCache.size,
-      operationQueue: this.operationQueue.length,
-      performanceHistory: this.connectionStats.latencyMeasurements.length,
-      totalSubscriptions: Array.from(this.billSubscriptions.values()).reduce((sum, subs) => sum + subs.size, 0)
-    };
-
-    // Check for potential memory leaks in connection pools
-    let totalMessageBuffers = 0;
-    let totalSubscriptionsPerConnection = 0;
-    let staleConnections = 0;
-
-    for (const [userId, pool] of this.connectionPool.entries()) {
-      for (const ws of pool.connections) {
-        if (ws.messageBuffer) {
-          totalMessageBuffers += ws.messageBuffer.length;
-        }
-        if (ws.subscriptions) {
-          totalSubscriptionsPerConnection += ws.subscriptions.size;
-        }
-        // Check for stale connections
-        if (ws.lastPing && now.getTime() - ws.lastPing > CONFIG.STALE_CONNECTION_THRESHOLD) {
-          staleConnections++;
-        }
-      }
-    }
-
     const healthStatus = {
-      timestamp: now.toISOString(),
+      timestamp: new Date().toISOString(),
       uptime: Math.floor(uptime / 1000),
       timeSinceLastActivity: Math.floor(timeSinceLastActivity / 1000),
       activeConnections: this.connectionStats.activeConnections,
@@ -1143,58 +1221,32 @@ export class WebSocketService {
       queueOverflows: this.connectionStats.queueOverflows,
       billSubscriptions: this.billSubscriptions.size,
       queueDepth: this.operationQueue.length,
-      averageLatency: this.connectionStats.averageLatency,
-      memoryUsage: memUsage,
+      averageLatency: this.latencyBuffer.getAverage(),
       heapUsedPercent,
-      memoryAnalysis,
-      dataStructureAnalysis,
-      messageBuffers: totalMessageBuffers,
-      subscriptionsPerConnection: totalSubscriptionsPerConnection,
-      staleConnections,
       isHealthy: timeSinceLastActivity < 300000 &&
         this.operationQueue.length < CONFIG.MAX_QUEUE_SIZE * 0.8 &&
-        heapUsedPercent < 95 // Increased threshold from 90 to 95
+        heapUsedPercent < 90
     };
 
     if (!healthStatus.isHealthy || healthStatus.queueDepth > CONFIG.MAX_QUEUE_SIZE * 0.5 || healthStatus.heapUsedPercent > 85) {
-      console.warn('WebSocket Health Warning:', {
+      logger.warn('WebSocket Health Warning', { component: 'WebSocketService' }, {
         activeConnections: healthStatus.activeConnections,
         queueDepth: healthStatus.queueDepth,
         droppedMessages: healthStatus.droppedMessages,
-        queueOverflows: healthStatus.queueOverflows,
         heapUsedPercent: healthStatus.heapUsedPercent,
-        isHealthy: healthStatus.isHealthy,
-        averageLatency: healthStatus.averageLatency,
-        memoryAnalysis,
-        dataStructureAnalysis,
-        messageBuffers: totalMessageBuffers,
-        staleConnections
-      });
-    }
-
-    // Log detailed memory analysis every 5 minutes or when memory is high
-    if (this.connectionStats.totalMessages % 1000 === 0 && this.connectionStats.totalMessages > 0 ||
-        healthStatus.heapUsedPercent > 90) {
-      console.log('WebSocket Detailed Memory Analysis:', {
-        messagesPerSecond: this.connectionStats.totalMessages / (uptime / 1000),
-        averageLatency: healthStatus.averageLatency,
-        peakConnections: this.connectionStats.peakConnections,
-        memoryAnalysis,
-        dataStructureAnalysis,
-        messageBuffers: totalMessageBuffers,
-        subscriptionsPerConnection: totalSubscriptionsPerConnection,
-        staleConnections
+        isHealthy: healthStatus.isHealthy
       });
     }
   }
 
   getStats() {
-    const now = new Date();
-    const uptime = now.getTime() - this.connectionStats.startTime.getTime();
+    const now = Date.now();
+    const uptime = now - this.connectionStats.startTime;
 
     return {
       ...this.connectionStats,
       uptime: Math.floor(uptime / 1000),
+      averageLatency: this.latencyBuffer.getAverage(),
       totalSubscriptions: Array.from(this.billSubscriptions.values())
         .reduce((sum, subscribers) => sum + subscribers.size, 0),
       billsWithSubscribers: this.billSubscriptions.size,
@@ -1212,9 +1264,7 @@ export class WebSocketService {
   }
 
   cleanup(): void {
-    if (this.isShuttingDown) {
-      return;
-    }
+    if (this.isShuttingDown) return;
 
     this.isShuttingDown = true;
     this.cleanupIntervals();
@@ -1227,9 +1277,9 @@ export class WebSocketService {
             clearTimeout(ws.flushTimer);
             ws.flushTimer = undefined;
           }
-          ws.messageBuffer = [];
+          ws.messageBuffer = undefined;
         } catch (error) {
-          console.error(`Error cleaning up connection for user ${userId}:`, error);
+          logger.error(`Error cleaning up connection for user ${userId}`, { component: 'WebSocketService' }, error);
         }
       }
     }
@@ -1240,24 +1290,23 @@ export class WebSocketService {
     this.connectionPool.clear();
     this.messageDedupeCache.clear();
     this.operationQueue.clear();
+    this.latencyBuffer.clear();
 
-    console.log('WebSocket service cleanup completed');
+    logger.info('WebSocket service cleanup completed', { component: 'WebSocketService' });
   }
 
   async shutdown(): Promise<void> {
     if (this.isShuttingDown) {
-      console.log('Shutdown already in progress');
+      logger.info('Shutdown already in progress', { component: 'WebSocketService' });
       return;
     }
 
-    console.log('🔄 Shutting down WebSocket service...');
+    logger.info('🔄 Shutting down WebSocket service...', { component: 'WebSocketService' });
     this.isShuttingDown = true;
 
     try {
-      // Stop accepting new operations
       this.cleanupIntervals();
 
-      // Send shutdown notification to all connected clients
       if (this.wss) {
         const shutdownMessage = {
           type: 'server_shutdown',
@@ -1282,7 +1331,7 @@ export class WebSocketService {
               ws.send(JSON.stringify(shutdownMessage));
             }
           } catch (error) {
-            console.error('Error sending shutdown message:', error);
+            logger.error('Error sending shutdown message', { component: 'WebSocketService' }, error);
           }
         }
 
@@ -1296,24 +1345,24 @@ export class WebSocketService {
               ws.close(1001, 'Server shutdown');
             }
           } catch (error) {
-            console.error('Error closing WebSocket connection:', error);
+            logger.error('Error closing WebSocket connection', { component: 'WebSocketService' }, error);
           }
         }
 
         // Close the WebSocket server
         await new Promise<void>((resolve, reject) => {
           const timeout = setTimeout(() => {
-            console.warn('WebSocket server close timeout, forcing shutdown');
+            logger.warn('WebSocket server close timeout, forcing shutdown', { component: 'WebSocketService' });
             resolve();
           }, 5000);
 
           this.wss!.close((err) => {
             clearTimeout(timeout);
             if (err) {
-              console.error('Error closing WebSocket server:', err);
+              logger.error('Error closing WebSocket server', { component: 'WebSocketService' }, err);
               reject(err);
             } else {
-              console.log('WebSocket server closed successfully');
+              logger.info('WebSocket server closed successfully', { component: 'WebSocketService' });
               resolve();
             }
           });
@@ -1326,32 +1375,26 @@ export class WebSocketService {
       const drainStartTime = Date.now();
       while (this.operationQueue.length > 0) {
         if (Date.now() - drainStartTime > CONFIG.SHUTDOWN_GRACE_PERIOD) {
-          console.warn(`Shutdown timeout - ${this.operationQueue.length} operations still in queue`);
+          logger.warn(`Shutdown timeout - ${this.operationQueue.length} operations still in queue`, { component: 'WebSocketService' });
           break;
         }
         await new Promise(resolve => setTimeout(resolve, 100));
       }
 
-      // Final cleanup
       this.cleanup();
       this.isInitialized = false;
 
-      // Log final statistics
-      console.log('WebSocket Service Shutdown Statistics:', {
+      logger.info('WebSocket Service Shutdown Statistics', { component: 'WebSocketService' }, {
         totalConnections: this.connectionStats.totalConnections,
         totalMessages: this.connectionStats.totalMessages,
         totalBroadcasts: this.connectionStats.totalBroadcasts,
         droppedMessages: this.connectionStats.droppedMessages,
-        duplicateMessages: this.connectionStats.duplicateMessages,
-        queueOverflows: this.connectionStats.queueOverflows,
-        peakConnections: this.connectionStats.peakConnections,
-        averageLatency: this.connectionStats.averageLatency
+        peakConnections: this.connectionStats.peakConnections
       });
 
-      console.log('✅ WebSocket service shutdown completed');
+      logger.info('✅ WebSocket service shutdown completed', { component: 'WebSocketService' });
     } catch (error) {
-      console.error('❌ Error during WebSocket shutdown:', error);
-      // Force cleanup even on error
+      logger.error('❌ Error during WebSocket shutdown', { component: 'WebSocketService' }, error);
       this.cleanup();
       this.isInitialized = false;
       throw error;
@@ -1359,16 +1402,16 @@ export class WebSocketService {
   }
 
   getHealthStatus() {
-    const now = new Date();
-    const uptime = now.getTime() - this.connectionStats.startTime.getTime();
-    const timeSinceLastActivity = now.getTime() - this.connectionStats.lastActivity.getTime();
+    const now = Date.now();
+    const uptime = now - this.connectionStats.startTime;
+    const timeSinceLastActivity = now - this.connectionStats.lastActivity;
 
     const stats = this.getStats();
     const memUsage = process.memoryUsage();
     const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
 
     return {
-      timestamp: now.toISOString(),
+      timestamp: new Date().toISOString(),
       uptime: Math.floor(uptime / 1000),
       timeSinceLastActivity: Math.floor(timeSinceLastActivity / 1000),
       isHealthy: this.connectionStats.activeConnections >= 0 &&
@@ -1402,7 +1445,7 @@ export class WebSocketService {
     }
 
     if (stats.averageLatency > 1000) {
-      warnings.push(`High average latency: ${stats.averageLatency}ms`);
+      warnings.push(`High average latency: ${stats.averageLatency.toFixed(0)}ms`);
     }
 
     if (stats.messageSuccessRate < 0.95) {
@@ -1412,11 +1455,8 @@ export class WebSocketService {
     return warnings;
   }
 
-  broadcastToAll(message: {
-    type: string;
-    data: any;
-    timestamp?: Date;
-  }) {
+  // Public utility methods
+  broadcastToAll(message: { type: string; data: any; timestamp?: Date }): void {
     const dedupeKey = `broadcast-${message.type}-${Date.now()}`;
     if (this.messageDedupeCache.has(dedupeKey)) {
       this.connectionStats.duplicateMessages++;
@@ -1426,7 +1466,7 @@ export class WebSocketService {
 
     this.queueOperation(async () => {
       this.connectionStats.totalBroadcasts++;
-      this.connectionStats.lastActivity = new Date();
+      this.connectionStats.lastActivity = Date.now();
 
       const broadcastMessage = {
         ...message,
@@ -1448,7 +1488,7 @@ export class WebSocketService {
             activeConnection.send(JSON.stringify(broadcastMessage));
             successfulDeliveries++;
           } catch (error) {
-            console.error(`Failed to broadcast to user ${userId}:`, error);
+            logger.error(`Failed to broadcast to user ${userId}`, { component: 'WebSocketService' }, error);
             this.connectionStats.droppedMessages++;
           }
         }
@@ -1458,7 +1498,7 @@ export class WebSocketService {
         ? (successfulDeliveries / totalAttempts * 100).toFixed(2)
         : 0;
 
-      console.log(`Broadcast completed: ${successfulDeliveries}/${totalAttempts} delivered (${deliveryRate}% success rate)`);
+      logger.info(`Broadcast completed: ${successfulDeliveries}/${totalAttempts} delivered (${deliveryRate}% success rate)`, { component: 'WebSocketService' });
     }, 1);
   }
 
@@ -1481,13 +1521,11 @@ export class WebSocketService {
 
   getAllConnectedUsers(): string[] {
     const connectedUsers: string[] = [];
-
     for (const [userId, pool] of this.connectionPool.entries()) {
       if (pool.connections.some(ws => ws.readyState === WebSocket.OPEN)) {
         connectedUsers.push(userId);
       }
     }
-
     return connectedUsers;
   }
 
@@ -1511,7 +1549,7 @@ export class WebSocketService {
         broadcasts: this.connectionStats.totalBroadcasts
       },
       performance: {
-        averageLatency: this.connectionStats.averageLatency,
+        averageLatency: this.latencyBuffer.getAverage(),
         queueDepth: this.operationQueue.length,
         queueOverflows: this.connectionStats.queueOverflows,
         messageSuccessRate: this.connectionStats.totalMessages > 0
@@ -1526,75 +1564,12 @@ export class WebSocketService {
       }
     };
   }
-
-  /**
-   * Force detailed memory analysis logging
-   */
-  forceMemoryAnalysis() {
-    console.log('🔍 FORCED MEMORY ANALYSIS - WebSocket Service');
-    this.performHealthCheck();
-
-    // Additional detailed analysis
-    const memUsage = process.memoryUsage();
-    const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
-
-    let totalMessageBuffers = 0;
-    let totalSubscriptionsPerConnection = 0;
-    let connectionDetails: any[] = [];
-
-    for (const [userId, pool] of this.connectionPool.entries()) {
-      for (const ws of pool.connections) {
-        const bufferSize = ws.messageBuffer ? ws.messageBuffer.length : 0;
-        const subscriptionSize = ws.subscriptions ? ws.subscriptions.size : 0;
-        totalMessageBuffers += bufferSize;
-        totalSubscriptionsPerConnection += subscriptionSize;
-
-        connectionDetails.push({
-          userId,
-          bufferSize,
-          subscriptionSize,
-          readyState: ws.readyState,
-          lastPing: ws.lastPing ? new Date(ws.lastPing).toISOString() : null
-        });
-      }
-    }
-
-    console.log('Detailed WebSocket Memory Breakdown:', {
-      memory: {
-        heapUsed: `${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
-        heapTotal: `${(memUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
-        heapUsedPercent: heapUsedPercent.toFixed(2) + '%'
-      },
-      dataStructures: {
-        clients: this.clients.size,
-        billSubscriptions: this.billSubscriptions.size,
-        userSubscriptionIndex: this.userSubscriptionIndex.size,
-        connectionPool: this.connectionPool.size,
-        messageDedupeCache: this.messageDedupeCache.size,
-        operationQueue: this.operationQueue.length,
-        performanceHistory: this.connectionStats.latencyMeasurements.length
-      },
-      buffers: {
-        totalMessageBuffers,
-        totalSubscriptionsPerConnection,
-        connectionDetails: connectionDetails.slice(0, 10) // First 10 connections
-      },
-      timestamp: new Date().toISOString()
-    });
-
-    return {
-      heapUsedPercent,
-      dataStructureSizes: {
-        clients: this.clients.size,
-        billSubscriptions: this.billSubscriptions.size,
-        connectionPool: this.connectionPool.size,
-        messageDedupeCache: this.messageDedupeCache.size,
-        operationQueue: this.operationQueue.length
-      },
-      totalMessageBuffers,
-      totalSubscriptionsPerConnection
-    };
-  }
 }
 
 export const webSocketService = new WebSocketService();
+
+
+
+
+
+

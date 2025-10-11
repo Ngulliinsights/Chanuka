@@ -1,4 +1,12 @@
+/**
+ * Legacy Metrics Service - Now delegates to the optimized Performance Monitoring Service
+ *
+ * This maintains backward compatibility while leveraging the new performance monitoring system.
+ */
+
 import { performance } from 'perf_hooks';
+import { performanceMonitoring } from '../services/performance-monitoring.js';
+import { logger } from '../utils/logger';
 
 interface MetricData {
   count: number;
@@ -10,36 +18,7 @@ interface MetricData {
 }
 
 class Metrics {
-  private metrics: Map<string, MetricData> = new Map();
   private thresholds: Map<string, number> = new Map();
-
-  // Internal method to update a metric
-  private updateMetric(name: string, value: number, threshold?: number): void {
-    const current = this.metrics.get(name) || {
-      count: 0,
-      total: 0,
-      min: Infinity,
-      max: -Infinity,
-      avg: 0,
-      lastUpdated: Date.now(),
-    };
-
-    current.count++;
-    current.total += value;
-    current.min = Math.min(current.min, value);
-    current.max = Math.max(current.max, value);
-    current.avg = current.total / current.count;
-    current.lastUpdated = Date.now();
-
-    this.metrics.set(name, current);
-
-    if (threshold !== undefined) {
-      this.thresholds.set(name, threshold);
-      if (value > threshold) {
-        console.warn(`Metric ${name} exceeded threshold: ${value} > ${threshold}`);
-      }
-    }
-  }
 
   // Creates a method decorator that tracks a metric with the given name
   track(name: string, threshold?: number): MethodDecorator {
@@ -56,7 +35,25 @@ class Metrics {
 
         // If a value is provided in the last argument and it's a number, use it
         const value = typeof args[args.length - 1] === 'number' ? args[args.length - 1] : 1;
-        this.updateMetric(name, value, threshold);
+
+        // Use the new performance monitoring service
+        performanceMonitoring.recordMetric(name, value, {
+          class: target.constructor.name,
+          method: String(propertyKey)
+        });
+
+        // Legacy threshold checking for backward compatibility
+        if (threshold !== undefined) {
+          this.thresholds.set(name, threshold);
+          if (value > threshold) {
+            logger.warn(`Metric ${name} exceeded threshold: ${value} > ${threshold}`, {
+              component: 'legacy-metrics',
+              metric: name,
+              value,
+              threshold
+            });
+          }
+        }
 
         return result;
       };
@@ -81,9 +78,24 @@ class Metrics {
           return await originalMethod.apply(this, args);
         } finally {
           const duration = performance.now() - start;
-          // 'this' here refers to the instance where the decorated method is called
-          // We need to use the metrics instance rather than 'this'
-          metrics.updateMetric(name, duration, threshold);
+
+          // Use the new performance monitoring service
+          performanceMonitoring.recordMetric(`${name}.duration`, duration, {
+            class: target.constructor.name,
+            method: String(propertyKey)
+          });
+
+          // Legacy threshold checking for backward compatibility
+          if (threshold !== undefined) {
+            if (duration > threshold) {
+              logger.warn(`Performance metric ${name} exceeded threshold: ${duration}ms > ${threshold}ms`, {
+                component: 'legacy-metrics',
+                metric: name,
+                duration,
+                threshold
+              });
+            }
+          }
         }
       };
 
@@ -93,36 +105,77 @@ class Metrics {
 
   // Direct API to track a metric value (non-decorator usage)
   trackValue(name: string, value: number, threshold?: number): void {
-    this.updateMetric(name, value, threshold);
+    performanceMonitoring.recordMetric(name, value);
+
+    // Legacy threshold checking for backward compatibility
+    if (threshold !== undefined) {
+      this.thresholds.set(name, threshold);
+      if (value > threshold) {
+        logger.warn(`Metric ${name} exceeded threshold: ${value} > ${threshold}`, {
+          component: 'legacy-metrics',
+          metric: name,
+          value,
+          threshold
+        });
+      }
+    }
   }
 
   // Direct API to measure execution time of a function (non-decorator usage)
   async measureFn<T>(name: string, fn: () => Promise<T>, threshold?: number): Promise<T> {
-    const start = performance.now();
-    try {
-      return await fn();
-    } finally {
-      const duration = performance.now() - start;
-      this.updateMetric(name, duration, threshold);
-    }
+    return await performanceMonitoring.measureExecution(name, fn);
   }
 
+  // Legacy method for backward compatibility - now delegates to new service
   getMetrics() {
+    const aggregated = performanceMonitoring.getAggregatedMetrics();
     const result: Record<string, MetricData & { threshold?: number }> = {};
-    for (const entry of Array.from(this.metrics.entries())) {
-      const [key, value] = entry;
+
+    for (const [key, metric] of Object.entries(aggregated)) {
       result[key] = {
-        ...value,
+        count: metric.count,
+        total: metric.sum,
+        min: metric.min,
+        max: metric.max,
+        avg: metric.avg,
+        lastUpdated: metric.lastTimestamp,
         threshold: this.thresholds.get(key),
       };
     }
+
     return result;
   }
 
   reset() {
-    this.metrics.clear();
     this.thresholds.clear();
+    // Note: The new performance monitoring service handles its own cleanup
+    logger.info('Legacy metrics reset (new service manages its own cleanup)', {
+      component: 'legacy-metrics'
+    });
   }
 }
 
 export const metrics = new Metrics();
+
+// Additional functions for test compatibility
+export function incrementCounter(name: string, tags?: Record<string, any>, value?: number): void {
+  performanceMonitoring.recordMetric(name, value || 1, tags);
+}
+
+export function recordTiming(name: string, value: number, tags?: Record<string, any>, unit?: string): void {
+  performanceMonitoring.recordMetric(`${name}.duration`, value, { ...tags, unit: unit || 'ms' });
+}
+
+export function recordGauge(name: string, value: number, tags?: Record<string, any>): void {
+  performanceMonitoring.recordMetric(name, value, tags);
+}
+
+// Export legacy interface for backward compatibility
+export type { MetricData };
+
+
+
+
+
+
+

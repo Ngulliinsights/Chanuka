@@ -1,5 +1,6 @@
 import { billStorage as storage } from './bill-storage.js';
 import { Bill, InsertBill, BillComment, InsertBillComment } from "../../../shared/schema.js";
+import { logger } from '../../utils/logger';
 
 // Define error classes for better error handling
 export class BillNotFoundError extends Error {
@@ -178,7 +179,7 @@ class BillsServiceImpl implements BillsService {
       // Return bills as-is since schema fields are consistent
       return bills;
     } catch (error) {
-      console.error('Failed to get bills:', error);
+      logger.error('Failed to get bills:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to retrieve bills from storage');
     }
   }
@@ -256,7 +257,7 @@ class BillsServiceImpl implements BillsService {
       if (error instanceof ValidationError) {
         throw error;
       }
-      console.error('Failed to create bill:', error);
+      logger.error('Failed to create bill:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to create bill in storage');
     }
   }
@@ -293,7 +294,7 @@ class BillsServiceImpl implements BillsService {
       if (error instanceof ValidationError) {
         throw error;
       }
-      console.error('Failed to get bills by tags:', error);
+      logger.error('Failed to get bills by tags:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to retrieve bills by tags from storage');
     }
   }
@@ -440,7 +441,7 @@ class BillsServiceImpl implements BillsService {
       if (error instanceof BillNotFoundError || error instanceof ValidationError) {
         throw error;
       }
-      console.error('Failed to create comment:', error);
+      logger.error('Failed to create comment:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to create comment in storage');
     }
   }
@@ -572,3 +573,11 @@ class BillsServiceImpl implements BillsService {
 
 // Export singleton instance of the service
 export const billsService = new BillsServiceImpl();
+
+
+
+
+
+
+
+

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { NavigationStatePersistence } from '../state-persistence';
 import { NavigationState, NavigationPreferences } from '@/types/navigation';
+import { logger } from '../utils/logger';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -325,3 +326,9 @@ describe('NavigationStatePersistence', () => {
     });
   });
 });
+
+
+
+
+
+

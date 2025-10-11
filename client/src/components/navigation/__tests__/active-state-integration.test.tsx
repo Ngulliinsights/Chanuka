@@ -5,6 +5,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import MobileNavigation from '../MobileNavigation';
 import RoleBasedNavigation from '../RoleBasedNavigation';
+import { logger } from '../utils/logger.js';
 
 // Mock the auth hook
 vi.mock('@/hooks/use-auth', () => ({

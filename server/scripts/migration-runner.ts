@@ -5,6 +5,7 @@ import pkg from 'pg';
 const { Pool } = pkg;
 import { MigrationService } from '../infrastructure/database/migration-service.js';
 import * as path from 'path';
+import { logger } from '../utils/logger';
 
 // Load environment variables
 dotenv.config();
@@ -34,10 +35,10 @@ class MigrationRunner {
   }
 
   async runUp(options: RunnerOptions): Promise<void> {
-    console.log('🚀 Running database migrations...');
+    logger.info('🚀 Running database migrations...', { component: 'SimpleTool' });
     
     if (options.dryRun) {
-      console.log('🔍 DRY RUN MODE - No changes will be made');
+      logger.info('🔍 DRY RUN MODE - No changes will be made', { component: 'SimpleTool' });
       const pending = await this.migrationService.getPendingMigrations();
       console.log(`Would execute ${pending.length} migrations:`);
       pending.forEach(filename => console.log(`  - ${filename}`));
@@ -50,8 +51,8 @@ class MigrationRunner {
       let successCount = 0;
       let failureCount = 0;
 
-      console.log('\n📊 Migration Results:');
-      console.log('='.repeat(50));
+      logger.info('\n📊 Migration Results:', { component: 'SimpleTool' });
+      logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
       for (const result of results) {
         if (result.success) {
@@ -64,41 +65,41 @@ class MigrationRunner {
         }
       }
 
-      console.log('='.repeat(50));
+      logger.info('=', { component: 'SimpleTool' }, .repeat(50));
       console.log(`✅ Successful: ${successCount}`);
       console.log(`❌ Failed: ${failureCount}`);
 
       if (failureCount > 0) {
-        console.log('\n⚠️  Some migrations failed. Please review the errors above.');
+        logger.info('\n⚠️  Some migrations failed. Please review the errors above.', { component: 'SimpleTool' });
         process.exit(1);
       } else {
-        console.log('\n🎉 All migrations completed successfully!');
+        logger.info('\n🎉 All migrations completed successfully!', { component: 'SimpleTool' });
       }
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      console.error('💥 Migration execution failed:', err.message);
-      console.error('Stack trace:', err.stack);
+      logger.error('💥 Migration execution failed:', { component: 'SimpleTool' }, err.message);
+      logger.error('Stack trace:', { component: 'SimpleTool' }, err.stack);
       process.exit(1);
     }
   }
 
   async runDown(options: RunnerOptions): Promise<void> {
     if (!options.target) {
-      console.error('❌ Target migration filename is required for rollback');
+      logger.error('❌ Target migration filename is required for rollback', { component: 'SimpleTool' });
       process.exit(1);
     }
 
     console.log(`🔄 Rolling back migration: ${options.target}`);
     
     if (options.dryRun) {
-      console.log('🔍 DRY RUN MODE - No changes would be made');
+      logger.info('🔍 DRY RUN MODE - No changes would be made', { component: 'SimpleTool' });
       console.log(`Would rollback: ${options.target}`);
       return;
     }
 
     if (!options.force) {
-      console.log('⚠️  This will rollback the specified migration and may result in data loss.');
-      console.log('Use --force to confirm this action.');
+      logger.info('⚠️  This will rollback the specified migration and may result in data loss.', { component: 'SimpleTool' });
+      logger.info('Use --force to confirm this action.', { component: 'SimpleTool' });
       process.exit(1);
     }
 
@@ -113,8 +114,8 @@ class MigrationRunner {
   }
 
   async showStatus(): Promise<void> {
-    console.log('📋 Migration Status');
-    console.log('='.repeat(50));
+    logger.info('📋 Migration Status', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     const applied = await this.migrationService.getAppliedMigrations();
     const pending = await this.migrationService.getPendingMigrations();
@@ -132,30 +133,30 @@ class MigrationRunner {
     });
 
     if (pending.length === 0) {
-      console.log('\n🎉 Database is up to date!');
+      logger.info('\n🎉 Database is up to date!', { component: 'SimpleTool' });
     }
   }
 
   async validateDatabase(): Promise<void> {
-    console.log('🔍 Validating database integrity...');
+    logger.info('🔍 Validating database integrity...', { component: 'SimpleTool' });
     
     const validation = await this.migrationService.validateDatabaseIntegrity();
     
-    console.log('='.repeat(50));
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
     
     if (validation.isValid) {
-      console.log('✅ Database integrity check passed');
+      logger.info('✅ Database integrity check passed', { component: 'SimpleTool' });
     } else {
-      console.log('❌ Database integrity check failed');
+      logger.info('❌ Database integrity check failed', { component: 'SimpleTool' });
     }
 
     if (validation.errors.length > 0) {
-      console.log('\n🚨 Errors:');
+      logger.info('\n🚨 Errors:', { component: 'SimpleTool' });
       validation.errors.forEach(error => console.log(`  - ${error}`));
     }
 
     if (validation.warnings.length > 0) {
-      console.log('\n⚠️  Warnings:');
+      logger.info('\n⚠️  Warnings:', { component: 'SimpleTool' });
       validation.warnings.forEach(warning => console.log(`  - ${warning}`));
     }
 
@@ -166,7 +167,7 @@ class MigrationRunner {
 
   async createMigration(name: string): Promise<void> {
     if (!name) {
-      console.error('❌ Migration name is required');
+      logger.error('❌ Migration name is required', { component: 'SimpleTool' });
       process.exit(1);
     }
 
@@ -201,7 +202,7 @@ class MigrationRunner {
     fs.writeFileSync(filepath, template);
     
     console.log(`✅ Created migration file: ${filepath}`);
-    console.log('📝 Please edit the file to add your migration SQL and rollback instructions.');
+    logger.info('📝 Please edit the file to add your migration SQL and rollback instructions.', { component: 'SimpleTool' });
   }
 
   async cleanup(): Promise<void> {
@@ -309,7 +310,7 @@ async function main(): Promise<void> {
     }
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
-    console.error('💥 Migration runner failed:', err.message);
+    logger.error('💥 Migration runner failed:', { component: 'SimpleTool' }, err.message);
     process.exit(1);
   } finally {
     await runner.cleanup();
@@ -318,17 +319,23 @@ async function main(): Promise<void> {
 
 // Handle uncaught errors gracefully
 process.on('uncaughtException', (error) => {
-  console.error('💥 Uncaught exception:', error.message);
+  logger.error('💥 Uncaught exception:', { component: 'SimpleTool' }, error.message);
   process.exit(1);
 });
 
 process.on('unhandledRejection', (error) => {
-  console.error('💥 Unhandled rejection:', error);
+  logger.error('💥 Unhandled rejection:', { component: 'SimpleTool' }, error);
   process.exit(1);
 });
 
 // Run the main function
 main().catch(error => {
-  console.error('💥 Fatal error:', error.message);
+  logger.error('💥 Fatal error:', { component: 'SimpleTool' }, error.message);
   process.exit(1);
 });
+
+
+
+
+
+

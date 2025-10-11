@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { ArchitectureComponent } from "@shared/schema";
 import { ExternalLink, Puzzle } from "lucide-react";
+import { logger } from '../utils/logger.js';
 
 interface ArchitecturePlanningProps {
   projectId: number;

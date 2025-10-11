@@ -1,8 +1,8 @@
 // Simple verification script to test active state logic
 const { isNavigationPathActive } = require('./client/src/utils/navigation/active-state.ts');
 
-console.log('Testing Active State Logic:');
-console.log('=========================');
+logger.info('Testing Active State Logic:', { component: 'SimpleTool' });
+logger.info('=========================', { component: 'SimpleTool' });
 
 // Test cases
 const testCases = [
@@ -25,9 +25,9 @@ testCases.forEach(({ path, currentPath, expected, description }) => {
   }
 });
 
-console.log('\nActive State Management Implementation Complete!');
-console.log('✅ Centralized active state utility created');
-console.log('✅ Consistent styling across all navigation components');
-console.log('✅ Immediate route change detection');
-console.log('✅ Proper handling of exact matches and nested routes');
-console.log('✅ Role-based styling for admin and expert items');
+logger.info('\nActive State Management Implementation Complete!', { component: 'SimpleTool' });
+logger.info('✅ Centralized active state utility created', { component: 'SimpleTool' });
+logger.info('✅ Consistent styling across all navigation components', { component: 'SimpleTool' });
+logger.info('✅ Immediate route change detection', { component: 'SimpleTool' });
+logger.info('✅ Proper handling of exact matches and nested routes', { component: 'SimpleTool' });
+logger.info('✅ Role-based styling for admin and expert items', { component: 'SimpleTool' });

@@ -7,6 +7,7 @@
 
 import { Redis, Cluster } from 'ioredis';
 import { HealthCheck, HealthResult, HealthStatus } from '../types';
+import { logger } from '../utils/logger';
 
 export interface RedisHealthConfig {
   maxLatencyMs?: number;
@@ -218,3 +219,9 @@ export class RedisHealthCheck implements HealthCheck {
     return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
   }
 }
+
+
+
+
+
+

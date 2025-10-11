@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi, beforeAll, afterAll } from 'vitest';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../../infrastructure/external-data/external-api-manager.js';
+import { logger } from '../utils/logger';
 
 // Mock fetch globally
 global.fetch = vi.fn();
@@ -32,8 +33,8 @@ describe('ExternalAPIManagementService', () => {
       const source = 'parliament-ca';
       const endpoint = '/test';
 
-      // Make requests up to the limit (60 per minute for parliament-ca)
-      const requests = [];
+  // Make requests up to the limit (60 per minute for parliament-ca)
+  const requests: Array<Promise<any>> = [];
       for (let i = 0; i < 60; i++) {
         requests.push(apiManager.makeRequest(source, endpoint));
       }
@@ -248,7 +249,7 @@ describe('ExternalAPIManagementService', () => {
       const endpoint = '/test';
 
       // Start 6 concurrent requests (exceeds limit of 5)
-      const requests = [];
+  const requests: Array<Promise<any>> = [];
       for (let i = 0; i < 6; i++) {
         requests.push(apiManager.makeRequest(source, endpoint));
       }
@@ -359,3 +360,9 @@ describe('ExternalAPIManagementService', () => {
     });
   });
 });
+
+
+
+
+
+

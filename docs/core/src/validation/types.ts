@@ -5,6 +5,7 @@
  */
 
 import { ZodError, ZodSchema } from 'zod';
+import { logger } from '../utils/logger';
 
 /**
  * Detailed validation error information for a specific field
@@ -201,3 +202,9 @@ export interface ValidationContext {
   /** Validation timestamp */
   timestamp?: Date;
 }
+
+
+
+
+
+

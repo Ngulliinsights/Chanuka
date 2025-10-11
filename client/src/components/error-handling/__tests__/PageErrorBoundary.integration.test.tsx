@@ -4,6 +4,7 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import PageErrorBoundary from '../PageErrorBoundary';
+import { logger } from '../utils/logger.js';
 
 // Mock component that can throw different types of errors
 const ErrorThrowingComponent = ({ 

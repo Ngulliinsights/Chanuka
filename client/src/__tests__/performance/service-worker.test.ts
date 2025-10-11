@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { logger } from '../utils/logger';
 
 // Mock service worker registration
 const mockServiceWorkerRegistration = {
@@ -70,7 +71,7 @@ class ServiceWorkerManager {
       this.registration = await navigator.serviceWorker.register(scriptURL);
       return this.registration;
     } catch (error) {
-      console.error('Service Worker registration failed:', error);
+      logger.error('Service Worker registration failed:', { component: 'SimpleTool' }, error);
       throw error;
     }
   }
@@ -89,3 +90,9 @@ class ServiceWorkerManager {
   async cacheResources(resources: string[]): Promise<void> {
     if (!this.cache) {
       throw 
+
+
+
+
+
+

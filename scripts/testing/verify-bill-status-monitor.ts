@@ -3,22 +3,23 @@ import { billService } from './services/bill-service.js';
 import { webSocketService } from './services/websocket.js';
 import { db } from './db.js';
 import { users, bills } from '../shared/schema.js';
+import { logger } from '../utils/logger';
 
 async function verifyBillStatusMonitor() {
-  console.log('🔍 Verifying Real-Time Bill Status Update System...');
+  logger.info('🔍 Verifying Real-Time Bill Status Update System...', { component: 'SimpleTool' });
   
   try {
     // Test 1: Check service initialization
-    console.log('1. Testing service initialization...');
+    logger.info('1. Testing service initialization...', { component: 'SimpleTool' });
     const initialStats = billStatusMonitorService.getStats();
-    console.log('✅ Service initialized:', {
+    logger.info('✅ Service initialized:', { component: 'SimpleTool' }, {
       statusChangeListeners: initialStats.statusChangeListeners,
       batchedNotificationUsers: initialStats.batchedNotificationUsers,
       totalBatchedNotifications: initialStats.totalBatchedNotifications
     });
 
     // Test 2: Create test data
-    console.log('2. Creating test data...');
+    logger.info('2. Creating test data...', { component: 'SimpleTool' });
     
     // Create test user
     const [testUser] = await db
@@ -47,13 +48,13 @@ async function verifyBillStatusMonitor() {
       })
       .returning();
     
-    console.log('✅ Test data created:', {
+    logger.info('✅ Test data created:', { component: 'SimpleTool' }, {
       userId: testUser.id,
       billId: testBill.id
     });
 
     // Test 3: Test bill status change handling
-    console.log('3. Testing bill status change handling...');
+    logger.info('3. Testing bill status change handling...', { component: 'SimpleTool' });
     
     await billStatusMonitorService.handleBillStatusChange({
       billId: testBill.id,
@@ -67,10 +68,10 @@ async function verifyBillStatusMonitor() {
       }
     });
     
-    console.log('✅ Bill status change handled successfully');
+    logger.info('✅ Bill status change handled successfully', { component: 'SimpleTool' });
 
     // Test 4: Test engagement update handling
-    console.log('4. Testing engagement update handling...');
+    logger.info('4. Testing engagement update handling...', { component: 'SimpleTool' });
     
     await billStatusMonitorService.handleBillEngagementUpdate({
       billId: testBill.id,
@@ -85,81 +86,87 @@ async function verifyBillStatusMonitor() {
       }
     });
     
-    console.log('✅ Engagement update handled successfully');
+    logger.info('✅ Engagement update handled successfully', { component: 'SimpleTool' });
 
     // Test 5: Test bill service integration
-    console.log('5. Testing bill service integration...');
+    logger.info('5. Testing bill service integration...', { component: 'SimpleTool' });
     
     // Test status update through bill service (should trigger notifications)
     await billService.updateBillStatus(testBill.id, 'passed', testUser.id);
-    console.log('✅ Bill service status update with notifications completed');
+    logger.info('✅ Bill service status update with notifications completed', { component: 'SimpleTool' });
 
     // Test engagement recording through bill service
     await billService.recordEngagement(testBill.id, testUser.id, 'comment');
-    console.log('✅ Bill service engagement recording with notifications completed');
+    logger.info('✅ Bill service engagement recording with notifications completed', { component: 'SimpleTool' });
 
     // Test 6: Test status change history
-    console.log('6. Testing status change history...');
+    logger.info('6. Testing status change history...', { component: 'SimpleTool' });
     
     const statusHistory = await billStatusMonitorService.getBillStatusHistory(testBill.id);
-    console.log('✅ Status history retrieved:', {
+    logger.info('✅ Status history retrieved:', { component: 'SimpleTool' }, {
       changesCount: statusHistory.length,
       latestChange: statusHistory[statusHistory.length - 1]?.newStatus
     });
 
     // Test 7: Check updated service stats
-    console.log('7. Testing updated service stats...');
+    logger.info('7. Testing updated service stats...', { component: 'SimpleTool' });
     const updatedStats = billStatusMonitorService.getStats();
-    console.log('✅ Updated service stats:', {
+    logger.info('✅ Updated service stats:', { component: 'SimpleTool' }, {
       statusChangeListeners: updatedStats.statusChangeListeners,
       batchedNotificationUsers: updatedStats.batchedNotificationUsers,
       totalBatchedNotifications: updatedStats.totalBatchedNotifications
     });
 
     // Test 8: Test WebSocket integration
-    console.log('8. Testing WebSocket integration...');
+    logger.info('8. Testing WebSocket integration...', { component: 'SimpleTool' });
     
     // Get WebSocket stats to verify integration
     const wsStats = webSocketService.getStats();
-    console.log('✅ WebSocket integration verified:', {
+    logger.info('✅ WebSocket integration verified:', { component: 'SimpleTool' }, {
       totalBroadcasts: wsStats.totalBroadcasts,
       activeConnections: wsStats.activeConnections
     });
 
     // Test 9: Test graceful shutdown
-    console.log('9. Testing graceful shutdown...');
+    logger.info('9. Testing graceful shutdown...', { component: 'SimpleTool' });
     await billStatusMonitorService.shutdown();
-    console.log('✅ Graceful shutdown completed');
+    logger.info('✅ Graceful shutdown completed', { component: 'SimpleTool' });
 
     // Cleanup test data
-    console.log('🧹 Cleaning up test data...');
+    logger.info('🧹 Cleaning up test data...', { component: 'SimpleTool' });
     await db.delete(bills).where(eq(bills.id, testBill.id));
     await db.delete(users).where(eq(users.id, testUser.id));
-    console.log('✅ Test data cleaned up');
+    logger.info('✅ Test data cleaned up', { component: 'SimpleTool' });
 
-    console.log('\n🎉 All Real-Time Bill Status Update tests passed!');
-    console.log('\n📋 Task 4.2 Implementation Summary:');
-    console.log('✅ Bill status change detection - IMPLEMENTED');
-    console.log('✅ Automatic notification triggers for status changes - IMPLEMENTED');
-    console.log('✅ Real-time updates for bill engagement statistics - IMPLEMENTED');
-    console.log('✅ User preference-based notification filtering - IMPLEMENTED');
-    console.log('\n🔧 Additional Features Implemented:');
-    console.log('✅ Comprehensive bill status monitoring service');
-    console.log('✅ Engagement update tracking and notifications');
-    console.log('✅ Batched notification system for non-immediate users');
-    console.log('✅ Quiet hours support for user preferences');
-    console.log('✅ Status change history tracking');
-    console.log('✅ Integration with existing bill service');
-    console.log('✅ WebSocket real-time broadcasting');
-    console.log('✅ Database notification storage');
-    console.log('✅ Graceful error handling and fallbacks');
-    console.log('\n✨ Real-Time Bill Status Update System is fully functional!');
+    logger.info('\n🎉 All Real-Time Bill Status Update tests passed!', { component: 'SimpleTool' });
+    logger.info('\n📋 Task 4.2 Implementation Summary:', { component: 'SimpleTool' });
+    logger.info('✅ Bill status change detection - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('✅ Automatic notification triggers for status changes - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('✅ Real-time updates for bill engagement statistics - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('✅ User preference-based notification filtering - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('\n🔧 Additional Features Implemented:', { component: 'SimpleTool' });
+    logger.info('✅ Comprehensive bill status monitoring service', { component: 'SimpleTool' });
+    logger.info('✅ Engagement update tracking and notifications', { component: 'SimpleTool' });
+    logger.info('✅ Batched notification system for non-immediate users', { component: 'SimpleTool' });
+    logger.info('✅ Quiet hours support for user preferences', { component: 'SimpleTool' });
+    logger.info('✅ Status change history tracking', { component: 'SimpleTool' });
+    logger.info('✅ Integration with existing bill service', { component: 'SimpleTool' });
+    logger.info('✅ WebSocket real-time broadcasting', { component: 'SimpleTool' });
+    logger.info('✅ Database notification storage', { component: 'SimpleTool' });
+    logger.info('✅ Graceful error handling and fallbacks', { component: 'SimpleTool' });
+    logger.info('\n✨ Real-Time Bill Status Update System is fully functional!', { component: 'SimpleTool' });
     
   } catch (error) {
-    console.error('❌ Error during bill status monitor verification:', error);
+    logger.error('❌ Error during bill status monitor verification:', { component: 'SimpleTool' }, error);
     throw error;
   }
 }
 
 // Run verification
 verifyBillStatusMonitor().catch(console.error);
+
+
+
+
+
+

@@ -8,6 +8,7 @@ import { useOnboarding } from '@/hooks/use-onboarding';
 import { useAuth } from '@/hooks/use-auth';
 import type { OnboardingData } from '@/types/onboarding';
 import { INTEREST_OPTIONS, DEFAULT_ONBOARDING_DATA, ACHIEVEMENT_TYPES, PROGRESS_MULTIPLIER } from '@/config/onboarding';
+import { logger } from '../utils/logger.js';
 
 // Enhanced interfaces with better type safety and documentation
 interface InterestsStepProps {
@@ -231,7 +232,7 @@ export default function OnboardingPage() {
         });
         setLocation('/');
       } catch (error) {
-        console.error('Failed to complete onboarding:', error);
+        logger.error('Failed to complete onboarding:', { component: 'SimpleTool' }, error);
         // In a real app, you might want to show a toast notification here
         // or set an error state to display to the user
       }

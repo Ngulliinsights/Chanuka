@@ -266,3 +266,9 @@ export const isValidLogEntry = (value: unknown): value is LogEntry => {
 export type LogEventHandler<T = unknown> = (entry: LogEntry<T>) => void | Promise<void>;
 export type LogFilter = (entry: LogEntry) => boolean;
 export type LogSerializer<T> = (data: T) => Record<string, unknown>;
+
+
+
+
+
+

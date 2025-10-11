@@ -1,10 +1,11 @@
 import crypto from 'crypto';
 import { Request, Response } from 'express';
-import { database as db } from '../shared/database/connection.js';
+import { database as db } from '../../../shared/database/connection.js';
 import { sessions, users } from '../../../shared/schema.js';
 import { eq, and, lt } from 'drizzle-orm';
-import { encryptionService } from './encryption-service.js';
-import { securityAuditService } from './security-audit-service.js';
+import { encryptionService } from '../../features/security/encryption-service.js';
+import { securityAuditService } from '../../features/security/security-audit-service.js';
+import { logger } from '../../utils/logger';
 
 export interface SecureSessionOptions {
   maxAge: number; // in milliseconds
@@ -126,7 +127,7 @@ export class SecureSessionService {
 
       // Log session creation
       await securityAuditService.logAuthEvent(
-        'session_created',
+        'login_success',
         req,
         userId,
         true,
@@ -136,7 +137,7 @@ export class SecureSessionService {
       return { sessionId, csrfToken };
 
     } catch (error) {
-      console.error('Session creation failed:', error);
+      logger.error('Session creation failed:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to create session');
     }
   }
@@ -195,6 +196,7 @@ export class SecureSessionService {
           userId: sessionData.userId,
           ipAddress: this.getClientIP(req),
           userAgent: req.get('User-Agent'),
+          result: 'blocked',
           success: false,
           details: {
             sessionId,
@@ -221,6 +223,7 @@ export class SecureSessionService {
           userId: sessionData.userId,
           ipAddress,
           userAgent: req.get('User-Agent'),
+          result: 'allowed',
           success: true,
           details: {
             sessionId,
@@ -259,7 +262,7 @@ export class SecureSessionService {
       return { isValid: true, session: sessionData };
 
     } catch (error) {
-      console.error('Session validation failed:', error);
+      logger.error('Session validation failed:', { component: 'SimpleTool' }, error);
       return { isValid: false, error: 'Session validation failed' };
     }
   }
@@ -277,7 +280,7 @@ export class SecureSessionService {
         })
         .where(eq(sessions.id, sessionId));
     } catch (error) {
-      console.error('Session invalidation failed:', error);
+      logger.error('Session invalidation failed:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -294,7 +297,7 @@ export class SecureSessionService {
         })
         .where(eq(sessions.userId, userId));
     } catch (error) {
-      console.error('User session invalidation failed:', error);
+      logger.error('User session invalidation failed:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -313,9 +316,9 @@ export class SecureSessionService {
           lt(sessions.expiresAt, now)
         ));
 
-      console.log('Expired sessions cleaned up');
+      logger.info('Expired sessions cleaned up', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('Session cleanup failed:', error);
+      logger.error('Session cleanup failed:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -343,7 +346,7 @@ export class SecureSessionService {
         }
       }
     } catch (error) {
-      console.error('User session cleanup failed:', error);
+      logger.error('User session cleanup failed:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -415,7 +418,7 @@ export class SecureSessionService {
         topUserAgents: [] // Would aggregate from session data
       };
     } catch (error) {
-      console.error('Failed to get session stats:', error);
+      logger.error('Failed to get session stats:', { component: 'SimpleTool' }, error);
       return {
         totalActiveSessions: 0,
         sessionsLast24h: 0,
@@ -428,3 +431,9 @@ export class SecureSessionService {
 
 // Singleton instance
 export const secureSessionService = new SecureSessionService();
+
+
+
+
+
+

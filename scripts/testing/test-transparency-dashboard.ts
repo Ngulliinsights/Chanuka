@@ -6,14 +6,15 @@
  */
 
 import { transparencyDashboardService } from "./services/transparency-dashboard.js";
+import { logger } from '../utils/logger';
 
 async function testTransparencyDashboard() {
-  console.log('🧪 Testing Transparency Dashboard and Reporting System\n');
+  logger.info('🧪 Testing Transparency Dashboard and Reporting System\n', { component: 'SimpleTool' });
 
   try {
     // Test 1: Main Dashboard Loading
-    console.log('📊 Test 1: Main Dashboard Loading');
-    console.log('=' .repeat(50));
+    logger.info('📊 Test 1: Main Dashboard Loading', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
     
     const dashboard = await transparencyDashboardService.getTransparencyDashboard();
     console.log(`✅ Dashboard loaded successfully`);
@@ -25,11 +26,11 @@ async function testTransparencyDashboard() {
     console.log(`   - Data Freshness: ${dashboard.systemHealth.dataFreshness}%`);
     console.log(`   - Alert Count: ${dashboard.systemHealth.alertCount}`);
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Test 2: Comprehensive Transparency Report Generation
-    console.log('📋 Test 2: Comprehensive Transparency Report Generation');
-    console.log('=' .repeat(50));
+    logger.info('📋 Test 2: Comprehensive Transparency Report Generation', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     const startDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000); // 90 days ago
     const endDate = new Date();
@@ -45,7 +46,7 @@ async function testTransparencyDashboard() {
     console.log(`   - Period: ${report.reportPeriod.startDate.toLocaleDateString()} to ${report.reportPeriod.endDate.toLocaleDateString()}`);
     console.log(`   - Generated At: ${report.generatedAt.toLocaleString()}`);
     
-    console.log('\n📊 Executive Summary:');
+    logger.info('\n📊 Executive Summary:', { component: 'SimpleTool' });
     console.log(`   - Total Sponsors Analyzed: ${report.executiveSummary.totalSponsors}`);
     console.log(`   - Average Transparency Score: ${report.executiveSummary.averageTransparencyScore}%`);
     console.log(`   - High Risk Sponsors: ${report.executiveSummary.highRiskSponsors}`);
@@ -54,7 +55,7 @@ async function testTransparencyDashboard() {
     console.log(`   - Trend Direction: ${report.executiveSummary.trendDirection}`);
 
     if (report.sponsorAnalysis.length > 0) {
-      console.log('\n👥 Top Sponsors by Transparency Score:');
+      logger.info('\n👥 Top Sponsors by Transparency Score:', { component: 'SimpleTool' });
       report.sponsorAnalysis.slice(0, 5).forEach((sponsor, index) => {
         console.log(`   ${index + 1}. ${sponsor.sponsorName}`);
         console.log(`      - Transparency Score: ${sponsor.transparencyScore}%`);
@@ -69,7 +70,7 @@ async function testTransparencyDashboard() {
     }
 
     if (report.conflictPatterns.length > 0) {
-      console.log('\n⚠️  Conflict Patterns Identified:');
+      logger.info('\n⚠️  Conflict Patterns Identified:', { component: 'SimpleTool' });
       report.conflictPatterns.forEach((pattern, index) => {
         console.log(`   ${index + 1}. ${pattern.patternType.toUpperCase()} Conflicts`);
         console.log(`      - Frequency: ${pattern.frequency} occurrences`);
@@ -81,17 +82,17 @@ async function testTransparencyDashboard() {
     }
 
     if (report.recommendations.length > 0) {
-      console.log('\n💡 Recommendations:');
+      logger.info('\n💡 Recommendations:', { component: 'SimpleTool' });
       report.recommendations.forEach((rec, index) => {
         console.log(`   ${index + 1}. ${rec}`);
       });
     }
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Test 3: Visual Conflict Mapping
-    console.log('🔗 Test 3: Visual Conflict Mapping');
-    console.log('=' .repeat(50));
+    logger.info('🔗 Test 3: Visual Conflict Mapping', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     const conflictMapping = await transparencyDashboardService.createConflictMapping();
     
@@ -101,7 +102,7 @@ async function testTransparencyDashboard() {
     console.log(`   - Total Clusters: ${conflictMapping.clusters.length}`);
 
     if (conflictMapping.nodes.length > 0) {
-      console.log('\n🎯 Node Distribution:');
+      logger.info('\n🎯 Node Distribution:', { component: 'SimpleTool' });
       const nodeTypes = conflictMapping.nodes.reduce((acc, node) => {
         acc[node.type] = (acc[node.type] || 0) + 1;
         return acc;
@@ -111,7 +112,7 @@ async function testTransparencyDashboard() {
         console.log(`   - ${type}: ${count} nodes`);
       });
 
-      console.log('\n🔴 Risk Level Distribution:');
+      logger.info('\n🔴 Risk Level Distribution:', { component: 'SimpleTool' });
       const riskLevels = conflictMapping.nodes.reduce((acc, node) => {
         acc[node.riskLevel] = (acc[node.riskLevel] || 0) + 1;
         return acc;
@@ -122,7 +123,7 @@ async function testTransparencyDashboard() {
       });
 
       // Sample nodes
-      console.log('\n📋 Sample Nodes:');
+      logger.info('\n📋 Sample Nodes:', { component: 'SimpleTool' });
       conflictMapping.nodes.slice(0, 3).forEach((node, index) => {
         console.log(`   ${index + 1}. ${node.label} (${node.type})`);
         console.log(`      - Risk Level: ${node.riskLevel}`);
@@ -132,7 +133,7 @@ async function testTransparencyDashboard() {
     }
 
     if (conflictMapping.edges.length > 0) {
-      console.log('\n🔗 Sample Relationships:');
+      logger.info('\n🔗 Sample Relationships:', { component: 'SimpleTool' });
       conflictMapping.edges.slice(0, 3).forEach((edge, index) => {
         console.log(`   ${index + 1}. ${edge.source} → ${edge.target}`);
         console.log(`      - Type: ${edge.relationshipType}`);
@@ -142,11 +143,11 @@ async function testTransparencyDashboard() {
       });
     }
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Test 4: Transparency Scoring Algorithm
-    console.log('🎯 Test 4: Transparency Scoring Algorithm');
-    console.log('=' .repeat(50));
+    logger.info('🎯 Test 4: Transparency Scoring Algorithm', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     // Test with first sponsor from the analysis if available
     if (report.sponsorAnalysis.length > 0) {
@@ -160,14 +161,14 @@ async function testTransparencyDashboard() {
         console.log(`   - Risk Level: ${transparencyScore.riskLevel}`);
         console.log(`   - Last Calculated: ${transparencyScore.lastCalculated.toLocaleString()}`);
         
-        console.log('\n📊 Component Scores:');
+        logger.info('\n📊 Component Scores:', { component: 'SimpleTool' });
         Object.entries(transparencyScore.componentScores).forEach(([component, score]) => {
           const componentName = component.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
           console.log(`   - ${componentName}: ${score}%`);
         });
 
         if (transparencyScore.recommendations.length > 0) {
-          console.log('\n💡 Specific Recommendations:');
+          logger.info('\n💡 Specific Recommendations:', { component: 'SimpleTool' });
           transparencyScore.recommendations.forEach((rec, index) => {
             console.log(`   ${index + 1}. ${rec}`);
           });
@@ -176,14 +177,14 @@ async function testTransparencyDashboard() {
         console.log(`⚠️  Could not calculate transparency score for sponsor ${testSponsorId}: ${error}`);
       }
     } else {
-      console.log('⚠️  No sponsors available for transparency scoring test');
+      logger.info('⚠️  No sponsors available for transparency scoring test', { component: 'SimpleTool' });
     }
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Test 5: Transparency Trend Analysis
-    console.log('📈 Test 5: Transparency Trend Analysis');
-    console.log('=' .repeat(50));
+    logger.info('📈 Test 5: Transparency Trend Analysis', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     const trendAnalysis = await transparencyDashboardService.analyzeTransparencyTrends(
       undefined, // All sponsors
@@ -196,7 +197,7 @@ async function testTransparencyDashboard() {
     console.log(`   - Trend Strength: ${trendAnalysis.analysis.trendStrength}`);
 
     if (trendAnalysis.trends.length > 0) {
-      console.log('\n📊 Recent Trend Data:');
+      logger.info('\n📊 Recent Trend Data:', { component: 'SimpleTool' });
       trendAnalysis.trends.slice(-6).forEach((trend, index) => {
         console.log(`   ${trend.period}:`);
         console.log(`      - Transparency Score: ${trend.transparencyScore}%`);
@@ -208,24 +209,24 @@ async function testTransparencyDashboard() {
     }
 
     if (trendAnalysis.recommendations.length > 0) {
-      console.log('\n💡 Trend-Based Recommendations:');
+      logger.info('\n💡 Trend-Based Recommendations:', { component: 'SimpleTool' });
       trendAnalysis.recommendations.forEach((rec, index) => {
         console.log(`   ${index + 1}. ${rec}`);
       });
     }
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Test 6: Error Handling and Edge Cases
-    console.log('🔍 Test 6: Error Handling and Edge Cases');
-    console.log('=' .repeat(50));
+    logger.info('🔍 Test 6: Error Handling and Edge Cases', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
 
     try {
       // Test with invalid sponsor ID
       await transparencyDashboardService.calculateTransparencyScore(99999);
-      console.log('❌ Expected error for invalid sponsor ID was not thrown');
+      logger.info('❌ Expected error for invalid sponsor ID was not thrown', { component: 'SimpleTool' });
     } catch (error) {
-      console.log('✅ Correctly handled invalid sponsor ID error');
+      logger.info('✅ Correctly handled invalid sponsor ID error', { component: 'SimpleTool' });
     }
 
     try {
@@ -239,22 +240,22 @@ async function testTransparencyDashboard() {
       console.log(`⚠️  Error with empty date range: ${error}`);
     }
 
-    console.log('\n');
+    logger.info('\n', { component: 'SimpleTool' });
 
     // Summary
-    console.log('📋 Test Summary');
-    console.log('=' .repeat(50));
-    console.log('✅ Main dashboard loading - PASSED');
-    console.log('✅ Comprehensive transparency report generation - PASSED');
-    console.log('✅ Visual conflict mapping - PASSED');
-    console.log('✅ Transparency scoring algorithms - PASSED');
-    console.log('✅ Transparency trend analysis - PASSED');
-    console.log('✅ Error handling and edge cases - PASSED');
+    logger.info('📋 Test Summary', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('✅ Main dashboard loading - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Comprehensive transparency report generation - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Visual conflict mapping - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Transparency scoring algorithms - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Transparency trend analysis - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Error handling and edge cases - PASSED', { component: 'SimpleTool' });
     
-    console.log('\n🎉 All transparency dashboard tests completed successfully!');
+    logger.info('\n🎉 All transparency dashboard tests completed successfully!', { component: 'SimpleTool' });
     
     // Performance metrics
-    console.log('\n⚡ Performance Metrics:');
+    logger.info('\n⚡ Performance Metrics:', { component: 'SimpleTool' });
     console.log(`   - Dashboard load time: < 2 seconds (estimated)`);
     console.log(`   - Report generation time: < 5 seconds (estimated)`);
     console.log(`   - Conflict mapping time: < 3 seconds (estimated)`);
@@ -262,7 +263,7 @@ async function testTransparencyDashboard() {
     console.log(`   - Error handling: Robust`);
 
   } catch (error) {
-    console.error('❌ Test failed with error:', error);
+    logger.error('❌ Test failed with error:', { component: 'SimpleTool' }, error);
     process.exit(1);
   }
 }
@@ -271,13 +272,19 @@ async function testTransparencyDashboard() {
 if (import.meta.url === `file://${process.argv[1]}`) {
   testTransparencyDashboard()
     .then(() => {
-      console.log('\n✅ Test execution completed');
+      logger.info('\n✅ Test execution completed', { component: 'SimpleTool' });
       process.exit(0);
     })
     .catch((error) => {
-      console.error('\n❌ Test execution failed:', error);
+      logger.error('\n❌ Test execution failed:', { component: 'SimpleTool' }, error);
       process.exit(1);
     });
 }
 
 export { testTransparencyDashboard };
+
+
+
+
+
+

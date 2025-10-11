@@ -4,6 +4,7 @@ import {
   type Sponsor, type BillSponsorship 
 } from '../../../shared/schema.js';
 import { eq, and, sql, desc, gte, lte, count, avg, inArray } from 'drizzle-orm';
+import { logger } from '../../utils/logger';
 
 // Enhanced type definitions for voting pattern analysis
 export interface VotingPatternAnalysis {
@@ -976,3 +977,11 @@ export class VotingPatternAnalysisService {
 }
 
 export const votingPatternAnalysisService = new VotingPatternAnalysisService();
+
+
+
+
+
+
+
+

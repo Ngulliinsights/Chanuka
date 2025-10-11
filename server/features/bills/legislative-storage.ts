@@ -10,6 +10,7 @@ import {
 } from "../../../shared/schema.js";
 import { eq, desc, and, or, like, count, asc, sql } from "drizzle-orm";
 import { database, readDatabase, writeDatabase, getDatabase, withTransaction } from "../../../shared/database/connection.js";
+import { logger } from '../../utils/logger';
 
 // Enhanced engagement statistics interface with more detailed metrics
 export interface BillEngagementStats {
@@ -410,3 +411,11 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
 }
 
 export const legislativeStorage = new DatabaseLegislativeStorage();
+
+
+
+
+
+
+
+

@@ -1,7 +1,7 @@
 // import RedisStore from 'connect-redis'; // Redis not available
 // import { Redis } from 'ioredis'; // Redis not available
 import { pool } from '../../../shared/database/pool.js';
-import { logger } from '../../../shared/utils/logger.js'
+import { logger } from '../../utils/logger'
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
@@ -44,3 +44,10 @@ export function initializeConnections(): StorageConnections {
 
   return { cache, pool, sessionStore };
 }
+
+
+
+
+
+
+

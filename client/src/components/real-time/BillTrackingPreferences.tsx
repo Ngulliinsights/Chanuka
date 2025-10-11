@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Bell, Clock, Mail, Smartphone, Volume2, VolumeX } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { logger } from '../utils/logger.js';
 
 interface BillTrackingPreferences {
   statusChanges: boolean;
@@ -67,7 +68,7 @@ export function BillTrackingPreferences({ className, onSave }: BillTrackingPrefe
         }
       }
     } catch (error) {
-      console.error('Error loading preferences:', error);
+      logger.error('Error loading preferences:', { component: 'SimpleTool' }, error);
     }
   };
 
@@ -97,7 +98,7 @@ export function BillTrackingPreferences({ className, onSave }: BillTrackingPrefe
         throw new Error('Failed to save preferences');
       }
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      logger.error('Error saving preferences:', { component: 'SimpleTool' }, error);
       alert('Failed to save preferences. Please try again.');
     } finally {
       setLoading(false);

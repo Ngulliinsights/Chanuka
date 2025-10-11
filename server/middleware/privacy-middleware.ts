@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 import { privacyService } from '../features/privacy/privacy-service.js';
 import { auditLogger } from '../infrastructure/monitoring/audit-log.js';
+import { logger } from '../utils/logger';
 
 export interface PrivacyRequest extends AuthenticatedRequest {
   privacyConsent?: {
@@ -58,7 +59,7 @@ export const checkDataProcessingConsent = (requiredConsent: keyof PrivacyRequest
 
       next();
     } catch (error) {
-      console.error('Error checking data processing consent:', error);
+      logger.error('Error checking data processing consent:', { component: 'SimpleTool' }, error);
       // Allow request to continue on error to avoid breaking functionality
       next();
     }
@@ -92,7 +93,7 @@ export const checkDataSharingConsent = (requiredSharing: 'publicProfile' | 'shar
 
       next();
     } catch (error) {
-      console.error('Error checking data sharing consent:', error);
+      logger.error('Error checking data sharing consent:', { component: 'SimpleTool' }, error);
       // Allow request to continue on error to avoid breaking functionality
       next();
     }
@@ -153,7 +154,7 @@ export const logDataAccess = (dataType: string, sensitivityLevel: 'low' | 'mediu
 
       next();
     } catch (error) {
-      console.error('Error logging data access:', error);
+      logger.error('Error logging data access:', { component: 'SimpleTool' }, error);
       // Allow request to continue on error
       next();
     }
@@ -197,7 +198,7 @@ export const enforceCookieConsent = (cookieType: 'analytics' | 'marketing' | 'pr
 
       next();
     } catch (error) {
-      console.error('Error enforcing cookie consent:', error);
+      logger.error('Error enforcing cookie consent:', { component: 'SimpleTool' }, error);
       // Allow request to continue on error
       next();
     }
@@ -244,7 +245,7 @@ export const validateDataRetention = async (req: AuthenticatedRequest, res: Resp
 
     next();
   } catch (error) {
-    console.error('Error validating data retention:', error);
+    logger.error('Error validating data retention:', { component: 'SimpleTool' }, error);
     next();
   }
 };
@@ -272,3 +273,9 @@ export const anonymizeIP = (req: Request, res: Response, next: NextFunction) => 
 
   next();
 };
+
+
+
+
+
+

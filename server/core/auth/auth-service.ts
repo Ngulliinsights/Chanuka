@@ -11,6 +11,7 @@ import { secureSessionService } from '../../features/security/secure-session-ser
 import { securityAuditService } from '../../features/security/security-audit-service.js';
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import { logger } from '../utils/logger';
 
 // Validation schemas
 export const registerSchema = z.object({
@@ -190,7 +191,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      console.error('Registration error:', error);
+      logger.error('Registration error:', { component: 'SimpleTool' }, error);
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -262,7 +263,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      console.error('Email verification error:', error);
+      logger.error('Email verification error:', { component: 'SimpleTool' }, error);
       return {
         success: false,
         error: 'Email verification failed'
@@ -340,7 +341,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      console.error('Login error:', error);
+      logger.error('Login error:', { component: 'SimpleTool' }, error);
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -367,7 +368,7 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      console.error('Logout error:', error);
+      logger.error('Logout error:', { component: 'SimpleTool' }, error);
       return {
         success: false,
         error: 'Logout failed'
@@ -467,7 +468,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      console.error('Token refresh error:', error);
+      logger.error('Token refresh error:', { component: 'SimpleTool' }, error);
       return {
         success: false,
         error: 'Token refresh failed'
@@ -527,7 +528,7 @@ export class AuthService {
       return { success: true };
 
     } catch (error) {
-      console.error('Password reset request error:', error);
+      logger.error('Password reset request error:', { component: 'SimpleTool' }, error);
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -625,7 +626,7 @@ export class AuthService {
       return { success: true };
 
     } catch (error) {
-      console.error('Password reset error:', error);
+      logger.error('Password reset error:', { component: 'SimpleTool' }, error);
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -707,7 +708,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      console.error('Token verification error:', error);
+      logger.error('Token verification error:', { component: 'SimpleTool' }, error);
       return {
         success: false,
         error: 'Invalid token'
@@ -780,11 +781,17 @@ export class AuthService {
         .delete(passwordResets)
         .where(eq(passwordResets.expiresAt, now));
 
-      console.log('Expired tokens cleaned up successfully');
+      logger.info('Expired tokens cleaned up successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('Token cleanup error:', error);
+      logger.error('Token cleanup error:', { component: 'SimpleTool' }, error);
     }
   }
 }
 
 export const authService = new AuthService();
+
+
+
+
+
+

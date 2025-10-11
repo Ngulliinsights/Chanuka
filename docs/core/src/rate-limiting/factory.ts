@@ -12,6 +12,7 @@ import { TokenBucketStore } from './algorithms/token-bucket';
 import { FixedWindowStore } from './algorithms/fixed-window';
 import { MemoryRateLimitStore } from './stores/memory-store';
 import { RedisRateLimitStore } from './stores/redis-store';
+import { logger } from '../utils/logger';
 
 export interface RateLimitFactoryOptions {
   redis?: Redis;
@@ -215,3 +216,9 @@ export function createRedisRateLimitStore(
 ): RedisRateLimitStore {
   return new RedisRateLimitStore(redis, options);
 }
+
+
+
+
+
+

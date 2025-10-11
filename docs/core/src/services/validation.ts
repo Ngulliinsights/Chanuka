@@ -12,3 +12,10 @@ export interface ValidationService {
   validate(data: any, options: ValidationOptions): ValidationResult;
   validateSchema(schema: any): boolean;
 }
+
+
+
+
+
+
+

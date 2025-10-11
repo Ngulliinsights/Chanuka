@@ -1,5 +1,6 @@
 import { HealthStatus, HealthCheck, HealthResult, OverallHealth } from './types';
 import { Logger } from '../logging';
+import { logger } from '../utils/logger';
 
 export interface HealthCheckerConfig {
   defaultTimeout?: number;
@@ -376,3 +377,10 @@ export class HealthChecker {
     };
   }
 }
+
+
+
+
+
+
+

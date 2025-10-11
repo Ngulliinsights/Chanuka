@@ -1,6 +1,7 @@
 import { advancedCachingService } from './advanced-caching.js';
 import { database as db, bills, sponsors, users, billComments } from '../../../shared/database/connection.js';
 import { desc, eq, sql, and } from 'drizzle-orm';
+import { logger } from '../utils/logger';
 
 export interface WarmingRule {
   id: string;
@@ -100,14 +101,14 @@ class CacheWarmingService {
    */
   async executeWarmingCycle(priority?: 'critical' | 'high' | 'medium' | 'low'): Promise<void> {
     if (this.isWarming) {
-      console.log('[Cache Warming] Warming cycle already in progress, skipping');
+      logger.info('[Cache Warming] Warming cycle already in progress, skipping', { component: 'SimpleTool' });
       return;
     }
 
     this.isWarming = true;
     const startTime = Date.now();
 
-    console.log('[Cache Warming] Starting cache warming cycle...');
+    logger.info('[Cache Warming] Starting cache warming cycle...', { component: 'SimpleTool' });
 
     try {
       // Get enabled rules, optionally filtered by priority
@@ -149,7 +150,7 @@ class CacheWarmingService {
       console.log(`[Cache Warming] Success: ${this.stats.successfulWarmings}, Failed: ${this.stats.failedWarmings}`);
 
     } catch (error) {
-      console.error('[Cache Warming] Error during warming cycle:', error);
+      logger.error('[Cache Warming] Error during warming cycle:', { component: 'SimpleTool' }, error);
     } finally {
       this.isWarming = false;
     }
@@ -252,13 +253,13 @@ class CacheWarmingService {
    * Warm cache on application startup
    */
   async warmOnStartup(): Promise<void> {
-    console.log('[Cache Warming] Executing startup cache warming...');
+    logger.info('[Cache Warming] Executing startup cache warming...', { component: 'SimpleTool' });
     
     const startupRules = Array.from(this.warmingRules.values())
       .filter(rule => rule.enabled && rule.schedule === 'startup');
 
     if (startupRules.length === 0) {
-      console.log('[Cache Warming] No startup warming rules configured');
+      logger.info('[Cache Warming] No startup warming rules configured', { component: 'SimpleTool' });
       return;
     }
 
@@ -287,7 +288,7 @@ class CacheWarmingService {
             .orderBy(desc(bills.viewCount))
             .limit(50);
         } catch (error) {
-          console.error('Error fetching popular bills:', error);
+          logger.error('Error fetching popular bills:', { component: 'SimpleTool' }, error);
           return [];
         }
       }
@@ -311,7 +312,7 @@ class CacheWarmingService {
             .orderBy(desc(bills.introducedDate))
             .limit(30);
         } catch (error) {
-          console.error('Error fetching recent bills:', error);
+          logger.error('Error fetching recent bills:', { component: 'SimpleTool' }, error);
           return [];
         }
       }
@@ -335,7 +336,7 @@ class CacheWarmingService {
             .where(eq(sponsors.isActive, true))
             .limit(100);
         } catch (error) {
-          console.error('Error fetching active sponsors:', error);
+          logger.error('Error fetching active sponsors:', { component: 'SimpleTool' }, error);
           return [];
         }
       }
@@ -364,7 +365,7 @@ class CacheWarmingService {
           
           return result;
         } catch (error) {
-          console.error('Error fetching bill categories:', error);
+          logger.error('Error fetching bill categories:', { component: 'SimpleTool' }, error);
           return [];
         }
       }
@@ -395,7 +396,7 @@ class CacheWarmingService {
             lastUpdated: new Date()
           };
         } catch (error) {
-          console.error('Error fetching engagement stats:', error);
+          logger.error('Error fetching engagement stats:', { component: 'SimpleTool' }, error);
           return {
             totalUsers: 0,
             totalBills: 0,
@@ -431,7 +432,7 @@ class CacheWarmingService {
             lastUpdated: new Date()
           };
         } catch (error) {
-          console.error('Error fetching critical system data:', error);
+          logger.error('Error fetching critical system data:', { component: 'SimpleTool' }, error);
           return {
             systemStatus: 'unknown',
             maintenanceMode: false,
@@ -455,7 +456,7 @@ class CacheWarmingService {
         .filter(rule => rule.enabled && rule.schedule === 'hourly');
       
       if (hourlyRules.length > 0) {
-        console.log('[Cache Warming] Executing hourly warming cycle...');
+        logger.info('[Cache Warming] Executing hourly warming cycle...', { component: 'SimpleTool' });
         await this.executeWarmingCycle('high');
       }
     }, 3600000); // 1 hour
@@ -466,7 +467,7 @@ class CacheWarmingService {
         .filter(rule => rule.enabled && rule.schedule === 'daily');
       
       if (dailyRules.length > 0) {
-        console.log('[Cache Warming] Executing daily warming cycle...');
+        logger.info('[Cache Warming] Executing daily warming cycle...', { component: 'SimpleTool' });
         await this.executeWarmingCycle('medium');
       }
     }, 86400000); // 24 hours
@@ -477,12 +478,12 @@ class CacheWarmingService {
         .filter(rule => rule.enabled && rule.schedule === 'weekly');
       
       if (weeklyRules.length > 0) {
-        console.log('[Cache Warming] Executing weekly warming cycle...');
+        logger.info('[Cache Warming] Executing weekly warming cycle...', { component: 'SimpleTool' });
         await this.executeWarmingCycle('low');
       }
     }, 604800000); // 7 days
 
-    console.log('[Cache Warming] Scheduled warming tasks');
+    logger.info('[Cache Warming] Scheduled warming tasks', { component: 'SimpleTool' });
   }
 
   /**
@@ -553,3 +554,9 @@ class CacheWarmingService {
 
 // Export singleton instance
 export const cacheWarmingService = new CacheWarmingService();
+
+
+
+
+
+

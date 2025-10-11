@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 import { preloadCriticalResources } from './serviceWorker';
 
 // Asset loading configuration
@@ -544,9 +545,9 @@ export class AssetLoadingManager {
 
     try {
       await this.loadAssets(criticalAssets, 'preload');
-      console.log('Critical assets preloaded successfully');
+      logger.info('Critical assets preloaded successfully', { component: 'SimpleTool' });
     } catch (error) {
-      console.error('Failed to preload critical assets:', error);
+      logger.error('Failed to preload critical assets:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -618,3 +619,9 @@ export function setupAssetPreloading() {
 
 // Import React for the hook
 import React from 'react';
+
+
+
+
+
+

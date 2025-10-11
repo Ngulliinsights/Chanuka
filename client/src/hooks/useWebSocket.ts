@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { logger } from '../utils/logger';
 
 interface WebSocketMessage {
   type: 'connected' | 'subscribed' | 'unsubscribed' | 'bill_update' | 'notification' | 'error' | 'pong';
@@ -80,7 +81,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   // Logging helper that respects debug flag
   const log = useCallback((...args: any[]) => {
     if (debug) {
-      console.log('[WebSocket]', ...args);
+      logger.info('[WebSocket]', { component: 'SimpleTool' }, ...args);
     }
   }, [debug]);
 
@@ -125,7 +126,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
           }, 5000); // Wait 5 seconds for pong response
 
         } catch (error) {
-          console.error('Failed to send ping:', error);
+          logger.error('Failed to send ping:', { component: 'SimpleTool' }, error);
           ws.current?.close(4000, 'Ping failed');
         }
       }
@@ -258,12 +259,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             try {
               handler(message);
             } catch (error) {
-              console.error('Error in message handler:', error);
+              logger.error('Error in message handler:', { component: 'SimpleTool' }, error);
             }
           });
 
         } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
+          logger.error('Error parsing WebSocket message:', { component: 'SimpleTool' }, error);
         }
       };
 
@@ -302,7 +303,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
               return { ...prev, reconnectAttempts: newAttempts };
             } else {
-              console.error('Max reconnection attempts reached');
+              logger.error('Max reconnection attempts reached', { component: 'SimpleTool' });
               return {
                 ...prev,
                 error: 'Failed to reconnect after multiple attempts'
@@ -314,7 +315,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
       // Handle connection errors
       ws.current.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        logger.error('WebSocket error:', { component: 'SimpleTool' }, error);
         safeSetState(prev => ({
           ...prev,
           error: 'Connection error',
@@ -323,7 +324,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       };
 
     } catch (error) {
-      console.error('Failed to create WebSocket connection:', error);
+      logger.error('Failed to create WebSocket connection:', { component: 'SimpleTool' }, error);
       safeSetState(prev => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Failed to connect',
@@ -340,7 +341,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         ws.current.send(JSON.stringify(message));
         return true;
       } catch (error) {
-        console.error('Failed to send message:', error);
+        logger.error('Failed to send message:', { component: 'SimpleTool' }, error);
         return false;
       }
     }
@@ -469,12 +470,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             safeSetState(prev => ({ ...prev, lastMessage: message }));
             messageHandlers.current.forEach(handler => handler(message));
           } catch (error) {
-            console.error('Failed to parse WebSocket message:', error);
+            logger.error('Failed to parse WebSocket message:', { component: 'SimpleTool' }, error);
           }
         };
 
         ws.current.onerror = (error) => {
-          console.error('WebSocket error:', error);
+          logger.error('WebSocket error:', { component: 'SimpleTool' }, error);
           safeSetState(prev => ({ ...prev, error: 'Connection error' }));
         };
 
@@ -498,7 +499,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         };
 
       } catch (error) {
-        console.error('Failed to create WebSocket connection:', error);
+        logger.error('Failed to create WebSocket connection:', { component: 'SimpleTool' }, error);
         safeSetState(prev => ({ ...prev, error: 'Failed to connect', isConnecting: false }));
       }
     };
@@ -574,3 +575,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     addMessageHandler
   };
 }
+
+
+
+
+
+

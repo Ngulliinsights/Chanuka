@@ -1,4 +1,5 @@
 import { RelatedPage, UserRole, PageRelationship } from '@/types/navigation';
+import { logger } from '../utils/logger';
 
 // Page relationship mapping
 const pageRelationships: Record<string, PageRelationship> = {
@@ -296,3 +297,9 @@ export function getContextualSuggestions(
   
   return boostedPages;
 }
+
+
+
+
+
+

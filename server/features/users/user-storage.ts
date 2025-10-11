@@ -1,9 +1,9 @@
-import { 
-  readDatabase, 
-  writeDatabase, 
+import {
+  readDatabase,
+  writeDatabase,
   pool,
   withTransaction
-} from '../shared/database/connection.js';
+} from '../../../shared/database/connection.js';
 import { 
   users,
   userProfiles,
@@ -16,6 +16,7 @@ import {
 import { eq, and, or, sql } from 'drizzle-orm';
 import type { StorageConfig } from './base/BaseStorage.js';
 import { BaseStorage } from './base/BaseStorage.js';
+import { logger } from '../../utils/logger';
 
 // Additional type definitions needed
 export type OAuthProvider = 'google' | 'github' | 'twitter';
@@ -242,3 +243,11 @@ export class UserStorage extends BaseStorage<User> {
     }
   }
 }
+
+
+
+
+
+
+
+

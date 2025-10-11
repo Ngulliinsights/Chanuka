@@ -35,6 +35,7 @@ const formatDistanceToNow = (date: Date) => {
   return date.toLocaleDateString();
 };
 import { useBillAnalysis } from '../../hooks/use-bill-analysis';
+import { logger } from '../utils/logger.js';
 
 interface Comment {
   id: number;
@@ -116,7 +117,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
       setNewExpertise('');
       setCharacterCount(0);
     } catch (error) {
-      console.error('Failed to add comment:', error);
+      logger.error('Failed to add comment:', { component: 'SimpleTool' }, error);
     }
   };
 
@@ -139,7 +140,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
         setPollData({ question: '', options: ['', ''] });
       }
     } catch (error) {
-      console.error('Failed to create poll:', error);
+      logger.error('Failed to create poll:', { component: 'SimpleTool' }, error);
     }
   };
 
@@ -155,7 +156,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
         // Comments will be updated by parent
       }
     } catch (error) {
-      console.error('Failed to vote:', error);
+      logger.error('Failed to vote:', { component: 'SimpleTool' }, error);
     }
   };
 
@@ -171,7 +172,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
         // Comments will be updated by parent
       }
     } catch (error) {
-      console.error('Failed to vote on poll:', error);
+      logger.error('Failed to vote on poll:', { component: 'SimpleTool' }, error);
     }
   };
 
@@ -195,7 +196,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
         // Comments will be updated by parent
       }
     } catch (error) {
-      console.error('Failed to reply:', error);
+      logger.error('Failed to reply:', { component: 'SimpleTool' }, error);
     }
   };
 
@@ -209,7 +210,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
         // Comments will be updated by parent
       }
     } catch (error) {
-      console.error('Failed to highlight comment:', error);
+      logger.error('Failed to highlight comment:', { component: 'SimpleTool' }, error);
     }
   };
 

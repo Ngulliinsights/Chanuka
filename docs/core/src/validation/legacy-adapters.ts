@@ -7,6 +7,7 @@
 import { z } from 'zod';
 import { ValidationService } from './validation-service';
 import { ValidationResult, ValidationError } from './types';
+import { logger } from '../utils/logger';
 
 /**
  * Adapter for the existing validators from server/utils/validators.ts
@@ -294,3 +295,9 @@ export function createLegacyValidationAdapters(validationService: ValidationServ
     middleware: new ValidationMiddlewareAdapter(validationService)
   };
 }
+
+
+
+
+
+

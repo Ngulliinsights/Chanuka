@@ -6,6 +6,7 @@
  */
 
 import { FinancialDisclosureIntegrationService } from './services/financial-disclosure-integration.js';
+import { logger } from '../utils/logger';
 
 // Mock data for testing
 const mockDisclosure = {
@@ -32,13 +33,13 @@ const mockAffiliation = {
 };
 
 async function testFinancialDisclosureIntegrationUnit() {
-  console.log('🧪 Testing Financial Disclosure Integration Service (Unit Tests)...\n');
+  logger.info('🧪 Testing Financial Disclosure Integration Service (Unit Tests)...\n', { component: 'SimpleTool' });
 
   const service = new FinancialDisclosureIntegrationService();
 
   try {
     // Test 1: Test private helper methods through public interface
-    console.log('1️⃣ Testing disclosure data enhancement...');
+    logger.info('1️⃣ Testing disclosure data enhancement...', { component: 'SimpleTool' });
     
     // Test disclosure completeness scoring for individual disclosure
     const completenessScore = (service as any).calculateDisclosureCompletenessScoreForDisclosure(mockDisclosure);
@@ -51,7 +52,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 2: Test relationship type mapping
-    console.log('2️⃣ Testing relationship type mapping...');
+    logger.info('2️⃣ Testing relationship type mapping...', { component: 'SimpleTool' });
     
     const disclosureRelationType = (service as any).mapDisclosureToRelationshipType('financial');
     console.log(`✅ Financial disclosure maps to: ${disclosureRelationType}`);
@@ -62,7 +63,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 3: Test financial strength calculation
-    console.log('3️⃣ Testing financial strength calculation...');
+    logger.info('3️⃣ Testing financial strength calculation...', { component: 'SimpleTool' });
     
     const lowAmount = (service as any).calculateFinancialStrength(25000);
     const mediumAmount = (service as any).calculateFinancialStrength(250000);
@@ -75,7 +76,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 4: Test conflict potential assessment
-    console.log('4️⃣ Testing conflict potential assessment...');
+    logger.info('4️⃣ Testing conflict potential assessment...', { component: 'SimpleTool' });
     
     const mockDisclosureData = {
       id: 1,
@@ -98,7 +99,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 5: Test threshold checking
-    console.log('5️⃣ Testing disclosure threshold checking...');
+    logger.info('5️⃣ Testing disclosure threshold checking...', { component: 'SimpleTool' });
     
     const exceedsFinancial = (service as any).exceedsThreshold('financial', 15000);
     const exceedsInvestment = (service as any).exceedsThreshold('investment', 75000);
@@ -111,7 +112,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 6: Test severity determination
-    console.log('6️⃣ Testing alert severity determination...');
+    logger.info('6️⃣ Testing alert severity determination...', { component: 'SimpleTool' });
     
     const lowSeverity = (service as any).determineSeverityFromAmount(50000);
     const mediumSeverity = (service as any).determineSeverityFromAmount(500000);
@@ -124,7 +125,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 7: Test relationship merging logic
-    console.log('7️⃣ Testing relationship merging...');
+    logger.info('7️⃣ Testing relationship merging...', { component: 'SimpleTool' });
     
     const testRelationships = [
       {
@@ -158,7 +159,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 8: Test risk assessment logic
-    console.log('8️⃣ Testing risk assessment...');
+    logger.info('8️⃣ Testing risk assessment...', { component: 'SimpleTool' });
     
     const lowRisk = (service as any).assessOverallFinancialRisk(100000, []);
     const mediumRisk = (service as any).assessOverallFinancialRisk(750000, [
@@ -176,7 +177,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 9: Test completeness risk assessment
-    console.log('9️⃣ Testing completeness risk assessment...');
+    logger.info('9️⃣ Testing completeness risk assessment...', { component: 'SimpleTool' });
     
     const recentDate = new Date();
     const oldDate = new Date();
@@ -191,36 +192,42 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Summary
-    console.log('📊 FINANCIAL DISCLOSURE INTEGRATION UNIT TEST SUMMARY');
-    console.log('='.repeat(55));
-    console.log('✅ Disclosure data enhancement - PASSED');
-    console.log('✅ Relationship type mapping - PASSED');
-    console.log('✅ Financial strength calculation - PASSED');
-    console.log('✅ Conflict potential assessment - PASSED');
-    console.log('✅ Threshold checking - PASSED');
-    console.log('✅ Alert severity determination - PASSED');
-    console.log('✅ Relationship merging logic - PASSED');
-    console.log('✅ Risk assessment logic - PASSED');
-    console.log('✅ Completeness risk assessment - PASSED');
+    logger.info('📊 FINANCIAL DISCLOSURE INTEGRATION UNIT TEST SUMMARY', { component: 'SimpleTool' });
+    logger.info('=', { component: 'SimpleTool' }, .repeat(55));
+    logger.info('✅ Disclosure data enhancement - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Relationship type mapping - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Financial strength calculation - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Conflict potential assessment - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Threshold checking - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Alert severity determination - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Relationship merging logic - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Risk assessment logic - PASSED', { component: 'SimpleTool' });
+    logger.info('✅ Completeness risk assessment - PASSED', { component: 'SimpleTool' });
     console.log();
-    console.log('🎉 All financial disclosure integration unit tests passed!');
+    logger.info('🎉 All financial disclosure integration unit tests passed!', { component: 'SimpleTool' });
     console.log();
-    console.log('📋 Task 8.2 Implementation Verification:');
-    console.log('- ✅ Financial disclosure data processing logic implemented');
-    console.log('- ✅ Disclosure completeness scoring algorithms working');
-    console.log('- ✅ Financial relationship mapping logic functional');
-    console.log('- ✅ Disclosure update monitoring and alert logic operational');
-    console.log('- ✅ All helper methods and calculations verified');
-    console.log('- ✅ Risk assessment and threshold logic validated');
+    logger.info('📋 Task 8.2 Implementation Verification:', { component: 'SimpleTool' });
+    logger.info('- ✅ Financial disclosure data processing logic implemented', { component: 'SimpleTool' });
+    logger.info('- ✅ Disclosure completeness scoring algorithms working', { component: 'SimpleTool' });
+    logger.info('- ✅ Financial relationship mapping logic functional', { component: 'SimpleTool' });
+    logger.info('- ✅ Disclosure update monitoring and alert logic operational', { component: 'SimpleTool' });
+    logger.info('- ✅ All helper methods and calculations verified', { component: 'SimpleTool' });
+    logger.info('- ✅ Risk assessment and threshold logic validated', { component: 'SimpleTool' });
 
   } catch (error) {
-    console.error('❌ Unit test failed:', error);
+    logger.error('❌ Unit test failed:', { component: 'SimpleTool' }, error);
     process.exit(1);
   }
 }
 
 // Run the unit test
 testFinancialDisclosureIntegrationUnit().catch(error => {
-  console.error('Fatal unit test error:', error);
+  logger.error('Fatal unit test error:', { component: 'SimpleTool' }, error);
   process.exit(1);
 });
+
+
+
+
+
+

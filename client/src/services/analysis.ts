@@ -345,3 +345,9 @@ class AnalysisService {
 
 // Export singleton instance for consistent usage across the application
 export const analysisService = new AnalysisService();
+
+
+
+
+
+

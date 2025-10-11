@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { 
+import { logger } from '../utils/logger.js';
   ArrowLeft, 
   Users, 
   Filter,
@@ -55,7 +56,7 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
           const data = await response.json();
           setCoSponsors(data.coSponsors || []);
         } else {
-          console.error('Failed to fetch co-sponsors data');
+          logger.error('Failed to fetch co-sponsors data', { component: 'SimpleTool' });
           // Fallback to mock data if API fails
           setCoSponsors([
             {
@@ -88,7 +89,7 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
           ]);
         }
       } catch (error) {
-        console.error('Error fetching co-sponsors data:', error);
+        logger.error('Error fetching co-sponsors data:', { component: 'SimpleTool' }, error);
         // Fallback to mock data on error
         setCoSponsors([]);
       } finally {

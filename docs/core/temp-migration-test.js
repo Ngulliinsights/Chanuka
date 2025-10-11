@@ -12,5 +12,5 @@
             // Test logger
             const logger = new Logger({ level: 'info' });
             
-            console.log('Core utilities test passed');
+            logger.info('Core utilities test passed', { component: 'SimpleTool' });
           

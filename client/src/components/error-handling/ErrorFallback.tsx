@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Logo } from '@/components/ui/logo';
 import { ErrorFallbackProps } from './PageErrorBoundary';
+import { logger } from '../utils/logger.js';
 
 export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   error,

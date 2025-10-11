@@ -1,6 +1,6 @@
-export interface AnalysisResult {
-  success: boolean;
-  data?: any;
+ export interface AnalysisResult {
+  success: boolean;                                            
+  data?: Record<string, unknown>;
   error?: string;
   confidence?: number;
   timestamp?: Date;
@@ -29,3 +29,9 @@ export interface StakeholderAnalysis {
   majorConcerns: string[];
   publicOpinion: number; // -100 to 100
 }
+
+
+
+
+
+

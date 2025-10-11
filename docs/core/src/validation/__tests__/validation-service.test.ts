@@ -9,6 +9,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ValidationService } from '../validation-service';
 import { z } from 'zod';
 import { ValidationError } from '../types';
+import { logger } from '../utils/logger';
 
 describe('ValidationService', () => {
   let validationService: ValidationService;
@@ -768,3 +769,9 @@ describe('ValidationService', () => {
     });
   });
 });
+
+
+
+
+
+

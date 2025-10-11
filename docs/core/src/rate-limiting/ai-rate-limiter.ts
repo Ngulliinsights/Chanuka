@@ -12,6 +12,7 @@
 import { RateLimitStore, RateLimitConfig, RateLimitResult } from './types';
 import { RedisStore } from './stores/redis-store';
 import { MemoryStore } from './stores/memory-store';
+import { logger } from '../utils/logger';
 
 export interface AIRateLimitConfig extends RateLimitConfig {
   service: string;
@@ -103,7 +104,7 @@ export class AIRateLimiter {
     try {
       return await this.store.check(effectiveKey, config);
     } catch (error) {
-      console.error('AI rate limit check failed:', error);
+      logger.error('AI rate limit check failed:', { component: 'SimpleTool' }, error);
       // Fail open - allow the request
       return {
         allowed: true,
@@ -313,7 +314,7 @@ export class AIRateLimiter {
 
     // This would depend on the store implementation
     // For now, we'll just log the reset request
-    console.log('Rate limit reset requested', {
+    logger.info('Rate limit reset requested', { component: 'SimpleTool' }, {
       key: effectiveKey,
       service,
       operation
@@ -408,3 +409,9 @@ export function getDefaultAIRateLimiter(): AIRateLimiter {
 export function setDefaultAIRateLimiter(limiter: AIRateLimiter): void {
   defaultAIRateLimiter = limiter;
 }
+
+
+
+
+
+

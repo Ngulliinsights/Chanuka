@@ -9,6 +9,7 @@
 
 import { BaseCacheAdapter } from '../base-adapter';
 import type { 
+import { logger } from '../utils/logger';
   CacheEntry, 
   CacheOptions, 
   CacheHealthStatus, 
@@ -754,3 +755,9 @@ export class MemoryAdapter extends BaseCacheAdapter {
     this.currentSizeBytes = 0;
   }
 }
+
+
+
+
+
+

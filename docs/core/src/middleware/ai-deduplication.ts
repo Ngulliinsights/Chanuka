@@ -11,6 +11,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { getDefaultCache } from '../cache';
 import { performance } from 'perf_hooks';
+import { logger } from '../utils/logger';
 
 export interface DeduplicationOptions {
   enabled?: boolean;
@@ -84,7 +85,7 @@ export class AIDeduplicationMiddleware {
           pendingRequest.requestCount++;
           pendingRequest.requestIds.push(requestId);
 
-          console.log('AI Request Deduplicated', {
+          logger.info('AI Request Deduplicated', { component: 'SimpleTool' }, {
             requestId,
             deduplicationKey,
             pendingRequestCount: pendingRequest.requestCount,
@@ -123,7 +124,7 @@ export class AIDeduplicationMiddleware {
         await pendingPromise;
 
       } catch (error) {
-        console.error('Deduplication error:', error);
+        logger.error('Deduplication error:', { component: 'SimpleTool' }, error);
         // On error, proceed without deduplication
         next();
       }
@@ -214,7 +215,7 @@ export class AIDeduplicationMiddleware {
    * Default duplicate handler
    */
   private defaultOnDuplicate = (req: Request, res: Response, originalResult: any): void => {
-    console.log('AI Request Served from Deduplication', {
+    logger.info('AI Request Served from Deduplication', { component: 'SimpleTool' }, {
       path: req.path,
       method: req.method,
       userId: (req as any).user?.id,
@@ -248,7 +249,7 @@ export class AIDeduplicationMiddleware {
   private recordMetrics(type: 'cache_hit' | 'deduplication_hit' | 'new_request', key: string): void {
     if (!this.options.enableMetrics) return;
 
-    console.log('AI Deduplication Metrics', {
+    logger.info('AI Deduplication Metrics', { component: 'SimpleTool' }, {
       type,
       key,
       timestamp: new Date().toISOString(),
@@ -364,3 +365,9 @@ export function getDefaultDeduplicationMiddleware(): AIDeduplicationMiddleware {
 export function setDefaultDeduplicationMiddleware(middleware: AIDeduplicationMiddleware): void {
   defaultDeduplicationMiddleware = middleware;
 }
+
+
+
+
+
+

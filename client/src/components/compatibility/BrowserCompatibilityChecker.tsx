@@ -8,6 +8,7 @@
 import React, { useEffect, useState } from 'react';
 import { getBrowserInfo, isBrowserSupported, BrowserInfo } from '../../utils/browser-compatibility';
 import { loadPolyfills, getPolyfillStatus } from '../../utils/polyfills';
+import { logger } from '../utils/logger.js';
 
 interface BrowserCompatibilityCheckerProps {
   children: React.ReactNode;
@@ -75,7 +76,7 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
       }));
 
     } catch (error) {
-      console.error('Browser compatibility check failed:', error);
+      logger.error('Browser compatibility check failed:', { component: 'SimpleTool' }, error);
       setState(prev => ({
         ...prev,
         isChecking: false,
@@ -115,7 +116,7 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
         window.location.reload();
       }
     } catch (error) {
-      console.error('Failed to clear cache:', error);
+      logger.error('Failed to clear cache:', { component: 'SimpleTool' }, error);
       window.location.reload();
     }
   };

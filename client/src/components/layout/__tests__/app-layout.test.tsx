@@ -22,6 +22,7 @@ vi.mock('@/components/navigation/MobileNavigation', () => ({
 
 import AppLayout from '../app-layout';
 import { useUnifiedNavigation } from '@/hooks/use-unified-navigation';
+import { logger } from '../utils/logger.js';
 
 const mockUseUnifiedNavigation = vi.mocked(useUnifiedNavigation);
 

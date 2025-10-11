@@ -6,6 +6,7 @@ import { UserRole } from '@/types/navigation';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Lock, Shield, UserX } from 'lucide-react';
+import { logger } from '../utils/logger.js';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

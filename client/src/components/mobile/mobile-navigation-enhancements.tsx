@@ -19,6 +19,7 @@ import {
 import { useResponsiveLayoutContext, TouchButton, SafeAreaWrapper } from './responsive-layout-manager';
 import { MobileTouchHandler, MobileTouchUtils } from '@/utils/mobile-touch-handler';
 import { Link, useLocation } from 'react-router-dom';
+import { logger } from '../utils/logger.js';
 
 interface NavigationItem {
   id: string;

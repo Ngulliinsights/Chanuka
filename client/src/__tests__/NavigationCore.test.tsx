@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import HomePage from '@/pages/home';
+import { logger } from '../utils/logger.js';
 
 // Mock hooks with minimal setup
 vi.mock('@/hooks/use-auth', () => ({

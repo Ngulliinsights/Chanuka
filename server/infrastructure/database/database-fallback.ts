@@ -1,5 +1,6 @@
 import { pool } from "../../../shared/database/connection.js";
 import { demoDataService } from "../demo-data.js";
+import { logger } from '../utils/logger';
 
 // Simple database connection status tracking (replaces server/db.js dependency)
 let isDatabaseConnected = false;
@@ -42,7 +43,7 @@ export class DatabaseFallbackService {
    * Initialize database connection with fallback handling
    */
   public async initialize(): Promise<boolean> {
-    console.log("🔄 Initializing database with fallback support...");
+    logger.info('🔄 Initializing database with fallback support...', { component: 'SimpleTool' });
     
     try {
       const connected = await this.testConnection();
@@ -51,12 +52,12 @@ export class DatabaseFallbackService {
         this.isConnected = true;
         this.retryCount = 0;
         setDatabaseConnectionStatus(true);
-        console.log("✅ Database connection established successfully");
+        logger.info('✅ Database connection established successfully', { component: 'SimpleTool' });
         
         // Disable demo mode if database is available
         if (demoDataService.isDemoMode()) {
           demoDataService.setDemoMode(false);
-          console.log("🔄 Disabled demo mode - database is available");
+          logger.info('🔄 Disabled demo mode - database is available', { component: 'SimpleTool' });
         }
         
         return true;
@@ -64,7 +65,7 @@ export class DatabaseFallbackService {
         return await this.handleConnectionFailure();
       }
     } catch (error) {
-      console.error("❌ Database initialization error:", error);
+      logger.error('❌ Database initialization error:', { component: 'SimpleTool' }, error);
       return await this.handleConnectionFailure();
     }
   }
@@ -75,7 +76,7 @@ export class DatabaseFallbackService {
   public async testConnection(): Promise<boolean> {
     try {
       if (!process.env.DATABASE_URL) {
-        console.log("⚠️  No DATABASE_URL configured");
+        logger.info('⚠️  No DATABASE_URL configured', { component: 'SimpleTool' });
         return false;
       }
 
@@ -101,7 +102,7 @@ export class DatabaseFallbackService {
       client.release();
 
       if (tableCheck.rows.length < 3) {
-        console.log("⚠️  Required tables missing - falling back to demo mode");
+        logger.info('⚠️  Required tables missing - falling back to demo mode', { component: 'SimpleTool' });
         return false;
       }
 
@@ -109,7 +110,7 @@ export class DatabaseFallbackService {
       return true;
 
     } catch (error) {
-      console.error("Database connection test failed:", {
+      logger.error('Database connection test failed:', { component: 'SimpleTool' }, {
         message: error instanceof Error ? error.message : String(error),
         code: (error as any)?.code
       });
@@ -130,7 +131,7 @@ export class DatabaseFallbackService {
     // Enable demo mode immediately
     if (!demoDataService.isDemoMode()) {
       demoDataService.setDemoMode(true);
-      console.log("🔄 Enabled demo mode due to database connection failure");
+      logger.info('🔄 Enabled demo mode due to database connection failure', { component: 'SimpleTool' });
     }
 
     // Schedule retry if we haven't exceeded max attempts
@@ -140,8 +141,8 @@ export class DatabaseFallbackService {
         this.attemptReconnection();
       }, this.retryInterval);
     } else {
-      console.log("⚠️  Max retry attempts reached. Running permanently in demo mode.");
-      console.log("💡 Restart the server to retry database connection.");
+      logger.info('⚠️  Max retry attempts reached. Running permanently in demo mode.', { component: 'SimpleTool' });
+      logger.info('💡 Restart the server to retry database connection.', { component: 'SimpleTool' });
     }
 
     return false;
@@ -160,18 +161,18 @@ export class DatabaseFallbackService {
         this.isConnected = true;
         this.retryCount = 0;
         setDatabaseConnectionStatus(true);
-        console.log("✅ Database reconnection successful!");
+        logger.info('✅ Database reconnection successful!', { component: 'SimpleTool' });
         
         // Disable demo mode
         if (demoDataService.isDemoMode()) {
           demoDataService.setDemoMode(false);
-          console.log("🔄 Disabled demo mode - database is back online");
+          logger.info('🔄 Disabled demo mode - database is back online', { component: 'SimpleTool' });
         }
       } else {
         await this.handleConnectionFailure();
       }
     } catch (error) {
-      console.error("Reconnection attempt failed:", error);
+      logger.error('Reconnection attempt failed:', { component: 'SimpleTool' }, error);
       await this.handleConnectionFailure();
     }
   }
@@ -185,7 +186,7 @@ export class DatabaseFallbackService {
         const healthy = await this.testConnection();
         
         if (!healthy) {
-          console.log("⚠️  Database health check failed - switching to demo mode");
+          logger.info('⚠️  Database health check failed - switching to demo mode', { component: 'SimpleTool' });
           await this.handleConnectionFailure();
         }
       } else if (this.retryCount < this.maxRetries) {
@@ -256,7 +257,7 @@ export class DatabaseFallbackService {
    * Force retry database connection (admin function)
    */
   public async forceRetry(): Promise<boolean> {
-    console.log("🔄 Force retrying database connection...");
+    logger.info('🔄 Force retrying database connection...', { component: 'SimpleTool' });
     this.retryCount = 0; // Reset retry count
     return await this.initialize();
   }
@@ -282,3 +283,9 @@ export class DatabaseFallbackService {
 
 // Export singleton instance
 export const databaseFallbackService = DatabaseFallbackService.getInstance();
+
+
+
+
+
+

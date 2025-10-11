@@ -14,6 +14,7 @@ import {
   Settings
 } from "lucide-react";
 import { cn, formatRelativeTime } from "@/lib/utils";
+import { logger } from '../utils/logger.js';
 
 interface SystemHealthProps {
   health?: any;

@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import pkg from 'pg';
+import { logger } from '../utils/logger';
 const { Pool } = pkg;
 
 dotenv.config();
@@ -11,7 +12,7 @@ async function checkSchema() {
   });
 
   try {
-    console.log('Checking current database schema...');
+    logger.info('Checking current database schema...', { component: 'SimpleTool' });
     
     // Get all tables
     const tables = await pool.query(`
@@ -42,10 +43,16 @@ async function checkSchema() {
     }
     
   } catch (error) {
-    console.error('Error:', error.message);
+    logger.error('Error:', { component: 'SimpleTool' }, error.message);
   } finally {
     await pool.end();
   }
 }
 
 checkSchema();
+
+
+
+
+
+

@@ -2,8 +2,10 @@
 import { Router, Request, Response } from "express";
 import { eq, desc, sql } from "drizzle-orm";
 import { database as db, expertVerifications, users } from "../../../shared/database/connection.js";
-import { VerificationRequest, createApiResponse, createErrorResponse } from "../types/api.js";
-import { ApiSuccess, ApiErrorResponse, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
+import { VerificationRequest } from "../../types/api.js";
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
+import { errorTracker } from '../../core/errors/error-tracker.js';
+import { logger } from '../../utils/logger';
 
 const router = Router();
 
@@ -39,11 +41,16 @@ export function setupVerificationRoutes(routerInstance: Router) {
         .where(eq(expertVerifications.billId, billId))
         .orderBy(desc(expertVerifications.createdAt));
 
-      return ApiSuccess(res, verifications, 
+      return ApiSuccess(res, verifications,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error("Error fetching verifications:", error);
-      return ApiError(res, 'Internal server error', 500, 
+      errorTracker.trackRequestError(
+        error as Error,
+        req,
+        'medium',
+        'database'
+      );
+      return ApiError(res, 'Internal server error', 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   });
@@ -80,11 +87,16 @@ export function setupVerificationRoutes(routerInstance: Router) {
         })
         .returning();
 
-      return ApiSuccess(res, verification[0], 
+      return ApiSuccess(res, verification[0],
         ApiResponseWrapper.createMetadata(startTime, 'database'), 201);
     } catch (error) {
-      console.error("Error creating verification:", error);
-      return ApiError(res, 'Internal server error', 500, 
+      errorTracker.trackRequestError(
+        error as Error,
+        req,
+        'medium',
+        'database'
+      );
+      return ApiError(res, 'Internal server error', 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   });
@@ -117,11 +129,16 @@ export function setupVerificationRoutes(routerInstance: Router) {
           ApiResponseWrapper.createMetadata(startTime, 'database'));
       }
 
-      return ApiSuccess(res, updatedVerification[0], 
+      return ApiSuccess(res, updatedVerification[0],
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error("Error updating verification:", error);
-      return ApiError(res, 'Internal server error', 500, 
+      errorTracker.trackRequestError(
+        error as Error,
+        req,
+        'medium',
+        'database'
+      );
+      return ApiError(res, 'Internal server error', 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   });
@@ -149,8 +166,13 @@ export function setupVerificationRoutes(routerInstance: Router) {
         }, {} as Record<string, number>),
       }, ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      console.error("Error fetching verification stats:", error);
-      return ApiError(res, 'Internal server error', 500, 
+      errorTracker.trackRequestError(
+        error as Error,
+        req,
+        'medium',
+        'database'
+      );
+      return ApiError(res, 'Internal server error', 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   });
@@ -161,3 +183,12 @@ setupVerificationRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,18 @@
 import request from 'supertest';
 import express from 'express';
-import { router as financialDisclosureRouter } from '../features/analytics/financial-disclosure.js';
+import { createFinancialDisclosureRouter } from '../features/analytics/financial-disclosure/index.ts';
+import { FinancialDisclosureMonitoringService } from '../features/analytics/financial-disclosure/monitoring.ts';
+import { financialDisclosureAnalyticsService } from '../features/analytics/services/financial-disclosure.service.js';
+import { logger } from '../utils/logger';
+
+// Create mock monitoring service for tests
+const mockMonitoringService = new FinancialDisclosureMonitoringService();
+
+// Create test router
+const financialDisclosureRouter = createFinancialDisclosureRouter(
+  mockMonitoringService,
+  financialDisclosureAnalyticsService
+);
 
 // Create test app
 const app = express();
@@ -227,3 +239,9 @@ describe('Financial Disclosure API Endpoints', () => {
     });
   });
 });
+
+
+
+
+
+

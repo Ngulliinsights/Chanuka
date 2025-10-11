@@ -23,6 +23,7 @@ import PerformanceMetricsCollector from "@/components/performance/PerformanceMet
 import { Suspense, useEffect } from "react";
 import { useComprehensiveLoading } from "@/hooks/useComprehensiveLoading";
 import {
+import { logger } from '../utils/logger.js';
   SafeLazyPages,
   SafeLazySponsorshipPages,
 } from "@/utils/safe-lazy-loading";
@@ -219,7 +220,7 @@ export default function App() {
 
   useEffect(() => {
     if (IS_DEV) {
-      console.log("App initialized with", ROUTES.length, "routes");
+      logger.info('App initialized with', { component: 'SimpleTool' }, ROUTES.length, "routes");
     }
   }, []);
 

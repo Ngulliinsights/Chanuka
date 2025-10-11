@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { logger } from '../utils/logger';
 
 // Mock browser environment
 const mockUserAgent = (userAgent: string) => {
@@ -335,3 +336,9 @@ describe('Feature Fallbacks', () => {
     expect(fallbacks.useWebWorkerFallback).toBeDefined();
   });
 });
+
+
+
+
+
+

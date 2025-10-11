@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '../utils/logger.js';
 
 interface OnboardingProgress {
   achievementType: string;

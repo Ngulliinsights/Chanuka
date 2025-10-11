@@ -10,7 +10,8 @@ import {
   timingMiddleware,
   createRequestLoggingPipeline,
 } from '../middleware.js';
-import { Logger } from '../logger.js';
+import { Logger } from '../logger';
+import { logger } from '../utils/logger';
 
 // Mock Express types
 interface MockRequest extends Partial<Request> {
@@ -395,3 +396,9 @@ describe('Request Logging Middleware', () => {
     });
   });
 });
+
+
+
+
+
+

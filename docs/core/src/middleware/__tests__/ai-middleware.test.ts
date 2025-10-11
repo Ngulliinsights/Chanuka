@@ -22,6 +22,7 @@ import {
 } from '../ai-middleware';
 import { getDefaultCache } from '../../cache';
 import { MemoryStore } from '../../rate-limiting/stores/memory-store';
+import { logger } from '../utils/logger';
 
 // Mock dependencies
 vi.mock('../../cache');
@@ -522,3 +523,9 @@ describe('AI Middleware', () => {
     });
   });
 });
+
+
+
+
+
+

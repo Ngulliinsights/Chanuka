@@ -16,6 +16,7 @@ import {
   securityAuditLogs 
 } from "../../../shared/schema.js";
 import { auditLogger } from "../../infrastructure/monitoring/audit-log.js";
+import { logger } from '../../utils/logger';
 
 export interface UserDataExport {
   user: {
@@ -407,7 +408,7 @@ class PrivacyService {
 
       return exportData;
     } catch (error) {
-      console.error('Error exporting user data:', error);
+      logger.error('Error exporting user data:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to export user data');
     }
   }
@@ -543,7 +544,7 @@ class PrivacyService {
         auditTrailKept: keepAuditTrail
       };
     } catch (error) {
-      console.error('Error deleting user data:', error);
+      logger.error('Error deleting user data:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to delete user data');
     }
   }
@@ -589,7 +590,7 @@ class PrivacyService {
         }
       };
     } catch (error) {
-      console.error('Error getting privacy preferences:', error);
+      logger.error('Error getting privacy preferences:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to get privacy preferences');
     }
   }
@@ -646,7 +647,7 @@ class PrivacyService {
 
       return updatedPrefs;
     } catch (error) {
-      console.error('Error updating privacy preferences:', error);
+      logger.error('Error updating privacy preferences:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to update privacy preferences');
     }
   }
@@ -761,7 +762,7 @@ class PrivacyService {
         cleanupResults
       };
     } catch (error) {
-      console.error('Error running data cleanup:', error);
+      logger.error('Error running data cleanup:', { component: 'SimpleTool' }, error);
       return {
         success: false,
         cleanupResults
@@ -887,7 +888,7 @@ class PrivacyService {
         recommendations
       };
     } catch (error) {
-      console.error('Error generating GDPR compliance report:', error);
+      logger.error('Error generating GDPR compliance report:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to generate GDPR compliance report');
     }
   }
@@ -913,3 +914,11 @@ class PrivacyService {
 }
 
 export const privacyService = new PrivacyService();
+
+
+
+
+
+
+
+

@@ -207,6 +207,7 @@ const NotFoundPage = () => (
 
 // Import React properly
 import React from 'react';
+import { logger } from '../utils/logger.js';
 
 describe('End-to-End User Flow Integration Tests', () => {
   let queryClient: QueryClient;

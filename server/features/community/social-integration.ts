@@ -1,5 +1,5 @@
 import type { User } from '../../../shared/schema.js';
-import { logger } from '../utils/logger.js';
+import { logger } from '../../utils/logger';
 import { cacheService } from './cache.js';
 
 interface SocialPlatform {
@@ -559,3 +559,12 @@ export class SocialIntegrationService {
 
 // Export singleton instance
 export const socialIntegrationService = new SocialIntegrationService();
+
+
+
+
+
+
+
+
+

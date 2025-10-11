@@ -2,11 +2,12 @@ import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
 import cors from 'cors';
-import { router as billsRouter } from '../../features/bills/bills.js';
-import { router as sponsorsRouter } from '../../features/bills/sponsors.js';
-import { router as financialDisclosureRouter } from '../../features/analytics/financial-disclosure.js';
+import { router as billsRouter } from '../../features/bills/bills-router.ts';
+import { router as sponsorsRouter } from '../../features/bills/sponsors.ts';
+import { router as financialDisclosureRouter } from '../../features/analytics/financial-disclosure/index.js';
 import { router as authRouter } from '../../core/auth/auth.js';
 import { TestHelpers, PerformanceUtils } from '../utils/test-helpers.js';
+import { logger } from '../utils/logger';
 
 describe('API Performance Tests', () => {
   let app: express.Application;
@@ -200,7 +201,7 @@ describe('API Performance Tests', () => {
         }
       });
 
-      console.log('Memory usage during test:', memoryTest);
+      logger.info('Memory usage during test:', { component: 'SimpleTool' }, memoryTest);
 
       // Memory increase should be reasonable (less than 50MB)
       expect(memoryTest.difference.heapUsed).toBeLessThan(50);
@@ -362,3 +363,9 @@ describe('API Performance Tests', () => {
     });
   });
 });
+
+
+
+
+
+

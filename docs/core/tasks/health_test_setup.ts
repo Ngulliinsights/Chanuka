@@ -7,6 +7,7 @@
  */
 
 import { jest } from '@jest/globals';
+import { logger } from '../utils/logger';
 
 // Global test setup
 export const setupHealthTests = () => {
@@ -31,7 +32,7 @@ export const setupHealthTests = () => {
 
   // Global error handler for unhandled promises in tests
   process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    logger.error('Unhandled Rejection at:', { component: 'SimpleTool' }, promise, 'reason:', reason);
   });
 };
 
@@ -658,3 +659,9 @@ export default {
   ChaosEngineer,
   TestReporter
 };
+
+
+
+
+
+

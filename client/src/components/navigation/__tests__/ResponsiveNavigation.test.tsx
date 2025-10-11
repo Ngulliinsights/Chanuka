@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { BrowserRouter } from 'react-router-dom';
 import { ResponsiveNavigationProvider, useResponsiveNavigation } from '@/contexts/ResponsiveNavigationContext';
 import { NavigationProvider } from '@/contexts/NavigationContext';
+import { logger } from '../utils/logger.js';
 
 // Mock the auth hook
 vi.mock('@/hooks/use-auth', () => ({

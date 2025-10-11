@@ -21,6 +21,7 @@ import {
 } from '@/utils/performanceMonitoring';
 import { useConnectionAwareLoading } from '@/utils/connectionAwareLoading';
 import { cn } from '@/lib/utils';
+import { logger } from '../utils/logger.js';
 
 export interface PerformanceDashboardProps {
   className?: string;

@@ -15,6 +15,7 @@ import {
   Server
 } from "lucide-react";
 import { cn, getStatusColor } from "@/lib/utils";
+import { logger } from '../utils/logger.js';
 
 interface EnvironmentSetupProps {
   environment?: any;

@@ -34,6 +34,7 @@ import {
 import { useJourneyAnalytics } from '../../hooks/use-journey-tracker';
 import { JourneyAnalytics, JourneyOptimization, PathAnalytics, DropOffPoint, ConversionFunnel } from '../../services/UserJourneyTracker';
 import { UserRole } from '../../types/navigation';
+import { logger } from '../utils/logger.js';
 
 interface JourneyAnalyticsDashboardProps {
   className?: string;
@@ -81,7 +82,7 @@ export function JourneyAnalyticsDashboard({ className }: JourneyAnalyticsDashboa
       setAnalytics(analyticsData);
       setOptimizations(optimizationData);
     } catch (error) {
-      console.error('Failed to load analytics:', error);
+      logger.error('Failed to load analytics:', { component: 'SimpleTool' }, error);
     } finally {
       setLoading(false);
     }

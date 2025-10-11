@@ -92,4 +92,10 @@ export { alertingService } from './alerting-service.js';
 // Export the core service as default for simple use cases
 export { notificationService as default } from './notification-service.js';
 
-console.log('📦 Notifications module loaded - Clean architecture implemented successfully');
+logger.info('📦 Notifications module loaded - Clean architecture implemented successfully', { component: 'SimpleTool' });
+
+
+
+
+
+

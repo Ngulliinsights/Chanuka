@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import App from '../../App';
+import { logger } from '../utils/logger.js';
 
 // Mock API calls
 vi.mock('../../services/api', () => ({

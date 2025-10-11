@@ -1,4 +1,5 @@
 import { performance } from 'perf_hooks';
+import { logger } from '../utils/logger';
 
 export class LoadTester {
   constructor(private readonly config: LoadTestConfig = {}) {}
@@ -353,3 +354,10 @@ export interface LoadTestSuite {
     averageResponseTime: number;
   };
 }
+
+
+
+
+
+
+

@@ -4,6 +4,7 @@
 
 import DOMPurify from 'dompurify';
 import escape from 'sql-template-tag';
+import { logger } from '../utils/logger';
 
 /**
  * Sanitize HTML content to prevent XSS
@@ -56,3 +57,10 @@ export function createSanitizer(options: {
     return result;
   };
 }
+
+
+
+
+
+
+

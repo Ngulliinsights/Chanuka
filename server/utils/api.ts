@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { logger } from '../utils/logger';
 // import { dashboardRouter } from './routes/dashboard'; // Dashboard route doesn't exist
 
 export const setupApi = () => {
@@ -17,3 +18,9 @@ export const setupApi = () => {
 
   return router;
 };
+
+
+
+
+
+

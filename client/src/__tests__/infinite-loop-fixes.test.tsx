@@ -3,6 +3,7 @@
  */
 import { renderHook, act } from '@testing-library/react';
 import React from 'react';
+import { logger } from '../utils/logger.js';
 
 // Mock dependencies
 jest.mock('../hooks/useConnectionAware', () => ({

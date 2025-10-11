@@ -1,27 +1,28 @@
 // Simple test script to verify database connection
 import { db, isDatabaseConnected, fallbackService, getConnectionStatus } from './db.ts';
+import { logger } from '../utils/logger.js';
 
-console.log('🧪 Testing database connection...');
+logger.info('🧪 Testing database connection...', { component: 'SimpleTool' });
 
 // Test connection status
 const status = getConnectionStatus();
-console.log('📊 Connection Status:', status);
+logger.info('📊 Connection Status:', { component: 'SimpleTool' }, status);
 
 // Test fallback service
 const fallbackStatus = fallbackService.getStatus();
-console.log('📋 Fallback Service Status:', fallbackStatus);
+logger.info('📋 Fallback Service Status:', { component: 'SimpleTool' }, fallbackStatus);
 
 // Test fallback data
 const bills = fallbackService.getBills();
-console.log('📄 Sample Bills:', bills.length, 'bills available');
+logger.info('📄 Sample Bills:', { component: 'SimpleTool' }, bills.length, 'bills available');
 
 if (bills.length > 0) {
-  console.log('📄 First Bill:', bills[0].title);
+  logger.info('📄 First Bill:', { component: 'SimpleTool' }, bills[0].title);
 }
 
 // Test users
 const users = fallbackService.getUsers();
-console.log('👥 Sample Users:', users.length, 'users available');
+logger.info('👥 Sample Users:', { component: 'SimpleTool' }, users.length, 'users available');
 
-console.log('✅ Database service test completed');
+logger.info('✅ Database service test completed', { component: 'SimpleTool' });
 console.log(`🔗 Database Connected: ${isDatabaseConnected}`);

@@ -3,6 +3,7 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from '../../../hooks/use-auth';
 import * as api from '../../../services/api';
+import { logger } from '../utils/logger.js';
 
 // Mock the API service
 vi.mock('../../../services/api', () => ({

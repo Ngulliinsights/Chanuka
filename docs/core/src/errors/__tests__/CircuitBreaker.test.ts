@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CircuitBreaker, CircuitBreakerState } from '../circuit-breaker';
+import { logger } from '../utils/logger';
 
 describe('CircuitBreaker', () => {
   let circuitBreaker: CircuitBreaker;
@@ -98,3 +99,10 @@ describe('CircuitBreaker', () => {
     expect(metrics.totalCalls).toBe(2);
   });
 });
+
+
+
+
+
+
+

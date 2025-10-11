@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import { promisify } from 'util';
+import { logger } from '../../utils/logger';
 
 /**
  * Comprehensive encryption service for data protection
@@ -78,7 +79,7 @@ export class EncryptionService {
 
       return Buffer.from(JSON.stringify(result)).toString('base64');
     } catch (error) {
-      console.error('Encryption failed:', error);
+      logger.error('Encryption failed:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to encrypt data');
     }
   }
@@ -104,7 +105,7 @@ export class EncryptionService {
 
       return decrypted;
     } catch (error) {
-      console.error('Decryption failed:', error);
+      logger.error('Decryption failed:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to decrypt data');
     }
   }
@@ -116,7 +117,7 @@ export class EncryptionService {
     try {
       return await bcrypt.hash(password, this.saltRounds);
     } catch (error) {
-      console.error('Password hashing failed:', error);
+      logger.error('Password hashing failed:', { component: 'SimpleTool' }, error);
       throw new Error('Failed to hash password');
     }
   }
@@ -128,7 +129,7 @@ export class EncryptionService {
     try {
       return await bcrypt.compare(password, hash);
     } catch (error) {
-      console.error('Password verification failed:', error);
+      logger.error('Password verification failed:', { component: 'SimpleTool' }, error);
       return false;
     }
   }
@@ -356,3 +357,11 @@ export class EncryptionService {
 
 // Singleton instance
 export const encryptionService = new EncryptionService();
+
+
+
+
+
+
+
+

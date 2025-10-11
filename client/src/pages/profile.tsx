@@ -3,6 +3,7 @@ import AppLayout from '@/components/layout/app-layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/hooks/use-auth';
+import { logger } from '../utils/logger.js';
 
 export default function Profile() {
   const { user } = useAuth();

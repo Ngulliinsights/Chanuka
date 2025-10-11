@@ -5,6 +5,7 @@ const { Pool } = pkg;
 import * as fs from 'fs';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
+import { logger } from '../utils/logger';
 
 // Load environment variables
 dotenv.config();
@@ -61,17 +62,17 @@ async function createDatabaseIfNeeded() {
   const defaultPool = createPool('postgres');
 
   try {
-    console.log('Attempting to create database...');
+    logger.info('Attempting to create database...', { component: 'SimpleTool' });
     await defaultPool.query('CREATE DATABASE legislative_track');
-    console.log('Database created successfully');
+    logger.info('Database created successfully', { component: 'SimpleTool' });
     return true;
   } catch (createError) {
     // Error code 42P04 means database already exists - this is fine
     if (createError.code === '42P04') {
-      console.log('Database already exists, continuing...');
+      logger.info('Database already exists, continuing...', { component: 'SimpleTool' });
       return true;
     }
-    console.log('Database creation failed:', createError.message);
+    logger.info('Database creation failed:', { component: 'SimpleTool' }, createError.message);
     return false;
   } finally {
     await defaultPool.end();
@@ -86,7 +87,7 @@ function ensureMigrationsDirectory() {
   const migrationsPath = path.join(process.cwd(), 'drizzle');
 
   if (!fs.existsSync(migrationsPath)) {
-    console.log('Creating migrations directory...');
+    logger.info('Creating migrations directory...', { component: 'SimpleTool' });
     fs.mkdirSync(migrationsPath, { recursive: true });
 
     // Create a more comprehensive initial migration
@@ -109,7 +110,7 @@ CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);`;
 
     fs.writeFileSync(path.join(migrationsPath, '0000_initial.sql'), initialMigration);
-    console.log('Created initial migration file');
+    logger.info('Created initial migration file', { component: 'SimpleTool' });
   }
 
   return migrationsPath;
@@ -137,9 +138,9 @@ async function ensureMigrationTrackingTable(pool) {
       ON drizzle_migrations(hash);
     `);
 
-    console.log('Migration tracking table ready');
+    logger.info('Migration tracking table ready', { component: 'SimpleTool' });
   } catch (error) {
-    console.error('Failed to create migration tracking table:', error.message);
+    logger.error('Failed to create migration tracking table:', { component: 'SimpleTool' }, error.message);
     throw error;
   }
 }
@@ -165,7 +166,7 @@ async function isMigrationApplied(pool, hash) {
     );
     return result.rows.length > 0;
   } catch (error) {
-    console.log('Could not check migration status:', error.message);
+    logger.info('Could not check migration status:', { component: 'SimpleTool' }, error.message);
     return false; // Assume not applied if we can't check
   }
 }
@@ -181,7 +182,7 @@ async function recordMigration(pool, hash, filename) {
       [hash, filename]
     );
   } catch (error) {
-    console.log('Could not record migration:', error.message);
+    logger.info('Could not record migration:', { component: 'SimpleTool' }, error.message);
     // Don't throw here - migration was successful even if we can't record it
   }
 }
@@ -219,19 +220,19 @@ async function executeMigration(pool, filePath, filename) {
 }
 
 async function main() {
-  console.log('Starting database migration process...');
+  logger.info('Starting database migration process...', { component: 'SimpleTool' });
 
   // Diagnostic logging for SSL authentication debugging
-  console.log('🔍 Migration Script (pg.Pool) Diagnostics:');
-  console.log('NODE_ENV:', process.env.NODE_ENV);
-  console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
-  console.log('DATABASE_URL starts with postgres:', process.env.DATABASE_URL?.startsWith('postgres'));
-  console.log('DATABASE_URL contains sslmode:', process.env.DATABASE_URL?.includes('sslmode'));
+  logger.info('🔍 Migration Script (pg.Pool) Diagnostics:', { component: 'SimpleTool' });
+  logger.info('NODE_ENV:', { component: 'SimpleTool' }, process.env.NODE_ENV);
+  logger.info('DATABASE_URL exists:', { component: 'SimpleTool' }, !!process.env.DATABASE_URL);
+  logger.info('DATABASE_URL starts with postgres:', { component: 'SimpleTool' }, process.env.DATABASE_URL?.startsWith('postgres'));
+  logger.info('DATABASE_URL contains sslmode:', { component: 'SimpleTool' }, process.env.DATABASE_URL?.includes('sslmode'));
   if (process.env.DATABASE_URL?.includes('sslmode')) {
     const sslmode = process.env.DATABASE_URL.match(/sslmode=([^&\s]+)/)?.[1];
-    console.log('SSL mode in URL:', sslmode);
+    logger.info('SSL mode in URL:', { component: 'SimpleTool' }, sslmode);
   }
-  console.log('SSL config will be:', process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false);
+  logger.info('SSL config will be:', { component: 'SimpleTool' }, process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false);
 
   let pool = null;
 
@@ -241,7 +242,7 @@ async function main() {
     const connectionTest = await testDatabaseConnection(pool);
 
     if (!connectionTest.success) {
-      console.log('Initial connection failed, analyzing issue...');
+      logger.info('Initial connection failed, analyzing issue...', { component: 'SimpleTool' });
 
       // If database doesn't exist, try to create it
       if (connectionTest.isDatabaseNotFound) {
@@ -266,7 +267,7 @@ async function main() {
       }
     }
 
-    console.log('Database connection established successfully');
+    logger.info('Database connection established successfully', { component: 'SimpleTool' });
 
     // Step 2: Ensure migrations directory exists
     const migrationsPath = ensureMigrationsDirectory();
@@ -280,7 +281,7 @@ async function main() {
       .sort(); // Natural sort ensures proper order
 
     if (migrationFiles.length === 0) {
-      console.log('No migration files found - database is ready');
+      logger.info('No migration files found - database is ready', { component: 'SimpleTool' });
       return;
     }
 
@@ -309,22 +310,22 @@ async function main() {
     }
 
     // Step 6: Report results
-    console.log('\n=== Migration Summary ===');
+    logger.info('\n=== Migration Summary ===', { component: 'SimpleTool' });
     console.log(`Successfully applied: ${successCount}`);
     console.log(`Skipped (already applied): ${skipCount}`);
     console.log(`Failed: ${errorCount}`);
 
     if (errorCount > 0) {
-      console.log('\nSome migrations failed. Please review the errors above.');
-      console.log('The application will continue, but you may need to fix failed migrations manually.');
+      logger.info('\nSome migrations failed. Please review the errors above.', { component: 'SimpleTool' });
+      logger.info('The application will continue, but you may need to fix failed migrations manually.', { component: 'SimpleTool' });
     } else {
-      console.log('\nAll migrations completed successfully!');
+      logger.info('\nAll migrations completed successfully!', { component: 'SimpleTool' });
     }
 
   } catch (error) {
-    console.error('Migration process failed:', error.message);
-    console.log('\nThis is not necessarily fatal - the application may still work with existing schema.');
-    console.log('Consider running migrations manually if needed.');
+    logger.error('Migration process failed:', { component: 'SimpleTool' }, error.message);
+    logger.info('\nThis is not necessarily fatal - the application may still work with existing schema.', { component: 'SimpleTool' });
+    logger.info('Consider running migrations manually if needed.', { component: 'SimpleTool' });
 
     // Exit with success to prevent cascading failures in your system
     // The application can often work even if migrations fail
@@ -334,9 +335,9 @@ async function main() {
     if (pool) {
       try {
         await pool.end();
-        console.log('Database connection closed');
+        logger.info('Database connection closed', { component: 'SimpleTool' });
       } catch (closeError) {
-        console.log('Error closing database connection:', closeError.message);
+        logger.info('Error closing database connection:', { component: 'SimpleTool' }, closeError.message);
       }
     }
   }
@@ -344,13 +345,19 @@ async function main() {
 
 // Handle uncaught errors gracefully
 process.on('uncaughtException', (error) => {
-  console.error('Uncaught exception during migration:', error.message);
+  logger.error('Uncaught exception during migration:', { component: 'SimpleTool' }, error.message);
   process.exit(0); // Exit successfully to avoid cascading failures
 });
 
 process.on('unhandledRejection', (error) => {
-  console.error('Unhandled rejection during migration:', error.message);
+  logger.error('Unhandled rejection during migration:', { component: 'SimpleTool' }, error.message);
   process.exit(0); // Exit successfully to avoid cascading failures
 });
 
 main();
+
+
+
+
+
+

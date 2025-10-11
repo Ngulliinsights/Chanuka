@@ -5,6 +5,7 @@ import { Logger } from '../logging/logger';
 import { ValidationService } from '../validation/validation-service';
 import { HealthChecker } from '../health/health-checker';
 import { configManager } from '../config';
+import { logger } from '../utils/logger';
 
 describe('Core Utilities Integration Tests', () => {
   let cache: any;
@@ -351,3 +352,9 @@ describe('Core Utilities Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+

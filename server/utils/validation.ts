@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { ZodError, z } from 'zod';
 import { ValidationError } from '../../shared/types/errors.js';
+import { logger } from '../utils/logger';
+import DOMPurify from 'isomorphic-dompurify';
 
 type ZodSchema<T> = z.ZodType<T>;
 
@@ -48,3 +50,113 @@ export function validateSchema<T>(schema: ZodSchema<T>) {
     }
   };
 }
+
+/**
+ * Validate email address
+ */
+export function validateEmail(email: string): { isValid: boolean; sanitized?: string; error?: string } {
+  if (!email || typeof email !== 'string') {
+    return { isValid: false, error: 'Email is required' };
+  }
+
+  const trimmed = email.trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(trimmed)) {
+    return { isValid: false, error: 'Invalid email format' };
+  }
+
+  return { isValid: true, sanitized: trimmed.toLowerCase() };
+}
+
+/**
+ * Validate password strength
+ */
+export function validatePassword(password: string): { isValid: boolean; strength?: string; score?: number; errors?: string[] } {
+  if (!password || typeof password !== 'string') {
+    return { isValid: false, errors: ['Password is required'] };
+  }
+
+  const errors: string[] = [];
+  let score = 0;
+
+  if (password.length < 8) {
+    errors.push('Password too short');
+  } else {
+    score += 1;
+  }
+
+  if (!/[a-z]/.test(password)) {
+    errors.push('Missing lowercase letter');
+  } else {
+    score += 1;
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Missing uppercase letter');
+  } else {
+    score += 1;
+  }
+
+  if (!/\d/.test(password)) {
+    errors.push('Missing number');
+  } else {
+    score += 1;
+  }
+
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    errors.push('Missing special character');
+  } else {
+    score += 1;
+  }
+
+  const strength = score >= 5 ? 'strong' : score >= 3 ? 'medium' : 'weak';
+
+  return {
+    isValid: errors.length === 0,
+    strength,
+    score,
+    errors: errors.length > 0 ? errors : undefined
+  };
+}
+
+/**
+ * Sanitize input to prevent XSS
+ */
+export function sanitizeInput(input: string): string {
+  if (!input || typeof input !== 'string') {
+    return '';
+  }
+
+  return DOMPurify.sanitize(input, { ALLOWED_TAGS: [] });
+}
+
+/**
+ * Validate Canadian bill number format
+ */
+export function validateBillNumber(billNumber: string): { isValid: boolean; normalized?: string; error?: string } {
+  if (!billNumber || typeof billNumber !== 'string') {
+    return { isValid: false, error: 'Bill number is required' };
+  }
+
+  const trimmed = billNumber.trim().toUpperCase();
+  const billRegex = /^[CS]-\d{1,4}$/;
+
+  if (!billRegex.test(trimmed)) {
+    return { isValid: false, error: 'Invalid bill number format. Expected C-123 or S-456' };
+  }
+
+  const number = parseInt(trimmed.split('-')[1]);
+  if (number < 1 || number > 9999) {
+    return { isValid: false, error: 'Bill number must be between 1 and 9999' };
+  }
+
+  return { isValid: true, normalized: trimmed };
+}
+
+
+
+
+
+
+

@@ -19,15 +19,16 @@ import { createCacheService } from '../cache';
 import { createRateLimitFactory } from '../rate-limiting';
 import { Logger } from '../logging/logger';
 import { ValidationService } from '../validation/validation-service';
+import { logger } from '../utils/logger';
 
 /**
  * Example: Complete performance testing workflow
  */
 export async function runCompletePerformanceTest() {
-  console.log('🚀 Starting comprehensive performance testing...\n');
+  logger.info('🚀 Starting comprehensive performance testing...\n', { component: 'SimpleTool' });
 
   // 1. Initialize components
-  console.log('📦 Initializing core components...');
+  logger.info('📦 Initializing core components...', { component: 'SimpleTool' });
   const cache = createCacheService({
     provider: 'memory',
     maxMemoryMB: 100,
@@ -64,7 +65,7 @@ export async function runCompletePerformanceTest() {
   const components = { cache, rateLimiter, logger, validator };
 
   // 2. Set up performance monitoring
-  console.log('📊 Setting up performance monitoring...');
+  logger.info('📊 Setting up performance monitoring...', { component: 'SimpleTool' });
   const monitor = new PerformanceMonitor({
     maxDataAge: 24 * 60 * 60 * 1000, // 24 hours
     maxDataPoints: 10000,
@@ -74,7 +75,7 @@ export async function runCompletePerformanceTest() {
   setupCoreMetricsMonitoring(monitor, components);
 
   // 3. Run performance benchmarks
-  console.log('⚡ Running performance benchmarks...');
+  logger.info('⚡ Running performance benchmarks...', { component: 'SimpleTool' });
   const benchmarks = new PerformanceBenchmarks({
     iterations: {
       cache: { get: 5000, set: 2500, delete: 2500 },
@@ -94,27 +95,27 @@ export async function runCompletePerformanceTest() {
   console.log(`✅ Benchmarks completed: ${benchmarkSuite.summary.successfulTests}/${benchmarkSuite.summary.totalTests} passed`);
 
   // 4. Analyze benchmark results
-  console.log('🔍 Analyzing performance results...');
+  logger.info('🔍 Analyzing performance results...', { component: 'SimpleTool' });
   const analysis = analyzePerformanceResults(benchmarkSuite);
   
   console.log(`\n📈 Performance Analysis (Score: ${analysis.overallScore}/100):`);
   if (analysis.criticalIssues.length > 0) {
-    console.log('🚨 Critical Issues:');
+    logger.info('🚨 Critical Issues:', { component: 'SimpleTool' });
     analysis.criticalIssues.forEach(issue => console.log(`  - ${issue}`));
   }
   
   if (analysis.warnings.length > 0) {
-    console.log('⚠️  Warnings:');
+    logger.info('⚠️  Warnings:', { component: 'SimpleTool' });
     analysis.warnings.forEach(warning => console.log(`  - ${warning}`));
   }
   
   if (analysis.recommendations.length > 0) {
-    console.log('💡 Recommendations:');
+    logger.info('💡 Recommendations:', { component: 'SimpleTool' });
     analysis.recommendations.forEach(rec => console.log(`  - ${rec}`));
   }
 
   // 5. Run stress tests
-  console.log('\n🔥 Running stress tests...');
+  logger.info('\n🔥 Running stress tests...', { component: 'SimpleTool' });
   const stressTests = new StressTests({
     systemStressDuration: 30000, // 30 seconds
     systemStressConcurrency: 50,
@@ -129,7 +130,7 @@ export async function runCompletePerformanceTest() {
   }
 
   // 6. Run load tests
-  console.log('\n🌊 Running load tests...');
+  logger.info('\n🌊 Running load tests...', { component: 'SimpleTool' });
   const loadTester = new LoadTester();
   const testSuite = createComprehensiveTestSuite(components);
   const loadResults = await loadTester.createLoadTestSuite(testSuite);
@@ -139,7 +140,7 @@ export async function runCompletePerformanceTest() {
   console.log(`⏱️  Average response time: ${loadResults.summary.averageResponseTime.toFixed(2)}ms`);
 
   // 7. Generate comprehensive report
-  console.log('\n📋 Generating performance report...');
+  logger.info('\n📋 Generating performance report...', { component: 'SimpleTool' });
   const performanceReport = monitor.generateReport(60 * 60 * 1000); // Last hour
   const reportPath = monitor.saveReport(performanceReport);
   console.log(`📄 Report saved to: ${reportPath}`);
@@ -160,7 +161,7 @@ export async function runCompletePerformanceTest() {
     await (cache as any).destroy();
   }
 
-  console.log('\n🎉 Performance testing completed successfully!');
+  logger.info('\n🎉 Performance testing completed successfully!', { component: 'SimpleTool' });
   
   return {
     benchmarkSuite,
@@ -176,7 +177,7 @@ export async function runCompletePerformanceTest() {
  * Example: Continuous performance monitoring
  */
 export async function startContinuousMonitoring(components: any) {
-  console.log('🔄 Starting continuous performance monitoring...');
+  logger.info('🔄 Starting continuous performance monitoring...', { component: 'SimpleTool' });
 
   const monitor = new PerformanceMonitor({
     maxDataAge: 7 * 24 * 60 * 60 * 1000, // 7 days
@@ -229,7 +230,7 @@ export async function startContinuousMonitoring(components: any) {
         });
       }
     } catch (error) {
-      console.error('Failed to generate report:', error);
+      logger.error('Failed to generate report:', { component: 'SimpleTool' }, error);
     }
   }, 60 * 60 * 1000); // Every hour
 
@@ -237,7 +238,7 @@ export async function startContinuousMonitoring(components: any) {
   return () => {
     monitor.stopAllMonitoring();
     clearInterval(reportInterval);
-    console.log('🛑 Continuous monitoring stopped');
+    logger.info('🛑 Continuous monitoring stopped', { component: 'SimpleTool' });
   };
 }
 
@@ -245,7 +246,7 @@ export async function startContinuousMonitoring(components: any) {
  * Example: Custom performance test scenario
  */
 export async function runCustomScenario() {
-  console.log('🎯 Running custom performance scenario...');
+  logger.info('🎯 Running custom performance scenario...', { component: 'SimpleTool' });
 
   // Create a custom cache implementation for testing
   const cache = createCacheService({
@@ -302,14 +303,14 @@ export async function runCustomScenario() {
     await (cache as any).destroy();
   }
 
-  console.log('✅ Custom scenario completed');
+  logger.info('✅ Custom scenario completed', { component: 'SimpleTool' });
 }
 
 /**
  * Example: Performance regression detection
  */
 export async function detectPerformanceRegressions() {
-  console.log('🔍 Running performance regression detection...');
+  logger.info('🔍 Running performance regression detection...', { component: 'SimpleTool' });
 
   const monitor = new PerformanceMonitor();
 
@@ -344,7 +345,7 @@ export async function detectPerformanceRegressions() {
   const cacheRegression = monitor.compareToBaseline('cache-operations');
   const memoryRegression = monitor.compareToBaseline('memory-usage');
 
-  console.log('📊 Regression Analysis:');
+  logger.info('📊 Regression Analysis:', { component: 'SimpleTool' });
   
   if (cacheRegression) {
     console.log(`\n🔄 Cache Operations:`);
@@ -368,7 +369,7 @@ export async function detectPerformanceRegressions() {
     }
   }
 
-  console.log('\n✅ Regression detection completed');
+  logger.info('\n✅ Regression detection completed', { component: 'SimpleTool' });
 }
 
 // Export all examples for easy testing
@@ -383,11 +384,17 @@ export const examples = {
 if (require.main === module) {
   runCompletePerformanceTest()
     .then(() => {
-      console.log('\n🎉 All examples completed successfully!');
+      logger.info('\n🎉 All examples completed successfully!', { component: 'SimpleTool' });
       process.exit(0);
     })
     .catch((error) => {
-      console.error('\n💥 Example execution failed:', error);
+      logger.error('\n💥 Example execution failed:', { component: 'SimpleTool' }, error);
       process.exit(1);
     });
 }
+
+
+
+
+
+

@@ -6,6 +6,7 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { 
+import { logger } from '../utils/logger';
   BrowserDetector, 
   FeatureDetector, 
   getBrowserInfo, 
@@ -376,3 +377,9 @@ describe('Singleton Pattern', () => {
     expect(instance1).toBe(instance2);
   });
 });
+
+
+
+
+
+

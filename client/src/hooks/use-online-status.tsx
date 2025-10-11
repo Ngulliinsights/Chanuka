@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { logger } from '../utils/logger.js';
 
 export function useOnlineStatus() {
   const [isOnline, setIsOnline] = useState<boolean | undefined>(undefined);

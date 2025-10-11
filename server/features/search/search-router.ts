@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { billsService } from '../bills/bills.js';
 import { ApiSuccess, ApiError, ApiValidationError } from '../../utils/api-response.js';
+import { logger } from '../../utils/logger';
 
 const router = Router();
 
@@ -56,7 +57,7 @@ router.get('/', async (req, res) => {
           relevanceScore: calculateRelevanceScore(searchQuery, bill.title, bill.description)
         })));
       } catch (error) {
-        console.error('Error searching bills:', error);
+        logger.error('Error searching bills:', { component: 'SimpleTool' }, error);
       }
     }
 
@@ -69,7 +70,7 @@ router.get('/', async (req, res) => {
 
     return ApiSuccess(res, results);
   } catch (error) {
-    console.error('Search error:', error);
+    logger.error('Search error:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Search failed', 500);
   }
 });
@@ -112,7 +113,7 @@ router.get('/suggestions', async (req, res) => {
 
       suggestions.push(...categorySuggestions);
     } catch (error) {
-      console.error('Error generating suggestions:', error);
+      logger.error('Error generating suggestions:', { component: 'SimpleTool' }, error);
     }
 
     return ApiSuccess(res, {
@@ -120,7 +121,7 @@ router.get('/suggestions', async (req, res) => {
       suggestions: suggestions.slice(0, suggestionLimit)
     });
   } catch (error) {
-    console.error('Suggestions error:', error);
+    logger.error('Suggestions error:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to generate suggestions', 500);
   }
 });
@@ -157,12 +158,12 @@ router.get('/filters', async (req, res) => {
         label: category!.charAt(0).toUpperCase() + category!.slice(1)
       }));
     } catch (error) {
-      console.error('Error fetching filter options:', error);
+      logger.error('Error fetching filter options:', { component: 'SimpleTool' }, error);
     }
 
     return ApiSuccess(res, filters);
   } catch (error) {
-    console.error('Filters error:', error);
+    logger.error('Filters error:', { component: 'SimpleTool' }, error);
     return ApiError(res, 'Failed to fetch search filters', 500);
   }
 });
@@ -203,3 +204,11 @@ function calculateRelevanceScore(query: string, title: string, description?: str
 }
 
 export { router };
+
+
+
+
+
+
+
+

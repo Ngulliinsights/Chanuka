@@ -6,6 +6,7 @@
 
 import { z } from 'zod';
 import { 
+import { logger } from '../utils/logger';
   coordinateSchema, 
   addressSchema, 
   moneySchema, 
@@ -392,3 +393,9 @@ export const propertySchemas = {
   propertyValuation: propertyValuationSchema,
   propertyReport: propertyReportSchema,
 } as const;
+
+
+
+
+
+

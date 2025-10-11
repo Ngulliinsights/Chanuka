@@ -1,0 +1,271 @@
+{
+  "analyticsDashboard": {
+    "title": "Analytics Service Health Dashboard",
+    "description": "Operational monitoring for analytics feature performance and reliability",
+    "refresh": "30s",
+    "panels": [
+      {
+        "title": "Request Volume",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{job=\"analytics\", route=~\"/api/analytics/.*\"}[5m])) by (route, method)",
+            "legendFormat": "{{route}} {{method}}"
+          }
+        ],
+        "yAxes": [
+          {
+            "unit": "reqps",
+            "label": "Requests per second"
+          }
+        ]
+      },
+      {
+        "title": "Response Time Percentiles",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{job=\"analytics\", route=~\"/api/analytics/.*\"}[5m])) by (le, route))",
+            "legendFormat": "p50 {{route}}"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"analytics\", route=~\"/api/analytics/.*\"}[5m])) by (le, route))",
+            "legendFormat": "p95 {{route}}"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{job=\"analytics\", route=~\"/api/analytics/.*\"}[5m])) by (le, route))",
+            "legendFormat": "p99 {{route}}"
+          }
+        ],
+        "yAxes": [
+          {
+            "unit": "seconds",
+            "label": "Response Time"
+          }
+        ]
+      },
+      {
+        "title": "Error Rate by Endpoint",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{job=\"analytics\", route=~\"/api/analytics/.*\", status=~\"5..\"}[5m])) by (route) / sum(rate(http_requests_total{job=\"analytics\", route=~\"/api/analytics/.*\"}[5m])) by (route) * 100",
+            "legendFormat": "{{route}}"
+          }
+        ],
+        "fieldConfig": {
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Value"
+              },
+              "properties": [
+                {
+                  "id": "unit",
+                  "value": "percent"
+                },
+                {
+                  "id": "thresholds",
+                  "value": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": null
+                      },
+                      {
+                        "color": "orange",
+                        "value": 1
+                      },
+                      {
+                        "color": "red",
+                        "value": 5
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "title": "Cache Hit Rate by Prefix",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "sum(rate(cache_hits_total{job=\"analytics\", cache=\"analytics\"}[5m])) by (prefix) / (sum(rate(cache_hits_total{job=\"analytics\", cache=\"analytics\"}[5m])) by (prefix) + sum(rate(cache_misses_total{job=\"analytics\", cache=\"analytics\"}[5m])) by (prefix)) * 100",
+            "legendFormat": "{{prefix}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "red",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": 50
+                },
+                {
+                  "color": "green",
+                  "value": 70
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "title": "Slow Request Count",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate(http_request_duration_seconds_count{job=\"analytics\", route=~\"/api/analytics/.*\", le=\"2\"}[5m]))",
+            "legendFormat": "Slow Requests (>2s)"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "reqps",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": 5
+                },
+                {
+                  "color": "red",
+                  "value": 10
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "title": "Database Query Performance",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket{job=\"analytics\"}[5m])) by (le, query_type))",
+            "legendFormat": "p95 {{query_type}}"
+          }
+        ],
+        "yAxes": [
+          {
+            "unit": "seconds",
+            "label": "Query Duration"
+          }
+        ]
+      },
+      {
+        "title": "Service Dependencies Health",
+        "type": "status-history",
+        "targets": [
+          {
+            "expr": "up{job=~\"postgres|redis|external-api\"}",
+            "legendFormat": "{{job}}"
+          }
+        ]
+      },
+      {
+        "title": "Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "process_resident_memory_bytes{job=\"analytics\"} / 1024 / 1024",
+            "legendFormat": "RSS Memory (MB)"
+          },
+          {
+            "expr": "jvm_memory_bytes_used{area=\"heap\", job=\"analytics\"} / 1024 / 1024",
+            "legendFormat": "Heap Used (MB)"
+          }
+        ],
+        "yAxes": [
+          {
+            "unit": "MB",
+            "label": "Memory"
+          }
+        ]
+      },
+      {
+        "title": "Active Connections",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "pg_stat_activity_count{job=\"postgres\", datname=\"analytics\"}",
+            "legendFormat": "PostgreSQL Connections"
+          },
+          {
+            "expr": "redis_connected_clients{job=\"redis\"}",
+            "legendFormat": "Redis Connections"
+          }
+        ]
+      }
+    ],
+    "alerts": [
+      {
+        "title": "High Error Rate",
+        "condition": "sum(rate(http_requests_total{job=\"analytics\", status=~\"5..\"}[5m])) / sum(rate(http_requests_total{job=\"analytics\"}[5m])) * 100 > 5",
+        "for": "5m",
+        "labels": {
+          "severity": "critical"
+        },
+        "annotations": {
+          "summary": "Analytics service error rate above 5%",
+          "description": "Error rate: {{ $value }}%"
+        }
+      },
+      {
+        "title": "Slow Response Time",
+        "condition": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job=\"analytics\"}[5m])) by (le)) > 2",
+        "for": "5m",
+        "labels": {
+          "severity": "warning"
+        },
+        "annotations": {
+          "summary": "Analytics service p95 response time above 2s",
+          "description": "p95 latency: {{ $value }}s"
+        }
+      },
+      {
+        "title": "Low Cache Hit Rate",
+        "condition": "sum(rate(cache_hits_total{job=\"analytics\"}[10m])) / (sum(rate(cache_hits_total{job=\"analytics\"}[10m])) + sum(rate(cache_misses_total{job=\"analytics\"}[10m]))) * 100 < 50",
+        "for": "10m",
+        "labels": {
+          "severity": "warning"
+        },
+        "annotations": {
+          "summary": "Analytics cache hit rate below 50%",
+          "description": "Cache hit rate: {{ $value }}%"
+        }
+      },
+      {
+        "title": "High Slow Request Count",
+        "condition": "sum(rate(http_request_duration_seconds_count{job=\"analytics\", le=\"2\"}[5m])) > 10",
+        "for": "5m",
+        "labels": {
+          "severity": "warning"
+        },
+        "annotations": {
+          "summary": "High number of slow analytics requests",
+          "description": "Slow requests: {{ $value }}/min"
+        }
+      }
+    ]
+  }
+}

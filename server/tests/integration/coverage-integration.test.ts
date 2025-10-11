@@ -2,6 +2,7 @@ import { describe, it, expect } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
 import coverageRouter from '../../features/coverage/coverage-routes';
+import { logger } from '../utils/logger';
 
 describe('Coverage Integration Tests', () => {
   let app: express.Application;
@@ -56,3 +57,9 @@ describe('Coverage Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+

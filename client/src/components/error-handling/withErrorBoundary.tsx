@@ -110,7 +110,7 @@ export function withLazyErrorBoundary<P extends object>(
 
       return { default: WrappedComponent };
     } catch (error) {
-      console.error('Failed to load lazy component:', error);
+      logger.error('Failed to load lazy component:', { component: 'SimpleTool' }, error);
       
       // Return a fallback component that shows the error
       const ErrorComponent: ComponentType<P> = () => (
@@ -141,6 +141,7 @@ export function withLazyErrorBoundary<P extends object>(
 // Utility for creating safe lazy components with built-in error handling
 export function createSafeLazyComponent<P extends object>(
   importFn: () => Promise<{ default: ComponentType<P> }>,
+import { logger } from '../utils/logger.js';
   componentName?: string
 ): LazyExoticComponent<ComponentType<P>> {
   return withLazyErrorBoundary(importFn, {
@@ -209,7 +210,7 @@ export function useErrorState() {
   const handleError = React.useCallback((error: Error) => {
     setError(error);
     setHasError(true);
-    console.error('Component error:', error);
+    logger.error('Component error:', { component: 'SimpleTool' }, error);
   }, []);
 
   const resetError = React.useCallback(() => {

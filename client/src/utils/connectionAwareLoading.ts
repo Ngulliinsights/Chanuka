@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger';
 // Connection-aware loading strategies for optimal performance
 
 export interface ConnectionInfo {
@@ -389,3 +390,9 @@ export function getOptimalVideoQuality(): 'low' | 'medium' | 'high' {
 
 // React import for the hook
 import React from 'react';
+
+
+
+
+
+

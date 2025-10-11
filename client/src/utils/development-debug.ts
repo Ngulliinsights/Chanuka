@@ -2,6 +2,7 @@
 // This module provides debugging utilities specifically for development mode
 
 import React from 'react';
+import { logger } from '../utils/logger';
 
 interface DebugInfo {
   environment: string;
@@ -236,22 +237,22 @@ Keyboard Shortcuts:
       
       const timeout = setTimeout(() => {
         ws.close();
-        console.error('❌ HMR connection test timeout');
+        logger.error('❌ HMR connection test timeout', { component: 'SimpleTool' });
       }, 5000);
       
       ws.onopen = () => {
         clearTimeout(timeout);
-        console.log('✅ HMR connection test successful');
+        logger.info('✅ HMR connection test successful', { component: 'SimpleTool' });
         ws.close();
       };
       
       ws.onerror = (error) => {
         clearTimeout(timeout);
-        console.error('❌ HMR connection test failed:', error);
+        logger.error('❌ HMR connection test failed:', { component: 'SimpleTool' }, error);
       };
       
     } catch (error) {
-      console.error('❌ HMR connection test error:', error);
+      logger.error('❌ HMR connection test error:', { component: 'SimpleTool' }, error);
     }
   }
 
@@ -274,13 +275,13 @@ Keyboard Shortcuts:
       
       case 'network':
         fetch('/non-existent-endpoint').catch(() => {
-          console.log('Simulated network error');
+          logger.info('Simulated network error', { component: 'SimpleTool' });
         });
         break;
       
       default:
         console.warn('Unknown error type:', type);
-        console.log('Available types: javascript, promise, resource, network');
+        logger.info('Available types: javascript, promise, resource, network', { component: 'SimpleTool' });
     }
   }
 
@@ -311,7 +312,7 @@ Keyboard Shortcuts:
     link.download = `debug-data-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
     link.click();
     
-    console.log('📁 Debug data exported');
+    logger.info('📁 Debug data exported', { component: 'SimpleTool' });
   }
 
   private showDebugPanel(): void {
@@ -398,3 +399,9 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 export default DevelopmentDebugger;
+
+
+
+
+
+

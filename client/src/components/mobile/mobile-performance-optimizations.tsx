@@ -445,6 +445,7 @@ export function MemoizedList<T>({
 // Bundle splitting utility
 export const createLazyComponent = <T extends React.ComponentType<any>>(
   importFn: () => Promise<{ default: T }>,
+import { logger } from '../utils/logger.js';
   fallback?: React.ReactNode
 ) => {
   const LazyComponent = lazy(importFn);

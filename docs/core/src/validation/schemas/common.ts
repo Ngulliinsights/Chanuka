@@ -6,6 +6,7 @@
  */
 
 import { z } from 'zod';
+import { logger } from '../utils/logger';
 
 /**
  * Email validation with comprehensive security checks
@@ -785,3 +786,9 @@ export const validationUtils = {
     return password.split('').sort(() => Math.random() - 0.5).join('');
   },
 };
+
+
+
+
+
+

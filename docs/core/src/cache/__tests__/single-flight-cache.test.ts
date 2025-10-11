@@ -7,6 +7,7 @@
 
 import { SingleFlightCache } from '../single-flight-cache';
 import type { CacheService, CacheMetrics } from '../types';
+import { logger } from '../utils/logger';
 
 // Mock cache adapter for testing
 class MockCacheAdapter implements CacheService {
@@ -572,3 +573,9 @@ describe('SingleFlightCache', () => {
     });
   });
 });
+
+
+
+
+
+

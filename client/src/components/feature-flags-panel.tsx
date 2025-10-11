@@ -3,6 +3,7 @@ import { FeatureFlag } from "@shared/schema";
 import { Settings } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from '../utils/logger.js';
 
 interface FeatureFlagsPanelProps {
   projectId: number;

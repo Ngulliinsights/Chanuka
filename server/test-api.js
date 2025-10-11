@@ -1,5 +1,6 @@
 // Test API endpoints
 import fetch from 'node-fetch';
+import { logger } from '../utils/logger.js';
 
 const BASE_URL = 'http://localhost:4200';
 
@@ -28,7 +29,7 @@ async function testEndpoint(endpoint, method = 'GET', body = null) {
 }
 
 async function runTests() {
-  console.log('🧪 Testing API endpoints...');
+  logger.info('🧪 Testing API endpoints...', { component: 'SimpleTool' });
   
   // Test health endpoint
   await testEndpoint('/api/health');
@@ -58,7 +59,7 @@ async function runTests() {
     password: 'testpassword'
   });
   
-  console.log('✅ API endpoint tests completed');
+  logger.info('✅ API endpoint tests completed', { component: 'SimpleTool' });
 }
 
 // Wait a moment for server to start, then run tests
