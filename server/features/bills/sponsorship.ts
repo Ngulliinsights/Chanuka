@@ -22,8 +22,8 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
       return ApiSuccess(res, analysis, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      logger.error('Error fetching sponsorship analysis:', { component: 'SimpleTool' }, error);
-      return ApiError(res, 'Failed to fetch sponsorship analysis', 500, 
+      logger.error('Error fetching sponsorship analysis:', { component: 'SimpleTool' }, error as any);
+      return ApiError(res, 'Failed to fetch sponsorship analysis', 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   }));
@@ -38,8 +38,8 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
       return ApiSuccess(res, analysis, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      logger.error('Error fetching primary sponsor analysis:', { component: 'SimpleTool' }, error);
-      return ApiError(res, 'Failed to fetch primary sponsor analysis', 500, 
+      logger.error('Error fetching primary sponsor analysis:', { component: 'SimpleTool' }, error as any);
+      return ApiError(res, 'Failed to fetch primary sponsor analysis', 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   }));
@@ -54,8 +54,8 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
       return ApiSuccess(res, analysis, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      logger.error('Error fetching co-sponsors analysis:', { component: 'SimpleTool' }, error);
-      return ApiError(res, 'Failed to fetch co-sponsors analysis', 500, 
+      logger.error('Error fetching co-sponsors analysis:', { component: 'SimpleTool' }, error as any);
+      return ApiError(res, 'Failed to fetch co-sponsors analysis', 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   }));
@@ -70,8 +70,8 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
       return ApiSuccess(res, analysis, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      logger.error('Error fetching financial network analysis:', { component: 'SimpleTool' }, error);
-      return ApiError(res, 'Failed to fetch financial network analysis', 500, 
+      logger.error('Error fetching financial network analysis:', { component: 'SimpleTool' }, error as any);
+      return ApiError(res, 'Failed to fetch financial network analysis', 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   }));

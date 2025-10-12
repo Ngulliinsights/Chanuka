@@ -1,7 +1,7 @@
 import { db } from "../server/db";
-import { 
 import { logger } from '../utils/logger';
-  users, bills, sponsors, billSponsorships, billComments, 
+import {
+  users, bills, sponsors, billSponsorships, billComments,
   userProfiles, analysis, sponsorAffiliations, sponsorTransparency,
   billSectionConflicts
 } from "../shared/schema.js";

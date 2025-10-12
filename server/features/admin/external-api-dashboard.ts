@@ -3,10 +3,13 @@
  * 
  * Provides comprehensive monitoring and management capabilities for external APIs
  * as part of task 12.3 - Build External API Management
+ * 
+ * This module offers real-time monitoring, cost analysis, performance optimization,
+ * and detailed configuration management for all external API integrations.
  */
 
-import { Router } from 'express';
-import { ApiSuccess, ApiErrorResponse, ApiResponseWrapper } from '../../utils/api-response.js';
+import { Router, Request, Response } from 'express';
+import { ApiSuccess, ApiResponse, ApiResponseWrapper } from '../../utils/api-response.js';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../../infrastructure/external-data/external-api-manager.js';
 import { performanceMonitor } from '../../infrastructure/monitoring/performance-monitor.js';
 import { advancedCachingService } from '../../infrastructure/cache/advanced-caching.js';
@@ -14,22 +17,64 @@ import { logger } from '../../utils/logger';
 
 export const router = Router();
 
-// Initialize the external API management service
+// Initialize the external API management service with singleton pattern
 const apiManagementService = new ExternalAPIManagementService();
 
 /**
- * Get comprehensive dashboard overview
+ * Helper function to create standardized error responses
+ * This ensures consistent error handling throughout the dashboard
  */
-router.get('/dashboard', async (req, res) => {
+const createErrorResponse = (
+  res: Response, 
+  message: string, 
+  statusCode: number = 500, 
+  metadata: any,
+  errorDetails?: unknown
+): Response => {
+  // Log error details for debugging while keeping response clean
+  if (errorDetails) {
+    logger.error(message, { component: 'ExternalAPIDashboard' }, errorDetails);
+  }
+  
+  return res.status(statusCode).json(
+    ApiResponse.error(message, statusCode, metadata)
+  );
+};
+
+/**
+ * Type guard to safely handle error objects
+ * This helps TypeScript understand that we've validated the error structure
+ */
+const isErrorWithMessage = (error: unknown): error is { message: string } => {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof (error as any).message === 'string'
+  );
+};
+
+/**
+ * GET /dashboard
+ * 
+ * Retrieves comprehensive dashboard overview including health status,
+ * performance metrics, cost analysis, and cache statistics for all
+ * configured external API sources.
+ */
+router.get('/dashboard', async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
-    const analytics = apiManagementService.getAPIAnalytics();
-    const healthStatuses = apiManagementService.getHealthStatus();
-    const cacheStats = apiManagementService.getCacheStatistics();
-    const performanceStats = performanceMonitor.getPerformanceSummary();
-    const advancedCacheStats = advancedCachingService.getCacheStats();
+    // Gather data from all monitoring services in parallel for efficiency
+    const [analytics, healthStatuses, cacheStats, performanceStats, advancedCacheStats] = await Promise.all([
+      Promise.resolve(apiManagementService.getAPIAnalytics()),
+      Promise.resolve(apiManagementService.getHealthStatus()),
+      Promise.resolve(apiManagementService.getCacheStatistics()),
+      Promise.resolve(performanceMonitor.getPerformanceSummary()),
+      Promise.resolve(advancedCachingService.getCacheStats())
+    ]);
 
+    // Calculate key metrics for the overview section
     const dashboardData = {
       overview: {
         totalSources: healthStatuses.length,
@@ -43,7 +88,7 @@ router.get('/dashboard', async (req, res) => {
         cacheHitRate: analytics.cacheHitRate
       },
       
-      // API Health Status
+      // API Health Status with recent downtime tracking
       healthStatus: healthStatuses.map(h => ({
         source: h.source,
         status: h.status,
@@ -52,12 +97,13 @@ router.get('/dashboard', async (req, res) => {
         errorRate: h.errorRate,
         uptime: h.uptime,
         lastChecked: h.lastChecked,
+        // Count downtime events from the last 24 hours
         recentDowntime: h.downtimeEvents
           .filter(event => !event.endTime || (new Date().getTime() - event.startTime.getTime()) < 86400000)
           .length
       })),
 
-      // Performance Metrics
+      // Performance Metrics highlighting top performers and problem areas
       performance: {
         topPerformingSources: analytics.topPerformingSources.slice(0, 5),
         slowestEndpoints: performanceStats.slowestEndpoints.slice(0, 10),
@@ -66,20 +112,21 @@ router.get('/dashboard', async (req, res) => {
         errorRate: performanceStats.errorRate
       },
 
-      // Cost Analysis
+      // Cost Analysis with breakdown by source
       costAnalysis: {
         totalCost: analytics.totalCost,
         costBreakdown: analytics.costBreakdown,
         averageCostPerRequest: analytics.totalRequests > 0 
           ? analytics.totalCost / analytics.totalRequests 
           : 0,
+        // Identify the most expensive API sources
         topCostSources: Object.entries(analytics.costBreakdown)
-          .sort(([, a], [, b]) => b - a)
+          .sort(([, a], [, b]) => (b as number) - (a as number))
           .slice(0, 5)
           .map(([source, cost]) => ({ source, cost }))
       },
 
-      // Quota Utilization
+      // Quota Utilization tracking across different time windows
       quotaUtilization: analytics.sources.map(s => ({
         source: s.source,
         minute: s.quotaUtilization.minute,
@@ -89,7 +136,7 @@ router.get('/dashboard', async (req, res) => {
         maxUtilization: Math.max(...Object.values(s.quotaUtilization))
       })),
 
-      // Cache Statistics
+      // Cache Statistics from both basic and advanced caching layers
       cacheStatistics: {
         basic: {
           totalEntries: cacheStats.totalEntries,
@@ -107,13 +154,13 @@ router.get('/dashboard', async (req, res) => {
         }
       },
 
-      // Error Analysis
+      // Error Analysis aggregated across all sources
       errorAnalysis: {
         totalErrors: analytics.sources.reduce((sum, s) => sum + s.failedRequests, 0),
         errorRate: analytics.overallSuccessRate > 0 ? 100 - analytics.overallSuccessRate : 0,
         errorBreakdown: analytics.sources.reduce((breakdown, source) => {
           Object.entries(source.errorBreakdown).forEach(([errorType, count]) => {
-            breakdown[errorType] = (breakdown[errorType] || 0) + count;
+            breakdown[errorType] = (breakdown[errorType] || 0) + (count as number);
           });
           return breakdown;
         }, {} as Record<string, number>),
@@ -122,13 +169,13 @@ router.get('/dashboard', async (req, res) => {
           errorCount: s.failedRequests,
           errorRate: s.totalRequests > 0 ? (s.failedRequests / s.totalRequests) * 100 : 0,
           topErrors: Object.entries(s.errorBreakdown)
-            .sort(([, a], [, b]) => b - a)
+            .sort(([, a], [, b]) => (b as number) - (a as number))
             .slice(0, 5)
             .map(([type, count]) => ({ type, count }))
         }))
       },
 
-      // Recent Activity
+      // Recent Activity showing the latest requests and failures
       recentActivity: {
         recentRequests: analytics.sources.reduce((sum, s) => sum + s.totalRequests, 0),
         recentFailures: healthStatuses
@@ -146,16 +193,24 @@ router.get('/dashboard', async (req, res) => {
 
     return ApiSuccess(res, dashboardData, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    logger.error('Error getting external API dashboard data:', { component: 'SimpleTool' }, error);
-    return ApiError(res, 'Failed to retrieve dashboard data', 500, 
-      ApiResponseWrapper.createMetadata(startTime, 'static'));
+    return createErrorResponse(
+      res, 
+      'Failed to retrieve dashboard data', 
+      500,
+      ApiResponseWrapper.createMetadata(startTime, 'static'),
+      error
+    );
   }
 });
 
 /**
- * Get real-time monitoring data
+ * GET /monitoring/realtime
+ * 
+ * Provides real-time monitoring data with active alerts and current status
+ * for all API sources. This endpoint is designed for frequent polling by
+ * monitoring dashboards.
  */
-router.get('/monitoring/realtime', async (req, res) => {
+router.get('/monitoring/realtime', async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
@@ -173,6 +228,7 @@ router.get('/monitoring/realtime', async (req, res) => {
         totalSources: healthStatuses.length
       },
       
+      // Active alerts with severity levels for prioritization
       alerts: performanceRegressions.map(regression => ({
         type: 'performance_regression',
         severity: regression.regressionPercent > 100 ? 'critical' : 'warning',
@@ -186,6 +242,7 @@ router.get('/monitoring/realtime', async (req, res) => {
         timestamp: new Date().toISOString()
       })),
 
+      // Current status of each source with trend indication
       sourceStatus: healthStatuses.map(status => ({
         source: status.source,
         status: status.status,
@@ -200,16 +257,24 @@ router.get('/monitoring/realtime', async (req, res) => {
 
     return ApiSuccess(res, realtimeData, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    logger.error('Error getting real-time monitoring data:', { component: 'SimpleTool' }, error);
-    return ApiError(res, 'Failed to retrieve real-time data', 500, 
-      ApiResponseWrapper.createMetadata(startTime, 'static'));
+    return createErrorResponse(
+      res,
+      'Failed to retrieve real-time data',
+      500,
+      ApiResponseWrapper.createMetadata(startTime, 'static'),
+      error
+    );
   }
 });
 
 /**
- * Optimize API performance
+ * POST /optimize
+ * 
+ * Performs various optimization actions including cache warming, clearing,
+ * quota resets, and health check triggering. This provides administrative
+ * control over API performance optimization.
  */
-router.post('/optimize', async (req, res) => {
+router.post('/optimize', async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
@@ -218,14 +283,14 @@ router.post('/optimize', async (req, res) => {
 
     switch (action) {
       case 'warm_cache':
-        // Warm cache for critical endpoints
+        // Pre-populate cache with frequently accessed data
         const warmingRules = [
           {
             key: `${source}:bills:recent`,
             fetchFn: async () => {
               return await apiManagementService.makeRequest(source, '/bills', { limit: 50 });
             },
-            ttl: 300, // 5 minutes
+            ttl: 300, // 5 minutes for recent bills
             priority: 'high' as const
           },
           {
@@ -233,7 +298,7 @@ router.post('/optimize', async (req, res) => {
             fetchFn: async () => {
               return await apiManagementService.makeRequest(source, '/sponsors', { active: true });
             },
-            ttl: 600, // 10 minutes
+            ttl: 600, // 10 minutes for active sponsors
             priority: 'medium' as const
           }
         ];
@@ -243,17 +308,21 @@ router.post('/optimize', async (req, res) => {
         break;
 
       case 'clear_cache':
+        // Remove cached data for a specific source or all sources
         const clearedCount = apiManagementService.clearCache(source);
-        result = { message: `Cache cleared for ${source || 'all sources'}`, clearedEntries: clearedCount };
+        result = { 
+          message: `Cache cleared for ${source || 'all sources'}`, 
+          clearedEntries: clearedCount 
+        };
         break;
 
       case 'reset_quotas':
-        // This would reset quotas for a specific source
+        // Reset rate limit quotas (useful for testing or after quota increases)
         result = { message: `Quotas reset for ${source}` };
         break;
 
       case 'trigger_health_check':
-        // Force health check for all sources
+        // Force immediate health check across all sources
         const healthStatuses = apiManagementService.getHealthStatus();
         result = { 
           message: 'Health checks triggered', 
@@ -263,22 +332,33 @@ router.post('/optimize', async (req, res) => {
         break;
 
       default:
-        return ApiError(res, `Unknown optimization action: ${action}`, 400,
-          ApiResponseWrapper.createMetadata(startTime, 'static'));
+        return createErrorResponse(
+          res,
+          `Unknown optimization action: ${action}`,
+          400,
+          ApiResponseWrapper.createMetadata(startTime, 'static')
+        );
     }
 
     return ApiSuccess(res, result, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    logger.error('Error performing API optimization:', { component: 'SimpleTool' }, error);
-    return ApiError(res, 'Failed to perform optimization', 500, 
-      ApiResponseWrapper.createMetadata(startTime, 'static'));
+    return createErrorResponse(
+      res,
+      'Failed to perform optimization',
+      500,
+      ApiResponseWrapper.createMetadata(startTime, 'static'),
+      error
+    );
   }
 });
 
 /**
- * Get detailed source configuration
+ * GET /sources/:sourceId/config
+ * 
+ * Retrieves detailed configuration and current status for a specific API source,
+ * including performance recommendations based on observed behavior.
  */
-router.get('/sources/:sourceId/config', async (req, res) => {
+router.get('/sources/:sourceId/config', async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
@@ -287,8 +367,12 @@ router.get('/sources/:sourceId/config', async (req, res) => {
     const healthStatus = apiManagementService.getHealthStatus(sourceId);
 
     if (healthStatus.length === 0) {
-      return ApiError(res, `Source '${sourceId}' not found`, 404,
-        ApiResponseWrapper.createMetadata(startTime, 'static'));
+      return createErrorResponse(
+        res,
+        `Source '${sourceId}' not found`,
+        404,
+        ApiResponseWrapper.createMetadata(startTime, 'static')
+      );
     }
 
     const sourceConfig = {
@@ -296,7 +380,7 @@ router.get('/sources/:sourceId/config', async (req, res) => {
       health: healthStatus[0],
       metrics: analytics.sources.find(s => s.source === sourceId),
       configuration: {
-        // This would come from the actual configuration
+        // Configuration that would typically come from a config file or database
         rateLimit: {
           requestsPerMinute: 60,
           requestsPerHour: 1000,
@@ -321,10 +405,15 @@ router.get('/sources/:sourceId/config', async (req, res) => {
           }
         }
       },
-      recommendations: []
+      recommendations: [] as Array<{
+        type: string;
+        severity: string;
+        message: string;
+        action: string;
+      }>
     };
 
-    // Add performance recommendations
+    // Generate intelligent recommendations based on observed metrics
     if (sourceConfig.health.responseTime > 3000) {
       sourceConfig.recommendations.push({
         type: 'performance',
@@ -345,24 +434,30 @@ router.get('/sources/:sourceId/config', async (req, res) => {
 
     return ApiSuccess(res, sourceConfig, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error(`Error getting source configuration for ${req.params.sourceId}:`, error);
-    return ApiError(res, 'Failed to retrieve source configuration', 500, 
-      ApiResponseWrapper.createMetadata(startTime, 'static'));
+    return createErrorResponse(
+      res,
+      'Failed to retrieve source configuration',
+      500,
+      ApiResponseWrapper.createMetadata(startTime, 'static'),
+      error
+    );
   }
 });
 
 /**
- * Update source configuration
+ * PUT /sources/:sourceId/config
+ * 
+ * Updates configuration settings for a specific API source including
+ * rate limits, caching behavior, failover settings, and monitoring thresholds.
  */
-router.put('/sources/:sourceId/config', async (req, res) => {
+router.put('/sources/:sourceId/config', async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
     const { sourceId } = req.params;
     const { rateLimit, caching, failover, monitoring } = req.body;
 
-    // This would update the actual configuration
-    // For now, we'll just return a success response
+    // In a production system, this would persist to a database or config file
     const updatedConfig = {
       source: sourceId,
       updated: {
@@ -376,49 +471,72 @@ router.put('/sources/:sourceId/config', async (req, res) => {
 
     return ApiSuccess(res, updatedConfig, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    console.error(`Error updating source configuration for ${req.params.sourceId}:`, error);
-    return ApiError(res, 'Failed to update source configuration', 500, 
-      ApiResponseWrapper.createMetadata(startTime, 'static'));
+    return createErrorResponse(
+      res,
+      'Failed to update source configuration',
+      500,
+      ApiResponseWrapper.createMetadata(startTime, 'static'),
+      error
+    );
   }
 });
 
 /**
- * Get comprehensive cost report
+ * GET /costs/report
+ * 
+ * Generates a comprehensive cost report showing spending across all API sources,
+ * trends over time, and cost efficiency metrics.
  */
-router.get('/costs/report', async (req, res) => {
+router.get('/costs/report', async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
     const costReport = apiManagementService.getCostReport();
     return ApiSuccess(res, costReport, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    logger.error('Error getting cost report:', { component: 'SimpleTool' }, error);
-    return ApiError(res, 'Failed to retrieve cost report', 500, 
-      ApiResponseWrapper.createMetadata(startTime, 'static'));
+    return createErrorResponse(
+      res,
+      'Failed to retrieve cost report',
+      500,
+      ApiResponseWrapper.createMetadata(startTime, 'static'),
+      error
+    );
   }
 });
 
 /**
- * Get cost alerts
+ * GET /costs/alerts
+ * 
+ * Retrieves active cost alerts for budget overruns or unusual spending patterns.
  */
-router.get('/costs/alerts', async (req, res) => {
+router.get('/costs/alerts', async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
     const costMonitoring = apiManagementService.getCostMonitoring();
     const alerts = costMonitoring.getActiveAlerts();
-    return ApiSuccess(res, { alerts, count: alerts.length }, ApiResponseWrapper.createMetadata(startTime, 'database'));
+    return ApiSuccess(
+      res, 
+      { alerts, count: alerts.length }, 
+      ApiResponseWrapper.createMetadata(startTime, 'database')
+    );
   } catch (error) {
-    logger.error('Error getting cost alerts:', { component: 'SimpleTool' }, error);
-    return ApiError(res, 'Failed to retrieve cost alerts', 500, 
-      ApiResponseWrapper.createMetadata(startTime, 'static'));
+    return createErrorResponse(
+      res,
+      'Failed to retrieve cost alerts',
+      500,
+      ApiResponseWrapper.createMetadata(startTime, 'static'),
+      error
+    );
   }
 });
 
 /**
- * Acknowledge cost alert
+ * POST /costs/alerts/:alertId/acknowledge
+ * 
+ * Acknowledges a cost alert to prevent it from triggering repeatedly.
  */
-router.post('/costs/alerts/:alertId/acknowledge', async (req, res) => {
+router.post('/costs/alerts/:alertId/acknowledge', async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
@@ -427,38 +545,63 @@ router.post('/costs/alerts/:alertId/acknowledge', async (req, res) => {
     const acknowledged = costMonitoring.acknowledgeAlert(alertId);
     
     if (acknowledged) {
-      return ApiSuccess(res, { message: 'Alert acknowledged', alertId }, ApiResponseWrapper.createMetadata(startTime, 'database'));
+      return ApiSuccess(
+        res, 
+        { message: 'Alert acknowledged', alertId }, 
+        ApiResponseWrapper.createMetadata(startTime, 'database')
+      );
     } else {
-      return ApiError(res, 'Alert not found', 404, ApiResponseWrapper.createMetadata(startTime, 'static'));
+      return createErrorResponse(
+        res,
+        'Alert not found',
+        404,
+        ApiResponseWrapper.createMetadata(startTime, 'static')
+      );
     }
   } catch (error) {
-    logger.error('Error acknowledging cost alert:', { component: 'SimpleTool' }, error);
-    return ApiError(res, 'Failed to acknowledge alert', 500, 
-      ApiResponseWrapper.createMetadata(startTime, 'static'));
+    return createErrorResponse(
+      res,
+      'Failed to acknowledge alert',
+      500,
+      ApiResponseWrapper.createMetadata(startTime, 'static'),
+      error
+    );
   }
 });
 
 /**
- * Get cost optimization recommendations
+ * GET /costs/recommendations
+ * 
+ * Provides AI-driven cost optimization recommendations based on usage patterns.
  */
-router.get('/costs/recommendations', async (req, res) => {
+router.get('/costs/recommendations', async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
     const costMonitoring = apiManagementService.getCostMonitoring();
     const recommendations = costMonitoring.getCostOptimizationRecommendations();
-    return ApiSuccess(res, { recommendations, count: recommendations.length }, ApiResponseWrapper.createMetadata(startTime, 'database'));
+    return ApiSuccess(
+      res, 
+      { recommendations, count: recommendations.length }, 
+      ApiResponseWrapper.createMetadata(startTime, 'database')
+    );
   } catch (error) {
-    logger.error('Error getting cost recommendations:', { component: 'SimpleTool' }, error);
-    return ApiError(res, 'Failed to retrieve cost recommendations', 500, 
-      ApiResponseWrapper.createMetadata(startTime, 'static'));
+    return createErrorResponse(
+      res,
+      'Failed to retrieve cost recommendations',
+      500,
+      ApiResponseWrapper.createMetadata(startTime, 'static'),
+      error
+    );
   }
 });
 
 /**
- * Update budget configuration
+ * PUT /costs/budget/:source
+ * 
+ * Updates budget configuration and alert thresholds for a specific API source.
  */
-router.put('/costs/budget/:source', async (req, res) => {
+router.put('/costs/budget/:source', async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
@@ -474,16 +617,23 @@ router.put('/costs/budget/:source', async (req, res) => {
       config: budgetConfig 
     }, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    logger.error('Error updating budget configuration:', { component: 'SimpleTool' }, error);
-    return ApiError(res, 'Failed to update budget configuration', 500, 
-      ApiResponseWrapper.createMetadata(startTime, 'static'));
+    return createErrorResponse(
+      res,
+      'Failed to update budget configuration',
+      500,
+      ApiResponseWrapper.createMetadata(startTime, 'static'),
+      error
+    );
   }
 });
 
 /**
- * Export metrics for external monitoring systems
+ * GET /metrics/export
+ * 
+ * Exports metrics in various formats (JSON or Prometheus) for integration
+ * with external monitoring systems like Grafana, Datadog, or New Relic.
  */
-router.get('/metrics/export', async (req, res) => {
+router.get('/metrics/export', async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
@@ -522,8 +672,8 @@ router.get('/metrics/export', async (req, res) => {
       }))
     };
 
+    // Support Prometheus format for time-series monitoring systems
     if (format === 'prometheus') {
-      // Convert to Prometheus format
       let prometheusMetrics = '';
       
       prometheusMetrics += `# HELP api_requests_total Total number of API requests\n`;
@@ -550,19 +700,15 @@ router.get('/metrics/export', async (req, res) => {
 
     return ApiSuccess(res, metrics, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    logger.error('Error exporting metrics:', { component: 'SimpleTool' }, error);
-    return ApiError(res, 'Failed to export metrics', 500, 
-      ApiResponseWrapper.createMetadata(startTime, 'static'));
+    return createErrorResponse(
+      res,
+      'Failed to export metrics',
+      500,
+      ApiResponseWrapper.createMetadata(startTime, 'static'),
+      error
+    );
   }
 });
 
 // Export the service instance for use in other parts of the application
 export { apiManagementService };
-
-
-
-
-
-
-
-

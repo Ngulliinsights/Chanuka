@@ -5,9 +5,7 @@ import { Badge } from '../ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog';
 import { Textarea } from '../ui/textarea';
-import { 
-import { logger } from '../utils/logger.js';
-  AlertTriangle, 
+import { AlertTriangle, 
   Eye, 
   CheckCircle, 
   XCircle, 
@@ -21,6 +19,7 @@ import { logger } from '../utils/logger.js';
   Gavel, 
   Scroll 
 } from 'lucide-react';
+import { logger } from '../../utils/logger';
 
 // Enhanced interface to support multiple workaround types in Kenyan context
 interface ImplementationWorkaround {

@@ -13,8 +13,7 @@ export { UserProfileService } from './user-profile';
 export { UserPreferencesService } from './user-preferences';
 export { CitizenVerificationService } from './citizen-verification';
 export { ExpertVerificationService } from './ExpertVerificationService';
-export { AlertPreferenceService } from './alert-preference';
-export { AdvancedAlertPreferencesService } from './advanced-alert-preferences';
+export { unifiedAlertPreferenceService } from './alert-preferences/unified_alert_service';
 
 // Storage
 export { UserStorage } from './user-storage';

@@ -9,9 +9,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { 
-import { logger } from '../utils/logger.js';
-  MessageSquare, 
+import {
+  MessageSquare,
   ThumbsUp, 
   ThumbsDown, 
   Users, 

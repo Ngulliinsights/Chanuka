@@ -66,8 +66,8 @@ if (process.env.NODE_ENV === 'development') {
         DevelopmentDebugger.getInstance();
         logger.info('🔧 Development debug utilities initialized', { component: 'SimpleTool' });
       })
-      .catch(error => console.warn('Failed to initialize development debug utilities:', error));
-  ]);
+      .catch(error => console.warn('Failed to initialize development debug utilities:', error))
+  ]).catch(() => {});
 }
 
 /**

@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { 
-import { logger } from '../utils/logger';
-  ConnectionInfo, 
-  HealthStatus, 
-  connectionMonitor, 
-  checkConnection, 
+import { logger } from '@/utils/logger';
+import {
+  ConnectionInfo,
+  HealthStatus,
+  connectionMonitor,
+  checkConnection,
   checkApiHealth,
-  diagnoseConnection 
+  diagnoseConnection
 } from '../utils/api-health.js';
 
 // Define diagnosis result type for better type safety and reusability

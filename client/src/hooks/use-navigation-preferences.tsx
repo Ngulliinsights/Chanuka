@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { logger } from '@/utils/logger';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { NavigationPreferences } from '@/types/navigation';
 
@@ -109,8 +110,8 @@ export function useNavigationPreferences() {
       favoritePages: [],
       recentlyVisited: [],
       compactMode: false,
-    };
-    updatePreferences(defaultPreferences);
+  };
+  updatePreferences(defaultPreferences);
     try {
       localStorage.removeItem(PREFERENCES_STORAGE_KEY);
     } catch (error) {
@@ -171,6 +172,5 @@ export function useNavigationPreferences() {
     resetPreferences,
     exportPreferences,
     importPreferences,
-import { logger } from '../utils/logger.js';
   };
 }

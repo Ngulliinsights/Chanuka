@@ -4,7 +4,7 @@ import { cacheService, CACHE_TTL } from "../infrastructure/cache/cache-service";
 import { searchSuggestionsService } from "./search-suggestions";
 import * as schema from "../../shared/schema";
 import { Bill, BillComment, Sponsor } from "../../shared/schema";
-import { logger } from '../../utils/logger';
+import { logger } from '../utils/logger';
 
 // Search interfaces and types
 export interface SearchQuery {
@@ -17,7 +17,7 @@ export interface SearchQuery {
 export interface SearchFilters {
   status?: string[];
   category?: string[];
-  sponsorId?: string[]; // Fixed: Changed from number[] to string[] to match UUID type
+  sponsorId?: number[]; // Fixed: Changed from string[] to number[] to match database schema
   dateFrom?: Date;
   dateTo?: Date;
   complexityMin?: number;
@@ -67,7 +67,7 @@ export interface SearchResponse {
 export interface SearchFacets {
   status: Array<{ value: string; count: number; label: string }>;
   category: Array<{ value: string; count: number; label: string }>;
-  sponsors: Array<{ value: string; count: number; label: string }>; // Fixed: Changed from number to string
+  sponsors: Array<{ value: number; count: number; label: string }>; // Fixed: Changed from string to number
   complexity: Array<{ range: string; count: number; min: number; max: number }>;
   dateRanges: Array<{ range: string; count: number; from: Date; to: Date }>;
 }

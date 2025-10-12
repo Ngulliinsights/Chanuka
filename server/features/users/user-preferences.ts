@@ -1,6 +1,7 @@
 import { database as db } from '../../../shared/database/connection.js';
 import { users, billEngagement } from '../../../shared/schema.js';
 import { eq, and } from 'drizzle-orm';
+import { logger } from '../../utils/logger';
 
 export interface BillTrackingPreferences {
   statusChanges: boolean;
@@ -100,7 +101,6 @@ const DEFAULT_PREFERENCES: UserNotificationPreferences = {
         enabled: false,
         urgentBillsImmediate: true,
         importantSponsorsImmediate: false,
-import { logger } from '../../utils/logger';
         highEngagementImmediate: false
       },
       batchingRules: {
@@ -141,7 +141,7 @@ export class UserPreferencesService {
       const userPrefs = user[0].preferences as Partial<UserNotificationPreferences> || {};
       return this.mergeWithDefaults(userPrefs);
     } catch (error) {
-      console.error(`Error getting preferences for user ${userId}:`, error);
+  logger.error(`Error getting preferences for user ${userId}:`, { component: 'SimpleTool' }, error);
       return DEFAULT_PREFERENCES;
     }
   }

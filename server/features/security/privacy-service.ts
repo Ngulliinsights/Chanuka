@@ -95,6 +95,35 @@ export class PrivacyService {
         const profile = await db
           .select()
           .from(userProfiles)
+          .where(eq(userProfiles.userId, request.userId))
+          .limit(1);
+
+        userData.userData.profile = user[0] || null;
+        userData.userData.profileDetails = profile[0] || null;
+      }
+
+      // Additional data types (comments, notifications) can be added similarly.
+
+      return userData;
+    } catch (error) {
+      logger.error('Error exporting user data:', { component: 'PrivacyService' });
+      throw error;
+    }
+  }
+
+  // Stub for deleting user data - conservative implementation
+  async deleteUserData(request: DataDeletionRequest): Promise<boolean> {
+    try {
+      logger.info(`Received data deletion request for user ${request.userId}`, { component: 'PrivacyService' });
+      // Implement deletion logic carefully to respect retention and audit.
+      return true;
+    } catch (err) {
+      logger.error('Error deleting user data:', { component: 'PrivacyService' });
+      return false;
+    }
+  }
+
+}
 
 
 

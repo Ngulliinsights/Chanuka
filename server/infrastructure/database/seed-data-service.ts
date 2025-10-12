@@ -55,7 +55,94 @@ export class SeedDataService {
       schema.analysis,
       schema.billSectionConflicts,
       schema.sponsorTransparency,
-      sch
+      schema.billSponsorships,
+      schema.sponsorAffiliations,
+      schema.sponsors,
+      schema.bills,
+      schema.userProfiles,
+      schema.users
+    ];
+    // Safely truncate tables in reverse dependency order if DB supports it.
+    for (const table of tables) {
+      try {
+        // Use database client abstraction if available, otherwise no-op
+        if (this.db && typeof (this.db as any).raw === 'function') {
+          await (this.db as any).raw(`DELETE FROM ${table}`);
+        } else if (this.db && typeof (this.db as any).exec === 'function') {
+          await (this.db as any).exec(`DELETE FROM ${table}`);
+        } else {
+          logger.info(`Would clear table: ${table}`, { component: 'SeedDataService' });
+        }
+      } catch (err) {
+        logger.warn(`Failed to clear table ${table}: ${err}`, { component: 'SeedDataService' });
+      }
+    }
+  }
+
+  // Minimal helper stubs to create seed data. These may be replaced by richer implementations.
+  private async createUsers(): Promise<any[]> {
+    logger.info('Creating stub users for seed...', { component: 'SeedDataService' });
+    return [];
+  }
+
+  private async createUserProfiles(users: any[]): Promise<any[]> {
+    logger.info('Creating stub user profiles...', { component: 'SeedDataService' });
+    return [];
+  }
+
+  private async createSponsors(): Promise<any[]> {
+    logger.info('Creating stub sponsors...', { component: 'SeedDataService' });
+    return [];
+  }
+
+  private async createSponsorAffiliations(sponsors: any[]): Promise<any[]> {
+    logger.info('Creating stub sponsor affiliations...', { component: 'SeedDataService' });
+    return [];
+  }
+
+  private async createBills(users: any[]): Promise<any[]> {
+    logger.info('Creating stub bills...', { component: 'SeedDataService' });
+    return [];
+  }
+
+  private async createBillSponsorships(bills: any[], sponsors: any[]): Promise<any[]> {
+    logger.info('Creating stub bill sponsorships...', { component: 'SeedDataService' });
+    return [];
+  }
+
+  private async createSponsorTransparency(sponsors: any[]): Promise<any[]> {
+    logger.info('Creating stub sponsor transparency...', { component: 'SeedDataService' });
+    return [];
+  }
+
+  private async createBillSectionConflicts(bills: any[], sponsors: any[]): Promise<any[]> {
+    logger.info('Creating stub bill section conflicts...', { component: 'SeedDataService' });
+    return [];
+  }
+
+  private async createAnalysis(bills: any[]): Promise<any[]> {
+    logger.info('Creating stub analysis entries...', { component: 'SeedDataService' });
+    return [];
+  }
+
+  private async createComments(bills: any[], users: any[]): Promise<any[]> {
+    logger.info('Creating stub comments...', { component: 'SeedDataService' });
+    return [];
+  }
+
+  private async createEngagement(bills: any[], users: any[]): Promise<any[]> {
+    logger.info('Creating stub engagement entries...', { component: 'SeedDataService' });
+    return [];
+  }
+
+  private async createNotifications(users: any[], bills: any[]): Promise<any[]> {
+    logger.info('Creating stub notifications...', { component: 'SeedDataService' });
+    return [];
+  }
+
+}
+
+export const seedDataService = new SeedDataService();
 
 
 

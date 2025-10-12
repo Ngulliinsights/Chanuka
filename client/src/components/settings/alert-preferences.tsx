@@ -22,6 +22,7 @@ import {
   AlertCircle,
   Info
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 interface NotificationChannel {
   type: 'inApp' | 'email' | 'push' | 'sms';
@@ -68,7 +69,6 @@ interface AlertPreferences {
       enabled: boolean;
       urgentBillsImmediate: boolean;
       importantSponsorsImmediate: boolean;
-import { logger } from '../utils/logger.js';
       highEngagementImmediate: boolean;
     };
     batchingRules: {

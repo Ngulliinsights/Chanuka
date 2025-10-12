@@ -6,14 +6,14 @@
  */
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { 
-import { logger } from '../utils/logger';
-  ApiResponse, 
-  ApiError, 
-  FetchOptions, 
-  apiService, 
+import { logger } from '@/utils/logger';
+import {
+  ApiResponse,
+  ApiError,
+  FetchOptions,
+  apiService,
   fallbackDataManager,
-  getErrorMessage 
+  getErrorMessage
 } from '@/services/api-error-handling';
 
 export interface UseApiOptions extends Omit<FetchOptions, 'method'> {

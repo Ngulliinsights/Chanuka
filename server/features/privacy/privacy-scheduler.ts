@@ -1,4 +1,4 @@
-import cron from 'node-cron';
+import * as cron from 'node-cron';
 import { privacyService } from './privacy-service.js';
 import { auditLogger } from "../../infrastructure/monitoring/audit-log.js";
 import { logger } from '../../utils/logger';
@@ -32,7 +32,6 @@ class PrivacySchedulerService {
         logger.info('Running scheduled data cleanup...', { component: 'SimpleTool' });
         await this.runScheduledCleanup();
       }, {
-        scheduled: false,
         timezone: 'UTC'
       });
 
@@ -45,14 +44,13 @@ class PrivacySchedulerService {
         logger.info('Running scheduled compliance monitoring...', { component: 'SimpleTool' });
         await this.runComplianceMonitoring();
       }, {
-        scheduled: false,
         timezone: 'UTC'
       });
 
       this.isInitialized = true;
       logger.info('✅ Privacy scheduler service initialized', { component: 'SimpleTool' });
     } catch (error) {
-      logger.error('❌ Failed to initialize privacy scheduler service:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Failed to initialize privacy scheduler service:', { component: 'SimpleTool' }, { errorMessage: error instanceof Error ? error.message : String(error) });
       throw error;
     } finally {
       this.initializationLock = false;
@@ -148,7 +146,8 @@ class PrivacySchedulerService {
           timestamp: new Date()
         },
         ipAddress: 'system',
-        userAgent: 'privacy-scheduler'
+        userAgent: 'privacy-scheduler',
+        severity: 'low'
       });
 
       if (result.success) {
@@ -159,7 +158,7 @@ class PrivacySchedulerService {
 
       return result;
     } catch (error) {
-      logger.error('❌ Error during scheduled data cleanup:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Error during scheduled data cleanup:', { component: 'SimpleTool' }, { errorMessage: error instanceof Error ? error.message : String(error) });
       
       // Log the error
       await auditLogger.log({
@@ -167,12 +166,13 @@ class PrivacySchedulerService {
         action: 'data.cleanup.failed',
         resource: 'system',
         details: {
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? error.message : String(error),
           duration: Date.now() - startTime,
           timestamp: new Date()
         },
         ipAddress: 'system',
-        userAgent: 'privacy-scheduler'
+        userAgent: 'privacy-scheduler',
+        severity: 'medium'
       });
 
       return {
@@ -231,7 +231,8 @@ class PrivacySchedulerService {
           timestamp: new Date()
         },
         ipAddress: 'system',
-        userAgent: 'privacy-scheduler'
+        userAgent: 'privacy-scheduler',
+        severity: 'low'
       });
 
       if (stalePolicies.length > 0) {
@@ -244,7 +245,7 @@ class PrivacySchedulerService {
       }
 
     } catch (error) {
-      logger.error('❌ Error during compliance monitoring:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Error during compliance monitoring:', { component: 'SimpleTool' }, { errorMessage: error instanceof Error ? error.message : String(error) });
       
       // Log the error
       await auditLogger.log({
@@ -252,12 +253,13 @@ class PrivacySchedulerService {
         action: 'compliance.monitoring.failed',
         resource: 'system',
         details: {
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? error.message : String(error),
           duration: Date.now() - startTime,
           timestamp: new Date()
         },
         ipAddress: 'system',
-        userAgent: 'privacy-scheduler'
+        userAgent: 'privacy-scheduler',
+        severity: 'medium'
       });
     } finally {
       this.complianceInProgress = false;

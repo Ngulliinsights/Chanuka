@@ -24,12 +24,12 @@ import { useUnifiedNavigation } from '@/hooks/use-unified-navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { NavigationSection, UserRole } from '@/types/navigation';
 import { 
-import { logger } from '../utils/logger.js';
   isNavigationPathActive, 
   getRoleBasedActiveClasses,
   getActiveIconClasses,
   getActiveTextClasses
 } from '@/utils/navigation/active-state';
+import { logger } from '../utils/logger';
 
 export interface NavigationItem {
   id: string;

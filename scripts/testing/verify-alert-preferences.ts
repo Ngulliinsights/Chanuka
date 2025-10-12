@@ -1,4 +1,4 @@
-import { alertPreferenceService } from './services/alert-preference.js';
+import { unifiedAlertPreferenceService } from '../../server/features/users/alert-preferences/unified_alert_service.js';
 import { db } from './db.js';
 import { users, bills, userInterests } from '../shared/schema.js';
 import { eq } from 'drizzle-orm';
@@ -10,7 +10,7 @@ async function verifyAlertPreferences() {
   try {
     // Test 1: Check service initialization
     logger.info('1. Testing service initialization...', { component: 'SimpleTool' });
-    const initialStats = alertPreferenceService.getStats();
+    const initialStats = unifiedAlertPreferenceService.getServiceStats();
     logger.info('✅ Alert preference service initialized:', { component: 'SimpleTool' }, initialStats);
 
     // Test 2: Create test data
@@ -102,11 +102,12 @@ async function verifyAlertPreferences() {
         engagementHistoryWeight: 0.2,
         trendingWeight: 0.1,
         duplicateFiltering: true,
-        spamFiltering: true
+        spamFiltering: true,
+        minimumConfidence: 0.3
       }
     };
     
-    const createdPreference = await alertPreferenceService.createAlertPreference(
+    const createdPreference = await unifiedAlertPreferenceService.createAlertPreference(
       testUser.id,
       preferenceData
     );
@@ -121,7 +122,7 @@ async function verifyAlertPreferences() {
     // Test 4: Get user alert preferences
     logger.info('4. Testing get user alert preferences...', { component: 'SimpleTool' });
     
-    const userPreferences = await alertPreferenceService.getUserAlertPreferences(testUser.id);
+    const userPreferences = await unifiedAlertPreferenceService.getUserAlertPreferences(testUser.id);
     logger.info('✅ User preferences retrieved:', { component: 'SimpleTool' }, {
       count: userPreferences.length,
       firstPreferenceName: userPreferences[0]?.name
@@ -130,7 +131,7 @@ async function verifyAlertPreferences() {
     // Test 5: Get specific alert preference
     logger.info('5. Testing get specific alert preference...', { component: 'SimpleTool' });
     
-    const specificPreference = await alertPreferenceService.getAlertPreference(
+    const specificPreference = await unifiedAlertPreferenceService.getAlertPreference(
       testUser.id,
       createdPreference.id
     );
@@ -144,7 +145,7 @@ async function verifyAlertPreferences() {
     // Test 6: Update alert preference
     logger.info('6. Testing alert preference update...', { component: 'SimpleTool' });
     
-    const updatedPreference = await alertPreferenceService.updateAlertPreference(
+    const updatedPreference = await unifiedAlertPreferenceService.updateAlertPreference(
       testUser.id,
       createdPreference.id,
       {
@@ -156,7 +157,8 @@ async function verifyAlertPreferences() {
           engagementHistoryWeight: 0.1,
           trendingWeight: 0.1,
           duplicateFiltering: true,
-          spamFiltering: true
+          spamFiltering: true,
+          minimumConfidence: 0.3
         }
       }
     );
@@ -166,35 +168,8 @@ async function verifyAlertPreferences() {
       userInterestWeight: updatedPreference.smartFiltering.userInterestWeight
     });
 
-    // Test 7: Create alert rule
-    logger.info('7. Testing alert rule creation...', { component: 'SimpleTool' });
-    
-    const ruleData = {
-      name: 'High Priority Healthcare Rule',
-      conditions: {
-        billCategories: ['healthcare'],
-        keywords: ['emergency', 'urgent', 'critical'],
-        minimumEngagement: 100
-      },
-      actions: {
-        channels: ['in_app', 'email', 'push'],
-        priority: 'high' as const,
-        customMessage: 'High priority healthcare bill requires attention'
-      },
-      isActive: true
-    };
-    
-    const createdRule = await alertPreferenceService.createAlertRule(
-      testUser.id,
-      createdPreference.id,
-      ruleData
-    );
-    
-    logger.info('✅ Alert rule created:', { component: 'SimpleTool' }, {
-      id: createdRule.id,
-      name: createdRule.name,
-      priority: createdRule.actions.priority
-    });
+    // Test 7: Skip alert rule creation (not supported in unified system)
+    logger.info('7. Skipping alert rule creation (not supported in unified system)...', { component: 'SimpleTool' });
 
     // Test 8: Test smart filtering
     logger.info('8. Testing smart filtering...', { component: 'SimpleTool' });
@@ -207,7 +182,7 @@ async function verifyAlertPreferences() {
       message: 'Healthcare bill status changed'
     };
     
-    const filteringResult = await alertPreferenceService.processSmartFiltering(
+    const filteringResult = await unifiedAlertPreferenceService.processSmartFiltering(
       testUser.id,
       'bill_status_change',
       alertData,
@@ -224,7 +199,7 @@ async function verifyAlertPreferences() {
     // Test 9: Process alert delivery
     logger.info('9. Testing alert delivery processing...', { component: 'SimpleTool' });
     
-    const deliveryLogs = await alertPreferenceService.processAlertDelivery(
+    const deliveryLogs = await unifiedAlertPreferenceService.processAlertDelivery(
       testUser.id,
       'bill_status_change',
       alertData,
@@ -240,7 +215,7 @@ async function verifyAlertPreferences() {
     // Test 10: Get alert delivery logs
     logger.info('10. Testing get alert delivery logs...', { component: 'SimpleTool' });
     
-    const logsResult = await alertPreferenceService.getAlertDeliveryLogs(testUser.id, {
+    const logsResult = await unifiedAlertPreferenceService.getAlertDeliveryLogs(testUser.id, {
       page: 1,
       limit: 10
     });
@@ -254,7 +229,7 @@ async function verifyAlertPreferences() {
     // Test 11: Get alert preference statistics
     logger.info('11. Testing alert preference statistics...', { component: 'SimpleTool' });
     
-    const stats = await alertPreferenceService.getAlertPreferenceStats(testUser.id);
+    const stats = await unifiedAlertPreferenceService.getAlertPreferenceStats(testUser.id);
     logger.info('✅ Preference statistics retrieved:', { component: 'SimpleTool' }, {
       totalPreferences: stats.totalPreferences,
       activePreferences: stats.activePreferences,
@@ -268,16 +243,16 @@ async function verifyAlertPreferences() {
     const alertTypes = ['new_comment', 'amendment', 'voting_scheduled'];
     
     for (const alertType of alertTypes) {
-      const typeDeliveryLogs = await alertPreferenceService.processAlertDelivery(
+      const typeDeliveryLogs = await unifiedAlertPreferenceService.processAlertDelivery(
         testUser.id,
-        alertType,
+        alertType as any,
         {
           ...alertData,
           message: `${alertType} alert for testing`
         },
         'low'
       );
-      
+
       console.log(`✅ ${alertType} alert processed: ${typeDeliveryLogs.length} logs`);
     }
 
@@ -314,11 +289,12 @@ async function verifyAlertPreferences() {
         engagementHistoryWeight: 0.3,
         trendingWeight: 0.2,
         duplicateFiltering: true,
-        spamFiltering: true
+        spamFiltering: true,
+        minimumConfidence: 0.3
       }
     };
     
-    const batchedPreference = await alertPreferenceService.createAlertPreference(
+    const batchedPreference = await unifiedAlertPreferenceService.createAlertPreference(
       testUser.id,
       batchedPreferenceData
     );
@@ -332,9 +308,9 @@ async function verifyAlertPreferences() {
     // Test 14: Delete alert preference
     logger.info('14. Testing alert preference deletion...', { component: 'SimpleTool' });
     
-    await alertPreferenceService.deleteAlertPreference(testUser.id, batchedPreference.id);
+    await unifiedAlertPreferenceService.deleteAlertPreference(testUser.id, batchedPreference.id);
     
-    const deletedPreference = await alertPreferenceService.getAlertPreference(
+    const deletedPreference = await unifiedAlertPreferenceService.getAlertPreference(
       testUser.id,
       batchedPreference.id
     );
@@ -346,7 +322,7 @@ async function verifyAlertPreferences() {
     // Test 15: Final statistics check
     logger.info('15. Testing final statistics...', { component: 'SimpleTool' });
     
-    const finalStats = await alertPreferenceService.getAlertPreferenceStats(testUser.id);
+    const finalStats = await unifiedAlertPreferenceService.getAlertPreferenceStats(testUser.id);
     logger.info('✅ Final statistics:', { component: 'SimpleTool' }, {
       totalPreferences: finalStats.totalPreferences,
       totalAlerts: finalStats.deliveryStats.totalAlerts,
@@ -355,7 +331,7 @@ async function verifyAlertPreferences() {
 
     // Test 16: Service shutdown
     logger.info('16. Testing service shutdown...', { component: 'SimpleTool' });
-    await alertPreferenceService.shutdown();
+    await unifiedAlertPreferenceService.shutdown();
     logger.info('✅ Service shutdown completed', { component: 'SimpleTool' });
 
     // Cleanup test data

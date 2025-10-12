@@ -1,4 +1,7 @@
 import { eq, and, desc, inArray, sql } from "drizzle-orm";
+import type { PgTransaction } from "drizzle-orm/pg-core";
+import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
+import type { ExtractTablesWithRelations } from "drizzle-orm";
 import { BaseStorage, type StorageConfig } from "../../infrastructure/database/base/BaseStorage.js";
 import { database as db } from "../../../shared/database/connection.js";
 import {
@@ -6,15 +9,32 @@ import {
   billTags,
   type Bill,
   type InsertBill,
+  schema
 } from "../../../shared/schema.js";
 import { logger } from '../../utils/logger';
 
-// Cache key generators
+// Cache configuration constants - these control cache behavior across the application
+const CACHE_TTL = 300; // Cache time-to-live in seconds (5 minutes default)
+
+// Cache key generators for consistent cache key construction
 const CACHE_KEY = {
   ALL_BILLS: "all",
   BILL_BY_ID: (id: number) => `id:${id}`,
   BILLS_BY_TAGS: (tags: string[]) => `tags:${tags.sort().join(",")}`,
 } as const;
+
+// Cache invalidation patterns for targeted cache clearing
+const CACHE_INVALIDATION = {
+  FULL: ["all", "id:*", "tags:*"], // Invalidates all caches
+  PATTERN_BY_TAGS: ["tags:*"], // Invalidates only tag-based caches
+} as const;
+
+// Type alias for transaction to improve readability
+type DbTransaction = PgTransaction<
+  NodePgQueryResultHKT,
+  typeof schema,
+  ExtractTablesWithRelations<typeof schema>
+>;
 
 /**
  * Enhanced BillStorage class with optimized Drizzle ORM operations
@@ -32,7 +52,10 @@ export class BillStorage extends BaseStorage<Bill> {
     super(options);
   }
 
-  // Implement required abstract method
+  /**
+   * Health check implementation to verify database connectivity
+   * Returns true if the database is accessible, false otherwise
+   */
   async isHealthy(): Promise<boolean> {
     try {
       await db.select().from(bills).limit(1);
@@ -45,6 +68,7 @@ export class BillStorage extends BaseStorage<Bill> {
 
   /**
    * Singleton pattern implementation for consistent storage access
+   * This ensures only one instance exists throughout the application lifecycle
    */
   static getInstance(options?: StorageConfig): BillStorage {
     if (!BillStorage.instance) {
@@ -56,8 +80,8 @@ export class BillStorage extends BaseStorage<Bill> {
   /**
    * Optimized method to retrieve all bills with enhanced caching
    *
-   * Uses read replica for better performance and implements smart caching
-   * to reduce database load on frequently accessed data.
+   * Uses intelligent caching to reduce database load while maintaining
+   * data freshness through the configured TTL.
    */
   async getBills(): Promise<Bill[]> {
     return this.getCached(
@@ -81,7 +105,6 @@ export class BillStorage extends BaseStorage<Bill> {
    * and error handling to ensure data integrity.
    */
   async getBill(id: number): Promise<Bill | undefined> {
-    // Enhanced input validation with descriptive error messages
     if (!Number.isInteger(id) || id <= 0) {
       throw new Error("Invalid bill ID: must be a positive integer");
     }
@@ -90,7 +113,6 @@ export class BillStorage extends BaseStorage<Bill> {
       CACHE_KEY.BILL_BY_ID(id),
       async () => {
         const result = await db.select().from(bills).where(eq(bills.id, id));
-
         return result[0];
       },
       CACHE_TTL
@@ -104,24 +126,22 @@ export class BillStorage extends BaseStorage<Bill> {
    * management, and intelligent cache invalidation.
    */
   async createBill(bill: InsertBill): Promise<Bill> {
-    // Enhanced input validation with specific error messages
+    // Comprehensive input validation with specific error messages
     if (!bill.title?.trim()) {
       throw new Error("Bill title is required and cannot be empty");
     }
 
-    if (!bill.content?.trim()) {
-      throw new Error("Bill content is required and cannot be empty");
-    }
+    // Handle optional content field safely - content can be null in schema
+    const content = bill.content?.trim() || null;
 
     return this.executeTransaction(async (tx) => {
-      // Insert new bill with proper defaults and timestamp handling
       const result = await tx
         .insert(bills)
         .values({
           ...bill,
           title: bill.title.trim(),
-          content: bill.content.trim(),
-          description: bill.description?.trim() || "",
+          content: content,
+          description: bill.description?.trim() || null,
           status: bill.status || "draft",
           viewCount: 0,
           shareCount: 0,
@@ -132,7 +152,7 @@ export class BillStorage extends BaseStorage<Bill> {
 
       const newBill = result[0];
 
-      // Intelligent cache invalidation - only invalidate what's necessary
+      // Invalidate all caches since we've added a new bill
       await this.invalidateCache(CACHE_INVALIDATION.FULL);
 
       return newBill;
@@ -163,7 +183,6 @@ export class BillStorage extends BaseStorage<Bill> {
     billId: number,
     field: "viewCount" | "shareCount"
   ): Promise<Bill> {
-    // Enhanced input validation
     if (!Number.isInteger(billId) || billId <= 0) {
       throw new Error("Invalid bill ID: must be a positive integer");
     }
@@ -208,7 +227,6 @@ export class BillStorage extends BaseStorage<Bill> {
    * deduplication, and optimized database queries.
    */
   async addTagsToBill(billId: number, tags: string[]): Promise<Bill> {
-    // Enhanced input validation
     if (!Number.isInteger(billId) || billId <= 0) {
       throw new Error("Invalid bill ID: must be a positive integer");
     }
@@ -253,9 +271,11 @@ export class BillStorage extends BaseStorage<Bill> {
 
   /**
    * Enhanced tag removal with proper validation
+   * 
+   * Removes specified tags from a bill while maintaining data integrity
+   * and cache consistency.
    */
-  async removeTagsFromBill(billId: number, tags: string[]): Promise<Bill> {
-    // Enhanced input validation
+  async removeTagsFromBill(billId: number, tags: string[]): Promise<Bill | undefined> {
     if (!Number.isInteger(billId) || billId <= 0) {
       throw new Error("Invalid bill ID: must be a positive integer");
     }
@@ -287,6 +307,7 @@ export class BillStorage extends BaseStorage<Bill> {
         ...CACHE_INVALIDATION.PATTERN_BY_TAGS,
       ]);
 
+      // Fetch and return the updated bill
       return this.getBill(billId);
     });
   }
@@ -298,7 +319,6 @@ export class BillStorage extends BaseStorage<Bill> {
    * optimized queries and intelligent caching strategies.
    */
   async getBillsByTags(tags: string[]): Promise<Bill[]> {
-    // Enhanced input validation
     if (!Array.isArray(tags) || tags.length === 0) {
       return [];
     }
@@ -345,7 +365,7 @@ export class BillStorage extends BaseStorage<Bill> {
     const cleanTags = tags
       .map((tag) => tag.trim().toLowerCase())
       .filter((tag) => tag.length > 0)
-      .filter((tag, index, array) => array.indexOf(tag) === index); // Remove duplicates
+      .filter((tag, index, array) => array.indexOf(tag) === index);
 
     if (cleanTags.length === 0) {
       throw new Error("No valid tags provided");
@@ -361,13 +381,12 @@ export class BillStorage extends BaseStorage<Bill> {
    * logging, and rollback mechanisms for data integrity.
    */
   private async executeTransaction<T>(
-    callback: (tx: typeof db) => Promise<T>
+    callback: (tx: DbTransaction) => Promise<T>
   ): Promise<T> {
     return await db.transaction(async (tx) => {
       try {
         return await callback(tx);
       } catch (error) {
-        // Enhanced error handling with context
         const enhancedError = new Error(
           `Transaction failed: ${
             error instanceof Error ? error.message : "Unknown error"
@@ -378,8 +397,7 @@ export class BillStorage extends BaseStorage<Bill> {
           enhancedError.stack = error.stack;
         }
 
-        // Log error for debugging while maintaining user-friendly messages
-        logger.error('Database transaction error:', { component: 'SimpleTool' }, error);
+        logger.error('Database transaction error:', { component: 'SimpleTool' }, error as Record<string, any>);
 
         throw enhancedError;
       }
@@ -395,11 +413,9 @@ export class BillStorage extends BaseStorage<Bill> {
   protected async invalidateCache(patterns: string | string[]): Promise<void> {
     const patternArray = Array.isArray(patterns) ? patterns : [patterns];
 
-    // Process patterns in parallel for better performance
     await Promise.all(
       patternArray.map(async (pattern) => {
         try {
-          // Handle wildcard patterns for flexible cache invalidation
           if (pattern.includes("*")) {
             const keys = [...this.cache.keys()];
             const matchingKeys = keys.filter((key) =>
@@ -412,11 +428,9 @@ export class BillStorage extends BaseStorage<Bill> {
               })
             );
           } else {
-            // Direct key invalidation for specific entries
             this.cache.delete(pattern);
           }
         } catch (error) {
-          // Log cache invalidation errors but don't fail the operation
           console.warn(
             `Cache invalidation failed for pattern ${pattern}:`,
             error
@@ -438,31 +452,29 @@ export class BillStorage extends BaseStorage<Bill> {
     ttl: number = CACHE_TTL
   ): Promise<T> {
     try {
-      // Check cache first with proper error handling
       const cached = this.cache.get(key);
       if (cached && cached.expires > Date.now()) {
         return cached.data as T;
       }
 
-      // Cache miss or expired - fetch fresh data
       const data = await fetchFn();
 
-      // Only cache if data is valid
       if (data !== undefined && data !== null) {
         try {
+          // Store cache entry with all required properties for tracking
           this.cache.set(key, {
             data: data,
             expires: Date.now() + ttl * 1000,
+            accessCount: 1,
+            lastAccessed: Date.now(),
           });
         } catch (cacheError) {
-          // Log cache write errors but don't fail the operation
           console.warn(`Cache write error for key ${key}:`, cacheError);
         }
       }
 
       return data;
     } catch (error) {
-      // Log fetch errors and remove corrupted cache entries
       console.error(`Cache fetch error for key ${key}:`, error);
       this.cache.delete(key);
       throw error;
@@ -472,12 +484,3 @@ export class BillStorage extends BaseStorage<Bill> {
 
 // Export singleton instance for consistent usage across the application
 export const billStorage = BillStorage.getInstance();
-
-
-
-
-
-
-
-
-

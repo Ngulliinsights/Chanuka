@@ -22,7 +22,6 @@ import {
   Area
 } from 'recharts';
 import { 
-import { logger } from '../utils/logger.js';
   TrendingUp, 
   TrendingDown, 
   Users, 
@@ -36,6 +35,7 @@ import { logger } from '../utils/logger.js';
   Calendar,
   BarChart3
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 interface EngagementMetrics {
   totalViews: number;

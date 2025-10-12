@@ -334,7 +334,7 @@ export class WebSocketService {
       this.isInitialized = true;
       logger.info('WebSocket server initialized on /ws', { component: 'WebSocketService' });
     } catch (error) {
-      logger.error('Failed to initialize WebSocket service:', { component: 'WebSocketService' }, error);
+      logger.error('Failed to initialize WebSocket service:', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
       this.isInitialized = false;
       throw error;
     } finally {
@@ -375,7 +375,7 @@ export class WebSocketService {
       (info.req as any).userId = decoded.userId;
       return true;
     } catch (error) {
-      logger.warn('Token verification failed', { component: 'WebSocketService' }, error);
+      logger.warn('Token verification failed', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
       return false;
     }
   }
@@ -469,7 +469,7 @@ export class WebSocketService {
           throw new Error('Invalid message structure');
         }
       } catch (error) {
-        logger.error('Error handling WebSocket message:', { component: 'WebSocketService' }, error);
+        logger.error('Error handling WebSocket message:', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
         this.sendOptimized(ws, {
           type: 'error',
           message: 'Invalid message format',
@@ -531,7 +531,7 @@ export class WebSocketService {
 
       return true;
     } catch (error) {
-      logger.error('Error sending WebSocket message:', { component: 'WebSocketService' }, error);
+      logger.error('Error sending WebSocket message:', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
       this.connectionStats.droppedMessages++;
       return false;
     }
@@ -556,7 +556,7 @@ export class WebSocketService {
       ws.send(JSON.stringify(message));
       ws.messageBuffer.length = 0; // More efficient than = []
     } catch (error) {
-      logger.error('Error flushing message buffer:', { component: 'WebSocketService' }, error);
+      logger.error('Error flushing message buffer:', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
       this.connectionStats.droppedMessages += ws.messageBuffer.length;
       ws.messageBuffer.length = 0;
     } finally {
@@ -600,7 +600,7 @@ export class WebSocketService {
       try {
         await item.item();
       } catch (error) {
-        logger.error('Error processing queued operation:', { component: 'WebSocketService' }, error);
+        logger.error('Error processing queued operation:', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
       }
     }
 
@@ -705,7 +705,7 @@ export class WebSocketService {
 
         subscribed.push(billId);
       } catch (error) {
-        logger.error(`Failed to subscribe to bill ${billId}:`, { component: 'WebSocketService' }, error);
+        logger.error(`Failed to subscribe to bill ${billId}:`, { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
         failed.push(billId);
       }
     }
@@ -813,7 +813,7 @@ export class WebSocketService {
         timestamp: new Date().toISOString()
       });
     } catch (error) {
-      logger.error('Error getting user preferences:', { component: 'WebSocketService' }, error);
+      logger.error('Error getting user preferences:', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
       this.sendOptimized(ws, {
         type: 'error',
         message: 'Failed to get preferences'
@@ -850,7 +850,7 @@ export class WebSocketService {
         timestamp: new Date().toISOString()
       });
     } catch (error) {
-      logger.error('Error updating user preferences:', { component: 'WebSocketService' }, error);
+      logger.error('Error updating user preferences:', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
       this.sendOptimized(ws, {
         type: 'error',
         message: 'Failed to update preferences'
@@ -874,7 +874,7 @@ export class WebSocketService {
       }
       ws.messageBuffer = undefined;
     } catch (error) {
-      logger.error('Error clearing message buffer:', { component: 'WebSocketService' }, error);
+      logger.error('Error clearing message buffer:', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
     }
 
     // Clean up subscriptions
@@ -893,7 +893,7 @@ export class WebSocketService {
         ws.subscriptions = undefined;
       }
     } catch (error) {
-      logger.error('Error cleaning up subscriptions:', { component: 'WebSocketService' }, error);
+      logger.error('Error cleaning up subscriptions:', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
     }
 
     // Clean up connection pool
@@ -906,7 +906,7 @@ export class WebSocketService {
         }
       }
     } catch (error) {
-      logger.error('Error cleaning up connection pool:', { component: 'WebSocketService' }, error);
+      logger.error('Error cleaning up connection pool:', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
     }
 
     // Clean up user subscription index
@@ -919,7 +919,7 @@ export class WebSocketService {
         }
       }
     } catch (error) {
-      logger.error('Error cleaning up user subscription index:', { component: 'WebSocketService' }, error);
+      logger.error('Error cleaning up user subscription index:', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
     }
 
     // Clean up clients map
@@ -932,7 +932,7 @@ export class WebSocketService {
         }
       }
     } catch (error) {
-      logger.error('Error cleaning up clients map:', { component: 'WebSocketService' }, error);
+      logger.error('Error cleaning up clients map:', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
     }
 
     // Clear WebSocket properties to help GC
@@ -1279,7 +1279,7 @@ export class WebSocketService {
           }
           ws.messageBuffer = undefined;
         } catch (error) {
-          logger.error(`Error cleaning up connection for user ${userId}`, { component: 'WebSocketService' }, error);
+          logger.error(`Error cleaning up connection for user ${userId}`, { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
         }
       }
     }
@@ -1331,7 +1331,7 @@ export class WebSocketService {
               ws.send(JSON.stringify(shutdownMessage));
             }
           } catch (error) {
-            logger.error('Error sending shutdown message', { component: 'WebSocketService' }, error);
+            logger.error('Error sending shutdown message', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
           }
         }
 
@@ -1345,7 +1345,7 @@ export class WebSocketService {
               ws.close(1001, 'Server shutdown');
             }
           } catch (error) {
-            logger.error('Error closing WebSocket connection', { component: 'WebSocketService' }, error);
+            logger.error('Error closing WebSocket connection', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
           }
         }
 
@@ -1394,7 +1394,7 @@ export class WebSocketService {
 
       logger.info('✅ WebSocket service shutdown completed', { component: 'WebSocketService' });
     } catch (error) {
-      logger.error('❌ Error during WebSocket shutdown', { component: 'WebSocketService' }, error);
+      logger.error('❌ Error during WebSocket shutdown', { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
       this.cleanup();
       this.isInitialized = false;
       throw error;
@@ -1488,7 +1488,7 @@ export class WebSocketService {
             activeConnection.send(JSON.stringify(broadcastMessage));
             successfulDeliveries++;
           } catch (error) {
-            logger.error(`Failed to broadcast to user ${userId}`, { component: 'WebSocketService' }, error);
+            logger.error(`Failed to broadcast to user ${userId}`, { component: 'WebSocketService' }, error instanceof Error ? error : new Error(String(error)));
             this.connectionStats.droppedMessages++;
           }
         }
@@ -1563,6 +1563,108 @@ export class WebSocketService {
         usersWithSubscriptions: this.userSubscriptionIndex.size
       }
     };
+  }
+
+  /**
+   * Force detailed memory analysis for debugging high memory usage
+   */
+  forceMemoryAnalysis(): any {
+    const memUsage = process.memoryUsage();
+
+    // Calculate connection pool memory usage
+    let connectionPoolMemory = 0;
+    for (const [userId, pool] of this.connectionPool.entries()) {
+      connectionPoolMemory += userId.length * 2; // Rough estimate for string storage
+      connectionPoolMemory += pool.connections.length * 100; // Rough estimate per connection
+    }
+
+    // Calculate subscription memory usage
+    let subscriptionMemory = 0;
+    for (const [billId, subscribers] of this.billSubscriptions.entries()) {
+      subscriptionMemory += 8; // Rough estimate for number key
+      subscriptionMemory += subscribers.size * 50; // Rough estimate per subscriber
+    }
+
+    // Calculate dedupe cache memory usage
+    const dedupeCacheMemory = this.messageDedupeCache.size * 100; // Rough estimate per entry
+
+    // Calculate operation queue memory usage
+    const queueMemory = this.operationQueue.length * 200; // Rough estimate per queued operation
+
+    // Calculate message buffer memory usage
+    let bufferMemory = 0;
+    for (const [userId, pool] of this.connectionPool.entries()) {
+      for (const ws of pool.connections) {
+        if (ws.messageBuffer) {
+          bufferMemory += ws.messageBuffer.length * 150; // Rough estimate per buffered message
+        }
+      }
+    }
+
+    return {
+      timestamp: new Date().toISOString(),
+      connections: {
+        active: this.connectionStats.activeConnections,
+        total: this.connectionStats.totalConnections,
+        peak: this.connectionStats.peakConnections,
+        poolSize: this.connectionPool.size,
+        memoryUsage: `${(connectionPoolMemory / 1024).toFixed(2)} KB`
+      },
+      subscriptions: {
+        billSubscriptions: this.billSubscriptions.size,
+        userSubscriptions: this.userSubscriptionIndex.size,
+        totalSubscriptions: Array.from(this.billSubscriptions.values())
+          .reduce((sum, subscribers) => sum + subscribers.size, 0),
+        memoryUsage: `${(subscriptionMemory / 1024).toFixed(2)} KB`
+      },
+      messages: {
+        totalProcessed: this.connectionStats.totalMessages,
+        broadcasts: this.connectionStats.totalBroadcasts,
+        dropped: this.connectionStats.droppedMessages,
+        duplicates: this.connectionStats.duplicateMessages,
+        dedupeCacheSize: this.messageDedupeCache.size,
+        dedupeCacheMemory: `${(dedupeCacheMemory / 1024).toFixed(2)} KB`
+      },
+      performance: {
+        averageLatency: this.latencyBuffer.getAverage(),
+        queueDepth: this.operationQueue.length,
+        queueOverflows: this.connectionStats.queueOverflows,
+        queueMemory: `${(queueMemory / 1024).toFixed(2)} KB`,
+        bufferMemory: `${(bufferMemory / 1024).toFixed(2)} KB`
+      },
+      memory: {
+        heapUsed: `${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
+        heapTotal: `${(memUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
+        external: `${(memUsage.external / 1024 / 1024).toFixed(2)} MB`,
+        rss: `${(memUsage.rss / 1024 / 1024).toFixed(2)} MB`,
+        heapUsedPercent: ((memUsage.heapUsed / memUsage.heapTotal) * 100).toFixed(2) + '%'
+      },
+      warnings: this.generateMemoryWarnings(memUsage, connectionPoolMemory, subscriptionMemory, dedupeCacheMemory, queueMemory, bufferMemory)
+    };
+  }
+
+  private generateMemoryWarnings(memUsage: NodeJS.MemoryUsage, ...memoryComponents: number[]): string[] {
+    const warnings: string[] = [];
+    const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
+
+    if (heapUsedPercent > 85) {
+      warnings.push(`High heap usage: ${heapUsedPercent.toFixed(2)}%`);
+    }
+
+    if (this.connectionStats.activeConnections > CONFIG.CONNECTION_POOL_SIZE * 0.8) {
+      warnings.push(`High connection count: ${this.connectionStats.activeConnections}/${CONFIG.CONNECTION_POOL_SIZE}`);
+    }
+
+    if (this.operationQueue.length > CONFIG.MAX_QUEUE_SIZE * 0.7) {
+      warnings.push(`High queue depth: ${this.operationQueue.length}/${CONFIG.MAX_QUEUE_SIZE}`);
+    }
+
+    const totalEstimatedMemory = memoryComponents.reduce((sum, mem) => sum + mem, 0);
+    if (totalEstimatedMemory > 50 * 1024 * 1024) { // 50MB
+      warnings.push(`High estimated WebSocket memory usage: ${(totalEstimatedMemory / 1024 / 1024).toFixed(2)} MB`);
+    }
+
+    return warnings;
   }
 }
 

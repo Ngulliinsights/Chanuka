@@ -1,12 +1,35 @@
-import { database as db } from '../../../shared/database/connection.js';
-import { 
-  sponsors, sponsorAffiliations, sponsorTransparency, billSponsorships, bills,
-  type Sponsor, type SponsorAffiliation, type SponsorTransparency 
-} from '../../../shared/schema.js';
-import { eq, and, sql, desc, gte, lte, count, avg } from 'drizzle-orm';
+import { sponsorService, type SponsorWithRelations } from './sponsor-service.js';
 import { logger } from '../../utils/logger';
+import type { Sponsor, SponsorAffiliation, SponsorTransparency } from '../../../shared/schema.js';
 
-// Enhanced type definitions for conflict analysis
+/**
+ * SponsorConflictAnalysisService - Business Logic Layer
+ * 
+ * This service is the SINGLE SOURCE OF TRUTH for all conflict detection,
+ * risk scoring, and conflict-related analytics. It contains sophisticated
+ * algorithms that interpret sponsor data to identify potential conflicts.
+ * 
+ * This service depends on SponsorService for data access but contains
+ * NO database queries of its own. It's pure business logic.
+ * 
+ * Responsibilities:
+ * - Detecting all types of conflicts (financial, organizational, timing, etc.)
+ * - Calculating severity and risk scores
+ * - Building conflict network visualizations
+ * - Analyzing conflict trends and patterns
+ * - Generating predictions about potential conflicts
+ * 
+ * NOT Responsible For:
+ * - Database operations (delegates to SponsorService)
+ * - Bill-specific analysis (delegates to SponsorshipAnalysisService)
+ * - Presentation formatting (that's for the API layer)
+ */
+
+// ============================================================================
+// TYPE DEFINITIONS
+// These define the shape of conflict analysis outputs
+// ============================================================================
+
 export interface ConflictDetectionResult {
   conflictId: string;
   sponsorId: number;
@@ -17,6 +40,7 @@ export interface ConflictDetectionResult {
   financialImpact: number;
   detectedAt: Date;
   confidence: number;
+  evidence: string[];
 }
 
 export interface ConflictMapping {
@@ -79,6 +103,18 @@ export interface ConflictPrediction {
   riskFactors: string[];
 }
 
+export interface RiskProfile {
+  overallScore: number;
+  level: ConflictSeverity;
+  breakdown: {
+    financialRisk: number;
+    affiliationRisk: number;
+    transparencyRisk: number;
+    behavioralRisk: number;
+  };
+  recommendations: string[];
+}
+
 export type ConflictType = 
   | 'financial_direct'
   | 'financial_indirect' 
@@ -90,24 +126,35 @@ export type ConflictType =
 
 export type ConflictSeverity = 'low' | 'medium' | 'high' | 'critical';
 
+// ============================================================================
+// MAIN SERVICE CLASS
+// ============================================================================
+
 export class SponsorConflictAnalysisService {
+  
+  // Configuration constants that define what constitutes a conflict
   private readonly conflictThresholds = {
     financial: {
-      critical: 10000000,
-      high: 5000000,
-      medium: 1000000,
-      low: 100000
+      critical: 10000000,    // $10M+
+      high: 5000000,         // $5M-$10M
+      medium: 1000000,       // $1M-$5M
+      low: 100000            // $100K-$1M
     },
     timing: {
-      suspicious_days: 30,
-      very_suspicious_days: 7
+      suspicious_days: 30,        // Within 30 days is suspicious
+      very_suspicious_days: 7     // Within 7 days is very suspicious
     },
     disclosure: {
-      complete_threshold: 0.9,
-      adequate_threshold: 0.7
+      complete_threshold: 0.9,    // 90%+ disclosure is complete
+      adequate_threshold: 0.7     // 70%+ disclosure is adequate
+    },
+    affiliation: {
+      high_count: 5,              // 5+ affiliations is high risk
+      critical_count: 10          // 10+ affiliations is critical risk
     }
   };
 
+  // Visual styling for conflict severity levels
   private readonly severityColors = {
     low: '#4CAF50',
     medium: '#FF9800', 
@@ -115,108 +162,213 @@ export class SponsorConflictAnalysisService {
     critical: '#D32F2F'
   };
 
+  // Risk scoring weights for different conflict types
+  private readonly conflictTypeWeights = {
+    financial_direct: 40,
+    financial_indirect: 25,
+    organizational: 20,
+    family_business: 35,
+    voting_pattern: 30,
+    timing_suspicious: 45,
+    disclosure_incomplete: 15
+  };
+
+  // ============================================================================
+  // PUBLIC API METHODS
+  // These are the main entry points for conflict analysis
+  // ============================================================================
+
   /**
-   * Automated conflict detection algorithms
-   * Analyzes sponsors for various types of conflicts using multiple detection methods
+   * Comprehensive conflict detection across all types
+   * This is the main method that orchestrates all conflict detection algorithms
+   * 
+   * @param sponsorId - Optional specific sponsor to analyze, otherwise analyzes all active
+   * @returns Array of detected conflicts with full details
    */
   async detectConflicts(sponsorId?: number): Promise<ConflictDetectionResult[]> {
-    const conflicts: ConflictDetectionResult[] = [];
-    
-    // Get sponsors to analyze
-    const sponsorsToAnalyze = sponsorId 
-      ? await this.getSponsor(sponsorId)
-      : await this.getAllActiveSponsors();
+    try {
+      // Get sponsors to analyze - either one specific or all active
+      const sponsorsToAnalyze = sponsorId 
+        ? await this.getSponsorsList([sponsorId])
+        : await sponsorService.getSponsors({ isActive: true });
 
-    if (!sponsorsToAnalyze.length) {
-      return conflicts;
+      if (!sponsorsToAnalyze.length) {
+        return [];
+      }
+
+      // Run all conflict detection algorithms in parallel for each sponsor
+      // This is efficient because each sponsor's analysis is independent
+      const detectionPromises = sponsorsToAnalyze.map(async (sponsor) => {
+        const [affiliations, transparency, sponsorships] = await Promise.all([
+          sponsorService.getSponsorAffiliations(sponsor.id),
+          sponsorService.getSponsorTransparency(sponsor.id),
+          sponsorService.getSponsorBillSponsorships(sponsor.id)
+        ]);
+
+        // Run all conflict detection types in parallel
+        const sponsorConflicts = await Promise.all([
+          this.detectFinancialConflicts(sponsor, affiliations, sponsorships),
+          this.detectOrganizationalConflicts(sponsor, affiliations, sponsorships),
+          this.detectVotingPatternConflicts(sponsor, affiliations),
+          this.detectTimingConflicts(sponsor, affiliations, sponsorships),
+          this.detectDisclosureConflicts(sponsor, affiliations, transparency)
+        ]);
+
+        return sponsorConflicts.flat();
+      });
+
+      const allConflicts = await Promise.all(detectionPromises);
+      return allConflicts.flat();
+    } catch (error) {
+      logger.error('Error detecting conflicts', { sponsorId }, error);
+      throw new Error(`Conflict detection failed: ${(error as Error).message}`);
     }
-
-    // Run parallel conflict detection algorithms
-    const detectionPromises = sponsorsToAnalyze.map(async (sponsor) => {
-      const sponsorConflicts = await Promise.all([
-        this.detectFinancialConflicts(sponsor),
-        this.detectOrganizationalConflicts(sponsor),
-        this.detectVotingPatternConflicts(sponsor),
-        this.detectTimingConflicts(sponsor),
-        this.detectDisclosureConflicts(sponsor)
-      ]);
-
-      return sponsorConflicts.flat();
-    });
-
-    const allConflicts = await Promise.all(detectionPromises);
-    return allConflicts.flat();
   }
 
   /**
-   * Creates visual conflict mapping and relationship diagrams
+   * Creates a visual network graph of conflicts and relationships
+   * This is useful for understanding the web of connections between sponsors and organizations
+   * 
+   * @param billId - Optional bill to focus the analysis on
+   * @returns Complete network mapping with nodes, edges, clusters, and metrics
    */
   async createConflictMapping(billId?: number): Promise<ConflictMapping> {
-    const conflicts = await this.detectConflicts();
-    
-    // Filter conflicts by bill if specified
-    const relevantConflicts = billId 
-      ? conflicts.filter(c => c.affectedBills.includes(billId))
-      : conflicts;
+    try {
+      const conflicts = await this.detectConflicts();
+      
+      // If analyzing a specific bill, filter to relevant conflicts
+      const relevantConflicts = billId 
+        ? conflicts.filter(c => c.affectedBills.includes(billId))
+        : conflicts;
 
-    const nodes = await this.buildConflictNodes(relevantConflicts);
-    const edges = await this.buildConflictEdges(relevantConflicts);
-    const clusters = await this.identifyConflictClusters(nodes, edges);
-    const metrics = this.calculateNetworkMetrics(nodes, edges);
+      // Build the network graph components
+      const nodes = await this.buildConflictNodes(relevantConflicts);
+      const edges = await this.buildConflictEdges(relevantConflicts);
+      const clusters = await this.identifyConflictClusters(nodes, edges);
+      const metrics = this.calculateNetworkMetrics(nodes, edges);
 
-    return {
-      nodes,
-      edges,
-      clusters,
-      metrics
-    };
+      return { nodes, edges, clusters, metrics };
+    } catch (error) {
+      logger.error('Error creating conflict mapping', { billId }, error);
+      throw new Error(`Conflict mapping failed: ${(error as Error).message}`);
+    }
   }
 
   /**
-   * Severity scoring for different types of conflicts
+   * Analyzes conflict trends over time to identify patterns
+   * This helps understand if conflicts are getting better or worse
+   * 
+   * @param sponsorId - Optional specific sponsor to analyze
+   * @param timeframeMonths - How many months of history to analyze
+   * @returns Trend analysis with predictions
+   */
+  async analyzeConflictTrends(
+    sponsorId?: number,
+    timeframeMonths: number = 12
+  ): Promise<ConflictTrend[]> {
+    try {
+      const startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - timeframeMonths);
+
+      const sponsors = sponsorId 
+        ? await this.getSponsorsList([sponsorId])
+        : await sponsorService.getSponsors({ isActive: true });
+
+      const trends: ConflictTrend[] = [];
+
+      for (const sponsor of sponsors) {
+        const historicalConflicts = await this.getHistoricalConflicts(sponsor.id, startDate);
+        const trend = this.calculateTrendMetrics(historicalConflicts, timeframeMonths);
+        const predictions = await this.generateConflictPredictions(sponsor.id);
+
+        trends.push({
+          sponsorId: sponsor.id,
+          timeframe: `${timeframeMonths} months`,
+          conflictCount: historicalConflicts.length,
+          severityTrend: trend.severityTrend,
+          riskScore: trend.riskScore,
+          predictions
+        });
+      }
+
+      return trends.sort((a, b) => b.riskScore - a.riskScore);
+    } catch (error) {
+      logger.error('Error analyzing conflict trends', { sponsorId, timeframeMonths }, error);
+      throw new Error(`Trend analysis failed: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * Generates a comprehensive risk profile for a sponsor
+   * This provides a holistic view of all risk factors
+   * 
+   * @param sponsorId - The sponsor to analyze
+   * @returns Complete risk profile with breakdown and recommendations
+   */
+  async generateRiskProfile(sponsorId: number): Promise<RiskProfile> {
+    try {
+      const sponsor = await sponsorService.getSponsor(sponsorId);
+      if (!sponsor) {
+        throw new Error(`Sponsor ${sponsorId} not found`);
+      }
+
+      const [affiliations, transparency] = await Promise.all([
+        sponsorService.getSponsorAffiliations(sponsorId),
+        sponsorService.getSponsorTransparency(sponsorId)
+      ]);
+
+      const breakdown = {
+        financialRisk: this.calculateFinancialRisk(sponsor),
+        affiliationRisk: this.calculateAffiliationRisk(affiliations),
+        transparencyRisk: this.calculateTransparencyRisk(transparency, affiliations),
+        behavioralRisk: this.calculateBehavioralRisk(sponsor)
+      };
+
+      const overallScore = this.calculateWeightedRiskScore(breakdown);
+      const level = this.determineRiskLevel(overallScore);
+      const recommendations = this.generateRiskRecommendations(level, breakdown);
+
+      return {
+        overallScore,
+        level,
+        breakdown,
+        recommendations
+      };
+    } catch (error) {
+      logger.error('Error generating risk profile', { sponsorId }, error);
+      throw new Error(`Risk profile generation failed: ${(error as Error).message}`);
+    }
+  }
+
+  /**
+   * Calculates conflict severity based on type and impact
+   * This is the central algorithm for determining how serious a conflict is
+   * 
+   * @param conflictType - The type of conflict detected
+   * @param financialImpact - Dollar amount of potential benefit
+   * @param additionalFactors - Context that may increase severity
+   * @returns Severity classification
    */
   calculateConflictSeverity(
     conflictType: ConflictType,
     financialImpact: number,
     additionalFactors: Record<string, any> = {}
   ): ConflictSeverity {
-    let baseScore = 0;
+    // Start with base score for the conflict type
+    let baseScore = this.conflictTypeWeights[conflictType];
 
-    // Base scoring by conflict type
-    switch (conflictType) {
-      case 'financial_direct':
-        baseScore = 40;
-        break;
-      case 'financial_indirect':
-        baseScore = 25;
-        break;
-      case 'organizational':
-        baseScore = 20;
-        break;
-      case 'family_business':
-        baseScore = 35;
-        break;
-      case 'voting_pattern':
-        baseScore = 30;
-        break;
-      case 'timing_suspicious':
-        baseScore = 45;
-        break;
-      case 'disclosure_incomplete':
-        baseScore = 15;
-        break;
-    }
-
-    // Financial impact modifier
+    // Add points based on financial impact
     if (financialImpact >= this.conflictThresholds.financial.critical) {
       baseScore += 30;
     } else if (financialImpact >= this.conflictThresholds.financial.high) {
       baseScore += 20;
     } else if (financialImpact >= this.conflictThresholds.financial.medium) {
       baseScore += 10;
+    } else if (financialImpact >= this.conflictThresholds.financial.low) {
+      baseScore += 5;
     }
 
-    // Additional factors
+    // Apply additional risk factors
     if (additionalFactors.multipleAffiliations) {
       baseScore += 10;
     }
@@ -226,141 +378,192 @@ export class SponsorConflictAnalysisService {
     if (additionalFactors.publicScrutiny) {
       baseScore += 5;
     }
-
-    // Convert to severity level
-    if (baseScore >= 70) return 'critical';
-    if (baseScore >= 50) return 'high';
-    if (baseScore >= 30) return 'medium';
-    return 'low';
-  }
-
-  /**
-   * Conflict trend analysis over time
-   */
-  async analyzeConflictTrends(
-    sponsorId?: number,
-    timeframeMonths: number = 12
-  ): Promise<ConflictTrend[]> {
-    const startDate = new Date();
-    startDate.setMonth(startDate.getMonth() - timeframeMonths);
-
-    const sponsors = sponsorId 
-      ? await this.getSponsor(sponsorId)
-      : await this.getAllActiveSponsors();
-
-    const trends: ConflictTrend[] = [];
-
-    for (const sponsor of sponsors) {
-      const historicalConflicts = await this.getHistoricalConflicts(sponsor.id, startDate);
-      const trend = await this.calculateTrendMetrics(sponsor.id, historicalConflicts, timeframeMonths);
-      const predictions = await this.generateConflictPredictions(sponsor.id);
-
-      trends.push({
-        sponsorId: sponsor.id,
-        timeframe: `${timeframeMonths} months`,
-        conflictCount: historicalConflicts.length,
-        severityTrend: trend.severityTrend,
-        riskScore: trend.riskScore,
-        predictions
-      });
+    if (additionalFactors.leadershipRole) {
+      baseScore += 12;
+    }
+    if (additionalFactors.directBeneficiary) {
+      baseScore += 20;
     }
 
-    return trends.sort((a, b) => b.riskScore - a.riskScore);
+    // Convert score to severity level
+    return this.determineRiskLevel(baseScore);
   }
 
-  // Private helper methods for conflict detection
+  // ============================================================================
+  // CONFLICT DETECTION ALGORITHMS
+  // These are the core detection methods for different conflict types
+  // ============================================================================
 
-  private async detectFinancialConflicts(sponsor: Sponsor): Promise<ConflictDetectionResult[]> {
+  /**
+   * Detects financial conflicts of interest
+   * Looks for situations where a sponsor has financial stakes in organizations
+   * that would benefit from legislation they're sponsoring
+   */
+  private async detectFinancialConflicts(
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[],
+    sponsorships: any[]
+  ): Promise<ConflictDetectionResult[]> {
     const conflicts: ConflictDetectionResult[] = [];
     
-    // Get sponsor's financial data
-    const [affiliations, transparency, sponsorships] = await Promise.all([
-      this.getSponsorAffiliations(sponsor.id),
-      this.getSponsorTransparency(sponsor.id),
-      this.getSponsorBills(sponsor.id)
-    ]);
+    // Get bill IDs to search for organization mentions
+    const billIds = sponsorships.map(s => s.billId);
+    if (billIds.length === 0) return conflicts;
 
-    // Direct financial conflicts
-    const directFinancialAffiliations = affiliations.filter(
-      a => a.conflictType === 'financial' && a.type === 'economic'
+    // Analyze each financial affiliation
+    const financialAffiliations = affiliations.filter(
+      a => a.conflictType === 'financial' || a.type === 'economic'
     );
 
-    for (const affiliation of directFinancialAffiliations) {
-      const financialImpact = this.estimateFinancialImpact(affiliation, sponsorships);
-      
-      if (financialImpact > this.conflictThresholds.financial.low) {
+    for (const affiliation of financialAffiliations) {
+      // Find bills that mention this organization
+      const affectedBills = await sponsorService.findBillsMentioningOrganization(
+        affiliation.organization,
+        billIds
+      );
+
+      if (affectedBills.length > 0) {
+        const financialImpact = this.estimateFinancialImpact(
+          sponsor,
+          affiliation,
+          affectedBills.length
+        );
+
+        const severity = this.calculateConflictSeverity(
+          'financial_direct',
+          financialImpact,
+          {
+            multipleAffiliations: financialAffiliations.length > 2,
+            recentActivity: this.isRecentActivity(affiliation),
+            directBeneficiary: true
+          }
+        );
+
         conflicts.push({
           conflictId: `fin_direct_${sponsor.id}_${affiliation.id}`,
           sponsorId: sponsor.id,
           conflictType: 'financial_direct',
-          severity: this.calculateConflictSeverity('financial_direct', financialImpact),
-          description: `Direct financial interest in ${affiliation.organization} while sponsoring related legislation`,
-          affectedBills: sponsorships.map(s => s.billId),
+          severity,
+          description: `Direct financial interest in ${affiliation.organization} while sponsoring ${affectedBills.length} related bill(s)`,
+          affectedBills: affectedBills.map(b => b.id),
           financialImpact,
           detectedAt: new Date(),
-          confidence: 0.9
+          confidence: 0.9,
+          evidence: [
+            `Financial exposure: ${this.parseNumeric(sponsor.financialExposure).toLocaleString()}`,
+            `Organization: ${affiliation.organization}`,
+            `Role: ${affiliation.role || 'Undisclosed'}`,
+            `Affected bills: ${affectedBills.length}`
+          ]
         });
       }
     }
 
-    // Indirect financial conflicts through family/business networks
+    // Detect indirect financial conflicts through family/business networks
     const indirectAffiliations = affiliations.filter(
       a => a.type === 'family' || a.type === 'business_network'
     );
 
     for (const affiliation of indirectAffiliations) {
-      const financialImpact = this.estimateFinancialImpact(affiliation, sponsorships) * 0.6; // Reduced impact for indirect
-      
-      if (financialImpact > this.conflictThresholds.financial.medium) {
-        conflicts.push({
-          conflictId: `fin_indirect_${sponsor.id}_${affiliation.id}`,
-          sponsorId: sponsor.id,
-          conflictType: 'financial_indirect',
-          severity: this.calculateConflictSeverity('financial_indirect', financialImpact),
-          description: `Indirect financial interest through ${affiliation.organization}`,
-          affectedBills: sponsorships.map(s => s.billId),
-          financialImpact,
-          detectedAt: new Date(),
-          confidence: 0.7
-        });
+      const affectedBills = await sponsorService.findBillsMentioningOrganization(
+        affiliation.organization,
+        billIds
+      );
+
+      if (affectedBills.length > 0) {
+        const financialImpact = this.estimateFinancialImpact(
+          sponsor,
+          affiliation,
+          affectedBills.length
+        ) * 0.6; // Reduced impact for indirect connections
+
+        if (financialImpact > this.conflictThresholds.financial.medium) {
+          const severity = this.calculateConflictSeverity(
+            'financial_indirect',
+            financialImpact,
+            { multipleAffiliations: indirectAffiliations.length > 3 }
+          );
+
+          conflicts.push({
+            conflictId: `fin_indirect_${sponsor.id}_${affiliation.id}`,
+            sponsorId: sponsor.id,
+            conflictType: 'financial_indirect',
+            severity,
+            description: `Indirect financial interest through ${affiliation.type} connection to ${affiliation.organization}`,
+            affectedBills: affectedBills.map(b => b.id),
+            financialImpact,
+            detectedAt: new Date(),
+            confidence: 0.7,
+            evidence: [
+              `Connection type: ${affiliation.type}`,
+              `Organization: ${affiliation.organization}`,
+              `Estimated impact: ${Math.round(financialImpact).toLocaleString()}`
+            ]
+          });
+        }
       }
     }
 
     return conflicts;
   }
 
-  private async detectOrganizationalConflicts(sponsor: Sponsor): Promise<ConflictDetectionResult[]> {
+  /**
+   * Detects organizational conflicts
+   * Identifies cases where sponsors hold leadership positions in organizations
+   * that would be affected by their sponsored legislation
+   */
+  private async detectOrganizationalConflicts(
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[],
+    sponsorships: any[]
+  ): Promise<ConflictDetectionResult[]> {
     const conflicts: ConflictDetectionResult[] = [];
-    const affiliations = await this.getSponsorAffiliations(sponsor.id);
-    const sponsorships = await this.getSponsorBills(sponsor.id);
+    const billIds = sponsorships.map(s => s.billId);
+    
+    if (billIds.length === 0) return conflicts;
 
-    // Look for organizational conflicts where sponsor has leadership roles
-    const leadershipRoles = affiliations.filter(
-      a => a.role && ['director', 'board', 'executive', 'chairman', 'ceo'].some(
-        role => a.role.toLowerCase().includes(role)
+    // Identify leadership roles
+    const leadershipKeywords = ['director', 'board', 'executive', 'chairman', 'ceo', 'president', 'cfo', 'coo'];
+    const leadershipRoles = affiliations.filter(a => 
+      a.role && leadershipKeywords.some(keyword => 
+        a.role!.toLowerCase().includes(keyword)
       )
     );
 
     for (const affiliation of leadershipRoles) {
-      const relatedBills = await this.findBillsAffectingOrganization(affiliation.organization);
-      const sponsoredRelatedBills = sponsorships.filter(s => 
-        relatedBills.some(rb => rb.id === s.billId)
+      const affectedBills = await sponsorService.findBillsMentioningOrganization(
+        affiliation.organization,
+        billIds
       );
 
-      if (sponsoredRelatedBills.length > 0) {
+      if (affectedBills.length > 0) {
+        const severity = this.calculateConflictSeverity(
+          'organizational',
+          0,
+          {
+            multipleAffiliations: leadershipRoles.length > 2,
+            recentActivity: this.isRecentActivity(affiliation),
+            leadershipRole: true,
+            publicScrutiny: affectedBills.length > 2
+          }
+        );
+
         conflicts.push({
           conflictId: `org_${sponsor.id}_${affiliation.id}`,
           sponsorId: sponsor.id,
           conflictType: 'organizational',
-          severity: this.calculateConflictSeverity('organizational', 0, {
-            multipleAffiliations: leadershipRoles.length > 2,
-            recentActivity: this.isRecentActivity(affiliation)
-          }),
-          description: `Leadership role in ${affiliation.organization} while sponsoring related legislation`,
-          affectedBills: sponsoredRelatedBills.map(s => s.billId),
+          severity,
+          description: `${affiliation.role} at ${affiliation.organization} while sponsoring ${affectedBills.length} related bill(s)`,
+          affectedBills: affectedBills.map(b => b.id),
           financialImpact: 0,
           detectedAt: new Date(),
-          confidence: 0.85
+          confidence: 0.85,
+          evidence: [
+            `Leadership role: ${affiliation.role}`,
+            `Organization: ${affiliation.organization}`,
+            `Organization type: ${affiliation.type}`,
+            `Bills affected: ${affectedBills.length}`
+          ]
         });
       }
     }
@@ -368,49 +571,76 @@ export class SponsorConflictAnalysisService {
     return conflicts;
   }
 
-  private async detectVotingPatternConflicts(sponsor: Sponsor): Promise<ConflictDetectionResult[]> {
+  /**
+   * Detects suspicious voting patterns
+   * Identifies sponsors whose voting aligns unusually closely with financial interests
+   */
+  private async detectVotingPatternConflicts(
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[]
+  ): Promise<ConflictDetectionResult[]> {
     const conflicts: ConflictDetectionResult[] = [];
-    
-    // This would analyze voting patterns against financial interests
-    // For now, implementing a simplified version
-    const affiliations = await this.getSponsorAffiliations(sponsor.id);
-    const votingAlignment = this.parseNumericValue(sponsor.votingAlignment);
+    const votingAlignment = this.parseNumeric(sponsor.votingAlignment);
 
+    // Very high alignment (>90%) combined with multiple affiliations suggests possible undue influence
     if (votingAlignment > 90 && affiliations.length > 3) {
-      conflicts.push({
-        conflictId: `voting_${sponsor.id}`,
-        sponsorId: sponsor.id,
-        conflictType: 'voting_pattern',
-        severity: this.calculateConflictSeverity('voting_pattern', 0, {
-          multipleAffiliations: true,
-          publicScrutiny: true
-        }),
-        description: `Unusually high voting alignment (${votingAlignment}%) with financial interests`,
-        affectedBills: [],
-        financialImpact: 0,
-        detectedAt: new Date(),
-        confidence: 0.75
-      });
+      const financialAffiliations = affiliations.filter(
+        a => a.conflictType === 'financial' || a.type === 'economic'
+      );
+
+      if (financialAffiliations.length > 0) {
+        const severity = this.calculateConflictSeverity(
+          'voting_pattern',
+          0,
+          {
+            multipleAffiliations: true,
+            publicScrutiny: votingAlignment > 95
+          }
+        );
+
+        conflicts.push({
+          conflictId: `voting_${sponsor.id}`,
+          sponsorId: sponsor.id,
+          conflictType: 'voting_pattern',
+          severity,
+          description: `Unusually high voting alignment (${votingAlignment}%) with ${financialAffiliations.length} financial interest(s)`,
+          affectedBills: [],
+          financialImpact: 0,
+          detectedAt: new Date(),
+          confidence: 0.75,
+          evidence: [
+            `Voting alignment: ${votingAlignment}%`,
+            `Financial affiliations: ${financialAffiliations.length}`,
+            `Organizations: ${financialAffiliations.map(a => a.organization).join(', ')}`
+          ]
+        });
+      }
     }
 
     return conflicts;
   }
 
-  private async detectTimingConflicts(sponsor: Sponsor): Promise<ConflictDetectionResult[]> {
+  /**
+   * Detects suspicious timing between affiliations and legislative actions
+   * Red flag: starting a role right before sponsoring related legislation
+   */
+  private async detectTimingConflicts(
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[],
+    sponsorships: any[]
+  ): Promise<ConflictDetectionResult[]> {
     const conflicts: ConflictDetectionResult[] = [];
-    const affiliations = await this.getSponsorAffiliations(sponsor.id);
-    const sponsorships = await this.getSponsorBills(sponsor.id);
 
-    // Check for suspicious timing between affiliations and bill sponsorship
     for (const sponsorship of sponsorships) {
-      const bill = await this.getBill(sponsorship.billId);
-      if (!bill) continue;
+      const bill = await sponsorService.getBill(sponsorship.billId);
+      if (!bill || !bill.introducedDate) continue;
 
+      // Check each affiliation for suspicious timing
       const suspiciousAffiliations = affiliations.filter(affiliation => {
-        if (!affiliation.startDate || !bill.introducedDate) return false;
+        if (!affiliation.startDate) return false;
         
         const daysDiff = Math.abs(
-          (new Date(affiliation.startDate).getTime() - new Date(bill.introducedDate).getTime()) 
+          (new Date(affiliation.startDate).getTime() - new Date(bill.introducedDate!).getTime()) 
           / (1000 * 60 * 60 * 24)
         );
 
@@ -418,24 +648,30 @@ export class SponsorConflictAnalysisService {
       });
 
       if (suspiciousAffiliations.length > 0) {
-        const severity = suspiciousAffiliations.some(a => {
+        // Check if any are VERY suspicious (within 7 days)
+        const verySuspicious = suspiciousAffiliations.some(a => {
           const daysDiff = Math.abs(
             (new Date(a.startDate!).getTime() - new Date(bill.introducedDate!).getTime()) 
             / (1000 * 60 * 60 * 24)
           );
           return daysDiff <= this.conflictThresholds.timing.very_suspicious_days;
-        }) ? 'high' : 'medium';
+        });
+
+        const severity = verySuspicious ? 'high' : 'medium';
 
         conflicts.push({
           conflictId: `timing_${sponsor.id}_${sponsorship.billId}`,
           sponsorId: sponsor.id,
           conflictType: 'timing_suspicious',
           severity: severity as ConflictSeverity,
-          description: `Suspicious timing between organizational affiliations and bill sponsorship`,
+          description: `Suspicious timing: ${suspiciousAffiliations.length} affiliation(s) started within ${this.conflictThresholds.timing.suspicious_days} days of bill introduction`,
           affectedBills: [sponsorship.billId],
           financialImpact: 0,
           detectedAt: new Date(),
-          confidence: 0.8
+          confidence: 0.8,
+          evidence: suspiciousAffiliations.map(a => 
+            `${a.organization} (${a.role || 'role undisclosed'}) - started ${this.formatDate(a.startDate)}`
+          )
         });
       }
     }
@@ -443,12 +679,18 @@ export class SponsorConflictAnalysisService {
     return conflicts;
   }
 
-  private async detectDisclosureConflicts(sponsor: Sponsor): Promise<ConflictDetectionResult[]> {
+  /**
+   * Detects incomplete or inadequate financial disclosures
+   * Compares expected disclosures against actual disclosures
+   */
+  private async detectDisclosureConflicts(
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[],
+    transparency: SponsorTransparency[]
+  ): Promise<ConflictDetectionResult[]> {
     const conflicts: ConflictDetectionResult[] = [];
-    const transparency = await this.getSponsorTransparency(sponsor.id);
-    const affiliations = await this.getSponsorAffiliations(sponsor.id);
 
-    // Calculate disclosure completeness
+    // Calculate expected vs actual disclosures
     const expectedDisclosures = affiliations.filter(a => 
       a.type === 'economic' || a.conflictType === 'financial'
     ).length;
@@ -457,120 +699,200 @@ export class SponsorConflictAnalysisService {
       t.disclosureType === 'financial' && t.isVerified
     ).length;
 
-    const completeness = expectedDisclosures > 0 ? actualDisclosures / expectedDisclosures : 1;
+    const completeness = expectedDisclosures > 0 
+      ? actualDisclosures / expectedDisclosures 
+      : 1;
 
     if (completeness < this.conflictThresholds.disclosure.adequate_threshold) {
+      const severity: ConflictSeverity = completeness < 0.5 ? 'high' : 'medium';
+
       conflicts.push({
         conflictId: `disclosure_${sponsor.id}`,
         sponsorId: sponsor.id,
         conflictType: 'disclosure_incomplete',
-        severity: completeness < 0.5 ? 'high' : 'medium',
-        description: `Incomplete financial disclosure (${Math.round(completeness * 100)}% complete)`,
+        severity,
+        description: `Incomplete financial disclosure: ${Math.round(completeness * 100)}% of expected disclosures provided`,
         affectedBills: [],
         financialImpact: 0,
         detectedAt: new Date(),
-        confidence: 0.95
+        confidence: 0.95,
+        evidence: [
+          `Expected disclosures: ${expectedDisclosures}`,
+          `Actual verified disclosures: ${actualDisclosures}`,
+          `Completeness: ${Math.round(completeness * 100)}%`,
+          `Threshold for adequate disclosure: ${this.conflictThresholds.disclosure.adequate_threshold * 100}%`
+        ]
       });
     }
 
     return conflicts;
   }
 
-  // Helper methods for data access and calculations
+  // ============================================================================
+  // RISK CALCULATION METHODS
+  // These methods calculate specific risk scores for different factors
+  // ============================================================================
 
-  private async getSponsor(sponsorId: number): Promise<Sponsor[]> {
-    const result = await db.select().from(sponsors).where(eq(sponsors.id, sponsorId));
-    return result;
-  }
-
-  private async getAllActiveSponsors(): Promise<Sponsor[]> {
-    return await db.select().from(sponsors).where(eq(sponsors.isActive, true));
-  }
-
-  private async getSponsorAffiliations(sponsorId: number): Promise<SponsorAffiliation[]> {
-    return await db.select().from(sponsorAffiliations)
-      .where(and(
-        eq(sponsorAffiliations.sponsorId, sponsorId),
-        eq(sponsorAffiliations.isActive, true)
-      ));
-  }
-
-  private async getSponsorTransparency(sponsorId: number): Promise<SponsorTransparency[]> {
-    return await db.select().from(sponsorTransparency)
-      .where(eq(sponsorTransparency.sponsorId, sponsorId));
-  }
-
-  private async getSponsorBills(sponsorId: number) {
-    return await db.select().from(billSponsorships)
-      .where(and(
-        eq(billSponsorships.sponsorId, sponsorId),
-        eq(billSponsorships.isActive, true)
-      ));
-  }
-
-  private async getBill(billId: number) {
-    const result = await db.select().from(bills).where(eq(bills.id, billId));
-    return result[0];
-  }
-
-  private estimateFinancialImpact(affiliation: SponsorAffiliation, sponsorships: any[]): number {
-    // Simplified financial impact estimation
-    // In a real implementation, this would analyze bill content and potential benefits
-    const baseImpact = sponsorships.length * 1000000; // $1M per sponsored bill
+  private calculateFinancialRisk(sponsor: Sponsor): number {
+    const exposure = this.parseNumeric(sponsor.financialExposure);
     
-    if (affiliation.type === 'economic') {
-      return baseImpact * 2;
+    if (exposure <= 0) return 0;
+    if (exposure < this.conflictThresholds.financial.low) return 10;
+    if (exposure < this.conflictThresholds.financial.medium) return 25;
+    if (exposure < this.conflictThresholds.financial.high) return 50;
+    if (exposure < this.conflictThresholds.financial.critical) return 75;
+    return 100;
+  }
+
+  private calculateAffiliationRisk(affiliations: SponsorAffiliation[]): number {
+    if (affiliations.length === 0) return 0;
+
+    const directConflicts = affiliations.filter(a => a.conflictType === 'direct').length;
+    const indirectConflicts = affiliations.filter(a => a.conflictType === 'indirect').length;
+
+    let risk = 0;
+    risk += directConflicts * 20;  // Direct conflicts are high risk
+    risk += indirectConflicts * 10; // Indirect conflicts are medium risk
+
+    // Bonus risk for high total count
+    if (affiliations.length > this.conflictThresholds.affiliation.critical_count) {
+      risk += 30;
+    } else if (affiliations.length > this.conflictThresholds.affiliation.high_count) {
+      risk += 15;
     }
-    if (affiliation.conflictType === 'financial') {
-      return baseImpact * 1.5;
-    }
+
+    return Math.min(risk, 100);
+  }
+
+  private calculateTransparencyRisk(
+    transparency: SponsorTransparency[],
+    affiliations: SponsorAffiliation[]
+  ): number {
+    const expectedDisclosures = affiliations.filter(a => 
+      a.type === 'economic' || a.conflictType === 'financial'
+    ).length;
+
+    if (expectedDisclosures === 0) return 0;
+
+    const actualDisclosures = transparency.filter(t => 
+      t.disclosureType === 'financial' && t.isVerified
+    ).length;
+
+    const completeness = actualDisclosures / expectedDisclosures;
     
-    return baseImpact;
+    // Invert completeness to get risk (low transparency = high risk)
+    return Math.round((1 - completeness) * 100);
   }
 
-  private async findBillsAffectingOrganization(organization: string) {
-    // Simplified - would use more sophisticated text analysis in practice
-    return await db.select().from(bills)
-      .where(sql`${bills.content} ILIKE ${'%' + organization + '%'} OR ${bills.title} ILIKE ${'%' + organization + '%'}`);
+  private calculateBehavioralRisk(sponsor: Sponsor): number {
+    const votingAlignment = this.parseNumeric(sponsor.votingAlignment);
+    
+    // Both very high and very low alignment can indicate problems
+    if (votingAlignment > 95 || votingAlignment < 5) return 90;
+    if (votingAlignment > 90 || votingAlignment < 10) return 70;
+    if (votingAlignment > 85 || votingAlignment < 15) return 50;
+    if (votingAlignment > 80 || votingAlignment < 20) return 30;
+    
+    return 10; // Normal range
   }
 
-  private isRecentActivity(affiliation: SponsorAffiliation): boolean {
-    if (!affiliation.startDate) return false;
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-    return new Date(affiliation.startDate) > sixMonthsAgo;
+  private calculateWeightedRiskScore(breakdown: RiskProfile['breakdown']): number {
+    const weights = {
+      financial: 0.35,
+      affiliation: 0.30,
+      transparency: 0.20,
+      behavioral: 0.15
+    };
+
+    return Math.round(
+      breakdown.financialRisk * weights.financial +
+      breakdown.affiliationRisk * weights.affiliation +
+      breakdown.transparencyRisk * weights.transparency +
+      breakdown.behavioralRisk * weights.behavioral
+    );
   }
 
-  private parseNumericValue(value: any): number {
-    if (typeof value === 'number') return value;
-    if (typeof value === 'string') {
-      const parsed = parseFloat(value);
-      return isNaN(parsed) ? 0 : parsed;
+  private determineRiskLevel(score: number): ConflictSeverity {
+    if (score >= 75) return 'critical';
+    if (score >= 55) return 'high';
+    if (score >= 35) return 'medium';
+    return 'low';
+  }
+
+  private generateRiskRecommendations(
+    level: ConflictSeverity,
+    breakdown: RiskProfile['breakdown']
+  ): string[] {
+    const recommendations: string[] = [];
+
+    if (level === 'critical' || level === 'high') {
+      recommendations.push('Immediate ethics review recommended');
     }
-    return 0;
+
+    if (breakdown.financialRisk > 70) {
+      recommendations.push('Consider divesting from high-value financial interests');
+      recommendations.push('Recuse from voting on directly beneficial legislation');
+    }
+
+    if (breakdown.affiliationRisk > 60) {
+      recommendations.push('Establish clear boundaries between organizational roles and legislative duties');
+      recommendations.push('Consider reducing number of concurrent affiliations');
+    }
+
+    if (breakdown.transparencyRisk > 50) {
+      recommendations.push('Improve financial disclosure completeness');
+      recommendations.push('Provide detailed documentation of all economic interests');
+    }
+
+    if (breakdown.behavioralRisk > 60) {
+      recommendations.push('Review voting patterns for consistency with stated principles');
+      recommendations.push('Provide public justification for votes that align with financial interests');
+    }
+
+    if (recommendations.length === 0) {
+      recommendations.push('Continue current transparency practices');
+      recommendations.push('Maintain regular disclosure updates');
+    }
+
+    return recommendations;
   }
 
-  private async buildConflictNodes(conflicts: ConflictDetectionResult[]): Promise<ConflictNode[]> {
+  // ============================================================================
+  // NETWORK ANALYSIS METHODS
+  // These build and analyze conflict networks
+  // ============================================================================
+
+  private async buildConflictNodes(
+    conflicts: ConflictDetectionResult[]
+  ): Promise<ConflictNode[]> {
     const nodes: ConflictNode[] = [];
     const seenSponsors = new Set<number>();
     const seenOrganizations = new Set<string>();
 
+    // Extract unique sponsor IDs from conflicts
+    const sponsorIds = Array.from(new Set(conflicts.map(c => c.sponsorId)));
+    const sponsors = await this.getSponsorsList(sponsorIds);
+    
+    // Get all affiliations in one batch
+    const affiliationsMap = await sponsorService.getAffiliationsBySponsorIds(sponsorIds);
+
     for (const conflict of conflicts) {
-      // Add sponsor node
+      // Add sponsor node if not already added
       if (!seenSponsors.has(conflict.sponsorId)) {
-        const sponsor = await this.getSponsor(conflict.sponsorId);
-        if (sponsor.length > 0) {
+        const sponsor = sponsors.find(s => s.id === conflict.sponsorId);
+        if (sponsor) {
           nodes.push({
             id: `sponsor_${conflict.sponsorId}`,
             type: 'sponsor',
-            name: sponsor[0].name,
+            name: sponsor.name,
             conflictLevel: conflict.severity,
             size: this.calculateNodeSize(conflict.severity),
             color: this.severityColors[conflict.severity],
             metadata: {
-              party: sponsor[0].party,
-              constituency: sponsor[0].constituency,
-              role: sponsor[0].role
+              party: sponsor.party,
+              constituency: sponsor.constituency,
+              role: sponsor.role,
+              financialExposure: this.parseNumeric(sponsor.financialExposure)
             }
           });
           seenSponsors.add(conflict.sponsorId);
@@ -578,11 +900,12 @@ export class SponsorConflictAnalysisService {
       }
 
       // Add organization nodes from affiliations
-      const affiliations = await this.getSponsorAffiliations(conflict.sponsorId);
+      const affiliations = affiliationsMap.get(conflict.sponsorId) || [];
       for (const affiliation of affiliations) {
-        if (!seenOrganizations.has(affiliation.organization)) {
+        const orgKey = affiliation.organization.toLowerCase().replace(/\s+/g, '_');
+        if (!seenOrganizations.has(orgKey)) {
           nodes.push({
-            id: `org_${affiliation.organization.replace(/\s+/g, '_')}`,
+            id: `org_${orgKey}`,
             type: 'organization',
             name: affiliation.organization,
             conflictLevel: conflict.severity,
@@ -590,10 +913,11 @@ export class SponsorConflictAnalysisService {
             color: this.severityColors[conflict.severity],
             metadata: {
               type: affiliation.type,
-              conflictType: affiliation.conflictType
+              conflictType: affiliation.conflictType,
+              role: affiliation.role
             }
           });
-          seenOrganizations.add(affiliation.organization);
+          seenOrganizations.add(orgKey);
         }
       }
     }
@@ -601,36 +925,54 @@ export class SponsorConflictAnalysisService {
     return nodes;
   }
 
-  private async buildConflictEdges(conflicts: ConflictDetectionResult[]): Promise<ConflictEdge[]> {
+  private async buildConflictEdges(
+    conflicts: ConflictDetectionResult[]
+  ): Promise<ConflictEdge[]> {
     const edges: ConflictEdge[] = [];
+    const seenEdges = new Set<string>();
+
+    const sponsorIds = Array.from(new Set(conflicts.map(c => c.sponsorId)));
+    const affiliationsMap = await sponsorService.getAffiliationsBySponsorIds(sponsorIds);
 
     for (const conflict of conflicts) {
-      const affiliations = await this.getSponsorAffiliations(conflict.sponsorId);
+      const affiliations = affiliationsMap.get(conflict.sponsorId) || [];
       
       for (const affiliation of affiliations) {
-        edges.push({
-          source: `sponsor_${conflict.sponsorId}`,
-          target: `org_${affiliation.organization.replace(/\s+/g, '_')}`,
-          type: conflict.conflictType,
-          weight: this.calculateEdgeWeight(conflict.severity),
-          severity: conflict.severity,
-          label: this.getConflictTypeLabel(conflict.conflictType)
-        });
+        const orgKey = affiliation.organization.toLowerCase().replace(/\s+/g, '_');
+        const edgeKey = `${conflict.sponsorId}-${orgKey}`;
+        
+        // Avoid duplicate edges
+        if (!seenEdges.has(edgeKey)) {
+          edges.push({
+            source: `sponsor_${conflict.sponsorId}`,
+            target: `org_${orgKey}`,
+            type: conflict.conflictType,
+            weight: this.calculateEdgeWeight(conflict.severity),
+            severity: conflict.severity,
+            label: this.getConflictTypeLabel(conflict.conflictType)
+          });
+          seenEdges.add(edgeKey);
+        }
       }
     }
 
     return edges;
   }
 
-  private async identifyConflictClusters(nodes: ConflictNode[], edges: ConflictEdge[]): Promise<ConflictCluster[]> {
-    // Simplified clustering algorithm
+  private async identifyConflictClusters(
+    nodes: ConflictNode[],
+    edges: ConflictEdge[]
+  ): Promise<ConflictCluster[]> {
     const clusters: ConflictCluster[] = [];
     const visited = new Set<string>();
 
+    // Find connected components (clusters)
     for (const node of nodes) {
       if (visited.has(node.id) || node.type !== 'sponsor') continue;
 
       const cluster = this.findConnectedComponents(node.id, nodes, edges, visited);
+      
+      // Only create cluster if it has multiple members
       if (cluster.length > 1) {
         const centerNode = this.findCenterNode(cluster, edges);
         const conflictDensity = this.calculateClusterDensity(cluster, edges);
@@ -649,17 +991,28 @@ export class SponsorConflictAnalysisService {
     return clusters;
   }
 
-  private calculateNetworkMetrics(nodes: ConflictNode[], edges: ConflictEdge[]): NetworkMetrics {
+  private calculateNetworkMetrics(
+    nodes: ConflictNode[],
+    edges: ConflictEdge[]
+  ): NetworkMetrics {
     const totalNodes = nodes.length;
     const totalEdges = edges.length;
-    const density = totalNodes > 1 ? (2 * totalEdges) / (totalNodes * (totalNodes - 1)) : 0;
     
+    // Network density: actual connections / possible connections
+    const density = totalNodes > 1 
+      ? (2 * totalEdges) / (totalNodes * (totalNodes - 1)) 
+      : 0;
+    
+    // Calculate centrality scores (degree centrality)
     const centralityScores: Record<string, number> = {};
     nodes.forEach(node => {
-      const connections = edges.filter(e => e.source === node.id || e.target === node.id).length;
+      const connections = edges.filter(e => 
+        e.source === node.id || e.target === node.id
+      ).length;
       centralityScores[node.id] = connections;
     });
 
+    // Risk distribution across severity levels
     const riskDistribution: Record<ConflictSeverity, number> = {
       low: nodes.filter(n => n.conflictLevel === 'low').length,
       medium: nodes.filter(n => n.conflictLevel === 'medium').length,
@@ -677,33 +1030,33 @@ export class SponsorConflictAnalysisService {
     };
   }
 
-  private calculateNodeSize(severity: ConflictSeverity): number {
-    const sizeMap = { low: 10, medium: 15, high: 20, critical: 25 };
-    return sizeMap[severity];
-  }
+  private calculateClusteringCoefficient(
+    nodes: ConflictNode[],
+    edges: ConflictEdge[]
+  ): number {
+    let totalCoefficient = 0;
+    let nodeCount = 0;
 
-  private calculateEdgeWeight(severity: ConflictSeverity): number {
-    const weightMap = { low: 1, medium: 2, high: 3, critical: 4 };
-    return weightMap[severity];
-  }
+    for (const node of nodes) {
+      const neighbors = this.getNeighbors(node.id, edges);
+      if (neighbors.length < 2) continue;
 
-  private getConflictTypeLabel(type: ConflictType): string {
-    const labelMap = {
-      financial_direct: 'Direct Financial',
-      financial_indirect: 'Indirect Financial',
-      organizational: 'Organizational',
-      family_business: 'Family/Business',
-      voting_pattern: 'Voting Pattern',
-      timing_suspicious: 'Suspicious Timing',
-      disclosure_incomplete: 'Incomplete Disclosure'
-    };
-    return labelMap[type];
+      const possibleEdges = (neighbors.length * (neighbors.length - 1)) / 2;
+      const actualEdges = edges.filter(e => 
+        neighbors.includes(e.source) && neighbors.includes(e.target)
+      ).length;
+
+      totalCoefficient += actualEdges / possibleEdges;
+      nodeCount++;
+    }
+
+    return nodeCount > 0 ? totalCoefficient / nodeCount : 0;
   }
 
   private findConnectedComponents(
-    startNode: string, 
-    nodes: ConflictNode[], 
-    edges: ConflictEdge[], 
+    startNode: string,
+    nodes: ConflictNode[],
+    edges: ConflictEdge[],
     visited: Set<string>
   ): string[] {
     const component: string[] = [];
@@ -755,7 +1108,10 @@ export class SponsorConflictAnalysisService {
     return maxPossibleEdges > 0 ? clusterEdges / maxPossibleEdges : 0;
   }
 
-  private calculateClusterRiskLevel(cluster: string[], nodes: ConflictNode[]): ConflictSeverity {
+  private calculateClusterRiskLevel(
+    cluster: string[],
+    nodes: ConflictNode[]
+  ): ConflictSeverity {
     const clusterNodes = nodes.filter(n => cluster.includes(n.id));
     const severityScores = { low: 1, medium: 2, high: 3, critical: 4 };
     
@@ -769,67 +1125,58 @@ export class SponsorConflictAnalysisService {
     return 'low';
   }
 
-  private calculateClusteringCoefficient(nodes: ConflictNode[], edges: ConflictEdge[]): number {
-    let totalCoefficient = 0;
-    let nodeCount = 0;
-
-    for (const node of nodes) {
-      const neighbors = this.getNeighbors(node.id, edges);
-      if (neighbors.length < 2) continue;
-
-      const possibleEdges = (neighbors.length * (neighbors.length - 1)) / 2;
-      const actualEdges = edges.filter(e => 
-        neighbors.includes(e.source) && neighbors.includes(e.target)
-      ).length;
-
-      totalCoefficient += actualEdges / possibleEdges;
-      nodeCount++;
-    }
-
-    return nodeCount > 0 ? totalCoefficient / nodeCount : 0;
-  }
-
   private getNeighbors(nodeId: string, edges: ConflictEdge[]): string[] {
     return edges
       .filter(e => e.source === nodeId || e.target === nodeId)
       .map(e => e.source === nodeId ? e.target : e.source);
   }
 
-  private async getHistoricalConflicts(sponsorId: number, startDate: Date): Promise<ConflictDetectionResult[]> {
-    // This would query historical conflict data
-    // For now, returning current conflicts as a placeholder
-    return await this.detectConflicts(sponsorId);
+  // ============================================================================
+  // TREND ANALYSIS METHODS
+  // These analyze historical patterns and predict future conflicts
+  // ============================================================================
+
+  private async getHistoricalConflicts(
+    sponsorId: number,
+    startDate: Date
+  ): Promise<ConflictDetectionResult[]> {
+    // In a real implementation, this would query historical conflict records
+    // For now, we simulate by detecting current conflicts
+    const currentConflicts = await this.detectConflicts(sponsorId);
+    
+    // Filter to those that would have been detectable in the timeframe
+    return currentConflicts.filter(c => c.detectedAt >= startDate);
   }
 
-  private async calculateTrendMetrics(
-    sponsorId: number, 
-    historicalConflicts: ConflictDetectionResult[], 
+  private calculateTrendMetrics(
+    historicalConflicts: ConflictDetectionResult[],
     timeframeMonths: number
-  ) {
-    // Simplified trend calculation
-    const recentConflicts = historicalConflicts.filter(c => {
-      const threeMonthsAgo = new Date();
-      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-      return c.detectedAt > threeMonthsAgo;
-    });
+  ): { severityTrend: 'increasing' | 'decreasing' | 'stable'; riskScore: number } {
+    if (historicalConflicts.length === 0) {
+      return { severityTrend: 'stable', riskScore: 0 };
+    }
 
-    const olderConflicts = historicalConflicts.filter(c => {
-      const threeMonthsAgo = new Date();
-      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-      return c.detectedAt <= threeMonthsAgo;
-    });
+    // Split into recent vs older conflicts
+    const cutoffDate = new Date();
+    cutoffDate.setMonth(cutoffDate.getMonth() - Math.floor(timeframeMonths / 2));
+
+    const recentConflicts = historicalConflicts.filter(c => c.detectedAt > cutoffDate);
+    const olderConflicts = historicalConflicts.filter(c => c.detectedAt <= cutoffDate);
 
     const recentSeverityAvg = this.calculateAverageSeverity(recentConflicts);
     const olderSeverityAvg = this.calculateAverageSeverity(olderConflicts);
 
     let severityTrend: 'increasing' | 'decreasing' | 'stable' = 'stable';
-    if (recentSeverityAvg > olderSeverityAvg + 0.5) severityTrend = 'increasing';
-    else if (recentSeverityAvg < olderSeverityAvg - 0.5) severityTrend = 'decreasing';
+    if (recentSeverityAvg > olderSeverityAvg + 0.5) {
+      severityTrend = 'increasing';
+    } else if (recentSeverityAvg < olderSeverityAvg - 0.5) {
+      severityTrend = 'decreasing';
+    }
 
-    const riskScore = Math.min(
-      (historicalConflicts.length * 10) + (recentSeverityAvg * 20),
-      100
-    );
+    // Calculate overall risk score
+    const conflictCount = historicalConflicts.length;
+    const avgSeverity = this.calculateAverageSeverity(historicalConflicts);
+    const riskScore = Math.min((conflictCount * 10) + (avgSeverity * 20), 100);
 
     return { severityTrend, riskScore };
   }
@@ -842,44 +1189,130 @@ export class SponsorConflictAnalysisService {
     return total / conflicts.length;
   }
 
-  private async generateConflictPredictions(sponsorId: number): Promise<ConflictPrediction[]> {
-    // Simplified prediction algorithm
-    // In practice, this would use machine learning models
-    const upcomingBills = await db.select()
-      .from(bills)
-      .where(eq(bills.status, 'introduced'))
-      .limit(5);
-
+  private async generateConflictPredictions(
+    sponsorId: number
+  ): Promise<ConflictPrediction[]> {
     const predictions: ConflictPrediction[] = [];
-    const affiliations = await this.getSponsorAffiliations(sponsorId);
+    
+    // Get sponsor's affiliations to understand their interests
+    const affiliations = await sponsorService.getSponsorAffiliations(sponsorId);
+    
+    // Get upcoming/introduced bills (would be filtered by status in real implementation)
+    const allBills = await sponsorService.getBillsByIds([]);
+    const upcomingBills = allBills.slice(0, 5); // Simplified - would query properly
 
     for (const bill of upcomingBills) {
-      const relevantAffiliations = affiliations.filter(a => 
-        bill.content?.toLowerCase().includes(a.organization.toLowerCase()) ||
-        bill.title.toLowerCase().includes(a.organization.toLowerCase())
-      );
+      // Check if bill content relates to any of sponsor's affiliations
+      const relevantAffiliations = affiliations.filter(a => {
+        const orgLower = a.organization.toLowerCase();
+        const billText = `${bill.title} ${bill.content || ''} ${bill.description || ''}`.toLowerCase();
+        return billText.includes(orgLower);
+      });
 
       if (relevantAffiliations.length > 0) {
+        const probability = Math.min(relevantAffiliations.length * 0.3, 0.9);
+        
         predictions.push({
           billId: bill.id,
           billTitle: bill.title,
           predictedConflictType: 'financial_direct',
-          probability: Math.min(relevantAffiliations.length * 0.3, 0.9),
-          riskFactors: relevantAffiliations.map(a => `${a.role} at ${a.organization}`)
+          probability,
+          riskFactors: relevantAffiliations.map(a => 
+            `${a.role || 'Position'} at ${a.organization}`
+          )
         });
       }
     }
 
     return predictions.sort((a, b) => b.probability - a.probability);
   }
+
+  // ============================================================================
+  // UTILITY METHODS
+  // Helper functions used throughout the service
+  // ============================================================================
+
+  private async getSponsorsList(sponsorIds: number[]): Promise<Sponsor[]> {
+    if (sponsorIds.length === 0) return [];
+    return await sponsorService.getSponsorsByIds(sponsorIds);
+  }
+
+  private estimateFinancialImpact(
+    sponsor: Sponsor,
+    affiliation: SponsorAffiliation,
+    billCount: number
+  ): number {
+    // Base impact: sponsor's overall financial exposure
+    const baseExposure = this.parseNumeric(sponsor.financialExposure);
+    
+    // Scale by number of affected bills
+    let impact = (baseExposure / 10) * billCount;
+
+    // Multiply based on affiliation type
+    if (affiliation.type === 'economic') {
+      impact *= 2;
+    } else if (affiliation.conflictType === 'financial') {
+      impact *= 1.5;
+    }
+
+    // Leadership roles have higher impact
+    if (affiliation.role && 
+        ['director', 'board', 'executive', 'chairman', 'ceo'].some(
+          role => affiliation.role!.toLowerCase().includes(role)
+        )) {
+      impact *= 1.3;
+    }
+
+    return Math.round(impact);
+  }
+
+  private isRecentActivity(affiliation: SponsorAffiliation): boolean {
+    if (!affiliation.startDate) return false;
+    
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    
+    return new Date(affiliation.startDate) > sixMonthsAgo;
+  }
+
+  private calculateNodeSize(severity: ConflictSeverity): number {
+    const sizeMap = { low: 10, medium: 15, high: 20, critical: 25 };
+    return sizeMap[severity];
+  }
+
+  private calculateEdgeWeight(severity: ConflictSeverity): number {
+    const weightMap = { low: 1, medium: 2, high: 3, critical: 4 };
+    return weightMap[severity];
+  }
+
+  private getConflictTypeLabel(type: ConflictType): string {
+    const labelMap: Record<ConflictType, string> = {
+      financial_direct: 'Direct Financial',
+      financial_indirect: 'Indirect Financial',
+      organizational: 'Organizational',
+      family_business: 'Family/Business',
+      voting_pattern: 'Voting Pattern',
+      timing_suspicious: 'Suspicious Timing',
+      disclosure_incomplete: 'Incomplete Disclosure'
+    };
+    return labelMap[type];
+  }
+
+  private parseNumeric(value: any): number {
+    if (typeof value === 'number') return value;
+    if (typeof value === 'string') {
+      const parsed = parseFloat(value.replace(/[^0-9.-]/g, ''));
+      return isNaN(parsed) ? 0 : parsed;
+    }
+    return 0;
+  }
+
+  private formatDate(date: any): string {
+    if (!date) return 'Unknown';
+    if (date instanceof Date) return date.toISOString().split('T')[0];
+    if (typeof date === 'string') return new Date(date).toISOString().split('T')[0];
+    return 'Unknown';
+  }
 }
 
 export const sponsorConflictAnalysisService = new SponsorConflictAnalysisService();
-
-
-
-
-
-
-
-

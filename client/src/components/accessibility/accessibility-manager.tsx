@@ -4,7 +4,6 @@
  */
 
 import React, { 
-import { logger } from '../utils/logger.js';
   createContext, 
   useContext, 
   useState, 
@@ -12,6 +11,7 @@ import { logger } from '../utils/logger.js';
   useCallback, 
   useRef 
 } from 'react';
+import { logger } from '../utils/logger';
 
 interface AccessibilitySettings {
   highContrast: boolean;

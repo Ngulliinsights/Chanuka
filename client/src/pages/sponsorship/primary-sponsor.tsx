@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-import { logger } from '../utils/logger.js';
-  ArrowLeft, 
+import { logger } from '@/utils/logger';
+import {
+  ArrowLeft,
   ChevronLeft, 
   ChevronRight, 
   AlertTriangle, 
