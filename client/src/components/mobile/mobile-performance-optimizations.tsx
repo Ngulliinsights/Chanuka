@@ -16,6 +16,7 @@ import React, {
 import { useResponsiveLayoutContext } from './responsive-layout-manager';
 
 // Intersection Observer hook for lazy loading
+import { logger } from '../utils/logger';
 function useIntersectionObserver(
   elementRef: React.RefObject<Element>,
   options: IntersectionObserverInit = {}
@@ -445,7 +446,6 @@ export function MemoizedList<T>({
 // Bundle splitting utility
 export const createLazyComponent = <T extends React.ComponentType<any>>(
   importFn: () => Promise<{ default: T }>,
-import { logger } from '../utils/logger.js';
   fallback?: React.ReactNode
 ) => {
   const LazyComponent = lazy(importFn);

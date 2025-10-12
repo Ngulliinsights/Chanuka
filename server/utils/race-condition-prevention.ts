@@ -12,7 +12,8 @@
  */
 export class AsyncLock {
   // Store both the promise and its resolver for better control
-  private locks = new Map<string, { promise: Promise<void>; waitCount: number }>();
+  // resolver allows head-of-line waiting promises to be resolved when clearing locks
+  private locks = new Map<string, { promise: Promise<void>; resolve?: () => void; waitCount: number }>();
   private lockCounts = new Map<string, number>();
 
   /**
@@ -20,32 +21,38 @@ export class AsyncLock {
    * this will wait until the lock is released.
    */
   async acquire(key: string): Promise<() => void> {
-    // Get or create lock entry atomically to prevent race conditions
-    let lockEntry = this.locks.get(key);
-    
-    if (lockEntry) {
-      // Increment wait count for monitoring before waiting
-      lockEntry.waitCount++;
-      await lockEntry.promise;
-      // After waiting, we need to recursively try again since another
-      // operation might have acquired the lock before us
-      return this.acquire(key);
+    // Loop instead of recursion to avoid deep call stacks when many waiters exist
+    while (true) {
+      // Get or create lock entry atomically to prevent race conditions
+      let lockEntry = this.locks.get(key);
+
+      if (lockEntry) {
+        // Increment wait count for monitoring before waiting
+        lockEntry.waitCount++;
+        // Wait until the current lock holder releases
+        await lockEntry.promise;
+        // After awaiting, loop to attempt acquiring again
+        continue;
+      }
+
+      // No existing lock, create a new one atomically
+      let releaseLock: () => void;
+      const lockPromise = new Promise<void>((resolve) => {
+        releaseLock = resolve;
+      });
+
+      // Store resolver so clearAll() can resolve waiting promises if needed
+      this.locks.set(key, { promise: lockPromise, resolve: releaseLock!, waitCount: 0 });
+      this.lockCounts.set(key, (this.lockCounts.get(key) || 0) + 1);
+
+      // Return release function with proper cleanup
+      return () => {
+        // Remove lock first so subsequent acquirers see no lock
+        this.locks.delete(key);
+        // Resolve the promise so any waiters can continue
+        releaseLock!();
+      };
     }
-
-    // No existing lock, create a new one atomically
-    let releaseLock: () => void;
-    const lockPromise = new Promise<void>((resolve) => {
-      releaseLock = resolve;
-    });
-
-    this.locks.set(key, { promise: lockPromise, waitCount: 0 });
-    this.lockCounts.set(key, (this.lockCounts.get(key) || 0) + 1);
-
-    // Return release function with proper cleanup
-    return () => {
-      this.locks.delete(key);
-      releaseLock!();
-    };
   }
 
   /**
@@ -106,9 +113,19 @@ export class AsyncLock {
    * Clear all locks. Use with extreme caution - only for testing or emergency shutdown.
    */
   clearAll(): void {
-    // Resolve all pending locks to prevent deadlocks
+    // Resolve all pending locks to prevent deadlocks.
+    // If there are waiters awaiting a lock's promise, resolving the promise
+    // will wake them and allow them to observe that the lock was removed.
     for (const entry of this.locks.values()) {
-      // The promise resolver will be called when we delete the entry
+      try {
+        if (entry.resolve) {
+          entry.resolve();
+        }
+      } catch (err) {
+        // Best-effort: if a resolver throws, swallow to avoid cascading failures
+        // eslint-disable-next-line no-console
+        console.warn('AsyncLock.clearAll: resolver threw', err);
+      }
     }
     this.locks.clear();
     this.lockCounts.clear();
@@ -124,6 +141,8 @@ export class Semaphore {
   private permits: number;
   private readonly maxPermits: number;
   private waitQueue: Array<() => void> = [];
+  // Warn if wait queue grows unexpectedly large to help detect resource pressure
+  private readonly maxWaitQueueWarn = 1000;
   private activeOperations = 0; // Track operations in flight for better monitoring
 
   constructor(permits: number) {
@@ -159,6 +178,10 @@ export class Semaphore {
           resolve(releaseFunc);
         } else {
           this.waitQueue.push(tryAcquire);
+          if (this.waitQueue.length > this.maxWaitQueueWarn) {
+            // eslint-disable-next-line no-console
+            console.warn(`Semaphore waitQueue length exceeded ${this.maxWaitQueueWarn}: ${this.waitQueue.length}`);
+          }
         }
       };
       tryAcquire();

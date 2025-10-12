@@ -143,7 +143,7 @@ export interface PrivacyPreferences {
     marketingEmails: boolean;
   };
   cookies: {
-    essential: boolean; // Always true, cannot be disabled
+    essential: boolean;
     analytics: boolean;
     marketing: boolean;
     preferences: boolean;
@@ -172,7 +172,7 @@ export interface GDPRComplianceReport {
     dataCollected: string[];
     dataProcessed: string[];
     unnecessaryDataIdentified: string[];
-    score: number; // 0-100
+    score: number;
   };
   userRights: {
     dataExportAvailable: boolean;
@@ -191,9 +191,9 @@ export interface GDPRComplianceReport {
     encryptionInTransit: boolean;
     accessControls: boolean;
     auditLogging: boolean;
-    score: number; // 0-100
+    score: number;
   };
-  overallComplianceScore: number; // 0-100
+  overallComplianceScore: number;
   recommendations: string[];
 }
 
@@ -267,11 +267,12 @@ class PrivacyService {
   ];
 
   /**
-   * Export all user data in a structured format for GDPR compliance
+   * Export all user data in a structured format for GDPR compliance.
+   * Gathers data from all related tables and formats it according to the UserDataExport interface.
    */
   async exportUserData(userId: string, requestedBy: string): Promise<UserDataExport> {
     try {
-      // Get user basic information
+      // Fetch user basic information
       const [user] = await db
         .select()
         .from(users)
@@ -282,40 +283,50 @@ class PrivacyService {
         throw new Error('User not found');
       }
 
-      // Get user profile
+      // Fetch user profile data
       const [profile] = await db
         .select()
         .from(userProfiles)
         .where(eq(userProfiles.userId, userId))
         .limit(1);
 
-      // Get user comments
-      const comments = await db
-        .select()
+      // Fetch user comments with proper type mapping
+      const commentsData = await db
+        .select({
+          id: billComments.id,
+          billId: billComments.billId,
+          content: billComments.content,
+          commentType: billComments.commentType,
+          isVerified: billComments.isVerified,
+          parentCommentId: billComments.parentCommentId,
+          upvotes: billComments.upvotes,
+          downvotes: billComments.downvotes,
+          createdAt: billComments.createdAt,
+          updatedAt: billComments.updatedAt
+        })
         .from(billComments)
         .where(eq(billComments.userId, userId));
 
-      // Get user engagement data
+      // Fetch engagement metrics
       const engagement = await db
         .select()
         .from(billEngagement)
         .where(eq(billEngagement.userId, userId));
 
-      // Get user interests
+      // Fetch user interests and extract just the interest strings
       const interestsResult = await db
         .select({ interest: userInterests.interest })
         .from(userInterests)
         .where(eq(userInterests.userId, userId));
-
       const interests = interestsResult.map(i => i.interest);
 
-      // Get notifications
-      const notifications = await db
+      // Fetch notifications - declare before use to avoid TDZ error
+      const notificationsData = await db
         .select()
         .from(notifications)
         .where(eq(notifications.userId, userId));
 
-      // Get social profiles (excluding sensitive tokens)
+      // Fetch social profiles excluding sensitive authentication tokens
       const socialProfiles = await db
         .select({
           provider: userSocialProfiles.provider,
@@ -326,25 +337,25 @@ class PrivacyService {
         .from(userSocialProfiles)
         .where(eq(userSocialProfiles.userId, userId));
 
-      // Get user progress
+      // Fetch user achievements and progress
       const progress = await db
         .select()
         .from(userProgress)
         .where(eq(userProgress.userId, userId));
 
-      // Get social shares
-      const socialShares = await db
+      // Fetch social media share data - declare before use
+      const socialSharesData = await db
         .select()
         .from(socialShares)
         .where(eq(socialShares.userId, userId));
 
-      // Get comment votes
-      const commentVotes = await db
+      // Fetch comment voting history - declare before use
+      const commentVotesData = await db
         .select()
         .from(commentVotes)
         .where(eq(commentVotes.userId, userId));
 
-      // Get audit logs (last 90 days only for privacy)
+      // Fetch audit logs from the last 90 days only for privacy protection
       const ninetyDaysAgo = new Date();
       ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
@@ -365,30 +376,32 @@ class PrivacyService {
           )
         );
 
+      // Calculate total records for metadata
       const totalRecords = 
-        1 + // user
+        1 + // user record
         (profile ? 1 : 0) +
-        comments.length +
+        commentsData.length +
         engagement.length +
         interests.length +
-        notifications.length +
+        notificationsData.length +
         socialProfiles.length +
         progress.length +
-        socialShares.length +
-        commentVotes.length +
+        socialSharesData.length +
+        commentVotesData.length +
         auditLogs.length;
 
+      // Construct the complete export object
       const exportData: UserDataExport = {
         user,
         profile: profile || undefined,
-        comments,
+        comments: commentsData,
         engagement,
         interests,
-        notifications,
+        notifications: notificationsData,
         socialProfiles,
         progress,
-        socialShares,
-        commentVotes,
+        socialShares: socialSharesData,
+        commentVotes: commentVotesData,
         auditLogs,
         exportMetadata: {
           exportedAt: new Date(),
@@ -398,12 +411,12 @@ class PrivacyService {
         }
       };
 
-      // Log the data export
+      // Log the data export event for audit trail
       await auditLogger.logDataExport(
         userId,
         'complete_user_data',
         totalRecords,
-        'system'
+        requestedBy
       );
 
       return exportData;
@@ -414,9 +427,14 @@ class PrivacyService {
   }
 
   /**
-   * Delete all user data (right to be forgotten)
+   * Delete all user data to fulfill the "right to be forgotten" under GDPR.
+   * Comments are anonymized rather than deleted to preserve discussion context.
    */
-  async deleteUserData(userId: string, requestedBy: string, keepAuditTrail: boolean = true): Promise<{
+  async deleteUserData(
+    userId: string, 
+    requestedBy: string, 
+    keepAuditTrail: boolean = true
+  ): Promise<{
     success: boolean;
     deletedRecords: Record<string, number>;
     auditTrailKept: boolean;
@@ -424,64 +442,65 @@ class PrivacyService {
     try {
       const deletedRecords: Record<string, number> = {};
 
+      // Execute all deletions within a transaction for data integrity
       await db.transaction(async (tx) => {
-        // Delete user interests
+        // Remove user interests
         const deletedInterests = await tx
           .delete(userInterests)
           .where(eq(userInterests.userId, userId))
           .returning({ id: userInterests.id });
         deletedRecords.interests = deletedInterests.length;
 
-        // Delete comment votes
+        // Remove comment votes
         const deletedVotes = await tx
           .delete(commentVotes)
           .where(eq(commentVotes.userId, userId))
           .returning({ id: commentVotes.id });
         deletedRecords.commentVotes = deletedVotes.length;
 
-        // Delete social shares
+        // Remove social media shares
         const deletedShares = await tx
           .delete(socialShares)
           .where(eq(socialShares.userId, userId))
           .returning({ id: socialShares.id });
         deletedRecords.socialShares = deletedShares.length;
 
-        // Delete user progress
+        // Remove user progress and achievements
         const deletedProgress = await tx
           .delete(userProgress)
           .where(eq(userProgress.userId, userId))
           .returning({ id: userProgress.id });
         deletedRecords.progress = deletedProgress.length;
 
-        // Delete social profiles
+        // Remove connected social profiles
         const deletedSocialProfiles = await tx
           .delete(userSocialProfiles)
           .where(eq(userSocialProfiles.userId, userId))
           .returning({ id: userSocialProfiles.id });
         deletedRecords.socialProfiles = deletedSocialProfiles.length;
 
-        // Delete sessions
+        // Remove all user sessions
         const deletedSessions = await tx
           .delete(sessions)
           .where(eq(sessions.userId, userId))
           .returning({ id: sessions.id });
         deletedRecords.sessions = deletedSessions.length;
 
-        // Delete notifications
+        // Remove notifications
         const deletedNotifications = await tx
           .delete(notifications)
           .where(eq(notifications.userId, userId))
           .returning({ id: notifications.id });
         deletedRecords.notifications = deletedNotifications.length;
 
-        // Delete bill engagement
+        // Remove engagement metrics
         const deletedEngagement = await tx
           .delete(billEngagement)
           .where(eq(billEngagement.userId, userId))
           .returning({ id: billEngagement.id });
         deletedRecords.engagement = deletedEngagement.length;
 
-        // Anonymize comments instead of deleting (to preserve discussion context)
+        // Anonymize comments to preserve discussion context and maintain thread integrity
         const anonymizedComments = await tx
           .update(billComments)
           .set({
@@ -493,28 +512,28 @@ class PrivacyService {
           .returning({ id: billComments.id });
         deletedRecords.comments = anonymizedComments.length;
 
-        // Delete user profile
+        // Remove user profile
         const deletedProfiles = await tx
           .delete(userProfiles)
           .where(eq(userProfiles.userId, userId))
           .returning({ id: userProfiles.id });
         deletedRecords.profiles = deletedProfiles.length;
 
-        // Delete moderation flags created by user
+        // Remove moderation flags created by the user
         const deletedFlags = await tx
           .delete(moderationFlags)
           .where(eq(moderationFlags.reportedBy, userId))
           .returning({ id: moderationFlags.id });
         deletedRecords.moderationFlags = deletedFlags.length;
 
-        // Finally, delete the user account
+        // Delete the main user account record
         const deletedUsers = await tx
           .delete(users)
           .where(eq(users.id, userId))
           .returning({ id: users.id });
         deletedRecords.users = deletedUsers.length;
 
-        // Keep audit trail if requested (for legal compliance)
+        // Optionally remove audit trail based on legal requirements
         if (!keepAuditTrail) {
           const deletedAuditLogs = await tx
             .delete(securityAuditLogs)
@@ -524,16 +543,17 @@ class PrivacyService {
         }
       });
 
-      // Log the data deletion
+      // Log the deletion event with proper severity level
       await auditLogger.log({
         userId: requestedBy,
         action: 'user.data.deleted',
         resource: 'user_data',
-        details: { 
-          deletedUserId: userId, 
+        severity: 'high',
+        details: {
+          deletedUserId: userId,
           deletedRecords,
           auditTrailKept: keepAuditTrail
-        },
+        } as Record<string, any>,
         ipAddress: 'system',
         userAgent: 'privacy-service'
       });
@@ -550,7 +570,7 @@ class PrivacyService {
   }
 
   /**
-   * Get user privacy preferences
+   * Retrieve user privacy preferences, merging with defaults for any missing values.
    */
   async getPrivacyPreferences(userId: string): Promise<PrivacyPreferences> {
     try {
@@ -564,9 +584,11 @@ class PrivacyService {
         throw new Error('User not found');
       }
 
-      const userPrefs = user.preferences as any || {};
+      // Safely extract privacy preferences with fallback to empty object
+      const userPrefs = (user.preferences as unknown as Record<string, any>) || {};
       const privacyPrefs = userPrefs.privacy || {};
 
+      // Merge user preferences with defaults to ensure all fields are present
       return {
         dataProcessing: {
           ...this.DEFAULT_PRIVACY_PREFERENCES.dataProcessing,
@@ -596,12 +618,16 @@ class PrivacyService {
   }
 
   /**
-   * Update user privacy preferences
+   * Update user privacy preferences while ensuring essential cookies remain enabled.
    */
-  async updatePrivacyPreferences(userId: string, preferences: Partial<PrivacyPreferences>): Promise<PrivacyPreferences> {
+  async updatePrivacyPreferences(
+    userId: string, 
+    preferences: Partial<PrivacyPreferences>
+  ): Promise<PrivacyPreferences> {
     try {
       const currentPrefs = await this.getPrivacyPreferences(userId);
       
+      // Merge new preferences with existing ones
       const updatedPrefs: PrivacyPreferences = {
         dataProcessing: { ...currentPrefs.dataProcessing, ...preferences.dataProcessing },
         dataSharing: { ...currentPrefs.dataSharing, ...preferences.dataSharing },
@@ -610,20 +636,20 @@ class PrivacyService {
         cookies: { 
           ...currentPrefs.cookies, 
           ...preferences.cookies,
-          essential: true // Always true, cannot be disabled
+          essential: true // Essential cookies cannot be disabled
         }
       };
 
-      // Get current user preferences
+      // Retrieve current user preferences object
       const [user] = await db
         .select({ preferences: users.preferences })
         .from(users)
         .where(eq(users.id, userId))
         .limit(1);
 
-      const currentUserPrefs = (user?.preferences as any) || {};
+      const currentUserPrefs = (user?.preferences as unknown as Record<string, any>) || {};
 
-      // Update user preferences
+      // Update preferences in database
       await db
         .update(users)
         .set({
@@ -635,12 +661,15 @@ class PrivacyService {
         })
         .where(eq(users.id, userId));
 
-      // Log the privacy preference update
+      // Log the preference update with appropriate severity
       await auditLogger.log({
         userId,
         action: 'privacy.preferences.updated',
         resource: 'user_preferences',
-        details: { updatedFields: Object.keys(preferences) },
+        severity: 'low',
+        details: { 
+          updatedFields: Object.keys(preferences) 
+        } as Record<string, any>,
         ipAddress: 'system',
         userAgent: 'privacy-service'
       });
@@ -653,7 +682,8 @@ class PrivacyService {
   }
 
   /**
-   * Run automated data cleanup based on retention policies
+   * Execute automated data cleanup based on configured retention policies.
+   * Removes old data that has exceeded its retention period.
    */
   async runDataCleanup(): Promise<{
     success: boolean;
@@ -670,17 +700,21 @@ class PrivacyService {
     }> = [];
 
     try {
+      // Process each active retention policy
       for (const policy of this.DATA_RETENTION_POLICIES) {
         if (!policy.isActive) continue;
 
         try {
+          // Calculate cutoff date based on retention period
           const cutoffDate = new Date();
           cutoffDate.setDate(cutoffDate.getDate() - policy.retentionPeriodDays);
 
           let recordsDeleted = 0;
 
+          // Execute cleanup based on data type
           switch (policy.dataType) {
             case 'notifications':
+              // Only delete read notifications older than cutoff
               const deletedNotifications = await db
                 .delete(notifications)
                 .where(
@@ -694,6 +728,7 @@ class PrivacyService {
               break;
 
             case 'audit_logs':
+              // Delete audit logs older than cutoff
               const deletedAuditLogs = await db
                 .delete(securityAuditLogs)
                 .where(lt(securityAuditLogs.createdAt, cutoffDate))
@@ -702,6 +737,7 @@ class PrivacyService {
               break;
 
             case 'sessions':
+              // Delete inactive sessions older than cutoff
               const deletedSessions = await db
                 .delete(sessions)
                 .where(
@@ -715,6 +751,7 @@ class PrivacyService {
               break;
 
             case 'moderation_flags':
+              // Delete resolved or dismissed moderation flags older than cutoff
               const deletedFlags = await db
                 .delete(moderationFlags)
                 .where(
@@ -733,7 +770,7 @@ class PrivacyService {
             recordsDeleted
           });
 
-          // Update policy last cleanup time
+          // Update policy metadata with cleanup results
           policy.lastCleanup = new Date();
           policy.recordsAffected = recordsDeleted;
 
@@ -747,12 +784,13 @@ class PrivacyService {
         }
       }
 
-      // Log the cleanup operation
+      // Log the cleanup operation with appropriate severity
       await auditLogger.log({
         userId: 'system',
         action: 'data.cleanup.completed',
         resource: 'system',
-        details: { cleanupResults },
+        severity: 'low',
+        details: { cleanupResults } as Record<string, any>,
         ipAddress: 'system',
         userAgent: 'privacy-service'
       });
@@ -771,7 +809,8 @@ class PrivacyService {
   }
 
   /**
-   * Generate GDPR compliance report for a user
+   * Generate a comprehensive GDPR compliance report analyzing various aspects
+   * of data protection and user rights implementation.
    */
   async generateGDPRComplianceReport(userId: string): Promise<GDPRComplianceReport> {
     try {
@@ -787,9 +826,9 @@ class PrivacyService {
 
       const privacyPrefs = await this.getPrivacyPreferences(userId);
 
-      // Check data processing lawfulness
+      // Evaluate data processing lawfulness
       const dataProcessingLawfulness = {
-        hasValidConsent: true, // Assume consent was given during registration
+        hasValidConsent: true,
         consentDate: user.createdAt,
         processingPurposes: [
           'Platform functionality',
@@ -800,7 +839,7 @@ class PrivacyService {
         legalBasis: 'Consent (GDPR Article 6(1)(a))'
       };
 
-      // Assess data minimization
+      // Assess data minimization practices
       const dataCollected = [
         'email', 'name', 'preferences', 'comments', 'engagement_data',
         'interests', 'notifications', 'audit_logs'
@@ -812,13 +851,17 @@ class PrivacyService {
           case 'preferences':
             return privacyPrefs.dataProcessing.personalization;
           default:
-            return true; // Essential data
+            return true; // Essential data always processed
         }
       });
-      const unnecessaryDataIdentified = dataCollected.filter(data => !dataProcessed.includes(data));
-      const dataMinimizationScore = Math.round((dataProcessed.length / dataCollected.length) * 100);
+      const unnecessaryDataIdentified = dataCollected.filter(
+        data => !dataProcessed.includes(data)
+      );
+      const dataMinimizationScore = Math.round(
+        (dataProcessed.length / dataCollected.length) * 100
+      );
 
-      // Check user rights implementation
+      // Verify user rights implementation
       const userRights = {
         dataExportAvailable: true,
         dataDeletionAvailable: true,
@@ -826,7 +869,7 @@ class PrivacyService {
         consentWithdrawalSupported: true
       };
 
-      // Check data retention policies
+      // Evaluate data retention policies
       const dataRetention = {
         policiesInPlace: true,
         automaticCleanupEnabled: true,
@@ -834,19 +877,19 @@ class PrivacyService {
           acc[policy.dataType] = policy.retentionPeriodDays;
           return acc;
         }, {} as Record<string, number>),
-        overdueDataIdentified: [] // Would need to check actual data ages
+        overdueDataIdentified: [] // Would require checking actual data ages
       };
 
-      // Check security measures
+      // Assess security measures implementation
       const securityMeasures = {
-        encryptionAtRest: true, // Assuming database encryption
-        encryptionInTransit: true, // HTTPS/TLS
-        accessControls: true, // Authentication required
-        auditLogging: true, // Audit logs implemented
-        score: 100 // All measures in place
+        encryptionAtRest: true,
+        encryptionInTransit: true,
+        accessControls: true,
+        auditLogging: true,
+        score: 100
       };
 
-      // Calculate overall compliance score
+      // Calculate overall compliance score from all categories
       const scores = [
         dataProcessingLawfulness.hasValidConsent ? 100 : 0,
         dataMinimizationScore,
@@ -854,15 +897,19 @@ class PrivacyService {
         dataRetention.policiesInPlace && dataRetention.automaticCleanupEnabled ? 100 : 0,
         securityMeasures.score
       ];
-      const overallComplianceScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+      const overallComplianceScore = Math.round(
+        scores.reduce((a, b) => a + b, 0) / scores.length
+      );
 
-      // Generate recommendations
+      // Generate actionable recommendations
       const recommendations: string[] = [];
       if (dataMinimizationScore < 90) {
         recommendations.push('Consider reducing data collection to essential purposes only');
       }
       if (unnecessaryDataIdentified.length > 0) {
-        recommendations.push(`Review necessity of collecting: ${unnecessaryDataIdentified.join(', ')}`);
+        recommendations.push(
+          `Review necessity of collecting: ${unnecessaryDataIdentified.join(', ')}`
+        );
       }
       if (overallComplianceScore < 95) {
         recommendations.push('Review and improve data protection measures');
@@ -894,14 +941,15 @@ class PrivacyService {
   }
 
   /**
-   * Get data retention policies
+   * Retrieve all configured data retention policies.
    */
   getDataRetentionPolicies(): DataRetentionPolicy[] {
     return [...this.DATA_RETENTION_POLICIES];
   }
 
   /**
-   * Update data retention policy
+   * Update the retention period for a specific data type.
+   * Returns true if the policy was found and updated.
    */
   updateDataRetentionPolicy(dataType: string, retentionPeriodDays: number): boolean {
     const policy = this.DATA_RETENTION_POLICIES.find(p => p.dataType === dataType);
@@ -914,11 +962,3 @@ class PrivacyService {
 }
 
 export const privacyService = new PrivacyService();
-
-
-
-
-
-
-
-

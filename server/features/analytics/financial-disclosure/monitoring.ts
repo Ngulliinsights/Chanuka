@@ -6,17 +6,17 @@ import {
   sponsors,
   sponsorTransparency,
   notifications
-} from "../../../shared/schema.ts";
+} from "../../../shared/schema";
 import { eq, gte, and, sql, desc, inArray } from "drizzle-orm";
 import { PgDatabase } from "drizzle-orm/pg-core";
-import { ICacheService } from "../../infrastructure/cache/cache-service.ts";
-import { ILogger } from "../../utils/logger.ts";
-import { 
-  SponsorNotFoundError, 
-  DatabaseError, 
-  InvalidInputError 
-} from "../../utils/errors.ts";
-import { FinancialDisclosureConfig } from '../config/financial-disclosure-config.ts';
+import { CacheService } from "../../infrastructure/cache/cache-service";
+import { logger } from "../../utils/logger";
+import {
+  NotFoundError as SponsorNotFoundError,
+  DatabaseError,
+  ValidationError as InvalidInputError
+} from "../../utils/errors";
+import { FinancialDisclosureConfig } from './config';
 import type {
   FinancialDisclosure,
   FinancialAlert,
@@ -25,7 +25,7 @@ import type {
   SponsorInfo,
   SystemHealthStatus,
   HealthCheckResult
-} from '../types/financial-disclosure-types.ts';
+} from './types';
 
 // ============================================================================
 // Service Interface & Dependencies
@@ -38,8 +38,8 @@ import type {
 export interface MonitoringServiceDependencies {
   readDb: PgDatabase<any>;
   writeDb: PgDatabase<any>;
-  cache: ICacheService;
-  logger: ILogger;
+  cache: CacheService;
+  logger: typeof logger;
 }
 
 // ============================================================================
@@ -72,8 +72,8 @@ export class FinancialDisclosureMonitoringService {
   // Injected dependencies
   private readonly readDb: PgDatabase<any>;
   private readonly writeDb: PgDatabase<any>;
-  private readonly cache: ICacheService;
-  private readonly logger: ILogger;
+  private readonly cache: CacheService;
+  private readonly logger: typeof logger;
   
   // Configuration from centralized config
   private readonly config = FinancialDisclosureConfig;
@@ -1255,7 +1255,6 @@ export function createMonitoringService(
 // ============================================================================
 
 export type {
-  MonitoringServiceDependencies,
   FinancialDisclosure,
   FinancialAlert,
   MonitoringStatus,

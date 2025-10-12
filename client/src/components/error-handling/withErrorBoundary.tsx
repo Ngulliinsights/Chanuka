@@ -1,4 +1,5 @@
 import React, { ComponentType, lazy, LazyExoticComponent } from 'react';
+import { logger } from '../utils/logger';
 import PageErrorBoundary, { ErrorFallbackProps, ErrorType, ErrorContext } from './PageErrorBoundary';
 import { 
   ComponentErrorFallback, 
@@ -141,7 +142,6 @@ export function withLazyErrorBoundary<P extends object>(
 // Utility for creating safe lazy components with built-in error handling
 export function createSafeLazyComponent<P extends object>(
   importFn: () => Promise<{ default: ComponentType<P> }>,
-import { logger } from '../utils/logger.js';
   componentName?: string
 ): LazyExoticComponent<ComponentType<P>> {
   return withLazyErrorBoundary(importFn, {

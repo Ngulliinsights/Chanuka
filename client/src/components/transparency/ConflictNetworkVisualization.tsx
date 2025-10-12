@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
-import { logger } from '../utils/logger.js';
   Network, 
   ZoomIn, 
   ZoomOut, 
@@ -14,6 +13,7 @@ import { logger } from '../utils/logger.js';
   Info,
   AlertTriangle
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 interface ConflictNode {
   id: string;

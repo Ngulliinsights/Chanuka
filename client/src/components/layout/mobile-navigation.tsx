@@ -28,10 +28,10 @@ import {
   SafeAreaWrapper 
 } from '@/components/mobile/responsive-layout-manager';
 import { 
-import { logger } from '../utils/logger.js';
   MobileTabBar, 
   SwipeableHeader 
 } from '@/components/mobile/mobile-navigation-enhancements';
+import { logger } from '@/utils/logger';
 
 // Type definitions for better TypeScript safety
 interface User {

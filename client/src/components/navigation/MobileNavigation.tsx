@@ -26,13 +26,13 @@ import { useNavigationAccessibility } from '@/hooks/use-navigation-accessibility
 import { useKeyboardFocus } from '@/hooks/use-keyboard-focus';
 import { NavigationSection } from '@/types/navigation';
 import { RoleBasedNavigation, useRoleBasedNavigation } from './RoleBasedNavigation';
-import { 
-import { logger } from '../utils/logger.js';
-  isNavigationPathActive, 
+import {
+  isNavigationPathActive,
   getActiveStateClasses,
   getActiveIconClasses,
   getActiveTextClasses
 } from '@/utils/navigation/active-state';
+import { logger } from '../utils/logger';
 
 interface NavigationItem {
   label: string;

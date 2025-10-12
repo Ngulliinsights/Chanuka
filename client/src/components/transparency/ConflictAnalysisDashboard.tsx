@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { 
-import { logger } from '../utils/logger.js';
   AlertTriangle, 
   TrendingUp, 
   TrendingDown, 
@@ -18,6 +17,7 @@ import { logger } from '../utils/logger.js';
   Eye,
   RefreshCw
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 interface ConflictData {
   conflicts: ConflictDetectionResult[];

@@ -4,8 +4,8 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import { db } from './index';
-import {
 import { logger } from '../utils/logger';
+import {
   users,
   bills,
   billComments,

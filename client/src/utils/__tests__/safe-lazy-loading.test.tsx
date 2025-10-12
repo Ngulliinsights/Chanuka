@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { Suspense } from 'react';
+import { logger } from '@/utils/logger';
 import {
-import { logger } from '../utils/logger.js';
   createSafeLazyPage,
   createSafeLazyComponent,
   retryLazyComponentLoad,

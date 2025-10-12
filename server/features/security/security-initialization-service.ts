@@ -1,11 +1,11 @@
 import { Express } from 'express';
-import { encryptionService } from './encryption-service.js';
-import { inputValidationService } from './input-validation-service.js';
-import { secureSessionService } from './secure-session-service.js';
-import { securityAuditService } from './security-audit-service.js';
-import { tlsConfigService } from './tls-config-service.js';
-import { securityMiddleware } from '../middleware/security-middleware.js';
-import { authRateLimit, apiRateLimit } from '../middleware/rate-limiter.js';
+import { encryptionService } from './encryption-service.ts';
+import { inputValidationService } from '../core/validation/input-validation-service.ts';
+import { secureSessionService } from '../core/auth/secure-session-service.ts';
+import { securityAuditService } from './security-audit-service.ts';
+import { tlsConfigService } from './tls-config-service.ts';
+import { securityMiddleware } from '../middleware/security-middleware.ts';
+import { authRateLimit, apiRateLimit } from '../middleware/rate-limiter.ts';
 import https from 'https';
 import fs from 'fs';
 import { logger } from '../../utils/logger';
@@ -65,6 +65,7 @@ export class SecurityInitializationService {
         eventType: 'security_system_initialized',
         severity: 'low',
         success: true,
+        result: 'success',
         details: {
           timestamp: new Date().toISOString(),
           components: [
@@ -80,7 +81,7 @@ export class SecurityInitializationService {
       });
 
     } catch (error) {
-      logger.error('❌ Security initialization failed:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Security initialization failed:', { component: 'SimpleTool' }, error as Error);
       throw new Error('Security system initialization failed');
     }
   }
@@ -111,7 +112,7 @@ export class SecurityInitializationService {
       
       logger.info('✅ Encryption service initialized and tested', { component: 'SimpleTool' });
     } catch (error) {
-      logger.error('❌ Encryption service test failed:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Encryption service test failed:', { component: 'SimpleTool' }, error as Error);
       throw error;
     }
   }
@@ -167,7 +168,7 @@ export class SecurityInitializationService {
 
       logger.info('✅ Input validation configured and tested', { component: 'SimpleTool' });
     } catch (error) {
-      logger.error('❌ Input validation test failed:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Input validation test failed:', { component: 'SimpleTool' }, error as Error);
       throw error;
     }
   }
@@ -184,12 +185,13 @@ export class SecurityInitializationService {
         eventType: 'security_audit_test',
         severity: 'low',
         success: true,
+        result: 'success',
         details: { test: true }
       });
 
       logger.info('✅ Security audit logging initialized', { component: 'SimpleTool' });
     } catch (error) {
-      logger.error('❌ Security audit logging test failed:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Security audit logging test failed:', { component: 'SimpleTool' }, error as Error);
       throw error;
     }
   }
@@ -202,17 +204,17 @@ export class SecurityInitializationService {
 
     try {
       const tlsOptions = tlsConfigService.getHTTPSServerOptions();
-      
-      if (tlsConfigService.validateTLSConfig(tlsOptions)) {
+
+      if (tlsConfigService.validateTLSConfig(tlsOptions as any)) {
         logger.info('✅ TLS configuration validated', { component: 'SimpleTool' });
-        
+
         // Store TLS options for server creation
         (this.app as any).tlsOptions = tlsOptions;
       } else {
         console.warn('⚠️  TLS configuration validation failed. Using HTTP in development.');
       }
     } catch (error) {
-      console.warn('⚠️  TLS setup failed:', error.message);
+      console.warn('⚠️  TLS setup failed:', (error as Error).message);
       console.warn('🔄 Continuing with HTTP for development');
     }
   }
@@ -233,7 +235,7 @@ export class SecurityInitializationService {
         // This would integrate with external monitoring tools in production
         
       } catch (error) {
-        logger.error('Security monitoring error:', { component: 'SimpleTool' }, error);
+        logger.error('Security monitoring error:', { component: 'SimpleTool' }, error as Error);
       }
     }, 15 * 60 * 1000); // Every 15 minutes
 
@@ -259,7 +261,7 @@ export class SecurityInitializationService {
         logger.info('📊 Daily security report generated:', { component: 'SimpleTool' }, report.summary);
         
       } catch (error) {
-        logger.error('Daily security cleanup error:', { component: 'SimpleTool' }, error);
+        logger.error('Daily security cleanup error:', { component: 'SimpleTool' }, error as Error);
       }
     }, 24 * 60 * 60 * 1000); // Every 24 hours
 
@@ -275,7 +277,7 @@ export class SecurityInitializationService {
         logger.info('📋 Weekly audit report:', { component: 'SimpleTool' }, auditReport.summary);
         
       } catch (error) {
-        logger.error('Weekly security audit error:', { component: 'SimpleTool' }, error);
+        logger.error('Weekly security audit error:', { component: 'SimpleTool' }, error as Error);
       }
     }, 7 * 24 * 60 * 60 * 1000); // Every 7 days
 
@@ -298,7 +300,7 @@ export class SecurityInitializationService {
       const certStatus = await tlsConfigService.checkCertificateExpiration(certPath);
 
       const report = {
-        status: 'healthy' as const,
+        status: 'healthy' as 'healthy' | 'warning' | 'critical',
         summary: {
           activeSessions: sessionStats.totalActiveSessions,
           recentSessions: sessionStats.sessionsLast24h,
@@ -327,7 +329,7 @@ export class SecurityInitializationService {
 
       return report;
     } catch (error) {
-      logger.error('Security report generation failed:', { component: 'SimpleTool' }, error);
+      logger.error('Security report generation failed:', { component: 'SimpleTool' }, error as Error);
       return {
         status: 'critical',
         summary: { error: 'Report generation failed' },
@@ -384,7 +386,7 @@ export class SecurityInitializationService {
         return null;
       }
     } catch (error) {
-      logger.error('❌ HTTPS server creation failed:', { component: 'SimpleTool' }, error);
+      logger.error('❌ HTTPS server creation failed:', { component: 'SimpleTool' }, error as Error);
       return null;
     }
   }

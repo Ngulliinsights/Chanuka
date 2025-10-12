@@ -1,4 +1,5 @@
 import { lazy, LazyExoticComponent, ComponentType, Suspense } from 'react';
+import { logger } from '@/utils/logger';
 import { withLazyErrorBoundary, createSafeLazyComponent } from '@/components/error-handling/withErrorBoundary';
 import { 
   PageLoader, 
@@ -259,7 +260,6 @@ export function createRetryableLazyComponent<P extends object = {}>(
 // Advanced factory function for creating batches of lazy components with shared configuration
 export function createLazyComponentBatch<T extends Record<string, string>>(
   importMap: T,
-import { logger } from '../utils/logger.js';
   options: {
     enableRetry?: boolean;
     maxRetries?: number;

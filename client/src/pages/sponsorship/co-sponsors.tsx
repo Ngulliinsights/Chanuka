@@ -6,9 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { 
-import { logger } from '../utils/logger.js';
-  ArrowLeft, 
+import {
+  ArrowLeft,
   Users, 
   Filter,
   Search,

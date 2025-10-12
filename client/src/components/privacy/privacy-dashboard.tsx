@@ -7,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import { 
-import { logger } from '../utils/logger.js';
   Shield, 
   Download, 
   Trash2, 
@@ -23,6 +22,7 @@ import { logger } from '../utils/logger.js';
   Bell,
   Smartphone
 } from 'lucide-react';
+import { logger } from '../utils/logger';
 
 interface PrivacyPreferences {
   dataProcessing: {

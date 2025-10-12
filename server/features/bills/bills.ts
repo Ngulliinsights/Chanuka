@@ -25,6 +25,26 @@ export class ValidationError extends Error {
 }
 
 /**
+ * Helper function to safely serialize errors for logging
+ * Converts unknown error types into a Record format the logger can handle
+ */
+function serializeError(error: unknown): Record<string, any> {
+  if (error instanceof Error) {
+    return {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    };
+  }
+  
+  if (typeof error === 'object' && error !== null) {
+    return { error: String(error) };
+  }
+  
+  return { error: String(error) };
+}
+
+/**
  * Interface defining the contract for bill-related operations
  */
 export interface BillsService {
@@ -164,8 +184,6 @@ class BillsServiceImpl implements BillsService {
     if (comment.content.length > 1000) {
       throw new ValidationError('Comment content must be 1000 characters or less');
     }
-
-    // Note: endorsements field doesn't exist in schema, removing validation
   }
 
   /**
@@ -175,11 +193,10 @@ class BillsServiceImpl implements BillsService {
   async getBills(): Promise<Bill[]> {
     try {
       const bills = await storage.getBills();
-
-      // Return bills as-is since schema fields are consistent
       return bills;
     } catch (error) {
-      logger.error('Failed to get bills:', { component: 'SimpleTool' }, error);
+      // Use the helper function to safely serialize the error for logging
+      logger.error('Failed to get bills:', { component: 'SimpleTool' }, serializeError(error));
       throw new Error('Failed to retrieve bills from storage');
     }
   }
@@ -209,13 +226,9 @@ class BillsServiceImpl implements BillsService {
         throw new BillNotFoundError(id);
       }
 
-      // Return bill as-is since schema fields are consistent
-      const normalizedBill: Bill = bill;
-
-      // Update cache
-      this.setCachedData(this.billCache, id, normalizedBill);
-
-      return normalizedBill;
+      // Cache and return the bill
+      this.setCachedData(this.billCache, id, bill);
+      return bill;
     } catch (error) {
       if (error instanceof BillNotFoundError || error instanceof ValidationError) {
         throw error;
@@ -246,18 +259,16 @@ class BillsServiceImpl implements BillsService {
 
       const createdBill = await storage.createBill(billWithDefaults);
 
-      // Return created bill as-is since schema fields are consistent
-      const normalizedBill: Bill = createdBill;
-
       // Cache the newly created bill
-      this.setCachedData(this.billCache, normalizedBill.id, normalizedBill);
+      this.setCachedData(this.billCache, createdBill.id, createdBill);
 
-      return normalizedBill;
+      return createdBill;
     } catch (error) {
       if (error instanceof ValidationError) {
         throw error;
       }
-      logger.error('Failed to create bill:', { component: 'SimpleTool' }, error);
+      // Use the helper function to safely serialize the error for logging
+      logger.error('Failed to create bill:', { component: 'SimpleTool' }, serializeError(error));
       throw new Error('Failed to create bill in storage');
     }
   }
@@ -287,14 +298,13 @@ class BillsServiceImpl implements BillsService {
       }
 
       const bills = await storage.getBillsByTags(validTags);
-
-      // Return bills as-is since schema fields are consistent
       return bills;
     } catch (error) {
       if (error instanceof ValidationError) {
         throw error;
       }
-      logger.error('Failed to get bills by tags:', { component: 'SimpleTool' }, error);
+      // Use the helper function to safely serialize the error for logging
+      logger.error('Failed to get bills by tags:', { component: 'SimpleTool' }, serializeError(error));
       throw new Error('Failed to retrieve bills by tags from storage');
     }
   }
@@ -383,15 +393,17 @@ class BillsServiceImpl implements BillsService {
       // Verify bill exists first
       await this.getBill(billId);
 
+      // Check if the storage method exists before calling it
+      if (typeof storage.getBillComments !== 'function') {
+        throw new Error('getBillComments method not implemented in storage layer');
+      }
+
       const comments = await storage.getBillComments(billId);
 
-      // Return comments as-is since schema fields are consistent
-      const normalizedComments = comments;
-
       // Cache the comments
-      this.setCachedData(this.commentCache, billId, normalizedComments);
+      this.setCachedData(this.commentCache, billId, comments);
 
-      return normalizedComments;
+      return comments;
     } catch (error) {
       if (error instanceof BillNotFoundError || error instanceof ValidationError) {
         throw error;
@@ -431,6 +443,11 @@ class BillsServiceImpl implements BillsService {
         }
       }
 
+      // Check if the storage method exists before calling it
+      if (typeof storage.createBillComment !== 'function') {
+        throw new Error('createBillComment method not implemented in storage layer');
+      }
+
       const createdComment = await storage.createBillComment(commentWithDefaults);
 
       // Invalidate comment cache for this bill to ensure fresh data
@@ -441,7 +458,8 @@ class BillsServiceImpl implements BillsService {
       if (error instanceof BillNotFoundError || error instanceof ValidationError) {
         throw error;
       }
-      logger.error('Failed to create comment:', { component: 'SimpleTool' }, error);
+      // Use the helper function to safely serialize the error for logging
+      logger.error('Failed to create comment:', { component: 'SimpleTool' }, serializeError(error));
       throw new Error('Failed to create comment in storage');
     }
   }
@@ -462,6 +480,11 @@ class BillsServiceImpl implements BillsService {
 
       if (typeof endorsements !== 'number' || endorsements < 0 || !Number.isInteger(endorsements)) {
         throw new ValidationError('Endorsements must be a non-negative integer');
+      }
+
+      // Check if the storage method exists before calling it
+      if (typeof storage.updateBillCommentEndorsements !== 'function') {
+        throw new Error('updateBillCommentEndorsements method not implemented in storage layer');
       }
 
       const updatedComment = await storage.updateBillCommentEndorsements(commentId, endorsements);
@@ -495,15 +518,12 @@ class BillsServiceImpl implements BillsService {
         throw new ValidationError('Parent comment ID must be a positive integer');
       }
 
-      // Validate parent comment exists
-      const parentComment = await storage.getBillComments(parentId);
-      if (!parentComment) {
-        throw new CommentNotFoundError(parentId);
+      // Check if the storage method exists before calling it
+      if (typeof storage.getCommentReplies !== 'function') {
+        throw new Error('getCommentReplies method not implemented in storage layer');
       }
 
       const replies = await storage.getCommentReplies(parentId);
-
-      // Return replies as-is since schema fields are consistent
       return replies;
     } catch (error) {
       if (error instanceof CommentNotFoundError || error instanceof ValidationError) {
@@ -525,6 +545,11 @@ class BillsServiceImpl implements BillsService {
       // Validate input
       if (!Number.isInteger(commentId) || commentId <= 0) {
         throw new ValidationError('Comment ID must be a positive integer');
+      }
+
+      // Check if the storage method exists before calling it
+      if (typeof storage.highlightComment !== 'function') {
+        throw new Error('highlightComment method not implemented in storage layer');
       }
 
       const updatedComment = await storage.highlightComment(commentId);
@@ -573,11 +598,3 @@ class BillsServiceImpl implements BillsService {
 
 // Export singleton instance of the service
 export const billsService = new BillsServiceImpl();
-
-
-
-
-
-
-
-

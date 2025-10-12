@@ -52,7 +52,7 @@ class MigrationRunner {
       let failureCount = 0;
 
       logger.info('\n📊 Migration Results:', { component: 'SimpleTool' });
-      logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+  logger.info('='.repeat(50), { component: 'SimpleTool' });
 
       for (const result of results) {
         if (result.success) {
@@ -65,7 +65,7 @@ class MigrationRunner {
         }
       }
 
-      logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+  logger.info('='.repeat(50), { component: 'SimpleTool' });
       console.log(`✅ Successful: ${successCount}`);
       console.log(`❌ Failed: ${failureCount}`);
 
@@ -115,7 +115,7 @@ class MigrationRunner {
 
   async showStatus(): Promise<void> {
     logger.info('📋 Migration Status', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+  logger.info('='.repeat(50), { component: 'SimpleTool' });
 
     const applied = await this.migrationService.getAppliedMigrations();
     const pending = await this.migrationService.getPendingMigrations();
@@ -142,7 +142,7 @@ class MigrationRunner {
     
     const validation = await this.migrationService.validateDatabaseIntegrity();
     
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+  logger.info('='.repeat(50), { component: 'SimpleTool' });
     
     if (validation.isValid) {
       logger.info('✅ Database integrity check passed', { component: 'SimpleTool' });

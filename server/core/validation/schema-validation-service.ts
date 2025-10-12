@@ -1,10 +1,10 @@
 import { db } from '../db.js';
 import { sql } from 'drizzle-orm';
-import { 
 import { logger } from '../utils/logger';
-  complianceChecks, 
-  securityAuditLogs, 
-  threatIntelligence 
+import {
+  complianceChecks,
+  securityAuditLogs,
+  threatIntelligence
 } from '../../shared/schema.js';
 
 export interface ValidationResult {

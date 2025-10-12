@@ -2,7 +2,7 @@
 // Shared type definitions for the financial disclosure system
 // This prevents type duplication and ensures consistency across all modules
 
-import { RequiredDisclosureType } from '../config/financial-disclosure-config';
+import { RequiredDisclosureType } from './config';
 
 /**
  * Core financial disclosure record with enriched metadata.

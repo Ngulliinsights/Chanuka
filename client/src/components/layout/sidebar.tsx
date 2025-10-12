@@ -1,14 +1,14 @@
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/ui/logo';
-import { 
-import { logger } from '../utils/logger.js';
-  Home, 
-  BarChart3, 
-  FileText, 
-  Users, 
-  Search, 
-  Settings, 
+import {
+  Home,
+  BarChart3,
+  FileText,
+  Users,
+  Search,
+  Settings,
   HelpCircle,
   MessageSquare,
   Shield,
@@ -16,6 +16,7 @@ import { logger } from '../utils/logger.js';
   User,
   BookOpen
 } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 const navigation = [
   { name: 'Home', href: '/', icon: Home },
