@@ -1,5 +1,5 @@
-import { logger } from '../utils/logger';
-import { prisma } from '../utils/database';
+import { logger } from '@shared/utils/logger';
+import { database as db } from '@shared/database/connection';
 
 /**
  * Kenyan Government Data Integration Service

@@ -31,7 +31,7 @@ import {
   MobileTabBar, 
   SwipeableHeader 
 } from '@/components/mobile/mobile-navigation-enhancements';
-import { logger } from '@/utils/logger';
+import { logger } from '@shared/utils/logger';
 
 // Type definitions for better TypeScript safety
 interface User {
@@ -324,6 +324,9 @@ const MobileNavigationContent: React.FC = () => {
       icon: <User className="h-5 w-5" />
     }
   ], []);
+
+  // Bottom navigation items with badge support
+  const bottomNavItems = useMemo(() => NAVIGATION_ITEMS.slice(0, 4), []);
 
   return (
     <>

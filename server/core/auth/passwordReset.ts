@@ -2,14 +2,14 @@
 import { database as db } from '../../../shared/database/connection.js';
 // Import specific tables and functions needed from the consolidated schema
 import { users, passwordResets } from '../../../shared/schema.js';
-import { ValidationError } from '../../shared/types/errors.js';
+import { ValidationError } from '../../../shared/types/errors.js';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import type { InferSelectModel } from 'drizzle-orm';
 import { and, eq, gt } from 'drizzle-orm';
-import { config } from '../config/index.js';
-import { emailService } from './email.js';
-import { logger } from '../utils/logger';
+import { config } from '../../config/index.js';
+import { sendTemplatedEmail } from '../../infrastructure/notifications/email-service.js';
+import { logger } from '../../utils/logger.js';
 
 // Reset token expiration time in minutes
 const TOKEN_EXPIRY_MINUTES = 60;
@@ -99,19 +99,16 @@ class PasswordResetService {
           set: {
             tokenHash: tokenHash,
             expiresAt: expiryDate,
-            updatedAt: new Date(),
           },
         });
     });
 
     // Send email with the reset token
-    const resetUrl = `http://localhost:${config.port}/reset-password?token=${resetToken}`;
+    const resetUrl = `http://localhost:${config.server.port}/reset-password?token=${resetToken}`;
 
-    await emailService.sendPasswordResetEmail({
-      to: user.email,
-      username: user.name || user.email,
+    await sendTemplatedEmail('password-reset', user.email, {
+      userName: user.name || user.email,
       resetUrl,
-      expiryMinutes: TOKEN_EXPIRY_MINUTES,
     });
   }
 
@@ -165,9 +162,9 @@ class PasswordResetService {
     });
 
     // Send password change confirmation email
-    await emailService.sendPasswordChangeConfirmation({
-      to: userEntry.email,
-      username: userEntry.name,
+    await sendTemplatedEmail('welcome', userEntry.email, {
+      userName: userEntry.name,
+      loginUrl: `http://localhost:${config.server.port}/login`,
     });
   }
 
@@ -193,10 +190,3 @@ class PasswordResetService {
 }
 
 export const passwordResetService = new PasswordResetService();
-
-
-
-
-
-
-

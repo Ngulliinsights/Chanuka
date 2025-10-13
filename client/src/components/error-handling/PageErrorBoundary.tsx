@@ -1,6 +1,6 @@
 import React, { Component, ReactNode, ErrorInfo } from 'react';
 import { ErrorFallback } from './ErrorFallback';
-import { logger } from '../utils/logger.js';
+import { logger } from '@shared/utils/logger';
 
 export type ErrorType = 'javascript' | 'network' | 'chunk' | 'timeout' | 'memory' | 'security' | 'unknown';
 export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
@@ -310,7 +310,6 @@ class PageErrorBoundary extends Component<Props, State> {
                 duration: entry.duration,
                 startTime: entry.startTime,
                 url: window.location.href,
-                timestamp: new Date().toISOString(),
               });
             }
           });

@@ -10,7 +10,7 @@ import {
 } from '../../../shared/schema.js';
 import { eq, and, or, sql, inArray, desc } from 'drizzle-orm';
 import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/user-preferences.js';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 export interface SmartFilterCriteria {
   userId: string;

@@ -7,11 +7,10 @@ import { users, sessions, passwordResets, type User } from '../../../shared/sche
 import { getEmailService } from '../../services/email.service.js';
 import { encryptionService } from '../../features/security/encryption-service.js';
 import { inputValidationService } from '../validation/input-validation-service.js';
-import { secureSessionService } from '../../features/security/secure-session-service.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger.js';
 
 // Validation schemas
 export const registerSchema = z.object({
@@ -789,9 +788,3 @@ export class AuthService {
 }
 
 export const authService = new AuthService();
-
-
-
-
-
-

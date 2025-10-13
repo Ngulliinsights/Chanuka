@@ -110,7 +110,7 @@ export class SecurityAuditService {
     * Log authentication events
     */
    async logAuthEvent(
-     eventType: 'login_attempt' | 'login_success' | 'login_failure' | 'logout' | 'password_change',
+     eventType: 'login_attempt' | 'login_success' | 'login_failure' | 'logout' | 'password_change' | 'registration_attempt',
      req: Request | undefined,
      userId?: string,
      success: boolean = true,

@@ -3,12 +3,14 @@ import { BillAnalysis, SponsorshipAnalysis } from '../../shared/types/bill.js';
 import { logger } from '../utils/logger';
 
 // Enhanced types for demo data that match API responses
-interface DemoBill extends Omit<Bill, 'id' | 'sponsorId'> {
+interface DemoBill extends Omit<Bill, 'id' | 'sponsorId' | 'commentCount' | 'engagementScore'> {
   id: number;
   sponsorId?: number;
+  commentCount?: number;
+  engagementScore?: number;
 }
 
-interface DemoSponsor extends Omit<Sponsor, 'id'> {
+interface DemoSponsor extends Omit<Sponsor, 'id' | 'updatedAt'> {
   id: number;
   profileImage?: string;
   socialMedia?: {
@@ -16,12 +18,14 @@ interface DemoSponsor extends Omit<Sponsor, 'id'> {
     facebook?: string;
     linkedin?: string;
   };
+  updatedAt: Date;
 }
 
-interface DemoBillComment extends Omit<BillComment, 'id' | 'userId'> {
+interface DemoBillComment extends Omit<BillComment, 'id' | 'userId' | 'isDeleted'> {
   id: number;
   userId: string;
   isHighlighted?: boolean;
+  isDeleted: boolean;
 }
 
 interface DemoBillEngagement extends Omit<BillEngagement, 'id' | 'userId'> {
@@ -38,6 +42,10 @@ interface DemoBillEngagement extends Omit<BillEngagement, 'id' | 'userId'> {
 export class DemoDataService {
   private static instance: DemoDataService;
   private demoMode: boolean = false;
+  
+  // Cache demo data to avoid recreating it on every call
+  private billsCache: DemoBill[] | null = null;
+  private sponsorsCache: DemoSponsor[] | null = null;
 
   private constructor() {}
 
@@ -53,7 +61,7 @@ export class DemoDataService {
    */
   public setDemoMode(enabled: boolean): void {
     this.demoMode = enabled;
-    console.log(`Demo mode ${enabled ? 'enabled' : 'disabled'}`);
+    logger.info(`Demo mode ${enabled ? 'enabled' : 'disabled'}`, { component: 'DemoDataService' });
   }
 
   /**
@@ -64,10 +72,23 @@ export class DemoDataService {
   }
 
   /**
+   * Clear cached data (useful for testing or forcing refresh)
+   */
+  public clearCache(): void {
+    this.billsCache = null;
+    this.sponsorsCache = null;
+  }
+
+  /**
    * Get sample bills data
+   * Uses caching to avoid recreating objects on every call
    */
   public getBills(): DemoBill[] {
-    return [
+    if (this.billsCache) {
+      return this.billsCache;
+    }
+
+    this.billsCache = [
       {
         id: 1,
         title: "Digital Economy and Data Protection Act 2024",
@@ -156,13 +177,20 @@ export class DemoDataService {
         updatedAt: new Date("2024-02-15")
       }
     ];
+
+    return this.billsCache;
   }
 
   /**
    * Get sample sponsors data
+   * Uses caching and eliminates duplicate entries
    */
   public getSponsors(): DemoSponsor[] {
-    return [
+    if (this.sponsorsCache) {
+      return this.sponsorsCache;
+    }
+
+    this.sponsorsCache = [
       {
         id: 1,
         name: "Hon. Sarah Mwangi",
@@ -183,10 +211,11 @@ export class DemoDataService {
           twitter: "@SarahMwangiMP",
           facebook: "SarahMwangiOfficial"
         },
-        createdAt: new Date("2023-01-01")
+        createdAt: new Date("2023-01-01"),
+        updatedAt: new Date("2024-01-01")
       },
       {
-        id: 2, 
+        id: 2,
         name: "Hon. James Kimani",
         role: "Senator",
         party: "Green Party",
@@ -205,7 +234,8 @@ export class DemoDataService {
           twitter: "@JamesKimaniSen",
           linkedin: "james-kimani-senator"
         },
-        createdAt: new Date("2023-01-01")
+        createdAt: new Date("2023-01-01"),
+        updatedAt: new Date("2024-01-01")
       },
       {
         id: 3,
@@ -227,16 +257,20 @@ export class DemoDataService {
           twitter: "@DrMaryWanjiku",
           facebook: "DrMaryWanjikuMP"
         },
-        createdAt: new Date("2023-01-01")
+        createdAt: new Date("2023-01-01"),
+        updatedAt: new Date("2024-01-01")
       }
     ];
+
+    return this.sponsorsCache;
   }
 
   /**
    * Get sample bill comments
+   * Organized by bill ID for efficient lookup
    */
   public getBillComments(billId: number): DemoBillComment[] {
-    const baseComments = [
+    const allComments: DemoBillComment[] = [
       {
         id: 1,
         billId: 1,
@@ -248,13 +282,14 @@ export class DemoDataService {
         parentCommentId: null,
         isVerified: true,
         isHighlighted: false,
+        isDeleted: false,
         createdAt: new Date("2024-01-16"),
         updatedAt: new Date("2024-01-16")
       },
       {
         id: 2,
         billId: 1,
-        userId: "user-002", 
+        userId: "user-002",
         content: "I'm concerned about the compliance burden on small tech startups. Perhaps a phased implementation would be better?",
         commentType: "concern" as const,
         upvotes: 8,
@@ -262,6 +297,7 @@ export class DemoDataService {
         parentCommentId: null,
         isVerified: false,
         isHighlighted: false,
+        isDeleted: false,
         createdAt: new Date("2024-01-17"),
         updatedAt: new Date("2024-01-17")
       },
@@ -276,6 +312,7 @@ export class DemoDataService {
         parentCommentId: null,
         isVerified: true,
         isHighlighted: true,
+        isDeleted: false,
         createdAt: new Date("2024-02-02"),
         updatedAt: new Date("2024-02-02")
       },
@@ -290,19 +327,21 @@ export class DemoDataService {
         parentCommentId: null,
         isVerified: true,
         isHighlighted: false,
+        isDeleted: false,
         createdAt: new Date("2024-02-16"),
         updatedAt: new Date("2024-02-16")
       }
     ];
 
-    return baseComments.filter(comment => comment.billId === billId);
+    return allComments.filter(comment => comment.billId === billId);
   }
 
   /**
    * Get sample bill engagement data
+   * Returns engagement metrics for a specific bill
    */
   public getBillEngagement(billId: number): DemoBillEngagement | null {
-    const engagements: DemoBillEngagement[] = [
+    const allEngagements: DemoBillEngagement[] = [
       {
         id: 1,
         billId: 1,
@@ -344,15 +383,20 @@ export class DemoDataService {
       }
     ];
 
-    return engagements.find(e => e.billId === billId) || null;
+    return allEngagements.find(e => e.billId === billId) || null;
   }
 
   /**
    * Get sample bill analysis data
+   * Provides complexity, transparency, and conflict analysis
    */
   public getBillAnalysis(billId: number): BillAnalysis | null {
-    const analyses = [
-      {
+    // Helper function to generate unique IDs for analysis records
+    const generateAnalysisId = (billId: number): number => billId + 1000;
+
+    const allAnalyses: Record<number, BillAnalysis> = {
+      1: {
+        id: generateAnalysisId(1),
         billId: 1,
         complexity: 8,
         transparency: 7,
@@ -373,7 +417,8 @@ export class DemoDataService {
         sentiment: {
           positive: 65,
           negative: 20,
-          neutral: 15
+          neutral: 15,
+          overall: "positive" as const
         },
         keyTerms: ["data protection", "privacy", "digital platforms", "consent", "penalties"],
         summary: "Comprehensive data protection framework with strong enforcement mechanisms",
@@ -382,9 +427,11 @@ export class DemoDataService {
           "Potential for regulatory overreach",
           "Cross-border data transfer restrictions"
         ],
+        createdAt: new Date("2024-01-15"),
         lastUpdated: new Date("2024-01-20")
       },
-      {
+      2: {
+        id: generateAnalysisId(2),
         billId: 2,
         complexity: 7,
         transparency: 9,
@@ -399,7 +446,8 @@ export class DemoDataService {
         sentiment: {
           positive: 78,
           negative: 12,
-          neutral: 10
+          neutral: 10,
+          overall: "positive" as const
         },
         keyTerms: ["climate change", "adaptation", "carbon offset", "fund", "resilience"],
         summary: "Well-structured climate adaptation funding mechanism with clear objectives",
@@ -408,9 +456,11 @@ export class DemoDataService {
           "Implementation capacity challenges",
           "Monitoring and evaluation complexity"
         ],
+        createdAt: new Date("2024-02-01"),
         lastUpdated: new Date("2024-02-05")
       },
-      {
+      3: {
+        id: generateAnalysisId(3),
         billId: 3,
         complexity: 9,
         transparency: 8,
@@ -431,7 +481,8 @@ export class DemoDataService {
         sentiment: {
           positive: 72,
           negative: 18,
-          neutral: 10
+          neutral: 10,
+          overall: "positive" as const
         },
         keyTerms: ["universal healthcare", "NHIF", "coverage", "financing", "quality"],
         summary: "Ambitious healthcare expansion with progressive financing model",
@@ -440,30 +491,33 @@ export class DemoDataService {
           "Provider quality assurance challenges",
           "Fiscal sustainability concerns"
         ],
+        createdAt: new Date("2024-01-10"),
         lastUpdated: new Date("2024-02-15")
       }
-    ];
+    };
 
-    return analyses.find(a => a.billId === billId) || null;
+    return allAnalyses[billId] || null;
   }
 
   /**
    * Get sample sponsorship analysis data
+   * Provides detailed sponsor conflict and financial analysis
    */
   public getSponsorshipAnalysis(billId: number): SponsorshipAnalysis | null {
-    const sponsorshipAnalyses = [
-      {
+    const allSponsorshipAnalyses: Record<number, SponsorshipAnalysis> = {
+      1: {
         billId: 1,
         title: "Digital Economy and Data Protection Act 2024",
         number: "HB-2024-001",
-        introduced: "2024-01-15",
+        introduced: new Date("2024-01-15").toISOString(),
         status: "committee_review",
         primarySponsor: {
-          id: "sponsor-001",
+          id: 1,
           name: "Hon. Sarah Mwangi",
-          role: "Member of Parliament",
+          role: "primary" as const,
           party: "Democratic Alliance",
           constituency: "Nairobi Central",
+          email: "s.mwangi@parliament.go.ke",
           conflictLevel: "low" as const,
           financialExposure: 15000,
           affiliations: [
@@ -477,26 +531,35 @@ export class DemoDataService {
           votingAlignment: 85,
           transparency: {
             disclosure: "complete" as const,
-            lastUpdated: "2024-01-15",
+            lastUpdated: new Date("2024-01-15"),
             publicStatements: 12
-          }
+          },
+          sponsorshipDate: new Date("2024-01-15"),
+          isActive: true,
+          createdAt: new Date("2023-01-01"),
+          updatedAt: new Date("2024-01-15")
         },
         coSponsors: [
           {
-            id: "sponsor-004",
+            id: 4,
             name: "Hon. Peter Ochieng",
-            role: "Member of Parliament", 
+            role: "co-sponsor" as const,
             party: "Progressive Coalition",
             constituency: "Kisumu Central",
+            email: "p.ochieng@parliament.go.ke",
             conflictLevel: "low" as const,
             financialExposure: 8000,
             affiliations: [],
             votingAlignment: 78,
             transparency: {
               disclosure: "complete" as const,
-              lastUpdated: "2024-01-16",
+              lastUpdated: new Date("2024-01-16"),
               publicStatements: 8
-            }
+            },
+            sponsorshipDate: new Date("2024-01-16"),
+            isActive: true,
+            createdAt: new Date("2023-01-01"),
+            updatedAt: new Date("2024-01-16")
           }
         ],
         totalFinancialExposure: 23000,
@@ -506,7 +569,7 @@ export class DemoDataService {
             number: "3",
             title: "Data Processing Requirements",
             conflictLevel: "medium" as const,
-            affectedSponsors: ["sponsor-001"],
+            affectedSponsors: ["1"],
             description: "Requirements for lawful data processing"
           }
         ],
@@ -517,12 +580,12 @@ export class DemoDataService {
         },
         timeline: [
           {
-            date: "2024-01-15",
+            date: new Date("2024-01-15").toISOString(),
             event: "Bill introduced",
             type: "legislative" as const
           },
           {
-            date: "2024-01-20",
+            date: new Date("2024-01-20").toISOString(),
             event: "Committee assignment",
             type: "legislative" as const
           }
@@ -553,9 +616,9 @@ export class DemoDataService {
           ]
         }
       }
-    ];
+    };
 
-    return sponsorshipAnalyses.find(a => a.billId === billId) || null;
+    return allSponsorshipAnalyses[billId] || null;
   }
 
   /**
@@ -590,15 +653,15 @@ export class DemoDataService {
   }
 
   /**
-   * Search bills by query
+   * Search bills by query with optional filters
+   * Performs case-insensitive text search across multiple fields
    */
   public searchBills(query: string, filters?: { status?: string; category?: string }): DemoBill[] {
     let bills = this.getBills();
-    
-    // Apply text search
-    if (query) {
-      const searchTerm = query.toLowerCase();
-      bills = bills.filter(bill => 
+
+    if (query && query.trim()) {
+      const searchTerm = query.toLowerCase().trim();
+      bills = bills.filter(bill =>
         bill.title.toLowerCase().includes(searchTerm) ||
         bill.description?.toLowerCase().includes(searchTerm) ||
         bill.summary?.toLowerCase().includes(searchTerm) ||
@@ -606,11 +669,10 @@ export class DemoDataService {
       );
     }
 
-    // Apply filters
     if (filters?.status) {
       bills = bills.filter(bill => bill.status === filters.status);
     }
-    
+
     if (filters?.category) {
       bills = bills.filter(bill => bill.category === filters.category);
     }
@@ -620,16 +682,24 @@ export class DemoDataService {
 
   /**
    * Get a specific bill by ID
+   * Returns null if bill not found
    */
   public getBill(id: number): DemoBill | null {
     return this.getBills().find(bill => bill.id === id) || null;
   }
 
   /**
-   * Get a specific sponsor by ID
+   * Get a specific sponsor by ID (accepts string or number)
+   * Returns null if sponsor not found
    */
   public getSponsor(id: string | number): DemoSponsor | null {
-    const numericId = typeof id === 'string' ? parseInt(id) : id;
+    const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+    
+    if (isNaN(numericId)) {
+      logger.warn(`Invalid sponsor ID provided: ${id}`, { component: 'DemoDataService' });
+      return null;
+    }
+    
     return this.getSponsors().find(sponsor => sponsor.id === numericId) || null;
   }
 
@@ -637,12 +707,10 @@ export class DemoDataService {
    * Detect if demo mode should be enabled based on environment or database status
    */
   public detectDemoMode(): boolean {
-    // Check environment variables
     if (process.env.DEMO_MODE === 'true' || process.env.NODE_ENV === 'demo') {
       return true;
     }
 
-    // Check if database is unavailable (this would be set by database connection logic)
     if (process.env.DATABASE_UNAVAILABLE === 'true') {
       return true;
     }
@@ -652,20 +720,25 @@ export class DemoDataService {
 
   /**
    * Auto-enable demo mode if conditions are met
+   * Useful for automatic fallback when database is unavailable
    */
   public autoEnableDemoMode(): void {
     if (this.detectDemoMode() && !this.demoMode) {
       this.setDemoMode(true);
-      logger.info('🔄 Auto-enabled demo mode due to system conditions', { component: 'SimpleTool' });
+      logger.info('🔄 Auto-enabled demo mode due to system conditions', { component: 'DemoDataService' });
     }
   }
 
   /**
    * Get comprehensive demo data for a bill (includes all related data)
+   * Returns a complete dataset for a single bill including comments, engagement, and analysis
    */
   public getComprehensiveBillData(billId: number) {
     const bill = this.getBill(billId);
-    if (!bill) return null;
+    if (!bill) {
+      logger.warn(`Bill with ID ${billId} not found`, { component: 'DemoDataService' });
+      return null;
+    }
 
     return {
       bill,
@@ -679,11 +752,14 @@ export class DemoDataService {
 
   /**
    * Get demo data health status
+   * Useful for monitoring and debugging
    */
   public getHealthStatus() {
+    const consistencyCheck = this.validateDataConsistency();
+    
     return {
       demoMode: this.demoMode,
-      dataConsistency: this.validateDataConsistency(),
+      dataConsistency: consistencyCheck,
       lastUpdated: new Date().toISOString(),
       availableDataSets: {
         bills: this.getBills().length,
@@ -696,44 +772,49 @@ export class DemoDataService {
 
   /**
    * Validate data consistency across demo datasets
+   * Checks referential integrity between bills and sponsors
    */
   private validateDataConsistency(): boolean {
     try {
       const bills = this.getBills();
       const sponsors = this.getSponsors();
-      
-      // Check that all bill sponsor IDs have corresponding sponsors
-      for (const bill of bills) {
-        if (bill.sponsorId) {
-          const sponsor = sponsors.find(s => s.id === bill.sponsorId);
-          if (!sponsor) {
-            console.warn(`Bill ${bill.id} references non-existent sponsor ${bill.sponsorId}`);
-            return false;
-          }
-        }
-      }
+      const sponsorIds = new Set(sponsors.map(s => s.id));
 
-      // Check that all bills have valid dates
       for (const bill of bills) {
-        if (!bill.introducedDate || !bill.createdAt || !bill.updatedAt) {
-          console.warn(`Bill ${bill.id} has invalid dates`);
+        if (bill.sponsorId && !sponsorIds.has(bill.sponsorId)) {
+          logger.warn(`Bill ${bill.id} references non-existent sponsor ${bill.sponsorId}`, { 
+            component: 'DemoDataService' 
+          });
           return false;
         }
       }
 
+      for (const bill of bills) {
+        if (!bill.introducedDate || !bill.createdAt || !bill.updatedAt) {
+          logger.warn(`Bill ${bill.id} has invalid dates`, { component: 'DemoDataService' });
+          return false;
+        }
+
+        if (bill.lastActionDate && bill.introducedDate > bill.lastActionDate) {
+          logger.warn(`Bill ${bill.id} has introducedDate after lastActionDate`, { 
+            component: 'DemoDataService' 
+          });
+          return false;
+        }
+      }
+
+      if (sponsors.length !== sponsorIds.size) {
+        logger.warn('Duplicate sponsor IDs detected', { component: 'DemoDataService' });
+        return false;
+      }
+
       return true;
     } catch (error) {
-      logger.error('Data consistency validation failed:', { component: 'SimpleTool' }, error);
+      logger.error('Data consistency validation failed:', { component: 'DemoDataService' }, error);
       return false;
     }
   }
 }
 
-// Export singleton instance
+// Export singleton instance for convenient access
 export const demoDataService = DemoDataService.getInstance();
-
-
-
-
-
-

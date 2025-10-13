@@ -4,7 +4,7 @@ import { eq, and, desc, inArray, sql } from 'drizzle-orm';
 import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/user-preferences.js';
 import { getEmailService } from '../../services/email.service';
 import { webSocketService } from '../websocket.js';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 export interface NotificationChannel {
   type: 'email' | 'inApp' | 'push' | 'sms';

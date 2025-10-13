@@ -5,8 +5,8 @@ import {
   type InsertBillComment
 } from '../../../shared/schema.js';
 import { eq, desc, and } from 'drizzle-orm';
-import { BaseStorage } from './base/BaseStorage.js';
-import { logger } from '../../utils/logger';
+import { BaseStorage } from '../../infrastructure/database/base/BaseStorage.js';
+import { logger } from '../../utils/logger.js';
 
 /**
  * CommentStorage handles the storage and retrieval of comments on bills.
@@ -387,11 +387,3 @@ export class CommentStorage extends BaseStorage<Comment> {
     return this.comments.has(id);
   }
 }
-
-
-
-
-
-
-
-

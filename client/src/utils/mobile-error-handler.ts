@@ -1,4 +1,4 @@
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 /**
  * Mobile Error Handler
  * Provides mobile-specific error handling and fallback mechanisms
@@ -228,7 +228,7 @@ export class MobileErrorHandler {
     // Enable offline mode if available
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.ready.then((registration) => {
-        registration.sync?.register('background-sync');
+        (registration as any).sync?.register('background-sync');
       });
     }
   }

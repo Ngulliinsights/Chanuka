@@ -1,7 +1,7 @@
 import { apmService } from '../monitoring/apm-service.js';
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
 import { errorTracker } from '../../core/errors/error-tracker.js';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 export interface AlertRule {
   id: string;

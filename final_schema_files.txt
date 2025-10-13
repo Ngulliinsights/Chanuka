@@ -1,0 +1,4 @@
+server/infrastructure/external-data/conflict-resolution-service.ts
+server/infrastructure/external-data/data-synchronization-service.ts
+server/services/schema-validation-demo.ts
+server/services/schema-validation-test.ts

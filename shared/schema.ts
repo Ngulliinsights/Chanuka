@@ -48,20 +48,22 @@ export const userProfiles = pgTable("user_profiles", {
 }));
 
 export const sessions = pgTable("sessions", {
-  id: text("id").primaryKey(),
-  userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  token: text("token"),
-  expiresAt: timestamp("expires_at").notNull(),
-  isActive: boolean("is_active").notNull().default(true),
-  ipAddress: text("ip_address"),
-  userAgent: text("user_agent"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-}, (table) => ({
-  userIdIdx: index("sessions_user_id_idx").on(table.userId),
-  expiresAtIdx: index("sessions_expires_at_idx").on(table.expiresAt),
-  isActiveIdx: index("sessions_is_active_idx").on(table.isActive),
-}));
+   id: text("id").primaryKey(),
+   userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+   token: text("token"),
+   refreshTokenHash: text("refresh_token_hash"),
+   expiresAt: timestamp("expires_at").notNull(),
+   refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+   isActive: boolean("is_active").notNull().default(true),
+   ipAddress: text("ip_address"),
+   userAgent: text("user_agent"),
+   createdAt: timestamp("created_at").notNull().defaultNow(),
+   updatedAt: timestamp("updated_at").notNull().defaultNow(),
+ }, (table) => ({
+   userIdIdx: index("sessions_user_id_idx").on(table.userId),
+   expiresAtIdx: index("sessions_expires_at_idx").on(table.expiresAt),
+   isActiveIdx: index("sessions_is_active_idx").on(table.isActive),
+ }));
 
 export const refreshTokens = pgTable("refresh_tokens", {
   id: serial("id").primaryKey(),
@@ -998,6 +1000,17 @@ export const insertComplianceCheckSchema = z.object({
   automated: z.boolean().default(true),
 });
 
+export const insertSocialShareSchema = z.object({
+  billId: z.number().int().positive(),
+  platform: z.string().min(1),
+  userId: z.string().uuid(),
+  metadata: z.any().optional(),
+  shareDate: z.date().optional(),
+  likes: z.number().int().min(0).default(0),
+  shares: z.number().int().min(0).default(0),
+  comments: z.number().int().min(0).default(0),
+});
+
 // ============================================================================
 // TYPESCRIPT TYPES
 // ============================================================================
@@ -1025,6 +1038,7 @@ export type CommentVote = typeof commentVotes.$inferSelect;
 
 export type BillEngagement = typeof billEngagement.$inferSelect;
 export type SocialShare = typeof socialShares.$inferSelect;
+export type InsertSocialShare = z.infer<typeof insertSocialShareSchema>;
 
 export type Sponsor = typeof sponsors.$inferSelect;
 export type InsertSponsor = z.infer<typeof insertSponsorSchema>;

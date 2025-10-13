@@ -414,7 +414,7 @@ export async function fetchWithFallback<T = any>(
 export class ApiService {
   private baseUrl: string;
 
-  constructor(baseUrl: string = import.meta.env.VITE_API_URL || 'http://localhost:5000') {
+  constructor(baseUrl: string = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || 'http://localhost:5000') {
     this.baseUrl = baseUrl.replace(/\/$/, ''); // Remove trailing slash
   }
 

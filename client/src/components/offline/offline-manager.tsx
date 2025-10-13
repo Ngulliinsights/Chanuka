@@ -12,7 +12,7 @@ import React, {
   useRef 
 } from 'react';
 import { WifiOff, Wifi, CloudOff, RefreshCw } from 'lucide-react';
-import { logger } from '../utils/logger.js';
+import { logger } from '@shared/utils/logger';
 
 interface OfflineData {
   bills: any[];
@@ -169,8 +169,9 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
     if (!dbRef.current) return;
 
     try {
+      const currentData = offlineData || { bills: [], user: null, preferences: null, lastSync: 0 };
       const newOfflineData = {
-        ...offlineData,
+        ...currentData,
         [key]: data,
         lastSync: Date.now()
       };

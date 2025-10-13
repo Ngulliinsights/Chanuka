@@ -6,7 +6,7 @@
  */
 
 import { featureDetector } from './browser-compatibility';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 // Polyfill loading status
 interface PolyfillStatus {
@@ -446,7 +446,7 @@ class PolyfillManager {
   async loadArrayPolyfills(): Promise<void> {
     await this.loadPolyfillIfNeeded(
       'arrayMethods',
-      () => Array.prototype.find && Array.prototype.includes && Array.prototype.from,
+      () => typeof Array.prototype.find === 'function' && typeof Array.prototype.includes === 'function' && typeof Array.from === 'function',
       () => {
         // Array.prototype.find
         if (!Array.prototype.find) {
@@ -476,7 +476,7 @@ class PolyfillManager {
         // Array.from
         if (!Array.from) {
           Array.from = function<T>(arrayLike: ArrayLike<T>, mapFn?: (v: T, k: number) => any): any[] {
-            const result = [];
+            const result: any[] = [];
             for (let i = 0; i < arrayLike.length; i++) {
               const value = mapFn ? mapFn(arrayLike[i], i) : arrayLike[i];
               result.push(value);
@@ -494,7 +494,7 @@ class PolyfillManager {
   async loadObjectPolyfills(): Promise<void> {
     await this.loadPolyfillIfNeeded(
       'objectMethods',
-      () => Object.assign && Object.keys && Object.values,
+      () => typeof Object.assign === 'function' && typeof Object.keys === 'function' && typeof Object.values === 'function',
       () => {
         // Object.assign
         if (!Object.assign) {
@@ -523,7 +523,7 @@ class PolyfillManager {
         // Object.keys (should be available in most browsers, but just in case)
         if (!Object.keys) {
           Object.keys = function(obj: any): string[] {
-            const keys = [];
+            const keys: string[] = [];
             for (const key in obj) {
               if (Object.prototype.hasOwnProperty.call(obj, key)) {
                 keys.push(key);
@@ -536,7 +536,7 @@ class PolyfillManager {
         // Object.values
         if (!Object.values) {
           Object.values = function(obj: any): any[] {
-            const values = [];
+            const values: any[] = [];
             for (const key in obj) {
               if (Object.prototype.hasOwnProperty.call(obj, key)) {
                 values.push(obj[key]);
@@ -555,7 +555,7 @@ class PolyfillManager {
   async loadStringPolyfills(): Promise<void> {
     await this.loadPolyfillIfNeeded(
       'stringMethods',
-      () => String.prototype.includes && String.prototype.startsWith && String.prototype.endsWith,
+      () => typeof String.prototype.includes === 'function' && typeof String.prototype.startsWith === 'function' && typeof String.prototype.endsWith === 'function',
       () => {
         // String.prototype.includes
         if (!String.prototype.includes) {
@@ -660,7 +660,7 @@ class PolyfillManager {
   async loadNumberPolyfills(): Promise<void> {
     await this.loadPolyfillIfNeeded(
       'numberMethods',
-      () => Number.isNaN && Number.isFinite && Number.parseInt,
+      () => typeof Number.isNaN === 'function' && typeof Number.isFinite === 'function' && typeof Number.parseInt === 'function',
       () => {
         // Number.isNaN
         if (!Number.isNaN) {

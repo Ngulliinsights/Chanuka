@@ -3,7 +3,7 @@ import pg from 'pg';
 const { Pool } = pg;
 import * as schema from "../shared/schema.js";
 import { fallbackService } from './services/fallback-service.js';
-import { logger } from '../utils/logger';
+import { logger } from './utils/logger.js';
 
 // Connection state management with clear separation of concerns
 interface DatabaseState {
@@ -131,7 +131,7 @@ async function seedInitialData(db: any): Promise<void> {
     
     logger.info('✅ Initial data seeded successfully', { component: 'SimpleTool' });
   } catch (error) {
-    logger.info('ℹ️ Could not seed data:', { component: 'SimpleTool' }, error instanceof Error ? error.message : 'Unknown error');
+    logger.info('ℹ️ Could not seed data: ' + (error instanceof Error ? error.message : 'Unknown error'), { component: 'SimpleTool' });
   }
 }
 
@@ -317,6 +317,7 @@ initializeDatabase().catch(error => {
 export const isDatabaseConnected = (): boolean => state.isConnected;
 export const db = () => state.db;
 export const pool = () => state.pool;
+export const readDatabase = () => state.db;
 export { fallbackService };
 
 // Re-export schema for convenience
@@ -335,9 +336,3 @@ export {
   billSectionConflicts,
   userInterests
 } from '../shared/schema.js';
-
-
-
-
-
-

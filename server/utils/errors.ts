@@ -87,6 +87,23 @@ export class OAuthError extends AuthError {
   }
 }
 
+export class DatabaseError extends AppError {
+  constructor(message: string, details?: Record<string, unknown>, code = 'DATABASE_ERROR') {
+    super(message, 500, code, details);
+    this.name = 'DatabaseError';
+  }
+}
+
+/**
+ * Error for when a sponsor is not found in the database
+ */
+export class SponsorNotFoundError extends NotFoundError {
+  constructor(message = 'Sponsor not found') {
+    super(message, undefined, 'SPONSOR_NOT_FOUND');
+    this.name = 'SponsorNotFoundError';
+  }
+}
+
 /**
  * Async handler wrapper for Express routes to catch errors
  */

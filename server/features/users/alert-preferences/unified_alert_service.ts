@@ -1,11 +1,11 @@
 import { eq, and, desc, sql, inArray } from 'drizzle-orm';
-import { databaseService } from '../../infrastructure/database/database-service.js';
-import { notificationChannelService } from '../../infrastructure/notifications/notification-channels.js';
-import { userProfileService } from './user-profile.js';
-import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service.js';
-import * as schema from '../../../shared/schema.js';
+import { databaseService } from '../../../infrastructure/database/database-service';
+import { notificationChannelService } from '../../../infrastructure/notifications/notification-channels';
+import { userProfileService } from '../user-profile';
+import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../../infrastructure/cache/cache-service';
+import * as schema from '@shared/schema';
 import { z } from 'zod';
-import { logger } from '../../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -797,7 +797,7 @@ export class UnifiedAlertPreferenceService {
           throw error;
         }
       },
-      CACHE_TTL.ANALYTICS
+      CACHE_TTL.ALERT_DATA
     );
   }
 
@@ -1057,14 +1057,26 @@ export class UnifiedAlertPreferenceService {
     priority: Priority
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      await notificationChannelService.sendNotification({
+      const notificationTypeMap: Record<AlertType, { type: any; subType?: any }> = {
+        'bill_status_change': { type: 'bill_update', subType: 'status_change' },
+        'new_comment': { type: 'bill_update', subType: 'new_comment' },
+        'amendment': { type: 'bill_update', subType: 'amendment' },
+        'voting_scheduled': { type: 'bill_update', subType: 'voting_scheduled' },
+        'sponsor_update': { type: 'bill_update', subType: 'status_change' },
+        'engagement_milestone': { type: 'digest' }
+      };
+
+      const mapped = notificationTypeMap[alertType] || { type: 'system_alert' };
+
+      await notificationChannelService.sendMultiChannelNotification({
         userId,
-        type: alertType,
+        type: mapped.type,
+        subType: mapped.subType,
         title: alertData.title || this.getDefaultTitle(alertType),
         message: alertData.message || alertData.description || 'You have a new alert',
-        data: alertData,
         priority: priority as any,
-        channels: channels.map(ch => ch.type) as any
+        relatedBillId: (alertData && alertData.billId) || undefined,
+        metadata: alertData as any
       });
 
       return { success: true };
@@ -1107,7 +1119,7 @@ export class UnifiedAlertPreferenceService {
         timestamp: new Date()
       });
       
-      await cacheService.set(batchKey, existingBatch, CACHE_TTL.NOTIFICATIONS);
+  await cacheService.set(batchKey, existingBatch, CACHE_TTL.LONG);
     } catch (error) {
       logger.error('Error adding to batch', { 
         component: 'AlertPreferenceService',
@@ -1437,19 +1449,17 @@ export class UnifiedAlertPreferenceService {
       }, {});
 
       // Send batch notification
-      await notificationChannelService.sendNotification({
+      await notificationChannelService.sendMultiChannelNotification({
         userId,
-        type: 'alert_batch',
+        type: 'digest',
         title: 'Alert Digest',
         message: `You have ${batch.length} new alerts`,
-        data: {
+        priority: 'medium',
+        metadata: {
           batch: groupedAlerts,
           preferenceId
-        },
-        priority: 'normal',
-        channels: preference.channels
-          .filter(ch => ch.enabled)
-          .map(ch => ch.type) as any
+        } as any,
+        relatedBillId: undefined
       });
 
       // Clear the batch

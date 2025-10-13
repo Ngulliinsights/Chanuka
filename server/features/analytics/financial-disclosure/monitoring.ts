@@ -6,17 +6,17 @@ import {
   sponsors,
   sponsorTransparency,
   notifications
-} from "../../../shared/schema";
+} from "@shared/schema.js";
 import { eq, gte, and, sql, desc, inArray } from "drizzle-orm";
 import { PgDatabase } from "drizzle-orm/pg-core";
-import { CacheService } from "../../infrastructure/cache/cache-service";
-import { logger } from "../../utils/logger";
+import { CacheService } from "../../../infrastructure/cache/cache-service.js";
+import { logger } from "../../../utils/logger.js";
 import {
   NotFoundError as SponsorNotFoundError,
   DatabaseError,
   ValidationError as InvalidInputError
-} from "../../utils/errors";
-import { FinancialDisclosureConfig } from './config';
+} from "../../../utils/errors.js";
+import { FinancialDisclosureConfig } from './config.js';
 import type {
   FinancialDisclosure,
   FinancialAlert,
@@ -25,7 +25,7 @@ import type {
   SponsorInfo,
   SystemHealthStatus,
   HealthCheckResult
-} from './types';
+} from './types.js';
 
 // ============================================================================
 // Service Interface & Dependencies

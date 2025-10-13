@@ -1,13 +1,13 @@
-import { and, desc, eq, inArray, or, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, or, sql, SQL } from 'drizzle-orm';
 import {
   billEngagement,
   bills,
   billTags,
   userInterests,
   type Bill,
-} from '../../../shared/schema';
+} from '@shared/schema';
 import { db } from '../db';
-import { logger } from '../../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 /**
  * Recommendation Service
@@ -156,7 +156,7 @@ export class RecommendationService {
       ]);
 
       // Build the query dynamically based on available data
-      const whereConditions = [];
+      const whereConditions: SQL<unknown>[] = [];
       const queryParams: Record<string, any> = {};
 
       // Always exclude bills the user has already engaged with
@@ -171,12 +171,15 @@ export class RecommendationService {
           or(
             inArray(billTags.tag, interestTags),
             sql`${bills.viewCount} > 50` // Lower threshold for broader discovery
-          )
+          ) as SQL<unknown>
         );
       } else {
         // If no interests, focus on popular and recent bills
         whereConditions.push(sql`${bills.viewCount} > 25`);
       }
+
+      // Filter out undefined values before using in and() clause
+      const filteredConditions = whereConditions.filter(c => c !== undefined);
 
       const recommendedBills = await db()
         .select({
@@ -185,7 +188,7 @@ export class RecommendationService {
         })
         .from(bills)
         .leftJoin(billTags, eq(bills.id, billTags.billId))
-        .where(and(...whereConditions))
+        .where(filteredConditions.length > 0 ? and(...filteredConditions) : undefined)
         .groupBy(bills.id)
         .orderBy(desc(sql`score`))
         .limit(Math.min(limit, 50)) // Cap limit to prevent excessive queries

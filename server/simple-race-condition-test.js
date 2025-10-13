@@ -199,10 +199,10 @@ async function runTests() {
     const total = results.length;
     
     logger.info('\n📊 Test Results:', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(40));
+    logger.info('='.repeat(40), { component: 'SimpleTool' });
     console.log(`✅ Passed: ${passed}/${total}`);
     console.log(`❌ Failed: ${total - passed}/${total}`);
-    logger.info('=', { component: 'SimpleTool' }, .repeat(40));
+    logger.info('='.repeat(40), { component: 'SimpleTool' });
     
     if (passed === total) {
       logger.info('\n🎉 All tests passed! Race condition fixes are working correctly.', { component: 'SimpleTool' });

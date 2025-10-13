@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import DOMPurify from 'isomorphic-dompurify';
 import { encryptionService } from '../../features/security/encryption-service.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger.js';
 
 /**
  * Comprehensive input validation and sanitization service
@@ -106,10 +106,10 @@ export class InputValidationService {
     } else {
       // Escape HTML entities
       sanitized = sanitized
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
+        .replace(/&/g, '&')
+        .replace(/</g, '<')
+        .replace(/>/g, '>')
+        .replace(/"/g, '"')
         .replace(/'/g, '&#x27;');
     }
 
@@ -410,9 +410,3 @@ export class InputValidationService {
 
 // Singleton instance
 export const inputValidationService = new InputValidationService();
-
-
-
-
-
-

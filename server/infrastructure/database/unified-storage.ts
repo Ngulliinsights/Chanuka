@@ -9,10 +9,10 @@ import {
   type BillEngagement, type Notification, type SponsorAffiliation, 
   type BillSponsorship, type SponsorTransparency, type BillSectionConflict,
   type UserInterest, type BillTag
-} from "../../shared/schema.js";
+} from "@shared/schema.js";
 import { eq, desc, and, or, like, sql, count } from "drizzle-orm";
 import { database as db } from "../../../shared/database/connection.js";
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 export interface UnifiedStorage {
   // Bill operations

@@ -281,32 +281,61 @@ class ApiClient {
 // Create and export the main API client instance
 export const api = new ApiClient();
 
+// Auth API
+export const authApi = {
+  async register(userData: any) {
+    return api.post('/api/auth/register', userData);
+  },
+
+  async login(credentials: any) {
+    return api.post('/api/auth/login', credentials);
+  },
+
+  async getCurrentUser() {
+    return api.get('/api/auth/me');
+  },
+
+  async logout() {
+    return api.post('/api/auth/logout');
+  }
+};
+
 // Bills API
 export const billsApi = {
   async getBills() {
     return api.get('/api/bills');
   },
-  
+
   async getBill(id: number) {
     return api.get(`/api/bills/${id}`);
   },
-  
+
+  async searchBills(query: any) {
+    const url = new URL('/api/bills/search', api.getBaseUrl());
+    Object.keys(query).forEach(key => {
+      if (query[key] !== undefined && query[key] !== null) {
+        url.searchParams.append(key, query[key]);
+      }
+    });
+    return api.get(url.pathname + url.search);
+  },
+
   async getBillComments(id: number) {
     return api.get(`/api/bills/${id}/comments`);
   },
-  
+
   async createBillComment(billId: number, comment: any) {
     return api.post(`/api/bills/${billId}/comments`, comment);
   },
-  
+
   async recordEngagement(billId: number, engagement: any) {
     return api.post(`/api/bills/${billId}/engagement`, engagement);
   },
-  
+
   async getBillCategories() {
     return api.get('/api/bills/meta/categories');
   },
-  
+
   async getBillStatuses() {
     return api.get('/api/bills/meta/statuses');
   }

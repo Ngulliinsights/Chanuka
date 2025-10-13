@@ -2,7 +2,7 @@ import { database as db } from '../../../shared/database/connection.js';
 import { sql } from 'drizzle-orm';
 import os from 'os';
 import process from 'process';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 export interface SystemHealth {
   status: 'healthy' | 'degraded' | 'unhealthy';

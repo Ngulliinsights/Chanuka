@@ -7,7 +7,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { performanceMonitor } from '../../utils/performanceMonitoring';
 import { performanceOptimizer, usePerformanceOptimization } from '../../utils/performance-optimizer';
 import { cacheManager } from '../../utils/cache-strategy';
-import { logger } from '../utils/logger.js';
+import { logger } from '@shared/utils/logger';
 
 interface PerformanceMetricsProps {
   showDetails?: boolean;
@@ -182,6 +182,7 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
                 <button
                   onClick={() => setIsVisible(false)}
                   className="text-gray-500 hover:text-gray-700"
+                  aria-label="Close"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

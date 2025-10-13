@@ -2,23 +2,17 @@
 // Centralized exports for core functionality
 
 // Authentication
-export * from './auth';
+export * from './auth/index.js';
 
 // Validation
-export * from './validation';
+export * from './validation/index.js';
 
 // Error Handling
-export * from './errors';
+export * from './errors/index.js';
 
 // Types
-export * from './types';
-export * from './StorageTypes';
+export * from './types/index.js';
+export * from './StorageTypes.js';
 
 // Routes Index
-export { default as routesIndex } from './index';
-
-
-
-
-
-
+export { default as routesIndex } from './index.js';

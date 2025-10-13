@@ -4,7 +4,7 @@ import path from "path";
 import { createServer as createViteServer, createLogger, type ViteDevServer } from "vite";
 import { type Server } from "http";
 import viteConfig from "../vite.config.js";
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 const viteLogger = createLogger();
 

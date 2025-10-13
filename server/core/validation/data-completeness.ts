@@ -1,6 +1,6 @@
-import { apiRequest } from '../utils/api';
-import { cache } from '../utils/cache';
-import { logger } from '../utils/metrics';
+import { apiRequest } from '../../utils/api.js';
+import { cache } from '../../utils/cache.js';
+import { logger } from '../../utils/logger.js';
 
 interface VerificationRule {
   id: string;
@@ -592,7 +592,7 @@ export class DataCompletenessService {
     const entitySpecificSources = entitySources[entityType] || [];
 
     // Combine and deduplicate
-    return [...new Set([...fieldSpecificSources, ...entitySpecificSources])];
+    return Array.from(new Set([...fieldSpecificSources, ...entitySpecificSources]));
   }
 
   /**
@@ -703,8 +703,18 @@ export class DataCompletenessService {
   private generateReportRecommendations(
     commonMissingFields: Array<{ field: string; count: number; percentage: number }>,
     entityType: string,
-  ): any[] {
-    const recommendations = [];
+  ): Array<{
+    action: string;
+    priority: 'low' | 'medium' | 'high';
+    rationale: string;
+    potentialSources: string[];
+  }> {
+    const recommendations: Array<{
+      action: string;
+      priority: 'low' | 'medium' | 'high';
+      rationale: string;
+      potentialSources: string[];
+    }> = [];
 
     // Recommend actions for common missing fields
     for (const { field, percentage } of commonMissingFields) {
@@ -742,10 +752,3 @@ export class DataCompletenessService {
 
 // Export singleton instance
 export const dataCompletenessService = new DataCompletenessService();
-
-
-
-
-
-
-

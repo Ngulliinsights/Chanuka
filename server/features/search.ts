@@ -1,7 +1,7 @@
-import { database as db } from '../../../shared/database/connection.js';
-import { bills, sponsors, billComments } from '../../../shared/schema.js';
-import { sql, or, and, ilike, desc, asc } from 'drizzle-orm';
-import { logger } from '../../utils/logger';
+import { database as db } from '../../shared/database/connection';
+import { bills, sponsors, billComments } from '../../shared/schema';
+import { sql, or, and, ilike, desc, asc, SQL } from 'drizzle-orm';
+import { logger } from '../../shared/utils/logger';
 
 export interface SearchFilters {
   query?: string;
@@ -30,7 +30,7 @@ export class SearchService {
   async searchBills(filters: SearchFilters, page = 1, limit = 20): Promise<SearchResult> {
     try {
       const offset = (page - 1) * limit;
-      const conditions = [];
+      const conditions: (SQL<unknown> | undefined)[] = [];
 
       // Text search across title, summary, and description
       if (filters.query) {
@@ -67,6 +67,8 @@ export class SearchService {
         conditions.push(sql`${bills.tags} && ${filters.tags}`);
       }
 
+      const filteredConditions = conditions.filter(c => c !== undefined) as SQL<unknown>[];
+
       // Build the query
       let orderByClause;
       switch (filters.sortBy) {
@@ -85,16 +87,16 @@ export class SearchService {
       }
 
       const results = await db.select().from(bills)
-        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .where(filteredConditions.length > 0 ? and(...filteredConditions) : undefined)
         .orderBy(orderByClause)
         .limit(limit)
         .offset(offset);
 
       // Get total count
-      const [{ count }] = await db.select({ count: sql`count(*)` }).from(bills).where(conditions.length > 0 ? and(...conditions) : undefined);
+      const [{ count }] = await db.select({ count: sql`count(*)` }).from(bills).where(filteredConditions.length > 0 ? and(...filteredConditions) : undefined);
 
       // Get facets for filtering UI
-      const facets = await this.getFacets(conditions);
+      const facets = await this.getFacets(filteredConditions);
 
       return {
         bills: results,
@@ -108,7 +110,7 @@ export class SearchService {
     }
   }
 
-  private async getFacets(existingConditions: any[]) {
+  private async getFacets(existingConditions: SQL<unknown>[]) {
     try {
       // Get category counts
       const categoryQuery = db
