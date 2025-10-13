@@ -1,6 +1,6 @@
-import { unifiedAlertPreferenceService, AlertPreference, AlertType, Priority } from './unified-alert-preference.js';
-import { logger } from '../../utils/logger';
-import { cacheService } from '../../infrastructure/cache/cache-service.js';
+import { unifiedAlertPreferenceService, AlertPreference, AlertType, Priority } from './unified_alert_service';
+import { logger } from '@shared/utils/logger';
+import { cacheService } from '../../../infrastructure/cache/cache-service';
 
 /**
  * Alert System Utilities and Helper Functions
@@ -158,11 +158,13 @@ export async function migrateLegacyPreferences(
   }
 }
 
+import type { AlertChannel } from './unified_alert_service';
+
 /**
  * Helper to migrate channel configs from advanced alerts
  */
-function migrateChannelConfigs(channelConfigs: any): any[] {
-  const channels = [];
+function migrateChannelConfigs(channelConfigs: any): AlertChannel[] {
+  const channels: AlertChannel[] = [];
 
   if (channelConfigs?.inApp?.enabled) {
     channels.push({
@@ -307,9 +309,10 @@ export async function processAllBatchedAlerts(
       component: 'AlertUtilities'
     });
 
-    // In production, you would query the database for all users with batched preferences
-    // For now, we'll get this from cache keys
-    const batchKeys = await cacheService.keys('alert_batch:*');
+  // In production, you would query the database for all users with batched preferences
+  // For now, we'll get this from cache keys
+  const allKeys = cacheService.getKeys();
+  const batchKeys = allKeys.filter(k => k.startsWith('alert_batch:'));
     
     let processed = 0;
     let failed = 0;
@@ -653,7 +656,6 @@ export async function generateUserAlertReport(
     return {
       summary: {
         period: `Last ${days} days`,
-        totalAlerts: logs.logs.length,
         totalPreferences: stats.totalPreferences,
         activePreferences: stats.activePreferences,
         ...stats.deliveryStats

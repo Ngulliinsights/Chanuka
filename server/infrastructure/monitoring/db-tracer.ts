@@ -1,6 +1,6 @@
 import { performance } from 'perf_hooks';
 import { performanceMonitor } from './performance-monitor.js';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 interface QueryMetrics {
   query: string;

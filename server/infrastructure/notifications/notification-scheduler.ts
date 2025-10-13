@@ -3,7 +3,7 @@ import { eq, and, lt, gte, sql } from 'drizzle-orm';
 import * as cron from 'node-cron';
 import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/user-preferences.js';
 import { enhancedNotificationService, type EnhancedNotificationData } from './enhanced-notification.js';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 export interface ScheduledDigest {
   userId: string;

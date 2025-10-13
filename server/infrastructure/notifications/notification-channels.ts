@@ -4,7 +4,7 @@ import { webSocketService } from '../websocket.ts';
 import { database as db } from '../../../shared/database/connection.ts';
 import { users, bills, notifications } from '../../../shared/schema.ts';
 import { eq } from 'drizzle-orm';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 export interface NotificationChannelConfig {
   type: 'email' | 'inApp' | 'sms' | 'push';

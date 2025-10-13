@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { cacheService } from "./cache-service.js";
 import { ApiSuccess, ApiErrorResponse, ApiNotFound } from "../../utils/api-response.js";
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 export const router = Router();
 

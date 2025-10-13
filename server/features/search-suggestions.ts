@@ -2,7 +2,7 @@ import { eq, desc, and, sql, count, ilike, or, inArray } from "drizzle-orm";
 import { databaseService } from "../services/database-service";
 import { cacheService, CACHE_KEYS, CACHE_TTL } from "../infrastructure/cache/cache-service";
 import * as schema from "../../shared/schema";
-import { logger } from '../../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 // Search suggestion interfaces
 export interface SearchSuggestion {

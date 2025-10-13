@@ -1,11 +1,11 @@
-import { db } from '../db.js';
+import { db } from '../../db.js';
 import { sql } from 'drizzle-orm';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger.js';
 import {
   complianceChecks,
   securityAuditLogs,
   threatIntelligence
-} from '../../shared/schema.js';
+} from '../../../shared/schema.js';
 
 export interface ValidationResult {
   tableName: string;
@@ -284,10 +284,10 @@ export class SchemaValidationService {
    */
   private async checkTableExists(tableName: string): Promise<boolean> {
     try {
-      const result = await db.execute(sql`
+      const result = await db().execute(sql`
         SELECT EXISTS (
-          SELECT FROM information_schema.tables 
-          WHERE table_schema = 'public' 
+          SELECT FROM information_schema.tables
+          WHERE table_schema = 'public'
           AND table_name = ${tableName}
         );
       `);
@@ -301,10 +301,10 @@ export class SchemaValidationService {
 
   private async getTableColumns(tableName: string): Promise<any[]> {
     try {
-      const result = await db.execute(sql`
+      const result = await db().execute(sql`
         SELECT column_name, data_type, is_nullable, column_default
         FROM information_schema.columns
-        WHERE table_schema = 'public' 
+        WHERE table_schema = 'public'
         AND table_name = ${tableName}
         ORDER BY ordinal_position;
       `);
@@ -428,8 +428,8 @@ export class SchemaValidationService {
   private async repairTable(validation: ValidationResult): Promise<boolean> {
     if (validation.tableName === 'compliance_checks' && validation.missingColumns.includes('next_check')) {
       try {
-        await db.execute(sql`
-          ALTER TABLE compliance_checks 
+        await db().execute(sql`
+          ALTER TABLE compliance_checks
           ADD COLUMN IF NOT EXISTS next_check TIMESTAMP;
         `);
         logger.info('✅ Added next_check column to compliance_checks table', { component: 'SimpleTool' });
@@ -442,8 +442,8 @@ export class SchemaValidationService {
 
     if (validation.tableName === 'security_audit_logs' && validation.missingColumns.includes('timestamp')) {
       try {
-        await db.execute(sql`
-          ALTER TABLE security_audit_logs 
+        await db().execute(sql`
+          ALTER TABLE security_audit_logs
           ADD COLUMN IF NOT EXISTS timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
         `);
         logger.info('✅ Added timestamp column to security_audit_logs table', { component: 'SimpleTool' });
@@ -456,8 +456,8 @@ export class SchemaValidationService {
 
     if (validation.tableName === 'threat_intelligence' && validation.missingColumns.includes('ip_address')) {
       try {
-        await db.execute(sql`
-          ALTER TABLE threat_intelligence 
+        await db().execute(sql`
+          ALTER TABLE threat_intelligence
           ADD COLUMN IF NOT EXISTS ip_address TEXT NOT NULL DEFAULT '';
         `);
         logger.info('✅ Added ip_address column to threat_intelligence table', { component: 'SimpleTool' });
@@ -501,9 +501,3 @@ export class SchemaValidationService {
 
 // Export singleton instance
 export const schemaValidationService = SchemaValidationService.getInstance();
-
-
-
-
-
-

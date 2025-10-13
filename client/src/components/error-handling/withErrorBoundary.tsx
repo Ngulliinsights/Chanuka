@@ -1,5 +1,5 @@
 import React, { ComponentType, lazy, LazyExoticComponent } from 'react';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 import PageErrorBoundary, { ErrorFallbackProps, ErrorType, ErrorContext } from './PageErrorBoundary';
 import { 
   ComponentErrorFallback, 

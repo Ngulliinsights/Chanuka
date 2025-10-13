@@ -1,4 +1,6 @@
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
+import React from 'react';
+
 /**
  * Responsive Layout Utility
  * Provides utilities for responsive design and layout management
@@ -74,7 +76,7 @@ export class ResponsiveLayoutManager {
       this.resizeObserver.observe(document.documentElement);
     } else {
       // Fallback to window resize event
-      window.addEventListener('resize', this.handleResize.bind(this), { passive: true });
+      (window as Window).addEventListener('resize', this.handleResize.bind(this), { passive: true });
     }
 
     // Listen for orientation changes
@@ -83,13 +85,15 @@ export class ResponsiveLayoutManager {
 
   private handleResize(): void {
     // Debounce resize events
-    clearTimeout(this.resizeTimeout);
-    this.resizeTimeout = setTimeout(() => {
+    if (this.resizeTimeout !== null) {
+      clearTimeout(this.resizeTimeout);
+    }
+    this.resizeTimeout = window.setTimeout(() => {
       this.updateState();
     }, 100);
   }
 
-  private resizeTimeout: NodeJS.Timeout | null = null;
+  private resizeTimeout: number | null = null;
 
   private handleOrientationChange(): void {
     // Delay to allow for orientation change to complete
@@ -311,12 +315,5 @@ export function createResponsiveStyles(
   
   return applicableStyle;
 }
-
 // Import React for hooks
-import React from 'react';
-
-
-
-
-
 

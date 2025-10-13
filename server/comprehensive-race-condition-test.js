@@ -250,7 +250,6 @@ async function testCircularDependencies() {
         const importPath = match[1];
         if (importPath.startsWith('./') || importPath.startsWith('../')) {
           imports.push(importPath);
-import { logger } from '../utils/logger.js';
         }
       }
       
@@ -438,11 +437,11 @@ async function runAllTests() {
     
     // Print summary
     logger.info('\n📊 Test Results Summary:', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('='.repeat(50), { component: 'SimpleTool' });
     console.log(`✅ Passed: ${testResults.passed}`);
     console.log(`❌ Failed: ${testResults.failed}`);
     console.log(`⚠️  Warnings: ${testResults.warnings}`);
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('='.repeat(50), { component: 'SimpleTool' });
     
     if (testResults.failed === 0) {
       logger.info('\n🎉 All critical tests passed! No race conditions or infinite loops detected.', { component: 'SimpleTool' });

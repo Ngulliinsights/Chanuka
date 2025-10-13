@@ -1,5 +1,33 @@
 import { config } from '../config/index.ts';
 
+/**
+ * Safely normalizes an unknown error into a structured object for logging.
+ * This prevents crashes from circular references or non-standard error types.
+ */
+function normalizeError(err: unknown): Record<string, any> {
+  if (err instanceof Error) {
+    return {
+      message: err.message,
+      stack: err.stack,
+      name: err.name,
+    };
+  }
+  if (typeof err === 'object' && err !== null) {
+    try {
+      // Attempt to stringify, but handle circular references
+      return JSON.parse(JSON.stringify(err, (key, value) => {
+        if (value instanceof Error) {
+          return { message: value.message, stack: value.stack, name: value.name };
+        }
+        return value;
+      }));
+    } catch {
+      return { error: 'Unserializable object' };
+    }
+  }
+  return { error: String(err) };
+}
+
 // Enhanced logger levels with numeric values for comparison
 const LOG_LEVELS = {
   debug: 0,
@@ -277,8 +305,17 @@ class UnifiedLogger {
    * Logs an error message. Used for error conditions that allow
    * the application to continue running but indicate problems.
    */
-  error(message: string, context?: LogContext, metadata?: Record<string, any>): void {
+  error(message: string, context?: LogContext, metadata?: Record<string, any>): void;
+  error(message: string, context: LogContext | undefined, err: unknown): void;
+  error(message: string, context?: LogContext, metadataOrError?: Record<string, any> | unknown): void {
     if (!this.shouldLog('error')) return;
+
+    let metadata: Record<string, any> | undefined;
+    if (typeof metadataOrError === 'object' && metadataOrError !== null) {
+      metadata = metadataOrError as Record<string, any>;
+    } else if (metadataOrError) {
+      metadata = normalizeError(metadataOrError);
+    }
 
     const entry = this.createLogEntry('error', message, context, metadata);
     this.storeLogEntry(entry);
@@ -289,8 +326,17 @@ class UnifiedLogger {
    * Logs a critical message. These are always logged regardless of level.
    * Used for severe errors that require immediate attention.
    */
-  critical(message: string, context?: LogContext, metadata?: Record<string, any>): void {
+  critical(message: string, context?: LogContext, metadata?: Record<string, any>): void;
+  critical(message: string, context: LogContext | undefined, err: unknown): void;
+  critical(message: string, context?: LogContext, metadataOrError?: Record<string, any> | unknown): void {
     // Critical logs bypass level filtering
+    let metadata: Record<string, any> | undefined;
+    if (typeof metadataOrError === 'object' && metadataOrError !== null) {
+      metadata = metadataOrError as Record<string, any>;
+    } else if (metadataOrError) {
+      metadata = normalizeError(metadataOrError);
+    }
+    
     const entry = this.createLogEntry('critical', message, context, metadata);
     this.storeLogEntry(entry);
     this.outputToConsole(entry, 'error');
@@ -304,7 +350,7 @@ class UnifiedLogger {
    */
   log(obj: object | string, msg?: string, ...args: any[]): void {
     const message = typeof obj === 'string' ? obj : msg || 'Log message';
-    const metadata = typeof obj === 'object' ? obj : undefined;
+    const metadata = typeof obj === 'object' ? { data: obj, extra: args } : { extra: args };
     this.info(message, undefined, metadata);
   }
 

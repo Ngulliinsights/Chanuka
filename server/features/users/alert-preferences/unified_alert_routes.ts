@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth.js';
+import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth';
 import {
   unifiedAlertPreferenceService,
   alertPreferenceSchema,
@@ -7,15 +7,15 @@ import {
   ChannelType,
   Priority,
   DeliveryStatus
-} from './unified_alert_service.js';
+} from './unified_alert_service';
 import { z } from 'zod';
 import { 
   ApiSuccess, 
   ApiError,
   ApiValidationError, 
   ApiResponseWrapper 
-} from "../../utils/api-response.js";
-import { logger } from '../../utils/logger';
+} from "../../../utils/api-response";
+import { logger } from '@shared/utils/logger';
 
 export const router = Router();
 

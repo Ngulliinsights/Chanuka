@@ -5,7 +5,7 @@ import { userPreferencesService, type BillTrackingPreferences } from '../../feat
 import nodemailer from 'nodemailer';
 import { z } from 'zod';
 import * as cron from 'node-cron';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 // Advanced notification interfaces
 export interface NotificationChannel {

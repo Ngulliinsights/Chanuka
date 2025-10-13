@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger.js';
 
 export interface ErrorContext {
   traceId?: string;
@@ -638,9 +638,3 @@ class ErrorTracker {
 
 // Export singleton instance
 export const errorTracker = new ErrorTracker();
-
-
-
-
-
-

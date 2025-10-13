@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { ApiSuccess, ApiError, ApiResponseWrapper } from '../../utils/api-response.js';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../external-data/external-api-manager.js';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 export const router = Router();
 

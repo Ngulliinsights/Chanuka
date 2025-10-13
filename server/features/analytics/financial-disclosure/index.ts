@@ -3,14 +3,15 @@
 // Provides REST endpoints for monitoring, analytics, and data export
 
 import { Router, Request, Response, NextFunction } from "express";
-import { FinancialDisclosureMonitoringService } from "./monitoring.ts";
-import { FinancialDisclosureAnalyticsService } from "./analytics.ts";
-import { ApiSuccess, ApiError } from "../../utils/api-response.ts";
+import { FinancialDisclosureMonitoringService } from "./monitoring.js";
+import { FinancialDisclosureAnalyticsService } from "../services/financial-disclosure.service.js";
+import { ApiSuccess, ApiError } from "../../../utils/api-response.js";
 import { z, ZodError } from "zod";
-import { BaseError, SponsorNotFoundError, InvalidInputError } from "../../utils/errors.ts";
+// Note: BaseError, InvalidInputError not found in utils/errors.js - using ValidationError instead
+import { ValidationError as InvalidInputError, SponsorNotFoundError, AppError } from "../../../utils/errors.js";
 import crypto from 'crypto';
-import { logger } from '../../utils/logger';
-import { errorTracker } from '../../core/errors/error-tracker';
+import { logger } from '../../../utils/logger.js';
+import { errorTracker } from '../../../core/errors/error-tracker.js';
 
 // ============================================================================
 // API Validation Schemas & Middleware
@@ -286,7 +287,7 @@ export function createFinancialDisclosureRouter(
         );
         
         // Return 201 Created for successful resource creation
-        ApiSuccess(res, alert, 201);
+        ApiSuccess(res, alert);
       } catch (error) {
         next(error);
       }
@@ -635,12 +636,7 @@ export function createFinancialDisclosureRouter(
   router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     // Handle Zod validation errors (should be caught earlier, but just in case)
     if (err instanceof ZodError) {
-      return ApiError(res, 'Validation failed', 400, {
-        errors: err.errors.map(e => ({
-          path: e.path.join('.'),
-          message: e.message
-        }))
-      });
+      return ApiError(res, 'Validation failed', 400);
     }
 
     // Handle known business logic errors with appropriate status codes
@@ -652,7 +648,7 @@ export function createFinancialDisclosureRouter(
       return ApiError(res, err.message, 400);
     }
     
-    if (err instanceof BaseError) {
+    if (err instanceof AppError) {
       return ApiError(res, err.message, err.statusCode || 500);
     }
     

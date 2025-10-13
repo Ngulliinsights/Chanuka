@@ -6,7 +6,7 @@ import { notificationChannelService } from './notification-channels.js';
 import { smartNotificationFilterService } from './smart-notification-filter.js';
 import { z } from 'zod';
 import { ApiSuccess, ApiError, ApiValidationError } from "../../utils/api-response.js";
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 export const router = Router();
 

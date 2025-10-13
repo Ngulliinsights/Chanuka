@@ -5,13 +5,13 @@
 
 import {
   sponsors, sponsorTransparency, sponsorAffiliations
-} from "../../../shared/schema.js";
+} from "@shared/schema.js";
 import { eq, desc, and, sql, count } from "drizzle-orm";
-import { readDatabase } from "../../../shared/database/connection.js";
-import { cache } from '../../../utils/cache';
-import { logger } from '../../utils/logger.js';
-import { SponsorNotFoundError, DatabaseError } from '../../utils/errors.js';
-import { FinancialDisclosureConfig } from '../config/financial-disclosure-config.js';
+import { readDatabase } from "../../../db.js";
+import { cache } from '../../../utils/cache.js';
+import { logger } from '../../../utils/logger.js';
+import { SponsorNotFoundError, DatabaseError } from '../../../utils/errors.js';
+import { FinancialDisclosureConfig } from '../financial-disclosure/config.js';
 import type {
   FinancialDisclosure,
   FinancialRelationship,
@@ -21,7 +21,7 @@ import type {
   TransparencyDashboard,
   SponsorInfo,
   SponsorAffiliation
-} from '../types';
+} from '../types/index.js';
 
 /**
  * Financial Disclosure Analytics Service
@@ -67,7 +67,7 @@ export class FinancialDisclosureAnalyticsService {
         this.config.cache.ttl.disclosureData,
         async () => {
           // Build the query with optional sponsor filtering
-          let query = readDatabase
+          let query = readDatabase()
             .select({
               id: sponsorTransparency.id,
               sponsorId: sponsorTransparency.sponsorId,
@@ -432,7 +432,7 @@ export class FinancialDisclosureAnalyticsService {
     }
 
     // Analyze each entity for conflicting relationship types
-    for (const [entity, rels] of entityMap.entries()) {
+    for (const [entity, rels] of Array.from(entityMap.entries())) {
       if (rels.length < 2) continue;
 
       // Check for ownership/business + investment conflicts
@@ -593,7 +593,7 @@ export class FinancialDisclosureAnalyticsService {
         }
       );
     } catch (error) {
-      logger.error('Error generating dashboard:', error);
+      logger.error('Error generating dashboard:', undefined, error);
       throw new DatabaseError('Failed to generate transparency dashboard');
     }
   }
@@ -602,7 +602,7 @@ export class FinancialDisclosureAnalyticsService {
    * Retrieves basic statistics about active sponsors in the system.
    */
   private async getSponsorStatistics() {
-    const result = await readDatabase
+    const result = await readDatabase()
       .select({ total: count() })
       .from(sponsors)
       .where(eq(sponsors.isActive, true));
@@ -615,7 +615,7 @@ export class FinancialDisclosureAnalyticsService {
    * and verification status.
    */
   private async getDisclosureStatistics() {
-    const stats = await readDatabase
+    const stats = await readDatabase()
       .select({
         disclosureType: sponsorTransparency.disclosureType,
         total: count(),
@@ -653,7 +653,7 @@ export class FinancialDisclosureAnalyticsService {
    * In production, consider implementing pagination or sampling strategies.
    */
   private async getRiskDistribution() {
-    const activeSponsors = await readDatabase
+    const activeSponsors = await readDatabase()
       .select({ id: sponsors.id })
       .from(sponsors)
       .where(eq(sponsors.isActive, true))
@@ -680,7 +680,7 @@ export class FinancialDisclosureAnalyticsService {
    * completeness scores and risk assessments.
    */
   private async getPerformanceMetrics() {
-    const activeSponsors = await readDatabase
+    const activeSponsors = await readDatabase()
       .select({ id: sponsors.id, name: sponsors.name })
       .from(sponsors)
       .where(eq(sponsors.isActive, true))
@@ -1022,7 +1022,7 @@ export class FinancialDisclosureAnalyticsService {
       cacheKey,
       this.config.cache.ttl.sponsorInfo,
       async () => {
-        const result = await readDatabase
+        const result = await readDatabase()
           .select({
             id: sponsors.id,
             name: sponsors.name,
@@ -1046,12 +1046,12 @@ export class FinancialDisclosureAnalyticsService {
    */
   private async getAffiliations(sponsorId: number): Promise<SponsorAffiliation[]> {
     try {
-      return await readDatabase
+      return await readDatabase()
         .select()
         .from(sponsorAffiliations)
         .where(eq(sponsorAffiliations.sponsorId, sponsorId));
     } catch (error) {
-      logger.warn('Failed to fetch affiliations:', { sponsorId }, error);
+      logger.warn('Failed to fetch affiliations:', { sponsorId, error });
       return [];
     }
   }

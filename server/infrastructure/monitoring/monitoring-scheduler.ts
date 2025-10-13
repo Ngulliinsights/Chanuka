@@ -1,5 +1,5 @@
 import { financialDisclosureMonitoringService } from '../../features/analytics/financial-disclosure/monitoring.js';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 /**
  * Monitoring scheduler service to manage automated background tasks

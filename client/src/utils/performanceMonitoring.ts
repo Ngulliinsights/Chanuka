@@ -1,4 +1,5 @@
 // Performance monitoring utilities for the Chanuka platform
+import { logger } from '@shared/utils/logger';
 
 export interface PerformanceMetrics {
   // Core Web Vitals
@@ -23,18 +24,19 @@ export interface PerformanceMetrics {
   totalBlockingTime?: number;
 }
 
-export interface PerformanceEntry {
+export interface PerformanceLogEntry {
   name: string;
   value: number;
   timestamp: number;
   url: string;
   userAgent: string;
   connectionType?: string;
+  metadata?: any;
 }
 
 class PerformanceMonitor {
   private metrics: PerformanceMetrics = {};
-  private entries: PerformanceEntry[] = [];
+  private entries: PerformanceLogEntry[] = [];
   private observer: PerformanceObserver | null = null;
   private navigationStartTime = performance.now();
 
@@ -50,11 +52,11 @@ class PerformanceMonitor {
     }
 
     try {
-      this.observer = new PerformanceObserver((list) => {
-        for (const entry of list.getEntries()) {
-          this.processPerformanceEntry(entry);
-        }
-      });
+        this.observer = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            this.processPerformanceEntry(entry as any);
+          }
+        });
 
       // Observe different types of performance entries
       this.observer.observe({ entryTypes: ['navigation', 'paint', 'largest-contentful-paint', 'first-input', 'layout-shift'] });
@@ -63,7 +65,7 @@ class PerformanceMonitor {
     }
   }
 
-  private processPerformanceEntry(entry: PerformanceEntry): void {
+  private processPerformanceEntry(entry: any): void {
     switch (entry.entryType) {
       case 'navigation':
         this.processNavigationEntry(entry as PerformanceNavigationTiming);
@@ -179,7 +181,7 @@ class PerformanceMonitor {
     }
   }
 
-  private recordMetric(name: string, value: number): void {
+  public recordMetric(name: string, value: number | undefined, metadata?: any): void {
     // Prevent duplicate entries for the same metric within a short time window
     const recentEntry = this.entries.find(entry => 
       entry.name === name && 
@@ -190,13 +192,14 @@ class PerformanceMonitor {
       return;
     }
 
-    const entry: PerformanceEntry = {
+    const entry: PerformanceLogEntry = {
       name,
-      value,
+      value: value ?? 0,
       timestamp: Date.now(),
       url: window.location.href,
       userAgent: navigator.userAgent,
       connectionType: this.getConnectionType(),
+      metadata
     };
 
     this.entries.push(entry);
@@ -208,7 +211,11 @@ class PerformanceMonitor {
 
     // Log in development
     if (process.env.NODE_ENV === 'development') {
-      console.log(`Performance: ${name} = ${value.toFixed(2)}ms`);
+      if (typeof value === 'number') {
+        console.log(`Performance: ${name} = ${value.toFixed(2)}ms`);
+      } else {
+        console.log(`Performance: ${name} = ${String(value)}ms`);
+      }
     }
   }
 
@@ -256,9 +263,12 @@ class PerformanceMonitor {
     return { ...this.metrics };
   }
 
-  public getEntries(): PerformanceEntry[] {
+  // Return our logged entries with a distinct API to avoid conflict with DOM PerformanceEntry
+  public getLoggedEntries(): PerformanceLogEntry[] {
     return [...this.entries];
   }
+
+  // NOTE: use getLoggedEntries() for strongly-typed logged entries.
 
   public getCoreWebVitals(): { lcp?: number; fid?: number; cls?: number } {
     return {

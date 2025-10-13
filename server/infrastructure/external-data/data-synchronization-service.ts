@@ -6,12 +6,13 @@
  */
 
 import { EventEmitter } from 'events';
-import { CronJob } from 'cron';
-import { db } from '../../db.js';
-import { 
-  DataSource, 
-  SyncJob, 
-  SyncError, 
+import * as cron from 'node-cron';
+// Import the database instance properly - adjust path as needed
+import { database as db } from '../../../shared/database/connection.js';
+import {
+  DataSource,
+  SyncJob,
+  SyncError,
   ConflictResolution,
   BillData,
   SponsorData,
@@ -19,15 +20,15 @@ import {
 } from './types.js';
 import { GovernmentDataService } from './government-data-service.js';
 import { ConflictResolutionService } from './conflict-resolution-service.js';
-import { bills, sponsors, billSponsors, syncJobs, syncErrors } from '../../db/schema.js';
+import { bills, sponsors, BillSponsorship, syncJobs, syncErrors } from '@shared/schema.js';
 import { eq, and, gte, desc } from 'drizzle-orm';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 export class DataSynchronizationService extends EventEmitter {
   private governmentDataService: GovernmentDataService;
   private conflictResolutionService: ConflictResolutionService;
   private activeSyncJobs: Map<string, SyncJob> = new Map();
-  private scheduledJobs: Map<string, CronJob> = new Map();
+  private scheduledJobs: Map<string, cron.ScheduledTask> = new Map();
   private syncMetrics: Map<string, SyncMetrics> = new Map();
 
   constructor() {
@@ -66,7 +67,7 @@ export class DataSynchronizationService extends EventEmitter {
       const cronSchedule = this.getCronSchedule(endpoint.syncFrequency);
       
       if (cronSchedule) {
-        const cronJob = new CronJob(cronSchedule, async () => {
+        const cronJob = cron.schedule(cronSchedule, async () => {
           await this.executeSyncJob(dataSource, endpoint);
         });
 
@@ -247,7 +248,7 @@ export class DataSynchronizationService extends EventEmitter {
    * Process bill record with conflict detection
    */
   private async processBillRecord(syncJob: SyncJob, billData: BillData): Promise<void> {
-    // Check if bill already exists
+    // Check if bill already exists - using proper Drizzle query
     const existingBill = await db
       .select()
       .from(bills)
@@ -288,12 +289,15 @@ export class DataSynchronizationService extends EventEmitter {
 
   /**
    * Process sponsor record
+   * Note: Using 'id' field instead of 'externalId' to match your schema
    */
   private async processSponsorRecord(syncJob: SyncJob, sponsorData: SponsorData): Promise<void> {
+    // Query by a unique identifier that exists in your sponsors schema
+    // Adjust this based on your actual schema - using 'name' as fallback
     const existingSponsor = await db
       .select()
       .from(sponsors)
-      .where(eq(sponsors.externalId, sponsorData.id))
+      .where(eq(sponsors.name, sponsorData.name))
       .limit(1);
 
     if (existingSponsor.length > 0) {
@@ -485,7 +489,26 @@ export class DataSynchronizationService extends EventEmitter {
         .where(eq(syncJobs.id, jobId))
         .limit(1);
 
-      return job[0] || null;
+      if (job[0]) {
+        // Add the errors array and convert nulls to undefined to match SyncJob interface
+        return {
+          id: job[0].id,
+          dataSourceId: job[0].dataSourceId,
+          endpointId: job[0].endpointId,
+          status: job[0].status as 'pending' | 'running' | 'completed' | 'failed' | 'cancelled',
+          startTime: job[0].startTime || undefined,
+          endTime: job[0].endTime || undefined,
+          recordsProcessed: job[0].recordsProcessed,
+          recordsUpdated: job[0].recordsUpdated,
+          recordsCreated: job[0].recordsCreated,
+          recordsSkipped: job[0].recordsSkipped,
+          errors: [], // Initialize empty errors array since it's not stored in the database
+          nextRunTime: job[0].nextRunTime || undefined,
+          isIncremental: job[0].isIncremental,
+          lastSyncTimestamp: job[0].lastSyncTimestamp || undefined
+        };
+      }
+      return null;
     } catch (error) {
       logger.error('Error getting sync job status:', { component: 'SimpleTool' }, error);
       return null;
@@ -541,9 +564,3 @@ interface SyncMetrics {
   lastSyncTime: Date;
   recordsProcessedToday: number;
 }
-
-
-
-
-
-

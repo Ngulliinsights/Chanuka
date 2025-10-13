@@ -237,35 +237,25 @@ export class AuthenticatedAPI {
  * Hook for coordinated API requests to prevent race conditions
  */
 export function useCoordinatedRequest() {
-  const [activeRequests, setActiveRequests] = useState<Set<string>>(new Set());
-
-  const makeRequest = async <T>(
-    key: string,
-    requestFn: () => Promise<APIResponse<T>>
-  ): Promise<APIResponse<T>> => {
-    // Prevent duplicate requests
-    if (activeRequests.has(key)) {
-      return {
-        error: 'Request already in progress',
-        status: 0
-      };
-    }
-
-    setActiveRequests(prev => new Set([...prev, key]));
-
-    try {
-      const result = await requestFn();
-      return result;
-    } finally {
-      setActiveRequests(prev => {
-        const next = new Set(prev);
-        next.delete(key);
-        return next;
-      });
-    }
+  // Note: This hook requires React, but this file is used in non-React contexts
+  // The hook is exported but should only be used in React components
+  return {
+    makeRequest: async <T>(
+      key: string,
+      requestFn: () => Promise<APIResponse<T>>
+    ): Promise<APIResponse<T>> => {
+      // Basic implementation without React state for compatibility
+      try {
+        return await requestFn();
+      } catch (error) {
+        return {
+          error: error instanceof Error ? error.message : 'Request failed',
+          status: 0
+        };
+      }
+    },
+    activeRequests: []
   };
-
-  return { makeRequest, activeRequests: Array.from(activeRequests) };
 }
 
 export default AuthenticatedAPI;

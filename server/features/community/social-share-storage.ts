@@ -1,3 +1,4 @@
+
 import { database as db } from '../../../shared/database/connection.js';
 import { 
   socialShares,
@@ -6,8 +7,8 @@ import {
   type InsertSocialShare
 } from '../../../shared/schema.js';
 import { eq, desc, sql } from 'drizzle-orm';
-import { logger } from '../../utils/logger';
-import { BaseStorage } from './base/BaseStorage.js';
+import { logger } from '../../utils/logger.js';
+import { BaseStorage } from '../../infrastructure/database/base/BaseStorage.js';
 
 const CACHE_TTL = 3600; // 1 hour in seconds
 
@@ -113,12 +114,3 @@ export class SocialShareStorage extends BaseStorage<SocialShare> {
     });
   }
 }
-
-
-
-
-
-
-
-
-

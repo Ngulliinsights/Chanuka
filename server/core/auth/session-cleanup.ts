@@ -1,5 +1,5 @@
 import { authService } from './auth-service.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger.js';
 
 export class SessionCleanupService {
   private cleanupInterval: NodeJS.Timeout | null = null;
@@ -66,9 +66,3 @@ export class SessionCleanupService {
 }
 
 export const sessionCleanupService = new SessionCleanupService();
-
-
-
-
-
-

@@ -1,49 +1,110 @@
-import { db } from '../../db/index.js';
-import { eq, sql, and, desc, count } from 'drizzle-orm';
+import { db } from '../../db.js';
+import { eq, sql, and, desc, count, ilike } from 'drizzle-orm';
 import { bills, analysis, evaluations, departments } from '../../../shared/schema.js';
-import type { Candidate, DepartmentStat, RadarDatum, EvaluationData } from '../../../shared/schema.js';
-import { logger } from '../../utils/logger';
-import { errorTracker } from '../core/errors/error-tracker';
+import type { DepartmentStat, RadarDatum } from '../../../shared/schema.js';
+import { logger } from '../../utils/logger.js';
+import { errorTracker } from '../../core/errors/error-tracker.js';
 
-// Enhanced cache interface with better type safety
+/**
+ * Type definitions for domain entities.
+ * These should ideally be exported from your schema file.
+ */
+interface Candidate {
+  id: number;
+  candidateName: string;
+  departmentId: number;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  relation?: any;
+  department?: {
+    id: number;
+    name: string;
+  };
+  competencyAssessment?: Array<{
+    id: number;
+    score: number;
+    lastUpdated: Date;
+    category: string;
+  }>;
+}
+
+interface EvaluationData {
+  candidateName: string;
+  departmentId: number;
+  status?: string;
+}
+
+/**
+ * Cache entry structure with metadata for tracking usage and freshness.
+ */
 interface CacheEntry<T> {
   data: T;
   timestamp: number;
-  hits: number; // Track cache usage for optimization
+  hits: number;
 }
 
-// Cache configuration with environment-based TTL
+/**
+ * Configuration for the caching layer.
+ * Shorter TTL in development for faster iteration.
+ */
 const CACHE_CONFIG = {
-  TTL: process.env.NODE_ENV === 'production' ? 5 * 60 * 1000 : 30 * 1000, // 5min prod, 30s dev
-  MAX_SIZE: 100, // Prevent memory leaks
-  CLEANUP_INTERVAL: 10 * 60 * 1000, // Clean up every 10 minutes
-};
+  TTL: process.env.NODE_ENV === 'production' ? 5 * 60 * 1000 : 30 * 1000,
+  MAX_SIZE: 100,
+  CLEANUP_INTERVAL: 10 * 60 * 1000,
+} as const;
 
-// Valid statuses as a readonly constant to prevent mutations
+/**
+ * Valid evaluation status values.
+ * Using 'as const' ensures type safety and prevents mutations.
+ */
 const VALID_STATUSES = ['Under Review', 'Approved', 'Rejected', 'On Hold'] as const;
 type ValidStatus = typeof VALID_STATUSES[number];
 
+/**
+ * Helper to safely capture errors with the error tracker.
+ * This handles cases where the error tracker might not have the capture method.
+ */
+function safeErrorCapture(error: Error, context: Record<string, any>): void {
+  try {
+    // Type-safe check for the capture method
+    if (errorTracker && typeof errorTracker === 'object' && 'capture' in errorTracker) {
+      const tracker = errorTracker as { capture: (error: Error, context: Record<string, any>) => void };
+      tracker.capture(error, context);
+    }
+  } catch (captureError) {
+    // If error capture itself fails, log it but don't throw
+    logger.warn('Failed to capture error with error tracker', { 
+      originalError: error.message,
+      captureError 
+    });
+  }
+}
+
+/**
+ * Dashboard storage service that handles all database operations
+ * for the analytics dashboard with intelligent caching.
+ */
 class DashboardStorageService {
   private cache = new Map<string, CacheEntry<any>>();
   private cleanupTimer: NodeJS.Timeout | null = null;
 
   constructor() {
-    // Start automatic cache cleanup to prevent memory leaks
     this.startCacheCleanup();
   }
 
   /**
-   * Automatic cache cleanup to prevent memory accumulation
-   * Removes expired entries and enforces size limits
+   * Starts a periodic cleanup process that removes stale cache entries
+   * and enforces size limits to prevent unbounded memory growth.
    */
   private startCacheCleanup(): void {
-    if (this.cleanupTimer) return; // Prevent multiple timers
+    if (this.cleanupTimer) return;
 
     this.cleanupTimer = setInterval(() => {
       const now = Date.now();
       const expiredKeys: string[] = [];
 
-      // Identify expired entries
+      // Identify all expired entries based on TTL
       for (const [key, entry] of this.cache.entries()) {
         if (now - entry.timestamp > CACHE_CONFIG.TTL) {
           expiredKeys.push(key);
@@ -53,19 +114,20 @@ class DashboardStorageService {
       // Remove expired entries
       expiredKeys.forEach(key => this.cache.delete(key));
 
-      // Enforce size limit by removing least recently used entries
+      // If cache exceeds max size, remove oldest entries
       if (this.cache.size > CACHE_CONFIG.MAX_SIZE) {
-        const entries = Array.from(this.cache.entries())
-          .sort((a, b) => a[1].timestamp - b[1].timestamp) // Sort by timestamp
-          .slice(0, this.cache.size - CACHE_CONFIG.MAX_SIZE);
-
-        entries.forEach(([key]) => this.cache.delete(key));
+        const sortedEntries = Array.from(this.cache.entries())
+          .sort((a, b) => a[1].timestamp - b[1].timestamp);
+        
+        const entriesToRemove = sortedEntries.slice(0, this.cache.size - CACHE_CONFIG.MAX_SIZE);
+        entriesToRemove.forEach(([key]) => this.cache.delete(key));
       }
     }, CACHE_CONFIG.CLEANUP_INTERVAL);
   }
 
   /**
-   * Enhanced cache retrieval with usage tracking
+   * Retrieves data from cache if it exists and hasn't expired.
+   * Also tracks cache hits for monitoring purposes.
    */
   private getCachedData<T>(key: string): T | null {
     const entry = this.cache.get(key);
@@ -77,13 +139,12 @@ class DashboardStorageService {
       return null;
     }
 
-    // Track cache hits for optimization insights
     entry.hits++;
     return entry.data;
   }
 
   /**
-   * Enhanced cache storage with metadata
+   * Stores data in the cache with timestamp metadata.
    */
   private setCachedData<T>(key: string, data: T): void {
     this.cache.set(key, {
@@ -94,15 +155,18 @@ class DashboardStorageService {
   }
 
   /**
-   * Validates evaluation status against allowed values
+   * Type guard that validates whether a string is a valid evaluation status.
    */
   private validateStatus(status: string): status is ValidStatus {
     return VALID_STATUSES.includes(status as ValidStatus);
   }
 
   /**
-   * Fetch candidate evaluations with enhanced filtering and pagination
-   * Now supports more flexible querying with better error handling
+   * Fetches candidate evaluations with flexible filtering, searching, and pagination.
+   * This is the primary method for retrieving evaluation data in the dashboard.
+   * 
+   * The method supports multiple filtering criteria that can be combined, including
+   * status filtering, department filtering, and text search on candidate names.
    */
   async getCandidateEvaluations(
     options: {
@@ -110,8 +174,8 @@ class DashboardStorageService {
       offset?: number;
       status?: string;
       departmentId?: number;
-      searchTerm?: string; // New: support name searching
-      sortBy?: 'createdAt' | 'updatedAt' | 'candidateName'; // New: flexible sorting
+      searchTerm?: string;
+      sortBy?: 'createdAt' | 'updatedAt' | 'candidateName';
       sortOrder?: 'asc' | 'desc';
     } = {},
   ): Promise<{ candidates: Candidate[]; total: number; hasMore: boolean }> {
@@ -126,7 +190,7 @@ class DashboardStorageService {
         sortOrder = 'desc',
       } = options;
 
-      // Input validation
+      // Validate input bounds to prevent abuse
       if (limit > 1000) {
         throw new Error('Limit cannot exceed 1000 records');
       }
@@ -135,60 +199,76 @@ class DashboardStorageService {
         throw new Error(`Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`);
       }
 
-      // Build dynamic where conditions
-      const whereConditions = [];
-      if (status) whereConditions.push(eq(evaluations.status, status));
-      if (departmentId) whereConditions.push(eq(evaluations.departmentId, departmentId));
+      // Build WHERE clause conditions dynamically based on provided filters
+      const whereConditions: any[] = [];
+      
+      if (status) {
+        whereConditions.push(eq(evaluations.status, status));
+      }
+      
+      if (departmentId) {
+        whereConditions.push(eq(evaluations.departmentId, departmentId));
+      }
+      
       if (searchTerm) {
-        // Add case-insensitive search capability
-        whereConditions.push(
-          sql`LOWER(${evaluations.candidateName}) LIKE LOWER(${'%' + searchTerm + '%'})`,
-        );
+        // Using ilike for case-insensitive search (PostgreSQL)
+        // If you're using a different database, you might need to adjust this
+        whereConditions.push(ilike(evaluations.candidateName, `%${searchTerm}%`));
       }
 
-      // Build order by clause
+      // Combine all conditions with AND, or use undefined if no conditions
+      const whereClause = whereConditions.length > 0 
+        ? and(...whereConditions) 
+        : undefined;
+
+      // Build ORDER BY clause based on sort parameters
       const orderByClause = sortOrder === 'desc' 
         ? desc(evaluations[sortBy])
         : evaluations[sortBy];
 
-      // Execute optimized parallel queries
+      // Execute both queries in parallel for better performance
+      // We fetch limit+1 records to determine if there are more pages
       const [results, countResult] = await Promise.all([
-        db.query.evaluations.findMany({
+          db().query.evaluations.findMany({
           with: {
-            relation: true,
             department: {
-              columns: { id: true, name: true }, // Limit department data
+              columns: { id: true, name: true },
             },
             competencyAssessment: {
               columns: {
                 id: true,
                 score: true,
                 lastUpdated: true,
-                category: true, // Include category for better UX
+                category: true,
               },
             },
           },
-          where: whereConditions.length ? and(...whereConditions) : undefined,
-          limit: limit + 1, // Fetch one extra to check if there are more
+          where: whereClause,
+          limit: limit + 1,
           offset,
           orderBy: orderByClause,
         }),
-        db.select({ count: count() }).from(evaluations)
-          .where(whereConditions.length ? and(...whereConditions) : undefined),
+          db().select({ count: count() })
+            .from(evaluations)
+            .where(whereClause),
       ]);
 
-      // Check if there are more results
+      // Determine if there are more results beyond this page
       const hasMore = results.length > limit;
       const candidates = hasMore ? results.slice(0, limit) : results;
 
       return {
-        candidates,
-        total: countResult[0].count,
+        candidates: candidates as Candidate[],
+        total: countResult[0]?.count || 0,
         hasMore,
       };
     } catch (error) {
-      logger.error('Error fetching evaluations:', { component: 'SimpleTool' }, error);
-      // Provide more specific error information
+      logger.error('Error fetching evaluations', { 
+        component: 'SimpleTool',
+        options,
+        error: error instanceof Error ? error.message : String(error)
+      });
+      
       if (error instanceof Error) {
         throw new Error(`Failed to fetch evaluations: ${error.message}`);
       }
@@ -197,28 +277,34 @@ class DashboardStorageService {
   }
 
   /**
-   * Create evaluation with enhanced validation and conflict resolution
+   * Creates a new evaluation record in the database.
+   * If a duplicate exists (same candidate name and department), it updates instead.
+   * 
+   * This upsert behavior prevents duplicate entries while allowing updates
+   * to existing evaluations when re-submitted.
    */
   async createEvaluation(data: EvaluationData): Promise<number> {
     try {
-      // Enhanced validation
+      // Validate required fields
       if (!data.candidateName?.trim()) {
         throw new Error('Candidate name is required and cannot be empty');
       }
+      
       if (!data.departmentId || data.departmentId <= 0) {
         throw new Error('Valid department ID is required');
       }
 
-      // Sanitize input data
+      // Prepare data with defaults and timestamps
       const sanitizedData = {
         ...data,
         candidateName: data.candidateName.trim(),
         createdAt: new Date(),
         updatedAt: new Date(),
-        status: 'Under Review' as const,
+        status: (data.status as ValidStatus) || 'Under Review',
       };
 
-      const result = await db
+      // Insert with conflict resolution (upsert)
+      const result = await db()
         .insert(evaluations)
         .values(sanitizedData)
         .onConflictDoUpdate({
@@ -231,15 +317,20 @@ class DashboardStorageService {
         .returning({ id: evaluations.id });
 
       if (!result[0]?.id) {
-        throw new Error('Failed to create evaluation: No ID returned');
+        throw new Error('Failed to create evaluation: No ID returned from database');
       }
 
-      // Invalidate related caches
+      // Invalidate related caches since data has changed
       this.invalidateRelatedCaches(['departmentStats']);
 
       return result[0].id;
     } catch (error) {
-      logger.error('Error creating evaluation:', { component: 'SimpleTool' }, error);
+      logger.error('Error creating evaluation', { 
+        component: 'SimpleTool',
+        data: { ...data, candidateName: data.candidateName?.substring(0, 50) }, // Truncate for logging
+        error: error instanceof Error ? error.message : String(error)
+      });
+      
       if (error instanceof Error) {
         throw new Error(`Failed to create evaluation: ${error.message}`);
       }
@@ -248,21 +339,27 @@ class DashboardStorageService {
   }
 
   /**
-   * Update evaluation status with enhanced validation and optimistic updates
+   * Updates the status of an existing evaluation.
+   * This validates the status value and checks that the evaluation exists
+   * before performing the update.
+   * 
+   * The method is idempotent - if the status is already set to the target value,
+   * it returns success without making a database call.
    */
   async updateEvaluationStatus(id: number, status: string): Promise<boolean> {
     try {
-      // Enhanced validation
+      // Validate the evaluation ID
       if (!id || id <= 0) {
         throw new Error('Valid evaluation ID is required');
       }
 
+      // Validate the status value against allowed values
       if (!this.validateStatus(status)) {
         throw new Error(`Invalid status. Must be one of: ${VALID_STATUSES.join(', ')}`);
       }
 
-      // Check if evaluation exists before updating
-      const existingEvaluation = await db.query.evaluations.findFirst({
+      // Check if the evaluation exists and get its current status
+  const existingEvaluation = await db().query.evaluations.findFirst({
         where: eq(evaluations.id, id),
         columns: { id: true, status: true },
       });
@@ -271,12 +368,13 @@ class DashboardStorageService {
         throw new Error(`Evaluation with ID ${id} not found`);
       }
 
-      // Skip update if status is the same
+      // Skip the database update if status hasn't changed (idempotency)
       if (existingEvaluation.status === status) {
         return true;
       }
 
-      const result = await db
+      // Perform the status update
+      const result = await db()
         .update(evaluations)
         .set({
           status,
@@ -287,30 +385,41 @@ class DashboardStorageService {
 
       const success = result.length > 0;
 
-      // Invalidate related caches on successful update
+      // Clear related caches on successful update
       if (success) {
         this.invalidateRelatedCaches(['departmentStats']);
       }
 
       return success;
     } catch (error) {
-      logger.error(`Error updating evaluation status to ${status}`, { component: 'dashboard', status, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
-      try {
-        if ((errorTracker as any)?.capture) {
-          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'dashboard', operation: 'updateEvaluationStatus', status });
-        }
-      } catch (reportErr) {
-        logger.warn('Failed to report dashboard updateEvaluationStatus error to errorTracker', { reportErr });
-      }
-      if (error instanceof Error) {
-        throw new Error(`Failed to update evaluation status: ${error.message}`);
-      }
-      throw new Error('Failed to update evaluation status: Unknown error');
+      const err = error instanceof Error ? error : new Error(String(error));
+      
+      logger.error('Error updating evaluation status', {
+        component: 'dashboard',
+        evaluationId: id,
+        targetStatus: status,
+        error: err.message,
+      });
+      
+      // Safely attempt to capture error in tracking system
+      safeErrorCapture(err, {
+        component: 'dashboard',
+        operation: 'updateEvaluationStatus',
+        evaluationId: id,
+        status,
+      });
+
+      throw new Error(`Failed to update evaluation status: ${err.message}`);
     }
   }
 
   /**
-   * Get department statistics with intelligent caching and fallback
+   * Retrieves aggregated statistics for all departments.
+   * This calculates the ratio of relation-based hires to total hires,
+   * which can be used to analyze hiring patterns.
+   * 
+   * Results are cached aggressively since department statistics
+   * don't change frequently.
    */
   async getDepartmentStats(): Promise<DepartmentStat[]> {
     const cacheKey = 'departmentStats';
@@ -321,8 +430,8 @@ class DashboardStorageService {
     }
 
     try {
-      // Optimized query with better joins and aggregations
-      const result = await db.query.departments.findMany({
+      // Fetch all departments with their associated hire records
+  const result = await db().query.departments.findMany({
         columns: {
           id: true,
           name: true,
@@ -337,40 +446,55 @@ class DashboardStorageService {
         },
       });
 
-      // Process data with better error handling
-      const stats = result.map(dept => {
-        const relationHires = dept.hires.filter(h => h.relationType && h.relationType !== 'None').length;
+      // Calculate statistics for each department
+      const stats: DepartmentStat[] = result.map(dept => {
+        // Count hires that came through relationships (excluding 'None')
+        const relationHires = dept.hires.filter(
+          h => h.relationType && h.relationType !== 'None'
+        ).length;
+        
         const totalHires = dept.hires.length;
 
+        // Calculate the relationship hire ratio
         return {
           name: dept.name,
           relationHires,
           totalHires,
-          score: totalHires > 0 ? Number((relationHires / totalHires).toFixed(3)) : 0,
+          score: totalHires > 0 
+            ? Number((relationHires / totalHires).toFixed(3)) 
+            : 0,
         };
       });
 
-      // Cache the processed data
+      // Cache the computed statistics
       this.setCachedData(cacheKey, stats);
 
       return stats;
     } catch (error) {
-      logger.error('Error fetching department statistics:', { component: 'dashboard', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
-      try {
-        if ((errorTracker as any)?.capture) {
-          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'dashboard', operation: 'getDepartmentStats' });
-        }
-      } catch (reportErr) {
-        logger.warn('Failed to report getDepartmentStats error to errorTracker', { reportErr });
-      }
-      // Fallback to empty array with warning rather than throwing
+      const err = error instanceof Error ? error : new Error(String(error));
+      
+      logger.error('Error fetching department statistics', {
+        component: 'dashboard',
+        error: err.message,
+      });
+
+      // Attempt to capture in error tracking system
+      safeErrorCapture(err, {
+        component: 'dashboard',
+        operation: 'getDepartmentStats',
+      });
+
+      // Return empty array as graceful degradation rather than throwing
       logger.warn('Returning empty department statistics due to error');
       return [];
     }
   }
 
   /**
-   * Get competency metrics with enhanced error handling and caching
+   * Retrieves competency assessment metrics for a specific candidate.
+   * This data is used to generate radar charts showing how the candidate
+   * compares to department averages and industry standards across
+   * different competency categories.
    */
   async getCompetencyMetrics(candidateId: number): Promise<RadarDatum[]> {
     try {
@@ -378,7 +502,7 @@ class DashboardStorageService {
         throw new Error('Valid candidate ID is required');
       }
 
-      // Try cache first for frequently accessed data
+      // Check cache first for frequently accessed candidate data
       const cacheKey = `competencyMetrics:${candidateId}`;
       const cached = this.getCachedData<RadarDatum[]>(cacheKey);
 
@@ -386,7 +510,8 @@ class DashboardStorageService {
         return cached;
       }
 
-      const candidate = await db.query.evaluations.findFirst({
+      // Fetch the candidate with their competency assessments
+  const candidate = await db().query.evaluations.findFirst({
         where: eq(evaluations.id, candidateId),
         with: {
           competencyAssessment: {
@@ -404,41 +529,51 @@ class DashboardStorageService {
         throw new Error(`Candidate with ID ${candidateId} not found`);
       }
 
-      // Transform data with validation
-      const metrics = candidate.competencyAssessment?.map(assessment => ({
+      // Transform the assessment data into radar chart format
+      // We clamp scores to 0-100 range to prevent display issues
+      const metrics: RadarDatum[] = candidate.competencyAssessment?.map(assessment => ({
         subject: assessment.category || 'Unknown',
-        candidate: Math.max(0, Math.min(100, assessment.score || 0)), // Clamp between 0-100
+        candidate: Math.max(0, Math.min(100, assessment.score || 0)),
         department: Math.max(0, Math.min(100, assessment.departmentAverage || 0)),
         expected: Math.max(0, Math.min(100, assessment.industryStandard || 0)),
       })) || [];
 
-      // Cache the results
+      // Cache the processed metrics
       this.setCachedData(cacheKey, metrics);
 
       return metrics;
     } catch (error) {
-      logger.error(`Error fetching competency metrics for candidate ${candidateId}:`, { component: 'dashboard', candidateId, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
-      try {
-        if ((errorTracker as any)?.capture) {
-          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'dashboard', operation: 'getCompetencyMetrics', candidateId });
-        }
-      } catch (reportErr) {
-        logger.warn('Failed to report getCompetencyMetrics error to errorTracker', { reportErr });
-      }
-      if (error instanceof Error) {
-        throw new Error(`Failed to fetch competency metrics: ${error.message}`);
-      }
-      throw new Error('Failed to fetch competency metrics: Unknown error');
+      const err = error instanceof Error ? error : new Error(String(error));
+      
+      logger.error('Error fetching competency metrics', {
+        component: 'dashboard',
+        candidateId,
+        error: err.message,
+      });
+
+      // Capture in error tracking system
+      safeErrorCapture(err, {
+        component: 'dashboard',
+        operation: 'getCompetencyMetrics',
+        candidateId,
+      });
+
+      throw new Error(`Failed to fetch competency metrics: ${err.message}`);
     }
   }
 
   /**
-   * Invalidate specific cache entries when data changes
+   * Invalidates cache entries that match the given keys.
+   * Supports both exact key matching and pattern-based matching
+   * for invalidating groups of related cache entries.
    */
   private invalidateRelatedCaches(cacheKeys: string[]): void {
     cacheKeys.forEach(key => {
+      // Delete the exact key if it exists
       this.cache.delete(key);
-      // Also delete pattern-based caches
+      
+      // If the key contains a colon, treat it as a pattern prefix
+      // This allows invalidating all entries like "competencyMetrics:*"
       if (key.includes(':')) {
         const pattern = key.split(':')[0];
         for (const cacheKey of this.cache.keys()) {
@@ -451,9 +586,15 @@ class DashboardStorageService {
   }
 
   /**
-   * Get cache statistics for monitoring
+   * Returns statistics about cache usage for monitoring and debugging.
+   * This can help identify which cached items are most valuable
+   * and whether the cache is sized appropriately.
    */
-  getCacheStats(): { size: number; hitRate: number; entries: Array<{ key: string; hits: number; age: number }> } {
+  getCacheStats(): {
+    size: number;
+    hitRate: number;
+    entries: Array<{ key: string; hits: number; age: number }>;
+  } {
     const entries = Array.from(this.cache.entries()).map(([key, entry]) => ({
       key,
       hits: entry.hits,
@@ -471,14 +612,15 @@ class DashboardStorageService {
   }
 
   /**
-   * Clear cache for testing or manual refresh
+   * Clears all cached data. Useful for testing or forcing a refresh.
    */
   clearCache(): void {
     this.cache.clear();
   }
 
   /**
-   * Graceful shutdown - cleanup resources
+   * Performs cleanup of resources before shutdown.
+   * This stops the cleanup timer and clears the cache to prevent memory leaks.
    */
   shutdown(): void {
     if (this.cleanupTimer) {
@@ -492,25 +634,18 @@ class DashboardStorageService {
 // Create singleton instance
 export const dashboardStorage = new DashboardStorageService();
 
-// Export utility functions for backward compatibility
+// Export the class as DashboardService for backward compatibility
+export { DashboardStorageService as DashboardService };
+
+// Export utility functions for convenience
 export const clearCache = (): void => {
   dashboardStorage.clearCache();
 };
 
-// Export cache stats for monitoring
 export const getCacheStats = () => {
   return dashboardStorage.getCacheStats();
 };
 
-// Graceful shutdown helper
 export const shutdownDashboardStorage = (): void => {
   dashboardStorage.shutdown();
 };
-
-
-
-
-
-
-
-

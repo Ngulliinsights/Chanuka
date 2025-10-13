@@ -1,6 +1,8 @@
+declare const window: Window & typeof globalThis;
+
 /**
  * Browser Compatibility Checker Component
- * 
+ *
  * This component checks browser compatibility and shows appropriate
  * messages and fallbacks for unsupported browsers.
  */
@@ -8,7 +10,7 @@
 import React, { useEffect, useState } from 'react';
 import { getBrowserInfo, isBrowserSupported, BrowserInfo } from '../../utils/browser-compatibility';
 import { loadPolyfills, getPolyfillStatus } from '../../utils/polyfills';
-import { logger } from '../utils/logger.js';
+import { logger } from '@shared/utils/logger';
 
 interface BrowserCompatibilityCheckerProps {
   children: React.ReactNode;
@@ -108,8 +110,9 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
     try {
       localStorage.clear();
       sessionStorage.clear();
-      if ('caches' in window) {
-        caches.keys().then(names => {
+      // Clear caches if available
+      if (typeof caches !== 'undefined') {
+        caches.keys().then((names: readonly string[]) => {
           names.forEach(name => caches.delete(name));
         }).finally(() => window.location.reload());
       } else {

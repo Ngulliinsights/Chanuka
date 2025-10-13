@@ -155,7 +155,41 @@ export const cache = Object.assign(
     /**
      * Check if key exists in cache
      */
-    has: (key: string) => cacheStore.has(key)
+    has: (key: string) => cacheStore.has(key),
+
+    /**
+     * Get a value from cache
+     */
+    get: (key: string) => {
+      try {
+        const cached = cacheStore.get(key);
+        const now = Date.now();
+        if (cached && (!cached.timestamp || now - cached.timestamp < 3600000)) { // Default 1 hour TTL
+          cacheMetrics.hits++;
+          return cached.value;
+        }
+        cacheMetrics.misses++;
+        return null;
+      } catch (error) {
+        cacheMetrics.errors++;
+        logger.warn('Cache get failed', { key, error });
+        return null;
+      }
+    },
+
+    /**
+     * Set a value in cache
+     */
+    set: (key: string, value: any, ttlSeconds: number = 3600) => {
+      try {
+        cacheStore.set(key, { value, timestamp: Date.now() });
+        cacheMetrics.sets++;
+        logger.debug('Cache set', { key, ttlSeconds });
+      } catch (error) {
+        cacheMetrics.errors++;
+        logger.warn('Cache set failed', { key, error });
+      }
+    }
   },
 );
 

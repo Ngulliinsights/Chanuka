@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { db } from '../db';
-import { bills, sponsors, billSponsorships, sponsorAffiliations } from '../../shared/schema';
+import { bills, sponsors, billSponsorships, sponsorAffiliations } from '@shared/schema';
 import { eq, and, or } from 'drizzle-orm';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/utils/logger';
 
 // Data source configuration
 interface DataSourceConfig {
