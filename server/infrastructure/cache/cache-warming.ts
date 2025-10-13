@@ -39,7 +39,7 @@ export interface WarmingStats {
   }>;
 }
 
-class CacheWarmingService {
+export class CacheWarmingService {
   private warmingRules: Map<string, WarmingRule> = new Map();
   private stats: WarmingStats = {
     totalRules: 0,

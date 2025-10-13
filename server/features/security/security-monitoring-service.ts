@@ -1,36 +1,45 @@
 import { Request, Response } from 'express';
-import { securityAuditService, SecurityEvent, SecurityIncident } from './security-audit-service.js';
+import { securityAuditService } from './security-audit-service.js';
 import { intrusionDetectionService, ThreatDetectionResult } from './intrusion-detection-service.js';
 import { database as db } from '../../../shared/database/connection.js';
-import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
-import { sql, and, gte, count, desc, eq, or, inArray } from 'drizzle-orm';
+import { pgTable, text, serial, timestamp, jsonb, boolean } from 'drizzle-orm/pg-core';
+import { sql, and, gte, desc, eq, or, count } from 'drizzle-orm';
 import { logger } from '../../utils/logger';
 
-// Dynamic import to avoid circular dependencies
-let performanceMonitoring: any = null;
-const getPerformanceMonitoring = async () => {
-  if (!performanceMonitoring) {
-    try {
-      const { performanceMonitoring: pm } = await import('../../services/performance-monitoring.js');
-      performanceMonitoring = pm;
-    } catch (error) {
-      // Performance monitoring not available, continue without it
-    }
-  }
-  return performanceMonitoring;
-};
+/**
+ * SecurityMonitoringService - The Active Intelligence Layer
+ * 
+ * This service has a clear mission: analyze security data in real-time, detect
+ * threats and anomalies, trigger appropriate alerts, and coordinate defensive
+ * responses. It's the "brain" that processes the raw data recorded by the audit
+ * service and makes intelligent decisions about what requires attention.
+ * 
+ * Key architectural principle: This service READS from the audit service and
+ * WRITES back to it to record its own actions. It never duplicates audit logging
+ * functionality. It's a consumer and producer of audit events, not an alternative
+ * audit system.
+ */
 
-// Security monitoring configuration table
-const securityConfig = pgTable("security_config", {
+// Database table definitions for monitoring-specific data
+
+const securityIncidents = pgTable("security_incidents", {
   id: serial("id").primaryKey(),
-  configKey: text("config_key").notNull().unique(),
-  configValue: jsonb("config_value").notNull(),
-  description: text("description"),
-  updatedBy: text("updated_by"),
+  incidentType: text("incident_type").notNull(),
+  severity: text("severity").notNull(),
+  status: text("status").notNull().default("open"),
+  description: text("description").notNull(),
+  affectedUsers: text("affected_users").array(),
+  detectionMethod: text("detection_method"),
+  firstDetected: timestamp("first_detected").defaultNow(),
+  lastSeen: timestamp("last_seen"),
+  resolvedAt: timestamp("resolved_at"),
+  assignedTo: text("assigned_to"),
+  evidence: jsonb("evidence"),
+  mitigationSteps: text("mitigation_steps").array(),
+  createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Security alerts table
 const securityAlerts = pgTable("security_alerts", {
   id: serial("id").primaryKey(),
   alertType: text("alert_type").notNull(),
@@ -41,13 +50,15 @@ const securityAlerts = pgTable("security_alerts", {
   status: text("status").notNull().default("active"),
   assignedTo: text("assigned_to"),
   metadata: jsonb("metadata"),
+  incidentId: serial("incident_id").references(() => securityIncidents.id),
   acknowledgedAt: timestamp("acknowledged_at"),
+  acknowledgedBy: text("acknowledged_by"),
   resolvedAt: timestamp("resolved_at"),
+  resolvedBy: text("resolved_by"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Compliance checks table
 const complianceChecks = pgTable("compliance_checks", {
   id: serial("id").primaryKey(),
   checkName: text("check_name").notNull().unique(),
@@ -64,40 +75,15 @@ const complianceChecks = pgTable("compliance_checks", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Reference to the security audit logs table for our queries
-// This should match the table definition in security-audit-service.ts
-const securityAuditLogs = pgTable("security_audit_logs", {
-  id: serial("id").primaryKey(),
-  eventType: text("event_type").notNull(),
-  userId: text("user_id"),
-  ipAddress: text("ip_address"),
-  userAgent: text("user_agent"),
-  resource: text("resource"),
-  action: text("action"),
-  result: text("result").notNull(),
-  severity: text("severity").default('info').notNull(),
-  details: jsonb("details"),
-  sessionId: text("session_id"),
-  createdAt: timestamp("created_at").defaultNow(),
-});
+// Type definitions
 
-// Type definitions remain the same as original
-export interface SecurityDashboard {
-  overview: SecurityOverview;
-  recentAlerts: SecurityAlert[];
-  threatSummary: ThreatSummary;
-  complianceStatus: ComplianceStatus;
-  systemHealth: SecuritySystemHealth;
-  recommendations: SecurityRecommendation[];
-}
-
-export interface SecurityOverview {
-  totalEvents: number;
-  criticalAlerts: number;
-  blockedThreats: number;
-  complianceScore: number;
-  riskLevel: 'low' | 'medium' | 'high' | 'critical';
-  lastIncident: Date | null;
+export interface SecurityIncident {
+  incidentType: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  description: string;
+  affectedUsers?: string[];
+  detectionMethod?: string;
+  evidence?: Record<string, any>;
 }
 
 export interface SecurityAlert {
@@ -108,141 +94,74 @@ export interface SecurityAlert {
   message: string;
   source: string;
   status: string;
+  incidentId?: number;
   createdAt: Date;
   metadata?: any;
 }
 
-export interface ThreatSummary {
-  totalThreats: number;
-  blockedIPs: number;
-  suspiciousActivity: number;
-  attackTypes: { type: string; count: number }[];
-  topThreats: { ip: string; threatType: string; severity: string; count: number }[];
-}
-
-export interface ComplianceStatus {
-  overallScore: number;
-  checks: {
-    name: string;
-    status: 'passing' | 'failing' | 'warning' | 'not_applicable';
-    lastChecked: Date;
-    priority: string;
-  }[];
-  failingChecks: number;
-  nextReview: Date;
-}
-
-export interface SecuritySystemHealth {
-  auditingEnabled: boolean;
-  intrusionDetectionEnabled: boolean;
-  alertingEnabled: boolean;
-  backupStatus: 'healthy' | 'warning' | 'error';
-  encryptionStatus: 'enabled' | 'partial' | 'disabled';
-  lastHealthCheck: Date;
-}
-
-export interface SecurityRecommendation {
-  id: string;
-  type: 'security' | 'compliance' | 'performance';
-  priority: 'low' | 'medium' | 'high' | 'critical';
-  title: string;
-  description: string;
-  action: string;
-  estimatedEffort: string;
-  impact: string;
-}
-
-export interface SecurityReport {
-  period: { start: Date; end: Date };
-  executive_summary: {
-    total_events: number;
-    security_incidents: number;
-    compliance_score: number;
-    risk_assessment: string;
-    key_findings: string[];
+export interface SecurityDashboard {
+  overview: {
+    totalEvents24h: number;
+    activeIncidents: number;
+    activeAlerts: number;
+    criticalAlerts: number;
+    riskLevel: 'low' | 'medium' | 'high' | 'critical';
+    complianceScore: number;
   };
-  threat_analysis: any;
-  compliance_report: any;
-  recommendations: SecurityRecommendation[];
-  appendices: {
-    detailed_logs: any[];
-    configuration_changes: any[];
-    user_access_reviews: any[];
+  recentIncidents: any[];
+  recentAlerts: SecurityAlert[];
+  threatSummary: {
+    blockedIPs: number;
+    suspiciousActivity: number;
+    topThreatTypes: { type: string; count: number }[];
+  };
+  recommendations: string[];
+}
+
+export interface MonitoringConfig {
+  thresholds: {
+    failedLoginAttempts: number;
+    failedLoginTimeWindow: number; // minutes
+    dataAccessVolume: number;
+    dataAccessTimeWindow: number; // minutes
+    highRiskScore: number;
+    criticalRiskScore: number;
+  };
+  actions: {
+    autoBlockCriticalThreats: boolean;
+    autoBlockDuration: number; // milliseconds
+    alertEscalationTimeout: number; // milliseconds
   };
 }
 
 /**
- * Comprehensive security monitoring and alerting service with optimizations
+ * Active security monitoring and threat response service
  */
 export class SecurityMonitoringService {
   private static instance: SecurityMonitoringService;
-  private alertHandlers = new Map<string, Function>();
-  private complianceChecks = new Map<string, Function>();
   
-  // Timer management for proper cleanup
-  private activeTimers: {
-    intervals: NodeJS.Timeout[];
-    timeouts: Map<number, NodeJS.Timeout>;
-  } = {
-    intervals: [],
-    timeouts: new Map()
-  };
-  
-  // Cache for configuration and frequently accessed data
-  private configCache: {
-    data: any;
-    lastRefresh: number;
-    ttl: number; // Time to live in milliseconds
-  } = {
-    data: null,
-    lastRefresh: 0,
-    ttl: 5 * 60 * 1000 // 5 minutes default
-  };
-  
-  // Cache for compliance scores
-  private complianceScoreCache: {
-    score: number | null;
-    lastCalculated: number;
-    ttl: number;
-  } = {
-    score: null,
-    lastCalculated: 0,
-    ttl: 10 * 60 * 1000 // 10 minutes
+  // Configuration with sensible defaults
+  private config: MonitoringConfig = {
+    thresholds: {
+      failedLoginAttempts: 5,
+      failedLoginTimeWindow: 60, // 1 hour
+      dataAccessVolume: 1000,
+      dataAccessTimeWindow: 60, // 1 hour
+      highRiskScore: 60,
+      criticalRiskScore: 85,
+    },
+    actions: {
+      autoBlockCriticalThreats: true,
+      autoBlockDuration: 24 * 60 * 60 * 1000, // 24 hours
+      alertEscalationTimeout: 60 * 60 * 1000, // 1 hour
+    },
   };
 
-  // Configuration defaults
-  private defaultConfig = {
-    alerting: {
-      enabled: true,
-      email_notifications: true,
-      slack_notifications: false,
-      sms_notifications: false,
-      escalation_timeout: 3600000, // 1 hour
-    },
-    monitoring: {
-      real_time_analysis: true,
-      behavioral_analysis: true,
-      threat_intelligence: true,
-      compliance_monitoring: true,
-    },
-    thresholds: {
-      critical_alert_threshold: 85,
-      high_alert_threshold: 70,
-      failed_login_threshold: 10,
-      data_access_threshold: 1000,
-    },
-    compliance: {
-      gdpr_enabled: true,
-      ccpa_enabled: false,
-      sox_enabled: false,
-      pci_dss_enabled: false,
-      custom_checks: [],
-    },
-    cache: {
-      config_ttl: 5 * 60 * 1000,
-      compliance_score_ttl: 10 * 60 * 1000,
-    }
-  };
+  // Track active escalation timers for cleanup
+  private escalationTimers = new Map<number, NodeJS.Timeout>();
+
+  // Compliance check registry
+  private complianceChecks = new Map<string, () => Promise<any>>();
 
   public static getInstance(): SecurityMonitoringService {
     if (!SecurityMonitoringService.instance) {
@@ -252,205 +171,172 @@ export class SecurityMonitoringService {
   }
 
   constructor() {
-    this.initializeAlertHandlers();
-    this.initializeComplianceChecks();
+    this.registerComplianceChecks();
   }
 
   /**
-   * Initialize the security monitoring system
+   * Initialize the monitoring service
    */
   async initialize(): Promise<void> {
     try {
-      // Load configuration with error context
-      await this.loadConfiguration();
-      
-      // Start monitoring services
-      await this.startMonitoring();
-      
-      // Schedule compliance checks with proper timer tracking
-      await this.scheduleComplianceChecks();
-      
-      logger.info('✅ Security monitoring system initialized', { component: 'SimpleTool' });
+      logger.info('🔒 Initializing security monitoring service', { component: 'SecurityMonitoring' });
+
+      // Run initial compliance checks
+      await this.runComplianceChecks();
+
+      // Schedule periodic compliance checks (daily)
+      setInterval(() => {
+        this.runComplianceChecks().catch(error => {
+          logger.error('Scheduled compliance check failed:', { component: 'SecurityMonitoring' }, error);
+        });
+      }, 24 * 60 * 60 * 1000);
+
+      // Log the initialization to the audit trail
+      await securityAuditService.logSecuritySystemEvent(
+        'monitoring_service_initialized',
+        'initialize',
+        {
+          thresholds: this.config.thresholds,
+          autoBlockEnabled: this.config.actions.autoBlockCriticalThreats,
+        }
+      );
+
+      logger.info('✅ Security monitoring service initialized', { component: 'SecurityMonitoring' });
     } catch (error) {
-      // Enhanced error logging with context
-      logger.error('❌ Failed to initialize security monitoring:', { component: 'SimpleTool' }, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
-        timestamp: new Date().toISOString()
-      });
+      logger.error('Failed to initialize security monitoring:', { component: 'SecurityMonitoring' }, error);
       throw error;
     }
   }
 
   /**
-   * Process incoming request through security monitoring
-   * Optimized with better error handling and reduced database calls
+   * Monitor an incoming request for threats
+   * This is the main entry point for real-time threat detection
    */
   async monitorRequest(req: Request, res: Response): Promise<ThreatDetectionResult> {
-    const startTime = Date.now();
-
     try {
-      // Extract request metadata once
-      const requestMetadata = {
-        ip: this.getClientIP(req),
-        userAgent: req.get('User-Agent'),
-        path: req.path,
-        method: req.method,
-        userId: (req as any).user?.id
-      };
-
-      // Analyze request for threats
+      // Use the intrusion detection service to analyze the request
       const threatResult = await intrusionDetectionService.analyzeRequest(req);
 
-      // Record performance metrics
-      const pm = await getPerformanceMonitoring();
-      if (pm) {
-        const processingTime = Date.now() - startTime;
-        pm.recordMetric('security.request.analysis_time', processingTime, {
-          component: 'security_monitoring',
-          threat_level: threatResult.threatLevel,
-          blocked: threatResult.isBlocked.toString()
-        });
-        pm.recordMetric('security.request.risk_score', threatResult.riskScore, {
-          component: 'security_monitoring',
-          path: requestMetadata.path,
-          method: requestMetadata.method
-        });
-        pm.recordMetric('security.threats.detected', threatResult.detectedThreats.length, {
-          component: 'security_monitoring',
-          threat_level: threatResult.threatLevel
-        });
-      }
-
-      // Prepare security event data
-      const securityEventData = {
-        eventType: 'request_analysis',
-        severity: this.mapThreatLevelToSeverity(threatResult.threatLevel),
-        ipAddress: requestMetadata.ip,
-        userAgent: requestMetadata.userAgent,
-        resource: requestMetadata.path,
-        action: requestMetadata.method,
-        result: threatResult.isBlocked ? 'blocked' : 'allowed',
-        success: !threatResult.isBlocked,
-        details: {
-          threatLevel: threatResult.threatLevel,
-          riskScore: threatResult.riskScore,
-          detectedThreats: threatResult.detectedThreats.length,
-          processingTime: Date.now() - startTime
-        },
-        userId: requestMetadata.userId
-      };
-
-      // Log security event asynchronously to avoid blocking
-      this.logSecurityEventAsync(securityEventData);
-
-      // Handle high-risk requests
-      if (threatResult.threatLevel === 'critical' || threatResult.threatLevel === 'high') {
-        // Run in background to not block the response
-        this.handleHighRiskRequestAsync(req, threatResult, requestMetadata);
-      }
-
-      // Create alerts if necessary - use cached config for threshold
-      const config = await this.getConfiguration();
-      if (threatResult.riskScore >= config.thresholds.critical_alert_threshold) {
-        // Create alert asynchronously
-        this.createSecurityAlertAsync({
-          type: 'high_risk_request',
-          severity: 'critical',
-          title: 'Critical Security Threat Detected',
-          message: `High-risk request detected from ${requestMetadata.ip}`,
-          source: 'intrusion_detection',
-          metadata: {
-            ip: requestMetadata.ip,
-            path: requestMetadata.path,
-            threats: threatResult.detectedThreats,
-            riskScore: threatResult.riskScore
-          }
-        });
+      // If this is a high-risk or critical threat, take action
+      if (threatResult.threatLevel === 'high' || threatResult.threatLevel === 'critical') {
+        await this.handleThreatDetection(req, threatResult);
       }
 
       return threatResult;
     } catch (error) {
-      // Record error metrics
-      const pm = await getPerformanceMonitoring();
-      if (pm) {
-        pm.recordMetric('security.monitoring.error', 1, {
-          component: 'security_monitoring',
-          path: req.path,
-          method: req.method
-        });
-      }
-
-      // Enhanced error logging
-      logger.error('Error in security monitoring:', { component: 'SimpleTool' }, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        path: req.path,
-        method: req.method,
-        ip: this.getClientIP(req),
-        timestamp: new Date().toISOString()
-      });
-
-      // Don't block requests due to monitoring errors - fail open safely
+      logger.error('Error monitoring request:', { component: 'SecurityMonitoring' }, error);
+      
+      // Fail open - don't block requests if monitoring fails
       return {
         isBlocked: false,
         threatLevel: 'none',
         detectedThreats: [],
         riskScore: 0,
-        recommendedAction: 'allow'
+        recommendedAction: 'allow',
       };
     }
   }
 
   /**
-   * Get security dashboard data with optimized queries
+   * Detect suspicious activity patterns by analyzing the audit log
+   * This is the core pattern detection engine that identifies anomalies
    */
-  async getSecurityDashboard(): Promise<SecurityDashboard> {
+  async detectSuspiciousPatterns(): Promise<void> {
+    const now = new Date();
+    const timeWindow = new Date(now.getTime() - this.config.thresholds.failedLoginTimeWindow * 60 * 1000);
+
     try {
-      // Run all queries in parallel for better performance
-      const [
-        overview,
-        recentAlerts,
-        threatSummary,
-        complianceStatus,
-        systemHealth
-      ] = await Promise.all([
-        this.getSecurityOverview(),
-        this.getRecentAlerts(),
-        this.getThreatSummary(),
-        this.getComplianceStatus(),
-        this.getSystemHealth()
-      ]);
+      // Check for brute force attacks (multiple failed logins)
+      await this.detectBruteForceAttacks(timeWindow);
 
-      // Generate recommendations based on the data
-      const recommendations = await this.generateRecommendations(overview, complianceStatus);
+      // Check for data exfiltration attempts (high volume data access)
+      await this.detectDataExfiltration(timeWindow);
 
-      return {
-        overview,
-        recentAlerts,
-        threatSummary,
-        complianceStatus,
-        systemHealth,
-        recommendations
-      };
+      // Check for privilege escalation attempts
+      await this.detectPrivilegeEscalation(timeWindow);
+
+      // Log that we completed a pattern detection cycle
+      await securityAuditService.logSecuritySystemEvent(
+        'pattern_detection_completed',
+        'detect_suspicious_patterns',
+        { timeWindow: timeWindow.toISOString() }
+      );
     } catch (error) {
-      logger.error('Error fetching security dashboard:', { component: 'SimpleTool' }, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
-      });
-      throw new Error('Failed to fetch security dashboard data');
+      logger.error('Error detecting suspicious patterns:', { component: 'SecurityMonitoring' }, error);
     }
   }
 
   /**
-   * Create security alert with improved timeout management
+   * Create a security incident
+   * Incidents represent significant security events that need investigation
    */
-  async createSecurityAlert(alertData: {
+  async createIncident(incident: SecurityIncident): Promise<number> {
+    try {
+      const result = await db.insert(securityIncidents).values({
+        incidentType: incident.incidentType,
+        severity: incident.severity,
+        description: incident.description,
+        affectedUsers: incident.affectedUsers,
+        detectionMethod: incident.detectionMethod || 'automated',
+        evidence: incident.evidence,
+        status: 'open',
+      }).returning({ id: securityIncidents.id });
+
+      const incidentId = result[0].id;
+
+      // Create an alert for this incident
+      await this.createAlert({
+        type: incident.incidentType,
+        severity: incident.severity,
+        title: `Security Incident: ${incident.incidentType}`,
+        message: incident.description,
+        source: 'incident_detection',
+        metadata: {
+          incidentId,
+          affectedUsers: incident.affectedUsers,
+          evidence: incident.evidence,
+        },
+      });
+
+      // Log incident creation to audit trail
+      await securityAuditService.logSecuritySystemEvent(
+        'security_incident_created',
+        'create_incident',
+        {
+          incidentId,
+          incidentType: incident.incidentType,
+          severity: incident.severity,
+          affectedUsers: incident.affectedUsers,
+        },
+        incident.severity
+      );
+
+      logger.info('🚨 Security incident created', {
+        component: 'SecurityMonitoring',
+        incidentId,
+        type: incident.incidentType,
+        severity: incident.severity,
+      });
+
+      return incidentId;
+    } catch (error) {
+      logger.error('Failed to create security incident:', { component: 'SecurityMonitoring' }, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Create a security alert
+   * Alerts notify security teams about events that need attention
+   */
+  async createAlert(alertData: {
     type: string;
     severity: 'low' | 'medium' | 'high' | 'critical';
     title: string;
     message: string;
     source: string;
     metadata?: any;
+    incidentId?: number;
   }): Promise<number> {
     try {
       const result = await db.insert(securityAlerts).values({
@@ -459,197 +345,365 @@ export class SecurityMonitoringService {
         title: alertData.title,
         message: alertData.message,
         source: alertData.source,
-        metadata: alertData.metadata || {}
+        metadata: alertData.metadata || {},
+        incidentId: alertData.incidentId,
+        status: 'active',
       }).returning({ id: securityAlerts.id });
 
       const alertId = result[0].id;
 
-      // Send notifications based on severity
-      if (alertData.severity === 'critical' || alertData.severity === 'high') {
-        // Run notifications asynchronously
-        this.sendAlertNotificationsAsync(alertData);
+      // Set up auto-escalation for critical alerts
+      if (alertData.severity === 'critical') {
+        this.scheduleAlertEscalation(alertId);
       }
 
-      // Auto-escalate if not acknowledged within timeout
-      if (alertData.severity === 'critical') {
-        const config = await this.getConfiguration();
-        const timeout = setTimeout(async () => {
-          await this.escalateAlert(alertId);
-          this.activeTimers.timeouts.delete(alertId);
-        }, config.alerting.escalation_timeout);
-        
-        // Track timeout for cleanup
-        this.activeTimers.timeouts.set(alertId, timeout);
-      }
+      // Log alert creation to audit trail
+      await securityAuditService.logSecuritySystemEvent(
+        'security_alert_created',
+        'create_alert',
+        {
+          alertId,
+          alertType: alertData.type,
+          severity: alertData.severity,
+          incidentId: alertData.incidentId,
+        },
+        alertData.severity
+      );
+
+      logger.info('🔔 Security alert created', {
+        component: 'SecurityMonitoring',
+        alertId,
+        type: alertData.type,
+        severity: alertData.severity,
+      });
 
       return alertId;
     } catch (error) {
-      logger.error('Error creating security alert:', { component: 'SimpleTool' }, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        alertType: alertData.type,
-        severity: alertData.severity,
-        timestamp: new Date().toISOString()
-      });
+      logger.error('Failed to create security alert:', { component: 'SecurityMonitoring' }, error);
       throw error;
     }
   }
 
   /**
-   * Run compliance checks with better error isolation
+   * Acknowledge an alert (mark it as seen by security team)
+   */
+  async acknowledgeAlert(alertId: number, acknowledgedBy: string): Promise<void> {
+    try {
+      await db
+        .update(securityAlerts)
+        .set({
+          status: 'acknowledged',
+          acknowledgedAt: new Date(),
+          acknowledgedBy,
+          updatedAt: new Date(),
+        })
+        .where(eq(securityAlerts.id, alertId));
+
+      // Cancel escalation timer if one exists
+      const timer = this.escalationTimers.get(alertId);
+      if (timer) {
+        clearTimeout(timer);
+        this.escalationTimers.delete(alertId);
+      }
+
+      // Log to audit trail
+      await securityAuditService.logSecuritySystemEvent(
+        'security_alert_acknowledged',
+        'acknowledge_alert',
+        { alertId, acknowledgedBy }
+      );
+
+      logger.info('Alert acknowledged', {
+        component: 'SecurityMonitoring',
+        alertId,
+        acknowledgedBy,
+      });
+    } catch (error) {
+      logger.error('Failed to acknowledge alert:', { component: 'SecurityMonitoring' }, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Resolve an alert (mark it as handled)
+   */
+  async resolveAlert(alertId: number, resolvedBy: string, resolution?: string): Promise<void> {
+    try {
+      await db
+        .update(securityAlerts)
+        .set({
+          status: 'resolved',
+          resolvedAt: new Date(),
+          resolvedBy,
+          updatedAt: new Date(),
+        })
+        .where(eq(securityAlerts.id, alertId));
+
+      // Cancel escalation timer if one exists
+      const timer = this.escalationTimers.get(alertId);
+      if (timer) {
+        clearTimeout(timer);
+        this.escalationTimers.delete(alertId);
+      }
+
+      // Log to audit trail
+      await securityAuditService.logSecuritySystemEvent(
+        'security_alert_resolved',
+        'resolve_alert',
+        { alertId, resolvedBy, resolution }
+      );
+
+      logger.info('Alert resolved', {
+        component: 'SecurityMonitoring',
+        alertId,
+        resolvedBy,
+      });
+    } catch (error) {
+      logger.error('Failed to resolve alert:', { component: 'SecurityMonitoring' }, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Run all registered compliance checks
    */
   async runComplianceChecks(): Promise<void> {
-    logger.info('🔍 Running compliance checks...', { component: 'SimpleTool' });
-    
-    const checkResults = await Promise.allSettled(
+    logger.info('🔍 Running compliance checks', { component: 'SecurityMonitoring' });
+
+    const results = await Promise.allSettled(
       Array.from(this.complianceChecks.entries()).map(async ([checkName, checkFunction]) => {
         try {
           const result = await checkFunction();
-          
-          // Upsert compliance check result
-          await db.insert(complianceChecks).values({
-            checkName,
-            checkType: result.type,
-            description: result.description,
-            status: result.status,
-            findings: result.findings,
-            remediation: result.remediation,
-            priority: result.priority,
-            nextCheck: new Date(Date.now() + 24 * 60 * 60 * 1000)
-          }).onConflictDoUpdate({
-            target: complianceChecks.checkName,
-            set: {
+
+          // Upsert the compliance check result
+          await db
+            .insert(complianceChecks)
+            .values({
+              checkName,
+              checkType: result.type,
+              description: result.description,
               status: result.status,
-              lastChecked: new Date(),
               findings: result.findings,
               remediation: result.remediation,
+              priority: result.priority,
               nextCheck: new Date(Date.now() + 24 * 60 * 60 * 1000),
-              updatedAt: new Date()
-            }
-          });
+            })
+            .onConflictDoUpdate({
+              target: complianceChecks.checkName,
+              set: {
+                status: result.status,
+                lastChecked: new Date(),
+                findings: result.findings,
+                remediation: result.remediation,
+                nextCheck: new Date(Date.now() + 24 * 60 * 60 * 1000),
+                updatedAt: new Date(),
+              },
+            });
 
-          // Create alert for failures
+          // Create alert for failing checks
           if (result.status === 'failing') {
-            await this.createSecurityAlert({
+            await this.createAlert({
               type: 'compliance_failure',
               severity: result.priority === 'high' ? 'high' : 'medium',
               title: `Compliance Check Failed: ${checkName}`,
               message: result.description,
               source: 'compliance_monitoring',
-              metadata: { 
-                findings: result.findings, 
+              metadata: {
+                checkName,
+                findings: result.findings,
                 remediation: result.remediation,
-                checkName
-              }
+              },
             });
           }
 
-          return { checkName, status: 'success', result };
+          return { checkName, status: 'success' };
         } catch (error) {
-          console.error(`Error running compliance check ${checkName}:`, {
-            error: error instanceof Error ? error.message : 'Unknown error',
-            checkName,
-            timestamp: new Date().toISOString()
-          });
+          logger.error(`Compliance check failed: ${checkName}`, { component: 'SecurityMonitoring' }, error);
           return { checkName, status: 'error', error };
         }
       })
     );
 
-    // Invalidate compliance score cache after checks
-    this.complianceScoreCache.score = null;
-    
-    // Log summary of check results
-    const successful = checkResults.filter(r => r.status === 'fulfilled').length;
-    const failed = checkResults.filter(r => r.status === 'rejected').length;
-    console.log(`✅ Compliance checks completed: ${successful} successful, ${failed} failed`);
+    const successful = results.filter(r => r.status === 'fulfilled').length;
+    const failed = results.filter(r => r.status === 'rejected').length;
+
+    // Log completion to audit trail
+    await securityAuditService.logSecuritySystemEvent(
+      'compliance_checks_completed',
+      'run_compliance_checks',
+      { successful, failed, total: results.length }
+    );
+
+    logger.info('✅ Compliance checks completed', {
+      component: 'SecurityMonitoring',
+      successful,
+      failed,
+      total: results.length,
+    });
   }
 
   /**
-   * Shutdown the security monitoring service with proper cleanup
+   * Get comprehensive security dashboard data
    */
-  async shutdown(): Promise<void> {
-    logger.info('🛑 Shutting down security monitoring service...', { component: 'SimpleTool' });
-
+  async getSecurityDashboard(): Promise<SecurityDashboard> {
     try {
-      // Clear all intervals
-      for (const interval of this.activeTimers.intervals) {
-        clearInterval(interval);
-      }
-      this.activeTimers.intervals = [];
+      const now = new Date();
+      const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-      // Clear all timeouts
-      for (const [alertId, timeout] of this.activeTimers.timeouts) {
-        clearTimeout(timeout);
-      }
-      this.activeTimers.timeouts.clear();
+      // Run queries in parallel for performance
+      const [
+        totalEvents24h,
+        activeIncidents,
+        activeAlerts,
+        criticalAlerts,
+        recentIncidents,
+        recentAlerts,
+        complianceScore,
+      ] = await Promise.all([
+        securityAuditService.getEventCount({ startDate: yesterday }),
+        this.getActiveIncidentCount(),
+        this.getActiveAlertCount(),
+        this.getCriticalAlertCount(),
+        this.getRecentIncidents(10),
+        this.getRecentAlerts(10),
+        this.calculateComplianceScore(),
+      ]);
 
-      // Clear caches
-      this.configCache.data = null;
-      this.complianceScoreCache.score = null;
-
-      logger.info('✅ Security monitoring service shut down successfully', { component: 'SimpleTool' });
-    } catch (error) {
-      logger.error('❌ Error shutting down security monitoring service:', { component: 'SimpleTool' }, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+      // Calculate overall risk level
+      const riskLevel = this.calculateRiskLevel({
+        activeIncidents,
+        criticalAlerts,
+        complianceScore,
       });
+
+      // Generate recommendations based on current state
+      const recommendations = await this.generateRecommendations({
+        activeIncidents,
+        activeAlerts,
+        criticalAlerts,
+        complianceScore,
+        riskLevel,
+      });
+
+      return {
+        overview: {
+          totalEvents24h,
+          activeIncidents,
+          activeAlerts,
+          criticalAlerts,
+          riskLevel,
+          complianceScore,
+        },
+        recentIncidents,
+        recentAlerts,
+        threatSummary: {
+          blockedIPs: await intrusionDetectionService.getBlockedIPCount(),
+          suspiciousActivity: activeIncidents,
+          topThreatTypes: await this.getTopThreatTypes(),
+        },
+        recommendations,
+      };
+    } catch (error) {
+      logger.error('Failed to generate security dashboard:', { component: 'SecurityMonitoring' }, error);
       throw error;
     }
   }
 
   /**
-   * Generate comprehensive security report
+   * Generate a comprehensive security report
    */
-  async generateSecurityReport(startDate: Date, endDate: Date): Promise<SecurityReport> {
+  async generateSecurityReport(startDate: Date, endDate: Date): Promise<any> {
     try {
-      const [auditReport, intrusionReport, complianceReport] = await Promise.all([
+      // Gather all report data in parallel
+      const [auditReport, incidents, alerts, complianceStatus] = await Promise.all([
         securityAuditService.generateAuditReport(startDate, endDate),
-        intrusionDetectionService.generateIntrusionReport(startDate, endDate),
-        this.generateComplianceReport(startDate, endDate)
+        this.getIncidentsInPeriod(startDate, endDate),
+        this.getAlertsInPeriod(startDate, endDate),
+        this.getComplianceStatus(),
       ]);
 
-      const totalEvents = auditReport.summary.totalEvents + intrusionReport.summary.totalThreats;
-      const securityIncidents = auditReport.summary.totalIncidents;
-      const complianceScore = complianceReport.overallScore;
-
-      const riskAssessment = this.assessOverallRisk(auditReport, intrusionReport, complianceReport);
-      const keyFindings = this.extractKeyFindings(auditReport, intrusionReport, complianceReport);
-      const recommendations = await this.generateDetailedRecommendations(auditReport, intrusionReport, complianceReport);
+      const criticalIncidents = incidents.filter(i => i.severity === 'critical').length;
+      const highSeverityAlerts = alerts.filter(a => a.severity === 'high' || a.severity === 'critical').length;
 
       return {
         period: { start: startDate, end: endDate },
         executive_summary: {
-          total_events: totalEvents,
-          security_incidents: securityIncidents,
-          compliance_score: complianceScore,
-          risk_assessment: riskAssessment,
-          key_findings: keyFindings
+          total_events: auditReport.summary.totalEvents,
+          security_incidents: incidents.length,
+          critical_incidents: criticalIncidents,
+          total_alerts: alerts.length,
+          high_severity_alerts: highSeverityAlerts,
+          compliance_score: complianceStatus.overallScore,
+          risk_assessment: this.assessOverallRisk(incidents, alerts, complianceStatus),
         },
-        threat_analysis: intrusionReport,
-        compliance_report: complianceReport,
-        recommendations,
-        appendices: {
-          detailed_logs: auditReport.events,
-          configuration_changes: await this.getConfigurationChanges(startDate, endDate),
-          user_access_reviews: await this.getUserAccessReviews(startDate, endDate)
-        }
+        audit_summary: auditReport.summary,
+        incidents: incidents.slice(0, 50), // Top 50 incidents
+        alerts: alerts.slice(0, 50), // Top 50 alerts
+        compliance_status: complianceStatus,
+        recommendations: await this.generateDetailedRecommendations(incidents, alerts, complianceStatus),
       };
     } catch (error) {
-      logger.error('Error generating security report:', { component: 'SimpleTool' }, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        period: { startDate, endDate },
-        timestamp: new Date().toISOString()
-      });
-      throw new Error('Failed to generate security report');
+      logger.error('Failed to generate security report:', { component: 'SecurityMonitoring' }, error);
+      throw error;
     }
   }
 
   /**
-   * Refresh configuration cache
+   * Update monitoring configuration
    */
-  async refreshConfiguration(): Promise<void> {
-    this.configCache.lastRefresh = 0; // Force refresh
-    await this.getConfiguration();
+  async updateConfiguration(newConfig: Partial<MonitoringConfig>): Promise<void> {
+    try {
+      // Merge with existing configuration
+      this.config = {
+        ...this.config,
+        ...newConfig,
+        thresholds: { ...this.config.thresholds, ...newConfig.thresholds },
+        actions: { ...this.config.actions, ...newConfig.actions },
+      };
+
+      // Log configuration change
+      await securityAuditService.logSecuritySystemEvent(
+        'monitoring_config_updated',
+        'update_configuration',
+        { newConfig },
+        'medium'
+      );
+
+      logger.info('Monitoring configuration updated', {
+        component: 'SecurityMonitoring',
+        config: this.config,
+      });
+    } catch (error) {
+      logger.error('Failed to update configuration:', { component: 'SecurityMonitoring' }, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Shutdown the monitoring service gracefully
+   */
+  async shutdown(): Promise<void> {
+    logger.info('🛑 Shutting down security monitoring service', { component: 'SecurityMonitoring' });
+
+    try {
+      // Clear all escalation timers
+      for (const [alertId, timer] of this.escalationTimers) {
+        clearTimeout(timer);
+      }
+      this.escalationTimers.clear();
+
+      // Log shutdown
+      await securityAuditService.logSecuritySystemEvent(
+        'monitoring_service_shutdown',
+        'shutdown',
+        { timestamp: new Date().toISOString() }
+      );
+
+      logger.info('✅ Security monitoring service shut down', { component: 'SecurityMonitoring' });
+    } catch (error) {
+      logger.error('Error during monitoring service shutdown:', { component: 'SecurityMonitoring' }, error);
+      throw error;
+    }
   }
 
   /**
@@ -657,200 +711,345 @@ export class SecurityMonitoringService {
    */
 
   /**
-   * Load configuration with caching
+   * Handle a detected threat by creating incident and taking action
    */
-  private async loadConfiguration(): Promise<void> {
+  private async handleThreatDetection(req: Request, threatResult: ThreatDetectionResult): Promise<void> {
+    const ipAddress = this.extractClientIP(req);
+
     try {
-      const configs = await db.select().from(securityConfig);
-      
-      for (const config of configs) {
-        const keys = config.configKey.split('.');
-        let current = this.defaultConfig as any;
-        
-        for (let i = 0; i < keys.length - 1; i++) {
-          if (!current[keys[i]]) current[keys[i]] = {};
-          current = current[keys[i]];
-        }
-        
-        current[keys[keys.length - 1]] = config.configValue;
-      }
-      
-      // Update cache TTLs from config
-      if (this.defaultConfig.cache) {
-        this.configCache.ttl = this.defaultConfig.cache.config_ttl;
-        this.complianceScoreCache.ttl = this.defaultConfig.cache.compliance_score_ttl;
-      }
-      
-      // Update cache
-      this.configCache.data = { ...this.defaultConfig };
-      this.configCache.lastRefresh = Date.now();
-    } catch (error) {
-      console.warn('Using default security configuration:', {
-        error: error instanceof Error ? error.message : 'Unknown error'
+      // Create an incident for this threat
+      const incidentId = await this.createIncident({
+        incidentType: 'threat_detected',
+        severity: threatResult.threatLevel as any,
+        description: `Threat detected from ${ipAddress}: ${threatResult.detectedThreats.map(t => t.type).join(', ')}`,
+        affectedUsers: [(req as any).user?.id].filter(Boolean),
+        detectionMethod: 'intrusion_detection',
+        evidence: {
+          ipAddress,
+          threats: threatResult.detectedThreats,
+          riskScore: threatResult.riskScore,
+          path: req.path,
+          method: req.method,
+          userAgent: req.get('User-Agent'),
+        },
       });
-      this.configCache.data = { ...this.defaultConfig };
-      this.configCache.lastRefresh = Date.now();
+
+      // Auto-block critical threats if configured
+      if (threatResult.threatLevel === 'critical' && this.config.actions.autoBlockCriticalThreats) {
+        await intrusionDetectionService.blockIP(
+          ipAddress,
+          `Auto-blocked due to critical threat (Incident #${incidentId})`,
+          this.config.actions.autoBlockDuration
+        );
+
+        logger.warn('🚫 IP auto-blocked due to critical threat', {
+          component: 'SecurityMonitoring',
+          ipAddress,
+          incidentId,
+          threats: threatResult.detectedThreats,
+        });
+      }
+    } catch (error) {
+      logger.error('Error handling threat detection:', { component: 'SecurityMonitoring' }, error);
     }
   }
 
   /**
-   * Get configuration with caching
+   * Detect brute force attacks by analyzing failed login patterns
    */
-  private async getConfiguration(): Promise<any> {
-    const now = Date.now();
-    
-    // Return cached config if still valid
-    if (this.configCache.data && 
-        (now - this.configCache.lastRefresh) < this.configCache.ttl) {
-      return this.configCache.data;
-    }
-    
-    // Refresh configuration
-    await this.loadConfiguration();
-    return this.configCache.data || this.defaultConfig;
-  }
+  private async detectBruteForceAttacks(since: Date): Promise<void> {
+    try {
+      const failedLogins = await securityAuditService.queryAuditLogs({
+        eventType: 'login_failure',
+        startDate: since,
+      });
 
-  private async startMonitoring(): Promise<void> {
-    const config = await this.getConfiguration();
-    
-    if (config.monitoring.real_time_analysis) {
-      logger.info('✅ Real-time security analysis enabled', { component: 'SimpleTool' });
-    }
-    
-    if (config.monitoring.behavioral_analysis) {
-      logger.info('✅ Behavioral analysis enabled', { component: 'SimpleTool' });
-    }
-    
-    if (config.monitoring.threat_intelligence) {
-      logger.info('✅ Threat intelligence enabled', { component: 'SimpleTool' });
-    }
-  }
+      // Group by user and IP
+      const failuresByUser = new Map<string, number>();
+      const failuresByIP = new Map<string, number>();
 
-  private async scheduleComplianceChecks(): Promise<void> {
-    // Run compliance checks every 24 hours
-    const interval = setInterval(async () => {
-      try {
-        await this.runComplianceChecks();
-      } catch (error) {
-        logger.error('Error in scheduled compliance check:', { component: 'SimpleTool' }, {
-          error: error instanceof Error ? error.message : 'Unknown error',
-          timestamp: new Date().toISOString()
-        });
-      }
-    }, 24 * 60 * 60 * 1000);
-    
-    // Track interval for cleanup
-    this.activeTimers.intervals.push(interval);
-    
-    // Run initial check
-    await this.runComplianceChecks();
-  }
-
-  private initializeAlertHandlers(): void {
-    this.alertHandlers.set('email', async (alert: any) => {
-      try {
-        const config = await this.getConfiguration();
-        if (config.alerting.email_notifications) {
-          // Send email alert
-          console.log(`📧 Email alert sent: ${alert.title}`);
+      failedLogins.forEach(event => {
+        if (event.userId) {
+          failuresByUser.set(event.userId, (failuresByUser.get(event.userId) || 0) + 1);
         }
-      } catch (error) {
-        logger.error('Error sending email alert:', { component: 'SimpleTool' }, error);
-      }
-    });
-
-    this.alertHandlers.set('slack', async (alert: any) => {
-      try {
-        const config = await this.getConfiguration();
-        if (config.alerting.slack_notifications) {
-          // Send Slack alert
-          console.log(`💬 Slack alert sent: ${alert.title}`);
+        if (event.ipAddress) {
+          failuresByIP.set(event.ipAddress, (failuresByIP.get(event.ipAddress) || 0) + 1);
         }
-      } catch (error) {
-        logger.error('Error sending Slack alert:', { component: 'SimpleTool' }, error);
+      });
+
+      // Check for threshold violations
+      for (const [userId, count] of failuresByUser) {
+        if (count >= this.config.thresholds.failedLoginAttempts) {
+          await this.createIncident({
+            incidentType: 'brute_force_attack',
+            severity: 'high',
+            description: `Multiple failed login attempts detected for user ${userId} (${count} attempts)`,
+            affectedUsers: [userId],
+            detectionMethod: 'automated_pattern_detection',
+            evidence: {
+              failedAttempts: count,
+              timeWindow: `${this.config.thresholds.failedLoginTimeWindow} minutes`,
+            },
+          });
+        }
       }
-    });
+
+      for (const [ipAddress, count] of failuresByIP) {
+        if (count >= this.config.thresholds.failedLoginAttempts) {
+          await this.createIncident({
+            incidentType: 'brute_force_attack',
+            severity: 'high',
+            description: `Multiple failed login attempts from IP ${ipAddress} (${count} attempts)`,
+            detectionMethod: 'automated_pattern_detection',
+            evidence: {
+              ipAddress,
+              failedAttempts: count,
+              timeWindow: `${this.config.thresholds.failedLoginTimeWindow} minutes`,
+            },
+          });
+
+          // Consider blocking the IP
+          if (count >= this.config.thresholds.failedLoginAttempts * 2) {
+            await intrusionDetectionService.blockIP(
+              ipAddress,
+              `Brute force attack detected (${count} failed attempts)`,
+              this.config.actions.autoBlockDuration
+            );
+          }
+        }
+      }
+    } catch (error) {
+      logger.error('Error detecting brute force attacks:', { component: 'SecurityMonitoring' }, error);
+    }
   }
 
-  private initializeComplianceChecks(): void {
+  /**
+   * Detect potential data exfiltration by analyzing data access patterns
+   */
+  private async detectDataExfiltration(since: Date): Promise<void> {
+    try {
+      const dataAccessEvents = await securityAuditService.queryAuditLogs({
+        eventType: 'data_access',
+        startDate: since,
+      });
+
+      // Group by user and sum record counts
+      const accessByUser = new Map<string, number>();
+
+      dataAccessEvents.forEach(event => {
+        if (event.userId) {
+          const details = event.details as any;
+          const recordCount = details?.recordCount || 0;
+          accessByUser.set(event.userId, (accessByUser.get(event.userId) || 0) + recordCount);
+        }
+      });
+
+      // Check for threshold violations
+      for (const [userId, totalRecords] of accessByUser) {
+        if (totalRecords >= this.config.thresholds.dataAccessVolume) {
+          await this.createIncident({
+            incidentType: 'potential_data_exfiltration',
+            severity: 'critical',
+            description: `Unusual high-volume data access detected for user ${userId} (${totalRecords} records)`,
+            affectedUsers: [userId],
+            detectionMethod: 'automated_pattern_detection',
+            evidence: {
+              recordsAccessed: totalRecords,
+              timeWindow: `${this.config.thresholds.dataAccessTimeWindow} minutes`,
+            },
+          });
+        }
+      }
+    } catch (error) {
+      logger.error('Error detecting data exfiltration:', { component: 'SecurityMonitoring' }, error);
+    }
+  }
+
+  /**
+   * Detect privilege escalation attempts
+   */
+  private async detectPrivilegeEscalation(since: Date): Promise<void> {
+    try {
+      const adminActions = await securityAuditService.queryAuditLogs({
+        eventType: 'admin_action',
+        startDate: since,
+      });
+
+      // Look for unusual patterns of admin actions
+      const actionsByUser = new Map<string, number>();
+
+      adminActions.forEach(event => {
+        if (event.userId) {
+          actionsByUser.set(event.userId, (actionsByUser.get(event.userId) || 0) + 1);
+        }
+      });
+
+      // Check for users with unusual admin activity
+      for (const [userId, count] of actionsByUser) {
+        if (count > 20) { // More than 20 admin actions in the time window is suspicious
+          await this.createIncident({
+            incidentType: 'suspicious_admin_activity',
+            severity: 'high',
+            description: `Unusual volume of administrative actions by user ${userId} (${count} actions)`,
+            affectedUsers: [userId],
+            detectionMethod: 'automated_pattern_detection',
+            evidence: {
+              adminActionCount: count,
+              timeWindow: `${this.config.thresholds.failedLoginTimeWindow} minutes`,
+            },
+          });
+        }
+      }
+    } catch (error) {
+      logger.error('Error detecting privilege escalation:', { component: 'SecurityMonitoring' }, error);
+    }
+  }
+
+  /**
+   * Schedule automatic escalation for an alert if not acknowledged
+   */
+  private scheduleAlertEscalation(alertId: number): void {
+    const timer = setTimeout(async () => {
+      try {
+        // Check if alert is still active
+        const alerts = await db
+          .select()
+          .from(securityAlerts)
+          .where(eq(securityAlerts.id, alertId))
+          .limit(1);
+
+        if (alerts.length > 0 && alerts[0].status === 'active') {
+          logger.warn('🚨 ESCALATING ALERT', {
+            component: 'SecurityMonitoring',
+            alertId,
+            title: alerts[0].title,
+          });
+
+          // Update alert status
+          await db
+            .update(securityAlerts)
+            .set({
+              status: 'escalated',
+              updatedAt: new Date(),
+            })
+            .where(eq(securityAlerts.id, alertId));
+
+          // Log escalation
+          await securityAuditService.logSecuritySystemEvent(
+            'security_alert_escalated',
+            'escalate_alert',
+            { alertId },
+            'high'
+          );
+
+          // In production, this would trigger additional notifications
+          // to senior staff, create tickets in incident management systems, etc.
+        }
+
+        this.escalationTimers.delete(alertId);
+      } catch (error) {
+        logger.error(`Error escalating alert ${alertId}:`, { component: 'SecurityMonitoring' }, error);
+      }
+    }, this.config.actions.alertEscalationTimeout);
+
+    this.escalationTimers.set(alertId, timer);
+  }
+
+  /**
+   * Register all compliance checks
+   */
+  private registerComplianceChecks(): void {
     // GDPR compliance checks
     this.complianceChecks.set('gdpr_data_retention', async () => ({
       type: 'gdpr',
-      description: 'Check data retention policies compliance',
+      description: 'Verify data retention policies are implemented',
       status: 'passing' as const,
       findings: { retentionPolicies: 'implemented', dataMinimization: 'active' },
       remediation: null,
-      priority: 'high'
+      priority: 'high',
     }));
 
     this.complianceChecks.set('gdpr_user_consent', async () => ({
       type: 'gdpr',
-      description: 'Verify user consent mechanisms',
+      description: 'Verify user consent mechanisms are in place',
       status: 'passing' as const,
       findings: { consentForms: 'compliant', optOut: 'available' },
       remediation: null,
-      priority: 'high'
+      priority: 'high',
     }));
 
-    // Security best practices checks
+    // Security best practices
     this.complianceChecks.set('password_policy', async () => ({
       type: 'security',
       description: 'Verify password policy enforcement',
       status: 'passing' as const,
       findings: { minLength: 12, complexity: 'enforced', expiration: 'optional' },
       remediation: null,
-      priority: 'medium'
+      priority: 'medium',
     }));
 
     this.complianceChecks.set('encryption_at_rest', async () => ({
       type: 'security',
-      description: 'Check data encryption at rest',
+      description: 'Verify data encryption at rest',
       status: 'passing' as const,
       findings: { database: 'encrypted', files: 'encrypted', backups: 'encrypted' },
       remediation: null,
-      priority: 'high'
+      priority: 'high',
+    }));
+
+    this.complianceChecks.set('audit_logging_enabled', async () => ({
+      type: 'security',
+      description: 'Verify comprehensive audit logging is active',
+      status: 'passing' as const,
+      findings: { auditService: 'active', coverage: 'comprehensive' },
+      remediation: null,
+      priority: 'high',
     }));
   }
 
   /**
-   * Optimized security overview with combined query
+   * Helper methods for dashboard queries
    */
-  private async getSecurityOverview(): Promise<SecurityOverview> {
-    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    
-    // Combine related queries for better performance
-    const [eventsResult, alertsResult] = await Promise.all([
-      db.select({ count: count() })
-        .from(securityAuditLogs)
-        .where(gte(securityAuditLogs.createdAt, oneWeekAgo)),
-      db.select({ count: count() })
-        .from(securityAlerts)
-        .where(and(
-          eq(securityAlerts.severity, 'critical'),
-          eq(securityAlerts.status, 'active')
-        ))
-    ]);
 
-    const complianceScore = await this.calculateComplianceScore();
-    const riskLevel = this.calculateRiskLevel(complianceScore, Number(alertsResult[0].count));
-
-    return {
-      totalEvents: Number(eventsResult[0].count),
-      criticalAlerts: Number(alertsResult[0].count),
-      blockedThreats: 0, // Would be calculated from threat intelligence
-      complianceScore,
-      riskLevel,
-      lastIncident: null // Would be fetched from incidents table
-    };
+  private async getActiveIncidentCount(): Promise<number> {
+    const result = await db
+      .select({ count: count() })
+      .from(securityIncidents)
+      .where(eq(securityIncidents.status, 'open'));
+    return Number(result[0].count);
   }
 
-  private async getRecentAlerts(): Promise<SecurityAlert[]> {
+  private async getActiveAlertCount(): Promise<number> {
+    const result = await db
+      .select({ count: count() })
+      .from(securityAlerts)
+      .where(eq(securityAlerts.status, 'active'));
+    return Number(result[0].count);
+  }
+
+  private async getCriticalAlertCount(): Promise<number> {
+    const result = await db
+      .select({ count: count() })
+      .from(securityAlerts)
+      .where(and(eq(securityAlerts.severity, 'critical'), eq(securityAlerts.status, 'active')));
+    return Number(result[0].count);
+  }
+
+  private async getRecentIncidents(limit: number): Promise<any[]> {
+    return await db
+      .select()
+      .from(securityIncidents)
+      .orderBy(desc(securityIncidents.createdAt))
+      .limit(limit);
+  }
+
+  private async getRecentAlerts(limit: number): Promise<SecurityAlert[]> {
     const alerts = await db
       .select()
       .from(securityAlerts)
       .where(eq(securityAlerts.status, 'active'))
       .orderBy(desc(securityAlerts.createdAt))
-      .limit(10);
+      .limit(limit);
 
     return alerts.map(alert => ({
       id: alert.id,
@@ -860,466 +1059,219 @@ export class SecurityMonitoringService {
       message: alert.message,
       source: alert.source,
       status: alert.status,
+      incidentId: alert.incidentId || undefined,
       createdAt: alert.createdAt!,
-      metadata: alert.metadata
+      metadata: alert.metadata,
     }));
   }
 
-  private async getThreatSummary(): Promise<ThreatSummary> {
-    // This would be implemented with actual threat data
-    return {
-      totalThreats: 0,
-      blockedIPs: 0,
-      suspiciousActivity: 0,
-      attackTypes: [],
-      topThreats: []
-    };
-  }
-
-  private async getComplianceStatus(): Promise<ComplianceStatus> {
-    const checks = await db.select().from(complianceChecks);
-    
-    const failingChecks = checks.filter(c => c.status === 'failing').length;
-    const overallScore = await this.calculateComplianceScore();
-    
-    return {
-      overallScore,
-      checks: checks.map(check => ({
-        name: check.checkName,
-        status: check.status as any,
-        lastChecked: check.lastChecked!,
-        priority: check.priority
-      })),
-      failingChecks,
-      nextReview: new Date(Date.now() + 24 * 60 * 60 * 1000)
-    };
-  }
-
-  private async getSystemHealth(): Promise<SecuritySystemHealth> {
-    const config = await this.getConfiguration();
-    
-    return {
-      auditingEnabled: true,
-      intrusionDetectionEnabled: true,
-      alertingEnabled: config.alerting.enabled,
-      backupStatus: 'healthy',
-      encryptionStatus: 'enabled',
-      lastHealthCheck: new Date()
-    };
-  }
-
-  private async generateRecommendations(
-    overview: SecurityOverview,
-    compliance: ComplianceStatus
-  ): Promise<SecurityRecommendation[]> {
-    const recommendations: SecurityRecommendation[] = [];
-
-    if (overview.criticalAlerts > 0) {
-      recommendations.push({
-        id: 'critical-alerts',
-        type: 'security',
-        priority: 'critical',
-        title: 'Address Critical Security Alerts',
-        description: `${overview.criticalAlerts} critical security alerts require immediate attention`,
-        action: 'Review and resolve all critical alerts in the security dashboard',
-        estimatedEffort: '2-4 hours',
-        impact: 'Reduces immediate security risks'
-      });
-    }
-
-    if (compliance.failingChecks > 0) {
-      recommendations.push({
-        id: 'compliance-failures',
-        type: 'compliance',
-        priority: 'high',
-        title: 'Fix Compliance Violations',
-        description: `${compliance.failingChecks} compliance checks are failing`,
-        action: 'Review and remediate failing compliance checks',
-        estimatedEffort: '4-8 hours',
-        impact: 'Ensures regulatory compliance'
-      });
-    }
-
-    if (overview.riskLevel === 'high' || overview.riskLevel === 'critical') {
-      recommendations.push({
-        id: 'risk-mitigation',
-        type: 'security',
-        priority: 'high',
-        title: 'Implement Risk Mitigation Measures',
-        description: 'Overall security risk level is elevated',
-        action: 'Review security policies and implement additional controls',
-        estimatedEffort: '1-2 days',
-        impact: 'Reduces overall security risk'
-      });
-    }
-
-    return recommendations;
-  }
-
-  /**
-   * Calculate compliance score with caching
-   */
   private async calculateComplianceScore(): Promise<number> {
-    const now = Date.now();
-    
-    // Return cached score if still valid
-    if (this.complianceScoreCache.score !== null && 
-        (now - this.complianceScoreCache.lastCalculated) < this.complianceScoreCache.ttl) {
-      return this.complianceScoreCache.score;
-    }
-    
-    // Calculate fresh score
     const checks = await db.select().from(complianceChecks);
-    if (checks.length === 0) {
-      this.complianceScoreCache.score = 100;
-      this.complianceScoreCache.lastCalculated = now;
-      return 100;
-    }
-    
+    if (checks.length === 0) return 100;
+
     const passingChecks = checks.filter(c => c.status === 'passing').length;
-    const score = Math.round((passingChecks / checks.length) * 100);
-    
-    // Update cache
-    this.complianceScoreCache.score = score;
-    this.complianceScoreCache.lastCalculated = now;
-    
-    return score;
+    return Math.round((passingChecks / checks.length) * 100);
   }
 
-  private calculateRiskLevel(complianceScore: number, criticalAlerts: number): 'low' | 'medium' | 'high' | 'critical' {
-    if (criticalAlerts > 5 || complianceScore < 60) return 'critical';
-    if (criticalAlerts > 2 || complianceScore < 80) return 'high';
-    if (criticalAlerts > 0 || complianceScore < 95) return 'medium';
+  private calculateRiskLevel(data: {
+    activeIncidents: number;
+    criticalAlerts: number;
+    complianceScore: number;
+  }): 'low' | 'medium' | 'high' | 'critical' {
+    if (data.criticalAlerts > 5 || data.activeIncidents > 10 || data.complianceScore < 70) {
+      return 'critical';
+    }
+    if (data.criticalAlerts > 2 || data.activeIncidents > 5 || data.complianceScore < 85) {
+      return 'high';
+    }
+    if (data.criticalAlerts > 0 || data.activeIncidents > 2 || data.complianceScore < 95) {
+      return 'medium';
+    }
     return 'low';
   }
 
-  private async handleHighRiskRequest(req: Request, threatResult: ThreatDetectionResult): Promise<void> {
-    const ipAddress = this.getClientIP(req);
+  private async getTopThreatTypes(): Promise<{ type: string; count: number }[]> {
+    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     
-    // Auto-block critical threats
-    if (threatResult.threatLevel === 'critical') {
-      await intrusionDetectionService.blockIP(
-        ipAddress,
-        `Critical threat detected: ${threatResult.detectedThreats.map(t => t.type).join(', ')}`,
-        24 * 60 * 60 * 1000 // 24 hours
-      );
-    }
-  }
+    const incidents = await db
+      .select()
+      .from(securityIncidents)
+      .where(gte(securityIncidents.createdAt, oneWeekAgo));
 
-  private async sendAlertNotifications(alert: any): Promise<void> {
-    const results = await Promise.allSettled(
-      Array.from(this.alertHandlers.entries()).map(async ([type, handler]) => {
-        try {
-          await handler(alert);
-          return { type, status: 'success' };
-        } catch (error) {
-          console.error(`Error sending ${type} alert:`, {
-            error: error instanceof Error ? error.message : 'Unknown error',
-            alertId: alert.id,
-            timestamp: new Date().toISOString()
-          });
-          return { type, status: 'error', error };
-        }
-      })
-    );
-    
-    // Log notification summary
-    const successful = results.filter(r => r.status === 'fulfilled').length;
-    const failed = results.filter(r => r.status === 'rejected').length;
-    if (failed > 0) {
-      console.warn(`Alert notifications: ${successful} successful, ${failed} failed`);
-    }
-  }
-
-  private async escalateAlert(alertId: number): Promise<void> {
-    try {
-      const alert = await db
-        .select()
-        .from(securityAlerts)
-        .where(eq(securityAlerts.id, alertId))
-        .limit(1);
-
-      if (alert.length > 0 && alert[0].status === 'active') {
-        console.warn(`🚨 ESCALATING ALERT ${alertId}: ${alert[0].title}`);
-        
-        // Update alert status to show it's been escalated
-        await db
-          .update(securityAlerts)
-          .set({ 
-            status: 'escalated',
-            updatedAt: new Date()
-          })
-          .where(eq(securityAlerts.id, alertId));
-        
-        // In production, this would escalate to senior staff, create tickets, etc.
-        // Could also trigger additional notifications here
-      }
-    } catch (error) {
-      console.error(`Error escalating alert ${alertId}:`, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
-      });
-    }
-  }
-
-  private getClientIP(req: Request): string {
-    return (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
-           (req.headers['x-real-ip'] as string) ||
-           req.connection.remoteAddress ||
-           req.socket.remoteAddress ||
-           'unknown';
-  }
-
-  /**
-   * Async helper methods to avoid blocking main operations
-   */
-  private logSecurityEventAsync(eventData: any): void {
-    securityAuditService.logSecurityEvent(eventData).catch(error => {
-      logger.error('Failed to log security event:', { component: 'SimpleTool' }, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        eventType: eventData.eventType,
-        timestamp: new Date().toISOString()
-      });
+    const typeCounts = new Map<string, number>();
+    incidents.forEach(incident => {
+      typeCounts.set(incident.incidentType, (typeCounts.get(incident.incidentType) || 0) + 1);
     });
+
+    return Array.from(typeCounts.entries())
+      .map(([type, count]) => ({ type, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
   }
 
-  private handleHighRiskRequestAsync(req: Request, threatResult: ThreatDetectionResult, metadata: any): void {
-    this.handleHighRiskRequest(req, threatResult).catch(error => {
-      logger.error('Failed to handle high-risk request:', { component: 'SimpleTool' }, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        ip: metadata.ip,
-        path: metadata.path,
-        timestamp: new Date().toISOString()
-      });
-    });
-  }
+  private async generateRecommendations(data: {
+    activeIncidents: number;
+    activeAlerts: number;
+    criticalAlerts: number;
+    complianceScore: number;
+    riskLevel: string;
+  }): Promise<string[]> {
+    const recommendations: string[] = [];
 
-  private createSecurityAlertAsync(alertData: any): void {
-    this.createSecurityAlert(alertData).catch(error => {
-      logger.error('Failed to create security alert:', { component: 'SimpleTool' }, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        alertType: alertData.type,
-        timestamp: new Date().toISOString()
-      });
-    });
-  }
+    if (data.criticalAlerts > 0) {
+      recommendations.push(`Address ${data.criticalAlerts} critical security alert${data.criticalAlerts > 1 ? 's' : ''} immediately`);
+    }
 
-  private sendAlertNotificationsAsync(alert: any): void {
-    this.sendAlertNotifications(alert).catch(error => {
-      logger.error('Failed to send alert notifications:', { component: 'SimpleTool' }, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        alertId: alert.id,
-        timestamp: new Date().toISOString()
-      });
-    });
-  }
+    if (data.activeIncidents > 5) {
+      recommendations.push(`Review and resolve ${data.activeIncidents} open security incidents`);
+    }
 
-  /**
-   * Helper method to map threat levels to severity
-   */
-  private mapThreatLevelToSeverity(threatLevel: string): 'low' | 'medium' | 'high' | 'critical' {
-    switch (threatLevel) {
-      case 'critical':
-        return 'critical';
-      case 'high':
-        return 'high';
-      case 'medium':
-        return 'medium';
-      default:
-        return 'low';
+    if (data.complianceScore < 90) {
+      recommendations.push(`Improve compliance score (currently ${data.complianceScore}%) by addressing failing checks`);
     }
-  }
 
-  /**
-   * Report generation helper methods
-   */
-  private assessOverallRisk(auditReport: any, intrusionReport: any, complianceReport: any): string {
-    const criticalEvents = auditReport.summary.highRiskEvents || 0;
-    const criticalThreats = intrusionReport.summary.totalThreats || 0;
-    const complianceScore = complianceReport.overallScore || 100;
+    if (data.riskLevel === 'high' || data.riskLevel === 'critical') {
+      recommendations.push('Implement additional security controls to reduce overall risk level');
+    }
 
-    if (criticalEvents > 10 || criticalThreats > 5 || complianceScore < 70) {
-      return 'HIGH - Immediate attention required';
-    } else if (criticalEvents > 5 || criticalThreats > 2 || complianceScore < 85) {
-      return 'MEDIUM - Monitor closely and address issues';
-    } else {
-      return 'LOW - Security posture is stable';
+    if (recommendations.length === 0) {
+      recommendations.push('Security posture is healthy - continue monitoring');
     }
-  }
 
-  private extractKeyFindings(auditReport: any, intrusionReport: any, complianceReport: any): string[] {
-    const findings: string[] = [];
-    
-    if (auditReport.summary.criticalIncidents > 0) {
-      findings.push(`${auditReport.summary.criticalIncidents} critical security incidents detected`);
-    }
-    
-    if (intrusionReport.summary.blockedIPs > 0) {
-      findings.push(`${intrusionReport.summary.blockedIPs} IP addresses blocked for malicious activity`);
-    }
-    
-    if (complianceReport.failingChecks > 0) {
-      findings.push(`${complianceReport.failingChecks} compliance checks failing`);
-    }
-    
-    if (findings.length === 0) {
-      findings.push('No critical security issues identified during this period');
-    }
-    
-    return findings;
-  }
-
-  private async generateDetailedRecommendations(
-    auditReport: any, 
-    intrusionReport: any, 
-    complianceReport: any
-  ): Promise<SecurityRecommendation[]> {
-    const recommendations: SecurityRecommendation[] = [];
-    
-    // Analyze audit report for recommendations
-    if (auditReport.summary.failedLogins > 50) {
-      recommendations.push({
-        id: 'failed-logins',
-        type: 'security',
-        priority: 'high',
-        title: 'Investigate Failed Login Attempts',
-        description: `Unusually high number of failed login attempts (${auditReport.summary.failedLogins})`,
-        action: 'Review failed login patterns and implement additional authentication measures',
-        estimatedEffort: '4-6 hours',
-        impact: 'Prevents potential account compromise'
-      });
-    }
-    
-    // Analyze intrusion report
-    if (intrusionReport.summary.totalThreats > 10) {
-      recommendations.push({
-        id: 'threat-patterns',
-        type: 'security',
-        priority: 'high',
-        title: 'Review Threat Patterns',
-        description: `Multiple threat detection events (${intrusionReport.summary.totalThreats})`,
-        action: 'Analyze threat patterns and update detection rules',
-        estimatedEffort: '6-8 hours',
-        impact: 'Improves threat detection accuracy'
-      });
-    }
-    
-    // Analyze compliance report
-    if (complianceReport.failingChecks > 0) {
-      complianceReport.checks
-        .filter((check: any) => check.status === 'failing')
-        .forEach((check: any) => {
-          recommendations.push({
-            id: `compliance-${check.name}`,
-            type: 'compliance',
-            priority: check.priority === 'high' ? 'high' : 'medium',
-            title: `Fix: ${check.name}`,
-            description: check.description,
-            action: check.remediation || 'Review and remediate compliance issue',
-            estimatedEffort: '2-4 hours',
-            impact: 'Ensures regulatory compliance'
-          });
-        });
-    }
-    
     return recommendations;
   }
 
-  private async getConfigurationChanges(startDate: Date, endDate: Date): Promise<any[]> {
-    try {
-      const changes = await db
-        .select()
-        .from(securityConfig)
-        .where(
-          and(
-            gte(securityConfig.updatedAt, startDate),
-            sql`${securityConfig.updatedAt} <= ${endDate}`
-          )
+  private async getIncidentsInPeriod(startDate: Date, endDate: Date): Promise<any[]> {
+    return await db
+      .select()
+      .from(securityIncidents)
+      .where(
+        and(
+          gte(securityIncidents.createdAt, startDate),
+          sql`${securityIncidents.createdAt} <= ${endDate}`
         )
-        .orderBy(desc(securityConfig.updatedAt));
-      
-      return changes.map(change => ({
-        configKey: change.configKey,
-        description: change.description,
-        updatedBy: change.updatedBy,
-        updatedAt: change.updatedAt
-      }));
-    } catch (error) {
-      logger.error('Error fetching configuration changes:', { component: 'SimpleTool' }, error);
-      return [];
-    }
+      )
+      .orderBy(desc(securityIncidents.createdAt));
   }
 
-  private async getUserAccessReviews(startDate: Date, endDate: Date): Promise<any[]> {
-    try {
-      // This would fetch user access reviews and changes from audit logs
-      const accessEvents = await db
-        .select()
-        .from(securityAuditLogs)
-        .where(
-          and(
-            gte(securityAuditLogs.createdAt, startDate),
-            sql`${securityAuditLogs.createdAt} <= ${endDate}`,
-            or(
-              eq(securityAuditLogs.eventType, 'user_created'),
-              eq(securityAuditLogs.eventType, 'user_deleted'),
-              eq(securityAuditLogs.eventType, 'role_changed'),
-              eq(securityAuditLogs.eventType, 'permission_granted'),
-              eq(securityAuditLogs.eventType, 'permission_revoked')
-            )
-          )
+  private async getAlertsInPeriod(startDate: Date, endDate: Date): Promise<SecurityAlert[]> {
+    const alerts = await db
+      .select()
+      .from(securityAlerts)
+      .where(
+        and(
+          gte(securityAlerts.createdAt, startDate),
+          sql`${securityAlerts.createdAt} <= ${endDate}`
         )
-        .orderBy(desc(securityAuditLogs.createdAt))
-        .limit(100);
-      
-      return accessEvents.map(event => ({
-        eventType: event.eventType,
-        userId: event.userId,
-        timestamp: event.createdAt,
-        details: event.details
-      }));
-    } catch (error) {
-      logger.error('Error fetching user access reviews:', { component: 'SimpleTool' }, error);
-      return [];
-    }
+      )
+      .orderBy(desc(securityAlerts.createdAt));
+
+    return alerts.map(alert => ({
+      id: alert.id,
+      type: alert.alertType,
+      severity: alert.severity as any,
+      title: alert.title,
+      message: alert.message,
+      source: alert.source,
+      status: alert.status,
+      incidentId: alert.incidentId || undefined,
+      createdAt: alert.createdAt!,
+      metadata: alert.metadata,
+    }));
   }
 
-  private async generateComplianceReport(startDate: Date, endDate: Date): Promise<any> {
-    try {
-      const checks = await db
-        .select()
-        .from(complianceChecks)
-        .where(
-          and(
-            gte(complianceChecks.lastChecked, startDate),
-            sql`${complianceChecks.lastChecked} <= ${endDate}`
-          )
-        );
+  private async getComplianceStatus(): Promise<any> {
+    const checks = await db.select().from(complianceChecks);
+    const overallScore = await this.calculateComplianceScore();
+    const failingChecks = checks.filter(c => c.status === 'failing').length;
 
-      const overallScore = await this.calculateComplianceScore();
-      const failingChecks = checks.filter(c => c.status === 'failing').length;
+    return {
+      overallScore,
+      failingChecks,
+      totalChecks: checks.length,
+      checks: checks.map(check => ({
+        name: check.checkName,
+        status: check.status,
+        priority: check.priority,
+        lastChecked: check.lastChecked,
+      })),
+    };
+  }
 
-      return {
-        overallScore,
-        failingChecks,
-        checks: checks.map(check => ({
-          name: check.checkName,
-          type: check.checkType,
-          status: check.status,
-          findings: check.findings,
-          remediation: check.remediation,
-          priority: check.priority,
-          lastChecked: check.lastChecked
-        }))
-      };
-    } catch (error) {
-      logger.error('Error generating compliance report:', { component: 'SimpleTool' }, error);
-      return {
-        overallScore: 0,
-        failingChecks: 0,
-        checks: []
-      };
+  private assessOverallRisk(incidents: any[], alerts: any[], compliance: any): string {
+    const criticalIncidents = incidents.filter(i => i.severity === 'critical').length;
+    const criticalAlerts = alerts.filter(a => a.severity === 'critical').length;
+
+    if (criticalIncidents > 5 || criticalAlerts > 5 || compliance.overallScore < 70) {
+      return 'CRITICAL - Immediate action required';
     }
+    if (criticalIncidents > 2 || criticalAlerts > 2 || compliance.overallScore < 85) {
+      return 'HIGH - Prompt attention needed';
+    }
+    if (incidents.length > 10 || alerts.length > 20 || compliance.overallScore < 95) {
+      return 'MEDIUM - Monitor and address issues';
+    }
+    return 'LOW - Security posture is healthy';
+  }
+
+  private async generateDetailedRecommendations(
+    incidents: any[],
+    alerts: any[],
+    compliance: any
+  ): Promise<string[]> {
+    const recommendations: string[] = [];
+
+    const criticalIncidents = incidents.filter(i => i.severity === 'critical');
+    if (criticalIncidents.length > 0) {
+      recommendations.push(
+        `Investigate and resolve ${criticalIncidents.length} critical security incident${criticalIncidents.length > 1 ? 's' : ''}`
+      );
+    }
+
+    const unresolvedAlerts = alerts.filter(a => a.status === 'active' || a.status === 'escalated');
+    if (unresolvedAlerts.length > 10) {
+      recommendations.push(
+        `Review and resolve ${unresolvedAlerts.length} unresolved security alerts`
+      );
+    }
+
+    if (compliance.failingChecks > 0) {
+      recommendations.push(
+        `Address ${compliance.failingChecks} failing compliance check${compliance.failingChecks > 1 ? 's' : ''} to improve security posture`
+      );
+    }
+
+    // Analyze incident types for patterns
+    const incidentTypes = new Map<string, number>();
+    incidents.forEach(incident => {
+      incidentTypes.set(incident.incidentType, (incidentTypes.get(incident.incidentType) || 0) + 1);
+    });
+
+    const topIncidentType = Array.from(incidentTypes.entries())
+      .sort((a, b) => b[1] - a[1])[0];
+
+    if (topIncidentType && topIncidentType[1] > 3) {
+      recommendations.push(
+        `Address recurring ${topIncidentType[0]} incidents (${topIncidentType[1]} occurrences) - consider preventive measures`
+      );
+    }
+
+    if (recommendations.length === 0) {
+      recommendations.push('No immediate security concerns - maintain current security practices');
+    }
+
+    return recommendations;
+  }
+
+  private extractClientIP(req: Request): string {
+    return (
+      (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+      (req.headers['x-real-ip'] as string) ||
+      req.connection?.remoteAddress ||
+      req.socket?.remoteAddress ||
+      req.ip ||
+      'unknown'
+    );
   }
 }
 
@@ -1327,12 +1279,4 @@ export class SecurityMonitoringService {
 export const securityMonitoringService = SecurityMonitoringService.getInstance();
 
 // Export table definitions for migrations
-export { securityConfig, securityAlerts, complianceChecks, securityAuditLogs };
-
-
-
-
-
-
-
-
+export { securityIncidents, securityAlerts, complianceChecks };

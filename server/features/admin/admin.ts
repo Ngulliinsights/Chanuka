@@ -1,7 +1,7 @@
 import { database as db, users, bills, billComments, analysis, notifications } from '../../../shared/database/connection.js';
 import { eq, count, desc, sql, and, gte } from 'drizzle-orm';
 import { systemHealthService } from '../../infrastructure/monitoring/system-health.js';
-import { alertingService } from '../../infrastructure/notifications/alerting-service.js';
+import { alertingService, notificationSchedulerService } from '../../infrastructure/notifications/index.js';
 import { logger } from '../../utils/logger';
 
 export interface AdminStats {
@@ -39,39 +39,39 @@ export class AdminService {
       const systemMetrics = await systemHealthService.getSystemMetrics();
 
       // User statistics
-      const [totalUsers] = await db.select({ count: count() }).from(users);
-      const [activeUsers] = await db.select({ count: count() }).from(users).where(eq(users.isActive, true));
-      const [newUsers] = await db.select({ count: count() }).from(users).where(gte(users.createdAt, oneWeekAgo));
-      
+      const [totalUsers] = await db.select({ count: sql<number>`count(*)` }).from(users);
+      const [activeUsers] = await db.select({ count: sql<number>`count(*)` }).from(users).where(eq(users.isActive, true));
+      const [newUsers] = await db.select({ count: sql<number>`count(*)` }).from(users).where(gte(users.createdAt, oneWeekAgo));
+
       const usersByRole = await db
         .select({
           role: users.role,
-          count: count()
+          count: sql<number>`count(*)`
         })
         .from(users)
         .groupBy(users.role);
 
       // Bill statistics
-      const [totalBills] = await db.select({ count: count() }).from(bills);
-      const [newBills] = await db.select({ count: count() }).from(bills).where(gte(bills.createdAt, oneWeekAgo));
-      
-      const billsByStatus = await db
-        .select({
-          status: bills.status,
-          count: count()
-        })
-        .from(bills)
-        .groupBy(bills.status);
+       const [totalBills] = await db.select({ count: sql<number>`count(*)` }).from(bills);
+       const [newBills] = await db.select({ count: sql<number>`count(*)` }).from(bills).where(gte(bills.createdAt, oneWeekAgo));
+
+       const billsByStatus = await db
+         .select({
+           status: bills.status,
+           count: sql<number>`count(*)`
+         })
+         .from(bills)
+         .groupBy(bills.status);
 
       // Engagement statistics
-      const [totalComments] = await db.select({ count: count() }).from(billComments);
-      const [totalAnalyses] = await db.select({ count: count() }).from(analysis);
+       const [totalComments] = await db.select({ count: sql<number>`count(*)` }).from(billComments);
+       const [totalAnalyses] = await db.select({ count: sql<number>`count(*)` }).from(analysis);
       
       // Active users (users who have engaged in the last week)
-      const [recentlyActiveUsers] = await db
-        .select({ count: count() })
-        .from(users)
-        .where(gte(users.lastLoginAt, oneWeekAgo));
+       const [recentlyActiveUsers] = await db
+         .select({ count: sql<number>`count(*)` })
+         .from(users)
+         .where(gte(users.lastLoginAt, oneWeekAgo));
 
       return {
         users: {
@@ -103,12 +103,12 @@ export class AdminService {
 
       try {
         // Try to get basic stats without system health
-        const [totalUsers] = await db.select({ count: count() }).from(users);
-        const [activeUsers] = await db.select({ count: count() }).from(users).where(eq(users.isActive, true));
-        const [newUsers] = await db.select({ count: count() }).from(users).where(gte(users.createdAt, oneWeekAgo));
-        const [totalBills] = await db.select({ count: count() }).from(bills);
-        const [newBills] = await db.select({ count: count() }).from(bills).where(gte(bills.createdAt, oneWeekAgo));
-        const [totalComments] = await db.select({ count: count() }).from(billComments);
+        const [totalUsers] = await db.select({ count: sql<number>`count(*)` }).from(users);
+        const [activeUsers] = await db.select({ count: sql<number>`count(*)` }).from(users).where(eq(users.isActive, true));
+        const [newUsers] = await db.select({ count: sql<number>`count(*)` }).from(users).where(gte(users.createdAt, oneWeekAgo));
+        const [totalBills] = await db.select({ count: sql<number>`count(*)` }).from(bills);
+        const [newBills] = await db.select({ count: sql<number>`count(*)` }).from(bills).where(gte(bills.createdAt, oneWeekAgo));
+        const [totalComments] = await db.select({ count: sql<number>`count(*)` }).from(billComments);
 
         return {
           users: {
@@ -176,7 +176,7 @@ export class AdminService {
 
       // Apply conditions
       if (conditions.length > 0) {
-        baseQuery = baseQuery.where(sql`${and(...conditions)}`);
+        baseQuery = baseQuery.where(and(...conditions));
       }
 
       const result = await baseQuery
@@ -185,9 +185,9 @@ export class AdminService {
         .offset(offset);
 
       // Get total count
-      let countQuery = db.select({ count: count() }).from(users);
+      let countQuery = db.select({ count: sql<number>`count(*)` }).from(users);
       if (conditions.length > 0) {
-        countQuery = countQuery.where(sql`${and(...conditions)}`);
+        countQuery = countQuery.where(and(...conditions));
       }
       const [{ count: total }] = await countQuery;
 

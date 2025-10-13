@@ -1,29 +1,21 @@
 import { Request } from 'express';
 import { database as db } from '../../../shared/database/connection.js';
 import { securityAuditLogs } from '../../../shared/schema.js';
-import { eq, and, or, gte } from 'drizzle-orm';
+import { eq, and, gte, lte, desc, sql, count, inArray } from 'drizzle-orm';
 import { logger } from '../../utils/logger';
 
-// Define securityIncidents table locally since it's not in the main schema
-import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
-
-const securityIncidents = pgTable("security_incidents", {
-  id: serial("id").primaryKey(),
-  incidentType: text("incident_type").notNull(),
-  severity: text("severity").notNull(),
-  status: text("status").notNull().default("open"),
-  description: text("description").notNull(),
-  affectedUsers: text("affected_users").array(),
-  detectionMethod: text("detection_method"),
-  firstDetected: timestamp("first_detected").defaultNow(),
-  lastSeen: timestamp("last_seen"),
-  resolvedAt: timestamp("resolved_at"),
-  assignedTo: text("assigned_to"),
-  evidence: jsonb("evidence"),
-  mitigationSteps: text("mitigation_steps").array(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
+/**
+ * SecurityAuditService - The System's Black Box Recorder
+ * 
+ * This service has ONE job: faithfully record all security-relevant events
+ * in the system. It does not make decisions about what's suspicious, it does
+ * not trigger alerts, and it does not take defensive actions. It simply writes
+ * everything down with complete accuracy.
+ * 
+ * Think of this as the flight recorder on an airplane. It captures every detail
+ * so that later analysis (by the monitoring service) can reconstruct what happened
+ * and identify patterns or problems.
+ */
 
 export interface SecurityEvent {
   eventType: string;
@@ -36,443 +28,459 @@ export interface SecurityEvent {
   result: string;
   success: boolean;
   details?: Record<string, any>;
-  riskScore?: number;
   sessionId?: string;
+  timestamp?: Date;
 }
 
-export interface SecurityIncident {
-  incidentType: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  description: string;
-  affectedUsers?: string[];
-  detectionMethod?: string;
-  evidence?: Record<string, any>;
+export interface AuditQueryOptions {
+  userId?: string;
+  ipAddress?: string;
+  eventType?: string;
+  eventTypes?: string[];
+  severity?: string;
+  startDate?: Date;
+  endDate?: Date;
+  limit?: number;
+  offset?: number;
+}
+
+export interface AuditReport {
+  period: { start: Date; end: Date };
+  summary: {
+    totalEvents: number;
+    eventsByType: Record<string, number>;
+    eventsBySeverity: Record<string, number>;
+    uniqueUsers: number;
+    uniqueIPs: number;
+  };
+  events: any[];
 }
 
 /**
- * Comprehensive security audit and monitoring service
+ * Pure audit logging service - records events without judgment or action
  */
 export class SecurityAuditService {
-  private suspiciousActivityThresholds = {
-    failedLoginAttempts: 5,
-    rapidRequests: 100, // requests per minute
-    dataAccessVolume: 1000, // records accessed per hour
-    unusualHours: { start: 22, end: 6 }, // 10 PM to 6 AM
-  };
-
-  private riskFactors = {
-    failedLogin: 10,
-    successfulLoginAfterFailures: 15,
-    dataExport: 20,
-    adminAction: 25,
-    unusualLocation: 30,
-    unusualTime: 15,
-    highVolumeAccess: 35,
-    privilegeEscalation: 50,
-  };
-
   /**
-    * Log security events with automatic risk assessment
-    */
-   async logSecurityEvent(event: SecurityEvent): Promise<void> {
-     try {
-       const riskScore = this.calculateRiskScore(event);
-
-       await db.insert(securityAuditLogs).values({
-         eventType: event.eventType,
-         userId: event.userId,
-         ipAddress: event.ipAddress,
-         userAgent: event.userAgent,
-         resource: event.resource,
-         action: event.action,
-         result: event.result,
-         severity: event.severity,
-         details: event.details,
-         sessionId: event.sessionId,
-         timestamp: new Date(),
-       });
-
-      // Check for suspicious patterns
-      await this.detectSuspiciousActivity(event);
-
-      // Alert on high-risk events
-      if (riskScore >= 40) {
-        await this.createSecurityAlert(event, riskScore);
-      }
-
-    } catch (error) {
-      logger.error('Failed to log security event:', { component: 'SimpleTool' }, error);
-      // Don't throw - security logging shouldn't break the application
-    }
-  }
-
-  /**
-    * Log authentication events
-    */
-   async logAuthEvent(
-     eventType: 'login_attempt' | 'login_success' | 'login_failure' | 'logout' | 'password_change' | 'registration_attempt',
-     req: Request | undefined,
-     userId?: string,
-     success: boolean = true,
-     details?: Record<string, any>
-   ): Promise<void> {
-     await this.logSecurityEvent({
-       eventType,
-       severity: success ? 'low' : 'medium',
-       userId,
-       ipAddress: this.getClientIP(req),
-       userAgent: req?.get?.('User-Agent') || 'unknown',
-       result: success ? 'success' : 'failure',
-       success,
-       details,
-       sessionId: (req as any)?.sessionID || 'unknown',
-     });
-   }
-
-  /**
-    * Log data access events
-    */
-   async logDataAccess(
-     resource: string,
-     action: string,
-     req: Request | undefined,
-     userId?: string,
-     recordCount?: number,
-     success: boolean = true
-   ): Promise<void> {
-     const severity = this.determineDataAccessSeverity(action, recordCount);
-
-     await this.logSecurityEvent({
-       eventType: 'data_access',
-       severity,
-       userId,
-       ipAddress: this.getClientIP(req),
-       userAgent: req?.get?.('User-Agent') || 'unknown',
-       resource,
-       action,
-       result: success ? 'allowed' : 'denied',
-       success,
-       details: { recordCount },
-       sessionId: (req as any)?.sessionID || 'unknown',
-     });
-   }
-
-  /**
-    * Log administrative actions
-    */
-   async logAdminAction(
-     action: string,
-     req: Request | undefined,
-     userId: string,
-     targetResource?: string,
-     details?: Record<string, any>
-   ): Promise<void> {
-     await this.logSecurityEvent({
-       eventType: 'admin_action',
-       severity: 'high',
-       userId,
-       ipAddress: this.getClientIP(req),
-       userAgent: req?.get?.('User-Agent') || 'unknown',
-       resource: targetResource,
-       action,
-       result: 'executed',
-       success: true,
-       details,
-       sessionId: (req as any)?.sessionID || 'unknown',
-     });
-   }
-
-  /**
-   * Create security incident
+   * Core logging method - records any security event to the audit trail
+   * This is the foundation method that all other logging methods use
    */
-  async createIncident(incident: SecurityIncident): Promise<number> {
-    const result = await db.insert(securityIncidents).values({
-      ...incident,
-      status: 'open',
-    }).returning({ id: securityIncidents.id });
-
-    const incidentId = result[0].id;
-
-    // Send alerts for high-severity incidents
-    if (incident.severity === 'high' || incident.severity === 'critical') {
-      await this.sendSecurityAlert(incident, incidentId);
-    }
-
-    return incidentId;
-  }
-
-  /**
-   * Detect suspicious activity patterns
-   */
-  private async detectSuspiciousActivity(event: SecurityEvent): Promise<void> {
-    if (!event.userId || !event.ipAddress) return;
-
-    const now = new Date();
-    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
-
-    // Check for multiple failed login attempts
-    if (event.eventType === 'login_failure') {
-      const recentFailures = await this.getRecentFailedLogins(event.userId, event.ipAddress, oneHourAgo);
-      
-      if (recentFailures >= this.suspiciousActivityThresholds.failedLoginAttempts) {
-        await this.createIncident({
-          incidentType: 'brute_force_attack',
-          severity: 'high',
-          description: `Multiple failed login attempts detected for user ${event.userId} from IP ${event.ipAddress}`,
-          affectedUsers: [event.userId],
-          detectionMethod: 'automated',
-          evidence: { failedAttempts: recentFailures, timeWindow: '1 hour' },
-        });
-      }
-    }
-
-    // Check for unusual access patterns
-    if (event.eventType === 'data_access' && event.details?.recordCount) {
-      const recentAccess = await this.getRecentDataAccess(event.userId, oneHourAgo);
-      
-      if (recentAccess >= this.suspiciousActivityThresholds.dataAccessVolume) {
-        await this.createIncident({
-          incidentType: 'data_exfiltration_attempt',
-          severity: 'critical',
-          description: `Unusual high-volume data access detected for user ${event.userId}`,
-          affectedUsers: [event.userId],
-          detectionMethod: 'automated',
-          evidence: { recordsAccessed: recentAccess, timeWindow: '1 hour' },
-        });
-      }
-    }
-  }
-
-  /**
-   * Calculate risk score for security events
-   */
-  private calculateRiskScore(event: SecurityEvent): number {
-    let score = 0;
-
-    // Base score by event type
-    switch (event.eventType) {
-      case 'login_failure':
-        score += this.riskFactors.failedLogin;
-        break;
-      case 'login_success':
-        score += event.details?.previousFailures ? this.riskFactors.successfulLoginAfterFailures : 5;
-        break;
-      case 'data_access':
-        if (event.action?.includes('export') || event.action?.includes('download')) {
-          score += this.riskFactors.dataExport;
-        }
-        if (event.details?.recordCount && event.details.recordCount > 100) {
-          score += this.riskFactors.highVolumeAccess;
-        }
-        break;
-      case 'admin_action':
-        score += this.riskFactors.adminAction;
-        break;
-    }
-
-    // Time-based risk
-    const hour = new Date().getHours();
-    if (hour >= this.suspiciousActivityThresholds.unusualHours.start || 
-        hour <= this.suspiciousActivityThresholds.unusualHours.end) {
-      score += this.riskFactors.unusualTime;
-    }
-
-    // Failure increases risk
-    if (!event.success) {
-      score += 10;
-    }
-
-    return Math.min(score, 100); // Cap at 100
-  }
-
-  /**
-   * Determine severity for data access events
-   */
-  private determineDataAccessSeverity(action: string, recordCount?: number): 'low' | 'medium' | 'high' | 'critical' {
-    if (action.includes('export') || action.includes('download')) {
-      return recordCount && recordCount > 1000 ? 'critical' : 'high';
-    }
-    
-    if (recordCount && recordCount > 100) {
-      return 'medium';
-    }
-    
-    return 'low';
-  }
-
-  /**
-   * Get client IP address from request
-   */
-  private getClientIP(req: Request | undefined): string {
-    if (!req || !req.headers) {
-      return 'unknown';
-    }
-    
-    return (req.headers['x-forwarded-for'] as string)?.split(',')[0] ||
-           req.headers['x-real-ip'] as string ||
-           (req as any).connection?.remoteAddress ||
-           (req as any).socket?.remoteAddress ||
-           req.ip ||
-           'unknown';
-  }
-
-  /**
-   * Get recent failed login attempts
-   */
-  private async getRecentFailedLogins(userId: string, ipAddress: string, since: Date): Promise<number> {
+  async logSecurityEvent(event: SecurityEvent): Promise<void> {
     try {
-      const result = await db
-        .select({ count: securityAuditLogs.id })
-        .from(securityAuditLogs)
-        .where(
-          and(
-            eq(securityAuditLogs.eventType, 'login_failure'),
-            or(eq(securityAuditLogs.userId, userId), eq(securityAuditLogs.ipAddress, ipAddress)),
-            gte(securityAuditLogs.createdAt, since)
-          )
-        );
-      
-      return result.length;
+      await db.insert(securityAuditLogs).values({
+        eventType: event.eventType,
+        userId: event.userId,
+        ipAddress: event.ipAddress,
+        userAgent: event.userAgent,
+        resource: event.resource,
+        action: event.action,
+        result: event.result,
+        severity: event.severity,
+        details: event.details,
+        sessionId: event.sessionId,
+        timestamp: event.timestamp || new Date(),
+      });
     } catch (error) {
-      logger.error('Failed to get recent failed logins:', { component: 'SimpleTool' }, error);
+      // Audit logging failures should be logged but should never crash the application
+      // This is critical because if audit logging breaks, we don't want to take down
+      // the entire system, but we absolutely need to know about it
+      logger.error('CRITICAL: Audit logging failed', { component: 'SecurityAudit' }, {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        eventType: event.eventType,
+        userId: event.userId,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+
+  /**
+   * Log authentication events - login attempts, logouts, password changes
+   * These are high-value audit events because authentication is often the first
+   * target of attackers
+   */
+  async logAuthEvent(
+    eventType: 'login_attempt' | 'login_success' | 'login_failure' | 'logout' | 
+              'password_change' | 'password_reset_request' | 'password_reset_complete' |
+              'registration_attempt' | 'registration_success' | 'registration_failure',
+    req: Request | undefined,
+    userId?: string,
+    success: boolean = true,
+    details?: Record<string, any>
+  ): Promise<void> {
+    // Determine severity based on the event type and success status
+    // Failed authentication attempts get elevated severity for easier monitoring
+    const severity = this.determineAuthSeverity(eventType, success);
+
+    await this.logSecurityEvent({
+      eventType,
+      severity,
+      userId,
+      ipAddress: this.extractClientIP(req),
+      userAgent: req?.get?.('User-Agent') || 'unknown',
+      result: success ? 'success' : 'failure',
+      success,
+      details: {
+        ...details,
+        // Add context about the authentication attempt
+        attemptTimestamp: new Date().toISOString(),
+        // Include any relevant headers that might help with forensics
+        referer: req?.get?.('Referer'),
+      },
+      sessionId: (req as any)?.sessionID || 'unknown',
+    });
+  }
+
+  /**
+   * Log data access events - reads, writes, exports, deletes
+   * These events help us track who accessed what data and when, which is
+   * crucial for compliance (GDPR, HIPAA, etc.) and breach investigations
+   */
+  async logDataAccess(
+    resource: string,
+    action: 'read' | 'write' | 'update' | 'delete' | 'export' | 'bulk_read' | 'bulk_export',
+    req: Request | undefined,
+    userId?: string,
+    recordCount?: number,
+    success: boolean = true,
+    details?: Record<string, any>
+  ): Promise<void> {
+    // Data access severity increases with volume and type of operation
+    const severity = this.determineDataAccessSeverity(action, recordCount);
+
+    await this.logSecurityEvent({
+      eventType: 'data_access',
+      severity,
+      userId,
+      ipAddress: this.extractClientIP(req),
+      userAgent: req?.get?.('User-Agent') || 'unknown',
+      resource,
+      action,
+      result: success ? 'allowed' : 'denied',
+      success,
+      details: {
+        recordCount,
+        ...details,
+        // Track data access patterns for compliance reporting
+        dataCategory: this.categorizeResource(resource),
+      },
+      sessionId: (req as any)?.sessionID || 'unknown',
+    });
+  }
+
+  /**
+   * Log administrative actions - user management, system config changes, etc.
+   * Admin actions always get high severity because they can have system-wide impact
+   */
+  async logAdminAction(
+    action: string,
+    req: Request | undefined,
+    userId: string,
+    targetResource?: string,
+    details?: Record<string, any>
+  ): Promise<void> {
+    await this.logSecurityEvent({
+      eventType: 'admin_action',
+      severity: 'high', // All admin actions are high severity by default
+      userId,
+      ipAddress: this.extractClientIP(req),
+      userAgent: req?.get?.('User-Agent') || 'unknown',
+      resource: targetResource,
+      action,
+      result: 'executed',
+      success: true,
+      details: {
+        ...details,
+        adminActionType: this.categorizeAdminAction(action),
+      },
+      sessionId: (req as any)?.sessionID || 'unknown',
+    });
+  }
+
+  /**
+   * Log security system events - monitoring actions, alert creation, etc.
+   * This creates an audit trail of the security system itself, which is important
+   * for understanding how the security system responded to events
+   */
+  async logSecuritySystemEvent(
+    eventType: string,
+    action: string,
+    details?: Record<string, any>,
+    severity: 'low' | 'medium' | 'high' | 'critical' = 'low'
+  ): Promise<void> {
+    await this.logSecurityEvent({
+      eventType,
+      severity,
+      action,
+      result: 'completed',
+      success: true,
+      details: {
+        ...details,
+        systemGenerated: true,
+        component: 'security_monitoring',
+      },
+    });
+  }
+
+  /**
+   * Query audit logs with flexible filtering
+   * This is how other services (especially the monitoring service) read the audit trail
+   * to analyze patterns and detect threats
+   */
+  async queryAuditLogs(options: AuditQueryOptions): Promise<any[]> {
+    try {
+      // Build the base query
+      let query = db.select().from(securityAuditLogs);
+
+      // Build where clause by chaining conditions inline
+      // This avoids TypeScript issues with condition arrays
+      const whereConditions: any[] = [];
+
+      if (options.userId) {
+        whereConditions.push(eq(securityAuditLogs.userId, options.userId));
+      }
+      if (options.ipAddress) {
+        whereConditions.push(eq(securityAuditLogs.ipAddress, options.ipAddress));
+      }
+      if (options.eventType) {
+        whereConditions.push(eq(securityAuditLogs.eventType, options.eventType));
+      }
+      if (options.eventTypes && options.eventTypes.length > 0) {
+        whereConditions.push(inArray(securityAuditLogs.eventType, options.eventTypes));
+      }
+      if (options.severity) {
+        whereConditions.push(eq(securityAuditLogs.severity, options.severity));
+      }
+      if (options.startDate) {
+        whereConditions.push(gte(securityAuditLogs.createdAt, options.startDate));
+      }
+      if (options.endDate) {
+        whereConditions.push(lte(securityAuditLogs.createdAt, options.endDate));
+      }
+
+      // Apply conditions if any exist
+      if (whereConditions.length > 0) {
+        query = query.where(and(...whereConditions)) as any;
+      }
+
+      // Apply ordering and pagination
+      query = query.orderBy(desc(securityAuditLogs.createdAt)) as any;
+
+      if (options.limit) {
+        query = query.limit(options.limit) as any;
+      }
+      if (options.offset) {
+        query = query.offset(options.offset) as any;
+      }
+
+      return await query;
+    } catch (error) {
+      logger.error('Failed to query audit logs:', { component: 'SecurityAudit' }, error);
+      throw new Error('Audit log query failed');
+    }
+  }
+
+  /**
+   * Get event count for a specific query - useful for pagination and statistics
+   */
+  async getEventCount(options: AuditQueryOptions): Promise<number> {
+    try {
+      // Build the base count query
+      let query = db.select({ count: count() }).from(securityAuditLogs);
+
+      // Build where conditions inline to avoid TypeScript inference issues
+      const whereConditions: any[] = [];
+
+      if (options.userId) {
+        whereConditions.push(eq(securityAuditLogs.userId, options.userId));
+      }
+      if (options.ipAddress) {
+        whereConditions.push(eq(securityAuditLogs.ipAddress, options.ipAddress));
+      }
+      if (options.eventType) {
+        whereConditions.push(eq(securityAuditLogs.eventType, options.eventType));
+      }
+      if (options.startDate) {
+        whereConditions.push(gte(securityAuditLogs.createdAt, options.startDate));
+      }
+      if (options.endDate) {
+        whereConditions.push(lte(securityAuditLogs.createdAt, options.endDate));
+      }
+
+      // Apply where conditions if any exist
+      if (whereConditions.length > 0) {
+        query = query.where(and(...whereConditions)) as any;
+      }
+
+      const result = await query;
+      return Number(result[0].count);
+    } catch (error) {
+      logger.error('Failed to get event count:', { component: 'SecurityAudit' }, error);
       return 0;
     }
   }
 
   /**
-   * Get recent data access volume
+   * Generate a comprehensive audit report for a time period
+   * This provides summary statistics and raw event data for compliance reporting
+   * and security analysis
    */
-  private async getRecentDataAccess(userId: string, since: Date): Promise<number> {
+  async generateAuditReport(startDate: Date, endDate: Date): Promise<AuditReport> {
     try {
-      // This would need proper SQL aggregation in production
-      const result = await db
-        .select()
-        .from(securityAuditLogs)
-        .where(
-          and(
-            eq(securityAuditLogs.eventType, 'data_access'),
-            eq(securityAuditLogs.userId, userId),
-            gte(securityAuditLogs.createdAt, since)
-          )
-        );
-      
-      return result.reduce((total, log) => {
-        const details = log.details as any;
-        return total + (details?.recordCount || 0);
-      }, 0);
-    } catch (error) {
-      logger.error('Failed to get recent data access:', { component: 'SimpleTool' }, error);
-      return 0;
-    }
-  }
+      // Fetch all events in the time period
+      const events = await this.queryAuditLogs({
+        startDate,
+        endDate,
+        limit: 10000, // Reasonable limit for report generation
+      });
 
-  /**
-   * Create security alert for high-risk events
-   */
-  private async createSecurityAlert(event: SecurityEvent, riskScore: number): Promise<void> {
-    console.warn('🚨 HIGH-RISK SECURITY EVENT DETECTED:', {
-      eventType: event.eventType,
-      severity: event.severity,
-      riskScore,
-      userId: event.userId,
-      ipAddress: event.ipAddress,
-      timestamp: new Date().toISOString(),
-    });
+      // Calculate summary statistics
+      const eventsByType: Record<string, number> = {};
+      const eventsBySeverity: Record<string, number> = {};
+      const uniqueUsers = new Set<string>();
+      const uniqueIPs = new Set<string>();
 
-    // In production, this would send alerts via email, Slack, etc.
-    // For now, we'll just log to console and could integrate with notification service
-  }
-
-  /**
-   * Send security alert for incidents
-   */
-  private async sendSecurityAlert(incident: SecurityIncident, incidentId: number): Promise<void> {
-    logger.error('🚨 SECURITY INCIDENT CREATED:', { component: 'SimpleTool' }, {
-      id: incidentId,
-      type: incident.incidentType,
-      severity: incident.severity,
-      description: incident.description,
-      timestamp: new Date().toISOString(),
-    });
-
-    // In production, integrate with alerting systems
-  }
-
-  /**
-   * Generate security audit report
-   */
-  async generateAuditReport(startDate: Date, endDate: Date): Promise<any> {
-    try {
-      // This would be a comprehensive report in production
-      const events = await db
-        .select()
-        .from(securityAuditLogs)
-        // .where(sql`timestamp BETWEEN ${startDate} AND ${endDate}`)
-        .limit(1000);
-
-      const incidents = await db
-        .select()
-        .from(securityIncidents)
-        // .where(sql`created_at BETWEEN ${startDate} AND ${endDate}`)
-        .limit(100);
+      events.forEach(event => {
+        // Count by type
+        eventsByType[event.eventType] = (eventsByType[event.eventType] || 0) + 1;
+        
+        // Count by severity
+        eventsBySeverity[event.severity] = (eventsBySeverity[event.severity] || 0) + 1;
+        
+        // Track unique users and IPs
+        if (event.userId) uniqueUsers.add(event.userId);
+        if (event.ipAddress) uniqueIPs.add(event.ipAddress);
+      });
 
       return {
         period: { start: startDate, end: endDate },
         summary: {
           totalEvents: events.length,
-          totalIncidents: incidents.length,
-          highRiskEvents: events.filter(e => e.severity === 'high' || e.severity === 'critical').length,
-          criticalIncidents: incidents.filter(i => i.severity === 'critical').length,
+          eventsByType,
+          eventsBySeverity,
+          uniqueUsers: uniqueUsers.size,
+          uniqueIPs: uniqueIPs.size,
         },
-        events: events.slice(0, 50), // Latest 50 events
-        incidents: incidents.slice(0, 20), // Latest 20 incidents
-        recommendations: this.generateSecurityRecommendations(events, incidents),
+        events: events.slice(0, 100), // Include first 100 events in report
       };
     } catch (error) {
-      logger.error('Failed to generate audit report:', { component: 'SimpleTool' }, error);
-      throw new Error('Failed to generate security audit report');
+      logger.error('Failed to generate audit report:', { component: 'SecurityAudit' }, error);
+      throw new Error('Audit report generation failed');
     }
   }
 
   /**
-   * Generate security recommendations based on audit data
+   * Get recent failed login attempts for a user or IP
+   * This is a convenience method frequently needed by the monitoring service
    */
-  private generateSecurityRecommendations(events: any[], incidents: any[]): string[] {
-    const recommendations: string[] = [];
+  async getRecentFailedLogins(
+    userIdOrIP: string, 
+    since: Date,
+    matchField: 'userId' | 'ipAddress' = 'userId'
+  ): Promise<any[]> {
+    return await this.queryAuditLogs({
+      [matchField]: userIdOrIP,
+      eventType: 'login_failure',
+      startDate: since,
+    });
+  }
 
-    const failedLogins = events.filter(e => e.eventType === 'login_failure').length;
-    if (failedLogins > 50) {
-      recommendations.push('Consider implementing additional authentication measures due to high failed login attempts');
+  /**
+   * Get recent data access volume for a user
+   * Used by monitoring service to detect data exfiltration attempts
+   * (Note: "exfiltration" refers to unauthorized data transfer out of a system)
+   */
+  async getRecentDataAccessVolume(userId: string, since: Date): Promise<number> {
+    const events = await this.queryAuditLogs({
+      userId,
+      eventType: 'data_access',
+      startDate: since,
+    });
+
+    // Sum up the record counts from all data access events
+    return events.reduce((total, event) => {
+      const details = event.details as any;
+      return total + (details?.recordCount || 0);
+    }, 0);
+  }
+
+  /**
+   * Private helper methods for categorization and severity determination
+   */
+
+  private determineAuthSeverity(eventType: string, success: boolean): 'low' | 'medium' | 'high' | 'critical' {
+    // Failed authentication attempts are medium severity because they could indicate attacks
+    if (!success) {
+      return 'medium';
     }
 
-    const highRiskEvents = events.filter(e => (e.riskScore || 0) >= 40).length;
-    if (highRiskEvents > 10) {
-      recommendations.push('Review and strengthen access controls due to multiple high-risk events');
+    // Successful password changes and resets are medium because they're sensitive operations
+    if (eventType.includes('password')) {
+      return 'medium';
     }
 
-    const criticalIncidents = incidents.filter(i => i.severity === 'critical').length;
-    if (criticalIncidents > 0) {
-      recommendations.push('Immediate review of critical security incidents required');
+    // Regular successful logins are low severity
+    return 'low';
+  }
+
+  private determineDataAccessSeverity(action: string, recordCount?: number): 'low' | 'medium' | 'high' | 'critical' {
+    // Exports and bulk operations are inherently higher risk
+    if (action.includes('export') || action.includes('bulk')) {
+      return recordCount && recordCount > 1000 ? 'critical' : 'high';
     }
 
-    if (recommendations.length === 0) {
-      recommendations.push('Security posture appears stable - continue monitoring');
+    // Deletes are high severity because they're destructive
+    if (action === 'delete') {
+      return 'high';
     }
 
-    return recommendations;
+    // High volume access is medium severity
+    if (recordCount && recordCount > 100) {
+      return 'medium';
+    }
+
+    // Regular read/write operations are low severity
+    return 'low';
+  }
+
+  private categorizeResource(resource: string): string {
+    // Categorize resources for compliance reporting
+    if (resource.includes('user') || resource.includes('profile')) {
+      return 'personal_data';
+    }
+    if (resource.includes('payment') || resource.includes('financial')) {
+      return 'financial_data';
+    }
+    if (resource.includes('health') || resource.includes('medical')) {
+      return 'health_data';
+    }
+    return 'general_data';
+  }
+
+  private categorizeAdminAction(action: string): string {
+    if (action.includes('user') || action.includes('role')) {
+      return 'user_management';
+    }
+    if (action.includes('config') || action.includes('setting')) {
+      return 'configuration';
+    }
+    if (action.includes('permission') || action.includes('access')) {
+      return 'access_control';
+    }
+    return 'general_admin';
+  }
+
+  private extractClientIP(req: Request | undefined): string {
+    if (!req || !req.headers) {
+      return 'unknown';
+    }
+    
+    return (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() ||
+           (req.headers['x-real-ip'] as string) ||
+           (req as any).connection?.remoteAddress ||
+           (req as any).socket?.remoteAddress ||
+           req.ip ||
+           'unknown';
   }
 }
 
-// Singleton instance
+// Export singleton instance
 export const securityAuditService = new SecurityAuditService();
-
-// Export table definitions for migrations
-export { securityAuditLogs, securityIncidents };
-
-
-
-
-
-
-
-

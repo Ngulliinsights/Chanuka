@@ -1,65 +1,131 @@
 import { config } from '../config/index.ts';
 
 /**
- * Safely normalizes an unknown error into a structured object for logging.
- * This prevents crashes from circular references or non-standard error types.
+ * Safely normalizes unknown errors into structured objects for logging.
+ * Optimized with early returns and improved circular reference handling.
  */
 function normalizeError(err: unknown): Record<string, any> {
+  // Handle null/undefined first (most common edge case)
+  if (err == null) {
+    return { error: String(err), type: typeof err };
+  }
+
+  // Fast path for Error instances (most common case)
   if (err instanceof Error) {
-    return {
+    const normalized: Record<string, any> = {
       message: err.message,
-      stack: err.stack,
       name: err.name,
     };
-  }
-  if (typeof err === 'object' && err !== null) {
-    try {
-      // Attempt to stringify, but handle circular references
-      return JSON.parse(JSON.stringify(err, (key, value) => {
-        if (value instanceof Error) {
-          return { message: value.message, stack: value.stack, name: value.name };
-        }
-        return value;
-      }));
-    } catch {
-      return { error: 'Unserializable object' };
+    
+    // Only include stack in non-production for security
+    // Fixed: Use config.server.nodeEnv instead of config.environment
+    if (config.server.nodeEnv !== 'production' && err.stack) {
+      normalized.stack = err.stack;
     }
+    
+    // Recursively handle error causes
+    // Fixed: Type assertion for cause property (ES2022 feature)
+    if ('cause' in err && err.cause !== undefined) {
+      normalized.cause = normalizeError(err.cause);
+    }
+    
+    return normalized;
   }
-  return { error: String(err) };
+
+  // Handle primitives efficiently
+  if (typeof err !== 'object') {
+    return { error: String(err), type: typeof err };
+  }
+
+  // Handle objects with improved circular reference detection
+  try {
+    const seen = new WeakSet<object>();
+    
+    const serialize = (obj: any, depth = 0): any => {
+      // Limit recursion depth to prevent stack overflow
+      if (depth > 10) return '[Max Depth Exceeded]';
+      
+      if (obj === null || typeof obj !== 'object') return obj;
+      
+      if (obj instanceof Error) {
+        return normalizeError(obj);
+      }
+      
+      if (seen.has(obj)) return '[Circular]';
+      seen.add(obj);
+      
+      if (Array.isArray(obj)) {
+        return obj.map(item => serialize(item, depth + 1));
+      }
+      
+      const result: Record<string, any> = {};
+      for (const [key, value] of Object.entries(obj)) {
+        result[key] = serialize(value, depth + 1);
+      }
+      return result;
+    };
+    
+    return serialize(err);
+  } catch (serializeError) {
+    // Fallback for truly unserializable objects
+    return {
+      error: 'Unserializable object',
+      type: Object.prototype.toString.call(err),
+      serializationError: (serializeError as Error).message,
+    };
+  }
 }
 
-// Enhanced logger levels with numeric values for comparison
-const LOG_LEVELS = {
-  debug: 0,
-  info: 1,
-  warn: 2,
-  error: 3,
-  critical: 4,
-} as const;
+// Log levels as const enum for better minification
+const enum LogLevelValue {
+  Debug = 0,
+  Info = 1,
+  Warn = 2,
+  Error = 3,
+  Critical = 4,
+}
 
-// Type-safe log level type derived from LOG_LEVELS
-type LogLevel = keyof typeof LOG_LEVELS;
+// Public log level type
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'critical';
 
-// Calculate current log level once at module load time for performance
-const currentLogLevel = LOG_LEVELS[config.logging?.level as LogLevel] ?? LOG_LEVELS.info;
+// Efficient log level mapping
+const LOG_LEVEL_MAP: Record<LogLevel, LogLevelValue> = {
+  debug: LogLevelValue.Debug,
+  info: LogLevelValue.Info,
+  warn: LogLevelValue.Warn,
+  error: LogLevelValue.Error,
+  critical: LogLevelValue.Critical,
+};
 
-// Log entry interface with improved type safety
+// Pre-calculate current log level once
+const CURRENT_LOG_LEVEL = LOG_LEVEL_MAP[(config.logging?.level as LogLevel) ?? 'info'];
+
+// Console output configuration
+const CONSOLE_ENABLED = config.logging?.enableConsole !== false;
+// Fixed: Use config.server.nodeEnv instead of config.environment
+const IS_PRODUCTION = config.server.nodeEnv === 'production';
+
+/**
+ * Structured log entry with comprehensive tracking information
+ */
 export interface LogEntry {
   timestamp: Date;
   level: LogLevel;
   message: string;
   context?: LogContext;
   metadata?: Record<string, any>;
+  correlationId: string;
   traceId?: string;
   requestId?: string;
   userId?: string;
   sessionId?: string;
   ipAddress?: string;
   userAgent?: string;
-  correlationId?: string;
 }
 
-// Log context interface with better documentation
+/**
+ * Context object for structured logging information
+ */
 export interface LogContext {
   component?: string;
   operation?: string;
@@ -67,25 +133,31 @@ export interface LogContext {
   statusCode?: number;
   errorCode?: string;
   tags?: string[];
-  value?: number; // For metrics logging
-  userId?: string; // For security logging
+  value?: number;
+  userId?: string;
   [key: string]: any;
 }
 
-// Log aggregation interface for analytics
+/**
+ * Aggregated log statistics for monitoring
+ */
 export interface LogAggregation {
   totalLogs: number;
-  logsByLevel: Record<string, number>;
+  logsByLevel: Record<LogLevel, number>;
   logsByComponent: Record<string, number>;
   recentLogs: LogEntry[];
   errorRate: number;
   performanceMetrics: {
     averageResponseTime: number;
     slowRequests: number;
+    p95ResponseTime: number;
+    p99ResponseTime: number;
   };
 }
 
-// Query filters interface for better type safety
+/**
+ * Filter criteria for log queries
+ */
 export interface LogQueryFilters {
   level?: LogLevel[];
   component?: string[];
@@ -93,62 +165,132 @@ export interface LogQueryFilters {
   correlationId?: string;
   userId?: string;
   limit?: number;
+  offset?: number;
 }
 
 /**
- * Enhanced unified logger with optimized performance and memory management.
- * This logger provides structured logging with correlation tracking, performance
- * monitoring, and flexible querying capabilities.
+ * Request context interface for type safety
+ */
+interface RequestContext {
+  traceId?: string;
+  requestId?: string;
+  userId?: string;
+  sessionId?: string;
+  ipAddress?: string;
+  userAgent?: string;
+}
+
+/**
+ * High-performance unified logger with structured logging and monitoring.
+ * Optimized for production use with minimal overhead.
  */
 class UnifiedLogger {
-  private logs: LogEntry[] = [];
-  private readonly MAX_LOGS = 10000;
-  private correlationCounter = 0;
+  // Use a circular buffer with pre-allocated array for better memory efficiency
+  private readonly logs: LogEntry[] = [];
+  private logIndex = 0;
+  private readonly MAX_LOGS: number;
+  private readonly SLOW_REQUEST_THRESHOLD = 5000; // ms
   
-  // Cache for error tracker to avoid repeated require attempts
-  private errorTrackerCache: any = null;
+  // Use BigInt for correlation counter to avoid number overflow
+  private correlationCounter = 0n;
+  
+  // Lazy-loaded error tracker
+  private errorTracker: any = null;
   private errorTrackerLoadAttempted = false;
+  
+  // Performance optimization: pre-compiled formatters
+  // Fixed: Removed fractionalSecondDigits which requires ES2021+
+  // For backwards compatibility, using standard precision
+  private readonly timestampFormatter = new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
+  constructor() {
+    // Fixed: Use hardcoded default since maxLogs is not in config
+    // Alternatively, you could add maxLogs to your logging config interface
+    this.MAX_LOGS = 10000;
+    
+    // Pre-allocate array for better performance
+    this.logs.length = this.MAX_LOGS;
+  }
 
   /**
-   * Generates a unique correlation ID for log entry grouping.
-   * Uses timestamp and counter to ensure uniqueness across requests.
+   * Generates a unique correlation ID with better performance.
+   * Uses BigInt counter and base36 encoding for shorter IDs.
    */
   private generateCorrelationId(): string {
-    return `corr_${Date.now()}_${++this.correlationCounter}`;
+    // Use base36 for more compact representation
+    const timestamp = Date.now().toString(36);
+    const counter = (++this.correlationCounter).toString(36);
+    return `${timestamp}-${counter}`;
   }
 
   /**
-   * Formats a log message with structured data in a human-readable format.
-   * This method is called lazily only when console output is enabled.
+   * Formats log entry for console output with improved performance.
    */
   private formatMessage(entry: LogEntry): string {
-    const timestamp = entry.timestamp.toISOString();
-    const level = entry.level.toUpperCase().padEnd(8);
-    const correlation = entry.correlationId ? `[${entry.correlationId}]` : '';
-    const context = entry.context?.component ? `[${entry.context.component}]` : '';
-
-    let message = `[${timestamp}] ${level} ${correlation} ${context} ${entry.message}`;
-
-    // Only add metadata section if there's actual metadata to display
-    if (entry.metadata && Object.keys(entry.metadata).length > 0) {
-      message += `\nMetadata: ${JSON.stringify(entry.metadata, null, 2)}`;
+    // Use string builder pattern for better performance
+    const parts: string[] = [];
+    
+    // Use ISO string for consistent timestamp formatting
+    parts.push(`[${entry.timestamp.toISOString()}]`);
+    parts.push(entry.level.toUpperCase().padEnd(8));
+    
+    if (entry.correlationId) {
+      parts.push(`[${entry.correlationId}]`);
     }
-
-    // Display context information beyond just the component name
-    if (entry.context && Object.keys(entry.context).length > 1) {
-      const contextCopy = { ...entry.context };
-      delete contextCopy.component;
-      if (Object.keys(contextCopy).length > 0) {
-        message += `\nContext: ${JSON.stringify(contextCopy, null, 2)}`;
+    
+    if (entry.context?.component) {
+      parts.push(`[${entry.context.component}]`);
+    }
+    
+    parts.push(entry.message);
+    
+    // Build the base message
+    let output = parts.join(' ');
+    
+    // Only stringify additional data if not in production
+    if (!IS_PRODUCTION) {
+      const additionalData: string[] = [];
+      
+      if (entry.metadata && Object.keys(entry.metadata).length > 0) {
+        additionalData.push(`  Metadata: ${JSON.stringify(entry.metadata, null, 2)}`);
+      }
+      
+      if (entry.context) {
+        const { component, ...restContext } = entry.context;
+        if (Object.keys(restContext).length > 0) {
+          additionalData.push(`  Context: ${JSON.stringify(restContext, null, 2)}`);
+        }
+      }
+      
+      if (additionalData.length > 0) {
+        output += '\n' + additionalData.join('\n');
       }
     }
-
-    return message;
+    
+    return output;
   }
 
   /**
-   * Creates a structured log entry with all available context.
-   * Automatically injects request context from global scope if available.
+   * Extracts request context from global scope if available.
+   */
+  private getRequestContext(): RequestContext | undefined {
+    // Type-safe access to global request context
+    if (typeof globalThis !== 'undefined' && 'requestContext' in globalThis) {
+      return (globalThis as any).requestContext as RequestContext;
+    }
+    return undefined;
+  }
+
+  /**
+   * Creates a log entry with automatic context injection.
    */
   private createLogEntry(
     level: LogLevel,
@@ -160,320 +302,385 @@ class UnifiedLogger {
       timestamp: new Date(),
       level,
       message,
-      context,
-      metadata,
       correlationId: this.generateCorrelationId(),
     };
-
-    // Safely extract request context from global scope if available
-    // This enables automatic context propagation across async operations
-    if (typeof global !== 'undefined' && (global as any).requestContext) {
-      const reqCtx = (global as any).requestContext;
-      entry.traceId = reqCtx.traceId;
-      entry.requestId = reqCtx.requestId;
-      entry.userId = reqCtx.userId;
-      entry.sessionId = reqCtx.sessionId;
-      entry.ipAddress = reqCtx.ipAddress;
-      entry.userAgent = reqCtx.userAgent;
+    
+    // Only add defined properties to avoid unnecessary memory usage
+    if (context && Object.keys(context).length > 0) {
+      entry.context = context;
     }
-
+    
+    if (metadata && Object.keys(metadata).length > 0) {
+      entry.metadata = metadata;
+    }
+    
+    // Extract request context efficiently
+    const reqCtx = this.getRequestContext();
+    if (reqCtx) {
+      // Use object spread for cleaner code
+      Object.assign(entry, {
+        traceId: reqCtx.traceId,
+        requestId: reqCtx.requestId,
+        userId: reqCtx.userId,
+        sessionId: reqCtx.sessionId,
+        ipAddress: reqCtx.ipAddress,
+        userAgent: reqCtx.userAgent,
+      });
+    }
+    
     return entry;
   }
 
   /**
-   * Lazily loads and caches the error tracker to avoid circular dependencies.
-   * Only attempts to load once to prevent repeated failures.
+   * Lazy-loads error tracker with improved error handling.
    */
-  private getErrorTracker(): any {
+  private async getErrorTracker(): Promise<any> {
     if (this.errorTrackerLoadAttempted) {
-      return this.errorTrackerCache;
+      return this.errorTracker;
     }
-
+    
     this.errorTrackerLoadAttempted = true;
-
+    
     try {
-      const { errorTracker } = require('../core/errors/error-tracker.ts');
-      this.errorTrackerCache = errorTracker;
-      return errorTracker;
+      // Use dynamic import for better code splitting
+      const module = await import('../core/errors/error-tracker.ts');
+      this.errorTracker = module.errorTracker;
+      return this.errorTracker;
     } catch (error) {
-      // Error tracker not available - this is acceptable in some deployment scenarios
-      console.warn('Error tracker module not available, error tracking will be limited');
+      // Log the error in development
+      if (!IS_PRODUCTION) {
+        console.warn('Error tracker unavailable:', error);
+      }
       return null;
     }
   }
 
   /**
-   * Stores a log entry in memory and integrates with error tracking system.
-   * Maintains circular buffer behavior to prevent unbounded memory growth.
+   * Stores log entry using circular buffer for memory efficiency.
    */
-  private storeLogEntry(entry: LogEntry): void {
-    this.logs.push(entry);
-
-    // Maintain max logs limit using efficient slice operation
-    if (this.logs.length > this.MAX_LOGS) {
-      this.logs = this.logs.slice(-this.MAX_LOGS);
-    }
-
-    // Forward error and critical logs to error tracker for centralized monitoring
+  private async storeLogEntry(entry: LogEntry): Promise<void> {
+    // Use circular buffer index for O(1) insertion
+    this.logs[this.logIndex] = entry;
+    this.logIndex = (this.logIndex + 1) % this.MAX_LOGS;
+    
+    // Forward errors to error tracker asynchronously
     if (entry.level === 'error' || entry.level === 'critical') {
-      const errorTracker = this.getErrorTracker();
-      
-      if (errorTracker) {
-        try {
-          const errorContext = {
-            traceId: entry.traceId,
-            userId: entry.userId,
-            ip: entry.ipAddress,
-            url: entry.context?.operation,
-            method: entry.context?.component,
-            headers: entry.userAgent ? { 'User-Agent': entry.userAgent } : undefined,
-            endpoint: entry.context?.operation,
-            currentAvg: entry.context?.duration,
-          };
-
-          errorTracker.trackError(
-            entry.message,
-            errorContext,
-            entry.level === 'critical' ? 'critical' : 'high',
-            'system'
-          );
-        } catch (error) {
-          // Fail silently to prevent logging errors from breaking application flow
-          console.error('Failed to track error with errorTracker:', error);
-        }
-      }
+      // Don't await to avoid blocking
+      this.forwardToErrorTracker(entry).catch(() => {
+        // Silently fail to prevent cascading failures
+      });
     }
   }
 
   /**
-   * Determines if a log at the given level should be processed.
-   * Uses numeric comparison for efficiency.
+   * Forwards error logs to error tracker with improved error handling.
+   */
+  private async forwardToErrorTracker(entry: LogEntry): Promise<void> {
+    const tracker = await this.getErrorTracker();
+    if (!tracker) return;
+    
+    tracker.trackError(
+      entry.message,
+      {
+        traceId: entry.traceId,
+        userId: entry.userId,
+        ip: entry.ipAddress,
+        url: entry.context?.operation,
+        method: entry.context?.component,
+        headers: entry.userAgent ? { 'User-Agent': entry.userAgent } : undefined,
+        endpoint: entry.context?.operation,
+        currentAvg: entry.context?.duration,
+      },
+      entry.level === 'critical' ? 'critical' : 'high',
+      'system'
+    );
+  }
+
+  /**
+   * Checks if logging is enabled for the given level.
    */
   private shouldLog(level: LogLevel): boolean {
-    return LOG_LEVELS[level] >= currentLogLevel;
+    return LOG_LEVEL_MAP[level] >= CURRENT_LOG_LEVEL;
   }
 
   /**
-   * Outputs a log entry to console if console logging is enabled.
-   * Formatting is done lazily only when needed.
+   * Outputs to console using appropriate method.
+   * Fixed: Added proper type guard for console methods
    */
-  private outputToConsole(entry: LogEntry, consoleMethod: 'debug' | 'log' | 'warn' | 'error'): void {
-    if (config.logging?.enableConsole) {
-      console[consoleMethod](this.formatMessage(entry));
+  private outputToConsole(entry: LogEntry): void {
+    if (!CONSOLE_ENABLED) return;
+    
+    // Use explicit method calls instead of dynamic access to avoid type issues
+    const message = this.formatMessage(entry);
+    
+    switch (entry.level) {
+      case 'debug':
+        console.debug(message);
+        break;
+      case 'info':
+        console.log(message);
+        break;
+      case 'warn':
+        console.warn(message);
+        break;
+      case 'error':
+      case 'critical':
+        console.error(message);
+        break;
     }
   }
 
-  // ==================== Core Logging Methods ====================
+  /**
+   * Internal logging method to reduce code duplication.
+   */
+  private logInternal(
+    level: LogLevel,
+    message: string,
+    context?: LogContext,
+    metadata?: Record<string, any>
+  ): void {
+    if (level !== 'critical' && !this.shouldLog(level)) return;
+    
+    const entry = this.createLogEntry(level, message, context, metadata);
+    this.storeLogEntry(entry);
+    this.outputToConsole(entry);
+  }
+
+  // ==================== Public Logging Methods ====================
 
   /**
-   * Logs a debug-level message. Used for detailed diagnostic information
-   * that's primarily useful during development and troubleshooting.
+   * Logs debug-level information for development.
    */
   debug(message: string, context?: LogContext, metadata?: Record<string, any>): void {
-    if (!this.shouldLog('debug')) return;
-
-    const entry = this.createLogEntry('debug', message, context, metadata);
-    this.storeLogEntry(entry);
-    this.outputToConsole(entry, 'debug');
+    this.logInternal('debug', message, context, metadata);
   }
 
   /**
-   * Logs an info-level message. Used for general informational messages
-   * about application operation and state transitions.
+   * Logs informational messages about normal operations.
    */
   info(message: string, context?: LogContext, metadata?: Record<string, any>): void {
-    if (!this.shouldLog('info')) return;
-
-    const entry = this.createLogEntry('info', message, context, metadata);
-    this.storeLogEntry(entry);
-    this.outputToConsole(entry, 'log');
+    this.logInternal('info', message, context, metadata);
   }
 
   /**
-   * Logs a warning message. Used for potentially problematic situations
-   * that don't prevent the application from functioning.
+   * Logs warning messages for potentially problematic situations.
    */
   warn(message: string, context?: LogContext, metadata?: Record<string, any>): void {
-    if (!this.shouldLog('warn')) return;
-
-    const entry = this.createLogEntry('warn', message, context, metadata);
-    this.storeLogEntry(entry);
-    this.outputToConsole(entry, 'warn');
+    this.logInternal('warn', message, context, metadata);
   }
 
   /**
-   * Logs an error message. Used for error conditions that allow
-   * the application to continue running but indicate problems.
+   * Logs errors with automatic error normalization.
    */
-  error(message: string, context?: LogContext, metadata?: Record<string, any>): void;
-  error(message: string, context: LogContext | undefined, err: unknown): void;
-  error(message: string, context?: LogContext, metadataOrError?: Record<string, any> | unknown): void {
-    if (!this.shouldLog('error')) return;
-
-    let metadata: Record<string, any> | undefined;
-    if (typeof metadataOrError === 'object' && metadataOrError !== null) {
-      metadata = metadataOrError as Record<string, any>;
-    } else if (metadataOrError) {
-      metadata = normalizeError(metadataOrError);
-    }
-
-    const entry = this.createLogEntry('error', message, context, metadata);
-    this.storeLogEntry(entry);
-    this.outputToConsole(entry, 'error');
+  error(
+    message: string,
+    context?: LogContext,
+    metadataOrError?: Record<string, any> | unknown
+  ): void {
+    const metadata = this.processErrorMetadata(metadataOrError);
+    this.logInternal('error', message, context, metadata);
   }
 
   /**
-   * Logs a critical message. These are always logged regardless of level.
-   * Used for severe errors that require immediate attention.
+   * Logs critical errors that always bypass level filtering.
    */
-  critical(message: string, context?: LogContext, metadata?: Record<string, any>): void;
-  critical(message: string, context: LogContext | undefined, err: unknown): void;
-  critical(message: string, context?: LogContext, metadataOrError?: Record<string, any> | unknown): void {
-    // Critical logs bypass level filtering
-    let metadata: Record<string, any> | undefined;
-    if (typeof metadataOrError === 'object' && metadataOrError !== null) {
-      metadata = metadataOrError as Record<string, any>;
-    } else if (metadataOrError) {
-      metadata = normalizeError(metadataOrError);
+  critical(
+    message: string,
+    context?: LogContext,
+    metadataOrError?: Record<string, any> | unknown
+  ): void {
+    const metadata = this.processErrorMetadata(metadataOrError);
+    this.logInternal('critical', message, context, metadata);
+  }
+
+  /**
+   * Processes error metadata with improved type checking.
+   */
+  private processErrorMetadata(
+    metadataOrError?: Record<string, any> | unknown
+  ): Record<string, any> | undefined {
+    if (metadataOrError === undefined) return undefined;
+    
+    // Check if it's already a metadata object
+    if (
+      typeof metadataOrError === 'object' &&
+      metadataOrError !== null &&
+      !('stack' in metadataOrError) &&
+      !(metadataOrError instanceof Error)
+    ) {
+      return metadataOrError as Record<string, any>;
     }
     
-    const entry = this.createLogEntry('critical', message, context, metadata);
-    this.storeLogEntry(entry);
-    this.outputToConsole(entry, 'error');
+    // Otherwise, normalize as error
+    return normalizeError(metadataOrError);
   }
 
-  // ==================== Legacy Compatibility ====================
-
   /**
-   * Legacy log method for backward compatibility with older code.
-   * New code should use the level-specific methods instead.
+   * Legacy logging method for backward compatibility.
+   * @deprecated Use level-specific methods instead
    */
   log(obj: object | string, msg?: string, ...args: any[]): void {
-    const message = typeof obj === 'string' ? obj : msg || 'Log message';
-    const metadata = typeof obj === 'object' ? { data: obj, extra: args } : { extra: args };
+    const message = typeof obj === 'string' ? obj : msg ?? 'Log entry';
+    const metadata = typeof obj === 'object'
+      ? { data: obj, ...(args.length > 0 && { extra: args }) }
+      : args.length > 0
+      ? { extra: args }
+      : undefined;
     this.info(message, undefined, metadata);
   }
 
   // ==================== Analytics and Querying ====================
 
   /**
-   * Aggregates log data over a time window for monitoring and analysis.
-   * Calculates error rates, performance metrics, and distribution statistics.
-   * 
-   * @param timeWindow - Time window in milliseconds (default: 1 hour)
+   * Gets valid logs (non-null entries) from the circular buffer.
+   */
+  private getValidLogs(): LogEntry[] {
+    return this.logs.filter(log => log != null);
+  }
+
+  /**
+   * Aggregates log statistics with improved performance.
    */
   getLogAggregation(timeWindow: number = 3600000): LogAggregation {
     const cutoffTime = new Date(Date.now() - timeWindow);
-    const recentLogs = this.logs.filter(log => log.timestamp > cutoffTime);
-
-    // Use single pass for efficiency instead of multiple iterations
-    const stats = {
-      logsByLevel: {} as Record<string, number>,
-      logsByComponent: {} as Record<string, number>,
-      errorCount: 0,
-      totalResponseTime: 0,
-      responseTimeCount: 0,
-      slowRequests: 0,
+    const validLogs = this.getValidLogs();
+    const recentLogs = validLogs.filter(log => log.timestamp >= cutoffTime);
+    
+    // Initialize aggregation data
+    const aggregation: LogAggregation = {
+      totalLogs: recentLogs.length,
+      logsByLevel: {
+        debug: 0,
+        info: 0,
+        warn: 0,
+        error: 0,
+        critical: 0,
+      },
+      logsByComponent: {},
+      recentLogs: [],
+      errorRate: 0,
+      performanceMetrics: {
+        averageResponseTime: 0,
+        slowRequests: 0,
+        p95ResponseTime: 0,
+        p99ResponseTime: 0,
+      },
     };
-
+    
+    if (recentLogs.length === 0) return aggregation;
+    
+    // Collect data in single pass
+    const responseTimes: number[] = [];
+    let errorCount = 0;
+    let slowRequests = 0;
+    let totalResponseTime = 0;
+    
     for (const log of recentLogs) {
       // Count by level
-      stats.logsByLevel[log.level] = (stats.logsByLevel[log.level] || 0) + 1;
-
+      aggregation.logsByLevel[log.level]++;
+      
       // Count by component
       if (log.context?.component) {
-        const comp = log.context.component;
-        stats.logsByComponent[comp] = (stats.logsByComponent[comp] || 0) + 1;
+        aggregation.logsByComponent[log.context.component] =
+          (aggregation.logsByComponent[log.context.component] ?? 0) + 1;
       }
-
-      // Track errors
+      
+      // Count errors
       if (log.level === 'error' || log.level === 'critical') {
-        stats.errorCount++;
+        errorCount++;
       }
-
-      // Track performance metrics
-      if (log.context?.duration !== undefined) {
-        stats.totalResponseTime += log.context.duration;
-        stats.responseTimeCount++;
-
-        if (log.context.duration > 5000) {
-          stats.slowRequests++;
+      
+      // Collect performance metrics
+      if (typeof log.context?.duration === 'number') {
+        const duration = log.context.duration;
+        responseTimes.push(duration);
+        totalResponseTime += duration;
+        
+        if (duration > this.SLOW_REQUEST_THRESHOLD) {
+          slowRequests++;
         }
       }
     }
-
-    const errorRate = recentLogs.length > 0 
-      ? (stats.errorCount / recentLogs.length) * 100 
-      : 0;
     
-    const averageResponseTime = stats.responseTimeCount > 0 
-      ? stats.totalResponseTime / stats.responseTimeCount 
-      : 0;
-
-    return {
-      totalLogs: recentLogs.length,
-      logsByLevel: stats.logsByLevel,
-      logsByComponent: stats.logsByComponent,
-      recentLogs: recentLogs.slice(-100), // Last 100 logs for quick review
-      errorRate,
-      performanceMetrics: {
-        averageResponseTime,
-        slowRequests: stats.slowRequests,
-      },
-    };
+    // Calculate statistics
+    aggregation.errorRate = (errorCount / recentLogs.length) * 100;
+    aggregation.recentLogs = recentLogs.slice(-100);
+    aggregation.performanceMetrics.slowRequests = slowRequests;
+    
+    // Calculate percentiles if we have data
+    if (responseTimes.length > 0) {
+      aggregation.performanceMetrics.averageResponseTime =
+        totalResponseTime / responseTimes.length;
+      
+      // Sort for percentile calculation
+      responseTimes.sort((a, b) => a - b);
+      
+      const p95Index = Math.ceil(responseTimes.length * 0.95) - 1;
+      const p99Index = Math.ceil(responseTimes.length * 0.99) - 1;
+      
+      aggregation.performanceMetrics.p95ResponseTime =
+        responseTimes[Math.max(0, p95Index)] ?? 0;
+      aggregation.performanceMetrics.p99ResponseTime =
+        responseTimes[Math.max(0, p99Index)] ?? 0;
+    }
+    
+    return aggregation;
   }
 
   /**
-   * Queries logs with multiple filter criteria for investigation and debugging.
-   * Results are sorted by timestamp in descending order (newest first).
+   * Queries logs with improved filtering performance.
    */
   queryLogs(filters: LogQueryFilters): LogEntry[] {
-    let filteredLogs = this.logs;
-
-    // Apply filters in order of expected selectivity for performance
+    let results = this.getValidLogs();
+    
+    // Apply filters in order of selectivity
     if (filters.correlationId) {
-      filteredLogs = filteredLogs.filter(log => 
-        log.correlationId === filters.correlationId
-      );
+      results = results.filter(log => log.correlationId === filters.correlationId);
     }
-
+    
     if (filters.userId) {
-      filteredLogs = filteredLogs.filter(log => 
-        log.userId === filters.userId
-      );
+      results = results.filter(log => log.userId === filters.userId);
     }
-
+    
     if (filters.timeRange) {
       const { start, end } = filters.timeRange;
-      filteredLogs = filteredLogs.filter(log =>
-        log.timestamp >= start && log.timestamp <= end
+      results = results.filter(
+        log => log.timestamp >= start && log.timestamp <= end
       );
     }
-
-    if (filters.level?.length) {
+    
+    if (filters.level && filters.level.length > 0) {
       const levelSet = new Set(filters.level);
-      filteredLogs = filteredLogs.filter(log => levelSet.has(log.level));
+      results = results.filter(log => levelSet.has(log.level));
     }
-
-    if (filters.component?.length) {
+    
+    if (filters.component && filters.component.length > 0) {
       const componentSet = new Set(filters.component);
-      filteredLogs = filteredLogs.filter(log =>
-        log.context?.component && componentSet.has(log.context.component)
+      results = results.filter(
+        log => log.context?.component && componentSet.has(log.context.component)
       );
     }
-
+    
     // Sort by timestamp descending (newest first)
-    filteredLogs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-
-    return filters.limit ? filteredLogs.slice(0, filters.limit) : filteredLogs;
+    results.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    
+    // Apply pagination
+    if (filters.offset) {
+      results = results.slice(filters.offset);
+    }
+    
+    if (filters.limit) {
+      results = results.slice(0, filters.limit);
+    }
+    
+    return results;
   }
 
   /**
-   * Retrieves all logs associated with a correlation ID for request tracing.
-   * Results are chronologically ordered to show the flow of a request.
+   * Gets logs by correlation ID in chronological order.
    */
   getLogsByCorrelation(correlationId: string): LogEntry[] {
-    return this.logs
+    return this.getValidLogs()
       .filter(log => log.correlationId === correlationId)
       .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   }
@@ -481,41 +688,115 @@ class UnifiedLogger {
   // ==================== Specialized Logging Methods ====================
 
   /**
-   * Logs performance metrics for an operation.
-   * Useful for tracking response times and identifying slow operations.
+   * Logs performance metrics for operations.
    */
-  logPerformance(operation: string, duration: number, metadata?: Record<string, any>): void {
-    this.info(`Performance: ${operation} completed`, {
-      component: 'performance',
-      operation,
-      duration,
-    }, metadata);
+  logPerformance(
+    operation: string,
+    duration: number,
+    metadata?: Record<string, any>
+  ): void {
+    const level: LogLevel = duration > this.SLOW_REQUEST_THRESHOLD ? 'warn' : 'info';
+    this.logInternal(
+      level,
+      `Performance: ${operation} completed in ${duration}ms`,
+      {
+        component: 'performance',
+        operation,
+        duration,
+      },
+      metadata
+    );
   }
 
   /**
-   * Logs security-related events for audit trails.
-   * These logs are critical for compliance and security monitoring.
+   * Logs security events with appropriate severity.
    */
-  logSecurity(event: string, userId?: string, metadata?: Record<string, any>): void {
-    this.info(`Security: ${event}`, {
+  logSecurity(
+    event: string,
+    userId?: string,
+    metadata?: Record<string, any>
+  ): void {
+    this.warn(`Security Event: ${event}`, {
       component: 'security',
       operation: event,
       userId,
+      tags: ['security', 'audit'],
     }, metadata);
   }
 
   /**
-   * Logs business metrics and KPIs for analytics.
-   * Enables tracking of business-critical measurements over time.
+   * Logs business metrics for analytics.
    */
-  logMetric(name: string, value: number, metadata?: Record<string, any>): void {
-    this.info(`Metric: ${name}`, {
+  logMetric(
+    name: string,
+    value: number,
+    metadata?: Record<string, any>
+  ): void {
+    this.info(`Metric: ${name} = ${value}`, {
       component: 'metrics',
       operation: name,
       value,
+      tags: ['metric', 'analytics'],
     }, metadata);
+  }
+
+  /**
+   * Clears all logs. Use with caution.
+   */
+  clearLogs(): void {
+    this.logs.length = 0;
+    this.logs.length = this.MAX_LOGS;
+    this.logIndex = 0;
+    this.correlationCounter = 0n;
+  }
+
+  /**
+   * Gets the count of valid log entries.
+   */
+  getLogCount(): number {
+    return this.getValidLogs().length;
+  }
+
+  /**
+   * Exports logs in a format suitable for external processing.
+   */
+  exportLogs(format: 'json' | 'csv' = 'json'): string {
+    const logs = this.getValidLogs();
+    
+    if (format === 'json') {
+      return JSON.stringify(logs, null, 2);
+    }
+    
+    // CSV export
+    const headers = [
+      'timestamp',
+      'level',
+      'message',
+      'correlationId',
+      'component',
+      'duration',
+      'userId',
+    ];
+    
+    const rows = logs.map(log => [
+      log.timestamp.toISOString(),
+      log.level,
+      `"${log.message.replace(/"/g, '""')}"`,
+      log.correlationId,
+      log.context?.component ?? '',
+      log.context?.duration?.toString() ?? '',
+      log.userId ?? '',
+    ]);
+    
+    return [
+      headers.join(','),
+      ...rows.map(row => row.join(',')),
+    ].join('\n');
   }
 }
 
-// Export singleton instance for application-wide use
+// Export singleton instance
 export const logger = new UnifiedLogger();
+
+// Export for testing purposes
+export { UnifiedLogger };

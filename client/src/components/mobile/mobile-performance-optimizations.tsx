@@ -3,11 +3,11 @@
  * Components and utilities for optimizing mobile performance
  */
 
-import React, { 
-  useState, 
-  useEffect, 
-  useRef, 
-  useCallback, 
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
   useMemo,
   Suspense,
   lazy,
@@ -16,7 +16,7 @@ import React, {
 import { useResponsiveLayoutContext } from './responsive-layout-manager';
 
 // Intersection Observer hook for lazy loading
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 function useIntersectionObserver(
   elementRef: React.RefObject<Element>,
   options: IntersectionObserverInit = {}
@@ -122,7 +122,7 @@ export function VirtualScroll<T>({
   }, [scrollTop, itemHeight, containerHeight, items.length, overscan]);
 
   const visibleItems = useMemo(() => {
-    const result = [];
+    const result: Array<{ index: number; item: T; offsetY: number }> = [];
     for (let i = visibleRange.startIndex; i <= visibleRange.endIndex; i++) {
       result.push({
         index: i,

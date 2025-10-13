@@ -32,7 +32,7 @@ import {
   getActiveIconClasses,
   getActiveTextClasses
 } from '@/utils/navigation/active-state';
-import { logger } from '../utils/logger';
+import { logger } from '../../utils/logger';
 
 interface NavigationItem {
   label: string;
