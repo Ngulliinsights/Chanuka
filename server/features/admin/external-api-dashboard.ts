@@ -9,7 +9,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { ApiSuccess, ApiResponse, ApiResponseWrapper } from '../../utils/api-response.js';
+import { ApiSuccess, ApiResponseWrapper } from '../../utils/api-response.js';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../../infrastructure/external-data/external-api-manager.js';
 import { performanceMonitor } from '../../infrastructure/monitoring/performance-monitor.js';
 import { advancedCachingService } from '../../infrastructure/cache/advanced-caching.js';
@@ -37,7 +37,7 @@ const createErrorResponse = (
   }
   
   return res.status(statusCode).json(
-    ApiResponse.error(message, statusCode, metadata)
+    ApiResponseWrapper.error(res, message, statusCode, metadata)
   );
 };
 
@@ -288,7 +288,7 @@ router.post('/optimize', async (req: Request, res: Response) => {
           {
             key: `${source}:bills:recent`,
             fetchFn: async () => {
-              return await apiManagementService.makeRequest(source, '/bills', { limit: 50 });
+              return await apiManagementService.makeRequest(source, '/bills', { params: { limit: 50 } });
             },
             ttl: 300, // 5 minutes for recent bills
             priority: 'high' as const
@@ -296,7 +296,7 @@ router.post('/optimize', async (req: Request, res: Response) => {
           {
             key: `${source}:sponsors:active`,
             fetchFn: async () => {
-              return await apiManagementService.makeRequest(source, '/sponsors', { active: true });
+              return await apiManagementService.makeRequest(source, '/sponsors', { params: { active: true } });
             },
             ttl: 600, // 10 minutes for active sponsors
             priority: 'medium' as const

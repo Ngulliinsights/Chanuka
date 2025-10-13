@@ -65,7 +65,7 @@ export interface CacheInvalidationRule {
   dependencies?: string[];
 }
 
-class AdvancedCachingService {
+export class AdvancedCachingService {
   private memoryCache: Map<string, CacheEntry> = new Map();
   private redisClient: any = null; // Would be Redis client in production
   private stats = {
@@ -162,7 +162,7 @@ class AdvancedCachingService {
     } catch (error) {
       logger.error('[Advanced Caching] Error getting from cache:', { component: 'SimpleTool' }, error);
       const duration = performance.now() - startTime;
-      this.trackPerformance('get', key, duration, error.message);
+      this.trackPerformance('get', key, duration, error instanceof Error ? error.message : String(error));
       return null;
     }
   }
@@ -201,7 +201,7 @@ class AdvancedCachingService {
     } catch (error) {
       logger.error('[Advanced Caching] Error setting cache:', { component: 'SimpleTool' }, error);
       const duration = performance.now() - startTime;
-      this.trackPerformance('set', key, duration, error.message);
+      this.trackPerformance('set', key, duration, error instanceof Error ? error.message : String(error));
       return false;
     }
   }
@@ -270,7 +270,7 @@ class AdvancedCachingService {
       performanceMonitor.addCustomMetric(
         'cache_miss_fetch',
         duration,
-        { key, traceId, error: error.message }
+        { key, traceId, error: error instanceof Error ? error.message : String(error) }
       );
       throw error;
     }

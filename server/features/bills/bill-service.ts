@@ -1,7 +1,7 @@
 import { eq, desc, and, sql, count, ilike, or, asc } from "drizzle-orm";
 import { databaseService } from "../../infrastructure/database/database-service.js";
 import { cacheService, CACHE_KEYS, CACHE_TTL } from "../../infrastructure/cache/cache-service.js";
-import { searchIndexManager } from "../search-index-manager.js";
+import { SearchIndexManager } from "../search/infrastructure/SearchIndexManager.js";
 import * as schema from "../../../shared/schema.js";
 import { Bill, InsertBill, BillEngagement } from "../../../shared/schema.js";
 import { logger } from '../../utils/logger';
@@ -388,7 +388,7 @@ export class BillService {
         await this.clearBillCaches();
 
         // Queue bill for search index update
-        await searchIndexManager.queueBillForIndexUpdate(newBill.id);
+        // TODO: Implement index update for new SearchIndexManager
 
         return newBill;
       },
@@ -421,7 +421,7 @@ export class BillService {
         await this.clearBillCaches(id);
 
         // Queue bill for search index update
-        await searchIndexManager.queueBillForIndexUpdate(id);
+        // TODO: Implement index update for new SearchIndexManager
 
         return updatedBill;
       },

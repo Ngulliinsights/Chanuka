@@ -1,10 +1,12 @@
 import { Request } from 'express';
 import { database as db } from '../../../shared/database/connection.js';
-import { securityAuditService, SecurityEvent, SecurityIncident } from './security-audit-service.js';
-import { emailService } from './email-service.js';
+import { securityAuditService, SecurityEvent } from './security-audit-service.js';
+import { SecurityIncident } from './security-monitoring-service.js';
+import { getEmailService } from '../../infrastructure/notifications/email-service.js';
 import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, count, desc, eq } from 'drizzle-orm';
-import { logger }from '../../utils/logger';
+import { logger } from '../../utils/logger';
+import { securityAuditLogs } from '../../../shared/schema.js';
 
 // Threat intelligence table
 const threatIntelligence = pgTable("threat_intelligence", {
@@ -144,7 +146,7 @@ export class IntrusionDetectionService {
     if (threatIntelResult.isThreat) {
       detectedThreats.push({
         type: 'known_threat_ip',
-        severity: threatIntelResult.severity,
+        severity: threatIntelResult.severity || 'medium',
         description: `IP address ${ipAddress} is known ${threatIntelResult.threatType}`,
         evidence: { source: threatIntelResult.source },
         confidence: 95
@@ -207,13 +209,13 @@ export class IntrusionDetectionService {
         userAgent,
         resource: url,
         action: method,
+        result: isBlocked ? 'blocked' : 'allowed',
         success: !isBlocked,
         details: {
           detectedThreats,
           riskScore,
           recommendedAction
         },
-        riskScore,
         userId
       });
     }
@@ -371,11 +373,11 @@ export class IntrusionDetectionService {
       const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const userEvents = await db
         .select()
-        .from(securityAuditService.securityAuditLogs)
+        .from(securityAuditLogs)
         .where(
           and(
-            eq(securityAuditService.securityAuditLogs.userId, userId),
-            gte(securityAuditService.securityAuditLogs.timestamp, oneWeekAgo)
+            eq(securityAuditLogs.userId, userId),
+            gte(securityAuditLogs.createdAt, oneWeekAgo)
           )
         )
         .limit(1000);
@@ -571,6 +573,23 @@ export class IntrusionDetectionService {
    */
   isIPBlocked(ipAddress: string): boolean {
     return this.blockedIPs.has(ipAddress);
+  }
+
+  /**
+   * Get count of blocked IP addresses
+   */
+  async getBlockedIPCount(): Promise<number> {
+    try {
+      const result = await db
+        .select({ count: count() })
+        .from(threatIntelligence)
+        .where(eq(threatIntelligence.blocked, true));
+
+      return Number(result[0].count);
+    } catch (error) {
+      logger.error('Error getting blocked IP count:', { component: 'SimpleTool' }, error);
+      return 0;
+    }
   }
 
   /**

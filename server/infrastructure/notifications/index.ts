@@ -24,47 +24,43 @@ export { router as notificationRoutes } from './notification-routes.js';
 
 // ===== ADVANCED SERVICES (Multi-channel & Smart Features) =====
 
-// Advanced notification service with smart filtering, batching, and multi-channel delivery
-export { 
-  AdvancedNotificationService,
-  advancedNotificationService,
-  notificationService as consolidatedNotificationService,
-  type NotificationChannel,
-  type NotificationPreference,
+// Notification orchestrator service with smart filtering, batching, and multi-channel delivery
+export {
+  NotificationOrchestratorService,
+  notificationOrchestratorService,
   type NotificationRequest,
-  type SmartNotificationFilter,
   type NotificationBatch,
-  type NotificationTemplate
-} from './advanced-notification-service.js';
+  type NotificationResult,
+  type BulkNotificationResult
+} from './notification-orchestrator.js';
 
 // ===== SPECIALIZED SERVICES (Domain-specific Features) =====
 
-// Enhanced notification service with advanced processing
-export { 
-  EnhancedNotificationService,
-  type EnhancedNotificationData
-} from './enhanced-notification.js';
+// Alerting service for monitoring and alerting
+export {
+  alertingService,
+  type AlertRule,
+  type AlertAction,
+  type Alert
+} from './alerting-service.js';
 
-// Notification scheduler for digest and cron job management
-export { 
-  NotificationSchedulerService,
+// Notification scheduler service for digest notifications
+export {
+  notificationSchedulerService,
   type ScheduledDigest,
   type DigestContent
 } from './notification-scheduler.js';
 
 // Smart notification filtering with AI/ML-based decisions
-export { 
+export {
   SmartNotificationFilterService,
-  type SmartFilterCriteria,
+  type FilterCriteria,
   type UserEngagementProfile,
   type FilterResult
 } from './smart-notification-filter.js';
 
 // Notification channel management
 export { notificationChannelService } from './notification-channels.js';
-
-// System alerting service
-export { alertingService } from './alerting-service.js';
 
 // ===== MIGRATION GUIDE =====
 
@@ -91,6 +87,8 @@ export { alertingService } from './alerting-service.js';
 
 // Export the core service as default for simple use cases
 export { notificationService as default } from './notification-service.js';
+
+import { logger } from '../../utils/logger.js';
 
 logger.info('📦 Notifications module loaded - Clean architecture implemented successfully', { component: 'SimpleTool' });
 

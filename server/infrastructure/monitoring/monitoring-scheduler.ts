@@ -1,4 +1,6 @@
-import { financialDisclosureMonitoringService } from '../../features/analytics/financial-disclosure/monitoring.js';
+import { createMonitoringService } from '../../features/analytics/financial-disclosure/monitoring.js';
+import { databaseService } from '../../infrastructure/database/database-service.js';
+import { cacheService } from '../../infrastructure/cache/cache-service.js';
 import { logger } from '@shared/utils/logger';
 
 /**
@@ -6,6 +8,7 @@ import { logger } from '@shared/utils/logger';
  */
 export class MonitoringScheduler {
   private isInitialized = false;
+  private financialDisclosureMonitoringService: any = null;
 
   /**
    * Initialize all monitoring services
@@ -19,8 +22,16 @@ export class MonitoringScheduler {
     try {
       logger.info('Initializing monitoring scheduler...', { component: 'SimpleTool' });
 
+      // Initialize financial disclosure monitoring service
+      this.financialDisclosureMonitoringService = createMonitoringService({
+        readDb: databaseService.getDatabase(),
+        writeDb: databaseService.getDatabase(),
+        cache: cacheService,
+        logger
+      });
+
       // Start financial disclosure monitoring
-      financialDisclosureMonitoringService.startAutomatedMonitoring();
+      this.financialDisclosureMonitoringService.startAutomatedMonitoring();
 
       // Set up graceful shutdown handlers
       this.setupShutdownHandlers();
@@ -45,7 +56,9 @@ export class MonitoringScheduler {
       logger.info('Shutting down monitoring scheduler...', { component: 'SimpleTool' });
 
       // Stop financial disclosure monitoring
-      financialDisclosureMonitoringService.stopAutomatedMonitoring();
+      if (this.financialDisclosureMonitoringService) {
+        await this.financialDisclosureMonitoringService.stopAutomatedMonitoring();
+      }
 
       this.isInitialized = false;
       logger.info('Monitoring scheduler shut down successfully', { component: 'SimpleTool' });

@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import {
   ArrowLeft,
-  Users, 
+  Users,
   Filter,
   Search,
   ChevronRight,
@@ -20,6 +20,7 @@ import {
   TrendingUp,
   AlertTriangle
 } from 'lucide-react';
+import { logger } from '../../utils/logger';
 
 interface CoSponsorsProps {
   billId?: string;
