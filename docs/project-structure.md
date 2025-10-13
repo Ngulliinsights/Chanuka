@@ -383,6 +383,7 @@ client/
 │   ├── vite-env.d.ts
 CODE_REVIEW_CHECKLIST.md
 components.json
+connection_files.txt
 db/
 ├── index.ts
 ├── init-scripts/
@@ -412,6 +413,531 @@ docs/
 │   ├── radix-ui-usage-matrix.md
 │   ├── schema-congruence-progress.md
 ├── analytics-core-integration.md
+├── chanuka_restructure_design.md
+├── chanuka_restructure_reqs.md
+├── chanuka_restructure_tasks.md
+├── financial-disclosure-monitoring.md
+├── guides/
+│   ├── DATABASE_SETUP_GUIDE.md
+│   ├── DEMO_MODE_CONFIGURATION.md
+│   ├── DEPLOYMENT.md
+│   ├── DEPLOYMENT_GUIDE.md
+│   ├── NAVIGATION_USER_GUIDE.md
+│   ├── TROUBLESHOOTING_GUIDE.md
+├── project-structure.md
+├── regulatory-change-monitoring.md
+├── SERVER_ARCHITECTURE.md
+├── summaries/
+│   ├── APP_RENDERING_FIX_SUMMARY.md
+│   ├── APPLAYOUT_ENHANCEMENT_SUMMARY.md
+│   ├── COMMENT_SYSTEM_IMPLEMENTATION_SUMMARY.md
+│   ├── COMPREHENSIVE_SEED_DATA_SUMMARY.md
+│   ├── dependency-removal-summary.md
+│   ├── FINAL_TASK_COMPLETION_SUMMARY.md
+│   ├── FINANCIAL_DISCLOSURE_INTEGRATION_SUMMARY.md
+│   ├── FINANCIAL_DISCLOSURE_MONITORING_SUMMARY.md
+│   ├── LOGO_INTEGRATION_SUMMARY.md
+│   ├── MIGRATION_SYSTEM_SUMMARY.md
+│   ├── NAVIGATION_OPTIMIZATION_SUMMARY.md
+│   ├── NAVIGATION_PERFORMANCE_ACCESSIBILITY_IMPLEMENTATION_SUMMARY.md
+│   ├── NAVIGATION_STATE_PERSISTENCE_SUMMARY.md
+│   ├── phase-1-completion-summary.md
+│   ├── phase-2-completion-summary.md
+│   ├── route-test-summary.md
+│   ├── SCHEMA_CONGRUENCE_COMPLETION_SUMMARY.md
+│   ├── SECURITY_MONITORING_IMPLEMENTATION_SUMMARY.md
+│   ├── SPONSOR_SERVICE_IMPLEMENTATION_SUMMARY.md
+│   ├── TRANSPARENCY_DASHBOARD_IMPLEMENTATION_SUMMARY.md
+│   ├── TYPESCRIPT_ERRORS_SUMMARY.md
+├── unified_ai_dev_framework.md
+├── unified_code_analysis_framework.md
+├── unified_coding_framework.md
+drizzle/
+drizzle.config.ts
+├── 0000_clear_risque.sql
+├── 0000_initial_migration.sql
+├── 0001_comprehensive_schema.sql
+├── 0001_strange_night_nurse.sql
+├── 0002_add_bill_engagement.sql
+├── 0002_calm_weapon_omega.sql
+├── 0003_add_comment_features.sql
+├── 0003_enhanced_comments_system.sql
+├── 0004_fix_schema.sql
+├── 0005_complete_schema_update.sql
+├── 0006_fix_implementation_workarounds.sql
+├── 0007_add_sponsorship_tables.sql
+├── 0008_seed_sponsorship_data.sql
+├── 0009_add_citizen_verification.sql
+├── 0010_add_search_vectors_and_indexes.sql
+├── 0011_add_moderation_and_analytics.sql
+├── 0012_add_missing_features.sql
+├── 0013_fix_missing_tables.sql
+├── 0014_create_security_tables.sql
+├── 0015_fix_schema_errors.sql
+├── 0016_add_last_checked_column.sql
+├── 0017_add_success_column.sql
+├── 0017_fix_security_schema_issues.sql
+├── 0018_add_risk_score_column.sql
+├── meta/
+│   ├── _journal.json
+│   ├── 0000_snapshot.json
+│   ├── 0001_snapshot.json
+│   ├── 0002_snapshot.json
+├── README.md
+├── relations.ts
+├── schema.ts
+drop-schema.ts
+final_schema_files.txt
+generate-structure-to-file.sh
+jest.client.config.js
+jest.config.js
+last_schema_files.txt
+logger_errors.txt
+logger_files.txt
+logger_files_clean.txt
+nginx.conf
+package.json
+package-lock.json
+phased_fixing_plan.md
+pool_files.txt
+postcss.config.js
+remaining_schema_files.txt
+replit.md
+schema_files.txt
+scripts/
+├── analyze-bundle.js
+├── check-architecture.js
+├── database/
+│   ├── check-schema.ts
+│   ├── debug-migration-table.ts
+│   ├── generate-migration.ts
+│   ├── migrate.ts
+│   ├── run-migrations.ts
+│   ├── setup-schema.ts
+├── deployment/
+│   ├── deploy.sh
+├── migrate-console-logs.ts
+├── testing/
+│   ├── bug-detector.ts
+│   ├── run-bug-detector.ts
+│   ├── run-frontend-serving-tests.js
+│   ├── test-api-health.js
+│   ├── test-app.html
+│   ├── test-application.js
+│   ├── test-build.js
+│   ├── test-comment-system.js
+│   ├── test-conflict-detection.ts
+│   ├── test-enhanced-transparency.ts
+│   ├── test-financial-disclosure-integration.ts
+│   ├── test-financial-disclosure-integration-unit.ts
+│   ├── test-financial-disclosure-simple.ts
+│   ├── test-minimal-server.js
+│   ├── test-mobile-navigation.html
+│   ├── test-profile-routes.ts
+│   ├── test-security-implementation.ts
+│   ├── test-security-monitoring.ts
+│   ├── test-security-monitoring-simple.ts
+│   ├── test-security-simple.cjs
+│   ├── test-security-simple.js
+│   ├── test-security-standalone.ts
+│   ├── test-simple-transparency.ts
+│   ├── test-sponsor-routes.js
+│   ├── test-sponsor-service.js
+│   ├── test-transparency-dashboard.ts
+│   ├── test-transparency-implementation.ts
+│   ├── test-user-profile-service.js
+│   ├── test-viewport.html
+│   ├── validate-user-profile.js
+│   ├── validate-user-profile.ts
+│   ├── validate-user-profile-static.ts
+│   ├── verify-active-state.js
+│   ├── verify-alert-preferences.ts
+│   ├── verify-auth-system.js
+│   ├── verify-bill-status-monitor.ts
+│   ├── verify-bill-tracking.ts
+│   ├── verify-engagement-analytics.ts
+│   ├── verify-financial-disclosure-monitoring.js
+│   ├── verify-navigation-persistence.js
+│   ├── verify-notification-system.ts
+│   ├── verify-real-time-tracking.js
+│   ├── verify-transparency-task.ts
+│   ├── verify-user-profile-service.ts
+│   ├── verify-websocket-service.ts
+server/
+├── CLEANUP_SUMMARY.md
+├── comprehensive-race-condition-test.js
+├── config/
+│   ├── development.ts
+│   ├── index.ts
+│   ├── production.ts
+│   ├── README.md
+│   ├── test.ts
+├── core/
+│   ├── auth/
+│   │   ├── auth.ts
+│   │   ├── auth-service.ts
+│   │   ├── index.ts
+│   │   ├── passwordReset.ts
+│   │   ├── secure-session-service.ts
+│   │   ├── session-cleanup.ts
+│   ├── errors/
+│   │   ├── error-tracker.ts
+│   │   ├── index.ts
+│   ├── index.ts
+│   ├── StorageTypes.d.ts
+│   ├── StorageTypes.ts
+│   ├── types/
+│   ├── types.ts
+│   │   ├── index.ts
+│   ├── validation/
+│   │   ├── data-completeness.ts
+│   │   ├── data-validation.ts
+│   │   ├── data-validation-service.ts
+│   │   ├── index.ts
+│   │   ├── input-validation-service.ts
+│   │   ├── schema-validation-service.ts
+├── db.ts
+├── demo/
+│   ├── real-time-tracking-demo.ts
+├── docs/
+│   ├── government-data-integration-implementation.md
+├── features/
+│   ├── admin/
+│   │   ├── admin.ts
+│   │   ├── admin-router.ts
+│   │   ├── content-moderation.ts
+│   │   ├── external-api-dashboard.ts
+│   │   ├── index.ts
+│   │   ├── moderation.ts
+│   │   ├── system.ts
+│   ├── analytics/
+│   │   ├── analysis.ts
+│   │   ├── analytics.ts
+│   │   ├── analytics_design.md
+│   │   ├── analytics_requirements.md
+│   │   ├── config/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── analytics.config.test.ts
+│   │   │   ├── analytics.config.ts
+│   │   ├── conflict-detection.ts
+│   │   ├── controllers/
+│   │   │   ├── engagement.controller.ts
+│   │   ├── dashboard.ts
+│   │   ├── deployment/
+│   │   │   ├── communication-templates.md
+│   │   │   ├── feature-flags.md
+│   │   │   ├── monitoring-checklist.md
+│   │   │   ├── runbook.md
+│   │   ├── docs/
+│   │   │   ├── automation-setup.md
+│   │   ├── financial-disclosure/
+│   │   │   ├── config.ts
+│   │   │   ├── index.ts
+│   │   │   ├── monitoring.ts
+│   │   │   ├── types.ts
+│   │   ├── index.ts
+│   │   ├── legal-analysis.ts
+│   │   ├── middleware/
+│   │   │   ├── analytics-context.ts
+│   │   │   ├── performance-tracking.ts
+│   │   ├── ml-analysis.ts
+│   │   ├── monitoring/
+│   │   │   ├── dashboard-config.json
+│   │   │   ├── runbooks.md
+│   │   │   ├── setup-guide.md
+│   │   ├── README.md
+│   │   ├── refactoring-plan.md
+│   │   ├── regulatory-change-monitoring.ts
+│   │   ├── services/
+│   │   │   ├── engagement.service.ts
+│   │   │   ├── financial-disclosure.service.ts
+│   │   │   ├── index.ts
+│   │   │   ├── ml.service.ts
+│   │   ├── storage/
+│   │   │   ├── index.ts
+│   │   │   ├── progress.storage.ts
+│   │   ├── swagger.ts
+│   │   ├── transparency-dashboard.ts
+│   │   ├── types/
+│   │   │   ├── common.ts
+│   │   │   ├── engagement.ts
+│   │   │   ├── financial-disclosure.ts
+│   │   │   ├── index.ts
+│   │   │   ├── ml.ts
+│   │   │   ├── progress-storage.d.ts
+│   ├── bills/
+│   │   ├── bill.js
+│   │   ├── bills.ts
+│   │   ├── bill-service.ts
+│   │   ├── bills-router.ts
+│   │   ├── bill-status-monitor.ts
+│   │   ├── bill-storage.ts
+│   │   ├── bill-tracking.ts
+│   │   ├── index.ts
+│   │   ├── legislative-storage.ts
+│   │   ├── LegislativeStorageTypes.ts
+│   │   ├── real-time-analysis.ts
+│   │   ├── sponsor-conflict-analysis.ts
+│   │   ├── sponsors.ts
+│   │   ├── sponsor-service.ts
+│   │   ├── sponsorship.ts
+│   │   ├── sponsorship-analysis.ts
+│   │   ├── voting-pattern-analysis.ts
+│   ├── community/
+│   │   ├── comment.ts
+│   │   ├── comment-storage.ts
+│   │   ├── comment-voting.ts
+│   │   ├── community.ts
+│   │   ├── index.ts
+│   │   ├── social-integration.ts
+│   │   ├── social-share-storage.d.ts
+│   │   ├── social-share-storage.ts
+│   │   ├── stakeholder-storage.ts
+│   ├── government-data/
+│   │   ├── routes.ts
+│   ├── privacy/
+│   │   ├── privacy-routes.ts
+│   │   ├── privacy-scheduler.ts
+│   │   ├── privacy-service.ts
+│   ├── recommendation/
+│   │   ├── application/
+│   │   │   ├── EngagementTracker.ts
+│   │   │   ├── RecommendationService.ts
+│   │   ├── domain/
+│   │   │   ├── EngagementScorer.ts
+│   │   │   ├── recommendation.dto.ts
+│   │   │   ├── RecommendationEngine.ts
+│   │   │   ├── RecommendationValidator.ts
+│   │   ├── index.ts
+│   │   ├── infrastructure/
+│   │   │   ├── RecommendationCache.ts
+│   │   │   ├── RecommendationRepository.ts
+│   │   ├── presentation/
+│   │   │   ├── RecommendationController.ts
+│   ├── search/
+│   │   ├── application/
+│   │   │   ├── RelevanceScorer.ts
+│   │   │   ├── SearchService.ts
+│   │   │   ├── SearchSuggestionsService.ts
+│   │   ├── domain/
+│   │   │   ├── RelevanceScorer.ts
+│   │   │   ├── search.dto.ts
+│   │   │   ├── SearchAnalytics.ts
+│   │   │   ├── SearchValidator.ts
+│   │   ├── index.ts
+│   │   ├── infrastructure/
+│   │   │   ├── SearchCache.ts
+│   │   │   ├── SearchIndexManager.ts
+│   │   │   ├── SearchQueryBuilder.ts
+│   │   │   ├── SearchRepository.ts
+│   │   ├── presentation/
+│   │   │   ├── SearchController.ts
+│   │   ├── recommendation.README.md
+│   │   ├── search-index-manager.ts
+│   ├── search-suggestions.ts
+│   ├── security/
+│   │   ├── encryption-service.ts
+│   │   ├── index.ts
+│   │   ├── intrusion-detection-service.ts
+│   │   ├── privacy-service.ts
+│   │   ├── security-audit-service.ts
+│   │   ├── security-initialization-service.ts
+│   │   ├── security-monitoring.ts
+│   │   ├── security-monitoring-service.ts
+│   │   ├── tls-config-service.ts
+│   ├── sidebar.tsx
+│   ├── users/
+│   │   ├── alert-preferences/
+│   │   │   ├── alert_system_docs.md
+│   │   │   ├── alert_utilities.ts
+│   │   │   ├── unified_alert_routes.ts
+│   │   │   ├── unified_alert_service.ts
+│   │   ├── citizen-verification.ts
+│   │   ├── ExpertVerificationService.test.ts
+│   │   ├── ExpertVerificationService.ts
+│   │   ├── index.ts
+│   │   ├── profile.ts
+│   │   ├── user-management.ts
+│   │   ├── user-preferences.ts
+│   │   ├── user-profile.ts
+│   │   ├── users.ts
+│   │   ├── user-storage.d.ts
+│   │   ├── user-storage.ts
+│   │   ├── verification.ts
+├── index.ts
+├── infrastructure/
+│   ├── cache/
+│   │   ├── advanced-caching.ts
+│   │   ├── cache.ts
+│   │   ├── cache-coordinator.ts
+│   │   ├── cache-service.ts
+│   │   ├── cache-warming.ts
+│   │   ├── index.ts
+│   ├── database/
+│   │   ├── base/
+│   │   │   ├── BaseStorage.d.ts
+│   │   │   ├── BaseStorage.js.map
+│   │   │   ├── BaseStorage.ts
+│   │   ├── config.d.ts
+│   │   ├── config.ts
+│   │   ├── connection-pool.ts
+│   │   ├── database-fallback.ts
+│   │   ├── database-optimization.ts
+│   │   ├── database-service.ts
+│   │   ├── db.ts
+│   │   ├── index.d.ts
+│   │   ├── index.ts
+│   │   ├── migration-service.ts
+│   │   ├── schema.sql
+│   │   ├── seed-data-service.ts
+│   │   ├── storage.ts
+│   │   ├── unified-storage.ts
+│   ├── demo-data.ts
+│   ├── external-data/
+│   │   ├── conflict-resolution-service.ts
+│   │   ├── data-synchronization-service.ts
+│   │   ├── external-api-manager.ts
+│   │   ├── government-data-integration.ts
+│   │   ├── government-data-service.ts
+│   │   ├── index.ts
+│   │   ├── types.ts
+│   ├── index.ts
+│   ├── monitoring/
+│   │   ├── apm-service.ts
+│   │   ├── audit-log.ts
+│   │   ├── db-tracer.ts
+│   │   ├── external-api-management.ts
+│   │   ├── health.ts
+│   │   ├── index.ts
+│   │   ├── monitoring.ts
+│   │   ├── monitoring-scheduler.ts
+│   │   ├── performance-monitor.ts
+│   │   ├── performance-monitoring-service.ts
+│   │   ├── system-health.ts
+│   ├── notifications/
+│   │   ├── alerting-service.ts
+│   │   ├── email-service.ts
+│   │   ├── index.ts
+│   │   ├── notification_integration_guide.md
+│   │   ├── notification-channels.ts
+│   │   ├── notification-orchestrator.ts
+│   │   ├── notification-routes.ts
+│   │   ├── notifications.ts
+│   │   ├── notification-scheduler.ts
+│   │   ├── notification-service.ts
+│   │   ├── README.md
+│   │   ├── refactored_summary.md
+│   │   ├── smart-notification-filter.ts
+│   ├── websocket.ts
+├── middleware/
+│   ├── auth.ts
+│   ├── error-handler.ts
+│   ├── privacy-middleware.ts
+│   ├── rate-limiter.ts
+│   ├── request-logger.ts
+│   ├── security-middleware.ts
+│   ├── security-monitoring-middleware.ts
+├── routes/
+│   ├── regulatory-monitoring.ts
+├── scripts/
+│   ├── api-race-condition-detector.ts
+│   ├── migration-runner.ts
+│   ├── simple-integration-test.js
+│   ├── test-conflict-analysis.ts
+│   ├── test-government-integration.ts
+│   ├── verify-external-api-management.ts
+├── services/
+│   ├── api-cost-monitoring.ts
+│   ├── database-service.ts
+│   ├── data-transformation.ts
+│   ├── email.service.ts
+│   ├── external-api-error-handler.ts
+│   ├── fallback-service.ts
+│   ├── managed-government-data-integration.ts
+│   ├── performance-monitoring.test.ts
+│   ├── performance-monitoring.ts
+│   ├── README-schema-validation.md
+│   ├── schema-validation-demo.ts
+│   ├── schema-validation-test.ts
+├── simple-race-condition-test.js
+├── test-api.js
+├── test-db.js
+├── test-imports.js
+├── tests/
+│   ├── auth-system.test.ts
+│   ├── external-api-management-task-verification.test.ts
+│   ├── features/
+│   ├── financial-disclosure-api.test.ts
+│   ├── financial-disclosure-monitoring.test.ts
+│   ├── integration/
+│   │   ├── api-endpoints.test.ts
+│   │   ├── api-integration.test.ts
+│   │   ├── authentication-flow-validation.test.ts
+│   │   ├── comprehensive-api-integration.test.ts
+│   │   ├── database-fallback.test.ts
+│   │   ├── database-operations.test.ts
+│   │   ├── database-transaction-integrity.test.ts
+│   │   ├── external-api-management.integration.test.ts
+│   │   ├── frontend-serving.test.ts
+│   │   ├── frontend-serving-README.md
+│   │   ├── README.md
+│   │   ├── real-time-notification-delivery.test.ts
+│   │   ├── simple-integration.test.ts
+│   │   ├── websocket-realtime.test.ts
+│   │   ├── working-api-integration.test.ts
+│   ├── migration-service.test.ts
+│   ├── performance/
+│   │   ├── api-performance.test.ts
+│   │   ├── bundle-size-monitoring.test.ts
+│   │   ├── database-query-performance.test.ts
+│   │   ├── memory-usage-profiling.test.ts
+│   │   ├── response-time-benchmarking.test.ts
+│   ├── privacy-service.test.ts
+│   ├── README.md
+│   ├── real-time-bill-tracking.test.ts
+│   ├── services/
+│   │   ├── database-fallback.integration.test.ts
+│   │   ├── demo-data.test.ts
+│   │   ├── external-api-management.test.ts
+│   ├── setup.ts
+│   ├── sponsor-conflict-analysis.test.ts
+│   ├── unit/
+│   │   ├── auth-service.test.ts
+│   │   ├── database-service.test.ts
+│   │   ├── data-validation.test.ts
+│   │   ├── mocks/
+│   │   │   ├── mock-data.ts
+│   │   ├── simple-unit.test.ts
+│   │   ├── utils.test.ts
+│   ├── user-profile-service.test.ts
+│   ├── utils/
+│   │   ├── logger.ts
+│   │   ├── test-helpers.ts
+│   ├── voting-pattern-analysis.test.ts
+├── types/
+│   ├── ambient.d.ts
+│   ├── api.ts
+├── utils/
+│   ├── __tests__/
+│   │   ├── cache.test.ts
+│   │   ├── db-helpers.test.ts
+│   ├── analytics-controller-wrapper.ts
+│   ├── api.ts
+│   ├── api-response.ts
+│   ├── cache.ts
+│   ├── crypto.ts
+│   ├── db-helpers.ts
+│   ├── db-init.ts
+│   ├── errors.ts
+│   ├── featureFlags.ts
+│   ├── logger.ts
+│   ├── metrics.ts
+│   ├── performance-monitoring-utils.ts
+│   ├── race-condition-prevention.ts
+│   ├── validation.ts
+├── vite.ts
+setup-postgres-windows.ps1
+shared/
 ├── core/
 │   ├── logs/
 │   │   ├── archive/
@@ -680,488 +1206,6 @@ docs/
 │   ├── test-validation.js
 │   ├── tsconfig.json
 │   ├── vitest.config.ts
-├── financial-disclosure-monitoring.md
-├── guides/
-│   ├── DATABASE_SETUP_GUIDE.md
-│   ├── DEMO_MODE_CONFIGURATION.md
-│   ├── DEPLOYMENT.md
-│   ├── DEPLOYMENT_GUIDE.md
-│   ├── NAVIGATION_USER_GUIDE.md
-│   ├── TROUBLESHOOTING_GUIDE.md
-├── project-structure.md
-├── regulatory-change-monitoring.md
-├── SERVER_ARCHITECTURE.md
-├── summaries/
-│   ├── APP_RENDERING_FIX_SUMMARY.md
-│   ├── APPLAYOUT_ENHANCEMENT_SUMMARY.md
-│   ├── COMMENT_SYSTEM_IMPLEMENTATION_SUMMARY.md
-│   ├── COMPREHENSIVE_SEED_DATA_SUMMARY.md
-│   ├── dependency-removal-summary.md
-│   ├── FINAL_TASK_COMPLETION_SUMMARY.md
-│   ├── FINANCIAL_DISCLOSURE_INTEGRATION_SUMMARY.md
-│   ├── FINANCIAL_DISCLOSURE_MONITORING_SUMMARY.md
-│   ├── LOGO_INTEGRATION_SUMMARY.md
-│   ├── MIGRATION_SYSTEM_SUMMARY.md
-│   ├── NAVIGATION_OPTIMIZATION_SUMMARY.md
-│   ├── NAVIGATION_PERFORMANCE_ACCESSIBILITY_IMPLEMENTATION_SUMMARY.md
-│   ├── NAVIGATION_STATE_PERSISTENCE_SUMMARY.md
-│   ├── phase-1-completion-summary.md
-│   ├── phase-2-completion-summary.md
-│   ├── route-test-summary.md
-│   ├── SCHEMA_CONGRUENCE_COMPLETION_SUMMARY.md
-│   ├── SECURITY_MONITORING_IMPLEMENTATION_SUMMARY.md
-│   ├── SPONSOR_SERVICE_IMPLEMENTATION_SUMMARY.md
-│   ├── TRANSPARENCY_DASHBOARD_IMPLEMENTATION_SUMMARY.md
-│   ├── TYPESCRIPT_ERRORS_SUMMARY.md
-├── unified_ai_dev_framework.md
-├── unified_code_analysis_framework.md
-├── unified_coding_framework.md
-drizzle/
-drizzle.config.ts
-├── 0000_clear_risque.sql
-├── 0000_initial_migration.sql
-├── 0001_comprehensive_schema.sql
-├── 0001_strange_night_nurse.sql
-├── 0002_add_bill_engagement.sql
-├── 0002_calm_weapon_omega.sql
-├── 0003_add_comment_features.sql
-├── 0003_enhanced_comments_system.sql
-├── 0004_fix_schema.sql
-├── 0005_complete_schema_update.sql
-├── 0006_fix_implementation_workarounds.sql
-├── 0007_add_sponsorship_tables.sql
-├── 0008_seed_sponsorship_data.sql
-├── 0009_add_citizen_verification.sql
-├── 0010_add_search_vectors_and_indexes.sql
-├── 0011_add_moderation_and_analytics.sql
-├── 0012_add_missing_features.sql
-├── 0013_fix_missing_tables.sql
-├── 0014_create_security_tables.sql
-├── 0015_fix_schema_errors.sql
-├── 0016_add_last_checked_column.sql
-├── 0017_add_success_column.sql
-├── 0017_fix_security_schema_issues.sql
-├── 0018_add_risk_score_column.sql
-├── meta/
-│   ├── _journal.json
-│   ├── 0000_snapshot.json
-│   ├── 0001_snapshot.json
-│   ├── 0002_snapshot.json
-├── README.md
-├── relations.ts
-├── schema.ts
-drop-schema.ts
-generate-structure-to-file.sh
-jest.client.config.js
-jest.config.js
-nginx.conf
-package.json
-package-lock.json
-phased_fixing_plan.md
-postcss.config.js
-replit.md
-scripts/
-├── analyze-bundle.js
-├── check-architecture.js
-├── database/
-│   ├── check-schema.ts
-│   ├── debug-migration-table.ts
-│   ├── generate-migration.ts
-│   ├── migrate.ts
-│   ├── run-migrations.ts
-│   ├── setup-schema.ts
-├── deployment/
-│   ├── deploy.sh
-├── migrate-console-logs.ts
-├── testing/
-│   ├── bug-detector.ts
-│   ├── run-bug-detector.ts
-│   ├── run-frontend-serving-tests.js
-│   ├── test-api-health.js
-│   ├── test-app.html
-│   ├── test-application.js
-│   ├── test-build.js
-│   ├── test-comment-system.js
-│   ├── test-conflict-detection.ts
-│   ├── test-enhanced-transparency.ts
-│   ├── test-financial-disclosure-integration.ts
-│   ├── test-financial-disclosure-integration-unit.ts
-│   ├── test-financial-disclosure-simple.ts
-│   ├── test-minimal-server.js
-│   ├── test-mobile-navigation.html
-│   ├── test-profile-routes.ts
-│   ├── test-security-implementation.ts
-│   ├── test-security-monitoring.ts
-│   ├── test-security-monitoring-simple.ts
-│   ├── test-security-simple.cjs
-│   ├── test-security-simple.js
-│   ├── test-security-standalone.ts
-│   ├── test-simple-transparency.ts
-│   ├── test-sponsor-routes.js
-│   ├── test-sponsor-service.js
-│   ├── test-transparency-dashboard.ts
-│   ├── test-transparency-implementation.ts
-│   ├── test-user-profile-service.js
-│   ├── test-viewport.html
-│   ├── validate-user-profile.js
-│   ├── validate-user-profile.ts
-│   ├── validate-user-profile-static.ts
-│   ├── verify-active-state.js
-│   ├── verify-alert-preferences.ts
-│   ├── verify-auth-system.js
-│   ├── verify-bill-status-monitor.ts
-│   ├── verify-bill-tracking.ts
-│   ├── verify-engagement-analytics.ts
-│   ├── verify-financial-disclosure-monitoring.js
-│   ├── verify-navigation-persistence.js
-│   ├── verify-notification-system.ts
-│   ├── verify-real-time-tracking.js
-│   ├── verify-transparency-task.ts
-│   ├── verify-user-profile-service.ts
-│   ├── verify-websocket-service.ts
-server/
-├── CLEANUP_SUMMARY.md
-├── comprehensive-race-condition-test.js
-├── config/
-│   ├── development.ts
-│   ├── index.ts
-│   ├── production.ts
-│   ├── README.md
-│   ├── test.ts
-├── core/
-│   ├── auth/
-│   │   ├── auth.ts
-│   │   ├── auth-service.ts
-│   │   ├── passwordReset.ts
-│   │   ├── secure-session-service.ts
-│   │   ├── session-cleanup.ts
-│   ├── errors/
-│   │   ├── error-tracker.ts
-│   ├── index.ts
-│   ├── StorageTypes.d.ts
-│   ├── StorageTypes.ts
-│   ├── types.ts
-│   ├── validation/
-│   │   ├── data-completeness.ts
-│   │   ├── data-validation.ts
-│   │   ├── data-validation-service.ts
-│   │   ├── input-validation-service.ts
-│   │   ├── schema-validation-service.ts
-├── db.ts
-├── demo/
-│   ├── real-time-tracking-demo.ts
-├── docs/
-│   ├── government-data-integration-implementation.md
-├── features/
-│   ├── admin/
-│   │   ├── admin.ts
-│   │   ├── admin-router.ts
-│   │   ├── content-moderation.ts
-│   │   ├── external-api-dashboard.ts
-│   │   ├── index.ts
-│   │   ├── moderation.ts
-│   │   ├── system.ts
-│   ├── analytics/
-│   │   ├── analysis.ts
-│   │   ├── analytics.ts
-│   │   ├── analytics_design.md
-│   │   ├── analytics_requirements.md
-│   │   ├── config/
-│   │   │   ├── __tests__/
-│   │   │   │   ├── analytics.config.test.ts
-│   │   │   ├── analytics.config.ts
-│   │   ├── conflict-detection.ts
-│   │   ├── controllers/
-│   │   │   ├── engagement.controller.ts
-│   │   ├── dashboard.ts
-│   │   ├── deployment/
-│   │   │   ├── communication-templates.md
-│   │   │   ├── feature-flags.md
-│   │   │   ├── monitoring-checklist.md
-│   │   │   ├── runbook.md
-│   │   ├── docs/
-│   │   │   ├── automation-setup.md
-│   │   ├── financial-disclosure/
-│   │   │   ├── config.ts
-│   │   │   ├── index.ts
-│   │   │   ├── monitoring.ts
-│   │   │   ├── types.ts
-│   │   ├── index.ts
-│   │   ├── legal-analysis.ts
-│   │   ├── middleware/
-│   │   │   ├── analytics-context.ts
-│   │   │   ├── performance-tracking.ts
-│   │   ├── ml-analysis.ts
-│   │   ├── monitoring/
-│   │   │   ├── dashboard-config.json
-│   │   │   ├── runbooks.md
-│   │   │   ├── setup-guide.md
-│   │   ├── progress-storage.d.ts
-│   │   ├── README.md
-│   │   ├── refactoring-plan.md
-│   │   ├── regulatory-change-monitoring.ts
-│   │   ├── services/
-│   │   │   ├── engagement.service.ts
-│   │   │   ├── financial-disclosure.service.ts
-│   │   │   ├── index.ts
-│   │   │   ├── ml.service.ts
-│   │   ├── storage/
-│   │   │   ├── index.ts
-│   │   │   ├── progress.storage.ts
-│   │   ├── swagger.ts
-│   │   ├── transparency-dashboard.ts
-│   │   ├── types/
-│   │   │   ├── common.ts
-│   │   │   ├── engagement.ts
-│   │   │   ├── financial-disclosure.ts
-│   │   │   ├── index.ts
-│   │   │   ├── ml.ts
-│   ├── bills/
-│   │   ├── bill.js
-│   │   ├── bills.ts
-│   │   ├── bill-service.ts
-│   │   ├── bills-router.ts
-│   │   ├── bill-status-monitor.ts
-│   │   ├── bill-storage.ts
-│   │   ├── bill-tracking.ts
-│   │   ├── index.ts
-│   │   ├── legislative-storage.ts
-│   │   ├── LegislativeStorageTypes.ts
-│   │   ├── real-time-analysis.ts
-│   │   ├── real-time-tracking.ts
-│   │   ├── sponsor-conflict-analysis.ts
-│   │   ├── sponsors.ts
-│   │   ├── sponsor-service.ts
-│   │   ├── sponsorship.ts
-│   │   ├── sponsorship-analysis.ts
-│   │   ├── voting-pattern-analysis.ts
-│   ├── community/
-│   │   ├── comment.ts
-│   │   ├── comment-storage.ts
-│   │   ├── comment-voting.ts
-│   │   ├── community.ts
-│   │   ├── index.ts
-│   │   ├── social-integration.ts
-│   │   ├── social-share-storage.d.ts
-│   │   ├── social-share-storage.ts
-│   │   ├── stakeholder-storage.ts
-│   ├── government-data/
-│   │   ├── routes.ts
-│   ├── privacy/
-│   │   ├── privacy-routes.ts
-│   │   ├── privacy-scheduler.ts
-│   │   ├── privacy-service.ts
-│   ├── recommendation.README.md
-│   ├── recommendation.ts
-│   ├── search/
-│   ├── search.ts
-│   │   ├── search-router.ts
-│   ├── search-index-manager.ts
-│   ├── search-service.ts
-│   ├── search-suggestions.ts
-│   ├── security/
-│   │   ├── encryption-service.ts
-│   │   ├── index.ts
-│   │   ├── intrusion-detection-service.ts
-│   │   ├── privacy-service.ts
-│   │   ├── security-audit-service.ts
-│   │   ├── security-initialization-service.ts
-│   │   ├── security-monitoring.ts
-│   │   ├── security-monitoring-service.ts
-│   │   ├── tls-config-service.ts
-│   ├── sidebar.tsx
-│   ├── users/
-│   │   ├── alert-preferences/
-│   │   │   ├── alert_system_docs.md
-│   │   │   ├── alert_utilities.ts
-│   │   │   ├── unified_alert_routes.ts
-│   │   │   ├── unified_alert_service.ts
-│   │   ├── citizen-verification.ts
-│   │   ├── ExpertVerificationService.test.ts
-│   │   ├── ExpertVerificationService.ts
-│   │   ├── index.ts
-│   │   ├── profile.ts
-│   │   ├── user-management.ts
-│   │   ├── user-preferences.ts
-│   │   ├── user-profile.ts
-│   │   ├── users.ts
-│   │   ├── user-storage.d.ts
-│   │   ├── user-storage.ts
-│   │   ├── verification.ts
-├── index.ts
-├── infrastructure/
-│   ├── cache/
-│   │   ├── advanced-caching.ts
-│   │   ├── cache.ts
-│   │   ├── cache-coordinator.ts
-│   │   ├── cache-service.ts
-│   │   ├── cache-warming.ts
-│   │   ├── index.ts
-│   ├── database/
-│   │   ├── base/
-│   │   │   ├── BaseStorage.d.ts
-│   │   │   ├── BaseStorage.js.map
-│   │   │   ├── BaseStorage.ts
-│   │   ├── config.d.ts
-│   │   ├── config.ts
-│   │   ├── connection-pool.ts
-│   │   ├── database-fallback.ts
-│   │   ├── database-optimization.ts
-│   │   ├── database-service.ts
-│   │   ├── db.ts
-│   │   ├── index.d.ts
-│   │   ├── index.ts
-│   │   ├── migration-service.ts
-│   │   ├── schema.sql
-│   │   ├── seed-data-service.ts
-│   │   ├── storage.ts
-│   │   ├── unified-storage.ts
-│   ├── demo-data.ts
-│   ├── external-data/
-│   │   ├── conflict-resolution-service.ts
-│   │   ├── data-synchronization-service.ts
-│   │   ├── external-api-manager.ts
-│   │   ├── government-data-integration.ts
-│   │   ├── government-data-service.ts
-│   │   ├── index.ts
-│   │   ├── types.ts
-│   ├── index.ts
-│   ├── monitoring/
-│   │   ├── apm-service.ts
-│   │   ├── audit-log.ts
-│   │   ├── db-tracer.ts
-│   │   ├── external-api-management.ts
-│   │   ├── health.ts
-│   │   ├── index.ts
-│   │   ├── monitoring.ts
-│   │   ├── monitoring-scheduler.ts
-│   │   ├── performance-monitor.ts
-│   │   ├── performance-monitoring-service.ts
-│   │   ├── system-health.ts
-│   ├── notifications/
-│   │   ├── advanced-notification-service.ts
-│   │   ├── alerting-service.ts
-│   │   ├── DEPRECATION_NOTICE.md
-│   │   ├── email-service.ts
-│   │   ├── enhanced-notification.ts
-│   │   ├── index.ts
-│   │   ├── MIGRATION_COMPLETED.md
-│   │   ├── notification-channels.ts
-│   │   ├── notification-routes.ts
-│   │   ├── notifications.ts
-│   │   ├── notification-scheduler.ts
-│   │   ├── notification-service.ts
-│   │   ├── README.md
-│   │   ├── smart-notification-filter.ts
-│   ├── websocket.ts
-├── middleware/
-│   ├── auth.ts
-│   ├── error-handler.ts
-│   ├── privacy-middleware.ts
-│   ├── rate-limiter.ts
-│   ├── request-logger.ts
-│   ├── security-middleware.ts
-│   ├── security-monitoring-middleware.ts
-├── routes/
-│   ├── regulatory-monitoring.ts
-├── scripts/
-│   ├── api-race-condition-detector.ts
-│   ├── migration-runner.ts
-│   ├── simple-integration-test.js
-│   ├── test-conflict-analysis.ts
-│   ├── test-government-integration.ts
-│   ├── verify-external-api-management.ts
-├── services/
-│   ├── api-cost-monitoring.ts
-│   ├── database-service.ts
-│   ├── data-transformation.ts
-│   ├── email.service.ts
-│   ├── external-api-error-handler.ts
-│   ├── fallback-service.ts
-│   ├── managed-government-data-integration.ts
-│   ├── performance-monitoring.test.ts
-│   ├── performance-monitoring.ts
-│   ├── README-schema-validation.md
-│   ├── schema-validation-demo.ts
-│   ├── schema-validation-test.ts
-├── simple-race-condition-test.js
-├── test-api.js
-├── test-db.js
-├── test-imports.js
-├── tests/
-│   ├── auth-system.test.ts
-│   ├── external-api-management-task-verification.test.ts
-│   ├── features/
-│   ├── financial-disclosure-api.test.ts
-│   ├── financial-disclosure-monitoring.test.ts
-│   ├── integration/
-│   │   ├── api-endpoints.test.ts
-│   │   ├── api-integration.test.ts
-│   │   ├── authentication-flow-validation.test.ts
-│   │   ├── comprehensive-api-integration.test.ts
-│   │   ├── database-fallback.test.ts
-│   │   ├── database-operations.test.ts
-│   │   ├── database-transaction-integrity.test.ts
-│   │   ├── external-api-management.integration.test.ts
-│   │   ├── frontend-serving.test.ts
-│   │   ├── frontend-serving-README.md
-│   │   ├── README.md
-│   │   ├── real-time-notification-delivery.test.ts
-│   │   ├── simple-integration.test.ts
-│   │   ├── websocket-realtime.test.ts
-│   │   ├── working-api-integration.test.ts
-│   ├── migration-service.test.ts
-│   ├── performance/
-│   │   ├── api-performance.test.ts
-│   │   ├── bundle-size-monitoring.test.ts
-│   │   ├── database-query-performance.test.ts
-│   │   ├── memory-usage-profiling.test.ts
-│   │   ├── response-time-benchmarking.test.ts
-│   ├── privacy-service.test.ts
-│   ├── README.md
-│   ├── real-time-bill-tracking.test.ts
-│   ├── services/
-│   │   ├── database-fallback.integration.test.ts
-│   │   ├── demo-data.test.ts
-│   │   ├── external-api-management.test.ts
-│   ├── setup.ts
-│   ├── sponsor-conflict-analysis.test.ts
-│   ├── unit/
-│   │   ├── auth-service.test.ts
-│   │   ├── database-service.test.ts
-│   │   ├── data-validation.test.ts
-│   │   ├── mocks/
-│   │   │   ├── mock-data.ts
-│   │   ├── simple-unit.test.ts
-│   │   ├── utils.test.ts
-│   ├── user-profile-service.test.ts
-│   ├── utils/
-│   │   ├── logger.ts
-│   │   ├── test-helpers.ts
-│   ├── voting-pattern-analysis.test.ts
-├── types/
-│   ├── api.ts
-├── utils/
-│   ├── __tests__/
-│   │   ├── cache.test.ts
-│   │   ├── db-helpers.test.ts
-│   ├── analytics-controller-wrapper.ts
-│   ├── api.ts
-│   ├── api-response.ts
-│   ├── cache.ts
-│   ├── crypto.ts
-│   ├── db-helpers.ts
-│   ├── db-init.ts
-│   ├── errors.ts
-│   ├── featureFlags.ts
-│   ├── logger.ts
-│   ├── metrics.ts
-│   ├── performance-monitoring-utils.ts
-│   ├── race-condition-prevention.ts
-│   ├── validation.ts
-├── vite.ts
-setup-postgres-windows.ps1
-shared/
 ├── database/
 │   ├── connection.ts
 │   ├── example-usage.ts
@@ -1193,4 +1237,4 @@ vitest.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-12 16:06:43
+Generated on: 2025-10-13 14:50:35
