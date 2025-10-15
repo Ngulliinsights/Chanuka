@@ -1,11 +1,10 @@
-// Validation module exports
-export * from './data-completeness.js';
-export * from './data-validation-service.js';
-export * from './data-validation.js';
-export * from './input-validation-service.js';
-export * from './schema-validation-service.js';
+// Validation module exports - Consolidated with shared/core
+export * from '../../../shared/core/src/validation';
 
-// Explicit re-exports to resolve naming conflicts
+// Re-export server-specific validation services with explicit naming to avoid conflicts
+export { DataCompletenessService } from './data-completeness.js';
 export { DataValidationService as DataValidationServiceFromService } from './data-validation-service.js';
 export { ValidationResult as ValidationResultFromService } from './data-validation-service.js';
 export { ValidationResult as ValidationResultFromSchema } from './schema-validation-service.js';
+export { InputValidationService } from './input-validation-service.js';
+export { SchemaValidationService } from './schema-validation-service.js';

@@ -6,7 +6,8 @@ import {
   rebuildSearchIndexes,
   getSearchIndexHealth,
 } from '../application/SearchService';
-import { ApiSuccess, ApiError, ApiValidationError } from '@/utils/api-response';
+import { ApiSuccess, ApiError, ApiValidationError } from '../../../utils/api-response';
+import { logger } from '../../../utils/logger';
 
 const router = Router();
 
@@ -41,7 +42,7 @@ router.get('/', async (req, res) => {
     const dto = await searchBills(query);
     return ApiSuccess(res, dto);
   } catch (e) {
-    logger.error('Search controller error', e);
+    logger.error('Search controller error', { error: e });
     return ApiError(res, (e as Error).message, 500);
   }
 });

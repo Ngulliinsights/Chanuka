@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { databaseService } from '../../../services/database-service';
+import { databaseService } from '../../../infrastructure/database/database-service';
 import { database as db } from '../../../../shared/database/connection.js';
 import { billComments, commentVotes, users, userProfiles, bills } from '../../../../shared/schema.js';
 import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';

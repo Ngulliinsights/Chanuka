@@ -178,7 +178,7 @@ class CircuitBreaker {
 /**
  * Comprehensive pool metrics for monitoring database performance.
  */
-interface PoolMetrics {
+export interface PoolMetrics {
   queries: number;
   connections: number;
   idleConnections: number;
@@ -272,7 +272,7 @@ class PoolMetricsTracker {
 /**
  * Enhanced Pool interface with metrics and circuit breaker capabilities.
  */
-interface EnhancedPool extends pg.Pool {
+export interface EnhancedPool extends pg.Pool {
   getMetrics: () => Promise<PoolMetrics>;
   resetMetrics: () => Promise<void>;
   trackQuery: (queryDuration: number) => Promise<void>;
@@ -365,7 +365,7 @@ const setupPool = (isReadOnly = false, name = isReadOnly ? 'read' : 'write'): En
   });
 
   // Attach enhanced methods to pool instance
-  newPool.getMetrics = () => metricsTracker.getMetrics(newPool.totalCount, newPool.waitingCount);
+  newPool.getMetrics = () => metricsTracker.getMetrics(newPool.totalCount || 0, newPool.waitingCount || 0);
   newPool.resetMetrics = () => metricsTracker.reset();
   newPool.trackQuery = (queryDuration: number) => metricsTracker.trackQuery(queryDuration);
   newPool.circuitBreaker = circuitBreaker;
@@ -533,7 +533,7 @@ export const executeQuery = async <T extends pg.QueryResultRow = any>(
 /**
  * Pool health status for monitoring.
  */
-interface PoolHealthStatus {
+export interface PoolHealthStatus {
   isHealthy: boolean;
   totalConnections: number;
   idleConnections: number;
@@ -553,15 +553,15 @@ export const checkPoolHealth = async (pool: EnhancedPool, poolName: string): Pro
     const maxConnections = pool.options.max || CONFIG.DEFAULT_MAX_POOL_SIZE;
     
     // Pool is healthy if it has connections, isn't overwhelmed, and circuit is closed
-    const isHealthy = pool.totalCount > 0 && 
-                     pool.waitingCount < maxConnections * 0.8 &&
-                     pool.circuitBreaker.getState() !== 'OPEN';
+    const isHealthy = (pool.totalCount || 0) > 0 &&
+                      (pool.waitingCount || 0) < maxConnections * 0.8 &&
+                      pool.circuitBreaker.getState() !== 'OPEN';
 
     return {
       isHealthy,
-      totalConnections: pool.totalCount,
-      idleConnections: pool.idleCount,
-      waitingClients: pool.waitingCount,
+      totalConnections: pool.totalCount || 0,
+      idleConnections: pool.idleCount || 0,
+      waitingClients: pool.waitingCount || 0,
       circuitBreakerState: pool.circuitBreaker.getState(),
       circuitBreakerFailures: pool.circuitBreaker.getFailureCount(),
     };
@@ -571,9 +571,9 @@ export const checkPoolHealth = async (pool: EnhancedPool, poolName: string): Pro
     
     return {
       isHealthy: false,
-      totalConnections: pool.totalCount,
-      idleConnections: pool.idleCount,
-      waitingClients: pool.waitingCount,
+      totalConnections: pool.totalCount || 0,
+      idleConnections: pool.idleCount || 0,
+      waitingClients: pool.waitingCount || 0,
       circuitBreakerState: pool.circuitBreaker.getState(),
       circuitBreakerFailures: pool.circuitBreaker.getFailureCount(),
       lastError: errorMessage,

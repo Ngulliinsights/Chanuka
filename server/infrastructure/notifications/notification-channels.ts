@@ -1,7 +1,7 @@
 import { database as db } from '../../../shared/database/connection.js';
 import { notifications, users } from '../../../shared/schema.js';
 import { eq } from 'drizzle-orm';
-import { getEmailService } from '../../services/email.service.js';
+import { getEmailService } from './email-service';
 import { webSocketService } from '../websocket.js';
 import { logger } from '@shared/utils/logger';
 

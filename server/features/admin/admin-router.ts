@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticateToken, requireRole } from '../../middleware/auth.js';
-import { billsService } from '../bills/bills.js';
+import { billsService } from '../bills/bills.ts';
 import { ApiSuccess, ApiError, ApiForbidden } from '../../utils/api-response.js';
 import { database as db } from '../../../shared/database/connection.js';
 import { logger } from '../../utils/logger';
@@ -330,6 +330,108 @@ router.post('/cache/clear', async (req, res) => {
   } catch (error) {
     logger.error('Cache clear error:', { component: 'Chanuka' }, error);
     return ApiError(res, 'Failed to clear cache', 500);
+  }
+});
+
+/**
+ * GET /api/admin/slow-queries
+ * Get recent slow queries for performance monitoring
+ */
+router.get('/slow-queries', async (req, res) => {
+  try {
+    const { limit = 50, type, minDuration } = req.query;
+    const queryLimit = Math.min(parseInt(limit as string) || 50, 500);
+
+    // Import query executor to access slow queries
+    const { queryExecutor } = await import('../../infrastructure/database/core/query-executor.js');
+
+    let slowQueries = queryExecutor.getSlowQueries(queryLimit);
+
+    // Filter by query type if specified
+    if (type && typeof type === 'string') {
+      slowQueries = slowQueries.filter(q => {
+        const queryType = q.sql.trim().toUpperCase().split(' ')[0];
+        return queryType === type.toUpperCase();
+      });
+    }
+
+    // Filter by minimum duration if specified
+    if (minDuration && typeof minDuration === 'string') {
+      const minDurationMs = parseInt(minDuration);
+      if (!isNaN(minDurationMs)) {
+        slowQueries = slowQueries.filter(q => q.executionTimeMs >= minDurationMs);
+      }
+    }
+
+    // Calculate summary statistics
+    const summary = {
+      total: slowQueries.length,
+      averageDuration: slowQueries.length > 0
+        ? slowQueries.reduce((sum, q) => sum + q.executionTimeMs, 0) / slowQueries.length
+        : 0,
+      maxDuration: slowQueries.length > 0
+        ? Math.max(...slowQueries.map(q => q.executionTimeMs))
+        : 0,
+      byType: {} as Record<string, number>
+    };
+
+    // Count by query type
+    slowQueries.forEach(query => {
+      const queryType = query.sql.trim().toUpperCase().split(' ')[0];
+      summary.byType[queryType] = (summary.byType[queryType] || 0) + 1;
+    });
+
+    return ApiSuccess(res, {
+      slowQueries: slowQueries.map(q => ({
+        queryId: q.queryId,
+        sql: q.sql.substring(0, 200) + (q.sql.length > 200 ? '...' : ''),
+        executionTimeMs: q.executionTimeMs,
+        timestamp: q.timestamp,
+        context: q.context,
+        stackTrace: q.stackTrace?.split('\n').slice(0, 5).join('\n'), // First 5 lines only
+        explainPlan: q.explainPlan?.split('\n').slice(0, 10).join('\n'), // First 10 lines only
+      })),
+      summary,
+      filters: {
+        limit: queryLimit,
+        type: type || null,
+        minDuration: minDuration || null
+      }
+    });
+  } catch (error) {
+    logger.error('Admin slow queries error:', { component: 'admin-router' }, error);
+    return ApiError(res, 'Failed to fetch slow queries', 500);
+  }
+});
+
+/**
+ * DELETE /api/admin/slow-queries
+ * Clear the slow query history
+ */
+router.delete('/slow-queries', async (req, res) => {
+  try {
+    const { queryExecutor } = await import('../../infrastructure/database/core/query-executor.js');
+    queryExecutor.clearSlowQueries();
+
+    // Log admin action
+    await securityAuditService.logAdminAction(
+      'clear_slow_queries',
+      req,
+      req.user!.id,
+      'system:slow-queries',
+      {
+        adminUserId: req.user!.id,
+        action: 'cleared_slow_query_history'
+      }
+    );
+
+    return ApiSuccess(res, {
+      message: 'Slow query history cleared successfully',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    logger.error('Clear slow queries error:', { component: 'admin-router' }, error);
+    return ApiError(res, 'Failed to clear slow queries', 500);
   }
 });
 

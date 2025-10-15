@@ -2,7 +2,16 @@ import { database as db, notifications, users, bills, billEngagement } from '../
 import { eq, and, lt, gte, sql } from 'drizzle-orm';
 import * as cron from 'node-cron';
 import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
-import { enhancedNotificationService, type EnhancedNotificationData } from './enhanced-notification.js';
+// import { enhancedNotificationService, type EnhancedNotificationData } from './enhanced-notification';
+
+// Temporary stub implementation until enhanced-notification service is created
+const enhancedNotificationService = {
+  createEnhancedNotification: async (data: any) => {
+    console.log('[NOTIFICATION] Creating enhanced notification:', data);
+  }
+};
+
+type EnhancedNotificationData = any;
 import { logger } from '@shared/utils/logger';
 
 export interface ScheduledDigest {

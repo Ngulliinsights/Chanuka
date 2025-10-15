@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, afterEach, vi, beforeAll, afterAll } from 'vitest';
+import { describe, test, expect, beforeEach, afterEach, vi, beforeAll, afterAll, type Mock } from 'vitest';
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom';
@@ -28,6 +28,18 @@ vi.mock('../../services/api', () => ({
   handleApiError: vi.fn()
 }));
 
+// Type assertions for mocked functions
+const mockApiClient = {
+  get: vi.fn() as Mock,
+  post: vi.fn() as Mock,
+  put: vi.fn() as Mock,
+  delete: vi.fn() as Mock,
+  request: vi.fn() as Mock
+};
+
+const mockCreateApiClient = vi.fn() as Mock;
+const mockHandleApiError = vi.fn() as Mock;
+
 // Mock authenticated API
 vi.mock('../../utils/authenticated-api', () => ({
   authenticatedApi: {
@@ -38,6 +50,14 @@ vi.mock('../../utils/authenticated-api', () => ({
   }
 }));
 
+// Type assertions for authenticated API mocks
+const mockAuthenticatedApi = {
+  get: vi.fn() as Mock,
+  post: vi.fn() as Mock,
+  put: vi.fn() as Mock,
+  delete: vi.fn() as Mock
+};
+
 // Mock API error handling
 vi.mock('../../services/api-error-handling', () => ({
   ApiErrorHandler: {
@@ -46,6 +66,13 @@ vi.mock('../../services/api-error-handling', () => ({
     getErrorMessage: vi.fn()
   }
 }));
+
+// Type assertions for API error handling mocks
+const mockApiErrorHandler = {
+  handleError: vi.fn() as Mock,
+  isRetryableError: vi.fn() as Mock,
+  getErrorMessage: vi.fn() as Mock
+};
 
 // Mock hooks
 vi.mock('../../hooks/use-api-with-fallback', () => ({
@@ -57,6 +84,10 @@ vi.mock('../../hooks/use-safe-query', () => ({
   UseApiResult: {},
   SafeQueryResult: {}
 }));
+
+// Type assertions for hook mocks
+const mockUseApiWithFallback = vi.fn() as Mock;
+const mockUseSafeQuery = vi.fn() as Mock;
 
 describe('API Communication Integration Tests', () => {
   let queryClient: QueryClient;
@@ -111,13 +142,13 @@ describe('API Communication Integration Tests', () => {
 
     test('should handle API client initialization errors', async () => {
       const { createApiClient } = await import('../../services/api');
-      
+
       // Mock API client creation failure
-      createApiClient.mockImplementationOnce(() => {
+      mockCreateApiClient.mockImplementationOnce(() => {
         throw new Error('Failed to create API client');
       });
 
-      expect(() => createApiClient()).toThrow('Failed to create API client');
+      expect(() => mockCreateApiClient()).toThrow('Failed to create API client');
     });
 
     test('should configure request timeout correctly', async () => {
@@ -146,7 +177,7 @@ describe('API Communication Integration Tests', () => {
       const { apiClient } = await import('../../services/api');
       
       // Mock first two calls to fail, third to succeed
-      apiClient.get
+      mockApiClient.get
         .mockRejectedValueOnce(new Error('Network error'))
         .mockRejectedValueOnce(new Error('Network error'))
         .mockResolvedValueOnce({ data: { success: true } });
@@ -185,7 +216,7 @@ describe('API Communication Integration Tests', () => {
       });
 
       const { apiClient } = await import('../../services/api');
-      apiClient.get.mockResolvedValueOnce({ data: mockResponse });
+      mockApiClient.get.mockResolvedValueOnce({ data: mockResponse });
 
       const response = await apiClient.get('/bills');
 
@@ -215,7 +246,7 @@ describe('API Communication Integration Tests', () => {
       });
 
       const { apiClient } = await import('../../services/api');
-      apiClient.get.mockRejectedValueOnce({
+      mockApiClient.get.mockRejectedValueOnce({
         response: {
           status: 400,
           data: mockErrorResponse
@@ -237,7 +268,7 @@ describe('API Communication Integration Tests', () => {
       mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
       const { apiClient } = await import('../../services/api');
-      apiClient.get.mockRejectedValueOnce(new Error('Network error'));
+      mockApiClient.get.mockRejectedValueOnce(new Error('Network error'));
 
       await expect(apiClient.get('/network-test')).rejects.toThrow('Network error');
     });
@@ -255,7 +286,7 @@ describe('API Communication Integration Tests', () => {
       });
 
       const { apiClient } = await import('../../services/api');
-      apiClient.get.mockRejectedValueOnce(new Error('Invalid JSON response'));
+      mockApiClient.get.mockRejectedValueOnce(new Error('Invalid JSON response'));
 
       await expect(apiClient.get('/invalid-json')).rejects.toThrow('Invalid JSON response');
     });
@@ -293,7 +324,7 @@ describe('API Communication Integration Tests', () => {
       mockFetch.mockRejectedValueOnce(new Error('CORS policy violation'));
 
       const { handleApiError } = await import('../../services/api');
-      handleApiError.mockImplementationOnce((error) => {
+      mockHandleApiError.mockImplementationOnce((error) => {
         if (error.message.includes('CORS')) {
           return {
             error: 'CORS policy violation',
@@ -305,7 +336,7 @@ describe('API Communication Integration Tests', () => {
       });
 
       const error = new Error('CORS policy violation');
-      const handledError = handleApiError(error);
+      const handledError = mockHandleApiError(error);
 
       expect(handledError.code).toBe('CORS_ERROR');
       expect(handledError.message).toBe('Cross-origin request blocked');
@@ -341,22 +372,22 @@ describe('API Communication Integration Tests', () => {
   describe('Authentication Integration', () => {
     test('should include authentication headers in requests', async () => {
       const { authenticatedApi } = await import('../../utils/authenticated-api');
-      
-      authenticatedApi.get.mockResolvedValueOnce({
+
+      mockAuthenticatedApi.get.mockResolvedValueOnce({
         data: { success: true, user: { id: 1, name: 'Test User' } }
       });
 
-      const response = await authenticatedApi.get('/profile');
+      const response = await mockAuthenticatedApi.get('/profile');
 
-      expect(authenticatedApi.get).toHaveBeenCalledWith('/profile');
-      expect(response.data.success).toBe(true);
-      expect(response.data.user.name).toBe('Test User');
+      expect(mockAuthenticatedApi.get).toHaveBeenCalledWith('/profile');
+      expect((response.data as any).success).toBe(true);
+      expect((response.data as any).user.name).toBe('Test User');
     });
 
     test('should handle authentication errors', async () => {
       const { authenticatedApi } = await import('../../utils/authenticated-api');
-      
-      authenticatedApi.get.mockRejectedValueOnce({
+
+      mockAuthenticatedApi.get.mockRejectedValueOnce({
         response: {
           status: 401,
           data: {
@@ -367,7 +398,7 @@ describe('API Communication Integration Tests', () => {
         }
       });
 
-      await expect(authenticatedApi.get('/protected')).rejects.toMatchObject({
+      await expect(mockAuthenticatedApi.get('/protected')).rejects.toMatchObject({
         response: {
           status: 401,
           data: {
@@ -381,7 +412,7 @@ describe('API Communication Integration Tests', () => {
       const { authenticatedApi } = await import('../../utils/authenticated-api');
       
       // Mock token refresh scenario
-      authenticatedApi.get
+      mockAuthenticatedApi.get
         .mockRejectedValueOnce({
           response: { status: 401, data: { error: 'Token expired' } }
         })
@@ -390,9 +421,9 @@ describe('API Communication Integration Tests', () => {
         });
 
       // This would normally trigger token refresh internally
-      const response = await authenticatedApi.get('/protected-resource');
-      
-      expect(response.data.data).toBe('Refreshed and retried');
+      const response = await mockAuthenticatedApi.get('/protected-resource');
+
+      expect((response.data as any).data).toBe('Refreshed and retried');
     });
   });
 
@@ -406,16 +437,16 @@ describe('API Communication Integration Tests', () => {
       const authError = { response: { status: 401, data: { error: 'Unauthorized' } } };
       const serverError = { response: { status: 500, data: { error: 'Internal server error' } } };
 
-      ApiErrorHandler.getErrorMessage
+      mockApiErrorHandler.getErrorMessage
         .mockReturnValueOnce('Network connection failed')
         .mockReturnValueOnce('Invalid input data')
         .mockReturnValueOnce('Authentication required')
         .mockReturnValueOnce('Server error occurred');
 
-      expect(ApiErrorHandler.getErrorMessage(networkError)).toBe('Network connection failed');
-      expect(ApiErrorHandler.getErrorMessage(validationError)).toBe('Invalid input data');
-      expect(ApiErrorHandler.getErrorMessage(authError)).toBe('Authentication required');
-      expect(ApiErrorHandler.getErrorMessage(serverError)).toBe('Server error occurred');
+      expect(mockApiErrorHandler.getErrorMessage(networkError)).toBe('Network connection failed');
+      expect(mockApiErrorHandler.getErrorMessage(validationError)).toBe('Invalid input data');
+      expect(mockApiErrorHandler.getErrorMessage(authError)).toBe('Authentication required');
+      expect(mockApiErrorHandler.getErrorMessage(serverError)).toBe('Server error occurred');
     });
 
     test('should determine which errors are retryable', async () => {
@@ -426,16 +457,16 @@ describe('API Communication Integration Tests', () => {
       const validationError = { response: { status: 400 } };
       const serverError = { response: { status: 500 } };
 
-      ApiErrorHandler.isRetryableError
+      mockApiErrorHandler.isRetryableError
         .mockReturnValueOnce(true)  // Network errors are retryable
         .mockReturnValueOnce(true)  // Timeout errors are retryable
         .mockReturnValueOnce(false) // Validation errors are not retryable
         .mockReturnValueOnce(true); // Server errors are retryable
 
-      expect(ApiErrorHandler.isRetryableError(networkError)).toBe(true);
-      expect(ApiErrorHandler.isRetryableError(timeoutError)).toBe(true);
-      expect(ApiErrorHandler.isRetryableError(validationError)).toBe(false);
-      expect(ApiErrorHandler.isRetryableError(serverError)).toBe(true);
+      expect(mockApiErrorHandler.isRetryableError(networkError)).toBe(true);
+      expect(mockApiErrorHandler.isRetryableError(timeoutError)).toBe(true);
+      expect(mockApiErrorHandler.isRetryableError(validationError)).toBe(false);
+      expect(mockApiErrorHandler.isRetryableError(serverError)).toBe(true);
     });
 
     test('should provide fallback data when API fails', async () => {
@@ -447,7 +478,7 @@ describe('API Communication Integration Tests', () => {
         ]
       };
 
-      useApiWithFallback.mockReturnValue({
+      mockUseApiWithFallback.mockReturnValue({
         data: fallbackData,
         isLoading: false,
         error: null,
@@ -455,7 +486,7 @@ describe('API Communication Integration Tests', () => {
       });
 
       const TestComponent = () => {
-        const { data, isUsingFallback } = useApiWithFallback('/bills', fallbackData);
+        const { data, isUsingFallback } = mockUseApiWithFallback('/bills', fallbackData);
         
         return (
           <div>
@@ -478,7 +509,7 @@ describe('API Communication Integration Tests', () => {
     test('should handle API errors gracefully in components', async () => {
       const { useSafeQuery } = await import('../../hooks/use-safe-query');
       
-      useSafeQuery.mockReturnValue({
+      mockUseSafeQuery.mockReturnValue({
         data: null,
         isLoading: false,
         error: new Error('API request failed'),
@@ -486,9 +517,9 @@ describe('API Communication Integration Tests', () => {
       });
 
       const TestComponent = () => {
-        const { data, isLoading, error, isError } = useSafeQuery(['bills'], () => {
+        const { data, isLoading, error, isError } = mockUseSafeQuery({ queryKey: ['bills'], queryFn: () => {
           throw new Error('API request failed');
-        });
+        } });
         
         if (isLoading) return <div data-testid="loading">Loading...</div>;
         if (isError) return <div data-testid="error">Error: {error.message}</div>;
@@ -515,10 +546,14 @@ describe('API Communication Integration Tests', () => {
         removeEventListener: vi.fn(),
         send: vi.fn(),
         close: vi.fn(),
-        readyState: WebSocket.OPEN
-      };
+        readyState: WebSocket.OPEN,
+        CONNECTING: 0,
+        OPEN: 1,
+        CLOSING: 2,
+        CLOSED: 3
+      } as any;
 
-      global.WebSocket = vi.fn().mockImplementation(() => mockWebSocket);
+      global.WebSocket = vi.fn().mockImplementation(() => mockWebSocket) as any;
 
       // Simulate WebSocket connection
       const ws = new WebSocket('ws://localhost:4200/ws');
@@ -533,10 +568,14 @@ describe('API Communication Integration Tests', () => {
         removeEventListener: vi.fn(),
         send: vi.fn(),
         close: vi.fn(),
-        readyState: WebSocket.CLOSED
-      };
+        readyState: WebSocket.CLOSED,
+        CONNECTING: 0,
+        OPEN: 1,
+        CLOSING: 2,
+        CLOSED: 3
+      } as any;
 
-      global.WebSocket = vi.fn().mockImplementation(() => mockWebSocket);
+      global.WebSocket = vi.fn().mockImplementation(() => mockWebSocket) as any;
 
       const ws = new WebSocket('ws://localhost:4200/ws');
       
@@ -558,10 +597,14 @@ describe('API Communication Integration Tests', () => {
         removeEventListener: vi.fn(),
         send: vi.fn(),
         close: vi.fn(),
-        readyState: WebSocket.OPEN
-      };
+        readyState: WebSocket.OPEN,
+        CONNECTING: 0,
+        OPEN: 1,
+        CLOSING: 2,
+        CLOSED: 3
+      } as any;
 
-      global.WebSocket = vi.fn().mockImplementation(() => mockWebSocket);
+      global.WebSocket = vi.fn().mockImplementation(() => mockWebSocket) as any;
 
       const ws = new WebSocket('ws://localhost:4200/ws');
       
@@ -618,12 +661,12 @@ describe('API Communication Integration Tests', () => {
       
       // Mock multiple concurrent requests
       const requests = [
-        apiClient.get('/bills'),
-        apiClient.get('/sponsors'),
-        apiClient.get('/analysis')
+        mockApiClient.get('/bills'),
+        mockApiClient.get('/sponsors'),
+        mockApiClient.get('/analysis')
       ];
 
-      apiClient.get
+      mockApiClient.get
         .mockResolvedValueOnce({ data: { bills: [] } })
         .mockResolvedValueOnce({ data: { sponsors: [] } })
         .mockResolvedValueOnce({ data: { analysis: {} } });
@@ -640,18 +683,18 @@ describe('API Communication Integration Tests', () => {
       const { apiClient } = await import('../../services/api');
       
       // Mock the same request made multiple times
-      apiClient.get.mockResolvedValue({ data: { result: 'deduplicated' } });
+      mockApiClient.get.mockResolvedValue({ data: { result: 'deduplicated' } });
 
       const requests = [
-        apiClient.get('/same-endpoint'),
-        apiClient.get('/same-endpoint'),
-        apiClient.get('/same-endpoint')
+        mockApiClient.get('/same-endpoint'),
+        mockApiClient.get('/same-endpoint'),
+        mockApiClient.get('/same-endpoint')
       ];
 
       await Promise.all(requests);
       
       // In a real implementation, this would only make one actual request
-      expect(apiClient.get).toHaveBeenCalledTimes(3);
+      expect(mockApiClient.get).toHaveBeenCalledTimes(3);
     });
   });
 });

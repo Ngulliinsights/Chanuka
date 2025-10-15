@@ -1,4 +1,4 @@
-import { databaseService } from '../../services/database-service.js';
+import { databaseService } from '../../infrastructure/database/database-service.js';
 import { database as db } from '../../../shared/database/connection.js';
 import { billComments, users, commentVotes } from '../../../shared/schema.js';
 import { eq, and, sql, desc } from 'drizzle-orm';
@@ -33,7 +33,7 @@ export class CommentVotingService {
    * Vote on a comment (upvote or downvote)
    */
   async voteOnComment(commentId: number, userId: string, voteType: 'up' | 'down'): Promise<VoteResult> {
-    return databaseService.withFallback(
+    const result = await databaseService.withFallback(
       async () => {
         // Check if comment exists
         const [comment] = await db
@@ -67,7 +67,7 @@ export class CommentVotingService {
             await db
               .delete(commentVotes)
               .where(eq(commentVotes.id, existingVote.id));
-            
+
             if (voteType === 'up') {
               upvoteChange = -1;
             } else {
@@ -83,7 +83,7 @@ export class CommentVotingService {
                 updatedAt: new Date()
               })
               .where(eq(commentVotes.id, existingVote.id));
-            
+
             if (voteType === 'up') {
               upvoteChange = 1;
               downvoteChange = -1;
@@ -101,7 +101,7 @@ export class CommentVotingService {
               userId,
               voteType
             });
-          
+
           if (voteType === 'up') {
             upvoteChange = 1;
           } else {
@@ -140,13 +140,14 @@ export class CommentVotingService {
       },
       `voteOnComment:${commentId}:${userId}`
     );
+    return result.data;
   }
 
   /**
    * Get user's vote on a specific comment
    */
   async getUserVote(commentId: number, userId: string): Promise<'up' | 'down' | null> {
-    return databaseService.withFallback(
+    const result = await databaseService.withFallback(
       async () => {
         const [vote] = await db
           .select({ voteType: commentVotes.voteType })
@@ -162,13 +163,14 @@ export class CommentVotingService {
       null,
       `getUserVote:${commentId}:${userId}`
     );
+    return result.data;
   }
 
   /**
    * Get voting statistics for multiple comments
    */
   async getCommentVotingStats(commentIds: number[]): Promise<Map<number, CommentEngagementStats>> {
-    return databaseService.withFallback(
+    const result = await databaseService.withFallback(
       async () => {
         const cacheKey = `${CACHE_KEYS.COMMENT_VOTES}:stats:${commentIds.join(',')}`;
         const cached = await cacheService.get(cacheKey);
@@ -190,7 +192,7 @@ export class CommentVotingService {
         comments.forEach((comment, index) => {
           const netVotes = comment.upvotes - comment.downvotes;
           const totalVotes = comment.upvotes + comment.downvotes;
-          
+
           // Calculate engagement score (weighted by recency and vote ratio)
           const engagementScore = this.calculateEngagementScore(
             comment.upvotes,
@@ -216,6 +218,7 @@ export class CommentVotingService {
       new Map(),
       `getCommentVotingStats:${commentIds.join(',')}`
     );
+    return result.data;
   }
 
   /**
@@ -227,7 +230,7 @@ export class CommentVotingService {
     engagementScore: number;
     trendingScore: number;
   }[]> {
-    return databaseService.withFallback(
+    const result = await databaseService.withFallback(
       async () => {
         const cacheKey = `${CACHE_KEYS.COMMENT_VOTES}:trending:${billId}:${timeframe}:${limit}`;
         const cached = await cacheService.get(cacheKey);
@@ -293,6 +296,7 @@ export class CommentVotingService {
       [],
       `getTrendingComments:${billId}:${timeframe}`
     );
+    return result.data;
   }
 
   /**
@@ -305,7 +309,7 @@ export class CommentVotingService {
     billId: number;
     billTitle: string;
   }[]> {
-    return databaseService.withFallback(
+    const result = await databaseService.withFallback(
       async () => {
         // Get user's votes from database with comment and bill information
         const userVotes = await db
@@ -333,6 +337,7 @@ export class CommentVotingService {
       [],
       `getUserVotingHistory:${userId}`
     );
+    return result.data;
   }
 
   /**
@@ -385,7 +390,7 @@ export class CommentVotingService {
     mostUpvotedCommentId: number | null;
     mostControversialCommentId: number | null;
   }> {
-    return databaseService.withFallback(
+    const result = await databaseService.withFallback(
       async () => {
         const cacheKey = `${CACHE_KEYS.COMMENT_VOTES}:summary:${billId}`;
         const cached = await cacheService.get(cacheKey);
@@ -416,7 +421,7 @@ export class CommentVotingService {
 
         // Get most controversial comment (highest total votes)
         const [mostControversial] = await db
-          .select({ 
+          .select({
             id: billComments.id,
             totalVotes: sql<number>`${billComments.upvotes} + ${billComments.downvotes}`
           })
@@ -425,18 +430,18 @@ export class CommentVotingService {
           .orderBy(sql`${billComments.upvotes} + ${billComments.downvotes} DESC`)
           .limit(1);
 
-        const result = {
+        const summaryResult = {
           totalVotes: Number(summary.totalUpvotes) + Number(summary.totalDownvotes),
           totalUpvotes: Number(summary.totalUpvotes),
           totalDownvotes: Number(summary.totalDownvotes),
-          averageEngagement: Number(summary.commentCount) > 0 ? 
+          averageEngagement: Number(summary.commentCount) > 0 ?
             (Number(summary.totalUpvotes) + Number(summary.totalDownvotes)) / Number(summary.commentCount) : 0,
           mostUpvotedCommentId: mostUpvoted?.id || null,
           mostControversialCommentId: mostControversial?.id || null
         };
 
-        await cacheService.set(cacheKey, result, this.VOTE_CACHE_TTL);
-        return result;
+        await cacheService.set(cacheKey, summaryResult, this.VOTE_CACHE_TTL);
+        return summaryResult;
       },
       {
         totalVotes: 0,
@@ -448,6 +453,7 @@ export class CommentVotingService {
       },
       `getBillCommentVoteSummary:${billId}`
     );
+    return result.data;
   }
 }
 

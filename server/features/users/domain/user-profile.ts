@@ -1,10 +1,10 @@
-import { database as db } from '../../../shared/database/connection.js';
-import { users, userProfiles, userInterests, billEngagement, notifications, billComments, bills } from '../../../shared/schema.js';
-import { eq, and, desc, sql, count, sum } from 'drizzle-orm';
-import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../infrastructure/cache/cache-service.js';
-import { databaseService } from '../../infrastructure/database/database-service.js';
+import { db } from '../../../db';
+import { users, userProfiles, userInterests, billEngagement, notifications, billComments, bills } from '../../../shared/schema.ts';
+import { eq, and, desc, sql, count } from 'drizzle-orm';
+import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../infrastructure/cache/cache-service';
+import { databaseService } from '../../infrastructure/database/database-service';
 import { z } from 'zod';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../utils/logger.js';
 
 // Data validation schemas
 const userProfileDataSchema = z.object({

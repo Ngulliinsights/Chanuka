@@ -87,7 +87,7 @@ export class DatabaseUnifiedStorage implements UnifiedStorage {
   // Bill operations
   async getBills(filters?: { category?: string; status?: string; search?: string }): Promise<Bill[]> {
     let query = db.select().from(bills);
-    
+
     if (filters?.search) {
       query = query.where(
         or(
@@ -101,7 +101,7 @@ export class DatabaseUnifiedStorage implements UnifiedStorage {
     } else if (filters?.status) {
       query = query.where(eq(bills.status, filters.status));
     }
-    
+
     return await query.orderBy(desc(bills.introducedDate));
   }
 

@@ -27,7 +27,6 @@ attached_assets/
 ├── unified_ai_dev_framework_1751746605014.md
 ├── unified_code_analysis_framework.md
 ├── unified_coding_framework_1751746614347.md
-check-table-structure.ts
 client/
 ├── index.html
 ├── public/
@@ -433,15 +432,13 @@ client/
 │   │   ├── safe-lazy-loading.tsx
 │   │   ├── serviceWorker.ts
 │   ├── vite-env.d.ts
-CODE_REVIEW_CHECKLIST.md
 components.json
-connection_files.txt
 db/
 ├── index.ts
 ├── init-scripts/
 │   ├── 01-init-database.sql
 ├── legislative-seed.ts
-├── migrations/
+├── migrations_backup/
 │   ├── 0000_quick_aaron_stack.sql
 │   ├── 0001_lowly_white_queen.sql
 │   ├── 0002_chief_stellaris.sql
@@ -472,6 +469,7 @@ docs/
 │   ├── chanuka-implementation-plan.md
 │   ├── phase-2-database-consolidation.md
 │   ├── project-structure.md
+├── CODE_REVIEW_CHECKLIST.md
 ├── financial-disclosure-monitoring.md
 ├── fix-before-tests.md
 ├── guides/
@@ -481,9 +479,12 @@ docs/
 │   ├── DEPLOYMENT_GUIDE.md
 │   ├── NAVIGATION_USER_GUIDE.md
 │   ├── TROUBLESHOOTING_GUIDE.md
+├── phased_fixing_plan.md
 ├── project-structure.md
 ├── project-structure2.md
+├── project-structure3.md
 ├── regulatory-change-monitoring.md
+├── replit.md
 ├── SERVER_ARCHITECTURE.md
 ├── summaries/
 │   ├── APP_RENDERING_FIX_SUMMARY.md
@@ -512,6 +513,42 @@ docs/
 ├── unified_coding_framework.md
 drizzle/
 drizzle.config.ts
+├── 0000_clear_risque.sql
+├── 0000_initial_migration.sql
+├── 0000_quick_aaron_stack.sql
+├── 0001_comprehensive_schema.sql
+├── 0001_lowly_white_queen.sql
+├── 0001_strange_night_nurse.sql
+├── 0002_add_bill_engagement.sql
+├── 0002_calm_weapon_omega.sql
+├── 0002_chief_stellaris.sql
+├── 0003_add_comment_features.sql
+├── 0003_enhanced_comments_system.sql
+├── 0004_fix_schema.sql
+├── 0005_complete_schema_update.sql
+├── 0006_fix_implementation_workarounds.sql
+├── 0007_add_sponsorship_tables.sql
+├── 0008_seed_sponsorship_data.sql
+├── 0009_add_citizen_verification.sql
+├── 0010_add_search_vectors_and_indexes.sql
+├── 0011_add_moderation_and_analytics.sql
+├── 0012_add_missing_features.sql
+├── 0013_fix_missing_tables.sql
+├── 0014_create_security_tables.sql
+├── 0015_fix_schema_errors.sql
+├── 0016_add_last_checked_column.sql
+├── 0017_add_success_column.sql
+├── 0017_fix_security_schema_issues.sql
+├── 0018_add_risk_score_column.sql
+├── meta/
+│   ├── _journal.json
+│   ├── 0000_snapshot.json
+│   ├── 0001_snapshot.json
+│   ├── 0002_snapshot.json
+├── README.md
+├── relations.ts
+├── schema.ts
+drizzle_backup/
 ├── 0000_clear_risque.sql
 ├── 0000_initial_migration.sql
 ├── 0001_comprehensive_schema.sql
@@ -544,27 +581,20 @@ drizzle.config.ts
 ├── README.md
 ├── relations.ts
 ├── schema.ts
-drop-schema.ts
-final_schema_files.txt
 generate-structure-to-file.sh
 jest.client.config.js
 jest.config.js
-last_schema_files.txt
-logger_errors.txt
-logger_files.txt
-logger_files_clean.txt
+logs/
+├── logger_errors.txt
+├── logger_files.txt
+├── logger_files_clean.txt
 nginx.conf
 package.json
 package-lock.json
-phased_fixing_plan.md
-pool_files.txt
 postcss.config.js
-remaining_schema_files.txt
-replit.md
-schema_files.txt
 scripts/
 ├── analyze-bundle.js
-├── check-architecture.js
+├── check-table-structure.ts
 ├── database/
 │   ├── check-schema.ts
 │   ├── debug-migration-table.ts
@@ -574,11 +604,11 @@ scripts/
 │   ├── setup-schema.ts
 ├── deployment/
 │   ├── deploy.sh
+├── drop-schema.ts
 ├── migrate-console-logs.ts
 ├── testing/
 │   ├── bug-detector.ts
 │   ├── run-bug-detector.ts
-│   ├── run-frontend-serving-tests.js
 │   ├── test-api-health.js
 │   ├── test-app.html
 │   ├── test-application.js
@@ -598,7 +628,6 @@ scripts/
 │   ├── test-security-simple.cjs
 │   ├── test-security-simple.js
 │   ├── test-security-standalone.ts
-│   ├── test-simple-transparency.ts
 │   ├── test-sponsor-routes.js
 │   ├── test-sponsor-service.js
 │   ├── test-transparency-dashboard.ts
@@ -907,6 +936,19 @@ server/
 │   │   ├── config.d.ts
 │   │   ├── config.ts
 │   │   ├── connection-pool.ts
+│   │   ├── core/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── circuit-breaker.test.ts
+│   │   │   │   ├── connection-manager.test.ts
+│   │   │   │   ├── connection-manager-metrics.test.ts
+│   │   │   │   ├── integration.test.ts
+│   │   │   │   ├── performance.test.ts
+│   │   │   │   ├── slow-query.test.ts
+│   │   │   │   ├── slow-query-integration.test.ts
+│   │   │   │   ├── slow-query-performance.test.ts
+│   │   │   ├── connection-manager.ts
+│   │   │   ├── connection-manager-metrics.ts
+│   │   │   ├── query-executor.ts
 │   │   ├── database-fallback.ts
 │   │   ├── database-optimization.ts
 │   │   ├── database-service.ts
@@ -968,7 +1010,6 @@ server/
 ├── scripts/
 │   ├── api-race-condition-detector.ts
 │   ├── migration-runner.ts
-│   ├── simple-integration-test.js
 │   ├── test-conflict-analysis.ts
 │   ├── test-government-integration.ts
 │   ├── verify-external-api-management.ts
@@ -1066,7 +1107,6 @@ server/
 │   ├── race-condition-prevention.ts
 │   ├── validation.ts
 ├── vite.ts
-setup-postgres-windows.ps1
 shared/
 ├── core/
 │   ├── MIGRATION_VALIDATION_REPORT.md
@@ -1292,6 +1332,7 @@ shared/
 │   │   │   ├── index.ts
 │   │   │   ├── migration.ts
 │   │   │   ├── number-utils.ts
+│   │   │   ├── race-condition-prevention.ts
 │   │   │   ├── regex-patterns.ts
 │   │   │   ├── response-helpers.ts
 │   │   │   ├── string-utils.ts
@@ -1352,7 +1393,6 @@ shared/
 │   ├── error-handler.ts
 │   ├── logger.ts
 tailwind.config.ts
-test-logger.js
 tools/
 ├── validate-schema-congruence.ts
 tsconfig.json
@@ -1363,4 +1403,4 @@ vitest.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-15 02:43:52
+Generated on: 2025-10-15 20:40:46

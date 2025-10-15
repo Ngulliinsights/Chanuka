@@ -1,6 +1,6 @@
 import { eq, and, desc, sql, inArray } from 'drizzle-orm';
 import { databaseService } from '../../infrastructure/database/database-service';
-import { readDatabase } from '../../../db.js';
+import { db } from '../../../db';
 import { notificationChannelService } from '../../infrastructure/notifications/notification-channels';
 import { userProfileService } from '../users/domain/user-profile';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service';
@@ -210,7 +210,7 @@ export const alertPreferenceSchema = z.object({
  * - Delivery tracking and analytics
  */
 export class UnifiedAlertPreferenceService {
-  private get db() { return readDatabase(); }
+  private get db() { return db; }
 
   // ========================================================================
   // PREFERENCE MANAGEMENT
