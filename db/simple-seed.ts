@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import { db } from './index';
-import { logger } from '../utils/logger';
+import { logger } from '../server/utils/logger';
 
 async function simpleSeed() {
   logger.info('🌱 Starting simple comprehensive seed process...', { component: 'Chanuka' });

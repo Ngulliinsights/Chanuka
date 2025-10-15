@@ -195,22 +195,29 @@ export class CacheService {
     let deletedCount = 0;
     const regex = new RegExp(pattern.replace(/\*/g, '.*'));
     const keysToDelete: string[] = [];
-    
+
     // Collect keys first to avoid modification during iteration
     for (const key of this.cache.keys()) {
       if (regex.test(key)) {
         keysToDelete.push(key);
       }
     }
-    
+
     // Delete collected keys
     for (const key of keysToDelete) {
       if (this.delete(key)) {
         deletedCount++;
       }
     }
-    
+
     return deletedCount;
+  }
+
+  /**
+   * Invalidate cache entries matching a pattern (alias for deletePattern)
+   */
+  invalidatePattern(pattern: string): number {
+    return this.deletePattern(pattern);
   }
 
   /**

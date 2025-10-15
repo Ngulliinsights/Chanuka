@@ -9,20 +9,20 @@ import { database as db } from '../shared/database/connection.js';
 import { config } from './config/index.js';
 // Feature Routes
 import { router as systemRouter } from './features/admin/system.js';
-import { router as billsRouter } from './features/bills/bills-router.js';
+import { router as billsRouter } from './features/bills/presentation/bills-router.js';
 import { router as sponsorshipRouter } from './features/bills/sponsorship.js';
 import { router as analysisRouter } from './features/analytics/analysis.js';
 import analyticsRouter from './features/analytics/analytics.js';
 import { router as sponsorsRouter } from './features/bills/sponsors.js';
 import { router as authRouter } from './core/auth/auth.js';
-import { router as usersRouter } from './features/users/users.js';
-import { router as verificationRouter } from './features/users/verification.js';
+import { router as usersRouter } from './features/users/application/users.js';
+import { router as verificationRouter } from './features/users/application/verification.js';
 import { router as healthRouter } from './infrastructure/monitoring/health.js';
 import { router as communityRouter } from './features/community/community.js';
 
 import { notificationRoutes as notificationsRouter } from './infrastructure/notifications/index.js';
 import { router as searchRouter } from './features/search/presentation/SearchController.js';
-import { router as profileRouter } from './features/users/profile.js';
+import { router as profileRouter } from './features/users/application/profile.js';
 import { router as privacyRouter } from './features/privacy/privacy-routes.js';
 // import governmentDataRouter from './features/government-data/routes.js'; // TODO: Implement government data router
 // import { router as billTrackingRouter } from './features/bills/bill-tracking.js'; // TODO: Implement bill tracking router

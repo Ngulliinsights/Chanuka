@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import App from '../../App';
-import { logger } from '../utils/logger.js';
+import logger from '../utils/logger.js';
 
 // Mock API calls
 vi.mock('../../services/api', () => ({
@@ -381,9 +381,9 @@ describe('End-to-End User Workflows', () => {
   });
 
   describe('Comment and Engagement Workflow', () => {
-    beforeEach(() => {
-      const { getCurrentUser } = import('../../services/api');
-      
+    beforeEach(async () => {
+      const { getCurrentUser } = await import('../../services/api');
+
       // Mock authenticated user
       (getCurrentUser as any).mockResolvedValue({
         success: true,
@@ -502,9 +502,9 @@ describe('End-to-End User Workflows', () => {
   });
 
   describe('User Profile and Settings Workflow', () => {
-    beforeEach(() => {
-      const { getCurrentUser } = import('../../services/api');
-      
+    beforeEach(async () => {
+      const { getCurrentUser } = await import('../../services/api');
+
       // Mock authenticated user
       (getCurrentUser as any).mockResolvedValue({
         success: true,

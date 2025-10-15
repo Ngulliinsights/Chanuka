@@ -196,7 +196,7 @@ const UserProfile: FC = () => {
               </Avatar>
               <div>
                 <h1 className="text-2xl font-bold">{profile.name}</h1>
-                <p className="text-muted-foreground">{profileQuery.data?.email}</p>
+                <p className="text-muted-foreground">{profile.email}</p>
                 <div className="flex items-center space-x-2 mt-2">
                   <Badge className={getRoleColor('user')}>
                     User

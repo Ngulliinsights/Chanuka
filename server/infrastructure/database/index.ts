@@ -17,6 +17,9 @@ export * from './base/BaseStorage';
 // Configuration
 export * from './config';
 
+// Database Tables
+export * from '../../../shared/schema';
+
 // Re-export stable DB accessors and legacy names for compatibility.
 export {
 	getDbInstance,

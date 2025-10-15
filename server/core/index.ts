@@ -14,5 +14,5 @@ export * from './errors/index.js';
 export * from './types/index.js';
 export * from './StorageTypes.js';
 
-// Routes Index
-export { default as routesIndex } from './index.js';
+// API Response Types
+export { ApiSuccess, ApiError, ApiValidationError } from '../utils/api-response';

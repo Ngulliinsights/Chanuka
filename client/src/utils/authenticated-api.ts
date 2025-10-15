@@ -258,6 +258,8 @@ export function useCoordinatedRequest() {
   };
 }
 
+export const authenticatedApi = AuthenticatedAPI;
+
 export default AuthenticatedAPI;
 
 

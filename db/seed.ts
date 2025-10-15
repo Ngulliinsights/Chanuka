@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import { db } from './index';
-import { logger } from '../utils/logger';
+import { logger } from '../server/utils/logger';
 import {
   users,
   bills,
@@ -1100,7 +1100,7 @@ PART VI – IMPLEMENTATION
 
     logger.info('✅ Comprehensive seed data creation completed successfully!', { component: 'Chanuka' });
     logger.info('📊 Database now contains:', { component: 'Chanuka' });
-    console.log(`   - ${createdUsers.length} users with diverse roles`);
+    console.log(`   - ${userIds.length} users with diverse roles`);
     console.log(`   - ${createdSponsors.length} sponsors with detailed profiles`);
     console.log(`   - ${createdBills.length} bills with comprehensive content`);
     console.log(`   - Multiple sponsor affiliations and transparency records`);

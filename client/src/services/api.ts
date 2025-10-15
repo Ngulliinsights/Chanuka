@@ -281,6 +281,14 @@ class ApiClient {
 // Create and export the main API client instance
 export const api = new ApiClient();
 
+// Additional exports for backward compatibility with tests
+export const apiClient = api;
+export const createApiClient = () => new ApiClient();
+export const handleApiError = (error: any) => {
+  console.error('API Error:', error);
+  return error;
+};
+
 // Auth API
 export const authApi = {
   async register(userData: any) {
@@ -298,6 +306,21 @@ export const authApi = {
   async logout() {
     return api.post('/api/auth/logout');
   }
+};
+
+// Individual API methods for backward compatibility
+export const register = authApi.register;
+export const login = authApi.login;
+export const getCurrentUser = authApi.getCurrentUser;
+export const logout = authApi.logout;
+
+// User API methods
+export const updateProfile = async (profileData: any) => {
+  return api.put('/api/users/profile', profileData);
+};
+
+export const updatePreferences = async (preferences: any) => {
+  return api.put('/api/users/preferences', preferences);
 };
 
 // Bills API
@@ -340,6 +363,13 @@ export const billsApi = {
     return api.get('/api/bills/meta/statuses');
   }
 };
+
+// Bills API methods for backward compatibility
+export const getBills = billsApi.getBills;
+export const getBill = billsApi.getBill;
+export const searchBills = billsApi.searchBills;
+export const createComment = billsApi.createBillComment;
+export const getComments = billsApi.getBillComments;
 
 // System API
 export const systemApi = {

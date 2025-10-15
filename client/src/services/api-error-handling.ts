@@ -544,6 +544,20 @@ export class ApiService {
 // Global API service instance
 export const apiService = new ApiService();
 
+// Additional exports for backward compatibility with tests
+export const ApiErrorHandler = {
+  handleError: (error: any) => {
+    console.error('API Error:', error);
+    return error;
+  },
+  isRetryableError: (error: any) => {
+    return error?.status >= 500 || !error?.status;
+  },
+  getErrorMessage: (error: any) => {
+    return error?.message || 'An error occurred';
+  }
+};
+
 /**
  * Manages fallback data for API endpoints.
  * Useful for offline-first applications or providing default data.

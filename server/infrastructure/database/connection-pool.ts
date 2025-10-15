@@ -211,9 +211,9 @@ class ConnectionPoolService {
       : 0;
 
     return {
-      totalConnections: pool.totalCount,
-      idleConnections: pool.idleCount,
-      waitingClients: pool.waitingCount,
+      totalConnections: pool?.totalCount || 0,
+      idleConnections: pool?.idleCount || 0,
+      waitingClients: pool?.waitingCount || 0,
       maxConnections: 20, // Default from shared pool config
       minConnections: 2,  // Default from shared pool config
       averageAcquireTime,
@@ -261,7 +261,7 @@ class ConnectionPoolService {
       : 0;
 
     // Check circuit breaker state from shared pool
-    const circuitBreakerState = pool.circuitBreaker.getState();
+    const circuitBreakerState = pool?.circuitBreaker?.getState() || 'UNKNOWN';
 
     let status: 'healthy' | 'warning' | 'critical' = 'healthy';
 
@@ -325,15 +325,15 @@ class ConnectionPoolService {
     const health = this.getHealthStatus();
 
     // Get detailed health status from shared pool
-    const poolHealth = await checkPoolHealth(pool, 'general');
+    const poolHealth = pool ? await checkPoolHealth(pool, 'general') : null;
 
     logger.info('[Connection Pool] Current metrics:', { component: 'Chanuka' }, {
       utilization: health.details.poolUtilization.toFixed(2) + '%',
       averageAcquireTime: health.details.averageAcquireTime.toFixed(2) + 'ms',
       errorRate: health.details.errorRate.toFixed(2) + '%',
       status: health.status,
-      circuitBreakerState: poolHealth.circuitBreakerState,
-      circuitBreakerFailures: poolHealth.circuitBreakerFailures
+      circuitBreakerState: poolHealth?.circuitBreakerState || 'UNKNOWN',
+      circuitBreakerFailures: poolHealth?.circuitBreakerFailures || 0
     });
 
     // Suggest optimizations based on metrics
@@ -355,12 +355,12 @@ class ConnectionPoolService {
       suggestions.push('Clients waiting for connections - consider pool tuning');
     }
 
-    if (poolHealth.circuitBreakerState === 'OPEN') {
+    if (poolHealth?.circuitBreakerState === 'OPEN') {
       suggestions.push('Circuit breaker is OPEN - database may be experiencing issues');
     }
 
-    if (poolHealth.circuitBreakerFailures > 0) {
-      suggestions.push(`Circuit breaker has ${poolHealth.circuitBreakerFailures} failures - monitor database health`);
+    if ((poolHealth?.circuitBreakerFailures || 0) > 0) {
+      suggestions.push(`Circuit breaker has ${poolHealth?.circuitBreakerFailures || 0} failures - monitor database health`);
     }
 
     if (suggestions.length > 0) {

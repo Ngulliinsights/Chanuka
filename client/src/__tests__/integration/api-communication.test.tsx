@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, afterEach, vi, beforeAll, afterAll 
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom';
-import { logger } from '../utils/logger.js';
+import logger from '../utils/logger.js';
 
 // Mock fetch globally
 const mockFetch = vi.fn();
@@ -53,7 +53,9 @@ vi.mock('../../hooks/use-api-with-fallback', () => ({
 }));
 
 vi.mock('../../hooks/use-safe-query', () => ({
-  useSafeQuery: vi.fn()
+  useSafeQuery: vi.fn(),
+  UseApiResult: {},
+  SafeQueryResult: {}
 }));
 
 describe('API Communication Integration Tests', () => {

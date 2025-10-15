@@ -293,7 +293,7 @@ class DatabaseOptimizationService {
         console.log(`[DB Optimization] ✅ Created index: ${index.name}`);
       } catch (error) {
         // Index might already exist, which is fine
-        if (!error.message.includes('already exists')) {
+        if (!(error instanceof Error) || !error.message.includes('already exists')) {
           console.error(`[DB Optimization] ❌ Failed to create index ${index.name}:`, error);
         }
       }
@@ -415,78 +415,78 @@ class DatabaseOptimizationService {
     try {
       // Get connection pool stats (PostgreSQL specific)
       const connectionStats = await db.execute(sql`
-        SELECT 
+        SELECT
           count(*) as total_connections,
           count(*) FILTER (WHERE state = 'active') as active_connections,
           count(*) FILTER (WHERE state = 'idle') as idle_connections,
           count(*) FILTER (WHERE wait_event IS NOT NULL) as waiting_connections
-        FROM pg_stat_activity 
+        FROM pg_stat_activity
         WHERE datname = current_database()
       `);
 
       // Get slow query stats
-      const slowQueries = await db.execute(sql`
-        SELECT 
+      const slowQueriesResult = await db.execute(sql`
+        SELECT
           query,
           mean_exec_time as avg_time,
           calls as call_count
-        FROM pg_stat_statements 
+        FROM pg_stat_statements
         WHERE mean_exec_time > ${this.slowQueryThreshold}
-        ORDER BY mean_exec_time DESC 
+        ORDER BY mean_exec_time DESC
         LIMIT 10
-      `).catch(() => []);
+      `).catch(() => ({ rows: [] }));
 
       // Get index usage stats
-      const indexUsage = await db.execute(sql`
-        SELECT 
+      const indexUsageResult = await db.execute(sql`
+        SELECT
           schemaname,
           tablename,
           indexname,
           idx_scan as scans,
           idx_tup_read as tuples_read,
           idx_tup_fetch as tuples_returned
-        FROM pg_stat_user_indexes 
-        ORDER BY idx_scan DESC 
+        FROM pg_stat_user_indexes
+        ORDER BY idx_scan DESC
         LIMIT 20
       `);
 
       // Get table statistics
-      const tableStats = await db.execute(sql`
-        SELECT 
+      const tableStatsResult = await db.execute(sql`
+        SELECT
           schemaname,
           tablename,
           n_tup_ins + n_tup_upd + n_tup_del as row_count,
           pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as table_size,
           pg_size_pretty(pg_indexes_size(schemaname||'.'||tablename)) as index_size
-        FROM pg_stat_user_tables 
+        FROM pg_stat_user_tables
         ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC
       `);
 
       return {
         connectionPool: {
-          totalConnections: connectionStats[0]?.total_connections || 0,
-          activeConnections: connectionStats[0]?.active_connections || 0,
-          idleConnections: connectionStats[0]?.idle_connections || 0,
-          waitingConnections: connectionStats[0]?.waiting_connections || 0
+          totalConnections: Number(connectionStats.rows[0]?.total_connections) || 0,
+          activeConnections: Number(connectionStats.rows[0]?.active_connections) || 0,
+          idleConnections: Number(connectionStats.rows[0]?.idle_connections) || 0,
+          waitingConnections: Number(connectionStats.rows[0]?.waiting_connections) || 0
         },
         queryPerformance: {
-          averageQueryTime: slowQueries.length > 0 
-            ? slowQueries.reduce((sum: number, q: any) => sum + q.avg_time, 0) / slowQueries.length 
+          averageQueryTime: slowQueriesResult.rows.length > 0
+            ? slowQueriesResult.rows.reduce((sum: number, q: any) => sum + q.avg_time, 0) / slowQueriesResult.rows.length
             : 0,
-          slowQueries: slowQueries.map((q: any) => ({
+          slowQueries: slowQueriesResult.rows.map((q: any) => ({
             query: q.query.substring(0, 100) + '...',
             avgTime: q.avg_time,
             callCount: q.call_count
           }))
         },
-        indexUsage: indexUsage.map((idx: any) => ({
+        indexUsage: indexUsageResult.rows.map((idx: any) => ({
           tableName: idx.tablename,
           indexName: idx.indexname,
           scans: idx.scans,
           tuplesRead: idx.tuples_read,
           tuplesReturned: idx.tuples_returned
         })),
-        tableStats: tableStats.map((table: any) => ({
+        tableStats: tableStatsResult.rows.map((table: any) => ({
           tableName: table.tablename,
           rowCount: table.row_count,
           tableSize: table.table_size,
@@ -546,7 +546,7 @@ class DatabaseOptimizationService {
       performanceMonitor.addCustomMetric(
         'database_query',
         duration,
-        { queryKey, cached: false, error: error.message }
+        { queryKey, cached: false, error: error instanceof Error ? error.message : String(error) }
       );
       throw error;
     }
@@ -620,7 +620,7 @@ class DatabaseOptimizationService {
         RETURNING id
       `);
 
-      console.log(`[DB Optimization] Cleaned up: ${expiredSessions.length} sessions, ${expiredTokens.length} tokens, ${oldNotifications.length} notifications`);
+      console.log(`[DB Optimization] Cleaned up: ${expiredSessions.rowCount} sessions, ${expiredTokens.rowCount} tokens, ${oldNotifications.rowCount} notifications`);
     } catch (error) {
       logger.error('[DB Optimization] Error during cleanup:', { component: 'Chanuka' }, error);
     }
