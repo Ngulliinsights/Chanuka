@@ -121,7 +121,7 @@ describe('Health System Load Tests', () => {
         }
       );
 
-      logger.info('Load test results:', { component: 'SimpleTool' }, loadResults);
+      logger.info('Load test results:', { component: 'Chanuka' }, loadResults);
 
       // Performance expectations
       expect(loadResults.successfulRequests).toBeGreaterThan(0);
@@ -316,7 +316,7 @@ describe('Health System Load Tests', () => {
         loadTester.reset();
       }
 
-      logger.info('Endpoint performance comparison:', { component: 'SimpleTool' });
+      logger.info('Endpoint performance comparison:', { component: 'Chanuka' });
       endpoints.forEach(endpoint => {
         const result = results[endpoint];
         console.log(`${endpoint}: ${result.requestsPerSecond.toFixed(1)} RPS, ${result.averageLatency.toFixed(1)}ms avg`);

@@ -125,7 +125,7 @@ export class AICache {
 
         this.recordCacheHit(service, entry.cost, performance.now() - startTime);
         
-        logger.info('AI Cache Hit', { component: 'SimpleTool' }, {
+        logger.info('AI Cache Hit', { component: 'Chanuka' }, {
           service,
           operation,
           key: cacheKey,
@@ -155,7 +155,7 @@ export class AICache {
       return null;
 
     } catch (error) {
-      logger.error('AI cache get error:', { component: 'SimpleTool' }, error);
+      logger.error('AI cache get error:', { component: 'Chanuka' }, error);
       this.recordCacheMiss(service, performance.now() - startTime);
       return null;
     }
@@ -197,7 +197,7 @@ export class AICache {
 
       await this.baseCache.set(cacheKey, entry, ttl);
 
-      logger.info('AI Cache Set', { component: 'SimpleTool' }, {
+      logger.info('AI Cache Set', { component: 'Chanuka' }, {
         service,
         operation,
         key: cacheKey,
@@ -212,7 +212,7 @@ export class AICache {
       }
 
     } catch (error) {
-      logger.error('AI cache set error:', { component: 'SimpleTool' }, error);
+      logger.error('AI cache set error:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -239,12 +239,12 @@ export class AICache {
       } else {
         // For more complex criteria, we'd need to scan all keys
         // This is a simplified implementation
-        logger.info('AI cache invalidation requested', { component: 'SimpleTool' }, criteria);
+        logger.info('AI cache invalidation requested', { component: 'Chanuka' }, criteria);
       }
 
       return invalidatedCount;
     } catch (error) {
-      logger.error('AI cache invalidation error:', { component: 'SimpleTool' }, error);
+      logger.error('AI cache invalidation error:', { component: 'Chanuka' }, error);
       return 0;
     }
   }
@@ -279,7 +279,7 @@ export class AICache {
           return;
         }
 
-        logger.info('Warming AI cache', { component: 'SimpleTool' }, {
+        logger.info('Warming AI cache', { component: 'Chanuka' }, {
           service: entry.service,
           operation: entry.operation,
           key: entry.key
@@ -430,7 +430,7 @@ export class AICache {
   ): void {
     // This would implement intelligent cache warming based on patterns
     // For now, just log the warming opportunity
-    logger.info('Cache warming opportunity detected', { component: 'SimpleTool' }, {
+    logger.info('Cache warming opportunity detected', { component: 'Chanuka' }, {
       service,
       operation,
       inputHash: this.hashInput(inputData)

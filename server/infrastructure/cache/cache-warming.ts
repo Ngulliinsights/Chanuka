@@ -101,14 +101,14 @@ export class CacheWarmingService {
    */
   async executeWarmingCycle(priority?: 'critical' | 'high' | 'medium' | 'low'): Promise<void> {
     if (this.isWarming) {
-      logger.info('[Cache Warming] Warming cycle already in progress, skipping', { component: 'SimpleTool' });
+      logger.info('[Cache Warming] Warming cycle already in progress, skipping', { component: 'Chanuka' });
       return;
     }
 
     this.isWarming = true;
     const startTime = Date.now();
 
-    logger.info('[Cache Warming] Starting cache warming cycle...', { component: 'SimpleTool' });
+    logger.info('[Cache Warming] Starting cache warming cycle...', { component: 'Chanuka' });
 
     try {
       // Get enabled rules, optionally filtered by priority
@@ -150,7 +150,7 @@ export class CacheWarmingService {
       console.log(`[Cache Warming] Success: ${this.stats.successfulWarmings}, Failed: ${this.stats.failedWarmings}`);
 
     } catch (error) {
-      logger.error('[Cache Warming] Error during warming cycle:', { component: 'SimpleTool' }, error);
+      logger.error('[Cache Warming] Error during warming cycle:', { component: 'Chanuka' }, error);
     } finally {
       this.isWarming = false;
     }
@@ -253,13 +253,13 @@ export class CacheWarmingService {
    * Warm cache on application startup
    */
   async warmOnStartup(): Promise<void> {
-    logger.info('[Cache Warming] Executing startup cache warming...', { component: 'SimpleTool' });
+    logger.info('[Cache Warming] Executing startup cache warming...', { component: 'Chanuka' });
     
     const startupRules = Array.from(this.warmingRules.values())
       .filter(rule => rule.enabled && rule.schedule === 'startup');
 
     if (startupRules.length === 0) {
-      logger.info('[Cache Warming] No startup warming rules configured', { component: 'SimpleTool' });
+      logger.info('[Cache Warming] No startup warming rules configured', { component: 'Chanuka' });
       return;
     }
 
@@ -288,7 +288,7 @@ export class CacheWarmingService {
             .orderBy(desc(bills.viewCount))
             .limit(50);
         } catch (error) {
-          logger.error('Error fetching popular bills:', { component: 'SimpleTool' }, error);
+          logger.error('Error fetching popular bills:', { component: 'Chanuka' }, error);
           return [];
         }
       }
@@ -312,7 +312,7 @@ export class CacheWarmingService {
             .orderBy(desc(bills.introducedDate))
             .limit(30);
         } catch (error) {
-          logger.error('Error fetching recent bills:', { component: 'SimpleTool' }, error);
+          logger.error('Error fetching recent bills:', { component: 'Chanuka' }, error);
           return [];
         }
       }
@@ -336,7 +336,7 @@ export class CacheWarmingService {
             .where(eq(sponsors.isActive, true))
             .limit(100);
         } catch (error) {
-          logger.error('Error fetching active sponsors:', { component: 'SimpleTool' }, error);
+          logger.error('Error fetching active sponsors:', { component: 'Chanuka' }, error);
           return [];
         }
       }
@@ -365,7 +365,7 @@ export class CacheWarmingService {
           
           return result;
         } catch (error) {
-          logger.error('Error fetching bill categories:', { component: 'SimpleTool' }, error);
+          logger.error('Error fetching bill categories:', { component: 'Chanuka' }, error);
           return [];
         }
       }
@@ -396,7 +396,7 @@ export class CacheWarmingService {
             lastUpdated: new Date()
           };
         } catch (error) {
-          logger.error('Error fetching engagement stats:', { component: 'SimpleTool' }, error);
+          logger.error('Error fetching engagement stats:', { component: 'Chanuka' }, error);
           return {
             totalUsers: 0,
             totalBills: 0,
@@ -432,7 +432,7 @@ export class CacheWarmingService {
             lastUpdated: new Date()
           };
         } catch (error) {
-          logger.error('Error fetching critical system data:', { component: 'SimpleTool' }, error);
+          logger.error('Error fetching critical system data:', { component: 'Chanuka' }, error);
           return {
             systemStatus: 'unknown',
             maintenanceMode: false,
@@ -456,7 +456,7 @@ export class CacheWarmingService {
         .filter(rule => rule.enabled && rule.schedule === 'hourly');
       
       if (hourlyRules.length > 0) {
-        logger.info('[Cache Warming] Executing hourly warming cycle...', { component: 'SimpleTool' });
+        logger.info('[Cache Warming] Executing hourly warming cycle...', { component: 'Chanuka' });
         await this.executeWarmingCycle('high');
       }
     }, 3600000); // 1 hour
@@ -467,7 +467,7 @@ export class CacheWarmingService {
         .filter(rule => rule.enabled && rule.schedule === 'daily');
       
       if (dailyRules.length > 0) {
-        logger.info('[Cache Warming] Executing daily warming cycle...', { component: 'SimpleTool' });
+        logger.info('[Cache Warming] Executing daily warming cycle...', { component: 'Chanuka' });
         await this.executeWarmingCycle('medium');
       }
     }, 86400000); // 24 hours
@@ -478,12 +478,12 @@ export class CacheWarmingService {
         .filter(rule => rule.enabled && rule.schedule === 'weekly');
       
       if (weeklyRules.length > 0) {
-        logger.info('[Cache Warming] Executing weekly warming cycle...', { component: 'SimpleTool' });
+        logger.info('[Cache Warming] Executing weekly warming cycle...', { component: 'Chanuka' });
         await this.executeWarmingCycle('low');
       }
     }, 604800000); // 7 days
 
-    logger.info('[Cache Warming] Scheduled warming tasks', { component: 'SimpleTool' });
+    logger.info('[Cache Warming] Scheduled warming tasks', { component: 'Chanuka' });
   }
 
   /**

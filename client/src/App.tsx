@@ -220,7 +220,7 @@ export default function App() {
 
   useEffect(() => {
     if (IS_DEV) {
-      logger.info('App initialized with', { component: 'SimpleTool' }, ROUTES.length, "routes");
+      logger.info('App initialized with', { component: 'Chanuka' }, ROUTES.length, "routes");
     }
   }, []);
 

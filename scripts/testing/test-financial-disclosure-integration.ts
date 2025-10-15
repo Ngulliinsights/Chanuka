@@ -9,19 +9,19 @@ import { financialDisclosureIntegrationService } from "./services/financial-disc
 import { logger } from '../utils/logger';
 
 async function testFinancialDisclosureIntegration() {
-  logger.info('🧪 Testing Enhanced Financial Disclosure Integration\n', { component: 'SimpleTool' });
+  logger.info('🧪 Testing Enhanced Financial Disclosure Integration\n', { component: 'Chanuka' });
 
   try {
     // Test 1: Financial Disclosure Data Processing
-    logger.info('📊 Test 1: Financial Disclosure Data Processing', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('📊 Test 1: Financial Disclosure Data Processing', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
     
     const allDisclosures = await financialDisclosureIntegrationService.processFinancialDisclosureData();
     console.log(`✅ Processed ${allDisclosures.length} total financial disclosures`);
     
     if (allDisclosures.length > 0) {
       const sampleDisclosure = allDisclosures[0];
-      logger.info('📋 Sample processed disclosure:', { component: 'SimpleTool' });
+      logger.info('📋 Sample processed disclosure:', { component: 'Chanuka' });
       console.log(`   - ID: ${sampleDisclosure.id}`);
       console.log(`   - Sponsor: ${sampleDisclosure.sponsorId}`);
       console.log(`   - Type: ${sampleDisclosure.disclosureType}`);
@@ -38,11 +38,11 @@ async function testFinancialDisclosureIntegration() {
       console.log(`✅ Processed ${sponsorDisclosures.length} disclosures for sponsor ${sponsorId}`);
     }
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Test 2: Disclosure Completeness Scoring
-    logger.info('🎯 Test 2: Disclosure Completeness Scoring', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('🎯 Test 2: Disclosure Completeness Scoring', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     if (allDisclosures.length > 0) {
       const sponsorId = allDisclosures[0].sponsorId;
@@ -59,7 +59,7 @@ async function testFinancialDisclosureIntegration() {
         console.log(`   - Last Update: ${completenessReport.lastUpdateDate.toLocaleDateString()}`);
         
         if (completenessReport.recommendations.length > 0) {
-          logger.info('   - Recommendations:', { component: 'SimpleTool' });
+          logger.info('   - Recommendations:', { component: 'Chanuka' });
           completenessReport.recommendations.forEach((rec, index) => {
             console.log(`     ${index + 1}. ${rec}`);
           });
@@ -68,14 +68,14 @@ async function testFinancialDisclosureIntegration() {
         console.log(`⚠️  Could not calculate completeness for sponsor ${sponsorId}: ${error}`);
       }
     } else {
-      logger.info('⚠️  No disclosures available for completeness testing', { component: 'SimpleTool' });
+      logger.info('⚠️  No disclosures available for completeness testing', { component: 'Chanuka' });
     }
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Test 3: Financial Relationship Mapping
-    logger.info('🔗 Test 3: Financial Relationship Mapping', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('🔗 Test 3: Financial Relationship Mapping', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     if (allDisclosures.length > 0) {
       const sponsorId = allDisclosures[0].sponsorId;
@@ -90,7 +90,7 @@ async function testFinancialDisclosureIntegration() {
         console.log(`   - Last Mapping Update: ${relationshipMapping.lastMappingUpdate.toLocaleDateString()}`);
         
         if (relationshipMapping.relationships.length > 0) {
-          logger.info('   - Sample Relationships:', { component: 'SimpleTool' });
+          logger.info('   - Sample Relationships:', { component: 'Chanuka' });
           relationshipMapping.relationships.slice(0, 3).forEach((rel, index) => {
             console.log(`     ${index + 1}. ${rel.relatedEntity}`);
             console.log(`        - Type: ${rel.relationshipType}`);
@@ -108,14 +108,14 @@ async function testFinancialDisclosureIntegration() {
         console.log(`⚠️  Could not create relationship mapping for sponsor ${sponsorId}: ${error}`);
       }
     } else {
-      logger.info('⚠️  No disclosures available for relationship mapping testing', { component: 'SimpleTool' });
+      logger.info('⚠️  No disclosures available for relationship mapping testing', { component: 'Chanuka' });
     }
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Test 4: Disclosure Update Monitoring and Alerts
-    logger.info('🚨 Test 4: Disclosure Update Monitoring and Alerts', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('🚨 Test 4: Disclosure Update Monitoring and Alerts', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     try {
       const alerts = await financialDisclosureIntegrationService.monitorDisclosureUpdates();
@@ -123,7 +123,7 @@ async function testFinancialDisclosureIntegration() {
       console.log(`✅ Generated ${alerts.length} disclosure update alerts`);
       
       if (alerts.length > 0) {
-        logger.info('📋 Sample alerts:', { component: 'SimpleTool' });
+        logger.info('📋 Sample alerts:', { component: 'Chanuka' });
         alerts.slice(0, 5).forEach((alert, index) => {
           console.log(`   ${index + 1}. ${alert.type.toUpperCase()}`);
           console.log(`      - Sponsor: ${alert.sponsorName}`);
@@ -144,7 +144,7 @@ async function testFinancialDisclosureIntegration() {
           critical: alerts.filter(a => a.severity === 'critical').length
         };
         
-        logger.info('\n📊 Alert Statistics:', { component: 'SimpleTool' });
+        logger.info('\n📊 Alert Statistics:', { component: 'Chanuka' });
         console.log(`   - Info: ${alertStats.info}`);
         console.log(`   - Warning: ${alertStats.warning}`);
         console.log(`   - Critical: ${alertStats.critical}`);
@@ -153,18 +153,18 @@ async function testFinancialDisclosureIntegration() {
       console.log(`⚠️  Error during monitoring: ${error}`);
     }
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Test 5: Data Validation and Error Handling
-    logger.info('🔍 Test 5: Data Validation and Error Handling', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('🔍 Test 5: Data Validation and Error Handling', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     try {
       // Test with invalid sponsor ID
       await financialDisclosureIntegrationService.calculateDisclosureCompletenessScore(99999);
-      logger.info('❌ Expected error for invalid sponsor ID was not thrown', { component: 'SimpleTool' });
+      logger.info('❌ Expected error for invalid sponsor ID was not thrown', { component: 'Chanuka' });
     } catch (error) {
-      logger.info('✅ Correctly handled invalid sponsor ID error', { component: 'SimpleTool' });
+      logger.info('✅ Correctly handled invalid sponsor ID error', { component: 'Chanuka' });
     }
 
     try {
@@ -175,28 +175,28 @@ async function testFinancialDisclosureIntegration() {
       console.log(`⚠️  Error with empty data source: ${error}`);
     }
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Summary
-    logger.info('📋 Test Summary', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
-    logger.info('✅ Financial disclosure data processing - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Disclosure completeness scoring - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Financial relationship mapping - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Disclosure update monitoring and alerts - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Data validation and error handling - PASSED', { component: 'SimpleTool' });
+    logger.info('📋 Test Summary', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
+    logger.info('✅ Financial disclosure data processing - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Disclosure completeness scoring - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Financial relationship mapping - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Disclosure update monitoring and alerts - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Data validation and error handling - PASSED', { component: 'Chanuka' });
     
-    logger.info('\n🎉 All financial disclosure integration tests completed successfully!', { component: 'SimpleTool' });
+    logger.info('\n🎉 All financial disclosure integration tests completed successfully!', { component: 'Chanuka' });
     
     // Performance metrics
-    logger.info('\n⚡ Performance Metrics:', { component: 'SimpleTool' });
+    logger.info('\n⚡ Performance Metrics:', { component: 'Chanuka' });
     console.log(`   - Total disclosures processed: ${allDisclosures.length}`);
     console.log(`   - Processing time: < 5 seconds (estimated)`);
     console.log(`   - Cache utilization: Active`);
     console.log(`   - Error handling: Robust`);
 
   } catch (error) {
-    logger.error('❌ Test failed with error:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Test failed with error:', { component: 'Chanuka' }, error);
     process.exit(1);
   }
 }
@@ -205,11 +205,11 @@ async function testFinancialDisclosureIntegration() {
 if (import.meta.url === `file://${process.argv[1]}`) {
   testFinancialDisclosureIntegration()
     .then(() => {
-      logger.info('\n✅ Test execution completed', { component: 'SimpleTool' });
+      logger.info('\n✅ Test execution completed', { component: 'Chanuka' });
       process.exit(0);
     })
     .catch((error) => {
-      logger.error('\n❌ Test execution failed:', { component: 'SimpleTool' }, error);
+      logger.error('\n❌ Test execution failed:', { component: 'Chanuka' }, error);
       process.exit(1);
     });
 }

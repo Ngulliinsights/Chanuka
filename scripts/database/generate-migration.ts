@@ -84,7 +84,7 @@ function initializeEnvironment(): { pool: Pool; db: ReturnType<typeof drizzle> }
 
   // Test the connection
   pool.on('error', err => {
-    logger.error('Unexpected error on idle client', { component: 'SimpleTool' }, err);
+    logger.error('Unexpected error on idle client', { component: 'Chanuka' }, err);
     process.exit(-1);
   });
 
@@ -423,7 +423,7 @@ FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
  * Generate migration file
  */
 async function generateMigrationFile(): Promise<MigrationResult> {
-  logger.info('Generating SQL migration...', { component: 'SimpleTool' });
+  logger.info('Generating SQL migration...', { component: 'Chanuka' });
 
   try {
     // Ensure migrations directory exists
@@ -461,11 +461,11 @@ async function generateMigrationFile(): Promise<MigrationResult> {
  * Run the migration against the database
  */
 async function runMigration(db: ReturnType<typeof drizzle>, pool: Pool): Promise<MigrationResult> {
-  logger.info('Running migration...', { component: 'SimpleTool' });
+  logger.info('Running migration...', { component: 'Chanuka' });
 
   try {
     await migrate(db, { migrationsFolder: './drizzle' });
-    logger.info('Migration completed successfully', { component: 'SimpleTool' });
+    logger.info('Migration completed successfully', { component: 'Chanuka' });
 
     return {
       success: true,
@@ -473,7 +473,7 @@ async function runMigration(db: ReturnType<typeof drizzle>, pool: Pool): Promise
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('Error running migration:', { component: 'SimpleTool' }, errorMessage);
+    logger.error('Error running migration:', { component: 'Chanuka' }, errorMessage);
 
     return {
       success: false,
@@ -543,12 +543,12 @@ async function main(): Promise<void> {
       const migrationResult = await runMigration(db, pool);
 
       if (!migrationResult.success) {
-        logger.error('Migration execution failed.', { component: 'SimpleTool' });
+        logger.error('Migration execution failed.', { component: 'Chanuka' });
         process.exit(1);
       }
     }
   } catch (error) {
-    logger.error('Fatal error:', { component: 'SimpleTool' }, error instanceof Error ? error.message : String(error));
+    logger.error('Fatal error:', { component: 'Chanuka' }, error instanceof Error ? error.message : String(error));
     process.exit(1);
   }
 }
@@ -556,7 +556,7 @@ async function main(): Promise<void> {
 // Execute main function with proper error handling
 main()
   .then(() => {
-    logger.info('Process completed successfully.', { component: 'SimpleTool' });
+    logger.info('Process completed successfully.', { component: 'Chanuka' });
     process.exit(0);
   })
   .catch(error => {

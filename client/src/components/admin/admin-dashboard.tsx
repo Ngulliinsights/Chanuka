@@ -350,7 +350,7 @@ const AdminDashboard = () => {
                   <span>New This Week</span>
                   <Badge variant="outline">{stats?.users.newThisWeek ?? 0}</Badge>
                 </div>
-                <Button className="w-full" onClick={() => logger.info('Navigate to user management', { component: 'SimpleTool' }, )}>
+                <Button className="w-full" onClick={() => logger.info('Navigate to user management', { component: 'Chanuka' }, )}>
                   <Users className="h-4 w-4 mr-2" />
                   Manage Users
                 </Button>

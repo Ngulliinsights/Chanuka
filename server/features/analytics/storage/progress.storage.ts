@@ -24,7 +24,7 @@ export class ProgressStorage extends BaseStorage<UserProgress> {
       // Simple health check for in-memory storage
       return true;
     } catch (error) {
-      logger.error('ProgressStorage health check failed:', { component: 'SimpleTool' }, error);
+      logger.error('ProgressStorage health check failed:', { component: 'Chanuka' }, error);
       return false;
     }
   }

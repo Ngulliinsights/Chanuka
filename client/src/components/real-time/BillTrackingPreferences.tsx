@@ -68,7 +68,7 @@ export function BillTrackingPreferences({ className, onSave }: BillTrackingPrefe
         }
       }
     } catch (error) {
-      logger.error('Error loading preferences:', { component: 'SimpleTool' }, error);
+      logger.error('Error loading preferences:', { component: 'Chanuka' }, error);
     }
   };
 
@@ -98,7 +98,7 @@ export function BillTrackingPreferences({ className, onSave }: BillTrackingPrefe
         throw new Error('Failed to save preferences');
       }
     } catch (error) {
-      logger.error('Error saving preferences:', { component: 'SimpleTool' }, error);
+      logger.error('Error saving preferences:', { component: 'Chanuka' }, error);
       alert('Failed to save preferences. Please try again.');
     } finally {
       setLoading(false);

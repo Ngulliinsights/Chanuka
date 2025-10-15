@@ -60,7 +60,7 @@ router.get('/dashboard', async (req, res) => {
         }));
 
     } catch (error) {
-      logger.error('Error fetching bill stats:', { component: 'SimpleTool' }, error);
+      logger.error('Error fetching bill stats:', { component: 'Chanuka' }, error);
     }
 
     try {
@@ -87,12 +87,12 @@ router.get('/dashboard', async (req, res) => {
       }));
 
     } catch (error) {
-      logger.error('Error fetching user stats:', { component: 'SimpleTool' }, error);
+      logger.error('Error fetching user stats:', { component: 'Chanuka' }, error);
     }
 
     return ApiSuccess(res, stats);
   } catch (error) {
-    logger.error('Admin dashboard error:', { component: 'SimpleTool' }, error);
+    logger.error('Admin dashboard error:', { component: 'Chanuka' }, error);
     return ApiError(res, 'Failed to fetch dashboard data', 500);
   }
 });
@@ -157,7 +157,7 @@ router.get('/users', async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('Admin users error:', { component: 'SimpleTool' }, error);
+    logger.error('Admin users error:', { component: 'Chanuka' }, error);
     return ApiError(res, 'Failed to fetch users', 500);
   }
 });
@@ -208,7 +208,7 @@ router.put('/users/:id/role', async (req, res) => {
       message: 'User role updated successfully'
     });
   } catch (error) {
-    logger.error('Update user role error:', { component: 'SimpleTool' }, error);
+    logger.error('Update user role error:', { component: 'Chanuka' }, error);
     return ApiError(res, 'Failed to update user role', 500);
   }
 });
@@ -259,7 +259,7 @@ router.put('/users/:id/status', async (req, res) => {
       message: `User ${isActive ? 'activated' : 'deactivated'} successfully`
     });
   } catch (error) {
-    logger.error('Update user status error:', { component: 'SimpleTool' }, error);
+    logger.error('Update user status error:', { component: 'Chanuka' }, error);
     return ApiError(res, 'Failed to update user status', 500);
   }
 });
@@ -293,12 +293,12 @@ router.get('/system/health', async (req, res) => {
     } catch (error) {
       health.status = 'degraded';
       health.database.connected = false;
-      logger.error('Database health check failed:', { component: 'SimpleTool' }, error);
+      logger.error('Database health check failed:', { component: 'Chanuka' }, error);
     }
 
     return ApiSuccess(res, health);
   } catch (error) {
-    logger.error('System health error:', { component: 'SimpleTool' }, error);
+    logger.error('System health error:', { component: 'Chanuka' }, error);
     return ApiError(res, 'Failed to fetch system health', 500);
   }
 });
@@ -328,7 +328,7 @@ router.post('/cache/clear', async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    logger.error('Cache clear error:', { component: 'SimpleTool' }, error);
+    logger.error('Cache clear error:', { component: 'Chanuka' }, error);
     return ApiError(res, 'Failed to clear cache', 500);
   }
 });
@@ -359,7 +359,7 @@ router.get('/logs', async (req, res) => {
       limit: logLimit
     });
   } catch (error) {
-    logger.error('Admin logs error:', { component: 'SimpleTool' }, error);
+    logger.error('Admin logs error:', { component: 'Chanuka' }, error);
     return ApiError(res, 'Failed to fetch logs', 500);
   }
 });

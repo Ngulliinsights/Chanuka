@@ -366,8 +366,8 @@ function enhanceTemplateForDevelopment(
       // Consolidated error handler
       const logError = (type, event) => {
         console.group(\`🚨 \${type}\`);
-        logger.error('Error:', { component: 'SimpleTool' }, event.error || event.reason || event.message);
-        logger.error('Location:', { component: 'SimpleTool' }, event.filename || 'unknown');
+        logger.error('Error:', { component: 'Chanuka' }, event.error || event.reason || event.message);
+        logger.error('Location:', { component: 'Chanuka' }, event.filename || 'unknown');
         console.groupEnd();
       };
       

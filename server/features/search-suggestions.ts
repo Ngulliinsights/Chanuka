@@ -1,5 +1,6 @@
 import { eq, desc, and, sql, count, ilike, or, inArray } from "drizzle-orm";
 import { databaseService } from "../services/database-service";
+import { readDatabase } from '../db.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from "../infrastructure/cache/cache-service";
 import * as schema from "../../shared/schema";
 import { logger } from '@shared/utils/logger';
@@ -75,7 +76,9 @@ const CONFIG = {
  * - Better error handling
  */
 export class SearchSuggestionsService {
-  private db = databaseService.getDatabase();
+  private get db() {
+    return readDatabase();
+  }
   private searchHistory: Map<string, number> = new Map();
   private popularTerms: Map<string, number> = new Map();
 
@@ -238,14 +241,14 @@ export class SearchSuggestionsService {
 
       // Log for monitoring (can be replaced with proper analytics service)
       if (process.env.NODE_ENV !== 'production') {
-        logger.info('Search analytics:', { component: 'SimpleTool' }, {
+        logger.info('Search analytics:', { component: 'Chanuka' }, {
           query: sanitizedQuery,
           resultCount: analytics.resultCount,
           timestamp: analytics.timestamp
         });
       }
     } catch (error) {
-      logger.error('Error recording search analytics:', { component: 'SimpleTool' }, error);
+      logger.error('Error recording search analytics:', { component: 'Chanuka' }, error);
       // Don't throw - analytics failures shouldn't break the app
     }
   }

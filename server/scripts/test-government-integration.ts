@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { GovernmentDataIntegrationService } from '../services/government-data-integration.js';
-import { DataValidationService } from '../services/data-validation.js';
-import { DataTransformationService } from '../services/data-transformation.js';
+import { GovernmentDataIntegrationService } from '../infrastructure/external-data/government-data-integration.js';
+import { DataValidationService } from '../core/validation/data-validation-service.js';
+import { ManagedGovernmentDataIntegrationService } from '../services/managed-government-data-integration.js';
 import { ExternalAPIErrorHandler, FallbackStrategy } from '../services/external-api-error-handler.js';
 import { logger } from '../utils/logger';
 
@@ -42,27 +42,27 @@ class GovernmentDataIntegrationCLI {
   }
 
   async testIntegrationStatus(): Promise<void> {
-    logger.info('\n📊 Testing Integration Status...', { component: 'SimpleTool' });
+    logger.info('\n📊 Testing Integration Status...', { component: 'Chanuka' });
     try {
       const status = await this.integrationService.getIntegrationStatus();
-      logger.info('✅ Integration Status:', { component: 'SimpleTool' }, JSON.stringify(status, null, 2));
+      logger.info('✅ Integration Status:', { component: 'Chanuka' }, JSON.stringify(status, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error('❌ Integration Status Error:', { component: 'SimpleTool' }, errorMessage);
+      logger.error('❌ Integration Status Error:', { component: 'Chanuka' }, errorMessage);
     }
   }
 
   async testBillIntegration(): Promise<void> {
-    logger.info('\n📋 Testing Bill Integration...', { component: 'SimpleTool' });
+    logger.info('\n📋 Testing Bill Integration...', { component: 'Chanuka' });
     try {
       const result = await this.integrationService.integrateBills({
         sources: ['parliament-ca'],
         dryRun: true
       });
-      logger.info('✅ Bill Integration Result:', { component: 'SimpleTool' }, JSON.stringify(result, null, 2));
+      logger.info('✅ Bill Integration Result:', { component: 'Chanuka' }, JSON.stringify(result, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error('❌ Bill Integration Error:', { component: 'SimpleTool' }, errorMessage);
+      logger.error('❌ Bill Integration Error:', { component: 'Chanuka' }, errorMessage);
 
       // Test error handling
       const errorToPass = error instanceof Error ? error : new Error(String(error));
@@ -71,21 +71,21 @@ class GovernmentDataIntegrationCLI {
         errorToPass,
         { operation: 'integrateBills' }
       );
-      logger.info('🔄 Error Handler Result:', { component: 'SimpleTool' }, JSON.stringify(errorResult, null, 2));
+      logger.info('🔄 Error Handler Result:', { component: 'Chanuka' }, JSON.stringify(errorResult, null, 2));
     }
   }
 
   async testSponsorIntegration(): Promise<void> {
-    logger.info('\n👥 Testing Sponsor Integration...', { component: 'SimpleTool' });
+    logger.info('\n👥 Testing Sponsor Integration...', { component: 'Chanuka' });
     try {
       const result = await this.integrationService.integrateSponsors({
         sources: ['parliament-ca'],
         dryRun: true
       });
-      logger.info('✅ Sponsor Integration Result:', { component: 'SimpleTool' }, JSON.stringify(result, null, 2));
+      logger.info('✅ Sponsor Integration Result:', { component: 'Chanuka' }, JSON.stringify(result, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error('❌ Sponsor Integration Error:', { component: 'SimpleTool' }, errorMessage);
+      logger.error('❌ Sponsor Integration Error:', { component: 'Chanuka' }, errorMessage);
 
       // Test error handling
       const errorToPass = error instanceof Error ? error : new Error(String(error));
@@ -94,12 +94,12 @@ class GovernmentDataIntegrationCLI {
         errorToPass,
         { operation: 'integrateSponsors' }
       );
-      logger.info('🔄 Error Handler Result:', { component: 'SimpleTool' }, JSON.stringify(errorResult, null, 2));
+      logger.info('🔄 Error Handler Result:', { component: 'Chanuka' }, JSON.stringify(errorResult, null, 2));
     }
   }
 
   async testDataTransformation(): Promise<void> {
-    logger.info('\n🔄 Testing Data Transformation...', { component: 'SimpleTool' });
+    logger.info('\n🔄 Testing Data Transformation...', { component: 'Chanuka' });
 
     // Test Parliament data transformation
     const mockParliamentData = {
@@ -124,20 +124,20 @@ class GovernmentDataIntegrationCLI {
     };
 
     try {
-      const transformed = DataTransformationService.transformParliamentData(mockParliamentData);
-      logger.info('✅ Parliament Data Transformation:', { component: 'SimpleTool' }, JSON.stringify(transformed, null, 2));
+      const transformed = ManagedGovernmentDataIntegrationService.transformParliamentData(mockParliamentData);
+      logger.info('✅ Parliament Data Transformation:', { component: 'Chanuka' }, JSON.stringify(transformed, null, 2));
 
       // Validate transformed data
       const validation = DataValidationService.validateBatch(transformed.bills || [], 'bills');
-      logger.info('📋 Validation Result:', { component: 'SimpleTool' }, JSON.stringify(validation, null, 2));
+      logger.info('📋 Validation Result:', { component: 'Chanuka' }, JSON.stringify(validation, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error('❌ Data Transformation Error:', { component: 'SimpleTool' }, errorMessage);
+      logger.error('❌ Data Transformation Error:', { component: 'Chanuka' }, errorMessage);
     }
   }
 
   async testDataValidation(): Promise<void> {
-    logger.info('\n✅ Testing Data Validation...', { component: 'SimpleTool' });
+    logger.info('\n✅ Testing Data Validation...', { component: 'Chanuka' });
 
     const testBills = [
       {
@@ -160,15 +160,15 @@ class GovernmentDataIntegrationCLI {
 
     try {
       const validation = DataValidationService.validateBatch(testBills, 'bills');
-      logger.info('✅ Batch Validation Result:', { component: 'SimpleTool' }, JSON.stringify(validation, null, 2));
+      logger.info('✅ Batch Validation Result:', { component: 'Chanuka' }, JSON.stringify(validation, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error('❌ Data Validation Error:', { component: 'SimpleTool' }, errorMessage);
+      logger.error('❌ Data Validation Error:', { component: 'Chanuka' }, errorMessage);
     }
   }
 
   async testCrossValidation(): Promise<void> {
-    logger.info('\n🔍 Testing Cross-Validation...', { component: 'SimpleTool' });
+    logger.info('\n🔍 Testing Cross-Validation...', { component: 'Chanuka' });
 
     const testRecords = [
       {
@@ -195,15 +195,15 @@ class GovernmentDataIntegrationCLI {
 
     try {
       const crossValidation = DataValidationService.crossValidate(testRecords, 'bills');
-      logger.info('✅ Cross-Validation Result:', { component: 'SimpleTool' }, JSON.stringify(crossValidation, null, 2));
+      logger.info('✅ Cross-Validation Result:', { component: 'Chanuka' }, JSON.stringify(crossValidation, null, 2));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error('❌ Cross-Validation Error:', { component: 'SimpleTool' }, errorMessage);
+      logger.error('❌ Cross-Validation Error:', { component: 'Chanuka' }, errorMessage);
     }
   }
 
   async testErrorHandling(): Promise<void> {
-    logger.info('\n🚨 Testing Error Handling...', { component: 'SimpleTool' });
+    logger.info('\n🚨 Testing Error Handling...', { component: 'Chanuka' });
 
     // Simulate different types of errors
     const errors = [
@@ -230,11 +230,11 @@ class GovernmentDataIntegrationCLI {
 
     // Test error statistics
     const stats = this.errorHandler.getErrorStatistics();
-    logger.info('📊 Error Statistics:', { component: 'SimpleTool' }, JSON.stringify(stats, null, 2));
+    logger.info('📊 Error Statistics:', { component: 'Chanuka' }, JSON.stringify(stats, null, 2));
   }
 
   async testCaching(): Promise<void> {
-    logger.info('\n💾 Testing Caching...', { component: 'SimpleTool' });
+    logger.info('\n💾 Testing Caching...', { component: 'Chanuka' });
     
     // Cache some test data
     this.errorHandler.cacheData('test-source', { cached: 'data', timestamp: new Date() });
@@ -249,11 +249,11 @@ class GovernmentDataIntegrationCLI {
       { strategy: FallbackStrategy.CACHED_DATA }
     );
     
-    logger.info('✅ Cache Fallback Result:', { component: 'SimpleTool' }, JSON.stringify(result, null, 2));
+    logger.info('✅ Cache Fallback Result:', { component: 'Chanuka' }, JSON.stringify(result, null, 2));
   }
 
   async runAllTests(): Promise<void> {
-    logger.info('🚀 Starting Government Data Integration Tests...\n', { component: 'SimpleTool' });
+    logger.info('🚀 Starting Government Data Integration Tests...\n', { component: 'Chanuka' });
     
     await this.testIntegrationStatus();
     await this.testDataTransformation();
@@ -264,7 +264,7 @@ class GovernmentDataIntegrationCLI {
     await this.testBillIntegration();
     await this.testSponsorIntegration();
     
-    logger.info('\n✅ All tests completed!', { component: 'SimpleTool' });
+    logger.info('\n✅ All tests completed!', { component: 'Chanuka' });
   }
 }
 
@@ -336,7 +336,7 @@ Examples:
 if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch(error => {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('❌ CLI Error:', { component: 'SimpleTool' }, errorMessage);
+    logger.error('❌ CLI Error:', { component: 'Chanuka' }, errorMessage);
     process.exit(1);
   });
 }

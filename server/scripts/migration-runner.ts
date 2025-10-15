@@ -35,10 +35,10 @@ class MigrationRunner {
   }
 
   async runUp(options: RunnerOptions): Promise<void> {
-    logger.info('🚀 Running database migrations...', { component: 'SimpleTool' });
+    logger.info('🚀 Running database migrations...', { component: 'Chanuka' });
     
     if (options.dryRun) {
-      logger.info('🔍 DRY RUN MODE - No changes will be made', { component: 'SimpleTool' });
+      logger.info('🔍 DRY RUN MODE - No changes will be made', { component: 'Chanuka' });
       const pending = await this.migrationService.getPendingMigrations();
       console.log(`Would execute ${pending.length} migrations:`);
       pending.forEach(filename => console.log(`  - ${filename}`));
@@ -51,8 +51,8 @@ class MigrationRunner {
       let successCount = 0;
       let failureCount = 0;
 
-      logger.info('\n📊 Migration Results:', { component: 'SimpleTool' });
-  logger.info('='.repeat(50), { component: 'SimpleTool' });
+      logger.info('\n📊 Migration Results:', { component: 'Chanuka' });
+  logger.info('='.repeat(50), { component: 'Chanuka' });
 
       for (const result of results) {
         if (result.success) {
@@ -65,41 +65,41 @@ class MigrationRunner {
         }
       }
 
-  logger.info('='.repeat(50), { component: 'SimpleTool' });
+  logger.info('='.repeat(50), { component: 'Chanuka' });
       console.log(`✅ Successful: ${successCount}`);
       console.log(`❌ Failed: ${failureCount}`);
 
       if (failureCount > 0) {
-        logger.info('\n⚠️  Some migrations failed. Please review the errors above.', { component: 'SimpleTool' });
+        logger.info('\n⚠️  Some migrations failed. Please review the errors above.', { component: 'Chanuka' });
         process.exit(1);
       } else {
-        logger.info('\n🎉 All migrations completed successfully!', { component: 'SimpleTool' });
+        logger.info('\n🎉 All migrations completed successfully!', { component: 'Chanuka' });
       }
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      logger.error('💥 Migration execution failed:', { component: 'SimpleTool' }, err.message);
-      logger.error('Stack trace:', { component: 'SimpleTool' }, err.stack);
+      logger.error('💥 Migration execution failed:', { component: 'Chanuka' }, err.message);
+      logger.error('Stack trace:', { component: 'Chanuka' }, err.stack);
       process.exit(1);
     }
   }
 
   async runDown(options: RunnerOptions): Promise<void> {
     if (!options.target) {
-      logger.error('❌ Target migration filename is required for rollback', { component: 'SimpleTool' });
+      logger.error('❌ Target migration filename is required for rollback', { component: 'Chanuka' });
       process.exit(1);
     }
 
     console.log(`🔄 Rolling back migration: ${options.target}`);
     
     if (options.dryRun) {
-      logger.info('🔍 DRY RUN MODE - No changes would be made', { component: 'SimpleTool' });
+      logger.info('🔍 DRY RUN MODE - No changes would be made', { component: 'Chanuka' });
       console.log(`Would rollback: ${options.target}`);
       return;
     }
 
     if (!options.force) {
-      logger.info('⚠️  This will rollback the specified migration and may result in data loss.', { component: 'SimpleTool' });
-      logger.info('Use --force to confirm this action.', { component: 'SimpleTool' });
+      logger.info('⚠️  This will rollback the specified migration and may result in data loss.', { component: 'Chanuka' });
+      logger.info('Use --force to confirm this action.', { component: 'Chanuka' });
       process.exit(1);
     }
 
@@ -114,8 +114,8 @@ class MigrationRunner {
   }
 
   async showStatus(): Promise<void> {
-    logger.info('📋 Migration Status', { component: 'SimpleTool' });
-  logger.info('='.repeat(50), { component: 'SimpleTool' });
+    logger.info('📋 Migration Status', { component: 'Chanuka' });
+  logger.info('='.repeat(50), { component: 'Chanuka' });
 
     const applied = await this.migrationService.getAppliedMigrations();
     const pending = await this.migrationService.getPendingMigrations();
@@ -133,30 +133,30 @@ class MigrationRunner {
     });
 
     if (pending.length === 0) {
-      logger.info('\n🎉 Database is up to date!', { component: 'SimpleTool' });
+      logger.info('\n🎉 Database is up to date!', { component: 'Chanuka' });
     }
   }
 
   async validateDatabase(): Promise<void> {
-    logger.info('🔍 Validating database integrity...', { component: 'SimpleTool' });
+    logger.info('🔍 Validating database integrity...', { component: 'Chanuka' });
     
     const validation = await this.migrationService.validateDatabaseIntegrity();
     
-  logger.info('='.repeat(50), { component: 'SimpleTool' });
+  logger.info('='.repeat(50), { component: 'Chanuka' });
     
     if (validation.isValid) {
-      logger.info('✅ Database integrity check passed', { component: 'SimpleTool' });
+      logger.info('✅ Database integrity check passed', { component: 'Chanuka' });
     } else {
-      logger.info('❌ Database integrity check failed', { component: 'SimpleTool' });
+      logger.info('❌ Database integrity check failed', { component: 'Chanuka' });
     }
 
     if (validation.errors.length > 0) {
-      logger.info('\n🚨 Errors:', { component: 'SimpleTool' });
+      logger.info('\n🚨 Errors:', { component: 'Chanuka' });
       validation.errors.forEach(error => console.log(`  - ${error}`));
     }
 
     if (validation.warnings.length > 0) {
-      logger.info('\n⚠️  Warnings:', { component: 'SimpleTool' });
+      logger.info('\n⚠️  Warnings:', { component: 'Chanuka' });
       validation.warnings.forEach(warning => console.log(`  - ${warning}`));
     }
 
@@ -167,7 +167,7 @@ class MigrationRunner {
 
   async createMigration(name: string): Promise<void> {
     if (!name) {
-      logger.error('❌ Migration name is required', { component: 'SimpleTool' });
+      logger.error('❌ Migration name is required', { component: 'Chanuka' });
       process.exit(1);
     }
 
@@ -202,7 +202,7 @@ class MigrationRunner {
     fs.writeFileSync(filepath, template);
     
     console.log(`✅ Created migration file: ${filepath}`);
-    logger.info('📝 Please edit the file to add your migration SQL and rollback instructions.', { component: 'SimpleTool' });
+    logger.info('📝 Please edit the file to add your migration SQL and rollback instructions.', { component: 'Chanuka' });
   }
 
   async cleanup(): Promise<void> {
@@ -310,7 +310,7 @@ async function main(): Promise<void> {
     }
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
-    logger.error('💥 Migration runner failed:', { component: 'SimpleTool' }, err.message);
+    logger.error('💥 Migration runner failed:', { component: 'Chanuka' }, err.message);
     process.exit(1);
   } finally {
     await runner.cleanup();
@@ -319,18 +319,18 @@ async function main(): Promise<void> {
 
 // Handle uncaught errors gracefully
 process.on('uncaughtException', (error) => {
-  logger.error('💥 Uncaught exception:', { component: 'SimpleTool' }, error.message);
+  logger.error('💥 Uncaught exception:', { component: 'Chanuka' }, error.message);
   process.exit(1);
 });
 
 process.on('unhandledRejection', (error) => {
-  logger.error('💥 Unhandled rejection:', { component: 'SimpleTool' }, error);
+  logger.error('💥 Unhandled rejection:', { component: 'Chanuka' }, error);
   process.exit(1);
 });
 
 // Run the main function
 main().catch(error => {
-  logger.error('💥 Fatal error:', { component: 'SimpleTool' }, error.message);
+  logger.error('💥 Fatal error:', { component: 'Chanuka' }, error.message);
   process.exit(1);
 });
 

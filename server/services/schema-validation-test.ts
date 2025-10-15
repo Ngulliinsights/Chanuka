@@ -8,20 +8,20 @@ import { schemaValidationService } from '@shared/schema.js';
 import { logger } from '../utils/logger';
 
 async function testSchemaValidation() {
-  logger.info('🔍 Testing Schema Validation Service...\n', { component: 'SimpleTool' });
+  logger.info('🔍 Testing Schema Validation Service...\n', { component: 'Chanuka' });
 
   try {
     // Test 1: Validate compliance_checks table specifically
-    logger.info('1. Testing compliance_checks table validation...', { component: 'SimpleTool' });
+    logger.info('1. Testing compliance_checks table validation...', { component: 'Chanuka' });
     const complianceResult = await schemaValidationService.validateComplianceChecksTable();
-    logger.info('   Result:', { component: 'SimpleTool' }, {
+    logger.info('   Result:', { component: 'Chanuka' }, {
       isValid: complianceResult.isValid,
       missingColumns: complianceResult.missingColumns,
       recommendations: complianceResult.recommendations.slice(0, 2) // Show first 2 recommendations
     });
 
     // Test 2: Validate all security monitoring tables
-    logger.info('\n2. Testing all security monitoring tables...', { component: 'SimpleTool' });
+    logger.info('\n2. Testing all security monitoring tables...', { component: 'Chanuka' });
     const allResults = await schemaValidationService.validateAllTables();
     console.log(`   Validated ${allResults.length} tables:`);
     allResults.forEach(result => {
@@ -29,9 +29,9 @@ async function testSchemaValidation() {
     });
 
     // Test 3: Generate comprehensive report
-    logger.info('\n3. Generating comprehensive validation report...', { component: 'SimpleTool' });
+    logger.info('\n3. Generating comprehensive validation report...', { component: 'Chanuka' });
     const report = await schemaValidationService.generateValidationReport();
-    logger.info('   Report Summary:', { component: 'SimpleTool' }, {
+    logger.info('   Report Summary:', { component: 'Chanuka' }, {
       overallStatus: report.overallStatus,
       validatedTables: report.validatedTables,
       invalidTables: report.invalidTables,
@@ -40,18 +40,18 @@ async function testSchemaValidation() {
     });
 
     // Test 4: Test schema repair functionality
-    logger.info('\n4. Testing schema repair functionality...', { component: 'SimpleTool' });
+    logger.info('\n4. Testing schema repair functionality...', { component: 'Chanuka' });
     const repairResult = await schemaValidationService.repairSchema();
-    logger.info('   Repair Result:', { component: 'SimpleTool' }, {
+    logger.info('   Repair Result:', { component: 'Chanuka' }, {
       success: repairResult.success,
       repairedTables: repairResult.repairedTables,
       errors: repairResult.errors.slice(0, 2) // Show first 2 errors if any
     });
 
-    logger.info('\n✅ Schema validation service test completed successfully!', { component: 'SimpleTool' });
+    logger.info('\n✅ Schema validation service test completed successfully!', { component: 'Chanuka' });
 
   } catch (error) {
-    logger.error('\n❌ Schema validation test failed:', { component: 'SimpleTool' }, error);
+    logger.error('\n❌ Schema validation test failed:', { component: 'Chanuka' }, error);
     process.exit(1);
   }
 }

@@ -16,7 +16,7 @@ describe('Bundle Size Monitoring and Regression Tests', () => {
 
   beforeAll(async () => {
     // Build the application for testing
-    logger.info('Building application for bundle analysis...', { component: 'SimpleTool' });
+    logger.info('Building application for bundle analysis...', { component: 'Chanuka' });
     try {
       execSync('npm run build:client', { stdio: 'pipe' });
     } catch (error) {
@@ -58,7 +58,7 @@ describe('Bundle Size Monitoring and Regression Tests', () => {
           }
         }
 
-        logger.info('Bundle Analysis:', { component: 'SimpleTool' });
+        logger.info('Bundle Analysis:', { component: 'Chanuka' });
         bundleFiles.forEach(bundle => {
           console.log(`  ${bundle.file}: ${bundle.sizeKB}KB`);
         });

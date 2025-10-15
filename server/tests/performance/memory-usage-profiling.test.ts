@@ -19,7 +19,7 @@ describe('Memory Usage Profiling for Caching Layer', () => {
     
     // Record initial memory usage
     initialMemory = process.memoryUsage();
-    logger.info('Initial memory usage:', { component: 'SimpleTool' }, formatMemoryUsage(initialMemory));
+    logger.info('Initial memory usage:', { component: 'Chanuka' }, formatMemoryUsage(initialMemory));
   });
 
   beforeEach(() => {
@@ -30,10 +30,15 @@ describe('Memory Usage Profiling for Caching Layer', () => {
   afterAll(() => {
     // Final memory check
     const finalMemory = process.memoryUsage();
-    logger.info('Final memory usage:', { component: 'SimpleTool' }, formatMemoryUsage(finalMemory));
-    
+    logger.info('Final memory usage:', { component: 'Chanuka' }, formatMemoryUsage(finalMemory));
+
     const heapIncrease = (finalMemory.heapUsed - initialMemory.heapUsed) / 1024 / 1024;
     console.log(`Heap usage increase: ${heapIncrease.toFixed(2)}MB`);
+
+    // Force cleanup of any remaining timers to prevent hanging
+    if (global.gc) {
+      global.gc();
+    }
   });
 
   describe('Cache Memory Management', () => {

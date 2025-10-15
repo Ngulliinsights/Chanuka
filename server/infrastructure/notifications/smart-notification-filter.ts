@@ -9,8 +9,8 @@ import {
   billSponsorships
 } from '../../../shared/schema.js';
 import { eq, and, inArray, desc } from 'drizzle-orm';
-import { userPreferencesService } from '../../features/users/user-preferences.js';
-import type { BillTrackingPreferences } from '../../features/users/user-preferences.js';
+import { userPreferencesService } from '../../features/users/domain/user-preferences.js';
+import type { BillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
 import { logger } from '@shared/utils/logger';
 
 /**

@@ -1,6 +1,16 @@
 import { sponsorService } from './sponsor-service.js';
 import { sponsorConflictAnalysisService } from './sponsor-conflict-analysis.js';
-import { database as db } from '../../../shared/database/connection.js';
+import { readDatabase } from '../../db.js';
+// Backwards-compatible proxy so existing code using `db.select()` etc. keeps working
+const db = new Proxy({}, {
+  get(_target, prop: string | symbol) {
+    const d = readDatabase();
+    if (!d) {
+      return (..._args: any[]) => { throw new Error('Database not initialized'); };
+    }
+    return (d as any)[prop as any];
+  }
+}) as any;
 import { billSectionConflicts } from '../../../shared/schema.js';
 import { eq } from 'drizzle-orm';
 import { NotFoundError } from '../../utils/errors.js';

@@ -66,7 +66,7 @@ export function RealTimeBillTracker({
   useEffect(() => {
     if (userToken && !isConnected) {
       connect(userToken).catch((error) => {
-        logger.error('Failed to connect to WebSocket:', { component: 'SimpleTool' }, error);
+        logger.error('Failed to connect to WebSocket:', { component: 'Chanuka' }, error);
         toast.error("Failed to connect to real-time updates");
       });
     }

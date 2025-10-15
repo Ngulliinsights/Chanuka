@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { database as db, users, userProfiles, userInterests, billEngagement, notifications, bills } from '../../shared/database/connection.ts';
-import { userProfileService } from '../features/users/user-profile.ts';
+import { userProfileService } from '../features/users/domain/user-profile.ts';
 import { eq } from 'drizzle-orm';
 import { logger } from '../utils/logger';
 

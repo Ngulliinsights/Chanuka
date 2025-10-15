@@ -26,11 +26,11 @@ export class SecurityInitializationService {
    */
   async initializeSecurity(): Promise<void> {
     if (this.isInitialized) {
-      logger.info('⚠️  Security already initialized', { component: 'SimpleTool' });
+      logger.info('⚠️  Security already initialized', { component: 'Chanuka' });
       return;
     }
 
-    logger.info('🔒 Initializing comprehensive security system...', { component: 'SimpleTool' });
+    logger.info('🔒 Initializing comprehensive security system...', { component: 'Chanuka' });
 
     try {
       // 1. Initialize encryption service
@@ -58,7 +58,7 @@ export class SecurityInitializationService {
       await this.setupAutomatedSecurityTasks();
 
       this.isInitialized = true;
-      logger.info('✅ Security system initialized successfully', { component: 'SimpleTool' });
+      logger.info('✅ Security system initialized successfully', { component: 'Chanuka' });
 
       // Log security initialization
       await securityAuditService.logSecurityEvent({
@@ -81,7 +81,7 @@ export class SecurityInitializationService {
       });
 
     } catch (error) {
-      logger.error('❌ Security initialization failed:', { component: 'SimpleTool' }, error as Error);
+      logger.error('❌ Security initialization failed:', { component: 'Chanuka' }, error as Error);
       throw new Error('Security system initialization failed');
     }
   }
@@ -90,7 +90,7 @@ export class SecurityInitializationService {
    * Initialize encryption service
    */
   private async initializeEncryption(): Promise<void> {
-    logger.info('🔐 Initializing encryption service...', { component: 'SimpleTool' });
+    logger.info('🔐 Initializing encryption service...', { component: 'Chanuka' });
 
     // Validate encryption configuration
     const hasEncryptionKey = process.env.ENCRYPTION_KEY && process.env.KEY_DERIVATION_SALT;
@@ -110,9 +110,9 @@ export class SecurityInitializationService {
         throw new Error('Encryption test failed');
       }
       
-      logger.info('✅ Encryption service initialized and tested', { component: 'SimpleTool' });
+      logger.info('✅ Encryption service initialized and tested', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Encryption service test failed:', { component: 'SimpleTool' }, error as Error);
+      logger.error('❌ Encryption service test failed:', { component: 'Chanuka' }, error as Error);
       throw error;
     }
   }
@@ -121,7 +121,7 @@ export class SecurityInitializationService {
    * Set up security middleware
    */
   private async setupSecurityMiddleware(): Promise<void> {
-    logger.info('🛡️  Setting up security middleware...', { component: 'SimpleTool' });
+    logger.info('🛡️  Setting up security middleware...', { component: 'Chanuka' });
 
     // Apply all security middleware
     const middlewares = securityMiddleware.initializeAll();
@@ -136,26 +136,26 @@ export class SecurityInitializationService {
     this.app.use('/api/auth/password-reset', authRateLimit);
     this.app.use('/api', apiRateLimit);
 
-    logger.info('✅ Security middleware configured', { component: 'SimpleTool' });
+    logger.info('✅ Security middleware configured', { component: 'Chanuka' });
   }
 
   /**
    * Initialize session management
    */
   private async initializeSessionManagement(): Promise<void> {
-    logger.info('🎫 Initializing secure session management...', { component: 'SimpleTool' });
+    logger.info('🎫 Initializing secure session management...', { component: 'Chanuka' });
 
     // Clean up expired sessions on startup
     await secureSessionService.cleanupExpiredSessions();
 
-    logger.info('✅ Session management initialized', { component: 'SimpleTool' });
+    logger.info('✅ Session management initialized', { component: 'Chanuka' });
   }
 
   /**
    * Set up input validation
    */
   private async setupInputValidation(): Promise<void> {
-    logger.info('🔍 Setting up input validation...', { component: 'SimpleTool' });
+    logger.info('🔍 Setting up input validation...', { component: 'Chanuka' });
 
     // Test input validation
     try {
@@ -166,9 +166,9 @@ export class SecurityInitializationService {
         throw new Error('Input validation test failed');
       }
 
-      logger.info('✅ Input validation configured and tested', { component: 'SimpleTool' });
+      logger.info('✅ Input validation configured and tested', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Input validation test failed:', { component: 'SimpleTool' }, error as Error);
+      logger.error('❌ Input validation test failed:', { component: 'Chanuka' }, error as Error);
       throw error;
     }
   }
@@ -177,7 +177,7 @@ export class SecurityInitializationService {
    * Initialize security audit logging
    */
   private async initializeSecurityAudit(): Promise<void> {
-    logger.info('📋 Initializing security audit logging...', { component: 'SimpleTool' });
+    logger.info('📋 Initializing security audit logging...', { component: 'Chanuka' });
 
     // Test audit logging
     try {
@@ -189,9 +189,9 @@ export class SecurityInitializationService {
         details: { test: true }
       });
 
-      logger.info('✅ Security audit logging initialized', { component: 'SimpleTool' });
+      logger.info('✅ Security audit logging initialized', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Security audit logging test failed:', { component: 'SimpleTool' }, error as Error);
+      logger.error('❌ Security audit logging test failed:', { component: 'Chanuka' }, error as Error);
       throw error;
     }
   }
@@ -200,13 +200,13 @@ export class SecurityInitializationService {
    * Set up TLS configuration
    */
   private async setupTLSConfiguration(): Promise<void> {
-    logger.info('🔐 Setting up TLS configuration...', { component: 'SimpleTool' });
+    logger.info('🔐 Setting up TLS configuration...', { component: 'Chanuka' });
 
     try {
       const tlsOptions = tlsConfigService.getHTTPSServerOptions();
 
       if (tlsConfigService.validateTLSConfig(tlsOptions as any)) {
-        logger.info('✅ TLS configuration validated', { component: 'SimpleTool' });
+        logger.info('✅ TLS configuration validated', { component: 'Chanuka' });
 
         // Store TLS options for server creation
         (this.app as any).tlsOptions = tlsOptions;
@@ -223,7 +223,7 @@ export class SecurityInitializationService {
    * Initialize security monitoring
    */
   private async initializeSecurityMonitoring(): Promise<void> {
-    logger.info('👁️  Initializing security monitoring...', { component: 'SimpleTool' });
+    logger.info('👁️  Initializing security monitoring...', { component: 'Chanuka' });
 
     // Set up periodic security checks
     setInterval(async () => {
@@ -235,53 +235,53 @@ export class SecurityInitializationService {
         // This would integrate with external monitoring tools in production
         
       } catch (error) {
-        logger.error('Security monitoring error:', { component: 'SimpleTool' }, error as Error);
+        logger.error('Security monitoring error:', { component: 'Chanuka' }, error as Error);
       }
     }, 15 * 60 * 1000); // Every 15 minutes
 
-    logger.info('✅ Security monitoring initialized', { component: 'SimpleTool' });
+    logger.info('✅ Security monitoring initialized', { component: 'Chanuka' });
   }
 
   /**
    * Set up automated security tasks
    */
   private async setupAutomatedSecurityTasks(): Promise<void> {
-    logger.info('⚙️  Setting up automated security tasks...', { component: 'SimpleTool' });
+    logger.info('⚙️  Setting up automated security tasks...', { component: 'Chanuka' });
 
     // Daily security cleanup
     setInterval(async () => {
       try {
-        logger.info('🧹 Running daily security cleanup...', { component: 'SimpleTool' });
+        logger.info('🧹 Running daily security cleanup...', { component: 'Chanuka' });
         
         // Clean up expired sessions
         await secureSessionService.cleanupExpiredSessions();
         
         // Generate security report
         const report = await this.generateSecurityReport();
-        logger.info('📊 Daily security report generated:', { component: 'SimpleTool' }, report.summary);
+        logger.info('📊 Daily security report generated:', { component: 'Chanuka' }, report.summary);
         
       } catch (error) {
-        logger.error('Daily security cleanup error:', { component: 'SimpleTool' }, error as Error);
+        logger.error('Daily security cleanup error:', { component: 'Chanuka' }, error as Error);
       }
     }, 24 * 60 * 60 * 1000); // Every 24 hours
 
     // Weekly security audit
     setInterval(async () => {
       try {
-        logger.info('🔍 Running weekly security audit...', { component: 'SimpleTool' });
+        logger.info('🔍 Running weekly security audit...', { component: 'Chanuka' });
         
         const endDate = new Date();
         const startDate = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000);
         
         const auditReport = await securityAuditService.generateAuditReport(startDate, endDate);
-        logger.info('📋 Weekly audit report:', { component: 'SimpleTool' }, auditReport.summary);
+        logger.info('📋 Weekly audit report:', { component: 'Chanuka' }, auditReport.summary);
         
       } catch (error) {
-        logger.error('Weekly security audit error:', { component: 'SimpleTool' }, error as Error);
+        logger.error('Weekly security audit error:', { component: 'Chanuka' }, error as Error);
       }
     }, 7 * 24 * 60 * 60 * 1000); // Every 7 days
 
-    logger.info('✅ Automated security tasks configured', { component: 'SimpleTool' });
+    logger.info('✅ Automated security tasks configured', { component: 'Chanuka' });
   }
 
   /**
@@ -329,7 +329,7 @@ export class SecurityInitializationService {
 
       return report;
     } catch (error) {
-      logger.error('Security report generation failed:', { component: 'SimpleTool' }, error as Error);
+      logger.error('Security report generation failed:', { component: 'Chanuka' }, error as Error);
       return {
         status: 'critical',
         summary: { error: 'Report generation failed' },
@@ -379,14 +379,14 @@ export class SecurityInitializationService {
           }
         });
 
-        logger.info('✅ HTTPS server created with TLS configuration', { component: 'SimpleTool' });
+        logger.info('✅ HTTPS server created with TLS configuration', { component: 'Chanuka' });
         return server;
       } else {
         console.warn('⚠️  TLS configuration invalid. Cannot create HTTPS server.');
         return null;
       }
     } catch (error) {
-      logger.error('❌ HTTPS server creation failed:', { component: 'SimpleTool' }, error as Error);
+      logger.error('❌ HTTPS server creation failed:', { component: 'Chanuka' }, error as Error);
       return null;
     }
   }

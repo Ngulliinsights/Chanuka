@@ -244,7 +244,7 @@ export function useRecordBillEngagement(billId: string | number) {
     },
     
     onError: (error: Error) => {
-      logger.error('Failed to record engagement:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to record engagement:', { component: 'Chanuka' }, error);
     },
   });
 }

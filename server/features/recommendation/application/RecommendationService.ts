@@ -6,7 +6,7 @@ import {
   userInterests,
   type Bill,
 } from '@shared/schema';
-import { db } from '../../../db';
+import { readDatabase } from '../../../infrastructure/database';
 import { logger } from '@shared/utils/logger';
 import { RecommendationEngine } from '../domain/RecommendationEngine';
 import { RecommendationValidator } from '../domain/RecommendationValidator';
@@ -41,6 +41,9 @@ export class RecommendationService {
 
   /**
    * Generic cache management utility
+   * This provides a clean abstraction for caching any type of data with automatic
+   * expiration and fallback to stale data if fresh data fetching fails.
+   * 
    * @param key - Cache key identifier
    * @param fetcher - Function to fetch data if not cached
    * @returns Cached or freshly fetched data
@@ -69,6 +72,8 @@ export class RecommendationService {
 
   /**
    * Get user's interests from database with caching
+   * Interests are relatively stable data, making them ideal for caching.
+   * 
    * @param userId - The ID of the user
    * @returns Promise resolving to array of interest strings
    */
@@ -77,14 +82,15 @@ export class RecommendationService {
 
     return this.getCachedData(cacheKey, async () => {
       try {
-        const interests = await db()
-          .select({ interest: userInterests.interest })
-          .from(userInterests)
-          .where(eq(userInterests.userId, userId));
+      const database = readDatabase();
+      const interests = await database
+        .select({ interest: userInterests.interest })
+        .from(userInterests)
+        .where(eq(userInterests.userId, userId));
 
         return interests.map((i: { interest: string }) => i.interest);
       } catch (error) {
-        logger.error('Error getting user interests:', { component: 'SimpleTool' }, error);
+        logger.error('Error getting user interests:', { component: 'Chanuka' }, error);
         return [];
       }
     });
@@ -92,6 +98,8 @@ export class RecommendationService {
 
   /**
    * Get user's previously engaged bill IDs with caching
+   * This helps us avoid recommending bills the user has already seen or interacted with.
+   * 
    * @param userId - The ID of the user
    * @returns Promise resolving to array of bill IDs
    */
@@ -100,14 +108,15 @@ export class RecommendationService {
 
     return this.getCachedData(cacheKey, async () => {
       try {
-        const userEngagement = await db()
+        const database = readDatabase();
+        const userEngagement = await database
           .select({ billId: billEngagement.billId })
           .from(billEngagement)
           .where(eq(billEngagement.userId, userId));
 
         return userEngagement.map((e: { billId: number }) => e.billId);
       } catch (error) {
-        logger.error('Error getting user engagement:', { component: 'SimpleTool' }, error);
+        logger.error('Error getting user engagement:', { component: 'Chanuka' }, error);
         return [];
       }
     });
@@ -115,10 +124,16 @@ export class RecommendationService {
 
   /**
    * Enhanced bill score calculation with more sophisticated weighting
+   * This creates a SQL expression that considers bill status, engagement metrics,
+   * and recency to compute a composite score for ranking bills.
+   * 
+   * Note: We don't use type parameters on the sql template tag as Drizzle
+   * infers types from usage context automatically.
+   * 
    * @returns SQL expression for bill score calculation
    */
   private getBillScoreExpression() {
-    return sql<number>`
+    return sql`
       CASE
         WHEN ${bills.status} = 'introduced' THEN ${this.SCORING_WEIGHTS.STATUS_INTRODUCED}
         WHEN ${bills.status} = 'committee' THEN ${this.SCORING_WEIGHTS.STATUS_COMMITTEE}
@@ -126,7 +141,6 @@ export class RecommendationService {
       END *
       (COALESCE(${bills.viewCount}, 0) * ${this.SCORING_WEIGHTS.VIEW} +
        COALESCE(${bills.shareCount}, 0) * ${this.SCORING_WEIGHTS.SHARE} +
-       -- Add recency factor: newer bills get slight boost
        CASE
          WHEN ${bills.createdAt} > NOW() - INTERVAL '7 days' THEN 1.2
          WHEN ${bills.createdAt} > NOW() - INTERVAL '30 days' THEN 1.1
@@ -191,7 +205,7 @@ export class RecommendationService {
         score: candidate.score,
       }));
     } catch (error) {
-      logger.error('Error getting personalized recommendations:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting personalized recommendations:', { component: 'Chanuka' }, error);
       // Return empty array rather than throwing to prevent cascade failures
       return [];
     }
@@ -240,7 +254,7 @@ export class RecommendationService {
         similarityScore: item.similarityScore,
       }));
     } catch (error) {
-      logger.error('Error getting similar bills:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting similar bills:', { component: 'Chanuka' }, error);
       return [];
     }
   }
@@ -287,7 +301,7 @@ export class RecommendationService {
         trendScore: item.trendScore,
       }));
     } catch (error) {
-      logger.error('Error getting trending bills:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting trending bills:', { component: 'Chanuka' }, error);
       return [];
     }
   }
@@ -337,13 +351,15 @@ export class RecommendationService {
         sanitizedEngagementType
       );
     } catch (error) {
-      logger.error('Error tracking engagement:', { component: 'SimpleTool' }, error);
+      logger.error('Error tracking engagement:', { component: 'Chanuka' }, error);
       throw error; // Re-throw to allow caller to handle
     }
   }
 
   /**
    * Calculate engagement score with consistent weights
+   * This provides a standardized way to compute how engaged users are with bills.
+   * 
    * @private
    */
   private calculateEngagementScore(
@@ -416,13 +432,16 @@ export class RecommendationService {
         score: item.score,
       }));
     } catch (error) {
-      logger.error('Error getting collaborative recommendations:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting collaborative recommendations:', { component: 'Chanuka' }, error);
       return [];
     }
   }
 
   /**
    * Get recent user activity for recommendation context
+   * This helps understand what the user has been interested in lately,
+   * allowing us to weight recent interests more heavily than older ones.
+   * 
    * @private
    */
   private async getRecentUserActivity(userId: string): Promise<Array<{
@@ -434,10 +453,12 @@ export class RecommendationService {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      const activities = await db()
+      const database = readDatabase();
+      const activities = await database
         .select({
           billId: billEngagement.billId,
-          engagementType: sql<string>`CASE
+          // Use sql template without type parameter - Drizzle infers types from context
+          engagementType: sql`CASE
             WHEN ${billEngagement.viewCount} > 0 THEN 'view'
             WHEN ${billEngagement.commentCount} > 0 THEN 'comment'
             WHEN ${billEngagement.shareCount} > 0 THEN 'share'
@@ -461,13 +482,16 @@ export class RecommendationService {
         timestamp: activity.timestamp,
       }));
     } catch (error) {
-      logger.error('Error getting recent user activity:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting recent user activity:', { component: 'Chanuka' }, error);
       return [];
     }
   }
 
   /**
    * Get available bills for recommendation (excluding very old or inactive bills)
+   * We filter to recent bills in active legislative stages to ensure recommendations
+   * are timely and actionable for users.
+   * 
    * @private
    */
   private async getAvailableBillsForRecommendation(): Promise<import('../domain/recommendation.dto').PlainBill[]> {
@@ -475,7 +499,8 @@ export class RecommendationService {
       const sixMonthsAgo = new Date();
       sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-      const availableBills = await db()
+      const database = readDatabase();
+      const availableBills = await database
         .select()
         .from(bills)
         .where(
@@ -489,7 +514,7 @@ export class RecommendationService {
 
       return availableBills.map(bill => ({ ...bill })); // Ensure plain objects
     } catch (error) {
-      logger.error('Error getting available bills for recommendation:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting available bills for recommendation:', { component: 'Chanuka' }, error);
       return [];
     }
   }
@@ -504,6 +529,9 @@ export class RecommendationService {
 
   /**
    * Get engagement data for trending calculation
+   * This aggregates recent engagement across all users to identify which bills
+   * are gaining momentum in the community.
+   * 
    * @private
    */
   private async getEngagementDataForTrending(days: number): Promise<Array<{
@@ -515,10 +543,13 @@ export class RecommendationService {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
 
-      const engagements = await db()
+      // Fixed: Changed from db() to readDatabase() for consistency
+      const database = readDatabase();
+      const engagements = await database
         .select({
           billId: billEngagement.billId,
-          engagementType: sql<string>`CASE
+          // Use sql template without type parameter - Drizzle infers the type
+          engagementType: sql`CASE
             WHEN ${billEngagement.viewCount} > 0 THEN 'view'
             WHEN ${billEngagement.commentCount} > 0 THEN 'comment'
             WHEN ${billEngagement.shareCount} > 0 THEN 'share'
@@ -537,13 +568,19 @@ export class RecommendationService {
         timestamp: engagement.timestamp,
       }));
     } catch (error) {
-      logger.error('Error getting engagement data for trending:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting engagement data for trending:', { component: 'Chanuka' }, error);
       return [];
     }
   }
 
   /**
    * Get similar users and their engagement data for collaborative filtering
+   * This implements a two-step process: first find users with shared interests,
+   * then retrieve their engagement patterns to recommend bills they liked.
+   * 
+   * The refactored approach computes similarity scores in JavaScript rather than
+   * in complex SQL subqueries, which is more maintainable and type-safe.
+   * 
    * @private
    */
   private async getSimilarUsersEngagements(
@@ -561,15 +598,18 @@ export class RecommendationService {
 
       const minSharedInterests = Math.max(1, Math.floor(interests.length * 0.4));
 
-      // Find similar users
-      const similarUsers = await db()
+      // Step 1: Find similar users based on shared interests
+      const database = readDatabase();
+      const similarUsers = await database
         .select({
           userId: userInterests.userId,
-          sharedInterests: sql<number>`COUNT(DISTINCT ${userInterests.interest})`,
+          // Count shared interests without type parameter on sql
+          sharedInterests: sql`COUNT(DISTINCT ${userInterests.interest})`.as('shared_interests'),
         })
         .from(userInterests)
         .where(
           and(
+            // Use inArray helper instead of manual SQL join
             inArray(userInterests.interest, interests),
             sql`${userInterests.userId} != ${userId}`
           )
@@ -582,49 +622,52 @@ export class RecommendationService {
       if (similarUsers.length === 0) return [];
 
       const similarUserIds = similarUsers.map(u => u.userId);
+      
+      // Step 2: Calculate similarity scores in JavaScript (cleaner than complex SQL)
+      // This maps each user ID to a score between 0 and 1 based on interest overlap
+      const userSimilarityMap = new Map(
+        similarUsers.map(u => [
+          u.userId, 
+          Math.min(1.0, Number(u.sharedInterests) / interests.length)
+        ])
+      );
 
-      // Get their engagement data
-      const engagements = await db()
+      // Step 3: Get engagement data for similar users
+      const engagements = await database
         .select({
           userId: billEngagement.userId,
           billId: billEngagement.billId,
-          engagementType: sql<string>`CASE
+          // Use sql template without type parameter
+          engagementType: sql`CASE
             WHEN ${billEngagement.viewCount} > 0 THEN 'view'
             WHEN ${billEngagement.commentCount} > 0 THEN 'comment'
             WHEN ${billEngagement.shareCount} > 0 THEN 'share'
             ELSE 'view'
-          END`,
+          END`.as('engagement_type'),
           timestamp: billEngagement.lastEngaged,
-          similarityScore: sql<number>`CASE
-            WHEN EXISTS (
-              SELECT 1 FROM user_interests ui
-              WHERE ui.user_id = ${billEngagement.userId}
-              AND ui.interest IN (${sql.join(interests.map(i => sql`${i}`), sql`, `)})
-              GROUP BY ui.user_id
-              HAVING COUNT(DISTINCT ui.interest) >= ${Math.floor(interests.length * 0.6)}
-            ) THEN 1.0
-            ELSE 0.8
-          END`,
         })
         .from(billEngagement)
         .where(inArray(billEngagement.userId, similarUserIds))
-        .limit(1000); // Reasonable limit
+        .limit(1000);
 
+      // Step 4: Attach similarity scores to each engagement
       return engagements.map(e => ({
         userId: e.userId,
         billId: e.billId,
         engagementType: e.engagementType as 'view' | 'comment' | 'share',
         timestamp: e.timestamp,
-        similarityScore: e.similarityScore,
+        similarityScore: userSimilarityMap.get(e.userId) || 0.5,
       }));
     } catch (error) {
-      logger.error('Error getting similar users engagements:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting similar users engagements:', { component: 'Chanuka' }, error);
       return [];
     }
   }
 
   /**
    * Get cache statistics for monitoring and debugging
+   * Useful for understanding cache hit rates and identifying memory usage patterns.
+   * 
    * @public
    */
   getCacheStats(): { size: number; keys: string[] } {
@@ -636,6 +679,7 @@ export class RecommendationService {
 }
 
 // Export functions for backward compatibility
+// These maintain the existing API while using the refactored service class internally
 export async function getPersonalizedRecommendations(
   userId: string,
   limit: number = 10,

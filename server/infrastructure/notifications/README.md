@@ -126,7 +126,7 @@ SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=your-email@gmail.com
 SMTP_PASS=your-app-password
-SMTP_FROM=noreply@simpletool.gov
+SMTP_FROM=noreply@Chanuka.gov
 
 # Application
 BASE_URL=https://yourapp.com
@@ -225,4 +225,4 @@ When adding new notification features:
 
 ## 📄 License
 
-This notification system is part of the SimpleTool Legislative Tracking Platform.
+This notification system is part of the Chanuka Legislative Tracking Platform.

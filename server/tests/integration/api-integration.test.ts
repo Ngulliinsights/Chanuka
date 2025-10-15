@@ -89,7 +89,7 @@ describe('Comprehensive API Integration Tests', () => {
   async function cleanupTestData() {
     // Cleanup would go here in a real implementation
     // For now, we'll just log that cleanup is happening
-    logger.info('Cleaning up test data...', { component: 'SimpleTool' });
+    logger.info('Cleaning up test data...', { component: 'Chanuka' });
   }
 
   // Authentication Tests

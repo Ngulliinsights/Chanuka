@@ -59,7 +59,7 @@ export interface UserDataExport {
     viewCount: number | null;
     commentCount: number | null;
     shareCount: number | null;
-    engagementScore: string | null;
+    engagementScore: number | null;
     lastEngaged: Date | null;
     createdAt: Date | null;
   }>;
@@ -421,7 +421,7 @@ class PrivacyService {
 
       return exportData;
     } catch (error) {
-      logger.error('Error exporting user data:', { component: 'SimpleTool' }, error);
+      logger.error('Error exporting user data:', { component: 'Chanuka' }, error);
       throw new Error('Failed to export user data');
     }
   }
@@ -564,7 +564,7 @@ class PrivacyService {
         auditTrailKept: keepAuditTrail
       };
     } catch (error) {
-      logger.error('Error deleting user data:', { component: 'SimpleTool' }, error);
+      logger.error('Error deleting user data:', { component: 'Chanuka' }, error);
       throw new Error('Failed to delete user data');
     }
   }
@@ -612,7 +612,7 @@ class PrivacyService {
         }
       };
     } catch (error) {
-      logger.error('Error getting privacy preferences:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting privacy preferences:', { component: 'Chanuka' }, error);
       throw new Error('Failed to get privacy preferences');
     }
   }
@@ -676,7 +676,7 @@ class PrivacyService {
 
       return updatedPrefs;
     } catch (error) {
-      logger.error('Error updating privacy preferences:', { component: 'SimpleTool' }, error);
+      logger.error('Error updating privacy preferences:', { component: 'Chanuka' }, error);
       throw new Error('Failed to update privacy preferences');
     }
   }
@@ -800,7 +800,7 @@ class PrivacyService {
         cleanupResults
       };
     } catch (error) {
-      logger.error('Error running data cleanup:', { component: 'SimpleTool' }, error);
+      logger.error('Error running data cleanup:', { component: 'Chanuka' }, error);
       return {
         success: false,
         cleanupResults
@@ -935,7 +935,7 @@ class PrivacyService {
         recommendations
       };
     } catch (error) {
-      logger.error('Error generating GDPR compliance report:', { component: 'SimpleTool' }, error);
+      logger.error('Error generating GDPR compliance report:', { component: 'Chanuka' }, error);
       throw new Error('Failed to generate GDPR compliance report');
     }
   }

@@ -225,11 +225,11 @@ async function testPerformance() {
 
 // Main test runner
 async function runAllTests() {
-  logger.info('🚀 Starting Comprehensive Application Testing', { component: 'SimpleTool' });
-  logger.info('=', { component: 'SimpleTool' }, .repeat(60));
+  logger.info('🚀 Starting Comprehensive Application Testing', { component: 'Chanuka' });
+  logger.info('=', { component: 'Chanuka' }, .repeat(60));
   
   // Wait for server to be ready
-  logger.info('⏳ Waiting for server to be ready...', { component: 'SimpleTool' });
+  logger.info('⏳ Waiting for server to be ready...', { component: 'Chanuka' });
   let serverReady = false;
   let attempts = 0;
   const maxAttempts = 30;
@@ -245,11 +245,11 @@ async function runAllTests() {
   }
   
   if (!serverReady) {
-    logger.info('❌ Server is not ready after 30 seconds', { component: 'SimpleTool' });
+    logger.info('❌ Server is not ready after 30 seconds', { component: 'Chanuka' });
     process.exit(1);
   }
   
-  logger.info('✅ Server is ready, starting tests...', { component: 'SimpleTool' });
+  logger.info('✅ Server is ready, starting tests...', { component: 'Chanuka' });
   
   // Run all tests
   await runTest('Application Startup and Health Check', testApplicationStartup);
@@ -262,15 +262,15 @@ async function runAllTests() {
   await runTest('Performance and Responsiveness', testPerformance);
   
   // Print summary
-  logger.info('\n', { component: 'SimpleTool' }, + '=' .repeat(60));
-  logger.info('📊 TEST SUMMARY', { component: 'SimpleTool' });
-  logger.info('=', { component: 'SimpleTool' }, .repeat(60));
+  logger.info('\n', { component: 'Chanuka' }, + '=' .repeat(60));
+  logger.info('📊 TEST SUMMARY', { component: 'Chanuka' });
+  logger.info('=', { component: 'Chanuka' }, .repeat(60));
   console.log(`✅ Passed: ${testResults.passed}`);
   console.log(`❌ Failed: ${testResults.failed}`);
   console.log(`📈 Success Rate: ${((testResults.passed / (testResults.passed + testResults.failed)) * 100).toFixed(1)}%`);
   
   if (testResults.failed > 0) {
-    logger.info('\n❌ Failed Tests:', { component: 'SimpleTool' });
+    logger.info('\n❌ Failed Tests:', { component: 'Chanuka' });
     testResults.tests
       .filter(test => test.status === 'FAILED')
       .forEach(test => {
@@ -278,30 +278,30 @@ async function runAllTests() {
       });
   }
   
-  logger.info('\n🎯 Core User Flows Status:', { component: 'SimpleTool' });
-  logger.info('   • Application Startup: ✅ Working', { component: 'SimpleTool' });
-  logger.info('   • Frontend Access: ✅ Working', { component: 'SimpleTool' });
-  logger.info('   • API Access: ✅ Working', { component: 'SimpleTool' });
-  logger.info('   • Database Fallback: ✅ Working', { component: 'SimpleTool' });
-  logger.info('   • Error Handling: ✅ Working', { component: 'SimpleTool' });
+  logger.info('\n🎯 Core User Flows Status:', { component: 'Chanuka' });
+  logger.info('   • Application Startup: ✅ Working', { component: 'Chanuka' });
+  logger.info('   • Frontend Access: ✅ Working', { component: 'Chanuka' });
+  logger.info('   • API Access: ✅ Working', { component: 'Chanuka' });
+  logger.info('   • Database Fallback: ✅ Working', { component: 'Chanuka' });
+  logger.info('   • Error Handling: ✅ Working', { component: 'Chanuka' });
   
-  logger.info('\n📝 Notes:', { component: 'SimpleTool' });
-  logger.info('   • Application runs in demo mode when database is unavailable', { component: 'SimpleTool' });
-  logger.info('   • Some database schema issues exist but don\', { component: 'SimpleTool' }, t prevent core functionality');
-  logger.info('   • Security monitoring is active but has some table schema issues', { component: 'SimpleTool' });
-  logger.info('   • Frontend is served via Vite development server', { component: 'SimpleTool' });
+  logger.info('\n📝 Notes:', { component: 'Chanuka' });
+  logger.info('   • Application runs in demo mode when database is unavailable', { component: 'Chanuka' });
+  logger.info('   • Some database schema issues exist but don\', { component: 'Chanuka' }, t prevent core functionality');
+  logger.info('   • Security monitoring is active but has some table schema issues', { component: 'Chanuka' });
+  logger.info('   • Frontend is served via Vite development server', { component: 'Chanuka' });
   
   if (testResults.failed === 0) {
-    logger.info('\n🎉 All tests passed! Application is ready for deployment.', { component: 'SimpleTool' });
+    logger.info('\n🎉 All tests passed! Application is ready for deployment.', { component: 'Chanuka' });
     process.exit(0);
   } else {
-    logger.info('\n⚠️  Some tests failed, but core functionality is working.', { component: 'SimpleTool' });
+    logger.info('\n⚠️  Some tests failed, but core functionality is working.', { component: 'Chanuka' });
     process.exit(1);
   }
 }
 
 // Run tests
 runAllTests().catch(error => {
-  logger.error('💥 Test runner failed:', { component: 'SimpleTool' }, error);
+  logger.error('💥 Test runner failed:', { component: 'Chanuka' }, error);
   process.exit(1);
 });

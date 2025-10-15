@@ -12,7 +12,7 @@ async function checkSchema() {
   });
 
   try {
-    logger.info('Checking current database schema...', { component: 'SimpleTool' });
+    logger.info('Checking current database schema...', { component: 'Chanuka' });
     
     // Get all tables
     const tables = await pool.query(`
@@ -43,7 +43,7 @@ async function checkSchema() {
     }
     
   } catch (error) {
-    logger.error('Error:', { component: 'SimpleTool' }, error.message);
+    logger.error('Error:', { component: 'Chanuka' }, error.message);
   } finally {
     await pool.end();
   }

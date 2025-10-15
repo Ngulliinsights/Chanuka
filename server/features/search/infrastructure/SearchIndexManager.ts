@@ -4,6 +4,7 @@
  *  ------------------------------------------------------------------ */
 import { sql } from 'drizzle-orm';
 import { databaseService } from '../../services/database-service';
+import { readDatabase } from '../../../db.js';
 import { cacheService } from '@/infrastructure/cache/cache-service';
 import { demoDataService } from '@/infrastructure/demo-data';
 import { logger } from '@shared/utils/logger';
@@ -22,8 +23,8 @@ export class SearchIndexManager {
     let updated = 0;
     let errors = 0;
     try {
-      const db = databaseService.getDatabase();
-      const res = await db.execute(sql`
+    const db = readDatabase();
+    const res = await db.execute(sql`
         update bills
         set search_vector =
           setweight(to_tsvector('english', coalesce(title,'')), 'A') ||
@@ -33,7 +34,7 @@ export class SearchIndexManager {
           updated_at = now()
         where search_vector is null or search_vector = to_tsvector('')
       `);
-      updated = res.rowCount || 0;
+  updated = res.rowCount || 0;
       await db.execute(sql`analyze bills`);
       await db.execute(sql`reindex index concurrently idx_bills_search_vector`);
     } catch (e) {

@@ -90,7 +90,7 @@ export { notificationService as default } from './notification-service.js';
 
 import { logger } from '../../utils/logger.js';
 
-logger.info('📦 Notifications module loaded - Clean architecture implemented successfully', { component: 'SimpleTool' });
+logger.info('📦 Notifications module loaded - Clean architecture implemented successfully', { component: 'Chanuka' });
 
 
 

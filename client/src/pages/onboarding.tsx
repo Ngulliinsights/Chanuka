@@ -232,7 +232,7 @@ export default function OnboardingPage() {
         });
         setLocation('/');
       } catch (error) {
-        logger.error('Failed to complete onboarding:', { component: 'SimpleTool' }, error);
+        logger.error('Failed to complete onboarding:', { component: 'Chanuka' }, error);
         // In a real app, you might want to show a toast notification here
         // or set an error state to display to the user
       }

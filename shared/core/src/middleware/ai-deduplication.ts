@@ -85,7 +85,7 @@ export class AIDeduplicationMiddleware {
           pendingRequest.requestCount++;
           pendingRequest.requestIds.push(requestId);
 
-          logger.info('AI Request Deduplicated', { component: 'SimpleTool' }, {
+          logger.info('AI Request Deduplicated', { component: 'Chanuka' }, {
             requestId,
             deduplicationKey,
             pendingRequestCount: pendingRequest.requestCount,
@@ -124,7 +124,7 @@ export class AIDeduplicationMiddleware {
         await pendingPromise;
 
       } catch (error) {
-        logger.error('Deduplication error:', { component: 'SimpleTool' }, error);
+        logger.error('Deduplication error:', { component: 'Chanuka' }, error);
         // On error, proceed without deduplication
         next();
       }
@@ -215,7 +215,7 @@ export class AIDeduplicationMiddleware {
    * Default duplicate handler
    */
   private defaultOnDuplicate = (req: Request, res: Response, originalResult: any): void => {
-    logger.info('AI Request Served from Deduplication', { component: 'SimpleTool' }, {
+    logger.info('AI Request Served from Deduplication', { component: 'Chanuka' }, {
       path: req.path,
       method: req.method,
       userId: (req as any).user?.id,
@@ -249,7 +249,7 @@ export class AIDeduplicationMiddleware {
   private recordMetrics(type: 'cache_hit' | 'deduplication_hit' | 'new_request', key: string): void {
     if (!this.options.enableMetrics) return;
 
-    logger.info('AI Deduplication Metrics', { component: 'SimpleTool' }, {
+    logger.info('AI Deduplication Metrics', { component: 'Chanuka' }, {
       type,
       key,
       timestamp: new Date().toISOString(),

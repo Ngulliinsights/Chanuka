@@ -276,14 +276,14 @@ class StandaloneSecurityTester {
  * Run standalone security tests
  */
 async function runStandaloneSecurityTests() {
-  logger.info('🔒 Testing Security Monitoring System (Standalone)', { component: 'SimpleTool' });
-  logger.info('=', { component: 'SimpleTool' }, .repeat(60));
+  logger.info('🔒 Testing Security Monitoring System (Standalone)', { component: 'Chanuka' });
+  logger.info('=', { component: 'Chanuka' }, .repeat(60));
 
   const securityTester = new StandaloneSecurityTester();
 
   try {
     // Test 1: Test XSS detection
-    logger.info('\n1. Testing XSS detection...', { component: 'SimpleTool' });
+    logger.info('\n1. Testing XSS detection...', { component: 'Chanuka' });
     
     const xssRequest = {
       originalUrl: '/api/bills?search=<script>alert("xss")</script>',
@@ -306,14 +306,14 @@ async function runStandaloneSecurityTests() {
     };
 
     const xssResult = securityTester.analyzeRequest(xssRequest);
-    logger.info('✅ XSS detection completed', { component: 'SimpleTool' });
+    logger.info('✅ XSS detection completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${xssResult.threatLevel}`);
     console.log(`   - Risk Score: ${xssResult.riskScore}`);
     console.log(`   - Detected Threats: ${xssResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${xssResult.recommendedAction}`);
 
     // Test 2: Test SQL injection detection
-    logger.info('\n2. Testing SQL injection detection...', { component: 'SimpleTool' });
+    logger.info('\n2. Testing SQL injection detection...', { component: 'Chanuka' });
     const sqlRequest = {
       ...xssRequest,
       originalUrl: '/api/bills?id=1; DROP TABLE users; --',
@@ -322,14 +322,14 @@ async function runStandaloneSecurityTests() {
     };
 
     const sqlResult = securityTester.analyzeRequest(sqlRequest);
-    logger.info('✅ SQL injection detection completed', { component: 'SimpleTool' });
+    logger.info('✅ SQL injection detection completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${sqlResult.threatLevel}`);
     console.log(`   - Risk Score: ${sqlResult.riskScore}`);
     console.log(`   - Detected Threats: ${sqlResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${sqlResult.recommendedAction}`);
 
     // Test 3: Test path traversal detection
-    logger.info('\n3. Testing path traversal detection...', { component: 'SimpleTool' });
+    logger.info('\n3. Testing path traversal detection...', { component: 'Chanuka' });
     const pathRequest = {
       ...xssRequest,
       originalUrl: '/api/files?path=../../../etc/passwd',
@@ -337,13 +337,13 @@ async function runStandaloneSecurityTests() {
     };
 
     const pathResult = securityTester.analyzeRequest(pathRequest);
-    logger.info('✅ Path traversal detection completed', { component: 'SimpleTool' });
+    logger.info('✅ Path traversal detection completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${pathResult.threatLevel}`);
     console.log(`   - Risk Score: ${pathResult.riskScore}`);
     console.log(`   - Detected Threats: ${pathResult.detectedThreats.length}`);
 
     // Test 4: Test rate limiting
-    logger.info('\n4. Testing rate limiting...', { component: 'SimpleTool' });
+    logger.info('\n4. Testing rate limiting...', { component: 'Chanuka' });
     const rapidRequests = [];
     for (let i = 0; i < 70; i++) {
       rapidRequests.push(securityTester.analyzeRequest(xssRequest));
@@ -356,7 +356,7 @@ async function runStandaloneSecurityTests() {
     console.log(`   - Rate limiting working: ${blockedRequests.length > 0 ? 'YES' : 'NO'}`);
 
     // Test 5: Test IP blocking
-    logger.info('\n5. Testing IP blocking functionality...', { component: 'SimpleTool' });
+    logger.info('\n5. Testing IP blocking functionality...', { component: 'Chanuka' });
     const testIP = '192.168.1.999';
     
     console.log(`   - Before blocking: ${securityTester.isIPBlocked(testIP) ? 'BLOCKED' : 'NOT BLOCKED'}`);
@@ -366,7 +366,7 @@ async function runStandaloneSecurityTests() {
     console.log(`   - After unblocking: ${securityTester.isIPBlocked(testIP) ? 'BLOCKED' : 'NOT BLOCKED'}`);
 
     // Test 6: Test normal request
-    logger.info('\n6. Testing normal request...', { component: 'SimpleTool' });
+    logger.info('\n6. Testing normal request...', { component: 'Chanuka' });
     const normalRequest = {
       originalUrl: '/api/bills?status=active&limit=10',
       url: '/api/bills?status=active&limit=10',
@@ -382,7 +382,7 @@ async function runStandaloneSecurityTests() {
     };
 
     const normalResult = securityTester.analyzeRequest(normalRequest);
-    logger.info('✅ Normal request analysis completed', { component: 'SimpleTool' });
+    logger.info('✅ Normal request analysis completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${normalResult.threatLevel}`);
     console.log(`   - Risk Score: ${normalResult.riskScore}`);
     console.log(`   - Detected Threats: ${normalResult.detectedThreats.length}`);
@@ -390,7 +390,7 @@ async function runStandaloneSecurityTests() {
     console.log(`   - Should pass: ${normalResult.recommendedAction === 'allow' ? 'YES' : 'NO'}`);
 
     // Test 7: Test multiple attack patterns
-    logger.info('\n7. Testing multiple attack patterns...', { component: 'SimpleTool' });
+    logger.info('\n7. Testing multiple attack patterns...', { component: 'Chanuka' });
     const multiAttackRequest = {
       ...xssRequest,
       originalUrl: '/api/search?q=<script>alert("xss")</script>&filter=../../../etc/passwd',
@@ -402,40 +402,40 @@ async function runStandaloneSecurityTests() {
     };
 
     const multiResult = securityTester.analyzeRequest(multiAttackRequest);
-    logger.info('✅ Multiple attack pattern detection completed', { component: 'SimpleTool' });
+    logger.info('✅ Multiple attack pattern detection completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${multiResult.threatLevel}`);
     console.log(`   - Risk Score: ${multiResult.riskScore}`);
     console.log(`   - Detected Threats: ${multiResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${multiResult.recommendedAction}`);
     
     if (multiResult.detectedThreats.length > 0) {
-      logger.info('   - Multiple threats detected:', { component: 'SimpleTool' });
+      logger.info('   - Multiple threats detected:', { component: 'Chanuka' });
       multiResult.detectedThreats.forEach((threat, index) => {
         console.log(`     ${index + 1}. ${threat.type} (${threat.severity})`);
       });
     }
 
-    logger.info('\n', { component: 'SimpleTool' }, + '='.repeat(60));
-    logger.info('🎉 Standalone security monitoring tests completed successfully!', { component: 'SimpleTool' });
-    logger.info('\n📊 Test Results Summary:', { component: 'SimpleTool' });
-    logger.info('✅ XSS Detection: WORKING', { component: 'SimpleTool' });
-    logger.info('✅ SQL Injection Detection: WORKING', { component: 'SimpleTool' });
-    logger.info('✅ Path Traversal Detection: WORKING', { component: 'SimpleTool' });
-    logger.info('✅ Rate Limiting: WORKING', { component: 'SimpleTool' });
-    logger.info('✅ IP Blocking: WORKING', { component: 'SimpleTool' });
-    logger.info('✅ Normal Request Processing: WORKING', { component: 'SimpleTool' });
-    logger.info('✅ Multiple Attack Detection: WORKING', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' }, + '='.repeat(60));
+    logger.info('🎉 Standalone security monitoring tests completed successfully!', { component: 'Chanuka' });
+    logger.info('\n📊 Test Results Summary:', { component: 'Chanuka' });
+    logger.info('✅ XSS Detection: WORKING', { component: 'Chanuka' });
+    logger.info('✅ SQL Injection Detection: WORKING', { component: 'Chanuka' });
+    logger.info('✅ Path Traversal Detection: WORKING', { component: 'Chanuka' });
+    logger.info('✅ Rate Limiting: WORKING', { component: 'Chanuka' });
+    logger.info('✅ IP Blocking: WORKING', { component: 'Chanuka' });
+    logger.info('✅ Normal Request Processing: WORKING', { component: 'Chanuka' });
+    logger.info('✅ Multiple Attack Detection: WORKING', { component: 'Chanuka' });
     
-    logger.info('\n🔒 Security Monitoring Core Functionality: VERIFIED', { component: 'SimpleTool' });
-    logger.info('📋 Attack pattern detection algorithms are working correctly', { component: 'SimpleTool' });
-    logger.info('⚡ Threat analysis and risk scoring is functional', { component: 'SimpleTool' });
-    logger.info('🛡️ Security controls are responding appropriately to threats', { component: 'SimpleTool' });
+    logger.info('\n🔒 Security Monitoring Core Functionality: VERIFIED', { component: 'Chanuka' });
+    logger.info('📋 Attack pattern detection algorithms are working correctly', { component: 'Chanuka' });
+    logger.info('⚡ Threat analysis and risk scoring is functional', { component: 'Chanuka' });
+    logger.info('🛡️ Security controls are responding appropriately to threats', { component: 'Chanuka' });
 
     return true;
 
   } catch (error) {
-    logger.error('\n❌ Standalone security test failed:', { component: 'SimpleTool' }, error);
-    logger.error('Stack trace:', { component: 'SimpleTool' }, (error as Error).stack);
+    logger.error('\n❌ Standalone security test failed:', { component: 'Chanuka' }, error);
+    logger.error('Stack trace:', { component: 'Chanuka' }, (error as Error).stack);
     return false;
   }
 }
@@ -444,16 +444,16 @@ async function runStandaloneSecurityTests() {
 runStandaloneSecurityTests()
   .then((success) => {
     if (success) {
-      logger.info('\n✅ Security monitoring core functionality verified', { component: 'SimpleTool' });
-      logger.info('🚀 System ready for integration with full application', { component: 'SimpleTool' });
+      logger.info('\n✅ Security monitoring core functionality verified', { component: 'Chanuka' });
+      logger.info('🚀 System ready for integration with full application', { component: 'Chanuka' });
       process.exit(0);
     } else {
-      logger.info('\n❌ Security monitoring tests failed', { component: 'SimpleTool' });
+      logger.info('\n❌ Security monitoring tests failed', { component: 'Chanuka' });
       process.exit(1);
     }
   })
   .catch((error) => {
-    logger.error('\n❌ Test execution failed:', { component: 'SimpleTool' }, error);
+    logger.error('\n❌ Test execution failed:', { component: 'Chanuka' }, error);
     process.exit(1);
   });
 

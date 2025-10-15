@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, jest } from '@jest/globals';
-import request from 'supertest';
+import * as request from 'supertest';
 import express from 'express';
 import cors from 'cors';
 import { router as authRouter } from '../../core/auth/auth.js';
@@ -40,6 +40,11 @@ describe('Authentication Flow Validation Tests', () => {
   afterAll(async () => {
     // Cleanup test data
     await cleanupTestAuthData();
+
+    // Force cleanup of any remaining timers to prevent hanging
+    if (global.gc) {
+      global.gc();
+    }
   });
 
   beforeEach(() => {
@@ -423,6 +428,22 @@ describe('Authentication Flow Validation Tests', () => {
   });
 
   describe('Protected Endpoint Access Control', () => {
+    // typed helpers available to all tests in this describe block
+    const agentRequest = (method: 'get' | 'post' | 'put' | 'delete' | 'patch', path: string) => {
+      switch (method) {
+        case 'get': return request(app).get(path);
+        case 'post': return request(app).post(path);
+        case 'put': return request(app).put(path);
+        case 'delete': return request(app).delete(path);
+        case 'patch': return request(app).patch(path);
+      }
+    };
+
+    const agentRequestAuth = (method: 'get' | 'post' | 'put' | 'delete' | 'patch', path: string, token?: string) => {
+      const req = agentRequest(method, path).set('Authorization', `Bearer ${token}`);
+      return req;
+    };
+
     it('should allow access to public endpoints without authentication', async () => {
       const publicEndpoints = [
         '/api/bills',
@@ -446,9 +467,9 @@ describe('Authentication Flow Validation Tests', () => {
       ];
 
       for (const endpoint of protectedEndpoints) {
-        const response = await request(app)[endpoint.method](endpoint.path);
+        const response = await agentRequest(endpoint.method as any, endpoint.path);
         expect([401, 404]).toContain(response.status);
-        
+
         if (response.status === 401) {
           expect(response.body).toHaveProperty('success', false);
           expect(response.body).toHaveProperty('error');
@@ -463,10 +484,13 @@ describe('Authentication Flow Validation Tests', () => {
         { method: 'get', path: '/api/auth/verify' }
       ];
 
+      const agentRequestAuth = (method: 'get' | 'post' | 'put' | 'delete' | 'patch', path: string, token?: string) => {
+        const req = agentRequest(method, path).set('Authorization', `Bearer ${token}`);
+        return req;
+      };
+
       for (const endpoint of protectedEndpoints) {
-        const response = await request(app)[endpoint.method](endpoint.path)
-          .set('Authorization', `Bearer ${validToken}`);
-        
+        const response = await agentRequestAuth(endpoint.method as any, endpoint.path, validToken);
         expect([200, 404]).toContain(response.status);
       }
     });
@@ -484,13 +508,11 @@ describe('Authentication Flow Validation Tests', () => {
 
       for (const endpoint of adminEndpoints) {
         // Citizen should be denied
-        const citizenResponse = await request(app)[endpoint.method](endpoint.path)
-          .set('Authorization', `Bearer ${citizenToken}`);
+        const citizenResponse = await agentRequestAuth(endpoint.method as any, endpoint.path, citizenToken);
         expect([403, 404]).toContain(citizenResponse.status);
 
         // Admin should be allowed
-        const adminResponse = await request(app)[endpoint.method](endpoint.path)
-          .set('Authorization', `Bearer ${adminToken}`);
+        const adminResponse = await agentRequestAuth(endpoint.method as any, endpoint.path, adminToken);
         expect([200, 404]).toContain(adminResponse.status);
       }
     });
@@ -507,14 +529,12 @@ describe('Authentication Flow Validation Tests', () => {
 
       for (const endpoint of verificationRequiredEndpoints) {
         // Unverified user might be denied
-        const unverifiedResponse = await request(app)[endpoint.method](endpoint.path)
-          .set('Authorization', `Bearer ${unverifiedToken}`)
+        const unverifiedResponse = await agentRequestAuth(endpoint.method as any, endpoint.path, unverifiedToken)
           .send({ content: 'Test content' });
         expect([200, 403, 404]).toContain(unverifiedResponse.status);
 
         // Verified user should be allowed
-        const verifiedResponse = await request(app)[endpoint.method](endpoint.path)
-          .set('Authorization', `Bearer ${verifiedToken}`)
+        const verifiedResponse = await agentRequestAuth(endpoint.method as any, endpoint.path, verifiedToken)
           .send({ content: 'Test content' });
         expect([200, 201, 404]).toContain(verifiedResponse.status);
       }

@@ -100,7 +100,7 @@ export default function PrimarySponsorAnalysis({ billId }: PrimarySponsorProps) 
         const data = await response.json();
         setSponsor(data);
       } catch (err) {
-        logger.error('Error fetching primary sponsor data:', { component: 'SimpleTool' }, err);
+        logger.error('Error fetching primary sponsor data:', { component: 'Chanuka' }, err);
         setError(err instanceof Error ? err.message : 'Failed to load primary sponsor data');
       } finally {
         setLoading(false);

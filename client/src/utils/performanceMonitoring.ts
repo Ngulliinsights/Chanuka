@@ -61,7 +61,7 @@ class PerformanceMonitor {
       // Observe different types of performance entries
       this.observer.observe({ entryTypes: ['navigation', 'paint', 'largest-contentful-paint', 'first-input', 'layout-shift'] });
     } catch (error) {
-      logger.error('Failed to initialize PerformanceObserver:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to initialize PerformanceObserver:', { component: 'Chanuka' }, error);
     }
   }
 

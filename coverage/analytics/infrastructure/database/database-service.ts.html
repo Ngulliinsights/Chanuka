@@ -1535,7 +1535,7 @@ export class DatabaseService {
    */
   private <span class="fstat-no" title="function not covered" >setupConnectionHandlers(</span>): void {
 <span class="cstat-no" title="statement not covered" >    this.pool.on('connect', <span class="fstat-no" title="function not covered" >(c</span>lient) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      logger.info('✅ Database client connected', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >      logger.info('✅ Database client connected', { component: 'Chanuka' });</span>
 <span class="cstat-no" title="statement not covered" >      this.isConnected = true;</span>
 <span class="cstat-no" title="statement not covered" >      this.connectionAttempts = 0;</span>
 <span class="cstat-no" title="statement not covered" >      this.consecutiveFailures = 0;</span>
@@ -1556,7 +1556,7 @@ export class DatabaseService {
     });
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    this.pool.on('remove', <span class="fstat-no" title="function not covered" >(c</span>lient) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" >      logger.info('🔄 Database client removed from pool', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >      logger.info('🔄 Database client removed from pool', { component: 'Chanuka' });</span>
     });
 &nbsp;
     // Add handler for when a client is acquired from the pool
@@ -1573,7 +1573,7 @@ export class DatabaseService {
 <span class="cstat-no" title="statement not covered" >    try {</span>
 <span class="cstat-no" title="statement not covered" >      await this.testConnection();</span>
 <span class="cstat-no" title="statement not covered" >      this.startHealthCheckMonitoring();</span>
-<span class="cstat-no" title="statement not covered" >      logger.info('✅ Database service initialized successfully', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >      logger.info('✅ Database service initialized successfully', { component: 'Chanuka' });</span>
     } catch (error) {
 <span class="cstat-no" title="statement not covered" >      console.warn('⚠️ Initial database connection failed, will retry in background');</span>
 <span class="cstat-no" title="statement not covered" >      this.scheduleReconnection();</span>
@@ -1714,7 +1714,7 @@ export class DatabaseService {
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (this.circuitBreakerState !== 'closed') {</span>
 <span class="cstat-no" title="statement not covered" >      this.circuitBreakerState = 'closed';</span>
 <span class="cstat-no" title="statement not covered" >      this.lastCircuitBreakerOpen = null;</span>
-<span class="cstat-no" title="statement not covered" >      logger.info('🟢 Circuit breaker closed - database requests resumed', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >      logger.info('🟢 Circuit breaker closed - database requests resumed', { component: 'Chanuka' });</span>
     }
   }
 &nbsp;
@@ -1724,7 +1724,7 @@ export class DatabaseService {
    */
   private <span class="fstat-no" title="function not covered" >scheduleReconnection(</span>): void {
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (this.connectionAttempts &gt;= this.retryConfig.maxAttempts) {</span>
-<span class="cstat-no" title="statement not covered" >      logger.info('🔄 Maximum retry attempts reached, will continue with fallback mode', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >      logger.info('🔄 Maximum retry attempts reached, will continue with fallback mode', { component: 'Chanuka' });</span>
 <span class="cstat-no" title="statement not covered" >      return;</span>
     }
 &nbsp;
@@ -1746,10 +1746,10 @@ export class DatabaseService {
 <span class="cstat-no" title="statement not covered" >    setTimeout(<span class="fstat-no" title="function not covered" >async </span>() =&gt; {</span>
 <span class="cstat-no" title="statement not covered" >      try {</span>
 <span class="cstat-no" title="statement not covered" >        await this.testConnection();</span>
-<span class="cstat-no" title="statement not covered" >        logger.info('✅ Database reconnection successful', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >        logger.info('✅ Database reconnection successful', { component: 'Chanuka' });</span>
 <span class="cstat-no" title="statement not covered" >        this.startHealthCheckMonitoring();</span>
       } catch (error) {
-<span class="cstat-no" title="statement not covered" >        logger.error('❌ Reconnection attempt failed', { component: 'SimpleTool', error: (error as Error).message });</span>
+<span class="cstat-no" title="statement not covered" >        logger.error('❌ Reconnection attempt failed', { component: 'Chanuka', error: (error as Error).message });</span>
 <span class="cstat-no" title="statement not covered" >        this.scheduleReconnection();</span>
       }
     }, delay);
@@ -2004,7 +2004,7 @@ export class DatabaseService {
    * Graceful shutdown with connection draining
    */
 <span class="fstat-no" title="function not covered" >  async </span>close(): Promise&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >    logger.info('🔄 Initiating graceful database shutdown...', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >    logger.info('🔄 Initiating graceful database shutdown...', { component: 'Chanuka' });</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (this.healthCheckInterval) {</span>
 <span class="cstat-no" title="statement not covered" >      clearInterval(this.healthCheckInterval);</span>
@@ -2020,7 +2020,7 @@ export class DatabaseService {
       );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >      await Promise.race([drainPromise, timeoutPromise]);</span>
-<span class="cstat-no" title="statement not covered" >      logger.info('✅ Database connections closed gracefully', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >      logger.info('✅ Database connections closed gracefully', { component: 'Chanuka' });</span>
     } catch (error) {
 <span class="cstat-no" title="statement not covered" >      errorTracker.trackError(</span>
         error as Error,
@@ -2039,7 +2039,7 @@ export class DatabaseService {
    * Force reconnection with circuit breaker reset
    */
 <span class="fstat-no" title="function not covered" >  async </span>forceReconnect(): Promise&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >    logger.info('🔄 Forcing database reconnection...', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >    logger.info('🔄 Forcing database reconnection...', { component: 'Chanuka' });</span>
 <span class="cstat-no" title="statement not covered" >    this.isConnected = false;</span>
 <span class="cstat-no" title="statement not covered" >    this.connectionAttempts = 0;</span>
 <span class="cstat-no" title="statement not covered" >    this.consecutiveFailures = 0;</span>
@@ -2052,7 +2052,7 @@ export class DatabaseService {
    */
 <span class="fstat-no" title="function not covered" >  updateRetryConfig(</span>config: Partial&lt;RetryConfig&gt;): void {
 <span class="cstat-no" title="statement not covered" >    this.retryConfig = { ...this.retryConfig, ...config };</span>
-<span class="cstat-no" title="statement not covered" >    logger.info('🔧 Retry configuration updated:', { component: 'SimpleTool' }, this.retryConfig);</span>
+<span class="cstat-no" title="statement not covered" >    logger.info('🔧 Retry configuration updated:', { component: 'Chanuka' }, this.retryConfig);</span>
   }
 }
 &nbsp;

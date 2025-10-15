@@ -285,7 +285,7 @@ class DatabaseOptimizationService {
       }
     ];
 
-    logger.info('[DB Optimization] Creating optimized database indexes...', { component: 'SimpleTool' });
+    logger.info('[DB Optimization] Creating optimized database indexes...', { component: 'Chanuka' });
 
     for (const index of indexes) {
       try {
@@ -299,7 +299,7 @@ class DatabaseOptimizationService {
       }
     }
 
-    logger.info('[DB Optimization] Database indexing completed', { component: 'SimpleTool' });
+    logger.info('[DB Optimization] Database indexing completed', { component: 'Chanuka' });
   }
 
   /**
@@ -494,7 +494,7 @@ class DatabaseOptimizationService {
         }))
       };
     } catch (error) {
-      logger.error('[DB Optimization] Error getting database metrics:', { component: 'SimpleTool' }, error);
+      logger.error('[DB Optimization] Error getting database metrics:', { component: 'Chanuka' }, error);
       return {
         connectionPool: { totalConnections: 0, activeConnections: 0, idleConnections: 0, waitingConnections: 0 },
         queryPerformance: { averageQueryTime: 0, slowQueries: [] },
@@ -578,7 +578,7 @@ class DatabaseOptimizationService {
       'notifications', 'sponsors', 'bill_sponsorships'
     ];
 
-    logger.info('[DB Optimization] Starting table optimization...', { component: 'SimpleTool' });
+    logger.info('[DB Optimization] Starting table optimization...', { component: 'Chanuka' });
 
     for (const table of tables) {
       try {
@@ -590,7 +590,7 @@ class DatabaseOptimizationService {
       }
     }
 
-    logger.info('[DB Optimization] Table optimization completed', { component: 'SimpleTool' });
+    logger.info('[DB Optimization] Table optimization completed', { component: 'Chanuka' });
   }
 
   /**
@@ -622,7 +622,7 @@ class DatabaseOptimizationService {
 
       console.log(`[DB Optimization] Cleaned up: ${expiredSessions.length} sessions, ${expiredTokens.length} tokens, ${oldNotifications.length} notifications`);
     } catch (error) {
-      logger.error('[DB Optimization] Error during cleanup:', { component: 'SimpleTool' }, error);
+      logger.error('[DB Optimization] Error during cleanup:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -661,18 +661,18 @@ class DatabaseOptimizationService {
     // Run table optimization daily
     setInterval(() => {
       this.optimizeTables().catch(error => {
-        logger.error('[DB Optimization] Periodic table optimization failed:', { component: 'SimpleTool' }, error);
+        logger.error('[DB Optimization] Periodic table optimization failed:', { component: 'Chanuka' }, error);
       });
     }, 86400000); // 24 hours
 
     // Clean up expired data every hour
     setInterval(() => {
       this.cleanupExpiredData().catch(error => {
-        logger.error('[DB Optimization] Periodic cleanup failed:', { component: 'SimpleTool' }, error);
+        logger.error('[DB Optimization] Periodic cleanup failed:', { component: 'Chanuka' }, error);
       });
     }, 3600000); // 1 hour
 
-    logger.info('[DB Optimization] Started periodic optimization tasks', { component: 'SimpleTool' });
+    logger.info('[DB Optimization] Started periodic optimization tasks', { component: 'Chanuka' });
   }
 }
 

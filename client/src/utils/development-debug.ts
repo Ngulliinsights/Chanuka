@@ -237,22 +237,22 @@ Keyboard Shortcuts:
       
       const timeout = setTimeout(() => {
         ws.close();
-        logger.error('❌ HMR connection test timeout', { component: 'SimpleTool' });
+        logger.error('❌ HMR connection test timeout', { component: 'Chanuka' });
       }, 5000);
       
       ws.onopen = () => {
         clearTimeout(timeout);
-        logger.info('✅ HMR connection test successful', { component: 'SimpleTool' });
+        logger.info('✅ HMR connection test successful', { component: 'Chanuka' });
         ws.close();
       };
       
       ws.onerror = (error) => {
         clearTimeout(timeout);
-        logger.error('❌ HMR connection test failed:', { component: 'SimpleTool' }, error);
+        logger.error('❌ HMR connection test failed:', { component: 'Chanuka' }, error);
       };
       
     } catch (error) {
-      logger.error('❌ HMR connection test error:', { component: 'SimpleTool' }, error);
+      logger.error('❌ HMR connection test error:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -275,13 +275,13 @@ Keyboard Shortcuts:
       
       case 'network':
         fetch('/non-existent-endpoint').catch(() => {
-          logger.info('Simulated network error', { component: 'SimpleTool' });
+          logger.info('Simulated network error', { component: 'Chanuka' });
         });
         break;
       
       default:
         console.warn('Unknown error type:', type);
-        logger.info('Available types: javascript, promise, resource, network', { component: 'SimpleTool' });
+        logger.info('Available types: javascript, promise, resource, network', { component: 'Chanuka' });
     }
   }
 
@@ -312,7 +312,7 @@ Keyboard Shortcuts:
     link.download = `debug-data-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
     link.click();
     
-    logger.info('📁 Debug data exported', { component: 'SimpleTool' });
+    logger.info('📁 Debug data exported', { component: 'Chanuka' });
   }
 
   private showDebugPanel(): void {

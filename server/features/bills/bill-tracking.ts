@@ -1,5 +1,6 @@
 import { eq, and, desc, sql, count, inArray, or } from 'drizzle-orm';
 import { databaseService } from '../../infrastructure/database/database-service.js';
+import { readDatabase } from '../../db.js';
 import { notificationService } from '../../infrastructure/notifications/notification-service.js';
 import { billStatusMonitorService } from './bill-status-monitor.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service.js';
@@ -101,7 +102,10 @@ const bulkTrackingSchema2 = z.object({
  * Handles bill tracking operations, user preferences, and analytics
  */
 export class BillTrackingService {
-  private db = databaseService.getDatabase();
+  // Resolve the runtime DB instance at call time to avoid eager initialization
+  private get db() {
+    return readDatabase();
+  }
 
   /**
    * Track a bill for a user
@@ -514,7 +518,7 @@ export class BillTrackingService {
       return result;
 
     } catch (error) {
-      logger.error('Error performing bulk tracking operation:', { component: 'SimpleTool' }, error);
+      logger.error('Error performing bulk tracking operation:', { component: 'Chanuka' }, error);
       throw error;
     }
   }
@@ -725,7 +729,7 @@ export class BillTrackingService {
       const preferences = await cacheService.get(cacheKey);
       return preferences || null;
     } catch (error) {
-      logger.error('Error getting tracking preferences from cache:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting tracking preferences from cache:', { component: 'Chanuka' }, error);
       return null;
     }
   }
@@ -740,7 +744,7 @@ export class BillTrackingService {
     try {
       await cacheService.set(cacheKey, preferences, CACHE_TTL.USER_DATA);
     } catch (error) {
-      logger.error('Error storing tracking preferences in cache:', { component: 'SimpleTool' }, error);
+      logger.error('Error storing tracking preferences in cache:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -750,7 +754,7 @@ export class BillTrackingService {
     try {
       await cacheService.delete(cacheKey);
     } catch (error) {
-      logger.error('Error removing tracking preferences from cache:', { component: 'SimpleTool' }, error);
+      logger.error('Error removing tracking preferences from cache:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -803,7 +807,7 @@ export class BillTrackingService {
       const activity = await cacheService.get(cacheKey);
       return activity || [];
     } catch (error) {
-      logger.error('Error getting recent tracking activity:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting recent tracking activity:', { component: 'Chanuka' }, error);
       return [];
     }
   }
@@ -832,7 +836,7 @@ export class BillTrackingService {
       
       await cacheService.set(cacheKey, updatedActivity, CACHE_TTL.USER_DATA);
     } catch (error) {
-      logger.error('Error recording tracking analytics:', { component: 'SimpleTool' }, error);
+      logger.error('Error recording tracking analytics:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -854,7 +858,7 @@ export class BillTrackingService {
         }
       });
     } catch (error) {
-      logger.error('Error sending tracking notification:', { component: 'SimpleTool' }, error);
+      logger.error('Error sending tracking notification:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -875,7 +879,7 @@ export class BillTrackingService {
         }
       });
     } catch (error) {
-      logger.error('Error sending bulk operation notification:', { component: 'SimpleTool' }, error);
+      logger.error('Error sending bulk operation notification:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -895,9 +899,9 @@ export class BillTrackingService {
    * Shutdown service
    */
   async shutdown(): Promise<void> {
-    logger.info('Shutting down Bill Tracking Service...', { component: 'SimpleTool' });
+    logger.info('Shutting down Bill Tracking Service...', { component: 'Chanuka' });
     // Cleanup any resources if needed
-    logger.info('Bill Tracking Service shutdown complete', { component: 'SimpleTool' });
+    logger.info('Bill Tracking Service shutdown complete', { component: 'Chanuka' });
   }
 }
 

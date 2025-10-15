@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, jest } from '@jest/globals';
-import request from 'supertest';
+import * as request from 'supertest';
 import express from 'express';
 import cors from 'cors';
 import WebSocket from 'ws';
@@ -124,9 +124,14 @@ describe('Real-Time Notification Delivery Tests', () => {
       }
     });
     wsClients = [];
-    
+
     // Clean up test notifications
     await cleanupTestNotifications();
+
+    // Force cleanup of any remaining timers to prevent hanging
+    if (global.gc) {
+      global.gc();
+    }
   });
 
   async function setupTestData() {
@@ -911,7 +916,7 @@ describe('Real-Time Notification Delivery Tests', () => {
         if (response.status === 201) {
           // Each user should receive appropriate notifications
           // This is complex to test without knowing the exact implementation
-          logger.info('Multi-user notification created successfully', { component: 'SimpleTool' });
+          logger.info('Multi-user notification created successfully', { component: 'Chanuka' });
         }
       }
     });

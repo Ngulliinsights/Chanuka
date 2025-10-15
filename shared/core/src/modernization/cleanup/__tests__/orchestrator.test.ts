@@ -20,7 +20,7 @@ describe('CleanupOrchestrator', () => {
     await fs.writeFile(join(tempDir, 'migrate-test.sh'), '#!/bin/bash\necho "test"');
     await fs.writeFile(join(tempDir, 'test-analysis.md'), '# Analysis');
     await fs.writeFile(join(tempDir, 'debug-script.sh'), '#!/bin/bash\necho "debug"');
-    await fs.writeFile(join(tempDir, 'test-file.js'), 'logger.info('test', { component: 'SimpleTool' });');
+    await fs.writeFile(join(tempDir, 'test-file.js'), 'logger.info('test', { component: 'Chanuka' });');
     await fs.writeFile(join(tempDir, '.env.staging'), 'NODE_ENV=staging');
     
     orchestrator = new CleanupOrchestrator(tempDir);

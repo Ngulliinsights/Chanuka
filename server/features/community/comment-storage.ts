@@ -44,7 +44,7 @@ export class CommentStorage extends BaseStorage<Comment> {
     try {
       return this.comments.size >= 0; // Simple health check for in-memory storage
     } catch (error) {
-      logger.error('CommentStorage health check failed:', { component: 'SimpleTool' }, error);
+      logger.error('CommentStorage health check failed:', { component: 'Chanuka' }, error);
       return false;
     }
   }

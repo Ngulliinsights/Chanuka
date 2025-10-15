@@ -161,7 +161,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
       const data = await response.json();
       setWorkarounds(data);
     } catch (error) {
-      logger.error('Failed to fetch workarounds:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to fetch workarounds:', { component: 'Chanuka' }, error);
       // In a real app, you might want to show a toast notification here
     } finally {
       setIsLoading(false);
@@ -206,7 +206,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
       // Refresh the workarounds list
       await fetchWorkarounds();
     } catch (error) {
-      logger.error('Failed to create workaround:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to create workaround:', { component: 'Chanuka' }, error);
       // In a real app, you might want to show an error toast here
     } finally {
       setIsSubmitting(false);
@@ -233,7 +233,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
 
       await fetchWorkarounds();
     } catch (error) {
-      logger.error('Failed to vote:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to vote:', { component: 'Chanuka' }, error);
     } finally {
       setVotingStates(prev => ({ ...prev, [workaroundId]: false }));
     }

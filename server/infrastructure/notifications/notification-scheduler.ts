@@ -1,7 +1,7 @@
 import { database as db, notifications, users, bills, billEngagement } from '../../../shared/database/connection.js';
 import { eq, and, lt, gte, sql } from 'drizzle-orm';
 import * as cron from 'node-cron';
-import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/user-preferences.js';
+import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
 import { enhancedNotificationService, type EnhancedNotificationData } from './enhanced-notification.js';
 import { logger } from '@shared/utils/logger';
 
@@ -52,14 +52,14 @@ export class NotificationSchedulerService {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized || this.initializationLock) {
-      logger.info('Notification scheduler already initialized or initialization in progress', { component: 'SimpleTool' });
+      logger.info('Notification scheduler already initialized or initialization in progress', { component: 'Chanuka' });
       return;
     }
 
     this.initializationLock = true;
     
     try {
-      logger.info('Initializing notification scheduler...', { component: 'SimpleTool' });
+      logger.info('Initializing notification scheduler...', { component: 'Chanuka' });
 
     // Schedule digest notifications
     await this.scheduleDigestNotifications();
@@ -71,7 +71,7 @@ export class NotificationSchedulerService {
     this.scheduleEngagementAnalysis();
 
       this.isInitialized = true;
-      logger.info('Notification scheduler initialized successfully', { component: 'SimpleTool' });
+      logger.info('Notification scheduler initialized successfully', { component: 'Chanuka' });
     } finally {
       this.initializationLock = false;
     }
@@ -91,7 +91,7 @@ export class NotificationSchedulerService {
 
       console.log(`Scheduled digest notifications for ${usersWithDigests.length} users`);
     } catch (error) {
-      logger.error('Error scheduling digest notifications:', { component: 'SimpleTool' }, error);
+      logger.error('Error scheduling digest notifications:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -239,7 +239,7 @@ export class NotificationSchedulerService {
 
       return billUpdates.filter(bill => bill.updates.length > 0);
     } catch (error) {
-      logger.error('Error getting bill updates for user:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting bill updates for user:', { component: 'Chanuka' }, error);
       return [];
     }
   }
@@ -272,7 +272,7 @@ export class NotificationSchedulerService {
         newBillsTracked: Number(result?.billsTracked) || 0
       };
     } catch (error) {
-      logger.error('Error getting engagement summary:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting engagement summary:', { component: 'Chanuka' }, error);
       return {
         totalViews: 0,
         totalComments: 0,
@@ -314,7 +314,7 @@ export class NotificationSchedulerService {
         category: bill.category || 'Uncategorized'
       }));
     } catch (error) {
-      logger.error('Error getting trending bills:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting trending bills:', { component: 'Chanuka' }, error);
       return [];
     }
   }
@@ -347,7 +347,7 @@ export class NotificationSchedulerService {
         deadline: bill.lastActionDate ? new Date(bill.lastActionDate) : undefined
       }));
     } catch (error) {
-      logger.error('Error getting action items:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting action items:', { component: 'Chanuka' }, error);
       return [];
     }
   }
@@ -360,9 +360,9 @@ export class NotificationSchedulerService {
     const cleanupJob = cron.schedule('0 2 * * *', async () => {
       try {
         await this.cleanupOldNotifications();
-        logger.info('Completed notification cleanup', { component: 'SimpleTool' });
+        logger.info('Completed notification cleanup', { component: 'Chanuka' });
       } catch (error) {
-        logger.error('Error during notification cleanup:', { component: 'SimpleTool' }, error);
+        logger.error('Error during notification cleanup:', { component: 'Chanuka' }, error);
       }
     });
 
@@ -377,9 +377,9 @@ export class NotificationSchedulerService {
     const analysisJob = cron.schedule('0 3 * * 0', async () => {
       try {
         await this.analyzeEngagementPatterns();
-        logger.info('Completed engagement analysis', { component: 'SimpleTool' });
+        logger.info('Completed engagement analysis', { component: 'Chanuka' });
       } catch (error) {
-        logger.error('Error during engagement analysis:', { component: 'SimpleTool' }, error);
+        logger.error('Error during engagement analysis:', { component: 'Chanuka' }, error);
       }
     });
 
@@ -573,12 +573,12 @@ export class NotificationSchedulerService {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
     // This would typically delete old notifications
-    logger.info('Cleaning up notifications older than 30 days', { component: 'SimpleTool' });
+    logger.info('Cleaning up notifications older than 30 days', { component: 'Chanuka' });
   }
 
   private async analyzeEngagementPatterns(): Promise<void> {
     // Analyze user engagement patterns to optimize notification timing
-    logger.info('Analyzing engagement patterns for notification optimization', { component: 'SimpleTool' });
+    logger.info('Analyzing engagement patterns for notification optimization', { component: 'Chanuka' });
   }
 
   /**
@@ -610,13 +610,13 @@ export class NotificationSchedulerService {
       try {
         job.destroy();
       } catch (error) {
-        logger.error('Error destroying scheduled job:', { component: 'SimpleTool' }, error);
+        logger.error('Error destroying scheduled job:', { component: 'Chanuka' }, error);
       }
     });
     this.scheduledJobs.clear();
     this.jobUpdateLock.clear();
     this.isInitialized = false;
-    logger.info('Notification scheduler cleanup completed', { component: 'SimpleTool' });
+    logger.info('Notification scheduler cleanup completed', { component: 'Chanuka' });
   }
 }
 

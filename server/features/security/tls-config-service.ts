@@ -60,9 +60,9 @@ export class TLSConfigService {
         config.ca = fs.readFileSync(caPath);
       }
 
-      logger.info('✅ TLS certificates loaded successfully', { component: 'SimpleTool' });
+      logger.info('✅ TLS certificates loaded successfully', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Failed to load TLS certificates:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Failed to load TLS certificates:', { component: 'Chanuka' }, error);
       throw new Error('TLS configuration failed');
     }
 
@@ -103,7 +103,7 @@ export class TLSConfigService {
    */
   private generateSelfSignedCertificate(certPath: string, keyPath: string): void {
     try {
-      logger.info('🔧 Generating self-signed certificate for development...', { component: 'SimpleTool' });
+      logger.info('🔧 Generating self-signed certificate for development...', { component: 'Chanuka' });
 
       // Generate private key
       const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
@@ -125,9 +125,9 @@ export class TLSConfigService {
       fs.writeFileSync(keyPath, privateKey);
       fs.writeFileSync(certPath, cert);
 
-      logger.info('✅ Self-signed certificate generated successfully', { component: 'SimpleTool' });
+      logger.info('✅ Self-signed certificate generated successfully', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Failed to generate self-signed certificate:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Failed to generate self-signed certificate:', { component: 'Chanuka' }, error);
       throw new Error('Certificate generation failed');
     }
   }
@@ -178,25 +178,25 @@ VQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC7
     try {
       // Check if certificate and key are present
       if (!options.cert || !options.key) {
-        logger.error('❌ TLS certificate or key missing', { component: 'SimpleTool' });
+        logger.error('❌ TLS certificate or key missing', { component: 'Chanuka' });
         return false;
       }
 
       // Validate certificate format
       if (typeof options.cert === 'string' && !options.cert.includes('BEGIN CERTIFICATE')) {
-        logger.error('❌ Invalid certificate format', { component: 'SimpleTool' });
+        logger.error('❌ Invalid certificate format', { component: 'Chanuka' });
         return false;
       }
 
       if (typeof options.key === 'string' && !options.key.includes('BEGIN PRIVATE KEY') && !options.key.includes('BEGIN RSA PRIVATE KEY')) {
-        logger.error('❌ Invalid private key format', { component: 'SimpleTool' });
+        logger.error('❌ Invalid private key format', { component: 'Chanuka' });
         return false;
       }
 
-      logger.info('✅ TLS configuration validated successfully', { component: 'SimpleTool' });
+      logger.info('✅ TLS configuration validated successfully', { component: 'Chanuka' });
       return true;
     } catch (error) {
-      logger.error('❌ TLS configuration validation failed:', { component: 'SimpleTool' }, error);
+      logger.error('❌ TLS configuration validation failed:', { component: 'Chanuka' }, error);
       return false;
     }
   }

@@ -43,7 +43,7 @@ export class DatabaseFallbackService {
    * Initialize database connection with fallback handling
    */
   public async initialize(): Promise<boolean> {
-    logger.info('🔄 Initializing database with fallback support...', { component: 'SimpleTool' });
+    logger.info('🔄 Initializing database with fallback support...', { component: 'Chanuka' });
     
     try {
       const connected = await this.testConnection();
@@ -52,12 +52,12 @@ export class DatabaseFallbackService {
         this.isConnected = true;
         this.retryCount = 0;
         setDatabaseConnectionStatus(true);
-        logger.info('✅ Database connection established successfully', { component: 'SimpleTool' });
+        logger.info('✅ Database connection established successfully', { component: 'Chanuka' });
         
         // Disable demo mode if database is available
         if (demoDataService.isDemoMode()) {
           demoDataService.setDemoMode(false);
-          logger.info('🔄 Disabled demo mode - database is available', { component: 'SimpleTool' });
+          logger.info('🔄 Disabled demo mode - database is available', { component: 'Chanuka' });
         }
         
         return true;
@@ -65,7 +65,7 @@ export class DatabaseFallbackService {
         return await this.handleConnectionFailure();
       }
     } catch (error) {
-      logger.error('❌ Database initialization error:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Database initialization error:', { component: 'Chanuka' }, error);
       return await this.handleConnectionFailure();
     }
   }
@@ -76,7 +76,7 @@ export class DatabaseFallbackService {
   public async testConnection(): Promise<boolean> {
     try {
       if (!process.env.DATABASE_URL) {
-        logger.info('⚠️  No DATABASE_URL configured', { component: 'SimpleTool' });
+        logger.info('⚠️  No DATABASE_URL configured', { component: 'Chanuka' });
         return false;
       }
 
@@ -102,7 +102,7 @@ export class DatabaseFallbackService {
       client.release();
 
       if (tableCheck.rows.length < 3) {
-        logger.info('⚠️  Required tables missing - falling back to demo mode', { component: 'SimpleTool' });
+        logger.info('⚠️  Required tables missing - falling back to demo mode', { component: 'Chanuka' });
         return false;
       }
 
@@ -110,7 +110,7 @@ export class DatabaseFallbackService {
       return true;
 
     } catch (error) {
-      logger.error('Database connection test failed:', { component: 'SimpleTool' }, {
+      logger.error('Database connection test failed:', { component: 'Chanuka' }, {
         message: error instanceof Error ? error.message : String(error),
         code: (error as any)?.code
       });
@@ -131,7 +131,7 @@ export class DatabaseFallbackService {
     // Enable demo mode immediately
     if (!demoDataService.isDemoMode()) {
       demoDataService.setDemoMode(true);
-      logger.info('🔄 Enabled demo mode due to database connection failure', { component: 'SimpleTool' });
+      logger.info('🔄 Enabled demo mode due to database connection failure', { component: 'Chanuka' });
     }
 
     // Schedule retry if we haven't exceeded max attempts
@@ -141,8 +141,8 @@ export class DatabaseFallbackService {
         this.attemptReconnection();
       }, this.retryInterval);
     } else {
-      logger.info('⚠️  Max retry attempts reached. Running permanently in demo mode.', { component: 'SimpleTool' });
-      logger.info('💡 Restart the server to retry database connection.', { component: 'SimpleTool' });
+      logger.info('⚠️  Max retry attempts reached. Running permanently in demo mode.', { component: 'Chanuka' });
+      logger.info('💡 Restart the server to retry database connection.', { component: 'Chanuka' });
     }
 
     return false;
@@ -161,18 +161,18 @@ export class DatabaseFallbackService {
         this.isConnected = true;
         this.retryCount = 0;
         setDatabaseConnectionStatus(true);
-        logger.info('✅ Database reconnection successful!', { component: 'SimpleTool' });
+        logger.info('✅ Database reconnection successful!', { component: 'Chanuka' });
         
         // Disable demo mode
         if (demoDataService.isDemoMode()) {
           demoDataService.setDemoMode(false);
-          logger.info('🔄 Disabled demo mode - database is back online', { component: 'SimpleTool' });
+          logger.info('🔄 Disabled demo mode - database is back online', { component: 'Chanuka' });
         }
       } else {
         await this.handleConnectionFailure();
       }
     } catch (error) {
-      logger.error('Reconnection attempt failed:', { component: 'SimpleTool' }, error);
+      logger.error('Reconnection attempt failed:', { component: 'Chanuka' }, error);
       await this.handleConnectionFailure();
     }
   }
@@ -186,7 +186,7 @@ export class DatabaseFallbackService {
         const healthy = await this.testConnection();
         
         if (!healthy) {
-          logger.info('⚠️  Database health check failed - switching to demo mode', { component: 'SimpleTool' });
+          logger.info('⚠️  Database health check failed - switching to demo mode', { component: 'Chanuka' });
           await this.handleConnectionFailure();
         }
       } else if (this.retryCount < this.maxRetries) {
@@ -257,7 +257,7 @@ export class DatabaseFallbackService {
    * Force retry database connection (admin function)
    */
   public async forceRetry(): Promise<boolean> {
-    logger.info('🔄 Force retrying database connection...', { component: 'SimpleTool' });
+    logger.info('🔄 Force retrying database connection...', { component: 'Chanuka' });
     this.retryCount = 0; // Reset retry count
     return await this.initialize();
   }

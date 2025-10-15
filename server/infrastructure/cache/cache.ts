@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { cacheService } from "./cache-service.js";
-import { ApiSuccess, ApiErrorResponse, ApiNotFound } from "../../utils/api-response.js";
+import { ApiSuccess, ApiError, ApiNotFound } from "../../utils/api-response.js";
 import { logger } from '@shared/utils/logger';
 
 export const router = Router();
@@ -21,7 +21,7 @@ router.get("/stats", (req, res) => {
       executionTime: Date.now() - startTime
     });
   } catch (error) {
-    logger.error('Error getting cache stats:', { component: 'SimpleTool' }, error);
+    logger.error('Error getting cache stats:', { component: 'Chanuka' }, error);
     return ApiError(res, "Failed to get cache statistics", 500, {
       source: 'cache',
       executionTime: Date.now() - startTime
@@ -44,7 +44,7 @@ router.get("/keys", (req, res) => {
       executionTime: Date.now() - startTime
     });
   } catch (error) {
-    logger.error('Error getting cache keys:', { component: 'SimpleTool' }, error);
+    logger.error('Error getting cache keys:', { component: 'Chanuka' }, error);
     return ApiError(res, "Failed to get cache keys", 500, {
       source: 'cache',
       executionTime: Date.now() - startTime
@@ -66,7 +66,7 @@ router.delete("/clear", (req, res) => {
       executionTime: Date.now() - startTime
     }, 200);
   } catch (error) {
-    logger.error('Error clearing cache:', { component: 'SimpleTool' }, error);
+    logger.error('Error clearing cache:', { component: 'Chanuka' }, error);
     return ApiError(res, "Failed to clear cache", 500, {
       source: 'cache',
       executionTime: Date.now() - startTime
@@ -96,7 +96,7 @@ router.delete("/key/:key", (req, res) => {
       });
     }
   } catch (error) {
-    logger.error('Error deleting cache key:', { component: 'SimpleTool' }, error);
+    logger.error('Error deleting cache key:', { component: 'Chanuka' }, error);
     return ApiError(res, "Failed to delete cache key", 500, {
       source: 'cache',
       executionTime: Date.now() - startTime
@@ -120,7 +120,7 @@ router.delete("/pattern/:pattern", (req, res) => {
       executionTime: Date.now() - startTime
     });
   } catch (error) {
-    logger.error('Error invalidating cache pattern:', { component: 'SimpleTool' }, error);
+    logger.error('Error invalidating cache pattern:', { component: 'Chanuka' }, error);
     return ApiError(res, "Failed to invalidate cache pattern", 500, {
       source: 'cache',
       executionTime: Date.now() - startTime
@@ -155,7 +155,7 @@ router.post("/warm", (req, res) => {
       executionTime: Date.now() - startTime
     }, 201);
   } catch (error) {
-    logger.error('Error warming cache:', { component: 'SimpleTool' }, error);
+    logger.error('Error warming cache:', { component: 'Chanuka' }, error);
     return ApiError(res, "Failed to warm cache", 500, {
       source: 'cache',
       executionTime: Date.now() - startTime
@@ -184,7 +184,7 @@ router.get("/health", (req, res) => {
       executionTime: Date.now() - startTime
     }, statusCode);
   } catch (error) {
-    logger.error('Error checking cache health:', { component: 'SimpleTool' }, error);
+    logger.error('Error checking cache health:', { component: 'Chanuka' }, error);
     return ApiError(res, "Failed to check cache health", 500, {
       source: 'cache',
       executionTime: Date.now() - startTime

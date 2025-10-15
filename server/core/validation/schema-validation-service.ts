@@ -1,4 +1,4 @@
-import { db } from '../../db.js';
+import { getDbInstance, readDatabase } from '../../infrastructure/database/index.ts';
 import { sql } from 'drizzle-orm';
 import { logger } from '../../utils/logger.js';
 import {
@@ -81,7 +81,7 @@ export class SchemaValidationService {
       }
 
       // Get current table structure
-      const columns = await this.getTableColumns(tableName);
+  const columns = await this.getTableColumns(tableName);
       const columnNames = columns.map(col => col.column_name);
 
       // Expected columns for compliance_checks table
@@ -284,7 +284,8 @@ export class SchemaValidationService {
    */
   private async checkTableExists(tableName: string): Promise<boolean> {
     try {
-      const result = await db().execute(sql`
+      const database = readDatabase();
+      const result = await database.execute(sql`
         SELECT EXISTS (
           SELECT FROM information_schema.tables
           WHERE table_schema = 'public'
@@ -301,7 +302,8 @@ export class SchemaValidationService {
 
   private async getTableColumns(tableName: string): Promise<any[]> {
     try {
-      const result = await db().execute(sql`
+      const database = readDatabase();
+      const result = await database.execute(sql`
         SELECT column_name, data_type, is_nullable, column_default
         FROM information_schema.columns
         WHERE table_schema = 'public'
@@ -428,42 +430,45 @@ export class SchemaValidationService {
   private async repairTable(validation: ValidationResult): Promise<boolean> {
     if (validation.tableName === 'compliance_checks' && validation.missingColumns.includes('next_check')) {
       try {
-        await db().execute(sql`
+        const database = readDatabase();
+        await database.execute(sql`
           ALTER TABLE compliance_checks
           ADD COLUMN IF NOT EXISTS next_check TIMESTAMP;
         `);
-        logger.info('✅ Added next_check column to compliance_checks table', { component: 'SimpleTool' });
+        logger.info('✅ Added next_check column to compliance_checks table', { component: 'Chanuka' });
         return true;
       } catch (error) {
-        logger.error('❌ Failed to add next_check column:', { component: 'SimpleTool' }, error);
+        logger.error('❌ Failed to add next_check column:', { component: 'Chanuka' }, error);
         throw error;
       }
     }
 
     if (validation.tableName === 'security_audit_logs' && validation.missingColumns.includes('timestamp')) {
       try {
-        await db().execute(sql`
+        const database = readDatabase();
+        await database.execute(sql`
           ALTER TABLE security_audit_logs
           ADD COLUMN IF NOT EXISTS timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
         `);
-        logger.info('✅ Added timestamp column to security_audit_logs table', { component: 'SimpleTool' });
+        logger.info('✅ Added timestamp column to security_audit_logs table', { component: 'Chanuka' });
         return true;
       } catch (error) {
-        logger.error('❌ Failed to add timestamp column:', { component: 'SimpleTool' }, error);
+        logger.error('❌ Failed to add timestamp column:', { component: 'Chanuka' }, error);
         throw error;
       }
     }
 
     if (validation.tableName === 'threat_intelligence' && validation.missingColumns.includes('ip_address')) {
       try {
-        await db().execute(sql`
+        const database = readDatabase();
+        await database.execute(sql`
           ALTER TABLE threat_intelligence
           ADD COLUMN IF NOT EXISTS ip_address TEXT NOT NULL DEFAULT '';
         `);
-        logger.info('✅ Added ip_address column to threat_intelligence table', { component: 'SimpleTool' });
+        logger.info('✅ Added ip_address column to threat_intelligence table', { component: 'Chanuka' });
         return true;
       } catch (error) {
-        logger.error('❌ Failed to add ip_address column:', { component: 'SimpleTool' }, error);
+        logger.error('❌ Failed to add ip_address column:', { component: 'Chanuka' }, error);
         throw error;
       }
     }

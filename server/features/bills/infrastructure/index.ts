@@ -1,0 +1,4 @@
+// Infrastructure Layer - Bills Domain
+// This layer contains repositories, external integrations, and infrastructure concerns
+
+export { BillStorage, billStorage } from './bill-storage.js';

@@ -249,7 +249,7 @@ export class LegalAnalysisService {
   async shutdown(): Promise<void> {
     // Currently no persistent resources to clean up
     // This method is here for future extensibility
-    logger.info('LegalAnalysisService shutting down gracefully', { component: 'SimpleTool' });
+    logger.info('LegalAnalysisService shutting down gracefully', { component: 'Chanuka' });
   }
 }
 

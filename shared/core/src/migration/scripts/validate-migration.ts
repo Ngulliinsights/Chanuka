@@ -373,7 +373,7 @@ class MigrationValidator {
             // Test logger
             const logger = new Logger({ level: 'info' });
             
-            logger.info('Core utilities test passed', { component: 'SimpleTool' });
+            logger.info('Core utilities test passed', { component: 'Chanuka' });
           `;
           
           const testFile = join(this.rootPath, 'temp-migration-test.js');
@@ -443,7 +443,7 @@ class MigrationValidator {
   ];
 
   async validateMigration(): Promise<ValidationSummary> {
-    logger.info('🔍 Starting migration validation...\n', { component: 'SimpleTool' });
+    logger.info('🔍 Starting migration validation...\n', { component: 'Chanuka' });
 
     const summary: ValidationSummary = {
       totalChecks: this.validationChecks.length,
@@ -497,7 +497,7 @@ class MigrationValidator {
         });
       }
       
-      logger.info('', { component: 'SimpleTool' }); // Empty line for readability
+      logger.info('', { component: 'Chanuka' }); // Empty line for readability
     }
 
     return summary;
@@ -619,20 +619,20 @@ ${summary.failed === 0
   }
 
   printSummary(summary: ValidationSummary): void {
-    logger.info('📊 Validation Summary:', { component: 'SimpleTool' });
+    logger.info('📊 Validation Summary:', { component: 'Chanuka' });
     console.log(`   Total checks: ${summary.totalChecks}`);
     console.log(`   ✅ Passed: ${summary.passed}`);
     console.log(`   ❌ Failed: ${summary.failed}`);
     console.log(`   ⚠️  Warnings: ${summary.warnings}`);
     
     if (summary.failed === 0) {
-      logger.info('\n🎉 Migration validation successful!', { component: 'SimpleTool' });
-      logger.info('✅ All critical checks passed', { component: 'SimpleTool' });
-      logger.info('🚀 Your migration to @triplecheck/core is complete', { component: 'SimpleTool' });
+      logger.info('\n🎉 Migration validation successful!', { component: 'Chanuka' });
+      logger.info('✅ All critical checks passed', { component: 'Chanuka' });
+      logger.info('🚀 Your migration to @triplecheck/core is complete', { component: 'Chanuka' });
     } else {
-      logger.info('\n⚠️  Migration validation found issues', { component: 'SimpleTool' });
+      logger.info('\n⚠️  Migration validation found issues', { component: 'Chanuka' });
       console.log(`❌ ${summary.failed} critical issues need to be addressed`);
-      logger.info('📋 Check the validation report for detailed information', { component: 'SimpleTool' });
+      logger.info('📋 Check the validation report for detailed information', { component: 'Chanuka' });
     }
   }
 }
@@ -651,7 +651,7 @@ if (require.main === module) {
       process.exit(summary.failed > 0 ? 1 : 0);
     })
     .catch((error) => {
-      logger.error('💥 Validation failed:', { component: 'SimpleTool' }, error);
+      logger.error('💥 Validation failed:', { component: 'Chanuka' }, error);
       process.exit(1);
     });
 }

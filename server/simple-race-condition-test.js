@@ -6,11 +6,11 @@
  * This script performs basic testing to verify race condition fixes are working
  */
 
-logger.info('🧪 Starting Simple Race Condition Test...\n', { component: 'SimpleTool' });
+logger.info('🧪 Starting Simple Race Condition Test...\n', { component: 'Chanuka' });
 
 // Test 1: Database service singleton behavior
 async function testDatabaseSingleton() {
-  logger.info('🗄️ Test 1: Database service singleton behavior...', { component: 'SimpleTool' });
+  logger.info('🗄️ Test 1: Database service singleton behavior...', { component: 'Chanuka' });
   
   try {
     // Import the database service multiple times
@@ -18,10 +18,10 @@ async function testDatabaseSingleton() {
     const { databaseService: db2 } = await import('./services/database-service.js');
     
     if (db1 === db2) {
-      logger.info('✅ Database service: Singleton pattern working correctly', { component: 'SimpleTool' });
+      logger.info('✅ Database service: Singleton pattern working correctly', { component: 'Chanuka' });
       return true;
     } else {
-      logger.info('❌ Database service: Multiple instances detected', { component: 'SimpleTool' });
+      logger.info('❌ Database service: Multiple instances detected', { component: 'Chanuka' });
       return false;
     }
   } catch (error) {
@@ -32,17 +32,17 @@ async function testDatabaseSingleton() {
 
 // Test 2: WebSocket service singleton behavior
 async function testWebSocketSingleton() {
-  logger.info('🔌 Test 2: WebSocket service singleton behavior...', { component: 'SimpleTool' });
+  logger.info('🔌 Test 2: WebSocket service singleton behavior...', { component: 'Chanuka' });
   
   try {
     const { webSocketService: ws1 } = await import('./infrastructure/websocket.js');
     const { webSocketService: ws2 } = await import('./infrastructure/websocket.js');
     
     if (ws1 === ws2) {
-      logger.info('✅ WebSocket service: Singleton pattern working correctly', { component: 'SimpleTool' });
+      logger.info('✅ WebSocket service: Singleton pattern working correctly', { component: 'Chanuka' });
       return true;
     } else {
-      logger.info('❌ WebSocket service: Multiple instances detected', { component: 'SimpleTool' });
+      logger.info('❌ WebSocket service: Multiple instances detected', { component: 'Chanuka' });
       return false;
     }
   } catch (error) {
@@ -53,7 +53,7 @@ async function testWebSocketSingleton() {
 
 // Test 3: Memory usage stability
 async function testMemoryStability() {
-  logger.info('🧠 Test 3: Memory usage stability...', { component: 'SimpleTool' });
+  logger.info('🧠 Test 3: Memory usage stability...', { component: 'Chanuka' });
   
   const initialMemory = process.memoryUsage();
   
@@ -91,7 +91,7 @@ async function testMemoryStability() {
 
 // Test 4: Concurrent operations
 async function testConcurrentOperations() {
-  logger.info('⚡ Test 4: Concurrent operations handling...', { component: 'SimpleTool' });
+  logger.info('⚡ Test 4: Concurrent operations handling...', { component: 'Chanuka' });
   
   const startTime = Date.now();
   const concurrentOps = [];
@@ -112,18 +112,18 @@ async function testConcurrentOperations() {
   
   // Check if all operations completed
   if (results.length === 10) {
-    logger.info('✅ Concurrent operations: All completed successfully', { component: 'SimpleTool' });
+    logger.info('✅ Concurrent operations: All completed successfully', { component: 'Chanuka' });
     console.log(`   Completion times: ${results.map(r => r.completedAt + 'ms').join(', ')}`);
     return true;
   } else {
-    logger.info('❌ Concurrent operations: Some operations failed', { component: 'SimpleTool' });
+    logger.info('❌ Concurrent operations: Some operations failed', { component: 'Chanuka' });
     return false;
   }
 }
 
 // Test 5: Resource cleanup
 async function testResourceCleanup() {
-  logger.info('🧹 Test 5: Resource cleanup...', { component: 'SimpleTool' });
+  logger.info('🧹 Test 5: Resource cleanup...', { component: 'Chanuka' });
   
   let intervalCount = 0;
   let timeoutCount = 0;
@@ -174,7 +174,7 @@ async function testResourceCleanup() {
   global.clearTimeout = originalClearTimeout;
   
   if (intervalCount === 0 && timeoutCount <= 0) {
-    logger.info('✅ Resource cleanup: All resources properly cleaned up', { component: 'SimpleTool' });
+    logger.info('✅ Resource cleanup: All resources properly cleaned up', { component: 'Chanuka' });
     return true;
   } else {
     console.log(`⚠️ Resource cleanup: ${intervalCount} intervals, ${timeoutCount} timeouts remaining`);
@@ -184,7 +184,7 @@ async function testResourceCleanup() {
 
 // Main test runner
 async function runTests() {
-  logger.info('🧪 Running Simple Race Condition Tests...\n', { component: 'SimpleTool' });
+  logger.info('🧪 Running Simple Race Condition Tests...\n', { component: 'Chanuka' });
   
   const results = [];
   
@@ -198,27 +198,27 @@ async function runTests() {
     const passed = results.filter(r => r).length;
     const total = results.length;
     
-    logger.info('\n📊 Test Results:', { component: 'SimpleTool' });
-    logger.info('='.repeat(40), { component: 'SimpleTool' });
+    logger.info('\n📊 Test Results:', { component: 'Chanuka' });
+    logger.info('='.repeat(40), { component: 'Chanuka' });
     console.log(`✅ Passed: ${passed}/${total}`);
     console.log(`❌ Failed: ${total - passed}/${total}`);
-    logger.info('='.repeat(40), { component: 'SimpleTool' });
+    logger.info('='.repeat(40), { component: 'Chanuka' });
     
     if (passed === total) {
-      logger.info('\n🎉 All tests passed! Race condition fixes are working correctly.', { component: 'SimpleTool' });
+      logger.info('\n🎉 All tests passed! Race condition fixes are working correctly.', { component: 'Chanuka' });
     } else {
       console.log(`\n⚠️ ${total - passed} test(s) failed. Some issues may need attention.`);
     }
     
-    logger.info('\n📋 Summary:', { component: 'SimpleTool' });
-    logger.info('- Database service singleton: ✅', { component: 'SimpleTool' });
-    logger.info('- WebSocket service singleton: ✅', { component: 'SimpleTool' });
-    logger.info('- Memory stability: ✅', { component: 'SimpleTool' });
-    logger.info('- Concurrent operations: ✅', { component: 'SimpleTool' });
-    logger.info('- Resource cleanup: ✅', { component: 'SimpleTool' });
+    logger.info('\n📋 Summary:', { component: 'Chanuka' });
+    logger.info('- Database service singleton: ✅', { component: 'Chanuka' });
+    logger.info('- WebSocket service singleton: ✅', { component: 'Chanuka' });
+    logger.info('- Memory stability: ✅', { component: 'Chanuka' });
+    logger.info('- Concurrent operations: ✅', { component: 'Chanuka' });
+    logger.info('- Resource cleanup: ✅', { component: 'Chanuka' });
     
   } catch (error) {
-    logger.error('❌ Test suite failed:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Test suite failed:', { component: 'Chanuka' }, error);
     process.exit(1);
   }
 }

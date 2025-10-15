@@ -82,7 +82,7 @@ export function useOfflineCapabilities(): OfflineCapabilities {
           isOfflineReady: !!registration && hasCriticalData,
         }));
       } catch (error) {
-        logger.error('Failed to check offline readiness:', { component: 'SimpleTool' }, error);
+        logger.error('Failed to check offline readiness:', { component: 'Chanuka' }, error);
       }
     };
 
@@ -105,9 +105,9 @@ export function useOfflineCapabilities(): OfflineCapabilities {
         lastSyncTime: Date.now(),
       }));
 
-      logger.info('Sync completed successfully', { component: 'SimpleTool' });
+      logger.info('Sync completed successfully', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('Sync failed:', { component: 'SimpleTool' }, error);
+      logger.error('Sync failed:', { component: 'Chanuka' }, error);
       throw error;
     }
   }, [state.isOnline, queryClient]);
@@ -128,7 +128,7 @@ export function useOfflineCapabilities(): OfflineCapabilities {
       pendingSyncCount: 0,
     }));
 
-    logger.info('Offline data cleared', { component: 'SimpleTool' });
+    logger.info('Offline data cleared', { component: 'Chanuka' });
   }, [queryClient]);
 
   const enableOfflineMode = useCallback(async () => {
@@ -156,15 +156,15 @@ export function useOfflineCapabilities(): OfflineCapabilities {
       }
 
       setState(prev => ({ ...prev, isOfflineReady: true }));
-      logger.info('Offline mode enabled', { component: 'SimpleTool' });
+      logger.info('Offline mode enabled', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('Failed to enable offline mode:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to enable offline mode:', { component: 'Chanuka' }, error);
     }
   }, []);
 
   const disableOfflineMode = useCallback(() => {
     clearOfflineData();
-    logger.info('Offline mode disabled', { component: 'SimpleTool' });
+    logger.info('Offline mode disabled', { component: 'Chanuka' });
   }, [clearOfflineData]);
 
   const isDataCached = useCallback((key: string): boolean => {

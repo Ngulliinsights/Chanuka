@@ -1,4 +1,5 @@
 import { databaseService } from '@/services/database-service';
+import { readDatabase } from '../../../db.js';
 import { bills, billTags, sponsors, billSponsorships } from '@shared/schema';
 import {
   sql,
@@ -34,23 +35,19 @@ export class SearchRepository {
           'MaxWords=50, MinWords=10, ShortWord=3, HighlightAll=false, MaxFragments=3, FragmentDelimiter=" ... "')`
       : sql<null>`null`;
 
-    const rows = await databaseService.withFallback(
-      () =>
-        databaseService
-          .getDatabase()
-          .select({
-            bill: bills,
-            rank: rankExpr,
-            snippet: snippetExpr,
-          })
-          .from(bills)
-          .leftJoin(billTags, sql`${bills.id} = ${billTags.billId}`)
-          .where(conditions.length ? and(...conditions) : undefined)
-          .orderBy(orderBy)
-          .limit(limit)
-          .offset(offset),
-      [] // fallback empty
-    );
+    const db = readDatabase();
+    const rows = await db
+      .select({
+        bill: bills,
+        rank: rankExpr,
+        snippet: snippetExpr,
+      })
+      .from(bills)
+      .leftJoin(billTags, sql`${bills.id} = ${billTags.billId}`)
+      .where(conditions.length ? and(...conditions) : undefined)
+      .orderBy(orderBy)
+      .limit(limit)
+      .offset(offset);
     return rows.map(r => ({
       bill: this.toPlain(r.bill),
       rank: Number(r.rank),
@@ -59,21 +56,17 @@ export class SearchRepository {
   }
 
   async count(conditions: SQL[]): Promise<number> {
-    const [row] = await databaseService.withFallback(
-      () =>
-        databaseService
-          .getDatabase()
-          .select({ cnt: count() })
-          .from(bills)
-          .where(conditions.length ? and(...conditions) : undefined),
-      [{ cnt: 0 }]
-    );
+    const db = readDatabase();
+    const [row] = await db
+      .select({ cnt: count() })
+      .from(bills)
+      .where(conditions.length ? and(...conditions) : undefined);
     return Number(row.cnt);
   }
 
   /*  Facets identical to original (sponsors, complexity, date ranges)  */
   async facets(conditions: SQL[]): Promise<SearchResponseDto['facets']> {
-    const db = databaseService.getDatabase();
+    const db = readDatabase();
     const [statusRows, categoryRows, sponsorRows, complexityRows] = await Promise.all([
       db
         .select({ value: bills.status, count: count() })
@@ -124,7 +117,7 @@ export class SearchRepository {
 
   /*  Popular-terms sub-query (used by suggestions)  */
   async popularTermCounts(limit: number): Promise<Array<{ term: string; freq: number }>> {
-    const db = databaseService.getDatabase();
+    const db = readDatabase();
     const rows = await db.execute<{
       term: string;
       freq: number;

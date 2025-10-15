@@ -1,18 +1,18 @@
 // Monitoring Infrastructure
 // Centralized exports for monitoring and observability services
 
-// Routes
-export { default as monitoringRouter } from './monitoring';
-export { default as healthRouter } from './health';
+// Routes (named exports)
+export { router as healthRouter } from './health';
 
-// Services
-export { MonitoringService } from './monitoring';
-export { MonitoringSchedulerService } from './monitoring-scheduler';
-export { PerformanceMonitorService } from './performance-monitor';
-export { SystemHealthService } from './system-health';
+// Monitoring core
+export { MonitoringService, getMonitoringService, resetMonitoringService } from './monitoring';
+
+// Scheduler and singletons
+export { MonitoringScheduler, monitoringScheduler } from './monitoring-scheduler';
+export { performanceMonitor, performanceMiddleware, measureAsync, measureSync } from './performance-monitor';
+export { apmService } from './apm-service';
+export { dbTracer, traceDbQuery } from './db-tracer';
 export { auditLogger } from './audit-log';
-export { APMService } from './apm-service';
-export { DBTracerService } from './db-tracer';
 
 
 

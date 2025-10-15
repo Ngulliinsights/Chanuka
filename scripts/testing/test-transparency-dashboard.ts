@@ -9,12 +9,12 @@ import { transparencyDashboardService } from "./services/transparency-dashboard.
 import { logger } from '../utils/logger';
 
 async function testTransparencyDashboard() {
-  logger.info('🧪 Testing Transparency Dashboard and Reporting System\n', { component: 'SimpleTool' });
+  logger.info('🧪 Testing Transparency Dashboard and Reporting System\n', { component: 'Chanuka' });
 
   try {
     // Test 1: Main Dashboard Loading
-    logger.info('📊 Test 1: Main Dashboard Loading', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('📊 Test 1: Main Dashboard Loading', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
     
     const dashboard = await transparencyDashboardService.getTransparencyDashboard();
     console.log(`✅ Dashboard loaded successfully`);
@@ -26,11 +26,11 @@ async function testTransparencyDashboard() {
     console.log(`   - Data Freshness: ${dashboard.systemHealth.dataFreshness}%`);
     console.log(`   - Alert Count: ${dashboard.systemHealth.alertCount}`);
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Test 2: Comprehensive Transparency Report Generation
-    logger.info('📋 Test 2: Comprehensive Transparency Report Generation', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('📋 Test 2: Comprehensive Transparency Report Generation', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     const startDate = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000); // 90 days ago
     const endDate = new Date();
@@ -46,7 +46,7 @@ async function testTransparencyDashboard() {
     console.log(`   - Period: ${report.reportPeriod.startDate.toLocaleDateString()} to ${report.reportPeriod.endDate.toLocaleDateString()}`);
     console.log(`   - Generated At: ${report.generatedAt.toLocaleString()}`);
     
-    logger.info('\n📊 Executive Summary:', { component: 'SimpleTool' });
+    logger.info('\n📊 Executive Summary:', { component: 'Chanuka' });
     console.log(`   - Total Sponsors Analyzed: ${report.executiveSummary.totalSponsors}`);
     console.log(`   - Average Transparency Score: ${report.executiveSummary.averageTransparencyScore}%`);
     console.log(`   - High Risk Sponsors: ${report.executiveSummary.highRiskSponsors}`);
@@ -55,7 +55,7 @@ async function testTransparencyDashboard() {
     console.log(`   - Trend Direction: ${report.executiveSummary.trendDirection}`);
 
     if (report.sponsorAnalysis.length > 0) {
-      logger.info('\n👥 Top Sponsors by Transparency Score:', { component: 'SimpleTool' });
+      logger.info('\n👥 Top Sponsors by Transparency Score:', { component: 'Chanuka' });
       report.sponsorAnalysis.slice(0, 5).forEach((sponsor, index) => {
         console.log(`   ${index + 1}. ${sponsor.sponsorName}`);
         console.log(`      - Transparency Score: ${sponsor.transparencyScore}%`);
@@ -70,7 +70,7 @@ async function testTransparencyDashboard() {
     }
 
     if (report.conflictPatterns.length > 0) {
-      logger.info('\n⚠️  Conflict Patterns Identified:', { component: 'SimpleTool' });
+      logger.info('\n⚠️  Conflict Patterns Identified:', { component: 'Chanuka' });
       report.conflictPatterns.forEach((pattern, index) => {
         console.log(`   ${index + 1}. ${pattern.patternType.toUpperCase()} Conflicts`);
         console.log(`      - Frequency: ${pattern.frequency} occurrences`);
@@ -82,17 +82,17 @@ async function testTransparencyDashboard() {
     }
 
     if (report.recommendations.length > 0) {
-      logger.info('\n💡 Recommendations:', { component: 'SimpleTool' });
+      logger.info('\n💡 Recommendations:', { component: 'Chanuka' });
       report.recommendations.forEach((rec, index) => {
         console.log(`   ${index + 1}. ${rec}`);
       });
     }
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Test 3: Visual Conflict Mapping
-    logger.info('🔗 Test 3: Visual Conflict Mapping', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('🔗 Test 3: Visual Conflict Mapping', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     const conflictMapping = await transparencyDashboardService.createConflictMapping();
     
@@ -102,7 +102,7 @@ async function testTransparencyDashboard() {
     console.log(`   - Total Clusters: ${conflictMapping.clusters.length}`);
 
     if (conflictMapping.nodes.length > 0) {
-      logger.info('\n🎯 Node Distribution:', { component: 'SimpleTool' });
+      logger.info('\n🎯 Node Distribution:', { component: 'Chanuka' });
       const nodeTypes = conflictMapping.nodes.reduce((acc, node) => {
         acc[node.type] = (acc[node.type] || 0) + 1;
         return acc;
@@ -112,7 +112,7 @@ async function testTransparencyDashboard() {
         console.log(`   - ${type}: ${count} nodes`);
       });
 
-      logger.info('\n🔴 Risk Level Distribution:', { component: 'SimpleTool' });
+      logger.info('\n🔴 Risk Level Distribution:', { component: 'Chanuka' });
       const riskLevels = conflictMapping.nodes.reduce((acc, node) => {
         acc[node.riskLevel] = (acc[node.riskLevel] || 0) + 1;
         return acc;
@@ -123,7 +123,7 @@ async function testTransparencyDashboard() {
       });
 
       // Sample nodes
-      logger.info('\n📋 Sample Nodes:', { component: 'SimpleTool' });
+      logger.info('\n📋 Sample Nodes:', { component: 'Chanuka' });
       conflictMapping.nodes.slice(0, 3).forEach((node, index) => {
         console.log(`   ${index + 1}. ${node.label} (${node.type})`);
         console.log(`      - Risk Level: ${node.riskLevel}`);
@@ -133,7 +133,7 @@ async function testTransparencyDashboard() {
     }
 
     if (conflictMapping.edges.length > 0) {
-      logger.info('\n🔗 Sample Relationships:', { component: 'SimpleTool' });
+      logger.info('\n🔗 Sample Relationships:', { component: 'Chanuka' });
       conflictMapping.edges.slice(0, 3).forEach((edge, index) => {
         console.log(`   ${index + 1}. ${edge.source} → ${edge.target}`);
         console.log(`      - Type: ${edge.relationshipType}`);
@@ -143,11 +143,11 @@ async function testTransparencyDashboard() {
       });
     }
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Test 4: Transparency Scoring Algorithm
-    logger.info('🎯 Test 4: Transparency Scoring Algorithm', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('🎯 Test 4: Transparency Scoring Algorithm', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     // Test with first sponsor from the analysis if available
     if (report.sponsorAnalysis.length > 0) {
@@ -161,14 +161,14 @@ async function testTransparencyDashboard() {
         console.log(`   - Risk Level: ${transparencyScore.riskLevel}`);
         console.log(`   - Last Calculated: ${transparencyScore.lastCalculated.toLocaleString()}`);
         
-        logger.info('\n📊 Component Scores:', { component: 'SimpleTool' });
+        logger.info('\n📊 Component Scores:', { component: 'Chanuka' });
         Object.entries(transparencyScore.componentScores).forEach(([component, score]) => {
           const componentName = component.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
           console.log(`   - ${componentName}: ${score}%`);
         });
 
         if (transparencyScore.recommendations.length > 0) {
-          logger.info('\n💡 Specific Recommendations:', { component: 'SimpleTool' });
+          logger.info('\n💡 Specific Recommendations:', { component: 'Chanuka' });
           transparencyScore.recommendations.forEach((rec, index) => {
             console.log(`   ${index + 1}. ${rec}`);
           });
@@ -177,14 +177,14 @@ async function testTransparencyDashboard() {
         console.log(`⚠️  Could not calculate transparency score for sponsor ${testSponsorId}: ${error}`);
       }
     } else {
-      logger.info('⚠️  No sponsors available for transparency scoring test', { component: 'SimpleTool' });
+      logger.info('⚠️  No sponsors available for transparency scoring test', { component: 'Chanuka' });
     }
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Test 5: Transparency Trend Analysis
-    logger.info('📈 Test 5: Transparency Trend Analysis', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('📈 Test 5: Transparency Trend Analysis', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     const trendAnalysis = await transparencyDashboardService.analyzeTransparencyTrends(
       undefined, // All sponsors
@@ -197,7 +197,7 @@ async function testTransparencyDashboard() {
     console.log(`   - Trend Strength: ${trendAnalysis.analysis.trendStrength}`);
 
     if (trendAnalysis.trends.length > 0) {
-      logger.info('\n📊 Recent Trend Data:', { component: 'SimpleTool' });
+      logger.info('\n📊 Recent Trend Data:', { component: 'Chanuka' });
       trendAnalysis.trends.slice(-6).forEach((trend, index) => {
         console.log(`   ${trend.period}:`);
         console.log(`      - Transparency Score: ${trend.transparencyScore}%`);
@@ -209,24 +209,24 @@ async function testTransparencyDashboard() {
     }
 
     if (trendAnalysis.recommendations.length > 0) {
-      logger.info('\n💡 Trend-Based Recommendations:', { component: 'SimpleTool' });
+      logger.info('\n💡 Trend-Based Recommendations:', { component: 'Chanuka' });
       trendAnalysis.recommendations.forEach((rec, index) => {
         console.log(`   ${index + 1}. ${rec}`);
       });
     }
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Test 6: Error Handling and Edge Cases
-    logger.info('🔍 Test 6: Error Handling and Edge Cases', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('🔍 Test 6: Error Handling and Edge Cases', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     try {
       // Test with invalid sponsor ID
       await transparencyDashboardService.calculateTransparencyScore(99999);
-      logger.info('❌ Expected error for invalid sponsor ID was not thrown', { component: 'SimpleTool' });
+      logger.info('❌ Expected error for invalid sponsor ID was not thrown', { component: 'Chanuka' });
     } catch (error) {
-      logger.info('✅ Correctly handled invalid sponsor ID error', { component: 'SimpleTool' });
+      logger.info('✅ Correctly handled invalid sponsor ID error', { component: 'Chanuka' });
     }
 
     try {
@@ -240,22 +240,22 @@ async function testTransparencyDashboard() {
       console.log(`⚠️  Error with empty date range: ${error}`);
     }
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Summary
-    logger.info('📋 Test Summary', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
-    logger.info('✅ Main dashboard loading - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Comprehensive transparency report generation - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Visual conflict mapping - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Transparency scoring algorithms - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Transparency trend analysis - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Error handling and edge cases - PASSED', { component: 'SimpleTool' });
+    logger.info('📋 Test Summary', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
+    logger.info('✅ Main dashboard loading - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Comprehensive transparency report generation - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Visual conflict mapping - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Transparency scoring algorithms - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Transparency trend analysis - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Error handling and edge cases - PASSED', { component: 'Chanuka' });
     
-    logger.info('\n🎉 All transparency dashboard tests completed successfully!', { component: 'SimpleTool' });
+    logger.info('\n🎉 All transparency dashboard tests completed successfully!', { component: 'Chanuka' });
     
     // Performance metrics
-    logger.info('\n⚡ Performance Metrics:', { component: 'SimpleTool' });
+    logger.info('\n⚡ Performance Metrics:', { component: 'Chanuka' });
     console.log(`   - Dashboard load time: < 2 seconds (estimated)`);
     console.log(`   - Report generation time: < 5 seconds (estimated)`);
     console.log(`   - Conflict mapping time: < 3 seconds (estimated)`);
@@ -263,7 +263,7 @@ async function testTransparencyDashboard() {
     console.log(`   - Error handling: Robust`);
 
   } catch (error) {
-    logger.error('❌ Test failed with error:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Test failed with error:', { component: 'Chanuka' }, error);
     process.exit(1);
   }
 }
@@ -272,11 +272,11 @@ async function testTransparencyDashboard() {
 if (import.meta.url === `file://${process.argv[1]}`) {
   testTransparencyDashboard()
     .then(() => {
-      logger.info('\n✅ Test execution completed', { component: 'SimpleTool' });
+      logger.info('\n✅ Test execution completed', { component: 'Chanuka' });
       process.exit(0);
     })
     .catch((error) => {
-      logger.error('\n❌ Test execution failed:', { component: 'SimpleTool' }, error);
+      logger.error('\n❌ Test execution failed:', { component: 'Chanuka' }, error);
       process.exit(1);
     });
 }

@@ -30,7 +30,7 @@ import { router as adminRouter } from './features/admin/admin.js';
 import { router as cacheRouter } from './infrastructure/cache/cache.js';
 import { cacheCoordinator } from './infrastructure/cache/index.js';
 // import { router as realTimeTrackingRouter } from './features/bills/real-time-tracking.js'; // TODO: Implement real-time tracking router
-import { router as alertPreferencesRouter } from './features/users/alert-preferences/unified_alert_routes.js';
+import { router as alertPreferencesRouter } from './features/alert-preferences/unified_alert_routes.js';
 // import engagementAnalyticsRouter from './features/analytics/engagement-analytics.js'; // TODO: Implement engagement analytics router
 // import { sponsorConflictAnalysisRouter } from './features/bills/sponsor-conflict-analysis.js'; // TODO: Implement sponsor conflict analysis router
 // import { votingPatternAnalysisRouter } from './features/bills/voting-pattern-analysis.js'; // TODO: Implement voting pattern analysis router
@@ -66,7 +66,7 @@ import { serveSwagger, setupSwagger } from './features/analytics/swagger.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
+export const app = express();
 const PORT = config.server.port;
 const isDevelopment = config.server.nodeEnv === 'development';
 
@@ -231,7 +231,7 @@ app.get('/api/frontend-health', (req, res) => {
 // Memory analysis endpoint for debugging high memory usage
 app.get('/api/debug/memory-analysis', (req, res) => {
   try {
-    logger.info('🔍 Triggering detailed memory analysis...', { component: 'SimpleTool' });
+    logger.info('🔍 Triggering detailed memory analysis...', { component: 'Chanuka' });
 
     // WebSocket memory analysis
     const wsAnalysis = webSocketService.forceMemoryAnalysis();
@@ -275,7 +275,7 @@ app.get('/api/debug/memory-analysis', (req, res) => {
 
     res.json(analysis);
   } catch (error) {
-    logger.error('Error in memory analysis:', { component: 'SimpleTool' }, error);
+    logger.error('Error in memory analysis:', { component: 'Chanuka' }, error);
     res.status(500).json({
       error: 'Failed to perform memory analysis',
       details: error instanceof Error ? error.message : String(error)
@@ -324,7 +324,7 @@ app.use('/api-docs', serveSwagger, setupSwagger);
 
 // API-specific error handling middleware
 app.use('/api', (error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  logger.error('API Error:', { component: 'SimpleTool' }, error);
+  logger.error('API Error:', { component: 'Chanuka' }, error);
 
   // Handle CORS errors
   if (error.message && error.message.includes('CORS')) {
@@ -382,10 +382,10 @@ app.use(errorHandler);
 async function testConnection() {
   try {
     await db.execute('SELECT 1');
-    logger.info('Database connection established successfully', { component: 'SimpleTool' });
+    logger.info('Database connection established successfully', { component: 'Chanuka' });
   } catch (error) {
-    logger.error('Database connection failed:', { component: 'SimpleTool' }, error);
-    logger.info('Server will continue in development mode without database', { component: 'SimpleTool' });
+    logger.error('Database connection failed:', { component: 'Chanuka' }, error);
+    logger.info('Server will continue in development mode without database', { component: 'Chanuka' });
   }
 }
 
@@ -415,7 +415,7 @@ async function startupInitialization() {
 }
 
 async function performStartupInitialization() {
-  logger.info('🚀 Starting Chanuka Platform...', { component: 'SimpleTool' });
+  logger.info('🚀 Starting Chanuka Platform...', { component: 'Chanuka' });
 
   try {
     // Use the new database fallback service
@@ -430,14 +430,14 @@ async function performStartupInitialization() {
     };
 
     if (dbConnected) {
-      logger.info('✅ Platform ready with full database functionality', { component: 'SimpleTool' });
+      logger.info('✅ Platform ready with full database functionality', { component: 'Chanuka' });
     } else {
-      logger.info('⚠️  Platform starting in demonstration mode with sample data', { component: 'SimpleTool' });
+      logger.info('⚠️  Platform starting in demonstration mode with sample data', { component: 'Chanuka' });
       console.log(`💡 ${healthInfo.system.message}`);
     }
   } catch (error) {
-    logger.error('❌ Startup initialization error:', { component: 'SimpleTool' }, error);
-    logger.info('🔄 Continuing with fallback mode...', { component: 'SimpleTool' });
+    logger.error('❌ Startup initialization error:', { component: 'Chanuka' }, error);
+    logger.info('🔄 Continuing with fallback mode...', { component: 'Chanuka' });
     
     // Ensure demo mode is enabled on startup failure
     databaseFallbackService.setDemoMode(true);
@@ -446,7 +446,7 @@ async function performStartupInitialization() {
 
 // Run initialization without blocking
 startupInitialization().catch(err => {
-  logger.info('Startup initialization error (non-blocking):', { component: 'SimpleTool' }, err.message);
+  logger.info('Startup initialization error (non-blocking):', { component: 'Chanuka' }, err.message);
   // Ensure demo mode is enabled on startup failure
   databaseFallbackService.setDemoMode(true);
 });
@@ -459,52 +459,52 @@ const gracefulShutdown = async (signal: string) => {
   
   try {
     // 1. Stop accepting new connections first
-    logger.info('🛑 Stopping new connections...', { component: 'SimpleTool' });
+    logger.info('🛑 Stopping new connections...', { component: 'Chanuka' });
     
     // 2. Clean up all services in reverse order of initialization
-    logger.info('🧹 Cleaning up services...', { component: 'SimpleTool' });
+    logger.info('🧹 Cleaning up services...', { component: 'Chanuka' });
     
     // Clean up privacy scheduler
     try {
       privacySchedulerService.stop();
       privacySchedulerService.destroy();
     } catch (error) {
-      logger.error('Error stopping privacy scheduler:', { component: 'SimpleTool' }, error);
+      logger.error('Error stopping privacy scheduler:', { component: 'Chanuka' }, error);
     }
     
     // Clean up security monitoring
     try {
       await securityMonitoringService.shutdown();
     } catch (error) {
-      logger.error('Error stopping security monitoring:', { component: 'SimpleTool' }, error);
+      logger.error('Error stopping security monitoring:', { component: 'Chanuka' }, error);
     }
     
     // Clean up search index manager
     try {
       // TODO: Implement shutdown for new SearchIndexManager
     } catch (error) {
-      logger.error('Error stopping search index manager:', { component: 'SimpleTool' }, error);
+      logger.error('Error stopping search index manager:', { component: 'Chanuka' }, error);
     }
     
     // Clean up session cleanup service
     try {
       sessionCleanupService.stop();
     } catch (error) {
-      logger.error('Error stopping session cleanup:', { component: 'SimpleTool' }, error);
+      logger.error('Error stopping session cleanup:', { component: 'Chanuka' }, error);
     }
     
     // Clean up monitoring scheduler
     try {
       await monitoringScheduler.shutdown();
     } catch (error) {
-      logger.error('Error stopping monitoring scheduler:', { component: 'SimpleTool' }, error);
+      logger.error('Error stopping monitoring scheduler:', { component: 'Chanuka' }, error);
     }
     
     // Clean up notification scheduler
     try {
       notificationSchedulerService.cleanup();
     } catch (error) {
-      logger.error('Error stopping notification scheduler:', { component: 'SimpleTool' }, error);
+      logger.error('Error stopping notification scheduler:', { component: 'Chanuka' }, error);
     }
     
     // Clean up notification services
@@ -512,21 +512,21 @@ const gracefulShutdown = async (signal: string) => {
       const { notificationService } = await import('./infrastructure/notifications/notification-service.js');
       notificationService.cleanup();
     } catch (error) {
-      logger.error('Error stopping notification service:', { component: 'SimpleTool' }, error);
+      logger.error('Error stopping notification service:', { component: 'Chanuka' }, error);
     }
     
     // Clean up cache coordinator
     try {
       cacheCoordinator.stop();
     } catch (error) {
-      logger.error('Error stopping cache coordinator:', { component: 'SimpleTool' }, error);
+      logger.error('Error stopping cache coordinator:', { component: 'Chanuka' }, error);
     }
 
     // Clean up WebSocket service
     try {
       await webSocketService.shutdown();
     } catch (error) {
-      logger.error('Error stopping WebSocket service:', { component: 'SimpleTool' }, error);
+      logger.error('Error stopping WebSocket service:', { component: 'Chanuka' }, error);
     }
     
     // Close Vite dev server if running
@@ -534,28 +534,28 @@ const gracefulShutdown = async (signal: string) => {
       const { closeVite } = await import('./vite.js');
       await closeVite();
     } catch (error) {
-      logger.error('Error closing Vite server:', { component: 'SimpleTool' }, error);
+      logger.error('Error closing Vite server:', { component: 'Chanuka' }, error);
     }
     
-    logger.info('✅ All services cleaned up', { component: 'SimpleTool' });
+    logger.info('✅ All services cleaned up', { component: 'Chanuka' });
     
   } catch (error) {
-    logger.error('Error during graceful shutdown:', { component: 'SimpleTool' }, error);
+    logger.error('Error during graceful shutdown:', { component: 'Chanuka' }, error);
   }
   
   // Close HTTP server
   server.close((err) => {
     if (err) {
-      logger.error('Error closing server:', { component: 'SimpleTool' }, err);
+      logger.error('Error closing server:', { component: 'Chanuka' }, err);
       process.exit(1);
     }
-    logger.info('Server closed successfully', { component: 'SimpleTool' });
+    logger.info('Server closed successfully', { component: 'Chanuka' });
     process.exit(0);
   });
   
   // Force exit after 10 seconds
   setTimeout(() => {
-    logger.error('Forced shutdown after timeout', { component: 'SimpleTool' });
+    logger.error('Forced shutdown after timeout', { component: 'Chanuka' });
     process.exit(1);
   }, 10000);
 };
@@ -566,12 +566,12 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
-  logger.error('Uncaught Exception:', { component: 'SimpleTool' }, error);
+  logger.error('Uncaught Exception:', { component: 'Chanuka' }, error);
   gracefulShutdown('UNCAUGHT_EXCEPTION');
 });
 
 process.on('unhandledRejection', (reason) => {
-  logger.error('Unhandled Rejection at:', { component: 'SimpleTool' }, reason);
+  logger.error('Unhandled Rejection at:', { component: 'Chanuka' }, reason);
   gracefulShutdown('UNHANDLED_REJECTION');
 });
 
@@ -580,19 +580,20 @@ server.on('error', (error: NodeJS.ErrnoException) => {
     console.error(`❌ Port ${PORT} is already in use. Please try a different port or stop the existing process.`);
     console.log(`💡 You can try: PORT=4201 npm run dev`);
   } else {
-    logger.error('❌ Server error:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Server error:', { component: 'Chanuka' }, error);
   }
   process.exit(1);
 });
 
-server.listen(config.server.port, config.server.host, async () => {
-  console.log(`Server running on http://${config.server.host}:${config.server.port}`);
+if (process.env.NODE_ENV !== 'test') {
+  server.listen(config.server.port, config.server.host, async () => {
+    console.log(`Server running on http://${config.server.host}:${config.server.port}`);
 
-  // Ensure startup initialization is complete before initializing services
-  await startupInitialization();
+    // Ensure startup initialization is complete before initializing services
+    await startupInitialization();
 
-  // Initialize services in proper order with error handling
-  const serviceInitializers = [
+    // Initialize services in proper order with error handling
+    const serviceInitializers = [
     {
       name: 'Performance monitoring',
       init: () => {
@@ -653,8 +654,8 @@ server.listen(config.server.port, config.server.host, async () => {
     }
   ];
 
-  // Initialize services sequentially to prevent race conditions
-  for (const service of serviceInitializers) {
+    // Initialize services sequentially to prevent race conditions
+    for (const service of serviceInitializers) {
     try {
       await service.init();
       console.log(`✅ ${service.name} initialized`);
@@ -668,15 +669,15 @@ server.listen(config.server.port, config.server.host, async () => {
   try {
     if (isDevelopment) {
       await setupVite(app, server);
-      logger.info('✅ Vite development server integrated successfully', { component: 'SimpleTool' });
+      logger.info('✅ Vite development server integrated successfully', { component: 'Chanuka' });
     } else {
       // Import serveStatic for production
       const { serveStatic } = await import('./vite.js');
       serveStatic(app);
-      logger.info('✅ Production static file serving configured', { component: 'SimpleTool' });
+      logger.info('✅ Production static file serving configured', { component: 'Chanuka' });
     }
   } catch (error) {
-    logger.error('❌ Failed to setup frontend serving:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Failed to setup frontend serving:', { component: 'Chanuka' }, error);
     
     // Fallback error page for frontend requests
     app.use('*', (req, res, next) => {
@@ -711,8 +712,19 @@ server.listen(config.server.port, config.server.host, async () => {
     });
   }
 
-  testConnection();
-});
+    testConnection();
+  });
+} else {
+  // In test environment, avoid starting the HTTP server. Exported `app` will be used by test runners.
+  // Still run a quick testConnection in a non-blocking manner to surface DB connection issues if needed.
+  (async () => {
+    try {
+      await testConnection();
+    } catch (err) {
+      // swallow in tests to avoid failing imports
+    }
+  })();
+}
 
 
 

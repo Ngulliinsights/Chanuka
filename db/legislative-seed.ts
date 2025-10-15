@@ -7,7 +7,7 @@ import {
 } from "../shared/schema.js";
 
 async function seedLegislativeData() {
-  logger.info('Starting legislative data seeding...', { component: 'SimpleTool' });
+  logger.info('Starting legislative data seeding...', { component: 'Chanuka' });
 
   try {
     // Create sample users
@@ -287,15 +287,15 @@ async function seedLegislativeData() {
       }
     ]);
 
-    logger.info('✅ Legislative data seeding completed successfully!', { component: 'SimpleTool' });
-    logger.info('Database now contains:', { component: 'SimpleTool' });
+    logger.info('✅ Legislative data seeding completed successfully!', { component: 'Chanuka' });
+    logger.info('Database now contains:', { component: 'Chanuka' });
     console.log(`- ${sampleUsers.length} users`);
     console.log(`- ${sampleSponsors.length} sponsors`);
     console.log(`- ${sampleBills.length} bills`);
-    logger.info('- Multiple comments, analysis records, and transparency data', { component: 'SimpleTool' });
+    logger.info('- Multiple comments, analysis records, and transparency data', { component: 'Chanuka' });
 
   } catch (error) {
-    logger.error('❌ Error seeding legislative data:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Error seeding legislative data:', { component: 'Chanuka' }, error);
     throw error;
   }
 }
@@ -303,11 +303,11 @@ async function seedLegislativeData() {
 // Run the seed function
 seedLegislativeData()
   .then(() => {
-    logger.info('Seeding process completed!', { component: 'SimpleTool' });
+    logger.info('Seeding process completed!', { component: 'Chanuka' });
     process.exit(0);
   })
   .catch((error) => {
-    logger.error('Seeding failed:', { component: 'SimpleTool' }, error);
+    logger.error('Seeding failed:', { component: 'Chanuka' }, error);
     process.exit(1);
   });
 

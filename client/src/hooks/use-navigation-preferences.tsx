@@ -23,7 +23,7 @@ export function useNavigationPreferences() {
           }
         }
       } catch (error) {
-        logger.error('Failed to load navigation preferences:', { component: 'SimpleTool' }, error);
+        logger.error('Failed to load navigation preferences:', { component: 'Chanuka' }, error);
       } finally {
         // Mark loading as complete regardless of success or failure
         setIsLoading(false);
@@ -42,7 +42,7 @@ export function useNavigationPreferences() {
       try {
         localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify(preferences));
       } catch (error) {
-        logger.error('Failed to save navigation preferences:', { component: 'SimpleTool' }, error);
+        logger.error('Failed to save navigation preferences:', { component: 'Chanuka' }, error);
       }
     }
   }, [preferences, isLoading]);
@@ -115,7 +115,7 @@ export function useNavigationPreferences() {
     try {
       localStorage.removeItem(PREFERENCES_STORAGE_KEY);
     } catch (error) {
-      logger.error('Failed to remove preferences from storage:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to remove preferences from storage:', { component: 'Chanuka' }, error);
     }
   }, [updatePreferences]);
 

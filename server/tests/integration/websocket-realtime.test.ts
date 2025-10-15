@@ -48,6 +48,11 @@ describe('WebSocket and Real-Time Features Integration Tests', () => {
     if (wsClient && wsClient.readyState === WebSocket.OPEN) {
       wsClient.close();
     }
+
+    // Force cleanup of any remaining timers to prevent hanging
+    if (global.gc) {
+      global.gc();
+    }
   });
 
   describe('WebSocket Connection', () => {

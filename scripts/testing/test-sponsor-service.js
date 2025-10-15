@@ -118,11 +118,11 @@ app.get('/api/sponsors/:id/conflicts', (req, res) => {
 });
 
 async function testSponsorAPI() {
-  logger.info('🧪 Testing Sponsor API endpoints...\n', { component: 'SimpleTool' });
+  logger.info('🧪 Testing Sponsor API endpoints...\n', { component: 'Chanuka' });
   
   try {
     // Test 1: Get all sponsors
-    logger.info('1. Testing GET /api/sponsors...', { component: 'SimpleTool' });
+    logger.info('1. Testing GET /api/sponsors...', { component: 'Chanuka' });
     const sponsorsResponse = await request(app)
       .get('/api/sponsors')
       .expect(200);
@@ -131,7 +131,7 @@ async function testSponsorAPI() {
     console.log(`   First sponsor: ${sponsorsResponse.body.data[0].name}`);
     
     // Test 2: Get specific sponsor
-    logger.info('\n2. Testing GET /api/sponsors/:id...', { component: 'SimpleTool' });
+    logger.info('\n2. Testing GET /api/sponsors/:id...', { component: 'Chanuka' });
     const sponsorResponse = await request(app)
       .get('/api/sponsors/1')
       .expect(200);
@@ -143,7 +143,7 @@ async function testSponsorAPI() {
     console.log(`   Bills sponsored: ${sponsor.stats.totalBillsSponsored}`);
     
     // Test 3: Get sponsor conflicts
-    logger.info('\n3. Testing GET /api/sponsors/:id/conflicts...', { component: 'SimpleTool' });
+    logger.info('\n3. Testing GET /api/sponsors/:id/conflicts...', { component: 'Chanuka' });
     const conflictsResponse = await request(app)
       .get('/api/sponsors/1/conflicts')
       .expect(200);
@@ -155,7 +155,7 @@ async function testSponsorAPI() {
     console.log(`   Recommendations: ${conflicts.recommendations.length}`);
     
     // Test 4: Rate limiting (should be disabled in test mode)
-    logger.info('\n4. Testing rate limiting (should be disabled)...', { component: 'SimpleTool' });
+    logger.info('\n4. Testing rate limiting (should be disabled)...', { component: 'Chanuka' });
     const rapidRequests = [];
     for (let i = 0; i < 10; i++) {
       rapidRequests.push(request(app).get('/api/sponsors'));
@@ -165,12 +165,12 @@ async function testSponsorAPI() {
     const successCount = responses.filter(r => r.status === 200).length;
     console.log(`✅ Made 10 rapid requests, ${successCount} succeeded (rate limiting disabled)`);
     
-    logger.info('\n🎉 All sponsor API tests completed successfully!', { component: 'SimpleTool' });
+    logger.info('\n🎉 All sponsor API tests completed successfully!', { component: 'Chanuka' });
     
   } catch (error) {
-    logger.error('❌ Test failed:', { component: 'SimpleTool' }, error.message);
+    logger.error('❌ Test failed:', { component: 'Chanuka' }, error.message);
     if (error.response) {
-      logger.error('Response:', { component: 'SimpleTool' }, error.response.body);
+      logger.error('Response:', { component: 'Chanuka' }, error.response.body);
     }
     throw error;
   }
@@ -178,7 +178,7 @@ async function testSponsorAPI() {
 
 // Test rate limiting configuration
 function testRateLimitConfig() {
-  logger.info('\n🔧 Testing rate limit configuration...', { component: 'SimpleTool' });
+  logger.info('\n🔧 Testing rate limit configuration...', { component: 'Chanuka' });
   
   // Test environment detection
   console.log(`Environment: ${process.env.NODE_ENV}`);
@@ -192,26 +192,26 @@ function testRateLimitConfig() {
     test: { max: 10000, windowMs: 15 * 60 * 1000 }
   };
   
-  logger.info('Rate limit configurations:', { component: 'SimpleTool' });
+  logger.info('Rate limit configurations:', { component: 'Chanuka' });
   Object.entries(testLimits).forEach(([env, config]) => {
     console.log(`  ${env}: ${config.max} requests per ${config.windowMs/1000/60} minutes`);
   });
   
-  logger.info('✅ Rate limit configuration verified', { component: 'SimpleTool' });
+  logger.info('✅ Rate limit configuration verified', { component: 'Chanuka' });
 }
 
 async function runTests() {
-  logger.info('🚀 Starting Sponsor Service Tests\n', { component: 'SimpleTool' });
+  logger.info('🚀 Starting Sponsor Service Tests\n', { component: 'Chanuka' });
   
   try {
     testRateLimitConfig();
     await testSponsorAPI();
     
-    logger.info('\n✨ All tests completed successfully!', { component: 'SimpleTool' });
+    logger.info('\n✨ All tests completed successfully!', { component: 'Chanuka' });
     process.exit(0);
     
   } catch (error) {
-    logger.error('\n💥 Tests failed:', { component: 'SimpleTool' }, error.message);
+    logger.error('\n💥 Tests failed:', { component: 'Chanuka' }, error.message);
     process.exit(1);
   }
 }

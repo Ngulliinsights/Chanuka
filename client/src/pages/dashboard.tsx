@@ -59,7 +59,7 @@ function Dashboard() {
       title: 'Track New Bill',
       description: 'Add a bill to your watchlist',
       icon: '➕',
-      action: () => logger.info('Track bill', { component: 'SimpleTool' }, ),
+      action: () => logger.info('Track bill', { component: 'Chanuka' }, ),
     },
     {
       title: 'Submit Analysis',

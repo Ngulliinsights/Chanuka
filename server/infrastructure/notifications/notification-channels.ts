@@ -436,7 +436,7 @@ export class NotificationChannelService {
     if (relatedBillId) text += `Related Bill ID: ${relatedBillId}\n`;
     if (priority) text += `Priority: ${priority.toUpperCase()}\n`;
     if (actionUrl) text += `\nView details: ${actionUrl}\n`;
-    text += `\nBest regards,\nSimpleTool Legislative Tracking`;
+    text += `\nBest regards,\nChanuka Legislative Tracking`;
 
     // HTML version
     const priorityColor = this.getPriorityColor(priority);
@@ -460,7 +460,7 @@ export class NotificationChannelService {
       <body>
         <div class="container">
           <div class="header">
-            <h1 style="margin: 0;">SimpleTool</h1>
+            <h1 style="margin: 0;">Chanuka</h1>
           </div>
           <div class="content">
             <h2 style="color: #2c3e50; margin-top: 0;">${title}</h2>

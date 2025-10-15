@@ -73,7 +73,7 @@ export function aiRequestMiddleware(options: AIMiddlewareOptions) {
     }
 
     // Log request
-    logger.info('AI Request Started', { component: 'SimpleTool' }, {
+    logger.info('AI Request Started', { component: 'Chanuka' }, {
       requestId,
       service: options.service,
       operation: req.aiContext.operation,
@@ -132,7 +132,7 @@ export function aiCachingMiddleware(options: AIMiddlewareOptions) {
           req.aiContext.cached = true;
         }
         
-        logger.info('AI Cache Hit', { component: 'SimpleTool' }, {
+        logger.info('AI Cache Hit', { component: 'Chanuka' }, {
           requestId: req.aiContext?.requestId,
           service: options.service,
           cacheKey,
@@ -288,7 +288,7 @@ function logAIResponse(
   const duration = performance.now() - req.aiContext.startTime;
   const success = res.statusCode >= 200 && res.statusCode < 300;
 
-  logger.info('AI Request Completed', { component: 'SimpleTool' }, {
+  logger.info('AI Request Completed', { component: 'Chanuka' }, {
     requestId: req.aiContext.requestId,
     service: options.service,
     operation: req.aiContext.operation,
@@ -328,7 +328,7 @@ interface AIMetrics {
 function recordAIMetrics(metrics: AIMetrics): void {
   // This would integrate with your metrics collection system
   // For now, we'll just log the metrics
-  logger.info('AI Metrics', { component: 'SimpleTool' }, metrics);
+  logger.info('AI Metrics', { component: 'Chanuka' }, metrics);
 }
 
 

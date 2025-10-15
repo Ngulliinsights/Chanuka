@@ -78,7 +78,7 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
       }));
 
     } catch (error) {
-      logger.error('Browser compatibility check failed:', { component: 'SimpleTool' }, error);
+      logger.error('Browser compatibility check failed:', { component: 'Chanuka' }, error);
       setState(prev => ({
         ...prev,
         isChecking: false,
@@ -119,7 +119,7 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
         window.location.reload();
       }
     } catch (error) {
-      logger.error('Failed to clear cache:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to clear cache:', { component: 'Chanuka' }, error);
       window.location.reload();
     }
   };

@@ -32,7 +32,7 @@ export class CacheMiddlewareProvider implements MiddlewareProvider {
         // Override json method to cache response
         res.json = (body: any) => {
           this.cacheService.set(cacheKey, body, ttl).catch(err => {
-            logger.error('Cache set error:', { component: 'SimpleTool' }, err);
+            logger.error('Cache set error:', { component: 'Chanuka' }, err);
           });
           return originalJson(body);
         };

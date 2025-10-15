@@ -12,7 +12,7 @@ if (typeof window === 'undefined') {
 }
 
 async function setupSchema() {
-  logger.info('🔧 Setting up database schema...', { component: 'SimpleTool' });
+  logger.info('🔧 Setting up database schema...', { component: 'Chanuka' });
 
   if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL must be set');
@@ -22,7 +22,7 @@ async function setupSchema() {
 
   try {
     // Create all required tables with IF NOT EXISTS
-    logger.info('📋 Creating tables...', { component: 'SimpleTool' });
+    logger.info('📋 Creating tables...', { component: 'Chanuka' });
 
     // Users table (might already exist)
     await pool.query(`
@@ -225,9 +225,9 @@ async function setupSchema() {
       );
     `);
 
-    logger.info('✅ Database schema setup completed successfully!', { component: 'SimpleTool' });
+    logger.info('✅ Database schema setup completed successfully!', { component: 'Chanuka' });
   } catch (error) {
-    logger.error('💥 Schema setup failed:', { component: 'SimpleTool' }, error.message);
+    logger.error('💥 Schema setup failed:', { component: 'Chanuka' }, error.message);
     throw error;
   } finally {
     await pool.end();
@@ -236,11 +236,11 @@ async function setupSchema() {
 
 setupSchema()
   .then(() => {
-    logger.info('Schema setup process completed', { component: 'SimpleTool' });
+    logger.info('Schema setup process completed', { component: 'Chanuka' });
     process.exit(0);
   })
   .catch((error) => {
-    logger.error('Schema setup process failed:', { component: 'SimpleTool' }, error);
+    logger.error('Schema setup process failed:', { component: 'Chanuka' }, error);
     process.exit(1);
   });
 

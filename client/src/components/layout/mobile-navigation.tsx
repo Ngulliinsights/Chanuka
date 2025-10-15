@@ -104,7 +104,7 @@ const MobileNavigation: React.FC = () => {
       const data: AuthResponse = await response.json();
       return data.user;
     } catch (error) {
-      logger.error('Failed to fetch user:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to fetch user:', { component: 'Chanuka' }, error);
       return null;
     }
   }, []);
@@ -228,7 +228,7 @@ const MobileNavigationContent: React.FC = () => {
       const data: AuthResponse = await response.json();
       return data.user;
     } catch (error) {
-      logger.error('Failed to fetch user:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to fetch user:', { component: 'Chanuka' }, error);
       return null;
     }
   }, []);

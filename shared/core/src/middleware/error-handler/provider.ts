@@ -12,7 +12,7 @@ export class ErrorHandlerMiddlewareProvider implements MiddlewareProvider {
   create(options: Record<string, any>) {
     return (error: Error, req: Request, res: Response, next: NextFunction): void => {
       // Log the error
-      logger.error('Unhandled error:', { component: 'SimpleTool' }, error);
+      logger.error('Unhandled error:', { component: 'Chanuka' }, error);
 
       // Send error response
       res.status(500).json({

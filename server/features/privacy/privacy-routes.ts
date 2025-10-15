@@ -97,7 +97,7 @@ router.get('/preferences', authenticateToken, async (req: AuthenticatedRequest, 
     return ApiSuccess(res, preferences, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    logger.error('Error fetching privacy preferences:', { component: 'SimpleTool' }, createErrorDetails(error));
+    logger.error('Error fetching privacy preferences:', { component: 'Chanuka' }, createErrorDetails(error));
     return ApiError(res, 'Failed to fetch privacy preferences', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -141,7 +141,7 @@ router.patch('/preferences', authenticateToken, async (req: AuthenticatedRequest
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    logger.error('Error updating privacy preferences:', { component: 'SimpleTool' }, createErrorDetails(error));
+    logger.error('Error updating privacy preferences:', { component: 'Chanuka' }, createErrorDetails(error));
     return ApiError(res, 'Failed to update privacy preferences', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -204,7 +204,7 @@ router.post('/data-export', authenticateToken, async (req: AuthenticatedRequest,
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    logger.error('Error exporting user data:', { component: 'SimpleTool' }, createErrorDetails(error));
+    logger.error('Error exporting user data:', { component: 'Chanuka' }, createErrorDetails(error));
     return ApiError(res, 'Failed to export user data', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -252,7 +252,7 @@ router.post('/data-deletion', authenticateToken, async (req: AuthenticatedReques
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    logger.error('Error deleting user data:', { component: 'SimpleTool' }, createErrorDetails(error));
+    logger.error('Error deleting user data:', { component: 'Chanuka' }, createErrorDetails(error));
     return ApiError(res, 'Failed to delete user data', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -286,7 +286,7 @@ router.get('/gdpr-report', authenticateToken, async (req: AuthenticatedRequest, 
     return ApiSuccess(res, complianceReport, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    logger.error('Error generating GDPR report:', { component: 'SimpleTool' }, createErrorDetails(error));
+    logger.error('Error generating GDPR report:', { component: 'Chanuka' }, createErrorDetails(error));
     return ApiError(res, 'Failed to generate GDPR compliance report', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -305,7 +305,7 @@ router.get('/retention-policies', async (req, res) => {
     return ApiSuccess(res, { policies }, 
       ApiResponseWrapper.createMetadata(startTime, 'cache'));
   } catch (error) {
-    logger.error('Error fetching retention policies:', { component: 'SimpleTool' }, createErrorDetails(error));
+    logger.error('Error fetching retention policies:', { component: 'Chanuka' }, createErrorDetails(error));
     return ApiError(res, 'Failed to fetch retention policies', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'cache'));
   }
@@ -347,7 +347,7 @@ router.post('/cleanup', authenticateToken, async (req: AuthenticatedRequest, res
     return ApiSuccess(res, cleanupResult, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    logger.error('Error running data cleanup:', { component: 'SimpleTool' }, createErrorDetails(error));
+    logger.error('Error running data cleanup:', { component: 'Chanuka' }, createErrorDetails(error));
     return ApiError(res, 'Failed to run data cleanup', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -403,7 +403,7 @@ router.patch('/retention-policies', authenticateToken, async (req: Authenticated
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    logger.error('Error updating retention policy:', { component: 'SimpleTool' }, createErrorDetails(error));
+    logger.error('Error updating retention policy:', { component: 'Chanuka' }, createErrorDetails(error));
     return ApiError(res, 'Failed to update retention policy', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -442,7 +442,7 @@ router.get('/dashboard', authenticateToken, async (req: AuthenticatedRequest, re
     return ApiSuccess(res, dashboard, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    logger.error('Error fetching privacy dashboard:', { component: 'SimpleTool' }, createErrorDetails(error));
+    logger.error('Error fetching privacy dashboard:', { component: 'Chanuka' }, createErrorDetails(error));
     return ApiError(res, 'Failed to fetch privacy dashboard', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -497,7 +497,7 @@ router.post('/withdraw-consent', authenticateToken, async (req: AuthenticatedReq
       updatedPreferences: updatedPrefs
     }, ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    logger.error('Error withdrawing consent:', { component: 'SimpleTool' }, createErrorDetails(error));
+    logger.error('Error withdrawing consent:', { component: 'Chanuka' }, createErrorDetails(error));
     return ApiError(res, 'Failed to withdraw consent', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }

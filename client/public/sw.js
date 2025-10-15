@@ -32,16 +32,16 @@ const API_CACHE_PATTERNS = [
 
 // Install event - cache critical assets
 self.addEventListener('install', (event) => {
-  logger.info('Service Worker: Installing...', { component: 'SimpleTool' });
+  logger.info('Service Worker: Installing...', { component: 'Chanuka' });
   
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        logger.info('Service Worker: Precaching assets', { component: 'SimpleTool' });
+        logger.info('Service Worker: Precaching assets', { component: 'Chanuka' });
         return cache.addAll(PRECACHE_ASSETS);
       })
       .then(() => {
-        logger.info('Service Worker: Skip waiting', { component: 'SimpleTool' });
+        logger.info('Service Worker: Skip waiting', { component: 'Chanuka' });
         return self.skipWaiting();
       })
   );
@@ -49,7 +49,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  logger.info('Service Worker: Activating...', { component: 'SimpleTool' });
+  logger.info('Service Worker: Activating...', { component: 'Chanuka' });
   
   event.waitUntil(
     caches.keys()
@@ -57,14 +57,14 @@ self.addEventListener('activate', (event) => {
         return Promise.all(
           cacheNames.map((cacheName) => {
             if (cacheName !== CACHE_NAME) {
-              logger.info('Service Worker: Deleting old cache:', { component: 'SimpleTool' }, cacheName);
+              logger.info('Service Worker: Deleting old cache:', { component: 'Chanuka' }, cacheName);
               return caches.delete(cacheName);
             }
           })
         );
       })
       .then(() => {
-        logger.info('Service Worker: Claiming clients', { component: 'SimpleTool' });
+        logger.info('Service Worker: Claiming clients', { component: 'Chanuka' });
         return self.clients.claim();
       })
   );
@@ -152,7 +152,7 @@ async function handleApiRequest(request) {
     return response;
 
   } catch (error) {
-    logger.info('Service Worker: API request failed, checking cache:', { component: 'SimpleTool' }, error);
+    logger.info('Service Worker: API request failed, checking cache:', { component: 'Chanuka' }, error);
     
     // Try to serve from cache
     const cachedResponse = await caches.match(request);
@@ -196,7 +196,7 @@ async function handleStaticAssets(request) {
     return response;
 
   } catch (error) {
-    logger.info('Service Worker: Static asset request failed:', { component: 'SimpleTool' }, error);
+    logger.info('Service Worker: Static asset request failed:', { component: 'Chanuka' }, error);
     
     // Try to serve from cache
     const cachedResponse = await caches.match(request);
@@ -227,7 +227,7 @@ async function handleNavigation(request) {
     return response;
 
   } catch (error) {
-    logger.info('Service Worker: Navigation request failed, checking cache:', { component: 'SimpleTool' }, error);
+    logger.info('Service Worker: Navigation request failed, checking cache:', { component: 'Chanuka' }, error);
     
     // Try to serve from cache
     const cachedResponse = await caches.match(request);
@@ -265,7 +265,7 @@ async function handleDefault(request) {
   try {
     return await fetch(request);
   } catch (error) {
-    logger.info('Service Worker: Default request failed:', { component: 'SimpleTool' }, error);
+    logger.info('Service Worker: Default request failed:', { component: 'Chanuka' }, error);
     
     // Try to serve from cache
     const cachedResponse = await caches.match(request);
@@ -283,7 +283,7 @@ async function handleDefault(request) {
 
 // Handle background sync for offline actions
 self.addEventListener('sync', (event) => {
-  logger.info('Service Worker: Background sync triggered:', { component: 'SimpleTool' }, event.tag);
+  logger.info('Service Worker: Background sync triggered:', { component: 'Chanuka' }, event.tag);
   
   if (event.tag === 'background-sync') {
     event.waitUntil(handleBackgroundSync());
@@ -301,11 +301,11 @@ async function handleBackgroundSync() {
         await processAction(action);
         await removePendingAction(action.id);
       } catch (error) {
-        logger.info('Service Worker: Failed to process action:', { component: 'SimpleTool' }, error);
+        logger.info('Service Worker: Failed to process action:', { component: 'Chanuka' }, error);
       }
     }
   } catch (error) {
-    logger.info('Service Worker: Background sync failed:', { component: 'SimpleTool' }, error);
+    logger.info('Service Worker: Background sync failed:', { component: 'Chanuka' }, error);
   }
 }
 
@@ -317,17 +317,17 @@ async function getPendingActions() {
 
 async function processAction(action) {
   // This would process the pending action
-  logger.info('Processing action:', { component: 'SimpleTool' }, action);
+  logger.info('Processing action:', { component: 'Chanuka' }, action);
 }
 
 async function removePendingAction(id) {
   // This would remove the action from IndexedDB
-  logger.info('Removing action:', { component: 'SimpleTool' }, id);
+  logger.info('Removing action:', { component: 'Chanuka' }, id);
 }
 
 // Handle push notifications
 self.addEventListener('push', (event) => {
-  logger.info('Service Worker: Push notification received', { component: 'SimpleTool' });
+  logger.info('Service Worker: Push notification received', { component: 'Chanuka' });
   
   const options = {
     body: 'You have new updates available',
@@ -359,7 +359,7 @@ self.addEventListener('push', (event) => {
 
 // Handle notification clicks
 self.addEventListener('notificationclick', (event) => {
-  logger.info('Service Worker: Notification clicked', { component: 'SimpleTool' });
+  logger.info('Service Worker: Notification clicked', { component: 'Chanuka' });
   
   event.notification.close();
 
@@ -381,7 +381,7 @@ self.addEventListener('notificationclick', (event) => {
 
 // Handle messages from the main thread
 self.addEventListener('message', (event) => {
-  logger.info('Service Worker: Message received:', { component: 'SimpleTool' }, event.data);
+  logger.info('Service Worker: Message received:', { component: 'Chanuka' }, event.data);
   
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();

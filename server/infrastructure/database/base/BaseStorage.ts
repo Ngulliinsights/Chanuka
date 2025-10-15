@@ -278,7 +278,7 @@ export abstract class BaseStorage<T> {
       );
       enhancedError.stack = errorStack;
       
-      logger.error('Transaction error:', { component: 'SimpleTool' }, {
+      logger.error('Transaction error:', { component: 'Chanuka' }, {
         duration,
         error: errorMessage,
         stack: errorStack
@@ -333,7 +333,7 @@ export abstract class BaseStorage<T> {
       results.readDatabase = true;
       results.writeDatabase = true;
     } catch (error) {
-      logger.error('Database health check failed:', { component: 'SimpleTool' }, error);
+      logger.error('Database health check failed:', { component: 'Chanuka' }, error);
     }
 
     // Test cache functionality
@@ -351,7 +351,7 @@ export abstract class BaseStorage<T> {
       // Clean up test entry
       this.cache.delete(testKey);
     } catch (error) {
-      logger.error('Cache health check failed:', { component: 'SimpleTool' }, error);
+      logger.error('Cache health check failed:', { component: 'Chanuka' }, error);
     }
 
     return results;

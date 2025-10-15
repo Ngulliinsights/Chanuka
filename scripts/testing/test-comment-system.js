@@ -5,11 +5,11 @@ import { contentModerationService } from '../../server/features/admin/content-mo
 import { logger } from '../utils/logger.js';
 
 async function testCommentSystem() {
-  logger.info('🧪 Testing Comment System...\n', { component: 'SimpleTool' });
+  logger.info('🧪 Testing Comment System...\n', { component: 'Chanuka' });
 
   try {
     // Test 1: Get comments for a bill (should return fallback data)
-    logger.info('1. Testing getBillComments...', { component: 'SimpleTool' });
+    logger.info('1. Testing getBillComments...', { component: 'Chanuka' });
     const commentsResult = await commentService.getBillComments(1, {
       sort: 'recent',
       limit: 10
@@ -19,7 +19,7 @@ async function testCommentSystem() {
     console.log(`   Has more: ${commentsResult.hasMore}\n`);
 
     // Test 2: Create a new comment (should use fallback)
-    logger.info('2. Testing createComment...', { component: 'SimpleTool' });
+    logger.info('2. Testing createComment...', { component: 'Chanuka' });
     const newComment = await commentService.createComment({
       billId: 1,
       userId: 'test-user-123',
@@ -30,7 +30,7 @@ async function testCommentSystem() {
     console.log(`   Content: ${newComment.content.substring(0, 50)}...\n`);
 
     // Test 3: Vote on a comment
-    logger.info('3. Testing comment voting...', { component: 'SimpleTool' });
+    logger.info('3. Testing comment voting...', { component: 'Chanuka' });
     const voteResult = await commentVotingService.voteOnComment(
       1, // comment ID
       'test-user-123',
@@ -41,7 +41,7 @@ async function testCommentSystem() {
     console.log(`   Net votes: ${voteResult.netVotes}\n`);
 
     // Test 4: Get comment statistics
-    logger.info('4. Testing comment statistics...', { component: 'SimpleTool' });
+    logger.info('4. Testing comment statistics...', { component: 'Chanuka' });
     const stats = await commentService.getCommentStats(1);
     console.log(`✅ Comment stats retrieved:`);
     console.log(`   Total comments: ${stats.totalComments}`);
@@ -49,7 +49,7 @@ async function testCommentSystem() {
     console.log(`   Verified comments: ${stats.verifiedComments}\n`);
 
     // Test 5: Content moderation analysis
-    logger.info('5. Testing content moderation...', { component: 'SimpleTool' });
+    logger.info('5. Testing content moderation...', { component: 'Chanuka' });
     const analysis = await contentModerationService.analyzeContent(
       1,
       'comment',
@@ -62,7 +62,7 @@ async function testCommentSystem() {
     console.log(`   Flags: ${analysis.flags.join(', ') || 'None'}\n`);
 
     // Test 6: Flag content
-    logger.info('6. Testing content flagging...', { component: 'SimpleTool' });
+    logger.info('6. Testing content flagging...', { component: 'Chanuka' });
     const flag = await contentModerationService.flagContent(
       'comment',
       1,
@@ -75,7 +75,7 @@ async function testCommentSystem() {
     console.log(`   Severity: ${flag.severity}\n`);
 
     // Test 7: Get moderation queue
-    logger.info('7. Testing moderation queue...', { component: 'SimpleTool' });
+    logger.info('7. Testing moderation queue...', { component: 'Chanuka' });
     const queue = await contentModerationService.getModerationQueue({
       status: 'pending',
       limit: 5
@@ -85,18 +85,18 @@ async function testCommentSystem() {
     console.log(`   Pending flags: ${queue.pendingCount}`);
     console.log(`   High priority flags: ${queue.highPriorityCount}\n`);
 
-    logger.info('🎉 All comment system tests completed successfully!', { component: 'SimpleTool' });
-    logger.info('\n📋 Summary:', { component: 'SimpleTool' });
-    logger.info('   ✅ Threaded comment system', { component: 'SimpleTool' });
-    logger.info('   ✅ Comment voting and engagement', { component: 'SimpleTool' });
-    logger.info('   ✅ Content moderation and analysis', { component: 'SimpleTool' });
-    logger.info('   ✅ Automated flagging system', { component: 'SimpleTool' });
-    logger.info('   ✅ Moderation queue management', { component: 'SimpleTool' });
-    logger.info('   ✅ Comment statistics and analytics', { component: 'SimpleTool' });
+    logger.info('🎉 All comment system tests completed successfully!', { component: 'Chanuka' });
+    logger.info('\n📋 Summary:', { component: 'Chanuka' });
+    logger.info('   ✅ Threaded comment system', { component: 'Chanuka' });
+    logger.info('   ✅ Comment voting and engagement', { component: 'Chanuka' });
+    logger.info('   ✅ Content moderation and analysis', { component: 'Chanuka' });
+    logger.info('   ✅ Automated flagging system', { component: 'Chanuka' });
+    logger.info('   ✅ Moderation queue management', { component: 'Chanuka' });
+    logger.info('   ✅ Comment statistics and analytics', { component: 'Chanuka' });
 
   } catch (error) {
-    logger.error('❌ Test failed:', { component: 'SimpleTool' }, error.message);
-    logger.error('Stack trace:', { component: 'SimpleTool' }, error.stack);
+    logger.error('❌ Test failed:', { component: 'Chanuka' }, error.message);
+    logger.error('Stack trace:', { component: 'Chanuka' }, error.stack);
   }
 }
 

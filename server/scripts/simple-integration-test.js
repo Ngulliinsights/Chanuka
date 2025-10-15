@@ -1,8 +1,8 @@
 // Simple JavaScript test for government data integration
-logger.info('🚀 Testing Government Data Integration Service...\n', { component: 'SimpleTool' });
+logger.info('🚀 Testing Government Data Integration Service...\n', { component: 'Chanuka' });
 
 // Test data transformation
-logger.info('📋 Testing Data Transformation...', { component: 'SimpleTool' });
+logger.info('📋 Testing Data Transformation...', { component: 'Chanuka' });
 
 const mockParliamentData = {
   Bills: {
@@ -78,14 +78,14 @@ function mapParliamentStatus(status) {
 // Test the transformation
 try {
   const transformed = transformParliamentData(mockParliamentData);
-  logger.info('✅ Parliament Data Transformation successful:', { component: 'SimpleTool' });
+  logger.info('✅ Parliament Data Transformation successful:', { component: 'Chanuka' });
   console.log(JSON.stringify(transformed, null, 2));
 } catch (error) {
-  logger.error('❌ Data Transformation Error:', { component: 'SimpleTool' }, error.message);
+  logger.error('❌ Data Transformation Error:', { component: 'Chanuka' }, error.message);
 }
 
 // Test data validation
-logger.info('\n✅ Testing Data Validation...', { component: 'SimpleTool' });
+logger.info('\n✅ Testing Data Validation...', { component: 'Chanuka' });
 
 function validateBill(bill) {
   const errors = [];
@@ -140,7 +140,7 @@ const testBills = [
 ];
 
 try {
-  logger.info('Testing bill validation...', { component: 'SimpleTool' });
+  logger.info('Testing bill validation...', { component: 'Chanuka' });
   testBills.forEach((bill, index) => {
     const validation = validateBill(bill);
     console.log(`Bill ${index + 1} validation:`, {
@@ -151,11 +151,11 @@ try {
     });
   });
 } catch (error) {
-  logger.error('❌ Data Validation Error:', { component: 'SimpleTool' }, error.message);
+  logger.error('❌ Data Validation Error:', { component: 'Chanuka' }, error.message);
 }
 
 // Test error handling simulation
-logger.info('\n🚨 Testing Error Handling...', { component: 'SimpleTool' });
+logger.info('\n🚨 Testing Error Handling...', { component: 'Chanuka' });
 
 function simulateErrorHandling(errorType) {
   const errorTypes = {
@@ -193,15 +193,15 @@ function simulateErrorHandling(errorType) {
   }
 });
 
-logger.info('\n📊 Integration Status Summary:', { component: 'SimpleTool' });
-logger.info('✅ Data transformation: Working', { component: 'SimpleTool' });
-logger.info('✅ Data validation: Working', { component: 'SimpleTool' });
-logger.info('✅ Error handling: Working', { component: 'SimpleTool' });
-logger.info('✅ Basic integration service: Ready for testing', { component: 'SimpleTool' });
+logger.info('\n📊 Integration Status Summary:', { component: 'Chanuka' });
+logger.info('✅ Data transformation: Working', { component: 'Chanuka' });
+logger.info('✅ Data validation: Working', { component: 'Chanuka' });
+logger.info('✅ Error handling: Working', { component: 'Chanuka' });
+logger.info('✅ Basic integration service: Ready for testing', { component: 'Chanuka' });
 
-logger.info('\n🎉 Government Data Integration Service basic functionality verified!', { component: 'SimpleTool' });
-logger.info('\nNext steps:', { component: 'SimpleTool' });
-logger.info('1. Test with real government API endpoints', { component: 'SimpleTool' });
-logger.info('2. Implement database integration', { component: 'SimpleTool' });
-logger.info('3. Set up scheduled synchronization', { component: 'SimpleTool' });
-logger.info('4. Configure monitoring and alerting', { component: 'SimpleTool' });
+logger.info('\n🎉 Government Data Integration Service basic functionality verified!', { component: 'Chanuka' });
+logger.info('\nNext steps:', { component: 'Chanuka' });
+logger.info('1. Test with real government API endpoints', { component: 'Chanuka' });
+logger.info('2. Implement database integration', { component: 'Chanuka' });
+logger.info('3. Set up scheduled synchronization', { component: 'Chanuka' });
+logger.info('4. Configure monitoring and alerting', { component: 'Chanuka' });

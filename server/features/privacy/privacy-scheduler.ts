@@ -16,7 +16,7 @@ class PrivacySchedulerService {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized || this.initializationLock) {
-      logger.info('Privacy scheduler already initialized or initialization in progress', { component: 'SimpleTool' });
+      logger.info('Privacy scheduler already initialized or initialization in progress', { component: 'Chanuka' });
       return;
     }
 
@@ -26,10 +26,10 @@ class PrivacySchedulerService {
       // Schedule daily data cleanup at 2 AM
       this.cleanupJob = cron.schedule('0 2 * * *', async () => {
         if (this.cleanupInProgress) {
-          logger.info('Data cleanup already in progress, skipping...', { component: 'SimpleTool' });
+          logger.info('Data cleanup already in progress, skipping...', { component: 'Chanuka' });
           return;
         }
-        logger.info('Running scheduled data cleanup...', { component: 'SimpleTool' });
+        logger.info('Running scheduled data cleanup...', { component: 'Chanuka' });
         await this.runScheduledCleanup();
       }, {
         timezone: 'UTC'
@@ -38,19 +38,19 @@ class PrivacySchedulerService {
       // Schedule weekly compliance monitoring on Sundays at 3 AM
       this.complianceReportJob = cron.schedule('0 3 * * 0', async () => {
         if (this.complianceInProgress) {
-          logger.info('Compliance monitoring already in progress, skipping...', { component: 'SimpleTool' });
+          logger.info('Compliance monitoring already in progress, skipping...', { component: 'Chanuka' });
           return;
         }
-        logger.info('Running scheduled compliance monitoring...', { component: 'SimpleTool' });
+        logger.info('Running scheduled compliance monitoring...', { component: 'Chanuka' });
         await this.runComplianceMonitoring();
       }, {
         timezone: 'UTC'
       });
 
       this.isInitialized = true;
-      logger.info('✅ Privacy scheduler service initialized', { component: 'SimpleTool' });
+      logger.info('✅ Privacy scheduler service initialized', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Failed to initialize privacy scheduler service:', { component: 'SimpleTool' }, { errorMessage: error instanceof Error ? error.message : String(error) });
+      logger.error('❌ Failed to initialize privacy scheduler service:', { component: 'Chanuka' }, { errorMessage: error instanceof Error ? error.message : String(error) });
       throw error;
     } finally {
       this.initializationLock = false;
@@ -67,12 +67,12 @@ class PrivacySchedulerService {
 
     if (this.cleanupJob) {
       this.cleanupJob.start();
-      logger.info('✅ Data cleanup job started (daily at 2 AM UTC)', { component: 'SimpleTool' });
+      logger.info('✅ Data cleanup job started (daily at 2 AM UTC)', { component: 'Chanuka' });
     }
 
     if (this.complianceReportJob) {
       this.complianceReportJob.start();
-      logger.info('✅ Compliance monitoring job started (weekly on Sundays at 3 AM UTC)', { component: 'SimpleTool' });
+      logger.info('✅ Compliance monitoring job started (weekly on Sundays at 3 AM UTC)', { component: 'Chanuka' });
     }
   }
 
@@ -82,12 +82,12 @@ class PrivacySchedulerService {
   stop(): void {
     if (this.cleanupJob) {
       this.cleanupJob.stop();
-      logger.info('🛑 Data cleanup job stopped', { component: 'SimpleTool' });
+      logger.info('🛑 Data cleanup job stopped', { component: 'Chanuka' });
     }
 
     if (this.complianceReportJob) {
       this.complianceReportJob.stop();
-      logger.info('🛑 Compliance monitoring job stopped', { component: 'SimpleTool' });
+      logger.info('🛑 Compliance monitoring job stopped', { component: 'Chanuka' });
     }
   }
 
@@ -102,7 +102,7 @@ class PrivacySchedulerService {
       error?: string;
     }>;
   }> {
-    logger.info('Running manual data cleanup...', { component: 'SimpleTool' });
+    logger.info('Running manual data cleanup...', { component: 'Chanuka' });
     return await this.runScheduledCleanup();
   }
 
@@ -118,7 +118,7 @@ class PrivacySchedulerService {
     }>;
   }> {
     if (this.cleanupInProgress) {
-      logger.info('Data cleanup already in progress', { component: 'SimpleTool' });
+      logger.info('Data cleanup already in progress', { component: 'Chanuka' });
       return { success: false, cleanupResults: [] };
     }
     
@@ -153,12 +153,12 @@ class PrivacySchedulerService {
       if (result.success) {
         console.log(`✅ Scheduled data cleanup completed. Deleted ${totalRecordsDeleted} records.`);
       } else {
-        logger.error('❌ Scheduled data cleanup completed with errors', { component: 'SimpleTool' });
+        logger.error('❌ Scheduled data cleanup completed with errors', { component: 'Chanuka' });
       }
 
       return result;
     } catch (error) {
-      logger.error('❌ Error during scheduled data cleanup:', { component: 'SimpleTool' }, { errorMessage: error instanceof Error ? error.message : String(error) });
+      logger.error('❌ Error during scheduled data cleanup:', { component: 'Chanuka' }, { errorMessage: error instanceof Error ? error.message : String(error) });
       
       // Log the error
       await auditLogger.log({
@@ -189,7 +189,7 @@ class PrivacySchedulerService {
    */
   private async runComplianceMonitoring(): Promise<void> {
     if (this.complianceInProgress) {
-      logger.info('Compliance monitoring already in progress', { component: 'SimpleTool' });
+      logger.info('Compliance monitoring already in progress', { component: 'Chanuka' });
       return;
     }
     
@@ -241,11 +241,11 @@ class PrivacySchedulerService {
           console.warn(`   - ${policy.dataType}: Last cleanup ${policy.lastCleanup || 'never'}`);
         });
       } else {
-        logger.info('✅ All retention policies are up to date', { component: 'SimpleTool' });
+        logger.info('✅ All retention policies are up to date', { component: 'Chanuka' });
       }
 
     } catch (error) {
-      logger.error('❌ Error during compliance monitoring:', { component: 'SimpleTool' }, { errorMessage: error instanceof Error ? error.message : String(error) });
+      logger.error('❌ Error during compliance monitoring:', { component: 'Chanuka' }, { errorMessage: error instanceof Error ? error.message : String(error) });
       
       // Log the error
       await auditLogger.log({
@@ -302,7 +302,7 @@ class PrivacySchedulerService {
     }
 
     this.isInitialized = false;
-    logger.info('🧹 Privacy scheduler service destroyed', { component: 'SimpleTool' });
+    logger.info('🧹 Privacy scheduler service destroyed', { component: 'Chanuka' });
   }
 }
 

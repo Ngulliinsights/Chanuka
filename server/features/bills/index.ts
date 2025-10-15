@@ -1,32 +1,23 @@
-// Bills Feature Domain
-// Centralized exports for bill-related functionality
+// Bills Feature Domain - Domain-Driven Design Architecture
+// Centralized exports for bill-related functionality organized by DDD layers
 
-// Routes
-export { default as billsRouter } from './bills';
-export { default as sponsorshipRouter } from './sponsorship';
-export { default as sponsorsRouter } from './sponsors';
-export { default as billTrackingRouter } from './bill-tracking';
-export { default as realTimeTrackingRouter } from './real-time-tracking';
-export { default as votingPatternAnalysisRouter } from './voting-pattern-analysis';
-export { default as sponsorConflictAnalysisRouter } from './sponsor-conflict-analysis';
+// Application Layer - Application services and use cases
+export * from './application/index.js';
 
-// Services
-export { BillService } from './bill-service';
-export { BillTrackingService } from './bill-tracking';
-export { BillStatusMonitorService } from './bill-status-monitor';
-export { SponsorService } from './sponsor-service';
-export { SponsorConflictAnalysisService } from './sponsor-conflict-analysis';
-export { SponsorshipAnalysisService } from './sponsorship-analysis';
-export { VotingPatternAnalysisService } from './voting-pattern-analysis';
-export { RealTimeAnalysisService } from './real-time-analysis';
+// Domain Layer - Domain entities, value objects, and business rules
+export * from './domain/index.js';
 
-// Storage
-export { BillStorage } from './bill-storage';
-export { LegislativeStorage } from './legislative-storage';
+// Infrastructure Layer - Repositories, external integrations, and infrastructure concerns
+export * from './infrastructure/index.js';
 
-// Types
-export * from './LegislativeStorageTypes';
-export * from './bill';
+// Presentation Layer - Controllers, routes, and presentation logic
+export * from './presentation/index.js';
+
+// Legacy exports for backward compatibility (to be deprecated)
+export { BillService } from './application/bill-service.js';
+export { billsService, BillNotFoundError, CommentNotFoundError, ValidationError } from './application/bills.js';
+export { BillStorage, billStorage } from './infrastructure/bill-storage.js';
+export * from './domain/LegislativeStorageTypes.js';
 
 
 

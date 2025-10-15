@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { databaseFallbackService } from '../../infrastructure/database/database-fallback.js';
 import { demoDataService } from '../../infrastructure/demo-data.js';
-import request from 'supertest';
+import * as request from 'supertest';
 import { app } from '../../index.js';
 import { logger } from '../utils/logger';
 
@@ -12,16 +12,22 @@ describe('Database Fallback Integration Tests', () => {
     jest.clearAllMocks();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     // Cleanup after each test
     databaseFallbackService.cleanup();
+
+    // Force cleanup of any remaining timers to prevent hanging
+    if (global.gc) {
+      global.gc();
+    }
   });
 
   describe('Database Connection Handling', () => {
     it('should handle database connection failure gracefully', async () => {
       // Mock database connection failure
-      const originalTestConnection = databaseFallbackService.testConnection;
-      databaseFallbackService.testConnection = jest.fn().mockResolvedValue(false);
+  const originalTestConnection = databaseFallbackService.testConnection;
+  // Provide a typed replacement that returns a Promise<boolean>
+  databaseFallbackService.testConnection = async () => false;
 
       const result = await databaseFallbackService.initialize();
 

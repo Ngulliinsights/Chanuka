@@ -81,7 +81,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   // Logging helper that respects debug flag
   const log = useCallback((...args: any[]) => {
     if (debug) {
-      logger.info('[WebSocket]', { component: 'SimpleTool' }, ...args);
+      logger.info('[WebSocket]', { component: 'Chanuka' }, ...args);
     }
   }, [debug]);
 
@@ -126,7 +126,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
           }, 5000); // Wait 5 seconds for pong response
 
         } catch (error) {
-          logger.error('Failed to send ping:', { component: 'SimpleTool' }, error);
+          logger.error('Failed to send ping:', { component: 'Chanuka' }, error);
           ws.current?.close(4000, 'Ping failed');
         }
       }
@@ -259,12 +259,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             try {
               handler(message);
             } catch (error) {
-              logger.error('Error in message handler:', { component: 'SimpleTool' }, error);
+              logger.error('Error in message handler:', { component: 'Chanuka' }, error);
             }
           });
 
         } catch (error) {
-          logger.error('Error parsing WebSocket message:', { component: 'SimpleTool' }, error);
+          logger.error('Error parsing WebSocket message:', { component: 'Chanuka' }, error);
         }
       };
 
@@ -303,7 +303,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
               return { ...prev, reconnectAttempts: newAttempts };
             } else {
-              logger.error('Max reconnection attempts reached', { component: 'SimpleTool' });
+              logger.error('Max reconnection attempts reached', { component: 'Chanuka' });
               return {
                 ...prev,
                 error: 'Failed to reconnect after multiple attempts'
@@ -315,7 +315,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
       // Handle connection errors
       ws.current.onerror = (error) => {
-        logger.error('WebSocket error:', { component: 'SimpleTool' }, error);
+        logger.error('WebSocket error:', { component: 'Chanuka' }, error);
         safeSetState(prev => ({
           ...prev,
           error: 'Connection error',
@@ -324,7 +324,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       };
 
     } catch (error) {
-      logger.error('Failed to create WebSocket connection:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to create WebSocket connection:', { component: 'Chanuka' }, error);
       safeSetState(prev => ({
         ...prev,
         error: error instanceof Error ? error.message : 'Failed to connect',
@@ -341,7 +341,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         ws.current.send(JSON.stringify(message));
         return true;
       } catch (error) {
-        logger.error('Failed to send message:', { component: 'SimpleTool' }, error);
+        logger.error('Failed to send message:', { component: 'Chanuka' }, error);
         return false;
       }
     }
@@ -470,12 +470,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             safeSetState(prev => ({ ...prev, lastMessage: message }));
             messageHandlers.current.forEach(handler => handler(message));
           } catch (error) {
-            logger.error('Failed to parse WebSocket message:', { component: 'SimpleTool' }, error);
+            logger.error('Failed to parse WebSocket message:', { component: 'Chanuka' }, error);
           }
         };
 
         ws.current.onerror = (error) => {
-          logger.error('WebSocket error:', { component: 'SimpleTool' }, error);
+          logger.error('WebSocket error:', { component: 'Chanuka' }, error);
           safeSetState(prev => ({ ...prev, error: 'Connection error' }));
         };
 
@@ -499,7 +499,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         };
 
       } catch (error) {
-        logger.error('Failed to create WebSocket connection:', { component: 'SimpleTool' }, error);
+        logger.error('Failed to create WebSocket connection:', { component: 'Chanuka' }, error);
         safeSetState(prev => ({ ...prev, error: 'Failed to connect', isConnecting: false }));
       }
     };

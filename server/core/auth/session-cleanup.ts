@@ -11,7 +11,7 @@ export class SessionCleanupService {
    */
   start(intervalMinutes: number = 60): void {
     if (this.isRunning) {
-      logger.info('Session cleanup service is already running', { component: 'SimpleTool' });
+      logger.info('Session cleanup service is already running', { component: 'Chanuka' });
       return;
     }
 
@@ -38,7 +38,7 @@ export class SessionCleanupService {
       this.cleanupInterval = null;
     }
     this.isRunning = false;
-    logger.info('🛑 Session cleanup service stopped', { component: 'SimpleTool' });
+    logger.info('🛑 Session cleanup service stopped', { component: 'Chanuka' });
   }
 
   /**
@@ -46,11 +46,11 @@ export class SessionCleanupService {
    */
   async runCleanup(): Promise<void> {
     try {
-      logger.info('🧹 Running session cleanup...', { component: 'SimpleTool' });
+      logger.info('🧹 Running session cleanup...', { component: 'Chanuka' });
       await authService.cleanupExpiredTokens();
-      logger.info('✅ Session cleanup completed', { component: 'SimpleTool' });
+      logger.info('✅ Session cleanup completed', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Session cleanup failed:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Session cleanup failed:', { component: 'Chanuka' }, error);
     }
   }
 

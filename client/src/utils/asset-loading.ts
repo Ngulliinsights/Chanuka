@@ -545,9 +545,9 @@ export class AssetLoadingManager {
 
     try {
       await this.loadAssets(criticalAssets, 'preload');
-      logger.info('Critical assets preloaded successfully', { component: 'SimpleTool' });
+      logger.info('Critical assets preloaded successfully', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('Failed to preload critical assets:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to preload critical assets:', { component: 'Chanuka' }, error);
     }
   }
 

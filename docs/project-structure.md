@@ -253,6 +253,58 @@ client/
 │   ├── docs/
 │   │   ├── navigation-performance-accessibility.md
 │   │   ├── navigation-state-persistence.md
+│   ├── features/
+│   │   ├── analytics/
+│   │   │   ├── components/
+│   │   │   │   ├── AnalyticsDashboard.tsx
+│   │   │   ├── hooks/
+│   │   │   │   ├── useAnalytics.ts
+│   │   │   ├── index.ts
+│   │   │   ├── services/
+│   │   │   │   ├── analytics-api.ts
+│   │   │   ├── types/
+│   │   │   ├── types.ts
+│   │   ├── bills/
+│   │   │   ├── components/
+│   │   │   │   ├── BillCard.tsx
+│   │   │   │   ├── BillList.tsx
+│   │   │   ├── hooks/
+│   │   │   │   ├── useBills.ts
+│   │   │   ├── index.ts
+│   │   │   ├── services/
+│   │   │   │   ├── bill-api.ts
+│   │   │   ├── types/
+│   │   │   ├── types.ts
+│   │   ├── community/
+│   │   │   ├── components/
+│   │   │   │   ├── CommentThread.tsx
+│   │   │   ├── hooks/
+│   │   │   │   ├── useCommunity.ts
+│   │   │   ├── index.ts
+│   │   │   ├── services/
+│   │   │   │   ├── community-api.ts
+│   │   │   ├── types/
+│   │   │   ├── types.ts
+│   │   ├── search/
+│   │   │   ├── components/
+│   │   │   │   ├── SearchBar.tsx
+│   │   │   ├── hooks/
+│   │   │   │   ├── useSearch.ts
+│   │   │   ├── index.ts
+│   │   │   ├── services/
+│   │   │   │   ├── search-api.ts
+│   │   │   ├── types/
+│   │   │   ├── types.ts
+│   │   ├── users/
+│   │   │   ├── components/
+│   │   │   │   ├── UserProfile.tsx
+│   │   │   ├── hooks/
+│   │   │   │   ├── useUsers.ts
+│   │   │   ├── index.ts
+│   │   │   ├── services/
+│   │   │   │   ├── user-api.ts
+│   │   │   ├── types/
+│   │   │   ├── types.ts
 │   ├── hooks/
 │   │   ├── __tests__/
 │   │   │   ├── use-api-with-fallback.integration.test.tsx
@@ -413,9 +465,13 @@ docs/
 │   ├── radix-ui-usage-matrix.md
 │   ├── schema-congruence-progress.md
 ├── analytics-core-integration.md
-├── chanuka_restructure_design.md
-├── chanuka_restructure_reqs.md
-├── chanuka_restructure_tasks.md
+├── chanuka/
+│   ├── chanuka_requirements_v4.md
+│   ├── chanuka_unified_reqs.md
+│   ├── chanuka-design-doc.md
+│   ├── chanuka-implementation-plan.md
+│   ├── phase-2-database-consolidation.md
+│   ├── project-structure.md
 ├── financial-disclosure-monitoring.md
 ├── guides/
 │   ├── DATABASE_SETUP_GUIDE.md
@@ -425,6 +481,7 @@ docs/
 │   ├── NAVIGATION_USER_GUIDE.md
 │   ├── TROUBLESHOOTING_GUIDE.md
 ├── project-structure.md
+├── project-structure2.md
 ├── regulatory-change-monitoring.md
 ├── SERVER_ARCHITECTURE.md
 ├── summaries/
@@ -610,11 +667,18 @@ server/
 │   │   ├── index.ts
 │   │   ├── moderation.ts
 │   │   ├── system.ts
+│   ├── alert-preferences/
+│   │   ├── __tests__/
+│   │   ├── alert_system_docs.md
+│   │   ├── alert_utilities.ts
+│   │   ├── application/
+│   │   ├── domain/
+│   │   ├── infrastructure/
+│   │   ├── unified_alert_routes.ts
+│   │   ├── unified_alert_service.ts
 │   ├── analytics/
 │   │   ├── analysis.ts
 │   │   ├── analytics.ts
-│   │   ├── analytics_design.md
-│   │   ├── analytics_requirements.md
 │   │   ├── config/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── analytics.config.test.ts
@@ -646,7 +710,6 @@ server/
 │   │   │   ├── runbooks.md
 │   │   │   ├── setup-guide.md
 │   │   ├── README.md
-│   │   ├── refactoring-plan.md
 │   │   ├── regulatory-change-monitoring.ts
 │   │   ├── services/
 │   │   │   ├── engagement.service.ts
@@ -666,16 +729,24 @@ server/
 │   │   │   ├── ml.ts
 │   │   │   ├── progress-storage.d.ts
 │   ├── bills/
+│   │   ├── application/
+│   │   │   ├── bills.ts
+│   │   │   ├── bill-service.ts
+│   │   │   ├── index.ts
 │   │   ├── bill.js
-│   │   ├── bills.ts
-│   │   ├── bill-service.ts
-│   │   ├── bills-router.ts
 │   │   ├── bill-status-monitor.ts
-│   │   ├── bill-storage.ts
 │   │   ├── bill-tracking.ts
+│   │   ├── domain/
+│   │   │   ├── index.ts
+│   │   │   ├── LegislativeStorageTypes.ts
 │   │   ├── index.ts
+│   │   ├── infrastructure/
+│   │   │   ├── bill-storage.ts
+│   │   │   ├── index.ts
 │   │   ├── legislative-storage.ts
-│   │   ├── LegislativeStorageTypes.ts
+│   │   ├── presentation/
+│   │   │   ├── bills-router.ts
+│   │   │   ├── index.ts
 │   │   ├── real-time-analysis.ts
 │   │   ├── sponsor-conflict-analysis.ts
 │   │   ├── sponsors.ts
@@ -747,23 +818,22 @@ server/
 │   │   ├── tls-config-service.ts
 │   ├── sidebar.tsx
 │   ├── users/
-│   │   ├── alert-preferences/
-│   │   │   ├── alert_system_docs.md
-│   │   │   ├── alert_utilities.ts
-│   │   │   ├── unified_alert_routes.ts
-│   │   │   ├── unified_alert_service.ts
-│   │   ├── citizen-verification.ts
-│   │   ├── ExpertVerificationService.test.ts
-│   │   ├── ExpertVerificationService.ts
+│   │   ├── __tests__/
+│   │   │   ├── ExpertVerificationService.test.ts
+│   │   ├── application/
+│   │   │   ├── profile.ts
+│   │   │   ├── users.ts
+│   │   │   ├── verification.ts
+│   │   ├── domain/
+│   │   │   ├── citizen-verification.ts
+│   │   │   ├── ExpertVerificationService.ts
+│   │   │   ├── user-management.ts
+│   │   │   ├── user-preferences.ts
+│   │   │   ├── user-profile.ts
 │   │   ├── index.ts
-│   │   ├── profile.ts
-│   │   ├── user-management.ts
-│   │   ├── user-preferences.ts
-│   │   ├── user-profile.ts
-│   │   ├── users.ts
-│   │   ├── user-storage.d.ts
-│   │   ├── user-storage.ts
-│   │   ├── verification.ts
+│   │   ├── infrastructure/
+│   │   │   ├── user-storage.d.ts
+│   │   │   ├── user-storage.ts
 ├── index.ts
 ├── infrastructure/
 │   ├── cache/
@@ -848,14 +918,8 @@ server/
 │   ├── verify-external-api-management.ts
 ├── services/
 │   ├── api-cost-monitoring.ts
-│   ├── database-service.ts
-│   ├── data-transformation.ts
-│   ├── email.service.ts
 │   ├── external-api-error-handler.ts
-│   ├── fallback-service.ts
 │   ├── managed-government-data-integration.ts
-│   ├── performance-monitoring.test.ts
-│   ├── performance-monitoring.ts
 │   ├── README-schema-validation.md
 │   ├── schema-validation-demo.ts
 │   ├── schema-validation-test.ts
@@ -916,7 +980,17 @@ server/
 │   ├── voting-pattern-analysis.test.ts
 ├── types/
 │   ├── ambient.d.ts
+│   ├── ambient-shims.d.ts
 │   ├── api.ts
+│   ├── api-response-shim.d.ts
+│   ├── drizzle-shims.d.ts
+│   ├── global-shims.d.ts
+│   ├── jest-extensions.d.ts
+│   ├── logger-shim.d.ts
+│   ├── schema-shims.d.ts
+│   ├── service-shims.d.ts
+│   ├── shared-schema-short.d.ts
+│   ├── shims.d.ts
 ├── utils/
 │   ├── __tests__/
 │   │   ├── cache.test.ts
@@ -939,8 +1013,6 @@ server/
 setup-postgres-windows.ps1
 shared/
 ├── core/
-│   ├── logs/
-│   │   ├── archive/
 │   ├── MIGRATION_VALIDATION_REPORT.md
 │   ├── package.json
 │   ├── package-lock.json
@@ -1046,9 +1118,7 @@ shared/
 │   │   │   │   ├── provider.ts
 │   │   │   ├── cache/
 │   │   │   │   ├── provider.ts
-│   │   │   ├── caching/
 │   │   │   ├── config.ts
-│   │   │   ├── deduplication/
 │   │   │   ├── enhanced-factory.ts
 │   │   │   ├── error-handler/
 │   │   │   │   ├── provider.ts
@@ -1056,13 +1126,10 @@ shared/
 │   │   │   ├── factory.ts.bak
 │   │   │   ├── factory.ts.new
 │   │   │   ├── index.ts
-│   │   │   ├── logging/
 │   │   │   ├── rate-limit/
 │   │   │   │   ├── provider.ts
-│   │   │   ├── rate-limiting/
 │   │   │   ├── registry.ts
 │   │   │   ├── types.ts
-│   │   │   ├── unified/
 │   │   │   ├── unified.ts
 │   │   │   ├── validation/
 │   │   │   │   ├── provider.ts
@@ -1106,6 +1173,8 @@ shared/
 │   │   ├── rate-limiting/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── ai-rate-limiter.test.ts
+│   │   │   │   ├── memory-store.test.ts
+│   │   │   │   ├── middleware.test.ts
 │   │   │   ├── adapters/
 │   │   │   │   ├── legacy-store-adapter.ts
 │   │   │   ├── ai-rate-limiter.ts
@@ -1231,10 +1300,11 @@ test-logger.js
 tools/
 ├── validate-schema-congruence.ts
 tsconfig.json
+tsconfig.server.json
 vite.config.ts
 vitest.config.ts
 ```
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-13 14:50:35
+Generated on: 2025-10-14 23:39:43

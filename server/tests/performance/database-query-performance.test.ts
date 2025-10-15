@@ -9,7 +9,7 @@ describe('Database Query Performance Tests', () => {
   
   beforeAll(async () => {
     // Ensure we have test data
-    logger.info('Setting up performance test data...', { component: 'SimpleTool' });
+    logger.info('Setting up performance test data...', { component: 'Chanuka' });
   });
 
   afterAll(async () => {

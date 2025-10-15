@@ -48,7 +48,7 @@ class LazyLoadErrorBoundary extends React.Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    logger.error('Lazy loading error:', { component: 'SimpleTool' }, error, errorInfo);
+    logger.error('Lazy loading error:', { component: 'Chanuka' }, error, errorInfo);
   }
 
   render() {

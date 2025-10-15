@@ -25,12 +25,12 @@ class BundleAnalyzer {
   }
 
   async analyze() {
-    logger.info('🔍 Starting bundle analysis...\n', { component: 'SimpleTool' });
+    logger.info('🔍 Starting bundle analysis...\n', { component: 'Chanuka' });
 
     try {
       // Check if build exists
       if (!fs.existsSync(this.distPath)) {
-        logger.error('❌ Build directory not found. Please run ', { component: 'SimpleTool' }, npm run build" first.');
+        logger.error('❌ Build directory not found. Please run ', { component: 'Chanuka' }, npm run build" first.');
         process.exit(1);
       }
 
@@ -55,13 +55,13 @@ class BundleAnalyzer {
       }
 
     } catch (error) {
-      logger.error('❌ Analysis failed:', { component: 'SimpleTool' }, error.message);
+      logger.error('❌ Analysis failed:', { component: 'Chanuka' }, error.message);
       process.exit(1);
     }
   }
 
   async analyzeFiles() {
-    logger.info('📁 Analyzing files...', { component: 'SimpleTool' });
+    logger.info('📁 Analyzing files...', { component: 'Chanuka' });
 
     const analyzeDirectory = (dir, basePath = '') => {
       const files = fs.readdirSync(dir);
@@ -150,7 +150,7 @@ class BundleAnalyzer {
   }
 
   async detectDuplicates() {
-    logger.info('🔍 Detecting duplicate modules...', { component: 'SimpleTool' });
+    logger.info('🔍 Detecting duplicate modules...', { component: 'Chanuka' });
 
     const moduleNames = new Map();
     const duplicates = [];
@@ -179,7 +179,7 @@ class BundleAnalyzer {
   }
 
   generateRecommendations() {
-    logger.info('💡 Generating recommendations...', { component: 'SimpleTool' });
+    logger.info('💡 Generating recommendations...', { component: 'Chanuka' });
 
     const recommendations = [];
 
@@ -267,8 +267,8 @@ class BundleAnalyzer {
   }
 
   displayResults() {
-    logger.info('\n📊 Bundle Analysis Results', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('\n📊 Bundle Analysis Results', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     // Summary
     console.log(`\n📦 Bundle Summary:`);
@@ -336,7 +336,7 @@ class BundleAnalyzer {
             console.log(`          ... and ${rec.files.length - 3} more`);
           }
         }
-        logger.info('', { component: 'SimpleTool' });
+        logger.info('', { component: 'Chanuka' });
       });
     }
 
@@ -378,7 +378,7 @@ class BundleAnalyzer {
 
   openBundleAnalyzer() {
     try {
-      logger.info('\n🌐 Opening bundle analyzer...', { component: 'SimpleTool' });
+      logger.info('\n🌐 Opening bundle analyzer...', { component: 'Chanuka' });
       execSync('npm run analyze:bundle', { stdio: 'inherit' });
     } catch (error) {
       console.warn('⚠️  Could not open bundle analyzer:', error.message);
@@ -398,22 +398,22 @@ class BundleAnalyzer {
 async function main() {
   const analyzer = new BundleAnalyzer();
   
-  logger.info('🚀 Chanuka Platform Bundle Analyzer', { component: 'SimpleTool' });
-  logger.info('=====================================\n', { component: 'SimpleTool' });
+  logger.info('🚀 Chanuka Platform Bundle Analyzer', { component: 'Chanuka' });
+  logger.info('=====================================\n', { component: 'Chanuka' });
 
   await analyzer.analyze();
 
-  logger.info('\n✅ Analysis complete!', { component: 'SimpleTool' });
-  logger.info('\nNext steps:', { component: 'SimpleTool' });
-  logger.info('  • Review recommendations above', { component: 'SimpleTool' });
-  logger.info('  • Run with --open flag to view detailed bundle analyzer', { component: 'SimpleTool' });
-  logger.info('  • Check bundle-analysis.json for detailed data', { component: 'SimpleTool' });
-  logger.info('  • Consider implementing suggested optimizations\n', { component: 'SimpleTool' });
+  logger.info('\n✅ Analysis complete!', { component: 'Chanuka' });
+  logger.info('\nNext steps:', { component: 'Chanuka' });
+  logger.info('  • Review recommendations above', { component: 'Chanuka' });
+  logger.info('  • Run with --open flag to view detailed bundle analyzer', { component: 'Chanuka' });
+  logger.info('  • Check bundle-analysis.json for detailed data', { component: 'Chanuka' });
+  logger.info('  • Consider implementing suggested optimizations\n', { component: 'Chanuka' });
 }
 
 if (require.main === module) {
   main().catch(error => {
-    logger.error('❌ Fatal error:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Fatal error:', { component: 'Chanuka' }, error);
     process.exit(1);
   });
 }

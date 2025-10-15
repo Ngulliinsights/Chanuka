@@ -150,14 +150,14 @@ export class RegulatoryChangeMonitoringService {
    * types of changes at appropriate intervals.
    */
   startAutomatedMonitoring(): void {
-    logger.info('Starting comprehensive regulatory change monitoring system...', { component: 'SimpleTool' });
+    logger.info('Starting comprehensive regulatory change monitoring system...', { component: 'Chanuka' });
 
     // Daily monitoring for immediate changes and urgent alerts
     this.monitoringTimer = setInterval(async () => {
       try {
         await this.performDailyMonitoring();
       } catch (error) {
-  logger.error('Error in daily monitoring:', { component: 'SimpleTool', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+  logger.error('Error in daily monitoring:', { component: 'Chanuka', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
       }
     }, this.MONITORING_INTERVALS.DAILY_CHECK);
 
@@ -166,7 +166,7 @@ export class RegulatoryChangeMonitoringService {
       try {
         await this.performWeeklyAnalysis();
       } catch (error) {
-  logger.error('Error in weekly analysis:', { component: 'SimpleTool', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+  logger.error('Error in weekly analysis:', { component: 'Chanuka', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
       }
     }, this.MONITORING_INTERVALS.WEEKLY_ANALYSIS);
 
@@ -175,13 +175,13 @@ export class RegulatoryChangeMonitoringService {
       try {
         await this.performMonthlyReview();
       } catch (error) {
-  logger.error('Error in monthly review:', { component: 'SimpleTool', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+  logger.error('Error in monthly review:', { component: 'Chanuka', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
       }
     }, this.MONITORING_INTERVALS.MONTHLY_REVIEW);
 
     // Run initial monitoring to establish baseline
     this.performDailyMonitoring().catch(error => {
-      logger.error('Error in initial monitoring run:', { component: 'SimpleTool' }, error);
+      logger.error('Error in initial monitoring run:', { component: 'Chanuka' }, error);
     });
   }
 
@@ -189,27 +189,27 @@ export class RegulatoryChangeMonitoringService {
    * Stop all automated monitoring processes cleanly
    */
   stopAutomatedMonitoring(): void {
-    logger.info('Stopping regulatory change monitoring system...', { component: 'SimpleTool' });
+    logger.info('Stopping regulatory change monitoring system...', { component: 'Chanuka' });
 
     if (this.monitoringTimer) {
       clearInterval(this.monitoringTimer);
       this.monitoringTimer = null;
-      logger.info('Daily monitoring stopped', { component: 'SimpleTool' });
+      logger.info('Daily monitoring stopped', { component: 'Chanuka' });
     }
 
     if (this.weeklyTimer) {
       clearInterval(this.weeklyTimer);
       this.weeklyTimer = null;
-      logger.info('Weekly analysis stopped', { component: 'SimpleTool' });
+      logger.info('Weekly analysis stopped', { component: 'Chanuka' });
     }
 
     if (this.monthlyTimer) {
       clearInterval(this.monthlyTimer);
       this.monthlyTimer = null;
-      logger.info('Monthly review stopped', { component: 'SimpleTool' });
+      logger.info('Monthly review stopped', { component: 'Chanuka' });
     }
 
-    logger.info('All automated regulatory change monitoring stopped.', { component: 'SimpleTool' });
+    logger.info('All automated regulatory change monitoring stopped.', { component: 'Chanuka' });
   }
 
   // Report generation and analysis methods
@@ -350,7 +350,7 @@ export class RegulatoryChangeMonitoringService {
 
       console.log(`Stored ${report.reportType} monitoring report: ${report.id}`);
     } catch (error) {
-  logger.error('Error storing monitoring report:', { component: 'SimpleTool', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+  logger.error('Error storing monitoring report:', { component: 'Chanuka', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
     }
   }
 
@@ -388,7 +388,7 @@ export class RegulatoryChangeMonitoringService {
 
       return filteredAlerts;
     } catch (error) {
-  logger.error('Error retrieving active alerts:', { component: 'SimpleTool', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+  logger.error('Error retrieving active alerts:', { component: 'Chanuka', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
       return [];
     }
   }
@@ -525,7 +525,7 @@ export class RegulatoryChangeMonitoringService {
    * Daily monitoring performs immediate-response monitoring for urgent changes
    */
   private async performDailyMonitoring(): Promise<MonitoringReport> {
-    logger.info('Performing daily regulatory change monitoring...', { component: 'SimpleTool' });
+    logger.info('Performing daily regulatory change monitoring...', { component: 'Chanuka' });
 
     const startTime = new Date();
     const cutoffTime = new Date(startTime.getTime() - this.MONITORING_INTERVALS.DAILY_CHECK);
@@ -564,7 +564,7 @@ export class RegulatoryChangeMonitoringService {
       console.log(`Daily monitoring completed. Generated ${alerts.length} alerts.`);
       return report;
     } catch (error) {
-  logger.error('Error in daily monitoring:', { component: 'SimpleTool', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+  logger.error('Error in daily monitoring:', { component: 'Chanuka', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
       throw error;
     }
   }
@@ -573,7 +573,7 @@ export class RegulatoryChangeMonitoringService {
    * Weekly analysis focuses on trend identification and strategic planning
    */
   private async performWeeklyAnalysis(): Promise<MonitoringReport> {
-    logger.info('Performing weekly regulatory trend analysis...', { component: 'SimpleTool' });
+    logger.info('Performing weekly regulatory trend analysis...', { component: 'Chanuka' });
 
     const endTime = new Date();
     const startTime = new Date(endTime.getTime() - this.MONITORING_INTERVALS.WEEKLY_ANALYSIS);
@@ -603,7 +603,7 @@ export class RegulatoryChangeMonitoringService {
     };
 
     await this.storeMonitoringReport(report);
-    logger.info('Weekly analysis completed', { component: 'SimpleTool' });
+    logger.info('Weekly analysis completed', { component: 'Chanuka' });
     return report;
   }
 
@@ -611,7 +611,7 @@ export class RegulatoryChangeMonitoringService {
    * Monthly review provides comprehensive strategic assessment
    */
   private async performMonthlyReview(): Promise<MonitoringReport> {
-    logger.info('Performing monthly regulatory review...', { component: 'SimpleTool' });
+    logger.info('Performing monthly regulatory review...', { component: 'Chanuka' });
 
     const endTime = new Date();
     const startTime = new Date(endTime.getTime() - this.MONITORING_INTERVALS.MONTHLY_REVIEW);
@@ -641,7 +641,7 @@ export class RegulatoryChangeMonitoringService {
     };
 
     await this.storeMonitoringReport(report);
-    logger.info('Monthly review completed', { component: 'SimpleTool' });
+    logger.info('Monthly review completed', { component: 'Chanuka' });
     return report;
   }
 

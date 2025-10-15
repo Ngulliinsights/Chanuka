@@ -84,7 +84,7 @@ export const PerformanceDashboard: React.FC<PerformanceDashboardProps> = ({
         historicalData
       });
     } catch (error) {
-      logger.error('Failed to load performance metrics:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to load performance metrics:', { component: 'Chanuka' }, error);
     } finally {
       setIsLoading(false);
     }

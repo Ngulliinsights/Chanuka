@@ -391,7 +391,7 @@ class APMService {
       try {
         await this.updateBaselines();
       } catch (error) {
-        logger.error('[APM] Error updating baselines:', { component: 'SimpleTool' }, error);
+        logger.error('[APM] Error updating baselines:', { component: 'Chanuka' }, error);
       }
     }, 300000);
 
@@ -400,7 +400,7 @@ class APMService {
       try {
         await this.checkPerformanceRegressions();
       } catch (error) {
-        logger.error('[APM] Error checking regressions:', { component: 'SimpleTool' }, error);
+        logger.error('[APM] Error checking regressions:', { component: 'Chanuka' }, error);
       }
     }, 60000);
 
@@ -418,7 +418,7 @@ class APMService {
         this.systemMetricsHistory = this.systemMetricsHistory
           .filter(entry => entry.timestamp > cutoffTime);
       } catch (error) {
-        logger.error('[APM] Error collecting system metrics:', { component: 'SimpleTool' }, error);
+        logger.error('[APM] Error collecting system metrics:', { component: 'Chanuka' }, error);
       }
     }, 30000);
   }

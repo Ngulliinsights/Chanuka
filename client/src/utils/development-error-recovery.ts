@@ -144,10 +144,10 @@ export class DevelopmentErrorRecovery {
 
   private handleHMRError(message: string, args: any[]): void {
     console.group('🔥 HMR Error Detected');
-    logger.error('Message:', { component: 'SimpleTool' }, message);
-    logger.error('Arguments:', { component: 'SimpleTool' }, args);
-    logger.error('HMR Status:', { component: 'SimpleTool' }, window.__DEV_SERVER__?.hmrStatus?.() || 'Unknown');
-    logger.error('Connection Attempts:', { component: 'SimpleTool' }, this.hmrConnectionAttempts);
+    logger.error('Message:', { component: 'Chanuka' }, message);
+    logger.error('Arguments:', { component: 'Chanuka' }, args);
+    logger.error('HMR Status:', { component: 'Chanuka' }, window.__DEV_SERVER__?.hmrStatus?.() || 'Unknown');
+    logger.error('Connection Attempts:', { component: 'Chanuka' }, this.hmrConnectionAttempts);
     console.groupEnd();
 
     // Attempt HMR recovery
@@ -160,7 +160,7 @@ export class DevelopmentErrorRecovery {
     this.isRecovering = true;
     
     try {
-      logger.info('🔄 Attempting HMR recovery...', { component: 'SimpleTool' });
+      logger.info('🔄 Attempting HMR recovery...', { component: 'Chanuka' });
       
       // Strategy 1: Try to reconnect WebSocket
       await this.attemptHMRReconnection();
@@ -177,7 +177,7 @@ export class DevelopmentErrorRecovery {
       }
       
     } catch (error) {
-      logger.error('❌ HMR recovery failed:', { component: 'SimpleTool' }, error);
+      logger.error('❌ HMR recovery failed:', { component: 'Chanuka' }, error);
     } finally {
       this.isRecovering = false;
     }
@@ -200,14 +200,14 @@ export class DevelopmentErrorRecovery {
         
         ws.onopen = () => {
           clearTimeout(timeout);
-          logger.info('✅ HMR reconnection successful', { component: 'SimpleTool' });
+          logger.info('✅ HMR reconnection successful', { component: 'Chanuka' });
           this.hmrConnectionAttempts = 0; // Reset on successful connection
           resolve();
         };
         
         ws.onerror = (error) => {
           clearTimeout(timeout);
-          logger.error('❌ HMR reconnection failed:', { component: 'SimpleTool' }, error);
+          logger.error('❌ HMR reconnection failed:', { component: 'Chanuka' }, error);
           reject(error);
         };
         
@@ -270,10 +270,10 @@ export class DevelopmentErrorRecovery {
 
     // Enhanced error logging
     console.group(`🚨 Development Error #${this.errorCount} [${errorInfo.type}]`);
-    logger.error('Error Info:', { component: 'SimpleTool' }, errorInfo);
-    logger.error('Dev Server Info:', { component: 'SimpleTool' }, window.__DEV_SERVER__);
-    logger.error('Recovery Attempts:', { component: 'SimpleTool' }, this.recoveryAttempts);
-    logger.error('Timestamp:', { component: 'SimpleTool' }, new Date().toISOString());
+    logger.error('Error Info:', { component: 'Chanuka' }, errorInfo);
+    logger.error('Dev Server Info:', { component: 'Chanuka' }, window.__DEV_SERVER__);
+    logger.error('Recovery Attempts:', { component: 'Chanuka' }, this.recoveryAttempts);
+    logger.error('Timestamp:', { component: 'Chanuka' }, new Date().toISOString());
     console.groupEnd();
 
     // Attempt automatic recovery for certain error types
@@ -318,7 +318,7 @@ export class DevelopmentErrorRecovery {
         await this.recoverFromGeneralError(errorInfo);
       }
 
-      logger.info('✅ Error recovery completed', { component: 'SimpleTool' });
+      logger.info('✅ Error recovery completed', { component: 'Chanuka' });
       
       // Reset recovery attempts on successful recovery
       setTimeout(() => {
@@ -326,7 +326,7 @@ export class DevelopmentErrorRecovery {
       }, 10000);
 
     } catch (recoveryError) {
-      logger.error('❌ Error recovery failed:', { component: 'SimpleTool' }, recoveryError);
+      logger.error('❌ Error recovery failed:', { component: 'Chanuka' }, recoveryError);
       
       // If all recovery attempts failed, suggest manual intervention
       if (this.recoveryAttempts >= this.maxRecoveryAttempts) {
@@ -349,22 +349,22 @@ export class DevelopmentErrorRecovery {
       if (resourceType === 'script') {
         const newScript = document.createElement('script');
         newScript.src = newUrl;
-        newScript.onload = () => logger.info('✅ Script reloaded successfully', { component: 'SimpleTool' });
-        newScript.onerror = () => logger.error('❌ Script reload failed', { component: 'SimpleTool' });
+        newScript.onload = () => logger.info('✅ Script reloaded successfully', { component: 'Chanuka' });
+        newScript.onerror = () => logger.error('❌ Script reload failed', { component: 'Chanuka' });
         document.head.appendChild(newScript);
       } else if (resourceType === 'link') {
         const newLink = document.createElement('link');
         newLink.rel = 'stylesheet';
         newLink.href = newUrl;
-        newLink.onload = () => logger.info('✅ Stylesheet reloaded successfully', { component: 'SimpleTool' });
-        newLink.onerror = () => logger.error('❌ Stylesheet reload failed', { component: 'SimpleTool' });
+        newLink.onload = () => logger.info('✅ Stylesheet reloaded successfully', { component: 'Chanuka' });
+        newLink.onerror = () => logger.error('❌ Stylesheet reload failed', { component: 'Chanuka' });
         document.head.appendChild(newLink);
       }
     }
   }
 
   private async recoverFromChunkError(errorInfo: any): Promise<void> {
-    logger.info('🔄 Attempting chunk error recovery', { component: 'SimpleTool' });
+    logger.info('🔄 Attempting chunk error recovery', { component: 'Chanuka' });
     
     // Clear module cache if available
     if (window.__DEV_SERVER__) {
@@ -377,7 +377,7 @@ export class DevelopmentErrorRecovery {
   }
 
   private async recoverFromGeneralError(errorInfo: any): Promise<void> {
-    logger.info('🔄 Attempting general error recovery', { component: 'SimpleTool' });
+    logger.info('🔄 Attempting general error recovery', { component: 'Chanuka' });
     
     // Try to clear caches and reload
     if (window.__DEV_SERVER__) {

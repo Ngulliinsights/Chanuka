@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { db } from '../db';
+import { db } from '@shared/database/pool.js';
 import { bills, sponsors, billSponsorships, sponsorAffiliations } from '@shared/schema';
 import { eq, and, or } from 'drizzle-orm';
 import { logger } from '@shared/utils/logger';

@@ -2,18 +2,18 @@ import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 // Mock the utils modules
 const mockValidation = {
-  validateEmail: jest.fn(),
-  validatePassword: jest.fn(),
-  sanitizeInput: jest.fn(),
-  validateBillNumber: jest.fn()
+  validateEmail: jest.fn() as jest.MockedFunction<() => { isValid: boolean; sanitized: string } | { isValid: boolean; error: string }>,
+  validatePassword: jest.fn() as jest.MockedFunction<() => { isValid: boolean; strength: string; score: number; errors?: string[] }>,
+  sanitizeInput: jest.fn() as jest.MockedFunction<() => string>,
+  validateBillNumber: jest.fn() as jest.MockedFunction<() => { isValid: boolean; normalized: string } | { isValid: boolean; error: string }>
 };
 
 const mockCrypto = {
-  generateSecureToken: jest.fn(),
-  hashPassword: jest.fn(),
-  verifyPassword: jest.fn(),
-  encrypt: jest.fn(),
-  decrypt: jest.fn()
+  generateSecureToken: jest.fn() as jest.MockedFunction<(length: number) => string>,
+  hashPassword: jest.fn() as jest.MockedFunction<(password: string) => Promise<string>>,
+  verifyPassword: jest.fn() as jest.MockedFunction<(password: string, hash: string) => Promise<boolean>>,
+  encrypt: jest.fn() as jest.MockedFunction<(data: string) => string>,
+  decrypt: jest.fn() as jest.MockedFunction<(data: string) => string>
 };
 
 const mockLogger = {
@@ -33,21 +33,21 @@ const mockApiResponse = {
   success: jest.fn(),
   error: jest.fn(),
   paginated: jest.fn()
-};
+} as any;
 
 // Mock the modules
-jest.mock('../../utils/validation.ts', () => mockValidation);
-jest.mock('../../utils/crypto.ts', () => mockCrypto);
+jest.mock('../../utils/validation', () => mockValidation);
+jest.mock('../../utils/crypto', () => mockCrypto);
 jest.mock('../../utils/logger', () => mockLogger);
-jest.mock('../../utils/metrics.ts', () => mockMetrics);
-jest.mock('../../utils/api-response.ts', () => mockApiResponse);
+jest.mock('../../utils/metrics', () => mockMetrics);
+jest.mock('../../utils/api-response', () => mockApiResponse);
 
 // Import the mocked modules for type safety
-import * as validation from '../../utils/validation.ts';
-import * as crypto from '../../utils/crypto.ts';
+import * as validation from '../../utils/validation';
+import * as crypto from '../../utils/crypto';
 import * as logger from '../../utils/logger';
-import * as metrics from '../../utils/metrics.ts';
-import * as apiResponse from '../../utils/api-response.ts';
+import * as metrics from '../../utils/metrics';
+import * as apiResponse from '../../utils/api-response';
 
 describe('Validation Utils', () => {
   beforeEach(() => {
@@ -67,7 +67,7 @@ describe('Validation Utils', () => {
     it('should reject invalid email formats', () => {
       mockValidation.validateEmail.mockReturnValue({ isValid: false, error: 'Invalid email format' });
 
-      const result = mockValidation.validateEmail('invalid-email');
+      const result = validation.validateEmail('invalid-email');
 
       expect(result.isValid).toBe(false);
       expect(result.error).toBe('Invalid email format');
@@ -86,8 +86,8 @@ describe('Validation Utils', () => {
       ];
 
       testCases.forEach(({ input, expected }) => {
-        mockValidation.validateEmail.mockReturnValue({ isValid: expected });
-        const result = mockValidation.validateEmail(input);
+        mockValidation.validateEmail.mockReturnValue(expected ? { isValid: expected, sanitized: input as string } : { isValid: expected, error: 'Invalid email format' });
+        const result = validation.validateEmail(input as string);
         expect(result.isValid).toBe(expected);
       });
     });
@@ -95,13 +95,13 @@ describe('Validation Utils', () => {
 
   describe('validatePassword', () => {
     it('should validate strong passwords', () => {
-      mockValidation.validatePassword.mockReturnValue({ 
-        isValid: true, 
+      mockValidation.validatePassword.mockReturnValue({
+        isValid: true,
         strength: 'strong',
-        score: 5 
+        score: 5
       });
 
-      const result = mockValidation.validatePassword('SecurePass123!');
+      const result = validation.validatePassword('SecurePass123!');
 
       expect(result.isValid).toBe(true);
       expect(result.strength).toBe('strong');
@@ -109,14 +109,14 @@ describe('Validation Utils', () => {
     });
 
     it('should reject weak passwords', () => {
-      mockValidation.validatePassword.mockReturnValue({ 
-        isValid: false, 
+      mockValidation.validatePassword.mockReturnValue({
+        isValid: false,
         strength: 'weak',
         score: 1,
         errors: ['Password too short', 'Missing special characters']
       });
 
-      const result = mockValidation.validatePassword('123');
+      const result = validation.validatePassword('123');
 
       expect(result.isValid).toBe(false);
       expect(result.strength).toBe('weak');
@@ -135,15 +135,17 @@ describe('Validation Utils', () => {
 
       requirements.forEach(({ password, shouldFail, shouldPass }) => {
         if (shouldPass) {
-          mockValidation.validatePassword.mockReturnValue({ isValid: true, strength: 'strong' });
+          mockValidation.validatePassword.mockReturnValue({ isValid: true, strength: 'strong', score: 5 });
         } else {
-          mockValidation.validatePassword.mockReturnValue({ 
-            isValid: false, 
-            errors: [shouldFail] 
+          mockValidation.validatePassword.mockReturnValue({
+            isValid: false,
+            strength: 'weak',
+            score: 1,
+            errors: [shouldFail as string]
           });
         }
 
-        const result = mockValidation.validatePassword(password);
+        const result = validation.validatePassword(password);
         expect(result.isValid).toBe(!!shouldPass);
       });
     });
@@ -153,7 +155,7 @@ describe('Validation Utils', () => {
     it('should sanitize HTML input', () => {
       mockValidation.sanitizeInput.mockReturnValue('Clean text');
 
-      const result = mockValidation.sanitizeInput('<script>alert("xss")</script>Clean text');
+      const result = validation.sanitizeInput('<script>alert("xss")</script>Clean text');
 
       expect(result).toBe('Clean text');
     });
@@ -169,7 +171,7 @@ describe('Validation Utils', () => {
 
       xssAttempts.forEach(xss => {
         mockValidation.sanitizeInput.mockReturnValue('');
-        const result = mockValidation.sanitizeInput(xss);
+        const result = validation.sanitizeInput(xss);
         expect(result).toBe('');
       });
     });
@@ -177,7 +179,7 @@ describe('Validation Utils', () => {
     it('should preserve safe HTML', () => {
       mockValidation.sanitizeInput.mockReturnValue('<p>Safe paragraph</p>');
 
-      const result = mockValidation.sanitizeInput('<p>Safe paragraph</p>');
+      const result = validation.sanitizeInput('<p>Safe paragraph</p>');
 
       expect(result).toBe('<p>Safe paragraph</p>');
     });
@@ -196,7 +198,7 @@ describe('Validation Utils', () => {
 
       validFormats.forEach(billNumber => {
         mockValidation.validateBillNumber.mockReturnValue({ isValid: true, normalized: billNumber.toUpperCase() });
-        const result = mockValidation.validateBillNumber(billNumber);
+        const result = validation.validateBillNumber(billNumber);
         expect(result.isValid).toBe(true);
       });
     });
@@ -214,7 +216,7 @@ describe('Validation Utils', () => {
 
       invalidFormats.forEach(billNumber => {
         mockValidation.validateBillNumber.mockReturnValue({ isValid: false, error: 'Invalid format' });
-        const result = mockValidation.validateBillNumber(billNumber);
+        const result = validation.validateBillNumber(billNumber);
         expect(result.isValid).toBe(false);
       });
     });
@@ -230,7 +232,7 @@ describe('Crypto Utils', () => {
     it('should generate tokens of specified length', () => {
       mockCrypto.generateSecureToken.mockReturnValue('a'.repeat(32));
 
-      const token = mockCrypto.generateSecureToken(32);
+      const token = crypto.generateSecureToken(32);
 
       expect(token).toHaveLength(32);
       expect(mockCrypto.generateSecureToken).toHaveBeenCalledWith(32);
@@ -243,9 +245,9 @@ describe('Crypto Utils', () => {
         .mockReturnValueOnce('token3');
 
       const tokens = [
-        mockCrypto.generateSecureToken(16),
-        mockCrypto.generateSecureToken(16),
-        mockCrypto.generateSecureToken(16)
+        crypto.generateSecureToken(16),
+        crypto.generateSecureToken(16),
+        crypto.generateSecureToken(16)
       ];
 
       expect(new Set(tokens).size).toBe(3); // All unique
@@ -256,7 +258,7 @@ describe('Crypto Utils', () => {
     it('should hash passwords securely', async () => {
       mockCrypto.hashPassword.mockResolvedValue('$2b$12$hashedpassword');
 
-      const hash = await mockCrypto.hashPassword('password123');
+      const hash = await crypto.hashPassword('password123');
 
       expect(hash).toMatch(/^\$2b\$/); // bcrypt format
       expect(mockCrypto.hashPassword).toHaveBeenCalledWith('password123');
@@ -265,9 +267,9 @@ describe('Crypto Utils', () => {
     it('should use appropriate salt rounds', async () => {
       mockCrypto.hashPassword.mockResolvedValue('$2b$12$hashedpassword');
 
-      await mockCrypto.hashPassword('password123', 12);
+      await crypto.hashPassword('password123');
 
-      expect(mockCrypto.hashPassword).toHaveBeenCalledWith('password123', 12);
+      expect(mockCrypto.hashPassword).toHaveBeenCalledWith('password123');
     });
   });
 
@@ -275,7 +277,7 @@ describe('Crypto Utils', () => {
     it('should verify correct passwords', async () => {
       mockCrypto.verifyPassword.mockResolvedValue(true);
 
-      const isValid = await mockCrypto.verifyPassword('password123', '$2b$12$hashedpassword');
+      const isValid = await crypto.verifyPassword('password123', '$2b$12$hashedpassword');
 
       expect(isValid).toBe(true);
       expect(mockCrypto.verifyPassword).toHaveBeenCalledWith('password123', '$2b$12$hashedpassword');
@@ -284,7 +286,7 @@ describe('Crypto Utils', () => {
     it('should reject incorrect passwords', async () => {
       mockCrypto.verifyPassword.mockResolvedValue(false);
 
-      const isValid = await mockCrypto.verifyPassword('wrongpassword', '$2b$12$hashedpassword');
+      const isValid = await crypto.verifyPassword('wrongpassword', '$2b$12$hashedpassword');
 
       expect(isValid).toBe(false);
     });
@@ -298,8 +300,8 @@ describe('Crypto Utils', () => {
       mockCrypto.encrypt.mockReturnValue(encryptedData);
       mockCrypto.decrypt.mockReturnValue(originalData);
 
-      const encrypted = mockCrypto.encrypt(originalData);
-      const decrypted = mockCrypto.decrypt(encrypted);
+      const encrypted = crypto.encrypt(originalData);
+      const decrypted = crypto.decrypt(encrypted);
 
       expect(encrypted).toBe(encryptedData);
       expect(decrypted).toBe(originalData);
@@ -310,7 +312,7 @@ describe('Crypto Utils', () => {
         throw new Error('Encryption failed');
       });
 
-      expect(() => mockCrypto.encrypt('data')).toThrow('Encryption failed');
+      expect(() => crypto.encrypt('data')).toThrow('Encryption failed');
     });
   });
 });

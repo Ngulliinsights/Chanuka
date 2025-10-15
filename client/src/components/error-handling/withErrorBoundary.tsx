@@ -111,7 +111,7 @@ export function withLazyErrorBoundary<P extends object>(
 
       return { default: WrappedComponent };
     } catch (error) {
-      logger.error('Failed to load lazy component:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to load lazy component:', { component: 'Chanuka' }, error);
       
       // Return a fallback component that shows the error
       const ErrorComponent: ComponentType<P> = () => (
@@ -210,7 +210,7 @@ export function useErrorState() {
   const handleError = React.useCallback((error: Error) => {
     setError(error);
     setHasError(true);
-    logger.error('Component error:', { component: 'SimpleTool' }, error);
+    logger.error('Component error:', { component: 'Chanuka' }, error);
   }, []);
 
   const resetError = React.useCallback(() => {

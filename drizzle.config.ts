@@ -6,14 +6,14 @@ if (!process.env.DATABASE_URL) {
 }
 
 // Diagnostic logging for SSL authentication debugging
-// logger.info('🔍 Drizzle Config Diagnostics:', { component: 'SimpleTool' });
-// logger.info('NODE_ENV:', { component: 'SimpleTool' }, process.env.NODE_ENV);
-// logger.info('DATABASE_URL exists:', { component: 'SimpleTool' }, !!process.env.DATABASE_URL);
-// logger.info('DATABASE_URL starts with postgres:', { component: 'SimpleTool' }, process.env.DATABASE_URL?.startsWith('postgres'));
-// logger.info('DATABASE_URL contains sslmode:', { component: 'SimpleTool' }, process.env.DATABASE_URL?.includes('sslmode'));
+// logger.info('🔍 Drizzle Config Diagnostics:', { component: 'Chanuka' });
+// logger.info('NODE_ENV:', { component: 'Chanuka' }, process.env.NODE_ENV);
+// logger.info('DATABASE_URL exists:', { component: 'Chanuka' }, !!process.env.DATABASE_URL);
+// logger.info('DATABASE_URL starts with postgres:', { component: 'Chanuka' }, process.env.DATABASE_URL?.startsWith('postgres'));
+// logger.info('DATABASE_URL contains sslmode:', { component: 'Chanuka' }, process.env.DATABASE_URL?.includes('sslmode'));
 // if (process.env.DATABASE_URL?.includes('sslmode')) {
 //   const sslmode = process.env.DATABASE_URL.match(/sslmode=([^&\s]+)/)?.[1];
-//   logger.info('SSL mode in URL:', { component: 'SimpleTool' }, sslmode);
+//   logger.info('SSL mode in URL:', { component: 'Chanuka' }, sslmode);
 // }
 
 export default defineConfig({

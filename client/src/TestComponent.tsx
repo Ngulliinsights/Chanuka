@@ -5,7 +5,7 @@ import { logger } from '../utils/logger.js';
 
 export default function TestComponent() {
   useEffect(() => {
-    logger.info('Simplified App mounted for debugging', { component: 'SimpleTool' });
+    logger.info('Simplified App mounted for debugging', { component: 'Chanuka' });
   }, []);
 
   return (

@@ -264,7 +264,7 @@ class DashboardStorageService {
       };
     } catch (error) {
       logger.error('Error fetching evaluations', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         options,
         error: error instanceof Error ? error.message : String(error)
       });
@@ -326,7 +326,7 @@ class DashboardStorageService {
       return result[0].id;
     } catch (error) {
       logger.error('Error creating evaluation', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         data: { ...data, candidateName: data.candidateName?.substring(0, 50) }, // Truncate for logging
         error: error instanceof Error ? error.message : String(error)
       });

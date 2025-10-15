@@ -62,7 +62,7 @@ class ConnectionPoolService {
    */
   async initialize(config?: Partial<ConnectionPoolConfig>): Promise<void> {
     // The shared pool is already initialized, so we just log the configuration
-    logger.info('[Connection Pool] Using shared database pool with circuit breaker and monitoring', { component: 'SimpleTool' });
+    logger.info('[Connection Pool] Using shared database pool with circuit breaker and monitoring', { component: 'Chanuka' });
 
     // Test the connection using the shared pool
     await this.testConnection();
@@ -131,7 +131,7 @@ class ConnectionPoolService {
       performanceMonitor.addQueryTrace(traceId || 'unknown', text, duration, params);
 
       const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error('[Connection Pool] Query error:', { component: 'SimpleTool' }, {
+      logger.error('[Connection Pool] Query error:', { component: 'Chanuka' }, {
         queryId,
         error: errorMessage,
         duration,
@@ -178,7 +178,7 @@ class ConnectionPoolService {
         try {
           await client.query('ROLLBACK');
         } catch (rollbackError) {
-          logger.error('[Connection Pool] Rollback error:', { component: 'SimpleTool' }, { error: rollbackError });
+          logger.error('[Connection Pool] Rollback error:', { component: 'Chanuka' }, { error: rollbackError });
         }
       }
 
@@ -289,7 +289,7 @@ class ConnectionPoolService {
   async close(): Promise<void> {
     // Use shared pool's close function
     await closePools();
-    logger.info('[Connection Pool] Closed shared database pools', { component: 'SimpleTool' });
+    logger.info('[Connection Pool] Closed shared database pools', { component: 'Chanuka' });
   }
 
   /**
@@ -298,12 +298,12 @@ class ConnectionPoolService {
   private async testConnection(): Promise<void> {
     try {
       const result = await this.query('SELECT NOW() as current_time, version() as pg_version');
-      logger.info('[Connection Pool] Connection test successful:', { component: 'SimpleTool' }, {
+      logger.info('[Connection Pool] Connection test successful:', { component: 'Chanuka' }, {
         currentTime: result.rows[0]?.current_time,
         version: result.rows[0]?.pg_version?.substring(0, 50) + '...'
       });
     } catch (error) {
-      logger.error('[Connection Pool] Connection test failed:', { component: 'SimpleTool' }, { error });
+      logger.error('[Connection Pool] Connection test failed:', { component: 'Chanuka' }, { error });
       throw error;
     }
   }
@@ -314,7 +314,7 @@ class ConnectionPoolService {
    */
   private setupEventListeners(): void {
     // Event listeners are handled by the shared pool implementation
-    logger.debug('[Connection Pool] Using shared pool event listeners', { component: 'SimpleTool' });
+    logger.debug('[Connection Pool] Using shared pool event listeners', { component: 'Chanuka' });
   }
 
   /**
@@ -327,7 +327,7 @@ class ConnectionPoolService {
     // Get detailed health status from shared pool
     const poolHealth = await checkPoolHealth(pool, 'general');
 
-    logger.info('[Connection Pool] Current metrics:', { component: 'SimpleTool' }, {
+    logger.info('[Connection Pool] Current metrics:', { component: 'Chanuka' }, {
       utilization: health.details.poolUtilization.toFixed(2) + '%',
       averageAcquireTime: health.details.averageAcquireTime.toFixed(2) + 'ms',
       errorRate: health.details.errorRate.toFixed(2) + '%',
@@ -364,9 +364,9 @@ class ConnectionPoolService {
     }
 
     if (suggestions.length > 0) {
-      logger.info('[Connection Pool] Optimization suggestions:', { component: 'SimpleTool' }, suggestions);
+      logger.info('[Connection Pool] Optimization suggestions:', { component: 'Chanuka' }, suggestions);
     } else {
-      logger.info('[Connection Pool] Pool performance is optimal', { component: 'SimpleTool' });
+      logger.info('[Connection Pool] Pool performance is optimal', { component: 'Chanuka' });
     }
   }
 }
