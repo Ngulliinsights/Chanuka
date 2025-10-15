@@ -58,17 +58,17 @@ export class EncryptionService {
     try {
       const iv = crypto.randomBytes(this.ivLength);
       const key = this.deriveKey(context);
-      const cipher = crypto.createCipherGCM(this.algorithm, key, iv);
-      
+      const cipher = crypto.createCipheriv(this.algorithm, key, iv, { authTagLength: this.tagLength });
+
       // Additional authenticated data
       const aad = Buffer.from(`legislative-platform-${context}`);
       cipher.setAAD(aad);
 
       let encrypted = cipher.update(plaintext, 'utf8', 'hex');
       encrypted += cipher.final('hex');
-      
+
       const tag = cipher.getAuthTag();
-      
+
       // Combine IV, tag, and encrypted data
       const result = {
         iv: iv.toString('hex'),
@@ -93,8 +93,8 @@ export class EncryptionService {
       const { iv, tag, data, context = 'default' } = parsed;
 
       const key = this.deriveKey(context);
-      const decipher = crypto.createDecipherGCM(this.algorithm, key, Buffer.from(iv, 'hex'));
-      
+      const decipher = crypto.createDecipheriv(this.algorithm, key, Buffer.from(iv, 'hex'), { authTagLength: this.tagLength });
+
       // Set additional authenticated data
       const aad = Buffer.from(`legislative-platform-${context}`);
       decipher.setAAD(aad);

@@ -4,8 +4,8 @@ const { Pool } = pg;
 import * as schema from "../../../shared/schema";
 import { eq, and, or, sql } from 'drizzle-orm';
 import { errorTracker } from '../../core/errors/error-tracker';
-import { config } from '../../config/index';
-import { logger } from '../../utils/logger';
+import { config } from '../../config/index.js';
+import { logger } from '../../utils/logger.js';
 
 // Database connection configuration with improved typing
 interface DatabaseConfig {
@@ -699,7 +699,7 @@ export class DatabaseService {
     try {
       // Wait for active connections to complete (with timeout)
       const drainTimeout = 10000; // 10 seconds
-      if (this.pool) {
+      if (this.pool && this.pool.end) {
         const drainPromise = this.pool.end() as Promise<void>;
         const timeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('Drain timeout')), drainTimeout)
@@ -718,7 +718,7 @@ export class DatabaseService {
         'database'
       );
       // Force close if graceful shutdown fails
-      if (this.pool) {
+      if (this.pool && this.pool.end) {
         this.pool.end();
       }
     }

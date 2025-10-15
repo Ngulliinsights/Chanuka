@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import HomePage from '@/pages/home';
+import HomePage from '../pages/home';
 import { logger } from '../utils/logger.js';
 
 // Mock hooks with minimal setup
-vi.mock('@/hooks/use-auth', () => ({
+vi.mock('../hooks/use-auth', () => ({
   useAuth: () => ({
     user: null,
     isAuthenticated: false,
@@ -13,7 +13,7 @@ vi.mock('@/hooks/use-auth', () => ({
   }),
 }));
 
-vi.mock('@/hooks/use-mobile', () => ({
+vi.mock('../hooks/use-mobile', () => ({
   useMediaQuery: vi.fn(() => false),
 }));
 
@@ -26,6 +26,31 @@ const localStorageMock = {
 };
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
+  writable: true,
+});
+
+// Mock browser info objects
+Object.defineProperty(window, 'navigator', {
+  value: {
+    userAgent: 'test-user-agent',
+    platform: 'test-platform',
+    language: 'en-US',
+    languages: ['en-US', 'en'],
+    cookieEnabled: true,
+    onLine: true,
+  },
+  writable: true,
+});
+
+Object.defineProperty(window, 'location', {
+  value: {
+    href: 'http://localhost:3000',
+    origin: 'http://localhost:3000',
+    pathname: '/',
+    search: '',
+    hash: '',
+  },
+  writable: true,
 });
 
 function renderHomePage() {
@@ -35,6 +60,30 @@ function renderHomePage() {
     </BrowserRouter>
   );
 }
+
+// Mock React initialization
+vi.mock('react', async () => {
+  const actualReact = await vi.importActual('react');
+  return {
+    ...actualReact,
+    useState: vi.fn((initial) => [initial, vi.fn()]),
+    useEffect: vi.fn((fn) => fn()),
+    useCallback: vi.fn((fn) => fn),
+    useMemo: vi.fn((fn) => fn()),
+  };
+});
+
+// Mock React DOM
+vi.mock('react-dom', async () => {
+  const actualReactDOM = await vi.importActual('react-dom');
+  return {
+    ...actualReactDOM,
+    createRoot: vi.fn(() => ({
+      render: vi.fn(),
+      unmount: vi.fn(),
+    })),
+  };
+});
 
 describe('Navigation Core Tests', () => {
   beforeEach(() => {

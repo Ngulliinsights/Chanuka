@@ -1,3 +1,5 @@
+// Consolidated with shared/core logging - this file should be deprecated
+// Use import { logger } from '../../../shared/core/src/logging' instead
 import { config } from '../config/index.ts';
 
 /**
@@ -800,3 +802,7 @@ export const logger = new UnifiedLogger();
 
 // Export for testing purposes
 export { UnifiedLogger };
+
+// Re-export shared/core logger as the primary logger
+// Note: Import path may need adjustment based on actual file structure
+// export { logger as sharedLogger } from '../../../shared/core/src/logging';

@@ -491,8 +491,8 @@ export class MonitoringService extends EventEmitter {
       filtered = filtered.filter(e => e.category === filters.category);
     }
 
-    if (filters?.since) {
-      filtered = filtered.filter(e => e.timestamp >= filters.since);
+    if (filters?.since != null) {
+      filtered = filtered.filter(e => e.timestamp >= filters.since!);
     }
 
     return filtered;

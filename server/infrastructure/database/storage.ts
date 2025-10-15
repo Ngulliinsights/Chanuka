@@ -11,10 +11,11 @@ import {
   type InsertUserProgress,
   type SocialShare,
   type InsertSocialShare,
-  type SocialProfile,
-} from '@shared/schema.js';
+  type UserSocialProfile,
+  type Evaluation,
+} from '../../shared/schema.js';
 import session from 'express-session';
-import { logger } from '@shared/utils/logger';
+import { logger } from '../../utils/logger.js';
 // Simple memory store implementation since memorystore is not available
 class SimpleMemoryStore extends session.Store {
   private sessions: Map<string, any> = new Map();
@@ -230,7 +231,7 @@ export class MemStorage implements IStorage {
     return newUser;
   }
 
-  async linkSocialProfile(userId: string, profile: SocialProfile): Promise<User> {
+  async linkSocialProfile(userId: string, profile: { platform: string; profileId: string; username: string }): Promise<User> {
     const user = this.users.get(userId);
     if (!user) throw new Error(`User not found with ID: ${userId}`);
 
@@ -678,7 +679,7 @@ export class MemStorage implements IStorage {
   }
 
   // Helper method to create a social profile index key
-  private indexSocialProfile(p: SocialProfile): string {
+  private indexSocialProfile(p: { platform: string; profileId: string; username: string }): string {
     return `${p.platform}:${p.profileId}`;
   }
 }

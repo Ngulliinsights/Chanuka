@@ -211,9 +211,9 @@ class ConnectionPoolService {
       : 0;
 
     return {
-      totalConnections: pool?.totalCount || 0,
-      idleConnections: pool?.idleCount || 0,
-      waitingClients: pool?.waitingCount || 0,
+      totalConnections: pool?.totalCount ?? 0,
+      idleConnections: pool?.idleCount ?? 0,
+      waitingClients: pool?.waitingCount ?? 0,
       maxConnections: 20, // Default from shared pool config
       minConnections: 2,  // Default from shared pool config
       averageAcquireTime,

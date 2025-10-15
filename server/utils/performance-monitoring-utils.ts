@@ -5,7 +5,47 @@
  * performance monitoring throughout the application.
  */
 
-import { performanceMonitoring, MonitoringLevel, SamplingStrategy } from '../services/performance-monitoring.js';
+// import { performanceMonitoring, MonitoringLevel, SamplingStrategy } from '../services/performance-monitoring.js';
+
+// Temporary stub implementation until performance-monitoring service is created
+const performanceMonitoring = {
+  measureExecution: async (name: string, fn: () => any) => {
+    const start = Date.now();
+    try {
+      const result = await fn();
+      console.log(`[PERF] ${name}: ${Date.now() - start}ms`);
+      return result;
+    } catch (error) {
+      console.log(`[PERF] ${name} failed: ${Date.now() - start}ms`);
+      throw error;
+    }
+  },
+  recordMetric: (name: string, value: number, tags?: any, metadata?: any) => {
+    console.log(`[METRIC] ${name}: ${value}`, tags, metadata);
+  },
+  getHealthStatus: () => ({ status: 'ok', uptime: 0 }),
+  getAggregatedMetrics: () => ({}),
+  getRecentAlerts: (limit: number) => [],
+  getBusinessKPIs: () => ({}),
+  updateConfig: (config: any) => {},
+  start: () => {}
+};
+
+type MonitoringLevel = 'basic' | 'standard' | 'detailed';
+
+type SamplingStrategy = 'none' | 'probabilistic' | 'adaptive';
+
+const MonitoringLevel = {
+  BASIC: 'basic' as MonitoringLevel,
+  STANDARD: 'standard' as MonitoringLevel,
+  DETAILED: 'detailed' as MonitoringLevel
+};
+
+const SamplingStrategy = {
+  NONE: 'none' as SamplingStrategy,
+  PROBABILISTIC: 'probabilistic' as SamplingStrategy,
+  ADAPTIVE: 'adaptive' as SamplingStrategy
+};
 
 // Method decorator for measuring execution time
 export function measure(threshold?: number) {
@@ -252,12 +292,12 @@ export function getBusinessKPIs() {
 }
 
 // Helper function to update monitoring configuration
-export function updateMonitoringConfig(config: Partial<import('../services/performance-monitoring.js').MonitoringConfig>) {
+export function updateMonitoringConfig(config: Partial<any>) {
   performanceMonitoring.updateConfig(config);
 }
 
 // Environment-specific configuration helpers
-export function getEnvironmentSpecificConfig(env: string): Partial<import('../services/performance-monitoring.js').MonitoringConfig> {
+export function getEnvironmentSpecificConfig(env: string): Partial<any> {
   switch (env) {
     case 'production':
       return {

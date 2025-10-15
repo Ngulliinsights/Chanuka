@@ -6,7 +6,7 @@ import { RelevanceScorer } from '../domain/RelevanceScorer';
 import { SearchSuggestionsService } from './SearchSuggestionsService';
 import { SearchAnalytics } from '../domain/SearchAnalytics';
 import { SearchValidator } from '../domain/SearchValidator';
-import { databaseService } from '../../../services/database-service';
+import { databaseService } from '../../../infrastructure/database/database-service';
 import { logger } from '@shared/utils/logger';
 import type {
   SearchQuery,

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -59,9 +59,9 @@ describe('End-to-End User Workflows', () => {
   describe('User Registration and Authentication Flow', () => {
     it('should complete full user registration workflow', async () => {
       const { register } = await import('../../services/api');
-      
+
       // Mock successful registration
-      (register as any).mockResolvedValue({
+      (register as Mock).mockResolvedValue({
         success: true,
         data: {
           user: {
@@ -115,7 +115,7 @@ describe('End-to-End User Workflows', () => {
       const { login, getCurrentUser } = await import('../../services/api');
 
       // Mock successful login
-      (login as any).mockResolvedValue({
+      (login as Mock).mockResolvedValue({
         success: true,
         data: {
           user: {
@@ -128,7 +128,7 @@ describe('End-to-End User Workflows', () => {
         }
       });
 
-      (getCurrentUser as any).mockResolvedValue({
+      (getCurrentUser as Mock).mockResolvedValue({
         success: true,
         data: {
           id: '1',
@@ -173,7 +173,7 @@ describe('End-to-End User Workflows', () => {
       const { login } = await import('../../services/api');
 
       // Mock login failure
-      (login as any).mockResolvedValue({
+      (login as Mock).mockResolvedValue({
         success: false,
         error: 'Invalid credentials'
       });
@@ -206,9 +206,9 @@ describe('End-to-End User Workflows', () => {
   });
 
   describe('Bill Browsing and Search Workflow', () => {
-    beforeEach(() => {
-      const { getCurrentUser } = import('../../services/api');
-      
+    beforeEach(async () => {
+      const { getCurrentUser } = await import('../../services/api');
+
       // Mock authenticated user
       (getCurrentUser as any).mockResolvedValue({
         success: true,
@@ -225,7 +225,7 @@ describe('End-to-End User Workflows', () => {
       const { getBills, getBill } = await import('../../services/api');
 
       // Mock bills list
-      (getBills as any).mockResolvedValue({
+      (getBills as Mock).mockResolvedValue({
         success: true,
         data: [
           {
@@ -252,7 +252,7 @@ describe('End-to-End User Workflows', () => {
       });
 
       // Mock bill details
-      (getBill as any).mockResolvedValue({
+      (getBill as Mock).mockResolvedValue({
         success: true,
         data: {
           id: 'bill-1',
@@ -295,7 +295,7 @@ describe('End-to-End User Workflows', () => {
       const { searchBills } = await import('../../services/api');
 
       // Mock search results
-      (searchBills as any).mockResolvedValue({
+      (searchBills as Mock).mockResolvedValue({
         success: true,
         data: [
           {
@@ -349,7 +349,7 @@ describe('End-to-End User Workflows', () => {
       const { searchBills } = await import('../../services/api');
 
       // Mock empty search results
-      (searchBills as any).mockResolvedValue({
+      (searchBills as Mock).mockResolvedValue({
         success: true,
         data: [],
         pagination: {
@@ -400,7 +400,7 @@ describe('End-to-End User Workflows', () => {
       const { getBill, createComment, getComments } = await import('../../services/api');
 
       // Mock bill details
-      (getBill as any).mockResolvedValue({
+      (getBill as Mock).mockResolvedValue({
         success: true,
         data: {
           id: 'bill-1',
@@ -412,7 +412,7 @@ describe('End-to-End User Workflows', () => {
       });
 
       // Mock existing comments
-      (getComments as any).mockResolvedValue({
+      (getComments as Mock).mockResolvedValue({
         success: true,
         data: [
           {
@@ -426,7 +426,7 @@ describe('End-to-End User Workflows', () => {
       });
 
       // Mock comment creation
-      (createComment as any).mockResolvedValue({
+      (createComment as Mock).mockResolvedValue({
         success: true,
         data: {
           id: 'comment-2',
@@ -477,7 +477,7 @@ describe('End-to-End User Workflows', () => {
       const { createComment } = await import('../../services/api');
 
       // Mock comment creation failure
-      (createComment as any).mockResolvedValue({
+      (createComment as Mock).mockResolvedValue({
         success: false,
         error: 'Comment is too short'
       });
@@ -525,7 +525,7 @@ describe('End-to-End User Workflows', () => {
       const { updateProfile } = await import('../../services/api');
 
       // Mock profile update
-      (updateProfile as any).mockResolvedValue({
+      (updateProfile as Mock).mockResolvedValue({
         success: true,
         data: {
           id: '1',
@@ -571,7 +571,7 @@ describe('End-to-End User Workflows', () => {
       const { updatePreferences } = await import('../../services/api');
 
       // Mock preferences update
-      (updatePreferences as any).mockResolvedValue({
+      (updatePreferences as Mock).mockResolvedValue({
         success: true,
         data: {
           emailNotifications: false,
@@ -745,7 +745,7 @@ describe('End-to-End User Workflows', () => {
         status: 'introduced'
       }));
 
-      (getBills as any).mockResolvedValue({
+      (getBills as Mock).mockResolvedValue({
         success: true,
         data: largeBillsList.slice(0, 20), // Paginated
         pagination: {
@@ -820,7 +820,7 @@ describe('End-to-End User Workflows', () => {
       const { getBills } = await import('../../services/api');
 
       // Mock network error
-      (getBills as any).mockRejectedValue(new Error('Network error'));
+      (getBills as Mock).mockRejectedValue(new Error('Network error'));
 
       renderApp();
 
@@ -838,7 +838,7 @@ describe('End-to-End User Workflows', () => {
       expect(retryButton).toBeInTheDocument();
 
       // Mock successful retry
-      (getBills as any).mockResolvedValue({
+      (getBills as Mock).mockResolvedValue({
         success: true,
         data: [],
         pagination: { page: 1, limit: 20, total: 0, totalPages: 0 }
@@ -856,7 +856,7 @@ describe('End-to-End User Workflows', () => {
       const { getCurrentUser } = await import('../../services/api');
 
       // Mock authentication error
-      (getCurrentUser as any).mockRejectedValue(new Error('Unauthorized'));
+      (getCurrentUser as Mock).mockRejectedValue(new Error('Unauthorized'));
 
       renderApp();
 

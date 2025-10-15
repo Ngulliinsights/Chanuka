@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import { eq, and } from 'drizzle-orm';
 import { database as db } from '../../../shared/database/connection.js';
 import { users, sessions, passwordResets, type User } from '../../../shared/schema.js';
-import { getEmailService } from '../../services/email.service.js';
+import { getEmailService } from '../../infrastructure/notifications/email-service';
 import { encryptionService } from '../../features/security/encryption-service.js';
 import { inputValidationService } from '../validation/input-validation-service.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';

@@ -2,9 +2,7 @@ import {
   readDatabase,
   writeDatabase,
   pool,
-  withTransaction
-} from '../../../shared/database/connection.js';
-import { 
+  withTransaction,
   users,
   userProfiles,
   userSocialProfiles,
@@ -12,11 +10,11 @@ import {
   type InsertUser,
   type UserProfile,
   type InsertUserProfile
-} from '../../../shared/schema.js';
+} from '../../../shared/database/connection.js';
 import { eq, and, or, sql } from 'drizzle-orm';
-import type { StorageConfig } from './base/BaseStorage.js';
-import { BaseStorage } from './base/BaseStorage.js';
-import { logger } from '../../utils/logger';
+import type { StorageConfig } from '../../../infrastructure/database/base/BaseStorage.js';
+import { BaseStorage } from '../../../infrastructure/database/base/BaseStorage.js';
+import { logger } from '../../../utils/logger.js';
 
 // Additional type definitions needed
 export type OAuthProvider = 'google' | 'github' | 'twitter';
@@ -73,8 +71,8 @@ export class UserStorage extends BaseStorage<User> {
       cacheKeys.push(`user:email:${email}`);
     }
 
-    // Invalidate all cache keys in parallel for better performance
-    await Promise.all(cacheKeys.map(key => this.invalidateCache(key)));
+    // Invalidate all cache keys
+    await this.invalidateCache(cacheKeys);
   }
 
   async getUser(id: string): Promise<User | null> {
@@ -131,7 +129,7 @@ export class UserStorage extends BaseStorage<User> {
       const user = result[0];
 
       // Invalidate relevant cache patterns
-      await this.invalidateCache(`user:*`);
+      await this.invalidateCache(['user:*']);
 
       return user;
     });
@@ -185,7 +183,7 @@ export class UserStorage extends BaseStorage<User> {
 
       // Invalidate cache entries for this user and social profile
       await this.invalidateUserCache(userId, user.name, user.email);
-      await this.invalidateCache(`user:social:${profile.provider}:${profile.id}`);
+      await this.invalidateCache([`user:social:${profile.provider}:${profile.id}`]);
 
       return user;
     });
@@ -203,7 +201,7 @@ export class UserStorage extends BaseStorage<User> {
     });
 
     // Invalidate cache for this user
-    await this.invalidateCache(`user:${userId}`);
+    await this.invalidateCache([`user:${userId}`]);
   }
 
   /**

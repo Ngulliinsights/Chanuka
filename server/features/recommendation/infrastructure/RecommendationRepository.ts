@@ -31,7 +31,7 @@ export class RecommendationRepository {
       .select({ billId: billEngagement.billId })
       .from(billEngagement)
       .where(eq(billEngagement.userId, userId));
-    return [...new Set(rows.map(r => r.billId))];
+    return [...new Set(rows.map(r => r.billId as number))] as number[];
   }
 
   /*  ==========  Bill  ==========  */
@@ -49,7 +49,7 @@ export class RecommendationRepository {
       .select({ billId: billTags.billId })
       .from(billTags)
       .where(inArray(billTags.tag, tags));
-    const billIds = [...new Set(tagRows.map(r => r.billId))].filter(id => !excludeIds.includes(id));
+    const billIds = [...new Set(tagRows.map(r => r.billId as number))].filter((id: unknown) => !excludeIds.includes(id as number));
     if (!billIds.length) return [];
     const rows = await db.select().from(bills).where(inArray(bills.id, billIds));
     return rows.map(r => this.toPlain(r));
@@ -121,7 +121,7 @@ export class RecommendationRepository {
       if (type === 'view') updates.viewCount++;
       if (type === 'comment') updates.commentCount++;
       if (type === 'share') updates.shareCount++;
-      updates.engagementScore = this.calcScore(updates.viewCount, updates.commentCount, updates.shareCount);
+      (updates as any).engagementScore = this.calcScore(updates.viewCount, updates.commentCount, updates.shareCount);
       await db
         .update(billEngagement)
         .set(updates)
