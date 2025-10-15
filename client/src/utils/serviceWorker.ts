@@ -14,7 +14,7 @@ export function isServiceWorkerSupported(): boolean {
 // Register service worker
 export async function registerServiceWorker(config: ServiceWorkerConfig = {}): Promise<ServiceWorkerRegistration | null> {
   if (!isServiceWorkerSupported()) {
-    logger.info('Service workers are not supported in this browser', { component: 'SimpleTool' });
+    logger.info('Service workers are not supported in this browser', { component: 'Chanuka' });
     return null;
   }
 
@@ -23,7 +23,7 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
       scope: '/',
     });
 
-    logger.info('Service Worker registered successfully:', { component: 'SimpleTool' }, registration);
+    logger.info('Service Worker registered successfully:', { component: 'Chanuka' }, registration);
 
     // Handle updates
     registration.addEventListener('updatefound', () => {
@@ -34,11 +34,11 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
         if (newWorker.state === 'installed') {
           if (navigator.serviceWorker.controller) {
             // New content is available
-            logger.info('New content is available; please refresh.', { component: 'SimpleTool' });
+            logger.info('New content is available; please refresh.', { component: 'Chanuka' });
             config.onUpdate?.(registration);
           } else {
             // Content is cached for offline use
-            logger.info('Content is cached for offline use.', { component: 'SimpleTool' });
+            logger.info('Content is cached for offline use.', { component: 'Chanuka' });
             config.onSuccess?.(registration);
           }
         }
@@ -47,7 +47,7 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
 
     return registration;
   } catch (error) {
-    logger.error('Service Worker registration failed:', { component: 'SimpleTool' }, error);
+    logger.error('Service Worker registration failed:', { component: 'Chanuka' }, error);
     config.onError?.(error as Error);
     return null;
   }
@@ -63,12 +63,12 @@ export async function unregisterServiceWorker(): Promise<boolean> {
     const registration = await navigator.serviceWorker.getRegistration();
     if (registration) {
       const result = await registration.unregister();
-      logger.info('Service Worker unregistered:', { component: 'SimpleTool' }, result);
+      logger.info('Service Worker unregistered:', { component: 'Chanuka' }, result);
       return result;
     }
     return false;
   } catch (error) {
-    logger.error('Service Worker unregistration failed:', { component: 'SimpleTool' }, error);
+    logger.error('Service Worker unregistration failed:', { component: 'Chanuka' }, error);
     return false;
   }
 }
@@ -88,7 +88,7 @@ export async function getServiceWorkerRegistration(): Promise<ServiceWorkerRegis
   try {
     return await navigator.serviceWorker.getRegistration();
   } catch (error) {
-    logger.error('Failed to get service worker registration:', { component: 'SimpleTool' }, error);
+    logger.error('Failed to get service worker registration:', { component: 'Chanuka' }, error);
     return null;
   }
 }
@@ -118,9 +118,9 @@ export async function sendMessageToServiceWorker(message: any): Promise<any> {
 export async function clearAllCaches(): Promise<void> {
   try {
     await sendMessageToServiceWorker({ type: 'CLEAR_CACHE' });
-    logger.info('All caches cleared', { component: 'SimpleTool' });
+    logger.info('All caches cleared', { component: 'Chanuka' });
   } catch (error) {
-    logger.error('Failed to clear caches:', { component: 'SimpleTool' }, error);
+    logger.error('Failed to clear caches:', { component: 'Chanuka' }, error);
     throw error;
   }
 }
@@ -133,9 +133,9 @@ export async function skipWaiting(): Promise<void> {
 
   try {
     await sendMessageToServiceWorker({ type: 'SKIP_WAITING' });
-    logger.info('Service worker skip waiting triggered', { component: 'SimpleTool' });
+    logger.info('Service worker skip waiting triggered', { component: 'Chanuka' });
   } catch (error) {
-    logger.error('Failed to skip waiting:', { component: 'SimpleTool' }, error);
+    logger.error('Failed to skip waiting:', { component: 'Chanuka' }, error);
   }
 }
 
@@ -145,7 +145,7 @@ export async function getServiceWorkerVersion(): Promise<string | null> {
     const response = await sendMessageToServiceWorker({ type: 'GET_VERSION' });
     return response.version || null;
   } catch (error) {
-    logger.error('Failed to get service worker version:', { component: 'SimpleTool' }, error);
+    logger.error('Failed to get service worker version:', { component: 'Chanuka' }, error);
     return null;
   }
 }
@@ -167,7 +167,7 @@ export async function isContentCached(url: string): Promise<boolean> {
     }
     return false;
   } catch (error) {
-    logger.error('Failed to check cache:', { component: 'SimpleTool' }, error);
+    logger.error('Failed to check cache:', { component: 'Chanuka' }, error);
     return false;
   }
 }
@@ -241,9 +241,9 @@ export async function preloadCriticalResources(urls: string[]): Promise<void> {
       await Promise.allSettled(chunk.map(url => preloadWithRetry(url)));
     }
     
-    logger.info('Critical resources preloaded with retry logic', { component: 'SimpleTool' });
+    logger.info('Critical resources preloaded with retry logic', { component: 'Chanuka' });
   } catch (error) {
-    logger.error('Failed to preload critical resources:', { component: 'SimpleTool' }, error);
+    logger.error('Failed to preload critical resources:', { component: 'Chanuka' }, error);
   }
 }
 
@@ -325,9 +325,9 @@ export async function registerBackgroundSync(tag: string): Promise<void> {
   if (registration && 'sync' in registration) {
     try {
       await (registration as any).sync.register(tag);
-      logger.info('Background sync registered:', { component: 'SimpleTool' }, tag);
+      logger.info('Background sync registered:', { component: 'Chanuka' }, tag);
     } catch (error) {
-      logger.error('Background sync registration failed:', { component: 'SimpleTool' }, error);
+      logger.error('Background sync registration failed:', { component: 'Chanuka' }, error);
     }
   }
 }

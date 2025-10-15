@@ -336,11 +336,11 @@ class AlertingService {
       try {
         await this.checkAlertConditions();
       } catch (error) {
-        logger.error('[Alerting] Error checking alert conditions:', { component: 'SimpleTool' }, error);
+        logger.error('[Alerting] Error checking alert conditions:', { component: 'Chanuka' }, error);
       }
     }, 60000);
 
-    logger.info('[Alerting] Started monitoring with alert rules', { component: 'SimpleTool' });
+    logger.info('[Alerting] Started monitoring with alert rules', { component: 'Chanuka' });
   }
 
   /**

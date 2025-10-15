@@ -83,7 +83,7 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
         onMetricsUpdate(newMetrics);
       }
     } catch (error) {
-      logger.error('Failed to collect performance metrics:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to collect performance metrics:', { component: 'Chanuka' }, error);
       setMetrics(prev => ({ ...prev, isLoading: false }));
     }
   }, [getBundleMetrics, getCacheMetrics, getLatestRecommendations, onMetricsUpdate]);

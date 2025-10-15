@@ -22,8 +22,13 @@ describe('Task 12.3: External API Management Implementation', () => {
     costMonitoring = new APICostMonitoringService();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     apiManager.shutdown();
+
+    // Force cleanup of any remaining timers to prevent hanging
+    if ((apiManager as any).forceCleanupTimers) {
+      (apiManager as any).forceCleanupTimers();
+    }
   });
 
   describe('1. API Rate Limiting and Quota Management', () => {

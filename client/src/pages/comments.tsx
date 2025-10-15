@@ -36,7 +36,7 @@ export default function CommentsPage() {
         setComments(data);
       }
     } catch (error) {
-      logger.error('Failed to fetch comments:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to fetch comments:', { component: 'Chanuka' }, error);
     } finally {
       setLoading(false);
     }
@@ -63,7 +63,7 @@ export default function CommentsPage() {
         fetchComments();
       }
     } catch (error) {
-      logger.error('Failed to submit comment:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to submit comment:', { component: 'Chanuka' }, error);
     }
   };
 

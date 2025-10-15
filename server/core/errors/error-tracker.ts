@@ -76,19 +76,36 @@ class ErrorTracker {
   private readonly MAX_ERRORS = 10000;
   private readonly MAX_PATTERNS = 1000;
 
+  private cleanupInterval?: NodeJS.Timeout;
+  private alertCheckInterval?: NodeJS.Timeout;
+
   constructor() {
     // Initialize default alert rules
     this.initializeDefaultAlertRules();
 
     // Clean up old errors periodically
-    setInterval(() => {
+    this.cleanupInterval = setInterval(() => {
       this.cleanupOldErrors();
     }, 3600000); // 1 hour
 
     // Check alert conditions periodically
-    setInterval(() => {
+    this.alertCheckInterval = setInterval(() => {
       this.checkAlertConditions();
     }, 60000); // 1 minute
+  }
+
+  /**
+   * Shutdown method to clean up timers
+   */
+  shutdown(): void {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = undefined;
+    }
+    if (this.alertCheckInterval) {
+      clearInterval(this.alertCheckInterval);
+      this.alertCheckInterval = undefined;
+    }
   }
 
   /**

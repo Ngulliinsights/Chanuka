@@ -123,7 +123,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
         setWorkarounds(data);
       }
     } catch (error) {
-      logger.error('Error fetching implementation workarounds:', { component: 'SimpleTool' }, error);
+      logger.error('Error fetching implementation workarounds:', { component: 'Chanuka' }, error);
     } finally {
       setLoading(false);
     }
@@ -143,7 +143,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
         fetchWorkarounds(); // Refresh data
       }
     } catch (error) {
-      logger.error('Error confirming workaround:', { component: 'SimpleTool' }, error);
+      logger.error('Error confirming workaround:', { component: 'Chanuka' }, error);
     }
   };
 
@@ -167,7 +167,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
         fetchWorkarounds(); // Refresh data
       }
     } catch (error) {
-      logger.error('Error reporting workaround:', { component: 'SimpleTool' }, error);
+      logger.error('Error reporting workaround:', { component: 'Chanuka' }, error);
     }
   };
 

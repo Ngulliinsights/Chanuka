@@ -56,7 +56,7 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
           const data = await response.json();
           setCoSponsors(data.coSponsors || []);
         } else {
-          logger.error('Failed to fetch co-sponsors data', { component: 'SimpleTool' });
+          logger.error('Failed to fetch co-sponsors data', { component: 'Chanuka' });
           // Fallback to mock data if API fails
           setCoSponsors([
             {
@@ -89,7 +89,7 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
           ]);
         }
       } catch (error) {
-        logger.error('Error fetching co-sponsors data:', { component: 'SimpleTool' }, error);
+        logger.error('Error fetching co-sponsors data:', { component: 'Chanuka' }, error);
         // Fallback to mock data on error
         setCoSponsors([]);
       } finally {

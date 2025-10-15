@@ -71,7 +71,7 @@ class ServiceWorkerManager {
       this.registration = await navigator.serviceWorker.register(scriptURL);
       return this.registration;
     } catch (error) {
-      logger.error('Service Worker registration failed:', { component: 'SimpleTool' }, error);
+      logger.error('Service Worker registration failed:', { component: 'Chanuka' }, error);
       throw error;
     }
   }

@@ -1,4 +1,4 @@
-import { unifiedAlertPreferenceService } from '../users/alert-preferences/unified_alert_service.ts';
+import { unifiedAlertPreferenceService } from '../alert-preferences/unified_alert_service.ts';
 import { readDatabase as db } from '../../db.ts';
 import { users, bills, userInterests } from '../../db.ts';
 import { eq } from 'drizzle-orm';

@@ -1,4 +1,4 @@
-import { unifiedAlertPreferenceService } from '../../server/features/users/alert-preferences/unified_alert_service.js';
+import { unifiedAlertPreferenceService } from '../../server/features/alert-preferences/unified_alert_service.js';
 import { readDatabase as db } from '../../server/db.js';
 import { users, bills, userInterests } from '../../server/db.js';
 import { eq } from 'drizzle-orm';

@@ -1,5 +1,6 @@
 import { createMonitoringService } from '../../features/analytics/financial-disclosure/monitoring.js';
 import { databaseService } from '../../infrastructure/database/database-service.js';
+import { readDatabase } from '../../db.js';
 import { cacheService } from '../../infrastructure/cache/cache-service.js';
 import { logger } from '@shared/utils/logger';
 
@@ -15,17 +16,17 @@ export class MonitoringScheduler {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) {
-      logger.info('Monitoring scheduler already initialized', { component: 'SimpleTool' });
+      logger.info('Monitoring scheduler already initialized', { component: 'Chanuka' });
       return;
     }
 
     try {
-      logger.info('Initializing monitoring scheduler...', { component: 'SimpleTool' });
+      logger.info('Initializing monitoring scheduler...', { component: 'Chanuka' });
 
       // Initialize financial disclosure monitoring service
       this.financialDisclosureMonitoringService = createMonitoringService({
-        readDb: databaseService.getDatabase(),
-        writeDb: databaseService.getDatabase(),
+        readDb: readDatabase(),
+        writeDb: readDatabase(),
         cache: cacheService,
         logger
       });
@@ -37,9 +38,9 @@ export class MonitoringScheduler {
       this.setupShutdownHandlers();
 
       this.isInitialized = true;
-      logger.info('Monitoring scheduler initialized successfully', { component: 'SimpleTool' });
+      logger.info('Monitoring scheduler initialized successfully', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('Error initializing monitoring scheduler:', { component: 'SimpleTool' }, error);
+      logger.error('Error initializing monitoring scheduler:', { component: 'Chanuka' }, error);
       throw error;
     }
   }
@@ -53,7 +54,7 @@ export class MonitoringScheduler {
     }
 
     try {
-      logger.info('Shutting down monitoring scheduler...', { component: 'SimpleTool' });
+      logger.info('Shutting down monitoring scheduler...', { component: 'Chanuka' });
 
       // Stop financial disclosure monitoring
       if (this.financialDisclosureMonitoringService) {
@@ -61,9 +62,9 @@ export class MonitoringScheduler {
       }
 
       this.isInitialized = false;
-      logger.info('Monitoring scheduler shut down successfully', { component: 'SimpleTool' });
+      logger.info('Monitoring scheduler shut down successfully', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('Error shutting down monitoring scheduler:', { component: 'SimpleTool' }, error);
+      logger.error('Error shutting down monitoring scheduler:', { component: 'Chanuka' }, error);
     }
   }
 

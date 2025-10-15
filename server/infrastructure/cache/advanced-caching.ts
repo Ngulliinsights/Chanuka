@@ -118,7 +118,7 @@ export class AdvancedCachingService {
     this.startPeriodicCleanup();
     this.startPerformanceMonitoring();
 
-    logger.info('[Advanced Caching] Initialized with config:', { component: 'SimpleTool' }, this.config);
+    logger.info('[Advanced Caching] Initialized with config:', { component: 'Chanuka' }, this.config);
   }
 
   /**
@@ -160,7 +160,7 @@ export class AdvancedCachingService {
       return null;
 
     } catch (error) {
-      logger.error('[Advanced Caching] Error getting from cache:', { component: 'SimpleTool' }, error);
+      logger.error('[Advanced Caching] Error getting from cache:', { component: 'Chanuka' }, error);
       const duration = performance.now() - startTime;
       this.trackPerformance('get', key, duration, error instanceof Error ? error.message : String(error));
       return null;
@@ -199,7 +199,7 @@ export class AdvancedCachingService {
       return true;
 
     } catch (error) {
-      logger.error('[Advanced Caching] Error setting cache:', { component: 'SimpleTool' }, error);
+      logger.error('[Advanced Caching] Error setting cache:', { component: 'Chanuka' }, error);
       const duration = performance.now() - startTime;
       this.trackPerformance('set', key, duration, error instanceof Error ? error.message : String(error));
       return false;
@@ -231,7 +231,7 @@ export class AdvancedCachingService {
       return memoryDeleted;
 
     } catch (error) {
-      logger.error('[Advanced Caching] Error deleting from cache:', { component: 'SimpleTool' }, error);
+      logger.error('[Advanced Caching] Error deleting from cache:', { component: 'Chanuka' }, error);
       return false;
     }
   }
@@ -299,7 +299,7 @@ export class AdvancedCachingService {
           invalidatedCount++;
         }
       } catch (error) {
-        logger.error('[Advanced Caching] Error invalidating Redis keys:', { component: 'SimpleTool' }, error);
+        logger.error('[Advanced Caching] Error invalidating Redis keys:', { component: 'Chanuka' }, error);
       }
     }
 
@@ -316,7 +316,7 @@ export class AdvancedCachingService {
     ttl?: number;
     priority: 'high' | 'medium' | 'low';
   }>): Promise<void> {
-    logger.info('[Advanced Caching] Starting cache warming...', { component: 'SimpleTool' });
+    logger.info('[Advanced Caching] Starting cache warming...', { component: 'Chanuka' });
 
     // Sort by priority
     const sortedRules = warmingRules.sort((a, b) => {
@@ -344,7 +344,7 @@ export class AdvancedCachingService {
     });
 
     await Promise.allSettled(warmingPromises);
-    logger.info('[Advanced Caching] Cache warming completed', { component: 'SimpleTool' });
+    logger.info('[Advanced Caching] Cache warming completed', { component: 'Chanuka' });
   }
 
   /**
@@ -680,7 +680,7 @@ export class AdvancedCachingService {
     // Log cache statistics every 10 minutes
     setInterval(() => {
       const stats = this.getCacheStats();
-      logger.info('[Advanced Caching] Performance stats:', { component: 'SimpleTool' }, {
+      logger.info('[Advanced Caching] Performance stats:', { component: 'Chanuka' }, {
         memoryHitRate: stats.memory.hitRate.toFixed(2) + '%',
         memoryUsage: (stats.memory.memoryUsage / 1024 / 1024).toFixed(2) + 'MB',
         entries: stats.memory.entries,

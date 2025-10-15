@@ -172,7 +172,7 @@ function logError(error: Error, req: Request, context: ErrorContext): void {
   
   // Use appropriate log level based on severity
   if (context.severity === 'critical' || context.severity === 'high') {
-    logger.error('CRITICAL/HIGH Error:', { component: 'SimpleTool' }, logData);
+    logger.error('CRITICAL/HIGH Error:', { component: 'Chanuka' }, logData);
   } else {
     console.warn('Error:', logData);
   }

@@ -1,4 +1,15 @@
-import { database as db, bills, analysis } from '../../../shared/database/connection.js';
+import { readDatabase } from '../../db.js';
+import { bills, analysis } from '../../../shared/schema.js';
+// Backwards-compatible proxy so existing code using `db.select()` etc. keeps working
+const db = new Proxy({}, {
+  get(_target, prop: string | symbol) {
+    const d = readDatabase();
+    if (!d) {
+      return (..._args: any[]) => { throw new Error('Database not initialized'); };
+    }
+    return (d as any)[prop as any];
+  }
+}) as any;
 import { eq } from 'drizzle-orm';
 import { MLAnalysisService } from '../analytics/services/ml.service.js';
 import { logger } from '../../utils/logger.js';

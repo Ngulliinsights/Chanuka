@@ -23,7 +23,7 @@ export class SocialShareStorage extends BaseStorage<SocialShare> {
       // Simple health check for in-memory storage
       return true;
     } catch (error) {
-      logger.error('SocialShareStorage health check failed:', { component: 'SimpleTool' }, error);
+      logger.error('SocialShareStorage health check failed:', { component: 'Chanuka' }, error);
       return false;
     }
   }

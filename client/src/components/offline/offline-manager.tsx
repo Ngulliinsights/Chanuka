@@ -61,7 +61,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
         const request = indexedDB.open('chanuka-offline', 1);
         
         request.onerror = () => {
-          logger.error('Failed to open IndexedDB', { component: 'SimpleTool' });
+          logger.error('Failed to open IndexedDB', { component: 'Chanuka' });
         };
         
         request.onsuccess = () => {
@@ -82,7 +82,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
           }
         };
       } catch (error) {
-        logger.error('IndexedDB initialization failed:', { component: 'SimpleTool' }, error);
+        logger.error('IndexedDB initialization failed:', { component: 'Chanuka' }, error);
       }
     };
 
@@ -94,7 +94,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
         .then((registration) => {
-          logger.info('Service Worker registered:', { component: 'SimpleTool' }, registration);
+          logger.info('Service Worker registered:', { component: 'Chanuka' }, registration);
           setIsServiceWorkerReady(true);
           
           // Listen for updates
@@ -104,14 +104,14 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                   // New version available
-                  logger.info('New version available', { component: 'SimpleTool' });
+                  logger.info('New version available', { component: 'Chanuka' });
                 }
               });
             }
           });
         })
         .catch((error) => {
-          logger.error('Service Worker registration failed:', { component: 'SimpleTool' }, error);
+          logger.error('Service Worker registration failed:', { component: 'Chanuka' }, error);
         });
     }
   }, []);
@@ -160,7 +160,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
         setPendingActions(actionsRequest.result || []);
       };
     } catch (error) {
-      logger.error('Failed to load offline data:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to load offline data:', { component: 'Chanuka' }, error);
     }
   }, []);
 
@@ -186,7 +186,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
 
       setOfflineData(newOfflineData);
     } catch (error) {
-      logger.error('Failed to cache data:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to cache data:', { component: 'Chanuka' }, error);
     }
   }, [offlineData]);
 
@@ -214,7 +214,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
       await store.put(action);
       setPendingActions(prev => [...prev, action]);
     } catch (error) {
-      logger.error('Failed to add pending action:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to add pending action:', { component: 'Chanuka' }, error);
     }
   }, []);
 
@@ -222,7 +222,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
   const syncPendingActions = useCallback(async () => {
     if (!isOnline || !dbRef.current || pendingActions.length === 0) return;
 
-    logger.info('Syncing pending actions:', { component: 'SimpleTool' }, pendingActions.length);
+    logger.info('Syncing pending actions:', { component: 'Chanuka' }, pendingActions.length);
 
     for (const action of pendingActions) {
       try {
@@ -235,7 +235,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
         
         setPendingActions(prev => prev.filter(a => a.id !== action.id));
       } catch (error) {
-        logger.error('Failed to sync action:', { component: 'SimpleTool' }, action, error);
+        logger.error('Failed to sync action:', { component: 'Chanuka' }, action, error);
         
         // Increment retry count
         const updatedAction = {
@@ -310,7 +310,7 @@ export function OfflineProvider({ children }: OfflineProviderProps) {
       setOfflineData(null);
       setPendingActions([]);
     } catch (error) {
-      logger.error('Failed to clear offline data:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to clear offline data:', { component: 'Chanuka' }, error);
     }
   }, []);
 

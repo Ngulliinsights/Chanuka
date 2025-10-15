@@ -2317,7 +2317,7 @@ export interface EmailService {
 <span class="fstat-no" title="function not covered" >export </span>class MockEmailService extends BaseEmailService {
   private <span class="cstat-no" title="statement not covered" >mockMessages: EmailInboxMessage[] = [];</span>
   private <span class="cstat-no" title="statement not covered" >fallbackEmails: EmailMessage[] = [];</span>
-  private readonly <span class="cstat-no" title="statement not covered" >SUPPORT_EMAIL = 'support@simpletool.gov';</span>
+  private readonly <span class="cstat-no" title="statement not covered" >SUPPORT_EMAIL = 'support@Chanuka.gov';</span>
 &nbsp;
 <span class="fstat-no" title="function not covered" >  async </span>initialize(): Promise&lt;void&gt; {
     const now = <span class="cstat-no" title="statement not covered" >Date.now();</span>
@@ -2764,7 +2764,7 @@ export class EmailTemplates {
   .footer{text-align:center;padding:20px;color:#666;font-size:12px;background:#f0f0f0;border-radius:0 0 8px 8px}
   ul{text-align:left;display:inline-block}
 &lt;/style&gt;&lt;/head&gt;&lt;body&gt;
-  &lt;div class="header"&gt;&lt;h1&gt;Welcome to SimpleTool! 🇺🇸&lt;/h1&gt;&lt;/div&gt;
+  &lt;div class="header"&gt;&lt;h1&gt;Welcome to Chanuka! 🇺🇸&lt;/h1&gt;&lt;/div&gt;
   &lt;div class="content"&gt;
     &lt;h2&gt;Hello ${safeName},&lt;/h2&gt;
     &lt;p&gt;Welcome to your legislative tracking platform. We're excited to have you on board!&lt;/p&gt;
@@ -2777,7 +2777,7 @@ export class EmailTemplates {
     &lt;a class="button" href="${safeUrl}"&gt;Access Your Account&lt;/a&gt;
     &lt;p style="margin-top:20px;font-size:14px;color:#666"&gt;If you didn't create this account, please ignore this email.&lt;/p&gt;
   &lt;/div&gt;
-  &lt;div class="footer"&gt;© ${new Date().getFullYear()} SimpleTool. All rights reserved.&lt;/div&gt;
+  &lt;div class="footer"&gt;© ${new Date().getFullYear()} Chanuka. All rights reserved.&lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;`;
   }
 &nbsp;
@@ -2798,7 +2798,7 @@ export class EmailTemplates {
   &lt;div class="header"&gt;&lt;h1&gt;🔐 Password Reset Request&lt;/h1&gt;&lt;/div&gt;
   &lt;div class="content"&gt;
     &lt;h2&gt;Hello ${safeName},&lt;/h2&gt;
-    &lt;p&gt;We received a request to reset your password for your SimpleTool account.&lt;/p&gt;
+    &lt;p&gt;We received a request to reset your password for your Chanuka account.&lt;/p&gt;
     &lt;a class="button" href="${safeUrl}"&gt;Reset Your Password&lt;/a&gt;
     &lt;div class="warning"&gt;
       &lt;strong&gt;⚠️ Security Notice:&lt;/strong&gt;&lt;br&gt;
@@ -2806,7 +2806,7 @@ export class EmailTemplates {
       If you didn't request this reset, please ignore this email and your password will remain unchanged.
     &lt;/div&gt;
   &lt;/div&gt;
-  &lt;div class="footer"&gt;© ${new Date().getFullYear()} SimpleTool. All rights reserved.&lt;/div&gt;
+  &lt;div class="footer"&gt;© ${new Date().getFullYear()} Chanuka. All rights reserved.&lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;`;
   }
 &nbsp;
@@ -2845,7 +2845,7 @@ export class EmailTemplates {
       &lt;/div&gt;
     &lt;/div&gt;
   &lt;/div&gt;
-  &lt;div class="footer"&gt;© ${new Date().getFullYear()} SimpleTool. All rights reserved.&lt;/div&gt;
+  &lt;div class="footer"&gt;© ${new Date().getFullYear()} Chanuka. All rights reserved.&lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;`;
   }
 &nbsp;
@@ -2867,7 +2867,7 @@ export class EmailTemplates {
       introduced: '#3B82F6',
     };
     const statusColor = <span class="cstat-no" title="statement not covered" >statusColors[status.toLowerCase()] ?? '#F59E0B';</span>
-    const frontendUrl = <span class="cstat-no" title="statement not covered" >config.server.frontendUrl || 'https://simpletool.gov';</span>
+    const frontendUrl = <span class="cstat-no" title="statement not covered" >config.server.frontendUrl || 'https://Chanuka.gov';</span>
     
 <span class="cstat-no" title="statement not covered" >    return `</span>
 &lt;!DOCTYPE html&gt;&lt;html&gt;&lt;head&gt;&lt;meta charset="utf-8"&gt;&lt;title&gt;Bill Update&lt;/title&gt;
@@ -2890,7 +2890,7 @@ export class EmailTemplates {
     &lt;/div&gt;
     &lt;a class="button" href="${frontendUrl}/dashboard/bills"&gt;View Full Bill Details&lt;/a&gt;
   &lt;/div&gt;
-  &lt;div class="footer"&gt;© ${new Date().getFullYear()} SimpleTool. All rights reserved.&lt;/div&gt;
+  &lt;div class="footer"&gt;© ${new Date().getFullYear()} Chanuka. All rights reserved.&lt;/div&gt;
 &lt;/body&gt;&lt;/html&gt;`;
   }
 }
@@ -2990,15 +2990,15 @@ export async function <span class="fstat-no" title="function not covered" >sendT
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  switch (template) {</span>
     case 'welcome':
-<span class="cstat-no" title="statement not covered" >      subject = 'Welcome to SimpleTool!';</span>
+<span class="cstat-no" title="statement not covered" >      subject = 'Welcome to Chanuka!';</span>
 <span class="cstat-no" title="statement not covered" >      html = EmailTemplates.welcomeEmail(</span>
         data.userName ?? 'User',
-        data.loginUrl ?? 'https://simpletool.gov/login'
+        data.loginUrl ?? 'https://Chanuka.gov/login'
       );
 <span class="cstat-no" title="statement not covered" >      break;</span>
 &nbsp;
     case 'password-reset':
-<span class="cstat-no" title="statement not covered" >      subject = 'Reset Your Password - SimpleTool';</span>
+<span class="cstat-no" title="statement not covered" >      subject = 'Reset Your Password - Chanuka';</span>
 <span class="cstat-no" title="statement not covered" >      html = EmailTemplates.passwordResetEmail(</span>
         data.userName ?? 'User',
         data.resetUrl ?? '#'

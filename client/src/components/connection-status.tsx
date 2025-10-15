@@ -30,7 +30,7 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
       const result = await diagnose();
       setDiagnostics(result);
     } catch (error) {
-      logger.error('Diagnostics failed:', { component: 'SimpleTool' }, error);
+      logger.error('Diagnostics failed:', { component: 'Chanuka' }, error);
     }
   };
 

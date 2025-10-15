@@ -252,7 +252,7 @@ class LoggingService {
       }
     } catch (error) {
       if (error instanceof ZodError) {
-        logger.error('Invalid event structure:', { component: 'SimpleTool' }, error.errors);
+        logger.error('Invalid event structure:', { component: 'Chanuka' }, error.errors);
       }
       // Still try to log the original message
       switch (level) {

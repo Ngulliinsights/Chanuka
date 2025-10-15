@@ -1,4 +1,15 @@
-import { database as db } from '../../../shared/database/connection.js';
+import { readDatabase } from '../../db.js';
+// Backwards-compatible proxy so existing code using `db.select()` etc. keeps working
+const db = new Proxy({}, {
+  get(_target, prop: string | symbol) {
+    const d = readDatabase();
+    if (!d) {
+      // Return a noop function for common chainable methods to avoid runtime crashes during tests
+      return (..._args: any[]) => { throw new Error('Database not initialized'); };
+    }
+    return (d as any)[prop as any];
+  }
+}) as any;
 import { 
   sponsors, sponsorAffiliations, sponsorTransparency, billSponsorships, bills,
   type Sponsor, type SponsorAffiliation, type SponsorTransparency, type BillSponsorship 

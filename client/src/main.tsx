@@ -57,14 +57,14 @@ if (process.env.NODE_ENV === 'development') {
     import('./utils/development-error-recovery')
       .then(({ DevelopmentErrorRecovery }) => {
         DevelopmentErrorRecovery.getInstance();
-        logger.info('🛡️ Development error recovery initialized', { component: 'SimpleTool' });
+        logger.info('🛡️ Development error recovery initialized', { component: 'Chanuka' });
       })
       .catch(error => console.warn('Failed to initialize development error recovery:', error)),
     
     import('./utils/development-debug')
       .then(({ default: DevelopmentDebugger }) => {
         DevelopmentDebugger.getInstance();
-        logger.info('🔧 Development debug utilities initialized', { component: 'SimpleTool' });
+        logger.info('🔧 Development debug utilities initialized', { component: 'Chanuka' });
       })
       .catch(error => console.warn('Failed to initialize development debug utilities:', error))
   ]).catch(() => {});
@@ -197,7 +197,7 @@ async function initializeBrowserCompatibility(): Promise<void> {
       logResults: true
     });
     
-    logger.info('Browser compatibility initialized:', { component: 'SimpleTool' }, {
+    logger.info('Browser compatibility initialized:', { component: 'Chanuka' }, {
       browser: `${compatibilityStatus.browserInfo.name} ${compatibilityStatus.browserInfo.version}`,
       supported: compatibilityStatus.isSupported,
       polyfillsLoaded: compatibilityStatus.polyfillsLoaded,
@@ -212,7 +212,7 @@ async function initializeBrowserCompatibility(): Promise<void> {
     
     try {
       await loadPolyfills();
-      logger.info('Fallback polyfills loaded successfully', { component: 'SimpleTool' });
+      logger.info('Fallback polyfills loaded successfully', { component: 'Chanuka' });
     } catch (polyfillError) {
       console.warn('Fallback polyfills also failed:', polyfillError);
     }
@@ -270,7 +270,7 @@ function validateAndConfigureRoot(): HTMLElement {
  */
 async function mountReactApp(rootElement: HTMLElement): Promise<void> {
   updateLoadingState('mounting', 'Mounting React application...', 60);
-  logger.info('DOM ready, mounting React application...', { component: 'SimpleTool' });
+  logger.info('DOM ready, mounting React application...', { component: 'Chanuka' });
   
   await new Promise(resolve => setTimeout(resolve, 100));
   
@@ -283,7 +283,7 @@ async function mountReactApp(rootElement: HTMLElement): Promise<void> {
     </AssetLoadingProvider>
   );
   
-  logger.info('React application mounted successfully', { component: 'SimpleTool' });
+  logger.info('React application mounted successfully', { component: 'Chanuka' });
   updateLoadingState('mounting', 'React application mounted...', 80);
 }
 
@@ -300,14 +300,14 @@ async function registerServiceWorkerIfProduction(): Promise<void> {
   try {
     await registerServiceWorker({
       onUpdate: (registration) => {
-        logger.info('New content is available; please refresh.', { component: 'SimpleTool' });
+        logger.info('New content is available; please refresh.', { component: 'Chanuka' });
         showUpdateNotification();
       },
       onSuccess: (registration) => {
-        logger.info('Content is cached for offline use.', { component: 'SimpleTool' });
+        logger.info('Content is cached for offline use.', { component: 'Chanuka' });
       },
       onError: (error) => {
-        logger.error('Service worker registration failed:', { component: 'SimpleTool' }, error);
+        logger.error('Service worker registration failed:', { component: 'Chanuka' }, error);
       },
     });
   } catch (swError) {
@@ -324,7 +324,7 @@ function initializePerformanceMonitoring(): void {
   updateLoadingState('complete', 'Initializing performance monitoring...', 95);
   
   try {
-    logger.info('🚀 Performance monitoring active', { component: 'SimpleTool' });
+    logger.info('🚀 Performance monitoring active', { component: 'Chanuka' });
     
     setTimeout(() => {
       performanceMonitor.measureRouteChange('initial-load')();
@@ -340,7 +340,7 @@ function initializePerformanceMonitoring(): void {
  * Each phase updates the loading state to keep users informed
  */
 async function initializeApp(): Promise<void> {
-  logger.info('Initializing Chanuka Legislative Transparency Platform...', { component: 'SimpleTool' });
+  logger.info('Initializing Chanuka Legislative Transparency Platform...', { component: 'Chanuka' });
   
   // Phase 1: Environment validation
   updateLoadingState('validating', 'Validating browser environment...', 10);
@@ -374,7 +374,7 @@ async function initializeApp(): Promise<void> {
     // Loading state will be replaced by actual app content
   }, 200);
   
-  logger.info('Application initialization completed successfully', { component: 'SimpleTool' });
+  logger.info('Application initialization completed successfully', { component: 'Chanuka' });
 }
 
 /**
@@ -435,11 +435,11 @@ function reportInitializationError(error: Error): void {
     // Check storage quota asynchronously
     if ('storage' in navigator && 'estimate' in navigator.storage) {
       navigator.storage.estimate().then(estimate => {
-        logger.info('Storage quota:', { component: 'SimpleTool' }, estimate);
+        logger.info('Storage quota:', { component: 'Chanuka' }, estimate);
       });
     }
   } catch (reportingError) {
-    logger.error('Failed to report initialization error:', { component: 'SimpleTool' }, reportingError);
+    logger.error('Failed to report initialization error:', { component: 'Chanuka' }, reportingError);
   }
 }
 
@@ -528,7 +528,7 @@ Timestamp: ${new Date().toISOString()}</pre>
             window.location.reload();
           }
         } catch (e) {
-          logger.error('Failed to clear storage:', { component: 'SimpleTool' }, e);
+          logger.error('Failed to clear storage:', { component: 'Chanuka' }, e);
           window.location.reload();
         }
       }
@@ -580,7 +580,7 @@ async function initWithRetry(config: RetryConfig = defaultRetryConfig): Promise<
   initializationPromise = (async () => {
     try {
       await initializeApp();
-      logger.info('Application initialized successfully', { component: 'SimpleTool' });
+      logger.info('Application initialized successfully', { component: 'Chanuka' });
     } catch (error) {
       const currentError = error as Error;
       initRetries++;
@@ -605,7 +605,7 @@ async function initWithRetry(config: RetryConfig = defaultRetryConfig): Promise<
         initializationPromise = null;
         return initWithRetry(config);
       } else {
-        logger.error('Maximum initialization retries exceeded or non-retryable error encountered', { component: 'SimpleTool' });
+        logger.error('Maximum initialization retries exceeded or non-retryable error encountered', { component: 'Chanuka' });
         showInitializationError(currentError);
         throw currentError;
       }
@@ -638,13 +638,13 @@ async function startApplication(): Promise<void> {
     await initWithRetry();
     
   } catch (error) {
-    logger.error('Fatal error during application startup:', { component: 'SimpleTool' }, error);
+    logger.error('Fatal error during application startup:', { component: 'Chanuka' }, error);
     reportInitializationError(error as Error);
     
     try {
       showInitializationError(error as Error);
     } catch (fallbackError) {
-      logger.error('Failed to show error message:', { component: 'SimpleTool' }, fallbackError);
+      logger.error('Failed to show error message:', { component: 'Chanuka' }, fallbackError);
       
       document.body.innerHTML = `
         <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; 
@@ -669,14 +669,14 @@ async function startApplication(): Promise<void> {
  * Allows the retry mechanism to handle errors gracefully
  */
 window.addEventListener('error', (event) => {
-  logger.error('Global error during initialization:', { component: 'SimpleTool' }, event.error);
+  logger.error('Global error during initialization:', { component: 'Chanuka' }, event.error);
   if (isInitializing) {
     event.preventDefault();
   }
 });
 
 window.addEventListener('unhandledrejection', (event) => {
-  logger.error('Unhandled promise rejection during initialization:', { component: 'SimpleTool' }, event.reason);
+  logger.error('Unhandled promise rejection during initialization:', { component: 'Chanuka' }, event.reason);
   if (isInitializing) {
     event.preventDefault();
   }

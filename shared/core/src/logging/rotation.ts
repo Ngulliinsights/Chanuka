@@ -57,7 +57,7 @@ export class LogRotationManager {
       // Cleanup old archives
       await this.cleanupOldArchives();
     } catch (error) {
-      logger.error('Error during log rotation:', { component: 'SimpleTool' }, error);
+      logger.error('Error during log rotation:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -139,7 +139,7 @@ export class LogRotationManager {
       }
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-        logger.error('Error cleaning up old archives:', { component: 'SimpleTool' }, error);
+        logger.error('Error cleaning up old archives:', { component: 'Chanuka' }, error);
       }
     }
   }
@@ -152,7 +152,7 @@ export class LogRotationManager {
       await mkdir(this.logDir, { recursive: true });
       await mkdir(path.join(this.logDir, 'archive'), { recursive: true });
     } catch (error) {
-      logger.error('Error creating log directories:', { component: 'SimpleTool' }, error);
+      logger.error('Error creating log directories:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -162,7 +162,7 @@ export class LogRotationManager {
   private startRotationCheck(): void {
     setInterval(() => {
       this.checkRotation().catch(error => {
-        logger.error('Error in rotation check interval:', { component: 'SimpleTool' }, error);
+        logger.error('Error in rotation check interval:', { component: 'Chanuka' }, error);
       });
     }, this.config.checkInterval);
   }

@@ -15,23 +15,23 @@ if (typeof window === 'undefined') {
 }
 
 async function runMigrations() {
-  logger.info('🚀 Starting database migrations...', { component: 'SimpleTool' });
+  logger.info('🚀 Starting database migrations...', { component: 'Chanuka' });
 
   if (!process.env.DATABASE_URL) {
     throw new Error('DATABASE_URL must be set');
   }
 
   // Diagnostic logging for SSL authentication debugging
-  logger.info('🔍 Migration Script Diagnostics:', { component: 'SimpleTool' });
-  logger.info('NODE_ENV:', { component: 'SimpleTool' }, process.env.NODE_ENV);
-  logger.info('DATABASE_URL exists:', { component: 'SimpleTool' }, !!process.env.DATABASE_URL);
-  logger.info('DATABASE_URL starts with postgres:', { component: 'SimpleTool' }, process.env.DATABASE_URL?.startsWith('postgres'));
-  logger.info('DATABASE_URL contains sslmode:', { component: 'SimpleTool' }, process.env.DATABASE_URL?.includes('sslmode'));
+  logger.info('🔍 Migration Script Diagnostics:', { component: 'Chanuka' });
+  logger.info('NODE_ENV:', { component: 'Chanuka' }, process.env.NODE_ENV);
+  logger.info('DATABASE_URL exists:', { component: 'Chanuka' }, !!process.env.DATABASE_URL);
+  logger.info('DATABASE_URL starts with postgres:', { component: 'Chanuka' }, process.env.DATABASE_URL?.startsWith('postgres'));
+  logger.info('DATABASE_URL contains sslmode:', { component: 'Chanuka' }, process.env.DATABASE_URL?.includes('sslmode'));
   if (process.env.DATABASE_URL?.includes('sslmode')) {
     const sslmode = process.env.DATABASE_URL.match(/sslmode=([^&\s]+)/)?.[1];
-    logger.info('SSL mode in URL:', { component: 'SimpleTool' }, sslmode);
+    logger.info('SSL mode in URL:', { component: 'Chanuka' }, sslmode);
   }
-  logger.info('Using Neon serverless pool', { component: 'SimpleTool' });
+  logger.info('Using Neon serverless pool', { component: 'Chanuka' });
 
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
@@ -100,9 +100,9 @@ async function runMigrations() {
       }
     }
 
-    logger.info('🎉 All migrations completed successfully!', { component: 'SimpleTool' });
+    logger.info('🎉 All migrations completed successfully!', { component: 'Chanuka' });
   } catch (error) {
-    logger.error('💥 Migration failed:', { component: 'SimpleTool' }, error.message);
+    logger.error('💥 Migration failed:', { component: 'Chanuka' }, error.message);
     throw error;
   } finally {
     await pool.end();
@@ -111,11 +111,11 @@ async function runMigrations() {
 
 runMigrations()
   .then(() => {
-    logger.info('Migration process completed', { component: 'SimpleTool' });
+    logger.info('Migration process completed', { component: 'Chanuka' });
     process.exit(0);
   })
   .catch((error) => {
-    logger.error('Migration process failed:', { component: 'SimpleTool' }, error);
+    logger.error('Migration process failed:', { component: 'Chanuka' }, error);
     process.exit(1);
   });
 

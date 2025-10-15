@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import { logger } from '../utils/logger.js';
 
-logger.info('🔍 Verifying Financial Disclosure Monitoring System...\n', { component: 'SimpleTool' });
+logger.info('🔍 Verifying Financial Disclosure Monitoring System...\n', { component: 'Chanuka' });
 
 async function verifySystem() {
   const results = {
@@ -261,17 +261,17 @@ async function verifySystem() {
 // Run verification
 verifySystem()
   .then(results => {
-    logger.info('\n📊 Verification Results:', { component: 'SimpleTool' });
+    logger.info('\n📊 Verification Results:', { component: 'Chanuka' });
     console.log(`✅ Passed: ${results.passed}`);
     console.log(`❌ Failed: ${results.failed}`);
     console.log(`📈 Success Rate: ${((results.passed / (results.passed + results.failed)) * 100).toFixed(1)}%`);
     
     if (results.failed === 0) {
-      logger.info('\n🎉 All tests passed! Financial Disclosure Monitoring System is ready.', { component: 'SimpleTool' });
+      logger.info('\n🎉 All tests passed! Financial Disclosure Monitoring System is ready.', { component: 'Chanuka' });
       process.exit(0);
     } else {
-      logger.info('\n⚠️  Some tests failed. Review the errors above.', { component: 'SimpleTool' });
-      logger.info('\nFailed Tests:', { component: 'SimpleTool' });
+      logger.info('\n⚠️  Some tests failed. Review the errors above.', { component: 'Chanuka' });
+      logger.info('\nFailed Tests:', { component: 'Chanuka' });
       results.tests
         .filter(test => test.status === 'FAILED')
         .forEach(test => {
@@ -281,6 +281,6 @@ verifySystem()
     }
   })
   .catch(error => {
-    logger.error('\n💥 Verification failed with error:', { component: 'SimpleTool' }, error);
+    logger.error('\n💥 Verification failed with error:', { component: 'Chanuka' }, error);
     process.exit(1);
   });

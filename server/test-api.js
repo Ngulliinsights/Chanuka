@@ -29,7 +29,7 @@ async function testEndpoint(endpoint, method = 'GET', body = null) {
 }
 
 async function runTests() {
-  logger.info('🧪 Testing API endpoints...', { component: 'SimpleTool' });
+  logger.info('🧪 Testing API endpoints...', { component: 'Chanuka' });
   
   // Test health endpoint
   await testEndpoint('/api/health');
@@ -59,7 +59,7 @@ async function runTests() {
     password: 'testpassword'
   });
   
-  logger.info('✅ API endpoint tests completed', { component: 'SimpleTool' });
+  logger.info('✅ API endpoint tests completed', { component: 'Chanuka' });
 }
 
 // Wait a moment for server to start, then run tests

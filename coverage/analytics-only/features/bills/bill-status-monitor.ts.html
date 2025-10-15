@@ -1637,7 +1637,7 @@ export class BillStatusMonitorService {
 <span class="cstat-no" title="statement not covered" >      console.log(`✅ Successfully processed status change for bill ${change.billId}`);</span>
 &nbsp;
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      logger.error('Error handling bill status change:', { component: 'SimpleTool' }, error as any);</span>
+<span class="cstat-no" title="statement not covered" >      logger.error('Error handling bill status change:', { component: 'Chanuka' }, error as any);</span>
 <span class="cstat-no" title="statement not covered" >      throw error;</span>
     }
   }
@@ -1684,7 +1684,7 @@ export class BillStatusMonitorService {
 <span class="cstat-no" title="statement not covered" >      console.log(`✅ Successfully processed engagement update for bill ${update.billId}`);</span>
 &nbsp;
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      logger.error('Error handling bill engagement update:', { component: 'SimpleTool' }, error as any);</span>
+<span class="cstat-no" title="statement not covered" >      logger.error('Error handling bill engagement update:', { component: 'Chanuka' }, error as any);</span>
 <span class="cstat-no" title="statement not covered" >      throw error;</span>
     }
   }
@@ -2171,7 +2171,7 @@ export class BillStatusMonitorService {
       
 <span class="cstat-no" title="statement not covered" >      await cacheService.set(cacheKey, recentChanges, CACHE_TTL.BILL_DATA);</span>
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      logger.error('Error caching status change:', { component: 'SimpleTool' }, error as any);</span>
+<span class="cstat-no" title="statement not covered" >      logger.error('Error caching status change:', { component: 'Chanuka' }, error as any);</span>
     }
   }
 &nbsp;
@@ -2206,7 +2206,7 @@ export class BillStatusMonitorService {
    * Cleanup resources
    */
 <span class="fstat-no" title="function not covered" >  async </span>shutdown(): Promise&lt;void&gt; {
-<span class="cstat-no" title="statement not covered" >    logger.info('Shutting down Bill Status Monitor Service...', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >    logger.info('Shutting down Bill Status Monitor Service...', { component: 'Chanuka' });</span>
     
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (this.batchInterval) {</span>
 <span class="cstat-no" title="statement not covered" >      clearInterval(this.batchInterval);</span>
@@ -2219,7 +2219,7 @@ export class BillStatusMonitorService {
 <span class="cstat-no" title="statement not covered" >    this.statusChangeListeners.clear();</span>
 <span class="cstat-no" title="statement not covered" >    this.batchedNotifications.clear();</span>
     
-<span class="cstat-no" title="statement not covered" >    logger.info('Bill Status Monitor Service shutdown complete', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >    logger.info('Bill Status Monitor Service shutdown complete', { component: 'Chanuka' });</span>
   }
 }
 &nbsp;

@@ -56,7 +56,7 @@ export class CoverageAnalyzer {
       
       return this.parseCoverageData(coverageData, 'server');
     } catch (error) {
-      logger.error('Error analyzing server coverage:', { component: 'SimpleTool' }, error);
+      logger.error('Error analyzing server coverage:', { component: 'Chanuka' }, error);
       return this.getEmptyCoverageReport();
     }
   }
@@ -69,7 +69,7 @@ export class CoverageAnalyzer {
       
       return this.parseCoverageData(coverageData, 'client');
     } catch (error) {
-      logger.error('Error analyzing client coverage:', { component: 'SimpleTool' }, error);
+      logger.error('Error analyzing client coverage:', { component: 'Chanuka' }, error);
       return this.getEmptyCoverageReport();
     }
   }
@@ -82,7 +82,7 @@ export class CoverageAnalyzer {
       
       return this.parseCoverageData(coverageData, 'integration');
     } catch (error) {
-      logger.error('Error analyzing integration coverage:', { component: 'SimpleTool' }, error);
+      logger.error('Error analyzing integration coverage:', { component: 'Chanuka' }, error);
       return this.getEmptyCoverageReport();
     }
   }

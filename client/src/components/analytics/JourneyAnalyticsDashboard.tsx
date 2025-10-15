@@ -82,7 +82,7 @@ export function JourneyAnalyticsDashboard({ className }: JourneyAnalyticsDashboa
       setAnalytics(analyticsData);
       setOptimizations(optimizationData);
     } catch (error) {
-      logger.error('Failed to load analytics:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to load analytics:', { component: 'Chanuka' }, error);
     } finally {
       setLoading(false);
     }

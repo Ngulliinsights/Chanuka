@@ -306,7 +306,7 @@ export class MLAnalysisService {
       };
     } catch (error) {
       logger.error('Error in implementation workaround detection:', {
-        component: 'SimpleTool',
+        component: 'Chanuka',
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined
       });
@@ -356,7 +356,7 @@ export async function detectImplementationWorkarounds(billId: string): Promise<I
     ];
   } catch (error) {
     logger.error('Error in detectImplementationWorkarounds:', {
-      component: 'SimpleTool',
+      component: 'Chanuka',
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined
     });
@@ -448,7 +448,7 @@ export async function performComprehensiveAnalysis(billId: string): Promise<{
     };
   } catch (error) {
     logger.error('Error in comprehensive analysis:', {
-      component: 'SimpleTool',
+      component: 'Chanuka',
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined
     });

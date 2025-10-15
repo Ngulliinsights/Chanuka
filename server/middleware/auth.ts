@@ -41,7 +41,7 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
     req.user = result.user;
     next();
   } catch (error) {
-    logger.error('Auth middleware error:', { component: 'SimpleTool' }, error);
+    logger.error('Auth middleware error:', { component: 'Chanuka' }, error);
     return res.status(403).json({ error: 'Invalid token' });
   }
 };

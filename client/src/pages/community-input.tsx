@@ -145,7 +145,7 @@ const CommunityInputPage: React.FC = () => {
         throw new Error('Failed to submit comment');
       }
     } catch (error) {
-      logger.error('Comment submission failed:', { component: 'SimpleTool' }, error);
+      logger.error('Comment submission failed:', { component: 'Chanuka' }, error);
       alert('Unable to submit comment. Please try again.');
     }
   };

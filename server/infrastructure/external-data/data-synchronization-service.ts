@@ -51,7 +51,7 @@ export class DataSynchronizationService extends EventEmitter {
 
       console.log(`✅ Initialized sync schedules for ${dataSources.length} data sources`);
     } catch (error) {
-      logger.error('❌ Failed to initialize sync schedules:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Failed to initialize sync schedules:', { component: 'Chanuka' }, error);
       throw error;
     }
   }
@@ -367,7 +367,7 @@ export class DataSynchronizationService extends EventEmitter {
 
       return lastJob[0]?.endTime || undefined;
     } catch (error) {
-      logger.error('Error getting last sync timestamp:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting last sync timestamp:', { component: 'Chanuka' }, error);
       return undefined;
     }
   }
@@ -510,7 +510,7 @@ export class DataSynchronizationService extends EventEmitter {
       }
       return null;
     } catch (error) {
-      logger.error('Error getting sync job status:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting sync job status:', { component: 'Chanuka' }, error);
       return null;
     }
   }

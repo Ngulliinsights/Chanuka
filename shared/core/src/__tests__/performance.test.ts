@@ -207,7 +207,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       expect(concurrentReadsResult!.operationsPerSecond).toBeGreaterThan(5000); // Should handle concurrent load
 
       // Log results for analysis
-      logger.info('\n=== Cache Performance Results ===', { component: 'SimpleTool' });
+      logger.info('\n=== Cache Performance Results ===', { component: 'Chanuka' });
       results.forEach(result => {
         if (result.success) {
           console.log(`${result.name}: ${result.operationsPerSecond.toFixed(0)} ops/sec, avg: ${(result.averageTimeMs || 0).toFixed(2)}ms`);
@@ -230,7 +230,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       // Should not use excessive memory (less than 100MB for test data)
       expect(largestPoint.heapUsed).toBeLessThan(100 * 1024 * 1024);
 
-      logger.info('\n=== Cache Memory Usage ===', { component: 'SimpleTool' });
+      logger.info('\n=== Cache Memory Usage ===', { component: 'Chanuka' });
       memoryPoints.forEach(point => {
         console.log(`${point.sizeKB}KB x ${point.entryCount}: ${(point.heapUsed / 1024 / 1024).toFixed(2)}MB heap`);
       });
@@ -253,7 +253,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       expect(burstResult).toBeDefined();
       expect(burstResult!.operationsPerSecond).toBeGreaterThan(2000); // Should handle burst traffic
 
-      logger.info('\n=== Rate Limiting Performance Results ===', { component: 'SimpleTool' });
+      logger.info('\n=== Rate Limiting Performance Results ===', { component: 'Chanuka' });
       results.forEach(result => {
         if (result.success && result.operationsPerSecond) {
           console.log(`${result.name}: ${result.operationsPerSecond.toFixed(0)} ops/sec, avg: ${(result.averageTimeMs || 0).toFixed(2)}ms`);
@@ -271,7 +271,7 @@ describe('Core Utilities Performance Benchmarks', () => {
 
       const algorithmResults = algorithmResult!.customResults!.algorithmResults;
       
-      logger.info('\n=== Rate Limiting Algorithm Comparison ===', { component: 'SimpleTool' });
+      logger.info('\n=== Rate Limiting Algorithm Comparison ===', { component: 'Chanuka' });
       algorithmResults.forEach((result: any) => {
         console.log(`${result.algorithm}: ${result.avgTimeMs.toFixed(2)}ms average`);
         expect(result.avgTimeMs).toBeLessThan(5); // All algorithms should be under 5ms
@@ -299,7 +299,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       expect(concurrentResult).toBeDefined();
       expect(concurrentResult!.operationsPerSecond).toBeGreaterThan(5000); // Should handle concurrent logging
 
-      logger.info('\n=== Logging Performance Results ===', { component: 'SimpleTool' });
+      logger.info('\n=== Logging Performance Results ===', { component: 'Chanuka' });
       results.forEach(result => {
         if (result.success) {
           console.log(`${result.name}: ${result.operationsPerSecond.toFixed(0)} ops/sec, avg: ${(result.averageTimeMs || 0).toFixed(2)}ms`);
@@ -329,7 +329,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       expect(batchResult).toBeDefined();
       expect(batchResult!.operationsPerSecond).toBeGreaterThan(100); // Should handle batch validations
 
-      logger.info('\n=== Validation Performance Results ===', { component: 'SimpleTool' });
+      logger.info('\n=== Validation Performance Results ===', { component: 'Chanuka' });
       results.forEach(result => {
         if (result.success) {
           console.log(`${result.name}: ${result.operationsPerSecond.toFixed(0)} ops/sec, avg: ${(result.averageTimeMs || 0).toFixed(2)}ms`);
@@ -358,7 +358,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       expect(rateLimitLoggingResult).toBeDefined();
       expect(rateLimitLoggingResult!.operationsPerSecond).toBeGreaterThan(3000); // Should handle rate limiting + logging efficiently
 
-      logger.info('\n=== Integration Performance Results ===', { component: 'SimpleTool' });
+      logger.info('\n=== Integration Performance Results ===', { component: 'Chanuka' });
       results.forEach(result => {
         if (result.success) {
           console.log(`${result.name}: ${result.operationsPerSecond.toFixed(0)} ops/sec, avg: ${(result.averageTimeMs || 0).toFixed(2)}ms`);
@@ -389,7 +389,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       expect(suite.summary.categoryStats.validation).toBeDefined();
       expect(suite.summary.categoryStats.integration).toBeDefined();
 
-      logger.info('\n=== Full Benchmark Suite Summary ===', { component: 'SimpleTool' });
+      logger.info('\n=== Full Benchmark Suite Summary ===', { component: 'Chanuka' });
       console.log(`Total Tests: ${suite.summary.totalTests}`);
       console.log(`Successful: ${suite.summary.successfulTests}`);
       console.log(`Failed: ${suite.summary.failedTests}`);
@@ -397,7 +397,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       console.log(`Environment: Node ${suite.environment.nodeVersion} on ${suite.environment.platform}`);
       console.log(`CPUs: ${suite.environment.cpuCount}, Memory: ${suite.environment.totalMemoryMB.toFixed(0)}MB`);
 
-      logger.info('\n=== Category Performance Summary ===', { component: 'SimpleTool' });
+      logger.info('\n=== Category Performance Summary ===', { component: 'Chanuka' });
       Object.entries(suite.summary.categoryStats).forEach(([category, stats]) => {
         console.log(`${category}: ${stats.averageOpsPerSecond.toFixed(0)} avg ops/sec, ${stats.averageTimeMs.toFixed(2)}ms avg time`);
       });
@@ -412,7 +412,7 @@ describe('Core Utilities Performance Benchmarks', () => {
         { name: 'integration:full-pipeline', minOpsPerSecond: 1000 }
       ];
 
-      logger.info('\n=== Performance Regression Check ===', { component: 'SimpleTool' });
+      logger.info('\n=== Performance Regression Check ===', { component: 'Chanuka' });
       criticalBenchmarks.forEach(({ name, minOpsPerSecond }) => {
         const result = suite.results.find(r => r.name === name);
         if (result && result.success) {
@@ -456,7 +456,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       });
 
       if (regressions.length > 0) {
-        logger.info('\n=== Performance Regressions Detected ===', { component: 'SimpleTool' });
+        logger.info('\n=== Performance Regressions Detected ===', { component: 'Chanuka' });
         regressions.forEach(regression => console.log(`⚠️  ${regression}`));
       }
 
@@ -468,7 +468,7 @@ describe('Core Utilities Performance Benchmarks', () => {
       
       const criticalOperations = ['cache:get', 'cache:set', 'rate-limit:single', 'logging:single'];
       
-      logger.info('\n=== Percentile Analysis ===', { component: 'SimpleTool' });
+      logger.info('\n=== Percentile Analysis ===', { component: 'Chanuka' });
       criticalOperations.forEach(opName => {
         const result = suite.results.find(r => r.name === opName);
         if (result && result.success && result.percentiles) {

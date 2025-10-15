@@ -98,7 +98,7 @@ export class SecurityMonitoringMiddleware {
         next();
 
       } catch (error) {
-        logger.error('Security monitoring error:', { component: 'SimpleTool' }, error);
+        logger.error('Security monitoring error:', { component: 'Chanuka' }, error);
         
         // Log the error but don't block the request
         if (this.options.enableAuditLogging) {

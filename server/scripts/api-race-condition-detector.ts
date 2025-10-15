@@ -234,7 +234,7 @@ export class EnhancedAPIRaceConditionDetector {
 
   async analyzeCodebase(): Promise<AnalysisReport> {
     const startTime = performance.now();
-    logger.info('🔍 Starting enhanced API race condition analysis...\n', { component: 'SimpleTool' });
+    logger.info('🔍 Starting enhanced API race condition analysis...\n', { component: 'Chanuka' });
 
     try {
       const files = await this.findRelevantFiles(process.cwd());
@@ -256,7 +256,7 @@ export class EnhancedAPIRaceConditionDetector {
 
       return report;
     } catch (error) {
-      logger.error('❌ Analysis failed:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Analysis failed:', { component: 'Chanuka' }, error);
       throw error;
     }
   }
@@ -719,7 +719,7 @@ async function main() {
   const detector = new EnhancedAPIRaceConditionDetector();
   try {
     const report = await detector.analyzeCodebase();
-    logger.info('\n✅ Analysis complete!', { component: 'SimpleTool' });
+    logger.info('\n✅ Analysis complete!', { component: 'Chanuka' });
     console.log(`📊 Total API calls found: ${report.summary.totalAPICalls}`);
     await detector.saveReport(report);
   } catch (error) {

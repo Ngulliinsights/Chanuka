@@ -1,8 +1,8 @@
 // Simple verification script to test active state logic
 const { isNavigationPathActive } = require('./client/src/utils/navigation/active-state.ts');
 
-logger.info('Testing Active State Logic:', { component: 'SimpleTool' });
-logger.info('=========================', { component: 'SimpleTool' });
+logger.info('Testing Active State Logic:', { component: 'Chanuka' });
+logger.info('=========================', { component: 'Chanuka' });
 
 // Test cases
 const testCases = [
@@ -25,9 +25,9 @@ testCases.forEach(({ path, currentPath, expected, description }) => {
   }
 });
 
-logger.info('\nActive State Management Implementation Complete!', { component: 'SimpleTool' });
-logger.info('✅ Centralized active state utility created', { component: 'SimpleTool' });
-logger.info('✅ Consistent styling across all navigation components', { component: 'SimpleTool' });
-logger.info('✅ Immediate route change detection', { component: 'SimpleTool' });
-logger.info('✅ Proper handling of exact matches and nested routes', { component: 'SimpleTool' });
-logger.info('✅ Role-based styling for admin and expert items', { component: 'SimpleTool' });
+logger.info('\nActive State Management Implementation Complete!', { component: 'Chanuka' });
+logger.info('✅ Centralized active state utility created', { component: 'Chanuka' });
+logger.info('✅ Consistent styling across all navigation components', { component: 'Chanuka' });
+logger.info('✅ Immediate route change detection', { component: 'Chanuka' });
+logger.info('✅ Proper handling of exact matches and nested routes', { component: 'Chanuka' });
+logger.info('✅ Role-based styling for admin and expert items', { component: 'Chanuka' });

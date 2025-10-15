@@ -1056,7 +1056,7 @@ class ConfigManager extends EventEmitter {
       this.validateRuntimeDependencies();
       
     } catch (error) {
-      logger.error('Configuration initialization failed:', { component: 'SimpleTool' }, error);
+      logger.error('Configuration initialization failed:', { component: 'Chanuka' }, error);
       process.exit(1);
     }
   }

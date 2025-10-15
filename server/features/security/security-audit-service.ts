@@ -25,7 +25,7 @@ export interface SecurityEvent {
   userAgent?: string;
   resource?: string;
   action?: string;
-  result: string;
+  result?: string;
   success: boolean;
   details?: Record<string, any>;
   sessionId?: string;
@@ -66,6 +66,8 @@ export class SecurityAuditService {
    */
   async logSecurityEvent(event: SecurityEvent): Promise<void> {
     try {
+      // Drizzle insert expects required fields to be non-undefined.
+      // Coalesce `result` to a sensible default so the insert signature matches.
       await db.insert(securityAuditLogs).values({
         eventType: event.eventType,
         userId: event.userId,
@@ -73,7 +75,8 @@ export class SecurityAuditService {
         userAgent: event.userAgent,
         resource: event.resource,
         action: event.action,
-        result: event.result,
+        // Ensure `result` is always a string (Drizzle's types require it)
+        result: event.result ?? (event.success ? 'success' : 'failure'),
         severity: event.severity,
         details: event.details,
         sessionId: event.sessionId,

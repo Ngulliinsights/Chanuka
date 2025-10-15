@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth.js';
 import { notificationService } from './notification-service.js';
-import { userPreferencesService } from '../../features/users/user-preferences.js';
+import { userPreferencesService } from '../../features/users/domain/user-preferences.js';
 import { notificationChannelService } from './notification-channels.js';
 import { smartNotificationFilterService } from './smart-notification-filter.js';
 import { z } from 'zod';
@@ -76,7 +76,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
     });
 
   } catch (error) {
-    logger.error('Error getting notifications:', { component: 'SimpleTool' }, error);
+    logger.error('Error getting notifications:', { component: 'Chanuka' }, error);
 
     if (error instanceof z.ZodError) {
       return ApiValidationError(res, error);
@@ -111,7 +111,7 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Respo
     return ApiSuccess(res, notification, {}, 201);
 
   } catch (error) {
-    logger.error('Error creating notification:', { component: 'SimpleTool' }, error);
+    logger.error('Error creating notification:', { component: 'Chanuka' }, error);
 
     if (error instanceof z.ZodError) {
       return ApiValidationError(res, error);
@@ -142,7 +142,7 @@ router.patch('/:id/read', authenticateToken, async (req: AuthenticatedRequest, r
     return ApiSuccess(res, { message: 'Notification marked as read' });
 
   } catch (error) {
-    logger.error('Error marking notification as read:', { component: 'SimpleTool' }, error);
+    logger.error('Error marking notification as read:', { component: 'Chanuka' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to mark notification as read' }, 500);
   }
 });
@@ -163,7 +163,7 @@ router.patch('/read-all', authenticateToken, async (req: AuthenticatedRequest, r
     return ApiSuccess(res, { message: 'All notifications marked as read' });
 
   } catch (error) {
-    logger.error('Error marking all notifications as read:', { component: 'SimpleTool' }, error);
+    logger.error('Error marking all notifications as read:', { component: 'Chanuka' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to mark all notifications as read' }, 500);
   }
 });
@@ -188,7 +188,7 @@ router.delete('/:id', authenticateToken, async (req: AuthenticatedRequest, res: 
     return ApiSuccess(res, { message: 'Notification deleted' });
 
   } catch (error) {
-    logger.error('Error deleting notification:', { component: 'SimpleTool' }, error);
+    logger.error('Error deleting notification:', { component: 'Chanuka' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to delete notification' }, 500);
   }
 });
@@ -208,7 +208,7 @@ router.get('/stats', authenticateToken, async (req: AuthenticatedRequest, res: R
     return ApiSuccess(res, stats);
 
   } catch (error) {
-    logger.error('Error getting notification stats:', { component: 'SimpleTool' }, error);
+    logger.error('Error getting notification stats:', { component: 'Chanuka' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to get notification statistics' }, 500);
   }
 });
@@ -265,7 +265,7 @@ router.get('/preferences/enhanced', authenticateToken, async (req: Authenticated
     });
 
   } catch (error) {
-    logger.error('Error getting enhanced preferences:', { component: 'SimpleTool' }, error);
+    logger.error('Error getting enhanced preferences:', { component: 'Chanuka' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to get enhanced preferences' }, 500);
   }
 });
@@ -289,7 +289,7 @@ router.patch('/preferences/channels', authenticateToken, async (req: Authenticat
     return ApiSuccess(res, { message: 'Channel preferences updated successfully' });
 
   } catch (error) {
-    logger.error('Error updating channel preferences:', { component: 'SimpleTool' }, error);
+    logger.error('Error updating channel preferences:', { component: 'Chanuka' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to update channel preferences' }, 500);
   }
 });
@@ -315,7 +315,7 @@ router.post('/test-filter', authenticateToken, async (req: AuthenticatedRequest,
     return ApiSuccess(res, filterResult);
 
   } catch (error) {
-    logger.error('Error testing smart filter:', { component: 'SimpleTool' }, error);
+    logger.error('Error testing smart filter:', { component: 'Chanuka' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to test smart filter' }, 500);
   }
 });
@@ -338,7 +338,7 @@ router.get('/status', async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    logger.error('Error getting service status:', { component: 'SimpleTool' }, error);
+    logger.error('Error getting service status:', { component: 'Chanuka' }, error);
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to get service status' }, 500);
   }
 });

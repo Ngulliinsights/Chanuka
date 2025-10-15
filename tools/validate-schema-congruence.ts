@@ -27,7 +27,7 @@ interface ValidationIssue {
 }
 
 async function validateSchemaCongruence() {
-  logger.info('🔍 Validating schema congruence...', { component: 'SimpleTool' });
+  logger.info('🔍 Validating schema congruence...', { component: 'Chanuka' });
   
   try {
     // 1. Check if schema file exists
@@ -63,7 +63,7 @@ async function validateSchemaCongruence() {
     reportResults(results);
     return true;
   } catch (error) {
-    logger.error('❌ Error during validation:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Error during validation:', { component: 'Chanuka' }, error);
     return false;
   }
 }
@@ -159,7 +159,7 @@ function reportResults(results: ValidationResult[]) {
   let errorCount = 0;
   let warningCount = 0;
   
-  logger.info('\\n📋 Schema Congruence Validation Results:\\n', { component: 'SimpleTool' });
+  logger.info('\\n📋 Schema Congruence Validation Results:\\n', { component: 'Chanuka' });
   
   for (const result of results) {
     const errors = result.issues.filter(i => i.type === 'error');
@@ -179,18 +179,18 @@ function reportResults(results: ValidationResult[]) {
         console.log(`  ⚠️  ${warning.message}${warning.line ? ` (line ${warning.line})` : ''}`);
       }
       
-      logger.info('', { component: 'SimpleTool' });
+      logger.info('', { component: 'Chanuka' });
     }
   }
   
   console.log(`✅ ${results.length} files checked, ${errorCount} errors, ${warningCount} warnings`);
   
   if (errorCount === 0 && warningCount === 0) {
-    logger.info('🎉 All storage implementations are congruent with the schema!', { component: 'SimpleTool' });
+    logger.info('🎉 All storage implementations are congruent with the schema!', { component: 'Chanuka' });
   } else if (errorCount === 0) {
-    logger.info('✨ No errors found, but some warnings to consider for optimization.', { component: 'SimpleTool' });
+    logger.info('✨ No errors found, but some warnings to consider for optimization.', { component: 'Chanuka' });
   } else {
-    logger.info('🔧 Found issues that should be addressed for proper schema congruence.', { component: 'SimpleTool' });
+    logger.info('🔧 Found issues that should be addressed for proper schema congruence.', { component: 'Chanuka' });
   }
 }
 
@@ -198,15 +198,15 @@ function reportResults(results: ValidationResult[]) {
 validateSchemaCongruence()
   .then(success => {
     if (success) {
-      logger.info('\\n🎉 Schema congruence validation completed!', { component: 'SimpleTool' });
+      logger.info('\\n🎉 Schema congruence validation completed!', { component: 'Chanuka' });
       process.exit(0);
     } else {
-      logger.error('\\n❌ Schema congruence validation failed!', { component: 'SimpleTool' });
+      logger.error('\\n❌ Schema congruence validation failed!', { component: 'Chanuka' });
       process.exit(1);
     }
   })
   .catch(error => {
-    logger.error('❌ Unexpected error:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Unexpected error:', { component: 'Chanuka' }, error);
     process.exit(1);
   });
 

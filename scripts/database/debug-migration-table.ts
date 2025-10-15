@@ -12,7 +12,7 @@ async function checkMigrationTable() {
   });
 
   try {
-    logger.info('Checking drizzle_migrations table structure...', { component: 'SimpleTool' });
+    logger.info('Checking drizzle_migrations table structure...', { component: 'Chanuka' });
     
     // Check if table exists
     const tableExists = await pool.query(`
@@ -22,7 +22,7 @@ async function checkMigrationTable() {
       );
     `);
     
-    logger.info('Table exists:', { component: 'SimpleTool' }, tableExists.rows[0].exists);
+    logger.info('Table exists:', { component: 'Chanuka' }, tableExists.rows[0].exists);
     
     if (tableExists.rows[0].exists) {
       // Get column information
@@ -33,7 +33,7 @@ async function checkMigrationTable() {
         ORDER BY ordinal_position;
       `);
       
-      logger.info('Current columns:', { component: 'SimpleTool' });
+      logger.info('Current columns:', { component: 'Chanuka' });
       columns.rows.forEach(col => {
         console.log(`  - ${col.column_name}: ${col.data_type} (nullable: ${col.is_nullable})`);
       });
@@ -47,7 +47,7 @@ async function checkMigrationTable() {
     }
     
   } catch (error) {
-    logger.error('Error:', { component: 'SimpleTool' }, error.message);
+    logger.error('Error:', { component: 'Chanuka' }, error.message);
   } finally {
     await pool.end();
   }

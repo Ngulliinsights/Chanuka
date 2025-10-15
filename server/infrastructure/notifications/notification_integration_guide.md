@@ -248,8 +248,8 @@ SMTP_HOST=smtp.example.com
 SMTP_PORT=587
 SMTP_USER=notifications@example.com
 SMTP_PASS=your-password
-SMTP_FROM=SimpleTool <noreply@simpletool.gov>
-FRONTEND_URL=https://simpletool.gov
+SMTP_FROM=Chanuka <noreply@Chanuka.gov>
+FRONTEND_URL=https://Chanuka.gov
 
 # SMS Configuration (for Channel Service)
 SMS_PROVIDER=twilio  # or 'aws-sns' or 'mock'

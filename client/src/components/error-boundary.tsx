@@ -22,7 +22,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    logger.error('Error boundary caught an error:', { component: 'SimpleTool' }, error, errorInfo);
+    logger.error('Error boundary caught an error:', { component: 'Chanuka' }, error, errorInfo);
   }
 
   componentDidMount() {
@@ -35,7 +35,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   handlePromiseRejection = (event: PromiseRejectionEvent) => {
-    logger.error('Unhandled promise rejection:', { component: 'SimpleTool' }, event.reason);
+    logger.error('Unhandled promise rejection:', { component: 'Chanuka' }, event.reason);
     event.preventDefault(); // Prevent default browser behavior
 
     // Don't update state for promise rejections to avoid infinite re-renders

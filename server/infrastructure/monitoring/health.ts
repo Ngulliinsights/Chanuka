@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { ApiSuccess, ApiErrorResponse, ApiResponseWrapper } from "../../utils/api-response.js";
+import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../utils/api-response.js";
 import { databaseFallbackService } from "../database/database-fallback.js";
 import { logger } from '@shared/utils/logger';
 
@@ -66,7 +66,7 @@ router.post("/database/retry", async (req, res) => {
   const startTime = Date.now();
   
   try {
-    logger.info('🔄 Manual database retry requested', { component: 'SimpleTool' });
+    logger.info('🔄 Manual database retry requested', { component: 'Chanuka' });
     const success = await databaseFallbackService.forceRetry();
     
     return ApiSuccess(res, {

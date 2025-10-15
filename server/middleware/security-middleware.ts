@@ -169,7 +169,7 @@ export class SecurityMiddleware {
 
         next();
       } catch (error) {
-        logger.error('Input validation failed:', { component: 'SimpleTool' }, error);
+        logger.error('Input validation failed:', { component: 'Chanuka' }, error);
         
         // Log security event
         securityAuditService.logSecurityEvent({
@@ -244,7 +244,7 @@ export class SecurityMiddleware {
 
         next();
       } catch (error) {
-        logger.error('Session security middleware error:', { component: 'SimpleTool' }, error);
+        logger.error('Session security middleware error:', { component: 'Chanuka' }, error);
         res.status(500).json({
           error: 'Internal server error',
           code: 'INTERNAL_ERROR'

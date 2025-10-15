@@ -66,7 +66,7 @@ export default function SponsorshipOverview({ billId }: OverviewProps) {
         const data = await response.json();
         setAnalysis(data);
       } catch (err) {
-        logger.error('Error fetching sponsorship analysis:', { component: 'SimpleTool' }, err);
+        logger.error('Error fetching sponsorship analysis:', { component: 'Chanuka' }, err);
         setError(err instanceof Error ? err.message : 'Failed to load analysis');
       } finally {
         setLoading(false);

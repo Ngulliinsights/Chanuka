@@ -40,7 +40,7 @@ type ModerationFilters = z.infer<typeof moderationFiltersSchema>;
 // Helper function to handle errors consistently across all routes
 // This centralizes error handling logic and ensures proper logging
 const handleError = (res: Response, error: unknown, message: string, startTime: number) => {
-  logger.error(message, { component: 'SimpleTool', error: error instanceof Error ? error.message : String(error) });
+  logger.error(message, { component: 'Chanuka', error: error instanceof Error ? error.message : String(error) });
 
   // Create the error response wrapper with proper metadata
   const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');

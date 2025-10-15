@@ -32,7 +32,7 @@ class AuditLogger {
     }
 
     // In production, you'd store this in a database table
-    logger.info('AUDIT LOG:', { component: 'SimpleTool' }, JSON.stringify(logEntry, null, 2));
+    logger.info('AUDIT LOG:', { component: 'Chanuka' }, JSON.stringify(logEntry, null, 2));
 
     // For critical actions, you might also send alerts
     if (entry.severity === 'critical') {
@@ -101,7 +101,7 @@ class AuditLogger {
 
   private async sendCriticalAlert(entry: AuditLogEntry): Promise<void> {
     // In production, send email/SMS/Slack notification for critical actions
-    logger.info('🚨 CRITICAL AUDIT EVENT:', { component: 'SimpleTool' }, entry);
+    logger.info('🚨 CRITICAL AUDIT EVENT:', { component: 'Chanuka' }, entry);
   }
 
   // Predefined logging methods for common actions

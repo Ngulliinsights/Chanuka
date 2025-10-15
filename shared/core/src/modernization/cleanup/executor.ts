@@ -64,7 +64,7 @@ export class CleanupExecutor {
 
       // Create backup if enabled
       if (this.config.createBackups && !this.config.dryRun) {
-        logger.info('🔄 Creating backup before cleanup operations...', { component: 'SimpleTool' });
+        logger.info('🔄 Creating backup before cleanup operations...', { component: 'Chanuka' });
         const backupResult = await this.backupSystem.createBackup(plan);
         
         if (!backupResult.success) {

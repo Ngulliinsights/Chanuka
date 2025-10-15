@@ -33,13 +33,13 @@ const mockAffiliation = {
 };
 
 async function testFinancialDisclosureIntegrationUnit() {
-  logger.info('🧪 Testing Financial Disclosure Integration Service (Unit Tests)...\n', { component: 'SimpleTool' });
+  logger.info('🧪 Testing Financial Disclosure Integration Service (Unit Tests)...\n', { component: 'Chanuka' });
 
   const service = new FinancialDisclosureIntegrationService();
 
   try {
     // Test 1: Test private helper methods through public interface
-    logger.info('1️⃣ Testing disclosure data enhancement...', { component: 'SimpleTool' });
+    logger.info('1️⃣ Testing disclosure data enhancement...', { component: 'Chanuka' });
     
     // Test disclosure completeness scoring for individual disclosure
     const completenessScore = (service as any).calculateDisclosureCompletenessScoreForDisclosure(mockDisclosure);
@@ -52,7 +52,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 2: Test relationship type mapping
-    logger.info('2️⃣ Testing relationship type mapping...', { component: 'SimpleTool' });
+    logger.info('2️⃣ Testing relationship type mapping...', { component: 'Chanuka' });
     
     const disclosureRelationType = (service as any).mapDisclosureToRelationshipType('financial');
     console.log(`✅ Financial disclosure maps to: ${disclosureRelationType}`);
@@ -63,7 +63,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 3: Test financial strength calculation
-    logger.info('3️⃣ Testing financial strength calculation...', { component: 'SimpleTool' });
+    logger.info('3️⃣ Testing financial strength calculation...', { component: 'Chanuka' });
     
     const lowAmount = (service as any).calculateFinancialStrength(25000);
     const mediumAmount = (service as any).calculateFinancialStrength(250000);
@@ -76,7 +76,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 4: Test conflict potential assessment
-    logger.info('4️⃣ Testing conflict potential assessment...', { component: 'SimpleTool' });
+    logger.info('4️⃣ Testing conflict potential assessment...', { component: 'Chanuka' });
     
     const mockDisclosureData = {
       id: 1,
@@ -99,7 +99,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 5: Test threshold checking
-    logger.info('5️⃣ Testing disclosure threshold checking...', { component: 'SimpleTool' });
+    logger.info('5️⃣ Testing disclosure threshold checking...', { component: 'Chanuka' });
     
     const exceedsFinancial = (service as any).exceedsThreshold('financial', 15000);
     const exceedsInvestment = (service as any).exceedsThreshold('investment', 75000);
@@ -112,7 +112,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 6: Test severity determination
-    logger.info('6️⃣ Testing alert severity determination...', { component: 'SimpleTool' });
+    logger.info('6️⃣ Testing alert severity determination...', { component: 'Chanuka' });
     
     const lowSeverity = (service as any).determineSeverityFromAmount(50000);
     const mediumSeverity = (service as any).determineSeverityFromAmount(500000);
@@ -125,7 +125,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 7: Test relationship merging logic
-    logger.info('7️⃣ Testing relationship merging...', { component: 'SimpleTool' });
+    logger.info('7️⃣ Testing relationship merging...', { component: 'Chanuka' });
     
     const testRelationships = [
       {
@@ -159,7 +159,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 8: Test risk assessment logic
-    logger.info('8️⃣ Testing risk assessment...', { component: 'SimpleTool' });
+    logger.info('8️⃣ Testing risk assessment...', { component: 'Chanuka' });
     
     const lowRisk = (service as any).assessOverallFinancialRisk(100000, []);
     const mediumRisk = (service as any).assessOverallFinancialRisk(750000, [
@@ -177,7 +177,7 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Test 9: Test completeness risk assessment
-    logger.info('9️⃣ Testing completeness risk assessment...', { component: 'SimpleTool' });
+    logger.info('9️⃣ Testing completeness risk assessment...', { component: 'Chanuka' });
     
     const recentDate = new Date();
     const oldDate = new Date();
@@ -192,37 +192,37 @@ async function testFinancialDisclosureIntegrationUnit() {
     console.log();
 
     // Summary
-    logger.info('📊 FINANCIAL DISCLOSURE INTEGRATION UNIT TEST SUMMARY', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(55));
-    logger.info('✅ Disclosure data enhancement - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Relationship type mapping - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Financial strength calculation - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Conflict potential assessment - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Threshold checking - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Alert severity determination - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Relationship merging logic - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Risk assessment logic - PASSED', { component: 'SimpleTool' });
-    logger.info('✅ Completeness risk assessment - PASSED', { component: 'SimpleTool' });
+    logger.info('📊 FINANCIAL DISCLOSURE INTEGRATION UNIT TEST SUMMARY', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(55));
+    logger.info('✅ Disclosure data enhancement - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Relationship type mapping - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Financial strength calculation - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Conflict potential assessment - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Threshold checking - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Alert severity determination - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Relationship merging logic - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Risk assessment logic - PASSED', { component: 'Chanuka' });
+    logger.info('✅ Completeness risk assessment - PASSED', { component: 'Chanuka' });
     console.log();
-    logger.info('🎉 All financial disclosure integration unit tests passed!', { component: 'SimpleTool' });
+    logger.info('🎉 All financial disclosure integration unit tests passed!', { component: 'Chanuka' });
     console.log();
-    logger.info('📋 Task 8.2 Implementation Verification:', { component: 'SimpleTool' });
-    logger.info('- ✅ Financial disclosure data processing logic implemented', { component: 'SimpleTool' });
-    logger.info('- ✅ Disclosure completeness scoring algorithms working', { component: 'SimpleTool' });
-    logger.info('- ✅ Financial relationship mapping logic functional', { component: 'SimpleTool' });
-    logger.info('- ✅ Disclosure update monitoring and alert logic operational', { component: 'SimpleTool' });
-    logger.info('- ✅ All helper methods and calculations verified', { component: 'SimpleTool' });
-    logger.info('- ✅ Risk assessment and threshold logic validated', { component: 'SimpleTool' });
+    logger.info('📋 Task 8.2 Implementation Verification:', { component: 'Chanuka' });
+    logger.info('- ✅ Financial disclosure data processing logic implemented', { component: 'Chanuka' });
+    logger.info('- ✅ Disclosure completeness scoring algorithms working', { component: 'Chanuka' });
+    logger.info('- ✅ Financial relationship mapping logic functional', { component: 'Chanuka' });
+    logger.info('- ✅ Disclosure update monitoring and alert logic operational', { component: 'Chanuka' });
+    logger.info('- ✅ All helper methods and calculations verified', { component: 'Chanuka' });
+    logger.info('- ✅ Risk assessment and threshold logic validated', { component: 'Chanuka' });
 
   } catch (error) {
-    logger.error('❌ Unit test failed:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Unit test failed:', { component: 'Chanuka' }, error);
     process.exit(1);
   }
 }
 
 // Run the unit test
 testFinancialDisclosureIntegrationUnit().catch(error => {
-  logger.error('Fatal unit test error:', { component: 'SimpleTool' }, error);
+  logger.error('Fatal unit test error:', { component: 'Chanuka' }, error);
   process.exit(1);
 });
 

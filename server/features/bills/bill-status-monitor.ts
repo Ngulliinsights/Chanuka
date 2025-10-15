@@ -1,7 +1,8 @@
 import { eq, and, desc, sql } from 'drizzle-orm';
 import { databaseService } from '../../infrastructure/database/database-service.js';
+import { readDatabase } from '../../db.js';
 import { webSocketService } from '../../infrastructure/websocket.js';
-import { userProfileService } from '../users/user-profile.js';
+import { userProfileService } from '../users/domain/user-profile.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service.js';
 import * as schema from '../../../shared/schema.js';
 import { Bill } from '../../../shared/schema.js';
@@ -56,7 +57,10 @@ export interface NotificationPreferences {
  * Handles bill status change detection, notification triggers, and user preference filtering
  */
 export class BillStatusMonitorService {
-  private db = databaseService.getDatabase();
+  // Resolve DB lazily using the central accessor to prevent auto-init side-effects
+  private get db() {
+    return readDatabase();
+  }
   private statusChangeListeners: Map<number, Set<string>> = new Map();
   private batchedNotifications: Map<string, Array<{
     billId: number;
@@ -126,7 +130,7 @@ export class BillStatusMonitorService {
       console.log(`✅ Successfully processed status change for bill ${change.billId}`);
 
     } catch (error) {
-      logger.error('Error handling bill status change:', { component: 'SimpleTool' }, error as any);
+      logger.error('Error handling bill status change:', { component: 'Chanuka' }, error as any);
       throw error;
     }
   }
@@ -173,7 +177,7 @@ export class BillStatusMonitorService {
       console.log(`✅ Successfully processed engagement update for bill ${update.billId}`);
 
     } catch (error) {
-      logger.error('Error handling bill engagement update:', { component: 'SimpleTool' }, error as any);
+      logger.error('Error handling bill engagement update:', { component: 'Chanuka' }, error as any);
       throw error;
     }
   }
@@ -660,7 +664,7 @@ export class BillStatusMonitorService {
       
       await cacheService.set(cacheKey, recentChanges, CACHE_TTL.BILL_DATA);
     } catch (error) {
-      logger.error('Error caching status change:', { component: 'SimpleTool' }, error as any);
+      logger.error('Error caching status change:', { component: 'Chanuka' }, error as any);
     }
   }
 
@@ -695,7 +699,7 @@ export class BillStatusMonitorService {
    * Cleanup resources
    */
   async shutdown(): Promise<void> {
-    logger.info('Shutting down Bill Status Monitor Service...', { component: 'SimpleTool' });
+    logger.info('Shutting down Bill Status Monitor Service...', { component: 'Chanuka' });
     
     if (this.batchInterval) {
       clearInterval(this.batchInterval);
@@ -708,7 +712,7 @@ export class BillStatusMonitorService {
     this.statusChangeListeners.clear();
     this.batchedNotifications.clear();
     
-    logger.info('Bill Status Monitor Service shutdown complete', { component: 'SimpleTool' });
+    logger.info('Bill Status Monitor Service shutdown complete', { component: 'Chanuka' });
   }
 }
 

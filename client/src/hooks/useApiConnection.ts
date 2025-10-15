@@ -161,7 +161,7 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
       prevHealthRef.current = isNowHealthy;
       
     } catch (err) {
-      logger.error('Health check failed:', { component: 'SimpleTool' }, err);
+      logger.error('Health check failed:', { component: 'Chanuka' }, err);
       setHealthStatus({
         api: false,
         frontend: false,

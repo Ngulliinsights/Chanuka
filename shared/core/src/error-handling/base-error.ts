@@ -119,7 +119,7 @@ export class BaseError extends Error {
           const recovered = await strategy.handler();
           if (recovered) return true;
         } catch (error) {
-          logger.error('Recovery strategy failed:', { component: 'SimpleTool' }, error);
+          logger.error('Recovery strategy failed:', { component: 'Chanuka' }, error);
         }
       }
     }

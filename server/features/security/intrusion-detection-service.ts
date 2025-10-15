@@ -267,7 +267,7 @@ export class IntrusionDetectionService {
 
       return { isThreat: false };
     } catch (error) {
-      logger.error('Error checking threat intelligence:', { component: 'SimpleTool' }, error);
+      logger.error('Error checking threat intelligence:', { component: 'Chanuka' }, error);
       return { isThreat: false };
     }
   }
@@ -434,7 +434,7 @@ export class IntrusionDetectionService {
       }
 
     } catch (error) {
-      logger.error('Error analyzing behavioral anomalies:', { component: 'SimpleTool' }, error);
+      logger.error('Error analyzing behavioral anomalies:', { component: 'Chanuka' }, error);
     }
 
     return threats;
@@ -587,7 +587,7 @@ export class IntrusionDetectionService {
 
       return Number(result[0].count);
     } catch (error) {
-      logger.error('Error getting blocked IP count:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting blocked IP count:', { component: 'Chanuka' }, error);
       return 0;
     }
   }
@@ -663,7 +663,7 @@ export class IntrusionDetectionService {
         recommendations: this.generateIntrusionRecommendations(threats)
       };
     } catch (error) {
-      logger.error('Error generating intrusion report:', { component: 'SimpleTool' }, error);
+      logger.error('Error generating intrusion report:', { component: 'Chanuka' }, error);
       throw new Error('Failed to generate intrusion detection report');
     }
   }

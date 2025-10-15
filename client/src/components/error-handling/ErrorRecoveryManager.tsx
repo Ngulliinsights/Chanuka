@@ -58,7 +58,7 @@ export const ErrorRecoveryManager: React.FC<ErrorRecoveryManagerProps> = ({
           break;
       }
     } catch (recoveryError) {
-      logger.error('Recovery strategy failed:', { component: 'SimpleTool' }, recoveryError);
+      logger.error('Recovery strategy failed:', { component: 'Chanuka' }, recoveryError);
       onFailure();
     } finally {
       setIsRecovering(false);
@@ -181,7 +181,7 @@ export function useErrorRecovery(
   }, [recoveryAttempts]);
 
   const handleFailure = useCallback(() => {
-    logger.error('All recovery strategies failed', { component: 'SimpleTool' });
+    logger.error('All recovery strategies failed', { component: 'Chanuka' });
     setIsRecovering(false);
   }, []);
 

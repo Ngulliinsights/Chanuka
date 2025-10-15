@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 const { Pool } = pg;
 import * as schema from "../shared/schema.js";
-import { fallbackService } from './services/fallback-service.js';
+import { databaseFallbackService as fallbackService } from './infrastructure/database/database-fallback.js';
 import { logger } from './utils/logger.js';
 
 // Connection state management with clear separation of concerns
@@ -78,7 +78,7 @@ async function seedInitialData(db: any): Promise<void> {
       return; // Data already exists, skip seeding
     }
 
-    logger.info('📋 Seeding initial demonstration data...', { component: 'SimpleTool' });
+    logger.info('📋 Seeding initial demonstration data...', { component: 'Chanuka' });
     
     await db.insert(schema.bills).values([
       {
@@ -129,9 +129,9 @@ async function seedInitialData(db: any): Promise<void> {
       }
     ]);
     
-    logger.info('✅ Initial data seeded successfully', { component: 'SimpleTool' });
+    logger.info('✅ Initial data seeded successfully', { component: 'Chanuka' });
   } catch (error) {
-    logger.info('ℹ️ Could not seed data: ' + (error instanceof Error ? error.message : 'Unknown error'), { component: 'SimpleTool' });
+    logger.info('ℹ️ Could not seed data: ' + (error instanceof Error ? error.message : 'Unknown error'), { component: 'Chanuka' });
   }
 }
 
@@ -140,9 +140,14 @@ async function seedInitialData(db: any): Promise<void> {
  * This ensures the application remains functional even without database access.
  */
 async function initializeFallback(): Promise<void> {
-  logger.info('📋 Initializing fallback data store...', { component: 'SimpleTool' });
-  const status = fallbackService.getStatus();
-  console.log(`✅ Fallback service ready: ${status.billCount} bills, ${status.userCount} users, ${status.commentCount} comments`);
+  logger.info('📋 Initializing fallback data store...', { component: 'Chanuka' });
+  // fallbackService.getStatus() has a runtime shape used across the codebase.
+  // Cast to `any` here to avoid tight coupling to the internal fallback type
+  // while we reconcile types across the project. This is a pragmatic, local
+  // shim to reduce TypeScript noise; we'll replace with a proper type once
+  // the fallback service contract is finalized.
+  const status = (fallbackService.getStatus() as any);
+  logger.info(`✅ Fallback service ready: ${status?.billCount ?? 0} bills, ${status?.userCount ?? 0} users, ${status?.commentCount ?? 0} comments`, { component: 'Chanuka' });
 }
 
 /**
@@ -152,8 +157,10 @@ async function initializeFallback(): Promise<void> {
 async function performInitialization(): Promise<void> {
   try {
     // Create connection pool with appropriate configuration
-    state.pool = new Pool(createPoolConfig());
-    state.db = drizzle(state.pool, { schema });
+  state.pool = new Pool(createPoolConfig());
+  state.db = drizzle(state.pool, { schema });
+  // expose runtime db to consumers
+  db = state.db;
     
     // Verify the connection works before marking as connected
     const isConnected = await testConnection(state.pool);
@@ -163,14 +170,14 @@ async function performInitialization(): Promise<void> {
     }
     
     state.isConnected = true;
-    logger.info('✅ Database connection established successfully', { component: 'SimpleTool' });
+    logger.info('✅ Database connection established successfully', { component: 'Chanuka' });
     
     // Seed data only after confirming connection
     await seedInitialData(state.db);
     
   } catch (error) {
-    logger.error('❌ Database connection failed:', { component: 'SimpleTool' }, error instanceof Error ? error.message : 'Unknown error');
-    logger.info('🔄 Application will continue with fallback mode', { component: 'SimpleTool' });
+    logger.error('❌ Database connection failed:', { component: 'Chanuka' }, error instanceof Error ? error.message : 'Unknown error');
+    logger.info('🔄 Application will continue with fallback mode', { component: 'Chanuka' });
     
     // Clean up any partial initialization
     if (state.pool) {
@@ -178,7 +185,8 @@ async function performInitialization(): Promise<void> {
       state.pool = null;
     }
     
-    state.db = null;
+  state.db = null;
+  db = null;
     state.isConnected = false;
     
     // Ensure fallback service is ready
@@ -254,19 +262,19 @@ export async function withFallback<T>(
   
   // Use fallback immediately if database is known to be unavailable
   if (!state.isConnected || !state.db) {
-    console.log(`⚠️ Database unavailable for ${context}, using fallback data`);
+    logger.warn(`⚠️ Database unavailable for ${context}, using fallback data`, { component: 'Chanuka' });
     return fallbackData;
   }
 
   try {
     return await operation();
   } catch (error) {
-    console.error(`❌ Database operation failed for ${context}:`, error instanceof Error ? error.message : 'Unknown error');
+    logger.error(`❌ Database operation failed for ${context}: ${error instanceof Error ? error.message : 'Unknown error'}`, { component: 'Chanuka' });
     
     // Only mark as disconnected for connection errors, not query errors
     if (isConnectionError(error)) {
       state.isConnected = false;
-      logger.info('🔌 Database marked as disconnected due to connection error', { component: 'SimpleTool' });
+      logger.info('🔌 Database marked as disconnected due to connection error', { component: 'Chanuka' });
     }
     
     return fallbackData;
@@ -279,7 +287,7 @@ export async function withFallback<T>(
  */
 export function setDatabaseConnectionStatus(connected: boolean): void {
   state.isConnected = connected;
-  console.log(`🔄 Database connection status updated: ${connected ? 'connected' : 'disconnected'}`);
+  logger.info(`🔄 Database connection status updated: ${connected ? 'connected' : 'disconnected'}`, { component: 'Chanuka' });
 }
 
 /**
@@ -304,20 +312,41 @@ export async function closeDatabase(): Promise<void> {
     state.pool = null;
     state.db = null;
     state.isConnected = false;
-    logger.info('🔌 Database connections closed', { component: 'SimpleTool' });
+    logger.info('🔌 Database connections closed', { component: 'Chanuka' });
   }
 }
 
-// Start initialization asynchronously without blocking module load
-initializeDatabase().catch(error => {
-  logger.error('Failed to initialize database:', { component: 'SimpleTool' }, error);
-});
+// Start initialization asynchronously without blocking module load (disabled during tests/tooling)
+if (process.env.NODE_ENV !== 'test' && process.env.DISABLE_DB_INIT !== '1') {
+  initializeDatabase().catch(error => {
+    logger.error('Failed to initialize database during auto-init', { component: 'Chanuka' }, error instanceof Error ? error.message : String(error));
+  });
+} else {
+  logger.info('Database auto-initialization disabled by environment', { component: 'Chanuka' });
+}
 
 // Export state accessors (read-only access to internal state)
 export const isDatabaseConnected = (): boolean => state.isConnected;
-export const db = () => state.db;
+
+// Export a live `db` binding typed as `any` so other modules that import
+// `{ db }` can access the runtime drizzle instance without TypeScript
+// complaining about missing members. We update this variable when the
+// initialization completes. This is a pragmatic shim while we reconcile
+// the Drizzle types across the codebase.
+export let db: any = null;
 export const pool = () => state.pool;
 export const readDatabase = () => state.db;
+// Accessor helpers encourage using a stable access surface instead of
+// directly importing internal variables. This improves separation of
+// concerns and makes future refactors less invasive.
+export function getDbInstance() {
+  return db;
+}
+
+export function getFallbackService() {
+  return fallbackService;
+}
+
 export { fallbackService };
 
 // Re-export schema for convenience

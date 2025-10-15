@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import { databaseService } from "../../services/database-service.js";
+import { readDatabase } from '../../db.js';
 import { cacheService } from "../../infrastructure/cache/cache-service.js";
 import { demoDataService } from "../../infrastructure/demo-data.js";
 import * as schema from "../../../shared/schema.js";
@@ -45,7 +46,9 @@ export interface IndexPerformanceMetrics {
  * Handles automatic search index updates, rebuilding, and performance monitoring
  */
 export class SearchIndexManager {
-  private db = databaseService.getDatabase();
+  private get db() {
+    return readDatabase();
+  }
   private indexUpdateQueue: Set<number> = new Set();
   private isProcessingQueue = false;
   private performanceHistory: IndexPerformanceMetrics[] = [];
@@ -57,7 +60,7 @@ export class SearchIndexManager {
    * Initialize the search index manager
    */
   async initialize(): Promise<void> {
-    logger.info('Initializing Search Index Manager...', { component: 'SimpleTool' });
+    logger.info('Initializing Search Index Manager...', { component: 'Chanuka' });
     
     try {
       // Check if search vectors exist and are properly configured
@@ -69,9 +72,9 @@ export class SearchIndexManager {
       // Start queue processing
       this.startQueueProcessing();
       
-      logger.info('✅ Search Index Manager initialized successfully', { component: 'SimpleTool' });
+      logger.info('✅ Search Index Manager initialized successfully', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Failed to initialize Search Index Manager:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Failed to initialize Search Index Manager:', { component: 'Chanuka' }, error);
       throw error;
     }
   }
@@ -142,11 +145,11 @@ export class SearchIndexManager {
     let errors = 0;
     const errorDetails: string[] = [];
 
-    logger.info('🔄 Starting full search index rebuild...', { component: 'SimpleTool' });
+    logger.info('🔄 Starting full search index rebuild...', { component: 'Chanuka' });
 
     // Check if system is in demo mode
     if (demoDataService.isDemoMode()) {
-      logger.info('🔄 Demo mode detected - search index rebuild not needed for demo data', { component: 'SimpleTool' });
+      logger.info('🔄 Demo mode detected - search index rebuild not needed for demo data', { component: 'Chanuka' });
       const demoBills = demoDataService.getBills();
       return {
         success: true,
@@ -220,7 +223,7 @@ export class SearchIndexManager {
       errors = 1;
       errorDetails.push(error instanceof Error ? error.message : String(error));
       
-      logger.error('❌ Search index rebuild failed:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Search index rebuild failed:', { component: 'Chanuka' }, error);
       
       return {
         success: false,
@@ -239,7 +242,7 @@ export class SearchIndexManager {
   async getIndexHealth(): Promise<SearchIndexHealth> {
     // Check if system is in demo mode first
     if (demoDataService.isDemoMode()) {
-      logger.info('🔍 Search index health check: System in demo mode, returning demo health status', { component: 'SimpleTool' });
+      logger.info('🔍 Search index health check: System in demo mode, returning demo health status', { component: 'Chanuka' });
       const demoBills = demoDataService.getBills();
       return {
         status: 'healthy',
@@ -261,7 +264,7 @@ export class SearchIndexManager {
       const result = await databaseService.withFallback(
         async () => {
           // Get basic index statistics
-          logger.info('🔍 Executing search index health query...', { component: 'SimpleTool' });
+          logger.info('🔍 Executing search index health query...', { component: 'Chanuka' });
           const executeResult = await this.db.execute(sql`
             SELECT
               COUNT(*) as total_bills,
@@ -270,10 +273,10 @@ export class SearchIndexManager {
               MAX(updated_at) as last_update
             FROM bills
           `);
-          logger.info('🔍 Execute result type:', { component: 'SimpleTool' }, typeof executeResult, 'isArray:', Array.isArray(executeResult), 'length:', executeResult?.length);
+          logger.info('🔍 Execute result type:', { component: 'Chanuka' }, typeof executeResult, 'isArray:', Array.isArray(executeResult), 'length:', executeResult?.length);
 
           if (!Array.isArray(executeResult)) {
-            logger.error('❌ Database execute returned non-array result:', { component: 'SimpleTool' }, executeResult);
+            logger.error('❌ Database execute returned non-array result:', { component: 'Chanuka' }, executeResult);
             throw new Error(`Database execute returned non-array result: ${typeof executeResult}`);
           }
 
@@ -297,7 +300,7 @@ export class SearchIndexManager {
           }
 
           const [indexStats] = executeResult;
-          logger.info('🔍 Index stats:', { component: 'SimpleTool' }, indexStats);
+          logger.info('🔍 Index stats:', { component: 'Chanuka' }, indexStats);
 
           const totalBills = parseInt(indexStats.total_bills as string);
           const indexedBills = parseInt(indexStats.indexed_bills as string);
@@ -379,7 +382,7 @@ export class SearchIndexManager {
 
       return result.data;
     } catch (error) {
-      logger.error('Error getting search index health:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting search index health:', { component: 'Chanuka' }, error);
       return {
         status: 'offline',
         totalBills: 0,
@@ -428,7 +431,7 @@ export class SearchIndexManager {
 
     // Check if system is in demo mode
     if (demoDataService.isDemoMode()) {
-      logger.info('🔄 Demo mode: Skipping search index optimization', { component: 'SimpleTool' });
+      logger.info('🔄 Demo mode: Skipping search index optimization', { component: 'Chanuka' });
       return {
         success: true,
         operations: ['Demo mode - no optimization needed'],
@@ -469,7 +472,7 @@ export class SearchIndexManager {
 
       return { success: true, operations, duration };
     } catch (error) {
-      logger.error('❌ Search index optimization failed:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Search index optimization failed:', { component: 'Chanuka' }, error);
       return { 
         success: false, 
         operations: [...operations, `Error: ${error instanceof Error ? error.message : String(error)}`], 
@@ -492,7 +495,7 @@ export class SearchIndexManager {
   }> {
     // Check if system is in demo mode
     if (demoDataService.isDemoMode()) {
-      logger.info('🔍 Search index statistics: System in demo mode, returning demo statistics', { component: 'SimpleTool' });
+      logger.info('🔍 Search index statistics: System in demo mode, returning demo statistics', { component: 'Chanuka' });
       const demoBills = demoDataService.getBills();
       return {
         indexSize: '1.0 MB',
@@ -546,7 +549,7 @@ export class SearchIndexManager {
 
       return result.data;
     } catch (error) {
-      logger.error('Error getting index statistics:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting index statistics:', { component: 'Chanuka' }, error);
       return {
         indexSize: 'Error',
         indexSizeBytes: 0,
@@ -567,7 +570,7 @@ export class SearchIndexManager {
   private async validateSearchIndexSetup(): Promise<void> {
     // Skip validation in demo mode
     if (demoDataService.isDemoMode()) {
-      logger.info('🔄 Demo mode: Skipping search index setup validation', { component: 'SimpleTool' });
+      logger.info('🔄 Demo mode: Skipping search index setup validation', { component: 'Chanuka' });
       return;
     }
 
@@ -609,9 +612,9 @@ export class SearchIndexManager {
         console.warn('⚠️ Search vector update trigger not found');
       }
 
-      logger.info('✅ Search index setup validation completed', { component: 'SimpleTool' });
+      logger.info('✅ Search index setup validation completed', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Search index setup validation failed:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Search index setup validation failed:', { component: 'Chanuka' }, error);
       throw error;
     }
   }
@@ -633,7 +636,7 @@ export class SearchIndexManager {
 
             // Auto-rebuild if too many missing indexes
             if (health.missingIndexes > 100) {
-              logger.info('🔄 Auto-triggering index rebuild due to many missing indexes', { component: 'SimpleTool' });
+              logger.info('🔄 Auto-triggering index rebuild due to many missing indexes', { component: 'Chanuka' });
               await this.rebuildAllIndexes();
             }
           }
@@ -645,7 +648,7 @@ export class SearchIndexManager {
           const memUsage = process.memoryUsage();
           const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
 
-          logger.info('Search Index Manager Memory Analysis:', { component: 'SimpleTool' }, {
+          logger.info('Search Index Manager Memory Analysis:', { component: 'Chanuka' }, {
             performanceHistorySize: this.performanceHistory.length,
             indexUpdateQueueSize: this.indexUpdateQueue.size,
             isProcessingQueue: this.isProcessingQueue,
@@ -654,7 +657,7 @@ export class SearchIndexManager {
             timestamp: new Date().toISOString()
           });
         } catch (error) {
-          logger.error('Error during health monitoring:', { component: 'SimpleTool' }, error);
+          logger.error('Error during health monitoring:', { component: 'Chanuka' }, error);
         }
       }, 30 * 60 * 1000); // 30 minutes
     }
@@ -677,7 +680,7 @@ export class SearchIndexManager {
     const cleanedItems = perfHistoryBefore - this.performanceHistory.length;
 
     if (cleanedItems > 0) {
-      logger.info('🧹 Search Index Manager Memory Cleanup:', { component: 'SimpleTool' }, {
+      logger.info('🧹 Search Index Manager Memory Cleanup:', { component: 'Chanuka' }, {
         performanceHistoryCleaned: cleanedItems,
         remainingHistorySize: this.performanceHistory.length,
         timestamp: new Date().toISOString()
@@ -711,7 +714,7 @@ export class SearchIndexManager {
 
         console.log(`✅ Updated search indexes for ${updated}/${billIds.length} bills`);
       } catch (error) {
-        logger.error('Error processing index update queue:', { component: 'SimpleTool' }, error);
+        logger.error('Error processing index update queue:', { component: 'Chanuka' }, error);
       } finally {
         this.isProcessingQueue = false;
       }
@@ -722,7 +725,7 @@ export class SearchIndexManager {
    * Shutdown the search index manager
    */
   async shutdown(): Promise<void> {
-    logger.info('🛑 Shutting down search index manager...', { component: 'SimpleTool' });
+    logger.info('🛑 Shutting down search index manager...', { component: 'Chanuka' });
 
     try {
       // Stop the health monitoring interval
@@ -743,9 +746,9 @@ export class SearchIndexManager {
       // Clear caches
       await this.clearSearchCaches();
 
-      logger.info('✅ Search index manager shut down successfully', { component: 'SimpleTool' });
+      logger.info('✅ Search index manager shut down successfully', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Error shutting down search index manager:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Error shutting down search index manager:', { component: 'Chanuka' }, error);
       throw error;
     }
   }
@@ -757,9 +760,9 @@ export class SearchIndexManager {
     try {
       await cacheService.deletePattern('search:*');
       await cacheService.deletePattern('bills:search:*');
-      logger.info('🧹 Search caches cleared', { component: 'SimpleTool' });
+      logger.info('🧹 Search caches cleared', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('Error clearing search caches:', { component: 'SimpleTool' }, error);
+      logger.error('Error clearing search caches:', { component: 'Chanuka' }, error);
     }
   }
 }

@@ -38,7 +38,7 @@ export async function checkApiHealth(): Promise<HealthStatus> {
       latency
     };
   } catch (error) {
-    logger.error('Health check failed:', { component: 'SimpleTool' }, error);
+    logger.error('Health check failed:', { component: 'Chanuka' }, error);
     
     return {
       api: false,
@@ -121,7 +121,7 @@ export async function testCorsPreflightRequest(): Promise<boolean> {
       response.headers.has('access-control-allow-methods')
     );
   } catch (error) {
-    logger.error('CORS preflight test failed:', { component: 'SimpleTool' }, error);
+    logger.error('CORS preflight test failed:', { component: 'Chanuka' }, error);
     return false;
   }
 }
@@ -249,7 +249,7 @@ export class ConnectionMonitor {
         this.notifyListeners(status);
       }
     } catch (error) {
-      logger.error('Connection check failed:', { component: 'SimpleTool' }, error);
+      logger.error('Connection check failed:', { component: 'Chanuka' }, error);
     }
   }
   
@@ -267,7 +267,7 @@ export class ConnectionMonitor {
       try {
         listener(status);
       } catch (error) {
-        logger.error('Connection monitor listener error:', { component: 'SimpleTool' }, error);
+        logger.error('Connection monitor listener error:', { component: 'Chanuka' }, error);
       }
     });
   }

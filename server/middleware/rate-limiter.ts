@@ -1,6 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../utils/logger';
+import {
+  createApiRateLimit,
+  createAuthRateLimit,
+  createSponsorRateLimit,
+  createSearchRateLimit,
+  createPasswordResetRateLimit,
+  createRegistrationRateLimit,
+  createMemoryStore
+} from '../../shared/core/src/rate-limiting';
 
+// Create shared rate limit store
+const rateLimitStore = createMemoryStore();
+
+// Legacy interface for backward compatibility
 interface RateLimitStore {
   [key: string]: {
     count: number;
@@ -85,8 +98,16 @@ export const createRateLimit = (options: {
   };
 };
 
-// Predefined rate limiters with environment-specific configurations
-export const apiRateLimit = createRateLimit({
+// Predefined rate limiters using shared infrastructure
+export const apiRateLimit = createApiRateLimit(rateLimitStore);
+export const authRateLimit = createAuthRateLimit(rateLimitStore);
+export const sponsorRateLimit = createSponsorRateLimit(rateLimitStore);
+export const searchRateLimit = createSearchRateLimit(rateLimitStore);
+export const passwordResetRateLimit = createPasswordResetRateLimit(rateLimitStore);
+export const registrationRateLimit = createRegistrationRateLimit(rateLimitStore);
+
+// Legacy rate limiters for backward compatibility (deprecated)
+export const legacyApiRateLimit = createRateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Production limit
   devMax: 1000, // Development limit
@@ -94,15 +115,15 @@ export const apiRateLimit = createRateLimit({
   message: 'Too many API requests from this IP'
 });
 
-export const authRateLimit = createRateLimit({
+export const legacyAuthRateLimit = createRateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // Production limit
-  devMax: 50, // Development limit  
+  devMax: 50, // Development limit
   testMax: 1000, // High limit for testing
   message: 'Too many authentication attempts'
 });
 
-export const sponsorRateLimit = createRateLimit({
+export const legacySponsorRateLimit = createRateLimit({
   windowMs: 10 * 60 * 1000, // 10 minutes
   max: 200, // Production limit for sponsor endpoints
   devMax: 2000, // Development limit
@@ -110,7 +131,7 @@ export const sponsorRateLimit = createRateLimit({
   message: 'Too many sponsor API requests from this IP'
 });
 
-export const searchRateLimit = createRateLimit({
+export const legacySearchRateLimit = createRateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
   max: 50, // Production limit for search
   devMax: 500, // Development limit
@@ -118,7 +139,7 @@ export const searchRateLimit = createRateLimit({
   message: 'Too many search requests from this IP'
 });
 
-export const passwordResetRateLimit = createRateLimit({
+export const legacyPasswordResetRateLimit = createRateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 3, // Production limit for password resets
   devMax: 30, // Development limit
@@ -126,7 +147,7 @@ export const passwordResetRateLimit = createRateLimit({
   message: 'Too many password reset requests from this IP'
 });
 
-export const registrationRateLimit = createRateLimit({
+export const legacyRegistrationRateLimit = createRateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 5, // Production limit for registrations
   devMax: 50, // Development limit

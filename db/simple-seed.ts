@@ -7,11 +7,11 @@ import { db } from './index';
 import { logger } from '../utils/logger';
 
 async function simpleSeed() {
-  logger.info('🌱 Starting simple comprehensive seed process...', { component: 'SimpleTool' });
+  logger.info('🌱 Starting simple comprehensive seed process...', { component: 'Chanuka' });
 
   try {
     // Clear existing data in reverse dependency order
-    logger.info('🧹 Clearing existing data...', { component: 'SimpleTool' });
+    logger.info('🧹 Clearing existing data...', { component: 'Chanuka' });
     await db.execute('DELETE FROM bill_section_conflicts');
     await db.execute('DELETE FROM sponsor_transparency');
     await db.execute('DELETE FROM bill_sponsorships');
@@ -26,7 +26,7 @@ async function simpleSeed() {
     await db.execute('DELETE FROM users');
 
     // 1. Create diverse user base
-    logger.info('👥 Creating users...', { component: 'SimpleTool' });
+    logger.info('👥 Creating users...', { component: 'Chanuka' });
     await db.execute(`
       INSERT INTO users (username, password, email, expertise, onboarding_completed, reputation)
       VALUES 
@@ -42,7 +42,7 @@ async function simpleSeed() {
     const userIds = createdUsers.rows.map(row => row.id);
 
     // 2. Create comprehensive user profiles
-    logger.info('📋 Creating user profiles...', { component: 'SimpleTool' });
+    logger.info('📋 Creating user profiles...', { component: 'Chanuka' });
     await db.execute(`
       INSERT INTO user_profiles (user_id, bio, expertise, location, organization, is_public)
       VALUES 
@@ -54,7 +54,7 @@ async function simpleSeed() {
     `);
 
     // 3. Create comprehensive sponsor database
-    logger.info('🏛️ Creating sponsors...', { component: 'SimpleTool' });
+    logger.info('🏛️ Creating sponsors...', { component: 'Chanuka' });
     await db.execute(`
       INSERT INTO sponsors (name, role, party, constituency, email, phone, conflict_level, financial_exposure, voting_alignment, transparency_score, bio, is_active)
       VALUES 
@@ -70,7 +70,7 @@ async function simpleSeed() {
     const sponsorIds = createdSponsors.rows.map(row => row.id);
 
     // 4. Create comprehensive bills with varied complexity
-    logger.info('📄 Creating bills...', { component: 'SimpleTool' });
+    logger.info('📄 Creating bills...', { component: 'Chanuka' });
     await db.execute(`
       INSERT INTO bills (title, description, content, summary, status, sponsor_id, category, tags, introduced_date, last_action_date, complexity_score)
       VALUES 
@@ -86,7 +86,7 @@ async function simpleSeed() {
     const billIds = createdBills.rows.map(row => row.id);
 
     // 5. Create bill comments
-    logger.info('💬 Creating comments...', { component: 'SimpleTool' });
+    logger.info('💬 Creating comments...', { component: 'Chanuka' });
     await db.execute(`
       INSERT INTO bill_comments (bill_id, user_id, content, upvotes, downvotes, is_verified)
       VALUES 
@@ -98,7 +98,7 @@ async function simpleSeed() {
     `);
 
     // 6. Create engagement data
-    logger.info('📈 Creating engagement data...', { component: 'SimpleTool' });
+    logger.info('📈 Creating engagement data...', { component: 'Chanuka' });
     await db.execute(`
       INSERT INTO bill_engagement (bill_id, user_id, view_count, comment_count, share_count, engagement_score)
       VALUES 
@@ -110,7 +110,7 @@ async function simpleSeed() {
     `);
 
     // 7. Create notifications
-    logger.info('🔔 Creating notifications...', { component: 'SimpleTool' });
+    logger.info('🔔 Creating notifications...', { component: 'Chanuka' });
     await db.execute(`
       INSERT INTO notifications (user_id, type, title, message, related_bill_id, is_read)
       VALUES 
@@ -121,8 +121,8 @@ async function simpleSeed() {
         (${userIds[4]}, 'bill_update', 'Bill Passed', 'Universal Healthcare Access Amendment Bill 2024 has been passed', ${billIds[2]}, false);
     `);
 
-    logger.info('✅ Simple comprehensive seed data creation completed successfully!', { component: 'SimpleTool' });
-    logger.info('📊 Database now contains:', { component: 'SimpleTool' });
+    logger.info('✅ Simple comprehensive seed data creation completed successfully!', { component: 'Chanuka' });
+    logger.info('📊 Database now contains:', { component: 'Chanuka' });
     console.log(`   - 5 users with diverse roles`);
     console.log(`   - 5 sponsors with detailed profiles`);
     console.log(`   - 5 bills with comprehensive content`);
@@ -130,7 +130,7 @@ async function simpleSeed() {
     console.log(`   - User notifications and interaction history`);
 
   } catch (error) {
-    logger.error('❌ Error during seed data creation:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Error during seed data creation:', { component: 'Chanuka' }, error);
     throw error;
   }
 }
@@ -138,11 +138,11 @@ async function simpleSeed() {
 // Execute the seed function
 simpleSeed()
   .then(() => {
-    logger.info('🎉 Simple seed process completed successfully!', { component: 'SimpleTool' });
+    logger.info('🎉 Simple seed process completed successfully!', { component: 'Chanuka' });
     process.exit(0);
   })
   .catch((error) => {
-    logger.error('💥 Simple seed process failed:', { component: 'SimpleTool' }, error);
+    logger.error('💥 Simple seed process failed:', { component: 'Chanuka' }, error);
     process.exit(1);
   });
 

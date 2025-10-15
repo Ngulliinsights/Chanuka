@@ -150,7 +150,7 @@ function BillsDashboard() {
         }
         setError(null);
       } catch (err) {
-        logger.info('Error type:', { component: 'SimpleTool' }, typeof err, err);
+        logger.info('Error type:', { component: 'Chanuka' }, typeof err, err);
         console.warn('API unavailable, using fallback data:', err instanceof Error ? err.message : String(err));
         setBills(FALLBACK_BILLS);
         setIsUsingFallback(true);

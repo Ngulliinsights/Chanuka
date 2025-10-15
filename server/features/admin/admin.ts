@@ -96,7 +96,7 @@ export class AdminService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching admin stats:', { component: 'SimpleTool' }, { error });
+      logger.error('Error fetching admin stats:', { component: 'Chanuka' }, { error });
       // Return fallback data if system health services fail
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -133,7 +133,7 @@ export class AdminService {
           }
         };
       } catch (fallbackError) {
-        logger.error('Error fetching fallback admin stats:', { component: 'SimpleTool' }, { error: fallbackError });
+        logger.error('Error fetching fallback admin stats:', { component: 'Chanuka' }, { error: fallbackError });
         throw error;
       }
     }
@@ -201,7 +201,7 @@ export class AdminService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching user management data:', { component: 'SimpleTool' }, { error });
+      logger.error('Error fetching user management data:', { component: 'Chanuka' }, { error });
       throw error;
     }
   }
@@ -215,7 +215,7 @@ export class AdminService {
 
       return { success: true };
     } catch (error) {
-      logger.error('Error updating user status:', { component: 'SimpleTool' }, { error });
+      logger.error('Error updating user status:', { component: 'Chanuka' }, { error });
       throw error;
     }
   }
@@ -252,7 +252,7 @@ export class AdminService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching system logs:', { component: 'SimpleTool' }, { error });
+      logger.error('Error fetching system logs:', { component: 'Chanuka' }, { error });
       throw error;
     }
   }
@@ -287,7 +287,7 @@ export class AdminService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching content moderation data:', { component: 'SimpleTool' }, { error });
+      logger.error('Error fetching content moderation data:', { component: 'Chanuka' }, { error });
       throw error;
     }
   }
@@ -298,7 +298,7 @@ export class AdminService {
       console.log(`Moderating comment ${commentId} with action: ${action}`);
       return { success: true };
     } catch (error) {
-      logger.error('Error moderating comment:', { component: 'SimpleTool' }, { error });
+      logger.error('Error moderating comment:', { component: 'Chanuka' }, { error });
       throw error;
     }
   }

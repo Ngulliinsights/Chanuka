@@ -228,7 +228,7 @@ export class LegacyErrorHandlerAdapter {
       const response = LegacyErrorResponseFormatter.format(normalizedError);
       
       // Log error
-      logger.error('Error occurred:', { component: 'SimpleTool' }, {
+      logger.error('Error occurred:', { component: 'Chanuka' }, {
         error: normalizedError,
         correlationId: req.correlationId,
         url: req.url,

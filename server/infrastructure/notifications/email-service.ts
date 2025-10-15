@@ -264,7 +264,7 @@ abstract class BaseEmailService implements EmailService {
 export class MockEmailService extends BaseEmailService {
   private mockMessages: EmailInboxMessage[] = [];
   private fallbackEmails: EmailMessage[] = [];
-  private readonly SUPPORT_EMAIL = 'support@simpletool.gov';
+  private readonly SUPPORT_EMAIL = 'support@Chanuka.gov';
 
   async initialize(): Promise<void> {
     const now = Date.now();
@@ -711,7 +711,7 @@ export class EmailTemplates {
   .footer{text-align:center;padding:20px;color:#666;font-size:12px;background:#f0f0f0;border-radius:0 0 8px 8px}
   ul{text-align:left;display:inline-block}
 </style></head><body>
-  <div class="header"><h1>Welcome to SimpleTool! 🇺🇸</h1></div>
+  <div class="header"><h1>Welcome to Chanuka! 🇺🇸</h1></div>
   <div class="content">
     <h2>Hello ${safeName},</h2>
     <p>Welcome to your legislative tracking platform. We're excited to have you on board!</p>
@@ -724,7 +724,7 @@ export class EmailTemplates {
     <a class="button" href="${safeUrl}">Access Your Account</a>
     <p style="margin-top:20px;font-size:14px;color:#666">If you didn't create this account, please ignore this email.</p>
   </div>
-  <div class="footer">© ${new Date().getFullYear()} SimpleTool. All rights reserved.</div>
+  <div class="footer">© ${new Date().getFullYear()} Chanuka. All rights reserved.</div>
 </body></html>`;
   }
 
@@ -745,7 +745,7 @@ export class EmailTemplates {
   <div class="header"><h1>🔐 Password Reset Request</h1></div>
   <div class="content">
     <h2>Hello ${safeName},</h2>
-    <p>We received a request to reset your password for your SimpleTool account.</p>
+    <p>We received a request to reset your password for your Chanuka account.</p>
     <a class="button" href="${safeUrl}">Reset Your Password</a>
     <div class="warning">
       <strong>⚠️ Security Notice:</strong><br>
@@ -753,7 +753,7 @@ export class EmailTemplates {
       If you didn't request this reset, please ignore this email and your password will remain unchanged.
     </div>
   </div>
-  <div class="footer">© ${new Date().getFullYear()} SimpleTool. All rights reserved.</div>
+  <div class="footer">© ${new Date().getFullYear()} Chanuka. All rights reserved.</div>
 </body></html>`;
   }
 
@@ -792,7 +792,7 @@ export class EmailTemplates {
       </div>
     </div>
   </div>
-  <div class="footer">© ${new Date().getFullYear()} SimpleTool. All rights reserved.</div>
+  <div class="footer">© ${new Date().getFullYear()} Chanuka. All rights reserved.</div>
 </body></html>`;
   }
 
@@ -814,7 +814,7 @@ export class EmailTemplates {
       introduced: '#3B82F6',
     };
     const statusColor = statusColors[status.toLowerCase()] ?? '#F59E0B';
-    const frontendUrl = config.server.frontendUrl || 'https://simpletool.gov';
+    const frontendUrl = config.server.frontendUrl || 'https://Chanuka.gov';
     
     return `
 <!DOCTYPE html><html><head><meta charset="utf-8"><title>Bill Update</title>
@@ -837,7 +837,7 @@ export class EmailTemplates {
     </div>
     <a class="button" href="${frontendUrl}/dashboard/bills">View Full Bill Details</a>
   </div>
-  <div class="footer">© ${new Date().getFullYear()} SimpleTool. All rights reserved.</div>
+  <div class="footer">© ${new Date().getFullYear()} Chanuka. All rights reserved.</div>
 </body></html>`;
   }
 }
@@ -937,15 +937,15 @@ export async function sendTemplatedEmail(
 
   switch (template) {
     case 'welcome':
-      subject = 'Welcome to SimpleTool!';
+      subject = 'Welcome to Chanuka!';
       html = EmailTemplates.welcomeEmail(
         data.userName ?? 'User',
-        data.loginUrl ?? 'https://simpletool.gov/login'
+        data.loginUrl ?? 'https://Chanuka.gov/login'
       );
       break;
 
     case 'password-reset':
-      subject = 'Reset Your Password - SimpleTool';
+      subject = 'Reset Your Password - Chanuka';
       html = EmailTemplates.passwordResetEmail(
         data.userName ?? 'User',
         data.resetUrl ?? '#'

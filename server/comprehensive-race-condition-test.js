@@ -15,7 +15,7 @@ import { setTimeout } from 'timers/promises';
 import fs from 'fs';
 import path from 'path';
 
-logger.info('🧪 Starting Comprehensive Race Condition Testing...\n', { component: 'SimpleTool' });
+logger.info('🧪 Starting Comprehensive Race Condition Testing...\n', { component: 'Chanuka' });
 
 // Test results tracking
 const testResults = {
@@ -44,7 +44,7 @@ function addResult(test, status, message, details = null) {
 
 // Test 1: Multiple concurrent server startups
 async function testConcurrentStartups() {
-  logger.info('\n🔄 Test 1: Multiple concurrent server startups...', { component: 'SimpleTool' });
+  logger.info('\n🔄 Test 1: Multiple concurrent server startups...', { component: 'Chanuka' });
   
   const processes = [];
   const ports = [4201, 4202, 4203];
@@ -83,7 +83,7 @@ async function testConcurrentStartups() {
 
 // Test 2: Database initialization race conditions
 async function testDatabaseRaceConditions() {
-  logger.info('\n🗄️ Test 2: Database initialization race conditions...', { component: 'SimpleTool' });
+  logger.info('\n🗄️ Test 2: Database initialization race conditions...', { component: 'Chanuka' });
   
   try {
     // Import database service and test concurrent initialization
@@ -129,7 +129,7 @@ async function testDatabaseRaceConditions() {
 
 // Test 3: WebSocket service race conditions
 async function testWebSocketRaceConditions() {
-  logger.info('\n🔌 Test 3: WebSocket service race conditions...', { component: 'SimpleTool' });
+  logger.info('\n🔌 Test 3: WebSocket service race conditions...', { component: 'Chanuka' });
   
   try {
     const { webSocketService } = await import('./infrastructure/websocket.js');
@@ -167,7 +167,7 @@ async function testWebSocketRaceConditions() {
 
 // Test 4: Memory leak detection
 async function testMemoryLeaks() {
-  logger.info('\n🧠 Test 4: Memory leak detection...', { component: 'SimpleTool' });
+  logger.info('\n🧠 Test 4: Memory leak detection...', { component: 'Chanuka' });
   
   const initialMemory = process.memoryUsage();
   
@@ -220,7 +220,7 @@ async function testMemoryLeaks() {
 
 // Test 5: Circular dependency detection
 async function testCircularDependencies() {
-  logger.info('\n🔄 Test 5: Circular dependency detection...', { component: 'SimpleTool' });
+  logger.info('\n🔄 Test 5: Circular dependency detection...', { component: 'Chanuka' });
   
   try {
     const dependencyMap = new Map();
@@ -311,7 +311,7 @@ async function testCircularDependencies() {
 
 // Test 6: Service redundancy detection
 async function testServiceRedundancy() {
-  logger.info('\n🔍 Test 6: Service redundancy detection...', { component: 'SimpleTool' });
+  logger.info('\n🔍 Test 6: Service redundancy detection...', { component: 'Chanuka' });
   
   try {
     const serviceInstances = new Map();
@@ -364,7 +364,7 @@ async function testServiceRedundancy() {
 
 // Test 7: Infinite loop detection in async operations
 async function testInfiniteLoops() {
-  logger.info('\n♾️ Test 7: Infinite loop detection...', { component: 'SimpleTool' });
+  logger.info('\n♾️ Test 7: Infinite loop detection...', { component: 'Chanuka' });
   
   try {
     // Test async operations with timeout
@@ -423,7 +423,7 @@ async function testInfiniteLoops() {
 
 // Main test runner
 async function runAllTests() {
-  logger.info('🧪 Starting Comprehensive Race Condition Tests...\n', { component: 'SimpleTool' });
+  logger.info('🧪 Starting Comprehensive Race Condition Tests...\n', { component: 'Chanuka' });
   
   try {
     await testDatabaseRaceConditions();
@@ -436,15 +436,15 @@ async function runAllTests() {
     // await testConcurrentStartups();
     
     // Print summary
-    logger.info('\n📊 Test Results Summary:', { component: 'SimpleTool' });
-    logger.info('='.repeat(50), { component: 'SimpleTool' });
+    logger.info('\n📊 Test Results Summary:', { component: 'Chanuka' });
+    logger.info('='.repeat(50), { component: 'Chanuka' });
     console.log(`✅ Passed: ${testResults.passed}`);
     console.log(`❌ Failed: ${testResults.failed}`);
     console.log(`⚠️  Warnings: ${testResults.warnings}`);
-    logger.info('='.repeat(50), { component: 'SimpleTool' });
+    logger.info('='.repeat(50), { component: 'Chanuka' });
     
     if (testResults.failed === 0) {
-      logger.info('\n🎉 All critical tests passed! No race conditions or infinite loops detected.', { component: 'SimpleTool' });
+      logger.info('\n🎉 All critical tests passed! No race conditions or infinite loops detected.', { component: 'Chanuka' });
       if (testResults.warnings > 0) {
         console.log(`⚠️  Note: ${testResults.warnings} warnings found (non-critical issues)`);
       }
@@ -454,10 +454,10 @@ async function runAllTests() {
     
     // Save detailed results
     fs.writeFileSync('test-results.json', JSON.stringify(testResults, null, 2));
-    logger.info('\n📄 Detailed results saved to test-results.json', { component: 'SimpleTool' });
+    logger.info('\n📄 Detailed results saved to test-results.json', { component: 'Chanuka' });
     
   } catch (error) {
-    logger.error('❌ Test suite failed:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Test suite failed:', { component: 'Chanuka' }, error);
     process.exit(1);
   }
 }

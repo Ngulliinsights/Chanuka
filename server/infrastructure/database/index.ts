@@ -16,8 +16,21 @@ export * from './base/BaseStorage';
 
 // Configuration
 export * from './config';
-export * from './db';
-export * from './index';
+
+// Re-export stable DB accessors and legacy names for compatibility.
+export {
+	getDbInstance,
+	getFallbackService,
+	getConnectionStatus,
+	isDatabaseConnected,
+	readDatabase,
+	pool as getPool,
+	db as legacyDb,
+	fallbackService as legacyFallbackService
+} from '../../db.ts';
+
+// Also export other DB utilities (legacy surface)
+export * from '../../db.ts';
 
 
 

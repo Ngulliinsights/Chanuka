@@ -13,17 +13,17 @@ import { APICostMonitoringService } from '../services/api-cost-monitoring.js';
 import { logger } from '../utils/logger';
 
 async function verifyExternalAPIManagement() {
-  logger.info('🔍 Verifying External API Management Implementation (Task 12.3)...\n', { component: 'SimpleTool' });
+  logger.info('🔍 Verifying External API Management Implementation (Task 12.3)...\n', { component: 'Chanuka' });
 
   try {
     // Initialize services
     const apiManager = new ExternalAPIManagementService();
     const costMonitoring = new APICostMonitoringService();
 
-    logger.info('✅ Services initialized successfully', { component: 'SimpleTool' });
+    logger.info('✅ Services initialized successfully', { component: 'Chanuka' });
 
     // 1. Verify API Rate Limiting and Quota Management
-    logger.info('\n📊 1. API Rate Limiting and Quota Management', { component: 'SimpleTool' });
+    logger.info('\n📊 1. API Rate Limiting and Quota Management', { component: 'Chanuka' });
     const analytics = apiManager.getAPIAnalytics();
     
     console.log(`   - Total sources configured: ${analytics.sources.length}`);
@@ -34,7 +34,7 @@ async function verifyExternalAPIManagement() {
     });
 
     // 2. Verify API Health Monitoring and Failover
-    logger.info('\n🏥 2. API Health Monitoring and Failover', { component: 'SimpleTool' });
+    logger.info('\n🏥 2. API Health Monitoring and Failover', { component: 'Chanuka' });
     const healthStatuses = apiManager.getHealthStatus();
     
     console.log(`   - Health monitoring active for ${healthStatuses.length} sources`);
@@ -43,7 +43,7 @@ async function verifyExternalAPIManagement() {
     });
 
     // 3. Verify API Response Caching and Optimization
-    logger.info('\n💾 3. API Response Caching and Optimization', { component: 'SimpleTool' });
+    logger.info('\n💾 3. API Response Caching and Optimization', { component: 'Chanuka' });
     const cacheStats = apiManager.getCacheStatistics();
     
     console.log(`   - Cache entries: ${cacheStats.totalEntries}`);
@@ -52,7 +52,7 @@ async function verifyExternalAPIManagement() {
     console.log(`   - Top cached endpoints: ${cacheStats.topCachedEndpoints.length}`);
 
     // 4. Verify API Usage Analytics and Cost Monitoring
-    logger.info('\n💰 4. API Usage Analytics and Cost Monitoring', { component: 'SimpleTool' });
+    logger.info('\n💰 4. API Usage Analytics and Cost Monitoring', { component: 'Chanuka' });
     console.log(`   - Total requests: ${analytics.totalRequests}`);
     console.log(`   - Total cost: $${analytics.totalCost.toFixed(4)}`);
     console.log(`   - Average response time: ${analytics.averageResponseTime.toFixed(2)}ms`);
@@ -68,11 +68,11 @@ async function verifyExternalAPIManagement() {
     console.log(`   - Cost optimization recommendations: ${costReport.recommendations.length}`);
 
     // 5. Verify Integration Features
-    logger.info('\n🔗 5. Integration Features', { component: 'SimpleTool' });
+    logger.info('\n🔗 5. Integration Features', { component: 'Chanuka' });
     
     // Test cost recording
     costMonitoring.recordRequestCost('test-source', 5, 0.01);
-    logger.info('   - Cost recording: ✅ Working', { component: 'SimpleTool' });
+    logger.info('   - Cost recording: ✅ Working', { component: 'Chanuka' });
     
     // Test cache clearing
     const clearedCount = apiManager.clearCache();
@@ -83,33 +83,33 @@ async function verifyExternalAPIManagement() {
     apiManager.on('cacheCleared', () => {
       eventHandled = true;
     });
-    logger.info('   - Event handling: ✅ Working', { component: 'SimpleTool' });
+    logger.info('   - Event handling: ✅ Working', { component: 'Chanuka' });
 
     // 6. Verify Dashboard Integration
-    logger.info('\n📈 6. Dashboard Integration', { component: 'SimpleTool' });
-    logger.info('   - External API Management Service: ✅ Available', { component: 'SimpleTool' });
-    logger.info('   - Cost Monitoring Service: ✅ Available', { component: 'SimpleTool' });
-    logger.info('   - Analytics API: ✅ Available', { component: 'SimpleTool' });
-    logger.info('   - Health Monitoring API: ✅ Available', { component: 'SimpleTool' });
-    logger.info('   - Cache Management API: ✅ Available', { component: 'SimpleTool' });
-    logger.info('   - Cost Reporting API: ✅ Available', { component: 'SimpleTool' });
+    logger.info('\n📈 6. Dashboard Integration', { component: 'Chanuka' });
+    logger.info('   - External API Management Service: ✅ Available', { component: 'Chanuka' });
+    logger.info('   - Cost Monitoring Service: ✅ Available', { component: 'Chanuka' });
+    logger.info('   - Analytics API: ✅ Available', { component: 'Chanuka' });
+    logger.info('   - Health Monitoring API: ✅ Available', { component: 'Chanuka' });
+    logger.info('   - Cache Management API: ✅ Available', { component: 'Chanuka' });
+    logger.info('   - Cost Reporting API: ✅ Available', { component: 'Chanuka' });
 
     // Summary
-    logger.info('\n🎉 Task 12.3 Verification Summary:', { component: 'SimpleTool' });
-    logger.info('   ✅ API rate limiting and quota management - IMPLEMENTED', { component: 'SimpleTool' });
-    logger.info('   ✅ API health monitoring and failover mechanisms - IMPLEMENTED', { component: 'SimpleTool' });
-    logger.info('   ✅ API response caching and optimization - IMPLEMENTED', { component: 'SimpleTool' });
-    logger.info('   ✅ API usage analytics and cost monitoring - IMPLEMENTED', { component: 'SimpleTool' });
-    logger.info('   ✅ Dashboard and management interfaces - IMPLEMENTED', { component: 'SimpleTool' });
-    logger.info('   ✅ Event handling and integration - IMPLEMENTED', { component: 'SimpleTool' });
+    logger.info('\n🎉 Task 12.3 Verification Summary:', { component: 'Chanuka' });
+    logger.info('   ✅ API rate limiting and quota management - IMPLEMENTED', { component: 'Chanuka' });
+    logger.info('   ✅ API health monitoring and failover mechanisms - IMPLEMENTED', { component: 'Chanuka' });
+    logger.info('   ✅ API response caching and optimization - IMPLEMENTED', { component: 'Chanuka' });
+    logger.info('   ✅ API usage analytics and cost monitoring - IMPLEMENTED', { component: 'Chanuka' });
+    logger.info('   ✅ Dashboard and management interfaces - IMPLEMENTED', { component: 'Chanuka' });
+    logger.info('   ✅ Event handling and integration - IMPLEMENTED', { component: 'Chanuka' });
 
-    logger.info('\n🚀 All components of External API Management are successfully implemented!', { component: 'SimpleTool' });
+    logger.info('\n🚀 All components of External API Management are successfully implemented!', { component: 'Chanuka' });
 
     // Cleanup
     apiManager.shutdown();
 
   } catch (error) {
-    logger.error('❌ Verification failed:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Verification failed:', { component: 'Chanuka' }, error);
     process.exit(1);
   }
 }

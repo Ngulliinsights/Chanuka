@@ -2,24 +2,22 @@
 // Centralized exports for user-related functionality
 
 // Routes
-export { default as usersRouter } from './users';
-export { default as profileRouter } from './profile';
-export { default as verificationRouter } from './verification';
-export { default as alertPreferencesRouter } from './alert-preferences';
+export { router as usersRouter } from './application/users';
+export { router as profileRouter } from './application/profile';
+export { router as verificationRouter } from './application/verification';
 
 // Services
-export { UserManagementService } from './user-management';
-export { UserProfileService } from './user-profile';
-export { UserPreferencesService } from './user-preferences';
-export { CitizenVerificationService } from './citizen-verification';
-export { ExpertVerificationService } from './ExpertVerificationService';
-export { unifiedAlertPreferenceService } from './alert-preferences/unified_alert_service';
+export { UserManagementService } from './domain/user-management';
+export { UserProfileService } from './domain/user-profile';
+export { UserPreferencesService } from './domain/user-preferences';
+export { CitizenVerificationService } from './domain/citizen-verification';
+export { ExpertVerificationService } from './domain/ExpertVerificationService';
 
 // Storage
-export { UserStorage } from './user-storage';
+export { UserStorage } from './infrastructure/user-storage';
 
 // Tests
-export * from './ExpertVerificationService.test';
+export * from './__tests__/ExpertVerificationService.test';
 
 
 

@@ -332,18 +332,18 @@ try {
     }
   });
 
-  logger.info('✅ Mock sponsor routes set up successfully', { component: 'SimpleTool' });
+  logger.info('✅ Mock sponsor routes set up successfully', { component: 'Chanuka' });
 
 } catch (error) {
-  logger.error('❌ Failed to set up routes:', { component: 'SimpleTool' }, error.message);
+  logger.error('❌ Failed to set up routes:', { component: 'Chanuka' }, error.message);
 }
 
 async function testSponsorRoutes() {
-  logger.info('🧪 Testing Sponsor Routes with Rate Limiting...\n', { component: 'SimpleTool' });
+  logger.info('🧪 Testing Sponsor Routes with Rate Limiting...\n', { component: 'Chanuka' });
   
   try {
     // Test 1: Basic sponsor listing
-    logger.info('1. Testing GET /api/sponsors...', { component: 'SimpleTool' });
+    logger.info('1. Testing GET /api/sponsors...', { component: 'Chanuka' });
     const sponsorsResponse = await request(app)
       .get('/api/sponsors')
       .expect(200);
@@ -352,7 +352,7 @@ async function testSponsorRoutes() {
     console.log(`   Response time: ${sponsorsResponse.body.metadata.responseTime ? 'included' : 'missing'}`);
     
     // Test 2: Sponsor with details
-    logger.info('\n2. Testing GET /api/sponsors/:id...', { component: 'SimpleTool' });
+    logger.info('\n2. Testing GET /api/sponsors/:id...', { component: 'Chanuka' });
     const sponsorResponse = await request(app)
       .get('/api/sponsors/1')
       .expect(200);
@@ -364,7 +364,7 @@ async function testSponsorRoutes() {
     console.log(`   Has stats: ${sponsor.stats ? 'yes' : 'no'}`);
     
     // Test 3: Search functionality
-    logger.info('\n3. Testing search with GET /api/sponsors?search=senator...', { component: 'SimpleTool' });
+    logger.info('\n3. Testing search with GET /api/sponsors?search=senator...', { component: 'Chanuka' });
     const searchResponse = await request(app)
       .get('/api/sponsors?search=senator')
       .expect(200);
@@ -372,7 +372,7 @@ async function testSponsorRoutes() {
     console.log(`✅ Search returned ${searchResponse.body.data.length} results`);
     
     // Test 4: Filtering
-    logger.info('\n4. Testing filtering with GET /api/sponsors?party=Independent...', { component: 'SimpleTool' });
+    logger.info('\n4. Testing filtering with GET /api/sponsors?party=Independent...', { component: 'Chanuka' });
     const filterResponse = await request(app)
       .get('/api/sponsors?party=Independent')
       .expect(200);
@@ -380,7 +380,7 @@ async function testSponsorRoutes() {
     console.log(`✅ Filter returned ${filterResponse.body.data.length} results`);
     
     // Test 5: Conflict analysis
-    logger.info('\n5. Testing GET /api/sponsors/:id/conflicts...', { component: 'SimpleTool' });
+    logger.info('\n5. Testing GET /api/sponsors/:id/conflicts...', { component: 'Chanuka' });
     const conflictsResponse = await request(app)
       .get('/api/sponsors/1/conflicts')
       .expect(200);
@@ -391,7 +391,7 @@ async function testSponsorRoutes() {
     console.log(`   Financial conflicts: ${conflicts.financialConflicts.length}`);
     
     // Test 6: Voting patterns
-    logger.info('\n6. Testing GET /api/sponsors/:id/voting-patterns...', { component: 'SimpleTool' });
+    logger.info('\n6. Testing GET /api/sponsors/:id/voting-patterns...', { component: 'Chanuka' });
     const patternsResponse = await request(app)
       .get('/api/sponsors/1/voting-patterns')
       .expect(200);
@@ -399,7 +399,7 @@ async function testSponsorRoutes() {
     console.log(`✅ Retrieved ${patternsResponse.body.data.length} voting patterns`);
     
     // Test 7: Voting consistency
-    logger.info('\n7. Testing GET /api/sponsors/:id/voting-consistency...', { component: 'SimpleTool' });
+    logger.info('\n7. Testing GET /api/sponsors/:id/voting-consistency...', { component: 'Chanuka' });
     const consistencyResponse = await request(app)
       .get('/api/sponsors/1/voting-consistency')
       .expect(200);
@@ -410,14 +410,14 @@ async function testSponsorRoutes() {
     console.log(`   Party alignment: ${(consistency.partyAlignment * 100).toFixed(1)}%`);
     
     // Test 8: Error handling
-    logger.info('\n8. Testing error handling with invalid ID...', { component: 'SimpleTool' });
+    logger.info('\n8. Testing error handling with invalid ID...', { component: 'Chanuka' });
     await request(app)
       .get('/api/sponsors/invalid')
       .expect(400);
     console.log(`✅ Invalid ID properly rejected`);
     
     // Test 9: Rate limiting (should be disabled in test mode)
-    logger.info('\n9. Testing rate limiting behavior...', { component: 'SimpleTool' });
+    logger.info('\n9. Testing rate limiting behavior...', { component: 'Chanuka' });
     const rapidRequests = [];
     for (let i = 0; i < 20; i++) {
       rapidRequests.push(request(app).get('/api/sponsors'));
@@ -432,40 +432,40 @@ async function testSponsorRoutes() {
     console.log(`   Rate limited: ${rateLimitedCount}`);
     console.log(`   Rate limiting ${rateLimitedCount === 0 ? 'disabled (as expected)' : 'active'}`);
     
-    logger.info('\n🎉 All sponsor route tests completed successfully!', { component: 'SimpleTool' });
+    logger.info('\n🎉 All sponsor route tests completed successfully!', { component: 'Chanuka' });
     
   } catch (error) {
-    logger.error('❌ Test failed:', { component: 'SimpleTool' }, error.message);
+    logger.error('❌ Test failed:', { component: 'Chanuka' }, error.message);
     if (error.response) {
-      logger.error('Response status:', { component: 'SimpleTool' }, error.response.status);
-      logger.error('Response body:', { component: 'SimpleTool' }, error.response.body);
+      logger.error('Response status:', { component: 'Chanuka' }, error.response.status);
+      logger.error('Response body:', { component: 'Chanuka' }, error.response.body);
     }
     throw error;
   }
 }
 
 async function runTests() {
-  logger.info('🚀 Starting Sponsor Routes Tests\n', { component: 'SimpleTool' });
+  logger.info('🚀 Starting Sponsor Routes Tests\n', { component: 'Chanuka' });
   
   try {
     await testSponsorRoutes();
     
-    logger.info('\n✨ All tests completed successfully!', { component: 'SimpleTool' });
-    logger.info('\n📋 Summary:', { component: 'SimpleTool' });
-    logger.info('   ✅ Sponsor listing works', { component: 'SimpleTool' });
-    logger.info('   ✅ Individual sponsor details work', { component: 'SimpleTool' });
-    logger.info('   ✅ Search functionality works', { component: 'SimpleTool' });
-    logger.info('   ✅ Filtering works', { component: 'SimpleTool' });
-    logger.info('   ✅ Conflict analysis works', { component: 'SimpleTool' });
-    logger.info('   ✅ Voting pattern analysis works', { component: 'SimpleTool' });
-    logger.info('   ✅ Voting consistency analysis works', { component: 'SimpleTool' });
-    logger.info('   ✅ Error handling works', { component: 'SimpleTool' });
-    logger.info('   ✅ Rate limiting properly configured for testing', { component: 'SimpleTool' });
+    logger.info('\n✨ All tests completed successfully!', { component: 'Chanuka' });
+    logger.info('\n📋 Summary:', { component: 'Chanuka' });
+    logger.info('   ✅ Sponsor listing works', { component: 'Chanuka' });
+    logger.info('   ✅ Individual sponsor details work', { component: 'Chanuka' });
+    logger.info('   ✅ Search functionality works', { component: 'Chanuka' });
+    logger.info('   ✅ Filtering works', { component: 'Chanuka' });
+    logger.info('   ✅ Conflict analysis works', { component: 'Chanuka' });
+    logger.info('   ✅ Voting pattern analysis works', { component: 'Chanuka' });
+    logger.info('   ✅ Voting consistency analysis works', { component: 'Chanuka' });
+    logger.info('   ✅ Error handling works', { component: 'Chanuka' });
+    logger.info('   ✅ Rate limiting properly configured for testing', { component: 'Chanuka' });
     
     process.exit(0);
     
   } catch (error) {
-    logger.error('\n💥 Tests failed:', { component: 'SimpleTool' }, error.message);
+    logger.error('\n💥 Tests failed:', { component: 'Chanuka' }, error.message);
     process.exit(1);
   }
 }

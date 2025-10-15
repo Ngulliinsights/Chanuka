@@ -8,6 +8,7 @@ import { performance } from 'perf_hooks';
 import { resolve } from 'path';
 import { existsSync, readFileSync } from 'fs';
 import { glob } from 'glob';
+import { logger } from '../logging';
 
 export interface ValidationResult {
   success: boolean;
@@ -44,7 +45,7 @@ export class MigrationValidator {
     this.startTime = performance.now();
     this.results = [];
 
-    logger.info('🔍 Starting comprehensive migration validation...\n', { component: 'SimpleTool' });
+    logger.info('🔍 Starting comprehensive migration validation...\n', { component: 'Chanuka' });
 
     // Run all validation categories
     await this.validateImports();
@@ -59,7 +60,7 @@ export class MigrationValidator {
   }
 
   private async validateImports(): Promise<void> {
-    logger.info('📦 Validating import resolution...', { component: 'SimpleTool' });
+    logger.info('📦 Validating import resolution...', { component: 'Chanuka' });
 
     // Test core module imports
     await this.testImport('Core Index', () => import('../index'));
@@ -82,7 +83,7 @@ export class MigrationValidator {
   }
 
   private async validateFunctionality(): Promise<void> {
-    logger.info('⚙️ Validating functionality preservation...', { component: 'SimpleTool' });
+    logger.info('⚙️ Validating functionality preservation...', { component: 'Chanuka' });
 
     // Test cache functionality
     await this.testFunctionality('Cache Service', async () => {
@@ -196,7 +197,7 @@ export class MigrationValidator {
   }
 
   private async validatePerformance(): Promise<void> {
-    logger.info('🚀 Validating performance characteristics...', { component: 'SimpleTool' });
+    logger.info('🚀 Validating performance characteristics...', { component: 'Chanuka' });
 
     // Test cache performance
     await this.testPerformance('Cache Performance', async () => {
@@ -289,7 +290,7 @@ export class MigrationValidator {
   }
 
   private async validateIntegration(): Promise<void> {
-    logger.info('🔗 Validating integration points...', { component: 'SimpleTool' });
+    logger.info('🔗 Validating integration points...', { component: 'Chanuka' });
 
     // Test middleware integration
     await this.testIntegration('Middleware Integration', async () => {
@@ -515,7 +516,6 @@ export class MigrationValidator {
     
     const categorizedResults = {
       imports: this.results.filter(r => r.category === 'imports'),
-import { logger } from '../utils/logger';
       functionality: this.results.filter(r => r.category === 'functionality'),
       performance: this.results.filter(r => r.category === 'performance'),
       integration: this.results.filter(r => r.category === 'integration'),

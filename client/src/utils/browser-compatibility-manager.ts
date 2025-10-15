@@ -99,7 +99,7 @@ export class BrowserCompatibilityManager {
       return this.status;
 
     } catch (error) {
-      logger.error('Failed to initialize browser compatibility manager:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to initialize browser compatibility manager:', { component: 'Chanuka' }, error);
       throw error;
     }
   }
@@ -117,7 +117,7 @@ export class BrowserCompatibilityManager {
       this.status.polyfillsLoaded = true;
       
       if (this.config.logResults) {
-        logger.info('✅ Browser polyfills loaded successfully', { component: 'SimpleTool' });
+        logger.info('✅ Browser polyfills loaded successfully', { component: 'Chanuka' });
         
         // Log polyfill status
         const polyfillStatus = polyfillManager.getPolyfillStatus();
@@ -130,7 +130,7 @@ export class BrowserCompatibilityManager {
         });
       }
     } catch (error) {
-      logger.error('Failed to load polyfills:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to load polyfills:', { component: 'Chanuka' }, error);
       this.status.polyfillsLoaded = false;
       throw error;
     }
@@ -157,7 +157,7 @@ export class BrowserCompatibilityManager {
 
       return testResults;
     } catch (error) {
-      logger.error('Failed to run compatibility tests:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to run compatibility tests:', { component: 'Chanuka' }, error);
       throw error;
     }
   }

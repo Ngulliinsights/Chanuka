@@ -117,7 +117,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
       setNewExpertise('');
       setCharacterCount(0);
     } catch (error) {
-      logger.error('Failed to add comment:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to add comment:', { component: 'Chanuka' }, error);
     }
   };
 
@@ -140,7 +140,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
         setPollData({ question: '', options: ['', ''] });
       }
     } catch (error) {
-      logger.error('Failed to create poll:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to create poll:', { component: 'Chanuka' }, error);
     }
   };
 
@@ -156,7 +156,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
         // Comments will be updated by parent
       }
     } catch (error) {
-      logger.error('Failed to vote:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to vote:', { component: 'Chanuka' }, error);
     }
   };
 
@@ -172,7 +172,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
         // Comments will be updated by parent
       }
     } catch (error) {
-      logger.error('Failed to vote on poll:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to vote on poll:', { component: 'Chanuka' }, error);
     }
   };
 
@@ -196,7 +196,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
         // Comments will be updated by parent
       }
     } catch (error) {
-      logger.error('Failed to reply:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to reply:', { component: 'Chanuka' }, error);
     }
   };
 
@@ -210,7 +210,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
         // Comments will be updated by parent
       }
     } catch (error) {
-      logger.error('Failed to highlight comment:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to highlight comment:', { component: 'Chanuka' }, error);
     }
   };
 

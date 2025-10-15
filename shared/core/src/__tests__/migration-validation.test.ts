@@ -14,24 +14,24 @@ describe('Migration Validation', () => {
   let validator: MigrationValidator;
 
   beforeAll(async () => {
-    logger.info('🚀 Starting comprehensive migration validation...', { component: 'SimpleTool' });
+    logger.info('🚀 Starting comprehensive migration validation...', { component: 'Chanuka' });
     validator = new MigrationValidator();
     validationReport = await validator.validateMigration();
   });
 
   afterAll(() => {
-    logger.info('\n📊 Migration Validation Summary:', { component: 'SimpleTool' });
-    logger.info('================================', { component: 'SimpleTool' });
+    logger.info('\n📊 Migration Validation Summary:', { component: 'Chanuka' });
+    logger.info('================================', { component: 'Chanuka' });
     validationReport.summary.forEach(line => console.log(line));
     
     if (validationReport.recommendations.length > 0) {
-      logger.info('\n💡 Recommendations:', { component: 'SimpleTool' });
-      logger.info('==================', { component: 'SimpleTool' });
+      logger.info('\n💡 Recommendations:', { component: 'Chanuka' });
+      logger.info('==================', { component: 'Chanuka' });
       validationReport.recommendations.forEach(rec => console.log(`• ${rec}`));
     }
     
-    logger.info('\n📈 Detailed Results:', { component: 'SimpleTool' });
-    logger.info('===================', { component: 'SimpleTool' });
+    logger.info('\n📈 Detailed Results:', { component: 'Chanuka' });
+    logger.info('===================', { component: 'Chanuka' });
     
     Object.entries(validationReport.categories).forEach(([category, results]) => {
       console.log(`\n${category.toUpperCase()}:`);
@@ -124,7 +124,7 @@ describe('Migration Validation', () => {
       const cacheResult = functionalityResults.find(r => r.test === 'Cache Service');
       
       if (cacheResult && !cacheResult.success) {
-        logger.error('Cache service functionality test failed:', { component: 'SimpleTool' }, cacheResult.message);
+        logger.error('Cache service functionality test failed:', { component: 'Chanuka' }, cacheResult.message);
       }
     });
 
@@ -133,7 +133,7 @@ describe('Migration Validation', () => {
       const loggingResult = functionalityResults.find(r => r.test === 'Logging Service');
       
       if (loggingResult && !loggingResult.success) {
-        logger.error('Logging service functionality test failed:', { component: 'SimpleTool' }, loggingResult.message);
+        logger.error('Logging service functionality test failed:', { component: 'Chanuka' }, loggingResult.message);
       }
     });
 
@@ -142,7 +142,7 @@ describe('Migration Validation', () => {
       const validationResult = functionalityResults.find(r => r.test === 'Validation Service');
       
       if (validationResult && !validationResult.success) {
-        logger.error('Validation service functionality test failed:', { component: 'SimpleTool' }, validationResult.message);
+        logger.error('Validation service functionality test failed:', { component: 'Chanuka' }, validationResult.message);
       }
     });
 
@@ -151,7 +151,7 @@ describe('Migration Validation', () => {
       const errorResult = functionalityResults.find(r => r.test === 'Error Handling Service');
       
       if (errorResult && !errorResult.success) {
-        logger.error('Error handling functionality test failed:', { component: 'SimpleTool' }, errorResult.message);
+        logger.error('Error handling functionality test failed:', { component: 'Chanuka' }, errorResult.message);
       }
     });
 
@@ -160,7 +160,7 @@ describe('Migration Validation', () => {
       const rateLimitResult = functionalityResults.find(r => r.test === 'Rate Limiting Service');
       
       if (rateLimitResult && !rateLimitResult.success) {
-        logger.error('Rate limiting functionality test failed:', { component: 'SimpleTool' }, rateLimitResult.message);
+        logger.error('Rate limiting functionality test failed:', { component: 'Chanuka' }, rateLimitResult.message);
       }
     });
 
@@ -169,7 +169,7 @@ describe('Migration Validation', () => {
       const healthResult = functionalityResults.find(r => r.test === 'Health Monitoring Service');
       
       if (healthResult && !healthResult.success) {
-        logger.error('Health monitoring functionality test failed:', { component: 'SimpleTool' }, healthResult.message);
+        logger.error('Health monitoring functionality test failed:', { component: 'Chanuka' }, healthResult.message);
       }
     });
   });
@@ -224,7 +224,7 @@ describe('Migration Validation', () => {
       const middlewareResult = integrationResults.find(r => r.test === 'Middleware Integration');
       
       if (middlewareResult && !middlewareResult.success) {
-        logger.error('Middleware integration test failed:', { component: 'SimpleTool' }, middlewareResult.message);
+        logger.error('Middleware integration test failed:', { component: 'Chanuka' }, middlewareResult.message);
       }
     });
 
@@ -233,7 +233,7 @@ describe('Migration Validation', () => {
       const legacyResult = integrationResults.find(r => r.test === 'Legacy Adapter Integration');
       
       if (legacyResult && !legacyResult.success) {
-        logger.error('Legacy adapter integration test failed:', { component: 'SimpleTool' }, legacyResult.message);
+        logger.error('Legacy adapter integration test failed:', { component: 'Chanuka' }, legacyResult.message);
       }
     });
 
@@ -242,7 +242,7 @@ describe('Migration Validation', () => {
       const crossServiceResult = integrationResults.find(r => r.test === 'Cross-Service Integration');
       
       if (crossServiceResult && !crossServiceResult.success) {
-        logger.error('Cross-service integration test failed:', { component: 'SimpleTool' }, crossServiceResult.message);
+        logger.error('Cross-service integration test failed:', { component: 'Chanuka' }, crossServiceResult.message);
       }
     });
   });

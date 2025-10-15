@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, numeric, uuid, varchar, index, uniqueIndex, check } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, numeric, uuid, varchar, index, uniqueIndex, check, inet, date, unique, foreignKey } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations, sql } from "drizzle-orm";
@@ -363,7 +363,7 @@ export const citizenVerifications = pgTable('citizen_verifications', {
   citizenId: uuid('citizen_id').notNull().references(() => users.id, { onDelete: "cascade" }),
   verificationType: varchar('verification_type', { length: 50 }).notNull(),
   verificationStatus: varchar('verification_status', { length: 50 }).notNull().default('pending'),
-  confidence: integer('confidence').notNull().default(0),
+  confidence: numeric('confidence', { precision: 5, scale: 2 }).notNull().default("0"),
   evidence: jsonb('evidence').notNull().default('[]'),
   expertise: jsonb('expertise').notNull().default('{}'),
   reasoning: text('reasoning').notNull(),
@@ -525,7 +525,7 @@ export const complianceChecks = pgTable("compliance_checks", {
   priorityIdx: index("compliance_checks_priority_idx").on(table.priority),
 }));
 
-export const threatIntelligence = pgTable("threat_intelligence", {
+export const threatIntelligenceTable2 = pgTable("threat_intelligence", {
   id: serial("id").primaryKey(),
   ipAddress: text("ip_address").notNull(),
   threatType: text("threat_type").notNull(), // malicious_ip, bot, scanner, etc.
@@ -701,6 +701,248 @@ export const notifications = pgTable("notifications", {
   typeIdx: index("notifications_type_idx").on(table.type),
   createdAtIdx: index("notifications_created_at_idx").on(table.createdAt),
   userReadIdx: index("notifications_user_read_idx").on(table.userId, table.isRead),
+}));
+
+// ============================================================================
+// SECURITY AND MONITORING TABLES
+// ============================================================================
+
+export const securityIncidents = pgTable("security_incidents", {
+  id: serial("id").primaryKey(),
+  incidentType: text("incident_type").notNull(),
+  severity: text("severity").notNull(),
+  status: text("status").notNull().default("open"),
+  description: text("description").notNull(),
+  affectedUsers: text("affected_users").array(),
+  detectionMethod: text("detection_method"),
+  firstDetected: timestamp("first_detected").defaultNow(),
+  lastSeen: timestamp("last_seen"),
+  resolvedAt: timestamp("resolved_at"),
+  assignedTo: text("assigned_to"),
+  evidence: jsonb("evidence"),
+  mitigationSteps: text("mitigation_steps").array(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const securityAlerts = pgTable("security_alerts", {
+  id: serial("id").primaryKey(),
+  alertType: text("alert_type").notNull(),
+  severity: text("severity").notNull(),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  source: text("source").notNull(),
+  status: text("status").notNull().default("active"),
+  assignedTo: text("assigned_to"),
+  metadata: jsonb("metadata"),
+  incidentId: serial("incident_id").references(() => securityIncidents.id),
+  acknowledgedAt: timestamp("acknowledged_at"),
+  acknowledgedBy: text("acknowledged_by"),
+  resolvedAt: timestamp("resolved_at"),
+  resolvedBy: text("resolved_by"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const threatIntelligenceTable = pgTable("threat_intelligence", {
+  id: serial("id").primaryKey(),
+  ipAddress: text("ip_address").notNull(),
+  threatType: text("threat_type").notNull(), // malicious_ip, bot, scanner, etc.
+  severity: text("severity").notNull().default("medium"),
+  source: text("source").notNull(), // internal, external_feed, manual
+  description: text("description"),
+  firstSeen: timestamp("first_seen").notNull().defaultNow(),
+  lastSeen: timestamp("last_seen").notNull().defaultNow(),
+  occurrences: integer("occurrences").notNull().default(1),
+  blocked: boolean("blocked").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true),
+  expiresAt: timestamp("expires_at"),
+  metadata: jsonb("metadata").default({}),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+}, (table) => ({
+  ipAddressIdx: uniqueIndex("threat_intelligence_ip_address_idx").on(table.ipAddress),
+  threatTypeIdx: index("threat_intelligence_threat_type_idx").on(table.threatType),
+  severityIdx: index("threat_intelligence_severity_idx").on(table.severity),
+  isActiveIdx: index("threat_intelligence_is_active_idx").on(table.isActive),
+}));
+
+
+export const attackPatterns = pgTable("attack_patterns", {
+  id: serial("id").primaryKey(),
+  patternName: text("pattern_name").notNull(),
+  patternType: text("pattern_type").notNull(), // regex, behavioral, statistical
+  pattern: text("pattern").notNull(),
+  description: text("description"),
+  severity: text("severity").notNull(),
+  enabled: boolean("enabled").default(true),
+  falsePositiveRate: integer("false_positive_rate").default(0),
+  detectionCount: integer("detection_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// ============================================================================
+// MODERATION AND CONTENT MANAGEMENT
+// ============================================================================
+
+export const moderationQueue = pgTable("moderation_queue", {
+  id: serial("id").primaryKey(),
+  contentType: text("content_type").notNull(),
+  contentId: integer("content_id").notNull(),
+  userId: uuid("user_id"),
+  flags: jsonb().default([]).notNull(),
+  priority: integer().default(1).notNull(),
+  status: text().default('pending').notNull(),
+  autoFlagged: boolean("auto_flagged").default(false),
+  flagReasons: text("flag_reasons").array().default([]),
+  moderatorId: uuid("moderator_id"),
+  moderatorNotes: text("moderator_notes"),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true, mode: 'string' }),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => ({
+  idxModerationQueueAutoFlagged: index("idx_moderation_queue_auto_flagged").using("btree", table.autoFlagged.asc().nullsLast(), table.createdAt.desc().nullsFirst()),
+  idxModerationQueueContent: index("idx_moderation_queue_content").using("btree", table.contentType.asc().nullsLast(), table.contentId.asc().nullsLast()),
+  idxModerationQueueModerator: index("idx_moderation_queue_moderator").using("btree", table.moderatorId.asc().nullsLast()),
+  idxModerationQueueStatusPriority: index("idx_moderation_queue_status_priority").using("btree", table.status.asc().nullsLast(), table.priority.desc().nullsFirst(), table.createdAt.asc().nullsLast()),
+  idxModerationQueueUser: index("idx_moderation_queue_user").using("btree", table.userId.asc().nullsLast()),
+  moderationQueueContentTypeCheck: check("moderation_queue_content_type_check", sql`content_type = ANY (ARRAY['bill_comment'::text, 'bill'::text, 'user_profile'::text, 'sponsor_transparency'::text])`),
+  moderationQueuePriorityCheck: check("moderation_queue_priority_check", sql`(priority >= 1) AND (priority <= 5)`),
+  moderationQueueStatusCheck: check("moderation_queue_status_check", sql`status = ANY (ARRAY['pending'::text, 'approved'::text, 'rejected'::text, 'escalated'::text])`),
+}));
+
+export const contentFlags = pgTable("content_flags", {
+  id: serial("id").primaryKey(),
+  contentType: text("content_type").notNull(),
+  contentId: integer("content_id").notNull(),
+  flaggerUserId: uuid("flagger_user_id").notNull(),
+  flagReason: text("flag_reason").notNull(),
+  flagCategory: text("flag_category").notNull(),
+  description: text(),
+  status: text().default('pending').notNull(),
+  reviewedBy: uuid("reviewed_by"),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true, mode: 'string' }),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => ({
+  idxContentFlagsCategory: index("idx_content_flags_category").using("btree", table.flagCategory.asc().nullsLast(), table.createdAt.desc().nullsFirst()),
+  idxContentFlagsContent: index("idx_content_flags_content").using("btree", table.contentType.asc().nullsLast(), table.contentId.asc().nullsLast()),
+  idxContentFlagsFlagger: index("idx_content_flags_flagger").using("btree", table.flaggerUserId.asc().nullsLast()),
+  idxContentFlagsStatus: index("idx_content_flags_status").using("btree", table.status.asc().nullsLast(), table.createdAt.desc().nullsFirst()),
+  contentFlagsContentTypeCheck: check("content_flags_content_type_check", sql`content_type = ANY (ARRAY['bill_comment'::text, 'bill'::text, 'user_profile'::text])`),
+  contentFlagsFlagCategoryCheck: check("content_flags_flag_category_check", sql`flag_category = ANY (ARRAY['spam'::text, 'harassment'::text, 'misinformation'::text, 'inappropriate'::text, 'copyright'::text, 'other'::text])`),
+  contentFlagsStatusCheck: check("content_flags_status_check", sql`status = ANY (ARRAY['pending'::text, 'reviewed'::text, 'dismissed'::text, 'escalated'::text])`),
+}));
+
+// ============================================================================
+// ANALYTICS AND METRICS TABLES
+// ============================================================================
+
+export const analyticsEvents = pgTable("analytics_events", {
+  id: serial("id").primaryKey(),
+  eventType: text("event_type").notNull(),
+  eventCategory: text("event_category").notNull(),
+  userId: uuid("user_id"),
+  sessionId: text("session_id"),
+  billId: integer("bill_id"),
+  commentId: integer("comment_id"),
+  sponsorId: integer("sponsor_id"),
+  eventData: jsonb("event_data").default({}),
+  userAgent: text("user_agent"),
+  ipAddress: inet("ip_address"),
+  referrer: text(),
+  pageUrl: text("page_url"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => ({
+  idxAnalyticsEventsBill: index("idx_analytics_events_bill").using("btree", table.billId.asc().nullsLast(), table.createdAt.desc().nullsFirst()),
+  idxAnalyticsEventsCategoryDate: index("idx_analytics_events_category_date").using("btree", table.eventCategory.asc().nullsLast(), table.createdAt.desc().nullsFirst()),
+  idxAnalyticsEventsSession: index("idx_analytics_events_session").using("btree", table.sessionId.asc().nullsLast(), table.createdAt.desc().nullsFirst()),
+  idxAnalyticsEventsTypeDate: index("idx_analytics_events_type_date").using("btree", table.eventType.asc().nullsLast(), table.createdAt.desc().nullsFirst()),
+  idxAnalyticsEventsUserDate: index("idx_analytics_events_user_date").using("btree", table.userId.asc().nullsLast(), table.createdAt.desc().nullsFirst()),
+}));
+
+export const analyticsDailySummary = pgTable("analytics_daily_summary", {
+  id: serial("id").primaryKey(),
+  date: date().notNull(),
+  eventType: text("event_type").notNull(),
+  eventCategory: text("event_category"),
+  totalEvents: integer("total_events").default(0).notNull(),
+  uniqueUsers: integer("unique_users").default(0).notNull(),
+  uniqueSessions: integer("unique_sessions").default(0).notNull(),
+  billInteractions: integer("bill_interactions").default(0),
+  commentInteractions: integer("comment_interactions").default(0),
+  searchQueries: integer("search_queries").default(0),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => ({
+  idxAnalyticsDailyCategory: index("idx_analytics_daily_category").using("btree", table.eventCategory.asc().nullsLast(), table.date.desc().nullsFirst()),
+  idxAnalyticsDailyDateType: index("idx_analytics_daily_date_type").using("btree", table.date.desc().nullsFirst(), table.eventType.asc().nullsLast()),
+  analyticsDailySummaryDateEventTypeEventCategoryKey: unique("analytics_daily_summary_date_event_type_event_category_key").on(table.date, table.eventType, table.eventCategory),
+}));
+
+export const userActivitySummary = pgTable("user_activity_summary", {
+  id: serial("id").primaryKey(),
+  userId: uuid("user_id").notNull(),
+  date: date().notNull(),
+  billsViewed: integer("bills_viewed").default(0),
+  billsTracked: integer("bills_tracked").default(0),
+  commentsPosted: integer("comments_posted").default(0),
+  commentsUpvoted: integer("comments_upvoted").default(0),
+  commentsDownvoted: integer("comments_downvoted").default(0),
+  searchesPerformed: integer("searches_performed").default(0),
+  sessionDurationMinutes: integer("session_duration_minutes").default(0),
+  engagementScore: numeric("engagement_score", { precision: 10, scale: 2 }).default('0'),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => ({
+  idxUserActivityDate: index("idx_user_activity_date").using("btree", table.date.desc().nullsFirst()),
+  idxUserActivityEngagement: index("idx_user_activity_engagement").using("btree", table.engagementScore.desc().nullsFirst(), table.date.desc().nullsFirst()),
+  idxUserActivityUserDate: index("idx_user_activity_user_date").using("btree", table.userId.asc().nullsLast(), table.date.desc().nullsFirst()),
+  userActivitySummaryUserIdFkey: foreignKey({
+    columns: [table.userId],
+    foreignColumns: [users.id],
+    name: "user_activity_summary_user_id_fkey"
+  }).onDelete("cascade"),
+  userActivitySummaryUserIdDateKey: unique("user_activity_summary_user_id_date_key").on(table.userId, table.date),
+}));
+
+export const billAnalyticsSummary = pgTable("bill_analytics_summary", {
+  id: serial("id").primaryKey(),
+  billId: integer("bill_id").notNull(),
+  date: date().notNull(),
+  views: integer().default(0),
+  uniqueViewers: integer("unique_viewers").default(0),
+  comments: integer().default(0),
+  shares: integer().default(0),
+  trackingUsers: integer("tracking_users").default(0),
+  engagementScore: numeric("engagement_score", { precision: 10, scale: 2 }).default('0'),
+  sentimentPositive: integer("sentiment_positive").default(0),
+  sentimentNegative: integer("sentiment_negative").default(0),
+  sentimentNeutral: integer("sentiment_neutral").default(0),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => ({
+  idxBillAnalyticsBillDate: index("idx_bill_analytics_bill_date").using("btree", table.billId.asc().nullsLast(), table.date.desc().nullsFirst()),
+  idxBillAnalyticsEngagement: index("idx_bill_analytics_engagement").using("btree", table.engagementScore.desc().nullsFirst(), table.date.desc().nullsFirst()),
+  idxBillAnalyticsViews: index("idx_bill_analytics_views").using("btree", table.views.desc().nullsFirst(), table.date.desc().nullsFirst()),
+  billAnalyticsSummaryBillIdFkey: foreignKey({
+    columns: [table.billId],
+    foreignColumns: [bills.id],
+    name: "bill_analytics_summary_bill_id_fkey"
+  }).onDelete("cascade"),
+  billAnalyticsSummaryBillIdDateKey: unique("bill_analytics_summary_bill_id_date_key").on(table.billId, table.date),
+}));
+
+export const systemHealthMetrics = pgTable("system_health_metrics", {
+  id: serial("id").primaryKey(),
+  metricName: text("metric_name").notNull(),
+  metricValue: numeric("metric_value").notNull(),
+  metricUnit: text("metric_unit"),
+  metricCategory: text("metric_category").notNull(),
+  recordedAt: timestamp("recorded_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+  metadata: jsonb().default({}),
+}, (table) => ({
+  idxSystemHealthCategoryTime: index("idx_system_health_category_time").using("btree", table.metricCategory.asc().nullsLast(), table.recordedAt.desc().nullsFirst()),
+  idxSystemHealthNameTime: index("idx_system_health_name_time").using("btree", table.metricName.asc().nullsLast(), table.recordedAt.desc().nullsFirst()),
 }));
 
 // ============================================================================
@@ -1061,7 +1303,7 @@ export type ModerationAction = typeof moderationActions.$inferSelect;
 export type SecurityAuditLog = typeof securityAuditLogs.$inferSelect;
 export type ComplianceCheck = typeof complianceChecks.$inferSelect;
 export type InsertComplianceCheck = z.infer<typeof insertComplianceCheckSchema>;
-export type ThreatIntelligence = typeof threatIntelligence.$inferSelect;
+export type ThreatIntelligence = typeof threatIntelligenceTable.$inferSelect;
 
 export type Regulation = typeof regulations.$inferSelect;
 export type RegulatoryChange = typeof regulatoryChanges.$inferSelect;

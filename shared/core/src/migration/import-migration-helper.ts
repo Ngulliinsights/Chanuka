@@ -271,26 +271,26 @@ const { ImportMigrationHelper } = require('./core/src/migration/import-migration
 async function main() {
   const migrationHelper = new ImportMigrationHelper();
   
-  logger.info('Starting import migration...', { component: 'SimpleTool' });
+  logger.info('Starting import migration...', { component: 'Chanuka' });
   
   // Migrate server directory
-  logger.info('Migrating server directory...', { component: 'SimpleTool' });
+  logger.info('Migrating server directory...', { component: 'Chanuka' });
   const serverResults = await migrationHelper.migrateDirectory('./server');
   console.log(\`Server: \${serverResults.migratedFiles}/\${serverResults.totalFiles} files migrated, \${serverResults.totalChanges} changes\`);
   
   // Migrate src directory
-  logger.info('Migrating src directory...', { component: 'SimpleTool' });
+  logger.info('Migrating src directory...', { component: 'Chanuka' });
   const srcResults = await migrationHelper.migrateDirectory('./src');
   console.log(\`Src: \${srcResults.migratedFiles}/\${srcResults.totalFiles} files migrated, \${srcResults.totalChanges} changes\`);
   
   // Report errors
   const allErrors = [...serverResults.errors, ...srcResults.errors];
   if (allErrors.length > 0) {
-    logger.info('\\nErrors encountered:', { component: 'SimpleTool' });
+    logger.info('\\nErrors encountered:', { component: 'Chanuka' });
     allErrors.forEach(error => console.log(\`  - \${error}\`));
   }
   
-  logger.info('\\nMigration completed!', { component: 'SimpleTool' });
+  logger.info('\\nMigration completed!', { component: 'Chanuka' });
   console.log(\`Total files migrated: \${serverResults.migratedFiles + srcResults.migratedFiles}\`);
   console.log(\`Total changes made: \${serverResults.totalChanges + srcResults.totalChanges}\`);
 }

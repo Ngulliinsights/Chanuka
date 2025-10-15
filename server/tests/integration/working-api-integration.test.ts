@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, jest } from '@jest/globals';
-import request from 'supertest';
+import * as request from 'supertest';
 import express from 'express';
 import cors from 'cors';
 import { router as billsRouter } from '../../features/bills/bills';
@@ -38,6 +38,11 @@ describe('Working API Integration Tests', () => {
   afterAll(async () => {
     // Cleanup test data
     await cleanupTestData();
+
+    // Force cleanup of any remaining timers to prevent hanging
+    if (global.gc) {
+      global.gc();
+    }
   });
 
   beforeEach(() => {

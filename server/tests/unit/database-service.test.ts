@@ -1,12 +1,20 @@
+// Mock all dependencies before importing the module
+jest.mock('pg');
+jest.mock('drizzle-orm/node-postgres');
+jest.mock('../../../shared/schema.ts', () => ({}), { virtual: true });
+jest.mock('../../utils/logger');
+jest.mock('../../core/errors/error-tracker.ts');
+jest.mock('../../config/index.ts');
+
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { DatabaseService } from '../../../infrastructure/database/database-service.js';
-import pg from 'pg';
+import { DatabaseService } from '../../infrastructure/database/database-service';
+import * as pg from 'pg';
 import { logger } from '../../utils/logger';
 
 // Mock pg module
 jest.mock('pg', () => ({
   Pool: jest.fn().mockImplementation(() => ({
-    connect: jest.fn(),
+    connect: jest.fn() as jest.MockedFunction<() => Promise<any>>,
     query: jest.fn(),
     end: jest.fn(),
     on: jest.fn(),
@@ -40,7 +48,7 @@ describe('DatabaseService', () => {
     };
 
     mockPool = {
-      connect: jest.fn().mockResolvedValue(mockClient),
+      connect: jest.fn() as jest.MockedFunction<() => Promise<any>>,
       query: jest.fn(),
       end: jest.fn(),
       on: jest.fn(),
@@ -56,6 +64,11 @@ describe('DatabaseService', () => {
   afterEach(async () => {
     if (databaseService) {
       await databaseService.close();
+
+      // Force cleanup of any remaining timers to prevent hanging
+      if (databaseService.forceCleanupTimers) {
+        databaseService.forceCleanupTimers();
+      }
     }
   });
 
@@ -81,7 +94,7 @@ describe('DatabaseService', () => {
 
   describe('withFallback', () => {
     it('should return database data when connection is available', async () => {
-      const mockOperation = jest.fn().mockResolvedValue({ id: 1, name: 'test' });
+      const mockOperation = jest.fn<() => Promise<{ id: number; name: string; }>>().mockResolvedValue({ id: 1, name: 'test' });
       const fallbackData = { id: 0, name: 'fallback' };
 
       mockClient.query.mockResolvedValue({ rows: [{ now: new Date() }] });
@@ -99,7 +112,7 @@ describe('DatabaseService', () => {
     });
 
     it('should return fallback data when database operation fails', async () => {
-      const mockOperation = jest.fn().mockRejectedValue(new Error('Database error'));
+      const mockOperation = jest.fn<() => Promise<{ id: number; name: string; }>>().mockRejectedValue(new Error('Database error'));
       const fallbackData = { id: 0, name: 'fallback' };
 
       const result = await databaseService.withFallback(
@@ -121,9 +134,10 @@ describe('DatabaseService', () => {
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] });
 
-      const mockCallback = jest.fn().mockResolvedValue({ success: true });
+      const mockCallback = jest.fn() as jest.MockedFunction<() => Promise<{ success: boolean }>>;
+      mockCallback.mockResolvedValue({ success: true });
 
-      const result = await databaseService.withTransaction(mockCallback, 'test-transaction');
+      const result = await databaseService.withTransaction(mockCallback as any, 'test-transaction');
 
       expect(result.source).toBe('database');
       expect(result.data).toEqual({ success: true });
@@ -137,10 +151,11 @@ describe('DatabaseService', () => {
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] });
 
-      const mockCallback = jest.fn().mockRejectedValue(new Error('Transaction error'));
+      const mockCallback = jest.fn() as jest.MockedFunction<() => Promise<{ success: boolean }>>;
+      mockCallback.mockRejectedValue(new Error('Transaction error'));
 
       await expect(
-        databaseService.withTransaction(mockCallback, 'test-transaction')
+        databaseService.withTransaction(mockCallback as any, 'test-transaction')
       ).rejects.toThrow('Transaction error');
 
       expect(mockClient.query).toHaveBeenCalledWith('BEGIN');

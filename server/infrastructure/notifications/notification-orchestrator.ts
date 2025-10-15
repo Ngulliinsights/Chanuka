@@ -3,7 +3,7 @@ import { notifications, users } from '../../../shared/schema.js';
 import { eq } from 'drizzle-orm';
 import { smartNotificationFilterService, type FilterCriteria, type FilterResult } from './smart-notification-filter.js';
 import { notificationChannelService, type ChannelDeliveryRequest, type DeliveryResult } from './notification-channels.js';
-import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/user-preferences.js';
+import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
 import { logger } from '@shared/utils/logger';
 
 /**

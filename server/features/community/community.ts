@@ -55,7 +55,7 @@ const pollVoteSchema = z.object({
  */
 function handleApiError(res: any, error: unknown, message: string, startTime: number) {
   // Log the full error for debugging
-  logger.error(message, { component: 'SimpleTool' }, error);
+  logger.error(message, { component: 'Chanuka' }, error);
   
   // Extract error details safely
   const errorDetails = error instanceof Error ? { message: error.message } : undefined;
@@ -161,7 +161,7 @@ router.post("/comments", requireAuth, async (req, res) => {
         'spam', // Default flag type for analysis
         'Automated content analysis',
         userId
-      ).catch(err => logger.error('Content moderation failed:', { component: 'SimpleTool' }, err));
+      ).catch(err => logger.error('Content moderation failed:', { component: 'Chanuka' }, err));
     }
     
     return ApiSuccess(res, comment, 

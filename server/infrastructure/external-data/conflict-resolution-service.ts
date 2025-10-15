@@ -5,7 +5,7 @@
  * resolution strategies based on source priority and confidence levels.
  */
 
-import { db } from '../../db.js';
+import { readDatabase } from '../../infrastructure/database/index.ts';
 import { 
   ConflictResolution, 
   ConflictSource, 
@@ -77,8 +77,8 @@ export class ConflictResolutionService {
       resolution.resolution = 'manual';
     }
 
-    // Store conflict in database
-    await this.storeConflict(resolution);
+  // Store conflict in database
+  await this.storeConflict(resolution);
 
     return resolution;
   }
@@ -354,7 +354,8 @@ export class ConflictResolutionService {
   private async storeConflict(conflict: ConflictResolution): Promise<void> {
     try {
       // Store main conflict record
-      await db.insert(conflicts).values({
+      const database = readDatabase();
+      await database.insert(conflicts).values({
         id: conflict.conflictId,
         dataType: conflict.dataType,
         recordId: conflict.recordId,
@@ -368,7 +369,7 @@ export class ConflictResolutionService {
 
       // Store conflict sources
       for (const source of conflict.sources) {
-        await db.insert(conflictSources).values({
+        await database.insert(conflictSources).values({
           conflictId: conflict.conflictId,
           sourceId: source.sourceId,
           sourceName: source.sourceName,
@@ -380,7 +381,7 @@ export class ConflictResolutionService {
       }
 
     } catch (error) {
-      logger.error('Error storing conflict:', { component: 'SimpleTool' }, error);
+      logger.error('Error storing conflict:', { component: 'Chanuka' }, error);
       throw error;
     }
   }
@@ -390,7 +391,8 @@ export class ConflictResolutionService {
    */
   async getPendingConflicts(limit = 50): Promise<ConflictResolution[]> {
     try {
-      const pendingConflicts = await db
+      const database = readDatabase();
+      const pendingConflicts = await database
         .select()
         .from(conflicts)
         .where(eq(conflicts.resolution, 'manual'))
@@ -399,7 +401,7 @@ export class ConflictResolutionService {
       const results: ConflictResolution[] = [];
 
       for (const conflict of pendingConflicts) {
-        const sources = await db
+        const sources = await database
           .select()
           .from(conflictSources)
           .where(eq(conflictSources.conflictId, conflict.id));
@@ -426,7 +428,7 @@ export class ConflictResolutionService {
 
       return results;
     } catch (error) {
-      logger.error('Error getting pending conflicts:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting pending conflicts:', { component: 'Chanuka' }, error);
       return [];
     }
   }
@@ -440,7 +442,8 @@ export class ConflictResolutionService {
     resolvedBy: string
   ): Promise<void> {
     try {
-      await db
+      const database = readDatabase();
+      await database
         .update(conflicts)
         .set({
           resolution: 'manual',
@@ -452,7 +455,7 @@ export class ConflictResolutionService {
         .where(eq(conflicts.id, conflictId));
 
     } catch (error) {
-      logger.error('Error manually resolving conflict:', { component: 'SimpleTool' }, error);
+      logger.error('Error manually resolving conflict:', { component: 'Chanuka' }, error);
       throw error;
     }
   }
@@ -478,7 +481,7 @@ export class ConflictResolutionService {
         averageConfidence: 0
       };
     } catch (error) {
-      logger.error('Error getting conflict statistics:', { component: 'SimpleTool' }, error);
+      logger.error('Error getting conflict statistics:', { component: 'Chanuka' }, error);
       throw error;
     }
   }

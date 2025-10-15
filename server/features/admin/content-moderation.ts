@@ -187,7 +187,7 @@ export class ContentModerationService {
       };
     } catch (error) {
       logger.error('Error fetching moderation queue:', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
@@ -238,7 +238,7 @@ export class ContentModerationService {
       return { success: true, message: `Content ${action}ed successfully` };
     } catch (error) {
       logger.error('Error moderating content:', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         error: error instanceof Error ? error.message : String(error)
       });
       return { success: false, message: 'Failed to moderate content' };
@@ -274,7 +274,7 @@ export class ContentModerationService {
       };
     } catch (error) {
       logger.error('Error performing bulk moderation:', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         error: error instanceof Error ? error.message : String(error)
       });
       return {
@@ -372,7 +372,7 @@ export class ContentModerationService {
       };
     } catch (error) {
       logger.error('Error reviewing flag:', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         error: error instanceof Error ? error.message : String(error)
       });
       return {
@@ -603,7 +603,7 @@ export class ContentModerationService {
       };
     } catch (error) {
       logger.error('Error fetching moderation stats:', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
@@ -810,7 +810,7 @@ export class ContentModerationService {
       };
     } catch (error) {
       logger.error('Error analyzing content:', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         error: error instanceof Error ? error.message : String(error)
       });
       
@@ -871,7 +871,7 @@ export class ContentModerationService {
       return { success: true, message: 'Content flagged successfully' };
     } catch (error) {
       logger.error('Error flagging content:', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         error: error instanceof Error ? error.message : String(error)
       });
       return { success: false, message: 'Failed to flag content' };
@@ -982,7 +982,7 @@ export class ContentModerationService {
       };
     } catch (error) {
       logger.error('Error fetching content analytics:', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
@@ -1063,7 +1063,7 @@ export class ContentModerationService {
       };
     } catch (error) {
       logger.error('Error fetching moderation history:', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
@@ -1149,7 +1149,7 @@ export class ContentModerationService {
       };
     } catch (error) {
       logger.error('Error fetching content details:', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         error: error instanceof Error ? error.message : String(error)
       });
       return {
@@ -1211,7 +1211,7 @@ export class ContentModerationService {
       }
     } catch (error) {
       logger.error('Error applying moderation action:', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         error: error instanceof Error ? error.message : String(error)
       });
     }
@@ -1278,7 +1278,7 @@ export class ContentModerationService {
           }
           
           logger.info('User ban action required:', {
-            component: 'SimpleTool',
+            component: 'Chanuka',
             userId,
             contentType,
             contentId
@@ -1287,13 +1287,13 @@ export class ContentModerationService {
 
         default:
           logger.warn('Unknown resolution type:', {
-            component: 'SimpleTool',
+            component: 'Chanuka',
             resolutionType
           });
       }
     } catch (error) {
       logger.error('Error applying resolution:', { 
-        component: 'SimpleTool',
+        component: 'Chanuka',
         error: error instanceof Error ? error.message : String(error)
       });
     }

@@ -113,7 +113,7 @@ export class WebSocketClient {
 
       try {
         const wsUrl = `${this.baseUrl}/ws?token=${encodeURIComponent(token)}`;
-        logger.info('WebSocket attempting to connect to:', { component: 'SimpleTool' }, wsUrl);
+        logger.info('WebSocket attempting to connect to:', { component: 'Chanuka' }, wsUrl);
         this.ws = new WebSocket(wsUrl);
 
         // Optimization: Add connection timeout to prevent hanging
@@ -126,7 +126,7 @@ export class WebSocketClient {
 
         this.ws.onopen = () => {
           clearTimeout(connectionTimeout);
-          logger.info('WebSocket connected successfully', { component: 'SimpleTool' });
+          logger.info('WebSocket connected successfully', { component: 'Chanuka' });
           this.connectionState = ConnectionState.CONNECTED;
           this.reconnectAttempts = 0;
           this.connectedAt = Date.now();
@@ -145,7 +145,7 @@ export class WebSocketClient {
             const message = JSON.parse(event.data);
             this.handleMessage(message);
           } catch (error) {
-            logger.error('Error parsing WebSocket message:', { component: 'SimpleTool' }, error);
+            logger.error('Error parsing WebSocket message:', { component: 'Chanuka' }, error);
             // Optimization: Don't crash on malformed messages
             this.emit('error', { message: 'Failed to parse message', error });
           }
@@ -153,7 +153,7 @@ export class WebSocketClient {
 
         this.ws.onclose = (event) => {
           clearTimeout(connectionTimeout);
-          logger.info('WebSocket connection closed:', { component: 'SimpleTool' }, event.code, event.reason);
+          logger.info('WebSocket connection closed:', { component: 'Chanuka' }, event.code, event.reason);
           
           // Optimization: Update state before emitting events
           const wasConnected = this.connectionState === ConnectionState.CONNECTED;
@@ -167,7 +167,7 @@ export class WebSocketClient {
             this.scheduleReconnect();
           } else if (this.reconnectAttempts >= this.maxReconnectAttempts) {
             this.connectionState = ConnectionState.FAILED;
-            logger.error('Max reconnection attempts reached', { component: 'SimpleTool' });
+            logger.error('Max reconnection attempts reached', { component: 'Chanuka' });
             this.emit('error', { message: 'Failed to reconnect after maximum attempts' });
             reject(new Error('Max reconnection attempts reached'));
           }
@@ -175,7 +175,7 @@ export class WebSocketClient {
 
         this.ws.onerror = (error) => {
           clearTimeout(connectionTimeout);
-          logger.error('WebSocket error:', { component: 'SimpleTool' }, error);
+          logger.error('WebSocket error:', { component: 'Chanuka' }, error);
           this.emit('error', error);
           
           // Optimization: Only reject if we're still trying to connect initially
@@ -186,7 +186,7 @@ export class WebSocketClient {
 
       } catch (error) {
         this.connectionState = ConnectionState.DISCONNECTED;
-        logger.error('Failed to connect to WebSocket:', { component: 'SimpleTool' }, error);
+        logger.error('Failed to connect to WebSocket:', { component: 'Chanuka' }, error);
         reject(error);
       }
     });
@@ -220,7 +220,7 @@ export class WebSocketClient {
     if (handler) {
       handler();
     } else {
-      logger.info('Unknown message type:', { component: 'SimpleTool' }, message.type);
+      logger.info('Unknown message type:', { component: 'Chanuka' }, message.type);
     }
   }
 
@@ -293,7 +293,7 @@ export class WebSocketClient {
       try {
         this.send(message);
       } catch (error) {
-        logger.error('Error sending queued message:', { component: 'SimpleTool' }, error);
+        logger.error('Error sending queued message:', { component: 'Chanuka' }, error);
         // Re-queue failed messages
         this.queueMessage(message);
       }
@@ -342,7 +342,7 @@ export class WebSocketClient {
       }
       this.ws.send(payload);
     } catch (error) {
-      logger.error('Error sending WebSocket message:', { component: 'SimpleTool' }, error);
+      logger.error('Error sending WebSocket message:', { component: 'Chanuka' }, error);
       this.emit('error', { message: 'Failed to send message', error });
       throw error;
     }
@@ -410,7 +410,7 @@ export class WebSocketClient {
       this.reconnectTimeoutId = null;
       if (this.currentToken) {
         this.connect(this.currentToken).catch(error => {
-          logger.error('Reconnection failed:', { component: 'SimpleTool' }, error);
+          logger.error('Reconnection failed:', { component: 'Chanuka' }, error);
         });
       }
     }, delay);
@@ -548,7 +548,7 @@ export function useWebSocket() {
     const handleConnected = () => updateConnectionState();
     const handleDisconnected = () => updateConnectionState();
     const handleError = (error: any) => {
-      logger.error('WebSocket error:', { component: 'SimpleTool' }, error);
+      logger.error('WebSocket error:', { component: 'Chanuka' }, error);
       updateConnectionState();
     };
 

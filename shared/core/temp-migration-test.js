@@ -12,5 +12,5 @@
             // Test logger
             const logger = new Logger({ level: 'info' });
             
-            logger.info('Core utilities test passed', { component: 'SimpleTool' });
+            logger.info('Core utilities test passed', { component: 'Chanuka' });
           

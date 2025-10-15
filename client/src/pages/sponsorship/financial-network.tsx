@@ -57,7 +57,7 @@ export default function FinancialNetworkAnalysis({ billId }: FinancialNetworkPro
             industryBreakdown: data.industryAnalysis?.breakdown || []
           });
         } else {
-          logger.error('Failed to fetch financial network data', { component: 'SimpleTool' });
+          logger.error('Failed to fetch financial network data', { component: 'Chanuka' });
           // Fallback to mock data if API fails
           setNetworkData({
             totalEntities: 13,
@@ -72,7 +72,7 @@ export default function FinancialNetworkAnalysis({ billId }: FinancialNetworkPro
           });
         }
       } catch (error) {
-        logger.error('Error fetching financial network data:', { component: 'SimpleTool' }, error);
+        logger.error('Error fetching financial network data:', { component: 'Chanuka' }, error);
         // Fallback to mock data on error
         setNetworkData({
           totalEntities: 13,

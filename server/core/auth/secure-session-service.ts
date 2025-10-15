@@ -137,7 +137,7 @@ export class SecureSessionService {
       return { sessionId, csrfToken };
 
     } catch (error) {
-      logger.error('Session creation failed:', { component: 'SimpleTool' }, error);
+      logger.error('Session creation failed:', { component: 'Chanuka' }, error);
       throw new Error('Failed to create session');
     }
   }
@@ -262,7 +262,7 @@ export class SecureSessionService {
       return { isValid: true, session: sessionData };
 
     } catch (error) {
-      logger.error('Session validation failed:', { component: 'SimpleTool' }, error);
+      logger.error('Session validation failed:', { component: 'Chanuka' }, error);
       return { isValid: false, error: 'Session validation failed' };
     }
   }
@@ -280,7 +280,7 @@ export class SecureSessionService {
         })
         .where(eq(sessions.id, sessionId));
     } catch (error) {
-      logger.error('Session invalidation failed:', { component: 'SimpleTool' }, error);
+      logger.error('Session invalidation failed:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -297,7 +297,7 @@ export class SecureSessionService {
         })
         .where(eq(sessions.userId, userId));
     } catch (error) {
-      logger.error('User session invalidation failed:', { component: 'SimpleTool' }, error);
+      logger.error('User session invalidation failed:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -316,9 +316,9 @@ export class SecureSessionService {
           lt(sessions.expiresAt, now)
         ));
 
-      logger.info('Expired sessions cleaned up', { component: 'SimpleTool' });
+      logger.info('Expired sessions cleaned up', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('Session cleanup failed:', { component: 'SimpleTool' }, error);
+      logger.error('Session cleanup failed:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -346,7 +346,7 @@ export class SecureSessionService {
         }
       }
     } catch (error) {
-      logger.error('User session cleanup failed:', { component: 'SimpleTool' }, error);
+      logger.error('User session cleanup failed:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -418,7 +418,7 @@ export class SecureSessionService {
         topUserAgents: [] // Would aggregate from session data
       };
     } catch (error) {
-      logger.error('Failed to get session stats:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to get session stats:', { component: 'Chanuka' }, error);
       return {
         totalActiveSessions: 0,
         sessionsLast24h: 0,

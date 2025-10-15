@@ -9,8 +9,18 @@ describe('Database Operations Integration Tests', () => {
   });
 
   afterAll(async () => {
-    // Clean up database connections
+    // Clean up database connections and timers
     await databaseService.close();
+
+    // Force cleanup of any remaining timers to prevent hanging
+    if ((databaseService as any).forceCleanupTimers) {
+      (databaseService as any).forceCleanupTimers();
+    }
+
+    // Force garbage collection
+    if (global.gc) {
+      global.gc();
+    }
   });
 
   describe('Database Connection', () => {

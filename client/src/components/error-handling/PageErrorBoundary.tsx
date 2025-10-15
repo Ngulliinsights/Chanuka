@@ -143,10 +143,10 @@ class PageErrorBoundary extends Component<Props, State> {
 
     // Enhanced error logging with context
     console.group(`🚨 PageErrorBoundary Error [${errorType}/${errorSeverity}]`);
-    logger.error('Error:', { component: 'SimpleTool' }, error);
-    logger.error('Error Info:', { component: 'SimpleTool' }, errorInfo);
-    logger.error('Component Stack:', { component: 'SimpleTool' }, errorInfo.componentStack);
-    logger.error('Context:', { component: 'SimpleTool' }, this.props.context);
+    logger.error('Error:', { component: 'Chanuka' }, error);
+    logger.error('Error Info:', { component: 'Chanuka' }, errorInfo);
+    logger.error('Component Stack:', { component: 'Chanuka' }, errorInfo.componentStack);
+    logger.error('Context:', { component: 'Chanuka' }, this.props.context);
     console.groupEnd();
 
     // Collect enhanced error context
@@ -327,7 +327,7 @@ class PageErrorBoundary extends Component<Props, State> {
       // Page became visible again, check if we should attempt recovery
       const timeSinceError = Date.now() - this.state.lastErrorTime;
       if (timeSinceError > 30000) { // 30 seconds
-        logger.info('Page became visible after error, attempting recovery', { component: 'SimpleTool' });
+        logger.info('Page became visible after error, attempting recovery', { component: 'Chanuka' });
         this.resetError();
       }
     }
@@ -335,7 +335,7 @@ class PageErrorBoundary extends Component<Props, State> {
 
   handlePromiseRejection = (event: PromiseRejectionEvent) => {
     const reason = event.reason;
-    logger.error('Unhandled promise rejection:', { component: 'SimpleTool' }, reason);
+    logger.error('Unhandled promise rejection:', { component: 'Chanuka' }, reason);
     
     // Create a proper error object from the rejection reason
     let error: Error;
@@ -392,7 +392,7 @@ class PageErrorBoundary extends Component<Props, State> {
   }
 
   handleGlobalError = (event: ErrorEvent) => {
-    logger.error('Global error:', { component: 'SimpleTool' }, event.error);
+    logger.error('Global error:', { component: 'Chanuka' }, event.error);
     
     const error = event.error || new Error(event.message);
     const errorType = PageErrorBoundary.classifyError(error);
@@ -413,7 +413,7 @@ class PageErrorBoundary extends Component<Props, State> {
     const target = event.target as HTMLElement;
     if (target && (target.tagName === 'SCRIPT' || target.tagName === 'LINK' || target.tagName === 'IMG')) {
       const resourceUrl = (target as any).src || (target as any).href;
-      logger.error('Resource loading error:', { component: 'SimpleTool' }, resourceUrl);
+      logger.error('Resource loading error:', { component: 'Chanuka' }, resourceUrl);
       
       this.errorReportingService.reportError(
         new Error(`Failed to load resource: ${resourceUrl}`),
@@ -610,7 +610,7 @@ class ErrorReportingService {
   }
 
   reportRecoveryAttempt(data: RecoveryAttempt) {
-    logger.info('Recovery attempt:', { component: 'SimpleTool' }, data);
+    logger.info('Recovery attempt:', { component: 'Chanuka' }, data);
     // In a real application, this would be sent to analytics
   }
 
@@ -644,14 +644,14 @@ ${errorReport.errorInfo?.componentStack || 'N/A'}
 
   private handleOnline = () => {
     this.isOnline = true;
-    logger.info('Connection restored, flushing error queues', { component: 'SimpleTool' });
+    logger.info('Connection restored, flushing error queues', { component: 'Chanuka' });
     this.flushErrorQueue();
     this.flushPerformanceQueue();
   };
 
   private handleOffline = () => {
     this.isOnline = false;
-    logger.info('Connection lost, errors will be queued', { component: 'SimpleTool' });
+    logger.info('Connection lost, errors will be queued', { component: 'Chanuka' });
   };
 
   private async flushErrorQueue() {
@@ -668,9 +668,9 @@ ${errorReport.errorInfo?.componentStack || 'N/A'}
       // Clear queue on successful send
       this.errorQueue = [];
       this.persistErrorQueue();
-      logger.info('Error reports sent successfully', { component: 'SimpleTool' });
+      logger.info('Error reports sent successfully', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('Failed to send error reports:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to send error reports:', { component: 'Chanuka' }, error);
       // Keep errors in queue for retry
     }
   }
@@ -688,9 +688,9 @@ ${errorReport.errorInfo?.componentStack || 'N/A'}
       
       // Clear queue on successful send
       this.performanceQueue = [];
-      logger.info('Performance reports sent successfully', { component: 'SimpleTool' });
+      logger.info('Performance reports sent successfully', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('Failed to send performance reports:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to send performance reports:', { component: 'Chanuka' }, error);
       // Keep performance issues in queue for retry
     }
   }
@@ -732,7 +732,7 @@ ${errorReport.errorInfo?.componentStack || 'N/A'}
       };
       localStorage.setItem('errorQueue', JSON.stringify(data));
     } catch (error) {
-      logger.error('Failed to persist error queue:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to persist error queue:', { component: 'Chanuka' }, error);
     }
   }
 
@@ -757,7 +757,7 @@ ${errorReport.errorInfo?.componentStack || 'N/A'}
         }
       }
     } catch (error) {
-      logger.error('Failed to load persisted errors:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to load persisted errors:', { component: 'Chanuka' }, error);
       // Clear corrupted data
       localStorage.removeItem('errorQueue');
     }
@@ -767,7 +767,7 @@ ${errorReport.errorInfo?.componentStack || 'N/A'}
     try {
       localStorage.removeItem('errorQueue');
     } catch (error) {
-      logger.error('Failed to clear persisted errors:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to clear persisted errors:', { component: 'Chanuka' }, error);
     }
   }
 

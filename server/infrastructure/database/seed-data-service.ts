@@ -1,4 +1,5 @@
 import { databaseService } from './database-service.js';
+import { readDatabase } from '../../db.js';
 import * as schema from '../../../shared/schema.js';
 import bcrypt from 'bcrypt';
 import { logger } from '@shared/utils/logger';
@@ -8,13 +9,15 @@ import { logger } from '@shared/utils/logger';
  * Generates realistic, diverse data for development and testing
  */
 export class SeedDataService {
-  private db = databaseService.getDatabase();
+  private get db() {
+    return readDatabase();
+  }
 
   /**
    * Generate comprehensive seed data
    */
   async generateSeedData(): Promise<void> {
-    logger.info('🌱 Starting comprehensive seed data generation...', { component: 'SimpleTool' });
+    logger.info('🌱 Starting comprehensive seed data generation...', { component: 'Chanuka' });
 
     try {
       // Clear existing data in proper order
@@ -34,10 +37,10 @@ export class SeedDataService {
       const engagement = await this.createEngagement(bills, users);
       const notifications = await this.createNotifications(users, bills);
 
-      logger.info('✅ Comprehensive seed data generation completed successfully', { component: 'SimpleTool' });
+      logger.info('✅ Comprehensive seed data generation completed successfully', { component: 'Chanuka' });
       console.log(`📊 Generated: ${users.length} users, ${bills.length} bills, ${sponsors.length} sponsors, ${comments.length} comments`);
     } catch (error) {
-      logger.error('❌ Seed data generation failed:', { component: 'SimpleTool' }, error);
+      logger.error('❌ Seed data generation failed:', { component: 'Chanuka' }, error);
       throw error;
     }
   }
@@ -46,7 +49,7 @@ export class SeedDataService {
    * Clear existing data in reverse dependency order
    */
   private async clearExistingData(): Promise<void> {
-    logger.info('🧹 Clearing existing data...', { component: 'SimpleTool' });
+    logger.info('🧹 Clearing existing data...', { component: 'Chanuka' });
     
     const tables = [
       schema.notifications,

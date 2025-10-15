@@ -181,7 +181,7 @@ export function EngagementDashboard() {
         document.body.removeChild(a);
       }
     } catch (err) {
-      logger.error('Export failed:', { component: 'SimpleTool' }, err);
+      logger.error('Export failed:', { component: 'Chanuka' }, err);
     }
   };
 

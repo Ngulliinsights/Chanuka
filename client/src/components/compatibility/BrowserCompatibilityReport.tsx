@@ -37,7 +37,7 @@ const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
         
         onIssuesDetected?.(criticalCount, highCount);
       } catch (error) {
-        logger.error('Failed to run compatibility check:', { component: 'SimpleTool' }, error);
+        logger.error('Failed to run compatibility check:', { component: 'Chanuka' }, error);
       } finally {
         setIsLoading(false);
       }

@@ -9,12 +9,12 @@ import { transparencyDashboardService } from "./services/transparency-dashboard.
 import { logger } from '../utils/logger';
 
 async function testEnhancedTransparencyFeatures() {
-  logger.info('🧪 Testing Enhanced Transparency Dashboard Features\n', { component: 'SimpleTool' });
+  logger.info('🧪 Testing Enhanced Transparency Dashboard Features\n', { component: 'Chanuka' });
 
   try {
     // Test 1: Transparency Scoring Algorithms
-    logger.info('🎯 Test 1: Transparency Scoring Algorithms', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('🎯 Test 1: Transparency Scoring Algorithms', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
     
     // Get a sample sponsor to test with
     const dashboard = await transparencyDashboardService.getTransparencyDashboard();
@@ -30,36 +30,36 @@ async function testEnhancedTransparencyFeatures() {
         console.log(`   - Risk Level: ${transparencyScore.riskLevel}`);
         console.log(`   - Last Calculated: ${transparencyScore.lastCalculated.toLocaleString()}`);
         
-        logger.info('\n📊 Component Scores (Weighted Algorithm):', { component: 'SimpleTool' });
+        logger.info('\n📊 Component Scores (Weighted Algorithm):', { component: 'Chanuka' });
         Object.entries(transparencyScore.componentScores).forEach(([component, score]) => {
           const componentName = component.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
           console.log(`   - ${componentName}: ${score}%`);
         });
 
         if (transparencyScore.recommendations.length > 0) {
-          logger.info('\n💡 Algorithm-Generated Recommendations:', { component: 'SimpleTool' });
+          logger.info('\n💡 Algorithm-Generated Recommendations:', { component: 'Chanuka' });
           transparencyScore.recommendations.forEach((rec, index) => {
             console.log(`   ${index + 1}. ${rec}`);
           });
         }
 
-        logger.info('\n🔍 Algorithm Details:', { component: 'SimpleTool' });
-        logger.info('   - Uses weighted scoring: Disclosure Completeness (35%), Verification (25%), Conflict Resolution (20%), Data Recency (15%), Public Accessibility (5%)', { component: 'SimpleTool' });
-        logger.info('   - Risk level determined by score thresholds and relationship analysis', { component: 'SimpleTool' });
-        logger.info('   - Recommendations generated based on component score analysis', { component: 'SimpleTool' });
+        logger.info('\n🔍 Algorithm Details:', { component: 'Chanuka' });
+        logger.info('   - Uses weighted scoring: Disclosure Completeness (35%), Verification (25%), Conflict Resolution (20%), Data Recency (15%), Public Accessibility (5%)', { component: 'Chanuka' });
+        logger.info('   - Risk level determined by score thresholds and relationship analysis', { component: 'Chanuka' });
+        logger.info('   - Recommendations generated based on component score analysis', { component: 'Chanuka' });
         
       } catch (error) {
         console.log(`⚠️  Could not test transparency scoring for sponsor ${testSponsorId}: ${error}`);
       }
     } else {
-      logger.info('⚠️  No sponsors available for transparency scoring algorithm test', { component: 'SimpleTool' });
+      logger.info('⚠️  No sponsors available for transparency scoring algorithm test', { component: 'Chanuka' });
     }
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Test 2: Transparency Trend Analysis and Historical Tracking
-    logger.info('📈 Test 2: Transparency Trend Analysis and Historical Tracking', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('📈 Test 2: Transparency Trend Analysis and Historical Tracking', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     // Test overall trends
     const overallTrends = await transparencyDashboardService.analyzeTransparencyTrends(
@@ -73,7 +73,7 @@ async function testEnhancedTransparencyFeatures() {
     console.log(`   - Trend Strength: ${overallTrends.analysis.trendStrength}`);
 
     if (overallTrends.trends.length > 0) {
-      logger.info('\n📊 Historical Tracking Data (Recent 6 months):', { component: 'SimpleTool' });
+      logger.info('\n📊 Historical Tracking Data (Recent 6 months):', { component: 'Chanuka' });
       overallTrends.trends.slice(-6).forEach((trend, index) => {
         console.log(`   ${trend.period}:`);
         console.log(`      - Transparency Score: ${trend.transparencyScore}%`);
@@ -85,21 +85,21 @@ async function testEnhancedTransparencyFeatures() {
     }
 
     if (overallTrends.analysis.keyChanges.length > 0) {
-      logger.info('\n🔄 Key Changes Detected by Algorithm:', { component: 'SimpleTool' });
+      logger.info('\n🔄 Key Changes Detected by Algorithm:', { component: 'Chanuka' });
       overallTrends.analysis.keyChanges.forEach((change, index) => {
         console.log(`   ${index + 1}. ${change.period}: ${change.description} (Impact: ${change.impact})`);
       });
     }
 
     if (overallTrends.analysis.predictions.length > 0) {
-      logger.info('\n🔮 Predictive Analysis:', { component: 'SimpleTool' });
+      logger.info('\n🔮 Predictive Analysis:', { component: 'Chanuka' });
       overallTrends.analysis.predictions.forEach((prediction, index) => {
         console.log(`   ${prediction.period}: ${prediction.predictedScore}% (Confidence: ${Math.round(prediction.confidence * 100)}%)`);
       });
     }
 
     if (overallTrends.recommendations.length > 0) {
-      logger.info('\n💡 Trend-Based Recommendations:', { component: 'SimpleTool' });
+      logger.info('\n💡 Trend-Based Recommendations:', { component: 'Chanuka' });
       overallTrends.recommendations.forEach((rec, index) => {
         console.log(`   ${index + 1}. ${rec}`);
       });
@@ -130,11 +130,11 @@ async function testEnhancedTransparencyFeatures() {
       }
     }
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Test 3: Advanced Reporting Features
-    logger.info('📋 Test 3: Advanced Transparency Reporting', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('📋 Test 3: Advanced Transparency Reporting', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     const comprehensiveReport = await transparencyDashboardService.generateTransparencyReport();
     
@@ -143,7 +143,7 @@ async function testEnhancedTransparencyFeatures() {
     console.log(`   - Title: ${comprehensiveReport.title}`);
     console.log(`   - Generated At: ${comprehensiveReport.generatedAt.toLocaleString()}`);
     
-    logger.info('\n📊 Executive Summary with Trend Analysis:', { component: 'SimpleTool' });
+    logger.info('\n📊 Executive Summary with Trend Analysis:', { component: 'Chanuka' });
     console.log(`   - Total Sponsors Analyzed: ${comprehensiveReport.executiveSummary.totalSponsors}`);
     console.log(`   - Average Transparency Score: ${comprehensiveReport.executiveSummary.averageTransparencyScore}%`);
     console.log(`   - High Risk Sponsors: ${comprehensiveReport.executiveSummary.highRiskSponsors}`);
@@ -152,7 +152,7 @@ async function testEnhancedTransparencyFeatures() {
     console.log(`   - Overall Trend Direction: ${comprehensiveReport.executiveSummary.trendDirection}`);
 
     if (comprehensiveReport.sponsorAnalysis.length > 0) {
-      logger.info('\n👥 Sponsor Analysis with Historical Context:', { component: 'SimpleTool' });
+      logger.info('\n👥 Sponsor Analysis with Historical Context:', { component: 'Chanuka' });
       comprehensiveReport.sponsorAnalysis.slice(0, 3).forEach((sponsor, index) => {
         console.log(`   ${index + 1}. ${sponsor.sponsorName}`);
         console.log(`      - Current Transparency Score: ${sponsor.transparencyScore}%`);
@@ -167,7 +167,7 @@ async function testEnhancedTransparencyFeatures() {
     }
 
     if (comprehensiveReport.conflictPatterns.length > 0) {
-      logger.info('\n⚠️  Trending Conflict Patterns:', { component: 'SimpleTool' });
+      logger.info('\n⚠️  Trending Conflict Patterns:', { component: 'Chanuka' });
       comprehensiveReport.conflictPatterns.forEach((pattern, index) => {
         console.log(`   ${index + 1}. ${pattern.patternType.toUpperCase()} Conflicts`);
         console.log(`      - Frequency: ${pattern.frequency} occurrences`);
@@ -179,7 +179,7 @@ async function testEnhancedTransparencyFeatures() {
     }
 
     if (comprehensiveReport.visualizations.length > 0) {
-      logger.info('\n📈 Available Visualizations:', { component: 'SimpleTool' });
+      logger.info('\n📈 Available Visualizations:', { component: 'Chanuka' });
       comprehensiveReport.visualizations.forEach((viz, index) => {
         console.log(`   ${index + 1}. ${viz.title} (${viz.type})`);
         console.log(`      - Description: ${viz.description}`);
@@ -188,11 +188,11 @@ async function testEnhancedTransparencyFeatures() {
       });
     }
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Test 4: System Health and Data Quality Monitoring
-    logger.info('🔍 Test 4: System Health and Data Quality Monitoring', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('🔍 Test 4: System Health and Data Quality Monitoring', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     console.log(`✅ System health monitoring active`);
     console.log(`   - Data Freshness: ${dashboard.systemHealth.dataFreshness}%`);
@@ -201,22 +201,22 @@ async function testEnhancedTransparencyFeatures() {
     console.log(`   - Alert Count: ${dashboard.systemHealth.alertCount}`);
 
     // Data quality indicators
-    logger.info('\n📊 Data Quality Indicators:', { component: 'SimpleTool' });
+    logger.info('\n📊 Data Quality Indicators:', { component: 'Chanuka' });
     console.log(`   - Total Sponsors Monitored: ${dashboard.summary.totalSponsors}`);
     console.log(`   - Total Disclosures Processed: ${dashboard.summary.totalDisclosures}`);
     console.log(`   - Verification Rate: ${dashboard.summary.verificationRate}%`);
     console.log(`   - Average Transparency Score: ${dashboard.summary.averageTransparencyScore}%`);
 
-    logger.info('\n🎯 Risk Distribution Analysis:', { component: 'SimpleTool' });
+    logger.info('\n🎯 Risk Distribution Analysis:', { component: 'Chanuka' });
     Object.entries(dashboard.summary.riskDistribution).forEach(([risk, count]) => {
       console.log(`   - ${risk.charAt(0).toUpperCase() + risk.slice(1)} Risk: ${count} sponsors`);
     });
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Test 5: Performance and Caching
-    logger.info('⚡ Test 5: Performance and Caching Verification', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
+    logger.info('⚡ Test 5: Performance and Caching Verification', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     const startTime = Date.now();
     
@@ -229,57 +229,57 @@ async function testEnhancedTransparencyFeatures() {
     console.log(`   - Caching: Active and functional`);
     console.log(`   - Response Time: ${cachedTime < 2000 ? 'Excellent' : cachedTime < 5000 ? 'Good' : 'Needs optimization'}`);
 
-    logger.info('\n', { component: 'SimpleTool' });
+    logger.info('\n', { component: 'Chanuka' });
 
     // Summary
-    logger.info('📋 Enhanced Transparency Features Test Summary', { component: 'SimpleTool' });
-    logger.info('=', { component: 'SimpleTool' }, .repeat(50));
-    logger.info('✅ Transparency scoring algorithms - PASSED', { component: 'SimpleTool' });
-    logger.info('   - Weighted component scoring implemented', { component: 'SimpleTool' });
-    logger.info('   - Risk level determination functional', { component: 'SimpleTool' });
-    logger.info('   - Automated recommendations generated', { component: 'SimpleTool' });
-    logger.info('', { component: 'SimpleTool' });
-    logger.info('✅ Transparency trend analysis and historical tracking - PASSED', { component: 'SimpleTool' });
-    logger.info('   - Historical data analysis implemented', { component: 'SimpleTool' });
-    logger.info('   - Trend pattern detection functional', { component: 'SimpleTool' });
-    logger.info('   - Predictive analysis capabilities active', { component: 'SimpleTool' });
-    logger.info('   - Key change detection working', { component: 'SimpleTool' });
-    logger.info('', { component: 'SimpleTool' });
-    logger.info('✅ Advanced transparency reporting - PASSED', { component: 'SimpleTool' });
-    logger.info('   - Comprehensive report generation functional', { component: 'SimpleTool' });
-    logger.info('   - Executive summaries with trend data', { component: 'SimpleTool' });
-    logger.info('   - Conflict pattern identification active', { component: 'SimpleTool' });
-    logger.info('   - Visualization framework ready', { component: 'SimpleTool' });
-    logger.info('', { component: 'SimpleTool' });
-    logger.info('✅ System health and data quality monitoring - PASSED', { component: 'SimpleTool' });
-    logger.info('   - Data freshness tracking active', { component: 'SimpleTool' });
-    logger.info('   - Processing status monitoring functional', { component: 'SimpleTool' });
-    logger.info('   - Quality indicators implemented', { component: 'SimpleTool' });
-    logger.info('   - Risk distribution analysis working', { component: 'SimpleTool' });
+    logger.info('📋 Enhanced Transparency Features Test Summary', { component: 'Chanuka' });
+    logger.info('=', { component: 'Chanuka' }, .repeat(50));
+    logger.info('✅ Transparency scoring algorithms - PASSED', { component: 'Chanuka' });
+    logger.info('   - Weighted component scoring implemented', { component: 'Chanuka' });
+    logger.info('   - Risk level determination functional', { component: 'Chanuka' });
+    logger.info('   - Automated recommendations generated', { component: 'Chanuka' });
+    logger.info('', { component: 'Chanuka' });
+    logger.info('✅ Transparency trend analysis and historical tracking - PASSED', { component: 'Chanuka' });
+    logger.info('   - Historical data analysis implemented', { component: 'Chanuka' });
+    logger.info('   - Trend pattern detection functional', { component: 'Chanuka' });
+    logger.info('   - Predictive analysis capabilities active', { component: 'Chanuka' });
+    logger.info('   - Key change detection working', { component: 'Chanuka' });
+    logger.info('', { component: 'Chanuka' });
+    logger.info('✅ Advanced transparency reporting - PASSED', { component: 'Chanuka' });
+    logger.info('   - Comprehensive report generation functional', { component: 'Chanuka' });
+    logger.info('   - Executive summaries with trend data', { component: 'Chanuka' });
+    logger.info('   - Conflict pattern identification active', { component: 'Chanuka' });
+    logger.info('   - Visualization framework ready', { component: 'Chanuka' });
+    logger.info('', { component: 'Chanuka' });
+    logger.info('✅ System health and data quality monitoring - PASSED', { component: 'Chanuka' });
+    logger.info('   - Data freshness tracking active', { component: 'Chanuka' });
+    logger.info('   - Processing status monitoring functional', { component: 'Chanuka' });
+    logger.info('   - Quality indicators implemented', { component: 'Chanuka' });
+    logger.info('   - Risk distribution analysis working', { component: 'Chanuka' });
     
-    logger.info('\n🎉 All enhanced transparency dashboard features tested successfully!', { component: 'SimpleTool' });
+    logger.info('\n🎉 All enhanced transparency dashboard features tested successfully!', { component: 'Chanuka' });
     
     // Requirements verification
-    logger.info('\n📋 Requirements Verification:', { component: 'SimpleTool' });
-    logger.info('✅ REQ-005.3: Transparency Reporting', { component: 'SimpleTool' });
-    logger.info('   - Reports include trending conflict patterns', { component: 'SimpleTool' });
-    logger.info('   - Sponsor influence networks visualized', { component: 'SimpleTool' });
-    logger.info('   - Monthly reports with executive summaries', { component: 'SimpleTool' });
-    logger.info('   - Historical comparison data available', { component: 'SimpleTool' });
-    logger.info('', { component: 'SimpleTool' });
-    logger.info('✅ REQ-005.4: Data Quality and Source Management', { component: 'SimpleTool' });
-    logger.info('   - Data freshness tracked with timestamps', { component: 'SimpleTool' });
-    logger.info('   - Source reliability validated and scored', { component: 'SimpleTool' });
-    logger.info('   - Data conflicts flagged for manual review', { component: 'SimpleTool' });
-    logger.info('   - Data lineage maintained for audit purposes', { component: 'SimpleTool' });
-    logger.info('', { component: 'SimpleTool' });
-    logger.info('✅ REQ-005.5: Historical Tracking (implied)', { component: 'SimpleTool' });
-    logger.info('   - Trend analysis with historical data', { component: 'SimpleTool' });
-    logger.info('   - Predictive capabilities implemented', { component: 'SimpleTool' });
-    logger.info('   - Change detection algorithms active', { component: 'SimpleTool' });
+    logger.info('\n📋 Requirements Verification:', { component: 'Chanuka' });
+    logger.info('✅ REQ-005.3: Transparency Reporting', { component: 'Chanuka' });
+    logger.info('   - Reports include trending conflict patterns', { component: 'Chanuka' });
+    logger.info('   - Sponsor influence networks visualized', { component: 'Chanuka' });
+    logger.info('   - Monthly reports with executive summaries', { component: 'Chanuka' });
+    logger.info('   - Historical comparison data available', { component: 'Chanuka' });
+    logger.info('', { component: 'Chanuka' });
+    logger.info('✅ REQ-005.4: Data Quality and Source Management', { component: 'Chanuka' });
+    logger.info('   - Data freshness tracked with timestamps', { component: 'Chanuka' });
+    logger.info('   - Source reliability validated and scored', { component: 'Chanuka' });
+    logger.info('   - Data conflicts flagged for manual review', { component: 'Chanuka' });
+    logger.info('   - Data lineage maintained for audit purposes', { component: 'Chanuka' });
+    logger.info('', { component: 'Chanuka' });
+    logger.info('✅ REQ-005.5: Historical Tracking (implied)', { component: 'Chanuka' });
+    logger.info('   - Trend analysis with historical data', { component: 'Chanuka' });
+    logger.info('   - Predictive capabilities implemented', { component: 'Chanuka' });
+    logger.info('   - Change detection algorithms active', { component: 'Chanuka' });
 
   } catch (error) {
-    logger.error('❌ Test failed with error:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Test failed with error:', { component: 'Chanuka' }, error);
     process.exit(1);
   }
 }
@@ -288,11 +288,11 @@ async function testEnhancedTransparencyFeatures() {
 if (import.meta.url === `file://${process.argv[1]}`) {
   testEnhancedTransparencyFeatures()
     .then(() => {
-      logger.info('\n✅ Enhanced transparency features test execution completed', { component: 'SimpleTool' });
+      logger.info('\n✅ Enhanced transparency features test execution completed', { component: 'Chanuka' });
       process.exit(0);
     })
     .catch((error) => {
-      logger.error('\n❌ Test execution failed:', { component: 'SimpleTool' }, error);
+      logger.error('\n❌ Test execution failed:', { component: 'Chanuka' }, error);
       process.exit(1);
     });
 }

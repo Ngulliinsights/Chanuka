@@ -59,7 +59,7 @@ export const checkDataProcessingConsent = (requiredConsent: keyof PrivacyRequest
 
       next();
     } catch (error) {
-      logger.error('Error checking data processing consent:', { component: 'SimpleTool' }, error);
+      logger.error('Error checking data processing consent:', { component: 'Chanuka' }, error);
       // Allow request to continue on error to avoid breaking functionality
       next();
     }
@@ -93,7 +93,7 @@ export const checkDataSharingConsent = (requiredSharing: 'publicProfile' | 'shar
 
       next();
     } catch (error) {
-      logger.error('Error checking data sharing consent:', { component: 'SimpleTool' }, error);
+      logger.error('Error checking data sharing consent:', { component: 'Chanuka' }, error);
       // Allow request to continue on error to avoid breaking functionality
       next();
     }
@@ -154,7 +154,7 @@ export const logDataAccess = (dataType: string, sensitivityLevel: 'low' | 'mediu
 
       next();
     } catch (error) {
-      logger.error('Error logging data access:', { component: 'SimpleTool' }, error);
+      logger.error('Error logging data access:', { component: 'Chanuka' }, error);
       // Allow request to continue on error
       next();
     }
@@ -198,7 +198,7 @@ export const enforceCookieConsent = (cookieType: 'analytics' | 'marketing' | 'pr
 
       next();
     } catch (error) {
-      logger.error('Error enforcing cookie consent:', { component: 'SimpleTool' }, error);
+      logger.error('Error enforcing cookie consent:', { component: 'Chanuka' }, error);
       // Allow request to continue on error
       next();
     }
@@ -245,7 +245,7 @@ export const validateDataRetention = async (req: AuthenticatedRequest, res: Resp
 
     next();
   } catch (error) {
-    logger.error('Error validating data retention:', { component: 'SimpleTool' }, error);
+    logger.error('Error validating data retention:', { component: 'Chanuka' }, error);
     next();
   }
 };

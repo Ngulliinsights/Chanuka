@@ -89,7 +89,7 @@ const migrationRules: MigrationRule[] = [
 ];
 
 async function runMigration() {
-  logger.info('🚀 Starting simple migration...\n', { component: 'SimpleTool' });
+  logger.info('🚀 Starting simple migration...\n', { component: 'Chanuka' });
 
   let totalChanges = 0;
   let modifiedFiles = 0;
@@ -127,17 +127,17 @@ async function runMigration() {
             totalChanges++;
           }
         } else {
-          logger.info('   No references found', { component: 'SimpleTool' });
+          logger.info('   No references found', { component: 'Chanuka' });
         }
       } catch (error) {
         // grep returns non-zero exit code when no matches found
-        logger.info('   No references found', { component: 'SimpleTool' });
+        logger.info('   No references found', { component: 'Chanuka' });
       }
     } catch (error) {
       console.warn(`   Warning: ${error}`);
     }
     
-    logger.info('', { component: 'SimpleTool' });
+    logger.info('', { component: 'Chanuka' });
   }
 
   // Update package.json
@@ -197,7 +197,7 @@ async function updatePackageJson() {
       packageJson.dependencies['@triplecheck/core'] = 'workspace:*';
       
       await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
-      logger.info('📦 Updated package.json with @triplecheck/core dependency', { component: 'SimpleTool' });
+      logger.info('📦 Updated package.json with @triplecheck/core dependency', { component: 'Chanuka' });
     }
   } catch (error) {
     console.warn('⚠️  Could not update package.json:', error);
@@ -205,7 +205,7 @@ async function updatePackageJson() {
 }
 
 async function validateMigration() {
-  logger.info('\n🔍 Validating migration...', { component: 'SimpleTool' });
+  logger.info('\n🔍 Validating migration...', { component: 'Chanuka' });
   
   const oldPatterns = [
     'server/cache/CacheService',
@@ -233,7 +233,7 @@ async function validateMigration() {
   }
   
   if (!foundOldImports) {
-    logger.info('✅ No old imports found - migration appears successful!', { component: 'SimpleTool' });
+    logger.info('✅ No old imports found - migration appears successful!', { component: 'Chanuka' });
   }
   
   // Check for new imports
@@ -248,7 +248,7 @@ async function validateMigration() {
       console.log(`✅ Found ${lines.length} new core utility imports`);
     }
   } catch (error) {
-    logger.info('⚠️  No new core utility imports found', { component: 'SimpleTool' });
+    logger.info('⚠️  No new core utility imports found', { component: 'Chanuka' });
   }
 }
 
@@ -256,11 +256,11 @@ async function validateMigration() {
 if (require.main === module) {
   runMigration()
     .then(() => {
-      logger.info('\n🎉 Migration completed successfully!', { component: 'SimpleTool' });
+      logger.info('\n🎉 Migration completed successfully!', { component: 'Chanuka' });
       process.exit(0);
     })
     .catch((error) => {
-      logger.error('\n💥 Migration failed:', { component: 'SimpleTool' }, error);
+      logger.error('\n💥 Migration failed:', { component: 'Chanuka' }, error);
       process.exit(1);
     });
 }

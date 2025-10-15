@@ -2199,7 +2199,7 @@ export interface BillStats {
         }
       });
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      logger.error('Error triggering status change notification:', { component: 'SimpleTool' }, error as any);</span>
+<span class="cstat-no" title="statement not covered" >      logger.error('Error triggering status change notification:', { component: 'Chanuka' }, error as any);</span>
       // Don't fail the status update if notification fails
     }
   }
@@ -2391,7 +2391,7 @@ export interface BillStats {
           newStats
         });
       } catch (error) {
-<span class="cstat-no" title="statement not covered" >        logger.error('Error triggering engagement notification:', { component: 'SimpleTool' }, error as any);</span>
+<span class="cstat-no" title="statement not covered" >        logger.error('Error triggering engagement notification:', { component: 'Chanuka' }, error as any);</span>
         // Don't fail the engagement recording if notification fails
       }
     }
@@ -2456,7 +2456,7 @@ export interface BillStats {
         }
       }));
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      logger.error('Error enhancing bills with engagement:', { component: 'SimpleTool' }, error as any);</span>
+<span class="cstat-no" title="statement not covered" >      logger.error('Error enhancing bills with engagement:', { component: 'Chanuka' }, error as any);</span>
       // Return bills without engagement data
 <span class="cstat-no" title="statement not covered" >      return bills.map(<span class="fstat-no" title="function not covered" >bill </span>=&gt; (<span class="cstat-no" title="statement not covered" >{ ...bill })</span>);</span>
     }
@@ -2514,7 +2514,7 @@ export interface BillStats {
       // Clear search result caches (pattern-based deletion would be ideal)
       // For now, we'll rely on TTL expiration
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      logger.error('Error clearing bill caches:', { component: 'SimpleTool' }, error as any);</span>
+<span class="cstat-no" title="statement not covered" >      logger.error('Error clearing bill caches:', { component: 'Chanuka' }, error as any);</span>
     }
   }
 }

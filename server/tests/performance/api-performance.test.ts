@@ -31,6 +31,11 @@ describe('API Performance Tests', () => {
 
   afterAll(async () => {
     await testHelpers.cleanup();
+
+    // Force cleanup of any remaining timers to prevent hanging
+    if (global.gc) {
+      global.gc();
+    }
   });
 
   describe('Response Time Tests', () => {
@@ -201,7 +206,7 @@ describe('API Performance Tests', () => {
         }
       });
 
-      logger.info('Memory usage during test:', { component: 'SimpleTool' }, memoryTest);
+      logger.info('Memory usage during test:', { component: 'Chanuka' }, memoryTest);
 
       // Memory increase should be reasonable (less than 50MB)
       expect(memoryTest.difference.heapUsed).toBeLessThan(50);

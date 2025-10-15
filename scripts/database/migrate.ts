@@ -62,17 +62,17 @@ async function createDatabaseIfNeeded() {
   const defaultPool = createPool('postgres');
 
   try {
-    logger.info('Attempting to create database...', { component: 'SimpleTool' });
+    logger.info('Attempting to create database...', { component: 'Chanuka' });
     await defaultPool.query('CREATE DATABASE legislative_track');
-    logger.info('Database created successfully', { component: 'SimpleTool' });
+    logger.info('Database created successfully', { component: 'Chanuka' });
     return true;
   } catch (createError) {
     // Error code 42P04 means database already exists - this is fine
     if (createError.code === '42P04') {
-      logger.info('Database already exists, continuing...', { component: 'SimpleTool' });
+      logger.info('Database already exists, continuing...', { component: 'Chanuka' });
       return true;
     }
-    logger.info('Database creation failed:', { component: 'SimpleTool' }, createError.message);
+    logger.info('Database creation failed:', { component: 'Chanuka' }, createError.message);
     return false;
   } finally {
     await defaultPool.end();
@@ -87,7 +87,7 @@ function ensureMigrationsDirectory() {
   const migrationsPath = path.join(process.cwd(), 'drizzle');
 
   if (!fs.existsSync(migrationsPath)) {
-    logger.info('Creating migrations directory...', { component: 'SimpleTool' });
+    logger.info('Creating migrations directory...', { component: 'Chanuka' });
     fs.mkdirSync(migrationsPath, { recursive: true });
 
     // Create a more comprehensive initial migration
@@ -110,7 +110,7 @@ CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);`;
 
     fs.writeFileSync(path.join(migrationsPath, '0000_initial.sql'), initialMigration);
-    logger.info('Created initial migration file', { component: 'SimpleTool' });
+    logger.info('Created initial migration file', { component: 'Chanuka' });
   }
 
   return migrationsPath;
@@ -138,9 +138,9 @@ async function ensureMigrationTrackingTable(pool) {
       ON drizzle_migrations(hash);
     `);
 
-    logger.info('Migration tracking table ready', { component: 'SimpleTool' });
+    logger.info('Migration tracking table ready', { component: 'Chanuka' });
   } catch (error) {
-    logger.error('Failed to create migration tracking table:', { component: 'SimpleTool' }, error.message);
+    logger.error('Failed to create migration tracking table:', { component: 'Chanuka' }, error.message);
     throw error;
   }
 }
@@ -166,7 +166,7 @@ async function isMigrationApplied(pool, hash) {
     );
     return result.rows.length > 0;
   } catch (error) {
-    logger.info('Could not check migration status:', { component: 'SimpleTool' }, error.message);
+    logger.info('Could not check migration status:', { component: 'Chanuka' }, error.message);
     return false; // Assume not applied if we can't check
   }
 }
@@ -182,7 +182,7 @@ async function recordMigration(pool, hash, filename) {
       [hash, filename]
     );
   } catch (error) {
-    logger.info('Could not record migration:', { component: 'SimpleTool' }, error.message);
+    logger.info('Could not record migration:', { component: 'Chanuka' }, error.message);
     // Don't throw here - migration was successful even if we can't record it
   }
 }
@@ -220,19 +220,19 @@ async function executeMigration(pool, filePath, filename) {
 }
 
 async function main() {
-  logger.info('Starting database migration process...', { component: 'SimpleTool' });
+  logger.info('Starting database migration process...', { component: 'Chanuka' });
 
   // Diagnostic logging for SSL authentication debugging
-  logger.info('🔍 Migration Script (pg.Pool) Diagnostics:', { component: 'SimpleTool' });
-  logger.info('NODE_ENV:', { component: 'SimpleTool' }, process.env.NODE_ENV);
-  logger.info('DATABASE_URL exists:', { component: 'SimpleTool' }, !!process.env.DATABASE_URL);
-  logger.info('DATABASE_URL starts with postgres:', { component: 'SimpleTool' }, process.env.DATABASE_URL?.startsWith('postgres'));
-  logger.info('DATABASE_URL contains sslmode:', { component: 'SimpleTool' }, process.env.DATABASE_URL?.includes('sslmode'));
+  logger.info('🔍 Migration Script (pg.Pool) Diagnostics:', { component: 'Chanuka' });
+  logger.info('NODE_ENV:', { component: 'Chanuka' }, process.env.NODE_ENV);
+  logger.info('DATABASE_URL exists:', { component: 'Chanuka' }, !!process.env.DATABASE_URL);
+  logger.info('DATABASE_URL starts with postgres:', { component: 'Chanuka' }, process.env.DATABASE_URL?.startsWith('postgres'));
+  logger.info('DATABASE_URL contains sslmode:', { component: 'Chanuka' }, process.env.DATABASE_URL?.includes('sslmode'));
   if (process.env.DATABASE_URL?.includes('sslmode')) {
     const sslmode = process.env.DATABASE_URL.match(/sslmode=([^&\s]+)/)?.[1];
-    logger.info('SSL mode in URL:', { component: 'SimpleTool' }, sslmode);
+    logger.info('SSL mode in URL:', { component: 'Chanuka' }, sslmode);
   }
-  logger.info('SSL config will be:', { component: 'SimpleTool' }, process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false);
+  logger.info('SSL config will be:', { component: 'Chanuka' }, process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false);
 
   let pool = null;
 
@@ -242,7 +242,7 @@ async function main() {
     const connectionTest = await testDatabaseConnection(pool);
 
     if (!connectionTest.success) {
-      logger.info('Initial connection failed, analyzing issue...', { component: 'SimpleTool' });
+      logger.info('Initial connection failed, analyzing issue...', { component: 'Chanuka' });
 
       // If database doesn't exist, try to create it
       if (connectionTest.isDatabaseNotFound) {
@@ -267,7 +267,7 @@ async function main() {
       }
     }
 
-    logger.info('Database connection established successfully', { component: 'SimpleTool' });
+    logger.info('Database connection established successfully', { component: 'Chanuka' });
 
     // Step 2: Ensure migrations directory exists
     const migrationsPath = ensureMigrationsDirectory();
@@ -281,7 +281,7 @@ async function main() {
       .sort(); // Natural sort ensures proper order
 
     if (migrationFiles.length === 0) {
-      logger.info('No migration files found - database is ready', { component: 'SimpleTool' });
+      logger.info('No migration files found - database is ready', { component: 'Chanuka' });
       return;
     }
 
@@ -310,22 +310,22 @@ async function main() {
     }
 
     // Step 6: Report results
-    logger.info('\n=== Migration Summary ===', { component: 'SimpleTool' });
+    logger.info('\n=== Migration Summary ===', { component: 'Chanuka' });
     console.log(`Successfully applied: ${successCount}`);
     console.log(`Skipped (already applied): ${skipCount}`);
     console.log(`Failed: ${errorCount}`);
 
     if (errorCount > 0) {
-      logger.info('\nSome migrations failed. Please review the errors above.', { component: 'SimpleTool' });
-      logger.info('The application will continue, but you may need to fix failed migrations manually.', { component: 'SimpleTool' });
+      logger.info('\nSome migrations failed. Please review the errors above.', { component: 'Chanuka' });
+      logger.info('The application will continue, but you may need to fix failed migrations manually.', { component: 'Chanuka' });
     } else {
-      logger.info('\nAll migrations completed successfully!', { component: 'SimpleTool' });
+      logger.info('\nAll migrations completed successfully!', { component: 'Chanuka' });
     }
 
   } catch (error) {
-    logger.error('Migration process failed:', { component: 'SimpleTool' }, error.message);
-    logger.info('\nThis is not necessarily fatal - the application may still work with existing schema.', { component: 'SimpleTool' });
-    logger.info('Consider running migrations manually if needed.', { component: 'SimpleTool' });
+    logger.error('Migration process failed:', { component: 'Chanuka' }, error.message);
+    logger.info('\nThis is not necessarily fatal - the application may still work with existing schema.', { component: 'Chanuka' });
+    logger.info('Consider running migrations manually if needed.', { component: 'Chanuka' });
 
     // Exit with success to prevent cascading failures in your system
     // The application can often work even if migrations fail
@@ -335,9 +335,9 @@ async function main() {
     if (pool) {
       try {
         await pool.end();
-        logger.info('Database connection closed', { component: 'SimpleTool' });
+        logger.info('Database connection closed', { component: 'Chanuka' });
       } catch (closeError) {
-        logger.info('Error closing database connection:', { component: 'SimpleTool' }, closeError.message);
+        logger.info('Error closing database connection:', { component: 'Chanuka' }, closeError.message);
       }
     }
   }
@@ -345,12 +345,12 @@ async function main() {
 
 // Handle uncaught errors gracefully
 process.on('uncaughtException', (error) => {
-  logger.error('Uncaught exception during migration:', { component: 'SimpleTool' }, error.message);
+  logger.error('Uncaught exception during migration:', { component: 'Chanuka' }, error.message);
   process.exit(0); // Exit successfully to avoid cascading failures
 });
 
 process.on('unhandledRejection', (error) => {
-  logger.error('Unhandled rejection during migration:', { component: 'SimpleTool' }, error.message);
+  logger.error('Unhandled rejection during migration:', { component: 'Chanuka' }, error.message);
   process.exit(0); // Exit successfully to avoid cascading failures
 });
 

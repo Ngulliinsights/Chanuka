@@ -171,7 +171,7 @@ export class SimpleTransparencyDashboardService {
 
       return { trends, analysis, recommendations };
     } catch (error) {
-      logger.error('Error analyzing transparency trends:', { component: 'SimpleTool' }, error);
+      logger.error('Error analyzing transparency trends:', { component: 'Chanuka' }, error);
       throw new Error('Failed to analyze transparency trends');
     }
   }
@@ -181,7 +181,7 @@ export class SimpleTransparencyDashboardService {
    */
   async getTransparencyDashboard() {
     try {
-      logger.info('🔄 Loading transparency dashboard...', { component: 'SimpleTool' });
+      logger.info('🔄 Loading transparency dashboard...', { component: 'Chanuka' });
 
       // Get all active sponsors
       const allSponsors = await readDatabase
@@ -266,7 +266,7 @@ export class SimpleTransparencyDashboardService {
 
       const alertCount = dataFreshness < 70 ? 1 : 0;
 
-      logger.info('✅ Transparency dashboard loaded', { component: 'SimpleTool' });
+      logger.info('✅ Transparency dashboard loaded', { component: 'Chanuka' });
 
       return {
         summary: {
@@ -297,7 +297,7 @@ export class SimpleTransparencyDashboardService {
         }
       };
     } catch (error) {
-      logger.error('Error loading transparency dashboard:', { component: 'SimpleTool' }, error);
+      logger.error('Error loading transparency dashboard:', { component: 'Chanuka' }, error);
       throw new Error('Failed to load transparency dashboard');
     }
   }
@@ -501,7 +501,7 @@ export class SimpleTransparencyDashboardService {
         conflictCount
       };
     } catch (error) {
-      logger.error('Error calculating period transparency:', { component: 'SimpleTool' }, error);
+      logger.error('Error calculating period transparency:', { component: 'Chanuka' }, error);
       return {
         averageScore: 0,
         averageRiskLevel: 'low',

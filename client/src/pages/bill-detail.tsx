@@ -94,7 +94,7 @@ const BillDetail = () => {
       const billData = await response.json();
       setBill(billData);
     } catch (error) {
-      logger.error('Error fetching bill:', { component: 'SimpleTool' }, error);
+      logger.error('Error fetching bill:', { component: 'Chanuka' }, error);
       setError(error instanceof Error ? error.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);

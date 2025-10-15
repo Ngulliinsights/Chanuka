@@ -103,7 +103,7 @@ export default function BillAnalysis() {
         billId: id,
       });
     } catch (error) {
-      logger.error('Failed to add comment:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to add comment:', { component: 'Chanuka' }, error);
       // This could trigger a user notification in a real app
     }
   }, [id, addComment]);
@@ -113,7 +113,7 @@ export default function BillAnalysis() {
     try {
       await endorseComment({ commentId, endorsements: 1 });
     } catch (error) {
-      logger.error('Failed to endorse comment:', { component: 'SimpleTool' }, error);
+      logger.error('Failed to endorse comment:', { component: 'Chanuka' }, error);
       // This could trigger a user notification in a real app
     }
   }, [endorseComment]);
@@ -162,7 +162,7 @@ export default function BillAnalysis() {
     } catch (error) {
       // Only log if it's not a user cancellation
       if (error instanceof Error && error.name !== 'AbortError') {
-        logger.error('Error sharing:', { component: 'SimpleTool' }, error);
+        logger.error('Error sharing:', { component: 'Chanuka' }, error);
         alert('Unable to share or copy link');
       }
     }

@@ -25,6 +25,11 @@ describe('Database Transaction Integrity Tests', () => {
   afterEach(async () => {
     // Ensure no hanging transactions
     await cleanupHangingTransactions();
+
+    // Force cleanup of any remaining timers to prevent hanging
+    if (global.gc) {
+      global.gc();
+    }
   });
 
   async function setupTestData() {

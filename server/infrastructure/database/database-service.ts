@@ -1,10 +1,10 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 const { Pool } = pg;
-import * as schema from "../../../shared/schema.js";
+import * as schema from "../../../shared/schema";
 import { eq, and, or, sql } from 'drizzle-orm';
-import { errorTracker } from '../../core/errors/error-tracker.js';
-import { config } from '../../config/index.js';
+import { errorTracker } from '../../core/errors/error-tracker';
+import { config } from '../../config/index';
 import { logger } from '../../utils/logger';
 
 // Database connection configuration with improved typing
@@ -134,7 +134,7 @@ export class DatabaseService {
    */
   private setupConnectionHandlers(): void {
     this.pool.on('connect', (client) => {
-      logger.info('✅ Database client connected', { component: 'SimpleTool' });
+      logger.info('✅ Database client connected', { component: 'Chanuka' });
       this.isConnected = true;
       this.connectionAttempts = 0;
       this.consecutiveFailures = 0;
@@ -155,7 +155,7 @@ export class DatabaseService {
     });
 
     this.pool.on('remove', (client) => {
-      logger.info('🔄 Database client removed from pool', { component: 'SimpleTool' });
+      logger.info('🔄 Database client removed from pool', { component: 'Chanuka' });
     });
 
     // Add handler for when a client is acquired from the pool
@@ -172,7 +172,7 @@ export class DatabaseService {
     try {
       await this.testConnection();
       this.startHealthCheckMonitoring();
-      logger.info('✅ Database service initialized successfully', { component: 'SimpleTool' });
+      logger.info('✅ Database service initialized successfully', { component: 'Chanuka' });
     } catch (error) {
       console.warn('⚠️ Initial database connection failed, will retry in background');
       this.scheduleReconnection();
@@ -202,12 +202,27 @@ export class DatabaseService {
   }
 
   /**
+   * Get current timer status for debugging
+   */
+  getTimerStatus(): {
+    healthCheckInterval: boolean;
+    reconnectionTimeout: boolean;
+  } {
+    return {
+      healthCheckInterval: this.healthCheckInterval !== null,
+      reconnectionTimeout: this.reconnectionTimeout !== undefined
+    };
+  }
+
+  /**
    * Start health monitoring with adaptive interval
    * Increases check frequency when issues are detected
    */
   private startHealthCheckMonitoring(): void {
+    // Clear existing interval if any
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
+      this.healthCheckInterval = null;
     }
 
     // Adapt check interval based on connection health
@@ -278,7 +293,11 @@ export class DatabaseService {
         'medium',
         'database'
       );
-      this.scheduleReconnection();
+
+      // Only schedule reconnection if not already scheduled
+      if (!this.reconnectionTimeout) {
+        this.scheduleReconnection();
+      }
 
       return {
         isHealthy: false,
@@ -313,7 +332,7 @@ export class DatabaseService {
     if (this.circuitBreakerState !== 'closed') {
       this.circuitBreakerState = 'closed';
       this.lastCircuitBreakerOpen = null;
-      logger.info('🟢 Circuit breaker closed - database requests resumed', { component: 'SimpleTool' });
+      logger.info('🟢 Circuit breaker closed - database requests resumed', { component: 'Chanuka' });
     }
   }
 
@@ -321,9 +340,17 @@ export class DatabaseService {
    * Optimized reconnection with exponential backoff and jitter
    * Jitter prevents thundering herd problem when multiple instances reconnect
    */
+  private reconnectionTimeout?: NodeJS.Timeout;
+
   private scheduleReconnection(): void {
+    // Clear any existing reconnection timeout
+    if (this.reconnectionTimeout) {
+      clearTimeout(this.reconnectionTimeout);
+      this.reconnectionTimeout = undefined;
+    }
+
     if (this.connectionAttempts >= this.retryConfig.maxAttempts) {
-      logger.info('🔄 Maximum retry attempts reached, will continue with fallback mode', { component: 'SimpleTool' });
+      logger.info('🔄 Maximum retry attempts reached, will continue with fallback mode', { component: 'Chanuka' });
       return;
     }
 
@@ -342,14 +369,16 @@ export class DatabaseService {
 
     console.log(`🔄 Scheduling reconnection attempt ${this.connectionAttempts}/${this.retryConfig.maxAttempts} in ${delay}ms`);
 
-    setTimeout(async () => {
+    this.reconnectionTimeout = setTimeout(async () => {
+      this.reconnectionTimeout = undefined; // Clear reference before attempting
+
       try {
         await this.testConnection();
-        logger.info('✅ Database reconnection successful', { component: 'SimpleTool' });
+        logger.info('✅ Database reconnection successful', { component: 'Chanuka' });
         this.startHealthCheckMonitoring();
       } catch (error) {
-        logger.error('❌ Reconnection attempt failed', { component: 'SimpleTool', error: (error as Error).message });
-        this.scheduleReconnection();
+        logger.error('❌ Reconnection attempt failed', { component: 'Chanuka', error: (error as Error).message });
+        this.scheduleReconnection(); // Schedule next attempt
       }
     }, delay);
   }
@@ -416,7 +445,11 @@ export class DatabaseService {
 
       this.isConnected = false;
       this.incrementFailureCount();
-      this.scheduleReconnection();
+
+      // Only schedule reconnection if not already scheduled
+      if (!this.reconnectionTimeout) {
+        this.scheduleReconnection();
+      }
 
       return {
         data: fallbackData,
@@ -488,6 +521,14 @@ export class DatabaseService {
           'high',
           'database'
         );
+
+        // Only schedule reconnection if not already scheduled and this is a connection error
+        if (!this.reconnectionTimeout && (error as any).code && ['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT'].includes((error as any).code)) {
+          this.isConnected = false;
+          this.incrementFailureCount();
+          this.scheduleReconnection();
+        }
+
         throw error;
       } finally {
         client.release();
@@ -541,6 +582,13 @@ export class DatabaseService {
   }
 
   /**
+   * Check if service has active timers (for debugging hanging tests)
+   */
+  hasActiveTimers(): boolean {
+    return this.healthCheckInterval !== null || this.reconnectionTimeout !== undefined;
+  }
+
+  /**
    * Manual health check trigger
    */
   async getHealthStatus(): Promise<HealthCheckResult> {
@@ -572,6 +620,27 @@ export class DatabaseService {
   }
 
   /**
+   * Shutdown method to clean up all timers and resources
+   */
+  shutdown(): void {
+    logger.info('🛑 Shutting down database service...', { component: 'Chanuka' });
+
+    // Clear all timers
+    if (this.healthCheckInterval) {
+      clearInterval(this.healthCheckInterval);
+      this.healthCheckInterval = null;
+    }
+
+    if (this.reconnectionTimeout) {
+      clearTimeout(this.reconnectionTimeout);
+      this.reconnectionTimeout = undefined;
+    }
+
+    // Note: We don't close the pool here as that should be done via close()
+    // This method is for cleaning up timers only
+  }
+
+  /**
    * Optimized batch execution with parallel processing option
    */
   async batchExecute<T = any>(
@@ -584,7 +653,8 @@ export class DatabaseService {
         if (parallel) {
           // Execute operations in parallel for better performance
           // Only safe when operations don't depend on each other
-          return await Promise.all(operations.map(op => op(tx)));
+          const results = await Promise.all(operations.map(op => op(tx)));
+          return results;
         } else {
           // Sequential execution for dependent operations
           const results: T[] = [];
@@ -603,11 +673,17 @@ export class DatabaseService {
    * Graceful shutdown with connection draining
    */
   async close(): Promise<void> {
-    logger.info('🔄 Initiating graceful database shutdown...', { component: 'SimpleTool' });
+    logger.info('🔄 Initiating graceful database shutdown...', { component: 'Chanuka' });
 
+    // Clear all timers to prevent hanging
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
       this.healthCheckInterval = null;
+    }
+
+    if (this.reconnectionTimeout) {
+      clearTimeout(this.reconnectionTimeout);
+      this.reconnectionTimeout = undefined;
     }
 
     try {
@@ -619,7 +695,7 @@ export class DatabaseService {
       );
 
       await Promise.race([drainPromise, timeoutPromise]);
-      logger.info('✅ Database connections closed gracefully', { component: 'SimpleTool' });
+      logger.info('✅ Database connections closed gracefully', { component: 'Chanuka' });
     } catch (error) {
       errorTracker.trackError(
         error as Error,
@@ -638,7 +714,14 @@ export class DatabaseService {
    * Force reconnection with circuit breaker reset
    */
   async forceReconnect(): Promise<void> {
-    logger.info('🔄 Forcing database reconnection...', { component: 'SimpleTool' });
+    logger.info('🔄 Forcing database reconnection...', { component: 'Chanuka' });
+
+    // Clear any pending reconnection timeout
+    if (this.reconnectionTimeout) {
+      clearTimeout(this.reconnectionTimeout);
+      this.reconnectionTimeout = undefined;
+    }
+
     this.isConnected = false;
     this.connectionAttempts = 0;
     this.consecutiveFailures = 0;
@@ -651,7 +734,24 @@ export class DatabaseService {
    */
   updateRetryConfig(config: Partial<RetryConfig>): void {
     this.retryConfig = { ...this.retryConfig, ...config };
-    logger.info('🔧 Retry configuration updated:', { component: 'SimpleTool' }, this.retryConfig);
+    logger.info('🔧 Retry configuration updated:', { component: 'Chanuka' }, this.retryConfig);
+  }
+
+  /**
+   * Force cleanup of all timers (for testing/debugging)
+   */
+  forceCleanupTimers(): void {
+    if (this.healthCheckInterval) {
+      clearInterval(this.healthCheckInterval);
+      this.healthCheckInterval = null;
+    }
+
+    if (this.reconnectionTimeout) {
+      clearTimeout(this.reconnectionTimeout);
+      this.reconnectionTimeout = undefined;
+    }
+
+    logger.info('🧹 Forced cleanup of all timers', { component: 'Chanuka' });
   }
 }
 

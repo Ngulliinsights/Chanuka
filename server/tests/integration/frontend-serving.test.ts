@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
-import request from 'supertest';
+import * as request from 'supertest';
 import express from 'express';
 import { createServer } from 'http';
 import path from 'path';
@@ -47,6 +47,13 @@ describe('Frontend Serving Integration Tests', () => {
   beforeEach(() => {
     // Clear any middleware from previous tests
     app._router = undefined;
+  });
+
+  afterEach(async () => {
+    // Force cleanup of any remaining timers to prevent hanging
+    if (global.gc) {
+      global.gc();
+    }
   });
 
   describe('Server Configuration and Vite Integration', () => {

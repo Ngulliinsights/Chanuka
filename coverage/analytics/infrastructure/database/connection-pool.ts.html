@@ -889,7 +889,7 @@ export interface QueryMetrics {
    */
 <span class="fstat-no" title="function not covered" >  async </span>initialize(config?: Partial&lt;ConnectionPoolConfig&gt;): Promise&lt;void&gt; {
     // The shared pool is already initialized, so we just log the configuration
-<span class="cstat-no" title="statement not covered" >    logger.info('[Connection Pool] Using shared database pool with circuit breaker and monitoring', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >    logger.info('[Connection Pool] Using shared database pool with circuit breaker and monitoring', { component: 'Chanuka' });</span>
 &nbsp;
     // Test the connection using the shared pool
 <span class="cstat-no" title="statement not covered" >    await this.testConnection();</span>
@@ -958,7 +958,7 @@ export interface QueryMetrics {
 <span class="cstat-no" title="statement not covered" >      performanceMonitor.addQueryTrace(traceId || 'unknown', text, duration, params);</span>
 &nbsp;
       const errorMessage = <span class="cstat-no" title="statement not covered" >error instanceof Error ? error.message : String(error);</span>
-<span class="cstat-no" title="statement not covered" >      logger.error('[Connection Pool] Query error:', { component: 'SimpleTool' }, {</span>
+<span class="cstat-no" title="statement not covered" >      logger.error('[Connection Pool] Query error:', { component: 'Chanuka' }, {</span>
         queryId,
         error: errorMessage,
         duration,
@@ -1005,7 +1005,7 @@ export interface QueryMetrics {
 <span class="cstat-no" title="statement not covered" >        try {</span>
 <span class="cstat-no" title="statement not covered" >          await client.query('ROLLBACK');</span>
         } catch (rollbackError) {
-<span class="cstat-no" title="statement not covered" >          logger.error('[Connection Pool] Rollback error:', { component: 'SimpleTool' }, { error: rollbackError });</span>
+<span class="cstat-no" title="statement not covered" >          logger.error('[Connection Pool] Rollback error:', { component: 'Chanuka' }, { error: rollbackError });</span>
         }
       }
 &nbsp;
@@ -1116,7 +1116,7 @@ export interface QueryMetrics {
 <span class="fstat-no" title="function not covered" >  async </span>close(): Promise&lt;void&gt; {
     // Use shared pool's close function
 <span class="cstat-no" title="statement not covered" >    await closePools();</span>
-<span class="cstat-no" title="statement not covered" >    logger.info('[Connection Pool] Closed shared database pools', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >    logger.info('[Connection Pool] Closed shared database pools', { component: 'Chanuka' });</span>
   }
 &nbsp;
   /**
@@ -1125,12 +1125,12 @@ export interface QueryMetrics {
   private <span class="fstat-no" title="function not covered" >async </span>testConnection(): Promise&lt;void&gt; {
 <span class="cstat-no" title="statement not covered" >    try {</span>
       const result = <span class="cstat-no" title="statement not covered" >await this.query('SELECT NOW() as current_time, version() as pg_version');</span>
-<span class="cstat-no" title="statement not covered" >      logger.info('[Connection Pool] Connection test successful:', { component: 'SimpleTool' }, {</span>
+<span class="cstat-no" title="statement not covered" >      logger.info('[Connection Pool] Connection test successful:', { component: 'Chanuka' }, {</span>
         currentTime: result.rows[0]?.current_time,
         version: result.rows[0]?.pg_version?.substring(0, 50) + '...'
       });
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >      logger.error('[Connection Pool] Connection test failed:', { component: 'SimpleTool' }, { error });</span>
+<span class="cstat-no" title="statement not covered" >      logger.error('[Connection Pool] Connection test failed:', { component: 'Chanuka' }, { error });</span>
 <span class="cstat-no" title="statement not covered" >      throw error;</span>
     }
   }
@@ -1141,7 +1141,7 @@ export interface QueryMetrics {
    */
   private <span class="fstat-no" title="function not covered" >setupEventListeners(</span>): void {
     // Event listeners are handled by the shared pool implementation
-<span class="cstat-no" title="statement not covered" >    logger.debug('[Connection Pool] Using shared pool event listeners', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >    logger.debug('[Connection Pool] Using shared pool event listeners', { component: 'Chanuka' });</span>
   }
 &nbsp;
   /**
@@ -1154,7 +1154,7 @@ export interface QueryMetrics {
     // Get detailed health status from shared pool
     const poolHealth = <span class="cstat-no" title="statement not covered" >await checkPoolHealth(pool, 'general');</span>
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    logger.info('[Connection Pool] Current metrics:', { component: 'SimpleTool' }, {</span>
+<span class="cstat-no" title="statement not covered" >    logger.info('[Connection Pool] Current metrics:', { component: 'Chanuka' }, {</span>
       utilization: health.details.poolUtilization.toFixed(2) + '%',
       averageAcquireTime: health.details.averageAcquireTime.toFixed(2) + 'ms',
       errorRate: health.details.errorRate.toFixed(2) + '%',
@@ -1191,9 +1191,9 @@ export interface QueryMetrics {
     }
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    if (suggestions.length &gt; 0) {</span>
-<span class="cstat-no" title="statement not covered" >      logger.info('[Connection Pool] Optimization suggestions:', { component: 'SimpleTool' }, suggestions);</span>
+<span class="cstat-no" title="statement not covered" >      logger.info('[Connection Pool] Optimization suggestions:', { component: 'Chanuka' }, suggestions);</span>
     } else {
-<span class="cstat-no" title="statement not covered" >      logger.info('[Connection Pool] Pool performance is optimal', { component: 'SimpleTool' });</span>
+<span class="cstat-no" title="statement not covered" >      logger.info('[Connection Pool] Pool performance is optimal', { component: 'Chanuka' });</span>
     }
   }
 }

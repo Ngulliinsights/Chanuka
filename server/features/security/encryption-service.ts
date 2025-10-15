@@ -79,7 +79,7 @@ export class EncryptionService {
 
       return Buffer.from(JSON.stringify(result)).toString('base64');
     } catch (error) {
-      logger.error('Encryption failed:', { component: 'SimpleTool' }, error);
+      logger.error('Encryption failed:', { component: 'Chanuka' }, error);
       throw new Error('Failed to encrypt data');
     }
   }
@@ -105,7 +105,7 @@ export class EncryptionService {
 
       return decrypted;
     } catch (error) {
-      logger.error('Decryption failed:', { component: 'SimpleTool' }, error);
+      logger.error('Decryption failed:', { component: 'Chanuka' }, error);
       throw new Error('Failed to decrypt data');
     }
   }
@@ -117,7 +117,7 @@ export class EncryptionService {
     try {
       return await bcrypt.hash(password, this.saltRounds);
     } catch (error) {
-      logger.error('Password hashing failed:', { component: 'SimpleTool' }, error);
+      logger.error('Password hashing failed:', { component: 'Chanuka' }, error);
       throw new Error('Failed to hash password');
     }
   }
@@ -129,7 +129,7 @@ export class EncryptionService {
     try {
       return await bcrypt.compare(password, hash);
     } catch (error) {
-      logger.error('Password verification failed:', { component: 'SimpleTool' }, error);
+      logger.error('Password verification failed:', { component: 'Chanuka' }, error);
       return false;
     }
   }

@@ -18,8 +18,13 @@ describe('ExternalAPIManagementService', () => {
     vi.clearAllMocks();
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     apiManager.shutdown();
+
+    // Force cleanup of any remaining timers to prevent hanging
+    if ((apiManager as any).forceCleanupTimers) {
+      (apiManager as any).forceCleanupTimers();
+    }
   });
 
   describe('Rate Limiting', () => {

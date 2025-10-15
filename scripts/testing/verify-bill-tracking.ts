@@ -5,16 +5,16 @@ import { eq } from 'drizzle-orm';
 import { logger } from '../utils/logger';
 
 async function verifyBillTracking() {
-  logger.info('🔍 Verifying Bill Tracking Service...', { component: 'SimpleTool' });
+  logger.info('🔍 Verifying Bill Tracking Service...', { component: 'Chanuka' });
   
   try {
     // Test 1: Check service initialization
-    logger.info('1. Testing service initialization...', { component: 'SimpleTool' });
+    logger.info('1. Testing service initialization...', { component: 'Chanuka' });
     const initialStats = billTrackingService.getStats();
-    logger.info('✅ Bill tracking service initialized:', { component: 'SimpleTool' }, initialStats);
+    logger.info('✅ Bill tracking service initialized:', { component: 'Chanuka' }, initialStats);
 
     // Test 2: Create test data
-    logger.info('2. Creating test data...', { component: 'SimpleTool' });
+    logger.info('2. Creating test data...', { component: 'Chanuka' });
     
     // Create test user
     const [testUser] = await db
@@ -69,13 +69,13 @@ async function verifyBillTracking() {
         { userId: testUser.id, interest: 'education' }
       ]);
     
-    logger.info('✅ Test data created:', { component: 'SimpleTool' }, {
+    logger.info('✅ Test data created:', { component: 'Chanuka' }, {
       userId: testUser.id,
       billCount: testBills.length
     });
 
     // Test 3: Track a bill
-    logger.info('3. Testing bill tracking...', { component: 'SimpleTool' });
+    logger.info('3. Testing bill tracking...', { component: 'Chanuka' });
     
     const trackingPreference = await billTrackingService.trackBill(testUser.id, testBills[0].id, {
       trackingTypes: ['status_changes', 'new_comments'],
@@ -83,25 +83,25 @@ async function verifyBillTracking() {
       alertChannels: ['in_app', 'email']
     });
     
-    logger.info('✅ Bill tracked successfully:', { component: 'SimpleTool' }, {
+    logger.info('✅ Bill tracked successfully:', { component: 'Chanuka' }, {
       billId: trackingPreference.billId,
       trackingTypes: trackingPreference.trackingTypes,
       alertFrequency: trackingPreference.alertFrequency
     });
 
     // Test 4: Check tracking status
-    logger.info('4. Testing tracking status check...', { component: 'SimpleTool' });
+    logger.info('4. Testing tracking status check...', { component: 'Chanuka' });
     
     const isTracking = await billTrackingService.isUserTrackingBill(testUser.id, testBills[0].id);
     const isNotTracking = await billTrackingService.isUserTrackingBill(testUser.id, testBills[1].id);
     
-    logger.info('✅ Tracking status check:', { component: 'SimpleTool' }, {
+    logger.info('✅ Tracking status check:', { component: 'Chanuka' }, {
       bill1Tracking: isTracking,
       bill2Tracking: isNotTracking
     });
 
     // Test 5: Update tracking preferences
-    logger.info('5. Testing tracking preference updates...', { component: 'SimpleTool' });
+    logger.info('5. Testing tracking preference updates...', { component: 'Chanuka' });
     
     const updatedPreferences = await billTrackingService.updateBillTrackingPreferences(
       testUser.id,
@@ -112,13 +112,13 @@ async function verifyBillTracking() {
       }
     );
     
-    logger.info('✅ Tracking preferences updated:', { component: 'SimpleTool' }, {
+    logger.info('✅ Tracking preferences updated:', { component: 'Chanuka' }, {
       alertFrequency: updatedPreferences.alertFrequency,
       trackingTypes: updatedPreferences.trackingTypes
     });
 
     // Test 6: Bulk tracking operations
-    logger.info('6. Testing bulk tracking operations...', { component: 'SimpleTool' });
+    logger.info('6. Testing bulk tracking operations...', { component: 'Chanuka' });
     
     const bulkResult = await billTrackingService.bulkTrackingOperation({
       userId: testUser.id,
@@ -130,14 +130,14 @@ async function verifyBillTracking() {
       }
     });
     
-    logger.info('✅ Bulk tracking operation completed:', { component: 'SimpleTool' }, {
+    logger.info('✅ Bulk tracking operation completed:', { component: 'Chanuka' }, {
       total: bulkResult.summary.total,
       successful: bulkResult.summary.successful,
       failed: bulkResult.summary.failed
     });
 
     // Test 7: Get user's tracked bills
-    logger.info('7. Testing tracked bills retrieval...', { component: 'SimpleTool' });
+    logger.info('7. Testing tracked bills retrieval...', { component: 'Chanuka' });
     
     const trackedBills = await billTrackingService.getUserTrackedBills(testUser.id, {
       page: 1,
@@ -146,45 +146,45 @@ async function verifyBillTracking() {
       sortOrder: 'desc'
     });
     
-    logger.info('✅ Tracked bills retrieved:', { component: 'SimpleTool' }, {
+    logger.info('✅ Tracked bills retrieved:', { component: 'Chanuka' }, {
       totalBills: trackedBills.pagination.total,
       billsOnPage: trackedBills.bills.length,
       firstBillTitle: trackedBills.bills[0]?.title
     });
 
     // Test 8: Get tracking analytics
-    logger.info('8. Testing tracking analytics...', { component: 'SimpleTool' });
+    logger.info('8. Testing tracking analytics...', { component: 'Chanuka' });
     
     const analytics = await billTrackingService.getUserTrackingAnalytics(testUser.id);
     
-    logger.info('✅ Tracking analytics retrieved:', { component: 'SimpleTool' }, {
+    logger.info('✅ Tracking analytics retrieved:', { component: 'Chanuka' }, {
       totalTrackedBills: analytics.totalTrackedBills,
       trackingByCategory: analytics.trackingByCategory.length,
       engagementSummary: analytics.engagementSummary
     });
 
     // Test 9: Get recommended bills for tracking
-    logger.info('9. Testing tracking recommendations...', { component: 'SimpleTool' });
+    logger.info('9. Testing tracking recommendations...', { component: 'Chanuka' });
     
     const recommendations = await billTrackingService.getRecommendedBillsForTracking(testUser.id, 5);
     
-    logger.info('✅ Tracking recommendations retrieved:', { component: 'SimpleTool' }, {
+    logger.info('✅ Tracking recommendations retrieved:', { component: 'Chanuka' }, {
       recommendationCount: recommendations.length,
       firstRecommendation: recommendations[0]?.title
     });
 
     // Test 10: Untrack a bill
-    logger.info('10. Testing bill untracking...', { component: 'SimpleTool' });
+    logger.info('10. Testing bill untracking...', { component: 'Chanuka' });
     
     await billTrackingService.untrackBill(testUser.id, testBills[0].id);
     
     const isStillTracking = await billTrackingService.isUserTrackingBill(testUser.id, testBills[0].id);
-    logger.info('✅ Bill untracked successfully:', { component: 'SimpleTool' }, {
+    logger.info('✅ Bill untracked successfully:', { component: 'Chanuka' }, {
       isStillTracking
     });
 
     // Test 11: Test bulk untracking
-    logger.info('11. Testing bulk untracking...', { component: 'SimpleTool' });
+    logger.info('11. Testing bulk untracking...', { component: 'Chanuka' });
     
     const bulkUntrackResult = await billTrackingService.bulkTrackingOperation({
       userId: testUser.id,
@@ -192,56 +192,56 @@ async function verifyBillTracking() {
       operation: 'untrack'
     });
     
-    logger.info('✅ Bulk untracking completed:', { component: 'SimpleTool' }, {
+    logger.info('✅ Bulk untracking completed:', { component: 'Chanuka' }, {
       successful: bulkUntrackResult.summary.successful,
       failed: bulkUntrackResult.summary.failed
     });
 
     // Test 12: Final analytics check
-    logger.info('12. Testing final analytics...', { component: 'SimpleTool' });
+    logger.info('12. Testing final analytics...', { component: 'Chanuka' });
     
     const finalAnalytics = await billTrackingService.getUserTrackingAnalytics(testUser.id);
-    logger.info('✅ Final analytics:', { component: 'SimpleTool' }, {
+    logger.info('✅ Final analytics:', { component: 'Chanuka' }, {
       totalTrackedBills: finalAnalytics.totalTrackedBills,
       recentActivityCount: finalAnalytics.recentActivity.length
     });
 
     // Test 13: Service shutdown
-    logger.info('13. Testing service shutdown...', { component: 'SimpleTool' });
+    logger.info('13. Testing service shutdown...', { component: 'Chanuka' });
     await billTrackingService.shutdown();
-    logger.info('✅ Service shutdown completed', { component: 'SimpleTool' });
+    logger.info('✅ Service shutdown completed', { component: 'Chanuka' });
 
     // Cleanup test data
-    logger.info('🧹 Cleaning up test data...', { component: 'SimpleTool' });
+    logger.info('🧹 Cleaning up test data...', { component: 'Chanuka' });
     await db.delete(userInterests).where(eq(userInterests.userId, testUser.id));
     for (const bill of testBills) {
       await db.delete(bills).where(eq(bills.id, bill.id));
     }
     await db.delete(users).where(eq(users.id, testUser.id));
-    logger.info('✅ Test data cleaned up', { component: 'SimpleTool' });
+    logger.info('✅ Test data cleaned up', { component: 'Chanuka' });
 
-    logger.info('\n🎉 All Bill Tracking Service tests passed!', { component: 'SimpleTool' });
-    logger.info('\n📋 Task 5.1 Implementation Summary:', { component: 'SimpleTool' });
-    logger.info('✅ trackBill and untrackBill operations with database persistence - IMPLEMENTED', { component: 'SimpleTool' });
-    logger.info('✅ User tracking history and analytics - IMPLEMENTED', { component: 'SimpleTool' });
-    logger.info('✅ Tracking preference management - IMPLEMENTED', { component: 'SimpleTool' });
-    logger.info('✅ Bulk tracking operations for multiple bills - IMPLEMENTED', { component: 'SimpleTool' });
-    logger.info('\n🔧 Additional Features Implemented:', { component: 'SimpleTool' });
-    logger.info('✅ Comprehensive bill tracking service with preferences', { component: 'SimpleTool' });
-    logger.info('✅ User tracking analytics with category and status breakdowns', { component: 'SimpleTool' });
-    logger.info('✅ Tracking recommendations based on user interests', { component: 'SimpleTool' });
-    logger.info('✅ Bulk tracking operations with detailed results', { component: 'SimpleTool' });
-    logger.info('✅ Integration with notification system for tracking updates', { component: 'SimpleTool' });
-    logger.info('✅ Caching layer for performance optimization', { component: 'SimpleTool' });
-    logger.info('✅ RESTful API endpoints for all tracking operations', { component: 'SimpleTool' });
-    logger.info('✅ Comprehensive error handling and validation', { component: 'SimpleTool' });
-    logger.info('✅ Recent activity tracking and analytics', { component: 'SimpleTool' });
-    logger.info('✅ Engagement statistics integration', { component: 'SimpleTool' });
-    logger.info('✅ Graceful service shutdown capabilities', { component: 'SimpleTool' });
-    logger.info('\n✨ Bill Tracking Service is fully functional and production-ready!', { component: 'SimpleTool' });
+    logger.info('\n🎉 All Bill Tracking Service tests passed!', { component: 'Chanuka' });
+    logger.info('\n📋 Task 5.1 Implementation Summary:', { component: 'Chanuka' });
+    logger.info('✅ trackBill and untrackBill operations with database persistence - IMPLEMENTED', { component: 'Chanuka' });
+    logger.info('✅ User tracking history and analytics - IMPLEMENTED', { component: 'Chanuka' });
+    logger.info('✅ Tracking preference management - IMPLEMENTED', { component: 'Chanuka' });
+    logger.info('✅ Bulk tracking operations for multiple bills - IMPLEMENTED', { component: 'Chanuka' });
+    logger.info('\n🔧 Additional Features Implemented:', { component: 'Chanuka' });
+    logger.info('✅ Comprehensive bill tracking service with preferences', { component: 'Chanuka' });
+    logger.info('✅ User tracking analytics with category and status breakdowns', { component: 'Chanuka' });
+    logger.info('✅ Tracking recommendations based on user interests', { component: 'Chanuka' });
+    logger.info('✅ Bulk tracking operations with detailed results', { component: 'Chanuka' });
+    logger.info('✅ Integration with notification system for tracking updates', { component: 'Chanuka' });
+    logger.info('✅ Caching layer for performance optimization', { component: 'Chanuka' });
+    logger.info('✅ RESTful API endpoints for all tracking operations', { component: 'Chanuka' });
+    logger.info('✅ Comprehensive error handling and validation', { component: 'Chanuka' });
+    logger.info('✅ Recent activity tracking and analytics', { component: 'Chanuka' });
+    logger.info('✅ Engagement statistics integration', { component: 'Chanuka' });
+    logger.info('✅ Graceful service shutdown capabilities', { component: 'Chanuka' });
+    logger.info('\n✨ Bill Tracking Service is fully functional and production-ready!', { component: 'Chanuka' });
     
   } catch (error) {
-    logger.error('❌ Error during bill tracking verification:', { component: 'SimpleTool' }, error);
+    logger.error('❌ Error during bill tracking verification:', { component: 'Chanuka' }, error);
     throw error;
   }
 }

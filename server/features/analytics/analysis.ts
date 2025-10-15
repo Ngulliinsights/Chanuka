@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { mlAnalysisService, performComprehensiveAnalysis } from './services/ml.service';
 import { conflictDetectionService } from './conflict-detection';
 import { realTimeBillAnalysisEngine } from '../bills/real-time-analysis';
-import { citizenVerificationService } from '../users/citizen-verification';
+import { citizenVerificationService } from '../users/domain/citizen-verification';
 import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
 import { logger } from '../../utils/logger';
 
@@ -26,7 +26,7 @@ router.get('/bills/:billId/analysis', async (req, res) => {
     return ApiSuccess(res, analysis, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    logger.error('Error fetching bill analysis:', { component: 'SimpleTool' }, error);
+    logger.error('Error fetching bill analysis:', { component: 'Chanuka' }, error);
     return ApiError(res, 'Failed to fetch bill analysis', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -56,7 +56,7 @@ router.post('/bills/:billId/analysis', async (req, res) => {
       return ApiValidationError(res, error.errors, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    logger.error('Error creating analysis:', { component: 'SimpleTool' }, error);
+    logger.error('Error creating analysis:', { component: 'Chanuka' }, error);
     return ApiError(res, 'Failed to create analysis', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -77,7 +77,7 @@ router.get('/bills/:billId/conflicts', async (req, res) => {
     return ApiSuccess(res, conflicts, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
-    logger.error('Error fetching bill conflicts:', { component: 'SimpleTool' }, error);
+    logger.error('Error fetching bill conflicts:', { component: 'Chanuka' }, error);
     return ApiError(res, 'Failed to fetch bill conflicts', 500, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }

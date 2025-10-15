@@ -324,7 +324,7 @@ describe('React Application Initialization Integration Tests', () => {
         }
 
         componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-          logger.error('Error boundary caught error:', { component: 'SimpleTool' }, error, errorInfo);
+          logger.error('Error boundary caught error:', { component: 'Chanuka' }, error, errorInfo);
         }
 
         render() {

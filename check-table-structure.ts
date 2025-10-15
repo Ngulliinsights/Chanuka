@@ -16,12 +16,12 @@ async function checkTableStructure() {
       context: 'check security_audit_logs structure'
     });
 
-    logger.info('Columns in security_audit_logs:', { component: 'SimpleTool' });
+    logger.info('Columns in security_audit_logs:', { component: 'Chanuka' });
     result.rows.forEach(row => {
       console.log(`${row.column_name}: ${row.data_type} ${row.is_nullable === 'YES' ? 'NULL' : 'NOT NULL'} ${row.column_default || ''}`);
     });
   } catch (error) {
-    logger.error('Error checking table structure:', { component: 'SimpleTool' }, error);
+    logger.error('Error checking table structure:', { component: 'Chanuka' }, error);
   }
 }
 
