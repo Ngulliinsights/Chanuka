@@ -1,10 +1,10 @@
 
 import { Router } from "express";
 import { eq } from "drizzle-orm";
-import { database as db, users, userInterests } from "../../../shared/database/connection.js";
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
-import { logger } from '../../utils/logger';
-import { securityAuditService } from '../../features/security/security-audit-service.js';
+import { database as db, users, userInterests } from "../../../../shared/database/connection.js";
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../../utils/api-response.js";
+import { logger } from '../../../utils/logger';
+import { securityAuditService } from '../../../features/security/security-audit-service.js';
 
 const router = Router();
 

@@ -473,6 +473,7 @@ docs/
 │   ├── phase-2-database-consolidation.md
 │   ├── project-structure.md
 ├── financial-disclosure-monitoring.md
+├── fix-before-tests.md
 ├── guides/
 │   ├── DATABASE_SETUP_GUIDE.md
 │   ├── DEMO_MODE_CONFIGURATION.md
@@ -672,8 +673,31 @@ server/
 │   │   ├── alert_system_docs.md
 │   │   ├── alert_utilities.ts
 │   │   ├── application/
+│   │   │   ├── commands/
+│   │   │   │   ├── create-alert-preference-command.ts
+│   │   │   ├── use-cases/
+│   │   │   │   ├── create-alert-preference-use-case.ts
 │   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   │   ├── alert-delivery-log.ts
+│   │   │   │   ├── alert-preference.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── alert-preference-repository.ts
+│   │   │   │   ├── delivery-log-repository.ts
+│   │   │   ├── services/
+│   │   │   │   ├── alert-delivery-service.ts
+│   │   │   │   ├── smart-filtering-service.ts
+│   │   │   ├── value-objects/
+│   │   │   │   ├── alert-channel.ts
+│   │   │   │   ├── alert-conditions.ts
+│   │   │   │   ├── alert-type.ts
+│   │   │   │   ├── channel-type.ts
+│   │   │   │   ├── frequency-config.ts
+│   │   │   │   ├── priority.ts
+│   │   │   │   ├── smart-filtering-config.ts
 │   │   ├── infrastructure/
+│   │   │   ├── repositories/
+│   │   │   │   ├── alert-preference-repository-impl.ts
 │   │   ├── unified_alert_routes.ts
 │   │   ├── unified_alert_service.ts
 │   ├── analytics/
@@ -821,17 +845,49 @@ server/
 │   │   ├── __tests__/
 │   │   │   ├── ExpertVerificationService.test.ts
 │   │   ├── application/
+│   │   │   ├── middleware/
+│   │   │   │   ├── validation-middleware.ts
 │   │   │   ├── profile.ts
+│   │   │   ├── services/
+│   │   │   │   ├── logging-service.ts
+│   │   │   │   ├── metrics-service.ts
+│   │   │   ├── use-cases/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── profile-management-use-case.ts
+│   │   │   │   ├── user-registration-use-case.ts
+│   │   │   │   ├── verification-operations-use-case.ts
+│   │   │   ├── user-application-service.ts
 │   │   │   ├── users.ts
 │   │   │   ├── verification.ts
 │   │   ├── domain/
+│   │   │   ├── aggregates/
+│   │   │   │   ├── user-aggregate.ts
 │   │   │   ├── citizen-verification.ts
+│   │   │   ├── entities/
+│   │   │   │   ├── citizen-verification.ts
+│   │   │   │   ├── user.ts
+│   │   │   │   ├── user-profile.ts
+│   │   │   │   ├── value-objects.ts
 │   │   │   ├── ExpertVerificationService.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── user-repository.ts
+│   │   │   │   ├── verification-repository.ts
+│   │   │   ├── services/
+│   │   │   │   ├── profile-domain-service.ts
+│   │   │   │   ├── user-management-domain-service.ts
+│   │   │   │   ├── user-verification-domain-service.ts
+│   │   │   │   ├── verification-domain-service.ts
 │   │   │   ├── user-management.ts
 │   │   │   ├── user-preferences.ts
 │   │   │   ├── user-profile.ts
 │   │   ├── index.ts
 │   │   ├── infrastructure/
+│   │   │   ├── email-service.ts
+│   │   │   ├── government-data-service.ts
+│   │   │   ├── notification-service.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── user-repository-impl.ts
+│   │   │   │   ├── verification-repository-impl.ts
 │   │   │   ├── user-storage.d.ts
 │   │   │   ├── user-storage.ts
 ├── index.ts
@@ -1307,4 +1363,4 @@ vitest.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-14 23:39:43
+Generated on: 2025-10-15 02:43:52

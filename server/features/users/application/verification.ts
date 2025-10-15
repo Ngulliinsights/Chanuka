@@ -1,11 +1,11 @@
 
 import { Router, Request, Response } from "express";
 import { eq, desc, sql } from "drizzle-orm";
-import { database as db, expertVerifications, users } from "../../../shared/database/connection.js";
-import { VerificationRequest } from "../../types/api.js";
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
-import { errorTracker } from '../../core/errors/error-tracker.js';
-import { logger } from '../../utils/logger';
+import { database as db, expertVerifications, users } from "../../../../shared/database/connection.js";
+import { VerificationRequest } from "../../../types/api.js";
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../../utils/api-response.js";
+import { errorTracker } from '../../../core/errors/error-tracker.js';
+import { logger } from '../../../utils/logger';
 
 const router = Router();
 

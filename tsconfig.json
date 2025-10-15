@@ -17,7 +17,6 @@
     "allowImportingTsExtensions": true,
   "moduleResolution": "node",
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
   "resolveJsonModule": true,
     "downlevelIteration": true,
     "forceConsistentCasingInFileNames": true,

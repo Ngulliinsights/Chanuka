@@ -60,7 +60,7 @@ interface RetryConfig {
  * 5. Memory-efficient health check scheduling
  */
 export class DatabaseService {
-  private pool: pg.Pool;
+  private pool: pg.Pool | undefined;
   private db: any;
   private isConnected: boolean = false;
   private lastHealthCheck: Date = new Date();
@@ -133,6 +133,8 @@ export class DatabaseService {
    * Enhanced connection handlers with better error context
    */
   private setupConnectionHandlers(): void {
+    if (!this.pool) return;
+
     this.pool.on('connect', (client) => {
       logger.info('✅ Database client connected', { component: 'Chanuka' });
       this.isConnected = true;
@@ -184,12 +186,14 @@ export class DatabaseService {
    * Optimized connection test with timeout
    */
   private async testConnection(): Promise<void> {
+    if (!this.pool) throw new Error('Pool not initialized');
+
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => reject(new Error('Connection test timeout')), 5000);
     });
 
     const connectPromise = (async () => {
-      const client = await this.pool.connect();
+      const client = await this.pool!.connect();
       try {
         await client.query('SELECT NOW()');
         this.isConnected = true;
@@ -256,7 +260,9 @@ export class DatabaseService {
     const startTime = Date.now();
 
     try {
-      const client = await this.pool.connect();
+      if (!this.pool) throw new Error('Pool not initialized');
+
+      const client = await this.pool!.connect();
       try {
         await client.query('SELECT 1');
         const responseTime = Date.now() - startTime;
@@ -476,6 +482,8 @@ export class DatabaseService {
       throw new Error(`Database unavailable for transaction: ${context}`);
     }
 
+    if (!this.pool) throw new Error('Pool not initialized');
+
     let attempts = 0;
     const maxSerializationRetries = 3;
 
@@ -548,10 +556,10 @@ export class DatabaseService {
     consecutiveFailures: number;
     circuitBreakerState: string;
     poolStats: {
-      totalCount: number;
-      idleCount: number;
-      waitingCount: number;
-    };
+      totalCount: number | undefined;
+      idleCount: number | undefined;
+      waitingCount: number | undefined;
+    } | undefined;
   } {
     return {
       isConnected: this.isConnected,
@@ -559,11 +567,11 @@ export class DatabaseService {
       connectionAttempts: this.connectionAttempts,
       consecutiveFailures: this.consecutiveFailures,
       circuitBreakerState: this.circuitBreakerState,
-      poolStats: {
+      poolStats: this.pool ? {
         totalCount: this.pool.totalCount,
         idleCount: this.pool.idleCount,
         waitingCount: this.pool.waitingCount
-      }
+      } : undefined
     };
   }
 
@@ -604,9 +612,11 @@ export class DatabaseService {
     fallbackData: T,
     context: string = 'raw_query'
   ): Promise<DatabaseResult<T>> {
+    if (!this.pool) throw new Error('Pool not initialized');
+
     return this.withFallback(
       async () => {
-        const client = await this.pool.connect();
+        const client = await this.pool!.connect();
         try {
           const result = await client.query(query, params);
           return result.rows as T;
@@ -689,13 +699,15 @@ export class DatabaseService {
     try {
       // Wait for active connections to complete (with timeout)
       const drainTimeout = 10000; // 10 seconds
-      const drainPromise = this.pool.end();
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Drain timeout')), drainTimeout)
-      );
+      if (this.pool) {
+        const drainPromise = this.pool.end() as Promise<void>;
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Drain timeout')), drainTimeout)
+        );
 
-      await Promise.race([drainPromise, timeoutPromise]);
-      logger.info('✅ Database connections closed gracefully', { component: 'Chanuka' });
+        await Promise.race([drainPromise, timeoutPromise]);
+        logger.info('✅ Database connections closed gracefully', { component: 'Chanuka' });
+      }
     } catch (error) {
       errorTracker.trackError(
         error as Error,
@@ -706,7 +718,9 @@ export class DatabaseService {
         'database'
       );
       // Force close if graceful shutdown fails
-      await this.pool.end();
+      if (this.pool) {
+        this.pool.end();
+      }
     }
   }
 

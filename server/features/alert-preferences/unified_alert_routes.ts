@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth';
+import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth';
 import {
   unifiedAlertPreferenceService,
   alertPreferenceSchema,
@@ -14,8 +14,8 @@ import {
   ApiError,
   ApiValidationError, 
   ApiResponseWrapper 
-} from "../../../utils/api-response";
-import { logger } from '@shared/utils/logger';
+} from "../../utils/api-response";
+import { logger } from '../../utils/logger';
 
 export const router = Router();
 

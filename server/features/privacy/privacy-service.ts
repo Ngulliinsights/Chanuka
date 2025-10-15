@@ -309,7 +309,15 @@ class PrivacyService {
 
       // Fetch engagement metrics
       const engagement = await db
-        .select()
+        .select({
+          billId: billEngagement.billId,
+          viewCount: billEngagement.viewCount,
+          commentCount: billEngagement.commentCount,
+          shareCount: billEngagement.shareCount,
+          engagementScore: sql<number>`${billEngagement.engagementScore}::numeric`,
+          lastEngaged: billEngagement.lastEngaged,
+          createdAt: billEngagement.createdAt
+        })
         .from(billEngagement)
         .where(eq(billEngagement.userId, userId));
 

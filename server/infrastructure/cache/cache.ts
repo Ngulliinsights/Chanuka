@@ -107,11 +107,11 @@ router.delete("/key/:key", (req, res) => {
 // Invalidate cache by pattern
 router.delete("/pattern/:pattern", (req, res) => {
   const startTime = Date.now();
-  
+
   try {
     const { pattern } = req.params;
-    const deletedCount = cacheService.invalidatePattern(decodeURIComponent(pattern));
-    
+    const deletedCount = cacheService.deletePattern(decodeURIComponent(pattern));
+
     return ApiSuccess(res, {
       message: `Invalidated ${deletedCount} cache entries matching pattern "${pattern}"`,
       deletedCount

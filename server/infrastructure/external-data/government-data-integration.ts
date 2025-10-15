@@ -466,17 +466,19 @@ export class GovernmentDataIntegrationService {
     if (!billSponsors) return;
 
     for (const sponsorInfo of billSponsors) {
+      if (!sponsorInfo.name) continue; // Skip if name is missing
+
       // Find or create sponsor
       let sponsor = await db.select()
         .from(sponsors)
-        .where(eq(sponsors.name, sponsorInfo.name!))
+        .where(eq(sponsors.name, sponsorInfo.name))
         .limit(1);
 
       if (sponsor.length === 0) {
         // Create sponsor if doesn't exist
         const [newSponsor] = await db.insert(sponsors).values({
           name: sponsorInfo.name,
-          role: sponsorInfo.role,
+          role: sponsorInfo.role || 'Unknown',
           party: sponsorInfo.party || null,
           isActive: true,
           createdAt: new Date()
@@ -802,7 +804,13 @@ export class GovernmentDataIntegrationService {
     }>;
     overallHealth: 'healthy' | 'degraded' | 'down';
   }> {
-    const sourceStatuses = [];
+    const sourceStatuses: Array<{
+      name: string;
+      status: 'healthy' | 'degraded' | 'down';
+      lastSync: Date | null;
+      errorCount: number;
+      dataQuality: DataQualityMetrics;
+    }> = [];
     
     for (const [sourceName, config] of this.dataSources) {
       try {

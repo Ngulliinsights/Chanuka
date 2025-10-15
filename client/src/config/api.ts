@@ -373,6 +373,11 @@ export const RATE_LIMIT_CONFIG = {
   queueOnLimit: true,
 } as const;
 
+// Additional exports for backward compatibility with tests
+export const API_BASE_URL = defaultApiConfig.baseUrl;
+export const API_TIMEOUT = defaultApiConfig.timeout;
+export const MAX_RETRIES = defaultApiConfig.retries;
+
 // Type exports for enhanced TypeScript integration throughout your codebase
 // These types enable autocomplete, type checking, and safer refactoring
 export type ApiEndpoints = typeof API_ENDPOINTS;
