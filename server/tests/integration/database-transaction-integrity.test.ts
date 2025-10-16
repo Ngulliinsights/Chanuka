@@ -226,7 +226,7 @@ describe('Database Transaction Integrity Tests', () => {
     });
 
     it('should handle partial nested transaction rollback', async () => {
-      let outerCommentId: number;
+      let outerCommentId: number | undefined;
 
       try {
         await withTransaction(async (outerTx) => {
@@ -264,15 +264,18 @@ describe('Database Transaction Integrity Tests', () => {
       }
 
       // Verify outer comment persisted
+      expect(outerCommentId).toBeDefined();
       const persistedComment = await db.select()
         .from(billComments)
-        .where(eq(billComments.id, outerCommentId));
+        .where(eq(billComments.id, outerCommentId!));
       
       expect(persistedComment).toHaveLength(1);
       expect(persistedComment[0].content).toBe('Outer comment should persist');
 
       // Cleanup
-      await db.delete(billComments).where(eq(billComments.id, outerCommentId));
+      if (outerCommentId) {
+        await db.delete(billComments).where(eq(billComments.id, outerCommentId));
+      }
     });
   });
 

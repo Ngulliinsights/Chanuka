@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
-import { databaseService } from '../../../infrastructure/database/database-service.js';
+import databaseService from '../../../infrastructure/database/database-service.js';
 import { logger } from '../utils/logger';
 
 describe('Database Operations Integration Tests', () => {
@@ -64,7 +64,7 @@ describe('Database Operations Integration Tests', () => {
       expect(result).toHaveProperty('data');
       expect(result).toHaveProperty('source');
       expect(result).toHaveProperty('timestamp');
-      expect(result.source).toBeOneOf(['database', 'fallback']);
+      expect(['database', 'fallback']).toContain(result.source);
       expect(result.timestamp).toBeInstanceOf(Date);
     });
 
@@ -373,7 +373,7 @@ describe('Database Operations Integration Tests', () => {
     });
 
     it('should handle rapid sequential operations', async () => {
-      const operations = [];
+      const operations: any[] = [];
       const startTime = Date.now();
 
       for (let i = 0; i < 20; i++) {
@@ -391,7 +391,7 @@ describe('Database Operations Integration Tests', () => {
       expect(results).toHaveLength(20);
       expect(endTime - startTime).toBeLessThan(10000); // Should complete within 10 seconds
 
-      results.forEach((result, index) => {
+      results.forEach((result: any, index) => {
         expect(result.data).toHaveProperty('sequence', index);
       });
     });
@@ -441,7 +441,7 @@ describe('Database Operations Integration Tests', () => {
   describe('Error Recovery and Resilience', () => {
     it('should recover from temporary connection issues', async () => {
       // Simulate connection recovery scenario
-      const operations = [];
+      const operations: any[] = [];
 
       for (let i = 0; i < 5; i++) {
         operations.push(
@@ -464,11 +464,11 @@ describe('Database Operations Integration Tests', () => {
       expect(results).toHaveLength(5);
       
       // Operation 2 should use fallback due to simulated error
-      expect(results[2].source).toBe('fallback');
-      expect(results[2].error).toBeInstanceOf(Error);
+      expect((results[2] as any).source).toBe('fallback');
+      expect((results[2] as any).error).toBeInstanceOf(Error);
       
       // Other operations should succeed or use fallback gracefully
-      results.forEach((result, index) => {
+      results.forEach((result: any, index) => {
         expect(result.data).toHaveProperty('id', index);
         expect(result.data).toHaveProperty('status');
       });

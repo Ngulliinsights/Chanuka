@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, jest } from '@jest/globals';
-import * as request from 'supertest';
+import request from 'supertest';
 import express from 'express';
 import cors from 'cors';
 import WebSocket from 'ws';
@@ -493,7 +493,7 @@ describe('Real-Time Notification Delivery Tests', () => {
           expect(notification.data.newStatus).toBe('passed');
         } catch (error) {
           // Notification system might not be fully implemented
-          console.warn('Real-time notification not received:', error.message);
+          console.warn('Real-time notification not received:', (error as Error).message);
         }
       }
     });
@@ -531,7 +531,7 @@ describe('Real-Time Notification Delivery Tests', () => {
           expect(notification.type).toBe('new_bill');
           expect(notification.data.title).toBe(newBillData.title);
         } catch (error) {
-          console.warn('New bill notification not received:', error.message);
+          console.warn('New bill notification not received:', (error as Error).message);
         }
       }
     });
@@ -565,7 +565,7 @@ describe('Real-Time Notification Delivery Tests', () => {
           expect(notification.data.billId).toBe(testBills[0].id);
           expect(notification.data.engagementType).toBe('view');
         } catch (error) {
-          console.warn('Engagement notification not received:', error.message);
+          console.warn('Engagement notification not received:', (error as Error).message);
         }
       }
     });
@@ -605,7 +605,7 @@ describe('Real-Time Notification Delivery Tests', () => {
           expect(notification.data.title).toBe(notificationData.title);
           expect(notification.data.message).toBe(notificationData.message);
         } catch (error) {
-          console.warn('User notification not received:', error.message);
+          console.warn('User notification not received:', (error as Error).message);
         }
       }
     });
@@ -655,7 +655,7 @@ describe('Real-Time Notification Delivery Tests', () => {
             expect(error.message).toContain('timeout');
           }
         } catch (error) {
-          console.warn('Notification delivery test failed:', error.message);
+          console.warn('Notification delivery test failed:', (error as Error).message);
         }
       }
     });
@@ -711,7 +711,7 @@ describe('Real-Time Notification Delivery Tests', () => {
             } catch (error) {
               if (!notif.shouldReceive) {
                 // Expected timeout for notifications that should be filtered
-                expect(error.message).toContain('timeout');
+                expect((error as Error).message).toContain('timeout');
               } else {
                 console.warn(`Expected notification not received for ${notif.type}`);
               }
@@ -768,7 +768,7 @@ describe('Real-Time Notification Delivery Tests', () => {
           expect(notification.type).toBe('user_notification');
           expect(notification.data.title).toBe(notificationData.title);
         } catch (error) {
-          console.warn('Reconnection notification test failed:', error.message);
+          console.warn('Reconnection notification test failed:', (error as Error).message);
         }
       }
     });
@@ -799,7 +799,7 @@ describe('Real-Time Notification Delivery Tests', () => {
       const successfulNotifications = responses.filter(r => r.status === 201);
 
       // Should receive notifications for successful creates
-      const receivedNotifications = [];
+      const receivedNotifications: any[] = [];
       for (let i = 0; i < successfulNotifications.length; i++) {
         try {
           const notification = await waitForWebSocketMessage(ws, 1000);
@@ -843,7 +843,7 @@ describe('Real-Time Notification Delivery Tests', () => {
           });
         
         if (response.status === 201) {
-          offlineNotifications.push(response.body.data);
+          (offlineNotifications as any[]).push(response.body.data);
         }
       }
 
@@ -860,7 +860,7 @@ describe('Real-Time Notification Delivery Tests', () => {
       // Check if queued notifications are delivered
       // This is an advanced feature that may not be implemented
       try {
-        const queuedNotifications = [];
+        const queuedNotifications: any[] = [];
         for (let i = 0; i < offlineNotifications.length; i++) {
           const notification = await waitForWebSocketMessage(newWs, 2000);
           queuedNotifications.push(notification);
@@ -868,7 +868,7 @@ describe('Real-Time Notification Delivery Tests', () => {
         
         expect(queuedNotifications.length).toBe(offlineNotifications.length);
       } catch (error) {
-        console.warn('Notification queuing not implemented or failed:', error.message);
+        console.warn('Notification queuing not implemented or failed:', (error as Error).message);
       }
     });
   });

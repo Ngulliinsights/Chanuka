@@ -1,18 +1,14 @@
-// DEPRECATED: Use jest.backend.config.js for backend testing
-// This config is kept for legacy compatibility only
-// 
-// For new development:
-// - Backend/Database tests: use jest.backend.config.js
-// - Frontend tests: use vitest.frontend.config.ts
-
 export default {
   preset: 'ts-jest/presets/default-esm',
   extensionsToTreatAsEsm: ['.ts'],
   testEnvironment: 'node',
-  roots: ['<rootDir>/server'],
+  displayName: 'Backend & Database Tests',
+  roots: ['<rootDir>/server', '<rootDir>/db'],
   testMatch: [
-    '**/__tests__/**/*.ts',
-    '**/?(*.)+(spec|test).ts'
+    '**/server/**/__tests__/**/*.ts',
+    '**/server/**/?(*.)+(spec|test).ts',
+    '**/db/**/__tests__/**/*.ts',
+    '**/db/**/?(*.)+(spec|test).ts'
   ],
   transform: {
     '^.+\\.ts$': ['ts-jest', {
@@ -24,13 +20,21 @@ export default {
   },
   collectCoverageFrom: [
     'server/**/*.ts',
+    'db/**/*.ts',
     '!server/**/*.d.ts',
+    '!db/**/*.d.ts',
     '!server/tests/**',
     '!server/index.ts'
   ],
-  coverageDirectory: 'coverage/legacy',
+  coverageDirectory: 'coverage/backend',
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/server/tests/setup.ts'],
   testTimeout: 30000,
-  maxWorkers: 1
+  maxWorkers: 1,
+  // Database-specific test patterns
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/client/',
+    '/dist/'
+  ]
 };

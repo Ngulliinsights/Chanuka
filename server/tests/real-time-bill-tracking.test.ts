@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 import WebSocket from 'ws';
 import jwt from 'jsonwebtoken';
 import { webSocketService } from '../infrastructure/websocket.js';
-import { billStatusMonitor } from '../features/bills/bill-status-monitor.js';
+import { billStatusMonitorService } from '../features/bills/bill-status-monitor.js';
 import { userPreferencesService } from '../features/users/domain/user-preferences.js';
 import { database as db, users, bills, billEngagement } from '../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
@@ -68,50 +68,56 @@ describe('Real-Time Bill Tracking System', () => {
   });
 
   describe('WebSocket Connection and Authentication', () => {
-    it('should reject connection without token', (done) => {
+    it('should reject connection without token', async () => {
       const ws = new WebSocket(wsUrl);
       
-      ws.on('error', (error) => {
-        expect(error).toBeDefined();
-        done();
-      });
-      
-      ws.on('close', (code) => {
-        expect(code).not.toBe(1000); // Not a normal closure
-        done();
-      });
-    });
-
-    it('should accept connection with valid token', (done) => {
-      const ws = new WebSocket(`${wsUrl}?token=${authToken}`);
-      
-      ws.on('open', () => {
-        expect(ws.readyState).toBe(WebSocket.OPEN);
-        ws.close();
-        done();
-      });
-      
-      ws.on('error', (error) => {
-        done(error);
-      });
-    });
-
-    it('should receive connection confirmation message', (done) => {
-      const ws = new WebSocket(`${wsUrl}?token=${authToken}`);
-      
-      ws.on('message', (data) => {
-        const message = JSON.parse(data.toString());
+      return new Promise<void>((resolve) => {
+        ws.on('error', (error) => {
+          expect(error).toBeDefined();
+          resolve();
+        });
         
-        if (message.type === 'connected') {
-          expect(message.message).toBe('WebSocket connection established');
-          expect(message.data.userId).toBe(testUserId);
-          ws.close();
-          done();
-        }
+        ws.on('close', (code) => {
+          expect(code).not.toBe(1000); // Not a normal closure
+          resolve();
+        });
       });
+    });
+
+    it('should accept connection with valid token', async () => {
+      const ws = new WebSocket(`${wsUrl}?token=${authToken}`);
       
-      ws.on('error', (error) => {
-        done(error);
+      return new Promise<void>((resolve, reject) => {
+        ws.on('open', () => {
+          expect(ws.readyState).toBe(WebSocket.OPEN);
+          ws.close();
+          resolve();
+        });
+        
+        ws.on('error', (error) => {
+          reject(error);
+        });
+      });
+    });
+
+    it('should receive connection confirmation message', async () => {
+      const ws = new WebSocket(`${wsUrl}?token=${authToken}`);
+      
+      return new Promise<void>((resolve, reject) => {
+        ws.on('message', (data) => {
+          const message = JSON.parse(data.toString());
+          
+          if (message.type === 'connected') {
+            expect(message.message).toBe('WebSocket connection established');
+            expect(message.data.userId).toBe(testUserId);
+            ws.close();
+            resolve();
+          }
+        });
+        
+        ws.on('error', (error) => {
+          reject(error);
+        });
       });
     });
   });

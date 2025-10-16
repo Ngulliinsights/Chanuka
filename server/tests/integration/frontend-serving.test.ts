@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
-import * as request from 'supertest';
+import request from 'supertest';
 import express from 'express';
 import { createServer } from 'http';
 import path from 'path';

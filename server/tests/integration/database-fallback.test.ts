@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { databaseFallbackService } from '../../infrastructure/database/database-fallback.js';
 import { demoDataService } from '../../infrastructure/demo-data.js';
-import * as request from 'supertest';
+import request from 'supertest';
 import { app } from '../../index.js';
 import { logger } from '../utils/logger';
 

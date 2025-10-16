@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
-import * as request from 'supertest';
+import request from 'supertest';
 import { app } from '../../index.js';
-import { databaseService } from '../../../infrastructure/database/database-service.js';
+import databaseService from '../../../infrastructure/database/database-service.js';
 import { logger } from '../utils/logger';
 
 describe('API Endpoints Integration Tests', () => {
@@ -67,7 +67,7 @@ describe('API Endpoints Integration Tests', () => {
         .send(userData)
         .expect('Content-Type', /json/);
 
-      expect(response.status).toBeOneOf([200, 201]);
+      expect([200, 201]).toContain(response.status);
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveProperty('user');
       expect(response.body.data).toHaveProperty('token');
@@ -112,7 +112,7 @@ describe('API Endpoints Integration Tests', () => {
         })
         .expect('Content-Type', /json/);
 
-      expect(response.status).toBeOneOf([400, 401]);
+      expect([400, 401]).toContain(response.status);
       expect(response.body.success).toBe(false);
       expect(response.body).toHaveProperty('error');
     });
@@ -333,7 +333,7 @@ describe('API Endpoints Integration Tests', () => {
         .send(commentData)
         .expect('Content-Type', /json/);
 
-      expect(response.status).toBeOneOf([200, 201]);
+      expect([200, 201]).toContain(response.status);
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveProperty('id');
       expect(response.body.data.content).toBe(commentData.content);
@@ -370,7 +370,7 @@ describe('API Endpoints Integration Tests', () => {
         })
         .expect('Content-Type', /json/);
 
-      expect(response.status).toBeOneOf([400, 422]);
+      expect([400, 422]).toContain(response.status);
       expect(response.body.success).toBe(false);
     });
   });
@@ -418,7 +418,7 @@ describe('API Endpoints Integration Tests', () => {
         .send('{"invalid": json}')
         .expect('Content-Type', /json/);
 
-      expect(response.status).toBeOneOf([400, 422]);
+      expect([400, 422]).toContain(response.status);
       expect(response.body.success).toBe(false);
     });
 
@@ -431,7 +431,7 @@ describe('API Endpoints Integration Tests', () => {
         })
         .expect('Content-Type', /json/);
 
-      expect(response.status).toBeOneOf([400, 422]);
+      expect([400, 422]).toContain(response.status);
       expect(response.body.success).toBe(false);
       expect(response.body).toHaveProperty('error');
     });
@@ -448,7 +448,7 @@ describe('API Endpoints Integration Tests', () => {
         })
         .expect('Content-Type', /json/);
 
-      expect(response.status).toBeOneOf([400, 422]);
+      expect([400, 422]).toContain(response.status);
       expect(response.body.success).toBe(false);
     });
 
@@ -464,14 +464,14 @@ describe('API Endpoints Integration Tests', () => {
         })
         .expect('Content-Type', /json/);
 
-      expect(response.status).toBeOneOf([400, 422]);
+      expect([400, 422]).toContain(response.status);
       expect(response.body.success).toBe(false);
     });
   });
 
   describe('Rate Limiting', () => {
     it('should handle rate limiting for authentication endpoints', async () => {
-      const requests = [];
+      const requests: Promise<any>[] = [];
       
       // Make multiple rapid requests
       for (let i = 0; i < 10; i++) {

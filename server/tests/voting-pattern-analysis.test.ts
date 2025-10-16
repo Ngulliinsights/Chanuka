@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
-import { votingPatternAnalysisService } from '../features/bills/voting-pattern-analysis.js';
+import { describe, it, expect, beforeEach } from '@jest/globals';
+import { votingPatternAnalysisService } from '../features/bills/voting-pattern-analysis';
 import { logger } from '../utils/logger';
 
 describe('VotingPatternAnalysisService', () => {
@@ -85,7 +85,7 @@ describe('VotingPatternAnalysisService', () => {
         expect(typeof result.coalitionStrength).toBe('number');
       } catch (error) {
         // If sponsor doesn't exist, that's expected in test environment
-        expect(error.message).toContain('not found');
+        expect((error as Error).message).toContain('not found');
       }
     });
   });
@@ -117,7 +117,7 @@ describe('VotingPatternAnalysisService', () => {
         expect(Array.isArray(result.recommendations)).toBe(true);
       } catch (error) {
         // If sponsor doesn't exist, that's expected in test environment
-        expect(error.message).toContain('not found');
+        expect((error as Error).message).toContain('not found');
       }
     });
   });
