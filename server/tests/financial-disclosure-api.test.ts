@@ -6,7 +6,11 @@ import { financialDisclosureAnalyticsService } from '../features/analytics/servi
 import { logger } from '../utils/logger';
 
 // Create mock monitoring service for tests
-const mockMonitoringService = new FinancialDisclosureMonitoringService();
+const mockDependencies = {
+  cacheService: { get: jest.fn(), set: jest.fn(), delete: jest.fn() },
+  logger: { info: jest.fn(), error: jest.fn(), warn: jest.fn() }
+};
+const mockMonitoringService = new FinancialDisclosureMonitoringService(mockDependencies);
 
 // Create test router
 const financialDisclosureRouter = createFinancialDisclosureRouter(

@@ -75,7 +75,7 @@ describe('External API Management Integration Tests', () => {
       expect(response.body.data).toHaveProperty('timestamp');
       expect(response.body.data).toHaveProperty('overallStatus');
       
-      expect(Array.isArray(response.
+      expect(Array.isArray(response.body.data.services)).toBe(true);
 
 
 

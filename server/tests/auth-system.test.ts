@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
-import { authService } from '../core/auth/auth-service.js';
-import { getEmailService } from '../services/email.service.js';
+import { authService } from '../core/auth/auth-service';
+import { getEmailService } from '../infrastructure/notifications/email-service';
 import { database as db, users, sessions, passwordResets } from '../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import { router as authRouter } from '../core/auth/auth.js';
@@ -373,7 +373,8 @@ describe('AuthService Unit Tests', () => {
 
   describe('Registration', () => {
     it('should register user with valid data', async () => {
-      const result = await authService.register(testUser);
+      const mockReq = { ip: '127.0.0.1', headers: { 'user-agent': 'test' } } as any;
+      const result = await authService.register(testUser, mockReq);
 
       expect(result.success).toBe(true);
       expect(result.user).toBeDefined();
@@ -385,10 +386,11 @@ describe('AuthService Unit Tests', () => {
 
     it('should reject duplicate email', async () => {
       // First registration
-      await authService.register(testUser);
+      const mockReq = { ip: '127.0.0.1', headers: { 'user-agent': 'test' } } as any;
+      await authService.register(testUser, mockReq);
 
       // Attempt duplicate
-      const result = await authService.register(testUser);
+      const result = await authService.register(testUser, mockReq);
 
       expect(result.success).toBe(false);
       expect(result.error).toContain('User with this email already exists');
@@ -398,18 +400,20 @@ describe('AuthService Unit Tests', () => {
   describe('Login', () => {
     beforeAll(async () => {
       // Ensure user exists
+      const mockReq = { ip: '127.0.0.1', headers: { 'user-agent': 'test' } } as any;
       await authService.register({
         ...testUser,
         email: `login-test-${Date.now()}@example.com`
-      });
+      }, mockReq);
     });
 
     it('should login with valid credentials', async () => {
       const loginEmail = `login-test-${Date.now()}@example.com`;
+      const mockReq = { ip: '127.0.0.1', headers: { 'user-agent': 'test' } } as any;
       await authService.register({
         ...testUser,
         email: loginEmail
-      });
+      }, mockReq);
 
       const result = await authService.login({
         email: loginEmail,
@@ -439,10 +443,11 @@ describe('AuthService Unit Tests', () => {
 
     beforeAll(async () => {
       const email = `token-test-${Date.now()}@example.com`;
+      const mockReq = { ip: '127.0.0.1', headers: { 'user-agent': 'test' } } as any;
       const registerResult = await authService.register({
         ...testUser,
         email
-      });
+      }, mockReq);
 
       token = registerResult.token!;
       refreshToken = registerResult.refreshToken!;
