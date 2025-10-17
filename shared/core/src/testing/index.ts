@@ -8,11 +8,6 @@
 // Load testing utilities
 export { LoadTester } from './load-tester';
 export type {
-  LoadTestConfig,
-  SimulateLoadOptions,
-  RequestResult,
-  LoadTestResults,
-  FailureInjectionOptions,
   LoadTestScenario,
   LoadTestSuiteOptions,
   LoadTestSuite
@@ -65,7 +60,58 @@ export type {
   SystemInfo
 } from './performance-monitor';
 
-// Utility functions for creating test scenarios
+// CI/CD testing
+export { CICDRunner } from './ci-cd-runner';
+export type {
+  CICDRunnerConfig,
+  CICDPipelineResult,
+  PipelineStageResult,
+  PipelineSummary,
+  PipelineRecommendation
+} from './ci-cd-runner';
+
+// Coverage reporting
+export { CoverageReporter } from './coverage-reporter';
+export type {
+  CoverageReporterConfig,
+  CoverageData,
+  FileCoverage,
+  CoverageMetrics,
+  CoverageSummary,
+  CoverageAnalysis,
+  CoverageRiskAssessment,
+  CoverageRecommendation,
+  CoverageTrends,
+  TrendMetrics,
+  CoverageReport,
+  CoverageReportSummary,
+  CoverageBaseline,
+  CoverageHistoryEntry
+} from './coverage-reporter';
+
+// Memory leak detection
+export { MemoryLeakDetector } from './memory-leak-detector';
+
+// Performance regression detection
+export { PerformanceRegressionDetector } from './performance-regression-detector';
+
+// Integration testing
+export { IntegrationTests } from './integration-tests';
+
+// Dependency validation
+export { DependencyValidator } from './dependency-validator';
+
+// Import types needed for utility functions
+import type { LoadTestScenario, LoadTestSuiteOptions } from './load-tester';
+import type { PerformanceMonitorConfig } from './performance-monitor';
+import type { BenchmarkSuite, BenchmarkResult, CategoryStats, MemoryBenchmarkPoint } from './performance-benchmarks';
+import { PerformanceMonitor } from './performance-monitor';
+
+/**
+ * Creates a load test scenario for cache operations
+ * This function generates a standardized test that exercises the three core cache operations:
+ * set, get, and delete. It's useful for establishing baseline performance metrics.
+ */
 export function createCacheTestScenario(cache: any, name: string = 'cache-test'): LoadTestScenario {
   return {
     name,
@@ -76,6 +122,7 @@ export function createCacheTestScenario(cache: any, name: string = 'cache-test')
       const key = `test:${Math.random()}`;
       const value = `value:${Math.random()}`;
       
+      // Exercise all three primary cache operations
       await cache.set(key, value, 300);
       await cache.get(key);
       await cache.del(key);
@@ -83,6 +130,11 @@ export function createCacheTestScenario(cache: any, name: string = 'cache-test')
   };
 }
 
+/**
+ * Creates a load test scenario for rate limiting
+ * This simulates multiple users hitting rate limits concurrently, which is
+ * representative of real-world API usage patterns
+ */
 export function createRateLimitTestScenario(rateLimiter: any, name: string = 'rate-limit-test'): LoadTestScenario {
   return {
     name,
@@ -90,12 +142,18 @@ export function createRateLimitTestScenario(rateLimiter: any, name: string = 'ra
     requests: 2000,
     concurrency: 20,
     requestFn: async () => {
+      // Simulate a pool of 100 users to test rate limit distribution
       const userId = `user:${Math.floor(Math.random() * 100)}`;
       await rateLimiter.hit(userId, 100, 60000);
     }
   };
 }
 
+/**
+ * Creates a high-volume logging test scenario
+ * This tests the logger's ability to handle rapid, concurrent log messages
+ * without blocking or causing memory issues
+ */
 export function createLoggingTestScenario(logger: any, name: string = 'logging-test'): LoadTestScenario {
   return {
     name,
@@ -112,6 +170,11 @@ export function createLoggingTestScenario(logger: any, name: string = 'logging-t
   };
 }
 
+/**
+ * Creates a validation performance test scenario
+ * This tests how well the validator handles concurrent validation requests
+ * with varying data patterns
+ */
 export function createValidationTestScenario(validator: any, name: string = 'validation-test'): LoadTestScenario {
   return {
     name,
@@ -130,7 +193,11 @@ export function createValidationTestScenario(validator: any, name: string = 'val
   };
 }
 
-// Test suite factory
+/**
+ * Factory function to create a comprehensive test suite
+ * This intelligently combines individual component tests and adds integration
+ * tests when multiple components are available
+ */
 export function createComprehensiveTestSuite(components: {
   cache?: any;
   rateLimiter?: any;
@@ -139,6 +206,7 @@ export function createComprehensiveTestSuite(components: {
 }): LoadTestSuiteOptions {
   const scenarios: LoadTestScenario[] = [];
 
+  // Add individual component tests
   if (components.cache) {
     scenarios.push(createCacheTestScenario(components.cache));
   }
@@ -155,7 +223,8 @@ export function createComprehensiveTestSuite(components: {
     scenarios.push(createValidationTestScenario(components.validator));
   }
 
-  // Add integration scenarios if multiple components are available
+  // Add integration test when multiple components are available
+  // This simulates a realistic workflow where components interact
   if (Object.keys(components).length > 1) {
     scenarios.push({
       name: 'integration-test',
@@ -165,19 +234,19 @@ export function createComprehensiveTestSuite(components: {
       requestFn: async () => {
         const userId = `user:${Math.random()}`;
         
-        // Rate limiting check
+        // Rate limiting check - simulate authentication/throttling layer
         if (components.rateLimiter) {
           const rateLimitResult = await components.rateLimiter.hit(userId, 100, 60000);
           if (!rateLimitResult.allowed) return;
         }
 
-        // Validation
+        // Validation - ensure data integrity
         if (components.validator) {
           const data = { name: 'Test', age: 25, email: 'test@example.com' };
           await components.validator.validate('user', data);
         }
 
-        // Cache operations
+        // Cache operations - simulate data layer
         if (components.cache) {
           const cacheKey = `data:${userId}`;
           let cachedData = await components.cache.get(cacheKey);
@@ -187,7 +256,7 @@ export function createComprehensiveTestSuite(components: {
           }
         }
 
-        // Logging
+        // Logging - audit trail
         if (components.logger) {
           components.logger.info('Integration test completed', { userId });
         }
@@ -198,11 +267,19 @@ export function createComprehensiveTestSuite(components: {
   return { scenarios };
 }
 
-// Performance monitoring helpers
+/**
+ * Helper function to create a performance monitor with optional configuration
+ * This provides a convenient way to instantiate monitors with sensible defaults
+ */
 export function createPerformanceMonitor(config?: PerformanceMonitorConfig): PerformanceMonitor {
   return new PerformanceMonitor(config);
 }
 
+/**
+ * Sets up comprehensive monitoring for core utility components
+ * This function establishes metric collection, baselines, and thresholds
+ * for all key performance indicators
+ */
 export function setupCoreMetricsMonitoring(
   monitor: PerformanceMonitor,
   components: {
@@ -211,7 +288,7 @@ export function setupCoreMetricsMonitoring(
     logger?: any;
   }
 ): void {
-  // Cache metrics
+  // Cache metrics - monitor cache effectiveness and performance
   if (components.cache && components.cache.getMetrics) {
     monitor.startMonitoring('cache-hit-rate', async () => {
       const metrics = components.cache.getMetrics();
@@ -229,7 +306,7 @@ export function setupCoreMetricsMonitoring(
     }, 5000);
   }
 
-  // Rate limiter metrics
+  // Rate limiter metrics - track throttling effectiveness
   if (components.rateLimiter && components.rateLimiter.getMetrics) {
     monitor.startMonitoring('rate-limit-block-rate', async () => {
       const metrics = components.rateLimiter.getMetrics();
@@ -242,17 +319,19 @@ export function setupCoreMetricsMonitoring(
     }, 5000);
   }
 
-  // System metrics
+  // System-level metrics - monitor overall application health
   monitor.startMonitoring('memory-usage', async () => {
     return process.memoryUsage().heapUsed;
   }, 10000);
 
   monitor.startMonitoring('cpu-usage', async () => {
     const usage = process.cpuUsage();
-    return (usage.user + usage.system) / 1000; // Convert to milliseconds
+    // Convert microseconds to milliseconds for easier interpretation
+    return (usage.user + usage.system) / 1000;
   }, 10000);
 
-  // Set up default baselines
+  // Establish performance baselines for comparison
+  // These thresholds are based on typical production requirements
   monitor.setBaseline('cache-hit-rate', {
     expectedValue: 0.8,
     p95Threshold: 0.9,
@@ -278,53 +357,80 @@ export function setupCoreMetricsMonitoring(
   });
 }
 
-// Test result analysis helpers
+/**
+ * Interface for performance analysis results
+ * This provides structured feedback about test performance
+ */
+export interface PerformanceAnalysis {
+  overallScore: number;
+  criticalIssues: string[];
+  warnings: string[];
+  recommendations: string[];
+  summary: {
+    totalTests: number;
+    successfulTests: number;
+    failedTests: number;
+    averagePerformance: number;
+  };
+}
+
+/**
+ * Analyzes benchmark results and provides actionable insights
+ * This function examines performance across all categories and identifies
+ * potential bottlenecks, degradations, or areas for optimization
+ */
 export function analyzePerformanceResults(results: BenchmarkSuite): PerformanceAnalysis {
   const criticalIssues: string[] = [];
   const warnings: string[] = [];
   const recommendations: string[] = [];
 
-  // Analyze cache performance
-  const cacheResults = results.results.filter(r => r.category === 'cache');
+  // Analyze cache performance - critical for application speed
+  const cacheResults = results.results.filter((r: BenchmarkResult) => r.category === 'cache');
   if (cacheResults.length > 0) {
-    const avgOps = cacheResults.reduce((sum, r) => sum + r.operationsPerSecond, 0) / cacheResults.length;
+    const avgOps = cacheResults.reduce((sum: number, r: BenchmarkResult) => 
+      sum + r.operationsPerSecond, 0) / cacheResults.length;
+    
     if (avgOps < 5000) {
       criticalIssues.push('Cache performance is below expected threshold (5000 ops/sec)');
       recommendations.push('Consider optimizing cache implementation or increasing memory allocation');
     }
 
-    const getResult = cacheResults.find(r => r.name === 'cache:get');
+    const getResult = cacheResults.find((r: BenchmarkResult) => r.name === 'cache:get');
     if (getResult && getResult.averageTimeMs && getResult.averageTimeMs > 1) {
       warnings.push('Cache get operations are slower than expected (>1ms)');
       recommendations.push('Investigate cache adapter performance and memory usage');
     }
   }
 
-  // Analyze rate limiting performance
-  const rateLimitResults = results.results.filter(r => r.category === 'rate-limit');
+  // Analyze rate limiting performance - important for API protection
+  const rateLimitResults = results.results.filter((r: BenchmarkResult) => r.category === 'rate-limit');
   if (rateLimitResults.length > 0) {
-    const avgOps = rateLimitResults.reduce((sum, r) => sum + r.operationsPerSecond, 0) / rateLimitResults.length;
+    const avgOps = rateLimitResults.reduce((sum: number, r: BenchmarkResult) => 
+      sum + r.operationsPerSecond, 0) / rateLimitResults.length;
+    
     if (avgOps < 2000) {
       criticalIssues.push('Rate limiting performance is below expected threshold (2000 ops/sec)');
       recommendations.push('Consider optimizing rate limiting algorithm or storage backend');
     }
   }
 
-  // Analyze logging performance
-  const loggingResults = results.results.filter(r => r.category === 'logging');
+  // Analyze logging performance - impacts overall system throughput
+  const loggingResults = results.results.filter((r: BenchmarkResult) => r.category === 'logging');
   if (loggingResults.length > 0) {
-    const avgOps = loggingResults.reduce((sum, r) => sum + r.operationsPerSecond, 0) / loggingResults.length;
+    const avgOps = loggingResults.reduce((sum: number, r: BenchmarkResult) => 
+      sum + r.operationsPerSecond, 0) / loggingResults.length;
+    
     if (avgOps < 5000) {
       warnings.push('Logging performance is below optimal threshold (5000 ops/sec)');
       recommendations.push('Consider enabling async transport or optimizing log formatting');
     }
   }
 
-  // Analyze memory usage
-  const memoryResults = results.results.filter(r => r.memoryResults);
+  // Analyze memory usage patterns - detect potential memory leaks
+  const memoryResults = results.results.filter((r: BenchmarkResult) => r.memoryResults);
   if (memoryResults.length > 0) {
-    const hasExcessiveMemoryUsage = memoryResults.some(r => 
-      r.memoryResults?.some(m => m.heapUsed > 500 * 1024 * 1024)
+    const hasExcessiveMemoryUsage = memoryResults.some((r: BenchmarkResult) => 
+      r.memoryResults?.some((m: MemoryBenchmarkPoint) => m.heapUsed > 500 * 1024 * 1024)
     );
     
     if (hasExcessiveMemoryUsage) {
@@ -343,33 +449,19 @@ export function analyzePerformanceResults(results: BenchmarkSuite): PerformanceA
       successfulTests: results.summary.successfulTests,
       failedTests: results.summary.failedTests,
       averagePerformance: Object.values(results.summary.categoryStats)
-        .reduce((sum, stats) => sum + stats.averageOpsPerSecond, 0) / Object.keys(results.summary.categoryStats).length
+        .reduce((sum: number, stats: CategoryStats) => 
+          sum + stats.averageOpsPerSecond, 0) / Object.keys(results.summary.categoryStats).length
     }
   };
 }
 
+/**
+ * Calculates an overall performance score based on issues found
+ * Scoring: 100 (perfect) - 20 per critical issue - 5 per warning
+ */
 function calculateOverallScore(criticalCount: number, warningCount: number): number {
   let score = 100;
-  score -= criticalCount * 20; // -20 points per critical issue
-  score -= warningCount * 5;   // -5 points per warning
+  score -= criticalCount * 20; // Severe performance issues
+  score -= warningCount * 5;   // Minor performance concerns
   return Math.max(0, score);
 }
-
-export interface PerformanceAnalysis {
-  overallScore: number;
-  criticalIssues: string[];
-  warnings: string[];
-  recommendations: string[];
-  summary: {
-    totalTests: number;
-    successfulTests: number;
-    failedTests: number;
-    averagePerformance: number;
-  };
-}
-
-
-
-
-
-

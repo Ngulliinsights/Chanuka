@@ -13,10 +13,10 @@ import {
   type InsertSocialShare,
   type UserSocialProfile,
   type Evaluation,
-} from '../../shared/schema.js';
+} from '../../../shared/schema.ts';
 import session from 'express-session';
-import { logger } from '../../utils/logger.js';
-// Simple memory store implementation since memorystore is not available
+import { logger } from '@shared/core/src/logging';
+// Simple memory store implementation since connect-memorystore is not available
 class SimpleMemoryStore extends session.Store {
   private sessions: Map<string, any> = new Map();
 
@@ -59,7 +59,7 @@ class SimpleMemoryStore extends session.Store {
 }
 
 // Define types for evaluation-related functionality
-interface Evaluation {
+interface EvaluationType {
   id: number;
   candidateId: number;
   evaluatorId: number;
@@ -72,8 +72,7 @@ interface Evaluation {
 }
 
 interface CreateEvaluationInput {
-  candidateId: number;
-  evaluatorId: number;
+  candidateName: string;
   departmentId: number;
   scores: Record<string, number>;
   feedback: string;
@@ -228,12 +227,28 @@ export class MemStorage implements IStorage {
     this.users.set(newUser.id, newUser);
     this.usersByUsername.set(user.email.toLowerCase(), newUser);
 
+    logger.info('User created successfully', {
+      component: 'storage',
+      operation: 'createUser',
+      userId: newUser.id,
+      email: newUser.email,
+      role: newUser.role,
+    });
+
     return newUser;
   }
 
   async linkSocialProfile(userId: string, profile: { platform: string; profileId: string; username: string }): Promise<User> {
     const user = this.users.get(userId);
-    if (!user) throw new Error(`User not found with ID: ${userId}`);
+    if (!user) {
+      logger.warn('Attempted to link social profile for non-existent user', {
+        component: 'storage',
+        operation: 'linkSocialProfile',
+        userId,
+        platform: profile.platform,
+      });
+      throw new Error(`User not found with ID: ${userId}`);
+    }
 
     // Create the key for social profile index
     const key = `${profile.platform}:${profile.profileId}`;
@@ -241,6 +256,13 @@ export class MemStorage implements IStorage {
     // Check if profile is already linked to another user
     const existingUser = this.usersBySocialProfile.get(key);
     if (existingUser && existingUser.id !== userId) {
+      logger.warn('Social profile already linked to another user', {
+        component: 'storage',
+        operation: 'linkSocialProfile',
+        userId,
+        platform: profile.platform,
+        existingUserId: existingUser.id,
+      });
       throw new Error(`Profile already linked to another user: ${existingUser.email}`);
     }
 
@@ -259,40 +281,93 @@ export class MemStorage implements IStorage {
 
     // Note: socialProfiles should be managed separately in a dedicated table
     // For now, just return the user without modifying it
+    logger.info('Social profile linked successfully', {
+      component: 'storage',
+      operation: 'linkSocialProfile',
+      userId,
+      platform: profile.platform,
+      username: profile.username,
+    });
+
     return user;
   }
 
   async unlinkSocialProfile(userId: string, platform: string): Promise<User> {
     const user = this.users.get(userId);
-    if (!user) throw new Error(`User not found with ID: ${userId}`);
+    if (!user) {
+      logger.warn('Attempted to unlink social profile for non-existent user', {
+        component: 'storage',
+        operation: 'unlinkSocialProfile',
+        userId,
+        platform,
+      });
+      throw new Error(`User not found with ID: ${userId}`);
+    }
 
     // Remove from social profile index
     const key = `${platform}:${userId}`;
+    const existed = this.usersBySocialProfile.has(key);
     this.usersBySocialProfile.delete(key);
 
     // Update user record
     user.updatedAt = new Date();
+
+    logger.info('Social profile unlinked', {
+      component: 'storage',
+      operation: 'unlinkSocialProfile',
+      userId,
+      platform,
+      existed,
+    });
 
     return user;
   }
 
   async updateUserReputation(userId: string, change: number): Promise<User> {
     const user = this.users.get(userId);
-    if (!user) throw new Error(`User not found with ID: ${userId}`);
+    if (!user) {
+      logger.warn('Attempted to update reputation for non-existent user', {
+        component: 'storage',
+        operation: 'updateUserReputation',
+        userId,
+        change,
+      });
+      throw new Error(`User not found with ID: ${userId}`);
+    }
 
     // Note: reputation property doesn't exist in User schema, skipping for now
     user.updatedAt = new Date();
+
+    logger.info('User reputation updated', {
+      component: 'storage',
+      operation: 'updateUserReputation',
+      userId,
+      change,
+    });
 
     return user;
   }
 
   async updateUserLastActive(userId: string): Promise<User> {
     const user = this.users.get(userId);
-    if (!user) throw new Error(`User not found with ID: ${userId}`);
+    if (!user) {
+      logger.warn('Attempted to update last active for non-existent user', {
+        component: 'storage',
+        operation: 'updateUserLastActive',
+        userId,
+      });
+      throw new Error(`User not found with ID: ${userId}`);
+    }
 
     // Note: lastActive property doesn't exist in User schema, using lastLoginAt instead
     user.lastLoginAt = new Date();
     user.updatedAt = new Date();
+
+    logger.debug('User last active updated', {
+      component: 'storage',
+      operation: 'updateUserLastActive',
+      userId,
+    });
 
     return user;
   }
@@ -345,33 +420,80 @@ export class MemStorage implements IStorage {
       });
     }
 
+    logger.info('Bill created successfully', {
+      component: 'storage',
+      operation: 'createBill',
+      billId: newBill.id,
+      title: newBill.title,
+      sponsorId: newBill.sponsorId,
+      tags: newBill.tags,
+    });
+
     return newBill;
   }
 
   async incrementBillViews(billId: number): Promise<Bill> {
     const bill = this.bills.get(billId);
-    if (!bill) throw new Error(`Bill not found with ID: ${billId}`);
+    if (!bill) {
+      logger.warn('Attempted to increment views for non-existent bill', {
+        component: 'storage',
+        operation: 'incrementBillViews',
+        billId,
+      });
+      throw new Error(`Bill not found with ID: ${billId}`);
+    }
 
     // Increment viewCount instead of using views property
-    bill.viewCount = (bill.viewCount || 0) + 1;
+    const previousViews = bill.viewCount || 0;
+    bill.viewCount = previousViews + 1;
     bill.updatedAt = new Date();
+
+    logger.debug('Bill views incremented', {
+      component: 'storage',
+      operation: 'incrementBillViews',
+      billId,
+      previousViews,
+      newViews: bill.viewCount,
+    });
 
     return bill;
   }
 
   async incrementBillShares(billId: number): Promise<Bill> {
     const bill = this.bills.get(billId);
-    if (!bill) throw new Error(`Bill not found with ID: ${billId}`);
+    if (!bill) {
+      logger.warn('Attempted to increment shares for non-existent bill', {
+        component: 'storage',
+        operation: 'incrementBillShares',
+        billId,
+      });
+      throw new Error(`Bill not found with ID: ${billId}`);
+    }
 
     // Increment shareCount instead of using shares property
-    bill.shareCount = (bill.shareCount || 0) + 1;
+    const previousShares = bill.shareCount || 0;
+    bill.shareCount = previousShares + 1;
     bill.updatedAt = new Date();
+
+    logger.debug('Bill shares incremented', {
+      component: 'storage',
+      operation: 'incrementBillShares',
+      billId,
+      previousShares,
+      newShares: bill.shareCount,
+    });
 
     return bill;
   }
 
   async getBillsByTags(tags: string[]): Promise<Bill[]> {
-    if (!tags || tags.length === 0) return [];
+    if (!tags || tags.length === 0) {
+      logger.debug('No tags provided for bill search', {
+        component: 'storage',
+        operation: 'getBillsByTags',
+      });
+      return [];
+    }
 
     // Find bills that match any of the provided tags
     const billIds = new Set<number>();
@@ -383,9 +505,18 @@ export class MemStorage implements IStorage {
     });
 
     // Get the actual bill objects
-    return Array.from(billIds)
+    const bills = Array.from(billIds)
       .map(id => this.bills.get(id))
       .filter((bill): bill is Bill => bill !== undefined);
+
+    logger.debug('Bills retrieved by tags', {
+      component: 'storage',
+      operation: 'getBillsByTags',
+      tags,
+      billCount: bills.length,
+    });
+
+    return bills;
   }
 
   // ==============================
@@ -413,8 +544,12 @@ export class MemStorage implements IStorage {
       updatedAt: new Date(),
       userId: progress.userId,
       achievementType: progress.achievementType,
-      progress: progress.progress,
-      completedAt: progress.completedAt,
+      achievementValue: progress.achievementValue,
+      level: progress.level || 1,
+      badge: progress.badge || null,
+      description: progress.description,
+      recommendation: progress.recommendation || null,
+      unlockedAt: new Date(),
     };
 
     this.userProgress.get(Number(userId))?.push(newProgress);
@@ -498,6 +633,16 @@ export class MemStorage implements IStorage {
 
     this.stakeholders.set(newStakeholder.id, newStakeholder);
 
+    logger.info('Stakeholder created successfully', {
+      component: 'storage',
+      operation: 'createStakeholder',
+      stakeholderId: newStakeholder.id,
+      name: newStakeholder.name,
+      organization: newStakeholder.organization,
+      sector: newStakeholder.sector,
+      type: newStakeholder.type,
+    });
+
     return newStakeholder;
   }
 
@@ -506,7 +651,16 @@ export class MemStorage implements IStorage {
     vote: { billId: number; vote: 'yes' | 'no' | 'abstain'; date: string },
   ): Promise<Stakeholder> {
     const stakeholder = this.stakeholders.get(stakeholderId);
-    if (!stakeholder) throw new Error(`Stakeholder not found with ID: ${stakeholderId}`);
+    if (!stakeholder) {
+      logger.warn('Attempted to update voting history for non-existent stakeholder', {
+        component: 'storage',
+        operation: 'updateStakeholderVotingHistory',
+        stakeholderId,
+        billId: vote.billId,
+        vote: vote.vote,
+      });
+      throw new Error(`Stakeholder not found with ID: ${stakeholderId}`);
+    }
 
     // Initialize votingHistory if it doesn't exist
     if (!(stakeholder as any).votingHistory) {
@@ -518,7 +672,8 @@ export class MemStorage implements IStorage {
       (v: any) => v.billId === vote.billId,
     );
 
-    if (existingVoteIndex >= 0) {
+    const isUpdate = existingVoteIndex >= 0;
+    if (isUpdate) {
       // Update existing vote
       (stakeholder as any).votingHistory[existingVoteIndex] = vote;
     } else {
@@ -527,6 +682,15 @@ export class MemStorage implements IStorage {
     }
 
     stakeholder.updatedAt = new Date();
+
+    logger.info('Stakeholder voting history updated', {
+      component: 'storage',
+      operation: 'updateStakeholderVotingHistory',
+      stakeholderId,
+      billId: vote.billId,
+      vote: vote.vote,
+      isUpdate,
+    });
 
     return stakeholder;
   }
@@ -542,12 +706,9 @@ export class MemStorage implements IStorage {
   async createEvaluation(input: CreateEvaluationInput): Promise<Evaluation> {
     const newEvaluation: Evaluation = {
       id: this.generateUniqueId(this.evaluations),
-      candidateId: input.candidateId,
-      evaluatorId: input.evaluatorId,
+      candidateName: input.candidateName,
       departmentId: input.departmentId,
       status: 'pending',
-      scores: input.scores,
-      feedback: input.feedback,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -561,7 +722,7 @@ export class MemStorage implements IStorage {
     const evaluation = this.evaluations.get(id);
     if (!evaluation) throw new Error(`Evaluation not found with ID: ${id}`);
 
-    evaluation.status = status;
+    evaluation.status = status as any;
     evaluation.updatedAt = new Date();
 
     return evaluation;
@@ -644,6 +805,15 @@ export class MemStorage implements IStorage {
       this.billCommentsByParent.get(comment.parentCommentId)?.add(newComment.id);
     }
 
+    logger.info('Bill comment created', {
+      component: 'storage',
+      operation: 'createBillComment',
+      commentId: newComment.id,
+      billId: newComment.billId,
+      userId: newComment.userId,
+      parentCommentId: newComment.parentCommentId,
+    });
+
     return newComment;
   }
 
@@ -653,10 +823,27 @@ export class MemStorage implements IStorage {
     endorsements: number,
   ): Promise<BillComment> {
     const comment = this.billComments.get(commentId);
-    if (!comment) throw new Error(`Comment not found with ID: ${commentId}`);
+    if (!comment) {
+      logger.warn('Attempted to update endorsements for non-existent comment', {
+        component: 'storage',
+        operation: 'updateBillCommentEndorsements',
+        commentId,
+        endorsements,
+      });
+      throw new Error(`Comment not found with ID: ${commentId}`);
+    }
 
-    comment.endorsements = endorsements;
+    const previousEndorsements = (comment as any).endorsements || 0;
+    (comment as any).endorsements = endorsements;
     comment.updatedAt = new Date();
+
+    logger.debug('Bill comment endorsements updated', {
+      component: 'storage',
+      operation: 'updateBillCommentEndorsements',
+      commentId,
+      previousEndorsements,
+      newEndorsements: endorsements,
+    });
 
     return comment;
   }
@@ -670,10 +857,25 @@ export class MemStorage implements IStorage {
 
   async highlightComment(commentId: number): Promise<BillComment> {
     const comment = this.billComments.get(commentId);
-    if (!comment) throw new Error(`Comment not found with ID: ${commentId}`);
+    if (!comment) {
+      logger.warn('Attempted to highlight non-existent comment', {
+        component: 'storage',
+        operation: 'highlightComment',
+        commentId,
+      });
+      throw new Error(`Comment not found with ID: ${commentId}`);
+    }
 
-    comment.isHighlighted = true;
+    (comment as any).isHighlighted = true;
     comment.updatedAt = new Date();
+
+    logger.info('Bill comment highlighted', {
+      component: 'storage',
+      operation: 'highlightComment',
+      commentId,
+      billId: comment.billId,
+      userId: comment.userId,
+    });
 
     return comment;
   }

@@ -4,7 +4,6 @@ import { getMonitoringService, resetMonitoringService } from '../../../monitorin
 import { connectionManager } from '../connection-manager';
 import type { PoolClient } from 'pg';
 
-// Mock the connection manager with explicit typing for better type safety
 jest.mock('../connection-manager', () => ({
   connectionManager: {
     acquireConnection: jest.fn(),
@@ -12,7 +11,6 @@ jest.mock('../connection-manager', () => ({
   },
 }));
 
-// Mock the logger to prevent console noise during tests
 jest.mock('../../../../utils/logger', () => ({
   logger: {
     info: jest.fn(),
@@ -22,62 +20,80 @@ jest.mock('../../../../utils/logger', () => ({
 }));
 
 describe('Slow Query Detection', () => {
-  // Constants improve readability and make threshold adjustments easier across all tests
   const SLOW_QUERY_THRESHOLD_MS = 100;
   const FAST_QUERY_DELAY_MS = 50;
   const SLOW_QUERY_DELAY_MS = 150;
   const TEST_SQL = 'SELECT * FROM test_table';
   const TEST_CONTEXT = 'test-context';
 
-  // FIX 1: Ensure queryExecutor is declared here in the outer scope
-  // so it's accessible within all `it` blocks. The "Cannot find name"
-  // error suggests this was either deleted or moved by accident.
   let queryExecutor: QueryExecutor;
   let mockClient: { query: jest.MockedFunction<(...args: any[]) => void> };
   let monitoringService: any;
 
   /**
-   * Creates a mock query function that simulates async database operations.
-   * With fake timers, the callback is scheduled but won't execute until we advance time.
-   * This gives us precise control over timing in tests.
+   * Creates a mock query function that works with callback-style pg queries and fake timers.
+   * 
+   * The key to making this work with fake timers is understanding the flow:
+   * 1. The query method is called with a callback as the last argument
+   * 2. We schedule the callback to run after a specific delay using setTimeout
+   * 3. The test controls when that setTimeout fires by advancing fake timers
+   * 4. We return undefined immediately (callback-style queries don't return anything)
+   * 
+   * The critical difference from the previous version: we DON'T use the delayMs parameter
+   * to actually delay execution. Instead, the QueryExecutor's internal timing mechanism
+   * will measure how long the query takes based on when we advance the fake timers.
    */
-  // FIX 2: Changed the function signature to use rest parameters (...args).
-  // This makes the mock's type generic enough to be compatible with Jest's
-  // internal 'UnknownFunction' type, resolving the type mismatch error.
-  const createMockQuery = (delayMs: number = 0) => {
-    return jest.fn((...args: any[]) => {
-      // The callback is always the last argument for this pg.Client.query overload
+  const createMockQuery = (delayMs: number = 0): jest.MockedFunction<(...args: any[]) => void> => {
+    return jest.fn((...args: any[]): void => {
+      // The last argument is always the callback in callback-style queries
       const callback = args[args.length - 1] as (err: Error | null, result: any) => void;
+      
+      // Schedule the callback to execute, but don't actually wait
+      // The test will control when this fires by advancing timers
       setTimeout(() => {
         callback(null, { rows: [], rowCount: 0 });
       }, delayMs);
-    });
+      
+      // Callback-style query methods return void, not a Promise
+      return undefined;
+    }) as jest.MockedFunction<(...args: any[]) => void>;
+  };
+
+  /**
+   * Helper function to advance time and flush all pending promises.
+   * 
+   * This is the secret sauce that prevents infinite timer loops:
+   * - advanceTimersByTime moves the clock forward by a specific amount
+   * - We then flush microtasks (promise callbacks) that were triggered
+   * - Finally, we run only the timers that are currently pending (not future ones)
+   * 
+   * This gives us surgical control over time advancement without falling into
+   * the trap of trying to exhaust all timers recursively.
+   */
+  const advanceTimersByTime = async (ms: number): Promise<void> => {
+    // Move the fake timer clock forward
+    jest.advanceTimersByTime(ms);
+    
+    // Flush any promise callbacks that were triggered by the timer advancement
+    await Promise.resolve();
+    
+    // Run any timers that are now ready to fire (but not recursively)
+    await jest.runOnlyPendingTimersAsync();
   };
 
   beforeEach(() => {
-    // Fake timers make tests deterministic, fast, and eliminate flakiness from real time delays
     jest.useFakeTimers();
-
-    // Reset services to ensure complete test isolation
     resetMonitoringService();
     monitoringService = getMonitoringService();
 
-    /**
-     * Create a fresh mock client for each test to prevent cross-test contamination.
-     * We use Pick<PoolClient, 'query'> to tell TypeScript we're only mocking the 'query' method,
-     * which is all our tests need. The type assertion 'as any as PoolClient' tells the connection
-     * manager mock that our partial mock is acceptable as a full PoolClient for testing purposes.
-     * This is a common pattern in testing where we don't need to mock every property of a complex type.
-     */
+    // Initialize the mock client with a default query implementation
     mockClient = {
       query: jest.fn(),
     };
 
-    // Setup connection manager mocks with proper typing
     jest.mocked(connectionManager.acquireConnection).mockResolvedValue(mockClient as any as PoolClient);
     jest.mocked(connectionManager.releaseConnection).mockResolvedValue(undefined);
 
-    // Initialize QueryExecutor with consistent test configuration
     queryExecutor = new QueryExecutor({
       slowQueryThresholdMs: SLOW_QUERY_THRESHOLD_MS,
       enableSlowQueryDetection: true,
@@ -85,26 +101,28 @@ describe('Slow Query Detection', () => {
   });
 
   afterEach(() => {
-    // Restore real timers and clear all mocks to prevent test pollution
     jest.useRealTimers();
     jest.clearAllMocks();
   });
 
   describe('Threshold Detection', () => {
     it('should detect queries exceeding the threshold', async () => {
-      // Setup a query that takes 150ms, which exceeds our 100ms threshold
+      // Mock the query to complete after SLOW_QUERY_DELAY_MS milliseconds
       mockClient.query = createMockQuery(SLOW_QUERY_DELAY_MS);
       const query = { sql: TEST_SQL, context: TEST_CONTEXT };
 
+      // Start the query execution (this returns a Promise but doesn't block)
       const executionPromise = queryExecutor.execute(query);
 
-      // Advance fake timers to simulate the passage of time and trigger query completion
-      await jest.advanceTimersByTimeAsync(SLOW_QUERY_DELAY_MS);
+      // Advance time past the slow query threshold
+      // This allows the QueryExecutor's internal timing mechanism to detect it as slow
+      await advanceTimersByTime(SLOW_QUERY_DELAY_MS + 10);
+      
+      // Wait for the execution to complete
       await executionPromise;
 
       const slowQueries = queryExecutor.getSlowQueries();
 
-      // Verify exactly one slow query was detected with correct attributes
       expect(slowQueries).toHaveLength(1);
       expect(slowQueries[0].executionTimeMs).toBeGreaterThanOrEqual(SLOW_QUERY_THRESHOLD_MS);
       expect(slowQueries[0].sql).toBe(query.sql);
@@ -112,23 +130,21 @@ describe('Slow Query Detection', () => {
     });
 
     it('should not detect queries below the threshold', async () => {
-      // Setup a query that takes 50ms, staying well below our 100ms threshold
+      // Mock the query to complete quickly
       mockClient.query = createMockQuery(FAST_QUERY_DELAY_MS);
       const query = { sql: TEST_SQL, context: TEST_CONTEXT };
 
       const executionPromise = queryExecutor.execute(query);
-
-      // Advance timers to complete the fast query
-      await jest.advanceTimersByTimeAsync(FAST_QUERY_DELAY_MS);
+      
+      // Advance time, but not enough to cross the slow query threshold
+      await advanceTimersByTime(FAST_QUERY_DELAY_MS + 10);
       await executionPromise;
 
-      // No slow queries should be recorded for fast queries
       expect(queryExecutor.getSlowQueries()).toHaveLength(0);
     });
 
     it('should respect disabled slow query detection', async () => {
-      // Create executor with detection disabled and a very low threshold that would normally trigger
-      // The low threshold proves the feature is truly disabled, not just having a high threshold
+      // Create an executor with detection disabled
       const disabledExecutor = new QueryExecutor({
         slowQueryThresholdMs: 10,
         enableSlowQueryDetection: false,
@@ -137,24 +153,24 @@ describe('Slow Query Detection', () => {
       mockClient.query = createMockQuery(SLOW_QUERY_DELAY_MS);
       const executionPromise = disabledExecutor.execute({ sql: TEST_SQL, context: TEST_CONTEXT });
 
-      await jest.advanceTimersByTimeAsync(SLOW_QUERY_DELAY_MS);
+      await advanceTimersByTime(SLOW_QUERY_DELAY_MS + 10);
       await executionPromise;
 
-      // Even with a query far exceeding the threshold, detection should be bypassed
+      // Even though the query was slow, it shouldn't be recorded
       expect(disabledExecutor.getSlowQueries()).toHaveLength(0);
     });
   });
 
   describe('Query Type Classification', () => {
     /**
-     * Helper function to test query type detection with minimal code duplication.
-     * This pattern keeps our tests DRY while maintaining clarity about what each test verifies.
+     * Helper function to test that different SQL query types are classified correctly.
+     * This verifies that the QueryExecutor can identify SELECT, INSERT, UPDATE, DELETE, etc.
      */
-    const testQueryType = async (sql: string, expectedKeyword: string) => {
+    const testQueryType = async (sql: string, expectedKeyword: string): Promise<void> => {
       mockClient.query = createMockQuery(SLOW_QUERY_DELAY_MS);
 
       const executionPromise = queryExecutor.execute({ sql });
-      await jest.advanceTimersByTimeAsync(SLOW_QUERY_DELAY_MS);
+      await advanceTimersByTime(SLOW_QUERY_DELAY_MS + 10);
       await executionPromise;
 
       const slowQueries = queryExecutor.getSlowQueries();
@@ -184,13 +200,13 @@ describe('Slow Query Detection', () => {
       mockClient.query = createMockQuery(SLOW_QUERY_DELAY_MS);
 
       const executionPromise = queryExecutor.execute({ sql: TEST_SQL });
-      await jest.advanceTimersByTimeAsync(SLOW_QUERY_DELAY_MS);
+      await advanceTimersByTime(SLOW_QUERY_DELAY_MS + 10);
       await executionPromise;
 
       const slowQueries = queryExecutor.getSlowQueries();
       expect(slowQueries).toHaveLength(1);
 
-      // Verify stack trace is captured and contains meaningful debugging information
+      // Verify that a stack trace was captured
       const { stackTrace } = slowQueries[0];
       expect(stackTrace).toBeDefined();
       expect(typeof stackTrace).toBe('string');
@@ -206,10 +222,10 @@ describe('Slow Query Detection', () => {
       mockClient.query = createMockQuery(SLOW_QUERY_DELAY_MS);
 
       const executionPromise = disabledExecutor.execute({ sql: TEST_SQL });
-      await jest.advanceTimersByTimeAsync(SLOW_QUERY_DELAY_MS);
+      await advanceTimersByTime(SLOW_QUERY_DELAY_MS + 10);
       await executionPromise;
 
-      // No slow queries should be recorded when detection is disabled
+      // When detection is disabled, no slow queries should be recorded at all
       expect(disabledExecutor.getSlowQueries()).toHaveLength(0);
     });
   });
@@ -220,10 +236,10 @@ describe('Slow Query Detection', () => {
       mockClient.query = createMockQuery(SLOW_QUERY_DELAY_MS);
 
       const executionPromise = queryExecutor.execute({ sql: 'SELECT * FROM users' });
-      await jest.advanceTimersByTimeAsync(SLOW_QUERY_DELAY_MS);
+      await advanceTimersByTime(SLOW_QUERY_DELAY_MS + 10);
       await executionPromise;
 
-      // Verify metrics were recorded with correct structure and values
+      // Verify that the monitoring service was called with the correct metric
       expect(recordMetricSpy).toHaveBeenCalledWith(
         'slow_query.select',
         1,
@@ -239,10 +255,10 @@ describe('Slow Query Detection', () => {
       mockClient.query = createMockQuery(SLOW_QUERY_DELAY_MS);
 
       const executionPromise = queryExecutor.execute({ sql: 'INSERT INTO users (name) VALUES ($1)' });
-      await jest.advanceTimersByTimeAsync(SLOW_QUERY_DELAY_MS);
+      await advanceTimersByTime(SLOW_QUERY_DELAY_MS + 10);
       await executionPromise;
 
-      // Verify metric name correctly reflects the query type for proper categorization
+      // Verify that INSERT queries get a different metric name than SELECT queries
       expect(recordMetricSpy).toHaveBeenCalledWith(
         'slow_query.insert',
         1,
@@ -255,22 +271,22 @@ describe('Slow Query Detection', () => {
     it('should store multiple slow queries', async () => {
       mockClient.query = createMockQuery(SLOW_QUERY_DELAY_MS);
 
-      // Execute multiple slow queries sequentially
+      // Execute three queries sequentially, advancing timers for each
       const p1 = queryExecutor.execute({ sql: 'SELECT * FROM table1' });
-      await jest.advanceTimersByTimeAsync(SLOW_QUERY_DELAY_MS);
+      await advanceTimersByTime(SLOW_QUERY_DELAY_MS + 10);
       await p1;
 
       const p2 = queryExecutor.execute({ sql: 'SELECT * FROM table2' });
-      await jest.advanceTimersByTimeAsync(SLOW_QUERY_DELAY_MS);
+      await advanceTimersByTime(SLOW_QUERY_DELAY_MS + 10);
       await p2;
 
       const p3 = queryExecutor.execute({ sql: 'SELECT * FROM table3' });
-      await jest.advanceTimersByTimeAsync(SLOW_QUERY_DELAY_MS);
+      await advanceTimersByTime(SLOW_QUERY_DELAY_MS + 10);
       await p3;
 
       const slowQueries = queryExecutor.getSlowQueries();
 
-      // Verify all three queries were captured and stored with correct SQL
+      // All three queries should be recorded
       expect(slowQueries).toHaveLength(3);
       expect(slowQueries[0].sql).toBe('SELECT * FROM table1');
       expect(slowQueries[1].sql).toBe('SELECT * FROM table2');
@@ -280,26 +296,26 @@ describe('Slow Query Detection', () => {
     it('should maintain chronological order of slow queries', async () => {
       mockClient.query = createMockQuery(SLOW_QUERY_DELAY_MS);
 
-      // Execute queries and verify they are stored in execution order
+      // Execute queries in a specific order
       const p1 = queryExecutor.execute({ sql: 'SELECT 1' });
-      await jest.advanceTimersByTimeAsync(SLOW_QUERY_DELAY_MS);
+      await advanceTimersByTime(SLOW_QUERY_DELAY_MS + 10);
       await p1;
 
       const p2 = queryExecutor.execute({ sql: 'SELECT 2' });
-      await jest.advanceTimersByTimeAsync(SLOW_QUERY_DELAY_MS);
+      await advanceTimersByTime(SLOW_QUERY_DELAY_MS + 10);
       await p2;
 
       const slowQueries = queryExecutor.getSlowQueries();
 
-      // Chronological ordering is important for debugging query patterns over time
+      // Verify that the queries are stored in the order they were executed
       expect(slowQueries).toHaveLength(2);
       expect(slowQueries[0].sql).toBe('SELECT 1');
       expect(slowQueries[1].sql).toBe('SELECT 2');
     });
 
     it('should clear slow queries when requested', () => {
-      // Manually populate slow queries to test the clearing mechanism
-      // Use `as any` to access the private property for testing purposes
+      // Directly populate the slow queries array to test the clear functionality
+      // This bypasses the need to execute actual queries for this specific test
       (queryExecutor as any)['slowQueries'] = [
         {
           queryId: '1',
@@ -317,22 +333,21 @@ describe('Slow Query Detection', () => {
         },
       ];
 
-      // Verify queries exist before clearing
       expect(queryExecutor.getSlowQueries()).toHaveLength(2);
 
       queryExecutor.clearSlowQueries();
 
-      // Verify all queries were removed
       expect(queryExecutor.getSlowQueries()).toHaveLength(0);
     });
 
     it('should handle clearing an already empty list without errors', () => {
-      // Ensure list starts empty
+      // Verify initial state is empty
       expect(queryExecutor.getSlowQueries()).toHaveLength(0);
 
-      // Clearing an empty list should be a safe no-op operation
+      // Clearing an empty list should not throw an error
       expect(() => queryExecutor.clearSlowQueries()).not.toThrow();
 
+      // State should remain empty
       expect(queryExecutor.getSlowQueries()).toHaveLength(0);
     });
   });

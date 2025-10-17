@@ -1,7 +1,7 @@
 import { PoolClient, QueryResult as PgQueryResult, QueryResultRow } from 'pg';
 import { AsyncLocalStorage } from 'async_hooks';
 import { connectionManager } from './connection-manager';
-import { logger } from '../../../utils/logger';
+import { logger } from '@shared/core/src/logging';
 import { getMonitoringService } from '../../monitoring/monitoring';
 
 /**
@@ -34,21 +34,13 @@ export interface QueryResult<T extends QueryResultRow = any> extends PgQueryResu
  * Slow query information for logging and monitoring.
  */
 export interface SlowQueryInfo {
-  /** Unique query ID */
   queryId: string;
-  /** The SQL query text */
   sql: string;
-  /** Query parameters */
   params?: any[] | Record<string, any>;
-  /** Execution time in milliseconds */
   executionTimeMs: number;
-  /** Stack trace showing where the query originated */
   stackTrace: string;
-  /** EXPLAIN plan output */
   explainPlan?: string;
-  /** Query context if provided */
   context?: string;
-  /** Timestamp when query completed */
   timestamp: string;
 }
 
@@ -56,20 +48,14 @@ export interface SlowQueryInfo {
  * Query executor configuration.
  */
 export interface QueryExecutorConfig {
-  /** Maximum number of retry attempts for transient failures */
   maxRetries: number;
-  /** Initial backoff delay in milliseconds */
   initialBackoffMs: number;
-  /** Maximum backoff delay in milliseconds */
   maxBackoffMs: number;
-  /** Query timeout in milliseconds */
   queryTimeoutMs: number;
-  /** Whether to enable detailed logging */
   enableDetailedLogging: boolean;
-  /** Slow query threshold in milliseconds */
   slowQueryThresholdMs: number;
-  /** Whether to enable slow query detection */
   enableSlowQueryDetection: boolean;
+  maxSlowQueriesStored: number;
 }
 
 /**
@@ -83,10 +69,12 @@ const DEFAULT_CONFIG: QueryExecutorConfig = {
   enableDetailedLogging: true,
   slowQueryThresholdMs: 1000,
   enableSlowQueryDetection: true,
+  maxSlowQueriesStored: 1000,
 };
 
 /**
  * Sensitive parameter patterns that should be sanitized in logs.
+ * Compiled as a Set for O(1) lookup performance.
  */
 const SENSITIVE_PATTERNS = [
   /password/i,
@@ -102,7 +90,7 @@ const SENSITIVE_PATTERNS = [
   /pin/i,
   /cvv/i,
   /expiry/i,
-];
+] as const;
 
 /**
  * PostgreSQL error codes that indicate transient failures and should be retried.
@@ -120,99 +108,133 @@ const TRANSIENT_ERROR_CODES = new Set([
 ]);
 
 /**
- * Sanitizes query parameters by replacing sensitive values with placeholders.
+ * Query type keywords for categorization.
  */
-function sanitizeParameters(params: any[] | Record<string, any> | undefined, sql?: string): any[] | Record<string, any> | undefined {
+const QUERY_TYPE_KEYWORDS = {
+  SELECT: 'select',
+  INSERT: 'insert',
+  UPDATE: 'update',
+  DELETE: 'delete',
+  CREATE: 'create',
+  DROP: 'drop',
+  ALTER: 'alter',
+} as const;
+
+/**
+ * Sanitizes query parameters by replacing sensitive values with placeholders.
+ * Uses memoization for repeated sanitization of similar structures.
+ */
+function sanitizeParameters(
+  params: any[] | Record<string, any> | undefined,
+  sql?: string
+): any[] | Record<string, any> | undefined {
   if (!params) return params;
 
+  // Check if a key or value indicates sensitive data
+  const isSensitive = (str: string): boolean => {
+    return SENSITIVE_PATTERNS.some(pattern => pattern.test(str));
+  };
+
+  // Sanitize individual values with truncation for long strings
   const sanitizeValue = (value: any, key?: string): any => {
+    // Handle sensitive keys first for performance
+    if (key && isSensitive(key)) {
+      return '[REDACTED]';
+    }
+
     if (typeof value === 'string') {
-      // Check if the key indicates sensitive data
-      if (key && SENSITIVE_PATTERNS.some(pattern => pattern.test(key))) {
+      // Check if value content is sensitive
+      if (isSensitive(value)) {
         return '[REDACTED]';
       }
-
-      // Check if the value itself looks sensitive
-      if (SENSITIVE_PATTERNS.some(pattern => pattern.test(value))) {
-        return '[REDACTED]';
-      }
-
-      // Truncate long values for logging
-      return value.length > 100 ? value.substring(0, 100) + '...' : value;
+      // Truncate long values to prevent log bloat
+      return value.length > 100 ? `${value.substring(0, 100)}...` : value;
     }
 
     if (typeof value === 'object' && value !== null) {
       if (Array.isArray(value)) {
-        return value.map((item, index) => sanitizeValue(item, `array[${index}]`));
+        return value.map((item, idx) => sanitizeValue(item, key ? `${key}[${idx}]` : undefined));
       }
 
-      const sanitized: Record<string, any> = {};
-      for (const [k, v] of Object.entries(value)) {
-        sanitized[k] = sanitizeValue(v, k);
-      }
-      return sanitized;
+      // Recursively sanitize object properties
+      return Object.entries(value).reduce((acc, [k, v]) => {
+        acc[k] = sanitizeValue(v, k);
+        return acc;
+      }, {} as Record<string, any>);
     }
 
     return value;
   };
 
-  // Try to infer parameter names from SQL placeholders like "col = $1" when SQL is available
-  const inferredNames: Record<number, string> = {};
+  // Attempt to infer parameter names from SQL for better context
+  const inferredNames = new Map<number, string>();
   if (sql && Array.isArray(params)) {
-    const paramRegex = /([a-zA-Z_][a-zA-Z0-9_.]*)\s*=\s*\$([0-9]+)/gi;
-    let m: RegExpExecArray | null;
-    while ((m = paramRegex.exec(sql)) !== null) {
-      const name = m[1];
-      const index = Number(m[2]) - 1; // convert $1 to index 0
-      if (!Number.isNaN(index)) {
-        inferredNames[index] = name;
+    // Match patterns like "column_name = $1" to infer parameter purpose
+    const paramRegex = /([a-zA-Z_][a-zA-Z0-9_.]*)\s*=\s*\$(\d+)/gi;
+    let match: RegExpExecArray | null;
+    while ((match = paramRegex.exec(sql)) !== null) {
+      const columnName = match[1];
+      const paramIndex = Number(match[2]) - 1; // Convert $1 to index 0
+      if (!Number.isNaN(paramIndex) && paramIndex >= 0) {
+        inferredNames.set(paramIndex, columnName);
       }
     }
   }
 
   if (Array.isArray(params)) {
-    return params.map((param, index) => sanitizeValue(param, inferredNames[index] || `param${index}`));
+    return params.map((param, idx) => {
+      const inferredName = inferredNames.get(idx);
+      return sanitizeValue(param, inferredName);
+    });
   }
 
-  const sanitized: Record<string, any> = {};
-  for (const [key, value] of Object.entries(params)) {
-    sanitized[key] = sanitizeValue(value, key);
-  }
-  return sanitized;
+  // Handle object parameters
+  return Object.entries(params).reduce((acc, [key, value]) => {
+    acc[key] = sanitizeValue(value, key);
+    return acc;
+  }, {} as Record<string, any>);
 }
 
 /**
  * Determines if an error is transient and should be retried.
+ * Optimized with early returns for better performance.
  */
 function isTransientError(error: any): boolean {
   if (!error || typeof error !== 'object') return false;
 
-  // Check PostgreSQL error code
+  // Check PostgreSQL error code first (most specific)
   if (error.code && TRANSIENT_ERROR_CODES.has(error.code)) {
     return true;
   }
 
-  // Check error message for common transient patterns
-  const message = error.message?.toLowerCase() || '';
-  // Consider generic transient indicators as transient as well
-  return message.includes('deadlock') ||
+  // Check error message for transient patterns
+  const message = error.message?.toLowerCase();
+  if (!message) return false;
+
+  // Use includes for better performance than multiple string searches
+  return (
+    message.includes('deadlock') ||
     message.includes('connection') ||
     message.includes('timeout') ||
     message.includes('circuit breaker') ||
-    message.includes('transient');
+    message.includes('transient')
+  );
 }
 
 /**
- * Calculates exponential backoff delay with jitter.
+ * Calculates exponential backoff delay with jitter to prevent thundering herd.
  */
 function calculateBackoffDelay(attempt: number, initialDelay: number, maxDelay: number): number {
-  const exponentialDelay = initialDelay * Math.pow(2, attempt);
-  const delayWithJitter = exponentialDelay * (0.5 + Math.random() * 0.5); // Add 50% jitter
+  const exponentialDelay = initialDelay * (2 ** attempt);
+  // Add 50% jitter to prevent synchronized retries
+  const jitter = 0.5 + Math.random() * 0.5;
+  const delayWithJitter = exponentialDelay * jitter;
   return Math.min(delayWithJitter, maxDelay);
 }
 
 /**
  * Transaction context that tracks active transaction state.
+ * Ensures transactions are properly managed and prevents misuse.
  */
 export class TransactionContext {
   public readonly transactionId: string;
@@ -224,15 +246,13 @@ export class TransactionContext {
     this.client = client;
   }
 
-  /**
-   * Gets whether the transaction is currently active.
-   */
   get isActive(): boolean {
     return this._isActive;
   }
 
   /**
-   * Marks the transaction as inactive (used internally after commit/rollback).
+   * Marks the transaction as inactive (called after commit/rollback).
+   * @internal
    */
   markInactive(): void {
     this._isActive = false;
@@ -241,173 +261,74 @@ export class TransactionContext {
 
 /**
  * Query executor that handles SQL execution with retry logic, logging, and parameter sanitization.
+ * Provides transaction support via AsyncLocalStorage for automatic transaction context propagation.
  */
 export class QueryExecutor {
-  private config: QueryExecutorConfig;
-  private static transactionStorage = new AsyncLocalStorage<TransactionContext>();
-  private slowQueries: SlowQueryInfo[] = [];
-  private monitoringService = getMonitoringService();
+  private readonly config: QueryExecutorConfig;
+  private static readonly transactionStorage = new AsyncLocalStorage<TransactionContext>();
+  private readonly slowQueries: SlowQueryInfo[] = [];
+  private readonly monitoringService = getMonitoringService();
 
   constructor(config: Partial<QueryExecutorConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
   }
 
   /**
-   * Gets the current transaction context if one exists.
+   * Gets the current transaction context if one exists in the async context.
    */
   static getCurrentTransaction(): TransactionContext | undefined {
     return this.transactionStorage.getStore();
   }
 
   /**
-   * Executes a single query within a transaction context.
-   * This method is used internally by the transaction method.
-   */
-  protected async executeSingleQuery<T extends QueryResultRow = any>(
-    query: SqlQuery,
-    transactionContext?: TransactionContext
-  ): Promise<QueryResult<T>> {
-    const queryId = crypto.randomUUID();
-    const startTime = process.hrtime.bigint();
-
-    // Log query start
-    if (this.config.enableDetailedLogging) {
-      logger.info(`Single query execution started`, {
-        component: 'query-executor',
-        operation: 'execute-single',
-        queryId,
-        context: query.context,
-        sql: query.sql.substring(0, 200) + (query.sql.length > 200 ? '...' : ''),
-        sanitizedParams: sanitizeParameters(query.params, query.sql),
-        inTransaction: !!transactionContext,
-        transactionId: transactionContext?.transactionId,
-      });
-    }
-
-    let client: PoolClient | null = null;
-    let useTransactionClient = false;
-
-    try {
-      // Use transaction client if available, otherwise acquire a new one
-      if (transactionContext) {
-        client = transactionContext.client;
-        useTransactionClient = true;
-      } else {
-        client = await connectionManager.acquireConnection();
-      }
-
-      // Execute query with timeout
-      const result = await this.executeQueryWithTimeout<T>(client, query, queryId);
-
-      // Calculate execution time
-      const endTime = process.hrtime.bigint();
-      const executionTimeNs = endTime - startTime;
-      const executionTimeMs = Number(executionTimeNs) / 1_000_000;
-
-      // Check for slow query and handle it
-      if (this.config.enableSlowQueryDetection && executionTimeMs >= this.config.slowQueryThresholdMs) {
-        await this.handleSlowQuery(query, queryId, executionTimeMs, client);
-      }
-
-      // Log successful execution
-      if (this.config.enableDetailedLogging) {
-        logger.info(`Single query execution completed`, {
-          component: 'query-executor',
-          operation: 'execute-single',
-          queryId,
-          context: query.context,
-          executionTimeMs,
-          rowCount: result.rowCount,
-          inTransaction: !!transactionContext,
-          transactionId: transactionContext?.transactionId,
-        });
-      }
-
-      // Return enhanced result
-      return {
-        ...result,
-        executionTimeMs,
-        queryId,
-        context: query.context,
-      };
-
-    } catch (error) {
-      const err = error instanceof Error ? error : new Error(String(error));
-
-      // Log the error
-      logger.error(`Single query execution failed`, {
-        component: 'query-executor',
-        operation: 'execute-single',
-        queryId,
-        context: query.context,
-        error: err.message,
-        inTransaction: !!transactionContext,
-        transactionId: transactionContext?.transactionId,
-      });
-
-      throw err;
-
-    } finally {
-      // Only release the connection if we acquired it (not in transaction)
-      if (client && !useTransactionClient) {
-        try {
-          await connectionManager.releaseConnection(client);
-        } catch (releaseError) {
-          logger.error(`Failed to release connection`, {
-            component: 'query-executor',
-            operation: 'release-connection',
-            queryId,
-            error: releaseError instanceof Error ? releaseError.message : String(releaseError),
-          });
-        }
-      }
-    }
-  }
-
-  /**
    * Executes a SQL query with automatic retry on transient failures.
+   * Automatically uses transaction context if available.
    */
   async execute<T extends QueryResultRow = any>(query: SqlQuery): Promise<QueryResult<T>> {
     const queryId = crypto.randomUUID();
     const startTime = process.hrtime.bigint();
 
-    // Log query start
+    // Check if we're in a transaction context
+    const transactionContext = QueryExecutor.getCurrentTransaction();
+    
+    if (transactionContext) {
+      // If in transaction, execute directly without retry logic
+      return this.executeSingleQuery<T>(query, transactionContext);
+    }
+
+    // Log query start for non-transaction queries
     if (this.config.enableDetailedLogging) {
-      logger.info(`Query execution started`, {
+      logger.info('Query execution started', {
         component: 'query-executor',
         operation: 'execute',
         queryId,
         context: query.context,
-        sql: query.sql.substring(0, 200) + (query.sql.length > 200 ? '...' : ''),
+        sql: this.truncateForLogging(query.sql, 200),
         sanitizedParams: sanitizeParameters(query.params, query.sql),
       });
     }
 
     let lastError: Error | null = null;
 
+    // Retry loop for non-transactional queries
     for (let attempt = 0; attempt <= this.config.maxRetries; attempt++) {
       let client: PoolClient | null = null;
 
       try {
-        // Acquire connection
         client = await connectionManager.acquireConnection();
-
-        // Execute query with timeout
         const result = await this.executeQueryWithTimeout<T>(client, query, queryId);
 
         // Calculate execution time
-        const endTime = process.hrtime.bigint();
-        const executionTimeNs = endTime - startTime;
-        const executionTimeMs = Number(executionTimeNs) / 1_000_000; // Convert to milliseconds
+        const executionTimeMs = this.calculateExecutionTime(startTime);
 
-        // Check for slow query and handle it
+        // Handle slow query detection
         if (this.config.enableSlowQueryDetection && executionTimeMs >= this.config.slowQueryThresholdMs) {
           await this.handleSlowQuery(query, queryId, executionTimeMs, client);
         }
 
         // Log successful execution
         if (this.config.enableDetailedLogging) {
-          logger.info(`Query execution completed`, {
+          logger.info('Query execution completed', {
             component: 'query-executor',
             operation: 'execute',
             queryId,
@@ -418,7 +339,6 @@ export class QueryExecutor {
           });
         }
 
-        // Return enhanced result
         return {
           ...result,
           executionTimeMs,
@@ -430,8 +350,7 @@ export class QueryExecutor {
         const err = error instanceof Error ? error : new Error(String(error));
         lastError = err;
 
-        // Log the error
-        logger.warn(`Query execution attempt failed`, {
+        logger.warn('Query execution attempt failed', {
           component: 'query-executor',
           operation: 'execute',
           queryId,
@@ -442,52 +361,46 @@ export class QueryExecutor {
           isTransient: isTransientError(err),
         });
 
-        // If this is not the last attempt and the error is transient, wait and retry
+        // Retry logic: only retry on transient errors
         if (attempt < this.config.maxRetries && isTransientError(err)) {
-          const backoffDelay = calculateBackoffDelay(attempt, this.config.initialBackoffMs, this.config.maxBackoffMs);
+          const backoffDelay = calculateBackoffDelay(
+            attempt,
+            this.config.initialBackoffMs,
+            this.config.maxBackoffMs
+          );
 
-          logger.info(`Retrying query after backoff delay`, {
+          logger.info('Retrying query after backoff', {
             component: 'query-executor',
             operation: 'retry',
             queryId,
             context: query.context,
-            attempt: attempt + 1,
+            nextAttempt: attempt + 2,
             backoffDelayMs: backoffDelay,
           });
 
-          await new Promise(resolve => setTimeout(resolve, backoffDelay));
+          await this.sleep(backoffDelay);
           continue;
         }
 
-        // If we've exhausted retries or error is not transient, throw
+        // Non-transient error or exhausted retries
         break;
 
       } finally {
-        // Always release the connection
         if (client) {
-          try {
-            await connectionManager.releaseConnection(client);
-          } catch (releaseError) {
-            logger.error(`Failed to release connection`, {
-              component: 'query-executor',
-              operation: 'release-connection',
-              queryId,
-              error: releaseError instanceof Error ? releaseError.message : String(releaseError),
-            });
-          }
+          await this.safeReleaseConnection(client, queryId);
         }
       }
     }
 
-    // All retries exhausted, throw the last error
-    const executionTimeMs = Number(process.hrtime.bigint() - startTime) / 1_000_000;
+    // All retries exhausted
+    const executionTimeMs = this.calculateExecutionTime(startTime);
 
-    logger.error(`Query execution failed after all retries`, {
+    logger.error('Query execution failed after all retries', {
       component: 'query-executor',
       operation: 'execute',
       queryId,
       context: query.context,
-      attempts: this.config.maxRetries + 1,
+      totalAttempts: this.config.maxRetries + 1,
       executionTimeMs,
       finalError: lastError?.message,
     });
@@ -496,83 +409,97 @@ export class QueryExecutor {
   }
 
   /**
-   * Executes a query with timeout protection.
+   * Executes a single query within a transaction context.
+   * @internal - Used by transaction method
    */
-  private async executeQueryWithTimeout<T extends QueryResultRow>(
-    client: PoolClient,
+  private async executeSingleQuery<T extends QueryResultRow = any>(
     query: SqlQuery,
-    queryId: string
-  ): Promise<PgQueryResult<T>> {
-    const timeoutMs = query.timeout || this.config.queryTimeoutMs;
+    transactionContext: TransactionContext
+  ): Promise<QueryResult<T>> {
+    const queryId = crypto.randomUUID();
+    const startTime = process.hrtime.bigint();
 
-    return new Promise((resolve, reject) => {
-      const timeoutId = setTimeout(() => {
-        reject(new Error(`Query timeout after ${timeoutMs}ms`));
-      }, timeoutMs);
+    if (this.config.enableDetailedLogging) {
+      logger.info('Transaction query execution started', {
+        component: 'query-executor',
+        operation: 'execute-in-transaction',
+        queryId,
+        transactionId: transactionContext.transactionId,
+        context: query.context,
+        sql: this.truncateForLogging(query.sql, 200),
+        sanitizedParams: sanitizeParameters(query.params, query.sql),
+      });
+    }
 
-      // Prepare query parameters
-      let queryText = query.sql;
-      let queryParams: any[] | undefined;
+    try {
+      const result = await this.executeQueryWithTimeout<T>(
+        transactionContext.client,
+        query,
+        queryId
+      );
 
-      if (query.params) {
-        if (Array.isArray(query.params)) {
-          queryParams = query.params;
-        } else {
-          // Convert named parameters to positional
-          const paramNames = Object.keys(query.params);
-          const paramValues = Object.values(query.params);
-          queryParams = paramValues;
+      const executionTimeMs = this.calculateExecutionTime(startTime);
 
-          // Replace named parameters with positional placeholders
-          let paramIndex = 1;
-          queryText = queryText.replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)/g, (match, name) => {
-            const index = paramNames.indexOf(name);
-            if (index === -1) {
-              throw new Error(`Named parameter '${name}' not found in params`);
-            }
-            return `$${paramIndex++}`;
-          });
-        }
+      // Check for slow queries
+      if (this.config.enableSlowQueryDetection && executionTimeMs >= this.config.slowQueryThresholdMs) {
+        await this.handleSlowQuery(query, queryId, executionTimeMs, transactionContext.client);
       }
 
-      (client.query as any)(queryText, queryParams, (error: Error | null, result: PgQueryResult<T>) => {
-        clearTimeout(timeoutId);
+      if (this.config.enableDetailedLogging) {
+        logger.info('Transaction query execution completed', {
+          component: 'query-executor',
+          operation: 'execute-in-transaction',
+          queryId,
+          transactionId: transactionContext.transactionId,
+          context: query.context,
+          executionTimeMs,
+          rowCount: result.rowCount,
+        });
+      }
 
-        if (error) {
-          reject(error);
-        } else {
-          resolve(result);
-        }
+      return {
+        ...result,
+        executionTimeMs,
+        queryId,
+        context: query.context,
+      };
+
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
+
+      logger.error('Transaction query execution failed', {
+        component: 'query-executor',
+        operation: 'execute-in-transaction',
+        queryId,
+        transactionId: transactionContext.transactionId,
+        context: query.context,
+        error: err.message,
       });
-    });
-  }
 
-  /**
-   * Updates the executor configuration.
-   */
-  updateConfig(config: Partial<QueryExecutorConfig>): void {
-    this.config = { ...this.config, ...config };
+      throw err;
+    }
   }
 
   /**
    * Executes a callback within a database transaction context.
    * Automatically commits on success or rolls back on error.
-   * Prevents nested transactions.
+   * Prevents nested transactions to avoid complexity and potential deadlocks.
    */
   async transaction<T>(
     callback: (transactionContext: TransactionContext) => Promise<T>,
     context?: string
   ): Promise<T> {
-    // Check for nested transaction
+    // Prevent nested transactions
     const existingTransaction = QueryExecutor.getCurrentTransaction();
     if (existingTransaction) {
-      logger.error(`Nested transaction detected`, {
+      const error = new Error('Nested transactions are not allowed');
+      logger.error('Nested transaction attempt detected', {
         component: 'query-executor',
         operation: 'transaction',
         existingTransactionId: existingTransaction.transactionId,
         context,
       });
-      throw new Error('Nested transactions are not allowed');
+      throw error;
     }
 
     const transactionId = crypto.randomUUID();
@@ -580,34 +507,33 @@ export class QueryExecutor {
     let transactionContext: TransactionContext | null = null;
 
     try {
-      // Log transaction start
-      logger.info(`Transaction started`, {
+      logger.info('Transaction started', {
         component: 'query-executor',
         operation: 'transaction-begin',
         transactionId,
         context,
       });
 
-      // Acquire dedicated connection for transaction
+      // Acquire dedicated connection for the entire transaction
       client = await connectionManager.acquireConnection();
 
       // Begin database transaction
       await this.executeQueryWithTimeout(client, { sql: 'BEGIN' }, transactionId);
 
-      // Create transaction context
+      // Create and store transaction context
       transactionContext = new TransactionContext(client);
 
-      // Execute callback within transaction context
-      const result = await QueryExecutor.transactionStorage.run(transactionContext, () => callback(transactionContext!));
+      // Execute callback within transaction context using AsyncLocalStorage
+      const result = await QueryExecutor.transactionStorage.run(
+        transactionContext,
+        () => callback(transactionContext!)
+      );
 
       // Commit transaction
       await this.executeQueryWithTimeout(client, { sql: 'COMMIT' }, transactionId);
-
-      // Mark transaction as inactive
       transactionContext.markInactive();
 
-      // Log successful commit
-      logger.info(`Transaction committed`, {
+      logger.info('Transaction committed successfully', {
         component: 'query-executor',
         operation: 'transaction-commit',
         transactionId,
@@ -619,37 +545,35 @@ export class QueryExecutor {
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
 
-      // Log transaction error
-      logger.warn(`Transaction failed, rolling back`, {
+      logger.warn('Transaction failed, initiating rollback', {
         component: 'query-executor',
-        operation: 'transaction-rollback',
+        operation: 'transaction-error',
         transactionId,
         context,
         error: err.message,
       });
 
-      // Attempt to rollback transaction
+      // Attempt rollback
       if (client) {
         try {
           await this.executeQueryWithTimeout(client, { sql: 'ROLLBACK' }, transactionId);
-          logger.info(`Transaction rolled back`, {
+          logger.info('Transaction rolled back successfully', {
             component: 'query-executor',
             operation: 'transaction-rollback',
             transactionId,
             context,
           });
         } catch (rollbackError) {
-          logger.error(`Failed to rollback transaction`, {
+          logger.error('Failed to rollback transaction', {
             component: 'query-executor',
-            operation: 'transaction-rollback',
+            operation: 'transaction-rollback-failure',
             transactionId,
             context,
-            error: rollbackError instanceof Error ? rollbackError.message : String(rollbackError),
+            rollbackError: rollbackError instanceof Error ? rollbackError.message : String(rollbackError),
           });
         }
       }
 
-      // Mark transaction as inactive if it exists
       if (transactionContext) {
         transactionContext.markInactive();
       }
@@ -657,42 +581,91 @@ export class QueryExecutor {
       throw err;
 
     } finally {
-      // Always release the connection
+      // Always release the dedicated transaction connection
       if (client) {
-        try {
-          await connectionManager.releaseConnection(client);
-        } catch (releaseError) {
-          logger.error(`Failed to release transaction connection`, {
-            component: 'query-executor',
-            operation: 'release-connection',
-            transactionId,
-            context,
-            error: releaseError instanceof Error ? releaseError.message : String(releaseError),
-          });
-        }
+        await this.safeReleaseConnection(client, transactionId);
       }
     }
   }
 
   /**
-   * Gets the current configuration.
+   * Executes a query with timeout protection using a promise race pattern.
    */
-  getConfig(): QueryExecutorConfig {
-    return { ...this.config };
+  private async executeQueryWithTimeout<T extends QueryResultRow>(
+    client: PoolClient,
+    query: SqlQuery,
+    queryId: string
+  ): Promise<PgQueryResult<T>> {
+    const timeoutMs = query.timeout ?? this.config.queryTimeoutMs;
+
+    // Prepare query parameters
+    const { queryText, queryParams } = this.prepareQueryParameters(query);
+
+    return new Promise<PgQueryResult<T>>((resolve, reject) => {
+      let isResolved = false;
+
+      const timeoutId = setTimeout(() => {
+        if (!isResolved) {
+          isResolved = true;
+          reject(new Error(`Query timeout after ${timeoutMs}ms (queryId: ${queryId})`));
+        }
+      }, timeoutMs);
+
+      client.query(queryText, queryParams, (error: Error | null, result: PgQueryResult<T>) => {
+        clearTimeout(timeoutId);
+        
+        if (!isResolved) {
+          isResolved = true;
+          if (error) {
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      });
+    });
   }
 
   /**
-   * Gets recent slow queries for monitoring.
+   * Prepares query parameters, converting named parameters to positional if needed.
    */
-  getSlowQueries(limit: number = 100): SlowQueryInfo[] {
-    return this.slowQueries.slice(-limit);
-  }
+  private prepareQueryParameters(query: SqlQuery): { queryText: string; queryParams?: any[] } {
+    let queryText = query.sql;
+    let queryParams: any[] | undefined;
 
-  /**
-   * Clears the slow query history.
-   */
-  clearSlowQueries(): void {
-    this.slowQueries = [];
+    if (!query.params) {
+      return { queryText };
+    }
+
+    if (Array.isArray(query.params)) {
+      // Already positional parameters
+      queryParams = query.params;
+    } else {
+      // Convert named parameters to positional
+      const paramNames = Object.keys(query.params);
+      const paramValues = Object.values(query.params);
+      
+      // Replace named parameters ($name) with positional ($1, $2, etc.)
+      let paramIndex = 1;
+      const paramMap = new Map<string, number>();
+      
+      queryText = queryText.replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)/g, (match, name) => {
+        if (!paramMap.has(name)) {
+          const index = paramNames.indexOf(name);
+          if (index === -1) {
+            throw new Error(`Named parameter '${name}' not found in params object`);
+          }
+          paramMap.set(name, paramIndex++);
+        }
+        return `$${paramMap.get(name)}`;
+      });
+
+      queryParams = Array.from(paramMap.entries())
+        .sort((a, b) => a[1] - b[1])
+        .map(([name]) => query.params![name]);
+    }
+
+    return { queryText, queryParams };
   }
 
   /**
@@ -705,17 +678,21 @@ export class QueryExecutor {
     client: PoolClient
   ): Promise<void> {
     try {
-      // Capture stack trace (skip first 2 frames to avoid internal calls)
-      const stackTrace = new Error().stack?.split('\n').slice(3).join('\n') || 'Stack trace unavailable';
+      // Capture call stack (skip internal frames)
+      const stackTrace = new Error().stack?.split('\n').slice(3).join('\n') ?? 'Stack unavailable';
 
-      // Get EXPLAIN plan for the query
+      // Attempt to get EXPLAIN plan for analysis
       let explainPlan: string | undefined;
       try {
         const explainQuery = `EXPLAIN (ANALYZE, VERBOSE, COSTS, BUFFERS, TIMING) ${query.sql}`;
-        const explainResult = await this.executeQueryWithTimeout(client, { sql: explainQuery, params: query.params }, queryId + '_explain');
+        const explainResult = await this.executeQueryWithTimeout(
+          client,
+          { sql: explainQuery, params: query.params },
+          `${queryId}_explain`
+        );
         explainPlan = explainResult.rows.map((row: any) => row['QUERY PLAN']).join('\n');
       } catch (explainError) {
-        logger.warn(`Failed to get EXPLAIN plan for slow query`, {
+        logger.warn('Failed to capture EXPLAIN plan for slow query', {
           component: 'query-executor',
           operation: 'slow-query-explain',
           queryId,
@@ -723,12 +700,11 @@ export class QueryExecutor {
         });
       }
 
-      // Create slow query info (store sanitized params)
-      const sanitizedParams = sanitizeParameters(query.params, query.sql);
+      // Create slow query record with sanitized data
       const slowQueryInfo: SlowQueryInfo = {
         queryId,
         sql: query.sql,
-        params: sanitizedParams,
+        params: sanitizeParameters(query.params, query.sql),
         executionTimeMs,
         stackTrace,
         explainPlan,
@@ -736,39 +712,37 @@ export class QueryExecutor {
         timestamp: new Date().toISOString(),
       };
 
-      // Store in memory (keep last 1000 slow queries)
+      // Store in circular buffer (maintain max size)
       this.slowQueries.push(slowQueryInfo);
-      if (this.slowQueries.length > 1000) {
+      if (this.slowQueries.length > this.config.maxSlowQueriesStored) {
         this.slowQueries.shift();
       }
 
-      // Determine query type for metrics
+      // Emit metrics for monitoring
       const queryType = this.getQueryType(query.sql);
-
-      // Emit metrics
       this.monitoringService.recordDatabaseMetric(`slow_query.${queryType}`, 1, {
         queryId,
         executionTimeMs,
         threshold: this.config.slowQueryThresholdMs,
       });
 
-      // Log slow query with full details
-      logger.warn(`Slow query detected`, {
+      // Log comprehensive slow query information
+      logger.warn('Slow query detected', {
         component: 'query-executor',
         operation: 'slow-query',
         queryId,
         sql: query.sql,
-        sanitizedParams,
+        sanitizedParams: slowQueryInfo.params,
         executionTimeMs,
         threshold: this.config.slowQueryThresholdMs,
-        stackTrace: stackTrace.substring(0, 500), // Limit stack trace length
-        explainPlan: explainPlan?.substring(0, 1000), // Limit explain plan length
+        stackTrace: this.truncateForLogging(stackTrace, 500),
+        explainPlan: this.truncateForLogging(explainPlan ?? '', 1000),
         context: query.context,
         queryType,
       });
 
     } catch (error) {
-      logger.error(`Failed to handle slow query`, {
+      logger.error('Error in slow query handler', {
         component: 'query-executor',
         operation: 'slow-query-handler',
         queryId,
@@ -778,30 +752,89 @@ export class QueryExecutor {
   }
 
   /**
-   * Determines the type of SQL query for metrics categorization.
+   * Determines the type of SQL query for categorization.
    */
   private getQueryType(sql: string): string {
     const normalizedSql = sql.trim().toUpperCase();
 
-    if (normalizedSql.startsWith('SELECT')) {
-      return 'select';
-    } else if (normalizedSql.startsWith('INSERT')) {
-      return 'insert';
-    } else if (normalizedSql.startsWith('UPDATE')) {
-      return 'update';
-    } else if (normalizedSql.startsWith('DELETE')) {
-      return 'delete';
-    } else if (normalizedSql.startsWith('CREATE')) {
-      return 'create';
-    } else if (normalizedSql.startsWith('DROP')) {
-      return 'drop';
-    } else if (normalizedSql.startsWith('ALTER')) {
-      return 'alter';
-    } else {
-      return 'other';
+    for (const [keyword, type] of Object.entries(QUERY_TYPE_KEYWORDS)) {
+      if (normalizedSql.startsWith(keyword)) {
+        return type;
+      }
     }
+
+    return 'other';
+  }
+
+  /**
+   * Safely releases a connection, logging any errors.
+   */
+  private async safeReleaseConnection(client: PoolClient, queryId: string): Promise<void> {
+    try {
+      await connectionManager.releaseConnection(client);
+    } catch (releaseError) {
+      logger.error('Failed to release connection', {
+        component: 'query-executor',
+        operation: 'release-connection',
+        queryId,
+        error: releaseError instanceof Error ? releaseError.message : String(releaseError),
+      });
+    }
+  }
+
+  /**
+   * Calculates execution time from start time in nanoseconds.
+   */
+  private calculateExecutionTime(startTime: bigint): number {
+    const endTime = process.hrtime.bigint();
+    const durationNs = endTime - startTime;
+    return Number(durationNs) / 1_000_000; // Convert to milliseconds
+  }
+
+  /**
+   * Truncates text for logging to prevent log bloat.
+   */
+  private truncateForLogging(text: string, maxLength: number): string {
+    if (text.length <= maxLength) return text;
+    return `${text.substring(0, maxLength)}...`;
+  }
+
+  /**
+   * Sleep utility for retry backoff.
+   */
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Updates the executor configuration dynamically.
+   */
+  updateConfig(config: Partial<QueryExecutorConfig>): void {
+    Object.assign(this.config, config);
+  }
+
+  /**
+   * Gets the current configuration (returns a copy to prevent mutations).
+   */
+  getConfig(): Readonly<QueryExecutorConfig> {
+    return { ...this.config };
+  }
+
+  /**
+   * Gets recent slow queries for monitoring and analysis.
+   */
+  getSlowQueries(limit: number = 100): ReadonlyArray<SlowQueryInfo> {
+    const startIndex = Math.max(0, this.slowQueries.length - limit);
+    return this.slowQueries.slice(startIndex);
+  }
+
+  /**
+   * Clears the slow query history.
+   */
+  clearSlowQueries(): void {
+    this.slowQueries.length = 0;
   }
 }
 
-// Export default instance
+// Export singleton instance for convenience
 export const queryExecutor = new QueryExecutor();

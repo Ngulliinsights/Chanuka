@@ -1,72 +1,32 @@
-export interface LogLevel {
-  DEBUG: 'debug';
-  INFO: 'info';
-  WARN: 'warn';
-  ERROR: 'error';
+export interface LogData {
+  [key: string]: any;
 }
 
-export interface EnhancedLogger {
-  debug(message: string, ...args: any[]): void;
-  info(message: string, ...args: any[]): void;
-  warn(message: string, ...args: any[]): void;
-  error(message: string, ...args: any[]): void;
-  setLevel(level: keyof LogLevel): void;
-}
-
-class Logger implements EnhancedLogger {
-  private level: keyof LogLevel = 'INFO';
-  private context: Record<string, any> = {};
-
-  setLevel(level: keyof LogLevel): void {
-    this.level = level;
+export class Logger {
+  info(message: string, data?: LogData): void {
+    console.log(this.format('info', message, data));
   }
 
-  withContext(context: Record<string, any>): Logger {
-    const newLogger = new Logger();
-    newLogger.level = this.level;
-    newLogger.context = { ...this.context, ...context };
-    return newLogger;
+  warn(message: string, data?: LogData): void {
+    console.warn(this.format('warn', message, data));
   }
 
-  debug(message: string, ...args: any[]): void {
-    if (this.shouldLog('DEBUG')) {
-      console.debug(`[DEBUG] ${message}`, ...args);
-    }
+  error(message: string, data?: LogData): void {
+    console.error(this.format('error', message, data));
   }
 
-  info(message: string, ...args: any[]): void {
-    if (this.shouldLog('INFO')) {
-      console.info(`[INFO] ${message}`, ...args);
-    }
+  debug(message: string, data?: LogData): void {
+    console.debug(this.format('debug', message, data));
   }
 
-  warn(message: string, ...args: any[]): void {
-    if (this.shouldLog('WARN')) {
-      console.warn(`[WARN] ${message}`, ...args);
-    }
-  }
-
-  error(message: string, ...args: any[]): void {
-    if (this.shouldLog('ERROR')) {
-      console.error(`[ERROR] ${message}`, ...args);
-    }
-  }
-
-  private shouldLog(level: keyof LogLevel): boolean {
-    const levels: Record<keyof LogLevel, number> = {
-      DEBUG: 0,
-      INFO: 1,
-      WARN: 2,
-      ERROR: 3
+  private format(level: string, message: string, data?: LogData): object {
+    return {
+      level,
+      message,
+      timestamp: new Date().toISOString(),
+      ...data
     };
-    return levels[level] >= levels[this.level];
   }
 }
 
 export const logger = new Logger();
-
-
-
-
-
-

@@ -1,11 +1,10 @@
 import { performance } from 'perf_hooks';
 import { EventEmitter } from 'events';
-import { LoadTester } from './load-tester';
-import type { CacheService } from '../cache/types';
-import type { RateLimitStore } from '../rate-limiting/types';
-import type { Logger } from '../logging/types';
-import type { ValidationService } from '../validation/types';
-import { logger } from '../utils/logger';
+import { LoadTester } from '../../shared/core/src/testing/load-tester';
+import type { CacheService } from '../../shared/core/src/cache/types';
+import type { RateLimitStore } from '../../shared/core/src/rate-limiting/types';
+import type { UnifiedLogger } from '../../shared/core/src/logging/logger';
+import type { ValidationService } from '../../shared/core/src/validation/validation-service';
 
 /**
  * Comprehensive performance benchmarking suite for core utilities
@@ -142,7 +141,7 @@ export class PerformanceBenchmarks extends EventEmitter {
   /**
    * Benchmark logging operations
    */
-  async benchmarkLogging(logger: Logger): Promise<BenchmarkResult[]> {
+  async benchmarkLogging(logger: UnifiedLogger): Promise<BenchmarkResult[]> {
     const results: BenchmarkResult[] = [];
 
     // Single log entry benchmarks
@@ -402,7 +401,7 @@ export class PerformanceBenchmarks extends EventEmitter {
   // Rate limiting benchmark implementations
   private async benchmarkRateLimitSingle(rateLimiter: RateLimitStore): Promise<BenchmarkResult> {
     return this.runBenchmark('rate-limit:single', async () => {
-      await rateLimiter.hit('benchmark:single', 100, 60000);
+      await rateLimiter.check('benchmark:single', { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
     }, {
       iterations: this.config.iterations?.rateLimit?.single || 5000,
       warmupIterations: 500
@@ -411,7 +410,7 @@ export class PerformanceBenchmarks extends EventEmitter {
 
   private async benchmarkRateLimitBurst(rateLimiter: RateLimitStore): Promise<BenchmarkResult> {
     return this.runConcurrentBenchmark('rate-limit:burst', async () => {
-      await rateLimiter.hit('benchmark:burst', 1000, 60000);
+      await rateLimiter.check('benchmark:burst', { windowMs: 60000, max: 1000, message: 'Rate limit exceeded' });
     }, {
       concurrency: this.config.concurrency?.rateLimit?.burst || 100,
       totalOperations: this.config.iterations?.rateLimit?.burst || 5000
@@ -421,7 +420,7 @@ export class PerformanceBenchmarks extends EventEmitter {
   private async benchmarkRateLimitConcurrent(rateLimiter: RateLimitStore): Promise<BenchmarkResult> {
     return this.runConcurrentBenchmark('rate-limit:concurrent', async () => {
       const userId = `user:${Math.floor(Math.random() * 1000)}`;
-      await rateLimiter.hit(userId, 100, 60000);
+      await rateLimiter.check(userId, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
     }, {
       concurrency: this.config.concurrency?.rateLimit?.concurrent || 50,
       totalOperations: this.config.iterations?.rateLimit?.concurrent || 10000
@@ -438,7 +437,7 @@ export class PerformanceBenchmarks extends EventEmitter {
 
       for (let i = 0; i < iterations; i++) {
         const start = performance.now();
-        await rateLimiter.hit(`benchmark:${algorithm}:${i}`, 100, 60000, algorithm);
+        await rateLimiter.check(`benchmark:${algorithm}:${i}`, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
         times.push(performance.now() - start);
       }
 
@@ -473,7 +472,7 @@ export class PerformanceBenchmarks extends EventEmitter {
     for (const userCount of userCounts) {
       // Create rate limit entries
       for (let i = 0; i < userCount; i++) {
-        await rateLimiter.hit(`user:${i}`, 100, 60000);
+        await rateLimiter.check(`user:${i}`, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
       }
 
       const currentMemory = process.memoryUsage();
@@ -501,7 +500,7 @@ export class PerformanceBenchmarks extends EventEmitter {
   }
 
   // Logging benchmark implementations
-  private async benchmarkLoggingSingle(logger: Logger): Promise<BenchmarkResult> {
+  private async benchmarkLoggingSingle(logger: UnifiedLogger): Promise<BenchmarkResult> {
     return this.runBenchmark('logging:single', async () => {
       logger.info('Benchmark log message', { data: 'test' });
     }, {
@@ -510,7 +509,7 @@ export class PerformanceBenchmarks extends EventEmitter {
     });
   }
 
-  private async benchmarkLoggingVolume(logger: Logger): Promise<BenchmarkResult> {
+  private async benchmarkLoggingVolume(logger: UnifiedLogger): Promise<BenchmarkResult> {
     return this.runBenchmark('logging:volume', async () => {
       for (let i = 0; i < 100; i++) {
         logger.info(`Volume test message ${i}`, { iteration: i, data: 'test'.repeat(10) });
@@ -521,9 +520,9 @@ export class PerformanceBenchmarks extends EventEmitter {
     });
   }
 
-  private async benchmarkLoggingConcurrent(logger: Logger): Promise<BenchmarkResult> {
+  private async benchmarkLoggingConcurrent(logger: UnifiedLogger): Promise<BenchmarkResult> {
     return this.runConcurrentBenchmark('logging:concurrent', async () => {
-      logger.info('Concurrent log message', { 
+      logger.info('Concurrent log message', {
         threadId: Math.floor(Math.random() * 1000),
         data: 'test data'
       });
@@ -533,7 +532,7 @@ export class PerformanceBenchmarks extends EventEmitter {
     });
   }
 
-  private async benchmarkLoggingStructured(logger: Logger): Promise<BenchmarkResult> {
+  private async benchmarkLoggingStructured(logger: UnifiedLogger): Promise<BenchmarkResult> {
     const complexObject = {
       user: { id: 123, name: 'Test User', email: 'test@example.com' },
       request: { method: 'POST', url: '/api/test', headers: { 'content-type': 'application/json' } },
@@ -549,7 +548,7 @@ export class PerformanceBenchmarks extends EventEmitter {
     });
   }
 
-  private async benchmarkLoggingContext(logger: Logger): Promise<BenchmarkResult> {
+  private async benchmarkLoggingContext(logger: UnifiedLogger): Promise<BenchmarkResult> {
     return this.runBenchmark('logging:context', async () => {
       if (logger.withContext) {
         logger.withContext({ requestId: 'test-123', userId: 'user-456' }, () => {
@@ -567,9 +566,16 @@ export class PerformanceBenchmarks extends EventEmitter {
   // Validation benchmark implementations
   private async benchmarkValidationSimple(validator: ValidationService): Promise<BenchmarkResult> {
     const simpleData = { name: 'Test', age: 25, email: 'test@example.com' };
+    // Create a simple schema for testing
+    const { z } = require('zod');
+    const schema = z.object({
+      name: z.string(),
+      age: z.number(),
+      email: z.string().email()
+    });
 
     return this.runBenchmark('validation:simple', async () => {
-      await validator.validate('user', simpleData);
+      await validator.validate(schema, simpleData);
     }, {
       iterations: this.config.iterations?.validation?.simple || 10000,
       warmupIterations: 1000
@@ -608,8 +614,43 @@ export class PerformanceBenchmarks extends EventEmitter {
       }
     };
 
+    // Create a complex schema for testing
+    const { z } = require('zod');
+    const complexSchema = z.object({
+      user: z.object({
+        id: z.number(),
+        profile: z.object({
+          name: z.string(),
+          email: z.string().email(),
+          preferences: z.object({
+            theme: z.string(),
+            notifications: z.object({
+              email: z.boolean(),
+              push: z.boolean(),
+              sms: z.boolean()
+            })
+          })
+        }),
+        addresses: z.array(z.object({
+          type: z.string(),
+          street: z.string(),
+          city: z.string(),
+          zip: z.string()
+        })),
+        orders: z.array(z.object({
+          id: z.number(),
+          items: z.array(z.object({
+            id: z.number(),
+            name: z.string(),
+            price: z.number(),
+            quantity: z.number()
+          }))
+        }))
+      })
+    });
+
     return this.runBenchmark('validation:complex', async () => {
-      await validator.validate('complex-user', complexData);
+      await validator.validate(complexSchema, complexData);
     }, {
       iterations: this.config.iterations?.validation?.complex || 1000,
       warmupIterations: 100
@@ -623,8 +664,16 @@ export class PerformanceBenchmarks extends EventEmitter {
       email: `user${i}@example.com`
     }));
 
+    // Create a schema for batch validation
+    const { z } = require('zod');
+    const userSchema = z.object({
+      name: z.string(),
+      age: z.number(),
+      email: z.string().email()
+    });
+
     return this.runBenchmark('validation:batch', async () => {
-      await validator.validateBatch('user', batchData);
+      await validator.validateBatch(userSchema, batchData);
     }, {
       iterations: this.config.iterations?.validation?.batch || 500,
       warmupIterations: 50
@@ -652,12 +701,12 @@ export class PerformanceBenchmarks extends EventEmitter {
       const cacheKey = `data:${userId}`;
 
       // 1. Rate limiting check
-      const rateLimitResult = await rateLimiter!.hit(userId, 100, 60000);
-      
+      const rateLimitResult = await rateLimiter!.check(userId, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
+
       if (rateLimitResult.allowed) {
         // 2. Cache lookup
         let data = await cache!.get(cacheKey);
-        
+
         if (!data) {
           // 3. Simulate data generation
           data = { userId, data: 'generated data', timestamp: Date.now() };
@@ -682,16 +731,24 @@ export class PerformanceBenchmarks extends EventEmitter {
       const key = `validated:${Math.random()}`;
       const data = { name: 'Test', age: 25, email: 'test@example.com' };
 
+      // Create schema for validation
+      const { z } = require('zod');
+      const userSchema = z.object({
+        name: z.string(),
+        age: z.number(),
+        email: z.string().email()
+      });
+
       // Validate data
-      const validatedData = await validator!.validate('user', data);
-      
+      const validatedData = await validator!.validate(userSchema, data);
+
       // Cache validated data
       await cache!.set(key, validatedData, 300);
-      
+
       // Retrieve and re-validate
       const cachedData = await cache!.get(key);
       if (cachedData) {
-        await validator!.validate('user', cachedData);
+        await validator!.validate(userSchema, cachedData);
       }
     }, {
       iterations: this.config.iterations?.integration?.cacheValidation || 1000,
@@ -704,7 +761,7 @@ export class PerformanceBenchmarks extends EventEmitter {
 
     return this.runBenchmark('integration:rate-limit-logging', async () => {
       const userId = `user:${Math.floor(Math.random() * 1000)}`;
-      const result = await rateLimiter!.hit(userId, 100, 60000);
+      const result = await rateLimiter!.check(userId, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
 
       if (result.allowed) {
         logger!.info('Request allowed', { userId, remaining: result.remaining });
@@ -724,7 +781,7 @@ export class PerformanceBenchmarks extends EventEmitter {
     options: BenchmarkOptions
   ): Promise<BenchmarkResult> {
     const { iterations, warmupIterations = 0 } = options;
-    
+
     // Warmup
     for (let i = 0; i < warmupIterations; i++) {
       await operation();
@@ -778,7 +835,7 @@ export class PerformanceBenchmarks extends EventEmitter {
   ): Promise<BenchmarkResult> {
     const { concurrency, totalOperations } = options;
     const operationsPerWorker = Math.floor(totalOperations / concurrency);
-    
+
     const startTime = performance.now();
     const start = new Date();
 
@@ -798,7 +855,7 @@ export class PerformanceBenchmarks extends EventEmitter {
 
     const results = await Promise.all(workers);
     const allTimes = results.flat();
-    
+
     const totalTime = performance.now() - startTime;
     const end = new Date();
 
@@ -949,7 +1006,7 @@ export interface BenchmarkConfig {
 export interface BenchmarkComponents {
   cache?: CacheService;
   rateLimiter?: RateLimitStore;
-  logger?: Logger;
+  logger?: UnifiedLogger;
   validator?: ValidationService;
 }
 
@@ -1034,9 +1091,3 @@ interface ConcurrentBenchmarkOptions {
   concurrency: number;
   totalOperations: number;
 }
-
-
-
-
-
-

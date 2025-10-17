@@ -5,6 +5,7 @@ import {
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations, sql } from "drizzle-orm";
+import { logger } from "@shared/core/src/logging";
 
 // ============================================================================
 // ENUMS - Native PostgreSQL enums for type safety across the stack
@@ -21,7 +22,7 @@ export const conflictTypeEnum = pgEnum("conflict_type", ["constitutional", "proc
 export const severityEnum = pgEnum("severity", ["info", "low", "medium", "high", "critical"]);
 export const stakeholderTypeEnum = pgEnum("stakeholder_type", ["business", "ngo", "agency", "individual"]);
 export const affiliationTypeEnum = pgEnum("affiliation_type", ["economic", "professional", "advocacy", "cultural"]);
-export const affiliationConflictTypeEnum = pgEnum("affiliation_conflict_type", ["financial", "ownership", "influence", "representation"]);
+export const affiliationConflictTypeEnum = pgEnum("affiliation_conflict_type", ["financial", "ownership", "influence", "representation", "none", "previous"]);
 export const disclosureTypeEnum = pgEnum("disclosure_type", ["financial", "business", "family"]);
 export const moderationContentTypeEnum = pgEnum("moderation_content_type", ["comment", "bill", "user_profile", "sponsor_transparency"]);
 export const flagTypeEnum = pgEnum("flag_type", ["spam", "harassment", "misinformation", "inappropriate", "copyright", "other"]);
@@ -348,6 +349,7 @@ export const analysis = pgTable("analysis", {
   results: jsonb("results").default({}),
   confidence: numeric("confidence", { precision: 5, scale: 4 }).default("0"),
   modelVersion: text("model_version"),
+  metadata: jsonb("metadata").default({}),
   isApproved: boolean("is_approved").notNull().default(false),
   approvedBy: uuid("approved_by").references(() => user.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
