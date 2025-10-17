@@ -63,8 +63,8 @@ export type FullDatabaseSchema = {
 type ActualSchemaType = typeof schema;
 
 /**
- * Validates schema type compatibility across the application.
- * Acts as a compile-time safety mechanism.
+ * Validates schema type compatibility at compile time.
+ * This ensures type safety throughout the application.
  */
 function validateSchemaType<T extends ActualSchemaType>(schemaToValidate: T): T {
   return schemaToValidate;
@@ -72,35 +72,48 @@ function validateSchemaType<T extends ActualSchemaType>(schemaToValidate: T): T 
 
 /**
  * Configuration constants with environment variable handling.
- * Centralizes configuration logic with sensible defaults.
+ * Centralizes all tunable parameters for easy adjustment.
  */
 const CONFIG = {
   IS_PRODUCTION: process.env.NODE_ENV === 'production',
   READ_REPLICA_URL: process.env.READ_REPLICA_URL,
   WRITE_MASTER_URL: process.env.DATABASE_URL,
   APP_NAME: 'chanuka',
-  MAX_CONNECTION_USES: 7500,
   SLOW_QUERY_THRESHOLD: parseInt(process.env.SLOW_QUERY_THRESHOLD || '1000', 10),
   MAX_QUERY_TIMES_STORED: parseInt(process.env.MAX_QUERY_TIMES_STORED || '100', 10),
   MAX_QUERY_RETRIES: parseInt(process.env.MAX_QUERY_RETRIES || '3', 10),
-  RETRY_DELAY_MS: parseInt(process.env.RETRY_DELAY_MS || '1000', 10),
+  RETRY_BASE_DELAY_MS: parseInt(process.env.RETRY_DELAY_MS || '1000', 10),
   CIRCUIT_BREAKER_FAILURE_THRESHOLD: parseInt(process.env.CIRCUIT_BREAKER_FAILURE_THRESHOLD || '5', 10),
   CIRCUIT_BREAKER_RESET_TIMEOUT: parseInt(process.env.CIRCUIT_BREAKER_RESET_TIMEOUT || '30000', 10),
-  QUERY_TIMEOUT_MS: parseInt(process.env.QUERY_TIMEOUT_MS || '5000', 10),
+  QUERY_TIMEOUT_MS: parseInt(process.env.QUERY_TIMEOUT_MS || '30000', 10),
   DEFAULT_MAX_POOL_SIZE: parseInt(process.env.DB_POOL_MAX || '20', 10),
   POOL_SHUTDOWN_TIMEOUT: parseInt(process.env.POOL_SHUTDOWN_TIMEOUT || '10000', 10),
+  HEALTH_CHECK_WARNING_THRESHOLD: 0.8,
 } as const;
 
 /**
- * Thread-safe mutex for synchronizing access to shared resources.
- * Prevents race conditions in concurrent environments.
+ * PostgreSQL error codes that should not be retried because they represent
+ * data integrity violations or permanent failures rather than transient issues.
+ */
+const NON_RETRYABLE_ERROR_CODES = new Set([
+  '23505', // unique_violation
+  '23503', // foreign_key_violation
+  '23514', // check_violation
+  '22P02', // invalid_text_representation
+  '42P01', // undefined_table
+  '42703', // undefined_column
+]);
+
+/**
+ * Lightweight mutex implementation for synchronizing access to shared state.
+ * Uses a promise-based queue to ensure only one operation executes at a time.
  */
 class Mutex {
   private locked = false;
   private readonly waitQueue: Array<() => void> = [];
 
   async runExclusive<T>(callback: () => T | Promise<T>): Promise<T> {
-    // Fast path for uncontended lock
+    // Fast path when lock is available immediately
     if (!this.locked) {
       this.locked = true;
       try {
@@ -110,7 +123,7 @@ class Mutex {
       }
     }
 
-    // Slow path for contended lock
+    // Queue the operation when lock is contended
     return new Promise<T>((resolve, reject) => {
       const execute = async () => {
         try {
@@ -130,7 +143,9 @@ class Mutex {
   private unlock(): void {
     const next = this.waitQueue.shift();
     if (next) {
-      next();
+      // Use nextTick to prevent race conditions where multiple waiters
+      // could acquire the lock simultaneously
+      process.nextTick(() => next());
     } else {
       this.locked = false;
     }
@@ -138,8 +153,8 @@ class Mutex {
 }
 
 /**
- * Circuit breaker implementation preventing cascading failures.
- * Protects the system from overwhelming a struggling database with retries.
+ * Circuit breaker pattern implementation that prevents cascading failures
+ * by temporarily blocking operations when the error rate exceeds a threshold.
  */
 class CircuitBreaker {
   private failures = 0;
@@ -149,33 +164,36 @@ class CircuitBreaker {
   constructor(
     private readonly failureThreshold: number,
     private readonly resetTimeoutMs: number,
-    private readonly timeoutMs: number
+    private readonly operationTimeoutMs: number
   ) {}
 
   async execute<T>(operation: () => Promise<T>): Promise<T> {
-    // Check if circuit should transition from OPEN to HALF_OPEN
+    // Transition from OPEN to HALF_OPEN after the reset timeout expires
     if (this.state === 'OPEN') {
       const timeSinceLastFailure = Date.now() - this.lastFailureTime;
       if (timeSinceLastFailure > this.resetTimeoutMs) {
         this.state = 'HALF_OPEN';
       } else {
-        throw new Error(`Circuit breaker is OPEN - operation not allowed. Retry in ${this.resetTimeoutMs - timeSinceLastFailure}ms`);
+        throw new Error(
+          `Circuit breaker is OPEN. Retry in ${Math.ceil((this.resetTimeoutMs - timeSinceLastFailure) / 1000)}s`
+        );
       }
     }
 
     try {
-      // Race the operation against a timeout to prevent hanging
-      const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Operation timeout')), this.timeoutMs);
-      });
+      // Apply timeout to prevent indefinite hanging
+      const result = await Promise.race([
+        operation(),
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Operation timeout')), this.operationTimeoutMs)
+        ),
+      ]);
 
-      const result = await Promise.race([operation(), timeoutPromise]);
-      
-      // Successful execution in HALF_OPEN state resets the circuit
+      // Success in HALF_OPEN state indicates recovery
       if (this.state === 'HALF_OPEN') {
         this.reset();
       }
-      
+
       return result;
     } catch (error) {
       this.recordFailure();
@@ -186,9 +204,13 @@ class CircuitBreaker {
   private recordFailure(): void {
     this.failures++;
     this.lastFailureTime = Date.now();
-    
+
     if (this.failures >= this.failureThreshold) {
       this.state = 'OPEN';
+      logger.warn('Circuit breaker opened', {
+        failures: this.failures,
+        threshold: this.failureThreshold,
+      });
     }
   }
 
@@ -196,6 +218,7 @@ class CircuitBreaker {
     this.failures = 0;
     this.state = 'CLOSED';
     this.lastFailureTime = 0;
+    logger.info('Circuit breaker reset to CLOSED state');
   }
 
   getState(): string {
@@ -208,7 +231,7 @@ class CircuitBreaker {
 }
 
 /**
- * Comprehensive pool metrics for monitoring database performance.
+ * Comprehensive metrics for monitoring pool performance and health.
  */
 export interface PoolMetrics {
   queries: number;
@@ -222,7 +245,8 @@ export interface PoolMetrics {
 }
 
 /**
- * Thread-safe metrics tracker with comprehensive performance monitoring.
+ * Thread-safe metrics tracker that maintains query statistics
+ * in a sliding window for accurate performance monitoring.
  */
 class PoolMetricsTracker {
   private metrics = {
@@ -240,7 +264,7 @@ class PoolMetricsTracker {
       this.metrics.queries++;
       this.metrics.queryTimes.push(duration);
 
-      // Maintain sliding window of recent query times
+      // Maintain a bounded sliding window of recent query times
       if (this.metrics.queryTimes.length > this.maxQueryTimes) {
         this.metrics.queryTimes.shift();
       }
@@ -259,15 +283,9 @@ class PoolMetricsTracker {
     });
   }
 
-  async decrementIdleConnections(): Promise<void> {
+  async updateIdleConnections(delta: number): Promise<void> {
     await this.mutex.runExclusive(() => {
-      this.metrics.idleConnections = Math.max(0, this.metrics.idleConnections - 1);
-    });
-  }
-
-  async incrementIdleConnections(): Promise<void> {
-    await this.mutex.runExclusive(() => {
-      this.metrics.idleConnections++;
+      this.metrics.idleConnections = Math.max(0, this.metrics.idleConnections + delta);
     });
   }
 
@@ -282,8 +300,8 @@ class PoolMetricsTracker {
         idleConnections: this.metrics.idleConnections,
         totalConnections,
         waitingClients,
-        avgQueryTime: hasQueryTimes 
-          ? queryTimes.reduce((sum, time) => sum + time, 0) / queryTimes.length 
+        avgQueryTime: hasQueryTimes
+          ? queryTimes.reduce((sum, time) => sum + time, 0) / queryTimes.length
           : undefined,
         maxQueryTime: hasQueryTimes ? Math.max(...queryTimes) : undefined,
         minQueryTime: hasQueryTimes ? Math.min(...queryTimes) : undefined,
@@ -293,16 +311,18 @@ class PoolMetricsTracker {
 
   async reset(): Promise<void> {
     await this.mutex.runExclusive(() => {
-      this.metrics.queries = 0;
-      this.metrics.connections = 0;
-      this.metrics.idleConnections = 0;
-      this.metrics.queryTimes = [];
+      this.metrics = {
+        queries: 0,
+        connections: 0,
+        idleConnections: 0,
+        queryTimes: [],
+      };
     });
   }
 }
 
 /**
- * Enhanced Pool interface with metrics and circuit breaker capabilities.
+ * Enhanced pool interface with additional monitoring and resilience capabilities.
  */
 export interface EnhancedPool extends pg.Pool {
   getMetrics: () => Promise<PoolMetrics>;
@@ -313,91 +333,86 @@ export interface EnhancedPool extends pg.Pool {
 
 /**
  * Creates optimized PostgreSQL connection pool configuration.
- * Intelligently adjusts settings based on read-only vs read-write operations.
+ * Intelligently routes to read replicas in production when appropriate.
  */
 export const createPoolConfig = (isReadOnly = false): pg.PoolConfig => {
-  const connectionString = isReadOnly && CONFIG.IS_PRODUCTION && CONFIG.READ_REPLICA_URL
-    ? CONFIG.READ_REPLICA_URL
-    : CONFIG.WRITE_MASTER_URL;
+  const connectionString =
+    isReadOnly && CONFIG.IS_PRODUCTION && CONFIG.READ_REPLICA_URL
+      ? CONFIG.READ_REPLICA_URL
+      : CONFIG.WRITE_MASTER_URL;
 
   const appName = `${CONFIG.APP_NAME}_${isReadOnly ? 'read' : 'write'}`;
 
   return {
     connectionString: connectionString || process.env.DATABASE_URL,
+    application_name: appName,
+    max: CONFIG.DEFAULT_MAX_POOL_SIZE,
   };
 };
 
 /**
- * Sets up PostgreSQL connection pool with comprehensive error handling.
- * Creates fully configured pool with event listeners for monitoring.
+ * Sets up a PostgreSQL connection pool with comprehensive monitoring,
+ * error handling, and automatic metric tracking.
  */
 const setupPool = (isReadOnly = false, name = isReadOnly ? 'read' : 'write'): EnhancedPool => {
   const newPool = new Pool(createPoolConfig(isReadOnly)) as EnhancedPool;
   const metricsTracker = new PoolMetricsTracker();
-  
+
   const circuitBreaker = new CircuitBreaker(
     CONFIG.CIRCUIT_BREAKER_FAILURE_THRESHOLD,
     CONFIG.CIRCUIT_BREAKER_RESET_TIMEOUT,
     CONFIG.QUERY_TIMEOUT_MS
   );
 
-  // Pool-level error handling with contextual information
+  // Handle pool-level errors with detailed context
   newPool.on('error', (err: Error) => {
     const pgError = err as any;
-    logger.error(`Postgres ${name} pool error:`, {
+    logger.error(`Postgres ${name} pool error`, {
       error: err.message,
       detail: pgError.detail,
       code: pgError.code,
       poolSize: newPool.totalCount,
       waiting: newPool.waitingCount,
       circuitBreakerState: circuitBreaker.getState(),
-      timestamp: new Date().toISOString(),
     });
   });
 
-  // Connection lifecycle monitoring
+  // Track connection lifecycle events
   newPool.on('connect', (client: pg.PoolClient) => {
-    metricsTracker.incrementConnections().catch(err => {
-      logger.error(`Error updating connection metrics in ${name} pool:`, err);
-    });
-    
-    // Individual client error handling prevents pool corruption
-    client.on('error', (clientErr: Error) => {
-      logger.error(`Client connection error in ${name} pool:`, {
-        error: clientErr.message,
-        poolName: name,
-        timestamp: new Date().toISOString(),
-      });
+    metricsTracker.incrementConnections().catch((err) => {
+      logger.error(`Error updating connection metrics in ${name} pool`, err);
     });
 
-    logger.debug(`New client connected to ${name} pool`, {
-      totalConnections: newPool.totalCount,
+    // Attach error handler to prevent unhandled rejections
+    client.on('error', (clientErr: Error) => {
+      logger.error(`Client connection error in ${name} pool`, {
+        error: clientErr.message,
+        poolName: name,
+      });
     });
   });
 
   newPool.on('acquire', () => {
-    metricsTracker.decrementIdleConnections().catch(err => {
-      logger.error(`Error updating idle connection metrics in ${name} pool:`, err);
+    metricsTracker.updateIdleConnections(-1).catch((err) => {
+      logger.error(`Error updating idle metrics in ${name} pool`, err);
     });
   });
 
   newPool.on('remove', () => {
-    metricsTracker.decrementConnections().catch(err => {
-      logger.error(`Error updating connection metrics in ${name} pool:`, err);
-    });
-    logger.debug(`Client removed from ${name} pool`, {
-      totalConnections: newPool.totalCount,
+    metricsTracker.decrementConnections().catch((err) => {
+      logger.error(`Error updating connection metrics in ${name} pool`, err);
     });
   });
 
   newPool.on('release', () => {
-    metricsTracker.incrementIdleConnections().catch(err => {
-      logger.error(`Error updating idle connection metrics in ${name} pool:`, err);
+    metricsTracker.updateIdleConnections(1).catch((err) => {
+      logger.error(`Error updating idle metrics in ${name} pool`, err);
     });
   });
 
   // Attach enhanced methods to pool instance
-  newPool.getMetrics = () => metricsTracker.getMetrics(newPool.totalCount || 0, newPool.waitingCount || 0);
+  newPool.getMetrics = () =>
+    metricsTracker.getMetrics(newPool.totalCount || 0, newPool.waitingCount || 0);
   newPool.resetMetrics = () => metricsTracker.reset();
   newPool.trackQuery = (queryDuration: number) => metricsTracker.trackQuery(queryDuration);
   newPool.circuitBreaker = circuitBreaker;
@@ -405,12 +420,12 @@ const setupPool = (isReadOnly = false, name = isReadOnly ? 'read' : 'write'): En
   return newPool;
 };
 
-// Initialize specialized connection pools
+// Initialize specialized connection pools for different access patterns
 const rawGeneralPool = setupPool(false, 'general');
 export const rawReadPool = setupPool(true, 'read');
 export const rawWritePool = setupPool(false, 'write');
 
-// Maintain backward compatibility with original export
+// Maintain backward compatibility
 export const pool = rawGeneralPool;
 
 // Create type-safe Drizzle ORM instances
@@ -419,7 +434,7 @@ export const readDb = drizzle(rawReadPool, { schema: validateSchemaType(schema) 
 export const writeDb = drizzle(rawWritePool, { schema: validateSchemaType(schema) });
 
 /**
- * Query execution parameters interface for type safety.
+ * Parameters for executing queries with optional context and pool selection.
  */
 interface QueryExecutionOptions {
   text: string;
@@ -429,67 +444,54 @@ interface QueryExecutionOptions {
 }
 
 /**
- * PostgreSQL error codes that should not be retried.
- * These represent data integrity violations rather than transient failures.
- */
-const NON_RETRYABLE_ERROR_CODES = new Set([
-  '23505', // unique_violation
-  '23503', // foreign_key_violation
-  '23514', // check_violation
-  '22P02', // invalid_text_representation
-  '42P01', // undefined_table
-  '42703', // undefined_column
-]);
-
-/**
- * Retry mechanism with exponential backoff for failed operations.
- * Automatically avoids retrying non-transient errors like constraint violations.
+ * Executes operations with exponential backoff retry logic.
+ * Automatically skips retry for non-transient errors like constraint violations.
  */
 async function retryWithBackoff<T>(
   operation: () => Promise<T>,
   maxRetries: number = CONFIG.MAX_QUERY_RETRIES,
-  baseDelay: number = CONFIG.RETRY_DELAY_MS
+  baseDelay: number = CONFIG.RETRY_BASE_DELAY_MS
 ): Promise<T> {
   let lastError: Error;
-  
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await operation();
     } catch (error) {
       lastError = error as Error;
-      
-      // Don't retry on last attempt
+
+      // Don't retry on final attempt
       if (attempt === maxRetries) {
         break;
       }
-      
-      // Don't retry non-transient errors
+
+      // Don't retry permanent errors
       const pgError = error as any;
       if (pgError.code && NON_RETRYABLE_ERROR_CODES.has(pgError.code)) {
         throw error;
       }
-      
-      // Calculate exponential backoff with jitter to prevent thundering herd
+
+      // Calculate exponential backoff with jitter to avoid thundering herd
       const delay = baseDelay * Math.pow(2, attempt);
       const jitter = Math.random() * 0.1 * delay;
-      
-      logger.warn(`Query attempt ${attempt + 1} failed, retrying in ${Math.round(delay + jitter)}ms`, {
+      const totalDelay = delay + jitter;
+
+      logger.warn(`Query attempt ${attempt + 1} failed, retrying in ${Math.round(totalDelay)}ms`, {
         error: (error as Error).message,
         attempt: attempt + 1,
         maxRetries,
       });
-      
-      await new Promise(resolve => setTimeout(resolve, delay + jitter));
+
+      await new Promise((resolve) => setTimeout(resolve, totalDelay));
     }
   }
-  
+
   throw lastError!;
 }
 
 /**
- * Enhanced query execution with comprehensive timing, error handling, and resilience.
- * Provides unified interface for executing SQL across different pools while tracking
- * performance metrics. Includes circuit breaker protection and retry logic.
+ * Executes SQL queries with comprehensive error handling, timing, and resilience features.
+ * Provides circuit breaker protection and automatic retries for transient failures.
  */
 export const executeQuery = async <T extends pg.QueryResultRow = any>(
   options: QueryExecutionOptions
@@ -498,10 +500,9 @@ export const executeQuery = async <T extends pg.QueryResultRow = any>(
   const start = Date.now();
 
   if (context) {
-    logger.debug(`Executing query in context: ${context}`, {
-      query: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
+    logger.debug(`Executing query: ${context}`, {
+      query: text.substring(0, 100),
       poolType: pool === rawReadPool ? 'read' : pool === rawWritePool ? 'write' : 'general',
-      circuitBreakerState: pool.circuitBreaker.getState(),
     });
   }
 
@@ -509,32 +510,29 @@ export const executeQuery = async <T extends pg.QueryResultRow = any>(
     // Execute through circuit breaker with retry logic
     const result = await pool.circuitBreaker.execute(async () => {
       return await retryWithBackoff(async () => {
-        // Handle different parameter formats for flexibility
         if (params === undefined) {
           return await pool.query<T>(text);
         } else if (Array.isArray(params)) {
           return await pool.query<T>(text, params);
         } else {
-          // Convert object parameters to positional format
-          const values = Object.values(params);
-          return await pool.query<T>({ text, values });
+          // Convert object params to positional format
+          return await pool.query<T>({ text, values: Object.values(params) });
         }
       });
     });
 
     const duration = Date.now() - start;
-    
+
     // Track metrics asynchronously to avoid blocking
-    pool.trackQuery(duration).catch(err => {
-      logger.error('Error tracking query metrics:', err);
+    pool.trackQuery(duration).catch((err) => {
+      logger.error('Error tracking query metrics', err);
     });
 
-    // Detect and log slow queries for optimization
+    // Log slow queries for optimization
     if (duration > CONFIG.SLOW_QUERY_THRESHOLD) {
-      logger.warn(`Slow query detected (${duration}ms):`, {
-        query: text.substring(0, 200) + (text.length > 200 ? '...' : ''),
+      logger.warn(`Slow query detected (${duration}ms)`, {
+        query: text.substring(0, 200),
         durationMs: duration,
-        poolType: pool === rawReadPool ? 'read' : pool === rawWritePool ? 'write' : 'general',
         rowCount: result.rowCount,
         context,
       });
@@ -550,11 +548,9 @@ export const executeQuery = async <T extends pg.QueryResultRow = any>(
       error: errorMessage,
       code: pgError.code,
       detail: pgError.detail,
-      query: text.substring(0, 100) + (text.length > 100 ? '...' : ''),
-      params: Array.isArray(params) ? params : params ? Object.keys(params) : undefined,
+      query: text.substring(0, 100),
       duration,
       context,
-      poolType: pool === rawReadPool ? 'read' : pool === rawWritePool ? 'write' : 'general',
       circuitBreakerState: pool.circuitBreaker.getState(),
     });
 
@@ -563,7 +559,7 @@ export const executeQuery = async <T extends pg.QueryResultRow = any>(
 };
 
 /**
- * Pool health status for monitoring.
+ * Health status information for a database pool.
  */
 export interface PoolHealthStatus {
   isHealthy: boolean;
@@ -572,35 +568,43 @@ export interface PoolHealthStatus {
   waitingClients: number;
   circuitBreakerState: string;
   circuitBreakerFailures: number;
+  utilizationPercentage: number;
   lastError?: string;
 }
 
 /**
- * Performs health check on a database pool.
- * Evaluates connection availability and circuit breaker state.
+ * Performs comprehensive health check on a database pool.
+ * Evaluates connection availability, utilization, and circuit breaker state.
  */
-export const checkPoolHealth = async (pool: EnhancedPool, poolName: string): Promise<PoolHealthStatus> => {
+export const checkPoolHealth = async (
+  pool: EnhancedPool,
+  poolName: string
+): Promise<PoolHealthStatus> => {
   try {
-    const metrics = await pool.getMetrics();
     const maxConnections = pool.options.max || CONFIG.DEFAULT_MAX_POOL_SIZE;
-    
-    // Pool is healthy if it has connections, isn't overwhelmed, and circuit is closed
-    const isHealthy = (pool.totalCount || 0) > 0 &&
-                      (pool.waitingCount || 0) < maxConnections * 0.8 &&
-                      pool.circuitBreaker.getState() !== 'OPEN';
+    const totalConnections = pool.totalCount || 0;
+    const waitingClients = pool.waitingCount || 0;
+    const utilizationPercentage = maxConnections > 0 ? (totalConnections / maxConnections) * 100 : 0;
+
+    // Pool is healthy if connections exist, not overwhelmed, and circuit is closed
+    const isHealthy =
+      totalConnections > 0 &&
+      waitingClients < maxConnections * CONFIG.HEALTH_CHECK_WARNING_THRESHOLD &&
+      pool.circuitBreaker.getState() !== 'OPEN';
 
     return {
       isHealthy,
-      totalConnections: pool.totalCount || 0,
+      totalConnections,
       idleConnections: pool.idleCount || 0,
-      waitingClients: pool.waitingCount || 0,
+      waitingClients,
       circuitBreakerState: pool.circuitBreaker.getState(),
       circuitBreakerFailures: pool.circuitBreaker.getFailureCount(),
+      utilizationPercentage,
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error(`Health check failed for ${poolName} pool:`, { error: errorMessage });
-    
+    logger.error(`Health check failed for ${poolName} pool`, { error: errorMessage });
+
     return {
       isHealthy: false,
       totalConnections: pool.totalCount || 0,
@@ -608,14 +612,15 @@ export const checkPoolHealth = async (pool: EnhancedPool, poolName: string): Pro
       waitingClients: pool.waitingCount || 0,
       circuitBreakerState: pool.circuitBreaker.getState(),
       circuitBreakerFailures: pool.circuitBreaker.getFailureCount(),
+      utilizationPercentage: 0,
       lastError: errorMessage,
     };
   }
 };
 
 /**
- * Monitors all pools and logs health status.
- * Provides comprehensive overview of database connection health.
+ * Monitors all database pools and returns their health status.
+ * Logs warnings for any unhealthy pools detected.
  */
 export const monitorPoolHealth = async (): Promise<Record<string, PoolHealthStatus>> => {
   const pools = { general: rawGeneralPool, read: rawReadPool, write: rawWritePool };
@@ -630,7 +635,7 @@ export const monitorPoolHealth = async (): Promise<Record<string, PoolHealthStat
     .map(([name]) => name);
 
   if (unhealthyPools.length > 0) {
-    logger.warn('Unhealthy database pools detected:', {
+    logger.warn('Unhealthy database pools detected', {
       unhealthyPools,
       healthStatuses,
     });
@@ -640,7 +645,7 @@ export const monitorPoolHealth = async (): Promise<Record<string, PoolHealthStat
 };
 
 /**
- * Pool management interface providing access to all database pools.
+ * Collection of all database pools with both raw and Drizzle interfaces.
  */
 export interface PoolCollection {
   general: { raw: EnhancedPool; drizzle: typeof db };
@@ -658,28 +663,25 @@ export const getPools = (): PoolCollection => ({
 });
 
 /**
- * Gracefully closes all database connection pools during application shutdown.
- * Ensures proper resource cleanup and prevents connection leaks.
+ * Gracefully closes all database connection pools with timeout protection.
+ * Should be called during application shutdown to ensure clean resource cleanup.
  */
 export const closePools = async (): Promise<void> => {
   logger.info('Initiating graceful shutdown of all database connection pools');
-  
+
   const pools = [
     { pool: rawGeneralPool, name: 'general' },
     { pool: rawReadPool, name: 'read' },
     { pool: rawWritePool, name: 'write' },
   ];
-  
+
   try {
-    // Check pool health before shutdown
+    // Perform final health check before shutdown
     await monitorPoolHealth();
-    
+
     // Close all pools concurrently with timeout protection
     await Promise.all(
       pools.map(async ({ pool, name }) => {
-        logger.debug(`Closing ${name} pool...`);
-
-        // Type guard to ensure pool.end() method exists
         if (pool && typeof pool.end === 'function') {
           const closePromise = pool.end();
           const timeoutPromise = new Promise<void>((_, reject) => {
@@ -690,23 +692,15 @@ export const closePools = async (): Promise<void> => {
           });
 
           await Promise.race([closePromise, timeoutPromise]);
-          logger.debug(`${name} pool closed successfully`);
-        } else {
-          logger.warn(`Unable to close pool ${name}: end method not available`);
+          logger.info(`${name} pool closed successfully`);
         }
       })
     );
-    
+
     logger.info('All database connection pools closed successfully');
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('Error during pool shutdown:', { error: errorMessage });
+    logger.error('Error during pool shutdown', { error: errorMessage });
     throw error;
   }
 };
-
-
-
-
-
-

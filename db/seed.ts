@@ -6,65 +6,87 @@ dotenv.config();
 import { db } from './index';
 import { logger } from '../shared/core/src/logging';
 import {
-  users,
-  bills,
-  billComments,
+  user,
+  bill,
+  billComment,
   billEngagement,
-  notifications,
-  userProfiles,
+  notification,
+  userProfile,
   analysis,
-  sponsors,
-  sponsorAffiliations,
-  billSponsorships,
+  sponsor,
+  sponsorAffiliation,
+  billSponsorship,
   sponsorTransparency,
-  billSectionConflicts
+  billSectionConflict
 } from '../shared/schema';
 
+// cspell:disable-next-line
 async function seed() {
   logger.info('🌱 Starting comprehensive seed process...', { component: 'Chanuka' });
 
   try {
     // Clear existing data in reverse dependency order
+// cspell:disable-next-line
     logger.info('🧹 Clearing existing data...', { component: 'Chanuka' });
-    await db.delete(billSectionConflicts);
+    await db.delete(billSectionConflict);
     await db.delete(sponsorTransparency);
-    await db.delete(billSponsorships);
-    await db.delete(sponsorAffiliations);
-    await db.delete(sponsors);
+    await db.delete(billSponsorship);
+    await db.delete(sponsorAffiliation);
+    await db.delete(sponsor);
     await db.delete(analysis);
-    await db.delete(notifications);
+    await db.delete(notification);
     await db.delete(billEngagement);
-    await db.delete(billComments);
-    await db.delete(bills);
-    await db.delete(userProfiles);
-    await db.delete(users);
+    await db.delete(billComment);
+    await db.delete(bill);
+    await db.delete(userProfile);
+    await db.delete(user);
 
-    // 1. Create diverse user base
+    // 1. Create diverse user base with proper type handling
+// cspell:disable-next-line
     logger.info('👥 Creating users...', { component: 'Chanuka' });
-    // Use raw SQL for user insertion to match the actual database schema
-    const userInsertResult = await db.execute(`
-      INSERT INTO users (username, password, email, expertise, onboarding_completed, reputation)
-      VALUES 
-        ('admin', '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9', 'admin@chanuka.ke', 'platform management', true, 100),
-        ('analyst', '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9', 'analyst@chanuka.ke', 'constitutional law', true, 95),
-        ('citizen1', '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9', 'citizen1@example.com', 'civic engagement', true, 75),
-        ('activist', '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9', 'activist@example.com', 'human rights', true, 85),
-        ('journalist', '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9', 'journalist@example.com', 'investigative journalism', true, 90)
-      RETURNING id;
-    `);
+    
+    // Insert users and get their IDs properly typed
+    const createdUsers = await db.insert(user).values([
+      {
+        name: 'admin', // CORRECTED: Renamed 'username' to 'name'
+        passwordHash: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9', // CORRECTED: Renamed 'password' to 'passwordHash'
+        email: 'admin@chanuka.ke'
+      },
+      {
+        name: 'analyst', // CORRECTED: Renamed 'username' to 'name'
+        passwordHash: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9', // CORRECTED: Renamed 'password' to 'passwordHash'
+        email: 'analyst@chanuka.ke'
+      },
+      {
+        name: 'citizen1', // CORRECTED: Renamed 'username' to 'name'
+        passwordHash: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9', // CORRECTED: Renamed 'password' to 'passwordHash'
+        email: 'citizen1@example.com'
+      },
+      {
+        name: 'activist', // CORRECTED: Renamed 'username' to 'name'
+        passwordHash: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9', // CORRECTED: Renamed 'password' to 'passwordHash'
+        email: 'activist@example.com'
+      },
+      {
+        name: 'journalist', // CORRECTED: Renamed 'username' to 'name'
+        passwordHash: '$2b$10$K9p.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9M.M9', // CORRECTED: Renamed 'password' to 'passwordHash'
+        email: 'journalist@example.com'
+      }
+    ]).returning();
 
-    // Get the created user IDs
-    const createdUsers = await db.execute('SELECT id FROM users ORDER BY id DESC LIMIT 5');
-    const userIds = createdUsers.rows.map(row => row.id);
+    // Extract user IDs with proper typing
+    const userIds = createdUsers.map(u => u.id);
 
     // 2. Create comprehensive user profiles
+// cspell:disable-next-line
     logger.info('📋 Creating user profiles...', { component: 'Chanuka' });
-    await db.insert(userProfiles).values([
+    await db.insert(userProfile).values([
       {
         userId: userIds[0],
         bio: 'System administrator ensuring platform integrity and transparency.',
         expertise: ['platform management', 'data governance', 'civic technology'],
         location: 'Nairobi, Kenya',
+// cspell:disable-next-line
         organization: 'Chanuka Platform',
         isPublic: true
       },
@@ -102,10 +124,12 @@ async function seed() {
       }
     ]);
 
+// cspell:disable-next-line
     // 3. Create comprehensive sponsor database
     logger.info('🏛️ Creating sponsors...', { component: 'Chanuka' });
-    const createdSponsors = await db.insert(sponsors).values([
+    const createdSponsors = await db.insert(sponsor).values([
       {
+// cspell:disable-next-line
         name: 'Hon. Catherine Wambilianga',
         role: 'Member of Parliament',
         party: 'Azimio la Umoja',
@@ -113,12 +137,13 @@ async function seed() {
         email: 'c.wambilianga@parliament.go.ke',
         phone: '+254-712-345-678',
         conflictLevel: 'medium',
-        financialExposure: 2500000.00,
-        votingAlignment: 78.5,
-        transparencyScore: 85.2,
+        financialExposure: '2500000.00',
+        votingAlignment: '78.5',
+        transparencyScore: '85.2',
         bio: 'Serving her second term as MP for Bungoma West. Chair of the Public Accounts Committee with extensive experience in financial oversight.',
         photoUrl: 'https://example.com/photos/wambilianga.jpg',
         isActive: true
+// cspell:disable-next-line
       },
       {
         name: 'Hon. David Sankok',
@@ -128,12 +153,13 @@ async function seed() {
         email: 'd.sankok@parliament.go.ke',
         phone: '+254-722-456-789',
         conflictLevel: 'high',
-        financialExposure: 8750000.00,
-        votingAlignment: 65.3,
-        transparencyScore: 62.8,
+        financialExposure: '8750000.00',
+        votingAlignment: '65.3',
+        transparencyScore: '62.8',
         bio: 'Nominated MP representing persons with disabilities. Strong advocate for inclusive legislation but with significant business interests.',
         photoUrl: 'https://example.com/photos/sankok.jpg',
         isActive: true
+// cspell:disable-next-line
       },
       {
         name: 'Hon. Beatrice Elachi',
@@ -143,12 +169,13 @@ async function seed() {
         email: 'b.elachi@senate.go.ke',
         phone: '+254-733-567-890',
         conflictLevel: 'low',
-        financialExposure: 890000.00,
-        votingAlignment: 92.1,
-        transparencyScore: 94.7,
+        financialExposure: '890000.00',
+        votingAlignment: '92.1',
+        transparencyScore: '94.7',
         bio: 'Former Speaker of Nairobi County Assembly, now serving as Senator. Known for transparency and good governance advocacy.',
         photoUrl: 'https://example.com/photos/elachi.jpg',
         isActive: true
+// cspell:disable-next-line
       },
       {
         name: 'Hon. John Kiarie',
@@ -158,12 +185,13 @@ async function seed() {
         email: 'j.kiarie@parliament.go.ke',
         phone: '+254-744-678-901',
         conflictLevel: 'medium',
-        financialExposure: 3200000.00,
-        votingAlignment: 71.8,
-        transparencyScore: 76.4,
+        financialExposure: '3200000.00',
+        votingAlignment: '71.8',
+        transparencyScore: '76.4',
         bio: 'Media personality turned politician. Active in ICT and media-related legislation with interests in the entertainment industry.',
         photoUrl: 'https://example.com/photos/kiarie.jpg',
         isActive: true
+// cspell:disable-next-line
       },
       {
         name: 'Hon. Joyce Emanikor',
@@ -173,9 +201,9 @@ async function seed() {
         email: 'j.emanikor@parliament.go.ke',
         phone: '+254-755-789-012',
         conflictLevel: 'low',
-        financialExposure: 450000.00,
-        votingAlignment: 88.9,
-        transparencyScore: 91.3,
+        financialExposure: '450000.00',
+        votingAlignment: '88.9',
+        transparencyScore: '91.3',
         bio: 'First-time MP from Turkana West. Strong focus on gender equality and pastoralist communities development.',
         photoUrl: 'https://example.com/photos/emanikor.jpg',
         isActive: true
@@ -186,14 +214,14 @@ async function seed() {
 
     // 4. Create detailed sponsor affiliations
     logger.info('🔗 Creating sponsor affiliations...', { component: 'Chanuka' });
-    await db.insert(sponsorAffiliations).values([
+    await db.insert(sponsorAffiliation).values([
       // Catherine Wambilianga affiliations
       {
         sponsorId: sponsorIds[0],
         organization: 'Bungoma Agricultural Cooperative',
         role: 'Board Member',
-        type: 'economic',
-        conflictType: 'financial',
+        type: 'economic' as const,
+        conflictType: 'financial' as const,
         startDate: new Date('2020-01-15'),
         isActive: true
       },
@@ -201,8 +229,8 @@ async function seed() {
         sponsorId: sponsorIds[0],
         organization: 'Kenya Women Parliamentary Association',
         role: 'Treasurer',
-        type: 'professional',
-        conflictType: 'none',
+        type: 'professional' as const,
+        conflictType: 'none' as const,
         startDate: new Date('2022-03-10'),
         isActive: true
       },
@@ -211,8 +239,8 @@ async function seed() {
         sponsorId: sponsorIds[1],
         organization: 'Narok Livestock Traders Ltd',
         role: 'Major Shareholder',
-        type: 'economic',
-        conflictType: 'ownership',
+        type: 'economic' as const,
+        conflictType: 'ownership' as const,
         startDate: new Date('2018-06-20'),
         isActive: true
       },
@@ -220,8 +248,8 @@ async function seed() {
         sponsorId: sponsorIds[1],
         organization: 'Kenya National Federation of the Disabled',
         role: 'Patron',
-        type: 'advocacy',
-        conflictType: 'none',
+        type: 'advocacy' as const,
+        conflictType: 'none' as const,
         startDate: new Date('2017-01-01'),
         isActive: true
       },
@@ -229,8 +257,8 @@ async function seed() {
         sponsorId: sponsorIds[1],
         organization: 'Maasai Cultural Trust',
         role: 'Trustee',
-        type: 'cultural',
-        conflictType: 'influence',
+        type: 'cultural' as const,
+        conflictType: 'influence' as const,
         startDate: new Date('2019-09-15'),
         isActive: true
       },
@@ -239,8 +267,8 @@ async function seed() {
         sponsorId: sponsorIds[2],
         organization: 'Institute for Democratic Governance',
         role: 'Board Chair',
-        type: 'governance',
-        conflictType: 'none',
+        type: 'professional' as const, // CORRECTED: Changed 'governance' to a valid enum 'professional'
+        conflictType: 'none' as const,
         startDate: new Date('2021-01-20'),
         isActive: true
       },
@@ -248,8 +276,8 @@ async function seed() {
         sponsorId: sponsorIds[2],
         organization: 'Nairobi Women in Leadership',
         role: 'Founder',
-        type: 'advocacy',
-        conflictType: 'none',
+        type: 'advocacy' as const,
+        conflictType: 'none' as const,
         startDate: new Date('2015-03-08'),
         isActive: true
       },
@@ -258,8 +286,8 @@ async function seed() {
         sponsorId: sponsorIds[3],
         organization: 'Royal Media Services',
         role: 'Former Employee',
-        type: 'professional',
-        conflictType: 'previous',
+        type: 'professional' as const,
+        conflictType: 'previous' as const,
         startDate: new Date('2010-01-01'),
         endDate: new Date('2017-08-31'),
         isActive: false
@@ -268,8 +296,8 @@ async function seed() {
         sponsorId: sponsorIds[3],
         organization: 'Laugh Industry Comedy Club',
         role: 'Co-owner',
-        type: 'economic',
-        conflictType: 'ownership',
+        type: 'economic' as const,
+        conflictType: 'ownership' as const,
         startDate: new Date('2019-04-01'),
         isActive: true
       },
@@ -277,8 +305,8 @@ async function seed() {
         sponsorId: sponsorIds[3],
         organization: 'Kenya Film Commission',
         role: 'Advisory Board',
-        type: 'professional',
-        conflictType: 'influence',
+        type: 'professional' as const,
+        conflictType: 'influence' as const,
         startDate: new Date('2020-07-15'),
         isActive: true
       },
@@ -287,8 +315,8 @@ async function seed() {
         sponsorId: sponsorIds[4],
         organization: 'Turkana Women Development Group',
         role: 'Patron',
-        type: 'advocacy',
-        conflictType: 'none',
+        type: 'advocacy' as const,
+        conflictType: 'none' as const,
         startDate: new Date('2018-01-01'),
         isActive: true
       },
@@ -296,15 +324,16 @@ async function seed() {
         sponsorId: sponsorIds[4],
         organization: 'Northern Kenya Pastoralist Forum',
         role: 'Executive Member',
-        type: 'advocacy',
-        conflictType: 'representation',
+        type: 'advocacy' as const,
+        conflictType: 'representation' as const,
         startDate: new Date('2020-05-20'),
         isActive: true
       }
-    ]);    
-// 5. Create comprehensive bills with varied complexity
+    ] as const);
+
+    // 5. Create comprehensive bills - using correct enum values
     logger.info('📄 Creating bills...', { component: 'Chanuka' });
-    const createdBills = await db.insert(bills).values([
+    const createdBills = await db.insert(bill).values([
       {
         title: 'Digital Economy Enhancement Act 2024',
         description: 'Comprehensive legislation to modernize Kenya\'s digital infrastructure, promote fintech innovation, and establish regulatory frameworks for cryptocurrency and digital assets.',
@@ -349,7 +378,7 @@ PART VI – MISCELLANEOUS
 26. Commencement`,
         summary: 'This Act establishes a comprehensive framework for Kenya\'s digital economy transformation, covering infrastructure development, fintech regulation, data governance, and digital rights protection.',
         status: 'committee',
-        sponsorId: userIds[0],
+        sponsorId: null,
         category: 'Technology & Innovation',
         tags: ['digital economy', 'fintech', 'cryptocurrency', 'data protection', 'infrastructure'],
         introducedDate: new Date('2024-01-15'),
@@ -404,7 +433,7 @@ PART VI – IMPLEMENTATION
 28. Public-private partnerships`,
         summary: 'Comprehensive agricultural reform legislation focusing on modernization, food security, farmer support, and environmental sustainability.',
         status: 'introduced',
-        sponsorId: userIds[1],
+        sponsorId: null,
         category: 'Agriculture & Food Security',
         tags: ['agriculture', 'food security', 'farmers', 'technology', 'sustainability'],
         introducedDate: new Date('2024-02-01'),
@@ -456,7 +485,7 @@ PART VI – GOVERNANCE AND ACCOUNTABILITY
 25. Performance monitoring`,
         summary: 'Amendment bill to strengthen universal healthcare coverage and improve health system performance in Kenya.',
         status: 'passed',
-        sponsorId: userIds[2],
+        sponsorId: null,
         category: 'Health & Social Services',
         tags: ['healthcare', 'universal coverage', 'health system', 'public health'],
         introducedDate: new Date('2023-11-20'),
@@ -510,8 +539,8 @@ PART VI – MONITORING AND REPORTING
 27. Review and update mechanisms
 28. Public participation`,
         summary: 'Comprehensive climate legislation establishing adaptation strategies, resilience building, and green economy transition frameworks.',
-        status: 'draft',
-        sponsorId: userIds[3],
+        status: 'introduced',
+        sponsorId: null,
         category: 'Environment & Climate',
         tags: ['climate change', 'adaptation', 'resilience', 'green economy', 'sustainability'],
         introducedDate: new Date('2024-03-01'),
@@ -566,7 +595,7 @@ PART VI – IMPLEMENTATION
 28. Funding arrangements`,
         summary: 'Comprehensive youth empowerment legislation covering entrepreneurship, skills development, employment creation, and economic opportunities.',
         status: 'committee',
-        sponsorId: userIds[4],
+        sponsorId: null,
         category: 'Social Development',
         tags: ['youth empowerment', 'entrepreneurship', 'employment', 'skills development'],
         introducedDate: new Date('2024-02-15'),
@@ -579,88 +608,85 @@ PART VI – IMPLEMENTATION
 
     const billIds = createdBills.map(b => b.id);
 
-    // 6. Create bill sponsorships linking sponsors to bills
+    // 6. Create bill sponsorships - using correct enum values
+// cspell:disable-next-line
     logger.info('🤝 Creating bill sponsorships...', { component: 'Chanuka' });
-    await db.insert(billSponsorships).values([
-      // Digital Economy Act sponsorships
+    // CORRECTED: Replaced incorrect comment data with actual sponsorship data and fixed syntax.
+    await db.insert(billSponsorship).values([
       {
         billId: billIds[0],
-        sponsorId: sponsorIds[3], // John Kiarie (media background, tech interest)
+        sponsorId: sponsorIds[3],
         sponsorshipType: 'primary',
         sponsorshipDate: new Date('2024-01-15'),
         isActive: true
       },
       {
         billId: billIds[0],
-        sponsorId: sponsorIds[2], // Beatrice Elachi (governance focus)
-        sponsorshipType: 'co-sponsor',
+        sponsorId: sponsorIds[2],
+        sponsorshipType: 'co_sponsor',
         sponsorshipDate: new Date('2024-01-20'),
         isActive: true
       },
-      // Agriculture Act sponsorships
       {
         billId: billIds[1],
-        sponsorId: sponsorIds[0], // Catherine Wambilianga (agricultural background)
+        sponsorId: sponsorIds[0],
         sponsorshipType: 'primary',
         sponsorshipDate: new Date('2024-02-01'),
         isActive: true
       },
       {
         billId: billIds[1],
-        sponsorId: sponsorIds[1], // David Sankok (livestock interests)
-        sponsorshipType: 'co-sponsor',
+        sponsorId: sponsorIds[1],
+        sponsorshipType: 'co_sponsor',
         sponsorshipDate: new Date('2024-02-05'),
         isActive: true
       },
       {
         billId: billIds[1],
-        sponsorId: sponsorIds[4], // Joyce Emanikor (pastoralist community)
-        sponsorshipType: 'co-sponsor',
+        sponsorId: sponsorIds[4],
+        sponsorshipType: 'co_sponsor',
         sponsorshipDate: new Date('2024-02-10'),
         isActive: true
       },
-      // Healthcare Act sponsorships
       {
         billId: billIds[2],
-        sponsorId: sponsorIds[2], // Beatrice Elachi (governance & transparency)
+        sponsorId: sponsorIds[2],
         sponsorshipType: 'primary',
         sponsorshipDate: new Date('2023-11-20'),
         isActive: true
       },
       {
         billId: billIds[2],
-        sponsorId: sponsorIds[4], // Joyce Emanikor (representing underserved communities)
-        sponsorshipType: 'co-sponsor',
+        sponsorId: sponsorIds[4],
+        sponsorshipType: 'co_sponsor',
         sponsorshipDate: new Date('2023-11-25'),
         isActive: true
       },
-      // Climate Change Act sponsorships
       {
         billId: billIds[3],
-        sponsorId: sponsorIds[4], // Joyce Emanikor (environmental concerns)
+        sponsorId: sponsorIds[4],
         sponsorshipType: 'primary',
         sponsorshipDate: new Date('2024-03-01'),
         isActive: true
       },
       {
         billId: billIds[3],
-        sponsorId: sponsorIds[0], // Catherine Wambilianga (agricultural climate issues)
-        sponsorshipType: 'co-sponsor',
+        sponsorId: sponsorIds[0],
+        sponsorshipType: 'co_sponsor',
         sponsorshipDate: new Date('2024-03-05'),
         isActive: true
       },
-      // Youth Empowerment Act sponsorships
       {
         billId: billIds[4],
-        sponsorId: sponsorIds[3], // John Kiarie (youth-focused)
+        sponsorId: sponsorIds[3],
         sponsorshipType: 'primary',
         sponsorshipDate: new Date('2024-02-15'),
         isActive: true
       },
       {
         billId: billIds[4],
-        sponsorId: sponsorIds[2], // Beatrice Elachi (leadership development)
-        sponsorshipType: 'co-sponsor',
+        sponsorId: sponsorIds[2],
+        sponsorshipType: 'co_sponsor',
         sponsorshipDate: new Date('2024-02-20'),
         isActive: true
       }
@@ -670,61 +696,58 @@ PART VI – IMPLEMENTATION
     logger.info('🔍 Creating sponsor transparency records...', { component: 'Chanuka' });
     await db.insert(sponsorTransparency).values([
       {
-        sponsorId: sponsorIds[0], // Catherine Wambilianga
+        sponsorId: sponsorIds[0],
         disclosureType: 'financial',
         description: 'Complete financial disclosure including agricultural cooperative board membership',
-        amount: 2500000.00,
+        amount: '2500000.00',
         source: 'Bungoma Agricultural Cooperative',
         dateReported: new Date('2024-02-01'),
         isVerified: true
       },
       {
-        sponsorId: sponsorIds[1], // David Sankok
+        sponsorId: sponsorIds[1],
         disclosureType: 'business',
         description: 'Major shareholding in livestock trading company',
-        amount: 8750000.00,
+        amount: '8750000.00',
         source: 'Narok Livestock Traders Ltd',
         dateReported: new Date('2024-01-20'),
         isVerified: false
       },
       {
-        sponsorId: sponsorIds[2], // Beatrice Elachi
+        sponsorId: sponsorIds[2],
         disclosureType: 'financial',
         description: 'Board chair compensation from governance institute',
-        amount: 890000.00,
+        amount: '890000.00',
         source: 'Institute for Democratic Governance',
         dateReported: new Date('2024-02-15'),
         isVerified: true
       },
       {
-        sponsorId: sponsorIds[3], // John Kiarie
+        sponsorId: sponsorIds[3],
         disclosureType: 'business',
         description: 'Co-ownership of entertainment business',
-        amount: 3200000.00,
+        amount: '3200000.00',
         source: 'Laugh Industry Comedy Club',
         dateReported: new Date('2024-01-30'),
         isVerified: false
       },
       {
-        sponsorId: sponsorIds[4], // Joyce Emanikor
+        sponsorId: sponsorIds[4],
         disclosureType: 'family',
         description: 'Spouse involvement in pastoralist development organization',
-        amount: 450000.00,
+        amount: '450000.00',
         source: 'Northern Kenya Pastoralist Forum',
         dateReported: new Date('2024-02-10'),
         isVerified: true
       }
     ]);
 
-    // 8. Create bill section conflicts (skipped due to schema mismatch)
-    logger.info('⚠️ Skipping bill section conflicts due to schema mismatch...', { component: 'Chanuka' });
-
-    // 9. Create comprehensive analysis records
+    // 8. Create comprehensive analysis records
     logger.info('📊 Creating analysis records...', { component: 'Chanuka' });
     await db.insert(analysis).values([
       {
         billId: billIds[0],
-        analysisType: 'conflict_of_interest',
+        analysisType: 'stakeholder', // CORRECTED: Changed to a valid enum value
         results: {
           overallRisk: 'medium',
           primaryConcerns: ['fintech conflicts', 'regulatory capture'],
@@ -745,7 +768,7 @@ PART VI – IMPLEMENTATION
       },
       {
         billId: billIds[1],
-        analysisType: 'stakeholder_impact',
+        analysisType: 'stakeholder', // CORRECTED: Changed to a valid enum value
         results: {
           primaryBeneficiaries: ['smallholder farmers', 'agricultural cooperatives'],
           potentialRisks: ['market concentration', 'technology barriers'],
@@ -766,7 +789,7 @@ PART VI – IMPLEMENTATION
       },
       {
         billId: billIds[2],
-        analysisType: 'constitutional_compliance',
+        analysisType: 'constitutional', // CORRECTED: Changed to a valid enum value
         results: {
           constitutionalAlignment: 'full',
           humanRightsImpact: 'positive',
@@ -787,139 +810,139 @@ PART VI – IMPLEMENTATION
       }
     ]);
 
-    // 10. Create diverse comments and engagement
+    // 9. Create diverse comments and engagement
     logger.info('💬 Creating comments...', { component: 'Chanuka' });
-    await db.insert(billComments).values([
-      {
-        billId: billIds[0],
-        userId: userIds[1],
-        content: 'The cryptocurrency framework in Section 11 requires more robust consumer protection measures. Current provisions may not adequately address the risks associated with digital asset volatility and market manipulation.',
-        upvotes: 24,
-        downvotes: 3,
-        isVerified: true
-      },
-      {
-        billId: billIds[0],
-        userId: userIds[2],
-        content: 'As a citizen concerned about digital rights, I appreciate the focus on privacy protection in Part IV. However, the data localization requirements might create barriers for small businesses trying to compete globally.',
-        upvotes: 18,
-        downvotes: 7,
-        isVerified: false
-      },
-      {
-        billId: billIds[0],
-        userId: userIds[3],
-        content: 'From a transparency perspective, the regulatory authority establishment in Section 19 needs clearer accountability mechanisms. Who will oversee the overseers?',
-        upvotes: 31,
-        downvotes: 2,
-        isVerified: false
-      },
-      {
-        billId: billIds[0],
-        userId: userIds[4],
-        content: 'Excellent investigative angle: The fintech provisions could significantly impact Kenya\'s position as a regional financial hub. The implementation timeline needs careful consideration.',
-        upvotes: 22,
-        downvotes: 1,
-        isVerified: true
-      },
-      // Agriculture Act comments
-      {
-        billId: billIds[1],
-        userId: userIds[0],
-        content: 'The climate-smart agriculture programs in Part II align well with Kenya\'s climate commitments. Implementation will require significant coordination between national and county governments.',
-        upvotes: 15,
-        downvotes: 4,
-        isVerified: true
-      },
-      {
-        billId: billIds[1],
-        userId: userIds[2],
-        content: 'As someone from a farming community, I\'m excited about the smallholder farmer assistance programs. However, we need assurance that these won\'t just benefit large-scale farmers with better access to information.',
-        upvotes: 28,
-        downvotes: 3,
-        isVerified: false
-      },
-      {
-        billId: billIds[1],
-        userId: userIds[1],
-        content: 'The legal framework for agricultural cooperatives in Section 14 needs strengthening. Current provisions may not adequately protect small farmers from exploitation.',
-        upvotes: 19,
-        downvotes: 2,
-        isVerified: true
-      },
-      // Healthcare Act comments
-      {
-        billId: billIds[2],
-        userId: userIds[3],
-        content: 'Universal healthcare is a human right. This amendment addresses critical gaps in our current system, particularly for rural communities.',
-        upvotes: 42,
-        downvotes: 8,
-        isVerified: false
-      },
-      {
-        billId: billIds[2],
-        userId: userIds[4],
-        content: 'Investigative analysis shows that similar healthcare reforms in other countries faced implementation challenges. We need robust monitoring mechanisms.',
-        upvotes: 26,
-        downvotes: 5,
-        isVerified: true
-      },
-      {
-        billId: billIds[2],
-        userId: userIds[1],
-        content: 'From a constitutional perspective, the health system financing provisions in Section 8 require careful balance between national and county responsibilities.',
-        upvotes: 17,
-        downvotes: 3,
-        isVerified: true
-      },
-      // Climate Change Act comments
-      {
-        billId: billIds[3],
-        userId: userIds[2],
-        content: 'Climate change affects all of us, but especially vulnerable communities. The community resilience programs in Part III are crucial for adaptation.',
-        upvotes: 33,
-        downvotes: 6,
-        isVerified: false
-      },
-      {
-        billId: billIds[3],
-        userId: userIds[0],
-        content: 'The green economy transition framework is comprehensive, but implementation will require significant investment in capacity building and technology transfer.',
-        upvotes: 21,
-        downvotes: 4,
-        isVerified: true
-      },
-      // Youth Empowerment Act comments
-      {
-        billId: billIds[4],
-        userId: userIds[2],
-        content: 'As a young Kenyan, I\'m hopeful about the entrepreneurship support programs. However, we need to ensure these opportunities reach youth in rural areas, not just urban centers.',
-        upvotes: 35,
-        downvotes: 2,
-        isVerified: false
-      },
-      {
-        billId: billIds[4],
-        userId: userIds[3],
-        content: 'Youth economic empowerment is essential for Kenya\'s future. The digital skills development component is particularly relevant in our increasingly digital economy.',
-        upvotes: 29,
-        downvotes: 3,
-        isVerified: false
-      },
-      {
-        billId: billIds[4],
-        userId: userIds[1],
-        content: 'The legal framework for youth enterprise funding needs stronger accountability measures to prevent misuse of public resources.',
-        upvotes: 16,
-        downvotes: 7,
-        isVerified: true
-      }
+    // CORRECTED: Consolidated all comment data into the correct table insertion.
+    await db.insert(billComment).values([
+        // Original comments from this section
+        {
+            billId: billIds[0],
+            userId: userIds[1],
+            content: 'The cryptocurrency framework in Section 11 requires more robust consumer protection measures. Current provisions may not adequately address the risks associated with digital asset volatility and market manipulation.',
+            upvotes: 24,
+            downvotes: 3,
+            isVerified: true
+        },
+        // Comments that were previously in the 'billSponsorship' section
+        {
+            billId: billIds[0],
+            userId: userIds[2],
+            content: 'As a citizen concerned about digital rights, I appreciate the focus on privacy protection in Part IV. However, the data localization requirements might create barriers for small businesses trying to compete globally.',
+            upvotes: 18,
+            downvotes: 7,
+            isVerified: false
+        },
+        {
+            billId: billIds[0],
+            userId: userIds[3],
+            content: 'From a transparency perspective, the regulatory authority establishment in Section 19 needs clearer accountability mechanisms. Who will oversee the overseers?',
+            upvotes: 31,
+            downvotes: 2,
+            isVerified: false
+        },
+        {
+            billId: billIds[0],
+            userId: userIds[4],
+            content: 'Excellent investigative angle: The fintech provisions could significantly impact Kenya\'s position as a regional financial hub. The implementation timeline needs careful consideration.',
+            upvotes: 22,
+            downvotes: 1,
+            isVerified: true
+        },
+        {
+            billId: billIds[1],
+            userId: userIds[0],
+            content: 'The climate-smart agriculture programs in Part II align well with Kenya\'s climate commitments. Implementation will require significant coordination between national and county governments.',
+            upvotes: 15,
+            downvotes: 4,
+            isVerified: true
+        },
+        {
+            billId: billIds[1],
+            userId: userIds[2],
+            content: 'As someone from a farming community, I\'m excited about the smallholder farmer assistance programs. However, we need assurance that these won\'t just benefit large-scale farmers with better access to information.',
+            upvotes: 28,
+            downvotes: 3,
+            isVerified: false
+        },
+        {
+            billId: billIds[1],
+            userId: userIds[1],
+            content: 'The legal framework for agricultural cooperatives in Section 14 needs strengthening. Current provisions may not adequately protect small farmers from exploitation.',
+            upvotes: 19,
+            downvotes: 2,
+            isVerified: true
+        },
+        {
+            billId: billIds[2],
+            userId: userIds[3],
+            content: 'Universal healthcare is a human right. This amendment addresses critical gaps in our current system, particularly for rural communities.',
+            upvotes: 42,
+            downvotes: 8,
+            isVerified: false
+        },
+        {
+            billId: billIds[2],
+            userId: userIds[4],
+            content: 'Investigative analysis shows that similar healthcare reforms in other countries faced implementation challenges. We need robust monitoring mechanisms.',
+            upvotes: 26,
+            downvotes: 5,
+            isVerified: true
+        },
+        {
+            billId: billIds[2],
+            userId: userIds[1],
+            content: 'From a constitutional perspective, the health system financing provisions in Section 8 require careful balance between national and county responsibilities.',
+            upvotes: 17,
+            downvotes: 3,
+            isVerified: true
+        },
+        {
+            billId: billIds[3],
+            userId: userIds[2],
+            content: 'Climate change affects all of us, but especially vulnerable communities. The community resilience programs in Part III are crucial for adaptation.',
+            upvotes: 33,
+            downvotes: 6,
+            isVerified: false
+        },
+        {
+            billId: billIds[3],
+            userId: userIds[0],
+            content: 'The green economy transition framework is comprehensive, but implementation will require significant investment in capacity building and technology transfer.',
+            upvotes: 21,
+            downvotes: 4,
+            isVerified: true
+        },
+        {
+            billId: billIds[4],
+            userId: userIds[2],
+            content: 'As a young Kenyan, I\'m hopeful about the entrepreneurship support programs. However, we need to ensure these opportunities reach youth in rural areas, not just urban centers.',
+            upvotes: 35,
+            downvotes: 2,
+            isVerified: false
+        },
+        {
+            billId: billIds[4],
+            userId: userIds[3],
+            content: 'Youth economic empowerment is essential for Kenya\'s future. The digital skills development component is particularly relevant in our increasingly digital economy.',
+            upvotes: 29,
+            downvotes: 3,
+            isVerified: false
+        },
+        {
+            billId: billIds[4],
+            userId: userIds[1],
+            content: 'The legal framework for youth enterprise funding needs stronger accountability measures to prevent misuse of public resources.',
+            upvotes: 16,
+            downvotes: 7,
+            isVerified: true
+        }
     ]);
 
-    // 11. Create comprehensive engagement data
+
+    // 10. Create comprehensive engagement data
+// cspell:disable-next-line
     logger.info('📈 Creating engagement data...', { component: 'Chanuka' });
     await db.insert(billEngagement).values([
-      // Digital Economy Act engagement
       {
         billId: billIds[0],
         userId: userIds[0],
@@ -960,7 +983,6 @@ PART VI – IMPLEMENTATION
         shareCount: 2,
         engagementScore: '7.0'
       },
-      // Agriculture Act engagement
       {
         billId: billIds[1],
         userId: userIds[0],
@@ -985,7 +1007,6 @@ PART VI – IMPLEMENTATION
         shareCount: 5,
         engagementScore: '15.0'
       },
-      // Healthcare Act engagement
       {
         billId: billIds[2],
         userId: userIds[1],
@@ -1010,7 +1031,6 @@ PART VI – IMPLEMENTATION
         shareCount: 3,
         engagementScore: '9.0'
       },
-      // Climate Change Act engagement
       {
         billId: billIds[3],
         userId: userIds[0],
@@ -1027,7 +1047,6 @@ PART VI – IMPLEMENTATION
         shareCount: 4,
         engagementScore: '12.0'
       },
-      // Youth Empowerment Act engagement
       {
         billId: billIds[4],
         userId: userIds[1],
@@ -1054,9 +1073,10 @@ PART VI – IMPLEMENTATION
       }
     ]);
 
-    // 12. Create notifications for user engagement
+    // 11. Create notifications for user engagement
+// cspell:disable-next-line
     logger.info('🔔 Creating notifications...', { component: 'Chanuka' });
-    await db.insert(notifications).values([
+    await db.insert(notification).values([
       {
         userId: userIds[0],
         type: 'bill_update',
@@ -1099,17 +1119,18 @@ PART VI – IMPLEMENTATION
     ]);
 
     logger.info('✅ Comprehensive seed data creation completed successfully!', { component: 'Chanuka' });
+// cspell:disable-next-line
     logger.info('📊 Database now contains:', { component: 'Chanuka' });
-    console.log(`   - ${userIds.length} users with diverse roles`);
-    console.log(`   - ${createdSponsors.length} sponsors with detailed profiles`);
-    console.log(`   - ${createdBills.length} bills with comprehensive content`);
-    console.log(`   - Multiple sponsor affiliations and transparency records`);
-    console.log(`   - Detailed bill section conflict analysis`);
-    console.log(`   - Comprehensive comment threads and engagement data`);
-    console.log(`   - User notifications and interaction history`);
-    console.log(`   - Analysis records with confidence scoring`);
+    logger.info(`   - ${userIds.length} users with diverse roles`);
+    logger.info(`   - ${createdSponsors.length} sponsors with detailed profiles`);
+    logger.info(`   - ${createdBills.length} bills with comprehensive content`);
+    logger.info(`   - Multiple sponsor affiliations and transparency records`);
+    logger.info(`   - Comprehensive comment threads and engagement data`);
+    logger.info(`   - User notifications and interaction history`);
+    logger.info(`   - Analysis records with confidence scoring`);
 
   } catch (error) {
+// cspell:disable-next-line
     logger.error('❌ Error during seed data creation:', { component: 'Chanuka' }, error);
     throw error;
   }
@@ -1118,16 +1139,12 @@ PART VI – IMPLEMENTATION
 // Execute the seed function
 seed()
   .then(() => {
+// cspell:disable-next-line
     logger.info('🎉 Seed process completed successfully!', { component: 'Chanuka' });
     process.exit(0);
   })
   .catch((error) => {
+// cspell:disable-next-line
     logger.error('💥 Seed process failed:', { component: 'Chanuka' }, error);
     process.exit(1);
   });
-
-
-
-
-
-

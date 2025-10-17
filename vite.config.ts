@@ -1,36 +1,41 @@
 import { defineConfig } from "vite";
+import type { Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { visualizer } from 'rollup-plugin-visualizer';
 import viteCompression from 'vite-plugin-compression';
-import { logger } from '../utils/logger';
 
 export default defineConfig({
   plugins: [
+    // Core React plugin
     react(),
-    // Bundle analyzer (only in build mode)
+    
+    // Bundle analyzer - only runs when ANALYZE env var is set
     process.env.ANALYZE && visualizer({
       filename: 'dist/stats.html',
       open: true,
       gzipSize: true,
       brotliSize: true,
-      template: 'treemap', // Better visualization
+      template: 'treemap',
     }),
-    // Gzip compression
+    
+    // Gzip compression for production builds
     viteCompression({
       algorithm: 'gzip',
       ext: '.gz',
-      threshold: 1024, // Only compress files larger than 1KB
+      threshold: 1024, // Only compress files > 1KB
       deleteOriginFile: false,
     }),
-    // Brotli compression
+    
+    // Brotli compression for even better compression ratios
     viteCompression({
       algorithm: 'brotliCompress',
       ext: '.br',
       threshold: 1024,
       deleteOriginFile: false,
     }),
-  ].filter(Boolean),
+  ].filter((plugin): plugin is Plugin => Boolean(plugin)),
+  
   resolve: {
     alias: {
       "@db": path.resolve(import.meta.dirname, "db"),
@@ -39,59 +44,64 @@ export default defineConfig({
       "@assets": path.resolve(import.meta.dirname, "attached_assets"),
     },
   },
+  
   root: path.resolve(import.meta.dirname, "client"),
+  
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    
     rollupOptions: {
       output: {
+        // Strategic chunk splitting for optimal caching and loading
         manualChunks: (id) => {
-          // Vendor chunks for better caching
+          // Vendor libraries - these change infrequently, so they cache well
           if (id.includes('node_modules')) {
-            // React ecosystem
+            // React ecosystem - core framework, changes rarely
             if (id.includes('react') || id.includes('react-dom')) {
               return 'react-vendor';
             }
             
-            // UI library chunks
+            // UI component libraries
             if (id.includes('@radix-ui')) {
               return 'ui-vendor';
             }
             
-            // Query and state management
+            // Data fetching and state management
             if (id.includes('@tanstack/react-query')) {
               return 'query-vendor';
             }
             
-            // Form handling
+            // Form handling libraries
             if (id.includes('react-hook-form') || id.includes('@hookform')) {
               return 'form-vendor';
             }
             
-            // Routing
+            // Routing libraries
             if (id.includes('react-router') || id.includes('wouter')) {
               return 'router-vendor';
             }
             
-            // Icons
+            // Icon libraries - can be large
             if (id.includes('lucide-react')) {
               return 'icons-vendor';
             }
             
-            // Utilities
-            if (id.includes('date-fns') || id.includes('zod') || id.includes('clsx') || id.includes('tailwind-merge')) {
+            // Utility libraries
+            if (id.includes('date-fns') || id.includes('zod') || 
+                id.includes('clsx') || id.includes('tailwind-merge')) {
               return 'utils-vendor';
             }
             
-            // Other vendor libraries
+            // Catch-all for other vendor code
             return 'vendor';
           }
           
-          // Route-based code splitting
+          // Route-based code splitting - loads only what's needed per page
           if (id.includes('/pages/')) {
             const pageName = id.split('/pages/')[1].split('.')[0];
             
-            // Group related pages together
+            // Group related pages to reduce number of chunks
             if (pageName.includes('bill')) {
               return 'bills-pages';
             }
@@ -101,14 +111,15 @@ export default defineConfig({
             if (pageName.includes('community') || pageName.includes('expert')) {
               return 'community-pages';
             }
-            if (pageName.includes('auth') || pageName.includes('profile') || pageName.includes('onboarding')) {
+            if (pageName.includes('auth') || pageName.includes('profile') || 
+                pageName.includes('onboarding')) {
               return 'user-pages';
             }
             
             return `page-${pageName}`;
           }
           
-          // Component-based splitting for large components
+          // Component-based splitting for feature-specific components
           if (id.includes('/components/')) {
             if (id.includes('/admin/')) {
               return 'admin-components';
@@ -124,36 +135,34 @@ export default defineConfig({
             }
           }
           
-          // Utility and service chunks
+          // Utility and service modules
           if (id.includes('/services/') || id.includes('/utils/')) {
             return 'app-utils';
           }
           
-          // Default chunk
+          // Everything else goes in the main chunk
           return 'main';
         }
       }
     },
-    // Optimize chunk sizes
+    
+    // Warning threshold for chunk sizes (in KB)
     chunkSizeWarningLimit: 1000,
-    // Enable source maps for better debugging
+    
+    // Source maps for debugging - only in development
     sourcemap: process.env.NODE_ENV === 'development',
-    // Additional optimizations
+    
+    // Terser minification for better compression
     minify: 'terser',
     terserOptions: {
       compress: {
+        // Remove console.log in production for cleaner, smaller builds
         drop_console: process.env.NODE_ENV === 'production',
         drop_debugger: process.env.NODE_ENV === 'production',
       },
     },
-    // Optimize asset inlining
-    assetsInlineLimit: 4096, // 4KB threshold for inlining assets
+    
+    // Inline small assets as base64 to reduce HTTP requests
+    assetsInlineLimit: 4096, // 4KB threshold
   },
 });
-
-
-
-
-
-
-

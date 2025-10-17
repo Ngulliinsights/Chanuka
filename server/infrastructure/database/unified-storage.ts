@@ -10,7 +10,7 @@ import {
   type BillSponsorship, type SponsorTransparency, type BillSectionConflict,
   type UserInterest, type BillTag
 } from "@shared/schema.js";
-import { eq, desc, and, or, like, sql, count } from "drizzle-orm";
+import { eq, desc, and, or, like, sql, count, SQL } from "drizzle-orm";
 import { database as db } from "../../../shared/database/connection.js";
 import { logger } from '@shared/utils/logger';
 
@@ -86,21 +86,27 @@ export interface UnifiedStorage {
 export class DatabaseUnifiedStorage implements UnifiedStorage {
   // Bill operations
   async getBills(filters?: { category?: string; status?: string; search?: string }): Promise<Bill[]> {
-    let query = db.select().from(bills);
+    const conditions: SQL[] = [];
 
     if (filters?.search) {
-      query = query.where(
+      conditions.push(
         or(
           like(bills.title, `%${filters.search}%`),
           like(bills.description, `%${filters.search}%`),
           like(bills.billNumber, `%${filters.search}%`)
         )
       );
-    } else if (filters?.category) {
-      query = query.where(eq(bills.category, filters.category));
-    } else if (filters?.status) {
-      query = query.where(eq(bills.status, filters.status));
     }
+    if (filters?.category) {
+      conditions.push(eq(bills.category, filters.category));
+    }
+    if (filters?.status) {
+      conditions.push(eq(bills.status, filters.status));
+    }
+
+    const query = conditions.length > 0
+      ? db.select().from(bills).where(and(...conditions))
+      : db.select().from(bills);
 
     return await query.orderBy(desc(bills.introducedDate));
   }

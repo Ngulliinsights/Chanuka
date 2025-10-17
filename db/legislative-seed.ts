@@ -1,17 +1,18 @@
 import { db } from "../server/db";
 import { logger } from '../shared/core/src/logging';
 import {
-  users, bills, sponsors, billSponsorships, billComments,
-  userProfiles, analysis, sponsorAffiliations, sponsorTransparency,
-  billSectionConflicts
+  user, bill, sponsor, billSponsorship, billComment,
+  userProfile, analysis, sponsorAffiliation, sponsorTransparency,
+  billSectionConflict
 } from "../shared/schema.js";
 
 async function seedLegislativeData() {
+// cspell:disable-next-line
   logger.info('Starting legislative data seeding...', { component: 'Chanuka' });
 
   try {
     // Create sample users
-    const sampleUsers = await db.insert(users).values([
+    const sampleUsers = await db.insert(user).values([
       {
         email: "jane.citizen@example.com",
         passwordHash: "$2a$10$hash1", // In real app, properly hash passwords
@@ -38,7 +39,7 @@ async function seedLegislativeData() {
     console.log(`Created ${sampleUsers.length} users`);
 
     // Create user profiles
-    await db.insert(userProfiles).values([
+    await db.insert(userProfile).values([
       {
         userId: sampleUsers[1].id,
         bio: "Constitutional law expert with 15 years experience",
@@ -50,11 +51,13 @@ async function seedLegislativeData() {
     ]);
 
     // Create sample sponsors
-    const sampleSponsors = await db.insert(sponsors).values([
+    const sampleSponsors = await db.insert(sponsor).values([
       {
+// cspell:disable-next-line
         name: "Hon. Michael Wanjala",
         role: "Member of Parliament",
         party: "ODM",
+// cspell:disable-next-line
         constituency: "Westlands",
         email: "m.wanjala@parliament.go.ke",
         phone: "+254700123456",
@@ -63,9 +66,11 @@ async function seedLegislativeData() {
         transparencyScore: "85.5"
       },
       {
+// cspell:disable-next-line
         name: "Sen. Grace Mutindi",
         role: "Senator",
         party: "UDA",
+// cspell:disable-next-line
         constituency: "Machakos",
         email: "g.mutindi@senate.go.ke",
         phone: "+254700654321",
@@ -74,9 +79,11 @@ async function seedLegislativeData() {
         transparencyScore: "72.3"
       },
       {
+// cspell:disable-next-line
         name: "Hon. James Kiprotich",
         role: "Member of Parliament",
         party: "UDA",
+// cspell:disable-next-line
         constituency: "Uasin Gishu North",
         email: "j.kiprotich@parliament.go.ke",
         bio: "Focus on agricultural policy and rural development",
@@ -88,9 +95,10 @@ async function seedLegislativeData() {
     console.log(`Created ${sampleSponsors.length} sponsors`);
 
     // Create sponsor affiliations
-    await db.insert(sponsorAffiliations).values([
+    await db.insert(sponsorAffiliation).values([
       {
         sponsorId: sampleSponsors[2].id,
+// cspell:disable-next-line
         organization: "AgriCorp Kenya Ltd",
         role: "Board Member",
         type: "economic",
@@ -114,7 +122,7 @@ async function seedLegislativeData() {
     ]);
 
     // Create sample bills
-    const sampleBills = await db.insert(bills).values([
+    const sampleBills = await db.insert(bill).values([
       {
         title: "Digital Literacy Enhancement Act 2025",
         description: "A comprehensive bill to improve digital literacy and technology access in schools across Kenya",
@@ -140,6 +148,7 @@ async function seedLegislativeData() {
       {
         title: "Healthcare Access Improvement Bill 2025",
         description: "Legislation to expand healthcare coverage and improve medical facility infrastructure in rural areas",
+// cspell:disable-next-line
         content: "This comprehensive healthcare bill addresses the critical need for improved medical services in underserved communities...",
         summary: "Expands healthcare access through infrastructure development and coverage improvements",
         status: "introduced",
@@ -186,7 +195,7 @@ async function seedLegislativeData() {
     console.log(`Created ${sampleBills.length} bills`);
 
     // Create bill sponsorships
-    await db.insert(billSponsorships).values([
+    await db.insert(billSponsorship).values([
       {
         billId: sampleBills[0].id,
         sponsorId: sampleSponsors[0].id,
@@ -214,14 +223,16 @@ async function seedLegislativeData() {
     ]);
 
     // Create bill comments
-    await db.insert(billComments).values([
+    await db.insert(billComment).values([
       {
         billId: sampleBills[0].id,
         userId: sampleUsers[0].id,
         content: "This bill has excellent potential to transform education in Kenya. The focus on digital literacy is exactly what our children need for the future.",
         commentType: "support",
         isVerified: false,
+// cspell:disable-next-line
         upvotes: 12,
+// cspell:disable-next-line
         downvotes: 2
       },
       {
@@ -230,7 +241,9 @@ async function seedLegislativeData() {
         content: "From a policy analysis perspective, this bill addresses critical infrastructure gaps. However, implementation timelines may need adjustment to ensure sustainability.",
         commentType: "analysis",
         isVerified: true,
+// cspell:disable-next-line
         upvotes: 28,
+// cspell:disable-next-line
         downvotes: 1
       },
       {
@@ -239,7 +252,9 @@ async function seedLegislativeData() {
         content: "While agricultural support is needed, the conflict of interest with the sponsor's business connections raises transparency concerns.",
         commentType: "concern",
         isVerified: false,
+// cspell:disable-next-line
         upvotes: 45,
+// cspell:disable-next-line
         downvotes: 8
       }
     ]);
@@ -275,7 +290,7 @@ async function seedLegislativeData() {
     ]);
 
     // Create bill section conflicts
-    await db.insert(billSectionConflicts).values([
+    await db.insert(billSectionConflict).values([
       {
         billId: sampleBills[2].id,
         sectionNumber: "Section 4.2",
@@ -287,14 +302,18 @@ async function seedLegislativeData() {
       }
     ]);
 
+// cspell:disable-next-line
     logger.info('✅ Legislative data seeding completed successfully!', { component: 'Chanuka' });
+// cspell:disable-next-line
     logger.info('Database now contains:', { component: 'Chanuka' });
     console.log(`- ${sampleUsers.length} users`);
     console.log(`- ${sampleSponsors.length} sponsors`);
     console.log(`- ${sampleBills.length} bills`);
+// cspell:disable-next-line
     logger.info('- Multiple comments, analysis records, and transparency data', { component: 'Chanuka' });
 
   } catch (error) {
+// cspell:disable-next-line
     logger.error('❌ Error seeding legislative data:', { component: 'Chanuka' }, error);
     throw error;
   }
@@ -303,10 +322,12 @@ async function seedLegislativeData() {
 // Run the seed function
 seedLegislativeData()
   .then(() => {
+// cspell:disable-next-line
     logger.info('Seeding process completed!', { component: 'Chanuka' });
     process.exit(0);
   })
   .catch((error) => {
+// cspell:disable-next-line
     logger.error('Seeding failed:', { component: 'Chanuka' }, error);
     process.exit(1);
   });

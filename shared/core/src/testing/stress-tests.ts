@@ -1,10 +1,9 @@
 import { performance } from 'perf_hooks';
 import { EventEmitter } from 'events';
-import { LoadTester } from './load-tester';
-import type { CacheService } from '../cache/types';
-import type { RateLimitStore } from '../rate-limiting/types';
-import type { Logger } from '../logging/types';
-import { logger } from '../utils/logger';
+import { LoadTester } from '../../shared/core/src/testing/load-tester';
+import type { CacheService } from '../../shared/core/src/cache/types';
+import type { RateLimitStore } from '../../shared/core/src/rate-limiting/types';
+import { UnifiedLogger } from '../../shared/core/src/logging/logger';
 
 /**
  * Stress testing utilities for core components
@@ -76,7 +75,7 @@ export class StressTests extends EventEmitter {
     const startTime = performance.now();
     const initialMemory = process.memoryUsage();
     const memorySnapshots: MemorySnapshot[] = [];
-    
+
     this.emit('stress:cache:memory:start');
 
     try {
@@ -91,12 +90,13 @@ export class StressTests extends EventEmitter {
       for (const { size, count, phase } of phases) {
         const phaseStart = performance.now();
         const data = 'x'.repeat(size);
-        
+        const keys: string[] = [];
+
         // Store objects
         const promises = [];
         for (let i = 0; i < count; i++) {
           promises.push(cache.set(`stress:memory:${phase}:${i}`, data, 3600));
-          
+
           // Take memory snapshots periodically
           if (i % Math.floor(count / 10) === 0) {
             const currentMemory = process.memoryUsage();
@@ -114,7 +114,7 @@ export class StressTests extends EventEmitter {
         }
 
         await Promise.all(promises);
-        
+
         const phaseEnd = performance.now();
         this.emit('stress:cache:memory:phase', {
           phase,
@@ -184,11 +184,11 @@ export class StressTests extends EventEmitter {
         // Mixed operations: 40% reads, 40% writes, 20% deletes
         const workers = Array(concurrency).fill(null).map(async (_, workerId) => {
           const workerResults = { reads: 0, writes: 0, deletes: 0, errors: 0 };
-          
+
           for (let i = 0; i < operationsPerWorker; i++) {
             const operation = Math.random();
             const key = `stress:concurrency:${workerId}:${i}`;
-            
+
             try {
               if (operation < 0.4) {
                 // Read operation
@@ -207,7 +207,7 @@ export class StressTests extends EventEmitter {
               workerResults.errors++;
             }
           }
-          
+
           return workerResults;
         });
 
@@ -283,15 +283,15 @@ export class StressTests extends EventEmitter {
       for (const pattern of floodPatterns) {
         const patternStart = performance.now();
         const { requests, concurrency, duration } = pattern;
-        
+
         const requestsPerWorker = Math.floor(requests / concurrency);
         const workers = Array(concurrency).fill(null).map(async (_, workerId) => {
           const workerResults = { allowed: 0, blocked: 0, errors: 0 };
           const userId = `flood-user-${workerId}`;
-          
+
           for (let i = 0; i < requestsPerWorker; i++) {
             try {
-              const result = await rateLimiter.hit(userId, 100, 60000); // 100 requests per minute
+              const result = await rateLimiter.check(userId, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
               if (result.allowed) {
                 workerResults.allowed++;
               } else {
@@ -300,13 +300,13 @@ export class StressTests extends EventEmitter {
             } catch (error) {
               workerResults.errors++;
             }
-            
+
             // Add small delay to simulate realistic request timing
             if (i % 10 === 0) {
               await new Promise(resolve => setTimeout(resolve, 1));
             }
           }
-          
+
           return workerResults;
         });
 
@@ -376,25 +376,25 @@ export class StressTests extends EventEmitter {
     try {
       // Create rate limit entries for many users
       const userCounts = [1000, 10000, 50000, 100000];
-      
+
       for (const userCount of userCounts) {
         const phaseStart = performance.now();
-        
+
         // Create rate limit entries in batches
         const batchSize = 1000;
         const batches = Math.ceil(userCount / batchSize);
-        
+
         for (let batch = 0; batch < batches; batch++) {
           const batchPromises = [];
           const startUser = batch * batchSize;
           const endUser = Math.min(startUser + batchSize, userCount);
-          
+
           for (let i = startUser; i < endUser; i++) {
-            batchPromises.push(rateLimiter.hit(`stress-user-${i}`, 100, 60000));
+            batchPromises.push(rateLimiter.check(`stress-user-${i}`, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' }));
           }
-          
+
           await Promise.all(batchPromises);
-          
+
           // Take memory snapshot
           if (batch % 10 === 0) {
             const currentMemory = process.memoryUsage();
@@ -454,7 +454,7 @@ export class StressTests extends EventEmitter {
   /**
    * Stress test logging under high volume
    */
-  async stressTestLoggingVolume(logger: Logger): Promise<StressTestResult> {
+  async stressTestLoggingVolume(logger: UnifiedLogger): Promise<StressTestResult> {
     const startTime = performance.now();
     this.emit('stress:logging:volume:start');
 
@@ -546,7 +546,7 @@ export class StressTests extends EventEmitter {
   /**
    * Stress test logging concurrency
    */
-  async stressTestLoggingConcurrency(logger: Logger): Promise<StressTestResult> {
+  async stressTestLoggingConcurrency(logger: UnifiedLogger): Promise<StressTestResult> {
     const startTime = performance.now();
     this.emit('stress:logging:concurrency:start');
 
@@ -560,7 +560,7 @@ export class StressTests extends EventEmitter {
 
         const workers = Array(concurrency).fill(null).map(async (_, workerId) => {
           const workerResults = { logs: 0, errors: 0 };
-          
+
           for (let i = 0; i < logsPerWorker; i++) {
             try {
               logger.info(`Concurrent log from worker ${workerId}`, {
@@ -574,7 +574,7 @@ export class StressTests extends EventEmitter {
               workerResults.errors++;
             }
           }
-          
+
           return workerResults;
         });
 
@@ -633,14 +633,14 @@ export class StressTests extends EventEmitter {
   async stressTestSystemWide(components: StressTestComponents): Promise<StressTestResult> {
     const startTime = performance.now();
     const initialMemory = process.memoryUsage();
-    
+
     this.emit('stress:system:start');
 
     try {
       const { cache, rateLimiter, logger } = components;
       const duration = this.config.systemStressDuration || 60000; // 1 minute
       const concurrency = this.config.systemStressConcurrency || 100;
-      
+
       const endTime = Date.now() + duration;
       const workers = Array(concurrency).fill(null).map(async (_, workerId) => {
         const workerStats = {
@@ -666,7 +666,7 @@ export class StressTests extends EventEmitter {
               workerStats.cacheOps++;
             } else if (operation < 0.6 && rateLimiter) {
               // Rate limiting checks
-              await rateLimiter.hit(userId, 100, 60000);
+              await rateLimiter.check(userId, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
               workerStats.rateLimitChecks++;
             } else if (logger) {
               // Logging
@@ -785,7 +785,7 @@ export class StressTests extends EventEmitter {
 
   private async testMemoryCleanup(cache: CacheService): Promise<any> {
     const beforeCleanup = process.memoryUsage();
-    
+
     // Trigger cleanup if available
     if (cache.clear) {
       await cache.clear();
@@ -822,7 +822,7 @@ export class StressTests extends EventEmitter {
   private captureSystemMetrics(): SystemMetrics {
     const memUsage = process.memoryUsage();
     const cpuUsage = process.cpuUsage();
-    
+
     return {
       timestamp: Date.now(),
       memory: {
@@ -852,7 +852,7 @@ export interface StressTestConfig {
 export interface StressTestComponents {
   cache?: CacheService;
   rateLimiter?: RateLimitStore;
-  logger?: Logger;
+  logger?: UnifiedLogger;
 }
 
 export interface StressTestResult {
@@ -970,9 +970,3 @@ export interface SystemMetrics {
   uptime: number;
   loadAverage: number[];
 }
-
-
-
-
-
-
