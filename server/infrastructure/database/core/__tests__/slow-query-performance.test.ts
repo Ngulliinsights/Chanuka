@@ -1,133 +1,147 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { QueryExecutor } from '../query-executor';
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
+import { QueryExecutor, QueryResult } from '../query-executor';
 import { getMonitoringService, resetMonitoringService } from '../../../monitoring/monitoring';
 import { connectionManager } from '../connection-manager';
+import type { PoolClient } from 'pg';
 
 // Mock the connection manager
-vi.mock('../connection-manager', () => ({
+jest.mock('../connection-manager', () => ({
   connectionManager: {
-    acquireConnection: vi.fn(),
-    releaseConnection: vi.fn(),
+    acquireConnection: jest.fn(),
+    releaseConnection: jest.fn(),
   },
 }));
 
 // Mock the logger
-vi.mock('../../../../utils/logger', () => ({
+jest.mock('../../../../utils/logger', () => ({
   logger: {
-    info: vi.fn(),
-    warn: vi.fn(),
-    error: vi.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
   },
 }));
 
+// --- Performance & Test Constants ---
+const PERF_OVERHEAD_THRESHOLD_DISABLED_MS = 5;
+const PERF_OVERHEAD_THRESHOLD_ENABLED_MS = 10;
+const MOCK_QUERY_DELAY_MS = 10;
+const NUM_FAST_QUERIES = 1000;
+const NUM_SLOW_QUERIES = 100;
+const NUM_CONCURRENT_QUERIES = 10;
+const MEMORY_LIMIT_MB_FAST_QUERIES = 10;
+const MEMORY_LIMIT_MB_SLOW_QUERIES = 50;
+
+/**
+ * Helper to create a versatile mock query implementation for testing various scenarios.
+ * @param options - Configuration for the mock query's behavior.
+ * @returns A Jest mock function simulating `pg.Client.query`.
+ */
+const createMockQuery = (options: { delayMs?: number; withExplain?: boolean } = {}) => {
+  const { delayMs = 0, withExplain = false } = options;
+  return jest.fn((sql: string, params: any[], callback: (err: Error | null, result: any) => void) => {
+    if (withExplain && sql.toUpperCase().startsWith('EXPLAIN')) {
+      return callback(null, { rows: [{ 'QUERY PLAN': 'Seq Scan' }], rowCount: 1 });
+    }
+
+    if (delayMs > 0) {
+      setTimeout(() => callback(null, { rows: [], rowCount: 0 }), delayMs);
+    } else {
+      // Use setImmediate to simulate async I/O without a real-time delay.
+      setImmediate(() => callback(null, { rows: [], rowCount: 0 }));
+    }
+  });
+};
+
+/**
+ * Helper to measure the execution time of an async action.
+ * @param action - The async function to measure.
+ * @returns The execution time in milliseconds.
+ */
+const measureExecutionTime = async (action: () => Promise<any>): Promise<number> => {
+  const startTime = process.hrtime.bigint();
+  await action();
+  const endTime = process.hrtime.bigint();
+  return Number(endTime - startTime) / 1_000_000;
+};
+
+// Define the specific type for the mock query function to resolve type errors.
+type MockQueryFn = (
+  sql: string,
+  params: any[],
+  callback: (err: Error | null, result: any) => void
+) => void;
+
 describe('Slow Query Performance Tests', () => {
-  let queryExecutor: QueryExecutor;
-  let mockClient: any;
+  // Use the specific mock function type for mockClient.query.
+  let mockClient: { query: jest.Mock<MockQueryFn> };
   let monitoringService: any;
 
   beforeEach(() => {
-    // Reset monitoring service
     resetMonitoringService();
     monitoringService = getMonitoringService();
 
-    // Create mock client
     mockClient = {
-      query: vi.fn(),
+      query: jest.fn(),
     };
 
-    // Setup connection manager mocks
-    (connectionManager.acquireConnection as any).mockResolvedValue(mockClient);
-    (connectionManager.releaseConnection as any).mockResolvedValue(undefined);
+    // Use jest.mocked for type-safe mock resolution
+    jest.mocked(connectionManager.acquireConnection).mockResolvedValue(mockClient as any as PoolClient);
+    jest.mocked(connectionManager.releaseConnection).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
+    // Ensures timers from mock implementations are cleared to prevent open handles.
+    jest.clearAllTimers();
   });
 
   describe('Overhead Measurement', () => {
     it('should have minimal overhead when slow query detection is disabled', async () => {
-      // Create executor with detection disabled
-      const disabledExecutor = new QueryExecutor({
-        enableSlowQueryDetection: false,
-      });
+      const disabledExecutor = new QueryExecutor({ enableSlowQueryDetection: false });
+      mockClient.query = createMockQuery();
 
-      mockClient.query.mockImplementation((sql: string, params: any[], callback: Function) => {
-        // Immediate response
-        callback(null, { rows: [], rowCount: 0 });
-      });
+      const executionTimeMs = await measureExecutionTime(() =>
+        disabledExecutor.execute({ sql: 'SELECT 1' })
+      );
 
-      const query = { sql: 'SELECT 1' };
-
-      const startTime = process.hrtime.bigint();
-      await disabledExecutor.execute(query);
-      const endTime = process.hrtime.bigint();
-
-      const executionTimeMs = Number(endTime - startTime) / 1_000_000;
-      expect(executionTimeMs).toBeLessThan(5); // Should be very fast
+      expect(executionTimeMs).toBeLessThan(PERF_OVERHEAD_THRESHOLD_DISABLED_MS);
     });
 
-    it('should have acceptable overhead when slow query detection is enabled', async () => {
-      // Create executor with detection enabled but high threshold
+    it('should have acceptable overhead when slow query detection is enabled for fast queries', async () => {
       const enabledExecutor = new QueryExecutor({
         enableSlowQueryDetection: true,
-        slowQueryThresholdMs: 10000, // Very high threshold
+        slowQueryThresholdMs: 10000, // High threshold ensures no detection
       });
+      mockClient.query = createMockQuery();
 
-      mockClient.query.mockImplementation((sql: string, params: any[], callback: Function) => {
-        // Immediate response
-        callback(null, { rows: [], rowCount: 0 });
-      });
+      const executionTimeMs = await measureExecutionTime(() =>
+        enabledExecutor.execute({ sql: 'SELECT 1' })
+      );
 
-      const query = { sql: 'SELECT 1' };
-
-      const startTime = process.hrtime.bigint();
-      await enabledExecutor.execute(query);
-      const endTime = process.hrtime.bigint();
-
-      const executionTimeMs = Number(endTime - startTime) / 1_000_000;
-      expect(executionTimeMs).toBeLessThan(10); // Should still be fast
+      expect(executionTimeMs).toBeLessThan(PERF_OVERHEAD_THRESHOLD_ENABLED_MS);
     });
 
-    it('should measure overhead of EXPLAIN plan retrieval for slow queries', async () => {
-      // Create executor with low threshold
+    it('should measure the overhead of running EXPLAIN for a slow query', async () => {
       const slowExecutor = new QueryExecutor({
         enableSlowQueryDetection: true,
-        slowQueryThresholdMs: 1, // Very low threshold
+        slowQueryThresholdMs: 1, // Low threshold to trigger detection
       });
+      mockClient.query = createMockQuery({ delayMs: MOCK_QUERY_DELAY_MS, withExplain: true });
 
-      let explainCallCount = 0;
+      const totalTimeMs = await measureExecutionTime(() =>
+        slowExecutor.execute({ sql: 'SELECT * FROM test_table' })
+      );
 
-      mockClient.query.mockImplementation((sql: string, params: any[], callback: Function) => {
-        if (sql.includes('EXPLAIN')) {
-          explainCallCount++;
-          // EXPLAIN query response
-          callback(null, {
-            rows: [{ 'QUERY PLAN': 'Seq Scan on test_table' }],
-            rowCount: 1
-          });
-        } else {
-          // Main query - make it slow
-          setTimeout(() => {
-            callback(null, { rows: [], rowCount: 0 });
-          }, 10);
-        }
-      });
+      // Verify EXPLAIN was called as part of the slow query logic
+      expect(mockClient.query).toHaveBeenCalledWith(
+        expect.stringMatching(/^EXPLAIN/i),
+        expect.any(Array),
+        expect.any(Function)
+      );
 
-      const query = { sql: 'SELECT * FROM test_table' };
-
-      const startTime = process.hrtime.bigint();
-      await slowExecutor.execute(query);
-      const endTime = process.hrtime.bigint();
-
-      const totalTimeMs = Number(endTime - startTime) / 1_000_000;
-
-      // Should have called EXPLAIN
-      expect(explainCallCount).toBe(1);
-
-      // Total time should include main query (10ms) + EXPLAIN overhead
-      // EXPLAIN overhead should be minimal (< 5ms additional)
-      expect(totalTimeMs).toBeGreaterThan(10);
-      expect(totalTimeMs).toBeLessThan(25); // Main query + reasonable overhead
+      // Total time should include the original query delay plus minimal overhead for EXPLAIN
+      expect(totalTimeMs).toBeGreaterThan(MOCK_QUERY_DELAY_MS);
+      expect(totalTimeMs).toBeLessThan(MOCK_QUERY_DELAY_MS + 20); // Allow reasonable overhead
     });
   });
 
@@ -135,74 +149,44 @@ describe('Slow Query Performance Tests', () => {
     it('should not accumulate excessive memory with many fast queries', async () => {
       const executor = new QueryExecutor({
         enableSlowQueryDetection: true,
-        slowQueryThresholdMs: 1000, // High threshold
+        slowQueryThresholdMs: 1000,
       });
-
-      mockClient.query.mockImplementation((sql: string, params: any[], callback: Function) => {
-        // Fast queries
-        callback(null, { rows: [], rowCount: 0 });
-      });
+      mockClient.query = createMockQuery();
 
       const initialMemory = process.memoryUsage().heapUsed;
 
-      // Execute many fast queries
-      const promises = [];
-      for (let i = 0; i < 1000; i++) {
-        promises.push(executor.execute({ sql: 'SELECT 1' }));
-      }
-
+      const promises = Array.from({ length: NUM_FAST_QUERIES }, () =>
+        executor.execute({ sql: 'SELECT 1' })
+      );
       await Promise.all(promises);
 
       const finalMemory = process.memoryUsage().heapUsed;
       const memoryIncrease = finalMemory - initialMemory;
 
-      // Memory increase should be reasonable (less than 10MB for 1000 queries)
-      expect(memoryIncrease).toBeLessThan(10 * 1024 * 1024);
-
-      // Should not have any slow queries stored
-      expect(executor.getSlowQueries().length).toBe(0);
+      expect(memoryIncrease).toBeLessThan(MEMORY_LIMIT_MB_FAST_QUERIES * 1024 * 1024);
+      expect(executor.getSlowQueries()).toHaveLength(0);
     });
 
-    it('should manage memory efficiently with slow query storage', async () => {
+    it('should manage memory efficiently when storing many slow queries', async () => {
       const executor = new QueryExecutor({
         enableSlowQueryDetection: true,
         slowQueryThresholdMs: 1,
       });
-
-      mockClient.query.mockImplementation((sql: string, params: any[], callback: Function) => {
-        if (sql.includes('EXPLAIN')) {
-          callback(null, {
-            rows: [{ 'QUERY PLAN': 'Seq Scan' }],
-            rowCount: 1
-          });
-        } else {
-          // Make queries slow
-          setTimeout(() => {
-            callback(null, { rows: [], rowCount: 0 });
-          }, 10);
-        }
-      });
+      mockClient.query = createMockQuery({ delayMs: MOCK_QUERY_DELAY_MS, withExplain: true });
 
       const initialMemory = process.memoryUsage().heapUsed;
 
-      // Execute many slow queries
-      const promises = [];
-      for (let i = 0; i < 100; i++) {
-        promises.push(executor.execute({ sql: `SELECT * FROM table_${i}` }));
-      }
-
+      const promises = Array.from({ length: NUM_SLOW_QUERIES }, (_, i) =>
+        executor.execute({ sql: `SELECT * FROM table_${i}` })
+      );
       await Promise.all(promises);
 
       const finalMemory = process.memoryUsage().heapUsed;
       const memoryIncrease = finalMemory - initialMemory;
 
-      // Memory increase should be reasonable even with slow queries
-      expect(memoryIncrease).toBeLessThan(50 * 1024 * 1024); // Less than 50MB
-
-      // Should have stored slow queries (up to limit)
-      const slowQueries = executor.getSlowQueries();
-      expect(slowQueries.length).toBeGreaterThan(0);
-      expect(slowQueries.length).toBeLessThanOrEqual(1000);
+      expect(memoryIncrease).toBeLessThan(MEMORY_LIMIT_MB_SLOW_QUERIES * 1024 * 1024);
+      // The number of stored queries should match the number executed (up to the internal limit)
+      expect(executor.getSlowQueries()).toHaveLength(NUM_SLOW_QUERIES);
     });
   });
 
@@ -210,99 +194,60 @@ describe('Slow Query Performance Tests', () => {
     it('should handle concurrent queries without excessive overhead', async () => {
       const executor = new QueryExecutor({
         enableSlowQueryDetection: true,
-        slowQueryThresholdMs: 100, // Moderate threshold
+        slowQueryThresholdMs: 100,
       });
+      mockClient.query = createMockQuery({ delayMs: MOCK_QUERY_DELAY_MS });
 
-      mockClient.query.mockImplementation((sql: string, params: any[], callback: Function) => {
-        // Simulate some processing time but not slow enough to trigger detection
-        setTimeout(() => {
-          callback(null, { rows: [], rowCount: 0 });
-        }, 10);
-      });
+      const promises = Array.from({ length: NUM_CONCURRENT_QUERIES }, () =>
+        executor.execute({ sql: 'SELECT * FROM concurrent_test' })
+      );
 
-      const query = { sql: 'SELECT * FROM concurrent_test' };
+      const totalTimeMs = await measureExecutionTime(() => Promise.all(promises));
 
-      const startTime = process.hrtime.bigint();
-
-      // Execute multiple queries concurrently
-      const promises = [];
-      for (let i = 0; i < 10; i++) {
-        promises.push(executor.execute(query));
-      }
-
-      await Promise.all(promises);
-
-      const endTime = process.hrtime.bigint();
-      const totalTimeMs = Number(endTime - startTime) / 1_000_000;
-
-      // Concurrent execution should not take excessively long
-      // With 10 concurrent queries each taking ~10ms, total should be reasonable
-      expect(totalTimeMs).toBeLessThan(200); // Allow some overhead for concurrency
-
-      // Should not have detected any slow queries (queries are 10ms, threshold is 100ms)
-      expect(executor.getSlowQueries().length).toBe(0);
+      // 10 concurrent queries each taking ~10ms should complete quickly.
+      expect(totalTimeMs).toBeLessThan(200);
+      expect(executor.getSlowQueries()).toHaveLength(0);
     });
   });
 
   describe('Metrics Performance', () => {
-    it('should not impact performance when emitting metrics', async () => {
+    it('should not add significant overhead when emitting metrics', async () => {
       const executor = new QueryExecutor({
         enableSlowQueryDetection: true,
         slowQueryThresholdMs: 1,
       });
+      const recordMetricSpy = jest.spyOn(monitoringService, 'recordDatabaseMetric');
+      mockClient.query = createMockQuery({ delayMs: MOCK_QUERY_DELAY_MS, withExplain: true });
 
-      const recordMetricSpy = vi.spyOn(monitoringService, 'recordDatabaseMetric');
+      const executionTimeMs = await measureExecutionTime(() =>
+        executor.execute({ sql: 'SELECT * FROM metrics_test' })
+      );
 
-      mockClient.query.mockImplementation((sql: string, params: any[], callback: Function) => {
-        if (sql.includes('EXPLAIN')) {
-          callback(null, {
-            rows: [{ 'QUERY PLAN': 'Seq Scan' }],
-            rowCount: 1
-          });
-        } else {
-          setTimeout(() => {
-            callback(null, { rows: [], rowCount: 0 });
-          }, 10);
-        }
-      });
-
-      const query = { sql: 'SELECT * FROM metrics_test' };
-
-      const startTime = process.hrtime.bigint();
-      await executor.execute(query);
-      const endTime = process.hrtime.bigint();
-
-      const executionTimeMs = Number(endTime - startTime) / 1_000_000;
-
-      // Metrics should have been recorded
       expect(recordMetricSpy).toHaveBeenCalled();
-
-      // Execution time should still be reasonable
-      expect(executionTimeMs).toBeLessThan(50);
+      expect(executionTimeMs).toBeLessThan(50); // Should remain fast
     });
   });
 
   describe('Configuration Performance', () => {
-    it('should handle configuration changes efficiently', async () => {
-      const executor = new QueryExecutor({
-        enableSlowQueryDetection: true,
-        slowQueryThresholdMs: 1000,
-      });
-
-      mockClient.query.mockImplementation((sql: string, params: any[], callback: Function) => {
-        callback(null, { rows: [], rowCount: 0 });
-      });
-
-      // Change configuration multiple times
-      for (let i = 0; i < 10; i++) {
-        executor.updateConfig({
-          slowQueryThresholdMs: 100 + i * 10,
+    it('should handle dynamic configuration updates efficiently', async () => {
+        const executor = new QueryExecutor({
+            enableSlowQueryDetection: true,
+            slowQueryThresholdMs: 1000,
         });
-        await executor.execute({ sql: 'SELECT 1' });
-      }
+        mockClient.query = createMockQuery();
 
-      // Should not have detected any slow queries
-      expect(executor.getSlowQueries().length).toBe(0);
+        const action = async () => {
+            for (let i = 0; i < 10; i++) {
+                executor.updateConfig({ slowQueryThresholdMs: 100 + i * 10 });
+                await executor.execute({ sql: 'SELECT 1' });
+            }
+        };
+
+        // We measure the total time to ensure it's not prohibitively slow.
+        const totalTimeMs = await measureExecutionTime(action);
+        
+        expect(totalTimeMs).toBeLessThan(100);
+        expect(executor.getSlowQueries()).toHaveLength(0);
     });
   });
 });

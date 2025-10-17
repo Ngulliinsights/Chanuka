@@ -174,8 +174,8 @@ Enhanced batch operations with circuit breaker protection:
 
 ### Basic Usage:
 ```typescript
-import { SingleFlightCache } from '@triplecheck/core/cache';
-import { MemoryAdapter } from '@triplecheck/core/cache';
+import { SingleFlightCache } from '@Chanuka/core/cache';
+import { MemoryAdapter } from '@Chanuka/core/cache';
 
 const adapter = new MemoryAdapter(config);
 const cache = new SingleFlightCache(adapter, {

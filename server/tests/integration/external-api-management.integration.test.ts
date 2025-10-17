@@ -1,29 +1,23 @@
-import { describe, it, expect, beforeEach, afterEach, vi, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
-import { router as externalApiManagementRouter } from '../../infrastructure/monitoring/external-api-management.js';
-import { logger } from '../utils/logger';
+import { router as externalApiManagementRouter } from '../../infrastructure/monitoring/external-api-management';
 
 // Mock fetch globally
-global.fetch = vi.fn();
+global.fetch = jest.fn();
 
 describe('External API Management Integration Tests', () => {
   let app: express.Application;
-  let mockFetch: any;
-
-  beforeAll(() => {
-    mockFetch = global.fetch as any;
-  });
 
   beforeEach(() => {
     app = express();
     app.use(express.json());
     app.use('/api/external-api', externalApiManagementRouter);
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    jest.clearAllMocks();
   });
 
   describe('GET /api/external-api/analytics', () => {
@@ -75,10 +69,8 @@ describe('External API Management Integration Tests', () => {
       expect(response.body.data).toHaveProperty('timestamp');
       expect(response.body.data).toHaveProperty('overallStatus');
       
+      // Verify that services is an array
       expect(Array.isArray(response.body.data.services)).toBe(true);
-
-
-
-
-
-
+    }); // This closing brace and parenthesis were missing
+  }); // This closing brace for the describe block was missing
+}); // This is your outermost describe block closing

@@ -1,186 +1,249 @@
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
-import { database as db, bills, billEngagement, billComments, sponsors } from '../../../shared/database/connection.js';
-import { eq, sql } from 'drizzle-orm';
+import { database as db, bills, billEngagement, billComments, sponsors } from '../../../shared/database/connection';
+import { eq, sql, desc } from 'drizzle-orm';
 import { logger } from '../utils/logger';
 
 describe('Database Query Performance Tests', () => {
+  // Performance thresholds remain conservative but realistic
   const PERFORMANCE_THRESHOLD_MS = 200;
   const SLOW_QUERY_THRESHOLD_MS = 500;
   
+  // Helper function to measure query execution time consistently
+  const measureQueryTime = async <T>(
+    queryFn: () => Promise<T>
+  ): Promise<{ result: T; queryTime: number }> => {
+    const startTime = performance.now(); // More precise than Date.now()
+    const result = await queryFn();
+    const endTime = performance.now();
+    const queryTime = Math.round(endTime - startTime);
+    return { result, queryTime };
+  };
+
+  // Helper to log performance results consistently
+  const logPerformance = (testName: string, queryTime: number, threshold: number) => {
+    const status = queryTime < threshold ? '✓' : '✗';
+    logger.info(`${status} ${testName}: ${queryTime}ms (threshold: ${threshold}ms)`, {
+      component: 'PerformanceTest',
+      queryTime,
+      threshold
+    });
+  };
+  
   beforeAll(async () => {
-    // Ensure we have test data
-    logger.info('Setting up performance test data...', { component: 'Chanuka' });
+    logger.info('Initializing performance test suite...', { component: 'PerformanceTest' });
+    
+    // Optionally verify database connection and warm up connection pool
+    try {
+      await db.select({ count: sql<number>`1` }).from(bills).limit(1);
+      logger.info('Database connection verified', { component: 'PerformanceTest' });
+    } catch (error) {
+      logger.error('Database connection failed', { 
+        component: 'PerformanceTest', 
+        error: error instanceof Error ? error.message : 'Unknown error'
+      });
+      throw error;
+    }
   });
 
   afterAll(async () => {
-    // Cleanup if needed
+    logger.info('Performance test suite completed', { component: 'PerformanceTest' });
   });
 
   describe('Bill Engagement Statistics Queries', () => {
     it('should retrieve engagement stats within performance threshold', async () => {
-      const startTime = Date.now();
+      const { result, queryTime } = await measureQueryTime(async () => {
+        // Optimized engagement query using proper aggregations
+        return db
+          .select({
+            billId: billEngagement.billId,
+            totalViews: sql<number>`COALESCE(SUM(${billEngagement.viewCount}), 0)::int`,
+            totalComments: sql<number>`COUNT(DISTINCT ${billComments.id})::int`,
+            totalShares: sql<number>`COALESCE(SUM(${billEngagement.shareCount}), 0)::int`,
+            uniqueViewers: sql<number>`COUNT(DISTINCT ${billEngagement.userId})::int`
+          })
+          .from(billEngagement)
+          .leftJoin(billComments, eq(billEngagement.billId, billComments.billId))
+          .groupBy(billEngagement.billId)
+          .orderBy(desc(sql`SUM(${billEngagement.viewCount})`)) // Added ordering for deterministic results
+          .limit(10);
+      });
       
-      // Test the optimized engagement query
-      const result = await db
-        .select({
-          billId: billEngagement.billId,
-          totalViews: sql<number>`COALESCE(SUM(${billEngagement.viewCount}), 0)`,
-          totalComments: sql<number>`COUNT(DISTINCT ${billComments.id})`,
-          totalShares: sql<number>`COALESCE(SUM(${billEngagement.shareCount}), 0)`,
-          uniqueViewers: sql<number>`COUNT(DISTINCT ${billEngagement.userId})`
-        })
-        .from(billEngagement)
-        .leftJoin(billComments, eq(billEngagement.billId, billComments.billId))
-        .groupBy(billEngagement.billId)
-        .limit(10);
-      
-      const endTime = Date.now();
-      const queryTime = endTime - startTime;
+      logPerformance('Engagement stats query', queryTime, PERFORMANCE_THRESHOLD_MS);
       
       expect(queryTime).toBeLessThan(PERFORMANCE_THRESHOLD_MS);
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
-      
-      console.log(`Engagement stats query completed in ${queryTime}ms`);
+      expect(result.length).toBeLessThanOrEqual(10);
     });
 
     it('should handle large dataset queries efficiently', async () => {
-      const startTime = Date.now();
+      const { result, queryTime } = await measureQueryTime(async () => {
+        // Optimized to reduce data transfer and computation
+        return db
+          .select({
+            billId: bills.id,
+            title: bills.title,
+            engagementCount: sql<number>`COUNT(${billEngagement.id})::int`
+          })
+          .from(bills)
+          .leftJoin(billEngagement, eq(bills.id, billEngagement.billId))
+          .groupBy(bills.id, bills.title)
+          .orderBy(desc(sql`COUNT(${billEngagement.id})`)) // Most engaged bills first
+          .limit(100);
+      });
       
-      // Test query with larger dataset
-      const result = await db
-        .select({
-          billId: bills.id,
-          title: bills.title,
-          engagementCount: sql<number>`COUNT(${billEngagement.id})`
-        })
-        .from(bills)
-        .leftJoin(billEngagement, eq(bills.id, billEngagement.billId))
-        .groupBy(bills.id, bills.title)
-        .limit(100);
-      
-      const endTime = Date.now();
-      const queryTime = endTime - startTime;
+      logPerformance('Large dataset query', queryTime, SLOW_QUERY_THRESHOLD_MS);
       
       expect(queryTime).toBeLessThan(SLOW_QUERY_THRESHOLD_MS);
       expect(result).toBeDefined();
-      
-      console.log(`Large dataset query completed in ${queryTime}ms`);
+      expect(result.length).toBeLessThanOrEqual(100);
     });
   });
 
   describe('Bill Search Performance', () => {
     it('should perform full-text search within threshold', async () => {
-      const startTime = Date.now();
-      
       const searchTerm = 'healthcare';
-      const result = await db
-        .select({
-          id: bills.id,
-          title: bills.title,
-          description: bills.description
-        })
-        .from(bills)
-        .where(sql`
-          ${bills.title} ILIKE ${'%' + searchTerm + '%'} OR 
-          ${bills.description} ILIKE ${'%' + searchTerm + '%'}
-        `)
-        .limit(20);
       
-      const endTime = Date.now();
-      const queryTime = endTime - startTime;
+      const { result, queryTime } = await measureQueryTime(async () => {
+        // Use parameterized queries for better query plan caching
+        const pattern = `%${searchTerm}%`;
+        return db
+          .select({
+            id: bills.id,
+            title: bills.title,
+            description: bills.description
+          })
+          .from(bills)
+          .where(sql`
+            ${bills.title} ILIKE ${pattern} OR 
+            ${bills.description} ILIKE ${pattern}
+          `)
+          .orderBy(bills.id) // Consistent ordering for reproducible results
+          .limit(20);
+      });
+      
+      logPerformance('Full-text search query', queryTime, PERFORMANCE_THRESHOLD_MS);
       
       expect(queryTime).toBeLessThan(PERFORMANCE_THRESHOLD_MS);
       expect(result).toBeDefined();
-      
-      console.log(`Search query completed in ${queryTime}ms`);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBeLessThanOrEqual(20);
     });
 
     it('should handle pagination efficiently', async () => {
-      const startTime = Date.now();
+      const { result, queryTime } = await measureQueryTime(async () => {
+        // Pagination query with stable ordering
+        return db
+          .select({
+            id: bills.id,
+            title: bills.title,
+            status: bills.status
+          })
+          .from(bills)
+          .orderBy(bills.id) // Using indexed column for efficient pagination
+          .limit(50)
+          .offset(100);
+      });
       
-      const result = await db
-        .select({
-          id: bills.id,
-          title: bills.title,
-          status: bills.status
-        })
-        .from(bills)
-        .orderBy(bills.id)
-        .limit(50)
-        .offset(100);
-      
-      const endTime = Date.now();
-      const queryTime = endTime - startTime;
+      logPerformance('Pagination query', queryTime, PERFORMANCE_THRESHOLD_MS);
       
       expect(queryTime).toBeLessThan(PERFORMANCE_THRESHOLD_MS);
       expect(result).toBeDefined();
-      
-      console.log(`Pagination query completed in ${queryTime}ms`);
+      expect(result.length).toBeLessThanOrEqual(50);
     });
   });
 
   describe('Sponsor Analysis Performance', () => {
     it('should retrieve sponsor data efficiently', async () => {
-      const startTime = Date.now();
+      const { result, queryTime } = await measureQueryTime(async () => {
+        // Optimized sponsor aggregation
+        return db
+          .select({
+            id: sponsors.id,
+            name: sponsors.name,
+            billCount: sql<number>`COUNT(${bills.id})::int`
+          })
+          .from(sponsors)
+          .leftJoin(bills, eq(sponsors.id, bills.sponsorId))
+          .groupBy(sponsors.id, sponsors.name)
+          .orderBy(desc(sql`COUNT(${bills.id})`)) // Most active sponsors first
+          .limit(25);
+      });
       
-      const result = await db
-        .select({
-          id: sponsors.id,
-          name: sponsors.name,
-          billCount: sql<number>`COUNT(${bills.id})`
-        })
-        .from(sponsors)
-        .leftJoin(bills, eq(sponsors.id, bills.sponsorId))
-        .groupBy(sponsors.id, sponsors.name)
-        .limit(25);
-      
-      const endTime = Date.now();
-      const queryTime = endTime - startTime;
+      logPerformance('Sponsor analysis query', queryTime, PERFORMANCE_THRESHOLD_MS);
       
       expect(queryTime).toBeLessThan(PERFORMANCE_THRESHOLD_MS);
       expect(result).toBeDefined();
-      
-      console.log(`Sponsor analysis query completed in ${queryTime}ms`);
+      expect(result.length).toBeLessThanOrEqual(25);
     });
   });
 
   describe('Query Optimization Verification', () => {
     it('should avoid N+1 query patterns', async () => {
-      const startTime = Date.now();
-      let queryCount = 0;
+      const { result, queryTime } = await measureQueryTime(async () => {
+        // Single optimized query replacing potential N+1 pattern
+        // This demonstrates fetching bills with all related data in one query
+        return db
+          .select({
+            billId: bills.id,
+            billTitle: bills.title,
+            viewCount: sql<number>`COALESCE(SUM(${billEngagement.viewCount}), 0)::int`,
+            commentCount: sql<number>`COUNT(DISTINCT ${billComments.id})::int`
+          })
+          .from(bills)
+          .leftJoin(billEngagement, eq(bills.id, billEngagement.billId))
+          .leftJoin(billComments, eq(bills.id, billComments.billId))
+          .groupBy(bills.id, bills.title)
+          .orderBy(bills.id) // Deterministic ordering
+          .limit(10);
+      });
       
-      // Mock query counter (in real implementation, you'd use query logging)
-      const originalQuery = db.select;
-      
-      // Get bills with their engagement data in a single query
-      const result = await db
-        .select({
-          billId: bills.id,
-          billTitle: bills.title,
-          viewCount: sql<number>`COALESCE(SUM(${billEngagement.viewCount}), 0)`,
-          commentCount: sql<number>`COUNT(DISTINCT ${billComments.id})`
-        })
-        .from(bills)
-        .leftJoin(billEngagement, eq(bills.id, billEngagement.billId))
-        .leftJoin(billComments, eq(bills.id, billComments.billId))
-        .groupBy(bills.id, bills.title)
-        .limit(10);
-      
-      const endTime = Date.now();
-      const queryTime = endTime - startTime;
+      logPerformance('N+1 prevention query', queryTime, PERFORMANCE_THRESHOLD_MS);
       
       expect(queryTime).toBeLessThan(PERFORMANCE_THRESHOLD_MS);
       expect(result).toBeDefined();
-      expect(result.length).toBeGreaterThanOrEqual(0);
+      expect(Array.isArray(result)).toBe(true);
       
-      console.log(`N+1 prevention query completed in ${queryTime}ms`);
+      // Verify that we're getting aggregated data properly
+      if (result.length > 0) {
+        expect(result[0]).toHaveProperty('billId');
+        expect(result[0]).toHaveProperty('billTitle');
+        expect(result[0]).toHaveProperty('viewCount');
+        expect(result[0]).toHaveProperty('commentCount');
+      }
+    });
+
+    it('should efficiently retrieve bills with multiple relationships', async () => {
+      const { result, queryTime } = await measureQueryTime(async () => {
+        // Complex query demonstrating efficient multi-join pattern
+        return db
+          .select({
+            billId: bills.id,
+            billTitle: bills.title,
+            sponsorName: sponsors.name,
+            totalEngagement: sql<number>`
+              COALESCE(SUM(${billEngagement.viewCount}), 0) + 
+              COALESCE(SUM(${billEngagement.shareCount}), 0)
+            `,
+            commentCount: sql<number>`COUNT(DISTINCT ${billComments.id})::int`
+          })
+          .from(bills)
+          .leftJoin(sponsors, eq(bills.sponsorId, sponsors.id))
+          .leftJoin(billEngagement, eq(bills.id, billEngagement.billId))
+          .leftJoin(billComments, eq(bills.id, billComments.billId))
+          .groupBy(bills.id, bills.title, sponsors.name)
+          .orderBy(desc(sql`
+            COALESCE(SUM(${billEngagement.viewCount}), 0) + 
+            COALESCE(SUM(${billEngagement.shareCount}), 0)
+          `))
+          .limit(15);
+      });
+      
+      logPerformance('Multi-relationship query', queryTime, PERFORMANCE_THRESHOLD_MS);
+      
+      expect(queryTime).toBeLessThan(PERFORMANCE_THRESHOLD_MS);
+      expect(result).toBeDefined();
+      expect(result.length).toBeLessThanOrEqual(15);
     });
   });
 });
-
-
-
-
-
-

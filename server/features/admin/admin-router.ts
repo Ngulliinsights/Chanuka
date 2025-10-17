@@ -1,152 +1,223 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
+import { sql, eq, and, or, ilike, desc, count } from 'drizzle-orm';
+
+// Local Application Imports
 import { authenticateToken, requireRole } from '../../middleware/auth.js';
-import { billsService } from '../bills/bills.ts';
-import { ApiSuccess, ApiError, ApiForbidden } from '../../utils/api-response.js';
-import { database as db } from '../../../shared/database/connection.js';
-import { logger } from '../../utils/logger';
+import { billsService } from '../bills/index.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
+import { ApiSuccess, ApiError, ApiForbidden } from '../../utils/api-response.js';
+import { logger } from '../../utils/logger';
+
+// Database & Schema Imports
+import { database as db } from '../../../shared/database/connection.js';
+import { users, bills } from '../../../drizzle/schema.js';
+
+// --- Constants and Types ---
+
+const USER_ROLES = ['citizen', 'expert', 'admin', 'journalist', 'advocate'] as const;
+type UserRole = (typeof USER_ROLES)[number];
+
+// Extend Express Request type to include authenticated user information
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    role: UserRole;
+    email: string;
+    name: string;
+  };
+}
 
 const router = Router();
 
-// All admin routes require authentication and admin role
+// --- Middleware ---
+
+// Apply authentication and admin-only access control to all routes
 router.use(authenticateToken);
 router.use(requireRole(['admin']));
 
+// --- Route Handlers ---
+
 /**
  * GET /api/admin/dashboard
- * Get admin dashboard statistics
+ * Retrieves comprehensive dashboard statistics with fully optimized database queries.
+ * 
+ * Key optimization: All aggregations happen at the database level, minimizing memory
+ * usage and network transfer. Queries execute in parallel for maximum efficiency.
  */
-router.get('/dashboard', async (req, res) => {
+router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
   try {
+    // Execute all dashboard queries in parallel to minimize total response time
+    const [billStats, userStats, recentBills, recentUsers] = await Promise.all([
+      // Aggregate bill statistics directly in database - much more efficient than loading all bills
+      db
+        .select({
+          total: count(),
+          status: bills.status
+        })
+        .from(bills)
+        .groupBy(bills.status)
+        .catch(err => {
+          logger.error('Error fetching bill stats for dashboard', { 
+            component: 'admin-router', 
+            error: err 
+          });
+          return []; // Graceful degradation - dashboard still works if one metric fails
+        }),
+
+      // Aggregate user statistics directly in database
+      db
+        .select({
+          total: count(),
+          role: users.role
+        })
+        .from(users)
+        .groupBy(users.role)
+        .catch(err => {
+          logger.error('Error fetching user stats for dashboard', { 
+            component: 'admin-router', 
+            error: err 
+          });
+          return [];
+        }),
+
+      // Fetch only the essential fields for recent bills to minimize data transfer
+      db
+        .select({
+          id: bills.id,
+          title: bills.title,
+          status: bills.status,
+          createdAt: bills.createdAt
+        })
+        .from(bills)
+        .orderBy(desc(bills.createdAt))
+        .limit(10)
+        .catch(err => {
+          logger.error('Error fetching recent bills for dashboard', { 
+            component: 'admin-router', 
+            error: err 
+          });
+          return [];
+        }),
+
+      // Fetch only the essential fields for recent users
+      db
+        .select({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          role: users.role,
+          createdAt: users.createdAt
+        })
+        .from(users)
+        .orderBy(desc(users.createdAt))
+        .limit(10)
+        .catch(err => {
+          logger.error('Error fetching recent users for dashboard', { 
+            component: 'admin-router', 
+            error: err 
+          });
+          return [];
+        }),
+    ]);
+
+    // Transform the parallel query results into the final response structure
     const stats = {
       bills: {
-        total: 0,
-        byStatus: {} as Record<string, number>,
-        recent: [] as any[]
+        total: billStats.reduce((sum, item) => sum + item.total, 0),
+        byStatus: billStats.reduce((acc, item) => { 
+          acc[item.status ?? 'unknown'] = item.total; 
+          return acc; 
+        }, {} as Record<string, number>),
+        recent: recentBills,
       },
       users: {
-        total: 0,
-        byRole: {} as Record<string, number>,
-        recent: [] as any[]
+        total: userStats.reduce((sum, item) => sum + item.total, 0),
+        byRole: userStats.reduce((acc, item) => { 
+          acc[item.role] = item.total; 
+          return acc; 
+        }, {} as Record<string, number>),
+        recent: recentUsers,
       },
       system: {
         cacheStats: billsService.getCacheStats(),
         uptime: process.uptime(),
         memory: process.memoryUsage(),
-        nodeVersion: process.version
-      }
+        nodeVersion: process.version,
+        environment: process.env.NODE_ENV || 'development',
+      },
     };
-
-    try {
-      // Get bill statistics
-      const allBills = await billsService.getBills();
-      stats.bills.total = allBills.length;
-      
-      // Count bills by status
-      allBills.forEach(bill => {
-        const status = bill.status || 'unknown';
-        stats.bills.byStatus[status] = (stats.bills.byStatus[status] || 0) + 1;
-      });
-
-      // Get recent bills (last 10)
-      stats.bills.recent = allBills
-        .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime())
-        .slice(0, 10)
-        .map(bill => ({
-          id: bill.id,
-          title: bill.title,
-          status: bill.status,
-          createdAt: bill.createdAt
-        }));
-
-    } catch (error) {
-      logger.error('Error fetching bill stats:', { component: 'Chanuka' }, error);
-    }
-
-    try {
-      // Get user statistics (basic query)
-      const userCountResult = await db.execute('SELECT COUNT(*) as count FROM users');
-      stats.users.total = parseInt(userCountResult.rows[0]?.count as string || '0');
-
-      // Get users by role
-      const roleCountResult = await db.execute('SELECT role, COUNT(*) as count FROM users GROUP BY role');
-      roleCountResult.rows.forEach((row: any) => {
-        stats.users.byRole[row.role] = parseInt(row.count);
-      });
-
-      // Get recent users
-      const recentUsersResult = await db.execute(
-        'SELECT id, name, email, role, created_at FROM users ORDER BY created_at DESC LIMIT 10'
-      );
-      stats.users.recent = recentUsersResult.rows.map((row: any) => ({
-        id: row.id,
-        name: row.name,
-        email: row.email,
-        role: row.role,
-        createdAt: row.created_at
-      }));
-
-    } catch (error) {
-      logger.error('Error fetching user stats:', { component: 'Chanuka' }, error);
-    }
 
     return ApiSuccess(res, stats);
   } catch (error) {
-    logger.error('Admin dashboard error:', { component: 'Chanuka' }, error);
+    logger.error('Admin dashboard critical error', { 
+      component: 'admin-router', 
+      error: error instanceof Error ? error.message : String(error) 
+    });
     return ApiError(res, 'Failed to fetch dashboard data', 500);
   }
 });
 
 /**
  * GET /api/admin/users
- * Get all users with pagination
+ * Retrieves a paginated, filterable, and searchable list of users.
+ * 
+ * Uses Drizzle's composable query builder for type-safe, SQL-injection-proof queries.
+ * Supports filtering by role and searching across name/email fields with case-insensitive matching.
  */
-router.get('/users', async (req, res) => {
+router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { page = 1, limit = 20, role, search } = req.query;
+    const { page = '1', limit = '20', role, search } = req.query;
+    
+    // Sanitize and validate pagination parameters
     const pageNum = Math.max(1, parseInt(page as string));
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit as string)));
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit as string))); // Cap at 100 to prevent abuse
     const offset = (pageNum - 1) * limitNum;
 
-    let query = 'SELECT id, name, email, role, verification_status, is_active, created_at, last_login_at FROM users';
-    let countQuery = 'SELECT COUNT(*) as count FROM users';
-    const params: any[] = [];
-    let whereConditions: string[] = [];
+    // Build composable, type-safe query conditions
+    // The 'and' function filters out undefined conditions automatically
+    const conditions = and(
+      role && typeof role === 'string'
+        ? eq(users.role, role as UserRole)
+        : undefined,
+      search && typeof search === 'string'
+        ? or(
+            ilike(users.name, `%${search}%`),
+            ilike(users.email, `%${search}%`)
+          )
+        : undefined
+    );
 
-    // Add role filter
-    if (role && typeof role === 'string') {
-      whereConditions.push(`role = $${params.length + 1}`);
-      params.push(role);
-    }
+    // Execute both queries in parallel for better performance
+    const [userResults, totalResult] = await Promise.all([
+      db
+        .select({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          role: users.role,
+          verificationStatus: users.verificationStatus,
+          isActive: users.isActive,
+          createdAt: users.createdAt,
+          lastLoginAt: users.lastLoginAt,
+        })
+        .from(users)
+        .where(conditions)
+        .orderBy(desc(users.createdAt))
+        .limit(limitNum)
+        .offset(offset),
 
-    // Add search filter
-    if (search && typeof search === 'string') {
-      whereConditions.push(`(name ILIKE $${params.length + 1} OR email ILIKE $${params.length + 1})`);
-      params.push(`%${search}%`);
-    }
-
-    // Apply WHERE conditions
-    if (whereConditions.length > 0) {
-      const whereClause = ` WHERE ${whereConditions.join(' AND ')}`;
-      query += whereClause;
-      countQuery += whereClause;
-    }
-
-    // Add pagination
-    query += ` ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-    params.push(limitNum, offset);
-
-    const [usersResult, countResult] = await Promise.all([
-      db.execute(query, params),
-      db.execute(countQuery, params.slice(0, -2)) // Remove limit and offset for count
+      // Count query for pagination - same conditions but just counting
+      db
+        .select({ count: count() })
+        .from(users)
+        .where(conditions),
     ]);
-
-    const users = usersResult.rows;
-    const total = parseInt(countResult.rows[0]?.count as string || '0');
+    
+    const total = totalResult[0]?.count ?? 0;
     const totalPages = Math.ceil(total / limitNum);
 
     return ApiSuccess(res, {
-      users,
+      users: userResults,
       pagination: {
         page: pageNum,
         limit: limitNum,
@@ -154,208 +225,297 @@ router.get('/users', async (req, res) => {
         totalPages,
         hasNext: pageNum < totalPages,
         hasPrev: pageNum > 1
-      }
+      },
     });
   } catch (error) {
-    logger.error('Admin users error:', { component: 'Chanuka' }, error);
+    logger.error('Error fetching users list', { 
+      component: 'admin-router', 
+      error: error instanceof Error ? error.message : String(error) 
+    });
     return ApiError(res, 'Failed to fetch users', 500);
   }
 });
 
 /**
  * PUT /api/admin/users/:id/role
- * Update user role
+ * Updates a user's role within a database transaction for atomicity.
+ * 
+ * Safety features:
+ * - Validates role against whitelist
+ * - Prevents admins from demoting themselves
+ * - Uses transaction to ensure user exists before updating
+ * - Comprehensive audit logging
  */
-router.put('/users/:id/role', async (req, res) => {
+router.put('/users/:id/role', async (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
-    const { role } = req.body;
+    const { role } = req.body as { role: UserRole };
 
-    if (!role || !['citizen', 'expert', 'admin', 'journalist', 'advocate'].includes(role)) {
-      return ApiError(res, 'Invalid role specified', 400);
+    // Validate the role against our whitelist
+    if (!role || !USER_ROLES.includes(role)) {
+      return ApiError(res, `Invalid role. Valid roles are: ${USER_ROLES.join(', ')}`, 400);
     }
 
-    // Prevent self-demotion from admin
-    if (req.user!.id === id && req.user!.role === 'admin' && role !== 'admin') {
-      return ApiForbidden(res, 'Cannot demote yourself from admin role');
+    // Prevent admins from accidentally demoting themselves and losing access
+    if (req.user?.id === id && req.user?.role === 'admin' && role !== 'admin') {
+      return ApiForbidden(res, 'Admins cannot demote their own role.');
     }
 
-    const result = await db.execute(
-      'UPDATE users SET role = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id, name, email, role',
-      [role, id]
-    );
+    // Transaction ensures atomicity: either both operations succeed or both roll back
+    const result = await db.transaction(async (tx) => {
+      // First, verify the user exists and get their current role
+      const currentUser = await tx
+        .select({ role: users.role })
+        .from(users)
+        .where(eq(users.id, id))
+        .then(r => r[0]);
+      
+      if (!currentUser) {
+        throw new Error('UserNotFound');
+      }
 
-    if (result.rows.length === 0) {
-      return ApiError(res, 'User not found', 404);
-    }
+      // Update the role and return the updated user data
+      const updatedUser = await tx
+        .update(users)
+        .set({ role, updatedAt: new Date().toISOString() })
+        .where(eq(users.id, id))
+        .returning({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          role: users.role
+        })
+        .then(r => r[0]);
+      
+      return { updatedUser, oldRole: currentUser.role };
+    });
 
-    // Log admin action
+    // Log this admin action for compliance and auditing purposes
     await securityAuditService.logAdminAction(
-      'update_user_role',
-      req,
-      req.user!.id,
+      'update_user_role', 
+      req, 
+      req.user!.id, 
       `user:${id}`,
-      {
-        targetUserId: id,
-        oldRole: result.rows[0].role !== role ? 'unknown' : role, // We don't have old role, so log what we know
-        newRole: role,
-        adminUserId: req.user!.id
+      { 
+        targetUserId: id, 
+        oldRole: result.oldRole, 
+        newRole: role, 
+        adminUserId: req.user!.id 
       }
     );
 
-    return ApiSuccess(res, {
-      user: result.rows[0],
-      message: 'User role updated successfully'
+    return ApiSuccess(res, { 
+      user: result.updatedUser, 
+      message: 'User role updated successfully' 
     });
   } catch (error) {
-    logger.error('Update user role error:', { component: 'Chanuka' }, error);
+    if (error instanceof Error && error.message === 'UserNotFound') {
+      return ApiError(res, 'User not found', 404);
+    }
+    logger.error('Error updating user role', { 
+      component: 'admin-router', 
+      userId: id, 
+      error: error instanceof Error ? error.message : String(error) 
+    });
     return ApiError(res, 'Failed to update user role', 500);
   }
 });
 
 /**
  * PUT /api/admin/users/:id/status
- * Update user active status
+ * Updates a user's active status within a database transaction.
+ * 
+ * Safety features:
+ * - Validates boolean input
+ * - Prevents admins from deactivating themselves
+ * - Atomic transaction for data consistency
+ * - Full audit trail
  */
-router.put('/users/:id/status', async (req, res) => {
+router.put('/users/:id/status', async (req: AuthenticatedRequest, res: Response) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
     const { isActive } = req.body;
 
+    // Strict type validation for the boolean field
     if (typeof isActive !== 'boolean') {
-      return ApiError(res, 'isActive must be a boolean', 400);
+      return ApiError(res, 'The "isActive" field must be a boolean value.', 400);
     }
 
-    // Prevent self-deactivation
-    if (req.user!.id === id && !isActive) {
-      return ApiForbidden(res, 'Cannot deactivate your own account');
+    // Prevent admins from accidentally locking themselves out
+    if (req.user?.id === id && !isActive) {
+      return ApiForbidden(res, 'You cannot deactivate your own account.');
     }
 
-    const result = await db.execute(
-      'UPDATE users SET is_active = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING id, name, email, is_active',
-      [isActive, id]
-    );
+    // Transaction ensures we only update if the user exists
+    const result = await db.transaction(async (tx) => {
+      // Get current status for audit logging
+      const currentUser = await tx
+        .select({ isActive: users.isActive })
+        .from(users)
+        .where(eq(users.id, id))
+        .then(r => r[0]);
+      
+      if (!currentUser) {
+        throw new Error('UserNotFound');
+      }
 
-    if (result.rows.length === 0) {
-      return ApiError(res, 'User not found', 404);
-    }
+      // Update the active status
+      const updatedUser = await tx
+        .update(users)
+        .set({ isActive, updatedAt: new Date().toISOString() })
+        .where(eq(users.id, id))
+        .returning({
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          isActive: users.isActive
+        })
+        .then(r => r[0]);
 
-    // Log admin action
+      return { updatedUser, oldStatus: currentUser.isActive };
+    });
+
+    // Create audit log entry for compliance tracking
     await securityAuditService.logAdminAction(
-      'update_user_status',
-      req,
-      req.user!.id,
+      'update_user_status', 
+      req, 
+      req.user!.id, 
       `user:${id}`,
-      {
-        targetUserId: id,
-        oldStatus: result.rows[0].is_active !== isActive ? 'unknown' : isActive,
-        newStatus: isActive,
-        adminUserId: req.user!.id
+      { 
+        targetUserId: id, 
+        oldStatus: result.oldStatus, 
+        newStatus: isActive, 
+        adminUserId: req.user!.id 
       }
     );
 
-    return ApiSuccess(res, {
-      user: result.rows[0],
-      message: `User ${isActive ? 'activated' : 'deactivated'} successfully`
+    return ApiSuccess(res, { 
+      user: result.updatedUser, 
+      message: `User account has been ${isActive ? 'activated' : 'deactivated'}.` 
     });
   } catch (error) {
-    logger.error('Update user status error:', { component: 'Chanuka' }, error);
+    if (error instanceof Error && error.message === 'UserNotFound') {
+      return ApiError(res, 'User not found', 404);
+    }
+    logger.error('Error updating user status', { 
+      component: 'admin-router', 
+      userId: id, 
+      error: error instanceof Error ? error.message : String(error) 
+    });
     return ApiError(res, 'Failed to update user status', 500);
   }
 });
 
 /**
  * GET /api/admin/system/health
- * Get detailed system health information
+ * Comprehensive system health check including database connectivity test.
+ * 
+ * Returns structured health information for monitoring and alerting systems.
  */
-router.get('/system/health', async (req, res) => {
+router.get('/system/health', async (req: AuthenticatedRequest, res: Response) => {
   try {
     const health = {
-      status: 'healthy',
+      status: 'healthy' as 'healthy' | 'degraded' | 'critical',
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       memory: process.memoryUsage(),
       nodeVersion: process.version,
       environment: process.env.NODE_ENV || 'development',
-      database: {
-        connected: false,
-        responseTime: 0
+      database: { 
+        connected: false, 
+        responseTime: 0 
       },
       cache: billsService.getCacheStats()
     };
 
-    // Test database connection
+    // Test database connectivity with response time measurement
     try {
       const start = Date.now();
-      await db.execute('SELECT 1');
+      await db.execute(sql`SELECT 1`);
       health.database.connected = true;
       health.database.responseTime = Date.now() - start;
-    } catch (error) {
+    } catch (dbError) {
+      // Degrade gracefully - system is still partially functional
       health.status = 'degraded';
       health.database.connected = false;
-      logger.error('Database health check failed:', { component: 'Chanuka' }, error);
+      logger.error('Database health check failed', { 
+        component: 'admin-router', 
+        error: dbError instanceof Error ? dbError.message : String(dbError) 
+      });
     }
 
     return ApiSuccess(res, health);
   } catch (error) {
-    logger.error('System health error:', { component: 'Chanuka' }, error);
+    logger.error('System health check critical error', { 
+      component: 'admin-router', 
+      error: error instanceof Error ? error.message : String(error) 
+    });
     return ApiError(res, 'Failed to fetch system health', 500);
   }
 });
 
 /**
  * POST /api/admin/cache/clear
- * Clear application caches
+ * Clears application-level caches with audit logging.
+ * 
+ * Use this endpoint to force cache invalidation when data is updated through
+ * external means or when troubleshooting stale data issues.
  */
-router.post('/cache/clear', async (req, res) => {
+router.post('/cache/clear', async (req: AuthenticatedRequest, res: Response) => {
   try {
     billsService.clearCache();
 
-    // Log admin action
+    // Log this admin action for compliance and debugging
     await securityAuditService.logAdminAction(
-      'clear_cache',
-      req,
-      req.user!.id,
+      'clear_cache', 
+      req, 
+      req.user!.id, 
       'system:cache',
-      {
-        adminUserId: req.user!.id,
-        cacheType: 'application_cache'
+      { 
+        adminUserId: req.user!.id, 
+        cacheType: 'application_cache' 
       }
     );
 
-    return ApiSuccess(res, {
-      message: 'Cache cleared successfully',
-      timestamp: new Date().toISOString()
+    return ApiSuccess(res, { 
+      message: 'Cache cleared successfully', 
+      timestamp: new Date().toISOString() 
     });
   } catch (error) {
-    logger.error('Cache clear error:', { component: 'Chanuka' }, error);
+    logger.error('Error clearing cache', { 
+      component: 'admin-router', 
+      error: error instanceof Error ? error.message : String(error) 
+    });
     return ApiError(res, 'Failed to clear cache', 500);
   }
 });
 
 /**
  * GET /api/admin/slow-queries
- * Get recent slow queries for performance monitoring
+ * Retrieves recent slow queries for performance analysis and optimization.
+ * 
+ * Supports filtering by query type (SELECT, INSERT, etc.) and minimum duration threshold.
+ * This helps identify performance bottlenecks in your application.
  */
-router.get('/slow-queries', async (req, res) => {
+router.get('/slow-queries', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { limit = 50, type, minDuration } = req.query;
+    const { limit = '50', type, minDuration } = req.query;
     const queryLimit = Math.min(parseInt(limit as string) || 50, 500);
 
-    // Import query executor to access slow queries
+    // Dynamic import allows this to work even if query executor isn't available
     const { queryExecutor } = await import('../../infrastructure/database/core/query-executor.js');
-
     let slowQueries = queryExecutor.getSlowQueries(queryLimit);
 
-    // Filter by query type if specified
+    // Filter by SQL operation type if specified (e.g., SELECT, UPDATE)
     if (type && typeof type === 'string') {
+      const queryType = type.toUpperCase();
       slowQueries = slowQueries.filter(q => {
-        const queryType = q.sql.trim().toUpperCase().split(' ')[0];
-        return queryType === type.toUpperCase();
+        const firstWord = q.sql.trim().toUpperCase().split(' ')[0];
+        return firstWord === queryType;
       });
     }
 
-    // Filter by minimum duration if specified
+    // Filter by minimum execution time threshold
     if (minDuration && typeof minDuration === 'string') {
       const minDurationMs = parseInt(minDuration);
       if (!isNaN(minDurationMs)) {
@@ -363,34 +523,37 @@ router.get('/slow-queries', async (req, res) => {
       }
     }
 
-    // Calculate summary statistics
+    // Calculate summary statistics to help identify patterns
     const summary = {
       total: slowQueries.length,
       averageDuration: slowQueries.length > 0
-        ? slowQueries.reduce((sum, q) => sum + q.executionTimeMs, 0) / slowQueries.length
+        ? Math.round(slowQueries.reduce((sum, q) => sum + q.executionTimeMs, 0) / slowQueries.length)
         : 0,
       maxDuration: slowQueries.length > 0
         ? Math.max(...slowQueries.map(q => q.executionTimeMs))
         : 0,
-      byType: {} as Record<string, number>
+      byType: slowQueries.reduce((acc, query) => {
+        const queryType = query.sql.trim().toUpperCase().split(' ')[0];
+        acc[queryType] = (acc[queryType] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>)
     };
 
-    // Count by query type
-    slowQueries.forEach(query => {
-      const queryType = query.sql.trim().toUpperCase().split(' ')[0];
-      summary.byType[queryType] = (summary.byType[queryType] || 0) + 1;
-    });
+    // Format queries for readability and reduce payload size
+    const formattedQueries = slowQueries.map(q => ({
+      queryId: q.queryId,
+      sql: q.sql.substring(0, 200) + (q.sql.length > 200 ? '...' : ''),
+      executionTimeMs: q.executionTimeMs,
+      timestamp: q.timestamp,
+      context: q.context,
+      // Truncate stack traces to most relevant frames
+      stackTrace: q.stackTrace?.split('\n').slice(0, 5).join('\n'),
+      // Include first part of explain plan for quick analysis
+      explainPlan: q.explainPlan?.split('\n').slice(0, 10).join('\n')
+    }));
 
     return ApiSuccess(res, {
-      slowQueries: slowQueries.map(q => ({
-        queryId: q.queryId,
-        sql: q.sql.substring(0, 200) + (q.sql.length > 200 ? '...' : ''),
-        executionTimeMs: q.executionTimeMs,
-        timestamp: q.timestamp,
-        context: q.context,
-        stackTrace: q.stackTrace?.split('\n').slice(0, 5).join('\n'), // First 5 lines only
-        explainPlan: q.explainPlan?.split('\n').slice(0, 10).join('\n'), // First 10 lines only
-      })),
+      slowQueries: formattedQueries,
       summary,
       filters: {
         limit: queryLimit,
@@ -399,79 +562,88 @@ router.get('/slow-queries', async (req, res) => {
       }
     });
   } catch (error) {
-    logger.error('Admin slow queries error:', { component: 'admin-router' }, error);
-    return ApiError(res, 'Failed to fetch slow queries', 500);
+    logger.error('Error fetching slow queries', { 
+      component: 'admin-router', 
+      error: error instanceof Error ? error.message : String(error) 
+    });
+    return ApiError(res, 'Failed to fetch slow queries. Ensure the query executor module is available.', 500);
   }
 });
 
 /**
  * DELETE /api/admin/slow-queries
- * Clear the slow query history
+ * Clears the slow query history with audit logging.
+ * 
+ * Use this after you've analyzed current slow queries and want to start
+ * fresh monitoring after deploying optimizations.
  */
-router.delete('/slow-queries', async (req, res) => {
+router.delete('/slow-queries', async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { queryExecutor } = await import('../../infrastructure/database/core/query-executor.js');
     queryExecutor.clearSlowQueries();
 
-    // Log admin action
+    // Log the action for audit compliance
     await securityAuditService.logAdminAction(
-      'clear_slow_queries',
-      req,
-      req.user!.id,
+      'clear_slow_queries', 
+      req, 
+      req.user!.id, 
       'system:slow-queries',
-      {
-        adminUserId: req.user!.id,
-        action: 'cleared_slow_query_history'
+      { 
+        adminUserId: req.user!.id, 
+        action: 'cleared_slow_query_history' 
       }
     );
 
-    return ApiSuccess(res, {
-      message: 'Slow query history cleared successfully',
-      timestamp: new Date().toISOString()
+    return ApiSuccess(res, { 
+      message: 'Slow query history cleared successfully', 
+      timestamp: new Date().toISOString() 
     });
   } catch (error) {
-    logger.error('Clear slow queries error:', { component: 'admin-router' }, error);
+    logger.error('Error clearing slow queries', { 
+      component: 'admin-router', 
+      error: error instanceof Error ? error.message : String(error) 
+    });
     return ApiError(res, 'Failed to clear slow queries', 500);
   }
 });
 
 /**
  * GET /api/admin/logs
- * Get recent application logs (basic implementation)
+ * Retrieves recent application logs with filtering capabilities.
+ * 
+ * NOTE: This is a placeholder implementation. In production, integrate with
+ * your actual logging backend (Winston transport, Datadog, LogRocket, etc.)
  */
-router.get('/logs', async (req, res) => {
+router.get('/logs', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { level = 'all', limit = 100 } = req.query;
+    const { level = 'all', limit = '100' } = req.query;
     const logLimit = Math.min(parseInt(limit as string) || 100, 1000);
 
-    // This is a basic implementation - in production you'd want to integrate with your logging system
-    const logs = [
-      {
-        timestamp: new Date().toISOString(),
-        level: 'info',
-        message: 'Admin logs endpoint accessed',
-        userId: req.user!.id
+    // Mock implementation - replace with actual logging service integration
+    const logs = [{
+      timestamp: new Date().toISOString(),
+      level: 'info',
+      message: 'Admin logs endpoint accessed by user.',
+      details: { 
+        userId: req.user!.id, 
+        userEmail: req.user!.email,
+        component: 'admin-router' 
       }
-    ];
+    }];
 
     return ApiSuccess(res, {
-      logs,
-      count: logs.length,
-      level,
-      limit: logLimit
+      logs, 
+      count: logs.length, 
+      filters: { level, limit: logLimit },
+      note: 'This is a placeholder endpoint. Integrate with your production logging backend (e.g., Winston, Pino, Datadog) for real log data.'
     });
   } catch (error) {
-    logger.error('Admin logs error:', { component: 'Chanuka' }, error);
+    logger.error('Error fetching logs', { 
+      component: 'admin-router', 
+      error: error instanceof Error ? error.message : String(error) 
+    });
     return ApiError(res, 'Failed to fetch logs', 500);
   }
 });
 
 export { router };
-
-
-
-
-
-
-
-

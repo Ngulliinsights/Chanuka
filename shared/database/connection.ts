@@ -4,14 +4,11 @@ import * as schema from '../schema.ts';
 import type { PgTransaction } from 'drizzle-orm/pg-core';
 import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
 import type { ExtractTablesWithRelations } from 'drizzle-orm';
-import { logger } from '../../server/utils/logger';
+import { logger } from '../core/src/logging';
 
 // Create a more descriptive type alias for transactions to improve code readability
-export type DatabaseTransaction = PgTransaction<
-  NodePgQueryResultHKT,
-  typeof schema,
-  ExtractTablesWithRelations<typeof schema>
->;
+// Use the actual transaction type from Drizzle ORM
+export type DatabaseTransaction = Parameters<Parameters<typeof writeDatabase.transaction>[0]>[0];
 
 // Export the main database connection with full schema
 export const database = db;

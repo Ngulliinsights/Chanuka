@@ -7,14 +7,14 @@
 
 import { EventEmitter } from 'events';
 import { performance } from 'perf_hooks';
-import type { 
-import { logger } from '../utils/logger';
-  CacheAdapter, 
-  CacheMetrics, 
-  CacheEvent, 
+import { logger } from '../../utils/logger';
+import type {
+  CacheAdapter,
+  CacheMetrics,
+  CacheEvent,
   CacheEventType,
   CacheOptions,
-  CacheTierStats 
+  CacheTierStats
 } from './types';
 
 export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdapter {

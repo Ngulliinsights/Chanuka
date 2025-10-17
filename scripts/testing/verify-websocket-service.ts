@@ -2,7 +2,7 @@ import { webSocketService } from '../../server/infrastructure/websocket.js';
 import { createServer } from 'http';
 import WebSocket from 'ws';
 import jwt from 'jsonwebtoken';
-import { logger } from '../../server/utils/logger';
+import { logger } from '../../shared/core/src/logging';
 
 /**
  * Comprehensive verification suite for the enhanced WebSocket service.

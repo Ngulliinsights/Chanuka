@@ -4,8 +4,7 @@
  * Global test configuration and utilities
  */
 
-import { beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
-import { logger } from '../utils/logger';
+import { beforeAll, afterAll, beforeEach, afterEach, vi } from 'vitest';
 
 // Mock environment variables for testing
 beforeAll(() => {
@@ -13,11 +12,83 @@ beforeAll(() => {
   process.env.NODE_ENV = 'test';
   process.env.JWT_SECRET = 'test-jwt-secret-key-for-testing-only';
   process.env.SESSION_SECRET = 'test-session-secret-key-for-testing';
-  process.env.DATABASE_URL = 'postgresql://localhost:5432/triplecheck_test';
+  process.env.DATABASE_URL = 'postgresql://localhost:5432/chanuka_test';
   process.env.REDIS_URL = 'redis://localhost:6379/1';
   process.env.LOG_LEVEL = 'error'; // Reduce log noise in tests
   process.env.CACHE_PROVIDER = 'memory'; // Use memory cache for tests
   process.env.RATE_LIMIT_PROVIDER = 'memory'; // Use memory rate limiting for tests
+
+  // Mock logger to prevent setup issues - ensure all methods are properly mocked
+  const mockLogger: any = {
+    // EventEmitter methods
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    removeAllListeners: vi.fn(),
+    listeners: vi.fn(() => []),
+    listenerCount: vi.fn(() => 0),
+    eventNames: vi.fn(() => []),
+
+    // Logging methods
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    trace: vi.fn(),
+    fatal: vi.fn(),
+    critical: vi.fn(),
+
+    // Logger management
+    child: vi.fn(() => mockLogger),
+    setLevel: vi.fn(),
+    withContext: vi.fn(() => mockLogger),
+    getContext: vi.fn(),
+
+    // Specialized logging
+    logRequest: vi.fn(),
+    logDatabaseQuery: vi.fn(),
+    logCacheOperation: vi.fn(),
+    logSecurityEvent: vi.fn(),
+    logBusinessEvent: vi.fn(),
+    logPerformance: vi.fn(),
+
+    // Timer methods
+    startTimer: vi.fn(),
+    endTimer: vi.fn(() => 0),
+    measure: vi.fn(),
+    measureAsync: vi.fn(),
+
+    // Error tracking
+    setErrorTracker: vi.fn(),
+
+    // Log querying
+    queryLogs: vi.fn(() => []),
+    getLogsByCorrelation: vi.fn(() => []),
+    getLogAggregation: vi.fn(() => ({})),
+
+    // Log management
+    clearLogs: vi.fn(),
+    getLogCount: vi.fn(() => 0),
+    exportLogs: vi.fn(() => ''),
+
+    // Configuration
+    getLevel: vi.fn(() => 'info'),
+    flush: vi.fn(),
+
+    // Metrics
+    getMetrics: vi.fn(() => ({})),
+    resetMetrics: vi.fn(),
+
+    // Health/status
+    cleanup: vi.fn(),
+    isEnabled: vi.fn(() => true),
+    isHealthy: vi.fn(() => true),
+  };
+
+  (global as any).logger = mockLogger;
+  (global as any).loggingService = mockLogger;
 });
 
 // Clean up after all tests
@@ -47,7 +118,7 @@ export const testUtils = {
    */
   createMockConfig: () => ({
     app: {
-      name: 'test-app',
+      name: 'chanuka',
       version: '1.0.0',
       environment: 'test' as const,
       port: 3000,
@@ -110,7 +181,7 @@ export const testUtils = {
       compressionQuality: 85,
     },
     database: {
-      url: 'postgresql://localhost:5432/triplecheck_test',
+      url: 'postgresql://localhost:5432/chanuka_test',
       maxConnections: 10,
       connectionTimeout: 5000,
       enableQueryLogging: false,
@@ -153,7 +224,7 @@ export const testUtils = {
     params: {},
     body: {},
     ip: '127.0.0.1',
-    get: (header: string) => undefined,
+    get: (_header: string) => undefined,
     ...overrides,
   }),
   
@@ -162,28 +233,28 @@ export const testUtils = {
    */
   createMockResponse: () => {
     const res: any = {
-      status: vi.fn().mockReturnThis(),
-      json: vi.fn().mockReturnThis(),
-      send: vi.fn().mockReturnThis(),
-      set: vi.fn().mockReturnThis(),
-      end: vi.fn().mockReturnThis(),
+      status: () => res,
+      json: () => res,
+      send: () => res,
+      set: () => res,
+      end: () => res,
       headersSent: false,
     };
     return res;
   },
-  
+
   /**
    * Create a mock next function
    */
-  createMockNext: () => vi.fn(),
+  createMockNext: () => () => {},
 };
 
 // Make test utilities globally available
 declare global {
-  var testUtils: typeof testUtils;
+  var testUtils: any;
 }
 
-globalThis.testUtils = testUtils;
+global.testUtils = testUtils;
 
 
 

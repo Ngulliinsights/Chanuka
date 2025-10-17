@@ -1,8 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
-import * as Sentry from '@sentry/node';
 import { BaseError, ErrorDomain, ErrorSeverity } from './base-error';
 import { Logger } from '../logging';
-import { logger } from '../utils/logger';
+
+// Conditionally import Sentry to avoid build errors if not installed
+let Sentry: any;
+try {
+  Sentry = require('@sentry/node');
+} catch (error) {
+  // Sentry not available, create a no-op implementation
+  Sentry = {
+    withScope: (fn: Function) => fn({ setUser: () => {}, setTag: () => {}, setContext: () => {} }),
+    captureException: () => {},
+  };
+}
 
 // Define a more flexible error response type that allows additional properties
 interface ErrorResponse {
@@ -146,7 +156,7 @@ function normalizeError(error: Error): BaseError {
 export function unifiedErrorHandler(options: ErrorHandlerOptions = {}) {
   // Merge provided options with sensible defaults
   const mergedOptions = { ...defaultOptions, ...options };
-  
+
   // Create a dedicated logger for error handling
   const logger = new Logger({
     name: 'ErrorHandler',
@@ -246,16 +256,25 @@ export function unifiedErrorHandler(options: ErrorHandlerOptions = {}) {
       mergedOptions.enableSentry &&
       mergedOptions.shouldReportToSentry?.(normalizedError)
     ) {
-      Sentry.withScope((scope) => {
-        // Add contextual information to help with debugging
-        scope.setUser({ id: userId });
-        scope.setTag('requestId', requestId as string);
-        scope.setTag('errorId', normalizedError.errorId);
-        scope.setTag('domain', normalizedError.metadata.domain);
-        scope.setTag('severity', normalizedError.metadata.severity);
-        scope.setContext('error', errorContext);
-        Sentry.captureException(normalizedError);
-      });
+      try {
+        Sentry.withScope((scope: any) => {
+          // Add contextual information to help with debugging
+          scope.setUser({ id: userId });
+          scope.setTag('requestId', requestId as string);
+          scope.setTag('errorId', normalizedError.errorId);
+          scope.setTag('domain', normalizedError.metadata.domain);
+          scope.setTag('severity', normalizedError.metadata.severity);
+          scope.setContext('error', errorContext);
+          Sentry.captureException(normalizedError);
+        });
+      } catch (sentryError) {
+        // Log Sentry errors but don't let them break the error response
+        logger.error({
+          msg: 'Failed to report error to Sentry',
+          sentryError: sentryError instanceof Error ? sentryError.message : sentryError,
+          originalErrorId: normalizedError.errorId,
+        });
+      }
     }
 
     // Create the response object that will be sent to the client
@@ -295,7 +314,12 @@ export function setupGlobalErrorHandlers(logger: Logger) {
 
     // Report to monitoring in production
     if (process.env.NODE_ENV === 'production') {
-      Sentry.captureException(normalizedError);
+      try {
+        Sentry.captureException(normalizedError);
+      } catch (sentryError) {
+        // Log Sentry errors but don't let them break the process
+        console.error('Failed to report uncaught exception to Sentry:', sentryError);
+      }
     }
 
     // Give time for logs and monitoring data to be sent before shutting down
@@ -320,7 +344,12 @@ export function setupGlobalErrorHandlers(logger: Logger) {
     // Report to monitoring but don't crash the process
     // Unhandled rejections are often recoverable
     if (process.env.NODE_ENV === 'production') {
-      Sentry.captureException(normalizedError);
+      try {
+        Sentry.captureException(normalizedError);
+      } catch (sentryError) {
+        // Log Sentry errors but don't let them break the process
+        console.error('Failed to report unhandled rejection to Sentry:', sentryError);
+      }
     }
   });
 }

@@ -2,7 +2,7 @@ import { unifiedAlertPreferenceService } from '../../server/features/alert-prefe
 import { readDatabase as db } from '../../server/db.js';
 import { users, bills, userInterests } from '../../server/db.js';
 import { eq } from 'drizzle-orm';
-import { logger } from '../../server/utils/logger.js';
+import { logger } from '../../shared/core/src/logging';
 
 /**
  * Comprehensive verification suite for the Alert Preference Management System.

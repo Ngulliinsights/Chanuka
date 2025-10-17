@@ -1,14 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
-import { logger } from '@/utils/logger';
-/* cspell:disable-next-line */
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, Link } from 'wouter';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { Button } from '../components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Progress } from '../components/ui/progress';
-import { Separator } from '../components/ui/separator';
-import { ImplementationWorkarounds } from '../components/bills/implementation-workarounds';
+import DOMPurify from 'dompurify';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import { Separator } from '@/components/ui/separator';
+import { ImplementationWorkarounds } from '@/components/bills/implementation-workarounds';
 import {
   FileText,
   Calendar, 
@@ -19,8 +18,6 @@ import {
   ExternalLink,
   Eye,
   MessageSquare,
-  ThumbsUp,
-  ThumbsDown,
   Share2
 } from 'lucide-react';
 
@@ -70,18 +67,52 @@ const BillDetail = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Memoized function to prevent unnecessary re-renders and improve performance
+  // XSS Protection: Configure DOMPurify with strict settings
+  // This removes all potentially dangerous HTML elements and attributes
+  const sanitizeConfig = useMemo(() => ({
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    ALLOWED_ATTR: ['class'],
+    KEEP_CONTENT: true,
+    // Prevent DOM clobbering attacks
+    SANITIZE_DOM: true,
+    // Remove all data attributes that could be exploited
+    FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover']
+  }), []);
+
+  // Sanitization utility function with validation
+  // This wraps DOMPurify to provide type safety and null checking
+  const sanitizeHTML = useCallback((dirty: string | undefined | null): string => {
+    if (!dirty || typeof dirty !== 'string') {
+      return '';
+    }
+    
+    // Trim whitespace to prevent layout issues
+    const trimmed = dirty.trim();
+    
+    // Return empty string for empty input
+    if (!trimmed) {
+      return '';
+    }
+    
+    // Apply DOMPurify with our strict configuration
+    return DOMPurify.sanitize(trimmed, sanitizeConfig);
+  }, [sanitizeConfig]);
+
+  // Memoized function to prevent unnecessary re-renders
   const fetchBill = useCallback(async () => {
-    if (!id) return;
+    if (!id) {
+      setError('No bill ID provided');
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
-      setError(null); // Clear any previous errors
+      setError(null);
 
       const response = await fetch(`/api/bills/${id}`);
 
       if (!response.ok) {
-        // More specific error handling based on status codes
         if (response.status === 404) {
           throw new Error('Bill not found');
         } else if (response.status >= 500) {
@@ -92,20 +123,42 @@ const BillDetail = () => {
       }
 
       const billData = await response.json();
-      setBill(billData);
+      
+      // Sanitize all user-generated content before setting state
+      // This is our defense-in-depth approach: sanitize at the boundary
+      const sanitizedBill: Bill = {
+        ...billData,
+        title: sanitizeHTML(billData.title),
+        summary: sanitizeHTML(billData.summary),
+        sponsor: sanitizeHTML(billData.sponsor),
+        committee: sanitizeHTML(billData.committee),
+        full_text: sanitizeHTML(billData.full_text),
+        sections: billData.sections?.map((section: any) => ({
+          ...section,
+          title: sanitizeHTML(section.title),
+          content: sanitizeHTML(section.content),
+          analysis: section.analysis ? {
+            ...section.analysis,
+            impact: sanitizeHTML(section.analysis.impact),
+            concerns: section.analysis.concerns?.map((c: string) => sanitizeHTML(c)) || []
+          } : undefined
+        })) || []
+      };
+      
+      setBill(sanitizedBill);
     } catch (error) {
-      logger.error('Error fetching bill:', { component: 'Chanuka' }, error);
+      console.error('Error fetching bill:', error);
       setError(error instanceof Error ? error.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);
     }
-  }, [id]); // Only recreate if id changes
+  }, [id, sanitizeHTML]);
 
   useEffect(() => {
     fetchBill();
   }, [fetchBill]);
 
-  // Memoized function to avoid recalculating on every render
+  // Status color mapping with type safety
   const getStatusColor = useCallback((status: string) => {
     const statusColors = {
       passed: 'bg-green-100 text-green-800',
@@ -118,22 +171,44 @@ const BillDetail = () => {
     return statusColors[status as keyof typeof statusColors] || 'bg-gray-100 text-gray-800';
   }, []);
 
-  // Helper function to format dates consistently
+  // Date formatting with error handling
   const formatDate = useCallback((dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    try {
+      const date = new Date(dateString);
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return 'Invalid date';
+      }
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return 'Invalid date';
+    }
   }, []);
 
-  // Helper function to calculate voting percentages safely
+  // Safe percentage calculation with validation
   const calculateVotingPercentage = useCallback((yesVotes: number, noVotes: number, abstentions: number) => {
-    const totalVotes = yesVotes + noVotes + abstentions;
-    return totalVotes > 0 ? Math.round((yesVotes / totalVotes) * 100) : 0;
+    // Validate inputs are numbers
+    const yes = Number(yesVotes) || 0;
+    const no = Number(noVotes) || 0;
+    const abs = Number(abstentions) || 0;
+    
+    const totalVotes = yes + no + abs;
+    
+    // Prevent division by zero
+    if (totalVotes === 0) {
+      return 0;
+    }
+    
+    // Ensure result is between 0 and 100
+    const percentage = Math.round((yes / totalVotes) * 100);
+    return Math.max(0, Math.min(100, percentage));
   }, []);
 
-  // Loading state with improved accessibility
+  // Loading state with semantic HTML
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen" role="status" aria-label="Loading">
@@ -145,7 +220,7 @@ const BillDetail = () => {
     );
   }
 
-  // Error state with retry option
+  // Error state with recovery options
   if (error) {
     return (
       <div className="container mx-auto py-8">
@@ -183,9 +258,7 @@ const BillDetail = () => {
 
   return (
     <div className="container mx-auto py-6 px-4">
-      {/* Header with improved semantic structure */}
       <header className="mb-6">
-        {/* Breadcrumb navigation with proper ARIA labels */}
         <nav className="text-sm mb-4" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2">
             <li><Link to="/" className="text-blue-600 hover:underline">Home</Link></li>
@@ -203,10 +276,13 @@ const BillDetail = () => {
           </Badge>
         </div>
 
-        <p className="text-gray-700 text-lg leading-relaxed">{bill.summary}</p>
+        {/* Using dangerouslySetInnerHTML safely with pre-sanitized content */}
+        <div 
+          className="text-gray-700 text-lg leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: bill.summary }}
+        />
       </header>
 
-      {/* Quick Stats with improved accessibility */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6" aria-labelledby="quick-stats-heading">
         <h2 id="quick-stats-heading" className="sr-only">Bill Statistics</h2>
 
@@ -255,7 +331,6 @@ const BillDetail = () => {
         </Card>
       </section>
 
-      {/* Transparency Alert with improved messaging */}
       {bill.conflict_indicators && (
         <section className="mb-6">
           <Card className="border-orange-200 bg-orange-50">
@@ -280,7 +355,6 @@ const BillDetail = () => {
         </section>
       )}
 
-      {/* Main Content Tabs with improved structure */}
       <main>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-5">
@@ -411,9 +485,10 @@ const BillDetail = () => {
                       <header className="mb-3">
                         <h3 className="font-semibold text-lg">Section {index + 1}: {section.title}</h3>
                       </header>
-                      <div className="prose prose-sm max-w-none mb-4">
-                        <p className="text-gray-700 leading-relaxed">{section.content}</p>
-                      </div>
+                      <div 
+                        className="prose prose-sm max-w-none mb-4"
+                        dangerouslySetInnerHTML={{ __html: section.content }}
+                      />
 
                       {section.analysis && (
                         <div className="bg-gray-50 p-4 rounded border-l-4 border-blue-200">

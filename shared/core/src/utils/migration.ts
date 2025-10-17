@@ -266,26 +266,26 @@ export class ImportMigrationHelper {
   static getImportMigrations(): Record<string, string> {
     return {
       // Cache service migrations
-      'server/cache/CacheService': '@triplecheck/core/cache',
-      'src/shared/services/CacheService': '@triplecheck/core/cache',
-      'server/infrastructure/cache/CacheService': '@triplecheck/core/cache',
+      'server/cache/CacheService': '@Chanuka/core/cache',
+      'src/shared/services/CacheService': '@Chanuka/core/cache',
+      'server/infrastructure/cache/CacheService': '@Chanuka/core/cache',
       
       // Logging migrations
-      'server/infrastructure/monitoring/logger': '@triplecheck/core/logging',
-      'src/shared/services/logger': '@triplecheck/core/logging',
+      'server/infrastructure/monitoring/logger': '@Chanuka/core/logging',
+      'src/shared/services/logger': '@Chanuka/core/logging',
       
       // Middleware migrations
-      'server/middleware/auth.middleware': '@triplecheck/core/middleware',
-      'server/middleware/cache.middleware': '@triplecheck/core/middleware',
-      'server/middleware/validation.middleware': '@triplecheck/core/middleware',
+      'server/middleware/auth.middleware': '@Chanuka/core/middleware',
+      'server/middleware/cache.middleware': '@Chanuka/core/middleware',
+      'server/middleware/validation.middleware': '@Chanuka/core/middleware',
       
       // Validation migrations
-      'server/middleware/data-validation': '@triplecheck/core/validation',
-      'src/shared/validation': '@triplecheck/core/validation',
+      'server/middleware/data-validation': '@Chanuka/core/validation',
+      'src/shared/validation': '@Chanuka/core/validation',
       
       // Error handling migrations
-      'server/middleware/error': '@triplecheck/core/error-handling',
-      'src/shared/error-handling': '@triplecheck/core/error-handling',
+      'server/middleware/error': '@Chanuka/core/error-handling',
+      'src/shared/error-handling': '@Chanuka/core/error-handling',
     };
   }
   

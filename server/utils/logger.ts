@@ -1,3 +1,11 @@
+/**
+ * @deprecated This logger module is deprecated. Use the core logger instead:
+ * import { logger } from '../../../shared/core/src/logging';
+ *
+ * This file is kept for backward compatibility but will be removed in a future version.
+ * All logging should migrate to the shared/core logger for consistency and better features.
+ */
+
 // Consolidated with shared/core logging - this file should be deprecated
 // Use import { logger } from '../../../shared/core/src/logging' instead
 import { config } from '../config/index.ts';
@@ -183,8 +191,11 @@ interface RequestContext {
 }
 
 /**
- * High-performance unified logger with structured logging and monitoring.
- * Optimized for production use with minimal overhead.
+ * @deprecated This UnifiedLogger class is deprecated. Use the core logger instead:
+ * import { logger } from '../../../shared/core/src/logging';
+ *
+ * This class is kept for backward compatibility but will be removed in a future version.
+ * All logging should migrate to the shared/core logger for consistency and better features.
  */
 class UnifiedLogger {
   // Use a circular buffer with pre-allocated array for better memory efficiency
@@ -519,7 +530,8 @@ class UnifiedLogger {
 
   /**
    * Legacy logging method for backward compatibility.
-   * @deprecated Use level-specific methods instead
+   * @deprecated Use level-specific methods instead. This entire logger is deprecated - migrate to:
+   * import { logger } from '../../../shared/core/src/logging';
    */
   log(obj: object | string, msg?: string, ...args: any[]): void {
     const message = typeof obj === 'string' ? obj : msg ?? 'Log entry';
@@ -798,6 +810,13 @@ class UnifiedLogger {
 }
 
 // Export singleton instance
+/**
+ * @deprecated This logger instance is deprecated. Use the core logger instead:
+ * import { logger } from '../../../shared/core/src/logging';
+ *
+ * This instance is kept for backward compatibility but will be removed in a future version.
+ * All logging should migrate to the shared/core logger for consistency and better features.
+ */
 export const logger = new UnifiedLogger();
 
 // Export for testing purposes
@@ -806,3 +825,11 @@ export { UnifiedLogger };
 // Re-export shared/core logger as the primary logger
 // Note: Import path may need adjustment based on actual file structure
 // export { logger as sharedLogger } from '../../../shared/core/src/logging';
+
+/**
+ * @deprecated This module is deprecated. Use the core logger instead:
+ * import { logger } from '../../../shared/core/src/logging';
+ *
+ * This file is kept for backward compatibility but will be removed in a future version.
+ * All logging should migrate to the shared/core logger for consistency and better features.
+ */

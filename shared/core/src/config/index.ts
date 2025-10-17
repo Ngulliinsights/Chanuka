@@ -6,13 +6,13 @@
  */
 
 import { EventEmitter } from 'events';
-import { watchFile } from 'chokidar';
-import { config as dotenvConfig } from 'dotenv-expand';
+import chokidar from 'chokidar';
+import dotenvExpand from 'dotenv-expand';
 import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 import { configSchema, type AppConfig, envMapping, defaultFeatures } from './schema';
+import { logger } from '../../../utils/logger';
 import type {
-import { logger } from '../utils/logger';
   ConfigLoadOptions,
   ConfigChangeEvent,
   ConfigChange,
@@ -64,7 +64,7 @@ export class ConfigManager extends EventEmitter {
           path: err.path.join('.'),
           message: err.message,
           code: err.code,
-          received: err.received,
+          received: 'received' in err ? err.received : undefined,
         }));
         
         const errorMessage = `Configuration validation failed: ${errors.map(e => `${e.path}: ${e.message}`).join(', ')}`;
@@ -235,7 +235,7 @@ export class ConfigManager extends EventEmitter {
         path: err.path.join('.'),
         message: err.message,
         code: err.code,
-        received: err.received,
+        received: 'received' in err ? err.received : undefined,
       }));
     }
 
@@ -337,7 +337,10 @@ export class ConfigManager extends EventEmitter {
       validation: 'validation',
     };
     
-    const section = sectionMappings[parts[0]];
+    const firstPart = parts[0];
+    if (!firstPart) return null;
+    
+    const section = sectionMappings[firstPart];
     if (!section) return null;
     
     const property = parts.slice(1).map((part, index) => 
@@ -356,13 +359,17 @@ export class ConfigManager extends EventEmitter {
     
     for (let i = 0; i < keys.length - 1; i++) {
       const key = keys[i];
+      if (!key) continue;
       if (!(key in current) || typeof current[key] !== 'object') {
         current[key] = {};
       }
       current = current[key];
     }
     
-    current[keys[keys.length - 1]] = value;
+    const lastKey = keys[keys.length - 1];
+    if (lastKey) {
+      current[lastKey] = value;
+    }
   }
 
   /**

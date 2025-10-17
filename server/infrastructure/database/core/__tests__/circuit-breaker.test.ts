@@ -1,214 +1,265 @@
-import { EventEmitter } from 'events';
 import { jest } from '@jest/globals';
+import { CircuitBreaker } from '../../../../../shared/core/src/errors/circuit-breaker';
 
-// Import the circuit breaker class (we'll need to extract it or mock it)
 describe('CircuitBreaker', () => {
-  let eventEmitter: EventEmitter;
-  let circuitBreaker: any;
+  let circuitBreaker: CircuitBreaker;
 
   beforeEach(() => {
-    eventEmitter = new EventEmitter();
-
-    // Create circuit breaker instance (we'll mock the internal implementation)
-    circuitBreaker = {
-      failures: 0,
-      lastFailureTime: 0,
-      state: 'CLOSED' as 'CLOSED' | 'OPEN' | 'HALF_OPEN',
-      failureThreshold: 5,
-      resetTimeoutMs: 30000,
-      timeoutMs: 5000,
-      eventEmitter,
-
-      execute: jest.fn(),
-      recordFailure: jest.fn(),
-      reset: jest.fn(),
-      getState: jest.fn(),
-      getFailureCount: jest.fn(),
-    };
-
-    // Mock the execute method to simulate circuit breaker behavior
-    circuitBreaker.execute.mockImplementation(async (operation: () => Promise<any>) => {
-      if (this.state === 'OPEN') {
-        const timeSinceLastFailure = Date.now() - this.lastFailureTime;
-        if (timeSinceLastFailure > this.resetTimeoutMs) {
-          this.state = 'HALF_OPEN';
-          this.eventEmitter.emit('circuit-breaker-state-change', 'OPEN', 'HALF_OPEN');
-        } else {
-          throw new Error(`Circuit breaker is OPEN - operation not allowed. Retry in ${this.resetTimeoutMs - timeSinceLastFailure}ms`);
-        }
-      }
-
-      try {
-        const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error('Operation timeout')), this.timeoutMs);
-        });
-
-        const result = await Promise.race([operation(), timeoutPromise]);
-
-        if (this.state === 'HALF_OPEN') {
-          this.reset();
-          this.eventEmitter.emit('circuit-breaker-state-change', 'HALF_OPEN', 'CLOSED');
-        }
-
-        return result;
-      } catch (error) {
-        this.recordFailure();
-        this.eventEmitter.emit('circuit-breaker-state-change', this.state, this.state);
-        throw error;
-      }
+    // Using fake timers gives us precise control over time-dependent behavior
+    // like reset timeouts and operation timeouts
+    jest.useFakeTimers();
+    
+    // Configure with reasonable test values that complete quickly
+    circuitBreaker = new CircuitBreaker({
+      failureThreshold: 3,
+      timeout: 5000,
+      slowCallDurationThreshold: 1000,
     });
-
-    circuitBreaker.recordFailure.mockImplementation(() => {
-      this.failures++;
-      this.lastFailureTime = Date.now();
-
-      if (this.failures >= this.failureThreshold) {
-        this.state = 'OPEN';
-      }
-    });
-
-    circuitBreaker.reset.mockImplementation(() => {
-      this.failures = 0;
-      this.state = 'CLOSED';
-      this.lastFailureTime = 0;
-    });
-
-    circuitBreaker.getState.mockImplementation(() => this.state);
-    circuitBreaker.getFailureCount.mockImplementation(() => this.failures);
   });
 
-  describe('State Transitions', () => {
-    it('should start in CLOSED state', () => {
+  afterEach(() => {
+    // Always restore real timers to avoid affecting other tests
+    jest.useRealTimers();
+  });
+
+  describe('Initial State', () => {
+    it('should start in CLOSED state with zero failures', () => {
       expect(circuitBreaker.getState()).toBe('CLOSED');
-      expect(circuitBreaker.getFailureCount()).toBe(0);
+      expect(circuitBreaker.getMetrics().failures).toBe(0);
     });
+  });
 
+  describe('CLOSED to OPEN Transition', () => {
     it('should transition to OPEN after failure threshold is reached', async () => {
-      const operation = jest.fn().mockRejectedValue(new Error('Operation failed'));
+      const failingOperation = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Operation failed'));
+      const stateChangeSpy = jest.fn();
 
-      // Simulate failures
-      for (let i = 0; i < 5; i++) {
-        try {
-          await circuitBreaker.execute(operation);
-        } catch (error) {
-          // Expected
-        }
+      circuitBreaker.on('open', stateChangeSpy);
+
+      // Execute enough failures to trip the breaker
+      for (let i = 0; i < 3; i++) {
+        await expect(circuitBreaker.execute(failingOperation)).rejects.toThrow('Operation failed');
       }
 
       expect(circuitBreaker.getState()).toBe('OPEN');
-      expect(circuitBreaker.getFailureCount()).toBe(5);
+      expect(circuitBreaker.getMetrics().failures).toBe(3);
+      expect(stateChangeSpy).toHaveBeenCalled();
     });
 
-    it('should transition from OPEN to HALF_OPEN after reset timeout', async () => {
-      // First set to OPEN state
-      circuitBreaker.state = 'OPEN';
-      circuitBreaker.lastFailureTime = Date.now() - 35000; // Past reset timeout
+    it('should count timeouts as failures toward the threshold', async () => {
+      // This operation takes longer than the configured timeout
+      const slowOperation = () => new Promise(resolve => setTimeout(resolve, 2000));
 
-      const operation = jest.fn().mockResolvedValue('success');
+      // Execute a slow operation and advance time to trigger timeout
+      const promise = circuitBreaker.execute(slowOperation);
+      await jest.advanceTimersByTimeAsync(1001);
 
-      await circuitBreaker.execute(operation);
+      await expect(promise).rejects.toThrow('Operation timed out');
+      expect(circuitBreaker.getMetrics().failures).toBe(1);
+    });
+  });
 
-      expect(circuitBreaker.getState()).toBe('CLOSED');
+  describe('OPEN State Behavior', () => {
+    beforeEach(async () => {
+      // Helper to put the breaker into OPEN state before each test
+      const failingOp = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
+      for (let i = 0; i < 3; i++) {
+        await expect(circuitBreaker.execute(failingOp)).rejects.toThrow();
+      }
     });
 
-    it('should transition from HALF_OPEN to CLOSED on successful operation', async () => {
-      circuitBreaker.state = 'HALF_OPEN';
-      circuitBreaker.failures = 2;
+    it('should reject operations immediately when OPEN', async () => {
+      const successfulOperation = jest.fn<() => Promise<string>>().mockResolvedValue('success');
 
-      const operation = jest.fn().mockResolvedValue('success');
-
-      await circuitBreaker.execute(operation);
-
-      expect(circuitBreaker.getState()).toBe('CLOSED');
-      expect(circuitBreaker.getFailureCount()).toBe(0);
+      // The breaker should reject without even calling the operation
+      await expect(circuitBreaker.execute(successfulOperation)).rejects.toThrow('Circuit breaker is OPEN');
+      expect(successfulOperation).not.toHaveBeenCalled();
     });
 
-    it('should stay in HALF_OPEN on failed operation', async () => {
-      circuitBreaker.state = 'HALF_OPEN';
-
-      const operation = jest.fn().mockRejectedValue(new Error('Operation failed'));
+    it('should provide time remaining in error message', async () => {
+      const operation = jest.fn<() => Promise<string>>().mockResolvedValue('success');
 
       try {
         await circuitBreaker.execute(operation);
-      } catch (error) {
-        // Expected
+        fail('Should have thrown an error');
+      } catch (error: any) {
+        // The error message should indicate when retry will be allowed
+        expect(error.message).toMatch(/Circuit breaker is OPEN.*Retry in \d+ms/);
+      }
+    });
+  });
+
+  describe('OPEN to HALF_OPEN Transition', () => {
+    it('should transition to HALF_OPEN after reset timeout expires', async () => {
+      const stateChangeSpy = jest.fn();
+      circuitBreaker.on('half-open', stateChangeSpy);
+
+      // Trip the breaker to OPEN state
+      const failingOp = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
+      for (let i = 0; i < 3; i++) {
+        await expect(circuitBreaker.execute(failingOp)).rejects.toThrow();
       }
 
+      expect(circuitBreaker.getState()).toBe('OPEN');
+
+      // Advance time past the reset timeout
+      await jest.advanceTimersByTimeAsync(5001);
+
+      // The breaker should automatically transition to HALF_OPEN
       expect(circuitBreaker.getState()).toBe('HALF_OPEN');
-      expect(circuitBreaker.getFailureCount()).toBe(1);
+      expect(stateChangeSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('HALF_OPEN State Behavior', () => {
+    beforeEach(() => {
+      // Set up HALF_OPEN state directly for cleaner test setup
+      (circuitBreaker as any).state = 'HALF_OPEN';
+      (circuitBreaker as any).failures = 3;
     });
 
-    it('should reject operations when OPEN', async () => {
-      circuitBreaker.state = 'OPEN';
-      circuitBreaker.lastFailureTime = Date.now(); // Not past reset timeout
+    it('should transition to CLOSED on successful operation', async () => {
+      const successfulOperation = jest.fn<() => Promise<string>>().mockResolvedValue('success');
+      const stateChangeSpy = jest.fn();
+      circuitBreaker.on('close', stateChangeSpy);
 
-      const operation = jest.fn().mockResolvedValue('success');
+      const result = await circuitBreaker.execute(successfulOperation);
 
-      await expect(circuitBreaker.execute(operation)).rejects.toThrow('Circuit breaker is OPEN');
+      expect(result).toBe('success');
+      expect(circuitBreaker.getState()).toBe('CLOSED');
+      expect(circuitBreaker.getMetrics().failures).toBe(0);
+      expect(stateChangeSpy).toHaveBeenCalled();
     });
 
-    it('should handle operation timeouts', async () => {
-      const slowOperation = jest.fn().mockImplementation(
-        () => new Promise(resolve => setTimeout(resolve, 10000)) // Longer than timeout
+    it('should transition back to OPEN on failed operation', async () => {
+      const failingOperation = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Still failing'));
+      const stateChangeSpy = jest.fn();
+      circuitBreaker.on('open', stateChangeSpy);
+
+      await expect(circuitBreaker.execute(failingOperation)).rejects.toThrow('Still failing');
+
+      expect(circuitBreaker.getState()).toBe('OPEN');
+      expect(stateChangeSpy).toHaveBeenCalled();
+    });
+
+    it('should transition to OPEN on timeout in HALF_OPEN', async () => {
+      const slowOperation = () => new Promise(resolve => setTimeout(resolve, 2000));
+
+      const promise = circuitBreaker.execute(slowOperation);
+      await jest.advanceTimersByTimeAsync(1001);
+
+      await expect(promise).rejects.toThrow('Operation timed out');
+      expect(circuitBreaker.getState()).toBe('OPEN');
+    });
+  });
+
+  describe('Failure Count Management', () => {
+    it('should increment failure count on each failure', async () => {
+      const failingOp = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
+
+      expect(circuitBreaker.getMetrics().failures).toBe(0);
+
+      await expect(circuitBreaker.execute(failingOp)).rejects.toThrow();
+      expect(circuitBreaker.getMetrics().failures).toBe(1);
+
+      await expect(circuitBreaker.execute(failingOp)).rejects.toThrow();
+      expect(circuitBreaker.getMetrics().failures).toBe(2);
+    });
+
+    it('should reset failure count when transitioning to CLOSED', async () => {
+      // Set up HALF_OPEN with some failures
+      (circuitBreaker as any).state = 'HALF_OPEN';
+      (circuitBreaker as any).failures = 3;
+
+      const successfulOp = jest.fn<() => Promise<string>>().mockResolvedValue('success');
+      await circuitBreaker.execute(successfulOp);
+
+      // Moving to CLOSED should clear the failure count
+      expect(circuitBreaker.getMetrics().failures).toBe(0);
+    });
+
+    it('should not increment failure count for successful operations', async () => {
+      const successfulOp = jest.fn<() => Promise<string>>().mockResolvedValue('success');
+
+      await circuitBreaker.execute(successfulOp);
+      await circuitBreaker.execute(successfulOp);
+
+      expect(circuitBreaker.getMetrics().failures).toBe(0);
+    });
+  });
+
+  describe('Event Emissions', () => {
+    it('should emit state change from CLOSED to OPEN', async () => {
+      const stateChangeSpy = jest.fn();
+      circuitBreaker.on('open', stateChangeSpy);
+
+      const failingOp = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
+
+      // Trip the breaker
+      for (let i = 0; i < 3; i++) {
+        await expect(circuitBreaker.execute(failingOp)).rejects.toThrow();
+      }
+
+      expect(stateChangeSpy).toHaveBeenCalled();
+    });
+
+    it('should emit all state transitions in sequence', async () => {
+      const openSpy = jest.fn();
+      const halfOpenSpy = jest.fn();
+      const closeSpy = jest.fn();
+
+      circuitBreaker.on('open', openSpy);
+      circuitBreaker.on('half-open', halfOpenSpy);
+      circuitBreaker.on('close', closeSpy);
+
+      // CLOSED -> OPEN
+      const failingOp = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
+      for (let i = 0; i < 3; i++) {
+        await expect(circuitBreaker.execute(failingOp)).rejects.toThrow();
+      }
+
+      // OPEN -> HALF_OPEN (after timeout)
+      await jest.advanceTimersByTimeAsync(5001);
+
+      // HALF_OPEN -> CLOSED (on success)
+      const successOp = jest.fn<() => Promise<string>>().mockResolvedValue('success');
+      await circuitBreaker.execute(successOp);
+
+      // Verify we saw all three transitions
+      expect(openSpy).toHaveBeenCalled();
+      expect(halfOpenSpy).toHaveBeenCalled();
+      expect(closeSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('should handle operations that complete just before timeout', async () => {
+      // Operation completes in 999ms, just under the 1000ms timeout
+      const almostSlowOp = jest.fn<() => Promise<string>>().mockImplementation(
+        () => new Promise(resolve => setTimeout(() => resolve('success'), 999))
       );
 
-      await expect(circuitBreaker.execute(slowOperation)).rejects.toThrow('Operation timeout');
-      expect(circuitBreaker.getFailureCount()).toBe(1);
-    });
-  });
+      const promise = circuitBreaker.execute(almostSlowOp);
+      await jest.advanceTimersByTimeAsync(999);
 
-  describe('Event Emission', () => {
-    it('should emit state change events', async () => {
-      const eventSpy = jest.fn();
-      eventEmitter.on('circuit-breaker-state-change', eventSpy);
-
-      // Transition to OPEN
-      circuitBreaker.state = 'CLOSED';
-      circuitBreaker.failures = 5;
-      circuitBreaker.recordFailure();
-
-      expect(eventSpy).toHaveBeenCalledWith('CLOSED', 'OPEN');
+      // Should succeed without timeout
+      await expect(promise).resolves.toBe('success');
+      expect(circuitBreaker.getMetrics().failures).toBe(0);
     });
 
-    it('should emit state change on HALF_OPEN to CLOSED', async () => {
-      const eventSpy = jest.fn();
-      eventEmitter.on('circuit-breaker-state-change', eventSpy);
+    it('should handle rapid successive failures', async () => {
+      const failingOp = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
 
-      circuitBreaker.state = 'HALF_OPEN';
-      const operation = jest.fn().mockResolvedValue('success');
+      // Execute failures in rapid succession without awaiting
+      const promises: Promise<void>[] = [];
+      for (let i = 0; i < 5; i++) {
+        promises.push(circuitBreaker.execute(failingOp).catch(() => {}));
+      }
 
-      await circuitBreaker.execute(operation);
+      await Promise.all(promises);
 
-      expect(eventSpy).toHaveBeenCalledWith('HALF_OPEN', 'CLOSED');
-    });
-  });
-
-  describe('Failure Recording', () => {
-    it('should increment failure count', () => {
-      expect(circuitBreaker.getFailureCount()).toBe(0);
-
-      circuitBreaker.recordFailure();
-
-      expect(circuitBreaker.getFailureCount()).toBe(1);
-    });
-
-    it('should update last failure time', () => {
-      const beforeTime = Date.now();
-      circuitBreaker.recordFailure();
-      const afterTime = Date.now();
-
-      expect(circuitBreaker.lastFailureTime).toBeGreaterThanOrEqual(beforeTime);
-      expect(circuitBreaker.lastFailureTime).toBeLessThanOrEqual(afterTime);
-    });
-
-    it('should reset failure count and time', () => {
-      circuitBreaker.failures = 3;
-      circuitBreaker.lastFailureTime = Date.now();
-
-      circuitBreaker.reset();
-
-      expect(circuitBreaker.getFailureCount()).toBe(0);
-      expect(circuitBreaker.lastFailureTime).toBe(0);
+      // Should have tripped after threshold, subsequent calls rejected
+      expect(circuitBreaker.getState()).toBe('OPEN');
     });
   });
 });

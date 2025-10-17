@@ -245,7 +245,6 @@ export class ImportMigrationHelper {
             report.potentialMigrations.push({
               file,
               imports: fileImports
-import { logger } from '../utils/logger';
             });
           }
         } catch (error) {

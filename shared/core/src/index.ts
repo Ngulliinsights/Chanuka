@@ -1,7 +1,7 @@
 /**
  * Core Utilities - Main Entry Point
  * 
- * Consolidated cross-cutting utilities for the TripleCheck platform
+ * Consolidated cross-cutting utilities for the Chanuka platform
  * Based on enhanced patterns from refined_cross_cutting.ts
  */
 

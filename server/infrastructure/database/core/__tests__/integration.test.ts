@@ -3,6 +3,21 @@ import { PoolClient } from 'pg';
 import { createConnectionManager, ConnectionManager } from '../connection-manager';
 import { getMonitoringService, resetMonitoringService } from '../../../monitoring/monitoring';
 
+// Define the pool interface with proper typing for better type inference
+interface MockPool {
+  connect: jest.Mock<Promise<PoolClient>>;
+  on: jest.Mock<void>;
+  getMetrics: jest.Mock<Promise<any>>;
+  circuitBreaker: {
+    getState: jest.Mock<string>;
+    getFailureCount: jest.Mock<number>;
+    execute: jest.Mock<Promise<any>>;
+  };
+  totalCount: number;
+  idleCount: number;
+  waitingCount: number;
+}
+
 // Mock the shared pool and its dependencies
 jest.mock('../../../../../shared/database/pool', () => ({
   pool: {
@@ -23,25 +38,32 @@ jest.mock('../../../../../shared/database/pool', () => ({
 
 import { pool, checkPoolHealth } from '../../../../../shared/database/pool';
 
+// Type assertion to help TypeScript understand our mock structure
+const mockPool = pool as unknown as MockPool;
+const mockCheckPoolHealth = checkPoolHealth as jest.Mock<Promise<any>>;
+
 describe('ConnectionManager Integration Tests', () => {
   let manager: ConnectionManager;
   let mockClient: jest.Mocked<PoolClient>;
 
   beforeEach(() => {
+    // Use fake timers for deterministic control of time-based operations
+    jest.useFakeTimers();
     resetMonitoringService();
     jest.clearAllMocks();
 
-    // Setup mock client
+    // Setup mock client with all required methods
     mockClient = {
       query: jest.fn(),
       release: jest.fn(),
       on: jest.fn(),
       off: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<PoolClient>;
 
-    // Setup mock pool
-    (pool.connect as jest.Mock).mockResolvedValue(mockClient);
-    (pool.getMetrics as jest.Mock).mockResolvedValue({
+    // Configure mock pool with default successful behavior
+    // The type assertion helps TypeScript understand this is safe
+    mockPool.connect.mockResolvedValue(mockClient as PoolClient);
+    mockPool.getMetrics.mockResolvedValue({
       queries: 100,
       connections: 10,
       idleConnections: 5,
@@ -51,11 +73,16 @@ describe('ConnectionManager Integration Tests', () => {
       maxQueryTime: 100,
       minQueryTime: 10,
     });
-    (pool.circuitBreaker.getState as jest.Mock).mockReturnValue('CLOSED');
-    (pool.circuitBreaker.getFailureCount as jest.Mock).mockReturnValue(0);
+    
+    // Configure circuit breaker with default closed state
+    mockPool.circuitBreaker.getState.mockReturnValue('CLOSED');
+    mockPool.circuitBreaker.getFailureCount.mockReturnValue(0);
+    // Default behavior: circuit breaker passes through the function call
+    // The type annotation on fn helps TypeScript understand the callback signature
+    mockPool.circuitBreaker.execute.mockImplementation(async <T>(fn: () => Promise<T>) => fn());
 
-    // Setup mock health check
-    (checkPoolHealth as jest.Mock).mockResolvedValue({
+    // Configure health check with default healthy state
+    mockCheckPoolHealth.mockResolvedValue({
       isHealthy: true,
       totalConnections: 10,
       idleConnections: 5,
@@ -64,35 +91,38 @@ describe('ConnectionManager Integration Tests', () => {
       circuitBreakerFailures: 0,
     });
 
+    // Create manager with short health check interval for testing
     manager = createConnectionManager({
-      healthCheckIntervalMs: 100, // Fast for testing
+      healthCheckIntervalMs: 100,
     });
   });
 
   afterEach(async () => {
     await manager.close();
+    jest.useRealTimers();
     resetMonitoringService();
   });
 
   describe('Connection Acquisition and Release', () => {
     it('should successfully acquire and release connections', async () => {
-      // Acquire connection
+      // Acquire a connection through the circuit breaker
       const client = await manager.acquireConnection();
+      
       expect(client).toBe(mockClient);
-      expect(pool.connect).toHaveBeenCalledTimes(1);
+      expect(mockPool.circuitBreaker.execute).toHaveBeenCalledTimes(1);
 
-      // Release connection
+      // Release the connection
       await manager.releaseConnection(client);
       expect(mockClient.release).toHaveBeenCalledTimes(1);
     });
 
     it('should handle multiple concurrent connections', async () => {
+      // Request 5 connections simultaneously
       const promises = Array(5).fill(null).map(() => manager.acquireConnection());
-
       const clients = await Promise.all(promises);
 
       expect(clients).toHaveLength(5);
-      expect(pool.connect).toHaveBeenCalledTimes(5);
+      expect(mockPool.circuitBreaker.execute).toHaveBeenCalledTimes(5);
 
       // Release all connections
       await Promise.all(clients.map(client => manager.releaseConnection(client)));
@@ -103,6 +133,7 @@ describe('ConnectionManager Integration Tests', () => {
       const client = await manager.acquireConnection();
       const stats = await manager.getPoolStatistics();
 
+      // Verify that pool statistics are correctly retrieved
       expect(stats).toEqual({
         queries: 100,
         connections: 10,
@@ -120,7 +151,7 @@ describe('ConnectionManager Integration Tests', () => {
 
   describe('Circuit Breaker Integration', () => {
     it('should allow connections when circuit breaker is closed', async () => {
-      (pool.circuitBreaker.getState as jest.Mock).mockReturnValue('CLOSED');
+      mockPool.circuitBreaker.getState.mockReturnValue('CLOSED');
 
       const client = await manager.acquireConnection();
 
@@ -129,8 +160,9 @@ describe('ConnectionManager Integration Tests', () => {
     });
 
     it('should prevent connections when circuit breaker is open', async () => {
-      (pool.circuitBreaker.getState as jest.Mock).mockReturnValue('OPEN');
-      (pool.circuitBreaker.execute as jest.Mock).mockRejectedValue(
+      // Configure circuit breaker to reject connections
+      mockPool.circuitBreaker.getState.mockReturnValue('OPEN');
+      mockPool.circuitBreaker.execute.mockRejectedValue(
         new Error('Circuit breaker is OPEN')
       );
 
@@ -138,8 +170,9 @@ describe('ConnectionManager Integration Tests', () => {
     });
 
     it('should allow connections in half-open state', async () => {
-      (pool.circuitBreaker.getState as jest.Mock).mockReturnValue('HALF_OPEN');
-      (pool.circuitBreaker.execute as jest.Mock).mockResolvedValue(mockClient);
+      // In half-open state, the circuit breaker allows test requests
+      mockPool.circuitBreaker.getState.mockReturnValue('HALF_OPEN');
+      mockPool.circuitBreaker.execute.mockResolvedValue(mockClient);
 
       const client = await manager.acquireConnection();
 
@@ -149,18 +182,18 @@ describe('ConnectionManager Integration Tests', () => {
 
   describe('Health Monitoring', () => {
     it('should perform health checks periodically', async () => {
-      // Wait for health check to run
-      await new Promise(resolve => setTimeout(resolve, 150));
+      // Advance timers past the health check interval (100ms)
+      await jest.advanceTimersByTimeAsync(150);
 
-      expect(checkPoolHealth).toHaveBeenCalledWith(pool, 'managed');
+      expect(mockCheckPoolHealth).toHaveBeenCalledWith(pool, 'managed');
     });
 
     it('should emit health status updates', async () => {
       const healthSpy = jest.fn();
       manager.on('health-status-update', healthSpy);
 
-      // Wait for health check
-      await new Promise(resolve => setTimeout(resolve, 150));
+      // Trigger health check by advancing timers
+      await jest.advanceTimersByTimeAsync(150);
 
       expect(healthSpy).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -173,7 +206,8 @@ describe('ConnectionManager Integration Tests', () => {
     });
 
     it('should report unhealthy status when pool is down', async () => {
-      (checkPoolHealth as jest.Mock).mockResolvedValue({
+      // Simulate an unhealthy pool
+      mockCheckPoolHealth.mockResolvedValue({
         isHealthy: false,
         totalConnections: 0,
         idleConnections: 0,
@@ -207,28 +241,26 @@ describe('ConnectionManager Integration Tests', () => {
       const stateChangeSpy = jest.fn();
       manager.on('circuit-breaker-state-change', stateChangeSpy);
 
-      // Simulate state change by mocking the circuit breaker
-      (pool.circuitBreaker.getState as jest.Mock).mockReturnValue('OPEN');
+      // Change circuit breaker state
+      mockPool.circuitBreaker.getState.mockReturnValue('OPEN');
 
-      // Trigger a health check which should detect the state change
+      // Trigger health check to detect state change
       await manager.getHealthStatus();
 
-      // Note: In a real scenario, state changes would be emitted by the circuit breaker
-      // This test verifies the event system is in place
-      expect(stateChangeSpy).not.toHaveBeenCalled(); // No change detected in this test
+      // Note: Actual state change events would come from the circuit breaker
+      // This test verifies the event listener infrastructure is in place
+      expect(stateChangeSpy).not.toHaveBeenCalled();
     });
   });
 
   describe('Metrics Integration', () => {
     it('should emit metrics when acquiring connections', async () => {
       const monitoring = getMonitoringService();
-
-      // Spy on the monitoring service
       const recordMetricSpy = jest.spyOn(monitoring, 'recordDatabaseMetric');
 
       const client = await manager.acquireConnection();
 
-      // Should have recorded connection acquisition metrics
+      // Verify connection acquisition metrics are recorded
       expect(recordMetricSpy).toHaveBeenCalledWith(
         'connection.acquired',
         1,
@@ -254,7 +286,7 @@ describe('ConnectionManager Integration Tests', () => {
       const client = await manager.acquireConnection();
       await manager.releaseConnection(client);
 
-      // Should have recorded connection release metrics
+      // Verify connection release metrics are recorded
       expect(recordMetricSpy).toHaveBeenCalledWith(
         'connection.released',
         1,
@@ -269,11 +301,11 @@ describe('ConnectionManager Integration Tests', () => {
       const recordMetricSpy = jest.spyOn(monitoring, 'recordDatabaseMetric');
 
       const error = new Error('Connection failed');
-      (pool.connect as jest.Mock).mockRejectedValueOnce(error);
+      mockPool.circuitBreaker.execute.mockRejectedValueOnce(error);
 
       await expect(manager.acquireConnection()).rejects.toThrow('Connection failed');
 
-      // Should have recorded failure metrics
+      // Verify failure metrics are recorded with error details
       expect(recordMetricSpy).toHaveBeenCalledWith(
         'connection.failed',
         1,
@@ -290,10 +322,10 @@ describe('ConnectionManager Integration Tests', () => {
 
       await manager.getHealthStatus();
 
-      // Should have recorded health status metrics
+      // Verify comprehensive health metrics
       expect(recordMetricSpy).toHaveBeenCalledWith(
         'pool.health_status',
-        1, // healthy = 1
+        1, // 1 = healthy, 0 = unhealthy
         expect.objectContaining({
           totalConnections: 10,
           idleConnections: 5,
@@ -302,7 +334,7 @@ describe('ConnectionManager Integration Tests', () => {
         })
       );
 
-      // Should have recorded pool gauges
+      // Verify pool gauge metrics
       expect(recordMetricSpy).toHaveBeenCalledWith('pool.size', 10, expect.any(Object));
       expect(recordMetricSpy).toHaveBeenCalledWith('pool.active_connections', 5, expect.any(Object));
       expect(recordMetricSpy).toHaveBeenCalledWith('pool.waiting_requests', 2, expect.any(Object));
@@ -314,7 +346,7 @@ describe('ConnectionManager Integration Tests', () => {
 
       await manager.getPoolStatistics();
 
-      // Should have recorded pool statistics metrics
+      // Verify all pool statistics are recorded
       expect(recordMetricSpy).toHaveBeenCalledWith('pool.queries_total', 100, expect.any(Object));
       expect(recordMetricSpy).toHaveBeenCalledWith('pool.connections_total', 10, expect.any(Object));
       expect(recordMetricSpy).toHaveBeenCalledWith('pool.query_time_avg', 50, expect.any(Object));
@@ -328,7 +360,7 @@ describe('ConnectionManager Integration Tests', () => {
 
       await manager.getHealthStatus();
 
-      // Should have recorded circuit breaker failure count
+      // Verify circuit breaker state is tracked
       expect(recordMetricSpy).toHaveBeenCalledWith(
         'circuit_breaker.failures',
         0,
@@ -342,13 +374,13 @@ describe('ConnectionManager Integration Tests', () => {
       const monitoring = getMonitoringService();
       const recordMetricSpy = jest.spyOn(monitoring, 'recordDatabaseMetric');
 
-      // Acquire 10 connections to trigger percentile calculation
+      // Generate enough data points to calculate meaningful percentiles
       for (let i = 0; i < 10; i++) {
         const client = await manager.acquireConnection();
         await manager.releaseConnection(client);
       }
 
-      // Should have recorded percentile metrics
+      // Verify percentile metrics are calculated and recorded
       expect(recordMetricSpy).toHaveBeenCalledWith(
         'connection.acquisition_time_avg',
         expect.any(Number),
@@ -372,7 +404,7 @@ describe('ConnectionManager Integration Tests', () => {
   describe('Error Handling', () => {
     it('should handle connection acquisition failures', async () => {
       const error = new Error('Connection pool exhausted');
-      (pool.connect as jest.Mock).mockRejectedValue(error);
+      mockPool.circuitBreaker.execute.mockRejectedValue(error);
 
       const errorSpy = jest.fn();
       manager.on('connection-error', errorSpy);
@@ -390,18 +422,17 @@ describe('ConnectionManager Integration Tests', () => {
       const errorSpy = jest.fn();
       manager.on('connection-error', errorSpy);
 
-      await expect(manager.releaseConnection(mockClient)).rejects.toThrow('Release failed');
+      await expect(manager.releaseConnection(mockClient as PoolClient)).rejects.toThrow('Release failed');
       expect(errorSpy).toHaveBeenCalledWith(error, mockClient);
     });
 
     it('should handle pool errors', async () => {
       const error = new Error('Pool connection lost');
-
       const errorSpy = jest.fn();
       manager.on('pool-error', errorSpy);
 
-      // Simulate pool error by calling the pool's error handler
-      const poolErrorHandler = (pool.on as jest.Mock).mock.calls.find(
+      // Find and invoke the pool error handler that was registered
+      const poolErrorHandler = mockPool.on.mock.calls.find(
         call => call[0] === 'error'
       )?.[1];
 
@@ -423,15 +454,16 @@ describe('ConnectionManager Integration Tests', () => {
     });
 
     it('should load configuration from environment', () => {
+      // Set environment variables
       process.env.CONNECTION_HEALTH_CHECK_INTERVAL_MS = '45000';
       process.env.CIRCUIT_BREAKER_FAILURE_THRESHOLD = '8';
 
-      // Create new manager to pick up env vars
+      // Create manager that reads from environment
       const envManager = createConnectionManager();
 
       expect(envManager).toBeDefined();
 
-      // Cleanup
+      // Clean up environment variables
       delete process.env.CONNECTION_HEALTH_CHECK_INTERVAL_MS;
       delete process.env.CIRCUIT_BREAKER_FAILURE_THRESHOLD;
     });

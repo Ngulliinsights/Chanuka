@@ -1,5 +1,5 @@
 import { db } from "../server/db";
-import { logger } from '../server/utils/logger';
+import { logger } from '../shared/core/src/logging';
 import {
   users, bills, sponsors, billSponsorships, billComments,
   userProfiles, analysis, sponsorAffiliations, sponsorTransparency,

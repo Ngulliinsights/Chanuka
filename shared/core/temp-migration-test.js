@@ -1,6 +1,6 @@
 
-            const { createCacheService } = require('@triplecheck/core/cache');
-            const { Logger } = require('@triplecheck/core/logging');
+            const { createCacheService } = require('@Chanuka/core/cache');
+            const { Logger } = require('@Chanuka/core/logging');
             
             // Test cache
             const cache = createCacheService({

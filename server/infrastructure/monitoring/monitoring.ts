@@ -78,6 +78,8 @@ export class MonitoringService extends EventEmitter {
   private alerts: Map<string, number> = new Map();
   private config: AlertConfig;
   private isHealthy: boolean = true;
+  private healthCheckInterval?: NodeJS.Timeout;
+  private cleanupInterval?: NodeJS.Timeout;
 
   constructor(config?: Partial<AlertConfig>) {
     super();
@@ -353,19 +355,19 @@ export class MonitoringService extends EventEmitter {
 
   /**
    * Initializes background monitoring tasks.
-   * 
+   *
    * Sets up periodic health checks and cleanup routines that run throughout
    * the application's lifetime. These ensure the monitoring system itself
    * remains healthy and doesn't consume excessive resources.
    */
   private initializeMonitoring(): void {
     // Periodic health check every 30 seconds
-    setInterval(() => {
+    this.healthCheckInterval = setInterval(() => {
       this.performHealthCheck();
     }, 30000);
 
     // Cleanup old data every 5 minutes to prevent memory leaks
-    setInterval(() => {
+    this.cleanupInterval = setInterval(() => {
       this.cleanupOldData();
     }, 300000);
   }
@@ -578,7 +580,7 @@ export class MonitoringService extends EventEmitter {
 
   /**
    * Category-specific error tracking methods.
-   * 
+   *
    * These provide a convenient way to log errors with the category
    * automatically set, making your error tracking code more readable.
    */
@@ -601,11 +603,28 @@ export class MonitoringService extends EventEmitter {
   public trackFallbackError(source: string, severity: SeverityLevel = 'medium', metadata?: Record<string, any>): void {
     this.trackError(source, severity, metadata, "fallback");
   }
+
+  /**
+   * Cleans up background monitoring tasks to prevent memory leaks.
+   *
+   * This method should be called when the monitoring service is no longer needed,
+   * such as during application shutdown or test cleanup, to clear any active timers.
+   */
+  public cleanup(): void {
+    if (this.healthCheckInterval) {
+      clearInterval(this.healthCheckInterval);
+      this.healthCheckInterval = undefined;
+    }
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = undefined;
+    }
+  }
 }
 
 /**
  * Factory function to create a singleton monitoring instance.
- * 
+ *
  * This ensures you have one central monitoring service throughout your
  * application, preventing duplicate metric collection and making it easy
  * to access monitoring from anywhere in your code.
@@ -621,13 +640,14 @@ export function getMonitoringService(config?: Partial<AlertConfig>): MonitoringS
 
 /**
  * Resets the singleton instance (useful for testing).
- * 
+ *
  * In test environments, you often want to start fresh between tests.
  * This function allows you to reset the monitoring state completely.
  */
 export function resetMonitoringService(): void {
   if (monitoringInstance) {
     monitoringInstance.removeAllListeners();
+    monitoringInstance.cleanup();
     monitoringInstance = null;
   }
 }

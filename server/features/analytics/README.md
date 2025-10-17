@@ -78,7 +78,7 @@ The analytics module integrates with core infrastructure components:
 
 - **Error Tracking**: Uses `core/errors/error-tracker` for centralized error reporting
 - **Validation**: Leverages `core/validation` for domain-level business rules
-- **Logging**: Uses `server/utils/logger` with structured logging and trace ID correlation
+- **Logging**: Uses `shared/core/src/logging` with structured logging and trace ID correlation
 - **Caching**: Uses `server/utils/cache` with standardized `getOrSetCache` utility
 - **Database**: Uses shared database infrastructure with connection pooling
 - **Authentication**: Integrates with existing auth middleware for user context

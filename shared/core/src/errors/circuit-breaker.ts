@@ -1,7 +1,6 @@
 import { EventEmitter } from 'events';
 import { BaseError, ErrorDomain, ErrorSeverity } from './base-error';
-import { loggingService } from '../logging/service';
-import { logger } from '../utils/logger';
+import { Logger } from '../logging';
 
 export interface CircuitBreakerMetrics {
   failures: number;
@@ -54,10 +53,13 @@ export class CircuitBreaker extends EventEmitter {
   private responseTimeWindow: number[] = [];
   private currentThreshold: number;
   private readonly name: string;
+  private readonly logger: Logger;
+
   constructor(private readonly options: CircuitBreakerOptions = {}) {
     super();
     this.name = options.name || 'default';
     this.currentThreshold = options.failureThreshold || 5;
+    this.logger = new Logger({ name: `CircuitBreaker-${this.name}` });
 
     const defaults: Required<CircuitBreakerOptions> = {
       name: 'default',
@@ -198,10 +200,9 @@ export class CircuitBreaker extends EventEmitter {
     this.adjustThreshold(true);
 
     const metrics = this.getMetrics();
-    loggingService.warn('Circuit breaker transitioned to OPEN state', { 
-      module: 'CircuitBreaker',
-      metrics, 
-      breakerName: this.name 
+    this.logger.warn('Circuit breaker transitioned to OPEN state', {
+      metrics,
+      breakerName: this.name
     });
     this.emit('open', { metrics });
   }
@@ -212,8 +213,7 @@ export class CircuitBreaker extends EventEmitter {
     this.lastStateChange = new Date();
 
     const metrics = this.getMetrics();
-    loggingService.info('Circuit breaker transitioned to HALF-OPEN state', {
-      module: 'CircuitBreaker',
+    this.logger.info('Circuit breaker transitioned to HALF-OPEN state', {
       metrics,
       breakerName: this.name
     });
@@ -229,8 +229,7 @@ export class CircuitBreaker extends EventEmitter {
     this.adjustThreshold(false);
 
     const metrics = this.getMetrics();
-    loggingService.info('Circuit breaker transitioned to CLOSED state', {
-      module: 'CircuitBreaker',
+    this.logger.info('Circuit breaker transitioned to CLOSED state', {
       metrics,
       breakerName: this.name
     });
