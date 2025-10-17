@@ -678,17 +678,22 @@ export const closePools = async (): Promise<void> => {
     await Promise.all(
       pools.map(async ({ pool, name }) => {
         logger.debug(`Closing ${name} pool...`);
-        
-        const closePromise = pool.end();
-        const timeoutPromise = new Promise<void>((_, reject) => {
-          setTimeout(
-            () => reject(new Error(`Pool ${name} closure timeout`)),
-            CONFIG.POOL_SHUTDOWN_TIMEOUT
-          );
-        });
-        
-        await Promise.race([closePromise, timeoutPromise]);
-        logger.debug(`${name} pool closed successfully`);
+
+        // Type guard to ensure pool.end() method exists
+        if (pool && typeof pool.end === 'function') {
+          const closePromise = pool.end();
+          const timeoutPromise = new Promise<void>((_, reject) => {
+            setTimeout(
+              () => reject(new Error(`Pool ${name} closure timeout`)),
+              CONFIG.POOL_SHUTDOWN_TIMEOUT
+            );
+          });
+
+          await Promise.race([closePromise, timeoutPromise]);
+          logger.debug(`${name} pool closed successfully`);
+        } else {
+          logger.warn(`Unable to close pool ${name}: end method not available`);
+        }
       })
     );
     
