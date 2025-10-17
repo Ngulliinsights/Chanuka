@@ -1,0 +1,17 @@
+{
+  "name": "migration-scripts",
+  "version": "1.0.0",
+  "description": "Automated migration tooling for import path updates",
+  "main": "codemod-imports.js",
+  "scripts": {
+    "migrate": "node codemod-imports.js",
+    "validate": "node ../validation/validate-migration.js",
+    "rollback": "node ../rollback/rollback-migration.js"
+  },
+  "dependencies": {
+    "glob": "^10.3.10"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

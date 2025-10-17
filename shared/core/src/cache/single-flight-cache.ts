@@ -7,13 +7,13 @@
  * Based on patterns from refined_cross_cutting.ts
  */
 
-import type { 
-import { logger } from '../utils/logger';
-  CacheService, 
-  CacheMetrics, 
-  CacheHealthStatus, 
+import { logger } from '../../utils/logger';
+import type {
+  CacheService,
+  CacheMetrics,
+  CacheHealthStatus,
   CircuitBreakerState,
-  SingleFlightOptions 
+  SingleFlightOptions
 } from './types';
 
 interface AdaptiveCircuitBreakerState extends CircuitBreakerState {

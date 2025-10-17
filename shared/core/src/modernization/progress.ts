@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import { Logger } from '../logging';
-import {
 import { logger } from '../utils/logger';
+import {
   ProgressState,
   ProgressMetrics,
   ResourceUsage,

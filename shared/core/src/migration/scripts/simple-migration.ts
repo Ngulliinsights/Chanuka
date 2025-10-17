@@ -20,70 +20,70 @@ const migrationRules: MigrationRule[] = [
   // Cache Service Migrations
   {
     from: 'server/cache/CacheService',
-    to: '@triplecheck/core/cache',
+    to: '@Chanuka/core/cache',
     description: 'Server cache service imports'
   },
   {
     from: 'src/shared/services/CacheService',
-    to: '@triplecheck/core/cache',
+    to: '@Chanuka/core/cache',
     description: 'Shared cache service imports'
   },
   {
     from: 'server/infrastructure/cache/CacheService',
-    to: '@triplecheck/core/cache',
+    to: '@Chanuka/core/cache',
     description: 'Infrastructure cache service imports'
   },
 
   // Logging Service Migrations
   {
     from: 'server/infrastructure/monitoring/logger',
-    to: '@triplecheck/core/logging',
+    to: '@Chanuka/core/logging',
     description: 'Infrastructure logger imports'
   },
   {
     from: 'src/shared/services/logger',
-    to: '@triplecheck/core/logging',
+    to: '@Chanuka/core/logging',
     description: 'Shared logger imports'
   },
 
   // Validation Migrations
   {
     from: 'server/middleware/data-validation',
-    to: '@triplecheck/core/validation',
+    to: '@Chanuka/core/validation',
     description: 'Data validation middleware imports'
   },
   {
     from: 'src/shared/validation',
-    to: '@triplecheck/core/validation',
+    to: '@Chanuka/core/validation',
     description: 'Shared validation imports'
   },
 
   // Middleware Migrations
   {
     from: 'server/middleware/auth.middleware',
-    to: '@triplecheck/core/middleware',
+    to: '@Chanuka/core/middleware',
     description: 'Auth middleware imports'
   },
   {
     from: 'server/middleware/cache.middleware',
-    to: '@triplecheck/core/middleware',
+    to: '@Chanuka/core/middleware',
     description: 'Cache middleware imports'
   },
   {
     from: 'server/middleware/validation.middleware',
-    to: '@triplecheck/core/validation',
+    to: '@Chanuka/core/validation',
     description: 'Validation middleware imports'
   },
 
   // Error Handling Migrations
   {
     from: 'server/middleware/error',
-    to: '@triplecheck/core/error-handling',
+    to: '@Chanuka/core/error-handling',
     description: 'Error middleware imports'
   },
   {
     from: 'src/shared/error-handling',
-    to: '@triplecheck/core/error-handling',
+    to: '@Chanuka/core/error-handling',
     description: 'Shared error handling imports'
   }
 ];
@@ -193,11 +193,11 @@ async function updatePackageJson() {
       packageJson.dependencies = {};
     }
     
-    if (!packageJson.dependencies['@triplecheck/core']) {
-      packageJson.dependencies['@triplecheck/core'] = 'workspace:*';
+    if (!packageJson.dependencies['@Chanuka/core']) {
+      packageJson.dependencies['@Chanuka/core'] = 'workspace:*';
       
       await fs.writeFile(packageJsonPath, JSON.stringify(packageJson, null, 2), 'utf8');
-      logger.info('📦 Updated package.json with @triplecheck/core dependency', { component: 'Chanuka' });
+      logger.info('📦 Updated package.json with @Chanuka/core dependency', { component: 'Chanuka' });
     }
   } catch (error) {
     console.warn('⚠️  Could not update package.json:', error);
@@ -238,7 +238,7 @@ async function validateMigration() {
   
   // Check for new imports
   try {
-    const result = execSync('grep -r "@triplecheck/core" . --include="*.ts" --exclude-dir=node_modules', {
+    const result = execSync('grep -r "@Chanuka/core" . --include="*.ts" --exclude-dir=node_modules', {
       encoding: 'utf8',
       cwd: process.cwd()
     });

@@ -90,6 +90,7 @@ const DEFAULT_CONFIG: QueryExecutorConfig = {
  */
 const SENSITIVE_PATTERNS = [
   /password/i,
+  /pass/i,
   /token/i,
   /secret/i,
   /key/i,
@@ -121,7 +122,7 @@ const TRANSIENT_ERROR_CODES = new Set([
 /**
  * Sanitizes query parameters by replacing sensitive values with placeholders.
  */
-function sanitizeParameters(params: any[] | Record<string, any> | undefined): any[] | Record<string, any> | undefined {
+function sanitizeParameters(params: any[] | Record<string, any> | undefined, sql?: string): any[] | Record<string, any> | undefined {
   if (!params) return params;
 
   const sanitizeValue = (value: any, key?: string): any => {
@@ -155,8 +156,22 @@ function sanitizeParameters(params: any[] | Record<string, any> | undefined): an
     return value;
   };
 
+  // Try to infer parameter names from SQL placeholders like "col = $1" when SQL is available
+  const inferredNames: Record<number, string> = {};
+  if (sql && Array.isArray(params)) {
+    const paramRegex = /([a-zA-Z_][a-zA-Z0-9_.]*)\s*=\s*\$([0-9]+)/gi;
+    let m: RegExpExecArray | null;
+    while ((m = paramRegex.exec(sql)) !== null) {
+      const name = m[1];
+      const index = Number(m[2]) - 1; // convert $1 to index 0
+      if (!Number.isNaN(index)) {
+        inferredNames[index] = name;
+      }
+    }
+  }
+
   if (Array.isArray(params)) {
-    return params.map((param, index) => sanitizeValue(param, `param${index}`));
+    return params.map((param, index) => sanitizeValue(param, inferredNames[index] || `param${index}`));
   }
 
   const sanitized: Record<string, any> = {};
@@ -179,10 +194,12 @@ function isTransientError(error: any): boolean {
 
   // Check error message for common transient patterns
   const message = error.message?.toLowerCase() || '';
+  // Consider generic transient indicators as transient as well
   return message.includes('deadlock') ||
-         message.includes('connection') ||
-         message.includes('timeout') ||
-         message.includes('circuit breaker');
+    message.includes('connection') ||
+    message.includes('timeout') ||
+    message.includes('circuit breaker') ||
+    message.includes('transient');
 }
 
 /**
@@ -261,7 +278,7 @@ export class QueryExecutor {
         queryId,
         context: query.context,
         sql: query.sql.substring(0, 200) + (query.sql.length > 200 ? '...' : ''),
-        sanitizedParams: sanitizeParameters(query.params),
+        sanitizedParams: sanitizeParameters(query.params, query.sql),
         inTransaction: !!transactionContext,
         transactionId: transactionContext?.transactionId,
       });
@@ -362,7 +379,7 @@ export class QueryExecutor {
         queryId,
         context: query.context,
         sql: query.sql.substring(0, 200) + (query.sql.length > 200 ? '...' : ''),
-        sanitizedParams: sanitizeParameters(query.params),
+        sanitizedParams: sanitizeParameters(query.params, query.sql),
       });
     }
 
@@ -706,11 +723,12 @@ export class QueryExecutor {
         });
       }
 
-      // Create slow query info
+      // Create slow query info (store sanitized params)
+      const sanitizedParams = sanitizeParameters(query.params, query.sql);
       const slowQueryInfo: SlowQueryInfo = {
         queryId,
         sql: query.sql,
-        params: query.params,
+        params: sanitizedParams,
         executionTimeMs,
         stackTrace,
         explainPlan,
@@ -740,7 +758,7 @@ export class QueryExecutor {
         operation: 'slow-query',
         queryId,
         sql: query.sql,
-        sanitizedParams: sanitizeParameters(query.params),
+        sanitizedParams,
         executionTimeMs,
         threshold: this.config.slowQueryThresholdMs,
         stackTrace: stackTrace.substring(0, 500), // Limit stack trace length

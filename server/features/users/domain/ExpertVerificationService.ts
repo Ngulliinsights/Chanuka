@@ -1,4 +1,4 @@
-import type { Analysis, Expert, VerificationTask } from '../../../shared/types/expert';
+import type { Analysis, Expert, VerificationTask } from '../../../../shared/types/expert';
 import {
   ExtendedExpert,
   ExtendedVerificationTask,
@@ -7,11 +7,11 @@ import {
   NotificationChannel,
   Stakeholder,
   ExpertError
-} from '../../../shared/types/expert';
+} from '../../../../shared/types/expert';
 
 // Re-export VerificationStatus for test imports
 export { VerificationStatus };
-import { logger } from '../../utils/logger';
+import { logger } from '../../../utils/logger';
 
 // Remove duplicate interface definitions since they're imported
 
@@ -85,9 +85,9 @@ export class ExpertVerificationService {
       nextId: () => '1',
       save: async () => {},
       find: async (analysisId: string, expertId: string) => {
-        if (analysisId === 'analysis-123' && expertId === 'expert-123') {
+        if (analysisId === 'analysis-123' && (expertId === 'expert-123' || expertId === 'expert-456')) {
           return {
-            id: 'task-1',
+            id: `task-${expertId}`,
             analysisId,
             expertId,
             status: VerificationStatus.PENDING,
@@ -164,7 +164,7 @@ export class ExpertVerificationService {
     expertId: string,
     verdict: VerificationStatus,
   ): Promise<void> {
-    if (!expertId) {
+    if (!analysisId || !expertId) {
       throw new ServiceExpertError('Invalid verification data', { code: 'INVALID_INPUT' });
     }
 
@@ -204,7 +204,7 @@ export class ExpertVerificationService {
    * @throws ServiceExpertError if analysis is invalid
    */
   private validateAnalysis(analysis: Analysis): void {
-    if (!analysis?.id || !analysis?.topic) {
+    if (!analysis?.id || !analysis?.topic || !analysis?.content?.trim()) {
       throw new ServiceExpertError('Invalid analysis data', { code: 'INVALID_INPUT' });
     }
   }
@@ -642,6 +642,7 @@ export class ExpertVerificationService {
     // cache.invalidate(`tasks:${analysisId}`);
   }
 }
+
 
 
 

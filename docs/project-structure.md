@@ -27,6 +27,7 @@ attached_assets/
 ├── unified_ai_dev_framework_1751746605014.md
 ├── unified_code_analysis_framework.md
 ├── unified_coding_framework_1751746614347.md
+BACKEND_TESTING_QUICKSTART.md
 client/
 ├── index.html
 ├── public/
@@ -469,6 +470,9 @@ docs/
 │   ├── chanuka-implementation-plan.md
 │   ├── phase-2-database-consolidation.md
 │   ├── project-structure.md
+│   ├── shared_core_design.md
+│   ├── shared_core_impl_plan.md
+│   ├── shared_core_requirements.md
 ├── CODE_REVIEW_CHECKLIST.md
 ├── financial-disclosure-monitoring.md
 ├── fix-before-tests.md
@@ -582,12 +586,31 @@ drizzle_backup/
 ├── relations.ts
 ├── schema.ts
 generate-structure-to-file.sh
+jest.backend.config.js
 jest.client.config.js
 jest.config.js
 logs/
 ├── logger_errors.txt
 ├── logger_files.txt
 ├── logger_files_clean.txt
+migration/
+├── __tests__/
+│   ├── codemod-imports.test.js
+│   ├── feature-flags.test.js
+│   ├── rollback-migration.test.js
+│   ├── validate-migration.test.js
+├── feature-flags.js
+├── package.json
+├── README.md
+├── rollback/
+│   ├── package.json
+│   ├── rollback-migration.js
+├── scripts/
+│   ├── codemod-imports.js
+│   ├── package.json
+├── validation/
+│   ├── package.json
+│   ├── validate-migration.js
 nginx.conf
 package.json
 package-lock.json
@@ -606,6 +629,7 @@ scripts/
 │   ├── deploy.sh
 ├── drop-schema.ts
 ├── migrate-console-logs.ts
+├── test-backend-only.js
 ├── testing/
 │   ├── bug-detector.ts
 │   ├── run-bug-detector.ts
@@ -1109,6 +1133,7 @@ server/
 ├── vite.ts
 shared/
 ├── core/
+│   ├── MIGRATION_GUIDE.md
 │   ├── MIGRATION_VALIDATION_REPORT.md
 │   ├── package.json
 │   ├── package-lock.json
@@ -1144,6 +1169,29 @@ shared/
 │   │   │   │   ├── cache-service-adapter.ts
 │   │   │   ├── single-flight-cache.ts
 │   │   │   ├── types.ts
+│   │   ├── caching/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── factory.test.ts
+│   │   │   │   ├── memory-adapter.test.ts
+│   │   │   │   ├── single-flight-cache.test.ts
+│   │   │   ├── adapters/
+│   │   │   │   ├── ai-cache.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── memory-adapter.ts
+│   │   │   │   ├── multi-tier-adapter.ts
+│   │   │   │   ├── redis-adapter.ts
+│   │   │   ├── core/
+│   │   │   │   ├── base-adapter.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── interfaces.ts
+│   │   │   │   ├── key-generator.ts
+│   │   │   ├── decorators.ts
+│   │   │   ├── factory.ts
+│   │   │   ├── index.ts
+│   │   │   ├── patterns/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── single-flight-cache.ts
+│   │   │   ├── README.md
 │   │   ├── config/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── config-manager.test.ts
@@ -1154,7 +1202,6 @@ shared/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── circuit-breaker.test.ts
 │   │   │   ├── base-error.ts
-│   │   │   ├── circuit-breaker.ts
 │   │   │   ├── errors/
 │   │   │   │   ├── enhanced-errors.ts
 │   │   │   ├── index.ts
@@ -1162,6 +1209,41 @@ shared/
 │   │   │   ├── legacy-adapters.ts
 │   │   │   │   ├── error-messages-adapter.ts
 │   │   │   ├── middleware.ts
+│   │   ├── error-management/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── circuit-breaker.test.ts
+│   │   │   │   ├── error-handler-chain.test.ts
+│   │   │   │   ├── specialized-errors.test.ts
+│   │   │   ├── errors/
+│   │   │   │   ├── specialized/
+│   │   │   │   │   ├── authentication-error.ts
+│   │   │   │   │   ├── authorization-error.ts
+│   │   │   │   │   ├── business-logic-error.ts
+│   │   │   │   │   ├── configuration-error.ts
+│   │   │   │   │   ├── conflict-error.ts
+│   │   │   │   │   ├── database-error.ts
+│   │   │   │   │   ├── external-service-error.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── internal-server-error.ts
+│   │   │   │   │   ├── network-error.ts
+│   │   │   │   │   ├── payload-too-large-error.ts
+│   │   │   │   │   ├── rate-limit-error.ts
+│   │   │   │   │   ├── resource-not-found-error.ts
+│   │   │   │   │   ├── system-error.ts
+│   │   │   │   │   ├── timeout-error.ts
+│   │   │   │   │   ├── unsupported-media-type-error.ts
+│   │   │   │   │   ├── validation-error.ts
+│   │   │   ├── handlers/
+│   │   │   │   ├── error-handler-chain.ts
+│   │   │   │   ├── index.ts
+│   │   │   ├── index.ts
+│   │   │   ├── middleware/
+│   │   │   │   ├── express-error-middleware.ts
+│   │   │   │   ├── index.ts
+│   │   │   ├── patterns/
+│   │   │   │   ├── circuit-breaker.ts
+│   │   │   │   ├── index.ts
+│   │   │   ├── README.md
 │   │   ├── errors/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── CircuitBreaker.test.ts
@@ -1266,22 +1348,84 @@ shared/
 │   │   │   ├── progress.ts
 │   │   │   ├── types.ts
 │   │   │   ├── validation.ts
+│   │   ├── observability/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── health.test.ts
+│   │   │   │   ├── logging.test.ts
+│   │   │   │   ├── metrics.test.ts
+│   │   │   │   ├── tracing.test.ts
+│   │   │   ├── health/
+│   │   │   │   ├── checks.ts
+│   │   │   │   ├── health-checker.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── types.ts
+│   │   │   ├── index.ts
+│   │   │   ├── legacy-adapters.ts
+│   │   │   ├── logging/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── logger.ts
+│   │   │   │   ├── types.ts
+│   │   │   ├── metrics/
+│   │   │   │   ├── exporters.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── registry.ts
+│   │   │   │   ├── types.ts
+│   │   │   ├── README.md
+│   │   │   ├── tracing/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── tracer.ts
+│   │   │   │   ├── types.ts
+│   │   ├── primitives/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── base-error.test.ts
+│   │   │   │   ├── branded.test.ts
+│   │   │   │   ├── constants.test.ts
+│   │   │   │   ├── maybe.test.ts
+│   │   │   │   ├── result.test.ts
+│   │   │   ├── constants/
+│   │   │   │   ├── http-status.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── time.ts
+│   │   │   ├── errors/
+│   │   │   │   ├── base-error.ts
+│   │   │   │   ├── index.ts
+│   │   │   ├── index.ts
+│   │   │   ├── README.md
+│   │   │   ├── types/
+│   │   │   │   ├── branded.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── maybe.ts
+│   │   │   │   ├── result.ts
 │   │   ├── rate-limiting/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── ai-rate-limiter.test.ts
 │   │   │   │   ├── memory-store.test.ts
 │   │   │   │   ├── middleware.test.ts
+│   │   │   │   ├── unified-rate-limiting.test.ts
 │   │   │   ├── adapters/
+│   │   │   │   ├── fixed-window-adapter.ts
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── legacy-store-adapter.ts
+│   │   │   │   ├── memory-adapter.ts
+│   │   │   │   ├── sliding-window-adapter.ts
+│   │   │   │   ├── token-bucket-adapter.ts
 │   │   │   ├── ai-rate-limiter.ts
 │   │   │   ├── algorithms/
 │   │   │   │   ├── fixed-window.ts
 │   │   │   │   ├── sliding-window.ts
 │   │   │   │   ├── token-bucket.ts
+│   │   │   ├── core/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── interfaces.ts
+│   │   │   │   ├── service.ts
 │   │   │   ├── factory.ts
 │   │   │   ├── index.ts
 │   │   │   ├── metrics.ts
+│   │   │   ├── middleware/
 │   │   │   ├── middleware.ts
+│   │   │   │   ├── express-middleware.ts
+│   │   │   │   ├── index.ts
+│   │   │   ├── README.md
 │   │   │   ├── services/
 │   │   │   │   ├── rate-limiting-service.ts
 │   │   │   ├── stores/
@@ -1340,14 +1484,28 @@ shared/
 │   │   ├── validation/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── common-schemas.test.ts
+│   │   │   │   ├── core-validation-service.test.ts
 │   │   │   │   ├── middleware.test.ts
+│   │   │   │   ├── setup.ts
 │   │   │   │   ├── validation-service.test.ts
+│   │   │   ├── adapters/
+│   │   │   │   ├── custom-adapter.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── joi-adapter.ts
+│   │   │   │   ├── zod-adapter.ts
+│   │   │   ├── core/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── interfaces.ts
+│   │   │   │   ├── validation-service.ts
 │   │   │   ├── index.ts
 │   │   │   ├── legacy-adapters/
 │   │   │   ├── legacy-adapters.ts
 │   │   │   │   ├── validation-service-adapter.ts
+│   │   │   ├── middleware/
 │   │   │   ├── middleware.ts
+│   │   │   │   ├── index.ts
 │   │   │   ├── migration-validator.ts
+│   │   │   ├── README.md
 │   │   │   ├── sanitization.ts
 │   │   │   ├── schemas/
 │   │   │   │   ├── auth.ts
@@ -1380,8 +1538,9 @@ shared/
 │   ├── pool.ts
 ├── i18n/
 │   ├── en.ts
-├── schema.test.ts
 ├── schema.ts
+├── schema_integration_tests.ts
+├── schema_unit_test.ts
 ├── types/
 │   ├── auth.ts
 │   ├── bill.ts
@@ -1391,16 +1550,34 @@ shared/
 │   ├── legal-analysis.ts
 ├── utils/
 │   ├── error-handler.ts
+│   ├── logger.d.ts
+│   ├── logger.d.ts.map
+│   ├── logger.js
+│   ├── logger.js.map
 │   ├── logger.ts
 tailwind.config.ts
+testing/
+├── benchmarks/
+│   ├── performance-benchmarks.ts
+├── ci-cd-runner.ts
+├── integration/
+│   ├── integration-tests.ts
+├── memory-leak-detector.ts
+├── performance-regression-detector.ts
+├── stress-tests/
+│   ├── stress-tests.ts
+├── validation/
+│   ├── dependency-validator.ts
+TESTING_GUIDE.md
 tools/
 ├── validate-schema-congruence.ts
 tsconfig.json
 tsconfig.server.json
 vite.config.ts
 vitest.config.ts
+vitest.frontend.config.ts
 ```
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-15 20:40:46
+Generated on: 2025-10-17 05:37:05

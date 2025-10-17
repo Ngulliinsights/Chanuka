@@ -3,8 +3,8 @@ import { promises as fs } from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import { Logger } from '../logging';
-import {
 import { logger } from '../utils/logger';
+import {
   BackupPlan,
   BackupScope,
   BackupStrategy,

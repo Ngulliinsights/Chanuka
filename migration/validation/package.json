@@ -1,0 +1,12 @@
+{
+  "name": "migration-validation",
+  "version": "1.0.0",
+  "description": "Validation tools for migration completeness",
+  "main": "validate-migration.js",
+  "dependencies": {
+    "glob": "^10.3.10"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

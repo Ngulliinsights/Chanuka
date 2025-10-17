@@ -6,8 +6,8 @@
 
 import { ZodSchema, ZodError } from 'zod';
 import crypto from 'crypto';
+import { logger } from '../../../utils/logger';
 import {
-import { logger } from '../utils/logger';
   ValidationError,
   ValidationOptions,
   ValidationResult,
@@ -94,7 +94,7 @@ export class ValidationService {
       name,
       schema,
       version: options.version || '1.0.0',
-      description: options.description,
+      description: options.description || '',
       tags: options.tags || [],
       createdAt: new Date(),
       updatedAt: new Date(),

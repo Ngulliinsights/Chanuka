@@ -5,15 +5,15 @@
  */
 
 import { z } from 'zod';
-import { 
-import { logger } from '../utils/logger';
-  coordinateSchema, 
-  addressSchema, 
-  moneySchema, 
-  urlSchema, 
+import { logger } from '../../../../utils/logger';
+import {
+  coordinateSchema,
+  addressSchema,
+  moneySchema,
+  urlSchema,
   fileUploadSchema,
   paginationSchema,
-  uuidSchema 
+  uuidSchema
 } from './common';
 
 /**
@@ -259,7 +259,13 @@ export const propertySearchSchema = z.object({
   }).optional(),
   sortBy: z.enum(['price', 'area', 'date', 'relevance', 'distance']).default('relevance'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
-}).merge(paginationSchema);
+  page: z.coerce.number().int().min(1, 'Page must be at least 1').default(1),
+  limit: z.coerce.number().int().min(1, 'Limit must be at least 1').max(100, 'Limit cannot exceed 100').default(10),
+  offset: z.coerce.number().int().min(0, 'Offset must be non-negative').optional(),
+}).transform((data) => ({
+  ...data,
+  offset: data.offset ?? (data.page - 1) * data.limit,
+}));
 
 /**
  * Property inquiry schema

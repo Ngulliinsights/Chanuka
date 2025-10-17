@@ -1,13 +1,27 @@
 /**
  * Validation Module - Main Exports
- * 
- * Comprehensive validation framework with Zod integration, preprocessing, and caching
+ *
+ * Unified validation framework with adapter pattern, schema caching, and comprehensive error handling
  */
 
-// Main validation service
+// ===== CORE INTERFACES =====
+export * from './core';
+
+// ===== ADAPTERS =====
+export * from './adapters';
+
+// ===== MIDDLEWARE =====
+export * from './middleware';
+
+// ===== SCHEMAS =====
+export * from './schemas';
+
+// ===== LEGACY COMPATIBILITY =====
+// Re-export existing validation service for backward compatibility
 export { ValidationService, validationService, createValidationService } from './validation-service';
 
-// Types and interfaces
+// Import for utility functions
+import { validationService } from './validation-service';
 export type {
   ValidationErrorDetail,
   ValidationOptions,
@@ -20,52 +34,35 @@ export type {
   ValidationServiceConfig,
   ValidationContext,
 } from './types';
-
-// Error classes
 export { ValidationError } from './types';
-
-// Middleware and decorators
-export {
-  validateRequest,
-  ValidationMiddleware,
-  validate as validateDecorator,
-  validateClass,
-  validateBatch as validateBatchMiddleware,
-  validateFileUpload,
-  validationErrorHandler,
-  getValidatedData,
-  getBatchValidationResult,
-  commonValidation,
-} from './middleware';
-
-export type {
-  RequestValidationConfig,
-  ValidationDecoratorOptions,
-} from './middleware';
-
-// Validation schemas
-export * from './schemas';
-
-// Ensure userRegistrationSchema is properly exported
-export { userRegistrationSchema } from './schemas/auth';
 
 // Legacy adapters for backward compatibility
 export * from './legacy-adapters';
 export { LegacyValidationService, validationService as legacyValidationService } from './legacy-adapters/validation-service-adapter';
 export type { LegacyValidationRule, LegacyValidationResult, LegacyValidationSchema } from './legacy-adapters/validation-service-adapter';
 
+// ===== UTILITY EXPORTS =====
 // Re-export commonly used Zod types for convenience
 export type { ZodSchema, ZodError, ZodType } from 'zod';
 
-// Utility functions for quick validation
+// Utility functions for quick validation (legacy)
 export const validate = validationService.validate.bind(validationService);
 export const validateSafe = validationService.validateSafe.bind(validationService);
 export const validateBatch = validationService.validateBatch.bind(validationService);
 export const registerSchema = validationService.registerSchema.bind(validationService);
 export const getSchema = validationService.getSchema.bind(validationService);
 
-// Default export for convenience
-export default validationService;
+// ===== FEATURE FLAG SUPPORT =====
+/**
+ * Feature flag for gradual migration to unified validation system
+ * Set to true to use new adapter-based validation system
+ * Set to false to use legacy validation system
+ */
+export const useUnifiedValidation = process.env.USE_UNIFIED_VALIDATION === 'true' || false;
+
+// ===== DEFAULT EXPORTS =====
+// Default export uses feature flag to determine which system to use
+export default useUnifiedValidation ? validationService : validationService;
 
 
 

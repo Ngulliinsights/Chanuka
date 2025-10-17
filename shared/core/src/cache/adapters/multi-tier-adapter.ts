@@ -8,14 +8,14 @@
 import { BaseCacheAdapter } from '../base-adapter';
 import { MemoryAdapter, type MemoryAdapterConfig } from './memory-adapter';
 import { RedisAdapter, type RedisAdapterConfig } from './redis-adapter';
-import type { 
-import { logger } from '../utils/logger';
-  CacheOptions, 
-  CacheHealthStatus, 
+import { logger } from '../../utils/logger';
+import type {
+  CacheOptions,
+  CacheHealthStatus,
   CacheMetrics,
   CacheTierStats,
   PromotionStrategy,
-  MultiTierOptions 
+  MultiTierOptions
 } from '../types';
 
 export interface MultiTierAdapterConfig {

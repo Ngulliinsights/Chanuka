@@ -8,13 +8,12 @@
  */
 
 import { BaseCacheAdapter } from '../base-adapter';
-import type { 
-import { logger } from '../utils/logger';
-  CacheEntry, 
-  CacheOptions, 
-  CacheHealthStatus, 
+import type {
+  CacheEntry,
+  CacheOptions,
+  CacheHealthStatus,
   EvictionPolicy,
-  CacheConfig 
+  CacheConfig
 } from '../types';
 
 export interface MemoryAdapterConfig extends CacheConfig {

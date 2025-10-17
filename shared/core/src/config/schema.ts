@@ -12,7 +12,7 @@ import { logger } from '../utils/logger';
 export const configSchema = z.object({
   // Environment and application settings
   app: z.object({
-    name: z.string().default('triplecheck'),
+    name: z.string().default('Chanuka'),
     version: z.string().default('1.0.0'),
     environment: z.enum(['development', 'staging', 'production', 'test']).default('development'),
     port: z.coerce.number().min(1).max(65535).default(3000),

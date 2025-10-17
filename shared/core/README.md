@@ -1,93 +1,77 @@
-# @triplecheck/core
+# @Chanuka/core
 
-Consolidated cross-cutting utilities for the TripleCheck platform. This package provides unified, high-performance, and well-tested utilities for caching, logging, validation, error handling, rate limiting, and other cross-cutting concerns.
+Consolidated cross-cutting utilities for the Chanuka platform. This package provides unified, high-performance, and well-tested utilities for caching, logging, validation, error handling, rate limiting, and other cross-cutting concerns.
 
 ## Features
 
-- 🚀 **Multi-Tier Caching** - Memory + Redis with automatic promotion and circuit breaker patterns
-- 📝 **Structured Logging** - Pino-based logging with async context preservation and redaction
-- ✅ **Comprehensive Validation** - Zod-based validation with preprocessing and caching
-- 🛡️ **Error Handling** - Categorized errors with circuit breaker integration
-- 🚦 **Rate Limiting** - Multiple algorithms (sliding window, token bucket, fixed window)
-- ⚙️ **Configuration Management** - Zod schema validation with hot reloading and feature flags
-- 🏥 **Health Monitoring** - Comprehensive dependency checking with timeout protection
+### Core Capabilities
+- 🚀 **Caching** - Multi-tier caching with Redis/memory, single-flight deduplication, circuit breakers
+- 📝 **Error Management** - Structured error handling with specialized classes, recovery strategies, correlation
+- 📊 **Observability** - Unified logging, health monitoring, metrics, and distributed tracing
+- ✅ **Validation** - Adapter-based validation (Zod/Joi/custom) with schema caching and middleware
+- 🚦 **Rate Limiting** - Multiple algorithms with Redis/memory storage and AI-specific optimizations
+
+### Cross-Cutting Features
+- 🔄 **Migration Support** - Backward compatibility adapters and gradual migration utilities
+- ⚙️ **Configuration Management** - Schema-validated config with hot reloading and feature flags
 - 🔧 **Middleware Integration** - Unified middleware for Express applications
 - 📊 **Performance Testing** - Built-in benchmarking, load testing, and monitoring tools
-- 🔄 **Migration Support** - Backward compatibility adapters and migration utilities
+- 🏗️ **Primitives** - Core types, errors, constants, and utilities
 
 ## Installation
 
 ```bash
-npm install @triplecheck/core
+npm install @Chanuka/core
 ```
 
 ## Quick Start
 
 ```typescript
-import { 
-  createCacheService, 
-  Logger, 
-  ValidationService, 
+import {
+  createCacheService,
+  logger,
+  ValidationService,
   createRateLimitFactory,
-  configManager 
-} from '@triplecheck/core';
+  ValidationError
+} from '@Chanuka/core';
 
-// Initialize configuration
-const config = await configManager.load();
-
-// Create cache service
+// Initialize services
 const cache = createCacheService({
-  provider: 'redis',
-  redisUrl: 'redis://localhost:6379',
-  maxMemoryMB: 100,
-  enableMetrics: true
+  provider: 'multi-tier',
+  redisUrl: process.env.REDIS_URL,
+  enableCircuitBreaker: true
 });
 
-// Create logger
-const logger = new Logger({
-  level: 'info',
-  pretty: process.env.NODE_ENV === 'development',
-  enableMetrics: true
-});
-
-// Create validator
 const validator = new ValidationService();
-await validator.registerSchema('user', {
-  type: 'object',
-  properties: {
-    name: { type: 'string', minLength: 1 },
-    email: { type: 'string', format: 'email' },
-    age: { type: 'number', minimum: 0, maximum: 150 }
-  },
-  required: ['name', 'email', 'age']
-});
+await validator.registerSchema('user', userSchema);
 
-// Create rate limiter
 const rateLimitFactory = createRateLimitFactory();
 const rateLimiter = rateLimitFactory.createStore('sliding-window');
 
 // Use in your application
 async function handleRequest(userData: any) {
-  // Rate limiting
+  // Rate limiting with automatic retry-after headers
   const rateLimitResult = await rateLimiter.hit('user:123', 100, 60000);
   if (!rateLimitResult.allowed) {
-    throw new Error('Rate limit exceeded');
+    throw new ValidationError('Rate limit exceeded', {
+      retryAfter: rateLimitResult.retryAfter
+    });
   }
 
-  // Validation
+  // Validation with preprocessing
   const validatedData = await validator.validate('user', userData);
 
-  // Caching
+  // Caching with single-flight protection
   const cacheKey = `user:${validatedData.email}`;
   let cachedUser = await cache.get(cacheKey);
-  
+
   if (!cachedUser) {
     // Process user data...
     cachedUser = { ...validatedData, processed: true };
     await cache.set(cacheKey, cachedUser, 300);
   }
 
-  // Logging
+  // Structured logging with correlation
   logger.info('User request processed', {
     email: validatedData.email,
     cached: !!cachedUser,
@@ -98,161 +82,90 @@ async function handleRequest(userData: any) {
 }
 ```
 
-## Core Modules
+## Core Capabilities
 
-### Cache Service
+The shared/core package is organized into five main capabilities, each providing comprehensive functionality for cross-cutting concerns:
 
-Multi-tier caching with Redis and memory support:
+### 🚀 Caching (`@Chanuka/core/caching`)
+Multi-tier caching with Redis and memory support, single-flight request deduplication, circuit breaker protection, and AI-specific optimizations.
 
 ```typescript
-import { createCacheService } from '@triplecheck/core/cache';
+import { createCacheService } from '@Chanuka/core/caching';
 
 const cache = createCacheService({
-  provider: 'multi-tier', // 'memory', 'redis', or 'multi-tier'
+  provider: 'multi-tier',
   redisUrl: 'redis://localhost:6379',
   maxMemoryMB: 100,
-  enableCompression: true,
   enableCircuitBreaker: true
 });
 
-// Basic operations
-await cache.set('key', 'value', 300); // TTL in seconds
-const value = await cache.get('key');
-await cache.del('key');
-
-// Batch operations
-await cache.mset([['key1', 'value1'], ['key2', 'value2']]);
-const values = await cache.mget(['key1', 'key2']);
-
-// Metrics
-const metrics = cache.getMetrics();
-console.log(`Hit rate: ${metrics.hitRate}%`);
+// Basic operations with automatic single-flight protection
+await cache.set('user:123', userData, 300);
+const user = await cache.get('user:123');
 ```
 
-### Logging Service
-
-Structured logging with context preservation:
+### 📝 Error Management (`@Chanuka/core/error-management`)
+Structured error handling with specialized error classes, recovery strategies, circuit breaker patterns, and comprehensive error correlation.
 
 ```typescript
-import { Logger } from '@triplecheck/core/logging';
+import { ValidationError, DatabaseError, CircuitBreaker } from '@Chanuka/core/error-management';
 
-const logger = new Logger({
-  level: 'info',
-  pretty: false,
-  redactPaths: ['password', 'token', 'ssn'],
-  asyncTransport: true,
-  enableMetrics: true
-});
+// Specialized errors with automatic recovery
+throw new ValidationError('Invalid email format', { field: 'email' });
 
-// Basic logging
-logger.info('User logged in', { userId: '123', ip: '192.168.1.1' });
-logger.error('Database error', { error: err, query: 'SELECT * FROM users' });
-
-// Structured logging methods
-logger.logRequest(req, res, duration);
-logger.logDatabaseQuery('SELECT * FROM users', 150, ['active']);
-logger.logCacheOperation('get', 'user:123', true, 2.5);
-logger.logBusinessEvent('user_signup', { userId: '123', plan: 'premium' });
-logger.logSecurityEvent('failed_login', { ip: '192.168.1.1', attempts: 3 });
-
-// Context preservation
-logger.withContext({ requestId: 'req-123', userId: '456' }, () => {
-  logger.info('Processing request'); // Automatically includes context
-});
+// Circuit breaker protection
+const breaker = new CircuitBreaker({ threshold: 5, timeout: 60000 });
+const result = await breaker.call(() => externalApiCall());
 ```
 
-### Validation Service
-
-Zod-based validation with preprocessing:
+### 📊 Observability (`@Chanuka/core/observability`)
+Unified logging, health monitoring, metrics collection, and distributed tracing with shared correlation IDs and comprehensive telemetry.
 
 ```typescript
-import { ValidationService } from '@triplecheck/core/validation';
+import { logger, createTracer, createCounter } from '@Chanuka/core/observability';
+
+// Structured logging with correlation
+logger.info('User login successful', { userId: '123', component: 'auth' });
+
+// Distributed tracing
+const tracer = createTracer('my-service', '1.0.0');
+const span = tracer.startSpan('http-request');
+
+// Metrics collection
+const requestCounter = createCounter('http_requests_total');
+requestCounter.increment(1, { method: 'GET', status: '200' });
+```
+
+### ✅ Validation (`@Chanuka/core/validation`)
+Adapter-based validation framework supporting Zod, Joi, and custom validators with schema caching, preprocessing, and Express middleware integration.
+
+```typescript
+import { ValidationService } from '@Chanuka/core/validation';
 
 const validator = new ValidationService();
+await validator.registerSchema('user', userSchema);
 
-// Register schemas
-await validator.registerSchema('user', {
-  type: 'object',
-  properties: {
-    name: { type: 'string', minLength: 1 },
-    email: { type: 'string', format: 'email' },
-    age: { type: 'number', minimum: 0, maximum: 150 }
-  },
-  required: ['name', 'email', 'age']
-});
+// Validate with automatic preprocessing
+const validatedData = await validator.validate('user', inputData);
 
-// Validate data
-const validatedData = await validator.validate('user', userData);
-
-// Batch validation
-const results = await validator.validateBatch('user', [user1, user2, user3]);
-console.log(`Valid: ${results.valid.length}, Invalid: ${results.invalid.length}`);
-
-// Safe validation (doesn't throw)
-const result = await validator.validateSafe('user', userData);
-if (result.success) {
-  console.log('Valid data:', result.data);
-} else {
-  console.log('Validation errors:', result.errors);
-}
+// Express middleware integration
+app.post('/users', validateRequest({ body: 'user' }), handler);
 ```
 
-### Rate Limiting
-
-Multiple algorithms with Redis and memory support:
+### 🚦 Rate Limiting (`@Chanuka/core/rate-limiting`)
+Multiple algorithms (sliding window, token bucket, fixed window) with Redis/memory storage, AI-specific rate limiting, and comprehensive metrics.
 
 ```typescript
-import { createRateLimitFactory } from '@triplecheck/core/rate-limiting';
+import { createRateLimitFactory } from '@Chanuka/core/rate-limiting';
 
 const factory = createRateLimitFactory(redisClient);
-const rateLimiter = factory.createStore('sliding-window'); // 'token-bucket', 'fixed-window'
+const rateLimiter = factory.createStore('sliding-window');
 
 // Check rate limit
-const result = await rateLimiter.hit('user:123', 100, 60000); // 100 requests per minute
-if (result.allowed) {
-  console.log(`Request allowed. Remaining: ${result.remaining}`);
-} else {
-  console.log(`Rate limited. Retry after: ${result.retryAfter}ms`);
+const result = await rateLimiter.hit('user:123', 100, 60000);
+if (!result.allowed) {
+  // Handle rate limit exceeded
 }
-
-// Get metrics
-const metrics = rateLimiter.getMetrics();
-console.log(`Block rate: ${metrics.blockRate}%`);
-```
-
-### Error Handling
-
-Categorized errors with circuit breaker patterns:
-
-```typescript
-import { 
-  AppError, 
-  ValidationError, 
-  NotFoundError,
-  CircuitBreaker,
-  errorHandlerMiddleware 
-} from '@triplecheck/core/error-handling';
-
-// Custom errors
-throw new ValidationError('Invalid email format', { field: 'email', value: 'invalid' });
-throw new NotFoundError('User not found', { userId: '123' });
-
-// Circuit breaker
-const circuitBreaker = new CircuitBreaker({
-  threshold: 5,
-  timeout: 60000,
-  slowCallThreshold: 5000
-});
-
-const result = await circuitBreaker.call(async () => {
-  return await externalApiCall();
-});
-
-// Express middleware
-app.use(errorHandlerMiddleware({
-  includeStackTrace: process.env.NODE_ENV === 'development',
-  enableSentryReporting: true
-}));
 ```
 
 ### Configuration Management
@@ -260,7 +173,7 @@ app.use(errorHandlerMiddleware({
 Schema-validated configuration with feature flags:
 
 ```typescript
-import { configManager } from '@triplecheck/core/config';
+import { configManager } from '@Chanuka/core/config';
 
 // Load configuration
 const config = await configManager.load();
@@ -286,7 +199,7 @@ configManager.on('config:changed', (newConfig) => {
 Comprehensive health checks with timeout protection:
 
 ```typescript
-import { HealthChecker } from '@triplecheck/core/health';
+import { HealthChecker } from '@Chanuka/core/health';
 
 const healthChecker = new HealthChecker();
 
@@ -317,38 +230,42 @@ app.get('/health', async (req, res) => {
 
 ## Middleware Integration
 
-Unified middleware for Express applications:
+Unified middleware for Express applications with comprehensive cross-cutting concerns:
 
 ```typescript
 import express from 'express';
-import { 
-  rateLimitMiddleware,
+import {
+  createExpressRateLimitMiddleware,
   validateRequest,
-  requestLoggingMiddleware,
-  errorHandlerMiddleware 
-} from '@triplecheck/core/middleware';
+  logger,
+  errorHandlerMiddleware
+} from '@Chanuka/core';
 
 const app = express();
 
-// Request logging
-app.use(requestLoggingMiddleware({
-  includeBody: true,
-  includeQuery: true,
-  redactFields: ['password', 'token']
+// Request logging with correlation IDs
+app.use((req, res, next) => {
+  req.correlationId = req.headers['x-correlation-id'] || generateId();
+  logger.info('Request started', {
+    method: req.method,
+    url: req.url,
+    correlationId: req.correlationId
+  });
+  next();
+});
+
+// Rate limiting with Redis storage
+app.use('/api', createExpressRateLimitMiddleware({
+  store: redisStore,
+  limit: 100,
+  windowMs: 15 * 60 * 1000,
+  keyGenerator: (req) => req.user?.id || req.ip
 }));
 
-// Rate limiting
-app.use('/api', rateLimitMiddleware({
-  windowMs: 60000,
-  max: 100,
-  keyGenerator: (req) => req.ip,
-  skipSuccessfulRequests: false
-}));
-
-// Validation
-app.post('/users', 
+// Validation with schema caching
+app.post('/users',
   validateRequest({
-    body: 'user', // References registered schema
+    body: 'user',
     query: 'pagination'
   }),
   async (req, res) => {
@@ -358,8 +275,11 @@ app.post('/users',
   }
 );
 
-// Error handling (should be last)
-app.use(errorHandlerMiddleware());
+// Error handling with structured responses
+app.use(errorHandlerMiddleware({
+  includeStackTrace: process.env.NODE_ENV === 'development',
+  enableSentryReporting: true
+}));
 ```
 
 ## Performance Testing
@@ -372,7 +292,7 @@ import {
   StressTests,
   PerformanceMonitor,
   createComprehensiveTestSuite 
-} from '@triplecheck/core/testing';
+} from '@Chanuka/core/testing';
 
 // Performance benchmarks
 const benchmarks = new PerformanceBenchmarks();
@@ -405,29 +325,41 @@ const report = monitor.generateReport();
 const reportPath = monitor.saveReport(report);
 ```
 
-## Migration from Legacy Code
+## Migration Support
 
-Backward compatibility adapters for smooth migration:
+Comprehensive migration utilities for gradual adoption of the consolidated system:
 
 ```typescript
-import { 
+import {
   LegacyCacheAdapter,
   LegacyLoggerAdapter,
-  MigrationFinalizer,
-  MigrationValidator 
-} from '@triplecheck/core/migration';
+  MigrationValidator,
+  useUnifiedCaching,
+  useUnifiedObservability
+} from '@Chanuka/core';
 
-// Legacy cache adapter
-const legacyCache = new LegacyCacheAdapter(coreCache);
-// Use existing cache interface without changes
+// Feature flag-based migration
+if (useUnifiedCaching) {
+  // Use new caching system
+  const cache = createCacheService(unifiedConfig);
+} else {
+  // Use legacy cache with adapter
+  const cache = new LegacyCacheAdapter(legacyCache);
+}
 
-// Migration scripts
-const migrationFinalizer = new MigrationFinalizer();
-await migrationFinalizer.finalizeMigration('./src');
+// Gradual observability migration
+if (useUnifiedObservability) {
+  // Use unified observability platform
+  logger.info('Using unified logging');
+} else {
+  // Use legacy fragmented systems
+  legacyLogger.info('Using legacy logging');
+}
 
-// Validation
+// Migration validation
 const validator = new MigrationValidator();
-const validationResult = await validator.validateMigration();
+const report = await validator.validateMigration('./src');
+console.log(`Migration readiness: ${report.score}%`);
 ```
 
 ## Environment Configuration
@@ -473,7 +405,7 @@ import type {
   RateLimitResult,
   HealthResult,
   AppConfig
-} from '@triplecheck/core';
+} from '@Chanuka/core';
 
 // All interfaces are fully typed
 const cache: CacheService = createCacheService(config);
@@ -482,19 +414,33 @@ const metrics: CacheMetrics = cache.getMetrics();
 
 ## Performance Characteristics
 
-- **Cache Operations**: >10,000 ops/sec (memory), >5,000 ops/sec (Redis)
-- **Logging**: >10,000 logs/sec with async transport
-- **Validation**: >10,000 simple validations/sec, >1,000 complex validations/sec
-- **Rate Limiting**: >5,000 checks/sec
-- **Memory Usage**: Optimized for minimal allocation and efficient garbage collection
+### Core Capabilities Performance
+- **Caching**: >10,000 ops/sec (memory), >5,000 ops/sec (Redis), single-flight deduplication
+- **Error Management**: Minimal overhead, automatic recovery strategies, correlation tracking
+- **Observability**: >10,000 logs/sec with async transport, efficient metrics collection
+- **Validation**: >10,000 simple validations/sec, >1,000 complex validations/sec with schema caching
+- **Rate Limiting**: >5,000 checks/sec, multiple algorithms with Redis/memory storage
+
+### System Performance
+- **Memory Usage**: Optimized allocation with efficient garbage collection
+- **Tree Shaking**: Named exports enable optimal bundle size reduction
+- **Type Safety**: Full TypeScript support with zero runtime type checking overhead
+- **Backward Compatibility**: Legacy adapters with minimal performance impact
 
 ## Testing
 
-Comprehensive test suite with >95% coverage:
+Comprehensive test suite with >95% coverage across all capabilities:
 
 ```bash
 # Run all tests
 npm test
+
+# Run capability-specific tests
+npm test -- src/caching/
+npm test -- src/error-management/
+npm test -- src/observability/
+npm test -- src/validation/
+npm test -- src/rate-limiting/
 
 # Run with coverage
 npm run test:coverage
@@ -524,9 +470,9 @@ MIT License - see LICENSE file for details.
 ## Support
 
 - Documentation: [Core Utilities Docs](./docs/)
-- Issues: [GitHub Issues](https://github.com/triplecheck/core/issues)
-- Discussions: [GitHub Discussions](https://github.com/triplecheck/core/discussions)
+- Issues: [GitHub Issues](https://github.com/Chanuka/core/issues)
+- Discussions: [GitHub Discussions](https://github.com/Chanuka/core/discussions)
 
 ---
 
-Built with ❤️ by the TripleCheck Team
+Built with ❤️ by the Chanuka Team

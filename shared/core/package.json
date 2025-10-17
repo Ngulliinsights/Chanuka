@@ -1,7 +1,7 @@
 {
-  "name": "@triplecheck/core",
+  "name": "@Chanuka/core",
   "version": "1.0.0",
-  "description": "Core utilities for cross-cutting concerns in the TripleCheck platform",
+  "description": "Core utilities for cross-cutting concerns in the Chanuka platform",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -24,7 +24,7 @@
     "health-monitoring",
     "middleware"
   ],
-  "author": "TripleCheck Team",
+  "author": "Chanuka Team",
   "license": "MIT",
   "dependencies": {
     "zod": "^3.22.4",
@@ -53,45 +53,60 @@
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./cache": {
-      "import": "./dist/cache/index.js",
-      "require": "./dist/cache/index.js",
-      "types": "./dist/cache/index.d.ts"
+    "./caching": {
+      "import": "./dist/caching/index.js",
+      "require": "./dist/caching/index.js",
+      "types": "./dist/caching/index.d.ts"
     },
-    "./logging": {
-      "import": "./dist/logging/index.js",
-      "require": "./dist/logging/index.js",
-      "types": "./dist/logging/index.d.ts"
+    "./error-management": {
+      "import": "./dist/error-management/index.js",
+      "require": "./dist/error-management/index.js",
+      "types": "./dist/error-management/index.d.ts"
+    },
+    "./observability": {
+      "import": "./dist/observability/index.js",
+      "require": "./dist/observability/index.js",
+      "types": "./dist/observability/index.d.ts"
     },
     "./validation": {
       "import": "./dist/validation/index.js",
       "require": "./dist/validation/index.js",
       "types": "./dist/validation/index.d.ts"
     },
-    "./error-handling": {
-      "import": "./dist/error-handling/index.js",
-      "require": "./dist/error-handling/index.js",
-      "types": "./dist/error-handling/index.d.ts"
-    },
     "./rate-limiting": {
       "import": "./dist/rate-limiting/index.js",
       "require": "./dist/rate-limiting/index.js",
       "types": "./dist/rate-limiting/index.d.ts"
     },
-    "./health": {
-      "import": "./dist/health/index.js",
-      "require": "./dist/health/index.js",
-      "types": "./dist/health/index.d.ts"
+    "./primitives": {
+      "import": "./dist/primitives/index.js",
+      "require": "./dist/primitives/index.js",
+      "types": "./dist/primitives/index.d.ts"
     },
-    "./middleware": {
-      "import": "./dist/middleware/index.js",
-      "require": "./dist/middleware/index.js",
-      "types": "./dist/middleware/index.d.ts"
+    "./migration": {
+      "import": "./dist/migration/index.js",
+      "require": "./dist/migration/index.js",
+      "types": "./dist/migration/index.d.ts"
     },
     "./modernization": {
       "import": "./dist/modernization/index.js",
       "require": "./dist/modernization/index.js",
       "types": "./dist/modernization/index.d.ts"
+    },
+    "./testing": {
+      "import": "./dist/testing/index.js",
+      "require": "./dist/testing/index.js",
+      "types": "./dist/testing/index.d.ts"
+    },
+    "./utils": {
+      "import": "./dist/utils/index.js",
+      "require": "./dist/utils/index.js",
+      "types": "./dist/utils/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types/index.js",
+      "require": "./dist/types/index.js",
+      "types": "./dist/types/index.d.ts"
     }
   },
   "files": [

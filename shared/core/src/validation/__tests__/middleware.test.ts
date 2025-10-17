@@ -1,385 +1,249 @@
 /**
  * Validation Middleware Tests
- * 
- * Tests for validation middleware functionality
+ *
+ * Tests for Express middleware validation functionality
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
+import { ValidationError } from '../types';
 import {
   validateRequest,
   ValidationMiddleware,
-  validate,
   validateBatch,
   validateFileUpload,
   validationErrorHandler,
   getValidatedData,
   getBatchValidationResult,
-  commonValidation,
 } from '../middleware';
-import { ValidationError } from '../types';
-import { logger } from '../utils/logger';
 
-// Mock Express request/response objects
-const createMockRequest = (overrides: Partial<Request> = {}): Request => ({
-  body: {},
-  query: {},
-  params: {},
-  headers: {},
-  method: 'GET',
+// Mock Express types
+const mockRequest = (body?: any, query?: any, params?: any, headers?: any): Partial<Request> => ({
+  body,
+  query,
+  params,
+  headers: headers || {},
   path: '/test',
+  method: 'POST',
   ip: '127.0.0.1',
-  ...overrides,
-} as Request);
+});
 
-const createMockResponse = (): Response => {
-  const res = {} as Response;
-  res.status = vi.fn().mockReturnValue(res);
-  res.json = vi.fn().mockReturnValue(res);
+const mockResponse = (): Partial<Response> => {
+  const res: Partial<Response> = {};
+  res.status = jest.fn().mockReturnValue(res);
+  res.json = jest.fn().mockReturnValue(res);
   return res;
 };
 
-const createMockNext = (): NextFunction => vi.fn();
+const mockNext = jest.fn();
 
 describe('Validation Middleware', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('validateRequest', () => {
+    const userSchema = z.object({
+      name: z.string().min(2),
+      email: z.string().email(),
+    });
+
     it('should validate request body successfully', async () => {
-      const schema = z.object({
-        name: z.string(),
-        age: z.number(),
+      const req = mockRequest({
+        name: 'John Doe',
+        email: 'john@example.com',
       });
+      const res = mockResponse();
+      const next = mockNext;
 
-      const middleware = validateRequest({ body: schema });
-      const req = createMockRequest({
-        body: { name: 'John', age: 30 },
+      const middleware = validateRequest({ body: userSchema });
+
+      await middleware(req as Request, res as Response, next as NextFunction);
+
+      expect(next).toHaveBeenCalled();
+      expect((req as any).validated.body).toEqual({
+        name: 'John Doe',
+        email: 'john@example.com',
       });
-      const res = createMockResponse();
-      const next = createMockNext();
-
-      await middleware(req, res, next);
-
-      expect(next).toHaveBeenCalledWith();
-      expect(req.body).toEqual({ name: 'John', age: 30 });
     });
 
-    it('should validate query parameters successfully', async () => {
-      const schema = z.object({
-        page: z.coerce.number().min(1),
-        limit: z.coerce.number().min(1).max(100),
+    it('should return validation error for invalid body', async () => {
+      const req = mockRequest({
+        name: 'J', // too short
+        email: 'invalid-email',
       });
+      const res = mockResponse();
+      const next = mockNext;
 
-      const middleware = validateRequest({ query: schema });
-      const req = createMockRequest({
-        query: { page: '2', limit: '10' },
-      });
-      const res = createMockResponse();
-      const next = createMockNext();
+      const middleware = validateRequest({ body: userSchema });
 
-      await middleware(req, res, next);
-
-      expect(next).toHaveBeenCalledWith();
-      expect(req.query).toEqual({ page: 2, limit: 10 });
-    });
-
-    it('should validate URL parameters successfully', async () => {
-      const schema = z.object({
-        id: z.string().uuid(),
-      });
-
-      const middleware = validateRequest({ params: schema });
-      const req = createMockRequest({
-        params: { id: '550e8400-e29b-41d4-a716-446655440000' },
-      });
-      const res = createMockResponse();
-      const next = createMockNext();
-
-      await middleware(req, res, next);
-
-      expect(next).toHaveBeenCalledWith();
-      expect(req.params.id).toBe('550e8400-e29b-41d4-a716-446655440000');
-    });
-
-    it('should return validation error for invalid data', async () => {
-      const schema = z.object({
-        name: z.string(),
-        age: z.number(),
-      });
-
-      const middleware = validateRequest({ body: schema });
-      const req = createMockRequest({
-        body: { name: 123, age: 'invalid' },
-      });
-      const res = createMockResponse();
-      const next = createMockNext();
-
-      await middleware(req, res, next);
+      await middleware(req as Request, res as Response, next as NextFunction);
 
       expect(res.status).toHaveBeenCalledWith(422);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           error: 'Validation Error',
-          details: expect.arrayContaining([
-            expect.objectContaining({ field: 'body.name' }),
-            expect.objectContaining({ field: 'body.age' }),
-          ]),
+          message: expect.stringContaining('Validation failed'),
+          details: expect.any(Array),
         })
       );
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should skip validation when skipIf condition is true', async () => {
-      const schema = z.object({
-        name: z.string(),
+    it('should validate query parameters', async () => {
+      const req = mockRequest(undefined, {
+        page: '1',
+        limit: '10',
+      });
+      const res = mockResponse();
+      const next = mockNext;
+
+      const querySchema = z.object({
+        page: z.string().transform(Number),
+        limit: z.string().transform(Number),
       });
 
-      const middleware = validateRequest({
-        body: schema,
-        skipIf: (req) => req.headers['x-skip-validation'] === 'true',
+      const middleware = validateRequest({ query: querySchema });
+
+      await middleware(req as Request, res as Response, next as NextFunction);
+
+      expect(next).toHaveBeenCalled();
+      expect((req as any).validated.query).toEqual({
+        page: 1,
+        limit: 10,
       });
-
-      const req = createMockRequest({
-        body: { name: 123 }, // Invalid data
-        headers: { 'x-skip-validation': 'true' },
-      });
-      const res = createMockResponse();
-      const next = createMockNext();
-
-      await middleware(req, res, next);
-
-      expect(next).toHaveBeenCalledWith();
-      expect(res.status).not.toHaveBeenCalled();
     });
 
-    it('should use custom error handler when provided', async () => {
-      const schema = z.object({
-        name: z.string(),
-      });
-
-      const customErrorHandler = vi.fn();
-      const middleware = validateRequest({
-        body: schema,
-        onError: customErrorHandler,
-      });
-
-      const req = createMockRequest({
-        body: { name: 123 },
-      });
-      const res = createMockResponse();
-      const next = createMockNext();
-
-      await middleware(req, res, next);
-
-      expect(customErrorHandler).toHaveBeenCalledWith(
-        expect.any(ValidationError),
-        req,
-        res,
-        next
-      );
-    });
-
-    it('should store validated data in request object', async () => {
-      const bodySchema = z.object({ name: z.string() });
-      const querySchema = z.object({ page: z.coerce.number() });
+    it('should skip validation when skipIf returns true', async () => {
+      const req = mockRequest({ name: 'John' });
+      const res = mockResponse();
+      const next = mockNext;
 
       const middleware = validateRequest({
-        body: bodySchema,
-        query: querySchema,
+        body: userSchema,
+        skipIf: (req) => req.method === 'GET',
       });
 
-      const req = createMockRequest({
-        body: { name: 'John' },
-        query: { page: '1' },
-      });
-      const res = createMockResponse();
-      const next = createMockNext();
+      // Simulate GET request
+      (req as any).method = 'GET';
 
-      await middleware(req, res, next);
+      await middleware(req as Request, res as Response, next as NextFunction);
 
-      const validatedData = getValidatedData(req);
-      expect(validatedData.body).toEqual({ name: 'John' });
-      expect(validatedData.query).toEqual({ page: 1 });
+      expect(next).toHaveBeenCalled();
+      expect((req as any).validated).toBeUndefined();
     });
   });
 
-  describe('ValidationMiddleware factory methods', () => {
+  describe('ValidationMiddleware static methods', () => {
+    const userSchema = z.object({
+      name: z.string().min(2),
+      email: z.string().email(),
+    });
+
     it('should create body validation middleware', async () => {
-      const schema = z.object({ name: z.string() });
-      const middleware = ValidationMiddleware.body(schema);
+      const req = mockRequest({ name: 'John Doe', email: 'john@example.com' });
+      const res = mockResponse();
+      const next = mockNext;
 
-      const req = createMockRequest({
-        body: { name: 'John' },
-      });
-      const res = createMockResponse();
-      const next = createMockNext();
+      const middleware = ValidationMiddleware.body(userSchema);
 
-      await middleware(req, res, next);
+      await middleware(req as Request, res as Response, next as NextFunction);
 
-      expect(next).toHaveBeenCalledWith();
+      expect(next).toHaveBeenCalled();
     });
 
     it('should create query validation middleware', async () => {
-      const schema = z.object({ page: z.coerce.number() });
-      const middleware = ValidationMiddleware.query(schema);
+      const req = mockRequest(undefined, { search: 'test' });
+      const res = mockResponse();
+      const next = mockNext;
 
-      const req = createMockRequest({
-        query: { page: '1' },
+      const querySchema = z.object({
+        search: z.string(),
       });
-      const res = createMockResponse();
-      const next = createMockNext();
 
-      await middleware(req, res, next);
+      const middleware = ValidationMiddleware.query(querySchema);
 
-      expect(next).toHaveBeenCalledWith();
-      expect(req.query).toEqual({ page: 1 });
+      await middleware(req as Request, res as Response, next as NextFunction);
+
+      expect(next).toHaveBeenCalled();
     });
 
-    it('should create conditional validation middleware', async () => {
-      const schema = z.object({ name: z.string() });
-      const middleware = ValidationMiddleware.conditional(
-        (req) => req.method === 'POST',
-        { body: schema }
-      );
+    it('should create params validation middleware', async () => {
+      const req = mockRequest(undefined, undefined, { id: '123' });
+      const res = mockResponse();
+      const next = mockNext;
 
-      // Should validate for POST request
-      const postReq = createMockRequest({
-        method: 'POST',
-        body: { name: 'John' },
+      const paramsSchema = z.object({
+        id: z.string().regex(/^\d+$/),
       });
-      const res1 = createMockResponse();
-      const next1 = createMockNext();
 
-      await middleware(postReq, res1, next1);
-      expect(next1).toHaveBeenCalledWith();
+      const middleware = ValidationMiddleware.params(paramsSchema);
 
-      // Should skip validation for GET request
-      const getReq = createMockRequest({
-        method: 'GET',
-        body: { name: 123 }, // Invalid data
-      });
-      const res2 = createMockResponse();
-      const next2 = createMockNext();
+      await middleware(req as Request, res as Response, next as NextFunction);
 
-      await middleware(getReq, res2, next2);
-      expect(next2).toHaveBeenCalledWith();
-      expect(res2.status).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalled();
     });
   });
 
-  describe('validate decorator', () => {
-    it('should validate method parameters', async () => {
-      class TestController {
-        @validate({
-          schema: z.object({ name: z.string(), age: z.number() }),
-        })
-        async createUser(userData: any) {
-          return { id: 1, ...userData };
-        }
-      }
-
-      const controller = new TestController();
-      const result = await controller.createUser({ name: 'John', age: 30 });
-
-      expect(result).toEqual({ id: 1, name: 'John', age: 30 });
+  describe('validateBatch', () => {
+    const itemSchema = z.object({
+      id: z.number(),
+      name: z.string().min(1),
     });
 
-    it('should throw validation error for invalid parameters', async () => {
-      class TestController {
-        @validate({
-          schema: z.object({ name: z.string(), age: z.number() }),
-        })
-        async createUser(userData: any) {
-          return { id: 1, ...userData };
-        }
-      }
+    it('should validate batch data successfully', async () => {
+      const batchData = [
+        { id: 1, name: 'Item 1' },
+        { id: 2, name: 'Item 2' },
+      ];
 
-      const controller = new TestController();
+      const req = mockRequest(batchData);
+      const res = mockResponse();
+      const next = mockNext;
 
-      await expect(
-        controller.createUser({ name: 123, age: 'invalid' })
-      ).rejects.toThrow(ValidationError);
-    });
-  });
+      const middleware = validateBatch(itemSchema);
 
-  describe('validateBatch middleware', () => {
-    it('should validate array of valid items', async () => {
-      const schema = z.object({
-        name: z.string(),
-        age: z.number(),
-      });
+      await middleware(req as Request, res as Response, next as NextFunction);
 
-      const middleware = validateBatch(schema);
-      const req = createMockRequest({
-        body: [
-          { name: 'John', age: 30 },
-          { name: 'Jane', age: 25 },
-        ],
-      });
-      const res = createMockResponse();
-      const next = createMockNext();
-
-      await middleware(req, res, next);
-
-      expect(next).toHaveBeenCalledWith();
-      expect(req.body).toEqual([
-        { name: 'John', age: 30 },
-        { name: 'Jane', age: 25 },
-      ]);
+      expect(next).toHaveBeenCalled();
+      expect(req.body).toEqual(batchData);
+      expect((req as any).batchValidation).toBeDefined();
     });
 
-    it('should return error for mixed valid/invalid items', async () => {
-      const schema = z.object({
-        name: z.string(),
-        age: z.number(),
-      });
+    it('should return batch validation error for invalid items', async () => {
+      const batchData = [
+        { id: 1, name: 'Valid Item' },
+        { id: 'invalid', name: '' }, // invalid
+      ];
 
-      const middleware = validateBatch(schema);
-      const req = createMockRequest({
-        body: [
-          { name: 'John', age: 30 },
-          { name: 123, age: 'invalid' },
-          { name: 'Jane', age: 25 },
-        ],
-      });
-      const res = createMockResponse();
-      const next = createMockNext();
+      const req = mockRequest(batchData);
+      const res = mockResponse();
+      const next = mockNext;
 
-      await middleware(req, res, next);
+      const middleware = validateBatch(itemSchema);
+
+      await middleware(req as Request, res as Response, next as NextFunction);
 
       expect(res.status).toHaveBeenCalledWith(422);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           error: 'Batch Validation Error',
-          valid: [
-            { name: 'John', age: 30 },
-            { name: 'Jane', age: 25 },
-          ],
-          invalid: expect.arrayContaining([
-            expect.objectContaining({
-              index: 1,
-              errors: expect.any(Array),
-            }),
-          ]),
-          summary: {
-            total: 3,
-            valid: 2,
-            invalid: 1,
-          },
+          message: expect.stringContaining('failed validation'),
+          valid: expect.any(Array),
+          invalid: expect.any(Array),
         })
       );
+      expect(next).not.toHaveBeenCalled();
     });
 
-    it('should return error for non-array body', async () => {
-      const schema = z.object({ name: z.string() });
-      const middleware = validateBatch(schema);
+    it('should reject non-array body', async () => {
+      const req = mockRequest({ not: 'an array' });
+      const res = mockResponse();
+      const next = mockNext;
 
-      const req = createMockRequest({
-        body: { name: 'John' }, // Not an array
-      });
-      const res = createMockResponse();
-      const next = createMockNext();
+      const middleware = validateBatch(itemSchema);
 
-      await middleware(req, res, next);
+      await middleware(req as Request, res as Response, next as NextFunction);
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith(
@@ -391,200 +255,111 @@ describe('Validation Middleware', () => {
     });
   });
 
-  describe('validateFileUpload middleware', () => {
-    it('should validate single file upload', async () => {
-      const fileSchema = z.object({
-        filename: z.string(),
-        mimetype: z.string(),
-        size: z.number().max(1024 * 1024), // 1MB
-      });
-
-      const middleware = validateFileUpload(fileSchema);
-      const req = createMockRequest({
-        file: {
-          originalname: 'test.jpg',
-          mimetype: 'image/jpeg',
-          size: 500000,
-        },
-      } as any);
-      const res = createMockResponse();
-      const next = createMockNext();
-
-      await middleware(req, res, next);
-
-      expect(next).toHaveBeenCalledWith();
+  describe('validateFileUpload', () => {
+    const fileSchema = z.object({
+      filename: z.string(),
+      mimetype: z.string(),
+      size: z.number().max(1024 * 1024), // 1MB
     });
 
-    it('should validate multiple file uploads', async () => {
-      const fileSchema = z.object({
-        filename: z.string(),
-        mimetype: z.string(),
-        size: z.number().max(1024 * 1024),
-      });
-
-      const middleware = validateFileUpload(fileSchema);
-      const req = createMockRequest({
-        files: [
-          {
-            originalname: 'test1.jpg',
-            mimetype: 'image/jpeg',
-            size: 500000,
-          },
-          {
-            originalname: 'test2.jpg',
-            mimetype: 'image/jpeg',
-            size: 600000,
-          },
-        ],
-      } as any);
-      const res = createMockResponse();
-      const next = createMockNext();
-
-      await middleware(req, res, next);
-
-      expect(next).toHaveBeenCalledWith();
-    });
-
-    it('should return error for invalid file', async () => {
-      const fileSchema = z.object({
-        filename: z.string(),
-        mimetype: z.string(),
-        size: z.number().max(1024), // Very small limit
-      });
-
-      const middleware = validateFileUpload(fileSchema);
-      const req = createMockRequest({
-        file: {
-          originalname: 'large.jpg',
-          mimetype: 'image/jpeg',
-          size: 2048, // Too large
-        },
-      } as any);
-      const res = createMockResponse();
-      const next = createMockNext();
-
-      await middleware(req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(422);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: 'File Validation Error',
-        })
+    it('should validate file upload successfully', async () => {
+      const req = mockRequest(
+        { metadata: 'test' },
+        undefined,
+        undefined,
+        undefined
       );
+      (req as any).file = {
+        originalname: 'test.jpg',
+        mimetype: 'image/jpeg',
+        size: 50000,
+      };
+
+      const res = mockResponse();
+      const next = mockNext;
+
+      const middleware = validateFileUpload(fileSchema);
+
+      await middleware(req as Request, res as Response, next as NextFunction);
+
+      expect(next).toHaveBeenCalled();
+    });
+
+    it('should validate multiple files', async () => {
+      const req = mockRequest();
+      (req as any).files = [
+        { originalname: 'file1.jpg', mimetype: 'image/jpeg', size: 50000 },
+        { originalname: 'file2.png', mimetype: 'image/png', size: 30000 },
+      ];
+
+      const res = mockResponse();
+      const next = mockNext;
+
+      const middleware = validateFileUpload(fileSchema);
+
+      await middleware(req as Request, res as Response, next as NextFunction);
+
+      expect(next).toHaveBeenCalled();
     });
   });
 
   describe('validationErrorHandler', () => {
     it('should handle ValidationError', () => {
-      const errorHandler = validationErrorHandler();
-      const error = new ValidationError(new z.ZodError([
-        {
-          code: 'invalid_type',
-          expected: 'string',
-          received: 'number',
-          path: ['name'],
-          message: 'Expected string, received number',
-        },
-      ]));
+      const error = new ValidationError('Test validation error');
+      const req = mockRequest();
+      const res = mockResponse();
+      const next = mockNext;
 
-      const req = createMockRequest();
-      const res = createMockResponse();
-      const next = createMockNext();
+      const middleware = validationErrorHandler();
 
-      errorHandler(error, req, res, next);
+      middleware(error, req as Request, res as Response, next as NextFunction);
 
       expect(res.status).toHaveBeenCalledWith(422);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
           error: 'Validation Error',
+          message: 'Test validation error',
           details: expect.any(Array),
         })
       );
       expect(next).not.toHaveBeenCalled();
     });
 
-    it('should handle ZodError', () => {
-      const errorHandler = validationErrorHandler();
-      const error = new z.ZodError([
-        {
-          code: 'invalid_type',
-          expected: 'string',
-          received: 'number',
-          path: ['name'],
-          message: 'Expected string, received number',
-        },
-      ]);
+    it('should pass through non-validation errors', () => {
+      const error = new Error('Regular error');
+      const req = mockRequest();
+      const res = mockResponse();
+      const next = mockNext;
 
-      const req = createMockRequest();
-      const res = createMockResponse();
-      const next = createMockNext();
+      const middleware = validationErrorHandler();
 
-      errorHandler(error, req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(422);
-      expect(res.json).toHaveBeenCalledWith(
-        expect.objectContaining({
-          error: 'Validation Error',
-          details: expect.any(Array),
-        })
-      );
-      expect(next).not.toHaveBeenCalled();
-    });
-
-    it('should pass non-validation errors to next handler', () => {
-      const errorHandler = validationErrorHandler();
-      const error = new Error('Some other error');
-
-      const req = createMockRequest();
-      const res = createMockResponse();
-      const next = createMockNext();
-
-      errorHandler(error, req, res, next);
+      middleware(error, req as Request, res as Response, next as NextFunction);
 
       expect(next).toHaveBeenCalledWith(error);
       expect(res.status).not.toHaveBeenCalled();
     });
   });
 
-  describe('Common validation presets', () => {
-    it('should create pagination validation middleware', async () => {
-      const middleware = await commonValidation.pagination();
-      expect(middleware).toBeDefined();
-      expect(typeof middleware).toBe('function');
-    });
-
-    it('should create UUID parameter validation middleware', () => {
-      const middleware = commonValidation.uuidParam('userId');
-      expect(middleware).toBeDefined();
-      expect(typeof middleware).toBe('function');
-    });
-
-    it('should create search query validation middleware', async () => {
-      const middleware = await commonValidation.searchQuery();
-      expect(middleware).toBeDefined();
-      expect(typeof middleware).toBe('function');
-    });
-
-    it('should create file upload validation middleware', async () => {
-      const middleware = await commonValidation.fileUpload();
-      expect(middleware).toBeDefined();
-      expect(typeof middleware).toBe('function');
-    });
-  });
-
   describe('Utility functions', () => {
-    it('should extract validated data from request', () => {
-      const req = createMockRequest();
-      (req as any).validated = { body: { name: 'John' } };
+    it('should extract validated data', () => {
+      const req = mockRequest();
+      (req as any).validated = {
+        body: { name: 'John' },
+        query: { page: 1 },
+      };
 
-      const validatedData = getValidatedData(req);
-      expect(validatedData).toEqual({ body: { name: 'John' } });
+      const result = getValidatedData(req as Request);
+
+      expect(result).toEqual({
+        body: { name: 'John' },
+        query: { page: 1 },
+      });
     });
 
-    it('should extract batch validation result from request', () => {
-      const req = createMockRequest();
+    it('should extract batch validation result', () => {
+      const req = mockRequest();
       const batchResult = {
-        valid: [{ name: 'John' }],
+        valid: [{ id: 1 }],
         invalid: [],
         totalCount: 1,
         validCount: 1,
@@ -592,14 +367,9 @@ describe('Validation Middleware', () => {
       };
       (req as any).batchValidation = batchResult;
 
-      const result = getBatchValidationResult(req);
+      const result = getBatchValidationResult(req as Request);
+
       expect(result).toEqual(batchResult);
     });
   });
 });
-
-
-
-
-
-

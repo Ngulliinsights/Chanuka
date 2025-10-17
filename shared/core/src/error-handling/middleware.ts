@@ -11,7 +11,6 @@ import { AsyncLocalStorage } from 'async_hooks';
 import * as Sentry from '@sentry/node';
 import { BaseError, ErrorDomain, ErrorSeverity } from '../errors/base-error';
 import { Logger } from '../logging';
-import { logger } from '../utils/logger';
 
 // Request context interface for async storage
 export interface RequestContext {

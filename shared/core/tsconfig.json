@@ -3,7 +3,6 @@
     "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "ignoreDeprecations": "6.0",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "outDir": "./dist",
     "rootDir": "./src",
@@ -33,15 +32,17 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@/config/*": ["./src/config/*"],
-      "@/cache/*": ["./src/cache/*"],
-      "@/logging/*": ["./src/logging/*"],
+      "@/caching/*": ["./src/caching/*"],
+      "@/error-management/*": ["./src/error-management/*"],
+      "@/observability/*": ["./src/observability/*"],
       "@/validation/*": ["./src/validation/*"],
-      "@/error-handling/*": ["./src/error-handling/*"],
       "@/rate-limiting/*": ["./src/rate-limiting/*"],
-      "@/health/*": ["./src/health/*"],
-      "@/middleware/*": ["./src/middleware/*"],
-      "@/utils/*": ["./src/utils/*"]
+      "@/primitives/*": ["./src/primitives/*"],
+      "@/migration/*": ["./src/migration/*"],
+      "@/modernization/*": ["./src/modernization/*"],
+      "@/testing/*": ["./src/testing/*"],
+      "@/utils/*": ["./src/utils/*"],
+      "@/types/*": ["./src/types/*"]
     }
   },
   "include": [

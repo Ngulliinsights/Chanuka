@@ -47,26 +47,26 @@ class MigrationValidator {
   private validationChecks: ValidationCheck[] = [
     {
       name: 'core-package-installed',
-      description: 'Check if @triplecheck/core package is installed',
+      description: 'Check if @Chanuka/core package is installed',
       severity: 'error',
       check: async () => {
         try {
           const packageJsonPath = join(this.rootPath, 'package.json');
           const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
           
-          const hasDependency = packageJson.dependencies?.['@triplecheck/core'] || 
-                               packageJson.devDependencies?.['@triplecheck/core'];
+          const hasDependency = packageJson.dependencies?.['@Chanuka/core'] || 
+                               packageJson.devDependencies?.['@Chanuka/core'];
           
           if (hasDependency) {
             return {
               passed: true,
-              message: '@triplecheck/core package is properly configured'
+              message: '@Chanuka/core package is properly configured'
             };
           } else {
             return {
               passed: false,
-              message: '@triplecheck/core package not found in dependencies',
-              details: ['Add "@triplecheck/core": "workspace:*" to your package.json dependencies']
+              message: '@Chanuka/core package not found in dependencies',
+              details: ['Add "@Chanuka/core": "workspace:*" to your package.json dependencies']
             };
           }
         } catch (error) {
@@ -213,10 +213,10 @@ class MigrationValidator {
       severity: 'info',
       check: async () => {
         const patterns = [
-          'from.*@triplecheck/core',
-          'from.*@triplecheck/core/cache',
-          'from.*@triplecheck/core/logging',
-          'from.*@triplecheck/core/validation'
+          'from.*@Chanuka/core',
+          'from.*@Chanuka/core/cache',
+          'from.*@Chanuka/core/logging',
+          'from.*@Chanuka/core/validation'
         ];
         
         const foundImports: string[] = [];
@@ -360,8 +360,8 @@ class MigrationValidator {
         try {
           // Try to import and use core utilities
           const testScript = `
-            const { createCacheService } = require('@triplecheck/core/cache');
-            const { Logger } = require('@triplecheck/core/logging');
+            const { createCacheService } = require('@Chanuka/core/cache');
+            const { Logger } = require('@Chanuka/core/logging');
             
             // Test cache
             const cache = createCacheService({
@@ -521,7 +521,7 @@ Generated: ${timestamp}
 ${summary.failed === 0 ? '✅ **MIGRATION SUCCESSFUL**' : '❌ **MIGRATION INCOMPLETE**'}
 
 ${summary.failed === 0 
-  ? 'All critical validation checks passed. The migration to @triplecheck/core is complete.'
+  ? 'All critical validation checks passed. The migration to @Chanuka/core is complete.'
   : `${summary.failed} critical issues found. Please address these before considering the migration complete.`
 }
 
@@ -590,7 +590,7 @@ The following items should be addressed for optimal migration:
     report += `## Next Steps
 
 ${summary.failed === 0 
-  ? `🎉 **Congratulations!** Your migration to @triplecheck/core is complete.
+  ? `🎉 **Congratulations!** Your migration to @Chanuka/core is complete.
 
 ### Post-Migration Tasks:
 1. Remove any legacy files that are no longer needed
@@ -604,7 +604,7 @@ ${summary.failed === 0
 3. Once all checks pass, your migration will be complete
 
 ### Common Issues:
-- **Missing @triplecheck/core dependency**: Add it to your package.json
+- **Missing @Chanuka/core dependency**: Add it to your package.json
 - **Old imports remaining**: Use find/replace to update import statements
 - **TypeScript errors**: Update type imports and fix any API changes
 - **Environment variables**: Update deprecated env vars to new format`
@@ -628,7 +628,7 @@ ${summary.failed === 0
     if (summary.failed === 0) {
       logger.info('\n🎉 Migration validation successful!', { component: 'Chanuka' });
       logger.info('✅ All critical checks passed', { component: 'Chanuka' });
-      logger.info('🚀 Your migration to @triplecheck/core is complete', { component: 'Chanuka' });
+      logger.info('🚀 Your migration to @Chanuka/core is complete', { component: 'Chanuka' });
     } else {
       logger.info('\n⚠️  Migration validation found issues', { component: 'Chanuka' });
       console.log(`❌ ${summary.failed} critical issues need to be addressed`);

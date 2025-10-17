@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 import * as schema from '../schema.ts';
-import { logger } from '../../server/utils/logger';
+import { logger } from '../core/src/logging';
 
 const { Pool } = pg;
 
@@ -10,22 +10,54 @@ const { Pool } = pg;
  * of all database operations and preventing runtime errors.
  */
 export type FullDatabaseSchema = {
-  users: typeof schema.users;
-  userProfiles: typeof schema.userProfiles;
-  userInterests: typeof schema.userInterests;
-  bills: typeof schema.bills;
-  billTags: typeof schema.billTags;
-  billComments: typeof schema.billComments;
+  user: typeof schema.user;
+  userProfile: typeof schema.userProfile;
+  session: typeof schema.session;
+  refreshToken: typeof schema.refreshToken;
+  passwordReset: typeof schema.passwordReset;
+  userSocialProfile: typeof schema.userSocialProfile;
+  userInterest: typeof schema.userInterest;
+  userProgress: typeof schema.userProgress;
+  sponsor: typeof schema.sponsor;
+  bill: typeof schema.bill;
+  billTag: typeof schema.billTag;
+  billSponsorship: typeof schema.billSponsorship;
+  billComment: typeof schema.billComment;
+  commentVote: typeof schema.commentVote;
   billEngagement: typeof schema.billEngagement;
-  notifications: typeof schema.notifications;
+  socialShare: typeof schema.socialShare;
   analysis: typeof schema.analysis;
-  sponsors: typeof schema.sponsors;
-  sponsorAffiliations: typeof schema.sponsorAffiliations;
-  billSponsorships: typeof schema.billSponsorships;
+  contentAnalysis: typeof schema.contentAnalysis;
+  billSectionConflict: typeof schema.billSectionConflict;
+  verification: typeof schema.verification;
+  stakeholder: typeof schema.stakeholder;
+  sponsorAffiliation: typeof schema.sponsorAffiliation;
   sponsorTransparency: typeof schema.sponsorTransparency;
-  billSectionConflicts: typeof schema.billSectionConflicts;
-  expertVerifications: typeof schema.expertVerifications;
-  citizenVerifications: typeof schema.citizenVerifications;
+  moderationFlag: typeof schema.moderationFlag;
+  moderationAction: typeof schema.moderationAction;
+  moderationQueue: typeof schema.moderationQueue;
+  contentFlag: typeof schema.contentFlag;
+  securityAuditLog: typeof schema.securityAuditLog;
+  complianceCheck: typeof schema.complianceCheck;
+  threatIntelligence: typeof schema.threatIntelligence;
+  securityIncident: typeof schema.securityIncident;
+  securityAlert: typeof schema.securityAlert;
+  attackPattern: typeof schema.attackPattern;
+  regulation: typeof schema.regulation;
+  regulatoryChange: typeof schema.regulatoryChange;
+  regulatoryImpact: typeof schema.regulatoryImpact;
+  syncJob: typeof schema.syncJob;
+  syncError: typeof schema.syncError;
+  conflict: typeof schema.conflict;
+  conflictSource: typeof schema.conflictSource;
+  notification: typeof schema.notification;
+  analyticsEvent: typeof schema.analyticsEvent;
+  analyticsDailySummary: typeof schema.analyticsDailySummary;
+  userActivitySummary: typeof schema.userActivitySummary;
+  billAnalyticsSummary: typeof schema.billAnalyticsSummary;
+  systemHealthMetric: typeof schema.systemHealthMetric;
+  department: typeof schema.department;
+  evaluation: typeof schema.evaluation;
 } & typeof schema;
 
 type ActualSchemaType = typeof schema;

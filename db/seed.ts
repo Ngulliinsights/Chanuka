@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import { db } from './index';
-import { logger } from '../server/utils/logger';
+import { logger } from '../shared/core/src/logging';
 import {
   users,
   bills,

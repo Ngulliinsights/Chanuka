@@ -9,12 +9,12 @@ import Redis from 'ioredis';
 import { compress, decompress } from 'zlib';
 import { promisify } from 'util';
 import { BaseCacheAdapter } from '../base-adapter';
-import type { 
-import { logger } from '../utils/logger';
-  CacheOptions, 
-  CacheHealthStatus, 
+import { logger } from '../../utils/logger';
+import type {
+  CacheOptions,
+  CacheHealthStatus,
   CompressionOptions,
-  CacheConfig 
+  CacheConfig
 } from '../types';
 
 // Handle cases where zlib functions might not be available (e.g., in tests)
