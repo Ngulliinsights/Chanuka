@@ -6,7 +6,7 @@
 
 import { performance } from 'perf_hooks';
 import { performanceMonitoring } from '../services/performance-monitoring.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 interface MetricData {
   count: number;

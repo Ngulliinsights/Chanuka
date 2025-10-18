@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { MigrationValidator, validateMigration } from '../validation/migration-validator';
 import type { MigrationValidationReport } from '../validation/migration-validator';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 describe('Migration Validation', () => {
   let validationReport: MigrationValidationReport;

@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import ws from "ws";
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 // Load environment variables
 dotenv.config();

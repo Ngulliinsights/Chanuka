@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 /**
  * Base error class for authentication related errors

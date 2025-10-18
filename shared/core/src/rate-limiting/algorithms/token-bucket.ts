@@ -7,7 +7,7 @@
 
 import { Redis } from 'ioredis';
 import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export class TokenBucketStore implements RateLimitStore {
   private readonly luaScript = `

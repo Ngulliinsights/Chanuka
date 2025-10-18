@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router-dom';
+import { renderWithProviders } from '../../test-utils';
 import App from '../../App';
 import logger from '../utils/logger.js';
+import { navigationService } from '../../services/navigation';
 
 // Mock API calls
 vi.mock('../../services/api', () => ({
@@ -32,28 +32,15 @@ vi.mock('../../hooks/useWebSocket', () => ({
 }));
 
 describe('End-to-End User Workflows', () => {
-  let queryClient: QueryClient;
   let user: ReturnType<typeof userEvent.setup>;
 
   beforeEach(() => {
-    queryClient = new QueryClient({
-      defaultOptions: {
-        queries: { retry: false },
-        mutations: { retry: false }
-      }
-    });
     user = userEvent.setup();
     vi.clearAllMocks();
   });
 
   const renderApp = () => {
-    return render(
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </QueryClientProvider>
-    );
+    return renderWithProviders(<App />);
   };
 
   describe('User Registration and Authentication Flow', () => {
@@ -78,14 +65,14 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Navigate to registration
-      const registerLink = screen.getByText(/register/i);
+      const registerLink = screen.getByTestId('register-link');
       await user.click(registerLink);
 
       // Fill out registration form
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
-      const firstNameInput = screen.getByLabelText(/first name/i);
-      const lastNameInput = screen.getByLabelText(/last name/i);
+      const emailInput = screen.getByTestId('email-input');
+      const passwordInput = screen.getByTestId('password-input');
+      const firstNameInput = screen.getByTestId('first-name-input');
+      const lastNameInput = screen.getByTestId('last-name-input');
 
       await user.type(emailInput, 'newuser@example.com');
       await user.type(passwordInput, 'SecurePass123!');
@@ -93,7 +80,7 @@ describe('End-to-End User Workflows', () => {
       await user.type(lastNameInput, 'User');
 
       // Submit registration
-      const submitButton = screen.getByRole('button', { name: /register/i });
+      const submitButton = screen.getByTestId('register-submit-btn');
       await user.click(submitButton);
 
       // Verify registration success
@@ -141,18 +128,18 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Navigate to login
-      const loginLink = screen.getByText(/login/i);
+      const loginLink = screen.getByTestId('login-link');
       await user.click(loginLink);
 
       // Fill out login form
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
+      const emailInput = screen.getByTestId('email-input');
+      const passwordInput = screen.getByTestId('password-input');
 
       await user.type(emailInput, 'user@example.com');
       await user.type(passwordInput, 'password123');
 
       // Submit login
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const submitButton = screen.getByTestId('login-submit-btn');
       await user.click(submitButton);
 
       // Verify login success
@@ -181,18 +168,18 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Navigate to login
-      const loginLink = screen.getByText(/login/i);
+      const loginLink = screen.getByTestId('login-link');
       await user.click(loginLink);
 
       // Fill out login form with invalid credentials
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/password/i);
+      const emailInput = screen.getByTestId('email-input');
+      const passwordInput = screen.getByTestId('password-input');
 
       await user.type(emailInput, 'user@example.com');
       await user.type(passwordInput, 'wrongpassword');
 
       // Submit login
-      const submitButton = screen.getByRole('button', { name: /login/i });
+      const submitButton = screen.getByTestId('login-submit-btn');
       await user.click(submitButton);
 
       // Should show error message
@@ -201,7 +188,7 @@ describe('End-to-End User Workflows', () => {
       });
 
       // Should remain on login page
-      expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+      expect(screen.getByTestId('email-input')).toBeInTheDocument();
     });
   });
 
@@ -270,7 +257,7 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Navigate to bills page
-      const billsLink = screen.getByText(/bills/i);
+      const billsLink = screen.getByTestId('nav-bills');
       await user.click(billsLink);
 
       // Wait for bills to load
@@ -317,14 +304,14 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Navigate to bills page
-      const billsLink = screen.getByText(/bills/i);
+      const billsLink = screen.getByTestId('nav-bills');
       await user.click(billsLink);
 
       // Use search functionality
-      const searchInput = screen.getByPlaceholderText(/search bills/i);
+      const searchInput = screen.getByTestId('bills-search-input');
       await user.type(searchInput, 'privacy');
 
-      const searchButton = screen.getByRole('button', { name: /search/i });
+      const searchButton = screen.getByTestId('search-submit-btn');
       await user.click(searchButton);
 
       // Verify search results
@@ -334,7 +321,7 @@ describe('End-to-End User Workflows', () => {
       });
 
       // Apply status filter
-      const statusFilter = screen.getByLabelText(/status/i);
+      const statusFilter = screen.getByTestId('status-filter');
       await user.selectOptions(statusFilter, 'introduced');
 
       // Verify filtered results
@@ -363,14 +350,14 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Navigate to bills page
-      const billsLink = screen.getByText(/bills/i);
+      const billsLink = screen.getByTestId('nav-bills');
       await user.click(billsLink);
 
       // Search for non-existent term
-      const searchInput = screen.getByPlaceholderText(/search bills/i);
+      const searchInput = screen.getByTestId('bills-search-input');
       await user.type(searchInput, 'nonexistentterm');
 
-      const searchButton = screen.getByRole('button', { name: /search/i });
+      const searchButton = screen.getByTestId('search-submit-btn');
       await user.click(searchButton);
 
       // Should show no results message
@@ -440,7 +427,7 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Navigate to bill details
-      const billsLink = screen.getByText(/bills/i);
+      const billsLink = screen.getByTestId('nav-bills');
       await user.click(billsLink);
 
       // Assume we're on bill details page
@@ -453,10 +440,10 @@ describe('End-to-End User Workflows', () => {
       expect(screen.getByText('Jane Doe')).toBeInTheDocument();
 
       // Add new comment
-      const commentInput = screen.getByPlaceholderText(/add your comment/i);
+      const commentInput = screen.getByTestId('comment-input');
       await user.type(commentInput, 'I agree, this bill is very important.');
 
-      const submitButton = screen.getByRole('button', { name: /post comment/i });
+      const submitButton = screen.getByTestId('comment-submit-btn');
       await user.click(submitButton);
 
       // Verify comment creation
@@ -485,10 +472,10 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Assume we're on bill details page
-      const commentInput = screen.getByPlaceholderText(/add your comment/i);
+      const commentInput = screen.getByTestId('comment-input');
       await user.type(commentInput, 'Too short');
 
-      const submitButton = screen.getByRole('button', { name: /post comment/i });
+      const submitButton = screen.getByTestId('comment-submit-btn');
       await user.click(submitButton);
 
       // Should show error message
@@ -538,7 +525,7 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Navigate to profile
-      const profileLink = screen.getByText(/profile/i);
+      const profileLink = screen.getByTestId('nav-profile');
       await user.click(profileLink);
 
       // Should show current profile information
@@ -548,12 +535,12 @@ describe('End-to-End User Workflows', () => {
       });
 
       // Update name
-      const nameInput = screen.getByLabelText(/name/i);
+      const nameInput = screen.getByTestId('name-input');
       await user.clear(nameInput);
       await user.type(nameInput, 'Updated User');
 
       // Save changes
-      const saveButton = screen.getByRole('button', { name: /save/i });
+      const saveButton = screen.getByTestId('profile-save-btn');
       await user.click(saveButton);
 
       // Verify profile update
@@ -582,19 +569,19 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Navigate to settings
-      const settingsLink = screen.getByText(/settings/i);
+      const settingsLink = screen.getByTestId('nav-settings');
       await user.click(settingsLink);
 
       // Toggle email notifications
-      const emailToggle = screen.getByLabelText(/email notifications/i);
+      const emailToggle = screen.getByTestId('email-notifications-toggle');
       await user.click(emailToggle);
 
       // Update category preferences
-      const healthcareCheckbox = screen.getByLabelText(/healthcare/i);
+      const healthcareCheckbox = screen.getByTestId('healthcare-category-checkbox');
       await user.click(healthcareCheckbox);
 
       // Save preferences
-      const saveButton = screen.getByRole('button', { name: /save preferences/i });
+      const saveButton = screen.getByTestId('preferences-save-btn');
       await user.click(saveButton);
 
       // Verify preferences update
@@ -631,7 +618,7 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Mobile navigation should be present
-      const mobileMenuButton = screen.getByLabelText(/menu/i);
+      const mobileMenuButton = screen.getByTestId('mobile-menu-btn');
       expect(mobileMenuButton).toBeInTheDocument();
 
       // Click mobile menu
@@ -647,7 +634,7 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Simulate touch events on interactive elements
-      const billCard = screen.getByTestId('bill-card-1');
+      const billCard = screen.getByTestId('bill-item-1');
       
       // Touch start
       fireEvent.touchStart(billCard, {
@@ -672,17 +659,17 @@ describe('End-to-End User Workflows', () => {
 
       // Tab through navigation elements
       await user.tab();
-      expect(screen.getByText(/home/i)).toHaveFocus();
+      expect(screen.getByTestId('nav-home')).toHaveFocus();
 
       await user.tab();
-      expect(screen.getByText(/bills/i)).toHaveFocus();
+      expect(screen.getByTestId('nav-bills')).toHaveFocus();
 
       await user.tab();
-      expect(screen.getByText(/sponsors/i)).toHaveFocus();
+      expect(screen.getByTestId('nav-sponsors')).toHaveFocus();
 
       // Enter key should activate focused element
       await user.keyboard('{Enter}');
-      
+
       await waitFor(() => {
         expect(screen.getByText(/sponsors list/i)).toBeInTheDocument();
       });
@@ -692,13 +679,13 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Check for proper ARIA attributes
-      const navigation = screen.getByRole('navigation');
+      const navigation = screen.getByTestId('navigation');
       expect(navigation).toHaveAttribute('aria-label', 'Main navigation');
 
-      const searchInput = screen.getByRole('searchbox');
+      const searchInput = screen.getByTestId('bills-search-input');
       expect(searchInput).toHaveAttribute('aria-label', 'Search bills');
 
-      const billsList = screen.getByRole('list', { name: /bills/i });
+      const billsList = screen.getByTestId('bills-list');
       expect(billsList).toBeInTheDocument();
     });
 
@@ -706,11 +693,11 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Check for screen reader announcements
-      const liveRegion = screen.getByRole('status');
+      const liveRegion = screen.getByTestId('live-region');
       expect(liveRegion).toHaveAttribute('aria-live', 'polite');
 
       // Check for descriptive text
-      const billCard = screen.getByTestId('bill-card-1');
+      const billCard = screen.getByTestId('bill-item-1');
       expect(billCard).toHaveAttribute('aria-describedby');
     });
 
@@ -718,11 +705,11 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Open modal dialog
-      const detailsButton = screen.getByRole('button', { name: /view details/i });
+      const detailsButton = screen.getByTestId('view-bill-1');
       await user.click(detailsButton);
 
       // Focus should move to modal
-      const modal = screen.getByRole('dialog');
+      const modal = screen.getByTestId('bill-details-modal');
       expect(modal).toHaveFocus();
 
       // Close modal with Escape key
@@ -761,7 +748,7 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Navigate to bills page
-      const billsLink = screen.getByText(/bills/i);
+      const billsLink = screen.getByTestId('nav-bills');
       await user.click(billsLink);
 
       // Wait for bills to load
@@ -780,7 +767,7 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Rapid clicking should not cause issues
-      const searchButton = screen.getByRole('button', { name: /search/i });
+      const searchButton = screen.getByTestId('search-submit-btn');
       
       for (let i = 0; i < 10; i++) {
         await user.click(searchButton);
@@ -800,10 +787,10 @@ describe('End-to-End User Workflows', () => {
       const pages = ['/bills', '/sponsors', '/profile', '/settings'];
       
       for (const page of pages) {
-        window.history.pushState({}, '', page);
+        navigationService.navigate(page);
         fireEvent(window, new Event('popstate'));
         await waitFor(() => {
-          expect(window.location.pathname).toBe(page);
+          expect(navigationService.getLocation().pathname).toBe(page);
         });
       }
 
@@ -825,7 +812,7 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Navigate to bills page
-      const billsLink = screen.getByText(/bills/i);
+      const billsLink = screen.getByTestId('nav-bills');
       await user.click(billsLink);
 
       // Should show error message
@@ -834,7 +821,7 @@ describe('End-to-End User Workflows', () => {
       });
 
       // Should provide retry option
-      const retryButton = screen.getByRole('button', { name: /retry/i });
+      const retryButton = screen.getByTestId('retry-btn');
       expect(retryButton).toBeInTheDocument();
 
       // Mock successful retry
@@ -875,15 +862,9 @@ describe('End-to-End User Workflows', () => {
         throw new Error('Component error');
       };
 
-      const AppWithError = () => (
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <ThrowError />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+      const AppWithError = () => <ThrowError />;
 
-      render(<AppWithError />);
+      renderWithProviders(<AppWithError />);
 
       // Should show error boundary
       expect(screen.getByText(/something went wrong/i)).toBeInTheDocument();

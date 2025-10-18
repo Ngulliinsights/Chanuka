@@ -7,7 +7,7 @@
  */
 
 import { jest } from '@jest/globals';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 // Global test setup
 export const setupHealthTests = () => {

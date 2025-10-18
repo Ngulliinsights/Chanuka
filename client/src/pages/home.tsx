@@ -1,19 +1,20 @@
 import { Link } from 'react-router-dom';
 import { memo, useMemo, useCallback } from 'react';
 import FavoritePageButton from '@/components/navigation/favorite-page-button';
-import { 
+import {
   ResponsiveLayoutProvider,
   ResponsiveContainer,
   ResponsiveGrid,
   TouchButton
 } from '@/components/mobile/responsive-layout-manager';
-import { 
+import {
   ResponsiveCardGrid,
   ResponsiveSection,
   ResponsiveStatsGrid
 } from '@/components/mobile/responsive-page-wrapper';
 import { LazyLoadWrapper } from '@/components/mobile/mobile-performance-optimizations';
 import { logger } from '../utils/logger.js';
+import { navigationService } from '../services/navigation';
 
 // Define the shape of a feature object for type safety
 // This ensures we maintain consistency across the application
@@ -107,23 +108,23 @@ function HomePage() {
   // Memoized navigation handlers with explicit return type (void)
   // These ensure stable function references across renders
   const handleStartTracking = useCallback((): void => {
-    window.location.href = '/bills';
+    navigationService.navigate('/bills');
   }, []);
 
   const handleJoinMovement = useCallback((): void => {
-    window.location.href = '/community';
+    navigationService.navigate('/community');
   }, []);
 
   const handleSeeImpact = useCallback((): void => {
-    window.location.href = '/dashboard';
+    navigationService.navigate('/dashboard');
   }, []);
 
   const handleAccessDashboard = useCallback((): void => {
-    window.location.href = '/dashboard';
+    navigationService.navigate('/dashboard');
   }, []);
 
   const handleExploreAnalysis = useCallback((): void => {
-    window.location.href = '/bill-sponsorship-analysis';
+    navigationService.navigate('/bill-sponsorship-analysis');
   }, []);
 
   return (

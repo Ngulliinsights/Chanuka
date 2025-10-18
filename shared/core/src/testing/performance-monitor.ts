@@ -2,7 +2,7 @@ import { performance } from 'perf_hooks';
 import { EventEmitter } from 'events';
 import { writeFileSync, existsSync, readFileSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 /**
  * Performance monitoring and reporting utility

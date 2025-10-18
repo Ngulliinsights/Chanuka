@@ -1,7 +1,7 @@
 import { advancedCachingService } from './advanced-caching.js';
 import { database as db, bills, sponsors, users, billComments } from '../../../shared/database/connection.js';
 import { desc, eq, sql, and } from 'drizzle-orm';
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 
 export interface WarmingRule {
   id: string;

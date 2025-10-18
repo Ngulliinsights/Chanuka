@@ -11,7 +11,7 @@ import {
   createRequestLoggingPipeline,
 } from '../middleware.js';
 import { Logger } from '../logger';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 // Mock Express types
 interface MockRequest extends Partial<Request> {

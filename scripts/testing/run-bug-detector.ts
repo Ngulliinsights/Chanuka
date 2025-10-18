@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
 import { BugDetector } from './scripts/testing/bug-detector.ts';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 async function main() {
   const detector = new BugDetector();

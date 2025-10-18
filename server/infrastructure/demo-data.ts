@@ -1,6 +1,6 @@
 import { Bill, BillComment, Sponsor, Analysis, BillEngagement } from '../../shared/schema.js';
 import { BillAnalysis, SponsorshipAnalysis } from '../../shared/types/bill.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 // Enhanced types for demo data that match API responses
 interface DemoBill extends Omit<Bill, 'id' | 'sponsorId' | 'commentCount' | 'engagementScore'> {

@@ -49,7 +49,7 @@ declare module '../utils/logger' {
   export default logger;
 }
 
-declare module '@shared/utils/logger' {
+declare module '@shared/core/src/logging' {
   export const logger: any;
   export default logger;
 }

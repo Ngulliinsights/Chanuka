@@ -18,7 +18,7 @@ export * from './base/BaseStorage';
 export * from './config';
 
 // Database Tables
-export * from '../../../shared/schema';
+export * from '../../../shared/schema/schema.ts';
 
 // Re-export stable DB accessors and legacy names for compatibility.
 export {

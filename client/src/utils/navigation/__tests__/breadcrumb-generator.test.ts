@@ -1,5 +1,5 @@
 import { generateBreadcrumbs, getPageTitle } from '../breadcrumb-generator';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 describe('breadcrumb-generator', () => {
   describe('generateBreadcrumbs', () => {

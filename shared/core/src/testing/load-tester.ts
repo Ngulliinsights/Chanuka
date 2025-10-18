@@ -1,5 +1,5 @@
 import { performance } from 'perf_hooks';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export class LoadTester {
   constructor(private readonly config: LoadTestConfig = {}) {}

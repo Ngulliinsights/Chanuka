@@ -1,5 +1,5 @@
 import { database as db } from '../../../../../shared/database/connection';
-import { citizenVerifications } from '../../../../../shared/schema';
+import { citizenVerifications } from '../../../../../shared/schema/schema';
 import { eq, and, sql } from 'drizzle-orm';
 import { VerificationRepository } from '../../domain/repositories/verification-repository';
 import { CitizenVerification, VerificationType } from '../../domain/entities/citizen-verification';

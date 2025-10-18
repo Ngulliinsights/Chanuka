@@ -6,7 +6,7 @@
  */
 
 import { simpleTransparencyDashboardService } from "./services/transparency-dashboard-simple.js";
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 async function verifyTransparencyTask() {
   logger.info('🔍 Verifying Task 8.3: Build Transparency Dashboard and Reporting\n', { component: 'Chanuka' });

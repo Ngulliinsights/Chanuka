@@ -9,7 +9,7 @@ import { Redis } from 'ioredis';
 import { RedisRateLimitStore } from '../redis-store';
 import { MemoryRateLimitStore } from '../memory-store';
 import { RateLimitConfig } from '../../types';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 // Mock Redis for testing
 const mockRedis = {

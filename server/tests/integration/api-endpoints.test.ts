@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from
 import request from 'supertest';
 import { app } from '../../index.js';
 import databaseService from '../../../infrastructure/database/database-service.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 describe('API Endpoints Integration Tests', () => {
   let server: any;

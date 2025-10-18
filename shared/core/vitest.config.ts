@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitest/config';
 import { resolve } from 'path';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export default defineConfig({
   test: {

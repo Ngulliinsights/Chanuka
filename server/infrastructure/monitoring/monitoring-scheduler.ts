@@ -2,7 +2,7 @@ import { createMonitoringService } from '../../features/analytics/financial-disc
 import { databaseService } from '../../infrastructure/database/database-service.js';
 import { readDatabase } from '../../db.js';
 import { cacheService } from '../../infrastructure/cache/cache-service.js';
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 
 /**
  * Monitoring scheduler service to manage automated background tasks

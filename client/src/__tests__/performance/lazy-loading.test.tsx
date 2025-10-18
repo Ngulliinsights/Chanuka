@@ -3,6 +3,14 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { BrowserRouter, MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { navigationService } from '../../services/navigation';
+
+// Minimal logger mock for tests (used in LazyLoadErrorBoundary)
+const logger = {
+  error: vi.fn(),
+  warn: vi.fn(),
+  info: vi.fn(),
+};
 
 // Mock dynamic imports
 const mockDynamicImport = (component: React.ComponentType, delay: number = 100) => {
@@ -382,7 +390,7 @@ describe('Lazy Loading and Code Splitting Tests', () => {
         <div data-testid="custom-error">
           <h2>Custom Error</h2>
           <p>{error.message}</p>
-          <button onClick={() => window.location.reload()}>Retry</button>
+          <button onClick={() => navigationService.reload()}>Retry</button>
         </div>
       );
 
@@ -446,9 +454,8 @@ describe('Lazy Loading and Code Splitting Tests', () => {
         const [showComponent, setShowComponent] = React.useState(false);
 
         const handleMouseEnter = () => {
-          // Trigger preload
-          import('./PreloadableComponent').catch(() => {});
-import { logger } from '../utils/logger.js';
+          // Trigger preload (simulated in tests)
+          preloadSpy();
         };
 
         return (
@@ -491,14 +498,14 @@ import { logger } from '../utils/logger.js';
     it('should handle bundle splitting effectively', async () => {
       const loadTimes: number[] = [];
       
-      const createTimedComponent = (name: string, delay: number) => 
-        React.lazy(() => {
+      const createTimedComponent = (name: string, delay: number) =>
+        React.lazy<React.FC>(() => {
           const startTime = Date.now();
-          return new Promise(resolve => {
+          return new Promise<{ default: React.FC }>((resolve) => {
             setTimeout(() => {
               loadTimes.push(Date.now() - startTime);
               resolve({
-                default: () => <div data-testid={`timed-${name}`}>Timed {name}</div>
+                default: () => <div data-testid={`timed-${name}`}>Timed {name}</div>,
               });
             }, delay);
           });

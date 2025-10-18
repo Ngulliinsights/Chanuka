@@ -2,7 +2,7 @@ import { userProfileService } from './services/user-profile.js';
 import { db } from './db.js';
 import { users } from '../shared/schema.js';
 import { eq } from 'drizzle-orm';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 async function verifyUserProfileService() {
   logger.info('🔍 Verifying User Profile Service implementation...', { component: 'Chanuka' });

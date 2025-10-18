@@ -4,7 +4,7 @@
 
 import DOMPurify from 'dompurify';
 import escape from 'sql-template-tag';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 /**
  * Sanitize HTML content to prevent XSS

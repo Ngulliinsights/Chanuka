@@ -51,7 +51,7 @@ declare module 'drizzle-orm' {
 }
 
 // Relax logger to a permissive any to avoid call-signature conflicts while migrating.
-declare module '@shared/utils/logger' {
+declare module '@shared/core/src/logging' {
   const logger: any;
   export { logger };
 }

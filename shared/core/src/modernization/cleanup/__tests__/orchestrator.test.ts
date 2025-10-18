@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import { join } from 'path';
 import { CleanupOrchestrator, FileCategory } from '../orchestrator';
 import { AnalysisType, FindingType } from '../../types';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 describe('CleanupOrchestrator', () => {
   let tempDir: string;

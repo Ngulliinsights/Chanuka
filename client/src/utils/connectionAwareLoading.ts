@@ -1,4 +1,4 @@
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 // Connection-aware loading strategies for optimal performance
 
 export interface ConnectionInfo {

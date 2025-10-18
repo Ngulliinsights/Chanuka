@@ -1,7 +1,7 @@
 import RedisStore from 'connect-redis';
 import { Redis } from 'ioredis';
 import { pool } from '../../shared/database/pool.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 interface StorageConnections {
     redis: Redis;
     pool: typeof pool;

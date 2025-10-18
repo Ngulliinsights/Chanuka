@@ -17,7 +17,7 @@ const generateUUID = (): string => {
 };
 import { Logger } from './logger';
 import { LogContext, RequestLogData } from './types.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export interface RequestLoggingOptions {
   logger?: Logger;

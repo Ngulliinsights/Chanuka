@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 describe('Memory Usage Profiling for Caching Layer', () => {
   const MEMORY_THRESHOLDS = {

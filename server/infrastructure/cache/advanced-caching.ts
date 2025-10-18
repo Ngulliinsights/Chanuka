@@ -1,5 +1,5 @@
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 
 export interface CacheConfig {
   redis?: {

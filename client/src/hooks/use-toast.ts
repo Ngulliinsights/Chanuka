@@ -1,5 +1,5 @@
 import { useState, useEffect, ReactNode } from "react"
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 import type {
   ToastActionElement,

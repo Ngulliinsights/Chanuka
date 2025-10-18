@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 /**
  * Core event schemas for structured logging

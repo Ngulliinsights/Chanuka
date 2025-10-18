@@ -6,7 +6,7 @@ import { CommentStorage } from './comment-storage.js';
 import { ProgressStorage } from '../../features/analytics/storage/progress.storage.js';
 import { SocialShareStorage } from './social-share-storage.js';
 import { UserStorage } from './user-storage.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 export interface CacheProvider {
     get<T>(key: string): Promise<T | null>;
     set<T>(key: string, value: T, ttl: number): Promise<void>;

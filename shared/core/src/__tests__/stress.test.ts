@@ -4,7 +4,7 @@ import { createCacheService } from '../cache';
 import { createRateLimitFactory } from '../rate-limiting';
 import { Logger } from '../logging/logger';
 import type { StressTestComponents, StressTestConfig } from '../testing/stress-tests';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 describe('Core Utilities Stress Tests', () => {
   let stressTests: StressTests;

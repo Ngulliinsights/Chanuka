@@ -1,4 +1,6 @@
 // Service Worker registration and management utilities
+import { navigationService } from '../services/navigation';
+import { logger } from '@shared/core/src/logging';
 
 export interface ServiceWorkerConfig {
   onUpdate?: (registration: ServiceWorkerRegistration) => void;
@@ -12,9 +14,13 @@ export function isServiceWorkerSupported(): boolean {
 }
 
 // Register service worker
-export async function registerServiceWorker(config: ServiceWorkerConfig = {}): Promise<ServiceWorkerRegistration | null> {
+export async function registerServiceWorker(
+  config: ServiceWorkerConfig = {},
+): Promise<ServiceWorkerRegistration | null> {
   if (!isServiceWorkerSupported()) {
-    logger.info('Service workers are not supported in this browser', { component: 'Chanuka' });
+    logger.info('Service workers are not supported in this browser', {
+      component: 'Chanuka',
+    });
     return null;
   }
 
@@ -23,7 +29,10 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
       scope: '/',
     });
 
-    logger.info('Service Worker registered successfully:', { component: 'Chanuka' }, registration);
+    logger.info('Service Worker registered successfully:', {
+      component: 'Chanuka',
+      registration, // FIX: Pass registration as part of the context object
+    });
 
     // Handle updates
     registration.addEventListener('updatefound', () => {
@@ -34,11 +43,15 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
         if (newWorker.state === 'installed') {
           if (navigator.serviceWorker.controller) {
             // New content is available
-            logger.info('New content is available; please refresh.', { component: 'Chanuka' });
+            logger.info('New content is available; please refresh.', {
+              component: 'Chanuka',
+            });
             config.onUpdate?.(registration);
           } else {
             // Content is cached for offline use
-            logger.info('Content is cached for offline use.', { component: 'Chanuka' });
+            logger.info('Content is cached for offline use.', {
+              component: 'Chanuka',
+            });
             config.onSuccess?.(registration);
           }
         }
@@ -47,7 +60,7 @@ export async function registerServiceWorker(config: ServiceWorkerConfig = {}): P
 
     return registration;
   } catch (error) {
-    logger.error('Service Worker registration failed:', { component: 'Chanuka' }, error);
+    logger.error('Service Worker registration failed:', { component: 'Chanuka', error });
     config.onError?.(error as Error);
     return null;
   }
@@ -63,20 +76,29 @@ export async function unregisterServiceWorker(): Promise<boolean> {
     const registration = await navigator.serviceWorker.getRegistration();
     if (registration) {
       const result = await registration.unregister();
-      logger.info('Service Worker unregistered:', { component: 'Chanuka' }, result);
+      logger.info('Service Worker unregistered:', {
+        component: 'Chanuka',
+        result, // FIX: Pass result as part of the context object
+      });
       return result;
     }
     return false;
   } catch (error) {
-    logger.error('Service Worker unregistration failed:', { component: 'Chanuka' }, error);
+    logger.error(
+      'Service Worker unregistration failed:',
+      { component: 'Chanuka' },
+      error,
+    );
     return false;
   }
 }
 
 // Check if app is running in standalone mode (PWA)
 export function isStandalone(): boolean {
-  return window.matchMedia('(display-mode: standalone)').matches ||
-         (window.navigator as any).standalone === true;
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    (window.navigator as any).standalone === true
+  );
 }
 
 // Get service worker registration
@@ -86,9 +108,14 @@ export async function getServiceWorkerRegistration(): Promise<ServiceWorkerRegis
   }
 
   try {
-    return await navigator.serviceWorker.getRegistration();
+    // FIX: Coalesce undefined to null to match return type
+    return (await navigator.serviceWorker.getRegistration()) || null;
   } catch (error) {
-    logger.error('Failed to get service worker registration:', { component: 'Chanuka' }, error);
+    logger.error(
+      'Failed to get service worker registration:',
+      { component: 'Chanuka' },
+      error,
+    );
     return null;
   }
 }
@@ -99,9 +126,13 @@ export async function sendMessageToServiceWorker(message: any): Promise<any> {
     throw new Error('Service worker not available');
   }
 
+  // FIX: Assign controller to a const after the check to ensure type-safety
+  // within the Promise executor's scope.
+  const { controller } = navigator.serviceWorker;
+
   return new Promise((resolve, reject) => {
     const messageChannel = new MessageChannel();
-    
+
     messageChannel.port1.onmessage = (event) => {
       if (event.data.error) {
         reject(new Error(event.data.error));
@@ -110,7 +141,7 @@ export async function sendMessageToServiceWorker(message: any): Promise<any> {
       }
     };
 
-    navigator.serviceWorker.controller.postMessage(message, [messageChannel.port2]);
+    controller.postMessage(message, [messageChannel.port2]);
   });
 }
 
@@ -119,8 +150,9 @@ export async function clearAllCaches(): Promise<void> {
   try {
     await sendMessageToServiceWorker({ type: 'CLEAR_CACHE' });
     logger.info('All caches cleared', { component: 'Chanuka' });
-  } catch (error) {
-    logger.error('Failed to clear caches:', { component: 'Chanuka' }, error);
+  } catch (err) {
+    const error = err as Error;
+    logger.error('Failed to clear caches', { component: 'Chanuka', error });
     throw error;
   }
 }
@@ -133,9 +165,11 @@ export async function skipWaiting(): Promise<void> {
 
   try {
     await sendMessageToServiceWorker({ type: 'SKIP_WAITING' });
-    logger.info('Service worker skip waiting triggered', { component: 'Chanuka' });
+    logger.info('Service worker skip waiting triggered', {
+      component: 'Chanuka',
+    });
   } catch (error) {
-    logger.error('Failed to skip waiting:', { component: 'Chanuka' }, error);
+    logger.error('Failed to skip waiting:', { component: 'Chanuka', error });
   }
 }
 
@@ -145,7 +179,7 @@ export async function getServiceWorkerVersion(): Promise<string | null> {
     const response = await sendMessageToServiceWorker({ type: 'GET_VERSION' });
     return response.version || null;
   } catch (error) {
-    logger.error('Failed to get service worker version:', { component: 'Chanuka' }, error);
+    logger.error('Failed to get service worker version:', { component: 'Chanuka', error });
     return null;
   }
 }
@@ -167,7 +201,7 @@ export async function isContentCached(url: string): Promise<boolean> {
     }
     return false;
   } catch (error) {
-    logger.error('Failed to check cache:', { component: 'Chanuka' }, error);
+    logger.error('Failed to check cache:', { component: 'Chanuka', error });
     return false;
   }
 }
@@ -182,28 +216,31 @@ export async function preloadCriticalResources(urls: string[]): Promise<void> {
 
   try {
     const cache = await caches.open('chanuka-preload-v1');
-    
+
     // Preload with retry logic
-    const preloadWithRetry = async (url: string, maxRetries = 2): Promise<void> => {
+    const preloadWithRetry = async (
+      url: string,
+      maxRetries = 2,
+    ): Promise<void> => {
       // Prevent duplicate requests for the same URL
       if (activeRequests.has(url)) {
         return;
       }
-      
+
       activeRequests.add(url);
-      
+
       try {
         let retries = 0;
-        
+
         while (retries <= maxRetries) {
           try {
             const request = new Request(url);
-            
+
             // Check if already cached
             if (await cache.match(request)) {
               return;
             }
-            
+
             // Try to fetch and cache
             const response = await fetch(request);
             if (response.ok) {
@@ -214,14 +251,23 @@ export async function preloadCriticalResources(urls: string[]): Promise<void> {
             }
           } catch (error) {
             retries++;
-            
+
             if (retries <= maxRetries) {
               // Exponential backoff
               const delay = Math.pow(2, retries) * 1000;
-              await new Promise(resolve => setTimeout(resolve, delay));
-              console.warn(`Retrying preload (${retries}/${maxRetries}): ${url}`, error);
+              await new Promise((resolve) => setTimeout(resolve, delay));
+              // REFINEMENT: Use logger instead of console
+              logger.warn(`Retrying preload (${retries}/${maxRetries}): ${url}`, {
+                component: 'Chanuka',
+                error,
+              });
             } else {
-              console.warn('Failed to preload resource after retries:', url, error);
+              // REFINEMENT: Use logger instead of console
+              logger.warn('Failed to preload resource after retries:', {
+                component: 'Chanuka',
+                url,
+                error,
+              });
             }
           }
         }
@@ -229,21 +275,28 @@ export async function preloadCriticalResources(urls: string[]): Promise<void> {
         activeRequests.delete(url);
       }
     };
-    
+
     // Process URLs with concurrency control
     const concurrency = 3;
-    const chunks = [];
+    // FIX: Explicitly type `chunks` as string[][] to avoid `never[]` type inference
+    const chunks: string[][] = [];
     for (let i = 0; i < urls.length; i += concurrency) {
       chunks.push(urls.slice(i, i + concurrency));
     }
-    
+
     for (const chunk of chunks) {
-      await Promise.allSettled(chunk.map(url => preloadWithRetry(url)));
+      await Promise.allSettled(chunk.map((url) => preloadWithRetry(url)));
     }
-    
-    logger.info('Critical resources preloaded with retry logic', { component: 'Chanuka' });
+
+    logger.info('Critical resources preloaded with retry logic', {
+      component: 'Chanuka',
+    });
   } catch (error) {
-    logger.error('Failed to preload critical resources:', { component: 'Chanuka' }, error);
+    logger.error(
+      'Failed to preload critical resources:',
+      { component: 'Chanuka' },
+      error,
+    );
   }
 }
 
@@ -256,10 +309,12 @@ export class ServiceWorkerUpdateNotifier {
     onUpdateInstalled?: () => void;
   } = {};
 
-  constructor(callbacks: {
-    onUpdateAvailable?: () => void;
-    onUpdateInstalled?: () => void;
-  } = {}) {
+  constructor(
+    callbacks: {
+      onUpdateAvailable?: () => void;
+      onUpdateInstalled?: () => void;
+    } = {},
+  ) {
     this.callbacks = callbacks;
   }
 
@@ -283,16 +338,20 @@ export class ServiceWorkerUpdateNotifier {
     const newWorker = this.registration.waiting;
     if (newWorker) {
       newWorker.postMessage({ type: 'SKIP_WAITING' });
-      
+
       // Wait for the new service worker to take control
       await new Promise<void>((resolve) => {
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-          resolve();
-        }, { once: true });
+        navigator.serviceWorker.addEventListener(
+          'controllerchange',
+          () => {
+            resolve();
+          },
+          { once: true },
+        );
       });
 
       // Reload the page to get the new content
-      window.location.reload();
+      navigationService.reload();
     }
   }
 
@@ -306,7 +365,9 @@ export function isOnline(): boolean {
   return navigator.onLine;
 }
 
-export function addNetworkStatusListener(callback: (isOnline: boolean) => void): () => void {
+export function addNetworkStatusListener(
+  callback: (isOnline: boolean) => void,
+): () => void {
   const handleOnline = () => callback(true);
   const handleOffline = () => callback(false);
 
@@ -325,15 +386,16 @@ export async function registerBackgroundSync(tag: string): Promise<void> {
   if (registration && 'sync' in registration) {
     try {
       await (registration as any).sync.register(tag);
-      logger.info('Background sync registered:', { component: 'Chanuka' }, tag);
+      logger.info('Background sync registered:', {
+        component: 'Chanuka',
+        tag, // FIX: Pass tag as part of the context object
+      });
     } catch (error) {
-      logger.error('Background sync registration failed:', { component: 'Chanuka' }, error);
+      logger.error(
+        'Background sync registration failed:',
+        { component: 'Chanuka' },
+        error,
+      );
     }
   }
 }
-
-
-
-
-
-

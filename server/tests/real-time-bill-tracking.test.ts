@@ -6,7 +6,7 @@ import { billStatusMonitorService } from '../features/bills/bill-status-monitor.
 import { userPreferencesService } from '../features/users/domain/user-preferences.js';
 import { database as db, users, bills, billEngagement } from '../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 describe('Real-Time Bill Tracking System', () => {
   let testUserId: string;

@@ -1,4 +1,4 @@
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 import { monitorPoolHealth, checkPoolHealth } from './pool.js';
 
 // Dynamic import to avoid circular dependencies

@@ -6,7 +6,7 @@
  */
 
 import { FinancialDisclosureIntegrationService } from './services/financial-disclosure-integration.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 // Mock data for testing
 const mockDisclosure = {

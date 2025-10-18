@@ -1,9 +1,10 @@
 import { describe, test, expect, beforeEach, afterEach, vi, beforeAll, afterAll } from 'vitest';
-import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
+import { screen, waitFor, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
+import { navigationService } from '../../services/navigation';
+import { renderWithProviders, createMockUser, createMockAuthState } from '../../test-utils';
+import React from 'react'; // Import React at the top
 
 // Mock the entire App component and its dependencies
 vi.mock('../../App', () => ({
@@ -12,7 +13,7 @@ vi.mock('../../App', () => ({
     
     React.useEffect(() => {
       const handleRouteChange = () => {
-        setCurrentRoute(window.location.pathname);
+        setCurrentRoute(navigationService.getLocation().pathname);
       };
       
       window.addEventListener('popstate', handleRouteChange);
@@ -20,7 +21,7 @@ vi.mock('../../App', () => ({
     }, []);
 
     const navigate = (path: string) => {
-      window.history.pushState({}, '', path);
+      navigationService.navigate(path);
       setCurrentRoute(path);
     };
 
@@ -55,13 +56,21 @@ const HomePage = () => (
 );
 
 const DashboardPage = () => {
+  // Define an interface for the bill structure
+  interface DashboardBill {
+    id: number;
+    title: string;
+    status: string;
+  }
+
   const [isLoading, setIsLoading] = React.useState(true);
-  const [bills, setBills] = React.useState([]);
+  // Explicitly type the bills state as an array of DashboardBill
+  const [bills, setBills] = React.useState<DashboardBill[]>([]);
   
   React.useEffect(() => {
     // Simulate API call
     setTimeout(() => {
-      setBills([
+      setBills([ // This now matches the <DashboardBill[]> type
         { id: 1, title: 'Healthcare Reform Bill', status: 'active' },
         { id: 2, title: 'Education Funding Bill', status: 'pending' }
       ]);
@@ -78,7 +87,7 @@ const DashboardPage = () => {
       <h1>Legislative Dashboard</h1>
       <div data-testid="bills-summary">
         <h2>Recent Bills</h2>
-        {bills.map(bill => (
+        {bills.map(bill => ( // 'bill' is now correctly typed as DashboardBill
           <div key={bill.id} data-testid={`bill-${bill.id}`}>
             <h3>{bill.title}</h3>
             <span data-testid={`bill-status-${bill.id}`}>{bill.status}</span>
@@ -131,23 +140,33 @@ const BillsPage = () => {
 };
 
 const ProfilePage = () => {
-  const [user, setUser] = React.useState(null);
+  // Define an interface for the user profile
+  interface UserProfile {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+  }
+
+  // Type the state to allow UserProfile OR null
+  const [user, setUser] = React.useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState(null);
+  // Type the state to allow string OR null
+  const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     // Simulate authentication check
     setTimeout(() => {
       const isAuthenticated = localStorage.getItem('auth_token');
       if (isAuthenticated) {
-        setUser({
+        setUser({ // This now matches the UserProfile type
           id: 1,
           name: 'Test User',
           email: 'test@example.com',
           role: 'citizen'
         });
       } else {
-        setError('Authentication required');
+        setError('Authentication required'); // This now matches the string type
       }
       setIsLoading(false);
     }, 100);
@@ -161,11 +180,11 @@ const ProfilePage = () => {
     return (
       <div data-testid="profile-error">
         <p>Error: {error}</p>
-        <button 
+        <button
           data-testid="login-btn"
           onClick={() => {
             localStorage.setItem('auth_token', 'mock-token');
-            window.location.reload();
+            navigationService.reload();
           }}
         >
           Login
@@ -174,19 +193,27 @@ const ProfilePage = () => {
     );
   }
 
+  // Add this check to handle the 'user is possibly null' error
+  if (!user) {
+    // This case shouldn't be reached if the logic is correct,
+    // but it satisfies TypeScript.
+    return <div data-testid="profile-error">Error: User data not found.</div>;
+  }
+
   return (
     <div data-testid="profile-page">
       <h1>User Profile</h1>
       <div data-testid="user-info">
+        {/* 'user' is now guaranteed to be non-null here */}
         <p data-testid="user-name">Name: {user.name}</p>
         <p data-testid="user-email">Email: {user.email}</p>
         <p data-testid="user-role">Role: {user.role}</p>
       </div>
-      <button 
+      <button
         data-testid="logout-btn"
         onClick={() => {
           localStorage.removeItem('auth_token');
-          window.location.reload();
+          navigationService.reload();
         }}
       >
         Logout
@@ -199,18 +226,16 @@ const NotFoundPage = () => (
   <div data-testid="not-found-page">
     <h1>Page Not Found</h1>
     <p>The requested page could not be found.</p>
-    <button data-testid="back-home-btn" onClick={() => window.history.pushState({}, '', '/')}>
+    <button data-testid="back-home-btn" onClick={() => navigationService.replace('/')}>
       Back to Home
     </button>
   </div>
 );
 
-// Import React properly
-import React from 'react';
-import { logger } from '../utils/logger.js';
+// Change to default import
+import logger from '../utils/logger.js';
 
 describe('End-to-End User Flow Integration Tests', () => {
-  let queryClient: QueryClient;
   let user: ReturnType<typeof userEvent.setup>;
 
   beforeAll(() => {
@@ -218,19 +243,6 @@ describe('End-to-End User Flow Integration Tests', () => {
   });
 
   beforeEach(() => {
-    // Create fresh QueryClient for each test
-    queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-          gcTime: 0,
-        },
-        mutations: {
-          retry: false,
-        },
-      },
-    });
-
     // Setup user event
     user = userEvent.setup();
 
@@ -238,32 +250,25 @@ describe('End-to-End User Flow Integration Tests', () => {
     localStorage.clear();
 
     // Reset URL
-    window.history.replaceState({}, '', '/');
+    navigationService.replace('/');
 
     // Clear all mocks
     vi.clearAllMocks();
   });
 
   afterEach(() => {
-    queryClient.clear();
     localStorage.clear();
   });
 
   describe('Application Loading and Navigation Flow', () => {
     test('should load application and display home page', async () => {
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />);
 
       // Check that app container is rendered
       expect(screen.getByTestId('app-container')).toBeInTheDocument();
-      
+
       // Check that navigation is present
       expect(screen.getByTestId('navigation')).toBeInTheDocument();
       expect(screen.getByTestId('nav-home')).toBeInTheDocument();
@@ -278,35 +283,29 @@ describe('End-to-End User Flow Integration Tests', () => {
 
     test('should navigate between pages successfully', async () => {
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />);
 
       // Start on home page
       expect(screen.getByTestId('home-page')).toBeInTheDocument();
 
       // Navigate to dashboard
       await user.click(screen.getByTestId('nav-dashboard'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('dashboard-page')).toBeInTheDocument();
       });
 
       // Navigate to bills page
       await user.click(screen.getByTestId('nav-bills'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('bills-page')).toBeInTheDocument();
       });
 
       // Navigate back to home
       await user.click(screen.getByTestId('nav-home'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('home-page')).toBeInTheDocument();
       });
@@ -314,24 +313,18 @@ describe('End-to-End User Flow Integration Tests', () => {
 
     test('should handle 404 pages correctly', async () => {
       const App = (await import('../../App')).default;
-      
+
       // Set initial URL to non-existent page
-      window.history.replaceState({}, '', '/non-existent-page');
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+      navigationService.replace('/non-existent-page');
+
+      renderWithProviders(<App />);
 
       expect(screen.getByTestId('not-found-page')).toBeInTheDocument();
       expect(screen.getByText('Page Not Found')).toBeInTheDocument();
 
       // Test back to home functionality
       await user.click(screen.getByTestId('back-home-btn'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('home-page')).toBeInTheDocument();
       });
@@ -341,14 +334,8 @@ describe('End-to-End User Flow Integration Tests', () => {
   describe('Dashboard Data Loading Flow', () => {
     test('should display loading state then load dashboard data', async () => {
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />);
 
       // Navigate to dashboard
       await user.click(screen.getByTestId('nav-dashboard'));
@@ -365,7 +352,7 @@ describe('End-to-End User Flow Integration Tests', () => {
       expect(screen.getByTestId('bills-summary')).toBeInTheDocument();
       expect(screen.getByTestId('bill-1')).toBeInTheDocument();
       expect(screen.getByTestId('bill-2')).toBeInTheDocument();
-      
+
       // Check bill details
       expect(screen.getByText('Healthcare Reform Bill')).toBeInTheDocument();
       expect(screen.getByText('Education Funding Bill')).toBeInTheDocument();
@@ -377,18 +364,12 @@ describe('End-to-End User Flow Integration Tests', () => {
   describe('Bills Search and Filter Flow', () => {
     test('should search and filter bills successfully', async () => {
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />);
 
       // Navigate to bills page
       await user.click(screen.getByTestId('nav-bills'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('bills-page')).toBeInTheDocument();
       });
@@ -433,18 +414,12 @@ describe('End-to-End User Flow Integration Tests', () => {
 
     test('should handle bill detail viewing', async () => {
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />);
 
       // Navigate to bills page
       await user.click(screen.getByTestId('nav-bills'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('bills-page')).toBeInTheDocument();
       });
@@ -457,7 +432,7 @@ describe('End-to-End User Flow Integration Tests', () => {
       // Click view details button (in a real app, this would navigate to detail page)
       const viewButton = screen.getByTestId('view-bill-1');
       expect(viewButton).toBeInTheDocument();
-      
+
       await user.click(viewButton);
       // In a real implementation, this would navigate to a detail page
     });
@@ -466,14 +441,8 @@ describe('End-to-End User Flow Integration Tests', () => {
   describe('Authentication Flow', () => {
     test('should handle unauthenticated user profile access', async () => {
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />, { providers: { authState: { user: null, isAuthenticated: false } } });
 
       // Navigate to profile page
       await user.click(screen.getByTestId('nav-profile'));
@@ -493,14 +462,8 @@ describe('End-to-End User Flow Integration Tests', () => {
 
     test('should handle login and profile display flow', async () => {
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />, { providers: { authState: { user: null, isAuthenticated: false } } });
 
       // Navigate to profile page
       await user.click(screen.getByTestId('nav-profile'));
@@ -525,18 +488,13 @@ describe('End-to-End User Flow Integration Tests', () => {
     });
 
     test('should handle logout flow', async () => {
+      // *** THIS IS THE CORRECTED LINE ***
       const App = (await import('../../App')).default;
-      
+
       // Set up authenticated state
       localStorage.setItem('auth_token', 'mock-token');
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />, { providers: { authState: { user: createMockUser(), isAuthenticated: true } } });
 
       // Navigate to profile page
       await user.click(screen.getByTestId('nav-profile'));
@@ -566,14 +524,8 @@ describe('End-to-End User Flow Integration Tests', () => {
       global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
 
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />);
 
       // App should still render despite network errors
       expect(screen.getByTestId('app-container')).toBeInTheDocument();
@@ -586,23 +538,17 @@ describe('End-to-End User Flow Integration Tests', () => {
     test('should handle component errors with error boundaries', async () => {
       // This test would require implementing actual error boundaries
       // For now, we'll test that the app structure supports error handling
-      
+
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />);
 
       // App should render successfully
       expect(screen.getByTestId('app-container')).toBeInTheDocument();
-      
+
       // Navigation should work
       await user.click(screen.getByTestId('nav-dashboard'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('dashboard-page')).toBeInTheDocument();
       });
@@ -610,32 +556,26 @@ describe('End-to-End User Flow Integration Tests', () => {
 
     test('should handle browser back/forward navigation', async () => {
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />);
 
       // Navigate to dashboard
       await user.click(screen.getByTestId('nav-dashboard'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('dashboard-page')).toBeInTheDocument();
       });
 
       // Navigate to bills
       await user.click(screen.getByTestId('nav-bills'));
-      
+
       await waitFor(() => {
         expect(screen.getByTestId('bills-page')).toBeInTheDocument();
       });
 
       // Simulate browser back button
       act(() => {
-        window.history.back();
+        navigationService.goBack();
       });
 
       // Should go back to dashboard
@@ -645,6 +585,7 @@ describe('End-to-End User Flow Integration Tests', () => {
 
       // Simulate browser forward button
       act(() => {
+        // Note: navigationService doesn't have forward() method, using history directly for test
         window.history.forward();
       });
 
@@ -658,14 +599,8 @@ describe('End-to-End User Flow Integration Tests', () => {
   describe('Performance and Loading States', () => {
     test('should show appropriate loading states during navigation', async () => {
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />);
 
       // Navigate to dashboard
       await user.click(screen.getByTestId('nav-dashboard'));
@@ -682,14 +617,8 @@ describe('End-to-End User Flow Integration Tests', () => {
 
     test('should handle concurrent navigation requests', async () => {
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />);
 
       // Rapidly click different navigation items
       await user.click(screen.getByTestId('nav-dashboard'));
@@ -710,14 +639,8 @@ describe('End-to-End User Flow Integration Tests', () => {
   describe('Accessibility and User Experience', () => {
     test('should maintain focus management during navigation', async () => {
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />);
 
       // Focus on navigation item
       const dashboardNav = screen.getByTestId('nav-dashboard');
@@ -734,14 +657,8 @@ describe('End-to-End User Flow Integration Tests', () => {
 
     test('should provide appropriate ARIA labels and roles', async () => {
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />);
 
       // Check that navigation has appropriate structure
       const navigation = screen.getByTestId('navigation');
@@ -754,14 +671,8 @@ describe('End-to-End User Flow Integration Tests', () => {
 
     test('should handle keyboard navigation properly', async () => {
       const App = (await import('../../App')).default;
-      
-      render(
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      );
+
+      renderWithProviders(<App />);
 
       // Tab through navigation items
       await user.tab();

@@ -1,6 +1,6 @@
 import express from 'express';
 import { router as profileRouter } from '../../server/features/users/profile.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 const app = express();
 app.use(express.json());

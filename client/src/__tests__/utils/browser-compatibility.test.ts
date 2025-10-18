@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { 
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
   BrowserDetector, 
   FeatureDetector, 
   getBrowserInfo, 

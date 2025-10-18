@@ -3,7 +3,7 @@ import express from 'express';
 import { createFinancialDisclosureRouter } from '../features/analytics/financial-disclosure/index.ts';
 import { FinancialDisclosureMonitoringService } from '../features/analytics/financial-disclosure/monitoring.ts';
 import { financialDisclosureAnalyticsService } from '../features/analytics/services/financial-disclosure.service.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 // Create mock monitoring service for tests
 const mockDependencies = {

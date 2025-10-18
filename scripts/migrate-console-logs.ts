@@ -89,7 +89,7 @@ function migrateFile(filePath: string): MigrationResult {
       if (importLines.length > 0) {
         const lastImportIndex = content.lastIndexOf(importLines[importLines.length - 1]);
         const insertPoint = content.indexOf('\n', lastImportIndex) + 1;
-        const loggerImport = "import { logger } from '../utils/logger';\n";
+        const loggerImport = "import { logger } from '../../shared/core/src/utils/logger';\n";
         content = content.slice(0, insertPoint) + loggerImport + content.slice(insertPoint);
       }
     }

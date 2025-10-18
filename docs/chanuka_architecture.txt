@@ -1,0 +1,1300 @@
+chanuka-platform/
+├── client/                                    # Frontend application
+│   ├── public/
+│   │   ├── assets/
+│   │   │   ├── images/
+│   │   │   ├── audio/                        # Audio versions of key content
+│   │   │   └── locales/                      # Multi-language resources
+│   │   ├── manifest.json
+│   │   ├── sw.js                             # Service worker for offline capability
+│   │   └── offline.html
+│   │
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── accessibility/
+│   │   │   │   ├── audio-content-player.tsx  # Plays audio versions of content
+│   │   │   │   ├── literacy-level-adapter.tsx # Adjusts complexity by user literacy
+│   │   │   │   └── accessibility-manager.tsx
+│   │   │   │
+│   │   │   ├── analysis/
+│   │   │   │   ├── constitutional/           # Constitutional analysis display
+│   │   │   │   │   ├── provision-explorer.tsx
+│   │   │   │   │   ├── precedent-viewer.tsx
+│   │   │   │   │   ├── uncertainty-indicator.tsx
+│   │   │   │   │   └── expert-flag-panel.tsx
+│   │   │   │   │
+│   │   │   │   ├── argument-intelligence/    # Argument visualization
+│   │   │   │   │   ├── argument-map-viewer.tsx
+│   │   │   │   │   ├── evidence-tracker.tsx
+│   │   │   │   │   ├── coalition-finder.tsx
+│   │   │   │   │   ├── legislative-brief-generator.tsx
+│   │   │   │   │   └── stakeholder-position-matrix.tsx
+│   │   │   │   │
+│   │   │   │   ├── comments.tsx
+│   │   │   │   ├── section.tsx
+│   │   │   │   ├── stats.tsx
+│   │   │   │   └── timeline.tsx
+│   │   │   │
+│   │   │   ├── advocacy/                     # Advocacy coordination tools
+│   │   │   │   ├── campaign-dashboard.tsx
+│   │   │   │   ├── action-coordinator.tsx
+│   │   │   │   ├── coalition-builder.tsx
+│   │   │   │   ├── impact-tracker.tsx
+│   │   │   │   └── representative-contact-tool.tsx
+│   │   │   │
+│   │   │   ├── ambassador/                   # Community ambassador interface
+│   │   │   │   ├── ambassador-dashboard.tsx
+│   │   │   │   ├── community-registration.tsx
+│   │   │   │   ├── facilitation-tools.tsx
+│   │   │   │   ├── offline-data-sync.tsx
+│   │   │   │   └── training-resources.tsx
+│   │   │   │
+│   │   │   ├── bills/
+│   │   │   ├── community/
+│   │   │   ├── dashboard/
+│   │   │   └── transparency/
+│   │   │
+│   │   ├── features/
+│   │   │   ├── constitutional-analysis/      # Constitutional analysis feature
+│   │   │   │   ├── components/
+│   │   │   │   ├── hooks/
+│   │   │   │   ├── services/
+│   │   │   │   └── types/
+│   │   │   │
+│   │   │   ├── argument-intelligence/        # Argument analysis feature
+│   │   │   │   ├── components/
+│   │   │   │   ├── hooks/
+│   │   │   │   ├── services/
+│   │   │   │   └── types/
+│   │   │   │
+│   │   │   ├── advocacy/                     # Advocacy coordination feature
+│   │   │   │   ├── components/
+│   │   │   │   ├── hooks/
+│   │   │   │   ├── services/
+│   │   │   │   └── types/
+│   │   │   │
+│   │   │   ├── bills/
+│   │   │   ├── community/
+│   │   │   ├── search/
+│   │   │   └── users/
+│   │   │
+│   │   ├── i18n/                            # Full localization system
+│   │   │   ├── core/
+│   │   │   │   ├── language-detector.ts
+│   │   │   │   ├── content-adapter.ts       # Adapts content for cultural context
+│   │   │   │   └── translation-manager.ts
+│   │   │   ├── languages/
+│   │   │   │   ├── en/                      # English
+│   │   │   │   ├── sw/                      # Swahili
+│   │   │   │   ├── ki/                      # Kikuyu
+│   │   │   │   ├── lu/                      # Luo
+│   │   │   │   └── ka/                      # Kamba
+│   │   │   └── regional-examples/           # Context-specific examples
+│   │   │
+│   │   └── pages/
+│   │       ├── constitutional-analysis.tsx   # Constitutional analysis page
+│   │       ├── argument-map.tsx             # Argument visualization page
+│   │       ├── advocacy-campaigns.tsx       # Advocacy coordination page
+│   │       └── [existing pages]
+│   │
+│   └── package.json
+│
+├── server/                                   # Backend application
+│   ├── core/
+│   │   ├── auth/
+│   │   ├── constitutional/                   # Constitutional domain models
+│   │   │   ├── entities/
+│   │   │   │   ├── constitutional-provision.ts
+│   │   │   │   ├── legal-precedent.ts
+│   │   │   │   ├── interpretive-framework.ts
+│   │   │   │   └── constitutional-analysis.ts
+│   │   │   ├── value-objects/
+│   │   │   │   ├── provision-reference.ts
+│   │   │   │   ├── certainty-level.ts
+│   │   │   │   └── conflict-severity.ts
+│   │   │   └── services/
+│   │   │       ├── provision-matcher.ts
+│   │   │       └── precedent-finder.ts
+│   │   │
+│   │   ├── argumentation/                    # Argumentation domain models
+│   │   │   ├── entities/
+│   │   │   │   ├── argument.ts
+│   │   │   │   ├── claim.ts
+│   │   │   │   ├── evidence.ts
+│   │   │   │   ├── reasoning-chain.ts
+│   │   │   │   └── stakeholder-position.ts
+│   │   │   ├── value-objects/
+│   │   │   │   ├── evidence-quality.ts
+│   │   │   │   ├── argument-strength.ts
+│   │   │   │   └── coalition-compatibility.ts
+│   │   │   └── services/
+│   │   │       ├── argument-extractor.ts
+│   │   │       ├── argument-clusterer.ts
+│   │   │       ├── evidence-evaluator.ts
+│   │   │       └── coalition-identifier.ts
+│   │   │
+│   │   ├── advocacy/                        # Advocacy domain models
+│   │   │   ├── entities/
+│   │   │   │   ├── campaign.ts
+│   │   │   │   ├── action-item.ts
+│   │   │   │   ├── coalition.ts
+│   │   │   │   └── impact-record.ts
+│   │   │   └── services/
+│   │   │       ├── campaign-coordinator.ts
+│   │   │       ├── action-generator.ts
+│   │   │       └── impact-tracker.ts
+│   │   │
+│   │   └── [existing core modules]
+│   │
+│   ├── features/
+│   │   ├── constitutional-analysis/          # Constitutional analysis service
+│   │   │   ├── application/
+│   │   │   │   ├── constitutional-analyzer.ts
+│   │   │   │   ├── grounding-service.ts    # Grounds analysis in precedent
+│   │   │   │   ├── uncertainty-assessor.ts  # Assesses interpretive complexity
+│   │   │   │   └── expert-flagging-service.ts
+│   │   │   ├── domain/
+│   │   │   │   └── [domain models from core]
+│   │   │   ├── infrastructure/
+│   │   │   │   ├── repositories/
+│   │   │   │   │   ├── provision-repository.ts
+│   │   │   │   │   ├── precedent-repository.ts
+│   │   │   │   │   └── analysis-cache.ts
+│   │   │   │   └── external/
+│   │   │   │       ├── legal-database-client.ts
+│   │   │   │       └── expert-notification-service.ts
+│   │   │   └── presentation/
+│   │   │       └── constitutional-router.ts
+│   │   │
+│   │   ├── argument-intelligence/            # Argument intelligence service
+│   │   │   ├── application/
+│   │   │   │   ├── argument-processor.ts
+│   │   │   │   ├── structure-extractor.ts   # Extracts argumentative structure
+│   │   │   │   ├── clustering-service.ts    # Clusters similar arguments
+│   │   │   │   ├── evidence-validator.ts    # Validates evidence claims
+│   │   │   │   ├── coalition-finder.ts      # Identifies potential coalitions
+│   │   │   │   ├── brief-generator.ts       # Generates legislative briefs
+│   │   │   │   └── power-balancer.ts        # Ensures minority voice visibility
+│   │   │   ├── domain/
+│   │   │   │   └── [domain models from core]
+│   │   │   ├── infrastructure/
+│   │   │   │   ├── nlp/
+│   │   │   │   │   ├── sentence-classifier.ts
+│   │   │   │   │   ├── entity-extractor.ts
+│   │   │   │   │   └── similarity-calculator.ts
+│   │   │   │   └── repositories/
+│   │   │   │       ├── argument-repository.ts
+│   │   │   │       └── brief-repository.ts
+│   │   │   └── presentation/
+│   │   │       └── argument-router.ts
+│   │   │
+│   │   ├── universal-access/                # Universal access service
+│   │   │   ├── ussd/
+│   │   │   │   ├── gateway/
+│   │   │   │   │   ├── ussd-server.ts      # USSD protocol handler
+│   │   │   │   │   ├── menu-builder.ts      # Builds text menus
+│   │   │   │   │   ├── session-manager.ts   # Manages USSD sessions
+│   │   │   │   │   └── response-formatter.ts
+│   │   │   │   ├── menus/
+│   │   │   │   │   ├── main-menu.ts
+│   │   │   │   │   ├── voting-record-menu.ts
+│   │   │   │   │   ├── bill-alerts-menu.ts
+│   │   │   │   │   └── representative-info-menu.ts
+│   │   │   │   └── services/
+│   │   │   │       ├── data-simplifier.ts   # Simplifies for text display
+│   │   │   │       └── telco-integrator.ts  # Integrates with carriers
+│   │   │   │
+│   │   │   ├── ambassador/
+│   │   │   │   ├── application/
+│   │   │   │   │   ├── ambassador-manager.ts
+│   │   │   │   │   ├── training-service.ts
+│   │   │   │   │   ├── community-mapper.ts  # Maps ambassador coverage
+│   │   │   │   │   ├── compensation-tracker.ts
+│   │   │   │   │   └── impact-assessor.ts   # Tracks ambassador impact
+│   │   │   │   ├── domain/
+│   │   │   │   │   ├── entities/
+│   │   │   │   │   │   ├── ambassador.ts
+│   │   │   │   │   │   ├── community.ts
+│   │   │   │   │   │   └── facilitation-session.ts
+│   │   │   │   │   └── services/
+│   │   │   │   │       └── matching-service.ts
+│   │   │   │   └── infrastructure/
+│   │   │   │       ├── repositories/
+│   │   │   │       └── offline-sync-service.ts
+│   │   │   │
+│   │   │   ├── localization/
+│   │   │   │   ├── content-adapter.ts       # Adapts content culturally
+│   │   │   │   ├── example-generator.ts     # Generates local examples
+│   │   │   │   ├── audio-generator.ts       # Text-to-speech integration
+│   │   │   │   └── complexity-adjuster.ts   # Adjusts language complexity
+│   │   │   │
+│   │   │   └── presentation/
+│   │   │       ├── ussd-router.ts
+│   │   │       └── ambassador-router.ts
+│   │   │
+│   │   ├── advocacy/                        # Advocacy coordination service
+│   │   │   ├── application/
+│   │   │   │   ├── campaign-manager.ts
+│   │   │   │   ├── action-coordinator.ts
+│   │   │   │   ├── alert-dispatcher.ts      # Dispatches urgent alerts
+│   │   │   │   ├── coalition-builder.ts
+│   │   │   │   ├── impact-tracker.ts        # Tracks advocacy impact
+│   │   │   │   └── representative-contact-router.ts
+│   │   │   ├── domain/
+│   │   │   │   └── [domain models from core]
+│   │   │   ├── infrastructure/
+│   │   │   │   ├── notification/
+│   │   │   │   │   ├── sms-dispatcher.ts
+│   │   │   │   │   ├── email-dispatcher.ts
+│   │   │   │   │   └── push-dispatcher.ts
+│   │   │   │   └── repositories/
+│   │   │   │       ├── campaign-repository.ts
+│   │   │   │       └── action-repository.ts
+│   │   │   └── presentation/
+│   │   │       └── advocacy-router.ts
+│   │   │
+│   │   ├── institutional-integration/        # Legislative integration
+│   │   │   ├── application/
+│   │   │   │   ├── legislative-api-gateway.ts # API for legislative staff
+│   │   │   │   ├── committee-adapter.ts     # Formats for committees
+│   │   │   │   ├── impact-reporter.ts       # Reports citizen impact
+│   │   │   │   ├── subscription-manager.ts  # Manages institutional subs
+│   │   │   │   └── usage-tracker.ts         # Tracks API usage
+│   │   │   ├── adapters/
+│   │   │   │   ├── budget-committee-adapter.ts
+│   │   │   │   ├── constitutional-committee-adapter.ts
+│   │   │   │   ├── sectoral-committee-adapter.ts
+│   │   │   │   └── plenary-adapter.ts
+│   │   │   ├── infrastructure/
+│   │   │   │   ├── authentication/
+│   │   │   │   │   ├── institutional-auth.ts
+│   │   │   │   │   └── api-key-manager.ts
+│   │   │   │   └── repositories/
+│   │   │   │       └── subscription-repository.ts
+│   │   │   └── presentation/
+│   │   │       ├── legislative-api-router.ts
+│   │   │       └── subscription-router.ts
+│   │   │
+│   │   ├── political-resilience/            # Political resilience service
+│   │   │   ├── application/
+│   │   │   │   ├── coalition-manager.ts     # Manages protective coalitions
+│   │   │   │   ├── threat-monitor.ts        # Monitors political threats
+│   │   │   │   ├── rapid-response.ts        # Coordinates rapid responses
+│   │   │   │   ├── legal-defense-coordinator.ts
+│   │   │   │   └── backup-orchestrator.ts   # Manages distributed backups
+│   │   │   ├── infrastructure/
+│   │   │   │   ├── monitoring/
+│   │   │   │   │   ├── media-scanner.ts     # Scans for threats
+│   │   │   │   │   ├── legislative-tracker.ts # Tracks hostile legislation
+│   │   │   │   │   └── sentiment-analyzer.ts
+│   │   │   │   ├── backup/
+│   │   │   │   │   ├── distributed-backup-service.ts
+│   │   │   │   │   ├── encryption-service.ts
+│   │   │   │   │   └── recovery-orchestrator.ts
+│   │   │   │   └── legal/
+│   │   │   │       ├── firm-coordinator.ts
+│   │   │   │       └── document-repository.ts
+│   │   │   └── presentation/
+│   │   │       └── resilience-router.ts
+│   │   │
+│   │   └── [existing features]
+│   │
+│   ├── infrastructure/
+│   │   ├── ai/                              # AI infrastructure
+│   │   │   ├── models/
+│   │   │   │   ├── constitutional-model.ts  # Specialized constitutional model
+│   │   │   │   ├── argument-model.ts        # Argument extraction model
+│   │   │   │   └── summarization-model.ts
+│   │   │   ├── embeddings/
+│   │   │   │   ├── embedding-service.ts     # Semantic embeddings
+│   │   │   │   └── similarity-service.ts
+│   │   │   ├── evaluation/
+│   │   │   │   ├── benchmark-runner.ts      # Runs Legal-GLUE benchmarks
+│   │   │   │   ├── accuracy-tracker.ts
+│   │   │   │   └── bias-detector.ts
+│   │   │   └── explainability/
+│   │   │       ├── attention-visualizer.ts
+│   │   │       ├── reasoning-tracer.ts
+│   │   │       └── uncertainty-quantifier.ts
+│   │   │
+│   │   ├── nlp/                             # NLP infrastructure
+│   │   │   ├── preprocessing/
+│   │   │   │   ├── tokenizer.ts
+│   │   │   │   ├── sentence-splitter.ts
+│   │   │   │   └── legal-normalizer.ts      # Normalizes legal text
+│   │   │   ├── extraction/
+│   │   │   │   ├── named-entity-recognizer.ts
+│   │   │   │   ├── relation-extractor.ts
+│   │   │   │   └── citation-parser.ts       # Parses legal citations
+│   │   │   └── classification/
+│   │   │       ├── text-classifier.ts
+│   │   │       └── sentiment-analyzer.ts
+│   │   │
+│   │   ├── knowledge-base/                  # Legal knowledge base
+│   │   │   ├── constitutional/
+│   │   │   │   ├── provisions-db.ts         # Constitutional provisions
+│   │   │   │   ├── precedents-db.ts         # Court precedents
+│   │   │   │   └── scholarly-works-db.ts    # Academic interpretations
+│   │   │   ├── legislative/
+│   │   │   │   ├── acts-db.ts               # Existing legislation
+│   │   │   │   ├── regulations-db.ts
+│   │   │   │   └── parliamentary-proceedings-db.ts
+│   │   │   └── indexing/
+│   │   │       ├── semantic-index.ts        # Semantic search index
+│   │   │       └── citation-graph.ts        # Citation network
+│   │   │
+│   │   └── [existing infrastructure]
+│   │
+│   └── [existing server structure]
+│
+├── shared/                                   # Shared code between client/server
+│   ├── core/
+│   │   ├── constitutional/                   # Shared constitutional types
+│   │   │   ├── types/
+│   │   │   │   ├── provision.ts
+│   │   │   │   ├── analysis.ts
+│   │   │   │   └── certainty.ts
+│   │   │   └── validators/
+│   │   │       └── analysis-validator.ts
+│   │   │
+│   │   ├── argumentation/                   # Shared argumentation types
+│   │   │   ├── types/
+│   │   │   │   ├── argument.ts
+│   │   │   │   ├── evidence.ts
+│   │   │   │   └── coalition.ts
+│   │   │   └── validators/
+│   │   │
+│   │   ├── accessibility/                   # Shared accessibility types
+│   │   │   ├── types/
+│   │   │   │   ├── literacy-level.ts
+│   │   │   │   ├── language-preference.ts
+│   │   │   │   └── access-mode.ts
+│   │   │   └── validators/
+│   │   │
+│   │   └── [existing shared code]
+│   │
+│   └── types/
+│       ├── constitutional.ts                 # Constitutional type definitions
+│       ├── argumentation.ts                 # Argumentation type definitions
+│       ├── advocacy.ts                      # Advocacy type definitions
+│       ├── accessibility.ts                 # Accessibility type definitions
+│       └── [existing types]
+│
+├── ai-models/                               # AI model storage and config
+│   ├── constitutional/
+│   │   ├── provision-matcher/
+│   │   │   ├── model.bin
+│   │   │   ├── config.json
+│   │   │   └── README.md
+│   │   └── precedent-finder/
+│   │
+│   ├── argumentation/
+│   │   ├── argument-extractor/
+│   │   ├── evidence-evaluator/
+│   │   └── coalition-identifier/
+│   │
+│   ├── summarization/
+│   │   ├── bill-summarizer/
+│   │   └── debate-summarizer/
+│   │
+│   ├── embeddings/
+│   │   ├── legal-embeddings/                # Legal domain embeddings
+│   │   └── multilingual-embeddings/         # Multi-language embeddings
+│   │
+│   └── evaluation/
+│       ├── benchmarks/
+│       │   ├── legal-glue/                  # Legal-GLUE benchmark suite
+│       │   └── constitutional-reasoning/
+│       └── test-sets/
+│           ├── kenyan-legislation/
+│           └── constitutional-cases/
+│
+├── knowledge-base/                          # Structured knowledge storage
+│   ├── constitutional/
+│   │   ├── kenyan-constitution/
+│   │   │   ├── full-text.json
+│   │   │   ├── articles/                    # Individual articles
+│   │   │   ├── bill-of-rights/
+│   │   │   └── interpretive-notes.json
+│   │   ├── precedents/
+│   │   │   ├── supreme-court/
+│   │   │   ├── court-of-appeal/
+│   │   │   └── high-court/
+│   │   └── scholarly-works/
+│   │       ├── commentaries/
+│   │       └── law-review-articles/
+│   │
+│   ├── legislative/
+│   │   ├── acts/                            # Existing legislation
+│   │   ├── bills/                           # Current bills
+│   │   └── regulations/
+│   │
+│   ├── parliamentary/
+│   │   ├── hansard/                         # Parliamentary proceedings
+│   │   ├── committee-reports/
+│   │   └── public-petitions/
+│   │
+│   └── contextual/                          # Localized context
+│       ├── regional-examples/
+│       │   ├── nairobi/
+│       │   ├── mombasa/
+│       │   ├── kisumu/
+│       │   └── rural-communities/
+│       ├── sector-specific/
+│       │   ├── agriculture/
+│       │   ├── healthcare/
+│       │   ├── education/
+│       │   └── small-business/
+│       └── translations/
+│           ├── swahili/
+│           ├── kikuyu/
+│           ├── luo/
+│           └── kamba/
+│
+├── ussd-gateway/                            # USSD service infrastructure
+│   ├── src/
+│   │   ├── server.ts                        # USSD server entry point
+│   │   ├── session/
+│   │   │   ├── session-manager.ts
+│   │   │   ├── state-machine.ts             # Manages menu navigation state
+│   │   │   └── session-store.ts
+│   │   ├── menus/
+│   │   │   ├── menu-builder.ts
+│   │   │   ├── main-menu.ts
+│   │   │   ├── voting-records/
+│   │   │   ├── bill-alerts/
+│   │   │   ├── representative-info/
+│   │   │   └── help-menu.ts
+│   │   ├── formatters/
+│   │   │   ├── text-formatter.ts            # Formats for 160-char SMS limit
+│   │   │   ├── data-simplifier.ts
+│   │   │   └── abbreviation-expander.ts
+│   │   ├── integration/
+│   │   │   ├── api-client.ts                # Connects to main platform API
+│   │   │   └── telco-adapters/
+│   │   │       ├── safaricom.ts
+│   │   │       ├── airtel.ts
+│   │   │       └── telkom.ts
+│   │   └── analytics/
+│   │       └── usage-tracker.ts             # Tracks USSD usage patterns
+│   │
+│   ├── config/
+│   │   ├── menu-structure.json
+│   │   └── telco-config.json
+│   │
+│   └── package.json
+│
+├── ambassador-tools/                        # Community ambassador toolkit
+│   ├── mobile-app/                          # Offline-capable mobile app
+│   │   ├── src/
+│   │   │   ├── screens/
+│   │   │   │   ├── community-dashboard.tsx
+│   │   │   │   ├── session-facilitator.tsx  # Guides facilitation sessions
+│   │   │   │   ├── data-collector.tsx       # Collects community feedback
+│   │   │   │   ├── training-viewer.tsx
+│   │   │   │   └── sync-manager.tsx
+│   │   │   ├── offline/
+│   │   │   │   ├── local-storage.ts
+│   │   │   │   ├── sync-queue.ts
+│   │   │   │   └── conflict-resolver.ts
+│   │   │   └── utils/
+│   │   │       ├── accessibility-helpers.ts
+│   │   │       └── low-literacy-ui.ts
+│   │   │
+│   │   └── package.json
+│   │
+│   ├── training-materials/
+│   │   ├── onboarding/
+│   │   │   ├── platform-basics.md
+│   │   │   ├── facilitation-techniques.md
+│   │   │   └── community-engagement.md
+│   │   ├── reference/
+│   │   │   ├── legislative-process.md
+│   │   │   ├── constitution-overview.md
+│   │   │   └── advocacy-strategies.md
+│   │   └── scenarios/
+│   │       ├── rural-farmer-scenario.md
+│   │       ├── urban-informal-sector.md
+│   │       └── youth-engagement.md
+│   │
+│   └── facilitation-guides/
+│       ├── bill-analysis-workshop.md
+│       ├── advocacy-planning-session.md
+│       └── digital-literacy-basics.md
+│
+├── institutional-api/                       # API for institutional clients
+│   ├── src/
+│   │   ├── gateway/
+│   │   │   ├── api-gateway.ts
+│   │   │   ├── rate-limiter.ts              # Higher limits for subscribers
+│   │   │   └── authentication.ts            # API key management
+│   │   ├── adapters/
+│   │   │   ├── committee-adapters/
+│   │   │   │   ├── budget-committee.ts
+│   │   │   │   ├── constitutional-affairs.ts
+│   │   │   │   └── sectoral-committees.ts
+│   │   │   └── format-adapters/
+│   │   │       ├── pdf-generator.ts
+│   │   │       ├── excel-exporter.ts
+│   │   │       └── parliamentary-format.ts
+│   │   ├── analytics/
+│   │   │   ├── usage-tracker.ts
+│   │   │   ├── value-reporter.ts            # Reports value to subscribers
+│   │   │   └── recommendation-engine.ts     # Suggests relevant data
+│   │   └── subscription/
+│   │       ├── tier-manager.ts
+│   │       ├── billing-integration.ts
+│   │       └── feature-gates.ts
+│   │
+│   ├── docs/
+│   │   ├── api-reference.md
+│   │   ├── integration-guide.md
+│   │   └── use-cases/
+│   │       ├── legislative-research.md
+│   │       ├── investigative-journalism.md
+│   │       └── civil-society-monitoring.md
+│   │
+│   └── package.json
+│
+├── resilience-infrastructure/               # Political resilience tools
+│   ├── monitoring/
+│   │   ├── src/
+│   │   │   ├── threat-detection/
+│   │   │   │   ├── media-scanner.ts         # Scans media for threats
+│   │   │   │   ├── legislative-tracker.ts   # Tracks hostile bills
+│   │   │   │   ├── sentiment-analyzer.ts
+│   │   │   │   └── alert-generator.ts
+│   │   │   ├── coalition-management/
+│   │   │   │   ├── stakeholder-tracker.ts
+│   │   │   │   ├── relationship-manager.ts
+│   │   │   │   └── coordination-tools.ts
+│   │   │   └── rapid-response/
+│   │   │       ├── alert-dispatcher.ts
+│   │   │       ├── message-templates.ts
+│   │   │       └── campaign-coordinator.ts
+│   │   └── package.json
+│   │
+│   ├── backup-system/
+│   │   ├── src/
+│   │   │   ├── distributed-backup.ts
+│   │   │   ├── encryption-service.ts
+│   │   │   ├── recovery-orchestrator.ts
+│   │   │   └── jurisdiction-manager.ts      # Manages multi-jurisdiction hosting
+│   │   └── config/
+│   │       ├── backup-locations.json
+│   │       └── recovery-procedures.md
+│   │
+│   └── legal-defense/
+│       ├── templates/
+│       │   ├── freedom-of-information-defense.md
+│       │   ├── public-interest-argument.md
+│       │   └── constitutional-protection.md
+│       ├── firm-contacts.json
+│       └── precedent-library/
+│
+├── evaluation-framework/                    # AI evaluation infrastructure
+│   ├── benchmarks/
+│   │   ├── legal-glue/
+│   │   │   ├── runner.ts
+│   │   │   ├── test-cases.json
+│   │   │   └── scoring.ts
+│   │   ├── constitutional-reasoning/
+│   │   │   ├── test-scenarios.json
+│   │   │   └── expert-labels.json
+│   │   └── argument-extraction/
+│   │       ├── annotated-corpus.json
+│   │       └── evaluation-metrics.ts
+│   │
+│   ├── bias-detection/
+│   │   ├── political-bias-detector.ts
+│   │   ├── demographic-bias-detector.ts
+│   │   └── fairness-metrics.ts
+│   │
+│   ├── explainability-tests/
+│   │   ├── reasoning-coherence.ts
+│   │   ├── citation-accuracy.ts
+│   │   └── uncertainty-calibration.ts
+│   │
+│   └── continuous-evaluation/
+│       ├── production-monitor.ts
+│       ├── error-analyzer.ts
+│       └── improvement-tracker.ts
+│
+├── localization-pipeline/                   # Content localization system
+│   ├── src/
+│   │   ├── translation/
+│   │   │   ├── translation-manager.ts
+│   │   │   ├── quality-checker.ts
+│   │   │   └── glossary-manager.ts          # Legal term glossaries
+│   │   ├── adaptation/
+│   │   │   ├── cultural-adapter.ts
+│   │   │   ├── example-generator.ts         # Generates local examples
+│   │   │   ├── regional-contextualizer.ts
+│   │   │   └── relevance-scorer.ts
+│   │   ├── audio/
+│   │   │   ├── tts-generator.ts
+│   │   │   ├── audio-recorder.ts            # For human recordings
+│   │   │   └── audio-validator.ts
+│   │   └── complexity-adjustment/
+│   │       ├── readability-analyzer.ts
+│   │       ├── simplifier.ts
+│   │       └── complexity-scorer.ts
+│   │
+│   ├── content/
+│   │   ├── source/                          # Original English content
+│   │   ├── translated/                      # Translated versions
+│   │   ├── adapted/                         # Culturally adapted versions
+│   │   └── audio/                           # Audio versions
+│   │
+│   └── workflows/
+│       ├── translation-workflow.md
+│       ├── quality-assurance.md
+│       └── community-review-process.md
+│
+├── impact-measurement/                      # Impact tracking infrastructure
+│   ├── src/
+│   │   ├── tracking/
+│   │   │   ├── participation-tracker.ts
+│   │   │   ├── advocacy-tracker.ts
+│   │   │   ├── legislative-outcome-tracker.ts
+│   │   │   └── attribution-engine.ts        # Attributes outcomes to platform
+│   │   ├── analysis/
+│   │   │   ├── impact-calculator.ts
+│   │   │   ├── trend-analyzer.ts
+│   │   │   └── comparative-analyzer.ts      # Compares to baseline
+│   │   ├── reporting/
+│   │   │   ├── impact-report-generator.ts
+│   │   │   ├── donor-report-generator.ts
+│   │   │   └── public-dashboard-updater.ts
+│   │   └── feedback-loop/
+│   │       ├── user-notifier.ts             # Notifies users of impact
+│   │       └── success-story-collector.ts
+│   │
+│   ├── metrics/
+│   │   ├── engagement-metrics.json
+│   │   ├── outcome-metrics.json
+│   │   └── sustainability-metrics.json
+│   │
+│   └── case-studies/
+│       ├── template.md
+│       └── examples/
+│
+├── integration-tests/                       # Comprehensive integration tests
+│   ├── constitutional-analysis/
+│   │   ├── grounding-accuracy.test.ts
+│   │   ├── uncertainty-calibration.test.ts
+│   │   └── expert-flagging.test.ts
+│   │
+│   ├── argument-intelligence/
+│   │   ├── extraction-accuracy.test.ts
+│   │   ├── clustering-quality.test.ts
+│   │   ├── power-balance.test.ts
+│   │   └── brief-generation.test.ts
+│   │
+│   ├── universal-access/
+│   │   ├── ussd-flows.test.ts
+│   │   ├── offline-sync.test.ts
+│   │   ├── multi-language.test.ts
+│   │   └── ambassador-workflows.test.ts
+│   │
+│   ├── advocacy/
+│   │   ├── campaign-coordination.test.ts
+│   │   ├── alert-dispatch.test.ts
+│   │   └── impact-tracking.test.ts
+│   │
+│   ├── institutional/
+│   │   ├── api-functionality.test.ts
+│   │   ├── format-adapters.test.ts
+│   │   └── subscription-management.test.ts
+│   │
+│   └── resilience/
+│       ├── threat-detection.test.ts
+│       ├── backup-recovery.test.ts
+│       └── rapid-response.test.ts
+│
+├── documentation/                           # Comprehensive documentation
+│   ├── architecture/
+│   │   ├── system-overview.md
+│   │   ├── constitutional-analysis.md       # Constitutional system docs
+│   │   ├── argument-intelligence.md         # Argumentation system docs
+│   │   ├── universal-access.md              # Access infrastructure docs
+│   │   ├── advocacy-coordination.md         # Advocacy system docs
+│   │   ├── institutional-integration.md     # Integration docs
+│   │   └── political-resilience.md          # Resilience strategy docs
+│   │
+│   ├── research-foundation/
+│   │   ├── literature-review.md
+│   │   ├── design-decisions.md              # Research-backed decisions
+│   │   └── evaluation-criteria.md           # Success metrics from research
+│   │
+│   ├── implementation-guides/
+│   │   ├── constitutional-analysis-implementation.md
+│   │   ├── argument-intelligence-implementation.md
+│   │   ├── ussd-gateway-setup.md
+│   │   ├── ambassador-program-launch.md
+│   │   ├── localization-workflow.md
+│   │   └── institutional-api-integration.md
+│   │
+│   ├── operational-procedures/
+│   │   ├── threat-response-playbook.md      # Political threat responses
+│   │   ├── backup-recovery-procedures.md
+│   │   ├── quality-assurance.md
+│   │   └── incident-response.md
+│   │
+│   ├── user-guides/
+│   │   ├── citizen-guide/
+│   │   │   ├── understanding-analysis.md
+│   │   │   ├── participating-effectively.md
+│   │   │   └── organizing-advocacy.md
+│   │   ├── ambassador-guide/
+│   │   │   ├── facilitation-techniques.md
+│   │   │   ├── community-engagement.md
+│   │   │   └── troubleshooting.md
+│   │   └── institutional-guide/
+│   │       ├── api-integration.md
+│   │       ├── data-interpretation.md
+│   │       └── best-practices.md
+│   │
+│   └── research-reports/                    # Impact research
+│       ├── baseline-study.md
+│       ├── quarterly-impact-reports/
+│       └── academic-publications/
+│
+├── deployment/                              # Deployment infrastructure
+│   ├── kubernetes/
+│   │   ├── constitutional-analysis/         # Constitutional service deployment
+│   │   ├── argument-intelligence/           # Argument service deployment
+│   │   ├── ussd-gateway/                    # USSD gateway deployment
+│   │   ├── institutional-api/               # Institutional API deployment
+│   │   └── [existing deployments]
+│   │
+│   ├── backup-infrastructure/               # Distributed backup deployment
+│   │   ├── primary-region/
+│   │   ├── secondary-regions/
+│   │   └── recovery-procedures/
+│   │
+│   └── monitoring/
+│       ├── dashboards/
+│       │   ├── system-health.json
+│       │   ├── ai-performance.json          # AI model monitoring
+│       │   ├── accessibility-metrics.json   # Access pattern monitoring
+│       │   └── political-threat-alerts.json # Threat monitoring
+│       └── alerts/
+│
+├── scripts/                                 # Utility scripts
+│   ├── ai-model-training/                   # Model training scripts
+│   │   ├── train-constitutional-model.ts
+│   │   ├── train-argument-extractor.ts
+│   │   └── evaluate-models.ts
+│   │
+│   ├── knowledge-base-updates/              # Knowledge base maintenance
+│   │   ├── import-precedents.ts
+│   │   ├── update-legislation.ts
+│   │   └── validate-citations.ts
+│   │
+│   ├── localization/                        # Localization scripts
+│   │   ├── extract-translatable.ts
+│   │   ├── import-translations.ts
+│   │   └── generate-audio.ts
+│   │
+│   ├── impact-measurement/                  # Impact measurement scripts
+│   │   ├── calculate-metrics.ts
+│   │   ├── generate-reports.ts
+│   │   └── export-for-research.ts
+│   │
+│   └── [existing scripts]
+│
+├── .env.example
+├── .gitignore
+├── docker-compose.yml                       # Includes all new services
+├── package.json
+├── README.md                                # Updated with new capabilities
+└── tsconfig.json
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                      ARCHITECTURAL OVERVIEW & INTEGRATION
+═══════════════════════════════════════════════════════════════════════════════
+
+DOMAIN 1: CONSTITUTIONAL ANALYSIS ENGINE
+────────────────────────────────────────────────────────────────────────────────
+Purpose: Helps citizens understand constitutional implications of legislation
+Research Foundation: Addresses "veneer of neutrality" problem through grounding
+
+Core Flow:
+  Bill Text → Provision Matcher (semantic embeddings)
+           → Grounding Service (precedent connection)
+           → Uncertainty Assessor (interpretive complexity)
+           → Expert Flagging (human review when needed)
+           → Citizen-Facing Display
+
+Key Components:
+  • Provision Matcher: Uses semantic embeddings to identify relevant 
+    constitutional provisions even when exact wording differs
+  • Grounding Service: Connects every analysis to established legal precedent,
+    court cases, and scholarly interpretation
+  • Uncertainty Assessor: Explicitly categorizes confidence levels rather than
+    hiding interpretive complexity
+  • Expert Flagging: Routes complex cases to verified constitutional lawyers
+
+Integration Points:
+  → Feeds constitutional analysis into bill detail views
+  → Informs argument intelligence layer for validation
+  → Provides context for advocacy campaigns
+  → Delivers structured analysis through institutional API
+
+
+DOMAIN 2: ARGUMENT INTELLIGENCE LAYER
+────────────────────────────────────────────────────────────────────────────────
+Purpose: Transforms scattered citizen input into structured legislative impact
+Research Foundation: Participation only matters when it produces outputs 
+                      legislators cannot ignore
+
+Core Flow:
+  Citizen Comments → Structure Extractor (identify claims/evidence/reasoning)
+                  → Clustering Service (find patterns across thousands)
+                  → Evidence Validator (assess claim quality)
+                  → Coalition Finder (identify potential alliances)
+                  → Brief Generator (create legislative summaries)
+                  → Power Balancer (ensure marginalized voices remain visible)
+
+Key Components:
+  • Structure Extractor: NLP model trained on informal argumentation patterns
+    to identify claims, evidence, reasoning, predictions
+  • Clustering Service: Semantic similarity reveals that 200 users made 
+    essentially the same point despite different phrasing
+  • Evidence Validator: Checks if cited facts can be verified, sources are
+    credible, reasoning is logically sound
+  • Coalition Finder: Discovers citizens who share concerns even when they
+    frame them differently (e.g., business + consumer advocates)
+  • Brief Generator: Creates outputs adapted for parliamentary committees,
+    executive summaries, detailed research
+  • Power Balancer: Evaluates argument quality not just volume; flags
+    marginalized community concerns; identifies coordinated lobbying
+
+Integration Points:
+  → Processes all community input (comments, responses, submissions)
+  → Feeds structured summaries to institutional API
+  → Powers advocacy coordination by revealing coalitions
+  → Validates arguments against constitutional analysis
+
+
+DOMAIN 3: UNIVERSAL ACCESS INFRASTRUCTURE
+────────────────────────────────────────────────────────────────────────────────
+Purpose: Ensures platform reaches citizens regardless of connectivity, device,
+         literacy, or language
+Research Foundation: Platforms serving only privileged users reinforce rather
+                      than challenge power imbalances
+
+Core Components:
+
+A. USSD GATEWAY (Zero-Data Access)
+   • Works on any phone including basic feature phones
+   • Costs users nothing (uses signaling channel)
+   • 160-character screen limit requires careful formatting
+   • Stateless protocol requires session management
+   • Telco integrations for Safaricom, Airtel, Telkom
+
+   Example Flow:
+   User dials: *384*46#
+   Response: "Chanuka-Legislative Info
+             1. Check MP votes
+             2. Bill alerts
+             3. Rep info
+             4. Help"
+   
+   User enters: 1
+   Response: "MP Votes
+             Enter MP name or
+             1. My MP
+             2. All MPs
+             3. By county
+             0. Back"
+
+B. AMBASSADOR PROGRAM (Human Infrastructure)
+   • Community ambassadors trained in facilitation
+   • Offline-capable mobile app for areas without connectivity
+   • Local storage + sync queue for disconnected operation
+   • Facilitation guides for community workshops
+   • Training materials covering legislative process + platform use
+
+C. LOCALIZATION PIPELINE (Cultural + Linguistic Adaptation)
+   • Translation into Swahili, Kikuyu, Luo, Kamba
+   • Legal term glossaries ensure consistency
+   • Cultural adaptation: adjusts examples to regional contexts
+     (tea farming examples in central Kenya, maize in western Kenya,
+      urban markets in Nairobi)
+   • Audio generation for limited literacy users
+   • Complexity adjustment based on user literacy level
+
+Integration Points:
+  → USSD gateway connects to main platform API for data
+  → Ambassador app syncs community feedback into main system
+  → Localization pipeline adapts all content across platform
+  → Accessibility features embedded throughout UI
+
+
+DOMAIN 4: ADVOCACY COORDINATION
+────────────────────────────────────────────────────────────────────────────────
+Purpose: Transforms platform from information source to organizing tool
+Research Foundation: Participation must connect to pathways for influence
+
+Core Flow:
+  Constitutional Analysis + Argument Intelligence + Citizen Concern
+    → Campaign Dashboard (discover/join campaigns)
+    → Action Coordinator (concrete steps: contact reps, attend hearings)
+    → Coalition Builder (connect citizens with complementary concerns)
+    → Impact Tracker (document outcomes, show participation matters)
+    → Representative Contact Tool (everything needed for effective outreach)
+
+Key Components:
+  • Campaign Dashboard: Helps citizens discover campaigns related to bills
+    they care about, see participation levels, understand status
+  • Action Coordinator: Breaks campaigns into concrete steps with guidance
+    on how to participate effectively at each level
+  • Coalition Builder: Uses argument intelligence findings to suggest
+    alliances between groups with complementary concerns
+  • Impact Tracker: Creates feedback loops showing citizens their
+    participation produces results (bills amended, votes changed)
+  • Alert Dispatcher: Notifies citizens of time-sensitive opportunities
+    (committee hearings scheduled, votes upcoming)
+
+Integration Points:
+  → Leverages argument intelligence to identify coalition opportunities
+  → Uses constitutional analysis to frame rights-based advocacy
+  → Delivers alerts through multiple channels (SMS, email, push, USSD)
+  → Feeds outcomes into impact measurement system
+
+
+DOMAIN 5: INSTITUTIONAL INTEGRATION
+────────────────────────────────────────────────────────────────────────────────
+Purpose: Serve institutional users (legislative staff, journalists, researchers)
+         while maintaining citizen-facing platform as free
+Research Foundation: Platform must integrate into existing legislative workflows
+
+Core Components:
+  • API Gateway: Structured access with authentication and rate limiting
+  • Committee Adapters: Format data for specific parliamentary committees
+    (Budget, Constitutional Affairs, Sectoral)
+  • Format Adapters: Export in formats institutions use (PDF, Word, Excel)
+  • Subscription Model: Think tanks, journalism orgs, civil society pay for
+    API access; creates sustainable funding
+  • Value Reporter: Shows subscribed institutions benefits they receive
+    (stories enabled, research informed, advocacy shaped)
+
+Integration Points:
+  → Delivers constitutional analysis in parliamentary format
+  → Provides argument intelligence briefs for committee use
+  → Exports participation data for research analysis
+  → Creates sustainable funding while keeping citizen access free
+
+
+DOMAIN 6: POLITICAL RESILIENCE INFRASTRUCTURE
+────────────────────────────────────────────────────────────────────────────────
+Purpose: Protect platform from political suppression attempts
+Research Foundation: Platforms that hold power accountable become targets
+
+Core Components:
+  • Threat Monitoring: Scans media for hostile rhetoric, tracks legislation
+    that might restrict civic tech, analyzes sentiment
+  • Distributed Backup: Encrypted backups across multiple jurisdictions,
+    documented recovery procedures, jurisdiction-specific legal protections
+  • Legal Defense: Relationships with freedom of information law firms,
+    template legal arguments, precedent library
+  • Rapid Response: Coordinates immediate action when threats emerge,
+    leverages user base for collective defense
+
+Integration Points:
+  → Alert generator notifies protective coalition when threats detected
+  → Backup orchestrator ensures platform can continue from any location
+  → Rapid response uses advocacy infrastructure to defend platform itself
+  → Legal defense coordinator maintains proactive protection
+
+
+DOMAIN 7: AI INFRASTRUCTURE & EVALUATION
+────────────────────────────────────────────────────────────────────────────────
+Purpose: Ensure AI components maintain quality, avoid bias, operate transparently
+Research Foundation: AI systems must be rigorously evaluated not just trusted
+
+Core Components:
+  • Model Storage: All trained models with configurations, documentation,
+    training data info, known limitations
+  • Evaluation Framework: Continuous testing against Legal-GLUE benchmarks,
+    constitutional reasoning tests, argument extraction accuracy
+  • Bias Detection: Monitors for political bias, demographic bias, fairness
+    across stakeholder groups
+  • Explainability Tools: Attention visualization, reasoning traces,
+    uncertainty quantification
+
+Key Models:
+  • Constitutional provision matcher (semantic embeddings)
+  • Argument structure extractor (NLP model)
+  • Evidence quality evaluator
+  • Coalition compatibility identifier
+  • Legal text summarizer
+
+Integration Points:
+  → All AI components report to evaluation framework
+  → Bias detection results visible on public dashboard
+  → Explainability tools embedded in user-facing displays
+  → Continuous monitoring ensures production quality
+
+
+DOMAIN 8: IMPACT MEASUREMENT
+────────────────────────────────────────────────────────────────────────────────
+Purpose: Rigorously evaluate whether platform achieves democratic goals
+Research Foundation: Civic technology must demonstrate actual impact not assume
+                      participation equals democratic improvement
+
+Core Components:
+  • Participation Tracker: Monitors who uses platform across demographics,
+    geography, literacy levels (reveals if universal access succeeds)
+  • Advocacy Tracker: Follows campaigns from initiation through outcomes,
+    tracks participation levels, legislative responses
+  • Legislative Outcome Tracker: Monitors bills from introduction to passage,
+    records amendments/votes, compares bills with/without citizen engagement
+  • Attribution Engine: Attempts to assess if legislative outcomes connect
+    causally to citizen engagement vs. other factors
+  • Trend Analyzer: Looks for longitudinal changes (participation increasing,
+    representatives more responsive, citizens feel more efficacious)
+
+Outputs:
+  • Donor reports demonstrate effectiveness to funding organizations
+  • Public dashboards show citizens how participation contributes
+  • Research reports provide data for academic study
+  • Success stories document specific instances of democratic impact
+
+Integration Points:
+  → Receives data from all domains (participation, advocacy, outcomes)
+  → Feeds results back to users (impact notifications, success stories)
+  → Informs platform development (what works, what needs improvement)
+  → Provides accountability for democratic claims
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                         CROSS-DOMAIN DATA FLOWS
+═══════════════════════════════════════════════════════════════════════════════
+
+EXAMPLE: Bill Introduction to Legislative Outcome
+──────────────────────────────────────────────────────────────────────────────
+1. New bill enters Parliament
+   ↓
+2. Constitutional Analysis Engine analyzes for rights implications
+   • Provision matcher identifies relevant constitutional articles
+   • Grounding service connects to precedent
+   • Uncertainty assessor evaluates interpretive complexity
+   • Expert flagging routes complex issues to lawyers
+   ↓
+3. Analysis reaches citizens through multiple pathways
+   • Web platform: full analysis with precedent citations
+   • USSD: simplified text menu ("May affect assembly rights. Details: #")
+   • Ambassadors: facilitated community discussions with local examples
+   • Localization: culturally adapted, multi-language versions
+   ↓
+4. Citizens respond with comments and concerns
+   ↓
+5. Argument Intelligence Layer processes input
+   • Structure extractor identifies claims, evidence, reasoning
+   • Clustering reveals 200 similar concerns about rights impact
+   • Evidence validator confirms claims cite credible sources
+   • Coalition finder identifies rights advocates + affected communities
+   • Brief generator creates parliamentary committee summary
+   • Power balancer ensures marginalized voices highlighted
+   ↓
+6. Advocacy Coordination activates
+   • Campaign dashboard surfaces coordinated campaign opportunity
+   • Action coordinator suggests concrete steps (contact reps, attend hearing)
+   • Coalition builder connects rights advocates with affected communities
+   • Alert dispatcher notifies when committee hearing scheduled
+   ↓
+7. Institutional Integration delivers to legislative staff
+   • API provides structured brief to constitutional affairs committee
+   • Format adapter creates PDF in parliamentary format
+   • Analysis shows 200+ citizens concerned, evidence-backed claims
+   ↓
+8. Legislative staff engage with input
+   • Constitutional analysis frames committee discussion
+   • Argument intelligence brief structures hearing testimony
+   • Representatives contacted by constituents take notice
+   ↓
+9. Bill amended in response to citizen concerns
+   ↓
+10. Impact Measurement tracks outcome
+    • Advocacy tracker documents campaign participation → amendment
+    • Attribution engine assesses citizen engagement role
+    • Impact tracker notifies participants of their success
+    • Success story collector documents case for future reference
+    ↓
+11. Feedback loop strengthens future participation
+    • Citizens see their voices mattered
+    • Platform demonstrates democratic effectiveness
+    • Participation confidence increases
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                    IMPLEMENTATION PRIORITIES & RATIONALE
+═══════════════════════════════════════════════════════════════════════════════
+
+PRIORITY 1: Constitutional Analysis Engine
+──────────────────────────────────────────────────────────────────────────────
+Rationale: Provides immediate high-value functionality that differentiates
+           Chanuka from simple legislative tracking. Understanding whether
+           legislation respects/violates rights is foundation of accountability.
+
+Minimum Viable Implementation:
+  • Bill text analysis against Bill of Rights provisions
+  • Basic precedent matching from Supreme Court database
+  • Simple uncertainty indicators (clear/uncertain/complex)
+  • Manual expert review workflow
+
+Full Implementation:
+  • Complete constitutional provision coverage
+  • Comprehensive precedent database (Supreme → High Court)
+  • Sophisticated uncertainty quantification
+  • Automated expert notification and review platform
+
+
+PRIORITY 2: Argument Intelligence Layer
+──────────────────────────────────────────────────────────────────────────────
+Rationale: Transforms participation from expression to influence. Even basic
+           implementation that extracts and clusters arguments dramatically
+           improves quality of citizen input reaching legislative staff.
+
+Minimum Viable Implementation:
+  • Basic claim extraction from comments
+  • Simple clustering by keyword similarity
+  • Manual brief generation with extracted arguments
+
+Full Implementation:
+  • Sophisticated NLP structure extraction
+  • Semantic clustering with argument mapping
+  • Automated evidence validation
+  • Coalition identification algorithms
+  • Automated brief generation with power balancing
+
+
+PRIORITY 3: Universal Access - USSD Gateway
+──────────────────────────────────────────────────────────────────────────────
+Rationale: Addresses fundamental equity issue. Without zero-data access, platform
+           only serves privileged users and reinforces power imbalances.
+
+Minimum Viable Implementation:
+  • Basic USSD menu structure (voting records, bill alerts, rep info)
+  • Single telco integration (e.g., Safaricom)
+  • Text formatting for 160-character constraint
+
+Full Implementation:
+  • Complete menu system with all platform features
+  • All telco integrations (Safaricom, Airtel, Telkom)
+  • Sophisticated abbreviation and pagination
+  • Usage analytics to inform ongoing development
+
+
+PRIORITY 4: Advocacy Coordination
+──────────────────────────────────────────────────────────────────────────────
+Rationale: Connects information to action. Once citizens understand issues
+           (constitutional analysis) and are collectively organized (argument
+           intelligence), advocacy tools enable influence.
+
+Minimum Viable Implementation:
+  • Campaign discovery dashboard
+  • Representative contact information
+  • Basic impact tracking (manual)
+
+Full Implementation:
+  • Automated coalition building from argument intelligence
+  • Multi-channel alert system (SMS/email/push/USSD)
+  • Sophisticated impact attribution
+  • Integrated campaign coordination tools
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                      TECHNICAL STACK & DEPENDENCIES
+═══════════════════════════════════════════════════════════════════════════════
+
+Client:
+  • React + TypeScript for type safety
+  • Tailwind CSS for responsive design
+  • Service workers for offline capability
+  • i18next for internationalization
+
+Server:
+  • Node.js + TypeScript
+  • Clean architecture (domain-driven design)
+  • PostgreSQL for relational data
+  • Vector database for semantic search (embeddings)
+
+AI/NLP:
+  • Hugging Face Transformers for NLP models
+  • Sentence-transformers for embeddings
+  • Custom fine-tuned models for legal domain
+  • LangChain for LLM orchestration
+
+USSD:
+  • Africa's Talking or AT&T USSD gateway
+  • Redis for session management
+  • SMS fallback for notifications
+
+Ambassador Tools:
+  • React Native for cross-platform mobile
+  • SQLite for offline storage
+  • Background sync for disconnected operation
+
+Infrastructure:
+  • Kubernetes for orchestration
+  • Docker for containerization
+  • Multi-region deployment for resilience
+  • Encrypted backup to multiple jurisdictions
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                         KEY ARCHITECTURAL PRINCIPLES
+═══════════════════════════════════════════════════════════════════════════════
+
+1. EXPLICIT UNCERTAINTY
+   AI components acknowledge limitations rather than hiding behind confident
+   prose. Uncertainty indicators visible to users. Complex cases flagged for
+   human expertise.
+
+2. GROUNDING IN PRECEDENT
+   Constitutional analysis always connects to established legal frameworks.
+   No interpretations generated without citing existing precedent, court
+   cases, scholarly work.
+
+3. POWER BALANCING
+   Automated systems actively work against amplifying existing power
+   imbalances. Marginalized voices flagged even when numerically smaller.
+   Coordinated lobbying identified and labeled.
+
+4. UNIVERSAL ACCESS
+   Platform meets citizens where they are rather than requiring them to come
+   to the technology. USSD for zero-data access, ambassadors for facilitation,
+   localization for language/culture, audio for limited literacy.
+
+5. PARTICIPATION → INFLUENCE
+   Architecture transforms scattered input into structured outputs legislators
+   cannot ignore. Argument intelligence creates legislative briefs. Advocacy
+   tools coordinate collective action. Impact tracking proves participation
+   produces results.
+
+6. INSTITUTIONAL INTEGRATION
+   Platform doesn't operate outside existing systems but integrates into
+   legislative workflows. API for staff use, committee-specific formatting,
+   export in formats institutions actually use.
+
+7. POLITICAL RESILIENCE
+   Built-in protections against suppression. Distributed backups across
+   jurisdictions, legal defense relationships, rapid response capability,
+   threat monitoring and early warning.
+
+8. RIGOROUS EVALUATION
+   Continuous testing against benchmarks, bias detection, explainability
+   tools, impact measurement. Claims of democratic effectiveness backed by
+   data not assumptions.
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+This is Chanuka: A comprehensive sociotechnical system designed to transform
+democratic participation in Kenya through research-grounded architecture that
+actively challenges rather than reinforces existing power inequalities.

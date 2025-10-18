@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
-import * as schema from '../schema.ts';
+import * as schema from '../schema/schema.ts';
 import { logger } from '../core/src/logging';
 
 const { Pool } = pg;
@@ -429,9 +429,9 @@ export const rawWritePool = setupPool(false, 'write');
 export const pool = rawGeneralPool;
 
 // Create type-safe Drizzle ORM instances
-export const db = drizzle(rawGeneralPool, { schema: validateSchemaType(schema) });
-export const readDb = drizzle(rawReadPool, { schema: validateSchemaType(schema) });
-export const writeDb = drizzle(rawWritePool, { schema: validateSchemaType(schema) });
+export const db = drizzle<FullDatabaseSchema>(rawGeneralPool, { schema: validateSchemaType(schema) });
+export const readDb = drizzle<FullDatabaseSchema>(rawReadPool, { schema: validateSchemaType(schema) });
+export const writeDb = drizzle<FullDatabaseSchema>(rawWritePool, { schema: validateSchemaType(schema) });
 
 /**
  * Parameters for executing queries with optional context and pool selection.

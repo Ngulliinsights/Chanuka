@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { ErrorDomain } from '../error-handling/base-error';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 interface ErrorResponse {
   statusCode: number;

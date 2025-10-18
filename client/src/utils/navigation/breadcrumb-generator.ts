@@ -1,5 +1,5 @@
 import { BreadcrumbItem } from '@/types/navigation';
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 
 // Route configuration for breadcrumb generation
 const routeConfig: Record<string, { label: string; parent?: string }> = {

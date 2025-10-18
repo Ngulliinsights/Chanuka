@@ -1,5 +1,5 @@
 import { BaseError, ErrorDomain, ErrorSeverity } from '@/errors';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 const formatFileSize = (bytes: number): string => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];

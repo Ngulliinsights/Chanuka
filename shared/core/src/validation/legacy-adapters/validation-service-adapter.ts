@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import { validationService as coreValidationService } from '../validation-service';
 import { ValidationError } from '../types';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export interface LegacyValidationRule {
   type: 'required' | 'email' | 'phone' | 'url' | 'min' | 'max' | 'pattern' | 'custom';

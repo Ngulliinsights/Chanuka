@@ -4,7 +4,7 @@ import { readDatabase } from '../../db.js';
 import { cacheService } from "../../infrastructure/cache/cache-service.js";
 import { demoDataService } from "../../infrastructure/demo-data.js";
 import * as schema from "../../../shared/schema.js";
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 
 // Search index health status
 export interface SearchIndexHealth {

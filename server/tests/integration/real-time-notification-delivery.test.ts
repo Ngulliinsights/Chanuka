@@ -11,7 +11,7 @@ import { router as authRouter } from '../../core/auth/auth.js';
 import { database as db, users, bills, notifications, billEngagement } from '../../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 describe('Real-Time Notification Delivery Tests', () => {
   let app: express.Application;

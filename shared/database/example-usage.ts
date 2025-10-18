@@ -6,11 +6,11 @@
  * with all safety mechanisms in place.
  */
 
-import { database, readDatabase, writeDatabase, withTransaction } from './connection.js';
+import { database, readDatabase, writeDatabase, withTransaction, user as userTable } from './connection.js';
 import { executeQuery } from './pool.js';
 import { initializeDatabaseSafety, shutdownDatabaseSafety } from './init.js';
-import { asyncErrorHandler } from '../utils/error-handler.js';
-import { logger } from '../utils/logger';
+import { asyncErrorHandler } from '../core/src/error-handling/error-handler';
+import { logger } from '../core/src/observability/logging';
 
 /**
  * Example: Safe database initialization
@@ -27,8 +27,8 @@ export const initializeApp = asyncErrorHandler(async () => {
  */
 export const safeReadExample = asyncErrorHandler(async (userId: string) => {
   // Use read database for read operations
-  const result = await readDatabase.query.users.findFirst({
-    where: (users, { eq }) => eq(users.id, userId),
+  const result = await readDatabase.query.user.findFirst({
+    where: (user, { eq }) => eq(user.id, userId),
   });
   
   return result;
@@ -40,12 +40,12 @@ export const safeReadExample = asyncErrorHandler(async (userId: string) => {
 export const safeWriteExample = asyncErrorHandler(async (userData: any) => {
   return await withTransaction(async (tx) => {
     // All operations within this transaction are protected
-    const user = await tx.insert(database.users).values(userData).returning();
+  const insertedUserRows = await tx.insert(userTable).values(userData).returning();
     
     // Additional operations can be added here
     // If any fail, the entire transaction will be rolled back
     
-    return user[0];
+  return insertedUserRows[0];
   });
 });
 

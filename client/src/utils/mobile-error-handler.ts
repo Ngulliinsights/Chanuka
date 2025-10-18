@@ -1,4 +1,4 @@
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 /**
  * Mobile Error Handler
  * Provides mobile-specific error handling and fallback mechanisms

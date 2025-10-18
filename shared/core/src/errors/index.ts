@@ -4,7 +4,7 @@ export * from './error-handler';
 
 // Re-export common error types
 import { BaseError, ErrorDomain, ErrorSeverity } from './base-error';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 type ErrorOptions = {
   statusCode: number;

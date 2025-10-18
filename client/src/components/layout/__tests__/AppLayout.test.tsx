@@ -1,10 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
 import AppLayout from '../app-layout';
-import { ResponsiveNavigationProvider } from '@/contexts/ResponsiveNavigationContext';
-import { NavigationProvider } from '@/contexts/NavigationContext';
-import { logger } from '../utils/logger.js';
+import { renderWithProviders } from '@/test-utils';
 
 // Mock hooks
 vi.mock('@/hooks/use-auth', () => ({
@@ -29,18 +26,6 @@ const localStorageMock = {
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 });
-
-function renderWithProviders(component: React.ReactElement) {
-  return render(
-    <BrowserRouter>
-      <NavigationProvider>
-        <ResponsiveNavigationProvider>
-          {component}
-        </ResponsiveNavigationProvider>
-      </NavigationProvider>
-    </BrowserRouter>
-  );
-}
 
 describe('AppLayout', () => {
   beforeEach(() => {
@@ -268,16 +253,19 @@ describe('AppLayout', () => {
       // Switch to mobile
       isMobile = true;
       
-      rerender(
-        <BrowserRouter>
-          <NavigationProvider>
-            <ResponsiveNavigationProvider>
-              <AppLayout>
-                <div data-testid="test-content">Test Content</div>
-              </AppLayout>
-            </ResponsiveNavigationProvider>
-          </NavigationProvider>
-        </BrowserRouter>
+      const { rerender: newRerender } = renderWithProviders(
+        <AppLayout>
+          <div data-testid="test-content">Test Content</div>
+        </AppLayout>
+      );
+
+      // Switch to mobile
+      isMobile = true;
+
+      newRerender(
+        <AppLayout>
+          <div data-testid="test-content">Test Content</div>
+        </AppLayout>
       );
 
       await waitFor(() => {

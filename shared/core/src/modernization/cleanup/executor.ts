@@ -3,7 +3,7 @@ import { join, dirname } from 'path';
 import { CleanupPlan, CleanupResult, CleanupError, FileOperation, FileMove, FileConsolidation } from './orchestrator';
 import { ValidationResult, ValidationStatus, ValidationCheck, ValidationType } from '../types';
 import { BackupSystem, BackupSystemConfig } from './backup-system';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export interface CleanupExecutorConfig {
   dryRun: boolean;

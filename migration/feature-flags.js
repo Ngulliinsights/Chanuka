@@ -25,7 +25,7 @@ const FEATURE_FLAGS = {
     description: 'Enable new error management system',
     enabled: false,
     rollout_percentage: 0,
-    affected_modules: ['shared/core/src/error-management']
+    affected_modules: ['shared/core/src/error-handling']
   },
   MIGRATION_PHASE_3: {
     name: 'Migration Phase 3: Validation',

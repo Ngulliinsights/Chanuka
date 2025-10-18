@@ -12,7 +12,7 @@ import { TokenBucketStore } from './algorithms/token-bucket';
 import { FixedWindowStore } from './algorithms/fixed-window';
 import { MemoryRateLimitStore } from './stores/memory-store';
 import { RedisRateLimitStore } from './stores/redis-store';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export interface RateLimitFactoryOptions {
   redis?: Redis;
