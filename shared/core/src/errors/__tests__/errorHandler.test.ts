@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Request, Response } from 'express';
 import { BaseError, ErrorDomain, ErrorSeverity } from '../base-error';
 import { unifiedErrorHandler } from '../error-handler';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 describe('unifiedErrorHandler', () => {
   let mockRequest: Partial<Request>;

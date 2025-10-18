@@ -1,6 +1,6 @@
 import { billStorage as storage } from '../infrastructure/bill-storage.js';
 import type { Bill, InsertBill, BillComment, InsertBillComment } from '@shared/schema';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 // Type-safe wrapper for optional storage methods with better type inference
 const storageAny: any = storage;

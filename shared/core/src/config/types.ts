@@ -5,7 +5,7 @@
  */
 
 import type { AppConfig } from './schema';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 // Re-export the main config type
 export type { AppConfig };

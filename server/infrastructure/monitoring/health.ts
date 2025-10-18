@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../utils/api-response.js";
 import { databaseFallbackService } from "../database/database-fallback.js";
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 export const router = Router();
 

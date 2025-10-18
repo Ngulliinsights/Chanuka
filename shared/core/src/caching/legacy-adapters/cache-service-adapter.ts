@@ -251,7 +251,7 @@ export class LegacyCacheService {
    * Import cache data
    */
   import(data: Record<string, any>): void {
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
     for (const [key, entryData] of Object.entries(data)) {
       if (entryData && typeof entryData === 'object') {
         this.set(key, entryData.data, {

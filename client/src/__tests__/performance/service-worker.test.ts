@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../../shared/core/src/observability/logging';
 
 // Mock service worker registration
 const mockServiceWorkerRegistration = {

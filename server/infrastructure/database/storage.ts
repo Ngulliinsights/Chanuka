@@ -15,7 +15,7 @@ import {
   type Evaluation,
 } from '../../../shared/schema/schema.ts';
 import session from 'express-session';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 // Simple memory store implementation since connect-memorystore is not available
 class SimpleMemoryStore extends session.Store {
   private sessions: Map<string, any> = new Map();

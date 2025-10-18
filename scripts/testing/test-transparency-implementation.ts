@@ -6,7 +6,7 @@
  */
 
 import { simpleTransparencyDashboardService } from "./services/transparency-dashboard-simple.js";
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 async function testTransparencyImplementation() {
   logger.info('🧪 Testing Transparency Dashboard Implementation\n', { component: 'Chanuka' });

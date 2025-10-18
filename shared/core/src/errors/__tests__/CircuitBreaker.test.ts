@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { CircuitBreaker, CircuitBreakerState } from '../circuit-breaker';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 describe('CircuitBreaker', () => {
   let circuitBreaker: CircuitBreaker;

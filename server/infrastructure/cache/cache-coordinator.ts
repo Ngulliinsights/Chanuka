@@ -7,7 +7,7 @@
 
 import { cacheService } from './cache-service.js';
 import { advancedCachingService } from './advanced-caching.js';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 export interface CacheCoordinatorConfig {
   cleanupInterval: number; // milliseconds

@@ -6,7 +6,7 @@ import Redis from 'ioredis-mock'; // Mock Redis for testing
 import { RateLimitFactory } from '../../factory/RateLimitFactory';
 import { rateLimitMiddleware } from '../../middleware/rateLimitMiddleware';
 import { RateLimitConfig } from '../../types/RateLimit';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../src/observability/logging';
 
 /**
  * Integration Test Philosophy:

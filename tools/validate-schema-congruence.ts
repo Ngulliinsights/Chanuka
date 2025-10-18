@@ -7,7 +7,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../shared/core/src/observability/logging';
 
 // Configuration
 const SCHEMA_PATH = path.resolve('./shared/schema.ts');

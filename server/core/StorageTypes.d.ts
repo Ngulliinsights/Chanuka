@@ -1,6 +1,6 @@
 import { QueryResult, QueryResultRow } from 'pg';
 import { InsertUser, InsertUserProgress, User, UserProgress } from '../../shared/schema.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 export interface TransactionClient {
     query<T extends QueryResultRow>(queryText: string, values?: any[]): Promise<QueryResult<T>>;
     release(): void;

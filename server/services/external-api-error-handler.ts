@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 // Error types for external API failures
 export enum ExternalAPIErrorType {

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { securityMonitoringService } from '../features/security/security-monitoring-service.js';
 import { intrusionDetectionService } from '../features/security/intrusion-detection-service.js';
 import { securityAuditService } from '../features/security/security-audit-service.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 export interface SecurityMonitoringOptions {
   enableThreatDetection: boolean;

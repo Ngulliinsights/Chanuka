@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { performance } from 'perf_hooks';
 import { performanceMonitor } from './performance-monitor.js';
 import { errorTracker } from '../../core/errors/error-tracker.js';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 export interface APMMetrics {
   requestMetrics: {

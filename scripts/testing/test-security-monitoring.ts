@@ -1,7 +1,7 @@
 import { securityMonitoringService } from './services/security-monitoring-service.js';
 import { intrusionDetectionService } from './services/intrusion-detection-service.js';
 import { securityAuditService } from './services/security-audit-service.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 /**
  * Test script to verify security monitoring and audit system functionality

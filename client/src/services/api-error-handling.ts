@@ -1,5 +1,5 @@
 import { ApiErrorFallback } from '@/components/error-handling';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 // API Error Types - Enhanced with better type safety
 export interface ApiError extends Error {

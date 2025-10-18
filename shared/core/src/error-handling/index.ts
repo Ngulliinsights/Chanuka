@@ -1,22 +1,20 @@
-// Core error handling types and primitives
-export * from './core/types.js';
+/**
+ * DEPRECATED: Legacy error-handling directory
+ * 
+ * This directory has been consolidated into the unified observability system.
+ * Please update your imports to use:
+ * 
+ * import { ... } from '@shared/core/observability/error-management'
+ * 
+ * This legacy export will be removed in a future version.
+ */
 
-// Error patterns and rules
-export * from './patterns/alert-rules.js';
-export * from './patterns/error-patterns.js';
+// Re-export from the new consolidated location
+export * from '../observability/error-management/legacy-adapters/error-handling-adapter.js';
 
-// Error handlers and middleware
-export * from './handlers/error-boundary.js';
-
-// Error reporting services
-export * from './services/error-reporting.js';
-
-// UI components (client-specific)
-export * from './ui/error-fallbacks.js';
-
-// Platform-specific adapters
-export * from './platform/server/request-context.js';
-export * from './platform/client/error-boundary-adapter.js';
-
-// Legacy adapters for backward compatibility
-export * from './legacy-adapters.js';
+// Deprecation warning
+console.warn(
+  '[DEPRECATED] Importing from shared/core/src/error-handling is deprecated. ' +
+  'Please import from shared/core/src/observability/error-management instead. ' +
+  'This legacy export will be removed in a future version.'
+);

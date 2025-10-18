@@ -7,7 +7,7 @@
 import { z } from 'zod';
 import { ValidationService } from './validation-service';
 import { ValidationResult, ValidationError } from './types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 /**
  * Adapter for the existing validators from server/utils/validators.ts

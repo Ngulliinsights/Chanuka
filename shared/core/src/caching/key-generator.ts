@@ -6,7 +6,7 @@
  */
 
 import type { CacheKeyGenerator } from './types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 export class CacheKeys implements CacheKeyGenerator {
   private static instance: CacheKeys;

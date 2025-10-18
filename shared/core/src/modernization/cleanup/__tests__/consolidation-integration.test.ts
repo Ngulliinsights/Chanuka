@@ -4,7 +4,7 @@ import { join } from 'path';
 import { CleanupOrchestrator } from '../orchestrator';
 import { CleanupExecutor } from '../executor';
 import { BackupSystem } from '../backup-system';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../observability/logging';
 
 describe('File Consolidation and Removal Integration', () => {
   const testDir = join(__dirname, 'test-workspace');

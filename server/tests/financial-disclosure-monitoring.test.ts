@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 import { FinancialDisclosureMonitoringService } from '../features/analytics/financial-disclosure/monitoring.js';
 import { cacheService } from '../infrastructure/cache/cache-service.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 describe('Financial Disclosure Monitoring Service', () => {
   beforeAll(async () => {

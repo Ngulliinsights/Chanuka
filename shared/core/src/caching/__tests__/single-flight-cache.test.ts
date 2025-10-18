@@ -7,7 +7,7 @@
 
 import { SingleFlightCache } from '../single-flight-cache';
 import type { CacheService, CacheMetrics } from '../types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 // Mock cache adapter for testing
 class MockCacheAdapter implements CacheService {

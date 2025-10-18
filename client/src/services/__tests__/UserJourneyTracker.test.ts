@@ -1,6 +1,6 @@
 import { UserJourneyTracker, UserJourney, JourneyStep } from '../UserJourneyTracker';
 import { UserRole, NavigationSection } from '@/types/navigation';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../../shared/core/src/observability/logging';
 
 describe('UserJourneyTracker', () => {
   let tracker: UserJourneyTracker;

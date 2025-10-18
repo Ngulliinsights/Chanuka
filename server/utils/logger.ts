@@ -1,13 +1,13 @@
 /**
  * @deprecated This logger module is deprecated. Use the core logger instead:
- * import { logger } from '../../../shared/core/src/logging';
+ * import { logger } from '../../../shared/core/src/observability/logging';
  *
  * This file is kept for backward compatibility but will be removed in a future version.
  * All logging should migrate to the shared/core logger for consistency and better features.
  */
 
 // Consolidated with shared/core logging - this file should be deprecated
-// Use import { logger } from '../../../shared/core/src/logging' instead
+// Use import { logger } from '../../../shared/core/src/observability/logging' instead
 import { config } from '../config/index.ts';
 
 /**
@@ -192,7 +192,7 @@ interface RequestContext {
 
 /**
  * @deprecated This UnifiedLogger class is deprecated. Use the core logger instead:
- * import { logger } from '../../../shared/core/src/logging';
+ * import { logger } from '../../../shared/core/src/observability/logging';
  *
  * This class is kept for backward compatibility but will be removed in a future version.
  * All logging should migrate to the shared/core logger for consistency and better features.
@@ -531,7 +531,7 @@ class UnifiedLogger {
   /**
    * Legacy logging method for backward compatibility.
    * @deprecated Use level-specific methods instead. This entire logger is deprecated - migrate to:
-   * import { logger } from '../../../shared/core/src/logging';
+   * import { logger } from '../../../shared/core/src/observability/logging';
    */
   log(obj: object | string, msg?: string, ...args: any[]): void {
     const message = typeof obj === 'string' ? obj : msg ?? 'Log entry';
@@ -812,7 +812,7 @@ class UnifiedLogger {
 // Export singleton instance
 /**
  * @deprecated This logger instance is deprecated. Use the core logger instead:
- * import { logger } from '../../../shared/core/src/logging';
+ * import { logger } from '../../../shared/core/src/observability/logging';
  *
  * This instance is kept for backward compatibility but will be removed in a future version.
  * All logging should migrate to the shared/core logger for consistency and better features.
@@ -824,11 +824,11 @@ export { UnifiedLogger };
 
 // Re-export shared/core logger as the primary logger
 // Note: Import path may need adjustment based on actual file structure
-// export { logger as sharedLogger } from '../../../shared/core/src/logging';
+// export { logger as sharedLogger } from '../../../shared/core/src/observability/logging';
 
 /**
  * @deprecated This module is deprecated. Use the core logger instead:
- * import { logger } from '../../../shared/core/src/logging';
+ * import { logger } from '../../../shared/core/src/observability/logging';
  *
  * This file is kept for backward compatibility but will be removed in a future version.
  * All logging should migrate to the shared/core logger for consistency and better features.

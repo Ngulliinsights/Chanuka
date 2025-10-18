@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PageRelationshipService } from '../PageRelationshipService';
 import { RelatedPage, UserRole } from '@/types/navigation';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../../shared/core/src/observability/logging';
 
 describe('PageRelationshipService', () => {
   let service: PageRelationshipService;

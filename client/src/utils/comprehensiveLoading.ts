@@ -1,5 +1,5 @@
 import { LoadingOperation } from '@/contexts/LoadingContext';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 // Utility functions for comprehensive loading management
 

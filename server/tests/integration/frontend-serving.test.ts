@@ -5,7 +5,7 @@ import { createServer } from 'http';
 import path from 'path';
 import fs from 'fs';
 import { setupVite } from '../../vite.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 describe('Frontend Serving Integration Tests', () => {
   let app: express.Application;

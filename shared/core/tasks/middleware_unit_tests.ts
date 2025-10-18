@@ -558,7 +558,7 @@ describe('LegacyBridge', () => {
 
 import { MigrationHelper } from '../migration/MigrationHelper';
 import { TestUtils } from './setup';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../src/observability/logging';
 
 describe('MigrationHelper', () => {
   describe('gradual migration strategies', () => {

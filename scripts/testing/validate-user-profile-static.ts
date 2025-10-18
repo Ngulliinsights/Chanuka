@@ -1,6 +1,6 @@
 // Static validation script for User Profile Service (no database required)
 import { userProfileService } from './services/user-profile.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 function validateUserProfileService() {
   logger.info('🔍 Validating User Profile Service Implementation (Static Analysis)...', { component: 'Chanuka' });

@@ -8,7 +8,7 @@
 import { getBrowserInfo, isBrowserSupported, getBrowserWarnings } from './browser-compatibility';
 import { loadPolyfills, polyfillManager } from './polyfills';
 import { runBrowserCompatibilityTests, CompatibilityTestSuite } from './browser-compatibility-tests';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 export interface CompatibilityManagerConfig {
   autoLoadPolyfills: boolean;

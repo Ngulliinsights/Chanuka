@@ -3,7 +3,7 @@ import { databaseService } from "../services/database-service";
 import { readDatabase } from '../db.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from "../infrastructure/cache/cache-service";
 import * as schema from "../../shared/schema/schema.js";
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 // Search suggestion interfaces
 export interface SearchSuggestion {

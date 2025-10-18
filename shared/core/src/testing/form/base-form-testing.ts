@@ -5,7 +5,7 @@
 
 import { ValidationType } from '../../types/validation-types';
 import { ValidationRule as BaseValidationRule } from '../../types/validation-types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 // Re-export the base validation rule type with extensions for form testing
 export type ValidationRule = BaseValidationRule;

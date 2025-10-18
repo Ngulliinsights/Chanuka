@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 // Type definitions - more precise and maintainable
 export type LoadingType = 'initial' | 'navigation' | 'component' | 'api' | 'progressive';

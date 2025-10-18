@@ -7,7 +7,6 @@ import { FinancialDisclosureMonitoringService } from "./monitoring.js";
 import { FinancialDisclosureAnalyticsService } from "../services/financial-disclosure.service.js";
 import { ApiSuccess, ApiError } from "../../../utils/api-response.js";
 import { z, ZodError } from "zod";
-// Note: BaseError, InvalidInputError not found in utils/errors.js - using ValidationError instead
 import { ValidationError as InvalidInputError, SponsorNotFoundError, AppError } from "../../../utils/errors.js";
 import crypto from 'crypto';
 import { logger } from '../../../utils/logger.js';

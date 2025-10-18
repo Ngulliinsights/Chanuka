@@ -11,7 +11,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { getDefaultCache } from '../cache';
 import { performance } from 'perf_hooks';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 export interface DeduplicationOptions {
   enabled?: boolean;

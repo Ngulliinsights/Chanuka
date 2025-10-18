@@ -1,4 +1,4 @@
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 import { database as db } from '@shared/database/connection';
 
 /**

@@ -827,7 +827,7 @@ export class BugDetector {
           this.projectRoot,
           "node_modules",
           importPath
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
         );
         return existsSync(nodeModulesPath) ? nodeModulesPath : null;
       }

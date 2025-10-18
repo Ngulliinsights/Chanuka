@@ -2,7 +2,7 @@ import { encryptionService } from './services/encryption-service.js';
 import { inputValidationService } from './services/input-validation-service.js';
 import { securityAuditService } from './services/security-audit-service.js';
 import { tlsConfigService } from './services/tls-config-service.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 /**
  * Test script to verify security implementation

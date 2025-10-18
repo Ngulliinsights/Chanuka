@@ -1,5 +1,5 @@
 import { defaultApiConfig, CORS_CONFIG, RETRY_CONFIG, ERROR_CONFIG } from '../config/api.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 // Request/Response interceptor types
 interface RequestInterceptor {

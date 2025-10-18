@@ -5,7 +5,7 @@ import { Logger } from '../logging/logger';
 import { ValidationService } from '../validation/validation-service';
 import { HealthChecker } from '../health/health-checker';
 import { configManager } from '../config';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 describe('Core Utilities Integration Tests', () => {
   let cache: any;

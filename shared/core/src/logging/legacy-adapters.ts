@@ -6,7 +6,7 @@
 
 import { Logger as CoreLogger } from './logger';
 import { LogContext } from './types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 /**
  * Adapter for the existing simple logger from src/shared/utils/logger.ts

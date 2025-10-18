@@ -1,7 +1,7 @@
 import { useNavigation } from '@/contexts/NavigationContext';
 import { useResponsiveNavigation } from '@/contexts/ResponsiveNavigationContext';
 import { useKeyboardFocus } from './use-keyboard-focus';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 /**
  * Unified navigation hook that combines both navigation contexts

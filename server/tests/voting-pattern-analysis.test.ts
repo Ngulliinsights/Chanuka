@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { votingPatternAnalysisService } from '../features/bills/voting-pattern-analysis';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 describe('VotingPatternAnalysisService', () => {
   beforeEach(() => {

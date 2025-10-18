@@ -1,5 +1,5 @@
 import { UserRole, NavigationSection } from '@/types/navigation';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 /**
  * Represents a single step in a user journey

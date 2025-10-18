@@ -271,7 +271,7 @@ export class UnifiedMiddlewareManager {
 // core/src/middleware/legacy/LegacyBridge.ts
 
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../src/observability/logging';
 
 export class LegacyBridge {
   private legacyMiddleware: Map<string, RequestHandler> = new Map();

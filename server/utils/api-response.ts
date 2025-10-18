@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 // Standard API response interface
 export interface ApiResponse<T = any> {

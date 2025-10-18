@@ -1,0 +1,34 @@
+/**
+ * Unified Error Management System
+ * 
+ * This module consolidates all error handling functionality under the observability umbrella,
+ * providing a single source of truth for error management across the application.
+ */
+
+// Core error types and base classes
+export * from './errors/base-error.js';
+export * from './errors/specialized-errors.js';
+
+// Error handlers and processing
+export * from './handlers/error-handler-chain.js';
+export * from './handlers/error-boundary.js';
+
+// Error patterns and resilience
+export * from './patterns/circuit-breaker.js';
+export * from './patterns/retry-patterns.js';
+
+// Middleware for different platforms
+export * from './middleware/express-error-middleware.js';
+export * from './middleware/error-middleware.js';
+
+// Legacy adapters for backward compatibility
+export * from './legacy-adapters/error-handling-adapter.js';
+export * from './legacy-adapters/errors-adapter.js';
+
+// Types and interfaces
+export * from './types.js';
+
+// Default exports for common use cases
+export { BaseError } from './errors/base-error.js';
+export { ErrorHandlerChain } from './handlers/error-handler-chain.js';
+export { CircuitBreaker } from './patterns/circuit-breaker.js';

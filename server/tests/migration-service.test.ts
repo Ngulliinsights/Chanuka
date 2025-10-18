@@ -3,7 +3,7 @@ import { MigrationService } from '../infrastructure/database/migration-service.t
 import { DataValidationService } from '../core/validation/data-validation-service.ts';
 import * as fs from 'fs';
 import * as path from 'path';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 // Mock pool for testing
 const mockPool = {

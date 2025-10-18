@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { Logger } from '../logger';
 import { AsyncLocalStorage } from 'async_hooks';
 import pino from 'pino';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 // Mock pino
 vi.mock('pino');

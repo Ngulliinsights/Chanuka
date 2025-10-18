@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 export function useKeyboardFocus() {
   const [isKeyboardUser, setIsKeyboardUser] = useState(false);

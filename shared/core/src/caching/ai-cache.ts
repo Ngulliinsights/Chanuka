@@ -12,7 +12,7 @@
 import { CacheService } from './types';
 import { getDefaultCache } from './index';
 import { performance } from 'perf_hooks';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 export interface AICacheOptions {
   baseCache?: CacheService;

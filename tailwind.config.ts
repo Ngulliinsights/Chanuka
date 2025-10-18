@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from './shared/core/src/observability/logging';
 
 export default {
   // Dark mode configuration - using class strategy for manual control

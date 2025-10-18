@@ -11,7 +11,7 @@ import {
 import { eq, and, inArray, desc } from 'drizzle-orm';
 import { userPreferencesService } from '../../features/users/domain/user-preferences.js';
 import type { BillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 /**
  * Smart Notification Filter Service

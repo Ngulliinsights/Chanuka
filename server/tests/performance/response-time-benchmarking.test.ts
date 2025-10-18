@@ -4,7 +4,7 @@ import express from 'express';
 import { router as billsRouter } from '../../features/bills/bills-router.ts';
 import { router as sponsorsRouter } from '../../features/bills/sponsors.ts';
 import { router as financialDisclosureRouter } from '../../features/analytics/financial-disclosure/index.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 describe('Response Time Benchmarking Tests', () => {
   let app: express.Application;

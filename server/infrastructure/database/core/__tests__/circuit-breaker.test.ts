@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { CircuitBreaker } from '../../../../../shared/core/src/errors/circuit-breaker';
+import { CircuitBreaker } from '../../../../../shared/core/src/observability/error-management';
 
 describe('CircuitBreaker', () => {
   let circuitBreaker: CircuitBreaker;

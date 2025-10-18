@@ -13,7 +13,7 @@ import { performance } from 'perf_hooks';
 import { getDefaultCache } from '../cache';
 import { rateLimitMiddleware } from '../rate-limiting/middleware';
 import { RateLimitStore } from '../rate-limiting/types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 export interface AIRequest extends Request {
   aiContext?: {

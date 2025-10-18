@@ -7,7 +7,7 @@ import { router as sponsorsRouter } from '../../features/bills/sponsors.ts';
 import { router as financialDisclosureRouter } from '../../features/analytics/financial-disclosure/index.js';
 import { router as authRouter } from '../../core/auth/auth.js';
 import { TestHelpers, PerformanceUtils } from '../utils/test-helpers.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 describe('API Performance Tests', () => {
   let app: express.Application;

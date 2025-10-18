@@ -26,3 +26,6 @@ export type {
 export {
   createLogRotationManager,
 } from './logger';
+
+// Legacy compatibility exports
+export { legacyLogger } from '../legacy-adapters/logging-migration-adapter';

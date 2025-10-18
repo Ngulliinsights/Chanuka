@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { ExpertVerificationService, VerificationStatus } from '../domain/ExpertVerificationService';
-import { logger } from '../../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 describe('ExpertVerificationService', () => {
   let service: ExpertVerificationService;

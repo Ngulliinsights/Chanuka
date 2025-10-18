@@ -10,7 +10,7 @@ import pg from 'pg';
 const { Pool } = pg;
 import * as schema from '../shared/schema.js';
 import { financialDisclosureIntegrationService } from './services/financial-disclosure-integration.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 // Use the same connection approach as the seed script
 const pool = new Pool({
