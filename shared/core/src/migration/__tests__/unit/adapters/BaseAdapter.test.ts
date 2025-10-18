@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { BaseAdapter } from '../../../adapters/BaseAdapter';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../../observability/logging';
 
 // Concrete implementation for testing abstract BaseAdapter
 class TestAdapter extends BaseAdapter {

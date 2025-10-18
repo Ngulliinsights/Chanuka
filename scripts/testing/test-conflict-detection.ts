@@ -1,6 +1,6 @@
 // Test file for conflict detection service implementation
 import { ConflictDetectionService } from './services/conflict-detection.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 async function testConflictDetection() {
   const service = new ConflictDetectionService();

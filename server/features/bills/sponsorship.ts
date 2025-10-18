@@ -2,7 +2,7 @@ import express, { Router } from 'express';
 import { readDatabase } from '../../infrastructure/database/index.ts';
 import { bills, billSponsorships, sponsors, sponsorTransparency, sponsorAffiliations, billSectionConflicts } from '../../../shared/schema.js';
 import { eq, desc, count, sql, and } from 'drizzle-orm';
-import { asyncHandler } from '../../utils/errors';
+import { asyncHandler } from '../../utils/errors.js';
 import { SponsorshipAnalysisService } from './sponsorship-analysis';
 import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../utils/api-response.js";
 import { logger } from '../../utils/logger';

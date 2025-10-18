@@ -1,6 +1,6 @@
 import React, { Component, ReactNode, ErrorInfo } from 'react';
 import { ErrorFallback } from './ErrorFallback';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 export type ErrorType = 'javascript' | 'network' | 'chunk' | 'timeout' | 'memory' | 'security' | 'unknown';
 export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';

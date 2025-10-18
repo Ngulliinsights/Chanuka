@@ -8,7 +8,7 @@ import { RateLimitStore } from '../src/rate-limiting/types';
 import { HealthChecker } from '../src/health/health-checker';
 import express from 'express';
 import request from 'supertest';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 describe('Core Utilities Integration Tests', () => {
   let app: express.Application;

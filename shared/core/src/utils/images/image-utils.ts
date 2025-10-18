@@ -1,5 +1,5 @@
 import { BaseError, ErrorDomain, ErrorSeverity } from '@/errors';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 const formatFileSize = (bytes: number): string => {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];

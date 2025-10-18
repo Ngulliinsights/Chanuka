@@ -8,7 +8,7 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 interface MigrationRule {
   from: string;

@@ -1,6 +1,6 @@
 import { MiddlewareProvider } from '../types';
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 export class ErrorHandlerMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'errorHandler';

@@ -1,6 +1,6 @@
 import { HealthStatus, HealthCheck, HealthResult, OverallHealth } from './types';
 import { Logger } from '../logging';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 export interface HealthCheckerConfig {
   defaultTimeout?: number;

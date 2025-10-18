@@ -9,7 +9,7 @@ import { NumberUtils } from '../../utils/number-utils';
 import { RegexPatterns } from '../../utils/regex-patterns';
 import { TypeGuards } from '../../utils/type-guards';
 import { Logger } from '../../logging';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 export interface ValidationError {
   field: string;

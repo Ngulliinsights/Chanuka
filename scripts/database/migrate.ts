@@ -5,7 +5,7 @@ const { Pool } = pkg;
 import * as fs from 'fs';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 // Load environment variables
 dotenv.config();

@@ -5,7 +5,7 @@ import { createRateLimitFactory } from '../rate-limiting';
 import { Logger } from '../logging/logger';
 import { ValidationService } from '../validation/validation-service';
 import type { BenchmarkComponents, BenchmarkConfig } from '../testing/performance-benchmarks';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 describe('Core Utilities Performance Benchmarks', () => {
   let benchmarks: PerformanceBenchmarks;

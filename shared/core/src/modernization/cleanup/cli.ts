@@ -2,7 +2,7 @@
 
 import { CleanupOrchestrator } from './orchestrator';
 import { CleanupExecutor } from './executor';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 async function main() {
   const args = process.argv.slice(2);

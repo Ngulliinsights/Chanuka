@@ -22,7 +22,7 @@
     "migrate:status": "tsx server/scripts/migration-runner.ts status",
     "migrate:validate": "tsx server/scripts/migration-runner.ts validate",
     "migrate:create": "tsx server/scripts/migration-runner.ts create",
-    "test": "npm run test:backend && npm run test:frontend",
+    "test": "npm run test:backend && npm run test:frontend && npm run test:e2e",
     "test:backend": "jest --config jest.backend.config.js --runInBand",
     "test:backend:watch": "jest --config jest.backend.config.js --watch --runInBand",
     "test:backend:coverage": "jest --config jest.backend.config.js --coverage --runInBand",
@@ -36,9 +36,21 @@
     "test:frontend-serving": "node scripts/testing/run-frontend-serving-tests.js",
     "test:frontend-serving:server": "jest --config jest.config.js --testPathPattern=frontend-serving --runInBand",
     "test:frontend-serving:client": "vitest run client/src/__tests__/integration/",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:headed": "playwright test --headed",
+    "test:api": "playwright test --project=api",
+    "test:performance": "playwright test tests/performance",
+    "test:performance:db": "playwright test --project=database-performance",
+    "test:integration": "playwright test --project=integration",
+    "test:visual": "playwright test --grep @visual",
+    "test:migration": "npm run test:performance:db && npm run test:integration && npm run test:api",
     "analyze:bundle": "webpack-bundle-analyzer dist/public/assets/*.js",
     "analyze:bundle:advanced": "node scripts/analyze-bundle.js",
-    "analyze:bundle:open": "node scripts/analyze-bundle.js --open"
+    "analyze:bundle:open": "node scripts/analyze-bundle.js --open",
+    "setup:playwright": "node scripts/setup-playwright.js",
+    "test:strategic": "node scripts/run-strategic-tests.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -106,6 +118,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@playwright/test": "^1.48.0",
     "@tailwindcss/typography": "^0.5.15",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",

@@ -22,7 +22,7 @@ export { DemoDataService } from './demo-data';
 // Core Services
 export { databaseService } from './database/database-service';
 export { cacheService } from './cache/cache-service';
-export { logger } from '../../shared/core/src/utils/logger';
+export { logger } from '../../shared/core/src/observability/logging';
 
 
 

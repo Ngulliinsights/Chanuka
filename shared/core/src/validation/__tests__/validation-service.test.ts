@@ -8,8 +8,8 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ValidationService } from '../validation-service';
 import { z } from 'zod';
-import { ValidationError } from '../types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { ValidationError } from '../../observability/error-management';
+import { logger } from '../../observability/logging';
 
 describe('ValidationService', () => {
   let validationService: ValidationService;

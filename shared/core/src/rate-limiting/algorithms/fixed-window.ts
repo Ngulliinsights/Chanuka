@@ -7,7 +7,7 @@
 
 import { Redis } from 'ioredis';
 import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 export class FixedWindowStore implements RateLimitStore {
   private readonly luaScript = `

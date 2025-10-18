@@ -1,4 +1,4 @@
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../core/src/observability/logging';
 import { databaseMonitor } from './monitoring.js';
 import { setupGlobalErrorHandlers } from '../utils/error-handler.js';
 import { monitorPoolHealth } from './pool.js';

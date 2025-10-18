@@ -6,7 +6,7 @@
  */
 
 import { z } from 'zod';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 // Enhanced schema with comprehensive validation
 export const configSchema = z.object({

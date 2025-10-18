@@ -1,7 +1,7 @@
 import { PoolClient, QueryResult as PgQueryResult, QueryResultRow } from 'pg';
 import { AsyncLocalStorage } from 'async_hooks';
 import { connectionManager } from './connection-manager';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 import { getMonitoringService } from '../../monitoring/monitoring';
 
 /**

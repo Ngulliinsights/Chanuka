@@ -16,7 +16,7 @@ import { AnalysisEngine } from './analysis';
 import { BackupManager } from './backup';
 import { ProgressTracker } from './progress';
 import { ValidationFramework } from './validation';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 export interface ModernizationOrchestratorOptions {
   config?: Partial<ModernizationConfig>;

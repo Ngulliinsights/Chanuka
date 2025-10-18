@@ -1,5 +1,5 @@
 import { beforeAll, afterAll, beforeEach, afterEach, jest, expect } from '@jest/globals';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 // Global test setup
 beforeAll(async () => {

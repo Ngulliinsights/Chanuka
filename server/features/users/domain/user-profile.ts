@@ -4,7 +4,7 @@ import { eq, and, desc, sql, count } from 'drizzle-orm';
 import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../../infrastructure/cache/cache-service';
 import { databaseService } from '../../../infrastructure/database/database-service';
 import { z } from 'zod';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 // Data validation schemas
 const userProfileDataSchema = z.object({

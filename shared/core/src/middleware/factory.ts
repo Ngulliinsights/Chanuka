@@ -15,7 +15,7 @@ import { CacheMiddlewareProvider } from './cache/provider';
 import { ValidationMiddlewareProvider } from './validation/provider';
 import { RateLimitMiddlewareProvider } from './rate-limit/provider';
 import { ErrorHandlerMiddlewareProvider } from './error-handler/provider';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 // Core interfaces for middleware configuration
 interface MiddlewareFeature {

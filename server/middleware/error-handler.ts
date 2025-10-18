@@ -1,7 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiResponseWrapper, ErrorCodes, HttpStatus } from '../utils/api-response.js';
 import { errorTracker } from '../core/errors/error-tracker.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
+import { 
+  BaseError, 
+  ValidationError, 
+  NotFoundError, 
+  UnauthorizedError, 
+  ForbiddenError, 
+  DatabaseError,
+  TooManyRequestsError,
+  ErrorDomain,
+  ErrorSeverity
+} from '../../shared/core/src/observability/error-management';
 
 // Type definitions for better type safety
 type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
@@ -16,31 +27,8 @@ interface ErrorContext {
   details?: any;
 }
 
-// Custom application error class with enhanced type safety
-export class AppError extends Error {
-  public readonly statusCode: number;
-  public readonly code: string;
-  public readonly details?: any;
-  public readonly isOperational: boolean;
-
-  constructor(
-    message: string, 
-    statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR, 
-    code: string = ErrorCodes.GENERIC_ERROR, 
-    details?: any,
-    isOperational: boolean = true
-  ) {
-    super(message);
-    this.statusCode = statusCode;
-    this.code = code;
-    this.details = details;
-    this.isOperational = isOperational;
-    this.name = 'AppError';
-    
-    // Maintains proper stack trace for where error was thrown (V8 engines only)
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
+// Use the unified BaseError from error management system
+export { BaseError as AppError } from '../../shared/core/src/observability/error-management';
 
 /**
  * Determines the severity level based on HTTP status code
@@ -65,85 +53,67 @@ function getCategoryFromErrorCode(code: string): ErrorCategory {
 }
 
 /**
- * Analyzes error patterns to determine context for unhandled errors
- * This is our safety net for errors we haven't explicitly categorized
+ * Converts generic errors to BaseError instances
+ * This leverages the unified error management system
  */
-function analyzeUnhandledError(error: Error): ErrorContext {
+function convertToBaseError(error: Error): BaseError {
+  if (error instanceof BaseError) {
+    return error;
+  }
+
   const errorMessage = error.message.toLowerCase();
   
   // Database-related errors
   if (errorMessage.includes('duplicate key') || errorMessage.includes('unique constraint')) {
-    return {
-      severity: 'medium',
-      category: 'database',
+    return new BaseError('Resource already exists', {
       statusCode: HttpStatus.CONFLICT,
       code: 'DUPLICATE_ENTRY',
-      message: 'Resource already exists'
-    };
+      domain: ErrorDomain.DATABASE,
+      severity: ErrorSeverity.MEDIUM,
+      cause: error
+    });
   }
   
   if (errorMessage.includes('not found') || errorMessage.includes('does not exist')) {
-    return {
-      severity: 'low',
-      category: 'database',
-      statusCode: HttpStatus.NOT_FOUND,
-      code: ErrorCodes.NOT_FOUND,
-      message: 'Resource not found'
-    };
+    return new NotFoundError('Resource not found', undefined, { cause: error });
   }
   
   if (errorMessage.includes('connection') || errorMessage.includes('econnrefused')) {
-    return {
-      severity: 'critical',
-      category: 'database',
-      statusCode: HttpStatus.SERVICE_UNAVAILABLE,
-      code: ErrorCodes.DATABASE_ERROR,
-      message: 'Database connection failed'
-    };
+    return new DatabaseError('Database connection failed', undefined, { 
+      severity: ErrorSeverity.CRITICAL,
+      cause: error 
+    });
   }
   
   // Rate limiting errors
   if (errorMessage.includes('rate limit') || errorMessage.includes('too many requests')) {
-    return {
-      severity: 'medium',
-      category: 'system',
-      statusCode: HttpStatus.TOO_MANY_REQUESTS,
-      code: ErrorCodes.RATE_LIMIT_EXCEEDED,
-      message: 'Rate limit exceeded'
-    };
+    return new TooManyRequestsError('Rate limit exceeded', undefined, { cause: error });
   }
   
   // JWT and authentication errors
   if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-    return {
-      severity: 'medium',
-      category: 'authentication',
-      statusCode: HttpStatus.UNAUTHORIZED,
-      code: ErrorCodes.UNAUTHORIZED,
-      message: 'Invalid or expired token'
-    };
+    return new UnauthorizedError('Invalid or expired token', { cause: error });
   }
   
   // Validation errors
   if (error.name === 'ValidationError' || error.name === 'ZodError') {
-    return {
-      severity: 'medium',
-      category: 'validation',
-      statusCode: HttpStatus.BAD_REQUEST,
-      code: ErrorCodes.VALIDATION_ERROR,
-      message: 'Validation failed',
-      details: error.message
-    };
+    return new ValidationError('Validation failed', undefined, { 
+      details: error.message,
+      cause: error 
+    });
   }
   
   // Default case for truly unexpected errors
-  return {
-    severity: 'high',
-    category: 'system',
-    statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-    code: ErrorCodes.GENERIC_ERROR,
-    message: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
-  };
+  return new BaseError(
+    process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
+    {
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      code: ErrorCodes.GENERIC_ERROR,
+      domain: ErrorDomain.SYSTEM,
+      severity: ErrorSeverity.HIGH,
+      cause: error
+    }
+  );
 }
 
 /**
@@ -195,44 +165,56 @@ export function errorHandler(
   next: NextFunction
 ): void {
   const startTime = Date.now();
-  let context: ErrorContext;
   
-  // Handle our custom AppError instances with known context
-  if (error instanceof AppError) {
-    context = {
-      severity: getSeverityFromStatusCode(error.statusCode),
-      category: getCategoryFromErrorCode(error.code),
-      statusCode: error.statusCode,
-      code: error.code,
-      message: error.message,
-      details: error.details
-    };
-  } else {
-    // For unknown errors, analyze and determine appropriate context
-    context = analyzeUnhandledError(error);
-  }
+  // Convert to BaseError using unified system
+  const baseError = convertToBaseError(error);
+  
+  // Add request context to error
+  const enhancedError = new BaseError(baseError.message, {
+    ...baseError,
+    correlationId: req.headers['x-correlation-id'] as string || baseError.metadata.correlationId,
+    context: {
+      ...baseError.metadata.context,
+      requestPath: req.path,
+      requestMethod: req.method,
+      userAgent: req.headers['user-agent'],
+      ip: req.ip,
+      requestId: req.headers['x-request-id'] as string
+    }
+  });
   
   // Log the error with full context for debugging
-  logError(error, req, context);
+  logger.error('Request error handled', {
+    component: 'ErrorHandler',
+    errorId: enhancedError.errorId,
+    path: req.path,
+    method: req.method,
+    statusCode: enhancedError.statusCode,
+    severity: enhancedError.metadata.severity,
+    domain: enhancedError.metadata.domain
+  });
   
   // Track the error in our monitoring system
-  errorTracker.trackRequestError(error, req, context.severity, context.category);
+  const severity = enhancedError.metadata.severity as 'low' | 'medium' | 'high' | 'critical';
+  const category = enhancedError.metadata.domain as 'database' | 'authentication' | 'validation' | 'external_api' | 'system' | 'business_logic';
+  errorTracker.trackRequestError(enhancedError, req, severity, category);
   
-  // Create metadata only after we've done all the processing
-  // This is more efficient as metadata creation involves timestamp calculations
+  // Create metadata for response
   const metadata = ApiResponseWrapper.createMetadata(startTime, undefined, {
-    requestId: typeof req.headers['x-request-id'] === 'string' ? req.headers['x-request-id'] : undefined
+    requestId: enhancedError.metadata.context?.requestId,
+    correlationId: enhancedError.metadata.correlationId
   });
   
   // Send the standardized error response
   ApiResponseWrapper.error(
     res,
     {
-      code: context.code,
-      message: context.message,
-      details: context.details
+      code: enhancedError.code,
+      message: enhancedError.getUserMessage(),
+      details: enhancedError.details,
+      errorId: enhancedError.errorId
     },
-    context.statusCode,
+    enhancedError.statusCode,
     metadata
   );
 }
@@ -250,51 +232,31 @@ export const createError = (
   return new AppError(message, statusCode, code, details);
 };
 
-// Convenience factory functions for common error scenarios
-// These make your code more readable: throw NotFoundError('User') vs throw new AppError(...)
+// Re-export convenience functions from unified error management
+export { 
+  NotFoundError, 
+  ValidationError, 
+  UnauthorizedError, 
+  ForbiddenError, 
+  DatabaseError,
+  TooManyRequestsError as RateLimitError
+} from '../../shared/core/src/observability/error-management';
 
-export const NotFoundError = (resource: string = 'Resource'): AppError => 
-  new AppError(
-    `${resource} not found`, 
-    HttpStatus.NOT_FOUND, 
-    ErrorCodes.NOT_FOUND
-  );
-
-export const ValidationError = (details: any): AppError => 
-  new AppError(
-    'Validation failed', 
-    HttpStatus.BAD_REQUEST, 
-    ErrorCodes.VALIDATION_ERROR, 
-    details
-  );
-
-export const UnauthorizedError = (message: string = 'Unauthorized access'): AppError => 
-  new AppError(
-    message, 
-    HttpStatus.UNAUTHORIZED, 
-    ErrorCodes.UNAUTHORIZED
-  );
-
-export const ForbiddenError = (message: string = 'Access forbidden'): AppError => 
-  new AppError(
-    message, 
-    HttpStatus.FORBIDDEN, 
-    ErrorCodes.FORBIDDEN
-  );
-
-export const DatabaseError = (message: string = 'Database operation failed'): AppError => 
-  new AppError(
-    message, 
-    HttpStatus.INTERNAL_SERVER_ERROR, 
-    ErrorCodes.DATABASE_ERROR
-  );
-
-export const RateLimitError = (message: string = 'Rate limit exceeded'): AppError =>
-  new AppError(
-    message,
-    HttpStatus.TOO_MANY_REQUESTS,
-    ErrorCodes.RATE_LIMIT_EXCEEDED
-  );
+// Legacy factory function for backward compatibility
+export const createError = (
+  message: string, 
+  statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR, 
+  code: string = ErrorCodes.GENERIC_ERROR, 
+  details?: any
+): BaseError => {
+  return new BaseError(message, {
+    statusCode,
+    code,
+    details,
+    domain: ErrorDomain.SYSTEM,
+    severity: statusCode >= 500 ? ErrorSeverity.HIGH : ErrorSeverity.MEDIUM
+  });
+};
 
 
 

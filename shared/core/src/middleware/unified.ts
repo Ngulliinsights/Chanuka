@@ -15,7 +15,7 @@ import { createHealthEndpoints } from '../health';
 import { Logger } from '../logging';
 import { ValidationService } from '../validation';
 import { getDefaultCache } from '../cache';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 export interface UnifiedMiddlewareConfig {
   // Rate limiting configuration

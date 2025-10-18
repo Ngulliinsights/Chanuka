@@ -4,7 +4,7 @@ import ws from "ws";
 import * as fs from 'fs';
 import * as path from 'path';
 import { createHash } from 'crypto';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 // Load environment variables
 dotenv.config();

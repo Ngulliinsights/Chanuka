@@ -1,7 +1,7 @@
 import { MiddlewareProvider } from '../types';
 import { CacheService } from '../../services/cache';
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 export class CacheMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'cache';

@@ -94,7 +94,7 @@ export class MigrationValidator {
       this.testImport('Cache Module', () => import('../cache')),
       this.testImport('Logging Module', () => import('../logging')),
       this.testImport('Validation Module', () => import('../validation')),
-      this.testImport('Error Handling Module', () => import('../error-handling')),
+      this.testImport('Error Management Module', () => import('../observability/error-management')),
       this.testImport('Rate Limiting Module', () => import('../rate-limiting')),
       this.testImport('Health Module', () => import('../health')),
       this.testImport('Middleware Module', () => import('../middleware'))

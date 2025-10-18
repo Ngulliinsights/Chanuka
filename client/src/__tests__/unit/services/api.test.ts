@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import * as api from '../../../services/api';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../../../shared/core/src/observability/logging';
 
 // Mock fetch
 const mockFetch = vi.fn();

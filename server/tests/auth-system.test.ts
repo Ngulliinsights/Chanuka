@@ -6,7 +6,7 @@ import { getEmailService } from '../infrastructure/notifications/email-service';
 import { database as db, users, sessions, passwordResets } from '../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import { router as authRouter } from '../core/auth/auth.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 // Create test app
 const app = express();

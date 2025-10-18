@@ -5,7 +5,7 @@
  */
 
 import { CacheService, CacheEntry, CacheOptions } from './types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 // Re-export the new legacy adapters
 export { LegacyCacheService, cacheService } from './legacy-adapters/cache-service-adapter';

@@ -8,7 +8,7 @@
 import { SingleFlightCache } from '../single-flight-cache';
 import { MemoryAdapter } from '../adapters/memory-adapter';
 import type { CacheService } from '../types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 describe('SingleFlightCache Integration', () => {
   let memoryAdapter: MemoryAdapter;

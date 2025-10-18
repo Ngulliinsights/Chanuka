@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 interface User {
   id: string;

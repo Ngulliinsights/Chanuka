@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { NavigationPreferences } from '@/types/navigation';
 

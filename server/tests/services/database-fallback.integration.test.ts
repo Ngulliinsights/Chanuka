@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { demoDataService } from '../../infrastructure/demo-data.js';
 import { DatabaseFallbackService } from '../../infrastructure/database/database-fallback.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 // Mock database connection
 const mockDatabase = {

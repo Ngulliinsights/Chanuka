@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import { LoadTester } from '../../shared/core/src/testing/load-tester';
 import type { CacheService } from '../../caching/core/interfaces';
 import type { RateLimitStore } from '../../shared/core/src/rate-limiting/types';
-import type { UnifiedLogger } from '../../shared/core/src/logging/logger';
+import type { UnifiedLogger } from '../observability/logging/logger';
 import type { ValidationService } from '../../shared/core/src/validation/validation-service';
 
 /**

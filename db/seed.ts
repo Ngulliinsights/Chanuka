@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import { db } from './index';
-import { logger } from '../shared/core/src/logging';
+import { logger } from '../shared/core/src/observability/logging';
 import {
   user,
   bill,

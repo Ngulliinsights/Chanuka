@@ -6,7 +6,7 @@
  */
 
 import { logger as coreLogger } from '../logger';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 interface LegacyLogger {
   info: (message: string, ...args: unknown[]) => void;

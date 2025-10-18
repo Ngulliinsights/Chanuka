@@ -7,8 +7,8 @@
 import { ZodSchema, ZodError } from 'zod';
 import crypto from 'crypto';
 import { logger } from '../../../utils/logger';
+import { ValidationError } from '../observability/error-management';
 import {
-  ValidationError,
   ValidationOptions,
   ValidationResult,
   BatchValidationResult,
@@ -168,7 +168,7 @@ export class ValidationService {
 
     } catch (error) {
       if (error instanceof ZodError) {
-        const validationError = new ValidationError(error);
+        const validationError = new ValidationError('Validation failed', error.errors);
         
         // Cache validation error
         if (mergedOptions.useCache && this.config.cache?.enabled) {
@@ -233,7 +233,7 @@ export class ValidationService {
 
     } catch (error) {
       if (error instanceof ZodError) {
-        const validationError = new ValidationError(error);
+        const validationError = new ValidationError('Validation failed', error.errors);
         const errorResult = { success: false, error: validationError } as ValidationResult<T>;
         
         // Cache validation error
@@ -247,11 +247,14 @@ export class ValidationService {
       }
       
       // Convert non-validation errors to ValidationError
-      const validationError = new ValidationError(new ZodError([{
-        code: 'custom',
-        message: error instanceof Error ? error.message : 'Unknown validation error',
-        path: [],
-      }]));
+      const validationError = new ValidationError(
+        error instanceof Error ? error.message : 'Unknown validation error',
+        [{
+          code: 'custom',
+          message: error instanceof Error ? error.message : 'Unknown validation error',
+          path: [],
+        }]
+      );
       const errorResult = { success: false, error: validationError } as ValidationResult<T>;
       
       this.updateMetrics('failure', startTime, context, validationError);
@@ -297,7 +300,7 @@ export class ValidationService {
         }
       } else {
         // Handle promise rejection (shouldn't happen with validateSafe, but just in case)
-        const error = new ValidationError(new ZodError([{
+        const error = new ValidationError('Batch validation promise rejected', [{
           code: 'custom',
           message: 'Batch validation promise rejected',
           path: [],

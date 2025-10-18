@@ -9,7 +9,7 @@ import { router as healthRouter } from '../../infrastructure/monitoring/health.j
 import { database as db, users, bills, sponsors } from '../../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 describe('Comprehensive API Integration Tests', () => {
   let app: express.Application;

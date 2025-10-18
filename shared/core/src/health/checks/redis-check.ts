@@ -7,7 +7,7 @@
 
 import { Redis, Cluster } from 'ioredis';
 import { HealthCheck, HealthResult, HealthStatus } from '../types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 export interface RedisHealthConfig {
   maxLatencyMs?: number;

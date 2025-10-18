@@ -7,7 +7,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { LoadTester } from '../load-tester';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 describe('LoadTester', () => {
   let loadTester: LoadTester;

@@ -1,6 +1,6 @@
 import { calculateRelatedPages, getContextualSuggestions } from '../related-pages-calculator';
 import { UserRole } from '@/types/navigation';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../../../shared/core/src/observability/logging';
 
 describe('related-pages-calculator', () => {
   describe('calculateRelatedPages', () => {

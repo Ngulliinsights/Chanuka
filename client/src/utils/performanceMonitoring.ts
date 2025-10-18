@@ -1,5 +1,5 @@
 // Performance monitoring utilities for the Chanuka platform
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 export interface PerformanceMetrics {
   // Core Web Vitals

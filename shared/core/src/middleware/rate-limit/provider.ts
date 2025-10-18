@@ -1,7 +1,7 @@
 import { MiddlewareProvider } from '../types';
 import { RateLimitStore } from '../../services/rate-limit';
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 export class RateLimitMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'rateLimit';

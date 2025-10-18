@@ -5,7 +5,7 @@ import * as jwt from 'jsonwebtoken';
 import { database as db } from '../../shared/database/connection.js';
 import { users } from '../../shared/schema.js';
 import { eq } from 'drizzle-orm';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 // ============================================================================
 // TYPE DEFINITIONS

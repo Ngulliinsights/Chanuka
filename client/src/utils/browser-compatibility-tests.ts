@@ -6,7 +6,7 @@
  */
 
 import { getBrowserInfo, featureDetector } from './browser-compatibility';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 export interface CompatibilityTestResult {
   testName: string;

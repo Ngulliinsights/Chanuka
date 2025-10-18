@@ -12,7 +12,7 @@ import {
 } from "@shared/schema.js";
 import { eq, desc, and, or, like, sql, count, SQL } from "drizzle-orm";
 import { database as db } from "../../../shared/database/connection.js";
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 export interface UnifiedStorage {
   // Bill operations

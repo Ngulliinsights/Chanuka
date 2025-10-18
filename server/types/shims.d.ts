@@ -1,6 +1,11 @@
-declare module '@shared/core/src/logging' {
+declare module '@shared/core/src/observability/logging' {
   export const logger: any;
   export default logger;
+}
+
+// Legacy compatibility - redirect to new location
+declare module '@shared/core/src/logging' {
+  export * from '@shared/core/src/observability/logging';
 }
 
 declare module '@shared/*' {

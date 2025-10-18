@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { HealthChecker } from '../health-checker';
 import type { HealthCheck, HealthResult } from '../types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 describe('HealthChecker', () => {
   let healthChecker: HealthChecker;

@@ -3,7 +3,7 @@ import { regulatoryChangeMonitoringService } from '../features/analytics/regulat
 import { z } from 'zod'; // For runtime validation
 import { errorTracker } from '../core/errors/error-tracker.js';
 import { ApiResponseWrapper } from '../utils/api-response.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 const router = Router();
 

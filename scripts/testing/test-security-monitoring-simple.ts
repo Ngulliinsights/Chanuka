@@ -1,5 +1,5 @@
 import { intrusionDetectionService } from './services/intrusion-detection-service.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 /**
  * Simplified test script to verify security monitoring functionality without database

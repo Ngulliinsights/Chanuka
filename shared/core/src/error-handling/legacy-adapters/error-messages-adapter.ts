@@ -6,7 +6,7 @@
  */
 
 import { ErrorCode } from '../../../../src/shared/error-handling/constants/error-codes';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 /**
  * User-friendly error messages mapped to error codes

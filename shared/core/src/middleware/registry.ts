@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { correlationIdMiddleware } from '../utils/correlation-id';
 import { MiddlewareFactory } from './factory';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 export class MiddlewareRegistry {
   private middlewares: ((app: any) => void)[] = [];

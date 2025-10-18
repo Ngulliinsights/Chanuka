@@ -19,7 +19,7 @@ import {
   AICacheEntry
 } from '../ai-cache';
 import { CacheService } from '../types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 describe('AI Cache', () => {
   let mockBaseCache: CacheService;

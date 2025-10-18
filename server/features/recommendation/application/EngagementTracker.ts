@@ -1,6 +1,6 @@
  import { RecommendationRepository } from '../infrastructure/RecommendationRepository';
 import { RecommendationCache } from '../infrastructure/RecommendationCache';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 const repo = new RecommendationRepository();
 const cache = new RecommendationCache();

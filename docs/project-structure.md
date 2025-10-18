@@ -514,6 +514,7 @@ generate-structure-to-file.sh
 jest.backend.config.js
 jest.client.config.js
 jest.config.js
+LOGGING_MIGRATION_SUMMARY.md
 logs/
 ├── logger_errors.txt
 ├── logger_files.txt
@@ -539,6 +540,8 @@ migration/
 nginx.conf
 package.json
 package-lock.json
+playwright.config.ts
+PLAYWRIGHT_MIGRATION_GUIDE.md
 postcss.config.js
 scripts/
 ├── analyze-bundle.js
@@ -554,6 +557,8 @@ scripts/
 │   ├── deploy.sh
 ├── drop-schema.ts
 ├── migrate-console-logs.ts
+├── run-strategic-tests.js
+├── setup-playwright.js
 ├── test-backend-only.js
 ├── testing/
 │   ├── bug-detector.ts
@@ -1010,6 +1015,8 @@ server/
 │   │   ├── external-api-management.test.ts
 │   ├── setup.ts
 │   ├── sponsor-conflict-analysis.test.ts
+│   ├── test-migrations/
+│   │   ├── 0001_test.sql
 │   ├── unit/
 │   │   ├── auth-service.test.ts
 │   │   ├── database-service.test.ts
@@ -1057,6 +1064,7 @@ server/
 ├── vite.ts
 shared/
 ├── core/
+│   ├── CONSOLIDATION_PLAN.md
 │   ├── MIGRATION_GUIDE.md
 │   ├── MIGRATION_VALIDATION_REPORT.md
 │   ├── package.json
@@ -1287,13 +1295,33 @@ shared/
 │   │   │   │   ├── logging.test.ts
 │   │   │   │   ├── metrics.test.ts
 │   │   │   │   ├── tracing.test.ts
+│   │   │   ├── error-management/
+│   │   │   │   ├── __tests__/
+│   │   │   │   ├── errors/
+│   │   │   │   │   ├── base-error.ts
+│   │   │   │   │   ├── specialized-errors.ts
+│   │   │   │   ├── handlers/
+│   │   │   │   │   ├── error-boundary.tsx
+│   │   │   │   │   ├── error-handler-chain.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── legacy-adapters/
+│   │   │   │   │   ├── error-handling-adapter.ts
+│   │   │   │   │   ├── errors-adapter.ts
+│   │   │   │   ├── middleware/
+│   │   │   │   │   ├── express-error-middleware.ts
+│   │   │   │   ├── patterns/
+│   │   │   │   │   ├── circuit-breaker.ts
+│   │   │   │   │   ├── retry-patterns.ts
+│   │   │   │   ├── types.ts
 │   │   │   ├── health/
 │   │   │   │   ├── checks.ts
 │   │   │   │   ├── health-checker.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── types.ts
 │   │   │   ├── index.ts
+│   │   │   ├── legacy-adapters/
 │   │   │   ├── legacy-adapters.ts
+│   │   │   │   ├── logging-migration-adapter.ts
 │   │   │   ├── logging/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── logger.ts
@@ -1492,8 +1520,27 @@ shared/
 │   ├── errors.ts
 │   ├── expert.ts
 │   ├── legal-analysis.ts
+STRATEGIC_MIGRATION_RESULTS.md
 tailwind.config.ts
 TESTING_GUIDE.md
+tests/
+├── api/
+│   ├── auth.spec.ts
+│   ├── database-performance.spec.ts
+│   ├── external-api-integration.spec.ts
+├── e2e/
+│   ├── auth-flow.spec.ts
+│   ├── database-performance-ui.spec.ts
+├── global-setup.ts
+├── global-teardown.ts
+├── integration/
+│   ├── slow-query-monitoring.spec.ts
+├── performance/
+│   ├── memory-profiling.spec.ts
+├── utils/
+│   ├── test-helpers.ts
+├── visual/
+│   ├── components.spec.ts
 tools/
 ├── validate-schema-congruence.ts
 tsconfig.json
@@ -1505,4 +1552,4 @@ vitest.frontend.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-18 08:46:45
+Generated on: 2025-10-18 16:01:58

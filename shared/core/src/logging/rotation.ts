@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import zlib from 'zlib';
 import { promisify } from 'util';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 const mkdir = promisify(fs.mkdir);
 const readdir = promisify(fs.readdir);

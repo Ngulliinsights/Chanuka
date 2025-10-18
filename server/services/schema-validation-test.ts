@@ -5,7 +5,7 @@
  */
 
 import { schemaValidationService } from '@shared/schema.js';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
 
 async function testSchemaValidation() {
   logger.info('🔍 Testing Schema Validation Service...\n', { component: 'Chanuka' });

@@ -6,7 +6,7 @@
  */
 
 import { z } from 'zod';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '../../observability/logging';
 
 /**
  * Email validation with comprehensive security checks

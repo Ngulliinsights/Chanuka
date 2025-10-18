@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MiddlewareFactory } from '../factory';
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 describe('MiddlewareFactory', () => {
   let middlewareFactory: MiddlewareFactory;

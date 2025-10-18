@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { offlineDataManager, cacheInvalidation } from '@/utils/apiCache';
 import { addNetworkStatusListener, isOnline } from '@/utils/serviceWorker';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 export interface OfflineState {
   isOnline: boolean;

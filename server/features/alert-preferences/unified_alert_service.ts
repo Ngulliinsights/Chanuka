@@ -6,7 +6,7 @@ import { userProfileService } from '../users/domain/user-profile';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service';
 import * as schema from '@shared/schema';
 import { z } from 'zod';
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 // ============================================================================
 // TYPE DEFINITIONS

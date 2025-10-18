@@ -1,5 +1,5 @@
 import { db } from "../server/db";
-import { logger } from '../shared/core/src/logging';
+import { logger } from '../shared/core/src/observability/logging';
 import {
   user, bill, sponsor, billSponsorship, billComment,
   userProfile, analysis, sponsorAffiliation, sponsorTransparency,

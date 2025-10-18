@@ -1,61 +1,46 @@
 import { NextFunction, Request, Response } from 'express';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../shared/core/src/observability/logging';
+import { 
+  BaseError,
+  ValidationError as BaseValidationError,
+  NotFoundError as BaseNotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  ConflictError as BaseConflictError,
+  DatabaseError as BaseDatabaseError,
+  ErrorDomain,
+  ErrorSeverity
+} from '../../shared/core/src/observability/error-management';
+
+// Re-export the unified error classes
+export { 
+  BaseError as AppError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  ConflictError,
+  DatabaseError
+} from '../../shared/core/src/observability/error-management';
 
 /**
- * Base error class for authentication related errors
+ * Authentication error - extends UnauthorizedError
  */
-export class AppError extends Error {
-  statusCode: number;
-  code?: string;
-  details?: Record<string, unknown>;
-
-  constructor(
-    message: string,
-    statusCode: number,
-    code?: string,
-    details?: Record<string, unknown>,
-  ) {
-    super(message);
-    this.name = 'AppError';
-    this.statusCode = statusCode;
-    this.code = code;
-    this.details = details;
-
-    // Capture stack trace
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
-
-export class AuthError extends AppError {
+export class AuthError extends UnauthorizedError {
   constructor(
     message: string,
     statusCode = 401,
     code = 'AUTH_ERROR',
     details?: Record<string, unknown>,
   ) {
-    super(message, statusCode, code, details);
+    super(message, { 
+      statusCode, 
+      code, 
+      details,
+      domain: ErrorDomain.AUTHENTICATION,
+      severity: ErrorSeverity.MEDIUM
+    });
     this.name = 'AuthError';
-  }
-}
-
-export class ValidationError extends AppError {
-  constructor(message: string, details?: Record<string, unknown>, code = 'VALIDATION_ERROR') {
-    super(message, 400, code, details);
-    this.name = 'ValidationError';
-  }
-}
-
-export class NotFoundError extends AppError {
-  constructor(message: string, details?: Record<string, unknown>, code = 'NOT_FOUND') {
-    super(message, 404, code, details);
-    this.name = 'NotFoundError';
-  }
-}
-
-export class ConflictError extends AppError {
-  constructor(message: string, details?: Record<string, unknown>, code = 'CONFLICT') {
-    super(message, 409, code, details);
-    this.name = 'ConflictError';
   }
 }
 
@@ -71,9 +56,10 @@ export class InvalidCredentialsError extends AuthError {
 /**
  * Error when user already exists during registration
  */
-export class UserExistsError extends AuthError {
+export class UserExistsError extends BaseConflictError {
   constructor(message = 'User already exists') {
-    super(message, 409, 'ALREADY_EXISTS');
+    super(message, 'user', { code: 'ALREADY_EXISTS' });
+    this.name = 'UserExistsError';
   }
 }
 
@@ -87,19 +73,12 @@ export class OAuthError extends AuthError {
   }
 }
 
-export class DatabaseError extends AppError {
-  constructor(message: string, details?: Record<string, unknown>, code = 'DATABASE_ERROR') {
-    super(message, 500, code, details);
-    this.name = 'DatabaseError';
-  }
-}
-
 /**
  * Error for when a sponsor is not found in the database
  */
-export class SponsorNotFoundError extends NotFoundError {
+export class SponsorNotFoundError extends BaseNotFoundError {
   constructor(message = 'Sponsor not found') {
-    super(message, undefined, 'SPONSOR_NOT_FOUND');
+    super('sponsor', undefined, { code: 'SPONSOR_NOT_FOUND' });
     this.name = 'SponsorNotFoundError';
   }
 }

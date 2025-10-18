@@ -6,7 +6,7 @@
  */
 
 import type { AppConfig } from '../config/types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../observability/logging';
 
 /**
  * Legacy Cache Adapter

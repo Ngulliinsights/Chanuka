@@ -17,7 +17,7 @@ import BrowserCompatibilityChecker from "@/components/compatibility/BrowserCompa
 import PerformanceMetricsCollector from "@/components/performance/PerformanceMetricsCollector";
 import { Suspense, useEffect } from "react";
 import { useComprehensiveLoading } from "@/hooks/useComprehensiveLoading";
-import { logger } from '@shared/core/src/logging';
+import { logger } from '@shared/core/src/observability/logging';
 import {
   SafeLazyPages,
   SafeLazySponsorshipPages,

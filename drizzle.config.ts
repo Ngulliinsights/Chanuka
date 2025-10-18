@@ -6,7 +6,7 @@ if (!process.env.DATABASE_URL) {
 
 // Diagnostic logging for SSL authentication debugging
 // DEPRECATED: Use shared/core logger instead
-// import { logger } from './shared/core/src/logging';
+// import { logger } from './shared/core/src/observability/logging';
 // logger.info('🔍 Drizzle Config Diagnostics:', { component: 'Chanuka' });
 // logger.info('NODE_ENV:', { component: 'Chanuka' }, process.env.NODE_ENV);
 // logger.info('DATABASE_URL exists:', { component: 'Chanuka' }, !!process.env.DATABASE_URL);

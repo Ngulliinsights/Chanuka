@@ -6,7 +6,7 @@
  */
 
 import { HealthCheck, HealthResult, HealthStatus } from '../types';
-import { logger } from '../../shared/core/src/utils/logger';
+import { logger } from '../../observability/logging';
 
 export interface MemoryHealthConfig {
   maxRssBytes?: number;
