@@ -1,6 +1,6 @@
 import { Event } from './schemas';
 import { loggingService } from './service';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 /**
  * Telemetry Aggregator

@@ -1,5 +1,5 @@
 import { beforeAll, afterAll, beforeEach, afterEach, jest, expect } from '@jest/globals';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 // Global test setup
 beforeAll(async () => {

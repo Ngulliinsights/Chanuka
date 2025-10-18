@@ -19,7 +19,7 @@ import { createCacheService } from '../cache';
 import { createRateLimitFactory } from '../rate-limiting';
 import { Logger } from '../logging/logger';
 import { ValidationService } from '../validation/validation-service';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 /**
  * Example: Complete performance testing workflow

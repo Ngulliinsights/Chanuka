@@ -31,7 +31,7 @@ import {
   MobileTabBar, 
   SwipeableHeader 
 } from '@/components/mobile/mobile-navigation-enhancements';
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 
 // Type definitions for better TypeScript safety
 interface User {

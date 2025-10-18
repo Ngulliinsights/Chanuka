@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 interface WebSocketMessage {
   type: 'connected' | 'subscribed' | 'unsubscribed' | 'bill_update' | 'notification' | 'error' | 'pong';

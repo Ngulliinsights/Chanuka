@@ -16,9 +16,11 @@ export interface RelatedPage {
   relevanceScore: number;
 }
 
-export type NavigationSection = 'legislative' | 'community' | 'user' | 'admin' | 'tools';
+export type NavigationSection = 'legislative' | 'community' | 'user' | 'admin' | 'tools' | 'system';
 
-export type UserRole = 'public' | 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate';
+// Include both 'citizen' and 'user' to remain compatible with different parts
+// of the codebase that use either term for an authenticated regular user.
+export type UserRole = 'public' | 'citizen' | 'user' | 'expert' | 'admin' | 'journalist' | 'advocate';
 
 export interface NavigationPreferences {
   defaultLandingPage: string;

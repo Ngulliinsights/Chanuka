@@ -22,9 +22,6 @@
     "client",
     "build",
     "dist",
-    "shared/core",
-    "shared/core/dist",
-    "shared/core/src",
     "server/tests",
     "**/*.test.ts",
     "**/*.spec.ts"

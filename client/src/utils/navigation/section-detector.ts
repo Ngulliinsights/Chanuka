@@ -1,5 +1,5 @@
 import { NavigationSection } from '@/types/navigation';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 /**
  * Determines the current navigation section based on the path

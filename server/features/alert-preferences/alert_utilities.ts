@@ -1,5 +1,5 @@
 import { unifiedAlertPreferenceService, AlertPreference, AlertType, Priority } from './unified_alert_service';
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 import { cacheService } from '../../../infrastructure/cache/cache-service';
 
 /**

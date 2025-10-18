@@ -3,7 +3,7 @@ import { billService } from './services/bill-service.js';
 import { webSocketService } from './services/websocket.js';
 import { db } from './db.js';
 import { users, bills } from '../shared/schema.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 async function verifyBillStatusMonitor() {
   logger.info('🔍 Verifying Real-Time Bill Status Update System...', { component: 'Chanuka' });

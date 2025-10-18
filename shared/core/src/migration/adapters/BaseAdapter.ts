@@ -1,6 +1,6 @@
 import { Logger } from '@/logging';
 import { MigrationMetrics } from '../monitoring/MigrationMetrics';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export type DualOperationOptions = {
   preferenceLegacy?: boolean;

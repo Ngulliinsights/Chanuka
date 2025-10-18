@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ApiResponseWrapper, ErrorCodes, HttpStatus } from '../utils/api-response.js';
 import { errorTracker } from '../core/errors/error-tracker.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 // Type definitions for better type safety
 type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 /**
  * @deprecated The `useSmoothTransition` hook is deprecated. Please use `useNavigationPerformance` for transition management.

@@ -7,7 +7,7 @@ import {
   type Bill,
 } from '@shared/schema';
 import { readDatabase } from '../../../infrastructure/database';
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 import { RecommendationEngine } from '../domain/RecommendationEngine';
 import { RecommendationValidator } from '../domain/RecommendationValidator';
 import { RecommendationRepository } from '../infrastructure/RecommendationRepository';

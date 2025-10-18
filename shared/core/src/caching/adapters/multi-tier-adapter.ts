@@ -1,13 +1,14 @@
 /**
  * Multi-Tier Cache Adapter
- *
+ * 
  * L1 (memory) + L2 (Redis) cache with automatic promotion and intelligent caching
  * Based on patterns from refined_cross_cutting.ts MultiTierCache
  */
 
-import { BaseCacheAdapter } from '../core/base-adapter';
+import { BaseCacheAdapter } from '../base-adapter';
 import { MemoryAdapter, type MemoryAdapterConfig } from './memory-adapter';
 import { RedisAdapter, type RedisAdapterConfig } from './redis-adapter';
+import { logger } from '../../utils/logger';
 import type {
   CacheOptions,
   CacheHealthStatus,
@@ -15,7 +16,7 @@ import type {
   CacheTierStats,
   PromotionStrategy,
   MultiTierOptions
-} from '../core/interfaces';
+} from '../types';
 
 export interface MultiTierAdapterConfig {
   l1Config: MemoryAdapterConfig;
@@ -79,7 +80,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
    */
   async connect(): Promise<void> {
     await this.l2Cache.connect();
-
+    
     if (this.enableL1Warmup) {
       await this.warmupL1Cache();
     }
@@ -113,10 +114,10 @@ export class MultiTierAdapter extends BaseCacheAdapter {
       const l2Result = await this.l2Cache.get<T>(key);
       if (l2Result !== null) {
         this.recordHit(key, 'L2');
-
+        
         // Consider promotion to L1
         await this.considerPromotion(key, l2Result);
-
+        
         return l2Result;
       }
 
@@ -134,23 +135,23 @@ export class MultiTierAdapter extends BaseCacheAdapter {
 
     return this.measureOperation(async () => {
       const size = this.calculateSize(value);
-
+      
       // Determine which tiers to use based on size and options
       const shouldUseL1 = this.shouldStoreInL1(size, { ttl: validatedTtl });
-
+      
       const promises: Promise<void>[] = [];
-
+      
       if (shouldUseL1) {
         // Store in L1 with shorter TTL (max 5 minutes)
         const l1Ttl = Math.min(validatedTtl || 300, 300);
         promises.push(this.l1Cache.set(key, value, l1Ttl));
       }
-
+      
       // Always store in L2
       promises.push(this.l2Cache.set(key, value, validatedTtl));
-
+      
       await Promise.all(promises);
-
+      
       this.recordSet(key, size, shouldUseL1 ? 'L1' : 'L2');
     }, 'set', key);
   }
@@ -167,10 +168,10 @@ export class MultiTierAdapter extends BaseCacheAdapter {
         this.l1Cache.del(key),
         this.l2Cache.del(key),
       ]);
-
+      
       // Remove from promotion candidates
       this.promotionCandidates.delete(key);
-
+      
       this.recordDelete(key);
     }, 'delete', key);
   }
@@ -180,10 +181,10 @@ export class MultiTierAdapter extends BaseCacheAdapter {
    */
   async exists(key: string): Promise<boolean> {
     this.validateKey(key);
-
+    
     const l1Exists = await this.l1Cache.exists(key);
     if (l1Exists) return true;
-
+    
     return await this.l2Cache.exists(key);
   }
 
@@ -192,11 +193,11 @@ export class MultiTierAdapter extends BaseCacheAdapter {
    */
   async ttl(key: string): Promise<number> {
     this.validateKey(key);
-
+    
     // Check L1 first
     const l1Ttl = await this.l1Cache.ttl(key);
     if (l1Ttl > -2) return l1Ttl; // Key exists in L1
-
+    
     // Check L2
     return await this.l2Cache.ttl(key);
   }
@@ -206,17 +207,17 @@ export class MultiTierAdapter extends BaseCacheAdapter {
    */
   async mget<T>(keys: string[]): Promise<(T | null)[]> {
     if (keys.length === 0) return [];
-
+    
     keys.forEach(key => this.validateKey(key));
 
     return this.measureOperation(async () => {
       const results: (T | null)[] = new Array(keys.length).fill(null);
       const l2Keys: string[] = [];
       const l2Indices: number[] = [];
-
+      
       // Try L1 first for all keys
       const l1Results = await this.l1Cache.mget<T>(keys);
-
+      
       for (let i = 0; i < keys.length; i++) {
         if (l1Results[i] !== null) {
           results[i] = l1Results[i];
@@ -226,19 +227,19 @@ export class MultiTierAdapter extends BaseCacheAdapter {
           l2Indices.push(i);
         }
       }
-
+      
       // Get remaining keys from L2
       if (l2Keys.length > 0) {
         const l2Results = await this.l2Cache.mget<T>(l2Keys);
-
+        
         for (let i = 0; i < l2Keys.length; i++) {
           const result = l2Results[i];
           const originalIndex = l2Indices[i];
-
+          
           if (result !== null) {
             results[originalIndex] = result;
             this.recordHit(l2Keys[i], 'L2');
-
+            
             // Consider promotion
             await this.considerPromotion(l2Keys[i], result);
           } else {
@@ -246,7 +247,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
           }
         }
       }
-
+      
       return results;
     }, 'hit', `mget:${keys.length}`);
   }
@@ -256,35 +257,35 @@ export class MultiTierAdapter extends BaseCacheAdapter {
    */
   async mset<T>(entries: [string, T, number?][]): Promise<void> {
     if (entries.length === 0) return;
-
+    
     entries.forEach(([key]) => this.validateKey(key));
 
     return this.measureOperation(async () => {
       const l1Entries: [string, T, number?][] = [];
       const l2Entries: [string, T, number?][] = [];
-
+      
       for (const [key, value, ttl] of entries) {
         const size = this.calculateSize(value);
         const validatedTtl = this.validateTtl(ttl);
-
+        
         if (this.shouldStoreInL1(size, { ttl: validatedTtl })) {
           const l1Ttl = Math.min(validatedTtl || 300, 300);
           l1Entries.push([key, value, l1Ttl]);
         }
-
+        
         l2Entries.push([key, value, validatedTtl]);
       }
-
+      
       const promises: Promise<void>[] = [];
-
+      
       if (l1Entries.length > 0) {
         promises.push(this.l1Cache.mset(l1Entries));
       }
-
+      
       if (l2Entries.length > 0) {
         promises.push(this.l2Cache.mset(l2Entries));
       }
-
+      
       await Promise.all(promises);
     }, 'set', `mset:${entries.length}`);
   }
@@ -297,7 +298,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
       this.l1Cache.clear(),
       this.l2Cache.clear(),
     ]);
-
+    
     this.promotionCandidates.clear();
   }
 
@@ -316,7 +317,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
       this.l1Cache.invalidateByPattern(pattern),
       this.l2Cache.invalidateByPattern(pattern),
     ]);
-
+    
     return l1Count + l2Count;
   }
 
@@ -328,7 +329,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
       this.l1Cache.invalidateByTags(tags),
       this.l2Cache.invalidateByTags(tags),
     ]);
-
+    
     return l1Count + l2Count;
   }
 
@@ -365,7 +366,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
       await this.set(testKey, 'test', 1);
       const result = await this.get(testKey);
       await this.del(testKey);
-
+      
       if (result !== 'test') {
         errors.push('Multi-tier cache operations failed');
       }
@@ -373,7 +374,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
       if (l1Health.errors) {
         errors.push(...l1Health.errors.map(e => `L1: ${e}`));
       }
-
+      
       if (l2Health.errors) {
         errors.push(...l2Health.errors.map(e => `L2: ${e}`));
       }
@@ -389,11 +390,11 @@ export class MultiTierAdapter extends BaseCacheAdapter {
           l2: l2Health.memory,
         },
         stats: this.getMetrics(),
-        errors: errors.length > 0 ? errors : [],
+        errors: errors.length > 0 ? errors : undefined,
       };
     } catch (error) {
       errors.push(error instanceof Error ? error.message : String(error));
-
+      
       return {
         connected: false,
         latency: performance.now() - start,
@@ -433,11 +434,11 @@ export class MultiTierAdapter extends BaseCacheAdapter {
     // Don't store large items in L1
     const maxL1Size = 1024 * 1024; // 1MB
     if (size > maxL1Size) return false;
-
+    
     // Don't store long-lived items in L1
     const maxL1Ttl = 3600; // 1 hour
     if (options.ttl && options.ttl > maxL1Ttl) return false;
-
+    
     return true;
   }
 
@@ -451,23 +452,23 @@ export class MultiTierAdapter extends BaseCacheAdapter {
     this.promotionCandidates.set(key, candidate);
 
     const shouldPromote = this.shouldPromoteToL1(key, candidate);
-
+    
     if (shouldPromote && value !== undefined) {
       try {
         // Promote to L1 with shorter TTL
         await this.l1Cache.set(key, value, 300); // 5 minutes
-
+        
         this.emitCacheEvent('promotion', key, {
           tier: 'L1',
           size: this.calculateSize(value),
         });
-
+        
         // Remove from promotion candidates
         this.promotionCandidates.delete(key);
       } catch (error) {
         // Promotion failed, continue normally
-        this.emitCacheEvent('error', key, {
-          error: error instanceof Error ? error : new Error(String(error))
+        this.emitCacheEvent('error', key, { 
+          error: error instanceof Error ? error : new Error(String(error)) 
         });
       }
     }
@@ -480,16 +481,16 @@ export class MultiTierAdapter extends BaseCacheAdapter {
     switch (this.promotionStrategy) {
       case 'lru':
         return candidate.hits >= this.promotionThreshold;
-
+        
       case 'frequency':
         const timeWindow = 5 * 60 * 1000; // 5 minutes
         const isRecent = Date.now() - candidate.lastHit < timeWindow;
         return candidate.hits >= this.promotionThreshold && isRecent;
-
+        
       case 'size':
         // Promote smaller items more aggressively
         return candidate.hits >= Math.max(1, this.promotionThreshold - 1);
-
+        
       case 'hybrid':
       default:
         const recentHits = candidate.hits;
@@ -506,13 +507,13 @@ export class MultiTierAdapter extends BaseCacheAdapter {
     try {
       // This is a simplified warmup - in production, you might want to
       // track popular keys and warm them up based on usage patterns
-
+      
       // For now, we'll just ensure L1 is ready
       await this.l1Cache.clear();
     } catch (error) {
       // Warmup failure shouldn't block startup
-      this.emitCacheEvent('error', 'l1_warmup', {
-        error: error instanceof Error ? error : new Error(String(error))
+      this.emitCacheEvent('error', 'l1_warmup', { 
+        error: error instanceof Error ? error : new Error(String(error)) 
       });
     }
   }
@@ -524,7 +525,7 @@ export class MultiTierAdapter extends BaseCacheAdapter {
     const totalHits = l1Stats.hits + l2Stats.hits;
     const totalMisses = l1Stats.misses + l2Stats.misses;
     const total = totalHits + totalMisses;
-
+    
     return total > 0 ? (totalHits / total) * 100 : 0;
   }
 
@@ -535,9 +536,9 @@ export class MultiTierAdapter extends BaseCacheAdapter {
     const l1Weight = l1Stats.operations || 0;
     const l2Weight = l2Stats.operations || 0;
     const totalWeight = l1Weight + l2Weight;
-
+    
     if (totalWeight === 0) return 0;
-
+    
     return ((l1Stats.avgResponseTime * l1Weight) + (l2Stats.avgResponseTime * l2Weight)) / totalWeight;
   }
 
@@ -568,3 +569,9 @@ export class MultiTierAdapter extends BaseCacheAdapter {
     this.l2Cache.destroy();
   }
 }
+
+
+
+
+
+

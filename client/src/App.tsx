@@ -2,15 +2,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "@/components/ui/toaster";
-import { PageErrorBoundary } from "@/components/error-handling";
-import { NavigationProvider } from "@/contexts/NavigationContext";
-import { ResponsiveNavigationProvider } from "@/contexts/ResponsiveNavigationContext";
-import { LoadingProvider } from "@/contexts/LoadingContext";
-import { AuthProvider } from "@/hooks/use-auth";
+import AppProviders from "@/components/AppProviders";
 import AppLayout from "@/components/layout/app-layout";
-import { AccessibilityProvider } from "@/components/accessibility/accessibility-manager";
 import { AccessibilityTrigger } from "@/components/accessibility/accessibility-settings-panel";
-import { OfflineProvider, OfflineStatus } from "@/components/offline/offline-manager";
+import { OfflineStatus } from "@/components/offline/offline-manager";
 import {
   CriticalAssetLoader,
   DevAssetLoadingDebug,
@@ -22,7 +17,7 @@ import BrowserCompatibilityChecker from "@/components/compatibility/BrowserCompa
 import PerformanceMetricsCollector from "@/components/performance/PerformanceMetricsCollector";
 import { Suspense, useEffect } from "react";
 import { useComprehensiveLoading } from "@/hooks/useComprehensiveLoading";
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 import {
   SafeLazyPages,
   SafeLazySponsorshipPages,
@@ -226,30 +221,16 @@ export default function App() {
 
   return (
     <BrowserCompatibilityChecker showWarnings={true} blockUnsupported={false}>
-      <QueryClientProvider client={queryClient}>
-        <PageErrorBoundary context="page">
-          <BrowserRouter>
-            <OfflineProvider>
-              <AccessibilityProvider>
-                <LoadingProvider>
-                  <AuthProvider>
-                    <NavigationProvider>
-                      <ResponsiveNavigationProvider>
-                        <AppContent />
-                        <Toaster />
-                        <AccessibilityTrigger />
-                        <OfflineStatus showDetails={true} />
-                      </ResponsiveNavigationProvider>
-                    </NavigationProvider>
-                  </AuthProvider>
-                </LoadingProvider>
-              </AccessibilityProvider>
-            </OfflineProvider>
-          </BrowserRouter>
-        </PageErrorBoundary>
+      <AppProviders queryClient={queryClient}>
+        <BrowserRouter>
+          <AppContent />
+          <Toaster />
+          <AccessibilityTrigger />
+          <OfflineStatus showDetails={true} />
+        </BrowserRouter>
+      </AppProviders>
 
-        {IS_DEV && <ReactQueryDevtools initialIsOpen={false} />}
-      </QueryClientProvider>
+      {IS_DEV && <ReactQueryDevtools initialIsOpen={false} />}
     </BrowserCompatibilityChecker>
   );
 }

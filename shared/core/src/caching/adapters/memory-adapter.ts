@@ -1,20 +1,20 @@
 /**
  * Memory Cache Adapter
- *
+ * 
  * Enhanced in-memory cache implementation consolidating:
  * - src/shared/services/CacheService.ts
  * - server/infrastructure/cache/CacheService.ts
  * With patterns from refined_cross_cutting.ts
  */
 
-import { BaseCacheAdapter } from '../core/base-adapter';
+import { BaseCacheAdapter } from '../base-adapter';
 import type {
   CacheEntry,
   CacheOptions,
   CacheHealthStatus,
   EvictionPolicy,
   CacheConfig
-} from '../core/interfaces';
+} from '../types';
 
 export interface MemoryAdapterConfig extends CacheConfig {
   maxMemoryMB: number;
@@ -36,10 +36,10 @@ export class MemoryAdapter extends BaseCacheAdapter {
   private enablePersistence: boolean;
   private storagePrefix: string;
 
-  constructor(protected override config: MemoryAdapterConfig) {
+  constructor(private config: MemoryAdapterConfig) {
     super({
       enableMetrics: config.enableMetrics,
-      keyPrefix: config.keyPrefix || '',
+      keyPrefix: config.keyPrefix,
     });
 
     this.maxSizeBytes = config.maxMemoryMB * 1024 * 1024;
@@ -49,7 +49,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
     this.storagePrefix = config.storagePrefix || 'cache_';
 
     this.startCleanupInterval(config.cleanupIntervalMs || 60000);
-
+    
     if (this.enablePersistence) {
       this.loadFromPersistentStorage();
       this.setupStorageEventListener();
@@ -61,7 +61,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
    */
   async get<T>(key: string): Promise<T | null> {
     this.validateKey(key);
-
+    
     return this.measureOperation(async () => {
       const formattedKey = this.formatKey(key);
       const entry = this.cache.get(formattedKey) as CacheEntry<T> | undefined;
@@ -98,7 +98,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
       const formattedKey = this.formatKey(key);
       const size = this.calculateSize(value);
       const ttl = validatedTtl * 1000; // Convert to milliseconds
-
+      
       // Check if adding this entry would exceed limits
       if (this.currentSizeBytes + size > this.maxSizeBytes) {
         await this.evictEntries(size);
@@ -154,34 +154,34 @@ export class MemoryAdapter extends BaseCacheAdapter {
   /**
    * Check if key exists and is not expired
    */
-  override async exists(key: string): Promise<boolean> {
+  async exists(key: string): Promise<boolean> {
     this.validateKey(key);
-
+    
     const formattedKey = this.formatKey(key);
     const entry = this.cache.get(formattedKey);
-
+    
     if (!entry) return false;
-
+    
     if (this.isExpired(entry)) {
       await this.deleteEntry(formattedKey);
       return false;
     }
-
+    
     return true;
   }
 
   /**
    * Get TTL for a key
    */
-  override async ttl(key: string): Promise<number> {
+  async ttl(key: string): Promise<number> {
     this.validateKey(key);
-
+    
     const formattedKey = this.formatKey(key);
     const entry = this.cache.get(formattedKey);
-
+    
     if (!entry) return -2; // Key doesn't exist
     if (entry.ttl === 0) return -1; // No expiration
-
+    
     const remaining = Math.floor((entry.timestamp + entry.ttl - Date.now()) / 1000);
     return remaining > 0 ? remaining : -2; // Expired
   }
@@ -189,19 +189,19 @@ export class MemoryAdapter extends BaseCacheAdapter {
   /**
    * Get multiple values from memory cache
    */
-  override async mget<T>(keys: string[]): Promise<(T | null)[]> {
+  async mget<T>(keys: string[]): Promise<(T | null)[]> {
     if (keys.length === 0) return [];
-
+    
     keys.forEach(key => this.validateKey(key));
 
     return this.measureOperation(async () => {
       const results: (T | null)[] = [];
-
+      
       for (const key of keys) {
         const result = await this.get<T>(key);
         results.push(result);
       }
-
+      
       return results;
     }, 'hit', `mget:${keys.length}`, 'L1');
   }
@@ -209,9 +209,9 @@ export class MemoryAdapter extends BaseCacheAdapter {
   /**
    * Set multiple values in memory cache
    */
-  override async mset<T>(entries: [string, T, number?][]): Promise<void> {
+  async mset<T>(entries: [string, T, number?][]): Promise<void> {
     if (entries.length === 0) return;
-
+    
     entries.forEach(([key]) => this.validateKey(key));
 
     return this.measureOperation(async () => {
@@ -224,7 +224,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
   /**
    * Clear all cache entries
    */
-  override async clear(): Promise<void> {
+  async clear(): Promise<void> {
     this.cache.clear();
     this.tagSets.clear();
     this.currentSizeBytes = 0;
@@ -239,14 +239,14 @@ export class MemoryAdapter extends BaseCacheAdapter {
   /**
    * Flush all cache entries (alias for clear)
    */
-  override async flush(): Promise<void> {
+  async flush(): Promise<void> {
     return this.clear();
   }
 
   /**
    * Invalidate entries by tags
    */
-  override async invalidateByTags(tags: string[]): Promise<number> {
+  async invalidateByTags(tags: string[]): Promise<number> {
     let invalidated = 0;
     const keysToDelete: string[] = [];
 
@@ -260,7 +260,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
 
     // Remove duplicates
     const uniqueKeys = [...new Set(keysToDelete)];
-
+    
     for (const key of uniqueKeys) {
       if (this.cache.has(key)) {
         await this.deleteEntry(key);
@@ -274,9 +274,9 @@ export class MemoryAdapter extends BaseCacheAdapter {
   /**
    * Invalidate entries by pattern
    */
-  override async invalidateByPattern(pattern: string): Promise<number> {
+  async invalidateByPattern(pattern: string): Promise<number> {
     let deletedCount = 0;
-
+    
     // Convert glob pattern to regex
     const escapedPattern = pattern
       .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
@@ -284,7 +284,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
     const regex = new RegExp(`^${escapedPattern}$`);
 
     const keysToDelete: string[] = [];
-
+    
     for (const key of this.cache.keys()) {
       if (regex.test(key)) {
         keysToDelete.push(key);
@@ -305,10 +305,10 @@ export class MemoryAdapter extends BaseCacheAdapter {
   async addToTags(key: string, tags: string[]): Promise<void> {
     const formattedKey = this.formatKey(key);
     const entry = this.cache.get(formattedKey);
-
+    
     if (entry) {
       entry.tags = [...new Set([...entry.tags, ...tags])];
-
+      
       // Update tag sets
       for (const tag of tags) {
         if (!this.tagSets.has(tag)) {
@@ -325,19 +325,19 @@ export class MemoryAdapter extends BaseCacheAdapter {
   async getByTag<T>(tag: string): Promise<Array<{ key: string; data: T }>> {
     const results: Array<{ key: string; data: T }> = [];
     const tagSet = this.tagSets.get(tag);
-
+    
     if (tagSet) {
       for (const key of tagSet) {
         const entry = this.cache.get(key);
         if (entry && !this.isExpired(entry)) {
-          results.push({
-            key: key.replace(this.keyPrefix + ':', ''),
-            data: entry.data as T
+          results.push({ 
+            key: key.replace(this.keyPrefix + ':', ''), 
+            data: entry.data as T 
           });
         }
       }
     }
-
+    
     return results;
   }
 
@@ -357,14 +357,15 @@ export class MemoryAdapter extends BaseCacheAdapter {
         try {
           const data = await factory();
           await this.set(key, data, options?.ttl);
-
+          
           if (options?.tags && options.tags.length > 0) {
             await this.addToTags(key, options.tags);
           }
         } catch (error) {
-          // Remove corrupted data
-          await this.del(key);
-          throw error;
+          // Log error but don't fail the entire preload
+          this.emitCacheEvent('error', key, { 
+            error: error instanceof Error ? error : new Error(String(error)) 
+          });
         }
       }
     });
@@ -377,7 +378,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
    */
   export(): Record<string, any> {
     const exported: Record<string, any> = {};
-
+    
     for (const [key, entry] of this.cache.entries()) {
       if (!this.isExpired(entry)) {
         exported[key] = {
@@ -388,7 +389,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
         };
       }
     }
-
+    
     return exported;
   }
 
@@ -400,7 +401,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
       if (entryData && typeof entryData === 'object') {
         const ttlSec = entryData.ttl ? Math.floor(entryData.ttl / 1000) : undefined;
         await this.set(key.replace(this.keyPrefix + ':', ''), entryData.data, ttlSec);
-
+        
         if (entryData.tags && entryData.tags.length > 0) {
           await this.addToTags(key, entryData.tags);
         }
@@ -411,7 +412,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
   /**
    * Get memory cache health status
    */
-  override async getHealth(): Promise<CacheHealthStatus> {
+  async getHealth(): Promise<CacheHealthStatus> {
     const start = performance.now();
     const errors: string[] = [];
 
@@ -421,7 +422,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
       await this.set(testKey, 'test', 1);
       const result = await this.get(testKey);
       await this.del(testKey);
-
+      
       if (result !== 'test') {
         errors.push('Basic memory cache operations failed');
       }
@@ -440,11 +441,11 @@ export class MemoryAdapter extends BaseCacheAdapter {
         latency,
         memory: memoryUsage,
         stats: this.getMetrics(),
-        errors: errors.length > 0 ? errors : [],
+        errors: errors.length > 0 ? errors : undefined,
       };
     } catch (error) {
       errors.push(error instanceof Error ? error.message : String(error));
-
+      
       return {
         connected: false,
         latency: performance.now() - start,
@@ -466,7 +467,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
    */
   updateConfig(newConfig: Partial<MemoryAdapterConfig>): void {
     Object.assign(this.config, newConfig);
-
+    
     // Apply new limits
     if (newConfig.maxMemoryMB) {
       this.maxSizeBytes = newConfig.maxMemoryMB * 1024 * 1024;
@@ -474,7 +475,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
         this.evictEntries(this.currentSizeBytes - this.maxSizeBytes);
       }
     }
-
+    
     if (newConfig.maxEntries) {
       this.maxEntries = newConfig.maxEntries;
       if (this.cache.size > this.maxEntries) {
@@ -490,7 +491,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
    * Get all cache keys
    */
   getKeys(): string[] {
-    return Array.from(this.cache.keys()).map(key =>
+    return Array.from(this.cache.keys()).map(key => 
       key.replace(this.keyPrefix + ':', '')
     );
   }
@@ -538,12 +539,12 @@ export class MemoryAdapter extends BaseCacheAdapter {
    */
   private async evictEntries(targetSize?: number): Promise<void> {
     const entries = Array.from(this.cache.entries());
-
+    
     if (entries.length === 0) return;
 
     let freedSize = 0;
     const targetToFree = targetSize || 0;
-
+    
     // Sort entries based on eviction policy
     switch (this.evictionPolicy) {
       case 'lru':
@@ -566,26 +567,24 @@ export class MemoryAdapter extends BaseCacheAdapter {
         // Shuffle array
         for (let i = entries.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
-          const temp = entries[i];
-          entries[i] = entries[j]!;
-          entries[j] = temp!;
+          [entries[i], entries[j]] = [entries[j], entries[i]];
         }
         break;
     }
-
+    
     for (const [key, entry] of entries) {
       await this.deleteEntry(key);
       freedSize += entry.size;
-
+      
       this.emitCacheEvent('eviction', key.replace(this.keyPrefix + ':', ''), {
         tier: 'L1',
         size: entry.size,
       });
-
+      
       if (targetSize && freedSize >= targetToFree) {
         break;
       }
-
+      
       if (!targetSize) {
         break; // Remove just one entry if no target size
       }
@@ -614,13 +613,13 @@ export class MemoryAdapter extends BaseCacheAdapter {
    */
   private cleanup(): void {
     const keysToDelete: string[] = [];
-
+    
     for (const [key, entry] of this.cache.entries()) {
       if (this.isExpired(entry)) {
         keysToDelete.push(key);
       }
     }
-
+    
     keysToDelete.forEach(key => this.deleteEntry(key));
   }
 
@@ -633,14 +632,14 @@ export class MemoryAdapter extends BaseCacheAdapter {
     }
 
     try {
-      const keys = Object.keys(localStorage).filter(key =>
+      const keys = Object.keys(localStorage).filter(key => 
         key.startsWith(this.storagePrefix)
       );
 
       for (const storageKey of keys) {
         const cacheKey = storageKey.replace(this.storagePrefix, '');
         const entryData = localStorage.getItem(storageKey);
-
+        
         if (entryData) {
           const entry = JSON.parse(entryData);
           if (!this.isExpired(entry)) {
@@ -699,10 +698,10 @@ export class MemoryAdapter extends BaseCacheAdapter {
     }
 
     try {
-      const keys = Object.keys(localStorage).filter(key =>
+      const keys = Object.keys(localStorage).filter(key => 
         key.startsWith(this.storagePrefix)
       );
-
+      
       keys.forEach(key => localStorage.removeItem(key));
     } catch (error) {
       // Ignore persistence errors
@@ -720,7 +719,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
     window.addEventListener('storage', (event) => {
       if (event.key?.startsWith(this.storagePrefix)) {
         const cacheKey = event.key.replace(this.storagePrefix, '');
-
+        
         if (event.newValue) {
           // Entry was added/updated
           try {
@@ -733,7 +732,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
           // Entry was removed
           this.cache.delete(cacheKey);
         }
-
+        
         this.updateMetricsCounters();
       }
     });
@@ -742,16 +741,22 @@ export class MemoryAdapter extends BaseCacheAdapter {
   /**
    * Cleanup resources
    */
-  override destroy(): void {
+  destroy(): void {
     super.destroy();
-
+    
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
     }
-
+    
     this.cache.clear();
     this.tagSets.clear();
     this.currentSizeBytes = 0;
   }
 }
+
+
+
+
+
+

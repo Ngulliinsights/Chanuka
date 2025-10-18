@@ -5,7 +5,7 @@
  */
 
 import { ZodError, ZodSchema } from 'zod';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 /**
  * Detailed validation error information for a specific field

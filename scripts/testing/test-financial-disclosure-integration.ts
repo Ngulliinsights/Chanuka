@@ -6,7 +6,7 @@
  */
 
 import { financialDisclosureIntegrationService } from "./services/financial-disclosure-integration.js";
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 async function testFinancialDisclosureIntegration() {
   logger.info('🧪 Testing Enhanced Financial Disclosure Integration\n', { component: 'Chanuka' });

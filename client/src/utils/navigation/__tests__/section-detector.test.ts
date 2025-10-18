@@ -1,5 +1,5 @@
 import { 
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
   determineNavigationSection, 
   getSectionDisplayName, 
   getSectionDescription,

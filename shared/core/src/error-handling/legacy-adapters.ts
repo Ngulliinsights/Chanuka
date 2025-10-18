@@ -1,279 +1,135 @@
-/**
- * Legacy Error Handling Adapters
- * 
- * Adapters to integrate existing error handling implementations with the core error handling system
- */
+// Legacy adapters for backward compatibility with existing error handling code
 
-import { AppError } from '../errors';
-import { logger } from '../utils/logger';
+import { ErrorTracker } from '../../../server/core/errors/error-tracker.js';
+import { ErrorBoundaryAdapter, withErrorBoundary } from './platform/client/error-boundary-adapter.js';
+import { ErrorReportingService } from './services/error-reporting.js';
+import { AlertRuleManager } from './patterns/alert-rules.js';
+import { ErrorPatternManager } from './patterns/error-patterns.js';
+import { RequestContextCapture } from './platform/server/request-context.js';
 
-/**
- * Legacy error classes that need to be migrated
- */
-export class LegacyAppError extends Error {
-  public statusCode: number;
-  public code: string;
-  public category: string;
-  public details?: Record<string, unknown>;
-  public correlationId?: string;
+// Re-export legacy ErrorTracker interface for backward compatibility
+export { ErrorTracker } from '../../../server/core/errors/error-tracker.js';
 
-  constructor(
-    code: string,
-    message: string,
-    statusCode: number = 500,
-    category: string = 'SYSTEM',
-    details?: Record<string, unknown>,
-    correlationId?: string
-  ) {
-    super(message);
-    this.name = 'AppError';
-    this.code = code;
-    this.statusCode = statusCode;
-    this.category = category;
-    this.details = details;
-    this.correlationId = correlationId;
-    
-    Object.setPrototypeOf(this, LegacyAppError.prototype);
-  }
-}
+// Create a unified error tracker that combines server and client features
+export class UnifiedErrorTracker {
+  private serverTracker?: ErrorTracker;
+  private clientReporter?: ErrorReportingService;
+  private alertManager?: AlertRuleManager;
+  private patternManager?: ErrorPatternManager;
 
-export class LegacyValidationError extends LegacyAppError {
-  constructor(message: string, details?: Record<string, unknown>, correlationId?: string) {
-    super('VALIDATION_ERROR', message, 400, 'VALIDATION', details, correlationId);
-    this.name = 'ValidationError';
-    Object.setPrototypeOf(this, LegacyValidationError.prototype);
-  }
-}
+  constructor(options: { isServer?: boolean; isClient?: boolean } = {}) {
+    const { isServer = false, isClient = false } = options;
 
-export class LegacyAuthenticationError extends LegacyAppError {
-  constructor(message: string, details?: Record<string, unknown>, correlationId?: string) {
-    super('AUTHENTICATION_ERROR', message, 401, 'AUTH', details, correlationId);
-    this.name = 'AuthenticationError';
-    Object.setPrototypeOf(this, LegacyAuthenticationError.prototype);
-  }
-}
-
-export class LegacyAuthorizationError extends LegacyAppError {
-  constructor(message: string, details?: Record<string, unknown>, correlationId?: string) {
-    super('AUTHORIZATION_ERROR', message, 403, 'AUTH', details, correlationId);
-    this.name = 'AuthorizationError';
-    Object.setPrototypeOf(this, LegacyAuthorizationError.prototype);
-  }
-}
-
-export class LegacyNotFoundError extends LegacyAppError {
-  constructor(message: string, correlationId?: string) {
-    super('NOT_FOUND', message, 404, 'CLIENT', undefined, correlationId);
-    this.name = 'NotFoundError';
-    Object.setPrototypeOf(this, LegacyNotFoundError.prototype);
-  }
-}
-
-export class LegacyConflictError extends LegacyAppError {
-  constructor(message: string, details?: Record<string, unknown>, correlationId?: string) {
-    super('CONFLICT', message, 409, 'CLIENT', details, correlationId);
-    this.name = 'ConflictError';
-    Object.setPrototypeOf(this, LegacyConflictError.prototype);
-  }
-}
-
-export class LegacyRateLimitError extends LegacyAppError {
-  constructor(message: string, details?: Record<string, unknown>, correlationId?: string) {
-    super('RATE_LIMIT', message, 429, 'CLIENT', details, correlationId);
-    this.name = 'RateLimitError';
-    Object.setPrototypeOf(this, LegacyRateLimitError.prototype);
-  }
-}
-
-export class LegacyDatabaseError extends LegacyAppError {
-  constructor(message: string, details?: Record<string, unknown>, correlationId?: string) {
-    super('DATABASE_ERROR', message, 500, 'SYSTEM', details, correlationId);
-    this.name = 'DatabaseError';
-    Object.setPrototypeOf(this, LegacyDatabaseError.prototype);
-  }
-}
-
-/**
- * Error conversion utilities
- */
-export class ErrorConversionAdapter {
-  /**
-   * Converts legacy error to core AppError
-   */
-  static convertLegacyError(legacyError: LegacyAppError): AppError {
-    return new AppError(
-      legacyError.code,
-      legacyError.message,
-      legacyError.statusCode,
-      legacyError.category as any,
-      legacyError.details,
-      legacyError.correlationId
-    );
-  }
-
-  /**
-   * Converts core AppError to legacy format for backward compatibility
-   */
-  static convertToLegacyError(coreError: AppError): LegacyAppError {
-    return new LegacyAppError(
-      coreError.code,
-      coreError.message,
-      coreError.statusCode,
-      coreError.category,
-      coreError.details,
-      coreError.correlationId
-    );
-  }
-
-  /**
-   * Detects if an error is a legacy error
-   */
-  static isLegacyError(error: any): error is LegacyAppError {
-    return error instanceof LegacyAppError || 
-           (error && typeof error === 'object' && 
-            'code' in error && 'statusCode' in error && 'category' in error);
-  }
-
-  /**
-   * Normalizes any error to core AppError format
-   */
-  static normalizeError(error: any): AppError {
-    if (error instanceof AppError) {
-      return error;
+    if (isServer) {
+      // Import server-specific modules only on server
+      this.serverTracker = new ErrorTracker();
+      this.alertManager = new AlertRuleManager();
+      this.patternManager = new ErrorPatternManager();
     }
 
-    if (this.isLegacyError(error)) {
-      return this.convertLegacyError(error);
+    if (isClient) {
+      // Import client-specific modules only on client
+      this.clientReporter = new ErrorReportingService();
     }
+  }
 
-    if (error instanceof Error) {
-      return new AppError(
-        'UNKNOWN_ERROR',
-        error.message,
-        500,
-        'SYSTEM',
-        { originalError: error.name },
-        undefined
-      );
+  // Unified error tracking method
+  trackError(error: Error | string, context: any = {}, severity?: string, category?: string): string | void {
+    if (this.serverTracker) {
+      // Server-side tracking
+      return this.serverTracker.trackError(error, context, severity as any, category as any);
+    } else if (this.clientReporter) {
+      // Client-side reporting
+      this.clientReporter.reportError(error instanceof Error ? error : new Error(error), context);
     }
+  }
 
-    return new AppError(
-      'UNKNOWN_ERROR',
-      'An unknown error occurred',
-      500,
-      'SYSTEM',
-      { originalError: String(error) },
-      undefined
-    );
+  // Unified request error tracking
+  trackRequestError(error: Error | string, req: any, severity?: string, category?: string): string | void {
+    if (this.serverTracker && req) {
+      return this.serverTracker.trackRequestError(error, req, severity as any, category as any);
+    } else if (this.clientReporter) {
+      this.clientReporter.reportError(error instanceof Error ? error : new Error(error), req);
+    }
+  }
+
+  // Unified error resolution
+  resolveError(errorId: string, resolvedBy?: string): boolean {
+    if (this.serverTracker) {
+      return this.serverTracker.resolveError(errorId, resolvedBy);
+    }
+    return false;
+  }
+
+  // Unified error retrieval
+  getError(errorId: string): any {
+    if (this.serverTracker) {
+      return this.serverTracker.getError(errorId);
+    }
+    return null;
+  }
+
+  // Unified error statistics
+  getErrorStats(timeWindow?: number): any {
+    if (this.serverTracker) {
+      return this.serverTracker.getErrorStats(timeWindow);
+    }
+    return {};
+  }
+
+  // Unified alert rule management
+  addAlertRule(rule: any): string | void {
+    if (this.alertManager) {
+      return this.alertManager.addAlertRule(rule);
+    }
+  }
+
+  getAlertRules(): any[] {
+    if (this.alertManager) {
+      return this.alertManager.getAlertRules();
+    }
+    return [];
+  }
+
+  // Unified error pattern management
+  getErrorPatterns(resolved?: boolean): any[] {
+    if (this.patternManager) {
+      return this.patternManager.getAllPatterns(resolved);
+    }
+    return [];
+  }
+
+  // Shutdown method
+  shutdown(): void {
+    if (this.serverTracker) {
+      this.serverTracker.shutdown();
+    }
   }
 }
 
-/**
- * Legacy error response formatter adapter
- */
-export class LegacyErrorResponseFormatter {
-  static format(error: LegacyAppError | AppError) {
-    const normalizedError = ErrorConversionAdapter.normalizeError(error);
-    
-    return {
-      success: false,
-      error: {
-        code: normalizedError.code,
-        message: normalizedError.message,
-        category: normalizedError.category,
-        statusCode: normalizedError.statusCode,
-        details: normalizedError.details,
-        correlationId: normalizedError.correlationId,
-        timestamp: new Date().toISOString()
-      }
-    };
-  }
+// Legacy error boundary exports for backward compatibility
+export { ErrorBoundaryAdapter as PageErrorBoundary } from './platform/client/error-boundary-adapter.js';
+export { withErrorBoundary } from './platform/client/error-boundary-adapter.js';
 
-  static formatValidationError(error: LegacyValidationError | any) {
-    return {
-      success: false,
-      error: 'Validation Error',
-      message: error.message,
-      details: error.details || {},
-      correlationId: error.correlationId,
-      timestamp: new Date().toISOString()
-    };
+// Legacy error reporting service
+export { ErrorReportingService as ErrorReportingService } from './services/error-reporting.js';
+
+// Legacy request context capture
+export { RequestContextCapture } from './platform/server/request-context.js';
+
+// Create singleton instances for backward compatibility
+let legacyErrorTracker: UnifiedErrorTracker | null = null;
+
+export function getLegacyErrorTracker(): UnifiedErrorTracker {
+  if (!legacyErrorTracker) {
+    // Detect environment
+    const isServer = typeof window === 'undefined';
+    const isClient = typeof window !== 'undefined';
+
+    legacyErrorTracker = new UnifiedErrorTracker({ isServer, isClient });
   }
+  return legacyErrorTracker;
 }
 
-/**
- * Correlation ID utilities
- */
-export class CorrelationIdAdapter {
-  static generateCorrelationId(): string {
-    return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  static createCorrelationIdMiddleware() {
-    return (req: any, res: any, next: any) => {
-      req.correlationId = req.headers['x-correlation-id'] || this.generateCorrelationId();
-      res.setHeader('X-Correlation-ID', req.correlationId);
-      next();
-    };
-  }
-}
-
-/**
- * Legacy error handler middleware adapter
- */
-export class LegacyErrorHandlerAdapter {
-  static createErrorHandler() {
-    return (error: any, req: any, res: any, next: any) => {
-      const normalizedError = ErrorConversionAdapter.normalizeError(error);
-      const response = LegacyErrorResponseFormatter.format(normalizedError);
-      
-      // Log error
-      logger.error('Error occurred:', { component: 'Chanuka' }, {
-        error: normalizedError,
-        correlationId: req.correlationId,
-        url: req.url,
-        method: req.method
-      });
-
-      res.status(normalizedError.statusCode).json(response);
-    };
-  }
-
-  static createValidationErrorHandler() {
-    return (error: any, req: any, res: any, next: any) => {
-      if (error instanceof LegacyValidationError || 
-          (error && error.name === 'ValidationError')) {
-        const response = LegacyErrorResponseFormatter.formatValidationError(error);
-        return res.status(400).json(response);
-      }
-      next(error);
-    };
-  }
-}
-
-/**
- * Factory function to create all legacy error adapters
- */
-export function createLegacyErrorAdapters() {
-  return {
-    ErrorConversionAdapter,
-    LegacyErrorResponseFormatter,
-    CorrelationIdAdapter,
-    LegacyErrorHandlerAdapter,
-    // Legacy error classes for backward compatibility
-    LegacyAppError,
-    LegacyValidationError,
-    LegacyAuthenticationError,
-    LegacyAuthorizationError,
-    LegacyNotFoundError,
-    LegacyConflictError,
-    LegacyRateLimitError,
-    LegacyDatabaseError
-  };
-}
-
-
-
-
-
-
+// Export legacy singleton for backward compatibility
+export const errorTracker = getLegacyErrorTracker();

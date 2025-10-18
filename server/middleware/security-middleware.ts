@@ -6,7 +6,7 @@ import { inputValidationService } from '../core/validation/input-validation-serv
 import { secureSessionService } from '../core/auth/secure-session-service.js';
 import { securityAuditService } from '../features/security/security-audit-service.js';
 import { createRateLimit } from './rate-limiter.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export interface SecurityMiddlewareOptions {
   enableCSP: boolean;

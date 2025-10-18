@@ -13,7 +13,7 @@ import {
   type InsertSocialShare,
   type UserSocialProfile,
   type Evaluation,
-} from '../../../shared/schema.ts';
+} from '../../../shared/schema/schema.ts';
 import session from 'express-session';
 import { logger } from '@shared/core/src/logging';
 // Simple memory store implementation since connect-memorystore is not available
@@ -554,6 +554,15 @@ export class MemStorage implements IStorage {
 
     this.userProgress.get(Number(userId))?.push(newProgress);
 
+    logger.info('User progress updated', {
+      component: 'storage',
+      operation: 'updateUserProgress',
+      progressId: newProgress.id,
+      userId: newProgress.userId,
+      achievementType: newProgress.achievementType,
+      level: newProgress.level,
+    });
+
     return newProgress;
   }
 
@@ -586,6 +595,15 @@ export class MemStorage implements IStorage {
 
     // Increment the bill's share count
     await this.incrementBillShares(billId);
+
+    logger.info('Social share tracked', {
+      component: 'storage',
+      operation: 'trackSocialShare',
+      shareId: newShare.id,
+      userId: newShare.userId,
+      billId: newShare.billId,
+      platform: newShare.platform,
+    });
 
     return newShare;
   }
@@ -715,15 +733,41 @@ export class MemStorage implements IStorage {
 
     this.evaluations.set(newEvaluation.id, newEvaluation);
 
+    logger.info('Evaluation created successfully', {
+      component: 'storage',
+      operation: 'createEvaluation',
+      evaluationId: newEvaluation.id,
+      candidateName: newEvaluation.candidateName,
+      departmentId: newEvaluation.departmentId,
+    });
+
     return newEvaluation;
   }
 
   async updateEvaluationStatus(id: number, status: string): Promise<Evaluation> {
     const evaluation = this.evaluations.get(id);
-    if (!evaluation) throw new Error(`Evaluation not found with ID: ${id}`);
+    if (!evaluation) {
+      logger.warn('Attempted to update status for non-existent evaluation', {
+        component: 'storage',
+        operation: 'updateEvaluationStatus',
+        evaluationId: id,
+        newStatus: status,
+      });
+      throw new Error(`Evaluation not found with ID: ${id}`);
+    }
 
+    const previousStatus = evaluation.status;
     evaluation.status = status as any;
     evaluation.updatedAt = new Date();
+
+    logger.info('Evaluation status updated', {
+      component: 'storage',
+      operation: 'updateEvaluationStatus',
+      evaluationId: id,
+      candidateName: evaluation.candidateName,
+      previousStatus,
+      newStatus: status,
+    });
 
     return evaluation;
   }

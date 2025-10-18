@@ -7,7 +7,7 @@
 
 import { EventEmitter } from 'events';
 import { performance } from 'perf_hooks';
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 import { config } from '../config/index.js';
 
 // Monitoring levels

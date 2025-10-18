@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { performance } from 'perf_hooks';
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 
 interface PerformanceMetric {
   id: string;

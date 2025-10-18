@@ -5,7 +5,7 @@
  */
 
 import type { AppConfig } from './schema';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 // Re-export the main config type
 export type { AppConfig };

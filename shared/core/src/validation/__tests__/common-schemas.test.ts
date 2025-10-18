@@ -7,7 +7,7 @@
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
 import {
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
   emailSchema,
   passwordSchema,
   strongPasswordSchema,

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { MiddlewareProvider } from '../types';
 import { Services } from '../../types/services';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export class AuthMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'auth';

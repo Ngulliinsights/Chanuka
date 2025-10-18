@@ -2,6 +2,7 @@
  * Authenticated API utility to prevent security vulnerabilities
  * and race conditions in API calls
  */
+import { navigationService } from '../services/navigation';
 
 export interface APIResponse<T = any> {
   data?: T;
@@ -66,7 +67,7 @@ export class AuthenticatedAPI {
           if (response.status === 401) {
             // Clear invalid token and redirect to login
             localStorage.removeItem('token');
-            window.location.href = '/auth';
+            navigationService.navigate('/auth');
             throw new Error('Authentication expired. Please log in again.');
           }
 

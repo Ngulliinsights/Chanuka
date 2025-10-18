@@ -2,7 +2,7 @@ import { billTrackingService } from './services/bill-tracking.js';
 import { db } from './db.js';
 import { users, bills, userInterests } from '../shared/schema.js';
 import { eq } from 'drizzle-orm';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 async function verifyBillTracking() {
   logger.info('🔍 Verifying Bill Tracking Service...', { component: 'Chanuka' });

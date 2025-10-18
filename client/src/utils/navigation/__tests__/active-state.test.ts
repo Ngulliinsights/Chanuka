@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { 
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
   isNavigationPathActive, 
   getActiveStateClasses,
   getActiveIconClasses,

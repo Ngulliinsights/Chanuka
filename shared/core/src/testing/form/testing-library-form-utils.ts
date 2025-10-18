@@ -4,7 +4,7 @@
 
 import { screen, fireEvent, waitFor, queries } from '@testing-library/dom';
 import { BaseFormTestingUtils, FormField, FormTestConfig, FormTestResult } from './base-form-testing';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 type QueryMethods = typeof queries & {
   getBySelector?: (selector: string) => HTMLElement;

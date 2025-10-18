@@ -8,7 +8,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { HealthChecker } from './health-checker';
 import { Logger } from '../logging';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export interface HealthEndpointConfig {
   includeDetails?: boolean;

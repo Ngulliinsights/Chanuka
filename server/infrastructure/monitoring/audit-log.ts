@@ -1,5 +1,5 @@
 import { database as db } from '../../../shared/database/connection.js';
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 
 // Define audit log table schema (would be added to schema.ts)
 export interface AuditLogEntry {

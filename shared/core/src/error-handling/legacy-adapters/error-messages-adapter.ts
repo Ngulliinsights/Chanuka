@@ -6,7 +6,7 @@
  */
 
 import { ErrorCode } from '../../../../src/shared/error-handling/constants/error-codes';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 /**
  * User-friendly error messages mapped to error codes

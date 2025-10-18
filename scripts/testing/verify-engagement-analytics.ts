@@ -3,7 +3,7 @@ import { billService } from './services/bill-service.js';
 import { db } from './db.js';
 import { users, bills, billEngagement } from '../shared/schema.js';
 import { eq } from 'drizzle-orm';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 async function verifyEngagementAnalytics() {
   logger.info('🔍 Verifying Engagement Analytics System...', { component: 'Chanuka' });

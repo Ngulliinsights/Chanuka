@@ -6,7 +6,7 @@
  */
 
 import { HealthCheck, HealthResult, HealthStatus } from '../types';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export interface DatabaseHealthConfig {
   testQuery?: string;

@@ -6,7 +6,10 @@ import { UserRole } from '@/types/navigation';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Lock, Shield, UserX } from 'lucide-react';
-import { logger } from '../utils/logger.js';
+// FIX: Use default import for 'logger.js'
+import logger from '../utils/logger.js';
+// OPTIMIZATION: Use path alias for consistency
+import { navigationService } from '@/services/navigation';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -25,8 +28,12 @@ interface ProtectedRouteProps {
   showAccessDenied?: boolean;
 }
 
+// REFACTOR: Create a specific type for denial reasons for better type safety
+type AccessDenialReason = 'unauthenticated' | 'insufficient_role' | 'admin_required' | 'custom_condition';
+
 interface AccessDeniedProps {
-  reason: 'unauthenticated' | 'insufficient_role' | 'admin_required' | 'custom_condition';
+  // REFACTOR: Use the specific AccessDenialReason type
+  reason: AccessDenialReason;
   allowedRoles?: UserRole[];
   currentRole?: UserRole;
   onSignIn?: () => void;
@@ -85,7 +92,8 @@ const AccessDenied: React.FC<AccessDeniedProps> = ({
   };
 
   const getActions = () => {
-    const actions = [];
+    // FIX: Explicitly type 'actions' array to hold React nodes
+    const actions: React.ReactNode[] = [];
 
     if (reason === 'unauthenticated' && onSignIn) {
       actions.push(
@@ -154,13 +162,17 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   showAccessDenied = false
 }) => {
   const { user } = useAuth();
-  const { userRole, navigateTo } = useNavigation();
+  // FIX: Alias userRole from context to resolve type conflict
+  const { userRole: contextUserRole, navigateTo } = useNavigation();
+  // FIX: Cast the aliased role to the UserRole type expected by this component's props
+  const userRole = contextUserRole as UserRole;
   const location = useLocation();
 
   /**
    * Check if user has access to the route
    */
-  const checkAccess = (): { hasAccess: boolean; reason?: string } => {
+  // REFACTOR: Use the specific AccessDenialReason type for the return value
+  const checkAccess = (): { hasAccess: boolean; reason?: AccessDenialReason } => {
     // Check authentication requirement
     if (requiresAuth && !user) {
       return { hasAccess: false, reason: 'unauthenticated' };
@@ -197,7 +209,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   };
 
   const handleGoBack = () => {
-    window.history.back();
+    navigationService.goBack();
   };
 
   // Show custom fallback if provided
@@ -209,7 +221,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   if (showAccessDenied) {
     return (
       <AccessDenied
-        reason={reason as any}
+        // REFACTOR: Use 'reason!' - we know it's defined if hasAccess is false
+        reason={reason!}
         allowedRoles={allowedRoles}
         currentRole={userRole}
         onSignIn={reason === 'unauthenticated' ? handleSignIn : undefined}
@@ -258,14 +271,18 @@ export const withRoleProtection = (
  */
 export const useRouteAccess = () => {
   const { user } = useAuth();
-  const { userRole } = useNavigation();
+  // FIX: Alias userRole from context to resolve type conflict
+  const { userRole: contextUserRole } = useNavigation();
+  // FIX: Cast the aliased role to the UserRole type expected by this component's props
+  const userRole = contextUserRole as UserRole;
 
   const checkRouteAccess = (config: {
     requiresAuth?: boolean;
     allowedRoles?: UserRole[];
     adminOnly?: boolean;
     condition?: (userRole: UserRole, user: any) => boolean;
-  }): { hasAccess: boolean; reason?: string } => {
+    // REFACTOR: Use the specific AccessDenialReason type for the return value
+  }): { hasAccess: boolean; reason?: AccessDenialReason } => {
     // Check authentication requirement
     if (config.requiresAuth && !user) {
       return { hasAccess: false, reason: 'unauthenticated' };

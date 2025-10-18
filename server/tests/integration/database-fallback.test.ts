@@ -3,7 +3,7 @@ import { databaseFallbackService } from '../../infrastructure/database/database-
 import { demoDataService } from '../../infrastructure/demo-data.js';
 import request from 'supertest';
 import { app } from '../../index.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 describe('Database Fallback Integration Tests', () => {
   beforeEach(() => {

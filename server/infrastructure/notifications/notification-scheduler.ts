@@ -12,7 +12,7 @@ const enhancedNotificationService = {
 };
 
 type EnhancedNotificationData = any;
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 
 export interface ScheduledDigest {
   userId: string;

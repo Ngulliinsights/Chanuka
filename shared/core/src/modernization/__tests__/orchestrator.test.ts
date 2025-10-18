@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ModernizationOrchestrator } from '../orchestrator';
 import { ModernizationTask, ModernizationPhase, TaskPriority, TaskStatus } from '../types';
 import { Logger } from '../../logging';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 // Mock the dependencies
 vi.mock('../analysis');

@@ -1,10 +1,10 @@
-import { db } from '../../../db';
-import { users, userProfiles, userInterests, billEngagement, notifications, billComments, bills } from '../../../shared/schema.ts';
+import { db } from '../../../../db';
+import { user as users, userProfile as userProfiles, userInterest as userInterests, billEngagement, notification as notifications, billComment as billComments, bill as bills } from '../../../../shared/schema/schema';
 import { eq, and, desc, sql, count } from 'drizzle-orm';
-import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../infrastructure/cache/cache-service';
-import { databaseService } from '../../infrastructure/database/database-service';
+import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../../infrastructure/cache/cache-service';
+import { databaseService } from '../../../infrastructure/database/database-service';
 import { z } from 'zod';
-import { logger } from '../../../utils/logger.js';
+import { logger } from '@shared/core/src/logging';
 
 // Data validation schemas
 const userProfileDataSchema = z.object({
@@ -402,7 +402,7 @@ export class UserProfileService {
 
       return profile;
     } catch (error) {
-      logger.error('Error fetching public profile:', { component: 'Chanuka' }, error);
+      logger.error('Error fetching public profile:', { component: 'Chanuka', error });
       throw error;
     }
   }
@@ -435,7 +435,7 @@ export class UserProfileService {
 
       return results;
     } catch (error) {
-      logger.error('Error searching users:', { component: 'Chanuka' }, error);
+      logger.error('Error searching users:', { component: 'Chanuka', error });
       return [];
     }
   }
@@ -683,7 +683,7 @@ export class UserProfileService {
             const [engagementStats] = await db
               .select({
                 totalBillsTracked: count(billEngagement.id),
-                totalEngagementScore: sum(billEngagement.engagementScore)
+                totalEngagementScore: sql`COALESCE(SUM(${billEngagement.engagementScore}), 0)`
               })
               .from(billEngagement)
               .where(eq(billEngagement.userId, userId));
@@ -701,13 +701,13 @@ export class UserProfileService {
               .select({
                 billId: billEngagement.billId,
                 billTitle: bills.title,
-                lastEngaged: billEngagement.lastEngaged,
+                lastEngagedAt: billEngagement.lastEngagedAt,
                 engagementScore: billEngagement.engagementScore
               })
               .from(billEngagement)
               .innerJoin(bills, eq(billEngagement.billId, bills.id))
               .where(eq(billEngagement.userId, userId))
-              .orderBy(desc(billEngagement.lastEngaged))
+              .orderBy(desc(billEngagement.lastEngagedAt))
               .limit(10);
 
             const recentComments = await db
@@ -728,7 +728,7 @@ export class UserProfileService {
                 type: 'track' as const,
                 billId: item.billId,
                 billTitle: item.billTitle,
-                timestamp: item.lastEngaged || new Date()
+                timestamp: item.lastEngagedAt || new Date()
               })),
               ...recentComments.map(item => ({
                 type: 'comment' as const,
@@ -811,7 +811,7 @@ export class UserProfileService {
           if (existingEngagement) {
             // Update existing engagement
             const updates: any = {
-              lastEngaged: new Date(),
+              lastEngagedAt: new Date(),
               updatedAt: new Date(),
               engagementScore: sql`${billEngagement.engagementScore} + ${engagementScoreIncrement}`
             };
@@ -840,7 +840,7 @@ export class UserProfileService {
                commentCount: engagementType === 'comment' ? 1 : 0,
                shareCount: engagementType === 'share' ? 1 : 0,
                engagementScore: engagementScoreIncrement,
-               lastEngaged: new Date(),
+               lastEngagedAt: new Date(),
                createdAt: new Date(),
                updatedAt: new Date()
              };
@@ -885,7 +885,7 @@ export class UserProfileService {
         engagement: engagementHistory
       };
     } catch (error) {
-      logger.error('Error fetching complete user profile:', { component: 'Chanuka' }, error);
+      logger.error('Error fetching complete user profile:', { component: 'Chanuka', error });
       throw error;
     }
   }

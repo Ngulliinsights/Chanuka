@@ -18,7 +18,7 @@ import {
   billSponsorship,
   sponsorTransparency,
   billSectionConflict
-} from '../shared/schema';
+} from '../shared/schema/schema';
 
 // cspell:disable-next-line
 async function seed() {

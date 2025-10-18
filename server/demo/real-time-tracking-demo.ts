@@ -13,7 +13,7 @@ import { billStatusMonitorService as billStatusMonitor } from '../features/bills
 import { userPreferencesService } from '../features/users/domain/user-preferences.js';
 import { createServer } from 'http';
 import express from 'express';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 async function runDemo() {
   logger.info('🚀 Starting Real-Time Bill Tracking Demo...\n', { component: 'Chanuka' });

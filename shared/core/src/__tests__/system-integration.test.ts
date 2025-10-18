@@ -7,7 +7,7 @@ import express from 'express';
 import request from 'supertest';
 import Redis from 'ioredis';
 import { Logger } from '../logging';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 describe('Core System Integration Tests', () => {
   let app: express.Application;

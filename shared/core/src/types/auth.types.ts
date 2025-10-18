@@ -1,5 +1,5 @@
 import type { Request } from 'express';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 // User interface
 export interface User {

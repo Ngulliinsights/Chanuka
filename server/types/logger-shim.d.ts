@@ -8,7 +8,7 @@ declare module '../utils/logger' {
   };
 }
 
-declare module '@shared/utils/logger' {
+declare module '@shared/core/src/logging' {
   export const logger: {
     info: (...args: any[]) => void;
     warn: (...args: any[]) => void;

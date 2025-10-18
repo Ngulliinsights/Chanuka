@@ -4,7 +4,7 @@
 
 import { promises as fs } from 'fs';
 import { join, dirname } from 'path';
-import { logger } from '../utils/logger';
+import { logger } from './logger';
 
 export interface LogRotationOptions {
   maxFileSize: string; // e.g., '10MB', '100KB'

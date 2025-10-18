@@ -1,5 +1,5 @@
 import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../rate-limiting/types';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 /**
  * Modern rate limiting service implementation that uses the new RateLimitStore interface

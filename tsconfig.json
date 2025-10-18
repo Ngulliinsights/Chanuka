@@ -2,6 +2,8 @@
   "include": ["client/src/**/*", "db/**/*", "server/**/*"],
   "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
   "compilerOptions": {
+    "baseUrl": ".",
+  "ignoreDeprecations": "6.0",
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
   "noEmit": true,
@@ -29,7 +31,8 @@
       "@db": ["./db/index.ts"],
       "@db/*": ["./db/*"],
       "@/*": ["./client/src/*"],
-      "@shared/*": ["./shared/*"]
+      "@shared/*": ["./shared/*"],
+      "shared/*": ["./shared/*"]
     }
   }
 }

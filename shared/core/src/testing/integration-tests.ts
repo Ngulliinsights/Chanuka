@@ -1,6 +1,6 @@
 import { performance } from 'perf_hooks';
 import { EventEmitter } from 'events';
-import type { CacheService } from '../../shared/core/src/cache/types';
+import type { CacheService } from '../../caching/core/interfaces';
 import type { RateLimitStore } from '../../shared/core/src/rate-limiting/types';
 import { UnifiedLogger } from '../../shared/core/src/logging/logger';
 import { ValidationService } from '../../shared/core/src/validation/validation-service';

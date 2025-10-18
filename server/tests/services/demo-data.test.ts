@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { demoDataService } from '../../infrastructure/demo-data.js';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 describe('DemoDataService', () => {
   beforeEach(() => {

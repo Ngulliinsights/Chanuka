@@ -118,6 +118,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { ImplementationWorkarounds } from '../components/bills/implementation-workarounds';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { logger } from '../utils/logger.js';
+import { navigationService } from '../services/navigation';
 
 function BillsDashboard() {
   const [bills, setBills] = useState(FALLBACK_BILLS);
@@ -222,7 +223,7 @@ function BillsDashboard() {
         enablePullToRefresh={true}
         onRefresh={async () => {
           // Refresh logic here
-          window.location.reload();
+          navigationService.reload();
         }}
       >
         {/* Search and Filters */}
@@ -338,15 +339,16 @@ function BillsDashboard() {
                           <span className="font-medium">{bill.transparency_score}%</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
+                          {/* progress bar width set via generated CSS class to avoid inline style prop */}
+                          <style>{`.progress-${bill.id} { width: ${bill.transparency_score}%; }`}</style>
+                          <div
                             className={`h-2 rounded-full ${
-                              bill.transparency_score >= 80 
+                              bill.transparency_score >= 80
                                 ? 'bg-green-500'
                                 : bill.transparency_score >= 60
                                 ? 'bg-yellow-500'
                                 : 'bg-red-500'
-                            }`}
-                            style={{ width: `${bill.transparency_score}%` }}
+                            } progress-${bill.id}`}
                           ></div>
                         </div>
                       </div>

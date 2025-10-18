@@ -10,7 +10,7 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 interface ValidationCheck {
   name: string;

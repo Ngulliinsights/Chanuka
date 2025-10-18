@@ -1,7 +1,7 @@
 import { BaseAdapter, DualOperationOptions } from './BaseAdapter';
 import { FlagManager } from '../feature-flags/FlagManager';
 import { MigrationFlag } from '../feature-flags/types';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export interface CacheOperations {
   get(key: string): Promise<any>;

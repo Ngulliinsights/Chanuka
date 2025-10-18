@@ -1,40 +1,22 @@
-/**
- * Error Handling Module
- * 
- * Comprehensive error handling system with circuit breaker integration,
- * context preservation, and graceful degradation
- */
+// Core error handling types and primitives
+export * from './core/types.js';
 
-// Core error classes and utilities
-export * from '../errors';
+// Error patterns and rules
+export * from './patterns/alert-rules.js';
+export * from './patterns/error-patterns.js';
 
-// Circuit breaker implementation
-export { CircuitBreaker, CircuitBreakerState, type CircuitBreakerOptions, type CircuitBreakerMetrics } from '../errors/circuit-breaker';
+// Error handlers and middleware
+export * from './handlers/error-boundary.js';
 
-// Enhanced middleware with context preservation
-export {
-  errorHandlerMiddleware,
-  requestContextMiddleware,
-  errorContextMiddleware,
-  asyncErrorBoundary,
-  setupGlobalErrorHandlers,
-  getCurrentContext,
-  runWithContext,
-  runWithContextAsync,
-  requestContextStorage,
-  type RequestContext,
-  type ErrorHandlerConfig,
-} from './middleware';
+// Error reporting services
+export * from './services/error-reporting.js';
 
-// Re-export error handler from errors module for backward compatibility
-export { unifiedErrorHandler, setupGlobalErrorHandlers as setupLegacyGlobalErrorHandlers } from '../errors/error-handler';
+// UI components (client-specific)
+export * from './ui/error-fallbacks.js';
+
+// Platform-specific adapters
+export * from './platform/server/request-context.js';
+export * from './platform/client/error-boundary-adapter.js';
 
 // Legacy adapters for backward compatibility
-export * from './legacy-adapters';
-export { ERROR_MESSAGES, AUTH_ERROR_MESSAGES, getErrorMessage } from './legacy-adapters/error-messages-adapter';
-
-
-
-
-
-
+export * from './legacy-adapters.js';

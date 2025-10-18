@@ -625,7 +625,7 @@ export class ValidationFramework extends EventEmitter {
     let match;
     while ((match = importRegex.exec(content)) !== null) {
       imports.push(match[1]);
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
     }
     return imports;
   }

@@ -7,7 +7,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { performanceMonitor } from '../../utils/performanceMonitoring';
 import { performanceOptimizer, usePerformanceOptimization } from '../../utils/performance-optimizer';
 import { cacheManager } from '../../utils/cache-strategy';
-import { logger } from '@shared/utils/logger';
+import { logger } from '@shared/core/src/logging';
 
 interface PerformanceMetricsProps {
   showDetails?: boolean;

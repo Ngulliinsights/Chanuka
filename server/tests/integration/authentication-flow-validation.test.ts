@@ -10,7 +10,7 @@ import { router as adminRouter } from '../../features/admin/admin.js';
 import { database as db, users } from '../../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 describe('Authentication Flow Validation Tests', () => {
   let app: express.Application;

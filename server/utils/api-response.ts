@@ -1,5 +1,5 @@
 import { Response } from 'express';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 // Standard API response interface
 export interface ApiResponse<T = any> {

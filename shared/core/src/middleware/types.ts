@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export type RegularMiddleware = (req: Request, res: Response, next: NextFunction) => void | Promise<void> | Response | Promise<Response | undefined>;
 export type ErrorMiddleware = (error: Error, req: Request, res: Response, next: NextFunction) => void | Promise<void> | Response | Promise<Response | undefined>;

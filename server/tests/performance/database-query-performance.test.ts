@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import { database as db, bills, billEngagement, billComments, sponsors } from '../../../shared/database/connection';
 import { eq, sql, desc } from 'drizzle-orm';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 describe('Database Query Performance Tests', () => {
   // Performance thresholds remain conservative but realistic

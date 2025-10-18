@@ -6,8 +6,9 @@
 
 import { z } from 'zod';
 import { emailSchema, passwordSchema, strongPasswordSchema, phoneSchema, nameSchema } from './common';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/core/src/logging';
 
+import { isAgeBetween } from '../helpers';
 /**
  * User registration schema
  */
@@ -18,13 +19,9 @@ export const userRegistrationSchema = z.object({
   password: passwordSchema,
   confirmPassword: z.string(),
   phone: phoneSchema.optional(),
-  dateOfBirth: z.coerce.date().refine(
-    (date) => {
-      const age = new Date().getFullYear() - date.getFullYear();
-      return age >= 18 && age <= 120;
-    },
-    { message: 'User must be between 18 and 120 years old' }
-  ).optional(),
+  dob: z.string().optional().refine((v) => (v ? isAgeBetween(13, 120)(v) : true), {
+    message: 'Date of birth indicates age must be between 13 and 120',
+  }),
   termsAccepted: z.boolean().refine(val => val === true, {
     message: 'Terms and conditions must be accepted',
   }),

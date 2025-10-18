@@ -89,6 +89,7 @@ client/
 │   │   │   ├── engagement-dashboard.tsx
 │   │   │   ├── JourneyAnalyticsDashboard.tsx
 │   │   ├── analytics-dashboard.tsx
+│   │   ├── AppProviders.tsx
 │   │   ├── architecture-planning.tsx
 │   │   ├── auth/
 │   │   │   ├── auth-forms.tsx
@@ -262,7 +263,6 @@ client/
 │   │   │   ├── index.ts
 │   │   │   ├── services/
 │   │   │   │   ├── analytics-api.ts
-│   │   │   ├── types/
 │   │   │   ├── types.ts
 │   │   ├── bills/
 │   │   │   ├── components/
@@ -273,7 +273,6 @@ client/
 │   │   │   ├── index.ts
 │   │   │   ├── services/
 │   │   │   │   ├── bill-api.ts
-│   │   │   ├── types/
 │   │   │   ├── types.ts
 │   │   ├── community/
 │   │   │   ├── components/
@@ -283,7 +282,6 @@ client/
 │   │   │   ├── index.ts
 │   │   │   ├── services/
 │   │   │   │   ├── community-api.ts
-│   │   │   ├── types/
 │   │   │   ├── types.ts
 │   │   ├── search/
 │   │   │   ├── components/
@@ -293,7 +291,6 @@ client/
 │   │   │   ├── index.ts
 │   │   │   ├── services/
 │   │   │   │   ├── search-api.ts
-│   │   │   ├── types/
 │   │   │   ├── types.ts
 │   │   ├── users/
 │   │   │   ├── components/
@@ -303,7 +300,6 @@ client/
 │   │   │   ├── index.ts
 │   │   │   ├── services/
 │   │   │   │   ├── user-api.ts
-│   │   │   ├── types/
 │   │   │   ├── types.ts
 │   ├── hooks/
 │   │   ├── __tests__/
@@ -380,6 +376,7 @@ client/
 │   │   ├── analysis.ts
 │   │   ├── api.ts
 │   │   ├── api-error-handling.ts
+│   │   ├── navigation.ts
 │   │   ├── PageRelationshipService.ts
 │   │   ├── UserJourneyTracker.ts
 │   │   ├── websocket-client.ts
@@ -387,6 +384,8 @@ client/
 │   ├── styles/
 │   │   ├── accessibility.css
 │   ├── TestComponent.tsx
+│   ├── test-utils/
+│   │   ├── index.tsx
 │   ├── types/
 │   │   ├── navigation.ts
 │   │   ├── onboarding.ts
@@ -434,48 +433,38 @@ client/
 │   │   ├── serviceWorker.ts
 │   ├── vite-env.d.ts
 components.json
+cspell.config.yaml
 db/
 ├── index.ts
 ├── init-scripts/
 │   ├── 01-init-database.sql
 ├── legislative-seed.ts
-├── migrations_backup/
-│   ├── 0000_quick_aaron_stack.sql
-│   ├── 0001_lowly_white_queen.sql
-│   ├── 0002_chief_stellaris.sql
-│   ├── meta/
-│   │   ├── _journal.json
-│   │   ├── 0000_snapshot.json
-│   │   ├── 0001_snapshot.json
-│   │   ├── 0002_snapshot.json
+├── schema/
+│   ├── relations.ts
+│   ├── schema.ts
+│   ├── schema1.ts
 ├── seed.ts
 ├── simple-seed.ts
 docker-compose.yml
 Dockerfile
 docs/
 ├── analysis/
-│   ├── api-analysis-report.json
-│   ├── api-race-condition-assessment.md
-│   ├── chanuka_comprehensive_analysis.md
-│   ├── crash-risk-analysis-report.md
-│   ├── depcheck-results.json
-│   ├── dependency-audit-results.md
-│   ├── radix-ui-usage-matrix.md
-│   ├── schema-congruence-progress.md
-├── analytics-core-integration.md
+│   ├── chanuka_implementation_guide.md
 ├── chanuka/
-│   ├── chanuka_requirements_v4.md
-│   ├── chanuka_unified_reqs.md
-│   ├── chanuka-design-doc.md
-│   ├── chanuka-implementation-plan.md
-│   ├── phase-2-database-consolidation.md
-│   ├── project-structure.md
+│   ├── ai_code_review_design.md
+│   ├── ai_code_review_implementation.md
+│   ├── ai_code_review_requirements.md
+│   ├── frontend_design.md
+│   ├── frontend_requirements.md
+│   ├── frontend-stabilization-plan.md
 │   ├── shared_core_design.md
 │   ├── shared_core_impl_plan.md
 │   ├── shared_core_requirements.md
-├── CODE_REVIEW_CHECKLIST.md
-├── financial-disclosure-monitoring.md
-├── fix-before-tests.md
+│   ├── unified_ai_dev_framework.md
+│   ├── unified_code_analysis_framework.md
+│   ├── unified_coding_framework.md
+├── chanuka_architecture.txt
+├── chanuka_functionality_analysis.md
 ├── guides/
 │   ├── DATABASE_SETUP_GUIDE.md
 │   ├── DEMO_MODE_CONFIGURATION.md
@@ -483,38 +472,8 @@ docs/
 │   ├── DEPLOYMENT_GUIDE.md
 │   ├── NAVIGATION_USER_GUIDE.md
 │   ├── TROUBLESHOOTING_GUIDE.md
-├── phased_fixing_plan.md
 ├── project-structure.md
-├── project-structure2.md
-├── project-structure3.md
-├── regulatory-change-monitoring.md
-├── replit.md
-├── SERVER_ARCHITECTURE.md
-├── summaries/
-│   ├── APP_RENDERING_FIX_SUMMARY.md
-│   ├── APPLAYOUT_ENHANCEMENT_SUMMARY.md
-│   ├── COMMENT_SYSTEM_IMPLEMENTATION_SUMMARY.md
-│   ├── COMPREHENSIVE_SEED_DATA_SUMMARY.md
-│   ├── dependency-removal-summary.md
-│   ├── FINAL_TASK_COMPLETION_SUMMARY.md
-│   ├── FINANCIAL_DISCLOSURE_INTEGRATION_SUMMARY.md
-│   ├── FINANCIAL_DISCLOSURE_MONITORING_SUMMARY.md
-│   ├── LOGO_INTEGRATION_SUMMARY.md
-│   ├── MIGRATION_SYSTEM_SUMMARY.md
-│   ├── NAVIGATION_OPTIMIZATION_SUMMARY.md
-│   ├── NAVIGATION_PERFORMANCE_ACCESSIBILITY_IMPLEMENTATION_SUMMARY.md
-│   ├── NAVIGATION_STATE_PERSISTENCE_SUMMARY.md
-│   ├── phase-1-completion-summary.md
-│   ├── phase-2-completion-summary.md
-│   ├── route-test-summary.md
-│   ├── SCHEMA_CONGRUENCE_COMPLETION_SUMMARY.md
-│   ├── SECURITY_MONITORING_IMPLEMENTATION_SUMMARY.md
-│   ├── SPONSOR_SERVICE_IMPLEMENTATION_SUMMARY.md
-│   ├── TRANSPARENCY_DASHBOARD_IMPLEMENTATION_SUMMARY.md
-│   ├── TYPESCRIPT_ERRORS_SUMMARY.md
-├── unified_ai_dev_framework.md
-├── unified_code_analysis_framework.md
-├── unified_coding_framework.md
+├── strategic-tables-recommendations.md
 drizzle/
 drizzle.config.ts
 ├── 0000_clear_risque.sql
@@ -550,41 +509,7 @@ drizzle.config.ts
 │   ├── 0001_snapshot.json
 │   ├── 0002_snapshot.json
 ├── README.md
-├── relations.ts
-├── schema.ts
-drizzle_backup/
-├── 0000_clear_risque.sql
-├── 0000_initial_migration.sql
-├── 0001_comprehensive_schema.sql
-├── 0001_strange_night_nurse.sql
-├── 0002_add_bill_engagement.sql
-├── 0002_calm_weapon_omega.sql
-├── 0003_add_comment_features.sql
-├── 0003_enhanced_comments_system.sql
-├── 0004_fix_schema.sql
-├── 0005_complete_schema_update.sql
-├── 0006_fix_implementation_workarounds.sql
-├── 0007_add_sponsorship_tables.sql
-├── 0008_seed_sponsorship_data.sql
-├── 0009_add_citizen_verification.sql
-├── 0010_add_search_vectors_and_indexes.sql
-├── 0011_add_moderation_and_analytics.sql
-├── 0012_add_missing_features.sql
-├── 0013_fix_missing_tables.sql
-├── 0014_create_security_tables.sql
-├── 0015_fix_schema_errors.sql
-├── 0016_add_last_checked_column.sql
-├── 0017_add_success_column.sql
-├── 0017_fix_security_schema_issues.sql
-├── 0018_add_risk_score_column.sql
-├── meta/
-│   ├── _journal.json
-│   ├── 0000_snapshot.json
-│   ├── 0001_snapshot.json
-│   ├── 0002_snapshot.json
-├── README.md
-├── relations.ts
-├── schema.ts
+evaluation.md
 generate-structure-to-file.sh
 jest.backend.config.js
 jest.client.config.js
@@ -722,7 +647,6 @@ server/
 │   │   ├── moderation.ts
 │   │   ├── system.ts
 │   ├── alert-preferences/
-│   │   ├── __tests__/
 │   │   ├── alert_system_docs.md
 │   │   ├── alert_utilities.ts
 │   │   ├── application/
@@ -1147,13 +1071,17 @@ shared/
 │   │   │   ├── setup.ts
 │   │   │   ├── stress.test.ts
 │   │   │   ├── system-integration.test.ts
-│   │   ├── cache/
+│   │   ├── caching/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── ai-cache.test.ts
 │   │   │   │   ├── circuit-breaker-single-flight.test.ts
+│   │   │   │   ├── factory.test.ts
+│   │   │   │   ├── memory-adapter.test.ts
 │   │   │   │   ├── single-flight-cache.test.ts
 │   │   │   │   ├── single-flight-integration.test.ts
 │   │   │   ├── adapters/
+│   │   │   │   ├── ai-cache.ts
+│   │   │   │   ├── index.ts
 │   │   │   │   ├── legacy/
 │   │   │   │   │   ├── infrastructure-cache-adapter.ts
 │   │   │   │   ├── memory-adapter.ts
@@ -1162,24 +1090,6 @@ shared/
 │   │   │   ├── ai-cache.ts
 │   │   │   ├── base-adapter.ts
 │   │   │   ├── CIRCUIT_BREAKER_IMPLEMENTATION.md
-│   │   │   ├── index.ts
-│   │   │   ├── key-generator.ts
-│   │   │   ├── legacy-adapters/
-│   │   │   ├── legacy-adapters.ts
-│   │   │   │   ├── cache-service-adapter.ts
-│   │   │   ├── single-flight-cache.ts
-│   │   │   ├── types.ts
-│   │   ├── caching/
-│   │   │   ├── __tests__/
-│   │   │   │   ├── factory.test.ts
-│   │   │   │   ├── memory-adapter.test.ts
-│   │   │   │   ├── single-flight-cache.test.ts
-│   │   │   ├── adapters/
-│   │   │   │   ├── ai-cache.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── memory-adapter.ts
-│   │   │   │   ├── multi-tier-adapter.ts
-│   │   │   │   ├── redis-adapter.ts
 │   │   │   ├── core/
 │   │   │   │   ├── base-adapter.ts
 │   │   │   │   ├── index.ts
@@ -1188,10 +1098,16 @@ shared/
 │   │   │   ├── decorators.ts
 │   │   │   ├── factory.ts
 │   │   │   ├── index.ts
+│   │   │   ├── key-generator.ts
+│   │   │   ├── legacy-adapters/
+│   │   │   ├── legacy-adapters.ts
+│   │   │   │   ├── cache-service-adapter.ts
 │   │   │   ├── patterns/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── single-flight-cache.ts
 │   │   │   ├── README.md
+│   │   │   ├── single-flight-cache.ts
+│   │   │   ├── types.ts
 │   │   ├── config/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── config-manager.test.ts
@@ -1201,20 +1117,14 @@ shared/
 │   │   ├── error-handling/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── circuit-breaker.test.ts
-│   │   │   ├── base-error.ts
-│   │   │   ├── errors/
-│   │   │   │   ├── enhanced-errors.ts
-│   │   │   ├── index.ts
-│   │   │   ├── legacy-adapters/
-│   │   │   ├── legacy-adapters.ts
-│   │   │   │   ├── error-messages-adapter.ts
-│   │   │   ├── middleware.ts
-│   │   ├── error-management/
-│   │   │   ├── __tests__/
-│   │   │   │   ├── circuit-breaker.test.ts
 │   │   │   │   ├── error-handler-chain.test.ts
 │   │   │   │   ├── specialized-errors.test.ts
+│   │   │   ├── base-error.ts
+│   │   │   ├── core/
+│   │   │   │   ├── types.ts
+│   │   │   ├── error-handler.ts
 │   │   │   ├── errors/
+│   │   │   │   ├── enhanced-errors.ts
 │   │   │   │   ├── specialized/
 │   │   │   │   │   ├── authentication-error.ts
 │   │   │   │   │   ├── authorization-error.ts
@@ -1234,16 +1144,35 @@ shared/
 │   │   │   │   │   ├── unsupported-media-type-error.ts
 │   │   │   │   │   ├── validation-error.ts
 │   │   │   ├── handlers/
+│   │   │   │   ├── error-boundary.ts
+│   │   │   │   ├── error-boundary.tsx
 │   │   │   │   ├── error-handler-chain.ts
 │   │   │   │   ├── index.ts
 │   │   │   ├── index.ts
+│   │   │   ├── legacy-adapters/
+│   │   │   ├── legacy-adapters.ts
+│   │   │   │   ├── error-messages-adapter.ts
 │   │   │   ├── middleware/
+│   │   │   ├── middleware.ts
 │   │   │   │   ├── express-error-middleware.ts
 │   │   │   │   ├── index.ts
 │   │   │   ├── patterns/
+│   │   │   │   ├── alert-rules.ts
 │   │   │   │   ├── circuit-breaker.ts
+│   │   │   │   ├── error-patterns.ts
 │   │   │   │   ├── index.ts
+│   │   │   ├── platform/
+│   │   │   │   ├── client/
+│   │   │   │   │   ├── error-boundary-adapter.ts
+│   │   │   │   ├── server/
+│   │   │   │   │   ├── request-context.ts
 │   │   │   ├── README.md
+│   │   │   ├── services/
+│   │   │   │   ├── error-reporting.ts
+│   │   │   ├── specialized/
+│   │   │   ├── ui/
+│   │   │   │   ├── error-fallbacks.ts
+│   │   │   │   ├── error-fallbacks.tsx
 │   │   ├── errors/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── CircuitBreaker.test.ts
@@ -1277,6 +1206,10 @@ shared/
 │   │   │   ├── legacy-adapters/
 │   │   │   ├── legacy-adapters.ts
 │   │   │   │   ├── logger-adapter.ts
+│   │   │   ├── logger.d.ts
+│   │   │   ├── logger.d.ts.map
+│   │   │   ├── logger.js
+│   │   │   ├── logger.js.map
 │   │   │   ├── logger.ts
 │   │   │   ├── log-rotation.ts
 │   │   │   ├── middleware.ts
@@ -1434,7 +1367,6 @@ shared/
 │   │   │   │   ├── memory-store.ts
 │   │   │   │   ├── redis-store.ts
 │   │   │   ├── types.ts
-│   │   ├── refined_cross_cutting.ts
 │   │   ├── services/
 │   │   │   ├── cache.ts
 │   │   │   ├── health.ts
@@ -1444,6 +1376,8 @@ shared/
 │   │   ├── testing/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── load-tester.test.ts
+│   │   │   ├── ci-cd-runner.ts
+│   │   │   ├── dependency-validator.ts
 │   │   │   ├── example-usage.ts
 │   │   │   ├── form/
 │   │   │   │   ├── base-form-testing.ts
@@ -1451,9 +1385,12 @@ shared/
 │   │   │   │   ├── form-testing-utils.ts
 │   │   │   │   ├── testing-library-form-utils.ts
 │   │   │   ├── index.ts
+│   │   │   ├── integration-tests.ts
 │   │   │   ├── load-tester.ts
+│   │   │   ├── memory-leak-detector.ts
 │   │   │   ├── performance-benchmarks.ts
 │   │   │   ├── performance-monitor.ts
+│   │   │   ├── performance-regression-detector.ts
 │   │   │   ├── stress-tests.ts
 │   │   ├── types/
 │   │   │   ├── auth.types.ts
@@ -1462,7 +1399,6 @@ shared/
 │   │   ├── utils/
 │   │   │   ├── constants.ts
 │   │   │   ├── correlation-id.ts
-│   │   │   ├── error-handler.ts
 │   │   │   ├── formatting/
 │   │   │   │   ├── currency.ts
 │   │   │   │   ├── date-time.ts
@@ -1493,10 +1429,12 @@ shared/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── joi-adapter.ts
 │   │   │   │   ├── zod-adapter.ts
+│   │   │   ├── constants.ts
 │   │   │   ├── core/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── interfaces.ts
 │   │   │   │   ├── validation-service.ts
+│   │   │   ├── helpers.ts
 │   │   │   ├── index.ts
 │   │   │   ├── legacy-adapters/
 │   │   │   ├── legacy-adapters.ts
@@ -1538,7 +1476,13 @@ shared/
 │   ├── pool.ts
 ├── i18n/
 │   ├── en.ts
-├── schema.ts
+├── schema/
+│   ├── enum.ts
+│   ├── index.ts
+│   ├── schema.ts
+│   ├── searchVectorMigration.ts
+│   ├── types.ts
+│   ├── validation.ts
 ├── schema_integration_tests.ts
 ├── schema_unit_test.ts
 ├── types/
@@ -1548,26 +1492,7 @@ shared/
 │   ├── errors.ts
 │   ├── expert.ts
 │   ├── legal-analysis.ts
-├── utils/
-│   ├── error-handler.ts
-│   ├── logger.d.ts
-│   ├── logger.d.ts.map
-│   ├── logger.js
-│   ├── logger.js.map
-│   ├── logger.ts
 tailwind.config.ts
-testing/
-├── benchmarks/
-│   ├── performance-benchmarks.ts
-├── ci-cd-runner.ts
-├── integration/
-│   ├── integration-tests.ts
-├── memory-leak-detector.ts
-├── performance-regression-detector.ts
-├── stress-tests/
-│   ├── stress-tests.ts
-├── validation/
-│   ├── dependency-validator.ts
 TESTING_GUIDE.md
 tools/
 ├── validate-schema-congruence.ts
@@ -1580,4 +1505,4 @@ vitest.frontend.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-17 05:37:05
+Generated on: 2025-10-18 08:46:45

@@ -2,7 +2,7 @@ import { database as db, users, bills, sponsors, notifications, billComments, bi
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { performance } from 'perf_hooks';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 export interface TestUser {
   id: string;

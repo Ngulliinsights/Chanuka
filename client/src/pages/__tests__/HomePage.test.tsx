@@ -1,10 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
 import HomePage from '../home';
-import { ResponsiveNavigationProvider } from '@/contexts/ResponsiveNavigationContext';
-import { NavigationProvider } from '@/contexts/NavigationContext';
-import { logger } from '../utils/logger.js';
+import { renderWithProviders } from '@/test-utils';
 
 // Mock hooks
 vi.mock('@/hooks/use-auth', () => ({
@@ -29,18 +26,6 @@ const localStorageMock = {
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 });
-
-function renderWithProviders(component: React.ReactElement) {
-  return render(
-    <BrowserRouter>
-      <NavigationProvider>
-        <ResponsiveNavigationProvider>
-          {component}
-        </ResponsiveNavigationProvider>
-      </NavigationProvider>
-    </BrowserRouter>
-  );
-}
 
 describe('HomePage', () => {
   beforeEach(() => {

@@ -8,7 +8,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
 import { ValidationError, ValidationOptions, ValidationContext } from './types';
 import { validationService } from './validation-service';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 /**
  * Request validation configuration

@@ -14,7 +14,7 @@ import { RedisHealthCheck } from '../checks/redis.check';
 import { DatabaseHealthCheck } from '../checks/database.check';
 import { MemoryHealthCheck } from '../checks/memory.check';
 import { 
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
   LoadTester, 
   PerformanceTimer, 
   ResourceMonitor, 

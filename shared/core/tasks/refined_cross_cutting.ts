@@ -1967,7 +1967,7 @@ export function CacheInvalidate(patterns: string[]) {
 // core/logging/Logger.ts
 import pino from 'pino';
 import { AsyncLocalStorage } from 'async_hooks';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 const requestContext = new AsyncLocalStorage<{
   requestId: string;

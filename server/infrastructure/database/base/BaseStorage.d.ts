@@ -1,6 +1,6 @@
 import { Redis } from 'ioredis';
 import { Pool, PoolClient } from 'pg';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 interface StorageOptions {
     cacheTTL?: number;
     prefix?: string;

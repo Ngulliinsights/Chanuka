@@ -5,7 +5,7 @@ import { LogRotationManager } from './rotation';
 import { telemetryAggregator } from './telemetry';
 import path from 'path';
 import { ZodError } from 'zod';
-import { logger } from '../utils/logger';
+import { logger } from '../../shared/core/src/utils/logger';
 
 /**
  * Unified Logging Service
