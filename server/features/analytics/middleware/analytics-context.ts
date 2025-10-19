@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { randomUUID } from 'crypto';
 import { AuthenticatedRequest } from '../../../middleware/auth.js';
 import { logger } from '../../../utils/logger.js';
-import { errorTracker } from '../../../core/errors/error-tracker';
+import { errorTracker } from '../../../core/errors/error-tracker.js';
 
 /**
  * Request context interface for analytics operations
@@ -124,3 +124,40 @@ export function addContextMetadata(
     req.analyticsContext.metadata[key] = value;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

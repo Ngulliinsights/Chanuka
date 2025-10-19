@@ -1,18 +1,39 @@
+/**
+ * LEGACY MIDDLEWARE - DEPRECATED
+ * 
+ * This file has been consolidated into the unified middleware system.
+ * Please update your imports to use:
+ * 
+ * import { errorHandler } from '@shared/core/middleware/legacy-adapters/server-middleware-adapter'
+ */
+
 import { Request, Response, NextFunction } from 'express';
-import { ApiResponseWrapper, ErrorCodes, HttpStatus } from '../utils/api-response.js';
-import { errorTracker } from '../core/errors/error-tracker.js';
-import { logger } from '../../shared/core/src/observability/logging';
+import { ApiResponseWrapper, ErrorCodes, HttpStatus } from '@shared/core/utilities/api';
+import { logger } from '../../shared/core/logger.js';
 import { 
   BaseError, 
   ValidationError, 
   NotFoundError, 
   UnauthorizedError, 
-  ForbiddenError, 
-  DatabaseError,
-  TooManyRequestsError,
-  ErrorDomain,
-  ErrorSeverity
-} from '../../shared/core/src/observability/error-management';
+  ForbiddenError
+} from '../../shared/core/index.js';
+import { ErrorDomain, ErrorSeverity, DatabaseError, ConflictError } from '../utils/errors.js';
+
+console.warn('[DEPRECATED] server/middleware/error-handler.ts is deprecated. Please import from @shared/core/middleware instead.');
+
+// Simple error tracker
+const errorTracker = {
+  track: (error: Error, context?: any) => {
+    logger.error('Error tracked', { error: error.message, context });
+  }
+};
+
+// Additional error classes
+class TooManyRequestsError extends BaseError {
+  constructor(message: string = 'Too many requests') {
+    super(message, 429, 'TOO_MANY_REQUESTS');
+  }
+}
 
 // Type definitions for better type safety
 type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
@@ -27,8 +48,8 @@ interface ErrorContext {
   details?: any;
 }
 
-// Use the unified BaseError from error management system
-export { BaseError as AppError } from '../../shared/core/src/observability/error-management';
+// Use the unified BaseError from shared core
+export { BaseError };
 
 /**
  * Determines the severity level based on HTTP status code
@@ -228,8 +249,8 @@ export const createError = (
   statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR, 
   code: string = ErrorCodes.GENERIC_ERROR, 
   details?: any
-): AppError => {
-  return new AppError(message, statusCode, code, details);
+): BaseError => {
+  return new BaseError(message, statusCode, code, details);
 };
 
 // Re-export convenience functions from unified error management
@@ -237,26 +258,49 @@ export {
   NotFoundError, 
   ValidationError, 
   UnauthorizedError, 
-  ForbiddenError, 
-  DatabaseError,
-  TooManyRequestsError as RateLimitError
-} from '../../shared/core/src/observability/error-management';
-
-// Legacy factory function for backward compatibility
-export const createError = (
-  message: string, 
-  statusCode: number = HttpStatus.INTERNAL_SERVER_ERROR, 
-  code: string = ErrorCodes.GENERIC_ERROR, 
-  details?: any
-): BaseError => {
-  return new BaseError(message, {
-    statusCode,
-    code,
-    details,
-    domain: ErrorDomain.SYSTEM,
-    severity: statusCode >= 500 ? ErrorSeverity.HIGH : ErrorSeverity.MEDIUM
-  });
+  ForbiddenError
 };
+
+export { DatabaseError } from '../utils/errors.js';
+export { TooManyRequestsError as RateLimitError };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

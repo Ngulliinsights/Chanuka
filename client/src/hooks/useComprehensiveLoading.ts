@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { logger } from '../../../shared/core/src/observability/logging';
+import { useConnectionAware } from './useConnectionAware';
+import { useOnlineStatus } from './use-online-status';
 
 // Type definitions - more precise and maintainable
 export type LoadingType = 'initial' | 'navigation' | 'component' | 'api' | 'progressive';
@@ -52,14 +54,6 @@ const BASE_LOADING_TIMES = Object.freeze({
   progressive: 10000,
 } as const);
 
-// Mock hooks for demonstration - replace with your actual implementations
-function useConnectionAware() {
-  return { connectionType: 'fast' as 'fast' | 'slow' | 'offline' };
-}
-
-function useOnlineStatus() {
-  return true;
-}
 
 // Utility function extracted for reusability
 function clearTimeoutSafe(timeout: NodeJS.Timeout | undefined) {
@@ -126,19 +120,20 @@ export function useComprehensiveLoading() {
     if (!loadingState.isLoading || !optionsRef.current.connectionAware) return;
 
     if (!isOnline) {
+      clearAllTimeouts();
       setLoadingState(prev => ({
         ...prev,
         error: new Error('Connection lost during loading'),
         message: 'You appear to be offline',
       }));
-    } else if (connectionInfo.connectionType === 'slow' && 
+    } else if (connectionInfo.connectionType === 'slow' &&
                !loadingState.message?.includes('slow connection')) {
       setLoadingState(prev => ({
         ...prev,
         message: `${prev.message || 'Loading...'} (slow connection detected)`,
       }));
     }
-  }, [isOnline, connectionInfo.connectionType, loadingState.isLoading, loadingState.message]);
+  }, [isOnline, connectionInfo.connectionType, loadingState.isLoading, loadingState.message, clearAllTimeouts]);
 
   const startLoading = useCallback((
     type: LoadingType,
@@ -245,7 +240,9 @@ export function useComprehensiveLoading() {
 
   const retry = useCallback(() => {
     if (!mountedRef.current) return;
-    
+
+    clearAllTimeouts();
+
     const { retryLimit = DEFAULT_OPTIONS.retryLimit, retryDelay = DEFAULT_OPTIONS.retryDelay } = optionsRef.current;
     const currentRetryCount = loadingState.retryCount;
 
@@ -271,14 +268,14 @@ export function useComprehensiveLoading() {
 
     timeoutsRef.current.retry = setTimeout(() => {
       if (!mountedRef.current) return;
-      
+
       if (retryCallbackRef.current) {
         retryCallbackRef.current();
       } else {
         startLoading(loadingState.loadingType, optionsRef.current);
       }
     }, delay);
-  }, [loadingState.retryCount, loadingState.loadingType, startLoading]);
+  }, [clearAllTimeouts, loadingState.retryCount, loadingState.loadingType, startLoading]);
 
   const reset = useCallback(() => {
     clearAllTimeouts();
@@ -472,9 +469,9 @@ export function useTimeoutAwareOperation<T>(
     // Set timeout handler
     timersRef.current.timeout = setTimeout(() => {
       if (!mountedRef.current || operationIdRef.current !== currentOperationId) return;
-      
+
       clearTimeoutSafe(timersRef.current.interval);
-      
+
       setState({
         isLoading: false,
         data: null,
@@ -486,7 +483,7 @@ export function useTimeoutAwareOperation<T>(
 
     try {
       const result = await operation();
-      
+
       if (mountedRef.current && operationIdRef.current === currentOperationId) {
         Object.values(timersRef.current).forEach(clearTimeoutSafe);
 
@@ -524,6 +521,43 @@ export function useTimeoutAwareOperation<T>(
 
   return { ...state, execute };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

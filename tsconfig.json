@@ -1,5 +1,5 @@
 {
-  "include": ["client/src/**/*", "db/**/*", "server/**/*"],
+  "include": ["client/src/**/*", "db/**/*", "server/**/*", "shared/**/*"],
   "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
   "compilerOptions": {
     "baseUrl": ".",
@@ -32,7 +32,8 @@
       "@db/*": ["./db/*"],
       "@/*": ["./client/src/*"],
       "@shared/*": ["./shared/*"],
-      "shared/*": ["./shared/*"]
+      "shared/*": ["./shared/*"],
+      "@shared/core": ["./shared/core/index.ts"]
     }
   }
 }

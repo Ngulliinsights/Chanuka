@@ -509,12 +509,9 @@ drizzle.config.ts
 │   ├── 0001_snapshot.json
 │   ├── 0002_snapshot.json
 ├── README.md
-evaluation.md
 generate-structure-to-file.sh
 jest.backend.config.js
 jest.client.config.js
-jest.config.js
-LOGGING_MIGRATION_SUMMARY.md
 logs/
 ├── logger_errors.txt
 ├── logger_files.txt
@@ -533,7 +530,9 @@ migration/
 │   ├── rollback-migration.js
 ├── scripts/
 │   ├── codemod-imports.js
+│   ├── migrate-error-imports.js
 │   ├── package.json
+│   ├── validate-error-migration.js
 ├── validation/
 │   ├── package.json
 │   ├── validate-migration.js
@@ -541,11 +540,14 @@ nginx.conf
 package.json
 package-lock.json
 playwright.config.ts
-PLAYWRIGHT_MIGRATION_GUIDE.md
 postcss.config.js
 scripts/
 ├── analyze-bundle.js
+├── audit-codebase-utilities.ts
+├── audit-error-handling-sprawl.ts
+├── audit-middleware-sprawl.ts
 ├── check-table-structure.ts
+├── consolidate-sprawl.ts
 ├── database/
 │   ├── check-schema.ts
 │   ├── debug-migration-table.ts
@@ -553,10 +555,14 @@ scripts/
 │   ├── migrate.ts
 │   ├── run-migrations.ts
 │   ├── setup-schema.ts
+│   ├── simple-connection-test.ts
+│   ├── test-connection.ts
 ├── deployment/
 │   ├── deploy.sh
 ├── drop-schema.ts
+├── migrate-codebase-utilities.ts
 ├── migrate-console-logs.ts
+├── migrate-error-handling.ts
 ├── run-strategic-tests.js
 ├── setup-playwright.js
 ├── test-backend-only.js
@@ -604,6 +610,7 @@ scripts/
 │   ├── verify-transparency-task.ts
 │   ├── verify-user-profile-service.ts
 │   ├── verify-websocket-service.ts
+├── validate-test-config.js
 server/
 ├── CLEANUP_SUMMARY.md
 ├── comprehensive-race-condition-test.js
@@ -1015,8 +1022,6 @@ server/
 │   │   ├── external-api-management.test.ts
 │   ├── setup.ts
 │   ├── sponsor-conflict-analysis.test.ts
-│   ├── test-migrations/
-│   │   ├── 0001_test.sql
 │   ├── unit/
 │   │   ├── auth-service.test.ts
 │   │   ├── database-service.test.ts
@@ -1050,6 +1055,7 @@ server/
 │   ├── analytics-controller-wrapper.ts
 │   ├── api.ts
 │   ├── api-response.ts
+│   ├── api-response.ts.backup
 │   ├── cache.ts
 │   ├── crypto.ts
 │   ├── db-helpers.ts
@@ -1057,6 +1063,7 @@ server/
 │   ├── errors.ts
 │   ├── featureFlags.ts
 │   ├── logger.ts
+│   ├── logger.ts.backup
 │   ├── metrics.ts
 │   ├── performance-monitoring-utils.ts
 │   ├── race-condition-prevention.ts
@@ -1064,12 +1071,19 @@ server/
 ├── vite.ts
 shared/
 ├── core/
+│   ├── CONSOLIDATION_MIGRATION_PLAN.md
 │   ├── CONSOLIDATION_PLAN.md
+│   ├── CONSOLIDATION_README.md
+│   ├── CONSOLIDATION_SUMMARY.md
+│   ├── ERROR_MANAGEMENT_MIGRATION_SUMMARY.md
 │   ├── MIGRATION_GUIDE.md
 │   ├── MIGRATION_VALIDATION_REPORT.md
 │   ├── package.json
 │   ├── package-lock.json
 │   ├── README.md
+│   ├── scripts/
+│   │   ├── consolidate-redundancies.ts
+│   │   ├── validate-consolidation.ts
 │   ├── src/
 │   │   ├── __tests__/
 │   │   │   ├── integration.test.ts
@@ -1245,6 +1259,9 @@ shared/
 │   │   │   ├── factory.ts.bak
 │   │   │   ├── factory.ts.new
 │   │   │   ├── index.ts
+│   │   │   ├── legacy-adapters/
+│   │   │   │   ├── auth-adapter.ts
+│   │   │   │   ├── server-middleware-adapter.ts
 │   │   │   ├── rate-limit/
 │   │   │   │   ├── provider.ts
 │   │   │   ├── registry.ts
@@ -1424,6 +1441,11 @@ shared/
 │   │   │   ├── auth.types.ts
 │   │   │   ├── services.ts
 │   │   │   ├── validation-types.ts
+│   │   ├── utilities/
+│   │   │   ├── cache/
+│   │   │   │   ├── index.ts
+│   │   │   ├── performance/
+│   │   │   │   ├── index.ts
 │   │   ├── utils/
 │   │   │   ├── constants.ts
 │   │   │   ├── correlation-id.ts
@@ -1459,6 +1481,7 @@ shared/
 │   │   │   │   ├── zod-adapter.ts
 │   │   │   ├── constants.ts
 │   │   │   ├── core/
+│   │   │   │   ├── base-adapter.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── interfaces.ts
 │   │   │   │   ├── validation-service.ts
@@ -1495,6 +1518,19 @@ shared/
 │   │   ├── refined_cross_cutting.ts
 │   ├── test-validation.js
 │   ├── tsconfig.json
+│   ├── utilities/
+│   │   ├── api/
+│   │   │   ├── index.ts
+│   │   │   ├── response.ts
+│   │   ├── database/
+│   │   ├── index.ts
+│   │   ├── logging/
+│   │   │   ├── index.ts
+│   │   │   ├── unified-logger.ts
+│   │   ├── performance/
+│   │   │   ├── index.ts
+│   │   │   ├── monitoring.ts
+│   │   ├── validation/
 │   ├── vitest.config.ts
 ├── database/
 │   ├── connection.ts
@@ -1520,7 +1556,6 @@ shared/
 │   ├── errors.ts
 │   ├── expert.ts
 │   ├── legal-analysis.ts
-STRATEGIC_MIGRATION_RESULTS.md
 tailwind.config.ts
 TESTING_GUIDE.md
 tests/
@@ -1546,10 +1581,9 @@ tools/
 tsconfig.json
 tsconfig.server.json
 vite.config.ts
-vitest.config.ts
 vitest.frontend.config.ts
 ```
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-18 16:01:58
+Generated on: 2025-10-18 20:35:40

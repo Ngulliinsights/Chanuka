@@ -12,7 +12,7 @@ import { logger } from '../shared/core/src/observability/logging';
 // Configuration
 const SCHEMA_PATH = path.resolve('./shared/schema.ts');
 const STORAGE_DIR = path.resolve('./server/storage');
-const CONNECTION_PATH = path.resolve('./shared/database/connection.ts');
+const CONNECTION_PATH = path.resolve(../shared/database/connection.ts');
 
 interface ValidationResult {
   file: string;
@@ -97,9 +97,9 @@ function validateStorageFile(content: string, filePath: string): ValidationIssue
   const hasSchemaImport = content.includes('from "../../shared/schema') || 
                          content.includes('from \'../../shared/schema') ||
                          content.includes('from "../../../shared/schema');
-  const hasConnectionImport = content.includes('from "../../shared/database/connection') || 
-                             content.includes('from \'../../shared/database/connection') ||
-                             content.includes('from "../../../shared/database/connection');
+  const hasConnectionImport = content.includes('from "../shared/database/connection') || 
+                             content.includes('from \'../shared/database/connection') ||
+                             content.includes('from "../shared/database/connection');
   
   if (!hasSchemaImport && !hasConnectionImport) {
     issues.push({
@@ -211,6 +211,43 @@ validateSchemaCongruence()
   });
 
 export { validateSchemaCongruence };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

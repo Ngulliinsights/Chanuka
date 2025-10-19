@@ -9,9 +9,9 @@ import {
   type BillEngagement, type Notification, type SponsorAffiliation, 
   type BillSponsorship, type SponsorTransparency, type BillSectionConflict,
   type UserInterest, type BillTag
-} from "@shared/schema.js";
+} from "@shared/schema";
 import { eq, desc, and, or, like, sql, count, SQL } from "drizzle-orm";
-import { database as db } from "../../../shared/database/connection.js";
+import { database as db } from "../shared/database/connection";
 import { logger } from '@shared/core/src/observability/logging';
 
 export interface UnifiedStorage {
@@ -421,6 +421,43 @@ export class DatabaseUnifiedStorage implements UnifiedStorage {
 
 // Export singleton instance
 export const unifiedStorage = new DatabaseUnifiedStorage();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

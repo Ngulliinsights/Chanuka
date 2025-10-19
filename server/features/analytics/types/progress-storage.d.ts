@@ -1,6 +1,6 @@
 import { Redis } from 'ioredis';
 import { Pool } from 'pg';
-import { type InsertUserProgress, type UserProgress } from '../../../../shared/schema.js';
+import { type InsertUserProgress, type UserProgress } from '../../../../shared/schema';
 import { BaseStorage } from './base/BaseStorage.js';
 import { logger } from '../../../utils/logger.js';
 export declare class ProgressStorage extends BaseStorage<UserProgress> {
@@ -18,6 +18,43 @@ export declare class ProgressStorage extends BaseStorage<UserProgress> {
     }>;
     shutdown(): Promise<void>;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

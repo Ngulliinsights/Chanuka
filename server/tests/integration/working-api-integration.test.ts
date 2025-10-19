@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, jest } from '@jest/globals';
-import * as request from 'supertest';
+import request from 'supertest';
 import express from 'express';
 import cors from 'cors';
-import { router as billsRouter } from '../../features/bills/bills';
+import { router as billsRouter } from '../../features/bills/presentation/bills-router.ts';
 import { router as sponsorsRouter } from '../../features/bills/sponsors';
 import { router as authRouter } from '../../core/auth/auth';
 import { router as healthRouter } from '../../infrastructure/monitoring/health';
@@ -73,7 +73,11 @@ describe('Working API Integration Tests', () => {
 
       for (const userData of testUserData) {
         try {
-          const user = await db.insert(users).values(userData).returning();
+          const user = await db.insert(users).values({
+            ...userData,
+            role: 'citizen' as const,
+            verificationStatus: 'verified' as const
+          }).returning();
           testUsers.push(user[0]);
           
           // Generate auth tokens
@@ -167,7 +171,10 @@ describe('Working API Integration Tests', () => {
 
       for (const billData of testBillData) {
         try {
-          const bill = await db.insert(bills).values(billData).returning();
+          const bill = await db.insert(bills).values({
+            ...billData,
+            status: 'introduced' as const
+          }).returning();
           testBills.push(bill[0]);
         } catch (error) {
           console.warn('Failed to create test bill:', error);
@@ -484,6 +491,43 @@ describe('Working API Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

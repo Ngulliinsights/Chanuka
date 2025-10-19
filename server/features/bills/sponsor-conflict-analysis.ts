@@ -1,6 +1,6 @@
 import { sponsorService, type SponsorWithRelations } from './sponsor-service.js';
 import { logger } from '../../utils/logger';
-import type { Sponsor, SponsorAffiliation, SponsorTransparency } from '../../../shared/schema.js';
+import type { Sponsor, SponsorAffiliation, SponsorTransparency } from '../../../shared/schema';
 
 /**
  * SponsorConflictAnalysisService - Business Logic Layer
@@ -220,7 +220,7 @@ export class SponsorConflictAnalysisService {
       const allConflicts = await Promise.all(detectionPromises);
       return allConflicts.flat();
     } catch (error) {
-      logger.error('Error detecting conflicts', { sponsorId }, error);
+      logger.error('Error detecting conflicts', { sponsorId, error: error.message });
       throw new Error(`Conflict detection failed: ${(error as Error).message}`);
     }
   }
@@ -249,7 +249,7 @@ export class SponsorConflictAnalysisService {
 
       return { nodes, edges, clusters, metrics };
     } catch (error) {
-      logger.error('Error creating conflict mapping', { billId }, error);
+      logger.error('Error creating conflict mapping', { billId, error: error.message });
       throw new Error(`Conflict mapping failed: ${(error as Error).message}`);
     }
   }
@@ -293,7 +293,7 @@ export class SponsorConflictAnalysisService {
 
       return trends.sort((a, b) => b.riskScore - a.riskScore);
     } catch (error) {
-      logger.error('Error analyzing conflict trends', { sponsorId, timeframeMonths }, error);
+      logger.error('Error analyzing conflict trends', { sponsorId, timeframeMonths, error: error.message });
       throw new Error(`Trend analysis failed: ${(error as Error).message}`);
     }
   }
@@ -335,7 +335,7 @@ export class SponsorConflictAnalysisService {
         recommendations
       };
     } catch (error) {
-      logger.error('Error generating risk profile', { sponsorId }, error);
+      logger.error('Error generating risk profile', { sponsorId, error: error.message });
       throw new Error(`Risk profile generation failed: ${(error as Error).message}`);
     }
   }
@@ -461,7 +461,7 @@ export class SponsorConflictAnalysisService {
 
     // Detect indirect financial conflicts through family/business networks
     const indirectAffiliations = affiliations.filter(
-      a => a.type === 'family' || a.type === 'business_network'
+      a => a.type === 'economic' || a.type === 'professional'
     );
 
     for (const affiliation of indirectAffiliations) {
@@ -747,8 +747,8 @@ export class SponsorConflictAnalysisService {
   private calculateAffiliationRisk(affiliations: SponsorAffiliation[]): number {
     if (affiliations.length === 0) return 0;
 
-    const directConflicts = affiliations.filter(a => a.conflictType === 'direct').length;
-    const indirectConflicts = affiliations.filter(a => a.conflictType === 'indirect').length;
+    const directConflicts = affiliations.filter(a => a.conflictType === 'financial' || a.conflictType === 'ownership').length;
+    const indirectConflicts = affiliations.filter(a => a.conflictType === 'influence' || a.conflictType === 'representation').length;
 
     let risk = 0;
     risk += directConflicts * 20;  // Direct conflicts are high risk
@@ -1316,3 +1316,40 @@ export class SponsorConflictAnalysisService {
 }
 
 export const sponsorConflictAnalysisService = new SponsorConflictAnalysisService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

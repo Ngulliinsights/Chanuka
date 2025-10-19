@@ -74,3 +74,39 @@ describe('External API Management Integration Tests', () => {
     }); // This closing brace and parenthesis were missing
   }); // This closing brace for the describe block was missing
 }); // This is your outermost describe block closing
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

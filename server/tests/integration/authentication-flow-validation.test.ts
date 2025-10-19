@@ -98,7 +98,11 @@ describe('Authentication Flow Validation Tests', () => {
       ];
 
       for (const userData of testUserData) {
-        const user = await db.insert(users).values(userData).returning();
+        const user = await db.insert(users).values({
+          ...userData,
+          role: 'citizen' as const,
+          verificationStatus: 'verified' as const
+        }).returning();
         testUsers.push(user[0]);
         
         // Generate valid tokens for each user
@@ -777,6 +781,43 @@ describe('Authentication Flow Validation Tests', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

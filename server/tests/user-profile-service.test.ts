@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
-import { database as db, users, userProfiles, userInterests, billEngagement, notifications, bills } from '../../shared/database/connection.ts';
+import { database as db, user as users, userProfile as userProfiles, userInterest as userInterests, billEngagement, notification as notifications, bill as bills } from '../../shared/database/connection.js';
 import { userProfileService } from '../features/users/domain/user-profile.ts';
 import { eq } from 'drizzle-orm';
 import { logger } from '../../shared/core/src/observability/logging';
@@ -217,7 +217,7 @@ describe('User Profile Service', () => {
       
       expect(completeProfile).toBeDefined();
       expect(completeProfile.id).toBe(testUserId);
-      expect(completeProfile.profile.bio).toBe('Test bio');
+      expect(completeProfile.profile?.bio).toBe('Test bio');
       expect(completeProfile.preferences.emailNotifications).toBe(false);
       expect(completeProfile.verification.verificationStatus).toBe('pending');
       expect(completeProfile.engagement.totalBillsTracked).toBe(1);
@@ -236,6 +236,43 @@ describe('User Profile Service', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

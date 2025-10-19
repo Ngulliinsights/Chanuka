@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 const { Pool } = pg;
-import * as schema from "../shared/schema.js";
+import * as schema from "../shared/schema";
 import { databaseFallbackService as fallbackService } from './infrastructure/database/database-fallback.js';
 import { logger } from './utils/logger.js';
 
@@ -350,18 +350,55 @@ export function getFallbackService() {
 export { fallbackService };
 
 // Re-export schema for convenience
-export { 
-  bills, 
-  users, 
-  billComments, 
-  userProfiles,
+export {
+  bill as bills,
+  user as users,
+  billComment as billComments,
+  userProfile as userProfiles,
   billEngagement,
-  notifications,
+  notification as notifications,
   analysis,
-  sponsors,
-  sponsorAffiliations,
-  billSponsorships,
+  sponsor as sponsors,
+  sponsorAffiliation as sponsorAffiliations,
+  billSponsorship as billSponsorships,
   sponsorTransparency,
-  billSectionConflicts,
-  userInterests
-} from '../shared/schema.js';
+  billSectionConflict as billSectionConflicts,
+  userInterest as userInterests
+} from '../shared/schema';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

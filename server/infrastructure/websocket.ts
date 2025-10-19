@@ -2,8 +2,8 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { Server } from 'http';
 import { IncomingMessage } from 'http';
 import * as jwt from 'jsonwebtoken';
-import { database as db } from '../../shared/database/connection.js';
-import { users } from '../../shared/schema.js';
+import { database as db } from '@shared/database/connection';
+import { User, users } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '../../shared/core/src/observability/logging';
 
@@ -460,13 +460,13 @@ export class WebSocketService {
       ) as { userId: string };
 
       // Verify user exists in database
-      const user = await db
+       const userRecord = await db
         .select({ id: users.id })
         .from(users)
         .where(eq(users.id, decoded.userId))
         .limit(1);
 
-      if (user.length === 0) {
+      if (userRecord.length === 0) {
         logger.warn('WebSocket connection rejected: User not found', { 
           component: 'WebSocketService',
           userId: decoded.userId 
@@ -490,9 +490,10 @@ export class WebSocketService {
       return true;
 
     } catch (error) {
-      logger.warn('Token verification failed', { 
-        component: 'WebSocketService' 
-      }, error instanceof Error ? error : new Error(String(error)));
+      logger.warn('Token verification failed', {
+        component: 'WebSocketService',
+        errorMessage: error instanceof Error ? error.message : String(error)
+      });
       return false;
     }
   }
@@ -954,6 +955,7 @@ export class WebSocketService {
    * Handle batch unsubscription request for multiple bills.
    * Efficiently processes multiple unsubscriptions at once.
    */
+  // cSpell:ignore unsubscriptions
   private async handleBatchUnsubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
     const { billIds } = message.data || {};
 
@@ -2119,3 +2121,40 @@ export class WebSocketService {
 
 // Export singleton instance
 export const webSocketService = new WebSocketService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

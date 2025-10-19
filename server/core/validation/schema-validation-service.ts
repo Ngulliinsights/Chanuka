@@ -5,7 +5,7 @@ import {
   complianceChecks,
   securityAuditLogs,
   threatIntelligence
-} from '../../../shared/schema.js';
+} from '../../../shared/schema';
 
 export interface ValidationResult {
   tableName: string;
@@ -506,3 +506,40 @@ export class SchemaValidationService {
 
 // Export singleton instance
 export const schemaValidationService = SchemaValidationService.getInstance();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

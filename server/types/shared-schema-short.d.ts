@@ -31,8 +31,45 @@ declare module '@shared/schema' {
   export default _default;
 }
 
-declare module '@shared/schema.js' {
+declare module '@shared/schema' {
   export * from '@shared/schema';
   const _default: any;
   export default _default;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

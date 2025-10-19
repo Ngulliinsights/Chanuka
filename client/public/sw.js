@@ -3,6 +3,31 @@
  * Provides caching and offline support for critical features
  */
 
+// Minimal client-side logger shim for service worker
+const logger = {
+  debug: function() {
+    // no-op in production unless __DEV_LOG__ is set
+    if (typeof window !== 'undefined' && window.__DEV_LOG__) {
+      console.debug.apply(console, arguments);
+    }
+  },
+  info: function() {
+    if (typeof window !== 'undefined' && window.__DEV_LOG__) {
+      console.info.apply(console, arguments);
+    }
+  },
+  warn: function() {
+    console.warn.apply(console, arguments);
+  },
+  error: function() {
+    console.error.apply(console, arguments);
+  },
+  child: function(meta) {
+    // return same logger for simplicity
+    return logger;
+  },
+};
+
 const CACHE_NAME = 'chanuka-v1';
 const OFFLINE_URL = '/offline.html';
 
@@ -391,3 +416,39 @@ self.addEventListener('message', (event) => {
     event.ports[0].postMessage({ version: CACHE_NAME });
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

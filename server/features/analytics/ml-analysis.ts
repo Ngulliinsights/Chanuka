@@ -1,8 +1,8 @@
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '../shared/database/connection';
 import { bills, analysis } from '../../../shared/schema/schema.js';
 import { eq, desc } from 'drizzle-orm';
 import { logger } from '../../utils/logger';
-import { errorTracker } from '../../core/errors/error-tracker';
+import { errorTracker } from '../../core/errors/error-tracker.js';
 import type {
   AnalysisResult,
   SimilarityAnalysis,
@@ -470,6 +470,43 @@ export async function performComprehensiveAnalysis(billId: string): Promise<{
     };
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

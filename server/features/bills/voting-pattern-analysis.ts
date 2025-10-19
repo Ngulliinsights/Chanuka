@@ -1,4 +1,4 @@
-import { readDatabase } from '../../db.js';
+import { readDatabase } from '../../../shared/database/connection.js';
 // Backwards-compatible proxy so existing code using `db.select()` etc. keeps working
 const db = new Proxy({}, {
   get(_target, prop: string | symbol) {
@@ -12,7 +12,7 @@ const db = new Proxy({}, {
 import { 
   sponsors, billSponsorships, bills, sponsorAffiliations,
   type Sponsor, type BillSponsorship 
-} from '../../../shared/schema.js';
+} from '../../../shared/schema';
 import { eq, and, sql, desc, gte, lte, count, avg, inArray } from 'drizzle-orm';
 import { logger } from '../../utils/logger';
 
@@ -987,6 +987,43 @@ export class VotingPatternAnalysisService {
 }
 
 export const votingPatternAnalysisService = new VotingPatternAnalysisService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

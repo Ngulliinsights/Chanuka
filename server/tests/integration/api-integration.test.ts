@@ -30,7 +30,17 @@ describe('Comprehensive API Integration Tests', () => {
     app.use('/api/auth', authRouter);
     app.use('/api/bills', billsRouter);
     app.use('/api/sponsors', sponsorsRouter);
-    app.use('/api/financial-disclosure', financialDisclosureRouter);
+    // Mock services for financial disclosure router
+    const mockMonitoringService = {
+      collectFinancialDisclosures: jest.fn(),
+      getDisclosureAlerts: jest.fn(),
+      buildFinancialRelationshipMap: jest.fn()
+    };
+    const mockAnalyticsService = {
+      generateReport: jest.fn(),
+      getMetrics: jest.fn()
+    };
+    app.use('/api/financial-disclosure', createFinancialDisclosureRouter(mockMonitoringService as any, mockAnalyticsService as any));
     app.use('/api/admin', adminRouter);
     app.use('/api/notifications', notificationsRouter);
     app.use('/api/real-time-tracking', realTimeTrackingRouter);
@@ -651,6 +661,43 @@ describe('Comprehensive API Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

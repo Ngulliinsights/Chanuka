@@ -1,6 +1,6 @@
 import { advancedCachingService } from './advanced-caching.js';
-import { database as db, bills, sponsors, users, billComments } from '../../../shared/database/connection.js';
-import { desc, eq, sql, and } from 'drizzle-orm';
+import { database as db, bill as bills, sponsor as sponsors, user as users, billComment as billComments } from '../../../shared/database/connection';
+import { desc, eq, sql } from 'drizzle-orm';
 import { logger } from '@shared/core/src/observability/logging';
 
 export interface WarmingRule {
@@ -58,6 +58,11 @@ export class CacheWarmingService {
   constructor() {
     this.initializeDefaultRules();
     this.scheduleWarmingTasks();
+    
+    // Schedule periodic cleanup to prevent memory leaks
+    setInterval(() => {
+      this.cleanupMemory();
+    }, 300000); // Every 5 minutes
   }
 
   /**
@@ -169,8 +174,15 @@ export class CacheWarmingService {
         return;
       }
 
-      // Execute the fetch function
-      const data = await rule.fetchFunction();
+      // Execute the fetch function with timeout protection
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error(`Cache warming timeout for rule ${rule.name}`)), 30000); // 30 second timeout
+      });
+
+      const data = await Promise.race([
+        rule.fetchFunction(),
+        timeoutPromise
+      ]);
 
       // Cache the result
       await advancedCachingService.set(rule.cacheKey, data, rule.ttl);
@@ -187,9 +199,9 @@ export class CacheWarmingService {
         cacheKey: rule.cacheKey
       });
 
-      // Keep only recent executions
-      if (this.stats.rulesExecuted.length > 1000) {
-        this.stats.rulesExecuted = this.stats.rulesExecuted.slice(-500);
+      // Keep only recent executions (more aggressive cleanup)
+      if (this.stats.rulesExecuted.length > 100) {
+        this.stats.rulesExecuted = this.stats.rulesExecuted.slice(-50);
       }
 
       console.log(`[Cache Warming] ✅ Warmed cache for ${rule.name} (${duration}ms)`);
@@ -550,10 +562,81 @@ export class CacheWarmingService {
 
     return true;
   }
+
+  /**
+   * Clean up memory by removing old execution records and optimizing data structures
+   */
+  private cleanupMemory(): void {
+    // Keep only last 25 execution records
+    if (this.stats.rulesExecuted.length > 25) {
+      this.stats.rulesExecuted = this.stats.rulesExecuted.slice(-25);
+    }
+
+    // Remove execution records older than 1 hour
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    this.stats.rulesExecuted = this.stats.rulesExecuted.filter(
+      record => record.timestamp > oneHourAgo
+    );
+
+    logger.info(`[Cache Warming] Memory cleanup completed. Execution records: ${this.stats.rulesExecuted.length}`, { component: 'Chanuka' });
+  }
+
+  /**
+   * Shutdown method to clean up intervals and prevent memory leaks
+   */
+  shutdown(): void {
+    // Clear all warming intervals
+    this.warmingIntervals.forEach((interval) => {
+      clearInterval(interval);
+    });
+    this.warmingIntervals.clear();
+
+    // Clear stats
+    this.stats.rulesExecuted = [];
+    
+    logger.info('[Cache Warming] Service shutdown completed', { component: 'Chanuka' });
+  }
 }
 
 // Export singleton instance
 export const cacheWarmingService = new CacheWarmingService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

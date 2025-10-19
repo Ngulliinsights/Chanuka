@@ -1,8 +1,8 @@
 declare module '@shared/schema' {
-  export * from '@shared/schema.js';
+  export * from '@shared/schema';
 }
 
-declare module '@shared/schema.js' {
+declare module '@shared/schema' {
   // Minimal schema shims: export commonly used tables/types as any
   export const bills: any;
   export const users: any;
@@ -38,3 +38,40 @@ declare module '*.js' {
   const m: any;
   export = m;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

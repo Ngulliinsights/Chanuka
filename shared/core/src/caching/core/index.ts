@@ -36,3 +36,39 @@ export { BaseCacheAdapter } from './base-adapter';
 
 // Key generator
 export { CacheKeyGenerator, cacheKeyGenerator } from './key-generator';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

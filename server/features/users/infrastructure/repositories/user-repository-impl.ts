@@ -1,4 +1,4 @@
-import { database as db } from '../../../../../shared/database/connection';
+import { database as db } from '../../../shared/database/connection';
 import { users, userProfiles, userInterests, citizenVerifications } from '../../../../../shared/schema/schema';
 import { eq, and, desc, sql, or } from 'drizzle-orm';
 import { UserRepository } from '../../domain/repositories/user-repository';
@@ -455,3 +455,39 @@ export class UserRepositoryImpl implements UserRepository {
     return statusCounts;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

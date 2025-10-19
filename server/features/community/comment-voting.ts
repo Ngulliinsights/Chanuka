@@ -1,6 +1,10 @@
 import { databaseService } from '../../infrastructure/database/database-service.js';
-import { database as db } from '../../../shared/database/connection.js';
-import { billComments, users, commentVotes } from '../../../shared/schema.js';
+import { database as db } from '../../../shared/database/connection';
+import { billComment, User, commentVote } from '../../../shared/schema';
+
+// Alias for backward compatibility
+const billComments = billComment;
+const commentVotes = commentVote;
 import { eq, and, sql, desc } from 'drizzle-orm';
 import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../infrastructure/cache/cache-service.js';
 import { logger } from '../../utils/logger';
@@ -458,6 +462,43 @@ export class CommentVotingService {
 }
 
 export const commentVotingService = new CommentVotingService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

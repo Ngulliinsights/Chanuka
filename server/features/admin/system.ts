@@ -1,11 +1,10 @@
 import express, { Request, Response } from 'express';
 import { sql } from 'drizzle-orm';
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '../../../shared/database/connection';
 import { HealthCheckResponse } from '../../types/api.ts';
 import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../utils/api-response.ts";
 import { errorTracker } from '../../core/errors/error-tracker.js';
-import { logger } from '../../utils/logger';
-
+import { logger } from '../../../shared/core/src/observability/logging';
 interface SchemaIssue {
   type: string;
   severity: 'critical' | 'warning';
@@ -20,7 +19,7 @@ export function setupSystemRoutes(app: express.Router) {
   // Database schema information
   app.get('/schema', async (req: express.Request, res: express.Response) => {
     const startTime = Date.now();
-    
+
     try {
       const tableInfo = await db.execute(sql`
         SELECT table_name, column_name, data_type, is_nullable, column_default
@@ -62,7 +61,7 @@ export function setupSystemRoutes(app: express.Router) {
   // Environment status
   app.get('/environment', (req: express.Request, res: express.Response) => {
     const startTime = Date.now();
-    
+
     const envStatus = {
       NODE_ENV: process.env.NODE_ENV || 'development',
       DATABASE_URL: process.env.DATABASE_URL ? 'Set' : 'Not set',
@@ -72,14 +71,14 @@ export function setupSystemRoutes(app: express.Router) {
       timestamp: new Date().toISOString()
     };
 
-    return ApiSuccess(res, envStatus, 
+    return ApiSuccess(res, envStatus,
       ApiResponseWrapper.createMetadata(startTime, 'static'));
   });
 
   // Database table count summary
   app.get('/stats', async (req: express.Request, res: express.Response) => {
     const startTime = Date.now();
-    
+
     try {
       const tableStats = await db.execute(sql`
         SELECT 
@@ -116,7 +115,7 @@ export function setupSystemRoutes(app: express.Router) {
   // Migration status
   app.get('/migrations', (req: express.Request, res: express.Response) => {
     const startTime = Date.now();
-    
+
     return ApiSuccess(res, {
       migrations: [
         {
@@ -142,7 +141,7 @@ export function setupSystemRoutes(app: express.Router) {
   // Schema consistency check
   app.get('/schema/check', async (req: express.Request, res: express.Response) => {
     const startTime = Date.now();
-    
+
     try {
       const issues: SchemaIssue[] = [];
 
@@ -209,7 +208,7 @@ export function setupSystemRoutes(app: express.Router) {
   // System health check
   app.get('/health', async (req: express.Request, res: express.Response<HealthCheckResponse>) => {
     const startTime = Date.now();
-    
+
     try {
       // Test database connection
       await db.execute(sql`SELECT 1`);
@@ -218,7 +217,8 @@ export function setupSystemRoutes(app: express.Router) {
         status: 'healthy',
         database: 'connected',
         timestamp: new Date().toISOString(),
-        uptime: process.uptime()
+        uptime: process.uptime(),
+        version: '1.0.0'
       };
 
       return ApiSuccess(res, healthResponse,
@@ -234,7 +234,8 @@ export function setupSystemRoutes(app: express.Router) {
         status: 'unhealthy',
         database: 'error',
         timestamp: new Date().toISOString(),
-        error: error instanceof Error ? error.message : 'Unknown error'
+        uptime: process.uptime(),
+        version: '1.0.0'
       };
       return ApiError(res, error instanceof Error ? error : 'System health check failed', 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -247,6 +248,43 @@ setupSystemRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

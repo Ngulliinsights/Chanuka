@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import WebSocket from 'ws';
-import { app } from '../../index.js';
+import { app } from '../../index.ts';
 import { logger } from '../../../shared/core/src/observability/logging';
 
 describe('WebSocket and Real-Time Features Integration Tests', () => {
@@ -674,6 +674,43 @@ describe('WebSocket and Real-Time Features Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

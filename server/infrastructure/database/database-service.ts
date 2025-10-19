@@ -3,7 +3,7 @@ import pg from 'pg';
 const { Pool } = pg;
 import * as schema from "../../../shared/schema/schema.js";
 import { eq, and, or, sql } from 'drizzle-orm';
-import { errorTracker } from '../../core/errors/error-tracker';
+import { errorTracker } from '../../core/errors/error-tracker.js';
 import { config } from '../../config/index.js';
 import { logger } from '../../utils/logger.js';
 
@@ -774,6 +774,43 @@ export const databaseService = new DatabaseService();
 
 // Export types
 export type { DatabaseResult, HealthCheckResult, TransactionCallback, RetryConfig };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

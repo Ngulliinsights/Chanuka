@@ -10,7 +10,7 @@ import {
   type InsertUser,
   type UserProfile,
   type InsertUserProfile
-} from '../../../shared/database/connection.js';
+} from '../shared/database/connection';
 import { eq, and, or, sql } from 'drizzle-orm';
 import type { StorageConfig } from '../../../infrastructure/database/base/BaseStorage.js';
 import { BaseStorage } from '../../../infrastructure/database/base/BaseStorage.js';
@@ -241,6 +241,43 @@ export class UserStorage extends BaseStorage<User> {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

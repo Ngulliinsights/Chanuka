@@ -5,7 +5,13 @@
  * into a single, unified base error class.
  */
 
-import { logger } from '../../../observability/logging/index.js';
+// Temporarily disable complex logging to avoid circular dependencies
+const logger = {
+  error: (msg: string, meta?: any) => console.error(msg, meta),
+  warn: (msg: string, meta?: any) => console.warn(msg, meta),
+  info: (msg: string, meta?: any) => console.info(msg, meta),
+  debug: (msg: string, meta?: any) => console.debug(msg, meta)
+};
 
 // Error domains for categorization
 export enum ErrorDomain {
@@ -334,3 +340,39 @@ export const AUTH_ERROR_MESSAGES = {
   FORBIDDEN: 'Access forbidden',
   TOKEN_REQUIRED: 'Authentication token required'
 } as const;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

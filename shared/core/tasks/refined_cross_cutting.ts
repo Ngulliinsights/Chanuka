@@ -549,7 +549,7 @@ export function RateLimit(options: {
 // -----------------------------------------------------------------------------
 
 // core/error-handling/errors.ts
-export class AppError extends Error {
+export class BaseError extends Error {
   constructor(
     message: string,
     public statusCode: number = 500,
@@ -558,18 +558,18 @@ export class AppError extends Error {
     public isOperational: boolean = true
   ) {
     super(message);
-    this.name = 'AppError';
+    this.name = 'BaseError';
     Error.captureStackTrace(this, this.constructor);
   }
 }
 
-export class ValidationError extends AppError {
+export class ValidationError extends BaseError {
   constructor(message: string, public errors: any[]) {
     super(message, 422, 'VALIDATION_ERROR', { errors });
   }
 }
 
-export class NotFoundError extends AppError {
+export class NotFoundError extends BaseError {
   constructor(resource: string, identifier?: string) {
     super(
       identifier ? `${resource} with id '${identifier}' not found` : `${resource} not found`,
@@ -580,31 +580,31 @@ export class NotFoundError extends AppError {
   }
 }
 
-export class UnauthorizedError extends AppError {
+export class UnauthorizedError extends BaseError {
   constructor(message = 'Authentication required') {
     super(message, 401, 'UNAUTHORIZED');
   }
 }
 
-export class ForbiddenError extends AppError {
+export class ForbiddenError extends BaseError {
   constructor(message = 'Insufficient permissions', requiredPermissions?: string[]) {
     super(message, 403, 'FORBIDDEN', { requiredPermissions });
   }
 }
 
-export class ConflictError extends AppError {
+export class ConflictError extends BaseError {
   constructor(message: string, conflictingResource?: string) {
     super(message, 409, 'CONFLICT', { conflictingResource });
   }
 }
 
-export class TooManyRequestsError extends AppError {
+export class TooManyRequestsError extends BaseError {
   constructor(retryAfter: number) {
     super('Too many requests', 429, 'TOO_MANY_REQUESTS', { retryAfter });
   }
 }
 
-export class ServiceUnavailableError extends AppError {
+export class ServiceUnavailableError extends BaseError {
   constructor(service: string, retryAfter?: number) {
     super(`Service ${service} is currently unavailable`, 503, 'SERVICE_UNAVAILABLE', {
       service,
@@ -765,7 +765,7 @@ export function unifiedErrorHandler() {
     }
     
     // Handle known error types
-    if (err instanceof AppError) {
+    if (err instanceof BaseError) {
       return res.status(err.statusCode).json({
         error: {
           message: err.message,
@@ -2546,6 +2546,43 @@ export class MemoryAdapter implements CacheService {
   }
 
   async get<T>(key: string): Promise<T | null> {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

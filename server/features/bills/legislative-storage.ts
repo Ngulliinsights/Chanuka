@@ -1,15 +1,15 @@
 import { 
-  bills, users, billComments, userProfiles, billEngagement, 
-  notifications, analysis, sponsors, sponsorAffiliations, 
-  billSponsorships, sponsorTransparency, billSectionConflicts,
+  bill as bills, user as users, billComment as billComments, userProfile as userProfiles, billEngagement,
+  notification as notifications, analysis, sponsor as sponsors, sponsorAffiliation as sponsorAffiliations,
+  billSponsorship as billSponsorships, sponsorTransparency, billSectionConflict as billSectionConflicts,
   type Bill, type InsertBill, type User, type InsertUser,
   type BillComment, type InsertBillComment, type UserProfile, type InsertUserProfile,
   type Sponsor, type InsertSponsor, type Analysis, type InsertAnalysis,
   type BillEngagement, type Notification, type SponsorAffiliation, 
   type SponsorTransparency, type BillSectionConflict
-} from "../../../shared/schema.js";
+} from "../../../shared/schema";
 import { eq, desc, and, or, like, count, asc, sql } from "drizzle-orm";
-import { readDatabase, writeDatabase } from '../../db.js';
+import { readDatabase } from '../../db.js';
 import { logger } from '../../utils/logger';
 
 // Enhanced engagement statistics interface with more detailed metrics
@@ -296,12 +296,12 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async createSponsor(insertSponsor: InsertSponsor): Promise<Sponsor> {
-    const result = await writeDatabase.insert(sponsors).values(insertSponsor).returning();
+    const result = await readDatabase().insert(sponsors).values(insertSponsor).returning();
     return result[0];
   }
 
   async updateSponsor(id: number, updateData: Partial<Sponsor>): Promise<Sponsor | undefined> {
-    const result = await writeDatabase.update(sponsors)
+    const result = await readDatabase().update(sponsors)
       .set(updateData)
       .where(eq(sponsors.id, id))
       .returning();
@@ -411,6 +411,43 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
 }
 
 export const legislativeStorage = new DatabaseLegislativeStorage();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

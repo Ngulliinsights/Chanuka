@@ -1,6 +1,12 @@
 import { databaseService } from '@/services/database-service';
 import { readDatabase } from '../../../db.js';
-import { bills, billTags, sponsors, billSponsorships } from '@shared/schema';
+import { bill, billTag, sponsor, billSponsorship } from '../../../../shared/schema/schema.js';
+
+// Alias for backward compatibility
+const bills = bill;
+const billTags = billTag;
+const sponsors = sponsor;
+const billSponsorships = billSponsorship;
 import {
   sql,
   and,
@@ -137,3 +143,39 @@ export class SearchRepository {
     return { ...row };
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

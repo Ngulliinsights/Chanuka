@@ -7,7 +7,7 @@ import { FinancialDisclosureMonitoringService } from "./monitoring.js";
 import { FinancialDisclosureAnalyticsService } from "../services/financial-disclosure.service.js";
 import { ApiSuccess, ApiError } from "../../../utils/api-response.js";
 import { z, ZodError } from "zod";
-import { ValidationError as InvalidInputError, SponsorNotFoundError, AppError } from "../../../utils/errors.js";
+import { ValidationError as InvalidInputError, SponsorNotFoundError, BaseError } from "../../../utils/errors.js";
 import crypto from 'crypto';
 import { logger } from '../../../utils/logger.js';
 import { errorTracker } from '../../../core/errors/error-tracker.js';
@@ -647,7 +647,7 @@ export function createFinancialDisclosureRouter(
       return ApiError(res, err.message, 400);
     }
     
-    if (err instanceof AppError) {
+    if (err instanceof BaseError) {
       return ApiError(res, err.message, err.statusCode || 500);
     }
     
@@ -683,3 +683,40 @@ export type {
   FinancialDisclosureMonitoringService,
   FinancialDisclosureAnalyticsService 
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

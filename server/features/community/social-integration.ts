@@ -1,4 +1,4 @@
-import type { User } from '../../../shared/schema.js';
+import type { User } from '../../../shared/schema';
 import { logger } from '../../utils/logger';
 
 // Define cache service interface locally if the module doesn't exist
@@ -611,3 +611,40 @@ export class SocialIntegrationService {
 
 // Export singleton instance for use throughout the application
 export const socialIntegrationService = new SocialIntegrationService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

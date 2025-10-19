@@ -1,11 +1,11 @@
 
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '../shared/database/connection';
 import { 
   socialShares,
   bills,
   type SocialShare, 
   type InsertSocialShare
-} from '../../../shared/schema.js';
+} from '../../../shared/schema';
 import { eq, desc, sql } from 'drizzle-orm';
 import { logger } from '../../utils/logger.js';
 import { BaseStorage } from '../../infrastructure/database/base/BaseStorage.js';
@@ -114,3 +114,40 @@ export class SocialShareStorage extends BaseStorage<SocialShare> {
     });
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

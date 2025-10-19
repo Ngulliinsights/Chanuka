@@ -344,3 +344,39 @@ export const LOG_LEVEL_VALUES: Record<LogLevel, number> = {
   fatal: 5,
   critical: 6,
 } as const;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

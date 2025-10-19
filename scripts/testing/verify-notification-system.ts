@@ -1,7 +1,7 @@
 import { notificationService } from './services/notification-service.js';
 import { billStatusMonitorService } from './services/bill-status-monitor.js';
 import { db } from './db.js';
-import { users, bills } from '../shared/schema.js';
+import { users, bills } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '../../shared/core/src/observability/logging';
 
@@ -241,6 +241,43 @@ async function verifyNotificationSystem() {
 
 // Run verification
 verifyNotificationSystem().catch(console.error);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -19,7 +19,6 @@ export * from './patterns/retry-patterns.js';
 
 // Middleware for different platforms
 export * from './middleware/express-error-middleware.js';
-export * from './middleware/error-middleware.js';
 
 // Legacy adapters for backward compatibility
 export * from './legacy-adapters/error-handling-adapter.js';
@@ -32,3 +31,39 @@ export * from './types.js';
 export { BaseError } from './errors/base-error.js';
 export { ErrorHandlerChain } from './handlers/error-handler-chain.js';
 export { CircuitBreaker } from './patterns/circuit-breaker.js';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

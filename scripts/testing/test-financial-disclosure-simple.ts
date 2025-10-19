@@ -8,7 +8,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 const { Pool } = pg;
-import * as schema from '../shared/schema.js';
+import * as schema from '../shared/schema';
 import { financialDisclosureIntegrationService } from './services/financial-disclosure-integration.js';
 import { logger } from '../../shared/core/src/observability/logging';
 
@@ -136,6 +136,43 @@ testFinancialDisclosureIntegration().catch(error => {
   logger.error('Fatal test error:', { component: 'Chanuka' }, error);
   process.exit(1);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

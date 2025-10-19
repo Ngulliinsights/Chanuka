@@ -1,12 +1,12 @@
 import {
   sponsors,
   type Sponsor
-} from "../../../shared/schema.js";
+} from "../../../shared/schema";
 import { eq, desc, and, or, sql, count, gt, gte, lte } from "drizzle-orm";
-import { database as db } from "../../../shared/database/connection.js";
+import { database as db } from "../shared/database/connection";
 import { cacheService, CACHE_KEYS, CACHE_TTL } from "../../infrastructure/cache/cache-service.js";
 import { logger } from '../../utils/logger';
-import { errorTracker } from '../../core/errors/error-tracker';
+import { errorTracker } from '../../core/errors/error-tracker.js';
 
 // Extended cache keys for monitoring features
 const MONITORING_CACHE_KEYS = {
@@ -660,6 +660,43 @@ export class RegulatoryChangeMonitoringService {
 
 // Export singleton instance
 export const regulatoryChangeMonitoringService = new RegulatoryChangeMonitoringService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

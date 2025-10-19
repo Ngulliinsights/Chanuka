@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
-import { database as db, bills, billEngagement, billComments, sponsors } from '../../../shared/database/connection';
+import { database as db, bill as bills, billEngagement, billComment as billComments, sponsor as sponsors } from '../../shared/database/connection.js';
 import { eq, sql, desc } from 'drizzle-orm';
 import { logger } from '../../../shared/core/src/observability/logging';
 
@@ -9,9 +9,7 @@ describe('Database Query Performance Tests', () => {
   const SLOW_QUERY_THRESHOLD_MS = 500;
   
   // Helper function to measure query execution time consistently
-  const measureQueryTime = async <T>(
-    queryFn: () => Promise<T>
-  ): Promise<{ result: T; queryTime: number }> => {
+  const measureQueryTime = async (queryFn: () => Promise<any>): Promise<{ result: any; queryTime: number }> => {
     const startTime = performance.now(); // More precise than Date.now()
     const result = await queryFn();
     const endTime = performance.now();
@@ -247,3 +245,40 @@ describe('Database Query Performance Tests', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,9 +1,9 @@
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '../shared/database/connection';
 import { 
   billComments,
   type BillComment as Comment, 
   type InsertBillComment
-} from '../../../shared/schema.js';
+} from '../../../shared/schema';
 import { eq, desc, and } from 'drizzle-orm';
 import { BaseStorage } from '../../infrastructure/database/base/BaseStorage.js';
 import { logger } from '../../utils/logger.js';
@@ -387,3 +387,40 @@ export class CommentStorage extends BaseStorage<Comment> {
     return this.comments.has(id);
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

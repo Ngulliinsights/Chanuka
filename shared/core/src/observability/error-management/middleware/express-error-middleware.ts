@@ -199,3 +199,44 @@ export function notFoundHandler(req: Request, res: Response, next: NextFunction)
 
   next(error);
 }
+
+/**
+ * Default unified error handler (legacy compatibility)
+ */
+export const unifiedErrorHandler = createErrorMiddleware();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

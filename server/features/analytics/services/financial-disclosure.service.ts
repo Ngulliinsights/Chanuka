@@ -5,7 +5,7 @@
 
 import {
   sponsors, sponsorTransparency, sponsorAffiliations
-} from "@shared/schema.js";
+} from "@shared/schema";
 import { eq, desc, and, sql, count } from "drizzle-orm";
 import { readDatabase } from "../../../db.js";
 import { cache } from '../../../utils/cache.js';
@@ -1070,3 +1070,40 @@ export class FinancialDisclosureAnalyticsService {
 // ============================================================================
 
 export const financialDisclosureAnalyticsService = new FinancialDisclosureAnalyticsService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

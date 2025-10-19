@@ -26,3 +26,40 @@ logger.info('👥 Sample Users:', { component: 'Chanuka' }, users.length, 'users
 
 logger.info('✅ Database service test completed', { component: 'Chanuka' });
 console.log(`🔗 Database Connected: ${isDatabaseConnected}`);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -11,7 +11,7 @@ const db = new Proxy({}, {
     return (d as any)[prop as any];
   }
 }) as any;
-import { billSectionConflicts } from '../../../shared/schema.js';
+import { billSectionConflict } from '../../../shared/schema/schema.js';
 import { eq } from 'drizzle-orm';
 import { NotFoundError } from '../../utils/errors.js';
 import { logger } from '../../utils/logger';
@@ -315,8 +315,8 @@ export class SponsorshipAnalysisService {
   private async getSectionConflicts(billId: number) {
     try {
       return await db.select()
-        .from(billSectionConflicts)
-        .where(eq(billSectionConflicts.billId, billId));
+        .from(billSectionConflict)
+        .where(eq(billSectionConflict.billId, billId));
     } catch (error) {
       logger.error('Error fetching section conflicts', { billId }, error as Record<string, any>);
       return [];
@@ -993,3 +993,40 @@ export class SponsorshipAnalysisService {
 }
 
 export const sponsorshipAnalysisService = new SponsorshipAnalysisService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,14 +1,15 @@
 /**
- * Cache Service Module
+ * Unified Caching System
  * 
- * Unified cache service with multi-tier support, circuit breaker patterns,
- * and single-flight request deduplication
+ * Consolidated cache service with multi-tier support, circuit breaker patterns,
+ * and single-flight request deduplication. Replaces all legacy cache implementations.
  */
 
 // Core cache interfaces and types
 export type {
   CacheService,
   CacheAdapter,
+  CacheAdapterConfig,
   CacheMetrics,
   CacheTierStats,
   CacheEntry,
@@ -17,7 +18,10 @@ export type {
   CacheHealthStatus,
   CacheEvent,
   CacheEventType,
+  CacheEventEmitter,
   CircuitBreakerState,
+  CircuitBreakerConfig,
+  CircuitBreakerMetrics,
   SingleFlightOptions,
   MultiTierOptions,
   PromotionStrategy,
@@ -27,15 +31,13 @@ export type {
   CacheWarmingStrategy,
   EvictionOptions,
   CacheStatsAggregation,
-} from './types';
+} from './core/interfaces.js';
 
 // Base adapter
-export { BaseCacheAdapter } from './base-adapter';
+export { BaseCacheAdapter } from './core/base-adapter.js';
 
 // Cache adapters
-export { MemoryAdapter, type MemoryAdapterConfig } from './adapters/memory-adapter';
-export { RedisAdapter, type RedisAdapterConfig } from './adapters/redis-adapter';
-export { MultiTierAdapter, type MultiTierAdapterConfig } from './adapters/multi-tier-adapter';
+export { MemoryAdapter, type MemoryAdapterConfig } from './adapters/memory-adapter.js';
 
 // Export CacheService as an alias for MemoryAdapter for backward compatibility
 export { MemoryAdapter as CacheService } from './adapters/memory-adapter';
@@ -146,7 +148,12 @@ export function resetDefaultCache(): void {
 }
 
 // Legacy adapters for backward compatibility
-export * from './legacy-adapters';
+export { 
+  LegacyCacheServiceAdapter, 
+  createLegacyCacheAdapter, 
+  isLegacyCacheService, 
+  migrateLegacyCacheService 
+} from './legacy-adapters/cache-service-adapter.js';
 
 // Cache decorators for method-level caching
 export function Cache(options: {
@@ -319,6 +326,43 @@ export class CacheManager {
 export function createCacheManager(cache?: CacheService): CacheManager {
   return new CacheManager(cache || getDefaultCache());
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

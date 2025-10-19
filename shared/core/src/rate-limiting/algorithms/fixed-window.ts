@@ -105,3 +105,40 @@ export class FixedWindowStore implements RateLimitStore {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

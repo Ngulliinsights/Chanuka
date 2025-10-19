@@ -1,13 +1,13 @@
-import { database as db } from '../../../shared/database/connection.js';
-import { 
-  users, 
-  bills, 
-  billEngagement, 
-  userInterests,
-  billComments,
-  sponsors,
-  billSponsorships
-} from '../../../shared/schema.js';
+import { database as db } from '../../../shared/database/connection';
+import {
+  user,
+  bill,
+  billEngagement,
+  userInterest,
+  billComment,
+  sponsor,
+  billSponsorship
+} from '../../../shared/schema';
 import { eq, and, inArray, desc } from 'drizzle-orm';
 import { userPreferencesService } from '../../features/users/domain/user-preferences.js';
 import type { BillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
@@ -85,7 +85,7 @@ export class SmartNotificationFilterService {
 
       // Get user engagement profile for intelligent filtering
       const engagementProfile = await this.getUserEngagementProfile(criteria.userId);
-      
+
       // Run all filter checks in parallel for performance
       const filterResults = await Promise.all([
         this.checkNotificationTypeEnabled(criteria, userPrefs.billTracking),
@@ -104,7 +104,7 @@ export class SmartNotificationFilterService {
 
     } catch (error) {
       logger.error('Error in smart filtering:', { component: 'SmartFilter' }, error);
-      
+
       // Fail open - if filtering fails, allow notification but with low confidence
       // This ensures notifications aren't lost due to filtering errors
       return {
@@ -172,13 +172,13 @@ export class SmartNotificationFilterService {
   ): Promise<Partial<FilterResult>> {
     const priorityLevels = { low: 1, medium: 2, high: 3, urgent: 4 };
     const thresholdLevels = { low: 1, medium: 2, high: 3 };
-    
+
     const meetsThreshold = priorityLevels[criteria.priority] >= thresholdLevels[smartFiltering.priorityThreshold];
-    
+
     return {
       shouldNotify: meetsThreshold,
       confidence: 1.0,
-      reasons: meetsThreshold ? 
+      reasons: meetsThreshold ?
         [`Priority ${criteria.priority} meets threshold ${smartFiltering.priorityThreshold}`] :
         [`Priority ${criteria.priority} below threshold ${smartFiltering.priorityThreshold}`]
     };
@@ -394,8 +394,8 @@ export class SmartNotificationFilterService {
     profile: UserEngagementProfile
   ): Promise<Partial<FilterResult>> {
     const currentHour = new Date().getHours();
-    
-    const preferredTime = profile.preferredNotificationTimes.find(t => 
+
+    const preferredTime = profile.preferredNotificationTimes.find(t =>
       Math.abs(t.hour - currentHour) <= 1
     );
 
@@ -429,31 +429,31 @@ export class SmartNotificationFilterService {
     try {
       // Get user's interests
       const userInterestsList = await db
-        .select({ interest: userInterests.interest })
-        .from(userInterests)
-        .where(eq(userInterests.userId, criteria.userId));
+        .select({ interest: userInterest.interest })
+        .from(userInterest)
+        .where(eq(userInterest.userId, criteria.userId));
 
       if (userInterestsList.length === 0) {
         return { shouldNotify: true, confidence: 0.5, reasons: ['No interests configured'] };
       }
 
       // Get bill details
-      const bill = await db
+      const billDetails = await db
         .select({
-          title: bills.title,
-          description: bills.description,
-          category: bills.category,
-          tags: bills.tags
+          title: bill.title,
+          description: bill.description,
+          category: bill.category,
+          tags: bill.tags
         })
-        .from(bills)
-        .where(eq(bills.id, criteria.billId))
+        .from(bill)
+        .where(eq(bill.id, criteria.billId))
         .limit(1);
 
-      if (bill.length === 0) {
+      if (billDetails.length === 0) {
         return { shouldNotify: true, confidence: 0.5, reasons: ['Bill not found'] };
       }
 
-      const billData = bill[0];
+      const billData = billDetails[0];
       const interests = userInterestsList.map(i => i.interest.toLowerCase());
       const searchText = `${billData.title} ${billData.description} ${billData.category}`.toLowerCase();
       const billTags = (billData.tags || []).map(tag => tag.toLowerCase());
@@ -493,7 +493,7 @@ export class SmartNotificationFilterService {
   ): FilterResult {
     // If any filter explicitly blocks, honor that decision
     const blockingResults = results.filter(r => r.shouldNotify === false);
-    
+
     if (blockingResults.length > 0) {
       // But allow urgent notifications to bypass most filters
       if (criteria.priority === 'urgent') {
@@ -519,13 +519,13 @@ export class SmartNotificationFilterService {
 
     // Calculate weighted confidence from all results
     const validResults = results.filter(r => r.confidence !== undefined);
-    const avgConfidence = validResults.length > 0 
+    const avgConfidence = validResults.length > 0
       ? validResults.reduce((sum, r) => sum + (r.confidence || 0), 0) / validResults.length
       : 0.5;
 
     // Determine channels based on confidence and priority
     const recommendedChannels = this.determineChannels(avgConfidence, criteria.priority);
-    
+
     // Determine if batching is appropriate
     const shouldBatch = this.shouldBatchNotification(criteria.priority, avgConfidence);
 
@@ -543,24 +543,24 @@ export class SmartNotificationFilterService {
    * Determine appropriate channels based on confidence and priority
    */
   private determineChannels(
-    confidence: number, 
+    confidence: number,
     priority: string
   ): Array<'email' | 'inApp' | 'sms' | 'push'> {
     const channels: Array<'email' | 'inApp' | 'sms' | 'push'> = ['inApp'];
-    
+
     // High confidence or high priority = more channels
     if (confidence > 0.7 || priority === 'urgent' || priority === 'high') {
       channels.push('push');
     }
-    
+
     if (confidence > 0.8 || priority === 'urgent') {
       channels.push('email');
     }
-    
+
     if (priority === 'urgent') {
       channels.push('sms');
     }
-    
+
     return channels;
   }
 
@@ -611,19 +611,19 @@ export class SmartNotificationFilterService {
     preferences: BillTrackingPreferences
   ): Array<'email' | 'inApp' | 'sms' | 'push'> {
     const channels: Array<'email' | 'inApp' | 'sms' | 'push'> = ['inApp'];
-    
+
     if (preferences.notificationChannels?.email) {
       channels.push('email');
     }
-    
+
     if (preferences.notificationChannels?.push) {
       channels.push('push');
     }
-    
+
     if (priority === 'urgent' && preferences.notificationChannels?.sms) {
       channels.push('sms');
     }
-    
+
     return channels;
   }
 
@@ -634,18 +634,18 @@ export class SmartNotificationFilterService {
     // Check cache
     const cached = this.engagementProfiles.get(userId);
     const expiry = this.profileCacheExpiry.get(userId);
-    
+
     if (cached && expiry && Date.now() < expiry) {
       return cached;
     }
 
     // Build new profile
     const profile = await this.buildEngagementProfile(userId);
-    
+
     // Cache it
     this.engagementProfiles.set(userId, profile);
     this.profileCacheExpiry.set(userId, Date.now() + this.CACHE_DURATION);
-    
+
     return profile;
   }
 
@@ -662,24 +662,24 @@ export class SmartNotificationFilterService {
           viewCount: billEngagement.viewCount,
           commentCount: billEngagement.commentCount,
           shareCount: billEngagement.shareCount,
-          lastEngaged: billEngagement.lastEngaged,
-          billCategory: bills.category
+          lastEngaged: billEngagement.lastEngagedAt,
+          billCategory: bill.category
         })
         .from(billEngagement)
-        .innerJoin(bills, eq(billEngagement.billId, bills.id))
+        .innerJoin(bill, eq(billEngagement.billId, bill.id))
         .where(eq(billEngagement.userId, userId))
-        .orderBy(desc(billEngagement.lastEngaged))
+        .orderBy(desc(billEngagement.lastEngagedAt))
         .limit(100);
 
       // Get comment timing data
       const commentHistory = await db
         .select({
-          createdAt: billComments.createdAt,
-          billId: billComments.billId
+          createdAt: billComment.createdAt,
+          billId: billComment.billId
         })
-        .from(billComments)
-        .where(eq(billComments.userId, userId))
-        .orderBy(desc(billComments.createdAt))
+        .from(billComment)
+        .where(eq(billComment.userId, userId))
+        .orderBy(desc(billComment.createdAt))
         .limit(50);
 
       // Analyze patterns
@@ -700,7 +700,7 @@ export class SmartNotificationFilterService {
 
     } catch (error) {
       logger.error('Error building engagement profile:', { component: 'SmartFilter' }, error);
-      
+
       // Return default profile
       return {
         userId,
@@ -718,7 +718,7 @@ export class SmartNotificationFilterService {
    */
   private analyzeCategoryEngagement(engagementHistory: any[]): Array<{ category: string; score: number }> {
     const categoryMap = new Map<string, number>();
-    
+
     engagementHistory.forEach(engagement => {
       if (engagement.billCategory) {
         const currentScore = categoryMap.get(engagement.billCategory) || 0;
@@ -737,34 +737,34 @@ export class SmartNotificationFilterService {
    * Analyze which sponsors user engages with most
    */
   private async analyzeSponsorEngagement(
-    userId: string, 
+    userId: string,
     engagementHistory: any[]
   ): Promise<Array<{ sponsorId: number; name: string; score: number }>> {
     if (engagementHistory.length === 0) return [];
 
     const billIds = engagementHistory.map(e => e.billId);
-    
+
     try {
       const sponsorData = await db
         .select({
-          sponsorId: sponsors.id,
-          sponsorName: sponsors.name,
-          billId: billSponsorships.billId,
-          sponsorshipType: billSponsorships.sponsorshipType
+          sponsorId: sponsor.id,
+          sponsorName: sponsor.name,
+          billId: billSponsorship.billId,
+          sponsorshipType: billSponsorship.sponsorshipType
         })
-        .from(billSponsorships)
-        .innerJoin(sponsors, eq(billSponsorships.sponsorId, sponsors.id))
-        .where(inArray(billSponsorships.billId, billIds));
+        .from(billSponsorship)
+        .innerJoin(sponsor, eq(billSponsorship.sponsorId, sponsor.id))
+        .where(inArray(billSponsorship.billId, billIds));
 
       const sponsorScores = new Map<number, { name: string; score: number }>();
-      
+
       sponsorData.forEach(sponsor => {
         const engagement = engagementHistory.find(e => e.billId === sponsor.billId);
         if (engagement) {
           const current = sponsorScores.get(sponsor.sponsorId) || { name: sponsor.sponsorName, score: 0 };
           const engagementScore = Number(engagement.engagementScore) || 0;
           const multiplier = sponsor.sponsorshipType === 'primary' ? 1.5 : 1.0;
-          
+
           sponsorScores.set(sponsor.sponsorId, {
             name: sponsor.sponsorName,
             score: current.score + (engagementScore * multiplier)
@@ -788,10 +788,10 @@ export class SmartNotificationFilterService {
    */
   private calculateEngagementLevel(engagementHistory: any[]): 'low' | 'medium' | 'high' {
     if (engagementHistory.length === 0) return 'low';
-    
+
     const totalEngagement = engagementHistory.reduce((sum, e) => sum + (Number(e.engagementScore) || 0), 0);
     const avgEngagement = totalEngagement / engagementHistory.length;
-    
+
     if (avgEngagement > 50) return 'high';
     if (avgEngagement > 20) return 'medium';
     return 'low';
@@ -802,7 +802,7 @@ export class SmartNotificationFilterService {
    */
   private analyzePreferredTimes(commentHistory: any[]): Array<{ hour: number; frequency: number }> {
     const hourMap = new Map<number, number>();
-    
+
     commentHistory.forEach(comment => {
       const hour = new Date(comment.createdAt).getHours();
       hourMap.set(hour, (hourMap.get(hour) || 0) + 1);
@@ -819,16 +819,16 @@ export class SmartNotificationFilterService {
    */
   private calculateAverageResponseTime(commentHistory: any[]): number {
     if (commentHistory.length < 2) return 12;
-    
+
     const recentComments = commentHistory.slice(0, 10);
     let totalTimeDiff = 0;
-    
+
     for (let i = 1; i < recentComments.length; i++) {
-      const timeDiff = new Date(recentComments[i-1].createdAt).getTime() - 
-                      new Date(recentComments[i].createdAt).getTime();
+      const timeDiff = new Date(recentComments[i - 1].createdAt).getTime() -
+        new Date(recentComments[i].createdAt).getTime();
       totalTimeDiff += timeDiff;
     }
-    
+
     const avgTimeDiff = totalTimeDiff / (recentComments.length - 1);
     return Math.min(Math.max(avgTimeDiff / (1000 * 60 * 60), 1), 48); // 1-48 hours
   }
@@ -841,7 +841,7 @@ export class SmartNotificationFilterService {
       return await userPreferencesService.getUserPreferences(userId);
     } catch (error) {
       logger.error('Error getting user preferences:', { component: 'SmartFilter' }, error);
-      
+
       // Return sensible defaults
       return {
         billTracking: {
@@ -851,8 +851,8 @@ export class SmartNotificationFilterService {
           amendments: true,
           updateFrequency: 'daily',
           notificationChannels: { inApp: true, email: false, push: false, sms: false },
-          smartFiltering: { 
-            enabled: false, 
+          smartFiltering: {
+            enabled: false,
             priorityThreshold: 'low',
             categoryFilters: [],
             keywordFilters: [],
@@ -908,3 +908,40 @@ export class SmartNotificationFilterService {
 
 // Export singleton instance
 export const smartNotificationFilterService = new SmartNotificationFilterService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

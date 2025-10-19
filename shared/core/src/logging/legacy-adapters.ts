@@ -224,3 +224,40 @@ export function createLegacyLoggerAdapter(legacyLogger: any, coreLogger: CoreLog
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

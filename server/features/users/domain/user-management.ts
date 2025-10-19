@@ -1,4 +1,4 @@
-import { database as db, users, sessions, billComments, notifications } from '../../../shared/database/connection.js';
+import { database as db, users, sessions, billComments, notifications } from '../shared/database/connection';
 import { eq, count, desc, sql, and, gte, or, inArray } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
 import { logger } from '../../utils/logger';
@@ -705,3 +705,40 @@ export class UserManagementService {
 
 // Export singleton instance for easy consumption
 export const userManagementService = UserManagementService.getInstance();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

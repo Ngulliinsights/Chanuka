@@ -2,7 +2,7 @@ import { billStatusMonitorService } from './services/bill-status-monitor.js';
 import { billService } from './services/bill-service.js';
 import { webSocketService } from './services/websocket.js';
 import { db } from './db.js';
-import { users, bills } from '../shared/schema.js';
+import { users, bills } from '../shared/schema';
 import { logger } from '../../shared/core/src/observability/logging';
 
 async function verifyBillStatusMonitor() {
@@ -164,6 +164,43 @@ async function verifyBillStatusMonitor() {
 
 // Run verification
 verifyBillStatusMonitor().catch(console.error);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

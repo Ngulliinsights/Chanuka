@@ -1,8 +1,8 @@
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '../shared/database/connection';
 import {
   bills, sponsors, sponsorAffiliations, billSponsorships, sponsorTransparency,
   type Sponsor, type SponsorAffiliation, type SponsorTransparency, type Bill
-} from '../../../shared/schema.js';
+} from '../../../shared/schema';
 import { eq, and, sql, desc, gte, lte, count, inArray, like, or } from 'drizzle-orm';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service';
 import { logger } from '../../utils/logger';
@@ -1232,3 +1232,40 @@ export class EnhancedConflictDetectionService {
 
 // Export a singleton instance for use throughout the application
 export const conflictDetectionService = new EnhancedConflictDetectionService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,239 +1,226 @@
 /**
- * Cache Core Interfaces
- *
- * Core interfaces for the caching abstraction following the adapter pattern.
- * Only imports from primitives to avoid circular dependencies.
+ * Core Cache Interfaces
+ * 
+ * Unified interfaces for all cache implementations
  */
 
-import type { Result } from '../../primitives/types/result';
-
-// Core cache service interface
 export interface CacheService {
-  get<T>(key: string): Promise<T | null>;
-  set<T>(key: string, value: T, ttlSec?: number): Promise<void>;
-  del(key: string): Promise<void>;
-  flush?(): Promise<void>;
-  mget?<T>(keys: string[]): Promise<(T | null)[]>;
-  mset?<T>(entries: [string, T, number?][]): Promise<void>;
-  getMetrics?(): CacheMetrics;
-  exists?(key: string): Promise<boolean>;
-  ttl?(key: string): Promise<number>;
-  clear?(): Promise<void>;
+  // Basic cache operations
+  get<T = any>(key: string): Promise<T | null>;
+  set<T = any>(key: string, value: T, ttlSeconds?: number): Promise<void>;
+  del(key: string): Promise<boolean>;
+  exists(key: string): Promise<boolean>;
+  
+  // Batch operations
+  mget<T = any>(keys: string[]): Promise<Array<T | null>>;
+  mset<T = any>(entries: Array<{ key: string; value: T; ttl?: number }>): Promise<void>;
+  mdel(keys: string[]): Promise<number>;
+  
+  // Advanced operations
+  increment(key: string, delta?: number): Promise<number>;
+  decrement(key: string, delta?: number): Promise<number>;
+  expire(key: string, ttlSeconds: number): Promise<boolean>;
+  ttl(key: string): Promise<number>;
+  
+  // Pattern operations (optional)
+  keys?(pattern: string): Promise<string[]>;
   invalidateByPattern?(pattern: string): Promise<number>;
   invalidateByTags?(tags: string[]): Promise<number>;
+  
+  // Cache management
+  clear?(): Promise<void>;
+  flush?(): Promise<void>;
+  size?(): Promise<number>;
+  
+  // Health and metrics
+  getHealth?(): Promise<CacheHealthStatus>;
+  getMetrics?(): CacheMetrics;
+  
+  // Lifecycle
+  connect?(): Promise<void>;
+  disconnect?(): Promise<void>;
+  destroy?(): Promise<void>;
 }
 
-// Cache metrics for performance monitoring
+export interface CacheAdapter extends CacheService {
+  readonly name: string;
+  readonly version: string;
+  readonly config: CacheAdapterConfig;
+}
+
+export interface CacheAdapterConfig {
+  keyPrefix?: string;
+  defaultTtlSec?: number;
+  maxMemoryMB?: number;
+  enableMetrics?: boolean;
+  enableCompression?: boolean;
+  compressionThreshold?: number;
+}
+
+export interface CacheHealthStatus {
+  status: 'healthy' | 'degraded' | 'unhealthy';
+  latency: number;
+  memoryUsage?: number;
+  connectionStatus?: 'connected' | 'disconnected' | 'connecting';
+  lastError?: string;
+  uptime?: number;
+}
+
 export interface CacheMetrics {
   hits: number;
   misses: number;
   hitRate: number;
   operations: number;
-  avgResponseTime: number;
   errors: number;
-  totalSize?: number;
-  totalEntries?: number;
-  l1Stats?: CacheTierStats;
-  l2Stats?: CacheTierStats;
+  memoryUsage: number;
+  keyCount: number;
+  avgLatency: number;
+  maxLatency: number;
+  minLatency: number;
 }
 
-// Cache tier statistics for multi-tier cache
-export interface CacheTierStats {
-  hits: number;
-  misses: number;
-  sets: number;
-  deletes: number;
-  errors: number;
-  hitRate: number;
-  avgResponseTime: number;
-  totalSize: number;
-  totalEntries: number;
-}
-
-// Cache entry with metadata
 export interface CacheEntry<T = any> {
-  data: T;
-  timestamp: number;
-  ttl: number;
-  accessCount: number;
-  lastAccessed: number;
-  tags: string[];
-  size: number;
-  compressed?: boolean;
-  tier?: 'L1' | 'L2';
+  key: string;
+  value: T;
+  ttl?: number;
+  createdAt: number;
+  accessedAt: number;
+  tags?: string[];
 }
 
-// Cache configuration options
 export interface CacheConfig {
-  provider: 'redis' | 'memory' | 'multi-tier';
-  defaultTtlSec: number;
-  redisUrl?: string;
-  maxMemoryMB: number;
-  compressionThreshold: number;
-  enableCompression: boolean;
-  enableMetrics: boolean;
+  provider: 'memory' | 'redis' | 'multi-tier';
   keyPrefix?: string;
-  l1MaxSizeMB?: number; // For multi-tier cache
+  defaultTtlSec?: number;
+  maxMemoryMB?: number;
+  enableMetrics?: boolean;
+  enableCompression?: boolean;
+  compressionThreshold?: number;
   enableCircuitBreaker?: boolean;
   circuitBreakerThreshold?: number;
   circuitBreakerTimeout?: number;
+  
+  // Redis-specific config
+  redisUrl?: string;
+  
+  // Multi-tier specific config
+  l1MaxSizeMB?: number;
 }
 
-// Cache operation options
 export interface CacheOptions {
-  ttl?: number; // Time to live in seconds
+  ttl?: number;
+  tags?: string[];
   compress?: boolean;
-  tags?: string[]; // For cache invalidation by tags
-  tier?: 'L1' | 'L2' | 'both'; // For multi-tier cache
-  skipL1?: boolean; // Skip L1 cache for large items
+  skipCache?: boolean;
 }
 
-// Cache key generator interface
-export interface CacheKeyGenerator {
-  property(id: number): string;
-  properties(filters: string): string;
-  user(id: number): string;
-  userByUsername(username: string): string;
-  reviews(propertyId: number): string;
-  searchResults(query: string): string;
-  trustScore(userId: string): string;
-  fraudDetection(propertyId: number): string;
-  apiResponse(endpoint: string, params: string): string;
-}
-
-// Circuit breaker state for cache operations
-export interface CircuitBreakerState {
-  failures: number;
-  lastFailure: number;
-  state: 'closed' | 'open' | 'half-open';
-  nextAttempt: number;
-}
-
-// Cache adapter interface for different implementations
-export interface CacheAdapter extends CacheService {
-  connect?(): Promise<void>;
-  disconnect?(): Promise<void>;
-  isConnected?(): boolean;
-  getHealth?(): Promise<CacheHealthStatus>;
-  warmUp?(entries: Array<{ key: string; value: any; options?: CacheOptions }>): Promise<void>;
-}
-
-// Cache health status
-export interface CacheHealthStatus {
-  connected: boolean;
-  latency: number;
-  memory?: any;
-  stats: CacheMetrics;
-  errors?: string[];
-}
-
-// Cache event types for monitoring
-export type CacheEventType =
-  | 'hit'
-  | 'miss'
-  | 'set'
-  | 'delete'
-  | 'error'
-  | 'promotion'
-  | 'eviction'
-  | 'circuit_breaker_open'
-  | 'circuit_breaker_close';
-
-// Cache event data
+// Event system for cache operations
 export interface CacheEvent {
   type: CacheEventType;
   key: string;
-  tier?: 'L1' | 'L2';
-  duration?: number;
-  size?: number;
-  error?: Error;
-  timestamp: Date;
+  timestamp: number;
+  metadata?: Record<string, any>;
 }
 
-// Cache factory options
-export interface CacheFactoryOptions {
-  config: CacheConfig;
-  logger?: any;
-  enableSingleFlight?: boolean;
-  enableCircuitBreaker?: boolean;
+export type CacheEventType = 
+  | 'hit' 
+  | 'miss' 
+  | 'set' 
+  | 'delete' 
+  | 'expire' 
+  | 'evict' 
+  | 'error'
+  | 'circuit_open'
+  | 'circuit_close';
+
+export interface CacheEventEmitter {
+  on(event: CacheEventType, listener: (event: CacheEvent) => void): void;
+  off(event: CacheEventType, listener: (event: CacheEvent) => void): void;
+  emit(event: CacheEventType, data: Omit<CacheEvent, 'type' | 'timestamp'>): void;
 }
 
-// Single flight cache options
+// Circuit breaker interfaces
+export interface CircuitBreakerConfig {
+  threshold: number;
+  timeout: number;
+  resetTimeout: number;
+}
+
+export type CircuitBreakerState = 'closed' | 'open' | 'half-open';
+
+export interface CircuitBreakerMetrics {
+  state: CircuitBreakerState;
+  failures: number;
+  successes: number;
+  lastFailure?: Date;
+  nextAttempt?: Date;
+}
+
+// Single-flight interfaces
 export interface SingleFlightOptions {
-  enableCircuitBreaker: boolean;
-  circuitBreakerThreshold: number;
-  circuitBreakerTimeout: number;
+  enableCircuitBreaker?: boolean;
+  circuitBreakerThreshold?: number;
+  circuitBreakerTimeout?: number;
+  maxConcurrentRequests?: number;
 }
 
-// Multi-tier cache promotion strategy
-export type PromotionStrategy = 'lru' | 'frequency' | 'size' | 'hybrid';
-
-// Multi-tier cache options
+// Multi-tier cache interfaces
 export interface MultiTierOptions {
-  l1MaxSizeMB: number;
-  l2Adapter: CacheAdapter;
-  promotionStrategy: PromotionStrategy;
-  promotionThreshold: number;
-  enableL1Warmup: boolean;
-  l1WarmupSize: number;
+  l1Config: CacheAdapterConfig;
+  l2Config: CacheAdapterConfig & { redisUrl: string };
+  promotionStrategy?: PromotionStrategy;
+  enableMetrics?: boolean;
+  keyPrefix?: string;
 }
 
-// Cache compression options
+export type PromotionStrategy = 'lru' | 'frequency' | 'size' | 'ttl';
+
+// Compression and serialization
 export interface CompressionOptions {
-  enabled: boolean;
-  threshold: number; // Compress if size > threshold bytes
   algorithm: 'gzip' | 'deflate' | 'brotli';
-  level: number; // Compression level (1-9)
+  threshold: number; // Minimum size in bytes to compress
+  level?: number; // Compression level
 }
 
-// Cache serialization options
 export interface SerializationOptions {
-  enableBinaryMode: boolean;
-  customSerializer?: {
-    serialize: (data: any) => string | Buffer;
-    deserialize: (data: string | Buffer) => any;
-  };
+  format: 'json' | 'msgpack' | 'binary';
+  enableCompression?: boolean;
+  compressionOptions?: CompressionOptions;
 }
 
-// Cache warming strategy
+// Cache warming and eviction
 export interface CacheWarmingStrategy {
   enabled: boolean;
-  batchSize: number;
-  concurrency: number;
-  retryAttempts: number;
-  retryDelay: number;
+  batchSize?: number;
+  concurrency?: number;
+  retryAttempts?: number;
 }
 
-// Cache eviction policy
 export type EvictionPolicy = 'lru' | 'lfu' | 'fifo' | 'ttl' | 'random';
 
-// Cache eviction options
 export interface EvictionOptions {
   policy: EvictionPolicy;
-  maxEntries: number;
-  maxMemoryMB: number;
-  evictionBatchSize: number;
-  enableBackgroundEviction: boolean;
+  maxSize?: number;
+  maxMemory?: number;
+  checkInterval?: number;
 }
 
-// Cache statistics aggregation
+// Statistics and monitoring
+export interface CacheTierStats {
+  tier: 'l1' | 'l2';
+  hits: number;
+  misses: number;
+  hitRate: number;
+  memoryUsage: number;
+  keyCount: number;
+}
+
 export interface CacheStatsAggregation {
-  period: 'minute' | 'hour' | 'day';
-  metrics: CacheMetrics[];
-  aggregatedAt: Date;
-  summary: {
-    avgHitRate: number;
-    avgResponseTime: number;
-    totalOperations: number;
-    errorRate: number;
+  total: CacheMetrics;
+  tiers?: CacheTierStats[];
+  timeWindow: {
+    start: Date;
+    end: Date;
+    duration: number;
   };
-}
-
-// Result-based cache operations
-export type CacheResult<T> = Result<T, CacheError>;
-
-export interface CacheError {
-  type: 'NOT_FOUND' | 'CONNECTION_ERROR' | 'SERIALIZATION_ERROR' | 'CIRCUIT_BREAKER_OPEN' | 'INVALID_KEY';
-  message: string;
-  originalError?: Error;
 }

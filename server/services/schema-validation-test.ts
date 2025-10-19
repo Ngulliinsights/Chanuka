@@ -4,7 +4,7 @@
  * Test script to validate the current schema validation service implementation
  */
 
-import { schemaValidationService } from '@shared/schema.js';
+import { schemaValidationService } from '@shared/schema';
 import { logger } from '../../shared/core/src/observability/logging';
 
 async function testSchemaValidation() {
@@ -58,6 +58,43 @@ async function testSchemaValidation() {
 
 // Run the test
 testSchemaValidation().catch(console.error);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

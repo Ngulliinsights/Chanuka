@@ -1,7 +1,7 @@
 import { db } from '../../db.js';
 import { eq, sql, and, desc, count, ilike } from 'drizzle-orm';
-import { bills, analysis, evaluations, departments } from '../../../shared/schema.js';
-import type { DepartmentStat, RadarDatum } from '../../../shared/schema.js';
+import { bills, analysis, evaluations, departments } from '../../../shared/schema';
+import type { DepartmentStat, RadarDatum } from '../../../shared/schema';
 import { logger } from '../../utils/logger.js';
 import { errorTracker } from '../../core/errors/error-tracker.js';
 
@@ -649,3 +649,40 @@ export const getCacheStats = () => {
 export const shutdownDashboardStorage = (): void => {
   dashboardStorage.shutdown();
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

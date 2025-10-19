@@ -49,3 +49,39 @@ export interface ErrorPattern {
 export type ErrorType = 'javascript' | 'network' | 'chunk' | 'timeout' | 'memory' | 'security' | 'unknown';
 export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical';
 export type ErrorContextType = 'page' | 'component' | 'api' | 'navigation' | 'authentication' | 'data-loading';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

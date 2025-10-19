@@ -712,3 +712,40 @@ router.get('/metrics/export', async (req: Request, res: Response) => {
 
 // Export the service instance for use in other parts of the application
 export { apiManagementService };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

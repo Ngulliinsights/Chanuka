@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
-import { databaseFallbackService } from '../../infrastructure/database/database-fallback.js';
+import { databaseFallbackService } from '../../infrastructure/database/database-fallback.ts';
 import { demoDataService } from '../../infrastructure/demo-data.js';
 import request from 'supertest';
 import { app } from '../../index.js';
@@ -346,6 +346,43 @@ describe('Database Fallback Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

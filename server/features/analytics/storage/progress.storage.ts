@@ -1,9 +1,9 @@
-import { database as db } from '../../../../shared/database/connection.js';
+import { database as db } from '../../shared/database/connection';
 import {
   userProgress,
   type UserProgress,
   type InsertUserProgress
-} from '../../../../shared/schema.js';
+} from '../../../../shared/schema';
 import { eq, desc, sql } from 'drizzle-orm';
 import { BaseStorage } from '../../../infrastructure/database/base/BaseStorage';
 import { logger } from '../../../utils/logger';
@@ -86,3 +86,40 @@ export class ProgressStorage extends BaseStorage<UserProgress> {
     });
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

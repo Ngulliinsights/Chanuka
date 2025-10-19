@@ -24,7 +24,7 @@ const mockDb = {
   delete: jest.fn().mockReturnThis()
 };
 
-jest.mock('../../../shared/database/connection.js', () => ({
+jest.mock('../shared/database/connection', () => ({
   database: mockDb
 }));
 
@@ -634,6 +634,43 @@ describe('AuthService', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
