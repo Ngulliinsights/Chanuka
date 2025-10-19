@@ -1,5 +1,14 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { ApiSuccess, ApiError, ApiResponseWrapper } from '../../utils/api-response.js';
+
+// Helper functions to replace the missing createMetadata functionality
+const sendResponse = (res: any, data: any, message: string = 'Success') => {
+  return res.json(ApiResponseWrapper.success(data, message));
+};
+
+const sendError = (res: any, message: string, statusCode: number = 500) => {
+  return res.status(statusCode).json(ApiResponseWrapper.error(message, 'API_ERROR', statusCode));
+};
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../external-data/external-api-manager.js';
 import { logger } from '../../utils/logger';
 
@@ -45,12 +54,7 @@ const asyncHandler = (fn: (req: Request, res: Response) => Promise<any>) => {
       const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
       const statusCode = (error as any).statusCode || 500;
       
-      return ApiError(
-        res,
-        errorMessage,
-        statusCode,
-        ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.STATIC)
-      );
+      return res.status(statusCode).json(ApiResponseWrapper.error(errorMessage, 'API_ERROR', statusCode));
     }
   };
 };
@@ -96,11 +100,7 @@ router.get('/analytics', asyncHandler(async (req, res) => {
 
   const analytics = apiManagementService.getAPIAnalytics(source);
 
-  return ApiSuccess(
-    res,
-    analytics,
-    ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.DATABASE)
-  );
+  return res.json(ApiResponseWrapper.success(analytics, 'Analytics retrieved successfully'));
 }));
 
 /**
@@ -121,11 +121,11 @@ router.get('/health', asyncHandler(async (req, res) => {
         ? 'degraded'
         : 'degraded';
 
-  return ApiSuccess(res, {
+  return sendResponse(res, {
     sources: healthStatuses,
     timestamp: new Date().toISOString(),
     overallStatus
-  }, ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.DATABASE));
+  });
 }));
 
 /**
@@ -137,30 +137,16 @@ router.get('/health/:source', asyncHandler(async (req, res) => {
   const source = req.params.source;
   
   if (!source || source.trim().length === 0) {
-    return ApiError(
-      res,
-      'Source parameter is required',
-      400,
-      ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.STATIC)
-    );
+    return sendError(res, 'Source parameter is required', 400);
   }
 
   const healthStatuses = apiManagementService.getHealthStatus(source);
 
   if (healthStatuses.length === 0) {
-    return ApiError(
-      res,
-      `API source '${source}' not found`,
-      404,
-      ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.STATIC)
-    );
+    return sendError(res, `API source '${source}' not found`, 404);
   }
 
-  return ApiSuccess(
-    res,
-    healthStatuses[0],
-    ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.DATABASE)
-  );
+  return sendResponse(res, healthStatuses[0]);
 }));
 
 /**
@@ -177,19 +163,10 @@ router.get('/usage/:source', asyncHandler(async (req, res) => {
   const sourceMetrics = analytics.sources.find(s => s.source === source);
   
   if (!sourceMetrics) {
-    return ApiError(
-      res,
-      `API source '${source}' not found or has no metrics`,
-      404,
-      ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.STATIC)
-    );
+    return sendError(res, `API source '${source}' not found or has no metrics`, 404);
   }
 
-  return ApiSuccess(
-    res,
-    sourceMetrics,
-    ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.DATABASE)
-  );
+  return sendResponse(res, sourceMetrics);
 }));
 
 /**
@@ -199,11 +176,7 @@ router.get('/cache/stats', asyncHandler(async (req, res) => {
   const startTime = Date.now();
   const cacheStats = apiManagementService.getCacheStatistics();
   
-  return ApiSuccess(
-    res,
-    cacheStats,
-    ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.DATABASE)
-  );
+  return sendResponse(res, cacheStats);
 }));
 
 /**
@@ -215,13 +188,14 @@ router.delete('/cache', asyncHandler(async (req, res) => {
   const source = validateSource(req.query.source);
   const clearedCount = apiManagementService.clearCache(source);
 
-  return ApiSuccess(res, {
+  const responseData = {
     message: source 
       ? `Cache cleared for source '${source}'`
       : 'All cache cleared',
     clearedEntries: clearedCount,
     timestamp: new Date().toISOString()
-  }, ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.DATABASE));
+  };
+  return res.json(ApiSuccess(responseData));
 }));
 
 /**
@@ -239,11 +213,12 @@ router.get('/quota', asyncHandler(async (req, res) => {
     totalCost: source.totalCost
   }));
 
-  return ApiSuccess(res, {
+  const responseData = {
     sources: quotaData,
     totalCost: analytics.totalCost,
     timestamp: new Date().toISOString()
-  }, ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.DATABASE));
+  };
+  return res.json(ApiSuccess(responseData));
 }));
 
 /**
@@ -279,11 +254,7 @@ router.get('/costs', asyncHandler(async (req, res) => {
     timestamp: new Date().toISOString()
   };
 
-  return ApiSuccess(
-    res,
-    costAnalysis,
-    ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.DATABASE)
-  );
+  return sendResponse(res, costAnalysis);
 }));
 
 /**
@@ -333,11 +304,7 @@ router.get('/performance', asyncHandler(async (req, res) => {
     timestamp: new Date().toISOString()
   };
 
-  return ApiSuccess(
-    res,
-    performanceData,
-    ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.DATABASE)
-  );
+  return sendResponse(res, performanceData);
 }));
 
 /**
@@ -375,11 +342,7 @@ router.get('/errors', asyncHandler(async (req, res) => {
     timestamp: new Date().toISOString()
   };
 
-  return ApiSuccess(
-    res,
-    errorAnalysis,
-    ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.DATABASE)
-  );
+  return sendResponse(res, errorAnalysis);
 }));
 
 /**
@@ -394,12 +357,7 @@ router.post('/test/:source', asyncHandler(async (req, res) => {
 
   // Validate source parameter
   if (!source || source.trim().length === 0) {
-    return ApiError(
-      res,
-      'Source parameter is required',
-      400,
-      ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.STATIC)
-    );
+    return sendError(res, 'Source parameter is required', 400);
   }
 
   const result = await apiManagementService.makeRequest(source, endpoint, {
@@ -408,13 +366,14 @@ router.post('/test/:source', asyncHandler(async (req, res) => {
     priority: 'high'
   });
 
-  return ApiSuccess(res, {
+  const responseData = {
     source,
     endpoint,
     method,
     testResult: result,
     timestamp: new Date().toISOString()
-  }, ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.DATABASE));
+  };
+  return res.json(ApiSuccess(responseData));
 }));
 
 /**
@@ -478,15 +437,48 @@ router.get('/dashboard', asyncHandler(async (req, res) => {
     timestamp: new Date().toISOString()
   };
 
-  return ApiSuccess(
-    res,
-    dashboardData,
-    ApiResponseWrapper.createMetadata(startTime, METADATA_TYPES.DATABASE)
-  );
+  return sendResponse(res, dashboardData);
 }));
 
 // Export the service instance for use in other parts of the application
 export { apiManagementService };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,27 +1,51 @@
 import { NextFunction, Request, Response } from 'express';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '../../shared/core/logger.js';
 import { 
   BaseError,
-  ValidationError as BaseValidationError,
-  NotFoundError as BaseNotFoundError,
-  UnauthorizedError,
-  ForbiddenError,
-  ConflictError as BaseConflictError,
-  DatabaseError as BaseDatabaseError,
-  ErrorDomain,
-  ErrorSeverity
-} from '../../shared/core/src/observability/error-management';
-
-// Re-export the unified error classes
-export { 
-  BaseError as AppError,
   ValidationError,
   NotFoundError,
   UnauthorizedError,
-  ForbiddenError,
-  ConflictError,
-  DatabaseError
-} from '../../shared/core/src/observability/error-management';
+  ForbiddenError
+} from '../../shared/core/index.js';
+
+// Simple error domain and severity enums
+export enum ErrorDomain {
+  SYSTEM = 'system',
+  BUSINESS = 'business',
+  EXTERNAL = 'external',
+  SECURITY = 'security',
+  VALIDATION = 'validation',
+  AUTHENTICATION = 'authentication'
+}
+
+export enum ErrorSeverity {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical'
+}
+
+// Additional error classes
+export class ConflictError extends BaseError {
+  constructor(message: string = 'Conflict') {
+    super(message, 409, 'CONFLICT');
+  }
+}
+
+export class DatabaseError extends BaseError {
+  constructor(message: string = 'Database error') {
+    super(message, 500, 'DATABASE_ERROR');
+  }
+}
+
+// Re-export the unified error classes
+export { 
+  BaseError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError
+};
 
 /**
  * Authentication error - extends UnauthorizedError
@@ -30,16 +54,11 @@ export class AuthError extends UnauthorizedError {
   constructor(
     message: string,
     statusCode = 401,
-    code = 'AUTH_ERROR',
-    details?: Record<string, unknown>,
+    code = 'AUTH_ERROR'
   ) {
-    super(message, { 
-      statusCode, 
-      code, 
-      details,
-      domain: ErrorDomain.AUTHENTICATION,
-      severity: ErrorSeverity.MEDIUM
-    });
+    super(message);
+    this.statusCode = statusCode;
+    this.code = code;
     this.name = 'AuthError';
   }
 }
@@ -56,9 +75,10 @@ export class InvalidCredentialsError extends AuthError {
 /**
  * Error when user already exists during registration
  */
-export class UserExistsError extends BaseConflictError {
+export class UserExistsError extends ConflictError {
   constructor(message = 'User already exists') {
-    super(message, 'user', { code: 'ALREADY_EXISTS' });
+    super(message);
+    this.code = 'ALREADY_EXISTS';
     this.name = 'UserExistsError';
   }
 }
@@ -76,9 +96,10 @@ export class OAuthError extends AuthError {
 /**
  * Error for when a sponsor is not found in the database
  */
-export class SponsorNotFoundError extends BaseNotFoundError {
+export class SponsorNotFoundError extends NotFoundError {
   constructor(message = 'Sponsor not found') {
-    super('sponsor', undefined, { code: 'SPONSOR_NOT_FOUND' });
+    super(message);
+    this.code = 'SPONSOR_NOT_FOUND';
     this.name = 'SponsorNotFoundError';
   }
 }
@@ -91,6 +112,43 @@ export function asyncHandler(fn: Function) {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

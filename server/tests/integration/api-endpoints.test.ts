@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
 import { app } from '../../index.js';
-import databaseService from '../../../infrastructure/database/database-service.js';
+import { databaseService } from '../../infrastructure/database/database-service.js';
 import { logger } from '../../../shared/core/src/observability/logging';
 
 describe('API Endpoints Integration Tests', () => {
@@ -556,6 +556,43 @@ expect.extend({
     }
   },
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

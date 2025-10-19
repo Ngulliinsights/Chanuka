@@ -4,8 +4,8 @@ import { readDatabase } from '../../db.js';
 import { notificationService } from '../../infrastructure/notifications/notification-service.js';
 import { billStatusMonitorService } from './bill-status-monitor.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service.js';
-import * as schema from '../../../shared/schema.js';
-import { Bill, BillEngagement } from '../../../shared/schema.js';
+import * as schema from '../../../shared/schema';
+import { Bill, BillEngagement } from '../../../shared/schema';
 import { z } from 'zod';
 import { logger } from '../../utils/logger';
 
@@ -1108,6 +1108,43 @@ router.get('/recommended', authenticateToken, async (req: AuthenticatedRequest, 
 export { router };
 
 export const billTrackingService = new BillTrackingService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

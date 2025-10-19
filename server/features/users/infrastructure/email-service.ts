@@ -339,3 +339,40 @@ ${message}
 
 // Export singleton instance
 export const userEmailService = new UserEmailService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

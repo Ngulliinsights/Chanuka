@@ -8,7 +8,7 @@
 import { EventEmitter } from 'events';
 import * as cron from 'node-cron';
 // Import the database instance properly - adjust path as needed
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '../shared/database/connection';
 import {
   DataSource,
   SyncJob,
@@ -20,7 +20,7 @@ import {
 } from './types.js';
 import { GovernmentDataService } from './government-data-service.js';
 import { ConflictResolutionService } from './conflict-resolution-service.js';
-import { bills, sponsors, BillSponsorship, syncJobs, syncErrors } from '@shared/schema.js';
+import { bills, sponsors, BillSponsorship, syncJobs, syncErrors } from '@shared/schema';
 import { eq, and, gte, desc } from 'drizzle-orm';
 import { logger } from '@shared/core/src/observability/logging';
 
@@ -564,3 +564,40 @@ interface SyncMetrics {
   lastSyncTime: Date;
   recordsProcessedToday: number;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

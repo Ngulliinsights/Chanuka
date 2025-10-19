@@ -1,7 +1,7 @@
 import { engagementAnalyticsService } from './services/engagement-analytics.js';
 import { billService } from './services/bill-service.js';
 import { db } from './db.js';
-import { users, bills, billEngagement } from '../shared/schema.js';
+import { users, bills, billEngagement } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '../../shared/core/src/observability/logging';
 
@@ -295,6 +295,43 @@ async function verifyEngagementAnalytics() {
 
 // Run verification
 verifyEngagementAnalytics().catch(console.error);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

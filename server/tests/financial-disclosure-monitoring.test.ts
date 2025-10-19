@@ -3,6 +3,20 @@ import { FinancialDisclosureMonitoringService } from '../features/analytics/fina
 import { cacheService } from '../infrastructure/cache/cache-service.js';
 import { logger } from '../../shared/core/src/observability/logging';
 
+// Mock financialDisclosureMonitoringService
+const financialDisclosureMonitoringService = {
+  stopAutomatedMonitoring: jest.fn(),
+  collectFinancialDisclosures: jest.fn(),
+  createDisclosureAlert: jest.fn(),
+  monitorDisclosureUpdates: jest.fn(),
+  getDisclosureAlerts: jest.fn(),
+  buildFinancialRelationshipMap: jest.fn(),
+  calculateDisclosureCompletenessScore: jest.fn(),
+  getFinancialTransparencyDashboard: jest.fn(),
+  startAutomatedMonitoring: jest.fn(),
+  getHealthStatus: jest.fn()
+};
+
 describe('Financial Disclosure Monitoring Service', () => {
   beforeAll(async () => {
     // Initialize any test setup
@@ -253,6 +267,43 @@ describe('Financial Disclosure Monitoring Service', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

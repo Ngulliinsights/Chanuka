@@ -299,3 +299,39 @@ export const infrastructureLogger = new InfrastructureLoggerAdapter();
 export const structuredLogger = new StructuredLoggerAdapter();
 
 export const legacyExpressHealth = createExpressHealthAdapter();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

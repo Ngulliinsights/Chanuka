@@ -1,5 +1,6 @@
 import { eq, desc, and, sql, count } from 'drizzle-orm';
-import { database as db, notifications, users, bills } from '../../../shared/database/connection.js';
+import { database as db } from '../../../shared/database/connection';
+import { notification, user, bill } from '../../../shared/schema';
 import { webSocketService } from '../websocket.js';
 import { z } from 'zod';
 import { logger } from '../../utils/logger';
@@ -439,6 +440,43 @@ export { NotificationService as CoreNotificationService };
 
 // Export for backward compatibility
 export { notificationService as coreNotificationService };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

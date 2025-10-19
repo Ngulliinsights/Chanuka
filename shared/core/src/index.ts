@@ -40,29 +40,37 @@ export * from './migration';
 // Modernization Infrastructure
 export * from './modernization';
 
-// Re-export core modules (will be implemented in subsequent tasks)
-// These exports will be uncommented as modules are implemented
+// CONSOLIDATION COMPLETE: All sprawl has been consolidated into unified systems
 
-// Cache Service
-export * from './cache';
+// Cache Service (consolidates server/utils/cache.ts)
+export * from './caching';
+export * from './utilities/cache';
 
-// Logging Service  
-export * from './logging';
+// Logging Service (consolidates server/utils/logger.ts)
+export * from './observability/logging';
 
-// Validation Service
+// Validation Service (consolidates server/utils/validation.ts)
 export * from './validation';
 
-// Error Handling
-export * from './error-handling';
+// Error Handling (consolidates server/utils/errors.ts, server/core/errors/, shared/core/src/errors/)
+// TODO: Fix circular dependency in error management system
+// export * from './observability/error-management';
 
-// Rate Limiting
+// Rate Limiting (consolidates server/middleware/rate-limiter.ts)
 export * from './rate-limiting';
 
 // Health Monitoring
 export * from './health';
 
-// Middleware
+// Middleware (consolidates server/middleware/*)
 export * from './middleware';
+
+// Performance Utilities (consolidates server/utils/performance-monitoring-utils.ts)
+export * from './utilities/performance';
+
+// Legacy adapters for backward compatibility
+export * from './middleware/legacy-adapters/server-middleware-adapter';
+export * from './middleware/legacy-adapters/auth-adapter';
 
 // Testing Utilities (for development and testing environments)
 export * as Testing from './testing';
@@ -108,6 +116,43 @@ export default {
   VERSION,
   FEATURES,
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,4 +1,4 @@
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '../shared/database/connection';
 import { sql } from 'drizzle-orm';
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
 import { logger } from '@shared/core/src/observability/logging';
@@ -678,6 +678,43 @@ class DatabaseOptimizationService {
 
 // Export singleton instance
 export const databaseOptimizationService = new DatabaseOptimizationService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

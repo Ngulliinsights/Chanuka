@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { ZodError, z } from 'zod';
-import { ValidationError } from '../../shared/core/src/observability/error-management';
+import { ValidationError } from '../../shared/core/index.js';
 import { logger } from '../../shared/core/src/observability/logging';
 import DOMPurify from 'isomorphic-dompurify';
 
@@ -153,6 +153,43 @@ export function validateBillNumber(billNumber: string): { isValid: boolean; norm
 
   return { isValid: true, normalized: trimmed };
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

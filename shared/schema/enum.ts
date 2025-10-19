@@ -19,7 +19,26 @@ export const affiliationConflictTypeEnum = pgEnum("affiliation_conflict_type", [
 export const disclosureTypeEnum = pgEnum("disclosure_type", ["financial", "business", "family"]);
 export const moderationContentTypeEnum = pgEnum("moderation_content_type", ["comment", "bill", "user_profile", "sponsor_transparency"]);
 export const flagTypeEnum = pgEnum("flag_type", ["spam", "harassment", "misinformation", "inappropriate", "copyright", "other"]);
-export const moderationStatusEnum = pgEnum("moderation_status", ["pending", "in_progress", "reviewed", "resolved", "dismissed", "escalated", "approved", "rejected", "active", "open", "investigating", "contained", "closed"]);
+
+// --- REFINED: Split moderationStatusEnum for domain-specific contexts ---
+
+// Original enum (for reference, now deprecated by specific enums):
+// export const moderationStatusEnum = pgEnum("moderation_status", ["pending", "in_progress", "reviewed", "resolved", "dismissed", "escalated", "approved", "rejected", "active", "open", "investigating", "contained", "closed"]);
+
+// NEW: For user-generated content reports (replaces contentFlag/moderationFlag)
+export const reportStatusEnum = pgEnum("report_status", ["pending", "reviewed", "resolved", "dismissed", "escalated"]);
+
+// NEW: For security incidents
+export const incidentStatusEnum = pgEnum("incident_status", ["open", "investigating", "contained", "resolved", "closed"]);
+
+// NEW: For compliance checks
+export const complianceStatusEnum = pgEnum("compliance_status", ["pending", "compliant", "non_compliant", "remediating"]);
+
+// NEW: For the 'evaluation' table in the dashboard
+export const evaluationStatusEnum = pgEnum("evaluation_status", ["pending", "screening", "interviewing", "rejected", "hired"]);
+
+// --- End of refinement ---
+
 export const moderationActionTypeEnum = pgEnum("moderation_action_type", ["warn", "hide", "delete", "ban_user", "verify", "highlight"]);
 export const securityResultEnum = pgEnum("security_result", ["success", "failure", "blocked"]);
 export const complianceCheckTypeEnum = pgEnum("compliance_check_type", ["gdpr", "ccpa", "sox", "pci_dss", "custom"]);

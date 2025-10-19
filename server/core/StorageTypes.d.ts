@@ -1,5 +1,5 @@
 import { QueryResult, QueryResultRow } from 'pg';
-import { InsertUser, InsertUserProgress, User, UserProgress } from '../../shared/schema.js';
+import { InsertUser, InsertUserProgress, User, UserProgress } from '../../shared/schema';
 import { logger } from '../../shared/core/src/observability/logging';
 export interface TransactionClient {
     query<T extends QueryResultRow>(queryText: string, values?: any[]): Promise<QueryResult<T>>;
@@ -30,6 +30,43 @@ export interface Storage {
     updateUserReputation(userId: string, change: number): Promise<User>;
     updateUserLastActive(userId: string): Promise<User>;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

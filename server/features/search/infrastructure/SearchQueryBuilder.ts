@@ -1,5 +1,8 @@
 import { SQL, sql, inArray, gte, lte, ilike, or } from 'drizzle-orm';
-import { bills } from '@shared/schema';
+import { bill } from '../../../../shared/schema/schema.js';
+
+// Alias for backward compatibility
+const bills = bill;
 import type { SearchFilters } from '../domain/search.dto';
 
 export class SearchQueryBuilder {
@@ -44,3 +47,39 @@ export class SearchQueryBuilder {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

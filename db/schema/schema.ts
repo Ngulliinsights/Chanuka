@@ -1,6 +1,6 @@
 /**
  * DEPRECATED: This schema file is deprecated and will be removed.
- * Use shared/schema/schema.ts as the authoritative schema definition.
+ * Use shared/schema as the authoritative schema definition.
  * This file is kept temporarily for migration purposes only.
  *
  * @deprecated Use shared/schema.ts instead
@@ -1253,3 +1253,40 @@ export const securityAuditLogs = pgTable("security_audit_logs", {
 		}).onDelete("set null"),
 	}
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

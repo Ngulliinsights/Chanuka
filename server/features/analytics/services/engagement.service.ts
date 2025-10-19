@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { databaseService } from '../../../infrastructure/database/database-service';
-import { database as db } from '../../../../shared/database/connection.js';
-import { billComments, commentVotes, users, userProfiles, bills } from '../../../../shared/schema.js';
+import { database as db } from '../../../../shared/database/connection';
+import { billComment, commentVote, user, userProfile, bill } from '@shared/schema';
 import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
 import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../../infrastructure/cache/cache-service';
 import { cache } from '../../../utils/cache';
@@ -9,7 +9,7 @@ import { buildTimeThreshold } from '../../../utils/db-helpers';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js';
 import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from "../../../utils/api-response.js";
 import { logger } from '../../../utils/logger';
-import { errorTracker } from '../../../core/errors/error-tracker';
+import { errorTracker } from '../../../core/errors/error-tracker.js';
 import { z } from 'zod';
 import type {
   UserEngagementMetrics,
@@ -625,3 +625,40 @@ router.get('/leaderboard', authenticateToken, async (req: AuthenticatedRequest, 
 });
 
 export default router;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

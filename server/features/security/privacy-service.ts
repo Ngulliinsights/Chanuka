@@ -1,5 +1,5 @@
-import { database as db } from '../../../shared/database/connection.js';
-import { users, userProfiles, billComments, notifications, sessions } from '../../../shared/schema.js';
+import { database as db } from '../shared/database/connection';
+import { users, userProfiles, billComments, notifications, sessions } from '../../../shared/schema';
 import { eq, and, lt } from 'drizzle-orm';
 import { encryptionService } from './encryption-service.js';
 import { securityAuditService } from './security-audit-service.js';
@@ -124,6 +124,43 @@ export class PrivacyService {
   }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

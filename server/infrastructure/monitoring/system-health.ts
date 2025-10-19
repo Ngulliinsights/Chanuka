@@ -1,4 +1,4 @@
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '../../../shared/database/connection';
 import { sql } from 'drizzle-orm';
 import os from 'os';
 import process from 'process';
@@ -149,10 +149,15 @@ export class SystemHealthService {
       errors: errorMetrics
     };
 
-    // Store metrics history (keep last 100 entries)
+    // Store metrics history (keep last 50 entries for memory efficiency)
     this.metricsHistory.push(metrics);
-    if (this.metricsHistory.length > 100) {
+    if (this.metricsHistory.length > 50) {
       this.metricsHistory.shift();
+    }
+
+    // Trigger periodic cleanup
+    if (this.metricsHistory.length % 10 === 0) {
+      this.cleanupOldMetrics();
     }
 
     return metrics;
@@ -209,17 +214,29 @@ export class SystemHealthService {
   recordAPIRequest(responseTime: number, statusCode: number, endpoint: string) {
     this.responseTimes.push(responseTime);
     
-    // Keep only last 1000 response times
-    if (this.responseTimes.length > 1000) {
+    // Keep only last 500 response times (reduced from 1000)
+    if (this.responseTimes.length > 500) {
       this.responseTimes.shift();
     }
 
     const key = `${endpoint}_${Math.floor(statusCode / 100)}xx`;
     this.requestCounts.set(key, (this.requestCounts.get(key) || 0) + 1);
 
+    // Limit request counts map size
+    if (this.requestCounts.size > 100) {
+      const oldestKey = this.requestCounts.keys().next().value;
+      this.requestCounts.delete(oldestKey);
+    }
+
     if (statusCode >= 400) {
       const errorKey = `${statusCode}`;
       this.errorCounts.set(errorKey, (this.errorCounts.get(errorKey) || 0) + 1);
+      
+      // Limit error counts map size
+      if (this.errorCounts.size > 50) {
+        const oldestKey = this.errorCounts.keys().next().value;
+        this.errorCounts.delete(oldestKey);
+      }
     }
   }
 
@@ -227,8 +244,8 @@ export class SystemHealthService {
   recordDatabaseQuery(queryTime: number, success: boolean) {
     this.queryTimes.push(queryTime);
     
-    // Keep only last 1000 query times
-    if (this.queryTimes.length > 1000) {
+    // Keep only last 500 query times (reduced from 1000)
+    if (this.queryTimes.length > 500) {
       this.queryTimes.shift();
     }
 
@@ -270,16 +287,22 @@ export class SystemHealthService {
     const usedMemory = totalMemory - freeMemory;
     const memoryUsagePercent = (usedMemory / totalMemory) * 100;
 
+    // Trigger automatic cleanup for high memory usage
+    if (memoryUsagePercent > 85) {
+      logger.warn(`[System Health] High memory usage detected: ${memoryUsagePercent.toFixed(2)}%`, { component: 'Chanuka' });
+      this.cleanupOldMetrics();
+    }
+
     if (memoryUsagePercent > 90) {
       return {
         status: 'fail',
-        message: 'Critical memory usage',
+        message: 'Critical memory usage - automatic cleanup triggered',
         usage: memoryUsagePercent
       };
     } else if (memoryUsagePercent > 80) {
       return {
         status: 'warn',
-        message: 'High memory usage',
+        message: 'High memory usage - monitoring closely',
         usage: memoryUsagePercent
       };
     }
@@ -462,12 +485,80 @@ export class SystemHealthService {
     // Clear old request/error counts
     this.requestCounts.clear();
     this.errorCounts.clear();
-    this.responseTimes.splice(0, Math.max(0, this.responseTimes.length - 500));
-    this.queryTimes.splice(0, Math.max(0, this.queryTimes.length - 500));
+    this.responseTimes.splice(0, Math.max(0, this.responseTimes.length - 250));
+    this.queryTimes.splice(0, Math.max(0, this.queryTimes.length - 250));
+  }
+
+  // Method for more aggressive cleanup during high memory usage
+  private cleanupOldMetrics() {
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    this.metricsHistory = this.metricsHistory.filter(metric => metric.timestamp > thirtyMinutesAgo);
+    
+    // More aggressive cleanup of arrays
+    if (this.responseTimes.length > 250) {
+      this.responseTimes = this.responseTimes.slice(-250);
+    }
+    if (this.queryTimes.length > 250) {
+      this.queryTimes = this.queryTimes.slice(-250);
+    }
+
+    // Clear old map entries
+    if (this.requestCounts.size > 50) {
+      const entries = Array.from(this.requestCounts.entries());
+      this.requestCounts.clear();
+      entries.slice(-25).forEach(([key, value]) => {
+        this.requestCounts.set(key, value);
+      });
+    }
+
+    if (this.errorCounts.size > 25) {
+      const entries = Array.from(this.errorCounts.entries());
+      this.errorCounts.clear();
+      entries.slice(-15).forEach(([key, value]) => {
+        this.errorCounts.set(key, value);
+      });
+    }
   }
 }
 
 export const systemHealthService = SystemHealthService.getInstance();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

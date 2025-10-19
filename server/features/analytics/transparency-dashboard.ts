@@ -1,12 +1,12 @@
 import { 
   sponsors, sponsorTransparency, sponsorAffiliations
-} from "../../../shared/schema.js";
+} from "../../../shared/schema";
 import { eq, desc, and, gte, lte, count } from "drizzle-orm";
-import { readDatabase } from "../../../shared/database/connection.js";
+import { readDatabase } from "../shared/database/connection";
 import { cacheService, CACHE_TTL } from "../../infrastructure/cache/cache-service.js";
 import { financialDisclosureAnalyticsService } from "./services/financial-disclosure.service.js";
 import { logger } from '../../utils/logger';
-import { errorTracker } from '../../core/errors/error-tracker';
+import { errorTracker } from '../../core/errors/error-tracker.js';
 
 export interface TransparencyScoreResult {
   overallScore: number;
@@ -645,6 +645,43 @@ export class SimpleTransparencyDashboardService {
 }
 
 export const simpleTransparencyDashboardService = new SimpleTransparencyDashboardService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

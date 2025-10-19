@@ -1,4 +1,4 @@
-import { database as db } from '../../../../../shared/database/connection';
+import { database as db } from '../../../shared/database/connection';
 import { citizenVerifications } from '../../../../../shared/schema/schema';
 import { eq, and, sql } from 'drizzle-orm';
 import { VerificationRepository } from '../../domain/repositories/verification-repository';
@@ -359,3 +359,39 @@ export class VerificationRepositoryImpl implements VerificationRepository {
     });
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

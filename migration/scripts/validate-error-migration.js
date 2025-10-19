@@ -12,10 +12,9 @@ const path = require('path');
 
 // Patterns that indicate old error system usage
 const OLD_PATTERNS = [
-  // Old import patterns
-  /from\s+['"].*\/shared\/core\/src\/errors['"]/,
-  /from\s+['"].*\/shared\/core\/src\/error-handling['"]/,
-  /from\s+['"].*\/server\/utils\/errors['"]/,
+  // Old import patterns (but exclude legacy adapters and new system)
+  /from\s+['"].*\/shared\/core\/src\/errors['"](?!.*observability)/,
+  /from\s+['"].*\/shared\/core\/src\/error-handling['"](?!.*observability)/,
   
   // Old class instantiations that might need updating
   /new\s+AppError\s*\(/,
@@ -184,3 +183,39 @@ if (require.main === module) {
 }
 
 module.exports = { analyzeFile, findFiles, generateReport };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

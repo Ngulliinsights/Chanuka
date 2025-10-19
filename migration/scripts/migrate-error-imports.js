@@ -14,27 +14,27 @@ const { execSync } = require('child_process');
 // Import mappings from old to new system
 const IMPORT_MAPPINGS = {
   // Old shared/core/src/errors imports
-  "from '../../../shared/core/src/errors'": "from '../../../shared/core/src/observability/error-management'",
-  "from '../../shared/core/src/errors'": "from '../../shared/core/src/observability/error-management'",
-  "from '../shared/core/src/errors'": "from '../shared/core/src/observability/error-management'",
-  "from '@shared/core/src/errors'": "from '@shared/core/src/observability/error-management'",
+  "from '../../../shared/core/src/observability/error-management'": "from '../../../shared/core/src/observability/error-management'",
+  "from '../../shared/core/src/observability/error-management'": "from '../../shared/core/src/observability/error-management'",
+  "from '../shared/core/src/observability/error-management'": "from '../shared/core/src/observability/error-management'",
+  "from '@shared/core/src/observability/error-management'": "from '@shared/core/src/observability/error-management'",
   
   // Old shared/core/src/error-handling imports
-  "from '../../../shared/core/src/error-handling'": "from '../../../shared/core/src/observability/error-management'",
-  "from '../../shared/core/src/error-handling'": "from '../../shared/core/src/observability/error-management'",
-  "from '../shared/core/src/error-handling'": "from '../shared/core/src/observability/error-management'",
-  "from '@shared/core/src/error-handling'": "from '@shared/core/src/observability/error-management'",
+  "from '../../../shared/core/src/observability/error-management'": "from '../../../shared/core/src/observability/error-management'",
+  "from '../../shared/core/src/observability/error-management'": "from '../../shared/core/src/observability/error-management'",
+  "from '../shared/core/src/observability/error-management'": "from '../shared/core/src/observability/error-management'",
+  "from '@shared/core/src/observability/error-management'": "from '@shared/core/src/observability/error-management'",
   
   // Server error imports
-  "from '../core/errors/error-tracker'": "from '../core/errors/error-tracker.js'",
-  "from '../../core/errors/error-tracker'": "from '../../core/errors/error-tracker.js'",
-  "from '../../../core/errors/error-tracker'": "from '../../../core/errors/error-tracker.js'",
+  "from '../core/errors/error-tracker.js'": "from '../core/errors/error-tracker.js'",
+  "from '../../core/errors/error-tracker.js'": "from '../../core/errors/error-tracker.js'",
+  "from '../../../core/errors/error-tracker.js'": "from '../../../core/errors/error-tracker.js'",
 };
 
 // Class name mappings for specialized cases
 const CLASS_MAPPINGS = {
-  'AppError': 'BaseError',
-  'EnhancedCircuitBreaker': 'CircuitBreaker'
+  'BaseError': 'BaseError',
+  'CircuitBreaker': 'CircuitBreaker'
 };
 
 function findFiles(dir, extensions = ['.ts', '.tsx', '.js', '.jsx']) {
@@ -132,3 +132,39 @@ if (require.main === module) {
 }
 
 module.exports = { updateImports, findFiles, IMPORT_MAPPINGS, CLASS_MAPPINGS };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-import type { Stakeholder, InsertStakeholder } from '../../../shared/schema.js';
+import type { Stakeholder, InsertStakeholder } from '../../../shared/schema';
 import { logger } from '../../utils/logger';
 
 /**
@@ -430,6 +430,43 @@ export class StakeholderStorage {
     return results;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

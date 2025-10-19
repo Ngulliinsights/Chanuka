@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, jest } from '@jest/globals';
-import { database as db, withTransaction, bills, users, billComments, billEngagement, sponsors, billSponsorships } from '../../../shared/database/connection.js';
+import { database as db, withTransaction, bill as bills, user as users, billComment as billComments, billEngagement, sponsor as sponsors, billSponsorship as billSponsorships } from '../../../shared/database/connection.js';
 import { eq, and } from 'drizzle-orm';
 import { logger } from '../../../shared/core/src/observability/logging';
 
@@ -622,6 +622,43 @@ describe('Database Transaction Integrity Tests', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

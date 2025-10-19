@@ -1,6 +1,6 @@
 // Re-export unified error management system
 export {
-  BaseError as AppError,
+  BaseError as BaseError,
   ValidationError,
   NotFoundError,
   UnauthorizedError as AuthenticationError,
@@ -63,6 +63,43 @@ export function setupGlobalErrorHandlers() {
   // This would set up global error handlers for unhandled rejections, etc.
   console.log('Global error handlers setup - implement as needed');
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

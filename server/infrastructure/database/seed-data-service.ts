@@ -1,6 +1,6 @@
 import { databaseService } from './database-service.js';
 import { readDatabase } from '../../db.js';
-import * as schema from '../../../shared/schema.js';
+import * as schema from '../../../shared/schema';
 import bcrypt from 'bcrypt';
 import { logger } from '@shared/core/src/observability/logging';
 
@@ -146,6 +146,43 @@ export class SeedDataService {
 }
 
 export const seedDataService = new SeedDataService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

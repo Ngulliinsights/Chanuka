@@ -25,8 +25,8 @@ export type {
 } from '../patterns/circuit-breaker.js';
 
 // Legacy class aliases
-export { BaseError as AppError } from '../errors/base-error.js';
-export { CircuitBreaker as EnhancedCircuitBreaker } from '../patterns/circuit-breaker.js';
+export { BaseError as BaseError } from '../errors/base-error.js';
+export { CircuitBreaker as CircuitBreaker } from '../patterns/circuit-breaker.js';
 
 // Legacy constants
 export const ERROR_DOMAINS = {
@@ -62,3 +62,39 @@ console.warn(
     '[DEPRECATED] Importing from error-handling is deprecated. ' +
     'Please import from @shared/core/observability/error-management instead.'
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,6 @@
 import { databaseService } from '../../infrastructure/database/database-service.js';
 import { db } from '../../db.js';
-import { billComments, users, userProfiles, bills } from '@shared/schema.js';
+import { billComment as billComments, user as users, userProfile as userProfiles, bill as bills } from '../../../shared/schema/schema.js';
 import { eq, and, desc, asc, sql, count, isNull, or } from 'drizzle-orm';
 import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../infrastructure/cache/cache-service.js';
 import { logger } from '../../utils/logger.js';
@@ -681,3 +681,40 @@ export class CommentService {
 }
 
 export const commentService = new CommentService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

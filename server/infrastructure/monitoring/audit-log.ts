@@ -1,4 +1,4 @@
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '../shared/database/connection';
 import { logger } from '@shared/core/src/observability/logging';
 
 // Define audit log table schema (would be added to schema.ts)
@@ -281,6 +281,43 @@ export const auditMiddleware = (req: any, res: any, next: any) => {
 
   next();
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

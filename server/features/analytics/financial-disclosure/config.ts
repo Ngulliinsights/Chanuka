@@ -203,3 +203,39 @@ export const FinancialDisclosureConfig = {
 
 // Type exports for strong typing throughout the application
 export type FinancialDisclosureConfigType = typeof FinancialDisclosureConfig;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

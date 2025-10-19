@@ -1,4 +1,4 @@
-import { schemaValidationService } from '@shared/schema.js';
+import { schemaValidationService } from '@shared/schema';
 import { logger } from '../../shared/core/src/observability/logging';
 
 /**
@@ -127,6 +127,43 @@ export async function validateSchemaBeforeSecurityInit(): Promise<void> {
   
   logger.info('✅ Database schema validation passed - security monitoring can proceed', { component: 'Chanuka' });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

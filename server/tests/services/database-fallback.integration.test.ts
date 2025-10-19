@@ -18,7 +18,7 @@ const mockPool = {
 };
 
 // Mock the database connection module
-jest.mock('../../../shared/database/connection.js', () => ({
+jest.mock('../shared/database/connection', () => ({
   database: mockDatabase,
   pool: mockPool,
   withTransaction: jest.fn(),
@@ -479,6 +479,43 @@ describe('Database Fallback Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

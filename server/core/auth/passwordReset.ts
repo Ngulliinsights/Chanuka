@@ -1,7 +1,7 @@
 // services/passwordReset.ts
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '../shared/database/connection';
 // Import specific tables and functions needed from the consolidated schema
-import { users, passwordResets } from '../../../shared/schema.js';
+import { user as users, passwordReset as passwordResets } from '../../../shared/schema';
 import { ValidationError } from '../../../shared/types/errors.js';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
@@ -190,3 +190,40 @@ class PasswordResetService {
 }
 
 export const passwordResetService = new PasswordResetService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

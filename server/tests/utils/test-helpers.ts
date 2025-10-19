@@ -1,4 +1,4 @@
-import { database as db, users, bills, sponsors, notifications, billComments, billEngagement } from '../../../shared/database/connection.js';
+import { database as db, users, bills, sponsors, notifications, billComments, billEngagement } from '../shared/database/connection';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { performance } from 'perf_hooks';
@@ -541,6 +541,43 @@ export class MockDataGenerator {
 // Export a default instance for convenience
 export const testDataManager = new TestDataManager();
 export const performanceMonitor = new PerformanceMonitor();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

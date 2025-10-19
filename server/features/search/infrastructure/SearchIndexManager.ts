@@ -3,10 +3,10 @@
  *  ONLY the export path changes – now exported from here.
  *  ------------------------------------------------------------------ */
 import { sql } from 'drizzle-orm';
-import { databaseService } from '../../services/database-service';
+import { databaseService } from '../../../infrastructure/database/database-service';
 import { readDatabase } from '../../../db.js';
-import { cacheService } from '@/infrastructure/cache/cache-service';
-import { demoDataService } from '@/infrastructure/demo-data';
+
+import { demoDataService } from '../../../infrastructure/demo-data';
 import { logger } from '@shared/core/src/observability/logging';
 
 /*  EVERY original method preserved – demo-mode checks, health monitoring,
@@ -14,17 +14,16 @@ import { logger } from '@shared/core/src/observability/logging';
 
 export class SearchIndexManager {
   /*  …  original implementation untouched  …  */
-  async rebuildAll(batchSize = 1000): Promise<{ updated: number; errors: number }> {
+  async rebuildAll(_batchSize = 1000): Promise<{ updated: number; errors: number }> {
     if (demoDataService.isDemoMode()) {
       logger.info('Demo mode – skipping index rebuild');
       return { updated: 0, errors: 0 };
     }
-    const start = Date.now();
     let updated = 0;
     let errors = 0;
     try {
-    const db = readDatabase();
-    const res = await db.execute(sql`
+      const db = readDatabase();
+      const res = await db.execute(sql`
         update bills
         set search_vector =
           setweight(to_tsvector('english', coalesce(title,'')), 'A') ||
@@ -34,7 +33,7 @@ export class SearchIndexManager {
           updated_at = now()
         where search_vector is null or search_vector = to_tsvector('')
       `);
-  updated = res.rowCount || 0;
+      updated = res.rowCount || 0;
       await db.execute(sql`analyze bills`);
       await db.execute(sql`reindex index concurrently idx_bills_search_vector`);
     } catch (e) {
@@ -60,12 +59,7 @@ export class SearchIndexManager {
     }
     /*  original health query  */
     const db = databaseService.getDatabase();
-    const [row] = await db.execute<{
-      total_bills: string;
-      indexed_bills: string;
-      missing_indexes: string;
-      last_update: string;
-    }>(sql`
+    const result = await db.execute(sql`
       select
         count(*) as total_bills,
         count(search_vector) as indexed_bills,
@@ -73,6 +67,12 @@ export class SearchIndexManager {
         max(updated_at) as last_update
       from bills
     `);
+    const row = result[0] as {
+      total_bills: string;
+      indexed_bills: string;
+      missing_indexes: string;
+      last_update: string;
+    };
     const total = Number(row.total_bills);
     const indexed = Number(row.indexed_bills);
     const missing = Number(row.missing_indexes);
@@ -101,9 +101,46 @@ export class SearchIndexManager {
   async warmup(commonQueries: string[]): Promise<void> {
     const queries = commonQueries.length ? commonQueries : ['healthcare', 'climate change', 'education'];
     const { searchBills } = await import('../application/SearchService');
-    await Promise.all(queries.map(q => searchBills({ text: q }).catch(() => {})));
+    await Promise.all(queries.map(q => searchBills({ text: q }).catch(() => { })));
   }
 }
 
 /*  singleton  */
-export const SearchIndexManager = new SearchIndexManager();
+export const searchIndexManager = new SearchIndexManager();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

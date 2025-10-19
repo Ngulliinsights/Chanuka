@@ -40,7 +40,7 @@ declare module '../utils/logger' {
   export default logger;
 }
 
-// Many server files import named exports from @shared/schema or @shared/schema.js
+// Many server files import named exports from @shared/schema or @shared/schema
 // declare common names used across the codebase as any. Add more names as
 // they surface from diagnostics.
 declare module '@shared/schema' {
@@ -56,7 +56,7 @@ declare module '@shared/schema' {
   export default _default;
 }
 
-declare module '@shared/schema.js' {
+declare module '@shared/schema' {
   // Re-export common values and also provide type aliases so both
   // value and `import type {}` import forms are satisfied.
   export const bills: any;
@@ -104,7 +104,7 @@ declare module '@shared/schema.js' {
 }
 
 // Additional permissive schema exports observed in diagnostics
-declare module '@shared/schema.js' {
+declare module '@shared/schema' {
   export const UserProgress: any;
   export const InsertUserProgress: any;
   export const SocialShare: any;
@@ -167,7 +167,7 @@ declare module 'pg' {
 }
 
 // Additional schema names seen in diagnostics
-declare module '@shared/schema.js' {
+declare module '@shared/schema' {
   export const Stakeholder: any;
   export const InsertStakeholder: any;
   export const expertVerifications: any;
@@ -222,3 +222,40 @@ declare module '*enhanced-notification.js' {
   export { enhancedNotificationService };
   export default enhancedNotificationService;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -13,7 +13,7 @@ import {
   BillData,
   SponsorData 
 } from './types.js';
-import { conflicts, conflictSources } from '@shared/schema.js';
+import { conflicts, conflictSources } from '@shared/schema';
 import { eq, and } from 'drizzle-orm';
 import { logger } from '@shared/core/src/observability/logging';
 
@@ -486,6 +486,43 @@ export class ConflictResolutionService {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

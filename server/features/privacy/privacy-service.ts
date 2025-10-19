@@ -1,22 +1,22 @@
 import { eq, and, lt, sql } from "drizzle-orm";
-import { database as db } from "../../../shared/database/connection.js";
-import { 
-  users, 
-  userProfiles, 
-  billComments, 
-  billEngagement, 
-  notifications, 
-  userInterests, 
-  sessions, 
-  userSocialProfiles, 
-  userProgress, 
-  socialShares, 
-  commentVotes, 
-  moderationFlags, 
-  securityAuditLogs 
-} from "../../../shared/schema.js";
+import { database as db } from "../../../shared/database/connection";
+import {
+  user,
+  userProfile,
+  billComment,
+  billEngagement,
+  notification,
+  userInterest,
+  session,
+  userSocialProfile,
+  userProgress,
+  socialShare,
+  commentVote,
+  moderationFlag,
+  securityAuditLog
+} from "../../../shared/schema/schema.js";
 import { auditLogger } from "../../infrastructure/monitoring/audit-log.js";
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 export interface UserDataExport {
   user: {
@@ -273,77 +273,77 @@ class PrivacyService {
   async exportUserData(userId: string, requestedBy: string): Promise<UserDataExport> {
     try {
       // Fetch user basic information
-      const [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, userId))
-        .limit(1);
+       const [userRecord] = await db
+         .select()
+         .from(user)
+         .where(eq(user.id, userId))
+         .limit(1);
 
       if (!user) {
         throw new Error('User not found');
       }
 
       // Fetch user profile data
-      const [profile] = await db
-        .select()
-        .from(userProfiles)
-        .where(eq(userProfiles.userId, userId))
-        .limit(1);
+       const [profile] = await db
+         .select()
+         .from(userProfile)
+         .where(eq(userProfile.userId, userId))
+         .limit(1);
 
       // Fetch user comments with proper type mapping
-      const commentsData = await db
-        .select({
-          id: billComments.id,
-          billId: billComments.billId,
-          content: billComments.content,
-          commentType: billComments.commentType,
-          isVerified: billComments.isVerified,
-          parentCommentId: billComments.parentCommentId,
-          upvotes: billComments.upvotes,
-          downvotes: billComments.downvotes,
-          createdAt: billComments.createdAt,
-          updatedAt: billComments.updatedAt
-        })
-        .from(billComments)
-        .where(eq(billComments.userId, userId));
+       const commentsData = await db
+         .select({
+           id: billComment.id,
+           billId: billComment.billId,
+           content: billComment.content,
+           commentType: billComment.commentType,
+           isVerified: billComment.isVerified,
+           parentCommentId: billComment.parentCommentId,
+           upvotes: billComment.upvotes,
+           downvotes: billComment.downvotes,
+           createdAt: billComment.createdAt,
+           updatedAt: billComment.updatedAt
+         })
+         .from(billComment)
+         .where(eq(billComment.userId, userId));
 
       // Fetch engagement metrics
-      const engagement = await db
-        .select({
-          billId: billEngagement.billId,
-          viewCount: billEngagement.viewCount,
-          commentCount: billEngagement.commentCount,
-          shareCount: billEngagement.shareCount,
-          engagementScore: sql<number>`${billEngagement.engagementScore}::numeric`,
-          lastEngaged: billEngagement.lastEngaged,
-          createdAt: billEngagement.createdAt
-        })
-        .from(billEngagement)
-        .where(eq(billEngagement.userId, userId));
+       const engagement = await db
+         .select({
+           billId: billEngagement.billId,
+           viewCount: billEngagement.viewCount,
+           commentCount: billEngagement.commentCount,
+           shareCount: billEngagement.shareCount,
+           engagementScore: sql<number>`${billEngagement.engagementScore}::numeric`,
+           lastEngaged: billEngagement.lastEngagedAt,
+           createdAt: billEngagement.createdAt
+         })
+         .from(billEngagement)
+         .where(eq(billEngagement.userId, userId));
 
       // Fetch user interests and extract just the interest strings
-      const interestsResult = await db
-        .select({ interest: userInterests.interest })
-        .from(userInterests)
-        .where(eq(userInterests.userId, userId));
-      const interests = interestsResult.map(i => i.interest);
+       const interestsResult = await db
+         .select({ interest: userInterest.interest })
+         .from(userInterest)
+         .where(eq(userInterest.userId, userId));
+       const interests = interestsResult.map(i => i.interest);
 
       // Fetch notifications - declare before use to avoid TDZ error
-      const notificationsData = await db
-        .select()
-        .from(notifications)
-        .where(eq(notifications.userId, userId));
+       const notificationsData = await db
+         .select()
+         .from(notification)
+         .where(eq(notification.userId, userId));
 
       // Fetch social profiles excluding sensitive authentication tokens
-      const socialProfiles = await db
-        .select({
-          provider: userSocialProfiles.provider,
-          username: userSocialProfiles.username,
-          displayName: userSocialProfiles.displayName,
-          createdAt: userSocialProfiles.createdAt
-        })
-        .from(userSocialProfiles)
-        .where(eq(userSocialProfiles.userId, userId));
+       const socialProfiles = await db
+         .select({
+           provider: userSocialProfile.provider,
+           username: userSocialProfile.username,
+           displayName: userSocialProfile.displayName,
+           createdAt: userSocialProfile.createdAt
+         })
+         .from(userSocialProfile)
+         .where(eq(userSocialProfile.userId, userId));
 
       // Fetch user achievements and progress
       const progress = await db
@@ -352,16 +352,24 @@ class PrivacyService {
         .where(eq(userProgress.userId, userId));
 
       // Fetch social media share data - declare before use
-      const socialSharesData = await db
-        .select()
-        .from(socialShares)
-        .where(eq(socialShares.userId, userId));
+       const socialSharesData = await db
+         .select({
+           billId: socialShare.billId,
+           platform: socialShare.platform,
+           metadata: socialShare.metadata,
+           shareDate: socialShare.sharedAt,
+           likes: socialShare.likes,
+           shares: socialShare.shares,
+           comments: socialShare.comments
+         })
+         .from(socialShare)
+         .where(eq(socialShare.userId, userId));
 
       // Fetch comment voting history - declare before use
-      const commentVotesData = await db
-        .select()
-        .from(commentVotes)
-        .where(eq(commentVotes.userId, userId));
+       const commentVotesData = await db
+         .select()
+         .from(commentVote)
+         .where(eq(commentVote.userId, userId));
 
       // Fetch audit logs from the last 90 days only for privacy protection
       const ninetyDaysAgo = new Date();
@@ -369,18 +377,18 @@ class PrivacyService {
 
       const auditLogs = await db
         .select({
-          eventType: securityAuditLogs.eventType,
-          resource: securityAuditLogs.resource,
-          action: securityAuditLogs.action,
-          result: securityAuditLogs.result,
-          severity: securityAuditLogs.severity,
-          createdAt: securityAuditLogs.createdAt
+          eventType: securityAuditLog.eventType,
+          resource: securityAuditLog.resource,
+          action: securityAuditLog.action,
+          result: securityAuditLog.result,
+          severity: securityAuditLog.severity,
+          createdAt: securityAuditLog.createdAt
         })
-        .from(securityAuditLogs)
+        .from(securityAuditLog)
         .where(
           and(
-            eq(securityAuditLogs.userId, userId),
-            sql`${securityAuditLogs.createdAt} >= ${ninetyDaysAgo}`
+            eq(securityAuditLog.userId, userId),
+            sql`${securityAuditLog.createdAt} >= ${ninetyDaysAgo}`
           )
         );
 
@@ -399,25 +407,25 @@ class PrivacyService {
         auditLogs.length;
 
       // Construct the complete export object
-      const exportData: UserDataExport = {
-        user,
-        profile: profile || undefined,
-        comments: commentsData,
-        engagement,
-        interests,
-        notifications: notificationsData,
-        socialProfiles,
-        progress,
-        socialShares: socialSharesData,
-        commentVotes: commentVotesData,
-        auditLogs,
-        exportMetadata: {
-          exportedAt: new Date(),
-          exportedBy: requestedBy,
-          dataVersion: '1.0',
-          totalRecords
-        }
-      };
+       const exportData: UserDataExport = {
+         user: userRecord,
+         profile: profile || undefined,
+         comments: commentsData,
+         engagement,
+         interests,
+         notifications: notificationsData,
+         socialProfiles,
+         progress,
+         socialShares: socialSharesData,
+         commentVotes: commentVotesData,
+         auditLogs,
+         exportMetadata: {
+           exportedAt: new Date(),
+           exportedBy: requestedBy,
+           dataVersion: '1.0',
+           totalRecords
+         }
+       };
 
       // Log the data export event for audit trail
       await auditLogger.logDataExport(
@@ -453,24 +461,24 @@ class PrivacyService {
       // Execute all deletions within a transaction for data integrity
       await db.transaction(async (tx) => {
         // Remove user interests
-        const deletedInterests = await tx
-          .delete(userInterests)
-          .where(eq(userInterests.userId, userId))
-          .returning({ id: userInterests.id });
+         const deletedInterests = await tx
+           .delete(userInterest)
+           .where(eq(userInterest.userId, userId))
+           .returning({ id: userInterest.id });
         deletedRecords.interests = deletedInterests.length;
 
         // Remove comment votes
-        const deletedVotes = await tx
-          .delete(commentVotes)
-          .where(eq(commentVotes.userId, userId))
-          .returning({ id: commentVotes.id });
+         const deletedVotes = await tx
+           .delete(commentVote)
+           .where(eq(commentVote.userId, userId))
+           .returning({ id: commentVote.id });
         deletedRecords.commentVotes = deletedVotes.length;
 
         // Remove social media shares
-        const deletedShares = await tx
-          .delete(socialShares)
-          .where(eq(socialShares.userId, userId))
-          .returning({ id: socialShares.id });
+         const deletedShares = await tx
+           .delete(socialShare)
+           .where(eq(socialShare.userId, userId))
+           .returning({ id: socialShare.id });
         deletedRecords.socialShares = deletedShares.length;
 
         // Remove user progress and achievements
@@ -481,24 +489,24 @@ class PrivacyService {
         deletedRecords.progress = deletedProgress.length;
 
         // Remove connected social profiles
-        const deletedSocialProfiles = await tx
-          .delete(userSocialProfiles)
-          .where(eq(userSocialProfiles.userId, userId))
-          .returning({ id: userSocialProfiles.id });
+         const deletedSocialProfiles = await tx
+           .delete(userSocialProfile)
+           .where(eq(userSocialProfile.userId, userId))
+           .returning({ id: userSocialProfile.id });
         deletedRecords.socialProfiles = deletedSocialProfiles.length;
 
         // Remove all user sessions
-        const deletedSessions = await tx
-          .delete(sessions)
-          .where(eq(sessions.userId, userId))
-          .returning({ id: sessions.id });
+         const deletedSessions = await tx
+           .delete(session)
+           .where(eq(session.userId, userId))
+           .returning({ id: session.id });
         deletedRecords.sessions = deletedSessions.length;
 
         // Remove notifications
-        const deletedNotifications = await tx
-          .delete(notifications)
-          .where(eq(notifications.userId, userId))
-          .returning({ id: notifications.id });
+         const deletedNotifications = await tx
+           .delete(notification)
+           .where(eq(notification.userId, userId))
+           .returning({ id: notification.id });
         deletedRecords.notifications = deletedNotifications.length;
 
         // Remove engagement metrics
@@ -509,46 +517,46 @@ class PrivacyService {
         deletedRecords.engagement = deletedEngagement.length;
 
         // Anonymize comments to preserve discussion context and maintain thread integrity
-        const anonymizedComments = await tx
-          .update(billComments)
-          .set({
-            userId: 'deleted-user',
-            content: '[Comment removed by user request]',
-            updatedAt: new Date()
-          })
-          .where(eq(billComments.userId, userId))
-          .returning({ id: billComments.id });
+         const anonymizedComments = await tx
+           .update(billComment)
+           .set({
+             userId: 'deleted-user',
+             content: '[Comment removed by user request]',
+             updatedAt: new Date()
+           })
+           .where(eq(billComment.userId, userId))
+           .returning({ id: billComment.id });
         deletedRecords.comments = anonymizedComments.length;
 
         // Remove user profile
-        const deletedProfiles = await tx
-          .delete(userProfiles)
-          .where(eq(userProfiles.userId, userId))
-          .returning({ id: userProfiles.id });
+         const deletedProfiles = await tx
+           .delete(userProfile)
+           .where(eq(userProfile.userId, userId))
+           .returning({ id: userProfile.id });
         deletedRecords.profiles = deletedProfiles.length;
 
         // Remove moderation flags created by the user
-        const deletedFlags = await tx
-          .delete(moderationFlags)
-          .where(eq(moderationFlags.reportedBy, userId))
-          .returning({ id: moderationFlags.id });
+         const deletedFlags = await tx
+           .delete(moderationFlag)
+           .where(eq(moderationFlag.reportedBy, userId))
+           .returning({ id: moderationFlag.id });
         deletedRecords.moderationFlags = deletedFlags.length;
 
         // Delete the main user account record
-        const deletedUsers = await tx
-          .delete(users)
-          .where(eq(users.id, userId))
-          .returning({ id: users.id });
+         const deletedUsers = await tx
+           .delete(user)
+           .where(eq(user.id, userId))
+           .returning({ id: user.id });
         deletedRecords.users = deletedUsers.length;
 
         // Optionally remove audit trail based on legal requirements
-        if (!keepAuditTrail) {
-          const deletedAuditLogs = await tx
-            .delete(securityAuditLogs)
-            .where(eq(securityAuditLogs.userId, userId))
-            .returning({ id: securityAuditLogs.id });
-          deletedRecords.auditLogs = deletedAuditLogs.length;
-        }
+         if (!keepAuditTrail) {
+           const deletedAuditLogs = await tx
+             .delete(securityAuditLog)
+             .where(eq(securityAuditLog.userId, userId))
+             .returning({ id: securityAuditLog.id });
+           deletedRecords.auditLogs = deletedAuditLogs.length;
+         }
       });
 
       // Log the deletion event with proper severity level
@@ -583,9 +591,9 @@ class PrivacyService {
   async getPrivacyPreferences(userId: string): Promise<PrivacyPreferences> {
     try {
       const [user] = await db
-        .select({ preferences: users.preferences })
-        .from(users)
-        .where(eq(users.id, userId))
+        .select({ preferences: user.preferences })
+        .from(user)
+        .where(eq(user.id, userId))
         .limit(1);
 
       if (!user) {
@@ -649,25 +657,25 @@ class PrivacyService {
       };
 
       // Retrieve current user preferences object
-      const [user] = await db
-        .select({ preferences: users.preferences })
-        .from(users)
-        .where(eq(users.id, userId))
-        .limit(1);
+       const [userRecord] = await db
+         .select({ preferences: user.preferences })
+         .from(user)
+         .where(eq(user.id, userId))
+         .limit(1);
 
-      const currentUserPrefs = (user?.preferences as unknown as Record<string, any>) || {};
+      const currentUserPrefs = (userRecord?.preferences as unknown as Record<string, any>) || {};
 
       // Update preferences in database
-      await db
-        .update(users)
-        .set({
-          preferences: {
-            ...currentUserPrefs,
-            privacy: updatedPrefs
-          },
-          updatedAt: new Date()
-        })
-        .where(eq(users.id, userId));
+       await db
+         .update(user)
+         .set({
+           preferences: {
+             ...currentUserPrefs,
+             privacy: updatedPrefs
+           },
+           updatedAt: new Date()
+         })
+         .where(eq(user.id, userId));
 
       // Log the preference update with appropriate severity
       await auditLogger.log({
@@ -723,52 +731,52 @@ class PrivacyService {
           switch (policy.dataType) {
             case 'notifications':
               // Only delete read notifications older than cutoff
-              const deletedNotifications = await db
-                .delete(notifications)
-                .where(
-                  and(
-                    eq(notifications.isRead, true),
-                    lt(notifications.createdAt, cutoffDate)
-                  )
-                )
-                .returning({ id: notifications.id });
+               const deletedNotifications = await db
+                 .delete(notification)
+                 .where(
+                   and(
+                     eq(notification.isRead, true),
+                     lt(notification.createdAt, cutoffDate)
+                   )
+                 )
+                 .returning({ id: notification.id });
               recordsDeleted = deletedNotifications.length;
               break;
 
             case 'audit_logs':
               // Delete audit logs older than cutoff
-              const deletedAuditLogs = await db
-                .delete(securityAuditLogs)
-                .where(lt(securityAuditLogs.createdAt, cutoffDate))
-                .returning({ id: securityAuditLogs.id });
+               const deletedAuditLogs = await db
+                 .delete(securityAuditLog)
+                 .where(lt(securityAuditLog.createdAt, cutoffDate))
+                 .returning({ id: securityAuditLog.id });
               recordsDeleted = deletedAuditLogs.length;
               break;
 
             case 'sessions':
               // Delete inactive sessions older than cutoff
-              const deletedSessions = await db
-                .delete(sessions)
-                .where(
-                  and(
-                    eq(sessions.isActive, false),
-                    lt(sessions.createdAt, cutoffDate)
-                  )
-                )
-                .returning({ id: sessions.id });
+               const deletedSessions = await db
+                 .delete(session)
+                 .where(
+                   and(
+                     eq(session.isActive, false),
+                     lt(session.createdAt, cutoffDate)
+                   )
+                 )
+                 .returning({ id: session.id });
               recordsDeleted = deletedSessions.length;
               break;
 
             case 'moderation_flags':
               // Delete resolved or dismissed moderation flags older than cutoff
-              const deletedFlags = await db
-                .delete(moderationFlags)
-                .where(
-                  and(
-                    sql`${moderationFlags.status} IN ('resolved', 'dismissed')`,
-                    lt(moderationFlags.createdAt, cutoffDate)
-                  )
-                )
-                .returning({ id: moderationFlags.id });
+               const deletedFlags = await db
+                 .delete(moderationFlag)
+                 .where(
+                   and(
+                     sql`${moderationFlag.status} IN ('resolved', 'dismissed')`,
+                     lt(moderationFlag.createdAt, cutoffDate)
+                   )
+                 )
+                 .returning({ id: moderationFlag.id });
               recordsDeleted = deletedFlags.length;
               break;
           }
@@ -822,10 +830,10 @@ class PrivacyService {
    */
   async generateGDPRComplianceReport(userId: string): Promise<GDPRComplianceReport> {
     try {
-      const [user] = await db
+      const [userRecord] = await db
         .select()
-        .from(users)
-        .where(eq(users.id, userId))
+        .from(user)
+        .where(eq(user.id, userId))
         .limit(1);
 
       if (!user) {
@@ -835,17 +843,17 @@ class PrivacyService {
       const privacyPrefs = await this.getPrivacyPreferences(userId);
 
       // Evaluate data processing lawfulness
-      const dataProcessingLawfulness = {
-        hasValidConsent: true,
-        consentDate: user.createdAt,
-        processingPurposes: [
-          'Platform functionality',
-          'User authentication',
-          'Legislative tracking',
-          'Community engagement'
-        ],
-        legalBasis: 'Consent (GDPR Article 6(1)(a))'
-      };
+       const dataProcessingLawfulness = {
+         hasValidConsent: true,
+         consentDate: userRecord.createdAt,
+         processingPurposes: [
+           'Platform functionality',
+           'User authentication',
+           'Legislative tracking',
+           'Community engagement'
+         ],
+         legalBasis: 'Consent (GDPR Article 6(1)(a))'
+       };
 
       // Assess data minimization practices
       const dataCollected = [
@@ -970,3 +978,40 @@ class PrivacyService {
 }
 
 export const privacyService = new PrivacyService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

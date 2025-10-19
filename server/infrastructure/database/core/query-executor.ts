@@ -838,3 +838,39 @@ export class QueryExecutor {
 
 // Export singleton instance for convenience
 export const queryExecutor = new QueryExecutor();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

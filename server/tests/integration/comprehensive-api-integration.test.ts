@@ -93,7 +93,11 @@ describe('Comprehensive API Integration Tests', () => {
 
       for (const userData of testUserData) {
         try {
-          const user = await db.insert(users).values(userData).returning();
+          const user = await db.insert(users).values({
+            ...userData,
+            role: 'citizen' as const,
+            verificationStatus: 'verified' as const
+          }).returning();
           testUsers.push(user[0]);
           
           // Generate auth tokens
@@ -187,7 +191,10 @@ describe('Comprehensive API Integration Tests', () => {
 
       for (const billData of testBillData) {
         try {
-          const bill = await db.insert(bills).values(billData).returning();
+          const bill = await db.insert(bills).values({
+            ...billData,
+            status: 'introduced' as const
+          }).returning();
           testBills.push(bill[0]);
         } catch (error) {
           console.warn('Failed to create test bill:', error);
@@ -333,6 +340,43 @@ describe('Comprehensive API Integration Tests', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

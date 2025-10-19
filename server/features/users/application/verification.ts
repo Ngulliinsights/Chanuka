@@ -1,11 +1,12 @@
 
 import { Router, Request, Response } from "express";
 import { eq, desc, sql } from "drizzle-orm";
-import { database as db, expertVerifications, users } from "../../../../shared/database/connection.js";
+import { database as db } from "../../../../shared/database/connection";
+import { verification as expertVerifications, user as users } from "../../../../shared/schema";
 import { VerificationRequest } from "../../../types/api.js";
 import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../../utils/api-response.js";
 import { errorTracker } from '../../../core/errors/error-tracker.js';
-import { logger } from '../../../utils/logger';
+import { logger } from '@shared/core/src/observability/logging';
 
 const router = Router();
 
@@ -183,6 +184,43 @@ setupVerificationRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

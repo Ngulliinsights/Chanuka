@@ -4,8 +4,8 @@ import { readDatabase } from '../../db.js';
 import { webSocketService } from '../../infrastructure/websocket.js';
 import { userProfileService } from '../users/domain/user-profile.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service.js';
-import * as schema from '../../../shared/schema.js';
-import { Bill } from '../../../shared/schema.js';
+import * as schema from '../../../shared/schema';
+import { Bill } from '../../../shared/schema';
 import { logger } from '../../utils/logger';
 
 export interface BillStatusChange {
@@ -717,6 +717,43 @@ export class BillStatusMonitorService {
 }
 
 export const billStatusMonitorService = new BillStatusMonitorService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

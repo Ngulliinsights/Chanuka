@@ -1,10 +1,10 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { pool, readDb, writeDb, db } from './pool.ts';
-import * as schema from '../schema/schema.ts';
+import * as schema from '../schema';
 import type { PgTransaction } from 'drizzle-orm/pg-core';
 import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
 import type { ExtractTablesWithRelations } from 'drizzle-orm';
-import { logger } from '../core/src/logging';
+import { logger } from '../core/index.js';
 
 // Create a more descriptive type alias for transactions to improve code readability
 // Use the actual transaction type from Drizzle ORM
@@ -21,7 +21,7 @@ export const writeDatabase = writeDb;
 export { pool };
 
 // Export all schema tables and types for easy importing
-export * from '../schema/schema.ts';
+export * from '../schema';
 
 // Enhanced operation type that's more explicit about its purpose
 export type DatabaseOperation = 'read' | 'write' | 'general';
@@ -223,6 +223,43 @@ export async function withReadConnection<T>(
 ): Promise<T> {
   return callback(readDatabase);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

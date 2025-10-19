@@ -85,7 +85,7 @@ declare module '../../../shared/schema' {
   export = whatever;
 }
 
-declare module '../../../shared/schema.js' {
+declare module '../../../shared/schema' {
   const whatever: any;
   export = whatever;
 }
@@ -94,7 +94,7 @@ declare module '../../features/security/security-audit-service.js' {
   export const securityAuditService: any;
 }
 
-declare module '../../../shared/schema.js' {
+declare module '../../../shared/schema' {
   const whatever: any;
   export = whatever;
 }
@@ -163,3 +163,40 @@ declare module '../../../shared/schema' {
   const whatever: any;
   export default whatever;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

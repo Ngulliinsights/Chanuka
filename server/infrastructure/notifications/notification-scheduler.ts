@@ -1,4 +1,5 @@
-import { database as db, notifications, users, bills, billEngagement } from '../../../shared/database/connection.js';
+import { database as db } from '../../../shared/database/connection';
+import { notification, user, bill, billEngagement } from '../../../shared/schema';
 import { eq, and, lt, gte, sql } from 'drizzle-orm';
 import * as cron from 'node-cron';
 import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
@@ -630,6 +631,43 @@ export class NotificationSchedulerService {
 }
 
 export const notificationSchedulerService = new NotificationSchedulerService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -4,9 +4,19 @@ import jwt from 'jsonwebtoken';
 import { webSocketService } from '../infrastructure/websocket.js';
 import { billStatusMonitorService } from '../features/bills/bill-status-monitor.js';
 import { userPreferencesService } from '../features/users/domain/user-preferences.js';
-import { database as db, users, bills, billEngagement } from '../../shared/database/connection.js';
+import { database as db, user as users, bill as bills, billEngagement } from '../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import { logger } from '../../shared/core/src/observability/logging';
+
+// Mock billStatusMonitor
+const billStatusMonitor = {
+  initialize: jest.fn(),
+  stopMonitoring: jest.fn(),
+  triggerStatusChange: jest.fn(),
+  getMonitoringStats: jest.fn(() => ({ activeMonitors: 0, totalEvents: 0 })),
+  addBillToMonitoring: jest.fn(),
+  getBillStatus: jest.fn(() => 'introduced')
+};
 
 describe('Real-Time Bill Tracking System', () => {
   let testUserId: string;
@@ -486,6 +496,43 @@ describe('Real-Time Bill Tracking System', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

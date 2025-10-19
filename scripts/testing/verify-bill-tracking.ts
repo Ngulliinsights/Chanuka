@@ -1,6 +1,6 @@
 import { billTrackingService } from './services/bill-tracking.js';
 import { db } from './db.js';
-import { users, bills, userInterests } from '../shared/schema.js';
+import { users, bills, userInterests } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '../../shared/core/src/observability/logging';
 
@@ -248,6 +248,43 @@ async function verifyBillTracking() {
 
 // Run verification
 verifyBillTracking().catch(console.error);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

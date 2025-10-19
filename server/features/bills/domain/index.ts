@@ -2,3 +2,39 @@
 // This layer contains domain entities, value objects, and business rules
 
 export * from './LegislativeStorageTypes.js';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

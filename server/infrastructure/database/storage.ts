@@ -13,7 +13,7 @@ import {
   type InsertSocialShare,
   type UserSocialProfile,
   type Evaluation,
-} from '../../../shared/schema/schema.ts';
+} from '../../../shared/schema';
 import session from 'express-session';
 import { logger } from '@shared/core/src/observability/logging';
 // Simple memory store implementation since connect-memorystore is not available
@@ -931,6 +931,43 @@ export class MemStorage implements IStorage {
 }
 
 export const storage = new MemStorage();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

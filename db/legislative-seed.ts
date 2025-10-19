@@ -4,7 +4,7 @@ import {
   user, bill, sponsor, billSponsorship, billComment,
   userProfile, analysis, sponsorAffiliation, sponsorTransparency,
   billSectionConflict
-} from "../shared/schema.js";
+} from "../shared/schema";
 
 async function seedLegislativeData() {
 // cspell:disable-next-line
@@ -331,6 +331,43 @@ seedLegislativeData()
     logger.error('Seeding failed:', { component: 'Chanuka' }, error);
     process.exit(1);
   });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

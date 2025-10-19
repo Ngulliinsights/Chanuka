@@ -1,18 +1,28 @@
 import { eq, desc, and, sql, count, like, or } from "drizzle-orm";
-// Changed to default imports based on how these modules actually export
-import databaseService from "../../infrastructure/database/database-service.js";
-import readDatabaseDefault from "../../db.js";
-import cacheServiceDefault from "../../infrastructure/cache/cache-service.js";
-// Import these as default and extract named exports at runtime to avoid TS .js named export issues
-const cacheService = (cacheServiceDefault as any) || {};
-const { CACHE_KEYS, CACHE_TTL } = cacheService;
-const readDatabase = (readDatabaseDefault as any)?.readDatabase || (readDatabaseDefault as any) || (() => undefined);
-import SearchIndexManager from "../search/infrastructure/SearchIndexManager.js";
-import * as schema from "../../../shared/schema.js";
-// Ensure these are properly exported from schema (use type-only imports where possible)
-import type { Bill, InsertBill, BillEngagement } from "@shared/schema";
-import loggerDefault from '../../utils/logger.js';
-const logger = (loggerDefault as any)?.logger || loggerDefault;
+import { database as databaseService, readDatabase } from '../../../../shared/database/connection';
+import * as schema from "../../../../shared/schema/schema.js";
+import type { Bill, InsertBill, BillEngagement } from "../../../../shared/schema/schema.js";
+import { logger } from '../../../../shared/core/logger.js';
+
+// Simple cache service mock for now
+const cacheService = {
+  get: async (key: string) => null,
+  set: async (key: string, value: any, ttl?: number) => {},
+  delete: async (key: string) => {},
+  clear: async () => {}
+};
+
+const CACHE_KEYS = {
+  BILL: 'bill',
+  BILLS: 'bills'
+};
+
+const CACHE_TTL = {
+  SHORT: 300,
+  MEDIUM: 1800,
+  LONG: 3600
+};
+// Logger is imported above
 import { billStorage } from '../infrastructure/bill-storage.js';
 
 // Types for bill operations
@@ -905,3 +915,40 @@ export class BillService {
 
 // Export singleton instance for application-wide use
 export const billService = new BillService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

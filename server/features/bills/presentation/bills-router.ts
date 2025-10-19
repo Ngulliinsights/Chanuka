@@ -35,15 +35,15 @@ function handleRouteError(res: Response, error: unknown, context: string, userId
 
   // Map domain-specific errors to appropriate HTTP responses
   if (error instanceof BillNotFoundError || error instanceof CommentNotFoundError) {
-    return ApiNotFound(res, error.message);
+    return res.status(404).json(ApiNotFound(error.message));
   }
   
   if (error instanceof ValidationError) {
-    return ApiValidationError(res, error.message);
+    return res.status(400).json(ApiValidationError([error.message]));
   }
 
   // Generic fallback for unexpected errors
-  return ApiError(res, `Failed to ${context.toLowerCase()}`, 500);
+  return res.status(500).json(ApiError(`Failed to ${context.toLowerCase()}`));
 }
 
 /**
@@ -74,11 +74,11 @@ router.get('/', asyncHandler(async (req, res) => {
 
   // Validate pagination parameters if provided
   if (parsedLimit !== undefined && (isNaN(parsedLimit) || parsedLimit <= 0 || parsedLimit > 100)) {
-    return ApiValidationError(res, 'Limit must be a positive number between 1 and 100');
+    return res.status(400).json(ApiValidationError(['Limit must be a positive number between 1 and 100']));
   }
 
   if (parsedOffset !== undefined && (isNaN(parsedOffset) || parsedOffset < 0)) {
-    return ApiValidationError(res, 'Offset must be a non-negative number');
+    return res.status(400).json(ApiValidationError(['Offset must be a non-negative number']));
   }
   
   let bills;
@@ -89,7 +89,7 @@ router.get('/', asyncHandler(async (req, res) => {
       : (tags as string).split(',').map(tag => tag.trim()).filter(Boolean);
     
     if (tagArray.length === 0) {
-      return ApiValidationError(res, 'At least one valid tag must be provided');
+      return res.status(400).json(ApiValidationError(['At least one valid tag must be provided']));
     }
     
     // billsService currently returns the full set; apply pagination here
@@ -114,7 +114,7 @@ router.get('/', asyncHandler(async (req, res) => {
     true
   );
 
-  return ApiSuccess(res, {
+  return res.json(ApiSuccess({
     bills,
     count: bills.length,
     hasMore: parsedLimit ? bills.length === parsedLimit : false,
@@ -124,7 +124,7 @@ router.get('/', asyncHandler(async (req, res) => {
       next: parsedLimit && bills.length === parsedLimit ? (parsedOffset || 0) + parsedLimit : null
     } : undefined,
     message: bills.length === 0 ? 'No bills found matching criteria' : undefined
-  });
+  }));
 }));
 
 /**
@@ -137,7 +137,7 @@ router.get('/', asyncHandler(async (req, res) => {
 router.get('/:id', asyncHandler(async (req, res) => {
   const idResult = parseIntParam(req.params.id, 'Bill ID');
   if (!idResult.valid) {
-    return ApiValidationError(res, idResult.error);
+    return res.status(400).json(ApiValidationError([idResult.error]));
   }
 
   const bill = await billsService.getBill(idResult.value);
@@ -161,7 +161,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
     }, err)
   );
 
-  return ApiSuccess(res, { bill });
+  return res.json(ApiSuccess({ bill }));
 }));
 
 /**
@@ -198,10 +198,10 @@ router.post('/', authenticateToken, asyncHandler(async (req, res) => {
     true
   );
 
-  return ApiSuccess(res, {
+  return res.status(201).json(ApiSuccess({
     bill: newBill,
     message: 'Bill created successfully'
-  }, {}, 201);
+  }));
 }));
 
 /**
@@ -214,16 +214,16 @@ router.post('/', authenticateToken, asyncHandler(async (req, res) => {
 router.post('/:id/share', asyncHandler(async (req, res) => {
   const idResult = parseIntParam(req.params.id, 'Bill ID');
   if (!idResult.valid) {
-    return ApiValidationError(res, idResult.error);
+    return res.status(400).json(ApiValidationError([idResult.error]));
   }
 
   const updatedBill = await billsService.incrementBillShares(idResult.value);
 
-  return ApiSuccess(res, { 
+  return res.json(ApiSuccess({ 
     bill: updatedBill,
     shares: updatedBill.shares,
     message: 'Share count updated'
-  });
+  }));
 }));
 
 /**
@@ -237,14 +237,14 @@ router.post('/:id/share', asyncHandler(async (req, res) => {
 router.get('/:id/comments', asyncHandler(async (req, res) => {
   const idResult = parseIntParam(req.params.id, 'Bill ID');
   if (!idResult.valid) {
-    return ApiValidationError(res, idResult.error);
+    return res.status(400).json(ApiValidationError([idResult.error]));
   }
 
   const { highlighted, sortBy } = req.query;
 
   // Validate query parameters
   if (sortBy && !['recent', 'popular', 'endorsements'].includes(sortBy as string)) {
-    return ApiValidationError(res, 'sortBy must be one of: recent, popular, endorsements');
+    return res.status(400).json(ApiValidationError(['sortBy must be one of: recent, popular, endorsements']));
   }
 
   const commentsRaw = await billsService.getBillComments(idResult.value);
@@ -264,12 +264,12 @@ router.get('/:id/comments', asyncHandler(async (req, res) => {
     comments.sort((a: any, b: any) => (b.endorsements || 0) - (a.endorsements || 0));
   }
 
-  return ApiSuccess(res, {
+  return res.json(ApiSuccess({
     comments,
     count: comments.length,
     billId: idResult.value,
     filters: { highlighted: highlighted === 'true', sortBy: sortKey }
-  });
+  }));
 }));
 
 /**
@@ -282,14 +282,14 @@ router.get('/:id/comments', asyncHandler(async (req, res) => {
 router.post('/:id/comments', authenticateToken, asyncHandler(async (req, res) => {
   const idResult = parseIntParam(req.params.id, 'Bill ID');
   if (!idResult.valid) {
-    return ApiValidationError(res, idResult.error);
+    return res.status(400).json(ApiValidationError([idResult.error]));
   }
 
   // Validate parent comment ID if this is a reply
   if (req.body.parentCommentId !== undefined) {
     const parentIdResult = parseIntParam(req.body.parentCommentId.toString(), 'Parent Comment ID');
     if (!parentIdResult.valid) {
-      return ApiValidationError(res, parentIdResult.error);
+      return res.status(400).json(ApiValidationError([parentIdResult.error]));
     }
   }
 
@@ -310,10 +310,10 @@ router.post('/:id/comments', authenticateToken, asyncHandler(async (req, res) =>
     isReply: !!req.body.parentCommentId
   });
 
-  return ApiSuccess(res, {
+  return res.status(201).json(ApiSuccess({
     comment: newComment,
     message: 'Comment created successfully'
-  }, {}, 201);
+  }));
 }));
 
 /**
@@ -325,16 +325,16 @@ router.post('/:id/comments', authenticateToken, asyncHandler(async (req, res) =>
 router.get('/comments/:commentId/replies', asyncHandler(async (req, res) => {
   const idResult = parseIntParam(req.params.commentId, 'Comment ID');
   if (!idResult.valid) {
-    return ApiValidationError(res, idResult.error);
+    return res.status(400).json(ApiValidationError([idResult.error]));
   }
 
   const replies = await billsService.getCommentReplies(idResult.value);
 
-  return ApiSuccess(res, {
+  return res.json(ApiSuccess({
     replies,
     count: replies.length,
     parentCommentId: idResult.value
-  });
+  }));
 }));
 
 /**
@@ -347,14 +347,14 @@ router.get('/comments/:commentId/replies', asyncHandler(async (req, res) => {
 router.put('/comments/:commentId/endorsements', authenticateToken, asyncHandler(async (req, res) => {
   const idResult = parseIntParam(req.params.commentId, 'Comment ID');
   if (!idResult.valid) {
-    return ApiValidationError(res, idResult.error);
+    return res.status(400).json(ApiValidationError([idResult.error]));
   }
 
   const { endorsements } = req.body;
 
   // Validate endorsements is a non-negative integer
   if (typeof endorsements !== 'number' || !Number.isInteger(endorsements) || endorsements < 0) {
-    return ApiValidationError(res, 'Endorsements must be a non-negative integer');
+    return res.status(400).json(ApiValidationError(['Endorsements must be a non-negative integer']));
   }
 
   const updatedComment = await billsService.updateBillCommentEndorsements(
@@ -362,10 +362,10 @@ router.put('/comments/:commentId/endorsements', authenticateToken, asyncHandler(
     endorsements
   );
 
-  return ApiSuccess(res, {
+  return res.json(ApiSuccess({
     comment: updatedComment,
     message: 'Endorsements updated successfully'
-  });
+  }));
 }));
 
 /**
@@ -378,13 +378,13 @@ router.put('/comments/:commentId/endorsements', authenticateToken, asyncHandler(
 router.put('/comments/:commentId/highlight', authenticateToken, asyncHandler(async (req, res) => {
   const idResult = parseIntParam(req.params.commentId, 'Comment ID');
   if (!idResult.valid) {
-    return ApiValidationError(res, idResult.error);
+    return res.status(400).json(ApiValidationError([idResult.error]));
   }
 
   // Check if user has permission to highlight comments
   // This could be expanded to check for moderator role as well
   if (req.user!.role !== 'admin' && req.user!.role !== 'moderator') {
-    return ApiError(res, 'Insufficient permissions to highlight comments', 403);
+    return res.status(403).json(ApiError('Insufficient permissions to highlight comments', 'FORBIDDEN', 403));
   }
 
   const updatedComment = await billsService.highlightComment(idResult.value);
@@ -397,10 +397,10 @@ router.put('/comments/:commentId/highlight', authenticateToken, asyncHandler(asy
     userRole: req.user!.role
   });
 
-  return ApiSuccess(res, {
+  return res.json(ApiSuccess({
     comment: updatedComment,
     message: 'Comment highlighted successfully'
-  });
+  }));
 }));
 
 /**
@@ -410,11 +410,11 @@ router.put('/comments/:commentId/highlight', authenticateToken, asyncHandler(asy
 router.delete('/comments/:commentId/highlight', authenticateToken, asyncHandler(async (req, res) => {
   const idResult = parseIntParam(req.params.commentId, 'Comment ID');
   if (!idResult.valid) {
-    return ApiValidationError(res, idResult.error);
+    return res.status(400).json(ApiValidationError([idResult.error]));
   }
 
   if (req.user!.role !== 'admin' && req.user!.role !== 'moderator') {
-    return ApiError(res, 'Insufficient permissions to unhighlight comments', 403);
+    return res.status(403).json(ApiError('Insufficient permissions to unhighlight comments', 'FORBIDDEN', 403));
   }
 
   const updatedComment = await billsService.unhighlightComment(idResult.value);
@@ -425,10 +425,10 @@ router.delete('/comments/:commentId/highlight', authenticateToken, asyncHandler(
     userId: req.user!.id
   });
 
-  return ApiSuccess(res, {
+  return res.json(ApiSuccess({
     comment: updatedComment,
     message: 'Comment highlight removed successfully'
-  });
+  }));
 }));
 
 /**
@@ -440,16 +440,16 @@ router.delete('/comments/:commentId/highlight', authenticateToken, asyncHandler(
  */
 router.get('/cache/stats', authenticateToken, asyncHandler(async (req, res) => {
   if (req.user!.role !== 'admin') {
-    return ApiError(res, 'Insufficient permissions', 403);
+    return res.status(403).json(ApiError('Insufficient permissions', 'FORBIDDEN', 403));
   }
 
   const stats = billsService.getCacheStats();
 
-  return ApiSuccess(res, {
+  return res.json(ApiSuccess({
     cacheStats: stats,
     timestamp: new Date().toISOString(),
     message: 'Cache statistics retrieved successfully'
-  });
+  }));
 }));
 
 /**
@@ -461,6 +461,43 @@ router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 export { router };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

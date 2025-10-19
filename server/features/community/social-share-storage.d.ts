@@ -1,6 +1,6 @@
 import { Redis } from 'ioredis';
 import { Pool } from 'pg';
-import type { InsertSocialShare, SocialShare } from '../../../shared/schema.js';
+import type { InsertSocialShare, SocialShare } from '../../../shared/schema';
 import { BaseStorage } from './base/BaseStorage.js';
 import { logger } from '../../utils/logger';
 export declare class SocialShareStorage extends BaseStorage<SocialShare> {
@@ -17,6 +17,43 @@ export declare class SocialShareStorage extends BaseStorage<SocialShare> {
     getBillShares(billId: number): Promise<SocialShare[]>;
     getRecentShares(limit?: number): Promise<SocialShare[]>;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

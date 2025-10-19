@@ -20,7 +20,7 @@ export enum ErrorType {
 /**
  * Enhanced error class with additional context
  */
-export class AppError extends Error {
+export class BaseError extends Error {
   public readonly type: ErrorType;
   public readonly statusCode: number;
   public readonly isOperational: boolean;
@@ -35,7 +35,7 @@ export class AppError extends Error {
     context?: Record<string, any>
   ) {
     super(message);
-    this.name = 'AppError';
+    this.name = 'BaseError';
     this.type = type;
     this.statusCode = statusCode;
     this.isOperational = isOperational;
@@ -43,7 +43,7 @@ export class AppError extends Error {
     this.timestamp = new Date();
 
     // Capture stack trace
-    Error.captureStackTrace(this, AppError);
+    Error.captureStackTrace(this, BaseError);
   }
 }
 
@@ -59,7 +59,7 @@ class ErrorHandler {
   /**
    * Handles errors with circuit breaker logic
    */
-  handleError(error: Error | AppError, context?: Record<string, any>): AppError {
+  handleError(error: Error | BaseError, context?: Record<string, any>): BaseError {
     const errorKey = this.getErrorKey(error);
     const now = Date.now();
     
@@ -83,8 +83,8 @@ class ErrorHandler {
       });
     }
     
-    // Convert to AppError if needed
-    const appError = error instanceof AppError ? error : this.convertToAppError(error);
+    // Convert to BaseError if needed
+    const appError = error instanceof BaseError ? error : this.convertToAppError(error);
     
     // Log the error
     this.logError(appError, context);
@@ -93,12 +93,12 @@ class ErrorHandler {
   }
 
   /**
-   * Converts generic errors to AppError instances
+   * Converts generic errors to BaseError instances
    */
-  private convertToAppError(error: Error): AppError {
+  private convertToAppError(error: Error): BaseError {
     // Database errors
     if (error.message.includes('connection') || error.message.includes('pool')) {
-      return new AppError(
+      return new BaseError(
         'Database connection error',
         ErrorType.DATABASE,
         503,
@@ -109,7 +109,7 @@ class ErrorHandler {
     
     // Network errors
     if (error.message.includes('timeout') || error.message.includes('ETIMEDOUT')) {
-      return new AppError(
+      return new BaseError(
         'Request timeout',
         ErrorType.TIMEOUT,
         408,
@@ -120,7 +120,7 @@ class ErrorHandler {
     
     // Circuit breaker errors
     if (error.message.includes('Circuit breaker')) {
-      return new AppError(
+      return new BaseError(
         'Service temporarily unavailable',
         ErrorType.CIRCUIT_BREAKER,
         503,
@@ -130,7 +130,7 @@ class ErrorHandler {
     }
     
     // Default to unknown error
-    return new AppError(
+    return new BaseError(
       error.message || 'An unknown error occurred',
       ErrorType.UNKNOWN,
       500,
@@ -143,7 +143,7 @@ class ErrorHandler {
    * Generates a key for error tracking
    */
   private getErrorKey(error: Error): string {
-    if (error instanceof AppError) {
+    if (error instanceof BaseError) {
       return error.type;
     }
     
@@ -168,7 +168,7 @@ class ErrorHandler {
   /**
    * Logs errors with appropriate level based on severity
    */
-  private logError(error: AppError, context?: Record<string, any>): void {
+  private logError(error: BaseError, context?: Record<string, any>): void {
     const logData = {
       message: error.message,
       type: error.type,
@@ -227,8 +227,8 @@ class ErrorHandler {
 export const errorHandler = new ErrorHandler();
 
 // Export utility functions
-export function createValidationError(message: string, field?: string): AppError {
-  return new AppError(
+export function createValidationError(message: string, field?: string): BaseError {
+  return new BaseError(
     message,
     ErrorType.VALIDATION,
     400,
@@ -237,8 +237,8 @@ export function createValidationError(message: string, field?: string): AppError
   );
 }
 
-export function createAuthenticationError(message: string = 'Authentication required'): AppError {
-  return new AppError(
+export function createAuthenticationError(message: string = 'Authentication required'): BaseError {
+  return new BaseError(
     message,
     ErrorType.AUTHENTICATION,
     401,
@@ -246,8 +246,8 @@ export function createAuthenticationError(message: string = 'Authentication requ
   );
 }
 
-export function createAuthorizationError(message: string = 'Insufficient permissions'): AppError {
-  return new AppError(
+export function createAuthorizationError(message: string = 'Insufficient permissions'): BaseError {
+  return new BaseError(
     message,
     ErrorType.AUTHORIZATION,
     403,
@@ -255,8 +255,8 @@ export function createAuthorizationError(message: string = 'Insufficient permiss
   );
 }
 
-export function createNotFoundError(message: string = 'Resource not found'): AppError {
-  return new AppError(
+export function createNotFoundError(message: string = 'Resource not found'): BaseError {
+  return new BaseError(
     message,
     ErrorType.NOT_FOUND,
     404,
@@ -264,8 +264,8 @@ export function createNotFoundError(message: string = 'Resource not found'): App
   );
 }
 
-export function createConflictError(message: string = 'Resource conflict'): AppError {
-  return new AppError(
+export function createConflictError(message: string = 'Resource conflict'): BaseError {
+  return new BaseError(
     message,
     ErrorType.CONFLICT,
     409,
@@ -273,8 +273,8 @@ export function createConflictError(message: string = 'Resource conflict'): AppE
   );
 }
 
-export function createDatabaseError(message: string = 'Database operation failed'): AppError {
-  return new AppError(
+export function createDatabaseError(message: string = 'Database operation failed'): BaseError {
+  return new BaseError(
     message,
     ErrorType.DATABASE,
     503,
@@ -334,6 +334,43 @@ export function setupGlobalErrorHandlers(): void {
     process.exit(0);
   });
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -3,7 +3,7 @@ import request from 'supertest';
 import express from 'express';
 import { authService } from '../core/auth/auth-service';
 import { getEmailService } from '../infrastructure/notifications/email-service';
-import { database as db, users, sessions, passwordResets } from '../../shared/database/connection.js';
+import { database as db, user as users, session as sessions, passwordReset as passwordResets } from '../../shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import { router as authRouter } from '../core/auth/auth.js';
 import { logger } from '../../shared/core/src/observability/logging';
@@ -480,6 +480,43 @@ describe('AuthService Unit Tests', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

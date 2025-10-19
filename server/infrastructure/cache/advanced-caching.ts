@@ -122,50 +122,55 @@ export class AdvancedCachingService {
   }
 
   /**
-   * Get value from cache with multi-layer strategy
-   */
-  async get<T = any>(key: string, traceId?: string): Promise<T | null> {
-    const startTime = performance.now();
+    * Get value from cache with multi-layer strategy
+    */
+   async get<T = any>(key: string, traceId?: string): Promise<T | null> {
+     const startTime = performance.now();
 
-    try {
-      // Try memory cache first (L1)
-      const memoryResult = this.getFromMemory<T>(key);
-      if (memoryResult !== null) {
-        this.stats.memory.hits++;
-        const duration = performance.now() - startTime;
-        this.trackPerformance('get', key, duration);
-        return memoryResult;
-      }
+     try {
+       // Try memory cache first (L1)
+       const memoryResult = this.getFromMemory<T>(key);
+       if (memoryResult !== null) {
+         this.stats.memory.hits++;
+         const duration = performance.now() - startTime;
+         this.trackPerformance('get', key, duration);
+         logger.debug('[Advanced Caching] Memory cache hit', { component: 'Chanuka', key, duration: Math.round(duration) });
+         return memoryResult;
+       }
 
-      this.stats.memory.misses++;
+       this.stats.memory.misses++;
+       logger.debug('[Advanced Caching] Memory cache miss', { component: 'Chanuka', key });
 
-      // Try Redis cache (L2) if available
-      if (this.redisClient) {
-        const redisResult = await this.getFromRedis<T>(key);
-        if (redisResult !== null) {
-          this.stats.redis.hits++;
-          
-          // Populate memory cache for faster future access
-          await this.setInMemory(key, redisResult, this.config.memory.ttl);
-          
-          const duration = performance.now() - startTime;
-          this.trackPerformance('get', key, duration);
-          return redisResult;
-        }
-        this.stats.redis.misses++;
-      }
+       // Try Redis cache (L2) if available
+       if (this.redisClient) {
+         const redisResult = await this.getFromRedis<T>(key);
+         if (redisResult !== null) {
+           this.stats.redis.hits++;
 
-      const duration = performance.now() - startTime;
-      this.trackPerformance('get', key, duration);
-      return null;
+           // Populate memory cache for faster future access
+           await this.setInMemory(key, redisResult, this.config.memory.ttl);
 
-    } catch (error) {
-      logger.error('[Advanced Caching] Error getting from cache:', { component: 'Chanuka' }, error);
-      const duration = performance.now() - startTime;
-      this.trackPerformance('get', key, duration, error instanceof Error ? error.message : String(error));
-      return null;
-    }
-  }
+           const duration = performance.now() - startTime;
+           this.trackPerformance('get', key, duration);
+           logger.debug('[Advanced Caching] Redis cache hit', { component: 'Chanuka', key, duration: Math.round(duration) });
+           return redisResult;
+         }
+         this.stats.redis.misses++;
+         logger.debug('[Advanced Caching] Redis cache miss', { component: 'Chanuka', key });
+       }
+
+       const duration = performance.now() - startTime;
+       this.trackPerformance('get', key, duration);
+       logger.debug('[Advanced Caching] Cache miss - no data found', { component: 'Chanuka', key, duration: Math.round(duration) });
+       return null;
+
+     } catch (error) {
+       logger.error('[Advanced Caching] Error getting from cache:', { component: 'Chanuka', key }, error);
+       const duration = performance.now() - startTime;
+       this.trackPerformance('get', key, duration, error instanceof Error ? error.message : String(error));
+       return null;
+     }
+   }
 
   /**
    * Set value in cache with multi-layer strategy
@@ -692,6 +697,43 @@ export class AdvancedCachingService {
 
 // Export singleton instance
 export const advancedCachingService = new AdvancedCachingService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

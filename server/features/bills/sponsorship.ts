@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import { readDatabase } from '../../infrastructure/database/index.ts';
-import { bills, billSponsorships, sponsors, sponsorTransparency, sponsorAffiliations, billSectionConflicts } from '../../../shared/schema.js';
+import { bills, billSponsorships, sponsors, sponsorTransparency, sponsorAffiliations, billSectionConflicts } from '../../../shared/schema';
 import { eq, desc, count, sql, and } from 'drizzle-orm';
 import { asyncHandler } from '../../utils/errors.js';
 import { SponsorshipAnalysisService } from './sponsorship-analysis';
@@ -82,6 +82,43 @@ setupSponsorshipRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

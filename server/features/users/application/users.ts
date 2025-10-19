@@ -1,8 +1,9 @@
 import { Router } from "express";
 import { eq } from "drizzle-orm";
-import { database as db, users, userInterests } from "../../../../shared/database/connection.js";
+import { database as db } from "../../../../shared/database/connection";
+import { user, userInterest } from "../../../../shared/schema";
 import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../../utils/api-response.js";
-import { logger } from '../../../utils/logger';
+import { logger } from '../../../../shared/core/index.js';
 import { securityAuditService } from '../../../features/security/security-audit-service.js';
 
 const router = Router();
@@ -16,21 +17,21 @@ function validateUserId(userId: string): boolean {
 // Helper function to fetch user interests - eliminates duplication
 async function getUserInterests(userId: string) {
   const interests = await db
-    .select({ interest: userInterests.interest })
-    .from(userInterests)
-    .where(eq(userInterests.userId, userId));
-  
+    .select({ interest: userInterest.interest })
+    .from(userInterest)
+    .where(eq(userInterest.userId, userId));
+
   return interests.map(i => i.interest);
 }
 
 // Helper function to update user interests - centralizes the logic
 async function updateUserInterests(userId: string, interests: string[]) {
   // Delete existing interests first
-  await db.delete(userInterests).where(eq(userInterests.userId, userId));
+  await db.delete(userInterest).where(eq(userInterest.userId, userId));
 
   // Insert new interests if any provided
   if (interests.length > 0) {
-    await db.insert(userInterests).values(
+    await db.insert(userInterest).values(
       interests.map((interest: string) => ({
         userId,
         interest,
@@ -49,32 +50,32 @@ export function setupUserRoutes(routerInstance: Router) {
   // Get user profile
   router.get("/users/:id", async (req, res) => {
     const startTime = Date.now();
-    
+
     try {
       const userId = req.params.id;
-      
+
       // Validate user ID
       if (!validateUserId(userId)) {
-        return ApiValidationError(res, { field: 'id', message: 'Invalid user ID' }, 
+        return ApiValidationError(res, { field: 'id', message: 'Invalid user ID' },
           createMetadata(startTime));
       }
 
       // Fetch user data
-      const user = await db
+      const userData = await db
         .select({
-          id: users.id,
-          email: users.email,
-          name: users.name,
-          role: users.role,
-          preferences: users.preferences,
-          createdAt: users.createdAt,
-          lastLoginAt: users.lastLoginAt,
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          preferences: user.preferences,
+          createdAt: user.createdAt,
+          lastLoginAt: user.lastLoginAt,
         })
-        .from(users)
-        .where(eq(users.id, userId))
+        .from(user)
+        .where(eq(user.id, userId))
         .limit(1);
 
-      if (user.length === 0) {
+      if (userData.length === 0) {
         return ApiNotFound(res, 'User', createMetadata(startTime));
       }
 
@@ -92,7 +93,7 @@ export function setupUserRoutes(routerInstance: Router) {
       );
 
       return ApiSuccess(res, {
-        ...user[0],
+        ...userData[0],
         interests,
       }, createMetadata(startTime));
     } catch (error) {
@@ -104,14 +105,14 @@ export function setupUserRoutes(routerInstance: Router) {
   // Update user profile
   router.put("/users/:id", async (req, res) => {
     const startTime = Date.now();
-    
+
     try {
       const userId = req.params.id;
       const { firstName, lastName, preferences, interests } = req.body;
 
       // Validate user ID
       if (!validateUserId(userId)) {
-        return ApiValidationError(res, { field: 'id', message: 'Invalid user ID' }, 
+        return ApiValidationError(res, { field: 'id', message: 'Invalid user ID' },
           createMetadata(startTime));
       }
 
@@ -132,15 +133,15 @@ export function setupUserRoutes(routerInstance: Router) {
 
       // Update user basic info
       const updatedUser = await db
-        .update(users)
+        .update(user)
         .set(updateData)
-        .where(eq(users.id, userId))
+        .where(eq(user.id, userId))
         .returning({
-          id: users.id,
-          email: users.email,
-          name: users.name,
-          role: users.role,
-          preferences: users.preferences,
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+          preferences: user.preferences,
         });
 
       if (updatedUser.length === 0) {
@@ -182,13 +183,13 @@ export function setupUserRoutes(routerInstance: Router) {
   // Get user interests
   router.get("/users/:id/interests", async (req, res) => {
     const startTime = Date.now();
-    
+
     try {
       const userId = req.params.id;
 
       // Validate user ID
       if (!validateUserId(userId)) {
-        return ApiValidationError(res, { field: 'id', message: 'Invalid user ID' }, 
+        return ApiValidationError(res, { field: 'id', message: 'Invalid user ID' },
           createMetadata(startTime));
       }
 
@@ -205,20 +206,20 @@ export function setupUserRoutes(routerInstance: Router) {
   // Update user interests
   router.put("/users/:id/interests", async (req, res) => {
     const startTime = Date.now();
-    
+
     try {
       const userId = req.params.id;
       const { interests } = req.body;
 
       // Validate user ID
       if (!validateUserId(userId)) {
-        return ApiValidationError(res, { field: 'id', message: 'Invalid user ID' }, 
+        return ApiValidationError(res, { field: 'id', message: 'Invalid user ID' },
           createMetadata(startTime));
       }
 
       // Validate interests array
       if (!Array.isArray(interests)) {
-        return ApiValidationError(res, { field: 'interests', message: 'Interests must be an array' }, 
+        return ApiValidationError(res, { field: 'interests', message: 'Interests must be an array' },
           createMetadata(startTime));
       }
 
@@ -238,3 +239,40 @@ setupUserRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

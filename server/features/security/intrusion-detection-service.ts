@@ -1,12 +1,12 @@
 import { Request } from 'express';
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '../../../shared/database/connection';
 import { securityAuditService, SecurityEvent } from './security-audit-service.js';
 import { SecurityIncident } from './security-monitoring-service.js';
 import { getEmailService } from '../../infrastructure/notifications/email-service.js';
 import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, count, desc, eq } from 'drizzle-orm';
 import { logger } from '../../utils/logger';
-import { securityAuditLogs } from '../../../shared/schema.js';
+import { securityAuditLog } from '../../../shared/schema';
 
 // Threat intelligence table
 const threatIntelligence = pgTable("threat_intelligence", {
@@ -373,11 +373,11 @@ export class IntrusionDetectionService {
       const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
       const userEvents = await db
         .select()
-        .from(securityAuditLogs)
+        .from(securityAuditLog)
         .where(
           and(
-            eq(securityAuditLogs.userId, userId),
-            gte(securityAuditLogs.createdAt, oneWeekAgo)
+            eq(securityAuditLog.userId, userId),
+            gte(securityAuditLog.createdAt, oneWeekAgo)
           )
         )
         .limit(1000);
@@ -699,6 +699,43 @@ export const intrusionDetectionService = IntrusionDetectionService.getInstance()
 
 // Export table definitions for migrations
 export { threatIntelligence, attackPatterns };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -4,9 +4,10 @@ import type {
   user, userProfile, session, refreshToken, passwordReset, userSocialProfile, userInterest, userProgress,
   bill, billTag, billSponsorship, billComment, commentVote, billEngagement, socialShare, sponsor,
   sponsorAffiliation, sponsorTransparency, analysis, contentAnalysis, billSectionConflict, verification,
-  stakeholder, moderationFlag, moderationAction, moderationQueue, contentFlag, securityAuditLog,
-  complianceCheck, threatIntelligence, securityIncident, securityAlert, attackPattern, regulation,
-  regulatoryChange, regulatoryImpact, syncJob, syncError, conflict, conflictSource, notification,
+  stakeholder, moderationAction, /* moderationFlag, moderationQueue, (REMOVED) */
+  contentReport, // <-- REFINED (was contentFlag)
+  securityAuditLog, complianceCheck, threatIntelligence, securityIncident, securityAlert, attackPattern,
+  regulation, regulatoryChange, regulatoryImpact, syncJob, syncError, conflict, conflictSource, notification,
   analyticsEvent, analyticsDailySummary, userActivitySummary, billAnalyticsSummary, systemHealthMetric,
   department, evaluation
 } from "./schema";
@@ -47,10 +48,12 @@ export type SponsorTransparency = typeof sponsorTransparency.$inferSelect;
 export type ContentAnalysis = typeof contentAnalysis.$inferSelect;
 export type BillSectionConflict = typeof billSectionConflict.$inferSelect;
 
-export type ModerationFlag = typeof moderationFlag.$inferSelect;
+// --- REFINED: Moderation types ---
+// export type ModerationFlag = typeof moderationFlag.$inferSelect; // <-- REMOVED
 export type ModerationAction = typeof moderationAction.$inferSelect;
-export type ModerationQueue = typeof moderationQueue.$inferSelect;
-export type ContentFlag = typeof contentFlag.$inferSelect;
+// export type ModerationQueue = typeof moderationQueue.$inferSelect; // <-- REMOVED
+export type ContentReport = typeof contentReport.$inferSelect; // <-- REFINED (was ContentFlag)
+// --- End Refinement ---
 
 export type SecurityAuditLog = typeof securityAuditLog.$inferSelect;
 export type ThreatIntelligence = typeof threatIntelligence.$inferSelect;
@@ -90,12 +93,26 @@ export type InsertComplianceCheck = z.infer<typeof validation.insertComplianceCh
 export type InsertSocialShare = z.infer<typeof validation.insertSocialShareSchema>;
 export type InsertVerification = z.infer<typeof validation.insertVerificationSchema>;
 
+// --- ADDED: Missing insert types ---
+export type InsertBillSponsorship = z.infer<typeof validation.insertBillSponsorshipSchema>;
+export type InsertCommentVote = z.infer<typeof validation.insertCommentVoteSchema>;
+export type InsertBillTag = z.infer<typeof validation.insertBillTagSchema>;
+export type InsertUserInterest = z.infer<typeof validation.insertUserInterestSchema>;
+
+// --- REFINED: Moderation insert types ---
+// export type InsertModerationFlag = ... // <-- REMOVED
+// export type InsertModerationQueue = ... // <-- REMOVED
+export type InsertContentReport = z.infer<typeof validation.insertContentReportSchema>; // <-- REFINED
+// --- End Refinement ---
+
 // ============================================================================
 // EXTENDED TYPES WITH COMPUTED FIELDS
 // ============================================================================
 
 export type CommentWithAuthorAndVotes = BillComment & {
-  author?: Pick<User, "id" | "name" | "role">;
+  author?: Pick<User, "id" | "name" | "role"> & {
+    profile?: Pick<UserProfile, "avatarUrl" | "reputationScore">
+  }; // <-- REFINED
   replies?: CommentWithAuthorAndVotes[];
   voteCount: number;
   netVotes: number;
@@ -103,9 +120,9 @@ export type CommentWithAuthorAndVotes = BillComment & {
 
 export type BillWithDetails = Bill & {
   sponsor?: Sponsor;
-  tags?: BillTag[];
+  tags?: BillTag[]; // <-- REFINED (was string[], now BillTag[])
   analyses?: Analysis[];
-  commentCount?: number;
+  liveCommentCount?: number; // <-- REFINED (distinguished from commentCountCached)
   engagementMetrics?: BillEngagement;
 };
 
@@ -113,7 +130,7 @@ export type UserWithProfile = User & {
   profile?: UserProfile;
   interests?: UserInterest[];
   progress?: UserProgress[];
-  reputationScore?: number;
+  // <-- REFINED: Removed reputationScore, as it's available via profile.reputationScore
 };
 
 export type SponsorWithDetails = Sponsor & {
@@ -168,8 +185,8 @@ export type AnalyticsMetrics = {
 };
 
 export type ModerationMetrics = {
-  pendingReviews: number;
-  flaggedContent: number;
+  pendingReports: number; // <-- REFINED (was pendingReviews)
+  autoFlaggedReports: number; // <-- REFINED
   averageReviewTime: number;
   autoFlagAccuracy: number;
   resolvedToday: number;

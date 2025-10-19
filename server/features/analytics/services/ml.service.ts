@@ -1,4 +1,4 @@
-import { database as db } from '../../../../shared/database/connection.js';
+import { database as db } from '../../shared/database/connection';
 import { bills, analysis } from '../../../../shared/schema/schema.js';
 import { eq, desc } from 'drizzle-orm';
 import { logger } from '../../../utils/logger';
@@ -460,3 +460,40 @@ export async function performComprehensiveAnalysis(billId: string): Promise<{
     };
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

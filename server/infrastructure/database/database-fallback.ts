@@ -1,4 +1,4 @@
-import { pool } from "../../../shared/database/connection.js";
+import { pool } from "../../../shared/database/connection";
 import { demoDataService } from "../demo-data.js";
 import { logger } from '@shared/core/src/observability/logging';
 
@@ -283,6 +283,43 @@ export class DatabaseFallbackService {
 
 // Export singleton instance
 export const databaseFallbackService = DatabaseFallbackService.getInstance();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -7,6 +7,9 @@ import { logger } from '../../shared/core/src/observability/logging';
 
 // Create mock monitoring service for tests
 const mockDependencies = {
+  readDb: jest.fn(),
+  writeDb: jest.fn(),
+  cache: { get: jest.fn(), set: jest.fn(), delete: jest.fn() },
   cacheService: { get: jest.fn(), set: jest.fn(), delete: jest.fn() },
   logger: { info: jest.fn(), error: jest.fn(), warn: jest.fn() }
 };
@@ -243,6 +246,43 @@ describe('Financial Disclosure API Endpoints', () => {
     });
   });
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

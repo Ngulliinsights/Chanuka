@@ -10,10 +10,10 @@ const db = new Proxy({}, {
     return (d as any)[prop as any];
   }
 }) as any;
-import { 
-  sponsors, sponsorAffiliations, sponsorTransparency, billSponsorships, bills,
-  type Sponsor, type SponsorAffiliation, type SponsorTransparency, type BillSponsorship 
-} from '../../../shared/schema.js';
+import {
+  sponsor as sponsors, sponsorAffiliation as sponsorAffiliations, sponsorTransparency, billSponsorship as billSponsorships, bill as bills,
+  type Sponsor, type SponsorAffiliation, type SponsorTransparency, type BillSponsorship
+} from '../../../shared/schema';
 import { eq, and, sql, desc, gte, lte, count, avg, inArray, like, or } from 'drizzle-orm';
 import { logger } from '../../utils/logger';
 
@@ -877,3 +877,40 @@ export class SponsorService {
 }
 
 export const sponsorService = new SponsorService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

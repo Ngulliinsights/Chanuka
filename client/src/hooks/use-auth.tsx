@@ -45,19 +45,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const mountedRef = useRef(true);
   const validationInProgressRef = useRef(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Helper function for making cancellable requests
-  const makeCancellableRequest = async (url: string, options: RequestInit = {}) => {
-    // Use the shared abort controller
-    if (!abortControllerRef.current) {
-      abortControllerRef.current = new AbortController();
-    }
-    
+  const makeCancellableRequest = async (url: string, options: RequestInit = {}, abortController: AbortController) => {
     try {
       const response = await fetch(url, {
         ...options,
-        signal: abortControllerRef.current.signal
+        signal: abortController.signal
       });
       return response;
     } catch (error: any) {
@@ -70,11 +64,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     mountedRef.current = true;
-    abortControllerRef.current = new AbortController();
-    
+
     const token = localStorage.getItem('token');
     if (token && !validationInProgressRef.current) {
-      validateToken(token);
+      const abortController = new AbortController();
+      validateToken(token, abortController);
     } else if (!token) {
       if (mountedRef.current) {
         setLoading(false);
@@ -83,13 +77,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       mountedRef.current = false;
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
     };
   }, []);
 
-  const validateToken = async (token: string) => {
+  const validateToken = async (token: string, abortController: AbortController) => {
     // Prevent multiple simultaneous validation requests
     if (validationInProgressRef.current) {
       return;
@@ -99,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     try {
       const response = await fetch('/api/auth/verify', {
-        signal: abortControllerRef.current?.signal,
+        signal: abortController.signal,
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -137,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (mountedRef.current) {
         setLoading(false);
       }
+      abortController.abort();
     }
   };
 
@@ -144,6 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (mountedRef.current) {
       setLoading(true);
     }
+    const abortController = new AbortController();
     try {
       const response = await makeCancellableRequest('/api/auth/login', {
         method: 'POST',
@@ -151,7 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
-      });
+      }, abortController);
 
       const result = await response.json();
 
@@ -172,6 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (mountedRef.current) {
         setLoading(false);
       }
+      abortController.abort();
     }
   };
 
@@ -179,6 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (mountedRef.current) {
       setLoading(true);
     }
+    const abortController = new AbortController();
     try {
       const response = await makeCancellableRequest('/api/auth/register', {
         method: 'POST',
@@ -186,7 +181,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
-      });
+      }, abortController);
 
       const result = await response.json();
 
@@ -196,9 +191,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (mountedRef.current) {
           setUser(result.data.user);
         }
-        return { 
-          success: true, 
-          requiresVerification: result.data.requiresVerification 
+        return {
+          success: true,
+          requiresVerification: result.data.requiresVerification
         };
       } else {
         return { success: false, error: result.error || 'Registration failed' };
@@ -210,10 +205,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (mountedRef.current) {
         setLoading(false);
       }
+      abortController.abort();
     }
   };
 
   const logout = async (): Promise<void> => {
+    const abortController = new AbortController();
     try {
       const token = localStorage.getItem('token');
       if (token) {
@@ -222,7 +219,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           headers: {
             'Authorization': `Bearer ${token}`
           }
-        });
+        }, abortController);
       }
     } catch (error) {
       logger.error('Logout request failed:', { component: 'Chanuka' }, error);
@@ -232,23 +229,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (mountedRef.current) {
         setUser(null);
       }
+      abortController.abort();
     }
   };
 
   const refreshToken = async (): Promise<{ success: boolean; error?: string }> => {
+    const abortController = new AbortController();
     try {
       const refreshTokenValue = localStorage.getItem('refreshToken');
       if (!refreshTokenValue) {
         return { success: false, error: 'No refresh token available' };
       }
 
-      const response = await fetch('/api/auth/refresh', {
+      const response = await makeCancellableRequest('/api/auth/refresh', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ refreshToken: refreshTokenValue }),
-      });
+      }, abortController);
 
       const result = await response.json();
 
@@ -275,10 +274,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
       }
       return { success: false, error: 'Network error during token refresh' };
+    } finally {
+      abortController.abort();
     }
   };
 
   const verifyEmail = async (token: string): Promise<{ success: boolean; error?: string }> => {
+    const abortController = new AbortController();
     try {
       const response = await makeCancellableRequest('/api/auth/verify-email', {
         method: 'POST',
@@ -286,7 +288,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ token }),
-      });
+      }, abortController);
 
       const result = await response.json();
 
@@ -301,10 +303,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       logger.error('Email verification failed:', { component: 'Chanuka' }, error);
       return { success: false, error: 'Network error. Please try again.' };
+    } finally {
+      abortController.abort();
     }
   };
 
   const requestPasswordReset = async (email: string): Promise<{ success: boolean; error?: string }> => {
+    const abortController = new AbortController();
     try {
       const response = await makeCancellableRequest('/api/auth/forgot-password', {
         method: 'POST',
@@ -312,7 +317,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email }),
-      });
+      }, abortController);
 
       const result = await response.json();
 
@@ -324,10 +329,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       logger.error('Password reset request failed:', { component: 'Chanuka' }, error);
       return { success: false, error: 'Network error. Please try again.' };
+    } finally {
+      abortController.abort();
     }
   };
 
   const resetPassword = async (token: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    const abortController = new AbortController();
     try {
       const response = await makeCancellableRequest('/api/auth/reset-password', {
         method: 'POST',
@@ -335,7 +343,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ token, password }),
-      });
+      }, abortController);
 
       const result = await response.json();
 
@@ -347,6 +355,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       logger.error('Password reset failed:', { component: 'Chanuka' }, error);
       return { success: false, error: 'Network error. Please try again.' };
+    } finally {
+      abortController.abort();
     }
   };
 

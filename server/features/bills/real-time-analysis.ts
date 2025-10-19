@@ -1,5 +1,5 @@
 import { readDatabase } from '../../db.js';
-import { bills, analysis } from '../../../shared/schema.js';
+import { bills, analysis } from '../../../shared/schema';
 // Backwards-compatible proxy so existing code using `db.select()` etc. keeps working
 const db = new Proxy({}, {
   get(_target, prop: string | symbol) {
@@ -782,3 +782,40 @@ export class RealTimeBillAnalysisEngine {
 }
 
 export const realTimeBillAnalysisEngine = new RealTimeBillAnalysisEngine();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

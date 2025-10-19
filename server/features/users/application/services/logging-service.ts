@@ -80,3 +80,39 @@ export const logUserActivity = LoggingService.getInstance().logUserActivity.bind
 export const logSecurityEvent = LoggingService.getInstance().logSecurityEvent.bind(LoggingService.getInstance());
 export const logAuditEvent = LoggingService.getInstance().logAuditEvent.bind(LoggingService.getInstance());
 export const logError = LoggingService.getInstance().logError.bind(LoggingService.getInstance());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

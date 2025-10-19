@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import { eq, and } from 'drizzle-orm';
 import { readDatabase } from '../../db.js';
 const db = readDatabase();
-import { users, sessions, passwordResets, type User } from '../../../shared/schema.js';
+import { user as users, session as sessions, passwordReset as passwordResets, type User } from '../../../shared/schema';
 import { getEmailService } from '../../infrastructure/notifications/email-service';
 import { encryptionService } from '../../features/security/encryption-service.js';
 import { inputValidationService } from '../validation/input-validation-service.js';
@@ -191,7 +191,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Registration error:', { component: 'Chanuka' }, error);
+      logger.error('Registration error:', { component: 'Chanuka', error: error.message });
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -263,7 +263,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Email verification error:', { component: 'Chanuka' }, error);
+      logger.error('Email verification error:', { component: 'Chanuka', error: error.message });
       return {
         success: false,
         error: 'Email verification failed'
@@ -341,7 +341,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Login error:', { component: 'Chanuka' }, error);
+      logger.error('Login error:', { component: 'Chanuka', error: error.message });
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -368,7 +368,7 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      logger.error('Logout error:', { component: 'Chanuka' }, error);
+      logger.error('Logout error:', { component: 'Chanuka', error: error.message });
       return {
         success: false,
         error: 'Logout failed'
@@ -468,7 +468,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Token refresh error:', { component: 'Chanuka' }, error);
+      logger.error('Token refresh error:', { component: 'Chanuka', error: error.message });
       return {
         success: false,
         error: 'Token refresh failed'
@@ -528,7 +528,7 @@ export class AuthService {
       return { success: true };
 
     } catch (error) {
-      logger.error('Password reset request error:', { component: 'Chanuka' }, error);
+      logger.error('Password reset request error:', { component: 'Chanuka', error: error.message });
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -626,7 +626,7 @@ export class AuthService {
       return { success: true };
 
     } catch (error) {
-      logger.error('Password reset error:', { component: 'Chanuka' }, error);
+      logger.error('Password reset error:', { component: 'Chanuka', error: error.message });
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -708,7 +708,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Token verification error:', { component: 'Chanuka' }, error);
+      logger.error('Token verification error:', { component: 'Chanuka', error: error.message });
       return {
         success: false,
         error: 'Invalid token'
@@ -783,9 +783,46 @@ export class AuthService {
 
       logger.info('Expired tokens cleaned up successfully', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('Token cleanup error:', { component: 'Chanuka' }, error);
+      logger.error('Token cleanup error:', { component: 'Chanuka', error: error.message });
     }
   }
 }
 
 export const authService = new AuthService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

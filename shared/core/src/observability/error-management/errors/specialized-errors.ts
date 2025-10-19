@@ -244,9 +244,9 @@ export class CacheError extends BaseError {
 }
 
 /**
- * Legacy AppError for backward compatibility
+ * Legacy BaseError for backward compatibility
  */
-export class AppError extends BaseError {
+export class BaseError extends BaseError {
   constructor(
     message: string,
     statusCode: number = 500,
@@ -264,3 +264,39 @@ export class AppError extends BaseError {
     });
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

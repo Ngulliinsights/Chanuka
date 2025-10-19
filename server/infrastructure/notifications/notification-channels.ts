@@ -1,5 +1,5 @@
-import { database as db } from '../../../shared/database/connection.js';
-import { notifications, users } from '../../../shared/schema.js';
+import { database as db } from '../../../shared/database/connection';
+import { notification as notifications, user as users } from '../../../shared/schema';
 import { eq } from 'drizzle-orm';
 import { getEmailService } from './email-service';
 import { webSocketService } from '../websocket.js';
@@ -101,7 +101,7 @@ export class NotificationChannelService {
       appId: process.env.FIREBASE_APP_ID || process.env.ONESIGNAL_APP_ID
     };
 
-    logger.info('✅ Notification Channel Service initialized', { 
+    logger.info('✅ Notification Channel Service initialized', {
       component: 'ChannelService',
       smsProvider: this.smsConfig.provider,
       pushProvider: this.pushConfig.provider
@@ -116,7 +116,7 @@ export class NotificationChannelService {
    */
   async sendToChannel(request: ChannelDeliveryRequest): Promise<DeliveryResult> {
     const attemptKey = `${request.userId}-${request.channel}-${Date.now()}`;
-    
+
     try {
       let result: DeliveryResult;
 
@@ -147,7 +147,7 @@ export class NotificationChannelService {
       const attempts = (this.deliveryAttempts.get(attemptKey) || 0) + 1;
       this.deliveryAttempts.set(attemptKey, attempts);
 
-      logger.error(`Channel delivery failed (attempt ${attempts}):`, { 
+      logger.error(`Channel delivery failed (attempt ${attempts}):`, {
         component: 'ChannelService',
         channel: request.channel,
         userId: request.userId
@@ -237,8 +237,8 @@ export class NotificationChannelService {
         });
       } catch (wsError) {
         // WebSocket failure shouldn't fail the entire notification
-        logger.warn('WebSocket delivery failed, but notification was saved:', { 
-          component: 'ChannelService' 
+        logger.warn('WebSocket delivery failed, but notification was saved:', {
+          component: 'ChannelService'
         }, wsError);
       }
 
@@ -489,7 +489,7 @@ export class NotificationChannelService {
   private formatSMSMessage(request: ChannelDeliveryRequest): string {
     const maxLength = request.config?.sms?.maxLength || 160;
     const shortFormat = request.config?.sms?.shortFormat ?? true;
-    
+
     const priorityPrefix = request.metadata?.priority === 'urgent' ? '[URGENT] ' : '';
     const { title, message } = request.content;
     const actionUrl = request.metadata?.actionUrl;
@@ -497,7 +497,7 @@ export class NotificationChannelService {
     if (shortFormat) {
       // Compact format for standard SMS
       let smsText = `${priorityPrefix}${title}: ${message}`;
-      
+
       if (smsText.length > maxLength - 20 && actionUrl) {
         // Leave room for URL
         const availableLength = maxLength - 20 - priorityPrefix.length - 3;
@@ -505,11 +505,11 @@ export class NotificationChannelService {
       } else if (smsText.length > maxLength) {
         smsText = smsText.substring(0, maxLength - 3) + '...';
       }
-      
+
       if (actionUrl && smsText.length + actionUrl.length + 1 <= maxLength) {
         smsText += ` ${actionUrl}`;
       }
-      
+
       return smsText;
     }
 
@@ -573,7 +573,7 @@ export class NotificationChannelService {
     //   to: phoneNumber
     // });
     // return result.sid;
-    
+
     logger.info(`[TWILIO SMS] To: ${phoneNumber}, Message: ${message}`, { component: 'ChannelService' });
     return `twilio-${Date.now()}`;
   }
@@ -587,7 +587,7 @@ export class NotificationChannelService {
     //   PhoneNumber: phoneNumber
     // }).promise();
     // return result.MessageId;
-    
+
     logger.info(`[AWS SNS SMS] To: ${phoneNumber}, Message: ${message}`, { component: 'ChannelService' });
     return `sns-${Date.now()}`;
   }
@@ -609,7 +609,7 @@ export class NotificationChannelService {
     //   data: payload.data
     // });
     // return result.responses[0].messageId;
-    
+
     logger.info(`[FIREBASE PUSH] Tokens: ${tokens.length}, Payload:`, { component: 'ChannelService' }, payload);
     return `fcm-${Date.now()}`;
   }
@@ -626,7 +626,7 @@ export class NotificationChannelService {
     // };
     // const result = await client.createNotification(notification);
     // return result.id;
-    
+
     logger.info(`[ONESIGNAL PUSH] Tokens: ${tokens.length}, Payload:`, { component: 'ChannelService' }, payload);
     return `onesignal-${Date.now()}`;
   }
@@ -708,3 +708,40 @@ export class NotificationChannelService {
 
 // Export singleton instance
 export const notificationChannelService = new NotificationChannelService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

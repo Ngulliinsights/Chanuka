@@ -1,5 +1,5 @@
-import { database as db } from '../../../shared/database/connection.js';
-import { notifications, users } from '../../../shared/schema.js';
+import { database as db } from '../shared/database/connection';
+import { notifications, users } from '../../../shared/schema';
 import { eq } from 'drizzle-orm';
 import { smartNotificationFilterService, type FilterCriteria, type FilterResult } from './smart-notification-filter.js';
 import { notificationChannelService, type ChannelDeliveryRequest, type DeliveryResult } from './notification-channels.js';
@@ -1203,3 +1203,40 @@ export class NotificationOrchestratorService {
 // ============================================================================
 
 export const notificationOrchestratorService = new NotificationOrchestratorService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

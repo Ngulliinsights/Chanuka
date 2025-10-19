@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
-import * as schema from '../schema/schema.ts';
-import { logger } from '../core/src/logging';
+import * as schema from '../schema';
+import { logger } from '../core/index.js';
 
 const { Pool } = pg;
 
@@ -165,7 +165,7 @@ class CircuitBreaker {
     private readonly failureThreshold: number,
     private readonly resetTimeoutMs: number,
     private readonly operationTimeoutMs: number
-  ) {}
+  ) { }
 
   async execute<T>(operation: () => Promise<T>): Promise<T> {
     // Transition from OPEN to HALF_OPEN after the reset timeout expires
@@ -333,7 +333,7 @@ export interface EnhancedPool extends pg.Pool {
 
 /**
  * Creates optimized PostgreSQL connection pool configuration.
- * Intelligently routes to read replicas in production when appropriate.
+ * Optimized for Neon PostgreSQL with proper SSL and connection settings.
  */
 export const createPoolConfig = (isReadOnly = false): pg.PoolConfig => {
   const connectionString =
@@ -347,6 +347,15 @@ export const createPoolConfig = (isReadOnly = false): pg.PoolConfig => {
     connectionString: connectionString || process.env.DATABASE_URL,
     application_name: appName,
     max: CONFIG.DEFAULT_MAX_POOL_SIZE,
+    // Neon-specific optimizations
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    connectionTimeoutMillis: 10000,
+    idleTimeoutMillis: 30000,
+    // Neon works better with fewer connections due to serverless architecture
+    min: 0,
+    // Enable keep-alive for better connection stability with Neon
+    keepAlive: true,
+    keepAliveInitialDelayMillis: 10000,
   };
 };
 
@@ -704,3 +713,39 @@ export const closePools = async (): Promise<void> => {
     throw error;
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

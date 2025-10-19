@@ -1,6 +1,6 @@
 import { Request } from 'express';
-import { database as db } from '../../../shared/database/connection.js';
-import { securityAuditLogs } from '../../../shared/schema.js';
+import { database as db } from '../../../shared/database/connection';
+import { securityAuditLog } from '../../../shared/schema';
 import { eq, and, gte, lte, desc, sql, count, inArray } from 'drizzle-orm';
 import { logger } from '../../utils/logger';
 
@@ -68,7 +68,7 @@ export class SecurityAuditService {
     try {
       // Drizzle insert expects required fields to be non-undefined.
       // Coalesce `result` to a sensible default so the insert signature matches.
-      await db.insert(securityAuditLogs).values({
+      await db.insert(securityAuditLog).values({
         eventType: event.eventType,
         userId: event.userId,
         ipAddress: event.ipAddress,
@@ -231,32 +231,32 @@ export class SecurityAuditService {
   async queryAuditLogs(options: AuditQueryOptions): Promise<any[]> {
     try {
       // Build the base query
-      let query = db.select().from(securityAuditLogs);
+      let query = db.select().from(securityAuditLog);
 
       // Build where clause by chaining conditions inline
       // This avoids TypeScript issues with condition arrays
       const whereConditions: any[] = [];
 
       if (options.userId) {
-        whereConditions.push(eq(securityAuditLogs.userId, options.userId));
+        whereConditions.push(eq(securityAuditLog.userId, options.userId));
       }
       if (options.ipAddress) {
-        whereConditions.push(eq(securityAuditLogs.ipAddress, options.ipAddress));
+        whereConditions.push(eq(securityAuditLog.ipAddress, options.ipAddress));
       }
       if (options.eventType) {
-        whereConditions.push(eq(securityAuditLogs.eventType, options.eventType));
+        whereConditions.push(eq(securityAuditLog.eventType, options.eventType));
       }
       if (options.eventTypes && options.eventTypes.length > 0) {
-        whereConditions.push(inArray(securityAuditLogs.eventType, options.eventTypes));
+        whereConditions.push(inArray(securityAuditLog.eventType, options.eventTypes));
       }
       if (options.severity) {
-        whereConditions.push(eq(securityAuditLogs.severity, options.severity));
+        whereConditions.push(eq(securityAuditLog.severity, options.severity));
       }
       if (options.startDate) {
-        whereConditions.push(gte(securityAuditLogs.createdAt, options.startDate));
+        whereConditions.push(gte(securityAuditLog.createdAt, options.startDate));
       }
       if (options.endDate) {
-        whereConditions.push(lte(securityAuditLogs.createdAt, options.endDate));
+        whereConditions.push(lte(securityAuditLog.createdAt, options.endDate));
       }
 
       // Apply conditions if any exist
@@ -265,7 +265,7 @@ export class SecurityAuditService {
       }
 
       // Apply ordering and pagination
-      query = query.orderBy(desc(securityAuditLogs.createdAt)) as any;
+      query = query.orderBy(desc(securityAuditLog.createdAt)) as any;
 
       if (options.limit) {
         query = query.limit(options.limit) as any;
@@ -287,25 +287,25 @@ export class SecurityAuditService {
   async getEventCount(options: AuditQueryOptions): Promise<number> {
     try {
       // Build the base count query
-      let query = db.select({ count: count() }).from(securityAuditLogs);
+      let query = db.select({ count: count() }).from(securityAuditLog);
 
       // Build where conditions inline to avoid TypeScript inference issues
       const whereConditions: any[] = [];
 
       if (options.userId) {
-        whereConditions.push(eq(securityAuditLogs.userId, options.userId));
+        whereConditions.push(eq(securityAuditLog.userId, options.userId));
       }
       if (options.ipAddress) {
-        whereConditions.push(eq(securityAuditLogs.ipAddress, options.ipAddress));
+        whereConditions.push(eq(securityAuditLog.ipAddress, options.ipAddress));
       }
       if (options.eventType) {
-        whereConditions.push(eq(securityAuditLogs.eventType, options.eventType));
+        whereConditions.push(eq(securityAuditLog.eventType, options.eventType));
       }
       if (options.startDate) {
-        whereConditions.push(gte(securityAuditLogs.createdAt, options.startDate));
+        whereConditions.push(gte(securityAuditLog.createdAt, options.startDate));
       }
       if (options.endDate) {
-        whereConditions.push(lte(securityAuditLogs.createdAt, options.endDate));
+        whereConditions.push(lte(securityAuditLog.createdAt, options.endDate));
       }
 
       // Apply where conditions if any exist
@@ -487,3 +487,40 @@ export class SecurityAuditService {
 
 // Export singleton instance
 export const securityAuditService = new SecurityAuditService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

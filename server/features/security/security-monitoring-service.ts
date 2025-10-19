@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { securityAuditService } from './security-audit-service.js';
 import { intrusionDetectionService, ThreatDetectionResult } from './intrusion-detection-service.js';
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '../../../shared/database/connection';
 import { pgTable, text, serial, timestamp, jsonb, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, desc, eq, or, count } from 'drizzle-orm';
 import { logger } from '../../utils/logger';
@@ -1280,3 +1280,40 @@ export const securityMonitoringService = SecurityMonitoringService.getInstance()
 
 // Export table definitions for migrations
 export { securityIncidents, securityAlerts, complianceChecks };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

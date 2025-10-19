@@ -1,7 +1,10 @@
-import { database as db } from '../../../shared/database/connection.js';
-import { users, billEngagement } from '../../../shared/schema.js';
+import { database as db } from '../../../../shared/database/connection';
+import { user, billEngagement } from '../../../../shared/schema';
+
+// Alias for backward compatibility
+const users = user;
 import { eq, and } from 'drizzle-orm';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../../shared/core/src/observability/logging';
 
 export interface BillTrackingPreferences {
   statusChanges: boolean;
@@ -397,6 +400,43 @@ export class UserPreferencesService {
 }
 
 export const userPreferencesService = new UserPreferencesService();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

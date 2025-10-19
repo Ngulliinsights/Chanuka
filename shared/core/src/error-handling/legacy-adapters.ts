@@ -133,3 +133,40 @@ export function getLegacyErrorTracker(): UnifiedErrorTracker {
 
 // Export legacy singleton for backward compatibility
 export const errorTracker = getLegacyErrorTracker();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

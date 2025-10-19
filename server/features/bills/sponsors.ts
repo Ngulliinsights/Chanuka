@@ -1,7 +1,7 @@
 import express from 'express';
 import { sponsorService, SponsorAffiliationInput, SponsorTransparencyInput } from './sponsor-service.js';
 import { sponsorConflictAnalysisService } from './sponsor-conflict-analysis.js';
-import { insertSponsorSchema } from '../../../shared/schema.js';
+import { insertSponsorSchema } from '../../../shared/schema/validation.js';
 import { z } from 'zod';
 import {
   ApiSuccess,
@@ -10,7 +10,7 @@ import {
   ApiValidationError,
   ApiResponseWrapper
 } from "../../utils/api-response.js";
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 const router = express.Router();
 
@@ -891,3 +891,40 @@ setupSponsorRoutes(router);
 
 // Export both the configured router and setup function for flexible integration
 export { router };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

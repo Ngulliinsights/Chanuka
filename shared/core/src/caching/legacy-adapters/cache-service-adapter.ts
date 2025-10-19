@@ -1,274 +1,288 @@
 /**
  * Legacy Cache Service Adapter
  * 
- * Provides backward compatibility for the old CacheService interface
- * while using the new core cache system underneath
+ * Provides backward compatibility for existing cache service implementations
+ * This adapter wraps the old cache service to work with the new unified interface
  */
 
-import { CacheService as CoreCacheService, CacheConfig, CacheMetrics } from '../types';
-import { createCacheService } from '../index';
+import { CacheService, CacheMetrics, CacheHealthStatus } from '../core/interfaces.js';
 
-export interface LegacyCacheEntry<T = any> {
-  data: T;
-  timestamp: number;
-  ttl: number;
-  accessCount: number;
-  lastAccessed: number;
-  tags: string[];
-  size: number;
+// Legacy cache service interface (what the old system expected)
+interface LegacyCacheService {
+  get(key: string): Promise<any>;
+  set(key: string, value: any, ttl?: number): Promise<void>;
+  delete(key: string): Promise<boolean>;
+  has(key: string): Promise<boolean>;
+  clear?(): Promise<void>;
+  size?(): Promise<number>;
+  keys?(): Promise<string[]>;
 }
 
-export interface LegacyCacheConfig {
-  maxSize: number;
-  defaultTTL: number;
-  maxEntries: number;
-  enableCompression: boolean;
-  enablePersistence: boolean;
-  storagePrefix: string;
-}
-
-export interface LegacyCacheStats {
-  hits: number;
-  misses: number;
-  hitRate: number;
-  totalEntries: number;
-  totalSize: number;
-  oldestEntry: number;
-  newestEntry: number;
+// Legacy cache configuration
+interface LegacyCacheConfig {
+  provider?: string;
+  ttl?: number;
+  maxSize?: number;
+  prefix?: string;
 }
 
 /**
- * Legacy CacheService implementation that wraps the new core cache system
+ * Adapter that wraps legacy cache services to work with the new unified interface
  */
-export class LegacyCacheService {
-  private static instance: LegacyCacheService;
-  private coreCache: CoreCacheService;
+export class LegacyCacheServiceAdapter implements CacheService {
+  private legacyService: LegacyCacheService;
   private config: LegacyCacheConfig;
+  private metrics: CacheMetrics;
 
-  static getInstance(): LegacyCacheService {
-    if (!LegacyCacheService.instance) {
-      LegacyCacheService.instance = new LegacyCacheService();
-    }
-    return LegacyCacheService.instance;
+  constructor(legacyService: LegacyCacheService, config: LegacyCacheConfig = {}) {
+    this.legacyService = legacyService;
+    this.config = config;
+    this.metrics = this.initializeMetrics();
   }
 
-  constructor() {
-    this.config = {
-      maxSize: 50 * 1024 * 1024, // 50MB
-      defaultTTL: 5 * 60 * 1000, // 5 minutes
-      maxEntries: 1000,
-      enableCompression: true,
-      enablePersistence: true,
-      storagePrefix: 'cache_'
-    };
-
-    // Create core cache service with legacy config
-    this.coreCache = createCacheService({
-      provider: 'memory',
-      maxMemoryMB: this.config.maxSize / (1024 * 1024),
-      defaultTtlSec: this.config.defaultTTL / 1000,
-      enableMetrics: true,
-      keyPrefix: this.config.storagePrefix,
-      enableCompression: this.config.enableCompression,
-      compressionThreshold: 1024,
-    });
-  }
-
-  /**
-   * Set cache entry
-   */
-  set<T>(
-    key: string, 
-    data: T, 
-    options: {
-      ttl?: number;
-      tags?: string[];
-      persist?: boolean;
-    } = {}
-  ): void {
-    const ttlSec = options.ttl ? options.ttl / 1000 : undefined;
-    this.coreCache.set(key, data, ttlSec);
-  }
-
-  /**
-   * Get cache entry
-   */
-  get<T>(key: string): T | null {
-    return this.coreCache.get(key) || null;
-  }
-
-  /**
-   * Check if key exists
-   */
-  has(key: string): boolean {
-    return this.coreCache.exists ? this.coreCache.exists(key) : this.get(key) !== null;
-  }
-
-  /**
-   * Delete cache entry
-   */
-  delete(key: string): boolean {
-    this.coreCache.del(key);
-    return true;
-  }
-
-  /**
-   * Clear all cache entries
-   */
-  clear(): void {
-    if (this.coreCache.clear) {
-      this.coreCache.clear();
-    } else if (this.coreCache.flush) {
-      this.coreCache.flush();
+  async get<T = any>(key: string): Promise<T | null> {
+    try {
+      const result = await this.legacyService.get(this.formatKey(key));
+      this.updateMetrics('hit');
+      return result || null;
+    } catch (error) {
+      this.updateMetrics('miss');
+      return null;
     }
   }
 
-  /**
-   * Invalidate entries by tags
-   */
-  invalidateByTags(tags: string[]): number {
-    if (this.coreCache.invalidateByTags) {
-      this.coreCache.invalidateByTags(tags);
-      return 1; // Return approximate count
+  async set<T = any>(key: string, value: T, ttlSeconds?: number): Promise<void> {
+    try {
+      const ttl = ttlSeconds || this.config.ttl;
+      await this.legacyService.set(this.formatKey(key), value, ttl);
+      this.updateMetrics('set');
+    } catch (error) {
+      this.updateMetrics('error');
+      throw error;
     }
+  }
+
+  async del(key: string): Promise<boolean> {
+    try {
+      const result = await this.legacyService.delete(this.formatKey(key));
+      this.updateMetrics('delete');
+      return result;
+    } catch (error) {
+      this.updateMetrics('error');
+      return false;
+    }
+  }
+
+  async exists(key: string): Promise<boolean> {
+    try {
+      return await this.legacyService.has(this.formatKey(key));
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async mget<T = any>(keys: string[]): Promise<Array<T | null>> {
+    // Legacy services don't typically support batch operations
+    // Fall back to individual gets
+    const results = await Promise.all(keys.map(key => this.get<T>(key)));
+    return results;
+  }
+
+  async mset<T = any>(entries: Array<{ key: string; value: T; ttl?: number }>): Promise<void> {
+    // Legacy services don't typically support batch operations
+    // Fall back to individual sets
+    await Promise.all(entries.map(({ key, value, ttl }) => this.set(key, value, ttl)));
+  }
+
+  async mdel(keys: string[]): Promise<number> {
+    // Legacy services don't typically support batch operations
+    // Fall back to individual deletes
+    const results = await Promise.all(keys.map(key => this.del(key)));
+    return results.filter(Boolean).length;
+  }
+
+  async increment(key: string, delta: number = 1): Promise<number> {
+    // Legacy services might not support atomic increment
+    // Implement using get/set (not atomic, but functional)
+    const current = await this.get<number>(key) || 0;
+    const newValue = current + delta;
+    await this.set(key, newValue);
+    return newValue;
+  }
+
+  async decrement(key: string, delta: number = 1): Promise<number> {
+    return this.increment(key, -delta);
+  }
+
+  async expire(key: string, ttlSeconds: number): Promise<boolean> {
+    // Legacy services might not support changing TTL
+    // Try to get the value and re-set it with new TTL
+    try {
+      const value = await this.get(key);
+      if (value === null) return false;
+      await this.set(key, value, ttlSeconds);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async ttl(key: string): Promise<number> {
+    // Legacy services typically don't support TTL queries
+    return -1;
+  }
+
+  async clear(): Promise<void> {
+    if (this.legacyService.clear) {
+      await this.legacyService.clear();
+    } else {
+      // Fallback: get all keys and delete them
+      if (this.legacyService.keys) {
+        const keys = await this.legacyService.keys();
+        await Promise.all(keys.map(key => this.del(key)));
+      }
+    }
+  }
+
+  async size(): Promise<number> {
+    if (this.legacyService.size) {
+      return await this.legacyService.size();
+    }
+    
+    // Fallback: count keys if available
+    if (this.legacyService.keys) {
+      const keys = await this.legacyService.keys();
+      return keys.length;
+    }
+    
     return 0;
   }
 
-  /**
-   * Get or set with factory function
-   */
-  async getOrSet<T>(
-    key: string,
-    factory: () => Promise<T>,
-    options: {
-      ttl?: number;
-      tags?: string[];
-      persist?: boolean;
-    } = {}
-  ): Promise<T> {
-    const cached = this.get<T>(key);
-    if (cached !== null) {
-      return cached;
+  async keys(pattern?: string): Promise<string[]> {
+    if (!this.legacyService.keys) {
+      return [];
     }
-
-    const data = await factory();
-    this.set(key, data, options);
-    return data;
+    
+    const keys = await this.legacyService.keys();
+    
+    if (!pattern) return keys;
+    
+    // Simple pattern matching
+    const regex = new RegExp(pattern.replace(/\*/g, '.*'));
+    return keys.filter(key => regex.test(key));
   }
 
-  /**
-   * Get cache statistics
-   */
-  getStats(): LegacyCacheStats {
-    const metrics = this.coreCache.getMetrics?.();
+  async invalidateByPattern(pattern: string): Promise<number> {
+    const keys = await this.keys(pattern);
+    const results = await Promise.all(keys.map(key => this.del(key)));
+    return results.filter(Boolean).length;
+  }
+
+  async getHealth(): Promise<CacheHealthStatus> {
+    const startTime = Date.now();
     
-    if (metrics) {
+    try {
+      // Test basic operations
+      const testKey = `health_check_${Date.now()}`;
+      await this.set(testKey, 'test', 1);
+      const result = await this.get(testKey);
+      await this.del(testKey);
+      
+      const latency = Date.now() - startTime;
+      
       return {
-        hits: metrics.hits,
-        misses: metrics.misses,
-        hitRate: metrics.hitRate,
-        totalEntries: metrics.size || 0,
-        totalSize: metrics.memoryUsage || 0,
-        oldestEntry: 0,
-        newestEntry: Date.now()
+        status: result === 'test' ? 'healthy' : 'degraded',
+        latency,
+        connectionStatus: 'connected'
+      };
+    } catch (error) {
+      return {
+        status: 'unhealthy',
+        latency: Date.now() - startTime,
+        connectionStatus: 'disconnected',
+        lastError: error instanceof Error ? error.message : 'Unknown error'
       };
     }
+  }
 
+  getMetrics(): CacheMetrics {
+    return { ...this.metrics };
+  }
+
+  // Private helper methods
+  private formatKey(key: string): string {
+    return this.config.prefix ? `${this.config.prefix}${key}` : key;
+  }
+
+  private updateMetrics(operation: 'hit' | 'miss' | 'set' | 'delete' | 'error'): void {
+    this.metrics.operations++;
+    
+    switch (operation) {
+      case 'hit':
+        this.metrics.hits++;
+        break;
+      case 'miss':
+        this.metrics.misses++;
+        break;
+      case 'error':
+        this.metrics.errors++;
+        break;
+    }
+
+    // Update hit rate
+    const total = this.metrics.hits + this.metrics.misses;
+    this.metrics.hitRate = total > 0 ? this.metrics.hits / total : 0;
+  }
+
+  private initializeMetrics(): CacheMetrics {
     return {
       hits: 0,
       misses: 0,
       hitRate: 0,
-      totalEntries: 0,
-      totalSize: 0,
-      oldestEntry: 0,
-      newestEntry: 0
+      operations: 0,
+      errors: 0,
+      memoryUsage: 0,
+      keyCount: 0,
+      avgLatency: 0,
+      maxLatency: 0,
+      minLatency: 0
     };
-  }
-
-  /**
-   * Get cache configuration
-   */
-  getConfig(): LegacyCacheConfig {
-    return { ...this.config };
-  }
-
-  /**
-   * Update cache configuration
-   */
-  updateConfig(newConfig: Partial<LegacyCacheConfig>): void {
-    this.config = { ...this.config, ...newConfig };
-  }
-
-  /**
-   * Get all cache keys
-   */
-  getKeys(): string[] {
-    // This would require extending the core cache interface
-    return [];
-  }
-
-  /**
-   * Get entries by tag
-   */
-  getByTag(tag: string): Array<{ key: string; data: any }> {
-    // This would require extending the core cache interface
-    return [];
-  }
-
-  /**
-   * Preload data into cache
-   */
-  async preload<T>(
-    entries: Array<{
-      key: string;
-      factory: () => Promise<T>;
-      options?: { ttl?: number; tags?: string[]; persist?: boolean };
-    }>
-  ): Promise<void> {
-    const promises = entries.map(async ({ key, factory, options }) => {
-      if (!this.has(key)) {
-        try {
-          const data = await factory();
-          this.set(key, data, options);
-        } catch (error) {
-          console.warn(`Failed to preload cache entry ${key}:`, error);
-        }
-      }
-    });
-
-    await Promise.allSettled(promises);
-  }
-
-  /**
-   * Export cache data
-   */
-  export(): Record<string, any> {
-    // This would require extending the core cache interface
-    return {};
-  }
-
-  /**
-   * Import cache data
-   */
-  import(data: Record<string, any>): void {
-import { logger } from '../../observability/logging';
-    for (const [key, entryData] of Object.entries(data)) {
-      if (entryData && typeof entryData === 'object') {
-        this.set(key, entryData.data, {
-          ttl: entryData.ttl,
-          tags: entryData.tags
-        });
-      }
-    }
   }
 }
 
-// Export singleton instance for backward compatibility
-export const cacheService = LegacyCacheService.getInstance();
-export default cacheService;
+/**
+ * Factory function to create a legacy cache adapter
+ */
+export function createLegacyCacheAdapter(
+  legacyService: LegacyCacheService, 
+  config?: LegacyCacheConfig
+): CacheService {
+  return new LegacyCacheServiceAdapter(legacyService, config);
+}
 
+/**
+ * Helper to detect if a service is a legacy cache service
+ */
+export function isLegacyCacheService(service: any): service is LegacyCacheService {
+  return (
+    service &&
+    typeof service.get === 'function' &&
+    typeof service.set === 'function' &&
+    typeof service.delete === 'function'
+  );
+}
 
-
-
-
-
+/**
+ * Migration helper to wrap existing cache services
+ */
+export function migrateLegacyCacheService(service: any, config?: LegacyCacheConfig): CacheService {
+  if (isLegacyCacheService(service)) {
+    console.warn(
+      '[MIGRATION] Wrapping legacy cache service. ' +
+      'Consider migrating to the new unified cache interface for better performance and features.'
+    );
+    return createLegacyCacheAdapter(service, config);
+  }
+  
+  throw new Error('Service does not implement the legacy cache interface');
+}

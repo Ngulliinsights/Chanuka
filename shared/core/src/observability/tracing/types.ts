@@ -308,3 +308,39 @@ export const SPAN_ATTRIBUTE_PREFIXES = {
   MESSAGING: 'messaging.',
   EXCEPTION: 'exception.',
 } as const;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

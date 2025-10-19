@@ -9,8 +9,8 @@ import { ApiSuccess, ApiError, ApiForbidden } from '../../utils/api-response.js'
 import { logger } from '../../utils/logger';
 
 // Database & Schema Imports
-import { database as db } from '../../../shared/database/connection.js';
-import { users, bills } from '../../../drizzle/schema.js';
+import { database as db } from '../../../shared/database/connection';
+import { user, bill } from '../../../shared/schema/schema.js';
 
 // --- Constants and Types ---
 
@@ -52,10 +52,10 @@ router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
       db
         .select({
           total: count(),
-          status: bills.status
+          status: bill.status
         })
-        .from(bills)
-        .groupBy(bills.status)
+        .from(bill)
+        .groupBy(bill.status)
         .catch(err => {
           logger.error('Error fetching bill stats for dashboard', { 
             component: 'admin-router', 
@@ -65,31 +65,31 @@ router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
         }),
 
       // Aggregate user statistics directly in database
-      db
-        .select({
-          total: count(),
-          role: users.role
-        })
-        .from(users)
-        .groupBy(users.role)
-        .catch(err => {
-          logger.error('Error fetching user stats for dashboard', { 
-            component: 'admin-router', 
-            error: err 
-          });
-          return [];
-        }),
+       db
+         .select({
+           total: count(),
+           role: user.role
+         })
+         .from(user)
+         .groupBy(user.role)
+         .catch(err => {
+           logger.error('Error fetching user stats for dashboard', {
+             component: 'admin-router',
+             error: err
+           });
+           return [];
+         }),
 
       // Fetch only the essential fields for recent bills to minimize data transfer
       db
         .select({
-          id: bills.id,
-          title: bills.title,
-          status: bills.status,
-          createdAt: bills.createdAt
+          id: bill.id,
+          title: bill.title,
+          status: bill.status,
+          createdAt: bill.createdAt
         })
-        .from(bills)
-        .orderBy(desc(bills.createdAt))
+        .from(bill)
+        .orderBy(desc(bill.createdAt))
         .limit(10)
         .catch(err => {
           logger.error('Error fetching recent bills for dashboard', { 
@@ -102,14 +102,14 @@ router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
       // Fetch only the essential fields for recent users
       db
         .select({
-          id: users.id,
-          name: users.name,
-          email: users.email,
-          role: users.role,
-          createdAt: users.createdAt
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          createdAt: user.createdAt
         })
-        .from(users)
-        .orderBy(desc(users.createdAt))
+        .from(user)
+        .orderBy(desc(user.createdAt))
         .limit(10)
         .catch(err => {
           logger.error('Error fetching recent users for dashboard', { 
@@ -177,12 +177,12 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
     // The 'and' function filters out undefined conditions automatically
     const conditions = and(
       role && typeof role === 'string'
-        ? eq(users.role, role as UserRole)
+        ? eq(user.role, role as UserRole)
         : undefined,
       search && typeof search === 'string'
         ? or(
-            ilike(users.name, `%${search}%`),
-            ilike(users.email, `%${search}%`)
+            ilike(user.name, `%${search}%`),
+            ilike(user.email, `%${search}%`)
           )
         : undefined
     );
@@ -191,25 +191,25 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
     const [userResults, totalResult] = await Promise.all([
       db
         .select({
-          id: users.id,
-          name: users.name,
-          email: users.email,
-          role: users.role,
-          verificationStatus: users.verificationStatus,
-          isActive: users.isActive,
-          createdAt: users.createdAt,
-          lastLoginAt: users.lastLoginAt,
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+          verificationStatus: user.verificationStatus,
+          isActive: user.isActive,
+          createdAt: user.createdAt,
+          lastLoginAt: user.lastLoginAt,
         })
-        .from(users)
+        .from(user)
         .where(conditions)
-        .orderBy(desc(users.createdAt))
+        .orderBy(desc(user.createdAt))
         .limit(limitNum)
         .offset(offset),
 
       // Count query for pagination - same conditions but just counting
       db
         .select({ count: count() })
-        .from(users)
+        .from(user)
         .where(conditions),
     ]);
     
@@ -265,9 +265,9 @@ router.put('/users/:id/role', async (req: AuthenticatedRequest, res: Response) =
     const result = await db.transaction(async (tx) => {
       // First, verify the user exists and get their current role
       const currentUser = await tx
-        .select({ role: users.role })
-        .from(users)
-        .where(eq(users.id, id))
+        .select({ role: user.role })
+        .from(user)
+        .where(eq(user.id, id))
         .then(r => r[0]);
       
       if (!currentUser) {
@@ -275,17 +275,17 @@ router.put('/users/:id/role', async (req: AuthenticatedRequest, res: Response) =
       }
 
       // Update the role and return the updated user data
-      const updatedUser = await tx
-        .update(users)
-        .set({ role, updatedAt: new Date().toISOString() })
-        .where(eq(users.id, id))
-        .returning({
-          id: users.id,
-          name: users.name,
-          email: users.email,
-          role: users.role
-        })
-        .then(r => r[0]);
+       const updatedUser = await tx
+         .update(user)
+         .set({ role, updatedAt: new Date() })
+         .where(eq(user.id, id))
+         .returning({
+           id: user.id,
+           name: user.name,
+           email: user.email,
+           role: user.role
+         })
+         .then(r => r[0]);
       
       return { updatedUser, oldRole: currentUser.role };
     });
@@ -350,9 +350,9 @@ router.put('/users/:id/status', async (req: AuthenticatedRequest, res: Response)
     const result = await db.transaction(async (tx) => {
       // Get current status for audit logging
       const currentUser = await tx
-        .select({ isActive: users.isActive })
-        .from(users)
-        .where(eq(users.id, id))
+        .select({ isActive: user.isActive })
+        .from(user)
+        .where(eq(user.id, id))
         .then(r => r[0]);
       
       if (!currentUser) {
@@ -360,17 +360,17 @@ router.put('/users/:id/status', async (req: AuthenticatedRequest, res: Response)
       }
 
       // Update the active status
-      const updatedUser = await tx
-        .update(users)
-        .set({ isActive, updatedAt: new Date().toISOString() })
-        .where(eq(users.id, id))
-        .returning({
-          id: users.id,
-          name: users.name,
-          email: users.email,
-          isActive: users.isActive
-        })
-        .then(r => r[0]);
+       const updatedUser = await tx
+         .update(user)
+         .set({ isActive, updatedAt: new Date() })
+         .where(eq(user.id, id))
+         .returning({
+           id: user.id,
+           name: user.name,
+           email: user.email,
+           isActive: user.isActive
+         })
+         .then(r => r[0]);
 
       return { updatedUser, oldStatus: currentUser.isActive };
     });
@@ -647,3 +647,40 @@ router.get('/logs', async (req: AuthenticatedRequest, res: Response) => {
 });
 
 export { router };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

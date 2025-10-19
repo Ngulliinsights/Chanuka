@@ -1,4 +1,4 @@
-import { Bill, BillComment, Sponsor, Analysis, BillEngagement } from '../../shared/schema.js';
+import { Bill, BillComment, Sponsor, Analysis, BillEngagement } from '../../shared/schema';
 import { BillAnalysis, SponsorshipAnalysis } from '../../shared/types/bill.js';
 import { logger } from '../../shared/core/src/observability/logging';
 
@@ -818,3 +818,40 @@ export class DemoDataService {
 
 // Export singleton instance for convenient access
 export const demoDataService = DemoDataService.getInstance();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -3,7 +3,7 @@ import { databaseService } from "../../services/database-service.js";
 import { readDatabase } from '../../db.js';
 import { cacheService } from "../../infrastructure/cache/cache-service.js";
 import { demoDataService } from "../../infrastructure/demo-data.js";
-import * as schema from "../../../shared/schema.js";
+import * as schema from "../../../shared/schema";
 import { logger } from '@shared/core/src/observability/logging';
 
 // Search index health status
@@ -769,6 +769,43 @@ export class SearchIndexManager {
 
 // Export singleton instance
 export const searchIndexManager = new SearchIndexManager();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

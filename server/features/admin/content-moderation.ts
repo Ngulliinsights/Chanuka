@@ -1,5 +1,13 @@
-import { database as db } from '../../../shared/database/connection.js';
-import { bills, billComments, users, moderationFlags, moderationActions, sponsors } from '../../../shared/schema.js';
+import { database as db } from '../../../shared/database/connection';
+import { bill, billComment, user, moderationFlag, moderationAction, sponsor } from '../../../shared/schema';
+
+// Alias for backward compatibility
+const bills = bill;
+const billComments = billComment;
+const users = user;
+const moderationFlags = moderationFlag;
+const moderationActions = moderationAction;
+const sponsors = sponsor;
 import { eq, count, desc, sql, and, gte, like, or, inArray, isNull, SQL } from 'drizzle-orm';
 import { logger } from '../../utils/logger';
 
@@ -1301,3 +1309,40 @@ export class ContentModerationService {
 }
 
 export const contentModerationService = ContentModerationService.getInstance();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,6 +1,6 @@
 import { userProfileService } from './services/user-profile.js';
 import { db } from './db.js';
-import { users } from '../shared/schema.js';
+import { users } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '../../shared/core/src/observability/logging';
 
@@ -113,6 +113,43 @@ async function verifyUserProfileService() {
 
 // Run verification
 verifyUserProfileService().catch(console.error);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

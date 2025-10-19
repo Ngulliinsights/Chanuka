@@ -472,3 +472,40 @@ export function createConnectionManager(config?: Partial<ConnectionManagerConfig
 
 // Export default instance
 export const connectionManager = createConnectionManager();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

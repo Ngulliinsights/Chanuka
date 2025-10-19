@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
-import databaseService from '../../../infrastructure/database/database-service.js';
+import { databaseService } from '../../infrastructure/database/database-service.js';
 import { logger } from '../../../shared/core/src/observability/logging';
 
 describe('Database Operations Integration Tests', () => {
@@ -512,6 +512,43 @@ expect.extend({
     }
   },
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

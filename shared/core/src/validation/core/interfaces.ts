@@ -1,191 +1,151 @@
 /**
- * Validation Core Interfaces
- *
- * Core interfaces for the validation system following the adapter pattern
+ * Core Validation Interfaces
+ * 
+ * Unified interfaces for all validation implementations
  */
 
-import { ValidationError } from '../../error-management/errors/specialized/validation-error';
-
-/**
- * Core validation result interface
- */
-export interface IValidationResult<T = any> {
-  success: boolean;
-  data?: T;
-  error?: ValidationError;
+export interface ValidationService {
+  // Schema management
+  registerSchema(name: string, schema: ValidationSchema): void;
+  getSchema(name: string): ValidationSchema | undefined;
+  hasSchema(name: string): boolean;
+  
+  // Validation operations
+  validate<T>(schema: ValidationSchema, data: unknown, options?: ValidationOptions): Promise<T>;
+  validateSync<T>(schema: ValidationSchema, data: unknown, options?: ValidationOptions): T;
+  validateSafe<T>(schema: ValidationSchema, data: unknown, options?: ValidationOptions): Promise<ValidationResult<T>>;
+  validateBatch<T>(schema: ValidationSchema, dataArray: unknown[], options?: ValidationOptions): Promise<BatchValidationResult<T>>;
+  
+  // Utility methods
+  sanitize(data: unknown, rules: SanitizationRules): unknown;
+  preprocess(data: unknown, rules: PreprocessingRules): unknown;
+  
+  // Metrics and health
+  getMetrics?(): ValidationMetrics;
+  getHealth?(): Promise<ValidationHealthStatus>;
+  
+  // Lifecycle
+  destroy?(): Promise<void>;
 }
 
-/**
- * Core batch validation result interface
- */
-export interface IBatchValidationResult<T = any> {
+export interface ValidationAdapter extends ValidationService {
+  readonly name: string;
+  readonly version: string;
+  readonly config: ValidationAdapterConfig;
+}
+
+export interface ValidationAdapterConfig {
+  enableCache?: boolean;
+  cacheTimeout?: number;
+  enableMetrics?: boolean;
+  enablePreprocessing?: boolean;
+  enableSanitization?: boolean;
+  strictMode?: boolean;
+}
+
+export interface ValidationSchema {
+  // Generic schema interface that adapters can implement
+  validate(data: unknown): ValidationResult<any>;
+  validateAsync?(data: unknown): Promise<ValidationResult<any>>;
+  
+  // Schema metadata
+  name?: string;
+  description?: string;
+  version?: string;
+  tags?: string[];
+}
+
+export interface ValidationOptions {
+  stripUnknown?: boolean;
+  enableCache?: boolean;
+  cacheKey?: string;
+  enablePreprocessing?: boolean;
+  enableSanitization?: boolean;
+  context?: ValidationContext;
+  abortEarly?: boolean;
+}
+
+export interface ValidationResult<T> {
+  success: boolean;
+  data?: T;
+  errors?: ValidationError[];
+}
+
+export interface BatchValidationResult<T> {
   valid: T[];
   invalid: Array<{
     index: number;
     data: unknown;
-    error: ValidationError;
+    errors: ValidationError[];
   }>;
-  totalCount: number;
-  validCount: number;
-  invalidCount: number;
-}
-
-/**
- * Core validation options interface
- */
-export interface IValidationOptions {
-  preprocess?: boolean;
-  useCache?: boolean;
-  cacheTtl?: number;
-  cacheKeyGenerator?: (schema: any, data: unknown) => string;
-  stripUnknown?: boolean;
-  abortEarly?: boolean;
-}
-
-/**
- * Core validation context interface
- */
-export interface IValidationContext {
-  userId?: string;
-  requestId?: string;
-  metadata?: Record<string, any>;
-  timestamp?: Date;
-}
-
-/**
- * Core validation service interface
- */
-export interface IValidationService {
-  /**
-   * Validate data against a schema
-   */
-  validate<T>(
-    schema: any,
-    data: unknown,
-    options?: IValidationOptions,
-    context?: IValidationContext
-  ): Promise<T>;
-
-  /**
-   * Validate data safely without throwing errors
-   */
-  validateSafe<T>(
-    schema: any,
-    data: unknown,
-    options?: IValidationOptions,
-    context?: IValidationContext
-  ): Promise<IValidationResult<T>>;
-
-  /**
-   * Validate multiple objects in batch
-   */
-  validateBatch<T>(
-    schema: any,
-    dataArray: unknown[],
-    options?: IValidationOptions,
-    context?: IValidationContext
-  ): Promise<IBatchValidationResult<T>>;
-
-  /**
-   * Register a schema with the service
-   */
-  registerSchema(
-    name: string,
-    schema: any,
-    options?: {
-      version?: string;
-      description?: string;
-      tags?: string[];
-    }
-  ): void;
-
-  /**
-   * Get a registered schema by name
-   */
-  getSchema(name: string): any | undefined;
-
-  /**
-   * Get validation metrics
-   */
-  getMetrics(): any;
-
-  /**
-   * Clear validation cache
-   */
-  clearCache(): void;
-}
-
-/**
- * Core schema adapter interface
- */
-export interface ISchemaAdapter {
-  /**
-   * Validate data using the adapter's validation library
-   */
-  validate<T>(schema: any, data: unknown): Promise<T>;
-
-  /**
-   * Validate data safely using the adapter's validation library
-   */
-  validateSafe<T>(schema: any, data: unknown): Promise<IValidationResult<T>>;
-
-  /**
-   * Check if the adapter supports the given schema type
-   */
-  supports(schema: any): boolean;
-
-  /**
-   * Get adapter name
-   */
-  getName(): string;
-
-  /**
-   * Get adapter version
-   */
-  getVersion(): string;
-}
-
-/**
- * Core preprocessing configuration interface
- */
-export interface IPreprocessingConfig {
-  trimStrings?: boolean;
-  coerceNumbers?: boolean;
-  coerceBooleans?: boolean;
-  emptyStringToNull?: boolean;
-  undefinedToNull?: boolean;
-  customPreprocessors?: Array<(data: unknown) => unknown>;
-}
-
-/**
- * Core caching configuration interface
- */
-export interface ICachingConfig {
-  enabled: boolean;
-  defaultTtl: number;
-  maxSize: number;
-}
-
-/**
- * Core validation service configuration interface
- */
-export interface IValidationServiceConfig {
-  defaultOptions?: IValidationOptions;
-  preprocessing?: IPreprocessingConfig;
-  cache?: ICachingConfig;
-  metrics?: {
-    enabled: boolean;
-    trackSchemaUsage: boolean;
-    trackErrorPatterns: boolean;
+  summary: {
+    total: number;
+    valid: number;
+    invalid: number;
+    successRate: number;
   };
 }
 
-/**
- * Core schema registration interface
- */
-export interface ISchemaRegistration {
+export interface ValidationError {
+  field: string;
+  message: string;
+  code: string;
+  value?: unknown;
+  context?: Record<string, any>;
+}
+
+export interface ValidationContext {
+  userId?: string;
+  requestId?: string;
+  operation?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface ValidationMetrics {
+  validations: number;
+  successes: number;
+  failures: number;
+  successRate: number;
+  avgLatency: number;
+  cacheHits: number;
+  cacheMisses: number;
+  cacheHitRate: number;
+  schemasRegistered: number;
+}
+
+export interface ValidationHealthStatus {
+  status: 'healthy' | 'degraded' | 'unhealthy';
+  latency: number;
+  schemasLoaded: number;
+  cacheStatus?: 'enabled' | 'disabled' | 'error';
+  lastError?: string;
+}
+
+// Sanitization and preprocessing
+export interface SanitizationRules {
+  trim?: boolean;
+  lowercase?: boolean;
+  uppercase?: boolean;
+  removeHtml?: boolean;
+  removeScripts?: boolean;
+  maxLength?: number;
+  allowedChars?: RegExp;
+  customRules?: Array<(value: any) => any>;
+}
+
+export interface PreprocessingRules {
+  convertTypes?: boolean;
+  parseNumbers?: boolean;
+  parseDates?: boolean;
+  parseJson?: boolean;
+  normalizeWhitespace?: boolean;
+  customRules?: Array<(value: any) => any>;
+}
+
+// Schema registration and management
+export interface SchemaRegistration {
   name: string;
-  schema: any;
+  schema: ValidationSchema;
   version?: string;
   description?: string;
   tags?: string[];
@@ -193,26 +153,68 @@ export interface ISchemaRegistration {
   updatedAt: Date;
 }
 
-/**
- * Core validation metrics interface
- */
-export interface IValidationMetrics {
-  totalValidations: number;
-  successfulValidations: number;
-  failedValidations: number;
-  cacheHits: number;
-  cacheMisses: number;
-  avgValidationTime: number;
-  schemaUsageCount: Record<string, number>;
-  errorsByField: Record<string, number>;
-  errorsByCode: Record<string, number>;
+export interface SchemaRegistry {
+  register(registration: Omit<SchemaRegistration, 'createdAt' | 'updatedAt'>): void;
+  get(name: string): SchemaRegistration | undefined;
+  list(tags?: string[]): SchemaRegistration[];
+  remove(name: string): boolean;
+  clear(): void;
 }
 
-/**
- * Core cached validation result interface
- */
-export interface ICachedValidationResult<T = any> {
-  result: IValidationResult<T>;
+// Validation configuration
+export interface ValidationConfig {
+  adapter: 'zod' | 'joi' | 'custom';
+  enableCache?: boolean;
+  cacheTimeout?: number;
+  enableMetrics?: boolean;
+  enablePreprocessing?: boolean;
+  enableSanitization?: boolean;
+  strictMode?: boolean;
+  
+  // Adapter-specific config
+  zodConfig?: ZodAdapterConfig;
+  joiConfig?: JoiAdapterConfig;
+  customConfig?: CustomAdapterConfig;
+}
+
+export interface ZodAdapterConfig extends ValidationAdapterConfig {
+  enableTransform?: boolean;
+  enableCoercion?: boolean;
+}
+
+export interface JoiAdapterConfig extends ValidationAdapterConfig {
+  allowUnknown?: boolean;
+  stripUnknown?: boolean;
+  presence?: 'optional' | 'required' | 'forbidden';
+}
+
+export interface CustomAdapterConfig extends ValidationAdapterConfig {
+  customValidators?: Record<string, (value: any) => boolean>;
+  customMessages?: Record<string, string>;
+}
+
+// Event system for validation operations
+export interface ValidationEvent {
+  type: ValidationEventType;
+  schema: string;
   timestamp: number;
-  ttl: number;
+  duration?: number;
+  success?: boolean;
+  errorCount?: number;
+  metadata?: Record<string, any>;
+}
+
+export type ValidationEventType = 
+  | 'validation_start'
+  | 'validation_success'
+  | 'validation_error'
+  | 'schema_registered'
+  | 'schema_removed'
+  | 'cache_hit'
+  | 'cache_miss';
+
+export interface ValidationEventEmitter {
+  on(event: ValidationEventType, listener: (event: ValidationEvent) => void): void;
+  off(event: ValidationEventType, listener: (event: ValidationEvent) => void): void;
+  emit(event: ValidationEventType, data: Omit<ValidationEvent, 'type' | 'timestamp'>): void;
 }

@@ -30,11 +30,44 @@ export { TooManyRequestsError } from '../errors/specialized-errors.js';
 export { ServiceUnavailableError } from '../errors/specialized-errors.js';
 export { CircuitBreaker } from '../patterns/circuit-breaker.js';
 
-// Legacy AppError for exact compatibility
-export { AppError } from '../errors/specialized-errors.js';
-
 // Deprecation warnings
 console.warn(
   '[DEPRECATED] Importing from errors is deprecated. ' +
   'Please import from @shared/core/observability/error-management instead.'
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

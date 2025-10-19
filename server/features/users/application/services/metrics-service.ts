@@ -124,3 +124,39 @@ export const recordOperationMetrics = MetricsService.getInstance().recordOperati
 export const recordMetric = MetricsService.getInstance().recordMetric.bind(MetricsService.getInstance());
 export const incrementCounter = MetricsService.getInstance().incrementCounter.bind(MetricsService.getInstance());
 export const recordTiming = MetricsService.getInstance().recordTiming.bind(MetricsService.getInstance());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

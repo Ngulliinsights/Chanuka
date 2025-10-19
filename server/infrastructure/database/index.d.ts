@@ -1,7 +1,7 @@
 import { type Store } from 'express-session';
 import { type Redis } from 'ioredis';
 import { type Pool } from 'pg';
-import { type Bill, type Stakeholder } from '../../shared/schema.js';
+import { type Bill, type Stakeholder } from '../../shared/schema';
 import { CommentStorage } from './comment-storage.js';
 import { ProgressStorage } from '../../features/analytics/storage/progress.storage.js';
 import { SocialShareStorage } from './social-share-storage.js';
@@ -45,6 +45,43 @@ export { ProgressStorage } from '../../features/analytics/storage/progress.stora
 export { SocialShareStorage } from './social-share-storage.js';
 export { UserStorage } from './user-storage.js';
 export declare function isError(err: unknown): err is Error;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

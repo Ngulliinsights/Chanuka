@@ -6,7 +6,7 @@ import {
   sponsors,
   sponsorTransparency,
   notifications
-} from "@shared/schema.js";
+} from "../../../../shared/schema/schema.js";
 import { eq, gte, and, sql, desc, inArray } from "drizzle-orm";
 import { PgDatabase } from "drizzle-orm/pg-core";
 import { CacheService } from "../../../infrastructure/cache/cache-service.js";
@@ -1261,3 +1261,40 @@ export type {
   CompletenessScore,
   SystemHealthStatus
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

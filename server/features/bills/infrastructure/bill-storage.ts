@@ -2,16 +2,15 @@ import { eq, and, desc, inArray, sql } from "drizzle-orm";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import type { ExtractTablesWithRelations } from "drizzle-orm";
-import { BaseStorage, type StorageConfig } from "../../infrastructure/database/base/BaseStorage.js";
-import { readDatabase } from '../../db.js';
+import { BaseStorage, type StorageConfig } from "../../../infrastructure/database/base/BaseStorage.js";
+import { readDatabase } from '../../../../shared/database/connection';
 import {
-  bills,
-  billTags,
+  bill as bills,
+  billTag as billTags,
   type Bill,
-  type InsertBill,
-  schema
-} from "../../../shared/schema.js";
-import { logger } from '../../utils/logger';
+  type InsertBill
+} from "../../../../shared/schema";
+import { logger } from '../../../../shared/core/index.js';
 
 // Cache configuration constants - these control cache behavior across the application
 const CACHE_TTL = 300; // Cache time-to-live in seconds (5 minutes default)
@@ -30,11 +29,7 @@ const CACHE_INVALIDATION = {
 } as const;
 
 // Type alias for transaction to improve readability
-type DbTransaction = PgTransaction<
-  NodePgQueryResultHKT,
-  typeof schema,
-  ExtractTablesWithRelations<typeof schema>
->;
+type DbTransaction = any;
 
 /**
  * Enhanced BillStorage class with optimized Drizzle ORM operations
@@ -112,8 +107,8 @@ export class BillStorage extends BaseStorage<Bill> {
     return this.getCached(
       CACHE_KEY.BILL_BY_ID(id),
       async () => {
-  const result = await readDatabase().select().from(bills).where(eq(bills.id, id));
-  return result[0];
+        const result = await readDatabase().select().from(bills).where(eq(bills.id, id));
+        return result[0];
       },
       CACHE_TTL
     );
@@ -153,7 +148,7 @@ export class BillStorage extends BaseStorage<Bill> {
       const newBill = result[0];
 
       // Invalidate all caches since we've added a new bill
-      await this.invalidateCache(CACHE_INVALIDATION.FULL);
+      await this.invalidateCache([...CACHE_INVALIDATION.FULL]);
 
       return newBill;
     });
@@ -332,12 +327,12 @@ export class BillStorage extends BaseStorage<Bill> {
       CACHE_KEY.BILLS_BY_TAGS(cleanTags),
       async () => {
         // Get bill IDs that have all the specified tags
-      const billIdsWithTags = await readDatabase()
-        .select({ billId: billTags.billId })
-        .from(billTags)
-        .where(inArray(billTags.tag, cleanTags))
-        .groupBy(billTags.billId)
-        .having(sql`COUNT(DISTINCT ${billTags.tag}) = ${cleanTags.length}`);
+        const billIdsWithTags = await readDatabase()
+          .select({ billId: billTags.billId })
+          .from(billTags)
+          .where(inArray(billTags.tag, cleanTags))
+          .groupBy(billTags.billId)
+          .having(sql`COUNT(DISTINCT ${billTags.tag}) = ${cleanTags.length}`);
 
         if (billIdsWithTags.length === 0) {
           return [];
@@ -388,8 +383,7 @@ export class BillStorage extends BaseStorage<Bill> {
         return await callback(tx);
       } catch (error) {
         const enhancedError = new Error(
-          `Transaction failed: ${
-            error instanceof Error ? error.message : "Unknown error"
+          `Transaction failed: ${error instanceof Error ? error.message : "Unknown error"
           }`
         );
 
@@ -484,3 +478,40 @@ export class BillStorage extends BaseStorage<Bill> {
 
 // Export singleton instance for consistent usage across the application
 export const billStorage = BillStorage.getInstance();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
