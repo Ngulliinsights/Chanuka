@@ -15,18 +15,60 @@ import type {
 // ============================================================================
 // TYPESCRIPT TYPES
 // ============================================================================
+// NOTE: This file historically exposed a mix of Zod-derived (validation) types
+// and Drizzle-inferred DB row types under the same names which led to
+// ambiguity. We're making Drizzle (DB) row shapes the canonical types for
+// domain entities and installing explicit aliases for Zod "select" schemas
+// as `*Dto` (data transfer / validation shapes). Where a DB table exists we
+// export three symbols:
+//   - <Name>Row  => the Drizzle-inferred DB row shape
+//   - <Name>Dto  => the Zod-derived select/validation shape
+//   - <Name>     => canonical alias pointing to <Name>Row (for minimal churn)
 
-// Select Types (Inferred from Zod)
-export type User = z.infer<typeof validation.selectUserSchema>;
-export type UserProfile = z.infer<typeof validation.selectUserProfileSchema>;
-export type Bill = z.infer<typeof validation.selectBillSchema>;
-export type Sponsor = z.infer<typeof validation.selectSponsorSchema>;
-export type Analysis = z.infer<typeof validation.selectAnalysisSchema>;
-export type Stakeholder = z.infer<typeof validation.selectStakeholderSchema>;
-export type Notification = z.infer<typeof validation.selectNotificationSchema>;
-export type ComplianceCheck = z.infer<typeof validation.selectComplianceCheckSchema>;
-export type SocialShare = z.infer<typeof validation.selectSocialShareSchema>;
-export type Verification = z.infer<typeof validation.selectVerificationSchema>;
+// Zod-derived DTOs (keep original validation schemas accessible)
+export type UserDto = z.infer<typeof validation.selectUserSchema>;
+export type UserProfileDto = z.infer<typeof validation.selectUserProfileSchema>;
+export type BillDto = z.infer<typeof validation.selectBillSchema>;
+export type SponsorDto = z.infer<typeof validation.selectSponsorSchema>;
+export type AnalysisDto = z.infer<typeof validation.selectAnalysisSchema>;
+export type StakeholderDto = z.infer<typeof validation.selectStakeholderSchema>;
+export type NotificationDto = z.infer<typeof validation.selectNotificationSchema>;
+export type ComplianceCheckDto = z.infer<typeof validation.selectComplianceCheckSchema>;
+export type SocialShareDto = z.infer<typeof validation.selectSocialShareSchema>;
+export type VerificationDto = z.infer<typeof validation.selectVerificationSchema>;
+
+// When a corresponding Drizzle table exists we expose the DB row type and
+// make it the canonical exported name. The DB table bindings are imported
+// from `./schema` at the top of this file (see imports).
+export type UserRow = typeof user.$inferSelect;
+export type User = UserRow;
+
+export type UserProfileRow = typeof userProfile.$inferSelect;
+export type UserProfile = UserProfileRow;
+
+export type BillRow = typeof bill.$inferSelect;
+export type Bill = BillRow;
+
+export type SponsorRow = typeof sponsor.$inferSelect;
+export type Sponsor = SponsorRow;
+
+export type AnalysisRow = typeof analysis.$inferSelect;
+export type Analysis = AnalysisRow;
+
+export type StakeholderRow = typeof stakeholder.$inferSelect;
+export type Stakeholder = StakeholderRow;
+
+export type NotificationRow = typeof notification.$inferSelect;
+export type Notification = NotificationRow;
+
+export type ComplianceCheckRow = typeof complianceCheck.$inferSelect;
+export type ComplianceCheck = ComplianceCheckRow;
+
+export type SocialShareRow = typeof socialShare.$inferSelect;
+export type SocialShare = SocialShareRow;
+
+export type VerificationRow = typeof verification.$inferSelect;
+export type Verification = VerificationRow;
 
 // Select Types (Inferred from Drizzle Table)
 export type Session = typeof session.$inferSelect;
