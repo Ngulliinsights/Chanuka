@@ -1,131 +1,36 @@
 import { randomBytes } from 'crypto';
-import { AsyncLocalStorage } from 'async_hooks';
+import { Result, Ok, Err } from '../../primitives/types';
+import { BaseError } from '../../primitives/errors';
 import {
-  Tracer,
-  Span,
-  SpanContext,
+  Tracer as ITracer,
+  Span as ISpan,
   SpanOptions,
-  TraceContext,
-  SpanKind,
-  SpanStatus,
   SamplingResult,
-  Sampler,
   SamplingConfig,
+  SamplingRule,
+  TraceExporter,
+  BatchSpanProcessor,
+  TracingConfig,
   DEFAULT_CONFIG,
-  TRACE_HEADER_W3C,
-  TRACE_HEADER_JAEGER,
-  TRACE_HEADER_B3,
+  Resource,
+  InstrumentationScope,
 } from './types';
+import { Span, createSpan, generateSpanId, generateTraceId } from './span';
+import { TraceContextManager, traceContextManager, withTraceContext, withTraceContextAsync } from './context';
 
-// ==================== Span Implementation ====================
-
-class SpanImpl implements Span {
-  private _context: SpanContext;
-  private ended = false;
-  private readonly tracer: TracerImpl;
-
-  constructor(
-    tracer: TracerImpl,
-    name: string,
-    options: SpanOptions = {},
-    traceContext: TraceContext
-  ) {
-    this.tracer = tracer;
-
-    const startTime = options.startTime || new Date();
-    const spanId = this.generateSpanId();
-
-    this._context = {
-      traceId: traceContext.traceId,
-      spanId,
-      parentSpanId: traceContext.spanId !== spanId ? traceContext.spanId : undefined,
-      name,
-      kind: options.kind || 'internal',
-      startTime,
-      status: 'unset',
-      attributes: { ...options.attributes },
-      events: [],
-      links: options.links || [],
-      resource: tracer.resource,
-      instrumentationScope: tracer.instrumentationScope,
-    };
-
-    // Add links if provided
-    if (options.links) {
-      this._context.links.push(...options.links);
-    }
-  }
-
-  context(): SpanContext {
-    return { ...this._context };
-  }
-
-  setAttribute(key: string, value: string | number | boolean): Span {
-    if (!this.ended) {
-      this._context.attributes[key] = value;
-    }
-    return this;
-  }
-
-  setAttributes(attributes: Record<string, string | number | boolean>): Span {
-    if (!this.ended) {
-      Object.assign(this._context.attributes, attributes);
-    }
-    return this;
-  }
-
-  addEvent(name: string, attributes?: Record<string, string | number | boolean>): Span {
-    if (!this.ended) {
-      this._context.events.push({
-        name,
-        timestamp: new Date(),
-        attributes: attributes || {},
-      });
-    }
-    return this;
-  }
-
-  addLink(link: any): Span {
-    if (!this.ended) {
-      this._context.links.push(link);
-    }
-    return this;
-  }
-
-  setStatus(status: SpanStatus, message?: string): Span {
-    if (!this.ended) {
-      this._context.status = status;
-      if (message) {
-        this._context.statusMessage = message;
-      }
-    }
-    return this;
-  }
-
-  end(endTime?: Date): void {
-    if (this.ended) return;
-
-    this.ended = true;
-    const actualEndTime = endTime || new Date();
-    this._context.endTime = actualEndTime;
-    this._context.duration = actualEndTime.getTime() - this._context.startTime.getTime();
-
-    // Notify tracer that span has ended
-    this.tracer.onSpanEnd(this);
-  }
-
-  isRecording(): boolean {
-    return !this.ended;
-  }
-
-  private generateSpanId(): string {
-    return randomBytes(8).toString('hex');
+/**
+ * Tracer implementation error
+ */
+export class TracerError extends BaseError {
+  constructor(message: string, cause?: Error) {
+    super(message, { statusCode: 500, code: 'TRACER_ERROR', cause, isOperational: false });
   }
 }
 
-// ==================== Sampler Implementation ====================
-
-class ProbabilisticSampler implements Sampler {
+/**
+ * Probabilistic sampler implementation
+ */
+export class ProbabilisticSampler {
   private config: SamplingConfig;
 
   constructor(config: SamplingConfig) {
@@ -135,7 +40,7 @@ class ProbabilisticSampler implements Sampler {
   shouldSample(
     traceId: string,
     name: string,
-    kind?: SpanKind,
+    kind?: string,
     attributes?: Record<string, string | number | boolean>
   ): SamplingResult {
     // Check sampling rules first
@@ -159,9 +64,9 @@ class ProbabilisticSampler implements Sampler {
   }
 
   private matchesRule(
-    rule: any,
+    rule: SamplingRule,
     name: string,
-    kind?: SpanKind,
+    kind?: string,
     attributes?: Record<string, string | number | boolean>
   ): boolean {
     if (rule.name && !name.includes(rule.name)) return false;
@@ -177,226 +82,11 @@ class ProbabilisticSampler implements Sampler {
   }
 }
 
-// ==================== Tracer Implementation ====================
-
-export class TracerImpl implements Tracer {
-  private spans = new Map<string, SpanImpl>();
-  private activeSpans = new AsyncLocalStorage<SpanImpl>();
-  public readonly resource: any;
-  public readonly instrumentationScope: any;
-  private sampler: Sampler;
-  private processors: any[] = [];
-
-  constructor(
-    serviceName: string,
-    serviceVersion = '1.0.0',
-    samplingConfig: SamplingConfig = { rate: DEFAULT_CONFIG.DEFAULT_SAMPLING_RATE }
-  ) {
-    this.resource = {
-      attributes: {
-        'service.name': serviceName,
-        'service.version': serviceVersion,
-        'telemetry.sdk.name': 'custom-tracer',
-        'telemetry.sdk.version': '1.0.0',
-      },
-    };
-
-    this.instrumentationScope = {
-      name: serviceName,
-      version: serviceVersion,
-      attributes: {},
-    };
-
-    this.sampler = new ProbabilisticSampler(samplingConfig);
-  }
-
-  startSpan(name: string, options: SpanOptions = {}): Span {
-    // Get parent context
-    let parentContext: TraceContext;
-
-    if (options.parent) {
-      if ('context' in options.parent) {
-        // It's a Span
-        const spanContext = (options.parent as Span).context();
-        parentContext = {
-          traceId: spanContext.traceId,
-          spanId: spanContext.spanId,
-        };
-      } else {
-        // It's a TraceContext
-        parentContext = options.parent as TraceContext;
-      }
-    } else {
-      // Get from async local storage
-      const activeSpan = this.activeSpans.getStore();
-      if (activeSpan) {
-        const spanContext = activeSpan.context();
-        parentContext = {
-          traceId: spanContext.traceId,
-          spanId: spanContext.spanId,
-        };
-      } else {
-        // Create new trace
-        parentContext = {
-          traceId: this.generateTraceId(),
-          spanId: this.generateSpanId(),
-        };
-      }
-    }
-
-    // Check sampling
-    const samplingResult = this.sampler.shouldSample(
-      parentContext.traceId,
-      name,
-      options.kind,
-      options.attributes
-    );
-
-    if (samplingResult.decision === 'DROP') {
-      // Return a no-op span
-      return new NoOpSpan();
-    }
-
-    // Create new span
-    const span = new SpanImpl(this, name, options, parentContext);
-
-    // Store span
-    this.spans.set(span.context().spanId, span);
-
-    // Set as active span
-    this.activeSpans.run(span, () => {
-      // Span is now active in this context
-    });
-
-    return span;
-  }
-
-  getCurrentSpan(): Span | undefined {
-    return this.activeSpans.getStore();
-  }
-
-  setCurrentSpan(span: Span): void {
-    if (span instanceof SpanImpl) {
-      this.activeSpans.enterWith(span);
-    }
-  }
-
-  extract(carrier: any, format: string): TraceContext | undefined {
-    switch (format) {
-      case 'w3c':
-        return this.extractW3C(carrier);
-      case 'jaeger':
-        return this.extractJaeger(carrier);
-      case 'b3':
-        return this.extractB3(carrier);
-      default:
-        return undefined;
-    }
-  }
-
-  inject(spanContext: TraceContext, carrier: any, format: string): void {
-    switch (format) {
-      case 'w3c':
-        this.injectW3C(spanContext, carrier);
-        break;
-      case 'jaeger':
-        this.injectJaeger(spanContext, carrier);
-        break;
-      case 'b3':
-        this.injectB3(spanContext, carrier);
-        break;
-    }
-  }
-
-  onSpanEnd(span: SpanImpl): void {
-    // Notify processors
-    for (const processor of this.processors) {
-      processor.onEnd(span);
-    }
-
-    // Clean up
-    this.spans.delete(span.context().spanId);
-  }
-
-  addProcessor(processor: any): void {
-    this.processors.push(processor);
-  }
-
-  private generateTraceId(): string {
-    return randomBytes(16).toString('hex');
-  }
-
-  private generateSpanId(): string {
-    return randomBytes(8).toString('hex');
-  }
-
-  private extractW3C(carrier: any): TraceContext | undefined {
-    const header = carrier[TRACE_HEADER_W3C];
-    if (!header || typeof header !== 'string') return undefined;
-
-    // Format: 00-traceId-spanId-sampled
-    const parts = header.split('-');
-    if (parts.length < 4) return undefined;
-
-    return {
-      traceId: parts[1],
-      spanId: parts[2],
-      sampled: parts[3] === '01',
-    };
-  }
-
-  private injectW3C(context: TraceContext, carrier: any): void {
-    const sampled = context.sampled ? '01' : '00';
-    carrier[TRACE_HEADER_W3C] = `00-${context.traceId}-${context.spanId}-${sampled}`;
-  }
-
-  private extractJaeger(carrier: any): TraceContext | undefined {
-    const header = carrier[TRACE_HEADER_JAEGER];
-    if (!header || typeof header !== 'string') return undefined;
-
-    // Format: traceId:spanId:parentSpanId:flags
-    const parts = header.split(':');
-    if (parts.length < 4) return undefined;
-
-    return {
-      traceId: parts[0],
-      spanId: parts[1],
-      parentSpanId: parts[2] !== '0' ? parts[2] : undefined,
-      sampled: (parseInt(parts[3], 10) & 1) === 1,
-    };
-  }
-
-  private injectJaeger(context: TraceContext, carrier: any): void {
-    const parentSpanId = context.parentSpanId || '0';
-    const flags = context.sampled ? '1' : '0';
-    carrier[TRACE_HEADER_JAEGER] = `${context.traceId}:${context.spanId}:${parentSpanId}:${flags}`;
-  }
-
-  private extractB3(carrier: any): TraceContext | undefined {
-    const traceId = carrier[TRACE_HEADER_B3];
-    const spanId = carrier['x-b3-spanid'];
-    const sampled = carrier['x-b3-sampled'];
-
-    if (!traceId || !spanId) return undefined;
-
-    return {
-      traceId,
-      spanId,
-      sampled: sampled === '1',
-    };
-  }
-
-  private injectB3(context: TraceContext, carrier: any): void {
-    carrier[TRACE_HEADER_B3] = context.traceId;
-    carrier['x-b3-spanid'] = context.spanId;
-    carrier['x-b3-sampled'] = context.sampled ? '1' : '0';
-  }
-}
-
-// ==================== No-Op Span ====================
-
-class NoOpSpan implements Span {
-  context(): SpanContext {
+/**
+ * No-op span for dropped spans
+ */
+export class NoOpSpan implements ISpan {
+  context(): any {
     return {
       traceId: '',
       spanId: '',
@@ -412,23 +102,23 @@ class NoOpSpan implements Span {
     };
   }
 
-  setAttribute(): Span {
+  setAttribute(): ISpan {
     return this;
   }
 
-  setAttributes(): Span {
+  setAttributes(): ISpan {
     return this;
   }
 
-  addEvent(): Span {
+  addEvent(): ISpan {
     return this;
   }
 
-  addLink(): Span {
+  addLink(): ISpan {
     return this;
   }
 
-  setStatus(): Span {
+  setStatus(): ISpan {
     return this;
   }
 
@@ -441,48 +131,418 @@ class NoOpSpan implements Span {
   }
 }
 
-// ==================== Factory Functions ====================
+/**
+ * Batch span processor
+ */
+export class BatchSpanProcessorImpl implements BatchSpanProcessor {
+  private spans: Span[] = [];
+  private exporter: TraceExporter;
+  private maxBatchSize: number;
+  private maxQueueSize: number;
+  private exportTimeout: number;
+  private scheduledDelay: number;
+  private timer?: NodeJS.Timeout;
+  private exporting = false;
 
+  constructor(
+    exporter: TraceExporter,
+    options: {
+      maxBatchSize?: number;
+      maxQueueSize?: number;
+      exportTimeout?: number;
+      scheduledDelay?: number;
+    } = {}
+  ) {
+    this.exporter = exporter;
+    this.maxBatchSize = options.maxBatchSize || DEFAULT_CONFIG.MAX_BATCH_SIZE;
+    this.maxQueueSize = options.maxQueueSize || DEFAULT_CONFIG.MAX_QUEUE_SIZE;
+    this.exportTimeout = options.exportTimeout || DEFAULT_CONFIG.EXPORT_TIMEOUT_MS;
+    this.scheduledDelay = options.scheduledDelay || DEFAULT_CONFIG.SCHEDULED_DELAY_MS;
+  }
+
+  onStart(span: ISpan): void {
+    // Optional: implement span start hooks
+  }
+
+  onEnd(span: ISpan): void {
+    if (!(span instanceof Span) || !span.isRecording()) {
+      return;
+    }
+
+    this.spans.push(span);
+
+    if (this.spans.length >= this.maxBatchSize) {
+      this.exportSpans();
+    } else if (!this.timer) {
+      this.scheduleExport();
+    }
+  }
+
+  async forceFlush(): Promise<void> {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = undefined;
+    }
+
+    if (this.spans.length > 0) {
+      await this.exportSpans();
+    }
+  }
+
+  async shutdown(): Promise<void> {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = undefined;
+    }
+
+    if (this.spans.length > 0) {
+      await this.exportSpans();
+    }
+  }
+
+  private scheduleExport(): void {
+    this.timer = setTimeout(() => {
+      this.timer = undefined;
+      this.exportSpans();
+    }, this.scheduledDelay);
+  }
+
+  private async exportSpans(): Promise<void> {
+    if (this.exporting || this.spans.length === 0) {
+      return;
+    }
+
+    this.exporting = true;
+    const spansToExport = this.spans.splice(0);
+
+    try {
+      await Promise.race([
+        this.exporter.export(spansToExport.map(span => span.context())),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Export timeout')), this.exportTimeout)
+        ),
+      ]);
+    } catch (error) {
+      console.error('Failed to export spans:', error);
+      // In a real implementation, you might want to retry or buffer failed exports
+    } finally {
+      this.exporting = false;
+    }
+  }
+}
+
+/**
+ * Comprehensive tracer implementation
+ */
+export class Tracer implements ITracer {
+  private resource: Resource;
+  private instrumentationScope: InstrumentationScope;
+  private sampler: ProbabilisticSampler;
+  private processors: BatchSpanProcessor[] = [];
+  private activeSpans = new Map<string, Span>();
+  private correlationIdGenerator: () => string;
+
+  constructor(
+    serviceName: string,
+    serviceVersion = '1.0.0',
+    samplingConfig: SamplingConfig = { rate: DEFAULT_CONFIG.DEFAULT_SAMPLING_RATE },
+    resourceAttributes: Record<string, string | number | boolean> = {}
+  ) {
+    this.resource = {
+      attributes: {
+        'service.name': serviceName,
+        'service.version': serviceVersion,
+        'telemetry.sdk.name': 'custom-tracer',
+        'telemetry.sdk.version': '1.0.0',
+        ...resourceAttributes,
+      },
+    };
+
+    this.instrumentationScope = {
+      name: serviceName,
+      version: serviceVersion,
+      attributes: {},
+    };
+
+    this.sampler = new ProbabilisticSampler(samplingConfig);
+    this.correlationIdGenerator = () => `corr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  /**
+   * Start a new span
+   */
+  startSpan(name: string, options: SpanOptions = {}): ISpan {
+    // Get parent context
+    let parentContext = this.getParentContext(options);
+
+    // Check sampling
+    const samplingResult = this.sampler.shouldSample(
+      parentContext.traceId,
+      name,
+      options.kind,
+      options.attributes
+    );
+
+    if (samplingResult.decision === 'DROP') {
+      return new NoOpSpan();
+    }
+
+    // Generate span ID
+    const spanId = generateSpanId();
+
+    // Create span
+    const span = createSpan(
+      parentContext.traceId,
+      spanId,
+      name,
+      {
+        kind: options.kind,
+        parentSpanId: parentContext.spanId,
+        startTime: options.startTime,
+        resource: this.resource,
+        instrumentationScope: this.instrumentationScope,
+        attributes: options.attributes,
+        links: options.links,
+      }
+    );
+
+    // Store active span
+    this.activeSpans.set(spanId, span);
+
+    // Set as current span in context
+    const traceContext = {
+      traceId: parentContext.traceId,
+      spanId,
+      parentSpanId: parentContext.spanId,
+      sampled: true,
+    };
+
+    // Run with trace context
+    return this.withSpanContext(span, traceContext);
+  }
+
+  /**
+   * Get the currently active span
+   */
+  currentSpan(): ISpan | undefined {
+    const context = traceContextManager.getCurrentContext();
+    if (context) {
+      return this.activeSpans.get(context.spanId);
+    }
+    return undefined;
+  }
+
+  /**
+   * Get the currently active span (alias for currentSpan)
+   */
+  getCurrentSpan(): ISpan | undefined {
+    return this.currentSpan();
+  }
+
+  /**
+   * Set the currently active span
+   */
+  setCurrentSpan(span: ISpan): void {
+    if (span instanceof Span) {
+      const context = span.context();
+      const traceContext = {
+        traceId: context.traceId,
+        spanId: context.spanId,
+        parentSpanId: context.parentSpanId,
+        sampled: true,
+      };
+      traceContextManager.setCurrentContext(traceContext);
+    }
+  }
+
+  /**
+   * Extract trace context from carrier
+   */
+  extract(carrier: any, format: string = 'w3c'): any {
+    return traceContextManager.extract(carrier, format);
+  }
+
+  /**
+   * Inject trace context into carrier
+   */
+  inject(spanContext: any, carrier: any, format: string = 'w3c'): void {
+    return traceContextManager.inject(spanContext, carrier, format);
+  }
+
+  /**
+   * Execute function with span context
+   */
+  withSpan<T>(span: ISpan, fn: () => T): T {
+    if (!(span instanceof Span)) {
+      return fn();
+    }
+
+    const context = span.context();
+    const traceContext = {
+      traceId: context.traceId,
+      spanId: context.spanId,
+      parentSpanId: context.parentSpanId,
+      sampled: true,
+    };
+
+    return withTraceContext(traceContext, () => {
+      this.setCurrentSpan(span);
+      return fn();
+    });
+  }
+
+  /**
+   * Execute async function with span context
+   */
+  async withSpanAsync<T>(span: ISpan, fn: () => Promise<T>): Promise<T> {
+    if (!(span instanceof Span)) {
+      return fn();
+    }
+
+    const context = span.context();
+    const traceContext = {
+      traceId: context.traceId,
+      spanId: context.spanId,
+      parentSpanId: context.parentSpanId,
+      sampled: true,
+    };
+
+    return withTraceContextAsync(traceContext, async () => {
+      this.setCurrentSpan(span);
+      return await fn();
+    });
+  }
+
+  /**
+   * Add a span processor
+   */
+  addProcessor(processor: BatchSpanProcessor): void {
+    this.processors.push(processor);
+  }
+
+  /**
+   * Get resource
+   */
+  getResource(): Resource {
+    return { ...this.resource };
+  }
+
+  /**
+   * Get instrumentation scope
+   */
+  getInstrumentationScope(): InstrumentationScope {
+    return { ...this.instrumentationScope };
+  }
+
+  /**
+   * Generate correlation ID
+   */
+  generateCorrelationId(): string {
+    return this.correlationIdGenerator();
+  }
+
+  /**
+   * End span and notify processors
+   */
+  endSpan(span: Span): void {
+    if (!span.isRecording()) {
+      return;
+    }
+
+    span.end();
+
+    // Notify processors
+    for (const processor of this.processors) {
+      processor.onEnd(span);
+    }
+
+    // Clean up
+    this.activeSpans.delete(span.context().spanId);
+  }
+
+  /**
+   * Get parent context from options or current context
+   */
+  private getParentContext(options: SpanOptions): { traceId: string; spanId: string } {
+    // Check if parent span is provided
+    if (options.parent) {
+      if ('context' in options.parent) {
+        // It's a Span
+        const spanContext = (options.parent as ISpan).context();
+        return {
+          traceId: spanContext.traceId,
+          spanId: spanContext.spanId,
+        };
+      } else {
+        // It's a TraceContext
+        const traceContext = options.parent as any;
+        return {
+          traceId: traceContext.traceId,
+          spanId: traceContext.spanId,
+        };
+      }
+    }
+
+    // Get from current context
+    const currentContext = traceContextManager.getCurrentContext();
+    if (currentContext) {
+      return {
+        traceId: currentContext.traceId,
+        spanId: currentContext.spanId,
+      };
+    }
+
+    // Create new trace
+    return {
+      traceId: generateTraceId(),
+      spanId: generateSpanId(),
+    };
+  }
+
+  /**
+   * Wrap span with context management
+   */
+  private withSpanContext(span: Span, traceContext: any): Span {
+    // Create a proxy that automatically manages context
+    const proxy = new Proxy(span, {
+      get: (target, prop) => {
+        if (prop === 'end') {
+          return () => {
+            target.end();
+            this.endSpan(target);
+          };
+        }
+        return (target as any)[prop];
+      },
+    });
+
+    return proxy;
+  }
+}
+
+/**
+ * Create a new tracer instance
+ */
 export function createTracer(
   serviceName: string,
   serviceVersion?: string,
-  samplingConfig?: SamplingConfig
+  samplingConfig?: SamplingConfig,
+  resourceAttributes?: Record<string, string | number | boolean>
 ): Tracer {
-  return new TracerImpl(serviceName, serviceVersion, samplingConfig);
+  return new Tracer(serviceName, serviceVersion, samplingConfig, resourceAttributes);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * Create a batch span processor
+ */
+export function createBatchSpanProcessor(
+  exporter: TraceExporter,
+  options?: {
+    maxBatchSize?: number;
+    maxQueueSize?: number;
+    exportTimeout?: number;
+    scheduledDelay?: number;
+  }
+): BatchSpanProcessor {
+  return new BatchSpanProcessorImpl(exporter, options);
+}

@@ -1,0 +1,771 @@
+/**
+ * Chanuka Design System - Component Design Standards
+ * Comprehensive CSS implementation of all design standards
+ */
+
+/* ===== KEYFRAMES ===== */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== INTERACTIVE STATES ===== */
+.chanuka-interactive-default,
+.chanuka-interactive-button,
+.chanuka-interactive-card,
+.chanuka-interactive-input,
+.chanuka-interactive-link {
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Button Interactive States */
+.chanuka-interactive-button:hover:not(:disabled):not([aria-disabled="true"]) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.chanuka-interactive-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px #f38a1f80;
+}
+
+.chanuka-interactive-button:active:not(:disabled):not([aria-disabled="true"]) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.chanuka-interactive-button:disabled,
+.chanuka-interactive-button[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+  background-color: #f5f5f5;
+  color: #9ca3af;
+  border-color: #f5f5f5;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Card Interactive States */
+.chanuka-interactive-card:hover:not(:disabled):not([aria-disabled="true"]) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border-color: #d1d5db;
+}
+
+.chanuka-interactive-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px #f38a1f80;
+  border-color: #f38a1f;
+}
+
+.chanuka-interactive-card:active:not(:disabled):not([aria-disabled="true"]) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Input Interactive States */
+.chanuka-interactive-input:hover:not(:disabled):not([aria-disabled="true"]) {
+  border-color: #f38a1f;
+  box-shadow: 0 0 0 3px #f38a1f80;
+}
+
+.chanuka-interactive-input:focus-visible {
+  outline: none;
+  border-color: #f38a1f;
+  box-shadow: 0 0 0 3px #f38a1f80;
+  background-color: rgba(243, 138, 31, 0.1);
+}
+
+/* ===== LOADING STATES ===== */
+.chanuka-spinner {
+  display: inline-block;
+  border: 2px solid #e5e5e5;
+  border-top: 2px solid #f38a1f;
+  border-radius: 50%;
+  animation: spin 500ms linear infinite;
+}
+
+.chanuka-spinner-small {
+  width: 16px;
+  height: 16px;
+  border-width: 2px;
+}
+
+.chanuka-spinner-medium {
+  width: 24px;
+  height: 24px;
+  border-width: 2px;
+}
+
+.chanuka-spinner-large {
+  width: 32px;
+  height: 32px;
+  border-width: 3px;
+}
+
+.chanuka-spinner-xlarge {
+  width: 48px;
+  height: 48px;
+  border-width: 4px;
+}
+
+.chanuka-skeleton {
+  background-color: #e5e5e5;
+  border-radius: 0.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.chanuka-skeleton::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #fafafa, transparent);
+  animation: shimmer 500ms ease-in-out infinite;
+}
+
+.chanuka-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  z-index: 10;
+  backdrop-filter: blur(2px);
+}
+
+.chanuka-progress-bar {
+  width: 100%;
+  height: 4px;
+  background-color: #e5e5e5;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.chanuka-progress-fill {
+  height: 100%;
+  background-color: #f38a1f;
+  border-radius: 9999px;
+  transition: width 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.chanuka-progress-indeterminate {
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #f38a1f, transparent);
+  animation: shimmer 500ms ease-in-out infinite;
+}
+
+/* ===== ERROR STATES ===== */
+.chanuka-error {
+  border-radius: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  animation: fadeIn 250ms cubic-bezier(0, 0, 0.2, 1);
+  border: 1px solid;
+}
+
+.chanuka-error-info {
+  background-color: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e40af;
+}
+
+.chanuka-error-warning {
+  background-color: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.chanuka-error-error {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.chanuka-error-critical {
+  background-color: #ef4444;
+  border-color: #dc2626;
+  color: #ffffff;
+  box-shadow: 0 10px 25px rgba(239, 68, 68, 0.25);
+}
+
+.chanuka-error-title {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+  margin-bottom: 0.25rem;
+}
+
+.chanuka-error-description {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.chanuka-error-details {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  margin-top: 0.25rem;
+  white-space: pre-wrap;
+  overflow: auto;
+  max-height: 200px;
+}
+
+.chanuka-error-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.chanuka-error-action-primary {
+  background-color: #f38a1f;
+  color: #ffffff;
+  border: none;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 150ms cubic-bezier(0, 0, 0.2, 1), background-color 150ms cubic-bezier(0, 0, 0.2, 1), border-color 150ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.chanuka-error-action-primary:hover {
+  background-color: #ea580c;
+}
+
+.chanuka-error-action-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #f38a1f80;
+}
+
+.chanuka-error-action-secondary {
+  background-color: transparent;
+  color: inherit;
+  border: 1px solid currentColor;
+  border-radius: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 150ms cubic-bezier(0, 0, 0.2, 1), background-color 150ms cubic-bezier(0, 0, 0.2, 1), border-color 150ms cubic-bezier(0, 0, 0.2, 1);
+  opacity: 0.8;
+}
+
+.chanuka-error-action-secondary:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.chanuka-error-action-secondary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #f38a1f80;
+}
+
+.chanuka-error-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+  color: #dc2626;
+  margin-top: 0.25rem;
+}
+
+.chanuka-error-inline-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.chanuka-error-inline-message {
+  line-height: 1.4;
+}
+
+.chanuka-error-boundary {
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  border: 2px dashed #e5e7eb;
+}
+
+.chanuka-error-boundary-icon {
+  width: 64px;
+  height: 64px;
+  color: #ef4444;
+  margin-bottom: 2rem;
+}
+
+.chanuka-error-boundary-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #171717;
+  margin-bottom: 0.5rem;
+}
+
+.chanuka-error-boundary-description {
+  font-size: 1rem;
+  color: #525252;
+  margin-bottom: 2rem;
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+/* ===== EMPTY STATES ===== */
+.chanuka-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem;
+  min-height: 300px;
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  border: 2px dashed #e5e7eb;
+  animation: fadeIn 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.chanuka-empty-compact {
+  min-height: 200px;
+  padding: 2rem;
+}
+
+.chanuka-empty-standard {
+  min-height: 300px;
+  padding: 3rem;
+}
+
+.chanuka-empty-spacious {
+  min-height: 400px;
+  padding: 4rem;
+}
+
+.chanuka-empty-dashboard {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chanuka-empty-modal {
+  background-color: transparent;
+  border: none;
+  padding: 2rem;
+}
+
+.chanuka-empty-page {
+  background-color: #ffffff;
+  border: none;
+  min-height: 60vh;
+}
+
+.chanuka-empty-sidebar {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  min-height: 250px;
+  padding: 2rem;
+}
+
+.chanuka-empty-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 2rem;
+  opacity: 0.8;
+}
+
+.chanuka-empty-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #171717;
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.chanuka-empty-description {
+  font-size: 1rem;
+  color: #525252;
+  margin-bottom: 1rem;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.chanuka-empty-suggestion {
+  font-size: 0.875rem;
+  color: #737373;
+  margin-bottom: 2rem;
+  max-width: 350px;
+  line-height: 1.4;
+}
+
+.chanuka-empty-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.chanuka-empty-action-primary {
+  background-color: #f38a1f;
+  color: #ffffff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 150ms cubic-bezier(0, 0, 0.2, 1), background-color 150ms cubic-bezier(0, 0, 0.2, 1), border-color 150ms cubic-bezier(0, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chanuka-empty-action-primary:hover {
+  background-color: #ea580c;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.chanuka-empty-action-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #f38a1f80;
+}
+
+.chanuka-empty-action-secondary {
+  background-color: transparent;
+  color: #404040;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.5rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 150ms cubic-bezier(0, 0, 0.2, 1), background-color 150ms cubic-bezier(0, 0, 0.2, 1), border-color 150ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.chanuka-empty-action-secondary:hover {
+  background-color: #fafafa;
+  border-color: #d1d5db;
+}
+
+.chanuka-empty-action-secondary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #f38a1f80;
+}
+
+/* ===== TYPOGRAPHY ===== */
+.chanuka-typography {
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+}
+
+.chanuka-heading-h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: #171717;
+  margin-bottom: 2rem;
+}
+
+.chanuka-heading-h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  color: #171717;
+  margin-bottom: 1rem;
+}
+
+.chanuka-heading-h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  color: #171717;
+  margin-bottom: 1rem;
+}
+
+.chanuka-body-default {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #404040;
+  margin-bottom: 1rem;
+}
+
+.chanuka-body-large {
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.7;
+  color: #404040;
+  margin-bottom: 1rem;
+}
+
+.chanuka-body-small {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #525252;
+  margin-bottom: 0.5rem;
+}
+
+.chanuka-link-default {
+  color: #ea580c;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.125em;
+  transition: all 150ms ease-out;
+}
+
+.chanuka-link-default:hover {
+  color: #c2410c;
+  text-decoration-color: currentColor;
+}
+
+.chanuka-link-default:focus {
+  outline: none;
+  color: #c2410c;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: 2px;
+}
+
+.chanuka-specialized-code {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.4;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+  color: #c2410c;
+  background-color: #f5f5f5;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+}
+
+/* ===== CARDS ===== */
+.chanuka-card {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 150ms ease-out, box-shadow 150ms ease-out;
+  overflow: hidden;
+}
+
+.chanuka-card-elevated {
+  background-color: #ffffff;
+  border: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.chanuka-card-outlined {
+  background-color: #ffffff;
+  border: 2px solid #d1d5db;
+  box-shadow: none;
+}
+
+.chanuka-card-ghost {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.chanuka-card-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border-color: #d1d5db;
+}
+
+.chanuka-card-interactive:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px #f38a1f80;
+  border-color: #f38a1f;
+}
+
+.chanuka-card-interactive:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== BUTTONS ===== */
+.chanuka-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 150ms ease-out;
+  user-select: none;
+}
+
+.chanuka-btn-primary {
+  background-color: #f38a1f;
+  border-color: #f38a1f;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.chanuka-btn-primary:hover {
+  background-color: #ea580c;
+  border-color: #ea580c;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.chanuka-btn-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px #f38a1f80;
+}
+
+.chanuka-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.chanuka-btn-sm {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  min-height: 32px;
+  min-width: 32px;
+}
+
+.chanuka-btn-md {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  min-height: 40px;
+  min-width: 40px;
+}
+
+.chanuka-btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  min-height: 48px;
+  min-width: 48px;
+}
+
+.chanuka-btn-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+  background-color: #f5f5f5;
+  color: #9ca3af;
+  border-color: #f5f5f5;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ===== INPUTS ===== */
+.chanuka-input {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #171717;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.chanuka-input::placeholder {
+  color: #a3a3a3;
+}
+
+.chanuka-input:hover {
+  border-color: #d1d5db;
+}
+
+.chanuka-input:focus {
+  border-color: #f38a1f;
+  box-shadow: 0 0 0 3px #f38a1f80;
+  background-color: rgba(243, 138, 31, 0.1);
+}
+
+.chanuka-input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background-color: #f5f5f5;
+  color: #9ca3af;
+  border-color: #f5f5f5;
+}
+
+.chanuka-input-error {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.chanuka-input-error:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
+}
+
+/* ===== UTILITY CLASSES ===== */
+.chanuka-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.chanuka-focus-visible:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px #f38a1f80;
+}
+
+.chanuka-transition-all {
+  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chanuka-transition-colors {
+  transition: color 150ms cubic-bezier(0, 0, 0.2, 1), background-color 150ms cubic-bezier(0, 0, 0.2, 1), border-color 150ms cubic-bezier(0, 0, 0.2, 1);
+}

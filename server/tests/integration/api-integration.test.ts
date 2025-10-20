@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, jest } from '@je
 import request from 'supertest';
 import express from 'express';
 import cors from 'cors';
-import billsRouter from '../../features/bills/bills-router.js';
+import { router as billsRouter } from '../../features/bills/presentation/bills-router';
 import { router as sponsorsRouter } from '../../features/bills/sponsors.js';
 import { createFinancialDisclosureRouter } from '../../features/analytics/financial-disclosure/index.js';
 import { router as authRouter } from '../../core/auth/auth.js';

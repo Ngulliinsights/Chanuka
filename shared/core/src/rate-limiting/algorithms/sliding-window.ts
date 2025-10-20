@@ -1,128 +1,101 @@
-import { Redis } from 'ioredis';
-import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../types';
-import { logger } from '../../observability/logging';
+import { Result, ok, err } from '../../primitives/types/result';
+import { RateLimitAlgorithm } from './interfaces';
 
-export class SlidingWindowStore implements RateLimitStore {
-  private readonly luaScript = `
-    local key = KEYS[1]
-    local now = tonumber(ARGV[1])
-    local windowMs = tonumber(ARGV[2])
-    local limit = tonumber(ARGV[3])
-    local burstAllowance = tonumber(ARGV[4])
-    
-    -- Clean old scores
-    redis.call('ZREMRANGEBYSCORE', key, 0, now - windowMs)
-    
-    -- Count requests in current window
-    local windowHits = redis.call('ZCARD', key)
-    
-    -- Calculate current rate
-    local effectiveLimit = limit + (burstAllowance or 0)
-    local allowed = windowHits < effectiveLimit
-    
-    if allowed then
-      -- Record new request
-      redis.call('ZADD', key, now, now .. '-' .. math.random())
-      -- Extend key expiration
-      redis.call('PEXPIRE', key, windowMs)
-    end
-    
-    return {
-      tostring(allowed and 1 or 0),
-      tostring(math.max(0, effectiveLimit - windowHits - (allowed and 1 or 0))),
-      tostring(now + windowMs),
-      tostring(windowHits + (allowed and 1 or 0))
-    }
-  `;
+/**
+ * Configuration for SlidingWindow algorithm
+ */
+export interface SlidingWindowConfig {
+  /** Size of the sliding window in milliseconds */
+  windowSize: number;
+  /** Maximum number of requests allowed within the window */
+  maxRequests: number;
+}
 
+/**
+ * Sliding Window Rate Limiting Algorithm
+ *
+ * Implements the sliding window algorithm where requests are tracked within
+ * a moving time window. Requests are allowed only if the number of requests
+ * within the current window does not exceed the limit.
+ */
+export class SlidingWindow implements RateLimitAlgorithm {
   constructor(
-    private readonly redis: Redis,
-    private readonly keyPrefix: string = 'ratelimit'
+    private readonly config: SlidingWindowConfig,
+    private readonly store: Map<string, number[]> = new Map()
   ) {}
 
-  async check(key: string, config: RateLimitConfig): Promise<RateLimitResult> {
-    const now = Date.now();
-    const prefixedKey = `${this.keyPrefix}:${key}`;
-    const burstAllowance = Math.floor(config.limit * (config.burstAllowance || 0.2));
+  /**
+   * Check if a request is allowed within the sliding window
+   * @param key - The rate limit key
+   * @param cost - The cost of the request (default: 1)
+   * @returns Promise<Result<boolean>> - true if allowed, false if rate limited
+   */
+  async checkLimit(key: string, cost: number = 1): Promise<Result<boolean>> {
+    try {
+      const now = Date.now();
+      const windowStart = now - this.config.windowSize;
 
-    const [allowed, remaining, resetTime, totalHits] = await this.redis.eval(
-      this.luaScript,
-      1,
-      prefixedKey,
-      now,
-      config.windowMs,
-      config.limit,
-      burstAllowance
-    ) as [string, string, string, string];
+      // Get or initialize request timestamps for this key
+      let timestamps = this.store.get(key) ?? [];
 
-    return {
-      allowed: allowed === '1',
-      remaining: parseInt(remaining, 10),
-      resetTime: parseInt(resetTime, 10),
-      retryAfter: allowed === '1' ? undefined : Math.ceil((parseInt(resetTime, 10) - now) / 1000),
-      totalHits: parseInt(totalHits, 10),
-      windowStart: now - config.windowMs,
-      algorithm: 'sliding-window'
-    };
-  }
+      // Remove timestamps outside the current window
+      timestamps = timestamps.filter(timestamp => timestamp > windowStart);
 
-  async cleanup(): Promise<void> {
-    const keys = await this.redis.keys(`${this.keyPrefix}:*`);
-    if (keys.length > 0) {
-      await this.redis.del(...keys);
+      // Check if adding this request would exceed the limit
+      if (timestamps.length + cost > this.config.maxRequests) {
+        this.store.set(key, timestamps);
+        return ok(false);
+      }
+
+      // Add the current request timestamp(s)
+      for (let i = 0; i < cost; i++) {
+        timestamps.push(now);
+      }
+
+      this.store.set(key, timestamps);
+      return ok(true);
+    } catch (error) {
+      return err(error instanceof Error ? error : new Error('Sliding window check failed'));
     }
   }
 
-  async healthCheck(): Promise<boolean> {
+  /**
+   * Reset the rate limit for a key
+   * @param key - The rate limit key
+   * @returns Promise<Result<void>>
+   */
+  async reset(key: string): Promise<Result<void>> {
     try {
-      await this.redis.ping();
-      return true;
-    } catch {
-      return false;
+      this.store.delete(key);
+      return ok(undefined);
+    } catch (error) {
+      return err(error instanceof Error ? error : new Error('Sliding window reset failed'));
+    }
+  }
+
+  /**
+   * Get the remaining requests allowed for a key within the current window
+   * @param key - The rate limit key
+   * @returns Promise<Result<number>> - remaining request count
+   */
+  async getRemaining(key: string): Promise<Result<number>> {
+    try {
+      const now = Date.now();
+      const windowStart = now - this.config.windowSize;
+
+      // Get request timestamps for this key
+      let timestamps = this.store.get(key) ?? [];
+
+      // Remove timestamps outside the current window
+      timestamps = timestamps.filter(timestamp => timestamp > windowStart);
+
+      // Update the store with cleaned timestamps
+      this.store.set(key, timestamps);
+
+      const remaining = Math.max(0, this.config.maxRequests - timestamps.length);
+      return ok(remaining);
+    } catch (error) {
+      return err(error instanceof Error ? error : new Error('Sliding window get remaining failed'));
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

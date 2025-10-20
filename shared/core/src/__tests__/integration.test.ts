@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { MiddlewareConfig } from '../src/middleware/config';
-import { MiddlewareFactory } from '../src/middleware/factory';
-import { Logger } from '../src/logging';
-import { CacheService } from '../src/cache';
-import { ValidationService } from '../src/validation';
-import { RateLimitStore } from '../src/rate-limiting/types';
-import { HealthChecker } from '../src/health/health-checker';
+import { MiddlewareConfig } from '../middleware/config';
+import { MiddlewareFactory } from '../middleware/factory';
+import { Logger } from '../logging/logger';
+import { CacheService } from '../caching/core/interfaces';
+import { ValidationService } from '../validation/validation-service';
+import { RateLimitStore } from '../rate-limiting/types';
+import { HealthChecker } from '../health/health-checker';
 import express from 'express';
 import request from 'supertest';
 import { logger } from '../observability/logging';
@@ -17,11 +17,40 @@ describe('Core Utilities Integration Tests', () => {
 
   beforeAll(() => {
     // Setup mock dependencies
-    const logger = {} as Logger;
-    const cache = {} as CacheService;
-    const validator = {} as ValidationService;
-    const rateLimitStore = {} as RateLimitStore;
-    const healthChecker = {} as HealthChecker;
+    const logger = {
+      info: jest.fn(),
+      error: jest.fn(),
+      warn: jest.fn(),
+      debug: jest.fn(),
+    } as unknown as Logger;
+
+    const cache = {
+      get: jest.fn().mockResolvedValue(null),
+      set: jest.fn().mockResolvedValue(undefined),
+      delete: jest.fn().mockResolvedValue(undefined),
+      clear: jest.fn().mockResolvedValue(undefined),
+      has: jest.fn().mockResolvedValue(false),
+      getMetrics: jest.fn().mockResolvedValue({}),
+    } as unknown as CacheService;
+
+    const validator = {
+      validate: jest.fn().mockResolvedValue({ isValid: true, errors: [] }),
+      registerSchema: jest.fn().mockResolvedValue(undefined),
+      getSchema: jest.fn().mockReturnValue(null),
+      listSchemas: jest.fn().mockReturnValue([]),
+    } as unknown as ValidationService;
+
+    const rateLimitStore = {
+      check: jest.fn().mockResolvedValue({ allowed: true, remaining: 100, resetTime: Date.now() + 60000 }),
+      recordRequest: jest.fn().mockResolvedValue(undefined),
+      getState: jest.fn().mockResolvedValue({}),
+      reset: jest.fn().mockResolvedValue(undefined),
+    } as unknown as RateLimitStore;
+
+    const healthChecker = {
+      check: jest.fn().mockResolvedValue({ healthy: true, details: {} }),
+      getMetrics: jest.fn().mockResolvedValue({}),
+    } as unknown as HealthChecker;
 
     config = {
       logging: { enabled: true, priority: 10 },
@@ -39,20 +68,21 @@ describe('Core Utilities Integration Tests', () => {
       },
       errorHandler: { enabled: true, priority: 90 },
       global: {
-        enableLegacyMode: false,
-        enableDeprecationWarnings: true,
-        performanceMonitoring: true
+        enabled: true,
+        priority: 100,
+        performanceMonitoring: true,
+        metricsRetentionSize: 1000,
+        logMetricsInterval: 100
       }
     };
 
-    factory = new MiddlewareFactory(
-      config,
+    factory = new MiddlewareFactory(config, {
       logger,
       cache,
       validator,
       rateLimitStore,
       healthChecker
-    );
+    });
 
     app = express();
     factory.createMiddleware().forEach(middleware => middleware(app));

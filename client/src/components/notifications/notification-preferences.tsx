@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Bell, 
   Mail, 
@@ -19,10 +21,20 @@ import {
   TestTube,
   Save,
   Plus,
-  X
+  X,
+  Phone,
+  Globe,
+  TrendingUp,
+  Users,
+  Calendar,
+  AlertTriangle,
+  CheckCircle,
+  Info
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '../utils/logger.js';
+
+// --- INTERFACES ---
 
 interface NotificationChannel {
   enabled: boolean;
@@ -32,6 +44,15 @@ interface NotificationChannel {
     end: string;
     timezone: string;
   };
+}
+
+interface SmartFiltering {
+  enabled: boolean;
+  interestBasedFiltering: boolean;
+  priorityThreshold: 'low' | 'medium' | 'high';
+  categoryFilters: string[];
+  keywordFilters: string[];
+  sponsorFilters: string[];
 }
 
 interface NotificationPreferences {
@@ -46,12 +67,34 @@ interface NotificationPreferences {
     commentReplies: boolean;
     expertVerifications: boolean;
     systemAlerts: boolean;
-    weeklyDigest: boolean;
+    weeklyDigest: boolean; // Ensured this is present
   };
   interests: string[];
   batchingEnabled: boolean;
   minimumPriority: 'low' | 'medium' | 'high' | 'urgent';
+  smartFiltering: SmartFiltering;
 }
+
+// These interfaces were in the enhanced file and may be used elsewhere or in future features
+interface EngagementProfile {
+  userId: string;
+  topCategories: Array<{ category: string; score: number }>;
+  topSponsors: Array<{ sponsorId: number; name: string; score: number }>;
+  engagementLevel: 'low' | 'medium' | 'high';
+  preferredNotificationTimes: Array<{ hour: number; frequency: number }>;
+  averageResponseTime: number;
+}
+
+interface ChannelInfo {
+  type: string;
+  name: string;
+  description: string;
+  supported: boolean;
+  requiresSetup: boolean;
+  setupInstructions?: string;
+}
+
+// --- CONSTANTS ---
 
 const channelIcons = {
   inApp: Bell,
@@ -81,6 +124,8 @@ const priorityOptions = [
   { value: 'urgent', label: 'Urgent', color: 'bg-red-100 text-red-800' }
 ];
 
+const smartPriorityOptions = priorityOptions.filter(p => p.value !== 'urgent');
+
 const categoryLabels = {
   billUpdates: 'Bill Updates',
   commentReplies: 'Comment Replies',
@@ -89,11 +134,21 @@ const categoryLabels = {
   weeklyDigest: 'Weekly Digest'
 };
 
+// --- COMPONENT ---
+
 export function NotificationPreferences() {
   const [preferences, setPreferences] = useState<NotificationPreferences | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  
+  // State for interest tags
   const [newInterest, setNewInterest] = useState('');
+  
+  // State for smart filter tags
+  const [newKeyword, setNewKeyword] = useState('');
+  const [newCategoryFilter, setNewCategoryFilter] = useState('');
+  const [newSponsorFilter, setNewSponsorFilter] = useState('');
+
   const { toast } = useToast();
 
   useEffect(() => {
@@ -101,17 +156,14 @@ export function NotificationPreferences() {
   }, []);
 
   const fetchPreferences = async () => {
+    setLoading(true);
     try {
       const response = await fetch('/api/notifications/preferences', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch preferences');
-      }
-
+      if (!response.ok) throw new Error('Failed to fetch preferences');
       const data = await response.json();
       setPreferences(data.data);
     } catch (error) {
@@ -127,7 +179,6 @@ export function NotificationPreferences() {
 
   const savePreferences = async () => {
     if (!preferences) return;
-
     setSaving(true);
     try {
       const response = await fetch('/api/notifications/preferences', {
@@ -138,11 +189,7 @@ export function NotificationPreferences() {
         },
         body: JSON.stringify(preferences)
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to save preferences');
-      }
-
+      if (!response.ok) throw new Error('Failed to save preferences');
       toast({
         title: 'Success',
         description: 'Notification preferences saved successfully'
@@ -166,11 +213,7 @@ export function NotificationPreferences() {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to send test notification');
-      }
-
+      if (!response.ok) throw new Error('Failed to send test notification');
       toast({
         title: 'Test Sent',
         description: 'Test notification sent successfully'
@@ -184,23 +227,24 @@ export function NotificationPreferences() {
     }
   };
 
+  // --- PREFERENCE UPDATE HANDLERS ---
+
   const updateChannelPreference = (
     channel: keyof NotificationPreferences['channels'],
     field: keyof NotificationChannel,
     value: any
   ) => {
     if (!preferences) return;
-
-    setPreferences({
-      ...preferences,
+    setPreferences(prev => ({
+      ...prev!,
       channels: {
-        ...preferences.channels,
+        ...prev!.channels,
         [channel]: {
-          ...preferences.channels[channel],
+          ...prev!.channels[channel],
           [field]: value
         }
       }
-    });
+    }));
   };
 
   const updateCategoryPreference = (
@@ -208,44 +252,73 @@ export function NotificationPreferences() {
     enabled: boolean
   ) => {
     if (!preferences) return;
-
-    setPreferences({
-      ...preferences,
+    setPreferences(prev => ({
+      ...prev!,
       categories: {
-        ...preferences.categories,
+        ...prev!.categories,
         [category]: enabled
       }
-    });
+    }));
   };
+
+  const updateSmartFiltering = (field: keyof SmartFiltering, value: any) => {
+    if (!preferences) return;
+    setPreferences(prev => ({
+      ...prev!,
+      smartFiltering: {
+        ...prev!.smartFiltering,
+        [field]: value
+      }
+    }));
+  };
+
+  // --- TAG/INTEREST HANDLERS ---
 
   const addInterest = () => {
     if (!preferences || !newInterest.trim()) return;
-
     const interest = newInterest.trim().toLowerCase();
     if (preferences.interests.includes(interest)) {
-      toast({
-        title: 'Duplicate Interest',
-        description: 'This interest is already added',
-        variant: 'destructive'
-      });
+      toast({ title: 'Duplicate Interest', description: 'This interest is already added', variant: 'destructive' });
       return;
     }
-
-    setPreferences({
-      ...preferences,
-      interests: [...preferences.interests, interest]
-    });
+    setPreferences({ ...preferences, interests: [...preferences.interests, interest] });
     setNewInterest('');
   };
 
   const removeInterest = (interest: string) => {
     if (!preferences) return;
-
     setPreferences({
       ...preferences,
       interests: preferences.interests.filter(i => i !== interest)
     });
   };
+
+  const addSmartFilterItem = (
+    field: 'keywordFilters' | 'categoryFilters' | 'sponsorFilters',
+    value: string,
+    resetFn: React.Dispatch<React.SetStateAction<string>>
+  ) => {
+    if (!preferences || !value.trim()) return;
+    const normalizedValue = value.trim().toLowerCase();
+    const currentFilters = preferences.smartFiltering[field];
+    if (currentFilters.includes(normalizedValue)) {
+      toast({ title: 'Duplicate Filter', description: 'This filter is already added', variant: 'destructive' });
+      return;
+    }
+    updateSmartFiltering(field, [...currentFilters, normalizedValue]);
+    resetFn('');
+  };
+
+  const removeSmartFilterItem = (
+    field: 'keywordFilters' | 'categoryFilters' | 'sponsorFilters',
+    value: string
+  ) => {
+    if (!preferences) return;
+    const currentFilters = preferences.smartFiltering[field];
+    updateSmartFiltering(field, currentFilters.filter(item => item !== value));
+  };
+
+  // --- RENDER LOGIC ---
 
   if (loading) {
     return (
@@ -274,21 +347,11 @@ export function NotificationPreferences() {
           <p className="text-gray-600">Customize how and when you receive notifications</p>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={sendTestNotification}
-            className="flex items-center gap-2"
-          >
-            <TestTube className="h-4 w-4" />
-            Send Test
+          <Button variant="outline" onClick={sendTestNotification} className="flex items-center gap-2">
+            <TestTube className="h-4 w-4" /> Send Test
           </Button>
-          <Button
-            onClick={savePreferences}
-            disabled={saving}
-            className="flex items-center gap-2"
-          >
-            <Save className="h-4 w-4" />
-            {saving ? 'Saving...' : 'Save Changes'}
+          <Button onClick={savePreferences} disabled={saving} className="flex items-center gap-2">
+            <Save className="h-4 w-4" /> {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
       </div>
@@ -301,12 +364,12 @@ export function NotificationPreferences() {
           <TabsTrigger value="advanced">Advanced</TabsTrigger>
         </TabsList>
 
+        {/* --- CHANNELS TAB --- */}
         <TabsContent value="channels" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Settings className="h-5 w-5" />
-                Notification Channels
+                <Settings className="h-5 w-5" /> Notification Channels
               </CardTitle>
               <CardDescription>
                 Configure how you want to receive notifications for each channel
@@ -316,7 +379,6 @@ export function NotificationPreferences() {
               {Object.entries(preferences.channels).map(([channelKey, channel]) => {
                 const Icon = channelIcons[channelKey as keyof typeof channelIcons];
                 const label = channelLabels[channelKey as keyof typeof channelLabels];
-
                 return (
                   <div key={channelKey} className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -333,9 +395,7 @@ export function NotificationPreferences() {
                         checked={channel.enabled}
                         onCheckedChange={(enabled) =>
                           updateChannelPreference(
-                            channelKey as keyof NotificationPreferences['channels'],
-                            'enabled',
-                            enabled
+                            channelKey as keyof NotificationPreferences['channels'], 'enabled', enabled
                           )
                         }
                       />
@@ -350,15 +410,11 @@ export function NotificationPreferences() {
                               value={channel.frequency}
                               onValueChange={(value) =>
                                 updateChannelPreference(
-                                  channelKey as keyof NotificationPreferences['channels'],
-                                  'frequency',
-                                  value
+                                  channelKey as keyof NotificationPreferences['channels'], 'frequency', value
                                 )
                               }
                             >
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
+                              <SelectTrigger><SelectValue /></SelectTrigger>
                               <SelectContent>
                                 {frequencyOptions.map((option) => (
                                   <SelectItem key={option.value} value={option.value}>
@@ -378,8 +434,7 @@ export function NotificationPreferences() {
                                   value={channel.quietHours?.start || '22:00'}
                                   onChange={(e) =>
                                     updateChannelPreference(
-                                      channelKey as keyof NotificationPreferences['channels'],
-                                      'quietHours',
+                                      channelKey as keyof NotificationPreferences['channels'], 'quietHours',
                                       {
                                         ...channel.quietHours,
                                         start: e.target.value,
@@ -396,8 +451,7 @@ export function NotificationPreferences() {
                                   value={channel.quietHours?.end || '08:00'}
                                   onChange={(e) =>
                                     updateChannelPreference(
-                                      channelKey as keyof NotificationPreferences['channels'],
-                                      'quietHours',
+                                      channelKey as keyof NotificationPreferences['channels'], 'quietHours',
                                       {
                                         ...channel.quietHours,
                                         start: channel.quietHours?.start || '22:00',
@@ -414,7 +468,6 @@ export function NotificationPreferences() {
                         </div>
                       </div>
                     )}
-
                     <Separator />
                   </div>
                 );
@@ -423,12 +476,12 @@ export function NotificationPreferences() {
           </Card>
         </TabsContent>
 
+        {/* --- CATEGORIES TAB --- */}
         <TabsContent value="categories" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                Notification Categories
+                <Filter className="h-5 w-5" /> Notification Categories
               </CardTitle>
               <CardDescription>
                 Choose which types of notifications you want to receive
@@ -449,8 +502,7 @@ export function NotificationPreferences() {
                     checked={enabled}
                     onCheckedChange={(checked) =>
                       updateCategoryPreference(
-                        categoryKey as keyof NotificationPreferences['categories'],
-                        checked
+                        categoryKey as keyof NotificationPreferences['categories'], checked
                       )
                     }
                   />
@@ -460,12 +512,14 @@ export function NotificationPreferences() {
           </Card>
         </TabsContent>
 
+        {/* --- INTERESTS TAB --- */}
         <TabsContent value="interests" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Smart Filtering by Interests</CardTitle>
+              <CardTitle>Interests</CardTitle>
               <CardDescription>
-                Add topics you're interested in to receive more relevant notifications
+                Add topics you're interested in to receive more relevant notifications.
+                This works with "Interest-Based Filtering" in the Advanced tab.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -485,10 +539,7 @@ export function NotificationPreferences() {
                 {preferences.interests.map((interest) => (
                   <Badge key={interest} variant="secondary" className="flex items-center gap-1">
                     {interest}
-                    <button
-                      onClick={() => removeInterest(interest)}
-                      className="ml-1 hover:text-red-600"
-                    >
+                    <button onClick={() => removeInterest(interest)} className="ml-1 hover:text-red-600">
                       <X className="h-3 w-3" />
                     </button>
                   </Badge>
@@ -497,17 +548,18 @@ export function NotificationPreferences() {
 
               {preferences.interests.length === 0 && (
                 <p className="text-sm text-gray-500 italic">
-                  No interests added. Add some topics to get more relevant notifications.
+                  No interests added.
                 </p>
               )}
             </CardContent>
           </Card>
         </TabsContent>
 
+        {/* --- ADVANCED TAB --- */}
         <TabsContent value="advanced" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Advanced Settings</CardTitle>
+              <CardTitle>General Settings</CardTitle>
               <CardDescription>
                 Fine-tune your notification experience
               </CardDescription>
@@ -542,9 +594,7 @@ export function NotificationPreferences() {
                     })
                   }
                 >
-                  <SelectTrigger className="w-48">
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {priorityOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
@@ -558,11 +608,146 @@ export function NotificationPreferences() {
               </div>
             </CardContent>
           </Card>
+
+          {/* --- SMART FILTERING CARD --- */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Smart Filtering</CardTitle>
+              <CardDescription>
+                Advanced filtering to silence notifications that don't match your criteria.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label className="text-base font-medium">Enable Smart Filtering</Label>
+                  <p className="text-sm text-gray-500">
+                    Apply advanced filters to your notifications
+                  </p>
+                </div>
+                <Switch
+                  checked={preferences.smartFiltering.enabled}
+                  onCheckedChange={(checked) => updateSmartFiltering('enabled', checked)}
+                />
+              </div>
+
+              {preferences.smartFiltering.enabled && (
+                <div className="space-y-6 pl-4 border-l-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-base font-medium">Interest-Based Filtering</Label>
+                      <p className="text-sm text-gray-500">
+                        Only notify about topics in your 'Interests' list
+                      </p>
+                    </div>
+                    <Switch
+                      checked={preferences.smartFiltering.interestBasedFiltering}
+                      onCheckedChange={(checked) => updateSmartFiltering('interestBasedFiltering', checked)}
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label className="text-base font-medium">Smart Priority Threshold</Label>
+                    <p className="text-sm text-gray-500 mb-3">
+                      Only apply smart filters to notifications below this priority
+                    </p>
+                    <Select
+                      value={preferences.smartFiltering.priorityThreshold}
+                      onValueChange={(value) => updateSmartFiltering('priorityThreshold', value)}
+                    >
+                      <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {smartPriorityOptions.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            <div className="flex items-center gap-2">
+                              <Badge className={option.color}>{option.label}</Badge>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Keyword Filters */}
+                  <div className="space-y-3">
+                    <Label>Keyword Filters</Label>
+                    <p className="text-sm text-gray-500">
+                      Only receive notifications that contain these keywords
+                    </p>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Add a keyword"
+                        value={newKeyword}
+                        onChange={(e) => setNewKeyword(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && addSmartFilterItem('keywordFilters', newKeyword, setNewKeyword)}
+                      />
+                      <Button onClick={() => addSmartFilterItem('keywordFilters', newKeyword, setNewKeyword)} size="sm">
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <FilterBadgeList
+                      items={preferences.smartFiltering.keywordFilters}
+                      onRemove={(item) => removeSmartFilterItem('keywordFilters', item)}
+                    />
+                  </div>
+
+                  {/* Category Filters */}
+                  <div className="space-y-3">
+                    <Label>Category Filters</Label>
+                     <p className="text-sm text-gray-500">
+                      Only receive notifications that match these categories
+                    </p>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Add a category filter"
+                        value={newCategoryFilter}
+                        onChange={(e) => setNewCategoryFilter(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && addSmartFilterItem('categoryFilters', newCategoryFilter, setNewCategoryFilter)}
+                      />
+                      <Button onClick={() => addSmartFilterItem('categoryFilters', newCategoryFilter, setNewCategoryFilter)} size="sm">
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <FilterBadgeList
+                      items={preferences.smartFiltering.categoryFilters}
+                      onRemove={(item) => removeSmartFilterItem('categoryFilters', item)}
+                    />
+                  </div>
+
+                  {/* Sponsor Filters */}
+                  <div className="space-y-3">
+                    <Label>Sponsor Filters</Label>
+                     <p className="text-sm text-gray-500">
+                      Only receive notifications related to these sponsors
+                    </p>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Add a sponsor filter"
+                        value={newSponsorFilter}
+                        onChange={(e) => setNewSponsorFilter(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && addSmartFilterItem('sponsorFilters', newSponsorFilter, setNewSponsorFilter)}
+                      />
+                      <Button onClick={() => addSmartFilterItem('sponsorFilters', newSponsorFilter, setNewSponsorFilter)} size="sm">
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <FilterBadgeList
+                      items={preferences.smartFiltering.sponsorFilters}
+                      onRemove={(item) => removeSmartFilterItem('sponsorFilters', item)}
+                    />
+                  </div>
+
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
   );
 }
+
+// --- HELPER COMPONENTS ---
 
 function getCategoryDescription(category: string): string {
   const descriptions = {
@@ -572,6 +757,28 @@ function getCategoryDescription(category: string): string {
     systemAlerts: 'Important system announcements and maintenance',
     weeklyDigest: 'Weekly summary of activity and updates'
   };
-  
   return descriptions[category as keyof typeof descriptions] || '';
+}
+
+interface FilterBadgeListProps {
+  items: string[];
+  onRemove: (item: string) => void;
+}
+
+function FilterBadgeList({ items, onRemove }: FilterBadgeListProps) {
+  if (items.length === 0) {
+    return <p className="text-sm text-gray-500 italic">No filters added.</p>;
+  }
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((item) => (
+        <Badge key={item} variant="secondary" className="flex items-center gap-1">
+          {item}
+          <button onClick={() => onRemove(item)} className="ml-1 hover:text-red-600">
+            <X className="h-3 w-3" />
+          </button>
+        </Badge>
+      ))}
+    </div>
+  );
 }

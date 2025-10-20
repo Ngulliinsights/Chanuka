@@ -70,7 +70,7 @@ describe('Database Transaction Integrity Tests', () => {
         description: 'This bill is used for testing database transaction integrity',
         content: 'Full content of test bill...',
         category: 'technology',
-        tags: ['test', 'transaction'],
+
         viewCount: 0,
         shareCount: 0,
         complexityScore: 5,

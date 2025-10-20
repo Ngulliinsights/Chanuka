@@ -5,29 +5,39 @@
  * and single-flight request deduplication. Replaces all legacy cache implementations.
  */
 
-// Core cache interfaces and types
+// Core cache interfaces and types from interfaces.ts
+export type {
+  CacheAdapter,
+  HealthStatus,
+  CacheMetrics,
+  BaseCacheConfig,
+  MemoryCacheConfig,
+  RedisCacheConfig,
+  MultiTierCacheConfig,
+  CacheConfig,
+  CacheOperationOptions,
+  CacheEventType,
+  CacheEvent,
+  CacheValidationResult,
+  CacheStatistics
+} from './interfaces';
+
+// Legacy types from types.ts for backward compatibility
 export type {
   CacheService,
-  CacheAdapter,
-  CacheAdapterConfig,
-  CacheMetrics,
+  CacheMetrics as LegacyCacheMetrics,
   CacheTierStats,
   CacheEntry,
-  CacheConfig,
   CacheOptions,
   CacheHealthStatus,
-  CacheEvent,
-  CacheEventType,
-  CacheEventEmitter,
   CircuitBreakerState,
-  CircuitBreakerConfig,
-  CircuitBreakerMetrics,
   SingleFlightOptions,
   MultiTierOptions,
   PromotionStrategy,
   EvictionPolicy,
   CompressionOptions,
   SerializationOptions,
+} from './types';
   CacheWarmingStrategy,
   EvictionOptions,
   CacheStatsAggregation,

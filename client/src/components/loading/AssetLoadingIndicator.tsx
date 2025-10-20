@@ -1,8 +1,22 @@
 import React from 'react';
-import { Loader2, Wifi, WifiOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { Loader2, Wifi, WifiOff, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAssetLoading, LoadingProgress } from '@/utils/asset-loading';
 import { logger } from '../utils/logger.js';
+import { AssetLoadingIndicatorProps } from './types';
+import { 
+  validateLoadingProgress, 
+  safeValidateLoadingProgress,
+  isValidProgressPercentage 
+} from './validation';
+import { 
+  LoadingError, 
+  LoadingAssetError, 
+  LoadingValidationError,
+  getErrorDisplayMessage,
+  getErrorRecoveryStrategy 
+} from './errors';
+import { useLoadingRecovery } from './hooks/useLoadingRecovery';
 
 export interface AssetLoadingIndicatorProps {
   className?: string;
@@ -22,34 +36,91 @@ export const AssetLoadingIndicator: React.FC<AssetLoadingIndicatorProps> = ({
   const { progress, getStats } = useAssetLoading();
   const [stats, setStats] = React.useState(getStats());
   const [isVisible, setIsVisible] = React.useState(true);
+  const [validationError, setValidationError] = React.useState<LoadingValidationError | null>(null);
+  const [assetError, setAssetError] = React.useState<LoadingAssetError | null>(null);
+  
+  const { recoveryState, recover, updateError } = useLoadingRecovery({
+    maxRecoveryAttempts: 3,
+    onRecoverySuccess: () => {
+      setAssetError(null);
+      setValidationError(null);
+    }
+  });
 
-  // Update stats periodically
+  // Validate progress data
+  const validatedProgress = React.useMemo(() => {
+    const validation = safeValidateLoadingProgress(progress);
+    if (!validation.success) {
+      setValidationError(validation.error!);
+      logger.error('Asset loading progress validation failed', { 
+        error: validation.error, 
+        progress 
+      });
+      return { loaded: 0, total: 0, phase: 'preload' as const, currentAsset: undefined };
+    }
+    setValidationError(null);
+    return validation.data;
+  }, [progress]);
+
+  // Update stats periodically with error handling
   React.useEffect(() => {
     const interval = setInterval(() => {
-      setStats(getStats());
+      try {
+        const newStats = getStats();
+        setStats(newStats);
+        
+        // Check for asset loading failures
+        if (newStats.failed > stats.failed) {
+          const error = new LoadingAssetError(
+            progress.currentAsset || 'unknown',
+            'Asset failed to load',
+            { previousFailed: stats.failed, currentFailed: newStats.failed }
+          );
+          setAssetError(error);
+        }
+      } catch (error) {
+        logger.error('Failed to update asset loading stats', { error });
+        const loadingError = new LoadingError(
+          'Failed to retrieve loading statistics',
+          'LOADING_ERROR',
+          500,
+          { originalError: error }
+        );
+        setAssetError(loadingError as LoadingAssetError);
+      }
     }, 500);
 
     return () => clearInterval(interval);
-  }, [getStats]);
+  }, [getStats, stats.failed, progress.currentAsset]);
+
+  // Update recovery when errors change
+  React.useEffect(() => {
+    const error = validationError || assetError;
+    updateError(error);
+  }, [validationError, assetError, updateError]);
 
   // Auto-hide when loading is complete
   React.useEffect(() => {
-    if (progress.phase === 'complete') {
+    if (validatedProgress.phase === 'complete') {
       const timer = setTimeout(() => {
         setIsVisible(false);
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [progress.phase]);
+  }, [validatedProgress.phase]);
 
   // Don't render if not visible or no loading activity
-  if (!isVisible || (progress.total === 0 && progress.loaded === 0)) {
+  if (!isVisible || (validatedProgress.total === 0 && validatedProgress.loaded === 0)) {
     return null;
   }
 
-  const progressPercentage = progress.total > 0 ? (progress.loaded / progress.total) * 100 : 0;
-  const isComplete = progress.phase === 'complete';
-  const hasErrors = stats.failed > 0;
+  const progressPercentage = validatedProgress.total > 0 
+    ? Math.min(100, Math.max(0, (validatedProgress.loaded / validatedProgress.total) * 100))
+    : 0;
+  
+  const isComplete = validatedProgress.phase === 'complete';
+  const hasErrors = stats.failed > 0 || validationError || assetError;
+  const currentError = validationError || assetError;
 
   const getPhaseMessage = () => {
     switch (progress.phase) {
@@ -82,16 +153,32 @@ export const AssetLoadingIndicator: React.FC<AssetLoadingIndicatorProps> = ({
         'flex items-center space-x-2 text-sm text-muted-foreground',
         className
       )}>
-        {isComplete ? (
+        {currentError ? (
+          <AlertCircle className="h-4 w-4 text-red-500" />
+        ) : isComplete ? (
           <CheckCircle className="h-4 w-4 text-green-500" />
         ) : (
           <Loader2 className="h-4 w-4 animate-spin" />
         )}
-        <span>{getPhaseMessage()}</span>
-        {showProgress && progress.total > 0 && (
+        <span>
+          {currentError 
+            ? getErrorDisplayMessage(currentError)
+            : getPhaseMessage()
+          }
+        </span>
+        {showProgress && validatedProgress.total > 0 && !currentError && (
           <span className="text-xs">
-            ({progress.loaded}/{progress.total})
+            ({validatedProgress.loaded}/{validatedProgress.total})
           </span>
+        )}
+        {currentError && recoveryState.canRecover && (
+          <button
+            onClick={recover}
+            className="text-xs text-primary hover:text-primary/80"
+            disabled={recoveryState.isRecovering}
+          >
+            {recoveryState.isRecovering ? 'Retrying...' : 'Retry'}
+          </button>
         )}
       </div>
     );
@@ -111,7 +198,9 @@ export const AssetLoadingIndicator: React.FC<AssetLoadingIndicatorProps> = ({
     )}>
       <div className="flex items-start space-x-3">
         <div className="flex-shrink-0">
-          {isComplete ? (
+          {currentError ? (
+            <AlertCircle className="h-5 w-5 text-red-500" />
+          ) : isComplete ? (
             <CheckCircle className="h-5 w-5 text-green-500" />
           ) : hasErrors ? (
             <AlertCircle className="h-5 w-5 text-yellow-500" />
@@ -122,16 +211,28 @@ export const AssetLoadingIndicator: React.FC<AssetLoadingIndicatorProps> = ({
         
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-foreground">
-              {getPhaseMessage()}
+            <p className={cn(
+              'text-sm font-medium',
+              currentError ? 'text-red-600' : 'text-foreground'
+            )}>
+              {currentError 
+                ? getErrorDisplayMessage(currentError)
+                : getPhaseMessage()
+              }
             </p>
             {showDetails && getConnectionIcon()}
           </div>
           
-          {showProgress && progress.total > 0 && (
+          {currentError && recoveryState.suggestions.length > 0 && (
+            <div className="mb-2 text-xs text-red-500">
+              {recoveryState.suggestions[0]}
+            </div>
+          )}
+          
+          {showProgress && validatedProgress.total > 0 && !currentError && (
             <div className="space-y-2">
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>{progress.loaded} of {progress.total} loaded</span>
+                <span>{validatedProgress.loaded} of {validatedProgress.total} loaded</span>
                 <span>{Math.round(progressPercentage)}%</span>
               </div>
               
@@ -147,13 +248,35 @@ export const AssetLoadingIndicator: React.FC<AssetLoadingIndicatorProps> = ({
             </div>
           )}
           
-          {progress.currentAsset && !isComplete && (
+          {validatedProgress.currentAsset && !isComplete && !currentError && (
             <p className="text-xs text-muted-foreground mt-2 truncate">
-              Loading: {progress.currentAsset.split('/').pop()}
+              Loading: {validatedProgress.currentAsset.split('/').pop()}
             </p>
           )}
           
-          {showDetails && (
+          {currentError && recoveryState.canRecover && (
+            <div className="mt-2">
+              <button
+                onClick={recover}
+                disabled={recoveryState.isRecovering}
+                className="inline-flex items-center px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+              >
+                {recoveryState.isRecovering ? (
+                  <>
+                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                    Retrying...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-3 w-3 mr-1" />
+                    Retry
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+          
+          {showDetails && !currentError && (
             <div className="mt-3 pt-2 border-t border-muted">
               <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
                 <div>
@@ -172,7 +295,7 @@ export const AssetLoadingIndicator: React.FC<AssetLoadingIndicatorProps> = ({
             </div>
           )}
           
-          {hasErrors && showDetails && (
+          {hasErrors && showDetails && !currentError && (
             <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded text-xs">
               <p className="text-yellow-700 dark:text-yellow-300">
                 Some assets failed to load. The app will continue to function with reduced features.

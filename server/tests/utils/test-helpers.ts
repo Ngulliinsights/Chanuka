@@ -1,4 +1,4 @@
-import { database as db, users, bills, sponsors, notifications, billComments, billEngagement } from '../shared/database/connection';
+import { database as db, users, bills, sponsors, notifications, billComments, billEngagement } from '../../../shared/database/connection';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { performance } from 'perf_hooks';
@@ -8,7 +8,7 @@ export interface TestUser {
   id: string;
   email: string;
   name: string;
-  role: string;
+  role: 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate';
   token: string;
   passwordHash: string;
   verificationStatus: string;
@@ -19,16 +19,16 @@ export interface TestBill {
   id: number;
   title: string;
   billNumber: string;
-  status: string;
+  status: 'introduced' | 'committee' | 'passed' | 'failed' | 'signed';
   category: string;
 }
 
 export interface TestSponsor {
   id: number;
   name: string;
-  party: string;
-  constituency: string;
-  email: string;
+  party: string | null;
+  constituency: string | null;
+  email: string | null;
 }
 
 export interface PerformanceMetrics {
@@ -51,9 +51,9 @@ export class TestDataManager {
     const defaultUserData = {
       email: `test-user-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`,
       name: 'Test User',
-      role: 'citizen',
+      role: 'citizen' as const,
       passwordHash: 'hashed-password',
-      verificationStatus: 'verified',
+      verificationStatus: 'verified' as const,
       isActive: true,
       firstName: 'Test',
       lastName: 'User',
@@ -66,11 +66,11 @@ export class TestDataManager {
 
     try {
       const user = await db.insert(users).values(defaultUserData).returning();
-      
+
       const token = jwt.sign(
-        { 
-          id: user[0].id, 
-          email: user[0].email, 
+        {
+          id: user[0].id,
+          email: user[0].email,
           role: user[0].role,
           verificationStatus: user[0].verificationStatus,
           isActive: user[0].isActive
@@ -97,7 +97,7 @@ export class TestDataManager {
       title: `Test Bill ${Date.now()}`,
       billNumber: `TEST-${Date.now()}`,
       introducedDate: new Date(),
-      status: 'introduced',
+      status: 'introduced' as const,
       summary: 'Test bill for integration testing',
       description: 'This bill is used for testing purposes',
       content: 'Full content of test bill...',
@@ -107,18 +107,24 @@ export class TestDataManager {
       shareCount: 0,
       complexityScore: 5,
       constitutionalConcerns: { concerns: [], severity: 'low' },
-      stakeholderAnalysis: { 
-        primary_beneficiaries: ['test users'], 
-        potential_opponents: [], 
-        economic_impact: 'minimal' 
+      stakeholderAnalysis: {
+        primary_beneficiaries: ['test users'],
+        potential_opponents: [],
+        economic_impact: 'minimal'
       },
       ...billData
     };
 
     try {
       const bill = await db.insert(bills).values(defaultBillData).returning();
-      const testBill: TestBill = bill[0];
-      
+      const testBill: TestBill = {
+        id: bill[0].id,
+        title: bill[0].title,
+        billNumber: bill[0].billNumber || '',
+        status: bill[0].status,
+        category: bill[0].category || ''
+      };
+
       this.createdBills.push(testBill);
       return testBill;
     } catch (error) {
@@ -133,6 +139,7 @@ export class TestDataManager {
       party: 'Test Party',
       constituency: 'Test District',
       email: `sponsor-${Date.now()}@parliament.gov`,
+      role: 'sponsor',
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -142,7 +149,7 @@ export class TestDataManager {
     try {
       const sponsor = await db.insert(sponsors).values(defaultSponsorData).returning();
       const testSponsor: TestSponsor = sponsor[0];
-      
+
       this.createdSponsors.push(testSponsor);
       return testSponsor;
     } catch (error) {
@@ -165,7 +172,7 @@ export class TestDataManager {
     try {
       const notification = await db.insert(notifications).values(defaultNotificationData).returning();
       const testNotification = notification[0];
-      
+
       this.createdNotifications.push(testNotification);
       return testNotification;
     } catch (error) {
@@ -177,24 +184,24 @@ export class TestDataManager {
   async cleanup(): Promise<void> {
     try {
       // Clean up in reverse order to handle foreign key constraints
-      
+
       // Clean up notifications
       for (const notification of this.createdNotifications) {
         await db.delete(notifications).where(eq(notifications.id, notification.id));
       }
-      
+
       // Clean up bill-related data
       for (const bill of this.createdBills) {
         await db.delete(billComments).where(eq(billComments.billId, bill.id));
         await db.delete(billEngagement).where(eq(billEngagement.billId, bill.id));
         await db.delete(bills).where(eq(bills.id, bill.id));
       }
-      
+
       // Clean up sponsors
       for (const sponsor of this.createdSponsors) {
         await db.delete(sponsors).where(eq(sponsors.id, sponsor.id));
       }
-      
+
       // Clean up users
       for (const user of this.createdUsers) {
         await db.delete(users).where(eq(users.id, user.id));
@@ -205,7 +212,7 @@ export class TestDataManager {
       this.createdBills = [];
       this.createdSponsors = [];
       this.createdNotifications = [];
-      
+
     } catch (error) {
       console.warn('Test data cleanup failed:', error);
     }
@@ -235,7 +242,7 @@ export class PerformanceMonitor {
       end: (): PerformanceMetrics => {
         const endTime = performance.now();
         const endMemory = process.memoryUsage();
-        
+
         const metric: PerformanceMetrics = {
           responseTime: endTime - startTime,
           memoryUsage: {
@@ -407,25 +414,25 @@ export class ConcurrencyTestHelper {
     delay: number = 100
   ): Promise<T[]> {
     const results: T[] = [];
-    
+
     for (let i = 0; i < count; i++) {
       const result = await requestFunction();
       results.push(result);
-      
+
       if (delay > 0 && i < count - 1) {
         await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
-    
+
     return results;
   }
 
   static validateConcurrentResponses(responses: any[], expectedStatus: number = 200): void {
     expect(responses.length).toBeGreaterThan(0);
-    
+
     const statusCodes = responses.map(r => r.status);
     const successCount = statusCodes.filter(s => s === expectedStatus).length;
-    
+
     // At least 80% should succeed
     expect(successCount / responses.length).toBeGreaterThanOrEqual(0.8);
   }
@@ -438,19 +445,19 @@ export class DatabaseTestHelper {
     delay: number = 100
   ): Promise<any> {
     let lastError: Error;
-    
+
     for (let i = 0; i < maxRetries; i++) {
       try {
         return await operation();
       } catch (error) {
         lastError = error as Error;
-        
+
         if (i < maxRetries - 1) {
           await new Promise(resolve => setTimeout(resolve, delay));
         }
       }
     }
-    
+
     throw lastError!;
   }
 
@@ -491,10 +498,10 @@ export class MockDataGenerator {
   static generateRandomName(): string {
     const firstNames = ['John', 'Jane', 'Bob', 'Alice', 'Charlie', 'Diana'];
     const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia'];
-    
+
     const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
     const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    
+
     return `${firstName} ${lastName}`;
   }
 
@@ -502,11 +509,11 @@ export class MockDataGenerator {
     const adjectives = ['Comprehensive', 'Enhanced', 'Improved', 'Advanced', 'Modern'];
     const subjects = ['Healthcare', 'Education', 'Technology', 'Environment', 'Security'];
     const types = ['Act', 'Bill', 'Amendment', 'Resolution', 'Initiative'];
-    
+
     const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
     const subject = subjects[Math.floor(Math.random() * subjects.length)];
     const type = types[Math.floor(Math.random() * types.length)];
-    
+
     return `${adjective} ${subject} ${type}`;
   }
 
@@ -515,7 +522,7 @@ export class MockDataGenerator {
     const year = new Date().getFullYear();
     const number = Math.floor(Math.random() * 9999) + 1;
     const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
-    
+
     return `${prefix}-${year}-${number.toString().padStart(4, '0')}`;
   }
 
@@ -526,14 +533,14 @@ export class MockDataGenerator {
       'magna', 'aliqua', 'enim', 'ad', 'minim', 'veniam', 'quis', 'nostrud',
       'exercitation', 'ullamco', 'laboris', 'nisi', 'aliquip', 'ex', 'ea', 'commodo'
     ];
-    
+
     const wordCount = Math.floor(Math.random() * (maxWords - minWords + 1)) + minWords;
-    const selectedWords = [];
-    
+    const selectedWords: string[] = [];
+
     for (let i = 0; i < wordCount; i++) {
       selectedWords.push(words[Math.floor(Math.random() * words.length)]);
     }
-    
+
     return selectedWords.join(' ');
   }
 }

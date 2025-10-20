@@ -24,7 +24,7 @@ jest.mock('../../../../../shared/database/pool', () => ({
     totalCount: 10,
     idleCount: 5,
     waitingCount: 2,
-  },
+  } as any,
   checkPoolHealth: jest.fn(),
 }));
 
@@ -61,7 +61,7 @@ describe('ConnectionManager', () => {
     };
 
     // Mock checkPoolHealth
-    (checkPoolHealth as jest.Mock).mockResolvedValue({
+    (checkPoolHealth as jest.MockedFunction<typeof checkPoolHealth>).mockResolvedValue({
       isHealthy: true,
       totalConnections: 10,
       idleConnections: 5,
@@ -69,6 +69,7 @@ describe('ConnectionManager', () => {
       circuitBreakerState: 'CLOSED',
       circuitBreakerFailures: 0,
       lastError: undefined,
+      utilizationPercentage: 50,
     });
 
     manager = new DatabaseConnectionManager(mockPool, config) as any;
@@ -80,7 +81,7 @@ describe('ConnectionManager', () => {
 
   describe('acquireConnection', () => {
     it('should acquire connection successfully', async () => {
-      const mockClient = { release: jest.fn() } as any;
+      const mockClient = { release: jest.fn(), query: jest.fn() } as any;
       mockPool.connect.mockResolvedValue(mockClient);
 
       const client = await manager.acquireConnection();
@@ -90,7 +91,7 @@ describe('ConnectionManager', () => {
     });
 
     it('should emit connection-acquired event', async () => {
-      const mockClient = { release: jest.fn() } as any;
+      const mockClient = { release: jest.fn(), query: jest.fn() } as any;
       mockPool.connect.mockResolvedValue(mockClient);
 
       const eventSpy = jest.fn();
@@ -115,7 +116,7 @@ describe('ConnectionManager', () => {
 
   describe('releaseConnection', () => {
     it('should release connection successfully', async () => {
-      const mockClient = { release: jest.fn() } as any;
+      const mockClient = { release: jest.fn(), query: jest.fn() } as any;
 
       await manager.releaseConnection(mockClient);
 
@@ -123,7 +124,7 @@ describe('ConnectionManager', () => {
     });
 
     it('should emit connection-released event', async () => {
-      const mockClient = { release: jest.fn() } as any;
+      const mockClient = { release: jest.fn(), query: jest.fn() } as any;
 
       const eventSpy = jest.fn();
       manager.on('connection-released', eventSpy);
@@ -134,7 +135,7 @@ describe('ConnectionManager', () => {
     });
 
     it('should emit connection-error event on release failure', async () => {
-      const mockClient = { release: jest.fn().mockImplementation(() => { throw new Error('Release failed'); }) } as any;
+      const mockClient = { release: jest.fn().mockImplementation(() => { throw new Error('Release failed'); }), query: jest.fn() } as any;
 
       const eventSpy = jest.fn();
       manager.on('connection-error', eventSpy);
@@ -201,7 +202,7 @@ describe('ConnectionManager', () => {
     });
 
     it('should return false when unhealthy', async () => {
-      (checkPoolHealth as jest.Mock).mockResolvedValue({
+      (checkPoolHealth as jest.MockedFunction<typeof checkPoolHealth>).mockResolvedValue({
         isHealthy: false,
         totalConnections: 0,
         idleConnections: 0,
@@ -209,6 +210,7 @@ describe('ConnectionManager', () => {
         circuitBreakerState: 'OPEN',
         circuitBreakerFailures: 5,
         lastError: undefined,
+        utilizationPercentage: 0,
       });
 
       const isHealthy = await manager.isHealthy();
@@ -252,7 +254,7 @@ describe('ConnectionManager', () => {
 
     it('should force close connections on timeout', async () => {
       // Acquire a connection that won't be released
-      const mockClient = { release: jest.fn() } as any;
+      const mockClient = { release: jest.fn(), query: jest.fn() } as any;
       mockPool.connect.mockResolvedValue(mockClient);
 
       const client = await manager.acquireConnection();

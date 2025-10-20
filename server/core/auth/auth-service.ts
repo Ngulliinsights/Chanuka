@@ -191,7 +191,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Registration error:', { component: 'Chanuka', error: error.message });
+      logger.error('Registration error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -263,7 +263,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Email verification error:', { component: 'Chanuka', error: error.message });
+      logger.error('Email verification error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
       return {
         success: false,
         error: 'Email verification failed'
@@ -341,7 +341,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Login error:', { component: 'Chanuka', error: error.message });
+      logger.error('Login error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -368,7 +368,7 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      logger.error('Logout error:', { component: 'Chanuka', error: error.message });
+      logger.error('Logout error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
       return {
         success: false,
         error: 'Logout failed'
@@ -468,7 +468,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Token refresh error:', { component: 'Chanuka', error: error.message });
+      logger.error('Token refresh error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
       return {
         success: false,
         error: 'Token refresh failed'
@@ -528,7 +528,7 @@ export class AuthService {
       return { success: true };
 
     } catch (error) {
-      logger.error('Password reset request error:', { component: 'Chanuka', error: error.message });
+      logger.error('Password reset request error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -626,7 +626,7 @@ export class AuthService {
       return { success: true };
 
     } catch (error) {
-      logger.error('Password reset error:', { component: 'Chanuka', error: error.message });
+      logger.error('Password reset error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -708,7 +708,7 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Token verification error:', { component: 'Chanuka', error: error.message });
+      logger.error('Token verification error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
       return {
         success: false,
         error: 'Invalid token'
@@ -783,7 +783,7 @@ export class AuthService {
 
       logger.info('Expired tokens cleaned up successfully', { component: 'Chanuka' });
     } catch (error) {
-      logger.error('Token cleanup error:', { component: 'Chanuka', error: error.message });
+      logger.error('Token cleanup error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
     }
   }
 }

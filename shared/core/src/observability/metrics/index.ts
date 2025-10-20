@@ -47,6 +47,34 @@ export {
   createJSONExporter,
 } from './exporters';
 
+// Re-export enhanced collectors
+export {
+  AtomicCounter,
+  AtomicGauge,
+  AggregatingHistogram,
+  AggregatingSummary,
+  createAtomicCounter,
+  createAtomicGauge,
+  createAggregatingHistogram,
+  createAggregatingSummary,
+} from './collectors';
+
+// Re-export enhanced exporters
+export {
+  EnhancedPrometheusExporter,
+  createEnhancedPrometheusExporter,
+} from './exporters/prometheus';
+
+export {
+  EnhancedStatsDExporter,
+  createEnhancedStatsDExporter,
+} from './exporters/statsd';
+
+export {
+  EnhancedCloudWatchExporter,
+  createEnhancedCloudWatchExporter,
+} from './exporters/cloudwatch';
+
 
 
 

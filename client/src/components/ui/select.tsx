@@ -1,11 +1,15 @@
 "use client"
 
-import { forwardRef, ElementRef, ComponentPropsWithoutRef } from "react"
+import { forwardRef, ElementRef, ComponentPropsWithoutRef, useState, useCallback, useEffect } from "react"
 import { Root, Group, Value, Trigger, Icon, ScrollUpButton, ScrollDownButton, Portal, Content, Viewport, Label, Item, ItemIndicator, ItemText, Separator } from "@radix-ui/react-select"
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { logger } from '../utils/logger.js';
+import { EnhancedSelectProps, ValidationState } from './types';
+import { validateSelectValue, safeValidateSelectValue } from './validation';
+import { UIValidationError } from './errors';
+import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';
 
 const Select = Root
 
@@ -147,6 +151,186 @@ const SelectSeparator = forwardRef<
 ))
 SelectSeparator.displayName = Separator.displayName
 
+// Enhanced select with validation
+const EnhancedSelect = forwardRef<
+  ElementRef<typeof Trigger>,
+  EnhancedSelectProps
+>(({ 
+  className,
+  label,
+  description,
+  errorMessage,
+  showValidation = true,
+  required = false,
+  customValidator,
+  onValidationChange,
+  value,
+  onValueChange,
+  placeholder = "Select an option...",
+  children,
+  ...props 
+}, ref) => {
+  const [validationState, setValidationState] = useState<ValidationState>({
+    isValid: true,
+    touched: false
+  });
+  const [retryCount, setRetryCount] = useState(0);
+
+  const validateValue = useCallback((selectValue: string): ValidationState => {
+    if (!showValidation) {
+      return { isValid: true, touched: validationState.touched };
+    }
+
+    try {
+      // Required validation
+      if (required && (!selectValue || selectValue.trim() === '')) {
+        return {
+          isValid: false,
+          error: 'Please select an option',
+          touched: validationState.touched
+        };
+      }
+
+      // Custom validation
+      if (selectValue && customValidator) {
+        const customError = customValidator(selectValue);
+        if (customError) {
+          return {
+            isValid: false,
+            error: customError,
+            touched: validationState.touched
+          };
+        }
+      }
+
+      // Basic select validation
+      if (selectValue) {
+        const result = safeValidateSelectValue(selectValue);
+        if (!result.success) {
+          return {
+            isValid: false,
+            error: result.error?.message || 'Invalid selection',
+            touched: validationState.touched
+          };
+        }
+      }
+
+      return { isValid: true, touched: validationState.touched };
+    } catch (error) {
+      logger.error('Select validation error:', error);
+      return {
+        isValid: false,
+        error: 'Validation error occurred',
+        touched: validationState.touched
+      };
+    }
+  }, [showValidation, required, customValidator, validationState.touched]);
+
+  const handleValidationError = useCallback(async (error: UIValidationError) => {
+    try {
+      const recoveryResult = await attemptUIRecovery('enhanced-select', error, retryCount);
+      
+      if (recoveryResult.success) {
+        setRetryCount(0);
+      } else if (recoveryResult.shouldRetry) {
+        setRetryCount(prev => prev + 1);
+      } else {
+        const suggestions = getUIRecoverySuggestions(error);
+        logger.warn('Select recovery failed, suggestions:', suggestions);
+      }
+    } catch (recoveryError) {
+      logger.error('Select recovery error:', recoveryError);
+    }
+  }, [retryCount]);
+
+  const handleValueChange = useCallback((newValue: string) => {
+    const newValidationState = {
+      ...validateValue(newValue),
+      touched: true
+    };
+    
+    setValidationState(newValidationState);
+    onValidationChange?.(newValidationState);
+
+    if (!newValidationState.isValid && newValidationState.error) {
+      const error = new UIValidationError(newValidationState.error, 'select', newValue);
+      handleValidationError(error);
+    }
+
+    onValueChange?.(newValue);
+  }, [validateValue, onValidationChange, onValueChange, handleValidationError]);
+
+  // Initial validation on mount if value is provided
+  useEffect(() => {
+    if (value && showValidation) {
+      const initialValidation = validateValue(value);
+      setValidationState(initialValidation);
+      onValidationChange?.(initialValidation);
+    }
+  }, [value, showValidation, validateValue, onValidationChange]);
+
+  const hasError = showValidation && validationState.touched && !validationState.isValid;
+  const displayError = errorMessage || validationState.error;
+
+  return (
+    <div className="space-y-2">
+      {label && (
+        <label 
+          className={cn(
+            "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+            hasError && "text-destructive",
+            required && "after:content-['*'] after:ml-0.5 after:text-destructive"
+          )}
+        >
+          {label}
+        </label>
+      )}
+      
+      <Root value={value} onValueChange={handleValueChange}>
+        <SelectTrigger
+          ref={ref}
+          className={cn(
+            hasError && "border-destructive focus:ring-destructive",
+            className
+          )}
+          aria-invalid={hasError}
+          aria-describedby={
+            description || hasError 
+              ? `${props.id}-description ${props.id}-error`.trim()
+              : undefined
+          }
+          {...props}
+        >
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {children}
+        </SelectContent>
+      </Root>
+      
+      {description && (
+        <p 
+          id={`${props.id}-description`}
+          className="text-sm text-muted-foreground"
+        >
+          {description}
+        </p>
+      )}
+      
+      {hasError && displayError && (
+        <p 
+          id={`${props.id}-error`}
+          className="text-sm font-medium text-destructive"
+          role="alert"
+        >
+          {displayError}
+        </p>
+      )}
+    </div>
+  );
+});
+EnhancedSelect.displayName = "EnhancedSelect";
+
 export {
   Select,
   SelectGroup,
@@ -158,4 +342,5 @@ export {
   SelectSeparator,
   SelectScrollUpButton,
   SelectScrollDownButton,
+  EnhancedSelect,
 }

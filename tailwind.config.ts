@@ -12,6 +12,23 @@ export default {
   ],
 
   theme: {
+    // Custom responsive breakpoints following mobile-first approach
+    screens: {
+      'mobile-sm': '320px',
+      'mobile-lg': '480px',
+      'tablet': '640px',
+      'tablet-lg': '768px',
+      'laptop': '1024px',
+      'laptop-lg': '1280px',
+      'desktop': '1440px',
+      'desktop-xl': '1920px',
+      // Keep default Tailwind breakpoints for compatibility
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+    },
     extend: {
       // Border radius system using CSS custom properties for consistency
       borderRadius: {

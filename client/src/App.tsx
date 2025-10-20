@@ -12,7 +12,6 @@ import {
 } from "@/components/loading/AssetLoadingIndicator";
 import { GlobalLoadingIndicator } from "@/components/loading/GlobalLoadingIndicator";
 import { LoadingStateManager } from "@/components/loading/LoadingStates";
-import { SidebarDebugger } from "@/components/navigation/SidebarDebugger";
 import BrowserCompatibilityChecker from "@/components/compatibility/BrowserCompatibilityChecker";
 import PerformanceMetricsCollector from "@/components/performance/PerformanceMetricsCollector";
 import { Suspense, useEffect } from "react";
@@ -164,7 +163,6 @@ function DevelopmentTools() {
           <DevAssetLoadingDebug />
         </>
       )}
-      {CONFIG.dev.showSidebarDebug && <SidebarDebugger />}
       {CONFIG.dev.showPerformanceMetrics && (
         <PerformanceMetricsCollector 
           showDetails={true}

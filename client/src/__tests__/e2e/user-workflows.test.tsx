@@ -1,9 +1,9 @@
-import { describe, it, expect, beforeEach, vi, type Mock } from 'vitest';
+import { describe, it, expect, beforeEach, vi, type MockedFunction } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../../test-utils';
 import App from '../../App';
-import logger from '../utils/logger.js';
+import logger from '@shared/core/src/observability/logging';
 import { navigationService } from '../../services/navigation';
 
 // Mock API calls

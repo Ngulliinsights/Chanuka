@@ -1,9 +1,9 @@
-import { RateLimitStore, RateLimitOptions, RateLimitResult } from '../types';
+import { Result, ok, err } from '../../primitives/types/result';
+import { RateLimitData, IRateLimitStore } from '../types';
 import Redis from 'ioredis';
 
-export class RedisRateLimitStore implements RateLimitStore {
+export class RedisRateLimitStore implements IRateLimitStore {
   private redis: Redis;
-  private scriptSha: string | null = null;
 
   constructor(redisUrl?: string) {
     this.redis = new Redis(redisUrl || process.env.REDIS_URL || 'redis://localhost:6379', {
@@ -15,163 +15,100 @@ export class RedisRateLimitStore implements RateLimitStore {
     this.redis.on('error', (err) => {
       console.warn('Redis connection error in rate limiter:', err.message);
     });
-
-    this.loadScript();
   }
 
-  async check(key: string, options: RateLimitOptions): Promise<RateLimitResult> {
-    const now = Date.now();
-    const windowMs = options.windowMs;
-    const maxRequests = this.getMaxRequests(options);
-
+  async get(key: string): Promise<Result<RateLimitData | null>> {
     try {
-      const result = await this.executeScript(key, maxRequests, windowMs, now);
-
-      const allowed = result[0] === 1;
-      const remaining = Math.max(0, (result[1] || 0) - 1);
-      const resetTime = result[2] || now + windowMs;
-
-      return {
-        allowed,
-        remaining,
-        resetAt: new Date(resetTime),
-        retryAfter: allowed ? undefined : Math.ceil((resetTime - now) / 1000)
-      };
-    } catch (error) {
-      console.error('Redis rate limit check failed:', error);
-      // Fallback to memory store behavior if Redis fails
-      throw error;
-    }
-  }
-
-  async reset(key: string): Promise<void> {
-    try {
-      await this.redis.del(`ratelimit:${key}`);
-    } catch (error) {
-      console.error('Redis rate limit reset failed:', error);
-      throw error;
-    }
-  }
-
-  async cleanup(): Promise<void> {
-    // Redis handles TTL automatically, no manual cleanup needed
-    return Promise.resolve();
-  }
-
-  private async loadScript(): Promise<void> {
-    const script = `
-      local key = KEYS[1]
-      local max_requests = tonumber(ARGV[1])
-      local window_ms = tonumber(ARGV[2])
-      local now = tonumber(ARGV[3])
-
-      local bucket_key = "ratelimit:" .. key
-      local data = redis.call("HMGET", bucket_key, "tokens", "reset_time")
-
-      local tokens = tonumber(data[1]) or max_requests
-      local reset_time = tonumber(data[2]) or 0
-
-      if now >= reset_time then
-        tokens = max_requests
-        reset_time = now + window_ms
-      end
-
-      local allowed = tokens > 0 and 1 or 0
-
-      if allowed == 1 then
-        tokens = tokens - 1
-      end
-
-      redis.call("HMSET", bucket_key, "tokens", tokens, "reset_time", reset_time)
-      redis.call("PEXPIRE", bucket_key, window_ms + 1000)
-
-      return {allowed, tokens, reset_time}
-    `;
-
-    try {
-      this.scriptSha = await this.redis.script('LOAD', script) as string;
-    } catch (error) {
-      console.error('Failed to load Redis script:', error);
-    }
-  }
-
-  private async executeScript(key: string, maxRequests: number, windowMs: number, now: number): Promise<number[]> {
-    if (!this.scriptSha) {
-      await this.loadScript();
-    }
-
-    if (!this.scriptSha) {
-      throw new Error('Redis script not loaded');
-    }
-
-    try {
-      const result = await this.redis.evalsha(this.scriptSha, 1, `ratelimit:${key}`, maxRequests, windowMs, now);
-      return result as number[];
-    } catch (error) {
-      // Script might have been flushed, reload it
-      this.scriptSha = null;
-      await this.loadScript();
-
-      if (this.scriptSha) {
-        const result = await this.redis.evalsha(this.scriptSha, 1, `ratelimit:${key}`, maxRequests, windowMs, now);
-        return result as number[];
+      const data = await this.redis.get(`ratelimit:${key}`);
+      if (!data) {
+        return ok(null);
       }
 
-      throw error;
+      const parsed = JSON.parse(data) as RateLimitData;
+      return ok(parsed);
+    } catch (error) {
+      return err(error as Error);
     }
   }
 
-  private getMaxRequests(options: RateLimitOptions): number {
-    const isTestEnvironment = process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined;
-    const isDevelopment = process.env.NODE_ENV === 'development';
+  async set(key: string, data: RateLimitData, ttl?: number): Promise<Result<void>> {
+    try {
+      const serialized = JSON.stringify(data);
+      const redisKey = `ratelimit:${key}`;
 
-    if (isTestEnvironment && options.testMax) {
-      return options.testMax;
-    } else if (isDevelopment && options.devMax) {
-      return options.devMax;
+      if (ttl) {
+        await this.redis.setex(redisKey, Math.ceil(ttl / 1000), serialized);
+      } else {
+        await this.redis.set(redisKey, serialized);
+      }
+
+      return ok(undefined);
+    } catch (error) {
+      return err(error as Error);
     }
+  }
 
-    return options.max;
+  async delete(key: string): Promise<Result<void>> {
+    try {
+      await this.redis.del(`ratelimit:${key}`);
+      return ok(undefined);
+    } catch (error) {
+      return err(error as Error);
+    }
+  }
+
+  async increment(key: string, field: string, amount: number = 1): Promise<Result<number>> {
+    try {
+      const redisKey = `ratelimit:${key}`;
+
+      // Get current data
+      const currentData = await this.get(key);
+      if (currentData.isErr()) {
+        return err(currentData.error);
+      }
+
+      let data = currentData.value;
+      if (!data) {
+        data = {
+          tokens: 0,
+          lastRefill: Date.now(),
+          resetTime: Date.now() + 60000 // Default 1 minute window
+        };
+      }
+
+      // Increment the field
+      if (field === 'tokens') {
+        data.tokens += amount;
+      } else if (field === 'lastRefill') {
+        data.lastRefill += amount;
+      } else if (field === 'resetTime') {
+        data.resetTime += amount;
+      } else {
+        return err(new Error(`Unknown field: ${field}`));
+      }
+
+      // Save back to Redis
+      const setResult = await this.set(key, data);
+      if (setResult.isErr()) {
+        return err(setResult.error);
+      }
+
+      return ok(data[field as keyof RateLimitData] as number);
+    } catch (error) {
+      return err(error as Error);
+    }
+  }
+
+  async expire(key: string, ttl: number): Promise<Result<void>> {
+    try {
+      await this.redis.pexpire(`ratelimit:${key}`, ttl);
+      return ok(undefined);
+    } catch (error) {
+      return err(error as Error);
+    }
   }
 
   async disconnect(): Promise<void> {
     await this.redis.quit();
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

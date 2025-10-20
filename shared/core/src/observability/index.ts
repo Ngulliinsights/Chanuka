@@ -12,6 +12,13 @@
  * a complete picture of system behavior and performance.
  */
 
+// Unified observability interfaces
+export * from './interfaces';
+
+// Main observability stack
+export * from './stack';
+export { ObservabilityStack, createObservabilityStack, AsyncCorrelationManager } from './stack';
+
 // Core logging functionality
 export * from './logging';
 

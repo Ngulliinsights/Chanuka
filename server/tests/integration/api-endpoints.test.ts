@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
-import { app } from '../../index.js';
+import { app } from '../../index';
 import { databaseService } from '../../infrastructure/database/database-service.js';
 import { logger } from '../../../shared/core/src/observability/logging';
 

@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { ApiSuccess, ApiError, ApiResponseWrapper } from '../../utils/api-response.js';
+import { ApiSuccess, ApiError, ApiResponseWrapper } from '../../utils/api-response';
 
 // Helper functions to replace the missing createMetadata functionality
 const sendResponse = (res: any, data: any, message: string = 'Success') => {

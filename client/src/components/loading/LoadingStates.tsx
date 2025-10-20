@@ -4,6 +4,35 @@ import { cn } from '@/lib/utils';
 import { useConnectionAware } from '@/hooks/useConnectionAware';
 import { useOnlineStatus } from '@/hooks/use-online-status';
 import { logger } from '../utils/logger.js';
+import { 
+  LoadingStateProps, 
+  LoadingSize, 
+  ConnectionType, 
+  LoadingStage,
+  ProgressiveLoaderProps,
+  TimeoutAwareLoaderProps,
+  NetworkAwareLoaderProps,
+  LoadingStateManagerProps,
+  SkeletonProps,
+  LazyLoadPlaceholderProps
+} from './types';
+import { 
+  validateLoadingProgress, 
+  validateLoadingStage, 
+  safeValidateLoadingProgress,
+  normalizeLoadingSize,
+  isValidProgressPercentage 
+} from './validation';
+import { 
+  LoadingError, 
+  LoadingTimeoutError, 
+  LoadingValidationError,
+  LoadingStageError,
+  isLoadingError,
+  getErrorRecoveryStrategy,
+  getErrorDisplayMessage
+} from './errors';
+import { useLoadingRecovery } from './hooks/useLoadingRecovery';
 
 // Enhanced loading state components for different contexts
 export interface LoadingStateProps {
@@ -19,21 +48,95 @@ export const PageLoader: React.FC<LoadingStateProps> = ({
   message = 'Loading page...',
   showMessage = true,
 }) => {
+  const [error, setError] = React.useState<LoadingError | null>(null);
+  const { recoveryState, recover, updateError } = useLoadingRecovery({
+    maxRecoveryAttempts: 3,
+    onRecoverySuccess: () => setError(null)
+  });
+
+  // Normalize and validate size
+  const validatedSize = React.useMemo(() => {
+    try {
+      return normalizeLoadingSize(size);
+    } catch (err) {
+      logger.warn('Invalid loading size provided, using default', { size, error: err });
+      return 'lg';
+    }
+  }, [size]);
+
   const sizeClasses = {
     sm: 'h-4 w-4',
     md: 'h-6 w-6',
     lg: 'h-8 w-8',
   };
 
+  // Update recovery when error changes
+  React.useEffect(() => {
+    updateError(error);
+  }, [error, updateError]);
+
+  // Error boundary for internal errors
+  React.useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      const loadingError = new LoadingError(
+        event.message || 'Page loading error',
+        'LOADING_ERROR',
+        500,
+        { filename: event.filename, lineno: event.lineno }
+      );
+      setError(loadingError);
+    };
+
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
+
+  if (error && !recoveryState.isRecovering) {
+    return (
+      <div className={cn(
+        'flex flex-col items-center justify-center min-h-screen bg-background',
+        className
+      )}>
+        <AlertCircle className="h-8 w-8 text-red-500 mb-4" />
+        <p className="text-sm font-medium text-red-600 mb-2">
+          {getErrorDisplayMessage(error)}
+        </p>
+        {recoveryState.canRecover && (
+          <button
+            onClick={recover}
+            className="mt-2 px-4 py-2 text-sm bg-primary text-primary-foreground rounded hover:bg-primary/90"
+          >
+            Try Again
+          </button>
+        )}
+        {recoveryState.suggestions.length > 0 && (
+          <div className="mt-4 text-xs text-muted-foreground max-w-md text-center">
+            <p className="font-medium mb-1">Suggestions:</p>
+            <ul className="list-disc list-inside space-y-1">
+              {recoveryState.suggestions.slice(0, 3).map((suggestion, index) => (
+                <li key={index}>{suggestion}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={cn(
       'flex flex-col items-center justify-center min-h-screen bg-background',
       className
     )}>
-      <Loader2 className={cn('animate-spin text-primary', sizeClasses[size])} />
+      <Loader2 className={cn('animate-spin text-primary', sizeClasses[validatedSize])} />
       {showMessage && (
         <p className="mt-4 text-sm text-muted-foreground animate-pulse">
           {message}
+        </p>
+      )}
+      {recoveryState.isRecovering && (
+        <p className="mt-2 text-xs text-yellow-600">
+          Attempting to recover...
         </p>
       )}
     </div>
@@ -46,21 +149,69 @@ export const ComponentLoader: React.FC<LoadingStateProps> = ({
   message = 'Loading...',
   showMessage = false,
 }) => {
+  const [error, setError] = React.useState<LoadingError | null>(null);
+  const { recoveryState, recover, updateError } = useLoadingRecovery({
+    maxRecoveryAttempts: 2,
+    onRecoverySuccess: () => setError(null)
+  });
+
+  // Normalize and validate size
+  const validatedSize = React.useMemo(() => {
+    try {
+      return normalizeLoadingSize(size);
+    } catch (err) {
+      logger.warn('Invalid loading size provided, using default', { size, error: err });
+      return 'md';
+    }
+  }, [size]);
+
   const sizeClasses = {
     sm: 'h-4 w-4',
     md: 'h-6 w-6',
     lg: 'h-8 w-8',
   };
 
+  // Update recovery when error changes
+  React.useEffect(() => {
+    updateError(error);
+  }, [error, updateError]);
+
+  if (error && !recoveryState.isRecovering) {
+    return (
+      <div className={cn(
+        'flex flex-col items-center justify-center p-8 border border-dashed border-red-200 rounded-lg',
+        className
+      )}>
+        <AlertCircle className="h-6 w-6 text-red-500 mb-2" />
+        <p className="text-sm text-red-600 text-center mb-2">
+          {getErrorDisplayMessage(error)}
+        </p>
+        {recoveryState.canRecover && (
+          <button
+            onClick={recover}
+            className="px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Retry
+          </button>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={cn(
       'flex flex-col items-center justify-center p-8',
       className
     )}>
-      <Loader2 className={cn('animate-spin text-primary', sizeClasses[size])} />
+      <Loader2 className={cn('animate-spin text-primary', sizeClasses[validatedSize])} />
       {showMessage && (
         <p className="mt-2 text-sm text-muted-foreground">
           {message}
+        </p>
+      )}
+      {recoveryState.isRecovering && (
+        <p className="mt-1 text-xs text-yellow-600">
+          Recovering...
         </p>
       )}
     </div>
@@ -224,28 +375,151 @@ export const ProgressiveLoader: React.FC<ProgressiveLoaderProps> = ({
   currentStage,
   className,
 }) => {
-  const currentStageData = stages[currentStage] || stages[0];
-  const progress = ((currentStage + 1) / stages.length) * 100;
+  const [validationError, setValidationError] = React.useState<LoadingValidationError | null>(null);
+  const [stageErrors, setStageErrors] = React.useState<Record<string, LoadingError>>({});
+
+  // Validate stages and current stage
+  const { validatedStages, validatedCurrentStage, progress } = React.useMemo(() => {
+    try {
+      // Validate each stage
+      const validated = stages.map(stage => validateLoadingStage(stage));
+      
+      // Validate current stage index
+      const currentIndex = Math.max(0, Math.min(currentStage, validated.length - 1));
+      
+      // Calculate progress
+      const progressValue = validated.length > 0 ? ((currentIndex + 1) / validated.length) * 100 : 0;
+      
+      if (!isValidProgressPercentage(progressValue)) {
+        throw new LoadingValidationError(
+          'Invalid progress calculation',
+          'progress',
+          progressValue
+        );
+      }
+
+      setValidationError(null);
+      return {
+        validatedStages: validated,
+        validatedCurrentStage: currentIndex,
+        progress: progressValue
+      };
+    } catch (error) {
+      const validationErr = error instanceof LoadingValidationError 
+        ? error 
+        : new LoadingValidationError('Stage validation failed', 'stages', stages);
+      
+      setValidationError(validationErr);
+      logger.error('Progressive loader validation failed', { error: validationErr, stages, currentStage });
+      
+      return {
+        validatedStages: [],
+        validatedCurrentStage: 0,
+        progress: 0
+      };
+    }
+  }, [stages, currentStage]);
+
+  const currentStageData = validatedStages[validatedCurrentStage];
+  const hasStageError = currentStageData && stageErrors[currentStageData.id];
+
+  // Handle stage errors
+  const handleStageError = React.useCallback((stageId: string, error: LoadingError) => {
+    setStageErrors(prev => ({
+      ...prev,
+      [stageId]: error
+    }));
+  }, []);
+
+  const retryStage = React.useCallback((stageId: string) => {
+    setStageErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors[stageId];
+      return newErrors;
+    });
+  }, []);
+
+  if (validationError) {
+    return (
+      <div className={cn(
+        'flex flex-col items-center justify-center p-8 border border-dashed border-red-200 rounded-lg',
+        className
+      )}>
+        <AlertCircle className="h-8 w-8 text-red-500 mb-2" />
+        <p className="text-sm font-medium text-red-600 mb-1">
+          Configuration Error
+        </p>
+        <p className="text-xs text-red-500 text-center">
+          {getErrorDisplayMessage(validationError)}
+        </p>
+      </div>
+    );
+  }
+
+  if (validatedStages.length === 0) {
+    return (
+      <div className={cn(
+        'flex flex-col items-center justify-center p-8',
+        className
+      )}>
+        <AlertCircle className="h-8 w-8 text-yellow-500 mb-2" />
+        <p className="text-sm text-muted-foreground">
+          No loading stages configured
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={cn(
       'flex flex-col items-center justify-center p-8 space-y-4',
       className
     )}>
-      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      {hasStageError ? (
+        <AlertCircle className="h-8 w-8 text-red-500" />
+      ) : (
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      )}
+      
       <div className="text-center space-y-2">
-        <p className="text-sm text-muted-foreground">
-          {currentStageData.message}
+        <p className={cn(
+          'text-sm',
+          hasStageError ? 'text-red-600 font-medium' : 'text-muted-foreground'
+        )}>
+          {hasStageError 
+            ? `Error in: ${currentStageData.message}` 
+            : currentStageData.message
+          }
         </p>
+        
+        {hasStageError && (
+          <p className="text-xs text-red-500">
+            {stageErrors[currentStageData.id]?.message || 'Stage failed'}
+          </p>
+        )}
+        
         <div className="w-48 bg-muted rounded-full h-2">
           <div
-            className="bg-primary h-2 rounded-full transition-all duration-300"
+            className={cn(
+              'h-2 rounded-full transition-all duration-300',
+              hasStageError ? 'bg-red-500' : 'bg-primary'
+            )}
             style={{ width: `${progress}%` }}
           />
         </div>
+        
         <p className="text-xs text-muted-foreground">
-          Step {currentStage + 1} of {stages.length}
+          Step {validatedCurrentStage + 1} of {validatedStages.length}
         </p>
+        
+        {hasStageError && currentStageData.retryable !== false && (
+          <button
+            onClick={() => retryStage(currentStageData.id)}
+            className="mt-2 px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Retry Stage
+          </button>
+        )}
       </div>
     </div>
   );
