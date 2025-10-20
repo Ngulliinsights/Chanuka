@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import WebSocket, { WebSocketServer } from 'ws';
 import { createServer } from 'http';
-import { router as notificationsRouter } from '../../infrastructure/notifications/notifications.js';
+import { router as notificationsRouter } from '../../infrastructure/notifications/notifications';
 // import { router as realTimeTrackingRouter } from '../../features/bills/real-time-tracking.js'; // TODO: Implement real-time tracking router
 import { router as billTrackingRouter } from '../../features/bills/bill-tracking.js';
 

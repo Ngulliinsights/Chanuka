@@ -4,11 +4,13 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { RateLimitStore, RateLimitConfig, RateLimitResult, RateLimitHeaders } from '../core/interfaces';
+import { Result, ok, err } from '../../primitives/types/result';
+import { logger } from '../../logging/logger';
 import { getMetricsCollector } from '../metrics';
+import { IRateLimitStore, RateLimitOptions, RateLimitResult, RateLimitHeaders } from '../types';
 
-export interface ExpressRateLimitOptions extends RateLimitConfig {
-  store: RateLimitStore;
+export interface ExpressRateLimitOptions extends RateLimitOptions {
+  store: IRateLimitStore;
   keyGenerator?: (req: Request) => string;
   skipSuccessfulRequests?: boolean;
   skipFailedRequests?: boolean;
@@ -48,14 +50,87 @@ export function createExpressRateLimitMiddleware(options: ExpressRateLimitOption
       }
 
       const key = keyGenerator(req);
-      const result = await store.check(key, config);
+
+      // For now, implement a simple check using the store's get/set operations
+      // This should be replaced with a proper check method when available
+      const now = Date.now();
+      const windowStart = now - config.windowMs;
+
+      // Get current data
+      const getResult = await store.get(key);
+      if (getResult.isErr()) {
+        logger.error('Rate limiter store get failed', {
+          error: getResult.error.message,
+          key,
+          ip: req.ip,
+          path: req.path
+        });
+        metrics.recordError(getResult.error.message);
+        // Fail open on errors
+        return next();
+      }
+
+      let data = getResult.value;
+      let tokens = 0;
+      let resetAt = new Date(now + config.windowMs);
+
+      if (!data) {
+        // First request in window
+        tokens = config.max - 1;
+        data = {
+          tokens,
+          lastRefill: now,
+          resetTime: resetAt.getTime()
+        };
+      } else {
+        // Check if window has expired
+        if (now >= data.resetTime) {
+          // Reset window
+          tokens = config.max - 1;
+          data = {
+            tokens,
+            lastRefill: now,
+            resetTime: resetAt.getTime()
+          };
+        } else {
+          // Within current window
+          if (data.tokens > 0) {
+            tokens = data.tokens - 1;
+            data.tokens = tokens;
+          } else {
+            // Rate limit exceeded
+            tokens = 0;
+          }
+        }
+      }
+
+      // Save updated data
+      const setResult = await store.set(key, data, config.windowMs);
+      if (setResult.isErr()) {
+        logger.error('Rate limiter store set failed', {
+          error: setResult.error.message,
+          key,
+          ip: req.ip,
+          path: req.path
+        });
+        metrics.recordError(setResult.error.message);
+        // Fail open on errors
+        return next();
+      }
+
+      const result: RateLimitResult = {
+        allowed: tokens >= 0,
+        remaining: Math.max(0, tokens),
+        resetAt,
+        retryAfter: tokens < 0 ? Math.ceil((resetAt.getTime() - now) / 1000) : undefined
+      };
 
       // Record metrics
       const processingTime = Date.now() - startTime;
       metrics.recordEvent({
         allowed: result.allowed,
         key,
-        algorithm: result.algorithm,
+        algorithm: 'express-middleware', // Could be enhanced to track actual algorithm
         remaining: result.remaining,
         processingTime,
         ip: req.ip,
@@ -68,6 +143,16 @@ export function createExpressRateLimitMiddleware(options: ExpressRateLimitOption
       setRateLimitHeaders(res, result, config, standardHeaders, legacyHeaders);
 
       if (!result.allowed) {
+        // Log rate limit violation
+        logger.warn('Rate limit exceeded', {
+          key,
+          ip: req.ip,
+          path: req.path,
+          method: req.method,
+          remaining: result.remaining,
+          resetAt: result.resetAt.toISOString()
+        });
+
         // Call custom handler if provided
         if (onLimitReached) {
           onLimitReached(req, res);
@@ -78,7 +163,7 @@ export function createExpressRateLimitMiddleware(options: ExpressRateLimitOption
           error: config.message || 'Too many requests',
           code: 'RATE_LIMIT_EXCEEDED',
           retryAfter: result.retryAfter,
-          limit: config.limit,
+          limit: config.max,
           remaining: result.remaining,
           resetAt: result.resetAt.toISOString()
         });
@@ -89,13 +174,15 @@ export function createExpressRateLimitMiddleware(options: ExpressRateLimitOption
     } catch (error) {
       // Record error metrics
       const processingTime = Date.now() - startTime;
-      metrics.recordError(error instanceof Error ? error.message : 'Unknown rate limiting error');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown rate limiting error';
+      metrics.recordError(errorMessage);
 
       // Log error
-      console.warn('Rate limiter error - failing open', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+      logger.error('Rate limiter middleware error - failing open', {
+        error: errorMessage,
         ip: req.ip,
-        path: req.path
+        path: req.path,
+        method: req.method
       });
 
       // Fail open - allow the request to proceed
@@ -136,27 +223,27 @@ function shouldSkipRequest(
 function setRateLimitHeaders(
   res: Response,
   result: RateLimitResult,
-  config: RateLimitConfig,
+  config: RateLimitOptions,
   standardHeaders: boolean,
   legacyHeaders: boolean
 ): void {
   if (standardHeaders) {
     // RFC 6585 standard headers
     res.set({
-      'RateLimit-Limit': String(config.limit),
+      'RateLimit-Limit': String(config.max),
       'RateLimit-Remaining': String(result.remaining),
       'RateLimit-Reset': String(Math.ceil(result.resetAt.getTime() / 1000))
-    } as RateLimitHeaders);
+    });
   }
 
   if (legacyHeaders) {
     // Legacy X-RateLimit headers
     res.set({
-      'X-RateLimit-Limit': String(config.limit),
+      'X-RateLimit-Limit': String(config.max),
       'X-RateLimit-Remaining': String(result.remaining),
       'X-RateLimit-Reset': result.resetAt.toISOString(),
       'X-RateLimit-Window': String(config.windowMs)
-    } as RateLimitHeaders);
+    });
   }
 
   if (result.retryAfter) {
@@ -167,65 +254,29 @@ function setRateLimitHeaders(
 /**
  * Pre-configured middleware factories for common use cases
  */
-export function createApiRateLimitMiddleware(store: RateLimitStore) {
+export function createApiRateLimitMiddleware(store: IRateLimitStore) {
   return createExpressRateLimitMiddleware({
     store,
     windowMs: 15 * 60 * 1000, // 15 minutes
-    limit: 100,
+    max: 100,
     message: 'Too many API requests from this IP'
   });
 }
 
-export function createAuthRateLimitMiddleware(store: RateLimitStore) {
+export function createAuthRateLimitMiddleware(store: IRateLimitStore) {
   return createExpressRateLimitMiddleware({
     store,
     windowMs: 15 * 60 * 1000, // 15 minutes
-    limit: 5,
+    max: 5,
     message: 'Too many authentication attempts'
   });
 }
 
-export function createSearchRateLimitMiddleware(store: RateLimitStore) {
+export function createSearchRateLimitMiddleware(store: IRateLimitStore) {
   return createExpressRateLimitMiddleware({
     store,
     windowMs: 5 * 60 * 1000, // 5 minutes
-    limit: 50,
+    max: 50,
     message: 'Too many search requests from this IP'
   });
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,74 +1,29 @@
 /**
- * Caching Core Module
- *
- * Core interfaces and utilities for the caching abstraction
+ * Core Cache System Exports
+ * 
+ * Unified exports for the refined cache system interfaces and base implementations.
  */
 
 // Core interfaces
 export type {
-  CacheService,
   CacheAdapter,
+  HealthStatus,
   CacheMetrics,
-  CacheTierStats,
-  CacheEntry,
+  BaseCacheConfig,
+  MemoryCacheConfig,
+  RedisCacheConfig,
+  MultiTierCacheConfig,
   CacheConfig,
-  CacheOptions,
-  CacheHealthStatus,
-  CacheEvent,
+  CacheOperationOptions,
   CacheEventType,
-  CircuitBreakerState,
-  SingleFlightOptions,
-  MultiTierOptions,
-  PromotionStrategy,
-  EvictionPolicy,
-  CompressionOptions,
-  SerializationOptions,
-  CacheWarmingStrategy,
-  EvictionOptions,
-  CacheStatsAggregation,
-  CacheResult,
-  CacheError,
-  CacheFactoryOptions,
-} from './interfaces';
+  CacheEvent,
+  CacheValidationResult,
+  CacheStatistics
+} from '../interfaces';
 
-// Base adapter
-export { BaseCacheAdapter } from './base-adapter';
+// Base implementation
+export { BaseCacheAdapter } from '../base-cache-adapter';
 
-// Key generator
-export { CacheKeyGenerator, cacheKeyGenerator } from './key-generator';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Re-export Result types for convenience
+export type { Result } from '../../primitives/types/result';
+export { ok, err, isOk, isErr } from '../../primitives/types/result';

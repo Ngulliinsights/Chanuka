@@ -1,80 +1,108 @@
-import { RateLimitStore, RateLimitOptions, RateLimitResult, RateLimitBucket } from '../types';
+import { Result, ok, err } from '../../primitives/types/result';
+import { RateLimitData, IRateLimitStore } from '../types';
 
-export class MemoryRateLimitStore implements RateLimitStore {
-  private buckets = new Map<string, RateLimitBucket>();
+export class MemoryRateLimitStore implements IRateLimitStore {
+  private data = new Map<string, RateLimitData>();
+  private locks = new Map<string, Promise<void>>();
   private cleanupInterval: NodeJS.Timeout | null = null;
 
   constructor(private cleanupIntervalMs: number = 60000) {
     this.startCleanup();
   }
 
-  async check(key: string, options: RateLimitOptions): Promise<RateLimitResult> {
-    const now = Date.now();
-    const windowMs = options.windowMs;
-    const maxRequests = this.getMaxRequests(options);
-
-    let bucket = this.buckets.get(key);
-
-    if (!bucket || now >= bucket.resetTime) {
-      // Create new bucket
-      bucket = {
-        tokens: maxRequests - 1,
-        lastRefill: now,
-        resetTime: now + windowMs
-      };
-      this.buckets.set(key, bucket);
-      return {
-        allowed: true,
-        remaining: bucket.tokens,
-        resetAt: new Date(bucket.resetTime)
-      };
+  async get(key: string): Promise<Result<RateLimitData | null>> {
+    try {
+      const data = this.data.get(key) || null;
+      return ok(data);
+    } catch (error) {
+      return err(error as Error);
     }
-
-    if (bucket.tokens > 0) {
-      bucket.tokens--;
-      return {
-        allowed: true,
-        remaining: bucket.tokens,
-        resetAt: new Date(bucket.resetTime)
-      };
-    }
-
-    return {
-      allowed: false,
-      remaining: 0,
-      resetAt: new Date(bucket.resetTime),
-      retryAfter: Math.ceil((bucket.resetTime - now) / 1000)
-    };
   }
 
-  async reset(key: string): Promise<void> {
-    this.buckets.delete(key);
-  }
+  async set(key: string, data: RateLimitData, ttl?: number): Promise<Result<void>> {
+    try {
+      this.data.set(key, data);
 
-  async cleanup(): Promise<void> {
-    const now = Date.now();
-    const keysToDelete: string[] = [];
-
-    for (const [key, bucket] of this.buckets.entries()) {
-      if (now >= bucket.resetTime) {
-        keysToDelete.push(key);
+      if (ttl) {
+        setTimeout(() => {
+          this.data.delete(key);
+        }, ttl);
       }
-    }
 
-    keysToDelete.forEach(key => this.buckets.delete(key));
+      return ok(undefined);
+    } catch (error) {
+      return err(error as Error);
+    }
   }
 
-  private getMaxRequests(options: RateLimitOptions): number {
-    const isTestEnvironment = process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined;
-    const isDevelopment = process.env.NODE_ENV === 'development';
+  async delete(key: string): Promise<Result<void>> {
+    try {
+      this.data.delete(key);
+      return ok(undefined);
+    } catch (error) {
+      return err(error as Error);
+    }
+  }
 
-    if (isTestEnvironment && options.testMax) {
-      return options.testMax;
-    } else if (isDevelopment && options.devMax) {
-      return options.devMax;
+  async increment(key: string, field: string, amount: number = 1): Promise<Result<number>> {
+    const lockKey = `lock:${key}`;
+
+    // Wait for any existing operation on this key
+    const existingLock = this.locks.get(lockKey);
+    if (existingLock) {
+      await existingLock;
     }
 
-    return options.max;
+    // Create a new lock for this operation
+    let resolveLock: () => void;
+    const lockPromise = new Promise<void>((resolve) => {
+      resolveLock = resolve;
+    });
+    this.locks.set(lockKey, lockPromise);
+
+    try {
+      let data = this.data.get(key);
+
+      if (!data) {
+        data = {
+          tokens: 0,
+          lastRefill: Date.now(),
+          resetTime: Date.now() + 60000 // Default 1 minute window
+        };
+      }
+
+      if (field === 'tokens') {
+        data.tokens += amount;
+      } else if (field === 'lastRefill') {
+        data.lastRefill += amount;
+      } else if (field === 'resetTime') {
+        data.resetTime += amount;
+      } else {
+        throw new Error(`Unknown field: ${field}`);
+      }
+
+      this.data.set(key, data);
+
+      return ok(data[field as keyof RateLimitData] as number);
+    } catch (error) {
+      return err(error as Error);
+    } finally {
+      // Release the lock
+      resolveLock!();
+      this.locks.delete(lockKey);
+    }
+  }
+
+  async expire(key: string, ttl: number): Promise<Result<void>> {
+    try {
+      setTimeout(() => {
+        this.data.delete(key);
+      }, ttl);
+
+      return ok(undefined);
+    } catch (error) {
+      return err(error as Error);
+    }
   }
 
   private startCleanup(): void {
@@ -83,48 +111,25 @@ export class MemoryRateLimitStore implements RateLimitStore {
     }, this.cleanupIntervalMs);
   }
 
+  private async cleanup(): Promise<void> {
+    const now = Date.now();
+    const keysToDelete: string[] = [];
+
+    for (const [key, data] of this.data.entries()) {
+      if (now >= data.resetTime) {
+        keysToDelete.push(key);
+      }
+    }
+
+    keysToDelete.forEach(key => this.data.delete(key));
+  }
+
   destroy(): void {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
     }
-    this.buckets.clear();
+    this.data.clear();
+    this.locks.clear();
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -31,13 +31,22 @@ import {
   MobileTabBar, 
   SwipeableHeader 
 } from '@/components/mobile/mobile-navigation-enhancements';
-import { logger } from '@shared/core/src/observability/logging';
+import { 
+  MobileNavigationProps,
+  NavigationItem as LayoutNavigationItem,
+  User as LayoutUser,
+  LayoutError,
+  LayoutRenderError,
+  LayoutNavigationError,
+  safeValidateNavigationItem
+} from './index';
 
 // Type definitions for better TypeScript safety
 interface User {
+  id: string;
   name: string;
   email: string;
-  role: 'user' | 'admin';
+  role: 'public' | 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate';
 }
 
 interface NavigationItem {
@@ -54,23 +63,27 @@ interface AuthResponse {
 
 
 // Constants moved outside component to prevent recreation on every render
-const NAVIGATION_ITEMS: NavigationItem[] = [
+const NAVIGATION_ITEMS: LayoutNavigationItem[] = [
   {
+    id: 'home',
     label: 'Home',
     href: '/',
     icon: <Home className="h-5 w-5" />
   },
   {
+    id: 'bills',
     label: 'Bills',
     href: '/bills',
     icon: <FileText className="h-5 w-5" />
   },
   {
+    id: 'search',
     label: 'Search',
     href: '/search',
     icon: <Search className="h-5 w-5" />
   },
   {
+    id: 'dashboard',
     label: 'Dashboard',
     href: '/dashboard',
     icon: <User className="h-5 w-5" />
@@ -79,16 +92,57 @@ const NAVIGATION_ITEMS: NavigationItem[] = [
 
 
 
-const MobileNavigation: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const MobileNavigation: React.FC<MobileNavigationProps> = ({ 
+  isOpen: controlledIsOpen,
+  onClose,
+  navigationItems = NAVIGATION_ITEMS,
+  user,
+  onLogout,
+  className,
+  enableSwipeGestures = true,
+  enableTouchOptimization = true
+}) => {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [touchOptimized, setTouchOptimized] = useState(false);
+  const [navigationError, setNavigationError] = useState<LayoutError | null>(null);
   const location = useLocation();
+
+  // Use controlled or internal state
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+  const setIsOpen = controlledIsOpen !== undefined ? (open: boolean) => {
+    if (!open) onClose?.();
+  } : setInternalIsOpen;
 
   const headerRef = useRef<HTMLDivElement>(null);
   const bottomNavRef = useRef<HTMLDivElement>(null);
 
+  // Validate navigation items
+  useEffect(() => {
+    for (const item of navigationItems) {
+      const validation = safeValidateNavigationItem(item);
+      if (!validation.success) {
+        const error = new LayoutNavigationError(
+          `Invalid navigation item: ${validation.error?.message}`,
+          item.label,
+          item.href,
+          { item, validationError: validation.error }
+        );
+        setNavigationError(error);
+        break;
+      }
+    }
+  }, [navigationItems]);
+
+  // Error recovery function
+  const recoverFromError = useCallback(() => {
+    setNavigationError(null);
+    setIsOpen(false);
+  }, [setIsOpen]);
+
   // Memoized API functions to prevent recreation on every render
   const fetchUser = useCallback(async (): Promise<User | null> => {
+    if (user) return user; // Use provided user if available
+    
     const token = localStorage.getItem('token');
     if (!token) return null;
     
@@ -104,28 +158,44 @@ const MobileNavigation: React.FC = () => {
       const data: AuthResponse = await response.json();
       return data.user;
     } catch (error) {
-      logger.error('Failed to fetch user:', { component: 'Chanuka' }, error);
+      const navError = new LayoutNavigationError(
+        'Failed to fetch user data',
+        'user-fetch',
+        '/api/auth/verify',
+        { error: (error as Error).message }
+      );
+      setNavigationError(navError);
       return null;
     }
-  }, []);
+  }, [user]);
 
-
-
-  // Optimized queries with proper error handling
-  const { data: user } = useQuery({
+  // Optimized queries with proper error handling (only if user not provided)
+  const { data: fetchedUser } = useQuery({
     queryKey: ['auth', 'user'],
     queryFn: fetchUser,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
+    enabled: !user, // Only fetch if user not provided
   });
 
-
+  const currentUser = user || fetchedUser;
 
   // Memoized logout handler to prevent recreation
   const handleLogout = useCallback(() => {
-    localStorage.removeItem('token');
-    window.location.href = '/auth';
-  }, []);
+    try {
+      onLogout?.();
+      localStorage.removeItem('token');
+      window.location.href = '/auth';
+    } catch (error) {
+      const navError = new LayoutNavigationError(
+        'Logout failed',
+        'logout',
+        '/auth',
+        { error: (error as Error).message }
+      );
+      setNavigationError(navError);
+    }
+  }, [onLogout]);
 
   // Memoized path checker to prevent recreation
   const isActivePath = useCallback((path: string): boolean => {
@@ -194,13 +264,52 @@ const MobileNavigation: React.FC = () => {
   );
 
   // Memoized navigation items for bottom nav
-  const bottomNavItems = useMemo(() => NAVIGATION_ITEMS.slice(0, 4), []);
+  const bottomNavItems = useMemo(() => navigationItems.slice(0, 4), [navigationItems]);
 
-  return (
-    <ResponsiveLayoutProvider>
-      <MobileNavigationContent />
-    </ResponsiveLayoutProvider>
-  );
+  // Error boundary rendering
+  if (navigationError) {
+    return (
+      <div className={cn("bg-red-50 border-b border-red-200 p-4", className)}>
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-red-600 text-sm font-medium">Navigation Error</div>
+            <div className="text-red-500 text-xs">{navigationError.message}</div>
+          </div>
+          <button
+            onClick={recoverFromError}
+            className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+            type="button"
+          >
+            Recover
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  try {
+    return (
+      <ResponsiveLayoutProvider>
+        <MobileNavigationContent 
+          isOpen={isOpen}
+          onClose={onClose}
+          navigationItems={navigationItems}
+          user={currentUser}
+          onLogout={handleLogout}
+          className={className}
+          enableSwipeGestures={enableSwipeGestures}
+          enableTouchOptimization={enableTouchOptimization}
+        />
+      </ResponsiveLayoutProvider>
+    );
+  } catch (error) {
+    const renderError = new LayoutRenderError(
+      `Mobile navigation render failed: ${(error as Error).message}`,
+      'MobileNavigation'
+    );
+    setNavigationError(renderError);
+    return null;
+  }
 };
 
 const MobileNavigationContent: React.FC = () => {

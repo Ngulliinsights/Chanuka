@@ -55,7 +55,6 @@ const ApiResponse = ApiResponseBuilder;
 
 // Updated API response utilities - no longer deprecated
 
-export const ApiResponseWrapper = ApiResponse;
 export const ApiSuccess = ApiResponse.success;
 export const ApiError = ApiResponse.error;
 export const ApiNotFound = ApiResponse.notFound;
@@ -66,13 +65,62 @@ export const ApiForbidden = (message: string = 'Forbidden') =>
 export const ApiValidationError = (errors: any[]) =>
   ApiResponse.validation('Validation failed', errors);
 
+// API Response Wrapper class with createMetadata method
+export class ApiResponseWrapper {
+  static success(res: any, data: any, metadata?: any, statusCode?: number) {
+    return ApiResponse.success(data);
+  }
+
+  static error(res: any, error: string | Error, statusCode?: number, metadata?: any) {
+    const message = typeof error === 'string' ? error : error.message;
+    return ApiResponse.error(message, undefined, statusCode);
+  }
+
+  static notFound(res: any, resource?: string, metadata?: any) {
+    return ApiResponse.notFound(resource || 'Resource not found');
+  }
+
+  static validationError(res: any, details: any, metadata?: any) {
+    return ApiResponse.validation('Validation failed', details);
+  }
+
+  static unauthorized(res: any, message?: string, metadata?: any) {
+    return ApiUnauthorized(message || 'Unauthorized');
+  }
+
+  static forbidden(res: any, message?: string, metadata?: any) {
+    return ApiForbidden(message || 'Forbidden');
+  }
+
+  static cached(res: any, data: any, metadata?: any) {
+    return ApiResponse.success(data);
+  }
+
+  static fallback(res: any, data: any, message?: string, metadata?: any) {
+    return ApiResponse.success(data);
+  }
+
+  static createMetadata(startTime: number, source?: string, additional?: any) {
+    return {
+      timestamp: new Date().toISOString(),
+      requestId: undefined,
+      source: source || 'api',
+      executionTime: Date.now() - startTime,
+      cacheHit: false,
+      version: '1.0.0',
+      ...additional
+    };
+  }
+}
+
 export const ErrorCodes = {
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   NOT_FOUND: 'NOT_FOUND',
   UNAUTHORIZED: 'UNAUTHORIZED',
   FORBIDDEN: 'FORBIDDEN',
-  RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED'
+  RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
+  DATABASE_ERROR: 'DATABASE_ERROR'
 };
 
 export const HttpStatus = {

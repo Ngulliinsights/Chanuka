@@ -220,7 +220,7 @@ export class SponsorConflictAnalysisService {
       const allConflicts = await Promise.all(detectionPromises);
       return allConflicts.flat();
     } catch (error) {
-      logger.error('Error detecting conflicts', { sponsorId, error: error.message });
+      logger.error('Error detecting conflicts', error instanceof Error ? error : new Error(String(error)), { sponsorId });
       throw new Error(`Conflict detection failed: ${(error as Error).message}`);
     }
   }
@@ -249,7 +249,7 @@ export class SponsorConflictAnalysisService {
 
       return { nodes, edges, clusters, metrics };
     } catch (error) {
-      logger.error('Error creating conflict mapping', { billId, error: error.message });
+      logger.error('Error creating conflict mapping', error instanceof Error ? error : new Error(String(error)), { billId });
       throw new Error(`Conflict mapping failed: ${(error as Error).message}`);
     }
   }
@@ -293,7 +293,7 @@ export class SponsorConflictAnalysisService {
 
       return trends.sort((a, b) => b.riskScore - a.riskScore);
     } catch (error) {
-      logger.error('Error analyzing conflict trends', { sponsorId, timeframeMonths, error: error.message });
+      logger.error('Error analyzing conflict trends', error instanceof Error ? error : new Error(String(error)), { sponsorId, timeframeMonths });
       throw new Error(`Trend analysis failed: ${(error as Error).message}`);
     }
   }
@@ -335,7 +335,7 @@ export class SponsorConflictAnalysisService {
         recommendations
       };
     } catch (error) {
-      logger.error('Error generating risk profile', { sponsorId, error: error.message });
+      logger.error('Error generating risk profile', error instanceof Error ? error : new Error(String(error)), { sponsorId });
       throw new Error(`Risk profile generation failed: ${(error as Error).message}`);
     }
   }

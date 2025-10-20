@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chanuka - Healthcare Access Improvement Act</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js"></script>
+    <style>
+        /* Optimized CSS Variables */
+        :root {
+            /* Colors */
+            --primary: #0d3b66;
+            --accent: #f38a1f;
+            --accent-hover: #d47716;
+            --text: #333;
+            --text-light: #555;
+            --background: #f5f7fa;
+            --white: #fff;
+            --border: #e5e7eb;
+            --tab-inactive: #e5e7eb;
+            --success: #28a745;
+            --danger: #dc3545;
+            --error-bg: #ffe3e3;
+            --error-border: #f87171;
+            --error-text: #b91c1c;
+            --gray-light: #f0f2f5;
+            --gray-medium: #6c757d;
+            --info: #17a2b8;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 8px rgba(0,0,0,0.15);
+            
+            /* Spacing */
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 0.75rem;
+            --spacing-lg: 1rem;
+            --spacing-xl: 1.5rem;
+            --spacing-2xl: 2rem;
+            
+            /* Font Sizes */
+            --font-sm: 0.875rem;
+            --font-md: 1rem;
+            --font-lg: 1.25rem;
+            --font-xl: 1.5rem;
+            --font-2xl: 2rem;
+            
+            /* Radius */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            
+            /* Transitions */
+            --transition: 0.2s ease;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            color: var(--primary);
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        h1 { font-size: var(--font-2xl); margin-bottom: var(--spacing-lg); }
+        h2 { font-size: var(--font-xl); margin-bottom: var(--spacing-md); }
+        h3 { font-size: var(--font-lg); margin-bottom: var(--spacing-sm); }
+        p { margin-bottom: var(--spacing-md); }
+
+        /* Header */
+        header { 
+            background: var(--primary); 
+            color: var(--white); 
+            padding: var(--spacing-md) var(--spacing-xl);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: var(--spacing-lg);
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background-color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-md);
+        }
+
+        nav a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-weight: 500;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            transition: background var(--transition);
+        }
+
+        nav a:hover, nav a.active {
+            background-color: rgba(255,255,255,0.15);
+        }
+
+        .user-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .notification-badge {
+            position: relative;
+            cursor: pointer;
+            color: var(--white);
+            padding: var(--spacing-xs);
+            border-radius: var(--radius-sm);
+            transition: background var(--transition);
+        }
+
+        .notification-badge:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background-color: var(--accent);
+            color: var(--white);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: var(--font-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.2);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-lg);
+        }
+
+        /* Add new styles for previously inline styled elements */
+        .full-width-btn {
+            width: 100%;
+            margin-top: var(--spacing-md);
+        }
+
+        .btn-group-margin {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .document-preview {
+            background: var(--gray-light);
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+
+        .document-meta {
+            margin-top: var(--spacing-sm);
+        }
+
+        .breadcrumbs {
+            display: flex;
+            gap: var(--spacing-xs);
+            margin-bottom: var(--spacing-xl);
+            font-size: var(--font-sm);
+            color: var(--gray-medium);
+            flex-wrap: wrap;
+        }
+
+        .breadcrumbs a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumbs a:hover {
+            text-decoration: underline;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-xl);
+        }
+
+        @media (min-width: 992px) {
+            .two-column {
+                grid-template-columns: 3fr 1fr;
+            }
+        }
+
+        /* Cards */
+        .card { 
+            background: var(--white); 
+            border-radius: var(--radius-md); 
+            box-shadow: var(--shadow-md); 
+            overflow: hidden;
+            margin-bottom: var(--spacing-xl);
+            transition: transform var(--transition), box-shadow var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .card-header { 
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border); 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-content { 
+            padding: var(--spacing-lg); 
+        }
+
+        /* Bill Status */
+        .bill-header {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .stage-indicator {
+            display: flex;
+            margin-top: var(--spacing-md);
+            position: relative;
+            align-items: center;
+        }
+
+        .stage-node {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--gray-light);
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-sm);
+            color: var(--text);
+        }
+
+        .stage-node.active {
+            background-color: var(--success);
+            color: var(--white);
+        }
+
+        .stage-node.current {
+            background-color: var(--info);
+            color: var(--white);
+        }
+
+        .stage-line {
+            flex: 1;
+            height: 3px;
+            background-color: var(--gray-light);
+        }
+
+        .stage-line.active {
+            background-color: var(--success);
+        }
+
+        .bill-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-lg);
+            font-size: var(--font-sm);
+            color: var(--gray-medium);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .bill-meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        /* Tags */
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .tag {
+            display: inline-block;
+            background: var(--background);
+            color: var(--primary);
+            padding: var(--spacing-xs) var(--spacing-md);
+            font-size: var(--font-sm);
+            font-weight: 500;
+            border-radius: 1rem;
+            border: 1px solid var(--border);
+            transition: all var(--transition);
+        }
+        
+        .tag:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        /* Impact Panel */
+        .impact-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .impact-item {
+            background-color: var(--gray-light);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+
+        .impact-number {
+            font-size: var(--font-lg);
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.2;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .impact-label {
+            font-size: var(--font-sm);
+            color: var(--gray-medium);
+        }
+
+        /* Tabs */
+        .tabs { 
+            background: var(--white); 
+            border-radius: var(--radius-md); 
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+
+        .tab-list { 
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .tab { 
+            flex: 1; 
+            min-width: 140px;
+            padding: var(--spacing-md) var(--spacing-lg); 
+            border: none; 
+            background: var(--tab-inactive); 
+            cursor: pointer;
+            font-weight: 500;
+            transition: background var(--transition), color var(--transition);
+            text-align: center;
+        }
+        
+        .tab:hover:not(.active) {
+            background: #e1e4eb;
+        }
+        
+        .tab.active { 
+            background: var(--accent); 
+            color: var(--white);
+        }
+        
+        .tab-content { 
+            padding: var(--spacing-lg);
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Input Area */
+        .textarea-container {
+            position: relative;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-bottom: var(--spacing-md);
+        }
+
+        textarea {
+            width: 100%;
+            padding: var(--spacing-md);
+            border: none;
+            resize: vertical;
+            min-height: 120px;
+            font-size: var(--font-md);
+            background: var(--white);
+        }
+
+        textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(13, 59, 102, 0.2);
+        }
+
+        .textarea-footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background-color: var(--gray-light);
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .char-count {
+            font-size: var(--font-sm);
+            color: var(--gray-medium);
+        }
+
+        .button-group {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        /* Buttons */
+        .btn { 
+            background: var(--accent); 
+            color: var(--white); 
+            border: none; 
+            padding: 0.6rem var(--spacing-lg); 
+            border-radius: var(--radius-sm); 
+            cursor: pointer; 
+            transition: background var(--transition);
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-xs);
+            font-size: var(--font-md);
+        }
+        
+        .btn:hover { 
+            background: var(--accent-hover); 
+        }
+        
+        .btn:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        
+        .btn-outline:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(243, 138, 31, 0.05);
+        }
+        
+        .btn-secondary {
+            background-color: var(--gray-light);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background-color: #d8dbe0;
+        }
+
+        /* Feedback Items */
+        .feedback-item {
+            padding: var(--spacing-lg) 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        .user-meta {
+            font-size: var(--font-sm);
+            color: var(--gray-medium);
+        }
+
+        .expert-badge {
+            background-color: var(--info);
+            color: var(--white);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .verified-badge {
+            background-color: var(--success);
+            color: var(--white);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .feedback-content {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .feedback-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            font-size: var(--font-sm);
+        }
+
+        .vote-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: none;
+            border: none;
+            padding: 0.3rem 0.5rem;
+            cursor: pointer;
+            color: var(--gray-medium);
+            transition: all var(--transition);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-sm);
+        }
+
+        .vote-btn:hover {
+            background-color: var(--gray-light);
+        }
+
+        .vote-btn.voted {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: none;
+            border: none;
+            padding: 0.3rem 0.5rem;
+            cursor: pointer;
+            color: var(--gray-medium);
+            transition: all var(--transition);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-sm);
+        }
+
+        .action-btn:hover {
+            background-color: var(--gray-light);
+            color: var(--text);
+        }
+
+        /* Polls */
+        .poll-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .poll-option {
+            position: relative;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .poll-option:hover {
+            background-color: var(--gray-light);
+        }
+
+        .poll-option.selected {
+            border-color: var(--primary);
+            background-color: rgba(13, 59, 102, 0.05);
+        }
+
+        .poll-option input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .poll-option-content {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Expert Opinions */
+        .expert-opinion {
+            background-color: rgba(23, 162, 184, 0.05);
+            border-left: 4px solid var(--info);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        }
+
+        .expert-opinion-title {
+            color: var(--info);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        /* Sidebar */
+        .sidebar-section {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .sidebar-title {
+            font-size: var(--font-md);
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: var(--primary);
+        }
+
+        .action-items {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            background-color: var(--gray-light);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .action-item:hover {
+            background-color: rgba(13, 59, 102, 0.1);
+        }
+
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255,255,255,0.7);
+            border-radius: 50%;
+            font-size: var(--font-lg);
+        }
+
+        .key-dates {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+
+        .key-date {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .date-bubble {
+            min-width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--gray-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-sm);
+            flex-shrink: 0;
+        }
+
+        .date-bubble .day {
+            font-weight: 700;
+            font-size: var(--font-md);
+        }
+
+        .date-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .date-title {
+            font-weight: 600;
+            font-size: var(--font-md);
+        }
+
+        .date-description {
+            font-size: var(--font-sm);
+            color: var(--gray-medium);
+        }
+
+        .engagement-stat {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .engagement-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--gray-light);
+            border-radius: 50%;
+            color: var(--primary);
+            font-size: var(--font-lg);
+            flex-shrink: 0;
+        }
+
+        .engagement-value {
+            font-weight: 600;
+            font-size: var(--font-md);
+        }
+
+        .engagement-label {
+            color: var(--gray-medium);
+            font-size: var(--font-sm);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+            margin-left: auto;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gray-medium);
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .notification-settings {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .notification-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: var(--spacing-2xl) var(--spacing-lg);
+            margin-top: var(--spacing-2xl);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: var(--spacing-2xl);
+        }
+
+        @media (min-width: 768px) {
+            .footer-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 992px) {
+            .footer-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .footer-column h3 {
+            margin-bottom: var(--spacing-md);
+            font-size: var(--font-lg);
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            transition: all var(--transition);
+            padding: var(--spacing-xs) 0;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: var(--spacing-2xl) auto 0;
+            padding-top: var(--spacing-md);
+            border-top: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            font-size: var(--font-sm);
+            opacity: 0.85;
+            gap: var(--spacing-md);
+        }
+
+        /* Transparency Banner */
+        .coi-banner { 
+            background: var(--error-bg); 
+            border-left: 4px solid var(--error-border); 
+            padding: var(--spacing-md);
+            margin: var(--spacing-xl) 0;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-sm);
+        }
+    
+        .coi-banner strong { color: var(--error-text); }
+
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: var(--font-xl);
+            cursor: pointer;
+            padding: var(--spacing-xs);
+        }
+
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: var(--primary);
+                flex-direction: column;
+                padding: var(--spacing-md);
+                box-shadow: var(--shadow-md);
+            }
+
+            nav ul.show {
+                display: flex;
+            }
+
+            .header-container {
+                flex-wrap: wrap;
+            }
+            
+            .impact-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-icon">C</div>
+                <span>Chanuka</span>
+            </div>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu" id="menuToggle">☰</button>
+            <nav>
+                <ul id="main-menu">
+                    <li><a href="#" class="active">Home</a></li>
+                    <li><a href="#">Bills</a></li>
+                    <li><a href="#">Representatives</a></li>
+                    <li><a href="#">Communities</a></li>
+                    <li><a href="#">Impact</a></li>
+                </ul>
+            </nav>
+            <div class="user-controls">
+                <div class="notification-badge" aria-label="Notifications">
+                    <span>🔔</span>
+                    <span class="badge">3</span>
+                </div>
+                <div class="user-avatar" aria-label="Your profile">MK</div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="breadcrumbs">
+            <a href="#">Home</a> 
+            <span>›</span> 
+            <a href="#">Bills</a> 
+            <span>›</span> 
+            <span>Healthcare Access Improvement Act</span>
+        </div>
+
+        <div class="two-column">
+            <div class="main-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h1>Healthcare Access Improvement Act</h1>
+                        <button class="btn-secondary">Follow</button>
+                    </div>
+                    <div class="card-content">
+                        <div class="bill-header">
+                            <h3>Bill Status</h3>
+                            <div class="stage-indicator">
+                                <div class="stage-node active" title="Introduction">1</div>
+                                <div class="stage-line active"></div>
+                                <div class="stage-node active" title="Committee Review">2</div>
+                                <div class="stage-line active"></div>
+                                <div class="stage-node current" title="Public Consultation" aria-label="Current stage">3</div>
+                                <div class="stage-line"></div>
+                                <div class="stage-node" title="Floor Debate">4</div>
+                                <div class="stage-line"></div>
+                                <div class="stage-node" title="Voting">5</div>
+                                <div class="stage-line"></div>
+                                <div class="stage-node" title="Implementation">6</div>
+                            </div>
+                        </div>
+
+                        <div class="bill-meta">
+                            <div class="bill-meta-item">
+                                <span>📅</span>
+                                <span>Sponsored: April 12, 2025</span>
+                            </div>
+                            <div class="bill-meta-item">
+                                <span>👤</span>
+                                <span>Sponsor: Hon. Sarah Mwangi</span>
+                            </div>
+                            <div class="bill-meta-item">
+                                <span>⏱️</span>
+                                <span>Consultation closes: May 30, 2025</span>
+                            </div>
+                        </div>
+
+                        <div class="bill-description">
+                            <p>This bill aims to improve healthcare access in underserved communities by establishing mobile clinics, expanding telemedicine infrastructure, and subsidizing essential medications for chronic conditions. The legislation would allocate funds over a five-year period to gradually implement these programs nationwide, with priority given to regions with the highest healthcare access disparities.</p>
+                        </div>
+
+                        <div class="tags">
+                            <span class="tag">Healthcare</span>
+                            <span class="tag">Rural Development</span>
+                            <span class="tag">Telemedicine</span>
+                            <span class="tag">Public Health</span>
+                            <span class="tag">Community Services</span>
+                        </div>
+
+                        <div class="impact-panel">
+                            <div class="impact-item">
+                                <div class="impact-number">89%</div>
+                                <div class="impact-label">Community Approval</div>
+                            </div>
+                            <div class="impact-item">
+                                <div class="impact-number">4,238</div>
+                                <div class="impact-label">Participants</div>
+                            </div>
+                            <div class="impact-item">
+                                <div class="impact-number">76%</div>
+                                <div class="impact-label">Expert Support</div>
+                            </div>
+                        </div>
+
+                        <div class="tabs">
+                            <ul class="tab-list" role="tablist">
+                                <button class="tab active" role="tab" aria-selected="true" aria-controls="community-content" data-tab="community">Community Input</button>
+                                <button class="tab" role="tab" aria-selected="false" aria-controls="experts-content" data-tab="experts">Expert Opinions</button>
+                                <button class="tab" role="tab" aria-selected="false" aria-controls="quick-poll-content" data-tab="quick-poll">Quick Poll</button>
+                                <button class="tab" role="tab" aria-selected="false" aria-controls="document-content" data-tab="document">Documents</button>
+                            </ul>
+                        </div>
+
+                        <div class="tab-content active" id="community-content">
+                            <h3>Community Discussion</h3>
+                            
+                            <div class="textarea-container">
+                                <textarea id="user-feedback" placeholder="What's your perspective on this bill? Your insights help shape better policies..." aria-label="Your feedback"></textarea>
+                                <div class="textarea-footer">
+                                    <div class="char-count">0/500</div>
+                                    <div class="button-group">
+                                        <button class="btn-secondary">Add Media</button>
+                                        <button class="btn">Submit Comment</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="community-feedback">
+                                <!-- Comment 1 - Healthcare Expert -->
+                                <div class="feedback-item">
+                                    <div class="feedback-header">
+                                        <div class="user-info">
+                                            <div class="user-avatar">JM</div>
+                                            <div>
+                                                <div class="user-name">Jane Muthoni <span class="expert-badge">Healthcare Expert</span></div>
+                                                <div class="user-meta">Turkana County • 2 days ago</div>
+                                            </div>
+                                        </div>
+                                        <button class="action-btn" aria-label="More options">⋮</button>
+                                    </div>
+                                    <div class="feedback-content">
+                                        <p>As a community healthcare worker in Turkana, I've seen firsthand how mobile clinics can transform healthcare access. But we need to ensure they're equipped for basic diagnostic testing too, not just consultations. Many patients travel hours only to be referred elsewhere for simple tests.</p>
+                                    </div>
+                                    <div class="feedback-actions">
+                                        <button class="vote-btn voted" aria-label="Upvote">
+                                            <span>👍</span>
+                                            <span>247</span>
+                                        </button>
+                                        <button class="vote-btn" aria-label="Downvote">
+                                            <span>👎</span>
+                                            <span>12</span>
+                                        </button>
+                                        <button class="action-btn" aria-label="Reply">
+                                            <span>💬</span>
+                                            <span>Reply</span>
+                                        </button>
+                                        <button class="action-btn" aria-label="Share">
+                                            <span>🔗</span>
+                                            <span>Share</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Comment 2 - Healthcare Worker -->
+                                <div class="feedback-item">
+                                    <div class="feedback-header">
+                                        <div class="user-info">
+                                            <div class="user-avatar">JK</div>
+                                            <div>
+                                                <div class="user-name">John Kamau <span class="verified-badge">Healthcare Worker</span></div>
+                                                <div class="user-meta">Nakuru County • 2 hours ago</div>
+                                            </div>
+                                        </div>
+                                        <button class="action-btn" aria-label="More options">⋮</button>
+                                    </div>
+                                    <div class="feedback-content">
+                                        <p>As a nurse working in a rural clinic, I can tell you this bill is desperately needed. We turn away patients every day because we lack basic supplies and staff. The incentives for healthcare workers would help retain talent where it's needed most.</p>
+                                    </div>
+                                    <div class="feedback-actions">
+                                        <button class="vote-btn" aria-label="Upvote">
+                                            <span>👍</span>
+                                            <span>47</span>
+                                        </button>
+                                        <button class="vote-btn" aria-label="Downvote">
+                                            <span>👎</span>
+                                            <span>3</span>
+                                        </button>
+                                        <button class="action-btn" aria-label="Reply">
+                                            <span>💬</span>
+                                            <span>Reply</span>
+                                        </button>
+                                        <button class="action-btn" aria-label="Share">
+                                            <span>🔗</span>
+                                            <span>Share</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Comment 3 - Medical Director -->
+                                <div class="feedback-item">
+                                    <div class="feedback-header">
+                                        <div class="user-info">
+                                            <div class="user-avatar">SK</div>
+                                            <div>
+                                                <div class="user-name">Dr. Samuel Kamau <span class="expert-badge">Medical Director</span></div>
+                                                <div class="user-meta">Nairobi County • 4 days ago</div>
+                                            </div>
+                                        </div>
+                                        <button class="action-btn" aria-label="More options">⋮</button>
+                                    </div>
+                                    <div class="feedback-content">
+                                        <p>The medication subsidy program needs careful consideration. I suggest focusing on chronic conditions like hypertension and diabetes first, as these require ongoing treatment and significantly impact quality of life when untreated. We should also include provisions for ensuring medication quality and preventing stockouts.</p>
+                                    </div>
+                                    <div class="feedback-actions">
+                                        <button class="vote-btn" aria-label="Upvote">
+                                            <span>👍</span>
+                                            <span>89</span>
+                                        </button>
+                                        <button class="vote-btn" aria-label="Downvote">
+                                            <span>👎</span>
+                                            <span>5</span>
+                                        </button>
+                                        <button class="action-btn" aria-label="Reply">
+                                            <span>💬</span>
+                                            <span>Reply</span>
+                                        </button>
+                                        <button class="action-btn" aria-label="Share">
+                                            <span>🔗</span>
+                                            <span>Share</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label>
+                                    <input type="checkbox" id="expert-input">
+                                    I have professional expertise on this topic
+                                </label>
+                                <small style="display: block; color: var(--gray-medium); margin-top: 0.3rem;">This will allow you to be verified as an expert contributor if your credentials are confirmed.</small>
+                            </div>
+                        </div>
+
+                        <div class="tab-content" id="experts-content">
+                            <div class="expert-opinion">
+                                <div class="expert-opinion-title">
+                                    <span>🏥</span>
+                                    <span>Dr. Amina Wanjiku - National Health Policy Advisor</span>
+                                </div>
+                                <p>The Healthcare Access Improvement Act addresses critical gaps in our current system, particularly for rural communities. The mobile clinic approach has proven effective in similar contexts across East Africa, with Uganda's rural health initiative showing a 42% increase in preventative care utilization.</p>
+                                <p>However, the bill should consider stronger provisions for sustainability. Training local community health workers should be integrated into the mobile clinic program to build lasting capacity. Additionally, the telemedicine component needs specific technical standards to ensure interoperability with our existing health information systems.</p>
+                            </div>
+
+                            <div class="expert-opinion">
+                                <div class="expert-opinion-title">
+                                    <span>💰</span>
+                                    <span>Prof. David Ndungu - Health Economics Institute</span>
+                                </div>
+                                <p>From an economic perspective, this bill makes sound investments. The return on investment for preventative care through mobile clinics is well-established, with every shilling spent potentially saving 3-4 shillings in emergency care costs. The medication subsidy program, however, requires more robust oversight mechanisms to prevent market distortions.</p>
+                                <p>I would recommend phased implementation with built-in evaluation periods to assess cost-effectiveness in different regions. The five-year timeline is appropriate, but funding should be front-loaded to establish infrastructure quickly, with operations funding spread across the remaining years.</p>
+                            </div>
+
+                            <div class="expert-opinion">
+                                <div class="expert-opinion-title">
+                                    <span>📱</span>
+                                    <span>Sarah Omondi - Digital Health Association</span>
+                                </div>
+                                <p>The telemedicine provisions in this bill represent an important step forward, but need technological specificity. Low-bandwidth solutions should be explicitly mandated to ensure rural access. Our research shows that even basic SMS-based health services can improve medication adherence by 23%.</p>
+                                <p>I strongly recommend including provisions for regular technology assessments and upgrades as part of the implementation plan. Digital health solutions evolve rapidly, and the regulatory framework should allow for adaptation without requiring new legislation.</p>
+                            </div>
+                        </div>
+
+                        <div class="tab-content" id="quick-poll-content">
+                            <h3>Your Position</h3>
+                            <div class="poll-options">
+                                <div class="poll-option">
+                                    <input type="radio" name="vote" id="strong-support">
+                                    <label for="strong-support" class="poll-option-content">
+                                        <span>Strongly Support</span>
+                                    </label>
+                                </div>
+                                <div class="poll-option">
+                                    <input type="radio" name="vote" id="support">
+                                    <label for="support" class="poll-option-content">
+                                        <span>Support</span>
+                                    </label>
+                                </div>
+                                <div class="poll-option">
+                                    <input type="radio" name="vote" id="neutral">
+                                    <label for="neutral" class="poll-option-content">
+                                        <span>Neutral</span>
+                                    </label>
+                                </div>
+                                <div class="poll-option">
+                                    <input type="radio" name="vote" id="oppose">
+                                    <label for="oppose" class="poll-option-content">
+                                        <span>Oppose</span>
+                                    </label>
+                                </div>
+                                <div class="poll-option">
+                                    <input type="radio" name="vote" id="strong-oppose">
+                                    <label for="strong-oppose" class="poll-option-content">
+                                        <span>Strongly Oppose</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn mt-lg">Submit Vote</button>
+                        </div>
+
+                        <div class="tab-content" id="document-content">
+                            <h3>Healthcare Access Improvement Act</h3>
+                            <p class="user-meta">Official document available for review</p>
+                            <div class="button-group btn-group-margin">
+                                <button class="btn">View Full Document</button>
+                                <button class="btn-secondary">Download PDF</button>
+                            </div>
+                            <div class="document-preview">
+                                <p>Document preview would appear here</p>
+                                <p class="user-meta document-meta">PDF • 1.2MB • 24 pages</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>How You Can Help</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="action-items">
+                            <div class="action-item">
+                                <div class="action-icon">📊</div>
+                                <span>Take the weekly poll</span>
+                            </div>
+                            <div class="action-item">
+                                <div class="action-icon">📝</div>
+                                <span>Share your expertise</span>
+                            </div>
+                            <div class="action-item">
+                                <div class="action-icon">📢</div>
+                                <span>Invite community members</span>
+                            </div>
+                            <div class="action-item">
+                                <div class="action-icon">📱</div>
+                                <span>Attend virtual town hall</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Your Impact</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="engagement-stat">
+                            <div class="engagement-icon">⭐</div>
+                            <div>
+                                <div class="engagement-value">Top 5%</div>
+                                <div class="engagement-label">Contributor Ranking</div>
+                            </div>
+                        </div>
+                        <div class="engagement-stat">
+                            <div class="engagement-icon">💬</div>
+                            <div>
+                                <div class="engagement-value">12</div>
+                                <div class="engagement-label">Comments Submitted</div>
+                            </div>
+                        </div>
+                        <div class="engagement-stat">
+                            <div class="engagement-icon">👍</div>
+                            <div>
+                                <div class="engagement-value">187</div>
+                                <div class="engagement-label">Upvotes Received</div>
+                            </div>
+                        </div>
+                        <div class="engagement-stat">
+                            <div class="engagement-icon">📊</div>
+                            <div>
+                                <div class="engagement-value">8</div>
+                                <div class="engagement-label">Polls Participated</div>
+                            </div>
+                        </div>
+                        <button class="btn-secondary" style="width: 100%; margin-top: var(--spacing-md);">View Full Impact Report</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Key Dates</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="key-dates">
+                            <div class="key-date">
+                                <div class="date-bubble">
+                                    <span class="day">15</span>
+                                    <span>May</span>
+                                </div>
+                                <div class="date-content">
+                                    <div class="date-title">Virtual Town Hall</div>
+                                    <div class="date-description">Live Q&A with bill sponsors</div>
+                                </div>
+                            </div>
+                            <div class="key-date">
+                                <div class="date-bubble">
+                                    <span class="day">30</span>
+                                    <span>May</span>
+                                </div>
+                                <div class="date-content">
+                                    <div class="date-title">Public Consultation Closes</div>
+                                    <div class="date-description">Last day for feedback</div>
+                                </div>
+                            </div>
+                            <div class="key-date">
+                                <div class="date-bubble">
+                                    <span class="day">12</span>
+                                    <span>Jun</span>
+                                </div>
+                                <div class="date-content">
+                                    <div class="date-title">Committee Vote</div>
+                                    <div class="date-description">Decision on amendments</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Notification Settings</h2>
+                    </div>
+                    <div class="card-content">
+                        <div class="notification-settings">                            <div class="notification-option">
+                                <label for="notify-bill-updates">Bill updates</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" checked id="notify-bill-updates" aria-label="Enable bill updates notifications">
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </div>
+                            <div class="notification-option">
+                                <label for="notify-expert-analysis">New expert analysis</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" checked id="notify-expert-analysis" aria-label="Enable expert analysis notifications">
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </div>
+                            <div class="notification-option">
+                                <label for="notify-comment-replies">Comment replies</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" checked id="notify-comment-replies" aria-label="Enable comment reply notifications">
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </div>
+                            <div class="notification-option">
+                                <label for="notify-upcoming-events">Upcoming events</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="notify-upcoming-events" aria-label="Enable upcoming events notifications">
+                                    <span class="toggle-slider"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="coi-banner" role="alert">
+            <strong>Transparency Alert:</strong> This platform is funded by various stakeholders, and we may have financial or other interests in the outcomes of the discussions and decisions made here. Please consider this when evaluating the information and opinions shared on this platform.
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-column">
+                <h3>Chanuka</h3>
+                <div class="footer-links">
+                    <a href="#">About Us</a>
+                    <a href="#">Our Mission</a>
+                    <a href="#">Impact Reports</a>
+                    <a href="#">Partners</a>
+                    <a href="#">Careers</a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Resources</h3>
+                <div class="footer-links">
+                    <a href="#">How Legislation Works</a>
+                    <a href="#">Civic Education</a>
+                    <a href="#">Data & Research</a>
+                    <a href="#">API Access</a>
+                    <a href="#">Developer Tools</a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Participate</h3>
+                <div class="footer-links">
+                    <a href="#">Current Bills</a>
+                    <a href="#">Find Your Representative</a>
+                    <a href="#">Community Guidelines</a>
+                    <a href="#">Upcoming Events</a>
+                    <a href="#">Success Stories</a>
+                </div>
+            </div>
+            <div class="footer-column">
+                <h3>Support</h3>
+                <div class="footer-links">
+                    <a href="#">Help Center</a>
+                    <a href="#">Contact Us</a>
+                    <a href="#">Accessibility</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>© 2025 Chanuka. All rights reserved.</div>
+            <div>Made with ❤️ in Kenya</div>
+        </div>
+    </footer>
+
+<script>
+    /**
+ * Interactive Web Components Manager
+ * Handles mobile menu, tabs, feedback forms, voting, and polls with improved performance and accessibility
+ */
+
+class InteractiveComponents {
+    constructor() {
+        // Cache DOM elements for better performance
+        this.elements = this.cacheElements();
+        
+        // Configuration constants
+        this.config = {
+            CHAR_LIMIT: 500,
+            WARNING_THRESHOLD: 450,
+            ANIMATION_DURATION: 200,
+            DEBOUNCE_DELAY: 150
+        };
+        
+        // Initialize all components
+        this.init();
+    }
+    
+    /**
+     * Cache all DOM elements to avoid repeated queries
+     * This improves performance by reducing DOM lookups
+     */
+    cacheElements() {
+        return {
+            menuToggle: document.getElementById('menuToggle'),
+            mainMenu: document.getElementById('main-menu'),
+            tabs: document.querySelectorAll('.tab'),
+            tabContents: document.querySelectorAll('.tab-content'),
+            textarea: document.getElementById('user-feedback'),
+            charCount: document.querySelector('.char-count'),
+            voteButtons: document.querySelectorAll('.vote-btn'),
+            pollOptions: document.querySelectorAll('.poll-option')
+        };
+    }
+    
+    /**
+     * Initialize all interactive components
+     * Separating initialization makes the code more maintainable
+     */
+    init() {
+        this.setupMobileMenu();
+        this.setupTabs();
+        this.setupFeedbackForm();
+        this.setupVoting();
+        this.setupPolls();
+        this.setupGlobalEventHandlers();
+        this.initializeExternalLibraries();
+    }
+    
+    /**
+     * Mobile Menu Management
+     * Handles responsive navigation with proper ARIA attributes
+     */
+    setupMobileMenu() {
+        if (!this.elements.menuToggle || !this.elements.mainMenu) return;
+        
+        this.elements.menuToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.toggleMobileMenu();
+        });
+    }
+    
+    toggleMobileMenu() {
+        const isOpen = this.elements.mainMenu.classList.toggle('show');
+        
+        // Update ARIA attributes for screen readers
+        this.elements.menuToggle.setAttribute('aria-expanded', isOpen.toString());
+        
+        // Manage focus for better accessibility
+        if (isOpen) {
+            this.elements.mainMenu.focus();
+        }
+    }
+    
+    closeMobileMenu() {
+        this.elements.mainMenu.classList.remove('show');
+        this.elements.menuToggle.setAttribute('aria-expanded', 'false');
+    }
+    
+    /**
+     * Tab Navigation System
+     * Implements accessible tab switching with keyboard support
+     */
+    setupTabs() {
+        if (!this.elements.tabs.length) return;
+        
+        this.elements.tabs.forEach((tab, index) => {
+            // Add ARIA attributes for accessibility
+            tab.setAttribute('role', 'tab');
+            tab.setAttribute('tabindex', index === 0 ? '0' : '-1');
+            
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.switchTab(tab);
+            });
+            
+            // Add keyboard navigation
+            tab.addEventListener('keydown', (e) => {
+                this.handleTabKeyNavigation(e, index);
+            });
+        });
+    }
+    
+    switchTab(activeTab) {
+        const tabId = activeTab.getAttribute('data-tab');
+        if (!tabId) return;
+        
+        // Remove active states efficiently
+        this.elements.tabs.forEach(tab => {
+            tab.classList.remove('active');
+            tab.setAttribute('tabindex', '-1');
+        });
+        
+        this.elements.tabContents.forEach(content => {
+            content.classList.remove('active');
+        });
+        
+        // Set active states
+        activeTab.classList.add('active');
+        activeTab.setAttribute('tabindex', '0');
+        activeTab.focus();
+        
+        const targetContent = document.getElementById(`${tabId}-content`);
+        if (targetContent) {
+            targetContent.classList.add('active');
+        }
+    }
+    
+    handleTabKeyNavigation(event, currentIndex) {
+        let targetIndex = currentIndex;
+        
+        switch (event.key) {
+            case 'ArrowLeft':
+                targetIndex = currentIndex > 0 ? currentIndex - 1 : this.elements.tabs.length - 1;
+                break;
+            case 'ArrowRight':
+                targetIndex = currentIndex < this.elements.tabs.length - 1 ? currentIndex + 1 : 0;
+                break;
+            case 'Home':
+                targetIndex = 0;
+                break;
+            case 'End':
+                targetIndex = this.elements.tabs.length - 1;
+                break;
+            default:
+                return; // Don't prevent default for other keys
+        }
+        
+        event.preventDefault();
+        this.switchTab(this.elements.tabs[targetIndex]);
+    }
+    
+    /**
+     * Feedback Form Management
+     * Handles character counting with visual feedback and input validation
+     */
+    setupFeedbackForm() {
+        if (!this.elements.textarea || !this.elements.charCount) return;
+        
+        // Use debounced input handler to improve performance
+        const debouncedHandler = this.debounce(
+            () => this.updateCharacterCount(),
+            this.config.DEBOUNCE_DELAY
+        );
+        
+        this.elements.textarea.addEventListener('input', debouncedHandler);
+        
+        // Initialize character count display
+        this.updateCharacterCount();
+    }
+    
+    updateCharacterCount() {
+        const currentLength = this.elements.textarea.value.length;
+        this.elements.charCount.textContent = `${currentLength}/${this.config.CHAR_LIMIT}`;
+        
+        // Apply visual feedback based on character count
+        if (currentLength >= this.config.WARNING_THRESHOLD) {
+            this.elements.charCount.style.color = 
+                currentLength > this.config.CHAR_LIMIT ? '#dc3545' : '#f38a1f';
+        } else {
+            this.elements.charCount.style.color = '';
+        }
+        
+        // Prevent exceeding character limit
+        if (currentLength > this.config.CHAR_LIMIT) {
+            this.elements.textarea.value = this.elements.textarea.value.substring(0, this.config.CHAR_LIMIT);
+            this.elements.charCount.textContent = `${this.config.CHAR_LIMIT}/${this.config.CHAR_LIMIT}`;
+        }
+    }
+    
+    /**
+     * Voting System
+     * Manages vote interactions with visual feedback and count updates
+     */
+    setupVoting() {
+        if (!this.elements.voteButtons.length) return;
+        
+        this.elements.voteButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.handleVote(button);
+            });
+        });
+    }
+    
+    handleVote(button) {
+        const isVoted = button.classList.contains('voted');
+        const voteCountElement = button.querySelector('span:last-child');
+        
+        if (!voteCountElement) return;
+        
+        // Update vote count
+        let count = parseInt(voteCountElement.textContent) || 0;
+        count = isVoted ? Math.max(0, count - 1) : count + 1; // Prevent negative votes
+        voteCountElement.textContent = count;
+        
+        // Toggle voted state
+        button.classList.toggle('voted');
+        
+        // Add visual feedback animation
+        this.animateButton(button);
+        
+        // Update ARIA label for accessibility
+        const action = isVoted ? 'removed' : 'added';
+        button.setAttribute('aria-label', `Vote ${action}. Current count: ${count}`);
+    }
+    
+    /**
+     * Poll Selection System
+     * Handles radio button polls with proper selection management
+     */
+    setupPolls() {
+        if (!this.elements.pollOptions.length) return;
+        
+        this.elements.pollOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                this.selectPollOption(option);
+            });
+            
+            // Handle keyboard selection
+            option.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.selectPollOption(option);
+                }
+            });
+        });
+    }
+    
+    selectPollOption(selectedOption) {
+        const radioInput = selectedOption.querySelector('input[type="radio"]');
+        if (!radioInput) return;
+        
+        // Get the poll group name to only affect related options
+        const pollName = radioInput.name;
+        const relatedOptions = document.querySelectorAll(`input[name="${pollName}"]`)
+            .map(input => input.closest('.poll-option'))
+            .filter(option => option);
+        
+        // Clear previous selections in this poll group
+        relatedOptions.forEach(option => {
+            if (option) option.classList.remove('selected');
+        });
+        
+        // Set new selection
+        selectedOption.classList.add('selected');
+        radioInput.checked = true;
+        
+        // Announce selection to screen readers
+        const optionText = selectedOption.textContent.trim();
+        this.announceToScreenReader(`Selected: ${optionText}`);
+    }
+    
+    /**
+     * Global Event Handlers
+     * Manages document-level events like clicks and keyboard shortcuts
+     */
+    setupGlobalEventHandlers() {
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (this.elements.mainMenu && this.elements.menuToggle &&
+                !this.elements.mainMenu.contains(e.target) && 
+                !this.elements.menuToggle.contains(e.target) && 
+                this.elements.mainMenu.classList.contains('show')) {
+                this.closeMobileMenu();
+            }
+        });
+        
+        // Handle global keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && this.elements.mainMenu?.classList.contains('show')) {
+                this.closeMobileMenu();
+                this.elements.menuToggle.focus();
+            }
+        });
+    }
+    
+    /**
+     * Utility Functions
+     * Helper methods for common operations
+     */
+    
+    // Debounce function to limit rapid function calls
+    debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func.apply(this, args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    // Animation helper for button feedback
+    animateButton(button) {
+        button.style.transform = 'scale(1.1)';
+        button.style.transition = `transform ${this.config.ANIMATION_DURATION}ms ease`;
+        
+        setTimeout(() => {
+            button.style.transform = '';
+        }, this.config.ANIMATION_DURATION);
+    }
+    
+    // Accessibility helper for screen reader announcements
+    announceToScreenReader(message) {
+        const announcement = document.createElement('div');
+        announcement.setAttribute('aria-live', 'polite');
+        announcement.setAttribute('aria-atomic', 'true');
+        announcement.style.position = 'absolute';
+        announcement.style.left = '-10000px';
+        announcement.style.width = '1px';
+        announcement.style.height = '1px';
+        announcement.style.overflow = 'hidden';
+        
+        document.body.appendChild(announcement);
+        announcement.textContent = message;
+        
+        // Clean up after announcement
+        setTimeout(() => {
+            document.body.removeChild(announcement);
+        }, 1000);
+    }
+    
+    /**
+     * External Library Initialization
+     * Initialize third-party libraries safely
+     */
+    initializeExternalLibraries() {
+        // Initialize Feather Icons if available
+        if (typeof feather !== 'undefined' && feather.replace) {
+            feather.replace();
+        }
+    }
+}
+
+// Initialize the components when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    new InteractiveComponents();
+});
+
+// Also initialize if DOM is already loaded (in case script loads after DOMContentLoaded)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        new InteractiveComponents();
+    });
+} else {
+    new InteractiveComponents();
+}
+</script>
+</body>
+</html>

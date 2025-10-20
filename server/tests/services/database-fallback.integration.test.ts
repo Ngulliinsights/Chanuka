@@ -3,22 +3,22 @@ import { demoDataService } from '../../infrastructure/demo-data.js';
 import { DatabaseFallbackService } from '../../infrastructure/database/database-fallback.js';
 import { logger } from '../../../shared/core/src/observability/logging';
 
-// Mock database connection
+// Mock database connection with proper typing
 const mockDatabase = {
   execute: jest.fn(),
   query: jest.fn(),
   transaction: jest.fn(),
-};
+} as any;
 
-// Mock pool connection
+// Mock pool connection with proper typing
 const mockPool = {
   connect: jest.fn(),
   query: jest.fn(),
   end: jest.fn(),
-};
+} as any;
 
 // Mock the database connection module
-jest.mock('../shared/database/connection', () => ({
+jest.mock('../../../shared/database/connection', () => ({
   database: mockDatabase,
   pool: mockPool,
   withTransaction: jest.fn(),

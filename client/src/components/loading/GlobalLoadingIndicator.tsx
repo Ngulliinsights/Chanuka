@@ -1,12 +1,27 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { Loader2, Wifi, WifiOff, AlertCircle, Clock, X } from 'lucide-react';
+import { Loader2, Wifi, WifiOff, AlertCircle, Clock, X, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLoadingContext } from '@/contexts/LoadingContext';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
 import { logger } from '../utils/logger.js';
+import { GlobalLoadingIndicatorProps } from './types';
+import { 
+  validateLoadingOperation, 
+  safeValidateLoadingOperation,
+  validateLoadingConfig 
+} from './validation';
+import { 
+  LoadingError, 
+  LoadingConfigurationError,
+  LoadingOperationFailedError,
+  getErrorDisplayMessage,
+  getErrorRecoveryStrategy,
+  isRetryableError 
+} from './errors';
+import { useLoadingRecovery } from './hooks/useLoadingRecovery';
 
 export interface GlobalLoadingIndicatorProps {
   position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'center';

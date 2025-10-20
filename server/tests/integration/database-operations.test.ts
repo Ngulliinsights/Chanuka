@@ -43,7 +43,7 @@ describe('Database Operations Integration Tests', () => {
       expect(status.poolStats).toHaveProperty('totalCount');
       expect(status.poolStats).toHaveProperty('idleCount');
       expect(status.poolStats).toHaveProperty('waitingCount');
-      expect(typeof status.poolStats.totalCount).toBe('number');
+      expect(typeof status.poolStats?.totalCount).toBe('number');
     });
   });
 
@@ -354,7 +354,7 @@ describe('Database Operations Integration Tests', () => {
             await new Promise(resolve => setTimeout(resolve, Math.random() * 100));
             return { id: i, processed: true, timestamp: new Date() };
           },
-          { id: i, processed: false, fallback: true },
+          { id: i, processed: false },
           `concurrent-load-test-${i}`
         )
       );
@@ -379,7 +379,7 @@ describe('Database Operations Integration Tests', () => {
       for (let i = 0; i < 20; i++) {
         const operation = databaseService.withFallback(
           async () => ({ sequence: i, timestamp: new Date() }),
-          { sequence: i, fallback: true },
+          { sequence: i },
           `sequential-test-${i}`
         );
         operations.push(operation);

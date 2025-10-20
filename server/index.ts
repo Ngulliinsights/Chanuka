@@ -107,8 +107,7 @@ const initializeMonitoring = (env: string) => {
 };
 import { serveSwagger, setupSwagger } from './features/analytics/swagger.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.resolve();
 
 export const app = express();
 const PORT = config.server.port;
@@ -490,7 +489,7 @@ async function performStartupInitialization() {
 
 // Run initialization without blocking
 startupInitialization().catch(err => {
-  logger.info('Startup initialization error (non-blocking):', { component: 'Chanuka' }, err.message);
+  logger.info('Startup initialization error (non-blocking):', { component: 'Chanuka', error: err.message });
   // Ensure demo mode is enabled on startup failure
   databaseFallbackService.setDemoMode(true);
 });
@@ -590,7 +589,7 @@ const gracefulShutdown = async (signal: string) => {
   // Close HTTP server
   server.close((err) => {
     if (err) {
-      logger.error('Error closing server:', { component: 'Chanuka' }, err);
+      logger.error('Error closing server:', err, { component: 'Chanuka' });
       process.exit(1);
     }
     logger.info('Server closed successfully', { component: 'Chanuka' });
@@ -615,7 +614,7 @@ process.on('uncaughtException', (error) => {
 });
 
 process.on('unhandledRejection', (reason) => {
-  logger.error('Unhandled Rejection at:', { component: 'Chanuka' }, reason);
+  logger.error('Unhandled Rejection at:', reason instanceof Error ? reason : new Error(String(reason)), { component: 'Chanuka' });
   gracefulShutdown('UNHANDLED_REJECTION');
 });
 

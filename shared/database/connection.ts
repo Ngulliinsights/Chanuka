@@ -136,9 +136,8 @@ export async function withTransaction<T>(
       const shouldRetry = attempt < maxRetries && isRetryableError;
       
       // Log comprehensive error information for debugging
-      logger.error('Transaction error:', { component: 'Chanuka' }, {
-        error: lastError.message,
-        stack: lastError.stack,
+      logger.error('Transaction error:', lastError, {
+        component: 'Chanuka',
         attempt: attempt + 1,
         maxRetries: maxRetries + 1,
         willRetry: shouldRetry,

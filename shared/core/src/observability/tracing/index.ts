@@ -9,8 +9,8 @@ export type {
   Resource,
   InstrumentationScope,
   Trace,
-  Tracer,
-  Span,
+  Tracer as TracerInterface,
+  Span as SpanInterface,
   SpanOptions,
   Sampler,
   SamplingResult,
@@ -36,8 +36,10 @@ export {
   SPAN_ATTRIBUTE_PREFIXES,
 } from './types';
 
-// Re-export tracer
-export { TracerImpl, createTracer } from './tracer';
+// Re-export implementations
+export { Tracer, createTracer, ProbabilisticSampler, BatchSpanProcessorImpl, createBatchSpanProcessor } from './tracer';
+export { Span, createSpan, generateSpanId, generateTraceId } from './span';
+export { TraceContextManager, traceContextManager, withTraceContext, withTraceContextAsync } from './context';
 
 
 

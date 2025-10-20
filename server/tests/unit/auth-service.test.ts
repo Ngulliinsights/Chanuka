@@ -5,12 +5,30 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { logger } from '../../utils/logger';
 
-// Mock dependencies
+// Mock dependencies with proper typing
 jest.mock('bcryptjs');
 jest.mock('jsonwebtoken');
 jest.mock('crypto');
 
-// Mock database
+// Create properly typed mocks using jest.MockedFunction
+const mockBcryptCompare = jest.fn() as jest.MockedFunction<(password: string, hash: string) => Promise<boolean>>;
+const mockBcryptHash = jest.fn() as jest.MockedFunction<(password: string, salt: string | number) => Promise<string>>;
+const mockJwtSign = jest.fn() as jest.MockedFunction<(payload: string | object | Buffer, secretOrPrivateKey: string | Buffer | object, options?: any) => string>;
+const mockJwtVerify = jest.fn() as jest.MockedFunction<(token: string, secretOrPublicKey: string | Buffer, options?: any) => string | object>;
+const mockCryptoRandomBytes = jest.fn() as jest.MockedFunction<(size: number) => Buffer>;
+const mockCryptoCreateHash = jest.fn() as jest.MockedFunction<(algorithm: string) => any>;
+const mockCryptoRandomUUID = jest.fn() as jest.MockedFunction<() => string>;
+
+// Apply mocks
+(bcrypt.compare as jest.MockedFunction<any>) = mockBcryptCompare;
+(bcrypt.hash as jest.MockedFunction<any>) = mockBcryptHash;
+(jwt.sign as jest.MockedFunction<any>) = mockJwtSign;
+(jwt.verify as jest.MockedFunction<any>) = mockJwtVerify;
+(crypto.randomBytes as jest.MockedFunction<any>) = mockCryptoRandomBytes;
+(crypto.createHash as jest.MockedFunction<any>) = mockCryptoCreateHash;
+(crypto.randomUUID as jest.MockedFunction<any>) = mockCryptoRandomUUID;
+
+// Mock database with proper typing
 const mockDb = {
   select: jest.fn().mockReturnThis(),
   from: jest.fn().mockReturnThis(),
@@ -21,8 +39,11 @@ const mockDb = {
   returning: jest.fn().mockReturnThis(),
   update: jest.fn().mockReturnThis(),
   set: jest.fn().mockReturnThis(),
-  delete: jest.fn().mockReturnThis()
-};
+  delete: jest.fn().mockReturnThis(),
+  execute: jest.fn(),
+  query: jest.fn(),
+  transaction: jest.fn()
+} as any;
 
 jest.mock('../shared/database/connection', () => ({
   database: mockDb
@@ -70,16 +91,12 @@ describe('AuthService', () => {
     };
 
     // Setup default mocks
-    (crypto.randomBytes as jest.Mock).mockReturnValue({
-      toString: jest.fn().mockReturnValue('mock-token')
-    });
-    
-    (crypto.createHash as jest.Mock).mockReturnValue({
+    mockCryptoRandomBytes.mockReturnValue(Buffer.from('mock-token'));
+    mockCryptoCreateHash.mockReturnValue({
       update: jest.fn().mockReturnThis(),
       digest: jest.fn().mockReturnValue('mock-hash')
     });
-
-    (crypto.randomUUID as jest.Mock).mockReturnValue('mock-uuid');
+    mockCryptoRandomUUID.mockReturnValue('mock-uuid');
   });
 
   describe('register', () => {
@@ -127,7 +144,7 @@ describe('AuthService', () => {
       }]);
 
       // Mock JWT generation
-      (jwt.sign as jest.Mock)
+      mockJwtSign
         .mockReturnValueOnce('access-token')
         .mockReturnValueOnce('refresh-token');
 
@@ -209,10 +226,10 @@ describe('AuthService', () => {
       mockDb.limit.mockResolvedValueOnce([mockUser]);
 
       // Mock password verification
-      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      mockBcryptCompare.mockResolvedValue(true);
 
       // Mock JWT generation
-      (jwt.sign as jest.Mock)
+      mockJwtSign
         .mockReturnValueOnce('access-token')
         .mockReturnValueOnce('refresh-token');
 
@@ -244,7 +261,7 @@ describe('AuthService', () => {
 
     it('should fail login for invalid password', async () => {
       mockDb.limit.mockResolvedValueOnce([mockUser]);
-      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+      mockBcryptCompare.mockResolvedValue(false);
 
       const result = await authService.login(validLoginData);
 
@@ -254,8 +271,8 @@ describe('AuthService', () => {
 
     it('should update last login timestamp', async () => {
       mockDb.limit.mockResolvedValueOnce([mockUser]);
-      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-      (jwt.sign as jest.Mock)
+      mockBcryptCompare.mockResolvedValue(true);
+      mockJwtSign
         .mockReturnValueOnce('access-token')
         .mockReturnValueOnce('refresh-token');
 
@@ -362,7 +379,7 @@ describe('AuthService', () => {
 
     it('should refresh token successfully', async () => {
       // Mock JWT verification
-      (jwt.verify as jest.Mock).mockReturnValue({ userId: 'user-id' });
+      mockJwtVerify.mockReturnValue({ userId: 'user-id' });
 
       // Mock database responses
       mockDb.limit
@@ -370,7 +387,7 @@ describe('AuthService', () => {
         .mockResolvedValueOnce([mockUser]); // User lookup
 
       // Mock new token generation
-      (jwt.sign as jest.Mock)
+      mockJwtSign
         .mockReturnValueOnce('new-access-token')
         .mockReturnValueOnce('new-refresh-token');
 
@@ -383,7 +400,7 @@ describe('AuthService', () => {
     });
 
     it('should fail refresh for invalid token', async () => {
-      (jwt.verify as jest.Mock).mockImplementation(() => {
+      mockJwtVerify.mockImplementation(() => {
         throw new Error('Invalid token');
       });
 
@@ -394,7 +411,7 @@ describe('AuthService', () => {
     });
 
     it('should fail refresh for non-existent session', async () => {
-      (jwt.verify as jest.Mock).mockReturnValue({ userId: 'user-id' });
+      mockJwtVerify.mockReturnValue({ userId: 'user-id' });
       mockDb.limit.mockResolvedValueOnce([]); // No session found
 
       const result = await authService.refreshToken('valid-refresh-token');
@@ -442,7 +459,7 @@ describe('AuthService', () => {
     };
 
     it('should verify token successfully', async () => {
-      (jwt.verify as jest.Mock).mockReturnValue({ userId: 'user-id' });
+      mockJwtVerify.mockReturnValue({ userId: 'user-id' });
       mockDb.limit
         .mockResolvedValueOnce([mockSession])
         .mockResolvedValueOnce([mockUser]);
@@ -454,7 +471,7 @@ describe('AuthService', () => {
     });
 
     it('should fail verification for invalid JWT', async () => {
-      (jwt.verify as jest.Mock).mockImplementation(() => {
+      mockJwtVerify.mockImplementation(() => {
         throw new Error('Invalid token');
       });
 
@@ -465,7 +482,7 @@ describe('AuthService', () => {
     });
 
     it('should fail verification for inactive session', async () => {
-      (jwt.verify as jest.Mock).mockReturnValue({ userId: 'user-id' });
+      mockJwtVerify.mockReturnValue({ userId: 'user-id' });
       mockDb.limit.mockResolvedValueOnce([]); // No active session
 
       const result = await authService.verifyToken('valid-token');
@@ -475,13 +492,13 @@ describe('AuthService', () => {
     });
 
     it('should fail verification for expired session', async () => {
-      (jwt.verify as jest.Mock).mockReturnValue({ userId: 'user-id' });
-      
+      mockJwtVerify.mockReturnValue({ userId: 'user-id' });
+
       const expiredSession = {
         ...mockSession,
         expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000) // Expired
       };
-      
+
       mockDb.limit.mockResolvedValueOnce([expiredSession]);
 
       const result = await authService.verifyToken('expired-token');
@@ -492,7 +509,7 @@ describe('AuthService', () => {
     });
 
     it('should fail verification for inactive user', async () => {
-      (jwt.verify as jest.Mock).mockReturnValue({ userId: 'user-id' });
+      mockJwtVerify.mockReturnValue({ userId: 'user-id' });
       mockDb.limit
         .mockResolvedValueOnce([mockSession])
         .mockResolvedValueOnce([{ ...mockUser, isActive: false }]);
@@ -553,7 +570,7 @@ describe('AuthService', () => {
         .mockResolvedValueOnce([mockResetRecord])
         .mockResolvedValueOnce([mockUser]);
 
-      (bcrypt.hash as jest.Mock).mockResolvedValue('new-hashed-password');
+      mockBcryptHash.mockResolvedValue('new-hashed-password');
 
       const { emailService } = require('../../infrastructure/notifications/email-service.js');
       emailService.sendPasswordChangeNotification.mockResolvedValue(true);
@@ -604,7 +621,7 @@ describe('AuthService', () => {
         .mockResolvedValueOnce([mockResetRecord])
         .mockResolvedValueOnce([mockUser]);
 
-      (bcrypt.hash as jest.Mock).mockResolvedValue('new-hashed-password');
+      mockBcryptHash.mockResolvedValue('new-hashed-password');
 
       await authService.resetPassword({
         token: 'valid-token',

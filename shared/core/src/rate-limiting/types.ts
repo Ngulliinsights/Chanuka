@@ -1,3 +1,5 @@
+import { Result } from '../primitives/types/result';
+
 export interface RateLimitOptions {
   windowMs: number;
   max: number;
@@ -36,6 +38,20 @@ export interface RateLimitHeaders {
   'X-RateLimit-Remaining': string;
   'X-RateLimit-Reset': string;
   'X-RateLimit-Window': string;
+}
+
+export interface RateLimitData {
+  tokens: number;
+  lastRefill: number;
+  resetTime: number;
+}
+
+export interface IRateLimitStore {
+  get(key: string): Promise<Result<RateLimitData | null>>;
+  set(key: string, data: RateLimitData, ttl?: number): Promise<Result<void>>;
+  delete(key: string): Promise<Result<void>>;
+  increment(key: string, field: string, amount?: number): Promise<Result<number>>;
+  expire(key: string, ttl: number): Promise<Result<void>>;
 }
 
 

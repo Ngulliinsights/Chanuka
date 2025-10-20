@@ -1,9 +1,11 @@
 import * as React from "react"
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
-import { Check, ChevronRight, Circle } from "lucide-react"
+import { Check, ChevronRight, Circle, AlertCircle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { logger } from '../utils/logger.js';
+import { UIComponentError } from './errors';
+import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';
 
 const DropdownMenu = DropdownMenuPrimitive.Root
 
@@ -180,6 +182,128 @@ const DropdownMenuShortcut = ({
 }
 DropdownMenuShortcut.displayName = "DropdownMenuShortcut"
 
+// Enhanced dropdown menu with error handling
+interface EnhancedDropdownMenuProps {
+  children: React.ReactNode;
+  onError?: (error: UIComponentError) => void;
+  fallbackContent?: React.ReactNode;
+}
+
+const EnhancedDropdownMenu = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Root>,
+  EnhancedDropdownMenuProps & React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Root>
+>(({ children, onError, fallbackContent, ...props }, ref) => {
+  const [error, setError] = React.useState<UIComponentError | null>(null);
+  const [retryCount, setRetryCount] = React.useState(0);
+
+  const handleError = React.useCallback(async (componentError: UIComponentError) => {
+    setError(componentError);
+    onError?.(componentError);
+
+    try {
+      const recoveryResult = await attemptUIRecovery('enhanced-dropdown-menu', componentError, retryCount);
+      
+      if (recoveryResult.success) {
+        setRetryCount(0);
+        setError(null);
+      } else if (recoveryResult.shouldRetry) {
+        setRetryCount(prev => prev + 1);
+      } else {
+        const suggestions = getUIRecoverySuggestions(componentError);
+        logger.warn('Dropdown menu recovery failed, suggestions:', suggestions);
+      }
+    } catch (recoveryError) {
+      logger.error('Dropdown menu recovery error:', recoveryError);
+    }
+  }, [onError, retryCount]);
+
+  const ErrorBoundary = React.useCallback(({ children }: { children: React.ReactNode }) => {
+    try {
+      return <>{children}</>;
+    } catch (boundaryError) {
+      const componentError = new UIComponentError(
+        'enhanced-dropdown-menu',
+        'render',
+        boundaryError instanceof Error ? boundaryError.message : 'Render error'
+      );
+      handleError(componentError);
+      
+      return (
+        <div className="p-2 text-sm text-destructive flex items-center gap-2">
+          <AlertCircle className="h-4 w-4" />
+          <span>Menu unavailable</span>
+        </div>
+      );
+    }
+  }, [handleError]);
+
+  if (error && fallbackContent) {
+    return <>{fallbackContent}</>;
+  }
+
+  return (
+    <DropdownMenuPrimitive.Root {...props}>
+      <ErrorBoundary>
+        {children}
+      </ErrorBoundary>
+    </DropdownMenuPrimitive.Root>
+  );
+});
+EnhancedDropdownMenu.displayName = "EnhancedDropdownMenu";
+
+// Enhanced dropdown menu item with error handling
+const EnhancedDropdownMenuItem = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
+    inset?: boolean;
+    onError?: (error: UIComponentError) => void;
+  }
+>(({ className, inset, onError, onSelect, children, ...props }, ref) => {
+  const [retryCount, setRetryCount] = React.useState(0);
+
+  const handleSelect = React.useCallback(async (event: Event) => {
+    try {
+      await onSelect?.(event);
+    } catch (selectError) {
+      const componentError = new UIComponentError(
+        'enhanced-dropdown-menu-item',
+        'select',
+        selectError instanceof Error ? selectError.message : 'Selection failed'
+      );
+      
+      onError?.(componentError);
+
+      try {
+        const recoveryResult = await attemptUIRecovery('enhanced-dropdown-menu-item', componentError, retryCount);
+        
+        if (recoveryResult.success) {
+          setRetryCount(0);
+        } else if (recoveryResult.shouldRetry) {
+          setRetryCount(prev => prev + 1);
+        }
+      } catch (recoveryError) {
+        logger.error('Dropdown menu item recovery error:', recoveryError);
+      }
+    }
+  }, [onSelect, onError, retryCount]);
+
+  return (
+    <DropdownMenuPrimitive.Item
+      ref={ref}
+      className={cn(
+        "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+        inset && "pl-8",
+        className
+      )}
+      onSelect={handleSelect}
+      {...props}
+    >
+      {children}
+    </DropdownMenuPrimitive.Item>
+  );
+});
+EnhancedDropdownMenuItem.displayName = "EnhancedDropdownMenuItem";
+
 export {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -196,4 +320,6 @@ export {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuRadioGroup,
+  EnhancedDropdownMenu,
+  EnhancedDropdownMenuItem,
 }
