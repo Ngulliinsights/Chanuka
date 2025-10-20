@@ -22,103 +22,13 @@ import {
   TracingConfig,
   HealthConfig
 } from './interfaces';
+import { TelemetryIntegration, TelemetryConfig, createTelemetryIntegration, createDefaultTelemetryConfig } from './telemetry';
+import { AsyncCorrelationManager } from './correlation';
 
 // ==================== Correlation Manager Implementation ====================
 
-/**
- * Correlation manager using AsyncLocalStorage for context propagation
- */
-export class AsyncCorrelationManager implements CorrelationManager {
-  private readonly asyncLocalStorage = new AsyncLocalStorage<CorrelationContext>();
-  private readonly generateIds: boolean;
-
-  constructor(options: { generateIds?: boolean } = {}) {
-    this.generateIds = options.generateIds ?? true;
-  }
-
-  /**
-   * Start a new request context
-   */
-  startRequest(context: Partial<CorrelationContext> = {}): CorrelationContext {
-    const correlationId = context.correlationId ?? (this.generateIds ? this.generateCorrelationId() : 'unknown');
-    const traceId = context.traceId ?? (this.generateIds ? this.generateTraceId() : undefined);
-    const requestId = context.requestId ?? (this.generateIds ? this.generateRequestId() : undefined);
-
-    const fullContext: CorrelationContext = {
-      correlationId,
-      traceId,
-      requestId,
-      spanId: context.spanId,
-      userId: context.userId,
-      sessionId: context.sessionId,
-      metadata: { ...context.metadata }
-    };
-
-    return fullContext;
-  }
-
-  /**
-   * Get current correlation ID
-   */
-  getCorrelationId(): string | undefined {
-    const context = this.asyncLocalStorage.getStore();
-    return context?.correlationId;
-  }
-
-  /**
-   * Get current correlation context
-   */
-  getContext(): CorrelationContext | undefined {
-    return this.asyncLocalStorage.getStore();
-  }
-
-  /**
-   * Execute function with correlation context
-   */
-  withContext<T>(context: CorrelationContext, fn: () => T): T {
-    return this.asyncLocalStorage.run(context, fn);
-  }
-
-  /**
-   * Execute async function with correlation context
-   */
-  async withContextAsync<T>(context: CorrelationContext, fn: () => Promise<T>): Promise<T> {
-    return this.asyncLocalStorage.run(context, fn);
-  }
-
-  /**
-   * Set context metadata
-   */
-  setMetadata(key: string, value: unknown): void {
-    const context = this.asyncLocalStorage.getStore();
-    if (context) {
-      if (!context.metadata) {
-        context.metadata = {};
-      }
-      context.metadata[key] = value;
-    }
-  }
-
-  /**
-   * Get context metadata
-   */
-  getMetadata(key: string): unknown {
-    const context = this.asyncLocalStorage.getStore();
-    return context?.metadata?.[key];
-  }
-
-  private generateCorrelationId(): string {
-    return `corr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  private generateTraceId(): string {
-    return `trace_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  private generateRequestId(): string {
-    return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-}
+// Import the correlation manager from the dedicated module
+// The AsyncCorrelationManager is now defined in correlation.ts
 
 // ==================== Observability Stack Error Classes ====================
 
@@ -154,6 +64,7 @@ export class ObservabilityStack {
   private tracer?: Tracer;
   private health?: HealthChecker;
   private correlation: CorrelationManager;
+  private telemetry?: TelemetryIntegration;
   private initialized = false;
   private readonly config: ObservabilityConfig;
 
@@ -202,13 +113,18 @@ export class ObservabilityStack {
       // Initialize health checker last (may depend on other components)
       if (this.config.health?.enabled !== false) {
         const healthResult = await this.initializeHealth();
-        if (healthResult.isError()) {
+        if (healthResult.isErr()) {
           return healthResult;
         }
       }
 
+      // Initialize telemetry integration if configured
+      if (this.config.telemetry?.enabled !== false) {
+        this.initializeTelemetry();
+      }
+
       this.initialized = true;
-      return Ok(undefined);
+      return ok(undefined);
 
     } catch (error) {
       return Err(new ObservabilityInitializationError('stack', error as Error));
@@ -388,6 +304,20 @@ export class ObservabilityStack {
     } catch (error) {
       return Err(new ObservabilityInitializationError('health', error as Error));
     }
+  }
+
+  private initializeTelemetry(): void {
+    const telemetryConfig = this.config.telemetry || createDefaultTelemetryConfig();
+    this.telemetry = createTelemetryIntegration(telemetryConfig, this.correlation);
+    // Type assertion needed due to interface differences
+    this.telemetry.integrate(this.logger, this.metrics, this.tracer as any);
+  }
+
+  /**
+   * Get the telemetry integration instance
+   */
+  getTelemetry(): TelemetryIntegration | undefined {
+    return this.telemetry;
   }
 
   // ==================== Private Factory Methods ====================

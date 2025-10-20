@@ -344,9 +344,24 @@ export interface CorrelationManager {
   startRequest(context?: Partial<CorrelationContext>): CorrelationContext;
 
   /**
+   * Start a new request context from HTTP headers
+   */
+  startRequestFromHeaders?(headers: Record<string, string | string[] | undefined>): CorrelationContext;
+
+  /**
    * Get current correlation ID
    */
   getCorrelationId(): string | undefined;
+
+  /**
+   * Get current trace ID
+   */
+  getTraceId?(): string | undefined;
+
+  /**
+   * Get current request ID
+   */
+  getRequestId?(): string | undefined;
 
   /**
    * Get current correlation context
@@ -372,6 +387,16 @@ export interface CorrelationManager {
    * Get context metadata
    */
   getMetadata(key: string): unknown;
+
+  /**
+   * Update current context with new values
+   */
+  updateContext?(updates: Partial<CorrelationContext>): void;
+
+  /**
+   * Create child context with additional metadata
+   */
+  createChildContext?(additionalContext?: Partial<CorrelationContext>): CorrelationContext;
 }
 
 // ==================== Configuration Interfaces ====================
@@ -424,4 +449,5 @@ export interface ObservabilityConfig {
     generateIds?: boolean;
     propagateHeaders?: boolean;
   };
+  telemetry?: import('./telemetry').TelemetryConfig;
 }

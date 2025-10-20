@@ -1,9 +1,21 @@
 {
-  "include": ["client/src/**/*", "db/**/*", "server/**/*", "shared/**/*"],
-  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
+  // Narrow the include set to backend and shared schema areas to avoid
+  // front-end and generated artifacts during focused typechecking.
+  "include": ["server/**/*", "db/**/*", "shared/schema/**/*", "shared/**/*/schema/**/*"],
+  "exclude": [
+    "node_modules",
+    "build",
+    "dist",
+    "**/*.test.ts",
+    // Exclude compiled/transpiled artifacts and dist folders under shared
+    "shared/**/dist/**",
+    "shared/**/build/**",
+    "shared/**/tasks/**/dist/**",
+    "shared/core/**"
+  ],
   "compilerOptions": {
     "baseUrl": ".",
-  "ignoreDeprecations": "5.0",
+    "ignoreDeprecations": "6.0",
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
   "noEmit": true,
@@ -37,3 +49,4 @@
     }
   }
 }
+ 

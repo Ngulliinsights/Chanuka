@@ -1,0 +1,191 @@
+import request from 'supertest';
+import express, { Express } from 'express';
+import { billTrackingRouter } from '../bill-tracking.routes'; // Import the router
+import { billTrackingService } from '../../application/bill-tracking.service'; // Import the service to mock
+import { authenticateToken } from '../../../../middleware/auth'; // Import or mock auth middleware
+
+// --- Mock the Service ---
+jest.mock('../../application/bill-tracking.service', () => ({
+  billTrackingService: {
+    trackBill: jest.fn(),
+    untrackBill: jest.fn(),
+    getUserTrackedBills: jest.fn(),
+    updateBillTrackingPreferences: jest.fn(),
+    isUserTrackingBill: jest.fn(),
+    bulkTrackingOperation: jest.fn(),
+    getUserTrackingAnalytics: jest.fn(),
+    getRecommendedBillsForTracking: jest.fn(),
+  },
+}));
+
+// --- Mock Auth Middleware ---
+// Basic mock: Assumes all requests are authenticated with a mock user
+jest.mock('../../../../middleware/auth', () => ({
+    authenticateToken: (req: any, res: any, next: any) => {
+        req.user = { id: 'mock-user-id', role: 'citizen' }; // Attach mock user
+        next();
+    }
+}));
+
+
+// --- Setup Express App for Testing ---
+const app: Express = express();
+app.use(express.json()); // Middleware to parse JSON bodies
+app.use('/api/bill-tracking', billTrackingRouter); // Mount the router
+
+// --- Test Suite ---
+describe('Bill Tracking API Routes', () => {
+  const mockUserId = 'mock-user-id';
+  const mockBillId = 123;
+   const mockPreferenceResult = {
+        id: 1, userId: mockUserId, billId: mockBillId, trackingTypes: ['status_changes'],
+        alertFrequency: 'immediate', alertChannels: ['in_app'], isActive: true,
+        createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+    };
+
+
+  beforeEach(() => {
+    // Reset mocks before each test
+    jest.clearAllMocks();
+  });
+
+  // --- Test Cases ---
+
+  describe('POST /api/bill-tracking/track/:billId', () => {
+    it('should return 200 and tracking info on successful tracking', async () => {
+       // Arrange
+       (billTrackingService.trackBill as jest.Mock).mockResolvedValue(mockPreferenceResult);
+       const preferences = { alertFrequency: 'daily' };
+
+      // Act
+      const response = await request(app)
+        .post(`/api/bill-tracking/track/${mockBillId}`)
+        .send({ preferences }); // Send preferences in body
+
+      // Assert
+      expect(response.status).toBe(200); // Expecting 200 based on route implementation
+       expect(response.body.status).toBe('success');
+       expect(response.body.data.message).toBe('Bill tracked successfully');
+       expect(response.body.data.tracking).toEqual(mockPreferenceResult);
+       expect(billTrackingService.trackBill).toHaveBeenCalledWith(mockUserId, mockBillId, preferences);
+    });
+
+    it('should return 400 if billId is invalid', async () => {
+      // Act
+      const response = await request(app).post('/api/bill-tracking/track/invalid');
+
+      // Assert
+      expect(response.status).toBe(400);
+      expect(response.body.status).toBe('fail');
+       expect(response.body.message).toContain('Invalid Bill ID');
+       expect(billTrackingService.trackBill).not.toHaveBeenCalled();
+    });
+
+    it('should return 500 if service throws an error', async () => {
+        // Arrange
+        const errorMessage = 'Database connection failed';
+        (billTrackingService.trackBill as jest.Mock).mockRejectedValue(new Error(errorMessage));
+
+        // Act
+        const response = await request(app).post(`/api/bill-tracking/track/${mockBillId}`);
+
+        // Assert
+        expect(response.status).toBe(500);
+        expect(response.body.status).toBe('error');
+        expect(response.body.message).toBe(errorMessage); // Error handler passes message
+    });
+
+      it('should return 400 if preferences are invalid', async () => {
+        // Arrange
+        const invalidPreferences = { alertFrequency: 'yearly' }; // Invalid value
+
+        // Act
+        const response = await request(app)
+            .post(`/api/bill-tracking/track/${mockBillId}`)
+            .send({ preferences: invalidPreferences });
+
+        // Assert
+        expect(response.status).toBe(400);
+        expect(response.body.status).toBe('fail');
+        expect(response.body.data).toEqual(expect.arrayContaining([
+            expect.objectContaining({ message: expect.stringContaining("Invalid enum value. Expected 'immediate' | 'hourly' | 'daily' | 'weekly'") })
+        ])); // Check Zod error structure
+        expect(billTrackingService.trackBill).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('DELETE /api/bill-tracking/track/:billId', () => {
+    it('should return 204 No Content on successful untracking', async () => {
+      // Arrange
+      (billTrackingService.untrackBill as jest.Mock).mockResolvedValue(undefined);
+
+      // Act
+      const response = await request(app).delete(`/api/bill-tracking/track/${mockBillId}`);
+
+      // Assert
+      expect(response.status).toBe(204);
+      expect(billTrackingService.untrackBill).toHaveBeenCalledWith(mockUserId, mockBillId);
+    });
+
+    it('should return 400 if billId is invalid', async () => {
+       // Act
+       const response = await request(app).delete('/api/bill-tracking/track/invalid');
+
+       // Assert
+       expect(response.status).toBe(400);
+       expect(response.body.status).toBe('fail');
+       expect(response.body.message).toContain('Invalid Bill ID');
+       expect(billTrackingService.untrackBill).not.toHaveBeenCalled();
+   });
+
+
+    it('should return 500 if service fails', async () => {
+       // Arrange
+        const errorMessage = 'Failed to update database';
+        (billTrackingService.untrackBill as jest.Mock).mockRejectedValue(new Error(errorMessage));
+
+       // Act
+       const response = await request(app).delete(`/api/bill-tracking/track/${mockBillId}`);
+
+       // Assert
+       expect(response.status).toBe(500);
+       expect(response.body.status).toBe('error');
+       expect(response.body.message).toBe(errorMessage);
+    });
+  });
+
+   describe('GET /api/bill-tracking/is-tracking/:billId', () => {
+        it('should return true if user is tracking', async () => {
+            (billTrackingService.isUserTrackingBill as jest.Mock).mockResolvedValue(true);
+
+            const response = await request(app).get(`/api/bill-tracking/is-tracking/${mockBillId}`);
+
+            expect(response.status).toBe(200);
+            expect(response.body.data.isTracking).toBe(true);
+            expect(billTrackingService.isUserTrackingBill).toHaveBeenCalledWith(mockUserId, mockBillId);
+        });
+
+        it('should return false if user is not tracking', async () => {
+             (billTrackingService.isUserTrackingBill as jest.Mock).mockResolvedValue(false);
+
+             const response = await request(app).get(`/api/bill-tracking/is-tracking/${mockBillId}`);
+
+             expect(response.status).toBe(200);
+             expect(response.body.data.isTracking).toBe(false);
+         });
+
+         it('should return 400 for invalid bill ID', async () => {
+             const response = await request(app).get(`/api/bill-tracking/is-tracking/abc`);
+             expect(response.status).toBe(400);
+             expect(response.body.message).toContain('Invalid Bill ID');
+         });
+    });
+
+
+  // Add more integration tests for:
+  // - GET /tracked (test pagination, filtering, sorting query params)
+  // - PUT /preferences/:billId (test valid and invalid preference updates)
+  // - POST /bulk (test track/untrack, validation, partial failures)
+  // - GET /analytics
+  // - GET /recommended
+});
