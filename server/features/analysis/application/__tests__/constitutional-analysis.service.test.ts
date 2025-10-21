@@ -1,5 +1,5 @@
 import { constitutionalAnalysisService, ConstitutionalAnalysisService } from '../constitutional-analysis.service';
-import { readDatabase } from '../../../../db';
+import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../../shared/schema';
 
 // --- Mock Dependencies ---

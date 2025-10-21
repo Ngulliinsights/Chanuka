@@ -24,7 +24,7 @@ export {
   OAuthError,
   SponsorNotFoundError,
   asyncHandler
-} from '../server/utils/errors.js';
+} from '../core/src/observability/error-management';
 
 // Legacy type for backward compatibility
 export type ErrorType = 'validation' | 'authentication' | 'authorization' | 'not_found' | 'conflict' | 'database' | 'network' | 'system';
@@ -56,7 +56,7 @@ export function createDatabaseError(message: string = 'Database operation failed
 
 // Re-export middleware functions
 export { errorHandler } from '../core/src/middleware/legacy-adapters/server-middleware-adapter';
-export { asyncHandler as asyncErrorHandler } from '../server/utils/errors.js';
+export { asyncHandler as asyncErrorHandler } from '../core/src/observability/error-management';
 
 // Placeholder for global error handlers setup
 export function setupGlobalErrorHandlers() {

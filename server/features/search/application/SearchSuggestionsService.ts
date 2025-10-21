@@ -1,5 +1,5 @@
 import { SearchRepository } from '../infrastructure/SearchRepository';
-import { readDatabase } from '../../../db.js';
+import { readDatabase } from '@shared/database/connection';
 import { sql } from 'drizzle-orm';
 import { logger } from '@shared/core/src/observability/logging';
 
@@ -14,7 +14,7 @@ const STATIC_POPULAR = [
 export class SearchSuggestionsService {
   async getAutocompleteSuggestions(partial: string, limit: number): Promise<string[]> {
     if (partial.length < 2) return [];
-    const db = readDatabase();
+  const db = readDatabase;
     const [billTitles, cats] = await Promise.all([
       repo.search(sql`null`, [sql`title ilike ${'%' + partial + '%'}`], sql`view_count desc`, limit, 0),
       repo.facets([sql`category ilike ${'%' + partial + '%'}`]),

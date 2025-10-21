@@ -68,6 +68,9 @@ export * from './middleware';
 // Performance Utilities (consolidates server/utils/performance-monitoring-utils.ts)
 export * from './utilities/performance';
 
+// API Response Utilities (consolidates server/utils/api-response.ts)
+export * from './utilities/api';
+
 // Legacy adapters for backward compatibility
 export * from './middleware/legacy-adapters/server-middleware-adapter';
 export * from './middleware/legacy-adapters/auth-adapter';

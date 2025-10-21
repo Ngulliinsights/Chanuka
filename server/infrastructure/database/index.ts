@@ -20,20 +20,18 @@ export * from './config';
 // Database Tables
 export * from '../../../shared/schema';
 
-// Re-export stable DB accessors and legacy names for compatibility.
+// Re-export stable DB accessors and legacy names from canonical shared connection
 export {
-	getDbInstance,
-	getFallbackService,
-	getConnectionStatus,
-	isDatabaseConnected,
+	database,
 	readDatabase,
-	pool as getPool,
-	db as legacyDb,
-	fallbackService as legacyFallbackService
-} from '../../db.ts';
+	writeDatabase,
+	withTransaction,
+	withReadConnection,
+	pool as getPool
+} from '@shared/database/connection';
 
-// Also export other DB utilities (legacy surface)
-export * from '../../db.ts';
+// Also export schema tables from shared schema for compatibility
+export * from '../../../shared/schema';
 
 
 

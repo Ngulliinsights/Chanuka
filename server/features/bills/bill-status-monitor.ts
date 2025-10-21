@@ -1,9 +1,9 @@
 import { eq, and, sql } from 'drizzle-orm';
 import { databaseService } from '../../infrastructure/database/database-service.js';
-import { readDatabase } from '../../db.js';
+import { readDb } from '@shared/database/pool';
 import { webSocketService } from '../../infrastructure/websocket.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service.js';
-import * as schema from '../../../shared/schema';
+import * as schema from '@shared/schema';
 import { Bill } from '../../../shared/schema';
 import { logger } from '../../utils/logger.js';
 // Import the orchestrator to trigger notifications
@@ -53,7 +53,7 @@ export interface BillEngagementUpdate {
 export class BillStatusMonitorService {
   private get db() {
     // Provides access to the read replica database connection
-    return readDatabase();
+    return readDb;
   }
 
   /**

@@ -1,10 +1,10 @@
-import { readDatabase } from '../../../../db'; // Adjusted path
+import { readDatabase } from '@shared/database/connection'; // Use shared connection
 import {
   sponsor as sponsors, sponsorAffiliation as sponsorAffiliations, sponsorTransparency, billSponsorship as billSponsorships, bill as bills,
   type Sponsor, type SponsorAffiliation, type SponsorTransparency, type BillSponsorship, type InsertSponsor // Added InsertSponsor
 } from '../../../../../shared/schema'; // Adjusted path
 import { eq, and, sql, desc, asc, count, avg, inArray, like, or, sql as sqlFn } from 'drizzle-orm'; // Added asc, sqlFn alias
-import { logger } from '../../../../utils/logger'; // Adjusted path
+import { logger } from '../../../../../shared/core/src/observability/logging';
 
 // Interface defining search options for listing sponsors
 export interface SponsorSearchOptions {
@@ -65,7 +65,7 @@ function getErrorMessage(error: unknown): string {
 export class SponsorRepository {
   // Use getter for dynamic DB connection access
   private get db() {
-    const d = readDatabase();
+    const d = readDatabase;
     if (!d) throw new Error('Database not initialized for SponsorRepository');
     return d;
   }

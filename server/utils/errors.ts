@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { logger } from '../../shared/core/logger.js';
+import { logger } from '../../shared/core';
 import { 
   BaseError,
   ValidationError,

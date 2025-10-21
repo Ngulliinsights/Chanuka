@@ -42,7 +42,7 @@ async function checkMigrationTable() {
       const data = await pool.query('SELECT * FROM drizzle_migrations ORDER BY id');
       console.log(`\nCurrent records: ${data.rows.length}`);
       data.rows.forEach(row => {
-        console.log(`  - ID: ${row.id}, Hash: ${row.hash || 'N/A'}, Created: ${row.created_at || 'N/A'}`);
+        console.log(`  - ID: ${row.id}, Filename: ${row.filename || 'N/A'}, Hash: ${row.hash || 'N/A'}, Created: ${row.created_at || 'N/A'}`);
       });
     }
     

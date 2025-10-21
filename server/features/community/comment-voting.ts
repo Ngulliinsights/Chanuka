@@ -7,7 +7,7 @@ const billComments = billComment;
 const commentVotes = commentVote;
 import { eq, and, sql, desc } from 'drizzle-orm';
 import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../infrastructure/cache/cache-service.js';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 export interface VoteResult {
   success: boolean;

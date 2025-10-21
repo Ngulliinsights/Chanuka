@@ -7,7 +7,7 @@
  * Based on patterns from refined_cross_cutting.ts
  */
 
-import { logger } from '../../utils/logger';
+import { logger } from '../observability/logging';
 import type {
   CacheService,
   CacheMetrics,

@@ -3,7 +3,7 @@ import { databaseService } from '../../../../infrastructure/database/database-se
 import { cacheService } from '../../../../infrastructure/cache/cache-service';
 import { notificationService } from '../../../../infrastructure/notifications/notification-service';
 import * as schema from '../../../../../shared/schema';
-import { readDatabase } from '../../../../db'; // Mock this
+import { readDatabase } from '@shared/database/connection'; // Mock this
 
 // --- Mock Dependencies ---
 jest.mock('../../../../db', () => ({

@@ -1,5 +1,5 @@
  import { databaseService } from '@/services/database-service';
- import { readDatabase } from '../../../db.js';
+ import { readDatabase } from '@shared/database/connection';
 import {
   billEngagement,
   userInterests,
@@ -13,11 +13,11 @@ import type { PlainBill } from '../domain/recommendation.dto';
 
 export class RecommendationRepository {
   private get db() {
-    return readDatabase();
+  return readDatabase;
   }
   /*  ==========  User  ==========  */
   async getUserInterests(userId: string): Promise<string[]> {
-    const db = readDatabase();
+  const db = readDatabase;
     const rows = await db
       .select({ interest: userInterests.interest })
       .from(userInterests)
@@ -26,7 +26,7 @@ export class RecommendationRepository {
   }
 
   async getUserEngagedBillIds(userId: string): Promise<number[]> {
-    const db = readDatabase();
+  const db = readDatabase;
     const rows = await db
       .select({ billId: billEngagement.billId })
       .from(billEngagement)
@@ -37,14 +37,14 @@ export class RecommendationRepository {
   /*  ==========  Bill  ==========  */
   async getBillsByIds(ids: number[]): Promise<PlainBill[]> {
     if (!ids.length) return [];
-    const db = readDatabase();
+  const db = readDatabase;
     const rows = await db.select().from(bills).where(inArray(bills.id, ids));
     return rows.map(r => this.toPlain(r));
   }
 
   async getBillsByTags(tags: string[], excludeIds: number[]): Promise<PlainBill[]> {
     if (!tags.length) return [];
-    const db = readDatabase();
+  const db = readDatabase;
     const tagRows = await db
       .select({ billId: billTags.billId })
       .from(billTags)
@@ -57,7 +57,7 @@ export class RecommendationRepository {
 
   async getTrendingBillIds(days: number, limit: number): Promise<number[]> {
     const threshold = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-    const db = readDatabase();
+  const db = readDatabase;
     const rows = await db
       .select({ billId: billEngagement.billId })
       .from(billEngagement)
@@ -72,7 +72,7 @@ export class RecommendationRepository {
   async getSimilarUserIds(userId: string, interests: string[]): Promise<string[]> {
     if (!interests.length) return [];
     const minShared = Math.max(1, Math.floor(interests.length * 0.4));
-    const db = readDatabase();
+  const db = readDatabase;
     const rows = await db
       .select({
         userId: userInterests.userId,
@@ -88,7 +88,7 @@ export class RecommendationRepository {
   }
 
   async getEngagementByUsers(userIds: string[]): Promise<Array<{ userId: string; billId: number; score: number }>> {
-    const db = readDatabase();
+  const db = readDatabase;
     const rows = await db
       .select({
         userId: billEngagement.userId,
@@ -102,7 +102,7 @@ export class RecommendationRepository {
 
   /*  ==========  Engagement tracking – atomic upsert  ==========  */
   async upsertEngagement(userId: string, billId: number, type: 'view' | 'comment' | 'share'): Promise<void> {
-    const db = readDatabase();
+  const db = readDatabase;
     const existing = await db
       .select()
       .from(billEngagement)
@@ -146,7 +146,7 @@ export class RecommendationRepository {
 
   /*  ==========  Tag helpers  ==========  */
   async getTagsForBill(billId: number): Promise<string[]> {
-    const db = readDatabase();
+  const db = readDatabase;
     const rows = await db.select({ tag: billTags.tag }).from(billTags).where(eq(billTags.billId, billId));
     return rows.map(r => r.tag);
   }

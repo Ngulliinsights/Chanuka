@@ -3,8 +3,8 @@ import { authenticateToken, AuthenticatedRequest } from '../../../middleware/aut
 import { userProfileService } from '../domain/user-profile.js';
 import { z } from 'zod';
 // Fixed import: Removed ApiErrorResponse, added ApiError
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from "../../../utils/api-response.js";
-import { logger } from '../../../utils/logger';
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from "../../../../shared/core/src/utilities/api";
+import { logger } from '../../../../shared/core/src/observability/logging';
 
 export const router = Router();
 

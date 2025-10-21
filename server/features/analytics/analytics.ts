@@ -6,8 +6,8 @@ import { performanceTrackingMiddleware } from './middleware/performance-tracking
 import { EngagementController, getEngagementMetricsSchema, getEngagementTrendsSchema } from './controllers/engagement.controller.js';
 import { engagementAnalyticsService } from './services/engagement.service.js';
 import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
-import { logger } from '../../utils/logger.js';
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utilities/api";
+import { logger } from '../../../shared/core/src/observability/logging';
 
 export const router = Router();
 

@@ -2,7 +2,7 @@ import { Router } from "express";
 import { eq } from "drizzle-orm";
 import { database as db } from "../../../../shared/database/connection";
 import { user, userInterest } from "../../../../shared/schema";
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../../utils/api-response.js";
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../../../shared/core/src/utilities/api";
 import { logger } from '../../../../shared/core/index.js';
 import { securityAuditService } from '../../../features/security/security-audit-service.js';
 

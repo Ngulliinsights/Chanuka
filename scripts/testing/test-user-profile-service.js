@@ -1,6 +1,6 @@
 // Simple test to verify user profile service functionality
 import { userProfileService } from '../../server/features/users/user-profile.js';
-import { logger } from '../utils/logger.js';
+import { logger } from '../../shared/core/src/observability/logging/index.js';
 
 async function testUserProfileService() {
   logger.info('🧪 Testing User Profile Service...\n', { component: 'Chanuka' });

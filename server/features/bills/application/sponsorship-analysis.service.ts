@@ -1,10 +1,10 @@
-import { sponsorService } from '../sponsors/infrastructure/repositories/sponsor.repository.js';
-import { SponsorConflictAnalysisService } from '../sponsors/application/sponsor-conflict-analysis.service.js';
-import { readDatabase } from '../../db.js';
+import { sponsorRepository } from '../sponsors/infrastructure/repositories/sponsor.repository.js';
+import { sponsorConflictAnalysisService } from '../sponsors/application/sponsor-conflict-analysis.service.js';
+import { readDatabase } from '@shared/database/connection';
 // Backwards-compatible proxy so existing code using `db.select()` etc. keeps working
 const db = new Proxy({}, {
   get(_target, prop: string | symbol) {
-    const d = readDatabase();
+  const d = readDatabase;
     if (!d) {
       return (..._args: any[]) => { throw new Error('Database not initialized'); };
     }
@@ -13,8 +13,8 @@ const db = new Proxy({}, {
 }) as any;
 import { billSectionConflict } from '../../../shared/schema/schema.js';
 import { eq } from 'drizzle-orm';
-import { NotFoundError } from '../../utils/errors.js';
-import { logger } from '../../../utils/logger.js';
+import { NotFoundError } from '../../../shared/core/src/observability/error-management/errors/specialized/not-found-error.js';
+import { logger } from '../../../shared/core/src/observability/logging/index.js';
 
 /**
  * SponsorshipAnalysisService - Bill-Centric Presentation Layer
@@ -130,13 +130,13 @@ export class SponsorshipAnalysisService {
       }
 
       // Get bill information
-      const bill = await sponsorService.getBill(billId);
+      const bill = await sponsorRepository.getBill(billId);
       if (!bill) {
         throw new NotFoundError(`Bill with ID ${billId} not found`);
       }
 
       // Get sponsorship data with all joins
-      const sponsorshipData = await sponsorService.getSponsorshipDataForBill(billId);
+      const sponsorshipData = await sponsorRepository.getSponsorshipDataForBill(billId);
       const sectionConflicts = await this.getSectionConflicts(billId);
 
       // Categorize sponsors
@@ -190,7 +190,7 @@ export class SponsorshipAnalysisService {
    */
   async getPrimarySponsorAnalysis(billId: number) {
     try {
-      const sponsorshipData = await sponsorService.getSponsorshipDataForBill(billId, 'primary');
+      const sponsorshipData = await sponsorRepository.getSponsorshipDataForBill(billId, 'primary');
       
       if (!sponsorshipData.length) {
         throw new NotFoundError(`Primary sponsor not found for bill ${billId}`);
@@ -249,7 +249,7 @@ export class SponsorshipAnalysisService {
    */
   async getCoSponsorsAnalysis(billId: number) {
     try {
-      const coSponsorships = await sponsorService.getSponsorshipDataForBill(billId, 'co-sponsor');
+      const coSponsorships = await sponsorRepository.getSponsorshipDataForBill(billId, 'co-sponsor');
 
       // Analyze patterns in parallel
       const [patterns, crossAnalysis] = await Promise.all([
@@ -285,7 +285,7 @@ export class SponsorshipAnalysisService {
    */
   async getFinancialNetworkAnalysis(billId: number) {
     try {
-      const sponsorships = await sponsorService.getSponsorshipDataForBill(billId);
+      const sponsorships = await sponsorRepository.getSponsorshipDataForBill(billId);
 
       // Build network components
       const [networkGraph, industryAnalysis, corporateConnections] = await Promise.all([
@@ -590,7 +590,7 @@ export class SponsorshipAnalysisService {
   private async calculateNetworkConnections(sponsorId: number) {
     try {
       // Get sponsor's affiliations
-      const affiliations = await sponsorService.getSponsorAffiliations(sponsorId);
+      const affiliations = await sponsorRepository.getSponsorAffiliations(sponsorId);
       
       // Calculate metrics based on affiliations
       const directConnections = affiliations.length;

@@ -11,7 +11,7 @@ import dotenvExpand from 'dotenv-expand';
 import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 import { configSchema, type AppConfig, envMapping, defaultFeatures } from './schema';
-import { logger } from '../../../utils/logger';
+import { logger } from '../observability/logging';
 import type {
   ConfigLoadOptions,
   ConfigChangeEvent,

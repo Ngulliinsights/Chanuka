@@ -1,8 +1,8 @@
 import { eq, desc, and, sql, count, ilike, or, inArray } from "drizzle-orm";
 import { databaseService } from "../services/database-service";
-import { readDatabase } from '../db.js';
+import { readDb } from '@shared/database/pool';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from "../infrastructure/cache/cache-service";
-import * as schema from "../../shared/schema/schema.js";
+import * as schema from "@shared/schema";
 import { logger } from '@shared/core/src/observability/logging';
 
 // Search suggestion interfaces
@@ -77,7 +77,7 @@ const CONFIG = {
  */
 export class SearchSuggestionsService {
   private get db() {
-    return readDatabase();
+    return readDb;
   }
   private searchHistory: Map<string, number> = new Map();
   private popularTerms: Map<string, number> = new Map();

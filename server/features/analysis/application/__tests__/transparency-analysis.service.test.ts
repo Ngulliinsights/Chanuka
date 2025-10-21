@@ -1,5 +1,5 @@
 import { transparencyAnalysisService, TransparencyAnalysisService } from '../transparency-analysis.service';
-import { readDatabase } from '../../../../db';
+import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../../shared/schema';
 import { ConflictSummary } from '../bill-comprehensive-analysis.service'; // Import ConflictSummary type
 

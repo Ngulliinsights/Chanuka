@@ -1,5 +1,5 @@
 import { billTrackingService } from './services/bill-tracking.js';
-import { db } from './db.js';
+import { db } from '@shared/database/pool.js';
 import { users, bills, userInterests } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '../../shared/core/src/observability/logging';

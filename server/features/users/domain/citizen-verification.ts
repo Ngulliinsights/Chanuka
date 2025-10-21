@@ -2,7 +2,7 @@
 import { database as db } from '../shared/database/connection';
 import { users, citizenVerifications, bills } from '../../../shared/schema';
 import { eq, and, desc, count, sql } from 'drizzle-orm';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../../shared/core/src/observability/logging';
 
 export interface CitizenVerification {
   id: string;

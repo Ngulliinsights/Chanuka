@@ -4,8 +4,8 @@ import { sponsorRepository, SponsorAffiliationInput, SponsorTransparencyInput } 
 import { sponsorConflictAnalysisService } from '../application/sponsor-conflict-analysis.service'; // Adjusted path
 import { insertSponsorSchema } from '../../../../shared/schema/validation'; // Adjusted path
 import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '../../../utils/api-response'; // Adjusted path
-import { logger } from '../../../utils/logger'; // Adjusted path
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '../../../../shared/core/src/utilities/api';
+import { logger } from '../../../../shared/core/src/observability/logging'; // Adjusted path
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth'; // Optional: if auth needed
 
 const router = express.Router();

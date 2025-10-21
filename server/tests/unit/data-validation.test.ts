@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { DataValidationService } from '../../core/validation/data-validation.ts';
-import { logger } from '../../utils/logger.ts';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 describe('DataValidationService', () => {
   describe('validateBill', () => {
