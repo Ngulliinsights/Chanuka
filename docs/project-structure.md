@@ -512,6 +512,8 @@ client/
 │   │   ├── design-system/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── responsive.test.ts
+│   │   │   │   ├── ResponsiveButton.test.tsx
+│   │   │   │   ├── ResponsiveContainer.test.tsx
 │   │   │   ├── accessibility/
 │   │   │   │   ├── contrast.ts
 │   │   │   │   ├── focus.ts
@@ -542,6 +544,7 @@ client/
 │   │   │   │   ├── TouchTarget.tsx
 │   │   │   │   ├── typography.ts
 │   │   │   ├── index.ts
+│   │   │   ├── README.md
 │   │   │   ├── responsive.css
 │   │   │   ├── responsive.ts
 │   │   │   ├── themes/
@@ -672,9 +675,12 @@ docs/
 │   ├── loopholes_1751746507009.md
 │   ├── merged_bill_sponsorship.html
 │   ├── Pasted-sw-js-230-Service-Worker-Navigation-request-failed-checking-cache-TypeError-Failed-to-fetch--1759907703032_1759907703033.txt
+│   ├── shared_core_design (2).md
 │   ├── shared_core_design.md
 │   ├── shared_core_impl_plan.md
+│   ├── shared_core_requirements (2).md
 │   ├── shared_core_requirements.md
+│   ├── shared_core_tasks.md
 │   ├── sponsorbyreal.html
 │   ├── unified_ai_dev_framework.md
 │   ├── unified_code_analysis_framework (2).md
@@ -720,6 +726,7 @@ drizzle.config.ts
 ├── 0017_add_success_column.sql
 ├── 0017_fix_security_schema_issues.sql
 ├── 0018_add_risk_score_column.sql
+├── 0019_add_tracking_preferences.sql
 ├── meta/
 │   ├── _journal.json
 │   ├── 0000_snapshot.json
@@ -918,6 +925,37 @@ server/
 │   │   │   │   ├── alert-preference-repository-impl.ts
 │   │   ├── unified_alert_routes.ts
 │   │   ├── unified_alert_service.ts
+│   ├── analysis/
+│   │   ├── application/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── bill-comprehensive-analysis.service.test.ts
+│   │   │   │   ├── constitutional-analysis.service.test.ts
+│   │   │   │   ├── public-interest-analysis.service.test.ts
+│   │   │   │   ├── stakeholder-analysis.service.test.ts
+│   │   │   │   ├── transparency-analysis.service.test.ts
+│   │   │   ├── bill-comprehensive-analysis.service.ts
+│   │   │   ├── constitutional-analysis.service.ts
+│   │   │   ├── public-interest-analysis.service.ts
+│   │   │   ├── stakeholder-analysis.service.ts
+│   │   │   ├── transparency-analysis.service.ts
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   │   ├── analysis-result.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── analysis-repository.ts
+│   │   ├── infrastructure/
+│   │   │   ├── adapters/
+│   │   │   │   ├── __tests__/
+│   │   │   │   │   ├── ml-service-adapter.test.ts
+│   │   │   │   ├── ml-service-adapter.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── __tests__/
+│   │   │   │   │   ├── analysis-repository-impl.test.ts
+│   │   │   │   ├── analysis-repository-impl.ts
+│   │   ├── presentation/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── analysis.routes.test.ts
+│   │   │   ├── analysis.routes.ts
 │   ├── analytics/
 │   │   ├── analysis.ts
 │   │   ├── analytics.ts
@@ -972,12 +1010,15 @@ server/
 │   │   │   ├── progress-storage.d.ts
 │   ├── bills/
 │   │   ├── application/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── bill-status-monitor.test.ts
+│   │   │   │   ├── bill-tracking.service.test.ts
 │   │   │   ├── bills.ts
 │   │   │   ├── bill-service.ts
+│   │   │   ├── bill-tracking.service.ts
 │   │   │   ├── index.ts
 │   │   ├── bill.js
 │   │   ├── bill-status-monitor.ts
-│   │   ├── bill-tracking.ts
 │   │   ├── domain/
 │   │   │   ├── index.ts
 │   │   │   ├── LegislativeStorageTypes.ts
@@ -987,9 +1028,11 @@ server/
 │   │   │   ├── index.ts
 │   │   ├── legislative-storage.ts
 │   │   ├── presentation/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── bill-tracking.routes.test.ts
 │   │   │   ├── bills-router.ts
+│   │   │   ├── bill-tracking.routes.ts
 │   │   │   ├── index.ts
-│   │   ├── real-time-analysis.ts
 │   │   ├── sponsor-conflict-analysis.ts
 │   │   ├── sponsors.ts
 │   │   ├── sponsor-service.ts
@@ -1173,6 +1216,8 @@ server/
 │   │   ├── performance-monitoring-service.ts
 │   │   ├── system-health.ts
 │   ├── notifications/
+│   │   ├── __tests__/
+│   │   │   ├── notification-orchestrator.test.ts
 │   │   ├── alerting-service.ts
 │   │   ├── email-service.ts
 │   │   ├── index.ts
@@ -1329,6 +1374,7 @@ shared/
 │   │   │   │   ├── ai-cache.test.ts
 │   │   │   │   ├── circuit-breaker-single-flight.test.ts
 │   │   │   │   ├── factory.test.ts
+│   │   │   │   ├── interfaces.test.ts
 │   │   │   │   ├── memory-adapter.test.ts
 │   │   │   │   ├── single-flight-cache.test.ts
 │   │   │   │   ├── single-flight-integration.test.ts
@@ -1342,6 +1388,7 @@ shared/
 │   │   │   │   ├── redis-adapter.ts
 │   │   │   ├── ai-cache.ts
 │   │   │   ├── base-adapter.ts
+│   │   │   ├── base-cache-adapter.ts
 │   │   │   ├── CIRCUIT_BREAKER_IMPLEMENTATION.md
 │   │   │   ├── core/
 │   │   │   │   ├── base-adapter.ts
@@ -1351,6 +1398,7 @@ shared/
 │   │   │   ├── decorators.ts
 │   │   │   ├── factory.ts
 │   │   │   ├── index.ts
+│   │   │   ├── interfaces.ts
 │   │   │   ├── key-generator.ts
 │   │   │   ├── legacy-adapters/
 │   │   │   ├── legacy-adapters.ts
@@ -1359,12 +1407,14 @@ shared/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── single-flight-cache.ts
 │   │   │   ├── README.md
+│   │   │   ├── README-interfaces.md
 │   │   │   ├── single-flight-cache.ts
 │   │   │   ├── types.ts
 │   │   ├── config/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── config-manager.test.ts
 │   │   │   ├── index.ts
+│   │   │   ├── manager.ts
 │   │   │   ├── schema.ts
 │   │   │   ├── types.ts
 │   │   ├── health/
@@ -1474,7 +1524,9 @@ shared/
 │   │   │   │   ├── health.test.ts
 │   │   │   │   ├── logging.test.ts
 │   │   │   │   ├── metrics.test.ts
+│   │   │   │   ├── stack.test.ts
 │   │   │   │   ├── tracing.test.ts
+│   │   │   ├── correlation.ts
 │   │   │   ├── error-management/
 │   │   │   │   ├── __tests__/
 │   │   │   │   ├── errors/
@@ -1499,6 +1551,7 @@ shared/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── types.ts
 │   │   │   ├── index.ts
+│   │   │   ├── interfaces.ts
 │   │   │   ├── legacy-adapters/
 │   │   │   ├── legacy-adapters.ts
 │   │   │   │   ├── logging-migration-adapter.ts
@@ -1507,13 +1560,23 @@ shared/
 │   │   │   │   ├── logger.ts
 │   │   │   │   ├── types.ts
 │   │   │   ├── metrics/
+│   │   │   │   ├── collectors.ts
+│   │   │   │   ├── exporters/
 │   │   │   │   ├── exporters.ts
+│   │   │   │   │   ├── cloudwatch.ts
+│   │   │   │   │   ├── prometheus.ts
+│   │   │   │   │   ├── statsd.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── registry.ts
 │   │   │   │   ├── types.ts
+│   │   │   ├── middleware.ts
 │   │   │   ├── README.md
+│   │   │   ├── stack.ts
+│   │   │   ├── telemetry.ts
 │   │   │   ├── tracing/
+│   │   │   │   ├── context.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── span.ts
 │   │   │   │   ├── tracer.ts
 │   │   │   │   ├── types.ts
 │   │   ├── primitives/
@@ -1540,8 +1603,10 @@ shared/
 │   │   ├── rate-limiting/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── ai-rate-limiter.test.ts
+│   │   │   │   ├── algorithms.test.ts
 │   │   │   │   ├── memory-store.test.ts
 │   │   │   │   ├── middleware.test.ts
+│   │   │   │   ├── stores.test.ts
 │   │   │   │   ├── unified-rate-limiting.test.ts
 │   │   │   ├── adapters/
 │   │   │   │   ├── fixed-window-adapter.ts
@@ -1553,6 +1618,7 @@ shared/
 │   │   │   ├── ai-rate-limiter.ts
 │   │   │   ├── algorithms/
 │   │   │   │   ├── fixed-window.ts
+│   │   │   │   ├── interfaces.ts
 │   │   │   │   ├── sliding-window.ts
 │   │   │   │   ├── token-bucket.ts
 │   │   │   ├── core/
@@ -1577,6 +1643,7 @@ shared/
 │   │   │   ├── types.ts
 │   │   ├── services/
 │   │   │   ├── cache.ts
+│   │   │   ├── composition.ts
 │   │   │   ├── health.ts
 │   │   │   ├── logging.ts
 │   │   │   ├── rate-limit.ts
@@ -1610,8 +1677,10 @@ shared/
 │   │   │   ├── performance/
 │   │   │   │   ├── index.ts
 │   │   ├── utils/
+│   │   │   ├── async-utils.ts
 │   │   │   ├── constants.ts
 │   │   │   ├── correlation-id.ts
+│   │   │   ├── data-utils.ts
 │   │   │   ├── formatting/
 │   │   │   │   ├── currency.ts
 │   │   │   │   ├── date-time.ts
@@ -1620,14 +1689,17 @@ shared/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── location.ts
 │   │   │   │   ├── status.ts
+│   │   │   ├── http-utils.ts
 │   │   │   ├── images/
 │   │   │   │   ├── image-utils.ts
 │   │   │   ├── index.ts
 │   │   │   ├── migration.ts
 │   │   │   ├── number-utils.ts
+│   │   │   ├── performance-utils.ts
 │   │   │   ├── race-condition-prevention.ts
 │   │   │   ├── regex-patterns.ts
 │   │   │   ├── response-helpers.ts
+│   │   │   ├── security-utils.ts
 │   │   │   ├── string-utils.ts
 │   │   │   ├── type-guards.ts
 │   │   ├── validation/
@@ -1680,19 +1752,6 @@ shared/
 │   │   ├── rate-limiting-integration-tests.ts
 │   │   ├── refined_cross_cutting.ts
 │   ├── test-validation.js
-│   ├── utilities/
-│   │   ├── api/
-│   │   │   ├── index.ts
-│   │   │   ├── response.ts
-│   │   ├── database/
-│   │   ├── index.ts
-│   │   ├── logging/
-│   │   │   ├── index.ts
-│   │   │   ├── unified-logger.ts
-│   │   ├── performance/
-│   │   │   ├── index.ts
-│   │   │   ├── monitoring.ts
-│   │   ├── validation/
 ├── database/
 │   ├── connection.ts
 │   ├── example-usage.ts
@@ -1748,4 +1807,4 @@ vitest.frontend.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-20 17:16:15
+Generated on: 2025-10-21 03:56:46

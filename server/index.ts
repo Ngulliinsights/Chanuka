@@ -41,23 +41,36 @@ import { getMonitoringService } from './infrastructure/monitoring/monitoring.js'
 import { router as externalApiManagementRouter } from './infrastructure/monitoring/external-api-management.js';
 import { router as externalApiDashboardRouter } from './features/admin/external-api-dashboard.js';
 import coverageRouter from './features/coverage/coverage-routes.js';
-// Simple middleware implementations using shared/core
+// Import migrated middleware
+import {
+  migratedAuthenticateToken,
+  migratedRequireRole,
+  migratedCreateRateLimit,
+  migratedApiRateLimit,
+  migratedAuthRateLimit,
+  migratedSponsorRateLimit,
+  migratedSearchRateLimit,
+  migratedPasswordResetRateLimit,
+  migratedRegistrationRateLimit
+} from './middleware/migration-wrapper.js';
+
+// Use migrated middleware
 const errorHandler = (err: any, req: any, res: any, next: any) => {
   logger.error('Request error:', { error: err.message, path: req.path });
-  
+
   const statusCode = err.statusCode || err.status || 500;
   const response = ApiResponse.error(
     err.message || 'Internal server error',
     err.code || 'INTERNAL_ERROR',
     statusCode
   );
-  
+
   res.status(statusCode).json(response);
 };
 
 const requestLogger = (req: any, res: any, next: any) => {
   const timer = Performance.startTimer(`${req.method} ${req.path}`);
-  
+
   res.on('finish', () => {
     const duration = timer.end();
     logger.info('Request completed', {
@@ -67,16 +80,17 @@ const requestLogger = (req: any, res: any, next: any) => {
       duration
     });
   });
-  
+
   next();
 };
 
-const apiRateLimit = RateLimit.middleware(100, 15 * 60 * 1000); // 100 requests per 15 minutes
+// Use migrated rate limit middleware
+const apiRateLimit = migratedApiRateLimit;
 
 const securityMonitoringMiddleware = {
   initializeAll: () => (req: any, res: any, next: any) => {
-    logger.debug('Security monitoring', { 
-      ip: req.ip, 
+    logger.debug('Security monitoring', {
+      ip: req.ip,
       userAgent: req.get('User-Agent'),
       path: req.path,
       method: req.method

@@ -11,7 +11,9 @@
     "shared/**/dist/**",
     "shared/**/build/**",
     "shared/**/tasks/**/dist/**",
-    "shared/core/**"
+    "shared/core/**",
+    // Also exclude raw source under shared/core to prevent accidental parsing
+    "shared/core/src/**"
   ],
   "compilerOptions": {
     "baseUrl": ".",
@@ -45,7 +47,8 @@
       "@/*": ["./client/src/*"],
       "@shared/*": ["./shared/*"],
       "shared/*": ["./shared/*"],
-      "@shared/core": ["./shared/core/index.ts"]
+      "@shared/core": ["./shared/core/index.ts"],
+      "@shared/core/*": ["./server/types/ambient-shims.d.ts"]
     }
   }
 }

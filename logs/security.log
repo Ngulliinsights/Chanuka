@@ -261,3 +261,7 @@
 {"timestamp":"2025-10-19T10:05:38.097Z","level":"warn","message":"⚠️ HIGH MEMORY PRESSURE - Performing moderate cleanup","correlationId":"mgxjjlbl-068930fd","component":"WebSocketService","heapUsedPercent":"91.99%"}
 {"timestamp":"2025-10-19T10:05:38.231Z","level":"warn","message":"WebSocket Health Warning","correlationId":"mgxjjlfb-9c122f9a","component":"WebSocketService","activeConnections":0,"queueDepth":0,"droppedMessages":0,"heapUsedPercent":"92.01%","isHealthy":false}
 {"timestamp":"2025-10-19T10:05:39.213Z","level":"error","message":"Connection timeout","correlationId":"mgxjjm6l-1288b059","component":"Chanuka"}
+{"timestamp":"2025-10-21T11:42:21.934Z","level":"error","message":"Error generating coverage report:","correlationId":"mh0hvoxa-56bbb8a7","error":{"error":{}}}
+{"timestamp":"2025-10-21T11:51:41.520Z","level":"error","message":"Error generating coverage report:","correlationId":"mh0i7opc-4132d735","error":{"error":{}}}
+{"timestamp":"2025-10-21T12:18:54.925Z","level":"error","message":"Error generating coverage report:","correlationId":"mh0j6p1p-fe27b89f","error":{"error":{}}}
+{"timestamp":"2025-10-21T12:58:06.438Z","level":"error","message":"Error generating coverage report:","correlationId":"mh0kl3hi-2b80d8f8","error":{"error":{}}}

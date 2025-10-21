@@ -1,447 +1,372 @@
-import { database as db } from '../../../../shared/database/connection';
-import { user, billEngagement } from '../../../../shared/schema';
-
-// Alias for backward compatibility
-const users = user;
-import { eq, and } from 'drizzle-orm';
+import { readDatabase } from '../../../../shared/database/connection';
+import { user } from '../../../../shared/schema'; // Import user table directly
+import { eq } from 'drizzle-orm';
 import { logger } from '../../../../shared/core/src/observability/logging';
 
+// --- Interface Definitions ---
+// Defines the structure of GLOBAL bill tracking preferences stored within user.preferences.
+// These serve as defaults unless overridden by per-bill settings in userBillTrackingPreference table.
 export interface BillTrackingPreferences {
+  // Global defaults for which event types trigger notifications
   statusChanges: boolean;
   newComments: boolean;
   votingSchedule: boolean;
   amendments: boolean;
+  // Global default notification frequency
   updateFrequency: 'immediate' | 'hourly' | 'daily' | 'weekly';
+  // Global default enabled notification channels
   notificationChannels: {
     inApp: boolean;
     email: boolean;
     push: boolean;
     sms: boolean;
   };
+  // Global quiet hours settings
   quietHours?: {
     enabled: boolean;
     startTime: string; // HH:MM format
     endTime: string;   // HH:MM format
-    timezone?: string; // User's timezone
+    timezone?: string; // IANA timezone string (e.g., "Africa/Nairobi")
   };
+  // Global smart filtering settings
   smartFiltering: {
     enabled: boolean;
-    interestBasedFiltering: boolean;
-    priorityThreshold: 'low' | 'medium' | 'high';
-    categoryFilters: string[]; // Categories user is interested in
-    keywordFilters: string[]; // Keywords to watch for
-    sponsorFilters: string[]; // Specific sponsors to follow
+    interestBasedFiltering: boolean; // Filter based on userInterest table?
+    priorityThreshold: 'low' | 'medium' | 'high'; // Minimum priority to receive
+    categoryFilters: string[]; // Global list of allowed categories
+    keywordFilters: string[]; // Global list of keywords
+    sponsorFilters: string[]; // Global list of followed sponsors
   };
-  advancedSettings: {
-    digestSchedule: {
+  // Global advanced settings
+  advancedSettings?: { // Make optional for backward compatibility
+    digestSchedule?: {
       enabled: boolean;
       frequency: 'daily' | 'weekly' | 'monthly';
-      dayOfWeek?: number; // 0-6 for weekly
+      dayOfWeek?: number; // 0=Sun, 6=Sat for weekly
       dayOfMonth?: number; // 1-31 for monthly
       timeOfDay: string; // HH:MM format
     };
-    escalationRules: {
+    escalationRules?: {
       enabled: boolean;
-      urgentBillsImmediate: boolean;
-      importantSponsorsImmediate: boolean;
-      highEngagementImmediate: boolean;
+      urgentBillsImmediate: boolean; // Bypass frequency/quiet hours for urgent
+      importantSponsorsImmediate: boolean; // Bypass for specific sponsors
+      highEngagementImmediate: boolean; // Bypass for highly engaged bills
     };
-    batchingRules: {
+    batchingRules?: {
       maxBatchSize: number;
       batchTimeWindow: number; // minutes
-      similarUpdatesGrouping: boolean;
+      similarUpdatesGrouping: boolean; // Group similar updates in digests
     };
   };
+   // Add potential aliases used elsewhere for consistency checks, although primary fields should be used
+   alertFrequency?: BillTrackingPreferences['updateFrequency'];
+   alertChannels?: Array<'in_app' | 'email' | 'push' | 'sms'>;
+   trackingTypes?: string[];
 }
 
+// Defines the overall structure expected within the user.preferences JSONB column.
 export interface UserNotificationPreferences {
-  billTracking: BillTrackingPreferences;
+  billTracking: BillTrackingPreferences; // Global bill tracking defaults
   general: {
-    systemUpdates: boolean;
-    securityAlerts: boolean;
-    weeklyDigest: boolean;
+    systemUpdates: boolean; // e.g., maintenance, new features
+    securityAlerts: boolean; // e.g., password changes, suspicious logins
+    weeklyDigest: boolean; // General platform activity digest
   };
   privacy: {
-    shareEngagement: boolean;
-    publicProfile: boolean;
+    shareEngagement: boolean; // Allow platform to use engagement data (anonymized)
+    publicProfile: boolean; // Make user profile visible to others
   };
 }
 
+// Default preferences applied to new users or when stored preferences are incomplete/invalid.
 const DEFAULT_PREFERENCES: UserNotificationPreferences = {
   billTracking: {
-    statusChanges: true,
-    newComments: false,
-    votingSchedule: true,
-    amendments: true,
-    updateFrequency: 'immediate',
-    notificationChannels: {
-      inApp: true,
-      email: false,
-      push: false,
-      sms: false
-    },
-    quietHours: {
-      enabled: false,
-      startTime: '22:00',
-      endTime: '08:00',
-      timezone: 'UTC'
-    },
-    smartFiltering: {
-      enabled: false,
-      interestBasedFiltering: false,
-      priorityThreshold: 'medium',
-      categoryFilters: [],
-      keywordFilters: [],
-      sponsorFilters: []
-    },
+    statusChanges: true, newComments: true, votingSchedule: true, amendments: false,
+    updateFrequency: 'daily',
+    notificationChannels: { inApp: true, email: true, push: false, sms: false },
+    quietHours: { enabled: false, startTime: '22:00', endTime: '07:00', timezone: undefined }, // Timezone undefined initially
+    smartFiltering: { enabled: false, interestBasedFiltering: true, priorityThreshold: 'medium', categoryFilters: [], keywordFilters: [], sponsorFilters: [] },
     advancedSettings: {
-      digestSchedule: {
-        enabled: false,
-        frequency: 'daily',
-        timeOfDay: '09:00'
-      },
-      escalationRules: {
-        enabled: false,
-        urgentBillsImmediate: true,
-        importantSponsorsImmediate: false,
-        highEngagementImmediate: false
-      },
-      batchingRules: {
-        maxBatchSize: 10,
-        batchTimeWindow: 30,
-        similarUpdatesGrouping: true
-      }
+      digestSchedule: { enabled: true, frequency: 'daily', timeOfDay: '08:00' },
+      escalationRules: { enabled: true, urgentBillsImmediate: true, importantSponsorsImmediate: false, highEngagementImmediate: false },
+      batchingRules: { maxBatchSize: 10, batchTimeWindow: 60, similarUpdatesGrouping: true }
     }
   },
-  general: {
-    systemUpdates: true,
-    securityAlerts: true,
-    weeklyDigest: false
-  },
-  privacy: {
-    shareEngagement: true,
-    publicProfile: true
-  }
+  general: { systemUpdates: true, securityAlerts: true, weeklyDigest: false },
+  privacy: { shareEngagement: false, publicProfile: true }
 };
 
+
+/**
+ * Service for managing GLOBAL user preferences stored in the user.preferences JSONB field.
+ *
+ * NOTE: This service deals *only* with the user-wide default settings.
+ * Per-bill notification preferences override these global settings and are managed
+ * separately by BillTrackingService (storage) and NotificationOrchestratorService (application).
+ */
 export class UserPreferencesService {
-  // Get user's notification preferences
+  // Use read replica if available for preference fetching
+  private get db() { return readDatabase(); }
+
+  /**
+   * Retrieves the user's GLOBAL notification preferences.
+   * Fetches the JSONB field from the user table and merges it deeply with
+   * system defaults to ensure a complete and valid preference object is always returned.
+   * @param userId The ID of the user whose preferences are being fetched. Use 'default' to get system defaults.
+   * @returns The user's complete global preferences object. Returns defaults if user not found or on DB error.
+   */
   async getUserPreferences(userId: string): Promise<UserNotificationPreferences> {
+    // Handle request for default preferences explicitly
+    if (userId === 'default') {
+      logger.debug("Returning default global preferences", { component: 'UserPreferencesService' });
+      return this.deepClone(DEFAULT_PREFERENCES); // Return a clone
+    }
+
+    const logContext = { component: 'UserPreferencesService', userId };
+    logger.debug("Fetching global user preferences from DB", logContext);
+
     try {
-      const user = await db
-        .select({
-          preferences: users.preferences
-        })
-        .from(users)
-        .where(eq(users.id, userId))
+      // Select only the preferences column for efficiency
+      const [userData] = await this.db
+        .select({ preferences: user.preferences })
+        .from(user)
+        .where(eq(user.id, userId))
         .limit(1);
 
-      if (user.length === 0) {
-        throw new Error('User not found');
+      if (!userData) {
+        logger.warn(`User not found when fetching global preferences. Returning defaults.`, logContext);
+        // It's safer to return defaults than throw an error here, allows services using this to proceed.
+        return this.deepClone(DEFAULT_PREFERENCES);
       }
 
-      // Merge with defaults to ensure all properties exist
-      const userPrefs = user[0].preferences as Partial<UserNotificationPreferences> || {};
-      return this.mergeWithDefaults(userPrefs);
+      // Deep merge the potentially partial/null data from DB with defaults
+      // This ensures the returned object always conforms to UserNotificationPreferences structure
+      const mergedPrefs = this.deepMerge(this.deepClone(DEFAULT_PREFERENCES), userData.preferences || {});
+      logger.debug("Successfully fetched and merged global preferences", logContext);
+      return mergedPrefs;
+
     } catch (error) {
-  logger.error(`Error getting preferences for user ${userId}:`, { component: 'Chanuka' }, error);
-      return DEFAULT_PREFERENCES;
+      logger.error(`Database error getting global preferences:`, logContext, error);
+      // Return defaults as a fallback to ensure calling services don't break
+      return this.deepClone(DEFAULT_PREFERENCES);
     }
   }
 
-  // Update user's notification preferences
+  /**
+   * Updates the user's GLOBAL notification preferences in the database.
+   * Performs a deep merge of the provided partial updates onto the current settings.
+   * @param userId The ID of the user.
+   * @param preferences Partial preferences object containing only the fields to update.
+   * @returns The fully updated and saved global preferences object.
+   * @throws Error if the user is not found or the database update fails.
+   */
   async updateUserPreferences(userId: string, preferences: Partial<UserNotificationPreferences>): Promise<UserNotificationPreferences> {
-    try {
-      // Get current preferences
-      const currentPrefs = await this.getUserPreferences(userId);
-      
-      // Deep merge with current preferences
-      const updatedPrefs = this.deepMerge(currentPrefs, preferences);
+    const logContext = { component: 'UserPreferencesService', userId };
+    logger.info("Updating global user preferences in DB", logContext);
 
-      // Update in database
-      await db
-        .update(users)
+    try {
+      // 1. Fetch current preferences directly from DB to avoid race conditions.
+      const [currentUser] = await this.db
+        .select({ preferences: user.preferences })
+        .from(user)
+        .where(eq(user.id, userId))
+        .limit(1);
+
+      if (!currentUser) {
+        logger.error("User not found during preference update.", logContext);
+        throw new Error(`User not found: ${userId}`);
+      }
+
+      // 2. Merge current DB state (merged with defaults) with the provided partial updates.
+      const currentPrefsWithDefaults = this.deepMerge(this.deepClone(DEFAULT_PREFERENCES), currentUser.preferences || {});
+      const updatedPrefsObject = this.deepMerge(currentPrefsWithDefaults, preferences);
+
+      // 3. (Optional but recommended) Validate the final structure before saving.
+      //    e.g., using a Zod schema for UserNotificationPreferences.
+
+      // 4. Perform the database update.
+      const result = await this.db
+        .update(user)
         .set({
-          preferences: updatedPrefs,
-          updatedAt: new Date()
+          preferences: updatedPrefsObject, // Save the fully merged object
+          updatedAt: new Date()           // Update modification timestamp
         })
-        .where(eq(users.id, userId));
+        .where(eq(user.id, userId))
+        .returning({ preferences: user.preferences }); // Return the updated data from DB
 
-      console.log(`Updated preferences for user ${userId}`);
-      return updatedPrefs;
+      if (result.length === 0) {
+        // Should not happen if user was found earlier, but handle defensively.
+        logger.error("DB update affected 0 rows, possible issue.", logContext);
+        throw new Error(`Failed to update preferences for user ${userId} (user might have been deleted concurrently).`);
+      }
+
+      logger.info(`Successfully updated global preferences`, logContext);
+      // Return the updated, fully merged preferences structure
+      // Re-merge with defaults just in case DB returns something unexpected (though returning() should be reliable)
+      return this.deepMerge(this.deepClone(DEFAULT_PREFERENCES), result[0].preferences || {});
+
     } catch (error) {
-      console.error(`Error updating preferences for user ${userId}:`, error);
+      logger.error(`Error updating global preferences:`, logContext, error);
+      // Re-throw the original error after logging
       throw error;
     }
   }
 
-  // Update specific bill tracking preferences
+  /**
+   * Updates only the GLOBAL bill tracking part (`billTracking` key) of the user's preferences.
+   * Note: This does NOT affect per-bill preferences stored in `userBillTrackingPreference` table.
+   * @param userId The ID of the user.
+   * @param preferences Partial global bill tracking preferences to update.
+   * @returns The updated global bill tracking preferences object.
+   * @throws Error if the update fails.
+   */
   async updateBillTrackingPreferences(userId: string, preferences: Partial<BillTrackingPreferences>): Promise<BillTrackingPreferences> {
+    const logContext = { component: 'UserPreferencesService', userId };
+    logger.info("Updating global bill tracking preferences specifically", logContext);
     try {
-      const currentPrefs = await this.getUserPreferences(userId);
-      const updatedBillPrefs = { ...currentPrefs.billTracking, ...preferences };
-      
-      await this.updateUserPreferences(userId, {
-        billTracking: updatedBillPrefs
+      // Delegate to the main update function, nesting the partial update correctly
+      const fullUpdatedPrefs = await this.updateUserPreferences(userId, {
+        billTracking: preferences // Apply updates only within the billTracking key
       });
-
-      return updatedBillPrefs;
+      // Return just the updated billTracking portion
+      return fullUpdatedPrefs.billTracking;
     } catch (error) {
-      console.error(`Error updating bill tracking preferences for user ${userId}:`, error);
-      throw error;
+      // Error already logged by updateUserPreferences
+      throw error; // Re-throw
     }
   }
 
-  // Check if user should receive notification based on preferences and timing
-  async shouldNotifyUser(userId: string, notificationType: keyof BillTrackingPreferences, channel: keyof BillTrackingPreferences['notificationChannels'] = 'inApp'): Promise<boolean> {
+  // --- Helper Methods ---
+
+  /** Creates a deep clone of an object (simple JSON approach). */
+  private deepClone<T>(obj: T): T {
+    if (obj === null || typeof obj !== 'object') {
+      return obj;
+    }
+    // Basic deep clone for JSON-serializable objects
     try {
-      const preferences = await this.getUserPreferences(userId);
-      const billPrefs = preferences.billTracking;
-
-      // Check if notification type is enabled
-      if (!billPrefs[notificationType]) {
-        return false;
-      }
-
-      // Check if notification channel is enabled
-      if (!billPrefs.notificationChannels[channel]) {
-        return false;
-      }
-
-      // Check quiet hours
-      if (billPrefs.quietHours?.enabled && this.isInQuietHours(billPrefs.quietHours)) {
-        return false;
-      }
-
-      return true;
-    } catch (error) {
-      console.error(`Error checking notification eligibility for user ${userId}:`, error);
-      return false;
+        return JSON.parse(JSON.stringify(obj));
+    } catch (e) {
+        logger.error("Failed to deep clone object", { component: 'UserPreferencesService' }, e);
+        return obj; // Fallback to shallow copy on error
     }
   }
 
-  // Get users who should be notified for a specific bill update
-  async getUsersToNotify(billId: number, notificationType: keyof BillTrackingPreferences): Promise<Array<{ userId: string; preferences: BillTrackingPreferences }>> {
-    try {
-      // Get all users tracking this bill
-      const trackers = await db
-        .select({
-          userId: billEngagement.userId,
-          userPreferences: users.preferences
-        })
-        .from(billEngagement)
-        .innerJoin(users, eq(billEngagement.userId, users.id))
-        .where(eq(billEngagement.billId, billId));
+  /** Helper to check if a value is a plain JavaScript object. */
+  private isObject(item: any): boolean {
+    return (item && typeof item === 'object' && !Array.isArray(item) && item !== null);
+  }
 
-      const eligibleUsers: Array<{ userId: string; preferences: BillTrackingPreferences }> = [];
+  /**
+   * Deeply merges properties from the source object into the target object.
+   * Overwrites primitives and arrays in target with values from source.
+   * Recursively merges nested plain objects.
+   * @param target The base object.
+   * @param source The object with properties to merge in.
+   * @returns A new object representing the merged result.
+   */
+  private deepMerge(target: any, source: any): any {
+    // Start with a shallow clone of the target
+    const output = { ...target };
 
-      for (const tracker of trackers) {
-        const userPrefs = this.mergeWithDefaults(tracker.userPreferences as Partial<UserNotificationPreferences> || {});
-        
-        if (await this.shouldNotifyUser(tracker.userId, notificationType)) {
-          eligibleUsers.push({
-            userId: tracker.userId,
-            preferences: userPrefs.billTracking
-          });
+    // Ensure both are objects before attempting merge
+    if (this.isObject(target) && this.isObject(source)) {
+      // Iterate over keys in the source object
+      Object.keys(source).forEach(key => {
+        const targetValue = target[key];
+        const sourceValue = source[key];
+
+        // If source value is an object and target value is also an object, recurse
+        if (this.isObject(sourceValue) && this.isObject(targetValue)) {
+          output[key] = this.deepMerge(targetValue, sourceValue);
         }
-      }
-
-      return eligibleUsers;
-    } catch (error) {
-      console.error(`Error getting users to notify for bill ${billId}:`, error);
-      return [];
+        // Otherwise, overwrite target value with source value (primitives, arrays, or replacing non-object with object)
+        else {
+          // Assign the source value (could be primitive, array, object, null, undefined)
+          output[key] = sourceValue;
+        }
+      });
+    } else if (this.isObject(source)) {
+      // If target wasn't an object, just return a clone of the source
+      return this.deepClone(source);
     }
+    // If source isn't an object, return the original target (or its clone)
+    return output;
   }
 
-  // Batch update preferences for multiple users (admin function)
-  async batchUpdatePreferences(updates: Array<{ userId: string; preferences: Partial<UserNotificationPreferences> }>): Promise<void> {
-    try {
-      const updatePromises = updates.map(update => 
-        this.updateUserPreferences(update.userId, update.preferences)
-      );
+  // --- Admin/Stat Methods (Keep implementations if needed) ---
 
-      await Promise.allSettled(updatePromises);
-      console.log(`Batch updated preferences for ${updates.length} users`);
-    } catch (error) {
-      logger.error('Error in batch preference update:', { component: 'Chanuka' }, error);
-      throw error;
+  /** Batch updates preferences for multiple users (Admin functionality). */
+  async batchUpdatePreferences(updates: Array<{ userId: string; preferences: Partial<UserNotificationPreferences> }>): Promise<{ success: number; failed: number; errors: any[] }> {
+    const logContext = { component: 'UserPreferencesService' };
+    logger.info(`Starting batch preference update for ${updates.length} users.`, logContext);
+    let success = 0;
+    let failed = 0;
+    const errors: any[] = [];
+
+    // Process updates sequentially or in parallel batches
+    for (const update of updates) {
+        try {
+            await this.updateUserPreferences(update.userId, update.preferences);
+            success++;
+        } catch(error) {
+            failed++;
+            errors.push({ userId: update.userId, error: error instanceof Error ? error.message : String(error) });
+            logger.error(`Batch update failed for user ${update.userId}`, logContext, error);
+        }
     }
+    logger.info(`Batch update completed. Success: ${success}, Failed: ${failed}`, logContext);
+    return { success, failed, errors };
   }
 
-  // Get preference statistics (for admin dashboard)
+  /** Retrieves statistics about global user preference settings (Admin functionality). */
   async getPreferenceStats(): Promise<{
     totalUsers: number;
-    immediateNotifications: number;
-    emailEnabled: number;
-    pushEnabled: number;
+    immediateBillNotifications: number; // Renamed for clarity
+    emailBillChannelEnabled: number; // Renamed
+    pushBillChannelEnabled: number; // Renamed
     quietHoursEnabled: number;
+    smartFilteringEnabled: number; // Added stat
   }> {
+    const logContext = { component: 'UserPreferencesService' };
+    logger.info("Calculating global preference statistics.", logContext);
     try {
-      const allUsers = await db
-        .select({
-          preferences: users.preferences
-        })
-        .from(users);
+      // Fetch preferences for all users (consider performance for very large user bases)
+      const allUsersPrefs = await this.db.select({ preferences: user.preferences }).from(user);
 
-      let immediateNotifications = 0;
-      let emailEnabled = 0;
-      let pushEnabled = 0;
+      let immediateBillNotifications = 0;
+      let emailBillChannelEnabled = 0;
+      let pushBillChannelEnabled = 0;
       let quietHoursEnabled = 0;
+      let smartFilteringEnabled = 0;
 
-      for (const user of allUsers) {
-        const prefs = this.mergeWithDefaults(user.preferences as Partial<UserNotificationPreferences> || {});
-        
-        if (prefs.billTracking.updateFrequency === 'immediate') {
-          immediateNotifications++;
-        }
-        if (prefs.billTracking.notificationChannels.email) {
-          emailEnabled++;
-        }
-        if (prefs.billTracking.notificationChannels.push) {
-          pushEnabled++;
-        }
-        if (prefs.billTracking.quietHours?.enabled) {
-          quietHoursEnabled++;
-        }
+      for (const userData of allUsersPrefs) {
+        // Ensure defaults are applied before checking
+        const prefs = this.deepMerge(this.deepClone(DEFAULT_PREFERENCES), userData.preferences || {});
+
+        if (prefs.billTracking.updateFrequency === 'immediate') immediateBillNotifications++;
+        if (prefs.billTracking.notificationChannels.email) emailBillChannelEnabled++;
+        if (prefs.billTracking.notificationChannels.push) pushBillChannelEnabled++;
+        if (prefs.billTracking.quietHours?.enabled) quietHoursEnabled++;
+        if (prefs.billTracking.smartFiltering.enabled) smartFilteringEnabled++;
       }
 
+      logger.info("Preference statistics calculated.", logContext);
       return {
-        totalUsers: allUsers.length,
-        immediateNotifications,
-        emailEnabled,
-        pushEnabled,
-        quietHoursEnabled
+        totalUsers: allUsersPrefs.length,
+        immediateBillNotifications,
+        emailBillChannelEnabled,
+        pushBillChannelEnabled,
+        quietHoursEnabled,
+        smartFilteringEnabled
       };
     } catch (error) {
-      logger.error('Error getting preference stats:', { component: 'Chanuka' }, error);
-      throw error;
+      logger.error('Error getting preference stats:', logContext, error);
+      // Return zeros or throw depending on desired error handling
+      return { totalUsers: 0, immediateBillNotifications: 0, emailBillChannelEnabled: 0, pushBillChannelEnabled: 0, quietHoursEnabled: 0, smartFilteringEnabled: 0 };
     }
-  }
-
-  // Helper method to check if current time is in quiet hours
-  private isInQuietHours(quietHours: { startTime: string; endTime: string }): boolean {
-    const now = new Date();
-    const currentTime = now.getHours() * 60 + now.getMinutes();
-    
-    const [startHour, startMin] = quietHours.startTime.split(':').map(Number);
-    const [endHour, endMin] = quietHours.endTime.split(':').map(Number);
-    
-    const startTime = startHour * 60 + startMin;
-    const endTime = endHour * 60 + endMin;
-
-    // Handle overnight quiet hours (e.g., 22:00 to 08:00)
-    if (startTime > endTime) {
-      return currentTime >= startTime || currentTime <= endTime;
-    } else {
-      return currentTime >= startTime && currentTime <= endTime;
-    }
-  }
-
-  // Helper method to merge preferences with defaults
-  private mergeWithDefaults(userPrefs: Partial<UserNotificationPreferences>): UserNotificationPreferences {
-    return {
-      billTracking: {
-        ...DEFAULT_PREFERENCES.billTracking,
-        ...userPrefs.billTracking,
-        notificationChannels: {
-          ...DEFAULT_PREFERENCES.billTracking.notificationChannels,
-          ...userPrefs.billTracking?.notificationChannels
-        },
-        quietHours: {
-          ...DEFAULT_PREFERENCES.billTracking.quietHours,
-          ...(userPrefs.billTracking?.quietHours || {})
-        },
-        smartFiltering: {
-          ...DEFAULT_PREFERENCES.billTracking.smartFiltering,
-          ...userPrefs.billTracking?.smartFiltering
-        },
-        advancedSettings: {
-          ...DEFAULT_PREFERENCES.billTracking.advancedSettings,
-          ...userPrefs.billTracking?.advancedSettings,
-          digestSchedule: {
-            ...DEFAULT_PREFERENCES.billTracking.advancedSettings.digestSchedule,
-            ...userPrefs.billTracking?.advancedSettings?.digestSchedule
-          },
-          escalationRules: {
-            ...DEFAULT_PREFERENCES.billTracking.advancedSettings.escalationRules,
-            ...userPrefs.billTracking?.advancedSettings?.escalationRules
-          },
-          batchingRules: {
-            ...DEFAULT_PREFERENCES.billTracking.advancedSettings.batchingRules,
-            ...userPrefs.billTracking?.advancedSettings?.batchingRules
-          }
-        }
-      },
-      general: {
-        ...DEFAULT_PREFERENCES.general,
-        ...userPrefs.general
-      },
-      privacy: {
-        ...DEFAULT_PREFERENCES.privacy,
-        ...userPrefs.privacy
-      }
-    };
-  }
-
-  // Helper method for deep merging objects
-  private deepMerge(target: any, source: any): any {
-    const result = { ...target };
-    
-    for (const key in source) {
-      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-        result[key] = this.deepMerge(target[key] || {}, source[key]);
-      } else {
-        result[key] = source[key];
-      }
-    }
-    
-    return result;
   }
 }
 
+// Export singleton instance
 export const userPreferencesService = new UserPreferencesService();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

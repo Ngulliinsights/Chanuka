@@ -1,947 +1,684 @@
-import { database as db } from '../../../shared/database/connection';
+import { database as db, readDatabase } from '../../../shared/database/connection';
 import {
-  user,
-  bill,
-  billEngagement,
-  userInterest,
-  billComment,
-  sponsor,
-  billSponsorship
+  user, bill, billEngagement, userInterest, billComment, sponsor, billSponsorship, billTag // Added billTag
 } from '../../../shared/schema';
-import { eq, and, inArray, desc } from 'drizzle-orm';
-import { userPreferencesService } from '../../features/users/domain/user-preferences.js';
-import type { BillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
+import { eq, and, inArray, desc, sql } from 'drizzle-orm';
+// Import the *combined* preference type, NOT the global one directly
+import type { CombinedBillTrackingPreferences } from './notification-orchestrator.js'; // Adjust path if needed
 import { logger } from '@shared/core/src/observability/logging';
+import { cacheService, CACHE_KEYS, CACHE_TTL } from './cache-service.js'; // Assuming cache service is here
 
 /**
  * Smart Notification Filter Service
- * 
- * Purpose: Determines whether a notification should be sent based on:
- * - User preferences and settings
- * - Smart filtering rules (categories, keywords, sponsors)
- * - User engagement patterns and history
- * - Timing preferences (quiet hours, active periods)
- * 
- * This service is PURELY about decision-making. It doesn't send notifications,
- * manage channels, or handle batching. It simply answers: "Should this user
- * receive this notification?"
+ *
+ * Determines if a notification should be sent based on combined user preferences,
+ * content relevance, and user engagement history. It provides reasons for its decision.
  */
 
+// Interface for the input criteria, now expecting combined preferences
 export interface FilterCriteria {
   userId: string;
   billId?: number;
   category?: string;
-  tags?: string[];
+  tags?: string[]; // Tags associated with the bill/event
   sponsorName?: string;
   priority: 'low' | 'medium' | 'high' | 'urgent';
   notificationType: 'bill_update' | 'comment_reply' | 'verification_status' | 'system_alert' | 'digest';
   subType?: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled' | 'sponsor_update';
-  content?: {
-    title: string;
-    message: string;
-  };
+  content?: { title: string; message: string; };
+  // *** Expects the fully merged preferences from the orchestrator ***
+  userPreferences: CombinedBillTrackingPreferences;
 }
 
+// Interface for the filtering result
 export interface FilterResult {
-  shouldNotify: boolean;
-  confidence: number; // 0-1 score indicating how confident the filter is
-  reasons: string[]; // Human-readable explanations for the decision
-  suggestedPriority: 'low' | 'medium' | 'high' | 'urgent';
-  recommendedChannels: Array<'email' | 'inApp' | 'sms' | 'push'>;
-  shouldBatch: boolean; // Whether this notification should be batched
+  shouldNotify: boolean; // Final decision
+  confidence: number; // Confidence score (0-1)
+  reasons: string[]; // Explanations for the decision
+  suggestedPriority: 'low' | 'medium' | 'high' | 'urgent'; // Can adjust priority
+  recommendedChannels: Array<'inApp' | 'email' | 'sms' | 'push'>; // Suggested delivery channels
+  shouldBatch: boolean; // Recommendation on batching (based on non-immediate frequency)
 }
 
+// Interface for the cached user engagement profile
 export interface UserEngagementProfile {
   userId: string;
   topCategories: Array<{ category: string; score: number }>;
   topSponsors: Array<{ sponsorId: number; name: string; score: number }>;
+  topTags: Array<{ tag: string; score: number }>; // Added tags
   engagementLevel: 'low' | 'medium' | 'high';
-  preferredNotificationTimes: Array<{ hour: number; frequency: number }>;
-  averageResponseTime: number; // in hours
+  // Note: Preferred times/response time might be less relevant for pure filtering decision
 }
 
 export class SmartNotificationFilterService {
-  // Cache for engagement profiles to avoid repeated database queries
-  private engagementProfiles: Map<string, UserEngagementProfile> = new Map();
-  private profileCacheExpiry: Map<string, number> = new Map();
-  private readonly CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+  private get db() { return readDatabase(); }
+  private readonly CACHE_DURATION_PROFILE = CACHE_TTL.USER_DATA_LONG; // Cache profile for a day
 
   /**
-   * Main filtering method - determines if notification should be sent
-   * 
-   * This is the primary entry point for the filtering service. It evaluates
-   * multiple criteria and returns a comprehensive decision with reasoning.
+   * Main filtering method: Determines if a notification should proceed based on various checks.
    */
   async shouldSendNotification(criteria: FilterCriteria): Promise<FilterResult> {
-    try {
-      // Get user preferences with error handling
-      const userPrefs = await this.getUserPreferences(criteria.userId);
-      const smartFiltering = userPrefs.billTracking.smartFiltering;
+    const logContext = { component: 'SmartFilter', userId: criteria.userId, type: criteria.notificationType, billId: criteria.billId };
+    logger.debug('Starting smart filtering', logContext);
 
-      // If smart filtering is disabled, allow everything with basic checks
-      if (!smartFiltering.enabled) {
-        return this.createBasicFilterResult(criteria, userPrefs.billTracking);
+    try {
+      // Preferences are now passed directly in criteria
+      const preferences = criteria.userPreferences;
+      const smartFiltering = preferences.smartFiltering;
+
+      // 1. Basic Preference Checks (Type Enabled, Quiet Hours)
+      const typeCheck = this.checkNotificationTypeEnabled(criteria, preferences);
+      if (!typeCheck.shouldNotify) {
+        return { ...this.createDefaultResult(criteria), ...typeCheck, confidence: 1.0, shouldNotify: false };
       }
 
-      // Get user engagement profile for intelligent filtering
+      const quietHoursCheck = this.checkQuietHours(preferences);
+      if (!quietHoursCheck.shouldNotify && criteria.priority !== 'urgent') { // Urgent bypasses quiet hours
+        return { ...this.createDefaultResult(criteria), ...quietHoursCheck, confidence: 1.0, shouldNotify: false };
+      }
+
+      // 2. If Smart Filtering is disabled, return basic positive result
+      if (!smartFiltering.enabled) {
+        logger.debug('Smart filtering disabled, allowing notification', logContext);
+        return {
+            shouldNotify: true, confidence: 1.0, reasons: ['Smart filtering disabled'],
+            suggestedPriority: criteria.priority,
+            // Use explicitly enabled channels from combined prefs
+            recommendedChannels: this.getEnabledChannels(preferences),
+            // Batch based purely on frequency preference
+            shouldBatch: preferences.alertFrequency !== 'immediate' && criteria.priority !== 'urgent'
+        };
+      }
+
+      // 3. Smart Filtering Checks (run concurrently)
+      // Get engagement profile (cached)
       const engagementProfile = await this.getUserEngagementProfile(criteria.userId);
 
-      // Run all filter checks in parallel for performance
-      const filterResults = await Promise.all([
-        this.checkNotificationTypeEnabled(criteria, userPrefs.billTracking),
+      const filterChecks = await Promise.all([
         this.checkPriorityThreshold(criteria, smartFiltering),
-        this.checkQuietHours(userPrefs.billTracking),
+        // Relevance checks become more important with smart filtering
         this.checkCategoryRelevance(criteria, smartFiltering, engagementProfile),
         this.checkKeywordRelevance(criteria, smartFiltering),
         this.checkSponsorRelevance(criteria, smartFiltering, engagementProfile),
-        this.checkEngagementHistory(criteria, engagementProfile),
-        this.checkTimingRelevance(engagementProfile),
-        this.checkInterestBasedRelevance(criteria, smartFiltering)
+        this.checkTagRelevance(criteria, smartFiltering, engagementProfile), // Added tag check
+        this.checkInterestBasedRelevance(criteria, smartFiltering) // Check against user's declared interests
+        // Removed checkEngagementHistory & checkTimingRelevance as they mainly influence *how* rather than *if*
       ]);
 
-      // Combine all filter results into final decision
-      return this.combineFilterResults(filterResults, criteria, engagementProfile);
+      // 4. Combine Results
+      return this.combineFilterResults(filterChecks, criteria, preferences, engagementProfile);
 
     } catch (error) {
-      logger.error('Error in smart filtering:', { component: 'SmartFilter' }, error);
-
-      // Fail open - if filtering fails, allow notification but with low confidence
-      // This ensures notifications aren't lost due to filtering errors
+      logger.error('Error during smart filtering:', logContext, error);
+      // Fail open: Allow notification but log error, use basic channels/priority
       return {
-        shouldNotify: true,
-        confidence: 0.3,
-        reasons: ['Filtering error - defaulting to allow'],
-        suggestedPriority: criteria.priority,
-        recommendedChannels: ['inApp'],
-        shouldBatch: false
+        shouldNotify: true, confidence: 0.3, reasons: ['Filtering error occurred - allowing notification'],
+        suggestedPriority: criteria.priority, recommendedChannels: this.getEnabledChannels(criteria.userPreferences), shouldBatch: false
       };
     }
   }
 
-  /**
-   * Check if notification type is enabled in user preferences
-   */
-  private async checkNotificationTypeEnabled(
-    criteria: FilterCriteria,
-    preferences: BillTrackingPreferences
-  ): Promise<Partial<FilterResult>> {
+  // --- Private Filter Check Methods ---
+
+  /** Creates a default negative result structure */
+  private createDefaultResult(criteria: FilterCriteria): Omit<FilterResult, 'shouldNotify' | 'confidence' | 'reasons'> {
+      return {
+          suggestedPriority: criteria.priority,
+          recommendedChannels: [], // No channels if filtered out
+          shouldBatch: false,
+      };
+  }
+
+  /** Gets currently enabled channels from combined preferences */
+  private getEnabledChannels(preferences: CombinedBillTrackingPreferences): FilterResult['recommendedChannels'] {
+       return Object.entries(preferences.notificationChannels)
+           .filter(([, enabled]) => enabled)
+           .map(([channel]) => channel as FilterResult['recommendedChannels'][number]);
+   }
+
+
+  /** Check 1: Is this notification type globally enabled by the user? */
+  private checkNotificationTypeEnabled(criteria: FilterCriteria, preferences: CombinedBillTrackingPreferences): Partial<FilterResult> & { shouldNotify: boolean } {
     let enabled = false;
-    let reason = '';
+    let typeKey: keyof Omit<CombinedBillTrackingPreferences, 'quietHours' | 'smartFiltering' | 'advancedSettings' | '_perBillSettingsApplied' | 'updateFrequency' | 'notificationChannels' | 'alertFrequency' | 'alertChannels'> | null = null;
 
     switch (criteria.notificationType) {
       case 'bill_update':
-        if (criteria.subType === 'status_change') {
-          enabled = preferences.statusChanges;
-          reason = enabled ? 'Status change notifications enabled' : 'Status change notifications disabled';
-        } else if (criteria.subType === 'new_comment') {
-          enabled = preferences.newComments;
-          reason = enabled ? 'Comment notifications enabled' : 'Comment notifications disabled';
-        } else if (criteria.subType === 'amendment') {
-          enabled = preferences.amendments;
-          reason = enabled ? 'Amendment notifications enabled' : 'Amendment notifications disabled';
-        } else if (criteria.subType === 'voting_scheduled') {
-          enabled = preferences.votingSchedule;
-          reason = enabled ? 'Voting schedule notifications enabled' : 'Voting schedule notifications disabled';
-        }
+        if (criteria.subType === 'status_change') typeKey = 'statusChanges';
+        else if (criteria.subType === 'new_comment') typeKey = 'newComments';
+        else if (criteria.subType === 'amendment') typeKey = 'amendments';
+        else if (criteria.subType === 'voting_scheduled') typeKey = 'votingSchedule';
         break;
-      case 'comment_reply':
-        enabled = preferences.newComments;
-        reason = enabled ? 'Comment reply notifications enabled' : 'Comment reply notifications disabled';
-        break;
+      case 'comment_reply': typeKey = 'newComments'; break; // Assuming replies fall under new comments
+      // System alerts, verification status, digests are usually implicitly enabled if channels are configured
       case 'verification_status':
       case 'system_alert':
-      case 'digest':
-        enabled = true; // Always enabled for system notifications
-        reason = 'System notification - always enabled';
-        break;
+      case 'digest': enabled = true; break;
     }
 
-    return {
-      shouldNotify: enabled,
-      confidence: 1.0,
-      reasons: [reason]
-    };
+    if (typeKey) {
+        // Check if the specific tracking type is enabled in the combined preferences
+        enabled = preferences.trackingTypes?.includes(typeKey as any) ?? false; // Check the array
+    }
+
+
+    const reason = enabled ? `Notification type '${criteria.subType || criteria.notificationType}' enabled by user.` : `Notification type '${criteria.subType || criteria.notificationType}' disabled by user.`;
+    return { shouldNotify: enabled, confidence: 1.0, reasons: [reason] };
   }
 
-  /**
-   * Check if notification priority meets user's threshold
-   */
-  private async checkPriorityThreshold(
-    criteria: FilterCriteria,
-    smartFiltering: BillTrackingPreferences['smartFiltering']
-  ): Promise<Partial<FilterResult>> {
-    const priorityLevels = { low: 1, medium: 2, high: 3, urgent: 4 };
-    const thresholdLevels = { low: 1, medium: 2, high: 3 };
-
-    const meetsThreshold = priorityLevels[criteria.priority] >= thresholdLevels[smartFiltering.priorityThreshold];
-
-    return {
-      shouldNotify: meetsThreshold,
-      confidence: 1.0,
-      reasons: meetsThreshold ?
-        [`Priority ${criteria.priority} meets threshold ${smartFiltering.priorityThreshold}`] :
-        [`Priority ${criteria.priority} below threshold ${smartFiltering.priorityThreshold}`]
-    };
-  }
-
-  /**
-   * Check if current time is within quiet hours
-   */
-  private async checkQuietHours(
-    preferences: BillTrackingPreferences
-  ): Promise<Partial<FilterResult>> {
-    if (!preferences.quietHours?.enabled) {
+  /** Check 2: Is the user currently in their defined quiet hours? (Urgent bypasses) */
+  private checkQuietHours(preferences: CombinedBillTrackingPreferences): Partial<FilterResult> & { shouldNotify: boolean } {
+    const quietHours = preferences.quietHours;
+    if (!quietHours?.enabled) {
       return { shouldNotify: true, confidence: 1.0, reasons: ['Quiet hours not enabled'] };
     }
 
-    const now = new Date();
-    const currentTime = now.getHours() * 60 + now.getMinutes();
+    try {
+        const now = new Date();
+        // TODO: Implement proper timezone handling using user's timezone if available
+        const currentHour = now.getHours(); // Use local server time for now
+        const currentMinute = now.getMinutes();
+        const currentTimeMinutes = currentHour * 60 + currentMinute;
 
-    const [startHour, startMin] = preferences.quietHours.startTime.split(':').map(Number);
-    const [endHour, endMin] = preferences.quietHours.endTime.split(':').map(Number);
+        const [startHour, startMin] = quietHours.startTime.split(':').map(Number);
+        const [endHour, endMin] = quietHours.endTime.split(':').map(Number);
+        const startTimeMinutes = startHour * 60 + startMin;
+        const endTimeMinutes = endHour * 60 + endMin;
 
-    const startTime = startHour * 60 + startMin;
-    const endTime = endHour * 60 + endMin;
+        let inQuietHours = false;
+        if (startTimeMinutes <= endTimeMinutes) { // Quiet hours within the same day (e.g., 09:00 - 17:00)
+            inQuietHours = currentTimeMinutes >= startTimeMinutes && currentTimeMinutes < endTimeMinutes;
+        } else { // Quiet hours span midnight (e.g., 22:00 - 08:00)
+            inQuietHours = currentTimeMinutes >= startTimeMinutes || currentTimeMinutes < endTimeMinutes;
+        }
 
-    let inQuietHours = false;
-    if (startTime < endTime) {
-      inQuietHours = currentTime >= startTime && currentTime <= endTime;
-    } else {
-      // Overnight quiet hours
-      inQuietHours = currentTime >= startTime || currentTime <= endTime;
+        const reason = inQuietHours ? `Currently within quiet hours (${quietHours.startTime}-${quietHours.endTime})` : 'Outside quiet hours';
+        return { shouldNotify: !inQuietHours, confidence: 1.0, reasons: [reason] };
+    } catch(e) {
+         logger.error('Error parsing quiet hours', { component: 'SmartFilter', quietHours }, e);
+         return { shouldNotify: true, confidence: 0.5, reasons: ['Could not determine quiet hours status'] }; // Fail open
     }
-
-    return {
-      shouldNotify: !inQuietHours,
-      confidence: 1.0,
-      reasons: inQuietHours ? ['Currently in quiet hours'] : ['Not in quiet hours']
-    };
   }
 
-  /**
-   * Check if notification category matches user interests
-   */
-  private async checkCategoryRelevance(
-    criteria: FilterCriteria,
-    smartFiltering: BillTrackingPreferences['smartFiltering'],
-    profile: UserEngagementProfile
-  ): Promise<Partial<FilterResult>> {
-    if (!criteria.category) {
-      return { shouldNotify: true, confidence: 0.5, reasons: ['No category specified'] };
+  /** Check 3: Does notification priority meet the user's smart filter threshold? */
+  private checkPriorityThreshold(criteria: FilterCriteria, smartFiltering: CombinedBillTrackingPreferences['smartFiltering']): Partial<FilterResult> & { shouldNotify: boolean } {
+    const priorityValues = { low: 1, medium: 2, high: 3, urgent: 4 };
+    const thresholdValue = priorityValues[smartFiltering.priorityThreshold ?? 'low']; // Default to low if unset
+    const notificationPriorityValue = priorityValues[criteria.priority];
+
+    const meetsThreshold = notificationPriorityValue >= thresholdValue;
+    const reason = meetsThreshold ? `Priority '${criteria.priority}' meets threshold '${smartFiltering.priorityThreshold}'.` : `Priority '${criteria.priority}' is below threshold '${smartFiltering.priorityThreshold}'.`;
+    return { shouldNotify: meetsThreshold, confidence: 1.0, reasons: [reason] };
+  }
+
+  /** Check 4: Is the bill's category relevant based on filters or engagement? */
+  private checkCategoryRelevance(criteria: FilterCriteria, smartFiltering: CombinedBillTrackingPreferences['smartFiltering'], profile: UserEngagementProfile): Partial<FilterResult> & { shouldNotify: boolean } {
+    const category = criteria.category?.toLowerCase();
+    if (!category) return { shouldNotify: true, confidence: 0.5, reasons: ['Notification has no category'] };
+
+    // Explicit Filter Check
+    const categoryFilters = smartFiltering.categoryFilters?.map(f => f.toLowerCase()) || [];
+    if (categoryFilters.length > 0) {
+      const isAllowed = categoryFilters.includes(category);
+      const reason = isAllowed ? `Category '${criteria.category}' matches user filter list.` : `Category '${criteria.category}' blocked by user filter list.`;
+      return { shouldNotify: isAllowed, confidence: 1.0, reasons: [reason] };
     }
 
-    // First check explicit category filters
-    if (smartFiltering.categoryFilters && smartFiltering.categoryFilters.length > 0) {
-      const isInFilter = smartFiltering.categoryFilters.includes(criteria.category);
-      if (!isInFilter) {
-        return {
-          shouldNotify: false,
-          confidence: 1.0,
-          reasons: [`Category ${criteria.category} not in user's filter list`]
-        };
-      }
-    }
-
-    // Then check engagement-based relevance
-    const categoryScore = profile.topCategories.find(c => c.category === criteria.category);
+    // Engagement Check (if no explicit filters)
+    const categoryScore = profile.topCategories.find(c => c.category.toLowerCase() === category);
     if (categoryScore) {
-      const confidence = Math.min(categoryScore.score / 100, 1.0);
-      return {
-        shouldNotify: true,
-        confidence,
-        reasons: [`High engagement with ${criteria.category} category (score: ${categoryScore.score.toFixed(1)})`]
-      };
+      // Allow if engagement score is decent (e.g., > 20)
+      const isRelevant = categoryScore.score > 20; // Tunable threshold
+      const confidence = Math.min(1.0, categoryScore.score / 50); // Confidence based on engagement score
+      const reason = isRelevant ? `Category '${criteria.category}' relevant based on engagement (Score: ${categoryScore.score.toFixed(0)}).` : `Category '${criteria.category}' has low engagement score (${categoryScore.score.toFixed(0)}).`;
+      return { shouldNotify: isRelevant, confidence, reasons: [reason] };
     }
 
-    return {
-      shouldNotify: true,
-      confidence: 0.3,
-      reasons: [`No previous engagement with ${criteria.category} category`]
-    };
+    // No explicit filter, no significant engagement -> Allow but lower confidence
+    return { shouldNotify: true, confidence: 0.4, reasons: [`Category '${criteria.category}' not explicitly filtered or engaged with.`] };
   }
 
-  /**
-   * Check if notification content matches keyword filters
-   */
-  private async checkKeywordRelevance(
-    criteria: FilterCriteria,
-    smartFiltering: BillTrackingPreferences['smartFiltering']
-  ): Promise<Partial<FilterResult>> {
-    if (!smartFiltering.keywordFilters || smartFiltering.keywordFilters.length === 0) {
+  /** Check 5: Does notification content match user's keyword filters? */
+  private checkKeywordRelevance(criteria: FilterCriteria, smartFiltering: CombinedBillTrackingPreferences['smartFiltering']): Partial<FilterResult> & { shouldNotify: boolean } {
+    const keywordFilters = smartFiltering.keywordFilters?.map(f => f.toLowerCase()) || [];
+    if (keywordFilters.length === 0) {
       return { shouldNotify: true, confidence: 0.5, reasons: ['No keyword filters set'] };
     }
-
     if (!criteria.content) {
-      return { shouldNotify: true, confidence: 0.5, reasons: ['No content to check keywords'] };
+      return { shouldNotify: true, confidence: 0.5, reasons: ['No content to check keywords against'] };
     }
 
     const searchText = `${criteria.content.title} ${criteria.content.message}`.toLowerCase();
-    const matchedKeywords = smartFiltering.keywordFilters.filter(keyword =>
-      searchText.includes(keyword.toLowerCase())
-    );
+    const matchedKeywords = keywordFilters.filter(keyword => searchText.includes(keyword));
 
-    if (matchedKeywords.length > 0) {
-      const confidence = Math.min(matchedKeywords.length / smartFiltering.keywordFilters.length, 1.0);
-      return {
-        shouldNotify: true,
-        confidence,
-        reasons: [`Matched keywords: ${matchedKeywords.join(', ')}`]
-      };
-    }
-
-    return {
-      shouldNotify: false,
-      confidence: 1.0,
-      reasons: ['No keyword matches found']
-    };
+    const matches = matchedKeywords.length > 0;
+    const reason = matches ? `Content matched keywords: [${matchedKeywords.join(', ')}].` : 'Content did not match any keyword filters.';
+    return { shouldNotify: matches, confidence: 1.0, reasons: [reason] };
   }
 
-  /**
-   * Check if sponsor matches user interests
-   */
-  private async checkSponsorRelevance(
-    criteria: FilterCriteria,
-    smartFiltering: BillTrackingPreferences['smartFiltering'],
-    profile: UserEngagementProfile
-  ): Promise<Partial<FilterResult>> {
-    if (!criteria.sponsorName) {
-      return { shouldNotify: true, confidence: 0.5, reasons: ['No sponsor information'] };
+  /** Check 6: Is the bill's sponsor relevant based on filters or engagement? */
+  private checkSponsorRelevance(criteria: FilterCriteria, smartFiltering: CombinedBillTrackingPreferences['smartFiltering'], profile: UserEngagementProfile): Partial<FilterResult> & { shouldNotify: boolean } {
+    const sponsorName = criteria.sponsorName?.toLowerCase();
+    if (!sponsorName) return { shouldNotify: true, confidence: 0.5, reasons: ['Notification has no sponsor info'] };
+
+    // Explicit Filter Check
+    const sponsorFilters = smartFiltering.sponsorFilters?.map(f => f.toLowerCase()) || [];
+    if (sponsorFilters.length > 0) {
+      const isAllowed = sponsorFilters.includes(sponsorName);
+      const reason = isAllowed ? `Sponsor '${criteria.sponsorName}' matches user filter list.` : `Sponsor '${criteria.sponsorName}' blocked by user filter list.`;
+      return { shouldNotify: isAllowed, confidence: 1.0, reasons: [reason] };
     }
 
-    // Check explicit sponsor filters
-    if (smartFiltering.sponsorFilters && smartFiltering.sponsorFilters.length > 0) {
-      const isInFilter = smartFiltering.sponsorFilters.includes(criteria.sponsorName);
-      if (!isInFilter) {
-        return {
-          shouldNotify: false,
-          confidence: 1.0,
-          reasons: [`Sponsor ${criteria.sponsorName} not in user's filter list`]
-        };
-      }
-    }
-
-    // Check engagement-based relevance
-    const sponsorScore = profile.topSponsors.find(s => s.name === criteria.sponsorName);
+    // Engagement Check
+    const sponsorScore = profile.topSponsors.find(s => s.name.toLowerCase() === sponsorName);
     if (sponsorScore) {
-      const confidence = Math.min(sponsorScore.score / 100, 1.0);
-      return {
-        shouldNotify: true,
-        confidence,
-        reasons: [`High engagement with sponsor ${criteria.sponsorName} (score: ${sponsorScore.score.toFixed(1)})`]
-      };
+      const isRelevant = sponsorScore.score > 15; // Tunable threshold
+      const confidence = Math.min(1.0, sponsorScore.score / 40);
+      const reason = isRelevant ? `Sponsor '${criteria.sponsorName}' relevant based on engagement (Score: ${sponsorScore.score.toFixed(0)}).` : `Sponsor '${criteria.sponsorName}' has low engagement score (${sponsorScore.score.toFixed(0)}).`;
+      return { shouldNotify: isRelevant, confidence, reasons: [reason] };
     }
 
-    return {
-      shouldNotify: true,
-      confidence: 0.4,
-      reasons: ['No specific sponsor engagement history']
-    };
+    // No explicit filter, no significant engagement -> Allow but lower confidence
+    return { shouldNotify: true, confidence: 0.4, reasons: [`Sponsor '${criteria.sponsorName}' not explicitly filtered or engaged with.`] };
   }
 
-  /**
-   * Check user's engagement history with this specific bill
-   */
-  private async checkEngagementHistory(
-    criteria: FilterCriteria,
-    profile: UserEngagementProfile
-  ): Promise<Partial<FilterResult>> {
-    if (!criteria.billId) {
-      return { shouldNotify: true, confidence: 0.5, reasons: ['No bill specified'] };
-    }
+  /** Check 7: Is the bill's tag relevant based on filters or engagement? */
+  private checkTagRelevance(criteria: FilterCriteria, smartFiltering: CombinedBillTrackingPreferences['smartFiltering'], profile: UserEngagementProfile): Partial<FilterResult> & { shouldNotify: boolean } {
+      const billTags = criteria.tags?.map(t => t.toLowerCase()) || [];
+      if (billTags.length === 0) return { shouldNotify: true, confidence: 0.5, reasons: ['Notification has no tags'] };
 
-    try {
-      const engagement = await db
-        .select({
-          engagementScore: billEngagement.engagementScore,
-          viewCount: billEngagement.viewCount,
-          commentCount: billEngagement.commentCount
-        })
-        .from(billEngagement)
-        .where(and(
-          eq(billEngagement.userId, criteria.userId),
-          eq(billEngagement.billId, criteria.billId)
-        ))
-        .limit(1);
-
-      if (engagement.length > 0) {
-        const score = Number(engagement[0].engagementScore) || 0;
-        const confidence = Math.min(score / 50, 1.0);
-        return {
-          shouldNotify: true,
-          confidence,
-          reasons: [`Previous engagement with this bill (score: ${score.toFixed(1)})`]
-        };
+      // Explicit Filter Check (Assuming keywords might act as tag filters, or add a dedicated tag filter preference)
+      const keywordFilters = smartFiltering.keywordFilters?.map(f => f.toLowerCase()) || [];
+      if (keywordFilters.length > 0) {
+          const matchedByKeywords = billTags.some(tag => keywordFilters.includes(tag));
+          if (matchedByKeywords) {
+              const matchedTags = billTags.filter(tag => keywordFilters.includes(tag));
+              return { shouldNotify: true, confidence: 0.9, reasons: [`Bill tags match keyword filters: [${matchedTags.join(', ')}]`] };
+              // Note: This logic assumes keywords *allow* tags. If keywords *block* non-matching, the logic flips.
+              // If keywords are ONLY for content, this check is different. Let's assume keywords can apply to tags.
+          }
+           // If keyword filters exist but none match the tags, should we block? Depends on intent.
+           // For now, let's say keyword filter matching tags ALLOWS, otherwise continue evaluation.
       }
 
-      // No direct engagement, use general engagement level
-      const confidenceByLevel = { high: 0.8, medium: 0.6, low: 0.3 };
-      return {
-        shouldNotify: true,
-        confidence: confidenceByLevel[profile.engagementLevel],
-        reasons: [`No previous engagement - user has ${profile.engagementLevel} overall engagement`]
-      };
 
-    } catch (error) {
-      logger.error('Error checking engagement history:', { component: 'SmartFilter' }, error);
-      return { shouldNotify: true, confidence: 0.5, reasons: ['Could not check engagement history'] };
-    }
+      // Engagement Check
+      const tagScores = profile.topTags.filter(t => billTags.includes(t.tag.toLowerCase()));
+      if (tagScores.length > 0) {
+          const maxScore = Math.max(...tagScores.map(t => t.score));
+          const isRelevant = maxScore > 25; // Tunable threshold
+          const confidence = Math.min(1.0, maxScore / 60);
+          const relevantTags = tagScores.filter(t => t.score > 25).map(t => t.tag);
+          const reason = isRelevant ? `Bill tags relevant based on engagement (Matched: [${relevantTags.join(', ')}], Max Score: ${maxScore.toFixed(0)}).` : `Bill tags have low engagement scores (Max Score: ${maxScore.toFixed(0)}).`;
+          return { shouldNotify: isRelevant, confidence, reasons: [reason] };
+      }
+
+      // No explicit filter match, no significant engagement -> Allow but lower confidence
+      return { shouldNotify: true, confidence: 0.4, reasons: ['Bill tags not explicitly filtered or highly engaged with.'] };
   }
 
-  /**
-   * Check if current time matches user's active periods
-   */
-  private async checkTimingRelevance(
-    profile: UserEngagementProfile
-  ): Promise<Partial<FilterResult>> {
-    const currentHour = new Date().getHours();
 
-    const preferredTime = profile.preferredNotificationTimes.find(t =>
-      Math.abs(t.hour - currentHour) <= 1
-    );
-
-    if (preferredTime) {
-      const confidence = Math.min(preferredTime.frequency / 10, 1.0);
-      return {
-        shouldNotify: true,
-        confidence,
-        reasons: [`Current time (${currentHour}:00) matches user's active period`]
-      };
-    }
-
-    return {
-      shouldNotify: true,
-      confidence: 0.4,
-      reasons: ['Outside user\'s typical active hours']
-    };
-  }
-
-  /**
-   * Check if bill content matches user's configured interests
-   */
-  private async checkInterestBasedRelevance(
-    criteria: FilterCriteria,
-    smartFiltering: BillTrackingPreferences['smartFiltering']
-  ): Promise<Partial<FilterResult>> {
+  /** Check 8: Does the bill match the user's declared interests? */
+  private async checkInterestBasedRelevance(criteria: FilterCriteria, smartFiltering: CombinedBillTrackingPreferences['smartFiltering']): Promise<Partial<FilterResult> & { shouldNotify: boolean }> {
     if (!smartFiltering.interestBasedFiltering || !criteria.billId) {
-      return { shouldNotify: true, confidence: 0.5, reasons: ['Interest-based filtering not enabled'] };
+      return { shouldNotify: true, confidence: 0.5, reasons: ['Interest-based filtering disabled or no bill ID'] };
     }
 
     try {
-      // Get user's interests
-      const userInterestsList = await db
+      // Get user's interests (could cache this per user)
+      const userInterestsList = await this.db
         .select({ interest: userInterest.interest })
         .from(userInterest)
         .where(eq(userInterest.userId, criteria.userId));
-
-      if (userInterestsList.length === 0) {
-        return { shouldNotify: true, confidence: 0.5, reasons: ['No interests configured'] };
-      }
-
-      // Get bill details
-      const billDetails = await db
-        .select({
-          title: bill.title,
-          description: bill.description,
-          category: bill.category,
-          tags: bill.tags
-        })
-        .from(bill)
-        .where(eq(bill.id, criteria.billId))
-        .limit(1);
-
-      if (billDetails.length === 0) {
-        return { shouldNotify: true, confidence: 0.5, reasons: ['Bill not found'] };
-      }
-
-      const billData = billDetails[0];
       const interests = userInterestsList.map(i => i.interest.toLowerCase());
-      const searchText = `${billData.title} ${billData.description} ${billData.category}`.toLowerCase();
-      const billTags = (billData.tags || []).map(tag => tag.toLowerCase());
 
-      const matchedInterests = interests.filter(interest =>
-        searchText.includes(interest) || billTags.some(tag => tag.includes(interest))
-      );
-
-      if (matchedInterests.length > 0) {
-        const confidence = Math.min(matchedInterests.length / interests.length, 1.0);
-        return {
-          shouldNotify: true,
-          confidence,
-          reasons: [`Matches user interests: ${matchedInterests.join(', ')}`]
-        };
+      if (interests.length === 0) {
+        return { shouldNotify: true, confidence: 0.5, reasons: ['User has no configured interests'] };
       }
 
-      return {
-        shouldNotify: false,
-        confidence: 0.8,
-        reasons: ['No match with user\'s configured interests']
-      };
+      // Get relevant bill data (category, tags - could cache this)
+      const billData = await this.getBillCategoryAndTags(criteria.billId);
+      if (!billData) {
+        return { shouldNotify: true, confidence: 0.5, reasons: ['Could not retrieve bill data for interest check'] };
+      }
 
+      const billCategoryLower = billData.category?.toLowerCase();
+      const billTagsLower = billData.tags.map(t => t.toLowerCase());
+
+      // Check for matches
+      const categoryMatch = billCategoryLower && interests.includes(billCategoryLower);
+      const tagMatches = billTagsLower.filter(tag => interests.includes(tag));
+
+      if (categoryMatch || tagMatches.length > 0) {
+          const matchedItems = [
+              ...(categoryMatch ? [`category: ${billData.category}`] : []),
+              ...(tagMatches.length > 0 ? [`tags: ${tagMatches.join(', ')}`] : [])
+          ];
+        return { shouldNotify: true, confidence: 0.9, reasons: [`Bill matches user interests (${matchedItems.join('; ')})`] };
+      } else {
+        // If interest filtering is ON and there's NO match, block the notification
+        return { shouldNotify: false, confidence: 1.0, reasons: ['Bill does not match user\'s configured interests'] };
+      }
     } catch (error) {
-      logger.error('Error checking interest-based relevance:', { component: 'SmartFilter' }, error);
-      return { shouldNotify: true, confidence: 0.5, reasons: ['Could not check interests'] };
+      logger.error('Error checking interest-based relevance:', { component: 'SmartFilter', userId: criteria.userId, billId: criteria.billId }, error);
+      return { shouldNotify: true, confidence: 0.5, reasons: ['Error during interest check - allowing notification'] }; // Fail open
     }
   }
 
-  /**
-   * Combine all filter results into final decision
-   */
+  // --- Combining Logic ---
+
+  /** Combines results from individual checks into a final decision */
   private combineFilterResults(
-    results: Partial<FilterResult>[],
+    checkResults: (Partial<FilterResult> & { shouldNotify: boolean })[],
     criteria: FilterCriteria,
+    preferences: CombinedBillTrackingPreferences,
     profile: UserEngagementProfile
   ): FilterResult {
-    // If any filter explicitly blocks, honor that decision
-    const blockingResults = results.filter(r => r.shouldNotify === false);
+    const blockingCheck = checkResults.find(r => r.shouldNotify === false);
 
-    if (blockingResults.length > 0) {
-      // But allow urgent notifications to bypass most filters
-      if (criteria.priority === 'urgent') {
-        return {
-          shouldNotify: true,
-          confidence: 0.9,
-          reasons: ['Urgent notification - bypassing filters', ...blockingResults.flatMap(r => r.reasons || [])],
-          suggestedPriority: 'urgent',
-          recommendedChannels: ['inApp', 'push', 'email', 'sms'],
-          shouldBatch: false
-        };
-      }
-
-      return {
-        shouldNotify: false,
-        confidence: Math.max(...blockingResults.map(r => r.confidence || 0)),
-        reasons: blockingResults.flatMap(r => r.reasons || []),
-        suggestedPriority: 'low',
-        recommendedChannels: [],
-        shouldBatch: false
-      };
+    // If any check explicitly blocks (and not bypassed by urgency), block the notification
+    if (blockingCheck) {
+         // Allow urgent notifications to bypass non-essential filters (e.g., relevance, but maybe not quiet hours or type disabled)
+         const canBypass = criteria.priority === 'urgent' && !blockingCheck.reasons?.some(r => r.includes('disabled by user') || r.includes('quiet hours'));
+         if (!canBypass) {
+            logger.debug(`Notification blocked`, { component: 'SmartFilter', userId: criteria.userId, reasons: blockingCheck.reasons });
+            return {
+                shouldNotify: false,
+                confidence: blockingCheck.confidence ?? 1.0, // Confidence of the blocking reason
+                reasons: blockingCheck.reasons ?? ['Blocked by filter rule'],
+                suggestedPriority: 'low',
+                recommendedChannels: [],
+                shouldBatch: false,
+            };
+         } else {
+              logger.debug(`Urgent notification bypassing filter: ${blockingCheck.reasons?.join('; ')}`, { component: 'SmartFilter', userId: criteria.userId });
+              // Continue processing as if it passed, but note the bypass
+         }
     }
 
-    // Calculate weighted confidence from all results
-    const validResults = results.filter(r => r.confidence !== undefined);
-    const avgConfidence = validResults.length > 0
-      ? validResults.reduce((sum, r) => sum + (r.confidence || 0), 0) / validResults.length
-      : 0.5;
 
-    // Determine channels based on confidence and priority
-    const recommendedChannels = this.determineChannels(avgConfidence, criteria.priority);
+    // If all checks pass, calculate overall confidence and recommendations
+    const contributingChecks = checkResults.filter(r => r.shouldNotify); // All checks passed or were bypassed
+    const avgConfidence = contributingChecks.length > 0
+        ? contributingChecks.reduce((sum, r) => sum + (r.confidence ?? 0.5), 0) / contributingChecks.length
+        : 0.5; // Default confidence if no checks contributed positively
 
-    // Determine if batching is appropriate
-    const shouldBatch = this.shouldBatchNotification(criteria.priority, avgConfidence);
+    const combinedReasons = [...new Set(contributingChecks.flatMap(r => r.reasons ?? []))]; // Unique reasons
 
+    // Adjust priority based on relevance? (e.g., boost if highly relevant)
+    let suggestedPriority = criteria.priority;
+    if (avgConfidence > 0.8 && criteria.priority === 'medium') suggestedPriority = 'high';
+    else if (avgConfidence < 0.4 && criteria.priority === 'medium') suggestedPriority = 'low';
+
+    // Determine channels based on final confidence, suggested priority, and *enabled* user channels
+    const recommendedChannels = this.determineRecommendedChannels(avgConfidence, suggestedPriority, preferences);
+
+    // Determine batching based on frequency and priority
+    const shouldBatch = preferences.alertFrequency !== 'immediate'
+                       && suggestedPriority !== 'urgent'
+                       && suggestedPriority !== 'high'; // Maybe don't batch high? Configurable.
+
+
+     logger.debug(`Notification allowed`, { component: 'SmartFilter', userId: criteria.userId, confidence: avgConfidence, priority: suggestedPriority, channels: recommendedChannels, batch: shouldBatch });
     return {
-      shouldNotify: true,
-      confidence: avgConfidence,
-      reasons: results.flatMap(r => r.reasons || []),
-      suggestedPriority: criteria.priority,
-      recommendedChannels,
-      shouldBatch
+        shouldNotify: true,
+        confidence: parseFloat(avgConfidence.toFixed(2)),
+        reasons: combinedReasons,
+        suggestedPriority,
+        recommendedChannels,
+        shouldBatch
     };
   }
 
-  /**
-   * Determine appropriate channels based on confidence and priority
-   */
-  private determineChannels(
+  // --- Channel & Batching Recommendations ---
+
+  /** Determines recommended channels based on confidence, priority, and USER ENABLED channels */
+  private determineRecommendedChannels(
     confidence: number,
-    priority: string
-  ): Array<'email' | 'inApp' | 'sms' | 'push'> {
-    const channels: Array<'email' | 'inApp' | 'sms' | 'push'> = ['inApp'];
+    priority: FilterResult['suggestedPriority'],
+    preferences: CombinedBillTrackingPreferences
+  ): FilterResult['recommendedChannels'] {
+      const allowed: FilterResult['recommendedChannels'] = [];
+      const enabledChannels = preferences.notificationChannels; // The merged { inApp: bool, email: bool, ... }
 
-    // High confidence or high priority = more channels
-    if (confidence > 0.7 || priority === 'urgent' || priority === 'high') {
-      channels.push('push');
-    }
+      // Always include inApp if enabled
+      if (enabledChannels.inApp) allowed.push('inApp');
 
-    if (confidence > 0.8 || priority === 'urgent') {
-      channels.push('email');
-    }
-
-    if (priority === 'urgent') {
-      channels.push('sms');
-    }
-
-    return channels;
-  }
-
-  /**
-   * Determine if notification should be batched
-   */
-  private shouldBatchNotification(priority: string, confidence: number): boolean {
-    // Never batch urgent or high priority
-    if (priority === 'urgent' || priority === 'high') {
-      return false;
-    }
-
-    // Low confidence notifications are good candidates for batching
-    if (confidence < 0.5) {
-      return true;
-    }
-
-    // Medium priority with medium confidence can be batched
-    if (priority === 'medium' && confidence < 0.7) {
-      return true;
-    }
-
-    return priority === 'low';
-  }
-
-  /**
-   * Create basic filter result when smart filtering is disabled
-   */
-  private createBasicFilterResult(
-    criteria: FilterCriteria,
-    preferences: BillTrackingPreferences
-  ): FilterResult {
-    return {
-      shouldNotify: true,
-      confidence: 1.0,
-      reasons: ['Smart filtering disabled - using basic rules'],
-      suggestedPriority: criteria.priority,
-      recommendedChannels: this.getBasicChannels(criteria.priority, preferences),
-      shouldBatch: criteria.priority === 'low'
-    };
-  }
-
-  /**
-   * Get basic channels when smart filtering is off
-   */
-  private getBasicChannels(
-    priority: string,
-    preferences: BillTrackingPreferences
-  ): Array<'email' | 'inApp' | 'sms' | 'push'> {
-    const channels: Array<'email' | 'inApp' | 'sms' | 'push'> = ['inApp'];
-
-    if (preferences.notificationChannels?.email) {
-      channels.push('email');
-    }
-
-    if (preferences.notificationChannels?.push) {
-      channels.push('push');
-    }
-
-    if (priority === 'urgent' && preferences.notificationChannels?.sms) {
-      channels.push('sms');
-    }
-
-    return channels;
-  }
-
-  /**
-   * Get or build user engagement profile with caching
-   */
-  private async getUserEngagementProfile(userId: string): Promise<UserEngagementProfile> {
-    // Check cache
-    const cached = this.engagementProfiles.get(userId);
-    const expiry = this.profileCacheExpiry.get(userId);
-
-    if (cached && expiry && Date.now() < expiry) {
-      return cached;
-    }
-
-    // Build new profile
-    const profile = await this.buildEngagementProfile(userId);
-
-    // Cache it
-    this.engagementProfiles.set(userId, profile);
-    this.profileCacheExpiry.set(userId, Date.now() + this.CACHE_DURATION);
-
-    return profile;
-  }
-
-  /**
-   * Build complete engagement profile from user history
-   */
-  private async buildEngagementProfile(userId: string): Promise<UserEngagementProfile> {
-    try {
-      // Get engagement history
-      const engagementHistory = await db
-        .select({
-          billId: billEngagement.billId,
-          engagementScore: billEngagement.engagementScore,
-          viewCount: billEngagement.viewCount,
-          commentCount: billEngagement.commentCount,
-          shareCount: billEngagement.shareCount,
-          lastEngaged: billEngagement.lastEngagedAt,
-          billCategory: bill.category
-        })
-        .from(billEngagement)
-        .innerJoin(bill, eq(billEngagement.billId, bill.id))
-        .where(eq(billEngagement.userId, userId))
-        .orderBy(desc(billEngagement.lastEngagedAt))
-        .limit(100);
-
-      // Get comment timing data
-      const commentHistory = await db
-        .select({
-          createdAt: billComment.createdAt,
-          billId: billComment.billId
-        })
-        .from(billComment)
-        .where(eq(billComment.userId, userId))
-        .orderBy(desc(billComment.createdAt))
-        .limit(50);
-
-      // Analyze patterns
-      const topCategories = this.analyzeCategoryEngagement(engagementHistory);
-      const topSponsors = await this.analyzeSponsorEngagement(userId, engagementHistory);
-      const engagementLevel = this.calculateEngagementLevel(engagementHistory);
-      const preferredTimes = this.analyzePreferredTimes(commentHistory);
-      const avgResponseTime = this.calculateAverageResponseTime(commentHistory);
-
-      return {
-        userId,
-        topCategories,
-        topSponsors,
-        engagementLevel,
-        preferredNotificationTimes: preferredTimes,
-        averageResponseTime: avgResponseTime
-      };
-
-    } catch (error) {
-      logger.error('Error building engagement profile:', { component: 'SmartFilter' }, error);
-
-      // Return default profile
-      return {
-        userId,
-        topCategories: [],
-        topSponsors: [],
-        engagementLevel: 'low',
-        preferredNotificationTimes: [],
-        averageResponseTime: 24
-      };
-    }
-  }
-
-  /**
-   * Analyze which categories user engages with most
-   */
-  private analyzeCategoryEngagement(engagementHistory: any[]): Array<{ category: string; score: number }> {
-    const categoryMap = new Map<string, number>();
-
-    engagementHistory.forEach(engagement => {
-      if (engagement.billCategory) {
-        const currentScore = categoryMap.get(engagement.billCategory) || 0;
-        const engagementScore = Number(engagement.engagementScore) || 0;
-        categoryMap.set(engagement.billCategory, currentScore + engagementScore);
+      // Add push for medium+ confidence OR high+ priority, if enabled
+      if (enabledChannels.push && (confidence > 0.6 || priority === 'high' || priority === 'urgent')) {
+          allowed.push('push');
       }
-    });
+      // Add email for high+ confidence OR high+ priority, if enabled
+      if (enabledChannels.email && (confidence > 0.75 || priority === 'high' || priority === 'urgent')) {
+          allowed.push('email');
+      }
+      // Add SMS only for urgent priority, if enabled
+      if (enabledChannels.sms && priority === 'urgent') {
+          allowed.push('sms');
+      }
 
+      // Ensure at least one channel if any were enabled globally/per-bill, default to inApp
+      if (allowed.length === 0 && this.getEnabledChannels(preferences).length > 0 && enabledChannels.inApp) {
+          return ['inApp'];
+      }
+      if (allowed.length === 0 && this.getEnabledChannels(preferences).length > 0) {
+          // If inApp wasn't enabled but others were, pick the first enabled one as fallback
+          const firstEnabled = this.getEnabledChannels(preferences)[0];
+          if (firstEnabled) return [firstEnabled];
+      }
+
+      return allowed;
+  }
+
+
+  // --- Engagement Profile Methods ---
+
+  /** Gets or builds user engagement profile with caching */
+  private async getUserEngagementProfile(userId: string): Promise<UserEngagementProfile> {
+    const cacheKey = CACHE_KEYS.USER_ENGAGEMENT_PROFILE(userId);
+    try {
+        const cachedProfile = await cacheService.get(cacheKey);
+        if (cachedProfile) {
+            logger.debug(`Cache hit for engagement profile: ${cacheKey}`);
+            return cachedProfile;
+        }
+        logger.debug(`Cache miss for engagement profile: ${cacheKey}`);
+
+        const profile = await this.buildEngagementProfile(userId);
+        await cacheService.set(cacheKey, profile, this.CACHE_DURATION_PROFILE);
+        return profile;
+    } catch(error) {
+         logger.error(`Error getting/building engagement profile for user ${userId}:`, { component: 'SmartFilter' }, error);
+         return this.getDefaultEngagementProfile(userId); // Return default on error
+    }
+  }
+
+  /** Builds the engagement profile by querying DB */
+  private async buildEngagementProfile(userId: string): Promise<UserEngagementProfile> {
+    logger.debug(`Building engagement profile for user ${userId}`);
+    try {
+        // Run queries concurrently
+        const [engagementHistory, commentHistory, interestData] = await Promise.all([
+            // Query 1: Engagement History (last N engagements)
+            this.db.select({
+                    billId: billEngagement.billId,
+                    engagementScore: billEngagement.engagementScore,
+                    // viewCount: billEngagement.viewCount, commentCount: billEngagement.commentCount, shareCount: billEngagement.shareCount,
+                    lastEngaged: billEngagement.lastEngagedAt,
+                    billCategory: bill.category // Include category
+                })
+                .from(billEngagement)
+                .innerJoin(bill, eq(billEngagement.billId, bill.id))
+                .where(eq(billEngagement.userId, userId))
+                .orderBy(desc(billEngagement.lastEngagedAt))
+                .limit(100), // Limit history size
+
+            // Query 2: Comment History (for timing analysis - optional for filtering)
+            // this.db.select({ createdAt: billComment.createdAt, billId: billComment.billId })
+            //     .from(billComment)
+            //     .where(eq(billComment.userId, userId))
+            //     .orderBy(desc(billComment.createdAt))
+            //     .limit(50),
+            Promise.resolve([]), // Skip comment history for now if not used in filtering logic
+
+             // Query 3: User Interests (already fetched, potentially refactor)
+             this.db.select({ interest: userInterest.interest })
+                 .from(userInterest)
+                 .where(eq(userInterest.userId, userId))
+
+        ]);
+
+        // Analyze patterns
+        const topCategories = this.analyzeCategoryEngagement(engagementHistory);
+        const topSponsors = await this.analyzeSponsorEngagement(userId, engagementHistory);
+        const topTags = await this.analyzeTagEngagement(userId, engagementHistory); // Added tag analysis
+        const engagementLevel = this.calculateEngagementLevel(engagementHistory);
+        // const preferredTimes = this.analyzePreferredTimes(commentHistory);
+        // const avgResponseTime = this.calculateAverageResponseTime(commentHistory);
+
+        return {
+            userId,
+            topCategories,
+            topSponsors,
+            topTags, // Include tags
+            engagementLevel,
+            // preferredNotificationTimes: preferredTimes, // Omit if not used
+            // averageResponseTime: avgResponseTime // Omit if not used
+        };
+    } catch (error) {
+      logger.error(`Error building engagement profile for user ${userId}:`, { component: 'SmartFilter' }, error);
+      return this.getDefaultEngagementProfile(userId); // Return default profile on error
+    }
+  }
+
+   /** Provides a default engagement profile structure */
+   private getDefaultEngagementProfile(userId: string): UserEngagementProfile {
+       return { userId, topCategories: [], topSponsors: [], topTags: [], engagementLevel: 'low' };
+   }
+
+  /** Analyzes category engagement from history */
+  private analyzeCategoryEngagement(engagementHistory: Array<{ billCategory: string | null, engagementScore: string | null }>): UserEngagementProfile['topCategories'] {
+    const categoryMap = new Map<string, number>();
+    engagementHistory.forEach(e => {
+      const category = e.billCategory || 'Uncategorized';
+      const score = parseFloat(e.engagementScore || '0') || 0;
+      categoryMap.set(category, (categoryMap.get(category) || 0) + Math.max(1, score)); // Add score, min 1 per interaction
+    });
     return Array.from(categoryMap.entries())
       .map(([category, score]) => ({ category, score }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5);
+      .sort((a, b) => b.score - a.score).slice(0, 5); // Top 5
   }
 
-  /**
-   * Analyze which sponsors user engages with most
-   */
-  private async analyzeSponsorEngagement(
-    userId: string,
-    engagementHistory: any[]
-  ): Promise<Array<{ sponsorId: number; name: string; score: number }>> {
+  /** Analyzes sponsor engagement from history */
+  private async analyzeSponsorEngagement(userId: string, engagementHistory: Array<{ billId: number, engagementScore: string | null }>): Promise<UserEngagementProfile['topSponsors']> {
     if (engagementHistory.length === 0) return [];
-
-    const billIds = engagementHistory.map(e => e.billId);
+    const billIds = [...new Set(engagementHistory.map(e => e.billId))]; // Unique bill IDs
 
     try {
-      const sponsorData = await db
-        .select({
-          sponsorId: sponsor.id,
-          sponsorName: sponsor.name,
-          billId: billSponsorship.billId,
-          sponsorshipType: billSponsorship.sponsorshipType
+      // Find sponsors for the bills the user engaged with
+      const sponsorData = await this.db.select({
+          sponsorId: sponsor.id, sponsorName: sponsor.name, billId: billSponsorship.billId, sponsorshipType: billSponsorship.sponsorshipType
         })
         .from(billSponsorship)
         .innerJoin(sponsor, eq(billSponsorship.sponsorId, sponsor.id))
-        .where(inArray(billSponsorship.billId, billIds));
+        .where(and(inArray(billSponsorship.billId, billIds), eq(billSponsorship.isActive, true))); // Active sponsorships
 
       const sponsorScores = new Map<number, { name: string; score: number }>();
+      const engagementMap = new Map(engagementHistory.map(e => [e.billId, parseFloat(e.engagementScore || '0') || 0]));
 
-      sponsorData.forEach(sponsor => {
-        const engagement = engagementHistory.find(e => e.billId === sponsor.billId);
-        if (engagement) {
-          const current = sponsorScores.get(sponsor.sponsorId) || { name: sponsor.sponsorName, score: 0 };
-          const engagementScore = Number(engagement.engagementScore) || 0;
-          const multiplier = sponsor.sponsorshipType === 'primary' ? 1.5 : 1.0;
-
-          sponsorScores.set(sponsor.sponsorId, {
-            name: sponsor.sponsorName,
-            score: current.score + (engagementScore * multiplier)
-          });
+      sponsorData.forEach(sp => {
+        const engagementScore = engagementMap.get(sp.billId) || 0;
+        if (engagementScore > 0) {
+          const current = sponsorScores.get(sp.sponsorId) || { name: sp.sponsorName, score: 0 };
+          const multiplier = sp.sponsorshipType === 'primary' ? 1.5 : 1.0; // Weight primary sponsors higher
+          sponsorScores.set(sp.sponsorId, { name: sp.sponsorName, score: current.score + Math.max(1, engagementScore) * multiplier });
         }
       });
 
       return Array.from(sponsorScores.entries())
         .map(([sponsorId, data]) => ({ sponsorId, name: data.name, score: data.score }))
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 5);
-
+        .sort((a, b) => b.score - a.score).slice(0, 5); // Top 5
     } catch (error) {
-      logger.error('Error analyzing sponsor engagement:', { component: 'SmartFilter' }, error);
+      logger.error('Error analyzing sponsor engagement:', { component: 'SmartFilter', userId }, error);
       return [];
     }
   }
 
-  /**
-   * Calculate overall engagement level
-   */
-  private calculateEngagementLevel(engagementHistory: any[]): 'low' | 'medium' | 'high' {
-    if (engagementHistory.length === 0) return 'low';
+  /** Analyzes tag engagement from history */
+  private async analyzeTagEngagement(userId: string, engagementHistory: Array<{ billId: number, engagementScore: string | null }>): Promise<UserEngagementProfile['topTags']> {
+      if (engagementHistory.length === 0) return [];
+      const billIds = [...new Set(engagementHistory.map(e => e.billId))];
 
-    const totalEngagement = engagementHistory.reduce((sum, e) => sum + (Number(e.engagementScore) || 0), 0);
-    const avgEngagement = totalEngagement / engagementHistory.length;
+      try {
+          // Find tags for the bills the user engaged with
+          const tagData = await this.db.select({
+                  tag: billTag.tag,
+                  billId: billTag.billId
+              })
+              .from(billTag)
+              .where(inArray(billTag.billId, billIds));
 
-    if (avgEngagement > 50) return 'high';
-    if (avgEngagement > 20) return 'medium';
+          const tagScores = new Map<string, number>();
+          const engagementMap = new Map(engagementHistory.map(e => [e.billId, parseFloat(e.engagementScore || '0') || 0]));
+
+          tagData.forEach(t => {
+              const engagementScore = engagementMap.get(t.billId) || 0;
+              if (engagementScore > 0) {
+                  const tagName = t.tag.toLowerCase(); // Normalize tag
+                  tagScores.set(tagName, (tagScores.get(tagName) || 0) + Math.max(1, engagementScore));
+              }
+          });
+
+          return Array.from(tagScores.entries())
+              .map(([tag, score]) => ({ tag, score }))
+              .sort((a, b) => b.score - a.score).slice(0, 10); // Top 10 tags
+
+      } catch (error) {
+          logger.error('Error analyzing tag engagement:', { component: 'SmartFilter', userId }, error);
+          return [];
+      }
+  }
+
+
+  /** Calculates overall engagement level */
+  private calculateEngagementLevel(engagementHistory: Array<{ engagementScore: string | null }>): 'low' | 'medium' | 'high' {
+    if (engagementHistory.length < 3) return 'low'; // Need a few interactions
+    const totalScore = engagementHistory.reduce((sum, e) => sum + (parseFloat(e.engagementScore || '0') || 0), 0);
+    const avgScore = totalScore / engagementHistory.length;
+    // Define thresholds for levels (tunable)
+    if (avgScore > 40) return 'high';
+    if (avgScore > 15) return 'medium';
     return 'low';
   }
 
-  /**
-   * Analyze when user is most active
-   */
-  private analyzePreferredTimes(commentHistory: any[]): Array<{ hour: number; frequency: number }> {
-    const hourMap = new Map<number, number>();
-
-    commentHistory.forEach(comment => {
-      const hour = new Date(comment.createdAt).getHours();
-      hourMap.set(hour, (hourMap.get(hour) || 0) + 1);
-    });
-
-    return Array.from(hourMap.entries())
-      .map(([hour, frequency]) => ({ hour, frequency }))
-      .sort((a, b) => b.frequency - a.frequency)
-      .slice(0, 3);
-  }
-
-  /**
-   * Calculate average response time
-   */
-  private calculateAverageResponseTime(commentHistory: any[]): number {
-    if (commentHistory.length < 2) return 12;
-
-    const recentComments = commentHistory.slice(0, 10);
-    let totalTimeDiff = 0;
-
-    for (let i = 1; i < recentComments.length; i++) {
-      const timeDiff = new Date(recentComments[i - 1].createdAt).getTime() -
-        new Date(recentComments[i].createdAt).getTime();
-      totalTimeDiff += timeDiff;
-    }
-
-    const avgTimeDiff = totalTimeDiff / (recentComments.length - 1);
-    return Math.min(Math.max(avgTimeDiff / (1000 * 60 * 60), 1), 48); // 1-48 hours
-  }
-
-  /**
-   * Get user preferences with error handling and defaults
-   */
-  private async getUserPreferences(userId: string): Promise<{ billTracking: BillTrackingPreferences }> {
+  /** Helper to get bill category and tags */
+  private async getBillCategoryAndTags(billId: number): Promise<{ category: string | null, tags: string[] } | null> {
     try {
-      return await userPreferencesService.getUserPreferences(userId);
-    } catch (error) {
-      logger.error('Error getting user preferences:', { component: 'SmartFilter' }, error);
+        const [billData] = await this.db.select({ category: bill.category }).from(bill).where(eq(bill.id, billId));
+        if (!billData) return null;
 
-      // Return sensible defaults
-      return {
-        billTracking: {
-          statusChanges: true,
-          newComments: true,
-          votingSchedule: true,
-          amendments: true,
-          updateFrequency: 'daily',
-          notificationChannels: { inApp: true, email: false, push: false, sms: false },
-          smartFiltering: {
-            enabled: false,
-            priorityThreshold: 'low',
-            categoryFilters: [],
-            keywordFilters: [],
-            sponsorFilters: [],
-            interestBasedFiltering: false
-          },
-          advancedSettings: {
-            digestSchedule: {
-              enabled: false,
-              frequency: 'daily' as const,
-              timeOfDay: '09:00'
-            },
-            escalationRules: {
-              enabled: false,
-              urgentBillsImmediate: false,
-              importantSponsorsImmediate: false,
-              highEngagementImmediate: false
-            },
-            batchingRules: {
-              similarUpdatesGrouping: true,
-              maxBatchSize: 10,
-              batchTimeWindow: 30
-            }
-          }
-        } as BillTrackingPreferences
-      };
+        const tagData = await this.db.select({ tag: billTag.tag }).from(billTag).where(eq(billTag.billId, billId));
+
+        return {
+            category: billData.category,
+            tags: tagData.map(t => t.tag)
+        };
+    } catch(error) {
+         logger.error(`Error fetching category/tags for bill ${billId}:`, { component: 'SmartFilter' }, error);
+         return null;
     }
   }
 
-  /**
-   * Clear cache for a specific user
-   */
+  // --- Cache Management ---
+  /** Clears the engagement profile cache for a specific user */
   clearUserCache(userId: string): void {
-    this.engagementProfiles.delete(userId);
-    this.profileCacheExpiry.delete(userId);
+      const cacheKey = CACHE_KEYS.USER_ENGAGEMENT_PROFILE(userId);
+      cacheService.delete(cacheKey)
+          .then(() => logger.debug(`Cleared engagement profile cache for user ${userId}`, { component: 'SmartFilter' }))
+          .catch(err => logger.error(`Error clearing engagement profile cache for user ${userId}:`, { component: 'SmartFilter' }, err));
   }
 
-  /**
-   * Clear all caches
-   */
-  clearAllCaches(): void {
-    this.engagementProfiles.clear();
-    this.profileCacheExpiry.clear();
-  }
-
-  /**
-   * Get engagement profile (for debugging/admin purposes)
-   */
-  async getEngagementProfile(userId: string): Promise<UserEngagementProfile> {
-    return this.getUserEngagementProfile(userId);
-  }
 }
 
 // Export singleton instance
 export const smartNotificationFilterService = new SmartNotificationFilterService();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

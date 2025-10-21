@@ -24,6 +24,8 @@
     "dist",
     "server/tests",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "shared/core/**",
+    "shared/core/src/**"
   ]
 }
