@@ -41,3 +41,5 @@
 {"timestamp":"2025-10-21T11:51:41.520Z","level":"error","message":"Error generating coverage report:","correlationId":"mh0i7opc-4132d735","error":{"error":{}}}
 {"timestamp":"2025-10-21T12:18:54.925Z","level":"error","message":"Error generating coverage report:","correlationId":"mh0j6p1p-fe27b89f","error":{"error":{}}}
 {"timestamp":"2025-10-21T12:58:06.438Z","level":"error","message":"Error generating coverage report:","correlationId":"mh0kl3hi-2b80d8f8","error":{"error":{}}}
+{"timestamp":"2025-10-21T13:26:51.403Z","level":"error","message":"Error generating coverage report:","correlationId":"mh0lm2h7-a5e356f3","error":{"error":{}}}
+{"timestamp":"2025-10-21T13:44:40.247Z","level":"error","message":"Error generating coverage report:","correlationId":"mh0m8z7b-d6157fee","error":{"error":{}}}

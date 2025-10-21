@@ -1017,6 +1017,7 @@ server/
 │   │   │   ├── bill-service.ts
 │   │   │   ├── bill-tracking.service.ts
 │   │   │   ├── index.ts
+│   │   │   ├── sponsorship-analysis.ts
 │   │   ├── bill.js
 │   │   ├── bill-status-monitor.ts
 │   │   ├── domain/
@@ -1033,11 +1034,7 @@ server/
 │   │   │   ├── bills-router.ts
 │   │   │   ├── bill-tracking.routes.ts
 │   │   │   ├── index.ts
-│   │   ├── sponsor-conflict-analysis.ts
-│   │   ├── sponsors.ts
-│   │   ├── sponsor-service.ts
-│   │   ├── sponsorship.ts
-│   │   ├── sponsorship-analysis.ts
+│   │   │   ├── sponsorship.ts
 │   │   ├── voting-pattern-analysis.ts
 │   ├── community/
 │   │   ├── comment.ts
@@ -1102,6 +1099,23 @@ server/
 │   │   ├── security-monitoring-service.ts
 │   │   ├── tls-config-service.ts
 │   ├── sidebar.tsx
+│   ├── sponsors/
+│   │   ├── application/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── sponsor-conflict-analysis.service.test.ts
+│   │   │   ├── sponsor-conflict-analysis.service.ts
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   ├── repositories/
+│   │   ├── infrastructure/
+│   │   │   ├── repositories/
+│   │   │   │   ├── __tests__/
+│   │   │   │   │   ├── sponsor.repository.test.ts
+│   │   │   │   ├── sponsor.repository.ts
+│   │   ├── presentation/
+│   │   │   ├── __tests__/
+│   │   │   │   ├── sponsors.routes.test.ts
+│   │   │   ├── sponsors.routes.ts
 │   ├── users/
 │   │   ├── __tests__/
 │   │   │   ├── ExpertVerificationService.test.ts
@@ -1160,6 +1174,7 @@ server/
 │   │   ├── cache-service.ts
 │   │   ├── cache-warming.ts
 │   │   ├── index.ts
+│   │   ├── migration-wrapper.ts
 │   ├── database/
 │   │   ├── base/
 │   │   │   ├── BaseStorage.d.ts
@@ -1234,7 +1249,7 @@ server/
 │   ├── websocket.ts
 ├── middleware/
 │   ├── auth.ts
-│   ├── error-handler.ts
+│   ├── migration-wrapper.ts
 │   ├── privacy-middleware.ts
 │   ├── rate-limiter.ts
 │   ├── request-logger.ts
@@ -1357,9 +1372,6 @@ shared/
 │   ├── MIGRATION_GUIDE.md
 │   ├── MIGRATION_VALIDATION_REPORT.md
 │   ├── README.md
-│   ├── scripts/
-│   │   ├── consolidate-redundancies.ts
-│   │   ├── validate-consolidation.ts
 │   ├── src/
 │   │   ├── __tests__/
 │   │   │   ├── integration.test.ts
@@ -1397,12 +1409,14 @@ shared/
 │   │   │   │   ├── key-generator.ts
 │   │   │   ├── decorators.ts
 │   │   │   ├── factory.ts
+│   │   │   ├── feature-flags.ts
 │   │   │   ├── index.ts
 │   │   │   ├── interfaces.ts
 │   │   │   ├── key-generator.ts
 │   │   │   ├── legacy-adapters/
 │   │   │   ├── legacy-adapters.ts
 │   │   │   │   ├── cache-service-adapter.ts
+│   │   │   ├── migration-adapter.ts
 │   │   │   ├── patterns/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── single-flight-cache.ts
@@ -1410,6 +1424,7 @@ shared/
 │   │   │   ├── README-interfaces.md
 │   │   │   ├── single-flight-cache.ts
 │   │   │   ├── types.ts
+│   │   │   ├── validation.ts
 │   │   ├── config/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── config-manager.test.ts
@@ -1471,10 +1486,12 @@ shared/
 │   │   │   ├── factory.ts
 │   │   │   ├── factory.ts.bak
 │   │   │   ├── factory.ts.new
+│   │   │   ├── feature-flags.ts
 │   │   │   ├── index.ts
 │   │   │   ├── legacy-adapters/
 │   │   │   │   ├── auth-adapter.ts
 │   │   │   │   ├── server-middleware-adapter.ts
+│   │   │   ├── migration-adapter.ts
 │   │   │   ├── rate-limit/
 │   │   │   │   ├── provider.ts
 │   │   │   ├── registry.ts
@@ -1738,20 +1755,6 @@ shared/
 │   │   │   │   ├── property.ts
 │   │   │   ├── types.ts
 │   │   │   ├── validation-service.ts
-│   ├── tasks/
-│   │   ├── advanced_integration_tests.ts
-│   │   ├── chaos_engineering_tests.ts
-│   │   ├── comprehensive_migration_tests.md
-│   │   ├── health_test_config.json
-│   │   ├── health_test_setup.ts
-│   │   ├── middleware_architecture.ts
-│   │   ├── middleware_unit_tests.ts
-│   │   ├── optimized_health_system.md
-│   │   ├── optimized_migration_strategy.md
-│   │   ├── optimized-rate-limiting.md
-│   │   ├── rate-limiting-integration-tests.ts
-│   │   ├── refined_cross_cutting.ts
-│   ├── test-validation.js
 ├── database/
 │   ├── connection.ts
 │   ├── example-usage.ts
@@ -1761,14 +1764,15 @@ shared/
 ├── i18n/
 │   ├── en.ts
 ├── schema/
+│   ├── __tests__/
+│   │   ├── schema_integration_tests.ts
+│   │   ├── schema_unit_test.ts
 │   ├── enum.ts
 │   ├── index.ts
 │   ├── schema.ts
 │   ├── searchVectorMigration.ts
 │   ├── types.ts
 │   ├── validation.ts
-├── schema_integration_tests.ts
-├── schema_unit_test.ts
 ├── types/
 │   ├── auth.ts
 │   ├── bill.ts
@@ -1807,4 +1811,4 @@ vitest.frontend.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-21 03:56:46
+Generated on: 2025-10-21 16:22:53
