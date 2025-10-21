@@ -14,7 +14,7 @@ import {
 import { eq, and, or, sql } from 'drizzle-orm';
 import type { StorageConfig } from '../../../infrastructure/database/base/BaseStorage.js';
 import { BaseStorage } from '../../../infrastructure/database/base/BaseStorage.js';
-import { logger } from '../../../utils/logger.js';
+import { logger } from '../../../../shared/core/src/observability/logging';
 
 // Additional type definitions needed
 export type OAuthProvider = 'google' | 'github' | 'twitter';

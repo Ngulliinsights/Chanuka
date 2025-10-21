@@ -1,6 +1,6 @@
 import { notificationService } from './services/notification-service.js';
 import { billStatusMonitorService } from './services/bill-status-monitor.js';
-import { db } from './db.js';
+import { db } from '@shared/database/pool.js';
 import { users, bills } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '../../shared/core/src/observability/logging';

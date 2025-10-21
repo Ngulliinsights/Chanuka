@@ -9,11 +9,11 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { ApiSuccess, ApiResponseWrapper } from '../../utils/api-response.js';
+import { ApiSuccess, ApiResponseWrapper } from '../../../shared/core/src/utilities/api';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../../infrastructure/external-data/external-api-manager.js';
 import { performanceMonitor } from '../../infrastructure/monitoring/performance-monitor.js';
 import { advancedCachingService } from '../../infrastructure/cache/advanced-caching.js';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 export const router = Router();
 

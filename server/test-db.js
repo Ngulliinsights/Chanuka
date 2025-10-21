@@ -1,6 +1,6 @@
 // Simple test script to verify database connection
 import { db, isDatabaseConnected, fallbackService, getConnectionStatus } from './db.ts';
-import { logger } from '../utils/logger.js';
+import { logger } from '../shared/core/src/observability/logging/index.js';
 
 logger.info('🧪 Testing database connection...', { component: 'Chanuka' });
 

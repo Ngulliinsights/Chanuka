@@ -7,10 +7,10 @@ import {
   sponsors, sponsorTransparency, sponsorAffiliations
 } from "@shared/schema";
 import { eq, desc, and, sql, count } from "drizzle-orm";
-import { readDatabase } from "../../../db.js";
-import { cache } from '../../../utils/cache.js';
-import { logger } from '../../../utils/logger.js';
-import { SponsorNotFoundError, DatabaseError } from '../../../utils/errors.js';
+import { readDatabase } from '@shared/database/connection';
+import { cache } from '../../../../shared/core/src/caching';
+import { logger } from '../../../../shared/core/src/observability/logging';
+import { SponsorNotFoundError, DatabaseError } from '../../../../shared/core/src/observability/error-management';
 import { FinancialDisclosureConfig } from '../financial-disclosure/config.js';
 import type {
   FinancialDisclosure,
@@ -67,7 +67,7 @@ export class FinancialDisclosureAnalyticsService {
         this.config.cache.ttl.disclosureData,
         async () => {
           // Build the query with optional sponsor filtering
-          let query = readDatabase()
+          let query = readDatabase
             .select({
               id: sponsorTransparency.id,
               sponsorId: sponsorTransparency.sponsorId,
@@ -602,7 +602,7 @@ export class FinancialDisclosureAnalyticsService {
    * Retrieves basic statistics about active sponsors in the system.
    */
   private async getSponsorStatistics() {
-    const result = await readDatabase()
+  const result = await readDatabase
       .select({ total: count() })
       .from(sponsors)
       .where(eq(sponsors.isActive, true));
@@ -615,7 +615,7 @@ export class FinancialDisclosureAnalyticsService {
    * and verification status.
    */
   private async getDisclosureStatistics() {
-    const stats = await readDatabase()
+  const stats = await readDatabase
       .select({
         disclosureType: sponsorTransparency.disclosureType,
         total: count(),
@@ -653,7 +653,7 @@ export class FinancialDisclosureAnalyticsService {
    * In production, consider implementing pagination or sampling strategies.
    */
   private async getRiskDistribution() {
-    const activeSponsors = await readDatabase()
+  const activeSponsors = await readDatabase
       .select({ id: sponsors.id })
       .from(sponsors)
       .where(eq(sponsors.isActive, true))
@@ -680,7 +680,7 @@ export class FinancialDisclosureAnalyticsService {
    * completeness scores and risk assessments.
    */
   private async getPerformanceMetrics() {
-    const activeSponsors = await readDatabase()
+  const activeSponsors = await readDatabase
       .select({ id: sponsors.id, name: sponsors.name })
       .from(sponsors)
       .where(eq(sponsors.isActive, true))
@@ -1022,7 +1022,7 @@ export class FinancialDisclosureAnalyticsService {
       cacheKey,
       this.config.cache.ttl.sponsorInfo,
       async () => {
-        const result = await readDatabase()
+  const result = await readDatabase
           .select({
             id: sponsors.id,
             name: sponsors.name,
@@ -1046,7 +1046,7 @@ export class FinancialDisclosureAnalyticsService {
    */
   private async getAffiliations(sponsorId: number): Promise<SponsorAffiliation[]> {
     try {
-      return await readDatabase()
+  return await readDatabase
         .select()
         .from(sponsorAffiliations)
         .where(eq(sponsorAffiliations.sponsorId, sponsorId));

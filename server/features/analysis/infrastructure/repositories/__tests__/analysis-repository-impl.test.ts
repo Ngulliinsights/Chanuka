@@ -1,5 +1,5 @@
 import { analysisRepository, AnalysisRepositoryImpl } from '../analysis-repository-impl';
-import { readDatabase } from '../../../../../db';
+import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../../../shared/schema';
 import { ComprehensiveAnalysis } from '../../../domain/entities/analysis-result'; // Import domain entity
 

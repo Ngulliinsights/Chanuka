@@ -4,11 +4,11 @@ import { database as db } from '../../../../shared/database/connection';
 import { billComment, commentVote, user, userProfile, bill } from '@shared/schema';
 import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
 import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../../infrastructure/cache/cache-service';
-import { cache } from '../../../utils/cache';
+import { cache } from '../../../../shared/core/src/caching';
 import { buildTimeThreshold } from '../../../utils/db-helpers';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from "../../../utils/api-response.js";
-import { logger } from '../../../utils/logger';
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from "../../../../shared/core/src/utilities/api";
+import { logger } from '../../../../shared/core/src/observability/logging';
 import { errorTracker } from '../../../core/errors/error-tracker.js';
 import { z } from 'zod';
 import type {

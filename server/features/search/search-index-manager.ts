@@ -1,6 +1,6 @@
 import { sql } from "drizzle-orm";
 import { databaseService } from "../../services/database-service.js";
-import { readDatabase } from '../../db.js';
+import { readDatabase } from '@shared/database/connection';
 import { cacheService } from "../../infrastructure/cache/cache-service.js";
 import { demoDataService } from "../../infrastructure/demo-data.js";
 import * as schema from "../../../shared/schema";
@@ -47,7 +47,7 @@ export interface IndexPerformanceMetrics {
  */
 export class SearchIndexManager {
   private get db() {
-    return readDatabase();
+  return readDatabase;
   }
   private indexUpdateQueue: Set<number> = new Set();
   private isProcessingQueue = false;

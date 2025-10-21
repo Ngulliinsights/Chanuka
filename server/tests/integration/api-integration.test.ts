@@ -12,7 +12,7 @@ import realTimeTrackingRouter from '../../features/bills/real-time-tracking.js';
 import engagementAnalyticsRouter from '../../features/analytics/engagement-analytics.js';
 import { router as healthRouter } from '../../infrastructure/monitoring/health.js';
 import { database as db, withTransaction } from '../../../shared/database/connection.js';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 describe('Comprehensive API Integration Tests', () => {
   let app: express.Application;

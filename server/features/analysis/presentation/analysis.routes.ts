@@ -4,8 +4,8 @@ import { billComprehensiveAnalysisService } from '../application/bill-comprehens
 // Import repository for fetching historical data
 import { analysisRepository } from '../infrastructure/repositories/analysis-repository-impl.js';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js'; // Use if auth needed
-import { ApiSuccess, ApiError, ApiValidationError } from '../../../utils/api-response.js';
-import { logger } from '../../../utils/logger.js';
+import { ApiSuccess, ApiError, ApiValidationError } from '../../../../shared/core/src/utilities/api';
+import { logger } from '../../../../shared/core/src/observability/logging';
 import { z } from 'zod';
 
 const router = Router();

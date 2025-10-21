@@ -3,7 +3,7 @@ import { Loader2, Wifi, WifiOff, AlertCircle, Clock, RefreshCw, CheckCircle, XCi
 import { cn } from '@/lib/utils';
 import { useConnectionAware } from '@/hooks/useConnectionAware';
 import { useOnlineStatus } from '@/hooks/use-online-status';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/shared/core/src/observability/logging';
 import { 
   LoadingStateProps, 
   LoadingSize, 

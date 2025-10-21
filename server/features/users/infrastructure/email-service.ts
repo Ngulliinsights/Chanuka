@@ -1,5 +1,5 @@
 import { getEmailService, sendTemplatedEmail, EmailResult } from '../../../infrastructure/notifications/email-service.js';
-import { logger } from '../../../utils/logger.js';
+import { logger } from '../../../../shared/core/src/observability/logging';
 import { config } from '../../../config/index.js';
 
 export interface UserEmailData {

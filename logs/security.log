@@ -267,3 +267,8 @@
 {"timestamp":"2025-10-21T12:58:06.438Z","level":"error","message":"Error generating coverage report:","correlationId":"mh0kl3hi-2b80d8f8","error":{"error":{}}}
 {"timestamp":"2025-10-21T13:26:51.403Z","level":"error","message":"Error generating coverage report:","correlationId":"mh0lm2h7-a5e356f3","error":{"error":{}}}
 {"timestamp":"2025-10-21T13:44:40.247Z","level":"error","message":"Error generating coverage report:","correlationId":"mh0m8z7b-d6157fee","error":{"error":{}}}
+{"timestamp":"2025-10-21T17:11:30.431Z","level":"error","message":"Migration process failed:","correlationId":"mh0tmyyn-57783ee8","component":"Chanuka","error":{"error":"connection is insecure (try using `sslmode=require`)","type":"string"}}
+{"timestamp":"2025-10-21T17:22:13.713Z","level":"error","message":"Migration process failed:","correlationId":"mh0u0rbl-89f6a510","component":"Chanuka","error":{"error":"connection is insecure (try using `sslmode=require`)","type":"string"}}
+{"timestamp":"2025-10-21T17:23:02.320Z","level":"error","message":"Migration process failed:","correlationId":"mh0u1sts-c4859bf0","component":"Chanuka","error":{"error":"connection is insecure (try using `sslmode=require`)","type":"string"}}
+{"timestamp":"2025-10-21T18:21:27.052Z","level":"error","message":"Migration process failed:","correlationId":"mh0w4x3g-13e5c695","component":"Chanuka","error":{"error":"connection is insecure (try using `sslmode=require`)","type":"string"}}
+{"timestamp":"2025-10-21T18:22:41.963Z","level":"error","message":"Migration process failed:","correlationId":"mh0w6iwb-3b0dd13a","component":"Chanuka","error":{"error":"connection is insecure (try using `sslmode=require`)","type":"string"}}

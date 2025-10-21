@@ -7,7 +7,7 @@
 
 import { EventEmitter } from 'events';
 import { performance } from 'perf_hooks';
-import { logger } from '../../utils/logger';
+import { logger } from '../observability/logging';
 import type {
   CacheAdapter,
   CacheMetrics,

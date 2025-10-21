@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { ApiSuccess, ApiError, ApiResponseWrapper } from '../../utils/api-response';
+import { ApiSuccess, ApiError, ApiResponseWrapper } from '../../../shared/core/src/utilities/api';
 
 // Helper functions to replace the missing createMetadata functionality
 const sendResponse = (res: any, data: any, message: string = 'Success') => {
@@ -10,7 +10,7 @@ const sendError = (res: any, message: string, statusCode: number = 500) => {
   return res.status(statusCode).json(ApiResponseWrapper.error(message, 'API_ERROR', statusCode));
 };
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../external-data/external-api-manager.js';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 export const router = Router();
 

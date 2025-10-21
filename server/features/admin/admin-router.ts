@@ -5,8 +5,8 @@ import { sql, eq, and, or, ilike, desc, count } from 'drizzle-orm';
 import { authenticateToken, requireRole } from '../../middleware/auth.js';
 import { billsService } from '../bills/index.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
-import { ApiSuccess, ApiError, ApiForbidden } from '../../utils/api-response.js';
-import { logger } from '../../utils/logger';
+import { ApiSuccess, ApiError, ApiForbidden } from '../../../shared/core/src/utilities/api';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 // Database & Schema Imports
 import { database as db } from '../../../shared/database/connection';

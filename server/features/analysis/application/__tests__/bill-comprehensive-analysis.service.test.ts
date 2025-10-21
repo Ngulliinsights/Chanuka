@@ -3,9 +3,9 @@ import { constitutionalAnalysisService } from '../constitutional-analysis.servic
 import { stakeholderAnalysisService } from '../stakeholder-analysis.service';
 import { transparencyAnalysisService } from '../transparency-analysis.service';
 import { publicInterestAnalysisService } from '../public-interest-analysis.service';
-import { sponsorConflictAnalysisService } from '../../../bills/application/sponsor-conflict-analysis.service'; // Adjust path
+import { sponsorConflictAnalysisService } from '../../../sponsors/application/sponsor-conflict-analysis.service'; // Updated path
 import { analysisRepository } from '../../infrastructure/repositories/analysis-repository-impl'; // Import repo to mock save
-import { readDatabase } from '../../../../db'; // Mock DB for sponsor lookup
+import { readDatabase } from '@shared/database/connection'; // Mock DB for sponsor lookup
 import * as schema from '../../../../../shared/schema';
 
 // --- Mock Dependencies ---
@@ -14,7 +14,7 @@ jest.mock('../constitutional-analysis.service');
 jest.mock('../stakeholder-analysis.service');
 jest.mock('../transparency-analysis.service');
 jest.mock('../public-interest-analysis.service');
-jest.mock('../../../bills/application/sponsor-conflict-analysis.service'); // Adjust path
+jest.mock('../../../sponsors/application/sponsor-conflict-analysis.service'); // Updated path
 jest.mock('../../infrastructure/repositories/analysis-repository-impl');
 
 // Mock DB return for fetching sponsors

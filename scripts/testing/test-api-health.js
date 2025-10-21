@@ -1,6 +1,6 @@
 // Simple test to verify API health endpoints
 import fetch from 'node-fetch';
-import { logger } from '../utils/logger.js';
+import { logger } from '../../shared/core/src/observability/logging/index.js';
 
 async function testApiHealth() {
   try {

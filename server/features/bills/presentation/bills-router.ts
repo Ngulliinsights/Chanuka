@@ -2,8 +2,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { billsService, BillNotFoundError, CommentNotFoundError, ValidationError } from '../application/bills.js';
 import { authenticateToken } from '../../../middleware/auth.js';
 import type { AuthenticatedRequest } from '../../../middleware/auth.js';
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '../../../utils/api-response.js';
-import { logger } from '../../../utils/logger.js';
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '../../../../shared/core/src/utilities/api';
+import { logger } from '../../../../shared/core/src/observability/logging/index.js';
 import { securityAuditService } from '../../security/security-audit-service.js';
 
 const router = Router();

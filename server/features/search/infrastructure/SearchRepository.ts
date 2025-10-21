@@ -1,6 +1,6 @@
 import { databaseService } from '@/services/database-service';
-import { readDatabase } from '../../../db.js';
-import { bill, billTag, sponsor, billSponsorship } from '../../../../shared/schema/schema.js';
+import { readDatabase } from '@shared/database/connection';
+import { bill, billTag, sponsor, billSponsorship } from '@shared/schema';
 
 // Alias for backward compatibility
 const bills = bill;
@@ -41,7 +41,7 @@ export class SearchRepository {
           'MaxWords=50, MinWords=10, ShortWord=3, HighlightAll=false, MaxFragments=3, FragmentDelimiter=" ... "')`
       : sql<null>`null`;
 
-    const db = readDatabase();
+  const db = readDatabase;
     const rows = await db
       .select({
         bill: bills,
@@ -62,7 +62,7 @@ export class SearchRepository {
   }
 
   async count(conditions: SQL[]): Promise<number> {
-    const db = readDatabase();
+  const db = readDatabase;
     const [row] = await db
       .select({ cnt: count() })
       .from(bills)
@@ -72,7 +72,7 @@ export class SearchRepository {
 
   /*  Facets identical to original (sponsors, complexity, date ranges)  */
   async facets(conditions: SQL[]): Promise<SearchResponseDto['facets']> {
-    const db = readDatabase();
+  const db = readDatabase;
     const [statusRows, categoryRows, sponsorRows, complexityRows] = await Promise.all([
       db
         .select({ value: bills.status, count: count() })
@@ -123,7 +123,7 @@ export class SearchRepository {
 
   /*  Popular-terms sub-query (used by suggestions)  */
   async popularTermCounts(limit: number): Promise<Array<{ term: string; freq: number }>> {
-    const db = readDatabase();
+  const db = readDatabase;
     const rows = await db.execute<{
       term: string;
       freq: number;

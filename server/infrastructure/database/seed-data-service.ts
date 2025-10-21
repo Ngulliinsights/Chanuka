@@ -1,6 +1,6 @@
 import { databaseService } from './database-service.js';
-import { readDatabase } from '../../db.js';
-import * as schema from '../../../shared/schema';
+import { readDb } from '@shared/database/pool';
+import * as schema from '@shared/schema';
 import bcrypt from 'bcrypt';
 import { logger } from '@shared/core/src/observability/logging';
 
@@ -10,7 +10,7 @@ import { logger } from '@shared/core/src/observability/logging';
  */
 export class SeedDataService {
   private get db() {
-    return readDatabase();
+    return readDb;
   }
 
   /**
@@ -62,19 +62,24 @@ export class SeedDataService {
       schema.sponsorAffiliations,
       schema.sponsors,
       schema.bills,
-      schema.userProfiles,
-      schema.users
+      schema.userProfile,
+      schema.user
     ];
     // Safely truncate tables in reverse dependency order if DB supports it.
     for (const table of tables) {
       try {
         // Use database client abstraction if available, otherwise no-op
-        if (this.db && typeof (this.db as any).raw === 'function') {
-          await (this.db as any).raw(`DELETE FROM ${table}`);
-        } else if (this.db && typeof (this.db as any).exec === 'function') {
-          await (this.db as any).exec(`DELETE FROM ${table}`);
-        } else {
-          logger.info(`Would clear table: ${table}`, { component: 'SeedDataService' });
+        try {
+          // prefer drizzle instance
+          if (readDb && typeof (readDb as any).delete === 'function') {
+            await (readDb as any).delete(table).run?.();
+          } else if (readDb && typeof (readDb as any).raw === 'function') {
+            await (readDb as any).raw(`DELETE FROM ${table}`);
+          } else {
+            logger.info(`Would clear table: ${table}`, { component: 'SeedDataService' });
+          }
+        } catch (err) {
+          logger.warn(`Failed to clear table ${table}: ${err}`, { component: 'SeedDataService' });
         }
       } catch (err) {
         logger.warn(`Failed to clear table ${table}: ${err}`, { component: 'SeedDataService' });

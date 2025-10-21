@@ -8,7 +8,7 @@ import { securityMiddleware } from '../middleware/security-middleware.ts';
 import { authRateLimit, apiRateLimit } from '../middleware/rate-limiter.ts';
 import https from 'https';
 import fs from 'fs';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 /**
  * Security initialization service that sets up all security components

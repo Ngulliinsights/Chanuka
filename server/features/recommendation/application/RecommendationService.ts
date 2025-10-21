@@ -6,7 +6,7 @@ import {
   userInterests,
   type Bill,
 } from '@shared/schema';
-import { readDatabase } from '../../../infrastructure/database';
+import { readDatabase } from '@shared/database/connection';
 import { logger } from '@shared/core/src/observability/logging';
 import { RecommendationEngine } from '../domain/RecommendationEngine';
 import { RecommendationValidator } from '../domain/RecommendationValidator';
@@ -81,9 +81,9 @@ export class RecommendationService {
     const cacheKey = `user_interests_${userId}`;
 
     return this.getCachedData(cacheKey, async () => {
-      try {
-      const database = readDatabase();
-      const interests = await database
+  try {
+  const database = readDatabase;
+  const interests = await database
         .select({ interest: userInterests.interest })
         .from(userInterests)
         .where(eq(userInterests.userId, userId));
@@ -108,7 +108,7 @@ export class RecommendationService {
 
     return this.getCachedData(cacheKey, async () => {
       try {
-        const database = readDatabase();
+  const database = readDatabase;
         const userEngagement = await database
           .select({ billId: billEngagement.billId })
           .from(billEngagement)
@@ -453,7 +453,7 @@ export class RecommendationService {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-      const database = readDatabase();
+  const database = readDatabase;
       const activities = await database
         .select({
           billId: billEngagement.billId,
@@ -499,7 +499,7 @@ export class RecommendationService {
       const sixMonthsAgo = new Date();
       sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-      const database = readDatabase();
+  const database = readDatabase;
       const availableBills = await database
         .select()
         .from(bills)
@@ -544,7 +544,7 @@ export class RecommendationService {
       cutoffDate.setDate(cutoffDate.getDate() - days);
 
       // Fixed: Changed from db() to readDatabase() for consistency
-      const database = readDatabase();
+  const database = readDatabase;
       const engagements = await database
         .select({
           billId: billEngagement.billId,
@@ -599,7 +599,7 @@ export class RecommendationService {
       const minSharedInterests = Math.max(1, Math.floor(interests.length * 0.4));
 
       // Step 1: Find similar users based on shared interests
-      const database = readDatabase();
+  const database = readDatabase;
       const similarUsers = await database
         .select({
           userId: userInterests.userId,

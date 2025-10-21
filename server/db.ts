@@ -3,7 +3,7 @@ import pg from 'pg';
 const { Pool } = pg;
 import * as schema from "../shared/schema";
 import { databaseFallbackService as fallbackService } from './infrastructure/database/database-fallback.js';
-import { logger } from './utils/logger.js';
+import { logger } from '../shared/core/src/observability/logging/index.js';
 
 // Connection state management with clear separation of concerns
 interface DatabaseState {
@@ -35,9 +35,20 @@ function createPoolConfig(): pg.PoolConfig {
   };
 
   if (process.env.DATABASE_URL) {
+    // Determine SSL configuration based on URL and environment
+    let sslConfig;
+    if (process.env.DATABASE_URL.includes('sslmode=require')) {
+      sslConfig = { rejectUnauthorized: false };
+    } else if (process.env.NODE_ENV === 'production') {
+      sslConfig = { rejectUnauthorized: false };
+    } else {
+      sslConfig = false;
+    }
+
     return {
       ...baseConfig,
-      connectionString: process.env.DATABASE_URL
+      connectionString: process.env.DATABASE_URL,
+      ssl: sslConfig
     };
   }
 
@@ -73,13 +84,13 @@ async function testConnection(pool: pg.Pool): Promise<boolean> {
 async function seedInitialData(db: any): Promise<void> {
   try {
     const existingBills = await db.select().from(schema.bills).limit(1);
-    
+
     if (existingBills.length > 0) {
       return; // Data already exists, skip seeding
     }
 
     logger.info('📋 Seeding initial demonstration data...', { component: 'Chanuka' });
-    
+
     await db.insert(schema.bills).values([
       {
         title: "Digital Rights and Privacy Protection Act",
@@ -128,7 +139,7 @@ async function seedInitialData(db: any): Promise<void> {
         }
       }
     ]);
-    
+
     logger.info('✅ Initial data seeded successfully', { component: 'Chanuka' });
   } catch (error) {
     logger.info('ℹ️ Could not seed data: ' + (error instanceof Error ? error.message : 'Unknown error'), { component: 'Chanuka' });
@@ -157,38 +168,38 @@ async function initializeFallback(): Promise<void> {
 async function performInitialization(): Promise<void> {
   try {
     // Create connection pool with appropriate configuration
-  state.pool = new Pool(createPoolConfig());
-  state.db = drizzle(state.pool, { schema });
-  // expose runtime db to consumers
-  db = state.db;
-    
+    state.pool = new Pool(createPoolConfig());
+    state.db = drizzle(state.pool, { schema });
+    // expose runtime db to consumers
+    db = state.db;
+
     // Verify the connection works before marking as connected
     const isConnected = await testConnection(state.pool);
-    
+
     if (!isConnected) {
       throw new Error('Connection test failed');
     }
-    
+
     state.isConnected = true;
     logger.info('✅ Database connection established successfully', { component: 'Chanuka' });
-    
+
     // Seed data only after confirming connection
     await seedInitialData(state.db);
-    
+
   } catch (error) {
     logger.error('❌ Database connection failed:', { component: 'Chanuka' }, error instanceof Error ? error.message : 'Unknown error');
     logger.info('🔄 Application will continue with fallback mode', { component: 'Chanuka' });
-    
+
     // Clean up any partial initialization
     if (state.pool) {
       await state.pool.end().catch(() => {});
       state.pool = null;
     }
-    
-  state.db = null;
-  db = null;
+
+    state.db = null;
+    db = null;
     state.isConnected = false;
-    
+
     // Ensure fallback service is ready
     await initializeFallback();
   }
@@ -203,11 +214,11 @@ async function initializeDatabase(): Promise<void> {
   if (state.initPromise) {
     return state.initPromise;
   }
-  
+
   // Create new initialization promise and track it
   state.isInitializing = true;
   state.initPromise = performInitialization();
-  
+
   try {
     await state.initPromise;
   } finally {
@@ -234,7 +245,7 @@ function isConnectionError(error: unknown): boolean {
   if (!(error instanceof Error)) {
     return false;
   }
-  
+
   const connectionKeywords = [
     'connection',
     'ECONNREFUSED',
@@ -243,8 +254,8 @@ function isConnectionError(error: unknown): boolean {
     'timeout',
     'connect ECONNREFUSED'
   ];
-  
-  return connectionKeywords.some(keyword => 
+
+  return connectionKeywords.some(keyword =>
     error.message.toLowerCase().includes(keyword.toLowerCase())
   );
 }
@@ -259,7 +270,7 @@ export async function withFallback<T>(
   context: string
 ): Promise<T> {
   await ensureInitialized();
-  
+
   // Use fallback immediately if database is known to be unavailable
   if (!state.isConnected || !state.db) {
     logger.warn(`⚠️ Database unavailable for ${context}, using fallback data`, { component: 'Chanuka' });
@@ -270,13 +281,13 @@ export async function withFallback<T>(
     return await operation();
   } catch (error) {
     logger.error(`❌ Database operation failed for ${context}: ${error instanceof Error ? error.message : 'Unknown error'}`, { component: 'Chanuka' });
-    
+
     // Only mark as disconnected for connection errors, not query errors
     if (isConnectionError(error)) {
       state.isConnected = false;
       logger.info('🔌 Database marked as disconnected due to connection error', { component: 'Chanuka' });
     }
-    
+
     return fallbackData;
   }
 }

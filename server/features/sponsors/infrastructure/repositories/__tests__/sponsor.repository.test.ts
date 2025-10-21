@@ -4,7 +4,7 @@ import * as schema from '../../../../../../shared/schema'; // Adjusted path
 import { eq, and, like, or, inArray, desc, asc, sql } from 'drizzle-orm';
 
 // --- Mock Dependencies ---
-jest.mock('../../../../../db', () => ({ readDatabase: jest.fn() }));
+jest.mock('@shared/database/connection', () => ({ readDatabase: jest.fn() }));
 
 // Comprehensive Mock DB Object
 const mockDb = {

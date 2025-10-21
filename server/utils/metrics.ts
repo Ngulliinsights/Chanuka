@@ -1,12 +1,13 @@
 /**
- * Legacy Metrics Service - Now delegates to the optimized Performance Monitoring Service
+ * Legacy Metrics Service - Now delegates to the unified ObservabilityStack
  *
- * This maintains backward compatibility while leveraging the new performance monitoring system.
+ * This maintains backward compatibility while leveraging the new observability system.
  */
 
 import { performance } from 'perf_hooks';
 import { performanceMonitoring } from '../services/performance-monitoring.js';
 import { logger } from '../../shared/core/src/observability/logging';
+import { createObservabilityStack } from '../../shared/core/src/observability/stack';
 
 interface MetricData {
   count: number;

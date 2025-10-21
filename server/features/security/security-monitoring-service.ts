@@ -4,7 +4,7 @@ import { intrusionDetectionService, ThreatDetectionResult } from './intrusion-de
 import { database as db } from '../../../shared/database/connection';
 import { pgTable, text, serial, timestamp, jsonb, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, desc, eq, or, count } from 'drizzle-orm';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 /**
  * SecurityMonitoringService - The Active Intelligence Layer

@@ -1,5 +1,5 @@
 import { stakeholderAnalysisService, StakeholderAnalysisService } from '../stakeholder-analysis.service';
-import { readDatabase } from '../../../../db';
+import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../../shared/schema';
 import { MLAnalysisService } from '../../../analytics/services/ml.service'; // Adjust path
 
