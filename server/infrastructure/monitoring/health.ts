@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../utils/api-response.js";
+import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../../shared/core/src/utilities/api";
 import { databaseFallbackService } from "../database/database-fallback.js";
 import { logger } from '@shared/core/src/observability/logging';
 

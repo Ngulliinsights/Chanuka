@@ -1,6 +1,6 @@
 import { getDbInstance, readDatabase } from '../../infrastructure/database/index.ts';
 import { sql } from 'drizzle-orm';
-import { logger } from '../../utils/logger.js';
+import { logger } from '../../../shared/core/src/observability/logging/index.js';
 import {
   complianceChecks,
   securityAuditLogs,
@@ -284,7 +284,7 @@ export class SchemaValidationService {
    */
   private async checkTableExists(tableName: string): Promise<boolean> {
     try {
-      const database = readDatabase();
+  const database = readDatabase;
       const result = await database.execute(sql`
         SELECT EXISTS (
           SELECT FROM information_schema.tables
@@ -302,7 +302,7 @@ export class SchemaValidationService {
 
   private async getTableColumns(tableName: string): Promise<any[]> {
     try {
-      const database = readDatabase();
+  const database = readDatabase;
       const result = await database.execute(sql`
         SELECT column_name, data_type, is_nullable, column_default
         FROM information_schema.columns
@@ -430,7 +430,7 @@ export class SchemaValidationService {
   private async repairTable(validation: ValidationResult): Promise<boolean> {
     if (validation.tableName === 'compliance_checks' && validation.missingColumns.includes('next_check')) {
       try {
-        const database = readDatabase();
+  const database = readDatabase;
         await database.execute(sql`
           ALTER TABLE compliance_checks
           ADD COLUMN IF NOT EXISTS next_check TIMESTAMP;
@@ -445,7 +445,7 @@ export class SchemaValidationService {
 
     if (validation.tableName === 'security_audit_logs' && validation.missingColumns.includes('timestamp')) {
       try {
-        const database = readDatabase();
+  const database = readDatabase;
         await database.execute(sql`
           ALTER TABLE security_audit_logs
           ADD COLUMN IF NOT EXISTS timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
@@ -460,7 +460,7 @@ export class SchemaValidationService {
 
     if (validation.tableName === 'threat_intelligence' && validation.missingColumns.includes('ip_address')) {
       try {
-        const database = readDatabase();
+  const database = readDatabase;
         await database.execute(sql`
           ALTER TABLE threat_intelligence
           ADD COLUMN IF NOT EXISTS ip_address TEXT NOT NULL DEFAULT '';

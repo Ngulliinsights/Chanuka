@@ -1,6 +1,6 @@
 import { eq, and, desc, asc, sql, count, inArray, or } from 'drizzle-orm';
 import { databaseService } from '../../../infrastructure/database/database-service.js';
-import { readDatabase } from '../../../db.js';
+import { readDatabase } from '@shared/database/connection';
 import { notificationService } from '../../../infrastructure/notifications/notification-service.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../../infrastructure/cache/cache-service.js';
 import * as schema from '../../../../shared/schema';
@@ -96,7 +96,7 @@ export interface TrackedBillWithDetails extends schema.Bill {
  */
 export class BillTrackingService {
   private get db() {
-    return readDatabase();
+    return readDatabase;
   }
 
   /**

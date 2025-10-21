@@ -1,7 +1,7 @@
 
 import { Router, Request, Response } from "express";
 import { authService, registerSchema, loginSchema, passwordResetRequestSchema, passwordResetSchema } from "./auth-service.js";
-import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized, ApiForbidden, ApiNotFound, ErrorCodes, HttpStatus, ApiResponseWrapper } from "../../utils/api-response.js";
+import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized, ApiForbidden, ApiNotFound, ErrorCodes, HttpStatus, ApiResponseWrapper } from "../../../shared/core/src/utilities/api";
 import { authRateLimit, passwordResetRateLimit, registrationRateLimit } from "../../middleware/rate-limiter.js";
 import { z } from "zod";
 import { errorTracker } from '../errors/error-tracker.js';

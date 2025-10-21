@@ -1,11 +1,21 @@
-import { readDatabase } from '../../../db.js';
+import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '../../../utils/logger.js';
 // Import the result type from sponsor conflict analysis
 // Ensure this path is correct based on your final structure
-import type { ConflictSummary } from '../../bills/application/sponsor-conflict-analysis.service.js'; // Assuming service path
+// Note: ConflictSummary is defined locally in bill-comprehensive-analysis.service.ts, not exported from sponsor-conflict-analysis.service.ts
+// import type { ConflictSummary } from '../../sponsors/application/sponsor-conflict-analysis.service.js'; // Updated path
 
+// Define ConflictSummary locally since it's not exported from sponsor-conflict-analysis.service.ts
+export interface ConflictSummary {
+  overallRisk: 'low' | 'medium' | 'high' | 'critical';
+  affectedSponsorsCount: number;
+  totalFinancialExposureEstimate: number;
+  directConflictCount: number;
+  indirectConflictCount: number;
+  relatedConflictDetails?: any[]; // Optional: Include raw details
+}
 
 // --- Interface Definitions ---
 export interface TransparencyScoreResult {
@@ -23,7 +33,7 @@ export interface TransparencyScoreResult {
  * Service for calculating the transparency score of a bill.
  */
 export class TransparencyAnalysisService {
-    private get db() { return readDatabase(); }
+    private get db() { return readDatabase; }
 
     /**
      * Calculates the transparency score based on bill data and conflict analysis.
@@ -116,8 +126,8 @@ export class TransparencyAnalysisService {
     private calculateFinancialConflictScore(conflictAnalysis: ConflictSummary): number {
         logger.debug("Calculating financial conflict transparency score.");
          // Higher penalty for direct conflicts
-         const directConflictPenalty = (conflictAnalysis.directConflicts || 0) * 20;
-         const indirectConflictPenalty = (conflictAnalysis.indirectConflicts || 0) * 10;
+         const directConflictPenalty = (conflictAnalysis.directConflictCount || 0) * 20;
+         const indirectConflictPenalty = (conflictAnalysis.indirectConflictCount || 0) * 10;
          // Penalty based on overall risk level
          const riskPenalties = { low: 0, medium: 5, high: 15, critical: 30 };
          const riskPenalty = riskPenalties[conflictAnalysis.overallRisk] || 0;

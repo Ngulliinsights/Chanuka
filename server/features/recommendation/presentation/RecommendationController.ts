@@ -6,7 +6,7 @@ import {
   getCollaborativeRecommendations,
 } from '../application/RecommendationService';
 import { trackEngagement } from '../application/EngagementTracker';
-import { ApiSuccess, ApiError, ApiValidationError } from '@/utils/api-response';
+import { ApiSuccess, ApiError, ApiValidationError } from '../../../../shared/core/src/utilities/api';
 
 const router = Router();
 

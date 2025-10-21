@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { regulatoryChangeMonitoringService } from '../features/analytics/regulatory-change-monitoring.js';
 import { z } from 'zod'; // For runtime validation
 import { errorTracker } from '../core/errors/error-tracker.js';
-import { ApiResponseWrapper } from '../utils/api-response.js';
+import { ApiResponseWrapper } from '../../shared/core/src/utilities/api';
 import { logger } from '../../shared/core/src/observability/logging';
 
 const router = Router();

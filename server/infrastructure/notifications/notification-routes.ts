@@ -5,7 +5,7 @@ import { userPreferencesService } from '../../features/users/domain/user-prefere
 import { notificationChannelService } from './notification-channels.js';
 import { smartNotificationFilterService } from './smart-notification-filter.js';
 import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiValidationError } from "../../utils/api-response.js";
+import { ApiSuccess, ApiError, ApiValidationError } from "../../../shared/core/src/utilities/api";
 import { logger } from '@shared/core/src/observability/logging';
 
 export const router = Router();

@@ -5,7 +5,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X, AlertCircle, Loader2 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { logger } from '../utils/logger.js';
+import { logger } from '@/shared/core/src/observability/logging';
 import { DialogValidationProps } from './types';
 import { DialogPropsSchema } from './validation';
 import { UIDialogError } from './errors';

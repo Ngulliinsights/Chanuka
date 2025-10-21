@@ -18,10 +18,10 @@ export interface StorageConfig {
 }
 
 export interface Storage {
-  // Note: UserProgress types don't exist in our schema, commenting out for now
-  // getUserProgress(userId: string): Promise<UserProgress[]>;
-  // updateUserProgress(progress: InsertUserProgress): Promise<UserProgress>;
-  // getProgressByType(userId: string, achievementType: string): Promise<UserProgress[]>;
+  // Progress-related methods (now aligned with shared/schema types)
+  getUserProgress(userId: string): Promise<UserProgress[]>;
+  updateUserProgress(progress: InsertUserProgress): Promise<UserProgress>;
+  getProgressByType(userId: string, achievementType: string): Promise<UserProgress[]>;
 
   // Additional methods from IStorage interface
   getUser(id: string): Promise<User | undefined>;

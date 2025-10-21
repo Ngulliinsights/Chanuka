@@ -7,7 +7,7 @@
 
 import { ZodSchema, ZodError } from 'zod';
 import crypto from 'crypto';
-import { logger } from '../../../utils/logger';
+import { logger } from '../observability/logging';
 import { ValidationError } from '../observability/error-management';
 import {
   ValidationOptions,

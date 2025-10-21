@@ -1,5 +1,5 @@
 import { eq, and, desc } from 'drizzle-orm';
-import { readDatabase } from '../../../../db.js';
+import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../../shared/schema';
 import { IAnalysisRepository } from '../../domain/repositories/analysis-repository';
 import { ComprehensiveAnalysis } from '../../domain/entities/analysis-result';
@@ -10,7 +10,7 @@ import { logger } from '../../../../utils/logger.js';
  */
 export class AnalysisRepositoryImpl implements IAnalysisRepository {
   private get db() {
-    return readDatabase();
+  return readDatabase;
   }
 
   /**

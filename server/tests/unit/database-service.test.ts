@@ -9,7 +9,7 @@ jest.mock('../../config/index.ts');
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { DatabaseService } from '../../infrastructure/database/database-service';
 import * as pg from 'pg';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 // Mock pg module
 jest.mock('pg', () => ({

@@ -5,7 +5,7 @@ import { eq, desc, and, gte, lte, count } from "drizzle-orm";
 import { readDatabase } from "../shared/database/connection";
 import { cacheService, CACHE_TTL } from "../../infrastructure/cache/cache-service.js";
 import { financialDisclosureAnalyticsService } from "./services/financial-disclosure.service.js";
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 import { errorTracker } from '../../core/errors/error-tracker.js';
 
 export interface TransparencyScoreResult {

@@ -4,9 +4,9 @@ import { insertAnalysisSchema } from '../../../shared/schema/validation.js';
 import { z } from 'zod';
 import { mlAnalysisService, performComprehensiveAnalysis } from './services/ml.service';
 import { conflictDetectionService } from './conflict-detection';
-import { realTimeBillAnalysisEngine } from '../bills/real-time-analysis';
+// import { realTimeBillAnalysisEngine } from '../bills/real-time-analysis'; // File deleted - remove import
 import { citizenVerificationService } from '../users/domain/citizen-verification';
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../utils/api-response.js";
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utilities/api";
 import { logger } from '../../../shared/core/src/observability/logging';
 
 export const router = express.Router();

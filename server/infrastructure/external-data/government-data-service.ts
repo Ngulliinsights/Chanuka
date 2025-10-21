@@ -7,7 +7,7 @@
 
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { EventEmitter } from 'events';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 import {
   DataSource,
   ApiEndpoint,

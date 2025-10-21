@@ -1,9 +1,9 @@
 import { databaseService } from '../../infrastructure/database/database-service.js';
-import { db } from '../../db.js';
+import { db } from '@shared/database/pool.js';
 import { billComment as billComments, user as users, userProfile as userProfiles, bill as bills } from '../../../shared/schema/schema.js';
 import { eq, and, desc, asc, sql, count, isNull, or } from 'drizzle-orm';
 import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../infrastructure/cache/cache-service.js';
-import { logger } from '../../utils/logger.js';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 // Types for comment operations
 export interface CommentWithUser {

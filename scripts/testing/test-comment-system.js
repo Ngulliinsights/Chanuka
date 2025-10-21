@@ -2,7 +2,7 @@
 import { commentService } from '../../server/features/community/comment.js';
 import { commentVotingService } from '../../server/features/community/comment-voting.js';
 import { contentModerationService } from '../../server/features/admin/content-moderation.js';
-import { logger } from '../utils/logger.js';
+import { logger } from '../../shared/core/src/observability/logging/index.js';
 
 async function testCommentSystem() {
   logger.info('🧪 Testing Comment System...\n', { component: 'Chanuka' });

@@ -4,7 +4,7 @@
  */
 
 // Logger
-export { logger } from './logger.js';
+export { logger } from './src/observability/logging/index.js';
 
 // Error classes for basic error handling
 export class BaseError extends Error {

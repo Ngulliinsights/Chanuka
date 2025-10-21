@@ -1,42 +1,18 @@
-// Define all the types that were previously imported from @shared/schema
+// Prefer canonical types from shared schema as single source of truth.
+// Import the user-related types and expose small local aliases when convenient.
+import type {
+  User as SharedUser,
+  InsertUser as SharedInsertUser,
+  UserProgress as SharedUserProgress,
+  InsertUserProgress as SharedInsertUserProgress,
+  UserSocialProfile as SharedUserSocialProfile,
+} from '../../shared/schema/types';
 
-// User-related types
-export interface User {
-  id: number;
-  username: string;
-  email: string;
-  expertise: string | null;
-  onboardingCompleted: boolean;
-  googleId: string | null;
-  avatarUrl: string | null;
-  reputation: number;
-  lastActive: Date;
-  createdAt: Date;
-  updatedAt: Date;
-  role: 'user' | 'admin' | 'expert';
-  socialProfiles: SocialProfile[];
-}
-
-export interface InsertUser {
-  username: string;
-  email: string;
-  password?: string;
-  role?: 'user' | 'admin' | 'expert';
-  expertise?: string | null;
-  onboardingCompleted?: boolean;
-  googleId?: string | null;
-  avatarUrl?: string | null;
-}
-
-export interface SocialProfile {
-  id?: number;
-  userId?: number;
-  platform: string;
-  profileId: string;
-  username: string;
-  avatarUrl?: string;
-  createdAt?: Date;
-}
+export type User = SharedUser;
+export type InsertUser = SharedInsertUser;
+export type UserProgress = SharedUserProgress;
+export type InsertUserProgress = SharedInsertUserProgress;
+export type SocialProfile = SharedUserSocialProfile;
 
 // Bill-related types
 export interface Bill {
@@ -125,28 +101,11 @@ export interface InsertBillComment {
 }
 
 // Progress-related types
-export interface UserProgress {
-  id: number;
-  userId: number;
-  achievementType: string;
-  achievementValue: number;
-  level?: string | null;
-  badge?: string | null;
-  description?: string | null;
-  unlockedAt?: Date;
-  metadata?: Record<string, any>;
-  createdAt: Date;
-}
-
-export interface InsertUserProgress {
-  userId: number;
-  achievementType: string;
-  achievementValue: number;
-  level?: string | null;
-  badge?: string | null;
-  description?: string | null;
-  metadata?: Record<string, any>;
-}
+/*
+  Other domain types (Bill, Stakeholder, etc.) remain defined locally here
+  for now. If you want, we can also import these from shared/schema to
+  centralize everything. I left them in place to minimize risk and scope.
+*/
 
 // Social sharing types
 export interface SocialShare {

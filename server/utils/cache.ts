@@ -1,4 +1,4 @@
-import { logger } from './logger';
+import { logger } from '@shared/core';
 
 // Cache metrics for monitoring
 interface CacheMetrics {
