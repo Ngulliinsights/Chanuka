@@ -55,7 +55,7 @@ export function createDatabaseError(message: string = 'Database operation failed
 }
 
 // Re-export middleware functions
-export { errorHandler } from '../server/middleware/error-handler.js';
+export { errorHandler } from '../core/src/middleware/legacy-adapters/server-middleware-adapter';
 export { asyncHandler as asyncErrorHandler } from '../server/utils/errors.js';
 
 // Placeholder for global error handlers setup

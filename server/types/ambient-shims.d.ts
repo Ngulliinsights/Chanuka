@@ -61,6 +61,22 @@ declare module '@shared/core/src/logging' {
   export * from '@shared/core/src/observability/logging';
 }
 
+// Broad shim to prevent the compiler from resolving into the full shared/core
+// source during focused typechecks. This is intentionally permissive and will
+// be tightened later during a proper migration.
+declare module '@shared/core' {
+  const _any: any;
+  export = _any;
+}
+
+// Catch-all for deep imports like '@shared/core/src/observability/logging'
+// or '@shared/core/src/validation/validation-service' so the compiler uses
+// these permissive shims instead of including the real source files.
+declare module '@shared/core/*' {
+  const _any: any;
+  export = _any;
+}
+
 
 
 

@@ -1,30 +1,31 @@
-import { database as db } from '../shared/database/connection';
-import { notifications, users } from '../../../shared/schema';
-import { eq } from 'drizzle-orm';
+import { database as db, readDatabase } from '../../../shared/database/connection';
+import { notifications, users, userBillTrackingPreference, bill } from '../../../shared/schema';
+import { eq, and } from 'drizzle-orm';
 import { smartNotificationFilterService, type FilterCriteria, type FilterResult } from './smart-notification-filter.js';
 import { notificationChannelService, type ChannelDeliveryRequest, type DeliveryResult } from './notification-channels.js';
-import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
+import { userPreferencesService, type UserNotificationPreferences, type BillTrackingPreferences as GlobalBillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
 import { logger } from '@shared/core/src/observability/logging';
 
 /**
- * Notification Orchestrator Service
+ * Unified Notification Orchestrator Service
  * 
- * Purpose: Coordinates the entire notification workflow by bringing together
- * filtering, batching, scheduling, and channel delivery.
+ * Purpose: Coordinates the complete notification workflow by integrating filtering,
+ * batching, scheduling, rate limiting, and multi-channel delivery with support for
+ * both global and per-bill user preferences.
  * 
- * Responsibilities:
+ * Key Responsibilities:
  * - Receive notification requests from application features
- * - Use SmartFilterService to determine if notification should be sent
- * - Manage batching and scheduling based on user preferences
- * - Handle rate limiting to prevent spam
- * - Coordinate delivery across multiple channels via ChannelService
- * - Track delivery status and handle failures
- * - Provide analytics and monitoring
+ * - Apply smart filtering through SmartFilterService
+ * - Manage batching and scheduling based on user preferences (global + per-bill)
+ * - Handle rate limiting to prevent notification spam
+ * - Coordinate multi-channel delivery via ChannelService
+ * - Track delivery status and handle failures with retry logic
+ * - Provide comprehensive analytics and monitoring
  * 
- * This service does NOT:
- * - Make filtering decisions (delegates to SmartFilterService)
- * - Handle channel-specific delivery (delegates to ChannelService)
- * - Store user preferences (uses UserPreferencesService)
+ * Delegation Strategy:
+ * - Filtering decisions → SmartFilterService
+ * - Channel-specific delivery → ChannelService
+ * - User preference storage → UserPreferencesService
  */
 
 // ============================================================================
@@ -33,7 +34,8 @@ import { logger } from '@shared/core/src/observability/logging';
 
 export interface NotificationRequest {
   userId: string;
-  billId?: number;
+  billId?: number; // Deprecated in favor of relatedBillId, maintained for backward compatibility
+  relatedBillId?: number; // Preferred field name for bill association
   category?: string;
   tags?: string[];
   sponsorName?: string;
@@ -129,41 +131,54 @@ interface ServiceMetrics {
   lastProcessedAt?: Date;
 }
 
+/**
+ * Combined preference type that merges global and per-bill settings.
+ * Per-bill settings take precedence when available and active.
+ */
+interface CombinedBillTrackingPreferences extends GlobalBillTrackingPreferences {
+  _perBillSettingsApplied?: boolean; // Internal flag indicating per-bill override was used
+  alertFrequency?: GlobalBillTrackingPreferences['updateFrequency']; // Alias for compatibility
+  alertChannels?: Array<'in_app' | 'email' | 'push' | 'sms'>; // Per-bill channel format
+}
+
 // ============================================================================
 // Main Service Class
 // ============================================================================
 
 export class NotificationOrchestratorService {
-  // Configuration with sensible defaults
+  // Database accessor using read replica when available
+  private get db() { return readDatabase(); }
+
+  // Configuration with sensible defaults that can be overridden
   private readonly config: OrchestratorConfig = {
     rateLimiting: {
-      maxPerHour: 50,
-      maxUrgentPerHour: 10,
-      windowMs: 60 * 60 * 1000 // 1 hour
+      maxPerHour: 50, // Prevents notification fatigue
+      maxUrgentPerHour: 10, // Stricter limit for urgent notifications
+      windowMs: 60 * 60 * 1000 // 1 hour rolling window
     },
     batching: {
-      checkIntervalMs: 60000, // 1 minute
-      maxBatchSize: 10,
-      maxRetries: 3
+      checkIntervalMs: 60000, // Check for due batches every minute
+      maxBatchSize: 10, // Group up to 10 notifications per digest
+      maxRetries: 3 // Retry failed batch deliveries up to 3 times
     },
     processing: {
-      bulkChunkSize: 50,
-      chunkDelayMs: 100,
-      maxConcurrentBatches: 5
+      bulkChunkSize: 50, // Process bulk operations in chunks of 50
+      chunkDelayMs: 100, // Small delay between chunks to prevent overload
+      maxConcurrentBatches: 5 // Limit concurrent batch processing
     },
     cleanup: {
-      rateLimitCleanupIntervalMs: 5 * 60 * 1000, // 5 minutes
-      batchCleanupIntervalMs: 60 * 60 * 1000, // 1 hour
-      failedBatchRetentionMs: 24 * 60 * 60 * 1000 // 24 hours
+      rateLimitCleanupIntervalMs: 5 * 60 * 1000, // Clean expired rate limits every 5 minutes
+      batchCleanupIntervalMs: 60 * 60 * 1000, // Clean old batches every hour
+      failedBatchRetentionMs: 24 * 60 * 60 * 1000 // Keep failed batches for 24 hours
     }
   };
 
-  // State management
+  // In-memory state management
   private batches: Map<string, NotificationBatch> = new Map();
   private rateLimits: Map<string, RateLimitState> = new Map();
-  private processingBatches: Set<string> = new Set(); // Track concurrent batch processing
+  private processingBatches: Set<string> = new Set();
   
-  // Background tasks
+  // Background task handles
   private batchProcessor: ReturnType<typeof setInterval> | null = null;
   private cleanupTasks: ReturnType<typeof setInterval>[] = [];
   
@@ -176,17 +191,18 @@ export class NotificationOrchestratorService {
     totalRetried: 0,
     averageDeliveryTime: 0
   };
-  private deliveryTimes: number[] = [];
+  private deliveryTimes: number[] = []; // Rolling window for average calculation
   
-  // Service state
+  // Service lifecycle state
   private isShuttingDown = false;
 
   constructor(customConfig?: Partial<OrchestratorConfig>) {
-    // Merge custom config with defaults
+    // Deep merge custom configuration with defaults
     if (customConfig) {
       this.config = this.mergeConfig(this.config, customConfig);
     }
 
+    // Initialize background processors
     this.startBatchProcessor();
     this.startCleanupTasks();
     
@@ -201,19 +217,25 @@ export class NotificationOrchestratorService {
   // ============================================================================
 
   /**
-   * Send a notification through the complete orchestration pipeline
+   * Main entry point: Send a notification through the complete orchestration pipeline.
    * 
-   * This is the main entry point for all notification requests.
-   * It handles the complete workflow from filtering to delivery.
+   * This method handles the entire notification lifecycle from validation through delivery:
+   * 1. Validates the request structure
+   * 2. Checks rate limits to prevent spam
+   * 3. Fetches and merges global and per-bill user preferences
+   * 4. Applies smart filtering based on user preferences and content relevance
+   * 5. Determines delivery strategy (immediate vs batched)
+   * 6. Executes delivery or adds to batch queue
+   * 7. Records metrics and updates rate limits
    */
   async sendNotification(request: NotificationRequest): Promise<NotificationResult> {
-    // Prevent new operations during shutdown
+    // Prevent new operations during graceful shutdown
     if (this.isShuttingDown) {
-      return {
-        success: false,
-        filtered: false,
-        batched: false,
-        error: 'Service is shutting down'
+      return { 
+        success: false, 
+        filtered: false, 
+        batched: false, 
+        error: 'Service shutting down' 
       };
     }
 
@@ -227,7 +249,7 @@ export class NotificationOrchestratorService {
         priority: request.priority
       });
 
-      // Step 1: Validate request
+      // Step 1: Validate request structure and required fields
       const validationError = this.validateRequest(request);
       if (validationError) {
         return {
@@ -238,11 +260,11 @@ export class NotificationOrchestratorService {
         };
       }
 
-      // Step 2: Rate limiting check
+      // Step 2: Check rate limits (can be bypassed for critical notifications)
       if (!request.config?.skipFiltering) {
         const rateLimitCheck = this.checkRateLimit(request.userId, request.priority);
         if (!rateLimitCheck.allowed) {
-          logger.warn('Notification rate limit exceeded', {
+          logger.warn('Rate limit exceeded', {
             component: 'NotificationOrchestrator',
             userId: request.userId,
             reason: rateLimitCheck.reason
@@ -256,8 +278,14 @@ export class NotificationOrchestratorService {
         }
       }
 
-      // Step 3: Smart filtering
-      const filterResult = await this.applySmartFiltering(request);
+      // Step 3: Fetch combined preferences (global + per-bill with priority to per-bill)
+      // This ensures we respect both user-wide settings and specific bill tracking preferences
+      const billId = request.relatedBillId ?? request.billId; // Support both field names
+      const combinedPreferences = await this.getCombinedPreferences(request.userId, billId);
+
+      // Step 4: Apply smart filtering using combined preferences
+      // The filter service uses ML/rules to determine notification relevance
+      const filterResult = await this.applySmartFiltering(request, combinedPreferences);
       
       if (!filterResult.shouldNotify) {
         this.metrics.totalFiltered++;
@@ -274,11 +302,12 @@ export class NotificationOrchestratorService {
         };
       }
 
-      // Step 4: Determine delivery strategy (immediate vs batched)
-      const shouldBatch = this.shouldBatchNotification(request, filterResult);
+      // Step 5: Determine delivery strategy based on preferences and notification characteristics
+      const shouldBatch = this.shouldBatchNotification(request, filterResult, combinedPreferences);
 
       if (shouldBatch) {
-        const batchId = await this.addToBatch(request, filterResult);
+        // Add to batch for later digest delivery
+        const batchId = await this.addToBatch(request, filterResult, combinedPreferences);
         this.metrics.totalBatched++;
         
         return {
@@ -289,10 +318,10 @@ export class NotificationOrchestratorService {
         };
       }
 
-      // Step 5: Immediate delivery
-      const deliveryResult = await this.deliverImmediately(request, filterResult);
+      // Step 6: Deliver immediately across appropriate channels
+      const deliveryResult = await this.deliverImmediately(request, filterResult, combinedPreferences);
       
-      // Step 6: Update rate limit counter and metrics
+      // Step 7: Update rate limit counters and record performance metrics
       if (deliveryResult.success) {
         this.updateRateLimit(request.userId, request.priority);
         this.recordDeliveryTime(Date.now() - startTime);
@@ -306,7 +335,7 @@ export class NotificationOrchestratorService {
         component: 'NotificationOrchestrator',
         userId: request.userId,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, error);
       
       return {
         success: false,
@@ -318,9 +347,11 @@ export class NotificationOrchestratorService {
   }
 
   /**
-   * Send notifications to multiple users (bulk operation)
+   * Send notifications to multiple users efficiently.
    * 
-   * Optimized for performance with batching and parallel processing
+   * Optimized for bulk operations with chunking to prevent system overload.
+   * Each notification is processed through the full pipeline independently,
+   * allowing for per-user filtering and preference handling.
    */
   async sendBulkNotification(
     userIds: string[],
@@ -342,14 +373,15 @@ export class NotificationOrchestratorService {
 
     logger.info('Starting bulk notification', {
       component: 'NotificationOrchestrator',
-      totalUsers: userIds.length
+      totalUsers: userIds.length,
+      notificationType: notificationTemplate.notificationType
     });
 
     // Process in chunks to avoid overwhelming the system
     const chunks = this.chunkArray(userIds, this.config.processing.bulkChunkSize);
 
     for (const chunk of chunks) {
-      // Process chunk with Promise.allSettled for better error handling
+      // Use Promise.allSettled to continue processing even if some fail
       const promises = chunk.map(async (userId) => {
         try {
           const request: NotificationRequest = {
@@ -359,6 +391,7 @@ export class NotificationOrchestratorService {
 
           const notificationResult = await this.sendNotification(request);
 
+          // Categorize result for summary
           if (notificationResult.success) {
             if (notificationResult.filtered) {
               result.filtered++;
@@ -385,7 +418,7 @@ export class NotificationOrchestratorService {
 
       await Promise.allSettled(promises);
 
-      // Add small delay between chunks to prevent overwhelming dependent services
+      // Small delay between chunks to prevent service saturation
       if (chunks.length > 1) {
         await this.delay(this.config.processing.chunkDelayMs);
       }
@@ -400,7 +433,8 @@ export class NotificationOrchestratorService {
   }
 
   /**
-   * Get service status and metrics
+   * Get current service status and performance metrics.
+   * Useful for monitoring dashboards and health checks.
    */
   getStatus(): {
     batchesQueued: number;
@@ -419,7 +453,10 @@ export class NotificationOrchestratorService {
   }
 
   /**
-   * Cleanup resources and shutdown gracefully
+   * Gracefully shutdown the service.
+   * 
+   * Ensures all pending batches are processed before stopping.
+   * Should be called during application shutdown to prevent data loss.
    */
   async cleanup(): Promise<void> {
     logger.info('Starting Notification Orchestrator cleanup', {
@@ -434,14 +471,14 @@ export class NotificationOrchestratorService {
       this.batchProcessor = null;
     }
 
-    // Stop cleanup tasks
+    // Stop all cleanup tasks
     this.cleanupTasks.forEach(task => clearInterval(task));
     this.cleanupTasks = [];
 
-    // Process any remaining pending batches
+    // Process any remaining pending batches before shutdown
     await this.processPendingBatches();
 
-    // Clear state
+    // Clear all in-memory state
     this.batches.clear();
     this.rateLimits.clear();
     this.processingBatches.clear();
@@ -457,7 +494,8 @@ export class NotificationOrchestratorService {
   // ============================================================================
 
   /**
-   * Validate notification request for required fields and data integrity
+   * Validate notification request structure and required fields.
+   * Returns error message if validation fails, null if valid.
    */
   private validateRequest(request: NotificationRequest): string | null {
     if (!request.userId || typeof request.userId !== 'string') {
@@ -480,41 +518,218 @@ export class NotificationOrchestratorService {
   }
 
   // ============================================================================
+  // Private Methods - Preferences Management (Core Enhancement)
+  // ============================================================================
+
+  /**
+   * Fetches and intelligently merges global and per-bill preferences.
+   * 
+   * Preference Priority Hierarchy:
+   * 1. Active per-bill settings (highest priority)
+   * 2. Global user preferences
+   * 3. System defaults (fallback)
+   * 
+   * This ensures users can have broad notification settings while still
+   * customizing behavior for specific bills they care about deeply.
+   */
+  private async getCombinedPreferences(
+    userId: string, 
+    billId?: number
+  ): Promise<{ billTracking: CombinedBillTrackingPreferences }> {
+    try {
+      // Fetch global preferences from the user preferences service
+      const globalPrefsContainer = await userPreferencesService.getUserPreferences(userId);
+      const globalBillPrefs = globalPrefsContainer.billTracking;
+
+      // Fetch per-bill preferences if a specific bill is referenced
+      let perBillPrefs: typeof userBillTrackingPreference.$inferSelect | null = null;
+      if (billId) {
+        const [result] = await this.db.select()
+          .from(userBillTrackingPreference)
+          .where(and(
+            eq(userBillTrackingPreference.userId, userId),
+            eq(userBillTrackingPreference.billId, billId)
+          ))
+          .limit(1);
+        perBillPrefs = result || null;
+      }
+
+      // Merge preferences with per-bill settings taking precedence
+      if (perBillPrefs && perBillPrefs.isActive !== false) {
+        // Per-bill settings exist and are active - use them to override global settings
+        const combined: CombinedBillTrackingPreferences = {
+          // Start with global settings as the base
+          ...globalBillPrefs,
+          
+          // Override with per-bill specific settings where they exist
+          trackingTypes: perBillPrefs.trackingTypes ?? globalBillPrefs.trackingTypes,
+          
+          // Map alert frequency from per-bill to global format
+          alertFrequency: (perBillPrefs.alertFrequency as GlobalBillTrackingPreferences['updateFrequency']) 
+            ?? globalBillPrefs.updateFrequency,
+          updateFrequency: (perBillPrefs.alertFrequency as GlobalBillTrackingPreferences['updateFrequency']) 
+            ?? globalBillPrefs.updateFrequency,
+          
+          // Merge channel preferences intelligently
+          alertChannels: perBillPrefs.alertChannels ?? [],
+          notificationChannels: this.mergeChannels(
+            globalBillPrefs.notificationChannels, 
+            perBillPrefs.alertChannels
+          ),
+          
+          // Keep global settings for features not typically overridden per-bill
+          quietHours: globalBillPrefs.quietHours,
+          smartFiltering: globalBillPrefs.smartFiltering,
+          advancedSettings: globalBillPrefs.advancedSettings,
+          
+          // Internal flag for debugging and logging
+          _perBillSettingsApplied: true
+        };
+
+        logger.debug(`Using merged preferences for user ${userId}, bill ${billId}`, {
+          component: 'NotificationOrchestrator',
+          hasPerBillOverrides: true
+        });
+        
+        return { billTracking: combined };
+      } else {
+        // No per-bill settings or they're inactive - use global preferences
+        logger.debug(`Using global preferences for user ${userId}, bill ${billId}`, {
+          component: 'NotificationOrchestrator',
+          hasPerBillOverrides: false
+        });
+        
+        // Create a combined object that maintains type consistency
+        const globalCombined: CombinedBillTrackingPreferences = {
+          ...globalBillPrefs,
+          alertFrequency: globalBillPrefs.updateFrequency,
+          alertChannels: Object.entries(globalBillPrefs.notificationChannels)
+            .filter(([, enabled]) => enabled)
+            .map(([channel]) => {
+              // Map channel names to per-bill format
+              const channelMap: Record<string, 'in_app' | 'email' | 'push' | 'sms'> = {
+                'inApp': 'in_app',
+                'email': 'email',
+                'push': 'push',
+                'sms': 'sms'
+              };
+              return channelMap[channel] || channel as any;
+            }),
+          _perBillSettingsApplied: false
+        };
+        
+        return { billTracking: globalCombined };
+      }
+    } catch (error) {
+      logger.error(`Error fetching combined preferences for user ${userId}, bill ${billId}:`, {
+        component: 'NotificationOrchestrator'
+      }, error);
+      
+      // Return sensible defaults on error to prevent notification failures
+      const defaultPrefs: CombinedBillTrackingPreferences = {
+        statusChanges: true,
+        newComments: true,
+        votingSchedule: true,
+        amendments: true,
+        updateFrequency: 'daily',
+        alertFrequency: 'daily',
+        notificationChannels: { inApp: true, email: false, push: false, sms: false },
+        alertChannels: ['in_app'],
+        quietHours: { enabled: false, start: '22:00', end: '08:00' },
+        smartFiltering: { enabled: true, priorityThreshold: 'low' },
+        advancedSettings: {
+          batchingRules: {
+            similarUpdatesGrouping: true,
+            maxBatchSize: this.config.batching.maxBatchSize,
+            batchTimeWindow: 30
+          }
+        },
+        _perBillSettingsApplied: false
+      };
+      
+      return { billTracking: defaultPrefs };
+    }
+  }
+
+  /**
+   * Intelligently merge global and per-bill channel settings.
+   * 
+   * If per-bill channels are specified, they completely override global settings
+   * for that bill. This gives users fine-grained control without complex merging logic.
+   */
+  private mergeChannels(
+    globalChannels: GlobalBillTrackingPreferences['notificationChannels'],
+    perBillChannels?: Array<'in_app' | 'email' | 'push' | 'sms'> | null
+  ): GlobalBillTrackingPreferences['notificationChannels'] {
+    if (!perBillChannels || perBillChannels.length === 0) {
+      return globalChannels; // Use global settings if no per-bill override
+    }
+
+    // Create channel object from per-bill array
+    const merged: GlobalBillTrackingPreferences['notificationChannels'] = {
+      inApp: false,
+      email: false,
+      push: false,
+      sms: false
+    };
+
+    // Enable channels specified in per-bill settings
+    perBillChannels.forEach(channel => {
+      if (channel === 'in_app') merged.inApp = true;
+      else if (channel === 'email') merged.email = true;
+      else if (channel === 'push') merged.push = true;
+      else if (channel === 'sms') merged.sms = true;
+    });
+
+    return merged;
+  }
+
+  // ============================================================================
   // Private Methods - Filtering
   // ============================================================================
 
   /**
-   * Apply smart filtering using the filter service
+   * Apply smart filtering using the filter service with combined preferences.
+   * 
+   * The filter service uses ML models and business rules to determine if a
+   * notification should be sent based on content relevance, user behavior patterns,
+   * and explicit user preferences.
    */
-  private async applySmartFiltering(request: NotificationRequest): Promise<FilterResult> {
-    // Skip filtering for critical notifications if configured
+  private async applySmartFiltering(
+    request: NotificationRequest,
+    combinedPrefs: { billTracking: CombinedBillTrackingPreferences }
+  ): Promise<FilterResult> {
+    // Allow critical notifications to bypass filtering
     if (request.config?.skipFiltering) {
       return {
         shouldNotify: true,
         confidence: 1.0,
         reasons: ['Filtering bypassed'],
         suggestedPriority: request.priority,
-        recommendedChannels: request.config.channels || ['inApp', 'email'],
+        recommendedChannels: request.config.channels || ['inApp'],
         shouldBatch: false
       };
     }
 
+    // Prepare criteria for filter service, including merged preferences
+    const billId = request.relatedBillId ?? request.billId;
     const filterCriteria: FilterCriteria = {
       userId: request.userId,
-      billId: request.billId,
+      billId: billId,
       category: request.category,
       tags: request.tags,
       sponsorName: request.sponsorName,
       priority: request.priority,
       notificationType: request.notificationType,
       subType: request.subType,
-      content: request.content
+      content: request.content,
+      userPreferences: combinedPrefs.billTracking // Pass merged preferences to filter
     };
 
     try {
       return await smartNotificationFilterService.shouldSendNotification(filterCriteria);
     } catch (error) {
-      // If filtering service fails, default to allowing notification but log error
+      // Fail open: if filtering fails, allow notification but log the error
       logger.error('Smart filtering service error, allowing notification:', {
         component: 'NotificationOrchestrator',
         userId: request.userId
@@ -536,99 +751,168 @@ export class NotificationOrchestratorService {
   // ============================================================================
 
   /**
-   * Determine if notification should be batched or sent immediately
+   * Determine if notification should be batched based on multiple factors.
+   * 
+   * Batching Decision Hierarchy:
+   * 1. Never batch urgent or forced immediate notifications
+   * 2. Never batch digest notifications (already batched)
+   * 3. Check user's update frequency preference
+   * 4. Consider filter service recommendations
    */
   private shouldBatchNotification(
     request: NotificationRequest,
-    filterResult: FilterResult
+    filterResult: FilterResult,
+    combinedPrefs: { billTracking: CombinedBillTrackingPreferences }
   ): boolean {
-    // Never batch urgent notifications or forced immediate
+    // Rule 1: Never batch urgent or explicitly immediate notifications
     if (request.priority === 'urgent' || request.config?.forceImmediate) {
       return false;
     }
 
-    // Never batch digest notifications (they're already batched)
+    // Rule 2: Never batch digest notifications (they're already aggregated)
     if (request.notificationType === 'digest') {
       return false;
     }
 
-    // Use filter service recommendation
-    return filterResult.shouldBatch;
+    // Rule 3: Check user's preferred update frequency
+    const frequency = combinedPrefs.billTracking.alertFrequency 
+      ?? combinedPrefs.billTracking.updateFrequency;
+    if (frequency === 'immediate') {
+      return false;
+    }
+
+    // Rule 4: Default to batching for non-immediate frequencies
+    return true;
   }
 
   /**
-   * Deliver notification immediately across appropriate channels
+   * Deliver notification immediately across appropriate channels.
+   * 
+   * Channel Selection Logic:
+   * 1. Start with channels enabled in user preferences
+   * 2. Intersect with filter service recommendations
+   * 3. Allow request config to override if specified
+   * 4. Implement retry logic with exponential backoff
    */
   private async deliverImmediately(
     request: NotificationRequest,
-    filterResult: FilterResult
+    filterResult: FilterResult,
+    combinedPrefs: { billTracking: CombinedBillTrackingPreferences }
   ): Promise<NotificationResult> {
     try {
-      // Determine channels to use
-      const channels = request.config?.channels || filterResult.recommendedChannels;
+      // Determine target channels through multi-step process
+      let targetChannels: Array<keyof GlobalBillTrackingPreferences['notificationChannels']> = [];
 
-      if (channels.length === 0) {
+      // Get channels enabled in user preferences
+      const enabledInPrefs: Array<keyof GlobalBillTrackingPreferences['notificationChannels']> =
+        Object.entries(combinedPrefs.billTracking.notificationChannels)
+          .filter(([, enabled]) => enabled)
+          .map(([channel]) => channel as keyof GlobalBillTrackingPreferences['notificationChannels']);
+
+      // Get channels recommended by filter service
+      const recommendedByFilter = filterResult.recommendedChannels as Array<keyof GlobalBillTrackingPreferences['notificationChannels']>;
+
+      // Intersect user preferences with filter recommendations for optimal delivery
+      if (filterResult.reasons.includes('Filtering bypassed') || 
+          filterResult.reasons.includes('Filtering service unavailable')) {
+        targetChannels = enabledInPrefs; // Use all enabled if filter didn't run
+      } else {
+        // Use channels that are BOTH enabled by user AND recommended by filter
+        targetChannels = enabledInPrefs.filter(ch => recommendedByFilter.includes(ch));
+      }
+
+      // Allow request config to completely override channel selection
+      if (request.config?.channels) {
+        targetChannels = request.config.channels as Array<keyof GlobalBillTrackingPreferences['notificationChannels']>;
+      }
+
+      // Validate we have at least one delivery channel
+      if (targetChannels.length === 0) {
+        logger.warn(`No active delivery channels for user ${request.userId}`, {
+          component: 'NotificationOrchestrator'
+        });
         return {
           success: false,
           filtered: true,
-          filterReason: 'No delivery channels available',
+          filterReason: 'No active/recommended delivery channels',
           batched: false
         };
       }
 
-      // Create channel delivery requests with retry logic
+      // Execute delivery across all target channels with retry logic
       const deliveryResults: DeliveryResult[] = [];
-      const maxRetries = request.config?.retryOnFailure ? 2 : 0;
+      const maxRetries = request.config?.retryOnFailure ? this.config.batching.maxRetries : 0;
+      const billId = request.relatedBillId ?? request.billId;
 
-      for (const channel of channels) {
+      for (const channel of targetChannels) {
         const channelRequest: ChannelDeliveryRequest = {
           userId: request.userId,
-          channel,
+          channel: channel,
           content: request.content,
           metadata: {
-            priority: request.priority,
-            relatedBillId: request.metadata?.relatedBillId,
+            priority: filterResult.suggestedPriority || request.priority,
+            relatedBillId: billId,
             category: request.category,
             actionUrl: request.metadata?.actionUrl,
             ...request.metadata
           }
         };
 
-        // Attempt delivery with retries
-        let result = await notificationChannelService.sendToChannel(channelRequest);
-        let retryCount = 0;
+        // Retry loop with exponential backoff
+        let attempt = 0;
+        let result: DeliveryResult | null = null;
+        
+        while (attempt <= maxRetries) {
+          try {
+            result = await notificationChannelService.sendToChannel(channelRequest);
+            if (result.success) break; // Success - exit retry loop
+          } catch (channelError) {
+            logger.error(`Error sending to channel ${channel} (Attempt ${attempt + 1})`, {
+              component: 'NotificationOrchestrator',
+              userId: request.userId
+            }, channelError);
+            result = {
+              success: false,
+              channel: channel,
+              error: channelError instanceof Error ? channelError.message : String(channelError)
+            };
+          }
 
-        while (!result.success && retryCount < maxRetries) {
-          retryCount++;
-          this.metrics.totalRetried++;
-          logger.warn('Retrying channel delivery', {
-            component: 'NotificationOrchestrator',
-            channel,
-            attempt: retryCount + 1
-          });
-          
-          await this.delay(1000 * retryCount); // Exponential backoff
-          result = await notificationChannelService.sendToChannel(channelRequest);
+          attempt++;
+          if (attempt <= maxRetries) {
+            this.metrics.totalRetried++;
+            const delayMs = Math.pow(2, attempt - 1) * 1000; // Exponential backoff: 1s, 2s, 4s
+            logger.warn(`Retrying channel ${channel} delivery in ${delayMs}ms (${attempt}/${maxRetries})`, {
+              component: 'NotificationOrchestrator',
+              userId: request.userId
+            });
+            await this.delay(delayMs);
+          }
         }
 
-        deliveryResults.push(result);
+        deliveryResults.push(result ?? {
+          success: false,
+          channel: channel,
+          error: 'Max retries exceeded'
+        });
       }
 
-      // Determine overall success
+      // Determine overall delivery success
       const allSucceeded = deliveryResults.every(r => r.success);
       const anySucceeded = deliveryResults.some(r => r.success);
 
-      if (allSucceeded) {
+      // Update metrics based on results
+      if (anySucceeded) {
         this.metrics.totalSent++;
-      } else if (!anySucceeded) {
+      } else {
         this.metrics.totalFailed++;
       }
 
-      logger.info('Immediate delivery completed', {
+      logger.info('Immediate delivery processed', {
         component: 'NotificationOrchestrator',
         userId: request.userId,
-        channels: deliveryResults.map(r => ({ channel: r.channel, success: r.success })),
-        overallSuccess: allSucceeded
+        results: deliveryResults.map(r => ({ channel: r.channel, success: r.success })),
+        overallSuccess: anySucceeded
       });
 
       return {
@@ -640,11 +924,11 @@ export class NotificationOrchestratorService {
       };
 
     } catch (error) {
-      logger.error('Error in immediate delivery:', {
+      logger.error('Unhandled error during immediate delivery:', {
         component: 'NotificationOrchestrator',
         userId: request.userId
       }, error);
-
+      
       return {
         success: false,
         filtered: false,
@@ -659,24 +943,30 @@ export class NotificationOrchestratorService {
   // ============================================================================
 
   /**
-   * Add notification to batch for later delivery
+   * Add notification to appropriate batch for later digest delivery.
+   * 
+   * Batches are organized by user and frequency to ensure notifications
+   * are grouped appropriately. Batches can be triggered early if they reach
+   * maximum size before the scheduled delivery time.
    */
   private async addToBatch(
     request: NotificationRequest,
-    filterResult: FilterResult
+    filterResult: FilterResult,
+    combinedPrefs: { billTracking: CombinedBillTrackingPreferences }
   ): Promise<string> {
-    // Get user preferences to determine batch schedule
-    const preferences = await this.getUserPreferences(request.userId);
-    const batchKey = this.getBatchKey(request.userId, preferences);
+    // Determine batch frequency from merged preferences
+    const frequency = combinedPrefs.billTracking.alertFrequency 
+      ?? combinedPrefs.billTracking.updateFrequency;
+    const batchKey = this.getBatchKey(request.userId, frequency);
 
+    // Get or create batch
     let batch = this.batches.get(batchKey);
-
     if (!batch) {
       batch = {
         id: batchKey,
         userId: request.userId,
         notifications: [],
-        scheduledFor: this.calculateBatchSchedule(preferences),
+        scheduledFor: this.calculateBatchSchedule(frequency),
         createdAt: new Date(),
         status: 'pending',
         retryCount: 0
@@ -684,27 +974,30 @@ export class NotificationOrchestratorService {
       this.batches.set(batchKey, batch);
     }
 
-    // Add to batch
+    // Add notification to batch
     batch.notifications.push(request);
 
     logger.info('Added notification to batch', {
       component: 'NotificationOrchestrator',
       batchId: batch.id,
       batchSize: batch.notifications.length,
-      scheduledFor: batch.scheduledFor
+      scheduledFor: batch.scheduledFor.toISOString()
     });
 
-    // Check if batch should be sent early (e.g., reached max size)
-    const maxBatchSize = preferences.billTracking.advancedSettings?.batchingRules?.maxBatchSize 
+    // Check if batch should be processed early due to size
+    const maxBatchSize = combinedPrefs.billTracking.advancedSettings?.batchingRules?.maxBatchSize
       || this.config.batching.maxBatchSize;
-    
+
     if (batch.notifications.length >= maxBatchSize) {
+      logger.info(`Batch ${batch.id} reached max size, processing early`, {
+        component: 'NotificationOrchestrator'
+      });
+      
       // Process batch asynchronously without blocking
-      this.processBatch(batch).catch(error => {
-        logger.error('Background batch processing failed:', {
-          component: 'NotificationOrchestrator',
-          batchId: batch.id
-        }, error);
+      this.processBatch(batch).catch(err => {
+        logger.error(`Error processing full batch ${batch.id}:`, {
+          component: 'NotificationOrchestrator'
+        }, err);
       });
     }
 
@@ -712,10 +1005,14 @@ export class NotificationOrchestratorService {
   }
 
   /**
-   * Process a batch by creating and sending a digest notification
+   * Process a batch by creating and sending a digest notification.
+   * 
+   * Important: Fetches CURRENT preferences at delivery time to ensure
+   * digest uses the latest user settings (e.g., if user disabled email
+   * after batch was created).
    */
   private async processBatch(batch: NotificationBatch): Promise<void> {
-    // Check if already processing or completed
+    // Prevent duplicate processing
     if (batch.status !== 'pending' || this.processingBatches.has(batch.id)) {
       return;
     }
@@ -739,7 +1036,10 @@ export class NotificationOrchestratorService {
         notificationCount: batch.notifications.length
       });
 
-      // Create digest content
+      // Fetch CURRENT preferences (not cached) for accurate delivery channel selection
+      const currentCombinedPrefs = await this.getCombinedPreferences(batch.userId);
+
+      // Create digest content from all batched notifications
       const digestContent = this.createDigestContent(batch.notifications);
 
       // Create digest notification request
@@ -754,58 +1054,94 @@ export class NotificationOrchestratorService {
           hasUrgent: batch.notifications.some(n => n.priority === 'urgent')
         },
         config: {
-          forceImmediate: true,
-          skipFiltering: true
+          forceImmediate: true, // Digests are always delivered immediately
+          skipFiltering: true // Digests bypass filtering (already filtered)
         }
       };
 
-      // Send digest
-      const result = await this.sendNotification(digestRequest);
+      // Create filter result for digest delivery using current channel preferences
+      const digestFilterResult: FilterResult = {
+        shouldNotify: true,
+        recommendedChannels: Object.entries(currentCombinedPrefs.billTracking.notificationChannels)
+          .filter(([, enabled]) => enabled)
+          .map(([channel]) => channel) as any,
+        shouldBatch: false,
+        reasons: ['Digest Delivery'],
+        confidence: 1.0,
+        suggestedPriority: 'medium'
+      };
+
+      // Send digest using current preferences
+      const result = await this.deliverImmediately(
+        digestRequest,
+        digestFilterResult,
+        currentCombinedPrefs
+      );
 
       if (result.success) {
         batch.status = 'sent';
         this.batches.delete(batch.id);
-        logger.info('Batch processed successfully', {
+        logger.info('Batch processed and sent successfully', {
           component: 'NotificationOrchestrator',
           batchId: batch.id
         });
       } else {
+        // Handle failure with retry logic
         batch.status = 'failed';
-        batch.lastError = result.error;
+        batch.lastError = result.error || 'Digest delivery failed';
         batch.retryCount = (batch.retryCount || 0) + 1;
-        
-        // Retry logic for failed batches
+
         if (batch.retryCount < this.config.batching.maxRetries) {
           batch.status = 'pending';
-          batch.scheduledFor = new Date(Date.now() + 5 * 60 * 1000); // Retry in 5 minutes
-          logger.warn('Batch processing failed, scheduled for retry', {
+          // Exponential backoff for retries (in minutes)
+          batch.scheduledFor = new Date(
+            Date.now() + Math.pow(2, batch.retryCount) * 60 * 1000
+          );
+          logger.warn(`Batch processing failed, scheduled for retry at ${batch.scheduledFor.toISOString()}`, {
             component: 'NotificationOrchestrator',
             batchId: batch.id,
             retryCount: batch.retryCount
           });
         } else {
-          logger.error('Batch processing failed after max retries', {
+          logger.error(`Batch processing failed after max retries, discarding`, {
             component: 'NotificationOrchestrator',
             batchId: batch.id,
-            error: result.error
+            error: batch.lastError
           });
+          this.batches.delete(batch.id);
         }
       }
-
     } catch (error) {
+      // Handle unexpected errors during batch processing
       batch.status = 'failed';
       batch.lastError = error instanceof Error ? error.message : String(error);
-      logger.error('Error processing batch:', {
-        component: 'NotificationOrchestrator',
-        batchId: batch.id
-      }, error);
+      batch.retryCount = (batch.retryCount || 0) + 1;
+
+      if (batch.retryCount < this.config.batching.maxRetries) {
+        batch.status = 'pending';
+        batch.scheduledFor = new Date(Date.now() + 5 * 60 * 1000); // Retry in 5 minutes
+        logger.warn(`Unexpected error processing batch, scheduled for retry`, {
+          component: 'NotificationOrchestrator',
+          batchId: batch.id,
+          retryCount: batch.retryCount
+        }, error);
+      } else {
+        logger.error('Unexpected error processing batch after max retries, discarding', {
+          component: 'NotificationOrchestrator',
+          batchId: batch.id
+        }, error);
+        this.batches.delete(batch.id);
+      }
     } finally {
       this.processingBatches.delete(batch.id);
     }
   }
 
   /**
-   * Create digest content from multiple notifications
+   * Create digest content from multiple notifications.
+   * 
+   * Groups notifications by type and creates both plain text and HTML versions.
+   * Limits individual type sections to 5 items to keep digests readable.
    */
   private createDigestContent(notifications: NotificationRequest[]): {
     title: string;
@@ -815,7 +1151,7 @@ export class NotificationOrchestratorService {
     const count = notifications.length;
     const categories = this.groupBy(notifications, 'notificationType');
 
-    // Text message
+    // Build plain text message
     let message = `You have ${count} new ${count === 1 ? 'notification' : 'notifications'}:\n\n`;
     
     for (const [type, items] of Object.entries(categories)) {
@@ -829,8 +1165,8 @@ export class NotificationOrchestratorService {
       message += '\n';
     }
 
-    // HTML message
-    let htmlMessage = `<h2>Your Notification Digest</h2>`;
+    // Build HTML message with better formatting
+    let htmlMessage = `<h2>Your Legislative Update Digest</h2>`;
     htmlMessage += `<p>You have ${count} new ${count === 1 ? 'notification' : 'notifications'}:</p>`;
     
     for (const [type, items] of Object.entries(categories)) {
@@ -859,13 +1195,16 @@ export class NotificationOrchestratorService {
   // ============================================================================
 
   /**
-   * Check if notification would exceed rate limits
+   * Check if notification would exceed rate limits.
+   * 
+   * Implements sliding window rate limiting with separate counters for
+   * urgent notifications to prevent abuse while allowing critical updates.
    */
   private checkRateLimit(userId: string, priority: string): { allowed: boolean; reason?: string } {
     const now = Date.now();
     let limitState = this.rateLimits.get(userId);
 
-    // Initialize or reset if window expired
+    // Initialize or reset if time window expired
     if (!limitState || now > limitState.resetTime) {
       limitState = {
         count: 0,
@@ -876,7 +1215,7 @@ export class NotificationOrchestratorService {
       this.rateLimits.set(userId, limitState);
     }
 
-    // Check general limit
+    // Check general notification limit
     if (limitState.count >= this.config.rateLimiting.maxPerHour) {
       return {
         allowed: false,
@@ -884,7 +1223,7 @@ export class NotificationOrchestratorService {
       };
     }
 
-    // Check urgent limit
+    // Check urgent notification limit (more restrictive)
     if (priority === 'urgent' && limitState.urgentCount >= this.config.rateLimiting.maxUrgentPerHour) {
       return {
         allowed: false,
@@ -896,7 +1235,7 @@ export class NotificationOrchestratorService {
   }
 
   /**
-   * Update rate limit counters after successful delivery
+   * Update rate limit counters after successful delivery.
    */
   private updateRateLimit(userId: string, priority: string): void {
     const limitState = this.rateLimits.get(userId);
@@ -914,7 +1253,9 @@ export class NotificationOrchestratorService {
   // ============================================================================
 
   /**
-   * Start batch processor that checks for due batches periodically
+   * Start periodic batch processor.
+   * 
+   * Runs at configured intervals to check for batches that are due for delivery.
    */
   private startBatchProcessor(): void {
     if (this.batchProcessor) {
@@ -934,7 +1275,9 @@ export class NotificationOrchestratorService {
   }
 
   /**
-   * Process all batches that are due for delivery
+   * Process all batches that are due for delivery.
+   * 
+   * Respects concurrent processing limits to prevent system overload.
    */
   private async processScheduledBatches(): Promise<void> {
     const now = new Date();
@@ -953,7 +1296,7 @@ export class NotificationOrchestratorService {
       count: dueBatches.length
     });
 
-    // Process batches respecting concurrency limit
+    // Process batches with concurrency control
     for (const batch of dueBatches) {
       // Wait if at concurrent processing limit
       while (this.processingBatches.size >= this.config.processing.maxConcurrentBatches) {
@@ -971,7 +1314,9 @@ export class NotificationOrchestratorService {
   }
 
   /**
-   * Process all pending batches during shutdown
+   * Process all pending batches during graceful shutdown.
+   * 
+   * Ensures no batches are lost when the service stops.
    */
   private async processPendingBatches(): Promise<void> {
     const pendingBatches = Array.from(this.batches.values()).filter(
@@ -987,14 +1332,17 @@ export class NotificationOrchestratorService {
       count: pendingBatches.length
     });
 
-    // Process all pending batches
+    // Process all pending batches in parallel
     await Promise.allSettled(
       pendingBatches.map(batch => this.processBatch(batch))
     );
   }
 
   /**
-   * Start cleanup tasks for expired data
+   * Start cleanup tasks for expired data.
+   * 
+   * Periodically removes expired rate limits and old failed batches
+   * to prevent unbounded memory growth.
    */
   private startCleanupTasks(): void {
     // Clean expired rate limits
@@ -1017,7 +1365,7 @@ export class NotificationOrchestratorService {
       }
     }, this.config.cleanup.rateLimitCleanupIntervalMs);
 
-    // Clean failed batches
+    // Clean old failed batches
     const batchCleanup = setInterval(() => {
       const cutoffTime = new Date(Date.now() - this.config.cleanup.failedBatchRetentionMs);
       let cleaned = 0;
@@ -1045,87 +1393,80 @@ export class NotificationOrchestratorService {
   // ============================================================================
 
   /**
-   * Get user preferences with fallback defaults
+   * Generate unique batch key based on user and frequency.
+   * 
+   * Creates time-based keys that ensure notifications are grouped
+   * appropriately for the user's preferred delivery frequency.
    */
-  private async getUserPreferences(userId: string): Promise<{ billTracking: BillTrackingPreferences }> {
-    try {
-      return await userPreferencesService.getUserPreferences(userId);
-    } catch (error) {
-      logger.warn('Error getting user preferences, using defaults:', {
-        component: 'NotificationOrchestrator',
-        userId
-      });
+  private getBatchKey(
+    userId: string, 
+    frequency: GlobalBillTrackingPreferences['updateFrequency']
+  ): string {
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const hourStr = String(now.getHours()).padStart(2, '0');
+
+    switch (frequency) {
+      case 'daily':
+        return `${userId}-daily-${dateStr}`;
+      case 'hourly':
+        return `${userId}-hourly-${dateStr}-${hourStr}`;
+      case 'immediate':
+      default:
+        // Create 5-minute windows for immediate notifications to enable debouncing
+        const minuteWindow = Math.floor(now.getMinutes() / 5) * 5;
+        return `${userId}-immediate-${dateStr}-${hourStr}-${String(minuteWindow).padStart(2, '0')}`;
+    }
+  }
+
+  /**
+   * Calculate when a batch should be sent based on frequency.
+   * 
+   * Schedules batches at user-friendly times (e.g., 9 AM for daily digests)
+   * rather than arbitrary intervals.
+   */
+  private calculateBatchSchedule(
+    frequency: GlobalBillTrackingPreferences['updateFrequency']
+  ): Date {
+    const now = new Date();
+
+    switch (frequency) {
+      case 'daily':
+        // Schedule for next 9 AM (or tomorrow if past 9 AM today)
+        const scheduleDateDaily = new Date(now);
+        scheduleDateDaily.setHours(9, 0, 0, 0);
+        if (now.getHours() >= 9) {
+          scheduleDateDaily.setDate(scheduleDateDaily.getDate() + 1);
+        }
+        return scheduleDateDaily;
       
-      // Return sensible defaults if preferences service fails
-      return {
-        billTracking: {
-          statusChanges: true,
-          newComments: true,
-          votingSchedule: true,
-          amendments: true,
-          updateFrequency: 'daily',
-          notificationChannels: { inApp: true, email: false, push: false, sms: false },
-          smartFiltering: { enabled: false, priorityThreshold: 'low' },
-          advancedSettings: {
-            batchingRules: { 
-              similarUpdatesGrouping: true, 
-              maxBatchSize: this.config.batching.maxBatchSize, 
-              batchTimeWindow: 30 
-            }
-          }
-        } as BillTrackingPreferences
-      };
+      case 'hourly':
+        // Schedule for the start of the next hour
+        return new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          now.getHours() + 1,
+          0, 0, 0
+        );
+      
+      case 'immediate':
+      default:
+        // Schedule for 5 minutes from now (debouncing window)
+        return new Date(now.getTime() + 5 * 60 * 1000);
     }
   }
 
   /**
-   * Generate unique batch key based on user and frequency
-   */
-  private getBatchKey(userId: string, preferences: { billTracking: BillTrackingPreferences }): string {
-    const frequency = preferences.billTracking.updateFrequency;
-    const now = new Date();
-    
-    switch (frequency) {
-      case 'daily':
-        return `${userId}-${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
-      case 'weekly':
-        const weekNum = Math.floor(now.getDate() / 7);
-        return `${userId}-${now.getFullYear()}-${now.getMonth()}-week${weekNum}`;
-      default: // hourly or immediate
-        return `${userId}-${now.getHours()}`;
-    }
-  }
-
-  /**
-   * Calculate when a batch should be sent based on user preferences
-   */
-  private calculateBatchSchedule(preferences: { billTracking: BillTrackingPreferences }): Date {
-    const now = new Date();
-    const frequency = preferences.billTracking.updateFrequency;
-
-    switch (frequency) {
-      case 'daily':
-        const tomorrow = new Date(now);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(9, 0, 0, 0); // Send at 9 AM
-        return tomorrow;
-      case 'weekly':
-        const nextWeek = new Date(now);
-        nextWeek.setDate(nextWeek.getDate() + (7 - nextWeek.getDay())); // Next Sunday
-        nextWeek.setHours(9, 0, 0, 0);
-        return nextWeek;
-      default: // hourly
-        return new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
-    }
-  }
-
-  /**
-   * Record delivery time for metrics
+   * Record delivery time for performance metrics.
+   * 
+   * Maintains a rolling window of delivery times to calculate
+   * average performance without unbounded memory growth.
    */
   private recordDeliveryTime(timeMs: number): void {
     this.deliveryTimes.push(timeMs);
     
-    // Keep only last 1000 delivery times to prevent unbounded growth
+    // Keep only last 1000 measurements
     if (this.deliveryTimes.length > 1000) {
       this.deliveryTimes.shift();
     }
@@ -1137,7 +1478,7 @@ export class NotificationOrchestratorService {
   }
 
   /**
-   * Merge custom configuration with defaults
+   * Deep merge custom configuration with defaults.
    */
   private mergeConfig(
     defaults: OrchestratorConfig,
@@ -1152,7 +1493,7 @@ export class NotificationOrchestratorService {
   }
 
   /**
-   * Split array into chunks
+   * Split array into chunks of specified size.
    */
   private chunkArray<T>(array: T[], size: number): T[][] {
     const chunks: T[][] = [];
@@ -1163,7 +1504,7 @@ export class NotificationOrchestratorService {
   }
 
   /**
-   * Group array elements by a key
+   * Group array elements by a key.
    */
   private groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
     return array.reduce((groups, item) => {
@@ -1177,7 +1518,7 @@ export class NotificationOrchestratorService {
   }
 
   /**
-   * Get human-readable label for notification type
+   * Get human-readable label for notification type.
    */
   private getTypeLabel(type: string): string {
     const labels: Record<string, string> = {
@@ -1191,7 +1532,7 @@ export class NotificationOrchestratorService {
   }
 
   /**
-   * Delay utility for rate limiting and backoff
+   * Async delay utility for rate limiting and backoff strategies.
    */
   private delay(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -1202,41 +1543,10 @@ export class NotificationOrchestratorService {
 // Export Singleton Instance
 // ============================================================================
 
+/**
+ * Singleton instance of the notification orchestrator service.
+ * 
+ * Use this instance throughout the application for consistent notification
+ * handling and shared state management.
+ */
 export const notificationOrchestratorService = new NotificationOrchestratorService();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

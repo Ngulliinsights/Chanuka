@@ -1,764 +1,359 @@
-import { eq, and, desc, sql } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { databaseService } from '../../infrastructure/database/database-service.js';
 import { readDatabase } from '../../db.js';
 import { webSocketService } from '../../infrastructure/websocket.js';
-import { userProfileService } from '../users/domain/user-profile.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service.js';
 import * as schema from '../../../shared/schema';
 import { Bill } from '../../../shared/schema';
-import { logger } from '../../utils/logger';
+import { logger } from '../../utils/logger.js';
+// Import the orchestrator to trigger notifications
+import { notificationOrchestratorService, NotificationRequest } from '../../infrastructure/notifications/notification-orchestrator.js';
 
+// --- Interface Definitions ---
+// Describes a change in a bill's status
 export interface BillStatusChange {
   billId: number;
-  oldStatus: string;
-  newStatus: string;
-  timestamp: Date;
-  triggeredBy?: string;
+  oldStatus: string; // Previous status (e.g., 'introduced')
+  newStatus: string; // New status (e.g., 'committee')
+  timestamp: Date; // When the change occurred
+  triggeredBy?: string; // Identifier for the cause ('system', user ID, etc.)
   metadata?: {
-    reason?: string;
-    automaticChange?: boolean;
-    scheduledChange?: boolean;
+    reason?: string; // Optional reason for the change
+    automaticChange?: boolean; // Flag if system-driven
+    scheduledChange?: boolean; // Flag if part of a scheduled process
   };
 }
 
+// Describes a user engagement event on a bill
 export interface BillEngagementUpdate {
   billId: number;
-  type: 'view' | 'comment' | 'share';
-  userId: string;
-  timestamp: Date;
-  newStats: {
+  type: 'view' | 'comment' | 'share'; // Type of engagement
+  userId: string; // User who performed the action
+  timestamp: Date; // When the engagement occurred
+  commentId?: number; // ID if the engagement was a comment
+  newStats: { // Overall bill stats *after* this engagement
     totalViews: number;
     totalComments: number;
     totalShares: number;
-    engagementScore: number;
-  };
-}
-
-export interface NotificationPreferences {
-  statusChanges: boolean;
-  newComments: boolean;
-  votingSchedule: boolean;
-  amendments: boolean;
-  updateFrequency: 'immediate' | 'hourly' | 'daily';
-  notificationChannels: {
-    inApp: boolean;
-    email: boolean;
-    push: boolean;
-  };
-  quietHours?: {
-    enabled: boolean;
-    startTime: string;
-    endTime: string;
+    engagementScore: number; // Assuming numeric representation here
   };
 }
 
 /**
  * Real-Time Bill Status Monitoring Service
- * Handles bill status change detection, notification triggers, and user preference filtering
+ *
+ * Responsibilities:
+ * - Detects significant bill events (status changes, engagement).
+ * - Caches recent status change history.
+ * - Broadcasts real-time updates via WebSockets.
+ * - Triggers the NotificationOrchestratorService to handle user notifications based on preferences.
+ *
+ * Note: This service *does not* handle notification preferences, batching, or delivery itself.
  */
 export class BillStatusMonitorService {
-  // Resolve DB lazily using the central accessor to prevent auto-init side-effects
   private get db() {
+    // Provides access to the read replica database connection
     return readDatabase();
   }
-  private statusChangeListeners: Map<number, Set<string>> = new Map();
-  private batchedNotifications: Map<string, Array<{
-    billId: number;
-    type: string;
-    data: any;
-    timestamp: Date;
-  }>> = new Map();
-  private batchInterval: NodeJS.Timeout | null = null;
-
-  constructor() {
-    this.initializeBatchProcessing();
-  }
 
   /**
-   * Initialize batch processing for notifications
-   */
-  private initializeBatchProcessing() {
-    // Process batched notifications every 5 minutes for non-immediate users
-    this.batchInterval = setInterval(() => {
-      this.processBatchedNotifications();
-    }, 5 * 60 * 1000); // 5 minutes
-  }
-
-  /**
-   * Monitor bill status change and trigger notifications
+   * Processes a detected bill status change.
+   * Updates cache, broadcasts WebSocket message, and triggers notifications via orchestrator.
    */
   async handleBillStatusChange(change: BillStatusChange): Promise<void> {
-    try {
-      console.log(`📊 Processing bill status change: Bill ${change.billId} from ${change.oldStatus} to ${change.newStatus}`);
+    const logContext = { component: 'BillStatusMonitorService', billId: change.billId, oldStatus: change.oldStatus, newStatus: change.newStatus };
+    logger.info(`📊 Processing bill status change`, logContext);
 
-      // Get bill details
+    try {
+      // 1. Fetch Essential Bill Details (Title, Category) for context
       const bill = await this.getBillDetails(change.billId);
       if (!bill) {
-        console.error(`Bill ${change.billId} not found`);
-        return;
+        logger.error(`Bill ${change.billId} not found during status change processing.`, logContext);
+        return; // Cannot proceed without bill context
       }
 
-      // Get all users subscribed to this bill
-      const subscribers = await this.getBillSubscribers(change.billId);
-      console.log(`📢 Found ${subscribers.length} subscribers for bill ${change.billId}`);
+      // 2. Cache the Status Change Event for historical lookups
+      await this.cacheStatusChange(change);
 
-      // Process notifications for each subscriber based on their preferences
-      for (const subscriber of subscribers) {
-        await this.processSubscriberNotification(subscriber, change, bill);
-      }
-
-      // Broadcast real-time update via WebSocket
+      // 3. Broadcast WebSocket Update to all connected clients viewing this bill
       webSocketService.broadcastBillUpdate(change.billId, {
         type: 'status_change',
         data: {
           billId: change.billId,
-          billTitle: bill.title,
+          billTitle: bill.title, // Include title for UI updates
           oldStatus: change.oldStatus,
           newStatus: change.newStatus,
           timestamp: change.timestamp,
-          metadata: change.metadata
+          metadata: change.metadata // Pass along any extra context
         },
         timestamp: change.timestamp
       });
 
-      // Update engagement statistics
-      await this.updateBillEngagementStats(change.billId, 'status_change');
+      // 4. Find Users Tracking This Event Type
+      // Query the new preference table for users tracking 'status_changes' for this specific bill
+      const usersToNotify = await this.getActiveTrackersForEvent(change.billId, 'status_changes');
 
-      // Cache the status change for analytics
-      await this.cacheStatusChange(change);
+      if (usersToNotify.length > 0) {
+        logger.info(`📢 Triggering Notification Orchestrator for ${usersToNotify.length} users`, logContext);
 
-      console.log(`✅ Successfully processed status change for bill ${change.billId}`);
-
-    } catch (error) {
-      logger.error('Error handling bill status change:', { component: 'Chanuka' }, error as any);
-      throw error;
-    }
-  }
-
-  /**
-   * Handle bill engagement updates (views, comments, shares)
-   */
-  async handleBillEngagementUpdate(update: BillEngagementUpdate): Promise<void> {
-    try {
-      console.log(`📈 Processing engagement update: ${update.type} for bill ${update.billId} by user ${update.userId}`);
-
-      // Get bill details
-      const bill = await this.getBillDetails(update.billId);
-      if (!bill) {
-        console.error(`Bill ${update.billId} not found`);
-        return;
-      }
-
-      // Get subscribers who want engagement notifications
-      const subscribers = await this.getBillSubscribersForEngagement(update.billId, update.type);
-
-      // Process notifications for engagement updates
-      for (const subscriber of subscribers) {
-        // Skip notifying the user who made the engagement
-        if (subscriber.userId === update.userId) continue;
-
-        await this.processEngagementNotification(subscriber, update, bill);
-      }
-
-      // Broadcast real-time engagement update
-      webSocketService.broadcastBillUpdate(update.billId, {
-        type: update.type === 'comment' ? 'new_comment' : 'new_comment',
-        data: {
-          billId: update.billId,
-          billTitle: bill.title,
-          engagementType: update.type,
-          userId: update.userId,
-          newStats: update.newStats,
-          timestamp: update.timestamp
-        },
-        timestamp: update.timestamp
-      });
-
-      console.log(`✅ Successfully processed engagement update for bill ${update.billId}`);
-
-    } catch (error) {
-      logger.error('Error handling bill engagement update:', { component: 'Chanuka' }, error as any);
-      throw error;
-    }
-  }
-
-  /**
-   * Process notification for a subscriber based on their preferences
-   */
-  private async processSubscriberNotification(
-    subscriber: { userId: string; preferences: NotificationPreferences },
-    change: BillStatusChange,
-    bill: Bill
-  ): Promise<void> {
-    // Check if user wants status change notifications
-    if (!subscriber.preferences.statusChanges) {
-      return;
-    }
-
-    // Check quiet hours
-    if (this.isInQuietHours(subscriber.preferences)) {
-      console.log(`⏰ User ${subscriber.userId} is in quiet hours, deferring notification`);
-      await this.deferNotification(subscriber.userId, {
-        type: 'status_change',
-        billId: change.billId,
-        data: change,
-        timestamp: change.timestamp
-      });
-      return;
-    }
-
-    // Create notification based on update frequency
-    const notification = {
-      type: 'bill_status_change',
-      title: `Bill Status Update: ${bill.title}`,
-      message: `Status changed from "${change.oldStatus}" to "${change.newStatus}"`,
-      data: {
-        billId: change.billId,
-        billTitle: bill.title,
-        oldStatus: change.oldStatus,
-        newStatus: change.newStatus,
-        timestamp: change.timestamp,
-        metadata: change.metadata
-      }
-    };
-
-    // Handle based on update frequency preference
-    switch (subscriber.preferences.updateFrequency) {
-      case 'immediate':
-        await this.sendImmediateNotification(subscriber.userId, notification);
-        break;
-      case 'hourly':
-      case 'daily':
-        await this.batchNotification(subscriber.userId, notification);
-        break;
-    }
-  }
-
-  /**
-   * Process engagement notification for a subscriber
-   */
-  private async processEngagementNotification(
-    subscriber: { userId: string; preferences: NotificationPreferences },
-    update: BillEngagementUpdate,
-    bill: Bill
-  ): Promise<void> {
-    // Check if user wants this type of engagement notification
-    const wantsNotification = 
-      (update.type === 'comment' && subscriber.preferences.newComments) ||
-      (update.type === 'view' && false) || // Usually don't notify for views
-      (update.type === 'share' && false);   // Usually don't notify for shares
-
-    if (!wantsNotification) {
-      return;
-    }
-
-    // Check quiet hours
-    if (this.isInQuietHours(subscriber.preferences)) {
-      await this.deferNotification(subscriber.userId, {
-        type: 'engagement_update',
-        billId: update.billId,
-        data: update,
-        timestamp: update.timestamp
-      });
-      return;
-    }
-
-    const notification = {
-      type: 'bill_engagement_update',
-      title: `New Activity: ${bill.title}`,
-      message: `New ${update.type} on bill you're tracking`,
-      data: {
-        billId: update.billId,
-        billTitle: bill.title,
-        engagementType: update.type,
-        newStats: update.newStats,
-        timestamp: update.timestamp
-      }
-    };
-
-    // Handle based on update frequency preference
-    switch (subscriber.preferences.updateFrequency) {
-      case 'immediate':
-        await this.sendImmediateNotification(subscriber.userId, notification);
-        break;
-      case 'hourly':
-      case 'daily':
-        await this.batchNotification(subscriber.userId, notification);
-        break;
-    }
-  }
-
-  /**
-   * Send immediate notification to user
-   */
-  private async sendImmediateNotification(userId: string, notification: any): Promise<void> {
-    try {
-      // Fallback to direct WebSocket and database storage
-      webSocketService.sendUserNotification(userId, notification);
-      await this.storeNotification(userId, notification);
-      console.log(`📱 Sent notification to user ${userId}`);
-    } catch (error) {
-      console.error(`Error sending notification to user ${userId}:`, error as any);
-    }
-  }
-
-  /**
-   * Create template variables for notification templates
-   */
-  private createTemplateVariables(notification: any): Record<string, string> {
-    const variables: Record<string, string> = {
-      userName: 'User', // Would get from user profile
-      timestamp: new Date().toLocaleString()
-    };
-
-    if (notification.data?.billId) {
-      variables.billId = notification.data.billId.toString();
-      variables.billUrl = `${process.env.CLIENT_URL || 'http://localhost:3000'}/bills/${notification.data.billId}`;
-    }
-
-    if (notification.data?.billTitle) {
-      variables.billTitle = notification.data.billTitle;
-    }
-
-    if (notification.data?.oldStatus && notification.data?.newStatus) {
-      variables.oldStatus = notification.data.oldStatus;
-      variables.newStatus = notification.data.newStatus;
-    }
-
-    if (notification.data?.engagementType) {
-      variables.engagementType = notification.data.engagementType;
-    }
-
-    return variables;
-  }
-
-  /**
-   * Batch notification for later delivery
-   */
-  private async batchNotification(userId: string, notification: any): Promise<void> {
-    if (!this.batchedNotifications.has(userId)) {
-      this.batchedNotifications.set(userId, []);
-    }
-
-    this.batchedNotifications.get(userId)!.push({
-      billId: notification.data.billId,
-      type: notification.type,
-      data: notification,
-      timestamp: new Date()
-    });
-
-    console.log(`📦 Batched notification for user ${userId}`);
-  }
-
-  /**
-   * Process all batched notifications
-   */
-  private async processBatchedNotifications(): Promise<void> {
-    console.log(`🔄 Processing batched notifications for ${this.batchedNotifications.size} users`);
-
-    for (const [userId, notifications] of this.batchedNotifications.entries()) {
-      if (notifications.length === 0) continue;
-
-      try {
-        // Get user preferences to determine batch frequency
-        const preferences = await this.getUserNotificationPreferences(userId);
-        
-        // Check if it's time to send based on frequency
-        if (!this.shouldSendBatchedNotifications(preferences)) {
-          continue;
-        }
-
-        // Create batched notification
-        const batchedNotification = {
-          type: 'batched_bill_updates',
-          title: `Bill Updates Summary (${notifications.length} updates)`,
-          message: `You have ${notifications.length} bill updates`,
-          data: {
-            updates: notifications,
-            count: notifications.length,
-            timestamp: new Date()
+        // 5. Prepare Notification Template for the Orchestrator
+        const notificationTemplate: Omit<NotificationRequest, 'userId'> = {
+          notificationType: 'bill_update',
+          subType: 'status_change',
+          priority: this.determinePriorityForStatus(change.newStatus), // Assign priority based on significance
+          relatedBillId: change.billId,
+          category: bill.category || undefined, // Include category for potential filtering
+          content: {
+            title: `Bill Status Update: ${bill.title}`,
+            message: `Status changed from "${change.oldStatus}" to "${change.newStatus}".`,
+            // htmlMessage: `Status changed from <strong>${change.oldStatus}</strong> to <strong>${change.newStatus}</strong>.` // Optional richer format
+          },
+          metadata: { // Include relevant details for the notification content/action
+            oldStatus: change.oldStatus,
+            newStatus: change.newStatus,
+            triggeredBy: change.triggeredBy,
+            reason: change.metadata?.reason,
+            actionUrl: `/bills/${change.billId}` // Deep link to the bill page
+          },
+          config: {
+            // No specific config needed here; orchestrator handles batching/timing based on user prefs
           }
         };
 
-        // Send batched notification
-        await this.sendImmediateNotification(userId, batchedNotification);
+        // 6. Trigger Orchestrator for Each User (non-blocking)
+        // The orchestrator will handle individual preferences, batching, etc.
+        usersToNotify.forEach(userId => {
+          this.triggerNotification(userId, notificationTemplate);
+        });
 
-        // Clear processed notifications
-        this.batchedNotifications.set(userId, []);
-
-        console.log(`📬 Sent batched notification to user ${userId} with ${notifications.length} updates`);
-
-      } catch (error) {
-        console.error(`Error processing batched notifications for user ${userId}:`, error as any);
+      } else {
+        logger.info(`📢 No users actively tracking status changes for this bill.`, logContext);
       }
+
+      logger.info(`✅ Successfully processed status change`, logContext);
+
+    } catch (error) {
+      logger.error('Error handling bill status change:', logContext, error);
+      // Log error but avoid throwing to prevent cascading failures in event processing
     }
   }
 
   /**
-   * Get bill details from database or cache
+   * Processes a detected bill engagement update (e.g., new comment).
+   * Broadcasts WebSocket message and triggers notifications for relevant users.
    */
-  private async getBillDetails(billId: number): Promise<Bill | null> {
-    const cacheKey = CACHE_KEYS.BILL_DETAILS(billId);
-    
-    return await cacheService.getOrSet(
-      cacheKey,
-      async () => {
-        const result = await databaseService.withFallback(
-          async () => {
-            const [bill] = await this.db
-              .select()
-              .from(schema.bills)
-              .where(eq(schema.bills.id, billId))
-              .limit(1);
-            
-            return bill || null;
+  async handleBillEngagementUpdate(update: BillEngagementUpdate): Promise<void> {
+    const logContext = { component: 'BillStatusMonitorService', billId: update.billId, type: update.type, userId: update.userId };
+    logger.info(`📈 Processing engagement update`, logContext);
+
+    try {
+      // 1. Fetch Bill Details
+      const bill = await this.getBillDetails(update.billId);
+      if (!bill) {
+        logger.error(`Bill ${update.billId} not found during engagement update processing.`, logContext);
+        return;
+      }
+
+      // 2. Broadcast WebSocket Update (primarily for comments)
+      if (update.type === 'comment') {
+        webSocketService.broadcastBillUpdate(update.billId, {
+          type: 'new_comment',
+          data: {
+            billId: update.billId,
+            billTitle: bill.title,
+            userId: update.userId, // User who commented
+            commentId: update.commentId,
+            newStats: update.newStats, // Pass updated engagement counts
+            timestamp: update.timestamp
           },
-          null,
-          `getBillDetails:${billId}`
-        );
-
-        return result.data;
-      },
-      CACHE_TTL.BILL_DATA
-    );
-  }
-
-  /**
-   * Get subscribers for a specific bill
-   */
-  private async getBillSubscribers(billId: number): Promise<Array<{
-    userId: string;
-    preferences: NotificationPreferences;
-  }>> {
-    try {
-      const result = await databaseService.withFallback(
-        async () => {
-          // Get users tracking this bill
-          const trackers = await this.db
-            .select({
-              userId: schema.billEngagement.userId
-            })
-            .from(schema.billEngagement)
-            .where(eq(schema.billEngagement.billId, billId));
-
-          // Get preferences for each user
-          const subscribers: Array<{ userId: string; preferences: NotificationPreferences; }> = [];
-          for (const tracker of trackers) {
-            const preferences = await this.getUserNotificationPreferences(tracker.userId);
-            subscribers.push({
-              userId: tracker.userId,
-              preferences
-            });
-          }
-
-          return subscribers;
-        },
-        [], // Fallback to empty array
-        `getBillSubscribers:${billId}`
-      );
-
-      return result.data;
-    } catch (error) {
-      console.error(`Error getting bill subscribers for bill ${billId}:`, error as any);
-      return [];
-    }
-  }
-
-  /**
-   * Get subscribers for engagement notifications
-   */
-  private async getBillSubscribersForEngagement(
-    billId: number, 
-    engagementType: string
-  ): Promise<Array<{
-    userId: string;
-    preferences: NotificationPreferences;
-  }>> {
-    const allSubscribers = await this.getBillSubscribers(billId);
-    
-    // Filter based on engagement type preferences
-    return allSubscribers.filter(subscriber => {
-      switch (engagementType) {
-        case 'comment':
-          return subscriber.preferences.newComments;
-        case 'view':
-          return false; // Usually don't notify for views
-        case 'share':
-          return false; // Usually don't notify for shares
-        default:
-          return false;
+          timestamp: update.timestamp
+        });
       }
-    });
-  }
+      // Note: WebSocket updates for 'view' or 'share' might be too noisy, omitted here.
 
-  /**
-   * Get user notification preferences
-   */
-  private async getUserNotificationPreferences(userId: string): Promise<NotificationPreferences> {
-    try {
-      const userPreferences = await userProfileService.getUserPreferences(userId);
-      
-      // Map user preferences to notification preferences
-      return {
-        statusChanges: userPreferences.emailNotifications ?? true,
-        newComments: userPreferences.pushNotifications ?? true,
-        votingSchedule: true,
-        amendments: true,
-        updateFrequency: 'immediate',
-        notificationChannels: {
-          inApp: true,
-          email: userPreferences.emailNotifications ?? true,
-          push: userPreferences.pushNotifications ?? true
-        },
-        quietHours: {
-          enabled: false,
-          startTime: '22:00',
-          endTime: '08:00'
-        }
-      };
-    } catch (error) {
-      console.error(`Error getting notification preferences for user ${userId}:`, error as any);
-      
-      // Return default preferences
-      return {
-        statusChanges: true,
-        newComments: true,
-        votingSchedule: true,
-        amendments: true,
-        updateFrequency: 'immediate',
-        notificationChannels: {
-          inApp: true,
-          email: true,
-          push: true
-        }
-      };
-    }
-  }
+      // 3. Trigger Notifications (only for comments, typically)
+      if (update.type === 'comment') {
+        // Find users tracking 'new_comments' for this bill, EXCLUDING the comment author
+        const usersToNotify = await this.getActiveTrackersForEvent(update.billId, 'new_comments');
+        const filteredUsers = usersToNotify.filter(id => id !== update.userId); // Exclude self-notification
 
-  /**
-   * Check if current time is in user's quiet hours
-   */
-  private isInQuietHours(preferences: NotificationPreferences): boolean {
-    if (!preferences.quietHours?.enabled) {
-      return false;
-    }
+        if (filteredUsers.length > 0) {
+          logger.info(`📢 Triggering Notification Orchestrator for ${filteredUsers.length} users (new comment)`, logContext);
 
-    const now = new Date();
-    const currentTime = now.getHours() * 100 + now.getMinutes();
-    
-    const startTime = this.parseTime(preferences.quietHours.startTime);
-    const endTime = this.parseTime(preferences.quietHours.endTime);
-
-    if (startTime <= endTime) {
-      return currentTime >= startTime && currentTime <= endTime;
-    } else {
-      // Quiet hours span midnight
-      return currentTime >= startTime || currentTime <= endTime;
-    }
-  }
-
-  /**
-   * Parse time string to minutes since midnight
-   */
-  private parseTime(timeStr: string): number {
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    return hours * 100 + minutes;
-  }
-
-  /**
-   * Determine if batched notifications should be sent
-   */
-  private shouldSendBatchedNotifications(preferences: NotificationPreferences): boolean {
-    const now = new Date();
-    
-    switch (preferences.updateFrequency) {
-      case 'hourly':
-        // Send at the top of each hour
-        return now.getMinutes() < 5;
-      case 'daily':
-        // Send at 9 AM daily
-        return now.getHours() === 9 && now.getMinutes() < 5;
-      default:
-        return false;
-    }
-  }
-
-  /**
-   * Store notification in database
-   */
-  private async storeNotification(userId: string, notification: any): Promise<void> {
-    try {
-      await databaseService.withFallback(
-        async () => {
-          await this.db
-            .insert(schema.notifications)
-            .values({
-              userId,
-              type: notification.type,
-              title: notification.title,
-              message: notification.message,
-              relatedBillId: notification.data?.billId,
-              isRead: false,
-              createdAt: new Date()
-            });
-        },
-        null,
-        `storeNotification:${userId}`
-      );
-    } catch (error) {
-      console.error(`Error storing notification for user ${userId}:`, error as any);
-    }
-  }
-
-  /**
-   * Defer notification for later delivery
-   */
-  private async deferNotification(userId: string, notification: any): Promise<void> {
-    // Add to batched notifications for later processing
-    await this.batchNotification(userId, {
-      type: notification.type,
-      title: 'Deferred Notification',
-      message: 'Notification deferred due to quiet hours',
-      data: notification.data
-    });
-  }
-
-  /**
-   * Update bill engagement statistics
-   */
-  private async updateBillEngagementStats(billId: number, engagementType: string): Promise<void> {
-    try {
-      await databaseService.withFallback(
-        async () => {
-          // Update view count for status changes (people checking the bill)
-          if (engagementType === 'status_change') {
-            await this.db
-              .update(schema.bills)
-              .set({
-                viewCount: sql`${schema.bills.viewCount} + 1`,
-                updatedAt: new Date()
-              })
-              .where(eq(schema.bills.id, billId));
+          // Prepare Notification Template
+          // TODO: Enhance message by fetching commenter's name/role if desired
+          // Try to fetch commenter details to make notifications more informative
+          let commenterName = 'A user';
+          try {
+            const userRes = await this.db.select({ id: schema.user.id, name: schema.user.name })
+              .from(schema.user)
+              .where(eq(schema.user.id, update.userId))
+              .limit(1);
+            if (userRes && userRes[0] && userRes[0].name) commenterName = userRes[0].name;
+          } catch (uErr) {
+            logger.debug(`Failed to fetch commenter name for user ${update.userId}: ${String(uErr)}`);
           }
-        },
-        null,
-        `updateBillEngagementStats:${billId}`
-      );
+
+          const notificationTemplate: Omit<NotificationRequest, 'userId'> = {
+            notificationType: 'bill_update', // Or 'comment_notification' if more specific type exists
+            subType: 'new_comment',
+            priority: 'medium', // Comments are generally medium priority
+            relatedBillId: update.billId,
+            category: bill.category || undefined,
+            content: {
+              title: `New Comment on: ${bill.title}`,
+              message: `${commenterName} posted a new comment on this bill.`,
+            },
+            metadata: {
+              commentId: update.commentId,
+              commenterUserId: update.userId,
+              actionUrl: `/bills/${update.billId}#comment-${update.commentId || ''}` // Link to comment anchor
+            },
+          };
+
+          // Trigger Orchestrator (non-blocking)
+          filteredUsers.forEach(userId => {
+            this.triggerNotification(userId, notificationTemplate);
+          });
+        } else {
+          logger.info(`📢 No users actively tracking new comments for this bill (excluding author).`, logContext);
+        }
+      }
+
+      logger.info(`✅ Successfully processed engagement update`, logContext);
+
     } catch (error) {
-      console.error(`Error updating engagement stats for bill ${billId}:`, error as any);
+      logger.error('Error handling bill engagement update:', logContext, error);
     }
   }
 
   /**
-   * Cache status change for analytics
+   * Safely triggers the notification orchestrator in a non-blocking way.
+   * Logs the outcome (success, filtered, batched, failed).
    */
-  private async cacheStatusChange(change: BillStatusChange): Promise<void> {
-    const cacheKey = `bill_status_changes:${change.billId}`;
-    
+  private triggerNotification(userId: string, template: Omit<NotificationRequest, 'userId'>): void {
+    notificationOrchestratorService.sendNotification({ ...template, userId })
+      .then(result => {
+        // Log outcome for observability
+        if (!result.success) {
+          logger.warn(`Notification Orchestrator failed`, { component: 'BillStatusMonitorService', userId, type: template.notificationType, error: result.error });
+        } else if (result.filtered) {
+          logger.debug(`Notification filtered by orchestrator`, { component: 'BillStatusMonitorService', userId, type: template.notificationType, reason: result.filterReason });
+        } else if (result.batched) {
+          logger.debug(`Notification batched by orchestrator`, { component: 'BillStatusMonitorService', userId, type: template.notificationType, batchId: result.batchId });
+        } else {
+          logger.debug(`Notification sent immediately by orchestrator`, { component: 'BillStatusMonitorService', userId, type: template.notificationType });
+        }
+      })
+      .catch(err => {
+        // Catch unexpected errors from the orchestrator promise itself
+        logger.error(`Unhandled error triggering Notification Orchestrator`, { component: 'BillStatusMonitorService', userId }, err);
+      });
+  }
+
+  /**
+   * Determines a notification priority based on the significance of the new status.
+   */
+  private determinePriorityForStatus(newStatus: string): NotificationRequest['priority'] {
+    switch (newStatus) {
+      case schema.billStatusEnum.enumValues.SIGNED: // Use enum value
+      case schema.billStatusEnum.enumValues.FAILED:
+        return 'high'; // Final, significant outcomes
+      case schema.billStatusEnum.enumValues.PASSED:
+        return 'high'; // Major milestone
+      case schema.billStatusEnum.enumValues.COMMITTEE: // Use enum value
+        return 'medium'; // Standard progress
+      case schema.billStatusEnum.enumValues.INTRODUCED: // Use enum value
+        return 'low'; // Initial state
+      default:
+        return 'medium'; // Default for unknown statuses
+    }
+  }
+
+  /**
+   * Queries the database to find user IDs actively tracking a specific event type for a given bill.
+   * Uses the `userBillTrackingPreference` table.
+   */
+  private async getActiveTrackersForEvent(billId: number, eventType: schema.UserBillTrackingPreference['trackingTypes'][number]): Promise<string[]> {
     try {
-      const existingChanges = await cacheService.get(cacheKey) || [];
-      existingChanges.push(change);
-      
-      // Keep only last 10 changes
-      const recentChanges = existingChanges.slice(-10);
-      
-      await cacheService.set(cacheKey, recentChanges, CACHE_TTL.BILL_DATA);
+      const results = await this.db
+        .select({ userId: schema.userBillTrackingPreference.userId })
+        .from(schema.userBillTrackingPreference)
+        .where(and(
+          eq(schema.userBillTrackingPreference.billId, billId),
+          eq(schema.userBillTrackingPreference.isActive, true), // Only users with active preference for this bill
+          // Check if the specific eventType exists within the user's trackingTypes array for this bill
+          sql`${eventType} = ANY(${schema.userBillTrackingPreference.trackingTypes})`
+        ));
+      return results.map(r => r.userId);
     } catch (error) {
-      logger.error('Error caching status change:', { component: 'Chanuka' }, error as any);
+      logger.error(`Error fetching active trackers for event '${eventType}', bill ${billId}:`, { component: 'BillStatusMonitorService' }, error);
+      return []; // Return empty array on error
     }
   }
 
-  /**
-   * Get bill status change history
-   */
+  /** Fetches minimal required bill details (ID, Title, Category) using caching. */
+  private async getBillDetails(billId: number): Promise<Pick<Bill, 'id' | 'title' | 'category'> | null> {
+    const cacheKey = CACHE_KEYS.BILL_MINIMAL_DETAILS(billId); // Use a specific key for minimal data
+    try {
+      const cachedBill = await cacheService.get(cacheKey);
+      if (cachedBill) return cachedBill;
+
+      const [bill] = await this.db
+        .select({ id: schema.bills.id, title: schema.bills.title, category: schema.bills.category })
+        .from(schema.bills)
+        .where(eq(schema.bills.id, billId))
+        .limit(1);
+
+      if (bill) {
+        await cacheService.set(cacheKey, bill, CACHE_TTL.BILL_DATA_SHORT); // Cache minimal data for short duration
+      }
+      return bill || null;
+    } catch (error) {
+      logger.error(`Failed to get bill details for bill ${billId}:`, { component: 'BillStatusMonitorService' }, error);
+      return null;
+    }
+  }
+
+  /** Caches the latest status change events for a bill. */
+  private async cacheStatusChange(change: BillStatusChange): Promise<void> {
+    const cacheKey = CACHE_KEYS.BILL_STATUS_HISTORY(change.billId);
+    try {
+      const existingChanges: BillStatusChange[] = await cacheService.get(cacheKey) || [];
+      // Add the new change, keep only the last N (e.g., 10), and ensure chronological order
+      const updatedChanges = [
+          ...existingChanges.filter(c => c.timestamp.getTime() !== change.timestamp.getTime()), // Avoid duplicates if re-processing
+          change
+      ]
+      .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime()) // Sort by time ascending
+      .slice(-10); // Keep last 10
+
+      await cacheService.set(cacheKey, updatedChanges, CACHE_TTL.BILL_DATA_LONG); // Cache history for longer
+    } catch (error) {
+      logger.error('Error caching status change:', { component: 'BillStatusMonitorService', billId: change.billId }, error);
+    }
+  }
+
+  /** Retrieves the cached status change history for a bill. */
   async getBillStatusHistory(billId: number): Promise<BillStatusChange[]> {
-    const cacheKey = `bill_status_changes:${billId}`;
-    
+    const cacheKey = CACHE_KEYS.BILL_STATUS_HISTORY(billId);
     try {
       const changes = await cacheService.get(cacheKey);
-      return changes || [];
+      // Ensure returned value is always an array
+      return Array.isArray(changes) ? changes.sort((a,b) => b.timestamp.getTime() - a.timestamp.getTime()) : []; // Return sorted descending
     } catch (error) {
-      console.error(`Error getting status history for bill ${billId}:`, error as any);
+      logger.error(`Error getting status history for bill ${billId}:`, { component: 'BillStatusMonitorService' }, error);
       return [];
     }
   }
 
-  /**
-   * Get service statistics
-   */
-  getStats() {
-    return {
-      statusChangeListeners: this.statusChangeListeners.size,
-      batchedNotificationUsers: this.batchedNotifications.size,
-      totalBatchedNotifications: Array.from(this.batchedNotifications.values())
-        .reduce((sum, notifications) => sum + notifications.length, 0)
-    };
-  }
-
-  /**
-   * Cleanup resources
-   */
+  /** Gracefully shuts down the service (if needed). */
   async shutdown(): Promise<void> {
-    logger.info('Shutting down Bill Status Monitor Service...', { component: 'Chanuka' });
-    
-    if (this.batchInterval) {
-      clearInterval(this.batchInterval);
-    }
-
-    // Process any remaining batched notifications
-    await this.processBatchedNotifications();
-
-    // Clear data structures
-    this.statusChangeListeners.clear();
-    this.batchedNotifications.clear();
-    
-    logger.info('Bill Status Monitor Service shutdown complete', { component: 'Chanuka' });
+    logger.info('Shutting down Bill Status Monitor Service...', { component: 'BillStatusMonitorService' });
+    // Add cleanup logic here if the service uses intervals, timers, or persistent connections
+    logger.info('Bill Status Monitor Service shutdown complete.', { component: 'BillStatusMonitorService' });
   }
 }
 
+// Export singleton instance
 export const billStatusMonitorService = new BillStatusMonitorService();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
