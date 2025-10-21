@@ -1,16 +1,29 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { ApiSuccess, ApiError, ApiResponseWrapper } from '../../../shared/core/src/utilities/api';
+import { logger } from '../../../shared/core/src/observability/logging';
+import { httpUtils } from '../../../shared/core/src/utils/http-utils';
+import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../external-data/external-api-manager.js';
 
-// Helper functions to replace the missing createMetadata functionality
+// Helper functions using shared utilities
 const sendResponse = (res: any, data: any, message: string = 'Success') => {
-  return res.json(ApiResponseWrapper.success(data, message));
+  return res.json({
+    success: true,
+    data,
+    message,
+    timestamp: new Date().toISOString()
+  });
 };
 
 const sendError = (res: any, message: string, statusCode: number = 500) => {
-  return res.status(statusCode).json(ApiResponseWrapper.error(message, 'API_ERROR', statusCode));
+  return res.status(statusCode).json({
+    success: false,
+    error: {
+      message,
+      code: 'API_ERROR',
+      statusCode
+    },
+    timestamp: new Date().toISOString()
+  });
 };
-import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../external-data/external-api-manager.js';
-import { logger } from '../../../shared/core/src/observability/logging';
 
 export const router = Router();
 

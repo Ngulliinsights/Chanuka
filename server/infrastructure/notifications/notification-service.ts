@@ -1,6 +1,6 @@
 import { eq, desc, and, sql, count } from 'drizzle-orm';
 import { database as db } from '../../../shared/database/connection';
-import { notification, user, bill } from '../../../shared/schema';
+import { notifications, users, bills } from '../../../shared/schema';
 import { webSocketService } from '../websocket.js';
 import { z } from 'zod';
 import { logger } from '../../../shared/core/src/observability/logging';

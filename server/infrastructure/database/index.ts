@@ -1,37 +1,48 @@
-// Database Infrastructure
-// Centralized exports for database-related services
+// Database Infrastructure - Consolidated
+// Uses shared/database for core functionality, keeps server-specific services
 
-// Services
-export { DatabaseService } from './database-service';
-export { databaseOptimizationService as DatabaseOptimizationService } from './database-optimization';
+// Core database functionality from shared
+export {
+  database,
+  readDatabase,
+  writeDatabase,
+  withTransaction,
+  withReadConnection,
+  getDatabase,
+  pool
+} from '../../../shared/database/connection';
+
+// Database schema and types
+export * from '../../../shared/schema';
+
+// Server-specific services (keep these)
 export { DatabaseFallbackService } from './database-fallback';
-export { connectionPoolService as ConnectionPoolService } from './connection-pool';
 export { MigrationService } from './migration-service';
 export { SeedDataService } from './seed-data-service';
+
+// Storage services (if they provide unique server-specific value)
 export { storage as StorageService } from './storage';
 export { unifiedStorage as UnifiedStorageService } from './unified-storage';
 
-// Storage Base
+// Storage base classes
 export * from './base/BaseStorage';
 
 // Configuration
 export * from './config';
 
-// Database Tables
-export * from '../../../shared/schema';
+// Database optimization (if it provides unique server-specific value)
+export { databaseOptimizationService as DatabaseOptimizationService } from './database-optimization';
 
-// Re-export stable DB accessors and legacy names from canonical shared connection
-export {
-	database,
-	readDatabase,
-	writeDatabase,
-	withTransaction,
-	withReadConnection,
-	pool as getPool
-} from '@shared/database/connection';
+// Legacy compatibility exports
+export { database as DatabaseService } from '../../../shared/database/connection';
+export { pool as ConnectionPoolService } from '../../../shared/database/connection';
 
-// Also export schema tables from shared schema for compatibility
-export * from '../../../shared/schema';
+// Re-export database types for convenience
+export type {
+  DatabaseTransaction,
+  DatabaseOperation,
+  TransactionOptions
+} from '../../../shared/database/connection';
 
 
 
