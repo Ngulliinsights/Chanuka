@@ -5,7 +5,7 @@
  * resolution strategies based on source priority and confidence levels.
  */
 
-import { readDatabase } from '../../infrastructure/database/index.ts';
+import { readDatabase } from '@shared/database/connection';
 import { 
   ConflictResolution, 
   ConflictSource, 
@@ -77,7 +77,7 @@ export class ConflictResolutionService {
       resolution.resolution = 'manual';
     }
 
-  // Store conflict in database
+    // Store conflict in database
   await this.storeConflict(resolution);
 
     return resolution;
@@ -354,7 +354,7 @@ export class ConflictResolutionService {
   private async storeConflict(conflict: ConflictResolution): Promise<void> {
     try {
       // Store main conflict record
-      const database = readDatabase();
+  const database = readDatabase;
       await database.insert(conflicts).values({
         id: conflict.conflictId,
         dataType: conflict.dataType,
@@ -391,7 +391,7 @@ export class ConflictResolutionService {
    */
   async getPendingConflicts(limit = 50): Promise<ConflictResolution[]> {
     try {
-      const database = readDatabase();
+  const database = readDatabase;
       const pendingConflicts = await database
         .select()
         .from(conflicts)
@@ -442,7 +442,7 @@ export class ConflictResolutionService {
     resolvedBy: string
   ): Promise<void> {
     try {
-      const database = readDatabase();
+  const database = readDatabase;
       await database
         .update(conflicts)
         .set({

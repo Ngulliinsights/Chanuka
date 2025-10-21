@@ -3,7 +3,7 @@ import { AuthService, registerSchema, loginSchema } from '../../core/auth/auth-s
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 // Mock dependencies with proper typing
 jest.mock('bcryptjs');

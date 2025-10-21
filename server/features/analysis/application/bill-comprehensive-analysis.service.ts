@@ -1,4 +1,4 @@
-import { readDatabase } from '../../../db.js';
+import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../shared/schema';
 import { eq, and } from 'drizzle-orm';
 import { logger } from '../../../utils/logger.js';
@@ -12,8 +12,8 @@ import { transparencyAnalysisService, TransparencyScoreResult } from './transpar
 import { publicInterestAnalysisService, PublicInterestScoreResult } from './public-interest-analysis.service.js';
 // Import sponsor conflict analysis service and its necessary types/functions
 // Adjust path based on final location of sponsor conflict analysis
-import { sponsorConflictAnalysisService } from '../../bills/application/sponsor-conflict-analysis.service.js'; // Assuming it's moved here
-import type { ConflictDetectionResult } from '../../bills/application/sponsor-conflict-analysis.service.js'; // Assuming type export
+import { sponsorConflictAnalysisService } from '../../sponsors/application/sponsor-conflict-analysis.service.js'; // Updated path
+import type { ConflictDetectionResult } from '../../sponsors/application/sponsor-conflict-analysis.service.js'; // Updated path
 
 
 // --- Define ConflictSummary type based on sponsor conflict service output ---
@@ -47,7 +47,7 @@ export interface ComprehensiveBillAnalysis {
  * real-time analysis of a legislative bill.
  */
 export class BillComprehensiveAnalysisService {
-     private get db() { return readDatabase(); }
+    private get db() { return readDatabase; }
 
     /**
      * Runs all relevant analyses for a given bill ID.

@@ -3,7 +3,7 @@ import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import type { ExtractTablesWithRelations } from "drizzle-orm";
 import { BaseStorage, type StorageConfig } from "../../../infrastructure/database/base/BaseStorage.js";
-import { readDatabase } from '../../../../shared/database/connection';
+import { readDatabase } from '@shared/database/connection';
 import {
   bill as bills,
   billTag as billTags,
@@ -53,7 +53,7 @@ export class BillStorage extends BaseStorage<Bill> {
    */
   async isHealthy(): Promise<boolean> {
     try {
-      await readDatabase().select().from(bills).limit(1);
+  await readDatabase.select().from(bills).limit(1);
       return true;
     } catch (error) {
       logger.error('BillStorage health check failed:', { component: 'Chanuka' }, error as any);
@@ -82,7 +82,7 @@ export class BillStorage extends BaseStorage<Bill> {
     return this.getCached(
       CACHE_KEY.ALL_BILLS,
       async () => {
-        const result = await readDatabase()
+  const result = await readDatabase
           .select()
           .from(bills)
           .orderBy(desc(bills.createdAt));
@@ -107,7 +107,7 @@ export class BillStorage extends BaseStorage<Bill> {
     return this.getCached(
       CACHE_KEY.BILL_BY_ID(id),
       async () => {
-        const result = await readDatabase().select().from(bills).where(eq(bills.id, id));
+  const result = await readDatabase.select().from(bills).where(eq(bills.id, id));
         return result[0];
       },
       CACHE_TTL
@@ -327,7 +327,7 @@ export class BillStorage extends BaseStorage<Bill> {
       CACHE_KEY.BILLS_BY_TAGS(cleanTags),
       async () => {
         // Get bill IDs that have all the specified tags
-        const billIdsWithTags = await readDatabase()
+  const billIdsWithTags = await readDatabase
           .select({ billId: billTags.billId })
           .from(billTags)
           .where(inArray(billTags.tag, cleanTags))
@@ -340,7 +340,7 @@ export class BillStorage extends BaseStorage<Bill> {
 
         // Get the actual bills
         const billIds = billIdsWithTags.map((row) => row.billId);
-        return await readDatabase()
+  return await readDatabase
           .select()
           .from(bills)
           .where(inArray(bills.id, billIds))
@@ -378,7 +378,7 @@ export class BillStorage extends BaseStorage<Bill> {
   private async executeTransaction<T>(
     callback: (tx: DbTransaction) => Promise<T>
   ): Promise<T> {
-    return await readDatabase().transaction(async (tx) => {
+  return await readDatabase.transaction(async (tx) => {
       try {
         return await callback(tx);
       } catch (error) {

@@ -1,4 +1,4 @@
-import { database as db, readDatabase } from '../../../shared/database/connection';
+import { database as db, readDatabase } from '@shared/database/connection';
 import { notifications, users, userBillTrackingPreference, bill } from '../../../shared/schema';
 import { eq, and } from 'drizzle-orm';
 import { smartNotificationFilterService, type FilterCriteria, type FilterResult } from './smart-notification-filter.js';
@@ -147,7 +147,7 @@ interface CombinedBillTrackingPreferences extends GlobalBillTrackingPreferences 
 
 export class NotificationOrchestratorService {
   // Database accessor using read replica when available
-  private get db() { return readDatabase(); }
+  private get db() { return readDatabase; }
 
   // Configuration with sensible defaults that can be overridden
   private readonly config: OrchestratorConfig = {

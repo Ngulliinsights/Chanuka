@@ -1,4 +1,4 @@
-import { db } from "../server/db";
+import { db } from "../shared/database/pool";
 import { logger } from '../shared/core/src/observability/logging';
 import {
   user, bill, sponsor, billSponsorship, billComment,

@@ -5,7 +5,7 @@ import { SecurityIncident } from './security-monitoring-service.js';
 import { getEmailService } from '../../infrastructure/notifications/email-service.js';
 import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, count, desc, eq } from 'drizzle-orm';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 import { securityAuditLog } from '../../../shared/schema';
 
 // Threat intelligence table

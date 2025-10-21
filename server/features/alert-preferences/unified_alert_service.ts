@@ -1,6 +1,6 @@
 import { eq, and, desc, sql, inArray } from 'drizzle-orm';
 import { databaseService } from '../../infrastructure/database/database-service';
-import { db } from '../../../db';
+import { db } from '@shared/database/pool';
 import { notificationChannelService } from '../../infrastructure/notifications/notification-channels';
 import { userProfileService } from '../users/domain/user-profile';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service';

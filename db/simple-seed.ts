@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
-import { db } from './index';
+import { db } from '../shared/database/pool';
 import { logger } from '../shared/core/src/observability/logging';
 
 async function simpleSeed() {

@@ -11,10 +11,10 @@ CREATE TABLE "user_bill_tracking_preference" (
   "id" serial PRIMARY KEY NOT NULL,
   
   -- Foreign key to the user
-  "user_id" uuid NOT_NULL REFERENCES "user"("id") ON DELETE cascade,
-  
+  "user_id" uuid NOT NULL REFERENCES "users"("id") ON DELETE cascade,
+
   -- Foreign key to the bill
-  "bill_id" integer NOT_NULL REFERENCES "bill"("id") ON DELETE cascade,
+  "bill_id" integer NOT NULL REFERENCES "bills"("id") ON DELETE cascade,
   
   -- User's notification preferences
   "tracking_types" text[] DEFAULT ARRAY['status_changes', 'new_comments']::text[] NOT NULL,

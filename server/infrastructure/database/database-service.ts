@@ -5,7 +5,7 @@ import * as schema from "../../../shared/schema/schema.js";
 import { eq, and, or, sql } from 'drizzle-orm';
 import { errorTracker } from '../../core/errors/error-tracker.js';
 import { config } from '../../config/index.js';
-import { logger } from '../../utils/logger.js';
+import { logger } from '../../../shared/core/src/observability/logging/index.js';
 
 // Database connection configuration with improved typing
 interface DatabaseConfig {

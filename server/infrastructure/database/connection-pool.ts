@@ -1,6 +1,6 @@
 import type { PoolClient } from 'pg';
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 import { pool, executeQuery, checkPoolHealth, closePools, getPools } from '../../../shared/database/pool.js';
 
 export interface ConnectionPoolConfig {

@@ -1,6 +1,6 @@
 import { createMonitoringService } from '../../features/analytics/financial-disclosure/monitoring.js';
 import { databaseService } from '../../infrastructure/database/database-service.js';
-import { readDatabase } from '../../db.js';
+import { readDb } from '@shared/database/pool';
 import { cacheService } from '../../infrastructure/cache/cache-service.js';
 import { logger } from '@shared/core/src/observability/logging';
 
@@ -25,8 +25,8 @@ export class MonitoringScheduler {
 
       // Initialize financial disclosure monitoring service
       this.financialDisclosureMonitoringService = createMonitoringService({
-        readDb: readDatabase(),
-        writeDb: readDatabase(),
+        readDb: readDb,
+        writeDb: readDb,
         cache: cacheService,
         logger
       });

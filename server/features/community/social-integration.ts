@@ -1,5 +1,5 @@
 import type { User } from '../../../shared/schema';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 // Define cache service interface locally if the module doesn't exist
 interface CacheService {

@@ -1,4 +1,4 @@
-import { readDatabase } from '../../../db.js';
+import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '../../../utils/logger.js';
@@ -48,7 +48,7 @@ export interface StakeholderAnalysisResult {
  * Service for analyzing the impact of a bill on various stakeholders.
  */
 export class StakeholderAnalysisService {
-     private get db() { return readDatabase(); }
+    private get db() { return readDatabase; }
 
     /**
      * Performs stakeholder analysis using bill content and potentially ML services.

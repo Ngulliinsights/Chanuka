@@ -100,14 +100,13 @@ declare module '../../../shared/schema' {
 }
 
 // Declarations for top-level server runtime modules with .js extensions
-declare module '../../db.js' {
-  export const readDatabase: (() => any) | undefined;
-  export let db: any;
-  export const pool: (() => any) | undefined;
-  export function ensureInitialized(): Promise<void>;
-  export function withFallback<T>(operation: () => Promise<T>, fallbackData: T, context: string): Promise<{ data: T; source?: string; timestamp?: Date } | T>;
-  export function closeDatabase(): Promise<void>;
-  export { default as default } from '../../db.js';
+declare module '@shared/database/connection' {
+  export const readDatabase: any;
+  export const writeDatabase: any;
+  export const database: any;
+  export const pool: any;
+  export function withTransaction(...args: any[]): any;
+  export function withReadConnection(...args: any[]): any;
 }
 
 declare module '../../utils/logger.js' {
@@ -123,13 +122,10 @@ declare module '../../infrastructure/cache/cache-service.js' {
 }
 
 // Extensionless module declarations (TypeScript resolves imports without .js extension)
-declare module '../../db' {
-  export const readDatabase: (() => any) | undefined;
-  export let db: any;
-  export const pool: (() => any) | undefined;
-  export function ensureInitialized(): Promise<void>;
-  export function withFallback<T>(operation: () => Promise<T>, fallbackData: T, context: string): Promise<{ data: T; source?: string; timestamp?: Date } | T>;
-  export function closeDatabase(): Promise<void>;
+declare module '@shared/database/connection' {
+  export const readDatabase: any;
+  export const writeDatabase: any;
+  export const database: any;
 }
 
 declare module '../../utils/logger' {

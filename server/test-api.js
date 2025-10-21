@@ -1,6 +1,6 @@
 // Test API endpoints
 import fetch from 'node-fetch';
-import { logger } from '../utils/logger.js';
+import { logger } from '../shared/core/src/observability/logging/index.js';
 
 const BASE_URL = 'http://localhost:4200';
 

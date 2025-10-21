@@ -1,5 +1,3 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pkg from 'pg';
 const { Pool } = pkg;
 import * as fs from 'fs';
@@ -18,9 +16,19 @@ function createPool(databaseName = 'legislative_track') {
   const baseUrl = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/legislative_track';
   const connectionString = baseUrl.replace(/\/[^/]*$/, `/${databaseName}`);
 
+  // Determine SSL configuration based on URL and environment
+  let sslConfig;
+  if (connectionString.includes('sslmode=require')) {
+    sslConfig = { rejectUnauthorized: false };
+  } else if (process.env.NODE_ENV === 'production') {
+    sslConfig = { rejectUnauthorized: false };
+  } else {
+    sslConfig = false;
+  }
+
   return new Pool({
     connectionString,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    ssl: sslConfig,
     // Add connection pool optimization
     max: 10, // Maximum number of connections
     idleTimeoutMillis: 30000, // Close idle connections after 30 seconds

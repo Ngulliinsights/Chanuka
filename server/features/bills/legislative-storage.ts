@@ -9,8 +9,8 @@ import {
   type SponsorTransparency, type BillSectionConflict
 } from "../../../shared/schema";
 import { eq, desc, and, or, like, count, asc, sql } from "drizzle-orm";
-import { readDatabase } from '../../db.js';
-import { logger } from '../../utils/logger';
+import { readDatabase } from '@shared/database/connection';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 // Enhanced engagement statistics interface with more detailed metrics
 export interface BillEngagementStats {
@@ -93,7 +93,7 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   async getBills(options: BillSearchOptions = {}): Promise<Bill[]> {
     const { limit = 50, offset = 0, sortBy = 'introducedDate', sortOrder = 'desc' } = options;
     
-  let query = readDatabase().select().from(bills);
+  let query = readDatabase.select().from(bills);
     
     // Apply filters if provided
     if (options.category) {
@@ -115,18 +115,18 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async getBill(id: number): Promise<Bill | undefined> {
-  const result = await readDatabase().select().from(bills).where(eq(bills.id, id));
+  const result = await readDatabase.select().from(bills).where(eq(bills.id, id));
     return result[0];
   }
 
   async getBillsByCategory(category: string): Promise<Bill[]> {
-  return await readDatabase().select().from(bills)
+  return await readDatabase.select().from(bills)
       .where(eq(bills.category, category))
       .orderBy(desc(bills.introducedDate));
   }
 
   async getBillsByStatus(status: string): Promise<Bill[]> {
-  return await readDatabase().select().from(bills)
+  return await readDatabase.select().from(bills)
       .where(eq(bills.status, status))
       .orderBy(desc(bills.lastActionDate));
   }
@@ -141,7 +141,7 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
       like(bills.billNumber, `%${query}%`)
     );
     
-  let dbQuery = readDatabase().select().from(bills).where(searchCondition);
+  let dbQuery = readDatabase.select().from(bills).where(searchCondition);
     
     // Apply additional filters from options
     if (options.category) {
@@ -159,12 +159,12 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async createBill(insertBill: InsertBill): Promise<Bill> {
-  const result = await readDatabase().insert(bills).values(insertBill).returning();
+  const result = await readDatabase.insert(bills).values(insertBill).returning();
   return result[0];
   }
 
   async updateBill(id: number, updateData: Partial<Bill>): Promise<Bill | undefined> {
-    const result = await readDatabase().update(bills)
+  const result = await readDatabase.update(bills)
       .set({ ...updateData, updatedAt: new Date() })
       .where(eq(bills.id, id))
       .returning();
@@ -172,28 +172,28 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async deleteBill(id: number): Promise<boolean> {
-  const result = await readDatabase().delete(bills).where(eq(bills.id, id)).returning();
+  const result = await readDatabase.delete(bills).where(eq(bills.id, id)).returning();
   return result.length > 0;
   }
 
   // Enhanced user methods
   async getUser(id: string): Promise<User | undefined> {
-  const result = await readDatabase().select().from(users).where(eq(users.id, id));
+  const result = await readDatabase.select().from(users).where(eq(users.id, id));
     return result[0];
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-  const result = await readDatabase().select().from(users).where(eq(users.email, email));
+  const result = await readDatabase.select().from(users).where(eq(users.email, email));
     return result[0];
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-  const result = await readDatabase().insert(users).values(insertUser).returning();
+  const result = await readDatabase.insert(users).values(insertUser).returning();
   return result[0];
   }
 
   async updateUser(id: string, updateData: Partial<User>): Promise<User | undefined> {
-    const result = await readDatabase().update(users)
+  const result = await readDatabase.update(users)
       .set({ ...updateData, updatedAt: new Date() })
       .where(eq(users.id, id))
       .returning();
@@ -201,7 +201,7 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async deactivateUser(id: string): Promise<boolean> {
-    const result = await readDatabase().update(users)
+  const result = await readDatabase.update(users)
       .set({ isActive: false, updatedAt: new Date() })
       .where(eq(users.id, id))
       .returning();
@@ -210,17 +210,17 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
 
   // User profile methods
   async getUserProfile(userId: string): Promise<UserProfile | undefined> {
-  const result = await readDatabase().select().from(userProfiles).where(eq(userProfiles.userId, userId));
+  const result = await readDatabase.select().from(userProfiles).where(eq(userProfiles.userId, userId));
     return result[0];
   }
 
   async createUserProfile(insertProfile: InsertUserProfile): Promise<UserProfile> {
-  const result = await readDatabase().insert(userProfiles).values(insertProfile).returning();
+  const result = await readDatabase.insert(userProfiles).values(insertProfile).returning();
   return result[0];
   }
 
   async updateUserProfile(userId: string, updateData: Partial<UserProfile>): Promise<UserProfile | undefined> {
-    const result = await readDatabase().update(userProfiles)
+  const result = await readDatabase.update(userProfiles)
       .set(updateData)
       .where(eq(userProfiles.userId, userId))
       .returning();
@@ -229,7 +229,7 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
 
   // Enhanced comment methods with pagination
   async getBillComments(billId: number, limit: number = 50, offset: number = 0): Promise<BillComment[]> {
-  return await readDatabase().select().from(billComments)
+  return await readDatabase.select().from(billComments)
       .where(eq(billComments.billId, billId))
       .orderBy(desc(billComments.createdAt))
       .limit(limit)
@@ -237,12 +237,12 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async createBillComment(insertComment: InsertBillComment): Promise<BillComment> {
-  const result = await readDatabase().insert(billComments).values(insertComment).returning();
+  const result = await readDatabase.insert(billComments).values(insertComment).returning();
   return result[0];
   }
 
   async updateComment(id: number, updateData: Partial<BillComment>): Promise<BillComment | undefined> {
-    const result = await readDatabase().update(billComments)
+  const result = await readDatabase.update(billComments)
       .set({ ...updateData, updatedAt: new Date() })
       .where(eq(billComments.id, id))
       .returning();
@@ -250,24 +250,24 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async deleteComment(id: number): Promise<boolean> {
-  const result = await readDatabase().delete(billComments).where(eq(billComments.id, id)).returning();
+  const result = await readDatabase.delete(billComments).where(eq(billComments.id, id)).returning();
   return result.length > 0;
   }
 
   // Sponsor methods
   async getSponsors(): Promise<Sponsor[]> {
-  return await readDatabase().select().from(sponsors)
+  return await readDatabase.select().from(sponsors)
       .where(eq(sponsors.isActive, true))
       .orderBy(sponsors.name);
   }
 
   async getSponsor(id: number): Promise<Sponsor | undefined> {
-  const result = await readDatabase().select().from(sponsors).where(eq(sponsors.id, id));
+  const result = await readDatabase.select().from(sponsors).where(eq(sponsors.id, id));
     return result[0];
   }
 
   async getBillSponsors(billId: number): Promise<(Sponsor & { sponsorshipType: string })[]> {
-  const result = await readDatabase().select({
+  const result = await readDatabase.select({
       id: sponsors.id,
       name: sponsors.name,
       role: sponsors.role,
@@ -296,12 +296,12 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async createSponsor(insertSponsor: InsertSponsor): Promise<Sponsor> {
-    const result = await readDatabase().insert(sponsors).values(insertSponsor).returning();
+  const result = await readDatabase.insert(sponsors).values(insertSponsor).returning();
     return result[0];
   }
 
   async updateSponsor(id: number, updateData: Partial<Sponsor>): Promise<Sponsor | undefined> {
-    const result = await readDatabase().update(sponsors)
+  const result = await readDatabase.update(sponsors)
       .set(updateData)
       .where(eq(sponsors.id, id))
       .returning();
@@ -310,25 +310,25 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
 
   // Analysis methods
   async getBillAnalysis(billId: number): Promise<Analysis[]> {
-  return await readDatabase().select().from(analysis)
+  return await readDatabase.select().from(analysis)
       .where(eq(analysis.billId, billId))
       .orderBy(desc(analysis.createdAt));
   }
 
   async createAnalysis(insertAnalysis: InsertAnalysis): Promise<Analysis> {
-  const result = await readDatabase().insert(analysis).values(insertAnalysis).returning();
+  const result = await readDatabase.insert(analysis).values(insertAnalysis).returning();
   return result[0];
   }
 
   // Fixed engagement methods - addressing the TypeScript errors
   async recordBillEngagement(engagement: Omit<BillEngagement, 'id' | 'createdAt'>): Promise<BillEngagement> {
-  const result = await readDatabase().insert(billEngagement).values(engagement).returning();
+  const result = await readDatabase.insert(billEngagement).values(engagement).returning();
   return result[0];
   }
 
   async getBillEngagementStats(billId: number): Promise<BillEngagementStats> {
     // Optimized query using single aggregation query as per design.md recommendations
-    const stats = await readDatabase()
+  const stats = await readDatabase
       .select({
         totalViews: sql<number>`SUM(${billEngagement.viewCount})`,
         totalComments: sql<number>`COUNT(DISTINCT ${billComments.id})`,
@@ -354,7 +354,7 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async getUserEngagementHistory(userId: string, limit: number = 50): Promise<BillEngagement[]> {
-  return await readDatabase().select().from(billEngagement)
+  return await readDatabase.select().from(billEngagement)
       .where(eq(billEngagement.userId, userId))
       .orderBy(desc(billEngagement.lastEngaged))
       .limit(limit);
@@ -362,7 +362,7 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
 
   // Enhanced notification methods
   async getUserNotifications(userId: string, includeRead: boolean = false): Promise<Notification[]> {
-  let query = readDatabase().select().from(notifications)
+  let query = readDatabase.select().from(notifications)
       .where(eq(notifications.userId, userId));
     
     if (!includeRead) {
@@ -376,26 +376,26 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async markNotificationRead(id: number): Promise<void> {
-    await readDatabase().update(notifications)
+  await readDatabase.update(notifications)
       .set({ isRead: true })
       .where(eq(notifications.id, id));
   }
 
   async markAllNotificationsRead(userId: string): Promise<void> {
-    await readDatabase().update(notifications)
+  await readDatabase.update(notifications)
       .set({ isRead: true })
       .where(eq(notifications.userId, userId));
   }
 
   // Transparency methods
   async getSponsorTransparency(sponsorId: number): Promise<SponsorTransparency[]> {
-  return await readDatabase().select().from(sponsorTransparency)
+  return await readDatabase.select().from(sponsorTransparency)
       .where(eq(sponsorTransparency.sponsorId, sponsorId))
       .orderBy(desc(sponsorTransparency.dateReported));
   }
 
   async getSponsorAffiliations(sponsorId: number): Promise<SponsorAffiliation[]> {
-  return await readDatabase().select().from(sponsorAffiliations)
+  return await readDatabase.select().from(sponsorAffiliations)
       .where(and(
         eq(sponsorAffiliations.sponsorId, sponsorId),
         eq(sponsorAffiliations.isActive, true)
@@ -404,7 +404,7 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async getBillConflicts(billId: number): Promise<BillSectionConflict[]> {
-  return await readDatabase().select().from(billSectionConflicts)
+  return await readDatabase.select().from(billSectionConflicts)
       .where(eq(billSectionConflicts.billId, billId))
       .orderBy(billSectionConflicts.sectionNumber);
   }

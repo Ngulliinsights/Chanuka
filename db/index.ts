@@ -1,3 +1,13 @@
+// Compatibility shim to re-export the canonical shared database pool and drizzle instances.
+// This file lets existing imports that reference `db/index.ts` continue to work while the
+// authoritative implementation lives in `shared/database/pool.ts`.
+export { db, readDb, writeDb, pool, getPools, executeQuery, closePools } from '@shared/database/pool';
+
+// Provide convenience functions to match older code that expected functions like readDatabase()
+export const readDatabase = () => readDb;
+export const writeDatabase = () => writeDb;
+
+export default db;
 import * as dotenv from 'dotenv';
 
 // Load environment variables first

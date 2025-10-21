@@ -14,8 +14,8 @@ import {
   ApiError,
   ApiValidationError, 
   ApiResponseWrapper 
-} from "../../utils/api-response";
-import { logger } from '../../utils/logger';
+} from "../../../shared/core/src/utilities/api";
+import { logger } from '../../../shared/core/src/observability/logging';
 
 export const router = Router();
 

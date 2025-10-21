@@ -1,4 +1,4 @@
-import { database as db, readDatabase } from '../../../shared/database/connection';
+import { database as db, readDatabase } from '@shared/database/connection';
 import {
   user, bill, billEngagement, userInterest, billComment, sponsor, billSponsorship, billTag // Added billTag
 } from '../../../shared/schema';
@@ -51,7 +51,7 @@ export interface UserEngagementProfile {
 }
 
 export class SmartNotificationFilterService {
-  private get db() { return readDatabase(); }
+  private get db() { return readDatabase; }
   private readonly CACHE_DURATION_PROFILE = CACHE_TTL.USER_DATA_LONG; // Cache profile for a day
 
   /**

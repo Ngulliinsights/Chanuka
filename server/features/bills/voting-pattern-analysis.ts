@@ -1,8 +1,8 @@
 import { readDatabase } from '../../../shared/database/connection.js';
 import * as schema from '../../../shared/schema';
-import { sponsorService } from './sponsor-service.js';
+import { sponsorService } from '../sponsors/infrastructure/repositories/sponsor.repository.js';
 import { eq, and, sql, desc, asc, count, avg, inArray, or, notInArray } from 'drizzle-orm';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -138,7 +138,7 @@ export class VotingPatternAnalysisService {
   // Using a getter ensures we always have a fresh database connection
   // This prevents stale connection issues and makes the code more resilient
   private get db() {
-    const d = readDatabase();
+  const d = readDatabase;
     if (!d) {
       throw new Error('Database not initialized for VotingPatternAnalysisService');
     }

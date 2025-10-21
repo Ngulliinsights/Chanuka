@@ -1,8 +1,8 @@
-import { db } from '../../db.js';
+import { db } from '@shared/database/pool.js';
 import { eq, sql, and, desc, count, ilike } from 'drizzle-orm';
 import { bills, analysis, evaluations, departments } from '../../../shared/schema';
 import type { DepartmentStat, RadarDatum } from '../../../shared/schema';
-import { logger } from '../../utils/logger.js';
+import { logger } from '../../../shared/core/src/observability/logging';
 import { errorTracker } from '../../core/errors/error-tracker.js';
 
 /**

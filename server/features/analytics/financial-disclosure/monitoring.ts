@@ -15,7 +15,7 @@ import {
   NotFoundError as SponsorNotFoundError,
   DatabaseError,
   ValidationError as InvalidInputError
-} from "../../../utils/errors.js";
+} from "../../../../shared/core/src/observability/error-management";
 import { FinancialDisclosureConfig } from './config.js';
 import type {
   FinancialDisclosure,

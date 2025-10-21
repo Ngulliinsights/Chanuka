@@ -106,7 +106,7 @@ const DEFAULT_PREFERENCES: UserNotificationPreferences = {
  */
 export class UserPreferencesService {
   // Use read replica if available for preference fetching
-  private get db() { return readDatabase(); }
+  private get db() { return readDatabase; }
 
   /**
    * Retrieves the user's GLOBAL notification preferences.

@@ -3,7 +3,7 @@
 
 import request from 'supertest';
 import express from 'express';
-import { logger } from '../utils/logger.js';
+import { logger } from '../../shared/core/src/observability/logging/index.js';
 
 // Create a simple test app
 const app = express();

@@ -8,7 +8,7 @@
 import { BaseCacheAdapter } from '../base-adapter';
 import { MemoryAdapter, type MemoryAdapterConfig } from './memory-adapter';
 import { RedisAdapter, type RedisAdapterConfig } from './redis-adapter';
-import { logger } from '../../utils/logger';
+import { logger } from '../../observability/logging';
 import type {
   CacheOptions,
   CacheHealthStatus,

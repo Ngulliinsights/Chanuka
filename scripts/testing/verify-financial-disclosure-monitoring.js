@@ -7,7 +7,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { logger } from '../utils/logger.js';
+import { logger } from '../../shared/core/src/observability/logging/index.js';
 
 logger.info('🔍 Verifying Financial Disclosure Monitoring System...\n', { component: 'Chanuka' });
 

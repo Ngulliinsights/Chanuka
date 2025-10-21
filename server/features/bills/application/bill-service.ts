@@ -2,7 +2,7 @@ import { eq, desc, and, sql, count, like, or } from "drizzle-orm";
 import { database as databaseService, readDatabase } from '../../../../shared/database/connection';
 import * as schema from "../../../../shared/schema/schema.js";
 import type { Bill, InsertBill, BillEngagement } from "../../../../shared/schema/schema.js";
-import { logger } from '../../../../shared/core/logger.js';
+import { logger } from '../../../../shared/core';
 
 // Simple cache service mock for now
 const cacheService = {
@@ -105,7 +105,7 @@ export class BillService {
    * This getter pattern ensures we always work with the current DB connection.
    */
   private get db() {
-    return readDatabase();
+  return readDatabase;
   }
 
   /**

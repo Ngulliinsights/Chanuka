@@ -1,5 +1,5 @@
 import { userProfileService } from './services/user-profile.js';
-import { db } from './db.js';
+import { db } from '@shared/database/pool.js';
 import { users } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '../../shared/core/src/observability/logging';

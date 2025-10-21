@@ -1,5 +1,5 @@
 import pkg from 'pg';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/src/observability/logging';
 const { Pool } = pkg;
 import type { Pool as PoolType } from 'pg';
 

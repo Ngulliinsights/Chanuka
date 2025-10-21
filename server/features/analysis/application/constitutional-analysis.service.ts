@@ -1,4 +1,4 @@
-import { readDatabase } from '../../../db.js';
+import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '../../../utils/logger.js';
@@ -31,7 +31,7 @@ export interface ConstitutionalAnalysisResult {
  * Service dedicated to analyzing the constitutional aspects of a bill.
  */
 export class ConstitutionalAnalysisService {
-    private get db() { return readDatabase(); }
+    private get db() { return readDatabase; }
 
     // Define constitutional check patterns (can be moved to config)
     private readonly constitutionalChecks = [
