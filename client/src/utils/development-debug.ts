@@ -2,7 +2,7 @@
 // This module provides debugging utilities specifically for development mode
 
 import React from 'react';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 interface DebugInfo {
   environment: string;

@@ -1,6 +1,8 @@
 // Development Error Recovery Utilities
 // This module provides enhanced error handling and recovery mechanisms for development mode
 
+import { logger } from '@/utils/browser-logger';
+
 interface DevServerInfo {
   url: string;
   timestamp: string;
@@ -144,10 +146,10 @@ export class DevelopmentErrorRecovery {
 
   private handleHMRError(message: string, args: any[]): void {
     console.group('🔥 HMR Error Detected');
-    logger.error('Message:', { component: 'Chanuka' }, message);
-    logger.error('Arguments:', { component: 'Chanuka' }, args);
-    logger.error('HMR Status:', { component: 'Chanuka' }, window.__DEV_SERVER__?.hmrStatus?.() || 'Unknown');
-    logger.error('Connection Attempts:', { component: 'Chanuka' }, this.hmrConnectionAttempts);
+    console.error('Message:', message);
+    console.error('Arguments:', args);
+    console.error('HMR Status:', (window as any).__DEV_SERVER__?.hmrStatus?.() || 'Unknown');
+    console.error('Connection Attempts:', this.hmrConnectionAttempts);
     console.groupEnd();
 
     // Attempt HMR recovery

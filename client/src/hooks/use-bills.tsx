@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { billsApi } from '@/services/api';
 import { useToast } from './use-toast';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 /**
  * Type definitions for query parameters and mutation payloads.

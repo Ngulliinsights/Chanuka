@@ -4,7 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 const ToastProvider = Provider
 

@@ -8,40 +8,40 @@ import helmet from 'helmet';
 import { database as db } from '../shared/database/connection.js';
 import { config } from './config/index.js';
 // Feature Routes
-import { router as systemRouter } from './features/admin/system.js';
-import { router as billsRouter } from './features/bills/presentation/bills-router.js';
-import { router as sponsorshipRouter } from './features/bills/presentation/sponsorship.routes.js';
-import { analysisRouter } from './features/analysis/presentation/analysis.routes.js';
-import { billTrackingRouter } from './features/bills/presentation/bill-tracking.routes.js';
-import analyticsRouter from './features/analytics/analytics.js';
-import { sponsorsRouter } from './features/sponsors/presentation/sponsors.routes.js';
-import { router as authRouter } from './core/auth/auth.js';
-import { router as usersRouter } from './features/users/application/users.js';
-import { router as verificationRouter } from './features/users/application/verification.js';
+// import { router as systemRouter } from './features/admin/system.js';
+// import { router as billsRouter } from './features/bills/presentation/bills-router.js';
+// import { router as sponsorshipRouter } from './features/bills/presentation/sponsorship.routes.js';
+// import { analysisRouter } from './features/analysis/presentation/analysis.routes.js';
+// import { billTrackingRouter } from './features/bills/presentation/bill-tracking.routes.js';
+// import analyticsRouter from './features/analytics/analytics.js';
+// import { sponsorsRouter } from './features/sponsors/presentation/sponsors.routes.js';
+// import { router as authRouter } from './core/auth/auth.js';
+// import { router as usersRouter } from './features/users/application/users.js';
+// import { router as verificationRouter } from './features/users/application/verification.js';
 import { router as healthRouter } from './infrastructure/monitoring/health.js';
-import { router as communityRouter } from './features/community/community.js';
+// import { router as communityRouter } from './features/community/community.js';
 
-import { notificationRoutes as notificationsRouter } from './infrastructure/notifications/index.js';
-import { router as searchRouter } from './features/search/presentation/SearchController.js';
-import { router as profileRouter } from './features/users/application/profile.js';
-import { router as privacyRouter } from './features/privacy/privacy-routes.js';
+// import { notificationRoutes as notificationsRouter } from './infrastructure/notifications/index.js';
+// import { router as searchRouter } from './features/search/presentation/SearchController.js';
+// import { router as profileRouter } from './features/users/application/profile.js';
+// import { router as privacyRouter } from './features/privacy/privacy-routes.js';
 // import governmentDataRouter from './features/government-data/routes.js'; // TODO: Implement government data router
 // import { router as billTrackingRouter } from './features/bills/bill-tracking.js'; // TODO: Implement bill tracking router
-import { router as adminRouter } from './features/admin/admin.js';
+// import { router as adminRouter } from './features/admin/admin.js';
 import { router as cacheRouter } from './infrastructure/cache/cache.js';
 import { cacheCoordinator } from './infrastructure/cache/index.js';
 // import { router as realTimeTrackingRouter } from './features/bills/real-time-tracking.js'; // TODO: Implement real-time tracking router
-import { router as alertPreferencesRouter } from './features/alert-preferences/unified_alert_routes.js';
+// import { router as alertPreferencesRouter } from './features/alert-preferences/unified_alert_routes.js';
 // import engagementAnalyticsRouter from './features/analytics/engagement-analytics.js'; // TODO: Implement engagement analytics router
 // import { sponsorConflictAnalysisRouter } from './features/bills/sponsor-conflict-analysis.js'; // TODO: Implement sponsor conflict analysis router
 // import { votingPatternAnalysisRouter } from './features/bills/voting-pattern-analysis.js'; // TODO: Implement voting pattern analysis router
-import { createFinancialDisclosureRouter } from './features/analytics/financial-disclosure/index.js';
+// import { createFinancialDisclosureRouter } from './features/analytics/financial-disclosure/index.js';
 // import financialDisclosureIntegrationRouter from './features/analytics/financial-disclosure-integration.js'; // TODO: Implement financial disclosure integration router
 // import { router as transparencyDashboardRouter } from './features/analytics/transparency-dashboard.js'; // TODO: Implement transparency dashboard router
-import { getMonitoringService } from './infrastructure/monitoring/monitoring.js';
-import { router as externalApiManagementRouter } from './infrastructure/monitoring/external-api-management.js';
-import { router as externalApiDashboardRouter } from './features/admin/external-api-dashboard.js';
-import coverageRouter from './features/coverage/coverage-routes.js';
+// import { getMonitoringService } from './infrastructure/monitoring/monitoring.js';
+// import { router as externalApiManagementRouter } from './infrastructure/monitoring/external-api-management.js';
+// import { router as externalApiDashboardRouter } from './features/admin/external-api-dashboard.js';
+// import coverageRouter from './features/coverage/coverage-routes.js';
 // Import migrated middleware
 import {
   migratedAuthenticateToken,
@@ -102,17 +102,17 @@ const securityMonitoringMiddleware = {
 // Infrastructure Services
 import { auditMiddleware } from './infrastructure/monitoring/audit-log.js';
 import { performanceMiddleware } from './infrastructure/monitoring/performance-monitor.js';
-import { setupVite } from './vite.js';
-import { initializeDatabase, validateDatabaseHealth } from "./utils/db-init.js";
-import { databaseFallbackService } from "./infrastructure/database/database-fallback.js";
-import { webSocketService } from './infrastructure/websocket.js';
-import { billStatusMonitorService as billStatusMonitor } from './features/bills/bill-status-monitor.js';
-import { notificationSchedulerService } from './infrastructure/notifications/index.js';
+// import { setupVite } from './vite.js';
+// import { initializeDatabase, validateDatabaseHealth } from "./utils/db-init.js";
+// import { databaseFallbackService } from "./infrastructure/database/database-fallback.js";
+// import { webSocketService } from './infrastructure/websocket.js';
+// import { billStatusMonitorService as billStatusMonitor } from './features/bills/bill-status-monitor.js';
+// import { notificationSchedulerService } from './infrastructure/notifications/index.js';
 import { monitoringScheduler } from './infrastructure/monitoring/monitoring-scheduler.js';
-import { sessionCleanupService } from './core/auth/session-cleanup.js';
-import { SearchIndexManager } from './features/search/infrastructure/SearchIndexManager.js';
-import { securityMonitoringService } from './features/security/security-monitoring-service.js';
-import { privacySchedulerService } from './features/privacy/privacy-scheduler.js';
+// import { sessionCleanupService } from './core/auth/session-cleanup.js';
+// import { SearchIndexManager } from './features/search/infrastructure/SearchIndexManager.js';
+// import { securityMonitoringService } from './features/security/security-monitoring-service.js';
+// import { privacySchedulerService } from './features/privacy/privacy-scheduler.js';
 // Unified utilities (consolidated from sprawl)
 import { logger, Performance, RateLimit, ApiResponse } from '../shared/core/index.js';
 
@@ -120,7 +120,7 @@ import { logger, Performance, RateLimit, ApiResponse } from '../shared/core/inde
 const initializeMonitoring = (env: string) => {
   logger.info('Performance monitoring initialized', { environment: env });
 };
-import { serveSwagger, setupSwagger } from './features/analytics/swagger.js';
+// import { serveSwagger, setupSwagger } from './features/analytics/swagger.js';
 
 const __dirname = path.resolve();
 
@@ -342,29 +342,29 @@ app.get('/api/debug/memory-analysis', (req, res) => {
 });
 
 // API Routes
-app.use('/api/system', systemRouter);
-app.use('/api/bills', billsRouter);
-app.use('/api/sponsorship', sponsorshipRouter);
-app.use('/api/analysis', analysisRouter);
+// app.use('/api/system', systemRouter);
+// app.use('/api/bills', billsRouter);
+// app.use('/api/sponsorship', sponsorshipRouter);
+// app.use('/api/analysis', analysisRouter);
 app.use('/api/bill-tracking', billTrackingRouter);
-app.use('/api/analytics', analyticsRouter);
-app.use('/api/sponsors', sponsorsRouter);
-app.use('/api/auth', authRouter);
-app.use('/api/users', usersRouter);
-app.use('/api/verification', verificationRouter);
+// app.use('/api/analytics', analyticsRouter);
+// app.use('/api/sponsors', sponsorsRouter);
+// app.use('/api/auth', authRouter);
+// app.use('/api/users', usersRouter);
+// app.use('/api/verification', verificationRouter);
 app.use('/api/health', healthRouter);
-app.use('/api/community', communityRouter);
+// app.use('/api/community', communityRouter);
 
-app.use('/api/notifications', notificationsRouter);
-app.use('/api/search', searchRouter);
-app.use('/api/profile', profileRouter);
-app.use('/api/privacy', privacyRouter);
+// app.use('/api/notifications', notificationsRouter);
+// app.use('/api/search', searchRouter);
+// app.use('/api/profile', profileRouter);
+// app.use('/api/privacy', privacyRouter);
 // app.use('/api/government-data', governmentDataRouter); // TODO: Implement government data router
 // app.use('/api/bill-tracking', billTrackingRouter); // TODO: Implement bill tracking router
-app.use('/api/admin', adminRouter);
+// app.use('/api/admin', adminRouter);
 app.use('/api/cache', cacheRouter);
 // app.use('/api/real-time', realTimeTrackingRouter); // TODO: Implement real-time tracking router
-app.use('/api/alert-preferences', alertPreferencesRouter);
+// app.use('/api/alert-preferences', alertPreferencesRouter);
 // app.use('/api/engagement-analytics', engagementAnalyticsRouter); // TODO: Implement engagement analytics router
 // app.use('/api', sponsorConflictAnalysisRouter); // TODO: Implement sponsor conflict analysis router
 // app.use('/api', votingPatternAnalysisRouter); // TODO: Implement voting pattern analysis router
@@ -372,14 +372,14 @@ app.use('/api/alert-preferences', alertPreferencesRouter);
 // app.use('/api/financial-disclosure-integration', financialDisclosureIntegrationRouter); // TODO: Implement financial disclosure integration router
 // app.use('/api/transparency', transparencyDashboardRouter); // TODO: Implement transparency dashboard router
 // app.use('/api/monitoring', monitoringRouter); // TODO: Initialize monitoring router
-app.use('/api/external-api', externalApiManagementRouter);
-app.use('/api/admin/external-api', externalApiDashboardRouter);
+// app.use('/api/external-api', externalApiManagementRouter);
+// app.use('/api/admin/external-api', externalApiDashboardRouter);
 // TODO: Implement security monitoring router
 // app.use('/api/security', securityMonitoringRouter);
-app.use('/api/coverage', coverageRouter);
+// app.use('/api/coverage', coverageRouter);
 
 // Swagger API documentation
-app.use('/api-docs', serveSwagger, setupSwagger);
+// app.use('/api-docs', serveSwagger, setupSwagger);
 
 // API-specific error handling middleware
 app.use('/api', (error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

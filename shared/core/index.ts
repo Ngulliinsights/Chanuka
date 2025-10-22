@@ -1,12 +1,40 @@
 /**
- * Shared Core Utilities
+ * Shared Core Utilities - Main Entry Point
  * Consolidated utilities for the Chanuka platform
+ * 
+ * This file provides essential exports for client-side usage,
+ * avoiding circular dependencies while maintaining functionality.
  */
 
-// Logger
-export { logger } from './src/observability/logging/index.js';
+// Essential logger - try to import from full system, fallback to simple
+let logger: any;
+try {
+  // Try to import the full logger system
+  const loggingModule = require('./src/observability/logging');
+  logger = loggingModule.logger || loggingModule.UnifiedLogger;
+} catch (error) {
+  // Fallback to simple console logger
+  logger = {
+    debug: (message: string, ...args: any[]) => {
+      if (process.env.NODE_ENV === 'development') {
+        console.debug(message, ...args);
+      }
+    },
+    info: (message: string, ...args: any[]) => {
+      console.info(message, ...args);
+    },
+    warn: (message: string, ...args: any[]) => {
+      console.warn(message, ...args);
+    },
+    error: (message: string, ...args: any[]) => {
+      console.error(message, ...args);
+    }
+  };
+}
 
-// Error classes for basic error handling
+export { logger };
+
+// Essential error classes
 export class BaseError extends Error {
   constructor(
     message: string,
@@ -46,7 +74,7 @@ export class ForbiddenError extends BaseError {
   }
 }
 
-// Simple API response utilities
+// Essential API response utilities
 export const ApiResponse = {
   success: (data: any, message = 'Success') => ({
     success: true,
@@ -74,7 +102,7 @@ export const ApiResponse = {
   })
 };
 
-// Simple performance monitoring
+// Essential performance monitoring
 export const Performance = {
   startTimer: (name: string) => {
     const start = Date.now();
@@ -100,7 +128,7 @@ export const Performance = {
   }
 };
 
-// Simple rate limiting (in-memory)
+// Essential rate limiting (in-memory)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
 export const RateLimit = {
@@ -135,3 +163,11 @@ export const RateLimit = {
     };
   }
 };
+
+// Re-export from src for server-side usage (when available)
+try {
+  const srcExports = require('./src');
+  Object.assign(module.exports, srcExports);
+} catch (error) {
+  // Client-side or src not available, use essentials only
+}

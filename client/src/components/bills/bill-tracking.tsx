@@ -19,7 +19,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '../../hooks/use-toast';
 import { useSafeQuery } from '../../hooks/use-safe-query';
 import AuthenticatedAPI from '../../utils/authenticated-api';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 interface Bill {
   id: number;

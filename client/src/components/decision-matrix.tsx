@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Download, Split, ArrowRight, Zap, Users } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 interface DecisionMatrixProps {
   projectId: number;

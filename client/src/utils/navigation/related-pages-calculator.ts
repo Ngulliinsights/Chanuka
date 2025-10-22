@@ -1,5 +1,5 @@
 import { RelatedPage, UserRole, PageRelationship } from '@/types/navigation';
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Page relationship mapping
 const pageRelationships: Record<string, PageRelationship> = {

@@ -1,4 +1,4 @@
-import { BaseError, ErrorDomain, ErrorSeverity } from '@/errors';
+import { BaseError, ErrorDomain, ErrorSeverity } from '../../observability/error-management';
 import { logger } from '../../observability/logging';
 
 const formatFileSize = (bytes: number): string => {

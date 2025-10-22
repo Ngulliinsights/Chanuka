@@ -129,14 +129,51 @@ export class UnifiedApiResponse {
   static serviceUnavailable(message: string = 'Service temporarily unavailable'): ErrorResponse {
     return this.error(message, 'SERVICE_UNAVAILABLE');
   }
+
+  static createMetadata(
+    startTime: number,
+    operation: string,
+    additionalMetadata?: Partial<ResponseMetadata>
+  ): Partial<ResponseMetadata> {
+    const duration = Date.now() - startTime;
+    return {
+      timestamp: new Date().toISOString(),
+      performance: {
+        duration
+      },
+      ...additionalMetadata
+    };
+  }
 }
 
 // Legacy exports for backward compatibility
-export const ApiSuccess = UnifiedApiResponse.success;
-export const ApiError = UnifiedApiResponse.error;
-export const ApiNotFound = (message?: string) => UnifiedApiResponse.notFound('Resource', message);
-export const ApiValidationError = (errors: any[]) => UnifiedApiResponse.validation(errors);
 export const ApiResponseWrapper = UnifiedApiResponse;
+
+// Error codes and HTTP status constants
+export const ErrorCodes = {
+  VALIDATION_ERROR: 'VALIDATION_ERROR',
+  DATABASE_ERROR: 'DATABASE_ERROR',
+  UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
+  NOT_FOUND: 'NOT_FOUND',
+  INTERNAL_ERROR: 'INTERNAL_ERROR',
+  CONFLICT: 'CONFLICT',
+  TOO_MANY_REQUESTS: 'TOO_MANY_REQUESTS',
+  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE'
+} as const;
+
+export const HttpStatus = {
+  OK: 200,
+  CREATED: 201,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  CONFLICT: 409,
+  TOO_MANY_REQUESTS: 429,
+  INTERNAL_SERVER_ERROR: 500,
+  SERVICE_UNAVAILABLE: 503
+} as const;
 
 /**
  * Express response helper
@@ -147,7 +184,7 @@ export function sendApiResponse<T>(
   statusCode?: number
 ): void {
   const status = statusCode || (response.success ? 200 : 500);
-  
+
   // Log the response for monitoring
   if (!response.success) {
     logger.error('API Error Response', {
@@ -157,6 +194,67 @@ export function sendApiResponse<T>(
   }
 
   res.status(status).json(response);
+}
+
+/**
+ * Legacy API response helper functions for backward compatibility
+ */
+export function ApiSuccess<T>(
+  res: Response,
+  data: T,
+  metadata?: Partial<ResponseMetadata>,
+  statusCode?: number
+): void {
+  const response = UnifiedApiResponse.success(data, undefined, metadata);
+  sendApiResponse(res, response, statusCode);
+}
+
+export function ApiError(
+  res: Response,
+  error: { code: string; message: string; details?: any },
+  statusCode: number = 500,
+  metadata?: Partial<ResponseMetadata>
+): void {
+  const response = UnifiedApiResponse.error(error.message, error.code, error.details, metadata);
+  sendApiResponse(res, response, statusCode);
+}
+
+export function ApiUnauthorized(
+  res: Response,
+  message: string = 'Authentication required',
+  metadata?: Partial<ResponseMetadata>
+): void {
+  const response = UnifiedApiResponse.unauthorized(message);
+  sendApiResponse(res, response, 401);
+}
+
+export function ApiForbidden(
+  res: Response,
+  message: string = 'Insufficient permissions',
+  metadata?: Partial<ResponseMetadata>
+): void {
+  const response = UnifiedApiResponse.forbidden(message);
+  sendApiResponse(res, response, 403);
+}
+
+export function ApiNotFound(
+  res: Response,
+  resource: string = 'Resource',
+  message?: string,
+  metadata?: Partial<ResponseMetadata>
+): void {
+  const response = UnifiedApiResponse.notFound(resource, message);
+  sendApiResponse(res, response, 404);
+}
+
+export function ApiValidationError(
+  res: Response,
+  errors: Array<{ field: string; message: string }> | { field: string; message: string },
+  metadata?: Partial<ResponseMetadata>
+): void {
+  const errorArray = Array.isArray(errors) ? errors : [errors];
+  const response = UnifiedApiResponse.validation(errorArray, 'Validation failed');
+  sendApiResponse(res, response, 400);
 }
 
 export default UnifiedApiResponse;

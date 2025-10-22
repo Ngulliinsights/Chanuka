@@ -1,4 +1,4 @@
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@/utils/browser-logger';
 import { preloadCriticalResources } from './serviceWorker';
 
 // Asset loading configuration

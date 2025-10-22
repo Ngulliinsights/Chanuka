@@ -1,5 +1,5 @@
-import { db } from '@shared/database/pool';
-import * as schema from '@shared/schema';
+import { database as db } from '../../shared/database/connection';
+import * as schema from '../../shared/schema';
 import { logger } from '../..//shared/core/src/observability/logging';
 
 export default async function seedLegislative() {

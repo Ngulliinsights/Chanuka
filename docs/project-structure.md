@@ -4,7 +4,6 @@ Maximum depth: 7 levels
 
 ```
 .
-BACKEND_TESTING_QUICKSTART.md
 client/
 ├── index.html
 ├── public/
@@ -272,6 +271,8 @@ client/
 │   │   │   │   ├── useRelatedPages.ts
 │   │   │   │   ├── useRouteAccess.ts
 │   │   │   ├── index.ts
+│   │   │   ├── navigation-preferences-dialog.tsx
+│   │   │   ├── quick-access-nav.tsx
 │   │   │   ├── recovery.ts
 │   │   │   ├── types.ts
 │   │   │   ├── ui/
@@ -633,38 +634,29 @@ client/
 │   │   ├── serviceWorker.ts
 │   ├── vite-env.d.ts
 components.json
+CONSOLIDATION_PROGRESS.md
 cspell.config.yaml
-db/
-├── index.ts
-├── init-scripts/
-│   ├── 01-init-database.sql
-├── legislative-seed.ts
-├── schema/
-│   ├── relations.ts
-│   ├── schema.ts
-│   ├── schema1.ts
-├── seed.ts
-├── simple-seed.ts
 docker-compose.yml
 Dockerfile
 docs/
 ├── analysis/
 │   ├── chanuka_implementation_guide.md
+│   ├── codebase-analysis.md
+├── architecture/
+│   ├── ai-code-review/
+│   │   ├── design.md
+│   │   ├── implementation.md
+│   │   ├── requirements.md
+│   ├── application-flow.md
+│   ├── frameworks/
+│   │   ├── comprehensive-code-analysis.md
+│   │   ├── synthesis.md
+│   │   ├── unified-ai-dev.md
+│   │   ├── unified-code-analysis.md
+│   │   ├── unified-code-analysis-v2.md
+│   │   ├── unified-coding.md
 ├── chanuka/
-│   ├── ai_code_review_design.md
-│   ├── ai_code_review_implementation.md
-│   ├── ai_code_review_requirements.md
-│   ├── application_flow_1751746507009.md
-│   ├── chanuka_brand_roadmap (1).md
-│   ├── chanuka_framework_synthesis_1751746507007.md
-│   ├── chanuka_manifesto (1).md
-│   ├── chanuka-best-functionality_1751746507008.md
-│   ├── chanuka-problem-statement_1751746507008.md
-│   ├── chanuka-user-guide_1751746507008.md
-│   ├── codebase-analysis_1751746507007.md
 │   ├── community-input_1751743369833.html
-│   ├── comprehensive_code_analysis_framework.md
-│   ├── core_function_1751746507009.md
 │   ├── dashboard_1751743369900.html
 │   ├── expert-verification_1751743369833.html
 │   ├── ezra-nehemiah-chanuka (1).md
@@ -682,19 +674,32 @@ docs/
 │   ├── shared_core_requirements.md
 │   ├── shared_core_tasks.md
 │   ├── sponsorbyreal.html
-│   ├── unified_ai_dev_framework.md
-│   ├── unified_code_analysis_framework (2).md
-│   ├── unified_code_analysis_framework.md
-│   ├── unified_coding_framework.md
 ├── chanuka_architecture.txt
 ├── chanuka_functionality_analysis.md
+├── features/
+│   ├── best-functionality.md
+│   ├── core-functionality.md
 ├── guides/
+│   ├── BACKEND_TESTING_QUICKSTART.md
+│   ├── CLEANUP_SUMMARY.md
+│   ├── CONSOLIDATION_COMPLETE.md
 │   ├── DATABASE_SETUP_GUIDE.md
 │   ├── DEMO_MODE_CONFIGURATION.md
 │   ├── DEPLOYMENT.md
 │   ├── DEPLOYMENT_GUIDE.md
+│   ├── FINAL_CONSOLIDATION_REPORT.md
+│   ├── INFRASTRUCTURE_CONSOLIDATION_PLAN.md
+│   ├── INFRASTRUCTURE_CONSOLIDATION_SUMMARY.md
+│   ├── MEMORY_OPTIMIZATION_GUIDE.md
 │   ├── NAVIGATION_USER_GUIDE.md
+│   ├── TESTING_GUIDE.md
 │   ├── TROUBLESHOOTING_GUIDE.md
+│   ├── user-guide.md
+│   ├── UTILITY_MIGRATION_REPORT.md
+├── project/
+│   ├── brand-roadmap.md
+│   ├── manifesto.md
+│   ├── problem-statement.md
 ├── project-structure.md
 ├── strategic-tables-recommendations.md
 drizzle/
@@ -744,7 +749,6 @@ logs/
 ├── logger_files_clean.txt
 ├── performance.log
 ├── security.log
-MEMORY_OPTIMIZATION_GUIDE.md
 migration/
 ├── __tests__/
 │   ├── codemod-imports.test.js
@@ -770,6 +774,7 @@ package.json
 package-lock.json
 playwright.config.ts
 postcss.config.js
+Readme1.md
 scripts/
 ├── analyze-bundle.js
 ├── audit-codebase-utilities.ts
@@ -799,6 +804,10 @@ scripts/
 ├── optimize-memory.js
 ├── rollback-cleanup.ts
 ├── run-strategic-tests.js
+├── seeds/
+│   ├── legislative-seed.ts
+│   ├── seed.ts
+│   ├── simple-seed.ts
 ├── setup-playwright.js
 ├── test-backend-only.js
 ├── testing/
@@ -848,7 +857,6 @@ scripts/
 ├── validate-test-config.js
 ├── verify-cleanup.ts
 server/
-├── CLEANUP_SUMMARY.md
 ├── comprehensive-race-condition-test.js
 ├── config/
 │   ├── development.ts
@@ -1017,7 +1025,7 @@ server/
 │   │   │   ├── bill-service.ts
 │   │   │   ├── bill-tracking.service.ts
 │   │   │   ├── index.ts
-│   │   │   ├── sponsorship-analysis.ts
+│   │   │   ├── sponsorship-analysis.service.ts
 │   │   ├── bill.js
 │   │   ├── bill-status-monitor.ts
 │   │   ├── domain/
@@ -1034,7 +1042,7 @@ server/
 │   │   │   ├── bills-router.ts
 │   │   │   ├── bill-tracking.routes.ts
 │   │   │   ├── index.ts
-│   │   │   ├── sponsorship.ts
+│   │   │   ├── sponsorship.routes.ts
 │   │   ├── voting-pattern-analysis.ts
 │   ├── community/
 │   │   ├── comment.ts
@@ -1107,6 +1115,7 @@ server/
 │   │   ├── domain/
 │   │   │   ├── entities/
 │   │   │   ├── repositories/
+│   │   ├── index.ts
 │   │   ├── infrastructure/
 │   │   │   ├── repositories/
 │   │   │   │   ├── __tests__/
@@ -1168,13 +1177,7 @@ server/
 ├── index.ts
 ├── infrastructure/
 │   ├── cache/
-│   │   ├── advanced-caching.ts
-│   │   ├── cache.ts
-│   │   ├── cache-coordinator.ts
-│   │   ├── cache-service.ts
-│   │   ├── cache-warming.ts
 │   │   ├── index.ts
-│   │   ├── migration-wrapper.ts
 │   ├── database/
 │   │   ├── base/
 │   │   │   ├── BaseStorage.d.ts
@@ -1182,7 +1185,6 @@ server/
 │   │   │   ├── BaseStorage.ts
 │   │   ├── config.d.ts
 │   │   ├── config.ts
-│   │   ├── connection-pool.ts
 │   │   ├── core/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── circuit-breaker.test.ts
@@ -1198,8 +1200,6 @@ server/
 │   │   │   ├── query-executor.ts
 │   │   ├── database-fallback.ts
 │   │   ├── database-optimization.ts
-│   │   ├── database-service.ts
-│   │   ├── db.ts
 │   │   ├── index.d.ts
 │   │   ├── index.ts
 │   │   ├── migration-service.ts
@@ -1218,18 +1218,8 @@ server/
 │   │   ├── types.ts
 │   ├── index.ts
 │   ├── monitoring/
-│   │   ├── apm-service.ts
-│   │   ├── audit-log.ts
-│   │   ├── db-tracer.ts
 │   │   ├── external-api-management.ts
-│   │   ├── health.ts
 │   │   ├── index.ts
-│   │   ├── memory-optimizer.ts
-│   │   ├── monitoring.ts
-│   │   ├── monitoring-scheduler.ts
-│   │   ├── performance-monitor.ts
-│   │   ├── performance-monitoring-service.ts
-│   │   ├── system-health.ts
 │   ├── notifications/
 │   │   ├── __tests__/
 │   │   │   ├── notification-orchestrator.test.ts
@@ -1368,7 +1358,6 @@ shared/
 │   ├── CONSOLIDATION_SUMMARY.md
 │   ├── ERROR_MANAGEMENT_MIGRATION_SUMMARY.md
 │   ├── index.ts
-│   ├── logger.ts
 │   ├── MIGRATION_GUIDE.md
 │   ├── MIGRATION_VALIDATION_REPORT.md
 │   ├── README.md
@@ -1658,6 +1647,7 @@ shared/
 │   │   │   │   ├── memory-store.ts
 │   │   │   │   ├── redis-store.ts
 │   │   │   ├── types.ts
+│   │   ├── schema/
 │   │   ├── services/
 │   │   │   ├── cache.ts
 │   │   │   ├── composition.ts
@@ -1689,6 +1679,8 @@ shared/
 │   │   │   ├── services.ts
 │   │   │   ├── validation-types.ts
 │   │   ├── utilities/
+│   │   │   ├── api/
+│   │   │   │   ├── index.ts
 │   │   │   ├── cache/
 │   │   │   │   ├── index.ts
 │   │   │   ├── performance/
@@ -1782,7 +1774,6 @@ shared/
 │   ├── legal-analysis.ts
 tailwind.config.ts
 test-auth-compile.ts
-TESTING_GUIDE.md
 tests/
 ├── api/
 │   ├── auth.spec.ts
@@ -1811,4 +1802,4 @@ vitest.frontend.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-21 16:22:53
+Generated on: 2025-10-22 02:19:08

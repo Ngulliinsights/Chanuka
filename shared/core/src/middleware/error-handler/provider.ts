@@ -1,6 +1,6 @@
 import { MiddlewareProvider } from '../types';
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../observability/logging';
+import { createErrorMiddleware } from '../../observability/error-management/middleware/express-error-middleware.js';
 
 export class ErrorHandlerMiddlewareProvider implements MiddlewareProvider {
   readonly name = 'errorHandler';
@@ -10,16 +10,12 @@ export class ErrorHandlerMiddlewareProvider implements MiddlewareProvider {
   }
 
   create(options: Record<string, any>) {
-    return (error: Error, req: Request, res: Response, next: NextFunction): void => {
-      // Log the error
-      logger.error('Unhandled error:', { component: 'Chanuka' }, error);
-
-      // Send error response
-      res.status(500).json({
-        error: 'Internal server error',
-        message: process.env.NODE_ENV === 'production' ? 'An unexpected error occurred' : error.message
-      });
-    };
+    // Use the unified error middleware from observability/error-management
+    return createErrorMiddleware({
+      includeStackTrace: options?.includeStackTrace ?? process.env.NODE_ENV === 'development',
+      logErrors: options?.logErrors ?? true,
+      correlationIdHeader: options?.correlationIdHeader ?? 'x-correlation-id'
+    });
   }
 }
 

@@ -34,7 +34,7 @@ import {
 import { useJourneyAnalytics } from '../../hooks/use-journey-tracker';
 import { JourneyAnalytics, JourneyOptimization, PathAnalytics, DropOffPoint, ConversionFunnel } from '../../services/UserJourneyTracker';
 import { UserRole } from '../../types/navigation';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 interface JourneyAnalyticsDashboardProps {
   className?: string;

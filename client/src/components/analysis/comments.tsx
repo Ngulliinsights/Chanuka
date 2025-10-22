@@ -35,7 +35,7 @@ const formatDistanceToNow = (date: Date) => {
   return date.toLocaleDateString();
 };
 import { useBillAnalysis } from '../../hooks/use-bill-analysis';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 interface Comment {
   id: number;

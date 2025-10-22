@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, afterEach, vi, beforeAll, afterAll,
 import { render, screen, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@testing-library/jest-dom';
-import logger from '../utils/logger.js';
+import { logger } from '@shared/core';
 
 // Mock fetch globally
 const mockFetch = vi.fn();

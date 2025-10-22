@@ -3,12 +3,12 @@ export default {
   extensionsToTreatAsEsm: ['.ts'],
   testEnvironment: 'node',
   displayName: 'Backend & Database Tests',
-  roots: ['<rootDir>/server', '<rootDir>/db'],
+  roots: ['<rootDir>/server', '<rootDir>/shared'],
   testMatch: [
     '**/server/**/__tests__/**/*.ts',
     '**/server/**/?(*.)+(spec|test).ts',
-    '**/db/**/__tests__/**/*.ts',
-    '**/db/**/?(*.)+(spec|test).ts'
+    '**/shared/**/__tests__/**/*.ts',
+    '**/shared/**/?(*.)+(spec|test).ts'
   ],
   transform: {
     '^.+\\.ts$': ['ts-jest', {
@@ -20,9 +20,9 @@ export default {
   },
   collectCoverageFrom: [
     'server/**/*.ts',
-    'db/**/*.ts',
+    'shared/**/*.ts',
     '!server/**/*.d.ts',
-    '!db/**/*.d.ts',
+    '!shared/**/*.d.ts',
     '!server/tests/**',
     '!server/index.ts'
   ],

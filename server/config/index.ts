@@ -2,7 +2,7 @@
 // Comprehensive, type-safe configuration for all server services
 
 import { z } from 'zod';
-import path from 'path';
+import * as path from 'path';
 import { fileURLToPath } from 'url';
 
 // Configuration utilities (defined early to avoid initialization issues)

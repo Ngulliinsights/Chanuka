@@ -1,4 +1,4 @@
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 import { processRequestInterceptors } from './apiInterceptors'; // <-- Import interceptors
 
 // API Error Types - Enhanced with better type safety

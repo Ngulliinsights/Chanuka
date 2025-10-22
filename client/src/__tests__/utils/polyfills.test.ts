@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import { loadPolyfills, loadFetchPolyfill, loadPromisePolyfill, getPolyfillStatus } from '../../utils/polyfills';
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Mock feature detector
 vi.mock('../../utils/browser-compatibility', () => ({

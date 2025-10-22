@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 import { Result, Ok, Err } from '../../primitives/types';
-import { BaseError } from '../../primitives/errors';
+import { BaseError } from '../error-management';
 import {
   Tracer as ITracer,
   Span as ISpan,

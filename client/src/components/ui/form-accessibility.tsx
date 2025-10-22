@@ -127,8 +127,9 @@ export const AccessibleFieldset: React.FC<AccessibleFieldsetProps> = ({
       </div>
     </fieldset>
   );
-};// Skip 
-link for form navigation
+};
+
+// Skip link for form navigation
 interface FormSkipLinkProps {
   targetId: string;
   children: React.ReactNode;

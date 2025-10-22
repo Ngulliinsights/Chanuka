@@ -8,7 +8,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { Result, ok, err } from '../primitives/types';
-import { BaseError } from '../primitives/errors';
+import { BaseError } from './error-management';
 import {
   Logger,
   MetricsCollector,

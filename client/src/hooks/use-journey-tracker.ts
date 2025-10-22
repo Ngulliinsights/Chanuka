@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { useNavigation } from '@/contexts/NavigationContext';
 import { UserJourneyTracker, JourneyAnalytics, JourneyOptimization } from '@/services/UserJourneyTracker';
 import { UserRole, NavigationSection } from '@/types/navigation';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@/utils/browser-logger';
 
 /**
  * Hook for tracking user journeys and analytics

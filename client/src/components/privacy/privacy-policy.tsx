@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Shield, Eye, Lock, Clock, Users, Globe } from 'lucide-react';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 export function PrivacyPolicy() {
   return (

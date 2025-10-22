@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import UserProfile from '@/components/profile/user-profile';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 const UserProfilePage: FC = () => {
   return (

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
   fetchWithFallback,
   ApiService,
   FallbackDataManager,

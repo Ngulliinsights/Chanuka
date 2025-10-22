@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AssetLoadingManager } from '@/utils/asset-loading';
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Mock DOM APIs
 const mockCreateElement = vi.fn();

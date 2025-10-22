@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Scale, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 import AppLayout from '@/components/layout/app-layout';
 import { wrapIcon } from '@/lib/icon-wrapper';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 // Wrap icons for consistent styling across the component
 const WrappedScale = wrapIcon(Scale);

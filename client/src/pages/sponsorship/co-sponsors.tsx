@@ -20,7 +20,7 @@ import {
   TrendingUp,
   AlertTriangle
 } from 'lucide-react';
-import { logger } from '../../utils/logger';
+import { logger } from '@/utils/browser-logger';
 
 interface CoSponsorsProps {
   billId?: string;

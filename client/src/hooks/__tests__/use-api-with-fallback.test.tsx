@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useApiWithFallback, useMutation, useApiPost } from '../use-api-with-fallback';
 import * as apiErrorHandling from '@/services/api-error-handling';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 // Mock the API service
 vi.mock('@/services/api-error-handling', () => ({

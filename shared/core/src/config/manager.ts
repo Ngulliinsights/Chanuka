@@ -12,7 +12,7 @@ import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 import { configSchema, type AppConfig, envMapping, defaultFeatures } from './schema';
 import { Result, Ok, Err, ok, err } from '../primitives/types';
-import { BaseError, ErrorDomain, ErrorSeverity } from '../primitives/errors';
+import { BaseError, ErrorDomain, ErrorSeverity } from '../observability/error-management';
 import { ObservabilityStack } from '../observability/stack';
 import type {
   ConfigLoadOptions,

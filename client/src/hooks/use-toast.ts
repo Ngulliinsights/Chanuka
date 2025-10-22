@@ -1,5 +1,5 @@
 import { useState, useEffect, ReactNode } from "react"
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 import type {
   ToastActionElement,

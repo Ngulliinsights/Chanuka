@@ -1,5 +1,5 @@
 import { databaseService } from '../../infrastructure/database/database-service.js';
-import { db } from '@shared/database/pool.js';
+import { database as db } from '@shared/database/connection';
 import { billComment as billComments, user as users, userProfile as userProfiles, bill as bills } from '../../../shared/schema/schema.js';
 import { eq, and, desc, asc, sql, count, isNull, or } from 'drizzle-orm';
 import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../infrastructure/cache/cache-service.js';
@@ -110,7 +110,7 @@ export class CommentService {
         } = filters;
 
         // Build base query
-        let query = db()
+        let query = db
           .select({
             comment: billComments,
             user: {
@@ -182,7 +182,7 @@ export class CommentService {
         const comments = results.slice(0, limit);
 
         // Get total count
-        const [{ count: totalCount }] = await db()
+        const [{ count: totalCount }] = await db
           .select({ count: count() })
           .from(billComments)
           .where(and(...conditions));
@@ -240,7 +240,7 @@ export class CommentService {
       async () => {
         const { sort = 'recent', limit = 10, offset = 0 } = filters;
 
-        let query = db()
+        let query = db
           .select({
             comment: billComments,
             user: {
@@ -304,7 +304,7 @@ export class CommentService {
       async () => {
         // Validate parent comment exists if specified
         if (data.parentCommentId) {
-          const parentComment = await db()
+          const parentComment = await db
             .select()
             .from(billComments)
             .where(eq(billComments.id, data.parentCommentId))
@@ -321,7 +321,7 @@ export class CommentService {
         }
 
         // Create the comment
-        const [newComment] = await db()
+        const [newComment] = await db
           .insert(billComments)
           .values({
             billId: data.billId,
@@ -336,7 +336,7 @@ export class CommentService {
           .returning();
 
         // Get user and profile information
-        const [userInfo] = await db()
+        const [userInfo] = await db
           .select({
             user: {
               id: users.id,
@@ -401,7 +401,7 @@ export class CommentService {
     const result = await databaseService.withFallback(
       async () => {
         // Verify comment exists and belongs to user
-        const [existingComment] = await db()
+        const [existingComment] = await db
           .select()
           .from(billComments)
           .where(and(
@@ -415,7 +415,7 @@ export class CommentService {
         }
 
         // Update the comment
-        const [updatedComment] = await db()
+        const [updatedComment] = await db
           .update(billComments)
           .set({
             ...data,
@@ -425,7 +425,7 @@ export class CommentService {
           .returning();
 
         // Get user information
-        const [userInfo] = await db()
+        const [userInfo] = await db
           .select({
             user: {
               id: users.id,
@@ -471,7 +471,7 @@ export class CommentService {
     const result = await databaseService.withFallback(
       async () => {
         // Verify comment exists and belongs to user
-        const [existingComment] = await db()
+        const [existingComment] = await db
           .select()
           .from(billComments)
           .where(and(
@@ -485,7 +485,7 @@ export class CommentService {
         }
 
         // Soft delete by updating content
-        await db()
+        await db
           .update(billComments)
           .set({
             content: '[Comment deleted by user]',
@@ -510,7 +510,7 @@ export class CommentService {
    */
   private async getReplyCount(commentId: number): Promise<number> {
     try {
-      const [{ count: replyCount }] = await db()
+      const [{ count: replyCount }] = await db
         .select({ count: count() })
         .from(billComments)
         .where(eq(billComments.parentCommentId, commentId));
@@ -534,13 +534,13 @@ export class CommentService {
         }
 
         // Get total comment count
-        const [{ count: totalComments }] = await db()
+        const [{ count: totalComments }] = await db
           .select({ count: count() })
           .from(billComments)
           .where(eq(billComments.billId, billId));
 
         // Get expert comment count
-        const [{ count: expertComments }] = await db()
+        const [{ count: expertComments }] = await db
           .select({ count: count() })
           .from(billComments)
           .innerJoin(users, eq(billComments.userId, users.id))
@@ -550,7 +550,7 @@ export class CommentService {
           ));
 
         // Get verified comment count
-        const [{ count: verifiedComments }] = await db()
+        const [{ count: verifiedComments }] = await db
           .select({ count: count() })
           .from(billComments)
           .where(and(
@@ -559,7 +559,7 @@ export class CommentService {
           ));
 
         // Get top contributors
-        const topContributors = await db()
+        const topContributors = await db
           .select({
             userId: users.id,
             userName: users.name,

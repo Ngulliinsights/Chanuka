@@ -1,5 +1,5 @@
 import { Gauge, Milestone, ToggleLeft, BarChart3, GitBranch, Layers, Flag, Split } from "lucide-react";
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 export default function Sidebar() {
   return (

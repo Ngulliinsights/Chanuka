@@ -4,7 +4,7 @@
  *  ------------------------------------------------------------------ */
 import { sql } from 'drizzle-orm';
 import { databaseService } from '../../../infrastructure/database/database-service';
-import { readDb } from '@shared/database/pool';
+import { readDatabase } from '@shared/database/connection';
 
 import { demoDataService } from '../../../infrastructure/demo-data';
 import { logger } from '@shared/core/src/observability/logging';
@@ -22,7 +22,7 @@ export class SearchIndexManager {
     let updated = 0;
     let errors = 0;
     try {
-    const db = readDb;
+    const db = readDatabase;
       const res = await db.execute(sql`
         update bills
         set search_vector =

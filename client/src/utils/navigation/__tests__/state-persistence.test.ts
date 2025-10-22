@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { NavigationStatePersistence } from '../state-persistence';
 import { NavigationState, NavigationPreferences } from '@/types/navigation';
-import { logger } from '../../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Mock localStorage
 const localStorageMock = (() => {

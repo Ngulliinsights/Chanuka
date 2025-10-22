@@ -17,7 +17,7 @@
  */
 
 import { Result, ok, err, isOk, isErr } from '../primitives/types/result';
-import { BaseError, BaseErrorOptions } from '../primitives/errors';
+import { BaseError, BaseErrorOptions } from '../observability/error-management';
 import { logger, MetricsCollector, Tracer, CorrelationManager } from '../observability';
 import { retry, timeout, delay } from '../utils/async-utils';
 import { ServiceContainer } from '../middleware/factory';

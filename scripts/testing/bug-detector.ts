@@ -1,79 +1,53 @@
 /**
- * Comprehensive bug detection and analysis system
+ * Focused bug detection for issues not covered by tsc/ESLint
+ * 
+ * This script complements standard tooling by focusing on:
+ * 1. Security vulnerabilities (hardcoded secrets, dangerous patterns)
+ * 2. Duplicate exports that cause build issues
+ * 3. Test vs production code separation
+ * 4. Project-level structural issues
+ * 
+ * What this does NOT do (handled by other tools):
+ * - Type checking (use: tsc --noEmit)
+ * - Import resolution (use: tsc --noEmit)
+ * - Code quality/style (use: ESLint)
+ * - Accessibility (use: eslint-plugin-jsx-a11y)
+ * - Performance hints (use: eslint-plugin-react)
+ * - Unused code (use: ts-prune or knip)
  */
 
 import { readFileSync, existsSync } from "fs";
-import { join, dirname, relative } from "path";
+import { relative } from "path";
 import { glob } from "glob";
 
 export interface BugReport {
   id: string;
-  type: BugType;
+  type: "security-vulnerability" | "duplicate-export" | "structural-issue";
   severity: "critical" | "high" | "medium" | "low";
-  category: BugCategory;
-  location: CodeLocation;
+  location: {
+    file: string;
+    line?: number;
+    context?: string;
+  };
   description: string;
   impact: string;
-  reproducible: boolean;
-  fixSuggestion?: string;
-  relatedFiles?: string[];
+  fixSuggestion: string;
+  isTestFile: boolean;
 }
-
-export interface CodeLocation {
-  file: string;
-  line?: number;
-  column?: number;
-  function?: string;
-  context?: string;
-}
-
-export type BugType =
-  | "import-error"
-  | "missing-file"
-  | "type-error"
-  | "runtime-error"
-  | "test-configuration"
-  | "database-error"
-  | "api-error"
-  | "performance-issue"
-  | "security-vulnerability"
-  | "accessibility-issue"
-  | "duplicate-code"
-  | "unused-code"
-  | "deprecated-api";
-
-export type BugCategory =
-  | "infrastructure"
-  | "frontend"
-  | "backend"
-  | "database"
-  | "testing"
-  | "build"
-  | "security"
-  | "performance"
-  | "accessibility";
 
 export interface BugDetectionResult {
   totalBugs: number;
-  criticalBugs: number;
-  highPriorityBugs: number;
-  bugs: BugReport[];
-  summary: BugSummary;
-  // Separate test vs production bugs
   productionBugs: BugReport[];
   testBugs: BugReport[];
-  productionSummary: BugSummary;
-  testSummary: BugSummary;
+  criticalCount: number;
+  highCount: number;
+  summary: {
+    production: { critical: number; high: number; medium: number; low: number };
+    test: { critical: number; high: number; medium: number; low: number };
+  };
 }
 
-export interface BugSummary {
-  byType: Record<BugType, number>;
-  byCategory: Record<BugCategory, number>;
-  bySeverity: Record<string, number>;
-  topIssues: BugReport[];
-}
-
-export class BugDetector {
+export class FocusedBugDetector {
   private projectRoot: string;
   private bugs: BugReport[] = [];
   private bugIdCounter = 1;
@@ -83,845 +57,399 @@ export class BugDetector {
   }
 
   /**
-   * Run comprehensive bug detection
+   * Run focused bug detection on non-redundant issues
    */
   async detectBugs(): Promise<BugDetectionResult> {
-    // eslint-disable-next-line no-console
-    logger.info('🔍 Starting comprehensive bug detection...', { component: 'Chanuka' });
-
+    console.log("🔍 Running focused bug detection...\n");
+    
     this.bugs = [];
     this.bugIdCounter = 1;
 
-    // Run different types of bug detection
-    await this.detectImportIssues();
-    await this.detectMissingFiles();
-    await this.detectTypeScriptIssues();
-    await this.detectTestConfigurationIssues();
-    await this.detectDatabaseIssues();
+    // Focus on high-value, non-redundant checks
+    await this.detectSecurityVulnerabilities();
     await this.detectDuplicateExports();
-    await this.detectUnusedCode();
-    await this.detectSecurityIssues();
-    await this.detectPerformanceIssues();
-    await this.detectAccessibilityIssues();
+    await this.detectStructuralIssues();
 
     return this.generateReport();
   }
 
   /**
-   * Detect import and module resolution issues
+   * Sophisticated security scanning for real vulnerabilities
+   * This goes beyond basic ESLint rules to catch context-specific issues
    */
-  private async detectImportIssues(): Promise<void> {
-    // eslint-disable-next-line no-console
-    logger.info('🔍 Detecting import issues...', { component: 'Chanuka' });
-
+  private async detectSecurityVulnerabilities(): Promise<void> {
+    console.log("🔒 Scanning for security vulnerabilities...");
+    
     const files = await this.getSourceFiles();
 
     for (const file of files) {
+      const isTestFile = this.isTestFile(file);
+      
       try {
         const content = readFileSync(file, "utf-8");
-        const lines = content.split("\n");
-
-        lines.forEach((line, index) => {
-          const importMatch = line.match(
-            /import\s+.*\s+from\s+['"]([^'"]+)['"]/
-          );
-          if (importMatch) {
-            const importPath = importMatch[1];
-            const resolvedPath = this.resolveImportPath(file, importPath);
-
-            // Skip built-in modules and only report actual import errors
-            if (
-              !resolvedPath ||
-              (resolvedPath !== "builtin" && !existsSync(resolvedPath))
-            ) {
-              this.addBug({
-                type: "import-error",
-                severity: "high",
-                category: "build",
-                location: {
-                  file: relative(this.projectRoot, file),
-                  line: index + 1,
-                  context: line.trim(),
-                },
-                description: `Failed to resolve import: ${importPath}`,
-                impact: "Build failure, runtime errors",
-                reproducible: true,
-                fixSuggestion: `Check if the file exists at ${importPath} or update the import path`,
-              });
-            }
-          }
-        });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`Failed to analyze ${file}:`, error);
-      }
-    }
-  }
-
-  /**
-   * Detect missing files referenced in code
-   */
-  private async detectMissingFiles(): Promise<void> {
-    // eslint-disable-next-line no-console
-    logger.info('🔍 Detecting missing files...', { component: 'Chanuka' });
-
-    const files = await this.getSourceFiles();
-
-    for (const file of files) {
-      try {
-        const content = readFileSync(file, "utf-8");
-
-        // Check for file references in strings
-        const fileReferences = content.match(
-          /['"]([^'"]*\.(ts|tsx|js|jsx|json|md))['"]/g
-        );
-
-        if (fileReferences) {
-          fileReferences.forEach((ref) => {
-            const filePath = ref.slice(1, -1); // Remove quotes
-            const resolvedPath = this.resolveImportPath(file, filePath);
-
-            if (resolvedPath && !existsSync(resolvedPath)) {
-              this.addBug({
-                type: "missing-file",
-                severity: "medium",
-                category: "infrastructure",
-                location: {
-                  file: relative(this.projectRoot, file),
-                  context: ref,
-                },
-                description: `Referenced file does not exist: ${filePath}`,
-                impact: "Potential runtime errors, broken functionality",
-                reproducible: true,
-                fixSuggestion: `Create the missing file or update the reference`,
-              });
-            }
-          });
-        }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`Failed to analyze ${file}:`, error);
-      }
-    }
-  }
-
-  /**
-   * Detect TypeScript compilation issues
-   */
-  private async detectTypeScriptIssues(): Promise<void> {
-    // eslint-disable-next-line no-console
-    logger.info('🔍 Detecting TypeScript issues...', { component: 'Chanuka' });
-
-    const files = await this.getSourceFiles(["**/*.ts", "**/*.tsx"]);
-
-    for (const file of files) {
-      try {
-        const content = readFileSync(file, "utf-8");
-        const lines = content.split("\n");
-
-        lines.forEach((line, index) => {
-          // Check for common TypeScript issues
-          if (line.includes("any") && !line.includes("// @ts-ignore")) {
-            this.addBug({
-              type: "type-error",
-              severity: "low",
-              category: "frontend",
-              location: {
-                file: relative(this.projectRoot, file),
-                line: index + 1,
-                context: line.trim(),
-              },
-              description: 'Usage of "any" type reduces type safety',
-              impact: "Reduced type safety, potential runtime errors",
-              reproducible: true,
-              fixSuggestion: 'Replace "any" with specific types',
-            });
-          }
-
-          // Check for @ts-ignore usage
-          if (line.includes("@ts-ignore")) {
-            this.addBug({
-              type: "type-error",
-              severity: "medium",
-              category: "frontend",
-              location: {
-                file: relative(this.projectRoot, file),
-                line: index + 1,
-                context: line.trim(),
-              },
-              description: "TypeScript error suppressed with @ts-ignore",
-              impact: "Hidden type errors, potential runtime issues",
-              reproducible: true,
-              fixSuggestion:
-                "Fix the underlying TypeScript error instead of suppressing it",
-            });
-          }
-        });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`Failed to analyze ${file}:`, error);
-      }
-    }
-  }
-
-  /**
-   * Detect test configuration issues
-   */
-  private async detectTestConfigurationIssues(): Promise<void> {
-    // eslint-disable-next-line no-console
-    logger.info('🔍 Detecting test configuration issues...', { component: 'Chanuka' });
-
-    const testFiles = await this.getSourceFiles([
-      "**/*.test.ts",
-      "**/*.test.tsx",
-      "**/*.spec.ts",
-      "**/*.spec.tsx",
-    ]);
-
-    for (const file of testFiles) {
-      try {
-        const content = readFileSync(file, "utf-8");
-
-        // Check for Playwright tests in unit test files
-        if (content.includes("test.describe") && !file.includes("e2e")) {
-          this.addBug({
-            type: "test-configuration",
-            severity: "high",
-            category: "testing",
-            location: {
-              file: relative(this.projectRoot, file),
-            },
-            description: "Playwright test syntax in unit test file",
-            impact: "Test execution failures, incorrect test environment",
-            reproducible: true,
-            fixSuggestion:
-              "Move Playwright tests to e2e directory or use Vitest syntax",
-          });
-        }
-
-        // Check for missing test setup
-        if (
-          content.includes("describe") &&
-          !content.includes("beforeEach") &&
-          !content.includes("afterEach")
-        ) {
-          this.addBug({
-            type: "test-configuration",
-            severity: "low",
-            category: "testing",
-            location: {
-              file: relative(this.projectRoot, file),
-            },
-            description: "Test file missing setup/teardown hooks",
-            impact: "Potential test isolation issues",
-            reproducible: true,
-            fixSuggestion:
-              "Add beforeEach/afterEach hooks for proper test isolation",
-          });
-        }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`Failed to analyze ${file}:`, error);
-      }
-    }
-  }
-
-  /**
-   * Detect database-related issues
-   */
-  private async detectDatabaseIssues(): Promise<void> {
-    // eslint-disable-next-line no-console
-    logger.info('🔍 Detecting database issues...', { component: 'Chanuka' });
-
-    const files = await this.getSourceFiles();
-
-    for (const file of files) {
-      try {
-        const content = readFileSync(file, "utf-8");
-
-        // Check for duplicate exports
-        const exportMatches = content.match(
-          /export\s+(function|const|let|var)\s+(\w+)/g
-        );
-        if (exportMatches) {
-          const exportNames = exportMatches
-            .map((match) => {
-              const nameMatch = match.match(
-                /export\s+(?:function|const|let|var)\s+(\w+)/
-              );
-              return nameMatch ? nameMatch[1] : null;
-            })
-            .filter(Boolean);
-
-          const duplicates = exportNames.filter(
-            (name, index) => exportNames.indexOf(name) !== index
-          );
-
-          duplicates.forEach((duplicate) => {
-            this.addBug({
-              type: "database-error",
-              severity: "critical",
-              category: "backend",
-              location: {
-                file: relative(this.projectRoot, file),
-              },
-              description: `Duplicate export: ${duplicate}`,
-              impact: "Build failure, module resolution errors",
-              reproducible: true,
-              fixSuggestion: `Remove duplicate export or rename one of the ${duplicate} exports`,
-            });
-          });
-        }
-
-        // Check for database connection issues
-        if (
-          content.includes("getDatabase") &&
-          content.includes("initializeDatabase")
-        ) {
-          const lines = content.split("\n");
-          let hasInitCheck = false;
-
-          lines.forEach((line) => {
-            if (line.includes("getDatabase") && line.includes("if (!db)")) {
-              hasInitCheck = true;
-            }
-          });
-
-          if (!hasInitCheck) {
-            this.addBug({
-              type: "database-error",
-              severity: "high",
-              category: "backend",
-              location: {
-                file: relative(this.projectRoot, file),
-              },
-              description: "Database access without initialization check",
-              impact: "Runtime errors, database connection failures",
-              reproducible: true,
-              fixSuggestion:
-                "Add database initialization check before accessing database",
-            });
-          }
-        }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`Failed to analyze ${file}:`, error);
-      }
-    }
-  }
-
-  /**
-   * Detect duplicate exports
-   */
-  private async detectDuplicateExports(): Promise<void> {
-    // eslint-disable-next-line no-console
-    logger.info('🔍 Detecting duplicate exports...', { component: 'Chanuka' });
-
-    const files = await this.getSourceFiles();
-
-    for (const file of files) {
-      try {
-        const content = readFileSync(file, "utf-8");
-        const exportRegex =
-          /export\s+(?:function|const|let|var|class|interface|type)\s+(\w+)/g;
-        const exports: { name: string; line: number }[] = [];
-
-        let match: RegExpExecArray | null;
-
-        while ((match = exportRegex.exec(content)) !== null) {
-          const name = match[1];
-          const lineIndex =
-            content.substring(0, match.index).split("\n").length - 1;
-          exports.push({ name, line: lineIndex + 1 });
-        }
-
-        // Find duplicates
-        const duplicates = exports.filter(
-          (exp, index) =>
-            exports.findIndex((e) => e.name === exp.name) !== index
-        );
-
-        duplicates.forEach((duplicate) => {
-          this.addBug({
-            type: "duplicate-code",
-            severity: "critical",
-            category: "build",
-            location: {
-              file: relative(this.projectRoot, file),
-              line: duplicate.line,
-            },
-            description: `Duplicate export: ${duplicate.name}`,
-            impact: "Build failure, module resolution errors",
-            reproducible: true,
-            fixSuggestion: `Remove or rename duplicate export: ${duplicate.name}`,
-          });
-        });
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`Failed to analyze ${file}:`, error);
-      }
-    }
-  }
-
-  /**
-   * Detect unused code
-   */
-  private async detectUnusedCode(): Promise<void> {
-    // eslint-disable-next-line no-console
-    logger.info('🔍 Detecting unused code...', { component: 'Chanuka' });
-
-    // This is a simplified unused code detection
-    // In a real implementation, you'd use AST parsing for more accuracy
-    const files = await this.getSourceFiles();
-
-    for (const file of files) {
-      try {
-        const content = readFileSync(file, "utf-8");
-
-        // Check for unused imports
-        const importRegex = /import\s+\{([^}]+)\}\s+from/g;
-        let match: RegExpExecArray | null;
-
-        while ((match = importRegex.exec(content)) !== null) {
-          const imports = match[1].split(",").map((imp) => imp.trim());
-          const matchContext = match[0]; // Capture the match context before forEach
-
-          imports.forEach((importName) => {
-            const cleanName = importName.replace(/\s+as\s+\w+/, "").trim();
-            const usageRegex = new RegExp(`\\b${cleanName}\\b`, "g");
-            const usages = (content.match(usageRegex) || []).length;
-
-            // If only used once (in the import), it's unused
-            if (usages <= 1) {
-              this.addBug({
-                type: "unused-code",
-                severity: "low",
-                category: "frontend",
-                location: {
-                  file: relative(this.projectRoot, file),
-                  context: matchContext,
-                },
-                description: `Unused import: ${cleanName}`,
-                impact: "Increased bundle size, code clutter",
-                reproducible: true,
-                fixSuggestion: `Remove unused import: ${cleanName}`,
-              });
-            }
-          });
-        }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`Failed to analyze ${file}:`, error);
-      }
-    }
-  }
-
-  /**
-   * Detect security issues
-   */
-  private async detectSecurityIssues(): Promise<void> {
-    // eslint-disable-next-line no-console
-    logger.info('🔍 Detecting security issues...', { component: 'Chanuka' });
-
-    const files = await this.getSourceFiles();
-
-    for (const file of files) {
-      try {
-        const content = readFileSync(file, "utf-8");
-
-        // Check for potential XSS vulnerabilities
+        
+        // Check for dangerouslySetInnerHTML without sanitization
         if (content.includes("dangerouslySetInnerHTML")) {
+          // Check if DOMPurify or similar sanitization is present
+          const hasSanitization = 
+            content.includes("DOMPurify") ||
+            content.includes("sanitize") ||
+            content.includes("xss");
+          
+          if (!hasSanitization) {
+            this.addBug({
+              type: "security-vulnerability",
+              severity: "high",
+              location: {
+                file: relative(this.projectRoot, file),
+                context: "dangerouslySetInnerHTML usage",
+              },
+              description: "Unsanitized HTML injection risk",
+              impact: "Potential XSS vulnerability allowing script injection",
+              fixSuggestion: "Use DOMPurify.sanitize() or avoid dangerouslySetInnerHTML",
+              isTestFile,
+            });
+          }
+        }
+
+        // Detect hardcoded credentials with sophisticated filtering
+        this.detectHardcodedSecrets(file, content, isTestFile);
+
+        // Check for eval() usage (major security risk)
+        if (content.includes("eval(") && !content.includes("// safe-eval")) {
+          this.addBug({
+            type: "security-vulnerability",
+            severity: "critical",
+            location: {
+              file: relative(this.projectRoot, file),
+            },
+            description: "Use of eval() detected",
+            impact: "Code injection vulnerability, arbitrary code execution",
+            fixSuggestion: "Remove eval() and use safer alternatives like JSON.parse() or Function constructor with validation",
+            isTestFile,
+          });
+        }
+
+        // Check for SQL injection risks (concatenated queries)
+        const sqlInjectionPattern = /(?:query|execute|sql)\s*[=:]\s*[`"'].*?\$\{[^}]+\}.*?[`"']/gi;
+        if (sqlInjectionPattern.test(content)) {
+          this.addBug({
+            type: "security-vulnerability",
+            severity: "critical",
+            location: {
+              file: relative(this.projectRoot, file),
+            },
+            description: "Potential SQL injection via string interpolation",
+            impact: "Database compromise, data breach",
+            fixSuggestion: "Use parameterized queries or prepared statements",
+            isTestFile,
+          });
+        }
+
+        // Check for insecure random number generation for security purposes
+        if (content.includes("Math.random()") && 
+            (content.includes("token") || content.includes("session") || content.includes("password"))) {
           this.addBug({
             type: "security-vulnerability",
             severity: "high",
-            category: "security",
             location: {
               file: relative(this.projectRoot, file),
             },
-            description:
-              "Potential XSS vulnerability with dangerouslySetInnerHTML",
-            impact: "Cross-site scripting attacks",
-            reproducible: true,
-            fixSuggestion: "Sanitize HTML content or use safer alternatives",
+            description: "Math.random() used for security-sensitive random generation",
+            impact: "Predictable tokens/sessions, potential account takeover",
+            fixSuggestion: "Use crypto.randomBytes() or crypto.getRandomValues() for cryptographic randomness",
+            isTestFile,
           });
         }
 
-        // Check for hardcoded secrets (but be smarter about test files and constants)
-        const isTestFile =
-          file.includes("test") ||
-          file.includes("spec") ||
-          file.includes("__tests__");
-        
-        const isErrorMessagesFile = file.includes("error-messages");
-        const isConstantsFile = file.includes("constants") || file.includes("config");
+      } catch (error) {
+        console.warn(`⚠️  Failed to analyze ${file}:`, error);
+      }
+    }
+  }
 
-        // Very precise patterns that only catch actual secrets
-        const secretPatterns = [
-          // Only catch actual hardcoded passwords with suspicious patterns
-          /(?:password|secret)\s*[:=]\s*['"](?!.*(?:required|invalid|expired|missing|failed|reset|weak|short|long|must|contain|least|characters|letter|number|uppercase|lowercase|violation|not found|error|message|description|title|search|location|type|query|overview|process|risks|legal|technical|logout|profile|refresh|update|health|check|test|lockout|history|notifications|show|hide|confirm|strength|feedback|animate|pulse|datakey|verifications|storage|config|default))[a-zA-Z0-9_!@#$%^&*]{16,}['"]/i,
-          // Only catch actual API keys with very suspicious patterns
-          /api[_-]?key\s*[:=]\s*['"](?!test|demo|mock|example)[a-zA-Z0-9_-]{32,}['"]/i,
-          // Only catch actual JWT secrets
-          /jwt[_-]?secret\s*[:=]\s*['"](?!test|demo|mock|example)[a-zA-Z0-9_-]{40,}['"]/i,
-          // Only catch actual database credentials
-          /(?:db|database)[_-]?password\s*[:=]\s*['"](?!test|mock|demo|example|generated|default)[a-zA-Z0-9_!@#$%^&*]{12,}['"]/i,
-          // Actual hardcoded credentials with very specific patterns
-          /(?:client_secret|private_key|access_token|bearer_token)\s*[:=]\s*['"][a-zA-Z0-9_-]{32,}['"]/i,
+  /**
+   * Detect hardcoded secrets with smart filtering
+   * This uses sophisticated heuristics to avoid false positives
+   */
+  private detectHardcodedSecrets(file: string, content: string, isTestFile: boolean): void {
+    // Skip certain file types that commonly have false positives
+    if (file.includes("error-messages") || 
+        file.includes("constants.ts") ||
+        file.includes("i18n") ||
+        file.includes("locales")) {
+      return;
+    }
+
+    const lines = content.split("\n");
+    
+    lines.forEach((line, index) => {
+      const trimmedLine = line.trim();
+      
+      // Skip comments and import statements
+      if (trimmedLine.startsWith("//") || 
+          trimmedLine.startsWith("*") ||
+          trimmedLine.startsWith("import ") ||
+          trimmedLine.startsWith("export ")) {
+        return;
+      }
+
+      // Pattern for actual hardcoded secrets (high confidence)
+      const highConfidencePatterns = [
+        // AWS keys
+        /(?:AKIA|ASIA)[0-9A-Z]{16}/,
+        // Private keys
+        /-----BEGIN (?:RSA |EC )?PRIVATE KEY-----/,
+        // GitHub tokens
+        /gh[pousr]_[A-Za-z0-9_]{36,}/,
+        // Slack tokens
+        /xox[baprs]-[0-9]{10,13}-[0-9]{10,13}-[A-Za-z0-9]{24,}/,
+        // JWT tokens (actual encoded ones, not variables)
+        /eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}/,
+      ];
+
+      // Check high-confidence patterns
+      for (const pattern of highConfidencePatterns) {
+        if (pattern.test(trimmedLine)) {
+          // Double-check it's not in a test file with obvious test data
+          if (isTestFile && /(?:test|mock|fake|example)/i.test(trimmedLine)) {
+            continue;
+          }
+
+          this.addBug({
+            type: "security-vulnerability",
+            severity: "critical",
+            location: {
+              file: relative(this.projectRoot, file),
+              line: index + 1,
+              context: trimmedLine.substring(0, 50) + "...",
+            },
+            description: "Hardcoded credential or secret token detected",
+            impact: "Credential exposure, potential security breach",
+            fixSuggestion: "Move to environment variables (process.env) or secure vault",
+            isTestFile,
+          });
+          break;
+        }
+      }
+
+      // Medium-confidence pattern: long random strings assigned to sensitive variables
+      const sensitiveVarPattern = /(?:secret|password|api_?key|token|auth|credential)\s*[=:]\s*['"]([a-zA-Z0-9_\-!@#$%^&*]{20,})['"](?!\s*(?:\|\||&&|\?))/i;
+      const match = trimmedLine.match(sensitiveVarPattern);
+      
+      if (match) {
+        const value = match[1].toLowerCase();
+        
+        // Skip obvious non-secrets
+        const nonSecretIndicators = [
+          "example", "test", "demo", "mock", "placeholder", "your-",
+          "insert", "replace", "change", "update", "default",
+          "xxxxxxxx", "--------", "********",
+        ];
+        
+        const isLikelyNonSecret = nonSecretIndicators.some(indicator => 
+          value.includes(indicator)
+        );
+
+        // Skip if it looks like an environment variable reference
+        const hasEnvReference = 
+          trimmedLine.includes("process.env") ||
+          trimmedLine.includes("import.meta.env") ||
+          trimmedLine.includes("||") ||
+          trimmedLine.includes("??");
+
+        if (!isLikelyNonSecret && !hasEnvReference) {
+          this.addBug({
+            type: "security-vulnerability",
+            severity: isTestFile ? "low" : "high",
+            location: {
+              file: relative(this.projectRoot, file),
+              line: index + 1,
+              context: trimmedLine.substring(0, 50) + "...",
+            },
+            description: "Possible hardcoded secret in sensitive variable",
+            impact: "Potential credential exposure if this is a real secret",
+            fixSuggestion: "If this is a real secret, move to environment variables. If it's a default/placeholder, add a comment to clarify.",
+            isTestFile,
+          });
+        }
+      }
+    });
+  }
+
+  /**
+   * Detect duplicate exports that cause build failures
+   * TypeScript sometimes doesn't catch these in all scenarios
+   */
+  private async detectDuplicateExports(): Promise<void> {
+    console.log("📦 Checking for duplicate exports...");
+    
+    const files = await this.getSourceFiles();
+
+    for (const file of files) {
+      const isTestFile = this.isTestFile(file);
+      
+      try {
+        const content = readFileSync(file, "utf-8");
+        const exportMap = new Map<string, number[]>();
+
+        // Match various export patterns
+        const exportPatterns = [
+          /export\s+(?:async\s+)?function\s+(\w+)/g,
+          /export\s+(?:const|let|var)\s+(\w+)/g,
+          /export\s+class\s+(\w+)/g,
+          /export\s+interface\s+(\w+)/g,
+          /export\s+type\s+(\w+)/g,
+          /export\s+enum\s+(\w+)/g,
         ];
 
-        secretPatterns.forEach((pattern) => {
-          const matches = content.match(pattern);
-          if (matches) {
-            const secretValue = matches[0].toLowerCase();
+        const lines = content.split("\n");
+        
+        exportPatterns.forEach(pattern => {
+          let match: RegExpExecArray | null;
+          const patternCopy = new RegExp(pattern.source, pattern.flags);
+          
+          while ((match = patternCopy.exec(content)) !== null) {
+            const name = match[1];
+            const lineNum = content.substring(0, match.index).split("\n").length;
             
-            // Skip error message files and constants files
-            if (isErrorMessagesFile || isConstantsFile) {
-              return;
+            if (!exportMap.has(name)) {
+              exportMap.set(name, []);
             }
+            exportMap.get(name)!.push(lineNum);
+          }
+        });
 
-            // Skip if it's a test file and the secret looks like a test value
-            if (isTestFile) {
-              const testIndicators = [
-                "test",
-                "mock",
-                "fake",
-                "dummy",
-                "example",
-                "demo",
-                "sample",
-                "placeholder",
-                "default",
-              ];
-              const isTestSecret = testIndicators.some((indicator) =>
-                secretValue.includes(indicator)
-              );
-
-              // Also skip common test passwords
-              const commonTestPasswords = [
-                "password123",
-                "testpassword",
-                "newpassword123",
-                "differentpassword123",
-                "securepassword123",
-              ];
-              const isCommonTestPassword = commonTestPasswords.some((pwd) =>
-                secretValue.includes(pwd)
-              );
-
-              if (isTestSecret || isCommonTestPassword) {
-                return; // Skip this match
-              }
-            }
-
-            // Skip environment variable fallbacks
-            if (secretValue.includes("process.env") || secretValue.includes("||")) {
-              return;
-            }
-
+        // Find actual duplicates
+        exportMap.forEach((lines, name) => {
+          if (lines.length > 1) {
             this.addBug({
-              type: "security-vulnerability",
+              type: "duplicate-export",
               severity: "critical",
-              category: "security",
               location: {
                 file: relative(this.projectRoot, file),
+                line: lines[1], // Report the second occurrence
+                context: `export ${name}`,
               },
-              description: "Hardcoded secret or credential detected",
-              impact: "Security breach, credential exposure",
-              reproducible: true,
-              fixSuggestion: "Move secrets to environment variables",
+              description: `Duplicate export: "${name}" (exported ${lines.length} times at lines: ${lines.join(", ")})`,
+              impact: "Build failure, module resolution errors, runtime crashes",
+              fixSuggestion: `Remove or rename duplicate export "${name}". Keep only one export with this name.`,
+              isTestFile,
             });
           }
         });
+
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`Failed to analyze ${file}:`, error);
+        console.warn(`⚠️  Failed to analyze ${file}:`, error);
       }
     }
   }
 
   /**
-   * Detect performance issues
+   * Detect structural issues in project organization
    */
-  private async detectPerformanceIssues(): Promise<void> {
-    // eslint-disable-next-line no-console
-    logger.info('🔍 Detecting performance issues...', { component: 'Chanuka' });
+  private async detectStructuralIssues(): Promise<void> {
+    console.log("🏗️  Checking project structure...");
+    
+    // Check for test files in production directories
+    const srcFiles = await glob("src/**/*.{ts,tsx}", {
+      cwd: this.projectRoot,
+      ignore: ["**/node_modules/**", "**/dist/**"],
+      absolute: true,
+    });
 
-    const files = await this.getSourceFiles(["**/*.tsx", "**/*.jsx"]);
-
-    for (const file of files) {
-      try {
-        const content = readFileSync(file, "utf-8");
-
-        // Check for missing React.memo on components
-        if (
-          content.includes("export default function") &&
-          !content.includes("React.memo")
-        ) {
-          this.addBug({
-            type: "performance-issue",
-            severity: "low",
-            category: "frontend",
-            location: {
-              file: relative(this.projectRoot, file),
-            },
-            description: "Component not wrapped with React.memo",
-            impact: "Unnecessary re-renders, performance degradation",
-            reproducible: true,
-            fixSuggestion:
-              "Consider wrapping component with React.memo if it receives props",
-          });
-        }
-
-        // Check for inline object/array creation in JSX
-        const inlineObjectRegex = /\{\s*\{[^}]+\}\s*\}/g;
-        if (inlineObjectRegex.test(content)) {
-          this.addBug({
-            type: "performance-issue",
-            severity: "medium",
-            category: "frontend",
-            location: {
-              file: relative(this.projectRoot, file),
-            },
-            description: "Inline object creation in JSX",
-            impact: "Unnecessary re-renders, performance issues",
-            reproducible: true,
-            fixSuggestion: "Move object creation outside render or use useMemo",
-          });
-        }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`Failed to analyze ${file}:`, error);
+    for (const file of srcFiles) {
+      // Skip actual test directories
+      if (file.includes("/__tests__/") || 
+          file.includes("/test/") || 
+          file.includes("/tests/")) {
+        continue;
       }
-    }
-  }
 
-  /**
-   * Detect accessibility issues
-   */
-  private async detectAccessibilityIssues(): Promise<void> {
-    // eslint-disable-next-line no-console
-    logger.info('🔍 Detecting accessibility issues...', { component: 'Chanuka' });
-
-    const files = await this.getSourceFiles(["**/*.tsx", "**/*.jsx"]);
-
-    for (const file of files) {
-      try {
-        const content = readFileSync(file, "utf-8");
-
-        // Check for missing alt attributes on images
-        if (content.includes("<img") && !content.includes("alt=")) {
-          this.addBug({
-            type: "accessibility-issue",
-            severity: "medium",
-            category: "frontend",
-            location: {
-              file: relative(this.projectRoot, file),
-            },
-            description: "Image missing alt attribute",
-            impact: "Poor accessibility for screen readers",
-            reproducible: true,
-            fixSuggestion: "Add alt attribute to all img elements",
-          });
-        }
-
-        // Check for missing labels on form inputs
-        if (
-          content.includes("<input") &&
-          !content.includes("aria-label") &&
-          !content.includes("<label")
-        ) {
-          this.addBug({
-            type: "accessibility-issue",
-            severity: "medium",
-            category: "frontend",
-            location: {
-              file: relative(this.projectRoot, file),
-            },
-            description: "Form input missing label or aria-label",
-            impact: "Poor accessibility for screen readers",
-            reproducible: true,
-            fixSuggestion: "Add label or aria-label to form inputs",
-          });
-        }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`Failed to analyze ${file}:`, error);
-      }
-    }
-  }
-
-  /**
-   * Get source files matching patterns
-   */
-  private async getSourceFiles(
-    patterns: string[] = ["**/*.{ts,tsx,js,jsx}"]
-  ): Promise<string[]> {
-    const allFiles: string[] = [];
-
-    for (const pattern of patterns) {
-      try {
-        const files = await glob(pattern, {
-          cwd: this.projectRoot,
-          ignore: [
-            "**/node_modules/**",
-            "**/dist/**",
-            "**/coverage/**",
-            "**/*.d.ts",
-          ],
-          absolute: true,
+      // Check if it's a test file by name in a non-test directory
+      if (file.match(/\.(test|spec)\.(ts|tsx)$/)) {
+        this.addBug({
+          type: "structural-issue",
+          severity: "medium",
+          location: {
+            file: relative(this.projectRoot, file),
+          },
+          description: "Test file in production source directory",
+          impact: "Test code included in production bundle, increased bundle size",
+          fixSuggestion: "Move test files to __tests__ directory or colocate in a dedicated test folder",
+          isTestFile: true,
         });
-        allFiles.push(...files);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.warn(`Failed to glob pattern ${pattern}:`, error);
       }
     }
 
-    return Array.from(new Set(allFiles));
-  }
+    // Check for misplaced configuration files
+    const configFiles = await glob("**/*.config.{ts,js}", {
+      cwd: this.projectRoot,
+      ignore: ["**/node_modules/**", "**/dist/**"],
+      absolute: true,
+    });
 
-  /**
-   * Resolve import path to absolute path
-   */
-  private resolveImportPath(
-    fromFile: string,
-    importPath: string
-  ): string | null {
-    try {
-      // Check if it's a Node.js built-in module
-      if (this.isNodeBuiltinModule(importPath)) {
-        return "builtin"; // Return a special marker for built-in modules
+    for (const file of configFiles) {
+      if (file.includes("/src/") && !file.includes("/config/")) {
+        this.addBug({
+          type: "structural-issue",
+          severity: "low",
+          location: {
+            file: relative(this.projectRoot, file),
+          },
+          description: "Configuration file in source directory",
+          impact: "Poor project organization, config files should be at project root",
+          fixSuggestion: "Move configuration files to project root or dedicated config directory",
+          isTestFile: false,
+        });
       }
-
-      if (importPath.startsWith(".")) {
-        // Relative import
-        const resolved = join(dirname(fromFile), importPath);
-
-        // Try different extensions
-        const extensions = [".ts", ".tsx", ".js", ".jsx", ".json"];
-        for (const ext of extensions) {
-          if (existsSync(resolved + ext)) {
-            return resolved + ext;
-          }
-        }
-
-        // Try index files
-        for (const ext of extensions) {
-          const indexPath = join(resolved, "index" + ext);
-          if (existsSync(indexPath)) {
-            return indexPath;
-          }
-        }
-
-        return existsSync(resolved) ? resolved : null;
-      } else if (importPath.startsWith("@/")) {
-        // Alias import
-        const aliasPath = importPath.replace("@/", "src/");
-        return this.resolveImportPath(
-          fromFile,
-          "./" + relative(dirname(fromFile), join(this.projectRoot, aliasPath))
-        );
-      } else {
-        // Node modules import
-        const nodeModulesPath = join(
-          this.projectRoot,
-          "node_modules",
-          importPath
-import { logger } from '../../shared/core/src/observability/logging';
-        );
-        return existsSync(nodeModulesPath) ? nodeModulesPath : null;
-      }
-    } catch (error) {
-      return null;
     }
   }
 
   /**
-   * Check if import path is a Node.js built-in module
+   * Get source files for analysis
    */
-  private isNodeBuiltinModule(importPath: string): boolean {
-    const builtinModules = [
-      "assert",
-      "async_hooks",
-      "buffer",
-      "child_process",
-      "cluster",
-      "console",
-      "constants",
-      "crypto",
-      "dgram",
-      "dns",
-      "domain",
-      "events",
-      "fs",
-      "http",
-      "http2",
-      "https",
-      "inspector",
-      "module",
-      "net",
-      "os",
-      "path",
-      "perf_hooks",
-      "process",
-      "punycode",
-      "querystring",
-      "readline",
-      "repl",
-      "stream",
-      "string_decoder",
-      "sys",
-      "timers",
-      "tls",
-      "trace_events",
-      "tty",
-      "url",
-      "util",
-      "v8",
-      "vm",
-      "wasi",
-      "worker_threads",
-      "zlib",
-      // Node.js built-in modules with subpaths
-      "fs/promises",
-      "stream/promises",
-      "timers/promises",
-      "util/types",
-      "worker_threads",
-    ];
+  private async getSourceFiles(): Promise<string[]> {
+    const patterns = ["**/*.{ts,tsx,js,jsx}"];
+    const files = await glob(patterns, {
+      cwd: this.projectRoot,
+      ignore: [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/build/**",
+        "**/coverage/**",
+        "**/*.d.ts",
+      ],
+      absolute: true,
+    });
 
-    // Check exact match or if it starts with a built-in module followed by /
-    return (
-      builtinModules.includes(importPath) ||
-      builtinModules.some((module) => importPath.startsWith(module + "/"))
-    );
+    return files;
   }
 
   /**
-   * Check if a file is a test file
+   * Determine if a file is a test file
    */
   private isTestFile(filePath: string): boolean {
     const testIndicators = [
-      '/test/',
-      '/tests/',
-      '/__tests__/',
-      '.test.',
-      '.spec.',
-      '/spec/',
-      '/e2e/',
-      '/cypress/',
-      '/playwright/',
-      'vitest.config',
-      'jest.config',
-      'test-setup',
-      'test-utils',
-      'mock',
-      '/fixtures/',
-      '/stubs/',
+      "/__tests__/",
+      "/test/",
+      "/tests/",
+      ".test.",
+      ".spec.",
+      "/e2e/",
+      "/cypress/",
+      "/playwright/",
+      "vitest.config",
+      "jest.config",
+      "test-setup",
+      "test-utils",
+      "/mocks/",
+      "/fixtures/",
+      "__mocks__",
     ];
     
-    const normalizedPath = filePath.toLowerCase().replace(/\\/g, '/');
-    return testIndicators.some(indicator => normalizedPath.includes(indicator));
+    const normalized = filePath.toLowerCase().replace(/\\/g, "/");
+    return testIndicators.some(indicator => normalized.includes(indicator));
   }
 
   /**
@@ -929,157 +457,143 @@ import { logger } from '../../shared/core/src/observability/logging';
    */
   private addBug(bug: Omit<BugReport, "id">): void {
     this.bugs.push({
-      id: `BUG-${this.bugIdCounter++}`,
+      id: `BUG-${String(this.bugIdCounter++).padStart(3, "0")}`,
       ...bug,
     });
   }
 
   /**
-   * Generate summary for a set of bugs
-   */
-  private generateSummary(bugs: BugReport[]): BugSummary {
-    const summary: BugSummary = {
-      byType: {} as Record<BugType, number>,
-      byCategory: {} as Record<BugCategory, number>,
-      bySeverity: {},
-      topIssues: [],
-    };
-
-    // Count by type
-    bugs.forEach((bug) => {
-      summary.byType[bug.type] = (summary.byType[bug.type] || 0) + 1;
-      summary.byCategory[bug.category] =
-        (summary.byCategory[bug.category] || 0) + 1;
-      summary.bySeverity[bug.severity] =
-        (summary.bySeverity[bug.severity] || 0) + 1;
-    });
-
-    // Get top issues (critical and high severity)
-    summary.topIssues = bugs
-      .filter((bug) => bug.severity === "critical" || bug.severity === "high")
-      .sort((a, b) => {
-        const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-        return severityOrder[a.severity] - severityOrder[b.severity];
-      })
-      .slice(0, 10);
-
-    return summary;
-  }
-
-  /**
-   * Generate comprehensive bug report with test/production separation
+   * Generate structured report
    */
   private generateReport(): BugDetectionResult {
-    // Separate bugs into test and production
-    const productionBugs = this.bugs.filter(bug => !this.isTestFile(bug.location.file));
-    const testBugs = this.bugs.filter(bug => this.isTestFile(bug.location.file));
+    const productionBugs = this.bugs.filter(b => !b.isTestFile);
+    const testBugs = this.bugs.filter(b => b.isTestFile);
 
-    // Generate summaries
-    const summary = this.generateSummary(this.bugs);
-    const productionSummary = this.generateSummary(productionBugs);
-    const testSummary = this.generateSummary(testBugs);
+    const countBySeverity = (bugs: BugReport[]) => ({
+      critical: bugs.filter(b => b.severity === "critical").length,
+      high: bugs.filter(b => b.severity === "high").length,
+      medium: bugs.filter(b => b.severity === "medium").length,
+      low: bugs.filter(b => b.severity === "low").length,
+    });
 
     return {
       totalBugs: this.bugs.length,
-      criticalBugs: this.bugs.filter((b) => b.severity === "critical").length,
-      highPriorityBugs: this.bugs.filter((b) => b.severity === "high").length,
-      bugs: this.bugs,
-      summary,
       productionBugs,
       testBugs,
-      productionSummary,
-      testSummary,
+      criticalCount: this.bugs.filter(b => b.severity === "critical").length,
+      highCount: this.bugs.filter(b => b.severity === "high").length,
+      summary: {
+        production: countBySeverity(productionBugs),
+        test: countBySeverity(testBugs),
+      },
     };
   }
 
   /**
-   * Generate bug report as markdown
+   * Generate actionable markdown report
    */
   generateMarkdownReport(result: BugDetectionResult): string {
+    const now = new Date().toISOString();
     let report = `# Bug Detection Report\n\n`;
-    report += `**Generated:** ${new Date().toISOString()}\n\n`;
+    report += `**Generated:** ${now}\n`;
+    report += `**Focus:** Security, Duplicates, Structure (complementing tsc/ESLint)\n\n`;
 
-    report += `## Summary\n\n`;
-    report += `- **Total Bugs:** ${result.totalBugs}\n`;
-    report += `- **Critical:** ${result.criticalBugs}\n`;
-    report += `- **High Priority:** ${result.highPriorityBugs}\n`;
-    report += `- **Medium Priority:** ${result.summary.bySeverity.medium || 0}\n`;
-    report += `- **Low Priority:** ${result.summary.bySeverity.low || 0}\n\n`;
+    // Executive summary
+    report += `## Executive Summary\n\n`;
+    report += `This report focuses on issues NOT covered by TypeScript or ESLint:\n\n`;
+    report += `- 🔒 **Security vulnerabilities** (hardcoded secrets, injection risks)\n`;
+    report += `- 📦 **Duplicate exports** (build-breaking issues)\n`;
+    report += `- 🏗️ **Structural problems** (misplaced files)\n\n`;
 
-    report += `## Top Issues\n\n`;
-    result.summary.topIssues.forEach((bug, index) => {
-      report += `### ${index + 1}. ${bug.description}\n\n`;
-      report += `- **ID:** ${bug.id}\n`;
-      report += `- **Severity:** ${bug.severity}\n`;
-      report += `- **Category:** ${bug.category}\n`;
-      report += `- **File:** ${bug.location.file}\n`;
-      if (bug.location.line) {
-        report += `- **Line:** ${bug.location.line}\n`;
-      }
-      report += `- **Impact:** ${bug.impact}\n`;
-      if (bug.fixSuggestion) {
-        report += `- **Fix:** ${bug.fixSuggestion}\n`;
-      }
-      report += `\n`;
-    });
+    // Production vs Test breakdown
+    report += `### Production Code\n\n`;
+    report += `- Critical: ${result.summary.production.critical}\n`;
+    report += `- High: ${result.summary.production.high}\n`;
+    report += `- Medium: ${result.summary.production.medium}\n`;
+    report += `- Low: ${result.summary.production.low}\n\n`;
 
-    report += `## Bugs by Category\n\n`;
-    Object.entries(result.summary.byCategory).forEach(([category, count]) => {
-      report += `- **${category}:** ${count}\n`;
-    });
+    report += `### Test Code\n\n`;
+    report += `- Critical: ${result.summary.test.critical}\n`;
+    report += `- High: ${result.summary.test.high}\n`;
+    report += `- Medium: ${result.summary.test.medium}\n`;
+    report += `- Low: ${result.summary.test.low}\n\n`;
 
-    report += `\n## Bugs by Type\n\n`;
-    Object.entries(result.summary.byType).forEach(([type, count]) => {
-      report += `- **${type}:** ${count}\n`;
-    });
+    // Priority: Critical production bugs first
+    const criticalProduction = result.productionBugs.filter(b => b.severity === "critical");
+    if (criticalProduction.length > 0) {
+      report += `## ⚠️ CRITICAL Production Issues\n\n`;
+      report += `These must be fixed immediately:\n\n`;
+      
+      criticalProduction.forEach(bug => {
+        report += `### ${bug.id}: ${bug.description}\n\n`;
+        report += `- **File:** \`${bug.location.file}\`\n`;
+        if (bug.location.line) report += `- **Line:** ${bug.location.line}\n`;
+        report += `- **Impact:** ${bug.impact}\n`;
+        report += `- **Fix:** ${bug.fixSuggestion}\n\n`;
+      });
+    }
+
+    // High priority production bugs
+    const highProduction = result.productionBugs.filter(b => b.severity === "high");
+    if (highProduction.length > 0) {
+      report += `## 🔴 High Priority Production Issues\n\n`;
+      
+      highProduction.forEach(bug => {
+        report += `### ${bug.id}: ${bug.description}\n\n`;
+        report += `- **File:** \`${bug.location.file}\`\n`;
+        if (bug.location.line) report += `- **Line:** ${bug.location.line}\n`;
+        report += `- **Impact:** ${bug.impact}\n`;
+        report += `- **Fix:** ${bug.fixSuggestion}\n\n`;
+      });
+    }
+
+    // All other bugs
+    const otherBugs = this.bugs.filter(b => 
+      b.severity !== "critical" && b.severity !== "high"
+    );
+    
+    if (otherBugs.length > 0) {
+      report += `## 📋 Other Issues\n\n`;
+      
+      otherBugs.forEach(bug => {
+        const icon = bug.isTestFile ? "🧪" : "📄";
+        report += `### ${icon} ${bug.id}: ${bug.description}\n\n`;
+        report += `- **Severity:** ${bug.severity}\n`;
+        report += `- **File:** \`${bug.location.file}\`\n`;
+        if (bug.location.line) report += `- **Line:** ${bug.location.line}\n`;
+        report += `- **Fix:** ${bug.fixSuggestion}\n\n`;
+      });
+    }
+
+    // Recommendations
+    report += `## 💡 Recommendations\n\n`;
+    report += `Run these complementary tools for complete coverage:\n\n`;
+    report += `- \`npx tsc --noEmit\` - Type checking and import resolution\n`;
+    report += `- \`npx eslint .\` - Code quality and style\n`;
+    report += `- \`npx knip\` - Unused code detection\n`;
+    report += `- This script - Security, duplicates, structure\n\n`;
+
+    if (result.totalBugs === 0) {
+      report += `✅ No issues found in areas covered by this tool!\n`;
+    }
 
     return report;
   }
 }
 
-// Export default instance
-export const bugDetector = new BugDetector();
+// Export convenience functions
+export async function runBugDetection(projectRoot?: string): Promise<BugDetectionResult> {
+  const detector = new FocusedBugDetector(projectRoot);
+  const result = await detector.detectBugs();
+  
+  console.log("\n" + detector.generateMarkdownReport(result));
+  
+  return result;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// CLI usage
+if (require.main === module) {
+  runBugDetection().then(result => {
+    process.exit(result.criticalCount > 0 ? 1 : 0);
+  });
+}

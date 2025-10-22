@@ -1,7 +1,7 @@
 
 
 import { useEffect } from 'react';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 export default function TestComponent() {
   useEffect(() => {

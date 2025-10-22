@@ -6,7 +6,7 @@
  */
 
 import { featureDetector } from './browser-compatibility';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@/utils/browser-logger';
 
 // Polyfill loading status
 interface PolyfillStatus {

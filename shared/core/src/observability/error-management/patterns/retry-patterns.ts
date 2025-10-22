@@ -48,7 +48,7 @@ export class ExponentialBackoffRetry {
 
   async execute<T>(action: () => Promise<T>): Promise<T> {
     const startTime = Date.now();
-    let lastError: Error;
+    let lastError: Error = new Error('No attempts made');
     
     for (let attempt = 1; attempt <= this.options.maxAttempts; attempt++) {
       try {
@@ -159,7 +159,7 @@ export class LinearBackoffRetry {
 
   async execute<T>(action: () => Promise<T>): Promise<T> {
     const startTime = Date.now();
-    let lastError: Error;
+    let lastError: Error = new Error('No attempts made');
     
     for (let attempt = 1; attempt <= this.options.maxAttempts; attempt++) {
       try {
@@ -210,7 +210,7 @@ export class ImmediateRetry {
   constructor(private readonly maxAttempts: number = 3) {}
 
   async execute<T>(action: () => Promise<T>): Promise<T> {
-    let lastError: Error;
+    let lastError: Error = new Error('No attempts made');
     
     for (let attempt = 1; attempt <= this.maxAttempts; attempt++) {
       try {

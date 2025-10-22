@@ -1,6 +1,6 @@
 import { AsyncLocalStorage } from 'async_hooks';
 import { Result, Ok, Err } from '../../primitives/types';
-import { BaseError } from '../../primitives/errors';
+import { BaseError } from '../error-management';
 import {
   TraceContext,
   TextMapPropagator,

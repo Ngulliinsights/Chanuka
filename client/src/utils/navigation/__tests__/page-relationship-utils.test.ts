@@ -1,5 +1,5 @@
 import { PageRelationshipUtils } from '../page-relationship-utils';
-import { logger } from '../../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 describe('PageRelationshipUtils', () => {
   beforeEach(() => {

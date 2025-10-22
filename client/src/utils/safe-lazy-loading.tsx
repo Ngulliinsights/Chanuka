@@ -1,5 +1,5 @@
 import { lazy, LazyExoticComponent, ComponentType, Suspense } from 'react';
-import { logger } from '@/utils/logger';
+import { logger } from '@/utils/browser-logger';
 import { withLazyErrorBoundary, createSafeLazyComponent } from '@/components/error-handling/withErrorBoundary';
 import { 
   PageLoader, 

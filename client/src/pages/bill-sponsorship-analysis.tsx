@@ -17,7 +17,7 @@ import PrimarySponsorAnalysis from './sponsorship/primary-sponsor';
 import CoSponsorsAnalysis from './sponsorship/co-sponsors';
 import FinancialNetworkAnalysis from './sponsorship/financial-network';
 import MethodologyPage from './sponsorship/methodology';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 // Navigation configuration for better maintainability
 const navigationCards = [

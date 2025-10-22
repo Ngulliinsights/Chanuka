@@ -3,7 +3,7 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu"
 import { Check, ChevronRight, Circle, AlertCircle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 import { UIComponentError } from './errors';
 import { attemptUIRecovery, getUIRecoverySuggestions } from './recovery';
 

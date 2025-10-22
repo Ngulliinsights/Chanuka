@@ -15,7 +15,7 @@ import {
 } from './LoadingStates';
 import { useComprehensiveLoading, useProgressiveLoading, useTimeoutAwareOperation } from '@/hooks/useComprehensiveLoading';
 import { useLoadingContext, usePageLoading, useComponentLoading, useApiLoading } from '@/contexts/LoadingContext';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 export const LoadingDemo: React.FC = () => {
   const [demoState, setDemoState] = useState<'idle' | 'loading' | 'success' | 'error' | 'timeout'>('idle');

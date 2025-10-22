@@ -1,5 +1,5 @@
 import { NavigationState, NavigationPreferences, RecentPage } from '@/types/navigation';
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Keys for localStorage
 const STORAGE_KEYS = {

@@ -1,6 +1,6 @@
 import { eq, and, sql } from 'drizzle-orm';
 import { databaseService } from '../../infrastructure/database/database-service.js';
-import { readDb } from '@shared/database/pool';
+import { readDatabase } from '@shared/database/connection';
 import { webSocketService } from '../../infrastructure/websocket.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service.js';
 import * as schema from '@shared/schema';
@@ -53,7 +53,7 @@ export interface BillEngagementUpdate {
 export class BillStatusMonitorService {
   private get db() {
     // Provides access to the read replica database connection
-    return readDb;
+    return readDatabase;
   }
 
   /**
