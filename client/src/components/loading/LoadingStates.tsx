@@ -1,9 +1,9 @@
 import React from 'react';
 import { Loader2, Wifi, WifiOff, AlertCircle, Clock, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
-import { cn } from '..\..\lib\utils';
-import { useConnectionAware } from '..\..\hooks\useConnectionAware';
-import { useOnlineStatus } from '..\..\hooks\use-online-status';
-import { logger } from '..\..\utils\browser-logger';
+import { cn } from '../../lib/utils';
+import { useConnectionAware } from '../../hooks/useConnectionAware';
+import { useOnlineStatus } from '../../hooks/use-online-status';
+import { logger } from '../../utils/browser-logger';
 import { 
   LoadingStateProps, 
   LoadingSize, 

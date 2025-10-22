@@ -1,12 +1,12 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { Loader2, Wifi, WifiOff, AlertCircle, Clock, X, RefreshCw } from 'lucide-react';
-import { cn } from '..\..\lib\utils';
-import { useLoadingContext } from '..\..\contexts\LoadingContext';
-import { Button } from '..\ui\button';
-import { Progress } from '..\ui\progress';
-import { Card, CardContent } from '..\ui\card';
-import { logger } from '..\..\utils\browser-logger';
+import { cn } from '../../lib/utils';
+import { useLoadingContext } from '../../contexts/LoadingContext';
+import { Button } from '../ui/button';
+import { Progress } from '../ui/progress';
+import { Card, CardContent } from '../ui/card';
+import { logger } from '../../utils/browser-logger';
 import { GlobalLoadingIndicatorProps } from './types';
 import { 
   validateLoadingOperation, 

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useMediaQuery } from '..\hooks\use-mobile';
+import { useMediaQuery } from '../hooks/use-mobile';
 import { 
   ResponsiveNavigationState, 
   ResponsiveNavigationContextValue 

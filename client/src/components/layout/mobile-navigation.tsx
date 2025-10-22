@@ -10,7 +10,7 @@ import {
   LogOut,
   Bell
 } from 'lucide-react';
-import { MobileTouchHandler, MobileTouchUtils } from '..\..\utils\mobile-touch-handler';
+import { MobileTouchHandler, MobileTouchUtils } from '../../utils/mobile-touch-handler';
 import { Button } from '..\ui\button';
 import { Sheet, SheetContent, SheetTrigger } from '..\ui\sheet';
 import { Badge } from '..\ui\badge';
@@ -26,11 +26,11 @@ import {
   useResponsiveLayoutContext, 
   TouchButton, 
   SafeAreaWrapper 
-} from '..\mobile\responsive-layout-manager';
+} from '../mobile/responsive-layout-manager';
 import { 
   MobileTabBar, 
   SwipeableHeader 
-} from '..\mobile\mobile-navigation-enhancements';
+} from '../mobile/mobile-navigation-enhancements';
 import { 
   MobileNavigationProps,
   NavigationItem as LayoutNavigationItem,
