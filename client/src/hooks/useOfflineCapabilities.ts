@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { offlineDataManager, cacheInvalidation } from '..\utils\apiCache';
-import { addNetworkStatusListener, isOnline } from '..\utils\serviceWorker';
+import { offlineDataManager } from '../utils/offlineDataManager';
+import { cacheInvalidation } from '../utils/cacheInvalidation';
+import { addNetworkStatusListener, isOnline } from '../utils/serviceWorker';
+import { backgroundSyncManager } from '../utils/backgroundSyncManager';
+import { offlineAnalytics } from '../utils/offlineAnalytics';
 import { logger } from '@shared/core';
 
 export interface OfflineState {
@@ -14,10 +17,10 @@ export interface OfflineState {
 export interface OfflineCapabilities {
   state: OfflineState;
   syncNow: () => Promise<void>;
-  clearOfflineData: () => void;
-  enableOfflineMode: () => void;
-  disableOfflineMode: () => void;
-  isDataCached: (key: string) => boolean;
+  clearOfflineData: () => Promise<void>;
+  enableOfflineMode: () => Promise<void>;
+  disableOfflineMode: () => Promise<void>;
+  isDataCached: (key: string) => Promise<boolean>;
 }
 
 export function useOfflineCapabilities(): OfflineCapabilities {
@@ -55,12 +58,16 @@ export function useOfflineCapabilities(): OfflineCapabilities {
 
   // Update sync status periodically
   useEffect(() => {
-    const updateSyncStatus = () => {
-      const syncStatus = offlineDataManager.getSyncStatus();
-      setState(prev => ({
-        ...prev,
-        pendingSyncCount: syncStatus.queueLength,
-      }));
+    const updateSyncStatus = async () => {
+      try {
+        const syncStatus = await backgroundSyncManager.getSyncStatus();
+        setState(prev => ({
+          ...prev,
+          pendingSyncCount: syncStatus.queueLength,
+        }));
+      } catch (error) {
+        logger.error('Failed to get sync status', { component: 'useOfflineCapabilities', error });
+      }
     };
 
     updateSyncStatus();
@@ -91,44 +98,62 @@ export function useOfflineCapabilities(): OfflineCapabilities {
 
   const syncNow = useCallback(async () => {
     if (!state.isOnline) {
-      console.warn('Cannot sync while offline');
+      logger.warn('Cannot sync while offline', { component: 'useOfflineCapabilities' });
       return;
     }
 
     try {
+      // Trigger background sync
+      await backgroundSyncManager.triggerSync();
+
       // Invalidate React Query cache to force fresh data
       await queryClient.invalidateQueries();
-      
+
       // Update last sync time
       setState(prev => ({
         ...prev,
         lastSyncTime: Date.now(),
       }));
 
-      logger.info('Sync completed successfully', { component: 'Chanuka' });
+      // Track sync event
+      await offlineAnalytics.trackUserAction('manual_sync', { success: true });
+
+      logger.info('Sync completed successfully', { component: 'useOfflineCapabilities' });
     } catch (error) {
-      logger.error('Sync failed:', { component: 'Chanuka' }, error);
+      await offlineAnalytics.trackUserAction('manual_sync', { success: false, error: String(error) });
+      logger.error('Sync failed:', { component: 'useOfflineCapabilities', error });
       throw error;
     }
   }, [state.isOnline, queryClient]);
 
-  const clearOfflineData = useCallback(() => {
-    // Clear offline cache
-    offlineDataManager.clearOfflineCache();
-    
-    // Clear API cache
-    cacheInvalidation.invalidateAll();
-    
-    // Clear React Query cache
-    queryClient.clear();
-    
-    setState(prev => ({
-      ...prev,
-      isOfflineReady: false,
-      pendingSyncCount: 0,
-    }));
+  const clearOfflineData = useCallback(async () => {
+    try {
+      // Clear offline cache
+      await offlineDataManager.clearOfflineCache();
 
-    logger.info('Offline data cleared', { component: 'Chanuka' });
+      // Clear API cache
+      await cacheInvalidation.invalidateAll();
+
+      // Clear React Query cache
+      queryClient.clear();
+
+      // Clear background sync data
+      await backgroundSyncManager.clearOfflineData();
+
+      setState(prev => ({
+        ...prev,
+        isOfflineReady: false,
+        pendingSyncCount: 0,
+      }));
+
+      // Track the clear action
+      await offlineAnalytics.trackUserAction('clear_offline_data');
+
+      logger.info('Offline data cleared', { component: 'useOfflineCapabilities' });
+    } catch (error) {
+      logger.error('Failed to clear offline data', { component: 'useOfflineCapabilities', error });
+      throw error;
+    }
   }, [queryClient]);
 
   const enableOfflineMode = useCallback(async () => {
@@ -145,30 +170,39 @@ export function useOfflineCapabilities(): OfflineCapabilities {
           const response = await fetch(endpoint);
           if (response.ok) {
             const data = await response.json();
-            localStorage.setItem(`offline_${endpoint.replace('/api/', '')}`, JSON.stringify({
-              data,
-              timestamp: Date.now(),
-            }));
+            await offlineDataManager.setOfflineData(endpoint, data);
           }
         } catch (error) {
-          console.warn(`Failed to cache ${endpoint}:`, error);
+          logger.warn(`Failed to cache ${endpoint}`, { component: 'useOfflineCapabilities', error });
         }
       }
 
       setState(prev => ({ ...prev, isOfflineReady: true }));
-      logger.info('Offline mode enabled', { component: 'Chanuka' });
+
+      // Track offline mode enable
+      await offlineAnalytics.trackUserAction('enable_offline_mode');
+
+      logger.info('Offline mode enabled', { component: 'useOfflineCapabilities' });
     } catch (error) {
-      logger.error('Failed to enable offline mode:', { component: 'Chanuka' }, error);
+      logger.error('Failed to enable offline mode:', { component: 'useOfflineCapabilities', error });
+      throw error;
     }
   }, []);
 
-  const disableOfflineMode = useCallback(() => {
-    clearOfflineData();
-    logger.info('Offline mode disabled', { component: 'Chanuka' });
+  const disableOfflineMode = useCallback(async () => {
+    await clearOfflineData();
+    await offlineAnalytics.trackUserAction('disable_offline_mode');
+    logger.info('Offline mode disabled', { component: 'useOfflineCapabilities' });
   }, [clearOfflineData]);
 
-  const isDataCached = useCallback((key: string): boolean => {
-    return localStorage.getItem(`offline_${key}`) !== null;
+  const isDataCached = useCallback(async (key: string): Promise<boolean> => {
+    try {
+      const data = await offlineDataManager.getOfflineData(key);
+      return data !== null;
+    } catch (error) {
+      logger.error('Failed to check if data is cached', { component: 'useOfflineCapabilities', key, error });
+      return false;
+    }
   }, []);
 
   return {
@@ -201,7 +235,7 @@ export function useOfflineQuery<T>(
         setError(null);
         setIsFromCache(false);
 
-        const result = await offlineDataManager.getOfflineData(
+        const result = await offlineDataManager.getOfflineDataWithFallback(
           key,
           fetchFn,
           fallbackData

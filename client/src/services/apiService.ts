@@ -1,5 +1,9 @@
 import { logger } from '@shared/core';
 import { processRequestInterceptors } from './apiInterceptors'; // <-- Import interceptors
+import { offlineDataManager } from '../utils/offlineDataManager';
+import { backgroundSyncManager } from '../utils/backgroundSyncManager';
+import { cacheInvalidation } from '../utils/cacheInvalidation';
+import { offlineAnalytics } from '../utils/offlineAnalytics';
 
 // API Error Types - Enhanced with better type safety
 export interface ApiError extends Error {
@@ -246,10 +250,23 @@ export async function fetchWithFallback<T = any>(
 
   // 1. Try cache first (only for GET requests)
   if (!skipCache && (!fetchOptions.method || fetchOptions.method === 'GET')) {
-    const cachedData = apiCache.get(cacheKey);
+    // Try memory cache first
+    let cachedData = apiCache.get(cacheKey);
     if (cachedData !== null) {
+      await offlineAnalytics.trackCacheAccess(true, cacheKey);
       return { data: cachedData, success: true, fromCache: true };
     }
+
+    // Try offline cache as fallback
+    cachedData = await offlineDataManager.getOfflineData(cacheKey);
+    if (cachedData !== null) {
+      await offlineAnalytics.trackCacheAccess(true, cacheKey);
+      // Restore to memory cache
+      apiCache.set(cacheKey, cachedData, cacheTTL);
+      return { data: cachedData, success: true, fromCache: true };
+    }
+
+    await offlineAnalytics.trackCacheAccess(false, cacheKey);
   }
 
   let lastError: ApiError | undefined;
@@ -307,6 +324,8 @@ export async function fetchWithFallback<T = any>(
         // Cache successful GET requests
         if (!skipCache && (!processedConfig.method || processedConfig.method === 'GET')) {
           apiCache.set(cacheKey, data, cacheTTL);
+          // Also cache in offline storage for persistence
+          await offlineDataManager.setOfflineData(cacheKey, data, cacheTTL);
         }
 
         return { data, success: true };
@@ -327,6 +346,23 @@ export async function fetchWithFallback<T = any>(
       }
 
       lastError.retryCount = attempt;
+
+      // Track API errors for analytics
+      await offlineAnalytics.trackApiError(url, lastError);
+
+      // Queue failed requests for background sync (for non-GET requests)
+      if (fetchOptions.method && fetchOptions.method !== 'GET' && !navigator.onLine) {
+        try {
+          await backgroundSyncManager.queueApiRequest(
+            fetchOptions.method,
+            url,
+            (fetchOptions as any).body ? JSON.parse((fetchOptions as any).body) : undefined,
+            'medium'
+          );
+        } catch (syncError) {
+          logger.warn('Failed to queue request for background sync', { component: 'ApiService', error: syncError });
+        }
+      }
 
       // Check if we should retry
       if (attempt < config.maxRetries && config.retryCondition?.(lastError, attempt)) {
@@ -471,7 +507,7 @@ export const authApi = {
     return apiService.get('/api/auth/me');
   },
   async logout() {
-    return apiService.post('/api/auth/logout');
+    return apiService.post('/api/auth/logout', {});
   }
 };
 export const { register, login, getCurrentUser, logout } = authApi;
@@ -517,7 +553,7 @@ export const billsApi = {
     return apiService.get('/api/bills/meta/statuses');
   }
 };
-export const { getBills, getBill, searchBills, createComment, getComments } = billsApi;
+export const { getBills, getBill, searchBills, getBillComments, createBillComment } = billsApi;
 
 // System API
 export const systemApi = {

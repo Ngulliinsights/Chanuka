@@ -318,36 +318,232 @@ self.addEventListener('sync', (event) => {
 // Handle background sync
 async function handleBackgroundSync() {
   try {
+    logger.info('Service Worker: Starting background sync', { component: 'Chanuka' });
+
     // Get pending actions from IndexedDB
     const pendingActions = await getPendingActions();
-    
+
+    if (pendingActions.length === 0) {
+      logger.info('Service Worker: No pending actions to sync', { component: 'Chanuka' });
+      return;
+    }
+
+    logger.info(`Service Worker: Processing ${pendingActions.length} pending actions`, { component: 'Chanuka' });
+
     for (const action of pendingActions) {
       try {
-        await processAction(action);
-        await removePendingAction(action.id);
+        const success = await processAction(action);
+        if (success) {
+          await removePendingAction(action.id);
+          logger.info('Service Worker: Action processed successfully', { component: 'Chanuka', actionId: action.id });
+        } else {
+          // Increment retry count and check if we should give up
+          await updateActionRetryCount(action.id);
+          const updatedAction = await getActionById(action.id);
+          if (updatedAction && updatedAction.retryCount >= updatedAction.maxRetries) {
+            logger.warn('Service Worker: Action failed permanently, removing', { component: 'Chanuka', actionId: action.id });
+            await removePendingAction(action.id);
+            await logOfflineError('sync_failure', { action: action.id, error: 'Max retries exceeded' });
+          }
+        }
       } catch (error) {
-        logger.info('Service Worker: Failed to process action:', { component: 'Chanuka' }, error);
+        logger.error('Service Worker: Failed to process action:', { component: 'Chanuka', actionId: action.id, error });
+        await updateActionRetryCount(action.id);
       }
     }
+
+    // Update last sync time
+    await updateLastSyncTime();
+
+    logger.info('Service Worker: Background sync completed', { component: 'Chanuka' });
   } catch (error) {
-    logger.info('Service Worker: Background sync failed:', { component: 'Chanuka' }, error);
+    logger.error('Service Worker: Background sync failed:', { component: 'Chanuka', error });
+    await logOfflineError('background_sync_failure', { error: error.message });
   }
 }
 
-// Placeholder functions for IndexedDB operations
+// IndexedDB operations for offline actions
 async function getPendingActions() {
-  // This would integrate with IndexedDB to get pending actions
-  return [];
+  try {
+    const db = await openIndexedDB();
+    const transaction = db.transaction(['offline-actions'], 'readonly');
+    const store = transaction.objectStore('offline-actions');
+    const request = store.getAll();
+
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => {
+        const actions = request.result;
+        // Sort by priority and timestamp
+        actions.sort((a, b) => {
+          const priorityOrder = { high: 3, medium: 2, low: 1 };
+          const priorityDiff = priorityOrder[b.priority] - priorityOrder[a.priority];
+          return priorityDiff !== 0 ? priorityDiff : a.timestamp - b.timestamp;
+        });
+        resolve(actions);
+      };
+      request.onerror = () => reject(request.error);
+    });
+  } catch (error) {
+    logger.error('Service Worker: Failed to get pending actions:', { component: 'Chanuka', error });
+    return [];
+  }
+}
+
+async function getActionById(actionId) {
+  try {
+    const db = await openIndexedDB();
+    const transaction = db.transaction(['offline-actions'], 'readonly');
+    const store = transaction.objectStore('offline-actions');
+    const request = store.get(actionId);
+
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  } catch (error) {
+    logger.error('Service Worker: Failed to get action by ID:', { component: 'Chanuka', actionId, error });
+    return null;
+  }
 }
 
 async function processAction(action) {
-  // This would process the pending action
-  logger.info('Processing action:', { component: 'Chanuka' }, action);
+  try {
+    logger.info('Service Worker: Processing action', { component: 'Chanuka', action });
+
+    const request = new Request(action.endpoint, {
+      method: action.method,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Offline-Sync': 'true',
+        'X-Request-ID': generateRequestId(),
+      },
+      body: action.data ? JSON.stringify(action.data) : undefined,
+    });
+
+    // Add auth token if available
+    if (typeof localStorage !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        request.headers.set('Authorization', `Bearer ${token}`);
+      }
+    }
+
+    const response = await fetch(request);
+
+    if (response.ok) {
+      logger.info('Service Worker: Action processed successfully', { component: 'Chanuka', actionId: action.id });
+      return true;
+    } else {
+      logger.warn('Service Worker: Action failed with status', { component: 'Chanuka', actionId: action.id, status: response.status });
+      return false;
+    }
+  } catch (error) {
+    logger.error('Service Worker: Action processing failed:', { component: 'Chanuka', actionId: action.id, error });
+    return false;
+  }
 }
 
-async function removePendingAction(id) {
-  // This would remove the action from IndexedDB
-  logger.info('Removing action:', { component: 'Chanuka' }, id);
+async function removePendingAction(actionId) {
+  try {
+    const db = await openIndexedDB();
+    const transaction = db.transaction(['offline-actions'], 'readwrite');
+    const store = transaction.objectStore('offline-actions');
+    const request = store.delete(actionId);
+
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  } catch (error) {
+    logger.error('Service Worker: Failed to remove pending action:', { component: 'Chanuka', actionId, error });
+  }
+}
+
+async function updateActionRetryCount(actionId) {
+  try {
+    const db = await openIndexedDB();
+    const transaction = db.transaction(['offline-actions'], 'readwrite');
+    const store = transaction.objectStore('offline-actions');
+    const getRequest = store.get(actionId);
+
+    return new Promise((resolve, reject) => {
+      getRequest.onsuccess = () => {
+        const action = getRequest.result;
+        if (action) {
+          action.retryCount += 1;
+          const updateRequest = store.put(action);
+          updateRequest.onsuccess = () => resolve();
+          updateRequest.onerror = () => reject(updateRequest.error);
+        } else {
+          resolve();
+        }
+      };
+      getRequest.onerror = () => reject(getRequest.error);
+    });
+  } catch (error) {
+    logger.error('Service Worker: Failed to update retry count:', { component: 'Chanuka', actionId, error });
+  }
+}
+
+async function updateLastSyncTime() {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('lastSyncTime', Date.now().toString());
+    }
+  } catch (error) {
+    logger.error('Service Worker: Failed to update last sync time:', { component: 'Chanuka', error });
+  }
+}
+
+async function logOfflineError(type, data) {
+  try {
+    const db = await openIndexedDB();
+    const transaction = db.transaction(['offline-analytics'], 'readwrite');
+    const store = transaction.objectStore('offline-analytics');
+
+    const errorEvent = {
+      type,
+      data,
+      timestamp: Date.now(),
+      userAgent: navigator.userAgent,
+      url: self.location.href,
+    };
+
+    store.add(errorEvent);
+  } catch (error) {
+    logger.error('Service Worker: Failed to log offline error:', { component: 'Chanuka', error });
+  }
+}
+
+// IndexedDB initialization
+async function openIndexedDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('chanuka-offline-db', 1);
+
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+
+      if (!db.objectStoreNames.contains('offline-actions')) {
+        const actionsStore = db.createObjectStore('offline-actions', { keyPath: 'id' });
+        actionsStore.createIndex('timestamp', 'timestamp', { unique: false });
+        actionsStore.createIndex('priority', 'priority', { unique: false });
+        actionsStore.createIndex('type', 'type', { unique: false });
+      }
+
+      if (!db.objectStoreNames.contains('offline-analytics')) {
+        const analyticsStore = db.createObjectStore('offline-analytics', { keyPath: 'id', autoIncrement: true });
+        analyticsStore.createIndex('timestamp', 'timestamp', { unique: false });
+        analyticsStore.createIndex('type', 'type', { unique: false });
+      }
+    };
+  });
+}
+
+function generateRequestId() {
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
 // Handle push notifications
@@ -407,15 +603,124 @@ self.addEventListener('notificationclick', (event) => {
 // Handle messages from the main thread
 self.addEventListener('message', (event) => {
   logger.info('Service Worker: Message received:', { component: 'Chanuka' }, event.data);
-  
+
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
   }
-  
+
   if (event.data && event.data.type === 'GET_VERSION') {
     event.ports[0].postMessage({ version: CACHE_NAME });
   }
+
+  if (event.data && event.data.type === 'ADD_OFFLINE_ACTION') {
+    addOfflineAction(event.data.action).then(() => {
+      event.ports[0].postMessage({ success: true });
+    }).catch(error => {
+      event.ports[0].postMessage({ success: false, error: error.message });
+    });
+  }
+
+  if (event.data && event.data.type === 'GET_SYNC_STATUS') {
+    getSyncStatus().then(status => {
+      event.ports[0].postMessage({ status });
+    }).catch(error => {
+      event.ports[0].postMessage({ error: error.message });
+    });
+  }
+
+  if (event.data && event.data.type === 'TRIGGER_SYNC') {
+    handleBackgroundSync().then(() => {
+      event.ports[0].postMessage({ success: true });
+    }).catch(error => {
+      event.ports[0].postMessage({ success: false, error: error.message });
+    });
+  }
+
+  if (event.data && event.data.type === 'CLEAR_OFFLINE_DATA') {
+    clearOfflineData().then(() => {
+      event.ports[0].postMessage({ success: true });
+    }).catch(error => {
+      event.ports[0].postMessage({ success: false, error: error.message });
+    });
+  }
 });
+
+// Add offline action from main thread
+async function addOfflineAction(action) {
+  try {
+    const db = await openIndexedDB();
+    const transaction = db.transaction(['offline-actions'], 'readwrite');
+    const store = transaction.objectStore('offline-actions');
+
+    const fullAction = {
+      ...action,
+      id: `${action.type}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: Date.now(),
+      retryCount: 0,
+    };
+
+    return new Promise((resolve, reject) => {
+      const request = store.add(fullAction);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  } catch (error) {
+    logger.error('Service Worker: Failed to add offline action:', { component: 'Chanuka', error });
+    throw error;
+  }
+}
+
+// Get sync status
+async function getSyncStatus() {
+  try {
+    const pendingActions = await getPendingActions();
+    const lastSyncTime = typeof localStorage !== 'undefined'
+      ? localStorage.getItem('lastSyncTime')
+      : null;
+
+    return {
+      queueLength: pendingActions.length,
+      lastSyncTime: lastSyncTime ? parseInt(lastSyncTime) : null,
+      pendingActions,
+    };
+  } catch (error) {
+    logger.error('Service Worker: Failed to get sync status:', { component: 'Chanuka', error });
+    throw error;
+  }
+}
+
+// Clear all offline data
+async function clearOfflineData() {
+  try {
+    const db = await openIndexedDB();
+    const transaction = db.transaction(['offline-actions', 'offline-analytics'], 'readwrite');
+
+    const actionsStore = transaction.objectStore('offline-actions');
+    const analyticsStore = transaction.objectStore('offline-analytics');
+
+    await Promise.all([
+      new Promise((resolve, reject) => {
+        const request = actionsStore.clear();
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      }),
+      new Promise((resolve, reject) => {
+        const request = analyticsStore.clear();
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      })
+    ]);
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem('lastSyncTime');
+    }
+
+    logger.info('Service Worker: Offline data cleared', { component: 'Chanuka' });
+  } catch (error) {
+    logger.error('Service Worker: Failed to clear offline data:', { component: 'Chanuka', error });
+    throw error;
+  }
+}
 
 
 

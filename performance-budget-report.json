@@ -1,0 +1,156 @@
+{
+  "timestamp": "2025-10-22T17:06:28.378Z",
+  "environment": "development",
+  "config": {
+    "environment": "development",
+    "strictMode": false,
+    "failOnViolation": false,
+    "failScore": 75,
+    "failSize": 3,
+    "verbose": true,
+    "alerts": {
+      "emailRecipients": [],
+      "slackWebhook": null,
+      "alertOnWarnings": false
+    },
+    "budgets": {
+      "coreWebVitals": {
+        "lcp": {
+          "name": "Largest Contentful Paint",
+          "description": "Time until the largest content element is painted",
+          "category": "core-web-vitals",
+          "metric": "lcp",
+          "threshold": 2500,
+          "unit": "ms",
+          "operator": "less-than",
+          "failOnViolation": true,
+          "warningThreshold": 2000
+        },
+        "fid": {
+          "name": "First Input Delay",
+          "description": "Time until the page responds to user input",
+          "category": "core-web-vitals",
+          "metric": "fid",
+          "threshold": 100,
+          "unit": "ms",
+          "operator": "less-than",
+          "failOnViolation": true,
+          "warningThreshold": 50
+        },
+        "cls": {
+          "name": "Cumulative Layout Shift",
+          "description": "Visual stability of the page layout",
+          "category": "core-web-vitals",
+          "metric": "cls",
+          "threshold": 0.1,
+          "unit": "score",
+          "operator": "less-than",
+          "failOnViolation": true,
+          "warningThreshold": 0.05
+        },
+        "fcp": {
+          "name": "First Contentful Paint",
+          "description": "Time until the first content is painted",
+          "category": "core-web-vitals",
+          "metric": "fcp",
+          "threshold": 1800,
+          "unit": "ms",
+          "operator": "less-than",
+          "failOnViolation": false,
+          "warningThreshold": 1400
+        },
+        "ttfb": {
+          "name": "Time to First Byte",
+          "description": "Time until the first byte of response is received",
+          "category": "core-web-vitals",
+          "metric": "ttfb",
+          "threshold": 800,
+          "unit": "ms",
+          "operator": "less-than",
+          "failOnViolation": false,
+          "warningThreshold": 600
+        }
+      },
+      "bundleSize": {
+        "totalJs": {
+          "name": "Total JavaScript Bundle Size",
+          "description": "Total size of all JavaScript bundles",
+          "category": "bundle-size",
+          "metric": "totalJsSize",
+          "threshold": 1024,
+          "unit": "KB",
+          "operator": "less-than",
+          "failOnViolation": true,
+          "warningThreshold": 800
+        },
+        "initialChunk": {
+          "name": "Initial Chunk Size",
+          "description": "Size of the initial JavaScript chunk",
+          "category": "bundle-size",
+          "metric": "initialChunkSize",
+          "threshold": 512,
+          "unit": "KB",
+          "operator": "less-than",
+          "failOnViolation": true,
+          "warningThreshold": 400
+        },
+        "largestChunk": {
+          "name": "Largest Chunk Size",
+          "description": "Size of the largest JavaScript chunk",
+          "category": "bundle-size",
+          "metric": "largestChunkSize",
+          "threshold": 1024,
+          "unit": "KB",
+          "operator": "less-than",
+          "failOnViolation": false,
+          "warningThreshold": 800
+        },
+        "totalCss": {
+          "name": "Total CSS Bundle Size",
+          "description": "Total size of all CSS bundles",
+          "category": "bundle-size",
+          "metric": "totalCssSize",
+          "threshold": 256,
+          "unit": "KB",
+          "operator": "less-than",
+          "failOnViolation": false,
+          "warningThreshold": 200
+        },
+        "totalAssets": {
+          "name": "Total Asset Size",
+          "description": "Total size of all static assets (images, fonts, etc.)",
+          "category": "bundle-size",
+          "metric": "totalAssetSize",
+          "threshold": 2048,
+          "unit": "KB",
+          "operator": "less-than",
+          "failOnViolation": false,
+          "warningThreshold": 1536
+        }
+      },
+      "custom": []
+    }
+  },
+  "results": {
+    "passed": true,
+    "violations": [],
+    "metrics": [],
+    "report": {
+      "violations": [],
+      "metrics": [],
+      "healthScore": 85,
+      "recommendations": [
+        "Performance monitoring module needs to be built and available"
+      ]
+    }
+  },
+  "summary": {
+    "passed": true,
+    "violationsCount": 0,
+    "metricsCount": 0,
+    "healthScore": 85,
+    "recommendations": [
+      "Performance monitoring module needs to be built and available"
+    ]
+  }
+}

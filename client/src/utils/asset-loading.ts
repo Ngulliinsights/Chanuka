@@ -1,5 +1,6 @@
 import { logger } from './browser-logger';
 import { preloadCriticalResources } from './serviceWorker';
+import { useOfflineDetection } from '../hooks/useOfflineDetection';
 
 // Asset loading configuration
 export interface AssetLoadConfig {
@@ -80,6 +81,7 @@ export class AssetLoadingManager {
   // Connection monitoring
   private connectionType: 'slow' | 'fast' | 'unknown' = 'unknown';
   private isOnline = navigator.onLine;
+  private offlineDetection = useOfflineDetection();
 
   constructor() {
     this.setupConnectionMonitoring();
@@ -87,27 +89,19 @@ export class AssetLoadingManager {
   }
 
   private setupConnectionMonitoring() {
-    // Monitor online/offline status
-    window.addEventListener('online', () => {
-      this.isOnline = true;
-    });
+    // Use enhanced offline detection
+    const updateConnectionStatus = () => {
+      this.isOnline = this.offlineDetection.isOnline;
+      this.connectionType = this.offlineDetection.connectionQuality.type === 'fast' ? 'fast' :
+                           this.offlineDetection.connectionQuality.type === 'slow' ? 'slow' : 'unknown';
+    };
 
-    window.addEventListener('offline', () => {
-      this.isOnline = false;
-    });
+    // Initial status
+    updateConnectionStatus();
 
-    // Monitor connection type if available
-    if ('connection' in navigator) {
-      const connection = (navigator as any).connection;
-      
-      const updateConnectionType = () => {
-        const effectiveType = connection.effectiveType;
-        this.connectionType = effectiveType === '4g' ? 'fast' : 'slow';
-      };
-
-      updateConnectionType();
-      connection.addEventListener('change', updateConnectionType);
-    }
+    // Listen for changes (we'll need to adapt this since offlineDetection is a hook)
+    // For now, we'll use a polling approach
+    setInterval(updateConnectionStatus, 5000);
   }
 
   private setupPerformanceMonitoring() {
@@ -224,6 +218,7 @@ export class AssetLoadingManager {
 
     // Check connection and adjust config if needed
     if (config.connectionAware && !this.isOnline) {
+      logger.warn('Asset loading skipped due to offline status', { component: 'AssetLoadingManager', url });
       return {
         success: false,
         error: new Error('Device is offline'),
@@ -235,6 +230,7 @@ export class AssetLoadingManager {
 
     if (config.connectionAware && this.connectionType === 'slow' && config.priority === 'low') {
       // Skip low priority assets on slow connections
+      logger.info('Skipping low priority asset on slow connection', { component: 'AssetLoadingManager', url });
       return {
         success: false,
         error: new Error('Skipped due to slow connection'),
@@ -242,6 +238,12 @@ export class AssetLoadingManager {
         loadTime: 0,
         fromCache: false,
       };
+    }
+
+    // Adjust retry config based on connection quality
+    if (this.connectionType === 'slow') {
+      config.maxRetries = Math.max(1, config.maxRetries - 1); // Reduce retries on slow connections
+      config.retryDelay = config.retryDelay * 1.5; // Increase delay
     }
 
     while (retries <= config.maxRetries) {
@@ -498,26 +500,51 @@ export class AssetLoadingManager {
     });
 
     const results: AssetLoadResult[] = [];
-    
+
+    // Filter assets based on offline status and connection quality
+    const filteredAssets = assets.filter(asset => {
+      const config = { ...DEFAULT_CONFIGS[asset.type], ...asset.config };
+
+      if (config.connectionAware && !this.isOnline) {
+        logger.debug('Skipping asset due to offline status', { component: 'AssetLoadingManager', url: asset.url });
+        return false;
+      }
+
+      if (config.connectionAware && this.connectionType === 'slow' && config.priority === 'low') {
+        logger.debug('Skipping low priority asset on slow connection', { component: 'AssetLoadingManager', url: asset.url });
+        return false;
+      }
+
+      return true;
+    });
+
+    if (filteredAssets.length !== assets.length) {
+      logger.info(`Filtered ${assets.length - filteredAssets.length} assets due to connection conditions`, {
+        component: 'AssetLoadingManager',
+        total: assets.length,
+        filtered: filteredAssets.length
+      });
+    }
+
     // Load assets with concurrency control
     const concurrency = this.connectionType === 'slow' ? 2 : 4;
-    const chunks = this.chunkArray(assets, concurrency);
-    
+    const chunks = this.chunkArray(filteredAssets, concurrency);
+
     for (const chunk of chunks) {
       const chunkPromises = chunk.map(async (asset, index) => {
         this.updateProgress({
           currentAsset: asset.url,
         });
-        
+
         const result = await this.loadAsset(asset.url, asset.type, asset.config);
-        
+
         this.updateProgress({
           loaded: this.loadingProgress.loaded + 1,
         });
-        
+
         return result;
       });
-      
+
       const chunkResults = await Promise.all(chunkPromises);
       results.push(...chunkResults);
     }
@@ -559,6 +586,9 @@ export class AssetLoadingManager {
       progress: this.loadingProgress,
       connectionType: this.connectionType,
       isOnline: this.isOnline,
+      connectionQuality: this.offlineDetection.connectionQuality,
+      lastOnlineTime: this.offlineDetection.lastOnlineTime,
+      lastOfflineTime: this.offlineDetection.lastOfflineTime,
     };
   }
 
