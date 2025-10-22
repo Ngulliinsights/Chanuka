@@ -4,8 +4,8 @@
 import { forwardRef, ElementRef, ComponentPropsWithoutRef } from "react"
 import { Root, List, Trigger, Content } from "@radix-ui/react-tabs"
 
-import { cn } from "@/lib/utils"
-import { logger } from '@/utils/browser-logger';
+import { cn } from '..\..\lib\utils'
+import { logger } from '..\..\utils\browser-logger';
 
 const Tabs = Root
 

@@ -1,5 +1,5 @@
 import { eq, desc, and, sql, count, like, or } from "drizzle-orm";
-import { database as databaseService, readDatabase } from '../../../../shared/database/connection';
+import { databaseService } from '../../../infrastructure/database/database-service';
 import * as schema from "../../../../shared/schema/schema.js";
 import type { Bill, InsertBill, BillEngagement } from "../../../../shared/schema/schema.js";
 import { logger } from '../../../../shared/core';
@@ -14,13 +14,24 @@ const cacheService = {
 
 const CACHE_KEYS = {
   BILL: 'bill',
-  BILLS: 'bills'
+  BILLS: 'bills',
+  BILL_SEARCH: 'bill_search',
+  SEARCH_RESULTS: 'search_results',
+  BILL_DETAILS: 'bill_details',
+  BILL_STATS: 'bill_stats',
+  BILL_CATEGORIES: 'bill_categories',
+  BILL_STATUSES: 'bill_statuses',
+  BILL_DATA: 'bill_data'
 };
 
 const CACHE_TTL = {
   SHORT: 300,
   MEDIUM: 1800,
-  LONG: 3600
+  LONG: 3600,
+  SEARCH_RESULTS: 1800,
+  BILL_DATA: 3600,
+  BILL_DETAILS: 3600,
+  STATIC_DATA: 7200
 };
 // Logger is imported above
 import { billStorage } from '../infrastructure/bill-storage.js';
@@ -105,7 +116,7 @@ export class BillService {
    * This getter pattern ensures we always work with the current DB connection.
    */
   private get db() {
-  return readDatabase;
+    return databaseService.getDatabase();
   }
 
   /**
@@ -118,16 +129,14 @@ export class BillService {
         id: 1,
         title: "Digital Economy and Data Protection Act 2024",
         summary: "Comprehensive legislation to regulate digital platforms and protect citizen data privacy rights.",
-        status: "committee_review",
+        status: "committee",
         category: "technology",
         introducedDate: new Date("2024-01-15"),
         billNumber: "HR-2024-001",
         description: "This bill establishes fundamental digital rights for citizens and creates oversight mechanisms for data protection.",
         content: "Full text of the Digital Economy and Data Protection Act...",
-        tags: ["privacy", "technology", "digital-rights"],
         viewCount: 1250,
         shareCount: 89,
-        commentCount: 45,
         engagementScore: "156",
         complexityScore: 7,
         constitutionalConcerns: {
@@ -143,6 +152,8 @@ export class BillService {
         lastActionDate: new Date("2024-01-20"),
         createdAt: new Date("2024-01-15"),
         updatedAt: new Date("2024-01-20"),
+        commentCountCached: 0,
+        searchVector: null,
         engagement: {
           totalViews: 1250,
           totalComments: 45,
@@ -155,16 +166,14 @@ export class BillService {
         id: 2,
         title: "Climate Change Adaptation Fund Bill 2024",
         summary: "Establishes a national fund for climate adaptation projects and carbon offset programs.",
-        status: "first_reading",
+        status: "introduced",
         category: "environment",
         introducedDate: new Date("2024-02-01"),
         billNumber: "S-2024-042",
         description: "Comprehensive climate action bill with targets for emissions reduction and renewable energy adoption.",
         content: "Full text of the Climate Change Adaptation Fund Bill...",
-        tags: ["climate", "energy", "environment"],
         viewCount: 2100,
         shareCount: 156,
-        commentCount: 78,
         engagementScore: "234",
         complexityScore: 9,
         constitutionalConcerns: {
@@ -180,6 +189,8 @@ export class BillService {
         lastActionDate: new Date("2024-02-05"),
         createdAt: new Date("2024-02-01"),
         updatedAt: new Date("2024-02-05"),
+        commentCountCached: 0,
+        searchVector: null,
         engagement: {
           totalViews: 2100,
           totalComments: 78,
@@ -204,16 +215,13 @@ export class BillService {
     pagination: PaginationOptions = { page: 1, limit: 10 }
   ): Promise<PaginatedBillResponse> {
     // Generate a unique cache key based on filters and pagination settings
-    const cacheKey = CACHE_KEYS.BILL_SEARCH(
-      filters.search || 'all',
-      JSON.stringify({ ...filters, ...pagination })
-    );
+    const cacheKey = `${CACHE_KEYS.BILL_SEARCH}_${filters.search || 'all'}_${JSON.stringify({ ...filters, ...pagination })}`;
 
     // Check cache first for performance optimization
     const cachedResult = await cacheService.get(cacheKey);
-    if (cachedResult) {
+    if (cachedResult && typeof cachedResult === 'object') {
       return {
-        ...cachedResult,
+        ...(cachedResult as any),
         metadata: {
           source: 'database',
           timestamp: new Date(),
@@ -231,7 +239,7 @@ export class BillService {
         const conditions: any[] = [];
         
         if (filters.status) {
-          conditions.push(eq(schema.bills.status, filters.status));
+          conditions.push(eq(schema.bills.status, filters.status as any));
         }
         
         if (filters.category) {
@@ -330,7 +338,7 @@ export class BillService {
    * @returns Complete bill data or null if not found
    */
   async getBillById(id: number): Promise<BillWithEngagement | null> {
-    const cacheKey = CACHE_KEYS.BILL_DETAILS(id);
+    const cacheKey = `${CACHE_KEYS.BILL_DETAILS}_${id}`;
 
     // Check cache for performance
     const cachedResult = await cacheService.get(cacheKey);
@@ -380,7 +388,12 @@ export class BillService {
           .limit(5);
 
         // Get sponsor details if the bill has a sponsor
-        let sponsorInfo = null;
+        let sponsorInfo: {
+          id: number;
+          name: string;
+          role: string;
+          party?: string | null;
+        } | null = null;
         if (bill.sponsorId) {
           const [sponsor] = await this.db
             .select({
@@ -391,8 +404,13 @@ export class BillService {
             })
             .from(schema.sponsors)
             .where(eq(schema.sponsors.id, bill.sponsorId));
-          
-          sponsorInfo = sponsor || null;
+
+          sponsorInfo = sponsor ? {
+            id: sponsor.id,
+            name: sponsor.name,
+            role: sponsor.role,
+            party: sponsor.party
+          } : null;
         }
 
         // Combine all data into a comprehensive bill object
@@ -415,7 +433,7 @@ export class BillService {
 
     // Cache the result for faster subsequent access
     if (result.source === 'database' && result.data) {
-      await cacheService.set(cacheKey, result.data, CACHE_TTL.BILL_DATA);
+      await cacheService.set(cacheKey, result.data, CACHE_TTL.BILL_DETAILS);
     }
 
     return result.data;
@@ -549,7 +567,7 @@ export class BillService {
 
     // Trigger real-time notification system (non-blocking)
     try {
-      const { billStatusMonitorService } = await import('./bill-status-monitor.js');
+      const { billStatusMonitorService } = await import('../bill-status-monitor');
       await billStatusMonitorService.handleBillStatusChange({
         billId: id,
         oldStatus,
@@ -575,7 +593,7 @@ export class BillService {
    * @returns Bill statistics object
    */
   async getBillStats(): Promise<BillStats> {
-    const cacheKey = CACHE_KEYS.BILL_STATS();
+    const cacheKey = CACHE_KEYS.BILL_STATS;
     
     // Check cache first
     const cachedResult = await cacheService.get(cacheKey);
@@ -755,7 +773,7 @@ export class BillService {
     // Trigger real-time notifications for comments and shares (not views to reduce noise)
     if (engagementType === 'comment' || engagementType === 'share') {
       try {
-        const { billStatusMonitorService } = await import('./bill-status-monitor.js');
+        const { billStatusMonitorService } = await import('../bill-status-monitor');
         await billStatusMonitorService.handleBillEngagementUpdate({
           billId,
           type: engagementType,
@@ -895,13 +913,13 @@ export class BillService {
   private async clearBillCaches(billId?: number): Promise<void> {
     try {
       // Clear general statistic caches
-      await cacheService.delete(CACHE_KEYS.BILL_STATS());
-      await cacheService.delete(CACHE_KEYS.BILL_CATEGORIES());
-      await cacheService.delete(CACHE_KEYS.BILL_STATUSES());
+      await cacheService.delete(CACHE_KEYS.BILL_STATS);
+      await cacheService.delete(CACHE_KEYS.BILL_CATEGORIES);
+      await cacheService.delete(CACHE_KEYS.BILL_STATUSES);
 
       // Clear specific bill cache if provided
       if (billId) {
-        await cacheService.delete(CACHE_KEYS.BILL_DETAILS(billId));
+        await cacheService.delete(`${CACHE_KEYS.BILL_DETAILS}_${billId}`);
       }
 
       // Note: Search result caches rely on TTL expiration

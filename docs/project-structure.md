@@ -502,6 +502,7 @@ client/
 │   │   │   ├── PageRelationshipService.test.ts
 │   │   │   ├── UserJourneyTracker.test.ts
 │   │   ├── analysis.ts
+│   │   ├── api.ts
 │   │   ├── apiInterceptors.ts
 │   │   ├── apiService.ts
 │   │   ├── navigation.ts
@@ -599,6 +600,7 @@ client/
 │   │   ├── browser-compatibility.ts
 │   │   ├── browser-compatibility-manager.ts
 │   │   ├── browser-compatibility-tests.ts
+│   │   ├── browser-logger.ts
 │   │   ├── cache-strategy.ts
 │   │   ├── comprehensiveLoading.ts
 │   │   ├── connectionAwareLoading.ts
@@ -633,6 +635,7 @@ client/
 │   │   ├── safe-lazy-loading.tsx
 │   │   ├── serviceWorker.ts
 │   ├── vite-env.d.ts
+├── tsconfig.json
 components.json
 CONSOLIDATION_PROGRESS.md
 cspell.config.yaml
@@ -773,6 +776,8 @@ nginx.conf
 package.json
 package-lock.json
 playwright.config.ts
+playwright-report/
+├── index.html
 postcss.config.js
 Readme1.md
 scripts/
@@ -931,7 +936,7 @@ server/
 │   │   ├── infrastructure/
 │   │   │   ├── repositories/
 │   │   │   │   ├── alert-preference-repository-impl.ts
-│   │   ├── unified_alert_routes.ts
+│   │   ├── unified-alert-routes.ts
 │   │   ├── unified_alert_service.ts
 │   ├── analysis/
 │   │   ├── application/
@@ -1177,6 +1182,7 @@ server/
 ├── index.ts
 ├── infrastructure/
 │   ├── cache/
+│   │   ├── cache.ts
 │   │   ├── index.ts
 │   ├── database/
 │   │   ├── base/
@@ -1218,8 +1224,12 @@ server/
 │   │   ├── types.ts
 │   ├── index.ts
 │   ├── monitoring/
+│   │   ├── audit-log.ts
 │   │   ├── external-api-management.ts
+│   │   ├── health.ts
 │   │   ├── index.ts
+│   │   ├── monitoring-scheduler.ts
+│   │   ├── performance-monitor.ts
 │   ├── notifications/
 │   │   ├── __tests__/
 │   │   │   ├── notification-orchestrator.test.ts
@@ -1245,6 +1255,7 @@ server/
 │   ├── request-logger.ts
 │   ├── security-middleware.ts
 │   ├── security-monitoring-middleware.ts
+├── minimal-server.ts
 ├── routes/
 │   ├── regulatory-monitoring.ts
 ├── scripts/
@@ -1316,18 +1327,9 @@ server/
 │   │   ├── test-helpers.ts
 │   ├── voting-pattern-analysis.test.ts
 ├── types/
-│   ├── ambient.d.ts
-│   ├── ambient-shims.d.ts
 │   ├── api.ts
-│   ├── api-response-shim.d.ts
-│   ├── drizzle-shims.d.ts
-│   ├── global-shims.d.ts
 │   ├── jest-extensions.d.ts
-│   ├── logger-shim.d.ts
-│   ├── schema-shims.d.ts
-│   ├── service-shims.d.ts
 │   ├── shared-schema-short.d.ts
-│   ├── shims.d.ts
 ├── utils/
 │   ├── __tests__/
 │   │   ├── cache.test.ts
@@ -1342,8 +1344,6 @@ server/
 │   ├── db-init.ts
 │   ├── errors.ts
 │   ├── featureFlags.ts
-│   ├── logger.ts
-│   ├── logger.ts.backup
 │   ├── metrics.ts
 │   ├── performance-monitoring-utils.ts
 │   ├── race-condition-prevention.ts
@@ -1408,7 +1408,6 @@ shared/
 │   │   │   ├── migration-adapter.ts
 │   │   │   ├── patterns/
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── single-flight-cache.ts
 │   │   │   ├── README.md
 │   │   │   ├── README-interfaces.md
 │   │   │   ├── single-flight-cache.ts
@@ -1433,30 +1432,6 @@ shared/
 │   │   │   ├── middleware.ts
 │   │   │   ├── types.ts
 │   │   ├── index.ts
-│   │   ├── logging/
-│   │   │   ├── __tests__/
-│   │   │   │   ├── logger.test.ts
-│   │   │   │   ├── log-rotation.test.ts
-│   │   │   │   ├── middleware.test.ts
-│   │   │   ├── adapters/
-│   │   │   │   ├── legacy/
-│   │   │   │   │   ├── fraud-detection-logger-adapter.ts
-│   │   │   ├── index.ts
-│   │   │   ├── legacy-adapters/
-│   │   │   ├── legacy-adapters.ts
-│   │   │   │   ├── logger-adapter.ts
-│   │   │   ├── logger.d.ts
-│   │   │   ├── logger.d.ts.map
-│   │   │   ├── logger.js
-│   │   │   ├── logger.js.map
-│   │   │   ├── logger.ts
-│   │   │   ├── log-rotation.ts
-│   │   │   ├── middleware.ts
-│   │   │   ├── rotation.ts
-│   │   │   ├── schemas.ts
-│   │   │   ├── service.ts
-│   │   │   ├── telemetry.ts
-│   │   │   ├── types.ts
 │   │   ├── middleware/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── ai-deduplication.test.ts
@@ -1473,8 +1448,6 @@ shared/
 │   │   │   ├── error-handler/
 │   │   │   │   ├── provider.ts
 │   │   │   ├── factory.ts
-│   │   │   ├── factory.ts.bak
-│   │   │   ├── factory.ts.new
 │   │   │   ├── feature-flags.ts
 │   │   │   ├── index.ts
 │   │   │   ├── legacy-adapters/
@@ -1596,9 +1569,6 @@ shared/
 │   │   │   │   ├── http-status.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── time.ts
-│   │   │   ├── errors/
-│   │   │   │   ├── base-error.ts
-│   │   │   │   ├── index.ts
 │   │   │   ├── index.ts
 │   │   │   ├── README.md
 │   │   │   ├── types/
@@ -1774,6 +1744,9 @@ shared/
 │   ├── legal-analysis.ts
 tailwind.config.ts
 test-auth-compile.ts
+test-results
+├── results.json
+├── results.xml
 tests/
 ├── api/
 │   ├── auth.spec.ts
@@ -1802,4 +1775,4 @@ vitest.frontend.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-22 02:19:08
+Generated on: 2025-10-22 11:11:31

@@ -1,7 +1,7 @@
 // Development Error Recovery Utilities
 // This module provides enhanced error handling and recovery mechanisms for development mode
 
-import { logger } from '@/utils/browser-logger';
+import { logger } from './browser-logger';
 
 interface DevServerInfo {
   url: string;

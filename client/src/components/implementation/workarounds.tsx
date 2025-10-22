@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Card } from '..\ui\card';
+import { Button } from '..\ui\button';
+import { Badge } from '..\ui\badge';
+import { Input } from '..\ui\input';
+import { Textarea } from '..\ui\textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '..\ui\select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '..\ui\dialog';
 import { ArrowUp, ArrowDown, Plus, Clock, DollarSign, Users, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\..\utils\browser-logger';
 
 // Type definitions with improved specificity
 type Priority = 'low' | 'medium' | 'high' | 'critical';

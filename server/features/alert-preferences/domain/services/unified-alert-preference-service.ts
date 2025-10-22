@@ -3,10 +3,10 @@ import { databaseService } from '../../infrastructure/database/database-service'
 import { database as db } from '@shared/database/connection';
 import { notificationChannelService } from '../../infrastructure/notifications/notification-channels';
 import { userProfileService } from '../users/domain/user-profile';
-import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service';
+import { cacheService } from '../../../infrastructure/cache';
 import * as schema from '@shared/schema';
 import { z } from 'zod';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -267,32 +267,40 @@ export class UnifiedAlertPreferenceService {
    * Retrieves all alert preferences for a user with caching
    */
   async getUserAlertPreferences(userId: string): Promise<AlertPreference[]> {
-    const cacheKey = `${CACHE_KEYS.USER_PROFILE(userId)}:alert_preferences`;
+    const cacheKey = `user:profile:${userId}:alert_preferences`;
 
-    return await cacheService.getOrSet(
-      cacheKey,
-      async () => {
-        try {
-          const preferences = await this.fetchPreferencesFromDatabase(userId);
-          
-          // If no preferences exist, create and return default
-          if (preferences.length === 0) {
-            const defaultPref = await this.createDefaultAlertPreference(userId);
-            return [defaultPref];
-          }
-          
-          return preferences;
-        } catch (error) {
-          logger.error('Error fetching alert preferences', { 
-            component: 'AlertPreferenceService',
-            userId 
-          }, error);
-          // Return default on error to ensure system continues working
-          return [await this.createDefaultAlertPreference(userId)];
+    // Try fetch from cache first
+    try {
+      const cached = await cacheService.get(cacheKey);
+      if (cached !== null && cached !== undefined) return cached as AlertPreference[];
+    } catch (err) {
+      // If cache read fails, fall through to compute and return
+      logger.warn('Cache read failed for alert preferences', { component: 'AlertPreferenceService', userId, error: err });
+    }
+
+    // Compute value and set cache
+    const computed = await (async () => {
+      try {
+        const preferences = await this.fetchPreferencesFromDatabase(userId);
+        if (preferences.length === 0) {
+          const defaultPref = await this.createDefaultAlertPreference(userId);
+          return [defaultPref];
         }
-      },
-      CACHE_TTL.USER_DATA
-    );
+        return preferences;
+      } catch (error) {
+        logger.error('Error fetching alert preferences', { component: 'AlertPreferenceService', userId }, error);
+        return [await this.createDefaultAlertPreference(userId)];
+      }
+    })();
+
+    try {
+      // USER_DATA TTL ≈ 1 hour (3600s)
+      await cacheService.set(cacheKey, computed, 3600);
+    } catch (err) {
+      logger.warn('Failed to write alert preferences to cache', { component: 'AlertPreferenceService', userId, error: err });
+    }
+
+    return computed;
   }
 
   /**
@@ -745,61 +753,60 @@ export class UnifiedAlertPreferenceService {
       successRate: number;
     }>;
   }> {
-    const cacheKey = `${CACHE_KEYS.USER_PROFILE(userId)}:alert_stats`;
+    const cacheKey = `user:profile:${userId}:alert_stats`;
 
-    return await cacheService.getOrSet(
-      cacheKey,
-      async () => {
-        try {
-          const preferences = await this.getUserAlertPreferences(userId);
-          const logs = await this.fetchDeliveryLogsFromDatabase(userId);
+    // Try cache first
+    try {
+      const cached = await cacheService.get(cacheKey);
+      if (cached !== null && cached !== undefined) return cached as any;
+    } catch (err) {
+      logger.warn('Cache read failed for alert stats', { component: 'AlertPreferenceService', userId, error: err });
+    }
 
-          const deliveryStats = {
-            totalAlerts: logs.length,
-            successfulDeliveries: logs.filter(log => 
-              log.status === 'sent' || log.status === 'delivered'
-            ).length,
-            failedDeliveries: logs.filter(log => log.status === 'failed').length,
-            filteredAlerts: logs.filter(log => log.status === 'filtered').length
-          };
+    try {
+      const preferences = await this.getUserAlertPreferences(userId);
+      const logs = await this.fetchDeliveryLogsFromDatabase(userId);
 
-          const channelStats: any = {};
-          const channelTypes: ChannelType[] = ['in_app', 'email', 'push', 'sms', 'webhook'];
-          
-          for (const channelType of channelTypes) {
-            const channelLogs = logs.filter(log => log.channels.includes(channelType));
-            const successfulChannelLogs = channelLogs.filter(log => 
-              log.status === 'sent' || log.status === 'delivered'
-            );
-            
-            channelStats[channelType] = {
-              enabled: preferences.some(p => 
-                p.channels.some(ch => ch.type === channelType && ch.enabled)
-              ),
-              deliveries: channelLogs.length,
-              successRate: channelLogs.length > 0 
-                ? (successfulChannelLogs.length / channelLogs.length) * 100 
-                : 0
-            };
-          }
+      const deliveryStats = {
+        totalAlerts: logs.length,
+        successfulDeliveries: logs.filter(log => log.status === 'sent' || log.status === 'delivered').length,
+        failedDeliveries: logs.filter(log => log.status === 'failed').length,
+        filteredAlerts: logs.filter(log => log.status === 'filtered').length
+      };
 
-          return {
-            totalPreferences: preferences.length,
-            activePreferences: preferences.filter(p => p.isActive).length,
-            deliveryStats,
-            channelStats
-          };
+      const channelStats: any = {};
+      const channelTypes: ChannelType[] = ['in_app', 'email', 'push', 'sms', 'webhook'];
 
-        } catch (error) {
-          logger.error('Error fetching alert stats', { 
-            component: 'AlertPreferenceService',
-            userId 
-          }, error);
-          throw error;
-        }
-      },
-      CACHE_TTL.ALERT_DATA
-    );
+      for (const channelType of channelTypes) {
+        const channelLogs = logs.filter(log => log.channels.includes(channelType));
+        const successfulChannelLogs = channelLogs.filter(log => log.status === 'sent' || log.status === 'delivered');
+
+        channelStats[channelType] = {
+          enabled: preferences.some(p => p.channels.some(ch => ch.type === channelType && ch.enabled)),
+          deliveries: channelLogs.length,
+          successRate: channelLogs.length > 0 ? (successfulChannelLogs.length / channelLogs.length) * 100 : 0
+        };
+      }
+
+      const result = {
+        totalPreferences: preferences.length,
+        activePreferences: preferences.filter(p => p.isActive).length,
+        deliveryStats,
+        channelStats
+      };
+
+      try {
+        // Cache for 1 hour
+        await cacheService.set(cacheKey, result, 3600);
+      } catch (err) {
+        logger.warn('Failed to write alert stats to cache', { component: 'AlertPreferenceService', userId, error: err });
+      }
+
+      return result;
+    } catch (error) {
+      logger.error('Error fetching alert stats', { component: 'AlertPreferenceService', userId }, error);
+      throw error;
+    }
   }
 
   // ========================================================================
@@ -1120,7 +1127,7 @@ export class UnifiedAlertPreferenceService {
         timestamp: new Date()
       });
       
-  await cacheService.set(batchKey, existingBatch, CACHE_TTL.LONG);
+  await cacheService.set(batchKey, existingBatch, 7200);
     } catch (error) {
       logger.error('Error adding to batch', { 
         component: 'AlertPreferenceService',
@@ -1396,8 +1403,8 @@ export class UnifiedAlertPreferenceService {
    */
   private async clearUserPreferenceCache(userId: string): Promise<void> {
     const patterns = [
-      `${CACHE_KEYS.USER_PROFILE(userId)}:alert_preferences`,
-      `${CACHE_KEYS.USER_PROFILE(userId)}:alert_stats`
+      `user:profile:${userId}:alert_preferences`,
+      `user:profile:${userId}:alert_stats`
     ];
 
     for (const pattern of patterns) {

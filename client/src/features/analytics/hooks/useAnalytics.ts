@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { analyticsApi } from '../services/analytics-api';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '..\..\..\hooks\use-toast';
 import type {
   BillAnalytics,
   AnalyticsFilters,

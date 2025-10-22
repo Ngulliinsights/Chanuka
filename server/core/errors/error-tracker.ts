@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { logger } from '../../utils/logger.js';
+import { logger } from '../../../shared/core/index.js';
 
 export interface ErrorContext {
   traceId?: string;

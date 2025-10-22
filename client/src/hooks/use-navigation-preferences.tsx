@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { logger } from '@/utils/browser-logger';
-import { useNavigation } from '@/contexts/NavigationContext';
-import { NavigationPreferences } from '@/types/navigation';
+import { logger } from '..\utils\browser-logger';
+import { useNavigation } from '..\contexts\NavigationContext';
+import { NavigationPreferences } from '..\types\navigation';
 
 const PREFERENCES_STORAGE_KEY = 'chanuka-navigation-preferences';
 

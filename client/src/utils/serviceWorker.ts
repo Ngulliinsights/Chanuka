@@ -1,6 +1,6 @@
 // Service Worker registration and management utilities
 import { navigationService } from '../services/navigation';
-import { logger } from '@/utils/browser-logger';
+import { logger } from './browser-logger';
 
 export interface ServiceWorkerConfig {
   onUpdate?: (registration: ServiceWorkerRegistration) => void;

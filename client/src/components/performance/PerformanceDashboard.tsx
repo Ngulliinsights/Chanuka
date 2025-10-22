@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '..\ui\card';
+import { Badge } from '..\ui\badge';
+import { Button } from '..\ui\button';
+import { Progress } from '..\ui\progress';
 import { 
   Activity, 
   Zap, 
@@ -18,10 +18,10 @@ import {
   performanceMonitor, 
   performanceBudget, 
   usePerformanceMonitoring 
-} from '@/utils/performanceMonitoring';
-import { useConnectionAwareLoading } from '@/utils/connectionAwareLoading';
-import { cn } from '@/lib/utils';
-import { logger } from '@/utils/browser-logger';
+} from '..\..\utils\performanceMonitoring';
+import { useConnectionAwareLoading } from '..\..\utils\connectionAwareLoading';
+import { cn } from '..\..\lib\utils';
+import { logger } from '..\..\utils\browser-logger';
 
 export interface PerformanceDashboardProps {
   className?: string;

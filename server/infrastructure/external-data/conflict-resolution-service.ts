@@ -15,7 +15,7 @@ import {
 } from './types.js';
 import { conflicts, conflictSources } from '@shared/schema';
 import { eq, and } from 'drizzle-orm';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 export class ConflictResolutionService {
   private autoResolveThreshold = 0.8; // 80% confidence threshold for auto-resolution

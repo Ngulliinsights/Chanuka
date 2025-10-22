@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { Button } from '..\..\..\components\ui\button';
 import { BillCard } from './BillCard';
 import { Loader2, AlertCircle, Filter } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '..\..\..\components\ui\card';
+import { Badge } from '..\..\..\components\ui\badge';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '..\..\..\components\ui\dropdown-menu';
 import type { Bill, BillsQueryParams } from '../types';
 
 interface BillListProps {

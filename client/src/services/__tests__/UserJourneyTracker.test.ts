@@ -1,5 +1,5 @@
 import { UserJourneyTracker, UserJourney, JourneyStep } from '../UserJourneyTracker';
-import { UserRole, NavigationSection } from '@/types/navigation';
+import { UserRole, NavigationSection } from '..\..\types\navigation';
 import { logger } from '@shared/core';
 
 describe('UserJourneyTracker', () => {

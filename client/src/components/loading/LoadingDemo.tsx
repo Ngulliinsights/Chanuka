@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '..\ui\button';
+import { Card, CardContent, CardHeader, CardTitle } from '..\ui\card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '..\ui\tabs';
 import { 
   LoadingStateManager,
   TimeoutAwareLoader,
@@ -13,9 +13,9 @@ import {
   ConnectionAwareLoader,
   ProgressiveLoader,
 } from './LoadingStates';
-import { useComprehensiveLoading, useProgressiveLoading, useTimeoutAwareOperation } from '@/hooks/useComprehensiveLoading';
-import { useLoadingContext, usePageLoading, useComponentLoading, useApiLoading } from '@/contexts/LoadingContext';
-import { logger } from '@/utils/browser-logger';
+import { useComprehensiveLoading, useProgressiveLoading, useTimeoutAwareOperation } from '..\..\hooks\useComprehensiveLoading';
+import { useLoadingContext, usePageLoading, useComponentLoading, useApiLoading } from '..\..\contexts\LoadingContext';
+import { logger } from '..\..\utils\browser-logger';
 
 export const LoadingDemo: React.FC = () => {
   const [demoState, setDemoState] = useState<'idle' | 'loading' | 'success' | 'error' | 'timeout'>('idle');

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../../utils/logger.js';
+import { logger } from '../../../../shared/core/index.js';
 import { trackApiMetric } from '../../../utils/performance-monitoring-utils.js';
 import { analyticsConfig } from '../config/analytics.config.js';
 import { AuthenticatedRequest } from '../../../middleware/auth.js';

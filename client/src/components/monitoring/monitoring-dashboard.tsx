@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { logger } from '@shared/core';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '..\ui\card';
+import { Badge } from '..\ui\badge';
+import { Button } from '..\ui\button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '..\ui\tabs';
+import { Progress } from '..\ui\progress';
+import { Alert, AlertDescription, AlertTitle } from '..\ui\alert';
 import { Activity, AlertTriangle, CheckCircle, Database, Server, TrendingUp, TrendingDown, Clock, Users, Zap, AlertCircle, RefreshCw } from 'lucide-react';
 
 interface SystemHealth {

@@ -1,10 +1,11 @@
 import { database as db } from '@shared/database/connection';
 import { user as users, userProfile as userProfiles, userInterest as userInterests, billEngagement, notification as notifications, billComment as billComments, bill as bills } from '../../../../shared/schema/schema';
 import { eq, and, desc, sql, count } from 'drizzle-orm';
-import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../../infrastructure/cache/cache-service';
+import { cacheService } from 'server/infrastructure/cache';
+import { cacheKeys } from '../../../../shared/core/src/caching/key-generator';
 import { databaseService } from '../../../infrastructure/database/database-service';
 import { z } from 'zod';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Data validation schemas
 const userProfileDataSchema = z.object({
@@ -167,85 +168,89 @@ export class UserProfileService {
 
   async getUserProfile(userId: string) {
     const sanitizedUserId = this.sanitizeUserId(userId);
-    const cacheKey = CACHE_KEYS.USER_PROFILE(sanitizedUserId);
-    
+    const cacheKey = cacheKeys.USER_PROFILE(sanitizedUserId);
+
     // Try to get from cache first
-    return await cacheService.getOrSet(
-      cacheKey,
-      async () => {
-        // Use database service with fallback
-        const result = await databaseService.withFallback(
-          async () => {
-            const [user] = await db
-              .select({
-                id: users.id,
-                email: users.email,
-                firstName: users.firstName,
-                lastName: users.lastName,
-                name: users.name,
-                role: users.role,
-                verificationStatus: users.verificationStatus,
-                createdAt: users.createdAt,
-                profile: {
-                  bio: userProfiles.bio,
-                  expertise: userProfiles.expertise,
-                  location: userProfiles.location,
-                  organization: userProfiles.organization,
-                  reputationScore: userProfiles.reputationScore,
-                  isPublic: userProfiles.isPublic
-                }
-              })
-              .from(users)
-              .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
-              .where(eq(users.id, userId))
-              .limit(1);
+    const cached = await cacheService.get(cacheKey);
+    if (cached !== null && cached !== undefined) return cached;
+    const computed = await (async () => {
+      // Use database service with fallback
+      const result = await databaseService.withFallback(
+        async () => {
+          const [user] = await db
+            .select({
+              id: users.id,
+              email: users.email,
+              firstName: users.firstName,
+              lastName: users.lastName,
+              name: users.name,
+              role: users.role,
+              verificationStatus: users.verificationStatus,
+              createdAt: users.createdAt,
+              profile: {
+                bio: userProfiles.bio,
+                expertise: userProfiles.expertise,
+                location: userProfiles.location,
+                organization: userProfiles.organization,
+                reputationScore: userProfiles.reputationScore,
+                isPublic: userProfiles.isPublic
+              }
+            })
+            .from(users)
+            .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
+            .where(eq(users.id, userId))
+            .limit(1);
 
-            if (!user) {
-              throw new Error('User not found');
-            }
+          if (!user) {
+            throw new Error('User not found');
+          }
 
-            // Get user interests
-            const interests = await db
-              .select({ interest: userInterests.interest })
-              .from(userInterests)
-              .where(eq(userInterests.userId, userId));
+          // Get user interests
+          const interests = await db
+            .select({ interest: userInterests.interest })
+            .from(userInterests)
+            .where(eq(userInterests.userId, userId));
 
-            return {
-              ...user,
-              interests: interests.map(i => i.interest)
-            };
+          return {
+            ...user,
+            interests: interests.map(i => i.interest)
+          };
+        },
+        // Fallback data for when database is unavailable
+        {
+          id: userId,
+          email: 'user@example.com',
+          firstName: 'Demo',
+          lastName: 'User',
+          name: 'Demo User',
+          role: 'citizen',
+          verificationStatus: 'pending',
+          createdAt: new Date(),
+          profile: {
+            bio: 'Demo user profile',
+            expertise: ['general'],
+            location: 'Demo Location',
+            organization: 'Demo Organization',
+            reputationScore: 0,
+            isPublic: true
           },
-          // Fallback data for when database is unavailable
-          {
-            id: userId,
-            email: 'user@example.com',
-            firstName: 'Demo',
-            lastName: 'User',
-            name: 'Demo User',
-            role: 'citizen',
-            verificationStatus: 'pending',
-            createdAt: new Date(),
-            profile: {
-              bio: 'Demo user profile',
-              expertise: ['general'],
-              location: 'Demo Location',
-              organization: 'Demo Organization',
-              reputationScore: 0,
-              isPublic: true
-            },
-            interests: ['general']
-          },
-          `getUserProfile:${userId}`
-        );
+          interests: ['general']
+        },
+        `getUserProfile:${userId}`
+      );
 
-        if (result.source === 'fallback') {
-          console.warn(`Using fallback data for user profile: ${userId}`);
-        }
+      if (result.source === 'fallback') {
+        console.warn(`Using fallback data for user profile: ${userId}`);
+      }
 
-        return result.data;
-      },
-      CACHE_TTL.USER_DATA
-    );
+      return result.data;
+    })();
+    try {
+      await cacheService.set(cacheKey, computed, 3600);
+    } catch (e) {
+      /* log but continue */
+    }
+    return computed;
   }
 
   async updateUserProfile(userId: string, profileData: UserProfileData) {
@@ -279,7 +284,7 @@ export class UserProfileService {
         }
 
         // Invalidate cache after update
-        cacheService.delete(CACHE_KEYS.USER_PROFILE(userId));
+        cacheService.delete(cacheKeys.USER_PROFILE(userId));
         
         return await this.getUserProfile(userId);
       },
@@ -329,7 +334,7 @@ export class UserProfileService {
         }
 
         // Invalidate cache after update
-        cacheService.delete(CACHE_KEYS.USER_PROFILE(userId));
+        cacheService.delete(cacheKeys.USER_PROFILE(userId));
 
         return { success: true };
       },
@@ -360,7 +365,7 @@ export class UserProfileService {
           .where(eq(users.id, userId));
 
         // Invalidate cache after update
-        cacheService.delete(CACHE_KEYS.USER_PROFILE(userId));
+        cacheService.delete(cacheKeys.USER_PROFILE(userId));
 
         return await this.getUserProfile(userId);
       },
@@ -442,38 +447,25 @@ export class UserProfileService {
 
   // User Preference Management
   async getUserPreferences(userId: string): Promise<UserPreferences> {
-    const cacheKey = `${CACHE_KEYS.USER_PROFILE(userId)}:preferences`;
-    
-    return await cacheService.getOrSet(
-      cacheKey,
-      async () => {
-        const result = await databaseService.withFallback(
-          async () => {
-            const [user] = await db
-              .select({ preferences: users.preferences })
-              .from(users)
-              .where(eq(users.id, userId))
-              .limit(1);
+    const cacheKey = `${cacheKeys.USER_PROFILE(userId)}:preferences`;
 
-            if (!user) {
-              throw new Error('User not found');
-            }
+    const cached = await cacheService.get(cacheKey);
+    if (cached !== null && cached !== undefined) return cached;
+    const computed = await (async () => {
+      const result = await databaseService.withFallback(
+        async () => {
+          const [user] = await db
+            .select({ preferences: users.preferences })
+            .from(users)
+            .where(eq(users.id, userId))
+            .limit(1);
 
-            // Return default preferences if none exist
-            const defaultPreferences: UserPreferences = {
-              emailNotifications: true,
-              pushNotifications: true,
-              smsNotifications: false,
-              notificationFrequency: 'immediate',
-              billCategories: [],
-              language: 'en',
-              theme: 'auto'
-            };
+          if (!user) {
+            throw new Error('User not found');
+          }
 
-            return { ...defaultPreferences, ...(user.preferences as UserPreferences || {}) };
-          },
-          // Fallback: return default preferences
-          {
+          // Return default preferences if none exist
+          const defaultPreferences: UserPreferences = {
             emailNotifications: true,
             pushNotifications: true,
             smsNotifications: false,
@@ -481,18 +473,35 @@ export class UserProfileService {
             billCategories: [],
             language: 'en',
             theme: 'auto'
-          },
-          `getUserPreferences:${userId}`
-        );
+          };
 
-        if (result.source === 'fallback') {
-          console.warn(`Using fallback preferences for user: ${userId}`);
-        }
+          return { ...defaultPreferences, ...(user.preferences as UserPreferences || {}) };
+        },
+        // Fallback: return default preferences
+        {
+          emailNotifications: true,
+          pushNotifications: true,
+          smsNotifications: false,
+          notificationFrequency: 'immediate',
+          billCategories: [],
+          language: 'en',
+          theme: 'auto'
+        },
+        `getUserPreferences:${userId}`
+      );
 
-        return result.data;
-      },
-      CACHE_TTL.USER_DATA
-    );
+      if (result.source === 'fallback') {
+        console.warn(`Using fallback preferences for user: ${userId}`);
+      }
+
+      return result.data;
+    })();
+    try {
+      await cacheService.set(cacheKey, computed, 3600);
+    } catch (e) {
+      /* log but continue */
+    }
+    return computed;
   }
 
   async updateUserPreferences(userId: string, preferences: Partial<UserPreferences>) {
@@ -514,8 +523,8 @@ export class UserProfileService {
           .where(eq(users.id, userId));
 
         // Invalidate cache after update
-        cacheService.delete(`${CACHE_KEYS.USER_PROFILE(userId)}:preferences`);
-        cacheService.delete(CACHE_KEYS.USER_PROFILE(userId));
+        cacheService.delete(`${cacheKeys.USER_PROFILE(userId)}:preferences`);
+        cacheService.delete(cacheKeys.USER_PROFILE(userId));
 
         return updatedPreferences;
       },
@@ -598,7 +607,7 @@ export class UserProfileService {
         }, 'updateUserVerificationStatus');
 
         // Invalidate cache after update
-        cacheService.delete(CACHE_KEYS.USER_PROFILE(userId));
+        cacheService.delete(cacheKeys.USER_PROFILE(userId));
 
         return await this.getUserProfile(userId);
       },
@@ -624,168 +633,176 @@ export class UserProfileService {
   }
 
   async getUserVerificationStatus(userId: string) {
-    const cacheKey = `${CACHE_KEYS.USER_PROFILE(userId)}:verification`;
-    
-    return await cacheService.getOrSet(
-      cacheKey,
-      async () => {
-        const result = await databaseService.withFallback(
-          async () => {
-            const [user] = await db
-              .select({
-                verificationStatus: users.verificationStatus,
-                verificationDocuments: userProfiles.verificationDocuments
-              })
-              .from(users)
-              .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
-              .where(eq(users.id, userId))
-              .limit(1);
+    const cacheKey = `${cacheKeys.USER_PROFILE(userId)}:verification`;
 
-            if (!user) {
-              throw new Error('User not found');
-            }
+    const cached = await cacheService.get(cacheKey);
+    if (cached !== null && cached !== undefined) return cached;
+    const computed = await (async () => {
+      const result = await databaseService.withFallback(
+        async () => {
+          const [user] = await db
+            .select({
+              verificationStatus: users.verificationStatus,
+              verificationDocuments: userProfiles.verificationDocuments
+            })
+            .from(users)
+            .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
+            .where(eq(users.id, userId))
+            .limit(1);
 
-            return {
-              verificationStatus: user.verificationStatus,
-              verificationDocuments: user.verificationDocuments,
-              canSubmitDocuments: user.verificationStatus === 'pending' || user.verificationStatus === 'rejected'
-            };
-          },
-          // Fallback: return default verification status
-          {
-            verificationStatus: 'pending',
-            verificationDocuments: null,
-            canSubmitDocuments: true
-          },
-          `getUserVerificationStatus:${userId}`
-        );
+          if (!user) {
+            throw new Error('User not found');
+          }
 
-        if (result.source === 'fallback') {
-          console.warn(`Using fallback verification status for user: ${userId}`);
-        }
+          return {
+            verificationStatus: user.verificationStatus,
+            verificationDocuments: user.verificationDocuments,
+            canSubmitDocuments: user.verificationStatus === 'pending' || user.verificationStatus === 'rejected'
+          };
+        },
+        // Fallback: return default verification status
+        {
+          verificationStatus: 'pending',
+          verificationDocuments: null,
+          canSubmitDocuments: true
+        },
+        `getUserVerificationStatus:${userId}`
+      );
 
-        return result.data;
-      },
-      CACHE_TTL.USER_DATA
-    );
+      if (result.source === 'fallback') {
+        console.warn(`Using fallback verification status for user: ${userId}`);
+      }
+
+      return result.data;
+    })();
+    try {
+      await cacheService.set(cacheKey, computed, 3600);
+    } catch (e) {
+      /* log but continue */
+    }
+    return computed;
   }
 
   // User Engagement History Tracking
   async getUserEngagementHistory(userId: string): Promise<UserEngagementHistory> {
-    const cacheKey = `${CACHE_KEYS.USER_PROFILE(userId)}:engagement`;
-    
-    return await cacheService.getOrSet(
-      cacheKey,
-      async () => {
-        const result = await databaseService.withFallback(
-          async () => {
-            // Get engagement statistics
-            const [engagementStats] = await db
-              .select({
-                totalBillsTracked: count(billEngagement.id),
-                totalEngagementScore: sql`COALESCE(SUM(${billEngagement.engagementScore}), 0)`
-              })
-              .from(billEngagement)
-              .where(eq(billEngagement.userId, userId));
+    const cacheKey = `${cacheKeys.USER_PROFILE(userId)}:engagement`;
 
-            // Get comment count
-            const [commentStats] = await db
-              .select({
-                totalComments: count(billComments.id)
-              })
-              .from(billComments)
-              .where(eq(billComments.userId, userId));
+    const cached = await cacheService.get(cacheKey);
+    if (cached !== null && cached !== undefined) return cached;
+    const computed = await (async () => {
+      const result = await databaseService.withFallback(
+        async () => {
+          // Get engagement statistics
+          const [engagementStats] = await db
+            .select({
+              totalBillsTracked: count(billEngagement.id),
+              totalEngagementScore: sql`COALESCE(SUM(${billEngagement.engagementScore}), 0)`
+            })
+            .from(billEngagement)
+            .where(eq(billEngagement.userId, userId));
 
-            // Get recent activity
-            const recentEngagement = await db
-              .select({
-                billId: billEngagement.billId,
-                billTitle: bills.title,
-                lastEngagedAt: billEngagement.lastEngagedAt,
-                engagementScore: billEngagement.engagementScore
-              })
-              .from(billEngagement)
-              .innerJoin(bills, eq(billEngagement.billId, bills.id))
-              .where(eq(billEngagement.userId, userId))
-              .orderBy(desc(billEngagement.lastEngagedAt))
-              .limit(10);
+          // Get comment count
+          const [commentStats] = await db
+            .select({
+              totalComments: count(billComments.id)
+            })
+            .from(billComments)
+            .where(eq(billComments.userId, userId));
 
-            const recentComments = await db
-              .select({
-                billId: billComments.billId,
-                billTitle: bills.title,
-                createdAt: billComments.createdAt
-              })
-              .from(billComments)
-              .innerJoin(bills, eq(billComments.billId, bills.id))
-              .where(eq(billComments.userId, userId))
-              .orderBy(desc(billComments.createdAt))
-              .limit(10);
+          // Get recent activity
+          const recentEngagement = await db
+            .select({
+              billId: billEngagement.billId,
+              billTitle: bills.title,
+              lastEngagedAt: billEngagement.lastEngagedAt,
+              engagementScore: billEngagement.engagementScore
+            })
+            .from(billEngagement)
+            .innerJoin(bills, eq(billEngagement.billId, bills.id))
+            .where(eq(billEngagement.userId, userId))
+            .orderBy(desc(billEngagement.lastEngagedAt))
+            .limit(10);
 
-            // Combine and sort recent activity
-            const recentActivity = [
-              ...recentEngagement.map(item => ({
-                type: 'track' as const,
-                billId: item.billId,
-                billTitle: item.billTitle,
-                timestamp: item.lastEngagedAt || new Date()
-              })),
-              ...recentComments.map(item => ({
-                type: 'comment' as const,
-                billId: item.billId,
-                billTitle: item.billTitle,
-                timestamp: item.createdAt || new Date()
-              }))
-            ]
-              .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-              .slice(0, 10);
+          const recentComments = await db
+            .select({
+              billId: billComments.billId,
+              billTitle: bills.title,
+              createdAt: billComments.createdAt
+            })
+            .from(billComments)
+            .innerJoin(bills, eq(billComments.billId, bills.id))
+            .where(eq(billComments.userId, userId))
+            .orderBy(desc(billComments.createdAt))
+            .limit(10);
 
-            // Get top categories by engagement
-            const topCategories = await db
-              .select({
-                category: bills.category,
-                engagementCount: count(billEngagement.id)
-              })
-              .from(billEngagement)
-              .innerJoin(bills, eq(billEngagement.billId, bills.id))
-              .where(and(
-                eq(billEngagement.userId, userId),
-                sql`${bills.category} IS NOT NULL`
-              ))
-              .groupBy(bills.category)
-              .orderBy(desc(count(billEngagement.id)))
-              .limit(5);
+          // Combine and sort recent activity
+          const recentActivity = [
+            ...recentEngagement.map(item => ({
+              type: 'track' as const,
+              billId: item.billId,
+              billTitle: item.billTitle,
+              timestamp: item.lastEngagedAt || new Date()
+            })),
+            ...recentComments.map(item => ({
+              type: 'comment' as const,
+              billId: item.billId,
+              billTitle: item.billTitle,
+              timestamp: item.createdAt || new Date()
+            }))
+          ]
+            .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+            .slice(0, 10);
 
-            return {
-              totalBillsTracked: Number(engagementStats?.totalBillsTracked || 0),
-              totalComments: Number(commentStats?.totalComments || 0),
-              totalEngagementScore: Number(engagementStats?.totalEngagementScore || 0),
-              recentActivity,
-              topCategories: topCategories.map(cat => ({
-                category: cat.category || 'Unknown',
-                engagementCount: Number(cat.engagementCount)
-              }))
-            };
-          },
-          // Fallback: return empty engagement history
-          {
-            totalBillsTracked: 0,
-            totalComments: 0,
-            totalEngagementScore: 0,
-            recentActivity: [],
-            topCategories: []
-          },
-          `getUserEngagementHistory:${userId}`
-        );
+          // Get top categories by engagement
+          const topCategories = await db
+            .select({
+              category: bills.category,
+              engagementCount: count(billEngagement.id)
+            })
+            .from(billEngagement)
+            .innerJoin(bills, eq(billEngagement.billId, bills.id))
+            .where(and(
+              eq(billEngagement.userId, userId),
+              sql`${bills.category} IS NOT NULL`
+            ))
+            .groupBy(bills.category)
+            .orderBy(desc(count(billEngagement.id)))
+            .limit(5);
 
-        if (result.source === 'fallback') {
-          console.warn(`Using fallback engagement history for user: ${userId}`);
-        }
+          return {
+            totalBillsTracked: Number(engagementStats?.totalBillsTracked || 0),
+            totalComments: Number(commentStats?.totalComments || 0),
+            totalEngagementScore: Number(engagementStats?.totalEngagementScore || 0),
+            recentActivity,
+            topCategories: topCategories.map(cat => ({
+              category: cat.category || 'Unknown',
+              engagementCount: Number(cat.engagementCount)
+            }))
+          };
+        },
+        // Fallback: return empty engagement history
+        {
+          totalBillsTracked: 0,
+          totalComments: 0,
+          totalEngagementScore: 0,
+          recentActivity: [],
+          topCategories: []
+        },
+        `getUserEngagementHistory:${userId}`
+      );
 
-        return result.data;
-      },
-      CACHE_TTL.ENGAGEMENT_STATS
-    );
+      if (result.source === 'fallback') {
+        console.warn(`Using fallback engagement history for user: ${userId}`);
+      }
+
+      return result.data;
+    })();
+    try {
+      await cacheService.set(cacheKey, computed, 7200);
+    } catch (e) {
+      /* log but continue */
+    }
+    return computed;
   }
 
   async updateUserEngagement(userId: string, billId: number, engagementType: 'view' | 'comment' | 'share') {
@@ -852,7 +869,7 @@ export class UserProfileService {
         }, 'updateUserEngagement');
 
         // Invalidate engagement cache after update
-        cacheService.delete(`${CACHE_KEYS.USER_PROFILE(userId)}:engagement`);
+        cacheService.delete(`${cacheKeys.USER_PROFILE(userId)}:engagement`);
 
         return { success: true };
       },

@@ -1,7 +1,7 @@
 import { forwardRef, ComponentProps, useState, useCallback, useEffect } from "react"
 
-import { cn } from "@/lib/utils"
-import { logger } from '@/utils/browser-logger';
+import { cn } from '..\..\lib\utils'
+import { logger } from '..\..\utils\browser-logger';
 import { EnhancedTextareaProps, ValidationState } from './types';
 import { validateInputValue, safeValidateInputValue } from './validation';
 import { UIInputError } from './errors';

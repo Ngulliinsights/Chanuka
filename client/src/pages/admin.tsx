@@ -1,9 +1,9 @@
 import { Shield, AlertTriangle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import AdminDashboard from '@/components/admin/admin-dashboard';
+import { Card, CardContent, CardHeader, CardTitle } from '..\components\ui\card';
+import { Alert, AlertDescription } from '..\components\ui\alert';
+import AdminDashboard from '..\components\admin\admin-dashboard';
 import { useQuery } from '@tanstack/react-query';
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\utils\browser-logger';
 
 const AdminPage = () => {
   const { data: user, isLoading } = useQuery({

@@ -1,5 +1,5 @@
 import { notificationService, NotificationData } from '../../../infrastructure/notifications/notification-service.js';
-import { logger } from '../../../utils/logger.js';
+import { logger } from '../../../../shared/core/index.js';
 
 export interface UserNotificationData extends Omit<NotificationData, 'userId'> {
   userId: string;

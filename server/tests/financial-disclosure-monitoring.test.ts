@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 import { FinancialDisclosureMonitoringService } from '../features/analytics/financial-disclosure/monitoring.js';
-import { cacheService } from '../infrastructure/cache/cache-service';
+import { cacheService } from 'server/infrastructure/cache';
 import { logger } from '../../shared/core/src/observability/logging';
 
 // Mock financialDisclosureMonitoringService

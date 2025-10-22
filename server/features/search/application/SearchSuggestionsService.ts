@@ -1,7 +1,7 @@
 import { SearchRepository } from '../infrastructure/SearchRepository';
 import { readDatabase } from '@shared/database/connection';
 import { sql } from 'drizzle-orm';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 const repo = new SearchRepository();
 

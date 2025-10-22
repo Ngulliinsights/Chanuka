@@ -1,9 +1,9 @@
 import { AlertTriangle, RefreshCw, Home, Bug } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Logo } from '@/components/ui/logo';
+import { Button } from '..\ui\button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '..\ui\card';
+import { Logo } from '..\ui\logo';
 import { ErrorFallbackProps } from './PageErrorBoundary';
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\..\utils\browser-logger';
 
 export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
   error,

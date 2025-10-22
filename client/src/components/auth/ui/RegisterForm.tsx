@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Mail, Lock, User } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '..\..\..\lib\utils';
 import { RegisterFormProps } from '../types';
 import { useRegisterForm } from '../hooks/useAuthForm';
 import { AuthInput } from './AuthInput';

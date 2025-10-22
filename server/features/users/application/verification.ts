@@ -6,7 +6,7 @@ import { verification as expertVerifications, user as users } from "../../../../
 import { VerificationRequest } from "../../../types/api.js";
 import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../../../shared/core/src/utilities/api";
 import { errorTracker } from '../../../core/errors/error-tracker.js';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 const router = Router();
 

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { LoadingSpinner } from '@/components/ui/spinner';
-import { useBills } from '@/hooks/use-bills';
-import { logger } from '@/utils/browser-logger';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '..\ui\table';
+import { Button } from '..\ui\button';
+import { Badge } from '..\ui\badge';
+import { LoadingSpinner } from '..\ui\spinner';
+import { useBills } from '..\..\hooks\use-bills';
+import { logger } from '..\..\utils\browser-logger';
 
 interface VerificationItem {
   id: number;

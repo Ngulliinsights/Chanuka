@@ -35,7 +35,7 @@ import {
   Calendar,
   BarChart3
 } from 'lucide-react';
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\..\utils\browser-logger';
 
 interface EngagementMetrics {
   totalViews: number;

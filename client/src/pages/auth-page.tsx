@@ -1,7 +1,7 @@
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '..\hooks\use-auth';
 import { Navigate } from 'react-router-dom';
-import AuthForms from '@/components/auth/auth-forms';
-import { logger } from '@/utils/browser-logger';
+import AuthForms from '..\components\auth\auth-forms';
+import { logger } from '..\utils\browser-logger';
 
 const AuthPage = () => {
   const { user } = useAuth();

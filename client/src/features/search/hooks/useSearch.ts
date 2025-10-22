@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { searchApi } from '../services/search-api';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '..\..\..\hooks\use-toast';
 import type {
   SearchRequest,
   SearchResponse,

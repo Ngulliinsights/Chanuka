@@ -1,19 +1,19 @@
 import { Link } from 'react-router-dom';
 import { memo, useMemo, useCallback } from 'react';
-import FavoritePageButton from '@/components/navigation/favorite-page-button';
+import FavoritePageButton from '..\components\navigation\favorite-page-button';
 import {
   ResponsiveLayoutProvider,
   ResponsiveContainer,
   ResponsiveGrid,
   TouchButton
-} from '@/components/mobile/responsive-layout-manager';
+} from '..\components\mobile\responsive-layout-manager';
 import {
   ResponsiveCardGrid,
   ResponsiveSection,
   ResponsiveStatsGrid
-} from '@/components/mobile/responsive-page-wrapper';
-import { LazyLoadWrapper } from '@/components/mobile/mobile-performance-optimizations';
-import { logger } from '@/utils/browser-logger';
+} from '..\components\mobile\responsive-page-wrapper';
+import { LazyLoadWrapper } from '..\components\mobile\mobile-performance-optimizations';
+import { logger } from '..\utils\browser-logger';
 import { navigationService } from '../services/navigation';
 
 // Define the shape of a feature object for type safety

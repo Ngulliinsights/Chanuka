@@ -1,13 +1,13 @@
 import { lazy, LazyExoticComponent, ComponentType, Suspense } from 'react';
-import { logger } from '@/utils/browser-logger';
-import { withLazyErrorBoundary, createSafeLazyComponent } from '@/components/error-handling/withErrorBoundary';
+import { logger } from './browser-logger';
+import { withLazyErrorBoundary, createSafeLazyComponent } from '..\components\error-handling\withErrorBoundary';
 import { 
   PageLoader, 
   ComponentLoader, 
   ConnectionAwareLoader,
   LazyLoadPlaceholder 
-} from '@/components/loading/LoadingStates';
-import { routePreloader } from '@/utils/route-preloading';
+} from '..\components\loading\LoadingStates';
+import { routePreloader } from './route-preloading';
 
 // Enhanced safe lazy loading function with better type inference and preloading
 export function createSafeLazyPage<P extends object = {}>(

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '..\ui\card';
+import { Progress } from '..\ui\progress';
+import { Badge } from '..\ui\badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '..\ui\tabs';
+import { Alert, AlertDescription, AlertTitle } from '..\ui\alert';
 import { 
   BarChart, 
   Bar, 

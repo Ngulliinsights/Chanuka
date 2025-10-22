@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { communityApi } from '../services/community-api';
-import { useToast } from '@/hooks/use-toast';
+import { useToast } from '..\..\..\hooks\use-toast';
 import type {
   Comment,
   DiscussionThread,

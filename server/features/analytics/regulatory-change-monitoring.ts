@@ -4,7 +4,7 @@ import {
 } from "../../../shared/schema";
 import { eq, desc, and, or, sql, count, gt, gte, lte } from "drizzle-orm";
 import { database as db } from "../shared/database/connection";
-import { cacheService, CACHE_KEYS, CACHE_TTL } from "../../infrastructure/cache/cache-service.js";
+import { cacheService } from 'server/infrastructure/cache';
 import { logger } from '../../../shared/core/src/observability/logging';
 import { errorTracker } from '../../core/errors/error-tracker.js';
 

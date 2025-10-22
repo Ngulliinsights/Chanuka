@@ -1,12 +1,12 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { PageErrorBoundary } from '@/components/error-handling';
-import { NavigationProvider } from '@/contexts/NavigationContext';
-import { ResponsiveNavigationProvider } from '@/contexts/ResponsiveNavigationContext';
-import { LoadingProvider } from '@/contexts/LoadingContext';
-import { AuthProvider } from '@/hooks/use-auth';
-import { AccessibilityProvider } from '@/components/accessibility/accessibility-manager';
-import { OfflineProvider } from '@/components/offline/offline-manager';
+import { PageErrorBoundary } from './error-handling';
+import { NavigationProvider } from '..\contexts\NavigationContext';
+import { ResponsiveNavigationProvider } from '..\contexts\ResponsiveNavigationContext';
+import { LoadingProvider } from '..\contexts\LoadingContext';
+import { AuthProvider } from '..\hooks\use-auth';
+import { AccessibilityProvider } from './accessibility\accessibility-manager';
+import { OfflineProvider } from './offline\offline-manager';
 
 // =============================================================================
 // PROVIDER CONFIGURATION

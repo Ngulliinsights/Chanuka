@@ -1,9 +1,10 @@
 import { eq, desc, and, sql, count, ilike, or, inArray } from "drizzle-orm";
 import { databaseService } from "../services/database-service";
 import { readDatabase } from '@shared/database/connection';
-import { cacheService, CACHE_KEYS, CACHE_TTL } from "../infrastructure/cache/cache-service";
+import { cacheService } from 'server/infrastructure/cache';
+import { cacheKeys } from '../../../shared/core/src/caching/key-generator';
 import * as schema from "@shared/schema";
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Search suggestion interfaces
 export interface SearchSuggestion {
@@ -96,7 +97,7 @@ export class SearchSuggestionsService {
       return this.getEmptyAutocompleteResult();
     }
 
-    const cacheKey = CACHE_KEYS.SEARCH_RESULTS(sanitizedQuery);
+    const cacheKey = cacheKeys.SEARCH_RESULTS(sanitizedQuery);
     const cachedResult = await cacheService.get(cacheKey);
     if (cachedResult) {
       return cachedResult;
@@ -119,7 +120,7 @@ export class SearchSuggestionsService {
 
     // Cache successful database results
     if (result.source === 'database') {
-      await cacheService.set(cacheKey, result.data, CACHE_TTL.SEARCH_RESULTS);
+      await cacheService.set(cacheKey, result.data, 300); // 5 minutes
     }
 
     return result.data;
@@ -176,7 +177,7 @@ export class SearchSuggestionsService {
    * Get popular search terms with better caching
    */
   async getPopularSearchTerms(limit: number = 20): Promise<string[]> {
-    const cacheKey = CACHE_KEYS.ANALYTICS();
+    const cacheKey = cacheKeys.ANALYTICS();
     const cachedResult = await cacheService.get(cacheKey);
     if (cachedResult) {
       return cachedResult.slice(0, limit);
@@ -190,14 +191,14 @@ export class SearchSuggestionsService {
         .map(([term]) => term);
       
       if (terms.length > 0) {
-        await cacheService.set(cacheKey, terms, CACHE_TTL.LONG);
+        await cacheService.set(cacheKey, terms, 3600); // 1 hour
         return terms;
       }
     }
 
     // Fallback to static popular terms
     const popularTerms = this.getStaticPopularTerms().slice(0, limit);
-    await cacheService.set(cacheKey, popularTerms, CACHE_TTL.LONG);
+    await cacheService.set(cacheKey, popularTerms, 3600); // 1 hour
     return popularTerms;
   }
 

@@ -3,7 +3,7 @@ import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../../shared/schema';
 import { IAnalysisRepository } from '../../domain/repositories/analysis-repository';
 import { ComprehensiveAnalysis } from '../../domain/entities/analysis-result';
-import { logger } from '../../../../utils/logger.js';
+import { logger } from '../../../../../shared/core/index.js';
 
 /**
  * Drizzle-based implementation of the Analysis Repository.

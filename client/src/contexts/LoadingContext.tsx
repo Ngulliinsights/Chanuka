@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useCallback, useEffect } from 'react';
-import { useConnectionAware } from '@/hooks/useConnectionAware';
-import { useOnlineStatus } from '@/hooks/use-online-status';
-import { logger } from '@/utils/browser-logger';
+import { useConnectionAware } from '..\hooks\useConnectionAware';
+import { useOnlineStatus } from '..\hooks\use-online-status';
+import { logger } from '..\utils\browser-logger';
 
 export interface LoadingOperation {
   id: string;

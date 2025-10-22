@@ -3,7 +3,8 @@ import { databaseService } from '../../../infrastructure/database/database-servi
 import { database as db } from '../../../../shared/database/connection';
 import { billComment, commentVote, user, userProfile, bill } from '@shared/schema';
 import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
-import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../../infrastructure/cache/cache-service';
+import { cacheService } from 'server/infrastructure/cache';
+import { cacheKeys } from '../../../../shared/core/src/caching/key-generator';
 import { cache } from '../../../../shared/core/src/caching';
 import { buildTimeThreshold } from '../../../utils/db-helpers';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js';
@@ -23,7 +24,7 @@ import type {
  * Provides detailed analytics on user and content engagement patterns
  */
 export class EngagementAnalyticsService {
-  private readonly ANALYTICS_CACHE_TTL = CACHE_TTL.MEDIUM;
+  private readonly ANALYTICS_CACHE_TTL = 1800; // 30 minutes
 
   /**
    * Get comprehensive user engagement metrics

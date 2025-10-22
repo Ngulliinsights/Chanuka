@@ -1,7 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui\card';
+import { Button } from './ui\button';
+import { Badge } from './ui\badge';
+import { Separator } from './ui\separator';
 import { 
   RefreshCw, 
   Download, 
@@ -13,8 +13,8 @@ import {
   HardDrive,
   Settings
 } from "lucide-react";
-import { cn, formatRelativeTime } from "@/lib/utils";
-import { logger } from '@/utils/browser-logger';
+import { cn, formatRelativeTime } from '..\lib\utils';
+import { logger } from '..\utils\browser-logger';
 
 interface SystemHealthProps {
   health?: any;

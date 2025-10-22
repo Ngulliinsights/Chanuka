@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Calendar, Users, AlertCircle, TrendingUp } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\..\utils\browser-logger';
 
 interface BillCardProps {
   bill: {

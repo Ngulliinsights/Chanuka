@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui\card';
+import { Button } from './ui\button';
+import { Badge } from './ui\badge';
+import { Alert, AlertDescription } from './ui\alert';
+import { Skeleton } from './ui\skeleton';
 import { 
   Search, 
   AlertCircle, 
@@ -11,7 +11,7 @@ import {
   Wand2,
   ExternalLink
 } from "lucide-react";
-import { cn, getStatusColor, getStatusBgColor } from "@/lib/utils";
+import { cn, getStatusColor, getStatusBgColor } from '..\lib\utils';
 
 interface HealthStatus {
   status: string;
@@ -198,7 +198,7 @@ export default function DatabaseStatus({ health, stats, schemaCheck, isLoading }
   );
 }
 import { useQuery } from "@tanstack/react-query";
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\utils\browser-logger';
 
 export function useDatabaseStatus() {
   // Updated database status endpoint to match refactored routes

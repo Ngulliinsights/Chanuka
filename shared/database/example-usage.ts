@@ -9,7 +9,7 @@
 import { database, readDatabase, writeDatabase, withTransaction, user as userTable } from './connection.js';
 import { executeQuery } from './pool.js';
 import { initializeDatabaseSafety, shutdownDatabaseSafety } from './init.js';
-import { asyncErrorHandler } from '../core/src/error-handling/error-handler';
+import { asyncErrorHandler } from '../core/src/observability/error-management';
 import { logger } from '../core/src/observability/logging';
 
 /**
@@ -18,7 +18,7 @@ import { logger } from '../core/src/observability/logging';
 export const initializeApp = asyncErrorHandler(async () => {
   // Initialize all safety mechanisms
   await initializeDatabaseSafety();
-  
+
   logger.info('Application database layer initialized safely');
 });
 
@@ -30,7 +30,7 @@ export const safeReadExample = asyncErrorHandler(async (userId: string) => {
   const result = await readDatabase.query.user.findFirst({
     where: (user, { eq }) => eq(user.id, userId),
   });
-  
+
   return result;
 });
 
@@ -40,12 +40,12 @@ export const safeReadExample = asyncErrorHandler(async (userId: string) => {
 export const safeWriteExample = asyncErrorHandler(async (userData: any) => {
   return await withTransaction(async (tx) => {
     // All operations within this transaction are protected
-  const insertedUserRows = await tx.insert(userTable).values(userData).returning();
-    
+    const insertedUserRows = await tx.insert(userTable).values(userData).returning();
+
     // Additional operations can be added here
     // If any fail, the entire transaction will be rolled back
-    
-  return insertedUserRows[0];
+
+    return insertedUserRows[0];
   });
 });
 
@@ -58,7 +58,7 @@ export const safeRawQueryExample = asyncErrorHandler(async (billId: number) => {
     params: [billId],
     context: 'fetch-bill-details',
   });
-  
+
   return result.rows;
 });
 
@@ -67,14 +67,14 @@ export const safeRawQueryExample = asyncErrorHandler(async (billId: number) => {
  */
 export const safeConcurrentExample = asyncErrorHandler(async () => {
   // These operations can run concurrently without race conditions
-  const promises = Array.from({ length: 10 }, (_, i) => 
+  const promises = Array.from({ length: 10 }, (_, i) =>
     executeQuery({
       text: 'SELECT COUNT(*) as count FROM bills WHERE status = $1',
       params: ['active'],
       context: `concurrent-query-${i}`,
     })
   );
-  
+
   const results = await Promise.all(promises);
   return results.map(r => r.rows[0]);
 });

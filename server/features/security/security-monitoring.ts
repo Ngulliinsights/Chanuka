@@ -1,4 +1,4 @@
-import { unifiedAlertPreferenceService } from '../alert-preferences/unified_alert_service';
+import { unifiedAlertPreferenceService } from '../alert-preferences/domain/services/unified-alert-preference-service';
 import { readDatabase as db } from '@shared/database/connection';
 import { users, bills, userInterests } from '@shared/schema';
 import { eq } from 'drizzle-orm';

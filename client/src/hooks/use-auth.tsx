@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\utils\browser-logger';
 
 interface User {
   id: string;

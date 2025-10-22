@@ -1,5 +1,5 @@
 import { LazyExoticComponent, ComponentType } from 'react';
-import { logger } from '@/utils/browser-logger';
+import { logger } from './browser-logger';
 
 // Route preloading configuration
 export interface RoutePreloadConfig {

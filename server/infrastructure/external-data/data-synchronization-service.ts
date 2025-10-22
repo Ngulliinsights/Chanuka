@@ -22,7 +22,7 @@ import { GovernmentDataService } from './government-data-service.js';
 import { ConflictResolutionService } from './conflict-resolution-service.js';
 import { bills, sponsors, BillSponsorship, syncJobs, syncErrors } from '@shared/schema';
 import { eq, and, gte, desc } from 'drizzle-orm';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 export class DataSynchronizationService extends EventEmitter {
   private governmentDataService: GovernmentDataService;
