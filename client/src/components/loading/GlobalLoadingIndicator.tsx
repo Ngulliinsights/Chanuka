@@ -6,7 +6,7 @@ import { useLoadingContext } from '@/contexts/LoadingContext';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 import { GlobalLoadingIndicatorProps } from './types';
 import { 
   validateLoadingOperation, 

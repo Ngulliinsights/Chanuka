@@ -7,7 +7,7 @@
  */
 
 import { Result, ok, err } from '../primitives/types';
-import { BaseError } from '../primitives/errors';
+import { BaseError } from './error-management';
 import { Logger, MetricsCollector, CorrelationManager } from './interfaces';
 import { Tracer, SpanContext as TracingSpanContext } from './tracing/types';
 import { LogLevel, LogContext } from './logging/types';

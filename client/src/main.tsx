@@ -5,7 +5,7 @@ import { registerServiceWorker } from "./utils/serviceWorker";
 import { assetLoadingManager, setupAssetPreloading } from "./utils/asset-loading";
 import { getMobileErrorHandler } from "./utils/mobile-error-handler";
 import { loadPolyfills } from "./utils/polyfills";
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@/utils/browser-logger';
 import { performanceMonitor } from "./utils/performanceMonitoring";
 
 /**

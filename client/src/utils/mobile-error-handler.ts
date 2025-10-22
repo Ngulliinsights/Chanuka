@@ -1,4 +1,4 @@
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@/utils/browser-logger';
 /**
  * Mobile Error Handler
  * Provides mobile-specific error handling and fallback mechanisms

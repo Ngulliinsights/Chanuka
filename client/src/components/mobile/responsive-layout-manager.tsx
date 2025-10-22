@@ -6,7 +6,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { useResponsiveLayout, ResponsiveState } from '@/utils/responsive-layout';
 import { MobileTouchUtils } from '@/utils/mobile-touch-handler';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 interface ResponsiveLayoutContextType {
   state: ResponsiveState;

@@ -1,6 +1,6 @@
 import { api } from '../services/api.js';
 import { API_ENDPOINTS } from '../config/api.js';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 export interface HealthStatus {
   api: boolean;

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useReducer, useEffect, useRef, ReactN
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ResponsiveNavigationProvider } from './ResponsiveNavigationContext';
 import { useAuth } from '../hooks/use-auth';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 // Types (inline to avoid import issues)
 export type NavigationSection = 'legislative' | 'community' | 'admin' | 'user' | 'system';

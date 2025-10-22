@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { performanceOptimizer } from '../../utils/performance-optimizer';
 import { cacheManager } from '../../utils/cache-strategy';
 import { performanceMonitor } from '../../utils/performanceMonitoring';
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Mock performance APIs
 const mockPerformance = {

@@ -11,7 +11,7 @@ import React, {
   useCallback, 
   useRef 
 } from 'react';
-import { logger } from '../utils/logger';
+import { logger } from '@shared/core';
 
 interface AccessibilitySettings {
   highContrast: boolean;

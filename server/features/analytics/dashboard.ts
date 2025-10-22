@@ -1,4 +1,4 @@
-import { db } from '@shared/database/pool.js';
+import { database as db } from '@shared/database/connection';
 import { eq, sql, and, desc, count, ilike } from 'drizzle-orm';
 import { bills, analysis, evaluations, departments } from '../../../shared/schema';
 import type { DepartmentStat, RadarDatum } from '../../../shared/schema';

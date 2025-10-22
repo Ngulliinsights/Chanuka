@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { ErrorFallback, ApiErrorFallback, ComponentErrorFallback } from '../ErrorFallback';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 // Mock window.location
 const mockLocation = {

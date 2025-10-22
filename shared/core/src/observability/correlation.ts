@@ -9,7 +9,7 @@
 
 import { AsyncLocalStorage } from 'async_hooks';
 import { Result, ok, err } from '../primitives/types';
-import { BaseError } from '../primitives/errors';
+import { BaseError } from './error-management';
 import { CorrelationContext, CorrelationManager } from './interfaces';
 
 // ==================== Correlation Constants ====================

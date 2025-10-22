@@ -6,7 +6,7 @@ import { NavigationProvider, useNavigation } from '../NavigationContext';
 import { useResponsiveNavigation } from '../ResponsiveNavigationContext';
 import { NavigationStatePersistence } from '@/utils/navigation/state-persistence';
 import { AuthProvider } from '@/hooks/use-auth';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 // Mock the auth hook
 vi.mock('@/hooks/use-auth', () => ({

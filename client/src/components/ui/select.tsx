@@ -5,7 +5,7 @@ import { Root, Group, Value, Trigger, Icon, ScrollUpButton, ScrollDownButton, Po
 import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 import { EnhancedSelectProps, ValidationState } from './types';
 import { validateSelectValue, safeValidateSelectValue } from './validation';
 import { UIValidationError } from './errors';

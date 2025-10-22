@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useSystemHealth, useSystemStats, useSystemSchema } from "@/hooks/use-system";
 import { Link } from "wouter";
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 export default function DatabaseManager() {
   const { data: health, isLoading: healthLoading } = useSystemHealth();

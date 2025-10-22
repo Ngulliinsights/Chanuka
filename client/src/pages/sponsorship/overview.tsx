@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { logger } from '@/utils/logger';
+import { logger } from '@/utils/browser-logger';
 import {
   ArrowLeft,
   ChevronRight, 

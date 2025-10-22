@@ -8,7 +8,7 @@ import type { CacheService, CacheConfig } from './core/interfaces';
 import { MemoryAdapter, type MemoryAdapterConfig } from './adapters/memory-adapter';
 import { RedisAdapter, type RedisAdapterConfig } from './adapters/redis-adapter';
 import { MultiTierAdapter, type MultiTierAdapterConfig } from './adapters/multi-tier-adapter';
-import { SingleFlightCache } from './patterns/single-flight-cache';
+import { SingleFlightCache } from './single-flight-cache';
 
 // Cache manager for cache operations
 export class CacheManager {

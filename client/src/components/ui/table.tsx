@@ -2,7 +2,7 @@ import { forwardRef, HTMLAttributes, ThHTMLAttributes, TdHTMLAttributes, useStat
 import { AlertCircle, RefreshCw } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 import { TableValidationProps, ValidationError } from './types';
 import { validateTableData } from './validation';
 import { UITableError } from './errors';

@@ -1,5 +1,5 @@
 import { 
-import { logger } from '../../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
   determineNavigationSection, 
   getSectionDisplayName, 
   getSectionDescription,

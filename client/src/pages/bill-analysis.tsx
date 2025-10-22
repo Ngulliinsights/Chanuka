@@ -12,7 +12,7 @@ import { Comments } from '@/components/analysis/comments';
 import { BillStats } from '@/components/analysis/stats';
 import { Share2, ArrowLeft } from 'lucide-react';
 import { useOnlineStatus } from '@/hooks/use-online-status';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 // Move constants outside component to prevent recreation on each render
 const STORAGE_KEY = 'bill-view-preferences';

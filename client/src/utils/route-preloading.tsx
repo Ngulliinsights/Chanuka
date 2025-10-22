@@ -1,5 +1,5 @@
 import { LazyExoticComponent, ComponentType } from 'react';
-import { logger } from '../../../shared/utils/logger';
+import { logger } from '@shared/core';
 
 export interface RouteConfig {
   path: string;

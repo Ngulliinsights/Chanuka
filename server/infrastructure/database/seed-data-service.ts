@@ -1,5 +1,5 @@
 import { databaseService } from './database-service.js';
-import { readDb } from '@shared/database/pool';
+import { readDatabase } from '@shared/database/connection';
 import * as schema from '@shared/schema';
 import bcrypt from 'bcrypt';
 import { logger } from '@shared/core/src/observability/logging';
@@ -10,7 +10,7 @@ import { logger } from '@shared/core/src/observability/logging';
  */
 export class SeedDataService {
   private get db() {
-    return readDb;
+    return readDatabase;
   }
 
   /**
@@ -71,10 +71,10 @@ export class SeedDataService {
         // Use database client abstraction if available, otherwise no-op
         try {
           // prefer drizzle instance
-          if (readDb && typeof (readDb as any).delete === 'function') {
-            await (readDb as any).delete(table).run?.();
-          } else if (readDb && typeof (readDb as any).raw === 'function') {
-            await (readDb as any).raw(`DELETE FROM ${table}`);
+          if (readDatabase && typeof (readDatabase as any).delete === 'function') {
+            await (readDatabase as any).delete(table).run?.();
+          } else if (readDatabase && typeof (readDatabase as any).raw === 'function') {
+            await (readDatabase as any).raw(`DELETE FROM ${table}`);
           } else {
             logger.info(`Would clear table: ${table}`, { component: 'SeedDataService' });
           }

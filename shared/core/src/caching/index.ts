@@ -38,6 +38,8 @@ export type {
   CompressionOptions,
   SerializationOptions,
 } from './types';
+
+export type {
   CacheWarmingStrategy,
   EvictionOptions,
   CacheStatsAggregation,
@@ -56,7 +58,7 @@ export { MemoryAdapter as CacheService } from './adapters/memory-adapter';
 export { SingleFlightCache } from './single-flight-cache';
 
 // Cache utilities
-export { CacheKeyGenerator } from './key-generator';
+export { CacheKeys as CacheKeyGenerator } from './key-generator';
 
 // Cache factory function
 export function createCacheService(config: CacheConfig): CacheService {

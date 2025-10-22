@@ -1,6 +1,6 @@
 // Service Worker registration and management utilities
 import { navigationService } from '../services/navigation';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@/utils/browser-logger';
 
 export interface ServiceWorkerConfig {
   onUpdate?: (registration: ServiceWorkerRegistration) => void;

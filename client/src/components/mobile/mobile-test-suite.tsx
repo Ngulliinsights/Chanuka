@@ -24,7 +24,7 @@ import {
 import { MobileTouchUtils } from '@/utils/mobile-touch-handler';
 import { useResponsiveLayout } from '@/utils/responsive-layout';
 import { useMobileErrorHandler } from '@/utils/mobile-error-handler';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 interface TestResult {
   name: string;

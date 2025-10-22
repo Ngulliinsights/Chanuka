@@ -1,4 +1,4 @@
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 import { apiService, ApiResponse, ApiError } from './apiService'; // <-- Import the new service
 
 /**

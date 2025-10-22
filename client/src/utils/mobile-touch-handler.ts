@@ -3,6 +3,8 @@
  * Provides enhanced touch interaction support for mobile devices
  */
 
+import { useState, useEffect } from 'react';
+
 export interface TouchHandlerOptions {
   preventScroll?: boolean;
   threshold?: number;
@@ -227,9 +229,9 @@ export function useMobileTouchHandler(
   elementRef: React.RefObject<HTMLElement>,
   options: TouchHandlerOptions = {}
 ) {
-  const [touchHandler, setTouchHandler] = React.useState<MobileTouchHandler | null>(null);
+  const [touchHandler, setTouchHandler] = useState<MobileTouchHandler | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!elementRef.current) return;
 
     const handler = new MobileTouchHandler(elementRef.current, options);

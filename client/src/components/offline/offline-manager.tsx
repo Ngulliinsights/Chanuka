@@ -12,7 +12,7 @@ import React, {
   useRef 
 } from 'react';
 import { WifiOff, Wifi, CloudOff, RefreshCw } from 'lucide-react';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@/utils/browser-logger';
 
 interface OfflineData {
   bills: any[];

@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg';

@@ -1,5 +1,5 @@
 import { NavigationSection } from '@/types/navigation';
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 /**
  * Determines the current navigation section based on the path

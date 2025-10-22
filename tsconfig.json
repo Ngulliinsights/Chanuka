@@ -17,7 +17,7 @@
   ],
   "compilerOptions": {
     "baseUrl": ".",
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
   "noEmit": true,
@@ -47,8 +47,7 @@
       "@/*": ["./client/src/*"],
       "@shared/*": ["./shared/*"],
       "shared/*": ["./shared/*"],
-      "@shared/core": ["./shared/core/index.ts"],
-      "@shared/core/*": ["./server/types/ambient-shims.d.ts"]
+      "@shared/core": ["./shared/core/index.ts"]
     }
   }
 }

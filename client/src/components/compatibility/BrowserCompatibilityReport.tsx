@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react';
 import { getBrowserInfo, browserDetector } from '../../utils/browser-compatibility';
 import { runBrowserCompatibilityTests, CompatibilityTestSuite } from '../../utils/browser-compatibility-tests';
 import BrowserCompatibilityTester from './BrowserCompatibilityTester';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 interface BrowserCompatibilityReportProps {
   showFullReport?: boolean;

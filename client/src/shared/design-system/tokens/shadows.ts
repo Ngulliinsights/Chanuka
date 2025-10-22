@@ -39,50 +39,50 @@ export const shadowTokens = {
   component: {
     // Card shadows
     card: {
-      default: shadowTokens.elevation.sm,
-      hover: shadowTokens.elevation.md,
-      active: shadowTokens.elevation.xs,
+      default: '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
+      hover: '0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06)',
+      active: '0 1px 2px rgba(0, 0, 0, 0.05)',
     },
 
     // Button shadows
     button: {
-      default: shadowTokens.elevation.xs,
-      hover: shadowTokens.elevation.sm,
-      pressed: shadowTokens.interactive.pressed.inset,
+      default: '0 1px 2px rgba(0, 0, 0, 0.05)',
+      hover: '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
+      pressed: 'inset 0 2px 4px rgba(0, 0, 0, 0.1)',
     },
 
     // Modal and overlay shadows
     modal: {
       backdrop: 'rgba(0, 0, 0, 0.5)',
-      content: shadowTokens.elevation['2xl'],
+      content: '0 25px 50px rgba(0, 0, 0, 0.25)',
     },
 
     // Dropdown and popover shadows
     dropdown: {
-      default: shadowTokens.elevation.lg,
-      large: shadowTokens.elevation.xl,
+      default: '0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)',
+      large: '0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)',
     },
 
     // Navigation shadows
     navigation: {
-      header: shadowTokens.elevation.sm,
-      sidebar: shadowTokens.elevation.md,
-      floating: shadowTokens.elevation.lg,
+      header: '0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)',
+      sidebar: '0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.06)',
+      floating: '0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)',
     },
 
     // Form element shadows
     form: {
       input: {
         default: 'inset 0 1px 2px rgba(0, 0, 0, 0.05)',
-        focus: shadowTokens.interactive.focus.accent,
-        error: shadowTokens.interactive.focus.error,
+        focus: '0 0 0 3px rgba(243, 138, 31, 0.15)',
+        error: '0 0 0 3px rgba(239, 68, 68, 0.15)',
       },
     },
 
     // Toast and notification shadows
     toast: {
-      default: shadowTokens.elevation.lg,
-      important: shadowTokens.elevation.xl,
+      default: '0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)',
+      important: '0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)',
     },
   },
 
@@ -136,7 +136,7 @@ export const darkShadowTokens = {
   component: {
     modal: {
       backdrop: 'rgba(0, 0, 0, 0.8)',
-      content: darkShadowTokens.elevation['2xl'],
+      content: '0 25px 50px rgba(0, 0, 0, 0.5)',
     },
   },
 } as const;

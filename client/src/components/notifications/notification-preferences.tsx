@@ -32,7 +32,7 @@ import {
   Info
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 // --- INTERFACES ---
 

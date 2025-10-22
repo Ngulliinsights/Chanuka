@@ -233,7 +233,7 @@ const NotFoundPage = () => (
 );
 
 // Change to default import
-import logger from '../utils/logger.js';
+import { logger } from '@shared/core';
 
 describe('End-to-End User Flow Integration Tests', () => {
   let user: ReturnType<typeof userEvent.setup>;

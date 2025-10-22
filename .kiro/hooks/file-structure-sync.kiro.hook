@@ -1,0 +1,16 @@
+{
+  "enabled": true,
+  "name": "File Structure Synchronizer",
+  "description": "Monitors file system changes (create, delete, move) and updates all references, imports, and project structure documentation to maintain consistency",
+  "version": "1",
+  "when": {
+    "type": "fileCreated",
+    "patterns": [
+      "**/*"
+    ]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A file has been created, deleted, or moved in the project. Please analyze the change and update all references including: 1) Import/export statements in TypeScript/JavaScript files, 2) File path references in configuration files, 3) Documentation that references file structure, 4) Any hardcoded file paths in the codebase, 5) Update the project structure documentation if needed. Ensure all references remain valid and the project maintains its integrity."
+  }
+}

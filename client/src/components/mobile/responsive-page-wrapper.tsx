@@ -13,7 +13,7 @@ import {
 import { LazyLoadWrapper, usePerformanceMonitoring } from './mobile-performance-optimizations';
 import { PullToRefresh } from './mobile-navigation-enhancements';
 import { AlertCircle, Wifi, WifiOff } from 'lucide-react';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 interface ResponsivePageWrapperProps {
   children: React.ReactNode;

@@ -4,7 +4,7 @@ import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { NavigationProvider, useNavigation } from '../NavigationContext';
 import { UserRole } from '@/types/navigation';
-import { logger } from '../utils/logger.js';
+import { logger } from '@/utils/browser-logger';
 
 // Mock localStorage
 const mockLocalStorage = {

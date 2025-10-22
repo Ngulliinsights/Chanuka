@@ -1,8 +1,8 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
+import * as bcrypt from 'bcryptjs';
+import * as jwt from 'jsonwebtoken';
+import * as crypto from 'crypto';
 import { eq, and } from 'drizzle-orm';
-import { readDatabase } from '@shared/database/connection';
+import { readDatabase } from '../../../shared/database/connection.js';
 const db = readDatabase;
 import { user as users, session as sessions, passwordReset as passwordResets, type User } from '../../../shared/schema';
 import { getEmailService } from '../../infrastructure/notifications/email-service';
@@ -11,7 +11,7 @@ import { inputValidationService } from '../validation/input-validation-service.j
 import { securityAuditService } from '../../features/security/security-audit-service.js';
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { logger } from '../../utils/logger.js';
+import { logger } from '../../../shared/core/src/observability/logging/index.js';
 
 // Validation schemas
 export const registerSchema = z.object({

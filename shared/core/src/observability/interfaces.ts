@@ -8,7 +8,7 @@
  */
 
 import { Result } from '../primitives/types';
-import { BaseError } from '../primitives/errors';
+import { BaseError } from './error-management';
 
 // ==================== Core Observability Types ====================
 

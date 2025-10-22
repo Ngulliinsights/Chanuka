@@ -4,7 +4,7 @@
  */
 
 import { performanceMonitor } from './performanceMonitoring';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@/utils/browser-logger';
 
 export interface PerformanceConfig {
   enableMetrics: boolean;

@@ -1,4 +1,4 @@
-import { db } from '@shared/database/pool';
+import { database as db } from '@shared/database/connection';
 import { user as users, userProfile as userProfiles, userInterest as userInterests, billEngagement, notification as notifications, billComment as billComments, bill as bills } from '../../../../shared/schema/schema';
 import { eq, and, desc, sql, count } from 'drizzle-orm';
 import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../../infrastructure/cache/cache-service';

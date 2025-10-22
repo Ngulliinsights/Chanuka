@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import { db } from '../../shared/database/pool';
+import { database as db } from '../../shared/database/connection';
 import { logger } from '../../shared/core';
 import * as schema from '../../shared/schema';
 

@@ -1,4 +1,4 @@
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 // Connection-aware loading strategies for optimal performance
 
 export interface ConnectionInfo {
@@ -28,7 +28,7 @@ class ConnectionAwareLoader {
     this.setupConnectionMonitoring();
   }
 
-  private getConnectionInfo(): ConnectionInfo {
+  public getConnectionInfo(): ConnectionInfo {
     if ('connection' in navigator) {
       const connection = (navigator as any).connection;
       return {
@@ -127,9 +127,7 @@ class ConnectionAwareLoader {
     return { ...this.strategy };
   }
 
-  public getConnectionInfo(): ConnectionInfo {
-    return { ...this.connectionInfo };
-  }
+
 
   public subscribe(callback: (strategy: LoadingStrategy) => void): () => void {
     this.observers.push(callback);
