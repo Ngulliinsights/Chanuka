@@ -7,7 +7,7 @@ import {
   ChannelType,
   Priority,
   DeliveryStatus
-} from './unified_alert_service';
+} from '../../domain/services/unified-alert-preference-service';
 import { z } from 'zod';
 import { 
   ApiSuccess, 

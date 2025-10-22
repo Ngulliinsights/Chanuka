@@ -3,8 +3,8 @@
 import * as React from "react"
 import * as ProgressPrimitive from "@radix-ui/react-progress"
 
-import { cn } from "@/lib/utils"
-import { logger } from '@/utils/browser-logger';
+import { cn } from '..\..\lib\utils'
+import { logger } from '..\..\utils\browser-logger';
 
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,

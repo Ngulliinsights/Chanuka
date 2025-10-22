@@ -3,7 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Menu, X, Search, Gavel } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import { Logo } from '@/components/ui/logo';
+import { Logo } from '..\ui\logo';
 import { 
   MobileHeaderProps, 
   NavigationItem, 

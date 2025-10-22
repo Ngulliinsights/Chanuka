@@ -1,7 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui\card';
+import { Button } from './ui\button';
+import { Badge } from './ui\badge';
+import { Skeleton } from './ui\skeleton';
 import { 
   GitBranch, 
   CheckCircle, 
@@ -11,8 +11,8 @@ import {
   FilePlus,
   AlertTriangle
 } from "lucide-react";
-import { cn, formatRelativeTime } from "@/lib/utils";
-import { logger } from '@/utils/browser-logger';
+import { cn, formatRelativeTime } from '..\lib\utils';
+import { logger } from '..\utils\browser-logger';
 
 interface Migration {
   name: string;

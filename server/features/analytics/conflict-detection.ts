@@ -4,8 +4,9 @@ import {
   type Sponsor, type SponsorAffiliation, type SponsorTransparency, type Bill
 } from '../../../shared/schema';
 import { eq, and, sql, desc, gte, lte, count, inArray, like, or } from 'drizzle-orm';
-import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service';
-import { logger } from '../../utils/logger';
+import { cacheService } from 'server/infrastructure/cache';
+import { cacheKeys } from '../../../shared/core/src/caching/key-generator';
+import { logger } from '../../../shared/core/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS AND INTERFACES
@@ -200,13 +201,15 @@ export class EnhancedConflictDetectionService {
     try {
       logger.info(`📊 Performing comprehensive analysis for sponsor ${sponsorId}${billId ? ` and bill ${billId}` : ''}`);
 
-      const result = await cacheService.getOrSet<ConflictAnalysis>(
-        cacheKey,
-        async () => await this.executeComprehensiveAnalysis(sponsorId, billId),
-        CACHE_TTL.COMPREHENSIVE_ANALYSIS
-      );
-
-      return result.data;
+      const cached = await cacheService.get(cacheKey);
+      if (cached !== null && cached !== undefined) return cached;
+      const computed = await this.executeComprehensiveAnalysis(sponsorId, billId);
+      try {
+        await cacheService.set(cacheKey, computed, 3600);
+      } catch (e) {
+        /* log but continue */
+      }
+      return computed;
 
     } catch (error) {
       logger.error(`Comprehensive analysis failed for sponsor ${sponsorId}`, {

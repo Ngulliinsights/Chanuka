@@ -4,7 +4,13 @@ import path from "path";
 import { createServer as createViteServer, createLogger, type ViteDevServer } from "vite";
 import { type Server } from "http";
 import viteConfig from "../vite.config.js";
-import { logger } from '@shared/core/src/observability/logging';
+// Simple console logging for Vite setup
+const logger = {
+  info: (msg: string, context?: any) => console.log(`[INFO] ${msg}`, context || ''),
+  error: (msg: string, context?: any, error?: any) => console.error(`[ERROR] ${msg}`, context || '', error || ''),
+  warn: (msg: string, context?: any) => console.warn(`[WARN] ${msg}`, context || ''),
+  debug: (msg: string, context?: any) => console.log(`[DEBUG] ${msg}`, context || '')
+};
 
 const viteLogger = createLogger();
 

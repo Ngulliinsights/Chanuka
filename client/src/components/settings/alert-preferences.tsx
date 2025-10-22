@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '..\ui\card';
+import { Button } from '..\ui\button';
+import { Switch } from '..\ui\switch';
+import { Label } from '..\ui\label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '..\ui\select';
+import { Input } from '..\ui\input';
+import { Badge } from '..\ui\badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '..\ui\tabs';
+import { Separator } from '..\ui\separator';
+import { Alert, AlertDescription } from '..\ui\alert';
 import { 
   Bell, 
   Mail, 
@@ -22,7 +22,7 @@ import {
   AlertCircle,
   Info
 } from 'lucide-react';
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\..\utils\browser-logger';
 
 interface NotificationChannel {
   type: 'inApp' | 'email' | 'push' | 'sms';

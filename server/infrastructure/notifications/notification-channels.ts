@@ -3,7 +3,7 @@ import { notification as notifications, user as users } from '../../../shared/sc
 import { eq } from 'drizzle-orm';
 import { getEmailService } from './email-service';
 import { webSocketService } from '../websocket.js';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 /**
  * Notification Channel Service

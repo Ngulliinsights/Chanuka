@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom';
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\..\utils\browser-logger';
 
 // Mock fetch globally
 const mockFetch = vi.fn();

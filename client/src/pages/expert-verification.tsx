@@ -1,9 +1,9 @@
-import { VerificationsList } from '@/components/verification/verification-list';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { VerificationsList } from '..\components\verification\verification-list';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '..\components\ui\card';
 import { Scale, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
-import AppLayout from '@/components/layout/app-layout';
-import { wrapIcon } from '@/lib/icon-wrapper';
-import { logger } from '@/utils/browser-logger';
+import AppLayout from '..\components\layout\app-layout';
+import { wrapIcon } from '..\lib\icon-wrapper';
+import { logger } from '..\utils\browser-logger';
 
 // Wrap icons for consistent styling across the component
 const WrappedScale = wrapIcon(Scale);

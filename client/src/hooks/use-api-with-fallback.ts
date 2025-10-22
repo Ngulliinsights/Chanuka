@@ -14,7 +14,7 @@ import {
   apiService,
   fallbackDataManager,
   getErrorMessage
-} from '@/services/api-error-handling';
+} from '..\services\api-error-handling';
 
 export interface UseApiOptions extends Omit<FetchOptions, 'method'> {
   enabled?: boolean;

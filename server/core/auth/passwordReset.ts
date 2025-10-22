@@ -9,7 +9,7 @@ import type { InferSelectModel } from 'drizzle-orm';
 import { and, eq, gt } from 'drizzle-orm';
 import { config } from '../../config/index.js';
 import { sendTemplatedEmail } from '../../infrastructure/notifications/email-service.js';
-import { logger } from '../../utils/logger.js';
+import { logger } from '../../../shared/core/index.js';
 
 // Reset token expiration time in minutes
 const TOKEN_EXPIRY_MINUTES = 60;

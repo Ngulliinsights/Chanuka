@@ -5,9 +5,9 @@
 
 import React from 'react';
 import { CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import { cn } from '..\..\..\lib\utils';
+import { Alert, AlertDescription } from '..\..\ui\alert';
+import { Button } from '..\..\ui\button';
 
 export interface AuthAlertProps {
   type: 'success' | 'error' | 'warning' | 'info';

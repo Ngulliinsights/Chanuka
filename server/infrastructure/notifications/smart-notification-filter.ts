@@ -5,7 +5,7 @@ import {
 import { eq, and, inArray, desc, sql } from 'drizzle-orm';
 // Import the *combined* preference type, NOT the global one directly
 import type { CombinedBillTrackingPreferences } from './notification-orchestrator.js'; // Adjust path if needed
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from './cache-service.js'; // Assuming cache service is here
 
 /**

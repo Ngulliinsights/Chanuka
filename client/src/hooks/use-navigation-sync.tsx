@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { useNavigation } from '@/contexts/NavigationContext';
-import { useResponsiveNavigation } from '@/contexts/ResponsiveNavigationContext';
-import { logger } from '@/utils/browser-logger';
+import { useNavigation } from '..\contexts\NavigationContext';
+import { useResponsiveNavigation } from '..\contexts\ResponsiveNavigationContext';
+import { logger } from '..\utils\browser-logger';
 
 /**
  * Hook to synchronize state between NavigationContext and ResponsiveNavigationContext

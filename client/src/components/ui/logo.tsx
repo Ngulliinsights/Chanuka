@@ -1,6 +1,6 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
-import { logger } from '@/utils/browser-logger';
+import { cn } from '..\..\lib\utils';
+import { logger } from '..\..\utils\browser-logger';
 
 interface LogoProps {
   className?: string;

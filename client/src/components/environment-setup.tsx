@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui\card';
+import { Button } from './ui\button';
+import { Badge } from './ui\badge';
+import { Progress } from './ui\progress';
+import { Separator } from './ui\separator';
 import { 
   Settings, 
   CheckCircle, 
@@ -14,8 +14,8 @@ import {
   Shield,
   Server
 } from "lucide-react";
-import { cn, getStatusColor } from "@/lib/utils";
-import { logger } from '@/utils/browser-logger';
+import { cn, getStatusColor } from '..\lib\utils';
+import { logger } from '..\utils\browser-logger';
 
 interface EnvironmentSetupProps {
   environment?: any;

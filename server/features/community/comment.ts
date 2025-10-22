@@ -2,7 +2,8 @@ import { databaseService } from '../../infrastructure/database/database-service.
 import { database as db } from '@shared/database/connection';
 import { billComment as billComments, user as users, userProfile as userProfiles, bill as bills } from '../../../shared/schema/schema.js';
 import { eq, and, desc, asc, sql, count, isNull, or } from 'drizzle-orm';
-import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../infrastructure/cache/cache-service.js';
+import { cacheService } from 'server/infrastructure/cache';
+import { cacheKeys } from '../../../shared/core/src/caching/key-generator';
 import { logger } from '../../../shared/core/src/observability/logging';
 
 // Types for comment operations
@@ -80,7 +81,7 @@ export interface CommentStats {
  * Handles threaded comments, voting, moderation, and expert verification
  */
 export class CommentService {
-  private readonly COMMENT_CACHE_TTL = CACHE_TTL.MEDIUM;
+  private readonly COMMENT_CACHE_TTL = 1800; // 30 minutes
 
   /**
    * Get comments for a bill with threading support
@@ -90,7 +91,7 @@ export class CommentService {
     totalCount: number;
     hasMore: boolean;
   }> {
-    const cacheKey = `${CACHE_KEYS.BILL_COMMENTS}:${billId}:${JSON.stringify(filters)}`;
+    const cacheKey = `${cacheKeys.BILL_COMMENTS}:${billId}:${JSON.stringify(filters)}`;
 
     const result = await databaseService.withFallback(
       async () => {
@@ -527,7 +528,7 @@ export class CommentService {
   async getCommentStats(billId: number): Promise<CommentStats> {
     const result = await databaseService.withFallback(
       async () => {
-        const cacheKey = `${CACHE_KEYS.BILL_COMMENTS}:stats:${billId}`;
+        const cacheKey = `${cacheKeys.BILL_COMMENTS}:stats:${billId}`;
         const cached = await cacheService.get(cacheKey);
         if (cached) {
           return cached;
@@ -608,8 +609,8 @@ export class CommentService {
    */
   private async clearCommentCaches(billId: number): Promise<void> {
     const patterns = [
-      `${CACHE_KEYS.BILL_COMMENTS}:${billId}:*`,
-      `${CACHE_KEYS.BILL_COMMENTS}:stats:${billId}`
+      `${cacheKeys.BILL_COMMENTS}:${billId}:*`,
+      `${cacheKeys.BILL_COMMENTS}:stats:${billId}`
     ];
 
     for (const pattern of patterns) {

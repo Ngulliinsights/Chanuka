@@ -16,7 +16,7 @@ import React, {
 import { useResponsiveLayoutContext } from './responsive-layout-manager';
 
 // Intersection Observer hook for lazy loading
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\..\utils\browser-logger';
 function useIntersectionObserver(
   elementRef: React.RefObject<Element>,
   options: IntersectionObserverInit = {}

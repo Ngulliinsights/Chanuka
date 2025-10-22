@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useCallback, ChangeEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { useLocation } from 'wouter';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { useOnboarding } from '@/hooks/use-onboarding';
-import { useAuth } from '@/hooks/use-auth';
-import type { OnboardingData } from '@/types/onboarding';
-import { INTEREST_OPTIONS, DEFAULT_ONBOARDING_DATA, ACHIEVEMENT_TYPES, PROGRESS_MULTIPLIER } from '@/config/onboarding';
-import { logger } from '@/utils/browser-logger';
+import { Card, CardContent } from '..\components\ui\card';
+import { Button } from '..\components\ui\button';
+import { Progress } from '..\components\ui\progress';
+import { useOnboarding } from '..\hooks\use-onboarding';
+import { useAuth } from '..\hooks\use-auth';
+import type { OnboardingData } from '..\types\onboarding';
+import { INTEREST_OPTIONS, DEFAULT_ONBOARDING_DATA, ACHIEVEMENT_TYPES, PROGRESS_MULTIPLIER } from '..\config\onboarding';
+import { logger } from '..\utils\browser-logger';
 
 // Enhanced interfaces with better type safety and documentation
 interface InterestsStepProps {

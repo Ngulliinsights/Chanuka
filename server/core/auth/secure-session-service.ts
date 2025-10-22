@@ -5,7 +5,7 @@ import { sessions, users } from '../../../shared/schema';
 import { eq, and, lt } from 'drizzle-orm';
 import { encryptionService } from '../../features/security/encryption-service.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/index.js';
 
 export interface SecureSessionOptions {
   maxAge: number; // in milliseconds

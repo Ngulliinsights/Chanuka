@@ -5,15 +5,15 @@ import {
   Grid, 
   List 
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import AdvancedSearch from '@/components/search/advanced-search';
+import { Button } from '..\components\ui\button';
+import { Card, CardContent, CardHeader, CardTitle } from '..\components\ui\card';
+import { Badge } from '..\components\ui\badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '..\components\ui\tabs';
+import AdvancedSearch from '..\components\search\advanced-search';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\utils\browser-logger';
 
 interface SearchFilters {
   query: string;

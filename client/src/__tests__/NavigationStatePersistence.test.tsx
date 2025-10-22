@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { NavigationProvider } from '@/contexts/NavigationContext';
-import { ResponsiveNavigationProvider } from '@/contexts/ResponsiveNavigationContext';
-import AppLayout from '@/components/layout/app-layout';
-import { logger } from '@/utils/browser-logger';
+import { NavigationProvider } from '..\contexts\NavigationContext';
+import { ResponsiveNavigationProvider } from '..\contexts\ResponsiveNavigationContext';
+import AppLayout from '..\components\layout\app-layout';
+import { logger } from '..\utils\browser-logger';
 
 // Mock hooks
 vi.mock('@/hooks/use-auth', () => ({

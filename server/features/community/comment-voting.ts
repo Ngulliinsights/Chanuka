@@ -6,7 +6,8 @@ import { billComment, User, commentVote } from '../../../shared/schema';
 const billComments = billComment;
 const commentVotes = commentVote;
 import { eq, and, sql, desc } from 'drizzle-orm';
-import { cacheService, CACHE_TTL, CACHE_KEYS } from '../../infrastructure/cache/cache-service.js';
+import { cacheService } from 'server/infrastructure/cache';
+import { cacheKeys } from '../../../shared/core/src/caching/key-generator';
 import { logger } from '../../../shared/core/src/observability/logging';
 
 export interface VoteResult {

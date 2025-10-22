@@ -3,7 +3,7 @@
  * Provides a clean interface for making HTTP requests
  */
 
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\utils\browser-logger';
 
 export interface ApiError extends Error {
   status?: number;

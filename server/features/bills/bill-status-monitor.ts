@@ -5,7 +5,7 @@ import { webSocketService } from '../../infrastructure/websocket.js';
 import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../infrastructure/cache/cache-service.js';
 import * as schema from '@shared/schema';
 import { Bill } from '../../../shared/schema';
-import { logger } from '../../utils/logger.js';
+import { logger } from '../../../shared/core/index.js';
 // Import the orchestrator to trigger notifications
 import { notificationOrchestratorService, NotificationRequest } from '../../infrastructure/notifications/notification-orchestrator.js';
 

@@ -1,7 +1,7 @@
 import { database as db } from '../shared/database/connection';
 import { bills, analysis } from '../../../shared/schema/schema.js';
 import { eq, desc } from 'drizzle-orm';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/index.js';
 import { errorTracker } from '../../core/errors/error-tracker.js';
 import type {
   AnalysisResult,

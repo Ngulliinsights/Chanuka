@@ -1,6 +1,6 @@
-import { unifiedAlertPreferenceService, AlertPreference, AlertType, Priority } from './unified_alert_service';
-import { logger } from '@shared/core/src/observability/logging';
-import { cacheService } from '../../../infrastructure/cache/cache-service';
+import { unifiedAlertPreferenceService, AlertPreference, AlertType, Priority } from '../../domain/services/unified-alert-preference-service';
+import { logger } from '@shared/core';
+import { cacheService } from '../../../../infrastructure/cache';
 
 /**
  * Alert System Utilities and Helper Functions
@@ -158,7 +158,7 @@ export async function migrateLegacyPreferences(
   }
 }
 
-import type { AlertChannel } from './unified_alert_service';
+import type { AlertChannel } from '../../domain/services/unified-alert-preference-service';
 
 /**
  * Helper to migrate channel configs from advanced alerts
@@ -311,7 +311,7 @@ export async function processAllBatchedAlerts(
 
   // In production, you would query the database for all users with batched preferences
   // For now, we'll get this from cache keys
-  const allKeys = cacheService.getKeys();
+  const allKeys = await cacheService.keys();
   const batchKeys = allKeys.filter(k => k.startsWith('alert_batch:'));
     
     let processed = 0;

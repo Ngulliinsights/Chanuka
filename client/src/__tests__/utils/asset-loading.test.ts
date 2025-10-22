@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { AssetLoadingManager } from '@/utils/asset-loading';
+import { AssetLoadingManager } from '..\..\utils\asset-loading';
 import { logger } from '@shared/core';
 
 // Mock DOM APIs

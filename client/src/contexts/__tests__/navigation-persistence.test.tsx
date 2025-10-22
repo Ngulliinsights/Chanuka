@@ -4,9 +4,9 @@ import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { NavigationProvider, useNavigation } from '../NavigationContext';
 import { useResponsiveNavigation } from '../ResponsiveNavigationContext';
-import { NavigationStatePersistence } from '@/utils/navigation/state-persistence';
-import { AuthProvider } from '@/hooks/use-auth';
-import { logger } from '@/utils/browser-logger';
+import { NavigationStatePersistence } from '..\..\utils\navigation\state-persistence';
+import { AuthProvider } from '..\..\hooks\use-auth';
+import { logger } from '..\..\utils\browser-logger';
 
 // Mock the auth hook
 vi.mock('@/hooks/use-auth', () => ({

@@ -5,7 +5,7 @@ import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized, ApiForbidden
 import { authRateLimit, passwordResetRateLimit, registrationRateLimit } from "../../middleware/rate-limiter.js";
 import { z } from "zod";
 import { errorTracker } from '../errors/error-tracker.js';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
 
 export const router = Router();

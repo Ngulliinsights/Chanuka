@@ -9,7 +9,7 @@ const moderationFlags = moderationFlag;
 const moderationActions = moderationAction;
 const sponsors = sponsor;
 import { eq, count, desc, sql, and, gte, like, or, inArray, isNull, SQL } from 'drizzle-orm';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/index.js';
 
 // Type definitions for better type safety
 export interface ContentModerationFilters {

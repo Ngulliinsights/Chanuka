@@ -25,7 +25,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\..\utils\browser-logger';
 
 interface RealTimeBillTrackerProps {
   billId?: number;

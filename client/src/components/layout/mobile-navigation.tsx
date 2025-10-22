@@ -10,27 +10,27 @@ import {
   LogOut,
   Bell
 } from 'lucide-react';
-import { MobileTouchHandler, MobileTouchUtils } from '@/utils/mobile-touch-handler';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
+import { MobileTouchHandler, MobileTouchUtils } from '..\..\utils\mobile-touch-handler';
+import { Button } from '..\ui\button';
+import { Sheet, SheetContent, SheetTrigger } from '..\ui\sheet';
+import { Badge } from '..\ui\badge';
+import { Separator } from '..\ui\separator';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useLocation } from 'react-router-dom';
-import NotificationCenter from '@/components/notifications/notification-center';
-import NavigationPreferencesDialog from '@/components/navigation/navigation-preferences-dialog';
-import QuickAccessNav from '@/components/navigation/quick-access-nav';
-import { useNavigationPreferences } from '@/hooks/use-navigation-preferences';
+import NotificationCenter from '..\notifications\notification-center';
+import NavigationPreferencesDialog from '..\navigation\navigation-preferences-dialog';
+import QuickAccessNav from '..\navigation\quick-access-nav';
+import { useNavigationPreferences } from '..\..\hooks\use-navigation-preferences';
 import { 
   ResponsiveLayoutProvider, 
   useResponsiveLayoutContext, 
   TouchButton, 
   SafeAreaWrapper 
-} from '@/components/mobile/responsive-layout-manager';
+} from '..\mobile\responsive-layout-manager';
 import { 
   MobileTabBar, 
   SwipeableHeader 
-} from '@/components/mobile/mobile-navigation-enhancements';
+} from '..\mobile\mobile-navigation-enhancements';
 import { 
   MobileNavigationProps,
   NavigationItem as LayoutNavigationItem,

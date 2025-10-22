@@ -1,10 +1,10 @@
 import { renderHook, act } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { useJourneyTracker, useJourneyAnalytics } from '../use-journey-tracker';
-import { NavigationProvider } from '@/contexts/NavigationContext';
-import { UserJourneyTracker } from '@/services/UserJourneyTracker';
+import { NavigationProvider } from '..\..\contexts\NavigationContext';
+import { UserJourneyTracker } from '..\..\services\UserJourneyTracker';
 import React from 'react';
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\..\utils\browser-logger';
 
 // Mock the UserJourneyTracker
 jest.mock('@/services/UserJourneyTracker');

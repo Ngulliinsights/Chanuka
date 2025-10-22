@@ -12,7 +12,7 @@ import { config } from './config/index.js';
 // import { router as billsRouter } from './features/bills/presentation/bills-router.js';
 // import { router as sponsorshipRouter } from './features/bills/presentation/sponsorship.routes.js';
 // import { analysisRouter } from './features/analysis/presentation/analysis.routes.js';
-// import { billTrackingRouter } from './features/bills/presentation/bill-tracking.routes.js';
+import { billTrackingRouter } from './features/bills/presentation/bill-tracking.routes.js';
 // import analyticsRouter from './features/analytics/analytics.js';
 // import { sponsorsRouter } from './features/sponsors/presentation/sponsors.routes.js';
 // import { router as authRouter } from './core/auth/auth.js';
@@ -31,7 +31,7 @@ import { router as healthRouter } from './infrastructure/monitoring/health.js';
 import { router as cacheRouter } from './infrastructure/cache/cache.js';
 import { cacheCoordinator } from './infrastructure/cache/index.js';
 // import { router as realTimeTrackingRouter } from './features/bills/real-time-tracking.js'; // TODO: Implement real-time tracking router
-// import { router as alertPreferencesRouter } from './features/alert-preferences/unified_alert_routes.js';
+// import { router as alertPreferencesRouter } from './features/alert-preferences/presentation/routes/unified-alert-routes.js';
 // import engagementAnalyticsRouter from './features/analytics/engagement-analytics.js'; // TODO: Implement engagement analytics router
 // import { sponsorConflictAnalysisRouter } from './features/bills/sponsor-conflict-analysis.js'; // TODO: Implement sponsor conflict analysis router
 // import { votingPatternAnalysisRouter } from './features/bills/voting-pattern-analysis.js'; // TODO: Implement voting pattern analysis router
@@ -102,17 +102,17 @@ const securityMonitoringMiddleware = {
 // Infrastructure Services
 import { auditMiddleware } from './infrastructure/monitoring/audit-log.js';
 import { performanceMiddleware } from './infrastructure/monitoring/performance-monitor.js';
-// import { setupVite } from './vite.js';
+import { setupVite } from './vite.js';
 // import { initializeDatabase, validateDatabaseHealth } from "./utils/db-init.js";
-// import { databaseFallbackService } from "./infrastructure/database/database-fallback.js";
-// import { webSocketService } from './infrastructure/websocket.js';
+import { databaseFallbackService } from "./infrastructure/database/database-fallback.js";
+import { webSocketService } from './infrastructure/websocket.js';
 // import { billStatusMonitorService as billStatusMonitor } from './features/bills/bill-status-monitor.js';
-// import { notificationSchedulerService } from './infrastructure/notifications/index.js';
+import { notificationSchedulerService } from './infrastructure/notifications/index.js';
 import { monitoringScheduler } from './infrastructure/monitoring/monitoring-scheduler.js';
-// import { sessionCleanupService } from './core/auth/session-cleanup.js';
+import { sessionCleanupService } from './core/auth/session-cleanup.js';
 // import { SearchIndexManager } from './features/search/infrastructure/SearchIndexManager.js';
-// import { securityMonitoringService } from './features/security/security-monitoring-service.js';
-// import { privacySchedulerService } from './features/privacy/privacy-scheduler.js';
+import { securityMonitoringService } from './features/security/security-monitoring-service.js';
+import { privacySchedulerService } from './features/privacy/privacy-scheduler.js';
 // Unified utilities (consolidated from sprawl)
 import { logger, Performance, RateLimit, ApiResponse } from '../shared/core/index.js';
 

@@ -1,10 +1,10 @@
 import { ReactNode, useEffect, useState, useCallback, useRef, ErrorInfo } from 'react';
-import { useUnifiedNavigation } from '@/hooks/use-unified-navigation';
-import { useNavigationPerformance } from '@/hooks/use-navigation-performance';
-import { useNavigationAccessibility, useNavigationKeyboardShortcuts } from '@/hooks/use-navigation-accessibility';
-import { DesktopSidebar } from '@/components/navigation';
-import MobileNavigation from '@/components/layout/mobile-navigation';
-import { SkipLink, useAccessibility } from '@/components/accessibility/accessibility-manager';
+import { useUnifiedNavigation } from '../../hooks/use-unified-navigation';
+import { useNavigationPerformance } from '../../hooks/use-navigation-performance';
+import { useNavigationAccessibility, useNavigationKeyboardShortcuts } from '../../hooks/use-navigation-accessibility';
+import { DesktopSidebar } from '../navigation';
+import MobileNavigation from './mobile-navigation';
+import { SkipLink, useAccessibility } from '../accessibility/accessibility-manager';
 import { 
   AppLayoutProps, 
   LayoutConfig, 

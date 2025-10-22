@@ -7,7 +7,7 @@ import { databaseService } from '../../../infrastructure/database/database-servi
 import { readDatabase } from '@shared/database/connection';
 
 import { demoDataService } from '../../../infrastructure/demo-data';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 /*  EVERY original method preserved – demo-mode checks, health monitoring,
     auto-rebuild, memory cleanup, performance history, etc.            */

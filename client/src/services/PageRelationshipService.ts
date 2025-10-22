@@ -1,4 +1,4 @@
-import { RelatedPage, PageRelationship, UserRole } from '@/types/navigation';
+import { RelatedPage, PageRelationship, UserRole } from '..\types\navigation';
 import { logger } from '@shared/core';
 
 /**

@@ -1,14 +1,14 @@
 import { eq, and, desc, asc, sql, count, inArray, or } from 'drizzle-orm';
-import { databaseService } from '../../../infrastructure/database/database-service.js';
+import { databaseService } from '@shared/database';
 import { readDatabase } from '@shared/database/connection';
 import { notificationService } from '../../../infrastructure/notifications/notification-service.js';
-import { cacheService, CACHE_KEYS, CACHE_TTL } from '../../../infrastructure/cache/cache-service.js';
+import { cacheService } from '../../../infrastructure/cache';
 import * as schema from '../../../../shared/schema';
 import { Bill } from '../../../../shared/schema'; // Ensure Bill type is correctly imported
 import { z } from 'zod';
-import { logger } from '../../../utils/logger.js';
+import { logger } from '../../../../shared/core/index.js';
 // Import the status monitor service if it exists at this path
-import { billStatusMonitorService } from './bill-status-monitor.js'; // Adjust path if needed
+import { billStatusMonitorService } from '../bill-status-monitor.js'; // Adjust path if needed
 
 // --- Type Definitions (Ensure these match shared types if defined there) ---
 // Define allowed enum values explicitly for validation and clarity
@@ -205,7 +205,7 @@ export class BillTrackingService {
     const sortOrder = options.sortOrder ?? 'desc';
 
     const filterKey = `${options.category ?? 'all'}:${options.status ?? 'all'}:${sortBy}:${sortOrder}`;
-    const cacheKey = `${CACHE_KEYS.USER_TRACKED_BILLS(userId)}:${page}:${limit}:${filterKey}`;
+  const cacheKey = `user:tracked_bills:${userId}:${page}:${limit}:${filterKey}`;
 
     const cachedData = await cacheService.get(cacheKey);
     if (cachedData) {
@@ -277,7 +277,7 @@ export class BillTrackingService {
         bills: enhancedBills,
         pagination: { page, limit, total: Number(total), pages: Math.ceil(Number(total) / limit) }
       };
-      await cacheService.set(cacheKey, response, CACHE_TTL.USER_DATA);
+  await cacheService.set(cacheKey, response, 3600); // 1 hour
       return response;
     } catch (error) {
       logger.error(`Error getting tracked bills for user ${userId}:`, { component: 'BillTrackingService' }, error);
@@ -369,7 +369,7 @@ export class BillTrackingService {
    * Get analytics related to a user's bill tracking activities.
    */
   async getUserTrackingAnalytics(userId: string): Promise<TrackingAnalytics> {
-     const cacheKey = CACHE_KEYS.USER_TRACKING_ANALYTICS(userId);
+  const cacheKey = `user:tracking_analytics:${userId}`;
      const cachedData = await cacheService.get(cacheKey);
      if (cachedData) {
          logger.debug(`Cache hit for tracking analytics: ${cacheKey}`);
@@ -434,7 +434,7 @@ export class BillTrackingService {
             }
         };
 
-        await cacheService.set(cacheKey, analyticsData, CACHE_TTL.USER_DATA);
+  await cacheService.set(cacheKey, analyticsData, 3600); // 1 hour
         return analyticsData;
     } catch (error) {
       logger.error(`Error getting tracking analytics for user ${userId}:`, { component: 'BillTrackingService' }, error);
@@ -450,7 +450,7 @@ export class BillTrackingService {
    * Check if a user is actively tracking a specific bill.
    */
   async isUserTrackingBill(userId: string, billId: number): Promise<boolean> {
-     const cacheKey = CACHE_KEYS.IS_USER_TRACKING(userId, billId);
+  const cacheKey = `user:tracking:${userId}:bill:${billId}`;
      const cachedValue = await cacheService.get(cacheKey);
      if (cachedValue !== null && cachedValue !== undefined) {
          logger.debug(`Cache hit for isUserTrackingBill: ${cacheKey}`);
@@ -467,7 +467,7 @@ export class BillTrackingService {
         .limit(1);
 
        const isTracking = preference?.isActive ?? false; // Default to false if no record found
-       await cacheService.set(cacheKey, isTracking, CACHE_TTL.USER_DATA_SHORT); // Use a shorter TTL for status checks
+  await cacheService.set(cacheKey, isTracking, 300); // 5 minutes
        return isTracking;
     } catch (error) {
       logger.error(`Error checking if user ${userId} is tracking bill ${billId}:`, { component: 'BillTrackingService' }, error);
@@ -479,7 +479,7 @@ export class BillTrackingService {
    * Recommend bills for tracking based on user interests and untracked popular bills.
    */
   async getRecommendedBillsForTracking(userId: string, limit: number = 10): Promise<schema.Bill[]> {
-    const cacheKey = CACHE_KEYS.USER_RECOMMENDED_TRACKING(userId, limit);
+  const cacheKey = `user:recommended_tracking:${userId}:${limit}`;
     const cachedData = await cacheService.get(cacheKey);
     if (cachedData) {
       logger.debug(`Cache hit for recommended tracking: ${cacheKey}`);
@@ -551,7 +551,7 @@ export class BillTrackingService {
 
       }
 
-      await cacheService.set(cacheKey, recommendations, CACHE_TTL.RECOMMENDATIONS);
+  await cacheService.set(cacheKey, recommendations, 3600); // 1 hour
       return recommendations;
     } catch (error) {
       logger.error(`Error getting recommended bills for user ${userId}:`, { component: 'BillTrackingService' }, error);
@@ -565,7 +565,7 @@ export class BillTrackingService {
   private async validateBillExists(billId: number): Promise<Pick<Bill, 'id' | 'title'> | null> {
     if (isNaN(billId) || billId <= 0) throw new Error('Invalid Bill ID provided.');
 
-    const cacheKey = CACHE_KEYS.BILL_EXISTS(billId); // Simple existence cache
+  const cacheKey = `bill:exists:${billId}`; // Simple existence cache
     const cachedExists = await cacheService.get(cacheKey);
     // Return minimal info if exists, null otherwise
     if (cachedExists !== null && cachedExists !== undefined) {
@@ -580,7 +580,7 @@ export class BillTrackingService {
         .where(eq(schema.bills.id, billId))
         .limit(1);
 
-      await cacheService.set(cacheKey, !!bill, CACHE_TTL.METADATA); // Cache boolean
+  await cacheService.set(cacheKey, !!bill, 3600); // 1 hour
       return bill || null;
     } catch (error) {
       logger.error(`Error validating bill existence for ID ${billId}:`, { component: 'BillTrackingService' }, error);
@@ -591,26 +591,34 @@ export class BillTrackingService {
   private async clearUserTrackingCaches(userId: string, billId?: number): Promise<void> {
     // Define patterns/keys more specifically using CACHE_KEYS
     const patternsToDelete = [
-      CACHE_KEYS.USER_TRACKED_BILLS(userId, '*'), // Pattern for paginated results
-      CACHE_KEYS.USER_TRACKING_ANALYTICS(userId),
-      CACHE_KEYS.USER_RECOMMENDED_TRACKING(userId, '*'), // Pattern for different limits
+      `user:tracked_bills:${userId}:*`, // Pattern for paginated results
+      `user:tracking_analytics:${userId}`,
+      `user:recommended_tracking:${userId}:*`, // Pattern for different limits
     ];
     if (billId) {
-      patternsToDelete.push(CACHE_KEYS.IS_USER_TRACKING(userId, billId));
+      patternsToDelete.push(`user:tracking:${userId}:bill:${billId}`);
     }
 
     logger.debug(`Clearing cache keys/patterns for user ${userId}: ${patternsToDelete.join(', ')}`);
     try {
       // Use Promise.all to clear concurrently
-      const clearPromises = patternsToDelete.map(keyOrPattern => {
-          // Check if it's a pattern (contains '*') or a specific key
-          if (keyOrPattern.includes('*')) {
-              return cacheService.deletePattern(keyOrPattern);
-          } else {
-              return cacheService.delete(keyOrPattern);
-          }
-      });
-      await Promise.all(clearPromises);
+    const clearPromises = patternsToDelete.map(async (keyOrPattern) => {
+      // Pattern-based invalidation
+      if (keyOrPattern.includes('*')) {
+        if (typeof (cacheService as any).invalidateByPattern === 'function') {
+          return (cacheService as any).invalidateByPattern(keyOrPattern);
+        }
+        // Fallback: resolve keys then delete
+        if (typeof (cacheService as any).keys === 'function') {
+          const keys: string[] = await (cacheService as any).keys(keyOrPattern);
+          return Promise.all(keys.map(k => (cacheService as any).del ? (cacheService as any).del(k) : (cacheService as any).delete ? (cacheService as any).delete(k) : Promise.resolve()));
+        }
+        return Promise.resolve();
+      } else {
+        return (cacheService as any).del ? (cacheService as any).del(keyOrPattern) : (cacheService as any).delete ? (cacheService as any).delete(keyOrPattern) : Promise.resolve();
+      }
+    });
+    await Promise.all(clearPromises);
 
       logger.debug(`Successfully cleared caches for user ${userId}`);
     } catch (error) {

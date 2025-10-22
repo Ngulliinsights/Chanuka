@@ -1,7 +1,7 @@
 
 import { Link } from 'react-router-dom';
-import { Logo } from '@/components/ui/logo';
-import { logger } from '@/utils/browser-logger';
+import { Logo } from '..\components\ui\logo';
+import { logger } from '..\utils\browser-logger';
 
 function NotFoundPage() {
   return (

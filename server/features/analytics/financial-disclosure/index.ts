@@ -9,7 +9,7 @@ import { ApiSuccess, ApiError } from "../../../../shared/core/src/utilities/api"
 import { z, ZodError } from "zod";
 import { ValidationError as InvalidInputError, SponsorNotFoundError, BaseError } from "../../../../shared/core/src/observability/error-management";
 import crypto from 'crypto';
-import { logger } from '../../../utils/logger.js';
+import { logger } from '../../../../shared/core/index.js';
 import { errorTracker } from '../../../core/errors/error-tracker.js';
 
 // ============================================================================

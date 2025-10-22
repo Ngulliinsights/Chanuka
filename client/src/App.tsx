@@ -1,26 +1,26 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Toaster } from "@/components/ui/toaster";
-import AppProviders from "@/components/AppProviders";
-import AppLayout from "@/components/layout/app-layout";
-import { AccessibilityTrigger } from "@/components/accessibility/accessibility-settings-panel";
-import { OfflineStatus } from "@/components/offline/offline-manager";
+import { Toaster } from "./components/ui/toaster";
+import AppProviders from "./components/AppProviders";
+import AppLayout from "./components/layout/app-layout";
+import { AccessibilityTrigger } from "./components/accessibility/accessibility-settings-panel";
+import { OfflineStatus } from "./components/offline/offline-manager";
 import {
   CriticalAssetLoader,
   DevAssetLoadingDebug,
-} from "@/components/loading/AssetLoadingIndicator";
-import { GlobalLoadingIndicator } from "@/components/loading/GlobalLoadingIndicator";
-import { LoadingStateManager } from "@/components/loading/LoadingStates";
-import BrowserCompatibilityChecker from "@/components/compatibility/BrowserCompatibilityChecker";
-import PerformanceMetricsCollector from "@/components/performance/PerformanceMetricsCollector";
+} from "./components/loading/AssetLoadingIndicator";
+import { GlobalLoadingIndicator } from "./components/loading/GlobalLoadingIndicator";
+import { LoadingStateManager } from "./components/loading/LoadingStates";
+import BrowserCompatibilityChecker from "./components/compatibility/BrowserCompatibilityChecker";
+import PerformanceMetricsCollector from "./components/performance/PerformanceMetricsCollector";
 import { Suspense, useEffect } from "react";
-import { useComprehensiveLoading } from "@/hooks/useComprehensiveLoading";
-import { logger } from '@/utils/browser-logger';
+import { useComprehensiveLoading } from "./hooks/useComprehensiveLoading";
+import { logger } from './utils/browser-logger';
 import {
   SafeLazyPages,
   SafeLazySponsorshipPages,
-} from "@/utils/safe-lazy-loading";
+} from "./utils/safe-lazy-loading";
 
 // =============================================================================
 // CONFIGURATION

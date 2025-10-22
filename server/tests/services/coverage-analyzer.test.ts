@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { CoverageAnalyzer } from '../../services/coverage-analyzer';
 import { exec } from 'child_process';
 import fs from 'fs/promises';
-import { logger } from '../../utils/logger';
+import { logger } from '../../../shared/core/index.js';
 
 // Mock dependencies
 jest.mock('child_process');

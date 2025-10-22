@@ -2,12 +2,12 @@ import React, { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
-import { LoadingProvider } from '@/contexts/LoadingContext';
-import { NavigationProvider } from '@/contexts/NavigationContext';
-import { ResponsiveNavigationProvider } from '@/contexts/ResponsiveNavigationContext';
-import { AuthProvider } from '@/hooks/use-auth';
-import { AccessibilityProvider } from '@/components/accessibility/accessibility-manager';
-import { OfflineProvider } from '@/components/offline/offline-manager';
+import { LoadingProvider } from '..\contexts\LoadingContext';
+import { NavigationProvider } from '..\contexts\NavigationContext';
+import { ResponsiveNavigationProvider } from '..\contexts\ResponsiveNavigationContext';
+import { AuthProvider } from '..\hooks\use-auth';
+import { AccessibilityProvider } from '..\components\accessibility\accessibility-manager';
+import { OfflineProvider } from '..\components\offline\offline-manager';
 import { vi } from 'vitest';
 
 // =============================================================================

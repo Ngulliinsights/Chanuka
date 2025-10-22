@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\utils\browser-logger';
 
 const MOBILE_BREAKPOINT = 768
 

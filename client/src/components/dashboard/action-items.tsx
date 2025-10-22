@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '..\ui\card';
+import { Button } from '..\ui\button';
 import { AlertCircle, RefreshCw, CheckCircle2, Clock, Plus, Filter } from 'lucide-react';
 import { useDashboard } from './hooks/useDashboard';
 import { useDashboardActions } from './hooks/useDashboardActions';

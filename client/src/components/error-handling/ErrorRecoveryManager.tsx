@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ErrorType, ErrorSeverity } from './PageErrorBoundary';
-import { logger } from '@/utils/browser-logger';
+import { logger } from '..\..\utils\browser-logger';
 
 export interface RecoveryStrategy {
   type: 'retry' | 'reload' | 'redirect' | 'fallback';
