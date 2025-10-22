@@ -4,12 +4,13 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { visualizer } from 'rollup-plugin-visualizer';
 import viteCompression from 'vite-plugin-compression';
+import bundleAnalysisPlugin from './scripts/bundle-analysis-plugin.js';
 
 export default defineConfig({
   plugins: [
     // Core React plugin
     react(),
-    
+
     // Bundle analyzer - only runs when ANALYZE env var is set
     process.env.ANALYZE && visualizer({
       filename: 'dist/stats.html',
@@ -18,7 +19,17 @@ export default defineConfig({
       brotliSize: true,
       template: 'treemap',
     }),
-    
+
+    // Automated bundle analysis plugin - disabled for now to avoid build issues
+    // bundleAnalysisPlugin({
+    //   outputDir: 'bundle-reports',
+    //   generateReports: ['html', 'json', 'markdown'],
+    //   compareBaseline: process.env.CI || process.env.COMPARE_BASELINE,
+    //   failOnScore: process.env.BUNDLE_FAIL_SCORE ? parseInt(process.env.BUNDLE_FAIL_SCORE) : 0,
+    //   failOnSize: process.env.BUNDLE_FAIL_SIZE ? parseFloat(process.env.BUNDLE_FAIL_SIZE) : 0,
+    //   verbose: process.env.BUNDLE_VERBOSE === 'true'
+    // }),
+
     // Gzip compression for production builds
     viteCompression({
       algorithm: 'gzip',
@@ -26,7 +37,7 @@ export default defineConfig({
       threshold: 1024, // Only compress files > 1KB
       deleteOriginFile: false,
     }),
-    
+
     // Brotli compression for even better compression ratios
     viteCompression({
       algorithm: 'brotliCompress',
