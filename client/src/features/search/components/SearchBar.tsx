@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, X, Clock, Star, TrendingUp } from 'lucide-react';
-import { Input } from '..\..\..\components\ui\input';
-import { Button } from '..\..\..\components\ui\button';
-import { Card, CardContent } from '..\..\..\components\ui\card';
-import { Badge } from '..\..\..\components\ui\badge';
+import { Input } from '../../../components/ui/input';
+import { Button } from '../../../components/ui/button';
+import { Card, CardContent } from '../../../components/ui/card';
+import { Badge } from '../../../components/ui/badge';
 import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '../hooks/useSearch';
 import type { SearchSuggestion } from '../types';
 

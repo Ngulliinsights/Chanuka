@@ -1,15 +1,56 @@
 import type { Config } from "tailwindcss";
-import { logger } from './shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 export default {
   // Dark mode configuration - using class strategy for manual control
   darkMode: ["class"],
 
-  // Content paths for Tailwind to scan for classes
+  // Content paths for Tailwind to scan for classes - expanded for comprehensive purging
   content: [
-    "./client/index.html", 
-    "./client/src/**/*.{js,jsx,ts,tsx}"
+    "./client/**/*.{js,jsx,ts,tsx,html}",
+    "./shared/**/*.{js,jsx,ts,tsx}" // Include shared components for design system preservation
   ],
+
+  // Purge configuration for production builds - removes unused CSS classes
+  purge: {
+    enabled: process.env.NODE_ENV === 'production',
+    content: [
+      "./client/**/*.{js,jsx,ts,tsx,html}",
+      "./shared/**/*.{js,jsx,ts,tsx}"
+    ],
+    // Preserve design system classes and common utilities
+    safelist: [
+      // Common responsive utilities
+      /^grid-cols-/,
+      /^col-span-/,
+      /^flex-/,
+      /^justify-/,
+      /^items-/,
+      /^space-/,
+      /^p-/,
+      /^m-/,
+      /^text-/,
+      /^bg-/,
+      /^border-/,
+      /^rounded-/,
+      /^shadow-/,
+      // Design system colors
+      /^bg-(primary|secondary|accent|muted|destructive|success|warning|danger|info)/,
+      /^text-(primary|secondary|accent|muted|destructive|success|warning|danger|info)/,
+      /^border-(primary|secondary|accent|muted|destructive|success|warning|danger|info)/,
+      // Animation classes
+      /^animate-/,
+      // Custom utilities
+      'card-enhanced',
+      'card-hover',
+      'btn-enhanced',
+      'status-indicator',
+      'verification-meter',
+      'risk-low',
+      'risk-medium',
+      'risk-high'
+    ]
+  },
 
   theme: {
     // Custom responsive breakpoints following mobile-first approach

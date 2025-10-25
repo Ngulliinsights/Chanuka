@@ -1,14 +1,14 @@
 "use client"
 
-import { forwardRef, createContext, useContext, useId, ElementRef, ComponentPropsWithoutRef, HTMLAttributes, useState, useCallback } from "react"
+import React, { forwardRef, createContext, useContext, useId, ElementRef, ComponentPropsWithoutRef, HTMLAttributes, useState, useCallback, useEffect } from "react"
 import { Root } from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"
 import { Controller, FormProvider, useFormContext, type ControllerProps, type FieldPath, type FieldValues } from "react-hook-form"
 import { z } from "zod"
 
-import { cn } from '..\..\lib\utils'
+import { cn } from '../../lib/utils'
 import { Label } from './label'
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '../../utils/browser-logger';
 import { FormValidationConfig } from './types';
 import { validateFormData, safeValidateFormData, FormValidationConfigSchema } from './validation';
 import { UIFormError } from './errors';
@@ -173,17 +173,21 @@ interface EnhancedFormProps {
   onSubmit?: (data: any) => void | Promise<void>;
   children: React.ReactNode;
   className?: string;
+  title?: string;
+  submitButton?: React.ReactNode;
 }
 
 const EnhancedForm = forwardRef<HTMLFormElement, EnhancedFormProps>(
-  ({ 
-    schema, 
-    config = {}, 
-    onValidationError, 
-    onSubmit, 
-    children, 
+  ({
+    schema,
+    config = {},
+    onValidationError,
+    onSubmit,
+    children,
     className,
-    ...props 
+    title,
+    submitButton,
+    ...props
   }, ref) => {
     const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -255,8 +259,15 @@ const EnhancedForm = forwardRef<HTMLFormElement, EnhancedFormProps>(
           if (formConfig.scrollToFirstError) {
             const firstErrorField = Object.keys(errors)[0];
             const element = event.currentTarget.querySelector(`[name="${firstErrorField}"]`) as HTMLElement;
-            element?.focus();
-            element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (element) {
+              element.focus();
+              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              // Announce focus change to screen readers
+              const liveRegion = document.getElementById(`${formId}-live-region`);
+              if (liveRegion) {
+                liveRegion.textContent = `Error in ${firstErrorField} field. Please correct this field.`;
+              }
+            }
           }
           
           await handleValidationError(validation.error);
@@ -277,34 +288,63 @@ const EnhancedForm = forwardRef<HTMLFormElement, EnhancedFormProps>(
 
     const formConfig = validatedConfig();
     const hasErrors = Object.keys(validationErrors).length > 0;
+    const formId = useId();
+    const formTitleId = `${formId}-title`;
+
+    // Update live region when status changes
+    useEffect(() => {
+      const liveRegion = document.getElementById(`${formId}-live-region`);
+      if (liveRegion) {
+        let announcement = '';
+        if (hasErrors) {
+          announcement += "Form contains errors that need to be corrected. ";
+        }
+        if (isSubmitting) {
+          announcement += "Form is being submitted.";
+        }
+        liveRegion.textContent = announcement;
+      }
+    }, [hasErrors, isSubmitting, formId]);
 
     return (
-      <form
-        ref={ref}
-        className={cn("space-y-6", className)}
-        onSubmit={handleSubmit}
-        noValidate
-        {...props}
-      >
+      <>
+        {title && (
+          <h2 id={formTitleId} className="sr-only">
+            {title}
+          </h2>
+        )}
+        <form
+          ref={ref}
+          className={cn("space-y-6", className)}
+          onSubmit={handleSubmit}
+          noValidate
+          role="form"
+          aria-labelledby={title ? formTitleId : undefined}
+          aria-describedby={isSubmitting ? `${formId}-status` : undefined}
+          {...props}
+        >
         {formConfig.showErrorSummary && hasErrors && (
-          <div 
+          <div
             className="rounded-md bg-destructive/15 p-4 border border-destructive/20"
             role="alert"
             aria-labelledby="form-error-summary"
+            aria-live="assertive"
+            aria-atomic="true"
           >
-            <h3 id="form-error-summary" className="text-sm font-medium text-destructive mb-2">
+            <h2 id="form-error-summary" className="text-sm font-medium text-destructive mb-2">
               Please correct the following errors:
-            </h3>
-            <ul className="text-sm text-destructive space-y-1">
+            </h2>
+            <ul className="text-sm text-destructive space-y-1" role="list">
               {Object.entries(validationErrors).map(([field, message]) => (
-                <li key={field}>
+                <li key={field} role="listitem">
                   <button
                     type="button"
-                    className="underline hover:no-underline"
+                    className="underline hover:no-underline focus:outline-none focus:ring-2 focus:ring-destructive focus:ring-offset-2"
                     onClick={() => {
                       const element = document.querySelector(`[name="${field}"]`) as HTMLElement;
                       element?.focus();
                     }}
+                    aria-label={`Focus on ${field} field`}
                   >
                     {field === 'general' ? message : `${field}: ${message}`}
                   </button>
@@ -315,14 +355,38 @@ const EnhancedForm = forwardRef<HTMLFormElement, EnhancedFormProps>(
         )}
         
         {children}
-        
+
+        {submitButton && (
+          <div className="flex justify-end">
+            {React.cloneElement(submitButton as React.ReactElement, {
+              disabled: isSubmitting,
+              'aria-describedby': isSubmitting ? `${formId}-status` : undefined,
+              'aria-label': isSubmitting ? 'Submitting form, please wait' : undefined,
+            })}
+          </div>
+        )}
+
         {isSubmitting && (
-          <div className="flex items-center justify-center py-4">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+          <div
+            className="flex items-center justify-center py-4"
+            aria-live="polite"
+            aria-atomic="true"
+            id={`${formId}-status`}
+          >
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" aria-hidden="true"></div>
             <span className="ml-2 text-sm text-muted-foreground">Submitting...</span>
           </div>
         )}
+
+        {/* Live region for dynamic content updates */}
+        <div
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+          id={`${formId}-live-region`}
+        />
       </form>
+    </>
     );
   }
 );

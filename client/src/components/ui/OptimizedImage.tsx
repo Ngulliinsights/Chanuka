@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { cn } from '..\..\lib\utils';
-import { logger } from '..\..\utils\browser-logger';
+import { cn } from '../../lib/utils';
+import { logger } from '../../utils/browser-logger';
 
 export interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;

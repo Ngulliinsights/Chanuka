@@ -1,79 +1,80 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { AuthService, registerSchema, loginSchema } from '../../core/auth/auth-service.ts';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Mock dependencies with proper typing
-jest.mock('bcryptjs');
-jest.mock('jsonwebtoken');
-jest.mock('crypto');
+vi.mock('bcryptjs');
+vi.mock('jsonwebtoken');
+vi.mock('crypto');
 
-// Create properly typed mocks using jest.MockedFunction
-const mockBcryptCompare = jest.fn() as jest.MockedFunction<(password: string, hash: string) => Promise<boolean>>;
-const mockBcryptHash = jest.fn() as jest.MockedFunction<(password: string, salt: string | number) => Promise<string>>;
-const mockJwtSign = jest.fn() as jest.MockedFunction<(payload: string | object | Buffer, secretOrPrivateKey: string | Buffer | object, options?: any) => string>;
-const mockJwtVerify = jest.fn() as jest.MockedFunction<(token: string, secretOrPublicKey: string | Buffer, options?: any) => string | object>;
-const mockCryptoRandomBytes = jest.fn() as jest.MockedFunction<(size: number) => Buffer>;
-const mockCryptoCreateHash = jest.fn() as jest.MockedFunction<(algorithm: string) => any>;
-const mockCryptoRandomUUID = jest.fn() as jest.MockedFunction<() => string>;
+// Create properly typed mocks using vi.MockedFunction
+const mockBcryptCompare = vi.fn() as vi.MockedFunction<(password: string, hash: string) => Promise<boolean>>;
+const mockBcryptHash = vi.fn() as vi.MockedFunction<(password: string, salt: string | number) => Promise<string>>;
+const mockJwtSign = vi.fn() as vi.MockedFunction<(payload: string | object | Buffer, secretOrPrivateKey: string | Buffer | object, options?: any) => string>;
+const mockJwtVerify = vi.fn() as vi.MockedFunction<(token: string, secretOrPublicKey: string | Buffer, options?: any) => string | object>;
+const mockCryptoRandomBytes = vi.fn() as vi.MockedFunction<(size: number) => Buffer>;
+const mockCryptoCreateHash = vi.fn() as vi.MockedFunction<(algorithm: string) => any>;
+const mockCryptoRandomUUID = vi.fn() as vi.MockedFunction<() => string>;
 
 // Apply mocks
-(bcrypt.compare as jest.MockedFunction<any>) = mockBcryptCompare;
-(bcrypt.hash as jest.MockedFunction<any>) = mockBcryptHash;
-(jwt.sign as jest.MockedFunction<any>) = mockJwtSign;
-(jwt.verify as jest.MockedFunction<any>) = mockJwtVerify;
-(crypto.randomBytes as jest.MockedFunction<any>) = mockCryptoRandomBytes;
-(crypto.createHash as jest.MockedFunction<any>) = mockCryptoCreateHash;
-(crypto.randomUUID as jest.MockedFunction<any>) = mockCryptoRandomUUID;
+(bcrypt.compare as vi.MockedFunction<any>) = mockBcryptCompare;
+(bcrypt.hash as vi.MockedFunction<any>) = mockBcryptHash;
+(jwt.sign as vi.MockedFunction<any>) = mockJwtSign;
+(jwt.verify as vi.MockedFunction<any>) = mockJwtVerify;
+(crypto.randomBytes as vi.MockedFunction<any>) = mockCryptoRandomBytes;
+(crypto.createHash as vi.MockedFunction<any>) = mockCryptoCreateHash;
+(crypto.randomUUID as vi.MockedFunction<any>) = mockCryptoRandomUUID;
 
 // Mock database with proper typing
 const mockDb = {
-  select: jest.fn().mockReturnThis(),
-  from: jest.fn().mockReturnThis(),
-  where: jest.fn().mockReturnThis(),
-  limit: jest.fn().mockReturnThis(),
-  insert: jest.fn().mockReturnThis(),
-  values: jest.fn().mockReturnThis(),
-  returning: jest.fn().mockReturnThis(),
-  update: jest.fn().mockReturnThis(),
-  set: jest.fn().mockReturnThis(),
-  delete: jest.fn().mockReturnThis(),
-  execute: jest.fn(),
-  query: jest.fn(),
-  transaction: jest.fn()
+  select: vi.fn().mockReturnThis(),
+  from: vi.fn().mockReturnThis(),
+  where: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockReturnThis(),
+  insert: vi.fn().mockReturnThis(),
+  values: vi.fn().mockReturnThis(),
+  returning: vi.fn().mockReturnThis(),
+  update: vi.fn().mockReturnThis(),
+  set: vi.fn().mockReturnThis(),
+  delete: vi.fn().mockReturnThis(),
+  execute: vi.fn(),
+  query: vi.fn(),
+  transaction: vi.fn()
 } as any;
 
-jest.mock('../shared/database/connection', () => ({
+vi.mock('../shared/database/connection', () => ({
   database: mockDb
 }));
 
 // Mock services
-jest.mock('../../infrastructure/notifications/email-service.js', () => ({
+vi.mock('../../infrastructure/notifications/email-service.js', () => ({
   emailService: {
-    sendVerificationEmail: jest.fn(),
-    sendPasswordResetEmail: jest.fn(),
-    sendPasswordChangeNotification: jest.fn()
+    sendVerificationEmail: vi.fn(),
+    sendPasswordResetEmail: vi.fn(),
+    sendPasswordChangeNotification: vi.fn()
   }
 }));
 
-jest.mock('../../features/security/encryption-service.js', () => ({
+vi.mock('../../features/security/encryption-service.js', () => ({
   encryptionService: {
-    hashPassword: jest.fn()
+    hashPassword: vi.fn()
   }
 }));
 
-jest.mock('../validation/input-validation-service.js', () => ({
+vi.mock('../validation/input-validation-service.js', () => ({
   inputValidationService: {
-    validateRequest: jest.fn(),
-    validateEmail: jest.fn()
+    validateRequest: vi.fn(),
+    validateEmail: vi.fn()
   }
 }));
 
-jest.mock('../../features/security/security-audit-service.js', () => ({
+vi.mock('../../features/security/security-audit-service.js', () => ({
   securityAuditService: {
-    logAuthEvent: jest.fn()
+    logAuthEvent: vi.fn()
   }
 }));
 
@@ -82,7 +83,7 @@ describe('AuthService', () => {
   let mockRequest: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     authService = new AuthService();
     
     mockRequest = {
@@ -93,8 +94,8 @@ describe('AuthService', () => {
     // Setup default mocks
     mockCryptoRandomBytes.mockReturnValue(Buffer.from('mock-token'));
     mockCryptoCreateHash.mockReturnValue({
-      update: jest.fn().mockReturnThis(),
-      digest: jest.fn().mockReturnValue('mock-hash')
+      update: vi.fn().mockReturnThis(),
+      digest: vi.fn().mockReturnValue('mock-hash')
     });
     mockCryptoRandomUUID.mockReturnValue('mock-uuid');
   });
@@ -421,7 +422,7 @@ describe('AuthService', () => {
     });
 
     it('should fail refresh for expired token', async () => {
-      (jwt.verify as jest.Mock).mockReturnValue({ userId: 'user-id' });
+      (jwt.verify as vi.Mock).mockReturnValue({ userId: 'user-id' });
       
       const expiredSession = {
         ...mockSession,

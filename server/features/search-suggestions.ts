@@ -1,8 +1,8 @@
 import { eq, desc, and, sql, count, ilike, or, inArray } from "drizzle-orm";
 import { databaseService } from "../services/database-service";
 import { readDatabase } from '@shared/database/connection';
-import { cacheService } from 'server/infrastructure/cache';
-import { cacheKeys } from '../../../shared/core/src/caching/key-generator';
+import { cacheService } from '@server/infrastructure/cache';
+import { cacheKeys } from '@shared/core';
 import * as schema from "@shared/schema";
 import { logger } from '@shared/core';
 

@@ -1,27 +1,28 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { demoDataService } from '../../infrastructure/demo-data.js';
 import { DatabaseFallbackService } from '../../infrastructure/database/database-fallback.js';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Mock database connection with proper typing
 const mockDatabase = {
-  execute: jest.fn(),
-  query: jest.fn(),
-  transaction: jest.fn(),
+  execute: vi.fn(),
+  query: vi.fn(),
+  transaction: vi.fn(),
 } as any;
 
 // Mock pool connection with proper typing
 const mockPool = {
-  connect: jest.fn(),
-  query: jest.fn(),
-  end: jest.fn(),
+  connect: vi.fn(),
+  query: vi.fn(),
+  end: vi.fn(),
 } as any;
 
 // Mock the database connection module
-jest.mock('../../../shared/database/connection', () => ({
+vi.mock('../../../shared/database/connection', () => ({
   database: mockDatabase,
   pool: mockPool,
-  withTransaction: jest.fn(),
+  withTransaction: vi.fn(),
 }));
 
 describe('Database Fallback Integration Tests', () => {
@@ -39,7 +40,7 @@ describe('Database Fallback Integration Tests', () => {
     databaseFallbackService = new DatabaseFallbackService();
     
     // Clear all mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
@@ -140,7 +141,7 @@ describe('Database Fallback Integration Tests', () => {
 
   describe('Connection Retry Logic', () => {
     it('should retry connection on transient failures', async () => {
-      const testConnectionSpy = jest.spyOn(databaseFallbackService, 'testConnection')
+      const testConnectionSpy = vi.spyOn(databaseFallbackService, 'testConnection')
         .mockResolvedValueOnce(false) // First attempt fails
         .mockResolvedValueOnce(false) // Second attempt fails
         .mockResolvedValueOnce(true); // Third attempt succeeds
@@ -156,7 +157,7 @@ describe('Database Fallback Integration Tests', () => {
     });
 
     it('should enable demo mode after max retries exceeded', async () => {
-      const testConnectionSpy = jest.spyOn(databaseFallbackService, 'testConnection')
+      const testConnectionSpy = vi.spyOn(databaseFallbackService, 'testConnection')
         .mockResolvedValue(false); // Always fails
 
       const result = await databaseFallbackService.initializeWithRetry({
@@ -171,7 +172,7 @@ describe('Database Fallback Integration Tests', () => {
     });
 
     it('should use exponential backoff for retries', async () => {
-      const testConnectionSpy = jest.spyOn(databaseFallbackService, 'testConnection')
+      const testConnectionSpy = vi.spyOn(databaseFallbackService, 'testConnection')
         .mockResolvedValue(false);
 
       const startTime = Date.now();
@@ -239,7 +240,7 @@ describe('Database Fallback Integration Tests', () => {
   describe('Recovery Scenarios', () => {
     it('should recover when database comes back online', async () => {
       // Start with database failure
-      const testConnectionSpy = jest.spyOn(databaseFallbackService, 'testConnection')
+      const testConnectionSpy = vi.spyOn(databaseFallbackService, 'testConnection')
         .mockResolvedValueOnce(false) // Initial failure
         .mockResolvedValueOnce(true); // Recovery
 
@@ -254,7 +255,7 @@ describe('Database Fallback Integration Tests', () => {
     });
 
     it('should maintain demo mode after max retries', async () => {
-      const testConnectionSpy = jest.spyOn(databaseFallbackService, 'testConnection')
+      const testConnectionSpy = vi.spyOn(databaseFallbackService, 'testConnection')
         .mockResolvedValue(false); // Always fails
 
       await databaseFallbackService.initializeWithRetry({
@@ -304,7 +305,7 @@ describe('Database Fallback Integration Tests', () => {
     it('should detect demo data inconsistencies', async () => {
       // Mock inconsistent demo data
       const originalGetBills = demoDataService.getBills;
-      demoDataService.getBills = jest.fn().mockReturnValue([
+      demoDataService.getBills = vi.fn().mockReturnValue([
         { id: 1, sponsorId: 999 }, // Non-existent sponsor
       ]);
 

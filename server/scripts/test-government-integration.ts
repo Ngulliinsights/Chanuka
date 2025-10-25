@@ -4,7 +4,7 @@ import { GovernmentDataIntegrationService } from '../infrastructure/external-dat
 import { DataValidationService } from '../core/validation/data-validation-service.js';
 import { ManagedGovernmentDataIntegrationService } from '../services/managed-government-data-integration.js';
 import { ExternalAPIErrorHandler, FallbackStrategy } from '../services/external-api-error-handler.js';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // CLI tool for testing government data integration
 class GovernmentDataIntegrationCLI {

@@ -1,5 +1,5 @@
 import type { Stakeholder, InsertStakeholder } from '../../../shared/schema';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 /**
  * Represents a voting record for a stakeholder

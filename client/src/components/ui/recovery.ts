@@ -57,6 +57,14 @@ export class UIRecoveryManager {
   }
 
   /**
+   * Clear all registered strategies (for testing purposes)
+   */
+  clearStrategies(): void {
+    this.recoveryStrategies.clear();
+    this.recoveryHistory.clear();
+  }
+
+  /**
    * Attempt recovery for a given error
    */
   async attemptRecovery(context: RecoveryContext): Promise<RecoveryResult> {

@@ -1,0 +1,25 @@
+/* Tablet Styles (641px-1024px) */
+
+@import '../base/variables.css';
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .chanuka-grid-cols-3,
+  .chanuka-grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .chanuka-container {
+    padding: 0 var(--space-lg);
+  }
+
+  /* Tablet-specific navigation */
+  .chanuka-sidebar-collapsed {
+    width: 5rem;
+    min-width: 5rem;
+  }
+
+  .chanuka-sidebar-expanded {
+    width: 18rem;
+    min-width: 18rem;
+  }
+}

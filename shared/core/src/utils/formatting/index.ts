@@ -3,12 +3,12 @@
  * Centralized formatting functions for consistent data presentation
  */
 
-export * from '../../utils/formatting/file-size';
-export * from '../../utils/formatting/date-time';
-export * from '../../utils/formatting/currency';
-export * from '../../utils/formatting/status';
-export * from '../../utils/formatting/document';
-export * from '../../utils/formatting/location';
+export * from './file-size';
+export * from './date-time';
+export * from './currency';
+export * from './status';
+export * from './document';
+export * from './location';
 
 
 

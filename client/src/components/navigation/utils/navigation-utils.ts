@@ -56,19 +56,19 @@ export const getAccessibleNavigationItems = (
     return [];
   }
 
-  try {
-    return DEFAULT_NAVIGATION_MAP.filter(item => {
+  return DEFAULT_NAVIGATION_MAP.filter(item => {
+    try {
       if (item.adminOnly && userRole !== 'admin') return false;
       if (item.requiresAuth && !user) return false;
       if (item.allowedRoles && !item.allowedRoles.includes(userRole)) return false;
       if (item.condition && !item.condition(userRole, user)) return false;
       return true;
-    });
-  } catch (error) {
-    // If there's an error in condition evaluation, exclude the item
-    console.warn('Error evaluating navigation item condition:', error);
-    return [];
-  }
+    } catch (error) {
+      // If there's an error in condition evaluation for this item, exclude it
+      console.warn(`Error evaluating navigation item condition for ${item.id}:`, error);
+      return false;
+    }
+  });
 };
 
 /**

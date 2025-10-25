@@ -2,7 +2,7 @@ import { Request } from 'express';
 import { database as db } from '../../../shared/database/connection';
 import { securityAuditLog } from '../../../shared/schema';
 import { eq, and, gte, lte, desc, sql, count, inArray } from 'drizzle-orm';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 /**
  * SecurityAuditService - The System's Black Box Recorder

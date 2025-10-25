@@ -18,7 +18,7 @@ import {
   DeduplicationOptions
 } from '../ai-deduplication';
 import { getDefaultCache } from '../../cache';
-import { logger } from '../../observability/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 // Mock dependencies
 vi.mock('../../cache');

@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { pool, readDb, writeDb, db } from './pool.ts';
-import * as schema from '../schema';
+import * as schema from '../types';
 import type { PgTransaction } from 'drizzle-orm/pg-core';
 import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
 import type { ExtractTablesWithRelations } from 'drizzle-orm';
@@ -21,7 +21,7 @@ export const writeDatabase = writeDb;
 export { pool };
 
 // Export all schema tables and types for easy importing
-export * from '../schema';
+export * from '../types';
 
 // Enhanced operation type that's more explicit about its purpose
 export type DatabaseOperation = 'read' | 'write' | 'general';

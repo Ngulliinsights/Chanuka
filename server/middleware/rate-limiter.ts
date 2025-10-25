@@ -1,17 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../../shared/core/src/observability/logging';
-import {
-  createApiRateLimit,
-  createAuthRateLimit,
-  createSponsorRateLimit,
-  createSearchRateLimit,
-  createPasswordResetRateLimit,
-  createRegistrationRateLimit,
-  createMemoryStore
-} from '../../shared/core/src/rate-limiting';
+import { logger } from '@shared/core';
 
-// Create shared rate limit store
-const rateLimitStore = createMemoryStore();
+// Create shared rate limit store (using legacy implementation for now)
+const store: RateLimitStore = {};
 
 // Legacy interface for backward compatibility
 interface RateLimitStore {
@@ -21,7 +12,7 @@ interface RateLimitStore {
   };
 }
 
-const store: RateLimitStore = {};
+// const store: RateLimitStore = {};
 
 // Environment-based configuration
 const isTestEnvironment = process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined;
@@ -98,13 +89,30 @@ export const createRateLimit = (options: {
   };
 };
 
-// Predefined rate limiters using shared infrastructure
-export const apiRateLimit = createApiRateLimit(rateLimitStore);
-export const authRateLimit = createAuthRateLimit(rateLimitStore);
-export const sponsorRateLimit = createSponsorRateLimit(rateLimitStore);
-export const searchRateLimit = createSearchRateLimit(rateLimitStore);
-export const passwordResetRateLimit = createPasswordResetRateLimit(rateLimitStore);
-export const registrationRateLimit = createRegistrationRateLimit(rateLimitStore);
+// Predefined rate limiters using legacy implementation
+export const apiRateLimit = createRateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Production limit
+  devMax: 1000, // Development limit
+  testMax: 10000, // Very high limit for testing
+  message: 'Too many API requests from this IP'
+});
+
+export const authRateLimit = createRateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Production limit
+  devMax: 50, // Development limit
+  testMax: 1000, // High limit for testing
+  message: 'Too many authentication attempts'
+});
+
+export const searchRateLimit = createRateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 50, // Production limit for search
+  devMax: 500, // Development limit
+  testMax: 5000, // High limit for testing
+  message: 'Too many search requests from this IP'
+});
 
 // Legacy rate limiters for backward compatibility (deprecated)
 export const legacyApiRateLimit = createRateLimit({

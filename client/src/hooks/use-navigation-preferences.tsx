@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
-import { logger } from '..\utils\browser-logger';
-import { useNavigation } from '..\contexts\NavigationContext';
-import { NavigationPreferences } from '..\types\navigation';
+import { logger } from '../utils/browser-logger';
+import { useNavigation } from '../contexts/NavigationContext';
+import { NavigationPreferences } from '../types/navigation';
 
-const PREFERENCES_STORAGE_KEY = 'chanuka-navigation-preferences';
+const PREFERENCES_STORAGE_KEY = 'navigation-preferences';
 
 export function useNavigationPreferences() {
   const { preferences, updatePreferences } = useNavigation();
@@ -23,7 +23,7 @@ export function useNavigationPreferences() {
           }
         }
       } catch (error) {
-        logger.error('Failed to load navigation preferences:', { component: 'Chanuka' }, error);
+        logger.error('Failed to load navigation preferences:', { component: 'NavigationPreferences' }, error);
       } finally {
         // Mark loading as complete regardless of success or failure
         setIsLoading(false);
@@ -42,7 +42,7 @@ export function useNavigationPreferences() {
       try {
         localStorage.setItem(PREFERENCES_STORAGE_KEY, JSON.stringify(preferences));
       } catch (error) {
-        logger.error('Failed to save navigation preferences:', { component: 'Chanuka' }, error);
+        logger.error('Failed to save navigation preferences:', { component: 'NavigationPreferences' }, error);
       }
     }
   }, [preferences, isLoading]);
@@ -110,12 +110,14 @@ export function useNavigationPreferences() {
       favoritePages: [],
       recentlyVisited: [],
       compactMode: false,
-  };
+      showBreadcrumbs: true,
+      autoExpand: false,
+    };
   updatePreferences(defaultPreferences);
     try {
       localStorage.removeItem(PREFERENCES_STORAGE_KEY);
     } catch (error) {
-      logger.error('Failed to remove preferences from storage:', { component: 'Chanuka' }, error);
+      logger.error('Failed to remove preferences from storage:', { component: 'NavigationPreferences' }, error);
     }
   }, [updatePreferences]);
 
@@ -126,7 +128,7 @@ export function useNavigationPreferences() {
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'chanuka-navigation-preferences.json';
+    link.download = 'navigation-preferences.json';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -161,6 +163,7 @@ export function useNavigationPreferences() {
   return {
     preferences,
     isLoading,
+    updatePreferences,
     addToFavorites,
     removeFromFavorites,
     isFavorite,

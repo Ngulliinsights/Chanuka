@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { MemoryRateLimitStore } from '../stores/memory-store';
 
@@ -58,10 +59,11 @@ describe('MemoryRateLimitStore', () => {
 
       const options = { windowMs: 1000, max: 10, devMax: 5 };
 
+      // First request should be allowed
       const result = await store.check('test-key', options);
       expect(result.allowed).toBe(true);
 
-      // Should be limited to devMax
+      // Should be limited to devMax (5), so after 4 more requests (5 total), should be denied
       for (let i = 0; i < 4; i++) {
         await store.check('test-key', options);
       }

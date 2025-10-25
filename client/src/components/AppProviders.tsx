@@ -7,6 +7,7 @@ import { LoadingProvider } from '../contexts/LoadingContext';
 import { AuthProvider } from '../hooks/use-auth';
 import { AccessibilityProvider } from './accessibility/accessibility-manager';
 import { OfflineProvider } from './offline/offline-manager';
+import { ThemeProvider } from '../contexts/ThemeContext';
 
 // =============================================================================
 // PROVIDER CONFIGURATION
@@ -20,6 +21,10 @@ interface ProviderConfig {
 
 const PROVIDERS: ProviderConfig[] = [
   // Innermost to outermost order for reduceRight
+  {
+    name: 'ThemeProvider',
+    component: ThemeProvider,
+  },
   {
     name: 'ResponsiveNavigationProvider',
     component: ResponsiveNavigationProvider,
@@ -68,6 +73,7 @@ interface ProviderOverrides {
   AuthProvider?: React.ComponentType<{ children: React.ReactNode }>;
   AccessibilityProvider?: React.ComponentType<{ children: React.ReactNode }>;
   OfflineProvider?: React.ComponentType<{ children: React.ReactNode }>;
+  ThemeProvider?: React.ComponentType<{ children: React.ReactNode }>;
 }
 
 interface AppProvidersProps {

@@ -4,11 +4,25 @@
  * Tests for the circuit breaker and single-flight patterns implementation
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { SingleFlightCache } from '../single-flight-cache';
 import { MemoryAdapter } from '../adapters/memory-adapter';
-import type { CacheService } from '../types';
-import { logger } from '../../observability/logging';
+import type { CacheService } from '@shared/types';
+import { logger } from '@shared/core/src/observability/logging';
 
 describe('Circuit Breaker and Single Flight Cache', () => {
   let mockAdapter: CacheService;

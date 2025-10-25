@@ -1,24 +1,25 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { stakeholderAnalysisService, StakeholderAnalysisService } from '../stakeholder-analysis.service';
 import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../../shared/schema';
 import { MLAnalysisService } from '../../../analytics/services/ml.service'; // Adjust path
 
 // --- Mock Dependencies ---
-jest.mock('../../../../db', () => ({ readDatabase: jest.fn() }));
+vi.mock('../../../../db', () => ({ readDatabase: vi.fn() }));
 // Mock the ML service adapter or the service itself
-jest.mock('../../../analytics/services/ml.service', () => ({
+vi.mock('../../../analytics/services/ml.service', () => ({
   MLAnalysisService: {
-    analyzeStakeholderInfluence: jest.fn(),
-    analyzeBeneficiaries: jest.fn(),
+    analyzeStakeholderInfluence: vi.fn(),
+    analyzeBeneficiaries: vi.fn(),
   },
 }));
 
 
 const mockDb = {
-  select: jest.fn().mockReturnThis(),
-  from: jest.fn().mockReturnThis(),
-  where: jest.fn().mockReturnThis(),
-  limit: jest.fn().mockResolvedValue([]),
+  select: vi.fn().mockReturnThis(),
+  from: vi.fn().mockReturnThis(),
+  where: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockResolvedValue([]),
 };
 const mockBill = {
     id: 1,
@@ -41,14 +42,14 @@ describe('StakeholderAnalysisService', () => {
   let service: StakeholderAnalysisService;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (readDatabase as jest.Mock).mockReturnValue(mockDb);
+    vi.clearAllMocks();
+    (readDatabase as vi.Mock).mockReturnValue(mockDb);
     // Mock DB to return the bill
-     mockDb.limit.mockImplementationOnce(() => ({ limit: jest.fn().mockResolvedValue([mockBill]) }));
+     mockDb.limit.mockImplementationOnce(() => ({ limit: vi.fn().mockResolvedValue([mockBill]) }));
 
      // Setup ML mocks
-     (MLAnalysisService.analyzeBeneficiaries as jest.Mock).mockResolvedValue(mockBeneficiaryResponse);
-     (MLAnalysisService.analyzeStakeholderInfluence as jest.Mock).mockResolvedValue(mockStakeholderResponse);
+     (MLAnalysisService.analyzeBeneficiaries as vi.Mock).mockResolvedValue(mockBeneficiaryResponse);
+     (MLAnalysisService.analyzeStakeholderInfluence as vi.Mock).mockResolvedValue(mockStakeholderResponse);
 
 
     service = stakeholderAnalysisService; // Or new StakeholderAnalysisService()
@@ -70,7 +71,7 @@ describe('StakeholderAnalysisService', () => {
   it('should estimate population impact based on keywords', async () => {
      // Arrange - Modify mockBill content if needed for different demographics
      const billWithDifferentContent = { ...mockBill, content: "Support for rural communities and students." };
-      mockDb.limit.mockImplementationOnce(() => ({ limit: jest.fn().mockResolvedValue([billWithDifferentContent]) }));
+      mockDb.limit.mockImplementationOnce(() => ({ limit: vi.fn().mockResolvedValue([billWithDifferentContent]) }));
 
 
     const result = await service.analyzeBill(billWithDifferentContent.id);
@@ -94,7 +95,7 @@ describe('StakeholderAnalysisService', () => {
   it('should assess social impact based on keywords', async () => {
      // Arrange - Add content triggering social impact scores
      const billWithSocialContent = { ...mockBill, content: "This improves access for disadvantaged groups but increases pollution." };
-      mockDb.limit.mockImplementationOnce(() => ({ limit: jest.fn().mockResolvedValue([billWithSocialContent]) }));
+      mockDb.limit.mockImplementationOnce(() => ({ limit: vi.fn().mockResolvedValue([billWithSocialContent]) }));
 
 
     const result = await service.analyzeBill(billWithSocialContent.id);
@@ -107,8 +108,8 @@ describe('StakeholderAnalysisService', () => {
 
    it('should handle ML service failure gracefully', async () => {
       // Arrange: Make ML service throw an error
-      (MLAnalysisService.analyzeBeneficiaries as jest.Mock).mockRejectedValue(new Error("ML API timeout"));
-      (MLAnalysisService.analyzeStakeholderInfluence as jest.Mock).mockRejectedValue(new Error("ML API timeout"));
+      (MLAnalysisService.analyzeBeneficiaries as vi.Mock).mockRejectedValue(new Error("ML API timeout"));
+      (MLAnalysisService.analyzeStakeholderInfluence as vi.Mock).mockRejectedValue(new Error("ML API timeout"));
 
 
       // Act: Should still complete using fallback/defaults

@@ -2,9 +2,9 @@ import express, { Request, Response } from 'express';
 import { sql } from 'drizzle-orm';
 import { database as db } from '../../../shared/database/connection';
 import { HealthCheckResponse } from '../../types/api.ts';
-import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../../shared/core/src/utilities/api";
+import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../../shared/core/src/utils/api";
 import { errorTracker } from '../../core/errors/error-tracker.js';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 interface SchemaIssue {
   type: string;
   severity: 'critical' | 'warning';

@@ -1,15 +1,16 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Loading hooks tests
  * Following navigation component patterns for testing
  */
 
 import { renderHook, act } from '@testing-library/react';
-import { useLoading, useLoadingState, useProgressiveLoading } from '../hooks';
+import { useLoading, useLoadingState, useProgressiveLoading } from '@/hooks';
 import { LoadingError } from '../errors';
-import { createCommonStages } from '../utils/loading-utils';
+import { createCommonStages } from '@/utils/loading-utils';
 
 // Mock timers for testing
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 describe('Loading Hooks', () => {
   describe('useLoading', () => {
@@ -48,7 +49,7 @@ describe('Loading Hooks', () => {
     });
 
     it('should handle operation failures', () => {
-      const onError = jest.fn();
+      const onError = vi.fn();
       const { result } = renderHook(() => useLoading({ onError }));
       
       let operationId: string;
@@ -148,7 +149,7 @@ describe('Loading Hooks', () => {
       expect(result.current.isSuccess).toBe(true);
       
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
       
       expect(result.current.state).toBe('loading');
@@ -157,7 +158,7 @@ describe('Loading Hooks', () => {
     it('should wrap async functions with loading state', async () => {
       const { result } = renderHook(() => useLoadingState());
       
-      const asyncFn = jest.fn().mockResolvedValue('success');
+      const asyncFn = vi.fn().mockResolvedValue('success');
       
       await act(async () => {
         const returnValue = await result.current.withLoading(asyncFn);
@@ -171,7 +172,7 @@ describe('Loading Hooks', () => {
     it('should handle async function errors', async () => {
       const { result } = renderHook(() => useLoadingState());
       
-      const asyncFn = jest.fn().mockRejectedValue(new Error('Async error'));
+      const asyncFn = vi.fn().mockRejectedValue(new Error('Async error'));
       
       await act(async () => {
         try {
@@ -202,7 +203,7 @@ describe('Loading Hooks', () => {
     });
 
     it('should start and progress through stages', () => {
-      const onStageComplete = jest.fn();
+      const onStageComplete = vi.fn();
       const { result } = renderHook(() => 
         useProgressiveLoading({ 
           stages: testStages,
@@ -229,7 +230,7 @@ describe('Loading Hooks', () => {
     });
 
     it('should handle stage failures', () => {
-      const onStageError = jest.fn();
+      const onStageError = vi.fn();
       const { result } = renderHook(() => 
         useProgressiveLoading({ 
           stages: testStages,
@@ -271,7 +272,7 @@ describe('Loading Hooks', () => {
     });
 
     it('should complete when all stages are done', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
       const { result } = renderHook(() => 
         useProgressiveLoading({ 
           stages: testStages,
@@ -364,5 +365,5 @@ describe('Loading Hooks', () => {
 });
 
 afterEach(() => {
-  jest.clearAllTimers();
+  vi.clearAllTimers();
 });

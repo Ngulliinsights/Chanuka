@@ -1,8 +1,8 @@
 import { database as db } from '@shared/database/connection';
 import { user as users, userProfile as userProfiles, userInterest as userInterests, billEngagement, notification as notifications, billComment as billComments, bill as bills } from '../../../../shared/schema/schema';
 import { eq, and, desc, sql, count } from 'drizzle-orm';
-import { cacheService } from 'server/infrastructure/cache';
-import { cacheKeys } from '../../../../shared/core/src/caching/key-generator';
+import { cacheService } from '@server/infrastructure/cache';
+import { cacheKeys } from '@shared/core';
 import { databaseService } from '../../../infrastructure/database/database-service';
 import { z } from 'zod';
 import { logger } from '@shared/core';

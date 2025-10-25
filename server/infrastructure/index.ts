@@ -28,7 +28,7 @@ export {
   createObservabilityStack,
   createCacheService,
   createCorrelationManager
-} from '../../shared/core/src/observability';
+} from '@shared/core';
 
 export {
   database,

@@ -6,9 +6,9 @@
  */
 
 import { ZodSchema, ZodError } from 'zod';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { logger } from '../observability/logging';
-import { ValidationError } from '../observability/error-management';
+import { ValidationError } from './types';
 import {
   ValidationOptions,
   ValidationResult,
@@ -199,7 +199,7 @@ export class ValidationService {
     } catch (error) {
       if (error instanceof ZodError) {
         // Transform Zod errors into our custom ValidationError format
-        const validationError = new ValidationError('Validation failed', error.errors);
+        const validationError = new ValidationError(error);
         
         // Cache validation failures to avoid re-validating the same bad data
         if (mergedOptions.useCache && this.config.cache?.enabled) {
@@ -272,7 +272,7 @@ export class ValidationService {
     } catch (error) {
       if (error instanceof ZodError) {
         // Convert Zod errors to our ValidationError format
-        const validationError = new ValidationError('Validation failed', error.errors);
+        const validationError = new ValidationError(error);
         const errorResult: ValidationResult<T> = { 
           success: false, 
           error: validationError 
@@ -292,9 +292,9 @@ export class ValidationService {
       const validationError = new ValidationError(
         error instanceof Error ? error.message : 'Unknown validation error',
         [{
+          field: '',
           code: 'custom',
           message: error instanceof Error ? error.message : 'Unknown validation error',
-          path: [],
         }]
       );
       const errorResult: ValidationResult<T> = { 
@@ -352,11 +352,11 @@ export class ValidationService {
       } else {
         // Handle unexpected promise rejections gracefully
         const error = new ValidationError('Batch validation promise rejected', [{
+          field: '',
           code: 'custom',
           message: promiseResult.reason instanceof Error 
             ? promiseResult.reason.message 
             : 'Batch validation promise rejected',
-          path: [],
         }]);
         invalid.push({
           index: -1,

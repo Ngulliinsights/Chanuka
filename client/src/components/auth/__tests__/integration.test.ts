@@ -1,9 +1,10 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Auth component integration tests
  */
 
 import { renderHook, act } from '@testing-library/react';
-import { useAuthForm } from '../hooks/useAuthForm';
+import { useAuthForm } from '@/hooks/useAuthForm';
 import {
   validateLoginData,
   validateRegisterData,
@@ -24,31 +25,31 @@ import {
   checkPasswordStrength,
   validateFormBatch,
   sanitizeInput
-} from '../utils/auth-validation';
+} from '@/utils/auth-validation';
 import {
   createMockUseAuth,
   createMockLoginData,
   createMockRegisterData,
   createMockChangeEvent,
   createMockSubmitEvent
-} from '../utils/test-utils';
+} from '@/utils/test-utils';
 
 // Mock the useAuth hook
 const mockUseAuth = createMockUseAuth();
-jest.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/use-auth', () => ({
   useAuth: () => mockUseAuth
 }));
 
 describe('Auth Component Integration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Complete login flow', () => {
     it('should handle successful login with validation and recovery', async () => {
       mockUseAuth.login.mockResolvedValue({ success: true, data: { user: { id: 1 } } });
       
-      const onSuccess = jest.fn();
+      const onSuccess = vi.fn();
       const { result } = renderHook(() => useAuthForm({ onSuccess }));
       
       // Fill form with valid data
@@ -78,7 +79,7 @@ describe('Auth Component Integration', () => {
     it('should handle login failure with recovery strategy', async () => {
       mockUseAuth.login.mockResolvedValue({ success: false, error: 'Invalid credentials' });
       
-      const onError = jest.fn();
+      const onError = vi.fn();
       const { result } = renderHook(() => useAuthForm({ onError }));
       
       // Fill form
@@ -136,7 +137,7 @@ describe('Auth Component Integration', () => {
     it('should handle successful registration with comprehensive validation', async () => {
       mockUseAuth.register.mockResolvedValue({ success: true, data: { user: { id: 1 } } });
       
-      const onSuccess = jest.fn();
+      const onSuccess = vi.fn();
       const { result } = renderHook(() => useAuthForm({ 
         initialMode: 'register',
         onSuccess 
@@ -218,7 +219,7 @@ describe('Auth Component Integration', () => {
 
   describe('Mode switching integration', () => {
     it('should switch between login and register modes cleanly', () => {
-      const onModeChange = jest.fn();
+      const onModeChange = vi.fn();
       const { result } = renderHook(() => useAuthForm({ onModeChange }));
       
       // Start in login mode

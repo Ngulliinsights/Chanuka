@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * GlobalLoadingIndicator component tests
  * Following navigation component patterns for testing
@@ -58,21 +59,21 @@ const mockLoadingContext = {
       retryDelay: 3000,
     },
   },
-  cancelOperation: jest.fn(),
-  retryOperation: jest.fn(),
-  getOperationsByPriority: jest.fn((priority) => {
+  cancelOperation: vi.fn(),
+  retryOperation: vi.fn(),
+  getOperationsByPriority: vi.fn((priority) => {
     const ops = Object.values(mockLoadingContext.state.operations);
     return ops.filter(op => op.priority === priority);
   }),
-  shouldShowGlobalLoader: jest.fn(() => true),
+  shouldShowGlobalLoader: vi.fn(() => true),
 };
 
-jest.mock('@/contexts/LoadingContext', () => ({
+vi.mock('@/contexts/LoadingContext', () => ({
   useLoadingContext: () => mockLoadingContext,
 }));
 
 // Mock recovery hook
-jest.mock('../hooks/useLoadingRecovery', () => ({
+vi.mock('../hooks/useLoadingRecovery', () => ({
   useLoadingRecovery: () => ({
     recoveryState: {
       canRecover: true,
@@ -81,33 +82,35 @@ jest.mock('../hooks/useLoadingRecovery', () => ({
       recoveryAttempts: 0,
       maxRecoveryAttempts: 3,
     },
-    recover: jest.fn().mockResolvedValue(true),
-    updateError: jest.fn(),
+    recover: vi.fn().mockResolvedValue(true),
+    updateError: vi.fn(),
   }),
 }));
 
 // Mock portal
-jest.mock('react-dom', () => ({
-  ...jest.requireActual('react-dom'),
+vi.mock('react-dom', () => ({
+  ...vi.requireActual('react-dom'),
   createPortal: (element: React.ReactNode) => element,
 }));
 
 // Mock logger
-jest.mock('../utils/logger.js', () => ({
+vi.mock('../utils/logger.js', () => ({
   logger: {
-    error: jest.fn(),
-    warn: jest.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
   },
 }));
 
 describe('GlobalLoadingIndicator', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    cleanup();
+    vi.useRealTimers();
+  
   });
 
   describe('GlobalLoadingIndicator Component', () => {
@@ -257,7 +260,7 @@ describe('GlobalLoadingIndicator', () => {
       render(<GlobalLoadingIndicator autoHide autoHideDelay={1000} />);
       
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
       
       await waitFor(() => {

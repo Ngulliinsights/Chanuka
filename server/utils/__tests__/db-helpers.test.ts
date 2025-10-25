@@ -1,17 +1,32 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { buildTimeThreshold, normalizeRowNumbers, groupByTime } from '../db-helpers';
-import { logger } from '../logger';
+import { logger } from '@shared/core/src/observability/logging';
 
 describe('Database Helpers', () => {
   describe('buildTimeThreshold', () => {
     const originalDate = new Date('2024-01-15T12:00:00Z'); // Monday
 
     beforeEach(() => {
-      jest.useFakeTimers();
-      jest.setSystemTime(originalDate);
+      vi.useFakeTimers();
+      vi.setSystemTime(originalDate);
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     describe('day formats (Xd)', () => {
@@ -73,14 +88,14 @@ describe('Database Helpers', () => {
 
     describe('edge cases', () => {
       test('handles month boundaries correctly', () => {
-        jest.setSystemTime(new Date('2024-03-31T12:00:00Z')); // End of March
+        vi.setSystemTime(new Date('2024-03-31T12:00:00Z')); // End of March
         const result = buildTimeThreshold('1d');
         const expected = new Date('2024-03-30T00:00:00Z');
         expect(result).toEqual(expected);
       });
 
       test('handles leap year correctly', () => {
-        jest.setSystemTime(new Date('2024-02-29T12:00:00Z')); // Leap day
+        vi.setSystemTime(new Date('2024-02-29T12:00:00Z')); // Leap day
         const result = buildTimeThreshold('1d');
         const expected = new Date('2024-02-28T00:00:00Z');
         expect(result).toEqual(expected);
@@ -138,7 +153,7 @@ describe('Database Helpers', () => {
     });
 
     test('handles invalid number strings gracefully', () => {
-      const loggerWarnSpy = jest.spyOn(logger, 'warn').mockImplementation();
+      const loggerWarnSpy = vi.spyOn(logger, 'warn').mockImplementation();
       const input = [
         { id: 1, row_number: 'invalid', name: 'test' }
       ];
@@ -185,7 +200,7 @@ describe('Database Helpers', () => {
     });
 
     test('handles invalid timestamps gracefully', () => {
-      const loggerWarnSpy = jest.spyOn(logger, 'warn').mockImplementation();
+      const loggerWarnSpy = vi.spyOn(logger, 'warn').mockImplementation();
       const invalidData = [
         { id: 1, createdAt: 'invalid', value: 10 }
       ];

@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Dashboard validation tests
  * Following navigation component validation testing patterns

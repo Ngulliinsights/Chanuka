@@ -1,15 +1,23 @@
-import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '..\ui\dialog';
-import { Button } from '..\ui\button';
-import { Switch } from '..\ui\switch';
-import { Label } from '..\ui\label';
-import { useNavigationPreferences } from '..\..\hooks\use-navigation-preferences';
+import React from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
+import { Switch } from "../ui/switch";
+import { Label } from "../ui/label";
+import { useNavigationPreferences } from "../../hooks/use-navigation-preferences";
 
 interface NavigationPreferencesDialogProps {
   trigger: React.ReactNode;
 }
 
-export const NavigationPreferencesDialog: React.FC<NavigationPreferencesDialogProps> = ({ trigger }) => {
+export const NavigationPreferencesDialog: React.FC<
+  NavigationPreferencesDialogProps
+> = ({ trigger }) => {
   const [open, setOpen] = React.useState(false);
   const { preferences, updatePreferences } = useNavigationPreferences();
 
@@ -19,9 +27,7 @@ export const NavigationPreferencesDialog: React.FC<NavigationPreferencesDialogPr
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {trigger}
-      </DialogTrigger>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Navigation Preferences</DialogTitle>
@@ -31,7 +37,9 @@ export const NavigationPreferencesDialog: React.FC<NavigationPreferencesDialogPr
             <Switch
               id="show-breadcrumbs"
               checked={preferences.showBreadcrumbs}
-              onCheckedChange={(checked) => handlePreferenceChange('showBreadcrumbs', checked)}
+              onCheckedChange={(checked: boolean) =>
+                handlePreferenceChange("showBreadcrumbs", checked)
+              }
             />
             <Label htmlFor="show-breadcrumbs">Show breadcrumbs</Label>
           </div>
@@ -39,7 +47,9 @@ export const NavigationPreferencesDialog: React.FC<NavigationPreferencesDialogPr
             <Switch
               id="compact-mode"
               checked={preferences.compactMode}
-              onCheckedChange={(checked) => handlePreferenceChange('compactMode', checked)}
+              onCheckedChange={(checked: boolean) =>
+                handlePreferenceChange("compactMode", checked)
+              }
             />
             <Label htmlFor="compact-mode">Compact mode</Label>
           </div>
@@ -47,7 +57,9 @@ export const NavigationPreferencesDialog: React.FC<NavigationPreferencesDialogPr
             <Switch
               id="auto-expand"
               checked={preferences.autoExpand}
-              onCheckedChange={(checked) => handlePreferenceChange('autoExpand', checked)}
+              onCheckedChange={(checked: boolean) =>
+                handlePreferenceChange("autoExpand", checked)
+              }
             />
             <Label htmlFor="auto-expand">Auto-expand sections</Label>
           </div>

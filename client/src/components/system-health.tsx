@@ -1,7 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui\card';
-import { Button } from './ui\button';
-import { Badge } from './ui\badge';
-import { Separator } from './ui\separator';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { Separator } from './ui/separator';
 import { 
   RefreshCw, 
   Download, 
@@ -13,8 +13,8 @@ import {
   HardDrive,
   Settings
 } from "lucide-react";
-import { cn, formatRelativeTime } from '..\lib\utils';
-import { logger } from '..\utils\browser-logger';
+import { cn, formatRelativeTime } from '../lib/utils';
+import { logger } from '../utils/browser-logger';
 
 interface SystemHealthProps {
   health?: any;
@@ -63,26 +63,26 @@ export default function SystemHealth({ health, stats, environment, activity }: S
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'success':
-        return 'text-green-600';
+        return 'text-success';
       case 'warning':
-        return 'text-yellow-600';
+        return 'text-warning';
       case 'error':
-        return 'text-red-600';
+        return 'text-destructive';
       default:
-        return 'text-gray-600';
+        return 'text-muted-foreground';
     }
   };
 
   const getStatusDot = (status: string) => {
     switch (status) {
       case 'success':
-        return 'bg-green-500';
+        return 'bg-success';
       case 'warning':
-        return 'bg-yellow-500';
+        return 'bg-warning';
       case 'error':
-        return 'bg-red-500';
+        return 'bg-destructive';
       default:
-        return 'bg-gray-500';
+        return 'bg-muted';
     }
   };
 
@@ -164,10 +164,10 @@ export default function SystemHealth({ health, stats, environment, activity }: S
 
             {activity?.recentBills?.slice(0, 2).map((bill: any, index: number) => (
               <div key={index} className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2" />
+                <div className="w-2 h-2 bg-success rounded-full mt-2" />
                 <div>
-                  <p className="text-sm text-gray-900">New bill: {bill.title}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-sm text-foreground">New bill: {bill.title}</p>
+                  <p className="text-xs text-muted-foreground">
                     {bill.createdAt ? formatRelativeTime(bill.createdAt) : '5 minutes ago'}
                   </p>
                 </div>
@@ -175,10 +175,10 @@ export default function SystemHealth({ health, stats, environment, activity }: S
             ))}
 
             <div className="flex items-start space-x-3">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
+              <div className="w-2 h-2 bg-info rounded-full mt-2" />
               <div>
-                <p className="text-sm text-gray-900">Database connection established</p>
-                <p className="text-xs text-gray-500">10 minutes ago</p>
+                <p className="text-sm text-foreground">Database connection established</p>
+                <p className="text-xs text-muted-foreground">10 minutes ago</p>
               </div>
             </div>
           </div>
@@ -197,9 +197,9 @@ export default function SystemHealth({ health, stats, environment, activity }: S
               <div className="flex items-center space-x-2">
                 <div className={cn(
                   "w-2 h-2 rounded-full",
-                  value === 'Set' || (typeof value === 'string' && value !== 'Not set') 
-                    ? 'bg-green-500' 
-                    : 'bg-red-500'
+                  value === 'Set' || (typeof value === 'string' && value !== 'Not set')
+                    ? 'bg-success'
+                    : 'bg-destructive'
                 )} />
                 <span className="text-xs font-medium text-gray-900">
                   {typeof value === 'string' && value !== 'Set' ? value : 

@@ -1,7 +1,7 @@
 import { Result, ok, err } from '../../primitives/types/result';
-import { RateLimitData, IRateLimitStore } from '../types';
+import { RateLimitData, IRateLimitStore, RateLimitStore, RateLimitOptions, RateLimitResult } from '../types';
 
-export class MemoryRateLimitStore implements IRateLimitStore {
+export class MemoryRateLimitStore implements IRateLimitStore, RateLimitStore {
   private data = new Map<string, RateLimitData>();
   private locks = new Map<string, Promise<void>>();
   private cleanupInterval: NodeJS.Timeout | null = null;
@@ -111,7 +111,67 @@ export class MemoryRateLimitStore implements IRateLimitStore {
     }, this.cleanupIntervalMs);
   }
 
-  private async cleanup(): Promise<void> {
+  // RateLimitStore interface methods
+  async check(key: string, options: RateLimitOptions): Promise<RateLimitResult> {
+    const now = Date.now();
+    let data = this.data.get(key);
+
+    // Determine the effective max based on environment
+    const effectiveMax = this.getEffectiveMax(options);
+
+    if (!data || now >= data.resetTime) {
+      // Reset window
+      data = {
+        tokens: effectiveMax - 1,
+        lastRefill: now,
+        resetTime: now + options.windowMs
+      };
+      this.data.set(key, data);
+
+      return {
+        allowed: true,
+        remaining: data.tokens,
+        resetAt: new Date(data.resetTime)
+      };
+    }
+
+    if (data.tokens > 0) {
+      data.tokens--;
+      this.data.set(key, data);
+
+      return {
+        allowed: true,
+        remaining: data.tokens,
+        resetAt: new Date(data.resetTime)
+      };
+    }
+
+    return {
+      allowed: false,
+      remaining: 0,
+      resetAt: new Date(data.resetTime),
+      retryAfter: Math.ceil((data.resetTime - now) / 1000)
+    };
+  }
+
+  private getEffectiveMax(options: RateLimitOptions): number {
+    const isTestEnvironment = process.env.NODE_ENV === 'test' || process.env.JEST_WORKER_ID !== undefined;
+    const isDevelopment = process.env.NODE_ENV === 'development';
+
+    if (isTestEnvironment && options.testMax) {
+      return options.testMax;
+    } else if (isDevelopment && options.devMax) {
+      return options.devMax;
+    }
+
+    return options.max;
+  }
+
+  async reset(key: string): Promise<void> {
+    this.data.delete(key);
+  }
+
+  async cleanup(): Promise<void> {
     const now = Date.now();
     const keysToDelete: string[] = [];
 
@@ -122,6 +182,11 @@ export class MemoryRateLimitStore implements IRateLimitStore {
     }
 
     keysToDelete.forEach(key => this.data.delete(key));
+  }
+
+  // Health check method
+  healthCheck(): Promise<boolean> {
+    return Promise.resolve(true);
   }
 
   destroy(): void {

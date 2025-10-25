@@ -1,8 +1,22 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import PageErrorBoundary from '../PageErrorBoundary';
 import { ErrorFallback } from '../ErrorFallback';
-import { logger } from '..\..\..\utils\browser-logger';
+import { logger } from '../../../utils/browser-logger';
 
 // Mock component that throws an error
 const ThrowError = ({ shouldThrow = false }: { shouldThrow?: boolean }) => {
@@ -35,8 +49,10 @@ describe('PageErrorBoundary', () => {
   });
 
   afterEach(() => {
+    cleanup();
     console.error = originalConsoleError;
     console.log = originalConsoleLog;
+  
   });
 
   it('renders children when there is no error', () => {

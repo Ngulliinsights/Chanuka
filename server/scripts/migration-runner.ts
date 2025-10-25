@@ -5,7 +5,7 @@ import pkg from 'pg';
 const { Pool } = pkg;
 import { MigrationService } from '../infrastructure/database/migration-service.js';
 import * as path from 'path';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Load environment variables
 dotenv.config();

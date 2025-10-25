@@ -1,14 +1,29 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { Pool } from 'pg';
 import { MigrationService } from '../infrastructure/database/migration-service.ts';
 import { DataValidationService } from '../core/validation/data-validation-service.ts';
 import * as fs from 'fs';
 import * as path from 'path';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Mock pool for testing
 const mockPool = {
-  query: jest.fn(),
-  end: jest.fn()
+  query: vi.fn(),
+  end: vi.fn()
 } as unknown as Pool;
 
 describe('MigrationService', () => {
@@ -16,7 +31,7 @@ describe('MigrationService', () => {
   let testMigrationsDir: string;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     testMigrationsDir = path.join(__dirname, 'test-migrations');
     migrationService = new MigrationService(mockPool, testMigrationsDir);
     
@@ -35,7 +50,7 @@ describe('MigrationService', () => {
 
   describe('initializeMigrationTable', () => {
     it('should create migration tracking table', async () => {
-      (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
+      (mockPool.query as vi.Mock).mockResolvedValue({ rows: [] });
 
       await migrationService.initializeMigrationTable();
 
@@ -101,7 +116,7 @@ DROP TABLE IF EXISTS test_table;
     });
 
     it('should execute migration successfully', async () => {
-      (mockPool.query as jest.Mock)
+      (mockPool.query as vi.Mock)
         .mockResolvedValueOnce({ rows: [] }) // Check if applied
         .mockResolvedValueOnce(undefined) // BEGIN
         .mockResolvedValueOnce(undefined) // Migration SQL
@@ -118,7 +133,7 @@ DROP TABLE IF EXISTS test_table;
     });
 
     it('should skip already applied migration', async () => {
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [{ id: 1 }] });
+      (mockPool.query as vi.Mock).mockResolvedValueOnce({ rows: [{ id: 1 }] });
 
       const result = await migrationService.executeMigration('0001_test.sql');
 
@@ -127,7 +142,7 @@ DROP TABLE IF EXISTS test_table;
     });
 
     it('should rollback on migration failure', async () => {
-      (mockPool.query as jest.Mock)
+      (mockPool.query as vi.Mock)
         .mockResolvedValueOnce({ rows: [] }) // Check if applied
         .mockResolvedValueOnce(undefined) // BEGIN
         .mockRejectedValueOnce(new Error('Migration failed')) // Migration SQL fails
@@ -149,7 +164,7 @@ DROP TABLE IF EXISTS test_table;
         rollback_sql: 'DROP TABLE IF EXISTS test_table;'
       };
 
-      (mockPool.query as jest.Mock)
+      (mockPool.query as vi.Mock)
         .mockResolvedValueOnce({ rows: [migrationRecord] }) // Get migration record
         .mockResolvedValueOnce(undefined) // BEGIN
         .mockResolvedValueOnce(undefined) // Rollback SQL
@@ -165,7 +180,7 @@ DROP TABLE IF EXISTS test_table;
     });
 
     it('should fail if migration not found', async () => {
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
+      (mockPool.query as vi.Mock).mockResolvedValueOnce({ rows: [] });
 
       const result = await migrationService.rollbackMigration('0001_test.sql');
 
@@ -180,7 +195,7 @@ DROP TABLE IF EXISTS test_table;
         rollback_sql: null
       };
 
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [migrationRecord] });
+      (mockPool.query as vi.Mock).mockResolvedValueOnce({ rows: [migrationRecord] });
 
       const result = await migrationService.rollbackMigration('0001_test.sql');
 
@@ -194,7 +209,7 @@ describe('DataValidationService', () => {
   let validationService: DataValidationService;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     validationService = new DataValidationService(mockPool);
   });
 
@@ -207,7 +222,7 @@ describe('DataValidationService', () => {
         severity: 'error' as const
       };
 
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
+      (mockPool.query as vi.Mock).mockResolvedValueOnce({ rows: [] });
 
       const result = await validationService.runValidationRule(rule);
 
@@ -224,7 +239,7 @@ describe('DataValidationService', () => {
         severity: 'error' as const
       };
 
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ 
+      (mockPool.query as vi.Mock).mockResolvedValueOnce({ 
         rows: [{ id: 1 }, { id: 2 }] 
       });
 
@@ -243,7 +258,7 @@ describe('DataValidationService', () => {
         severity: 'error' as const
       };
 
-      (mockPool.query as jest.Mock).mockRejectedValueOnce(new Error('SQL error'));
+      (mockPool.query as vi.Mock).mockRejectedValueOnce(new Error('SQL error'));
 
       const result = await validationService.runValidationRule(rule);
 
@@ -255,7 +270,7 @@ describe('DataValidationService', () => {
   describe('runAllValidations', () => {
     it('should run all validation rules', async () => {
       // Mock all validation queries to return empty results
-      (mockPool.query as jest.Mock).mockResolvedValue({ rows: [] });
+      (mockPool.query as vi.Mock).mockResolvedValue({ rows: [] });
 
       const summary = await validationService.runAllValidations();
 
@@ -269,14 +284,14 @@ describe('DataValidationService', () => {
   describe('autoFixIssues', () => {
     it('should perform dry run without making changes', async () => {
       // Mock count queries for dry run
-      (mockPool.query as jest.Mock).mockResolvedValue({ rows: [{ count: '5' }] });
+      (mockPool.query as vi.Mock).mockResolvedValue({ rows: [{ count: '5' }] });
 
       const result = await validationService.autoFixIssues(true);
 
       expect(result.fixed).toBeGreaterThan(0);
       expect(result.errors).toHaveLength(0);
       // Verify no DELETE queries were executed
-      const deleteQueries = (mockPool.query as jest.Mock).mock.calls
+      const deleteQueries = (mockPool.query as vi.Mock).mock.calls
         .filter(call => call[0].includes('DELETE'));
       expect(deleteQueries).toHaveLength(0);
     });

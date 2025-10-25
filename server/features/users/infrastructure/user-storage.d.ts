@@ -4,7 +4,7 @@ import { UserProfile } from '../../../shared/types/auth.js';
 import { BaseStorage } from './base/BaseStorage.js';
 import { type OAuthProvider, type SocialProfile } from '../../../shared/types/auth.js';
 import type { StorageOptions } from './StorageTypes.js';
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 export interface CreateUserData {
     username: string;
     email: string;

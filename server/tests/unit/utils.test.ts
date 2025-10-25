@@ -1,57 +1,58 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 
 // Mock the utils modules
 const mockValidation = {
-  validateEmail: jest.fn() as jest.MockedFunction<() => { isValid: boolean; sanitized: string } | { isValid: boolean; error: string }>,
-  validatePassword: jest.fn() as jest.MockedFunction<() => { isValid: boolean; strength: string; score: number; errors?: string[] }>,
-  sanitizeInput: jest.fn() as jest.MockedFunction<() => string>,
-  validateBillNumber: jest.fn() as jest.MockedFunction<() => { isValid: boolean; normalized: string } | { isValid: boolean; error: string }>
+  validateEmail: vi.fn() as vi.MockedFunction<() => { isValid: boolean; sanitized: string } | { isValid: boolean; error: string }>,
+  validatePassword: vi.fn() as vi.MockedFunction<() => { isValid: boolean; strength: string; score: number; errors?: string[] }>,
+  sanitizeInput: vi.fn() as vi.MockedFunction<() => string>,
+  validateBillNumber: vi.fn() as vi.MockedFunction<() => { isValid: boolean; normalized: string } | { isValid: boolean; error: string }>
 };
 
 const mockCrypto = {
-  generateSecureToken: jest.fn() as jest.MockedFunction<(length: number) => string>,
-  hashPassword: jest.fn() as jest.MockedFunction<(password: string) => Promise<string>>,
-  verifyPassword: jest.fn() as jest.MockedFunction<(password: string, hash: string) => Promise<boolean>>,
-  encrypt: jest.fn() as jest.MockedFunction<(data: string) => string>,
-  decrypt: jest.fn() as jest.MockedFunction<(data: string) => string>
+  generateSecureToken: vi.fn() as vi.MockedFunction<(length: number) => string>,
+  hashPassword: vi.fn() as vi.MockedFunction<(password: string) => Promise<string>>,
+  verifyPassword: vi.fn() as vi.MockedFunction<(password: string, hash: string) => Promise<boolean>>,
+  encrypt: vi.fn() as vi.MockedFunction<(data: string) => string>,
+  decrypt: vi.fn() as vi.MockedFunction<(data: string) => string>
 };
 
 const mockLogger = {
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-  debug: jest.fn()
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  debug: vi.fn()
 };
 
 const mockMetrics = {
-  incrementCounter: jest.fn(),
-  recordTiming: jest.fn(),
-  recordGauge: jest.fn()
+  incrementCounter: vi.fn(),
+  recordTiming: vi.fn(),
+  recordGauge: vi.fn()
 };
 
 const mockApiResponse = {
-  success: jest.fn(),
-  error: jest.fn(),
-  paginated: jest.fn()
+  success: vi.fn(),
+  error: vi.fn(),
+  paginated: vi.fn()
 } as any;
 
 // Mock the modules
-jest.mock('../../utils/validation', () => mockValidation);
-jest.mock('../../utils/crypto', () => mockCrypto);
-jest.mock('../../utils/logger', () => mockLogger);
-jest.mock('../../utils/metrics', () => mockMetrics);
-jest.mock('../../utils/api-response', () => mockApiResponse);
+vi.mock('../../utils/validation', () => mockValidation);
+vi.mock('../../utils/crypto', () => mockCrypto);
+vi.mock('../../utils/logger', () => mockLogger);
+vi.mock('../../utils/metrics', () => mockMetrics);
+vi.mock('../../utils/api-response', () => mockApiResponse);
 
 // Import the mocked modules for type safety
-import * as validation from '../../utils/validation';
-import * as crypto from '../../utils/crypto';
-import * as logger from '../../utils/logger';
-import * as metrics from '../../utils/metrics';
-import * as apiResponse from '../../utils/api-response';
+import * as validation from '@/$2/validation';
+import * as crypto from '@/$2/crypto';
+import * as logger from '@shared/core/src/observability/logging';
+import * as metrics from '@/$2/metrics';
+import * as apiResponse from '@/$2/api-response';
 
 describe('Validation Utils', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('validateEmail', () => {
@@ -225,7 +226,7 @@ describe('Validation Utils', () => {
 
 describe('Crypto Utils', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('generateSecureToken', () => {
@@ -319,7 +320,7 @@ describe('Crypto Utils', () => {
 
 describe('Logger Utils', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('logging levels', () => {
@@ -367,7 +368,7 @@ describe('Logger Utils', () => {
 
 describe('Metrics Utils', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('counter metrics', () => {
@@ -417,7 +418,7 @@ describe('Metrics Utils', () => {
 
 describe('API Response Utils', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('success responses', () => {

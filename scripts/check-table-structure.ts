@@ -2,7 +2,7 @@ import { config } from 'dotenv';
 config();
 
 import { executeQuery } from './shared/database/pool.js';
-import { logger } from '../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 async function checkTableStructure() {
   try {

@@ -1,8 +1,8 @@
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '@/$2/browser-logger';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
-import { AssetLoadingIndicator, AssetLoadingProvider } from '..\..\components\loading\AssetLoadingIndicator';
-import { assetLoadingManager } from '..\..\utils\asset-loading';
+import { AssetLoadingIndicator, AssetLoadingProvider } from '@/$2/loading/AssetLoadingIndicator';
+import { assetLoadingManager } from '@/$2/asset-loading';
 
 // Mock the asset loading manager
 const mockAssetLoadingManager = {
@@ -55,7 +55,9 @@ describe('Asset Loading Integration', () => {
   });
 
   afterEach(() => {
+    cleanup();
     vi.restoreAllMocks();
+  
   });
 
   it('should render asset loading indicator with progress', async () => {

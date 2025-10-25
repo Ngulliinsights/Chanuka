@@ -1,6 +1,20 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import PageErrorBoundary from '../PageErrorBoundary';
 import { 
   ChunkErrorFallback, 
@@ -9,7 +23,7 @@ import {
   ApiErrorFallback 
 } from '../ErrorFallback';
 import { withErrorBoundary, CriticalSection } from '../withErrorBoundary';
-import { logger } from '..\..\..\utils\browser-logger';
+import { logger } from '../../../utils/browser-logger';
 
 // Mock components for testing
 const ThrowingComponent: React.FC<{ 
@@ -59,9 +73,11 @@ describe('Enhanced PageErrorBoundary', () => {
   });
 
   afterEach(() => {
+    cleanup();
     console.error = originalConsoleError;
     console.log = originalConsoleLog;
     console.warn = originalConsoleWarn;
+  
   });
 
   describe('Error Classification', () => {

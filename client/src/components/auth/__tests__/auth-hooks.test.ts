@@ -12,10 +12,10 @@ import {
   TestSuiteHelper
 } from './test-helpers';
 
-import { useAuthForm } from '../hooks/useAuthForm';
-import { usePasswordStrength, usePasswordVisibility, usePasswordValidation } from '../hooks/usePasswordUtils';
+import { useAuthForm } from '@/hooks/useAuthForm';
+import { usePasswordStrength, usePasswordVisibility, usePasswordValidation } from '@/hooks/usePasswordUtils';
 import { AuthError, AuthValidationError } from '../errors';
-import { AuthMode } from '../types';
+import { AuthMode } from '@shared/types';
 
 // Mock the auth hook
 const mockLogin = vi.fn();

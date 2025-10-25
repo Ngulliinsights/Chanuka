@@ -6,7 +6,7 @@
 
 import { z } from 'zod';
 import { ValidationService } from './validation-service';
-import { ValidationResult, ValidationError } from './types';
+import { ValidationResult, ValidationError, LegacyValidationResult } from './types';
 import { logger } from '../observability/logging';
 
 /**
@@ -22,23 +22,23 @@ export class LegacyValidatorsAdapter {
   /**
    * Validates property ID using core validation system
    */
-  validatePropertyId(id: string): ValidationResult<number> {
+  async validatePropertyId(id: string): Promise<LegacyValidationResult<number>> {
     const schema = z.string().transform((val) => {
       const parsed = parseInt(val.trim());
       if (isNaN(parsed) || parsed <= 0) {
         throw new Error('Property ID must be a positive number');
       }
       return parsed;
-    });
+    }) as z.ZodType<number, z.ZodTypeDef, string>;
 
     try {
-      const result = this.validationService.validateSafe(schema, id);
+      const result = await this.validationService.validateSafe(schema, id);
       if (result.success) {
         return { valid: true, data: result.data };
       } else {
         return { 
           valid: false, 
-          error: result.error.issues[0]?.message || 'Property ID validation failed' 
+          error: result.error?.errors[0]?.message || 'Property ID validation failed' 
         };
       }
     } catch (error) {
@@ -52,23 +52,23 @@ export class LegacyValidatorsAdapter {
   /**
    * Validates user ID using core validation system
    */
-  validateUserId(userId: unknown): ValidationResult<number> {
+  async validateUserId(userId: unknown): Promise<LegacyValidationResult<number>> {
     const schema = z.union([z.string(), z.number()]).transform((val) => {
       const parsed = typeof val === 'string' ? parseInt(val) : val;
       if (isNaN(parsed) || parsed <= 0) {
         throw new Error('User ID must be a positive number');
       }
       return parsed;
-    });
+    }) as z.ZodType<number, z.ZodTypeDef, string | number>;
 
     try {
-      const result = this.validationService.validateSafe(schema, userId);
+      const result = await this.validationService.validateSafe(schema, userId);
       if (result.success) {
         return { valid: true, data: result.data };
       } else {
         return { 
           valid: false, 
-          error: result.error.issues[0]?.message || 'User ID validation failed' 
+          error: result.error?.errors[0]?.message || 'User ID validation failed' 
         };
       }
     } catch (error) {
@@ -82,17 +82,17 @@ export class LegacyValidatorsAdapter {
   /**
    * Validates email using core validation system
    */
-  validateEmail(email: string): ValidationResult<string> {
+  async validateEmail(email: string): Promise<LegacyValidationResult<string>> {
     const schema = z.string().email('Invalid email format').min(1, 'Email is required');
 
     try {
-      const result = this.validationService.validateSafe(schema, email);
+      const result = await this.validationService.validateSafe(schema, email);
       if (result.success) {
         return { valid: true, data: result.data };
       } else {
         return { 
           valid: false, 
-          error: result.error.issues[0]?.message || 'Email validation failed' 
+          error: result.error?.errors[0]?.message || 'Email validation failed' 
         };
       }
     } catch (error) {
@@ -106,7 +106,7 @@ export class LegacyValidatorsAdapter {
   /**
    * Validates password using core validation system
    */
-  validatePassword(password: string): ValidationResult<string> {
+  async validatePassword(password: string): Promise<LegacyValidationResult<string>> {
     const schema = z.string()
       .min(8, 'Password must be at least 8 characters long')
       .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
@@ -115,13 +115,13 @@ export class LegacyValidatorsAdapter {
       .regex(/[^A-Za-z0-9]/, 'Password must contain at least one special character');
 
     try {
-      const result = this.validationService.validateSafe(schema, password);
+      const result = await this.validationService.validateSafe(schema, password);
       if (result.success) {
         return { valid: true, data: result.data };
       } else {
         return { 
           valid: false, 
-          error: result.error.issues[0]?.message || 'Password validation failed' 
+          error: result.error?.errors[0]?.message || 'Password validation failed' 
         };
       }
     } catch (error) {
@@ -135,20 +135,20 @@ export class LegacyValidatorsAdapter {
   /**
    * Validates username using core validation system
    */
-  validateUsername(username: string): ValidationResult<string> {
+  async validateUsername(username: string): Promise<LegacyValidationResult<string>> {
     const schema = z.string()
       .min(3, 'Username must be at least 3 characters long')
       .max(30, 'Username must be no more than 30 characters long')
       .regex(/^[a-zA-Z0-9_-]+$/, 'Username can only contain letters, numbers, underscores, and hyphens');
 
     try {
-      const result = this.validationService.validateSafe(schema, username);
+      const result = await this.validationService.validateSafe(schema, username);
       if (result.success) {
         return { valid: true, data: result.data };
       } else {
         return { 
           valid: false, 
-          error: result.error.issues[0]?.message || 'Username validation failed' 
+          error: result.error?.errors[0]?.message || 'Username validation failed' 
         };
       }
     } catch (error) {
@@ -172,7 +172,7 @@ export class LegacyValidatorsAdapter {
   /**
    * Validates search filters using core validation system
    */
-  validateSearchFilters(filters: unknown): ValidationResult<any> {
+  async validateSearchFilters(filters: unknown): Promise<LegacyValidationResult<any>> {
     const schema = z.object({
       location: z.string().optional(),
       priceMin: z.number().min(0).optional(),
@@ -184,13 +184,13 @@ export class LegacyValidatorsAdapter {
     }).partial();
 
     try {
-      const result = this.validationService.validateSafe(schema, filters);
+      const result = await this.validationService.validateSafe(schema, filters);
       if (result.success) {
         return { valid: true, data: result.data };
       } else {
         return { 
           valid: false, 
-          error: result.error.issues[0]?.message || 'Search filters validation failed' 
+          error: result.error?.errors[0]?.message || 'Search filters validation failed' 
         };
       }
     } catch (error) {
@@ -226,36 +226,27 @@ export class ValidationMiddlewareAdapter {
 
         // Validate body
         if (config.body && req.body) {
-          const bodyResult = this.validationService.validateSafe(config.body, req.body);
+          const bodyResult = await this.validationService.validateSafe(config.body, req.body);
           if (!bodyResult.success) {
-            throw new ValidationError('Request body validation failed', {
-              issues: bodyResult.error.issues,
-              correlationId
-            });
+            throw new ValidationError('Request body validation failed');
           }
           req.validatedBody = bodyResult.data;
         }
 
         // Validate query
         if (config.query && req.query) {
-          const queryResult = this.validationService.validateSafe(config.query, req.query);
+          const queryResult = await this.validationService.validateSafe(config.query, req.query);
           if (!queryResult.success) {
-            throw new ValidationError('Query parameters validation failed', {
-              issues: queryResult.error.issues,
-              correlationId
-            });
+            throw new ValidationError('Query parameters validation failed');
           }
           req.validatedQuery = queryResult.data;
         }
 
         // Validate params
         if (config.params && req.params) {
-          const paramsResult = this.validationService.validateSafe(config.params, req.params);
+          const paramsResult = await this.validationService.validateSafe(config.params, req.params);
           if (!paramsResult.success) {
-            throw new ValidationError('Path parameters validation failed', {
-              issues: paramsResult.error.issues,
-              correlationId
-            });
+            throw new ValidationError('Path parameters validation failed');
           }
           req.validatedParams = paramsResult.data;
         }
@@ -277,8 +268,7 @@ export class ValidationMiddlewareAdapter {
           success: false,
           error: 'Validation Error',
           message: error.message,
-          details: error.details,
-          correlationId: error.details?.correlationId
+          correlationId: req.correlationId
         });
       }
       next(error);

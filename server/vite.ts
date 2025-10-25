@@ -213,17 +213,35 @@ export async function setupVite(app: Express, server: Server) {
           ignored: ['**/node_modules/**', '**/dist/**', '**/.git/**'],
           usePolling: process.env.VITE_USE_POLLING === 'true',
         },
+        fs: {
+          // Allow serving files from the entire project
+          allow: ['..']
+        }
       },
       appType: "custom",
       optimizeDeps: {
         include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
       },
+      esbuild: {
+        // Ensure JSX is handled properly
+        jsx: 'automatic',
+        jsxImportSource: 'react'
+      }
     });
 
     // Simplified Vite middleware with single timeout handler
     app.use((req: Request, res: Response, next: NextFunction) => {
       if (!viteDevServer) {
         return next();
+      }
+      
+      // Let Vite handle all its special routes and source files
+      if (req.originalUrl.startsWith('/src/') || 
+          req.originalUrl.startsWith('/@') ||
+          req.originalUrl.includes('?import') ||
+          req.originalUrl.includes('?direct') ||
+          req.originalUrl.match(/\.(ts|tsx|jsx|vue)$/)) {
+        return viteDevServer.middlewares(req, res, next);
       }
       
       const timeout = setTimeout(() => {
@@ -252,10 +270,12 @@ export async function setupVite(app: Express, server: Server) {
 
     // Streamlined SPA routing with focused error handling
     app.use("*", async (req: Request, res: Response, next: NextFunction) => {
-      // Skip non-frontend routes
+      // Skip non-frontend routes and TypeScript/JSX files
       if (req.originalUrl.startsWith('/api/') || 
           req.originalUrl.startsWith('/health') ||
-          req.originalUrl.match(/\.(js|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|json|map)$/)) {
+          req.originalUrl.startsWith('/src/') ||
+          req.originalUrl.startsWith('/@') ||
+          req.originalUrl.match(/\.(js|mjs|ts|tsx|jsx|css|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|json|map)$/)) {
         return next();
       }
 

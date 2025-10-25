@@ -495,11 +495,11 @@ import {
   UnifiedApiResponse, 
   ApiResponse, 
   ErrorResponse 
-} from '@shared/core/utilities/api';
+} from '@shared/core/utils/api-utils';
 
 console.warn(
   '[DEPRECATED] server/utils/api-response.ts is deprecated. ' +
-  'Please import from @shared/core/utilities/api instead.'
+  'Please import from @shared/core/utils/api-utils instead.'
 );
 
 export const ApiResponseWrapper = UnifiedApiResponse;
@@ -518,11 +518,11 @@ export type { ApiResponse, ErrorResponse };
  * LEGACY ADAPTER: Server Logger
  */
 
-import { UnifiedLogger } from '@shared/core/utilities/logging';
+import { UnifiedLogger } from '@shared/core/observability/logging';
 
 console.warn(
   '[DEPRECATED] server/utils/logger.ts is deprecated. ' +
-  'Please import from @shared/core/utilities/logging instead.'
+  'Please import from @shared/core/observability/logging instead.'
 );
 
 const serverLogger = UnifiedLogger.createServerLogger({
@@ -596,9 +596,9 @@ export default logger;
 
 ### New Unified API
 \`\`\`typescript
-import { UnifiedApiResponse } from '@shared/core/utilities/api';
-import { logger } from '@shared/core/utilities/logging';
-import { UnifiedPerformanceMonitor } from '@shared/core/utilities/performance';
+import { UnifiedApiResponse } from '@shared/core/utils/api-utils';
+import { logger } from '@shared/core/observability/logging';
+import { UnifiedPerformanceMonitor } from '@shared/core/utils/performance-utils';
 
 // API responses
 const response = UnifiedApiResponse.success(data);

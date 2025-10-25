@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { EventEmitter } from 'events';
 import { PoolClient } from 'pg';
 import { jest } from '@jest/globals';
@@ -12,20 +13,20 @@ import {
 } from '../connection-manager';
 
 // Mock the shared pool
-jest.mock('../../../../../shared/database/pool', () => ({
+vi.mock('../../../../../shared/database/pool', () => ({
   pool: {
-    connect: jest.fn(),
-    on: jest.fn(),
-    getMetrics: jest.fn(),
+    connect: vi.fn(),
+    on: vi.fn(),
+    getMetrics: vi.fn(),
     circuitBreaker: {
-      getState: jest.fn(),
-      getFailureCount: jest.fn(),
+      getState: vi.fn(),
+      getFailureCount: vi.fn(),
     },
     totalCount: 10,
     idleCount: 5,
     waitingCount: 2,
   } as any,
-  checkPoolHealth: jest.fn(),
+  checkPoolHealth: vi.fn(),
 }));
 
 import { pool, checkPoolHealth } from '../../../../../shared/database/pool';
@@ -36,15 +37,15 @@ describe('ConnectionManager', () => {
   let manager: ConnectionManager;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     mockPool = {
-      connect: jest.fn(),
-      on: jest.fn(),
-      getMetrics: jest.fn(),
+      connect: vi.fn(),
+      on: vi.fn(),
+      getMetrics: vi.fn(),
       circuitBreaker: {
-        getState: jest.fn().mockReturnValue('CLOSED'),
-        getFailureCount: jest.fn().mockReturnValue(0),
+        getState: vi.fn().mockReturnValue('CLOSED'),
+        getFailureCount: vi.fn().mockReturnValue(0),
       },
       totalCount: 10,
       idleCount: 5,
@@ -61,7 +62,7 @@ describe('ConnectionManager', () => {
     };
 
     // Mock checkPoolHealth
-    (checkPoolHealth as jest.MockedFunction<typeof checkPoolHealth>).mockResolvedValue({
+    (checkPoolHealth as vi.MockedFunction<typeof checkPoolHealth>).mockResolvedValue({
       isHealthy: true,
       totalConnections: 10,
       idleConnections: 5,
@@ -81,7 +82,7 @@ describe('ConnectionManager', () => {
 
   describe('acquireConnection', () => {
     it('should acquire connection successfully', async () => {
-      const mockClient = { release: jest.fn(), query: jest.fn() } as any;
+      const mockClient = { release: vi.fn(), query: vi.fn() } as any;
       mockPool.connect.mockResolvedValue(mockClient);
 
       const client = await manager.acquireConnection();
@@ -91,10 +92,10 @@ describe('ConnectionManager', () => {
     });
 
     it('should emit connection-acquired event', async () => {
-      const mockClient = { release: jest.fn(), query: jest.fn() } as any;
+      const mockClient = { release: vi.fn(), query: vi.fn() } as any;
       mockPool.connect.mockResolvedValue(mockClient);
 
-      const eventSpy = jest.fn();
+      const eventSpy = vi.fn();
       manager.on('connection-acquired', eventSpy);
 
       await manager.acquireConnection();
@@ -106,7 +107,7 @@ describe('ConnectionManager', () => {
       const error = new Error('Connection failed');
       mockPool.connect.mockRejectedValue(error);
 
-      const eventSpy = jest.fn();
+      const eventSpy = vi.fn();
       manager.on('connection-error', eventSpy);
 
       await expect(manager.acquireConnection()).rejects.toThrow('Connection failed');
@@ -116,7 +117,7 @@ describe('ConnectionManager', () => {
 
   describe('releaseConnection', () => {
     it('should release connection successfully', async () => {
-      const mockClient = { release: jest.fn(), query: jest.fn() } as any;
+      const mockClient = { release: vi.fn(), query: vi.fn() } as any;
 
       await manager.releaseConnection(mockClient);
 
@@ -124,9 +125,9 @@ describe('ConnectionManager', () => {
     });
 
     it('should emit connection-released event', async () => {
-      const mockClient = { release: jest.fn(), query: jest.fn() } as any;
+      const mockClient = { release: vi.fn(), query: vi.fn() } as any;
 
-      const eventSpy = jest.fn();
+      const eventSpy = vi.fn();
       manager.on('connection-released', eventSpy);
 
       await manager.releaseConnection(mockClient);
@@ -135,9 +136,9 @@ describe('ConnectionManager', () => {
     });
 
     it('should emit connection-error event on release failure', async () => {
-      const mockClient = { release: jest.fn().mockImplementation(() => { throw new Error('Release failed'); }), query: jest.fn() } as any;
+      const mockClient = { release: vi.fn().mockImplementation(() => { throw new Error('Release failed'); }), query: vi.fn() } as any;
 
-      const eventSpy = jest.fn();
+      const eventSpy = vi.fn();
       manager.on('connection-error', eventSpy);
 
       await expect(manager.releaseConnection(mockClient)).rejects.toThrow('Release failed');
@@ -202,7 +203,7 @@ describe('ConnectionManager', () => {
     });
 
     it('should return false when unhealthy', async () => {
-      (checkPoolHealth as jest.MockedFunction<typeof checkPoolHealth>).mockResolvedValue({
+      (checkPoolHealth as vi.MockedFunction<typeof checkPoolHealth>).mockResolvedValue({
         isHealthy: false,
         totalConnections: 0,
         idleConnections: 0,
@@ -221,7 +222,7 @@ describe('ConnectionManager', () => {
 
   describe('shutdown', () => {
     it('should shutdown gracefully with no active connections', async () => {
-      const shutdownSpy = jest.spyOn(manager, 'shutdown');
+      const shutdownSpy = vi.spyOn(manager, 'shutdown');
 
       await manager.shutdown(1000);
 
@@ -229,7 +230,7 @@ describe('ConnectionManager', () => {
     });
 
     it('should emit shutdown-started event', async () => {
-      const eventSpy = jest.fn();
+      const eventSpy = vi.fn();
       manager.on('shutdown-started', eventSpy);
 
       await manager.shutdown(5000);
@@ -238,7 +239,7 @@ describe('ConnectionManager', () => {
     });
 
     it('should emit shutdown-completed event', async () => {
-      const eventSpy = jest.fn();
+      const eventSpy = vi.fn();
       manager.on('shutdown-completed', eventSpy);
 
       await manager.shutdown(1000);
@@ -254,7 +255,7 @@ describe('ConnectionManager', () => {
 
     it('should force close connections on timeout', async () => {
       // Acquire a connection that won't be released
-      const mockClient = { release: jest.fn(), query: jest.fn() } as any;
+      const mockClient = { release: vi.fn(), query: vi.fn() } as any;
       mockPool.connect.mockResolvedValue(mockClient);
 
       const client = await manager.acquireConnection();
@@ -273,7 +274,7 @@ describe('ConnectionManager', () => {
 
   describe('close', () => {
     it('should call shutdown with 0 timeout', async () => {
-      const shutdownSpy = jest.spyOn(manager, 'shutdown');
+      const shutdownSpy = vi.spyOn(manager, 'shutdown');
 
       await manager.close();
 

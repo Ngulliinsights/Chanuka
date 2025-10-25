@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
 import express, { Express } from 'express';
 import { analysisRouter } from '../analysis.routes'; // Import the NEW router
@@ -5,15 +6,15 @@ import { analysisRouter } from '../analysis.routes'; // Import the NEW router
 import { billComprehensiveAnalysisService } from '../../application/bill-comprehensive-analysis.service';
 // Mock the repository for history endpoint
 import { analysisRepository } from '../../infrastructure/repositories/analysis-repository-impl';
-import { authenticateToken } from '../../../../middleware/auth'; // Import or mock auth
+import { authenticateToken } from '@/components/auth'; // Import or mock auth
 import * as schema from '../../../../../shared/schema'; // For mock types
 
 // --- Mock Dependencies ---
-jest.mock('../../application/bill-comprehensive-analysis.service');
-jest.mock('../../infrastructure/repositories/analysis-repository-impl');
+vi.mock('../../application/bill-comprehensive-analysis.service');
+vi.mock('../../infrastructure/repositories/analysis-repository-impl');
 // Mock Auth Middleware - Assume admin for POST /run, allow others for GET
-jest.mock('../../../../middleware/auth', () => ({
-    authenticateToken: jest.fn((req: any, res: any, next: any) => {
+vi.mock('../../../../middleware/auth', () => ({
+    authenticateToken: vi.fn((req: any, res: any, next: any) => {
         // Simple mock: Allow if GET, require admin if POST
         if (req.method === 'POST') {
              // Simulate different users for testing permissions
@@ -37,7 +38,7 @@ jest.mock('../../../../middleware/auth', () => ({
             next();
         }
     }),
-    AuthenticatedRequest: jest.fn(), // Mock type if needed elsewhere
+    AuthenticatedRequest: vi.fn(), // Mock type if needed elsewhere
 }));
 
 // --- Setup Express App ---
@@ -68,14 +69,14 @@ const mockHistoryDbRecord: schema.Analysis = {
 describe('Analysis API Routes', () => {
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (billComprehensiveAnalysisService.analyzeBill as jest.Mock).mockClear();
-    (analysisRepository.findHistoryByBillId as jest.Mock).mockClear();
+    vi.clearAllMocks();
+    (billComprehensiveAnalysisService.analyzeBill as vi.Mock).mockClear();
+    (analysisRepository.findHistoryByBillId as vi.Mock).mockClear();
   });
 
   describe('GET /api/analysis/bills/:billId/comprehensive', () => {
     it('should return 200 and the analysis result', async () => {
-       (billComprehensiveAnalysisService.analyzeBill as jest.Mock).mockResolvedValue(mockComprehensiveResult);
+       (billComprehensiveAnalysisService.analyzeBill as vi.Mock).mockResolvedValue(mockComprehensiveResult);
       const response = await request(app).get(`/api/analysis/bills/${mockBillId}/comprehensive`);
       expect(response.status).toBe(200);
       expect(response.body.status).toBe('success');
@@ -91,14 +92,14 @@ describe('Analysis API Routes', () => {
     });
 
      it('should return 404 if analysis service throws "not found"', async () => {
-         (billComprehensiveAnalysisService.analyzeBill as jest.Mock).mockRejectedValue(new Error(`Bill with ID ${mockBillId} not found for analysis.`));
+         (billComprehensiveAnalysisService.analyzeBill as vi.Mock).mockRejectedValue(new Error(`Bill with ID ${mockBillId} not found for analysis.`));
          const response = await request(app).get(`/api/analysis/bills/${mockBillId}/comprehensive`);
          expect(response.status).toBe(404);
          expect(response.body.message).toContain(`Bill with ID ${mockBillId} not found`);
      });
 
      it('should return 500 if analysis service fails', async () => {
-         (billComprehensiveAnalysisService.analyzeBill as jest.Mock).mockRejectedValue(new Error("Analysis engine unavailable"));
+         (billComprehensiveAnalysisService.analyzeBill as vi.Mock).mockRejectedValue(new Error("Analysis engine unavailable"));
          const response = await request(app).get(`/api/analysis/bills/${mockBillId}/comprehensive`);
          expect(response.status).toBe(500);
          expect(response.body.message).toContain("Analysis could not be completed: Analysis engine unavailable");
@@ -117,7 +118,7 @@ describe('Analysis API Routes', () => {
     });
 
     it('should return 201 and the new analysis result when triggered by admin', async () => {
-       (billComprehensiveAnalysisService.analyzeBill as jest.Mock).mockResolvedValue(mockComprehensiveResult);
+       (billComprehensiveAnalysisService.analyzeBill as vi.Mock).mockResolvedValue(mockComprehensiveResult);
       const response = await request(app)
           .post(`/api/analysis/bills/${mockBillId}/comprehensive/run`)
           .set('x-mock-role', 'admin'); // Simulate admin user
@@ -138,7 +139,7 @@ describe('Analysis API Routes', () => {
    });
 
     it('should return 500 if analysis service fails during run', async () => {
-        (billComprehensiveAnalysisService.analyzeBill as jest.Mock).mockRejectedValue(new Error("Analysis engine failure"));
+        (billComprehensiveAnalysisService.analyzeBill as vi.Mock).mockRejectedValue(new Error("Analysis engine failure"));
         const response = await request(app)
             .post(`/api/analysis/bills/${mockBillId}/comprehensive/run`)
             .set('x-mock-role', 'admin');
@@ -151,7 +152,7 @@ describe('Analysis API Routes', () => {
         it('should return 200 and formatted analysis history', async () => {
             // Arrange
             const historyData = [mockHistoryDbRecord, { ...mockHistoryDbRecord, id: 102, confidence: '75.0000', results: { analysisId: 'old_id_456'} }];
-            (analysisRepository.findHistoryByBillId as jest.Mock).mockResolvedValue(historyData);
+            (analysisRepository.findHistoryByBillId as vi.Mock).mockResolvedValue(historyData);
 
             // Act
             const response = await request(app).get(`/api/analysis/bills/${mockBillId}/history?limit=5`);
@@ -192,7 +193,7 @@ describe('Analysis API Routes', () => {
          });
 
          it('should return 500 if repository fails', async () => {
-            (analysisRepository.findHistoryByBillId as jest.Mock).mockRejectedValue(new Error("DB timeout"));
+            (analysisRepository.findHistoryByBillId as vi.Mock).mockRejectedValue(new Error("DB timeout"));
             const response = await request(app).get(`/api/analysis/bills/${mockBillId}/history`);
             expect(response.status).toBe(500);
             expect(response.body.message).toContain("internal server error");

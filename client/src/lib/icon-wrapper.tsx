@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import { cn } from './utils';
-import { logger } from '..\utils\browser-logger';
+import { logger } from '../utils/browser-logger';
 
 interface IconWrapperProps extends React.SVGProps<SVGSVGElement> {
   className?: string;

@@ -5,7 +5,7 @@
  */
 
 import { ZodSchema, ZodError } from 'zod';
-import { ValidationError } from '../../error-management/errors/specialized/validation-error';
+import { ValidationError } from '../../observability/error-management/errors/specialized-errors';
 import {
   ISchemaAdapter,
   IValidationResult,

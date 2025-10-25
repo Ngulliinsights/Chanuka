@@ -7,16 +7,16 @@ import {
   Tag, 
   User 
 } from 'lucide-react';
-import { Button } from '..\ui\button';
-import { Input } from '..\ui\input';
-import { Label } from '..\ui\label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '..\ui\select';
-import { Card, CardContent, CardHeader, CardTitle } from '..\ui\card';
-import { Badge } from '..\ui\badge';
-import { Popover, PopoverContent, PopoverTrigger } from '..\ui\popover';
-import { Calendar as CalendarComponent } from '..\ui\calendar';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Calendar as CalendarComponent } from '../ui/calendar';
 import { format } from 'date-fns';
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '../../utils/browser-logger';
 
 interface SearchFilters {
   query: string;

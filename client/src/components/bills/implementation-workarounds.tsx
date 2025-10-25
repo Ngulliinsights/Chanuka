@@ -19,7 +19,7 @@ import { AlertTriangle,
   Gavel, 
   Scroll 
 } from 'lucide-react';
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '../../utils/browser-logger';
 
 // Enhanced interface to support multiple workaround types in Kenyan context
 interface ImplementationWorkaround {

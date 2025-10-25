@@ -1,5 +1,6 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { test, expect } from '@playwright/test';
-import { TestHelpers } from '../utils/test-helpers';
+import { TestHelpers } from '@/utils/test-helpers';
 
 test.describe('Visual Regression Tests', () => {
   test.describe('Authentication Components', () => {

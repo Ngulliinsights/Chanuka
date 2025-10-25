@@ -1,0 +1,398 @@
+/* Accessibility Enhancements */
+
+@import '../base/variables.css';
+
+/* Accessibility Enhancements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  :root {
+    --border: 0 0% 0%; /* Black border */
+    --foreground: 0 0% 0%; /* Black text */
+    --card: 0 0% 100%; /* White background */
+  }
+
+  .dark {
+    --border: 0 0% 100%; /* White border */
+    --foreground: 0 0% 100%; /* White text */
+    --card: 0 0% 0%; /* Black background */
+  }
+}
+
+/* Print Styles */
+@media print {
+  .chanuka-header,
+  .chanuka-sidebar,
+  .chanuka-filter-bar {
+    display: none !important;
+  }
+
+  .chanuka-card {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+
+  .chanuka-btn {
+    border: 1px solid #000;
+    background: transparent !important;
+    color: #000 !important;
+  }
+}
+
+/* Enhanced Navigation Performance and Accessibility */
+
+/* Skip link styles for accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.sr-only:focus,
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* Enhanced focus management for navigation */
+.chanuka-nav-focus-trap:focus,
+.chanuka-nav-item:focus,
+.chanuka-nav-button:focus {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px hsl(var(--ring) / 0.2);
+}
+
+/* Performance optimizations with GPU acceleration */
+.chanuka-layout-stable {
+  contain: layout style;
+  will-change: auto;
+  transform: translateZ(0); /* Force GPU layer */
+  backface-visibility: hidden;
+}
+
+.chanuka-sidebar-transition {
+  contain: layout style;
+  will-change: width, transform;
+  transform: translateZ(0); /* Force GPU layer */
+  backface-visibility: hidden;
+  transition: width var(--timing-base) var(--easing-in-out),
+    transform var(--timing-base) var(--easing-in-out);
+}
+
+.chanuka-content-transition {
+  contain: layout;
+  will-change: margin-left, padding;
+  transform: translateZ(0); /* Force GPU layer */
+  backface-visibility: hidden;
+  transition: margin-left var(--timing-base) var(--easing-in-out),
+    padding var(--timing-base) var(--easing-in-out);
+}
+
+/* Optimized sidebar states to prevent layout shifts */
+.chanuka-desktop-sidebar-collapsed {
+  width: 4rem;
+  min-width: 4rem;
+  max-width: 4rem;
+}
+
+.chanuka-desktop-sidebar-expanded {
+  width: 16rem;
+  min-width: 16rem;
+  max-width: 16rem;
+}
+
+/* Mobile navigation optimizations */
+.chanuka-mobile-nav-enter-active {
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform var(--timing-base) var(--easing-out),
+    opacity var(--timing-base) var(--easing-out);
+}
+
+.chanuka-mobile-nav-exit-active {
+  transform: translateY(-100%);
+  opacity: 0;
+  transition: transform var(--timing-base) var(--easing-in),
+    opacity var(--timing-base) var(--easing-in);
+}
+
+/* Prevent layout shifts during transitions */
+.chanuka-layout-transition {
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Touch-friendly navigation for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .chanuka-nav-item {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+
+  .chanuka-mobile-nav-button {
+    min-height: 48px;
+    min-width: 48px;
+    touch-action: manipulation;
+  }
+
+  /* Enhanced touch targets */
+  .chanuka-btn,
+  button,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+    touch-action: manipulation;
+  }
+
+  /* Prevent text selection on touch */
+  .chanuka-nav-item,
+  .chanuka-btn,
+  .chanuka-tab {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Improve tap highlighting */
+  .chanuka-nav-item,
+  .chanuka-btn {
+    -webkit-tap-highlight-color: rgba(59, 130, 246, 0.1);
+  }
+}
+
+/* Mobile error handling styles */
+.mobile-error-fallback {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.mobile-notification {
+  animation: slideInFromTop 0.3s ease-out;
+}
+
+/* Safe area support for devices with notches */
+@supports (padding: max(0px)) {
+  .chanuka-header {
+    padding-top: max(12px, env(safe-area-inset-top));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+
+  .chanuka-mobile-bottom-nav {
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+
+  .chanuka-mobile-sheet {
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
+  }
+}
+
+/* Landscape mobile optimizations */
+@media (max-height: 500px) and (orientation: landscape) {
+  .chanuka-mobile-header {
+    padding: 8px 16px;
+    min-height: 48px;
+  }
+
+  .chanuka-mobile-bottom-nav {
+    padding: 4px 16px;
+  }
+
+  .chanuka-mobile-sheet .chanuka-card-content {
+    padding: 12px;
+  }
+}
+
+/* High contrast mode support for mobile */
+@media (prefers-contrast: high) and (hover: none) {
+  .chanuka-nav-item,
+  .chanuka-btn {
+    border: 2px solid;
+  }
+
+  .chanuka-nav-item:focus,
+  .chanuka-btn:focus {
+    outline: 3px solid;
+    outline-offset: 2px;
+  }
+}
+
+/* Keyboard navigation enhancements */
+.chanuka-nav-item:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  background-color: hsl(var(--ring) / 0.1);
+}
+
+/* Enhanced navigation tooltips for collapsed sidebar */
+.chanuka-nav-tooltip-enhanced {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1f2937;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.chanuka-nav-tooltip-enhanced::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -4px;
+  transform: translateY(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: #1f2937;
+}
+
+.chanuka-nav-item:hover .chanuka-nav-tooltip-enhanced,
+.chanuka-nav-item:focus .chanuka-nav-tooltip-enhanced {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Loading states for better perceived performance */
+.chanuka-nav-loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.chanuka-nav-loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid hsl(var(--ring));
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Accessibility announcements */
+.chanuka-sr-announcement {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+/* Enhanced high contrast mode support */
+@media (prefers-contrast: high) {
+  .chanuka-sidebar-transition,
+  .chanuka-content-transition {
+    border: 1px solid;
+  }
+
+  /* Enhanced contrast for navigation elements */
+  .chanuka-nav-item {
+    border: 1px solid;
+  }
+
+  .chanuka-nav-item:hover,
+  .chanuka-nav-item:focus {
+    background-color: ButtonHighlight;
+    color: ButtonText;
+  }
+
+  .chanuka-nav-item[aria-current="page"] {
+    background-color: Highlight;
+    color: HighlightText;
+    border-color: HighlightText;
+  }
+}
+
+/* Dark mode support for navigation */
+@media (prefers-color-scheme: dark) {
+  .chanuka-nav-tooltip-enhanced {
+    background: #374151;
+    color: #f9fafb;
+  }
+
+  .chanuka-nav-tooltip-enhanced::before {
+    background: #374151;
+  }
+}
+
+/* Smooth scrolling for navigation transitions */
+@media (prefers-reduced-motion: no-preference) {
+  .chanuka-layout-transition,
+  .chanuka-sidebar-transition,
+  .chanuka-content-transition {
+    scroll-behavior: smooth;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Enhanced reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .chanuka-layout-transition,
+  .chanuka-sidebar-transition,
+  .chanuka-content-transition {
+    transition: none;
+  }
+
+  .chanuka-mobile-nav-enter-active,
+  .chanuka-mobile-nav-exit-active {
+    transition: none;
+  }
+
+  /* Disable all animations for users who prefer reduced motion */
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Sidebar } from '../sidebar';
-import { NavigationItem, User } from '../types';
+import { NavigationItem, User } from '@shared/types';
 
 // Mock dependencies
 vi.mock('@/lib/utils', () => ({
@@ -162,7 +162,7 @@ describe('Sidebar Component', () => {
     });
 
     it('should render toggle button when onToggle is provided', () => {
-      const onToggle = jest.fn();
+      const onToggle = vi.fn();
 
       render(
         <TestWrapper>

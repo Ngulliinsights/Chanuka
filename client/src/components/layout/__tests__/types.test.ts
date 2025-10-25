@@ -9,7 +9,7 @@ import {
   NavigationItem,
   User,
   UserPreferences
-} from '../types';
+} from '@shared/types';
 
 describe('Layout Types', () => {
   describe('LayoutType', () => {

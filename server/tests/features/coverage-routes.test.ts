@@ -1,8 +1,9 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
 // Mock the CoverageAnalyzer (module will be imported dynamically after env is set)
-jest.mock('../../services/coverage-analyzer');
+vi.mock('../../services/coverage-analyzer');
 
 describe('Coverage Routes', () => {
   let app: express.Application;
@@ -14,7 +15,7 @@ describe('Coverage Routes', () => {
     app.use(express.json());
 
     // Reset mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
   // Ensure test environment uses 'test' and has sufficiently long secrets to pass config validation
   process.env.NODE_ENV = 'test';
@@ -23,15 +24,15 @@ describe('Coverage Routes', () => {
 
     // Create mock instance
     mockCoverageAnalyzer = {
-      analyzeServerCoverage: jest.fn(),
-      analyzeClientCoverage: jest.fn(),
-      analyzeIntegrationCoverage: jest.fn(),
-      identifyGaps: jest.fn(),
-      generateCoverageReport: jest.fn()
+      analyzeServerCoverage: vi.fn(),
+      analyzeClientCoverage: vi.fn(),
+      analyzeIntegrationCoverage: vi.fn(),
+      identifyGaps: vi.fn(),
+      generateCoverageReport: vi.fn()
     } as any;
     // Dynamically import the mocked CoverageAnalyzer and set the implementation
     const imported = await import('../../services/coverage-analyzer');
-    const CoverageAnalyzer = imported.CoverageAnalyzer as unknown as jest.MockedClass<any>;
+    const CoverageAnalyzer = imported.CoverageAnalyzer as unknown as vi.MockedClass<any>;
     CoverageAnalyzer.mockImplementation(() => mockCoverageAnalyzer);
 
     // Import router after mocking

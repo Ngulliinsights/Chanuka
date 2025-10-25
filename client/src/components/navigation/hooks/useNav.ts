@@ -1,5 +1,5 @@
-import { useAuth } from '..\..\..\hooks\use-auth';
-import { useUnifiedNavigation } from '..\..\..\hooks\use-unified-navigation';
+import { useAuth } from '../../../hooks/use-auth';
+import { useUnifiedNavigation } from '../../../hooks/use-unified-navigation';
 import { DEFAULT_NAVIGATION_MAP } from '../constants';
 import { canViewItem } from '../core/roleGuard';
 import type { NavigationSection } from '../types';

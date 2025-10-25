@@ -15,7 +15,7 @@ import { LoadingStateManager } from "./components/loading/LoadingStates";
 import BrowserCompatibilityChecker from "./components/compatibility/BrowserCompatibilityChecker";
 import PerformanceMetricsCollector from "./components/performance/PerformanceMetricsCollector";
 import { Suspense, useEffect } from "react";
-import { useComprehensiveLoading } from "./hooks/useComprehensiveLoading";
+import { useSimplifiedLoading } from "./hooks/useSimplifiedLoading";
 import { logger } from './utils/browser-logger';
 import {
   SafeLazyPages,
@@ -81,7 +81,7 @@ const getQueryClient = (): QueryClient => {
 // =============================================================================
 
 function PageLoader() {
-  const { loadingState, startLoading } = useComprehensiveLoading();
+  const pageLoading = useSimplifiedLoading('app-page-loading');
 
   useEffect(() => {
     startLoading("initial", {

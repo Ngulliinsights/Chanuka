@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { NavigationValidationError } from './errors';
+import { NavigationValidationError, InvalidNavigationPathError } from './errors';
 
 /**
  * Navigation validation schemas and utilities
@@ -54,9 +54,9 @@ export function validateNavigationPath(path: string): string {
   } catch (error) {
     if (error instanceof z.ZodError) {
       const message = error.errors[0]?.message || 'Invalid navigation path';
-      throw new NavigationValidationError(message, 'path', path, { zodError: error });
+      throw new InvalidNavigationPathError(path, message);
     }
-    throw new NavigationValidationError('Navigation path validation failed', 'path', path);
+    throw new InvalidNavigationPathError(path, 'Navigation path validation failed');
   }
 }
 

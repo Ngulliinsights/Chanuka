@@ -1,16 +1,17 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 const { FeatureFlagManager, featureFlagManager } = require('../feature-flags');
 const fs = require('fs');
 const path = require('path');
 
 // Mock fs
-jest.mock('fs');
+vi.mock('fs');
 
 describe('Feature Flag Manager', () => {
   let manager;
   const configPath = './migration/feature-flags.json';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     manager = new FeatureFlagManager(configPath);
   });
 
@@ -53,7 +54,7 @@ describe('Feature Flag Manager', () => {
       manager.flags.TEST_FLAG = { enabled: true, rollout_percentage: 50 };
 
       // Mock hash function to return consistent values
-      manager.simpleHash = jest.fn();
+      manager.simpleHash = vi.fn();
       manager.simpleHash.mockReturnValueOnce(25); // Within 50%
       manager.simpleHash.mockReturnValueOnce(75); // Outside 50%
 
@@ -144,7 +145,7 @@ describe('Feature Flag Manager', () => {
         rollout_percentage: 50
       };
 
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       manager.displayStatus();
 

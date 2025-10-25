@@ -1,20 +1,35 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 import { FinancialDisclosureMonitoringService } from '../features/analytics/financial-disclosure/monitoring.js';
-import { cacheService } from 'server/infrastructure/cache';
-import { logger } from '../../shared/core/src/observability/logging';
+import { cacheService } from '@server/infrastructure/cache';
+import { logger } from '@shared/core';
 
 // Mock financialDisclosureMonitoringService
 const financialDisclosureMonitoringService = {
-  stopAutomatedMonitoring: jest.fn(),
-  collectFinancialDisclosures: jest.fn(),
-  createDisclosureAlert: jest.fn(),
-  monitorDisclosureUpdates: jest.fn(),
-  getDisclosureAlerts: jest.fn(),
-  buildFinancialRelationshipMap: jest.fn(),
-  calculateDisclosureCompletenessScore: jest.fn(),
-  getFinancialTransparencyDashboard: jest.fn(),
-  startAutomatedMonitoring: jest.fn(),
-  getHealthStatus: jest.fn()
+  stopAutomatedMonitoring: vi.fn(),
+  collectFinancialDisclosures: vi.fn(),
+  createDisclosureAlert: vi.fn(),
+  monitorDisclosureUpdates: vi.fn(),
+  getDisclosureAlerts: vi.fn(),
+  buildFinancialRelationshipMap: vi.fn(),
+  calculateDisclosureCompletenessScore: vi.fn(),
+  getFinancialTransparencyDashboard: vi.fn(),
+  startAutomatedMonitoring: vi.fn(),
+  getHealthStatus: vi.fn()
 };
 
 describe('Financial Disclosure Monitoring Service', () => {

@@ -9,7 +9,7 @@ import { Request, Response, NextFunction, Application } from 'express';
 import { performance } from 'perf_hooks';
 
 // Import core utilities
-import { rateLimitMiddleware, RateLimitFactory, createRateLimitFactory } from '../rate-limiting';
+import { RateLimitMiddleware as rateLimitMiddleware, RateLimitFactory, createRateLimitFactory } from '../rate-limiting';
 import { unifiedErrorHandler } from '../observability/error-management/middleware/express-error-middleware.js';
 import { setupGlobalErrorHandlers } from '../observability/error-management';
 import { createHealthEndpoints } from '../health';

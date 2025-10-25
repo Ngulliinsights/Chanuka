@@ -1,6 +1,6 @@
 import { database as db } from '../../shared/database/connection';
 import * as schema from '../../shared/schema';
-import { logger } from '../..//shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 export default async function seedLegislative() {
   logger.info('Starting legislative seed (placeholder)');

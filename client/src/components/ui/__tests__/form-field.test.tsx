@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Tests for enhanced form field components
  */
@@ -97,7 +98,7 @@ describe('EnhancedFormInput', () => {
 
   it('validates required fields', async () => {
     const user = userEvent.setup();
-    const onValidationChange = jest.fn();
+    const onValidationChange = vi.fn();
     
     render(
       <EnhancedFormInput 
@@ -168,7 +169,7 @@ describe('EnhancedFormInput', () => {
 
   it('calls onValidationChange callback', async () => {
     const user = userEvent.setup();
-    const onValidationChange = jest.fn();
+    const onValidationChange = vi.fn();
     
     render(
       <EnhancedFormInput 
@@ -277,7 +278,7 @@ describe('EnhancedFormTextarea', () => {
   it('updates character count on change', async () => {
     const user = userEvent.setup();
     let value = '';
-    const onChange = jest.fn((e) => {
+    const onChange = vi.fn((e) => {
       value = e.target.value;
     });
     
@@ -390,7 +391,7 @@ describe('EnhancedFormSelect', () => {
 
   it('calls onValidationChange callback', async () => {
     const user = userEvent.setup();
-    const onValidationChange = jest.fn();
+    const onValidationChange = vi.fn();
     
     render(
       <EnhancedFormSelect 

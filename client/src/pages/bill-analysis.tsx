@@ -1,18 +1,18 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, Link } from 'wouter';
-import AppLayout from '..\components\layout\app-layout';
+import AppLayout from '../components/layout/app-layout';
 import DOMPurify from 'dompurify';
-import { LoadingSpinner } from '..\components\ui\spinner';
-import { useBillAnalysis } from '..\hooks\use-bill-analysis';
-import { Button } from '..\components\ui\button';
-import { Progress } from '..\components\ui\progress';
-import { AnalysisSection } from '..\components\analysis\section';
-import { ActionTimeline } from '..\components\analysis\timeline';
-import { Comments } from '..\components\analysis\comments';
-import { BillStats } from '..\components\analysis\stats';
+import { LoadingSpinner } from '../components/ui/spinner';
+import { useBillAnalysis } from '../hooks/use-bill-analysis';
+import { Button } from '../components/ui/button';
+import { Progress } from '../components/ui/progress';
+import { AnalysisSection } from '../components/analysis/section';
+import { ActionTimeline } from '../components/analysis/timeline';
+import { Comments } from '../components/analysis/comments';
+import { BillStats } from '../components/analysis/stats';
 import { Share2, ArrowLeft } from 'lucide-react';
-import { useOnlineStatus } from '..\hooks\use-online-status';
-import { logger } from '..\utils\browser-logger';
+import { useOnlineStatus } from '../hooks/use-online-status';
+import { logger } from '../utils/browser-logger';
 
 // Move constants outside component to prevent recreation on each render
 const STORAGE_KEY = 'bill-view-preferences';

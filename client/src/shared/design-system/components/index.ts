@@ -1,8 +1,8 @@
 /**
  * Responsive Design System Components
- * 
+ *
  * Export all responsive design system components for easy importing.
- * 
+ *
  * Requirements: 9.1, 9.5
  */
 
@@ -19,3 +19,14 @@ export type { default as ResponsiveStackProps } from './ResponsiveStack';
 export type { default as TouchTargetProps } from './TouchTarget';
 export type { default as ResponsiveButtonProps } from './ResponsiveButton';
 export type { default as ResponsiveInputProps } from './ResponsiveInput';
+
+// Utility functions
+export { buttonUtils } from './button';
+export { inputUtils } from './input';
+export { cardUtils } from './card';
+export { emptyStateUtils } from './empty-states';
+export { errorStateUtils } from './error-states';
+
+// Utility types
+export type { EmptyStateType, EmptyStateLayout, EmptyStateContext } from './empty-states';
+export type { ErrorSeverity, ErrorComponent } from './error-states';

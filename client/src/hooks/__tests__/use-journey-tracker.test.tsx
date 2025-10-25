@@ -1,18 +1,19 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { useJourneyTracker, useJourneyAnalytics } from '../use-journey-tracker';
-import { NavigationProvider } from '..\..\contexts\NavigationContext';
-import { UserJourneyTracker } from '..\..\services\UserJourneyTracker';
+import { NavigationProvider } from '../../contexts/NavigationContext';
+import { UserJourneyTracker } from '@/$2/UserJourneyTracker';
 import React from 'react';
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '@/$2/browser-logger';
 
 // Mock the UserJourneyTracker
-jest.mock('@/services/UserJourneyTracker');
+vi.mock('@/services/UserJourneyTracker');
 
 // Mock react-router-dom
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', () => ({
+  ...vi.requireActual('react-router-dom'),
   useLocation: () => ({
     pathname: '/test-path',
     search: '',
@@ -24,7 +25,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Mock NavigationContext
-jest.mock('@/contexts/NavigationContext', () => ({
+vi.mock('@/contexts/NavigationContext', () => ({
   NavigationProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   useNavigation: () => ({
     currentPath: '/test-path',
@@ -41,42 +42,42 @@ jest.mock('@/contexts/NavigationContext', () => ({
       recentlyVisited: [],
       compactMode: false,
     },
-    navigateTo: jest.fn(),
-    updateBreadcrumbs: jest.fn(),
-    updateRelatedPages: jest.fn(),
-    toggleSidebar: jest.fn(),
-    toggleMobileMenu: jest.fn(),
-    updateUserRole: jest.fn(),
-    updatePreferences: jest.fn(),
-    addToRecentPages: jest.fn(),
+    navigateTo: vi.fn(),
+    updateBreadcrumbs: vi.fn(),
+    updateRelatedPages: vi.fn(),
+    toggleSidebar: vi.fn(),
+    toggleMobileMenu: vi.fn(),
+    updateUserRole: vi.fn(),
+    updatePreferences: vi.fn(),
+    addToRecentPages: vi.fn(),
   }),
 }));
 
 describe('useJourneyTracker', () => {
-  let mockTracker: jest.Mocked<UserJourneyTracker>;
+  let mockTracker: vi.Mocked<UserJourneyTracker>;
 
   beforeEach(() => {
     // Reset mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     
     // Create mock tracker instance
     mockTracker = {
-      startJourney: jest.fn(),
-      trackStep: jest.fn(),
-      trackConversionEvent: jest.fn(),
-      completeJourney: jest.fn(),
-      endJourney: jest.fn(),
-      getJourney: jest.fn(),
-      getUserJourneys: jest.fn(),
-      getJourneyAnalytics: jest.fn(),
-      getOptimizationRecommendations: jest.fn(),
-      getGoalCompletionRate: jest.fn(),
-      exportJourneyData: jest.fn(),
-      clearAllData: jest.fn(),
+      startJourney: vi.fn(),
+      trackStep: vi.fn(),
+      trackConversionEvent: vi.fn(),
+      completeJourney: vi.fn(),
+      endJourney: vi.fn(),
+      getJourney: vi.fn(),
+      getUserJourneys: vi.fn(),
+      getJourneyAnalytics: vi.fn(),
+      getOptimizationRecommendations: vi.fn(),
+      getGoalCompletionRate: vi.fn(),
+      exportJourneyData: vi.fn(),
+      clearAllData: vi.fn(),
     } as any;
 
     // Mock the getInstance method
-    (UserJourneyTracker.getInstance as jest.Mock).mockReturnValue(mockTracker);
+    (UserJourneyTracker.getInstance as vi.Mock).mockReturnValue(mockTracker);
   });
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -297,12 +298,12 @@ describe('useJourneyTracker', () => {
   describe('Automatic Tracking', () => {
     it('should automatically track page visits on location change', () => {
       // Mock location change
-      const mockUseLocation = jest.fn()
+      const mockUseLocation = vi.fn()
         .mockReturnValueOnce({ pathname: '/test-path' })
         .mockReturnValueOnce({ pathname: '/bills' });
 
-      jest.doMock('react-router-dom', () => ({
-        ...jest.requireActual('react-router-dom'),
+      vi.doMock('react-router-dom', () => ({
+        ...vi.requireActual('react-router-dom'),
         useLocation: mockUseLocation,
       }));
 
@@ -342,19 +343,19 @@ describe('useJourneyTracker', () => {
 });
 
 describe('useJourneyAnalytics', () => {
-  let mockTracker: jest.Mocked<UserJourneyTracker>;
+  let mockTracker: vi.Mocked<UserJourneyTracker>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     
     mockTracker = {
-      getJourneyAnalytics: jest.fn(),
-      getOptimizationRecommendations: jest.fn(),
-      getGoalCompletionRate: jest.fn(),
-      exportJourneyData: jest.fn(),
+      getJourneyAnalytics: vi.fn(),
+      getOptimizationRecommendations: vi.fn(),
+      getGoalCompletionRate: vi.fn(),
+      exportJourneyData: vi.fn(),
     } as any;
 
-    (UserJourneyTracker.getInstance as jest.Mock).mockReturnValue(mockTracker);
+    (UserJourneyTracker.getInstance as vi.Mock).mockReturnValue(mockTracker);
   });
 
   it('should provide analytics methods', () => {
@@ -397,25 +398,25 @@ describe('useJourneyAnalytics', () => {
 });
 
 describe('Hook Error Handling', () => {
-  let mockTracker: jest.Mocked<UserJourneyTracker>;
+  let mockTracker: vi.Mocked<UserJourneyTracker>;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     
     mockTracker = {
-      startJourney: jest.fn(),
-      trackStep: jest.fn(),
-      trackConversionEvent: jest.fn(),
-      completeJourney: jest.fn(),
-      endJourney: jest.fn(),
-      getJourney: jest.fn(),
-      getJourneyAnalytics: jest.fn(),
-      getOptimizationRecommendations: jest.fn(),
-      getGoalCompletionRate: jest.fn(),
-      exportJourneyData: jest.fn(),
+      startJourney: vi.fn(),
+      trackStep: vi.fn(),
+      trackConversionEvent: vi.fn(),
+      completeJourney: vi.fn(),
+      endJourney: vi.fn(),
+      getJourney: vi.fn(),
+      getJourneyAnalytics: vi.fn(),
+      getOptimizationRecommendations: vi.fn(),
+      getGoalCompletionRate: vi.fn(),
+      exportJourneyData: vi.fn(),
     } as any;
 
-    (UserJourneyTracker.getInstance as jest.Mock).mockReturnValue(mockTracker);
+    (UserJourneyTracker.getInstance as vi.Mock).mockReturnValue(mockTracker);
   });
 
   const wrapper = ({ children }: { children: React.ReactNode }) => (

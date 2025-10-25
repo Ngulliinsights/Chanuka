@@ -9,7 +9,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import ResponsiveButton from '../components/ResponsiveButton';
+import ResponsiveButton from '@/components/ResponsiveButton';
 
 // Mock the responsive hook
 const mockUseResponsive = vi.fn();

@@ -1,8 +1,8 @@
-import { unifiedAlertPreferenceService } from '../../server/features/alert-preferences/domain/services/unified-alert-preference-service';
-import { readDatabase as db } from '../../server/infrastructure/database/index.js';
+import { unifiedAlertPreferenceService } from '@server/features/alert-preferences/domain/services/unified-alert-preference-service';
+import { readDatabase as db } from '@server/infrastructure/database/index.js';
 import { users, bills, userInterests } from '../../shared/schema/index.js';
 import { eq } from 'drizzle-orm';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 /**
  * Comprehensive verification suite for the Alert Preference Management System.

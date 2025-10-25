@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { QueryExecutor, QueryResult } from '../query-executor';
 import { getMonitoringService, resetMonitoringService } from '../../../monitoring/monitoring';
@@ -5,19 +6,19 @@ import { connectionManager } from '../connection-manager';
 import type { PoolClient } from 'pg';
 
 // Mock the connection manager
-jest.mock('../connection-manager', () => ({
+vi.mock('../connection-manager', () => ({
   connectionManager: {
-    acquireConnection: jest.fn(),
-    releaseConnection: jest.fn(),
+    acquireConnection: vi.fn(),
+    releaseConnection: vi.fn(),
   },
 }));
 
 // Mock the logger
-jest.mock('../../../../utils/logger', () => ({
+vi.mock('../../../../utils/logger', () => ({
   logger: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
@@ -38,7 +39,7 @@ const MEMORY_LIMIT_MB_SLOW_QUERIES = 50;
  */
 const createMockQuery = (options: { delayMs?: number; withExplain?: boolean } = {}) => {
   const { delayMs = 0, withExplain = false } = options;
-  return jest.fn((sql: string, params: any[], callback: (err: Error | null, result: any) => void) => {
+  return vi.fn((sql: string, params: any[], callback: (err: Error | null, result: any) => void) => {
     if (withExplain && sql.toUpperCase().startsWith('EXPLAIN')) {
       return callback(null, { rows: [{ 'QUERY PLAN': 'Seq Scan' }], rowCount: 1 });
     }
@@ -73,7 +74,7 @@ type MockQueryFn = (
 
 describe('Slow Query Performance Tests', () => {
   // Use the specific mock function type for mockClient.query.
-  let mockClient: { query: jest.Mock<MockQueryFn> };
+  let mockClient: { query: vi.Mock<MockQueryFn> };
   let monitoringService: any;
 
   beforeEach(() => {
@@ -81,18 +82,18 @@ describe('Slow Query Performance Tests', () => {
     monitoringService = getMonitoringService();
 
     mockClient = {
-      query: jest.fn(),
+      query: vi.fn(),
     };
 
-    // Use jest.mocked for type-safe mock resolution
-    jest.mocked(connectionManager.acquireConnection).mockResolvedValue(mockClient as any as PoolClient);
-    jest.mocked(connectionManager.releaseConnection).mockResolvedValue(undefined);
+    // Use vi.mocked for type-safe mock resolution
+    vi.mocked(connectionManager.acquireConnection).mockResolvedValue(mockClient as any as PoolClient);
+    vi.mocked(connectionManager.releaseConnection).mockResolvedValue(undefined);
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Ensures timers from mock implementations are cleared to prevent open handles.
-    jest.clearAllTimers();
+    vi.clearAllTimers();
   });
 
   describe('Overhead Measurement', () => {
@@ -216,7 +217,7 @@ describe('Slow Query Performance Tests', () => {
         enableSlowQueryDetection: true,
         slowQueryThresholdMs: 1,
       });
-      const recordMetricSpy = jest.spyOn(monitoringService, 'recordDatabaseMetric');
+      const recordMetricSpy = vi.spyOn(monitoringService, 'recordDatabaseMetric');
       mockClient.query = createMockQuery({ delayMs: MOCK_QUERY_DELAY_MS, withExplain: true });
 
       const executionTimeMs = await measureExecutionTime(() =>

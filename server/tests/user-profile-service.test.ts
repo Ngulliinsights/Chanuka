@@ -1,8 +1,23 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
-import { database as db, user as users, userProfile as userProfiles, userInterest as userInterests, billEngagement, notification as notifications, bill as bills } from '../../shared/database/connection';
+import { database as db, user as users, userProfile as userProfiles, userInterest as userInterests, billEngagement, notification as notifications, bill as bills } from '@shared/database/connection';
 import { userProfileService } from '../features/users/domain/user-profile.ts';
 import { eq } from 'drizzle-orm';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 describe('User Profile Service', () => {
   let testUserId: string;

@@ -1,6 +1,16 @@
 import { logger } from './browser-logger';
 import { preloadCriticalResources } from './serviceWorker';
 import { useOfflineDetection } from '../hooks/useOfflineDetection';
+import {
+  DEFAULT_ASSET_FALLBACKS,
+  getAssetFallback,
+  getAssetPriority,
+  determineEnhancementLevel,
+  getFeatureAvailability,
+  applyDegradedMode,
+  initializeAssetFallbacks,
+  EnhancementLevel
+} from './asset-fallback-config';
 
 // Asset loading configuration
 export interface AssetLoadConfig {
@@ -86,6 +96,13 @@ export class AssetLoadingManager {
   constructor() {
     this.setupConnectionMonitoring();
     this.setupPerformanceMonitoring();
+    this.initializeFallbackSystem();
+  }
+
+  private initializeFallbackSystem() {
+    if (typeof window !== 'undefined') {
+      initializeAssetFallbacks();
+    }
   }
 
   private setupConnectionMonitoring() {
@@ -152,11 +169,12 @@ export class AssetLoadingManager {
     this.progressCallbacks.forEach(callback => callback(this.loadingProgress));
   }
 
-  // Load a single asset with retry logic
+  // Load a single asset with retry logic and fallbacks
   async loadAsset(
     url: string,
     type: 'script' | 'style' | 'image' | 'font' | 'critical',
-    config?: Partial<AssetLoadConfig>
+    config?: Partial<AssetLoadConfig>,
+    assetKey?: string
   ): Promise<AssetLoadResult> {
     // Return cached promise if already loading
     if (this.loadPromises.has(url)) {
@@ -185,7 +203,18 @@ export class AssetLoadingManager {
     }
 
     const finalConfig = { ...DEFAULT_CONFIGS[type], ...config };
-    const loadPromise = this.performAssetLoad(url, type, finalConfig);
+
+    // Get fallback strategy if asset key is provided
+    const fallbackStrategy = assetKey ? getAssetFallback(type + 's' as keyof typeof DEFAULT_ASSET_FALLBACKS, assetKey) : null;
+    const priority = assetKey ? getAssetPriority(assetKey) : 'medium';
+
+    // Adjust config based on priority
+    if (priority === 'critical') {
+      finalConfig.maxRetries = Math.max(finalConfig.maxRetries, 3);
+      finalConfig.timeout = Math.min(finalConfig.timeout, 5000);
+    }
+
+    const loadPromise = this.performAssetLoadWithFallback(url, type, finalConfig, fallbackStrategy);
     this.loadPromises.set(url, loadPromise);
 
     try {
@@ -205,6 +234,96 @@ export class AssetLoadingManager {
     } finally {
       this.loadPromises.delete(url);
     }
+  }
+
+  private async performAssetLoadWithFallback(
+    url: string,
+    type: string,
+    config: AssetLoadConfig,
+    fallbackStrategy?: any
+  ): Promise<AssetLoadResult> {
+    const startTime = performance.now();
+    let retries = 0;
+    let lastError: Error | undefined;
+    let currentUrl = url;
+
+    // Check connection and adjust config if needed
+    if (config.connectionAware && !this.isOnline) {
+      logger.warn('Asset loading skipped due to offline status', { component: 'AssetLoadingManager', url });
+      return {
+        success: false,
+        error: new Error('Device is offline'),
+        retries: 0,
+        loadTime: 0,
+        fromCache: false,
+      };
+    }
+
+    if (config.connectionAware && this.connectionType === 'slow' && config.priority === 'low') {
+      // Skip low priority assets on slow connections
+      logger.info('Skipping low priority asset on slow connection', { component: 'AssetLoadingManager', url });
+      return {
+        success: false,
+        error: new Error('Skipped due to slow connection'),
+        retries: 0,
+        loadTime: 0,
+        fromCache: false,
+      };
+    }
+
+    // Adjust retry config based on connection quality
+    if (this.connectionType === 'slow') {
+      config.maxRetries = Math.max(1, config.maxRetries - 1); // Reduce retries on slow connections
+      config.retryDelay = config.retryDelay * 1.5; // Increase delay
+    }
+
+    while (retries <= config.maxRetries) {
+      try {
+        const loadResult = await this.loadAssetByType(currentUrl, type, config.timeout);
+        const loadTime = performance.now() - startTime;
+
+        return {
+          success: true,
+          retries,
+          loadTime,
+          fromCache: loadResult.fromCache,
+        };
+      } catch (error) {
+        lastError = error as Error;
+        retries++;
+
+        // Try fallback URL if available
+        if (fallbackStrategy && currentUrl === url && fallbackStrategy.fallbacks && fallbackStrategy.fallbacks.length > 0) {
+          currentUrl = fallbackStrategy.fallbacks[0];
+          logger.info('Trying fallback URL', { component: 'AssetLoadingManager', original: url, fallback: currentUrl });
+          continue;
+        }
+
+        // Try offline fallback if available
+        if (fallbackStrategy && fallbackStrategy.offlineFallback && !this.isOnline && currentUrl !== fallbackStrategy.offlineFallback) {
+          currentUrl = fallbackStrategy.offlineFallback;
+          logger.info('Using offline fallback', { component: 'AssetLoadingManager', url: currentUrl });
+          continue;
+        }
+
+        if (retries <= config.maxRetries) {
+          // Exponential backoff with jitter
+          const delay = config.retryDelay * Math.pow(2, retries - 1) + Math.random() * 1000;
+          await new Promise(resolve => setTimeout(resolve, delay));
+
+          console.warn(`Retrying asset load (${retries}/${config.maxRetries}): ${currentUrl}`, error);
+        }
+      }
+    }
+
+    const loadTime = performance.now() - startTime;
+    return {
+      success: false,
+      error: lastError,
+      retries,
+      loadTime,
+      fromCache: false,
+    };
   }
 
   private async performAssetLoad(
@@ -578,8 +697,13 @@ export class AssetLoadingManager {
     }
   }
 
-  // Get loading statistics
+  // Get loading statistics with enhancement level
   getLoadingStats() {
+    const loaded = Array.from(this.loadedAssets);
+    const failed = Array.from(this.failedAssets);
+    const enhancementLevel = determineEnhancementLevel(loaded, failed);
+    const featureAvailability = getFeatureAvailability(loaded, failed);
+
     return {
       loaded: this.loadedAssets.size,
       failed: this.failedAssets.size,
@@ -589,7 +713,17 @@ export class AssetLoadingManager {
       connectionQuality: this.offlineDetection.connectionQuality,
       lastOnlineTime: this.offlineDetection.lastOnlineTime,
       lastOfflineTime: this.offlineDetection.lastOfflineTime,
+      enhancementLevel,
+      featureAvailability,
+      loadedAssets: loaded,
+      failedAssets: failed,
     };
+  }
+
+  // Apply degraded mode based on current loading state
+  applyDegradedMode(): void {
+    const stats = this.getLoadingStats();
+    applyDegradedMode(stats.enhancementLevel);
   }
 
   // Clear cache and reset state
@@ -616,17 +750,27 @@ export function useAssetLoading() {
     phase: 'preload',
   });
 
+  const [enhancementLevel, setEnhancementLevel] = React.useState<EnhancementLevel>(EnhancementLevel.FULL);
+
   React.useEffect(() => {
-    const unsubscribe = assetLoadingManager.onProgress(setProgress);
+    const unsubscribe = assetLoadingManager.onProgress((newProgress) => {
+      setProgress(newProgress);
+      // Update enhancement level when progress changes
+      const stats = assetLoadingManager.getLoadingStats();
+      setEnhancementLevel(stats.enhancementLevel);
+    });
     return unsubscribe;
   }, []);
 
   return {
     progress,
-    loadAsset: assetLoadingManager.loadAsset.bind(assetLoadingManager),
+    enhancementLevel,
+    loadAsset: (url: string, type: 'script' | 'style' | 'image' | 'font' | 'critical', config?: Partial<AssetLoadConfig>, assetKey?: string) =>
+      assetLoadingManager.loadAsset(url, type, config, assetKey),
     loadAssets: assetLoadingManager.loadAssets.bind(assetLoadingManager),
     preloadCriticalAssets: assetLoadingManager.preloadCriticalAssets.bind(assetLoadingManager),
     getStats: assetLoadingManager.getLoadingStats.bind(assetLoadingManager),
+    applyDegradedMode: assetLoadingManager.applyDegradedMode.bind(assetLoadingManager),
   };
 }
 

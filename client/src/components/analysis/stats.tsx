@@ -1,6 +1,6 @@
 import { Card, CardContent, CardTitle } from '../ui/card';
 import { Progress } from '../ui/progress';
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '../../utils/browser-logger';
 
 interface Bill {
   supportPercentage?: number;

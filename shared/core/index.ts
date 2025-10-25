@@ -6,10 +6,10 @@
  * avoiding circular dependencies while maintaining functionality.
  */
 
-// Essential logger - try to import from full system, fallback to simple
+// Essential logger - import from consolidated observability
 let logger: any;
 try {
-  // Try to import the full logger system
+  // Import from the single source of truth for logging
   const loggingModule = require('./src/observability/logging');
   logger = loggingModule.logger || loggingModule.UnifiedLogger;
 } catch (error) {
@@ -33,6 +33,30 @@ try {
 }
 
 export { logger };
+
+// Error enums and types
+export enum ErrorSeverity {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical'
+}
+
+export enum ErrorDomain {
+  SYSTEM = 'system',
+  VALIDATION = 'validation',
+  AUTHENTICATION = 'authentication',
+  AUTHORIZATION = 'authorization',
+  DATABASE = 'database',
+  CACHE = 'cache',
+  NETWORK = 'network',
+  EXTERNAL_SERVICE = 'external_service',
+  BUSINESS_LOGIC = 'business_logic',
+  INFRASTRUCTURE = 'infrastructure',
+  SECURITY = 'security',
+  DATA = 'data',
+  INTEGRATION = 'integration'
+}
 
 // Essential error classes
 export class BaseError extends Error {
@@ -163,6 +187,33 @@ export const RateLimit = {
     };
   }
 };
+
+// Error recovery engine (simplified version for client)
+export const createErrorRecoveryEngine = () => ({
+  suggestRecovery: (error: any) => ({
+    suggestions: ['Try refreshing the page', 'Check your connection'],
+    automatic: false
+  })
+});
+
+export const AutomatedErrorRecoveryEngine = createErrorRecoveryEngine;
+
+// Enhanced Error Boundary (simplified version for client)
+export const EnhancedErrorBoundary = ({ children, fallback }: any) => {
+  // This is a simplified version - the full implementation should be in the client
+  return children;
+};
+
+export interface EnhancedErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ComponentType<any>;
+}
+
+export interface RecoverySuggestion {
+  type: string;
+  message: string;
+  action?: () => void;
+}
 
 // Re-export from src for server-side usage (when available)
 try {

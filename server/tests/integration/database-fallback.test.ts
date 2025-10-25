@@ -1,15 +1,30 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { databaseFallbackService } from '../../infrastructure/database/database-fallback.ts';
 import { demoDataService } from '../../infrastructure/demo-data.js';
 import request from 'supertest';
 import { app } from '../../index.js';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 describe('Database Fallback Integration Tests', () => {
   beforeEach(() => {
     // Reset services before each test
     demoDataService.setDemoMode(false);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(async () => {
@@ -49,7 +64,7 @@ describe('Database Fallback Integration Tests', () => {
     });
 
     it('should retry connection on failure', async () => {
-      const testConnectionSpy = jest.spyOn(databaseFallbackService, 'testConnection')
+      const testConnectionSpy = vi.spyOn(databaseFallbackService, 'testConnection')
         .mockResolvedValueOnce(false)
         .mockResolvedValueOnce(true);
 
@@ -263,7 +278,7 @@ describe('Database Fallback Integration Tests', () => {
   describe('Error Recovery', () => {
     it('should recover when database comes back online', async () => {
       // Start with database failure
-      const testConnectionSpy = jest.spyOn(databaseFallbackService, 'testConnection')
+      const testConnectionSpy = vi.spyOn(databaseFallbackService, 'testConnection')
         .mockResolvedValueOnce(false)
         .mockResolvedValueOnce(true);
 
@@ -278,7 +293,7 @@ describe('Database Fallback Integration Tests', () => {
     });
 
     it('should maintain demo mode after max retries', async () => {
-      const testConnectionSpy = jest.spyOn(databaseFallbackService, 'testConnection')
+      const testConnectionSpy = vi.spyOn(databaseFallbackService, 'testConnection')
         .mockResolvedValue(false);
 
       // Initialize with failure

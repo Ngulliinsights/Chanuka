@@ -1,10 +1,24 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { renderHook } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { useUnifiedNavigation } from '../use-unified-navigation';
-import { NavigationProvider } from '..\..\contexts\NavigationContext';
+import { NavigationProvider } from '../../contexts/NavigationContext';
 import React from 'react';
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '@/$2/browser-logger';
 
 // Test wrapper component
 const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (

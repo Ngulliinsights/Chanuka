@@ -15,13 +15,13 @@ const { execSync } = require('child_process');
 const IMPORT_MAPPINGS = {
   // Old shared/core/src/errors imports
   "from '../../../shared/core/src/observability/error-management'": "from '../../../shared/core/src/observability/error-management'",
-  "from '../../shared/core/src/observability/error-management'": "from '../../shared/core/src/observability/error-management'",
+  "from '@shared/core/src/observability/error-management'": "from '@shared/core/src/observability/error-management'",
   "from '../shared/core/src/observability/error-management'": "from '../shared/core/src/observability/error-management'",
   "from '@shared/core/src/observability/error-management'": "from '@shared/core/src/observability/error-management'",
   
   // Old shared/core/src/error-handling imports
   "from '../../../shared/core/src/observability/error-management'": "from '../../../shared/core/src/observability/error-management'",
-  "from '../../shared/core/src/observability/error-management'": "from '../../shared/core/src/observability/error-management'",
+  "from '@shared/core/src/observability/error-management'": "from '@shared/core/src/observability/error-management'",
   "from '../shared/core/src/observability/error-management'": "from '../shared/core/src/observability/error-management'",
   "from '@shared/core/src/observability/error-management'": "from '@shared/core/src/observability/error-management'",
   

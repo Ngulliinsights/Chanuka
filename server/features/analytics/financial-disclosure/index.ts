@@ -5,9 +5,9 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { FinancialDisclosureMonitoringService } from "./monitoring.js";
 import { FinancialDisclosureAnalyticsService } from "../services/financial-disclosure.service.js";
-import { ApiSuccess, ApiError } from "../../../../shared/core/src/utilities/api";
+import { ApiSuccess, ApiError } from '@shared/core';
 import { z, ZodError } from "zod";
-import { ValidationError as InvalidInputError, SponsorNotFoundError, BaseError } from "../../../../shared/core/src/observability/error-management";
+import { ValidationError as InvalidInputError, SponsorNotFoundError, BaseError } from '@shared/core';
 import crypto from 'crypto';
 import { logger } from '../../../../shared/core/index.js';
 import { errorTracker } from '../../../core/errors/error-tracker.js';

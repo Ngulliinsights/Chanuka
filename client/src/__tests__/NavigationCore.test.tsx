@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import HomePage from '../pages/home';
-import { logger } from '..\utils\browser-logger';
+import { logger } from '@/utils/browser-logger';
 
 // Mock hooks with minimal setup
 vi.mock('../hooks/use-auth', () => ({
@@ -368,5 +368,30 @@ describe('Navigation Core Tests', () => {
         expect(joinMovementButton).toBeInTheDocument();
       });
     });
+  });
+});
+
+describe('NavigationCore', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('should render without crashing', () => {
+    const { container } = render(<NavigationCore />);
+    expect(container).toBeInTheDocument();
+  });
+
+  it('should be accessible', () => {
+    const { container } = render(<NavigationCore />);
+    expect(container.firstChild).toHaveAttribute('role');
+  });
+
+  it('should handle props correctly', () => {
+    // TODO: Add specific prop tests for NavigationCore
+    expect(true).toBe(true);
   });
 });

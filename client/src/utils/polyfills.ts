@@ -1029,9 +1029,9 @@ class PolyfillManager {
 
     try {
       await Promise.all(polyfillPromises);
-      logger.info('All polyfills loaded successfully', { component: 'Chanuka' });
+      logger.info('All polyfills loaded successfully', { component: 'Polyfills' });
     } catch (error) {
-      logger.error('Some polyfills failed to load:', { component: 'Chanuka' }, error);
+      logger.error('Some polyfills failed to load:', { component: 'Polyfills' }, error);
       // Don't throw - allow app to continue with partial polyfill support
     }
   }

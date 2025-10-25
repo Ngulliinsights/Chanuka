@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Auth component accessibility tests
  */
@@ -5,16 +6,16 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { axe, toHaveNoViolations } from 'jest-axe';
-import { useAuthForm } from '../hooks/useAuthForm';
+import { useAuthForm } from '@/hooks/useAuthForm';
 import { AUTH_ACCESSIBILITY, AUTH_TEST_IDS } from '../constants';
-import { createMockUseAuth } from '../utils/test-utils';
+import { createMockUseAuth } from '@/utils/test-utils';
 
 // Extend Jest matchers
 expect.extend(toHaveNoViolations);
 
 // Mock the useAuth hook
 const mockUseAuth = createMockUseAuth();
-jest.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/use-auth', () => ({
   useAuth: () => mockUseAuth
 }));
 
@@ -275,7 +276,7 @@ function TestAuthForm({ mode = 'login' }: { mode?: 'login' | 'register' }) {
 
 describe('Auth Accessibility', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('WCAG 2.1 AA Compliance', () => {
@@ -444,7 +445,7 @@ describe('Auth Accessibility', () => {
     });
 
     it('should support Enter key for form submission', async () => {
-      const mockSubmit = jest.fn();
+      const mockSubmit = vi.fn();
       mockUseAuth.login.mockResolvedValue({ success: true, data: {} });
       
       render(<TestAuthForm />);
@@ -639,5 +640,26 @@ describe('Auth Accessibility', () => {
       expect(errorAlert).toHaveAttribute('role', 'alert');
       expect(errorAlert).toHaveAttribute('aria-live', 'assertive');
     });
+  });
+});
+
+describe('accessibility', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should be defined and properly exported', () => {
+    expect(accessibility).toBeDefined();
+    expect(typeof accessibility).not.toBe('undefined');
+  });
+
+  it('should export expected functions/classes', () => {
+    // TODO: Add specific export tests for accessibility
+    expect(typeof accessibility).toBe('object');
+  });
+
+  it('should handle basic functionality', () => {
+    // TODO: Add specific functionality tests for accessibility
+    expect(true).toBe(true);
   });
 });

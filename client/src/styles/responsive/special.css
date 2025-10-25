@@ -1,0 +1,53 @@
+/* Special Responsive Styles - Landscape, High DPI, Container Queries */
+
+@import '../base/variables.css';
+
+/* Landscape Mobile Styles */
+@media (max-width: 1024px) and (orientation: landscape) {
+  .chanuka-mobile-landscape {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  /* Adjust header height for landscape */
+  .chanuka-header {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  /* Optimize sidebar for landscape tablets */
+  .chanuka-sidebar {
+    width: 12rem;
+    min-width: 12rem;
+  }
+}
+
+/* High DPI / Retina Display Optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .chanuka-card {
+    border-width: 0.5px;
+  }
+
+  .chanuka-btn {
+    border-width: 0.5px;
+  }
+}
+
+/* Container Queries Support (Progressive Enhancement) */
+@supports (container-type: inline-size) {
+  .chanuka-responsive-container {
+    container-type: inline-size;
+  }
+
+  @container (max-width: 400px) {
+    .chanuka-card-responsive {
+      padding: var(--space-sm);
+    }
+  }
+
+  @container (min-width: 600px) {
+    .chanuka-card-responsive {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: var(--space-lg);
+    }
+  }
+}

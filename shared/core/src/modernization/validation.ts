@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import { Logger } from '../logging';
+import { logger } from '../observability/logging/logger';
 import {
   ValidationResult,
   ValidationScope,
@@ -118,7 +118,7 @@ export class ValidationFramework extends EventEmitter {
    */
   public getLatestValidation(scope: ValidationScope): ValidationResult | null {
     const scopeResults = this.validationHistory.filter(r => r.scope === scope);
-    return scopeResults.length > 0 
+    return scopeResults.length > 0
       ? scopeResults.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0]
       : null;
   }
@@ -157,7 +157,7 @@ export class ValidationFramework extends EventEmitter {
             if (this.isCriticalValidation(validationType)) {
               criticalIssues.push(check.message);
             }
-            
+
             if (this.config.failFast) {
               break;
             }
@@ -174,10 +174,10 @@ export class ValidationFramework extends EventEmitter {
             message: `Validation check failed: ${error.message}`,
             duration: 0
           };
-          
+
           checks.push(failedCheck);
           overallStatus = ValidationStatus.FAILED;
-          
+
           if (this.isCriticalValidation(validationType)) {
             criticalIssues.push(failedCheck.message);
           }
@@ -191,7 +191,7 @@ export class ValidationFramework extends EventEmitter {
       }
 
       const summary = this.createValidationSummary(checks, overallStatus, criticalIssues);
-      
+
       const result: ValidationResult = {
         id: validationId,
         timestamp: new Date(),
@@ -202,23 +202,23 @@ export class ValidationFramework extends EventEmitter {
       };
 
       this.validationHistory.push(result);
-      
+
       const duration = Date.now() - startTime;
-      this.logger.info({ 
+      this.logger.info({
         validationId,
         scope,
         status: overallStatus,
         checksCount: checks.length,
-        duration 
+        duration
       }, 'Validation completed');
 
       return result;
 
     } catch (error) {
-      const validationError = error instanceof ValidationError 
-        ? error 
+      const validationError = error instanceof ValidationError
+        ? error
         : new ValidationError(`Validation failed: ${error.message}`, ValidationType.FUNCTIONALITY);
-      
+
       this.emit('validation:error', validationError);
       throw validationError;
     }
@@ -278,7 +278,7 @@ export class ValidationFramework extends EventEmitter {
 
     } catch (error) {
       const duration = Date.now() - startTime;
-      
+
       return {
         id: checkId,
         name: checkName,
@@ -321,7 +321,7 @@ export class ValidationFramework extends EventEmitter {
       return {
         status: ValidationStatus.FAILED,
         message: `Syntax errors found in ${syntaxErrors.length} files`,
-        details: { 
+        details: {
           filesChecked: tsFiles.length,
           errorFiles: syntaxErrors.slice(0, 5), // Show first 5 errors
           totalErrors: syntaxErrors.length
@@ -343,7 +343,7 @@ export class ValidationFramework extends EventEmitter {
       try {
         const content = await fs.readFile(file, 'utf-8');
         const imports = this.extractImports(content);
-        
+
         for (const importPath of imports) {
           if (!(await this.importExists(importPath, file))) {
             brokenImports.push(`${file}: ${importPath}`);
@@ -364,7 +364,7 @@ export class ValidationFramework extends EventEmitter {
       return {
         status: ValidationStatus.FAILED,
         message: `Broken imports found in ${brokenImports.length} locations`,
-        details: { 
+        details: {
           filesChecked: sourceFiles.length,
           brokenImports: brokenImports.slice(0, 5),
           totalBroken: brokenImports.length
@@ -380,7 +380,7 @@ export class ValidationFramework extends EventEmitter {
   }> {
     // Check if tests exist and can run
     const testFiles = await this.findFiles(['**/*.test.ts', '**/*.test.js', '**/*.spec.ts', '**/*.spec.js']);
-    
+
     if (testFiles.length === 0) {
       return {
         status: ValidationStatus.WARNING,
@@ -391,12 +391,12 @@ export class ValidationFramework extends EventEmitter {
 
     // In a real implementation, would run the tests
     const testResults = await this.runTests(testFiles);
-    
+
     if (testResults.passed) {
       return {
         status: ValidationStatus.PASSED,
         message: `All ${testFiles.length} test files passed`,
-        details: { 
+        details: {
           testFiles: testFiles.length,
           ...testResults
         }
@@ -405,7 +405,7 @@ export class ValidationFramework extends EventEmitter {
       return {
         status: ValidationStatus.FAILED,
         message: `Test failures detected`,
-        details: { 
+        details: {
           testFiles: testFiles.length,
           ...testResults
         }
@@ -421,7 +421,7 @@ export class ValidationFramework extends EventEmitter {
     // Check if project builds successfully
     try {
       const buildResult = await this.runBuild();
-      
+
       if (buildResult.success) {
         return {
           status: ValidationStatus.PASSED,
@@ -471,7 +471,7 @@ export class ValidationFramework extends EventEmitter {
       return {
         status: ValidationStatus.PASSED,
         message: `All ${functionalityChecks.length} functionality checks passed`,
-        details: { 
+        details: {
           totalChecks: functionalityChecks.length,
           passed,
           failed,
@@ -482,7 +482,7 @@ export class ValidationFramework extends EventEmitter {
       return {
         status: ValidationStatus.FAILED,
         message: `${failed} functionality checks failed`,
-        details: { 
+        details: {
           totalChecks: functionalityChecks.length,
           passed,
           failed,
@@ -499,7 +499,7 @@ export class ValidationFramework extends EventEmitter {
   }> {
     // Basic performance validation
     const performanceMetrics = await this.gatherPerformanceMetrics();
-    
+
     const issues = [];
     if (performanceMetrics.buildTime > 60000) { // 1 minute
       issues.push('Build time exceeds 1 minute');
@@ -530,7 +530,7 @@ export class ValidationFramework extends EventEmitter {
   }> {
     // Basic security validation
     const securityIssues = await this.checkSecurityIssues();
-    
+
     if (securityIssues.length === 0) {
       return {
         status: ValidationStatus.PASSED,
@@ -540,11 +540,11 @@ export class ValidationFramework extends EventEmitter {
     } else {
       const criticalIssues = securityIssues.filter(issue => issue.severity === 'critical');
       const status = criticalIssues.length > 0 ? ValidationStatus.FAILED : ValidationStatus.WARNING;
-      
+
       return {
         status,
         message: `${securityIssues.length} security issues found`,
-        details: { 
+        details: {
           totalIssues: securityIssues.length,
           criticalIssues: criticalIssues.length,
           issues: securityIssues.slice(0, 5)
@@ -625,7 +625,6 @@ export class ValidationFramework extends EventEmitter {
     let match;
     while ((match = importRegex.exec(content)) !== null) {
       imports.push(match[1]);
-import { logger } from '../observability/logging';
     }
     return imports;
   }

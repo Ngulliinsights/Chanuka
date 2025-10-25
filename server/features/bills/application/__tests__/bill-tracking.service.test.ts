@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { billTrackingService, BillTrackingService } from '../bill-tracking.service';
 import { databaseService } from '../../../../infrastructure/database/database-service';
 import { cacheService } from '../../../../infrastructure/cache/cache-service';
@@ -6,37 +7,37 @@ import * as schema from '../../../../../shared/schema';
 import { readDatabase } from '@shared/database/connection'; // Mock this
 
 // --- Mock Dependencies ---
-jest.mock('../../../../db', () => ({
-  readDatabase: jest.fn(),
+vi.mock('../../../../db', () => ({
+  readDatabase: vi.fn(),
 }));
-jest.mock('../../../../infrastructure/database/database-service');
-jest.mock('../../../../infrastructure/cache/cache-service');
-jest.mock('../../../../infrastructure/notifications/notification-service');
+vi.mock('../../../../infrastructure/database/database-service');
+vi.mock('../../../../infrastructure/cache/cache-service');
+vi.mock('../../../../infrastructure/notifications/notification-service');
 // Mock the status monitor if needed for side effects
-jest.mock('../bill-status-monitor', () => ({
+vi.mock('../bill-status-monitor', () => ({
     billStatusMonitorService: {
-        getBillStatusHistory: jest.fn().mockResolvedValue([]), // Mock relevant methods
+        getBillStatusHistory: vi.fn().mockResolvedValue([]), // Mock relevant methods
     },
 }));
 
 
 // Type assertion for the mocked DB
 const mockDb = {
-  select: jest.fn().mockReturnThis(),
-  from: jest.fn().mockReturnThis(),
-  where: jest.fn().mockReturnThis(),
-  limit: jest.fn().mockResolvedValue([]), // Default empty result
-  insert: jest.fn().mockReturnThis(),
-  values: jest.fn().mockReturnThis(),
-  onConflictDoUpdate: jest.fn().mockReturnThis(),
-  returning: jest.fn().mockResolvedValue([]), // Default empty returning
-  update: jest.fn().mockReturnThis(),
-  set: jest.fn().mockReturnThis(),
-  leftJoin: jest.fn().mockReturnThis(),
-  innerJoin: jest.fn().mockReturnThis(),
-  orderBy: jest.fn().mockReturnThis(),
-  offset: jest.fn().mockReturnThis(),
-  groupBy: jest.fn().mockReturnThis(), // Add groupBy if used
+  select: vi.fn().mockReturnThis(),
+  from: vi.fn().mockReturnThis(),
+  where: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockResolvedValue([]), // Default empty result
+  insert: vi.fn().mockReturnThis(),
+  values: vi.fn().mockReturnThis(),
+  onConflictDoUpdate: vi.fn().mockReturnThis(),
+  returning: vi.fn().mockResolvedValue([]), // Default empty returning
+  update: vi.fn().mockReturnThis(),
+  set: vi.fn().mockReturnThis(),
+  leftJoin: vi.fn().mockReturnThis(),
+  innerJoin: vi.fn().mockReturnThis(),
+  orderBy: vi.fn().mockReturnThis(),
+  offset: vi.fn().mockReturnThis(),
+  groupBy: vi.fn().mockReturnThis(), // Add groupBy if used
 };
 
 // --- Test Suite ---
@@ -53,11 +54,11 @@ describe('BillTrackingService', () => {
 
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Configure the mock DB instance
-    (readDatabase as jest.Mock).mockReturnValue(mockDb);
+    (readDatabase as vi.Mock).mockReturnValue(mockDb);
     // Mock databaseService transactions to execute the provided callback
-     (databaseService.withTransaction as jest.Mock).mockImplementation(async (callback) => {
+     (databaseService.withTransaction as vi.Mock).mockImplementation(async (callback) => {
         const mockTx = mockDb; // Simulate transaction object being the same as db for simplicity
         try {
             const data = await callback(mockTx);
@@ -69,7 +70,7 @@ describe('BillTrackingService', () => {
     });
 
     // Mock cache get to simulate cache misses by default
-    (cacheService.get as jest.Mock).mockResolvedValue(null);
+    (cacheService.get as vi.Mock).mockResolvedValue(null);
 
     service = billTrackingService; // Use the exported instance or new BillTrackingService()
 
@@ -80,8 +81,8 @@ describe('BillTrackingService', () => {
             // Need to chain .where() response correctly
             const self = {
                  ...mockDb,
-                 where: jest.fn().mockReturnThis(), // Ensure where returns the chainable object
-                 limit: jest.fn().mockResolvedValue([mockBill]) // Return the mock bill when limit(1) is called after where
+                 where: vi.fn().mockReturnThis(), // Ensure where returns the chainable object
+                 limit: vi.fn().mockResolvedValue([mockBill]) // Return the mock bill when limit(1) is called after where
             };
             self.where.mockReturnValue(self); // Make where return the modified self
             return self;
@@ -98,8 +99,8 @@ describe('BillTrackingService', () => {
       // Arrange: No existing preference, no existing engagement
        mockDb.returning.mockResolvedValueOnce([mockPreference]); // For preference insert
        mockDb.select.mockReturnValueOnce({ // For checking existing engagement
-           from: jest.fn().mockReturnThis(),
-           where: jest.fn().mockResolvedValue([]), // No existing engagement
+           from: vi.fn().mockReturnThis(),
+           where: vi.fn().mockResolvedValue([]), // No existing engagement
        });
        // Setup mock for engagement insert (no returning needed usually)
        mockDb.values.mockResolvedValueOnce(undefined); // for engagement insert
@@ -120,13 +121,13 @@ describe('BillTrackingService', () => {
        // Arrange: Existing preference exists (onConflictDoUpdate handles this), existing engagement exists
        mockDb.returning.mockResolvedValueOnce([mockPreference]); // onConflictDoUpdate returns updated pref
        mockDb.select.mockReturnValueOnce({ // For checking existing engagement
-           from: jest.fn().mockReturnThis(),
-           where: jest.fn().mockResolvedValue([{ id: 5 }]), // Existing engagement found
+           from: vi.fn().mockReturnThis(),
+           where: vi.fn().mockResolvedValue([{ id: 5 }]), // Existing engagement found
        });
        // Setup mock for engagement update
         mockDb.update.mockReturnValueOnce({ // for engagement update
-            set: jest.fn().mockReturnThis(),
-            where: jest.fn().mockResolvedValue(undefined),
+            set: vi.fn().mockReturnThis(),
+            where: vi.fn().mockResolvedValue(undefined),
         });
 
       // Act
@@ -145,7 +146,7 @@ describe('BillTrackingService', () => {
      it('should throw an error if the bill does not exist', async () => {
       // Arrange: Mock validateBillExists to return null
       mockDb.limit.mockImplementationOnce((limitVal) => {
-         const self = { ...mockDb, where: jest.fn().mockReturnThis(), limit: jest.fn().mockResolvedValue([]) }; // No bill found
+         const self = { ...mockDb, where: vi.fn().mockReturnThis(), limit: vi.fn().mockResolvedValue([]) }; // No bill found
          self.where.mockReturnValue(self);
          return self;
       });
@@ -187,11 +188,11 @@ describe('BillTrackingService', () => {
     it('should return true if an active preference exists', async () => {
       // Arrange
        mockDb.select.mockReturnValueOnce({
-           from: jest.fn().mockReturnThis(),
-           where: jest.fn().mockReturnThis(),
-           limit: jest.fn().mockResolvedValue([{ isActive: true }]),
+           from: vi.fn().mockReturnThis(),
+           where: vi.fn().mockReturnThis(),
+           limit: vi.fn().mockResolvedValue([{ isActive: true }]),
        });
-       (cacheService.get as jest.Mock).mockResolvedValue(null); // Cache miss
+       (cacheService.get as vi.Mock).mockResolvedValue(null); // Cache miss
 
 
       // Act
@@ -205,11 +206,11 @@ describe('BillTrackingService', () => {
     it('should return false if preference exists but is inactive', async () => {
        // Arrange
        mockDb.select.mockReturnValueOnce({
-           from: jest.fn().mockReturnThis(),
-           where: jest.fn().mockReturnThis(),
-           limit: jest.fn().mockResolvedValue([{ isActive: false }]),
+           from: vi.fn().mockReturnThis(),
+           where: vi.fn().mockReturnThis(),
+           limit: vi.fn().mockResolvedValue([{ isActive: false }]),
        });
-       (cacheService.get as jest.Mock).mockResolvedValue(null); // Cache miss
+       (cacheService.get as vi.Mock).mockResolvedValue(null); // Cache miss
 
       // Act
       const result = await service.isUserTrackingBill(mockUserId, mockBillId);
@@ -222,11 +223,11 @@ describe('BillTrackingService', () => {
     it('should return false if no preference exists', async () => {
       // Arrange
        mockDb.select.mockReturnValueOnce({
-           from: jest.fn().mockReturnThis(),
-           where: jest.fn().mockReturnThis(),
-           limit: jest.fn().mockResolvedValue([]), // No record found
+           from: vi.fn().mockReturnThis(),
+           where: vi.fn().mockReturnThis(),
+           limit: vi.fn().mockResolvedValue([]), // No record found
        });
-       (cacheService.get as jest.Mock).mockResolvedValue(null); // Cache miss
+       (cacheService.get as vi.Mock).mockResolvedValue(null); // Cache miss
 
       // Act
       const result = await service.isUserTrackingBill(mockUserId, mockBillId);
@@ -238,7 +239,7 @@ describe('BillTrackingService', () => {
 
      it('should return value from cache if available', async () => {
         // Arrange
-        (cacheService.get as jest.Mock).mockResolvedValue(true); // Cache hit
+        (cacheService.get as vi.Mock).mockResolvedValue(true); // Cache hit
 
         // Act
         const result = await service.isUserTrackingBill(mockUserId, mockBillId);

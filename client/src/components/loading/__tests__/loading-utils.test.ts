@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Loading utilities tests
  * Following navigation component patterns for testing
@@ -14,8 +15,8 @@ import {
   canRetryOperation,
   calculateProgressPercentage,
   createProgress,
-} from '../utils/loading-utils';
-import { LoadingOperation, LoadingStage } from '../types';
+} from '@/utils/loading-utils';
+import { LoadingOperation, LoadingStage } from '@shared/types';
 import { LOADING_TIMEOUTS, RETRY_DELAYS } from '../constants';
 
 describe('Loading Utils', () => {

@@ -1,16 +1,17 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useRouteAccess } from '../hooks/useRouteAccess';
+import { useRouteAccess } from '@/hooks/useRouteAccess';
 import { NavigationValidationError } from '../errors';
 
 // Mock the auth hook
-jest.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/use-auth', () => ({
   useAuth: () => ({
     user: { id: '1', role: 'citizen' },
   }),
 }));
 
 // Mock the unified navigation hook
-jest.mock('@/hooks/use-unified-navigation', () => ({
+vi.mock('@/hooks/use-unified-navigation', () => ({
   useUnifiedNavigation: () => ({
     userRole: 'citizen',
   }),
@@ -47,7 +48,7 @@ describe('useRouteAccess', () => {
 
   it('should handle unauthenticated users', () => {
     // Mock unauthenticated user
-    jest.mocked(require('@/hooks/use-auth').useAuth).mockReturnValue({
+    vi.mocked(require('@/hooks/use-auth').useAuth).mockReturnValue({
       user: null,
     });
 
@@ -67,7 +68,7 @@ describe('useRouteAccess', () => {
 
   it('should handle invalid user roles', () => {
     // Mock invalid user role
-    jest.mocked(require('@/hooks/use-unified-navigation').useUnifiedNavigation).mockReturnValue({
+    vi.mocked(require('@/hooks/use-unified-navigation').useUnifiedNavigation).mockReturnValue({
       userRole: 'invalid-role',
     });
 

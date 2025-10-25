@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 import pkg from 'pg';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 const { Pool } = pkg;
 
 dotenv.config();

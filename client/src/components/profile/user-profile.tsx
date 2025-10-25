@@ -9,17 +9,17 @@ import {
   Eye, 
   EyeOff 
 } from "lucide-react";
-import { Button } from '..\ui\button';
-import { Input } from '..\ui\input';
-import { Label } from '..\ui\label';
-import { Textarea } from '..\ui\textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '..\ui\card';
-import { Badge } from '..\ui\badge';
-import { Switch } from '..\ui\switch';
-import { Avatar, AvatarFallback, AvatarImage } from '..\ui\avatar';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Textarea } from '../ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Switch } from '../ui/switch';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from '..\..\hooks\use-toast';
-import { logger } from '..\..\utils\browser-logger';
+import { useToast } from '../../hooks/use-toast';
+import { logger } from '../../utils/browser-logger';
 
 // Main user profile interface - this represents the complete profile from the API
 interface UserProfile {
@@ -292,22 +292,22 @@ const UserProfile: FC = () => {
   // Get role-specific styling
   const getRoleColor = (role: string): string => {
     const roleColors: Record<string, string> = {
-      admin: "bg-red-100 text-red-800",
-      expert: "bg-purple-100 text-purple-800",
-      journalist: "bg-blue-100 text-blue-800",
-      advocate: "bg-green-100 text-green-800",
+      admin: "bg-destructive text-destructive-foreground",
+      expert: "bg-accent text-accent-foreground",
+      journalist: "bg-info text-info-foreground",
+      advocate: "bg-success text-success-foreground",
     };
-    return roleColors[role] || "bg-gray-100 text-gray-800";
+    return roleColors[role] || "bg-muted text-muted-foreground";
   };
 
   // Get verification status styling
   const getVerificationColor = (status: string): string => {
     const statusColors: Record<string, string> = {
-      verified: "bg-green-100 text-green-800",
-      pending: "bg-yellow-100 text-yellow-800",
-      rejected: "bg-red-100 text-red-800",
+      verified: "bg-success text-success-foreground",
+      pending: "bg-warning text-warning-foreground",
+      rejected: "bg-destructive text-destructive-foreground",
     };
-    return statusColors[status] || "bg-gray-100 text-gray-800";
+    return statusColors[status] || "bg-muted text-muted-foreground";
   };
 
   // Handle loading state

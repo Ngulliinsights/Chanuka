@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { cn } from '..\..\lib\utils';
-import { Logo } from '..\ui\logo';
+import { cn } from '../../lib/utils';
+import { Logo } from '../ui/logo';
 import {
   Home,
   BarChart3,

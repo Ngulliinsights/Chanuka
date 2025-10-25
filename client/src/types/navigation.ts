@@ -27,6 +27,8 @@ export interface NavigationPreferences {
   favoritePages: string[];
   recentlyVisited: RecentPage[];
   compactMode: boolean;
+  showBreadcrumbs: boolean;
+  autoExpand: boolean;
 }
 
 export interface RecentPage {

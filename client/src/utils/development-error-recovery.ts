@@ -162,7 +162,7 @@ export class DevelopmentErrorRecovery {
     this.isRecovering = true;
     
     try {
-      logger.info('🔄 Attempting HMR recovery...', { component: 'Chanuka' });
+      logger.info('🔄 Attempting HMR recovery...', { component: 'DevelopmentErrorRecovery' });
       
       // Strategy 1: Try to reconnect WebSocket
       await this.attemptHMRReconnection();
@@ -179,7 +179,7 @@ export class DevelopmentErrorRecovery {
       }
       
     } catch (error) {
-      logger.error('❌ HMR recovery failed:', { component: 'Chanuka' }, error);
+      logger.error('❌ HMR recovery failed:', { component: 'DevelopmentErrorRecovery' }, error);
     } finally {
       this.isRecovering = false;
     }
@@ -202,14 +202,14 @@ export class DevelopmentErrorRecovery {
         
         ws.onopen = () => {
           clearTimeout(timeout);
-          logger.info('✅ HMR reconnection successful', { component: 'Chanuka' });
+          logger.info('✅ HMR reconnection successful', { component: 'DevelopmentErrorRecovery' });
           this.hmrConnectionAttempts = 0; // Reset on successful connection
           resolve();
         };
         
         ws.onerror = (error) => {
           clearTimeout(timeout);
-          logger.error('❌ HMR reconnection failed:', { component: 'Chanuka' }, error);
+          logger.error('❌ HMR reconnection failed:', { component: 'DevelopmentErrorRecovery' }, error);
           reject(error);
         };
         
@@ -272,10 +272,10 @@ export class DevelopmentErrorRecovery {
 
     // Enhanced error logging
     console.group(`🚨 Development Error #${this.errorCount} [${errorInfo.type}]`);
-    logger.error('Error Info:', { component: 'Chanuka' }, errorInfo);
-    logger.error('Dev Server Info:', { component: 'Chanuka' }, window.__DEV_SERVER__);
-    logger.error('Recovery Attempts:', { component: 'Chanuka' }, this.recoveryAttempts);
-    logger.error('Timestamp:', { component: 'Chanuka' }, new Date().toISOString());
+    logger.error('Error Info:', { component: 'DevelopmentErrorRecovery' }, errorInfo);
+    logger.error('Dev Server Info:', { component: 'DevelopmentErrorRecovery' }, window.__DEV_SERVER__);
+    logger.error('Recovery Attempts:', { component: 'DevelopmentErrorRecovery' }, this.recoveryAttempts);
+    logger.error('Timestamp:', { component: 'DevelopmentErrorRecovery' }, new Date().toISOString());
     console.groupEnd();
 
     // Attempt automatic recovery for certain error types
@@ -320,7 +320,7 @@ export class DevelopmentErrorRecovery {
         await this.recoverFromGeneralError(errorInfo);
       }
 
-      logger.info('✅ Error recovery completed', { component: 'Chanuka' });
+      logger.info('✅ Error recovery completed', { component: 'DevelopmentErrorRecovery' });
       
       // Reset recovery attempts on successful recovery
       setTimeout(() => {
@@ -328,7 +328,7 @@ export class DevelopmentErrorRecovery {
       }, 10000);
 
     } catch (recoveryError) {
-      logger.error('❌ Error recovery failed:', { component: 'Chanuka' }, recoveryError);
+      logger.error('❌ Error recovery failed:', { component: 'DevelopmentErrorRecovery' }, recoveryError);
       
       // If all recovery attempts failed, suggest manual intervention
       if (this.recoveryAttempts >= this.maxRecoveryAttempts) {
@@ -351,22 +351,22 @@ export class DevelopmentErrorRecovery {
       if (resourceType === 'script') {
         const newScript = document.createElement('script');
         newScript.src = newUrl;
-        newScript.onload = () => logger.info('✅ Script reloaded successfully', { component: 'Chanuka' });
-        newScript.onerror = () => logger.error('❌ Script reload failed', { component: 'Chanuka' });
+        newScript.onload = () => logger.info('✅ Script reloaded successfully', { component: 'DevelopmentErrorRecovery' });
+        newScript.onerror = () => logger.error('❌ Script reload failed', { component: 'DevelopmentErrorRecovery' });
         document.head.appendChild(newScript);
       } else if (resourceType === 'link') {
         const newLink = document.createElement('link');
         newLink.rel = 'stylesheet';
         newLink.href = newUrl;
-        newLink.onload = () => logger.info('✅ Stylesheet reloaded successfully', { component: 'Chanuka' });
-        newLink.onerror = () => logger.error('❌ Stylesheet reload failed', { component: 'Chanuka' });
+        newLink.onload = () => logger.info('✅ Stylesheet reloaded successfully', { component: 'DevelopmentErrorRecovery' });
+        newLink.onerror = () => logger.error('❌ Stylesheet reload failed', { component: 'DevelopmentErrorRecovery' });
         document.head.appendChild(newLink);
       }
     }
   }
 
   private async recoverFromChunkError(errorInfo: any): Promise<void> {
-    logger.info('🔄 Attempting chunk error recovery', { component: 'Chanuka' });
+    logger.info('🔄 Attempting chunk error recovery', { component: 'DevelopmentErrorRecovery' });
     
     // Clear module cache if available
     if (window.__DEV_SERVER__) {

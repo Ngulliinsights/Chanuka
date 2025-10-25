@@ -1,5 +1,5 @@
 import { sponsorConflictAnalysisService } from '../features/bills/sponsor-conflict-analysis.js';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 async function testConflictAnalysis() {
   logger.info('🔍 Testing Sponsor Conflict Analysis Service...\n', { component: 'Chanuka' });

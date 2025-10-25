@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { publicInterestAnalysisService, PublicInterestAnalysisService } from '../public-interest-analysis.service';
 import { StakeholderAnalysisResult, EconomicImpact, SocialImpact } from '../stakeholder-analysis.service';
 import { TransparencyScoreResult } from '../transparency-analysis.service';

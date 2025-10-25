@@ -4,10 +4,10 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '..\ui\card';
-import { Button } from '..\ui\button';
-import { Badge } from '..\ui\badge';
-import { Separator } from '..\ui\separator';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Separator } from '../ui/separator';
 import { 
   Smartphone, 
   Tablet, 
@@ -21,10 +21,10 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
-import { MobileTouchUtils } from '..\..\utils\mobile-touch-handler';
-import { useResponsiveLayout } from '..\..\utils\responsive-layout';
-import { useMobileErrorHandler } from '..\..\utils\mobile-error-handler';
-import { logger } from '..\..\utils\browser-logger';
+import { MobileTouchUtils } from '../../utils/mobile-touch-handler';
+import { useResponsiveLayout } from '../../utils/responsive-layout';
+import { useMobileErrorHandler } from '../../utils/mobile-error-handler';
+import { logger } from '../../utils/browser-logger';
 
 interface TestResult {
   name: string;

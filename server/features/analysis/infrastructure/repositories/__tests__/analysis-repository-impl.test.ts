@@ -1,21 +1,22 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { analysisRepository, AnalysisRepositoryImpl } from '../analysis-repository-impl';
 import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../../../shared/schema';
 import { ComprehensiveAnalysis } from '../../../domain/entities/analysis-result'; // Import domain entity
 
 // --- Mock Dependencies ---
-jest.mock('../../../../../db', () => ({ readDatabase: jest.fn() }));
+vi.mock('../../../../../db', () => ({ readDatabase: vi.fn() }));
 
 const mockDb = {
-  select: jest.fn().mockReturnThis(),
-  from: jest.fn().mockReturnThis(),
-  where: jest.fn().mockReturnThis(),
-  orderBy: jest.fn().mockReturnThis(),
-  limit: jest.fn().mockResolvedValue([]),
-  insert: jest.fn().mockReturnThis(),
-  values: jest.fn().mockReturnThis(),
-  onConflictDoUpdate: jest.fn().mockReturnThis(),
-  returning: jest.fn().mockResolvedValue([]),
+  select: vi.fn().mockReturnThis(),
+  from: vi.fn().mockReturnThis(),
+  where: vi.fn().mockReturnThis(),
+  orderBy: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockResolvedValue([]),
+  insert: vi.fn().mockReturnThis(),
+  values: vi.fn().mockReturnThis(),
+  onConflictDoUpdate: vi.fn().mockReturnThis(),
+  returning: vi.fn().mockResolvedValue([]),
 };
 
 // Mock ComprehensiveAnalysis instance
@@ -43,8 +44,8 @@ describe('AnalysisRepositoryImpl', () => {
   let repository: AnalysisRepositoryImpl;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (readDatabase as jest.Mock).mockReturnValue(mockDb);
+    vi.clearAllMocks();
+    (readDatabase as vi.Mock).mockReturnValue(mockDb);
     repository = analysisRepository; // Or new AnalysisRepositoryImpl()
   });
 

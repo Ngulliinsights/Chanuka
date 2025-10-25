@@ -3,10 +3,24 @@
  * Tests for the performance monitoring and optimization features
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { performanceOptimizer } from '../../utils/performance-optimizer';
-import { cacheManager } from '../../utils/cache-strategy';
-import { performanceMonitor } from '../../utils/performanceMonitoring';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
+import { performanceOptimizer } from '@/$2/performance-optimizer';
+import { cacheManager } from '@/$2/cache-strategy';
+import { performanceMonitor } from '@/$2/performanceMonitoring';
 import { logger } from '@shared/core';
 
 // Mock performance APIs

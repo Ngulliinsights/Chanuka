@@ -2,7 +2,7 @@ import { database as db } from '@shared/database/connection';
 import { eq, sql, and, desc, count, ilike } from 'drizzle-orm';
 import { bills, analysis, evaluations, departments } from '../../../shared/schema';
 import type { DepartmentStat, RadarDatum } from '../../../shared/schema';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 import { errorTracker } from '../../core/errors/error-tracker.js';
 
 /**

@@ -1,3 +1,18 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { describe, it, expect, beforeAll, afterAll, beforeEach, jest } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
@@ -11,8 +26,8 @@ import { router as notificationsRouter } from '../../infrastructure/notification
 import realTimeTrackingRouter from '../../features/bills/real-time-tracking.js';
 import engagementAnalyticsRouter from '../../features/analytics/engagement-analytics.js';
 import { router as healthRouter } from '../../infrastructure/monitoring/health.js';
-import { database as db, withTransaction } from '../../../shared/database/connection.js';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { database as db, withTransaction } from '@shared/database/connection.js';
+import { logger } from '@shared/core';
 
 describe('Comprehensive API Integration Tests', () => {
   let app: express.Application;
@@ -32,13 +47,13 @@ describe('Comprehensive API Integration Tests', () => {
     app.use('/api/sponsors', sponsorsRouter);
     // Mock services for financial disclosure router
     const mockMonitoringService = {
-      collectFinancialDisclosures: jest.fn(),
-      getDisclosureAlerts: jest.fn(),
-      buildFinancialRelationshipMap: jest.fn()
+      collectFinancialDisclosures: vi.fn(),
+      getDisclosureAlerts: vi.fn(),
+      buildFinancialRelationshipMap: vi.fn()
     };
     const mockAnalyticsService = {
-      generateReport: jest.fn(),
-      getMetrics: jest.fn()
+      generateReport: vi.fn(),
+      getMetrics: vi.fn()
     };
     app.use('/api/financial-disclosure', createFinancialDisclosureRouter(mockMonitoringService as any, mockAnalyticsService as any));
     app.use('/api/admin', adminRouter);
@@ -58,7 +73,7 @@ describe('Comprehensive API Integration Tests', () => {
 
   beforeEach(() => {
     // Reset any mocks or state before each test
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // Helper functions

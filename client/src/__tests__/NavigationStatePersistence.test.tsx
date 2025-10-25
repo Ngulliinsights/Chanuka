@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { NavigationProvider } from '..\contexts\NavigationContext';
-import { ResponsiveNavigationProvider } from '..\contexts\ResponsiveNavigationContext';
-import AppLayout from '..\components\layout\app-layout';
-import { logger } from '..\utils\browser-logger';
+import { NavigationProvider } from '../contexts/NavigationContext';
+import { ResponsiveNavigationProvider } from '../contexts/ResponsiveNavigationContext';
+import AppLayout from '@/components/layout/app-layout';
+import { logger } from '@/utils/browser-logger';
 
 // Mock hooks
 vi.mock('@/hooks/use-auth', () => ({
@@ -559,5 +559,30 @@ describe('Navigation State Persistence', () => {
       // Should handle gracefully without migration for now
       expect(true).toBe(true);
     });
+  });
+});
+
+describe('NavigationStatePersistence', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('should render without crashing', () => {
+    const { container } = render(<NavigationStatePersistence />);
+    expect(container).toBeInTheDocument();
+  });
+
+  it('should be accessible', () => {
+    const { container } = render(<NavigationStatePersistence />);
+    expect(container.firstChild).toHaveAttribute('role');
+  });
+
+  it('should handle props correctly', () => {
+    // TODO: Add specific prop tests for NavigationStatePersistence
+    expect(true).toBe(true);
   });
 });

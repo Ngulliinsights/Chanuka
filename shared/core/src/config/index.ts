@@ -8,7 +8,8 @@
 import { EventEmitter } from 'events';
 import chokidar from 'chokidar';
 import dotenvExpand from 'dotenv-expand';
-import { existsSync, readFileSync } from 'fs';
+import { config as dotenvConfig } from 'dotenv';
+import { existsSync, readFileSync, watchFile } from 'fs';
 import { resolve } from 'path';
 import { configSchema, type AppConfig, envMapping, defaultFeatures } from './schema';
 import { logger } from '../observability/logging';

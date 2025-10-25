@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Auth recovery system tests
  */
@@ -24,7 +25,7 @@ import {
 // Mock window.location for tests
 const mockLocation = {
   href: '',
-  reload: jest.fn()
+  reload: vi.fn()
 };
 Object.defineProperty(window, 'location', {
   value: mockLocation,
@@ -33,13 +34,13 @@ Object.defineProperty(window, 'location', {
 
 // Mock window.open
 Object.defineProperty(window, 'open', {
-  value: jest.fn(),
+  value: vi.fn(),
   writable: true
 });
 
 describe('Auth Recovery System', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockLocation.href = '';
   });
 
@@ -174,7 +175,7 @@ describe('Auth Recovery System', () => {
 
       it('should test server connectivity in auto-recovery', async () => {
         // Mock fetch for health check
-        global.fetch = jest.fn().mockResolvedValue({ ok: true });
+        global.fetch = vi.fn().mockResolvedValue({ ok: true });
         
         const error = new AuthNetworkError();
         const context = createRecoveryContext(error, 1, {}, 'login');
@@ -217,10 +218,10 @@ describe('Auth Recovery System', () => {
       it('should clear session data in auto-recovery', async () => {
         // Mock localStorage and sessionStorage
         const mockLocalStorage = {
-          removeItem: jest.fn()
+          removeItem: vi.fn()
         };
         const mockSessionStorage = {
-          clear: jest.fn()
+          clear: vi.fn()
         };
         
         Object.defineProperty(window, 'localStorage', { value: mockLocalStorage });
@@ -382,7 +383,7 @@ describe('Auth Recovery System', () => {
   describe('Integration scenarios', () => {
     it('should handle complete recovery flow for network error', async () => {
       // Mock successful health check
-      global.fetch = jest.fn().mockResolvedValue({ ok: true });
+      global.fetch = vi.fn().mockResolvedValue({ ok: true });
       
       const error = new AuthNetworkError();
       let context = createRecoveryContext(error, 1, {}, 'login');

@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Dashboard integration tests
  * Following navigation component integration testing patterns
@@ -61,15 +62,15 @@ const mockUseBills = {
   ],
   isLoading: false,
   error: null,
-  refetch: jest.fn().mockResolvedValue(undefined)
+  refetch: vi.fn().mockResolvedValue(undefined)
 };
 
-jest.mock('@/hooks/use-bills', () => ({
+vi.mock('@/hooks/use-bills', () => ({
   useBills: () => mockUseBills
 }));
 
 // Mock Lucide React icons
-jest.mock('lucide-react', () => ({
+vi.mock('lucide-react', () => ({
   AlertCircle: ({ className }: { className?: string }) => <div data-testid="alert-circle" className={className} />,
   RefreshCw: ({ className }: { className?: string }) => <div data-testid="refresh-cw" className={className} />,
   TrendingUp: ({ className }: { className?: string }) => <div data-testid="trending-up" className={className} />,
@@ -84,7 +85,7 @@ jest.mock('lucide-react', () => ({
 
 describe('Dashboard Integration Tests', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('ActivitySummary Component', () => {
@@ -107,7 +108,7 @@ describe('Dashboard Integration Tests', () => {
         summary: null
       };
 
-      jest.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(loadingMockUseBills);
+      vi.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(loadingMockUseBills);
 
       render(<ActivitySummary />);
 
@@ -136,7 +137,7 @@ describe('Dashboard Integration Tests', () => {
         summary: null
       };
 
-      jest.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(errorMockUseBills);
+      vi.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(errorMockUseBills);
 
       render(<ActivitySummary />);
 
@@ -145,13 +146,13 @@ describe('Dashboard Integration Tests', () => {
     });
 
     it('should call onError callback when error occurs', () => {
-      const onError = jest.fn();
+      const onError = vi.fn();
       const errorMockUseBills = {
         ...mockUseBills,
         error: new Error('Test error')
       };
 
-      jest.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(errorMockUseBills);
+      vi.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(errorMockUseBills);
 
       render(<ActivitySummary onError={onError} />);
 
@@ -159,7 +160,7 @@ describe('Dashboard Integration Tests', () => {
     });
 
     it('should call onDataChange callback when data changes', () => {
-      const onDataChange = jest.fn();
+      const onDataChange = vi.fn();
 
       render(<ActivitySummary onDataChange={onDataChange} />);
 
@@ -356,7 +357,7 @@ describe('Dashboard Integration Tests', () => {
 
   describe('Component Integration', () => {
     it('should handle data updates across components', () => {
-      const onDataChange = jest.fn();
+      const onDataChange = vi.fn();
 
       render(
         <div>
@@ -379,13 +380,13 @@ describe('Dashboard Integration Tests', () => {
     });
 
     it('should handle error states consistently', () => {
-      const onError = jest.fn();
+      const onError = vi.fn();
       const errorMockUseBills = {
         ...mockUseBills,
         error: new Error('Consistent error')
       };
 
-      jest.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(errorMockUseBills);
+      vi.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(errorMockUseBills);
 
       render(
         <div>
@@ -484,7 +485,7 @@ describe('Dashboard Integration Tests', () => {
 
   describe('Performance', () => {
     it('should not cause unnecessary re-renders', () => {
-      const renderSpy = jest.fn();
+      const renderSpy = vi.fn();
       
       const TestComponent = () => {
         renderSpy();
@@ -518,7 +519,7 @@ describe('Dashboard Integration Tests', () => {
         actionItems: largeActionItems
       };
 
-      jest.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(largeMockUseBills);
+      vi.mocked(require('@/hooks/use-bills').useBills).mockReturnValue(largeMockUseBills);
 
       const startTime = performance.now();
       render(<ActionItems />);

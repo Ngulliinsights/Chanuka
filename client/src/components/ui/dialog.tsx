@@ -4,8 +4,8 @@ import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X, AlertCircle, Loader2 } from "lucide-react"
 
-import { cn } from '..\..\lib\utils'
-import { logger } from '..\..\utils\browser-logger';
+import { cn } from '../../lib/utils'
+import { logger } from '../../utils/browser-logger';
 import { DialogValidationProps } from './types';
 import { DialogPropsSchema } from './validation';
 import { UIDialogError } from './errors';

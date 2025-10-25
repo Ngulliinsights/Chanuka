@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ConnectionManagerMetrics } from '../connection-manager-metrics';
 import { getMonitoringService, resetMonitoringService } from '../../../monitoring/monitoring';
 
@@ -8,8 +9,8 @@ describe('ConnectionManagerMetrics', () => {
   beforeEach(() => {
     resetMonitoringService();
     mockMonitoring = {
-      recordDatabaseMetric: jest.fn(),
-      getMetrics: jest.fn().mockReturnValue([]),
+      recordDatabaseMetric: vi.fn(),
+      getMetrics: vi.fn().mockReturnValue([]),
     };
     metrics = new ConnectionManagerMetrics(mockMonitoring);
   });

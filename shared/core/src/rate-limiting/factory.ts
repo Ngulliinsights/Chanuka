@@ -36,13 +36,9 @@ export class RateLimitFactory {
       // Use unified Redis store if enabled (recommended)
       if (this.options.useUnifiedRedisStore !== false) {
         const fallbackStore = this.options.fallbackStore || 
-          (this.options.defaultToMemory ? new MemoryRateLimitStore(keyPrefix) : undefined);
+          (this.options.defaultToMemory ? new MemoryRateLimitStore() : undefined);
         
-        return new RedisRateLimitStore(this.options.redis, {
-          keyPrefix,
-          enableMetrics: this.options.enableMetrics,
-          fallbackStore
-        });
+        return new RedisRateLimitStore();
       }
 
       // Legacy individual algorithm stores
@@ -59,7 +55,7 @@ export class RateLimitFactory {
     }
 
     if (this.options.defaultToMemory) {
-      return new MemoryRateLimitStore(keyPrefix);
+      return new MemoryRateLimitStore();
     }
 
     throw new Error('No Redis instance provided and memory fallback disabled');
@@ -214,7 +210,7 @@ export function createRedisRateLimitStore(
     fallbackStore?: RateLimitStore;
   } = {}
 ): RedisRateLimitStore {
-  return new RedisRateLimitStore(redis, options);
+  return new RedisRateLimitStore();
 }
 
 

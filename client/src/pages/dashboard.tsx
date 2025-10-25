@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { logger } from '..\utils\browser-logger';
+import { logger } from '../utils/browser-logger';
 
 interface DashboardStats {
   totalBills: number;
@@ -19,7 +19,7 @@ function Dashboard() {
 
   useEffect(() => {
     // Simulate loading dashboard data
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       setStats({
         totalBills: 1247,
         highTransparency: 892,
@@ -28,6 +28,9 @@ function Dashboard() {
       });
       setLoading(false);
     }, 1000);
+
+    // Cleanup timeout on unmount
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const recentActivity = [

@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AppLayout from '../app-layout';
 import { MobileHeader } from '../mobile-header';
 import { Sidebar } from '../sidebar';
-import { LayoutConfig } from '../types';
+import { LayoutConfig } from '@shared/types';
 
 // Mock axe-core for accessibility testing
 vi.mock('axe-core', () => ({

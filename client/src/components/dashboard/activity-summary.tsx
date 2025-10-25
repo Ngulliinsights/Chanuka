@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card, CardContent, CardHeader } from '..\ui\card';
+import { Card, CardContent, CardHeader } from '../ui/card';
 import { AlertCircle, RefreshCw, TrendingUp } from 'lucide-react';
-import { Button } from '..\ui\button';
+import { Button } from '../ui/button';
 import { useDashboard } from './hooks/useDashboard';
 import type { DashboardComponentProps } from './types';
 import { validateActivitySummary } from './validation';

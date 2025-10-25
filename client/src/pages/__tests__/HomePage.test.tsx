@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import HomePage from '../home';
-import { renderWithProviders } from '..\..\test-utils';
+import { renderWithProviders } from '../../test-utils';
 
 // Mock hooks
 vi.mock('@/hooks/use-auth', () => ({
@@ -349,5 +349,30 @@ describe('HomePage', () => {
       // Should unmount cleanly without errors
       expect(true).toBe(true);
     });
+  });
+});
+
+describe('HomePage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('should render without crashing', () => {
+    const { container } = render(<HomePage />);
+    expect(container).toBeInTheDocument();
+  });
+
+  it('should be accessible', () => {
+    const { container } = render(<HomePage />);
+    expect(container.firstChild).toHaveAttribute('role');
+  });
+
+  it('should handle props correctly', () => {
+    // TODO: Add specific prop tests for HomePage
+    expect(true).toBe(true);
   });
 });

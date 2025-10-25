@@ -3,7 +3,7 @@ import { Loader2, Wifi, WifiOff, AlertCircle, CheckCircle, RefreshCw } from 'luc
 import { cn } from '../../lib/utils';
 import { useAssetLoading, LoadingProgress } from '../../utils/asset-loading';
 import { logger } from '../../utils/browser-logger';
-import { AssetLoadingIndicatorProps } from './types';
+import { AssetLoadingIndicatorProps as TypesAssetLoadingIndicatorProps } from './types';
 import { 
   validateLoadingProgress, 
   safeValidateLoadingProgress,
@@ -33,17 +33,18 @@ export const AssetLoadingIndicator: React.FC<AssetLoadingIndicatorProps> = ({
   minimal = false,
   position = 'fixed',
 }) => {
-  const { progress, getStats } = useAssetLoading();
+  const { progress, enhancementLevel, getStats, applyDegradedMode } = useAssetLoading();
   const [stats, setStats] = React.useState(getStats());
   const [isVisible, setIsVisible] = React.useState(true);
   const [validationError, setValidationError] = React.useState<LoadingValidationError | null>(null);
   const [assetError, setAssetError] = React.useState<LoadingAssetError | null>(null);
-  
-  const { recoveryState, recover, updateError } = useLoadingRecovery({
+
+  const { recoveryState, recover } = useLoadingRecovery({
     maxRecoveryAttempts: 3,
     onRecoverySuccess: () => {
       setAssetError(null);
       setValidationError(null);
+      applyDegradedMode(); // Re-evaluate enhancement level
     }
   });
 
@@ -82,8 +83,8 @@ export const AssetLoadingIndicator: React.FC<AssetLoadingIndicatorProps> = ({
         logger.error('Failed to update asset loading stats', { error });
         const loadingError = new LoadingError(
           'Failed to retrieve loading statistics',
-          'LOADING_ERROR',
-          500,
+          undefined,
+          undefined,
           { originalError: error }
         );
         setAssetError(loadingError as LoadingAssetError);
@@ -96,8 +97,11 @@ export const AssetLoadingIndicator: React.FC<AssetLoadingIndicatorProps> = ({
   // Update recovery when errors change
   React.useEffect(() => {
     const error = validationError || assetError;
-    updateError(error);
-  }, [validationError, assetError, updateError]);
+    if (error) {
+      // Trigger recovery for new errors
+      recover();
+    }
+  }, [validationError, assetError, recover]);
 
   // Auto-hide when loading is complete
   React.useEffect(() => {

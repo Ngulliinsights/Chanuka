@@ -1,6 +1,6 @@
 import express from 'express';
-import { router as profileRouter } from '../../server/features/users/profile.js';
-import { logger } from '../../shared/core/src/observability/logging';
+import { router as profileRouter } from '@server/features/users/profile.js';
+import { logger } from '@shared/core';
 
 const app = express();
 app.use(express.json());

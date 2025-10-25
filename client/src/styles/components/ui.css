@@ -1,0 +1,201 @@
+/* UI Components - Tabs, Status, Progress, Timeline, etc. */
+
+@import '../base/variables.css';
+
+@layer components {
+  /* Tab System - Enhanced with better state management */
+  .chanuka-tabs {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .chanuka-tab-list {
+    display: flex;
+    background-color: hsl(var(--muted));
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .chanuka-tab {
+    flex: 1;
+    padding: var(--space-md) var(--space-lg);
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+    background-color: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: hsl(var(--muted-foreground));
+    cursor: pointer;
+    transition: all var(--timing-fast) var(--easing-out);
+  }
+
+  .chanuka-tab:hover:not(.active) {
+    background-color: hsl(var(--muted) / 0.8);
+    color: hsl(var(--foreground));
+  }
+
+  .chanuka-tab.active {
+    background-color: hsl(var(--accent));
+    border-bottom-color: hsl(var(--accent));
+    color: hsl(var(--accent-foreground));
+  }
+
+  .chanuka-tab-content {
+    padding: var(--space-lg);
+  }
+
+  /* Status Indicators - Improved semantic design */
+  .chanuka-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: hsl(var(--primary-foreground));
+    border-radius: var(--radius-full);
+  }
+
+  .chanuka-status-success {
+    background-color: hsl(var(--success));
+  }
+  .chanuka-status-warning {
+    background-color: hsl(var(--warning));
+    color: hsl(var(--foreground));
+  }
+  .chanuka-status-error {
+    background-color: hsl(var(--danger));
+  }
+  .chanuka-status-info {
+    background-color: hsl(var(--info));
+  }
+
+  .chanuka-status-urgent {
+    background-color: hsl(var(--danger));
+    animation: pulse 2s infinite;
+  }
+
+  /* Progress Indicators */
+  .chanuka-progress {
+    width: 100%;
+    height: 0.5rem;
+    background-color: hsl(var(--muted));
+    border-radius: var(--radius-full);
+    overflow: hidden;
+  }
+
+  .chanuka-progress-bar {
+    height: 100%;
+    background-color: hsl(var(--accent));
+    border-radius: var(--radius-full);
+    transition: width var(--timing-slow) var(--easing-out);
+  }
+
+  /* Timeline Component */
+  .chanuka-timeline {
+    position: relative;
+    padding-left: var(--space-xl);
+    margin: var(--space-xl) 0;
+  }
+
+  .chanuka-timeline::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0.5rem;
+    height: 100%;
+    width: 2px;
+    background-color: hsl(var(--border));
+  }
+
+  .chanuka-timeline-item {
+    position: relative;
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-lg);
+  }
+
+  .chanuka-timeline-marker {
+    position: absolute;
+    left: -var(--space-xl);
+    top: var(--space-xs);
+    width: 1rem;
+    height: 1rem;
+    background-color: hsl(var(--card));
+    border: 2px solid hsl(var(--border));
+    border-radius: var(--radius-full);
+    z-index: 1;
+  }
+
+  .chanuka-timeline-marker.active {
+    background-color: hsl(var(--success));
+    border-color: hsl(var(--success));
+  }
+
+  .chanuka-timeline-marker.current {
+    background-color: hsl(var(--accent));
+    border-color: hsl(var(--accent));
+    box-shadow: 0 0 0 4px rgba(243, 138, 31, 0.15);
+  }
+
+  /* Filter and Search Components */
+  .chanuka-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+
+  .chanuka-search-box {
+    position: relative;
+    flex: 1;
+    max-width: 24rem;
+  }
+
+  .chanuka-search-box input {
+    padding-left: 2.5rem;
+  }
+
+  .chanuka-search-icon {
+    position: absolute;
+    left: var(--space-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: hsl(var(--muted-foreground));
+    pointer-events: none;
+  }
+
+  /* Breadcrumb Navigation */
+  .chanuka-breadcrumb {
+    display: flex;
+    align-items: center;
+    padding: var(--space-md);
+    font-size: 0.875rem;
+    background-color: hsl(var(--muted));
+    border-bottom: 1px solid hsl(var(--border));
+  }
+
+  .chanuka-breadcrumb a {
+    color: hsl(var(--primary));
+    text-decoration: none;
+    transition: color var(--timing-fast) var(--easing-out);
+  }
+
+  .chanuka-breadcrumb a:hover {
+    color: hsl(var(--accent));
+  }
+
+  .chanuka-breadcrumb .separator {
+    margin: 0 var(--space-sm);
+    color: hsl(var(--muted-foreground));
+  }
+
+  .chanuka-breadcrumb .current {
+    color: hsl(var(--foreground));
+    font-weight: 500;
+  }
+}

@@ -1,5 +1,5 @@
 import { Gauge, Milestone, ToggleLeft, BarChart3, GitBranch, Layers, Flag, Split } from "lucide-react";
-import { logger } from '..\utils\browser-logger';
+import { logger } from '../utils/browser-logger';
 
 export default function Sidebar() {
   return (
@@ -35,11 +35,11 @@ export default function Sidebar() {
       
       <div className="space-y-3">
         <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Quick Actions</h3>
-        <button className="w-full flex items-center justify-center space-x-2 bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+        <button className="w-full flex items-center justify-center space-x-2 bg-primary text-primary-foreground px-3 py-2 rounded-lg hover:bg-primary-dark transition-colors">
           <Flag className="w-4 h-4" />
           <span>Create Checkpoint</span>
         </button>
-        <button className="w-full flex items-center justify-center space-x-2 bg-amber-600 text-white px-3 py-2 rounded-lg hover:bg-amber-700 transition-colors">
+        <button className="w-full flex items-center justify-center space-x-2 bg-warning text-warning-foreground px-3 py-2 rounded-lg hover:bg-warning-dark transition-colors">
           <Split className="w-4 h-4" />
           <span>Plan Pivot</span>
         </button>

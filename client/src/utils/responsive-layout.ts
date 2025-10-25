@@ -127,7 +127,7 @@ export class ResponsiveLayoutManager {
       try {
         listener(this.currentState);
       } catch (error) {
-        logger.error('Error in responsive layout listener:', { component: 'Chanuka' }, error);
+        logger.error('Error in responsive layout listener:', { component: 'ResponsiveLayout' }, error);
       }
     });
   }

@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useBills } from '..\..\..\hooks\use-bills';
+import { useBills } from '../../../hooks/use-bills';
 import type { 
   DashboardData, 
   DashboardConfig, 

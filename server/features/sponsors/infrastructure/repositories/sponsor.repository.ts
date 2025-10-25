@@ -4,7 +4,7 @@ import {
   type Sponsor, type SponsorAffiliation, type SponsorTransparency, type BillSponsorship, type InsertSponsor // Added InsertSponsor
 } from '../../../../../shared/schema'; // Adjusted path
 import { eq, and, sql, desc, asc, count, avg, inArray, like, or, sql as sqlFn } from 'drizzle-orm'; // Added asc, sqlFn alias
-import { logger } from '../../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Interface defining search options for listing sponsors
 export interface SponsorSearchOptions {

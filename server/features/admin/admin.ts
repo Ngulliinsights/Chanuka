@@ -3,7 +3,7 @@ import { user, bill, billComment, analysis, notification } from '../../../shared
 import { eq, count, desc, sql, and, gte } from 'drizzle-orm';
 import { systemHealthService } from '../../infrastructure/monitoring/system-health.js';
 import { alertingService, notificationSchedulerService } from '../../infrastructure/notifications/index.js';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 export interface AdminStats {
   users: {

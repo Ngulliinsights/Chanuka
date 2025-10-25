@@ -1,10 +1,11 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
 import { router as externalApiManagementRouter } from '../../infrastructure/monitoring/external-api-management';
 
 // Mock fetch globally
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('External API Management Integration Tests', () => {
   let app: express.Application;
@@ -13,11 +14,11 @@ describe('External API Management Integration Tests', () => {
     app = express();
     app.use(express.json());
     app.use('/api/external-api', externalApiManagementRouter);
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('GET /api/external-api/analytics', () => {

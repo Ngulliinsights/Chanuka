@@ -4,8 +4,8 @@ import {
 } from "../../../shared/schema";
 import { eq, desc, and, or, sql, count, gt, gte, lte } from "drizzle-orm";
 import { database as db } from "../shared/database/connection";
-import { cacheService } from 'server/infrastructure/cache';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { cacheService } from '@server/infrastructure/cache';
+import { logger } from '@shared/core';
 import { errorTracker } from '../../core/errors/error-tracker.js';
 
 // Extended cache keys for monitoring features

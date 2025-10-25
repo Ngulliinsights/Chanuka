@@ -1,5 +1,5 @@
 // Validation module exports - Consolidated with shared/core
-export * from '../../../shared/core/src/validation';
+export * from '@shared/core';
 
 // Re-export server-specific validation services with explicit naming to avoid conflicts
 export { DataCompletenessService } from './data-completeness.js';

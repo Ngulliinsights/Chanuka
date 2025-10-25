@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   findNavigationItemByPath,
   findNavigationItemById,
@@ -6,7 +7,7 @@ import {
   determineCurrentSection,
   getPageTitle,
   isValidNavigationPath,
-} from '../utils/navigation-utils';
+} from '@/utils/navigation-utils';
 import { InvalidNavigationPathError } from '../errors';
 
 describe('navigation-utils', () => {

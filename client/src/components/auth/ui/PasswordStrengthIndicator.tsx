@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { cn } from '..\..\..\lib\utils';
+import { cn } from '../../../lib/utils';
 import { AuthConfig } from '../types';
 import { usePasswordStrength } from '../hooks/usePasswordUtils';
 import { PASSWORD_STRENGTH_LEVELS, PASSWORD_STRENGTH_LABELS, PASSWORD_STRENGTH_COLORS } from '../constants';

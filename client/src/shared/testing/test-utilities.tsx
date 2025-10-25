@@ -237,13 +237,20 @@ export const TestProvider: React.FC<TestProviderProps> = ({
   };
 
   return (
-    <MockAuthContext.Provider value={mockAuthValue}>
-      <MockThemeContext.Provider value={mockThemeValue}>
-        <MockLocaleContext.Provider value={mockLocaleValue}>
-          {children}
-        </MockLocaleContext.Provider>
-      </MockThemeContext.Provider>
-    </MockAuthContext.Provider>
+    <div
+      data-testid="test-provider"
+      data-theme={theme}
+      data-locale={locale}
+      data-user={user ? 'authenticated' : 'null'}
+    >
+      <MockAuthContext.Provider value={mockAuthValue}>
+        <MockThemeContext.Provider value={mockThemeValue}>
+          <MockLocaleContext.Provider value={mockLocaleValue}>
+            {children}
+          </MockLocaleContext.Provider>
+        </MockThemeContext.Provider>
+      </MockAuthContext.Provider>
+    </div>
   );
 };
 
@@ -322,7 +329,9 @@ export class AsyncTestHelper {
     while (Date.now() - startTime < timeout) {
       try {
         const result = await callback();
-        return result;
+        if (result) {
+          return result;
+        }
       } catch (error) {
         // Continue waiting if callback throws
       }

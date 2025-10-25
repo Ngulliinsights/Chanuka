@@ -1,9 +1,9 @@
 import { performance } from 'perf_hooks';
 import { EventEmitter } from 'events';
-import type { CacheService } from '../../caching/core/interfaces';
-import type { RateLimitStore } from '../../shared/core/src/rate-limiting/types';
+import type { CacheService } from '../caching/core/interfaces';
+import type { RateLimitStore } from '../rate-limiting/types';
 import { UnifiedLogger } from '../observability/logging/logger';
-import { ValidationService } from '../../shared/core/src/validation/validation-service';
+import { ValidationService } from '../validation/validation-service';
 
 /**
  * Comprehensive integration tests for the consolidated core system

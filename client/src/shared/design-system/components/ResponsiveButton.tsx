@@ -10,6 +10,7 @@
 import React from 'react';
 import { cn } from '../../lib/utils';
 import { useResponsive } from '../responsive';
+import { buttonUtils } from './button';
 
 interface ResponsiveButtonProps {
   children: React.ReactNode;
@@ -52,66 +53,26 @@ export const ResponsiveButton: React.FC<ResponsiveButtonProps> = ({
   const { isTouchDevice, prefersReducedMotion } = useResponsive();
 
   const getVariantClasses = () => {
+    // Map component variants to design standards variants
     const variantMap = {
-      primary: [
-        'bg-blue-600 text-white border-blue-600',
-        'hover:bg-blue-700 hover:border-blue-700',
-        'focus:ring-blue-500',
-        'active:bg-blue-800',
-        'disabled:bg-blue-300 disabled:border-blue-300',
-      ],
-      secondary: [
-        'bg-gray-600 text-white border-gray-600',
-        'hover:bg-gray-700 hover:border-gray-700',
-        'focus:ring-gray-500',
-        'active:bg-gray-800',
-        'disabled:bg-gray-300 disabled:border-gray-300',
-      ],
-      outline: [
-        'bg-transparent text-gray-700 border-gray-300',
-        'hover:bg-gray-50 hover:border-gray-400',
-        'focus:ring-gray-500',
-        'active:bg-gray-100',
-        'disabled:text-gray-400 disabled:border-gray-200',
-        'dark:text-gray-300 dark:border-gray-600',
-        'dark:hover:bg-gray-800 dark:hover:border-gray-500',
-        'dark:active:bg-gray-700',
-      ],
-      ghost: [
-        'bg-transparent text-gray-700 border-transparent',
-        'hover:bg-gray-100',
-        'focus:ring-gray-500',
-        'active:bg-gray-200',
-        'disabled:text-gray-400',
-        'dark:text-gray-300',
-        'dark:hover:bg-gray-800',
-        'dark:active:bg-gray-700',
-      ],
-      destructive: [
-        'bg-red-600 text-white border-red-600',
-        'hover:bg-red-700 hover:border-red-700',
-        'focus:ring-red-500',
-        'active:bg-red-800',
-        'disabled:bg-red-300 disabled:border-red-300',
-      ],
-    };
-    
+      primary: 'primary',
+      secondary: 'secondary',
+      outline: 'outline',
+      ghost: 'ghost',
+      destructive: 'destructive',
+    } as const;
+
     return variantMap[variant];
   };
 
   const getSizeClasses = () => {
+    // Map component sizes to design standards sizes
     const sizeMap = {
-      small: isTouchDevice 
-        ? 'min-h-[36px] px-3 py-1.5 text-sm' 
-        : 'min-h-[32px] px-2.5 py-1 text-sm',
-      medium: isTouchDevice 
-        ? 'min-h-[44px] px-4 py-2 text-base' 
-        : 'min-h-[36px] px-3 py-1.5 text-sm',
-      large: isTouchDevice 
-        ? 'min-h-[48px] px-6 py-3 text-lg' 
-        : 'min-h-[40px] px-4 py-2 text-base',
-    };
-    
+      small: 'sm',
+      medium: 'md',
+      large: 'lg',
+    } as const;
+
     return sizeMap[size];
   };
 
@@ -151,13 +112,7 @@ export const ResponsiveButton: React.FC<ResponsiveButtonProps> = ({
   };
 
   const baseClasses = [
-    'responsive-button',
-    'inline-flex items-center justify-center',
-    'font-medium rounded-md border',
-    'focus:outline-none focus:ring-2 focus:ring-offset-2',
-    'disabled:cursor-not-allowed disabled:opacity-50',
-    getSizeClasses(),
-    getVariantClasses(),
+    buttonUtils.getButtonClasses(getVariantClasses(), getSizeClasses(), disabled || loading, loading),
     getTransitionClasses(),
     getTouchClasses(),
     fullWidth && 'w-full',

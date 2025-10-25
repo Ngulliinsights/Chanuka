@@ -1,9 +1,23 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '@/$2/browser-logger';
 
 // Mock performance API
 const mockPerformance = {
@@ -149,8 +163,10 @@ describe('Page Load Performance Tests', () => {
   });
 
   afterEach(() => {
+    cleanup();
     measurer.clear();
     vi.restoreAllMocks();
+  
   });
 
   describe('Initial Page Load Performance', () => {

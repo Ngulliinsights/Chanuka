@@ -1,4 +1,4 @@
-import { LoadingOperation } from '..\contexts\LoadingContext';
+import { LoadingOperation } from '../contexts/LoadingContext';
 import { logger } from '@shared/core';
 
 // Utility functions for comprehensive loading management

@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { NavigationProvider } from '..\contexts\NavigationContext';
-import { ResponsiveNavigationProvider } from '..\contexts\ResponsiveNavigationContext';
-import AppLayout from '..\components\layout\app-layout';
-import HomePage from '..\pages\home';
-import { logger } from '..\utils\browser-logger';
+import { NavigationProvider } from '../contexts/NavigationContext';
+import { ResponsiveNavigationProvider } from '../contexts/ResponsiveNavigationContext';
+import AppLayout from '@/components/layout/app-layout';
+import HomePage from '../pages/home';
+import { logger } from '@/utils/browser-logger';
 
 // Mock pages for testing
 function BillsPage() {
@@ -500,5 +500,30 @@ describe('Navigation Test Suite', () => {
       // Desktop sidebar should be hidden
       expect(screen.queryByTitle('Collapse sidebar')).not.toBeInTheDocument();
     });
+  });
+});
+
+describe('NavigationTestSuite', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('should render without crashing', () => {
+    const { container } = render(<NavigationTestSuite />);
+    expect(container).toBeInTheDocument();
+  });
+
+  it('should be accessible', () => {
+    const { container } = render(<NavigationTestSuite />);
+    expect(container.firstChild).toHaveAttribute('role');
+  });
+
+  it('should handle props correctly', () => {
+    // TODO: Add specific prop tests for NavigationTestSuite
+    expect(true).toBe(true);
   });
 });

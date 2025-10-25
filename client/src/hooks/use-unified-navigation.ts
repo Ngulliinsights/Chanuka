@@ -1,5 +1,5 @@
-import { useNavigation } from '..\contexts\NavigationContext';
-import { useResponsiveNavigation } from '..\contexts\ResponsiveNavigationContext';
+import { useNavigation } from '../contexts/NavigationContext';
+import { useResponsiveNavigation } from '../contexts/ResponsiveNavigationContext';
 import { useKeyboardFocus } from './use-keyboard-focus';
 import { logger } from '@shared/core';
 

@@ -10,7 +10,7 @@
 import { config } from 'dotenv';
 import { database, pool } from '../../shared/database/connection.js';
 import { monitorPoolHealth } from '../../shared/database/pool.js';
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core';
 
 // Load environment variables
 config();

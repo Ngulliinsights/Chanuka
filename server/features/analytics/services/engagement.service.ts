@@ -3,13 +3,13 @@ import { databaseService } from '../../../infrastructure/database/database-servi
 import { database as db } from '../../../../shared/database/connection';
 import { billComment, commentVote, user, userProfile, bill } from '@shared/schema';
 import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
-import { cacheService } from 'server/infrastructure/cache';
-import { cacheKeys } from '../../../../shared/core/src/caching/key-generator';
-import { cache } from '../../../../shared/core/src/caching';
+import { cacheService } from '@server/infrastructure/cache';
+import { cacheKeys } from '@shared/core';
+import { cache } from '@shared/core';
 import { buildTimeThreshold } from '../../../utils/db-helpers';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from "../../../../shared/core/src/utilities/api";
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from '@shared/core';
+import { logger } from '@shared/core';
 import { errorTracker } from '../../../core/errors/error-tracker.js';
 import { z } from 'zod';
 import type {

@@ -1,26 +1,27 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
 import express, { Express } from 'express';
 import { billTrackingRouter } from '../bill-tracking.routes'; // Import the router
 import { billTrackingService } from '../../application/bill-tracking.service'; // Import the service to mock
-import { authenticateToken } from '../../../../middleware/auth'; // Import or mock auth middleware
+import { authenticateToken } from '@/components/auth'; // Import or mock auth middleware
 
 // --- Mock the Service ---
-jest.mock('../../application/bill-tracking.service', () => ({
+vi.mock('../../application/bill-tracking.service', () => ({
   billTrackingService: {
-    trackBill: jest.fn(),
-    untrackBill: jest.fn(),
-    getUserTrackedBills: jest.fn(),
-    updateBillTrackingPreferences: jest.fn(),
-    isUserTrackingBill: jest.fn(),
-    bulkTrackingOperation: jest.fn(),
-    getUserTrackingAnalytics: jest.fn(),
-    getRecommendedBillsForTracking: jest.fn(),
+    trackBill: vi.fn(),
+    untrackBill: vi.fn(),
+    getUserTrackedBills: vi.fn(),
+    updateBillTrackingPreferences: vi.fn(),
+    isUserTrackingBill: vi.fn(),
+    bulkTrackingOperation: vi.fn(),
+    getUserTrackingAnalytics: vi.fn(),
+    getRecommendedBillsForTracking: vi.fn(),
   },
 }));
 
 // --- Mock Auth Middleware ---
 // Basic mock: Assumes all requests are authenticated with a mock user
-jest.mock('../../../../middleware/auth', () => ({
+vi.mock('../../../../middleware/auth', () => ({
     authenticateToken: (req: any, res: any, next: any) => {
         req.user = { id: 'mock-user-id', role: 'citizen' }; // Attach mock user
         next();
@@ -46,7 +47,7 @@ describe('Bill Tracking API Routes', () => {
 
   beforeEach(() => {
     // Reset mocks before each test
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   // --- Test Cases ---
@@ -54,7 +55,7 @@ describe('Bill Tracking API Routes', () => {
   describe('POST /api/bill-tracking/track/:billId', () => {
     it('should return 200 and tracking info on successful tracking', async () => {
        // Arrange
-       (billTrackingService.trackBill as jest.Mock).mockResolvedValue(mockPreferenceResult);
+       (billTrackingService.trackBill as vi.Mock).mockResolvedValue(mockPreferenceResult);
        const preferences = { alertFrequency: 'daily' };
 
       // Act
@@ -84,7 +85,7 @@ describe('Bill Tracking API Routes', () => {
     it('should return 500 if service throws an error', async () => {
         // Arrange
         const errorMessage = 'Database connection failed';
-        (billTrackingService.trackBill as jest.Mock).mockRejectedValue(new Error(errorMessage));
+        (billTrackingService.trackBill as vi.Mock).mockRejectedValue(new Error(errorMessage));
 
         // Act
         const response = await request(app).post(`/api/bill-tracking/track/${mockBillId}`);
@@ -117,7 +118,7 @@ describe('Bill Tracking API Routes', () => {
   describe('DELETE /api/bill-tracking/track/:billId', () => {
     it('should return 204 No Content on successful untracking', async () => {
       // Arrange
-      (billTrackingService.untrackBill as jest.Mock).mockResolvedValue(undefined);
+      (billTrackingService.untrackBill as vi.Mock).mockResolvedValue(undefined);
 
       // Act
       const response = await request(app).delete(`/api/bill-tracking/track/${mockBillId}`);
@@ -142,7 +143,7 @@ describe('Bill Tracking API Routes', () => {
     it('should return 500 if service fails', async () => {
        // Arrange
         const errorMessage = 'Failed to update database';
-        (billTrackingService.untrackBill as jest.Mock).mockRejectedValue(new Error(errorMessage));
+        (billTrackingService.untrackBill as vi.Mock).mockRejectedValue(new Error(errorMessage));
 
        // Act
        const response = await request(app).delete(`/api/bill-tracking/track/${mockBillId}`);
@@ -156,7 +157,7 @@ describe('Bill Tracking API Routes', () => {
 
    describe('GET /api/bill-tracking/is-tracking/:billId', () => {
         it('should return true if user is tracking', async () => {
-            (billTrackingService.isUserTrackingBill as jest.Mock).mockResolvedValue(true);
+            (billTrackingService.isUserTrackingBill as vi.Mock).mockResolvedValue(true);
 
             const response = await request(app).get(`/api/bill-tracking/is-tracking/${mockBillId}`);
 
@@ -166,7 +167,7 @@ describe('Bill Tracking API Routes', () => {
         });
 
         it('should return false if user is not tracking', async () => {
-             (billTrackingService.isUserTrackingBill as jest.Mock).mockResolvedValue(false);
+             (billTrackingService.isUserTrackingBill as vi.Mock).mockResolvedValue(false);
 
              const response = await request(app).get(`/api/bill-tracking/is-tracking/${mockBillId}`);
 

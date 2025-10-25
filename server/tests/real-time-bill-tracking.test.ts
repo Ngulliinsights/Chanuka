@@ -1,21 +1,36 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 import WebSocket from 'ws';
 import jwt from 'jsonwebtoken';
 import { webSocketService } from '../infrastructure/websocket.js';
 import { billStatusMonitorService } from '../features/bills/bill-status-monitor.js';
 import { userPreferencesService } from '../features/users/domain/user-preferences.js';
-import { database as db, user as users, bill as bills, billEngagement } from '../../shared/database/connection.js';
+import { database as db, user as users, bill as bills, billEngagement } from '@shared/database/connection.js';
 import { eq } from 'drizzle-orm';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Mock billStatusMonitor
 const billStatusMonitor = {
-  initialize: jest.fn(),
-  stopMonitoring: jest.fn(),
-  triggerStatusChange: jest.fn(),
-  getMonitoringStats: jest.fn(() => ({ activeMonitors: 0, totalEvents: 0 })),
-  addBillToMonitoring: jest.fn(),
-  getBillStatus: jest.fn(() => 'introduced')
+  initialize: vi.fn(),
+  stopMonitoring: vi.fn(),
+  triggerStatusChange: vi.fn(),
+  getMonitoringStats: vi.fn(() => ({ activeMonitors: 0, totalEvents: 0 })),
+  addBillToMonitoring: vi.fn(),
+  getBillStatus: vi.fn(() => 'introduced')
 };
 
 describe('Real-Time Bill Tracking System', () => {

@@ -1,21 +1,22 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { QueryExecutor } from '../query-executor';
 import { getMonitoringService, resetMonitoringService } from '../../../monitoring/monitoring';
 import { connectionManager } from '../connection-manager';
 import type { PoolClient } from 'pg';
 
-jest.mock('../connection-manager', () => ({
+vi.mock('../connection-manager', () => ({
   connectionManager: {
-    acquireConnection: jest.fn(),
-    releaseConnection: jest.fn(),
+    acquireConnection: vi.fn(),
+    releaseConnection: vi.fn(),
   },
 }));
 
-jest.mock('../../../../utils/logger', () => ({
+vi.mock('../../../../utils/logger', () => ({
   logger: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
@@ -27,7 +28,7 @@ describe('Slow Query Detection', () => {
   const TEST_CONTEXT = 'test-context';
 
   let queryExecutor: QueryExecutor;
-  let mockClient: { query: jest.MockedFunction<(...args: any[]) => void> };
+  let mockClient: { query: vi.MockedFunction<(...args: any[]) => void> };
   let monitoringService: any;
 
   /**
@@ -43,8 +44,8 @@ describe('Slow Query Detection', () => {
    * to actually delay execution. Instead, the QueryExecutor's internal timing mechanism
    * will measure how long the query takes based on when we advance the fake timers.
    */
-  const createMockQuery = (delayMs: number = 0): jest.MockedFunction<(...args: any[]) => void> => {
-    return jest.fn((...args: any[]): void => {
+  const createMockQuery = (delayMs: number = 0): vi.MockedFunction<(...args: any[]) => void> => {
+    return vi.fn((...args: any[]): void => {
       // The last argument is always the callback in callback-style queries
       const callback = args[args.length - 1] as (err: Error | null, result: any) => void;
       
@@ -56,7 +57,7 @@ describe('Slow Query Detection', () => {
       
       // Callback-style query methods return void, not a Promise
       return undefined;
-    }) as jest.MockedFunction<(...args: any[]) => void>;
+    }) as vi.MockedFunction<(...args: any[]) => void>;
   };
 
   /**
@@ -72,27 +73,27 @@ describe('Slow Query Detection', () => {
    */
   const advanceTimersByTime = async (ms: number): Promise<void> => {
     // Move the fake timer clock forward
-    jest.advanceTimersByTime(ms);
+    vi.advanceTimersByTime(ms);
     
     // Flush any promise callbacks that were triggered by the timer advancement
     await Promise.resolve();
     
     // Run any timers that are now ready to fire (but not recursively)
-    await jest.runOnlyPendingTimersAsync();
+    await vi.runOnlyPendingTimersAsync();
   };
 
   beforeEach(() => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     resetMonitoringService();
     monitoringService = getMonitoringService();
 
     // Initialize the mock client with a default query implementation
     mockClient = {
-      query: jest.fn(),
+      query: vi.fn(),
     };
 
-    jest.mocked(connectionManager.acquireConnection).mockResolvedValue(mockClient as any as PoolClient);
-    jest.mocked(connectionManager.releaseConnection).mockResolvedValue(undefined);
+    vi.mocked(connectionManager.acquireConnection).mockResolvedValue(mockClient as any as PoolClient);
+    vi.mocked(connectionManager.releaseConnection).mockResolvedValue(undefined);
 
     queryExecutor = new QueryExecutor({
       slowQueryThresholdMs: SLOW_QUERY_THRESHOLD_MS,
@@ -101,8 +102,8 @@ describe('Slow Query Detection', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
-    jest.clearAllMocks();
+    vi.useRealTimers();
+    vi.clearAllMocks();
   });
 
   describe('Threshold Detection', () => {
@@ -232,7 +233,7 @@ describe('Slow Query Detection', () => {
 
   describe('Metrics Emission', () => {
     it('should emit metrics for slow queries', async () => {
-      const recordMetricSpy = jest.spyOn(monitoringService, 'recordDatabaseMetric');
+      const recordMetricSpy = vi.spyOn(monitoringService, 'recordDatabaseMetric');
       mockClient.query = createMockQuery(SLOW_QUERY_DELAY_MS);
 
       const executionPromise = queryExecutor.execute({ sql: 'SELECT * FROM users' });
@@ -251,7 +252,7 @@ describe('Slow Query Detection', () => {
     });
 
     it('should emit correct metric names for different query types', async () => {
-      const recordMetricSpy = jest.spyOn(monitoringService, 'recordDatabaseMetric');
+      const recordMetricSpy = vi.spyOn(monitoringService, 'recordDatabaseMetric');
       mockClient.query = createMockQuery(SLOW_QUERY_DELAY_MS);
 
       const executionPromise = queryExecutor.execute({ sql: 'INSERT INTO users (name) VALUES ($1)' });

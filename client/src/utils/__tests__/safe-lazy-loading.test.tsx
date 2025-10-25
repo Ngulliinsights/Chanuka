@@ -1,4 +1,18 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { render, screen, waitFor } from '@testing-library/react';
 import { Suspense } from 'react';
 import { logger } from '@shared/core';
@@ -109,7 +123,9 @@ describe('retryLazyComponentLoad', () => {
   });
 
   afterEach(() => {
+    cleanup();
     vi.useRealTimers();
+  
   });
 
   it('should retry failed loads', async () => {

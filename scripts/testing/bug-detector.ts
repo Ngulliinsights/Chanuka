@@ -592,7 +592,7 @@ export async function runBugDetection(projectRoot?: string): Promise<BugDetectio
 }
 
 // CLI usage
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   runBugDetection().then(result => {
     process.exit(result.criticalCount > 0 ? 1 : 0);
   });

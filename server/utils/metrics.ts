@@ -6,8 +6,8 @@
 
 import { performance } from 'perf_hooks';
 import { performanceMonitoring } from '../services/performance-monitoring.js';
-import { logger } from '../../shared/core/src/observability/logging';
-import { createObservabilityStack } from '../../shared/core/src/observability/stack';
+import { logger } from '@shared/core';
+import { createObservabilityStack } from '@shared/core';
 
 interface MetricData {
   count: number;

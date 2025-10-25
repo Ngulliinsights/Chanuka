@@ -1,5 +1,6 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { jest } from '@jest/globals';
-import { CircuitBreaker } from '../../../../../shared/core/src/observability/error-management';
+import { CircuitBreaker } from '@shared/core';
 
 describe('CircuitBreaker', () => {
   let circuitBreaker: CircuitBreaker;
@@ -7,7 +8,7 @@ describe('CircuitBreaker', () => {
   beforeEach(() => {
     // Using fake timers gives us precise control over time-dependent behavior
     // like reset timeouts and operation timeouts
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     
     // Configure with reasonable test values that complete quickly
     circuitBreaker = new CircuitBreaker({
@@ -19,7 +20,7 @@ describe('CircuitBreaker', () => {
 
   afterEach(() => {
     // Always restore real timers to avoid affecting other tests
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('Initial State', () => {
@@ -31,8 +32,8 @@ describe('CircuitBreaker', () => {
 
   describe('CLOSED to OPEN Transition', () => {
     it('should transition to OPEN after failure threshold is reached', async () => {
-      const failingOperation = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Operation failed'));
-      const stateChangeSpy = jest.fn();
+      const failingOperation = vi.fn<() => Promise<never>>().mockRejectedValue(new Error('Operation failed'));
+      const stateChangeSpy = vi.fn();
 
       circuitBreaker.on('open', stateChangeSpy);
 
@@ -52,7 +53,7 @@ describe('CircuitBreaker', () => {
 
       // Execute a slow operation and advance time to trigger timeout
       const promise = circuitBreaker.execute(slowOperation);
-      await jest.advanceTimersByTimeAsync(1001);
+      await vi.advanceTimersByTimeAsync(1001);
 
       await expect(promise).rejects.toThrow('Operation timed out');
       expect(circuitBreaker.getMetrics().failures).toBe(1);
@@ -62,14 +63,14 @@ describe('CircuitBreaker', () => {
   describe('OPEN State Behavior', () => {
     beforeEach(async () => {
       // Helper to put the breaker into OPEN state before each test
-      const failingOp = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
+      const failingOp = vi.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
       for (let i = 0; i < 3; i++) {
         await expect(circuitBreaker.execute(failingOp)).rejects.toThrow();
       }
     });
 
     it('should reject operations immediately when OPEN', async () => {
-      const successfulOperation = jest.fn<() => Promise<string>>().mockResolvedValue('success');
+      const successfulOperation = vi.fn<() => Promise<string>>().mockResolvedValue('success');
 
       // The breaker should reject without even calling the operation
       await expect(circuitBreaker.execute(successfulOperation)).rejects.toThrow('Circuit breaker is OPEN');
@@ -77,7 +78,7 @@ describe('CircuitBreaker', () => {
     });
 
     it('should provide time remaining in error message', async () => {
-      const operation = jest.fn<() => Promise<string>>().mockResolvedValue('success');
+      const operation = vi.fn<() => Promise<string>>().mockResolvedValue('success');
 
       try {
         await circuitBreaker.execute(operation);
@@ -91,11 +92,11 @@ describe('CircuitBreaker', () => {
 
   describe('OPEN to HALF_OPEN Transition', () => {
     it('should transition to HALF_OPEN after reset timeout expires', async () => {
-      const stateChangeSpy = jest.fn();
+      const stateChangeSpy = vi.fn();
       circuitBreaker.on('half-open', stateChangeSpy);
 
       // Trip the breaker to OPEN state
-      const failingOp = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
+      const failingOp = vi.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
       for (let i = 0; i < 3; i++) {
         await expect(circuitBreaker.execute(failingOp)).rejects.toThrow();
       }
@@ -103,7 +104,7 @@ describe('CircuitBreaker', () => {
       expect(circuitBreaker.getState()).toBe('OPEN');
 
       // Advance time past the reset timeout
-      await jest.advanceTimersByTimeAsync(5001);
+      await vi.advanceTimersByTimeAsync(5001);
 
       // The breaker should automatically transition to HALF_OPEN
       expect(circuitBreaker.getState()).toBe('HALF_OPEN');
@@ -119,8 +120,8 @@ describe('CircuitBreaker', () => {
     });
 
     it('should transition to CLOSED on successful operation', async () => {
-      const successfulOperation = jest.fn<() => Promise<string>>().mockResolvedValue('success');
-      const stateChangeSpy = jest.fn();
+      const successfulOperation = vi.fn<() => Promise<string>>().mockResolvedValue('success');
+      const stateChangeSpy = vi.fn();
       circuitBreaker.on('close', stateChangeSpy);
 
       const result = await circuitBreaker.execute(successfulOperation);
@@ -132,8 +133,8 @@ describe('CircuitBreaker', () => {
     });
 
     it('should transition back to OPEN on failed operation', async () => {
-      const failingOperation = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Still failing'));
-      const stateChangeSpy = jest.fn();
+      const failingOperation = vi.fn<() => Promise<never>>().mockRejectedValue(new Error('Still failing'));
+      const stateChangeSpy = vi.fn();
       circuitBreaker.on('open', stateChangeSpy);
 
       await expect(circuitBreaker.execute(failingOperation)).rejects.toThrow('Still failing');
@@ -146,7 +147,7 @@ describe('CircuitBreaker', () => {
       const slowOperation = () => new Promise(resolve => setTimeout(resolve, 2000));
 
       const promise = circuitBreaker.execute(slowOperation);
-      await jest.advanceTimersByTimeAsync(1001);
+      await vi.advanceTimersByTimeAsync(1001);
 
       await expect(promise).rejects.toThrow('Operation timed out');
       expect(circuitBreaker.getState()).toBe('OPEN');
@@ -155,7 +156,7 @@ describe('CircuitBreaker', () => {
 
   describe('Failure Count Management', () => {
     it('should increment failure count on each failure', async () => {
-      const failingOp = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
+      const failingOp = vi.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
 
       expect(circuitBreaker.getMetrics().failures).toBe(0);
 
@@ -171,7 +172,7 @@ describe('CircuitBreaker', () => {
       (circuitBreaker as any).state = 'HALF_OPEN';
       (circuitBreaker as any).failures = 3;
 
-      const successfulOp = jest.fn<() => Promise<string>>().mockResolvedValue('success');
+      const successfulOp = vi.fn<() => Promise<string>>().mockResolvedValue('success');
       await circuitBreaker.execute(successfulOp);
 
       // Moving to CLOSED should clear the failure count
@@ -179,7 +180,7 @@ describe('CircuitBreaker', () => {
     });
 
     it('should not increment failure count for successful operations', async () => {
-      const successfulOp = jest.fn<() => Promise<string>>().mockResolvedValue('success');
+      const successfulOp = vi.fn<() => Promise<string>>().mockResolvedValue('success');
 
       await circuitBreaker.execute(successfulOp);
       await circuitBreaker.execute(successfulOp);
@@ -190,10 +191,10 @@ describe('CircuitBreaker', () => {
 
   describe('Event Emissions', () => {
     it('should emit state change from CLOSED to OPEN', async () => {
-      const stateChangeSpy = jest.fn();
+      const stateChangeSpy = vi.fn();
       circuitBreaker.on('open', stateChangeSpy);
 
-      const failingOp = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
+      const failingOp = vi.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
 
       // Trip the breaker
       for (let i = 0; i < 3; i++) {
@@ -204,25 +205,25 @@ describe('CircuitBreaker', () => {
     });
 
     it('should emit all state transitions in sequence', async () => {
-      const openSpy = jest.fn();
-      const halfOpenSpy = jest.fn();
-      const closeSpy = jest.fn();
+      const openSpy = vi.fn();
+      const halfOpenSpy = vi.fn();
+      const closeSpy = vi.fn();
 
       circuitBreaker.on('open', openSpy);
       circuitBreaker.on('half-open', halfOpenSpy);
       circuitBreaker.on('close', closeSpy);
 
       // CLOSED -> OPEN
-      const failingOp = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
+      const failingOp = vi.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
       for (let i = 0; i < 3; i++) {
         await expect(circuitBreaker.execute(failingOp)).rejects.toThrow();
       }
 
       // OPEN -> HALF_OPEN (after timeout)
-      await jest.advanceTimersByTimeAsync(5001);
+      await vi.advanceTimersByTimeAsync(5001);
 
       // HALF_OPEN -> CLOSED (on success)
-      const successOp = jest.fn<() => Promise<string>>().mockResolvedValue('success');
+      const successOp = vi.fn<() => Promise<string>>().mockResolvedValue('success');
       await circuitBreaker.execute(successOp);
 
       // Verify we saw all three transitions
@@ -235,12 +236,12 @@ describe('CircuitBreaker', () => {
   describe('Edge Cases', () => {
     it('should handle operations that complete just before timeout', async () => {
       // Operation completes in 999ms, just under the 1000ms timeout
-      const almostSlowOp = jest.fn<() => Promise<string>>().mockImplementation(
+      const almostSlowOp = vi.fn<() => Promise<string>>().mockImplementation(
         () => new Promise(resolve => setTimeout(() => resolve('success'), 999))
       );
 
       const promise = circuitBreaker.execute(almostSlowOp);
-      await jest.advanceTimersByTimeAsync(999);
+      await vi.advanceTimersByTimeAsync(999);
 
       // Should succeed without timeout
       await expect(promise).resolves.toBe('success');
@@ -248,7 +249,7 @@ describe('CircuitBreaker', () => {
     });
 
     it('should handle rapid successive failures', async () => {
-      const failingOp = jest.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
+      const failingOp = vi.fn<() => Promise<never>>().mockRejectedValue(new Error('Fail'));
 
       // Execute failures in rapid succession without awaiting
       const promises: Promise<void>[] = [];

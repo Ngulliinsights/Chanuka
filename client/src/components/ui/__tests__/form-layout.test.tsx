@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Tests for enhanced form layout components
  */
@@ -79,7 +80,7 @@ describe('FormSection', () => {
 
   it('calls onToggle when collapsed/expanded', async () => {
     const user = userEvent.setup();
-    const onToggle = jest.fn();
+    const onToggle = vi.fn();
     
     render(
       <FormSection title="Toggle Section" collapsible onToggle={onToggle}>
@@ -152,7 +153,7 @@ describe('FormStepIndicator', () => {
 
   it('calls onStepClick when step is clicked', async () => {
     const user = userEvent.setup();
-    const onStepClick = jest.fn();
+    const onStepClick = vi.fn();
     
     render(
       <FormStepIndicator 
@@ -195,7 +196,7 @@ describe('FormValidationSummary', () => {
 
   it('calls onErrorClick when error is clicked', async () => {
     const user = userEvent.setup();
-    const onErrorClick = jest.fn();
+    const onErrorClick = vi.fn();
     
     render(
       <FormValidationSummary 
@@ -235,7 +236,7 @@ describe('FormSuccessIndicator', () => {
 
   it('renders action buttons', async () => {
     const user = userEvent.setup();
-    const mockAction = jest.fn();
+    const mockAction = vi.fn();
     
     render(
       <FormSuccessIndicator 

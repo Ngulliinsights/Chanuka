@@ -1,32 +1,33 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { sponsorRepository, SponsorRepository } from '../sponsor.repository';
 import { readDatabase } from '../../../../../db'; // Adjusted path
 import * as schema from '../../../../../../shared/schema'; // Adjusted path
 import { eq, and, like, or, inArray, desc, asc, sql } from 'drizzle-orm';
 
 // --- Mock Dependencies ---
-jest.mock('@shared/database/connection', () => ({ readDatabase: jest.fn() }));
+vi.mock('@shared/database/connection', () => ({ readDatabase: vi.fn() }));
 
 // Comprehensive Mock DB Object
 const mockDb = {
-    select: jest.fn().mockReturnThis(),
-    selectDistinct: jest.fn().mockReturnThis(), // For unique parties/constituencies
-    from: jest.fn().mockReturnThis(),
-    where: jest.fn().mockReturnThis(),
-    orderBy: jest.fn().mockReturnThis(),
-    limit: jest.fn().mockResolvedValue([]), // Default empty result array
-    offset: jest.fn().mockResolvedValue([]), // Default empty result array
-    insert: jest.fn().mockReturnThis(),
-    values: jest.fn().mockReturnThis(),
-    returning: jest.fn().mockResolvedValue([]), // Default empty returning array
-    update: jest.fn().mockReturnThis(),
-    set: jest.fn().mockReturnThis(),
-    delete: jest.fn().mockReturnThis(),
-    leftJoin: jest.fn().mockReturnThis(), // For relation fetching if needed
-    innerJoin: jest.fn().mockReturnThis(),
-    groupBy: jest.fn().mockReturnThis(),
+    select: vi.fn().mockReturnThis(),
+    selectDistinct: vi.fn().mockReturnThis(), // For unique parties/constituencies
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnThis(),
+    orderBy: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockResolvedValue([]), // Default empty result array
+    offset: vi.fn().mockResolvedValue([]), // Default empty result array
+    insert: vi.fn().mockReturnThis(),
+    values: vi.fn().mockReturnThis(),
+    returning: vi.fn().mockResolvedValue([]), // Default empty returning array
+    update: vi.fn().mockReturnThis(),
+    set: vi.fn().mockReturnThis(),
+    delete: vi.fn().mockReturnThis(),
+    leftJoin: vi.fn().mockReturnThis(), // For relation fetching if needed
+    innerJoin: vi.fn().mockReturnThis(),
+    groupBy: vi.fn().mockReturnThis(),
     // Mock execution for promise resolution
-    then: jest.fn((resolve) => resolve([])), // Default resolve empty array
-    catch: jest.fn(),
+    then: vi.fn((resolve) => resolve([])), // Default resolve empty array
+    catch: vi.fn(),
     // Allow mocking specific query results directly if needed
     _mockResult: (result: any[]) => {
         mockDb.limit.mockResolvedValue(result);
@@ -63,8 +64,8 @@ describe('SponsorRepository', () => {
     let repository: SponsorRepository;
 
     beforeEach(() => {
-        jest.clearAllMocks();
-        (readDatabase as jest.Mock).mockReturnValue(mockDb);
+        vi.clearAllMocks();
+        (readDatabase as vi.Mock).mockReturnValue(mockDb);
         // Reset default mock result behavior
          mockDb._mockResult([]); // Default to empty array
         repository = sponsorRepository; // Use singleton instance

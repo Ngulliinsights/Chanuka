@@ -41,6 +41,21 @@ export interface ValidationAdapterConfig {
   enablePreprocessing?: boolean;
   enableSanitization?: boolean;
   strictMode?: boolean;
+  
+  // Additional properties needed by CoreValidationService
+  // These provide more granular control over adapter behavior
+  defaultOptions?: ValidationOptions;
+  preprocessing?: PreprocessingConfig;
+  cache?: {
+    enabled?: boolean;
+    defaultTtl?: number;
+    maxSize?: number;
+  };
+  metrics?: {
+    enabled?: boolean;
+    trackSchemaUsage?: boolean;
+    trackErrorPatterns?: boolean;
+  };
 }
 
 export interface ValidationSchema {
@@ -63,6 +78,13 @@ export interface ValidationOptions {
   enableSanitization?: boolean;
   context?: ValidationContext;
   abortEarly?: boolean;
+  
+  // Additional options needed by CoreValidationService
+  // These options control caching behavior at the operation level
+  preprocess?: boolean;
+  useCache?: boolean;
+  cacheTtl?: number;
+  cacheKeyGenerator?: (schema: any, data: unknown) => string;
 }
 
 export interface ValidationResult<T> {
@@ -101,16 +123,50 @@ export interface ValidationContext {
   metadata?: Record<string, any>;
 }
 
+/**
+ * Represents a cached validation result with timing metadata
+ * This is distinct from ValidationResult because it includes cache-specific information
+ */
+export interface CachedValidationResult<T> {
+  result: ValidationResult<T>;  // The actual validation result
+  timestamp: number;             // When this result was cached (milliseconds since epoch)
+  ttl: number;                  // Time-to-live in seconds
+}
+
+export interface PreprocessingConfig {
+  trimStrings?: boolean;
+  coerceNumbers?: boolean;
+  coerceBooleans?: boolean;
+  emptyStringToNull?: boolean;
+  undefinedToNull?: boolean;
+  customPreprocessors?: Array<(data: unknown) => unknown>;
+}
+
+export interface ValidationServiceConfig {
+  defaultOptions?: ValidationOptions;
+  preprocessing?: PreprocessingConfig;
+  cache?: {
+    enabled?: boolean;
+    defaultTtl?: number;
+    maxSize?: number;
+  };
+  metrics?: {
+    enabled?: boolean;
+    trackSchemaUsage?: boolean;
+    trackErrorPatterns?: boolean;
+  };
+}
+
 export interface ValidationMetrics {
-  validations: number;
-  successes: number;
-  failures: number;
-  successRate: number;
-  avgLatency: number;
+  totalValidations: number;
+  successfulValidations: number;
+  failedValidations: number;
   cacheHits: number;
   cacheMisses: number;
-  cacheHitRate: number;
-  schemasRegistered: number;
+  avgValidationTime: number;
+  schemaUsageCount: Record<string, number>;
+  errorsByField: Record<string, number>;
+  errorsByCode: Record<string, number>;
 }
 
 export interface ValidationHealthStatus {
@@ -140,6 +196,15 @@ export interface PreprocessingRules {
   parseJson?: boolean;
   normalizeWhitespace?: boolean;
   customRules?: Array<(value: any) => any>;
+  
+  // Additional properties needed by CoreValidationService
+  // These extend the preprocessing capabilities with more granular control
+  trimStrings?: boolean;
+  coerceNumbers?: boolean;
+  coerceBooleans?: boolean;
+  emptyStringToNull?: boolean;
+  undefinedToNull?: boolean;
+  customPreprocessors?: Array<(data: unknown) => unknown>;
 }
 
 // Schema registration and management
@@ -218,3 +283,34 @@ export interface ValidationEventEmitter {
   off(event: ValidationEventType, listener: (event: ValidationEvent) => void): void;
   emit(event: ValidationEventType, data: Omit<ValidationEvent, 'type' | 'timestamp'>): void;
 }
+
+/**
+ * Type aliases with I prefix for backward compatibility
+ * 
+ * These aliases allow existing code using the I-prefix convention to work
+ * without modification while pointing to the correct, comprehensive interfaces
+ */
+
+// Core service interfaces
+export type IValidationService = ValidationService;
+export type IValidationResult<T> = ValidationResult<T>;
+export type IBatchValidationResult<T> = BatchValidationResult<T>;
+
+// Options and context
+export type IValidationOptions = ValidationOptions;
+export type IValidationContext = ValidationContext;
+
+// Configuration interfaces - these now point to the comprehensive configs
+export type IValidationServiceConfig = ValidationServiceConfig;  // Changed from ValidationAdapterConfig
+export type IValidationMetrics = ValidationMetrics;
+
+// Cache interface - now points to the proper cached result structure
+export type ICachedValidationResult<T> = CachedValidationResult<T>;  // Changed from ValidationResult<T>
+
+// Schema and adapter interfaces
+export type ISchemaRegistration = SchemaRegistration;
+export type ISchemaAdapter = ValidationAdapter;
+
+// Preprocessing and caching configs - now point to the comprehensive interfaces
+export type IPreprocessingConfig = PreprocessingConfig;  // Changed from PreprocessingRules
+export type ICachingConfig = ValidationServiceConfig['cache'];  // Changed to point to the cache property type

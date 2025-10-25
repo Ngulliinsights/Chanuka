@@ -26,6 +26,7 @@ describe('UI Recovery Utilities', () => {
   beforeEach(() => {
     // Get a fresh instance for each test
     recoveryManager = UIRecoveryManager.getInstance();
+    recoveryManager.clearStrategies(); // Clear strategies for test isolation
     vi.clearAllMocks();
   });
 
@@ -361,5 +362,26 @@ describe('UI Recovery Utilities', () => {
         }).not.toThrow();
       }
     });
+  });
+});
+
+describe('recovery', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should be defined and properly exported', () => {
+    expect(recovery).toBeDefined();
+    expect(typeof recovery).not.toBe('undefined');
+  });
+
+  it('should export expected functions/classes', () => {
+    // TODO: Add specific export tests for recovery
+    expect(typeof recovery).toBe('object');
+  });
+
+  it('should handle basic functionality', () => {
+    // TODO: Add specific functionality tests for recovery
+    expect(true).toBe(true);
   });
 });

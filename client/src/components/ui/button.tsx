@@ -3,8 +3,8 @@ import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Loader2, AlertCircle, CheckCircle } from "lucide-react"
 
-import { cn } from '..\..\lib\utils'
-import { logger } from '..\..\utils\browser-logger';
+import { cn } from '../../lib/utils'
+import { logger } from '../../utils/browser-logger';
 import { EnhancedButtonProps, ButtonState } from './types';
 import { ButtonStateSchema, ButtonVariantSchema, ButtonSizeSchema } from './validation';
 import { UIComponentError } from './errors';

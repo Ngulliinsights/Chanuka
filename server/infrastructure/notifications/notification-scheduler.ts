@@ -430,7 +430,7 @@ export class NotificationSchedulerService {
 
   // Helper methods
   private async getUsersWithDigestEnabled(): Promise<Array<{ userId: string; preferences: any }>> {
-    const allUsers = await db.select({ id: users.id, preferences: users.preferences }).from(users);
+    const allUsers = await db.select({ id: user.id, preferences: user.preferences }).from(user);
     
     return allUsers
       .map(user => ({

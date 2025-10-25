@@ -1,8 +1,8 @@
 import { forwardRef, ElementRef, ComponentPropsWithoutRef } from "react"
 import { Root } from "@radix-ui/react-separator"
 
-import { cn } from '..\..\lib\utils'
-import { logger } from '..\..\utils\browser-logger';
+import { cn } from '../../lib/utils'
+import { logger } from '../../utils/browser-logger';
 
 const Separator = forwardRef<
   ElementRef<typeof Root>,

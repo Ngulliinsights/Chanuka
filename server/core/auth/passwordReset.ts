@@ -1,5 +1,5 @@
 // services/passwordReset.ts
-import { database as db } from '../shared/database/connection';
+import { db } from '../../../shared/database';
 // Import specific tables and functions needed from the consolidated schema
 import { user as users, passwordReset as passwordResets } from '../../../shared/schema';
 import { ValidationError } from '../../../shared/types/errors.js';

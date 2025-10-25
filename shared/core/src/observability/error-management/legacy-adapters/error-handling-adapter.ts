@@ -6,10 +6,10 @@
  */
 
 // Re-export everything from the new consolidated system
-export * from '../errors/base-error.js';
-export * from '../errors/specialized-errors.js';
-export * from '../patterns/circuit-breaker.js';
-export * from '../patterns/retry-patterns.js';
+export * from '../errors/base-error';
+export * from '../errors/specialized-errors';
+export * from '../patterns/circuit-breaker';
+export * from '../patterns/retry-patterns';
 
 // Legacy type aliases for backward compatibility
 export type {
@@ -25,8 +25,8 @@ export type {
 } from '../patterns/circuit-breaker.js';
 
 // Legacy class aliases
-export { BaseError as BaseError } from '../errors/base-error.js';
-export { CircuitBreaker as CircuitBreaker } from '../patterns/circuit-breaker.js';
+export { BaseError as BaseError } from '../errors/base-error';
+export { CircuitBreaker as CircuitBreaker } from '../patterns/circuit-breaker';
 
 // Legacy constants
 export const ERROR_DOMAINS = {

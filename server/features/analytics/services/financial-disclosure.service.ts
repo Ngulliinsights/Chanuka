@@ -8,9 +8,9 @@ import {
 } from "@shared/schema";
 import { eq, desc, and, sql, count } from "drizzle-orm";
 import { readDatabase } from '@shared/database/connection';
-import { cache } from '../../../../shared/core/src/caching';
-import { logger } from '../../../../shared/core/src/observability/logging';
-import { SponsorNotFoundError, DatabaseError } from '../../../../shared/core/src/observability/error-management';
+import { cache } from '@shared/core';
+import { logger } from '@shared/core';
+import { SponsorNotFoundError, DatabaseError } from '@shared/core';
 import { FinancialDisclosureConfig } from '../financial-disclosure/config.js';
 import type {
   FinancialDisclosure,

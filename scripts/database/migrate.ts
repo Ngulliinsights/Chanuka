@@ -3,7 +3,7 @@ const { Pool } = pkg;
 import * as fs from 'fs';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Load environment variables
 dotenv.config();
@@ -12,9 +12,9 @@ dotenv.config();
  * Creates a database pool with consistent configuration
  * This centralizes our connection logic to avoid duplication
  */
-function createPool(databaseName = 'legislative_track') {
-  const baseUrl = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/legislative_track';
-  const connectionString = baseUrl.replace(/\/[^/]*$/, `/${databaseName}`);
+function createPool(databaseName?: string) {
+  const baseUrl = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/neondb';
+  const connectionString = databaseName ? baseUrl.replace(/\/[^/]*(\?|$)/, `/${databaseName}$1`) : baseUrl;
 
   // Determine SSL configuration based on URL and environment
   let sslConfig;
@@ -23,7 +23,7 @@ function createPool(databaseName = 'legislative_track') {
   } else if (process.env.NODE_ENV === 'production') {
     sslConfig = { rejectUnauthorized: false };
   } else {
-    sslConfig = false;
+    sslConfig = { rejectUnauthorized: false }; // Always use SSL for Neon
   }
 
   return new Pool({
@@ -157,9 +157,10 @@ async function ensureMigrationTrackingTable(pool) {
  * Generates a simple hash for migration content
  * This helps us track which migrations have been applied
  */
+import { createHash } from 'crypto';
+
 function generateMigrationHash(content, filename) {
-  const crypto = require('crypto');
-  return crypto.createHash('sha256').update(content + filename).digest('hex');
+  return createHash('sha256').update(content + filename).digest('hex');
 }
 
 /**

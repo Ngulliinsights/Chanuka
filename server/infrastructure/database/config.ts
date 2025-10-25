@@ -1,7 +1,7 @@
 // import RedisStore from 'connect-redis'; // Redis not available
 // import { Redis } from 'ioredis'; // Redis not available
 import { pool } from '../../../shared/database/pool.js';
-import { logger } from '../../../shared/core/src/observability/logging'
+import { logger } from '@shared/core'
 
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 

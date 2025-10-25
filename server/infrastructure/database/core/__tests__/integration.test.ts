@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { jest } from '@jest/globals';
 import { PoolClient } from 'pg';
 import { createConnectionManager, ConnectionManager } from '../connection-manager';
@@ -5,13 +6,13 @@ import { getMonitoringService, resetMonitoringService } from '../../../monitorin
 
 // Define the pool interface with proper typing for better type inference
 interface MockPool {
-  connect: jest.Mock<Promise<PoolClient>>;
-  on: jest.Mock<void>;
-  getMetrics: jest.Mock<Promise<any>>;
+  connect: vi.Mock<Promise<PoolClient>>;
+  on: vi.Mock<void>;
+  getMetrics: vi.Mock<Promise<any>>;
   circuitBreaker: {
-    getState: jest.Mock<string>;
-    getFailureCount: jest.Mock<number>;
-    execute: jest.Mock<Promise<any>>;
+    getState: vi.Mock<string>;
+    getFailureCount: vi.Mock<number>;
+    execute: vi.Mock<Promise<any>>;
   };
   totalCount: number;
   idleCount: number;
@@ -19,46 +20,46 @@ interface MockPool {
 }
 
 // Mock the shared pool and its dependencies
-jest.mock('../../../../../shared/database/pool', () => ({
+vi.mock('../../../../../shared/database/pool', () => ({
   pool: {
-    connect: jest.fn(),
-    on: jest.fn(),
-    getMetrics: jest.fn(),
+    connect: vi.fn(),
+    on: vi.fn(),
+    getMetrics: vi.fn(),
     circuitBreaker: {
-      getState: jest.fn(),
-      getFailureCount: jest.fn(),
-      execute: jest.fn(),
+      getState: vi.fn(),
+      getFailureCount: vi.fn(),
+      execute: vi.fn(),
     },
     totalCount: 10,
     idleCount: 5,
     waitingCount: 2,
   },
-  checkPoolHealth: jest.fn(),
+  checkPoolHealth: vi.fn(),
 }));
 
 import { pool, checkPoolHealth } from '../../../../../shared/database/pool';
 
 // Type assertion to help TypeScript understand our mock structure
 const mockPool = pool as unknown as MockPool;
-const mockCheckPoolHealth = checkPoolHealth as jest.Mock<Promise<any>>;
+const mockCheckPoolHealth = checkPoolHealth as vi.Mock<Promise<any>>;
 
 describe('ConnectionManager Integration Tests', () => {
   let manager: ConnectionManager;
-  let mockClient: jest.Mocked<PoolClient>;
+  let mockClient: vi.Mocked<PoolClient>;
 
   beforeEach(() => {
     // Use fake timers for deterministic control of time-based operations
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     resetMonitoringService();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Setup mock client with all required methods
     mockClient = {
-      query: jest.fn(),
-      release: jest.fn(),
-      on: jest.fn(),
-      off: jest.fn(),
-    } as unknown as jest.Mocked<PoolClient>;
+      query: vi.fn(),
+      release: vi.fn(),
+      on: vi.fn(),
+      off: vi.fn(),
+    } as unknown as vi.Mocked<PoolClient>;
 
     // Configure mock pool with default successful behavior
     // The type assertion helps TypeScript understand this is safe
@@ -99,7 +100,7 @@ describe('ConnectionManager Integration Tests', () => {
 
   afterEach(async () => {
     await manager.close();
-    jest.useRealTimers();
+    vi.useRealTimers();
     resetMonitoringService();
   });
 
@@ -183,17 +184,17 @@ describe('ConnectionManager Integration Tests', () => {
   describe('Health Monitoring', () => {
     it('should perform health checks periodically', async () => {
       // Advance timers past the health check interval (100ms)
-      await jest.advanceTimersByTimeAsync(150);
+      await vi.advanceTimersByTimeAsync(150);
 
       expect(mockCheckPoolHealth).toHaveBeenCalledWith(pool, 'managed');
     });
 
     it('should emit health status updates', async () => {
-      const healthSpy = jest.fn();
+      const healthSpy = vi.fn();
       manager.on('health-status-update', healthSpy);
 
       // Trigger health check by advancing timers
-      await jest.advanceTimersByTimeAsync(150);
+      await vi.advanceTimersByTimeAsync(150);
 
       expect(healthSpy).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -224,8 +225,8 @@ describe('ConnectionManager Integration Tests', () => {
 
   describe('Event Emission', () => {
     it('should emit connection lifecycle events', async () => {
-      const acquireSpy = jest.fn();
-      const releaseSpy = jest.fn();
+      const acquireSpy = vi.fn();
+      const releaseSpy = vi.fn();
 
       manager.on('connection-acquired', acquireSpy);
       manager.on('connection-released', releaseSpy);
@@ -238,7 +239,7 @@ describe('ConnectionManager Integration Tests', () => {
     });
 
     it('should emit circuit breaker state changes', async () => {
-      const stateChangeSpy = jest.fn();
+      const stateChangeSpy = vi.fn();
       manager.on('circuit-breaker-state-change', stateChangeSpy);
 
       // Change circuit breaker state
@@ -256,7 +257,7 @@ describe('ConnectionManager Integration Tests', () => {
   describe('Metrics Integration', () => {
     it('should emit metrics when acquiring connections', async () => {
       const monitoring = getMonitoringService();
-      const recordMetricSpy = jest.spyOn(monitoring, 'recordDatabaseMetric');
+      const recordMetricSpy = vi.spyOn(monitoring, 'recordDatabaseMetric');
 
       const client = await manager.acquireConnection();
 
@@ -281,7 +282,7 @@ describe('ConnectionManager Integration Tests', () => {
 
     it('should emit metrics when releasing connections', async () => {
       const monitoring = getMonitoringService();
-      const recordMetricSpy = jest.spyOn(monitoring, 'recordDatabaseMetric');
+      const recordMetricSpy = vi.spyOn(monitoring, 'recordDatabaseMetric');
 
       const client = await manager.acquireConnection();
       await manager.releaseConnection(client);
@@ -298,7 +299,7 @@ describe('ConnectionManager Integration Tests', () => {
 
     it('should emit metrics on connection failures', async () => {
       const monitoring = getMonitoringService();
-      const recordMetricSpy = jest.spyOn(monitoring, 'recordDatabaseMetric');
+      const recordMetricSpy = vi.spyOn(monitoring, 'recordDatabaseMetric');
 
       const error = new Error('Connection failed');
       mockPool.circuitBreaker.execute.mockRejectedValueOnce(error);
@@ -318,7 +319,7 @@ describe('ConnectionManager Integration Tests', () => {
 
     it('should emit pool health metrics', async () => {
       const monitoring = getMonitoringService();
-      const recordMetricSpy = jest.spyOn(monitoring, 'recordDatabaseMetric');
+      const recordMetricSpy = vi.spyOn(monitoring, 'recordDatabaseMetric');
 
       await manager.getHealthStatus();
 
@@ -342,7 +343,7 @@ describe('ConnectionManager Integration Tests', () => {
 
     it('should emit pool statistics metrics', async () => {
       const monitoring = getMonitoringService();
-      const recordMetricSpy = jest.spyOn(monitoring, 'recordDatabaseMetric');
+      const recordMetricSpy = vi.spyOn(monitoring, 'recordDatabaseMetric');
 
       await manager.getPoolStatistics();
 
@@ -356,7 +357,7 @@ describe('ConnectionManager Integration Tests', () => {
 
     it('should emit circuit breaker metrics', async () => {
       const monitoring = getMonitoringService();
-      const recordMetricSpy = jest.spyOn(monitoring, 'recordDatabaseMetric');
+      const recordMetricSpy = vi.spyOn(monitoring, 'recordDatabaseMetric');
 
       await manager.getHealthStatus();
 
@@ -372,7 +373,7 @@ describe('ConnectionManager Integration Tests', () => {
 
     it('should emit percentile metrics periodically', async () => {
       const monitoring = getMonitoringService();
-      const recordMetricSpy = jest.spyOn(monitoring, 'recordDatabaseMetric');
+      const recordMetricSpy = vi.spyOn(monitoring, 'recordDatabaseMetric');
 
       // Generate enough data points to calculate meaningful percentiles
       for (let i = 0; i < 10; i++) {
@@ -406,7 +407,7 @@ describe('ConnectionManager Integration Tests', () => {
       const error = new Error('Connection pool exhausted');
       mockPool.circuitBreaker.execute.mockRejectedValue(error);
 
-      const errorSpy = jest.fn();
+      const errorSpy = vi.fn();
       manager.on('connection-error', errorSpy);
 
       await expect(manager.acquireConnection()).rejects.toThrow('Connection pool exhausted');
@@ -419,7 +420,7 @@ describe('ConnectionManager Integration Tests', () => {
         throw error;
       });
 
-      const errorSpy = jest.fn();
+      const errorSpy = vi.fn();
       manager.on('connection-error', errorSpy);
 
       await expect(manager.releaseConnection(mockClient as PoolClient)).rejects.toThrow('Release failed');
@@ -428,7 +429,7 @@ describe('ConnectionManager Integration Tests', () => {
 
     it('should handle pool errors', async () => {
       const error = new Error('Pool connection lost');
-      const errorSpy = jest.fn();
+      const errorSpy = vi.fn();
       manager.on('pool-error', errorSpy);
 
       // Find and invoke the pool error handler that was registered

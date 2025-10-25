@@ -17,9 +17,9 @@ import {
   MoreHorizontal
 } from 'lucide-react';
 import { useResponsiveLayoutContext, TouchButton, SafeAreaWrapper } from './responsive-layout-manager';
-import { MobileTouchHandler, MobileTouchUtils } from '..\..\utils\mobile-touch-handler';
+import { MobileTouchHandler, MobileTouchUtils } from '../../utils/mobile-touch-handler';
 import { Link, useLocation } from 'react-router-dom';
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '../../utils/browser-logger';
 
 interface NavigationItem {
   id: string;

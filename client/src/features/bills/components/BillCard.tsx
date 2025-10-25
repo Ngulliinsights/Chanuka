@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '..\..\..\components\ui\card';
-import { Badge } from '..\..\..\components\ui\badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Badge } from '../../../components/ui/badge';
 import { Calendar, Users, AlertCircle, TrendingUp } from 'lucide-react';
-import { cn } from '..\..\..\lib\utils';
+import { cn } from '../../../lib/utils';
 import type { Bill } from '../types';
 
 interface BillCardProps {

@@ -5,8 +5,8 @@
 
 import React from 'react';
 import { Loader2 } from 'lucide-react';
-import { cn } from '..\..\..\lib\utils';
-import { Button } from '..\..\ui\button';
+import { cn } from '../../../lib/utils';
+import { Button } from '../../ui/button';
 import { AuthButtonProps } from '../types';
 
 export const AuthButton: React.FC<AuthButtonProps> = ({

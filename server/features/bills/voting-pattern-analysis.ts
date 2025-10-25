@@ -2,7 +2,7 @@ import { readDatabase } from '../../../shared/database/connection.js';
 import * as schema from '../../../shared/schema';
 import { sponsorService } from '../sponsors/infrastructure/repositories/sponsor.repository.js';
 import { eq, and, sql, desc, asc, count, avg, inArray, or, notInArray } from 'drizzle-orm';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // ============================================================================
 // TYPE DEFINITIONS

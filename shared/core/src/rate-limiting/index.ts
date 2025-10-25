@@ -2,12 +2,24 @@
 export * from './core';
 export * from './adapters';
 export * from './middleware';
-export * from './metrics';
 
-// Legacy exports for backward compatibility
-export * from './types';
-export * from './factory';
-export * from './ai-rate-limiter';
+// Specific exports for backward compatibility
+export { RateLimitMiddleware } from './middleware';
+export const rateLimitMiddleware = RateLimitMiddleware;
+
+// Legacy exports for backward compatibility - be specific to avoid conflicts
+export type { 
+  RateLimitOptions, 
+  RateLimitResult, 
+  RateLimitStore, 
+  RateLimitBucket, 
+  AIRateLimitOptions, 
+  RateLimitData, 
+  IRateLimitStore,
+  RateLimitConfig
+} from './types';
+export { RateLimitFactory } from './factory';
+export { AIRateLimiter } from './ai-rate-limiter';
 
 // Store implementations
 export { MemoryRateLimitStore } from './stores/memory-store';
@@ -40,6 +52,14 @@ export function createRateLimiter(store?: any) {
 export function createAIRateLimiter(store?: any, maxCostPerWindow: number = 100) {
   const rateLimitStore = store || createMemoryStore();
   return AIRateLimiter.createOpenAIRateLimiter(rateLimitStore, maxCostPerWindow);
+}
+
+export function createRateLimitFactory() {
+  return {
+    createMemoryStore,
+    createRateLimiter,
+    createAIRateLimiter
+  };
 }
 
 // Feature flag for gradual migration

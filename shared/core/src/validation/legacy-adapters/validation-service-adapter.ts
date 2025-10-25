@@ -151,10 +151,10 @@ export class LegacyValidationService {
    * Sanitize HTML content to prevent XSS
    */
   sanitizeHtml(html: string): string {
-    // Use core validation service if available
-    if (coreValidationService && typeof coreValidationService.sanitizeHtml === 'function') {
-      return coreValidationService.sanitizeHtml(html);
-    }
+    // Use core validation service if available (method doesn't exist yet)
+    // if (coreValidationService && typeof coreValidationService.sanitizeHtml === 'function') {
+    //   return coreValidationService.sanitizeHtml(html);
+    // }
 
     // Fallback implementation
     return html

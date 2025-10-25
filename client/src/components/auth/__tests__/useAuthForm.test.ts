@@ -1,9 +1,10 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * useAuthForm hook tests
  */
 
 import { renderHook, act } from '@testing-library/react';
-import { useAuthForm } from '../hooks/useAuthForm';
+import { useAuthForm } from '@/hooks/useAuthForm';
 import {
   createMockUseAuth,
   createMockChangeEvent,
@@ -11,17 +12,17 @@ import {
   createMockSubmitEvent,
   createMockLoginData,
   createMockRegisterData
-} from '../utils/test-utils';
+} from '@/utils/test-utils';
 
 // Mock the useAuth hook
 const mockUseAuth = createMockUseAuth();
-jest.mock('@/hooks/use-auth', () => ({
+vi.mock('@/hooks/use-auth', () => ({
   useAuth: () => mockUseAuth
 }));
 
 describe('useAuthForm Hook', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Initial state', () => {
@@ -52,9 +53,9 @@ describe('useAuthForm Hook', () => {
     });
 
     it('should initialize with custom options', () => {
-      const onSuccess = jest.fn();
-      const onError = jest.fn();
-      const onModeChange = jest.fn();
+      const onSuccess = vi.fn();
+      const onError = vi.fn();
+      const onModeChange = vi.fn();
       
       const { result } = renderHook(() => useAuthForm({
         initialMode: 'register',
@@ -166,7 +167,7 @@ describe('useAuthForm Hook', () => {
 
   describe('Form submission', () => {
     it('should handle successful login', async () => {
-      const onSuccess = jest.fn();
+      const onSuccess = vi.fn();
       mockUseAuth.login.mockResolvedValue({ success: true, data: { user: { id: 1 } } });
       
       const { result } = renderHook(() => useAuthForm({ onSuccess }));
@@ -189,7 +190,7 @@ describe('useAuthForm Hook', () => {
     });
 
     it('should handle successful registration', async () => {
-      const onSuccess = jest.fn();
+      const onSuccess = vi.fn();
       mockUseAuth.register.mockResolvedValue({ success: true, data: { user: { id: 1 } } });
       
       const { result } = renderHook(() => useAuthForm({ 
@@ -222,7 +223,7 @@ describe('useAuthForm Hook', () => {
     });
 
     it('should handle login failure', async () => {
-      const onError = jest.fn();
+      const onError = vi.fn();
       mockUseAuth.login.mockResolvedValue({ success: false, error: 'Invalid credentials' });
       
       const { result } = renderHook(() => useAuthForm({ onError }));
@@ -284,7 +285,7 @@ describe('useAuthForm Hook', () => {
 
   describe('Mode toggling', () => {
     it('should toggle between login and register modes', () => {
-      const onModeChange = jest.fn();
+      const onModeChange = vi.fn();
       const { result } = renderHook(() => useAuthForm({ onModeChange }));
       
       expect(result.current.mode).toBe('login');
@@ -510,7 +511,7 @@ describe('useAuthForm Hook', () => {
     });
 
     it('should handle unexpected errors during submission', async () => {
-      const onError = jest.fn();
+      const onError = vi.fn();
       mockUseAuth.login.mockRejectedValue(new Error('Unexpected error'));
       
       const { result } = renderHook(() => useAuthForm({ onError }));
@@ -531,7 +532,7 @@ describe('useAuthForm Hook', () => {
     it('should handle form submission without preventDefault', async () => {
       const { result } = renderHook(() => useAuthForm());
       
-      const mockEvent = { preventDefault: jest.fn() } as any;
+      const mockEvent = { preventDefault: vi.fn() } as any;
       
       await act(async () => {
         await result.current.handleSubmit(mockEvent);

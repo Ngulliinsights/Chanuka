@@ -4,10 +4,10 @@ import { useMediaQuery } from '../hooks/use-mobile';
 import { 
   ResponsiveNavigationState, 
   ResponsiveNavigationContextValue 
-} from '..\types\navigation';
-import { isNavigationPathActive } from '..\utils\navigation\active-state';
-import { NavigationStatePersistence } from '..\utils\navigation\state-persistence';
-import { logger } from '..\utils\browser-logger';
+} from '../types/navigation';
+import { isNavigationPathActive } from '../utils/navigation/active-state';
+import { NavigationStatePersistence } from '../utils/navigation/state-persistence';
+import { logger } from '../utils/browser-logger';
 
 // Action types
 type ResponsiveNavigationAction =

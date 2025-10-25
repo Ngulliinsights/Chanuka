@@ -67,7 +67,7 @@ class PerformanceOptimizer {
   private initialize(): void {
     // Only initialize if this session is selected for monitoring
     if (Math.random() > this.config.sampleRate) {
-      logger.info('Performance monitoring disabled for this session (sampling)', { component: 'Chanuka' });
+      logger.info('Performance monitoring disabled for this session (sampling)', { component: 'PerformanceOptimizer' });
       return;
     }
 
@@ -87,7 +87,7 @@ class PerformanceOptimizer {
       this.initializeOptimizations();
     }
 
-    logger.info('🚀 Performance Optimizer initialized', { component: 'Chanuka' });
+    logger.info('🚀 Performance Optimizer initialized', { component: 'PerformanceOptimizer' });
   }
 
   private initializeMetricsCollection(): void {
@@ -266,7 +266,7 @@ class PerformanceOptimizer {
     };
 
     // Log bundle analysis
-    logger.info('📦 Bundle Analysis:', { component: 'Chanuka' }, this.bundleMetrics);
+    logger.info('📦 Bundle Analysis:', { component: 'PerformanceOptimizer' }, this.bundleMetrics);
 
     // Check bundle size budgets
     this.checkBundleBudgets();
@@ -436,7 +436,7 @@ class PerformanceOptimizer {
   }
 
   private applySlowConnectionOptimizations(): void {
-    logger.info('🐌 Applying slow connection optimizations', { component: 'Chanuka' });
+    logger.info('🐌 Applying slow connection optimizations', { component: 'PerformanceOptimizer' });
     
     // Reduce image quality
     const images = document.querySelectorAll('img[data-src]');
@@ -452,7 +452,7 @@ class PerformanceOptimizer {
   }
 
   private applyMediumConnectionOptimizations(): void {
-    logger.info('📶 Applying medium connection optimizations', { component: 'Chanuka' });
+    logger.info('📶 Applying medium connection optimizations', { component: 'PerformanceOptimizer' });
     
     // Moderate image quality
     const images = document.querySelectorAll('img[data-src]');
@@ -465,7 +465,7 @@ class PerformanceOptimizer {
   }
 
   private applyFastConnectionOptimizations(): void {
-    logger.info('🚀 Applying fast connection optimizations', { component: 'Chanuka' });
+    logger.info('🚀 Applying fast connection optimizations', { component: 'PerformanceOptimizer' });
     
     // Enable prefetching
     this.enableResourcePrefetching();
@@ -475,7 +475,7 @@ class PerformanceOptimizer {
   }
 
   private applyLowMemoryOptimizations(): void {
-    logger.info('🧠 Applying low memory optimizations', { component: 'Chanuka' });
+    logger.info('🧠 Applying low memory optimizations', { component: 'PerformanceOptimizer' });
     
     // Reduce concurrent operations
     // Implement lazy loading more aggressively
@@ -483,7 +483,7 @@ class PerformanceOptimizer {
   }
 
   private applyBatterySavingOptimizations(): void {
-    logger.info('🔋 Applying battery saving optimizations', { component: 'Chanuka' });
+    logger.info('🔋 Applying battery saving optimizations', { component: 'PerformanceOptimizer' });
     
     // Reduce animation frame rate
     // Disable non-critical background tasks
@@ -555,7 +555,7 @@ class PerformanceOptimizer {
     if (recommendations.bundleOptimizations.length > 0 || 
         recommendations.cacheOptimizations.length > 0 || 
         recommendations.performanceOptimizations.length > 0) {
-      logger.info('💡 Performance Optimization Recommendations:', { component: 'Chanuka' }, recommendations);
+      logger.info('💡 Performance Optimization Recommendations:', { component: 'PerformanceOptimizer' }, recommendations);
     }
   }
 
@@ -742,7 +742,7 @@ class PerformanceOptimizer {
       this.resourceObserver.disconnect();
     }
 
-    logger.info('Performance Optimizer destroyed', { component: 'Chanuka' });
+    logger.info('Performance Optimizer destroyed', { component: 'PerformanceOptimizer' });
   }
 }
 

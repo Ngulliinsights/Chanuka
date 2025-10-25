@@ -4,7 +4,7 @@
  * Adapter for custom validation functions implementing the core validation interfaces
  */
 
-import { ValidationError } from '../../error-management/errors/specialized/validation-error';
+import { ValidationError } from '../../observability/error-management/errors/specialized-errors';
 import {
   ISchemaAdapter,
   IValidationResult,

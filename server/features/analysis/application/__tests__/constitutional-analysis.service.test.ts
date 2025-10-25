@@ -1,15 +1,16 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { constitutionalAnalysisService, ConstitutionalAnalysisService } from '../constitutional-analysis.service';
 import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../../shared/schema';
 
 // --- Mock Dependencies ---
-jest.mock('../../../../db', () => ({ readDatabase: jest.fn() }));
+vi.mock('../../../../db', () => ({ readDatabase: vi.fn() }));
 
 const mockDb = {
-  select: jest.fn().mockReturnThis(),
-  from: jest.fn().mockReturnThis(),
-  where: jest.fn().mockReturnThis(),
-  limit: jest.fn().mockResolvedValue([]),
+  select: vi.fn().mockReturnThis(),
+  from: vi.fn().mockReturnThis(),
+  where: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockResolvedValue([]),
 };
 const mockBill = { id: 1, content: 'This bill discusses commerce clause and due process.' } as schema.Bill;
 
@@ -17,11 +18,11 @@ describe('ConstitutionalAnalysisService', () => {
   let service: ConstitutionalAnalysisService;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (readDatabase as jest.Mock).mockReturnValue(mockDb);
+    vi.clearAllMocks();
+    (readDatabase as vi.Mock).mockReturnValue(mockDb);
     // Setup mock to return the bill when fetching content
      mockDb.limit.mockImplementationOnce(() => ({ // Specific mock for getBillContent
-         limit: jest.fn().mockResolvedValue([mockBill])
+         limit: vi.fn().mockResolvedValue([mockBill])
      }));
 
     service = constitutionalAnalysisService; // Or new ConstitutionalAnalysisService()
@@ -62,7 +63,7 @@ describe('ConstitutionalAnalysisService', () => {
 
    it('should throw error if bill not found', async () => {
         mockDb.limit.mockImplementationOnce(() => ({ // Specific mock for getBillContent returning empty
-            limit: jest.fn().mockResolvedValue([])
+            limit: vi.fn().mockResolvedValue([])
         }));
         await expect(service.analyzeBill(999)).rejects.toThrow('Bill 999 not found');
     });

@@ -4,6 +4,10 @@ export class MonitoringScheduler {
   private intervals: Map<string, NodeJS.Timeout> = new Map();
   private isRunning = false;
 
+  initialize() {
+    this.start();
+  }
+
   start() {
     if (this.isRunning) {
       logger.warn('Monitoring scheduler already running', { component: 'Chanuka' });
