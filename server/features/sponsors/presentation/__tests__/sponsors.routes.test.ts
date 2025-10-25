@@ -1,22 +1,23 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
 import express, { Express } from 'express';
 import { sponsorsRouter } from '../sponsors.routes'; // Import the NEW router
 // Mock the NEW repository and analysis service
 import { sponsorRepository } from '../../infrastructure/repositories/sponsor.repository';
 import { sponsorConflictAnalysisService } from '../../application/sponsor-conflict-analysis.service';
-import { authenticateToken } from '../../../../middleware/auth'; // Mock auth if needed
+import { authenticateToken } from '@/components/auth'; // Mock auth if needed
 import * as schema from '../../../../../shared/schema';
 
 // --- Mock Dependencies ---
-jest.mock('../../infrastructure/repositories/sponsor.repository');
-jest.mock('../../application/sponsor-conflict-analysis.service');
+vi.mock('../../infrastructure/repositories/sponsor.repository');
+vi.mock('../../application/sponsor-conflict-analysis.service');
 // Mock Auth Middleware (Allow all for testing, add specific checks if needed)
-jest.mock('../../../../middleware/auth', () => ({
-    authenticateToken: jest.fn((req: any, res: any, next: any) => {
+vi.mock('../../../../middleware/auth', () => ({
+    authenticateToken: vi.fn((req: any, res: any, next: any) => {
         req.user = { id: 'mock-test-user', role: 'admin' }; // Assume admin for protected POST/PUT/DELETE
         next();
     }),
-    AuthenticatedRequest: jest.fn(),
+    AuthenticatedRequest: vi.fn(),
 }));
 
 // --- Setup Express App ---
@@ -37,37 +38,37 @@ const mockRiskProfile: any = { overallScore: 60, level: 'medium', breakdown: {},
 describe('Sponsors API Routes', () => {
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         // Reset mocks for repository methods
-        (sponsorRepository.list as jest.Mock).mockResolvedValue([mockSponsor1, mockSponsor2]);
-        (sponsorRepository.search as jest.Mock).mockResolvedValue([mockSponsor1]);
-        (sponsorRepository.findByIdWithRelations as jest.Mock).mockResolvedValue(mockSponsorWithRelations);
-        (sponsorRepository.findById as jest.Mock).mockResolvedValue(mockSponsor1); // Needed if findByIdWithRelations uses it
-        (sponsorRepository.create as jest.Mock).mockResolvedValue({ ...mockSponsor1, id: 3 });
-        (sponsorRepository.update as jest.Mock).mockResolvedValue(mockSponsor1);
-        (sponsorRepository.setActiveStatus as jest.Mock).mockResolvedValue({ ...mockSponsor1, isActive: false });
-        (sponsorRepository.listAffiliations as jest.Mock).mockResolvedValue([mockAffiliation]);
-        (sponsorRepository.addAffiliation as jest.Mock).mockResolvedValue({ ...mockAffiliation, id: 11 });
-        (sponsorRepository.updateAffiliation as jest.Mock).mockResolvedValue(mockAffiliation);
-        (sponsorRepository.setAffiliationActiveStatus as jest.Mock).mockResolvedValue({ ...mockAffiliation, isActive: false });
-        (sponsorRepository.listTransparencyRecords as jest.Mock).mockResolvedValue([mockTransparency]);
-        (sponsorRepository.addTransparencyRecord as jest.Mock).mockResolvedValue({ ...mockTransparency, id: 21 });
-        (sponsorRepository.updateTransparencyRecord as jest.Mock).mockResolvedValue(mockTransparency);
-        (sponsorRepository.verifyTransparencyRecord as jest.Mock).mockResolvedValue({ ...mockTransparency, isVerified: true });
-        (sponsorRepository.listBillSponsorshipsBySponsor as jest.Mock).mockResolvedValue([mockSponsorship]);
-         (sponsorRepository.createBillSponsorship as jest.Mock).mockResolvedValue({ ...mockSponsorship, id: 31 });
-         (sponsorRepository.deactivateBillSponsorship as jest.Mock).mockResolvedValue({ ...mockSponsorship, isActive: false });
-         (sponsorRepository.getUniqueParties as jest.Mock).mockResolvedValue(['Independent', 'Unity']);
-         (sponsorRepository.getUniqueConstituencies as jest.Mock).mockResolvedValue(['District A', 'District B']);
-         (sponsorRepository.getActiveSponsorCount as jest.Mock).mockResolvedValue(2);
-         (sponsorRepository.getBillsByIds as jest.Mock).mockResolvedValue([{id: 101, title: 'Bill 101'}] as schema.Bill[]); // For sponsored-bills route
+        (sponsorRepository.list as vi.Mock).mockResolvedValue([mockSponsor1, mockSponsor2]);
+        (sponsorRepository.search as vi.Mock).mockResolvedValue([mockSponsor1]);
+        (sponsorRepository.findByIdWithRelations as vi.Mock).mockResolvedValue(mockSponsorWithRelations);
+        (sponsorRepository.findById as vi.Mock).mockResolvedValue(mockSponsor1); // Needed if findByIdWithRelations uses it
+        (sponsorRepository.create as vi.Mock).mockResolvedValue({ ...mockSponsor1, id: 3 });
+        (sponsorRepository.update as vi.Mock).mockResolvedValue(mockSponsor1);
+        (sponsorRepository.setActiveStatus as vi.Mock).mockResolvedValue({ ...mockSponsor1, isActive: false });
+        (sponsorRepository.listAffiliations as vi.Mock).mockResolvedValue([mockAffiliation]);
+        (sponsorRepository.addAffiliation as vi.Mock).mockResolvedValue({ ...mockAffiliation, id: 11 });
+        (sponsorRepository.updateAffiliation as vi.Mock).mockResolvedValue(mockAffiliation);
+        (sponsorRepository.setAffiliationActiveStatus as vi.Mock).mockResolvedValue({ ...mockAffiliation, isActive: false });
+        (sponsorRepository.listTransparencyRecords as vi.Mock).mockResolvedValue([mockTransparency]);
+        (sponsorRepository.addTransparencyRecord as vi.Mock).mockResolvedValue({ ...mockTransparency, id: 21 });
+        (sponsorRepository.updateTransparencyRecord as vi.Mock).mockResolvedValue(mockTransparency);
+        (sponsorRepository.verifyTransparencyRecord as vi.Mock).mockResolvedValue({ ...mockTransparency, isVerified: true });
+        (sponsorRepository.listBillSponsorshipsBySponsor as vi.Mock).mockResolvedValue([mockSponsorship]);
+         (sponsorRepository.createBillSponsorship as vi.Mock).mockResolvedValue({ ...mockSponsorship, id: 31 });
+         (sponsorRepository.deactivateBillSponsorship as vi.Mock).mockResolvedValue({ ...mockSponsorship, isActive: false });
+         (sponsorRepository.getUniqueParties as vi.Mock).mockResolvedValue(['Independent', 'Unity']);
+         (sponsorRepository.getUniqueConstituencies as vi.Mock).mockResolvedValue(['District A', 'District B']);
+         (sponsorRepository.getActiveSponsorCount as vi.Mock).mockResolvedValue(2);
+         (sponsorRepository.getBillsByIds as vi.Mock).mockResolvedValue([{id: 101, title: 'Bill 101'}] as schema.Bill[]); // For sponsored-bills route
 
 
         // Reset mocks for analysis service methods
-        (sponsorConflictAnalysisService.detectConflicts as jest.Mock).mockResolvedValue([mockConflictResult]);
-        (sponsorConflictAnalysisService.generateRiskProfile as jest.Mock).mockResolvedValue(mockRiskProfile);
-        (sponsorConflictAnalysisService.analyzeConflictTrends as jest.Mock).mockResolvedValue([{ sponsorId: 1, conflictCount: 1, severityTrend: 'stable', riskScore: 50, predictions: [] }]);
-         (sponsorConflictAnalysisService.createConflictMapping as jest.Mock).mockResolvedValue({ nodes: [], edges: [], clusters: [], metrics: {} });
+        (sponsorConflictAnalysisService.detectConflicts as vi.Mock).mockResolvedValue([mockConflictResult]);
+        (sponsorConflictAnalysisService.generateRiskProfile as vi.Mock).mockResolvedValue(mockRiskProfile);
+        (sponsorConflictAnalysisService.analyzeConflictTrends as vi.Mock).mockResolvedValue([{ sponsorId: 1, conflictCount: 1, severityTrend: 'stable', riskScore: 50, predictions: [] }]);
+         (sponsorConflictAnalysisService.createConflictMapping as vi.Mock).mockResolvedValue({ nodes: [], edges: [], clusters: [], metrics: {} });
     });
 
     // --- CRUD Tests ---
@@ -114,7 +115,7 @@ describe('Sponsors API Routes', () => {
         });
 
         it('should return 404 if sponsor not found', async () => {
-            (sponsorRepository.findByIdWithRelations as jest.Mock).mockResolvedValue(null);
+            (sponsorRepository.findByIdWithRelations as vi.Mock).mockResolvedValue(null);
             const response = await request(app).get('/api/sponsors/99');
             expect(response.status).toBe(404);
             expect(response.body.message).toContain('Sponsor with ID 99 not found');
@@ -131,7 +132,7 @@ describe('Sponsors API Routes', () => {
         it('should create a new sponsor', async () => {
              const newSponsorData = { name: 'Charlie Chaps', role: 'Minister', party: 'Progress' };
              const createdSponsor = { ...newSponsorData, id: 3, /* other defaults */ };
-             (sponsorRepository.create as jest.Mock).mockResolvedValue(createdSponsor);
+             (sponsorRepository.create as vi.Mock).mockResolvedValue(createdSponsor);
 
             const response = await request(app).post('/api/sponsors').send(newSponsorData);
 
@@ -156,7 +157,7 @@ describe('Sponsors API Routes', () => {
         it('should update an existing sponsor', async () => {
              const updateData = { party: 'Updated' };
              const updatedSponsor = { ...mockSponsor1, party: 'Updated' };
-             (sponsorRepository.update as jest.Mock).mockResolvedValue(updatedSponsor);
+             (sponsorRepository.update as vi.Mock).mockResolvedValue(updatedSponsor);
 
             const response = await request(app).put('/api/sponsors/1').send(updateData);
 
@@ -166,7 +167,7 @@ describe('Sponsors API Routes', () => {
         });
 
          it('should return 404 if sponsor not found', async () => {
-             (sponsorRepository.update as jest.Mock).mockResolvedValue(null);
+             (sponsorRepository.update as vi.Mock).mockResolvedValue(null);
              const response = await request(app).put('/api/sponsors/99').send({ name: 'Update Fail' });
              expect(response.status).toBe(404);
          });
@@ -190,7 +191,7 @@ describe('Sponsors API Routes', () => {
         });
 
         it('should return 404 if sponsor not found', async () => {
-            (sponsorRepository.setActiveStatus as jest.Mock).mockResolvedValue(null);
+            (sponsorRepository.setActiveStatus as vi.Mock).mockResolvedValue(null);
             const response = await request(app).delete('/api/sponsors/99');
             expect(response.status).toBe(404);
         });
@@ -276,14 +277,14 @@ describe('Sponsors API Routes', () => {
     // --- Error Handling ---
     describe('Error Handling', () => {
         it('should return 500 for generic repository errors', async () => {
-             (sponsorRepository.list as jest.Mock).mockRejectedValue(new Error("Generic DB Error"));
+             (sponsorRepository.list as vi.Mock).mockRejectedValue(new Error("Generic DB Error"));
              const response = await request(app).get('/api/sponsors');
              expect(response.status).toBe(500);
              expect(response.body.message).toContain('internal server error');
         });
 
          it('should return 500 for generic analysis service errors', async () => {
-             (sponsorConflictAnalysisService.detectConflicts as jest.Mock).mockRejectedValue(new Error("Analysis Service Error"));
+             (sponsorConflictAnalysisService.detectConflicts as vi.Mock).mockRejectedValue(new Error("Analysis Service Error"));
              const response = await request(app).get('/api/sponsors/1/conflicts');
              expect(response.status).toBe(500);
              expect(response.body.message).toContain('internal server error');

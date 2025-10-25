@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 const {
   restoreFile,
   findBackupFiles,
@@ -10,12 +11,12 @@ const fs = require('fs');
 const { glob } = require('glob');
 
 // Mock fs and glob
-jest.mock('fs');
-jest.mock('glob');
+vi.mock('fs');
+vi.mock('glob');
 
 describe('Rollback Migration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('restoreFile', () => {
@@ -38,7 +39,7 @@ describe('Rollback Migration', () => {
     it('should return false when no backup exists', () => {
       fs.existsSync.mockReturnValue(false);
 
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       const result = restoreFile('test.ts');
 
@@ -54,7 +55,7 @@ describe('Rollback Migration', () => {
         throw new Error('Read failed');
       });
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const result = restoreFile('test.ts');
 
@@ -77,7 +78,7 @@ describe('Rollback Migration', () => {
     it('should handle glob errors', async () => {
       glob.mockRejectedValue(new Error('Glob error'));
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const files = await findBackupFiles();
 
@@ -96,7 +97,7 @@ describe('Rollback Migration', () => {
       fs.writeFileSync.mockImplementation(() => {});
       fs.unlinkSync.mockImplementation(() => {});
 
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       const result = await rollbackAll();
 
@@ -111,7 +112,7 @@ describe('Rollback Migration', () => {
     it('should handle no backups found', async () => {
       glob.mockResolvedValue([]);
 
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       const result = await rollbackAll();
 
@@ -137,7 +138,7 @@ describe('Rollback Migration', () => {
       fs.writeFileSync.mockImplementation(() => {});
       fs.unlinkSync.mockImplementation(() => {});
 
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       const result = await rollbackSelective(patterns);
 
@@ -153,7 +154,7 @@ describe('Rollback Migration', () => {
       glob.mockResolvedValue(['file1.ts.backup', 'file2.js.backup']);
       fs.unlinkSync.mockImplementation(() => {});
 
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       const result = await cleanupBackups();
 
@@ -170,7 +171,7 @@ describe('Rollback Migration', () => {
         throw new Error('Unlink failed');
       });
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const result = await cleanupBackups();
 
@@ -188,7 +189,7 @@ describe('Rollback Migration', () => {
       fs.existsSync.mockReturnValue(false);
       fs.copyFileSync.mockImplementation(() => {});
 
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       const result = await createFullBackup();
 

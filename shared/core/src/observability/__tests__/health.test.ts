@@ -5,7 +5,7 @@ import {
   createDiskHealthCheck,
   createExternalServiceHealthCheck,
   createProcessHealthCheck,
-} from '../health';
+} from '../observability/health';
 
 describe('HealthCheckOrchestrator', () => {
   let orchestrator: HealthCheckOrchestrator;

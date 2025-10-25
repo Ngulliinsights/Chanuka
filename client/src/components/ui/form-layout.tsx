@@ -5,7 +5,7 @@
 
 import React, { forwardRef, useState, useCallback, useRef, useEffect } from 'react';
 import { ChevronDown, ChevronRight, AlertCircle, CheckCircle, Info } from 'lucide-react';
-import { cn } from '..\..\lib\utils';
+import { cn } from '../../lib/utils';
 import { Button } from './button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@radix-ui/react-collapsible';

@@ -1,11 +1,11 @@
-import { database as db } from '../shared/database/connection';
+import { database as db } from '@shared/database/connection';
 import {
   bills, sponsors, sponsorAffiliations, billSponsorships, sponsorTransparency,
   type Sponsor, type SponsorAffiliation, type SponsorTransparency, type Bill
 } from '../../../shared/schema';
 import { eq, and, sql, desc, gte, lte, count, inArray, like, or } from 'drizzle-orm';
-import { cacheService } from 'server/infrastructure/cache';
-import { cacheKeys } from '../../../shared/core/src/caching/key-generator';
+import { cacheService } from '@server/infrastructure/cache';
+import { CacheKeyGenerator } from '@shared/core/src/caching';
 import { logger } from '../../../shared/core/index.js';
 
 // ============================================================================
@@ -171,7 +171,7 @@ export class ConflictDetectionError extends Error {
  */
 export class EnhancedConflictDetectionService {
   private readonly config: ConflictDetectionConfig;
-  
+
   // Memoization cache for frequently computed values within a single analysis
   private readonly memoCache = new Map<string, any>();
 
@@ -194,7 +194,7 @@ export class EnhancedConflictDetectionService {
     billId?: number
   ): Promise<ConflictAnalysis> {
     const cacheKey = `comprehensive_analysis:${sponsorId}:${billId || 'all'}`;
-    
+
     // Clear memoization cache at the start of each new analysis
     this.memoCache.clear();
 
@@ -238,12 +238,12 @@ export class EnhancedConflictDetectionService {
       const results = await Promise.allSettled(
         patterns.map(pattern => cacheService.invalidatePattern(pattern))
       );
-      
+
       const failures = results.filter(r => r.status === 'rejected');
       if (failures.length > 0) {
         logger.warn(`Some cache invalidations failed for sponsor ${sponsorId}`, { failures });
       }
-      
+
       logger.info(`Cache invalidated for sponsor ${sponsorId}`);
     } catch (error) {
       logger.error(`Failed to invalidate cache for sponsor ${sponsorId}`, { error });
@@ -272,8 +272,8 @@ export class EnhancedConflictDetectionService {
 
     if (!sponsor) {
       throw new ConflictDetectionError(
-        `Sponsor with ID ${sponsorId} not found`, 
-        'SPONSOR_NOT_FOUND', 
+        `Sponsor with ID ${sponsorId} not found`,
+        'SPONSOR_NOT_FOUND',
         sponsorId
       );
     }
@@ -339,9 +339,9 @@ export class EnhancedConflictDetectionService {
   // ==========================================================================
 
   private async analyzeFinancialConflicts(
-    sponsor: Sponsor, 
-    disclosures: SponsorTransparency[], 
-    affiliations: SponsorAffiliation[], 
+    sponsor: Sponsor,
+    disclosures: SponsorTransparency[],
+    affiliations: SponsorAffiliation[],
     billId?: number
   ): Promise<FinancialConflict[]> {
     // Execute all financial analysis types in parallel
@@ -355,27 +355,27 @@ export class EnhancedConflictDetectionService {
   }
 
   private async analyzeDirectFinancialConflicts(
-    sponsor: Sponsor, 
-    disclosures: SponsorTransparency[], 
+    sponsor: Sponsor,
+    disclosures: SponsorTransparency[],
     billId?: number
   ): Promise<FinancialConflict[]> {
     const conflicts: FinancialConflict[] = [];
-    
+
     // Filter and process only relevant disclosures
     const financialDisclosures = disclosures.filter(
-      d => d.disclosureType === 'financial' && 
-           Number(d.amount) >= this.config.financialThresholds.direct
+      d => d.disclosureType === 'financial' &&
+        Number(d.amount) >= this.config.financialThresholds.direct
     );
-    
+
     // Batch process affected bills lookup to reduce database calls
     const organizationNames = financialDisclosures.map(d => d.source || '').filter(Boolean);
     const affectedBillsMap = await this.batchFindAffectedBills(organizationNames, billId);
-    
+
     for (const disclosure of financialDisclosures) {
       const amount = Number(disclosure.amount);
       const organization = disclosure.source || 'Unknown Organization';
       const affectedBills = affectedBillsMap.get(organization) || [];
-      
+
       conflicts.push({
         id: `financial_${sponsor.id}_${disclosure.id}`,
         type: 'direct_investment',
@@ -390,32 +390,32 @@ export class EnhancedConflictDetectionService {
         lastUpdated: new Date()
       });
     }
-    
+
     return conflicts;
   }
 
   private async analyzeIndirectFinancialConflicts(
-    sponsor: Sponsor, 
-    affiliations: SponsorAffiliation[], 
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[],
     billId?: number
   ): Promise<FinancialConflict[]> {
     const conflicts: FinancialConflict[] = [];
-    
+
     // Filter relevant affiliations upfront
     const economicAffiliations = affiliations.filter(
       a => a.conflictType === 'economic' && a.isActive
     );
-    
+
     // Batch lookup affected bills
     const organizations = economicAffiliations.map(a => a.organization);
     const affectedBillsMap = await this.batchFindAffectedBills(organizations, billId);
-    
+
     for (const affiliation of economicAffiliations) {
       const estimatedValue = this.estimateAffiliationValue(affiliation);
-      
+
       if (estimatedValue >= this.config.financialThresholds.indirect) {
         const affectedBills = affectedBillsMap.get(affiliation.organization) || [];
-        
+
         conflicts.push({
           id: `indirect_${sponsor.id}_${affiliation.id}`,
           type: 'indirect_investment',
@@ -431,34 +431,34 @@ export class EnhancedConflictDetectionService {
         });
       }
     }
-    
+
     return conflicts;
   }
 
   private async analyzeFamilyFinancialConflicts(
-    sponsor: Sponsor, 
-    disclosures: SponsorTransparency[], 
+    sponsor: Sponsor,
+    disclosures: SponsorTransparency[],
     billId?: number
   ): Promise<FinancialConflict[]> {
     const conflicts: FinancialConflict[] = [];
-    
+
     // Efficiently filter family-related disclosures
-    const familyDisclosures = disclosures.filter(d => 
-      d.disclosureType === 'family' || 
+    const familyDisclosures = disclosures.filter(d =>
+      d.disclosureType === 'family' ||
       (d.description && d.description.toLowerCase().includes('family'))
     );
-    
+
     // Batch lookup affected bills
     const organizations = familyDisclosures.map(d => d.source || '').filter(Boolean);
     const affectedBillsMap = await this.batchFindAffectedBills(organizations, billId);
-    
+
     for (const disclosure of familyDisclosures) {
       const amount = Number(disclosure.amount);
-      
+
       if (amount && amount >= this.config.financialThresholds.family) {
         const organization = disclosure.source || 'Family Interest';
         const affectedBills = affectedBillsMap.get(organization) || [];
-        
+
         conflicts.push({
           id: `family_${sponsor.id}_${disclosure.id}`,
           type: 'family_interest',
@@ -474,7 +474,7 @@ export class EnhancedConflictDetectionService {
         });
       }
     }
-    
+
     return conflicts;
   }
 
@@ -483,41 +483,41 @@ export class EnhancedConflictDetectionService {
   // ==========================================================================
 
   private async analyzeProfessionalConflicts(
-    sponsor: Sponsor, 
-    affiliations: SponsorAffiliation[], 
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[],
     billId?: number
   ): Promise<ProfessionalConflict[]> {
     // Pre-filter active affiliations to reduce processing
     const activeAffiliations = affiliations.filter(a => a.isActive);
-    
+
     // Batch lookup affected bills for all affiliations at once
     const organizations = activeAffiliations.map(a => a.organization);
     const affectedBillsMap = await this.batchFindAffectedBills(organizations, billId);
-    
+
     // Execute all professional analysis types in parallel
     const [leadership, advisory, ownership] = await Promise.all([
       this.analyzeLeadershipConflicts(sponsor, activeAffiliations, affectedBillsMap),
       this.analyzeAdvisoryConflicts(sponsor, activeAffiliations, affectedBillsMap),
       this.analyzeOwnershipConflicts(sponsor, activeAffiliations, affectedBillsMap)
     ]);
-    
+
     return [...leadership, ...advisory, ...ownership];
   }
 
   private async analyzeLeadershipConflicts(
-    sponsor: Sponsor, 
-    affiliations: SponsorAffiliation[], 
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[],
     affectedBillsMap: Map<string, number[]>
   ): Promise<ProfessionalConflict[]> {
     const conflicts: ProfessionalConflict[] = [];
     const leadershipRoles = ['director', 'ceo', 'chairman', 'president', 'board'];
-    
+
     for (const affiliation of affiliations) {
       const role = (affiliation.role || '').toLowerCase();
-      
+
       if (leadershipRoles.some(lr => role.includes(lr))) {
         const relationshipStrength = this.calculateRelationshipStrength(affiliation);
-        
+
         conflicts.push({
           id: `leadership_${sponsor.id}_${affiliation.id}`,
           type: 'leadership_role',
@@ -536,24 +536,24 @@ export class EnhancedConflictDetectionService {
         });
       }
     }
-    
+
     return conflicts;
   }
 
   private async analyzeAdvisoryConflicts(
-    sponsor: Sponsor, 
-    affiliations: SponsorAffiliation[], 
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[],
     affectedBillsMap: Map<string, number[]>
   ): Promise<ProfessionalConflict[]> {
     const conflicts: ProfessionalConflict[] = [];
     const advisoryRoles = ['advisor', 'consultant', 'advisory', 'counsel'];
-    
+
     for (const affiliation of affiliations) {
       const role = (affiliation.role || '').toLowerCase();
-      
+
       if (advisoryRoles.some(ar => role.includes(ar))) {
         const relationshipStrength = this.calculateRelationshipStrength(affiliation);
-        
+
         conflicts.push({
           id: `advisory_${sponsor.id}_${affiliation.id}`,
           type: 'advisory_position',
@@ -572,21 +572,21 @@ export class EnhancedConflictDetectionService {
         });
       }
     }
-    
+
     return conflicts;
   }
 
   private async analyzeOwnershipConflicts(
-    sponsor: Sponsor, 
-    affiliations: SponsorAffiliation[], 
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[],
     affectedBillsMap: Map<string, number[]>
   ): Promise<ProfessionalConflict[]> {
     const conflicts: ProfessionalConflict[] = [];
-    
+
     for (const affiliation of affiliations) {
       if (affiliation.conflictType === 'ownership') {
         const relationshipStrength = this.calculateRelationshipStrength(affiliation);
-        
+
         conflicts.push({
           id: `ownership_${sponsor.id}_${affiliation.id}`,
           type: 'ownership_stake',
@@ -605,7 +605,7 @@ export class EnhancedConflictDetectionService {
         });
       }
     }
-    
+
     return conflicts;
   }
 
@@ -614,32 +614,32 @@ export class EnhancedConflictDetectionService {
   // ==========================================================================
 
   private async analyzeVotingPatternInconsistencies(
-    sponsor: Sponsor, 
+    sponsor: Sponsor,
     votingHistory: any[]
   ): Promise<VotingAnomaly[]> {
     // Filter valid votes once upfront
     const validVotes = votingHistory.filter(isValidVote);
-    
+
     // Execute both anomaly detection types in parallel
     const [partyDeviations, patternInconsistencies] = await Promise.all([
       this.analyzePartyDeviations(sponsor, validVotes),
       this.analyzePatternInconsistency(sponsor, validVotes)
     ]);
-    
+
     return [...partyDeviations, ...patternInconsistencies];
   }
 
   private async analyzePartyDeviations(
-    sponsor: Sponsor, 
+    sponsor: Sponsor,
     validVotes: ValidatedVote[]
   ): Promise<VotingAnomaly[]> {
     const anomalies: VotingAnomaly[] = [];
     const threshold = this.config.votingAnomalyThresholds.partyDeviation * 100;
-    
+
     for (const vote of validVotes) {
       if (vote.partyPosition && vote.vote !== vote.partyPosition) {
         const anomalyScore = this.calculateAnomalyScore('party_deviation', vote);
-        
+
         if (anomalyScore >= threshold) {
           anomalies.push({
             id: `party_dev_${sponsor.id}_${vote.billId}`,
@@ -656,18 +656,18 @@ export class EnhancedConflictDetectionService {
         }
       }
     }
-    
+
     return anomalies;
   }
 
   private async analyzePatternInconsistency(
-    sponsor: Sponsor, 
+    sponsor: Sponsor,
     validVotes: ValidatedVote[]
   ): Promise<VotingAnomaly[]> {
     if (validVotes.length < 3) return [];
-    
+
     const anomalies: VotingAnomaly[] = [];
-    
+
     // Group votes by category efficiently
     const categoryStats = validVotes.reduce<Record<string, CategoryStats>>((acc, vote) => {
       const category = vote.billCategory || 'general';
@@ -680,21 +680,21 @@ export class EnhancedConflictDetectionService {
     }, {});
 
     const inconsistencyThreshold = 1 - this.config.votingAnomalyThresholds.patternInconsistency;
-    
+
     for (const [category, stats] of Object.entries(categoryStats)) {
       const totalVotes = stats.yes + stats.no;
       if (totalVotes < 3) continue;
-      
+
       const consistency = Math.max(stats.yes, stats.no) / totalVotes;
 
       if (consistency < inconsistencyThreshold) {
         // Identify the minority votes as inconsistent
         const majorityVote = stats.yes > stats.no ? 'yes' : 'no';
         const inconsistentVotes = stats.votes.filter(v => v.vote !== majorityVote);
-        
+
         for (const vote of inconsistentVotes) {
           const anomalyScore = this.calculateAnomalyScore('pattern_inconsistency', vote);
-          
+
           anomalies.push({
             id: `pattern_inc_${sponsor.id}_${vote.billId}`,
             type: 'pattern_inconsistency',
@@ -705,7 +705,7 @@ export class EnhancedConflictDetectionService {
             description: `Inconsistent voting pattern on ${category} legislation`,
             anomalyScore,
             contextFactors: [
-              `Category consistency: ${Math.round(consistency * 100)}%`, 
+              `Category consistency: ${Math.round(consistency * 100)}%`,
               `Total ${category} votes: ${totalVotes}`
             ],
             detectionDate: new Date()
@@ -713,7 +713,7 @@ export class EnhancedConflictDetectionService {
         }
       }
     }
-    
+
     return anomalies;
   }
 
@@ -722,9 +722,9 @@ export class EnhancedConflictDetectionService {
   // ==========================================================================
 
   private calculateOverallRiskScore(
-    financialConflicts: FinancialConflict[], 
-    professionalConflicts: ProfessionalConflict[], 
-    votingAnomalies: VotingAnomaly[], 
+    financialConflicts: FinancialConflict[],
+    professionalConflicts: ProfessionalConflict[],
+    votingAnomalies: VotingAnomaly[],
     transparencyScore: number
   ): number {
     // Financial conflicts score with temporal decay and severity weighting
@@ -743,7 +743,7 @@ export class EnhancedConflictDetectionService {
 
     // Voting anomalies score
     const votingScore = votingAnomalies.reduce(
-      (sum, a) => sum + (a.anomalyScore / 100) * 10, 
+      (sum, a) => sum + (a.anomalyScore / 100) * 10,
       0
     );
 
@@ -756,7 +756,7 @@ export class EnhancedConflictDetectionService {
 
     return Math.min(Math.round(totalScore), 100);
   }
-  
+
   private determineRiskLevel(score: number): 'low' | 'medium' | 'high' | 'critical' {
     if (score >= 80) return 'critical';
     if (score >= 60) return 'high';
@@ -773,7 +773,7 @@ export class EnhancedConflictDetectionService {
     if (disclosures.length === 0) return 0;
 
     let score = 0;
-    
+
     // Base score for having disclosures (max 40 points)
     score += Math.min(disclosures.length * 10, 40);
 
@@ -807,36 +807,36 @@ export class EnhancedConflictDetectionService {
   }
 
   private calculateAnalysisConfidence(
-    financialConflicts: FinancialConflict[], 
-    professionalConflicts: ProfessionalConflict[], 
-    votingAnomalies: VotingAnomaly[], 
+    financialConflicts: FinancialConflict[],
+    professionalConflicts: ProfessionalConflict[],
+    votingAnomalies: VotingAnomaly[],
     transparencyScore: number
   ): number {
     let totalEvidence = 0;
     let weightedEvidence = 0;
 
     // Accumulate evidence from all conflict types
-    financialConflicts.forEach(c => { 
-      totalEvidence += 100; 
-      weightedEvidence += c.evidenceStrength; 
+    financialConflicts.forEach(c => {
+      totalEvidence += 100;
+      weightedEvidence += c.evidenceStrength;
     });
-    
-    professionalConflicts.forEach(c => { 
-      totalEvidence += 100; 
-      weightedEvidence += c.evidenceStrength; 
+
+    professionalConflicts.forEach(c => {
+      totalEvidence += 100;
+      weightedEvidence += c.evidenceStrength;
     });
-    
+
     // Voting anomalies have inherently lower certainty
-    votingAnomalies.forEach(a => { 
-      totalEvidence += 100; 
-      weightedEvidence += a.anomalyScore / 2; 
+    votingAnomalies.forEach(a => {
+      totalEvidence += 100;
+      weightedEvidence += a.anomalyScore / 2;
     });
 
     // Default confidence when no conflicts are found
     if (totalEvidence === 0) return 0.5;
 
     const evidenceConfidence = Math.min(weightedEvidence / totalEvidence, 1);
-    
+
     // Higher transparency increases confidence in findings
     const finalConfidence = evidenceConfidence * (0.7 + (transparencyScore / 100) * 0.3);
 
@@ -850,15 +850,15 @@ export class EnhancedConflictDetectionService {
    */
   private calculateRecencyFactor(lastUpdated: Date): number {
     const cacheKey = `recency_${lastUpdated.getTime()}`;
-    
+
     if (this.memoCache.has(cacheKey)) {
       return this.memoCache.get(cacheKey);
     }
-    
+
     const monthsAgo = (Date.now() - lastUpdated.getTime()) / (1000 * 3600 * 24 * 30);
     // Exponential decay: ~10% weight loss per year, floor at 0.5
     const factor = Math.max(0.5, Math.exp(-monthsAgo / 120));
-    
+
     this.memoCache.set(cacheKey, factor);
     return factor;
   }
@@ -879,29 +879,29 @@ export class EnhancedConflictDetectionService {
 
   private calculateRelationshipStrength(affiliation: SponsorAffiliation): number {
     let strength = 50; // Base strength
-    
+
     if (affiliation.isActive) strength += 30;
-    
+
     const role = affiliation.role?.toLowerCase() || '';
     if (['director', 'ceo', 'chairman', 'owner'].some(r => role.includes(r))) {
       strength += 20;
     }
-    
+
     if (affiliation.conflictType === 'ownership') strength += 25;
-    
+
     return Math.min(strength, 100);
   }
 
   private calculateAnomalyScore(type: string, vote: ValidatedVote): number {
     let score = 50;
-    
+
     if (type === 'party_deviation') score += 30;
     if (type === 'pattern_inconsistency') score += 20;
-    
+
     if (vote.confidence) {
       score *= vote.confidence;
     }
-    
+
     return Math.min(Math.round(score), 100);
   }
 
@@ -911,38 +911,38 @@ export class EnhancedConflictDetectionService {
    */
   private estimateAffiliationValue(affiliation: SponsorAffiliation): number {
     const cacheKey = `affiliation_value_${affiliation.id}`;
-    
+
     if (this.memoCache.has(cacheKey)) {
       return this.memoCache.get(cacheKey);
     }
-    
+
     const baseValues: Record<string, number> = {
       'board_position': 500000,
       'executive': 1000000,
       'ownership': 2000000,
       'advisory': 300000
     };
-    
+
     const role = (affiliation.role || '').toLowerCase();
-    
+
     for (const [key, value] of Object.entries(baseValues)) {
       if (affiliation.conflictType?.includes(key) || role.includes(key)) {
         this.memoCache.set(cacheKey, value);
         return value;
       }
     }
-    
+
     const defaultValue = 100000;
     this.memoCache.set(cacheKey, defaultValue);
     return defaultValue;
   }
 
   private getSeverityWeight(severity: string): number {
-    const weights: Record<string, number> = { 
-      'low': 0.4, 
-      'medium': 0.6, 
-      'high': 0.8, 
-      'critical': 1.0 
+    const weights: Record<string, number> = {
+      'low': 0.4,
+      'medium': 0.6,
+      'high': 0.8,
+      'critical': 1.0
     };
     return weights[severity] || 0.4;
   }
@@ -952,19 +952,19 @@ export class EnhancedConflictDetectionService {
   // ==========================================================================
 
   private generateConflictRecommendations(
-    financialConflicts: FinancialConflict[], 
-    professionalConflicts: ProfessionalConflict[], 
-    votingAnomalies: VotingAnomaly[], 
-    transparencyScore: number, 
+    financialConflicts: FinancialConflict[],
+    professionalConflicts: ProfessionalConflict[],
+    votingAnomalies: VotingAnomaly[],
+    transparencyScore: number,
     riskLevel: string
   ): string[] {
     const recommendations: string[] = [];
-    
+
     // Critical risk requires immediate action
     if (riskLevel === 'critical') {
       recommendations.push('Immediate ethics committee review required');
     }
-    
+
     // Financial conflict recommendations
     const highFinancialConflicts = financialConflicts.filter(
       c => c.conflictSeverity === 'high' || c.conflictSeverity === 'critical'
@@ -972,38 +972,38 @@ export class EnhancedConflictDetectionService {
     if (highFinancialConflicts.length > 0) {
       recommendations.push('Consider divesting from high-risk financial interests');
     }
-    
+
     // Professional conflict recommendations
     const highInfluenceRoles = professionalConflicts.filter(c => c.relationshipStrength > 75);
     if (highInfluenceRoles.length > 0) {
       recommendations.push('Consider resigning from high-influence positions that create conflicts');
     }
-    
+
     // Voting pattern recommendations
     if (votingAnomalies.length > 0) {
       recommendations.push('Review voting patterns for consistency with stated positions');
     }
-    
+
     // Transparency recommendations
     if (transparencyScore < 70) {
       recommendations.push('Enhance disclosure completeness and verification');
     }
-    
+
     // Default positive recommendation
     if (recommendations.length === 0) {
       recommendations.push('Maintain current transparency and ethical practices');
     }
-    
+
     return recommendations;
   }
 
   private generateFallbackAnalysis(
-    sponsorId: number, 
-    billId: number | undefined, 
+    sponsorId: number,
+    billId: number | undefined,
     error: any
   ): ConflictAnalysis {
     logger.warn(`Generating fallback analysis for sponsor ${sponsorId}`, { error });
-    
+
     return {
       sponsorId,
       sponsorName: 'Analysis Incomplete',
@@ -1052,24 +1052,24 @@ export class EnhancedConflictDetectionService {
         low: Number(process.env.CONFIDENCE_LOW) || 0.4
       }
     };
-    
+
     // Validate configuration values
     const { direct, indirect, family } = config.financialThresholds;
     if (direct <= 0 || indirect <= 0 || family <= 0) {
       throw new ConflictDetectionError(
-        'Financial thresholds must be positive', 
+        'Financial thresholds must be positive',
         'INVALID_CONFIG'
       );
     }
-    
+
     if (direct < indirect || indirect < family) {
       logger.warn('Financial thresholds should ideally decrease from direct -> indirect -> family');
     }
-    
-    if (config.votingAnomalyThresholds.partyDeviation < 0 || 
-        config.votingAnomalyThresholds.partyDeviation > 1) {
+
+    if (config.votingAnomalyThresholds.partyDeviation < 0 ||
+      config.votingAnomalyThresholds.partyDeviation > 1) {
       throw new ConflictDetectionError(
-        'Party deviation threshold must be between 0 and 1', 
+        'Party deviation threshold must be between 0 and 1',
         'INVALID_CONFIG'
       );
     }
@@ -1087,7 +1087,7 @@ export class EnhancedConflictDetectionService {
       .from(sponsors)
       .where(eq(sponsors.id, sponsorId))
       .limit(1);
-    
+
     return result[0] || null;
   }
 
@@ -1097,7 +1097,7 @@ export class EnhancedConflictDetectionService {
       .from(bills)
       .where(eq(bills.id, billId))
       .limit(1);
-    
+
     return result[0] || null;
   }
 
@@ -1122,7 +1122,7 @@ export class EnhancedConflictDetectionService {
       .select()
       .from(billSponsorships)
       .where(and(
-        eq(billSponsorships.sponsorId, sponsorId), 
+        eq(billSponsorships.sponsorId, sponsorId),
         eq(billSponsorships.isActive, true)
       ))
       .orderBy(desc(billSponsorships.sponsorshipDate));
@@ -1135,7 +1135,7 @@ export class EnhancedConflictDetectionService {
   private async getVotingHistory(sponsorId: number): Promise<any[]> {
     const sponsorships = await this.getSponsorBillSponsorships(sponsorId);
     const votingHistory: any[] = [];
-    
+
     for (const sponsorship of sponsorships) {
       const bill = await this.getBill(sponsorship.billId);
       if (bill) {
@@ -1150,7 +1150,7 @@ export class EnhancedConflictDetectionService {
         });
       }
     }
-    
+
     return votingHistory;
   }
 
@@ -1163,11 +1163,11 @@ export class EnhancedConflictDetectionService {
    * @returns Map of organization names to affected bill IDs
    */
   private async batchFindAffectedBills(
-    organizations: string[], 
+    organizations: string[],
     specificBillId?: number
   ): Promise<Map<string, number[]>> {
     const resultMap = new Map<string, number[]>();
-    
+
     // If a specific bill is provided, all organizations map to that bill
     if (specificBillId) {
       organizations.forEach(org => {
@@ -1175,25 +1175,25 @@ export class EnhancedConflictDetectionService {
       });
       return resultMap;
     }
-    
+
     // Filter out empty organization names
     const validOrgs = organizations.filter(Boolean);
     if (validOrgs.length === 0) return resultMap;
-    
+
     try {
       // Build a single query to search for all organizations at once
-      const conditions = validOrgs.map(org => 
+      const conditions = validOrgs.map(org =>
         or(
           like(bills.title, `%${org}%`),
           like(bills.content, `%${org}%`),
           like(bills.description, `%${org}%`)
         )
       );
-      
+
       // Execute single query for all organizations
       const results = await db
-        .select({ 
-          id: bills.id, 
+        .select({
+          id: bills.id,
           title: bills.title,
           content: bills.content,
           description: bills.description
@@ -1201,23 +1201,23 @@ export class EnhancedConflictDetectionService {
         .from(bills)
         .where(or(...conditions))
         .limit(200); // Reasonable limit for batch processing
-      
+
       // Map results back to organizations
       for (const org of validOrgs) {
-        const matchingBills = results.filter(bill => 
+        const matchingBills = results.filter(bill =>
           bill.title?.includes(org) ||
           bill.content?.includes(org) ||
           bill.description?.includes(org)
         ).map(b => b.id);
-        
+
         resultMap.set(org, matchingBills);
       }
-      
+
     } catch (error) {
       logger.error('Error in batch finding affected bills', { error, organizations: validOrgs });
       // Return empty map on error - graceful degradation
     }
-    
+
     return resultMap;
   }
 
@@ -1227,7 +1227,7 @@ export class EnhancedConflictDetectionService {
    */
   private async findAffectedBills(organizationName: string): Promise<number[]> {
     if (!organizationName) return [];
-    
+
     const resultMap = await this.batchFindAffectedBills([organizationName]);
     return resultMap.get(organizationName) || [];
   }

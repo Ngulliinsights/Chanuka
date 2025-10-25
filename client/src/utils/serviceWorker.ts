@@ -19,7 +19,7 @@ export async function registerServiceWorker(
 ): Promise<ServiceWorkerRegistration | null> {
   if (!isServiceWorkerSupported()) {
     logger.info('Service workers are not supported in this browser', {
-      component: 'Chanuka',
+      component: 'ServiceWorker',
     });
     return null;
   }
@@ -30,7 +30,7 @@ export async function registerServiceWorker(
     });
 
     logger.info('Service Worker registered successfully:', {
-      component: 'Chanuka',
+      component: 'ServiceWorker',
       registration, // FIX: Pass registration as part of the context object
     });
 
@@ -44,13 +44,13 @@ export async function registerServiceWorker(
           if (navigator.serviceWorker.controller) {
             // New content is available
             logger.info('New content is available; please refresh.', {
-              component: 'Chanuka',
+              component: 'ServiceWorker',
             });
             config.onUpdate?.(registration);
           } else {
             // Content is cached for offline use
             logger.info('Content is cached for offline use.', {
-              component: 'Chanuka',
+              component: 'ServiceWorker',
             });
             config.onSuccess?.(registration);
           }
@@ -60,7 +60,7 @@ export async function registerServiceWorker(
 
     return registration;
   } catch (error) {
-    logger.error('Service Worker registration failed:', { component: 'Chanuka', error });
+    logger.error('Service Worker registration failed:', { component: 'ServiceWorker', error });
     config.onError?.(error as Error);
     return null;
   }
@@ -77,7 +77,7 @@ export async function unregisterServiceWorker(): Promise<boolean> {
     if (registration) {
       const result = await registration.unregister();
       logger.info('Service Worker unregistered:', {
-        component: 'Chanuka',
+        component: 'ServiceWorker',
         result, // FIX: Pass result as part of the context object
       });
       return result;
@@ -86,7 +86,7 @@ export async function unregisterServiceWorker(): Promise<boolean> {
   } catch (error) {
     logger.error(
       'Service Worker unregistration failed:',
-      { component: 'Chanuka' },
+      { component: 'ServiceWorker' },
       error,
     );
     return false;
@@ -113,7 +113,7 @@ export async function getServiceWorkerRegistration(): Promise<ServiceWorkerRegis
   } catch (error) {
     logger.error(
       'Failed to get service worker registration:',
-      { component: 'Chanuka' },
+      { component: 'ServiceWorker' },
       error,
     );
     return null;
@@ -149,10 +149,10 @@ export async function sendMessageToServiceWorker(message: any): Promise<any> {
 export async function clearAllCaches(): Promise<void> {
   try {
     await sendMessageToServiceWorker({ type: 'CLEAR_CACHE' });
-    logger.info('All caches cleared', { component: 'Chanuka' });
+    logger.info('All caches cleared', { component: 'ServiceWorker' });
   } catch (err) {
     const error = err as Error;
-    logger.error('Failed to clear caches', { component: 'Chanuka', error });
+    logger.error('Failed to clear caches', { component: 'ServiceWorker', error });
     throw error;
   }
 }
@@ -166,10 +166,10 @@ export async function skipWaiting(): Promise<void> {
   try {
     await sendMessageToServiceWorker({ type: 'SKIP_WAITING' });
     logger.info('Service worker skip waiting triggered', {
-      component: 'Chanuka',
+      component: 'ServiceWorker',
     });
   } catch (error) {
-    logger.error('Failed to skip waiting:', { component: 'Chanuka', error });
+    logger.error('Failed to skip waiting:', { component: 'ServiceWorker', error });
   }
 }
 
@@ -179,7 +179,7 @@ export async function getServiceWorkerVersion(): Promise<string | null> {
     const response = await sendMessageToServiceWorker({ type: 'GET_VERSION' });
     return response.version || null;
   } catch (error) {
-    logger.error('Failed to get service worker version:', { component: 'Chanuka', error });
+    logger.error('Failed to get service worker version:', { component: 'ServiceWorker', error });
     return null;
   }
 }
@@ -201,7 +201,7 @@ export async function isContentCached(url: string): Promise<boolean> {
     }
     return false;
   } catch (error) {
-    logger.error('Failed to check cache:', { component: 'Chanuka', error });
+    logger.error('Failed to check cache:', { component: 'ServiceWorker', error });
     return false;
   }
 }
@@ -258,13 +258,13 @@ export async function preloadCriticalResources(urls: string[]): Promise<void> {
               await new Promise((resolve) => setTimeout(resolve, delay));
               // REFINEMENT: Use logger instead of console
               logger.warn(`Retrying preload (${retries}/${maxRetries}): ${url}`, {
-                component: 'Chanuka',
+                component: 'ServiceWorker',
                 error,
               });
             } else {
               // REFINEMENT: Use logger instead of console
               logger.warn('Failed to preload resource after retries:', {
-                component: 'Chanuka',
+                component: 'ServiceWorker',
                 url,
                 error,
               });
@@ -289,12 +289,12 @@ export async function preloadCriticalResources(urls: string[]): Promise<void> {
     }
 
     logger.info('Critical resources preloaded with retry logic', {
-      component: 'Chanuka',
+      component: 'ServiceWorker',
     });
   } catch (error) {
     logger.error(
       'Failed to preload critical resources:',
-      { component: 'Chanuka' },
+      { component: 'ServiceWorker' },
       error,
     );
   }
@@ -387,13 +387,13 @@ export async function registerBackgroundSync(tag: string): Promise<void> {
     try {
       await (registration as any).sync.register(tag);
       logger.info('Background sync registered:', {
-        component: 'Chanuka',
+        component: 'ServiceWorker',
         tag, // FIX: Pass tag as part of the context object
       });
     } catch (error) {
       logger.error(
         'Background sync registration failed:',
-        { component: 'Chanuka' },
+        { component: 'ServiceWorker' },
         error,
       );
     }

@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Validation Middleware Tests
  *
@@ -6,7 +7,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { ValidationError } from '../types';
+import { ValidationError } from '@shared/types';
 import {
   validateRequest,
   ValidationMiddleware,
@@ -30,16 +31,16 @@ const mockRequest = (body?: any, query?: any, params?: any, headers?: any): Part
 
 const mockResponse = (): Partial<Response> => {
   const res: Partial<Response> = {};
-  res.status = jest.fn().mockReturnValue(res);
-  res.json = jest.fn().mockReturnValue(res);
+  res.status = vi.fn().mockReturnValue(res);
+  res.json = vi.fn().mockReturnValue(res);
   return res;
 };
 
-const mockNext = jest.fn();
+const mockNext = vi.fn();
 
 describe('Validation Middleware', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('validateRequest', () => {

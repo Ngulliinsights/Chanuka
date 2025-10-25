@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '..\ui\table';
-import { Button } from '..\ui\button';
-import { Badge } from '..\ui\badge';
-import { LoadingSpinner } from '..\ui\spinner';
-import { useBills } from '..\..\hooks\use-bills';
-import { logger } from '..\..\utils\browser-logger';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { LoadingSpinner } from '../ui/spinner';
+import { useBills } from '../../hooks/use-bills';
+import { logger } from '../../utils/browser-logger';
 
 interface VerificationItem {
   id: number;
@@ -72,26 +72,26 @@ export const VerificationsList = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'verified':
-        return <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">Verified</Badge>;
+        return <Badge variant="outline" className="bg-success text-success-foreground hover:bg-success">Verified</Badge>;
       case 'disputed':
-        return <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">Disputed</Badge>;
+        return <Badge variant="outline" className="bg-destructive text-destructive-foreground hover:bg-destructive">Disputed</Badge>;
       default:
-        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Pending</Badge>;
+        return <Badge variant="outline" className="bg-warning text-warning-foreground hover:bg-warning">Pending</Badge>;
     }
   };
 
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'constitutional':
-        return 'text-blue-600';
+        return 'text-info';
       case 'economic':
-        return 'text-green-600';
+        return 'text-success';
       case 'legal':
-        return 'text-purple-600';
+        return 'text-accent';
       case 'scientific':
-        return 'text-amber-600';
+        return 'text-warning';
       default:
-        return 'text-slate-600';
+        return 'text-muted-foreground';
     }
   };
 

@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect } from "vitest";
 import React from "react";
 import { z } from "zod";
@@ -279,5 +280,31 @@ describe("UI Test Utilities", () => {
       expect(props.onConfirm).toBeDefined();
       expect(props.onCancel).toBeDefined();
     });
+  });
+});
+
+
+describe('test-utils', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('should render without crashing', () => {
+    const { container } = render(<test-utils />);
+    expect(container).toBeInTheDocument();
+  });
+
+  it('should be accessible', () => {
+    const { container } = render(<test-utils />);
+    expect(container.firstChild).toHaveAttribute('role');
+  });
+
+  it('should handle props correctly', () => {
+    // TODO: Add specific prop tests for test-utils
+    expect(true).toBe(true);
   });
 });

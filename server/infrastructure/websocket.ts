@@ -2,10 +2,11 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { Server } from 'http';
 import { IncomingMessage } from 'http';
 import * as jwt from 'jsonwebtoken';
-import { database as db } from '@shared/database/connection';
-import { User, users } from '@shared/schema';
+import { database as db } from '../../shared/database/connection.js';
+import { User, users } from '../../shared/schema/schema.js';
 import { eq } from 'drizzle-orm';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core/src/observability/logging/index.js';
+import { MemoryLeakDetector } from '@shared/core/src/testing/memory-leak-detector.js';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -54,33 +55,31 @@ interface ConnectionPoolEntry {
 // CONFIGURATION
 // ============================================================================
 
-const CONFIG = {
+/**
+ * Base configuration containing truly immutable values.
+ * These represent architectural constants that should never change during runtime.
+ * Using 'as const' provides compile-time type safety and prevents accidental modification.
+ */
+const BASE_CONFIG = {
   // Connection management
   HEARTBEAT_INTERVAL: 30000,
   HEALTH_CHECK_INTERVAL: 60000,
   STALE_CONNECTION_THRESHOLD: 60000,
-  MAX_CONNECTIONS_PER_USER: 5,
   CONNECTION_POOL_SIZE: 10000,
   
   // Message handling
   MAX_QUEUE_SIZE: 1000,
-  MESSAGE_BATCH_SIZE: 10,
-  MESSAGE_BATCH_DELAY: 50,
   MAX_PAYLOAD: 100 * 1024, // 100KB
   
   // Performance optimization
-  COMPRESSION_THRESHOLD: 1024,
   MAX_LATENCY_SAMPLES: 200,
-  DEDUPE_CACHE_SIZE: 5000,
-  DEDUPE_WINDOW: 5000,
   DEDUPE_CACHE_CLEANUP_AGE: 1800000, // 30 minutes
   
   // Reconnection
   MAX_RECONNECT_ATTEMPTS: 3,
   RECONNECT_DELAY: 1000,
   
-  // Memory management
-  MEMORY_CLEANUP_INTERVAL: 180000, // 3 minutes
+  // Memory management thresholds
   HIGH_MEMORY_THRESHOLD: 85,
   CRITICAL_MEMORY_THRESHOLD: 95,
   PERFORMANCE_HISTORY_MAX_SIZE: 100,
@@ -88,6 +87,62 @@ const CONFIG = {
   // Shutdown
   SHUTDOWN_GRACE_PERIOD: 5000,
 } as const;
+
+/**
+ * Runtime configuration class for values that can be adjusted dynamically.
+ * This enables progressive degradation and adaptive optimization under varying load conditions.
+ * Each property can be modified at runtime to tune system behavior in response to memory pressure.
+ */
+class RuntimeConfig {
+  // Message handling - adjustable for batching optimization
+  MESSAGE_BATCH_SIZE: number = 10;
+  MESSAGE_BATCH_DELAY: number = 50;
+  
+  // Performance optimization - adjustable for memory management
+  COMPRESSION_THRESHOLD: number = 1024;
+  DEDUPE_CACHE_SIZE: number = 5000;
+  DEDUPE_WINDOW: number = 5000;
+  
+  // Connection limits - adjustable for load shedding
+  MAX_CONNECTIONS_PER_USER: number = 5;
+  
+  // Memory management - adjustable cleanup frequency
+  MEMORY_CLEANUP_INTERVAL: number = 180000; // 3 minutes
+
+  /**
+   * Reset all runtime configuration to default values.
+   * Called when memory pressure subsides to restore optimal performance settings.
+   */
+  reset(): void {
+    this.MESSAGE_BATCH_SIZE = 10;
+    this.MESSAGE_BATCH_DELAY = 50;
+    this.COMPRESSION_THRESHOLD = 1024;
+    this.DEDUPE_CACHE_SIZE = 5000;
+    this.DEDUPE_WINDOW = 5000;
+    this.MAX_CONNECTIONS_PER_USER = 5;
+    this.MEMORY_CLEANUP_INTERVAL = 180000;
+  }
+
+  /**
+   * Get current configuration as a plain object for logging and monitoring.
+   * Useful for tracking configuration changes during degradation events.
+   */
+  toObject(): Record<string, number> {
+    return {
+      MESSAGE_BATCH_SIZE: this.MESSAGE_BATCH_SIZE,
+      MESSAGE_BATCH_DELAY: this.MESSAGE_BATCH_DELAY,
+      COMPRESSION_THRESHOLD: this.COMPRESSION_THRESHOLD,
+      DEDUPE_CACHE_SIZE: this.DEDUPE_CACHE_SIZE,
+      DEDUPE_WINDOW: this.DEDUPE_WINDOW,
+      MAX_CONNECTIONS_PER_USER: this.MAX_CONNECTIONS_PER_USER,
+      MEMORY_CLEANUP_INTERVAL: this.MEMORY_CLEANUP_INTERVAL,
+    };
+  }
+}
+
+// Create singleton instances for use throughout the service
+const CONFIG = BASE_CONFIG;
+const RUNTIME_CONFIG = new RuntimeConfig();
 
 // ============================================================================
 // UTILITY CLASSES
@@ -321,7 +376,7 @@ export class WebSocketService {
 
   // Deduplication cache with timestamp tracking
   private messageDedupeCache: LRUCache<string, number>;
-  private readonly DEDUPE_WINDOW = CONFIG.DEDUPE_WINDOW;
+  private readonly DEDUPE_WINDOW = RUNTIME_CONFIG.DEDUPE_WINDOW;
 
   // Statistics tracking
   private connectionStats = {
@@ -356,10 +411,226 @@ export class WebSocketService {
   // Connection tracking
   private nextConnectionId = 0;
 
+  // Memory leak detection
+  private memoryLeakDetector: MemoryLeakDetector;
+  private memoryPressureMode = false;
+  private progressiveDegradationLevel = 0;
+
   constructor() {
-    this.messageDedupeCache = new LRUCache(CONFIG.DEDUPE_CACHE_SIZE);
+    this.messageDedupeCache = new LRUCache(RUNTIME_CONFIG.DEDUPE_CACHE_SIZE);
     this.latencyBuffer = new CircularBuffer(CONFIG.MAX_LATENCY_SAMPLES);
     this.operationQueue = new PriorityQueue(CONFIG.MAX_QUEUE_SIZE);
+
+    // Initialize memory leak detector
+    this.memoryLeakDetector = new MemoryLeakDetector({
+      thresholds: {
+        heapGrowthRate: 0.05, // 5% growth per minute
+        retainedSizeIncrease: 100 * 1024 * 1024, // 100MB
+        memoryPressureThreshold: 0.85 // 85%
+      }
+    });
+
+    // Set up memory leak detection event handlers
+    this.memoryLeakDetector.on('leak:detected', (data) => {
+      logger.warn('Memory leak detected in WebSocket service', {
+        component: 'WebSocketService',
+        severity: data.severity,
+        recommendations: data.recommendations
+      });
+      this.handleMemoryLeakDetected(data);
+    });
+
+    this.memoryLeakDetector.on('memory:pressure', (data) => {
+      logger.warn('Memory pressure detected in WebSocket service', {
+        component: 'WebSocketService',
+        pressure: data.pressure,
+        threshold: data.threshold
+      });
+      this.handleMemoryPressure(data);
+    });
+
+    // Start memory monitoring
+    this.memoryLeakDetector.startMonitoring(60000); // Check every minute
+  }
+
+  // ==========================================================================
+  // MEMORY MANAGEMENT
+  // ==========================================================================
+
+  /**
+   * Handle memory leak detection events.
+   */
+  private handleMemoryLeakDetected(data: any): void {
+    logger.warn('🚨 Memory leak detected - initiating cleanup', {
+      component: 'WebSocketService',
+      severity: data.severity,
+      growthRate: data.analysis.growthRate,
+      retainedIncrease: data.analysis.retainedIncrease
+    });
+
+    // Increase degradation level
+    this.progressiveDegradationLevel = Math.min(this.progressiveDegradationLevel + 1, 3);
+    this.memoryPressureMode = true;
+
+    // Perform immediate cleanup
+    this.performEmergencyCleanup();
+
+    // Broadcast memory warning to clients
+    this.broadcastToAll({
+      type: 'system_warning',
+      data: {
+        type: 'memory_pressure',
+        severity: data.severity,
+        message: 'Server experiencing memory pressure. Some features may be degraded.'
+      }
+    });
+  }
+
+  /**
+   * Handle memory pressure events.
+   */
+  private handleMemoryPressure(data: any): void {
+    logger.warn('⚠️ Memory pressure detected - applying optimizations', {
+      component: 'WebSocketService',
+      pressure: data.pressure,
+      threshold: data.threshold
+    });
+
+    this.memoryPressureMode = true;
+    this.progressiveDegradationLevel = Math.min(this.progressiveDegradationLevel + 1, 3);
+
+    // Apply progressive degradation
+    this.applyProgressiveDegradation();
+  }
+
+  /**
+   * Perform emergency cleanup when memory leaks are detected.
+   */
+  private performEmergencyCleanup(): void {
+    logger.info('🧹 Performing emergency memory cleanup', { 
+      component: 'WebSocketService',
+      configBefore: RUNTIME_CONFIG.toObject()
+    });
+
+    // Clear all message buffers
+    for (const [, pool] of this.connectionPool.entries()) {
+      for (const ws of pool.connections) {
+        if (ws.messageBuffer) {
+          ws.messageBuffer.length = 0;
+        }
+      }
+    }
+
+    // Reduce dedupe cache size by 50%
+    const oldSize = this.messageDedupeCache.size;
+    const newSize = Math.floor(RUNTIME_CONFIG.DEDUPE_CACHE_SIZE * 0.5);
+    RUNTIME_CONFIG.DEDUPE_CACHE_SIZE = newSize;
+    this.messageDedupeCache = new LRUCache(newSize);
+
+    // Clear operation queue to prevent overflow
+    const clearedOps = this.operationQueue.length;
+    this.operationQueue.clear();
+
+    // Force garbage collection if available
+    if (global.gc) {
+      global.gc();
+    }
+
+    logger.info('Emergency cleanup completed', {
+      component: 'WebSocketService',
+      clearedBuffers: 'all',
+      dedupeCacheReduced: `${oldSize} -> ${newSize}`,
+      operationsCleared: clearedOps,
+      configAfter: RUNTIME_CONFIG.toObject()
+    });
+  }
+
+  /**
+   * Apply progressive degradation based on memory pressure level.
+   */
+  private applyProgressiveDegradation(): void {
+    const level = this.progressiveDegradationLevel;
+
+    logger.info(`Applying progressive degradation level ${level}`, {
+      component: 'WebSocketService',
+      configBefore: RUNTIME_CONFIG.toObject()
+    });
+
+    switch (level) {
+      case 1: // Light degradation
+        // Reduce batch sizes and increase cleanup frequency
+        RUNTIME_CONFIG.MESSAGE_BATCH_SIZE = Math.max(5, RUNTIME_CONFIG.MESSAGE_BATCH_SIZE - 5);
+        RUNTIME_CONFIG.MEMORY_CLEANUP_INTERVAL = Math.max(90000, RUNTIME_CONFIG.MEMORY_CLEANUP_INTERVAL - 60000);
+        break;
+
+      case 2: // Moderate degradation
+        // Disable compression for new connections
+        RUNTIME_CONFIG.COMPRESSION_THRESHOLD = Number.MAX_SAFE_INTEGER;
+        // Reduce dedupe cache size
+        const newCacheSize = Math.floor(RUNTIME_CONFIG.DEDUPE_CACHE_SIZE * 0.3);
+        RUNTIME_CONFIG.DEDUPE_CACHE_SIZE = newCacheSize;
+        this.messageDedupeCache = new LRUCache(newCacheSize);
+        break;
+
+      case 3: // Severe degradation
+        // Disable batching entirely
+        RUNTIME_CONFIG.MESSAGE_BATCH_SIZE = 1;
+        RUNTIME_CONFIG.MESSAGE_BATCH_DELAY = 0;
+        // Reduce connection limits
+        RUNTIME_CONFIG.MAX_CONNECTIONS_PER_USER = Math.max(1, RUNTIME_CONFIG.MAX_CONNECTIONS_PER_USER - 2);
+        break;
+    }
+
+    logger.info('Progressive degradation applied', {
+      component: 'WebSocketService',
+      level,
+      configAfter: RUNTIME_CONFIG.toObject()
+    });
+
+    // Broadcast degradation status to clients
+    this.broadcastToAll({
+      type: 'system_status',
+      data: {
+        degradationLevel: level,
+        message: `Server optimization level ${level} active due to memory pressure`
+      }
+    });
+  }
+
+  /**
+   * Reset progressive degradation when memory pressure subsides.
+   */
+  private resetProgressiveDegradation(): void {
+    if (this.progressiveDegradationLevel > 0) {
+      logger.info('Memory pressure subsided - resetting degradation', {
+        component: 'WebSocketService',
+        previousLevel: this.progressiveDegradationLevel,
+        configBefore: RUNTIME_CONFIG.toObject()
+      });
+
+      // Reset configuration to defaults
+      RUNTIME_CONFIG.reset();
+
+      // Reinitialize cache with default size
+      this.messageDedupeCache = new LRUCache(RUNTIME_CONFIG.DEDUPE_CACHE_SIZE);
+
+      this.progressiveDegradationLevel = 0;
+      this.memoryPressureMode = false;
+
+      logger.info('Configuration reset complete', {
+        component: 'WebSocketService',
+        configAfter: RUNTIME_CONFIG.toObject()
+      });
+
+      // Broadcast recovery status
+      this.broadcastToAll({
+        type: 'system_status',
+        data: {
+          degradationLevel: 0,
+          message: 'Server optimization reset - normal operation restored'
+        }
+      });
+    }
   }
 
   // ==========================================================================
@@ -397,7 +668,7 @@ export class WebSocketService {
           serverNoContextTakeover: true,
           serverMaxWindowBits: 10,
           concurrencyLimit: 10,
-          threshold: CONFIG.COMPRESSION_THRESHOLD
+          threshold: RUNTIME_CONFIG.COMPRESSION_THRESHOLD
         },
         maxPayload: CONFIG.MAX_PAYLOAD,
         clientTracking: true,
@@ -421,7 +692,7 @@ export class WebSocketService {
         component: 'WebSocketService',
         config: {
           maxPayload: CONFIG.MAX_PAYLOAD,
-          maxConnectionsPerUser: CONFIG.MAX_CONNECTIONS_PER_USER,
+          maxConnectionsPerUser: RUNTIME_CONFIG.MAX_CONNECTIONS_PER_USER,
           heartbeatInterval: CONFIG.HEARTBEAT_INTERVAL
         }
       });
@@ -476,11 +747,11 @@ export class WebSocketService {
 
       // Enforce per-user connection limit
       const userConnections = this.connectionPool.get(decoded.userId);
-      if (userConnections && userConnections.connections.length >= CONFIG.MAX_CONNECTIONS_PER_USER) {
+      if (userConnections && userConnections.connections.length >= RUNTIME_CONFIG.MAX_CONNECTIONS_PER_USER) {
         logger.warn(`Connection limit exceeded for user ${decoded.userId}`, { 
           component: 'WebSocketService',
           currentConnections: userConnections.connections.length,
-          limit: CONFIG.MAX_CONNECTIONS_PER_USER
+          limit: RUNTIME_CONFIG.MAX_CONNECTIONS_PER_USER
         });
         return false;
       }
@@ -749,11 +1020,11 @@ export class WebSocketService {
       if (!ws.flushTimer) {
         ws.flushTimer = setTimeout(() => {
           this.flushMessageBuffer(ws);
-        }, CONFIG.MESSAGE_BATCH_DELAY);
+        }, RUNTIME_CONFIG.MESSAGE_BATCH_DELAY);
       }
 
       // Flush if buffer reaches batch size
-      if (ws.messageBuffer.length >= CONFIG.MESSAGE_BATCH_SIZE) {
+      if (ws.messageBuffer.length >= RUNTIME_CONFIG.MESSAGE_BATCH_SIZE) {
         this.flushMessageBuffer(ws);
       }
 
@@ -955,7 +1226,6 @@ export class WebSocketService {
    * Handle batch unsubscription request for multiple bills.
    * Efficiently processes multiple unsubscriptions at once.
    */
-  // cSpell:ignore unsubscriptions
   private async handleBatchUnsubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
     const { billIds } = message.data || {};
 
@@ -1273,7 +1543,7 @@ export class WebSocketService {
     // Check for duplicate within dedupe window
     if (this.messageDedupeCache.has(dedupeKey)) {
       const lastSent = this.messageDedupeCache.get(dedupeKey)!;
-      if (Date.now() - lastSent < this.DEDUPE_WINDOW) {
+      if (Date.now() - lastSent < RUNTIME_CONFIG.DEDUPE_WINDOW) {
         this.connectionStats.duplicateMessages++;
         return;
       }
@@ -1472,7 +1742,7 @@ export class WebSocketService {
     // Memory cleanup interval
     this.memoryCleanupInterval = setInterval(() => {
       this.performMemoryCleanup();
-    }, CONFIG.MEMORY_CLEANUP_INTERVAL);
+    }, RUNTIME_CONFIG.MEMORY_CLEANUP_INTERVAL);
   }
 
   /**
@@ -1559,9 +1829,11 @@ export class WebSocketService {
       cleanedItems++;
 
       // Reduce dedupe cache size significantly
-      if (this.messageDedupeCache.size > CONFIG.DEDUPE_CACHE_SIZE * 0.2) {
+      if (this.messageDedupeCache.size > RUNTIME_CONFIG.DEDUPE_CACHE_SIZE * 0.2) {
         const oldSize = this.messageDedupeCache.size;
-        this.messageDedupeCache = new LRUCache(Math.floor(CONFIG.DEDUPE_CACHE_SIZE * 0.2));
+        const newSize = Math.floor(RUNTIME_CONFIG.DEDUPE_CACHE_SIZE * 0.2);
+        RUNTIME_CONFIG.DEDUPE_CACHE_SIZE = newSize;
+        this.messageDedupeCache = new LRUCache(newSize);
         cleanedItems += oldSize;
       }
 
@@ -1606,8 +1878,8 @@ export class WebSocketService {
     let bufferCleanups = 0;
     for (const [, pool] of this.connectionPool.entries()) {
       for (const ws of pool.connections) {
-        if (ws.messageBuffer && ws.messageBuffer.length > CONFIG.MESSAGE_BATCH_SIZE * 2) {
-          ws.messageBuffer = ws.messageBuffer.slice(-CONFIG.MESSAGE_BATCH_SIZE);
+        if (ws.messageBuffer && ws.messageBuffer.length > RUNTIME_CONFIG.MESSAGE_BATCH_SIZE * 2) {
+          ws.messageBuffer = ws.messageBuffer.slice(-RUNTIME_CONFIG.MESSAGE_BATCH_SIZE);
           bufferCleanups++;
           cleanedItems++;
         }
@@ -2121,40 +2393,3 @@ export class WebSocketService {
 
 // Export singleton instance
 export const webSocketService = new WebSocketService();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

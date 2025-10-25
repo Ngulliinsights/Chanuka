@@ -1,16 +1,17 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { transparencyAnalysisService, TransparencyAnalysisService } from '../transparency-analysis.service';
 import { readDatabase } from '@shared/database/connection';
 import * as schema from '../../../../../shared/schema';
 import { ConflictSummary } from '../bill-comprehensive-analysis.service'; // Import ConflictSummary type
 
 // --- Mock Dependencies ---
-jest.mock('../../../../db', () => ({ readDatabase: jest.fn() }));
+vi.mock('../../../../db', () => ({ readDatabase: vi.fn() }));
 
 const mockDb = {
-  select: jest.fn().mockReturnThis(),
-  from: jest.fn().mockReturnThis(),
-  where: jest.fn().mockReturnThis(),
-  limit: jest.fn().mockResolvedValue([]),
+  select: vi.fn().mockReturnThis(),
+  from: vi.fn().mockReturnThis(),
+  where: vi.fn().mockReturnThis(),
+  limit: vi.fn().mockResolvedValue([]),
 };
 // Mock Bill and Sponsor data
 const mockBill = { id: 1, sponsorId: 10, status: 'committee' } as schema.Bill;
@@ -20,13 +21,13 @@ describe('TransparencyAnalysisService', () => {
   let service: TransparencyAnalysisService;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (readDatabase as jest.Mock).mockReturnValue(mockDb);
+    vi.clearAllMocks();
+    (readDatabase as vi.Mock).mockReturnValue(mockDb);
 
      // Setup mocks to return bill and sponsor
      mockDb.limit
-         .mockImplementationOnce(() => ({ limit: jest.fn().mockResolvedValue([mockBill]) })) // For getBillDetails
-         .mockImplementationOnce(() => ({ limit: jest.fn().mockResolvedValue([mockSponsor]) }));// For sponsor score in calculateSponsorDisclosureScore
+         .mockImplementationOnce(() => ({ limit: vi.fn().mockResolvedValue([mockBill]) })) // For getBillDetails
+         .mockImplementationOnce(() => ({ limit: vi.fn().mockResolvedValue([mockSponsor]) }));// For sponsor score in calculateSponsorDisclosureScore
 
 
     service = transparencyAnalysisService; // Or new TransparencyAnalysisService()
@@ -52,13 +53,13 @@ describe('TransparencyAnalysisService', () => {
 
         // Need to reset mockDb setup for sponsor score fetch within the service call
         mockDb.limit
-            .mockImplementationOnce(() => ({ limit: jest.fn().mockResolvedValue([mockBill]) })) // getBillDetails
-            .mockImplementationOnce(() => ({ limit: jest.fn().mockResolvedValue([mockSponsor]) })); // Sponsor score for highConflict test
+            .mockImplementationOnce(() => ({ limit: vi.fn().mockResolvedValue([mockBill]) })) // getBillDetails
+            .mockImplementationOnce(() => ({ limit: vi.fn().mockResolvedValue([mockSponsor]) })); // Sponsor score for highConflict test
         const resultHighConflict = await service.calculateScore(mockBill.id, highConflict);
 
          mockDb.limit
-             .mockImplementationOnce(() => ({ limit: jest.fn().mockResolvedValue([mockBill]) })) // getBillDetails
-             .mockImplementationOnce(() => ({ limit: jest.fn().mockResolvedValue([mockSponsor]) })); // Sponsor score for lowConflict test
+             .mockImplementationOnce(() => ({ limit: vi.fn().mockResolvedValue([mockBill]) })) // getBillDetails
+             .mockImplementationOnce(() => ({ limit: vi.fn().mockResolvedValue([mockSponsor]) })); // Sponsor score for lowConflict test
         const resultLowConflict = await service.calculateScore(mockBill.id, lowConflict);
 
 
@@ -73,7 +74,7 @@ describe('TransparencyAnalysisService', () => {
     const highConflict: ConflictSummary = { overallRisk: 'critical', affectedSponsorsCount: 2, totalFinancialExposureEstimate: 1000000, directConflictCount: 2, indirectConflictCount: 1 };
     const lowConflict: ConflictSummary = { overallRisk: 'low', affectedSponsorsCount: 0, totalFinancialExposureEstimate: 0, directConflictCount: 0, indirectConflictCount: 0 };
 
-     mockDb.limit.mockImplementation(() => ({ limit: jest.fn().mockResolvedValue([mockBill]) })); // Mock getBillDetails consistently
+     mockDb.limit.mockImplementation(() => ({ limit: vi.fn().mockResolvedValue([mockBill]) })); // Mock getBillDetails consistently
 
     const resultHigh = await service.calculateScore(mockBill.id, highConflict);
     const resultLow = await service.calculateScore(mockBill.id, lowConflict);
@@ -94,8 +95,8 @@ describe('TransparencyAnalysisService', () => {
         const worstConflict: ConflictSummary = { overallRisk: 'critical', affectedSponsorsCount: 5, totalFinancialExposureEstimate: 10e6, directConflictCount: 5, indirectConflictCount: 5 };
         const badSponsor = { ...mockSponsor, transparencyScore: '10.00' };
          mockDb.limit
-            .mockImplementationOnce(() => ({ limit: jest.fn().mockResolvedValue([mockBill]) })) // getBillDetails
-            .mockImplementationOnce(() => ({ limit: jest.fn().mockResolvedValue([badSponsor]) })); // Sponsor score
+            .mockImplementationOnce(() => ({ limit: vi.fn().mockResolvedValue([mockBill]) })) // getBillDetails
+            .mockImplementationOnce(() => ({ limit: vi.fn().mockResolvedValue([badSponsor]) })); // Sponsor score
 
         // Act
         const result = await service.calculateScore(mockBill.id, worstConflict);

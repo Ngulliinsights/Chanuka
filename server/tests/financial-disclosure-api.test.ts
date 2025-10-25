@@ -1,17 +1,32 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import request from 'supertest';
 import express from 'express';
 import { createFinancialDisclosureRouter } from '../features/analytics/financial-disclosure/index.ts';
 import { FinancialDisclosureMonitoringService } from '../features/analytics/financial-disclosure/monitoring.ts';
 import { financialDisclosureAnalyticsService } from '../features/analytics/services/financial-disclosure.service.js';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Create mock monitoring service for tests
 const mockDependencies = {
-  readDb: jest.fn(),
-  writeDb: jest.fn(),
-  cache: { get: jest.fn(), set: jest.fn(), delete: jest.fn() },
-  cacheService: { get: jest.fn(), set: jest.fn(), delete: jest.fn() },
-  logger: { info: jest.fn(), error: jest.fn(), warn: jest.fn() }
+  readDb: vi.fn(),
+  writeDb: vi.fn(),
+  cache: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
+  cacheService: { get: vi.fn(), set: vi.fn(), delete: vi.fn() },
+  logger: { info: vi.fn(), error: vi.fn(), warn: vi.fn() }
 };
 const mockMonitoringService = new FinancialDisclosureMonitoringService(mockDependencies);
 

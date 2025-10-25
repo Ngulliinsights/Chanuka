@@ -1,14 +1,28 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { MiddlewareConfig } from '../middleware/config';
-import { MiddlewareFactory } from '../middleware/factory';
-import { Logger } from '../logging/logger';
+import { MiddlewareFactory } from '@shared/core/src/middleware/factory';
+import { Logger } from '@shared/core/src/observability/logging';
 import { CacheService } from '../caching/core/interfaces';
 import { ValidationService } from '../validation/validation-service';
-import { RateLimitStore } from '../rate-limiting/types';
-import { HealthChecker } from '../health/health-checker';
+import { RateLimitStore } from '@shared/types';
+import { HealthChecker } from '../observability/health/health-checker';
 import express from 'express';
 import request from 'supertest';
-import { logger } from '../observability/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 describe('Core Utilities Integration Tests', () => {
   let app: express.Application;
@@ -18,38 +32,38 @@ describe('Core Utilities Integration Tests', () => {
   beforeAll(() => {
     // Setup mock dependencies
     const logger = {
-      info: jest.fn(),
-      error: jest.fn(),
-      warn: jest.fn(),
-      debug: jest.fn(),
+      info: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      debug: vi.fn(),
     } as unknown as Logger;
 
     const cache = {
-      get: jest.fn().mockResolvedValue(null),
-      set: jest.fn().mockResolvedValue(undefined),
-      delete: jest.fn().mockResolvedValue(undefined),
-      clear: jest.fn().mockResolvedValue(undefined),
-      has: jest.fn().mockResolvedValue(false),
-      getMetrics: jest.fn().mockResolvedValue({}),
+      get: vi.fn().mockResolvedValue(null),
+      set: vi.fn().mockResolvedValue(undefined),
+      delete: vi.fn().mockResolvedValue(undefined),
+      clear: vi.fn().mockResolvedValue(undefined),
+      has: vi.fn().mockResolvedValue(false),
+      getMetrics: vi.fn().mockResolvedValue({}),
     } as unknown as CacheService;
 
     const validator = {
-      validate: jest.fn().mockResolvedValue({ isValid: true, errors: [] }),
-      registerSchema: jest.fn().mockResolvedValue(undefined),
-      getSchema: jest.fn().mockReturnValue(null),
-      listSchemas: jest.fn().mockReturnValue([]),
+      validate: vi.fn().mockResolvedValue({ isValid: true, errors: [] }),
+      registerSchema: vi.fn().mockResolvedValue(undefined),
+      getSchema: vi.fn().mockReturnValue(null),
+      listSchemas: vi.fn().mockReturnValue([]),
     } as unknown as ValidationService;
 
     const rateLimitStore = {
-      check: jest.fn().mockResolvedValue({ allowed: true, remaining: 100, resetTime: Date.now() + 60000 }),
-      recordRequest: jest.fn().mockResolvedValue(undefined),
-      getState: jest.fn().mockResolvedValue({}),
-      reset: jest.fn().mockResolvedValue(undefined),
+      check: vi.fn().mockResolvedValue({ allowed: true, remaining: 100, resetTime: Date.now() + 60000 }),
+      recordRequest: vi.fn().mockResolvedValue(undefined),
+      getState: vi.fn().mockResolvedValue({}),
+      reset: vi.fn().mockResolvedValue(undefined),
     } as unknown as RateLimitStore;
 
     const healthChecker = {
-      check: jest.fn().mockResolvedValue({ healthy: true, details: {} }),
-      getMetrics: jest.fn().mockResolvedValue({}),
+      check: vi.fn().mockResolvedValue({ healthy: true, details: {} }),
+      getMetrics: vi.fn().mockResolvedValue({}),
     } as unknown as HealthChecker;
 
     config = {

@@ -2,9 +2,9 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth.js';
 import { privacyService, PrivacyPreferences } from './privacy-service.js';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utilities/api";
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utils/api";
 import { auditLogger } from "../../infrastructure/monitoring/audit-log.js";
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 export const router = Router();
 

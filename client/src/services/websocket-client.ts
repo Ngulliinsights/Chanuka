@@ -410,7 +410,7 @@ export class WebSocketClient {
       this.reconnectTimeoutId = null;
       if (this.currentToken) {
         this.connect(this.currentToken).catch(error => {
-          logger.error('Reconnection failed:', { component: 'Chanuka' }, error);
+          logger.error('Reconnection failed:', { component: 'WebSocketClient' }, error);
         });
       }
     }, delay);

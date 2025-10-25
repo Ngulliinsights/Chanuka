@@ -1,4 +1,4 @@
-import { NavigationState, NavigationPreferences, RecentPage } from '..\..\types\navigation';
+import { NavigationState, NavigationPreferences, RecentPage } from '../../types/navigation';
 import { logger } from '@shared/core';
 
 // Keys for localStorage
@@ -210,6 +210,8 @@ export class NavigationStatePersistence {
       favoritePages: [],
       recentlyVisited: [],
       compactMode: false,
+      showBreadcrumbs: true,
+      autoExpand: false,
     };
 
     if (!preferences || typeof preferences !== 'object') {
@@ -235,6 +237,14 @@ export class NavigationStatePersistence {
       compactMode: typeof preferences.compactMode === 'boolean'
         ? preferences.compactMode
         : defaultPreferences.compactMode,
+      
+      showBreadcrumbs: typeof preferences.showBreadcrumbs === 'boolean'
+        ? preferences.showBreadcrumbs
+        : defaultPreferences.showBreadcrumbs,
+      
+      autoExpand: typeof preferences.autoExpand === 'boolean'
+        ? preferences.autoExpand
+        : defaultPreferences.autoExpand,
     };
   }
 

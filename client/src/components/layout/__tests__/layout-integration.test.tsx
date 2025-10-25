@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -7,46 +8,46 @@ import AppLayout from '../app-layout';
 import { MobileHeader } from '../mobile-header';
 import MobileNavigation from '../mobile-navigation';
 import { Sidebar } from '../sidebar';
-import { LayoutConfig, User, NavigationItem } from '../types';
+import { LayoutConfig, User, NavigationItem } from '@shared/types';
 
 // Mock dependencies
-jest.mock('@/hooks/use-unified-navigation', () => ({
-  useUnifiedNavigation: jest.fn(),
+vi.mock('@/hooks/use-unified-navigation', () => ({
+  useUnifiedNavigation: vi.fn(),
 }));
 
-jest.mock('@/hooks/use-navigation-performance', () => ({
+vi.mock('@/hooks/use-navigation-performance', () => ({
   useNavigationPerformance: () => ({
-    startTransition: jest.fn(),
-    endTransition: jest.fn(),
-    enableGPUAcceleration: jest.fn(),
-    disableGPUAcceleration: jest.fn(),
+    startTransition: vi.fn(),
+    endTransition: vi.fn(),
+    enableGPUAcceleration: vi.fn(),
+    disableGPUAcceleration: vi.fn(),
     isTransitioning: false,
   }),
 }));
 
-jest.mock('@/hooks/use-navigation-accessibility', () => ({
+vi.mock('@/hooks/use-navigation-accessibility', () => ({
   useNavigationAccessibility: () => ({
-    announce: jest.fn(),
-    handleKeyboardNavigation: jest.fn(),
-    generateSkipLinks: jest.fn(),
-    handleRouteChange: jest.fn(),
-    getAriaAttributes: jest.fn(),
+    announce: vi.fn(),
+    handleKeyboardNavigation: vi.fn(),
+    generateSkipLinks: vi.fn(),
+    handleRouteChange: vi.fn(),
+    getAriaAttributes: vi.fn(),
   }),
   useNavigationKeyboardShortcuts: () => ({
-    registerShortcut: jest.fn(() => jest.fn()),
+    registerShortcut: vi.fn(() => vi.fn()),
   }),
 }));
 
-jest.mock('@/components/accessibility/accessibility-manager', () => ({
+vi.mock('@/components/accessibility/accessibility-manager', () => ({
   SkipLink: ({ children, href }: { children: React.ReactNode; href: string }) => (
     <a href={href} data-testid="skip-link">{children}</a>
   ),
   useAccessibility: () => ({
-    announceToScreenReader: jest.fn(),
+    announceToScreenReader: vi.fn(),
   }),
 }));
 
-jest.mock('@/components/navigation', () => ({
+vi.mock('@/components/navigation', () => ({
   DesktopSidebar: ({ onToggle }: { onToggle?: () => void }) => (
     <div data-testid="desktop-sidebar">
       <button onClick={onToggle} data-testid="sidebar-toggle">
@@ -58,7 +59,7 @@ jest.mock('@/components/navigation', () => ({
 }));
 
 // Mock fetch for API calls
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 const createTestWrapper = () => {
   const queryClient = new QueryClient({
@@ -107,8 +108,8 @@ describe('Layout Integration Tests', () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (global.fetch as jest.Mock).mockResolvedValue({
+    vi.clearAllMocks();
+    (global.fetch as vi.Mock).mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ user: mockUser }),
     });
@@ -139,7 +140,7 @@ describe('Layout Integration Tests', () => {
     });
 
     it('should handle layout configuration changes', async () => {
-      const onLayoutChange = jest.fn();
+      const onLayoutChange = vi.fn();
       const TestWrapper = createTestWrapper();
 
       const { rerender } = render(
@@ -224,7 +225,7 @@ describe('Layout Integration Tests', () => {
         <TestWrapper>
           <MobileNavigation
             isOpen={true}
-            onClose={jest.fn()}
+            onClose={vi.fn()}
             user={mockUser}
             navigationItems={mockNavigationItems}
           />
@@ -264,7 +265,7 @@ describe('Layout Integration Tests', () => {
 
     it('should handle sidebar toggle functionality', async () => {
       const user = userEvent.setup();
-      const onToggle = jest.fn();
+      const onToggle = vi.fn();
       const TestWrapper = createTestWrapper();
 
       render(
@@ -281,7 +282,7 @@ describe('Layout Integration Tests', () => {
 
     it('should handle sidebar search functionality', async () => {
       const user = userEvent.setup();
-      const onSearchChange = jest.fn();
+      const onSearchChange = vi.fn();
       const TestWrapper = createTestWrapper();
 
       render(
@@ -434,7 +435,7 @@ describe('Layout Integration Tests', () => {
 
   describe('Error Handling Integration', () => {
     it('should handle layout errors gracefully across components', () => {
-      const onError = jest.fn();
+      const onError = vi.fn();
       const TestWrapper = createTestWrapper();
 
       const invalidConfig = {

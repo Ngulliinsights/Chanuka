@@ -121,7 +121,9 @@ describe('API Communication Integration Tests', () => {
   });
 
   afterEach(() => {
+    cleanup();
     queryClient.clear();
+  
   });
 
   describe('API Client Configuration', () => {

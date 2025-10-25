@@ -1,29 +1,30 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { CoverageAnalyzer } from '../../services/coverage-analyzer';
+import { CoverageAnalyzer } from '@/$2/coverage-analyzer';
 import { exec } from 'child_process';
 import fs from 'fs/promises';
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 // Mock dependencies
-jest.mock('child_process');
-jest.mock('fs/promises');
-jest.mock('../../utils/logger');
+vi.mock('child_process');
+vi.mock('fs/promises');
+vi.mock('../../utils/logger');
 
-const mockExec = exec as jest.MockedFunction<typeof exec>;
-const mockFs = fs as jest.Mocked<typeof fs>;
+const mockExec = exec as vi.MockedFunction<typeof exec>;
+const mockFs = fs as vi.Mocked<typeof fs>;
 
 describe('CoverageAnalyzer', () => {
   let coverageAnalyzer: CoverageAnalyzer;
 
   beforeEach(() => {
     coverageAnalyzer = new CoverageAnalyzer();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('analyzeServerCoverage', () => {
     it('should analyze server coverage successfully', async () => {
       // Mock successful command execution
-      const mockCallback = jest.fn((command: string, options: any, callback: any) => {
+      const mockCallback = vi.fn((command: string, options: any, callback: any) => {
         callback(null, { stdout: 'Coverage complete', stderr: '' });
       });
       mockExec.mockImplementation(mockCallback as any);
@@ -52,7 +53,7 @@ describe('CoverageAnalyzer', () => {
 
     it('should handle coverage analysis errors gracefully', async () => {
       // Mock command execution failure
-      const mockCallback = jest.fn((command: string, options: any, callback: any) => {
+      const mockCallback = vi.fn((command: string, options: any, callback: any) => {
         callback(new Error('Command failed'), null);
       });
       mockExec.mockImplementation(mockCallback as any);
@@ -74,7 +75,7 @@ describe('CoverageAnalyzer', () => {
   describe('analyzeClientCoverage', () => {
     it('should analyze client coverage successfully', async () => {
       // Mock successful command execution
-      const mockCallback = jest.fn((command: string, options: any, callback: any) => {
+      const mockCallback = vi.fn((command: string, options: any, callback: any) => {
         callback(null, { stdout: 'Coverage complete', stderr: '' });
       });
       mockExec.mockImplementation(mockCallback as any);
@@ -179,9 +180,9 @@ describe('CoverageAnalyzer', () => {
         uncoveredLines: []
       };
 
-      jest.spyOn(coverageAnalyzer, 'analyzeServerCoverage').mockResolvedValue(mockServerCoverage);
-      jest.spyOn(coverageAnalyzer, 'analyzeClientCoverage').mockResolvedValue(mockClientCoverage);
-      jest.spyOn(coverageAnalyzer, 'analyzeIntegrationCoverage').mockResolvedValue(mockServerCoverage);
+      vi.spyOn(coverageAnalyzer, 'analyzeServerCoverage').mockResolvedValue(mockServerCoverage);
+      vi.spyOn(coverageAnalyzer, 'analyzeClientCoverage').mockResolvedValue(mockClientCoverage);
+      vi.spyOn(coverageAnalyzer, 'analyzeIntegrationCoverage').mockResolvedValue(mockServerCoverage);
 
       const report = await coverageAnalyzer.generateCoverageReport();
 
@@ -205,9 +206,9 @@ describe('CoverageAnalyzer', () => {
         uncoveredLines: []
       };
 
-      jest.spyOn(coverageAnalyzer, 'analyzeServerCoverage').mockResolvedValue(mockCoverage);
-      jest.spyOn(coverageAnalyzer, 'analyzeClientCoverage').mockResolvedValue(mockCoverage);
-      jest.spyOn(coverageAnalyzer, 'analyzeIntegrationCoverage').mockResolvedValue(mockCoverage);
+      vi.spyOn(coverageAnalyzer, 'analyzeServerCoverage').mockResolvedValue(mockCoverage);
+      vi.spyOn(coverageAnalyzer, 'analyzeClientCoverage').mockResolvedValue(mockCoverage);
+      vi.spyOn(coverageAnalyzer, 'analyzeIntegrationCoverage').mockResolvedValue(mockCoverage);
 
       const report = await coverageAnalyzer.generateCoverageReport();
 

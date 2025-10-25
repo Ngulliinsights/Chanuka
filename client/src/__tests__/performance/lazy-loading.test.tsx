@@ -1,9 +1,23 @@
 import React from 'react';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { BrowserRouter, MemoryRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { navigationService } from '../../services/navigation';
+import { navigationService } from '@/components/navigation';
 
 // Minimal logger mock for tests (used in LazyLoadErrorBoundary)
 const logger = {
@@ -137,7 +151,9 @@ describe('Lazy Loading and Code Splitting Tests', () => {
   });
 
   afterEach(() => {
+    cleanup();
     vi.restoreAllMocks();
+  
   });
 
   describe('Basic Lazy Loading', () => {

@@ -1,7 +1,7 @@
 import { readDatabase } from '../../../../shared/database/connection';
 import { user } from '../../../../shared/schema'; // Import user table directly
 import { eq } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // --- Interface Definitions ---
 // Defines the structure of GLOBAL bill tracking preferences stored within user.preferences.

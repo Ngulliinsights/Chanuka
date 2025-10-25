@@ -7,7 +7,7 @@ import React, { useState, useEffect } from 'react';
 import { performanceMonitor } from '../../utils/performanceMonitoring';
 import { usePerformanceOptimization } from '../../utils/performance-optimizer';
 import { cacheManager } from '../../utils/cache-strategy';
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '../../utils/browser-logger';
 
 interface PerformanceDashboardProps {
   className?: string;

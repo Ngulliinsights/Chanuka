@@ -1,7 +1,7 @@
 import { database as db } from '../../shared/database/connection';
 import { bills, analysis } from '../../../../shared/schema/schema.js';
 import { eq, desc } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 import type {
   AnalysisResult,
   SimilarityAnalysis,

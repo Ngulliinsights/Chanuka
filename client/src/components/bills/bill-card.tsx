@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Calendar, Users, AlertCircle, TrendingUp } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '../../utils/browser-logger';
 
 interface BillCardProps {
   bill: {
@@ -20,11 +20,11 @@ interface BillCardProps {
 }
 
 const statusColors = {
-  introduced: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  committee: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  passed: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-  rejected: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+  introduced: 'bg-info text-info-foreground',
+  committee: 'bg-warning text-warning-foreground',
+  passed: 'bg-success text-success-foreground',
+  failed: 'bg-destructive text-destructive-foreground',
+  rejected: 'bg-destructive text-destructive-foreground',
 };
 
 const conflictColors = {

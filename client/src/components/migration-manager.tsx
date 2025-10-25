@@ -1,7 +1,7 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui\card';
-import { Button } from './ui\button';
-import { Badge } from './ui\badge';
-import { Skeleton } from './ui\skeleton';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { Skeleton } from './ui/skeleton';
 import { 
   GitBranch, 
   CheckCircle, 
@@ -11,8 +11,8 @@ import {
   FilePlus,
   AlertTriangle
 } from "lucide-react";
-import { cn, formatRelativeTime } from '..\lib\utils';
-import { logger } from '..\utils\browser-logger';
+import { cn, formatRelativeTime } from '../lib/utils';
+import { logger } from '../utils/browser-logger';
 
 interface Migration {
   name: string;
@@ -30,24 +30,24 @@ interface MigrationManagerProps {
 const getStatusIcon = (status: string) => {
   switch (status.toLowerCase()) {
     case 'applied':
-      return <CheckCircle className="h-4 w-4 text-green-500" />;
+      return <CheckCircle className="h-4 w-4 text-success" />;
     case 'pending':
-      return <Clock className="h-4 w-4 text-yellow-500" />;
+      return <Clock className="h-4 w-4 text-warning" />;
     case 'ready':
-      return <FileText className="h-4 w-4 text-blue-500" />;
+      return <FileText className="h-4 w-4 text-info" />;
     default:
-      return <AlertTriangle className="h-4 w-4 text-gray-500" />;
+      return <AlertTriangle className="h-4 w-4 text-muted-foreground" />;
   }
 };
 
 const getStatusBadge = (status: string) => {
   switch (status.toLowerCase()) {
     case 'applied':
-      return <Badge className="bg-green-100 text-green-800 hover:bg-green-200">Applied</Badge>;
+      return <Badge className="bg-success text-success-foreground hover:bg-success/80">Applied</Badge>;
     case 'pending':
-      return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">Pending</Badge>;
+      return <Badge className="bg-warning text-warning-foreground hover:bg-warning/80">Pending</Badge>;
     case 'ready':
-      return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-200">Ready</Badge>;
+      return <Badge className="bg-info text-info-foreground hover:bg-info/80">Ready</Badge>;
     default:
       return <Badge variant="secondary">{status}</Badge>;
   }
@@ -106,7 +106,7 @@ export default function MigrationManager({ migrations, isLoading }: MigrationMan
                       </Badge>
                     )}
                     {migration.enhanced && (
-                      <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-200">
+                      <Badge className="bg-accent text-accent-foreground hover:bg-accent/80">
                         Enhanced
                       </Badge>
                     )}

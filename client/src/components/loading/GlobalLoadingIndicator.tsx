@@ -2,7 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { Loader2, Wifi, WifiOff, AlertCircle, Clock, X, RefreshCw } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import { useLoadingContext } from '../../contexts/LoadingContext';
+import { useUnifiedLoading } from '../../contexts/UnifiedLoadingContext';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
 import { Card, CardContent } from '../ui/card';
@@ -50,7 +50,7 @@ export const GlobalLoadingIndicator: React.FC<GlobalLoadingIndicatorProps> = ({
     retryOperation,
     getOperationsByPriority,
     shouldShowGlobalLoader,
-  } = useLoadingContext();
+  } = useUnifiedLoading();
 
   const [isVisible, setIsVisible] = React.useState(false);
   const [expandedOperations, setExpandedOperations] = React.useState<Set<string>>(new Set());
@@ -326,7 +326,7 @@ export const GlobalLoadingIndicator: React.FC<GlobalLoadingIndicatorProps> = ({
 export const MinimalGlobalLoadingIndicator: React.FC<{
   className?: string;
 }> = ({ className }) => {
-  const { state, shouldShowGlobalLoader } = useLoadingContext();
+  const { state, shouldShowGlobalLoader } = useUnifiedLoading();
   const [isVisible, setIsVisible] = React.useState(false);
 
   React.useEffect(() => {

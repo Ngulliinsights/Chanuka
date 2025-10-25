@@ -1,7 +1,7 @@
-import { apmService } from '../monitoring/apm-service.js';
-import { performanceMonitor } from '../monitoring/performance-monitor.js';
-import { errorTracker } from '../../core/errors/error-tracker.js';
+import { apmService } from '../monitoring';
+import { errorTracker } from '../../core/errors/error-tracker';
 import { logger } from '@shared/core';
+import { createObservabilityStack } from '@shared/core/src/observability';
 
 export interface AlertRule {
   id: string;
@@ -344,11 +344,11 @@ class AlertingService {
   }
 
   /**
-   * Check all alert conditions
-   */
-  private async checkAlertConditions(): Promise<void> {
-    const metrics = await apmService.getAPMMetrics();
-    const errorStats = errorTracker.getErrorStats(60);
+     * Check all alert conditions
+     */
+    private async checkAlertConditions(): Promise<void> {
+      const metrics = apmService.getAPMMetrics();
+      const errorStats = errorTracker.getErrorStats(60);
 
     for (const rule of this.alertRules.values()) {
       if (!rule.enabled) continue;

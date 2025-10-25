@@ -4,7 +4,21 @@
  * Tests for browser detection, feature detection, and compatibility checking.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { 
 import { logger } from '@shared/core';
   BrowserDetector, 
@@ -13,7 +27,7 @@ import { logger } from '@shared/core';
   isBrowserSupported,
   getBrowserWarnings,
   getBrowserRecommendations
-} from '../../utils/browser-compatibility';
+} from '@/$2/browser-compatibility';
 
 // Mock navigator and window objects
 const mockNavigator = {

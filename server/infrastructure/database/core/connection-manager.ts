@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import { PoolClient } from 'pg';
 import { pool, EnhancedPool, PoolMetrics, checkPoolHealth, PoolHealthStatus } from '../../../../shared/database/pool';
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 import { ConnectionManagerMetrics } from './connection-manager-metrics';
 
 /**

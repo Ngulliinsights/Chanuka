@@ -54,6 +54,15 @@ export interface IRateLimitStore {
   expire(key: string, ttl: number): Promise<Result<void>>;
 }
 
+export interface RateLimitConfig {
+  windowMs: number;
+  max: number;
+  message?: string;
+  keyGenerator?: (req: any) => string;
+  skip?: (req: any) => boolean;
+  onLimitReached?: (req: any, res: any) => void;
+}
+
 
 
 

@@ -1,8 +1,9 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   checkRouteAccess,
   getAccessDenialReason,
   getRequiredRoleForAccess,
-} from '../utils/route-access';
+} from '@/utils/route-access';
 
 describe('route-access', () => {
   describe('checkRouteAccess', () => {

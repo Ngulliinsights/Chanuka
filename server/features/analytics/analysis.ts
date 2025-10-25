@@ -6,8 +6,8 @@ import { mlAnalysisService, performComprehensiveAnalysis } from './services/ml.s
 import { conflictDetectionService } from './conflict-detection';
 // import { realTimeBillAnalysisEngine } from '../bills/real-time-analysis'; // File deleted - remove import
 import { citizenVerificationService } from '../users/domain/citizen-verification';
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utilities/api";
-import { logger } from '../../../shared/core/src/observability/logging';
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utils/api";
+import { logger } from '@shared/core';
 
 export const router = express.Router();
 

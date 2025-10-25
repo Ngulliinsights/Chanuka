@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { z } from "zod";
-import { ApiSuccess, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utilities/api";
+import { ApiSuccess, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utils/api";
 import { commentService } from "./comment.js";
 import { commentVotingService } from "./comment-voting.js";
 import { contentModerationService } from "../admin/content-moderation.js";
 import { authenticateToken as requireAuth } from "../../middleware/auth.js";
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 export const router = Router();
 

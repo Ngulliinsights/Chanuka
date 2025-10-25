@@ -1,9 +1,9 @@
 import * as React from "react"
 import { ChevronLeft, ChevronRight, AlertCircle } from "lucide-react"
 import { DayPicker } from "react-day-picker"
-import { cn } from '..\..\lib\utils'
+import { cn } from '../../lib/utils'
 import { buttonVariants } from './button'
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '../../utils/browser-logger';
 import { DateValidationProps, ValidationState } from './types';
 import { validateDate, safeValidateDate } from './validation';
 import { UIDateError } from './errors';

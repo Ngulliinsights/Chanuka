@@ -1,6 +1,21 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { ExpertVerificationService, VerificationStatus } from '../domain/ExpertVerificationService';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 describe('ExpertVerificationService', () => {
   let service: ExpertVerificationService;

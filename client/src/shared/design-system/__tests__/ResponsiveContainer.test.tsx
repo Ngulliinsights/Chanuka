@@ -9,7 +9,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import ResponsiveContainer from '../components/ResponsiveContainer';
+import ResponsiveContainer from '@/components/ResponsiveContainer';
 
 // Mock the responsive hook
 const mockUseResponsive = vi.fn();

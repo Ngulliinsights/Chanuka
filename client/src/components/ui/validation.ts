@@ -51,7 +51,13 @@ export const URLSchema = z.string()
   .max(2048, 'URL too long');
 
 export const NumberInputSchema = z.union([
-  z.string().regex(/^\d*\.?\d*$/, 'Invalid number format'),
+  z.string().transform((val) => {
+    if (/^\d*\.?\d*$/.test(val)) {
+      const num = parseFloat(val);
+      return isNaN(num) ? undefined : num;
+    }
+    return undefined;
+  }),
   z.number()
 ]).transform((val) => {
   if (typeof val === 'string') {
@@ -271,19 +277,37 @@ export function validateTableData(data: unknown[], columns: Array<{ key: string;
           });
         }
         
-        if (column.validator && value !== undefined && value !== null && value !== '') {
-          try {
-            column.validator.parse(value);
-          } catch (validationError) {
-            if (validationError instanceof z.ZodError) {
+        if (column.validator) {
+          if (value === undefined || value === null || value === '') {
+            if (column.required !== false) { // Treat fields with validators as required unless explicitly optional
               errors.push({
                 row: rowIndex,
                 column: column.key,
-                message: validationError.errors[0]?.message || 'Invalid value',
+                message: `${column.key} is required`,
                 value
               });
             }
+          } else {
+            try {
+              column.validator.parse(value);
+            } catch (validationError) {
+              if (validationError instanceof z.ZodError) {
+                errors.push({
+                  row: rowIndex,
+                  column: column.key,
+                  message: validationError.errors[0]?.message || 'Invalid value',
+                  value
+                });
+              }
+            }
           }
+        } else if (column.required && (value === undefined || value === null || value === '')) {
+          errors.push({
+            row: rowIndex,
+            column: column.key,
+            message: `${column.key} is required`,
+            value
+          });
         }
       });
     });

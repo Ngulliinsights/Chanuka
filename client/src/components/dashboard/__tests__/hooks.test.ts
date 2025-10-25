@@ -1,17 +1,18 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Dashboard hooks tests
  * Following navigation component hook testing patterns
  */
 
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useDashboard } from '../hooks/useDashboard';
-import { useDashboardActions } from '../hooks/useDashboardActions';
-import { useDashboardTopics } from '../hooks/useDashboardTopics';
-import { useDashboardConfig } from '../hooks/useDashboardConfig';
+import { useDashboard } from '@/hooks/useDashboard';
+import { useDashboardActions } from '@/hooks/useDashboardActions';
+import { useDashboardTopics } from '@/hooks/useDashboardTopics';
+import { useDashboardConfig } from '@/hooks/useDashboardConfig';
 
 // Mock the useBills hook
-jest.mock('@/hooks/use-bills', () => ({
-  useBills: jest.fn(() => ({
+vi.mock('@/hooks/use-bills', () => ({
+  useBills: vi.fn(() => ({
     summary: {
       billsTracked: 5,
       actionsNeeded: 3,
@@ -43,16 +44,16 @@ jest.mock('@/hooks/use-bills', () => ({
     ],
     isLoading: false,
     error: null,
-    refetch: jest.fn().mockResolvedValue(undefined)
+    refetch: vi.fn().mockResolvedValue(undefined)
   }))
 }));
 
 // Mock localStorage
 const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
+  getItem: vi.fn(),
+  setItem: vi.fn(),
+  removeItem: vi.fn(),
+  clear: vi.fn(),
 };
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock
@@ -60,7 +61,7 @@ Object.defineProperty(window, 'localStorage', {
 
 describe('Dashboard Hooks', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorageMock.getItem.mockReturnValue(null);
   });
 

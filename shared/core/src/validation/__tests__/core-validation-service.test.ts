@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Core Validation Service Tests
  *
@@ -5,7 +6,7 @@
  */
 
 import { ZodSchema, z } from 'zod';
-import { ValidationError } from '../types';
+import { ValidationError } from '@shared/types';
 import { ZodValidationService, zodValidationService } from '../adapters/zod-adapter';
 import { CustomValidationService, createCustomSchema } from '../adapters/custom-adapter';
 

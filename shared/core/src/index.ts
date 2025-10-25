@@ -44,36 +44,34 @@ export * from './modernization';
 
 // Cache Service (consolidates server/utils/cache.ts)
 export * from './caching';
-export * from './utilities/cache';
 
-// Logging Service (consolidates server/utils/logger.ts)
-export * from './observability/logging';
+// OBSERVABILITY - Single Source of Truth
+// All logging, health, and error management consolidated here
+export * from './observability';
+
+// MIDDLEWARE - Cross-cutting middleware orchestration
+export * from './middleware';
+
+// PRIMITIVES - Core types and building blocks
+export * from './primitives';
 
 // Validation Service (consolidates server/utils/validation.ts)
 export * from './validation';
 
-// Error Handling (consolidates server/utils/errors.ts, server/core/errors/, shared/core/src/errors/)
-// TODO: Fix circular dependency in error management system
-// export * from './observability/error-management';
-
 // Rate Limiting (consolidates server/middleware/rate-limiter.ts)
 export * from './rate-limiting';
 
-// Health Monitoring
-export * from './health';
-
-// Middleware (consolidates server/middleware/*)
-export * from './middleware';
+// UTILITIES - Consolidated utility functions
+export * from './utils';
 
 // Performance Utilities (consolidates server/utils/performance-monitoring-utils.ts)
-export * from './utilities/performance';
+export * from './performance';
 
 // API Response Utilities (consolidates server/utils/api-response.ts)
-export * from './utilities/api';
+// Note: API utilities are available through ./utils/api-utils
 
 // Legacy adapters for backward compatibility
-export * from './middleware/legacy-adapters/server-middleware-adapter';
-export * from './middleware/legacy-adapters/auth-adapter';
+// Note: Legacy adapters are available through specific modules in observability and validation
 
 // Testing Utilities (for development and testing environments)
 export * as Testing from './testing';
@@ -102,12 +100,9 @@ export const FEATURES = {
   MIGRATION_UTILITIES: true,
   MODERNIZATION_INFRASTRUCTURE: true, // Enabled in task 1
   CACHE_SERVICE: true, // Enabled in task 2
-  LOGGING_SERVICE: true, // Enabled in task 3
+  OBSERVABILITY: true, // CONSOLIDATED: logging, health, middleware, error management
   VALIDATION_SERVICE: true, // Enabled in task 4
-  ERROR_HANDLING: true, // Enabled in task 5
   RATE_LIMITING: true, // Enabled in task 6
-  HEALTH_MONITORING: true, // Enabled in task 7
-  MIDDLEWARE_INTEGRATION: true, // Enabled in task 8
   PERFORMANCE_TESTING: true, // Performance benchmarks and load testing
 } as const;
 

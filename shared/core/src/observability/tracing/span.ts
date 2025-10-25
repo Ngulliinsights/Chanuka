@@ -1,6 +1,6 @@
 import { randomBytes } from 'crypto';
 import { Result, Ok, Err } from '../../primitives/types';
-import { BaseError } from '../error-management';
+import { BaseError } from '../observability/error-management';
 import {
   Span as ISpan,
   SpanContext,

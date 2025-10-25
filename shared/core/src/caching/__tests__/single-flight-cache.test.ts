@@ -1,3 +1,18 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 /**
  * Single Flight Cache Tests
  * 
@@ -6,8 +21,8 @@
  */
 
 import { SingleFlightCache } from '../single-flight-cache';
-import type { CacheService, CacheMetrics } from '../types';
-import { logger } from '../../observability/logging';
+import type { CacheService, CacheMetrics } from '@shared/types';
+import { logger } from '@shared/core/src/observability/logging';
 
 // Mock cache adapter for testing
 class MockCacheAdapter implements CacheService {

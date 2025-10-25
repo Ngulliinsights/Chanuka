@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Loading components integration tests
  * Following navigation component patterns for integration testing
@@ -11,10 +12,10 @@ import { AssetLoadingProvider, useAssetLoadingContext } from '../AssetLoadingInd
 import { LoadingError, LoadingTimeoutError, LoadingNetworkError } from '../errors';
 
 // Mock timers for integration tests
-jest.useFakeTimers();
+vi.useFakeTimers();
 
 // Mock external dependencies
-jest.mock('@/hooks/useConnectionAware', () => ({
+vi.mock('@/hooks/useConnectionAware', () => ({
   useConnectionAware: () => ({
     connectionType: 'fast',
     effectiveType: '4g',
@@ -23,11 +24,11 @@ jest.mock('@/hooks/useConnectionAware', () => ({
   }),
 }));
 
-jest.mock('@/hooks/use-online-status', () => ({
+vi.mock('@/hooks/use-online-status', () => ({
   useOnlineStatus: () => true,
 }));
 
-jest.mock('@/utils/asset-loading', () => ({
+vi.mock('@/utils/asset-loading', () => ({
   useAssetLoading: () => ({
     progress: {
       loaded: 0,
@@ -44,7 +45,7 @@ jest.mock('@/utils/asset-loading', () => ({
   }),
 }));
 
-jest.mock('@/contexts/LoadingContext', () => ({
+vi.mock('@/contexts/LoadingContext', () => ({
   useLoadingContext: () => ({
     state: {
       operations: {},
@@ -58,26 +59,28 @@ jest.mock('@/contexts/LoadingContext', () => ({
         retryDelay: 1000,
       },
     },
-    cancelOperation: jest.fn(),
-    retryOperation: jest.fn(),
-    getOperationsByPriority: jest.fn(() => []),
-    shouldShowGlobalLoader: jest.fn(() => false),
+    cancelOperation: vi.fn(),
+    retryOperation: vi.fn(),
+    getOperationsByPriority: vi.fn(() => []),
+    shouldShowGlobalLoader: vi.fn(() => false),
   }),
 }));
 
 describe('Loading Components Integration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(() => {
-    jest.clearAllTimers();
+    cleanup();
+    vi.clearAllTimers();
+  
   });
 
   describe('LoadingStateManager Integration', () => {
     it('should handle state transitions correctly', async () => {
-      const onRetry = jest.fn();
-      const onTimeout = jest.fn();
+      const onRetry = vi.fn();
+      const onTimeout = vi.fn();
 
       const { rerender } = render(
         <LoadingStateManager
@@ -159,7 +162,7 @@ describe('Loading Components Integration', () => {
     });
 
     it('should handle timeout scenarios', async () => {
-      const onTimeout = jest.fn();
+      const onTimeout = vi.fn();
 
       render(
         <LoadingStateManager
@@ -172,7 +175,7 @@ describe('Loading Components Integration', () => {
 
       // Fast-forward time to trigger timeout
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
 
       await waitFor(() => {
@@ -233,7 +236,7 @@ describe('Loading Components Integration', () => {
   describe('Error Handling Integration', () => {
     it('should handle loading errors with recovery', async () => {
       const error = new LoadingError('Network failed', 'NETWORK_ERROR', 500);
-      const onRetry = jest.fn();
+      const onRetry = vi.fn();
 
       render(
         <LoadingStateManager
@@ -319,7 +322,7 @@ describe('Loading Components Integration', () => {
     });
 
     it('should handle keyboard navigation for interactive elements', () => {
-      const onRetry = jest.fn();
+      const onRetry = vi.fn();
 
       render(
         <LoadingStateManager
@@ -376,7 +379,7 @@ describe('Loading Components Integration', () => {
         { id: 'stage3', message: 'Finalizing', retryable: false },
       ];
 
-      const onRetryStage = jest.fn();
+      const onRetryStage = vi.fn();
 
       const { rerender } = render(
         <LoadingStateManager
@@ -404,10 +407,10 @@ describe('Loading Components Integration', () => {
 
     it('should handle connection state changes during loading', async () => {
       // Mock connection state change
-      const mockUseOnlineStatus = jest.fn();
+      const mockUseOnlineStatus = vi.fn();
       mockUseOnlineStatus.mockReturnValue(false);
 
-      jest.doMock('@/hooks/use-online-status', () => ({
+      vi.doMock('@/hooks/use-online-status', () => ({
         useOnlineStatus: mockUseOnlineStatus,
       }));
 

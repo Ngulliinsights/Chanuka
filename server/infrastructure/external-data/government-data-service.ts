@@ -7,7 +7,7 @@
 
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { EventEmitter } from 'events';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 import { httpUtils } from '../../../shared/core/src/utils/http-utils';
 import {
   DataSource,

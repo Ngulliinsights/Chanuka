@@ -7,3 +7,11 @@
 export * from './LoadingIndicator';
 export * from './ProgressiveLoader';
 export * from './TimeoutAwareLoader';
+
+// Skeleton components for layout stability
+export * from './Skeleton';
+export * from './CardSkeleton';
+export * from './ListSkeleton';
+export * from './FormSkeleton';
+export * from './TextSkeleton';
+export * from './AvatarSkeleton';

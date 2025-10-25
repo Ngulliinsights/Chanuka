@@ -12,11 +12,11 @@ import {
   userProgress,
   socialShare,
   commentVote,
-  moderationFlag,
+  contentReport,
   securityAuditLog
 } from "../../../shared/schema/schema.js";
-import { auditLogger } from "../../infrastructure/monitoring/audit-log.js";
-import { logger } from '../../../shared/core/src/observability/logging';
+import { auditLogger } from "../../infrastructure/monitoring/index.js";
+import { logger } from '@shared/core';
 
 export interface UserDataExport {
   user: {
@@ -535,11 +535,11 @@ class PrivacyService {
            .returning({ id: userProfile.id });
         deletedRecords.profiles = deletedProfiles.length;
 
-        // Remove moderation flags created by the user
-         const deletedFlags = await tx
-           .delete(moderationFlag)
-           .where(eq(moderationFlag.reportedBy, userId))
-           .returning({ id: moderationFlag.id });
+        // Remove content reports created by the user
+          const deletedFlags = await tx
+            .delete(contentReport)
+            .where(eq(contentReport.reportedBy, userId))
+            .returning({ id: contentReport.id });
         deletedRecords.moderationFlags = deletedFlags.length;
 
         // Delete the main user account record
@@ -767,16 +767,16 @@ class PrivacyService {
               break;
 
             case 'moderation_flags':
-              // Delete resolved or dismissed moderation flags older than cutoff
-               const deletedFlags = await db
-                 .delete(moderationFlag)
-                 .where(
-                   and(
-                     sql`${moderationFlag.status} IN ('resolved', 'dismissed')`,
-                     lt(moderationFlag.createdAt, cutoffDate)
-                   )
-                 )
-                 .returning({ id: moderationFlag.id });
+              // Delete resolved or dismissed content reports older than cutoff
+                const deletedFlags = await db
+                  .delete(contentReport)
+                  .where(
+                    and(
+                      sql`${contentReport.status} IN ('resolved', 'dismissed')`,
+                      lt(contentReport.createdAt, cutoffDate)
+                    )
+                  )
+                  .returning({ id: contentReport.id });
               recordsDeleted = deletedFlags.length;
               break;
           }

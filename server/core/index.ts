@@ -15,7 +15,7 @@ export * from './types/index.js';
 export * from './StorageTypes.js';
 
 // API Response Types
-export { ApiSuccess, ApiError, ApiValidationError } from '../../shared/core/src/utilities/api';
+export { ApiSuccess, ApiError, ApiValidationError } from '@shared/core/src/utils/api';
 
 
 

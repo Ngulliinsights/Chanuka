@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Dashboard utilities tests
  * Following navigation component utility testing patterns
@@ -8,7 +9,7 @@ import {
   formatActivitySummary,
   formatActionItem,
   formatTrackedTopic
-} from '../utils/dashboard-formatters';
+} from '@/utils/dashboard-formatters';
 import {
   createDashboardConfig,
   mergeDashboardConfigs,
@@ -18,9 +19,9 @@ import {
   getConfigurationRecommendations,
   exportDashboardConfig,
   importDashboardConfig
-} from '../utils/dashboard-config-utils';
-import { dashboardConstants } from '../utils/dashboard-constants';
-import type { ActivitySummary, ActionItem, TrackedTopic, DashboardConfig } from '../types';
+} from '@/utils/dashboard-config-utils';
+import { dashboardConstants } from '@/utils/dashboard-constants';
+import type { ActivitySummary, ActionItem, TrackedTopic, DashboardConfig } from '@shared/types';
 
 describe('Dashboard Utilities', () => {
   describe('Dashboard Formatters', () => {
@@ -416,7 +417,7 @@ describe('Dashboard Utilities', () => {
         const result = validateConfigurationLimits(config);
 
         expect(result.isValid).toBe(false);
-        expect(result.errors).toContain(expect.stringContaining('Refresh interval too short'));
+        expect(result.errors).toContain('Refresh interval too short');
       });
 
       it('should detect max items errors', () => {
@@ -427,7 +428,7 @@ describe('Dashboard Utilities', () => {
         const result = validateConfigurationLimits(config);
 
         expect(result.isValid).toBe(false);
-        expect(result.errors).toContain(expect.stringContaining('Must display at least 1 action item'));
+        expect(result.errors).toContain('Must display at least 1 action item');
       });
 
       it('should provide warnings for performance concerns', () => {
@@ -439,7 +440,7 @@ describe('Dashboard Utilities', () => {
         const result = validateConfigurationLimits(config);
 
         expect(result.warnings.length).toBeGreaterThan(0);
-        expect(result.warnings).toContain(expect.stringContaining('Fast refresh intervals'));
+        expect(result.warnings).toContain('Fast refresh intervals may increase data usage');
       });
     });
 

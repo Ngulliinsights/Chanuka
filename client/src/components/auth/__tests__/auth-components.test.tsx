@@ -15,7 +15,7 @@ import {
   FormTestHelper,
   ErrorTestHelper,
   TestSuiteHelper 
-} from '../../../shared/testing/test-utilities';
+} from '@shared/testing/test-utilities';
 
 import { LoginForm } from '../ui/LoginForm';
 import { RegisterForm } from '../ui/RegisterForm';
@@ -25,7 +25,7 @@ import { AuthAlert } from '../ui/AuthAlert';
 import { PasswordStrengthIndicator } from '../ui/PasswordStrengthIndicator';
 
 import { AuthError, AuthValidationError } from '../errors';
-import { AuthInputProps, AuthButtonProps } from '../types';
+import { AuthInputProps, AuthButtonProps } from '@shared/types';
 
 // Mock the auth hook
 vi.mock('@/hooks/use-auth', () => ({

@@ -6,11 +6,11 @@ import {
   UnifiedApiResponse, 
   ApiResponse, 
   ErrorResponse 
-} from '@shared/core/utilities/api';
+} from '@shared/core/utils/api-utils';
 
 console.warn(
   '[DEPRECATED] server/utils/api-response.ts is deprecated. ' +
-  'Please import from @shared/core/utilities/api instead.'
+  'Please import from @shared/core/utils/api-utils instead.'
 );
 
 export const ApiResponseWrapper = UnifiedApiResponse;

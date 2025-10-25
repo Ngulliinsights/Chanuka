@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { test, expect } from '@playwright/test';
 
 // Strategic Migration: Database Performance Testing via API

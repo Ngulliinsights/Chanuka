@@ -24,6 +24,8 @@ import {
 } from './interfaces';
 import { TelemetryIntegration, TelemetryConfig, createTelemetryIntegration, createDefaultTelemetryConfig } from './telemetry';
 import { AsyncCorrelationManager } from './correlation';
+import { E } from 'vitest/dist/chunks/environment.d.cL3nLXbE.js';
+import { ok } from 'assert';
 
 // ==================== Correlation Manager Implementation ====================
 
@@ -80,7 +82,7 @@ export class ObservabilityStack {
    */
   async initialize(): Promise<Result<void, BaseError>> {
     if (this.initialized) {
-      return Ok(undefined);
+      return new Ok(undefined);
     }
 
     try {
@@ -124,10 +126,10 @@ export class ObservabilityStack {
       }
 
       this.initialized = true;
-      return ok(undefined);
+      return new Ok(undefined);
 
     } catch (error) {
-      return Err(new ObservabilityInitializationError('stack', error as Error));
+      return new Err(new ObservabilityInitializationError('stack', error as Error));
     }
   }
 
@@ -239,10 +241,10 @@ export class ObservabilityStack {
 
       await Promise.all(shutdownPromises);
       this.initialized = false;
-      return Ok(undefined);
+      return new Ok(undefined);
 
     } catch (error) {
-      return Err(new ObservabilityError('Failed to shutdown observability stack', error as Error));
+      return new Err(new ObservabilityError('Failed to shutdown observability stack', error as Error));
     }
   }
 
@@ -267,9 +269,9 @@ export class ObservabilityStack {
       // This would be implemented with actual metrics collector
       // For now, we'll create a placeholder that would be replaced with real implementation
       this.metrics = this.createMetricsCollector(this.config.metrics!);
-      return Ok(undefined);
+      return new Ok(undefined);
     } catch (error) {
-      return Err(new ObservabilityInitializationError('metrics', error as Error));
+      return new Err(new ObservabilityInitializationError('metrics', error as Error));
     }
   }
 
@@ -278,9 +280,9 @@ export class ObservabilityStack {
       // This would be implemented with actual tracer
       // For now, we'll create a placeholder that would be replaced with real implementation
       this.tracer = this.createTracer(this.config.tracing!);
-      return Ok(undefined);
+      return new Ok(undefined);
     } catch (error) {
-      return Err(new ObservabilityInitializationError('tracing', error as Error));
+      return new Err(new ObservabilityInitializationError('tracing', error as Error));
     }
   }
 
@@ -289,9 +291,9 @@ export class ObservabilityStack {
       // This would be implemented with actual logger
       // For now, we'll create a placeholder that would be replaced with real implementation
       this.logger = this.createLogger(this.config.logging!);
-      return Ok(undefined);
+      return new Ok(undefined);
     } catch (error) {
-      return Err(new ObservabilityInitializationError('logging', error as Error));
+      return new Err(new ObservabilityInitializationError('logging', error as Error));
     }
   }
 
@@ -300,9 +302,9 @@ export class ObservabilityStack {
       // This would be implemented with actual health checker
       // For now, we'll create a placeholder that would be replaced with real implementation
       this.health = this.createHealthChecker(this.config.health!);
-      return Ok(undefined);
+      return new Ok(undefined);
     } catch (error) {
-      return Err(new ObservabilityInitializationError('health', error as Error));
+      return new Err(new ObservabilityInitializationError('health', error as Error));
     }
   }
 
@@ -339,25 +341,21 @@ export class ObservabilityStack {
 
     // Return enhanced metrics collector implementation
     return {
-      counter: (name: string, help?: string, labels?: Record<string, string>) => {
-        const counter = createAtomicCounter(name, help || '', labels);
-        registry.register(counter);
-        return counter;
+      counter: (name: string, value?: number, labels?: Record<string, string>) => {
+        // Placeholder implementation - would increment counter by value
+        console.log(`Counter ${name} incremented by ${value || 1}`, labels);
       },
-      gauge: (name: string, help?: string, labels?: Record<string, string>) => {
-        const gauge = createAtomicGauge(name, help || '', labels);
-        registry.register(gauge);
-        return gauge;
+      gauge: (name: string, value: number, labels?: Record<string, string>) => {
+        // Placeholder implementation - would set gauge value
+        console.log(`Gauge ${name} set to ${value}`, labels);
       },
-      histogram: (name: string, help?: string, buckets?: number[], labels?: Record<string, string>) => {
-        const histogram = createAggregatingHistogram(name, help || '', buckets, labels);
-        registry.register(histogram);
-        return histogram;
+      histogram: (name: string, value: number, labels?: Record<string, string>) => {
+        // Placeholder implementation - would record histogram observation
+        console.log(`Histogram ${name} observed ${value}`, labels);
       },
-      summary: (name: string, help?: string, quantiles?: number[], labels?: Record<string, string>) => {
-        const summary = createAggregatingSummary(name, help || '', quantiles, labels);
-        registry.register(summary);
-        return summary;
+      summary: (name: string, value: number, labels?: Record<string, string>) => {
+        // Placeholder implementation - would record summary observation
+        console.log(`Summary ${name} observed ${value}`, labels);
       },
       incrementGauge: (name: string, value?: number, labels?: Record<string, string>) => {
         const gauge = registry.get(name) as any;
@@ -406,7 +404,7 @@ export class ObservabilityStack {
     return createNewTracer(
       config.serviceName,
       config.serviceVersion,
-      config.sampling
+      config.samplingRate
     );
   }
 
@@ -430,25 +428,25 @@ export class ObservabilityStack {
   private createHealthChecker(config: HealthConfig): HealthChecker {
     // Placeholder implementation - would be replaced with real health checker
     return {
-      registerCheck: () => Ok(undefined),
-      unregisterCheck: () => Ok(undefined),
-      checkHealth: async () => Ok({
+      registerCheck: () => new Ok(undefined),
+      unregisterCheck: () => new Ok(undefined),
+      checkHealth: async () => new Ok({
         status: 'healthy' as const,
         timestamp: new Date(),
         duration: 0,
         checks: {},
         summary: { total: 0, healthy: 0, unhealthy: 0, degraded: 0, unknown: 0 }
       }),
-      checkHealthFor: async () => Ok({
+      checkHealthFor: async () => new Ok({
         status: 'healthy' as const,
         message: '',
         timestamp: new Date(),
         duration: 0
       }),
       getRegisteredChecks: () => [],
-      enableCheck: () => Ok(undefined),
-      disableCheck: () => Ok(undefined),
-      getCheckConfig: () => Err(new BaseError('Check not found', 404, 'CHECK_NOT_FOUND'))
+      enableCheck: () => new Ok(undefined),
+      disableCheck: () => new Ok(undefined),
+      getCheckConfig: () => new Err(new BaseError('Check not found'))
     };
   }
 

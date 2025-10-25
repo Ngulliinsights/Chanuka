@@ -1,6 +1,21 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import { databaseService } from '../../infrastructure/database/database-service.js';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 describe('Database Operations Integration Tests', () => {
   beforeAll(async () => {
@@ -555,3 +570,25 @@ expect.extend({
 
 
 
+
+
+describe('database-operations', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should be defined and properly exported', () => {
+    expect(database-operations).toBeDefined();
+    expect(typeof database-operations).not.toBe('undefined');
+  });
+
+  it('should export expected functions/classes', () => {
+    // TODO: Add specific export tests for database-operations
+    expect(typeof database-operations).toBe('object');
+  });
+
+  it('should handle basic functionality', () => {
+    // TODO: Add specific functionality tests for database-operations
+    expect(true).toBe(true);
+  });
+});

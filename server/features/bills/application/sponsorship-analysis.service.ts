@@ -13,8 +13,8 @@ const db = new Proxy({}, {
 }) as any;
 import { billSectionConflict } from '../../../shared/schema/schema.js';
 import { eq } from 'drizzle-orm';
-import { NotFoundError } from '../../../shared/core/src/observability/error-management/errors/specialized/not-found-error.js';
-import { logger } from '../../../shared/core/src/observability/logging/index.js';
+import { NotFoundError } from '@shared/core';
+import { logger } from '@shared/core';
 
 /**
  * SponsorshipAnalysisService - Bill-Centric Presentation Layer

@@ -18,7 +18,7 @@ import { billTrackingRouter } from './features/bills/presentation/bill-tracking.
 // import { router as authRouter } from './core/auth/auth.js';
 // import { router as usersRouter } from './features/users/application/users.js';
 // import { router as verificationRouter } from './features/users/application/verification.js';
-import { router as healthRouter } from './infrastructure/monitoring/health.js';
+// import { router } from '@shared/core';
 // import { router as communityRouter } from './features/community/community.js';
 
 // import { notificationRoutes as notificationsRouter } from './infrastructure/notifications/index.js';
@@ -352,7 +352,7 @@ app.use('/api/bill-tracking', billTrackingRouter);
 // app.use('/api/auth', authRouter);
 // app.use('/api/users', usersRouter);
 // app.use('/api/verification', verificationRouter);
-app.use('/api/health', healthRouter);
+// app.use('/api/health', router);
 // app.use('/api/community', communityRouter);
 
 // app.use('/api/notifications', notificationsRouter);

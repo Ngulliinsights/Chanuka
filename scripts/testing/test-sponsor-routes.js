@@ -1,7 +1,7 @@
 // Test script to verify actual sponsor routes with rate limiting
 import request from 'supertest';
 import express from 'express';
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/src/observability/logging/index.js';
 
 // Set test environment
 process.env.NODE_ENV = 'test';

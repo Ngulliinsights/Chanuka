@@ -53,3 +53,28 @@ export {
   createIntegrationManager
 } from './integrations/error-tracking-integration.js';
 export { EnhancedErrorBoundary, withEnhancedErrorBoundary } from './handlers/enhanced-error-boundary.js';
+
+// Global error handlers setup
+export function setupGlobalErrorHandlers() {
+  // Setup global unhandled promise rejection handler
+  if (typeof process !== 'undefined') {
+    process.on('unhandledRejection', (reason, promise) => {
+      console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    });
+
+    process.on('uncaughtException', (error) => {
+      console.error('Uncaught Exception:', error);
+    });
+  }
+
+  // Setup global error handler for browser
+  if (typeof window !== 'undefined') {
+    window.addEventListener('error', (event) => {
+      console.error('Global error:', event.error);
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('Unhandled promise rejection:', event.reason);
+    });
+  }
+}

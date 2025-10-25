@@ -1,21 +1,22 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 const { validateFile, validateNewPaths, runValidation } = require('../validation/validate-migration');
 const fs = require('fs');
 const { glob } = require('glob');
 
 // Mock fs and glob
-jest.mock('fs');
-jest.mock('glob');
+vi.mock('fs');
+vi.mock('glob');
 
 describe('Validate Migration', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('validateFile', () => {
     it('should detect old import patterns', () => {
       const mockContent = `
-import { ErrorHandler } from 'shared/core/error-handling/';
-import { Validator } from 'shared/core/validation/';
+import { ErrorHandler } from '@shared/core/error-handling/';
+import { Validator } from '@shared/core/validation/';
 const { Util } = require('shared/core/error-handling/utils');
       `.trim();
 
@@ -40,8 +41,8 @@ const { Util } = require('shared/core/error-handling/utils');
 
     it('should return empty array for valid files', () => {
       const mockContent = `
-import { ErrorHandler } from 'shared/core/error-management/';
-import { Validator } from 'shared/core/validation/';
+import { ErrorHandler } from '@shared/core/error-management/';
+import { Validator } from '@shared/core/validation/';
       `.trim();
 
       fs.readFileSync.mockReturnValue(mockContent);
@@ -56,7 +57,7 @@ import { Validator } from 'shared/core/validation/';
         throw new Error('Read error');
       });
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const issues = validateFile('bad.ts');
 
@@ -116,11 +117,11 @@ import { Validator } from 'shared/core/validation/';
     });
 
     it('should pass validation when no issues found', async () => {
-      fs.readFileSync.mockReturnValue('import {} from "shared/core/error-management/";');
+      fs.readFileSync.mockReturnValue('import {} from '@shared/core/error-management/";');
       glob.mockResolvedValue(['exists.ts']);
 
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-      const exitSpy = jest.spyOn(process, 'exit').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {});
 
       await runValidation();
 
@@ -132,11 +133,11 @@ import { Validator } from 'shared/core/validation/';
     });
 
     it('should fail validation when issues found', async () => {
-      fs.readFileSync.mockReturnValue('import {} from "shared/core/error-handling/";');
+      fs.readFileSync.mockReturnValue('import {} from '@shared/core/error-handling/";');
       glob.mockResolvedValue([]);
 
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-      const exitSpy = jest.spyOn(process, 'exit').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
+      const exitSpy = vi.spyOn(process, 'exit').mockImplementation(() => {});
 
       await runValidation();
 

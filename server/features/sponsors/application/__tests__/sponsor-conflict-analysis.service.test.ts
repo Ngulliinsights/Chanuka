@@ -1,10 +1,11 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { sponsorConflictAnalysisService, SponsorConflictAnalysisService, ConflictDetectionResult, ConflictType, ConflictSeverity, RiskProfile } from '../sponsor-conflict-analysis.service';
 // Mock the NEW repository
 import { sponsorRepository, SponsorRepository } from '../../infrastructure/repositories/sponsor.repository';
 import * as schema from '../../../../../shared/schema'; // Adjusted path
 
 // --- Mock Dependencies ---
-jest.mock('../../infrastructure/repositories/sponsor.repository'); // Mock the repository
+vi.mock('../../infrastructure/repositories/sponsor.repository'); // Mock the repository
 
 // --- Mock Data ---
 const mockSponsor: schema.Sponsor = {
@@ -32,25 +33,25 @@ const mockSponsorships: schema.BillSponsorship[] = [
 ];
 
 // Mock repository instance type
-type MockSponsorRepository = jest.Mocked<SponsorRepository>;
+type MockSponsorRepository = vi.Mocked<SponsorRepository>;
 
 describe('SponsorConflictAnalysisService', () => {
     let service: SponsorConflictAnalysisService;
     let mockRepo: MockSponsorRepository;
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         // Create a mocked instance of the repository
         mockRepo = new SponsorRepository() as MockSponsorRepository;
         // Mock repository methods
-        mockRepo.findByIds = jest.fn().mockResolvedValue([mockSponsor]);
-        mockRepo.list = jest.fn().mockResolvedValue([mockSponsor]);
-        mockRepo.findAffiliationsBySponsorIds = jest.fn().mockResolvedValue(new Map([[1, [mockAffiliationDirect, mockAffiliationIndirect, mockAffiliationLeadership, mockAffiliationTiming]]]));
-        mockRepo.findTransparencyBySponsorIds = jest.fn().mockResolvedValue(new Map([[1, mockTransparency]]));
+        mockRepo.findByIds = vi.fn().mockResolvedValue([mockSponsor]);
+        mockRepo.list = vi.fn().mockResolvedValue([mockSponsor]);
+        mockRepo.findAffiliationsBySponsorIds = vi.fn().mockResolvedValue(new Map([[1, [mockAffiliationDirect, mockAffiliationIndirect, mockAffiliationLeadership, mockAffiliationTiming]]]));
+        mockRepo.findTransparencyBySponsorIds = vi.fn().mockResolvedValue(new Map([[1, mockTransparency]]));
          // Mock listBillSponsorshipsBySponsor used in getSponsorData
-         mockRepo.listBillSponsorshipsBySponsor = jest.fn().mockResolvedValue(mockSponsorships);
+         mockRepo.listBillSponsorshipsBySponsor = vi.fn().mockResolvedValue(mockSponsorships);
          // Mock findBillsMentioningOrganization
-         mockRepo.findBillsMentioningOrganization = jest.fn().mockImplementation(async (org, billIds) => {
+         mockRepo.findBillsMentioningOrganization = vi.fn().mockImplementation(async (org, billIds) => {
              if (org === 'TechCorp' && billIds?.includes(101)) return [mockBill1];
              if (org === 'FinanceInc Subsidiary' && billIds?.includes(102)) return [mockBill2];
               if (org === 'Industry Group' && billIds?.includes(101)) return [mockBill1]; // Assuming Industry Group relates to Bill 101
@@ -58,7 +59,7 @@ describe('SponsorConflictAnalysisService', () => {
              return [];
          });
          // Mock getBill used by detectTimingConflicts
-         mockRepo.getBill = jest.fn().mockImplementation(async (id) => {
+         mockRepo.getBill = vi.fn().mockImplementation(async (id) => {
              if (id === 101) return { ...mockBill1, introducedDate: new Date(Date.now() - 20 * 86400000)}; // Bill introduced 20 days ago
              if (id === 102) return { ...mockBill2, introducedDate: new Date('2024-02-01')};
              return null;

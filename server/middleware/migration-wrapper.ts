@@ -2,9 +2,9 @@
 // Provides gradual migration from legacy middleware to modern middleware
 
 import { authenticateToken, requireRole } from './auth';
-import { createRateLimit, apiRateLimit, authRateLimit, sponsorRateLimit, searchRateLimit, passwordResetRateLimit, registrationRateLimit } from './rate-limiter';
-import { createMiddlewareMigrationAdapter } from '../../shared/core/src/middleware/migration-adapter';
-import { logger } from '../../shared/core/src/observability/logging';
+import { createRateLimit, apiRateLimit, authRateLimit, searchRateLimit, legacySponsorRateLimit, legacyPasswordResetRateLimit, legacyRegistrationRateLimit } from './rate-limiter';
+// import { createMiddlewareMigrationAdapter } from '@shared/core';
+import { logger } from '@shared/core';
 
 // Legacy middleware factory interface
 interface LegacyMiddlewareFactory {
@@ -52,22 +52,22 @@ const serviceContainer = {
   }
 };
 
-// Create migration adapter
-const middlewareMigrationAdapter = createMiddlewareMigrationAdapter(
-  legacyFactory,
-  serviceContainer
-);
+// Create migration adapter (placeholder - migration not yet active)
+const middlewareMigrationAdapter = {
+  createAuth: () => authenticateToken,
+  createRateLimit: (options?: any) => createRateLimit(options || { max: 100, windowMs: 15 * 60 * 1000 }),
+};
 
-// Export migrated middleware functions
-export const migratedAuthenticateToken = middlewareMigrationAdapter.createAuth();
+// Export migrated middleware functions (using legacy implementations for now)
+export const migratedAuthenticateToken = authenticateToken;
 export const migratedRequireRole = requireRole; // Keep legacy for now
-export const migratedCreateRateLimit = middlewareMigrationAdapter.createRateLimit.bind(middlewareMigrationAdapter);
-export const migratedApiRateLimit = middlewareMigrationAdapter.createRateLimit({ max: 100, windowMs: 15 * 60 * 1000 });
-export const migratedAuthRateLimit = middlewareMigrationAdapter.createRateLimit({ max: 5, windowMs: 15 * 60 * 1000 });
-export const migratedSponsorRateLimit = middlewareMigrationAdapter.createRateLimit({ max: 200, windowMs: 10 * 60 * 1000 });
-export const migratedSearchRateLimit = middlewareMigrationAdapter.createRateLimit({ max: 50, windowMs: 5 * 60 * 1000 });
-export const migratedPasswordResetRateLimit = middlewareMigrationAdapter.createRateLimit({ max: 3, windowMs: 60 * 60 * 1000 });
-export const migratedRegistrationRateLimit = middlewareMigrationAdapter.createRateLimit({ max: 5, windowMs: 60 * 60 * 1000 });
+export const migratedCreateRateLimit = createRateLimit;
+export const migratedApiRateLimit = apiRateLimit;
+export const migratedAuthRateLimit = authRateLimit;
+export const migratedSponsorRateLimit = legacySponsorRateLimit;
+export const migratedSearchRateLimit = searchRateLimit;
+export const migratedPasswordResetRateLimit = legacyPasswordResetRateLimit;
+export const migratedRegistrationRateLimit = legacyRegistrationRateLimit;
 
 // Validation function for testing migration
 export async function validateMiddlewareMigration(): Promise<boolean> {
@@ -92,8 +92,8 @@ export {
   createRateLimit,
   apiRateLimit,
   authRateLimit,
-  sponsorRateLimit,
+  legacySponsorRateLimit as sponsorRateLimit,
   searchRateLimit,
-  passwordResetRateLimit,
-  registrationRateLimit
+  legacyPasswordResetRateLimit as passwordResetRateLimit,
+  legacyRegistrationRateLimit as registrationRateLimit
 };

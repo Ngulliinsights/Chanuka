@@ -18,12 +18,10 @@ export { propertySchemas } from './property';
 
 // Schema composition utilities
 export {
-  createOptionalSchema,
   createArraySchema,
-  createNullableSchema,
-  createPartialSchema,
+  createConditionalSchema,
+  createPaginatedSchema,
   SchemaVersionManager,
-  schemaVersionManager,
 } from './common';
 
 // All schemas collection for easy access

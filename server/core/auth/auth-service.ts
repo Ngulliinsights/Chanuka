@@ -11,7 +11,7 @@ import { inputValidationService } from '../validation/input-validation-service.j
 import { securityAuditService } from '../../features/security/security-audit-service.js';
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { logger } from '../../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core';
 
 // Validation schemas
 export const registerSchema = z.object({
@@ -191,7 +191,11 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Registration error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
+      logger.error('Registration error:', { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        component: 'Chanuka' 
+      });
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -263,7 +267,11 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Email verification error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
+      logger.error('Email verification error:', { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        component: 'Chanuka' 
+      });
       return {
         success: false,
         error: 'Email verification failed'
@@ -341,7 +349,11 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Login error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
+      logger.error('Login error:', { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        component: 'Chanuka' 
+      });
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -368,7 +380,11 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      logger.error('Logout error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
+      logger.error('Logout error:', { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        component: 'Chanuka' 
+      });
       return {
         success: false,
         error: 'Logout failed'
@@ -468,7 +484,11 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Token refresh error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
+      logger.error('Token refresh error:', { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        component: 'Chanuka' 
+      });
       return {
         success: false,
         error: 'Token refresh failed'
@@ -528,7 +548,11 @@ export class AuthService {
       return { success: true };
 
     } catch (error) {
-      logger.error('Password reset request error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
+      logger.error('Password reset request error:', { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        component: 'Chanuka' 
+      });
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -626,7 +650,11 @@ export class AuthService {
       return { success: true };
 
     } catch (error) {
-      logger.error('Password reset error:', error instanceof Error ? error : new Error(String(error)), { component: 'Chanuka' });
+      logger.error('Password reset error:', { 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        component: 'Chanuka' 
+      });
       if (error instanceof z.ZodError) {
         return {
           success: false,

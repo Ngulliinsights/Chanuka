@@ -1,4 +1,4 @@
-import { NavigationSection } from '..\..\types\navigation';
+import { NavigationSection } from '../../types/navigation';
 import { logger } from '@shared/core';
 
 /**

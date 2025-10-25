@@ -7,7 +7,7 @@ import AppLayout from '../app-layout';
 import { MobileHeader } from '../mobile-header';
 import { Sidebar } from '../sidebar';
 import MobileNavigation from '../mobile-navigation';
-import { LayoutConfig, NavigationItem, User, HeaderAction } from '../types';
+import { LayoutConfig, NavigationItem, User, HeaderAction } from '@shared/types';
 
 // Mock dependencies
 vi.mock('@/hooks/use-unified-navigation', () => ({

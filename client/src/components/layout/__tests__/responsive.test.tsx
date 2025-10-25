@@ -6,7 +6,7 @@ import AppLayout from '../app-layout';
 import { MobileHeader } from '../mobile-header';
 import MobileNavigation from '../mobile-navigation';
 import { Sidebar } from '../sidebar';
-import { LayoutConfig } from '../types';
+import { LayoutConfig } from '@shared/types';
 
 // Mock window.matchMedia for responsive testing
 const mockMatchMedia = (matches: boolean) => {

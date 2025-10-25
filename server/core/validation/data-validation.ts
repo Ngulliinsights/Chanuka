@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Comprehensive data validation service for government data integration
 export class DataValidationService {

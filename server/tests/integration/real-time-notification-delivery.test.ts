@@ -1,3 +1,18 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, jest } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
@@ -11,10 +26,10 @@ import { router as billTrackingRouter } from '../../features/bills/bill-tracking
 // Mock realTimeTrackingRouter
 const realTimeTrackingRouter = express.Router();
 import { router as authRouter } from '../../core/auth/auth.js';
-import { database as db, users, bills, notifications, billEngagement } from '../../../shared/database/connection.js';
+import { database as db, users, bills, notifications, billEngagement } from '@shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 describe('Real-Time Notification Delivery Tests', () => {
   let app: express.Application;
@@ -116,7 +131,7 @@ describe('Real-Time Notification Delivery Tests', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   afterEach(async () => {

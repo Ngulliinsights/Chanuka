@@ -1,20 +1,21 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Important: This test mocks the EXTERNAL API call.
 // It does NOT test the ML model itself.
 
 import { mlServiceAdapter, MlServiceAdapter } from '../ml-service-adapter';
 // If you have a real client, mock it here:
 // import { MlApiClient } from 'some-ml-client';
-// jest.mock('some-ml-client');
+// vi.mock('some-ml-client');
 
 describe('MlServiceAdapter', () => {
     let adapter: MlServiceAdapter;
-    // const mockApiClient = new MlApiClient() as jest.Mocked<MlApiClient>; // Mocked instance
+    // const mockApiClient = new MlApiClient() as vi.Mocked<MlApiClient>; // Mocked instance
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        vi.clearAllMocks();
         // Reset or provide mock implementations for the client methods
-        // (mockApiClient.analyzeStakeholders as jest.Mock).mockClear();
-        // (mockApiClient.analyzeBeneficiaries as jest.Mock).mockClear();
+        // (mockApiClient.analyzeStakeholders as vi.Mock).mockClear();
+        // (mockApiClient.analyzeBeneficiaries as vi.Mock).mockClear();
 
         adapter = new MlServiceAdapter();
         // If using a real client: adapter = new MlServiceAdapter(mockApiClient);
@@ -24,7 +25,7 @@ describe('MlServiceAdapter', () => {
         it('should call the ML API client and transform the response', async () => {
             // Arrange
              const mockApiResp = { data: { identified_groups: ["group A"], influence_scores: {"group A": 0.8} }, model_confidence: 0.9 };
-             // (mockApiClient.analyzeStakeholders as jest.Mock).mockResolvedValue(mockApiResp); // Mock the actual client call
+             // (mockApiClient.analyzeStakeholders as vi.Mock).mockResolvedValue(mockApiResp); // Mock the actual client call
             const inputText = "Some bill text mentioning group A.";
 
             // Act
@@ -51,7 +52,7 @@ describe('MlServiceAdapter', () => {
         it('should throw an error if the API client call fails', async () => {
             // Arrange
             const apiError = new Error("ML Service Unavailable");
-             // (mockApiClient.analyzeStakeholders as jest.Mock).mockRejectedValue(apiError); // Mock failure
+             // (mockApiClient.analyzeStakeholders as vi.Mock).mockRejectedValue(apiError); // Mock failure
             const inputText = "Some bill text.";
 
             // Act & Assert
@@ -63,7 +64,7 @@ describe('MlServiceAdapter', () => {
          it('should call the ML API client and transform the response', async () => {
              // Arrange
               const mockApiResp = { data: { direct_beneficiaries: ["group B"], potential_losers: ["group C"] }, model_confidence: 0.88 };
-              // (mockApiClient.analyzeBeneficiaries as jest.Mock).mockResolvedValue(mockApiResp);
+              // (mockApiClient.analyzeBeneficiaries as vi.Mock).mockResolvedValue(mockApiResp);
              const inputText = "Text about group B and group C.";
 
              // Act

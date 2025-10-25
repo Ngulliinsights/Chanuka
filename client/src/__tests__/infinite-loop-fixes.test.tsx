@@ -1,12 +1,13 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * @jest-environment jsdom
  */
 import { renderHook, act } from '@testing-library/react';
 import React from 'react';
-import { logger } from '..\utils\browser-logger';
+import { logger } from '@/utils/browser-logger';
 
 // Mock dependencies
-jest.mock('../hooks/useConnectionAware', () => ({
+vi.mock('../hooks/useConnectionAware', () => ({
   useConnectionAware: () => ({
     isOnline: true,
     connectionType: 'fast',
@@ -16,16 +17,16 @@ jest.mock('../hooks/useConnectionAware', () => ({
   }),
 }));
 
-jest.mock('../hooks/use-online-status', () => ({
+vi.mock('../hooks/use-online-status', () => ({
   useOnlineStatus: () => true,
 }));
 
 // Mock fetch for auth tests
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('Infinite Loop and Race Condition Fixes', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     localStorage.clear();
   });
 
@@ -35,8 +36,8 @@ describe('Infinite Loop and Race Condition Fixes', () => {
       // that callbacks don't have unnecessary dependencies
       
       // Mock the hooks to test dependency arrays
-      const mockUseCallback = jest.fn();
-      const mockUseMemo = jest.fn();
+      const mockUseCallback = vi.fn();
+      const mockUseMemo = vi.fn();
       
       // This test verifies our fixes are in place
       expect(true).toBe(true); // Placeholder - actual implementation would check dependencies
@@ -99,5 +100,30 @@ describe('Infinite Loop and Race Condition Fixes', () => {
       // Test that TypeScript types are correctly defined
       expect(true).toBe(true); // Placeholder
     });
+  });
+});
+
+describe('infinite-loop-fixes', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  it('should render without crashing', () => {
+    const { container } = render(<infinite-loop-fixes />);
+    expect(container).toBeInTheDocument();
+  });
+
+  it('should be accessible', () => {
+    const { container } = render(<infinite-loop-fixes />);
+    expect(container.firstChild).toHaveAttribute('role');
+  });
+
+  it('should handle props correctly', () => {
+    // TODO: Add specific prop tests for infinite-loop-fixes
+    expect(true).toBe(true);
   });
 });

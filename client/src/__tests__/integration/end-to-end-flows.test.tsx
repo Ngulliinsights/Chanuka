@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, afterEach, vi, beforeAll, afterAll 
 import { screen, waitFor, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import { navigationService } from '../../services/navigation';
+import { navigationService } from '@/components/navigation';
 import { renderWithProviders, createMockUser, createMockAuthState } from '../../test-utils';
 import React from 'react'; // Import React at the top
 

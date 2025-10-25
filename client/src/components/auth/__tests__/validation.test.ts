@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Auth validation tests
  */
@@ -14,7 +15,7 @@ import {
   validateField
 } from '../validation';
 import { AuthValidationError } from '../errors';
-import { TEST_DATA_SETS } from '../utils/test-utils';
+import { TEST_DATA_SETS } from '@/utils/test-utils';
 
 describe('Auth Validation', () => {
   describe('validateEmail', () => {

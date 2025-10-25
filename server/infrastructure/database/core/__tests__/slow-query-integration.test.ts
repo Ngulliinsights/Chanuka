@@ -1,23 +1,24 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { QueryExecutor } from '../query-executor';
 import { getMonitoringService, resetMonitoringService } from '../../../monitoring/monitoring';
 import { connectionManager } from '../connection-manager';
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Mock the connection manager with explicit typing for better type safety
-jest.mock('../connection-manager', () => ({
+vi.mock('../connection-manager', () => ({
   connectionManager: {
-    acquireConnection: jest.fn(),
-    releaseConnection: jest.fn(),
+    acquireConnection: vi.fn(),
+    releaseConnection: vi.fn(),
   },
 }));
 
 // Mock the logger to prevent console noise and enable verification
-jest.mock('../../../../utils/logger', () => ({
+vi.mock('../../../../utils/logger', () => ({
   logger: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
@@ -29,7 +30,7 @@ describe('Slow Query Integration Tests', () => {
   // Helper function to create a slow query mock with configurable delay
   // This standardizes how we simulate database query execution across tests
   const createSlowQueryMock = (delayMs: number = 50) => {
-    return jest.fn((sql: string, params: any[], callback: Function) => {
+    return vi.fn((sql: string, params: any[], callback: Function) => {
       setTimeout(() => {
         callback(null, { rows: [], rowCount: 0 });
       }, delayMs);
@@ -39,7 +40,7 @@ describe('Slow Query Integration Tests', () => {
   // Helper to create an EXPLAIN plan mock that returns realistic query plan data
   // This simulates PostgreSQL's EXPLAIN output structure
   const createExplainPlanMock = (planLines: string[]) => {
-    return jest.fn((sql: string, params: any[], callback: Function) => {
+    return vi.fn((sql: string, params: any[], callback: Function) => {
       if (sql.includes('EXPLAIN')) {
         callback(null, {
           rows: planLines.map(line => ({ 'QUERY PLAN': line })),
@@ -59,12 +60,12 @@ describe('Slow Query Integration Tests', () => {
 
     // Create a fresh mock client for each test to avoid pollution
     mockClient = {
-      query: jest.fn(),
+      query: vi.fn(),
     };
 
     // Setup connection manager mocks with proper type safety
-    jest.mocked(connectionManager.acquireConnection).mockResolvedValue(mockClient);
-    jest.mocked(connectionManager.releaseConnection).mockResolvedValue(undefined);
+    vi.mocked(connectionManager.acquireConnection).mockResolvedValue(mockClient);
+    vi.mocked(connectionManager.releaseConnection).mockResolvedValue(undefined);
 
     // Create query executor with a low threshold to make tests fast and reliable
     // The 10ms threshold ensures we can easily trigger slow query detection
@@ -76,7 +77,7 @@ describe('Slow Query Integration Tests', () => {
 
   afterEach(() => {
     // Clear all mocks to ensure no state carries over between tests
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('EXPLAIN Plan Retrieval', () => {
@@ -197,7 +198,7 @@ describe('Slow Query Integration Tests', () => {
 
   describe('Logging Integration', () => {
     it('should log slow queries with full details', async () => {
-      const loggerWarnSpy = jest.spyOn(logger, 'warn');
+      const loggerWarnSpy = vi.spyOn(logger, 'warn');
 
       mockClient.query = createSlowQueryMock(50);
 
@@ -230,7 +231,7 @@ describe('Slow Query Integration Tests', () => {
     });
 
     it('should include EXPLAIN plan in logs when available', async () => {
-      const loggerWarnSpy = jest.spyOn(logger, 'warn');
+      const loggerWarnSpy = vi.spyOn(logger, 'warn');
 
       const explainPlan = 'Index Scan using idx_users_email on users  (cost=0.00..8.27 rows=1 width=32)';
 
@@ -254,7 +255,7 @@ describe('Slow Query Integration Tests', () => {
     });
 
     it('should log query execution without EXPLAIN when retrieval fails', async () => {
-      const loggerWarnSpy = jest.spyOn(logger, 'warn');
+      const loggerWarnSpy = vi.spyOn(logger, 'warn');
 
       mockClient.query
         .mockImplementationOnce(createSlowQueryMock(50))

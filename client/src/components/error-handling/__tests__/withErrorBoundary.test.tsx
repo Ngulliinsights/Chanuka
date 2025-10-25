@@ -1,6 +1,20 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { render, screen, fireEvent } from '@testing-library/react';
-import { logger } from '..\..\..\utils\browser-logger';
+import { logger } from '../../../utils/browser-logger';
 import {
   withErrorBoundary,
   CriticalSection,

@@ -107,3 +107,6 @@ export class FixedWindow implements RateLimitAlgorithm {
     return Math.floor(currentTime / this.config.windowDuration) * this.config.windowDuration;
   }
 }
+
+// Export alias for backward compatibility
+export { FixedWindow as FixedWindowStore };

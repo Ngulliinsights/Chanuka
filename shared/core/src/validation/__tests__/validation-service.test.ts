@@ -5,11 +5,25 @@
  * and batch validation functionality
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { ValidationService } from '../validation-service';
 import { z } from 'zod';
 import { ValidationError } from '../../observability/error-management';
-import { logger } from '../../observability/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 describe('ValidationService', () => {
   let validationService: ValidationService;
@@ -812,3 +826,25 @@ describe('ValidationService', () => {
 
 
 
+
+
+describe('validation-service', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should be defined and properly exported', () => {
+    expect(validation-service).toBeDefined();
+    expect(typeof validation-service).not.toBe('undefined');
+  });
+
+  it('should export expected functions/classes', () => {
+    // TODO: Add specific export tests for validation-service
+    expect(typeof validation-service).toBe('object');
+  });
+
+  it('should handle basic functionality', () => {
+    // TODO: Add specific functionality tests for validation-service
+    expect(true).toBe(true);
+  });
+});

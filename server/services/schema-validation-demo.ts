@@ -1,5 +1,5 @@
 import { schemaValidationService } from '@shared/schema';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 /**
  * Demonstration script showing how to use the SchemaValidationService

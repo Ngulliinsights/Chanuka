@@ -4,7 +4,7 @@ import { eq, and, lt } from 'drizzle-orm';
 import { encryptionService } from './encryption-service.js';
 import { securityAuditService } from './security-audit-service.js';
 import { Request } from 'express';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 export interface DataExportRequest {
   userId: string;

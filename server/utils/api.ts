@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 // import { dashboardRouter } from './routes/dashboard'; // Dashboard route doesn't exist
 
 export const setupApi = () => {

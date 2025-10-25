@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Tests for form accessibility components
  */
@@ -175,8 +176,8 @@ describe('AccessibleErrorSummary', () => {
     // Create a mock field element
     const mockField = document.createElement('input');
     mockField.id = 'email-input';
-    mockField.focus = jest.fn();
-    mockField.scrollIntoView = jest.fn();
+    mockField.focus = vi.fn();
+    mockField.scrollIntoView = vi.fn();
     document.body.appendChild(mockField);
     
     render(

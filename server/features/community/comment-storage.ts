@@ -6,7 +6,7 @@ import {
 } from '../../../shared/schema';
 import { eq, desc, and } from 'drizzle-orm';
 import { BaseStorage } from '../../infrastructure/database/base/BaseStorage.js';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 /**
  * CommentStorage handles the storage and retrieval of comments on bills.

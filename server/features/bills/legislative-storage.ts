@@ -10,7 +10,7 @@ import {
 } from "../../../shared/schema";
 import { eq, desc, and, or, like, count, asc, sql } from "drizzle-orm";
 import { readDatabase } from '@shared/database/connection';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Enhanced engagement statistics interface with more detailed metrics
 export interface BillEngagementStats {

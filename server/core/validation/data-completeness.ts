@@ -1,6 +1,6 @@
 import { apiRequest } from '../../utils/api.js';
-import { cache } from '../../../shared/core/src/caching';
-import { logger } from '../../../shared/core/src/observability/logging/index.js';
+import { cache } from '@shared/core';
+import { logger } from '@shared/core';
 
 interface VerificationRule {
   id: string;

@@ -34,6 +34,20 @@ export {
 // Export UI components (will be created in next task)
 export * from './ui';
 
+// Export skeleton components for layout stability
+export type {
+  SkeletonProps,
+} from './types';
+
+export {
+  Skeleton,
+  CardSkeleton,
+  ListSkeleton,
+  FormSkeleton,
+  TextSkeleton,
+  AvatarSkeleton,
+} from './ui';
+
 // Export utilities
 export * from './utils';
 
@@ -87,9 +101,6 @@ export {
   LoadingRecoveryManager,
   useLoadingRecovery,
   createRecoveryContext,
-  canAttemptRecovery,
-  shouldUseGracefulDegradation,
-  getRecoveryMessage,
 } from './recovery';
 
 

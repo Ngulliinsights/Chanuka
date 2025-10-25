@@ -361,25 +361,102 @@ function ContactForm() {
 }
 ```
 
-### Responsive Navigation
+### Responsive Navigation with Theme Support
 ```tsx
-import { useResponsive, TouchTarget } from '@/shared/design-system';
+import { useResponsive, TouchTarget, ResponsiveStack } from '@/shared/design-system';
+import { colorTokens, buttonUtils } from '@/shared/design-system';
+import { useState } from 'react';
 
 function Navigation() {
   const { isMobile, isTouchDevice } = useResponsive();
-  
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const navItems = [
+    { href: '/home', label: 'Home' },
+    { href: '/about', label: 'About' },
+    { href: '/contact', label: 'Contact' }
+  ];
+
+  const navItemClasses = buttonUtils.getButtonClasses({
+    variant: 'ghost',
+    size: 'medium'
+  });
+
   return (
-    <nav>
+    <nav
+      style={{
+        backgroundColor: colorTokens.surface.card.light,
+        borderBottom: `1px solid ${colorTokens.border.light}`,
+        padding: 'var(--spacing-md)'
+      }}
+    >
       {isMobile ? (
-        <TouchTarget size={isTouchDevice ? "large" : "medium"}>
-          <MenuIcon />
-        </TouchTarget>
+        <ResponsiveStack direction="horizontal" justify="space-between" align="center">
+          <h1 style={{ color: colorTokens.primary[600] }}>App Name</h1>
+          <TouchTarget
+            size={isTouchDevice ? "large" : "medium"}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={isMenuOpen}
+          >
+            <MenuIcon />
+          </TouchTarget>
+
+          {isMenuOpen && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
+                backgroundColor: colorTokens.surface.card.light,
+                border: `1px solid ${colorTokens.border.light}`,
+                padding: 'var(--spacing-md)',
+                zIndex: 1000
+              }}
+            >
+              <ResponsiveStack direction="vertical" gap="sm">
+                {navItems.map(item => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className={navItemClasses}
+                    style={{
+                      display: 'block',
+                      padding: 'var(--spacing-sm) var(--spacing-md)',
+                      color: colorTokens.primary[600],
+                      textDecoration: 'none',
+                      borderRadius: 'var(--radius-md)'
+                    }}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </ResponsiveStack>
+            </div>
+          )}
+        </ResponsiveStack>
       ) : (
-        <div className="responsive-inline">
-          <a href="/home">Home</a>
-          <a href="/about">About</a>
-          <a href="/contact">Contact</a>
-        </div>
+        <ResponsiveStack direction="horizontal" justify="space-between" align="center">
+          <h1 style={{ color: colorTokens.primary[600] }}>App Name</h1>
+          <ResponsiveStack direction="horizontal" gap="md">
+            {navItems.map(item => (
+              <a
+                key={item.href}
+                href={item.href}
+                className={navItemClasses}
+                style={{
+                  padding: 'var(--spacing-sm) var(--spacing-md)',
+                  color: colorTokens.primary[600],
+                  textDecoration: 'none',
+                  borderRadius: 'var(--radius-md)'
+                }}
+              >
+                {item.label}
+              </a>
+            ))}
+          </ResponsiveStack>
+        </ResponsiveStack>
       )}
     </nav>
   );

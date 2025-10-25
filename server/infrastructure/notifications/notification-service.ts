@@ -3,7 +3,7 @@ import { database as db } from '../../../shared/database/connection';
 import { notifications, users, bills } from '../../../shared/schema';
 import { webSocketService } from '../websocket.js';
 import { z } from 'zod';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Core notification interfaces (consolidated from basic services)
 export interface NotificationData {

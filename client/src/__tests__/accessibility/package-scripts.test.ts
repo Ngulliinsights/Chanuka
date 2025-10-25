@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Test scripts for accessibility testing
 // This file contains test utilities for running accessibility tests
 

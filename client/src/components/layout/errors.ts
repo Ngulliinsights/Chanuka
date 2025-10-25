@@ -66,8 +66,9 @@ export class LayoutValidationError extends LayoutError {
 
 export class LayoutRenderError extends LayoutError {
   constructor(message: string, component?: string, details?: Record<string, any>) {
+    const fullMessage = component ? message : `Layout render error: ${message}`;
     super(
-      `Layout render error${component ? ` in ${component}` : ''}: ${message}`,
+      fullMessage,
       LayoutErrorType.LAYOUT_RENDER_ERROR,
       500,
       { component, ...details }

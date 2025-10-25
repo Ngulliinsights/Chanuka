@@ -1,13 +1,27 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { LoadTester } from '../testing/load-tester';
-import { HealthChecker } from '../health/health-checker';
+import { HealthChecker } from '../observability/health/health-checker';
 import { SlidingWindowStore } from '../rate-limiting/algorithms/sliding-window';
-import { MiddlewareFactory } from '../middleware/factory';
+import { MiddlewareFactory } from '@shared/core/src/middleware/factory';
 import express from 'express';
 import request from 'supertest';
 import Redis from 'ioredis';
 import { Logger } from '../logging';
-import { logger } from '../observability/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 describe('Core System Integration Tests', () => {
   let app: express.Application;

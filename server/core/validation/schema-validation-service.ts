@@ -1,6 +1,6 @@
 import { getDbInstance, readDatabase } from '../../infrastructure/database/index.ts';
 import { sql } from 'drizzle-orm';
-import { logger } from '../../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core';
 import {
   complianceChecks,
   securityAuditLogs,

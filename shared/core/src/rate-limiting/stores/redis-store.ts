@@ -1,8 +1,8 @@
 import { Result, ok, err } from '../../primitives/types/result';
-import { RateLimitData, IRateLimitStore } from '../types';
+import { RateLimitData, IRateLimitStore, RateLimitStore, RateLimitOptions, RateLimitResult } from '../types';
 import Redis from 'ioredis';
 
-export class RedisRateLimitStore implements IRateLimitStore {
+export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
   private redis: Redis;
 
   constructor(redisUrl?: string) {
@@ -111,4 +111,71 @@ export class RedisRateLimitStore implements IRateLimitStore {
   async disconnect(): Promise<void> {
     await this.redis.quit();
   }
+
+ // RateLimitStore interface methods
+ async check(key: string, options: RateLimitOptions): Promise<RateLimitResult> {
+   const now = Date.now();
+   const redisKey = `ratelimit:${key}`;
+
+   try {
+     const data = await this.get(key);
+
+     if (data.isErr() || !data.value || now >= data.value.resetTime) {
+       // Reset window
+       const newData: RateLimitData = {
+         tokens: options.max - 1,
+         lastRefill: now,
+         resetTime: now + options.windowMs
+       };
+
+       await this.set(key, newData, options.windowMs);
+
+       return {
+         allowed: true,
+         remaining: newData.tokens,
+         resetAt: new Date(newData.resetTime)
+       };
+     }
+
+     const currentData = data.value;
+
+     if (currentData.tokens > 0) {
+       currentData.tokens--;
+       await this.set(key, currentData);
+
+       return {
+         allowed: true,
+         remaining: currentData.tokens,
+         resetAt: new Date(currentData.resetTime)
+       };
+     }
+
+     return {
+       allowed: false,
+       remaining: 0,
+       resetAt: new Date(currentData.resetTime),
+       retryAfter: Math.ceil((currentData.resetTime - now) / 1000)
+     };
+   } catch (error) {
+     // Fallback to allow on Redis errors
+     return {
+       allowed: true,
+       remaining: options.max - 1,
+       resetAt: new Date(now + options.windowMs)
+     };
+   }
+ }
+
+ async reset(key: string): Promise<void> {
+   await this.delete(key);
+ }
+
+ async cleanup(): Promise<void> {
+   // Redis handles TTL automatically, no cleanup needed
+ }
+
+ // Health check method
+ healthCheck(): Promise<boolean> {
+   return this.redis.ping().then(() => true).catch(() => false);
+ }
 }

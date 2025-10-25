@@ -6,7 +6,25 @@ import { eq, and, inArray, desc, sql } from 'drizzle-orm';
 // Import the *combined* preference type, NOT the global one directly
 import type { CombinedBillTrackingPreferences } from './notification-orchestrator.js'; // Adjust path if needed
 import { logger } from '@shared/core';
-import { cacheService, CACHE_KEYS, CACHE_TTL } from './cache-service.js'; // Assuming cache service is here
+import { getDefaultCache } from '@shared/core/src/caching';
+
+// Cache key constants (moved from cache-service.ts)
+const CACHE_KEYS = {
+  USER_ENGAGEMENT_PROFILE: (userId: string) => `user:engagement:${userId}`,
+  USER_PREFERENCES: (userId: string) => `user:preferences:${userId}`,
+  BILL_DATA: (billId: number) => `bill:data:${billId}`,
+  NOTIFICATION_HISTORY: (userId: string) => `notification:history:${userId}`,
+  FILTER_RESULTS: (userId: string, criteriaHash: string) => `filter:results:${userId}:${criteriaHash}`
+};
+
+// Cache TTL constants (moved from cache-service.ts)
+const CACHE_TTL = {
+  USER_DATA_SHORT: 300000,    // 5 minutes
+  USER_DATA_LONG: 86400000,   // 24 hours
+  BILL_DATA: 3600000,         // 1 hour
+  NOTIFICATION_DATA: 1800000, // 30 minutes
+  FILTER_RESULTS: 600000      // 10 minutes
+};
 
 /**
  * Smart Notification Filter Service
@@ -51,8 +69,9 @@ export interface UserEngagementProfile {
 }
 
 export class SmartNotificationFilterService {
-  private get db() { return readDatabase; }
-  private readonly CACHE_DURATION_PROFILE = CACHE_TTL.USER_DATA_LONG; // Cache profile for a day
+   private get db() { return readDatabase; }
+   private readonly CACHE_DURATION_PROFILE = CACHE_TTL.USER_DATA_LONG; // Cache profile for a day
+   private get cacheService() { return getDefaultCache(); }
 
   /**
    * Main filtering method: Determines if a notification should proceed based on various checks.
@@ -477,7 +496,7 @@ export class SmartNotificationFilterService {
   private async getUserEngagementProfile(userId: string): Promise<UserEngagementProfile> {
     const cacheKey = CACHE_KEYS.USER_ENGAGEMENT_PROFILE(userId);
     try {
-        const cachedProfile = await cacheService.get(cacheKey);
+        const cachedProfile = await this.cacheService.get(cacheKey);
         if (cachedProfile) {
             logger.debug(`Cache hit for engagement profile: ${cacheKey}`);
             return cachedProfile;
@@ -485,7 +504,7 @@ export class SmartNotificationFilterService {
         logger.debug(`Cache miss for engagement profile: ${cacheKey}`);
 
         const profile = await this.buildEngagementProfile(userId);
-        await cacheService.set(cacheKey, profile, this.CACHE_DURATION_PROFILE);
+        await this.cacheService.set(cacheKey, profile, this.CACHE_DURATION_PROFILE);
         return profile;
     } catch(error) {
          logger.error(`Error getting/building engagement profile for user ${userId}:`, { component: 'SmartFilter' }, error);
@@ -673,7 +692,7 @@ export class SmartNotificationFilterService {
   /** Clears the engagement profile cache for a specific user */
   clearUserCache(userId: string): void {
       const cacheKey = CACHE_KEYS.USER_ENGAGEMENT_PROFILE(userId);
-      cacheService.delete(cacheKey)
+      this.cacheService.delete(cacheKey)
           .then(() => logger.debug(`Cleared engagement profile cache for user ${userId}`, { component: 'SmartFilter' }))
           .catch(err => logger.error(`Error clearing engagement profile cache for user ${userId}:`, { component: 'SmartFilter' }, err));
   }

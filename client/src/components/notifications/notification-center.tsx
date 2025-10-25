@@ -6,13 +6,13 @@ import {
   Clock, 
   AlertCircle 
 } from 'lucide-react';
-import { Button } from '..\ui\button';
-import { Badge } from '..\ui\badge';
-import { Card, CardContent, CardHeader, CardTitle } from '..\ui\card';
-import { ScrollArea } from '..\ui\scroll-area';
-import { Popover, PopoverContent, PopoverTrigger } from '..\ui\popover';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { ScrollArea } from '../ui/scroll-area';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '../../utils/browser-logger';
 
 interface Notification {
   id: number;

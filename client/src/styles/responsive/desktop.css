@@ -1,0 +1,40 @@
+/* Desktop Styles (1025px+) */
+
+@import '../base/variables.css';
+
+@media (min-width: 1025px) {
+  .chanuka-container {
+    padding: 0 var(--space-xl);
+  }
+
+  /* Desktop hover effects */
+  .chanuka-card:hover {
+    transform: translateY(-4px);
+  }
+
+  .chanuka-btn:hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* Large Desktop Styles (1280px+) */
+@media (min-width: 1280px) {
+  .chanuka-container {
+    max-width: 1280px;
+  }
+
+  .chanuka-grid {
+    gap: var(--space-xl);
+  }
+}
+
+/* Ultra-wide Styles (1536px+) */
+@media (min-width: 1536px) {
+  .chanuka-container {
+    max-width: 1536px;
+  }
+
+  .chanuka-grid {
+    gap: var(--space-2xl);
+  }
+}

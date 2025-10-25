@@ -6,8 +6,8 @@ import {
   rebuildSearchIndexes,
   getSearchIndexHealth,
 } from '../application/SearchService';
-import { ApiSuccess, ApiError, ApiValidationError } from '../../../../shared/core/src/utilities/api';
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { ApiSuccess, ApiError, ApiValidationError } from '../../../../shared/core/src/utils/api';
+import { logger } from '@shared/core';
 
 const router = Router();
 

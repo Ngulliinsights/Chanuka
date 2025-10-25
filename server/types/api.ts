@@ -32,13 +32,13 @@ export type {
   RegisterRequest,
   AuthResponse,
   HealthCheckResponse
-} from '../../shared/types/common.js';
+} from '@shared/types/common.js';
 
 // Legacy types for backward compatibility
 
 // Legacy functions for backward compatibility (deprecated)
 
-import type { ApiResponse, ErrorResponse, ResponseMetadata } from '../../shared/types/common.js';
+import type { ApiResponse, ErrorResponse, ResponseMetadata } from '@shared/types/common.js';
 
 /**
  * @deprecated Use ApiResponseWrapper from server/utils/api-response.ts instead.

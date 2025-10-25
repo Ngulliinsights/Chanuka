@@ -4,8 +4,8 @@ import { bills, billSponsorships, sponsors, sponsorTransparency, sponsorAffiliat
 import { eq, desc, count, sql, and } from 'drizzle-orm';
 import { asyncHandler } from '../../../shared/core/src/observability/error-management/middleware/async-handler.js';
 import { SponsorshipAnalysisService } from '../application/sponsorship-analysis.service.ts';
-import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../../shared/core/src/utilities/api/index.js";
-import { logger } from '../../../shared/core/src/observability/logging/index.js';
+import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../../shared/core/src/utils/api/index.js";
+import { logger } from '@shared/core';
 
 const router = Router();
 

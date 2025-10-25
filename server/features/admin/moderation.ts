@@ -1,9 +1,9 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
-import { ApiSuccess, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utilities/api";
+import { ApiSuccess, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utils/api";
 import { contentModerationService } from "./content-moderation.js";
 import { authenticateToken, requireRole } from "../../middleware/auth.js";
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 export const router = Router();
 

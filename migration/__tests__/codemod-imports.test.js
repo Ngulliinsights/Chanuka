@@ -1,30 +1,31 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 const { processFile, runMigration } = require('../scripts/codemod-imports');
 const fs = require('fs');
 const path = require('path');
 
 // Mock fs and glob
-jest.mock('fs');
-jest.mock('glob', () => ({
-  glob: jest.fn()
+vi.mock('fs');
+vi.mock('glob', () => ({
+  glob: vi.fn()
 }));
 
 const { glob } = require('glob');
 
 describe('Codemod Imports', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('processFile', () => {
     it('should update ES6 import statements', () => {
       const mockContent = `
-import { ErrorHandler } from 'shared/core/error-handling/';
-import { Validator } from 'shared/core/validation/';
+import { ErrorHandler } from '@shared/core/error-handling/';
+import { Validator } from '@shared/core/validation/';
       `.trim();
 
       const expectedContent = `
-import { ErrorHandler } from 'shared/core/error-management/';
-import { Validator } from 'shared/core/validation/';
+import { ErrorHandler } from '@shared/core/error-management/';
+import { Validator } from '@shared/core/validation/';
       `.trim();
 
       fs.readFileSync.mockReturnValue(mockContent);
@@ -61,7 +62,7 @@ const { Validator } = require('shared/core/validation/');
 
     it('should return false when no changes are made', () => {
       const mockContent = `
-import { SomeUtil } from 'shared/core/utils/';
+import { SomeUtil } from '@shared/core/utils/';
       `.trim();
 
       fs.readFileSync.mockReturnValue(mockContent);
@@ -78,7 +79,7 @@ import { SomeUtil } from 'shared/core/utils/';
         throw new Error('File not found');
       });
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       const result = processFile('nonexistent.ts');
 
@@ -97,11 +98,11 @@ import { SomeUtil } from 'shared/core/utils/';
       const mockFiles = ['file1.ts', 'file2.js', 'file3.tsx'];
 
       glob.mockResolvedValue(mockFiles);
-      fs.readFileSync.mockReturnValue('import {} from "shared/core/error-handling/";');
+      fs.readFileSync.mockReturnValue('import {} from '@shared/core/error-handling/";');
       fs.writeFileSync.mockImplementation(() => {});
       fs.existsSync.mockReturnValue(false);
 
-      const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       await runMigration();
 
@@ -116,7 +117,7 @@ import { SomeUtil } from 'shared/core/utils/';
     it('should handle glob errors', async () => {
       glob.mockRejectedValue(new Error('Glob error'));
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
       await expect(runMigration()).rejects.toThrow('Glob error');
 

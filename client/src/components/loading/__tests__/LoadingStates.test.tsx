@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * LoadingStates component tests
  * Following navigation component patterns for testing
@@ -19,10 +20,10 @@ import {
   ListSkeleton,
 } from '../LoadingStates';
 import { LoadingError, LoadingStageError } from '../errors';
-import { createCommonStages } from '../utils/loading-utils';
+import { createCommonStages } from '@/utils/loading-utils';
 
 // Mock hooks
-jest.mock('../hooks/useLoadingRecovery', () => ({
+vi.mock('../hooks/useLoadingRecovery', () => ({
   useLoadingRecovery: () => ({
     recoveryState: {
       canRecover: true,
@@ -31,12 +32,12 @@ jest.mock('../hooks/useLoadingRecovery', () => ({
       recoveryAttempts: 0,
       maxRecoveryAttempts: 3,
     },
-    recover: jest.fn().mockResolvedValue(true),
-    updateError: jest.fn(),
+    recover: vi.fn().mockResolvedValue(true),
+    updateError: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useConnectionAware', () => ({
+vi.mock('@/hooks/useConnectionAware', () => ({
   useConnectionAware: () => ({
     connectionType: 'fast',
     effectiveType: '4g',
@@ -45,21 +46,21 @@ jest.mock('@/hooks/useConnectionAware', () => ({
   }),
 }));
 
-jest.mock('@/hooks/use-online-status', () => ({
+vi.mock('@/hooks/use-online-status', () => ({
   useOnlineStatus: () => true,
 }));
 
 // Mock logger
-jest.mock('../utils/logger.js', () => ({
+vi.mock('../utils/logger.js', () => ({
   logger: {
-    warn: jest.fn(),
-    error: jest.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
 describe('LoadingStates Components', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('PageLoader', () => {
@@ -248,7 +249,7 @@ describe('LoadingStates Components', () => {
     });
 
     it('should show retry button for failed retryable stages', () => {
-      const onStageError = jest.fn();
+      const onStageError = vi.fn();
       const retryableStages = [
         { id: 'test', message: 'Test stage', retryable: true },
       ];
@@ -273,12 +274,14 @@ describe('LoadingStates Components', () => {
 
   describe('TimeoutAwareLoader', () => {
     beforeEach(() => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
     });
 
     afterEach(() => {
-      jest.useRealTimers();
-    });
+    cleanup();
+      vi.useRealTimers();
+    
+  });
 
     it('should render loading state initially', () => {
       render(<TimeoutAwareLoader timeout={5000} />);
@@ -291,18 +294,18 @@ describe('LoadingStates Components', () => {
       
       // Advance to 70% of timeout (7 seconds)
       act(() => {
-        jest.advanceTimersByTime(7000);
+        vi.advanceTimersByTime(7000);
       });
       
       expect(screen.getByText('Taking too long...')).toBeInTheDocument();
     });
 
     it('should show timeout state after timeout', () => {
-      const onTimeout = jest.fn();
+      const onTimeout = vi.fn();
       render(<TimeoutAwareLoader timeout={5000} onTimeout={onTimeout} />);
       
       act(() => {
-        jest.advanceTimersByTime(5000);
+        vi.advanceTimersByTime(5000);
       });
       
       expect(screen.getByText('Loading timeout')).toBeInTheDocument();
@@ -313,7 +316,7 @@ describe('LoadingStates Components', () => {
       render(<TimeoutAwareLoader timeout={10000} />);
       
       act(() => {
-        jest.advanceTimersByTime(8000);
+        vi.advanceTimersByTime(8000);
       });
       
       expect(screen.getByText('8s elapsed')).toBeInTheDocument();
@@ -331,7 +334,7 @@ describe('LoadingStates Components', () => {
 
     it('should adapt message for slow connection', () => {
       // Mock slow connection
-      jest.mocked(require('@/hooks/useConnectionAware').useConnectionAware).mockReturnValue({
+      vi.mocked(require('@/hooks/useConnectionAware').useConnectionAware).mockReturnValue({
         connectionType: 'slow',
         effectiveType: '2g',
         downlink: 0.5,
@@ -344,7 +347,7 @@ describe('LoadingStates Components', () => {
     });
 
     it('should show offline state', () => {
-      jest.mocked(require('@/hooks/use-online-status').useOnlineStatus).mockReturnValue(false);
+      vi.mocked(require('@/hooks/use-online-status').useOnlineStatus).mockReturnValue(false);
 
       render(<NetworkAwareLoader />);
       
@@ -361,7 +364,7 @@ describe('LoadingStates Components', () => {
     });
 
     it('should render error state with retry button', () => {
-      const onRetry = jest.fn();
+      const onRetry = vi.fn();
       const error = new Error('Test error');
       
       render(
@@ -485,7 +488,7 @@ describe('LoadingStates Components', () => {
     });
 
     it('should be keyboard accessible for interactive elements', () => {
-      const onRetry = jest.fn();
+      const onRetry = vi.fn();
       render(
         <LoadingStateManager 
           type="component" 
@@ -517,7 +520,7 @@ describe('LoadingStates Components', () => {
 
   describe('Performance', () => {
     it('should not cause unnecessary re-renders', () => {
-      const renderSpy = jest.fn();
+      const renderSpy = vi.fn();
       
       const TestComponent = () => {
         renderSpy();

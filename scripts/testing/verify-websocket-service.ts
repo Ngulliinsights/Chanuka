@@ -1,8 +1,8 @@
-import { webSocketService } from '../../server/infrastructure/websocket.js';
+import { webSocketService } from '@server/infrastructure/websocket.js';
 import { createServer } from 'http';
 import WebSocket from 'ws';
 import jwt from 'jsonwebtoken';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 /**
  * Comprehensive verification suite for the enhanced WebSocket service.

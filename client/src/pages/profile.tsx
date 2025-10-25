@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import AppLayout from '..\components\layout\app-layout';
-import { Card, CardContent } from '..\components\ui\card';
-import { Switch } from '..\components\ui\switch';
-import { useAuth } from '..\hooks\use-auth';
-import { logger } from '..\utils\browser-logger';
+import AppLayout from '../components/layout/app-layout';
+import { Card, CardContent } from '../components/ui/card';
+import { Switch } from '../components/ui/switch';
+import { useAuth } from '../hooks/use-auth';
+import { logger } from '../utils/browser-logger';
+import { ThemeToggle } from '../components/ui/theme-toggle';
 
 export default function Profile() {
   const { user } = useAuth();
-  const [darkMode, setDarkMode] = useState(false);
   const [emailDigest, setEmailDigest] = useState(true);
   const [billUpdates, setBillUpdates] = useState(true);
   const [commentResponses, setCommentResponses] = useState(true);
@@ -68,16 +68,12 @@ export default function Profile() {
               <div data-testid="profile-preferences">
                 <h3 className="text-lg font-medium">Preferences</h3>
                 <div className="mt-2 space-y-3">
-                  <div className="flex items-center justify-between" data-testid="profile-dark-mode">
+                  <div className="flex items-center justify-between" data-testid="profile-theme">
                     <div>
-                      <h4 className="font-medium">Dark Mode</h4>
-                      <p className="text-sm text-slate-500">Enable dark mode theme</p>
+                      <h4 className="font-medium">Theme</h4>
+                      <p className="text-sm text-slate-500">Choose your preferred theme</p>
                     </div>
-                    <Switch
-                      checked={darkMode}
-                      onCheckedChange={setDarkMode}
-                      data-testid="profile-dark-mode-switch"
-                    />
+                    <ThemeToggle variant="dropdown" size="sm" />
                   </div>
                   <div className="flex items-center justify-between" data-testid="profile-email-digest">
                     <div>

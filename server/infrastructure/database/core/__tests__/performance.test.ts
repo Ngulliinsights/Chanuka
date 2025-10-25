@@ -1,47 +1,48 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { jest } from '@jest/globals';
 import { PoolClient } from 'pg';
 import { createConnectionManager, ConnectionManager } from '../connection-manager';
 import { getMonitoringService, resetMonitoringService } from '../../../monitoring/monitoring';
 
 // Mock the shared pool and its dependencies
-jest.mock('../../../../../shared/database/pool', () => ({
+vi.mock('../../../../../shared/database/pool', () => ({
   pool: {
-    connect: jest.fn(),
-    on: jest.fn(),
-    getMetrics: jest.fn(),
+    connect: vi.fn(),
+    on: vi.fn(),
+    getMetrics: vi.fn(),
     circuitBreaker: {
-      getState: jest.fn(),
-      getFailureCount: jest.fn(),
-      execute: jest.fn(),
+      getState: vi.fn(),
+      getFailureCount: vi.fn(),
+      execute: vi.fn(),
     },
     totalCount: 10,
     idleCount: 5,
     waitingCount: 2,
   },
-  checkPoolHealth: jest.fn(),
+  checkPoolHealth: vi.fn(),
 }));
 
 import { pool, checkPoolHealth } from '../../../../../shared/database/pool';
 
 describe('ConnectionManager Performance Tests', () => {
   let manager: ConnectionManager;
-  let mockClient: jest.Mocked<PoolClient>;
+  let mockClient: vi.Mocked<PoolClient>;
 
   beforeEach(() => {
     resetMonitoringService();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Setup mock client
     mockClient = {
-      query: jest.fn(),
-      release: jest.fn(),
-      on: jest.fn(),
-      off: jest.fn(),
+      query: vi.fn(),
+      release: vi.fn(),
+      on: vi.fn(),
+      off: vi.fn(),
     } as any;
 
     // Setup mock pool
-    (pool.connect as jest.Mock).mockResolvedValue(mockClient);
-    (pool.getMetrics as jest.Mock).mockResolvedValue({
+    (pool.connect as vi.Mock).mockResolvedValue(mockClient);
+    (pool.getMetrics as vi.Mock).mockResolvedValue({
       queries: 100,
       connections: 10,
       idleConnections: 5,
@@ -51,11 +52,11 @@ describe('ConnectionManager Performance Tests', () => {
       maxQueryTime: 100,
       minQueryTime: 10,
     });
-    (pool.circuitBreaker.getState as jest.Mock).mockReturnValue('CLOSED');
-    (pool.circuitBreaker.getFailureCount as jest.Mock).mockReturnValue(0);
+    (pool.circuitBreaker.getState as vi.Mock).mockReturnValue('CLOSED');
+    (pool.circuitBreaker.getFailureCount as vi.Mock).mockReturnValue(0);
 
     // Setup mock health check
-    (checkPoolHealth as jest.Mock).mockResolvedValue({
+    (checkPoolHealth as vi.Mock).mockResolvedValue({
       isHealthy: true,
       totalConnections: 10,
       idleConnections: 5,
@@ -180,7 +181,7 @@ describe('ConnectionManager Performance Tests', () => {
       // Measure time without metrics (simulate by mocking monitoring to do nothing)
       const monitoring = getMonitoringService();
       const originalRecordMetric = monitoring.recordDatabaseMetric;
-      monitoring.recordDatabaseMetric = jest.fn(); // No-op
+      monitoring.recordDatabaseMetric = vi.fn(); // No-op
 
       const iterations = 100;
       let totalTimeWithoutMetrics = 0;

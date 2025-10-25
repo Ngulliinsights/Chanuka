@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { billComprehensiveAnalysisService, BillComprehensiveAnalysisService } from '../bill-comprehensive-analysis.service';
 import { constitutionalAnalysisService } from '../constitutional-analysis.service';
 import { stakeholderAnalysisService } from '../stakeholder-analysis.service';
@@ -9,19 +10,19 @@ import { readDatabase } from '@shared/database/connection'; // Mock DB for spons
 import * as schema from '../../../../../shared/schema';
 
 // --- Mock Dependencies ---
-jest.mock('../../../../db', () => ({ readDatabase: jest.fn() }));
-jest.mock('../constitutional-analysis.service');
-jest.mock('../stakeholder-analysis.service');
-jest.mock('../transparency-analysis.service');
-jest.mock('../public-interest-analysis.service');
-jest.mock('../../../sponsors/application/sponsor-conflict-analysis.service'); // Updated path
-jest.mock('../../infrastructure/repositories/analysis-repository-impl');
+vi.mock('../../../../db', () => ({ readDatabase: vi.fn() }));
+vi.mock('../constitutional-analysis.service');
+vi.mock('../stakeholder-analysis.service');
+vi.mock('../transparency-analysis.service');
+vi.mock('../public-interest-analysis.service');
+vi.mock('../../../sponsors/application/sponsor-conflict-analysis.service'); // Updated path
+vi.mock('../../infrastructure/repositories/analysis-repository-impl');
 
 // Mock DB return for fetching sponsors
 const mockDb = {
-    select: jest.fn().mockReturnThis(),
-    from: jest.fn().mockReturnThis(),
-    where: jest.fn().mockResolvedValue([{ sponsorId: 10 }]), // Mock returning one sponsor
+    select: vi.fn().mockReturnThis(),
+    from: vi.fn().mockReturnThis(),
+    where: vi.fn().mockResolvedValue([{ sponsorId: 10 }]), // Mock returning one sponsor
 };
 
 describe('BillComprehensiveAnalysisService', () => {
@@ -40,19 +41,19 @@ describe('BillComprehensiveAnalysisService', () => {
 
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (readDatabase as jest.Mock).mockReturnValue(mockDb);
+    vi.clearAllMocks();
+    (readDatabase as vi.Mock).mockReturnValue(mockDb);
 
     // Setup mocks for sub-services
-    (constitutionalAnalysisService.analyzeBill as jest.Mock).mockResolvedValue(mockConstitutionalResult);
-    (stakeholderAnalysisService.analyzeBill as jest.Mock).mockResolvedValue(mockStakeholderResult);
+    (constitutionalAnalysisService.analyzeBill as vi.Mock).mockResolvedValue(mockConstitutionalResult);
+    (stakeholderAnalysisService.analyzeBill as vi.Mock).mockResolvedValue(mockStakeholderResult);
     // Mock the conflict detection specifically used within the orchestrator
-     (sponsorConflictAnalysisService.detectConflicts as jest.Mock).mockResolvedValue(mockConflictDetectionResult); // Mock the underlying call
-    (transparencyAnalysisService.calculateScore as jest.Mock).mockResolvedValue(mockTransparencyResult);
-    (publicInterestAnalysisService.calculateScore as jest.Mock).mockResolvedValue(mockPublicInterestResult);
+     (sponsorConflictAnalysisService.detectConflicts as vi.Mock).mockResolvedValue(mockConflictDetectionResult); // Mock the underlying call
+    (transparencyAnalysisService.calculateScore as vi.Mock).mockResolvedValue(mockTransparencyResult);
+    (publicInterestAnalysisService.calculateScore as vi.Mock).mockResolvedValue(mockPublicInterestResult);
 
     // Mock the repository save method
-    (analysisRepository.save as jest.Mock).mockResolvedValue(mockAnalysisRecord);
+    (analysisRepository.save as vi.Mock).mockResolvedValue(mockAnalysisRecord);
 
     service = billComprehensiveAnalysisService; // Or new BillComprehensiveAnalysisService()
   });
@@ -86,8 +87,8 @@ describe('BillComprehensiveAnalysisService', () => {
 
   it('should generate recommendations based on results', async () => {
     // Arrange: Mock sub-services to return values triggering specific recommendations
-     (constitutionalAnalysisService.analyzeBill as jest.Mock).mockResolvedValue({ ...mockConstitutionalResult, riskAssessment: 'high' });
-     (transparencyAnalysisService.calculateScore as jest.Mock).mockResolvedValue({ ...mockTransparencyResult, overall: 55, grade: 'F' });
+     (constitutionalAnalysisService.analyzeBill as vi.Mock).mockResolvedValue({ ...mockConstitutionalResult, riskAssessment: 'high' });
+     (transparencyAnalysisService.calculateScore as vi.Mock).mockResolvedValue({ ...mockTransparencyResult, overall: 55, grade: 'F' });
 
     // Act
     const result = await service.analyzeBill(mockBillId);
@@ -121,7 +122,7 @@ describe('BillComprehensiveAnalysisService', () => {
    it('should handle failure in a sub-service using Promise.allSettled', async () => {
         // Arrange: Make one service fail
         const failureReason = new Error("Constitutional analysis API failed");
-        (constitutionalAnalysisService.analyzeBill as jest.Mock).mockRejectedValue(failureReason);
+        (constitutionalAnalysisService.analyzeBill as vi.Mock).mockRejectedValue(failureReason);
 
         // Act
         const result = await service.analyzeBill(mockBillId);

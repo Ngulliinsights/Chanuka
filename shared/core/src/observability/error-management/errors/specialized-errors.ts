@@ -11,18 +11,50 @@ import { BaseError, ErrorDomain, ErrorSeverity, BaseErrorOptions } from './base-
  * Validation Error - for input validation failures
  */
 export class ValidationError extends BaseError {
-  constructor(message: string, errors?: any[], details?: Record<string, any>) {
+  public readonly errors: Array<{
+    field?: string;
+    code: string;
+    message: string;
+    value?: unknown;
+  }>;
+
+  constructor(messageOrZodError: string | any, errors?: any[], details?: Record<string, any>) {
+    let message: string;
+    let validationErrors: Array<{
+      field?: string;
+      code: string;
+      message: string;
+      value?: unknown;
+    }>;
+
+    // Handle ZodError input
+    if (typeof messageOrZodError === 'object' && messageOrZodError?.issues) {
+      message = 'Validation failed';
+      validationErrors = messageOrZodError.issues.map((issue: any) => ({
+        field: issue.path?.join('.') || '',
+        code: issue.code || 'invalid',
+        message: issue.message || 'Invalid value',
+        value: issue.received
+      }));
+    } else {
+      // Handle string message + errors array
+      message = messageOrZodError;
+      validationErrors = errors || [];
+    }
+
     super(message, {
       statusCode: 400,
       code: 'VALIDATION_ERROR',
       details: { 
-        errors: errors || [],
+        errors: validationErrors,
         ...details 
       },
       isOperational: true,
       domain: ErrorDomain.VALIDATION,
       severity: ErrorSeverity.LOW,
     });
+
+    this.errors = validationErrors;
   }
 }
 

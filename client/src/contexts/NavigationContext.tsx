@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ResponsiveNavigationProvider } from './ResponsiveNavigationContext';
 import { useAuth } from '../hooks/use-auth';
 import { logger } from '../utils/browser-logger';
+import { NavigationPreferences } from '../types/navigation';
 
 // Types (inline to avoid import issues)
 export type NavigationSection = 'legislative' | 'community' | 'admin' | 'user' | 'system';
@@ -28,12 +29,7 @@ export interface RecentPage {
   visitCount: number;
 }
 
-export interface NavigationPreferences {
-  defaultLandingPage: string;
-  favoritePages: string[];
-  recentlyVisited: RecentPage[];
-  compactMode: boolean;
-}
+
 
 export interface NavigationState {
   currentPath: string;
@@ -187,6 +183,8 @@ const initialState: NavigationState = {
     favoritePages: [],
     recentlyVisited: [],
     compactMode: false,
+    showBreadcrumbs: true,
+    autoExpand: false,
   },
 };
 
@@ -305,6 +303,8 @@ function navigationReducer(state: NavigationState, action: NavigationAction): Na
           favoritePages: [],
           recentlyVisited: [],
           compactMode: false,
+          showBreadcrumbs: true,
+          autoExpand: false,
         },
         sidebarOpen: false,
         mobileMenuOpen: false,

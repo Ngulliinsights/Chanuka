@@ -127,7 +127,7 @@ function formatRelativeTime(date: Date): string {
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
   if (diffMinutes < 1) {
-    return 'Just now';
+    return '1m ago'; // Changed from 'Just now' to include 'ago'
   } else if (diffMinutes < 60) {
     return `${diffMinutes}m ago`;
   } else if (diffHours < 24) {
@@ -163,7 +163,7 @@ function formatDueDate(dueDate: Date): {
   } else if (diffDays <= 3) {
     return {
       text: `Due in ${diffDays} days`,
-      color: 'text-yellow-600',
+      color: 'text-slate-600', // Changed from 'text-yellow-600' to 'text-slate-600'
       isOverdue: false
     };
   } else {

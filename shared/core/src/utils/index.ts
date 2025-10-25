@@ -5,6 +5,12 @@
 
 // ==================== Consolidated Utility Modules ====================
 
+// API utilities - response handling, error formatting, status codes
+export * from './api-utils';
+
+// Cache utilities - caching decorators, metrics, management
+export * from './cache-utils';
+
 // Async utilities - debouncing, throttling, retry logic, concurrency control
 export * from './async-utils';
 
@@ -25,6 +31,9 @@ export * from './string-utils';
 
 // Type guards - runtime type checking and validation
 export * from './type-guards';
+
+// Browser logger - client-side logging utility
+export * from './browser-logger';
 
 // ==================== Legacy/Existing Utilities ====================
 

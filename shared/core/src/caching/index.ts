@@ -49,20 +49,22 @@ export type {
 export { BaseCacheAdapter } from './core/base-adapter.js';
 
 // Cache adapters
-export { MemoryAdapter, type MemoryAdapterConfig } from './adapters/memory-adapter.js';
+import { MemoryAdapter, type MemoryAdapterConfig } from './adapters/memory-adapter.js';
+export { MemoryAdapter, type MemoryAdapterConfig };
 
 // Export CacheService as an alias for MemoryAdapter for backward compatibility
-export { MemoryAdapter as CacheService } from './adapters/memory-adapter';
+// export { MemoryAdapter as CacheService } from './adapters/memory-adapter';
 
 // Enhanced cache wrappers with circuit breaker and single-flight patterns
-export { SingleFlightCache } from './single-flight-cache';
+import { SingleFlightCache } from './single-flight-cache';
+export { SingleFlightCache };
 
 // Cache utilities
 export { CacheKeys as CacheKeyGenerator } from './key-generator';
 
 // Cache factory function
-export function createCacheService(config: CacheConfig): CacheService {
-  let baseAdapter: CacheAdapter;
+export function createCacheService(config: any): any {
+  let baseAdapter: any;
 
   switch (config.provider) {
     case 'memory':
@@ -73,42 +75,6 @@ export function createCacheService(config: CacheConfig): CacheService {
         defaultTtlSec: config.defaultTtlSec,
         enableCompression: config.enableCompression,
         compressionThreshold: config.compressionThreshold,
-      });
-      break;
-
-    case 'redis':
-      baseAdapter = new RedisAdapter({
-        redisUrl: config.redisUrl!,
-        maxMemoryMB: config.maxMemoryMB,
-        enableMetrics: config.enableMetrics,
-        keyPrefix: config.keyPrefix,
-        defaultTtlSec: config.defaultTtlSec,
-        enableCompression: config.enableCompression,
-        compressionThreshold: config.compressionThreshold,
-      });
-      break;
-
-    case 'multi-tier':
-      baseAdapter = new MultiTierAdapter({
-        l1Config: {
-          maxMemoryMB: config.l1MaxSizeMB || Math.floor(config.maxMemoryMB * 0.2),
-          enableMetrics: config.enableMetrics,
-          keyPrefix: config.keyPrefix,
-          defaultTtlSec: config.defaultTtlSec,
-          enableCompression: false, // Disable compression for L1
-          compressionThreshold: config.compressionThreshold,
-        },
-        l2Config: {
-          redisUrl: config.redisUrl!,
-          maxMemoryMB: config.maxMemoryMB,
-          enableMetrics: config.enableMetrics,
-          keyPrefix: config.keyPrefix,
-          defaultTtlSec: config.defaultTtlSec,
-          enableCompression: config.enableCompression,
-          compressionThreshold: config.compressionThreshold,
-        },
-        enableMetrics: config.enableMetrics,
-        keyPrefix: config.keyPrefix,
       });
       break;
 
@@ -129,12 +95,12 @@ export function createCacheService(config: CacheConfig): CacheService {
 }
 
 // Default cache instance (will be configured by ConfigManager)
-let defaultCacheInstance: CacheService | null = null;
+let defaultCacheInstance: any | null = null;
 
 /**
  * Get the default cache instance
  */
-export function getDefaultCache(): CacheService {
+export function getDefaultCache(): any {
   if (!defaultCacheInstance) {
     throw new Error('Default cache not initialized. Call initializeDefaultCache() first.');
   }
@@ -144,7 +110,7 @@ export function getDefaultCache(): CacheService {
 /**
  * Initialize the default cache instance
  */
-export function initializeDefaultCache(config: CacheConfig): CacheService {
+export function initializeDefaultCache(config: any): any {
   defaultCacheInstance = createCacheService(config);
   return defaultCacheInstance;
 }
@@ -266,7 +232,7 @@ export function InvalidateCache(options: {
 
 // Utility functions for cache warming and management
 export class CacheManager {
-  constructor(private cache: CacheService) {}
+  constructor(private cache: any) {}
 
   /**
    * Warm up cache with predefined data
@@ -295,14 +261,14 @@ export class CacheManager {
   /**
    * Get cache statistics
    */
-  getStats(): CacheMetrics | undefined {
+  getStats(): any | undefined {
     return this.cache.getMetrics?.();
   }
 
   /**
    * Get cache health status
    */
-  async getHealth(): Promise<CacheHealthStatus | undefined> {
+  async getHealth(): Promise<any | undefined> {
     if (this.cache.getHealth) {
       return await this.cache.getHealth();
     }
@@ -335,7 +301,7 @@ export class CacheManager {
 /**
  * Create a cache manager instance
  */
-export function createCacheManager(cache?: CacheService): CacheManager {
+export function createCacheManager(cache?: any): CacheManager {
   return new CacheManager(cache || getDefaultCache());
 }
 

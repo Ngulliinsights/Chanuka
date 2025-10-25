@@ -1,8 +1,8 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '..\components\ui\card';
-import { Button } from '..\components\ui\button';
-import { Badge } from '..\components\ui\badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '..\components\ui\tabs';
-import { Alert, AlertDescription } from '..\components\ui\alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Alert, AlertDescription } from '../components/ui/alert';
 import { 
   Database, 
   AlertTriangle, 
@@ -12,9 +12,9 @@ import {
   HardDrive,
   FileText
 } from "lucide-react";
-import { useSystemHealth, useSystemStats, useSystemSchema } from '..\hooks\use-system';
+import { useSystemHealth, useSystemStats, useSystemSchema } from '../hooks/use-system';
 import { Link } from "wouter";
-import { logger } from '..\utils\browser-logger';
+import { logger } from '../utils/browser-logger';
 
 export default function DatabaseManager() {
   const { data: health, isLoading: healthLoading } = useSystemHealth();

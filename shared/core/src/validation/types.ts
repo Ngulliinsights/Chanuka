@@ -25,15 +25,24 @@ export class ValidationError extends Error {
   public readonly statusCode = 422;
   public readonly isOperational = true;
 
-  constructor(zodError: ZodError) {
-    const errors: ValidationErrorDetail[] = zodError.errors.map((error) => ({
-      field: error.path.join('.'),
-      message: error.message,
-      code: error.code,
-      received: error.received,
-    }));
+  constructor(zodErrorOrMessage: ZodError | string, customErrors?: ValidationErrorDetail[]) {
+    let errors: ValidationErrorDetail[];
+    let message: string;
 
-    super(`Validation failed: ${errors.map(e => e.field).join(', ')}`);
+    if (typeof zodErrorOrMessage === 'string') {
+      message = zodErrorOrMessage;
+      errors = customErrors || [];
+    } else {
+      errors = zodErrorOrMessage.errors.map((error) => ({
+        field: error.path.join('.'),
+        message: error.message,
+        code: error.code,
+        received: 'received' in error ? error.received : undefined,
+      }));
+      message = `Validation failed: ${errors.map(e => e.field).join(', ')}`;
+    }
+
+    super(message);
     this.name = 'ValidationError';
     this.errors = errors;
 
@@ -95,6 +104,15 @@ export interface ValidationResult<T> {
   success: boolean;
   data?: T;
   error?: ValidationError;
+}
+
+/**
+ * Legacy validation result for backward compatibility
+ */
+export interface LegacyValidationResult<T> {
+  valid: boolean;
+  data?: T;
+  error?: string;
 }
 
 /**

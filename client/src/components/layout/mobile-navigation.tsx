@@ -10,17 +10,19 @@ import {
   LogOut,
   Bell
 } from 'lucide-react';
+import { cn } from '../../lib/utils';
+import { logger } from '../../utils/browser-logger';
 import { MobileTouchHandler, MobileTouchUtils } from '../../utils/mobile-touch-handler';
-import { Button } from '..\ui\button';
-import { Sheet, SheetContent, SheetTrigger } from '..\ui\sheet';
-import { Badge } from '..\ui\badge';
-import { Separator } from '..\ui\separator';
+import { Button } from '../ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
+import { Badge } from '../ui/badge';
+import { Separator } from '../ui/separator';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useLocation } from 'react-router-dom';
-import NotificationCenter from '..\notifications\notification-center';
-import NavigationPreferencesDialog from '..\navigation\navigation-preferences-dialog';
-import QuickAccessNav from '..\navigation\quick-access-nav';
-import { useNavigationPreferences } from '..\..\hooks\use-navigation-preferences';
+import NotificationCenter from '../notifications/notification-center';
+import NavigationPreferencesDialog from '../navigation/navigation-preferences-dialog';
+import QuickAccessNav from '../navigation/quick-access-nav';
+import { useNavigationPreferences } from '../../hooks/use-navigation-preferences';
 import { 
   ResponsiveLayoutProvider, 
   useResponsiveLayoutContext, 
@@ -58,6 +60,17 @@ interface NavigationItem {
 
 interface AuthResponse {
   user: User;
+}
+
+interface MobileNavigationContentProps {
+  isOpen: boolean;
+  onClose: () => void;
+  navigationItems: NavigationItem[];
+  user: User | null;
+  onLogout: () => void;
+  className?: string;
+  enableSwipeGestures: boolean;
+  enableTouchOptimization: boolean;
 }
 
 
@@ -312,49 +325,21 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   }
 };
 
-const MobileNavigationContent: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
+  isOpen,
+  onClose,
+  navigationItems,
+  user,
+  onLogout,
+  className,
+  enableSwipeGestures,
+  enableTouchOptimization
+}) => {
   const location = useLocation();
   const { touchOptimized, isMobile } = useResponsiveLayoutContext();
 
   const headerRef = useRef<HTMLDivElement>(null);
   const bottomNavRef = useRef<HTMLDivElement>(null);
-
-  // Memoized API functions to prevent recreation on every render
-  const fetchUser = useCallback(async (): Promise<User | null> => {
-    const token = localStorage.getItem('token');
-    if (!token) return null;
-    
-    try {
-      const response = await fetch('/api/auth/verify', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!response.ok) return null;
-      
-      const data: AuthResponse = await response.json();
-      return data.user;
-    } catch (error) {
-      logger.error('Failed to fetch user:', { component: 'Chanuka' }, error);
-      return null;
-    }
-  }, []);
-
-  // Optimized queries with proper error handling
-  const { data: user } = useQuery({
-    queryKey: ['auth', 'user'],
-    queryFn: fetchUser,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 2,
-  });
-
-  // Memoized logout handler to prevent recreation
-  const handleLogout = useCallback(() => {
-    localStorage.removeItem('token');
-    window.location.href = '/auth';
-  }, []);
 
   // Memoized path checker to prevent recreation
   const isActivePath = useCallback((path: string): boolean => {
@@ -363,11 +348,6 @@ const MobileNavigationContent: React.FC = () => {
     }
     return location.pathname.startsWith(path);
   }, [location.pathname]);
-
-  // Memoized close handler for sheet
-  const handleSheetClose = useCallback(() => {
-    setIsOpen(false);
-  }, []);
 
   // Touch optimization effect with cleanup
   useEffect(() => {
@@ -394,9 +374,9 @@ const MobileNavigationContent: React.FC = () => {
 
     touchHandler.onSwipe = (swipe) => {
       if (swipe.direction === 'right' && !isOpen) {
-        setIsOpen(true);
+        // Can't open from this component, it's controlled by parent
       } else if (swipe.direction === 'left' && isOpen) {
-        setIsOpen(false);
+        onClose();
       }
     };
 
@@ -404,10 +384,10 @@ const MobileNavigationContent: React.FC = () => {
     return () => {
       touchHandler.destroy();
     };
-  }, [isOpen, touchOptimized]);
+  }, [isOpen, touchOptimized, onClose]);
 
-  // Navigation items for bottom tab bar
-  const navigationItems = useMemo(() => [
+  // Bottom navigation items for tab bar
+  const bottomNavigationItems = useMemo(() => [
     {
       id: 'home',
       label: 'Home',
@@ -441,10 +421,10 @@ const MobileNavigationContent: React.FC = () => {
     <>
       {/* Enhanced Mobile Header with Swipe Support */}
       <SwipeableHeader
-        title="Chanuka"
+        title="Navigation"
         leftAction={{
           icon: <Menu className="h-6 w-6" />,
-          onClick: () => setIsOpen(true),
+          onClick: () => {/* Navigation controlled by parent */},
           label: "Open navigation menu"
         }}
         rightActions={[
@@ -459,11 +439,11 @@ const MobileNavigationContent: React.FC = () => {
             label: "Sign In"
           }] : [])
         ]}
-        onSwipeRight={() => setIsOpen(true)}
+        onSwipeRight={() => {/* Navigation controlled by parent */}}
       />
 
       {/* Navigation Drawer */}
-      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
         <SheetContent side="left" className="w-80">
           <div className="flex flex-col h-full">
             {/* Header */}
@@ -605,7 +585,7 @@ const MobileNavigationContent: React.FC = () => {
 
       {/* Enhanced Bottom Tab Bar */}
       <MobileTabBar
-        items={navigationItems}
+        items={bottomNavigationItems}
         maxVisible={4}
         onItemClick={(item) => {
           // Handle navigation

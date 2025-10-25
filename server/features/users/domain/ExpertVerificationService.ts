@@ -11,7 +11,7 @@ import {
 
 // Re-export VerificationStatus for test imports
 export { VerificationStatus };
-import { logger } from '../../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Remove duplicate interface definitions since they're imported
 

@@ -1,13 +1,14 @@
 import React, { ComponentType, lazy, LazyExoticComponent } from 'react';
-import { logger } from '../../utils/browser-logger';
+import { logger } from '../../../utils/browser-logger';
 import PageErrorBoundary, { ErrorFallbackProps, ErrorType, ErrorContext } from './PageErrorBoundary';
-import { 
-  ComponentErrorFallback, 
-  ApiErrorFallback, 
-  ChunkErrorFallback, 
+import {
+  ComponentErrorFallback,
+  ApiErrorFallback,
+  ChunkErrorFallback,
   NetworkErrorFallback,
-  CriticalErrorFallback 
+  CriticalErrorFallback
 } from './ErrorFallback';
+import { ErrorSeverity } from '@shared/core';
 
 // Smart fallback component selector
 function getSmartFallback(errorType?: ErrorType, context?: ErrorContext): React.ComponentType<ErrorFallbackProps> {
@@ -85,13 +86,15 @@ export function withLazyErrorBoundary<P extends object>(
   } = options;
 
   return lazy(async () => {
+    let componentName = 'LazyComponent';
     try {
       const module = await lazyComponent();
       const Component = module.default;
+      componentName = Component.displayName || Component.name || 'LazyComponent';
 
       // Wrap the component with error boundary
       const WrappedComponent: ComponentType<P> = (props) => {
-        const FallbackComponent = fallbackComponent || 
+        const FallbackComponent = fallbackComponent ||
           (smartFallback ? ChunkErrorFallback : ComponentErrorFallback);
 
         return (
@@ -107,11 +110,11 @@ export function withLazyErrorBoundary<P extends object>(
         );
       };
 
-      WrappedComponent.displayName = `withLazyErrorBoundary(${Component.displayName || Component.name})`;
+      WrappedComponent.displayName = `withLazyErrorBoundary(${componentName})`;
 
       return { default: WrappedComponent };
     } catch (error) {
-      logger.error('Failed to load lazy component:', { component: 'Chanuka' }, error);
+      logger.error('Failed to load lazy component:', { component: componentName }, error);
       
       // Return a fallback component that shows the error
       const ErrorComponent: ComponentType<P> = () => (
@@ -198,7 +201,7 @@ export const CriticalSection: React.FC<CriticalSectionProps> = ({
 };
 
 // Hook for managing component error state
-export function useErrorState() {
+export function useErrorState(componentName?: string) {
   const [error, setError] = React.useState<Error | null>(null);
   const [hasError, setHasError] = React.useState(false);
 
@@ -210,8 +213,8 @@ export function useErrorState() {
   const handleError = React.useCallback((error: Error) => {
     setError(error);
     setHasError(true);
-    logger.error('Component error:', { component: 'Chanuka' }, error);
-  }, []);
+    logger.error('Component error:', { component: componentName || 'Unknown' }, error);
+  }, [componentName]);
 
   const resetError = React.useCallback(() => {
     clearError();

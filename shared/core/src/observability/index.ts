@@ -1,128 +1,25 @@
-/**
- * Unified Observability System
- * 
- * This module provides a comprehensive observability solution that includes:
- * - Structured logging with multiple transports
- * - Unified error management and recovery
- * - Metrics collection and reporting
- * - Distributed tracing
- * - Health monitoring
- * 
- * All components are designed to work together seamlessly and provide
- * a complete picture of system behavior and performance.
- */
+// Observability - Single Source of Truth
+// This module consolidates all logging, health, middleware, and error management
 
-// Unified observability interfaces
+// Core observability
 export * from './interfaces';
-
-// Main observability stack
-export * from './stack';
-export { ObservabilityStack, createObservabilityStack } from './stack';
-
-// Correlation functionality
+export * from './middleware';
 export * from './correlation';
-export { AsyncCorrelationManager, createCorrelationManager, createDefaultCorrelationManager } from './correlation';
+export * from './stack';
+export * from './telemetry';
 
-// Core logging functionality
+// Logging
 export * from './logging';
-
-// Unified error management
-export * from './error-management';
 
 // Health monitoring
 export * from './health';
 
-// Metrics collection
-export * from './metrics';
+// Error management
+export * from './error-management';
 
-// Distributed tracing
+// Metrics and tracing
+export * from './metrics';
 export * from './tracing';
 
 // Legacy adapters for backward compatibility
 export * from './legacy-adapters';
-
-// Unified telemetry data export
-export {
-  TelemetryData,
-  LogEntry,
-  MetricEntry,
-  TraceEntry,
-  ExportDestination,
-  FileDestinationConfig,
-  HttpDestinationConfig,
-  QueueDestinationConfig,
-  ConsoleDestinationConfig,
-  DestinationConfig,
-  SamplingConfig,
-  SamplingRule,
-  FilterConfig,
-  TelemetryConfig,
-  TelemetryExporter,
-  TelemetryCollector,
-  TelemetryError,
-  TelemetryExportError,
-  TelemetryConfigError,
-  UnifiedTelemetryExporter,
-  TelemetryIntegration,
-  createTelemetryExporter,
-  createTelemetryIntegration,
-  createDefaultTelemetryConfig
-} from './telemetry';
-
-// Observability middleware
-export {
-  MiddlewareConfig,
-  MiddlewareDependencies,
-  MiddlewareError,
-  CorrelationMiddlewareError,
-  LoggingMiddlewareError,
-  MetricsMiddlewareError,
-  createCorrelationMiddleware,
-  createRequestLoggingMiddleware,
-  createPerformanceMonitoringMiddleware,
-  createErrorTrackingMiddleware,
-  createRequestTimeoutMiddleware,
-  createObservabilityMiddleware
-} from './middleware';
-
-// Default exports for common use cases
-export { logger } from './logging';
-
-// Feature flag for gradual migration
-export const useUnifiedObservability = process.env.USE_UNIFIED_OBSERVABILITY === 'true';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

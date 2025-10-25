@@ -9,14 +9,14 @@ import {
   Eye,
   EyeOff
 } from "lucide-react";
-import { Button } from '..\..\..\components\ui\button';
-import { Input } from '..\..\..\components\ui\input';
-import { Label } from '..\..\..\components\ui\label';
-import { Textarea } from '..\..\..\components\ui\textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '..\..\..\components\ui\card';
-import { Badge } from '..\..\..\components\ui\badge';
-import { Switch } from '..\..\..\components\ui\switch';
-import { Avatar, AvatarFallback, AvatarImage } from '..\..\..\components\ui\avatar';
+import { Button } from '../../../components/ui/button';
+import { Input } from '../../../components/ui/input';
+import { Label } from '../../../components/ui/label';
+import { Textarea } from '../../../components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '../../../components/ui/card';
+import { Badge } from '../../../components/ui/badge';
+import { Switch } from '../../../components/ui/switch';
+import { Avatar, AvatarFallback, AvatarImage } from '../../../components/ui/avatar';
 import { useProfile, useVerification } from '../hooks/useUsers';
 import type { UserProfile as UserProfileType, UpdateProfileData } from '../types';
 

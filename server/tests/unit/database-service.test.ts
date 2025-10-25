@@ -1,23 +1,24 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Mock all dependencies before importing the module
-jest.mock('pg');
-jest.mock('drizzle-orm/node-postgres');
-jest.mock('../../../shared/schema.ts', () => ({}), { virtual: true });
-jest.mock('../../utils/logger');
-jest.mock('../../core/errors/error-tracker.ts');
-jest.mock('../../config/index.ts');
+vi.mock('pg');
+vi.mock('drizzle-orm/node-postgres');
+vi.mock('../../../shared/schema.ts', () => ({}), { virtual: true });
+vi.mock('../../utils/logger');
+vi.mock('../../core/errors/error-tracker.ts');
+vi.mock('../../config/index.ts');
 
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { DatabaseService } from '../../infrastructure/database/database-service';
 import * as pg from 'pg';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Mock pg module
-jest.mock('pg', () => ({
-  Pool: jest.fn().mockImplementation(() => ({
-    connect: jest.fn() as jest.MockedFunction<() => Promise<any>>,
-    query: jest.fn(),
-    end: jest.fn(),
-    on: jest.fn(),
+vi.mock('pg', () => ({
+  Pool: vi.fn().mockImplementation(() => ({
+    connect: vi.fn() as vi.MockedFunction<() => Promise<any>>,
+    query: vi.fn(),
+    end: vi.fn(),
+    on: vi.fn(),
     totalCount: 10,
     idleCount: 5,
     waitingCount: 0
@@ -25,12 +26,12 @@ jest.mock('pg', () => ({
 }));
 
 // Mock drizzle-orm
-jest.mock('drizzle-orm/node-postgres', () => ({
-  drizzle: jest.fn().mockReturnValue({
-    select: jest.fn(),
-    insert: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn()
+vi.mock('drizzle-orm/node-postgres', () => ({
+  drizzle: vi.fn().mockReturnValue({
+    select: vi.fn(),
+    insert: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn()
   })
 }));
 
@@ -40,24 +41,24 @@ describe('DatabaseService', () => {
   let mockClient: any;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     
     mockClient = {
-      query: jest.fn(),
-      release: jest.fn()
+      query: vi.fn(),
+      release: vi.fn()
     };
 
     mockPool = {
-      connect: jest.fn() as jest.MockedFunction<() => Promise<any>>,
-      query: jest.fn(),
-      end: jest.fn(),
-      on: jest.fn(),
+      connect: vi.fn() as vi.MockedFunction<() => Promise<any>>,
+      query: vi.fn(),
+      end: vi.fn(),
+      on: vi.fn(),
       totalCount: 10,
       idleCount: 5,
       waitingCount: 0
     };
 
-    (pg.Pool as jest.MockedClass<typeof pg.Pool>).mockImplementation(() => mockPool);
+    (pg.Pool as vi.MockedClass<typeof pg.Pool>).mockImplementation(() => mockPool);
     databaseService = new DatabaseService();
   });
 
@@ -94,7 +95,7 @@ describe('DatabaseService', () => {
 
   describe('withFallback', () => {
     it('should return database data when connection is available', async () => {
-      const mockOperation = jest.fn<() => Promise<{ id: number; name: string; }>>().mockResolvedValue({ id: 1, name: 'test' });
+      const mockOperation = vi.fn<() => Promise<{ id: number; name: string; }>>().mockResolvedValue({ id: 1, name: 'test' });
       const fallbackData = { id: 0, name: 'fallback' };
 
       mockClient.query.mockResolvedValue({ rows: [{ now: new Date() }] });
@@ -112,7 +113,7 @@ describe('DatabaseService', () => {
     });
 
     it('should return fallback data when database operation fails', async () => {
-      const mockOperation = jest.fn<() => Promise<{ id: number; name: string; }>>().mockRejectedValue(new Error('Database error'));
+      const mockOperation = vi.fn<() => Promise<{ id: number; name: string; }>>().mockRejectedValue(new Error('Database error'));
       const fallbackData = { id: 0, name: 'fallback' };
 
       const result = await databaseService.withFallback(
@@ -134,7 +135,7 @@ describe('DatabaseService', () => {
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] });
 
-      const mockCallback = jest.fn() as jest.MockedFunction<() => Promise<{ success: boolean }>>;
+      const mockCallback = vi.fn() as vi.MockedFunction<() => Promise<{ success: boolean }>>;
       mockCallback.mockResolvedValue({ success: true });
 
       const result = await databaseService.withTransaction(mockCallback as any, 'test-transaction');
@@ -151,7 +152,7 @@ describe('DatabaseService', () => {
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] });
 
-      const mockCallback = jest.fn() as jest.MockedFunction<() => Promise<{ success: boolean }>>;
+      const mockCallback = vi.fn() as vi.MockedFunction<() => Promise<{ success: boolean }>>;
       mockCallback.mockRejectedValue(new Error('Transaction error'));
 
       await expect(

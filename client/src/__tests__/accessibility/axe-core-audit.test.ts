@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { test, expect } from './accessibility-test-utils.test';
 
 test.describe('Axe Core Accessibility Audits', () => {

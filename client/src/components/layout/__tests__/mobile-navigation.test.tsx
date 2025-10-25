@@ -1,24 +1,25 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import MobileNavigation from '../mobile-navigation';
-import { NavigationItem, User } from '../types';
+import { NavigationItem, User } from '@shared/types';
 
 // Mock dependencies
-jest.mock('@/utils/mobile-touch-handler', () => ({
-  MobileTouchHandler: jest.fn().mockImplementation(() => ({
+vi.mock('@/utils/mobile-touch-handler', () => ({
+  MobileTouchHandler: vi.fn().mockImplementation(() => ({
     onSwipe: null,
-    destroy: jest.fn(),
+    destroy: vi.fn(),
   })),
   MobileTouchUtils: {
     isTouchDevice: () => true,
-    preventZoomOnDoubleTap: jest.fn(),
+    preventZoomOnDoubleTap: vi.fn(),
   },
 }));
 
-jest.mock('@/components/ui/button', () => ({
+vi.mock('@/components/ui/button', () => ({
   Button: ({ children, onClick, ...props }: any) => (
     <button onClick={onClick} {...props}>
       {children}
@@ -26,7 +27,7 @@ jest.mock('@/components/ui/button', () => ({
   ),
 }));
 
-jest.mock('@/components/ui/sheet', () => ({
+vi.mock('@/components/ui/sheet', () => ({
   Sheet: ({ children, open, onOpenChange }: any) => (
     <div data-testid="sheet" data-open={open}>
       {children}
@@ -40,7 +41,7 @@ jest.mock('@/components/ui/sheet', () => ({
   SheetTrigger: ({ children }: any) => <div data-testid="sheet-trigger">{children}</div>,
 }));
 
-jest.mock('@/components/ui/badge', () => ({
+vi.mock('@/components/ui/badge', () => ({
   Badge: ({ children, variant }: any) => (
     <span data-testid="badge" data-variant={variant}>
       {children}
@@ -48,36 +49,36 @@ jest.mock('@/components/ui/badge', () => ({
   ),
 }));
 
-jest.mock('@/components/ui/separator', () => ({
+vi.mock('@/components/ui/separator', () => ({
   Separator: () => <hr data-testid="separator" />,
 }));
 
-jest.mock('@/components/notifications/notification-center', () => {
+vi.mock('@/components/notifications/notification-center', () => {
   return function MockNotificationCenter() {
     return <div data-testid="notification-center">Notification Center</div>;
   };
 });
 
-jest.mock('@/components/navigation/navigation-preferences-dialog', () => {
+vi.mock('@/components/navigation/navigation-preferences-dialog', () => {
   return function MockNavigationPreferencesDialog({ trigger }: any) {
     return <div data-testid="navigation-preferences">{trigger}</div>;
   };
 });
 
-jest.mock('@/components/navigation/quick-access-nav', () => {
+vi.mock('@/components/navigation/quick-access-nav', () => {
   return function MockQuickAccessNav() {
     return <div data-testid="quick-access-nav">Quick Access</div>;
   };
 });
 
-jest.mock('@/hooks/use-navigation-preferences', () => ({
+vi.mock('@/hooks/use-navigation-preferences', () => ({
   useNavigationPreferences: () => ({
     preferences: {},
-    updatePreferences: jest.fn(),
+    updatePreferences: vi.fn(),
   }),
 }));
 
-jest.mock('@/components/mobile/responsive-layout-manager', () => ({
+vi.mock('@/components/mobile/responsive-layout-manager', () => ({
   ResponsiveLayoutProvider: ({ children }: any) => (
     <div data-testid="responsive-layout-provider">{children}</div>
   ),
@@ -93,7 +94,7 @@ jest.mock('@/components/mobile/responsive-layout-manager', () => ({
   SafeAreaWrapper: ({ children }: any) => <div data-testid="safe-area-wrapper">{children}</div>,
 }));
 
-jest.mock('@/components/mobile/mobile-navigation-enhancements', () => ({
+vi.mock('@/components/mobile/mobile-navigation-enhancements', () => ({
   MobileTabBar: ({ items, onItemClick }: any) => (
     <div data-testid="mobile-tab-bar">
       {items.map((item: any) => (
@@ -116,8 +117,8 @@ jest.mock('@/components/mobile/mobile-navigation-enhancements', () => ({
   ),
 }));
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+vi.mock('react-router-dom', () => ({
+  ...vi.requireActual('react-router-dom'),
   Link: ({ to, children, onClick, className }: any) => (
     <a href={to} onClick={onClick} className={className} data-testid="nav-link">
       {children}
@@ -129,7 +130,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Mock fetch for user data
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 const createTestWrapper = () => {
   const queryClient = new QueryClient({
@@ -172,8 +173,8 @@ describe('MobileNavigation Component', () => {
   ];
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    (global.fetch as jest.Mock).mockResolvedValue({
+    vi.clearAllMocks();
+    (global.fetch as vi.Mock).mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ user: mockUser }),
     });
@@ -185,7 +186,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={false} onClose={jest.fn()} />
+          <MobileNavigation isOpen={false} onClose={vi.fn()} />
         </TestWrapper>
       );
 
@@ -201,7 +202,7 @@ describe('MobileNavigation Component', () => {
         <TestWrapper>
           <MobileNavigation
             isOpen={false}
-            onClose={jest.fn()}
+            onClose={vi.fn()}
             navigationItems={mockNavigationItems}
           />
         </TestWrapper>
@@ -215,7 +216,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={false} onClose={jest.fn()} user={mockUser} />
+          <MobileNavigation isOpen={false} onClose={vi.fn()} user={mockUser} />
         </TestWrapper>
       );
 
@@ -229,7 +230,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={true} onClose={jest.fn()} />
+          <MobileNavigation isOpen={true} onClose={vi.fn()} />
         </TestWrapper>
       );
 
@@ -242,7 +243,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={false} onClose={jest.fn()} />
+          <MobileNavigation isOpen={false} onClose={vi.fn()} />
         </TestWrapper>
       );
 
@@ -252,7 +253,7 @@ describe('MobileNavigation Component', () => {
 
     it('should call onClose when drawer is closed', async () => {
       const TestWrapper = createTestWrapper();
-      const onClose = jest.fn();
+      const onClose = vi.fn();
 
       render(
         <TestWrapper>
@@ -271,7 +272,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={true} onClose={jest.fn()} user={mockUser} />
+          <MobileNavigation isOpen={true} onClose={vi.fn()} user={mockUser} />
         </TestWrapper>
       );
 
@@ -287,7 +288,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={true} onClose={jest.fn()} />
+          <MobileNavigation isOpen={true} onClose={vi.fn()} />
         </TestWrapper>
       );
 
@@ -302,12 +303,12 @@ describe('MobileNavigation Component', () => {
 
     it('should handle logout functionality', async () => {
       const TestWrapper = createTestWrapper();
-      const onLogout = jest.fn();
+      const onLogout = vi.fn();
 
       // Mock localStorage
       Object.defineProperty(window, 'localStorage', {
         value: {
-          removeItem: jest.fn(),
+          removeItem: vi.fn(),
         },
         writable: true,
       });
@@ -318,7 +319,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={true} onClose={jest.fn()} user={mockUser} onLogout={onLogout} />
+          <MobileNavigation isOpen={true} onClose={vi.fn()} user={mockUser} onLogout={onLogout} />
         </TestWrapper>
       );
 
@@ -335,7 +336,7 @@ describe('MobileNavigation Component', () => {
         <TestWrapper>
           <MobileNavigation
             isOpen={true}
-            onClose={jest.fn()}
+            onClose={vi.fn()}
             navigationItems={mockNavigationItems}
           />
         </TestWrapper>
@@ -353,7 +354,7 @@ describe('MobileNavigation Component', () => {
         <TestWrapper>
           <MobileNavigation
             isOpen={true}
-            onClose={jest.fn()}
+            onClose={vi.fn()}
             navigationItems={mockNavigationItems}
           />
         </TestWrapper>
@@ -376,7 +377,7 @@ describe('MobileNavigation Component', () => {
         <TestWrapper>
           <MobileNavigation
             isOpen={false}
-            onClose={jest.fn()}
+            onClose={vi.fn()}
             enableTouchOptimization={true}
           />
         </TestWrapper>
@@ -393,7 +394,7 @@ describe('MobileNavigation Component', () => {
         <TestWrapper>
           <MobileNavigation
             isOpen={false}
-            onClose={jest.fn()}
+            onClose={vi.fn()}
             enableSwipeGestures={true}
           />
         </TestWrapper>
@@ -408,7 +409,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={false} onClose={jest.fn()} />
+          <MobileNavigation isOpen={false} onClose={vi.fn()} />
         </TestWrapper>
       );
 
@@ -435,7 +436,7 @@ describe('MobileNavigation Component', () => {
         <TestWrapper>
           <MobileNavigation
             isOpen={true}
-            onClose={jest.fn()}
+            onClose={vi.fn()}
             navigationItems={invalidNavigationItems}
           />
         </TestWrapper>
@@ -456,11 +457,11 @@ describe('MobileNavigation Component', () => {
     it('should handle fetch errors gracefully', async () => {
       const TestWrapper = createTestWrapper();
 
-      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
+      (global.fetch as vi.Mock).mockRejectedValue(new Error('Network error'));
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={true} onClose={jest.fn()} />
+          <MobileNavigation isOpen={true} onClose={vi.fn()} />
         </TestWrapper>
       );
 
@@ -477,7 +478,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={true} onClose={jest.fn()} />
+          <MobileNavigation isOpen={true} onClose={vi.fn()} />
         </TestWrapper>
       );
 
@@ -490,7 +491,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={true} onClose={jest.fn()} />
+          <MobileNavigation isOpen={true} onClose={vi.fn()} />
         </TestWrapper>
       );
 
@@ -503,7 +504,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={true} onClose={jest.fn()} />
+          <MobileNavigation isOpen={true} onClose={vi.fn()} />
         </TestWrapper>
       );
 
@@ -517,7 +518,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={true} onClose={jest.fn()} />
+          <MobileNavigation isOpen={true} onClose={vi.fn()} />
         </TestWrapper>
       );
 
@@ -530,7 +531,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={true} onClose={jest.fn()} />
+          <MobileNavigation isOpen={true} onClose={vi.fn()} />
         </TestWrapper>
       );
 
@@ -544,7 +545,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={true} onClose={jest.fn()} enableTouchOptimization={true} />
+          <MobileNavigation isOpen={true} onClose={vi.fn()} enableTouchOptimization={true} />
         </TestWrapper>
       );
 
@@ -556,7 +557,7 @@ describe('MobileNavigation Component', () => {
 
       render(
         <TestWrapper>
-          <MobileNavigation isOpen={true} onClose={jest.fn()} />
+          <MobileNavigation isOpen={true} onClose={vi.fn()} />
         </TestWrapper>
       );
 

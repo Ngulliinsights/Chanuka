@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Dashboard recovery tests
  * Following navigation component recovery testing patterns
@@ -17,7 +18,7 @@ import {
   DashboardTopicError,
   DashboardErrorType
 } from '../errors';
-import type { DashboardData, DashboardConfig } from '../types';
+import type { DashboardData, DashboardConfig } from '@shared/types';
 
 describe('Dashboard Recovery', () => {
   const mockData: Partial<DashboardData> = {
@@ -195,7 +196,7 @@ describe('Dashboard Recovery', () => {
     });
 
     it('should execute auto-recovery function when available', async () => {
-      const mockAutoRecover = jest.fn().mockResolvedValue(true);
+      const mockAutoRecover = vi.fn().mockResolvedValue(true);
       const strategy = {
         canRecover: true,
         suggestions: ['Auto-recovering'],
@@ -213,14 +214,14 @@ describe('Dashboard Recovery', () => {
     });
 
     it('should handle auto-recovery failures gracefully', async () => {
-      const mockAutoRecover = jest.fn().mockRejectedValue(new Error('Recovery failed'));
+      const mockAutoRecover = vi.fn().mockRejectedValue(new Error('Recovery failed'));
       const strategy = {
         canRecover: true,
         suggestions: ['Auto-recovering'],
         autoRecover: mockAutoRecover
       };
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation();
 
       const result = await executeRecovery(strategy, {
         error: new DashboardError('Test error'),

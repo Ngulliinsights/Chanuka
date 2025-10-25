@@ -1,15 +1,30 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { describe, it, expect, beforeAll, afterAll, beforeEach, jest } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
 import cors from 'cors';
 import { router as billsRouter } from '../../features/bills/presentation/bills-router.ts';
 import { router as sponsorsRouter } from '../../features/bills/sponsors';
-import { router as authRouter } from '../../core/auth/auth';
+import { router as authRouter } from '@/components/auth';
 import { router as healthRouter } from '../../infrastructure/monitoring/health';
-import { database as db, users, bills, sponsors } from '../../../shared/database/connection.js';
+import { database as db, users, bills, sponsors } from '@shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 describe('Working API Integration Tests', () => {
   let app: express.Application;
@@ -46,7 +61,7 @@ describe('Working API Integration Tests', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   async function setupTestData() {

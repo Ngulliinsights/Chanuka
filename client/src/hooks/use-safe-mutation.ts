@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, UseMutationResult } from '@tanstack/react-query';
-import AuthenticatedAPI, { APIResponse } from '..\utils\authenticated-api';
+import AuthenticatedAPI, { APIResponse } from '../utils/authenticated-api';
 import { logger } from '@shared/core';
 
 /**

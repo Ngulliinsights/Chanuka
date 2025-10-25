@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from '..\ui\button';
-import { Card, CardContent, CardHeader, CardTitle } from '..\ui\card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '..\ui\tabs';
+import { Button } from '../ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { 
   LoadingStateManager,
   TimeoutAwareLoader,
@@ -13,16 +13,17 @@ import {
   ConnectionAwareLoader,
   ProgressiveLoader,
 } from './LoadingStates';
-import { useComprehensiveLoading, useProgressiveLoading, useTimeoutAwareOperation } from '..\..\hooks\useComprehensiveLoading';
-import { useLoadingContext, usePageLoading, useComponentLoading, useApiLoading } from '..\..\contexts\LoadingContext';
-import { logger } from '..\..\utils\browser-logger';
+import { useSimplifiedLoading, useProgressiveLoading } from '../../hooks/useSimplifiedLoading';
+import { useTimeoutAwareOperation } from '../../hooks/useTimeoutAwareLoading';
+import { useUnifiedLoading, usePageLoading, useComponentLoading, useApiLoading } from '../../contexts/UnifiedLoadingContext';
+import { logger } from '../../utils/browser-logger';
 
 export const LoadingDemo: React.FC = () => {
   const [demoState, setDemoState] = useState<'idle' | 'loading' | 'success' | 'error' | 'timeout'>('idle');
   const [selectedDemo, setSelectedDemo] = useState('basic');
   
-  // Comprehensive loading hook
-  const comprehensiveLoading = useComprehensiveLoading();
+  // Simplified loading hook
+  const simplifiedLoading = useSimplifiedLoading('demo-loading');
   
   // Progressive loading stages
   const progressiveStages = [
@@ -44,7 +45,7 @@ export const LoadingDemo: React.FC = () => {
   );
   
   // Loading context hooks
-  const { startOperation, completeOperation, state: loadingContextState } = useLoadingContext();
+  const { startOperation, completeOperation, state: loadingContextState } = useUnifiedLoading();
   const pageLoading = usePageLoading();
   const componentLoading = useComponentLoading();
   const apiLoading = useApiLoading();

@@ -35,7 +35,7 @@ export { applyMiddleware } from './registry';
 // Re-export specific middleware from core utilities
 export { rateLimitMiddleware } from '../rate-limiting';
 export { unifiedErrorHandler } from '../observability/error-management/middleware/express-error-middleware.js';
-export { createHealthEndpoints } from '../health';
+export { createHealthEndpoints } from '../observability/health/health-checker';
 
 // Convenience functions for common middleware setups
 export function createBasicMiddlewareStack(services: {

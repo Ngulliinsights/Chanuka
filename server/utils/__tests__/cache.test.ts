@@ -1,12 +1,13 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { cache } from '../cache';
 
 // Mock logger to avoid console output during tests
-jest.mock('../logger', () => ({
+vi.mock('../logger', () => ({
   logger: {
-    debug: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn()
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn()
   }
 }));
 
@@ -24,7 +25,7 @@ describe('Cache Utility', () => {
       const expectedValue = { data: 'cached-value' };
 
       // First call - should compute and cache
-      const computeFn = jest.fn().mockResolvedValue(expectedValue);
+      const computeFn = vi.fn().mockResolvedValue(expectedValue);
       const result1 = await cache.getOrSetCache(key, ttl, computeFn);
 
       expect(result1).toEqual(expectedValue);
@@ -42,7 +43,7 @@ describe('Cache Utility', () => {
       const ttl = 300;
       const expectedValue = { data: 'computed-value' };
 
-      const computeFn = jest.fn().mockResolvedValue(expectedValue);
+      const computeFn = vi.fn().mockResolvedValue(expectedValue);
       const result = await cache.getOrSetCache(key, ttl, computeFn);
 
       expect(result).toEqual(expectedValue);
@@ -56,11 +57,11 @@ describe('Cache Utility', () => {
 
       // Mock cache store to throw on get
       const originalGet = Map.prototype.get;
-      Map.prototype.get = jest.fn().mockImplementation(() => {
+      Map.prototype.get = vi.fn().mockImplementation(() => {
         throw new Error('Cache get failed');
       });
 
-      const computeFn = jest.fn().mockResolvedValue(expectedValue);
+      const computeFn = vi.fn().mockResolvedValue(expectedValue);
       const result = await cache.getOrSetCache(key, ttl, computeFn);
 
       expect(result).toEqual(expectedValue);
@@ -77,11 +78,11 @@ describe('Cache Utility', () => {
 
       // Mock cache store to throw on set
       const originalSet = Map.prototype.set;
-      Map.prototype.set = jest.fn().mockImplementation(() => {
+      Map.prototype.set = vi.fn().mockImplementation(() => {
         throw new Error('Cache set failed');
       });
 
-      const computeFn = jest.fn().mockResolvedValue(expectedValue);
+      const computeFn = vi.fn().mockResolvedValue(expectedValue);
       const result = await cache.getOrSetCache(key, ttl, computeFn);
 
       expect(result).toEqual(expectedValue);
@@ -98,14 +99,14 @@ describe('Cache Utility', () => {
       const value2 = { data: 'second-value' };
 
       // First call
-      const computeFn1 = jest.fn().mockResolvedValue(value1);
+      const computeFn1 = vi.fn().mockResolvedValue(value1);
       await cache.getOrSetCache(key, ttl, computeFn1);
 
       // Wait for TTL to expire
       await new Promise(resolve => setTimeout(resolve, 1100));
 
       // Second call should recompute
-      const computeFn2 = jest.fn().mockResolvedValue(value2);
+      const computeFn2 = vi.fn().mockResolvedValue(value2);
       const result = await cache.getOrSetCache(key, ttl, computeFn2);
 
       expect(result).toEqual(value2);
@@ -126,7 +127,7 @@ describe('Cache Utility', () => {
       expect(metrics.misses).toBe(0);
 
       // First call - miss
-      const computeFn = jest.fn().mockResolvedValue(expectedValue);
+      const computeFn = vi.fn().mockResolvedValue(expectedValue);
       await cache.getOrSetCache(key, ttl, computeFn);
 
       metrics = cache.getMetrics();
@@ -150,11 +151,11 @@ describe('Cache Utility', () => {
 
       // Mock cache get to fail
       const originalGet = Map.prototype.get;
-      Map.prototype.get = jest.fn().mockImplementation(() => {
+      Map.prototype.get = vi.fn().mockImplementation(() => {
         throw new Error('Cache error');
       });
 
-      const computeFn = jest.fn().mockResolvedValue(expectedValue);
+      const computeFn = vi.fn().mockResolvedValue(expectedValue);
       await cache.getOrSetCache(key, ttl, computeFn);
 
       const metrics = cache.getMetrics();
@@ -170,7 +171,7 @@ describe('Cache Utility', () => {
       const expectedValue = { data: 'test' };
 
       // Generate some metrics
-      const computeFn = jest.fn().mockResolvedValue(expectedValue);
+      const computeFn = vi.fn().mockResolvedValue(expectedValue);
       await cache.getOrSetCache(key, ttl, computeFn);
       await cache.getOrSetCache(key, ttl, computeFn);
 
@@ -196,7 +197,7 @@ describe('Cache Utility', () => {
       const expectedValue = { data: 'test' };
 
       // Set a value in cache
-      const computeFn = jest.fn().mockResolvedValue(expectedValue);
+      const computeFn = vi.fn().mockResolvedValue(expectedValue);
       await cache.getOrSetCache(key, ttl, computeFn);
 
       expect(cache.has(key)).toBe(true);
@@ -254,7 +255,7 @@ describe('Cache Utility', () => {
       const expectedValue = { data: 'ttl-test' };
 
       // Set with TTL
-      const computeFn = jest.fn().mockResolvedValue(expectedValue);
+      const computeFn = vi.fn().mockResolvedValue(expectedValue);
       await cache.getOrSetCache(key, ttl, computeFn);
 
       // Should be cached immediately

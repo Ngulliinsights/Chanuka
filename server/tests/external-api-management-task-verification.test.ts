@@ -1,3 +1,18 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 /**
  * Task 12.3 Verification Test
  * 
@@ -10,8 +25,8 @@
 
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../infrastructure/external-data/index';
-import { APICostMonitoringService } from '../services/api-cost-monitoring';
-import { logger } from '../../shared/core/src/observability/logging';
+import { APICostMonitoringService } from '@/services/api-cost-monitoring';
+import { logger } from '@shared/core';
 
 describe('Task 12.3: External API Management Implementation', () => {
   let apiManager: ExternalAPIManagementService;

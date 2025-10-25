@@ -185,7 +185,7 @@ export class MobileErrorHandler {
         console.log(`Recovery strategy executed for ${type} error`);
         return;
       } catch (recoveryError) {
-        logger.error('Recovery strategy failed:', { component: 'Chanuka' }, recoveryError);
+        logger.error('Recovery strategy failed:', { component: 'MobileErrorHandler' }, recoveryError);
       }
     }
 

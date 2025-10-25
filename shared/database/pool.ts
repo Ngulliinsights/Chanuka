@@ -1,6 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
-import * as schema from '../schema';
+import * as schema from '../types';
 import { logger } from '../core/index.js';
 
 const { Pool } = pg;
@@ -33,10 +33,8 @@ export type FullDatabaseSchema = {
   stakeholder: typeof schema.stakeholder;
   sponsorAffiliation: typeof schema.sponsorAffiliation;
   sponsorTransparency: typeof schema.sponsorTransparency;
-  moderationFlag: typeof schema.moderationFlag;
+  contentReport: typeof schema.contentReport;
   moderationAction: typeof schema.moderationAction;
-  moderationQueue: typeof schema.moderationQueue;
-  contentFlag: typeof schema.contentFlag;
   securityAuditLog: typeof schema.securityAuditLog;
   complianceCheck: typeof schema.complianceCheck;
   threatIntelligence: typeof schema.threatIntelligence;

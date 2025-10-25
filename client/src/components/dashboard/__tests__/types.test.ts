@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * Dashboard types tests
  * Following navigation component testing patterns
@@ -12,7 +13,7 @@ import type {
   ActionPriority,
   TopicCategory,
   DashboardSection
-} from '../types';
+} from '@shared/types';
 
 describe('Dashboard Types', () => {
   describe('ActionItem', () => {

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '..\ui\card';
-import { Button } from '..\ui\button';
-import { Badge } from '..\ui\badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '..\ui\select';
-import { Alert, AlertDescription } from '..\ui\alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { Alert, AlertDescription } from '../ui/alert';
 import { 
   Network, 
   ZoomIn, 
@@ -13,7 +13,7 @@ import {
   Info,
   AlertTriangle
 } from 'lucide-react';
-import { logger } from '..\..\utils\browser-logger';
+import { logger } from '../../utils/browser-logger';
 
 interface ConflictNode {
   id: string;

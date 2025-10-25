@@ -2,9 +2,9 @@ import { databaseService } from '../../infrastructure/database/database-service.
 import { database as db } from '@shared/database/connection';
 import { billComment as billComments, user as users, userProfile as userProfiles, bill as bills } from '../../../shared/schema/schema.js';
 import { eq, and, desc, asc, sql, count, isNull, or } from 'drizzle-orm';
-import { cacheService } from 'server/infrastructure/cache';
+import { cacheService } from '@server/infrastructure/cache';
 import { cacheKeys } from '../../../shared/core/src/caching/key-generator';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Types for comment operations
 export interface CommentWithUser {

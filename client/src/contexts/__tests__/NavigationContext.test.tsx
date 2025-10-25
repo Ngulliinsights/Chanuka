@@ -1,10 +1,24 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { NavigationProvider, useNavigation } from '../NavigationContext';
-import { UserRole } from '..\..\types\navigation';
-import { logger } from '..\..\utils\browser-logger';
+import { UserRole } from '@/components/navigation';
+import { logger } from '@/$2/browser-logger';
 
 // Mock localStorage
 const mockLocalStorage = {
@@ -90,7 +104,9 @@ describe('NavigationContext', () => {
   });
 
   afterEach(() => {
+    cleanup();
     vi.restoreAllMocks();
+  
   });
 
   describe('Initial State', () => {

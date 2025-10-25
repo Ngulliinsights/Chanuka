@@ -1,12 +1,27 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 import request from 'supertest';
 import express from 'express';
 import { authService } from '../core/auth/auth-service';
 import { getEmailService } from '../infrastructure/notifications/email-service';
-import { database as db, user as users, session as sessions, passwordReset as passwordResets } from '../../shared/database/connection.js';
+import { database as db, user as users, session as sessions, passwordReset as passwordResets } from '@shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import { router as authRouter } from '../core/auth/auth.js';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 // Create test app
 const app = express();

@@ -5,9 +5,23 @@
  * and stress testing capabilities
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { LoadTester } from '../load-tester';
-import { logger } from '../../observability/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 describe('LoadTester', () => {
   let loadTester: LoadTester;

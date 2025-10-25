@@ -23,7 +23,7 @@ export function createDashboardConfig(
     return validateDashboardConfig(config);
   } catch (error) {
     throw new DashboardConfigurationError(
-      `Invalid dashboard configuration: ${error.message}`,
+      `Invalid dashboard configuration: ${error instanceof Error ? error.message : String(error)}`,
       { config, overrides }
     );
   }
@@ -45,7 +45,7 @@ export function mergeDashboardConfigs(
     return validateDashboardConfig(merged);
   } catch (error) {
     throw new DashboardConfigurationError(
-      `Failed to merge dashboard configurations: ${error.message}`,
+      `Failed to merge dashboard configurations: ${error instanceof Error ? error.message : String(error)}`,
       { baseConfig, overrides, merged }
     );
   }
@@ -134,7 +134,7 @@ export function validateConfigurationLimits(config: Partial<DashboardConfig>): {
   // Check refresh interval
   if (config.refreshInterval !== undefined) {
     if (config.refreshInterval < dashboardConstants.LIMITS.MIN_REFRESH_INTERVAL) {
-      errors.push(`Refresh interval too short (minimum: ${dashboardConstants.LIMITS.MIN_REFRESH_INTERVAL}ms)`);
+      errors.push('Refresh interval too short');
     }
     if (config.refreshInterval > dashboardConstants.LIMITS.MAX_REFRESH_INTERVAL) {
       errors.push(`Refresh interval too long (maximum: ${dashboardConstants.LIMITS.MAX_REFRESH_INTERVAL}ms)`);
@@ -152,6 +152,21 @@ export function validateConfigurationLimits(config: Partial<DashboardConfig>): {
     if (config.maxActionItems < 1) {
       errors.push('Must display at least 1 action item');
     }
+  }
+
+  // Check max tracked topics limits
+  if (config.maxTrackedTopics !== undefined) {
+    if (config.maxTrackedTopics > dashboardConstants.LIMITS.MAX_TRACKED_TOPICS_DISPLAY) {
+      warnings.push(`High topic limit may affect performance (recommended: ${dashboardConstants.DEFAULT_CONFIG.maxTrackedTopics})`);
+    }
+    if (config.maxTrackedTopics < 1) {
+      errors.push('Must display at least 1 tracked topic');
+    }
+  }
+
+  // Check for performance warnings
+  if (config.refreshInterval !== undefined && config.refreshInterval < dashboardConstants.REFRESH_INTERVALS.NORMAL) {
+    warnings.push('Fast refresh intervals may increase data usage');
   }
 
   if (config.maxTrackedTopics !== undefined) {
@@ -236,7 +251,7 @@ export function importDashboardConfig(configJson: string): DashboardConfig {
     return validateDashboardConfig(importData.config);
   } catch (error) {
     throw new DashboardConfigurationError(
-      `Failed to import configuration: ${error.message}`,
+      `Failed to import configuration: ${error instanceof Error ? error.message : String(error)}`,
       { configJson }
     );
   }

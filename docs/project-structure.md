@@ -19,6 +19,17 @@ client/
 │   ├── sw.js
 ├── src/
 │   ├── __tests__/
+│   │   ├── accessibility/
+│   │   │   ├── accessibility-ci.test.ts
+│   │   │   ├── accessibility-regression.test.ts
+│   │   │   ├── accessibility-test-utils.test.ts
+│   │   │   ├── accessibility-workflow.test.ts
+│   │   │   ├── axe-core-audit.test.ts
+│   │   │   ├── keyboard-navigation.test.ts
+│   │   │   ├── lighthouse-audit.test.ts
+│   │   │   ├── package-scripts.test.ts
+│   │   │   ├── screen-reader-support.test.ts
+│   │   │   ├── visual-accessibility.test.ts
 │   │   ├── browser-compatibility.test.ts
 │   │   ├── e2e/
 │   │   │   ├── user-workflows.test.tsx
@@ -198,6 +209,7 @@ client/
 │   │   │   ├── validation.ts
 │   │   ├── loading/
 │   │   │   ├── __tests__/
+│   │   │   │   ├── AssetFallbacks.test.tsx
 │   │   │   │   ├── AssetLoadingIndicator.test.tsx
 │   │   │   │   ├── GlobalLoadingIndicator.test.tsx
 │   │   │   │   ├── hooks.test.ts
@@ -213,6 +225,7 @@ client/
 │   │   │   ├── core/
 │   │   │   │   ├── loadingCore.ts
 │   │   │   ├── errors.ts
+│   │   │   ├── FontFallback.tsx
 │   │   │   ├── GlobalLoadingIndicator.tsx
 │   │   │   ├── hooks/
 │   │   │   │   ├── index.ts
@@ -222,15 +235,23 @@ client/
 │   │   │   │   ├── useProgressiveLoading.ts
 │   │   │   │   ├── useTimeoutAwareLoading.ts
 │   │   │   │   ├── useUnifiedLoading.ts
+│   │   │   ├── ImageFallback.tsx
 │   │   │   ├── index.ts
 │   │   │   ├── LoadingDemo.tsx
 │   │   │   ├── LoadingStates.tsx
 │   │   │   ├── recovery.ts
+│   │   │   ├── ScriptFallback.tsx
 │   │   │   ├── types.ts
 │   │   │   ├── ui/
+│   │   │   │   ├── AvatarSkeleton.tsx
+│   │   │   │   ├── CardSkeleton.tsx
+│   │   │   │   ├── FormSkeleton.tsx
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── ListSkeleton.tsx
 │   │   │   │   ├── LoadingIndicator.tsx
 │   │   │   │   ├── ProgressiveLoader.tsx
+│   │   │   │   ├── Skeleton.tsx
+│   │   │   │   ├── TextSkeleton.tsx
 │   │   │   │   ├── TimeoutAwareLoader.tsx
 │   │   │   ├── utils/
 │   │   │   │   ├── connection-utils.ts
@@ -291,6 +312,8 @@ client/
 │   │   │   ├── notification-preferences.tsx
 │   │   ├── offline/
 │   │   │   ├── offline-manager.tsx
+│   │   ├── OfflineIndicator.tsx
+│   │   ├── OfflineModal.tsx
 │   │   ├── performance/
 │   │   │   ├── PerformanceDashboard.tsx
 │   │   │   ├── PerformanceMetricsCollector.tsx
@@ -359,6 +382,7 @@ client/
 │   │   │   ├── table.tsx
 │   │   │   ├── tabs.tsx
 │   │   │   ├── textarea.tsx
+│   │   │   ├── theme-toggle.tsx
 │   │   │   ├── toast.tsx
 │   │   │   ├── toaster.tsx
 │   │   │   ├── types.ts
@@ -375,6 +399,8 @@ client/
 │   │   ├── LoadingContext.tsx
 │   │   ├── NavigationContext.tsx
 │   │   ├── ResponsiveNavigationContext.tsx
+│   │   ├── ThemeContext.tsx
+│   │   ├── UnifiedLoadingContext.tsx
 │   ├── docs/
 │   │   ├── backward-compatibility-requirements.md
 │   │   ├── deduplication-strategy.md
@@ -443,6 +469,7 @@ client/
 │   │   ├── use-bills.tsx
 │   │   ├── useComprehensiveLoading.ts
 │   │   ├── useConnectionAware.tsx
+│   │   ├── useErrorRecovery.ts
 │   │   ├── use-i18n.tsx
 │   │   ├── use-journey-tracker.ts
 │   │   ├── use-keyboard-focus.ts
@@ -452,11 +479,14 @@ client/
 │   │   ├── use-navigation-preferences.tsx
 │   │   ├── use-navigation-sync.tsx
 │   │   ├── useOfflineCapabilities.ts
+│   │   ├── useOfflineDetection.tsx
 │   │   ├── use-onboarding.tsx
 │   │   ├── use-online-status.tsx
 │   │   ├── use-safe-mutation.ts
 │   │   ├── use-safe-query.ts
+│   │   ├── useSimplifiedLoading.ts
 │   │   ├── use-system.tsx
+│   │   ├── useTimeoutAwareLoading.ts
 │   │   ├── use-toast.ts
 │   │   ├── use-unified-navigation.ts
 │   │   ├── useWebSocket.ts
@@ -546,6 +576,8 @@ client/
 │   │   │   │   ├── TouchTarget.tsx
 │   │   │   │   ├── typography.ts
 │   │   │   ├── index.ts
+│   │   │   ├── lib/
+│   │   │   │   ├── utils.ts
 │   │   │   ├── README.md
 │   │   │   ├── responsive.css
 │   │   │   ├── responsive.ts
@@ -585,6 +617,25 @@ client/
 │   │   │   ├── index.ts
 │   ├── styles/
 │   │   ├── accessibility.css
+│   │   ├── base/
+│   │   │   ├── base.css
+│   │   │   ├── variables.css
+│   │   ├── components/
+│   │   │   ├── buttons.css
+│   │   │   ├── forms.css
+│   │   │   ├── layout.css
+│   │   │   ├── ui.css
+│   │   ├── fallbacks.css
+│   │   ├── responsive/
+│   │   │   ├── desktop.css
+│   │   │   ├── mobile.css
+│   │   │   ├── special.css
+│   │   │   ├── tablet.css
+│   │   ├── themes/
+│   │   │   ├── dark.css
+│   │   ├── utilities/
+│   │   │   ├── accessibility.css
+│   │   │   ├── animations.css
 │   ├── TestComponent.tsx
 │   ├── test-utils/
 │   │   ├── index.tsx
@@ -595,12 +646,15 @@ client/
 │   │   ├── __tests__/
 │   │   │   ├── safe-lazy-loading.test.tsx
 │   │   ├── api-health.ts
+│   │   ├── asset-fallback-config.ts
 │   │   ├── asset-loading.ts
 │   │   ├── authenticated-api.ts
+│   │   ├── backgroundSyncManager.ts
 │   │   ├── browser-compatibility.ts
 │   │   ├── browser-compatibility-manager.ts
 │   │   ├── browser-compatibility-tests.ts
 │   │   ├── browser-logger.ts
+│   │   ├── cacheInvalidation.ts
 │   │   ├── cache-strategy.ts
 │   │   ├── comprehensiveLoading.ts
 │   │   ├── connectionAwareLoading.ts
@@ -624,6 +678,8 @@ client/
 │   │   │   ├── related-pages-calculator.ts
 │   │   │   ├── section-detector.ts
 │   │   │   ├── state-persistence.ts
+│   │   ├── offlineAnalytics.ts
+│   │   ├── offlineDataManager.ts
 │   │   ├── performanceMonitoring.ts
 │   │   ├── performance-optimizer.ts
 │   │   ├── polyfills.ts
@@ -638,6 +694,9 @@ client/
 ├── tsconfig.json
 components.json
 CONSOLIDATION_PROGRESS.md
+CORE_CONSISTENCY_REPORT.md
+CORE_STRUCTURE_FINAL_UPDATE.md
+CORE_UPDATE_COMPLETE.md
 cspell.config.yaml
 docker-compose.yml
 Dockerfile
@@ -679,21 +738,30 @@ docs/
 │   ├── sponsorbyreal.html
 ├── chanuka_architecture.txt
 ├── chanuka_functionality_analysis.md
+├── database-schema-final.md
 ├── features/
 │   ├── best-functionality.md
 │   ├── core-functionality.md
 ├── guides/
 │   ├── BACKEND_TESTING_QUICKSTART.md
 │   ├── CLEANUP_SUMMARY.md
+│   ├── CONSISTENCY_REPORT.md
 │   ├── CONSOLIDATION_COMPLETE.md
+│   ├── CONSOLIDATION_MIGRATION_PLAN.md
+│   ├── CONSOLIDATION_PLAN.md
+│   ├── CONSOLIDATION_README.md
+│   ├── CONSOLIDATION_SUMMARY.md
 │   ├── DATABASE_SETUP_GUIDE.md
 │   ├── DEMO_MODE_CONFIGURATION.md
 │   ├── DEPLOYMENT.md
 │   ├── DEPLOYMENT_GUIDE.md
+│   ├── ERROR_MANAGEMENT_MIGRATION_SUMMARY.md
 │   ├── FINAL_CONSOLIDATION_REPORT.md
 │   ├── INFRASTRUCTURE_CONSOLIDATION_PLAN.md
 │   ├── INFRASTRUCTURE_CONSOLIDATION_SUMMARY.md
 │   ├── MEMORY_OPTIMIZATION_GUIDE.md
+│   ├── MIGRATION_GUIDE.md
+│   ├── MIGRATION_VALIDATION_REPORT.md
 │   ├── NAVIGATION_USER_GUIDE.md
 │   ├── TESTING_GUIDE.md
 │   ├── TROUBLESHOOTING_GUIDE.md
@@ -735,12 +803,15 @@ drizzle.config.ts
 ├── 0017_fix_security_schema_issues.sql
 ├── 0018_add_risk_score_column.sql
 ├── 0019_add_tracking_preferences.sql
+├── 0020_comprehensive_schema_normalization.sql
 ├── meta/
 │   ├── _journal.json
 │   ├── 0000_snapshot.json
 │   ├── 0001_snapshot.json
 │   ├── 0002_snapshot.json
 ├── README.md
+false/
+├── trace.json
 generate-structure-to-file.sh
 Home - Shortcut.lnk
 jest.backend.config.js
@@ -772,41 +843,57 @@ migration/
 ├── validation/
 │   ├── package.json
 │   ├── validate-migration.js
+NAVIGATION_BUG_FIXES.md
 nginx.conf
+OBSERVABILITY_CONSOLIDATION.md
 package.json
 package-lock.json
+performance-budget-report.json
+performance-budget-report.md
+performance-budgets.json
 playwright.config.ts
 playwright-report/
 ├── index.html
 postcss.config.js
 Readme1.md
 scripts/
-├── analyze-bundle.js
+├── accessibility/
+│   ├── accessibility-reporter.test.js
+├── analyze-bundle.cjs
 ├── audit-codebase-utilities.ts
 ├── audit-error-handling-sprawl.ts
 ├── audit-middleware-sprawl.ts
+├── bundle-analysis-plugin.js
+├── bundle-analyzer.js
 ├── check-table-structure.ts
 ├── cleanup-deprecated-folders.ts
 ├── consolidate-sprawl.ts
 ├── database/
 │   ├── check-schema.ts
+│   ├── check-tables.ts
 │   ├── debug-migration-table.ts
 │   ├── generate-migration.ts
 │   ├── migrate.ts
 │   ├── run-migrations.ts
 │   ├── setup-schema.ts
 │   ├── simple-connection-test.ts
+│   ├── simple-migrate.ts
 │   ├── test-connection.ts
 ├── deployment/
 │   ├── deploy.sh
 ├── drop-schema.ts
 ├── fix-api-response-calls.js
+├── fix-frontend-imports.js
 ├── fix-remaining-api-calls.js
+├── fix-server-logger-imports.js
+├── generate-bundle-report.js
 ├── immediate-memory-cleanup.cjs
 ├── migrate-codebase-utilities.ts
 ├── migrate-console-logs.ts
 ├── migrate-error-handling.ts
 ├── optimize-memory.js
+├── performance-budget-enforcer.cjs
+├── performance-trend-analyzer.cjs
 ├── rollback-cleanup.ts
 ├── run-strategic-tests.js
 ├── seeds/
@@ -859,6 +946,7 @@ scripts/
 │   ├── verify-transparency-task.ts
 │   ├── verify-user-profile-service.ts
 │   ├── verify-websocket-service.ts
+├── update-core-references.js
 ├── validate-test-config.js
 ├── verify-cleanup.ts
 server/
@@ -909,12 +997,13 @@ server/
 │   │   ├── system.ts
 │   ├── alert-preferences/
 │   │   ├── alert_system_docs.md
-│   │   ├── alert_utilities.ts
 │   │   ├── application/
 │   │   │   ├── commands/
 │   │   │   │   ├── create-alert-preference-command.ts
 │   │   │   ├── use-cases/
 │   │   │   │   ├── create-alert-preference-use-case.ts
+│   │   │   ├── utils/
+│   │   │   │   ├── alert-utilities.ts
 │   │   ├── domain/
 │   │   │   ├── entities/
 │   │   │   │   ├── alert-delivery-log.ts
@@ -925,6 +1014,7 @@ server/
 │   │   │   ├── services/
 │   │   │   │   ├── alert-delivery-service.ts
 │   │   │   │   ├── smart-filtering-service.ts
+│   │   │   │   ├── unified-alert-preference-service.ts
 │   │   │   ├── value-objects/
 │   │   │   │   ├── alert-channel.ts
 │   │   │   │   ├── alert-conditions.ts
@@ -936,8 +1026,9 @@ server/
 │   │   ├── infrastructure/
 │   │   │   ├── repositories/
 │   │   │   │   ├── alert-preference-repository-impl.ts
-│   │   ├── unified-alert-routes.ts
-│   │   ├── unified_alert_service.ts
+│   │   ├── presentation/
+│   │   │   ├── routes/
+│   │   │   │   ├── unified-alert-routes.ts
 │   ├── analysis/
 │   │   ├── application/
 │   │   │   ├── __tests__/
@@ -1002,6 +1093,7 @@ server/
 │   │   │   ├── dashboard-config.json
 │   │   │   ├── runbooks.md
 │   │   │   ├── setup-guide.md
+│   │   ├── performance-dashboard.ts
 │   │   ├── README.md
 │   │   ├── regulatory-change-monitoring.ts
 │   │   ├── services/
@@ -1206,6 +1298,7 @@ server/
 │   │   │   ├── query-executor.ts
 │   │   ├── database-fallback.ts
 │   │   ├── database-optimization.ts
+│   │   ├── database-service.ts
 │   │   ├── index.d.ts
 │   │   ├── index.ts
 │   │   ├── migration-service.ts
@@ -1226,7 +1319,6 @@ server/
 │   ├── monitoring/
 │   │   ├── audit-log.ts
 │   │   ├── external-api-management.ts
-│   │   ├── health.ts
 │   │   ├── index.ts
 │   │   ├── monitoring-scheduler.ts
 │   │   ├── performance-monitor.ts
@@ -1247,6 +1339,11 @@ server/
 │   │   ├── refactored_summary.md
 │   │   ├── smart-notification-filter.ts
 │   ├── websocket.ts
+├── logs/
+│   ├── app.log
+│   ├── error.log
+│   ├── performance.log
+│   ├── security.log
 ├── middleware/
 │   ├── auth.ts
 │   ├── migration-wrapper.ts
@@ -1255,7 +1352,6 @@ server/
 │   ├── request-logger.ts
 │   ├── security-middleware.ts
 │   ├── security-monitoring-middleware.ts
-├── minimal-server.ts
 ├── routes/
 │   ├── regulatory-monitoring.ts
 ├── scripts/
@@ -1351,15 +1447,7 @@ server/
 ├── vite.ts
 shared/
 ├── core/
-│   ├── CLEANUP_SUMMARY.md
-│   ├── CONSOLIDATION_MIGRATION_PLAN.md
-│   ├── CONSOLIDATION_PLAN.md
-│   ├── CONSOLIDATION_README.md
-│   ├── CONSOLIDATION_SUMMARY.md
-│   ├── ERROR_MANAGEMENT_MIGRATION_SUMMARY.md
 │   ├── index.ts
-│   ├── MIGRATION_GUIDE.md
-│   ├── MIGRATION_VALIDATION_REPORT.md
 │   ├── README.md
 │   ├── src/
 │   │   ├── __tests__/
@@ -1419,17 +1507,6 @@ shared/
 │   │   │   ├── index.ts
 │   │   │   ├── manager.ts
 │   │   │   ├── schema.ts
-│   │   │   ├── types.ts
-│   │   ├── health/
-│   │   │   ├── __tests__/
-│   │   │   │   ├── health-checker.test.ts
-│   │   │   ├── checks/
-│   │   │   │   ├── database-check.ts
-│   │   │   │   ├── memory-check.ts
-│   │   │   │   ├── redis-check.ts
-│   │   │   ├── health-checker.ts
-│   │   │   ├── index.ts
-│   │   │   ├── middleware.ts
 │   │   │   ├── types.ts
 │   │   ├── index.ts
 │   │   ├── middleware/
@@ -1508,26 +1585,48 @@ shared/
 │   │   │   ├── correlation.ts
 │   │   │   ├── error-management/
 │   │   │   │   ├── __tests__/
+│   │   │   │   │   ├── error-management-integration.test.ts
+│   │   │   │   ├── analytics/
+│   │   │   │   │   ├── error-analytics.ts
 │   │   │   │   ├── errors/
 │   │   │   │   │   ├── base-error.ts
+│   │   │   │   │   ├── specialized/
 │   │   │   │   │   ├── specialized-errors.ts
 │   │   │   │   ├── handlers/
+│   │   │   │   │   ├── enhanced-error-boundary.tsx
 │   │   │   │   │   ├── error-boundary.tsx
 │   │   │   │   │   ├── error-handler-chain.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── integrations/
+│   │   │   │   │   ├── error-tracking-integration.ts
 │   │   │   │   ├── legacy-adapters/
 │   │   │   │   │   ├── error-handling-adapter.ts
 │   │   │   │   │   ├── errors-adapter.ts
 │   │   │   │   ├── middleware/
 │   │   │   │   │   ├── express-error-middleware.ts
+│   │   │   │   ├── monitoring/
+│   │   │   │   │   ├── error-monitor.ts
 │   │   │   │   ├── patterns/
 │   │   │   │   │   ├── circuit-breaker.ts
 │   │   │   │   │   ├── retry-patterns.ts
+│   │   │   │   ├── recovery/
+│   │   │   │   │   ├── error-recovery-engine.ts
+│   │   │   │   ├── reporting/
+│   │   │   │   │   ├── user-error-reporter.ts
 │   │   │   │   ├── types.ts
 │   │   │   ├── health/
+│   │   │   │   ├── __tests__/
+│   │   │   │   │   ├── health-checker.test.ts
+│   │   │   │   ├── checks/
 │   │   │   │   ├── checks.ts
+│   │   │   │   │   ├── database-check.ts
+│   │   │   │   │   ├── memory-check.ts
+│   │   │   │   │   ├── redis-check.ts
 │   │   │   │   ├── health-checker.ts
+│   │   │   │   ├── health-service.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── middleware.ts
+│   │   │   │   ├── server-health.ts
 │   │   │   │   ├── types.ts
 │   │   │   ├── index.ts
 │   │   │   ├── interfaces.ts
@@ -1537,6 +1636,7 @@ shared/
 │   │   │   ├── logging/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── logger.ts
+│   │   │   │   ├── logging-service.ts
 │   │   │   │   ├── types.ts
 │   │   │   ├── metrics/
 │   │   │   │   ├── collectors.ts
@@ -1558,6 +1658,11 @@ shared/
 │   │   │   │   ├── span.ts
 │   │   │   │   ├── tracer.ts
 │   │   │   │   ├── types.ts
+│   │   │   ├── types.ts
+│   │   ├── performance/
+│   │   │   ├── budgets.ts
+│   │   │   ├── index.ts
+│   │   │   ├── monitoring.ts
 │   │   ├── primitives/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── base-error.test.ts
@@ -1617,12 +1722,9 @@ shared/
 │   │   │   │   ├── memory-store.ts
 │   │   │   │   ├── redis-store.ts
 │   │   │   ├── types.ts
-│   │   ├── schema/
 │   │   ├── services/
 │   │   │   ├── cache.ts
 │   │   │   ├── composition.ts
-│   │   │   ├── health.ts
-│   │   │   ├── logging.ts
 │   │   │   ├── rate-limit.ts
 │   │   │   ├── validation.ts
 │   │   ├── testing/
@@ -1646,17 +1748,16 @@ shared/
 │   │   │   ├── stress-tests.ts
 │   │   ├── types/
 │   │   │   ├── auth.types.ts
+│   │   │   ├── index.ts
 │   │   │   ├── services.ts
 │   │   │   ├── validation-types.ts
-│   │   ├── utilities/
+│   │   ├── utils/
 │   │   │   ├── api/
 │   │   │   │   ├── index.ts
-│   │   │   ├── cache/
-│   │   │   │   ├── index.ts
-│   │   │   ├── performance/
-│   │   │   │   ├── index.ts
-│   │   ├── utils/
+│   │   │   ├── api-utils.ts
 │   │   │   ├── async-utils.ts
+│   │   │   ├── browser-logger.ts
+│   │   │   ├── cache-utils.ts
 │   │   │   ├── constants.ts
 │   │   │   ├── correlation-id.ts
 │   │   │   ├── data-utils.ts
@@ -1720,6 +1821,7 @@ shared/
 ├── database/
 │   ├── connection.ts
 │   ├── example-usage.ts
+│   ├── index.ts
 │   ├── init.ts
 │   ├── monitoring.ts
 │   ├── pool.ts
@@ -1741,10 +1843,11 @@ shared/
 │   ├── common.ts
 │   ├── errors.ts
 │   ├── expert.ts
+│   ├── index.ts
 │   ├── legal-analysis.ts
 tailwind.config.ts
 test-auth-compile.ts
-test-results
+test-results/
 ├── results.json
 ├── results.xml
 tests/
@@ -1775,4 +1878,4 @@ vitest.frontend.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-22 11:11:31
+Generated on: 2025-10-25 11:30:19

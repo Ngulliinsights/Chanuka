@@ -3,7 +3,7 @@ import { billStatusMonitorService } from './services/bill-status-monitor.js';
 import { db } from '@shared/database/pool.js';
 import { users, bills } from '../shared/schema';
 import { eq } from 'drizzle-orm';
-import { logger } from '../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 async function verifyNotificationSystem() {
   logger.info('🔍 Verifying Multi-Channel Notification System...', { component: 'Chanuka' });

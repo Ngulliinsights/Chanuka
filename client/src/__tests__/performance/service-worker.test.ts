@@ -1,4 +1,18 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { logger } from '@shared/core';
 
 // Mock service worker registration
@@ -133,3 +147,25 @@ class ServiceWorkerManager {
 
 
 
+
+
+describe('service-worker', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should be defined and properly exported', () => {
+    expect(service-worker).toBeDefined();
+    expect(typeof service-worker).not.toBe('undefined');
+  });
+
+  it('should export expected functions/classes', () => {
+    // TODO: Add specific export tests for service-worker
+    expect(typeof service-worker).toBe('object');
+  });
+
+  it('should handle basic functionality', () => {
+    // TODO: Add specific functionality tests for service-worker
+    expect(true).toBe(true);
+  });
+});

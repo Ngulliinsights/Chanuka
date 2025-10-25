@@ -1,5 +1,5 @@
 // Re-export database service from the infrastructure layer
-export { databaseService } from '../../server/infrastructure/database/database-service';
+export { databaseService } from '@server/infrastructure/database/database-service';
 
 // Re-export connection utilities
 export { database, readDatabase, writeDatabase, pool } from './connection';
@@ -8,7 +8,7 @@ export { database, readDatabase, writeDatabase, pool } from './connection';
 export { withTransaction, withReadConnection } from './connection';
 
 // Re-export schema
-export * from '../schema';
+export * from '../types';
 
 // Re-export types
 export type { DatabaseTransaction, DatabaseOperation, TransactionOptions } from './connection';

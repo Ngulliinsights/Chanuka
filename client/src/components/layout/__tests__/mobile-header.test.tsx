@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MobileHeader } from '../mobile-header';
-import { HeaderAction } from '../types';
+import { HeaderAction } from '@shared/types';
 import { LayoutRenderError } from '../errors';
 
 // Mock dependencies
@@ -97,7 +97,7 @@ describe('MobileHeader Component', () => {
           id: 'back',
           icon: <span>←</span>,
           label: 'Go back',
-          onClick: jest.fn(),
+          onClick: vi.fn(),
         },
       ];
 
@@ -116,7 +116,7 @@ describe('MobileHeader Component', () => {
           id: 'notifications',
           icon: <span>🔔</span>,
           label: 'Notifications',
-          onClick: jest.fn(),
+          onClick: vi.fn(),
           badge: 3,
         },
       ];

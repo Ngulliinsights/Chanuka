@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { z } from 'zod';
-import { useAuth } from '..\..\..\hooks\use-auth';
+import { useAuth } from '../../../hooks/use-auth';
 import { 
   AuthMode, 
   FormData, 

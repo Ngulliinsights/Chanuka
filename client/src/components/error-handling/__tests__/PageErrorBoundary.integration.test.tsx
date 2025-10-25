@@ -1,10 +1,24 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import PageErrorBoundary from '../PageErrorBoundary';
-import { logger } from '..\..\..\utils\browser-logger';
+import { logger } from '../../../utils/browser-logger';
 
 // Mock component that can throw different types of errors
 const ErrorThrowingComponent = ({ 
@@ -88,8 +102,10 @@ describe('PageErrorBoundary Integration Tests', () => {
   });
 
   afterEach(() => {
+    cleanup();
     vi.clearAllMocks();
     vi.restoreAllMocks();
+  
   });
 
   describe('Error Boundary Behavior', () => {

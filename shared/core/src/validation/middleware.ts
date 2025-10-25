@@ -4,6 +4,7 @@
  * Express middleware for request validation with comprehensive error handling
  */
 
+import 'reflect-metadata';
 import { Request, Response, NextFunction } from 'express';
 import { ZodSchema, ZodError } from 'zod';
 import { ValidationError, ValidationOptions, ValidationContext } from './types';
@@ -84,7 +85,8 @@ export function validateRequest(config: RequestValidationConfig) {
           req.body = config.transform ? config.transform(validatedData.body, req) : validatedData.body;
         } catch (error) {
           if (error instanceof ValidationError) {
-            error.errors = error.errors.map(e => ({ ...e, field: `body.${e.field}` }));
+            const updatedErrors = error.errors.map(e => ({ ...e, field: `body.${e.field}` }));
+            throw new ValidationError(error.message, updatedErrors);
           }
           throw error;
         }
@@ -102,7 +104,8 @@ export function validateRequest(config: RequestValidationConfig) {
           req.query = config.transform ? config.transform(validatedData.query, req) : validatedData.query;
         } catch (error) {
           if (error instanceof ValidationError) {
-            error.errors = error.errors.map(e => ({ ...e, field: `query.${e.field}` }));
+            const updatedErrors = error.errors.map(e => ({ ...e, field: `query.${e.field}` }));
+            throw new ValidationError(error.message, updatedErrors);
           }
           throw error;
         }
@@ -120,7 +123,8 @@ export function validateRequest(config: RequestValidationConfig) {
           req.params = config.transform ? config.transform(validatedData.params, req) : validatedData.params;
         } catch (error) {
           if (error instanceof ValidationError) {
-            error.errors = error.errors.map(e => ({ ...e, field: `params.${e.field}` }));
+            const updatedErrors = error.errors.map(e => ({ ...e, field: `params.${e.field}` }));
+            throw new ValidationError(error.message, updatedErrors);
           }
           throw error;
         }
@@ -138,7 +142,8 @@ export function validateRequest(config: RequestValidationConfig) {
           // Note: We don't modify req.headers as it might break other middleware
         } catch (error) {
           if (error instanceof ValidationError) {
-            error.errors = error.errors.map(e => ({ ...e, field: `headers.${e.field}` }));
+            const updatedErrors = error.errors.map(e => ({ ...e, field: `headers.${e.field}` }));
+            throw new ValidationError(error.message, updatedErrors);
           }
           throw error;
         }
@@ -155,7 +160,7 @@ export function validateRequest(config: RequestValidationConfig) {
         }
         
         // Default error response
-        return res.status(error.statusCode).json({
+        res.status(error.statusCode).json({
           error: 'Validation Error',
           message: error.message,
           details: error.errors,
@@ -320,7 +325,7 @@ export function validateBatch(schema: ZodSchema, options?: ValidationOptions) {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       if (!Array.isArray(req.body)) {
-        return res.status(400).json({
+        res.status(400).json({
           error: 'Bad Request',
           message: 'Request body must be an array for batch validation',
           timestamp: new Date().toISOString(),
@@ -352,7 +357,7 @@ export function validateBatch(schema: ZodSchema, options?: ValidationOptions) {
 
       // If there are invalid items, return them in the response
       if (result.invalidCount > 0) {
-        return res.status(422).json({
+        res.status(422).json({
           error: 'Batch Validation Error',
           message: `${result.invalidCount} of ${result.totalCount} items failed validation`,
           valid: result.valid,
@@ -429,7 +434,7 @@ export function validateFileUpload(
         );
 
         if (result.invalidCount > 0) {
-          return res.status(422).json({
+          res.status(422).json({
             error: 'File Validation Error',
             message: `${result.invalidCount} of ${result.totalCount} files failed validation`,
             invalid: result.invalid.map(item => ({
@@ -455,7 +460,7 @@ export function validateFileUpload(
       next();
     } catch (error) {
       if (error instanceof ValidationError) {
-        return res.status(error.statusCode).json({
+        res.status(error.statusCode).json({
           error: 'File Validation Error',
           message: error.message,
           details: error.errors,

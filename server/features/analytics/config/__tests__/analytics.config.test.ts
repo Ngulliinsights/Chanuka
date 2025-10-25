@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   analyticsConfigSchema,
   defaultAnalyticsConfig,
@@ -25,7 +26,7 @@ describe('Analytics Configuration', () => {
     // Reset the analytics config singleton
     resetAnalyticsConfig();
 
-    jest.resetModules();
+    vi.resetModules();
   });
 
   afterEach(() => {

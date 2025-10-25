@@ -1,9 +1,23 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { CleanupOrchestrator, FileCategory } from '../orchestrator';
-import { AnalysisType, FindingType } from '../../types';
-import { logger } from '../../../observability/logging';
+import { AnalysisType, FindingType } from '@shared/types';
+import { logger } from '@shared/core/src/observability/logging';
 
 describe('CleanupOrchestrator', () => {
   let tempDir: string;

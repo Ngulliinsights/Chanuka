@@ -1,10 +1,24 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { StressTests } from '../testing/stress-tests';
 import { createCacheService } from '../cache';
 import { createRateLimitFactory } from '../rate-limiting';
-import { Logger } from '../logging/logger';
+import { Logger } from '@shared/core/src/observability/logging';
 import type { StressTestComponents, StressTestConfig } from '../testing/stress-tests';
-import { logger } from '../observability/logging';
+import { logger } from '@shared/core/src/observability/logging';
 
 describe('Core Utilities Stress Tests', () => {
   let stressTests: StressTests;

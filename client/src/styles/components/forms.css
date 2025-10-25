@@ -1,0 +1,42 @@
+/* Form Controls - Improved accessibility and consistency */
+
+@import '../base/variables.css';
+
+@layer components {
+  .chanuka-input,
+  .chanuka-select,
+  .chanuka-textarea {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    font-family: inherit;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: hsl(var(--foreground));
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius-md);
+    transition: all var(--timing-fast) var(--easing-out);
+  }
+
+  .chanuka-input:focus,
+  .chanuka-select:focus,
+  .chanuka-textarea:focus {
+    outline: none;
+    border-color: hsl(var(--ring));
+    box-shadow: var(--shadow-focus);
+  }
+
+  .chanuka-input::placeholder,
+  .chanuka-textarea::placeholder {
+    color: hsl(var(--muted-foreground));
+  }
+
+  .chanuka-select {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right var(--space-sm) center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+}

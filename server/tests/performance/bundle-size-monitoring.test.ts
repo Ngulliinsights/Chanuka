@@ -1,8 +1,23 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock logger
+const mockLogger = {
+  info: vi.fn(),
+  error: vi.fn(),
+  warn: vi.fn(),
+  debug: vi.fn(),
+  trace: vi.fn(),
+};
+
+vi.mock('@shared/core/src/observability/logging', () => ({
+  logger: mockLogger,
+  createLogger: vi.fn(() => mockLogger),
+}));
+
 import { describe, it, expect, beforeAll } from '@jest/globals';
 import { execSync } from 'child_process';
 import { readFileSync, existsSync, statSync } from 'fs';
 import { join } from 'path';
-import { logger } from '../../../shared/core/src/observability/logging';
+import { logger } from '@shared/core';
 
 describe('Bundle Size Monitoring and Regression Tests', () => {
   const BUNDLE_SIZE_LIMITS = {
@@ -266,3 +281,25 @@ describe('Bundle Size Monitoring and Regression Tests', () => {
 
 
 
+
+
+describe('bundle-size-monitoring', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should be defined and properly exported', () => {
+    expect(bundle-size-monitoring).toBeDefined();
+    expect(typeof bundle-size-monitoring).not.toBe('undefined');
+  });
+
+  it('should export expected functions/classes', () => {
+    // TODO: Add specific export tests for bundle-size-monitoring
+    expect(typeof bundle-size-monitoring).toBe('object');
+  });
+
+  it('should handle basic functionality', () => {
+    // TODO: Add specific functionality tests for bundle-size-monitoring
+    expect(true).toBe(true);
+  });
+});

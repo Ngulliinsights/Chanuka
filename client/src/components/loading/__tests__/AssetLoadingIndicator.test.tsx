@@ -1,3 +1,4 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 /**
  * AssetLoadingIndicator component tests
  * Following navigation component patterns for testing
@@ -25,7 +26,7 @@ const mockUseAssetLoading = {
     phase: 'critical' as const,
     currentAsset: '/assets/test.jpg',
   },
-  getStats: jest.fn(() => ({
+  getStats: vi.fn(() => ({
     loaded: 5,
     failed: 1,
     connectionType: 'fast' as const,
@@ -33,12 +34,12 @@ const mockUseAssetLoading = {
   })),
 };
 
-jest.mock('@/utils/asset-loading', () => ({
+vi.mock('@/utils/asset-loading', () => ({
   useAssetLoading: () => mockUseAssetLoading,
 }));
 
 // Mock recovery hook
-jest.mock('../hooks/useLoadingRecovery', () => ({
+vi.mock('../hooks/useLoadingRecovery', () => ({
   useLoadingRecovery: () => ({
     recoveryState: {
       canRecover: true,
@@ -47,27 +48,29 @@ jest.mock('../hooks/useLoadingRecovery', () => ({
       recoveryAttempts: 0,
       maxRecoveryAttempts: 3,
     },
-    recover: jest.fn().mockResolvedValue(true),
-    updateError: jest.fn(),
+    recover: vi.fn().mockResolvedValue(true),
+    updateError: vi.fn(),
   }),
 }));
 
 // Mock logger
-jest.mock('../utils/logger.js', () => ({
+vi.mock('../utils/logger.js', () => ({
   logger: {
-    error: jest.fn(),
-    warn: jest.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
   },
 }));
 
 describe('AssetLoadingIndicator', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    cleanup();
+    vi.useRealTimers();
+  
   });
 
   describe('AssetLoadingIndicator Component', () => {
@@ -128,7 +131,7 @@ describe('AssetLoadingIndicator', () => {
       
       // Fast-forward auto-hide timer
       act(() => {
-        jest.advanceTimersByTime(2000);
+        vi.advanceTimersByTime(2000);
       });
       
       await waitFor(() => {
@@ -185,7 +188,7 @@ describe('AssetLoadingIndicator', () => {
       
       // Trigger stats update
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
       });
 
       await waitFor(() => {
@@ -205,7 +208,7 @@ describe('AssetLoadingIndicator', () => {
       render(<AssetLoadingIndicator />);
       
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
       });
 
       await waitFor(() => {
@@ -224,7 +227,7 @@ describe('AssetLoadingIndicator', () => {
       render(<AssetLoadingIndicator showDetails />);
       
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
       });
 
       await waitFor(() => {
@@ -241,7 +244,7 @@ describe('AssetLoadingIndicator', () => {
       render(<AssetLoadingIndicator />);
       
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
       });
 
       await waitFor(() => {
@@ -357,7 +360,7 @@ describe('AssetLoadingIndicator', () => {
       };
 
       // Suppress console.error for this test
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation();
       
       expect(() => render(<TestComponent />)).toThrow(
         'useAssetLoadingContext must be used within AssetLoadingProvider'
@@ -468,7 +471,7 @@ describe('AssetLoadingIndicator', () => {
       
       // Advance timer to trigger stats update
       act(() => {
-        jest.advanceTimersByTime(1000);
+        vi.advanceTimersByTime(1000);
       });
       
       expect(screen.getByText('Progress: 5/10')).toBeInTheDocument(); // Progress comes from progress object, not stats
@@ -502,7 +505,7 @@ describe('AssetLoadingIndicator', () => {
       render(<AssetLoadingIndicator />);
       
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
       });
 
       await waitFor(() => {
@@ -511,9 +514,9 @@ describe('AssetLoadingIndicator', () => {
     });
 
     it('should handle recovery process', async () => {
-      const mockRecover = jest.fn().mockResolvedValue(true);
+      const mockRecover = vi.fn().mockResolvedValue(true);
       
-      jest.mocked(require('../hooks/useLoadingRecovery').useLoadingRecovery).mockReturnValue({
+      vi.mocked(require('../hooks/useLoadingRecovery').useLoadingRecovery).mockReturnValue({
         recoveryState: {
           canRecover: true,
           suggestions: ['Retry loading'],
@@ -522,7 +525,7 @@ describe('AssetLoadingIndicator', () => {
           maxRecoveryAttempts: 3,
         },
         recover: mockRecover,
-        updateError: jest.fn(),
+        updateError: vi.fn(),
       });
 
       mockUseAssetLoading.getStats.mockReturnValue({
@@ -535,7 +538,7 @@ describe('AssetLoadingIndicator', () => {
       render(<AssetLoadingIndicator />);
       
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
       });
 
       await waitFor(() => {
@@ -547,7 +550,7 @@ describe('AssetLoadingIndicator', () => {
     });
 
     it('should show recovery in progress state', async () => {
-      jest.mocked(require('../hooks/useLoadingRecovery').useLoadingRecovery).mockReturnValue({
+      vi.mocked(require('../hooks/useLoadingRecovery').useLoadingRecovery).mockReturnValue({
         recoveryState: {
           canRecover: true,
           suggestions: ['Retrying...'],
@@ -555,8 +558,8 @@ describe('AssetLoadingIndicator', () => {
           recoveryAttempts: 1,
           maxRecoveryAttempts: 3,
         },
-        recover: jest.fn(),
-        updateError: jest.fn(),
+        recover: vi.fn(),
+        updateError: vi.fn(),
       });
 
       mockUseAssetLoading.getStats.mockReturnValue({
@@ -569,7 +572,7 @@ describe('AssetLoadingIndicator', () => {
       render(<AssetLoadingIndicator />);
       
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
       });
 
       await waitFor(() => {
@@ -598,7 +601,7 @@ describe('AssetLoadingIndicator', () => {
       render(<AssetLoadingIndicator />);
       
       act(() => {
-        jest.advanceTimersByTime(500);
+        vi.advanceTimersByTime(500);
       });
 
       await waitFor(() => {
