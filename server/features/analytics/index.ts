@@ -2,12 +2,11 @@
 // Centralized exports for analytics and reporting functionality
 
 // Routes
-export { default as analyticsRouter } from './analytics.js';
-export { default as engagementAnalyticsRouter } from './services/engagement.service.js';
-export { default as transparencyDashboardRouter } from './transparency-dashboard.js';
-export { default as analysisRouter } from './analysis.js';
-export { default as financialDisclosureRouter } from './financial-disclosure/index.js';
-export { default as financialDisclosureIntegrationRouter } from './financial-disclosure/analytics.js';
+export { router as analyticsRouter } from './analytics.js';
+export { default as engagementAnalyticsRouter } from './engagement-analytics.js';
+export { simpleTransparencyDashboardService as transparencyDashboardRouter } from './transparency-dashboard.js';
+export { router as analysisRouter } from './analysis.js';
+export { createFinancialDisclosureRouter as financialDisclosureRouter } from './financial-disclosure/index.js';
 
 // Services - Organized exports from services/ folder
 export {
@@ -20,8 +19,8 @@ export {
 } from './services/index.js';
 
 // Legacy services (keeping for backward compatibility)
-export { TransparencyDashboardService } from './transparency-dashboard.js';
-export { TransparencyDashboardSimpleService } from './transparency-dashboard.js';
+export { SimpleTransparencyDashboardService } from './transparency-dashboard.js';
+export { simpleTransparencyDashboardService } from './transparency-dashboard.js';
 export { DashboardService } from './dashboard.js';
 export { LegalAnalysisService } from './legal-analysis.js';
 export { conflictDetectionService as ConflictDetectionService } from './conflict-detection.js';

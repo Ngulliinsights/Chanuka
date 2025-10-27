@@ -108,17 +108,17 @@ const getApiBaseUrl = (): string => {
       // Transform known dev server ports to API server port
       // This is a common pattern where frontend runs on :5173 and backend on :4201
       if (isDevelopmentPort(currentOrigin)) {
-        return currentOrigin.replace(/:\d+$/, ':4201');
+        return currentOrigin.replace(/:\d+$/, ':4200');
       }
       
       // If we're already on the API server port, use it directly
-      if (currentOrigin.includes(':4201')) {
+      if (currentOrigin.includes(':4200')) {
         return currentOrigin;
       }
     }
     
     // Fallback to localhost for development environments
-    return 'http://localhost:4201';
+    return 'http://localhost:4200';
   }
 
   // Priority 3: Production - use same origin for security

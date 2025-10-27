@@ -8,7 +8,7 @@ import { BaseCacheAdapter } from '../core/base-adapter.js';
 import { CacheAdapterConfig } from '../core/interfaces.js';
 
 export interface MemoryAdapterConfig extends CacheAdapterConfig {
-  maxEntries?: number;
+  maxSize?: number;
   cleanupInterval?: number;
   enableLRU?: boolean;
 }
@@ -24,14 +24,14 @@ export class MemoryAdapter extends BaseCacheAdapter {
   private cache = new Map<string, CacheEntry>();
   private accessOrder: string[] = [];
   private cleanupTimer?: NodeJS.Timeout;
-  private readonly maxEntries: number;
+  private readonly maxSize: number;
   private readonly cleanupInterval: number;
   private readonly enableLRU: boolean;
 
   constructor(config: MemoryAdapterConfig = {}) {
     super('MemoryAdapter', '1.0.0', config);
-    
-    this.maxEntries = config.maxEntries || 10000;
+
+    this.maxSize = config.maxSize || 10000;
     this.cleanupInterval = config.cleanupInterval || 60000; // 1 minute
     this.enableLRU = config.enableLRU !== false;
     
@@ -83,7 +83,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
       };
 
       // Check if we need to evict entries
-      if (this.cache.size >= this.maxEntries && !this.cache.has(formattedKey)) {
+      if (this.cache.size >= this.maxSize && !this.cache.has(formattedKey)) {
         await this.evictLRU();
       }
 
@@ -102,15 +102,19 @@ export class MemoryAdapter extends BaseCacheAdapter {
     return this.measureLatency(async () => {
       const formattedKey = this.formatKey(key);
       const existed = this.cache.delete(formattedKey);
-      
+
       if (existed) {
         this.removeFromAccessOrder(formattedKey);
         this.updateMetrics('delete');
         this.emit('delete', { key: formattedKey });
       }
-      
+
       return existed;
     });
+  }
+
+  async delete(key: string): Promise<boolean> {
+    return this.del(key);
   }
 
   async exists(key: string): Promise<boolean> {

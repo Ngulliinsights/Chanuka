@@ -25,7 +25,7 @@ export interface ValidationRule<T = any> {
 }
 
 // Enhanced validation error with better debugging context
-export interface ValidationError {
+export interface ValidationErrorDetail {
   field: string;
   message: string;
   type: ValidationType;
@@ -33,6 +33,9 @@ export interface ValidationError {
   ruleName?: string;
   timestamp?: Date;
 }
+
+// Type alias for backward compatibility
+export type ValidationError = ValidationErrorDetail;
 
 // Comprehensive validation result
 export interface ValidationResult {

@@ -164,7 +164,7 @@ describe('Navigation State Persistence and Consistency', () => {
       );
 
       // Toggle sidebar
-      act(() => {
+      await act(() => {
         screen.getByTestId('toggle-sidebar').click();
       });
 
@@ -279,7 +279,7 @@ describe('Navigation State Persistence and Consistency', () => {
       expect(screen.getByTestId('sidebar-collapsed')).toHaveTextContent('true');
 
       // Toggle sidebar
-      act(() => {
+      await act(() => {
         screen.getByTestId('toggle-sidebar').click();
       });
 

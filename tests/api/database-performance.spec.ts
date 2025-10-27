@@ -1,4 +1,16 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock performance API
+Object.defineProperty(global, 'performance', {
+  writable: true,
+  value: {
+    now: vi.fn(() => Date.now()),
+    mark: vi.fn(),
+    measure: vi.fn(),
+    getEntriesByName: vi.fn(() => []),
+    getEntriesByType: vi.fn(() => []),
+  },
+});
+
 import { test, expect } from '@playwright/test';
 
 // Strategic Migration: Database Performance Testing via API

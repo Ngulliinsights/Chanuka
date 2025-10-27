@@ -130,7 +130,7 @@ describe('AssetLoadingIndicator', () => {
       expect(container.firstChild).toBeInTheDocument();
       
       // Fast-forward auto-hide timer
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(2000);
       });
       
@@ -187,7 +187,7 @@ describe('AssetLoadingIndicator', () => {
       render(<AssetLoadingIndicator />);
       
       // Trigger stats update
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(500);
       });
 
@@ -207,7 +207,7 @@ describe('AssetLoadingIndicator', () => {
 
       render(<AssetLoadingIndicator />);
       
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(500);
       });
 
@@ -226,7 +226,7 @@ describe('AssetLoadingIndicator', () => {
 
       render(<AssetLoadingIndicator showDetails />);
       
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(500);
       });
 
@@ -243,7 +243,7 @@ describe('AssetLoadingIndicator', () => {
 
       render(<AssetLoadingIndicator />);
       
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(500);
       });
 
@@ -470,7 +470,7 @@ describe('AssetLoadingIndicator', () => {
       });
       
       // Advance timer to trigger stats update
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(1000);
       });
       
@@ -504,7 +504,7 @@ describe('AssetLoadingIndicator', () => {
 
       render(<AssetLoadingIndicator />);
       
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(500);
       });
 
@@ -537,7 +537,7 @@ describe('AssetLoadingIndicator', () => {
 
       render(<AssetLoadingIndicator />);
       
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(500);
       });
 
@@ -571,7 +571,7 @@ describe('AssetLoadingIndicator', () => {
 
       render(<AssetLoadingIndicator />);
       
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(500);
       });
 
@@ -600,7 +600,7 @@ describe('AssetLoadingIndicator', () => {
 
       render(<AssetLoadingIndicator />);
       
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(500);
       });
 

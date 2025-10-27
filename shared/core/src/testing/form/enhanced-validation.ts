@@ -11,12 +11,15 @@ import { TypeGuards } from '../../utils/type-guards';
 import { Logger } from '../../logging';
 import { logger } from '../../observability/logging';
 
-export interface ValidationError {
+export interface ValidationErrorDetail {
   field: string;
   message: string;
   type: string;
   value?: any;
 }
+
+// Type alias for backward compatibility
+export type ValidationError = ValidationErrorDetail;
 
 export interface ValidationResult {
   isValid: boolean;

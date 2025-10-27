@@ -42,8 +42,10 @@ describe('ConfigManager', () => {
   });
 
   afterEach(() => {
+    cleanup();
     process.env = originalEnv;
     configManager?.destroy();
+  
   });
 
   describe('Configuration Loading', () => {

@@ -1,4 +1,23 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock WebSocket
+global.WebSocket = vi.fn().mockImplementation(() => ({
+  send: vi.fn(),
+  close: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  readyState: 1,
+}));
+
+// Mock fetch
+global.fetch = vi.fn(() =>
+  Promise.resolve({
+    ok: true,
+    status: 200,
+    json: () => Promise.resolve({}),
+    text: () => Promise.resolve(''),
+  } as Response)
+);
+
 // Mock logger
 const mockLogger = {
   info: vi.fn(),

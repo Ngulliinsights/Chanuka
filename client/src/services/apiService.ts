@@ -4,6 +4,7 @@ import { offlineDataManager } from '../utils/offlineDataManager';
 import { backgroundSyncManager } from '../utils/backgroundSyncManager';
 import { cacheInvalidation } from '../utils/cacheInvalidation';
 import { offlineAnalytics } from '../utils/offlineAnalytics';
+import { serviceRecovery } from '../utils/service-recovery';
 
 // API Error Types - Enhanced with better type safety
 export interface ApiError extends Error {
@@ -35,25 +36,25 @@ export interface FetchOptions extends RequestInit {
 // Improved type safety: success and error states are mutually exclusive
 export type ApiResponse<T = any> =
   | {
-      data: T;
-      success: true;
-      fromCache?: boolean;
-      fromFallback?: false;
-    }
+    data: T;
+    success: true;
+    fromCache?: boolean;
+    fromFallback?: false;
+  }
   | {
-      data: T;
-      success: false;
-      error: ApiError;
-      fromCache?: false;
-      fromFallback: true;
-    }
+    data: T;
+    success: false;
+    error: ApiError;
+    fromCache?: false;
+    fromFallback: true;
+  }
   | { // Added a dedicated error state for non-fallback failures
-      data: null;
-      success: false;
-      error: ApiError;
-      fromCache?: false;
-      fromFallback?: false;
-    };
+    data: null;
+    success: false;
+    error: ApiError;
+    fromCache?: false;
+    fromFallback?: false;
+  };
 
 // Default configurations with smarter retry logic
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
@@ -67,7 +68,7 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
       // Only retry these specific client errors
       return error.status === 408 || error.status === 429; // Timeout or rate limit
     }
-    
+
     // Retry network errors and server errors (5xx)
     if (!error.status || error.status >= 500) {
       // On the last attempt, only retry 503 (Service Unavailable) and 504 (Gateway Timeout)
@@ -76,7 +77,7 @@ const DEFAULT_RETRY_CONFIG: RetryConfig = {
       }
       return true;
     }
-    
+
     return false;
   },
   onRetry: (error, attempt, delayMs) => {
@@ -209,7 +210,7 @@ function createCacheKey(url: string, options?: RequestInit): string {
   if (method === 'GET' && !options?.body) {
     return `${method}:${url}`;
   }
-  const body = options?.body 
+  const body = options?.body
     ? (typeof options.body === 'string' ? options.body : JSON.stringify(options.body))
     : '';
   return `${method}:${url}:${body}`;
@@ -284,8 +285,8 @@ export async function fetchWithFallback<T = any>(
           url,
           signal: controller.signal,
         });
-        
-        const response = await fetch(processedConfig.url, processedConfig);
+
+        const response = await serviceRecovery.fetchWithRetry(processedConfig.url, processedConfig);
         clearTimeout(timeoutId);
 
         if (!response.ok) {
@@ -294,7 +295,7 @@ export async function fetchWithFallback<T = any>(
             localStorage.removeItem('token');
             window.location.href = '/auth'; // or use a navigation service
           }
-          
+
           let errorDetails: any;
           try {
             errorDetails = await parseResponse(response);
@@ -385,7 +386,7 @@ export async function fetchWithFallback<T = any>(
   if (fallbackData !== undefined) {
     return { data: fallbackData, success: false, error: lastError!, fromFallback: true };
   }
-  
+
   // Return a standard error response
   return { data: null, success: false, error: lastError! };
 }
@@ -409,7 +410,7 @@ export class ApiService {
   }
 
   async get<T = any>(
-    endpoint: string, 
+    endpoint: string,
     options: Omit<FetchOptions, 'method'> = {}
   ): Promise<ApiResponse<T>> {
     return fetchWithFallback<T>(this.getFullUrl(endpoint), {
@@ -419,8 +420,8 @@ export class ApiService {
   }
 
   async post<T = any>(
-    endpoint: string, 
-    data: any, 
+    endpoint: string,
+    data: any,
     options: Omit<FetchOptions, 'method' | 'body'> = {}
   ): Promise<ApiResponse<T>> {
     return fetchWithFallback<T>(this.getFullUrl(endpoint), {
@@ -432,8 +433,8 @@ export class ApiService {
   }
 
   async put<T = any>(
-    endpoint: string, 
-    data: any, 
+    endpoint: string,
+    data: any,
     options: Omit<FetchOptions, 'method' | 'body'> = {}
   ): Promise<ApiResponse<T>> {
     return fetchWithFallback<T>(this.getFullUrl(endpoint), {
@@ -445,8 +446,8 @@ export class ApiService {
   }
 
   async patch<T = any>(
-    endpoint: string, 
-    data: any, 
+    endpoint: string,
+    data: any,
     options: Omit<FetchOptions, 'method' | 'body'> = {}
   ): Promise<ApiResponse<T>> {
     return fetchWithFallback<T>(this.getFullUrl(endpoint), {
@@ -458,7 +459,7 @@ export class ApiService {
   }
 
   async delete<T = any>(
-    endpoint: string, 
+    endpoint: string,
     options: Omit<FetchOptions, 'method'> = {}
   ): Promise<ApiResponse<T>> {
     return fetchWithFallback<T>(this.getFullUrl(endpoint), {
@@ -480,7 +481,7 @@ export class ApiService {
   getCacheStats(): { size: number; maxSize: number } {
     return apiCache.getStats();
   }
-  
+
   setBaseUrl(baseUrl: string): void {
     this.baseUrl = baseUrl.replace(/\/$/, '');
   }
@@ -586,11 +587,11 @@ export function isClientError(error: ApiError): boolean {
 }
 
 export function isRetryableError(error: ApiError): boolean {
-  return isNetworkError(error) || 
-         error.status === 408 || 
-         error.status === 429 ||
-         error.status === 503 ||
-         error.status === 504;
+  return isNetworkError(error) ||
+    error.status === 408 ||
+    error.status === 429 ||
+    error.status === 503 ||
+    error.status === 504;
 }
 
 export function getErrorMessage(error: ApiError): string {

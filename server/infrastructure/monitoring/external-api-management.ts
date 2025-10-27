@@ -5,7 +5,7 @@ import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } f
 
 // Helper functions using shared utilities
 const sendResponse = (res: any, data: any, message: string = 'Success') => {
-  return res.json({
+  return sendResponse(res, {
     success: true,
     data,
     message,

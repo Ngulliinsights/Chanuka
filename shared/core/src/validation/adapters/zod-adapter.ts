@@ -16,6 +16,7 @@ import {
   IValidationServiceConfig,
   ISchemaRegistration,
   IValidationMetrics,
+  ValidationErrorDetail,
 } from '../core/interfaces';
 import { CoreValidationService } from '../core/validation-service';
 
@@ -45,8 +46,15 @@ export class ZodSchemaAdapter implements ISchemaAdapter {
       return { success: true, data: result };
     } catch (error) {
       if (error instanceof ZodError) {
-        const validationError = new ValidationError(error.message, { zodError: error });
-        return { success: false, error: validationError };
+        const validationError = new ValidationError(error, undefined, { zodError: error });
+        const errorDetails: ValidationErrorDetail[] = validationError.errors.map(err => ({
+          field: err.field || '',
+          message: err.message,
+          code: err.code,
+          value: err.value,
+          context: { zodError: error }
+        }));
+        return { success: false, errors: errorDetails };
       }
       throw error;
     }
@@ -83,8 +91,11 @@ export class ZodValidationService extends CoreValidationService implements IVali
           this.updateMetrics('cacheHit', startTime);
           if (cached.success && cached.data) {
             return cached.data;
-          } else if (!cached.success && cached.error) {
-            throw cached.error;
+          } else if (!cached.success && cached.errors && cached.errors.length > 0) {
+            const validationError = new ValidationError('Cached validation error', undefined, {
+              cachedErrors: cached.errors
+            });
+            throw validationError;
           }
         } else {
           this.updateMetrics('cacheMiss');
@@ -114,7 +125,14 @@ export class ZodValidationService extends CoreValidationService implements IVali
         // Cache validation error
         if (mergedOptions.useCache && this.config.cache?.enabled) {
           const cacheKey = this.generateCacheKey(schema, data, mergedOptions);
-          this.setCache(cacheKey, { success: false, error }, mergedOptions.cacheTtl);
+          const errorDetails: ValidationErrorDetail[] = error.errors.map(err => ({
+            field: err.field || '',
+            message: err.message,
+            code: err.code,
+            value: err.value,
+            context: { cached: true }
+          }));
+          this.setCache(cacheKey, { success: false, errors: errorDetails }, mergedOptions.cacheTtl);
         }
 
         this.updateMetrics('failure', startTime, context, error);
@@ -165,16 +183,24 @@ export class ZodValidationService extends CoreValidationService implements IVali
         this.setCache(cacheKey, result, mergedOptions.cacheTtl);
       }
 
-      this.updateMetrics(result.success ? 'success' : 'failure', startTime, context, result.error);
+      this.updateMetrics(result.success ? 'success' : 'failure', startTime, context);
       return result;
 
     } catch (error) {
       // Handle unexpected errors
       const validationError = new ValidationError(
         error instanceof Error ? error.message : 'Unknown validation error',
+        undefined,
         { originalError: error }
       );
-      const errorResult = { success: false, error: validationError } as IValidationResult<T>;
+      const errorDetails: ValidationErrorDetail[] = validationError.errors.map(err => ({
+        field: err.field || '',
+        message: err.message,
+        code: err.code,
+        value: err.value,
+        context: { originalError: error }
+      }));
+      const errorResult = { success: false, errors: errorDetails } as IValidationResult<T>;
 
       this.updateMetrics('failure', startTime, context, validationError);
       return errorResult;
@@ -191,7 +217,7 @@ export class ZodValidationService extends CoreValidationService implements IVali
     const invalid: Array<{
       index: number;
       data: unknown;
-      error: ValidationError;
+      errors: ValidationErrorDetail[];
     }> = [];
 
     // Process all items
@@ -207,22 +233,29 @@ export class ZodValidationService extends CoreValidationService implements IVali
         const { result, index, data } = promiseResult.value;
         if (result.success && result.data) {
           valid.push(result.data);
-        } else if (!result.success && result.error) {
+        } else if (!result.success && result.errors && result.errors.length > 0) {
           invalid.push({
             index,
             data,
-            error: result.error,
+            errors: result.errors,
           });
         }
       } else {
         // Handle promise rejection (shouldn't happen with validateSafe, but just in case)
-        const error = new ValidationError('Batch validation promise rejected', {
+        const validationError = new ValidationError('Batch validation promise rejected', undefined, {
           reason: promiseResult.reason
         });
+        const errorDetails: ValidationErrorDetail[] = validationError.errors.map(err => ({
+          field: err.field || '',
+          message: err.message,
+          code: err.code,
+          value: err.value,
+          context: { reason: promiseResult.reason }
+        }));
         invalid.push({
           index: -1,
           data: null,
-          error,
+          errors: errorDetails,
         });
       }
     });
@@ -230,9 +263,12 @@ export class ZodValidationService extends CoreValidationService implements IVali
     return {
       valid,
       invalid,
-      totalCount: dataArray.length,
-      validCount: valid.length,
-      invalidCount: invalid.length,
+      summary: {
+        total: dataArray.length,
+        valid: valid.length,
+        invalid: invalid.length,
+        successRate: valid.length / dataArray.length,
+      },
     };
   }
 }

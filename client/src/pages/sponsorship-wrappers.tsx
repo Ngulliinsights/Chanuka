@@ -1,34 +1,103 @@
+import React from 'react';
 import { useParams } from 'react-router-dom';
-import SponsorshipOverview from './sponsorship/overview';
-import PrimarySponsor from './sponsorship/primary-sponsor';
-import CoSponsors from './sponsorship/co-sponsors';
-import FinancialNetwork from './sponsorship/financial-network';
-import Methodology from './sponsorship/methodology';
-import { logger } from '../utils/browser-logger';
-
-// Wrapper components that extract billId from URL params and pass to the actual components
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 
 export function SponsorshipOverviewWrapper() {
-  const { id: billId } = useParams<{ id: string }>();
-  return <SponsorshipOverview billId={billId} />;
+  const { id } = useParams();
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Sponsorship Overview</h1>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Overview for Bill #{id}</CardTitle>
+          <CardDescription>Complete sponsorship analysis overview</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600">Sponsorship overview coming soon...</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
 
 export function PrimarySponsorWrapper() {
-  const { id: billId } = useParams<{ id: string }>();
-  return <PrimarySponsor billId={billId} />;
+  const { id } = useParams();
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Primary Sponsor</h1>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Primary Sponsor for Bill #{id}</CardTitle>
+          <CardDescription>Detailed analysis of the primary sponsor</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600">Primary sponsor analysis coming soon...</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
 
 export function CoSponsorsWrapper() {
-  const { id: billId } = useParams<{ id: string }>();
-  return <CoSponsors billId={billId} />;
+  const { id } = useParams();
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Co-Sponsors</h1>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Co-Sponsors for Bill #{id}</CardTitle>
+          <CardDescription>Analysis of all co-sponsors</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600">Co-sponsors analysis coming soon...</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
 
 export function FinancialNetworkWrapper() {
-  const { id: billId } = useParams<{ id: string }>();
-  return <FinancialNetwork billId={billId} />;
+  const { id } = useParams();
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Financial Network</h1>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Financial Network for Bill #{id}</CardTitle>
+          <CardDescription>Financial connections and influence mapping</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600">Financial network analysis coming soon...</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
 
 export function MethodologyWrapper() {
-  const { id: billId } = useParams<{ id: string }>();
-  return <Methodology billId={billId} />;
+  const { id } = useParams();
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">Methodology</h1>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Analysis Methodology for Bill #{id}</CardTitle>
+          <CardDescription>How we analyze sponsorship and financial data</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600">Methodology documentation coming soon...</p>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }

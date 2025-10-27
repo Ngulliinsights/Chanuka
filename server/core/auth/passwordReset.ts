@@ -1,5 +1,5 @@
 // services/passwordReset.ts
-import { db } from '../../../shared/database';
+import { database as db } from '../../../shared/database/connection.js';
 // Import specific tables and functions needed from the consolidated schema
 import { user as users, passwordReset as passwordResets } from '../../../shared/schema';
 import { ValidationError } from '../../../shared/types/errors.js';
@@ -9,7 +9,7 @@ import type { InferSelectModel } from 'drizzle-orm';
 import { and, eq, gt } from 'drizzle-orm';
 import { config } from '../../config/index.js';
 import { sendTemplatedEmail } from '../../infrastructure/notifications/email-service.js';
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '../../../shared/core/src/index.js';
 
 // Reset token expiration time in minutes
 const TOKEN_EXPIRY_MINUTES = 60;
@@ -25,14 +25,15 @@ type UserEntry = InferSelectModel<typeof users>;
 
 // Define a type for the joined result based on your actual schema structure
 interface JoinedResetResult {
-  password_resets: {
+  password_reset: {
     id: number;
     userId: string;
     tokenHash: string;
     expiresAt: Date;
+    isUsed: boolean;
     createdAt: Date;
   } | null;
-  users: {
+  user: {
     id: string;
     email: string;
     name: string;
@@ -134,12 +135,12 @@ class PasswordResetService {
 
     const result = results[0]; // Get the first result if it exists
 
-    if (!result || !result.users || !result.password_resets) {
+    if (!result || !result.user || !result.password_reset) {
       throw new ValidationError('Invalid or expired reset token');
     }
 
-    const resetEntry = result.password_resets;
-    const userEntry = result.users;
+    const resetEntry = result.password_reset;
+    const userEntry = result.user;
 
     // Hash the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);

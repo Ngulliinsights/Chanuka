@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Connection Test</title>
+</head>
+<body>
+    <h1>Testing Connection to Server</h1>
+    <div id="result">Testing...</div>
+    
+    <script>
+        async function testConnection() {
+            const result = document.getElementById('result');
+            
+            try {
+                // Test API connection
+                const response = await fetch('http://localhost:4200/api/health');
+                const data = await response.json();
+                
+                result.innerHTML = `
+                    <h2>✅ Connection Successful!</h2>
+                    <p>Status: ${response.status}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <h2>❌ Connection Failed</h2>
+                    <p>Error: ${error.message}</p>
+                    <p>Make sure the server is running on port 4200</p>
+                `;
+            }
+        }
+        
+        testConnection();
+    </script>
+</body>
+</html>

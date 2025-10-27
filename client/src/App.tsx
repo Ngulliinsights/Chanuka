@@ -21,6 +21,7 @@ import {
   SafeLazyPages,
   SafeLazySponsorshipPages,
 } from "./utils/safe-lazy-loading";
+import { SimpleErrorBoundary } from "./components/error-handling/SimpleErrorBoundary";
 
 // =============================================================================
 // CONFIGURATION
@@ -81,25 +82,21 @@ const getQueryClient = (): QueryClient => {
 // =============================================================================
 
 function PageLoader() {
-  const pageLoading = useSimplifiedLoading('app-page-loading');
+  const { isLoading, error, isTimeout } = useSimplifiedLoading('app-page-loading', {
+    timeout: CONFIG.loading.pageTimeout,
+    connectionAware: CONFIG.loading.connectionAware,
+    showTimeoutWarning: CONFIG.loading.showTimeoutWarning,
+  });
 
-  useEffect(() => {
-    startLoading("initial", {
-      timeout: CONFIG.loading.pageTimeout,
-      connectionAware: CONFIG.loading.connectionAware,
-      showTimeoutWarning: CONFIG.loading.showTimeoutWarning,
-    });
-  }, [startLoading]);
-
-  const currentState = loadingState.hasTimedOut ? "timeout" : "loading";
-  const loadingMessage = loadingState.message || "Loading page...";
+  const currentState = isTimeout ? "timeout" : "loading";
+  const loadingMessage = error?.message || "Loading page...";
 
   return (
     <LoadingStateManager
       type="page"
       state={currentState}
       message={loadingMessage}
-      error={loadingState.error ?? undefined}
+      error={error ?? undefined}
       timeout={CONFIG.loading.pageTimeout}
       className="min-h-screen"
       showDetails={IS_DEV}
@@ -218,17 +215,19 @@ export default function App() {
   }, []);
 
   return (
-    <BrowserCompatibilityChecker showWarnings={true} blockUnsupported={false}>
-      <AppProviders queryClient={queryClient}>
-        <BrowserRouter>
-          <AppContent />
-          <Toaster />
-          <AccessibilityTrigger />
-          <OfflineStatus showDetails={true} />
-        </BrowserRouter>
-      </AppProviders>
+    <SimpleErrorBoundary>
+      <BrowserCompatibilityChecker showWarnings={true} blockUnsupported={false}>
+        <AppProviders queryClient={queryClient}>
+          <BrowserRouter>
+            <AppContent />
+            <Toaster />
+            <AccessibilityTrigger />
+            <OfflineStatus showDetails={true} />
+          </BrowserRouter>
+        </AppProviders>
 
-      {IS_DEV && <ReactQueryDevtools initialIsOpen={false} />}
-    </BrowserCompatibilityChecker>
+        {IS_DEV && <ReactQueryDevtools initialIsOpen={false} />}
+      </BrowserCompatibilityChecker>
+    </SimpleErrorBoundary>
   );
 }

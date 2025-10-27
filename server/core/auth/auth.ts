@@ -1,8 +1,9 @@
 
 import { Router, Request, Response } from "express";
 import { authService, registerSchema, loginSchema, passwordResetRequestSchema, passwordResetSchema } from "./auth-service.js";
-import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized, ApiForbidden, ApiNotFound, ErrorCodes, HttpStatus, ApiResponseWrapper } from "../../../shared/core/src/utils/api";
-import { authRateLimit, passwordResetRateLimit, registrationRateLimit } from "../../middleware/rate-limiter.js";
+import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized } from "@shared/core/src/utils/api-utils.js";
+import { ErrorCodes, HttpStatus, ApiResponseWrapper } from "@shared/core/src/utils/api-utils.js";
+import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from "../../middleware/rate-limiter.js";
 import { z } from "zod";
 import { errorTracker } from '../errors/error-tracker.js';
 import { logger } from '@shared/core';

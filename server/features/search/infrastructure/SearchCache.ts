@@ -1,5 +1,11 @@
-import { cacheService } from '../../../infrastructure/cache/cache-service';
-import { CACHE_TTL } from '../../../infrastructure/cache/cache-service';
+import { cacheService } from '../../../infrastructure/cache/cache-service.js';
+
+// Cache TTL constants
+const CACHE_TTL = {
+  SEARCH_RESULTS: 300, // 5 minutes
+  SUGGESTIONS: 600, // 10 minutes
+  LONG: 3600 // 1 hour
+};
 
 const hash = (obj: any): string => Buffer.from(JSON.stringify(obj)).toString('base64url');
 

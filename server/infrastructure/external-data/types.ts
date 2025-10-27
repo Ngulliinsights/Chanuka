@@ -67,12 +67,15 @@ export interface DataValidationResult {
   dataQualityScore: number; // 0-100
 }
 
-export interface ValidationError {
+export interface ValidationErrorDetail {
   field: string;
   message: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   code: string;
 }
+
+// Type alias for backward compatibility
+export type ValidationError = ValidationErrorDetail;
 
 export interface ValidationWarning {
   field: string;

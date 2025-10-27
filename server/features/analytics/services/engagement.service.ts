@@ -1,14 +1,16 @@
 import { Router } from 'express';
 import { databaseService } from '../../../infrastructure/database/database-service';
 import { database as db } from '../../../../shared/database/connection';
-import { billComment, commentVote, user, userProfile, bill } from '@shared/schema';
+// FIXED: Import plural table names and correct type references
+import { billComments, commentVotes, users, userProfiles, bills } from '@shared/schema';
 import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
-import { cacheKeys } from '@shared/core';
-import { cache } from '@shared/core';
+// FIXED: Import cacheKeys from the correct location
+import { cache, cacheKeys } from '@shared/core';
 import { buildTimeThreshold } from '../../../utils/db-helpers';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from '@shared/core';
+import { ApiSuccessResponse, ApiErrorResponse, ApiValidationErrorResponse } from '@shared/core';
+import { ApiResponseWrapper } from '@shared/core/src/utils/api-utils.js';
 import { logger } from '@shared/core';
 import { errorTracker } from '../../../core/errors/error-tracker.js';
 import { z } from 'zod';
@@ -30,9 +32,10 @@ export class EngagementAnalyticsService {
    * Get comprehensive user engagement metrics
    */
   async getUserEngagementMetrics(userId: string, timeframe: '7d' | '30d' | '90d' = '30d'): Promise<UserEngagementMetrics> {
-    return databaseService.withFallback(
+    const result = await databaseService.withFallback(
       async () => {
-        const cacheKey = `${CACHE_KEYS.USER_PROFILE(userId)}:engagement:${timeframe}`;
+        // FIXED: Use cacheKeys instead of CACHE_KEYS
+        const cacheKey = `${cacheKeys.USER_PROFILE(userId)}:engagement:${timeframe}`;
 
         // Use enhanced cache utility with error handling and metrics
         return await cache.getOrSetCache(
@@ -42,7 +45,7 @@ export class EngagementAnalyticsService {
             // Calculate time threshold using standardized helper
             const timeThreshold = buildTimeThreshold(`${timeframe.slice(0, -1)}d`);
 
-            // Get user information
+            // Get user information - FIXED: Use plural table names
             const [userInfo] = await db
               .select({
                 name: users.name,
@@ -57,11 +60,13 @@ export class EngagementAnalyticsService {
               throw new Error('User not found');
             }
 
-            // Get comment statistics
+            // Get comment statistics - FIXED: Use billComments (plural)
             const [commentStats] = await db
               .select({
                 totalComments: count(billComments.id),
+                // cspell:disable-next-line
                 totalVotes: sum(sql`${billComments.upvotes} + ${billComments.downvotes}`),
+                // cspell:disable-next-line
                 averageVotes: avg(sql`${billComments.upvotes} + ${billComments.downvotes}`)
               })
               .from(billComments)
@@ -70,10 +75,11 @@ export class EngagementAnalyticsService {
                 sql`${billComments.createdAt} >= ${timeThreshold}`
               ));
 
-            // Get top comment
+            // Get top comment - FIXED: Use billComments (plural)
             const [topComment] = await db
               .select({
                 id: billComments.id,
+                // cspell:disable-next-line
                 votes: sql<number>`${billComments.upvotes} + ${billComments.downvotes}`
               })
               .from(billComments)
@@ -81,10 +87,11 @@ export class EngagementAnalyticsService {
                 eq(billComments.userId, userId),
                 sql`${billComments.createdAt} >= ${timeThreshold}`
               ))
+              // cspell:disable-next-line
               .orderBy(sql`${billComments.upvotes} + ${billComments.downvotes} DESC`)
               .limit(1);
 
-            // Calculate participation days
+            // Calculate participation days - FIXED: Use billComments (plural)
             const participationDays = await db
               .select({
                 uniqueDays: sql<number>`COUNT(DISTINCT DATE(${billComments.createdAt}))`
@@ -139,22 +146,24 @@ export class EngagementAnalyticsService {
       },
       `getUserEngagementMetrics:${userId}:${timeframe}`
     );
+
+    return result.data;
   }
 
   /**
    * Get comprehensive bill engagement metrics
    */
   async getBillEngagementMetrics(billId: number): Promise<BillEngagementMetrics> {
-    return databaseService.withFallback(
+    const result = await databaseService.withFallback(
       async () => {
-        const cacheKey = `${CACHE_KEYS.BILL_DETAILS(billId)}:engagement:metrics`;
+        // FIXED: Use cacheKeys instead of CACHE_KEYS
+        const cacheKey = `${cacheKeys.BILL_DETAILS(billId)}:engagement:metrics`;
 
-        // Use enhanced cache utility with error handling and metrics
         return await cache.getOrSetCache(
           cacheKey,
           this.ANALYTICS_CACHE_TTL,
           async () => {
-            // Get bill information
+            // Get bill information - FIXED: Use bills (plural)
             const [billInfo] = await db
               .select({
                 title: bills.title,
@@ -168,10 +177,11 @@ export class EngagementAnalyticsService {
               throw new Error('Bill not found');
             }
 
-            // Get engagement statistics
+            // Get engagement statistics - FIXED: Use billComments and users (plural)
             const [engagementStats] = await db
               .select({
                 totalComments: count(billComments.id),
+                // cspell:disable-next-line
                 totalVotes: sum(sql`${billComments.upvotes} + ${billComments.downvotes}`),
                 uniqueParticipants: sql<number>`COUNT(DISTINCT ${billComments.userId})`,
                 expertComments: sql<number>`COUNT(CASE WHEN ${users.role} = 'expert' THEN 1 END)`
@@ -180,7 +190,7 @@ export class EngagementAnalyticsService {
               .leftJoin(users, eq(billComments.userId, users.id))
               .where(eq(billComments.billId, billId));
 
-            // Get first comment time
+            // Get first comment time - FIXED: Use billComments (plural)
             const [firstComment] = await db
               .select({
                 createdAt: billComments.createdAt
@@ -190,10 +200,12 @@ export class EngagementAnalyticsService {
               .orderBy(billComments.createdAt)
               .limit(1);
 
-            // Calculate controversy score (high when votes are split)
+            // Calculate controversy score - FIXED: Use billComments (plural)
             const [controversyData] = await db
               .select({
+                // cspell:disable-next-line
                 totalUpvotes: sum(billComments.upvotes),
+                // cspell:disable-next-line
                 totalDownvotes: sum(billComments.downvotes)
               })
               .from(billComments)
@@ -245,15 +257,18 @@ export class EngagementAnalyticsService {
       },
       `getBillEngagementMetrics:${billId}`
     );
+
+    return result.data;
   }
 
   /**
    * Get engagement trends over time
    */
   async getEngagementTrends(billId: number, period: 'hourly' | 'daily' | 'weekly' = 'daily'): Promise<CommentEngagementTrends[typeof period]> {
-    return databaseService.withFallback(
+    const result = await databaseService.withFallback(
       async () => {
-        const cacheKey = `${CACHE_KEYS.BILL_DETAILS(billId)}:engagement:trends:${period}`;
+        // FIXED: Use cacheKeys instead of CACHE_KEYS
+        const cacheKey = `${cacheKeys.BILL_DETAILS(billId)}:engagement:trends:${period}`;
 
         return await cache.getOrSetCache(
           cacheKey,
@@ -277,10 +292,12 @@ export class EngagementAnalyticsService {
                 break;
             }
 
+            // FIXED: Use billComments (plural)
             const trends = await db
               .select({
                 period: sql`${selectFormat}`,
                 comments: count(billComments.id),
+                // cspell:disable-next-line
                 votes: sum(sql`${billComments.upvotes} + ${billComments.downvotes}`)
               })
               .from(billComments)
@@ -302,13 +319,15 @@ export class EngagementAnalyticsService {
       [],
       `getEngagementTrends:${billId}:${period}`
     );
+
+    return result.data;
   }
 
   /**
    * Get engagement leaderboard
    */
   async getEngagementLeaderboard(timeframe: '7d' | '30d' | '90d' = '30d', limit: number = 10): Promise<EngagementLeaderboard> {
-    return databaseService.withFallback(
+    const result = await databaseService.withFallback(
       async () => {
         const cacheKey = `engagement:leaderboard:${timeframe}:${limit}`;
 
@@ -319,13 +338,16 @@ export class EngagementAnalyticsService {
             // Calculate time threshold using standardized helper
             const timeThreshold = buildTimeThreshold(`${timeframe.slice(0, -1)}d`);
 
-            // Top commenters
+            // Top commenters - FIXED: Use billComments and users (plural)
+            // cspell:disable-next-line
             const topCommenters = await db
               .select({
                 userId: users.id,
                 userName: users.name,
                 commentCount: count(billComments.id),
+                // cspell:disable-next-line
                 totalVotes: sum(sql`${billComments.upvotes} + ${billComments.downvotes}`),
+                // cspell:disable-next-line
                 averageVotes: avg(sql`${billComments.upvotes} + ${billComments.downvotes}`)
               })
               .from(billComments)
@@ -335,15 +357,17 @@ export class EngagementAnalyticsService {
               .orderBy(desc(count(billComments.id)))
               .limit(limit);
 
-            // Top voters (users who give the most votes)
+            // Top voters - FIXED: Use commentVotes and users (plural)
+            // cspell:disable-next-line
             const topVoters = await db
               .select({
                 userId: commentVotes.userId,
                 userName: users.name,
                 votesGiven: count(commentVotes.id),
                 votesReceived: sql<number>`COALESCE((
+                  // cspell:disable-next-line
                   SELECT SUM(upvotes + downvotes)
-                  FROM bill_comments
+                  FROM bill_comment
                   WHERE user_id = ${commentVotes.userId}
                 ), 0)`
               })
@@ -354,11 +378,12 @@ export class EngagementAnalyticsService {
               .orderBy(desc(count(commentVotes.id)))
               .limit(limit);
 
-            // Most engaged bills
+            // Most engaged bills - FIXED: Use billComments and bills (plural)
             const mostEngagedBills = await db
               .select({
                 billId: billComments.billId,
                 billTitle: bills.title,
+                // cspell:disable-next-line
                 totalEngagement: sum(sql`${billComments.upvotes} + ${billComments.downvotes}`),
                 uniqueUsers: sql<number>`COUNT(DISTINCT ${billComments.userId})`
               })
@@ -366,6 +391,7 @@ export class EngagementAnalyticsService {
               .innerJoin(bills, eq(billComments.billId, bills.id))
               .where(sql`${billComments.createdAt} >= ${timeThreshold}`)
               .groupBy(billComments.billId, bills.title)
+              // cspell:disable-next-line
               .orderBy(desc(sum(sql`${billComments.upvotes} + ${billComments.downvotes}`)))
               .limit(limit);
 
@@ -404,6 +430,8 @@ export class EngagementAnalyticsService {
       },
       `getEngagementLeaderboard:${timeframe}`
     );
+
+    return result.data;
   }
 
   /**
@@ -446,6 +474,7 @@ export class EngagementAnalyticsService {
    * Get peak engagement hour for a bill
    */
   private async getPeakEngagementHour(billId: number): Promise<number> {
+    // FIXED: Use billComments (plural)
     const hourlyData = await db
       .select({
         hour: sql<number>`EXTRACT(HOUR FROM ${billComments.createdAt})`,
@@ -495,15 +524,14 @@ router.get('/user/:userId/metrics', authenticateToken, async (req: Authenticated
 
     const metrics = await engagementAnalyticsService.getUserEngagementMetrics(userId, query.timeframe);
 
-    return ApiSuccess(res, metrics,
+    return ApiSuccessResponse(res, metrics,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, error.errors,
+      return ApiValidationErrorResponse(res, error.errors,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
 
-    // Track error with analytics context
     errorTracker.trackRequestError(
       error instanceof Error ? error : new Error(String(error)),
       req as any,
@@ -518,7 +546,7 @@ router.get('/user/:userId/metrics', authenticateToken, async (req: Authenticated
       timeframe: req.query.timeframe
     }, error instanceof Error ? error : { message: String(error) });
 
-    return ApiError(res, 'Failed to fetch user engagement metrics', 500,
+    return ApiErrorResponse(res, 'Failed to fetch user engagement metrics', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
 });
@@ -533,15 +561,14 @@ router.get('/bill/:billId/metrics', authenticateToken, async (req: Authenticated
 
     const metrics = await engagementAnalyticsService.getBillEngagementMetrics(query.billId);
 
-    return ApiSuccess(res, metrics,
+    return ApiSuccessResponse(res, metrics,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, error.errors,
+      return ApiValidationErrorResponse(res, error.errors,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
 
-    // Track error with analytics context
     errorTracker.trackRequestError(
       error instanceof Error ? error : new Error(String(error)),
       req as any,
@@ -555,7 +582,7 @@ router.get('/bill/:billId/metrics', authenticateToken, async (req: Authenticated
       billId: req.params.billId
     }, error instanceof Error ? error : { message: String(error) });
 
-    return ApiError(res, error instanceof Error ? error.message : 'Failed to fetch bill engagement metrics', 500,
+    return ApiErrorResponse(res, error instanceof Error ? error.message : 'Failed to fetch bill engagement metrics', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
 });
@@ -570,11 +597,11 @@ router.get('/bill/:billId/trends', authenticateToken, async (req: AuthenticatedR
 
     const trends = await engagementAnalyticsService.getEngagementTrends(query.billId, query.period);
 
-    return ApiSuccess(res, trends,
+    return ApiSuccessResponse(res, trends,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, error.errors,
+      return ApiValidationErrorResponse(res, error.errors,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
     logger.error('Error fetching engagement trends:', {
@@ -583,7 +610,7 @@ router.get('/bill/:billId/trends', authenticateToken, async (req: AuthenticatedR
       billId: req.params.billId,
       period: req.query.period
     }, error instanceof Error ? error : { message: String(error) });
-    return ApiError(res, 'Failed to fetch engagement trends', 500,
+    return ApiErrorResponse(res, 'Failed to fetch engagement trends', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
 });
@@ -597,15 +624,14 @@ router.get('/leaderboard', authenticateToken, async (req: AuthenticatedRequest, 
 
     const leaderboard = await engagementAnalyticsService.getEngagementLeaderboard(query.timeframe, query.limit);
 
-    return ApiSuccess(res, leaderboard,
+    return ApiSuccessResponse(res, leaderboard,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, error.errors,
+      return ApiValidationErrorResponse(res, error.errors,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
 
-    // Track error with analytics context
     errorTracker.trackRequestError(
       error instanceof Error ? error : new Error(String(error)),
       req as any,
@@ -620,46 +646,9 @@ router.get('/leaderboard', authenticateToken, async (req: AuthenticatedRequest, 
       limit: req.query.limit
     }, error instanceof Error ? error : { message: String(error) });
 
-    return ApiError(res, 'Failed to fetch engagement leaderboard', 500,
+    return ApiErrorResponse(res, 'Failed to fetch engagement leaderboard', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
 });
 
 export default router;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

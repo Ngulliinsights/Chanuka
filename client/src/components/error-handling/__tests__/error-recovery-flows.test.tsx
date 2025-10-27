@@ -1,4 +1,14 @@
 import React, { useState } from 'react';
+// Mock fetch
+global.fetch = vi.fn(() =>
+  Promise.resolve({
+    ok: true,
+    status: 200,
+    json: () => Promise.resolve({}),
+    text: () => Promise.resolve(''),
+  } as Response)
+);
+
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -534,7 +544,7 @@ describe('Error Recovery Flows', () => {
       fireEvent.click(retryButton);
 
       // Simulate user cancellation
-      act(() => {
+      await act(() => {
         controller.abort();
       });
 

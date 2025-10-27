@@ -14,16 +14,23 @@ export interface ValidationErrorDetail {
   field: string;
   message: string;
   code: string;
-  received?: any;
+  value?: unknown;
+  context?: Record<string, any>;
 }
 
 /**
  * Custom validation error class with detailed field-level error information
+ * Implements unified validation error interface for compatibility
  */
 export class ValidationError extends Error {
   public readonly errors: ValidationErrorDetail[];
   public readonly statusCode = 422;
   public readonly isOperational = true;
+
+  // Unified interface properties for compatibility
+  public readonly field?: string;
+  public readonly code?: string;
+  public readonly errorId?: string;
 
   constructor(zodErrorOrMessage: ZodError | string, customErrors?: ValidationErrorDetail[]) {
     let errors: ValidationErrorDetail[];
@@ -45,6 +52,11 @@ export class ValidationError extends Error {
     super(message);
     this.name = 'ValidationError';
     this.errors = errors;
+
+    // Set unified interface properties for compatibility
+    this.field = errors.length === 1 ? errors[0].field : undefined;
+    this.code = 'VALIDATION_ERROR';
+    this.errorId = undefined; // Can be set via customErrors if needed
 
     // Maintain proper stack trace for where our error was thrown (only available on V8)
     if (Error.captureStackTrace) {

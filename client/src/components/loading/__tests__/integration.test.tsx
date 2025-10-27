@@ -174,7 +174,7 @@ describe('Loading Components Integration', () => {
       );
 
       // Fast-forward time to trigger timeout
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(5000);
       });
 

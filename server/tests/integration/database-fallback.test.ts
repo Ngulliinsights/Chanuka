@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
+
 // Mock logger
 const mockLogger = {
   info: vi.fn(),

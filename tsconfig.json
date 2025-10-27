@@ -44,10 +44,11 @@
     "paths": {
       "@db": ["./db/index.ts"],
       "@db/*": ["./db/*"],
+      "@server/*": ["./server/*"],
       "@/*": ["./client/src/*"],
       "@shared/*": ["./shared/*"],
       "shared/*": ["./shared/*"],
-      "@shared/core": ["./shared/core/index.ts"]
+      "@shared/core": ["./server/utils/shared-core-fallback.ts"]
     }
   }
 }

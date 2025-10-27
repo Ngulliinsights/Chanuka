@@ -259,7 +259,7 @@ describe('GlobalLoadingIndicator', () => {
       // Re-render to trigger effect
       render(<GlobalLoadingIndicator autoHide autoHideDelay={1000} />);
       
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(1000);
       });
       

@@ -38,7 +38,9 @@ describe('ValidationService', () => {
   });
 
   afterEach(() => {
+    cleanup();
     validationService?.destroy();
+  
   });
 
   describe('Schema Registration', () => {

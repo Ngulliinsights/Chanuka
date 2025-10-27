@@ -81,10 +81,10 @@ export class LegacyValidationService {
    * Validate individual field
    */
   private validateField(
-    field: string, 
-    value: any, 
+    field: string,
+    value: unknown,
     rule: LegacyValidationRule
-  ): { error?: string; sanitizedValue?: any } {
+  ): { error?: string; sanitizedValue?: unknown } {
     switch (rule.type) {
       case 'required':
         if (value === undefined || value === null || value === '') {
@@ -93,19 +93,19 @@ export class LegacyValidationService {
         break;
 
       case 'email':
-        if (value && !this.isValidEmail(value)) {
+        if (value && typeof value === 'string' && !this.isValidEmail(value)) {
           return { error: rule.message || `${field} must be a valid email address` };
         }
-        return { sanitizedValue: value ? value.toLowerCase().trim() : value };
+        return { sanitizedValue: value && typeof value === 'string' ? value.toLowerCase().trim() : value };
 
       case 'phone':
-        if (value && !this.isValidPhone(value)) {
+        if (value && typeof value === 'string' && !this.isValidPhone(value)) {
           return { error: rule.message || `${field} must be a valid phone number` };
         }
-        return { sanitizedValue: value ? this.sanitizePhone(value) : value };
+        return { sanitizedValue: value && typeof value === 'string' ? this.sanitizePhone(value) : value };
 
       case 'url':
-        if (value && !this.isValidUrl(value)) {
+        if (value && typeof value === 'string' && !this.isValidUrl(value)) {
           return { error: rule.message || `${field} must be a valid URL` };
         }
         break;
@@ -129,7 +129,7 @@ export class LegacyValidationService {
         break;
 
       case 'pattern':
-        if (value && !new RegExp(rule.value).test(value)) {
+        if (value && typeof value === 'string' && !new RegExp(rule.value).test(value)) {
           return { error: rule.message || `${field} format is invalid` };
         }
         break;
@@ -149,6 +149,7 @@ export class LegacyValidationService {
 
   /**
    * Sanitize HTML content to prevent XSS
+   * @deprecated Use the sanitization utilities from shared/core/src/validation/sanitization.ts instead
    */
   sanitizeHtml(html: string): string {
     // Use core validation service if available (method doesn't exist yet)
@@ -167,6 +168,7 @@ export class LegacyValidationService {
 
   /**
    * Sanitize SQL input to prevent injection
+   * @deprecated Use parameterized queries instead of string sanitization
    */
   sanitizeSql(input: string): string {
     // Basic SQL sanitization - escape single quotes
@@ -175,6 +177,7 @@ export class LegacyValidationService {
 
   /**
    * Validate and sanitize user input
+   * @deprecated Use the sanitization utilities from shared/core/src/validation/sanitization.ts instead
    */
   sanitizeUserInput(input: string): string {
     return input

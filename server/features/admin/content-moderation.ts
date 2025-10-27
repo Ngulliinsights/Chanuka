@@ -1,31 +1,42 @@
 import { database as db } from '../../../shared/database/connection';
-import { bill, billComment, user, moderationFlag, moderationAction, sponsor } from '../../../shared/schema';
-
-// Alias for backward compatibility
-const bills = bill;
-const billComments = billComment;
-const users = user;
-const moderationFlags = moderationFlag;
-const moderationActions = moderationAction;
-const sponsors = sponsor;
-import { eq, count, desc, sql, and, gte, like, or, inArray, isNull, SQL } from 'drizzle-orm';
+import { 
+  bill, 
+  billComment, 
+  user, 
+  contentReport, 
+  moderationAction, 
+  sponsor 
+} from '../../../shared/schema';
+import { eq, count, desc, sql, and, gte, or, inArray, SQL } from 'drizzle-orm';
 import { logger } from '../../../shared/core/index.js';
 
-// Type definitions for better type safety
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+/**
+ * Filters for querying the moderation queue
+ * These filters allow moderators to narrow down content that needs review
+ */
 export interface ContentModerationFilters {
-  contentType?: 'bill' | 'comment';
-  status?: 'pending' | 'approved' | 'rejected' | 'flagged';
-  severity?: 'low' | 'medium' | 'high' | 'critical';
+  contentType?: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency';
+  status?: 'pending' | 'reviewed' | 'resolved' | 'dismissed' | 'escalated';
+  severity?: 'info' | 'low' | 'medium' | 'high' | 'critical';
   dateRange?: {
     start: Date;
     end: Date;
   };
-  moderator?: string;
+  moderator?: string; // UUID of the reviewer
+  reportType?: 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'copyright' | 'other';
+  autoDetected?: boolean;
 }
 
+/**
+ * Represents a single item in the moderation queue with full context
+ */
 export interface ModerationItem {
   id: number;
-  contentType: 'bill' | 'comment';
+  contentType: 'comment' | 'bill' | 'user_profile' | 'sponsor_transparency';
   contentId: number;
   content: {
     title?: string;
@@ -37,36 +48,44 @@ export interface ModerationItem {
     };
     createdAt: Date;
   };
-  flagType: string;
-  severity: string;
+  reportType: 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'copyright' | 'other';
+  severity: 'info' | 'low' | 'medium' | 'high' | 'critical';
   reason: string;
+  description?: string;
   reportedBy: string;
   autoDetected: boolean;
-  status: 'pending' | 'approved' | 'rejected' | 'flagged';
+  status: 'pending' | 'reviewed' | 'resolved' | 'dismissed' | 'escalated';
   reviewedBy?: string | null;
   reviewedAt?: Date | null;
-  resolution?: string | null;
+  resolutionNotes?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface ModerationAction {
+/**
+ * Record of a moderation action taken by a moderator
+ */
+export interface ModerationActionRecord {
   id: number;
   contentType: string;
   contentId: number;
-  actionType: string;
+  actionType: 'warn' | 'hide' | 'delete' | 'ban_user' | 'verify' | 'highlight';
   reason: string;
   moderatorId: string;
   moderatorName: string;
   createdAt: Date;
 }
 
+/**
+ * Analytics data about the moderation system's performance
+ */
 export interface ContentAnalytics {
   totalContent: number;
   pendingModeration: number;
-  approvedContent: number;
-  rejectedContent: number;
-  flaggedContent: number;
+  reviewedContent: number;
+  resolvedContent: number;
+  dismissedContent: number;
+  escalatedContent: number;
   averageReviewTime: number;
   topModerators: {
     id: string;
@@ -74,19 +93,36 @@ export interface ContentAnalytics {
     actionsCount: number;
   }[];
   contentQualityScore: number;
-  flagReasons: {
+  reportReasons: {
     reason: string;
     count: number;
   }[];
 }
 
+/**
+ * Parameters for bulk moderation operations
+ */
 export interface BulkModerationOperation {
-  itemIds: number[];
-  action: 'approve' | 'reject' | 'flag' | 'delete';
-  reason: string;
+  reportIds: number[]; // IDs from contentReport table
+  action: 'resolve' | 'dismiss' | 'escalate' | 'delete';
+  resolutionNotes: string;
   moderatorId: string;
 }
 
+// ============================================================================
+// CONTENT MODERATION SERVICE
+// ============================================================================
+
+/**
+ * ContentModerationService handles all content moderation operations.
+ * 
+ * This service provides a comprehensive moderation workflow including:
+ * - Queue management with filtering and pagination
+ * - Content analysis and automated flagging
+ * - Manual review and action application
+ * - Analytics and reporting
+ * - Bulk operations for efficiency
+ */
 export class ContentModerationService {
   private static instance: ContentModerationService;
 
@@ -99,8 +135,10 @@ export class ContentModerationService {
 
   /**
    * Retrieves the moderation queue with filtering and pagination.
-   * This method is the heart of the moderation workflow, providing moderators
-   * with a filtered, paginated view of content that needs review.
+   * 
+   * This is the primary interface for moderators to see what content
+   * needs their attention. The queue is sorted by severity first
+   * (critical issues bubble to the top), then by creation date.
    */
   async getModerationQueue(
     page = 1,
@@ -117,66 +155,79 @@ export class ContentModerationService {
   }> {
     try {
       const offset = (page - 1) * limit;
-      
-      // Build filter conditions as an array, filtering out undefined values
+
+      // Build dynamic WHERE conditions based on filters
       const conditions: SQL[] = [];
 
       if (filters?.contentType) {
-        conditions.push(eq(moderationFlags.contentType, filters.contentType));
+        conditions.push(eq(contentReport.contentType, filters.contentType));
       }
 
       if (filters?.status) {
-        conditions.push(eq(moderationFlags.status, filters.status));
+        conditions.push(eq(contentReport.status, filters.status));
       }
 
       if (filters?.severity) {
-        conditions.push(eq(moderationFlags.severity, filters.severity));
+        conditions.push(eq(contentReport.severity, filters.severity));
+      }
+
+      if (filters?.reportType) {
+        conditions.push(eq(contentReport.reportType, filters.reportType));
       }
 
       if (filters?.moderator) {
-        conditions.push(eq(moderationFlags.reviewedBy, filters.moderator));
+        conditions.push(eq(contentReport.reviewedBy, filters.moderator));
+      }
+
+      if (filters?.autoDetected !== undefined) {
+        conditions.push(eq(contentReport.autoDetected, filters.autoDetected));
       }
 
       if (filters?.dateRange) {
-        conditions.push(gte(moderationFlags.createdAt, filters.dateRange.start));
-        conditions.push(sql`${moderationFlags.createdAt} <= ${filters.dateRange.end}`);
+        conditions.push(gte(contentReport.createdAt, filters.dateRange.start));
+        conditions.push(sql`${contentReport.createdAt} <= ${filters.dateRange.end}`);
       }
 
+      // Fetch reports with all their details
       const queueItems = await db
         .select({
-          id: moderationFlags.id,
-          contentType: moderationFlags.contentType,
-          contentId: moderationFlags.contentId,
-          flagType: moderationFlags.flagType,
-          severity: moderationFlags.severity,
-          reason: moderationFlags.reason,
-          reportedBy: moderationFlags.reportedBy,
-          autoDetected: moderationFlags.autoDetected,
-          status: moderationFlags.status,
-          reviewedBy: moderationFlags.reviewedBy,
-          reviewedAt: moderationFlags.reviewedAt,
-          resolution: moderationFlags.resolution,
-          createdAt: moderationFlags.createdAt,
-          updatedAt: moderationFlags.updatedAt
+          id: contentReport.id,
+          contentType: contentReport.contentType,
+          contentId: contentReport.contentId,
+          reportType: contentReport.reportType,
+          severity: contentReport.severity,
+          reason: contentReport.reason,
+          description: contentReport.description,
+          reportedBy: contentReport.reportedBy,
+          autoDetected: contentReport.autoDetected,
+          status: contentReport.status,
+          reviewedBy: contentReport.reviewedBy,
+          reviewedAt: contentReport.reviewedAt,
+          resolutionNotes: contentReport.resolutionNotes,
+          createdAt: contentReport.createdAt,
+          updatedAt: contentReport.updatedAt
         })
-        .from(moderationFlags)
-        .$dynamic()
+        .from(contentReport)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(desc(moderationFlags.severity), desc(moderationFlags.createdAt))
+        .orderBy(desc(contentReport.severity), desc(contentReport.createdAt))
         .limit(limit)
         .offset(offset);
 
+      // Get total count for pagination
       const countResult = await db
         .select({ count: count() })
-        .from(moderationFlags)
-        .$dynamic()
+        .from(contentReport)
         .where(conditions.length > 0 ? and(...conditions) : undefined);
-      
+
       const total = countResult[0]?.count ?? 0;
 
+      // Enhance each item with the actual content details
       const enhancedItems = await Promise.all(
         queueItems.map(async (item) => {
-          const contentDetails = await this.getContentDetails(item.contentType, item.contentId);
+          const contentDetails = await this.getContentDetails(
+            item.contentType, 
+            item.contentId
+          );
           return {
             ...item,
             content: contentDetails
@@ -194,8 +245,8 @@ export class ContentModerationService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching moderation queue:', { 
-        component: 'Chanuka',
+      logger.error('Error fetching moderation queue:', {
+        component: 'ContentModeration',
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
@@ -203,423 +254,204 @@ export class ContentModerationService {
   }
 
   /**
-   * Processes a moderation decision on a specific piece of content.
+   * Reviews a content report and applies the appropriate moderation action.
+   * 
+   * This method handles the core moderation workflow: a moderator reviews
+   * a report, decides what action to take, and both the report status
+   * and the actual content are updated accordingly.
    */
-  async moderateContent(
-    itemId: number,
-    action: 'approve' | 'reject' | 'flag' | 'edit' | 'delete',
-    reason: string,
-    moderatorId: string
-  ): Promise<{ success: boolean; message: string }> {
+  async reviewReport(
+    reportId: number,
+    moderatorId: string,
+    decision: 'resolve' | 'dismiss' | 'escalate',
+    actionType: 'warn' | 'hide' | 'delete' | 'ban_user' | 'verify' | 'highlight',
+    resolutionNotes: string
+  ): Promise<{
+    success: boolean;
+    message: string;
+    report?: ModerationItem;
+  }> {
     try {
-      const [item] = await db
+      // Fetch the report to be reviewed
+      const [report] = await db
         .select()
-        .from(moderationFlags)
-        .where(eq(moderationFlags.id, itemId));
+        .from(contentReport)
+        .where(eq(contentReport.id, reportId));
 
-      if (!item) {
-        return { success: false, message: 'Moderation item not found' };
+      if (!report) {
+        return {
+          success: false,
+          message: 'Report not found'
+        };
       }
 
-      const newStatus = action === 'approve' ? 'approved' : 
-                       action === 'reject' ? 'rejected' : 'flagged';
-
+      // Update the report with the review decision
       await db
-        .update(moderationFlags)
+        .update(contentReport)
         .set({
+          status: decision === 'resolve' ? 'resolved' : 
+                  decision === 'dismiss' ? 'dismissed' : 'escalated',
           reviewedBy: moderatorId,
           reviewedAt: new Date(),
-          resolution: reason
+          resolutionNotes: resolutionNotes,
+          updatedAt: new Date()
         })
-        .where(eq(moderationFlags.id, itemId));
+        .where(eq(contentReport.id, reportId));
 
-      await db.insert(moderationActions).values({
-        contentType: item.contentType,
-        contentId: item.contentId,
-        actionType: action,
-        reason: reason,
-        moderatorId: moderatorId
-      } as any);
+      // Record the moderation action
+      await db.insert(moderationAction).values({
+        contentType: report.contentType,
+        contentId: report.contentId,
+        actionType: actionType,
+        reason: resolutionNotes,
+        moderatorId: moderatorId,
+        reportId: reportId
+      });
 
-      await this.applyModerationAction(item.contentType, item.contentId, action);
+      // Apply the actual moderation action to the content
+      if (decision === 'resolve') {
+        await this.applyModerationAction(
+          report.contentType,
+          report.contentId,
+          report.reportedBy,
+          actionType
+        );
+      }
 
-      return { success: true, message: `Content ${action}ed successfully` };
+      // Fetch the updated report
+      const [updatedReport] = await db
+        .select()
+        .from(contentReport)
+        .where(eq(contentReport.id, reportId));
+
+      const contentDetails = await this.getContentDetails(
+        updatedReport.contentType,
+        updatedReport.contentId
+      );
+
+      return {
+        success: true,
+        message: `Report ${decision}d successfully`,
+        report: {
+          ...updatedReport,
+          content: contentDetails
+        } as ModerationItem
+      };
     } catch (error) {
-      logger.error('Error moderating content:', { 
-        component: 'Chanuka',
+      logger.error('Error reviewing report:', {
+        component: 'ContentModeration',
         error: error instanceof Error ? error.message : String(error)
       });
-      return { success: false, message: 'Failed to moderate content' };
+      return {
+        success: false,
+        message: 'Failed to review report'
+      };
     }
   }
 
   /**
-   * Performs bulk moderation operations on multiple items.
+   * Performs bulk moderation operations on multiple reports.
+   * 
+   * This is useful when moderators need to handle many similar reports
+   * at once, such as clearing out obvious spam or approving multiple
+   * false positives from automated detection.
    */
-  async bulkModerateContent(
+  async bulkModerateReports(
     operation: BulkModerationOperation
-  ): Promise<{ success: boolean; message: string; processedCount: number }> {
+  ): Promise<{ 
+    success: boolean; 
+    message: string; 
+    processedCount: number;
+    failedIds: number[];
+  }> {
     try {
       let processedCount = 0;
+      const failedIds: number[] = [];
 
-      for (const itemId of operation.itemIds) {
-        const result = await this.moderateContent(
-          itemId,
-          operation.action,
-          operation.reason,
-          operation.moderatorId
-        );
+      for (const reportId of operation.reportIds) {
+        try {
+          const [report] = await db
+            .select()
+            .from(contentReport)
+            .where(eq(contentReport.id, reportId));
 
-        if (result.success) {
+          if (!report) {
+            failedIds.push(reportId);
+            continue;
+          }
+
+          // Update report status
+          await db
+            .update(contentReport)
+            .set({
+              status: operation.action === 'resolve' ? 'resolved' :
+                      operation.action === 'dismiss' ? 'dismissed' :
+                      operation.action === 'escalate' ? 'escalated' : 'resolved',
+              reviewedBy: operation.moderatorId,
+              reviewedAt: new Date(),
+              resolutionNotes: operation.resolutionNotes,
+              updatedAt: new Date()
+            })
+            .where(eq(contentReport.id, reportId));
+
+          // Record action
+          const actionType = operation.action === 'delete' ? 'delete' : 'hide';
+          await db.insert(moderationAction).values({
+            contentType: report.contentType,
+            contentId: report.contentId,
+            actionType: actionType,
+            reason: operation.resolutionNotes,
+            moderatorId: operation.moderatorId,
+            reportId: reportId
+          });
+
+          // Apply action to content if resolving
+          if (operation.action === 'resolve' || operation.action === 'delete') {
+            await this.applyModerationAction(
+              report.contentType,
+              report.contentId,
+              report.reportedBy,
+              actionType
+            );
+          }
+
           processedCount++;
+        } catch (itemError) {
+          logger.error('Error processing bulk item:', {
+            component: 'ContentModeration',
+            reportId,
+            error: itemError instanceof Error ? itemError.message : String(itemError)
+          });
+          failedIds.push(reportId);
         }
       }
 
       return {
-        success: true,
-        message: `Bulk moderation completed. ${processedCount}/${operation.itemIds.length} items processed.`,
-        processedCount
+        success: failedIds.length === 0,
+        message: `Bulk moderation completed. ${processedCount}/${operation.reportIds.length} reports processed.`,
+        processedCount,
+        failedIds
       };
     } catch (error) {
-      logger.error('Error performing bulk moderation:', { 
-        component: 'Chanuka',
+      logger.error('Error performing bulk moderation:', {
+        component: 'ContentModeration',
         error: error instanceof Error ? error.message : String(error)
       });
       return {
         success: false,
         message: 'Failed to perform bulk moderation',
-        processedCount: 0
+        processedCount: 0,
+        failedIds: operation.reportIds
       };
     }
   }
 
   /**
-   * Reviews a specific flag and applies a resolution decision.
-   */
-  async reviewFlag(
-    flagId: number,
-    moderatorId: string,
-    resolutionType: 'approve' | 'reject' | 'warn' | 'remove' | 'ban-user',
-    reason: string
-  ): Promise<{
-    success: boolean;
-    message: string;
-    flag?: ModerationItem;
-  }> {
-    try {
-      const [flag] = await db
-        .select()
-        .from(moderationFlags)
-        .where(eq(moderationFlags.id, flagId));
-
-      if (!flag) {
-        return {
-          success: false,
-          message: 'Flag not found'
-        };
-      }
-
-      let newStatus: string;
-      switch (resolutionType) {
-        case 'approve':
-          newStatus = 'approved';
-          break;
-        case 'reject':
-        case 'warn':
-          newStatus = 'flagged';
-          break;
-        case 'remove':
-        case 'ban-user':
-          newStatus = 'rejected';
-          break;
-        default:
-          newStatus = 'pending';
-      }
-
-      await db
-        .update(moderationFlags)
-        .set({
-          reviewedBy: moderatorId,
-          reviewedAt: new Date(),
-          resolution: reason
-        })
-        .where(eq(moderationFlags.id, flagId));
-
-      await db.insert(moderationActions).values({
-        contentType: flag.contentType,
-        contentId: flag.contentId,
-        actionType: resolutionType,
-        reason: reason,
-        moderatorId: moderatorId
-      } as any);
-
-      await this.applyResolution(
-        flag.contentType,
-        flag.contentId,
-        flag.reportedBy,
-        resolutionType
-      );
-
-      const [updatedFlag] = await db
-        .select()
-        .from(moderationFlags)
-        .where(eq(moderationFlags.id, flagId));
-
-      const contentDetails = await this.getContentDetails(
-        updatedFlag.contentType,
-        updatedFlag.contentId
-      );
-
-      return {
-        success: true,
-        message: `Flag reviewed successfully with resolution: ${resolutionType}`,
-        flag: {
-          ...updatedFlag,
-          content: contentDetails
-        } as ModerationItem
-      };
-    } catch (error) {
-      logger.error('Error reviewing flag:', { 
-        component: 'Chanuka',
-        error: error instanceof Error ? error.message : String(error)
-      });
-      return {
-        success: false,
-        message: 'Failed to review flag'
-      };
-    }
-  }
-
-  /**
-   * Retrieves comprehensive moderation statistics for a specified timeframe.
-   */
-  async getModerationStats(
-    startDate: Date,
-    endDate: Date
-  ): Promise<{
-    flagsCreated: number;
-    flagsResolved: number;
-    flagsPending: number;
-    averageResolutionTime: number;
-    violationsByType: { type: string; count: number }[];
-    resolutionsByType: { type: string; count: number }[];
-    moderatorActivity: {
-      moderatorId: string;
-      moderatorName: string;
-      reviewCount: number;
-      averageReviewTime: number;
-    }[];
-    contentTypeBreakdown: { contentType: string; count: number }[];
-    severityBreakdown: { severity: string; count: number }[];
-  }> {
-    try {
-      const [flagsCreatedResult] = await db
-        .select({ count: count() })
-        .from(moderationFlags)
-        .where(
-          and(
-            gte(moderationFlags.createdAt, startDate),
-            sql`${moderationFlags.createdAt} <= ${endDate}`
-          )
-        );
-
-      const [flagsResolvedResult] = await db
-        .select({ count: count() })
-        .from(moderationFlags)
-        .where(
-          and(
-            sql`${moderationFlags.reviewedAt} IS NOT NULL`,
-            gte(moderationFlags.reviewedAt, startDate),
-            sql`${moderationFlags.reviewedAt} <= ${endDate}`
-          )
-        );
-
-      const [flagsPendingResult] = await db
-        .select({ count: count() })
-        .from(moderationFlags)
-        .where(eq(moderationFlags.status, 'pending'));
-
-      const resolvedFlags = await db
-        .select({
-          createdAt: moderationFlags.createdAt,
-          reviewedAt: moderationFlags.reviewedAt
-        })
-        .from(moderationFlags)
-        .where(
-          and(
-            sql`${moderationFlags.reviewedAt} IS NOT NULL`,
-            gte(moderationFlags.reviewedAt, startDate),
-            sql`${moderationFlags.reviewedAt} <= ${endDate}`
-          )
-        );
-
-      const averageResolutionTime = resolvedFlags.length > 0
-        ? resolvedFlags.reduce((sum, flag) => {
-            if (!flag.reviewedAt) return sum;
-            const resolutionTime = flag.reviewedAt.getTime() - flag.createdAt.getTime();
-            return sum + resolutionTime;
-          }, 0) / resolvedFlags.length / (1000 * 60 * 60)
-        : 0;
-
-      const violationsByTypeData = await db
-        .select({
-          type: moderationFlags.flagType,
-          count: count()
-        })
-        .from(moderationFlags)
-        .where(
-          and(
-            gte(moderationFlags.createdAt, startDate),
-            sql`${moderationFlags.createdAt} <= ${endDate}`
-          )
-        )
-        .groupBy(moderationFlags.flagType)
-        .orderBy(desc(sql`count(*)`));
-
-      const violationsByType = violationsByTypeData.map(item => ({
-        type: item.type,
-        count: Number(item.count)
-      }));
-
-      const resolutionsByTypeData = await db
-        .select({
-          type: moderationActions.actionType,
-          count: count()
-        })
-        .from(moderationActions)
-        .where(
-          and(
-            gte(moderationActions.createdAt, startDate),
-            sql`${moderationActions.createdAt} <= ${endDate}`
-          )
-        )
-        .groupBy(moderationActions.actionType)
-        .orderBy(desc(sql`count(*)`));
-
-      const resolutionsByType = resolutionsByTypeData.map(item => ({
-        type: item.type,
-        count: Number(item.count)
-      }));
-
-      const moderatorActivityData = await db
-        .select({
-          moderatorId: moderationActions.moderatorId,
-          reviewCount: count()
-        })
-        .from(moderationActions)
-        .where(
-          and(
-            gte(moderationActions.createdAt, startDate),
-            sql`${moderationActions.createdAt} <= ${endDate}`
-          )
-        )
-        .groupBy(moderationActions.moderatorId)
-        .orderBy(desc(sql`count(*)`));
-
-      const moderatorIds = moderatorActivityData.map(m => m.moderatorId);
-      const moderatorDetails = moderatorIds.length > 0
-        ? await db
-            .select({ id: users.id, name: users.name })
-            .from(users)
-            .where(inArray(users.id, moderatorIds))
-        : [];
-
-      const moderatorActivity = await Promise.all(
-        moderatorActivityData.map(async (mod) => {
-          const moderator = moderatorDetails.find(m => m.id === mod.moderatorId);
-          
-          const moderatorFlags = await db
-            .select({
-              createdAt: moderationFlags.createdAt,
-              reviewedAt: moderationFlags.reviewedAt
-            })
-            .from(moderationFlags)
-            .where(
-              and(
-                eq(moderationFlags.reviewedBy, mod.moderatorId),
-                sql`${moderationFlags.reviewedAt} IS NOT NULL`,
-                gte(moderationFlags.reviewedAt, startDate),
-                sql`${moderationFlags.reviewedAt} <= ${endDate}`
-              )
-            );
-
-          const averageReviewTime = moderatorFlags.length > 0
-            ? moderatorFlags.reduce((sum, flag) => {
-                if (!flag.reviewedAt) return sum;
-                const reviewTime = flag.reviewedAt.getTime() - flag.createdAt.getTime();
-                return sum + reviewTime;
-              }, 0) / moderatorFlags.length / (1000 * 60 * 60)
-            : 0;
-
-          return {
-            moderatorId: mod.moderatorId,
-            moderatorName: moderator?.name || 'Unknown',
-            reviewCount: Number(mod.reviewCount),
-            averageReviewTime
-          };
-        })
-      );
-
-      const contentTypeBreakdownData = await db
-        .select({
-          contentType: moderationFlags.contentType,
-          count: count()
-        })
-        .from(moderationFlags)
-        .where(
-          and(
-            gte(moderationFlags.createdAt, startDate),
-            sql`${moderationFlags.createdAt} <= ${endDate}`
-          )
-        )
-        .groupBy(moderationFlags.contentType);
-
-      const contentTypeBreakdown = contentTypeBreakdownData.map(item => ({
-        contentType: item.contentType,
-        count: Number(item.count)
-      }));
-
-      const severityBreakdownData = await db
-        .select({
-          severity: moderationFlags.severity,
-          count: count()
-        })
-        .from(moderationFlags)
-        .where(
-          and(
-            gte(moderationFlags.createdAt, startDate),
-            sql`${moderationFlags.createdAt} <= ${endDate}`
-          )
-        )
-        .groupBy(moderationFlags.severity);
-
-      const severityBreakdown = severityBreakdownData.map(item => ({
-        severity: item.severity,
-        count: Number(item.count)
-      }));
-
-      return {
-        flagsCreated: Number(flagsCreatedResult.count),
-        flagsResolved: Number(flagsResolvedResult.count),
-        flagsPending: Number(flagsPendingResult.count),
-        averageResolutionTime,
-        violationsByType,
-        resolutionsByType,
-        moderatorActivity,
-        contentTypeBreakdown,
-        severityBreakdown
-      };
-    } catch (error) {
-      logger.error('Error fetching moderation stats:', { 
-        component: 'Chanuka',
-        error: error instanceof Error ? error.message : String(error)
-      });
-      throw error;
-    }
-  }
-
-  /**
-   * Analyzes content against moderation rules without creating a flag.
+   * Analyzes content for policy violations without creating a report.
+   * 
+   * This is useful for real-time content analysis during submission,
+   * allowing the system to warn users about potential issues before
+   * they post, or automatically flag content that clearly violates policies.
    */
   async analyzeContent(
     contentType: 'bill' | 'comment',
@@ -630,12 +462,12 @@ export class ContentModerationService {
     }
   ): Promise<{
     shouldFlag: boolean;
-    severity: 'low' | 'medium' | 'high' | 'critical';
+    severity: 'info' | 'low' | 'medium' | 'high' | 'critical';
     detectedIssues: {
       type: string;
       description: string;
       confidence: number;
-      severity: 'low' | 'medium' | 'high' | 'critical';
+      severity: 'info' | 'low' | 'medium' | 'high' | 'critical';
     }[];
     overallScore: number;
     recommendations: string[];
@@ -645,30 +477,32 @@ export class ContentModerationService {
         type: string;
         description: string;
         confidence: number;
-        severity: 'low' | 'medium' | 'high' | 'critical';
+        severity: 'info' | 'low' | 'medium' | 'high' | 'critical';
       }[] = [];
 
       const lowerContent = content.toLowerCase();
 
+      // Check for profanity and explicit language
       const profanityPatterns = [
         'fuck', 'shit', 'damn', 'bastard', 'asshole', 'bitch',
         'crap', 'piss', 'dick', 'cock', 'pussy'
       ];
-      
-      const profanityCount = profanityPatterns.filter(word => 
+
+      const profanityCount = profanityPatterns.filter(word =>
         lowerContent.includes(word)
       ).length;
 
       if (profanityCount > 0) {
         detectedIssues.push({
-          type: 'profanity',
+          type: 'inappropriate',
           description: `Detected ${profanityCount} instance(s) of explicit language`,
           confidence: Math.min(profanityCount * 0.3, 1),
           severity: profanityCount >= 3 ? 'high' : profanityCount >= 2 ? 'medium' : 'low'
         });
       }
 
-      const hasExcessiveCaps = content.split('').filter(c => 
+      // Check for spam indicators
+      const hasExcessiveCaps = content.split('').filter(c =>
         c === c.toUpperCase() && c !== c.toLowerCase()
       ).length / content.length > 0.5;
 
@@ -682,7 +516,7 @@ export class ContentModerationService {
       if (hasExcessiveCaps || hasExcessiveLinks || hasRepetitiveText) {
         const spamSignals = [hasExcessiveCaps, hasExcessiveLinks, hasRepetitiveText]
           .filter(Boolean).length;
-        
+
         detectedIssues.push({
           type: 'spam',
           description: 'Content shows characteristics of spam (excessive caps, links, or repetition)',
@@ -691,6 +525,7 @@ export class ContentModerationService {
         });
       }
 
+      // Check for hate speech and violent language
       const hateSpeechPatterns = [
         'hate', 'kill', 'die', 'destroy', 'eliminate',
         'inferior', 'subhuman', 'vermin', 'scum'
@@ -702,13 +537,14 @@ export class ContentModerationService {
 
       if (hateSpeechCount > 0) {
         detectedIssues.push({
-          type: 'hate-speech',
+          type: 'harassment',
           description: 'Content may contain hate speech or violent language',
           confidence: Math.min(hateSpeechCount * 0.4, 1),
           severity: hateSpeechCount >= 3 ? 'critical' : hateSpeechCount >= 2 ? 'high' : 'medium'
         });
       }
 
+      // Check for personal attacks and harassment
       const harassmentPatterns = [
         'you are', 'you\'re a', 'idiot', 'moron', 'stupid',
         'shut up', 'kill yourself', 'loser', 'pathetic'
@@ -727,15 +563,18 @@ export class ContentModerationService {
         });
       }
 
+      // Check content quality
       if (content.length < 10) {
         detectedIssues.push({
-          type: 'low-quality',
+          type: 'inappropriate',
           description: 'Content is extremely short and may not be substantive',
           confidence: 0.6,
           severity: 'low'
         });
       }
 
+      // Check for misinformation markers
+      // cspell:disable-next-line
       const misinformationMarkers = [
         'they don\'t want you to know', 'the truth they\'re hiding',
         'big pharma', 'wake up', 'do your own research',
@@ -755,52 +594,51 @@ export class ContentModerationService {
         });
       }
 
+      // Calculate overall risk score
+      const severityWeights = {
+        info: 0.5,
+        low: 1,
+        medium: 2,
+        high: 3,
+        critical: 4
+      };
+
       const overallScore = detectedIssues.reduce((score, issue) => {
-        const severityWeight = {
-          low: 1,
-          medium: 2,
-          high: 3,
-          critical: 4
-        };
-        return score + (issue.confidence * severityWeight[issue.severity]);
+        return score + (issue.confidence * severityWeights[issue.severity]);
       }, 0);
 
       const hasCriticalIssues = detectedIssues.some(i => i.severity === 'critical');
       const shouldFlag = hasCriticalIssues || overallScore >= 3;
 
-      let overallSeverity: 'low' | 'medium' | 'high' | 'critical';
+      // Determine overall severity
+      let overallSeverity: 'info' | 'low' | 'medium' | 'high' | 'critical';
       if (hasCriticalIssues || overallScore >= 6) {
         overallSeverity = 'critical';
       } else if (overallScore >= 4) {
         overallSeverity = 'high';
       } else if (overallScore >= 2) {
         overallSeverity = 'medium';
-      } else {
+      } else if (overallScore >= 1) {
         overallSeverity = 'low';
+      } else {
+        overallSeverity = 'info';
       }
 
+      // Generate recommendations
       const recommendations: string[] = [];
-      
-      if (detectedIssues.some(i => i.type === 'profanity')) {
+
+      if (detectedIssues.some(i => i.type === 'inappropriate')) {
         recommendations.push('Consider removing explicit language to maintain a professional tone');
       }
-      
+
       if (detectedIssues.some(i => i.type === 'spam')) {
         recommendations.push('Reduce repetition, excessive capitalization, or number of links');
       }
-      
-      if (detectedIssues.some(i => i.type === 'hate-speech')) {
-        recommendations.push('Remove language that could be considered hateful or violent');
-      }
-      
+
       if (detectedIssues.some(i => i.type === 'harassment')) {
-        recommendations.push('Focus on ideas rather than personal attacks');
+        recommendations.push('Focus on ideas rather than personal attacks. Remove any hateful or violent language');
       }
-      
-      if (detectedIssues.some(i => i.type === 'low-quality')) {
-        recommendations.push('Provide more substantive content to contribute meaningfully to the discussion');
-      }
-      
+
       if (detectedIssues.some(i => i.type === 'misinformation')) {
         recommendations.push('Support claims with credible sources and avoid conspiracy language');
       }
@@ -817,14 +655,14 @@ export class ContentModerationService {
         recommendations
       };
     } catch (error) {
-      logger.error('Error analyzing content:', { 
-        component: 'Chanuka',
+      logger.error('Error analyzing content:', {
+        component: 'ContentModeration',
         error: error instanceof Error ? error.message : String(error)
       });
-      
+
       return {
         shouldFlag: false,
-        severity: 'low',
+        severity: 'info',
         detectedIssues: [],
         overallScore: 0,
         recommendations: ['Content analysis temporarily unavailable']
@@ -833,123 +671,399 @@ export class ContentModerationService {
   }
 
   /**
-   * Creates or updates a flag on a piece of content.
+   * Creates a new content report (flag).
+   * 
+   * This can be called either by users reporting content manually,
+   * or by automated systems when they detect policy violations.
    */
-  async flagContent(
-    contentType: 'bill' | 'comment',
+  async createReport(
+    contentType: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
     contentId: number,
-    flagType: string,
+    reportType: 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'copyright' | 'other',
     reason: string,
     reportedBy: string,
-    autoDetected = false
-  ): Promise<{ success: boolean; message: string }> {
+    autoDetected = false,
+    description?: string
+  ): Promise<{ success: boolean; message: string; reportId?: number }> {
     try {
-      const [existingFlag] = await db
+      // Check if there's already a pending report for this content
+      const [existingReport] = await db
         .select()
-        .from(moderationFlags)
+        .from(contentReport)
         .where(
           and(
-            eq(moderationFlags.contentType, contentType),
-            eq(moderationFlags.contentId, contentId),
-            eq(moderationFlags.status, 'pending')
+            eq(contentReport.contentType, contentType),
+            eq(contentReport.contentId, contentId),
+            eq(contentReport.status, 'pending')
           )
         );
 
-      const severity = this.calculateSeverity(flagType);
+      // Calculate severity based on report type
+      const severity = this.calculateSeverity(reportType);
 
-      if (existingFlag) {
+      if (existingReport) {
+        // Update existing report instead of creating duplicate
         await db
-          .update(moderationFlags)
+          .update(contentReport)
           .set({
-            reason: `${existingFlag.reason}; ${reason}`
+            reason: `${existingReport.reason}; ${reason}`,
+            description: description ? 
+              `${existingReport.description || ''}; ${description}` : 
+              existingReport.description,
+            updatedAt: new Date()
           })
-          .where(eq(moderationFlags.id, existingFlag.id));
-      } else {
-        await db.insert(moderationFlags).values({
-          contentType,
-          contentId,
-          flagType,
-          severity,
-          reason,
-          reportedBy,
-          autoDetected
-        } as any);
-      }
+          .where(eq(contentReport.id, existingReport.id));
 
-      return { success: true, message: 'Content flagged successfully' };
+        return { 
+          success: true, 
+          message: 'Existing report updated',
+          reportId: existingReport.id
+        };
+      } else {
+        // Create new report
+        const [newReport] = await db
+          .insert(contentReport)
+          .values({
+            contentType,
+            contentId,
+            reportedBy,
+            reportType,
+            reason,
+            description,
+            status: 'pending',
+            severity,
+            autoDetected
+          })
+          .returning({ id: contentReport.id });
+
+        return { 
+          success: true, 
+          message: 'Content reported successfully',
+          reportId: newReport.id
+        };
+      }
     } catch (error) {
-      logger.error('Error flagging content:', { 
-        component: 'Chanuka',
+      logger.error('Error creating report:', {
+        component: 'ContentModeration',
         error: error instanceof Error ? error.message : String(error)
       });
-      return { success: false, message: 'Failed to flag content' };
+      return { success: false, message: 'Failed to report content' };
     }
   }
 
   /**
-   * Generates comprehensive analytics about content moderation.
+   * Retrieves comprehensive moderation statistics for analytics dashboards.
+   */
+  async getModerationStats(
+    startDate: Date,
+    endDate: Date
+  ): Promise<{
+    reportsCreated: number;
+    reportsResolved: number;
+    reportsPending: number;
+    averageResolutionTime: number;
+    reportsByType: { type: string; count: number }[];
+    actionsByType: { type: string; count: number }[];
+    moderatorActivity: {
+      moderatorId: string;
+      moderatorName: string;
+      reviewCount: number;
+      averageReviewTime: number;
+    }[];
+    contentTypeBreakdown: { contentType: string; count: number }[];
+    severityBreakdown: { severity: string; count: number }[];
+  }> {
+    try {
+      // Count reports created in the time period
+      const [reportsCreatedResult] = await db
+        .select({ count: count() })
+        .from(contentReport)
+        .where(
+          and(
+            gte(contentReport.createdAt, startDate),
+            sql`${contentReport.createdAt} <= ${endDate}`
+          )
+        );
+
+      // Count reports resolved in the time period
+      const [reportsResolvedResult] = await db
+        .select({ count: count() })
+        .from(contentReport)
+        .where(
+          and(
+            eq(contentReport.status, 'resolved'),
+            sql`${contentReport.reviewedAt} IS NOT NULL`,
+            gte(contentReport.reviewedAt, startDate),
+            sql`${contentReport.reviewedAt} <= ${endDate}`
+          )
+        );
+
+      // Count currently pending reports
+      const [reportsPendingResult] = await db
+        .select({ count: count() })
+        .from(contentReport)
+        .where(eq(contentReport.status, 'pending'));
+
+      // Calculate average resolution time
+      const resolvedReports = await db
+        .select({
+          createdAt: contentReport.createdAt,
+          reviewedAt: contentReport.reviewedAt
+        })
+        .from(contentReport)
+        .where(
+          and(
+            eq(contentReport.status, 'resolved'),
+            sql`${contentReport.reviewedAt} IS NOT NULL`,
+            gte(contentReport.reviewedAt, startDate),
+            sql`${contentReport.reviewedAt} <= ${endDate}`
+          )
+        );
+
+      const averageResolutionTime = resolvedReports.length > 0
+        ? resolvedReports.reduce((sum, report) => {
+          if (!report.reviewedAt || !report.createdAt) return sum;
+          const resolutionTime = report.reviewedAt.getTime() - report.createdAt.getTime();
+          return sum + resolutionTime;
+        }, 0) / resolvedReports.length / (1000 * 60 * 60) // Convert to hours
+        : 0;
+
+      // Group reports by type
+      const reportsByTypeData = await db
+        .select({
+          type: contentReport.reportType,
+          count: count()
+        })
+        .from(contentReport)
+        .where(
+          and(
+            gte(contentReport.createdAt, startDate),
+            sql`${contentReport.createdAt} <= ${endDate}`
+          )
+        )
+        .groupBy(contentReport.reportType)
+        .orderBy(desc(sql`count(*)`));
+
+      const reportsByType = reportsByTypeData.map(item => ({
+        type: item.type,
+        count: Number(item.count)
+      }));
+
+      // Group moderation actions by type
+      const actionsByTypeData = await db
+        .select({
+          type: moderationAction.actionType,
+          count: count()
+        })
+        .from(moderationAction)
+        .where(
+          and(
+            gte(moderationAction.createdAt, startDate),
+            sql`${moderationAction.createdAt} <= ${endDate}`
+          )
+        )
+        .groupBy(moderationAction.actionType)
+        .orderBy(desc(sql`count(*)`));
+
+      const actionsByType = actionsByTypeData.map(item => ({
+        type: item.type,
+        count: Number(item.count)
+      }));
+
+      // Get moderator activity
+      const moderatorActivityData = await db
+        .select({
+          moderatorId: moderationAction.moderatorId,
+          reviewCount: count()
+        })
+        .from(moderationAction)
+        .where(
+          and(
+            gte(moderationAction.createdAt, startDate),
+            sql`${moderationAction.createdAt} <= ${endDate}`
+          )
+        )
+        .groupBy(moderationAction.moderatorId)
+        .orderBy(desc(sql`count(*)`));
+
+      const moderatorIds = moderatorActivityData.map(m => m.moderatorId);
+      const moderatorDetails = moderatorIds.length > 0
+        ? await db
+          .select({ id: user.id, name: user.name })
+          .from(user)
+          .where(inArray(user.id, moderatorIds))
+        : [];
+
+      const moderatorActivity = await Promise.all(
+        moderatorActivityData.map(async (mod) => {
+          const moderator = moderatorDetails.find(m => m.id === mod.moderatorId);
+
+          // Calculate average review time for this moderator
+          const moderatorReports = await db
+            .select({
+              createdAt: contentReport.createdAt,
+              reviewedAt: contentReport.reviewedAt
+            })
+            .from(contentReport)
+            .where(
+              and(
+                eq(contentReport.reviewedBy, mod.moderatorId),
+                sql`${contentReport.reviewedAt} IS NOT NULL`,
+                gte(contentReport.reviewedAt, startDate),
+                sql`${contentReport.reviewedAt} <= ${endDate}`
+              )
+            );
+
+          const averageReviewTime = moderatorReports.length > 0
+            ? moderatorReports.reduce((sum, report) => {
+              if (!report.reviewedAt || !report.createdAt) return sum;
+              const reviewTime = report.reviewedAt.getTime() - report.createdAt.getTime();
+              return sum + reviewTime;
+            }, 0) / moderatorReports.length / (1000 * 60 * 60) // Convert to hours
+            : 0;
+
+          return {
+            moderatorId: mod.moderatorId,
+            moderatorName: moderator?.name || 'Unknown',
+            reviewCount: Number(mod.reviewCount),
+            averageReviewTime
+          };
+        })
+      );
+
+      // Content type breakdown
+      const contentTypeBreakdownData = await db
+        .select({
+          contentType: contentReport.contentType,
+          count: count()
+        })
+        .from(contentReport)
+        .where(
+          and(
+            gte(contentReport.createdAt, startDate),
+            sql`${contentReport.createdAt} <= ${endDate}`
+          )
+        )
+        .groupBy(contentReport.contentType);
+
+      const contentTypeBreakdown = contentTypeBreakdownData.map(item => ({
+        contentType: item.contentType,
+        count: Number(item.count)
+      }));
+
+      // Severity breakdown
+      const severityBreakdownData = await db
+        .select({
+          severity: contentReport.severity,
+          count: count()
+        })
+        .from(contentReport)
+        .where(
+          and(
+            gte(contentReport.createdAt, startDate),
+            sql`${contentReport.createdAt} <= ${endDate}`
+          )
+        )
+        .groupBy(contentReport.severity);
+
+      const severityBreakdown = severityBreakdownData.map(item => ({
+        severity: item.severity,
+        count: Number(item.count)
+      }));
+
+      return {
+        reportsCreated: Number(reportsCreatedResult.count),
+        reportsResolved: Number(reportsResolvedResult.count),
+        reportsPending: Number(reportsPendingResult.count),
+        averageResolutionTime,
+        reportsByType,
+        actionsByType,
+        moderatorActivity,
+        contentTypeBreakdown,
+        severityBreakdown
+      };
+    } catch (error) {
+      logger.error('Error fetching moderation stats:', {
+        component: 'ContentModeration',
+        error: error instanceof Error ? error.message : String(error)
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Generates comprehensive analytics about content moderation performance.
    */
   async getContentAnalytics(): Promise<ContentAnalytics> {
     try {
-      const [totalBills] = await db.select({ count: count() }).from(bills);
-      const [totalComments] = await db.select({ count: count() }).from(billComments);
+      // Get total content across the platform
+      const [totalBills] = await db.select({ count: count() }).from(bill);
+      const [totalComments] = await db.select({ count: count() }).from(billComment);
       const totalContent = Number(totalBills.count) + Number(totalComments.count);
 
-      const [pendingItems] = await db
+      // Get report counts by status
+      const [pendingReports] = await db
         .select({ count: count() })
-        .from(moderationFlags)
-        .where(eq(moderationFlags.status, 'pending'));
+        .from(contentReport)
+        .where(eq(contentReport.status, 'pending'));
 
-      const [approvedItems] = await db
+      const [reviewedReports] = await db
         .select({ count: count() })
-        .from(moderationFlags)
-        .where(eq(moderationFlags.status, 'approved'));
+        .from(contentReport)
+        .where(eq(contentReport.status, 'reviewed'));
 
-      const [rejectedItems] = await db
+      const [resolvedReports] = await db
         .select({ count: count() })
-        .from(moderationFlags)
-        .where(eq(moderationFlags.status, 'rejected'));
+        .from(contentReport)
+        .where(eq(contentReport.status, 'resolved'));
 
-      const [flaggedItems] = await db
+      const [dismissedReports] = await db
         .select({ count: count() })
-        .from(moderationFlags)
-        .where(eq(moderationFlags.status, 'flagged'));
+        .from(contentReport)
+        .where(eq(contentReport.status, 'dismissed'));
 
+      const [escalatedReports] = await db
+        .select({ count: count() })
+        .from(contentReport)
+        .where(eq(contentReport.status, 'escalated'));
+
+      // Calculate average review time
       const reviewedItems = await db
         .select({
-          createdAt: moderationFlags.createdAt,
-          reviewedAt: moderationFlags.reviewedAt
+          createdAt: contentReport.createdAt,
+          reviewedAt: contentReport.reviewedAt
         })
-        .from(moderationFlags)
-        .where(sql`${moderationFlags.reviewedAt} IS NOT NULL`);
+        .from(contentReport)
+        .where(sql`${contentReport.reviewedAt} IS NOT NULL`);
 
       const averageReviewTime = reviewedItems.length > 0
         ? reviewedItems.reduce((sum, item) => {
-            if (!item.reviewedAt) return sum;
-            const reviewTime = item.reviewedAt.getTime() - item.createdAt.getTime();
-            return sum + reviewTime;
-          }, 0) / reviewedItems.length / (1000 * 60 * 60)
+          if (!item.reviewedAt || !item.createdAt) return sum;
+          const reviewTime = item.reviewedAt.getTime() - item.createdAt.getTime();
+          return sum + reviewTime;
+        }, 0) / reviewedItems.length / (1000 * 60 * 60) // Convert to hours
         : 0;
 
-      const topModerators = await db
+      // Get top moderators
+      const topModeratorsData = await db
         .select({
-          moderatorId: moderationActions.moderatorId,
+          moderatorId: moderationAction.moderatorId,
           actionCount: count()
         })
-        .from(moderationActions)
-        .groupBy(moderationActions.moderatorId)
+        .from(moderationAction)
+        .groupBy(moderationAction.moderatorId)
         .orderBy(desc(sql`count(*)`))
         .limit(5);
 
-      const moderatorIds = topModerators.map(m => m.moderatorId);
+      const moderatorIds = topModeratorsData.map(m => m.moderatorId);
       const moderatorDetails = moderatorIds.length > 0
         ? await db
-            .select({ id: users.id, name: users.name })
-            .from(users)
-            .where(inArray(users.id, moderatorIds))
+          .select({ id: user.id, name: user.name })
+          .from(user)
+          .where(inArray(user.id, moderatorIds))
         : [];
 
-      const topModeratorsWithNames = topModerators.map(mod => {
+      const topModerators = topModeratorsData.map(mod => {
         const moderator = moderatorDetails.find(m => m.id === mod.moderatorId);
         return {
           id: mod.moderatorId,
@@ -958,39 +1072,49 @@ export class ContentModerationService {
         };
       });
 
-      const qualityScore = totalContent > 0
-        ? ((Number(approvedItems.count) / totalContent) * 100)
+      // Calculate content quality score
+      // This is a simple metric: (content without issues / total content) * 100
+      const totalReports = Number(pendingReports.count) + 
+                          Number(reviewedReports.count) + 
+                          Number(resolvedReports.count) +
+                          Number(dismissedReports.count) +
+                          Number(escalatedReports.count);
+      
+      const contentQualityScore = totalContent > 0
+        ? ((totalContent - totalReports) / totalContent) * 100
         : 100;
 
-      const flagReasonsData = await db
+      // Get report reasons breakdown
+      const reportReasonsData = await db
         .select({
-          flagType: moderationFlags.flagType,
-          flagCount: count()
+          reportType: contentReport.reportType,
+          reportCount: count()
         })
-        .from(moderationFlags)
-        .groupBy(moderationFlags.flagType)
+        .from(contentReport)
+        .groupBy(contentReport.reportType)
         .orderBy(desc(sql`count(*)`))
         .limit(10);
 
-      const flagReasons = flagReasonsData.map(item => ({
-        reason: item.flagType,
-        count: Number(item.flagCount)
+      const reportReasons = reportReasonsData.map(item => ({
+        reason: item.reportType,
+        count: Number(item.reportCount)
       }));
 
       return {
         totalContent,
-        pendingModeration: Number(pendingItems.count),
-        approvedContent: Number(approvedItems.count),
-        rejectedContent: Number(rejectedItems.count),
-        flaggedContent: Number(flaggedItems.count),
+        pendingModeration: Number(pendingReports.count),
+        reviewedContent: Number(reviewedReports.count),
+        resolvedContent: Number(resolvedReports.count),
+        dismissedContent: Number(dismissedReports.count),
+        escalatedContent: Number(escalatedReports.count),
         averageReviewTime,
-        topModerators: topModeratorsWithNames,
-        contentQualityScore: qualityScore,
-        flagReasons
+        topModerators,
+        contentQualityScore,
+        reportReasons
       };
     } catch (error) {
-      logger.error('Error fetching content analytics:', { 
-        component: 'Chanuka',
+      logger.error('Error fetching content analytics:', {
+        component: 'ContentModeration',
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
@@ -998,15 +1122,15 @@ export class ContentModerationService {
   }
 
   /**
-   * Retrieves the complete moderation history for content or the entire system.
+   * Retrieves the complete moderation history for specific content or system-wide.
    */
   async getModerationHistory(
-    contentType?: 'bill' | 'comment',
+    contentType?: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
     contentId?: number,
     page = 1,
     limit = 20
   ): Promise<{
-    actions: ModerationAction[];
+    actions: ModerationActionRecord[];
     pagination: {
       page: number;
       limit: number;
@@ -1016,39 +1140,39 @@ export class ContentModerationService {
   }> {
     try {
       const offset = (page - 1) * limit;
-      
+
       const conditions: SQL[] = [];
 
       if (contentType && contentId) {
-        conditions.push(eq(moderationActions.contentType, contentType));
-        conditions.push(eq(moderationActions.contentId, contentId));
+        conditions.push(eq(moderationAction.contentType, contentType));
+        conditions.push(eq(moderationAction.contentId, contentId));
       }
 
+      // Fetch actions with moderator details
       const actions = await db
         .select({
-          id: moderationActions.id,
-          contentType: moderationActions.contentType,
-          contentId: moderationActions.contentId,
-          actionType: moderationActions.actionType,
-          reason: moderationActions.reason,
-          moderatorId: moderationActions.moderatorId,
-          moderatorName: users.name,
-          createdAt: moderationActions.createdAt
+          id: moderationAction.id,
+          contentType: moderationAction.contentType,
+          contentId: moderationAction.contentId,
+          actionType: moderationAction.actionType,
+          reason: moderationAction.reason,
+          moderatorId: moderationAction.moderatorId,
+          moderatorName: user.name,
+          createdAt: moderationAction.createdAt
         })
-        .from(moderationActions)
-        .innerJoin(users, eq(moderationActions.moderatorId, users.id))
-        .$dynamic()
+        .from(moderationAction)
+        .innerJoin(user, eq(moderationAction.moderatorId, user.id))
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(desc(moderationActions.createdAt))
+        .orderBy(desc(moderationAction.createdAt))
         .limit(limit)
         .offset(offset);
 
+      // Get total count for pagination
       const countResult = await db
         .select({ count: count() })
-        .from(moderationActions)
-        .$dynamic()
+        .from(moderationAction)
         .where(conditions.length > 0 ? and(...conditions) : undefined);
-      
+
       const total = countResult[0]?.count ?? 0;
 
       return {
@@ -1070,31 +1194,48 @@ export class ContentModerationService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching moderation history:', { 
-        component: 'Chanuka',
+      logger.error('Error fetching moderation history:', {
+        component: 'ContentModeration',
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
     }
   }
 
+  // ============================================================================
+  // PRIVATE HELPER METHODS
+  // ============================================================================
+
   /**
    * Fetches the full details of content being moderated.
+   * This provides moderators with context about what they're reviewing.
    */
-  private async getContentDetails(contentType: string, contentId: number) {
+  private async getContentDetails(
+    contentType: string, 
+    contentId: number
+  ): Promise<{
+    title?: string;
+    text: string;
+    author: {
+      id: string;
+      name: string;
+      email: string;
+    };
+    createdAt: Date;
+  }> {
     try {
       if (contentType === 'bill') {
-        const [bill] = await db
+        const [billData] = await db
           .select({
-            title: bills.title,
-            text: bills.summary,
-            sponsorId: bills.sponsorId,
-            createdAt: bills.createdAt
+            title: bill.title,
+            text: bill.summary,
+            sponsorId: bill.sponsorId,
+            createdAt: bill.createdAt
           })
-          .from(bills)
-          .where(eq(bills.id, contentId));
+          .from(bill)
+          .where(eq(bill.id, contentId));
 
-        if (!bill) {
+        if (!billData) {
           return {
             title: 'Bill not found',
             text: '',
@@ -1103,35 +1244,47 @@ export class ContentModerationService {
           };
         }
 
-        let sponsor: { id: number; name: string; email: string | null } | null = null;
-        if (bill.sponsorId) {
+        // Get sponsor details if available
+        let sponsorData: { id: number; name: string; email: string | null } | null = null;
+        if (billData.sponsorId) {
           const sponsorResult = await db
-            .select({ id: sponsors.id, name: sponsors.name, email: sponsors.email })
-            .from(sponsors)
-            .where(eq(sponsors.id, bill.sponsorId));
-          sponsor = sponsorResult[0] || null;
+            .select({ id: sponsor.id, name: sponsor.name, email: sponsor.email })
+            .from(sponsor)
+            .where(eq(sponsor.id, billData.sponsorId));
+          sponsorData = sponsorResult[0] || null;
         }
 
         return {
-          title: bill.title,
-          text: bill.text || '',
-          author: sponsor ? { id: sponsor.id.toString(), name: sponsor.name, email: sponsor.email || '' } : { id: bill.sponsorId?.toString() || '', name: 'Unknown', email: '' },
-          createdAt: bill.createdAt
+          title: billData.title,
+          text: billData.text || '',
+          author: sponsorData 
+            ? { 
+                id: sponsorData.id.toString(), 
+                name: sponsorData.name, 
+                email: sponsorData.email || '' 
+              }
+            : { 
+                id: billData.sponsorId?.toString() || '', 
+                name: 'Unknown', 
+                email: '' 
+              },
+          createdAt: billData.createdAt
         };
-      } else if (contentType === 'comment') {
-        const [comment] = await db
-          .select({
-            text: billComments.content,
-            authorId: billComments.userId,
-            createdAt: billComments.createdAt,
-            authorName: users.name,
-            authorEmail: users.email
-          })
-          .from(billComments)
-          .innerJoin(users, eq(billComments.userId, users.id))
-          .where(eq(billComments.id, contentId));
 
-        if (!comment) {
+      } else if (contentType === 'comment') {
+        const [commentData] = await db
+          .select({
+            text: billComment.content,
+            authorId: billComment.userId,
+            createdAt: billComment.createdAt,
+            authorName: user.name,
+            authorEmail: user.email
+          })
+          .from(billComment)
+          .innerJoin(user, eq(billComment.userId, user.id))
+          .where(eq(billComment.id, contentId));
+
+        if (!commentData) {
           return {
             text: 'Comment not found',
             author: { id: '', name: 'Unknown', email: '' },
@@ -1140,24 +1293,28 @@ export class ContentModerationService {
         }
 
         return {
-          text: comment.text,
+          text: commentData.text,
           author: {
-            id: comment.authorId,
-            name: comment.authorName,
-            email: comment.authorEmail
+            id: commentData.authorId,
+            name: commentData.authorName,
+            email: commentData.authorEmail
           },
-          createdAt: comment.createdAt
+          createdAt: commentData.createdAt
         };
       }
 
+      // For other content types (user_profile, sponsor_transparency)
       return {
-        text: 'Content not found',
-        author: { id: '', name: 'Unknown', email: '' },
+        text: 'Content details not available for this type',
+        author: { id: '', name: 'System', email: '' },
         createdAt: new Date()
       };
+
     } catch (error) {
-      logger.error('Error fetching content details:', { 
-        component: 'Chanuka',
+      logger.error('Error fetching content details:', {
+        component: 'ContentModeration',
+        contentType,
+        contentId,
         error: error instanceof Error ? error.message : String(error)
       });
       return {
@@ -1169,84 +1326,67 @@ export class ContentModerationService {
   }
 
   /**
-   * Calculates severity level based on the type of flag.
+   * Calculates severity level based on the type of report.
+   * This helps prioritize what moderators should review first.
    */
-  private calculateSeverity(flagType: string): 'low' | 'medium' | 'high' | 'critical' {
-    const criticalFlags = ['harassment', 'hate-speech', 'threats', 'doxxing', 'illegal-content'];
-    const highFlags = ['spam', 'misinformation', 'impersonation'];
-    const mediumFlags = ['inappropriate', 'off-topic', 'low-quality'];
-    
-    const normalizedType = flagType.toLowerCase();
-    
-    if (criticalFlags.includes(normalizedType)) {
+  private calculateSeverity(
+    reportType: string
+  ): 'info' | 'low' | 'medium' | 'high' | 'critical' {
+    const criticalTypes = ['harassment'];
+    const highTypes = ['misinformation', 'copyright'];
+    const mediumTypes = ['spam', 'inappropriate'];
+    const lowTypes = ['other'];
+
+    const normalizedType = reportType.toLowerCase();
+
+    if (criticalTypes.includes(normalizedType)) {
       return 'critical';
-    } else if (highFlags.includes(normalizedType)) {
+    } else if (highTypes.includes(normalizedType)) {
       return 'high';
-    } else if (mediumFlags.includes(normalizedType)) {
+    } else if (mediumTypes.includes(normalizedType)) {
       return 'medium';
+    } else if (lowTypes.includes(normalizedType)) {
+      return 'low';
     }
 
-    return 'low';
+    return 'info';
   }
 
   /**
-   * Applies the moderation decision to the actual content.
-   * This is where moderator decisions are translated into actual changes 
-   * to the content visibility and state.
+   * Applies the moderation action to the actual content.
+   * This is where moderator decisions translate into visible changes.
    */
   private async applyModerationAction(
     contentType: string,
     contentId: number,
-    action: string
+    reportedBy: string,
+    actionType: 'warn' | 'hide' | 'delete' | 'ban_user' | 'verify' | 'highlight'
   ): Promise<void> {
     try {
-      if (action === 'delete') {
-        if (contentType === 'comment') {
-          await db
-            .update(billComments)
-            .set({ 
-              content: '[Content removed by moderator]'
-            })
-            .where(eq(billComments.id, contentId));
-        }
-      } else if (action === 'reject') {
-        if (contentType === 'comment') {
-          await db
-            .update(billComments)
-            .set({ content: '[Comment hidden by moderator]' })
-            .where(eq(billComments.id, contentId));
-        }
-      }
-    } catch (error) {
-      logger.error('Error applying moderation action:', { 
-        component: 'Chanuka',
-        error: error instanceof Error ? error.message : String(error)
-      });
-    }
-  }
-
-  /**
-   * Applies a specific resolution type to content and potentially the user who created it.
-   * This method extends beyond simple content modification to include user-level actions
-   * like warnings and bans.
-   */
-  private async applyResolution(
-    contentType: string,
-    contentId: number,
-    userId: string,
-    resolutionType: string
-  ): Promise<void> {
-    try {
-      switch (resolutionType) {
-        case 'approve':
-          break;
-
-        case 'reject':
+      switch (actionType) {
+        case 'delete':
           if (contentType === 'comment') {
             await db
-              .update(billComments)
-              .set({ content: '[Comment hidden by moderator]' })
-              .where(eq(billComments.id, contentId));
+              .update(billComment)
+              .set({
+                content: '[Content removed by moderator]',
+                isDeleted: true,
+                updatedAt: new Date()
+              })
+              .where(eq(billComment.id, contentId));
+          }
+          break;
+
+        case 'hide':
+          if (contentType === 'comment') {
+            await db
+              .update(billComment)
+              .set({ 
+                content: '[Comment hidden by moderator]',
+                isDeleted: true,
+                updatedAt: new Date()
+              })
+              .where(eq(billComment.id, contentId));
           }
           break;
 
@@ -1254,95 +1394,94 @@ export class ContentModerationService {
           if (contentType === 'comment') {
             const [comment] = await db
               .select()
-              .from(billComments)
-              .where(eq(billComments.id, contentId));
-            
-            if (comment) {
+              .from(billComment)
+              .where(eq(billComment.id, contentId));
+
+            if (comment && !comment.isDeleted) {
               await db
-                .update(billComments)
+                .update(billComment)
                 .set({
-                  content: `[Moderator Warning: This comment was flagged for policy violation]\n\n${comment.content}`
+                  content: `[⚠️ Moderator Warning: This comment was flagged for policy violation]\n\n${comment.content}`,
+                  updatedAt: new Date()
                 })
-                .where(eq(billComments.id, contentId));
+                .where(eq(billComment.id, contentId));
             }
           }
           break;
 
-        case 'remove':
+        case 'ban_user':
+          // In a full implementation, this would:
+          // 1. Mark the user as banned
+          // 2. Hide/delete all their content
+          // 3. Prevent them from posting
+          // For now, we just log the action
+          logger.warn('User ban action required:', {
+            component: 'ContentModeration',
+            userId: reportedBy,
+            contentType,
+            contentId
+          });
+          
+          // Hide the specific content
           if (contentType === 'comment') {
             await db
-              .update(billComments)
-              .set({ content: '[Content removed by moderator for policy violation]' })
-              .where(eq(billComments.id, contentId));
+              .update(billComment)
+              .set({ 
+                content: '[Content removed - user banned for policy violations]',
+                isDeleted: true,
+                updatedAt: new Date()
+              })
+              .where(eq(billComment.id, contentId));
           }
           break;
 
-        case 'ban-user':
+        case 'verify':
+          // Mark content as verified/endorsed by moderators
           if (contentType === 'comment') {
             await db
-              .update(billComments)
-              .set({ content: '[Content removed - user banned for policy violations]' })
-              .where(eq(billComments.id, contentId));
+              .update(billComment)
+              .set({ 
+                isVerified: true,
+                updatedAt: new Date()
+              })
+              .where(eq(billComment.id, contentId));
           }
-          
-          logger.info('User ban action required:', {
-            component: 'Chanuka',
-            userId,
+          break;
+
+        case 'highlight':
+          // In a full implementation, this might add a special badge
+          // or increase visibility of quality content
+          logger.info('Content highlighted:', {
+            component: 'ContentModeration',
             contentType,
             contentId
           });
           break;
 
         default:
-          logger.warn('Unknown resolution type:', {
-            component: 'Chanuka',
-            resolutionType
+          logger.warn('Unknown action type:', {
+            component: 'ContentModeration',
+            actionType
           });
       }
     } catch (error) {
-      logger.error('Error applying resolution:', { 
-        component: 'Chanuka',
+      logger.error('Error applying moderation action:', {
+        component: 'ContentModeration',
+        contentType,
+        contentId,
+        actionType,
         error: error instanceof Error ? error.message : String(error)
       });
     }
   }
 }
 
+// ============================================================================
+// SINGLETON EXPORT
+// ============================================================================
+
+/**
+ * Singleton instance of the content moderation service.
+ * Use this throughout your application to ensure consistent state.
+ */
 export const contentModerationService = ContentModerationService.getInstance();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

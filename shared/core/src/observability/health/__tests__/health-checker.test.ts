@@ -37,7 +37,9 @@ describe('HealthChecker', () => {
   });
 
   afterEach(() => {
+    cleanup();
     healthChecker?.destroy();
+  
   });
 
   describe('Health Check Registration', () => {

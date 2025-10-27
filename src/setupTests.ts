@@ -158,3 +158,41 @@ export const mockApiError = (message: string) => ({
 export const waitForNextTick = () => new Promise(resolve => setTimeout(resolve, 0));
 
 export const flushPromises = () => new Promise(resolve => setImmediate(resolve));
+// Mock window.location
+const mockLocation = {
+  href: 'http://localhost:3000/',
+  origin: 'http://localhost:3000',
+  protocol: 'http:',
+  host: 'localhost:3000',
+  hostname: 'localhost',
+  port: '3000',
+  pathname: '/',
+  search: '',
+  hash: '',
+  assign: vi.fn(),
+  replace: vi.fn(),
+  reload: vi.fn(),
+  toString: () => 'http://localhost:3000/',
+};
+
+Object.defineProperty(window, 'location', {
+  value: mockLocation,
+  writable: true,
+});
+
+// Mock history API
+const mockHistory = {
+  length: 1,
+  scrollRestoration: 'auto' as ScrollRestoration,
+  state: null,
+  back: vi.fn(),
+  forward: vi.fn(),
+  go: vi.fn(),
+  pushState: vi.fn(),
+  replaceState: vi.fn(),
+};
+
+Object.defineProperty(window, 'history', {
+  value: mockHistory,
+  writable: true,
+});

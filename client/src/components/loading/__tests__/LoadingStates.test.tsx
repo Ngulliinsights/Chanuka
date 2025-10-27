@@ -111,7 +111,7 @@ describe('LoadingStates Components', () => {
       // Simulate error by triggering window error event
       render(<PageLoader />);
       
-      act(() => {
+      await act(() => {
         window.dispatchEvent(new ErrorEvent('error', {
           message: 'Test error',
           filename: 'test.js',
@@ -127,7 +127,7 @@ describe('LoadingStates Components', () => {
     it('should show recovery button when error can be recovered', async () => {
       render(<PageLoader />);
       
-      act(() => {
+      await act(() => {
         window.dispatchEvent(new ErrorEvent('error', {
           message: 'Test error',
         }));
@@ -141,7 +141,7 @@ describe('LoadingStates Components', () => {
     it('should show recovery suggestions', async () => {
       render(<PageLoader />);
       
-      act(() => {
+      await act(() => {
         window.dispatchEvent(new ErrorEvent('error', {
           message: 'Test error',
         }));
@@ -263,7 +263,7 @@ describe('LoadingStates Components', () => {
       );
       
       // Simulate stage error by calling the error handler
-      act(() => {
+      await act(() => {
         onStageError('test', new LoadingStageError('test', 'Test stage', 'Test error'));
       });
 
@@ -293,7 +293,7 @@ describe('LoadingStates Components', () => {
       render(<TimeoutAwareLoader timeout={10000} timeoutMessage="Taking too long..." />);
       
       // Advance to 70% of timeout (7 seconds)
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(7000);
       });
       
@@ -304,7 +304,7 @@ describe('LoadingStates Components', () => {
       const onTimeout = vi.fn();
       render(<TimeoutAwareLoader timeout={5000} onTimeout={onTimeout} />);
       
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(5000);
       });
       
@@ -315,7 +315,7 @@ describe('LoadingStates Components', () => {
     it('should show elapsed time during timeout warning', () => {
       render(<TimeoutAwareLoader timeout={10000} />);
       
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(8000);
       });
       

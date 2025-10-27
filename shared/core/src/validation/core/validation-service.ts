@@ -6,9 +6,23 @@
  */
 
 import crypto from 'crypto';
-import { logger } from '../../logging';
+import { logger } from '../../observability/logging/logger';
 import { ValidationError } from '../../observability/error-management/errors/specialized-errors';
 import {
+  ValidationService,
+  ValidationSchema,
+  ValidationOptions,
+  ValidationContext,
+  ValidationResult,
+  BatchValidationResult,
+  ValidationServiceConfig,
+  ValidationMetrics,
+  CachedValidationResult,
+  SchemaRegistration,
+  PreprocessingConfig,
+  SanitizationRules,
+  PreprocessingRules,
+  ValidationHealthStatus,
   IValidationService,
   IValidationResult,
   IBatchValidationResult,
@@ -31,13 +45,13 @@ import {
  */
 export abstract class CoreValidationService implements ValidationService {
   // Schema registry stores all registered schemas by name for quick lookup
-  protected schemaRegistry = new Map<string, ISchemaRegistration>();
-  
+  protected schemaRegistry = new Map<string, SchemaRegistration>();
+
   // Validation cache stores recently validated data to improve performance
-  protected validationCache = new Map<string, ICachedValidationResult<any>>();
-  
+  protected validationCache = new Map<string, CachedValidationResult<any>>();
+
   // Metrics track validation performance and patterns over time
-  protected metrics: IValidationMetrics = {
+  protected metrics: ValidationMetrics = {
     totalValidations: 0,
     successfulValidations: 0,
     failedValidations: 0,
@@ -50,15 +64,15 @@ export abstract class CoreValidationService implements ValidationService {
   };
   
   // Configuration controls all aspects of validation behavior
-  protected config: IValidationServiceConfig;
+  protected config: ValidationServiceConfig;
 
   /**
    * Initialize the validation service with configuration
-   * 
+   *
    * The configuration is merged with sensible defaults to ensure
    * the service works out of the box while remaining highly customizable
    */
-  constructor(config: IValidationServiceConfig = {}) {
+  constructor(config: ValidationServiceConfig = {}) {
     // Build complete configuration by merging provided config with defaults
     // This ensures that all nested objects exist even if not provided
     this.config = {
@@ -102,48 +116,63 @@ export abstract class CoreValidationService implements ValidationService {
 
   /**
    * Validate data against a schema, returning the typed result or throwing an error
-   * 
+   *
    * This is the "throw on error" version - it's convenient when you want to
    * use try-catch for error handling rather than checking a result object
-   * 
+   *
    * @abstract Must be implemented by concrete validation service
    */
   abstract validate<T>(
     schema: any,
     data: unknown,
-    options?: IValidationOptions,
-    context?: IValidationContext
+    options?: ValidationOptions,
+    context?: ValidationContext
   ): Promise<T>;
 
   /**
    * Validate data safely, always returning a result object with success status
-   * 
+   *
    * This is the "never throw" version - it's useful when you want to handle
    * validation errors as data rather than exceptions
-   * 
+   *
    * @abstract Must be implemented by concrete validation service
    */
   abstract validateSafe<T>(
     schema: any,
     data: unknown,
-    options?: IValidationOptions,
-    context?: IValidationContext
-  ): Promise<IValidationResult<T>>;
+    options?: ValidationOptions,
+    context?: ValidationContext
+  ): Promise<ValidationResult<T>>;
+
+  /**
+   * Validate data synchronously, returning the typed result or throwing an error
+   *
+   * This is the synchronous version of validate - useful when you don't need
+   * async validation or when working in synchronous contexts
+   *
+   * @abstract Must be implemented by concrete validation service
+   */
+  abstract validateSync<T>(
+    schema: any,
+    data: unknown,
+    options?: ValidationOptions,
+    context?: ValidationContext
+  ): T;
 
   /**
    * Validate multiple data items against the same schema efficiently
-   * 
+   *
    * This method optimizes batch validation by reusing the schema compilation
    * and collecting all results into a single response object
-   * 
+   *
    * @abstract Must be implemented by concrete validation service
    */
   abstract validateBatch<T>(
     schema: any,
     dataArray: unknown[],
-    options?: IValidationOptions,
-    context?: IValidationContext
-  ): Promise<IBatchValidationResult<T>>;
+    options?: ValidationOptions,
+    context?: ValidationContext
+  ): Promise<BatchValidationResult<T>>;
 
   /**
    * Register a schema with a human-readable name for later retrieval
@@ -161,7 +190,7 @@ export abstract class CoreValidationService implements ValidationService {
       tags?: string[];
     } = {}
   ): void {
-    const registration: ISchemaRegistration = {
+    const registration: SchemaRegistration = {
       name,
       schema,
       version: options.version || '1.0.0',
@@ -186,22 +215,31 @@ export abstract class CoreValidationService implements ValidationService {
   }
 
   /**
+   * Check if a schema with the given name is registered
+   *
+   * Returns true if the schema exists in the registry, false otherwise
+   */
+  hasSchema(name: string): boolean {
+    return this.schemaRegistry.has(name);
+  }
+
+  /**
    * Get all registered schemas with their metadata
-   * 
+   *
    * This is useful for building schema catalogs, documentation, or
    * administrative interfaces that need to list available schemas
    */
-  getRegisteredSchemas(): ISchemaRegistration[] {
+  getRegisteredSchemas(): SchemaRegistration[] {
     return Array.from(this.schemaRegistry.values());
   }
 
   /**
    * Get current validation metrics for monitoring and observability
-   * 
+   *
    * Returns a copy of the metrics object to prevent external modification
    * of the internal metrics state
    */
-  getMetrics(): IValidationMetrics {
+  getMetrics(): ValidationMetrics {
     return { ...this.metrics };
   }
 
@@ -280,12 +318,12 @@ export abstract class CoreValidationService implements ValidationService {
 
   /**
    * Apply built-in preprocessing rules recursively through data structures
-   * 
+   *
    * This method handles the standard transformations like trimming and coercion.
    * It recursively processes arrays and objects to ensure all nested data
    * gets preprocessed consistently.
    */
-  private applyBuiltInPreprocessing(data: unknown, config: IPreprocessingConfig): unknown {
+  private applyBuiltInPreprocessing(data: unknown, config: PreprocessingConfig): unknown {
     // Handle null and undefined at the top level
     if (data === null || data === undefined) {
       if (config.undefinedToNull && data === undefined) {
@@ -351,7 +389,7 @@ export abstract class CoreValidationService implements ValidationService {
 
   /**
    * Generate a cache key for storing/retrieving validation results
-   * 
+   *
    * The cache key must uniquely identify the combination of schema, data, and
    * options. If any of these change, we need a different cache key to ensure
    * we don't return stale results.
@@ -359,7 +397,7 @@ export abstract class CoreValidationService implements ValidationService {
   protected generateCacheKey(
     schema: any,
     data: unknown,
-    options: IValidationOptions
+    options: ValidationOptions
   ): string {
     // If a custom cache key generator is provided, use it
     // This allows for application-specific caching strategies
@@ -390,11 +428,11 @@ export abstract class CoreValidationService implements ValidationService {
 
   /**
    * Attempt to retrieve a validation result from cache
-   * 
+   *
    * Returns null if the entry doesn't exist or has expired. This method
    * automatically cleans up expired entries as it encounters them.
    */
-  protected getFromCache<T>(key: string): IValidationResult<T> | null {
+  protected getFromCache<T>(key: string): ValidationResult<T> | null {
     const cached = this.validationCache.get(key);
     if (!cached) {
       return null;
@@ -414,12 +452,12 @@ export abstract class CoreValidationService implements ValidationService {
 
   /**
    * Store a validation result in the cache with a time-to-live
-   * 
+   *
    * This implements a simple LRU-like eviction strategy: when the cache is full,
    * we remove the oldest entry. A more sophisticated implementation might use
    * actual LRU tracking or other eviction strategies.
    */
-  protected setCache<T>(key: string, result: IValidationResult<T>, ttl?: number): void {
+  protected setCache<T>(key: string, result: ValidationResult<T>, ttl?: number): void {
     if (!this.config.cache?.enabled) {
       return;
     }
@@ -438,7 +476,7 @@ export abstract class CoreValidationService implements ValidationService {
     this.validationCache.set(key, {
       result,
       timestamp: Date.now(),
-      ttl: cacheTtl,
+      ttl: cacheTtl || 300,
     });
   }
 
@@ -460,7 +498,7 @@ export abstract class CoreValidationService implements ValidationService {
 
   /**
    * Update validation metrics after each operation
-   * 
+   *
    * This tracks both high-level metrics (success rate, timing) and detailed
    * metrics (error patterns) that help identify issues in your validation logic
    * or common problems in your data.
@@ -468,7 +506,7 @@ export abstract class CoreValidationService implements ValidationService {
   protected updateMetrics(
     type: 'success' | 'failure' | 'cacheHit' | 'cacheMiss',
     startTime?: number,
-    context?: IValidationContext,
+    context?: ValidationContext,
     error?: ValidationError
   ): void {
     if (!this.config.metrics?.enabled) {
@@ -508,7 +546,7 @@ export abstract class CoreValidationService implements ValidationService {
 
   /**
    * Track error patterns for analytics and debugging
-   * 
+   *
    * This helps identify which types of validation errors occur most frequently,
    * allowing you to improve either your validation schemas or your data quality
    * processes.
@@ -518,5 +556,132 @@ export abstract class CoreValidationService implements ValidationService {
     // In a production system, you'd want more sophisticated error categorization
     const errorCode = error.message.toLowerCase();
     this.metrics.errorsByCode[errorCode] = (this.metrics.errorsByCode[errorCode] || 0) + 1;
+  }
+
+  /**
+   * Sanitize data according to the provided rules
+   *
+   * Sanitization cleans and normalizes data to ensure it meets security and
+   * quality standards before validation or processing
+   */
+  sanitize(data: unknown, rules: SanitizationRules): unknown {
+    if (!rules || !data) {
+      return data;
+    }
+
+    // Handle string sanitization
+    if (typeof data === 'string') {
+      let sanitized = data;
+
+      // Apply basic sanitization rules
+      if (rules.trim) {
+        sanitized = sanitized.trim();
+      }
+
+      if (rules.lowercase) {
+        sanitized = sanitized.toLowerCase();
+      }
+
+      if (rules.uppercase) {
+        sanitized = sanitized.toUpperCase();
+      }
+
+      if (rules.maxLength && sanitized.length > rules.maxLength) {
+        sanitized = sanitized.substring(0, rules.maxLength);
+      }
+
+      if (rules.allowedChars) {
+        sanitized = sanitized.replace(new RegExp(`[^${rules.allowedChars.source}]`, 'g'), '');
+      }
+
+      // Apply custom rules
+      if (rules.customRules) {
+        for (const rule of rules.customRules) {
+          sanitized = rule(sanitized);
+        }
+      }
+
+      return sanitized;
+    }
+
+    // Handle array sanitization recursively
+    if (Array.isArray(data)) {
+      return data.map(item => this.sanitize(item, rules));
+    }
+
+    // Handle object sanitization recursively
+    if (typeof data === 'object' && data !== null) {
+      const sanitized: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(data)) {
+        sanitized[key] = this.sanitize(value, rules);
+      }
+      return sanitized;
+    }
+
+    // Return as-is for other types
+    return data;
+  }
+
+  /**
+   * Preprocess data according to the provided rules
+   *
+   * Preprocessing transforms data into a consistent format before validation,
+   * handling type conversions and normalization
+   */
+  preprocess(data: unknown, rules: PreprocessingRules): unknown {
+    if (!rules || !data) {
+      return data;
+    }
+
+    // Handle string preprocessing
+    if (typeof data === 'string') {
+      let processed = data;
+
+      // Apply basic preprocessing rules
+      if (rules.normalizeWhitespace) {
+        processed = processed.replace(/\s+/g, ' ').trim();
+      }
+
+      if (rules.parseNumbers && /^-?\d+(\.\d+)?$/.test(processed)) {
+        const num = Number(processed);
+        if (!isNaN(num) && isFinite(num)) {
+          return num;
+        }
+      }
+
+      if (rules.parseJson) {
+        try {
+          return JSON.parse(processed);
+        } catch {
+          // If parsing fails, return the original string
+        }
+      }
+
+      // Apply custom rules
+      if (rules.customRules) {
+        for (const rule of rules.customRules) {
+          processed = rule(processed);
+        }
+      }
+
+      return processed;
+    }
+
+    // Handle array preprocessing recursively
+    if (Array.isArray(data)) {
+      return data.map(item => this.preprocess(item, rules));
+    }
+
+    // Handle object preprocessing recursively
+    if (typeof data === 'object' && data !== null) {
+      const processed: Record<string, unknown> = {};
+      for (const [key, value] of Object.entries(data)) {
+        processed[key] = this.preprocess(value, rules);
+      }
+      return processed;
+    }
+
+    // Return as-is for other types
+    return data;
   }
 }

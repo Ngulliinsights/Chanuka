@@ -90,7 +90,7 @@ export interface ValidationOptions {
 export interface ValidationResult<T> {
   success: boolean;
   data?: T;
-  errors?: ValidationError[];
+  errors?: ValidationErrorDetail[];
 }
 
 export interface BatchValidationResult<T> {
@@ -98,7 +98,7 @@ export interface BatchValidationResult<T> {
   invalid: Array<{
     index: number;
     data: unknown;
-    errors: ValidationError[];
+    errors: ValidationErrorDetail[];
   }>;
   summary: {
     total: number;
@@ -108,7 +108,7 @@ export interface BatchValidationResult<T> {
   };
 }
 
-export interface ValidationError {
+export interface ValidationErrorDetail {
   field: string;
   message: string;
   code: string;
@@ -314,3 +314,6 @@ export type ISchemaAdapter = ValidationAdapter;
 // Preprocessing and caching configs - now point to the comprehensive interfaces
 export type IPreprocessingConfig = PreprocessingConfig;  // Changed from PreprocessingRules
 export type ICachingConfig = ValidationServiceConfig['cache'];  // Changed to point to the cache property type
+
+// Type alias for backward compatibility - ValidationError now points to ValidationErrorDetail
+export type ValidationError = ValidationErrorDetail;

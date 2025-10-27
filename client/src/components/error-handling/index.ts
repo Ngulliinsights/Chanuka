@@ -13,6 +13,8 @@ export {
   NetworkErrorFallback,
   CriticalErrorFallback
 } from './ErrorFallback';
+export { ServiceUnavailable } from './ServiceUnavailable';
+export { SimpleErrorBoundary } from './SimpleErrorBoundary';
 export {
   withErrorBoundary,
   withLazyErrorBoundary,

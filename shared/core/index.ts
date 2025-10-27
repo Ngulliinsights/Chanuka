@@ -6,33 +6,25 @@
  * avoiding circular dependencies while maintaining functionality.
  */
 
-// Essential logger - import from consolidated observability
-let logger: any;
-try {
-  // Import from the single source of truth for logging
-  const loggingModule = require('./src/observability/logging');
-  logger = loggingModule.logger || loggingModule.UnifiedLogger;
-} catch (error) {
-  // Fallback to simple console logger
-  logger = {
-    debug: (message: string, ...args: any[]) => {
-      if (process.env.NODE_ENV === 'development') {
-        console.debug(message, ...args);
-      }
-    },
-    info: (message: string, ...args: any[]) => {
-      console.info(message, ...args);
-    },
-    warn: (message: string, ...args: any[]) => {
-      console.warn(message, ...args);
-    },
-    error: (message: string, ...args: any[]) => {
-      console.error(message, ...args);
+// Essential logger - fallback implementation
+export const logger = {
+  debug: (message: string, context?: any, meta?: any) => {
+    if (process.env.NODE_ENV === 'development') {
+      console.debug(`[DEBUG] ${message}`, context || '', meta || '');
     }
-  };
-}
+  },
+  info: (message: string, context?: any, meta?: any) => {
+    console.info(`[INFO] ${message}`, context || '', meta || '');
+  },
+  warn: (message: string, context?: any, meta?: any) => {
+    console.warn(`[WARN] ${message}`, context || '', meta || '');
+  },
+  error: (message: string, context?: any, error?: any) => {
+    console.error(`[ERROR] ${message}`, context || '', error || '');
+  }
+};
 
-export { logger };
+// Logger is already exported above
 
 // Error enums and types
 export enum ErrorSeverity {
@@ -126,6 +118,117 @@ export const ApiResponse = {
   })
 };
 
+// API Response types for compatibility
+export class ApiSuccess<T = any> {
+  constructor(
+    public data: T,
+    public message: string = 'Success',
+    public statusCode: number = 200
+  ) {}
+
+  toJSON() {
+    return {
+      success: true,
+      data: this.data,
+      message: this.message,
+      statusCode: this.statusCode,
+      timestamp: new Date().toISOString()
+    };
+  }
+}
+
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    public statusCode: number = 500,
+    public code: string = 'API_ERROR'
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+
+  toJSON() {
+    return {
+      success: false,
+      error: {
+        message: this.message,
+        code: this.code,
+        statusCode: this.statusCode
+      },
+      timestamp: new Date().toISOString()
+    };
+  }
+}
+
+export class ApiValidationError extends ApiError {
+  constructor(
+    message: string,
+    public details?: any
+  ) {
+    super(message, 400, 'VALIDATION_ERROR');
+    this.name = 'ApiValidationError';
+  }
+
+  toJSON() {
+    return {
+      success: false,
+      error: {
+        message: this.message,
+        code: this.code,
+        statusCode: this.statusCode,
+        details: this.details
+      },
+      timestamp: new Date().toISOString()
+    };
+  }
+}
+
+export type ApiResponseWrapperType<T = any> = ApiSuccess<T> | ApiError;
+
+// API Response helper functions for Express responses
+export const ApiSuccessResponse = (res: any, data: any, metadata?: any) => {
+  return res.status(200).json({
+    success: true,
+    data,
+    metadata,
+    timestamp: new Date().toISOString()
+  });
+};
+
+export const ApiErrorResponse = (res: any, message: string, statusCode: number = 500, metadata?: any) => {
+  return res.status(statusCode).json({
+    success: false,
+    error: { message, statusCode },
+    metadata,
+    timestamp: new Date().toISOString()
+  });
+};
+
+export const ApiValidationErrorResponse = (res: any, errors: any, metadata?: any) => {
+  return res.status(400).json({
+    success: false,
+    error: { message: 'Validation failed', errors, statusCode: 400 },
+    metadata,
+    timestamp: new Date().toISOString()
+  });
+};
+
+// For backward compatibility with existing code - using different names to avoid conflicts
+export { ApiSuccessResponse as ApiSuccessFunc };
+export { ApiErrorResponse as ApiErrorFunc };
+export { ApiValidationErrorResponse as ApiValidationErrorFunc };
+
+// ApiResponseWrapper utility class
+export class ApiResponseWrapper {
+  static createMetadata(startTime: number, source: string) {
+    return {
+      responseTime: Date.now() - startTime,
+      source,
+      timestamp: new Date().toISOString()
+    };
+  }
+}
+
 // Essential performance monitoring
 export const Performance = {
   startTimer: (name: string) => {
@@ -215,10 +318,53 @@ export interface RecoverySuggestion {
   action?: () => void;
 }
 
-// Re-export from src for server-side usage (when available)
-try {
-  const srcExports = require('./src');
-  Object.assign(module.exports, srcExports);
-} catch (error) {
-  // Client-side or src not available, use essentials only
-}
+// Cache keys for consistent caching across the application
+export const cacheKeys = {
+  USER_PROFILE: (userId: string) => `user:profile:${userId}`,
+  BILL_DETAILS: (billId: number) => `bill:details:${billId}`,
+  BILL_COMMENTS: (billId: number) => `bill:comments:${billId}`,
+  USER_ENGAGEMENT: (userId: string) => `user:engagement:${userId}`,
+  ANALYTICS: (key: string) => `analytics:${key}`
+};
+
+// For backward compatibility
+export const CACHE_KEYS = cacheKeys;
+
+// Simple cache utility for client-side usage
+export const cache = {
+  getOrSetCache: async <T>(
+    key: string,
+    ttl: number,
+    fetchFn: () => Promise<T>
+  ): Promise<T> => {
+    // This is a simplified version - server should use proper cache service
+    try {
+      return await fetchFn();
+    } catch (error) {
+      logger.error('Cache operation failed', { key, ttl }, error);
+      throw error;
+    }
+  }
+};
+
+// Additional exports for compatibility - temporarily disabled to fix import issues
+// export * from './src/index.js';
+
+// Re-export types with aliases to resolve conflicts
+export type { CircuitBreakerState as CacheCircuitBreakerState } from './src/caching/types';
+export { CircuitBreakerState as ObservabilityCircuitBreakerState } from './src/observability/error-management/patterns/circuit-breaker';
+export type { HealthStatus as ObservabilityHealthStatus } from './src/observability/health/types';
+export type { HealthStatus as MiddlewareHealthStatus } from './src/middleware/types';
+export type { HealthStatus as ServicesHealthStatus } from './src/types/services';
+export type { RateLimitStore as RateLimitingStore } from './src/rate-limiting/types';
+export type { RateLimitStore as ServicesRateLimitStore } from './src/types/services';
+export type { RateLimitStore as MiddlewareRateLimitStore } from './src/middleware/types';
+export { ValidationError as ValidationTypesError } from './src/validation/types';
+export { ValidationError as ErrorManagementValidationError } from './src/observability/error-management/errors/specialized-errors';
+export type { ValidationError as ValidationTypesAlias } from './src/types/validation-types';
+export { ValidationError as ModernizationValidationError } from './src/modernization/types';
+export type { ValidationResult as ValidationTypesResult } from './src/validation/types';
+export type { ValidationResult as CoreValidationResult } from './src/validation/core/interfaces';
+export type { ValidationResult as TypesValidationResult } from './src/types/validation-types';
+export type { ValidationResult as MiddlewareValidationResult } from './src/middleware/types';
+export type { ValidationResult as ServicesValidationResult } from './src/types/services';

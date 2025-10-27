@@ -64,6 +64,9 @@ export * from './rate-limiting';
 // UTILITIES - Consolidated utility functions
 export * from './utils';
 
+// TYPES - Consolidated type definitions with conflict resolution
+// Note: Types are exported with aliases to resolve conflicts, so we use explicit exports
+
 // Performance Utilities (consolidates server/utils/performance-monitoring-utils.ts)
 export * from './performance';
 

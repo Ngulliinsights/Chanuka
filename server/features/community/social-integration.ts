@@ -1,5 +1,7 @@
 import type { User } from '../../../shared/schema';
-import { logger } from '@shared/core';
+import { database as db } from '../../../shared/database/connection';
+import { userSocialProfile } from '../../../shared/schema/schema';
+import { logger } from '../../../shared/core';
 
 // Define cache service interface locally if the module doesn't exist
 interface CacheService {
@@ -299,7 +301,7 @@ export class SocialIntegrationService {
 
       return await response.json();
     } catch (error) {
-      logger.error({ platform, error }, 'Social auth token exchange failed');
+      logger.error('Social auth token exchange failed', { platform, error });
       throw error;
     }
   }
@@ -313,18 +315,22 @@ export class SocialIntegrationService {
       // Fetch user profile information from the social platform
       const profileData = await this.fetchSocialProfile(platform, accessToken);
 
-      // Log the connection details (in production, this would be saved to database)
-      logger.info(
-        { 
-          userId, 
-          platform, 
-          profileId: profileData.id,
-          username: profileData.username 
-        },
-        'Social profile linked successfully'
-      );
+      // Save the social profile connection to database
+      await db.insert(userSocialProfile).values({
+        userId: userId as any, // UUID type
+        provider: platform,
+        providerId: profileData.id,
+      });
+
+      // Log the connection details
+      logger.info('Social profile linked successfully', {
+        userId,
+        platform,
+        profileId: profileData.id,
+        username: profileData.username
+      });
     } catch (error) {
-      logger.error({ userId, platform, error }, 'Failed to link social profile');
+      logger.error('Failed to link social profile', { userId, platform, error });
       throw error;
     }
   }
@@ -353,7 +359,7 @@ export class SocialIntegrationService {
 
       return await response.json();
     } catch (error) {
-      logger.error({ platform, error }, 'Social profile fetch failed');
+      logger.error('Social profile fetch failed', { platform, error });
       throw error;
     }
   }
@@ -366,7 +372,7 @@ export class SocialIntegrationService {
   async createCommunityAction(action: CommunityAction): Promise<string> {
     // Generate unique identifier for tracking this action
     const actionId = `action_${Date.now()}`;
-    logger.info({ actionId, action }, 'Community action created');
+    logger.info('Community action created', { actionId, action });
 
     // Schedule for later execution if scheduledTime is provided
     if (action.scheduledTime) {
@@ -383,10 +389,10 @@ export class SocialIntegrationService {
    * Coordinates the actual sharing across user networks
    */
   private async executeCommunityAction(actionId: string): Promise<void> {
-    logger.info({ actionId }, 'Executing community action');
+    logger.info('Executing community action', { actionId });
 
     // In production, this would fetch action details from database and execute
-    logger.info({ actionId }, 'Community action completed');
+    logger.info('Community action completed', { actionId });
   }
 
   /**
@@ -413,23 +419,17 @@ export class SocialIntegrationService {
               optimizedContent,
             );
 
-            logger.info(
-              {
-                userId: user.id,
-                platform: profile.platform,
-                contentId: action.content.url,
-              },
-              'Content shared to social platform successfully'
-            );
+            logger.info('Content shared to social platform successfully', {
+              userId: user.id,
+              platform: profile.platform,
+              contentId: action.content.url,
+            });
           } catch (error) {
-            logger.error(
-              {
-                userId: user.id,
-                platform: profile.platform,
-                error,
-              },
-              'Failed to share content to social platform'
-            );
+            logger.error('Failed to share content to social platform', {
+              userId: user.id,
+              platform: profile.platform,
+              error,
+            });
           }
         }),
       );
@@ -491,7 +491,7 @@ export class SocialIntegrationService {
         throw new Error(`Failed to share: ${JSON.stringify(errorData)}`);
       }
     } catch (error) {
-      logger.error({ platform, error }, 'Social sharing failed');
+      logger.error('Social sharing failed', { platform, error });
       throw error;
     }
   }
@@ -508,7 +508,7 @@ export class SocialIntegrationService {
     }
 
     // Log the start of social listening (would integrate with actual service in production)
-    logger.info({ configKey, keywords: config.keywords }, 'Social listening started');
+    logger.info('Social listening started', { configKey, keywords: config.keywords });
 
     // In production, this would register webhooks or start polling for mentions
   }
@@ -521,17 +521,14 @@ export class SocialIntegrationService {
     const { text, author, url, sentiment } = mention;
 
     // Store mention data for analysis and reporting
-    logger.info(
-      {
-        platform,
-        text: text.substring(0, 100),
-        author,
-        url,
-        sentiment,
-        receivedAt: new Date().toISOString(),
-      },
-      'Social mention processed and stored'
-    );
+    logger.info('Social mention processed and stored', {
+      platform,
+      text: text.substring(0, 100),
+      author,
+      url,
+      sentiment,
+      receivedAt: new Date().toISOString(),
+    });
 
     // Trigger notifications for high-priority mentions
     if (this.isHighPriorityMention(mention)) {
@@ -565,21 +562,18 @@ export class SocialIntegrationService {
    */
   private async notifyAboutMention(mention: any): Promise<void> {
     // Create notification for important mention (would integrate with notification service)
-    logger.info(
-      {
-        type: 'social_mention',
-        priority: 'high',
-        title: 'Important Social Media Mention',
-        message: `From ${mention.author.name} on ${mention.platform}: ${mention.text.substring(0, 100)}...`,
-        link: mention.url,
-        metadata: {
-          platform: mention.platform,
-          authorId: mention.author.id,
-          mentionId: mention.id,
-        },
+    logger.info('High priority social mention notification sent', {
+      type: 'social_mention',
+      priority: 'high',
+      title: 'Important Social Media Mention',
+      message: `From ${mention.author.name} on ${mention.platform}: ${mention.text.substring(0, 100)}...`,
+      link: mention.url,
+      metadata: {
+        platform: mention.platform,
+        authorId: mention.author.id,
+        mentionId: mention.id,
       },
-      'High priority social mention notification sent'
-    );
+    });
   }
 
   /**
@@ -588,13 +582,10 @@ export class SocialIntegrationService {
    */
   async generateImpactReport(startDate: Date, endDate: Date): Promise<any> {
     // Log report generation (would fetch actual metrics from database in production)
-    logger.info(
-      {
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-      },
-      'Generating social media impact report'
-    );
+    logger.info('Generating social media impact report', {
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+    });
 
     // Return structured report data
     return {

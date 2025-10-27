@@ -1,136 +1,243 @@
 /**
- * LEGACY ADAPTER: API Response Utilities
+ * API Response Utilities - Complete Implementation
+ * Provides standardized response formats for all API endpoints
  */
 
-// Simple API response utilities
-interface ApiResponse<T = any> {
+import { Response } from 'express';
+
+export interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
+  error?: {
+    message: string;
+    code: string;
+    statusCode: number;
+    details?: any;
+  };
   message?: string;
-  error?: string;
-  code?: string;
-  statusCode?: number;
-  errors?: any[];
+  timestamp: string;
+  metadata?: {
+    requestId?: string;
+    duration?: number;
+    source?: string;
+    version?: string;
+  };
 }
 
-class ApiResponseBuilder {
-  static success<T>(data?: T, message?: string): ApiResponse<T> {
-    return {
-      success: true,
-      data,
-      message
-    };
-  }
+export interface ErrorResponse {
+  success: false;
+  error: {
+    message: string;
+    code: string;
+    statusCode: number;
+    details?: any;
+  };
+  timestamp: string;
+  metadata?: {
+    requestId?: string;
+    duration?: number;
+    source?: string;
+    version?: string;
+  };
+}
 
-  static error(message: string, code?: string, statusCode: number = 500): ApiResponse {
-    return {
-      success: false,
-      error: message,
-      code,
-      statusCode
-    };
-  }
+export interface ValidationError {
+  field: string;
+  message: string;
+  code?: string;
+  value?: any;
+}
 
-  static notFound(message: string = 'Resource not found'): ApiResponse {
-    return {
-      success: false,
-      error: message,
-      code: 'NOT_FOUND',
-      statusCode: 404
-    };
-  }
+export interface PaginationMetadata {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}
 
-  static validation(message: string, errors: any[]): ApiResponse {
-    return {
-      success: false,
-      error: message,
+export interface ApiMetadata {
+  requestId?: string;
+  duration?: number;
+  source?: string;
+  version?: string;
+  pagination?: PaginationMetadata;
+}
+
+export const UnifiedApiResponse = {
+  success: <T>(data: T, message = 'Success', metadata?: ApiMetadata): ApiResponse<T> => ({
+    success: true,
+    data,
+    message,
+    timestamp: new Date().toISOString(),
+    metadata
+  }),
+
+  error: (message: string, code = 'ERROR', statusCode = 500, metadata?: ApiMetadata): ErrorResponse => ({
+    success: false,
+    error: { message, code, statusCode },
+    timestamp: new Date().toISOString(),
+    metadata
+  }),
+
+  notFound: (message = 'Resource not found', metadata?: ApiMetadata): ErrorResponse => ({
+    success: false,
+    error: { message, code: 'NOT_FOUND', statusCode: 404 },
+    timestamp: new Date().toISOString(),
+    metadata
+  }),
+
+  validation: (errors: ValidationError[], message = 'Validation failed', metadata?: ApiMetadata): ErrorResponse => ({
+    success: false,
+    error: {
+      message,
       code: 'VALIDATION_ERROR',
       statusCode: 400,
-      errors
-    };
-  }
-}
+      details: errors
+    },
+    timestamp: new Date().toISOString(),
+    metadata
+  }),
 
-const ApiResponse = ApiResponseBuilder;
+  unauthorized: (message = 'Unauthorized access', metadata?: ApiMetadata): ErrorResponse => ({
+    success: false,
+    error: { message, code: 'UNAUTHORIZED', statusCode: 401 },
+    timestamp: new Date().toISOString(),
+    metadata
+  }),
 
-// Updated API response utilities - no longer deprecated
+  forbidden: (message = 'Access forbidden', metadata?: ApiMetadata): ErrorResponse => ({
+    success: false,
+    error: { message, code: 'FORBIDDEN', statusCode: 403 },
+    timestamp: new Date().toISOString(),
+    metadata
+  }),
 
-export const ApiSuccess = ApiResponse.success;
-export const ApiError = ApiResponse.error;
-export const ApiNotFound = ApiResponse.notFound;
-export const ApiUnauthorized = (message: string = 'Unauthorized') =>
-  ApiResponse.error(message, 'UNAUTHORIZED', 401);
-export const ApiForbidden = (message: string = 'Forbidden') =>
-  ApiResponse.error(message, 'FORBIDDEN', 403);
-export const ApiValidationError = (errors: any[]) =>
-  ApiResponse.validation('Validation failed', errors);
+  conflict: (message = 'Resource conflict', metadata?: ApiMetadata): ErrorResponse => ({
+    success: false,
+    error: { message, code: 'CONFLICT', statusCode: 409 },
+    timestamp: new Date().toISOString(),
+    metadata
+  }),
 
-// API Response Wrapper class with createMetadata method
+  rateLimit: (message = 'Rate limit exceeded', metadata?: ApiMetadata): ErrorResponse => ({
+    success: false,
+    error: { message, code: 'RATE_LIMIT_EXCEEDED', statusCode: 429 },
+    timestamp: new Date().toISOString(),
+    metadata
+  }),
+
+  serverError: (message = 'Internal server error', metadata?: ApiMetadata): ErrorResponse => ({
+    success: false,
+    error: { message, code: 'INTERNAL_SERVER_ERROR', statusCode: 500 },
+    timestamp: new Date().toISOString(),
+    metadata
+  })
+};
+
+// Express Response Helpers
+export const ApiSuccess = <T>(res: Response, data: T, metadata?: ApiMetadata, statusCode = 200) => {
+  return res.status(statusCode).json(UnifiedApiResponse.success(data, 'Success', metadata));
+};
+
+export const ApiError = (res: Response, message: string, statusCode = 500, metadata?: ApiMetadata) => {
+  const response = UnifiedApiResponse.error(message, 'ERROR', statusCode, metadata);
+  return res.status(statusCode).json(response);
+};
+
+export const ApiNotFound = (res: Response, message = 'Resource not found', metadata?: ApiMetadata) => {
+  const response = UnifiedApiResponse.notFound(message, metadata);
+  return res.status(404).json(response);
+};
+
+export const ApiValidationError = (res: Response, errors: ValidationError[] | ValidationError, metadata?: ApiMetadata) => {
+  const errorArray = Array.isArray(errors) ? errors : [errors];
+  const response = UnifiedApiResponse.validation(errorArray, 'Validation failed', metadata);
+  return res.status(400).json(response);
+};
+
+export const ApiUnauthorized = (res: Response, message = 'Unauthorized access', metadata?: ApiMetadata) => {
+  const response = UnifiedApiResponse.unauthorized(message, metadata);
+  return res.status(401).json(response);
+};
+
+export const ApiForbidden = (res: Response, message = 'Access forbidden', metadata?: ApiMetadata) => {
+  const response = UnifiedApiResponse.forbidden(message, metadata);
+  return res.status(403).json(response);
+};
+
+export const ApiConflict = (res: Response, message = 'Resource conflict', metadata?: ApiMetadata) => {
+  const response = UnifiedApiResponse.conflict(message, metadata);
+  return res.status(409).json(response);
+};
+
+export const ApiRateLimit = (res: Response, message = 'Rate limit exceeded', metadata?: ApiMetadata) => {
+  const response = UnifiedApiResponse.rateLimit(message, metadata);
+  return res.status(429).json(response);
+};
+
+export const ApiServerError = (res: Response, message = 'Internal server error', metadata?: ApiMetadata) => {
+  const response = UnifiedApiResponse.serverError(message, metadata);
+  return res.status(500).json(response);
+};
+
+// Utility class for creating metadata
 export class ApiResponseWrapper {
-  static success(res: any, data: any, metadata?: any, statusCode?: number) {
-    return ApiResponse.success(data);
-  }
-
-  static error(res: any, error: string | Error, statusCode?: number, metadata?: any) {
-    const message = typeof error === 'string' ? error : error.message;
-    return ApiResponse.error(message, undefined, statusCode);
-  }
-
-  static notFound(res: any, resource?: string, metadata?: any) {
-    return ApiResponse.notFound(resource || 'Resource not found');
-  }
-
-  static validationError(res: any, details: any, metadata?: any) {
-    return ApiResponse.validation('Validation failed', details);
-  }
-
-  static unauthorized(res: any, message?: string, metadata?: any) {
-    return ApiUnauthorized(message || 'Unauthorized');
-  }
-
-  static forbidden(res: any, message?: string, metadata?: any) {
-    return ApiForbidden(message || 'Forbidden');
-  }
-
-  static cached(res: any, data: any, metadata?: any) {
-    return ApiResponse.success(data);
-  }
-
-  static fallback(res: any, data: any, message?: string, metadata?: any) {
-    return ApiResponse.success(data);
-  }
-
-  static createMetadata(startTime: number, source?: string, additional?: any) {
+  static createMetadata(startTime: number, source: string, requestId?: string): ApiMetadata {
     return {
-      timestamp: new Date().toISOString(),
-      requestId: undefined,
-      source: source || 'api',
-      executionTime: Date.now() - startTime,
-      cacheHit: false,
-      version: '1.0.0',
-      ...additional
+      requestId,
+      duration: Date.now() - startTime,
+      source,
+      version: process.env.API_VERSION || '1.0.0'
     };
+  }
+
+  static createPaginationMetadata(page: number, limit: number, total: number): PaginationMetadata {
+    const totalPages = Math.ceil(total / limit);
+    return {
+      page,
+      limit,
+      total,
+      totalPages,
+      hasNext: page < totalPages,
+      hasPrev: page > 1
+    };
+  }
+
+  static success<T>(data: T, message?: string, metadata?: ApiMetadata): ApiResponse<T> {
+    return UnifiedApiResponse.success(data, message, metadata);
+  }
+
+  static error(message: string, code?: string, statusCode?: number, metadata?: ApiMetadata): ErrorResponse {
+    return UnifiedApiResponse.error(message, code, statusCode, metadata);
   }
 }
 
-export const ErrorCodes = {
-  INTERNAL_ERROR: 'INTERNAL_ERROR',
+// Legacy exports for backward compatibility
+// Note: ApiResponseWrapper class is defined above, so we don't re-export here
+
+// Type guards
+export const isApiResponse = (obj: any): obj is ApiResponse => {
+  return obj && typeof obj === 'object' && typeof obj.success === 'boolean' && obj.timestamp;
+};
+
+export const isErrorResponse = (obj: any): obj is ErrorResponse => {
+  return isApiResponse(obj) && obj.success === false && !!obj.error;
+};
+
+// Common error codes
+export const ERROR_CODES = {
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   NOT_FOUND: 'NOT_FOUND',
   UNAUTHORIZED: 'UNAUTHORIZED',
   FORBIDDEN: 'FORBIDDEN',
+  CONFLICT: 'CONFLICT',
   RATE_LIMIT_EXCEEDED: 'RATE_LIMIT_EXCEEDED',
-  DATABASE_ERROR: 'DATABASE_ERROR'
-};
+  INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
+  BAD_REQUEST: 'BAD_REQUEST',
+  SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
+  TIMEOUT: 'TIMEOUT'
+} as const;
 
-export const HttpStatus = {
-  OK: 200,
-  CREATED: 201,
-  BAD_REQUEST: 400,
-  UNAUTHORIZED: 401,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  INTERNAL_SERVER_ERROR: 500
-};
-
-export type { ApiResponse };
+export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES];

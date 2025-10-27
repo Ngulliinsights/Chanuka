@@ -4,7 +4,7 @@ import { sponsorRepository, SponsorAffiliationInput, SponsorTransparencyInput } 
 import { sponsorConflictAnalysisService } from '../application/sponsor-conflict-analysis.service'; // Adjusted path
 import { insertSponsorSchema } from '../../../../shared/schema/validation'; // Adjusted path
 import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '@shared/core';
+import { ApiSuccessResponse as ApiSuccess, ApiErrorResponse as ApiError, ApiNotFound, ApiValidationErrorResponse as ApiValidationError } from '@shared/core';
 import { logger } from '@shared/core'; // Adjusted path
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth'; // Optional: if auth needed
 
@@ -98,7 +98,7 @@ router.post('/', async (req: express.Request, res, next) => { // Without auth fo
         }
         const sponsorData = validationResult.data;
         const newSponsor = await sponsorRepository.create(sponsorData);
-        return ApiSuccess(res, newSponsor, undefined, 201); // 201 Created
+        return ApiSuccess(res, newSponsor, 201);
     } catch (error) {
         // Handle potential unique constraint errors, etc.
         if (error instanceof Error && error.message.includes('duplicate key value violates unique constraint')) {
@@ -185,7 +185,7 @@ router.post('/:id/affiliations', async (req: express.Request, res, next) => {
             return ApiValidationError(res, "Organization and type are required for affiliation.");
         }
         const newAffiliation = await sponsorRepository.addAffiliation(affiliationData);
-        return ApiSuccess(res, newAffiliation, undefined, 201);
+        return ApiSuccess(res, newAffiliation, 201);
     } catch (error) {
         next(error);
     }
@@ -262,7 +262,7 @@ router.post('/:id/transparency', async (req: express.Request, res, next) => {
             return ApiValidationError(res, "Disclosure type and description are required.");
         }
         const newRecord = await sponsorRepository.addTransparencyRecord(transparencyData);
-        return ApiSuccess(res, newRecord, undefined, 201);
+        return ApiSuccess(res, newRecord, 201);
     } catch (error) {
         next(error);
     }
@@ -495,4 +495,4 @@ router.use((err: Error, req: express.Request, res: express.Response, next: expre
 
 
 // Export the configured router
-export { router as sponsorsRouter };
+export { router };

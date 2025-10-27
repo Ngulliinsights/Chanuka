@@ -5,9 +5,9 @@
  */
 
 import { performance } from 'perf_hooks';
-import { performanceMonitoring } from '../services/performance-monitoring.js';
+// import { performanceMonitoring } from '../services/performance-monitoring.js'; // TODO: Fix missing module
 import { logger } from '@shared/core';
-import { createObservabilityStack } from '@shared/core';
+// import { createObservabilityStack } from '@shared/core'; // TODO: Fix missing export
 
 interface MetricData {
   count: number;
@@ -37,11 +37,11 @@ class Metrics {
         // If a value is provided in the last argument and it's a number, use it
         const value = typeof args[args.length - 1] === 'number' ? args[args.length - 1] : 1;
 
-        // Use the new performance monitoring service
-        performanceMonitoring.recordMetric(name, value, {
-          class: target.constructor.name,
-          method: String(propertyKey)
-        });
+        // TODO: Use the new performance monitoring service when available
+        // performanceMonitoring.recordMetric(name, value, {
+        //   class: target.constructor.name,
+        //   method: String(propertyKey)
+        // });
 
         // Legacy threshold checking for backward compatibility
         if (threshold !== undefined) {
@@ -80,11 +80,11 @@ class Metrics {
         } finally {
           const duration = performance.now() - start;
 
-          // Use the new performance monitoring service
-          performanceMonitoring.recordMetric(`${name}.duration`, duration, {
-            class: target.constructor.name,
-            method: String(propertyKey)
-          });
+          // TODO: Use the new performance monitoring service when available
+          // performanceMonitoring.recordMetric(`${name}.duration`, duration, {
+          //   class: target.constructor.name,
+          //   method: String(propertyKey)
+          // });
 
           // Legacy threshold checking for backward compatibility
           if (threshold !== undefined) {
@@ -106,7 +106,8 @@ class Metrics {
 
   // Direct API to track a metric value (non-decorator usage)
   trackValue(name: string, value: number, threshold?: number): void {
-    performanceMonitoring.recordMetric(name, value);
+    // TODO: Use the new performance monitoring service when available
+    // performanceMonitoring.recordMetric(name, value);
 
     // Legacy threshold checking for backward compatibility
     if (threshold !== undefined) {
@@ -124,25 +125,29 @@ class Metrics {
 
   // Direct API to measure execution time of a function (non-decorator usage)
   async measureFn<T>(name: string, fn: () => Promise<T>, threshold?: number): Promise<T> {
-    return await performanceMonitoring.measureExecution(name, fn);
+    // TODO: Use the new performance monitoring service when available
+    // return await performanceMonitoring.measureExecution(name, fn);
+    return await fn(); // Fallback to direct execution
   }
 
   // Legacy method for backward compatibility - now delegates to new service
   getMetrics() {
-    const aggregated = performanceMonitoring.getAggregatedMetrics();
+    // TODO: Use the new performance monitoring service when available
+    // const aggregated = performanceMonitoring.getAggregatedMetrics();
     const result: Record<string, MetricData & { threshold?: number }> = {};
 
-    for (const [key, metric] of Object.entries(aggregated)) {
-      result[key] = {
-        count: metric.count,
-        total: metric.sum,
-        min: metric.min,
-        max: metric.max,
-        avg: metric.avg,
-        lastUpdated: metric.lastTimestamp,
-        threshold: this.thresholds.get(key),
-      };
-    }
+    // TODO: Fix when performance monitoring service is available
+    // for (const [key, metric] of Object.entries(aggregated)) {
+    //   result[key] = {
+    //     count: metric.count,
+    //     total: metric.sum,
+    //     min: metric.min,
+    //     max: metric.max,
+    //     avg: metric.avg,
+    //     lastUpdated: metric.lastTimestamp,
+    //     threshold: this.thresholds.get(key),
+    //   };
+    // }
 
     return result;
   }
@@ -160,15 +165,21 @@ export const metrics = new Metrics();
 
 // Additional functions for test compatibility
 export function incrementCounter(name: string, tags?: Record<string, any>, value?: number): void {
-  performanceMonitoring.recordMetric(name, value || 1, tags);
+  // TODO: Use the new performance monitoring service when available
+  // performanceMonitoring.recordMetric(name, value || 1, tags);
+  console.log('incrementCounter called:', { name, tags, value });
 }
 
 export function recordTiming(name: string, value: number, tags?: Record<string, any>, unit?: string): void {
-  performanceMonitoring.recordMetric(`${name}.duration`, value, { ...tags, unit: unit || 'ms' });
+  // TODO: Use the new performance monitoring service when available
+  // performanceMonitoring.recordMetric(`${name}.duration`, value, { ...tags, unit: unit || 'ms' });
+  console.log('recordTiming called:', { name, value, tags, unit });
 }
 
 export function recordGauge(name: string, value: number, tags?: Record<string, any>): void {
-  performanceMonitoring.recordMetric(name, value, tags);
+  // TODO: Use the new performance monitoring service when available
+  // performanceMonitoring.recordMetric(name, value, tags);
+  console.log('recordGauge called:', { name, value, tags });
 }
 
 // Export legacy interface for backward compatibility

@@ -1,4 +1,18 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock window.location
+Object.defineProperty(window, 'location', {
+  writable: true,
+  value: {
+    href: 'http://localhost:3000/test',
+    pathname: '/test',
+    search: '',
+    hash: '',
+    replace: vi.fn(),
+    assign: vi.fn(),
+    reload: vi.fn(),
+  },
+});
+
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
