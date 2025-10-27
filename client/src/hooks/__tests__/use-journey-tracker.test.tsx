@@ -119,7 +119,7 @@ describe('useJourneyTracker', () => {
     it('should provide startJourney method', () => {
       const { result } = renderHook(() => useJourneyTracker(), { wrapper });
       
-      act(() => {
+      await act(() => {
         result.current.startJourney('citizen');
       });
       
@@ -133,7 +133,7 @@ describe('useJourneyTracker', () => {
     it('should provide trackPageVisit method', () => {
       const { result } = renderHook(() => useJourneyTracker(), { wrapper });
       
-      act(() => {
+      await act(() => {
         result.current.trackPageVisit('/bills', 'legislative', '/', 5);
       });
       
@@ -149,7 +149,7 @@ describe('useJourneyTracker', () => {
     it('should provide trackConversion method', () => {
       const { result } = renderHook(() => useJourneyTracker(), { wrapper });
       
-      act(() => {
+      await act(() => {
         result.current.trackConversion('bill_analysis_viewed');
       });
       
@@ -162,7 +162,7 @@ describe('useJourneyTracker', () => {
     it('should provide completeJourney method', () => {
       const { result } = renderHook(() => useJourneyTracker(), { wrapper });
       
-      act(() => {
+      await act(() => {
         result.current.completeJourney(true);
       });
       
@@ -175,7 +175,7 @@ describe('useJourneyTracker', () => {
     it('should provide endJourney method', () => {
       const { result } = renderHook(() => useJourneyTracker(), { wrapper });
       
-      act(() => {
+      await act(() => {
         result.current.endJourney();
       });
       
@@ -254,7 +254,7 @@ describe('useJourneyTracker', () => {
     it('should provide convenience methods for common conversions', () => {
       const { result } = renderHook(() => useJourneyTracker(), { wrapper });
       
-      act(() => {
+      await act(() => {
         result.current.trackBillAnalysisViewed();
         result.current.trackCommentPosted();
         result.current.trackExpertVerificationCompleted();
@@ -373,7 +373,7 @@ describe('useJourneyAnalytics', () => {
     const startDate = new Date('2023-01-01');
     const endDate = new Date('2023-12-31');
     
-    act(() => {
+    await act(() => {
       result.current.getAnalytics(startDate, endDate, 'citizen');
       result.current.getOptimizations(startDate, endDate);
       result.current.getGoalCompletionRate('bill_research');
@@ -389,7 +389,7 @@ describe('useJourneyAnalytics', () => {
   it('should handle export data with default format', () => {
     const { result } = renderHook(() => useJourneyAnalytics());
     
-    act(() => {
+    await act(() => {
       result.current.exportData();
     });
     
@@ -436,7 +436,7 @@ describe('Hook Error Handling', () => {
     
     // Should not throw error
     expect(() => {
-      act(() => {
+      await act(() => {
         result.current.trackPageVisit('/test', 'legislative');
       });
     }).not.toThrow();

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { z, ZodError } from 'zod';
 import { ApiValidationError, ApiError, ApiSuccess } from './api-response.js';
-import { logger } from './logger.js';
+import { logger } from '@shared/core';
 import { AuthenticatedRequest } from '../middleware/auth.js';
 
 /**

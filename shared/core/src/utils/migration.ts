@@ -382,8 +382,8 @@ export class MigrationValidator {
     
     try {
       // Test cache service
-      const { createCacheService } = await import('../cache');
-      const cache = createCacheService();
+      const { createCacheService } = await import('../caching');
+      const cache = createCacheService({ provider: 'memory' });
       await cache.set('test', 'value', 1);
       const value = await cache.get('test');
       if (value !== 'value') {
@@ -395,8 +395,7 @@ export class MigrationValidator {
     
     try {
       // Test logging service
-      const { createLogger } = await import('../logging');
-      const logger = createLogger();
+      const { logger } = await import('../observability/logging');
       logger.info('Migration validation test');
     } catch (error) {
       errors.push(`Logging service test failed: ${error}`);

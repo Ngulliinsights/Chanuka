@@ -8,14 +8,24 @@ export * from './auth/index.js';
 export * from './validation/index.js';
 
 // Error Handling
-export * from './errors/index.js';
+export { errorTracker } from './errors/error-tracker.js';
 
 // Types
-export * from './types/index.js';
+// Avoid re-exporting SocialProfile to prevent conflicts
+export {
+  User,
+  Bill,
+  BillComment,
+  SocialShare,
+  Stakeholder
+} from './types/index.js';
 export * from './StorageTypes.js';
 
 // API Response Types
 export { ApiSuccess, ApiError, ApiValidationError } from '@shared/core/src/utils/api';
+
+// Avoid re-exporting SocialProfile to prevent conflicts
+// export * from './types/index.js'; // SocialProfile already exported elsewhere
 
 
 

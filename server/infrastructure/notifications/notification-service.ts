@@ -8,7 +8,7 @@ import { logger } from '@shared/core';
 // Core notification interfaces (consolidated from basic services)
 export interface NotificationData {
   userId: string;
-  type: 'bill_update' | 'comment_reply' | 'verification_status' | 'system_alert';
+  type: 'verification_status' | 'bill_update' | 'comment_reply' | 'system_alert';
   title: string;
   message: string;
   relatedBillId?: number;
@@ -30,7 +30,7 @@ export interface NotificationHistory {
 // Validation schemas
 const notificationDataSchema = z.object({
   userId: z.string(),
-  type: z.enum(['bill_update', 'comment_reply', 'verification_status', 'system_alert']),
+  type: z.enum(['verification_status', 'bill_update', 'comment_reply', 'system_alert']),
   title: z.string().min(1).max(200),
   message: z.string().min(1).max(1000),
   relatedBillId: z.number().optional(),
@@ -78,7 +78,7 @@ export class NotificationService {
         .insert(notifications)
         .values({
           userId: validatedData.userId,
-          type: validatedData.type,
+          type: validatedData.type as 'verification_status' | 'bill_update' | 'comment_reply',
           title: validatedData.title,
           message: validatedData.message,
           relatedBillId: validatedData.relatedBillId,
@@ -94,7 +94,7 @@ export class NotificationService {
       return notification[0];
 
     } catch (error) {
-      logger.error({ error }, 'Error creating notification');
+      logger.error('Error creating notification', { error: error instanceof Error ? error.message : String(error) });
       throw error;
     }
   }
@@ -122,7 +122,7 @@ export class NotificationService {
       }
       
       if (type) {
-        conditions.push(eq(notifications.type, type));
+        conditions.push(eq(notifications.type, type as 'verification_status' | 'bill_update' | 'comment_reply'));
       }
 
       const userNotifications = await db
@@ -158,7 +158,7 @@ export class NotificationService {
       }));
 
     } catch (error) {
-      logger.error({ error }, 'Error getting user notifications');
+      logger.error('Error getting user notifications', { error: error instanceof Error ? error.message : String(error) });
       throw error;
     }
   }
@@ -181,7 +181,7 @@ export class NotificationService {
       logger.info(`📖 Marked notification ${notificationId} as read for user ${userId}`);
 
     } catch (error) {
-      logger.error({ error }, 'Error marking notification as read');
+      logger.error('Error marking notification as read', { error: error instanceof Error ? error.message : String(error) });
       throw error;
     }
   }
@@ -199,7 +199,7 @@ export class NotificationService {
       logger.info(`📖 Marked all notifications as read for user ${userId}`);
 
     } catch (error) {
-      logger.error({ error }, 'Error marking all notifications as read');
+      logger.error('Error marking all notifications as read', { error: error instanceof Error ? error.message : String(error) });
       throw error;
     }
   }
@@ -222,7 +222,7 @@ export class NotificationService {
       return Number(result.count);
 
     } catch (error) {
-      logger.error({ error }, 'Error getting unread count');
+      logger.error('Error getting unread count', { error: error instanceof Error ? error.message : String(error) });
       return 0;
     }
   }
@@ -244,7 +244,7 @@ export class NotificationService {
       logger.info(`🗑️ Deleted notification ${notificationId} for user ${userId}`);
 
     } catch (error) {
-      logger.error({ error }, 'Error deleting notification');
+      logger.error('Error deleting notification', { error: error instanceof Error ? error.message : String(error) });
       throw error;
     }
   }
@@ -266,7 +266,7 @@ export class NotificationService {
         }
       });
     } catch (error) {
-      logger.warn({ error }, 'Failed to send real-time notification');
+      logger.warn('Failed to send real-time notification', { error: error instanceof Error ? error.message : String(error) });
       // Don't throw - notification was still created in database
     }
   }
@@ -321,7 +321,7 @@ export class NotificationService {
       return result.rowCount || 0;
 
     } catch (error) {
-      logger.error({ error }, 'Error cleaning up old notifications');
+      logger.error('Error cleaning up old notifications', { error: error instanceof Error ? error.message : String(error) });
       return 0;
     }
   }
@@ -391,7 +391,7 @@ export class NotificationService {
       };
 
     } catch (error) {
-      logger.error({ error }, 'Error getting notification stats');
+      logger.error('Error getting notification stats', { error: error instanceof Error ? error.message : String(error) });
       return {
         total: 0,
         unread: 0,
@@ -411,7 +411,7 @@ export class NotificationService {
       await this.cleanupOldNotifications();
       logger.info('✅ Notification service cleanup completed');
     } catch (error) {
-      logger.error({ error }, '❌ Error during notification service cleanup');
+      logger.error('❌ Error during notification service cleanup', { error: error instanceof Error ? error.message : String(error) });
       throw error;
     }
   }

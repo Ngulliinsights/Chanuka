@@ -1,11 +1,12 @@
 import { database as db } from '@shared/database/connection';
-import { user as users, userProfile as userProfiles, userInterest as userInterests, billEngagement, notification as notifications, billComment as billComments, bill as bills } from '../../../../shared/schema/schema';
+import { users, userProfiles, userInterests, billEngagement, notifications, billComments, bills } from '@shared/schema/schema';
 import { eq, and, desc, sql, count } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
 import { cacheKeys } from '@shared/core';
 import { databaseService } from '../../../infrastructure/database/database-service';
 import { z } from 'zod';
 import { logger } from '@shared/core';
+import { CACHE_KEYS } from '@shared/core';
 
 // Data validation schemas
 const userProfileDataSchema = z.object({
@@ -290,7 +291,7 @@ export class UserProfileService {
       },
       // Fallback: return updated profile data merged with existing cached data
       (() => {
-        const cachedProfile = cacheService.get(CACHE_KEYS.USER_PROFILE(userId));
+        const cachedProfile = cacheService.get(cacheKeys.USER_PROFILE(userId));
         if (cachedProfile) {
           return {
             ...cachedProfile,
@@ -371,7 +372,7 @@ export class UserProfileService {
       },
       // Fallback: return updated basic info merged with cached data
       (() => {
-        const cachedProfile = cacheService.get(CACHE_KEYS.USER_PROFILE(userId));
+        const cachedProfile = cacheService.get(cacheKeys.USER_PROFILE(userId));
         if (cachedProfile) {
           return {
             ...cachedProfile,
@@ -530,7 +531,7 @@ export class UserProfileService {
       },
       // Fallback: return merged preferences but warn about database unavailability
       (() => {
-        const currentPreferences = cacheService.get(`${CACHE_KEYS.USER_PROFILE(userId)}:preferences`) || {
+        const currentPreferences = cacheService.get(`${cacheKeys.USER_PROFILE(userId)}:preferences`) || {
           emailNotifications: true,
           pushNotifications: true,
           smsNotifications: false,
@@ -613,7 +614,7 @@ export class UserProfileService {
       },
       // Fallback: return updated verification status merged with cached data
       (() => {
-        const cachedProfile = cacheService.get(CACHE_KEYS.USER_PROFILE(userId));
+        const cachedProfile = cacheService.get(cacheKeys.USER_PROFILE(userId));
         if (cachedProfile) {
           return {
             ...cachedProfile,

@@ -446,15 +446,15 @@ describe('NavigationContext', () => {
       );
 
       // Rapid navigation
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId('navigate-to-bills'));
       });
 
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId('navigate-to-bills'));
       });
 
-      act(() => {
+      await act(() => {
         fireEvent.click(screen.getByTestId('navigate-to-bills'));
       });
 
@@ -475,7 +475,7 @@ describe('NavigationContext', () => {
       );
 
       // Try to navigate to invalid path
-      act(() => {
+      await act(() => {
         const navigation = useNavigation();
         navigation.navigateTo('invalid-path');
       });

@@ -4,12 +4,14 @@ Maximum depth: 7 levels
 
 ```
 .
+503_ERROR_RESOLUTION.md
 client/
 ├── index.html
 ├── public/
 │   ├── Chanuka_logo.png
 │   ├── Chanuka_logo.svg
 │   ├── Chanuka_logo.webp
+│   ├── favicon.ico
 │   ├── favicon.svg
 │   ├── icon-144x144.png
 │   ├── logo-192.png
@@ -181,6 +183,8 @@ client/
 │   │   │   ├── ErrorRecoveryManager.tsx
 │   │   │   ├── index.ts
 │   │   │   ├── PageErrorBoundary.tsx
+│   │   │   ├── ServiceUnavailable.tsx
+│   │   │   ├── SimpleErrorBoundary.tsx
 │   │   │   ├── withErrorBoundary.tsx
 │   │   ├── feature-flags-panel.tsx
 │   │   ├── implementation/
@@ -484,6 +488,7 @@ client/
 │   │   ├── use-online-status.tsx
 │   │   ├── use-safe-mutation.ts
 │   │   ├── use-safe-query.ts
+│   │   ├── useServiceStatus.ts
 │   │   ├── useSimplifiedLoading.ts
 │   │   ├── use-system.tsx
 │   │   ├── useTimeoutAwareLoading.ts
@@ -639,6 +644,7 @@ client/
 │   ├── TestComponent.tsx
 │   ├── test-utils/
 │   │   ├── index.tsx
+│   │   ├── navigation-test-utils.tsx
 │   ├── types/
 │   │   ├── navigation.ts
 │   │   ├── onboarding.ts
@@ -683,12 +689,14 @@ client/
 │   │   ├── performanceMonitoring.ts
 │   │   ├── performance-optimizer.ts
 │   │   ├── polyfills.ts
+│   │   ├── preload-optimizer.ts
 │   │   ├── race-condition-prevention.ts
 │   │   ├── responsive-layout.ts
 │   │   ├── route-preloading.ts
 │   │   ├── route-preloading.tsx
 │   │   ├── route-validation.ts
 │   │   ├── safe-lazy-loading.tsx
+│   │   ├── service-recovery.ts
 │   │   ├── serviceWorker.ts
 │   ├── vite-env.d.ts
 ├── tsconfig.json
@@ -775,40 +783,13 @@ docs/
 ├── strategic-tables-recommendations.md
 drizzle/
 drizzle.config.ts
-├── 0000_clear_risque.sql
-├── 0000_initial_migration.sql
-├── 0000_quick_aaron_stack.sql
-├── 0001_comprehensive_schema.sql
-├── 0001_lowly_white_queen.sql
-├── 0001_strange_night_nurse.sql
-├── 0002_add_bill_engagement.sql
-├── 0002_calm_weapon_omega.sql
-├── 0002_chief_stellaris.sql
-├── 0003_add_comment_features.sql
-├── 0003_enhanced_comments_system.sql
-├── 0004_fix_schema.sql
-├── 0005_complete_schema_update.sql
-├── 0006_fix_implementation_workarounds.sql
-├── 0007_add_sponsorship_tables.sql
-├── 0008_seed_sponsorship_data.sql
-├── 0009_add_citizen_verification.sql
-├── 0010_add_search_vectors_and_indexes.sql
-├── 0011_add_moderation_and_analytics.sql
-├── 0012_add_missing_features.sql
-├── 0013_fix_missing_tables.sql
-├── 0014_create_security_tables.sql
-├── 0015_fix_schema_errors.sql
-├── 0016_add_last_checked_column.sql
-├── 0017_add_success_column.sql
-├── 0017_fix_security_schema_issues.sql
-├── 0018_add_risk_score_column.sql
-├── 0019_add_tracking_preferences.sql
-├── 0020_comprehensive_schema_normalization.sql
+├── 0021_clean_comprehensive_schema.sql
 ├── meta/
 │   ├── _journal.json
 │   ├── 0000_snapshot.json
 │   ├── 0001_snapshot.json
 │   ├── 0002_snapshot.json
+│   ├── 0021_snapshot.json
 ├── README.md
 false/
 ├── trace.json
@@ -830,6 +811,7 @@ migration/
 │   ├── rollback-migration.test.js
 │   ├── validate-migration.test.js
 ├── feature-flags.js
+├── feature-flags.json
 ├── package.json
 ├── README.md
 ├── rollback/
@@ -855,6 +837,8 @@ playwright.config.ts
 playwright-report/
 ├── index.html
 postcss.config.js
+PROJECT_STRUCTURE_REPORT.md
+project-structure-report.json
 Readme1.md
 scripts/
 ├── accessibility/
@@ -873,18 +857,29 @@ scripts/
 │   ├── check-tables.ts
 │   ├── debug-migration-table.ts
 │   ├── generate-migration.ts
+│   ├── health-check.ts
 │   ├── migrate.ts
+│   ├── README.md
+│   ├── reset-database.ts
+│   ├── reset-database-fixed.ts
 │   ├── run-migrations.ts
+│   ├── run-reset.sh
+│   ├── run-reset.ts
 │   ├── setup-schema.ts
 │   ├── simple-connection-test.ts
 │   ├── simple-migrate.ts
 │   ├── test-connection.ts
 ├── deployment/
 │   ├── deploy.sh
+├── diagnose-503-issues.js
 ├── drop-schema.ts
 ├── fix-api-response-calls.js
+├── fix-failing-tests.ts
 ├── fix-frontend-imports.js
+├── fix-navigation-tests.ts
+├── fix-performance-tests.ts
 ├── fix-remaining-api-calls.js
+├── fix-remaining-test-issues.ts
 ├── fix-server-logger-imports.js
 ├── generate-bundle-report.js
 ├── immediate-memory-cleanup.cjs
@@ -905,6 +900,9 @@ scripts/
 ├── testing/
 │   ├── bug-detector.ts
 │   ├── run-bug-detector.ts
+│   ├── services/
+│   │   ├── transparency-dashboard.js
+│   │   ├── transparency-dashboard-simple.js
 │   ├── test-api-health.js
 │   ├── test-app.html
 │   ├── test-application.js
@@ -946,9 +944,13 @@ scripts/
 │   ├── verify-transparency-task.ts
 │   ├── verify-user-profile-service.ts
 │   ├── verify-websocket-service.ts
+├── test-status-summary.ts
 ├── update-core-references.js
+├── update-test-configuration.ts
 ├── validate-test-config.js
+├── verify-and-fix-project-structure.ts
 ├── verify-cleanup.ts
+├── verify-project-structure.ts
 server/
 ├── comprehensive-race-condition-test.js
 ├── config/
@@ -1078,6 +1080,7 @@ server/
 │   │   │   ├── runbook.md
 │   │   ├── docs/
 │   │   │   ├── automation-setup.md
+│   │   ├── engagement-analytics.ts
 │   │   ├── financial-disclosure/
 │   │   │   ├── config.ts
 │   │   │   ├── index.ts
@@ -1140,7 +1143,9 @@ server/
 │   │   │   ├── bill-tracking.routes.ts
 │   │   │   ├── index.ts
 │   │   │   ├── sponsorship.routes.ts
+│   │   ├── real-time-tracking.ts
 │   │   ├── voting-pattern-analysis.ts
+│   │   ├── voting-pattern-analysis-router.ts
 │   ├── community/
 │   │   ├── comment.ts
 │   │   ├── comment-storage.ts
@@ -1209,9 +1214,6 @@ server/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── sponsor-conflict-analysis.service.test.ts
 │   │   │   ├── sponsor-conflict-analysis.service.ts
-│   │   ├── domain/
-│   │   │   ├── entities/
-│   │   │   ├── repositories/
 │   │   ├── index.ts
 │   │   ├── infrastructure/
 │   │   │   ├── repositories/
@@ -1350,8 +1352,10 @@ server/
 │   ├── privacy-middleware.ts
 │   ├── rate-limiter.ts
 │   ├── request-logger.ts
+│   ├── resource-availability.ts
 │   ├── security-middleware.ts
 │   ├── security-monitoring-middleware.ts
+│   ├── service-availability.ts
 ├── routes/
 │   ├── regulatory-monitoring.ts
 ├── scripts/
@@ -1368,6 +1372,7 @@ server/
 │   ├── schema-validation-demo.ts
 │   ├── schema-validation-test.ts
 ├── simple-race-condition-test.js
+├── simple-server.ts
 ├── test-api.js
 ├── test-db.js
 ├── test-imports.js
@@ -1445,6 +1450,7 @@ server/
 │   ├── race-condition-prevention.ts
 │   ├── validation.ts
 ├── vite.ts
+SERVICE_AVAILABILITY_SOLUTIONS.md
 shared/
 ├── core/
 │   ├── index.ts
@@ -1590,7 +1596,6 @@ shared/
 │   │   │   │   │   ├── error-analytics.ts
 │   │   │   │   ├── errors/
 │   │   │   │   │   ├── base-error.ts
-│   │   │   │   │   ├── specialized/
 │   │   │   │   │   ├── specialized-errors.ts
 │   │   │   │   ├── handlers/
 │   │   │   │   │   ├── enhanced-error-boundary.tsx
@@ -1845,8 +1850,13 @@ shared/
 │   ├── expert.ts
 │   ├── index.ts
 │   ├── legal-analysis.ts
+src/
+├── setupTests.ts
 tailwind.config.ts
+TEST_FIXING_COMPLETE_SUMMARY.md
+TEST_STATUS_SUMMARY.md
 test-auth-compile.ts
+test-connection.html
 test-results/
 ├── results.json
 ├── results.xml
@@ -1873,9 +1883,10 @@ tools/
 tsconfig.json
 tsconfig.server.json
 vite.config.ts
+vitest.config.ts
 vitest.frontend.config.ts
 ```
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-25 11:30:19
+Generated on: 2025-10-27 02:14:24

@@ -9,6 +9,7 @@ import { BaseError, ErrorDomain, ErrorSeverity, BaseErrorOptions } from './base-
 
 /**
  * Validation Error - for input validation failures
+ * Implements unified validation error interface for compatibility
  */
 export class ValidationError extends BaseError {
   public readonly errors: Array<{
@@ -17,6 +18,10 @@ export class ValidationError extends BaseError {
     message: string;
     value?: unknown;
   }>;
+
+  // Unified interface properties for compatibility
+  public readonly field?: string;
+  public readonly errorId?: string;
 
   constructor(messageOrZodError: string | any, errors?: any[], details?: Record<string, any>) {
     let message: string;
@@ -45,9 +50,9 @@ export class ValidationError extends BaseError {
     super(message, {
       statusCode: 400,
       code: 'VALIDATION_ERROR',
-      details: { 
+      details: {
         errors: validationErrors,
-        ...details 
+        ...details
       },
       isOperational: true,
       domain: ErrorDomain.VALIDATION,
@@ -55,6 +60,10 @@ export class ValidationError extends BaseError {
     });
 
     this.errors = validationErrors;
+
+    // Set unified interface properties for compatibility
+    this.field = validationErrors.length === 1 ? validationErrors[0].field : undefined;
+    this.errorId = details?.errorId;
   }
 }
 

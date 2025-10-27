@@ -2,9 +2,9 @@ import express, { Router } from 'express';
 import { readDatabase } from '../../../infrastructure/database/index.ts';
 import { bills, billSponsorships, sponsors, sponsorTransparency, sponsorAffiliations, billSectionConflicts } from '../../../../shared/schema/index.ts';
 import { eq, desc, count, sql, and } from 'drizzle-orm';
-import { asyncHandler } from '../../../shared/core/src/observability/error-management/middleware/async-handler.js';
+import { asyncHandler } from '../../../../shared/core/src/observability/error-management/middleware/express-error-middleware.js';
 import { SponsorshipAnalysisService } from '../application/sponsorship-analysis.service.ts';
-import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../../shared/core/src/utils/api/index.js";
+import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../../../shared/core/src/utils/api-utils.js";
 import { logger } from '@shared/core';
 
 const router = Router();
@@ -23,7 +23,7 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
       logger.error('Error fetching sponsorship analysis:', { component: 'Chanuka' }, error as any);
-      return ApiError(res, 'Failed to fetch sponsorship analysis', 500,
+      return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to fetch sponsorship analysis' }, 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   }));
@@ -39,7 +39,7 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
       logger.error('Error fetching primary sponsor analysis:', { component: 'Chanuka' }, error as any);
-      return ApiError(res, 'Failed to fetch primary sponsor analysis', 500,
+      return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to fetch primary sponsor analysis' }, 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   }));
@@ -55,7 +55,7 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
       logger.error('Error fetching co-sponsors analysis:', { component: 'Chanuka' }, error as any);
-      return ApiError(res, 'Failed to fetch co-sponsors analysis', 500,
+      return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to fetch co-sponsors analysis' }, 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   }));
@@ -71,7 +71,7 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
       logger.error('Error fetching financial network analysis:', { component: 'Chanuka' }, error as any);
-      return ApiError(res, 'Failed to fetch financial network analysis', 500,
+      return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to fetch financial network analysis' }, 500,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   }));

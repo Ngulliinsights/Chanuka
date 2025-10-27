@@ -28,9 +28,11 @@ describe('Rate Limiting Stores', () => {
     });
 
     afterEach(() => {
+    cleanup();
       store.destroy();
       vi.useRealTimers();
-    });
+    
+  });
 
     describe('Basic Operations', () => {
       it('should get non-existent key', async () => {

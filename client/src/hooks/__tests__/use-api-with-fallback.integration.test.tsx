@@ -1,4 +1,14 @@
 import React from 'react';
+// Mock fetch
+global.fetch = vi.fn(() =>
+  Promise.resolve({
+    ok: true,
+    status: 200,
+    json: () => Promise.resolve({}),
+    text: () => Promise.resolve(''),
+  } as Response)
+);
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -351,7 +361,7 @@ describe('useApiWithFallback Integration Tests', () => {
         expect(result.current.data).toEqual(initialData);
       });
 
-      act(() => {
+      await act(() => {
         result.current.refetch();
       });
 
@@ -589,7 +599,7 @@ describe('useMutation Integration Tests', () => {
         { wrapper: createWrapper() }
       );
 
-      act(() => {
+      await act(() => {
         result.current.mutate({ name: 'Updated User' });
       });
 

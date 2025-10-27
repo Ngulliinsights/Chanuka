@@ -19,6 +19,7 @@ export * from '../../../shared/schema';
 export { DatabaseFallbackService } from './database-fallback';
 export { MigrationService } from './migration-service';
 export { SeedDataService } from './seed-data-service';
+export { databaseService } from './database-service';
 
 // Storage services (if they provide unique server-specific value)
 export { storage as StorageService } from './storage';

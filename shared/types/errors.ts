@@ -1,5 +1,5 @@
 // Import from the single source of truth for error management
-import { 
+import {
   BaseError,
   ValidationError,
   NotFoundError,
@@ -54,6 +54,34 @@ export class SponsorNotFoundError extends NotFoundError {
     super('Sponsor', undefined, { message });
     this.name = 'SponsorNotFoundError';
   }
+}
+
+/**
+ * Unified ValidationError Interface
+ *
+ * Satisfies both simple and complex ValidationError needs:
+ * - Simple interface: field, message, code properties
+ * - Complex interface: errors array, errorId, statusCode properties
+ */
+export interface UnifiedValidationError {
+  // Simple interface compatibility properties
+  field?: string;
+  message: string;
+  code?: string;
+
+  // Specialized error compatibility properties
+  errors?: Array<{
+    field?: string;
+    code: string;
+    message: string;
+    value?: unknown;
+  }>;
+  errorId?: string;
+  statusCode?: number;
+
+  // Common error properties
+  name?: string;
+  stack?: string;
 }
 
 // Legacy type for backward compatibility

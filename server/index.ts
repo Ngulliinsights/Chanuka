@@ -1,3 +1,11 @@
+// Add diagnostic logging at the very top
+console.log('🔍 DIAGNOSTIC: Server startup initiated');
+console.log('🔍 DIAGNOSTIC: Environment variables check:', {
+  DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT SET',
+  JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'NOT SET',
+  ENCRYPTION_KEY: process.env.ENCRYPTION_KEY ? 'SET' : 'NOT SET',
+  KEY_DERIVATION_SALT: process.env.KEY_DERIVATION_SALT ? 'SET' : 'NOT SET',
+});
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
@@ -8,40 +16,39 @@ import helmet from 'helmet';
 import { database as db } from '../shared/database/connection.js';
 import { config } from './config/index.js';
 // Feature Routes
-// import { router as systemRouter } from './features/admin/system.js';
-// import { router as billsRouter } from './features/bills/presentation/bills-router.js';
-// import { router as sponsorshipRouter } from './features/bills/presentation/sponsorship.routes.js';
-// import { analysisRouter } from './features/analysis/presentation/analysis.routes.js';
+import { router as systemRouter } from './features/admin/system.js';
+import { router as billsRouter } from './features/bills/presentation/bills-router.js';
+import { router as sponsorshipRouter } from './features/bills/presentation/sponsorship.routes.js';
+import { realTimeTrackingRouter } from './features/bills/index.js';
+import { analysisRouter } from './features/analysis/presentation/analysis.routes.js';
 import { billTrackingRouter } from './features/bills/presentation/bill-tracking.routes.js';
-// import analyticsRouter from './features/analytics/analytics.js';
-// import { sponsorsRouter } from './features/sponsors/presentation/sponsors.routes.js';
-// import { router as authRouter } from './core/auth/auth.js';
-// import { router as usersRouter } from './features/users/application/users.js';
-// import { router as verificationRouter } from './features/users/application/verification.js';
-// import { router } from '@shared/core';
-// import { router as communityRouter } from './features/community/community.js';
+import analyticsRouter from './features/analytics/analytics.js';
+import { sponsorsRouter } from './features/sponsors/presentation/sponsors.routes.js';
+import { router as authRouter } from './core/auth/auth.js';
+import { router as usersRouter } from './features/users/application/users.js';
+import { router as verificationRouter } from './features/users/application/verification.js';
+import { router as communityRouter } from './features/community/community.js';
 
-// import { notificationRoutes as notificationsRouter } from './infrastructure/notifications/index.js';
-// import { router as searchRouter } from './features/search/presentation/SearchController.js';
-// import { router as profileRouter } from './features/users/application/profile.js';
-// import { router as privacyRouter } from './features/privacy/privacy-routes.js';
-// import governmentDataRouter from './features/government-data/routes.js'; // TODO: Implement government data router
-// import { router as billTrackingRouter } from './features/bills/bill-tracking.js'; // TODO: Implement bill tracking router
-// import { router as adminRouter } from './features/admin/admin.js';
+import { notificationRoutes as notificationsRouter } from './infrastructure/notifications/index.js';
+import { router as searchRouter } from './features/search/presentation/SearchController.js';
+import { router as profileRouter } from './features/users/application/profile.js';
+import { router as privacyRouter } from './features/privacy/privacy-routes.js';
+import { KenyanGovernmentDataIntegrationService } from './features/government-data/routes.js';
+import { router as adminRouter } from './features/admin/admin.js';
 import { router as cacheRouter } from './infrastructure/cache/cache.js';
 import { cacheCoordinator } from './infrastructure/cache/index.js';
 // import { router as realTimeTrackingRouter } from './features/bills/real-time-tracking.js'; // TODO: Implement real-time tracking router
-// import { router as alertPreferencesRouter } from './features/alert-preferences/presentation/routes/unified-alert-routes.js';
+// import { router as alertPreferencesRouter } from './features/alert-preferences/presentation/routes/unified-alert-routes.js'; // TODO: Fix missing dependencies
 // import engagementAnalyticsRouter from './features/analytics/engagement-analytics.js'; // TODO: Implement engagement analytics router
 // import { sponsorConflictAnalysisRouter } from './features/bills/sponsor-conflict-analysis.js'; // TODO: Implement sponsor conflict analysis router
 // import { votingPatternAnalysisRouter } from './features/bills/voting-pattern-analysis.js'; // TODO: Implement voting pattern analysis router
-// import { createFinancialDisclosureRouter } from './features/analytics/financial-disclosure/index.js';
+// import { createFinancialDisclosureRouter } from './features/analytics/financial-disclosure/index.js'; // TODO: Fix financial disclosure router
 // import financialDisclosureIntegrationRouter from './features/analytics/financial-disclosure-integration.js'; // TODO: Implement financial disclosure integration router
 // import { router as transparencyDashboardRouter } from './features/analytics/transparency-dashboard.js'; // TODO: Implement transparency dashboard router
-// import { getMonitoringService } from './infrastructure/monitoring/monitoring.js';
-// import { router as externalApiManagementRouter } from './infrastructure/monitoring/external-api-management.js';
-// import { router as externalApiDashboardRouter } from './features/admin/external-api-dashboard.js';
-// import coverageRouter from './features/coverage/coverage-routes.js';
+// import { getMonitoringService } from './infrastructure/monitoring/monitoring.js'; // TODO: Initialize monitoring router
+import { router as externalApiManagementRouter } from './infrastructure/monitoring/external-api-management.js';
+import { router as externalApiDashboardRouter } from './features/admin/external-api-dashboard.js';
+import coverageRouter from './features/coverage/coverage-routes.js';
 // Import migrated middleware
 import {
   migratedAuthenticateToken,
@@ -161,14 +168,14 @@ const corsOptions = {
 
     const allowedOrigins = isDevelopment
       ? [
-          `http://localhost:${PORT}`,
-          `http://127.0.0.1:${PORT}`,
-          `http://0.0.0.0:${PORT}`,
-          'http://localhost:3000', // Common React dev port
-          'http://localhost:5173', // Default Vite dev port
-          'http://localhost:5174', // Alternative Vite dev port
-          'http://localhost:4200', // Current server port for frontend
-        ]
+        `http://localhost:${PORT}`,
+        `http://127.0.0.1:${PORT}`,
+        `http://0.0.0.0:${PORT}`,
+        'http://localhost:3000', // Common React dev port
+        'http://localhost:5173', // Default Vite dev port
+        'http://localhost:5174', // Alternative Vite dev port
+        'http://localhost:4200', // Current server port for frontend
+      ]
       : config.server.frontendUrl ? [config.server.frontendUrl] : [origin];
 
     if (allowedOrigins.includes(origin)) {
@@ -223,6 +230,12 @@ app.use(express.urlencoded({
   }
 }));
 
+// Temporarily disable service availability middleware to fix 503 errors
+// import { serviceAvailabilityMiddleware } from './middleware/service-availability.js';
+// import { resourceAvailabilityMiddleware } from './middleware/resource-availability.js';
+// app.use(serviceAvailabilityMiddleware);
+// app.use(resourceAvailabilityMiddleware);
+
 // Request logging and monitoring
 app.use(requestLogger);
 app.use(performanceMiddleware);
@@ -258,6 +271,7 @@ app.get('/api', (req, res) => {
 
 // Frontend serving health check
 app.get('/api/frontend-health', (req, res) => {
+  const memUsage = process.memoryUsage();
   const healthStatus = {
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -265,15 +279,15 @@ app.get('/api/frontend-health', (req, res) => {
     serving_mode: isDevelopment ? 'development' : 'production',
     vite_integration: isDevelopment ? 'enabled' : 'disabled',
     static_serving: !isDevelopment ? 'enabled' : 'disabled',
+    memory: {
+      heapUsed: `${(memUsage.heapUsed / 1024 / 1024).toFixed(2)} MB`,
+      heapTotal: `${(memUsage.heapTotal / 1024 / 1024).toFixed(2)} MB`,
+      heapUsedPercent: `${((memUsage.heapUsed / memUsage.heapTotal) * 100).toFixed(2)}%`
+    },
     cors: {
       enabled: true,
       origin: req.headers.origin || 'no-origin',
       credentials: config.cors.credentials
-    },
-    headers: {
-      'user-agent': req.headers['user-agent'],
-      'accept': req.headers.accept,
-      'content-type': req.headers['content-type']
     }
   };
 
@@ -284,6 +298,19 @@ app.get('/api/frontend-health', (req, res) => {
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, X-CSRF-Token, X-Request-ID');
 
   res.json(healthStatus);
+});
+
+// Simple service status endpoint
+app.get('/api/service-status', (req, res) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  res.json({
+    status: 'online',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    version: '1.0.0'
+  });
 });
 
 // Memory analysis endpoint for debugging high memory usage
@@ -342,41 +369,40 @@ app.get('/api/debug/memory-analysis', (req, res) => {
 });
 
 // API Routes
-// app.use('/api/system', systemRouter);
-// app.use('/api/bills', billsRouter);
-// app.use('/api/sponsorship', sponsorshipRouter);
-// app.use('/api/analysis', analysisRouter);
+app.use('/api/system', systemRouter);
+app.use('/api/bills', billsRouter);
+app.use('/api/sponsorship', sponsorshipRouter);
+app.use('/api/real-time', realTimeTrackingRouter);
+app.use('/api/analysis', analysisRouter);
 app.use('/api/bill-tracking', billTrackingRouter);
-// app.use('/api/analytics', analyticsRouter);
-// app.use('/api/sponsors', sponsorsRouter);
-// app.use('/api/auth', authRouter);
-// app.use('/api/users', usersRouter);
-// app.use('/api/verification', verificationRouter);
-// app.use('/api/health', router);
-// app.use('/api/community', communityRouter);
+app.use('/api/analytics', analyticsRouter);
+app.use('/api/sponsors', sponsorsRouter);
+app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/verification', verificationRouter);
+// app.use('/api/health', healthRouter); // TODO: Create health router
+app.use('/api/community', communityRouter);
 
-// app.use('/api/notifications', notificationsRouter);
-// app.use('/api/search', searchRouter);
-// app.use('/api/profile', profileRouter);
-// app.use('/api/privacy', privacyRouter);
-// app.use('/api/government-data', governmentDataRouter); // TODO: Implement government data router
-// app.use('/api/bill-tracking', billTrackingRouter); // TODO: Implement bill tracking router
-// app.use('/api/admin', adminRouter);
+app.use('/api/notifications', notificationsRouter);
+app.use('/api/search', searchRouter);
+app.use('/api/profile', profileRouter);
+app.use('/api/privacy', privacyRouter);
+// app.use('/api/government-data', governmentDataRouter); // TODO: Create router for government data service
+app.use('/api/admin', adminRouter);
 app.use('/api/cache', cacheRouter);
 // app.use('/api/real-time', realTimeTrackingRouter); // TODO: Implement real-time tracking router
-// app.use('/api/alert-preferences', alertPreferencesRouter);
+// app.use('/api/alert-preferences', alertPreferencesRouter); // TODO: Fix missing dependencies
 // app.use('/api/engagement-analytics', engagementAnalyticsRouter); // TODO: Implement engagement analytics router
 // app.use('/api', sponsorConflictAnalysisRouter); // TODO: Implement sponsor conflict analysis router
 // app.use('/api', votingPatternAnalysisRouter); // TODO: Implement voting pattern analysis router
-// app.use('/api/financial-disclosure', financialDisclosureRouter); // TODO: Initialize financial disclosure router
 // app.use('/api/financial-disclosure-integration', financialDisclosureIntegrationRouter); // TODO: Implement financial disclosure integration router
 // app.use('/api/transparency', transparencyDashboardRouter); // TODO: Implement transparency dashboard router
 // app.use('/api/monitoring', monitoringRouter); // TODO: Initialize monitoring router
-// app.use('/api/external-api', externalApiManagementRouter);
-// app.use('/api/admin/external-api', externalApiDashboardRouter);
+app.use('/api/external-api', externalApiManagementRouter);
+app.use('/api/admin/external-api', externalApiDashboardRouter);
 // TODO: Implement security monitoring router
 // app.use('/api/security', securityMonitoringRouter);
-// app.use('/api/coverage', coverageRouter);
+app.use('/api/coverage', coverageRouter);
 
 // Swagger API documentation
 // app.use('/api-docs', serveSwagger, setupSwagger);
@@ -458,14 +484,14 @@ async function startupInitialization() {
   if (initializationInProgress) {
     return initializationPromise;
   }
-  
+
   if (initializationPromise) {
     return initializationPromise;
   }
-  
+
   initializationInProgress = true;
   initializationPromise = performStartupInitialization();
-  
+
   try {
     await initializationPromise;
   } finally {
@@ -479,10 +505,10 @@ async function performStartupInitialization() {
   try {
     // Use the new database fallback service
     const dbConnected = await databaseFallbackService.initialize();
-    
+
     // Get comprehensive health status
     const healthInfo = await databaseFallbackService.getHealthInfo();
-    
+
     databaseStatus = {
       connected: dbConnected,
       initialized: healthInfo.database.connected
@@ -497,7 +523,7 @@ async function performStartupInitialization() {
   } catch (error) {
     logger.error('❌ Startup initialization error:', error, { component: 'Chanuka' });
     logger.info('🔄 Continuing with fallback mode...', { component: 'Chanuka' });
-    
+
     // Ensure demo mode is enabled on startup failure
     databaseFallbackService.setDemoMode(true);
   }
@@ -515,14 +541,14 @@ const server = createServer(app);
 // Graceful shutdown handling
 const gracefulShutdown = async (signal: string) => {
   console.log(`\n${signal} received. Starting graceful shutdown...`);
-  
+
   try {
     // 1. Stop accepting new connections first
     logger.info('🛑 Stopping new connections...', { component: 'Chanuka' });
-    
+
     // 2. Clean up all services in reverse order of initialization
     logger.info('🧹 Cleaning up services...', { component: 'Chanuka' });
-    
+
     // Clean up privacy scheduler
     try {
       privacySchedulerService.stop();
@@ -530,42 +556,42 @@ const gracefulShutdown = async (signal: string) => {
     } catch (error) {
       logger.error('Error stopping privacy scheduler:', error, { component: 'Chanuka' });
     }
-    
+
     // Clean up security monitoring
     try {
       await securityMonitoringService.shutdown();
     } catch (error) {
       logger.error('Error stopping security monitoring:', error, { component: 'Chanuka' });
     }
-    
+
     // Clean up search index manager
     try {
       // TODO: Implement shutdown for new SearchIndexManager
     } catch (error) {
       logger.error('Error stopping search index manager:', error, { component: 'Chanuka' });
     }
-    
+
     // Clean up session cleanup service
     try {
       sessionCleanupService.stop();
     } catch (error) {
       logger.error('Error stopping session cleanup:', error, { component: 'Chanuka' });
     }
-    
+
     // Clean up monitoring scheduler
     try {
-      await monitoringScheduler.shutdown();
+      monitoringScheduler.stop();
     } catch (error) {
       logger.error('Error stopping monitoring scheduler:', error, { component: 'Chanuka' });
     }
-    
+
     // Clean up notification scheduler
     try {
       notificationSchedulerService.cleanup();
     } catch (error) {
       logger.error('Error stopping notification scheduler:', error, { component: 'Chanuka' });
     }
-    
+
     // Clean up notification services
     try {
       const { notificationService } = await import('./infrastructure/notifications/notification-service.js');
@@ -573,7 +599,7 @@ const gracefulShutdown = async (signal: string) => {
     } catch (error) {
       logger.error('Error stopping notification service:', error, { component: 'Chanuka' });
     }
-    
+
     // Clean up cache coordinator
     try {
       cacheCoordinator.stop();
@@ -587,7 +613,7 @@ const gracefulShutdown = async (signal: string) => {
     } catch (error) {
       logger.error('Error stopping WebSocket service:', error, { component: 'Chanuka' });
     }
-    
+
     // Close Vite dev server if running
     try {
       const { closeVite } = await import('./vite.js');
@@ -595,13 +621,13 @@ const gracefulShutdown = async (signal: string) => {
     } catch (error) {
       logger.error('Error closing Vite server:', error, { component: 'Chanuka' });
     }
-    
+
     logger.info('✅ All services cleaned up', { component: 'Chanuka' });
-    
+
   } catch (error) {
     logger.error('Error during graceful shutdown:', error, { component: 'Chanuka' });
   }
-  
+
   // Close HTTP server
   server.close((err) => {
     if (err) {
@@ -611,7 +637,7 @@ const gracefulShutdown = async (signal: string) => {
     logger.info('Server closed successfully', { component: 'Chanuka' });
     process.exit(0);
   });
-  
+
   // Force exit after 10 seconds
   setTimeout(() => {
     logger.error('Forced shutdown after timeout', { component: 'Chanuka' });
@@ -653,98 +679,98 @@ if (process.env.NODE_ENV !== 'test') {
 
     // Initialize services in proper order with error handling
     const serviceInitializers = [
-    {
-      name: 'Performance monitoring',
-      init: () => {
-        initializeMonitoring(config.server.nodeEnv);
-        return Promise.resolve();
+      {
+        name: 'Performance monitoring',
+        init: () => {
+          initializeMonitoring(config.server.nodeEnv);
+          return Promise.resolve();
+        }
+      },
+      {
+        name: 'WebSocket service',
+        init: () => {
+          webSocketService.initialize(server);
+          return Promise.resolve();
+        }
+      },
+      {
+        name: 'Bill status monitor',
+        init: () => {
+          // Bill status monitor is initialized automatically via constructor
+          return Promise.resolve();
+        }
+      },
+      {
+        name: 'Notification scheduler',
+        init: () => notificationSchedulerService.initialize()
+      },
+      {
+        name: 'Monitoring scheduler',
+        init: () => monitoringScheduler.initialize()
+      },
+      {
+        name: 'Session cleanup service',
+        init: () => {
+          sessionCleanupService.start(60); // Run cleanup every 60 minutes
+          return Promise.resolve();
+        }
+      },
+      {
+        name: 'Search index manager',
+        init: () => Promise.resolve() // TODO: Implement initialization for new SearchIndexManager
+      },
+      {
+        name: 'Security monitoring service',
+        init: () => securityMonitoringService.initialize()
+      },
+      {
+        name: 'Privacy scheduler service',
+        init: async () => {
+          await privacySchedulerService.initialize();
+          privacySchedulerService.start();
+        }
+      },
+      {
+        name: 'Cache coordinator',
+        init: () => {
+          cacheCoordinator.start();
+          return Promise.resolve();
+        }
       }
-    },
-    {
-      name: 'WebSocket service',
-      init: () => {
-        webSocketService.initialize(server);
-        return Promise.resolve();
-      }
-    },
-    {
-      name: 'Bill status monitor',
-      init: () => {
-        // Bill status monitor is initialized automatically via constructor
-        return Promise.resolve();
-      }
-    },
-    {
-      name: 'Notification scheduler',
-      init: () => notificationSchedulerService.initialize()
-    },
-    {
-      name: 'Monitoring scheduler',
-      init: () => monitoringScheduler.initialize()
-    },
-    {
-      name: 'Session cleanup service',
-      init: () => {
-        sessionCleanupService.start(60); // Run cleanup every 60 minutes
-        return Promise.resolve();
-      }
-    },
-    {
-      name: 'Search index manager',
-      init: () => Promise.resolve() // TODO: Implement initialization for new SearchIndexManager
-    },
-    {
-      name: 'Security monitoring service',
-      init: () => securityMonitoringService.initialize()
-    },
-    {
-      name: 'Privacy scheduler service',
-      init: async () => {
-        await privacySchedulerService.initialize();
-        privacySchedulerService.start();
-      }
-    },
-    {
-      name: 'Cache coordinator',
-      init: () => {
-        cacheCoordinator.start();
-        return Promise.resolve();
-      }
-    }
-  ];
+    ];
 
     // Initialize services sequentially to prevent race conditions
     for (const service of serviceInitializers) {
-    try {
-      await service.init();
-      console.log(`✅ ${service.name} initialized`);
-    } catch (error) {
-      console.error(`❌ Failed to initialize ${service.name}:`, error);
-      // Continue with other services even if one fails
-    }
-  }
-
-  // Setup frontend serving (Vite dev server or static files)
-  try {
-    if (isDevelopment) {
-      await setupVite(app, server);
-      logger.info('✅ Vite development server integrated successfully', { component: 'Chanuka' });
-    } else {
-      // Import serveStatic for production
-      const { serveStatic } = await import('./vite.js');
-      serveStatic(app);
-      logger.info('✅ Production static file serving configured', { component: 'Chanuka' });
-    }
-  } catch (error) {
-    logger.error('❌ Failed to setup frontend serving:', error, { component: 'Chanuka' });
-    
-    // Fallback error page for frontend requests
-    app.use('*', (req, res, next) => {
-      if (req.originalUrl.startsWith('/api/')) {
-        return next();
+      try {
+        await service.init();
+        console.log(`✅ ${service.name} initialized`);
+      } catch (error) {
+        console.error(`❌ Failed to initialize ${service.name}:`, error);
+        // Continue with other services even if one fails
       }
-      
-      res.status(500).send(`
+    }
+
+    // Setup frontend serving (Vite dev server or static files)
+    try {
+      if (isDevelopment) {
+        await setupVite(app, server);
+        logger.info('✅ Vite development server integrated successfully', { component: 'Chanuka' });
+      } else {
+        // Import serveStatic for production
+        const { serveStatic } = await import('./vite.js');
+        serveStatic(app);
+        logger.info('✅ Production static file serving configured', { component: 'Chanuka' });
+      }
+    } catch (error) {
+      logger.error('❌ Failed to setup frontend serving:', error, { component: 'Chanuka' });
+
+      // Fallback error page for frontend requests
+      app.use('*', (req, res, next) => {
+        if (req.originalUrl.startsWith('/api/')) {
+          return next();
+        }
+
+        res.status(500).send(`
         <!DOCTYPE html>
         <html>
           <head>
@@ -768,8 +794,8 @@ if (process.env.NODE_ENV !== 'test') {
           </body>
         </html>
       `);
-    });
-  }
+      });
+    }
 
     testConnection();
   });

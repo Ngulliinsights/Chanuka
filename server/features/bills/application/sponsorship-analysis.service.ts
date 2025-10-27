@@ -1,17 +1,17 @@
-import { sponsorRepository } from '../sponsors/infrastructure/repositories/sponsor.repository.js';
-import { sponsorConflictAnalysisService } from '../sponsors/application/sponsor-conflict-analysis.service.js';
+import { sponsorRepository } from '../../sponsors/infrastructure/repositories/sponsor.repository.js';
+import { sponsorConflictAnalysisService } from '../../sponsors/application/sponsor-conflict-analysis.service.js';
 import { readDatabase } from '@shared/database/connection';
 // Backwards-compatible proxy so existing code using `db.select()` etc. keeps working
 const db = new Proxy({}, {
   get(_target, prop: string | symbol) {
-  const d = readDatabase;
+    const d = readDatabase;
     if (!d) {
       return (..._args: any[]) => { throw new Error('Database not initialized'); };
     }
     return (d as any)[prop as any];
   }
 }) as any;
-import { billSectionConflict } from '../../../shared/schema/schema.js';
+import { billSectionConflict } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 import { NotFoundError } from '@shared/core';
 import { logger } from '@shared/core';
@@ -94,7 +94,7 @@ interface NetworkEdge {
 }
 
 export class SponsorshipAnalysisService {
-  
+
   // Industry categorization for financial analysis
   private readonly industryCategories = new Map([
     ['pharmaceutical', 'Pharmaceutical'],
@@ -191,18 +191,18 @@ export class SponsorshipAnalysisService {
   async getPrimarySponsorAnalysis(billId: number) {
     try {
       const sponsorshipData = await sponsorRepository.getSponsorshipDataForBill(billId, 'primary');
-      
+
       if (!sponsorshipData.length) {
         throw new NotFoundError(`Primary sponsor not found for bill ${billId}`);
       }
 
       const sponsorData = sponsorshipData[0];
-      
+
       // Ensure sponsor exists before proceeding
       if (!sponsorData.sponsor) {
         throw new NotFoundError(`Sponsor data incomplete for bill ${billId}`);
       }
-      
+
       const sponsorId = sponsorData.sponsor.id;
 
       // Use conflict analysis service for conflict detection
@@ -214,7 +214,7 @@ export class SponsorshipAnalysisService {
 
       // Calculate bill-specific impact
       const billImpact = await this.calculateBillImpact(billId, sponsorData.sponsor);
-      
+
       // Calculate network position
       const networkAnalysis = await this.calculateNetworkConnections(sponsorId);
 
@@ -259,7 +259,7 @@ export class SponsorshipAnalysisService {
 
       const riskDistribution = this.calculateRiskDistribution(coSponsorships);
       const totalExposure = coSponsorships.reduce(
-        (sum, s) => sum + this.parseNumeric(s.sponsor?.financialExposure), 
+        (sum, s) => sum + this.parseNumeric(s.sponsor?.financialExposure),
         0
       );
 
@@ -346,7 +346,7 @@ export class SponsorshipAnalysisService {
 
   private calculateTotalFinancialExposure(sponsorships: SponsorshipData[]): number {
     return sponsorships.reduce(
-      (total, s) => total + this.parseNumeric(s.sponsor?.financialExposure), 
+      (total, s) => total + this.parseNumeric(s.sponsor?.financialExposure),
       0
     );
   }
@@ -355,7 +355,7 @@ export class SponsorshipAnalysisService {
     if (sponsorships.length === 0) return 0;
 
     const total = sponsorships.reduce(
-      (sum, s) => sum + this.parseNumeric(s.sponsor?.votingAlignment), 
+      (sum, s) => sum + this.parseNumeric(s.sponsor?.votingAlignment),
       0
     );
 
@@ -366,12 +366,12 @@ export class SponsorshipAnalysisService {
     // Generate a realistic bill number based on bill characteristics
     const year = new Date(bill.introducedDate || bill.createdAt).getFullYear();
     const title = bill.title || '';
-    
+
     if (title.toLowerCase().includes('finance')) return `FB${year}`;
     if (title.toLowerCase().includes('health')) return `NHRA${year}`;
     if (title.toLowerCase().includes('education')) return `EDA${year}`;
     if (title.toLowerCase().includes('environment')) return `EPA${year}`;
-    
+
     return `BILL${year}/${bill.id}`;
   }
 
@@ -386,15 +386,15 @@ export class SponsorshipAnalysisService {
   }
 
   private calculateFinancialBreakdown(primarySponsor: any, coSponsors: any[]) {
-    const primaryExposure = primarySponsor 
-      ? this.parseNumeric(primarySponsor.sponsor?.financialExposure) 
+    const primaryExposure = primarySponsor
+      ? this.parseNumeric(primarySponsor.sponsor?.financialExposure)
       : 0;
-    
+
     const coSponsorsTotal = coSponsors.reduce(
-      (total, s) => total + this.parseNumeric(s.sponsor?.financialExposure), 
+      (total, s) => total + this.parseNumeric(s.sponsor?.financialExposure),
       0
     );
-    
+
     const totalExposure = primaryExposure + coSponsorsTotal;
 
     return {
@@ -406,7 +406,7 @@ export class SponsorshipAnalysisService {
   }
 
   private async determineOverallRiskLevel(
-    billId: number, 
+    billId: number,
     sponsorships: SponsorshipData[]
   ): Promise<string> {
     try {
@@ -415,19 +415,19 @@ export class SponsorshipAnalysisService {
       const allConflicts = await Promise.all(
         sponsorIds.map(id => sponsorConflictAnalysisService.detectConflicts(id))
       );
-      
-      const billConflicts = allConflicts.flat().filter(c => 
+
+      const billConflicts = allConflicts.flat().filter(c =>
         c.affectedBills.includes(billId)
       );
 
       // Determine risk level based on conflicts
       const criticalCount = billConflicts.filter(c => c.severity === 'critical').length;
       const highCount = billConflicts.filter(c => c.severity === 'high').length;
-      
+
       if (criticalCount > 0) return 'critical';
       if (highCount > 1) return 'high';
       if (highCount > 0 || billConflicts.length > 3) return 'medium';
-      
+
       return 'low';
     } catch (error) {
       logger.error('Error determining risk level', { billId }, error as Record<string, any>);
@@ -440,7 +440,7 @@ export class SponsorshipAnalysisService {
     const billDate = new Date(bill.introducedDate || bill.createdAt);
 
     // Add pre-bill events based on affiliations
-    const allAffiliations = sponsorships.flatMap(s => 
+    const allAffiliations = sponsorships.flatMap(s =>
       Array.isArray(s.affiliations) ? s.affiliations : []
     );
 
@@ -482,7 +482,7 @@ export class SponsorshipAnalysisService {
       type: 'legislative'
     });
 
-    return timeline.sort((a, b) => 
+    return timeline.sort((a, b) =>
       new Date(a.date).getTime() - new Date(b.date).getTime()
     );
   }
@@ -490,27 +490,27 @@ export class SponsorshipAnalysisService {
   private getMethodology() {
     return {
       verificationSources: [
-        { 
-          name: 'Parliamentary Records', 
-          weight: 90, 
+        {
+          name: 'Parliamentary Records',
+          weight: 90,
           reliability: 'high',
           description: 'Official legislative documentation and voting records'
         },
-        { 
-          name: 'Financial Disclosures', 
-          weight: 85, 
+        {
+          name: 'Financial Disclosures',
+          weight: 85,
           reliability: 'high',
           description: 'Mandatory financial interest declarations'
         },
-        { 
-          name: 'Corporate Registries', 
-          weight: 80, 
+        {
+          name: 'Corporate Registries',
+          weight: 80,
           reliability: 'high',
           description: 'Official company registration and directorship records'
         },
-        { 
-          name: 'Media Reports', 
-          weight: 65, 
+        {
+          name: 'Media Reports',
+          weight: 65,
           reliability: 'medium',
           description: 'Verified journalistic investigations and reports'
         }
@@ -556,7 +556,7 @@ export class SponsorshipAnalysisService {
 
     // Get section conflicts to identify affected areas
     const sectionConflicts = await this.getSectionConflicts(billId);
-    
+
     // Filter sections that affect this sponsor (with safe property access)
     const affectedSections = sectionConflicts
       .filter(s => {
@@ -591,11 +591,11 @@ export class SponsorshipAnalysisService {
     try {
       // Get sponsor's affiliations
       const affiliations = await sponsorRepository.getSponsorAffiliations(sponsorId);
-      
+
       // Calculate metrics based on affiliations
       const directConnections = affiliations.length;
-      const leadershipRoles = affiliations.filter(a => 
-        a.role && ['director', 'board', 'executive'].some(r => 
+      const leadershipRoles = affiliations.filter(a =>
+        a.role && ['director', 'board', 'executive'].some(r =>
           a.role!.toLowerCase().includes(r)
         )
       ).length;
@@ -665,10 +665,10 @@ export class SponsorshipAnalysisService {
 
     // Count how many sponsors are affiliated with each organization
     sponsorships.forEach(sponsorship => {
-      const affiliations = Array.isArray(sponsorship.sponsor?.affiliations) 
-        ? sponsorship.sponsor.affiliations 
+      const affiliations = Array.isArray(sponsorship.sponsor?.affiliations)
+        ? sponsorship.sponsor.affiliations
         : [];
-      
+
       affiliations.forEach((affiliation: any) => {
         const org = affiliation.organization;
         if (org) {
@@ -680,25 +680,25 @@ export class SponsorshipAnalysisService {
     // Return only organizations shared by multiple sponsors
     return Array.from(orgMap.entries())
       .filter(([_, count]) => count > 1)
-      .map(([org, count]) => ({ 
-        organization: org, 
-        sponsorCount: count 
+      .map(([org, count]) => ({
+        organization: org,
+        sponsorCount: count
       }))
       .sort((a, b) => b.sponsorCount - a.sponsorCount);
   }
 
   private calculateContributionPatterns(sponsorships: SponsorshipData[]) {
-    const highExposureSponsors = sponsorships.filter(s => 
+    const highExposureSponsors = sponsorships.filter(s =>
       this.parseNumeric(s.sponsor?.financialExposure) > 1000000
     );
 
     return {
       averageExposure: sponsorships.length > 0
         ? Math.round(
-            sponsorships.reduce((sum, s) => 
-              sum + this.parseNumeric(s.sponsor?.financialExposure), 0
-            ) / sponsorships.length
-          )
+          sponsorships.reduce((sum, s) =>
+            sum + this.parseNumeric(s.sponsor?.financialExposure), 0
+          ) / sponsorships.length
+        )
         : 0,
       highExposureCount: highExposureSponsors.length,
       concentrationIndex: sponsorships.length > 0
@@ -708,7 +708,7 @@ export class SponsorshipAnalysisService {
   }
 
   private calculateVotingAlignment(sponsorships: SponsorshipData[]) {
-    const alignments = sponsorships.map(s => 
+    const alignments = sponsorships.map(s =>
       this.parseNumeric(s.sponsor?.votingAlignment)
     );
     const validAlignments = alignments.filter(a => a > 0);
@@ -736,7 +736,7 @@ export class SponsorshipAnalysisService {
 
   private async calculateCrossSponsorsAnalysis(coSponsorships: SponsorshipData[]) {
     const sharedConnections = this.calculateSharedConnections(coSponsorships);
-    
+
     // Calculate interconnection rate
     const totalPossibleConnections = coSponsorships.length * (coSponsorships.length - 1) / 2;
     const actualSharedOrgs = sharedConnections.length;
@@ -772,8 +772,8 @@ export class SponsorshipAnalysisService {
       });
 
       // Add organization nodes and edges
-      const affiliations = Array.isArray(sponsorship.sponsor.affiliations) 
-        ? sponsorship.sponsor.affiliations 
+      const affiliations = Array.isArray(sponsorship.sponsor.affiliations)
+        ? sponsorship.sponsor.affiliations
         : [];
 
       affiliations.forEach((affiliation: any) => {
@@ -832,7 +832,7 @@ export class SponsorshipAnalysisService {
     const scores: Record<string, number> = {};
 
     nodes.forEach(node => {
-      const connections = edges.filter(edge => 
+      const connections = edges.filter(edge =>
         edge.source === node.id || edge.target === node.id
       ).length;
       scores[node.id] = connections;
@@ -843,7 +843,7 @@ export class SponsorshipAnalysisService {
 
   private calculateInterconnectionRate(nodes: NetworkNode[], edges: NetworkEdge[]): number {
     if (nodes.length < 2) return 0;
-    
+
     const maxPossibleEdges = (nodes.length * (nodes.length - 1)) / 2;
     return Math.round((edges.length / maxPossibleEdges) * 100);
   }
@@ -854,12 +854,12 @@ export class SponsorshipAnalysisService {
 
   private async calculateIndustryInfluence(sponsorships: SponsorshipData[]) {
     const breakdown = this.calculateIndustryBreakdown(sponsorships);
-    
-    const dominantSector = breakdown.length > 0 
-      ? breakdown.reduce((max, sector) => 
-          sector.percentage > max.percentage ? sector : max, 
-          breakdown[0]
-        )
+
+    const dominantSector = breakdown.length > 0
+      ? breakdown.reduce((max, sector) =>
+        sector.percentage > max.percentage ? sector : max,
+        breakdown[0]
+      )
       : { sector: 'None', percentage: 0, amount: 0 };
 
     return {
@@ -873,8 +873,8 @@ export class SponsorshipAnalysisService {
     const industries = new Map<string, number>();
 
     sponsorships.forEach(sponsorship => {
-      const affiliations = Array.isArray(sponsorship.sponsor?.affiliations) 
-        ? sponsorship.sponsor.affiliations 
+      const affiliations = Array.isArray(sponsorship.sponsor?.affiliations)
+        ? sponsorship.sponsor.affiliations
         : [];
 
       affiliations.forEach((affiliation: any) => {
@@ -914,7 +914,7 @@ export class SponsorshipAnalysisService {
 
   private calculateDiversityIndex(breakdown: any[]): number {
     if (breakdown.length === 0) return 0;
-    
+
     const total = breakdown.reduce((sum, item) => sum + item.amount, 0);
     if (total === 0) return 0;
 
@@ -932,8 +932,8 @@ export class SponsorshipAnalysisService {
     const connections = new Map<string, any>();
 
     sponsorships.forEach(sponsorship => {
-      const affiliations = Array.isArray(sponsorship.sponsor?.affiliations) 
-        ? sponsorship.sponsor.affiliations 
+      const affiliations = Array.isArray(sponsorship.sponsor?.affiliations)
+        ? sponsorship.sponsor.affiliations
         : [];
 
       affiliations.forEach((affiliation: any) => {

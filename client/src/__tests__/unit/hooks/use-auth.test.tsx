@@ -453,7 +453,7 @@ describe('useAuth Hook', () => {
 
       (api.login as any).mockReturnValue(loginPromise);
 
-      act(() => {
+      await act(() => {
         result.current.login({
           email: 'test@example.com',
           password: 'password123'

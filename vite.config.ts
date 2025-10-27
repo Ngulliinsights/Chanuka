@@ -7,6 +7,23 @@ import viteCompression from 'vite-plugin-compression';
 import bundleAnalysisPlugin from './scripts/bundle-analysis-plugin.js';
 
 export default defineConfig({
+  server: {
+    port: 4200,
+    host: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4200',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/ws': {
+        target: 'ws://localhost:4200',
+        ws: true,
+        changeOrigin: true,
+      },
+    },
+  },
+  
   plugins: [
     // Core React plugin
     react(),

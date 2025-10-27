@@ -1,7 +1,7 @@
 import { readDatabase } from '@shared/database/connection'; // Use shared connection
 import {
   sponsor as sponsors, sponsorAffiliation as sponsorAffiliations, sponsorTransparency, billSponsorship as billSponsorships, bill as bills,
-  type Sponsor, type SponsorAffiliation, type SponsorTransparency, type BillSponsorship, type InsertSponsor // Added InsertSponsor
+  type Sponsor, type SponsorAffiliation, type SponsorTransparency, type BillSponsorship, type InsertSponsor, type Bill, type InsertBillSponsorship // Added InsertSponsor
 } from '../../../../../shared/schema'; // Adjusted path
 import { eq, and, sql, desc, asc, count, avg, inArray, like, or, sql as sqlFn } from 'drizzle-orm'; // Added asc, sqlFn alias
 import { logger } from '@shared/core';
@@ -179,13 +179,14 @@ export class SponsorRepository {
       if (options.party) conditions.push(eq(sponsors.party, options.party));
       if (options.role) conditions.push(eq(sponsors.role, options.role));
       if (options.constituency) conditions.push(eq(sponsors.constituency, options.constituency));
-      if (options.conflictLevel) conditions.push(eq(sponsors.conflictLevel, options.conflictLevel));
+      if (options.conflictLevel) conditions.push(eq(sponsors.conflictLevel, options.conflictLevel as any));
 
       // Build query
       let query = this.db.select().from(sponsors);
       if (conditions.length > 0) {
         query = query.where(and(...conditions));
       }
+      query = query.limit(limit).offset(offset);
 
       // Apply sorting
       const sortColumnMap = {
@@ -209,7 +210,7 @@ export class SponsorRepository {
       }
 
 
-      const result = await query.limit(limit).offset(offset);
+      const result = await query;
       logger.debug(`Found ${result.length} sponsors`, logContext);
       return result;
 
@@ -242,9 +243,9 @@ export class SponsorRepository {
       let dbQuery = this.db.select().from(sponsors).where(and(...conditions));
 
       // Simple sort by name for search results
-      dbQuery = dbQuery.orderBy(asc(sponsors.name));
+      dbQuery = dbQuery.orderBy(asc(sponsors.name)).limit(limit).offset(offset);
 
-      const results = await dbQuery.limit(limit).offset(offset);
+      const results = await dbQuery;
       logger.debug(`Found ${results.length} sponsors matching search`, logContext);
       return results;
 
@@ -345,7 +346,7 @@ export class SponsorRepository {
      logger.debug("Adding sponsor affiliation", logContext);
     try {
        // Explicitly set isActive default if not provided
-       const dataToInsert = { ...affiliationData, isActive: affiliationData.isActive ?? true, createdAt: new Date() };
+       const dataToInsert = { ...affiliationData, isActive: affiliationData.isActive ?? true, createdAt: new Date() } as any;
 
       const [newAffiliation] = await this.db.insert(sponsorAffiliations)
         .values(dataToInsert)
@@ -365,9 +366,9 @@ export class SponsorRepository {
      const logContext = { component: 'SponsorRepository', operation: 'updateAffiliation', affiliationId: id };
      logger.debug("Updating sponsor affiliation", logContext);
     try {
-       const dataToUpdate = { ...updateData, updatedAt: new Date() };
-        // Remove undefined keys
-       Object.keys(dataToUpdate).forEach(key => (dataToUpdate as any)[key] === undefined && delete (dataToUpdate as any)[key]);
+       const dataToUpdate = { ...updateData, updatedAt: new Date() } as any;
+         // Remove undefined keys
+        Object.keys(dataToUpdate).forEach(key => (dataToUpdate as any)[key] === undefined && delete (dataToUpdate as any)[key]);
 
       const [updatedAffiliation] = await this.db.update(sponsorAffiliations)
         .set(dataToUpdate)
@@ -595,7 +596,7 @@ export class SponsorRepository {
   }
 
    /** Updates an existing sponsorship record. */
-  async updateBillSponsorship(id: number, updateData: Partial<schema.InsertBillSponsorship>): Promise<BillSponsorship | null> {
+  async updateBillSponsorship(id: number, updateData: Partial<InsertBillSponsorship>): Promise<BillSponsorship | null> {
        const logContext = { component: 'SponsorRepository', operation: 'updateBillSponsorship', sponsorshipId: id };
        logger.debug("Updating bill sponsorship", logContext);
        try {
@@ -638,7 +639,7 @@ export class SponsorRepository {
   // BILL DATA ACCESS (Needed for context)
   // ============================================================================
 
-  async getBill(billId: number): Promise<schema.Bill | null> {
+  async getBill(billId: number): Promise<Bill | null> {
      const logContext = { component: 'SponsorRepository', operation: 'getBill', billId };
      logger.debug("Fetching bill details", logContext);
     try {
@@ -651,7 +652,7 @@ export class SponsorRepository {
     }
   }
 
-  async getBillsByIds(billIds: number[]): Promise<schema.Bill[]> {
+  async getBillsByIds(billIds: number[]): Promise<Bill[]> {
      const logContext = { component: 'SponsorRepository', operation: 'getBillsByIds', count: billIds.length };
      logger.debug("Fetching multiple bills by IDs", logContext);
     try {
@@ -664,7 +665,7 @@ export class SponsorRepository {
   }
 
    /** Finds bills whose content/title/description mention an organization. */
-   async findBillsMentioningOrganization(organization: string, billIds?: number[]): Promise<schema.Bill[]> {
+   async findBillsMentioningOrganization(organization: string, billIds?: number[]): Promise<Bill[]> {
        const logContext = { component: 'SponsorRepository', operation: 'findBillsMentioningOrganization', organization };
        logger.debug("Finding bills mentioning organization", logContext);
        try {

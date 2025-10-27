@@ -1,13 +1,20 @@
-import { FC } from 'react';
-import UserProfile from '../components/profile/user-profile';
-import { logger } from '../utils/browser-logger';
+import React from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 
-const UserProfilePage: FC = () => {
+export default function UserProfilePage() {
   return (
-    <div className="pb-20 lg:pb-0">
-      <UserProfile />
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-8">User Profile</h1>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Profile Settings</CardTitle>
+          <CardDescription>Manage your account and preferences</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600">Profile management coming soon...</p>
+        </CardContent>
+      </Card>
     </div>
   );
-};
-
-export default UserProfilePage;
+}

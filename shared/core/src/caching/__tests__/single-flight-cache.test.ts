@@ -160,7 +160,9 @@ describe('SingleFlightCache', () => {
   });
 
   afterEach(() => {
+    cleanup();
     cache.destroy();
+  
   });
 
   describe('Single Flight Pattern', () => {

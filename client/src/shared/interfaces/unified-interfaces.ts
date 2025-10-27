@@ -226,12 +226,15 @@ export interface ValidationResult {
   data?: any;
 }
 
-export interface ValidationError {
+export interface ValidationErrorDetail {
   field: string;
   message: string;
   code: string;
   value?: any;
 }
+
+// Type alias for backward compatibility
+export type ValidationError = ValidationErrorDetail;
 
 export interface ValidationSchema<T = any> {
   schema: z.ZodSchema<T>;

@@ -1,19 +1,125 @@
 /**
  * Core Types Index
- * 
+ *
  * Central export point for all core types
+ * Explicit re-exports with aliases to resolve naming conflicts
  */
 
 // Export all type files
 export * from './auth.types';
-export * from './services';
+// Export services types with explicit exports to resolve ValidationResult conflict
+export type {
+  Services,
+  CacheService as ServicesCacheService,
+  ValidationService as ServicesValidationService,
+  RateLimitStore as ServicesRateLimitStore,
+  RateLimitInfo,
+  HealthChecker as ServicesHealthChecker,
+  HealthStatus as ServicesHealthStatus
+} from './services';
+
 export * from './validation-types';
 
-// Export types from other modules
-export * from '../caching/types';
+// Export types from other modules with conflict resolution
+
+// Caching types - explicit exports to avoid conflicts
+export type {
+  CacheOptions,
+  CacheMetrics,
+  CacheHealthStatus,
+  CacheEvent,
+  SingleFlightOptions
+} from '../caching/types';
+
+// CircuitBreakerState conflicts resolved with aliases
+export type { CircuitBreakerState as CacheCircuitBreakerState } from '../caching/types';
+export { CircuitBreakerState as ObservabilityCircuitBreakerState } from '../observability/error-management/patterns/circuit-breaker';
+// Database CircuitBreakerState is defined inline in connection-manager.ts, skip aliasing
+
+// HealthStatus conflicts resolved with aliases
+export type { HealthStatus as ObservabilityHealthStatus } from '../observability/health/types';
+export type { HealthStatus as MiddlewareHealthStatus } from '../middleware/types';
+
+// RateLimitStore conflicts resolved with aliases
+export type { RateLimitStore as RateLimitingStore } from '../rate-limiting/types';
+export type { RateLimitStore as MiddlewareRateLimitStore } from '../middleware/types';
+
+// ValidationError conflicts resolved with aliases
+export { ValidationError as ValidationTypesError } from '../validation/types';
+export { ValidationError as ErrorManagementValidationError } from '../observability/error-management/errors/specialized-errors';
+export type { ValidationError as ValidationTypesAlias } from './validation-types';
+export { ValidationError as ModernizationValidationError } from '../modernization/types';
+
+// ValidationResult conflicts resolved with aliases
+export type { ValidationResult as ValidationTypesResult } from '../validation/types';
+export type { ValidationResult as CoreValidationResult } from '../validation/core/interfaces';
+export type { ValidationResult as TypesValidationResult } from './validation-types';
+export type { ValidationResult as MiddlewareValidationResult } from '../middleware/types';
+
+// Config types
 export * from '../config/types';
-export * from '../middleware/types';
-export * from '../modernization/types';
-export * from '../observability/types';
-export * from '../rate-limiting/types';
-export * from '../validation/types';
+
+// Middleware types (excluding conflicting ones already aliased above)
+export type {
+  RegularMiddleware,
+  ErrorMiddleware,
+  AnyMiddleware,
+  PerformanceMetrics,
+  DetailedMetrics,
+  CacheService,
+  ValidationService,
+  HealthChecker
+} from '../middleware/types';
+
+// Modernization types (excluding conflicting ValidationError already aliased)
+export type {
+  ModernizationTask,
+  ModernizationPhase,
+  ModernizationConfig,
+  ValidationScope,
+  ValidationCheck,
+  ValidationStatus,
+  ValidationType,
+  BackupResult,
+  ProgressState,
+  ValidationResult as ModernizationValidationResult
+} from '../modernization/types';
+
+// Observability types (excluding conflicting ones already aliased above)
+export type {
+  ObservabilityConfig,
+  ObservabilityContext,
+  ObservabilityEvent,
+  ObservabilityProvider,
+  ObservabilityMiddleware,
+  ObservabilityStack,
+  TelemetryData,
+  TelemetryExporter,
+  CircuitBreakerMetrics,
+  HealthCheckResult
+} from '../observability/types';
+
+// Rate limiting types (excluding conflicting RateLimitStore already aliased)
+export type {
+  RateLimitOptions,
+  RateLimitResult,
+  RateLimitHeaders,
+  RateLimitBucket,
+  RateLimitData,
+  IRateLimitStore,
+  RateLimitConfig,
+  AIRateLimitOptions
+} from '../rate-limiting/types';
+
+// Validation types (excluding conflicting ones already aliased above)
+export type {
+  ValidationOptions,
+  BatchValidationResult,
+  CachedValidationResult,
+  SchemaRegistration,
+  ValidationContext,
+  ValidationMetrics,
+  ValidationServiceConfig,
+  ValidationErrorDetail,
+  LegacyValidationResult
+} from '../validation/types';

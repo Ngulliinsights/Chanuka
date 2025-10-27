@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
+
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { MemoryRateLimitStore } from '../stores/memory-store';
 

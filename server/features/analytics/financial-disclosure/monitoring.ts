@@ -10,12 +10,12 @@ import {
 import { eq, gte, and, sql, desc, inArray } from "drizzle-orm";
 import { PgDatabase } from "drizzle-orm/pg-core";
 import { CacheService } from "../../../infrastructure/cache/cache-service.js";
-import { logger } from "../../../utils/logger.js";
+import { logger } from "../../../../shared/core/src/observability/logging/logger.js";
 import {
   NotFoundError as SponsorNotFoundError,
   DatabaseError,
   ValidationError as InvalidInputError
-} from '@shared/core';
+} from '../../../utils/errors.js';
 import { FinancialDisclosureConfig } from './config.js';
 import type {
   FinancialDisclosure,
@@ -244,27 +244,28 @@ export class FinancialDisclosureMonitoringService {
 
     const cacheKey = this.config.cache.keyPrefixes.sponsor(sponsorId);
     
-    return await this.cache.getOrSet(
-      cacheKey,
-      async () => {
-        const result = await this.readDb
-          .select({
-            id: sponsors.id,
-            name: sponsors.name,
-            isActive: sponsors.isActive
-          })
-          .from(sponsors)
-          .where(eq(sponsors.id, sponsorId))
-          .limit(1);
+    const cached = await this.cache.get<SponsorInfo>(cacheKey);
+    if (cached) {
+      return cached;
+    }
 
-        if (result.length === 0) {
-          throw new SponsorNotFoundError(`Sponsor with ID ${sponsorId} not found.`);
-        }
+    const result = await this.readDb
+      .select({
+        id: sponsors.id,
+        name: sponsors.name,
+        isActive: sponsors.isActive
+      })
+      .from(sponsors)
+      .where(eq(sponsors.id, sponsorId))
+      .limit(1);
 
-        return result[0];
-      },
-      this.config.cache.ttl.sponsorInfo
-    );
+    if (result.length === 0) {
+      throw new SponsorNotFoundError(`Sponsor with ID ${sponsorId} not found.`);
+    }
+
+    const sponsorInfo = result[0];
+    await this.cache.set(cacheKey, sponsorInfo, this.config.cache.ttl.sponsorInfo);
+    return sponsorInfo;
   }
 
   /**
@@ -280,26 +281,27 @@ export class FinancialDisclosureMonitoringService {
       : this.config.cache.keyPrefixes.allDisclosures();
 
     try {
-      return await this.cache.getOrSet(
-        cacheKey,
-        async () => {
-          let query = this.readDb
-            .select()
-            .from(sponsorTransparency)
-            .$dynamic();
+      const cached = await this.cache.get<FinancialDisclosure[]>(cacheKey);
+      if (cached) {
+        return cached;
+      }
 
-          if (sponsorId) {
-            query = query.where(eq(sponsorTransparency.sponsorId, sponsorId));
-          }
+      let query = this.readDb
+        .select()
+        .from(sponsorTransparency)
+        .$dynamic();
 
-          const rawDisclosures = await query.orderBy(
-            desc(sponsorTransparency.dateReported)
-          );
+      if (sponsorId) {
+        query = query.where(eq(sponsorTransparency.sponsorId, sponsorId));
+      }
 
-          return rawDisclosures.map(d => this.enhanceDisclosure(d));
-        },
-        this.config.cache.ttl.disclosureData
+      const rawDisclosures = await query.orderBy(
+        desc(sponsorTransparency.dateReported)
       );
+
+      const disclosures = rawDisclosures.map(d => this.enhanceDisclosure(d));
+      await this.cache.set(cacheKey, disclosures, this.config.cache.ttl.disclosureData);
+      return disclosures;
     } catch (error) {
       this.logger.error('Error collecting financial disclosures', { sponsorId, error });
       throw new DatabaseError('Failed to collect financial disclosures.');
@@ -710,7 +712,7 @@ export class FinancialDisclosureMonitoringService {
       const thresholdConditions = Object.entries(this.config.thresholds)
         .map(([type, threshold]) =>
           and(
-            eq(sponsorTransparency.disclosureType, type),
+            eq(sponsorTransparency.disclosureType, type as any),
             sql`CAST(${sponsorTransparency.amount} AS NUMERIC) > ${threshold}`
           )
         );
@@ -958,7 +960,7 @@ export class FinancialDisclosureMonitoringService {
   private async createNotifications(alerts: FinancialAlert[]): Promise<void> {
     const notificationValues = alerts.map(alert => ({
       userId: this.config.alerting.adminUserId,
-      type: 'financial_disclosure_alert' as const,
+      type: 'bill_update' as const, // Use existing notification type
       title: `[${alert.severity.toUpperCase()}] ${alert.type.replace(/_/g, ' ')}`,
       message: `${alert.sponsorName}: ${alert.description}`,
       isRead: false,
@@ -1031,25 +1033,19 @@ export class FinancialDisclosureMonitoringService {
   private async checkCacheHealth(): Promise<HealthCheckResult> {
     try {
       const stats = this.cache.getStats();
-      
-      // Check if cache is being used effectively
-      const hitRate = stats.hits + stats.misses > 0
-        ? stats.hits / (stats.hits + stats.misses)
-        : 0;
 
-      if (hitRate < 0.5 && stats.hits + stats.misses > 100) {
+      // Simple health check based on cache size
+      if (stats.size > 10000) {
         return {
           name: 'Cache',
           status: 'degraded',
-          message: `Low cache hit rate: ${(hitRate * 100).toFixed(1)}%`,
-          stats
+          message: `Cache size is high: ${stats.size} entries`
         };
       }
 
       return {
         name: 'Cache',
-        status: 'healthy',
-        stats
+        status: 'healthy'
       };
     } catch (error) {
       return {

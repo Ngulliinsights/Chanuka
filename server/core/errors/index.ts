@@ -1,9 +1,15 @@
 // Errors module exports - Consolidated with shared/core
-export * from '../../../shared/core/index.js';
+// Avoid re-exporting ErrorDomain and ErrorSeverity to prevent conflicts
+export {
+  BaseError,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError
+} from '../../../shared/core/index.js';
 export * from '../../utils/errors.js';
 
 // Re-export server-specific error handling
-export { errorTracker } from './error-tracker.js';
 export { errorTracker } from './error-tracker.js';
 
 

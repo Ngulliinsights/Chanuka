@@ -11,6 +11,7 @@ import {
   IValidationService,
   IBatchValidationResult,
   IValidationServiceConfig,
+  ValidationErrorDetail,
 } from '../core/interfaces';
 import { CoreValidationService } from '../core/validation-service';
 
@@ -53,7 +54,12 @@ export class CustomSchemaAdapter implements ISchemaAdapter {
       }
       // Convert other errors to ValidationError
       const message = error instanceof Error ? error.message : 'Custom validation failed';
-      throw new ValidationError(message, { originalError: error, schema: schema.description });
+      throw new ValidationError(message, [{
+        field: 'data',
+        code: 'custom_validation_failed',
+        message: message,
+        value: data
+      }], { originalError: error, schema: schema.description });
     }
   }
 
@@ -63,12 +69,27 @@ export class CustomSchemaAdapter implements ISchemaAdapter {
       return { success: true, data: result };
     } catch (error) {
       if (error instanceof ValidationError) {
-        return { success: false, error };
+        return { success: false, errors: error.errors.map(err => ({
+          field: err.field || 'data',
+          message: err.message,
+          code: err.code,
+          value: err.value
+        })) };
       }
       // Convert other errors to ValidationError
       const message = error instanceof Error ? error.message : 'Custom validation failed';
-      const validationError = new ValidationError(message, { originalError: error });
-      return { success: false, error: validationError };
+      const validationError = new ValidationError(message, [{
+        field: 'data',
+        code: 'custom_validation_failed',
+        message: message,
+        value: data
+      }], { originalError: error });
+      return { success: false, errors: validationError.errors.map(err => ({
+        field: err.field || 'data',
+        message: err.message,
+        code: err.code,
+        value: err.value
+      })) };
     }
   }
 }
@@ -103,8 +124,8 @@ export class CustomValidationService extends CoreValidationService implements IV
           this.updateMetrics('cacheHit', startTime);
           if (cached.success && cached.data) {
             return cached.data;
-          } else if (!cached.success && cached.error) {
-            throw cached.error;
+          } else if (!cached.success && cached.errors && cached.errors.length > 0) {
+            throw cached.errors[0];
           }
         } else {
           this.updateMetrics('cacheMiss');
@@ -134,7 +155,12 @@ export class CustomValidationService extends CoreValidationService implements IV
         // Cache validation error
         if (mergedOptions.useCache && this.config.cache?.enabled) {
           const cacheKey = this.generateCacheKey(schema, data, mergedOptions);
-          this.setCache(cacheKey, { success: false, error }, mergedOptions.cacheTtl);
+          this.setCache(cacheKey, { success: false, errors: error.errors.map(err => ({
+            field: err.field || 'data',
+            message: err.message,
+            code: err.code,
+            value: err.value
+          })) }, mergedOptions.cacheTtl);
         }
 
         this.updateMetrics('failure', startTime, context, error);
@@ -185,16 +211,29 @@ export class CustomValidationService extends CoreValidationService implements IV
         this.setCache(cacheKey, result, mergedOptions.cacheTtl);
       }
 
-      this.updateMetrics(result.success ? 'success' : 'failure', startTime, context, result.error);
+      this.updateMetrics(result.success ? 'success' : 'failure', startTime, context);
       return result;
 
     } catch (error) {
       // Handle unexpected errors
       const validationError = new ValidationError(
         error instanceof Error ? error.message : 'Unknown validation error',
+        [{
+          field: 'data',
+          code: 'unknown_validation_error',
+          message: error instanceof Error ? error.message : 'Unknown validation error',
+          value: data
+        }],
         { originalError: error }
       );
-      const errorResult = { success: false, error: validationError } as IValidationResult<T>;
+      const errorDetails: ValidationErrorDetail[] = validationError.errors.map(err => ({
+        field: err.field || 'data',
+        message: err.message,
+        code: err.code,
+        value: err.value,
+        context: { originalError: error }
+      }));
+      const errorResult = { success: false, errors: errorDetails } as IValidationResult<T>;
 
       this.updateMetrics('failure', startTime, context, validationError);
       return errorResult;
@@ -211,7 +250,7 @@ export class CustomValidationService extends CoreValidationService implements IV
     const invalid: Array<{
       index: number;
       data: unknown;
-      error: ValidationError;
+      errors: ValidationErrorDetail[];
     }> = [];
 
     // Process all items
@@ -227,22 +266,32 @@ export class CustomValidationService extends CoreValidationService implements IV
         const { result, index, data } = promiseResult.value;
         if (result.success && result.data) {
           valid.push(result.data);
-        } else if (!result.success && result.error) {
+        } else if (!result.success && result.errors && result.errors.length > 0) {
           invalid.push({
             index,
             data,
-            error: result.error,
+            errors: result.errors,
           });
         }
       } else {
         // Handle promise rejection (shouldn't happen with validateSafe, but just in case)
-        const error = new ValidationError('Batch validation promise rejected', {
+        const error = new ValidationError('Batch validation promise rejected', [{
+          field: 'batch',
+          code: 'batch_validation_failed',
+          message: 'Batch validation promise rejected',
+          value: promiseResult.reason
+        }], {
           reason: promiseResult.reason
         });
         invalid.push({
           index: -1,
           data: null,
-          error,
+          errors: error.errors.map(err => ({
+            field: err.field || 'batch',
+            message: err.message,
+            code: err.code,
+            value: err.value
+          })),
         });
       }
     });
@@ -250,9 +299,12 @@ export class CustomValidationService extends CoreValidationService implements IV
     return {
       valid,
       invalid,
-      totalCount: dataArray.length,
-      validCount: valid.length,
-      invalidCount: invalid.length,
+      summary: {
+        total: dataArray.length,
+        valid: valid.length,
+        invalid: invalid.length,
+        successRate: valid.length / dataArray.length,
+      },
     };
   }
 }

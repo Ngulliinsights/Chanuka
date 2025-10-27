@@ -55,7 +55,7 @@ describe('Auth Component Integration', () => {
       // Fill form with valid data
       const loginData = createMockLoginData();
       
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', loginData.email));
         result.current.handleInputChange(createMockChangeEvent('password', loginData.password));
       });
@@ -85,7 +85,7 @@ describe('Auth Component Integration', () => {
       // Fill form
       const loginData = createMockLoginData();
       
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', loginData.email));
         result.current.handleInputChange(createMockChangeEvent('password', 'wrongpassword'));
       });
@@ -107,13 +107,13 @@ describe('Auth Component Integration', () => {
       const { result } = renderHook(() => useAuthForm());
       
       // Fill form with invalid data
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'invalid-email'));
         result.current.handleInputChange(createMockChangeEvent('password', 'short'));
       });
       
       // Trigger validation
-      act(() => {
+      await act(() => {
         result.current.handleBlur(createMockChangeEvent('email', 'invalid-email'));
         result.current.handleBlur(createMockChangeEvent('password', 'short'));
       });
@@ -146,7 +146,7 @@ describe('Auth Component Integration', () => {
       // Fill form with valid registration data
       const registerData = createMockRegisterData();
       
-      act(() => {
+      await act(() => {
         Object.entries(registerData).forEach(([key, value]) => {
           result.current.handleInputChange(createMockChangeEvent(key, value));
         });
@@ -179,14 +179,14 @@ describe('Auth Component Integration', () => {
       const { result } = renderHook(() => useAuthForm({ initialMode: 'register' }));
       
       // Test weak password
-      act(() => {
+      await act(() => {
         result.current.handleBlur(createMockChangeEvent('password', 'weakpass'));
       });
       
       expect(result.current.errors.password).toBeTruthy();
       
       // Test strong password
-      act(() => {
+      await act(() => {
         result.current.handleBlur(createMockChangeEvent('password', 'StrongP@ssw0rd123!'));
       });
       
@@ -197,19 +197,19 @@ describe('Auth Component Integration', () => {
       const { result } = renderHook(() => useAuthForm({ initialMode: 'register' }));
       
       // Set password first
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('password', 'StrongP@ssw0rd123!'));
       });
       
       // Set mismatched confirm password
-      act(() => {
+      await act(() => {
         result.current.handleBlur(createMockChangeEvent('confirmPassword', 'DifferentP@ssw0rd123!'));
       });
       
       expect(result.current.errors.confirmPassword).toContain("don't match");
       
       // Fix confirm password
-      act(() => {
+      await act(() => {
         result.current.handleBlur(createMockChangeEvent('confirmPassword', 'StrongP@ssw0rd123!'));
       });
       
@@ -227,7 +227,7 @@ describe('Auth Component Integration', () => {
       expect(result.current.isLoginMode).toBe(true);
       
       // Fill some data and create errors
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleBlur(createMockChangeEvent('password', 'short'));
       });
@@ -236,7 +236,7 @@ describe('Auth Component Integration', () => {
       expect(result.current.errors.password).toBeTruthy();
       
       // Switch to register mode
-      act(() => {
+      await act(() => {
         result.current.toggleMode();
       });
       
@@ -247,7 +247,7 @@ describe('Auth Component Integration', () => {
       expect(onModeChange).toHaveBeenCalledWith('register');
       
       // Switch back to login
-      act(() => {
+      await act(() => {
         result.current.toggleMode();
       });
       
@@ -264,7 +264,7 @@ describe('Auth Component Integration', () => {
       const { result } = renderHook(() => useAuthForm());
       
       // Fill valid form
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleInputChange(createMockChangeEvent('password', 'password123'));
       });
@@ -367,7 +367,7 @@ describe('Auth Component Integration', () => {
       ];
       
       inputs.forEach(({ name, value, expected }) => {
-        act(() => {
+        await act(() => {
           result.current.handleInputChange(createMockChangeEvent(name, value));
         });
         
@@ -393,7 +393,7 @@ describe('Auth Component Integration', () => {
       ];
       
       // Execute actions rapidly
-      act(() => {
+      await act(() => {
         actions.forEach(action => action());
       });
       
@@ -408,7 +408,7 @@ describe('Auth Component Integration', () => {
       const { result } = renderHook(() => useAuthForm());
       
       // Fill form
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleInputChange(createMockChangeEvent('password', 'wrongpassword'));
       });
@@ -451,7 +451,7 @@ describe('Auth Component Integration', () => {
       const { result } = renderHook(() => useAuthForm());
       
       // Fill form
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleInputChange(createMockChangeEvent('password', 'password123'));
       });
@@ -474,7 +474,7 @@ describe('Auth Component Integration', () => {
       const { result } = renderHook(() => useAuthForm());
       
       // Fill form and create error
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleBlur(createMockChangeEvent('email', 'invalid-email'));
       });
@@ -500,7 +500,7 @@ describe('Auth Component Integration', () => {
       ];
       
       testCases.forEach(({ field, value, expectedError }) => {
-        act(() => {
+        await act(() => {
           result.current.handleBlur(createMockChangeEvent(field, value));
         });
         

@@ -1,4 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// Mock fetch
+global.fetch = vi.fn(() =>
+  Promise.resolve({
+    ok: true,
+    status: 200,
+    json: () => Promise.resolve({}),
+    text: () => Promise.resolve(''),
+  } as Response)
+);
+
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useApiWithFallback, useMutation, useApiPost } from '../use-api-with-fallback';
 import * as apiErrorHandling from '@/$2/api-error-handling';
@@ -143,7 +153,7 @@ describe('useApiWithFallback', () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    act(() => {
+    await act(() => {
       result.current.refetch();
     });
 
@@ -173,7 +183,7 @@ describe('useApiWithFallback', () => {
       expect(result.current.error).toEqual(mockError);
     });
 
-    act(() => {
+    await act(() => {
       result.current.clearError();
     });
 
@@ -323,7 +333,7 @@ describe('useMutation', () => {
 
     expect(result.current.data).toEqual(mockData);
 
-    act(() => {
+    await act(() => {
       result.current.reset();
     });
 

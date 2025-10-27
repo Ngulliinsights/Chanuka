@@ -294,7 +294,7 @@ describe('PageErrorBoundary Integration Tests', () => {
       rejectionEvent.reason = new Error('Unhandled promise rejection');
       rejectionEvent.preventDefault = vi.fn();
 
-      act(() => {
+      await act(() => {
         window.dispatchEvent(rejectionEvent);
       });
 
@@ -323,7 +323,7 @@ describe('PageErrorBoundary Integration Tests', () => {
         colno: 1,
       });
 
-      act(() => {
+      await act(() => {
         window.dispatchEvent(errorEvent);
       });
 

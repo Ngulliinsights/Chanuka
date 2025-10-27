@@ -98,7 +98,7 @@ describe('Dashboard Hooks', () => {
     it('should provide reset action', () => {
       const { result } = renderHook(() => useDashboard());
 
-      act(() => {
+      await act(() => {
         result.current.actions.reset();
       });
 

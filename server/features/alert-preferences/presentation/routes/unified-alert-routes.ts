@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth';
+import { authenticateToken, AuthenticatedRequest } from '../../../../middleware/auth';
 import {
   unifiedAlertPreferenceService,
   alertPreferenceSchema,
@@ -14,7 +14,7 @@ import {
   ApiError,
   ApiValidationError, 
   ApiResponseWrapper 
-} from "../../../shared/core/src/utils/api";
+} from "../../../../../shared/core/src/utils/api-utils.js";
 import { logger } from '@shared/core';
 
 export const router = Router();
@@ -64,526 +64,9 @@ const verifyChannelSchema = z.object({
 // ============================================================================
 
 /**
- * POST /api/alert-preferences/:preferenceId/process-batch
- * Manually trigger processing of batched alerts for a preference
- */
-router.post(
-  '/:preferenceId/process-batch',
-  authenticateToken,
-  async (req: AuthenticatedRequest, res) => {
-    const startTime = Date.now();
-    
-    try {
-      const userId = req.user!.id;
-      const preferenceId = req.params.preferenceId;
-      
-      const processedCount = await unifiedAlertPreferenceService.processBatchedAlerts(
-        userId,
-        preferenceId
-      );
-      
-      return ApiSuccess(
-        res,
-        {
-          success: true,
-          processedCount,
-          message: `Processed ${processedCount} batched alerts`
-        },
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
-    } catch (error) {
-      return handleError(res, error, 'Failed to process batched alerts', startTime);
-    }
-  }
-);
-
-// ============================================================================
-// DELIVERY LOGS AND ANALYTICS ROUTES
-// ============================================================================
-
-/**
- * GET /api/alert-preferences/delivery-logs
- * Get delivery logs with pagination and filtering
- */
-router.get('/logs/delivery', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
-  
-  try {
-    const userId = req.user!.id;
-    const query = deliveryLogsQuerySchema.parse(req.query);
-    
-    const result = await unifiedAlertPreferenceService.getAlertDeliveryLogs(userId, {
-      page: query.page,
-      limit: query.limit,
-      alertType: query.alertType,
-      status: query.status,
-      startDate: query.startDate ? new Date(query.startDate) : undefined,
-      endDate: query.endDate ? new Date(query.endDate) : undefined
-    });
-    
-    return ApiSuccess(
-      res, 
-      result, 
-      ApiResponseWrapper.createMetadata(startTime, 'database')
-    );
-  } catch (error) {
-    return handleError(res, error, 'Failed to fetch delivery logs', startTime);
-  }
-});
-
-/**
- * GET /api/alert-preferences/stats
- * Get comprehensive statistics about alert preferences and delivery
- */
-router.get('/analytics/stats', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
-  
-  try {
-    const userId = req.user!.id;
-    const stats = await unifiedAlertPreferenceService.getAlertPreferenceStats(userId);
-    
-    return ApiSuccess(
-      res, 
-      stats, 
-      ApiResponseWrapper.createMetadata(startTime, 'database')
-    );
-  } catch (error) {
-    return handleError(res, error, 'Failed to fetch alert preference stats', startTime);
-  }
-});
-
-// ============================================================================
-// TESTING AND DEBUGGING ROUTES
-// ============================================================================
-
-/**
- * POST /api/alert-preferences/test-filtering
- * Test smart filtering logic without actually sending alerts
- * (Development/testing only)
- */
-router.post('/test/filtering', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
-  
-  try {
-    // Only allow in non-production environments
-    if (process.env.NODE_ENV === 'production') {
-      return ApiError(
-        res, 
-        'Test endpoint not available in production', 
-        403, 
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
-    }
-    
-    const userId = req.user!.id;
-    const { alertType, alertData, preferenceId } = req.body;
-    
-    // Validate required fields
-    if (!alertType || !alertData || !preferenceId) {
-      return ApiError(
-        res, 
-        'alertType, alertData, and preferenceId are required', 
-        400, 
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
-    }
-    
-    // Get the preference
-    const preference = await unifiedAlertPreferenceService.getAlertPreference(
-      userId, 
-      preferenceId
-    );
-    
-    if (!preference) {
-      return ApiError(
-        res, 
-        'Alert preference not found', 
-        404, 
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
-    }
-    
-    // Process smart filtering
-    const filteringResult = await unifiedAlertPreferenceService.processSmartFiltering(
-      userId,
-      alertType,
-      alertData,
-      preference
-    );
-    
-    return ApiSuccess(
-      res,
-      {
-        filteringResult,
-        preference: {
-          id: preference.id,
-          name: preference.name,
-          smartFiltering: preference.smartFiltering
-        }
-      },
-      ApiResponseWrapper.createMetadata(startTime, 'database')
-    );
-  } catch (error) {
-    return handleError(res, error, 'Failed to test smart filtering', startTime);
-  }
-});
-
-/**
- * POST /api/alert-preferences/:preferenceId/test-channel
- * Send a test notification to a specific channel
- */
-router.post(
-  '/:preferenceId/test-channel',
-  authenticateToken,
-  async (req: AuthenticatedRequest, res) => {
-    const startTime = Date.now();
-    
-    try {
-      const userId = req.user!.id;
-      const preferenceId = req.params.preferenceId;
-      const { channelType } = z.object({
-        channelType: z.enum(['in_app', 'email', 'push', 'sms', 'webhook'])
-      }).parse(req.body);
-      
-      // Get the preference to verify channel exists
-      const preference = await unifiedAlertPreferenceService.getAlertPreference(
-        userId,
-        preferenceId
-      );
-      
-      if (!preference) {
-        return ApiError(
-          res,
-          'Alert preference not found',
-          404,
-          ApiResponseWrapper.createMetadata(startTime, 'database')
-        );
-      }
-      
-      const channel = preference.channels.find(ch => ch.type === channelType);
-      
-      if (!channel) {
-        return ApiError(
-          res,
-          `Channel ${channelType} not found in preference`,
-          404,
-          ApiResponseWrapper.createMetadata(startTime, 'database')
-        );
-      }
-      
-      if (!channel.enabled) {
-        return ApiError(
-          res,
-          `Channel ${channelType} is not enabled`,
-          400,
-          ApiResponseWrapper.createMetadata(startTime, 'database')
-        );
-      }
-      
-      // Send test alert
-      const testAlertData = {
-        title: `Test ${channelType} Notification`,
-        message: `This is a test notification for the ${channelType} channel.`,
-        billId: 0,
-        timestamp: new Date().toISOString()
-      };
-      
-      const deliveryLogs = await unifiedAlertPreferenceService.processAlertDelivery(
-        userId,
-        'bill_status_change',
-        testAlertData,
-        'normal'
-      );
-      
-      return ApiSuccess(
-        res,
-        {
-          success: true,
-          message: `Test notification sent via ${channelType}`,
-          deliveryLogs
-        },
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
-    } catch (error) {
-      return handleError(res, error, 'Failed to send test notification', startTime);
-    }
-  }
-);
-
-// ============================================================================
-// ADMIN/SERVICE ROUTES
-// ============================================================================
-
-/**
- * GET /api/alert-preferences/service/stats
- * Get service-level statistics (admin only)
- */
-router.get('/service/stats', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
-  
-  try {
-    // Check if user has admin role
-    if (req.user!.role !== 'admin') {
-      return ApiError(
-        res, 
-        'Insufficient permissions', 
-        403, 
-        ApiResponseWrapper.createMetadata(startTime, 'database')
-      );
-    }
-    
-    const stats = unifiedAlertPreferenceService.getServiceStats();
-    
-    return ApiSuccess(
-      res, 
-      stats, 
-      ApiResponseWrapper.createMetadata(startTime, 'database')
-    );
-  } catch (error) {
-    return handleError(res, error, 'Failed to fetch service stats', startTime);
-  }
-});
-
-/**
- * GET /api/alert-preferences/service/health
- * Health check endpoint for monitoring
- */
-router.get('/service/health', async (req, res) => {
-  const startTime = Date.now();
-  
-  try {
-    const health = {
-      status: 'healthy',
-      service: 'unified-alert-preferences',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime()
-    };
-    
-    return ApiSuccess(
-      res,
-      health,
-      ApiResponseWrapper.createMetadata(startTime, 'database')
-    );
-  } catch (error) {
-    return ApiError(
-      res,
-      'Service unhealthy',
-      503,
-      ApiResponseWrapper.createMetadata(startTime, 'database')
-    );
-  }
-});
-
-// ============================================================================
-// BULK OPERATIONS
-// ============================================================================
-
-/**
- * POST /api/alert-preferences/bulk/update
- * Update multiple preferences at once
- */
-router.post('/bulk/update', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
-  
-  try {
-    const userId = req.user!.id;
-    const { updates } = z.object({
-      updates: z.array(z.object({
-        preferenceId: z.string(),
-        data: updatePreferenceSchema
-      }))
-    }).parse(req.body);
-    
-    const results: Array<{ success: boolean; preferenceId: string; preference?: any; error?: string }> = [];
-
-    for (const update of updates) {
-      try {
-        const updatedPreference = await unifiedAlertPreferenceService.updateAlertPreference(
-          userId,
-          update.preferenceId,
-          update.data
-        );
-        results.push({ success: true, preferenceId: update.preferenceId, preference: updatedPreference });
-      } catch (error) {
-        results.push({
-          success: false,
-          preferenceId: update.preferenceId,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        });
-      }
-    }
-    
-    const successCount = results.filter(r => r.success).length;
-    const failCount = results.filter(r => !r.success).length;
-    
-    return ApiSuccess(
-      res,
-      {
-        results,
-        summary: {
-          total: results.length,
-          successful: successCount,
-          failed: failCount
-        }
-      },
-      ApiResponseWrapper.createMetadata(startTime, 'database')
-    );
-  } catch (error) {
-    return handleError(res, error, 'Failed to bulk update preferences', startTime);
-  }
-});
-
-export default router;
-
-/**
- * POST /api/alert-preferences/bulk/enable
- * Enable or disable multiple preferences at once
- */
-router.post('/bulk/enable', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
-  
-  try {
-    const userId = req.user!.id;
-    const { preferenceIds, isActive } = z.object({
-      preferenceIds: z.array(z.string()).min(1),
-      isActive: z.boolean()
-    }).parse(req.body);
-    
-    const results: Array<{ success: boolean; preferenceId: string; preference?: any; error?: string }> = [];
-
-    for (const preferenceId of preferenceIds) {
-      try {
-        const updatedPreference = await unifiedAlertPreferenceService.updateAlertPreference(
-          userId,
-          preferenceId,
-          { isActive }
-        );
-        results.push({ success: true, preferenceId, preference: updatedPreference });
-      } catch (error) {
-        results.push({
-          success: false,
-          preferenceId,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        });
-      }
-    }
-    
-    const successCount = results.filter(r => r.success).length;
-    
-    return ApiSuccess(
-      res,
-      {
-        results,
-        summary: {
-          total: results.length,
-          successful: successCount,
-          message: `${successCount} preferences ${isActive ? 'enabled' : 'disabled'}`
-        }
-      },
-      ApiResponseWrapper.createMetadata(startTime, 'database')
-    );
-  } catch (error) {
-    return handleError(res, error, 'Failed to bulk enable/disable preferences', startTime);
-  }
-});
-
-// ============================================================================
-// EXPORT/IMPORT ROUTES
-// ============================================================================
-
-/**
- * GET /api/alert-preferences/export
- * Export all user preferences for backup
- */
-router.get('/backup/export', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
-  
-  try {
-    const userId = req.user!.id;
-    const preferences = await unifiedAlertPreferenceService.getUserAlertPreferences(userId);
-    
-    const exportData = {
-      version: '2.0.0',
-      exportedAt: new Date().toISOString(),
-      userId,
-      preferences
-    };
-    
-    return ApiSuccess(
-      res,
-      exportData,
-      ApiResponseWrapper.createMetadata(startTime, 'database')
-    );
-  } catch (error) {
-    return handleError(res, error, 'Failed to export preferences', startTime);
-  }
-});
-
-/**
- * POST /api/alert-preferences/import
- * Import preferences from backup
- */
-router.post('/backup/import', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
-  
-  try {
-    const userId = req.user!.id;
-    const { preferences, overwrite } = z.object({
-      preferences: z.array(z.any()),
-      overwrite: z.boolean().default(false)
-    }).parse(req.body);
-    
-    if (overwrite) {
-      // Delete existing preferences first
-      const existingPreferences = await unifiedAlertPreferenceService.getUserAlertPreferences(userId);
-      for (const pref of existingPreferences) {
-        await unifiedAlertPreferenceService.deleteAlertPreference(userId, pref.id);
-      }
-    }
-    
-    const results: Array<{ success: boolean; preference?: any; error?: string }> = [];
-
-    for (const preference of preferences) {
-      try {
-        // Remove id, userId, dates to create fresh preferences
-        const { id, userId: prefUserId, createdAt, updatedAt, ...preferenceData } = preference;
-
-        const newPreference = await unifiedAlertPreferenceService.createAlertPreference(
-          userId,
-          preferenceData
-        );
-
-        results.push({ success: true, preference: newPreference });
-      } catch (error) {
-        results.push({
-          success: false,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        });
-      }
-    }
-    
-    const successCount = results.filter(r => r.success).length;
-    
-    return ApiSuccess(
-      res,
-      {
-        results,
-        summary: {
-          total: results.length,
-          successful: successCount,
-          message: `Imported ${successCount} preferences`
-        }
-      },
-      ApiResponseWrapper.createMetadata(startTime, 'database')
-    );
-  } catch (error) {
-    return handleError(res, error, 'Failed to import preferences', startTime);
-  }
-});
-
-/**
- * Centralized error handler to reduce code duplication
- * Provides consistent error responses across all endpoints
+ * Centralized error handler to reduce code duplication and provide
+ * consistent error responses across all endpoints. This function handles
+ * both validation errors (from Zod) and general errors gracefully.
  */
 const handleError = (
   res: any, 
@@ -591,11 +74,17 @@ const handleError = (
   defaultMessage: string, 
   startTime: number
 ) => {
-  // Handle Zod validation errors specially
+  // Handle Zod validation errors with proper formatting
   if (error instanceof z.ZodError) {
+    // Transform Zod errors into the expected format for ApiValidationError
+    const formattedErrors = error.errors.map(err => ({
+      field: err.path.join('.') || 'unknown',
+      message: err.message
+    }));
+    
     return ApiValidationError(
       res, 
-      error.errors, 
+      formattedErrors, 
       ApiResponseWrapper.createMetadata(startTime, 'database')
     );
   }
@@ -603,13 +92,16 @@ const handleError = (
   // Extract error message from Error objects
   const errorMessage = error instanceof Error ? error.message : defaultMessage;
   
-  // Log the error for debugging
+  // Log the error for debugging and monitoring
   logger.error(defaultMessage, { component: 'AlertPreferenceRoutes' }, error);
   
-  // Return standardized error response
+  // Return standardized error response with proper structure
   return ApiError(
     res, 
-    errorMessage, 
+    {
+      code: 'INTERNAL_ERROR',
+      message: errorMessage
+    },
     500, 
     ApiResponseWrapper.createMetadata(startTime, 'database')
   );
@@ -621,7 +113,7 @@ const handleError = (
 
 /**
  * POST /api/alert-preferences
- * Create a new alert preference
+ * Create a new alert preference with full validation
  */
 router.post('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -688,7 +180,10 @@ router.get('/:preferenceId', authenticateToken, async (req: AuthenticatedRequest
     if (!preference) {
       return ApiError(
         res, 
-        'Alert preference not found', 
+        {
+          code: 'NOT_FOUND',
+          message: 'Alert preference not found'
+        },
         404, 
         ApiResponseWrapper.createMetadata(startTime, 'database')
       );
@@ -706,7 +201,7 @@ router.get('/:preferenceId', authenticateToken, async (req: AuthenticatedRequest
 
 /**
  * PATCH /api/alert-preferences/:preferenceId
- * Update an existing alert preference
+ * Update an existing alert preference with partial data
  */
 router.patch('/:preferenceId', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -734,7 +229,7 @@ router.patch('/:preferenceId', authenticateToken, async (req: AuthenticatedReque
 
 /**
  * DELETE /api/alert-preferences/:preferenceId
- * Delete an alert preference
+ * Delete an alert preference permanently
  */
 router.delete('/:preferenceId', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -764,7 +259,7 @@ router.delete('/:preferenceId', authenticateToken, async (req: AuthenticatedRequ
 
 /**
  * POST /api/alert-preferences/:preferenceId/verify-channel
- * Verify a notification channel (email, SMS, etc.)
+ * Verify a notification channel using a verification code
  */
 router.post(
   '/:preferenceId/verify-channel', 
@@ -787,7 +282,10 @@ router.post(
       if (!verified) {
         return ApiError(
           res,
-          'Channel verification failed',
+          {
+            code: 'VERIFICATION_FAILED',
+            message: 'Channel verification failed. Invalid or expired code.'
+          },
           400,
           ApiResponseWrapper.createMetadata(startTime, 'database')
         );
@@ -813,8 +311,8 @@ router.post(
 
 /**
  * POST /api/alert-preferences/process-alert
- * Process and deliver an alert based on user preferences
- * (typically called by internal services, not directly by users)
+ * Process and deliver an alert based on user preferences.
+ * This is typically called by internal services, not directly by users.
  */
 router.post('/process-alert', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -844,39 +342,547 @@ router.post('/process-alert', authenticateToken, async (req: AuthenticatedReques
   }
 });
 
+/**
+ * POST /api/alert-preferences/:preferenceId/process-batch
+ * Manually trigger processing of batched alerts for a specific preference
+ */
+router.post(
+  '/:preferenceId/process-batch',
+  authenticateToken,
+  async (req: AuthenticatedRequest, res) => {
+    const startTime = Date.now();
+    
+    try {
+      const userId = req.user!.id;
+      const preferenceId = req.params.preferenceId;
+      
+      const processedCount = await unifiedAlertPreferenceService.processBatchedAlerts(
+        userId,
+        preferenceId
+      );
+      
+      return ApiSuccess(
+        res,
+        {
+          success: true,
+          processedCount,
+          message: `Processed ${processedCount} batched alerts`
+        },
+        ApiResponseWrapper.createMetadata(startTime, 'database')
+      );
+    } catch (error) {
+      return handleError(res, error, 'Failed to process batched alerts', startTime);
+    }
+  }
+);
 
+// ============================================================================
+// DELIVERY LOGS AND ANALYTICS ROUTES
+// ============================================================================
 
+/**
+ * GET /api/alert-preferences/logs/delivery
+ * Get delivery logs with pagination and filtering capabilities
+ */
+router.get('/logs/delivery', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  const startTime = Date.now();
+  
+  try {
+    const userId = req.user!.id;
+    const query = deliveryLogsQuerySchema.parse(req.query);
+    
+    const result = await unifiedAlertPreferenceService.getAlertDeliveryLogs(userId, {
+      page: query.page,
+      limit: query.limit,
+      alertType: query.alertType,
+      status: query.status,
+      startDate: query.startDate ? new Date(query.startDate) : undefined,
+      endDate: query.endDate ? new Date(query.endDate) : undefined
+    });
+    
+    return ApiSuccess(
+      res, 
+      result, 
+      ApiResponseWrapper.createMetadata(startTime, 'database')
+    );
+  } catch (error) {
+    return handleError(res, error, 'Failed to fetch delivery logs', startTime);
+  }
+});
 
+/**
+ * GET /api/alert-preferences/analytics/stats
+ * Get comprehensive statistics about alert preferences and delivery metrics
+ */
+router.get('/analytics/stats', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  const startTime = Date.now();
+  
+  try {
+    const userId = req.user!.id;
+    const stats = await unifiedAlertPreferenceService.getAlertPreferenceStats(userId);
+    
+    return ApiSuccess(
+      res, 
+      stats, 
+      ApiResponseWrapper.createMetadata(startTime, 'database')
+    );
+  } catch (error) {
+    return handleError(res, error, 'Failed to fetch alert preference stats', startTime);
+  }
+});
 
+// ============================================================================
+// TESTING AND DEBUGGING ROUTES
+// ============================================================================
 
+/**
+ * POST /api/alert-preferences/test/filtering
+ * Test smart filtering logic without actually sending alerts.
+ * This is a development/testing endpoint only, disabled in production.
+ */
+router.post('/test/filtering', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  const startTime = Date.now();
+  
+  try {
+    // Security check: only allow in non-production environments
+    if (process.env.NODE_ENV === 'production') {
+      return ApiError(
+        res, 
+        {
+          code: 'FORBIDDEN',
+          message: 'Test endpoint not available in production'
+        },
+        403, 
+        ApiResponseWrapper.createMetadata(startTime, 'database')
+      );
+    }
+    
+    const userId = req.user!.id;
+    const { alertType, alertData, preferenceId } = req.body;
+    
+    // Validate required fields
+    if (!alertType || !alertData || !preferenceId) {
+      return ApiError(
+        res, 
+        {
+          code: 'VALIDATION_ERROR',
+          message: 'alertType, alertData, and preferenceId are required'
+        },
+        400, 
+        ApiResponseWrapper.createMetadata(startTime, 'database')
+      );
+    }
+    
+    // Get the preference to test against
+    const preference = await unifiedAlertPreferenceService.getAlertPreference(
+      userId, 
+      preferenceId
+    );
+    
+    if (!preference) {
+      return ApiError(
+        res, 
+        {
+          code: 'NOT_FOUND',
+          message: 'Alert preference not found'
+        },
+        404, 
+        ApiResponseWrapper.createMetadata(startTime, 'database')
+      );
+    }
+    
+    // Process smart filtering without sending actual alerts
+    const filteringResult = await unifiedAlertPreferenceService.processSmartFiltering(
+      userId,
+      alertType,
+      alertData,
+      preference
+    );
+    
+    return ApiSuccess(
+      res,
+      {
+        filteringResult,
+        preference: {
+          id: preference.id,
+          name: preference.name,
+          smartFiltering: preference.smartFiltering
+        }
+      },
+      ApiResponseWrapper.createMetadata(startTime, 'database')
+    );
+  } catch (error) {
+    return handleError(res, error, 'Failed to test smart filtering', startTime);
+  }
+});
 
+/**
+ * POST /api/alert-preferences/:preferenceId/test-channel
+ * Send a test notification to a specific channel to verify configuration
+ */
+router.post(
+  '/:preferenceId/test-channel',
+  authenticateToken,
+  async (req: AuthenticatedRequest, res) => {
+    const startTime = Date.now();
+    
+    try {
+      const userId = req.user!.id;
+      const preferenceId = req.params.preferenceId;
+      const { channelType } = z.object({
+        channelType: z.enum(['in_app', 'email', 'push', 'sms', 'webhook'])
+      }).parse(req.body);
+      
+      // Get the preference to verify channel exists and is configured
+      const preference = await unifiedAlertPreferenceService.getAlertPreference(
+        userId,
+        preferenceId
+      );
+      
+      if (!preference) {
+        return ApiError(
+          res,
+          {
+            code: 'NOT_FOUND',
+            message: 'Alert preference not found'
+          },
+          404,
+          ApiResponseWrapper.createMetadata(startTime, 'database')
+        );
+      }
+      
+      const channel = preference.channels.find(ch => ch.type === channelType);
+      
+      if (!channel) {
+        return ApiError(
+          res,
+          {
+            code: 'NOT_FOUND',
+            message: `Channel ${channelType} not found in preference`
+          },
+          404,
+          ApiResponseWrapper.createMetadata(startTime, 'database')
+        );
+      }
+      
+      if (!channel.enabled) {
+        return ApiError(
+          res,
+          {
+            code: 'CHANNEL_DISABLED',
+            message: `Channel ${channelType} is not enabled`
+          },
+          400,
+          ApiResponseWrapper.createMetadata(startTime, 'database')
+        );
+      }
+      
+      // Create and send test alert data
+      const testAlertData = {
+        title: `Test ${channelType} Notification`,
+        message: `This is a test notification for the ${channelType} channel.`,
+        billId: 0,
+        timestamp: new Date().toISOString()
+      };
+      
+      const deliveryLogs = await unifiedAlertPreferenceService.processAlertDelivery(
+        userId,
+        'bill_status_change',
+        testAlertData,
+        'normal'
+      );
+      
+      return ApiSuccess(
+        res,
+        {
+          success: true,
+          message: `Test notification sent via ${channelType}`,
+          deliveryLogs
+        },
+        ApiResponseWrapper.createMetadata(startTime, 'database')
+      );
+    } catch (error) {
+      return handleError(res, error, 'Failed to send test notification', startTime);
+    }
+  }
+);
 
+// ============================================================================
+// ADMIN/SERVICE ROUTES
+// ============================================================================
 
+/**
+ * GET /api/alert-preferences/service/stats
+ * Get service-level statistics. Admin access required.
+ */
+router.get('/service/stats', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  const startTime = Date.now();
+  
+  try {
+    // Authorization check: verify user has admin role
+    if (req.user!.role !== 'admin') {
+      return ApiError(
+        res, 
+        {
+          code: 'FORBIDDEN',
+          message: 'Insufficient permissions. Admin access required.'
+        },
+        403, 
+        ApiResponseWrapper.createMetadata(startTime, 'database')
+      );
+    }
+    
+    const stats = unifiedAlertPreferenceService.getServiceStats();
+    
+    return ApiSuccess(
+      res, 
+      stats, 
+      ApiResponseWrapper.createMetadata(startTime, 'database')
+    );
+  } catch (error) {
+    return handleError(res, error, 'Failed to fetch service stats', startTime);
+  }
+});
 
+/**
+ * GET /api/alert-preferences/service/health
+ * Health check endpoint for monitoring and load balancers
+ */
+router.get('/service/health', async (req, res) => {
+  const startTime = Date.now();
+  
+  try {
+    const health = {
+      status: 'healthy',
+      service: 'unified-alert-preferences',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    };
+    
+    return ApiSuccess(
+      res,
+      health,
+      ApiResponseWrapper.createMetadata(startTime, 'database')
+    );
+  } catch (error) {
+    return ApiError(
+      res,
+      {
+        code: 'SERVICE_UNHEALTHY',
+        message: 'Service unhealthy'
+      },
+      503,
+      ApiResponseWrapper.createMetadata(startTime, 'database')
+    );
+  }
+});
 
+// ============================================================================
+// BULK OPERATIONS
+// ============================================================================
 
+/**
+ * POST /api/alert-preferences/bulk/update
+ * Update multiple preferences at once for efficiency
+ */
+router.post('/bulk/update', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  const startTime = Date.now();
+  
+  try {
+    const userId = req.user!.id;
+    const { updates } = z.object({
+      updates: z.array(z.object({
+        preferenceId: z.string(),
+        data: updatePreferenceSchema
+      }))
+    }).parse(req.body);
+    
+    const results: Array<{ success: boolean; preferenceId: string; preference?: any; error?: string }> = [];
 
+    // Process each update individually to handle partial failures gracefully
+    for (const update of updates) {
+      try {
+        const updatedPreference = await unifiedAlertPreferenceService.updateAlertPreference(
+          userId,
+          update.preferenceId,
+          update.data
+        );
+        results.push({ success: true, preferenceId: update.preferenceId, preference: updatedPreference });
+      } catch (error) {
+        results.push({
+          success: false,
+          preferenceId: update.preferenceId,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }
+    
+    const successCount = results.filter(r => r.success).length;
+    const failCount = results.filter(r => !r.success).length;
+    
+    return ApiSuccess(
+      res,
+      {
+        results,
+        summary: {
+          total: results.length,
+          successful: successCount,
+          failed: failCount
+        }
+      },
+      ApiResponseWrapper.createMetadata(startTime, 'database')
+    );
+  } catch (error) {
+    return handleError(res, error, 'Failed to bulk update preferences', startTime);
+  }
+});
 
+/**
+ * POST /api/alert-preferences/bulk/enable
+ * Enable or disable multiple preferences at once
+ */
+router.post('/bulk/enable', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  const startTime = Date.now();
+  
+  try {
+    const userId = req.user!.id;
+    const { preferenceIds, isActive } = z.object({
+      preferenceIds: z.array(z.string()).min(1),
+      isActive: z.boolean()
+    }).parse(req.body);
+    
+    const results: Array<{ success: boolean; preferenceId: string; preference?: any; error?: string }> = [];
 
+    // Process each preference individually for granular error handling
+    for (const preferenceId of preferenceIds) {
+      try {
+        const updatedPreference = await unifiedAlertPreferenceService.updateAlertPreference(
+          userId,
+          preferenceId,
+          { isActive }
+        );
+        results.push({ success: true, preferenceId, preference: updatedPreference });
+      } catch (error) {
+        results.push({
+          success: false,
+          preferenceId,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }
+    
+    const successCount = results.filter(r => r.success).length;
+    
+    return ApiSuccess(
+      res,
+      {
+        results,
+        summary: {
+          total: results.length,
+          successful: successCount,
+          message: `${successCount} preferences ${isActive ? 'enabled' : 'disabled'}`
+        }
+      },
+      ApiResponseWrapper.createMetadata(startTime, 'database')
+    );
+  } catch (error) {
+    return handleError(res, error, 'Failed to bulk enable/disable preferences', startTime);
+  }
+});
 
+// ============================================================================
+// EXPORT/IMPORT ROUTES
+// ============================================================================
 
+/**
+ * GET /api/alert-preferences/backup/export
+ * Export all user preferences for backup purposes
+ */
+router.get('/backup/export', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  const startTime = Date.now();
+  
+  try {
+    const userId = req.user!.id;
+    const preferences = await unifiedAlertPreferenceService.getUserAlertPreferences(userId);
+    
+    const exportData = {
+      version: '2.0.0',
+      exportedAt: new Date().toISOString(),
+      userId,
+      preferences
+    };
+    
+    return ApiSuccess(
+      res,
+      exportData,
+      ApiResponseWrapper.createMetadata(startTime, 'database')
+    );
+  } catch (error) {
+    return handleError(res, error, 'Failed to export preferences', startTime);
+  }
+});
 
+/**
+ * POST /api/alert-preferences/backup/import
+ * Import preferences from backup with optional overwrite
+ */
+router.post('/backup/import', authenticateToken, async (req: AuthenticatedRequest, res) => {
+  const startTime = Date.now();
+  
+  try {
+    const userId = req.user!.id;
+    const { preferences, overwrite } = z.object({
+      preferences: z.array(z.any()),
+      overwrite: z.boolean().default(false)
+    }).parse(req.body);
+    
+    // If overwrite is true, delete existing preferences first
+    if (overwrite) {
+      const existingPreferences = await unifiedAlertPreferenceService.getUserAlertPreferences(userId);
+      for (const pref of existingPreferences) {
+        await unifiedAlertPreferenceService.deleteAlertPreference(userId, pref.id);
+      }
+    }
+    
+    const results: Array<{ success: boolean; preference?: any; error?: string }> = [];
 
+    // Create new preferences from import data
+    for (const preference of preferences) {
+      try {
+        // Remove system-generated fields to create fresh preferences
+        const { id, userId: prefUserId, createdAt, updatedAt, ...preferenceData } = preference;
 
+        const newPreference = await unifiedAlertPreferenceService.createAlertPreference(
+          userId,
+          preferenceData
+        );
 
+        results.push({ success: true, preference: newPreference });
+      } catch (error) {
+        results.push({
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+    }
+    
+    const successCount = results.filter(r => r.success).length;
+    
+    return ApiSuccess(
+      res,
+      {
+        results,
+        summary: {
+          total: results.length,
+          successful: successCount,
+          message: `Imported ${successCount} preferences`
+        }
+      },
+      ApiResponseWrapper.createMetadata(startTime, 'database')
+    );
+  } catch (error) {
+    return handleError(res, error, 'Failed to import preferences', startTime);
+  }
+});
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default router;

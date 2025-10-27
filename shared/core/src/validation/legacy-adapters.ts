@@ -22,29 +22,29 @@ export class LegacyValidatorsAdapter {
   /**
    * Validates property ID using core validation system
    */
-  async validatePropertyId(id: string): Promise<LegacyValidationResult<number>> {
-    const schema = z.string().transform((val) => {
-      const parsed = parseInt(val.trim());
-      if (isNaN(parsed) || parsed <= 0) {
-        throw new Error('Property ID must be a positive number');
+  async validatePropertyId(id: string | number): Promise<LegacyValidationResult<number>> {
+    const schema = z.union([z.string(), z.number()]).transform((val) => {
+      const parsed = typeof val === 'string' ? parseInt(val.trim(), 10) : Number(val);
+      if (isNaN(parsed) || parsed <= 0 || !Number.isInteger(parsed)) {
+        throw new Error('Property ID must be a positive integer');
       }
       return parsed;
-    }) as z.ZodType<number, z.ZodTypeDef, string>;
+    });
 
     try {
       const result = await this.validationService.validateSafe(schema, id);
       if (result.success) {
-        return { valid: true, data: result.data };
+        return { valid: true, data: result.data as number };
       } else {
-        return { 
-          valid: false, 
-          error: result.error?.errors[0]?.message || 'Property ID validation failed' 
+        return {
+          valid: false,
+          error: result.error?.errors[0]?.message || 'Property ID validation failed'
         };
       }
     } catch (error) {
-      return { 
-        valid: false, 
-        error: error instanceof Error ? error.message : 'Property ID validation failed' 
+      return {
+        valid: false,
+        error: error instanceof Error ? error.message : 'Property ID validation failed'
       };
     }
   }
@@ -52,29 +52,29 @@ export class LegacyValidatorsAdapter {
   /**
    * Validates user ID using core validation system
    */
-  async validateUserId(userId: unknown): Promise<LegacyValidationResult<number>> {
+  async validateUserId(userId: string | number): Promise<LegacyValidationResult<number>> {
     const schema = z.union([z.string(), z.number()]).transform((val) => {
-      const parsed = typeof val === 'string' ? parseInt(val) : val;
-      if (isNaN(parsed) || parsed <= 0) {
-        throw new Error('User ID must be a positive number');
+      const parsed = typeof val === 'string' ? parseInt(val.toString().trim(), 10) : Number(val);
+      if (isNaN(parsed) || parsed <= 0 || !Number.isInteger(parsed)) {
+        throw new Error('User ID must be a positive integer');
       }
       return parsed;
-    }) as z.ZodType<number, z.ZodTypeDef, string | number>;
+    });
 
     try {
       const result = await this.validationService.validateSafe(schema, userId);
       if (result.success) {
-        return { valid: true, data: result.data };
+        return { valid: true, data: result.data as number };
       } else {
-        return { 
-          valid: false, 
-          error: result.error?.errors[0]?.message || 'User ID validation failed' 
+        return {
+          valid: false,
+          error: result.error?.errors[0]?.message || 'User ID validation failed'
         };
       }
     } catch (error) {
-      return { 
-        valid: false, 
-        error: error instanceof Error ? error.message : 'User ID validation failed' 
+      return {
+        valid: false,
+        error: error instanceof Error ? error.message : 'User ID validation failed'
       };
     }
   }
@@ -172,15 +172,34 @@ export class LegacyValidatorsAdapter {
   /**
    * Validates search filters using core validation system
    */
-  async validateSearchFilters(filters: unknown): Promise<LegacyValidationResult<any>> {
+  async validateSearchFilters(filters: Record<string, unknown>): Promise<LegacyValidationResult<Record<string, unknown>>> {
     const schema = z.object({
       location: z.string().optional(),
-      priceMin: z.number().min(0).optional(),
-      priceMax: z.number().min(0).optional(),
+      priceMin: z.union([z.string(), z.number()]).transform((val) => {
+        const parsed = typeof val === 'string' ? parseFloat(val.trim()) : Number(val);
+        return isNaN(parsed) || parsed < 0 ? 0 : parsed;
+      }).optional(),
+      priceMax: z.union([z.string(), z.number()]).transform((val) => {
+        const parsed = typeof val === 'string' ? parseFloat(val.trim()) : Number(val);
+        return isNaN(parsed) || parsed < 0 ? 0 : parsed;
+      }).optional(),
       propertyType: z.string().optional(),
-      bedrooms: z.number().min(0).optional(),
-      bathrooms: z.number().min(0).optional(),
-      verified: z.boolean().optional()
+      bedrooms: z.union([z.string(), z.number()]).transform((val) => {
+        const parsed = typeof val === 'string' ? parseInt(val.trim(), 10) : Number(val);
+        return isNaN(parsed) || parsed < 0 || !Number.isInteger(parsed) ? 0 : parsed;
+      }).optional(),
+      bathrooms: z.union([z.string(), z.number()]).transform((val) => {
+        const parsed = typeof val === 'string' ? parseFloat(val.trim()) : Number(val);
+        return isNaN(parsed) || parsed < 0 ? 0 : parsed;
+      }).optional(),
+      verified: z.union([z.string(), z.boolean()]).transform((val) => {
+        if (typeof val === 'boolean') return val;
+        if (typeof val === 'string') {
+          const lower = val.toLowerCase().trim();
+          return lower === 'true' || lower === '1' || lower === 'yes';
+        }
+        return false;
+      }).optional()
     }).partial();
 
     try {
@@ -188,15 +207,15 @@ export class LegacyValidatorsAdapter {
       if (result.success) {
         return { valid: true, data: result.data };
       } else {
-        return { 
-          valid: false, 
-          error: result.error?.errors[0]?.message || 'Search filters validation failed' 
+        return {
+          valid: false,
+          error: result.error?.errors[0]?.message || 'Search filters validation failed'
         };
       }
     } catch (error) {
-      return { 
-        valid: false, 
-        error: error instanceof Error ? error.message : 'Search filters validation failed' 
+      return {
+        valid: false,
+        error: error instanceof Error ? error.message : 'Search filters validation failed'
       };
     }
   }
@@ -216,9 +235,9 @@ export class ValidationMiddlewareAdapter {
    * Creates validation middleware compatible with existing patterns
    */
   createValidationMiddleware(config: {
-    body?: z.ZodSchema<any>;
-    query?: z.ZodSchema<any>;
-    params?: z.ZodSchema<any>;
+    body?: z.ZodSchema;
+    query?: z.ZodSchema;
+    params?: z.ZodSchema;
   }) {
     return async (req: any, res: any, next: any) => {
       try {
@@ -228,7 +247,7 @@ export class ValidationMiddlewareAdapter {
         if (config.body && req.body) {
           const bodyResult = await this.validationService.validateSafe(config.body, req.body);
           if (!bodyResult.success) {
-            throw new ValidationError('Request body validation failed');
+            throw new ValidationError('Request body validation failed', bodyResult.error?.errors);
           }
           req.validatedBody = bodyResult.data;
         }
@@ -237,7 +256,7 @@ export class ValidationMiddlewareAdapter {
         if (config.query && req.query) {
           const queryResult = await this.validationService.validateSafe(config.query, req.query);
           if (!queryResult.success) {
-            throw new ValidationError('Query parameters validation failed');
+            throw new ValidationError('Query parameters validation failed', queryResult.error?.errors);
           }
           req.validatedQuery = queryResult.data;
         }
@@ -246,7 +265,7 @@ export class ValidationMiddlewareAdapter {
         if (config.params && req.params) {
           const paramsResult = await this.validationService.validateSafe(config.params, req.params);
           if (!paramsResult.success) {
-            throw new ValidationError('Path parameters validation failed');
+            throw new ValidationError('Path parameters validation failed', paramsResult.error?.errors);
           }
           req.validatedParams = paramsResult.data;
         }
@@ -268,6 +287,7 @@ export class ValidationMiddlewareAdapter {
           success: false,
           error: 'Validation Error',
           message: error.message,
+          details: error.errors,
           correlationId: req.correlationId
         });
       }

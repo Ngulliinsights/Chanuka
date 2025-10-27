@@ -74,7 +74,7 @@ describe('useAuthForm Hook', () => {
     it('should handle input changes', () => {
       const { result } = renderHook(() => useAuthForm());
       
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
       });
       
@@ -84,7 +84,7 @@ describe('useAuthForm Hook', () => {
     it('should sanitize input by removing control characters', () => {
       const { result } = renderHook(() => useAuthForm());
       
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test\x00@example.com\x1F'));
       });
       
@@ -95,12 +95,12 @@ describe('useAuthForm Hook', () => {
       const { result } = renderHook(() => useAuthForm());
       
       // Set an API response
-      act(() => {
+      await act(() => {
         result.current.handleSubmit(createMockSubmitEvent());
       });
       
       // Clear it by typing
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'new@example.com'));
       });
       
@@ -112,7 +112,7 @@ describe('useAuthForm Hook', () => {
     it('should validate email field on blur', () => {
       const { result } = renderHook(() => useAuthForm());
       
-      act(() => {
+      await act(() => {
         result.current.handleBlur(createMockBlurEvent('email', 'invalid-email'));
       });
       
@@ -124,14 +124,14 @@ describe('useAuthForm Hook', () => {
       const { result } = renderHook(() => useAuthForm());
       
       // Set invalid email first
-      act(() => {
+      await act(() => {
         result.current.handleBlur(createMockBlurEvent('email', 'invalid-email'));
       });
       
       expect(result.current.errors.email).toBeTruthy();
       
       // Fix the email
-      act(() => {
+      await act(() => {
         result.current.handleBlur(createMockBlurEvent('email', 'valid@example.com'));
       });
       
@@ -142,12 +142,12 @@ describe('useAuthForm Hook', () => {
       const { result } = renderHook(() => useAuthForm({ initialMode: 'register' }));
       
       // Set password first
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('password', 'SecurePass123!'));
       });
       
       // Set mismatched confirm password
-      act(() => {
+      await act(() => {
         result.current.handleBlur(createMockBlurEvent('confirmPassword', 'DifferentPass123!'));
       });
       
@@ -157,7 +157,7 @@ describe('useAuthForm Hook', () => {
     it('should skip validation when realTimeValidation is disabled', () => {
       const { result } = renderHook(() => useAuthForm({ realTimeValidation: false }));
       
-      act(() => {
+      await act(() => {
         result.current.handleBlur(createMockBlurEvent('email', 'invalid-email'));
       });
       
@@ -173,7 +173,7 @@ describe('useAuthForm Hook', () => {
       const { result } = renderHook(() => useAuthForm({ onSuccess }));
       
       // Fill form with valid data
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleInputChange(createMockChangeEvent('password', 'password123'));
       });
@@ -201,7 +201,7 @@ describe('useAuthForm Hook', () => {
       const registerData = createMockRegisterData();
       
       // Fill form with valid registration data
-      act(() => {
+      await act(() => {
         Object.entries(registerData).forEach(([key, value]) => {
           result.current.handleInputChange(createMockChangeEvent(key, value));
         });
@@ -229,7 +229,7 @@ describe('useAuthForm Hook', () => {
       const { result } = renderHook(() => useAuthForm({ onError }));
       
       // Fill form with valid data
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleInputChange(createMockChangeEvent('password', 'wrongpassword'));
       });
@@ -249,7 +249,7 @@ describe('useAuthForm Hook', () => {
       const { result } = renderHook(() => useAuthForm());
       
       // Submit form with invalid data
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'invalid-email'));
         result.current.handleInputChange(createMockChangeEvent('password', 'short'));
       });
@@ -269,7 +269,7 @@ describe('useAuthForm Hook', () => {
       const { result } = renderHook(() => useAuthForm({ initialMode: 'register' }));
       
       // Fill and submit form
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleInputChange(createMockChangeEvent('firstName', 'John'));
       });
@@ -290,14 +290,14 @@ describe('useAuthForm Hook', () => {
       
       expect(result.current.mode).toBe('login');
       
-      act(() => {
+      await act(() => {
         result.current.toggleMode();
       });
       
       expect(result.current.mode).toBe('register');
       expect(onModeChange).toHaveBeenCalledWith('register');
       
-      act(() => {
+      await act(() => {
         result.current.toggleMode();
       });
       
@@ -309,7 +309,7 @@ describe('useAuthForm Hook', () => {
       const { result } = renderHook(() => useAuthForm());
       
       // Fill form and create errors
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleBlur(createMockBlurEvent('password', 'short'));
       });
@@ -318,7 +318,7 @@ describe('useAuthForm Hook', () => {
       expect(result.current.errors.password).toBeTruthy();
       
       // Toggle mode
-      act(() => {
+      await act(() => {
         result.current.toggleMode();
       });
       
@@ -340,7 +340,7 @@ describe('useAuthForm Hook', () => {
     it('should be valid when all required fields are filled (login)', () => {
       const { result } = renderHook(() => useAuthForm());
       
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleInputChange(createMockChangeEvent('password', 'password123'));
       });
@@ -354,7 +354,7 @@ describe('useAuthForm Hook', () => {
       
       const registerData = createMockRegisterData();
       
-      act(() => {
+      await act(() => {
         Object.entries(registerData).forEach(([key, value]) => {
           result.current.handleInputChange(createMockChangeEvent(key, value));
         });
@@ -367,7 +367,7 @@ describe('useAuthForm Hook', () => {
     it('should be invalid when there are validation errors', () => {
       const { result } = renderHook(() => useAuthForm());
       
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleInputChange(createMockChangeEvent('password', 'password123'));
         result.current.handleBlur(createMockBlurEvent('email', 'invalid-email'));
@@ -382,7 +382,7 @@ describe('useAuthForm Hook', () => {
       
       const { result } = renderHook(() => useAuthForm());
       
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleInputChange(createMockChangeEvent('password', 'password123'));
       });
@@ -396,7 +396,7 @@ describe('useAuthForm Hook', () => {
     it('should provide field error getter', () => {
       const { result } = renderHook(() => useAuthForm());
       
-      act(() => {
+      await act(() => {
         result.current.handleBlur(createMockBlurEvent('email', 'invalid-email'));
       });
       
@@ -407,7 +407,7 @@ describe('useAuthForm Hook', () => {
     it('should provide field props helper', () => {
       const { result } = renderHook(() => useAuthForm());
       
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleBlur(createMockBlurEvent('email', 'invalid-email'));
       });
@@ -427,13 +427,13 @@ describe('useAuthForm Hook', () => {
       const { result } = renderHook(() => useAuthForm());
       
       // Create an error state
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
       });
       
       // Simulate API error (this would normally be set by handleSubmit)
       // For testing, we'll manually trigger the retry
-      act(() => {
+      await act(() => {
         result.current.retry();
       });
       
@@ -444,13 +444,13 @@ describe('useAuthForm Hook', () => {
       const { result } = renderHook(() => useAuthForm());
       
       // Fill form and create state
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleBlur(createMockBlurEvent('password', 'short'));
       });
       
       // Reset form
-      act(() => {
+      await act(() => {
         result.current.resetForm();
       });
       
@@ -473,7 +473,7 @@ describe('useAuthForm Hook', () => {
       const { result } = renderHook(() => useAuthForm());
       
       // Fill and submit form
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleInputChange(createMockChangeEvent('password', 'password123'));
       });
@@ -491,7 +491,7 @@ describe('useAuthForm Hook', () => {
       
       // Simulate having a recovery context (would be set by handleSubmit)
       // For testing, we'll check that input changes clear it
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'new@example.com'));
       });
       
@@ -516,7 +516,7 @@ describe('useAuthForm Hook', () => {
       
       const { result } = renderHook(() => useAuthForm({ onError }));
       
-      act(() => {
+      await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
         result.current.handleInputChange(createMockChangeEvent('password', 'password123'));
       });

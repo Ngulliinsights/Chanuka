@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { cleanup } from '@testing-library/react';
+
 import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals';
 import { demoDataService } from '../../infrastructure/demo-data.js';
 import { DatabaseFallbackService } from '../../infrastructure/database/database-fallback.js';

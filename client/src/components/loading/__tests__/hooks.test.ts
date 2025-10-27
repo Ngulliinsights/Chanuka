@@ -29,7 +29,7 @@ describe('Loading Hooks', () => {
       
       let operationId: string;
       
-      act(() => {
+      await act(() => {
         operationId = result.current.actions.start({
           type: 'component',
           message: 'Loading test',
@@ -40,7 +40,7 @@ describe('Loading Hooks', () => {
       expect(result.current.progress?.total).toBe(1);
       expect(result.current.progress?.loaded).toBe(0);
       
-      act(() => {
+      await act(() => {
         result.current.actions.complete(operationId);
       });
       
@@ -54,7 +54,7 @@ describe('Loading Hooks', () => {
       
       let operationId: string;
       
-      act(() => {
+      await act(() => {
         operationId = result.current.actions.start({
           type: 'component',
           message: 'Loading test',
@@ -63,7 +63,7 @@ describe('Loading Hooks', () => {
       
       const testError = new Error('Test error');
       
-      act(() => {
+      await act(() => {
         result.current.actions.fail(operationId, testError);
       });
       
@@ -75,7 +75,7 @@ describe('Loading Hooks', () => {
     it('should reset all operations', () => {
       const { result } = renderHook(() => useLoading());
       
-      act(() => {
+      await act(() => {
         result.current.actions.start({
           type: 'component',
           message: 'Loading test 1',
@@ -88,7 +88,7 @@ describe('Loading Hooks', () => {
       
       expect(result.current.isLoading).toBe(true);
       
-      act(() => {
+      await act(() => {
         result.current.actions.reset();
       });
       
@@ -112,7 +112,7 @@ describe('Loading Hooks', () => {
     it('should transition between states', () => {
       const { result } = renderHook(() => useLoadingState());
       
-      act(() => {
+      await act(() => {
         result.current.setSuccess();
       });
       
@@ -120,7 +120,7 @@ describe('Loading Hooks', () => {
       expect(result.current.isSuccess).toBe(true);
       expect(result.current.isLoading).toBe(false);
       
-      act(() => {
+      await act(() => {
         result.current.setError('Test error');
       });
       
@@ -128,7 +128,7 @@ describe('Loading Hooks', () => {
       expect(result.current.isError).toBe(true);
       expect(result.current.error?.message).toBe('Test error');
       
-      act(() => {
+      await act(() => {
         result.current.reset();
       });
       
@@ -142,13 +142,13 @@ describe('Loading Hooks', () => {
         useLoadingState({ autoReset: true, autoResetDelay: 1000 })
       );
       
-      act(() => {
+      await act(() => {
         result.current.setSuccess();
       });
       
       expect(result.current.isSuccess).toBe(true);
       
-      act(() => {
+      await act(() => {
         vi.advanceTimersByTime(1000);
       });
       
@@ -211,7 +211,7 @@ describe('Loading Hooks', () => {
         })
       );
       
-      act(() => {
+      await act(() => {
         result.current.start();
       });
       
@@ -220,7 +220,7 @@ describe('Loading Hooks', () => {
       expect(result.current.isFirstStage).toBe(true);
       expect(result.current.canGoNext).toBe(true);
       
-      act(() => {
+      await act(() => {
         result.current.completeCurrentStage();
       });
       
@@ -238,13 +238,13 @@ describe('Loading Hooks', () => {
         })
       );
       
-      act(() => {
+      await act(() => {
         result.current.start();
       });
       
       const testError = new Error('Stage failed');
       
-      act(() => {
+      await act(() => {
         result.current.failCurrentStage(testError);
       });
       
@@ -259,11 +259,11 @@ describe('Loading Hooks', () => {
         useProgressiveLoading({ stages: testStages })
       );
       
-      act(() => {
+      await act(() => {
         result.current.start();
       });
       
-      act(() => {
+      await act(() => {
         result.current.skipCurrentStage('Testing skip');
       });
       
@@ -280,13 +280,13 @@ describe('Loading Hooks', () => {
         })
       );
       
-      act(() => {
+      await act(() => {
         result.current.start();
       });
       
       // Complete all stages
       testStages.forEach(() => {
-        act(() => {
+        await act(() => {
           result.current.completeCurrentStage();
         });
       });
@@ -301,11 +301,11 @@ describe('Loading Hooks', () => {
         useProgressiveLoading({ stages: testStages })
       );
       
-      act(() => {
+      await act(() => {
         result.current.start();
       });
       
-      act(() => {
+      await act(() => {
         result.current.setStageProgress(50);
       });
       
@@ -319,7 +319,7 @@ describe('Loading Hooks', () => {
         useProgressiveLoading({ stages: testStages })
       );
       
-      act(() => {
+      await act(() => {
         result.current.start();
         result.current.nextStage();
       });
@@ -327,13 +327,13 @@ describe('Loading Hooks', () => {
       expect(result.current.currentStageIndex).toBe(1);
       expect(result.current.canGoPrevious).toBe(true);
       
-      act(() => {
+      await act(() => {
         result.current.previousStage();
       });
       
       expect(result.current.currentStageIndex).toBe(0);
       
-      act(() => {
+      await act(() => {
         result.current.goToStage(2);
       });
       
@@ -345,7 +345,7 @@ describe('Loading Hooks', () => {
         useProgressiveLoading({ stages: testStages, retryable: true })
       );
       
-      act(() => {
+      await act(() => {
         result.current.start();
         result.current.failCurrentStage('Test failure');
       });
@@ -353,7 +353,7 @@ describe('Loading Hooks', () => {
       expect(result.current.state).toBe('error');
       expect(result.current.canRetry).toBe(true);
       
-      act(() => {
+      await act(() => {
         result.current.retryCurrentStage();
       });
       

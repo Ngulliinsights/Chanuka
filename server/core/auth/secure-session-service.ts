@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { Request, Response } from 'express';
-import { database as db } from '../shared/database/connection';
+import { database as db } from '../../../shared/database/connection.js';
 import { sessions, users } from '../../../shared/schema';
 import { eq, and, lt } from 'drizzle-orm';
 import { encryptionService } from '../../features/security/encryption-service.js';

@@ -117,12 +117,15 @@ export interface TableColumn {
   required?: boolean;
 }
 
-export interface ValidationError {
+export interface ValidationErrorDetail {
   row: number;
   column: string;
   message: string;
   value: any;
 }
+
+// Type alias for backward compatibility
+export type ValidationError = ValidationErrorDetail;
 
 // Calendar and date picker validation
 export interface DateValidationProps {

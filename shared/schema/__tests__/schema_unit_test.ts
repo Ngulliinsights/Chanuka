@@ -10,7 +10,7 @@ import {
   insertNotificationSchema,
   insertComplianceCheckSchema,
   insertContentReportSchema // <-- REFINED: Added new schema
-} from './schema/validation'; // <-- REFINED: Imports from validation.ts
+} from '../validation'; // <-- REFINED: Imports from validation.ts
 
 // Tests for insertUserSchema
 describe('insertUserSchema', () => {

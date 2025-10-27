@@ -1,4 +1,14 @@
 import React from 'react';
+// Mock fetch
+global.fetch = vi.fn(() =>
+  Promise.resolve({
+    ok: true,
+    status: 200,
+    json: () => Promise.resolve({}),
+    text: () => Promise.resolve(''),
+  } as Response)
+);
+
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import {

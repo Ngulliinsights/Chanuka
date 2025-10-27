@@ -34,7 +34,7 @@ export const allSchemas = {
 /**
  * Schema registry for dynamic schema access
  */
-export class SchemaRegistry {
+class SchemaRegistry {
   private static instance: SchemaRegistry;
   private schemas = new Map<string, any>();
 

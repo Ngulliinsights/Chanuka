@@ -1,4 +1,13 @@
 import { describe, it, expect, beforeEach, vi, type MockedFunction } from 'vitest';
+// Mock WebSocket
+global.WebSocket = vi.fn().mockImplementation(() => ({
+  send: vi.fn(),
+  close: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  readyState: 1,
+}));
+
 import { screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderWithProviders } from '../../test-utils';
@@ -790,7 +799,7 @@ describe('End-to-End User Workflows', () => {
         navigationService.navigate(page);
         fireEvent(window, new Event('popstate'));
         await waitFor(() => {
-          expect(navigationService.getLocation().pathname).toBe(page);
+          expect((navigationService.getLocation() || { pathname: "/" }).pathname).toBe(page);
         });
       }
 

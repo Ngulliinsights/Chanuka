@@ -1,12 +1,11 @@
-import { database as db } from '../../../shared/database/connection';
-import { users, userProfiles, userInterests, citizenVerifications } from '../../../../../shared/schema/schema';
-import { eq, and, desc, sql, or } from 'drizzle-orm';
+import { database as db } from '@shared/database/connection';
+import { users, userProfiles, userInterests, verifications } from '@shared/schema/schema';
+import { eq, and, sql, or } from 'drizzle-orm';
 import { UserRepository } from '../../domain/repositories/user-repository';
 import { User } from '../../domain/entities/user';
 import { UserProfile, UserInterest } from '../../domain/entities/user-profile';
 import { CitizenVerification } from '../../domain/entities/citizen-verification';
 import { UserAggregate } from '../../domain/aggregates/user-aggregate';
-import { UserStorage } from '../user-storage';
 
 export class UserRepositoryImpl implements UserRepository {
   /**
@@ -53,7 +52,7 @@ export class UserRepositoryImpl implements UserRepository {
    */
   private mapToVerification(row: any): CitizenVerification {
     const evidence = Array.isArray(row.evidence) 
-      ? row.evidence.map(e => ({
+      ? row.evidence.map((e: any) => ({
           type: e.type,
           source: e.source,
           url: e.url,
@@ -64,18 +63,18 @@ export class UserRepositoryImpl implements UserRepository {
         })) 
       : [];
 
-    const expertise = {
+    const expertise = row.expertise ? {
       domain: row.expertise.domain,
       level: row.expertise.level,
       credentials: row.expertise.credentials,
       verifiedCredentials: row.expertise.verifiedCredentials,
       reputationScore: row.expertise.reputationScore
-    };
+    } : {};
 
     return CitizenVerification.create({
       id: row.id,
       billId: row.billId,
-      citizenId: row.citizenId,
+      citizenId: row.userId, // Map userId to citizenId for domain compatibility
       verificationType: row.verificationType as any,
       verificationStatus: row.verificationStatus as any,
       confidence: Number(row.confidence),
@@ -116,8 +115,8 @@ export class UserRepositoryImpl implements UserRepository {
     const insertPayload: any = {
       email: userData.email,
       name: userData.name,
-      role: userData.role,
-      verificationStatus: userData.verificationStatus,
+      role: userData.role as "citizen" | "expert" | "admin" | "journalist" | "advocate",
+      verificationStatus: userData.verificationStatus as "pending" | "verified" | "disputed" | "rejected",
       isActive: userData.isActive,
       lastLoginAt: userData.lastLoginAt,
       createdAt: userData.createdAt,
@@ -140,8 +139,8 @@ export class UserRepositoryImpl implements UserRepository {
       .set({
         email: userData.email,
         name: userData.name,
-        role: userData.role,
-        verificationStatus: userData.verificationStatus,
+        role: userData.role as "citizen" | "expert" | "admin" | "journalist" | "advocate",
+        verificationStatus: userData.verificationStatus as "pending" | "verified" | "disputed" | "rejected",
         isActive: userData.isActive,
         lastLoginAt: userData.lastLoginAt,
         updatedAt: userData.updatedAt
@@ -235,8 +234,8 @@ export class UserRepositoryImpl implements UserRepository {
   async findVerificationsByUserId(userId: string): Promise<CitizenVerification[]> {
     const results = await db
       .select()
-      .from(citizenVerifications)
-      .where(eq(citizenVerifications.citizenId, userId));
+      .from(verifications)
+      .where(eq(verifications.userId, userId));
 
     return results.map(result => this.mapToVerification(result));
   }
@@ -244,8 +243,8 @@ export class UserRepositoryImpl implements UserRepository {
   async findVerificationById(id: string): Promise<CitizenVerification | null> {
     const result = await db
       .select()
-      .from(citizenVerifications)
-      .where(eq(citizenVerifications.id, id))
+      .from(verifications)
+      .where(eq(verifications.id, id))
       .limit(1);
 
     return result[0] ? this.mapToVerification(result[0]) : null;
@@ -254,13 +253,14 @@ export class UserRepositoryImpl implements UserRepository {
   async saveVerification(verification: CitizenVerification): Promise<void> {
     const verificationData = verification.toJSON();
     // Include the id field as it's required by the schema
-    await db.insert(citizenVerifications).values({
+    await db.insert(verifications).values({
       id: verificationData.id,
       billId: verificationData.billId,
-      citizenId: verificationData.citizenId,
+      userId: verificationData.citizenId,
+      userRole: 'citizen' as const,
       verificationType: verificationData.verificationType,
       verificationStatus: verificationData.verificationStatus,
-      confidence: verificationData.confidence.toString(),
+      confidence: verificationData.confidence,
       evidence: verificationData.evidence,
       expertise: verificationData.expertise,
       reasoning: verificationData.reasoning,
@@ -274,10 +274,10 @@ export class UserRepositoryImpl implements UserRepository {
   async updateVerification(verification: CitizenVerification): Promise<void> {
     const verificationData = verification.toJSON();
     await db
-      .update(citizenVerifications)
+      .update(verifications)
       .set({
         verificationStatus: verificationData.verificationStatus,
-        confidence: verificationData.confidence.toString(),
+        confidence: verificationData.confidence,
         evidence: verificationData.evidence,
         expertise: verificationData.expertise,
         reasoning: verificationData.reasoning,
@@ -285,7 +285,7 @@ export class UserRepositoryImpl implements UserRepository {
         disputes: verificationData.disputes,
         updatedAt: verificationData.updatedAt
       })
-      .where(eq(citizenVerifications.id, verificationData.id));
+      .where(eq(verifications.id, verificationData.id));
   }
 
   /**
@@ -350,7 +350,7 @@ export class UserRepositoryImpl implements UserRepository {
     const results = await db
       .select()
       .from(users)
-      .where(eq(users.role, role));
+      .where(eq(users.role, role as "citizen" | "expert" | "admin" | "journalist" | "advocate"));
 
     return results.map(result => this.mapToUser(result));
   }
@@ -359,7 +359,7 @@ export class UserRepositoryImpl implements UserRepository {
     const results = await db
       .select()
       .from(users)
-      .where(eq(users.verificationStatus, status));
+      .where(eq(users.verificationStatus, status as "pending" | "verified" | "disputed" | "rejected"));
 
     return results.map(result => this.mapToUser(result));
   }

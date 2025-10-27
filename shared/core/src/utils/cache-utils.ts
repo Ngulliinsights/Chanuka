@@ -10,18 +10,18 @@ import { CacheAdapter } from '../caching/core/interfaces';
 import { MemoryAdapter } from '../caching/adapters/memory-adapter';
 
 // Cache metrics for monitoring
-interface CacheMetrics {
+export interface CacheMetrics {
   hits: number;
   misses: number;
   errors: number;
   sets: number;
 }
 
-type CacheOptions = {
+export type CacheOptions = {
   ttl: number;
 };
 
-type CacheDecorator = (
+export type CacheDecorator = (
   target: any,
   propertyKey: string | symbol,
   descriptor: TypedPropertyDescriptor<any>,
@@ -30,7 +30,7 @@ type CacheDecorator = (
 // Default cache adapter
 const defaultAdapter = new MemoryAdapter({
   maxSize: 1000,
-  defaultTtl: 3600
+  defaultTtlSec: 3600
 });
 
 const cacheMetrics: CacheMetrics = {
@@ -215,5 +215,3 @@ export const cache = Object.assign(
     }
   },
 );
-
-export type { CacheMetrics, CacheOptions, CacheDecorator };

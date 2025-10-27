@@ -1,9 +1,9 @@
 import { eq, and, desc, sql, inArray } from 'drizzle-orm';
-import { databaseService } from '../../infrastructure/database/database-service';
+import { databaseService } from '../../../../infrastructure/database/database-service';
 import { database as db } from '@shared/database/connection';
-import { notificationChannelService } from '../../infrastructure/notifications/notification-channels';
-import { userProfileService } from '../users/domain/user-profile';
-import { cacheService } from '../../../infrastructure/cache';
+import { notificationChannelService } from '../../../../infrastructure/notifications/notification-channels';
+import { userProfileService } from '../../../users/domain/user-profile';
+import { cacheService } from '../../../../infrastructure/cache';
 import * as schema from '@shared/schema';
 import { z } from 'zod';
 import { logger } from '@shared/core';

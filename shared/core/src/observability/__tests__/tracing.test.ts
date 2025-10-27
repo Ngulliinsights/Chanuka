@@ -116,7 +116,7 @@ describe('Tracer', () => {
         'traceparent': '00-12345678901234567890123456789012-1234567890123456-01',
       };
 
-      const context = tracer.extract(carrier, 'w3c');
+      const context = tracer.extrawait act(carrier, 'w3c');
 
       expect(context).toBeDefined();
       expect(context?.traceId).toBe('12345678901234567890123456789012');
@@ -141,7 +141,7 @@ describe('Tracer', () => {
         'uber-trace-id': '12345678901234567890123456789012:1234567890123456:0:1',
       };
 
-      const context = tracer.extract(carrier, 'jaeger');
+      const context = tracer.extrawait act(carrier, 'jaeger');
 
       expect(context).toBeDefined();
       expect(context?.traceId).toBe('12345678901234567890123456789012');
@@ -168,7 +168,7 @@ describe('Tracer', () => {
         'x-b3-sampled': '1',
       };
 
-      const context = tracer.extract(carrier, 'b3');
+      const context = tracer.extrawait act(carrier, 'b3');
 
       expect(context).toBeDefined();
       expect(context?.traceId).toBe('12345678901234567890123456789012');

@@ -90,7 +90,7 @@ describe('useAuthForm Hook', () => {
   it('should handle field updates', () => {
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
-    act(() => {
+    await act(() => {
       const event = {
         target: { name: 'email', value: 'test@example.com' }
       } as React.ChangeEvent<HTMLInputElement>;
@@ -103,7 +103,7 @@ describe('useAuthForm Hook', () => {
   it('should handle field validation', async () => {
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
-    act(() => {
+    await act(() => {
       result.current.validateField('email', 'invalid-email');
     });
 
@@ -115,7 +115,7 @@ describe('useAuthForm Hook', () => {
   it('should handle form reset', () => {
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
-    act(() => {
+    await act(() => {
       const emailEvent = {
         target: { name: 'email', value: 'test@example.com' }
       } as React.ChangeEvent<HTMLInputElement>;
@@ -129,7 +129,7 @@ describe('useAuthForm Hook', () => {
 
     expect(result.current.formData.email).toBe('test@example.com');
 
-    act(() => {
+    await act(() => {
       result.current.resetForm();
     });
 
@@ -141,11 +141,11 @@ describe('useAuthForm Hook', () => {
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
     // Simulate errors
-    act(() => {
+    await act(() => {
       result.current.validateField('email', 'invalid');
     });
 
-    act(() => {
+    await act(() => {
       result.current.resetForm();
     });
 
@@ -158,7 +158,7 @@ describe('useAuthForm Hook', () => {
     const options = { ...defaultOptions, onSuccess: mockOnSuccess };
     const { result } = renderHookWithProviders(() => useAuthForm(options));
 
-    act(() => {
+    await act(() => {
       const emailEvent = {
         target: { name: 'email', value: 'test@example.com' }
       } as React.ChangeEvent<HTMLInputElement>;
@@ -186,7 +186,7 @@ describe('useAuthForm Hook', () => {
     const options = { ...defaultOptions, onError: mockOnError };
     const { result } = renderHookWithProviders(() => useAuthForm(options));
 
-    act(() => {
+    await act(() => {
       const emailEvent = {
         target: { name: 'email', value: 'test@example.com' }
       } as React.ChangeEvent<HTMLInputElement>;
@@ -212,7 +212,7 @@ describe('useAuthForm Hook', () => {
     const options = { ...defaultOptions, onSuccess: mockOnSuccess };
     const { result } = renderHookWithProviders(() => useAuthForm(options));
 
-    act(() => {
+    await act(() => {
       result.current.toggleMode(); // Switch to register mode
 
       const firstNameEvent = {
@@ -255,7 +255,7 @@ describe('useAuthForm Hook', () => {
   it('should validate login form validation errors', async () => {
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
-    act(() => {
+    await act(() => {
       const emailEvent = {
         target: { name: 'email', value: 'invalid-email' }
       } as React.ChangeEvent<HTMLInputElement>;
@@ -280,7 +280,7 @@ describe('useAuthForm Hook', () => {
   it('should validate register form validation errors', async () => {
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
-    act(() => {
+    await act(() => {
       result.current.toggleMode(); // Switch to register mode
 
       const firstNameEvent = {
@@ -323,7 +323,7 @@ describe('useAuthForm Hook', () => {
 
     expect(result.current.mode).toBe('login');
 
-    act(() => {
+    await act(() => {
       result.current.toggleMode();
     });
 
@@ -334,7 +334,7 @@ describe('useAuthForm Hook', () => {
     mockRecover.mockResolvedValue(true);
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
-    act(() => {
+    await act(() => {
       result.current.retry();
     });
 
@@ -344,7 +344,7 @@ describe('useAuthForm Hook', () => {
   it('should handle input sanitization', () => {
     const { result } = renderHookWithProviders(() => useAuthForm(defaultOptions));
 
-    act(() => {
+    await act(() => {
       const event = {
         target: { name: 'email', value: 'test@example.com\x00\x1F' }
       } as React.ChangeEvent<HTMLInputElement>;
@@ -374,7 +374,7 @@ describe('useAuthForm Hook', () => {
     expect(result.current.isValid).toBe(false);
     expect(result.current.canSubmit).toBe(false);
 
-    act(() => {
+    await act(() => {
       const emailEvent = {
         target: { name: 'email', value: 'test@example.com' }
       } as React.ChangeEvent<HTMLInputElement>;
@@ -434,7 +434,7 @@ describe('usePasswordVisibility Hook', () => {
   it('should handle visibility toggle', () => {
     const { result } = renderHookWithProviders(() => usePasswordVisibility(false));
 
-    act(() => {
+    await act(() => {
       result.current.toggle();
     });
 
@@ -445,13 +445,13 @@ describe('usePasswordVisibility Hook', () => {
   it('should handle show and hide methods', () => {
     const { result } = renderHookWithProviders(() => usePasswordVisibility(false));
 
-    act(() => {
+    await act(() => {
       result.current.show();
     });
 
     expect(result.current.isVisible).toBe(true);
 
-    act(() => {
+    await act(() => {
       result.current.hide();
     });
 

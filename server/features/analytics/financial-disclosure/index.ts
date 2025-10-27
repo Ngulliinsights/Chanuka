@@ -5,11 +5,11 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { FinancialDisclosureMonitoringService } from "./monitoring.js";
 import { FinancialDisclosureAnalyticsService } from "../services/financial-disclosure.service.js";
-import { ApiSuccess, ApiError } from '@shared/core';
+import { ApiSuccess, ApiError } from '../../../utils/api-response.js';
 import { z, ZodError } from "zod";
-import { ValidationError as InvalidInputError, SponsorNotFoundError, BaseError } from '@shared/core';
-import crypto from 'crypto';
-import { logger } from '../../../../shared/core/index.js';
+import { ValidationError as InvalidInputError, SponsorNotFoundError, BaseError } from '../../../utils/errors.js';
+import * as crypto from 'crypto';
+import { logger } from '../../../../shared/core/src/observability/logging/logger.js';
 import { errorTracker } from '../../../core/errors/error-tracker.js';
 
 // ============================================================================
@@ -648,7 +648,7 @@ export function createFinancialDisclosureRouter(
     }
     
     if (err instanceof BaseError) {
-      return ApiError(res, err.message, err.statusCode || 500);
+      return ApiError(res, err.message, (err as any).statusCode || 500);
     }
     
     // Log unexpected errors with full context for debugging
