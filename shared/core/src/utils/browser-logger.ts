@@ -1,10 +1,58 @@
 import { LogLevel, LogContext, LoggerChild } from '../observability/logging/types';
 
 /**
+ * Environment detection for adaptive logging behavior
+ */
+export interface EnvironmentConfig {
+  name: 'development' | 'staging' | 'production' | 'test';
+  isDevelopment: boolean;
+  isStaging: boolean;
+  isProduction: boolean;
+  isTest: boolean;
+  features: {
+    serverSync: boolean;
+    consoleLogging: boolean;
+    performanceTracking: boolean;
+    errorTracking: boolean;
+    userTracking: boolean;
+  };
+}
+
+/**
+ * Feature flags for gradual migration and A/B testing
+ */
+export interface FeatureFlags {
+  unifiedLogging: boolean;
+  serverSync: boolean;
+  enhancedBuffering: boolean;
+  performanceMetrics: boolean;
+  errorAnalytics: boolean;
+  legacyFallback: boolean;
+}
+
+/**
+ * Unified logging configuration
+ */
+export interface UnifiedLoggerConfig {
+  environment: EnvironmentConfig;
+  featureFlags: FeatureFlags;
+  baseUrl?: string;
+  sessionId?: string;
+  userId?: string;
+  correlationId?: string;
+  enableAutoFlush?: boolean;
+  flushIntervalMs?: number;
+  maxBufferSize?: number;
+  flushBatchSize?: number;
+  legacyLogger?: LoggerChild;
+}
+
+/**
  * Browser-compatible logger that integrates with the server-side observability system.
- * Sends logs to the server via HTTP requests while providing local console logging.
+ * Enhanced with environment detection, unified API, and feature flag migration support.
  */
 export class BrowserLogger implements LoggerChild {
+  private config: UnifiedLoggerConfig;
   private baseUrl: string;
   private sessionId: string;
   private userId?: string;
@@ -21,25 +69,20 @@ export class BrowserLogger implements LoggerChild {
   private maxBufferSize: number = 100;
   private flushBatchSize: number = 10;
   private flushIntervalMs: number = 30000; // 30 seconds
+  private legacyLogger?: LoggerChild;
 
-  constructor(options: {
-    baseUrl?: string;
-    sessionId?: string;
-    userId?: string;
-    correlationId?: string;
-    enableAutoFlush?: boolean;
-    flushIntervalMs?: number;
-    maxBufferSize?: number;
-    flushBatchSize?: number;
-  } = {}) {
-    this.baseUrl = options.baseUrl || '/api/logs';
-    this.sessionId = options.sessionId || this.generateSessionId();
-    this.userId = options.userId;
-    this.correlationId = options.correlationId;
+  constructor(config: UnifiedLoggerConfig) {
+    this.config = config;
+    this.legacyLogger = config.legacyLogger;
 
-    this.maxBufferSize = options.maxBufferSize || 100;
-    this.flushBatchSize = options.flushBatchSize || 10;
-    this.flushIntervalMs = options.flushIntervalMs || 30000;
+    this.baseUrl = config.baseUrl || '/api/logs';
+    this.sessionId = config.sessionId || this.generateSessionId();
+    this.userId = config.userId;
+    this.correlationId = config.correlationId;
+
+    this.maxBufferSize = config.maxBufferSize || 100;
+    this.flushBatchSize = config.flushBatchSize || 10;
+    this.flushIntervalMs = config.flushIntervalMs || 30000;
 
     // Listen for online/offline events
     window.addEventListener('online', () => {
@@ -51,8 +94,8 @@ export class BrowserLogger implements LoggerChild {
       this.isOnline = false;
     });
 
-    // Set up periodic flush if enabled
-    if (options.enableAutoFlush !== false) {
+    // Set up periodic flush if enabled and feature flag allows
+    if (config.enableAutoFlush !== false && config.featureFlags.serverSync) {
       this.flushInterval = window.setInterval(() => {
         if (this.isOnline) {
           this.flush();
@@ -197,29 +240,42 @@ export class BrowserLogger implements LoggerChild {
   }
 
   /**
-   * Internal logging implementation
+   * Internal logging implementation with unified features
    */
   private logInternal(level: LogLevel, message: string, context?: LogContext, metadata?: Record<string, unknown>): void {
-    // Log to console immediately
-    this.logToConsole(level, message, context, metadata);
-
-    // Buffer for server sending
-    this.buffer.push({
-      level,
-      message,
-      context,
-      metadata,
-      timestamp: new Date(),
-    });
-
-    // Prevent buffer from growing too large
-    if (this.buffer.length > this.maxBufferSize) {
-      this.buffer.shift(); // Remove oldest log
+    // Use legacy logger if feature flag is enabled and legacy logger exists
+    if (this.config.featureFlags.legacyFallback && this.legacyLogger) {
+      try {
+        this.legacyLogger[level](message, context, metadata);
+      } catch (error) {
+        console.warn('Legacy logger fallback failed:', error);
+      }
     }
 
-    // Auto-flush if buffer is getting full
-    if (this.buffer.length >= this.flushBatchSize && this.isOnline) {
-      this.flush();
+    // Log to console if enabled
+    if (this.config.environment.features.consoleLogging) {
+      this.logToConsole(level, message, context, metadata);
+    }
+
+    // Buffer for server sending if feature flag enabled
+    if (this.config.featureFlags.serverSync) {
+      this.buffer.push({
+        level,
+        message,
+        context,
+        metadata,
+        timestamp: new Date(),
+      });
+
+      // Prevent buffer from growing too large
+      if (this.buffer.length > this.maxBufferSize) {
+        this.buffer.shift(); // Remove oldest log
+      }
+
+      // Auto-flush if buffer is getting full
+      if (this.buffer.length >= this.flushBatchSize && this.isOnline) {
+        this.flush();
+      }
     }
   }
 
@@ -258,13 +314,8 @@ export class BrowserLogger implements LoggerChild {
 
   child(bindings: Record<string, unknown>): LoggerChild {
     const childLogger = new BrowserLogger({
-      baseUrl: this.baseUrl,
-      sessionId: this.sessionId,
-      userId: this.userId,
-      correlationId: this.correlationId,
+      ...this.config,
       enableAutoFlush: false, // Child loggers don't auto-flush
-      maxBufferSize: this.maxBufferSize,
-      flushBatchSize: this.flushBatchSize,
     });
 
     // Merge bindings into context for all future logs
@@ -306,16 +357,22 @@ export class BrowserLogger implements LoggerChild {
   // Browser-specific methods
 
   /**
-   * Log browser performance metrics
+   * Log browser performance metrics with enhanced tracking
    */
   logPerformance(operation: string, duration: number, metadata?: Record<string, unknown>): void {
-    this.info(`Performance: ${operation} completed in ${duration.toFixed(2)}ms`, {
+    if (!this.config.featureFlags.performanceMetrics) return;
+
+    const performanceData = {
       component: 'performance',
       operation,
       duration,
       userAgent: navigator.userAgent,
       url: window.location.href,
-    }, metadata);
+      memoryUsage: this.getMemoryUsage(),
+      connectionType: this.getConnectionType(),
+    };
+
+    this.info(`Performance: ${operation} completed in ${duration.toFixed(2)}ms`, performanceData, metadata);
   }
 
   /**
@@ -428,6 +485,52 @@ export class BrowserLogger implements LoggerChild {
   }
 
   /**
+   * Get memory usage information
+   */
+  private getMemoryUsage(): Record<string, unknown> | undefined {
+    if ('memory' in performance) {
+      const mem = (performance as any).memory;
+      return {
+        used: mem.usedJSHeapSize,
+        total: mem.totalJSHeapSize,
+        limit: mem.jsHeapSizeLimit,
+      };
+    }
+    return undefined;
+  }
+
+  /**
+   * Get connection type information
+   */
+  private getConnectionType(): string | undefined {
+    if ('connection' in navigator) {
+      return (navigator as any).connection?.effectiveType || 'unknown';
+    }
+    return undefined;
+  }
+
+  /**
+   * Get current configuration
+   */
+  getConfig(): UnifiedLoggerConfig {
+    return this.config;
+  }
+
+  /**
+   * Update feature flags dynamically
+   */
+  updateFeatureFlags(flags: Partial<FeatureFlags>): void {
+    this.config.featureFlags = { ...this.config.featureFlags, ...flags };
+  }
+
+  /**
+   * Set legacy logger for fallback
+   */
+  setLegacyLogger(logger: LoggerChild): void {
+    this.legacyLogger = logger;
+  }
+
+  /**
    * Clean up resources
    */
   destroy(): void {
@@ -439,9 +542,62 @@ export class BrowserLogger implements LoggerChild {
 }
 
 /**
- * Default browser logger instance
+ * Environment detection utility
+ */
+export function detectEnvironment(): EnvironmentConfig {
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  const nodeEnv = process.env.NODE_ENV || 'development';
+
+  let name: EnvironmentConfig['name'] = 'development';
+  if (hostname.includes('staging') || nodeEnv === 'staging') {
+    name = 'staging';
+  } else if (hostname.includes('prod') || hostname.includes('production') || nodeEnv === 'production') {
+    name = 'production';
+  } else if (nodeEnv === 'test') {
+    name = 'test';
+  }
+
+  const isDevelopment = name === 'development';
+  const isStaging = name === 'staging';
+  const isProduction = name === 'production';
+  const isTest = name === 'test';
+
+  return {
+    name,
+    isDevelopment,
+    isStaging,
+    isProduction,
+    isTest,
+    features: {
+      serverSync: !isTest, // Disable server sync in tests
+      consoleLogging: isDevelopment || isStaging,
+      performanceTracking: isDevelopment || isStaging || isProduction,
+      errorTracking: true, // Always enabled
+      userTracking: isStaging || isProduction,
+    },
+  };
+}
+
+/**
+ * Default feature flags based on environment
+ */
+export function getDefaultFeatureFlags(environment: EnvironmentConfig): FeatureFlags {
+  return {
+    unifiedLogging: true, // Always enabled for new logger
+    serverSync: environment.features.serverSync,
+    enhancedBuffering: environment.isDevelopment || environment.isStaging,
+    performanceMetrics: environment.features.performanceTracking,
+    errorAnalytics: environment.features.errorTracking,
+    legacyFallback: environment.isDevelopment, // Enable fallback in dev for testing
+  };
+}
+
+/**
+ * Default browser logger instance with unified configuration
  */
 export const browserLogger = new BrowserLogger({
+  environment: detectEnvironment(),
+  featureFlags: getDefaultFeatureFlags(detectEnvironment()),
   baseUrl: process.env.NODE_ENV === 'production'
     ? '/api/logs'
     : 'http://localhost:3000/api/logs',
@@ -452,46 +608,86 @@ export const browserLogger = new BrowserLogger({
 });
 
 /**
- * Global error handler integration
+ * Enhanced global error handler integration with unified features
  */
 export function setupGlobalErrorHandling(logger: BrowserLogger = browserLogger): void {
+  const config = logger.getConfig();
+
   // Handle unhandled promise rejections
   window.addEventListener('unhandledrejection', (event) => {
-    logger.logError('Unhandled promise rejection', {
-      component: 'global-error',
-      operation: 'unhandledrejection',
-    }, {
-      reason: event.reason,
-      promise: event.promise,
-    });
+    if (config.featureFlags.errorAnalytics) {
+      logger.logError('Unhandled promise rejection', {
+        component: 'global-error',
+        operation: 'unhandledrejection',
+      }, {
+        reason: event.reason,
+        promise: event.promise,
+      });
+    }
   });
 
   // Handle uncaught errors
   window.addEventListener('error', (event) => {
-    logger.logError('Uncaught error', {
-      component: 'global-error',
-      operation: 'uncaughterror',
-    }, {
-      message: event.message,
-      filename: event.filename,
-      lineno: event.lineno,
-      colno: event.colno,
-      error: event.error,
-    });
+    if (config.featureFlags.errorAnalytics) {
+      logger.logError('Uncaught error', {
+        component: 'global-error',
+        operation: 'uncaughterror',
+      }, {
+        message: event.message,
+        filename: event.filename,
+        lineno: event.lineno,
+        colno: event.colno,
+        error: event.error,
+      });
+    }
   });
 
-  // Handle console errors (override console methods)
-  const originalConsoleError = console.error;
-  console.error = (...args: any[]) => {
-    originalConsoleError.apply(console, args);
-    logger.error(args.join(' '), { component: 'console', operation: 'error' });
+  // Handle console errors (override console methods) if console logging is enabled
+  if (config.environment.features.consoleLogging) {
+    const originalConsoleError = console.error;
+    console.error = (...args: any[]) => {
+      originalConsoleError.apply(console, args);
+      logger.error(args.join(' '), { component: 'console', operation: 'error' });
+    };
+
+    const originalConsoleWarn = console.warn;
+    console.warn = (...args: any[]) => {
+      originalConsoleWarn.apply(console, args);
+      logger.warn(args.join(' '), { component: 'console', operation: 'warn' });
+    };
+  }
+}
+
+/**
+ * Migration helper to create browser logger with legacy fallback
+ */
+export function createBrowserLoggerWithLegacyFallback(
+  legacyLogger?: LoggerChild,
+  customConfig?: Partial<UnifiedLoggerConfig>
+): BrowserLogger {
+  const environment = detectEnvironment();
+  const defaultConfig: UnifiedLoggerConfig = {
+    environment,
+    featureFlags: getDefaultFeatureFlags(environment),
+    legacyLogger,
+    ...customConfig,
   };
 
-  const originalConsoleWarn = console.warn;
-  console.warn = (...args: any[]) => {
-    originalConsoleWarn.apply(console, args);
-    logger.warn(args.join(' '), { component: 'console', operation: 'warn' });
-  };
+  return new BrowserLogger(defaultConfig);
+}
+
+/**
+ * Utility to check if unified logging is enabled
+ */
+export function isUnifiedLoggingEnabled(logger: BrowserLogger = browserLogger): boolean {
+  return logger.getConfig().featureFlags.unifiedLogging;
+}
+
+/**
+ * Utility to enable/disable server sync
+ */
+export function setServerSyncEnabled(enabled: boolean, logger: BrowserLogger = browserLogger): void {
+  logger.updateFeatureFlags({ serverSync: enabled });
 }
 
 // Auto-setup global error handling if running in browser

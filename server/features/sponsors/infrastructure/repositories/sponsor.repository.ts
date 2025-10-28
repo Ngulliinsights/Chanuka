@@ -1,10 +1,10 @@
-import { readDatabase } from '@shared/database/connection'; // Use shared connection
+import { db } from '../../../../../shared/database/pool.js'; // Use shared connection
 import {
   sponsor as sponsors, sponsorAffiliation as sponsorAffiliations, sponsorTransparency, billSponsorship as billSponsorships, bill as bills,
   type Sponsor, type SponsorAffiliation, type SponsorTransparency, type BillSponsorship, type InsertSponsor, type Bill, type InsertBillSponsorship // Added InsertSponsor
 } from '../../../../../shared/schema'; // Adjusted path
 import { eq, and, sql, desc, asc, count, avg, inArray, like, or, sql as sqlFn } from 'drizzle-orm'; // Added asc, sqlFn alias
-import { logger } from '@shared/core';
+import { logger } from '../../../../../shared/core/src/observability/logging/index.js';
 
 // Interface defining search options for listing sponsors
 export interface SponsorSearchOptions {
@@ -64,10 +64,9 @@ function getErrorMessage(error: unknown): string {
  */
 export class SponsorRepository {
   // Use getter for dynamic DB connection access
-  private get db() {
-    const d = readDatabase;
-    if (!d) throw new Error('Database not initialized for SponsorRepository');
-    return d;
+  private get database() {
+    if (!db) throw new Error('Database not initialized for SponsorRepository');
+    return db;
   }
 
   // ============================================================================
@@ -78,7 +77,7 @@ export class SponsorRepository {
     const logContext = { component: 'SponsorRepository', operation: 'findById', sponsorId: id };
     logger.debug("Fetching sponsor by ID", logContext);
     try {
-      const result = await this.db.select().from(sponsors).where(eq(sponsors.id, id)).limit(1);
+      const result = await this.database.select().from(sponsors).where(eq(sponsors.id, id)).limit(1);
       if (result.length === 0) {
           logger.warn("Sponsor not found", logContext);
           return null;
@@ -106,7 +105,7 @@ export class SponsorRepository {
         updatedAt: new Date()  // Set update timestamp
       };
 
-      const [newSponsor] = await this.db.insert(sponsors)
+      const [newSponsor] = await this.database.insert(sponsors)
         .values(dataToInsert)
         .returning();
 
@@ -135,7 +134,7 @@ export class SponsorRepository {
       Object.keys(dataToUpdate).forEach(key => dataToUpdate[key] === undefined && delete dataToUpdate[key]);
 
 
-      const [updatedSponsor] = await this.db.update(sponsors)
+      const [updatedSponsor] = await this.database.update(sponsors)
         .set(dataToUpdate)
         .where(eq(sponsors.id, id))
         .returning();
@@ -182,7 +181,7 @@ export class SponsorRepository {
       if (options.conflictLevel) conditions.push(eq(sponsors.conflictLevel, options.conflictLevel as any));
 
       // Build query
-      let query = this.db.select().from(sponsors);
+      let query = this.database.select().from(sponsors);
       if (conditions.length > 0) {
         query = query.where(and(...conditions));
       }
@@ -240,7 +239,7 @@ export class SponsorRepository {
       if (options.party) conditions.push(eq(sponsors.party, options.party));
       // Add other filters from options if needed
 
-      let dbQuery = this.db.select().from(sponsors).where(and(...conditions));
+      let dbQuery = this.database.select().from(sponsors).where(and(...conditions));
 
       // Simple sort by name for search results
       dbQuery = dbQuery.orderBy(asc(sponsors.name)).limit(limit).offset(offset);
@@ -260,7 +259,7 @@ export class SponsorRepository {
     logger.debug("Fetching sponsors by IDs", logContext);
     try {
       if (ids.length === 0) return [];
-      return await this.db.select().from(sponsors).where(inArray(sponsors.id, ids));
+      return await this.database.select().from(sponsors).where(inArray(sponsors.id, ids));
     } catch (error) {
       logger.error('Error fetching sponsors by IDs', { ...logContext, error: getErrorMessage(error) });
       throw new Error(`Database error retrieving sponsors: ${getErrorMessage(error)}`);
@@ -300,7 +299,7 @@ export class SponsorRepository {
       const conditions = [eq(sponsorAffiliations.sponsorId, sponsorId)];
       if (activeOnly) conditions.push(eq(sponsorAffiliations.isActive, true));
 
-      return await this.db.select()
+      return await this.database.select()
         .from(sponsorAffiliations)
         .where(and(...conditions))
         .orderBy(desc(sponsorAffiliations.startDate), desc(sponsorAffiliations.createdAt)); // Sort by start date then creation
@@ -320,7 +319,7 @@ export class SponsorRepository {
           const conditions = [inArray(sponsorAffiliations.sponsorId, sponsorIds)];
           if (activeOnly) conditions.push(eq(sponsorAffiliations.isActive, true));
 
-          const affiliations = await this.db.select()
+          const affiliations = await this.database.select()
               .from(sponsorAffiliations)
               .where(and(...conditions))
               .orderBy(desc(sponsorAffiliations.startDate));
@@ -348,7 +347,7 @@ export class SponsorRepository {
        // Explicitly set isActive default if not provided
        const dataToInsert = { ...affiliationData, isActive: affiliationData.isActive ?? true, createdAt: new Date() } as any;
 
-      const [newAffiliation] = await this.db.insert(sponsorAffiliations)
+      const [newAffiliation] = await this.database.insert(sponsorAffiliations)
         .values(dataToInsert)
         .returning();
 
@@ -370,7 +369,7 @@ export class SponsorRepository {
          // Remove undefined keys
         Object.keys(dataToUpdate).forEach(key => (dataToUpdate as any)[key] === undefined && delete (dataToUpdate as any)[key]);
 
-      const [updatedAffiliation] = await this.db.update(sponsorAffiliations)
+      const [updatedAffiliation] = await this.database.update(sponsorAffiliations)
         .set(dataToUpdate)
         .where(eq(sponsorAffiliations.id, id))
         .returning();
@@ -397,7 +396,7 @@ export class SponsorRepository {
         };
         // Set end date only when deactivating, if provided or not already set
         if (!isActive) {
-             const [currentAff] = await this.db.select({ endDate: sponsorAffiliations.endDate }).from(sponsorAffiliations).where(eq(sponsorAffiliations.id, id));
+             const [currentAff] = await this.database.select({ endDate: sponsorAffiliations.endDate }).from(sponsorAffiliations).where(eq(sponsorAffiliations.id, id));
              if (!currentAff?.endDate) { // Only set end date if not already set
                  updateData.endDate = endDate || new Date();
              }
@@ -418,7 +417,7 @@ export class SponsorRepository {
      const logContext = { component: 'SponsorRepository', operation: 'listTransparencyRecords', sponsorId };
      logger.debug("Fetching sponsor transparency records", logContext);
     try {
-      return await this.db.select()
+      return await this.database.select()
         .from(sponsorTransparency)
         .where(eq(sponsorTransparency.sponsorId, sponsorId))
         .orderBy(desc(sponsorTransparency.dateReported), desc(sponsorTransparency.createdAt)); // Sort by report date, then creation
@@ -435,7 +434,7 @@ export class SponsorRepository {
        if (sponsorIds.length === 0) return transparencyMap;
 
        try {
-           const records = await this.db.select()
+           const records = await this.database.select()
                .from(sponsorTransparency)
                .where(inArray(sponsorTransparency.sponsorId, sponsorIds))
                .orderBy(desc(sponsorTransparency.dateReported));
@@ -471,7 +470,7 @@ export class SponsorRepository {
       Object.keys(dataToInsert).forEach(key => (dataToInsert as any)[key] === undefined && delete (dataToInsert as any)[key]);
 
 
-      const [newRecord] = await this.db.insert(sponsorTransparency)
+      const [newRecord] = await this.database.insert(sponsorTransparency)
           .values(dataToInsert)
           .returning();
 
@@ -494,7 +493,7 @@ export class SponsorRepository {
        Object.keys(dataToUpdate).forEach(key => dataToUpdate[key] === undefined && delete dataToUpdate[key]);
 
 
-      const [updatedRecord] = await this.db.update(sponsorTransparency)
+      const [updatedRecord] = await this.database.update(sponsorTransparency)
         .set(dataToUpdate)
         .where(eq(sponsorTransparency.id, id))
         .returning();
@@ -534,7 +533,7 @@ export class SponsorRepository {
       const conditions = [eq(billSponsorships.sponsorId, sponsorId)];
       if (activeOnly) conditions.push(eq(billSponsorships.isActive, true));
 
-      return await this.db.select()
+      return await this.database.select()
         .from(billSponsorships)
         .where(and(...conditions))
         .orderBy(desc(billSponsorships.sponsorshipDate));
@@ -552,7 +551,7 @@ export class SponsorRepository {
       const conditions = [eq(billSponsorships.billId, billId)];
       if (activeOnly) conditions.push(eq(billSponsorships.isActive, true));
 
-      return await this.db.select()
+      return await this.database.select()
         .from(billSponsorships)
         .where(and(...conditions))
          // Order by type (primary first), then by date
@@ -574,7 +573,7 @@ export class SponsorRepository {
            throw new Error(`Invalid sponsorshipType: ${sponsorshipType}. Must be one of ${validTypes.join(', ')}`);
        }
 
-      const [newSponsorship] = await this.db.insert(billSponsorships)
+      const [newSponsorship] = await this.database.insert(billSponsorships)
         .values({
           sponsorId, billId, sponsorshipType,
           sponsorshipDate: sponsorshipDate || new Date(),
@@ -604,7 +603,7 @@ export class SponsorRepository {
             // Remove undefined keys
             Object.keys(dataToUpdate).forEach(key => dataToUpdate[key] === undefined && delete dataToUpdate[key]);
 
-            const [updatedSponsorship] = await this.db.update(billSponsorships)
+            const [updatedSponsorship] = await this.database.update(billSponsorships)
                 .set(dataToUpdate)
                 .where(eq(billSponsorships.id, id))
                 .returning();
@@ -643,7 +642,7 @@ export class SponsorRepository {
      const logContext = { component: 'SponsorRepository', operation: 'getBill', billId };
      logger.debug("Fetching bill details", logContext);
     try {
-      const [bill] = await this.db.select().from(bills).where(eq(bills.id, billId)).limit(1);
+      const [bill] = await this.database.select().from(bills).where(eq(bills.id, billId)).limit(1);
       if (!bill) logger.warn("Bill not found", logContext);
       return bill || null;
     } catch (error) {
@@ -657,7 +656,7 @@ export class SponsorRepository {
      logger.debug("Fetching multiple bills by IDs", logContext);
     try {
       if (billIds.length === 0) return [];
-      return await this.db.select().from(bills).where(inArray(bills.id, billIds));
+      return await this.database.select().from(bills).where(inArray(bills.id, billIds));
     } catch (error) {
       logger.error('Error fetching bills by IDs', { ...logContext, error: getErrorMessage(error) });
       throw new Error(`Database error retrieving bills: ${getErrorMessage(error)}`);
@@ -677,7 +676,7 @@ export class SponsorRepository {
                sql`${bills.description} ILIKE ${searchPattern}`
            );
 
-           let query = this.db.select().from(bills);
+           let query = this.database.select().from(bills);
            const conditions: ReturnType<typeof sqlFn>[] = [searchConditions];
 
            // Filter by specific bill IDs if provided
@@ -706,7 +705,7 @@ export class SponsorRepository {
     const logContext = { component: 'SponsorRepository', operation: 'getActiveSponsorCount' };
     logger.debug("Counting active sponsors", logContext);
     try {
-      const [result] = await this.db.select({ count: count() }).from(sponsors).where(eq(sponsors.isActive, true));
+      const [result] = await this.database.select({ count: count() }).from(sponsors).where(eq(sponsors.isActive, true));
       return result?.count ?? 0;
     } catch (error) {
       logger.error('Error counting active sponsors', { ...logContext, error: getErrorMessage(error) });
@@ -718,7 +717,7 @@ export class SponsorRepository {
     const logContext = { component: 'SponsorRepository', operation: 'getUniqueParties' };
      logger.debug("Fetching unique parties", logContext);
     try {
-      const result = await this.db.selectDistinct({ party: sponsors.party }).from(sponsors).where(eq(sponsors.isActive, true));
+      const result = await this.database.selectDistinct({ party: sponsors.party }).from(sponsors).where(eq(sponsors.isActive, true));
       // Filter out null/undefined and return unique strings
       return result.map(r => r.party).filter((p): p is string => !!p);
     } catch (error) {
@@ -731,7 +730,7 @@ export class SponsorRepository {
      const logContext = { component: 'SponsorRepository', operation: 'getUniqueConstituencies' };
      logger.debug("Fetching unique constituencies", logContext);
     try {
-      const result = await this.db.selectDistinct({ constituency: sponsors.constituency }).from(sponsors).where(eq(sponsors.isActive, true));
+      const result = await this.database.selectDistinct({ constituency: sponsors.constituency }).from(sponsors).where(eq(sponsors.isActive, true));
       return result.map(r => r.constituency).filter((c): c is string => !!c);
     } catch (error) {
       logger.error('Error fetching unique constituencies', { ...logContext, error: getErrorMessage(error) });

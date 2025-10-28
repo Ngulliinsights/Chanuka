@@ -61,6 +61,9 @@ export * from './validation';
 // Rate Limiting (consolidates server/middleware/rate-limiter.ts)
 export * from './rate-limiting';
 
+// Cross-cutting utilities for loading, navigation, and dashboard operations
+// (Client-specific implementations are in client/src/core/)
+
 // UTILITIES - Consolidated utility functions
 export * from './utils';
 

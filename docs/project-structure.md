@@ -6,6 +6,8 @@ Maximum depth: 7 levels
 .
 503_ERROR_RESOLUTION.md
 client/
+├── CONSOLIDATION_PLAN.md
+├── CONSOLIDATION_SUMMARY.md
 ├── index.html
 ├── public/
 │   ├── Chanuka_logo.png
@@ -19,6 +21,8 @@ client/
 │   ├── manifest.webmanifest
 │   ├── offline.html
 │   ├── sw.js
+├── scripts/
+│   ├── consolidate-client.js
 ├── src/
 │   ├── __tests__/
 │   │   ├── accessibility/
@@ -68,7 +72,6 @@ client/
 │   │   │   ├── accessibility-settings-panel.tsx
 │   │   ├── admin/
 │   │   │   ├── admin-dashboard.tsx
-│   │   │   ├── PerformanceDashboard.tsx
 │   │   ├── analysis/
 │   │   │   ├── comments.tsx
 │   │   │   ├── section.tsx
@@ -77,7 +80,6 @@ client/
 │   │   ├── analytics/
 │   │   │   ├── engagement-dashboard.tsx
 │   │   │   ├── JourneyAnalyticsDashboard.tsx
-│   │   ├── analytics-dashboard.tsx
 │   │   ├── AppProviders.tsx
 │   │   ├── architecture-planning.tsx
 │   │   ├── auth/
@@ -400,11 +402,33 @@ client/
 │   │   ├── __tests__/
 │   │   │   ├── NavigationContext.test.tsx
 │   │   │   ├── navigation-persistence.test.tsx
-│   │   ├── LoadingContext.tsx
 │   │   ├── NavigationContext.tsx
-│   │   ├── ResponsiveNavigationContext.tsx
 │   │   ├── ThemeContext.tsx
 │   │   ├── UnifiedLoadingContext.tsx
+│   ├── core/
+│   │   ├── dashboard/
+│   │   │   ├── context.ts
+│   │   │   ├── hooks.ts
+│   │   │   ├── index.ts
+│   │   │   ├── reducer.ts
+│   │   │   ├── types.ts
+│   │   │   ├── utils.ts
+│   │   │   ├── widgets.ts
+│   │   ├── loading/
+│   │   │   ├── context.ts
+│   │   │   ├── hooks.ts
+│   │   │   ├── index.ts
+│   │   │   ├── reducer.ts
+│   │   │   ├── types.ts
+│   │   │   ├── utils.ts
+│   │   ├── navigation/
+│   │   │   ├── context.ts
+│   │   │   ├── hooks.ts
+│   │   │   ├── index.ts
+│   │   │   ├── persistence.ts
+│   │   │   ├── reducer.ts
+│   │   │   ├── types.ts
+│   │   │   ├── utils.ts
 │   ├── docs/
 │   │   ├── backward-compatibility-requirements.md
 │   │   ├── deduplication-strategy.md
@@ -481,7 +505,6 @@ client/
 │   │   ├── use-navigation-accessibility.ts
 │   │   ├── use-navigation-performance.ts
 │   │   ├── use-navigation-preferences.tsx
-│   │   ├── use-navigation-sync.tsx
 │   │   ├── useOfflineCapabilities.ts
 │   │   ├── useOfflineDetection.tsx
 │   │   ├── use-onboarding.tsx
@@ -666,7 +689,6 @@ client/
 │   │   ├── connectionAwareLoading.ts
 │   │   ├── development-debug.ts
 │   │   ├── development-error-recovery.ts
-│   │   ├── logger.js
 │   │   ├── logger.ts
 │   │   ├── mobile-error-handler.ts
 │   │   ├── mobile-touch-handler.ts
@@ -699,8 +721,10 @@ client/
 │   │   ├── service-recovery.ts
 │   │   ├── serviceWorker.ts
 │   ├── vite-env.d.ts
+├── TECHNICAL_IMPLEMENTATION.md
 ├── tsconfig.json
 components.json
+CONSOLIDATION_MIGRATION_SUMMARY.md
 CONSOLIDATION_PROGRESS.md
 CORE_CONSISTENCY_REPORT.md
 CORE_STRUCTURE_FINAL_UPDATE.md
@@ -804,6 +828,7 @@ logs/
 ├── logger_files_clean.txt
 ├── performance.log
 ├── security.log
+manual-bug-fixing-guide.md
 migration/
 ├── __tests__/
 │   ├── codemod-imports.test.js
@@ -1144,6 +1169,8 @@ server/
 │   │   │   ├── index.ts
 │   │   │   ├── sponsorship.routes.ts
 │   │   ├── real-time-tracking.ts
+│   │   ├── services/
+│   │   │   ├── voting-pattern-analysis-service.ts
 │   │   ├── voting-pattern-analysis.ts
 │   │   ├── voting-pattern-analysis-router.ts
 │   ├── community/
@@ -1277,6 +1304,7 @@ server/
 ├── infrastructure/
 │   ├── cache/
 │   │   ├── cache.ts
+│   │   ├── cache-service.ts
 │   │   ├── index.ts
 │   ├── database/
 │   │   ├── base/
@@ -1445,9 +1473,11 @@ server/
 │   ├── db-init.ts
 │   ├── errors.ts
 │   ├── featureFlags.ts
+│   ├── logger.ts
 │   ├── metrics.ts
 │   ├── performance-monitoring-utils.ts
 │   ├── race-condition-prevention.ts
+│   ├── shared-core-fallback.ts
 │   ├── validation.ts
 ├── vite.ts
 SERVICE_AVAILABILITY_SOLUTIONS.md
@@ -1765,6 +1795,7 @@ shared/
 │   │   │   ├── cache-utils.ts
 │   │   │   ├── constants.ts
 │   │   │   ├── correlation-id.ts
+│   │   │   ├── dashboard-utils.ts
 │   │   │   ├── data-utils.ts
 │   │   │   ├── formatting/
 │   │   │   │   ├── currency.ts
@@ -1778,7 +1809,9 @@ shared/
 │   │   │   ├── images/
 │   │   │   │   ├── image-utils.ts
 │   │   │   ├── index.ts
+│   │   │   ├── loading-utils.ts
 │   │   │   ├── migration.ts
+│   │   │   ├── navigation-utils.ts
 │   │   │   ├── number-utils.ts
 │   │   │   ├── performance-utils.ts
 │   │   │   ├── race-condition-prevention.ts
@@ -1823,6 +1856,19 @@ shared/
 │   │   │   │   ├── property.ts
 │   │   │   ├── types.ts
 │   │   │   ├── validation-service.ts
+│   ├── utilities/
+│   │   ├── api/
+│   │   │   ├── index.ts
+│   │   │   ├── response.ts
+│   │   ├── database/
+│   │   ├── index.ts
+│   │   ├── logging/
+│   │   │   ├── index.ts
+│   │   │   ├── unified-logger.ts
+│   │   ├── performance/
+│   │   │   ├── index.ts
+│   │   │   ├── monitoring.ts
+│   │   ├── validation/
 ├── database/
 │   ├── connection.ts
 │   ├── example-usage.ts
@@ -1834,6 +1880,7 @@ shared/
 │   ├── en.ts
 ├── schema/
 │   ├── __tests__/
+│   │   ├── schema.ts
 │   │   ├── schema_integration_tests.ts
 │   │   ├── schema_unit_test.ts
 │   ├── enum.ts
@@ -1882,6 +1929,7 @@ tools/
 ├── validate-schema-congruence.ts
 tsconfig.json
 tsconfig.server.json
+UTILITY_MIGRATION_REPORT.md
 vite.config.ts
 vitest.config.ts
 vitest.frontend.config.ts
@@ -1889,4 +1937,4 @@ vitest.frontend.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-27 02:14:24
+Generated on: 2025-10-28 10:36:13

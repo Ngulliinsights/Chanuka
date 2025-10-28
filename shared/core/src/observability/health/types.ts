@@ -130,6 +130,41 @@ export interface ProcessHealthCheckOptions extends HealthCheckOptions {
   maxCpuPercent?: number;
 }
 
+export interface ApiEndpointHealthCheckOptions extends HealthCheckOptions {
+  url: string;
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
+  headers?: Record<string, string>;
+  body?: string;
+  expectedStatusCodes?: number[];
+  maxResponseTime?: number;
+  followRedirects?: boolean;
+  auth?: {
+    type: 'bearer' | 'basic' | 'api-key';
+    token?: string;
+    username?: string;
+    password?: string;
+    headerName?: string;
+  };
+}
+
+export interface ApiServiceHealthCheckOptions extends HealthCheckOptions {
+  baseUrl: string;
+  endpoints: Array<{
+    path: string;
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
+    expectedStatusCodes?: number[];
+    weight?: number;
+  }>;
+  minHealthyEndpoints?: number;
+  auth?: {
+    type: 'bearer' | 'basic' | 'api-key';
+    token?: string;
+    username?: string;
+    password?: string;
+    headerName?: string;
+  };
+}
+
 export interface CustomHealthCheckOptions extends HealthCheckOptions {
   checkFunction: () => Promise<HealthCheckResult>;
 }

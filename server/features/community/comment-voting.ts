@@ -9,6 +9,7 @@ import { eq, and, sql, desc } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
 import { cacheKeys } from '../../../shared/core/src/caching/key-generator';
 import { logger } from '@shared/core';
+import { CACHE_TTL_SHORT } from '../../../shared/core/src/primitives/constants/time.js';
 
 export interface VoteResult {
   success: boolean;
@@ -32,7 +33,7 @@ export interface CommentEngagementStats {
  * Handles upvotes, downvotes, and engagement analytics
  */
 export class CommentVotingService {
-  private readonly VOTE_CACHE_TTL = CACHE_TTL.SHORT;
+  private readonly VOTE_CACHE_TTL = CACHE_TTL_SHORT;
 
   /**
    * Vote on a comment (upvote or downvote)
