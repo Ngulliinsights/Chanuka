@@ -124,3 +124,4 @@ export function LazyLoadPlaceholder() {
     </div>
   );
 }
+

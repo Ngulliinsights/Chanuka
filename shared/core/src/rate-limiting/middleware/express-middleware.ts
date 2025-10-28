@@ -280,3 +280,4 @@ export function createSearchRateLimitMiddleware(store: IRateLimitStore) {
     message: 'Too many search requests from this IP'
   });
 }
+

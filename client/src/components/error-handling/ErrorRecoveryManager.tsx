@@ -66,3 +66,4 @@ export function ErrorRecoveryManager({ children }: ErrorRecoveryManagerProps) {
 
   return <>{children}</>;
 }
+

@@ -279,3 +279,4 @@ export const interactiveStateUtils = {
 
 export type InteractiveComponent = 'button' | 'card' | 'input' | 'link' | 'default';
 export type InteractiveState = 'hover' | 'focus' | 'active' | 'disabled' | 'loading' | 'default';
+

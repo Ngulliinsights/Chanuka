@@ -390,3 +390,4 @@ export const typographyUtils = {
 export type TypographyToken = typeof typographyTokens;
 export type TypographyScale = typeof typographyScale;
 export type ResponsiveTypography = typeof responsiveTypography;
+

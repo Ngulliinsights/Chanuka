@@ -392,3 +392,4 @@ export type ResponsiveValue<T> = Partial<Record<Breakpoint, T>>;
 
 // React import for the hook
 import React from 'react';
+

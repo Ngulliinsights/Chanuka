@@ -295,3 +295,4 @@ export function initializeAssetFallbacks(): void {
 }
 
 export default DEFAULT_ASSET_FALLBACKS;
+

@@ -3,7 +3,7 @@
  * Implements comprehensive performance tracking, bundle analysis, and optimization strategies
  */
 
-import { performanceMonitor } from './performanceMonitoring';
+import { performanceMonitor } from '@shared/core/performance'';
 import { logger } from './browser-logger';
 
 export interface PerformanceConfig {
@@ -765,6 +765,7 @@ export function usePerformanceOptimization() {
     exportPerformanceReport: () => performanceOptimizer.exportPerformanceReport()
   };
 }
+
 
 
 

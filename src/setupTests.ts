@@ -196,3 +196,4 @@ Object.defineProperty(window, 'history', {
   value: mockHistory,
   writable: true,
 });
+

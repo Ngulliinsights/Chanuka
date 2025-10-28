@@ -184,3 +184,4 @@ describe('ComponentErrorFallback', () => {
     expect(mockProps.resetError).toHaveBeenCalled();
   });
 });
+

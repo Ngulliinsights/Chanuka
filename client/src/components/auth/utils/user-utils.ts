@@ -261,3 +261,4 @@ export function getAvatarUrl(email: string, size: number = 80): string {
   // Return a placeholder avatar URL (you can replace with actual service)
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(email)}&size=${size}&background=${color}&color=fff`;
 }
+

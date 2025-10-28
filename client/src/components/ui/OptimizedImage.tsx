@@ -303,3 +303,4 @@ export const OptimizedHeroImage: React.FC<OptimizedHeroImageProps> = ({
     </div>
   );
 };
+

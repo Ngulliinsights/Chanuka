@@ -161,3 +161,4 @@ export function safeValidateDashboardConfig(config: unknown): { success: boolean
     return { success: false, error: error as DashboardValidationError };
   }
 }
+

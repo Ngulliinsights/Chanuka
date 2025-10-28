@@ -331,3 +331,4 @@ export function validateDashboardConfig(config: any): { valid: boolean; errors: 
     errors,
   };
 }
+

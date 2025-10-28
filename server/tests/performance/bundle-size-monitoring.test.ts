@@ -303,3 +303,4 @@ describe('bundle-size-monitoring', () => {
     expect(true).toBe(true);
   });
 });
+

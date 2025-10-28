@@ -108,3 +108,4 @@ export const isValidNavigationPath = (path: string): boolean => {
     return false;
   }
 };
+

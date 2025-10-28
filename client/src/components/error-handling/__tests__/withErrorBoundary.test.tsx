@@ -247,3 +247,4 @@ describe('ErrorState', () => {
     expect(screen.getByText('Dismiss')).toBeInTheDocument();
   });
 });
+

@@ -90,3 +90,4 @@ export const PerformanceUtils = UnifiedPerformanceMonitor;
 export const startTimer = UnifiedPerformanceMonitor.startTimer.bind(UnifiedPerformanceMonitor);
 export const endTimer = UnifiedPerformanceMonitor.endTimer.bind(UnifiedPerformanceMonitor);
 export const measureAsync = UnifiedPerformanceMonitor.measureAsync.bind(UnifiedPerformanceMonitor);
+

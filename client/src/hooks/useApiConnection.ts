@@ -7,7 +7,7 @@ import {
   checkConnection,
   checkApiHealth,
   diagnoseConnection
-} from '../utils/api-health.js';
+} from '@shared/core/utils/api''-health.js';
 
 // Define diagnosis result type for better type safety and reusability
 export interface DiagnosisResult {
@@ -463,6 +463,7 @@ export function useApiRetry<T>(
     reset
   };
 }
+
 
 
 

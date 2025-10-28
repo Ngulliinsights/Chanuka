@@ -339,3 +339,4 @@ describe('generateComponentTemplate', () => {
     expect(paths1).toEqual(paths2);
   });
 });
+

@@ -448,3 +448,4 @@ export function assessConnectionQuality(info: ConnectionInfo): 'poor' | 'fair' |
   if (score >= -1) return 'fair';
   return 'poor';
 }
+

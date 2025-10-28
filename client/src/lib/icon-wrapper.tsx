@@ -22,3 +22,4 @@ export function wrapIcon(Icon: React.ComponentType<React.SVGProps<SVGSVGElement>
   WrappedIcon.displayName = `Wrapped${Icon.displayName || 'Icon'}`;
   return WrappedIcon;
 }
+

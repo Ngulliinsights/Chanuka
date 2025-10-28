@@ -94,3 +94,4 @@ export function ThemeToggle({
 export function ThemeToggleButton({ className = '' }: { className?: string }) {
   return <ThemeToggle variant="button" className={className} />;
 }
+

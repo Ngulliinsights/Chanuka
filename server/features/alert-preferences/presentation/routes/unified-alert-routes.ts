@@ -14,7 +14,7 @@ import {
   ApiError,
   ApiValidationError, 
   ApiResponseWrapper 
-} from "../../../../../shared/core/src/utils/api-utils.js";
+} from '@shared/core/utils/api'-utils.js";
 import { logger } from '@shared/core';
 
 export const router = Router();

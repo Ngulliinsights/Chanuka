@@ -107,3 +107,4 @@ describe('useRelatedPages', () => {
     expect(result.current.recoverySuggestions!.length).toBeGreaterThan(0);
   });
 });
+

@@ -89,3 +89,4 @@ export const highContrastTheme = {
     letterSpacing: '0.025em',  // Wider letter spacing
   },
 } as const;
+

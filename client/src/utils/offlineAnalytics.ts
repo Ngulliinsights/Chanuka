@@ -328,3 +328,4 @@ if (typeof window !== 'undefined') {
     offlineAnalytics.trackConnectionChange(false);
   });
 }
+

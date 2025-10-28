@@ -115,3 +115,4 @@ export const contrastUtils = {
     return contrastUtils.getAccessibleTextColor(backgroundColor);
   },
 } as const;
+

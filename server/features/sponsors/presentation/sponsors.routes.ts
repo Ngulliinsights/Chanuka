@@ -3,7 +3,7 @@ import { sponsorRepository, SponsorAffiliationInput, SponsorTransparencyInput } 
 import { sponsorConflictAnalysisService } from '../application/sponsor-conflict-analysis.service';
 import { insertSponsorSchema } from '../../../../shared/schema/validation';
 import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '../../../../shared/core/src/utils/api-utils.js';
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '@shared/core/utils/api'-utils.js';
 import { logger } from '../../../../shared/core/src/observability/logging/index.js';
 
 const router = express.Router();

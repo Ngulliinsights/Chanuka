@@ -200,3 +200,4 @@ export function useAdaptiveLoading() {
     strategy: getLoadingStrategy(),
   };
 }
+

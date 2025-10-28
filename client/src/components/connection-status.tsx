@@ -272,3 +272,4 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
 }
 
 export default ConnectionStatus;
+

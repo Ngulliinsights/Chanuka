@@ -24,10 +24,6 @@ export interface EnvironmentConfig {
 export interface FeatureFlags {
   unifiedLogging: boolean;
   serverSync: boolean;
-  enhancedBuffering: boolean;
-  performanceMetrics: boolean;
-  errorAnalytics: boolean;
-  legacyFallback: boolean;
 }
 
 /**
@@ -243,15 +239,6 @@ export class BrowserLogger implements LoggerChild {
    * Internal logging implementation with unified features
    */
   private logInternal(level: LogLevel, message: string, context?: LogContext, metadata?: Record<string, unknown>): void {
-    // Use legacy logger if feature flag is enabled and legacy logger exists
-    if (this.config.featureFlags.legacyFallback && this.legacyLogger) {
-      try {
-        this.legacyLogger[level](message, context, metadata);
-      } catch (error) {
-        console.warn('Legacy logger fallback failed:', error);
-      }
-    }
-
     // Log to console if enabled
     if (this.config.environment.features.consoleLogging) {
       this.logToConsole(level, message, context, metadata);
@@ -360,8 +347,6 @@ export class BrowserLogger implements LoggerChild {
    * Log browser performance metrics with enhanced tracking
    */
   logPerformance(operation: string, duration: number, metadata?: Record<string, unknown>): void {
-    if (!this.config.featureFlags.performanceMetrics) return;
-
     const performanceData = {
       component: 'performance',
       operation,
@@ -531,6 +516,13 @@ export class BrowserLogger implements LoggerChild {
   }
 
   /**
+   * Get legacy logger
+   */
+  getLegacyLogger(): LoggerChild | undefined {
+    return this.legacyLogger;
+  }
+
+  /**
    * Clean up resources
    */
   destroy(): void {
@@ -585,10 +577,6 @@ export function getDefaultFeatureFlags(environment: EnvironmentConfig): FeatureF
   return {
     unifiedLogging: true, // Always enabled for new logger
     serverSync: environment.features.serverSync,
-    enhancedBuffering: environment.isDevelopment || environment.isStaging,
-    performanceMetrics: environment.features.performanceTracking,
-    errorAnalytics: environment.features.errorTracking,
-    legacyFallback: environment.isDevelopment, // Enable fallback in dev for testing
   };
 }
 
@@ -615,31 +603,27 @@ export function setupGlobalErrorHandling(logger: BrowserLogger = browserLogger):
 
   // Handle unhandled promise rejections
   window.addEventListener('unhandledrejection', (event) => {
-    if (config.featureFlags.errorAnalytics) {
-      logger.logError('Unhandled promise rejection', {
-        component: 'global-error',
-        operation: 'unhandledrejection',
-      }, {
-        reason: event.reason,
-        promise: event.promise,
-      });
-    }
+    logger.logError('Unhandled promise rejection', {
+      component: 'global-error',
+      operation: 'unhandledrejection',
+    }, {
+      reason: event.reason,
+      promise: event.promise,
+    });
   });
 
   // Handle uncaught errors
   window.addEventListener('error', (event) => {
-    if (config.featureFlags.errorAnalytics) {
-      logger.logError('Uncaught error', {
-        component: 'global-error',
-        operation: 'uncaughterror',
-      }, {
-        message: event.message,
-        filename: event.filename,
-        lineno: event.lineno,
-        colno: event.colno,
-        error: event.error,
-      });
-    }
+    logger.logError('Uncaught error', {
+      component: 'global-error',
+      operation: 'uncaughterror',
+    }, {
+      message: event.message,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+      error: event.error,
+    });
   });
 
   // Handle console errors (override console methods) if console logging is enabled

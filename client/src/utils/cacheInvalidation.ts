@@ -345,3 +345,4 @@ class CacheInvalidationManager {
 
 // Global instance
 export const cacheInvalidation = new CacheInvalidationManager();
+

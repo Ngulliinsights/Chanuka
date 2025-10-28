@@ -130,3 +130,4 @@ export const NameInput: React.FC<Omit<AuthInputProps, 'type'> & { fieldType: 'fi
     type="text"
   />
 );
+

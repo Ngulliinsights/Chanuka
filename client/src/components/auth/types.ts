@@ -141,3 +141,4 @@ export interface AuthConfig {
     lockoutDuration: number;
   };
 }
+

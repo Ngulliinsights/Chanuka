@@ -4,3 +4,4 @@ export { NavLink, NavSection, DesktopSidebar } from './ui';
 export { canViewItem } from './core/roleGuard';
 export { DEFAULT_NAVIGATION_MAP, SECTION_ORDER, SECTION_TITLES } from './constants';
 export * from './utils';
+

@@ -6,7 +6,7 @@ import { performanceTrackingMiddleware } from './middleware/performance-tracking
 import { EngagementController, getEngagementMetricsSchema, getEngagementTrendsSchema } from './controllers/engagement.controller.js';
 import { engagementAnalyticsService } from './services/engagement.service.js';
 import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utils/api";
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from '@shared/core/utils/api'";
 import { logger } from '@shared/core';
 
 export const router = Router();
@@ -412,6 +412,7 @@ router.get('/engagement/leaderboard', authenticateToken, async (req: Authenticat
 });
 
 export default router;
+
 
 
 

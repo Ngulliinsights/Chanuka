@@ -281,3 +281,4 @@ export class WidgetValidator {
     return permissions.includes(userRole);
   }
 }
+

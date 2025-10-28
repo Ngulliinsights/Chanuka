@@ -3,3 +3,4 @@ import { useAuthForm } from './client/src/components/auth/hooks/useAuthForm';
 
 // This is just a compilation test
 console.log('Auth components compile successfully');
+

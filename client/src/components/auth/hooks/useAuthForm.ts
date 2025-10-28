@@ -294,3 +294,4 @@ export function useAuthForm(options: UseAuthFormOptions = {}): UseAuthFormResult
     })
   };
 }
+

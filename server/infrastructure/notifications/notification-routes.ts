@@ -5,7 +5,7 @@ import { userPreferencesService } from '../../features/users/domain/user-prefere
 import { notificationChannelService } from './notification-channels.js';
 import { smartNotificationFilterService } from './smart-notification-filter.js';
 import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiValidationError } from "../../../shared/core/src/utils/api-utils";
+import { ApiSuccess, ApiError, ApiValidationError } from '@shared/core/utils/api'-utils";
 import { logger } from '@shared/core';
 
 export const router = Router();
@@ -344,6 +344,7 @@ router.get('/status', async (req: Request, res: Response) => {
 });
 
 export default router;
+
 
 
 

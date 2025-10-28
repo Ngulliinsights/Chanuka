@@ -319,3 +319,4 @@ export function useMultiLoadingState(options: UseMultiLoadingStateOptions = {}):
     withLoading,
   };
 }
+

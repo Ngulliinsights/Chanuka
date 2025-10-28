@@ -1,7 +1,7 @@
 /**
  * Unified Cache Utilities
  * 
- * Consolidates all caching functionality from server/utils/cache.ts
+ * Consolidates all caching functionality from '@shared/core/caching'.ts
  * into the shared core system.
  */
 
@@ -215,3 +215,4 @@ export const cache = Object.assign(
     }
   },
 );
+

@@ -501,3 +501,4 @@ function calculateOverallScore(criticalCount: number, warningCount: number): num
 
 
 
+

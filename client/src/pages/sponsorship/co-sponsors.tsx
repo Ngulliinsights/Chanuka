@@ -518,3 +518,4 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
     </div>
   );
 }
+

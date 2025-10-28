@@ -347,3 +347,4 @@ export function AccessibilityTrigger({ className = '' }: AccessibilityTriggerPro
 }
 
 export default AccessibilitySettingsPanel;
+

@@ -4,7 +4,7 @@ import { bills, billSponsorships, sponsors, sponsorTransparency, sponsorAffiliat
 import { eq, desc, count, sql, and } from 'drizzle-orm';
 import { asyncHandler } from '../../../../shared/core/src/observability/error-management/middleware/express-error-middleware.js';
 import { SponsorshipAnalysisService } from '../application/sponsorship-analysis.service.ts';
-import { ApiSuccess, ApiError, ApiResponseWrapper } from "../../../../shared/core/src/utils/api-utils.js";
+import { ApiSuccess, ApiError, ApiResponseWrapper } from '@shared/core/utils/api'-utils.js";
 import { logger } from '@shared/core';
 
 const router = Router();
@@ -82,6 +82,7 @@ setupSponsorshipRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
 
 
 

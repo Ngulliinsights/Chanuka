@@ -92,3 +92,4 @@ export class DashboardTopicError extends DashboardError {
     );
   }
 }
+

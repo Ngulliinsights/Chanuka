@@ -4,7 +4,7 @@
  * Provides comprehensive utilities for asynchronous operations, including
  * debouncing, throttling, retry logic, and concurrency control.
  *
- * This module consolidates async-related utilities from race-condition-prevention.ts
+ * This module consolidates async-related utilities from '@shared/core/utils/async-utils'.ts
  * and other sources into a unified, framework-agnostic interface.
  */
 

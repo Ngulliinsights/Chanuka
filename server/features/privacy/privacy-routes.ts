@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth.js';
 import { privacyService, PrivacyPreferences } from './privacy-service.js';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utils/api";
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from '@shared/core/utils/api'";
 import { logger } from '@shared/core';
 
 export const router = Router();

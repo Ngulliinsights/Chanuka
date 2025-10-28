@@ -220,3 +220,4 @@ export default function SystemHealth({ health, stats, environment, activity }: S
     </div>
   );
 }
+

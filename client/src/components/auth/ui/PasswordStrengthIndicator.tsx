@@ -161,3 +161,4 @@ export const SimplePasswordStrengthIndicator: React.FC<{
     </div>
   );
 };
+

@@ -23,3 +23,4 @@ export * from './tracing';
 
 // Legacy adapters for backward compatibility
 export * from './legacy-adapters';
+

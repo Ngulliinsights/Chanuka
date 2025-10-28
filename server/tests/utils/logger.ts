@@ -1,5 +1,5 @@
 // Minimal no-op logger shim for tests.
-// Tests import this from server/tests/**/../utils/logger
+// Tests import this from '@shared/core/utils/browser-logger'
 export const logger = {
   debug: (_msg: string, _context?: any, _meta?: any) => {},
   info: (_msg: string, _context?: any, _meta?: any) => {},
@@ -22,6 +22,7 @@ export const logger = {
 };
 
 export default logger;
+
 
 
 

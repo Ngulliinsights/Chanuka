@@ -264,3 +264,4 @@ export function preloadFonts(fonts: Array<string | FontFallbackConfig>): Promise
 }
 
 export default FontFallback;
+

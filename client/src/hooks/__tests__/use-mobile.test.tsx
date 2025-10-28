@@ -106,3 +106,4 @@ describe('useMediaQuery', () => {
     expect(result.current).toBe(false);
   });
 });
+

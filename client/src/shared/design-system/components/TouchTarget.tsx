@@ -111,3 +111,4 @@ export const TouchTarget: React.FC<TouchTargetProps> = ({
 };
 
 export default TouchTarget;
+

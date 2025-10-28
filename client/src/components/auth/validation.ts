@@ -241,3 +241,4 @@ export function validateField(fieldName: string, value: string, mode: 'login' | 
     return error instanceof Error ? error.message : 'Validation failed';
   }
 }
+

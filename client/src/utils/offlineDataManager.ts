@@ -363,3 +363,4 @@ if (typeof window !== 'undefined') {
     logger.error('Failed to initialize offline data manager', { component: 'OfflineDataManager', error });
   });
 }
+

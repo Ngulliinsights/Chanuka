@@ -414,3 +414,4 @@ export const CoverageDashboard: React.FC = () => {
 };
 
 export default CoverageDashboard;
+

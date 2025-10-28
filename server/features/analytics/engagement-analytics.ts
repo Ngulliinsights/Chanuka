@@ -5,7 +5,7 @@ import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
 import { cacheKeys } from '@shared/core/src/caching/key-generator';
 import { getDefaultCache } from '@shared/core/src/caching';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from '../../utils/api-response';
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from '@shared/core/utils/api'-response';
 import { logger } from '@shared/core';
 import { AuthenticatedRequest } from '@shared/core/src/types/auth.types';
 

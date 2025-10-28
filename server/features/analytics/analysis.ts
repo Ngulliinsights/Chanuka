@@ -6,7 +6,7 @@ import { mlAnalysisService, performComprehensiveAnalysis } from './services/ml.s
 import { conflictDetectionService } from './conflict-detection';
 // import { realTimeBillAnalysisEngine } from '../bills/real-time-analysis'; // File deleted - remove import
 import { citizenVerificationService } from '../users/domain/citizen-verification';
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utils/api";
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from '@shared/core/utils/api'";
 import { logger } from '@shared/core';
 
 export const router = express.Router();
@@ -92,6 +92,7 @@ router.get('/health', async (req, res) => {
     timestamp: new Date().toISOString()
   }, ApiResponseWrapper.createMetadata(startTime, 'static'));
 });
+
 
 
 

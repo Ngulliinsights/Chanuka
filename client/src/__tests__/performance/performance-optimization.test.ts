@@ -20,7 +20,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 
 import { performanceOptimizer } from '@/$2/performance-optimizer';
 import { cacheManager } from '@/$2/cache-strategy';
-import { performanceMonitor } from '@/$2/performanceMonitoring';
+import { performanceMonitor } from '@shared/core/performance'';
 import { logger } from '@shared/core';
 
 // Mock performance APIs
@@ -417,6 +417,7 @@ describe('Performance Integration', () => {
     expect(parsed).toHaveProperty('timestamp');
   });
 });
+
 
 
 

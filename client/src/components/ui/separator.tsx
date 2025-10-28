@@ -28,3 +28,4 @@ const Separator = forwardRef<
 Separator.displayName = Root.displayName
 
 export { Separator }
+

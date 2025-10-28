@@ -153,3 +153,4 @@ export type DashboardAction =
   | { type: 'REMOVE_WIDGET'; payload: string }
   | { type: 'UPDATE_LAYOUT'; payload: DashboardLayout }
   | { type: 'UPDATE_SETTINGS'; payload: Partial<DashboardSettings> };
+

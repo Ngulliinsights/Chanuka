@@ -637,3 +637,4 @@ describe('Sidebar Component', () => {
     });
   });
 });
+

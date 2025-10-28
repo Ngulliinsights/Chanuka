@@ -188,3 +188,4 @@ export function initializeSmartPreloading() {
     }
   }, 1000);
 }
+

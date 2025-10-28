@@ -138,3 +138,4 @@ export const a11yClasses = {
   // Reduced motion support
   reducedMotion: 'motion-reduce:transition-none motion-reduce:animate-none',
 };
+

@@ -511,3 +511,4 @@ describe('Auth Component Integration', () => {
     });
   });
 });
+

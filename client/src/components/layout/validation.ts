@@ -283,3 +283,4 @@ export function validateAccessibilityRequirements(config: any): { isValid: boole
     warnings
   };
 }
+

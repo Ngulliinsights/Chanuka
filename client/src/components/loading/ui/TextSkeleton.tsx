@@ -69,3 +69,4 @@ export const TextSkeleton: React.FC<TextSkeletonProps> = ({
 };
 
 export default TextSkeleton;
+

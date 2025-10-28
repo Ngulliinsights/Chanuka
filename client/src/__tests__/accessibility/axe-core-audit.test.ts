@@ -107,3 +107,4 @@ test.describe('Axe Core Accessibility Audits', () => {
     expect(landmarkViolations).toHaveLength(0);
   });
 });
+

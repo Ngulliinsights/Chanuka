@@ -55,3 +55,4 @@ const TabsContent = forwardRef<
 TabsContent.displayName = Content.displayName
 
 export { Tabs, TabsList, TabsTrigger, TabsContent }
+

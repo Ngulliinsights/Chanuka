@@ -10,7 +10,7 @@ import { cache, cacheKeys } from '@shared/core';
 import { buildTimeThreshold } from '../../../utils/db-helpers';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js';
 import { ApiSuccessResponse, ApiErrorResponse, ApiValidationErrorResponse } from '@shared/core';
-import { ApiResponseWrapper } from '@shared/core/src/utils/api-utils.js';
+import { ApiResponseWrapper } from '@shared/core/utils/api'-utils.js';
 import { logger } from '@shared/core';
 import { errorTracker } from '../../../core/errors/error-tracker.js';
 import { z } from 'zod';

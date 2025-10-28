@@ -162,3 +162,4 @@ export function navigationReducer(state: NavigationState, action: NavigationActi
       return state;
   }
 }
+
