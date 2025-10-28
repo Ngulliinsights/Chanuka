@@ -35,6 +35,37 @@ export {
   performanceMonitor,
 } from './monitoring';
 
+// Method timing service
+export type {
+  MethodTimingData,
+  MethodTimingStats,
+  MethodTimingConfig,
+  TimingHandle,
+} from './method-timing';
+
+export {
+  MethodTimingService,
+  methodTimingService,
+  timed,
+  timeMethod,
+  getGlobalMethodTimingService,
+  setGlobalMethodTimingService,
+} from './method-timing';
+
+// Unified performance monitoring service
+export type {
+  UnifiedPerformanceMetric,
+  EnvironmentPerformanceReport,
+  PerformanceInsight,
+  CrossEnvironmentComparison,
+  UnifiedMonitoringConfig,
+} from './unified-monitoring';
+
+export {
+  UnifiedPerformanceMonitoringService,
+  unifiedPerformanceMonitor,
+} from './unified-monitoring';
+
 // Utility functions
 export function createPerformanceMonitor(config?: {
   budgets?: import('./budgets').PerformanceBudgetConfig;

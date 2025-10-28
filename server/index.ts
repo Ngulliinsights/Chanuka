@@ -148,7 +148,7 @@ if (config.security.enableHelmet) {
           ? ["'self'", "'unsafe-eval'", "'unsafe-inline'"] // Allow eval in development for HMR
           : config.security.contentSecurityPolicy.scriptSrc,
         connectSrc: isDevelopment
-          ? ["'self'", "ws:", "wss:", `ws://localhost:${PORT}`, `ws://localhost:${PORT + 1}`, `http://localhost:${PORT}`] // Allow WebSocket and HTTP for app and HMR
+          ? ["'self'", "ws:", "wss:", `ws://localhost:${PORT}`, `ws://localhost:${PORT + 1}`, `http://localhost:${PORT}`, `http://localhost:${PORT + 1}`, "ws://localhost:4201", "http://localhost:4201"] // Allow WebSocket and HTTP for app and HMR
           : config.security.contentSecurityPolicy.connectSrc,
         objectSrc: config.security.contentSecurityPolicy.objectSrc,
         upgradeInsecureRequests: config.security.contentSecurityPolicy.upgradeInsecureRequests ? [] : null,

@@ -8,19 +8,19 @@
 import Redis, { RedisOptions } from 'ioredis';
 import { gzip, gunzip } from 'zlib';
 import { promisify } from 'util';
-import { BaseCacheAdapter } from '../base-adapter';
+import { BaseCacheAdapter } from '../core/base-adapter';
 import type {
-  CacheOptions,
+  CacheAdapterConfig,
   CacheHealthStatus,
   CompressionOptions,
   CacheConfig
-} from '../types';
+} from '../core/interfaces';
 
 // Promisified compression functions
 const compressAsync = promisify(gzip);
 const decompressAsync = promisify(gunzip);
 
-export interface RedisAdapterConfig extends CacheConfig {
+export interface RedisAdapterConfig extends CacheAdapterConfig {
   redisUrl: string;
   maxRetries?: number;
   retryDelayOnFailover?: number;
@@ -33,21 +33,16 @@ export interface RedisAdapterConfig extends CacheConfig {
 
 export class RedisAdapter extends BaseCacheAdapter {
   private client!: Redis;
-  private connected: boolean = false;
+  protected connected: boolean = false;
   private connectionPromise: Promise<void> | null = null;
   private compressionOptions: CompressionOptions;
 
-  constructor(protected override config: RedisAdapterConfig) {
-    super({
-      enableMetrics: config.enableMetrics,
-      // Only pass keyPrefix if it's defined, avoiding the undefined assignment issue
-      ...(config.keyPrefix !== undefined && { keyPrefix: config.keyPrefix }),
-    });
+  constructor(config: RedisAdapterConfig) {
+    super('RedisAdapter', '1.0.0', config);
 
     this.compressionOptions = {
-      enabled: config.enableCompression ?? false,
-      threshold: config.compressionThreshold ?? 1024,
       algorithm: 'gzip',
+      threshold: config.compressionThreshold ?? 1024,
       level: 6,
     };
 
@@ -61,22 +56,22 @@ export class RedisAdapter extends BaseCacheAdapter {
    */
   private initializeRedis(): void {
     const redisOptions: RedisOptions = {
-      maxRetriesPerRequest: this.config.maxRetries ?? 3,
+      maxRetriesPerRequest: (this.config as any).maxRetries ?? 3,
       retryStrategy: (times: number) => {
         const delay = Math.min(times * 50, 2000);
         return delay;
       },
-      enableOfflineQueue: this.config.enableOfflineQueue ?? false,
-      lazyConnect: this.config.lazyConnect ?? true,
-      keepAlive: this.config.keepAlive ?? 30000,
-      family: this.config.family ?? 4,
-      db: this.config.db ?? 0,
+      enableOfflineQueue: (this.config as any).enableOfflineQueue ?? false,
+      lazyConnect: (this.config as any).lazyConnect ?? true,
+      keepAlive: (this.config as any).keepAlive ?? 30000,
+      family: (this.config as any).family ?? 4,
+      db: (this.config as any).db ?? 0,
       enableReadyCheck: true,
       autoResubscribe: true,
       autoResendUnfulfilledCommands: true,
     };
 
-    this.client = new Redis(this.config.redisUrl, redisOptions);
+    this.client = new Redis((this.config as any).redisUrl, redisOptions);
     this.setupEventHandlers();
   }
 
@@ -86,7 +81,7 @@ export class RedisAdapter extends BaseCacheAdapter {
   private setupEventHandlers(): void {
     this.client.on('connect', () => {
       this.connected = true;
-      this.emitCacheEvent('circuit_breaker_close', 'redis_connection');
+      this.emit('circuit_close', { key: 'redis_connection' });
     });
 
     this.client.on('ready', () => {
@@ -96,7 +91,7 @@ export class RedisAdapter extends BaseCacheAdapter {
     this.client.on('error', (error) => {
       this.connected = false;
       this.metrics.errors++;
-      this.emitCacheEvent('error', 'redis_connection', { error });
+      this.emit('error', { key: 'redis_connection' });
     });
 
     this.client.on('close', () => {
@@ -104,7 +99,7 @@ export class RedisAdapter extends BaseCacheAdapter {
     });
 
     this.client.on('reconnecting', () => {
-      this.emitCacheEvent('circuit_breaker_open', 'redis_reconnecting');
+      this.emit('circuit_open', { key: 'redis_reconnecting' });
     });
 
     this.client.on('end', () => {
@@ -147,9 +142,7 @@ export class RedisAdapter extends BaseCacheAdapter {
       }
       this.connected = false;
     } catch (error) {
-      this.emitCacheEvent('error', 'redis_disconnect', { 
-        error: error instanceof Error ? error : new Error(String(error)) 
-      });
+      this.emit('error', { key: 'redis_disconnect' });
       // Force disconnect on error
       this.client.disconnect();
       this.connected = false;
@@ -167,118 +160,103 @@ export class RedisAdapter extends BaseCacheAdapter {
    * Get value from Redis with automatic decompression
    */
   override async get<T>(key: string): Promise<T | null> {
-    this.validateKey(key);
-    
-    return this.measureOperation(async () => {
-      if (!this.connected) {
-        this.recordMiss(key, 'L2');
+    if (!this.connected) {
+      this.updateMetrics('miss');
+      return null;
+    }
+
+    try {
+      const formattedKey = this.formatKey(key);
+      const data = await this.client.getBuffer(formattedKey);
+
+      if (!data) {
+        this.updateMetrics('miss');
         return null;
       }
 
-      try {
-        const formattedKey = this.formatKey(key);
-        const data = await this.client.getBuffer(formattedKey);
-        
-        if (!data) {
-          this.recordMiss(key, 'L2');
-          return null;
-        }
+      this.updateMetrics('hit');
 
-        this.recordHit(key, 'L2');
-
-        // Handle decompression if needed
-        let parsed: string;
-        if (this.compressionOptions.enabled && data[0] === 0x1f && data[1] === 0x8b) {
-          // Gzip magic number detected
-          const decompressed = await decompressAsync(data);
-          parsed = decompressed.toString('utf8');
-        } else {
-          parsed = data.toString('utf8');
-        }
-
-        try {
-          return JSON.parse(parsed) as T;
-        } catch (parseError) {
-          // Remove corrupted data
-          await this.del(key);
-          this.recordMiss(key, 'L2');
-          return null;
-        }
-      } catch (error) {
-        this.recordMiss(key, 'L2');
-        this.metrics.errors++;
-        throw error;
+      // Handle decompression if needed
+      let parsed: string;
+      if (this.config.enableCompression && data[0] === 0x1f && data[1] === 0x8b) {
+        // Gzip magic number detected
+        const decompressed = await decompressAsync(data);
+        parsed = decompressed.toString('utf8');
+      } else {
+        parsed = data.toString('utf8');
       }
-    }, 'hit', key, 'L2');
+
+      try {
+        return JSON.parse(parsed) as T;
+      } catch (parseError) {
+        // Remove corrupted data
+        await this.del(key);
+        this.updateMetrics('miss');
+        return null;
+      }
+    } catch (error) {
+      this.updateMetrics('miss');
+      this.metrics.errors++;
+      throw error;
+    }
   }
 
   /**
    * Set value in Redis with automatic compression
    */
   override async set<T>(key: string, value: T, ttlSec?: number): Promise<void> {
-    this.validateKey(key);
-    const validatedTtl = this.validateTtl(ttlSec);
+    if (!this.connected) {
+      throw new Error('Redis not connected');
+    }
 
-    return this.measureOperation(async () => {
-      if (!this.connected) {
-        throw new Error('Redis not connected');
+    try {
+      const serialized = JSON.stringify(value);
+      let data: Buffer = Buffer.from(serialized, 'utf8');
+
+      // Apply compression if enabled and data exceeds threshold
+      if (this.config.enableCompression &&
+          this.shouldCompress(data)) {
+        data = await compressAsync(data);
       }
 
-      try {
-        const serialized = JSON.stringify(value);
-        const originalSize = this.calculateSize(serialized);
-        let data: Buffer = Buffer.from(serialized, 'utf8');
-        
-        // Apply compression if enabled and data exceeds threshold
-        if (this.compressionOptions.enabled && 
-            this.shouldCompress(serialized, this.compressionOptions.threshold)) {
-          data = await compressAsync(data);
-        }
+      const formattedKey = this.formatKey(key);
 
-        const formattedKey = this.formatKey(key);
-        
-        if (validatedTtl > 0) {
-          await this.client.setex(formattedKey, validatedTtl, data);
-        } else {
-          await this.client.set(formattedKey, data);
-        }
-
-        this.recordSet(key, originalSize, 'L2');
-      } catch (error) {
-        this.metrics.errors++;
-        throw error;
+      if (ttlSec && ttlSec > 0) {
+        await this.client.setex(formattedKey, ttlSec, data);
+      } else {
+        await this.client.set(formattedKey, data);
       }
-    }, 'set', key, 'L2');
+
+      this.updateMetrics('set');
+    } catch (error) {
+      this.metrics.errors++;
+      throw error;
+    }
   }
 
   /**
    * Delete value from Redis
    */
-  override async del(key: string): Promise<void> {
-    this.validateKey(key);
+  override async del(key: string): Promise<boolean> {
+    if (!this.connected) {
+      return false;
+    }
 
-    return this.measureOperation(async () => {
-      if (!this.connected) {
-        return;
-      }
-
-      try {
-        const formattedKey = this.formatKey(key);
-        await this.client.del(formattedKey);
-        this.recordDelete(key, 'L2');
-      } catch (error) {
-        this.metrics.errors++;
-        throw error;
-      }
-    }, 'delete', key, 'L2');
+    try {
+      const formattedKey = this.formatKey(key);
+      const result = await this.client.del(formattedKey);
+      this.updateMetrics('delete');
+      return result === 1;
+    } catch (error) {
+      this.metrics.errors++;
+      throw error;
+    }
   }
 
   /**
    * Check if key exists in Redis
    */
   override async exists(key: string): Promise<boolean> {
-    this.validateKey(key);
-
     if (!this.connected) {
       return false;
     }
@@ -297,8 +275,6 @@ export class RedisAdapter extends BaseCacheAdapter {
    * Get TTL for a key
    */
   override async ttl(key: string): Promise<number> {
-    this.validateKey(key);
-
     if (!this.connected) {
       return -1;
     }
@@ -316,16 +292,13 @@ export class RedisAdapter extends BaseCacheAdapter {
    * Set expiration for a key
    */
   async expire(key: string, seconds: number): Promise<boolean> {
-    this.validateKey(key);
-    const validatedTtl = this.validateTtl(seconds);
-
     if (!this.connected) {
       return false;
     }
 
     try {
       const formattedKey = this.formatKey(key);
-      const result = await this.client.expire(formattedKey, validatedTtl);
+      const result = await this.client.expire(formattedKey, seconds);
       return result === 1;
     } catch (error) {
       this.metrics.errors++;
@@ -338,107 +311,97 @@ export class RedisAdapter extends BaseCacheAdapter {
    */
   override async mget<T>(keys: string[]): Promise<(T | null)[]> {
     if (keys.length === 0) return [];
-    
-    keys.forEach(key => this.validateKey(key));
 
-    return this.measureOperation(async () => {
-      if (!this.connected) {
-        return keys.map(() => null);
-      }
+    if (!this.connected) {
+      return keys.map(() => null);
+    }
 
-      try {
-        const formattedKeys = keys.map(key => this.formatKey(key));
-        const values = await this.client.mgetBuffer(...formattedKeys);
-        
-        return await Promise.all(values.map(async (value, index) => {
-           const key = keys[index];
-           if (!key) {
-             return null;
+    try {
+      const formattedKeys = keys.map(key => this.formatKey(key));
+      const values = await this.client.mgetBuffer(...formattedKeys);
+
+      return await Promise.all(values.map(async (value, index) => {
+         const key = keys[index];
+         if (!key) {
+           return null;
+         }
+
+         if (!value) {
+           this.updateMetrics('miss');
+           return null;
+         }
+
+         this.updateMetrics('hit');
+
+         try {
+           // Handle decompression
+           let parsed: string;
+           if (this.config.enableCompression && value[0] === 0x1f && value[1] === 0x8b) {
+             const decompressed = await decompressAsync(value);
+             parsed = decompressed.toString('utf8');
+           } else {
+             parsed = value.toString('utf8');
            }
 
-           if (!value) {
-             this.recordMiss(key, 'L2');
-             return null;
-           }
-
-           this.recordHit(key, 'L2');
-
-           try {
-             // Handle decompression
-             let parsed: string;
-             if (this.compressionOptions.enabled && value[0] === 0x1f && value[1] === 0x8b) {
-               const decompressed = await decompressAsync(value);
-               parsed = decompressed.toString('utf8');
-             } else {
-               parsed = value.toString('utf8');
-             }
-
-             return JSON.parse(parsed) as T;
-           } catch (parseError) {
-             // Remove corrupted data
-             this.del(key);
-             this.recordMiss(key, 'L2');
-             return null;
-           }
-         }));
-      } catch (error) {
-        keys.forEach(key => this.recordMiss(key, 'L2'));
-        this.metrics.errors++;
-        throw error;
-      }
-    }, 'hit', `mget:${keys.length}`, 'L2');
+           return JSON.parse(parsed) as T;
+         } catch (parseError) {
+           // Remove corrupted data
+           this.del(key);
+           this.updateMetrics('miss');
+           return null;
+         }
+       }));
+    } catch (error) {
+      keys.forEach(() => this.updateMetrics('miss'));
+      this.metrics.errors++;
+      throw error;
+    }
   }
 
   /**
    * Set multiple values in Redis using pipeline
    */
-  override async mset<T>(entries: [string, T, number?][]): Promise<void> {
+  override async mset<T>(entries: Array<{ key: string; value: T; ttl?: number }>): Promise<void> {
     if (entries.length === 0) return;
-    
-    entries.forEach(([key]) => this.validateKey(key));
 
-    return this.measureOperation(async () => {
-      if (!this.connected) {
-        throw new Error('Redis not connected');
-      }
+    if (!this.connected) {
+      throw new Error('Redis not connected');
+    }
 
-      try {
-        const pipeline = this.client.pipeline();
+    try {
+      const pipeline = this.client.pipeline();
 
-        for (const [key, value, ttl] of entries) {
-          const validatedTtl = ttl !== undefined ? this.validateTtl(ttl) : 0;
-          const serialized = JSON.stringify(value);
-          let data: Buffer = Buffer.from(serialized, 'utf8');
-          
-          // Apply compression if needed
-          if (this.compressionOptions.enabled && 
-              this.shouldCompress(serialized, this.compressionOptions.threshold)) {
-            data = await compressAsync(data);
-          }
+      for (const { key, value, ttl } of entries) {
+        const serialized = JSON.stringify(value);
+        let data: Buffer = Buffer.from(serialized, 'utf8');
 
-          const formattedKey = this.formatKey(key);
-          
-          if (validatedTtl > 0) {
-            pipeline.setex(formattedKey, validatedTtl, data);
-          } else {
-            pipeline.set(formattedKey, data);
-          }
-
-          this.recordSet(key, this.calculateSize(serialized), 'L2');
+        // Apply compression if needed
+        if (this.config.enableCompression && this.shouldCompress(data)) {
+          data = await compressAsync(data);
         }
 
-        await pipeline.exec();
-      } catch (error) {
-        this.metrics.errors++;
-        throw error;
+        const formattedKey = this.formatKey(key);
+
+        if (ttl && ttl > 0) {
+          pipeline.setex(formattedKey, ttl, data);
+        } else {
+          pipeline.set(formattedKey, data);
+        }
+
+        this.updateMetrics('set');
       }
-    }, 'set', `mset:${entries.length}`, 'L2');
+
+      await pipeline.exec();
+    } catch (error) {
+      this.metrics.errors++;
+      throw error;
+    }
   }
 
   /**
    * Invalidate cache by pattern using SCAN
    */
-  override async invalidateByPattern(pattern: string): Promise<number> {
+  async invalidateByPattern(pattern: string): Promise<number> {
     if (!this.connected) {
       return 0;
     }
@@ -450,10 +413,10 @@ export class RedisAdapter extends BaseCacheAdapter {
 
       do {
         const [nextCursor, keys] = await this.client.scan(
-          cursor, 
-          'MATCH', 
-          formattedPattern, 
-          'COUNT', 
+          cursor,
+          'MATCH',
+          formattedPattern,
+          'COUNT',
           100
         );
         cursor = nextCursor;
@@ -474,7 +437,7 @@ export class RedisAdapter extends BaseCacheAdapter {
   /**
    * Invalidate cache by tags using Redis Sets
    */
-  override async invalidateByTags(tags: string[]): Promise<number> {
+  async invalidateByTags(tags: string[]): Promise<number> {
     if (!this.connected || tags.length === 0) {
       return 0;
     }
@@ -486,7 +449,7 @@ export class RedisAdapter extends BaseCacheAdapter {
       for (const tag of tags) {
         const tagKey = this.formatKey(`tag:${tag}`);
         const keys = await this.client.smembers(tagKey);
-        
+
         if (keys.length > 0) {
           pipeline.del(...keys);
           totalDeleted += keys.length;
@@ -529,7 +492,7 @@ export class RedisAdapter extends BaseCacheAdapter {
   /**
    * Clear all cache entries
    */
-  override async flush(): Promise<void> {
+  async flush(): Promise<void> {
     if (!this.connected) {
       return;
     }
@@ -555,7 +518,7 @@ export class RedisAdapter extends BaseCacheAdapter {
   /**
    * Warm up cache with critical data using batching
    */
-  async warmUp(entries: Array<{ key: string; value: any; options?: CacheOptions }>): Promise<void> {
+  async warmUp(entries: Array<{ key: string; value: any; options?: any }>): Promise<void> {
     if (entries.length === 0) return;
 
     try {
@@ -563,15 +526,14 @@ export class RedisAdapter extends BaseCacheAdapter {
       for (let i = 0; i < entries.length; i += batchSize) {
         const batch = entries.slice(i, i + batchSize);
         // Create properly typed entries array without undefined ttl values
-        const msetEntries: [string, any, number?][] = batch.map(({ key, value, options }) => {
-          const entry: [string, any, number?] = options?.ttl !== undefined 
-            ? [key, value, options.ttl]
-            : [key, value];
-          return entry;
-        });
-        
+        const msetEntries: Array<{ key: string; value: any; ttl?: number }> = batch.map(({ key, value, options }) => ({
+          key,
+          value,
+          ttl: options?.ttl
+        }));
+
         await this.mset(msetEntries);
-        
+
         // Handle tags for each entry
         const tagPromises = batch
           .filter(({ options }) => options?.tags && options.tags.length > 0)
@@ -581,7 +543,7 @@ export class RedisAdapter extends BaseCacheAdapter {
             }
             return Promise.resolve();
           });
-        
+
         await Promise.all(tagPromises);
       }
     } catch (error) {
@@ -630,26 +592,26 @@ export class RedisAdapter extends BaseCacheAdapter {
       // Return with explicit errors array or omit the property entirely
       return errors.length > 0
         ? {
-            connected: this.connected,
+            status: 'degraded' as const,
             latency,
-            memory,
-            stats: this.getMetrics(),
-            errors,
+            memoryUsage: memory,
+            lastError: errors[0],
+            uptime: Date.now() - this.startTime
           }
         : {
-            connected: this.connected,
+            status: 'healthy' as const,
             latency,
-            memory,
-            stats: this.getMetrics(),
+            memoryUsage: memory,
+            uptime: Date.now() - this.startTime
           };
     } catch (error) {
       errors.push(error instanceof Error ? error.message : String(error));
       
       return {
-        connected: false,
+        status: 'unhealthy' as const,
         latency: performance.now() - start,
-        stats: this.getMetrics(),
-        errors,
+        lastError: errors[0],
+        uptime: Date.now() - this.startTime
       };
     }
   }
@@ -686,9 +648,9 @@ export class RedisAdapter extends BaseCacheAdapter {
   /**
    * Cleanup resources and disconnect
    */
-  override destroy(): void {
-    super.destroy();
-    this.disconnect();
+  async destroy(): Promise<void> {
+    await super.destroy();
+    await this.disconnect();
   }
 }
 

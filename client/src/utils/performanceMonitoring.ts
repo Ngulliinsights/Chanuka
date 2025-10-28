@@ -1,5 +1,6 @@
 // Performance monitoring utilities for the Chanuka platform
 import { logger } from './browser-logger';
+import { onCLS, onFCP, onLCP, onTTFB } from 'web-vitals';
 
 export interface PerformanceMetrics {
   // Core Web Vitals
@@ -60,6 +61,9 @@ class PerformanceMonitor {
 
       // Observe different types of performance entries
       this.observer.observe({ entryTypes: ['navigation', 'paint', 'largest-contentful-paint', 'first-input', 'layout-shift'] });
+
+      // Initialize web-vitals monitoring
+      this.initializeWebVitals();
     } catch (error) {
       logger.error('Failed to initialize PerformanceObserver:', { component: 'PerformanceMonitoring' }, error);
     }
@@ -156,7 +160,7 @@ class PerformanceMonitor {
   private measureTimeToInteractive(): void {
     // Simple TTI approximation - when the main thread is idle for 5 seconds
     let lastLongTaskTime = 0;
-    
+
     if ('PerformanceObserver' in window) {
       try {
         const longTaskObserver = new PerformanceObserver((list) => {
@@ -164,9 +168,9 @@ class PerformanceMonitor {
             lastLongTaskTime = entry.startTime + entry.duration;
           }
         });
-        
+
         longTaskObserver.observe({ entryTypes: ['longtask'] });
-        
+
         // Check TTI after 5 seconds of no long tasks
         setTimeout(() => {
           const now = performance.now();
@@ -178,6 +182,38 @@ class PerformanceMonitor {
       } catch (error) {
         console.warn('Long task observer not supported:', error);
       }
+    }
+  }
+
+  private initializeWebVitals(): void {
+    try {
+      // Monitor Core Web Vitals using web-vitals library
+      onCLS((metric) => {
+        this.metrics.cls = metric.value;
+        this.recordMetric('CLS', metric.value, { id: metric.id });
+      });
+
+      onFCP((metric) => {
+        this.metrics.fcp = metric.value;
+        this.recordMetric('FCP', metric.value, { id: metric.id });
+      });
+
+      onLCP((metric) => {
+        this.metrics.lcp = metric.value;
+        this.recordMetric('LCP', metric.value, { id: metric.id });
+      });
+
+      onTTFB((metric) => {
+        this.metrics.ttfb = metric.value;
+        this.recordMetric('TTFB', metric.value, { id: metric.id });
+      });
+
+      logger.info('Web Vitals monitoring initialized', { component: 'PerformanceMonitoring' });
+    } catch (error) {
+      logger.warn('Failed to initialize web-vitals monitoring', {
+        component: 'PerformanceMonitoring',
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   }
 
@@ -270,11 +306,13 @@ class PerformanceMonitor {
 
   // NOTE: use getLoggedEntries() for strongly-typed logged entries.
 
-  public getCoreWebVitals(): { lcp?: number; fid?: number; cls?: number } {
+  public getCoreWebVitals(): { lcp?: number; fid?: number; cls?: number; fcp?: number; ttfb?: number } {
     return {
       lcp: this.metrics.lcp,
       fid: this.metrics.fid,
       cls: this.metrics.cls,
+      fcp: this.metrics.fcp,
+      ttfb: this.metrics.ttfb,
     };
   }
 

@@ -13,6 +13,8 @@ export type {
   DiskHealthCheckOptions,
   ExternalServiceHealthCheckOptions,
   ProcessHealthCheckOptions,
+  ApiEndpointHealthCheckOptions,
+  ApiServiceHealthCheckOptions,
   CustomHealthCheckOptions,
 } from './types';
 
@@ -28,6 +30,8 @@ export {
   createDiskHealthCheck,
   createExternalServiceHealthCheck,
   createProcessHealthCheck,
+  createApiEndpointHealthCheck,
+  createApiServiceHealthCheck,
   createCustomHealthCheck,
   defaultHealthChecks,
 } from './checks';

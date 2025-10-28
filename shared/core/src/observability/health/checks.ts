@@ -73,7 +73,15 @@ export const createDiskHealthCheck = (options: {
     const warningThreshold = options.warningThreshold ?? 0.1; // 10% free
     const criticalThreshold = options.criticalThreshold ?? 0.05; // 5% free
 
-    const results = [];
+    const results: Array<{
+      path: string;
+      totalMB?: number;
+      freeMB?: number;
+      freeRatio?: number;
+      available?: string;
+      error?: string;
+      status: 'healthy' | 'degraded' | 'unhealthy' | 'unknown';
+    }> = [];
 
     for (const checkPath of paths) {
       try {
@@ -302,6 +310,306 @@ export const createProcessHealthCheck = (options: {
       timestamp: new Date(),
       duration: 0,
       details,
+    };
+  },
+});
+
+/**
+ * API endpoint health check
+ */
+export const createApiEndpointHealthCheck = (options: {
+  name: string;
+  url: string;
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
+  headers?: Record<string, string>;
+  body?: string;
+  expectedStatusCodes?: number[];
+  maxResponseTime?: number;
+  timeout?: number;
+  followRedirects?: boolean;
+  auth?: {
+    type: 'bearer' | 'basic' | 'api-key';
+    token?: string;
+    username?: string;
+    password?: string;
+    headerName?: string;
+  };
+}): HealthCheck => ({
+  name: options.name,
+  description: `Checks API endpoint ${options.url}`,
+  timeout: options.timeout ?? 10000,
+  check: async () => {
+    const startTime = Date.now();
+
+    try {
+      const fetchOptions: RequestInit = {
+        method: options.method ?? 'GET',
+        headers: {
+          'User-Agent': 'APIHealthCheck/1.0',
+          'Accept': 'application/json',
+          ...options.headers,
+        },
+        redirect: options.followRedirects ? 'follow' : 'manual',
+      };
+
+      // Add authentication
+      if (options.auth) {
+        switch (options.auth.type) {
+          case 'bearer':
+            if (options.auth.token) {
+              fetchOptions.headers = {
+                ...fetchOptions.headers,
+                'Authorization': `Bearer ${options.auth.token}`,
+              };
+            }
+            break;
+          case 'basic':
+            if (options.auth.username && options.auth.password) {
+              const credentials = btoa(`${options.auth.username}:${options.auth.password}`);
+              fetchOptions.headers = {
+                ...fetchOptions.headers,
+                'Authorization': `Basic ${credentials}`,
+              };
+            }
+            break;
+          case 'api-key':
+            if (options.auth.token && options.auth.headerName) {
+              fetchOptions.headers = {
+                ...fetchOptions.headers,
+                [options.auth.headerName]: options.auth.token,
+              };
+            }
+            break;
+        }
+      }
+
+      if (options.body) {
+        fetchOptions.body = options.body;
+      }
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), options.timeout ?? 10000);
+      fetchOptions.signal = controller.signal;
+
+      const response = await fetch(options.url, fetchOptions);
+      clearTimeout(timeoutId);
+
+      const duration = Date.now() - startTime;
+      const expectedCodes = options.expectedStatusCodes ?? [200, 201, 202, 204];
+      const maxResponseTime = options.maxResponseTime ?? 5000;
+
+      const details = {
+        statusCode: response.status,
+        statusText: response.statusText,
+        responseTime: duration,
+        url: options.url,
+        method: options.method ?? 'GET',
+      };
+
+      // Check response time
+      if (duration > maxResponseTime) {
+        return {
+          status: 'degraded',
+          message: `API response too slow: ${duration}ms > ${maxResponseTime}ms`,
+          timestamp: new Date(),
+          duration,
+          details,
+        };
+      }
+
+      // Check status code
+      if (!expectedCodes.includes(response.status)) {
+        return {
+          status: 'unhealthy',
+          message: `Unexpected status code: ${response.status} ${response.statusText}`,
+          timestamp: new Date(),
+          duration,
+          details: { ...details, expectedCodes },
+        };
+      }
+
+      return {
+        status: 'healthy',
+        message: `API endpoint responded successfully in ${duration}ms`,
+        timestamp: new Date(),
+        duration,
+        details,
+      };
+
+    } catch (error) {
+      const duration = Date.now() - startTime;
+
+      return {
+        status: 'unhealthy',
+        message: `API endpoint unreachable: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        timestamp: new Date(),
+        duration,
+        error: error instanceof Error ? error : undefined,
+        details: {
+          url: options.url,
+          method: options.method ?? 'GET',
+        },
+      };
+    }
+  },
+});
+
+/**
+ * API service health check (checks multiple endpoints)
+ */
+export const createApiServiceHealthCheck = (options: {
+  name: string;
+  baseUrl: string;
+  endpoints: Array<{
+    path: string;
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
+    expectedStatusCodes?: number[];
+    weight?: number; // Importance weight for overall health calculation
+  }>;
+  headers?: Record<string, string>;
+  timeout?: number;
+  maxResponseTime?: number;
+  minHealthyEndpoints?: number; // Minimum number of endpoints that must be healthy
+  auth?: {
+    type: 'bearer' | 'basic' | 'api-key';
+    token?: string;
+    username?: string;
+    password?: string;
+    headerName?: string;
+  };
+}): HealthCheck => ({
+  name: options.name,
+  description: `Checks API service at ${options.baseUrl}`,
+  timeout: options.timeout ?? 30000,
+  check: async () => {
+    const startTime = Date.now();
+    const results: Array<{
+      endpoint: string;
+      status: 'healthy' | 'degraded' | 'unhealthy';
+      responseTime: number;
+      statusCode?: number;
+      error?: string;
+    }> = [];
+
+    let totalWeight = 0;
+    let healthyWeight = 0;
+
+    for (const endpoint of options.endpoints) {
+      const endpointStartTime = Date.now();
+      const weight = endpoint.weight ?? 1;
+      totalWeight += weight;
+
+      try {
+        const url = options.baseUrl.replace(/\/$/, '') + endpoint.path;
+        const fetchOptions: RequestInit = {
+          method: endpoint.method ?? 'GET',
+          headers: {
+            'User-Agent': 'APIServiceHealthCheck/1.0',
+            'Accept': 'application/json',
+            ...options.headers,
+          },
+        };
+
+        // Add authentication
+        if (options.auth) {
+          switch (options.auth.type) {
+            case 'bearer':
+              if (options.auth.token) {
+                fetchOptions.headers = {
+                  ...fetchOptions.headers,
+                  'Authorization': `Bearer ${options.auth.token}`,
+                };
+              }
+              break;
+            case 'basic':
+              if (options.auth.username && options.auth.password) {
+                const credentials = btoa(`${options.auth.username}:${options.auth.password}`);
+                fetchOptions.headers = {
+                  ...fetchOptions.headers,
+                  'Authorization': `Basic ${credentials}`,
+                };
+              }
+              break;
+            case 'api-key':
+              if (options.auth.token && options.auth.headerName) {
+                fetchOptions.headers = {
+                  ...fetchOptions.headers,
+                  [options.auth.headerName]: options.auth.token,
+                };
+              }
+              break;
+          }
+        }
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), options.timeout ?? 30000);
+        fetchOptions.signal = controller.signal;
+
+        const response = await fetch(url, fetchOptions);
+        clearTimeout(timeoutId);
+
+        const responseTime = Date.now() - endpointStartTime;
+        const expectedCodes = endpoint.expectedStatusCodes ?? [200, 201, 202, 204];
+        const maxResponseTime = options.maxResponseTime ?? 5000;
+
+        let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
+        if (!expectedCodes.includes(response.status)) {
+          status = 'unhealthy';
+        } else if (responseTime > maxResponseTime) {
+          status = 'degraded';
+        }
+
+        results.push({
+          endpoint: endpoint.path,
+          status,
+          responseTime,
+          statusCode: response.status,
+        });
+
+        if (status === 'healthy') {
+          healthyWeight += weight;
+        }
+
+      } catch (error) {
+        const responseTime = Date.now() - endpointStartTime;
+        results.push({
+          endpoint: endpoint.path,
+          status: 'unhealthy',
+          responseTime,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+
+    const duration = Date.now() - startTime;
+    const healthyCount = results.filter(r => r.status === 'healthy').length;
+    const minHealthy = options.minHealthyEndpoints ?? Math.ceil(options.endpoints.length * 0.8); // 80% default
+    const healthRatio = totalWeight > 0 ? healthyWeight / totalWeight : 0;
+
+    let overallStatus: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
+    if (healthyCount < minHealthy) {
+      overallStatus = 'unhealthy';
+    } else if (healthRatio < 0.9) { // Less than 90% healthy by weight
+      overallStatus = 'degraded';
+    }
+
+    return {
+      status: overallStatus,
+      message: `API service: ${healthyCount}/${options.endpoints.length} endpoints healthy`,
+      timestamp: new Date(),
+      duration,
+      details: {
+        baseUrl: options.baseUrl,
+        endpoints: results,
+        summary: {
+          total: options.endpoints.length,
+          healthy: healthyCount,
+          unhealthy: results.filter(r => r.status === 'unhealthy').length,
+          degraded: results.filter(r => r.status === 'degraded').length,
+          healthRatio,
+          minHealthyRequired: minHealthy,
+        },
+      },
     };
   },
 });
