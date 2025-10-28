@@ -76,3 +76,4 @@ export const runAccessibilityTests = async () => {
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { runAccessibilityTests };
 }
+

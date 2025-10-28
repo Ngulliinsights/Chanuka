@@ -525,3 +525,4 @@ describe('useAuth Hook', () => {
     });
   });
 });
+

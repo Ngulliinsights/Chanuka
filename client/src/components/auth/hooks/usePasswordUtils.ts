@@ -124,3 +124,4 @@ export function usePasswordValidation(password: string, confirmPassword?: string
     isStrong: strength.isStrong,
   };
 }
+

@@ -344,3 +344,4 @@ const AdvancedSearch = ({ onSearch, isLoading = false }: AdvancedSearchProps) =>
 };
 
 export default AdvancedSearch;
+

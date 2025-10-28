@@ -51,3 +51,4 @@ export const AvatarSkeleton: React.FC<AvatarSkeletonProps> = ({
 };
 
 export default AvatarSkeleton;
+

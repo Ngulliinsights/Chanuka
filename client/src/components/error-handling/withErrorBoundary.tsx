@@ -125,3 +125,4 @@ export function createSafeLazyComponent<P extends object>(
 
   return LazyComponent;
 }
+

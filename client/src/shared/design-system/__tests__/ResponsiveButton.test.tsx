@@ -241,3 +241,4 @@ describe('ResponsiveButton', () => {
     expect(button).toHaveClass('custom-class');
   });
 });
+

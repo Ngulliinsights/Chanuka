@@ -27,3 +27,4 @@ export interface RelatedPage {
   context?: string;
   relevanceScore: number;
 }
+

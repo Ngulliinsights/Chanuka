@@ -188,3 +188,4 @@ export interface LazyLoadPlaceholderProps {
   isLoading?: boolean;
   className?: string;
 }
+

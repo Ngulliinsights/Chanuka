@@ -39,3 +39,4 @@ export function useSystemEnvironment() {
     queryFn: () => systemApi.getEnvironment(),
   });
 }
+

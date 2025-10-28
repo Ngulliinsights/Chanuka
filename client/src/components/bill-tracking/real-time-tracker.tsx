@@ -492,3 +492,4 @@ export function RealTimeBillTracker({
     </div>
   );
 }
+

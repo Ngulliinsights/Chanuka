@@ -108,3 +108,4 @@ export const navigationTestHelpers = {
 // Export everything
 export * from '@testing-library/react';
 export { mockNavigationService, navigationTestHelpers };
+

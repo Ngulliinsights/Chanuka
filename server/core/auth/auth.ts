@@ -1,8 +1,8 @@
 
 import { Router, Request, Response } from "express";
 import { authService, registerSchema, loginSchema, passwordResetRequestSchema, passwordResetSchema } from "./auth-service.js";
-import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized } from "@shared/core/src/utils/api-utils.js";
-import { ErrorCodes, HttpStatus, ApiResponseWrapper } from "@shared/core/src/utils/api-utils.js";
+import { ApiSuccess, ApiError, ApiValidationError, ApiUnauthorized } from '@shared/core/utils/api'-utils.js";
+import { ErrorCodes, HttpStatus, ApiResponseWrapper } from '@shared/core/utils/api'-utils.js";
 import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from "../../middleware/rate-limiter.js";
 import { z } from "zod";
 import { errorTracker } from '../errors/error-tracker.js';
@@ -334,6 +334,7 @@ router.post("/reset-password", async (req: Request, res: Response) => {
      }, HttpStatus.INTERNAL_SERVER_ERROR, ApiResponseWrapper.createMetadata(startTime, 'database'));
    }
 });
+
 
 
 

@@ -1478,3 +1478,4 @@ export function generateComponentTemplate(config: ComponentTemplateConfig): {
   
   return { files, errors: structureErrors };
 }
+

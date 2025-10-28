@@ -644,3 +644,4 @@ describe('React Application Initialization Integration Tests', () => {
     });
   });
 });
+

@@ -458,3 +458,4 @@ export default function MethodologyPage({ billId }: MethodologyProps) {
     </div>
   );
 }
+

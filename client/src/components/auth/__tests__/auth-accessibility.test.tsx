@@ -639,3 +639,4 @@ describe('Auth Components Accessibility', () => {
     });
   });
 });
+

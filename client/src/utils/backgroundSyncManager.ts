@@ -169,3 +169,4 @@ if (typeof window !== 'undefined') {
   // Setup auto-sync
   backgroundSyncManager.setupAutoSync();
 }
+

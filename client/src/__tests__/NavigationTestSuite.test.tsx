@@ -527,3 +527,4 @@ describe('NavigationTestSuite', () => {
     expect(true).toBe(true);
   });
 });
+

@@ -128,3 +128,4 @@ test.describe('Accessibility CI Pipeline', () => {
     console.log('Comprehensive accessibility report:', JSON.stringify(report, null, 2));
   });
 });
+

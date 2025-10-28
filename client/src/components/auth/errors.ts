@@ -220,3 +220,4 @@ export function getUserFriendlyMessage(error: unknown): string {
       return 'An error occurred during authentication. Please try again.';
   }
 }
+

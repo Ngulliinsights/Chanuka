@@ -395,3 +395,4 @@ describe('NavigationCore', () => {
     expect(true).toBe(true);
   });
 });
+

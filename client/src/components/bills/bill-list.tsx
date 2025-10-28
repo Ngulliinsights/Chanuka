@@ -275,3 +275,4 @@ export const BillList = ({ bills, isLoading, error, title = "Bills" }: BillListP
     </div>
   );
 };
+

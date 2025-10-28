@@ -195,3 +195,4 @@ describe('Asset Loading Integration', () => {
 // Import React for the test component
 import React from 'react';
 import { vi } from 'vitest';
+

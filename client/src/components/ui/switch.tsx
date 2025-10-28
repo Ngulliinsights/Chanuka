@@ -26,3 +26,4 @@ const Switch = forwardRef<
 Switch.displayName = Root.displayName
 
 export { Switch }
+

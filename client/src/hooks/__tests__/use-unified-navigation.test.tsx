@@ -79,3 +79,4 @@ describe('useUnifiedNavigation', () => {
     expect(result.current.isActive('/dashboard')).toBe(false);
   });
 });
+

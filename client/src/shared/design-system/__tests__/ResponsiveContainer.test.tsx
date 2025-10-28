@@ -133,3 +133,4 @@ describe('ResponsiveContainer', () => {
     expect(container.tagName).toBe('DIV'); // div default
   });
 });
+

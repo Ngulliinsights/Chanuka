@@ -92,3 +92,4 @@ export function BillCard({ bill }: BillCardProps) {
     </Card>
   );
 }
+

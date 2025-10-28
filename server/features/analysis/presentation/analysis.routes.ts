@@ -4,7 +4,7 @@ import { billComprehensiveAnalysisService } from '../application/bill-comprehens
 // Import repository for fetching historical data
 import { analysisRepository } from '../infrastructure/repositories/analysis-repository-impl.js';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js'; // Use if auth needed
-import { ApiSuccess, ApiError, ApiValidationError } from '../../../../shared/core/src/utils/api';
+import { ApiSuccess, ApiError, ApiValidationError } from '@shared/core/utils/api'';
 import { logger } from '@shared/core';
 import { z } from 'zod';
 

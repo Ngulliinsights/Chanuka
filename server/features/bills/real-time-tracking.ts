@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { authenticateToken } from '../../middleware/auth.js';
 import type { AuthenticatedRequest } from '../../middleware/auth.js';
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '../../../shared/core/src/utils/api';
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '@shared/core/utils/api'';
 import { logger } from '@shared/core';
 import { webSocketService } from '../../infrastructure/websocket.js';
 // import { billsService } from '../application/bills';

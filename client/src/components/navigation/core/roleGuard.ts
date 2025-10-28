@@ -7,3 +7,4 @@ export const canViewItem = (item: NavigationItem, role: UserRole, user: any | nu
   if (item.condition && !item.condition(role, user)) return false;
   return true;
 };
+

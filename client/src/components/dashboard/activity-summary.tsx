@@ -166,3 +166,4 @@ export const ActivitySummary: React.FC<DashboardComponentProps> = ({
     </Card>
   );
 };
+

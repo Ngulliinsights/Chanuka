@@ -328,3 +328,4 @@ export function BillTrackingPreferences({ className, onSave }: BillTrackingPrefe
     </div>
   );
 }
+

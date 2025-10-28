@@ -10,3 +10,4 @@ export { ComponentTemplateGenerator, TemplateValidator, generateComponentTemplat
 
 // Types
 export type { ComponentTemplateConfig, TemplateFile } from './component-templates';
+

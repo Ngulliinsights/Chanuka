@@ -261,3 +261,4 @@ export function generateValidationReport(results: Record<string, ValidationResul
 
   return { summary, details };
 }
+

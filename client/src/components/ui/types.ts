@@ -153,3 +153,4 @@ export interface UIErrorContext {
   userAgent?: string;
   additionalData?: Record<string, any>;
 }
+

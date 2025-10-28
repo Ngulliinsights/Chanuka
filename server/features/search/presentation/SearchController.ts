@@ -6,7 +6,7 @@ import {
   rebuildSearchIndexes,
   getSearchIndexHealth,
 } from '../application/SearchService';
-import { ApiSuccess, ApiError, ApiValidationError } from '../../../../shared/core/src/utils/api';
+import { ApiSuccess, ApiError, ApiValidationError } from '@shared/core/utils/api'';
 import { logger } from '@shared/core';
 
 const router = Router();
@@ -74,6 +74,7 @@ router.get('/admin/index-health', async (_req, res) => {
 });
 
 export { router };
+
 
 
 

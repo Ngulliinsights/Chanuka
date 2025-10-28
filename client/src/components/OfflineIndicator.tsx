@@ -147,3 +147,4 @@ export const OfflineIndicator: React.FC<OfflineIndicatorProps> = ({
 };
 
 export default OfflineIndicator;
+

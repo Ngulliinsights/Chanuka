@@ -9,7 +9,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { ApiSuccess, ApiResponseWrapper } from '../../../shared/core/src/utils/api';
+import { ApiSuccess, ApiResponseWrapper } from '@shared/core/utils/api'';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../../infrastructure/external-data/external-api-manager.js';
 import { performanceMonitor } from '../../infrastructure/monitoring/performance-monitor.js';
 // import { advancedCachingService } from '../../infrastructure/cache/advanced-caching.js'; // TODO: Create advanced caching service
@@ -712,6 +712,7 @@ router.get('/metrics/export', async (req: Request, res: Response) => {
 
 // Export the service instance for use in other parts of the application
 export { apiManagementService };
+
 
 
 

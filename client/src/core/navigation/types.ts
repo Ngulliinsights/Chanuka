@@ -95,3 +95,4 @@ export interface NavigationContextValue extends NavigationState {
   setSidebarCollapsed: (collapsed: boolean) => void;
   isActive: (path: string) => boolean;
 }
+

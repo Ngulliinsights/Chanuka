@@ -90,3 +90,4 @@ export interface LoadingResult<T = any> {
   cancel: () => void;
   reset: () => void;
 }
+

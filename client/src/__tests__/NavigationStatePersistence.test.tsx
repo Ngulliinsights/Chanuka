@@ -586,3 +586,4 @@ describe('NavigationStatePersistence', () => {
     expect(true).toBe(true);
   });
 });
+

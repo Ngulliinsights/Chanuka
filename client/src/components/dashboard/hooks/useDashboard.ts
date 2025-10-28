@@ -262,3 +262,4 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
     recovery
   };
 }
+

@@ -319,3 +319,4 @@ export const TrackedTopics: React.FC<DashboardComponentProps> = ({
     </Card>
   );
 };
+

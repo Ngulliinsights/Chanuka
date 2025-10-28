@@ -314,3 +314,4 @@ describe('FormHelpText', () => {
     expect(document.querySelector('svg')).toBeInTheDocument();
   });
 });
+

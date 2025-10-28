@@ -363,3 +363,4 @@ export function useProgressiveTimeout(
     progress: stages.length > 0 ? ((currentStage + 1) / stages.length) * 100 : 0,
   };
 }
+

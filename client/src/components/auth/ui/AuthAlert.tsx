@@ -119,3 +119,4 @@ export const WarningAlert: React.FC<Omit<AuthAlertProps, 'type'>> = (props) => (
 export const InfoAlert: React.FC<Omit<AuthAlertProps, 'type'>> = (props) => (
   <AuthAlert {...props} type="info" />
 );
+

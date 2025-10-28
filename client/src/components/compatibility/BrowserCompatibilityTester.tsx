@@ -297,3 +297,4 @@ const BrowserCompatibilityTester: React.FC<BrowserCompatibilityTesterProps> = ({
 };
 
 export default BrowserCompatibilityTester;
+

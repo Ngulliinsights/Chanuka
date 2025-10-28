@@ -782,3 +782,4 @@ function FilterBadgeList({ items, onRemove }: FilterBadgeListProps) {
     </div>
   );
 }
+

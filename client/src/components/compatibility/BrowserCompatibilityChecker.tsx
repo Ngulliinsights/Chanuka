@@ -496,3 +496,4 @@ const CompatibilityInfoModal: React.FC<{
 };
 
 export default BrowserCompatibilityChecker;
+

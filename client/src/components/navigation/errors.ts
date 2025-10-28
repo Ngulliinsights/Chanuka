@@ -97,3 +97,4 @@ export class NavigationConfigurationError extends NavigationError {
     );
   }
 }
+

@@ -70,3 +70,4 @@ export const ApiValidationError = (errors: any[]) =>
   UnifiedApiResponse.validation(errors);
 export const ApiForbidden = (message = 'Access forbidden') => 
   UnifiedApiResponse.error(message, 'FORBIDDEN');
+

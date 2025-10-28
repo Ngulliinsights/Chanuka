@@ -403,3 +403,4 @@ export function canAutoRecoverUI(error: UIError): boolean {
   const manager = UIRecoveryManager.getInstance();
   return manager.canAutoRecover(error);
 }
+

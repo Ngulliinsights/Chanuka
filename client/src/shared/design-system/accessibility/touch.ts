@@ -91,3 +91,4 @@ export const touchUtils = {
     element.style.touchAction = 'manipulation'; // Prevents double-tap zoom
   },
 } as const;
+

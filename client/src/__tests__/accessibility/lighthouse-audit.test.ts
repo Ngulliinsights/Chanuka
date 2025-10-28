@@ -90,3 +90,4 @@ test.describe('Lighthouse Accessibility Audits', () => {
     expect(results.accessibility?.score).toBeGreaterThanOrEqual(0.85);
   });
 });
+

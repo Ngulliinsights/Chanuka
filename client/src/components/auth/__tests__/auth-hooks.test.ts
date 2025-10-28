@@ -512,3 +512,4 @@ describe('usePasswordValidation Hook', () => {
     expect(result.current.errors).toContain('Password must be at least 16 characters');
   });
 });
+

@@ -242,3 +242,4 @@ describe('PageErrorBoundary', () => {
     expect(screen.getByText(/Maximum retry attempts reached/)).toBeInTheDocument();
   });
 });
+

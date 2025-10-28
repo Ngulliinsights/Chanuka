@@ -56,3 +56,4 @@ export function useMediaQuery(query: string): boolean {
   // Only return actual matches value after we're confirmed to be on the client
   return isClient ? matches : false
 }
+

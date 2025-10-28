@@ -132,3 +132,4 @@ export function safeValidateUserRole(role: string): { success: boolean; data?: s
     return { success: false, error: error as NavigationValidationError };
   }
 }
+

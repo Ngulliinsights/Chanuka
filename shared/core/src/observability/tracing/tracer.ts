@@ -546,3 +546,4 @@ export function createBatchSpanProcessor(
 ): BatchSpanProcessor {
   return new BatchSpanProcessorImpl(exporter, options);
 }
+

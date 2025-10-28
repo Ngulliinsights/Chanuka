@@ -726,3 +726,4 @@ export function AlertPreferences({ userId }: AlertPreferencesProps) {
     </div>
   );
 }
+

@@ -254,3 +254,4 @@ export function CommentThread({ billId, comments, onCommentUpdate }: CommentThre
     </div>
   );
 }
+

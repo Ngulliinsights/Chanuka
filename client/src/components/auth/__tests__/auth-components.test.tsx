@@ -519,3 +519,4 @@ describe('PasswordStrengthIndicator Component', () => {
     expect(indicator).not.toBeInTheDocument();
   });
 });
+

@@ -46,3 +46,4 @@ export function clearTimeoutSafe(timeout: NodeJS.Timeout | undefined): void {
 export function generateOperationId(type: LoadingType, identifier: string): string {
   return `${type}-${identifier}-${Date.now()}`;
 }
+

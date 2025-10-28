@@ -238,3 +238,4 @@ const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
 };
 
 export default BrowserCompatibilityReport;
+

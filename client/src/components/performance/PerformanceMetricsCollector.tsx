@@ -4,9 +4,9 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { performanceMonitor } from '../../utils/performanceMonitoring';
+import { performanceMonitor } from '@shared/core/performance'';
 import { performanceOptimizer, usePerformanceOptimization } from '../../utils/performance-optimizer';
-import { cacheManager } from '../../utils/cache-strategy';
+import { cacheManager } from '@shared/core/caching'-strategy';
 import { logger } from '../../utils/browser-logger';
 
 interface PerformanceMetricsProps {
@@ -363,3 +363,4 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
 };
 
 export default PerformanceMetricsCollector;
+

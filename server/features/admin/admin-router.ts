@@ -6,7 +6,7 @@ import { authenticateToken, requireRole } from '../../middleware/auth.js';
 // TODO: Fix billsService import when available
 // import { billsService } from '../bills/index.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
-import { ApiSuccess, ApiError, ApiForbidden } from '../../../shared/core/src/utils/api';
+import { ApiSuccess, ApiError, ApiForbidden } from '@shared/core/utils/api'';
 import { logger } from '@shared/core';
 
 // Database & Schema Imports

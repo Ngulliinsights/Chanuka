@@ -249,3 +249,4 @@ export const OfflineModal: React.FC<OfflineModalProps> = ({ isOpen, onClose }) =
 };
 
 export default OfflineModal;
+

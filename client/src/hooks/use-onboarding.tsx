@@ -64,3 +64,4 @@ export function useOnboarding() {
     isResetting: resetProgressMutation.isPending,
   };
 }
+

@@ -85,3 +85,4 @@ export const darkTheme = {
     '--info': '213 94% 78%',
   },
 } as const;
+

@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { z } from "zod";
-import { ApiSuccess, ApiValidationError, ApiResponseWrapper } from "../../../shared/core/src/utils/api";
+import { ApiSuccess, ApiValidationError, ApiResponseWrapper } from '@shared/core/utils/api'";
 import { contentModerationService } from "./content-moderation.js";
 import { authenticateToken, requireRole } from "../../middleware/auth.js";
 import { logger } from '@shared/core';
@@ -201,6 +201,7 @@ router.post("/analyze", async (req: Request, res: Response) => {
     return handleError(res, error, "Failed to analyze content", startTime);
   }
 });
+
 
 
 

@@ -1,4 +1,4 @@
-import { apiRequest } from '../../utils/api.js';
+import { apiRequest } from '@shared/core/utils/api'.js';
 import { cache } from '@shared/core';
 import { logger } from '@shared/core';
 
@@ -752,6 +752,7 @@ export class DataCompletenessService {
 
 // Export singleton instance
 export const dataCompletenessService = new DataCompletenessService();
+
 
 
 

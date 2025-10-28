@@ -255,3 +255,4 @@ export function normalizeLoadingType(type: unknown): 'page' | 'component' | 'inl
   }
   return 'component'; // Default fallback
 }
+

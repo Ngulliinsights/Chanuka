@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { offlineDataManager } from '../utils/offlineDataManager';
-import { cacheInvalidation } from '../utils/cacheInvalidation';
+import { cacheInvalidation } from '@shared/core/caching'Invalidation';
 import { addNetworkStatusListener, isOnline } from '../utils/serviceWorker';
 import { backgroundSyncManager } from '../utils/backgroundSyncManager';
 import { offlineAnalytics } from '../utils/offlineAnalytics';
@@ -355,6 +355,7 @@ export function useOfflineNotifications() {
     clearNotifications,
   };
 }
+
 
 
 

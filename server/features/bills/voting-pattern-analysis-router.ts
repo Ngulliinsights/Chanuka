@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { votingPatternAnalysisService } from './voting-pattern-analysis.js';
 import { authenticateToken } from '../../middleware/auth.js';
 import type { AuthenticatedRequest } from '../../middleware/auth.js';
-import { UnifiedApiResponse } from '../../../shared/core/src/utils/api';
+import { UnifiedApiResponse } from '@shared/core/utils/api'';
 import { logger } from '@shared/core';
 import { securityAuditService } from '../security/security-audit-service.js';
 

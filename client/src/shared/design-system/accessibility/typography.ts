@@ -100,3 +100,4 @@ export const typographyUtils = {
     return typographyUtils.applyFontScaling(baseSize, userPreference);
   },
 } as const;
+

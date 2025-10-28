@@ -6,7 +6,7 @@ import { assetLoadingManager, setupAssetPreloading } from "./utils/asset-loading
 import { getMobileErrorHandler } from "./utils/mobile-error-handler";
 import { loadPolyfills } from "./utils/polyfills";
 import { logger } from './utils/browser-logger';
-import { performanceMonitor } from "./utils/performanceMonitoring";
+import { performanceMonitor } from '@shared/core/performance'";
 
 /**
  * Application Loading States
@@ -684,3 +684,4 @@ window.addEventListener('unhandledrejection', (event) => {
 
 // Start the application
 startApplication();
+

@@ -96,3 +96,4 @@ export const ResponsiveGrid: React.FC<ResponsiveGridProps> = ({
 };
 
 export default ResponsiveGrid;
+

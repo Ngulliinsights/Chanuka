@@ -94,3 +94,4 @@ export const useResponsiveNavigation = () => {
     setSidebarCollapsed: navigation.setSidebarCollapsed,
   };
 };
+

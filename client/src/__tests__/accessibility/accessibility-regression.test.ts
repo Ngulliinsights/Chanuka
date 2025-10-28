@@ -121,3 +121,4 @@ test.describe('Accessibility Regression Tests', () => {
     expect(interactiveElements.length).toBeGreaterThan(0);
   });
 });
+
