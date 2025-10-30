@@ -56,7 +56,7 @@ export * as FormTesting from '../testing/form/form-testing-utils';
 // Note: HTTP_STATUS from constants conflicts with http-utils, use explicit imports
 // export * from './constants';
 export * from './correlation-id';
-export * from './migration';
+// Migration utilities removed by design during development
 export * from './number-utils';
 export * from './regex-patterns';
 
@@ -65,7 +65,7 @@ export * from './response-helpers';
 
 // Race condition prevention (consider migrating to async-utils)
 // Note: These may conflict with async-utils exports, so use explicit imports if needed
-// export * from '@shared/core/utils/async-utils'';
+// export * from '@shared/core/src/utils/async-utils'';
 
 
 

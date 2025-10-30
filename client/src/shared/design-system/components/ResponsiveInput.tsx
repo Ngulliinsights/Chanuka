@@ -8,11 +8,11 @@
  */
 
 import React from 'react';
-import { cn } from '../../lib/utils';
+import { cn } from '../lib/utils';
 import { useResponsive } from '../responsive';
 import { inputUtils } from './input';
 
-interface ResponsiveInputProps {
+export interface ResponsiveInputProps {
   className?: string;
   type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search';
   size?: 'small' | 'medium' | 'large';

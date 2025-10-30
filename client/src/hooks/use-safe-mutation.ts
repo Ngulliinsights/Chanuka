@@ -9,7 +9,7 @@ import { logger } from '@shared/core';
  * @param mutationFn The async function that performs the mutation.
  * @param options React Query mutation options.
  */
-export function useSafeMutation<TData = any, TError = Error, TVariables = void>(
+export function useSafeMutation<TData = any, TError = Error, TVariables = any>(
   mutationFn: (variables: TVariables) => Promise<TData>,
   options?: Omit<UseMutationOptions<TData, TError, TVariables>, 'mutationFn'>
 ): UseMutationResult<TData, TError, TVariables> {
@@ -53,16 +53,16 @@ export function useSafePut<TData = any, TVariables = any>(
 
 /**
  * A hook for performing DELETE requests with a simplified API.
- * 
+ *
  * @param endpoint The API endpoint to hit.
  * @param options Mutation options.
  */
-export function useSafeDelete<TData = any, TVariables = any>(
+export function useSafeDelete<TData = any>(
   endpoint: string,
-  options?: Omit<UseMutationOptions<TData, Error, TVariables>, 'mutationFn'>
+  options?: Omit<UseMutationOptions<TData, Error, void>, 'mutationFn'>
 ) {
-  return useSafeMutation<TData, Error, TVariables>(
-    (variables: TVariables) => AuthenticatedAPI.delete(endpoint, variables).then(res => res.data as TData),
+  return useSafeMutation<TData, Error, void>(
+    () => AuthenticatedAPI.delete(endpoint).then(res => res.data as TData),
     options
   );
 }

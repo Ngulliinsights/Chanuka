@@ -10,7 +10,9 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 4
+    },
     "preserveOutput": "always",
     "reporter": [
       [
@@ -40,7 +42,9 @@
         "outputDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "chromium",
         "name": "chromium",
         "testDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/tests",
@@ -48,13 +52,15 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "firefox",
         "name": "firefox",
         "testDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/tests",
@@ -62,13 +68,15 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "webkit",
         "name": "webkit",
         "testDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/tests",
@@ -76,13 +84,15 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "Mobile Chrome",
         "name": "Mobile Chrome",
         "testDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/tests",
@@ -90,13 +100,15 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "Mobile Safari",
         "name": "Mobile Safari",
         "testDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/tests",
@@ -104,13 +116,15 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "api",
         "name": "api",
         "testDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/tests/api",
@@ -118,13 +132,15 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "database-performance",
         "name": "database-performance",
         "testDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/tests/api",
@@ -132,13 +148,15 @@
         "testMatch": [
           "**/database-performance.spec.ts"
         ],
-        "timeout": 30000
+        "timeout": 60000
       },
       {
         "outputDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/test-results",
         "repeatEach": 1,
         "retries": 0,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 4
+        },
         "id": "integration",
         "name": "integration",
         "testDir": "c:/Users/Access Granted/Downloads/projects/SimpleTool/tests/integration",
@@ -146,7 +164,7 @@
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
         ],
-        "timeout": 30000
+        "timeout": 60000
       }
     ],
     "shard": null,
@@ -161,19 +179,312 @@
       "timeout": 120000
     }
   },
-  "suites": [],
-  "errors": [
+  "suites": [
     {
-      "message": "Error: Process from config.webServer was not able to start. Exit code: 1",
-      "stack": "Error: Process from config.webServer was not able to start. Exit code: 1"
+      "title": "e2e\\responsive-test.spec.ts",
+      "file": "e2e/responsive-test.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Responsive Design Testing",
+          "file": "e2e/responsive-test.spec.ts",
+          "line": 3,
+          "column": 6,
+          "specs": [
+            {
+              "title": "bills-dashboard page should be responsive",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 7568,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1')\nExpected substring: \u001b[32m\"Bills Dashboard\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1')\nExpected substring: \u001b[32m\"Bills Dashboard\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\n    at c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts:10:42",
+                        "location": {
+                          "file": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts",
+                          "column": 42,
+                          "line": 10
+                        },
+                        "snippet": "\u001b[0m \u001b[90m  8 |\u001b[39m\n \u001b[90m  9 |\u001b[39m         \u001b[90m// Check that the page loads\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 10 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'h1'\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\u001b[32m'Bills Dashboard'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 11 |\u001b[39m\n \u001b[90m 12 |\u001b[39m         \u001b[90m// Check responsive container\u001b[39m\n \u001b[90m 13 |\u001b[39m         \u001b[36mconst\u001b[39m container \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'.container'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts",
+                            "column": 42,
+                            "line": 10
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1')\nExpected substring: \u001b[32m\"Bills Dashboard\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\n\n   8 |\n   9 |         // Check that the page loads\n> 10 |         await expect(page.locator('h1')).toContainText('Bills Dashboard');\n     |                                          ^\n  11 |\n  12 |         // Check responsive container\n  13 |         const container = page.locator('.container');\n    at c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts:10:42"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-29T21:01:33.676Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\test-results\\e2e-responsive-test-Respon-3cd32-d-page-should-be-responsive-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\test-results\\e2e-responsive-test-Respon-3cd32-d-page-should-be-responsive-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\test-results\\e2e-responsive-test-Respon-3cd32-d-page-should-be-responsive-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts",
+                        "column": 42,
+                        "line": 10
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "8805a440702804dee85d-4172566b530b25209d24",
+              "file": "e2e/responsive-test.spec.ts",
+              "line": 4,
+              "column": 5
+            },
+            {
+              "title": "home page should be responsive with ResponsiveGrid",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 7421,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1')\nExpected substring: \u001b[32m\"Welcome to Chanuka Platform\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1')\nExpected substring: \u001b[32m\"Welcome to Chanuka Platform\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\n    at c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts:37:42",
+                        "location": {
+                          "file": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts",
+                          "column": 42,
+                          "line": 37
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 35 |\u001b[39m\n \u001b[90m 36 |\u001b[39m         \u001b[90m// Check that the page loads\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 37 |\u001b[39m         \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'h1'\u001b[39m))\u001b[33m.\u001b[39mtoContainText(\u001b[32m'Welcome to Chanuka Platform'\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                          \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 38 |\u001b[39m\n \u001b[90m 39 |\u001b[39m         \u001b[90m// Check responsive grid\u001b[39m\n \u001b[90m 40 |\u001b[39m         \u001b[36mconst\u001b[39m grid \u001b[33m=\u001b[39m page\u001b[33m.\u001b[39mlocator(\u001b[32m'.responsive-grid'\u001b[39m)\u001b[33m;\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts",
+                            "column": 42,
+                            "line": 37
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoContainText\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator: locator('h1')\nExpected substring: \u001b[32m\"Welcome to Chanuka Platform\"\u001b[39m\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n\u001b[2m  - Expect \"toContainText\" with timeout 5000ms\u001b[22m\n\u001b[2m  - waiting for locator('h1')\u001b[22m\n\n\n  35 |\n  36 |         // Check that the page loads\n> 37 |         await expect(page.locator('h1')).toContainText('Welcome to Chanuka Platform');\n     |                                          ^\n  38 |\n  39 |         // Check responsive grid\n  40 |         const grid = page.locator('.responsive-grid');\n    at c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts:37:42"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-29T21:01:33.620Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\test-results\\e2e-responsive-test-Respon-c61b7-ponsive-with-ResponsiveGrid-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\test-results\\e2e-responsive-test-Respon-c61b7-ponsive-with-ResponsiveGrid-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\test-results\\e2e-responsive-test-Respon-c61b7-ponsive-with-ResponsiveGrid-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts",
+                        "column": 42,
+                        "line": 37
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "8805a440702804dee85d-9a8766b8b516a318a0f8",
+              "file": "e2e/responsive-test.spec.ts",
+              "line": 31,
+              "column": 5
+            },
+            {
+              "title": "ResponsiveContainer should apply correct padding and max-width",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "timedOut",
+                      "duration": 66748,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts",
+                            "column": 40,
+                            "line": 68
+                          },
+                          "message": "Error: locator.evaluate: Test timeout of 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.responsive-container')\u001b[22m\n\n\n  66 |         // Check ResponsiveContainer styles\n  67 |         const container = page.locator('.responsive-container');\n> 68 |         const styles = await container.evaluate(el => {\n     |                                        ^\n  69 |             const computed = window.getComputedStyle(el);\n  70 |             return {\n  71 |                 maxWidth: computed.maxWidth,\n    at c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts:68:40"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-29T21:01:33.619Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\test-results\\e2e-responsive-test-Respon-74e4c-rrect-padding-and-max-width-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\test-results\\e2e-responsive-test-Respon-74e4c-rrect-padding-and-max-width-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\test-results\\e2e-responsive-test-Respon-74e4c-rrect-padding-and-max-width-chromium\\error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "8805a440702804dee85d-739d7dc5e66e5f0a36c0",
+              "file": "e2e/responsive-test.spec.ts",
+              "line": 62,
+              "column": 5
+            },
+            {
+              "title": "ResponsiveGrid should adapt columns based on screen size",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "timedOut",
+                      "duration": 66697,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 60000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts",
+                            "column": 55,
+                            "line": 91
+                          },
+                          "message": "Error: locator.evaluate: Test timeout of 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('.responsive-grid')\u001b[22m\n\n\n  89 |\n  90 |         const gridDesktop = page.locator('.responsive-grid');\n> 91 |         const gridTemplateDesktop = await gridDesktop.evaluate(el =>\n     |                                                       ^\n  92 |             window.getComputedStyle(el).gridTemplateColumns\n  93 |         );\n  94 |         expect(gridTemplateDesktop).toContain('repeat(3, minmax(0, 1fr))');\n    at c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\tests\\e2e\\responsive-test.spec.ts:91:55"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-29T21:01:33.738Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\test-results\\e2e-responsive-test-Respon-ea833-olumns-based-on-screen-size-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\test-results\\e2e-responsive-test-Respon-ea833-olumns-based-on-screen-size-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\test-results\\e2e-responsive-test-Respon-ea833-olumns-based-on-screen-size-chromium\\error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "8805a440702804dee85d-bda4413e0ca75211e25a",
+              "file": "e2e/responsive-test.spec.ts",
+              "line": 85,
+              "column": 5
+            }
+          ]
+        }
+      ]
     }
   ],
+  "errors": [],
   "stats": {
-    "startTime": "2025-10-27T12:54:50.107Z",
-    "duration": 4293.107,
+    "startTime": "2025-10-29T21:01:25.964Z",
+    "duration": 75947.228,
     "expected": 0,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 4,
     "flaky": 0
   }
 }

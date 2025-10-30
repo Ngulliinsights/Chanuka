@@ -74,8 +74,7 @@ const IMPORT_MAPPINGS = {
   
   // Contexts
   '@/contexts/LoadingContext': './contexts/LoadingContext',
-  '@/contexts/NavigationContext': './contexts/NavigationContext',
-  '@/contexts/ResponsiveNavigationContext': './contexts/ResponsiveNavigationContext',
+  '@/contexts/NavigationContext': './core/navigation/context',
   
   // Components - UI
   '@/components/ui/toaster': './components/ui/toaster',
@@ -126,7 +125,7 @@ const IMPORT_MAPPINGS = {
   // Components - Error Handling
   '@/components/error-handling/withErrorBoundary': './components/error-handling/withErrorBoundary',
   '@/components/error-handling/ErrorFallback': './components/error-handling/ErrorFallback',
-  '@/components/error-handling/PageErrorBoundary': './components/error-handling/PageErrorBoundary',
+  '@/components/error-handling/EnhancedErrorBoundary': './components/error-handling/EnhancedErrorBoundary',
   '@/components/error-handling': './components/error-handling',
   
   // Components - Accessibility

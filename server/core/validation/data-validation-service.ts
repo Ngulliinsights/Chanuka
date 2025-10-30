@@ -1,5 +1,5 @@
 import pkg from 'pg';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 const { Pool } = pkg;
 import type { Pool as PoolType } from 'pg';
 

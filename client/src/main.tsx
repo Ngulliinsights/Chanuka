@@ -6,7 +6,7 @@ import { assetLoadingManager, setupAssetPreloading } from "./utils/asset-loading
 import { getMobileErrorHandler } from "./utils/mobile-error-handler";
 import { loadPolyfills } from "./utils/polyfills";
 import { logger } from './utils/browser-logger';
-import { performanceMonitor } from '@shared/core/performance'";
+import { performanceMonitor } from '../../shared/core/src/performance/monitoring';
 
 /**
  * Application Loading States
@@ -327,7 +327,7 @@ function initializePerformanceMonitoring(): void {
     logger.info('🚀 Performance monitoring active', { component: 'Chanuka' });
     
     setTimeout(() => {
-      performanceMonitor.measureRouteChange('initial-load')();
+      performanceMonitor.startMonitoring();
     }, 1000);
   } catch (perfError) {
     console.warn('Performance monitoring initialization failed:', perfError);

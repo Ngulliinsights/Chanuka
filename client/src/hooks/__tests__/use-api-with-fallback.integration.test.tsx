@@ -13,8 +13,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useApiWithFallback, useMutation, useApiPost } from '../use-api-with-fallback';
-import * as apiErrorHandling from '@/$2/api-error-handling';
-import { logger } from '@/$2/browser-logger';
+// Note: api-error-handling was intentionally removed - using built-in error handling
+import { logger } from '@shared/core';
 
 // Mock the API service with more realistic behavior
 vi.mock('@/services/api-error-handling', () => ({

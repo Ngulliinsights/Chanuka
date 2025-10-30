@@ -8,10 +8,10 @@
  */
 
 import React from 'react';
-import { cn } from '../../lib/utils';
+import { cn } from '../lib/utils';
 import { useResponsive, type Breakpoint } from '../responsive';
 
-interface ResponsiveContainerProps {
+export interface ResponsiveContainerProps {
   children: React.ReactNode;
   className?: string;
   maxWidth?: Breakpoint | 'none';

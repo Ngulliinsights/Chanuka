@@ -4,11 +4,10 @@ Maximum depth: 7 levels
 
 ```
 .
-503_ERROR_RESOLUTION.md
 client/
-├── CONSOLIDATION_PLAN.md
-├── CONSOLIDATION_SUMMARY.md
 ├── index.html
+├── package.json
+├── package-lock.json
 ├── public/
 │   ├── Chanuka_logo.png
 │   ├── Chanuka_logo.svg
@@ -180,14 +179,13 @@ client/
 │   │   │   │   ├── error-recovery-flows.test.tsx
 │   │   │   │   ├── PageErrorBoundary.integration.test.tsx
 │   │   │   │   ├── PageErrorBoundary.test.tsx
-│   │   │   │   ├── withErrorBoundary.test.tsx
+│   │   │   ├── EnhancedErrorBoundary.tsx
 │   │   │   ├── ErrorFallback.tsx
 │   │   │   ├── ErrorRecoveryManager.tsx
 │   │   │   ├── index.ts
-│   │   │   ├── PageErrorBoundary.tsx
+│   │   │   ├── MIGRATION_GUIDE.md
 │   │   │   ├── ServiceUnavailable.tsx
 │   │   │   ├── SimpleErrorBoundary.tsx
-│   │   │   ├── withErrorBoundary.tsx
 │   │   ├── feature-flags-panel.tsx
 │   │   ├── implementation/
 │   │   │   ├── workarounds.tsx
@@ -273,7 +271,6 @@ client/
 │   │   │   ├── mobile-performance-optimizations.tsx
 │   │   │   ├── mobile-test-suite.tsx
 │   │   │   ├── responsive-layout-manager.tsx
-│   │   │   ├── responsive-page-wrapper.tsx
 │   │   ├── monitoring/
 │   │   │   ├── monitoring-dashboard.tsx
 │   │   ├── navigation/
@@ -391,6 +388,7 @@ client/
 │   │   │   ├── theme-toggle.tsx
 │   │   │   ├── toast.tsx
 │   │   │   ├── toaster.tsx
+│   │   │   ├── tooltip.tsx
 │   │   │   ├── types.ts
 │   │   │   ├── validation.ts
 │   │   ├── verification/
@@ -404,10 +402,9 @@ client/
 │   │   │   ├── navigation-persistence.test.tsx
 │   │   ├── NavigationContext.tsx
 │   │   ├── ThemeContext.tsx
-│   │   ├── UnifiedLoadingContext.tsx
 │   ├── core/
 │   │   ├── dashboard/
-│   │   │   ├── context.ts
+│   │   │   ├── context.tsx
 │   │   │   ├── hooks.ts
 │   │   │   ├── index.ts
 │   │   │   ├── reducer.ts
@@ -415,14 +412,14 @@ client/
 │   │   │   ├── utils.ts
 │   │   │   ├── widgets.ts
 │   │   ├── loading/
-│   │   │   ├── context.ts
+│   │   │   ├── context.tsx
 │   │   │   ├── hooks.ts
 │   │   │   ├── index.ts
 │   │   │   ├── reducer.ts
 │   │   │   ├── types.ts
 │   │   │   ├── utils.ts
 │   │   ├── navigation/
-│   │   │   ├── context.ts
+│   │   │   ├── context.tsx
 │   │   │   ├── hooks.ts
 │   │   │   ├── index.ts
 │   │   │   ├── persistence.ts
@@ -495,7 +492,6 @@ client/
 │   │   ├── use-auth.tsx
 │   │   ├── use-bill-analysis.tsx
 │   │   ├── use-bills.tsx
-│   │   ├── useComprehensiveLoading.ts
 │   │   ├── useConnectionAware.tsx
 │   │   ├── useErrorRecovery.ts
 │   │   ├── use-i18n.tsx
@@ -512,7 +508,6 @@ client/
 │   │   ├── use-safe-mutation.ts
 │   │   ├── use-safe-query.ts
 │   │   ├── useServiceStatus.ts
-│   │   ├── useSimplifiedLoading.ts
 │   │   ├── use-system.tsx
 │   │   ├── useTimeoutAwareLoading.ts
 │   │   ├── use-toast.ts
@@ -520,7 +515,6 @@ client/
 │   │   ├── useWebSocket.ts
 │   ├── index.css
 │   ├── lib/
-│   │   ├── icon-wrapper.tsx
 │   │   ├── protected-route.tsx
 │   │   ├── queryClient.ts
 │   │   ├── utils.ts
@@ -551,7 +545,6 @@ client/
 │   │   │   ├── methodology.tsx
 │   │   │   ├── overview.tsx
 │   │   │   ├── primary-sponsor.tsx
-│   │   ├── sponsorship-wrappers.tsx
 │   │   ├── user-profile.tsx
 │   ├── services/
 │   │   ├── __tests__/
@@ -581,6 +574,7 @@ client/
 │   │   │   │   ├── motion.ts
 │   │   │   │   ├── touch.ts
 │   │   │   │   ├── typography.ts
+│   │   │   ├── BUG_FIXES_SUMMARY.md
 │   │   │   ├── components/
 │   │   │   │   ├── __tests__/
 │   │   │   │   │   ├── design-standards.test.ts
@@ -674,7 +668,6 @@ client/
 │   ├── utils/
 │   │   ├── __tests__/
 │   │   │   ├── safe-lazy-loading.test.tsx
-│   │   ├── api-health.ts
 │   │   ├── asset-fallback-config.ts
 │   │   ├── asset-loading.ts
 │   │   ├── authenticated-api.ts
@@ -684,12 +677,10 @@ client/
 │   │   ├── browser-compatibility-tests.ts
 │   │   ├── browser-logger.ts
 │   │   ├── cacheInvalidation.ts
-│   │   ├── cache-strategy.ts
 │   │   ├── comprehensiveLoading.ts
 │   │   ├── connectionAwareLoading.ts
 │   │   ├── development-debug.ts
 │   │   ├── development-error-recovery.ts
-│   │   ├── logger.ts
 │   │   ├── mobile-error-handler.ts
 │   │   ├── mobile-touch-handler.ts
 │   │   ├── navigation/
@@ -708,11 +699,9 @@ client/
 │   │   │   ├── state-persistence.ts
 │   │   ├── offlineAnalytics.ts
 │   │   ├── offlineDataManager.ts
-│   │   ├── performanceMonitoring.ts
 │   │   ├── performance-optimizer.ts
 │   │   ├── polyfills.ts
 │   │   ├── preload-optimizer.ts
-│   │   ├── race-condition-prevention.ts
 │   │   ├── responsive-layout.ts
 │   │   ├── route-preloading.ts
 │   │   ├── route-preloading.tsx
@@ -721,18 +710,13 @@ client/
 │   │   ├── service-recovery.ts
 │   │   ├── serviceWorker.ts
 │   ├── vite-env.d.ts
-├── TECHNICAL_IMPLEMENTATION.md
 ├── tsconfig.json
 components.json
-CONSOLIDATION_MIGRATION_SUMMARY.md
-CONSOLIDATION_PROGRESS.md
-CORE_CONSISTENCY_REPORT.md
-CORE_STRUCTURE_FINAL_UPDATE.md
-CORE_UPDATE_COMPLETE.md
 cspell.config.yaml
 docker-compose.yml
 Dockerfile
 docs/
+├── adapter-analysis-report.md
 ├── analysis/
 │   ├── chanuka_implementation_guide.md
 │   ├── codebase-analysis.md
@@ -754,51 +738,21 @@ docs/
 │   ├── dashboard_1751743369900.html
 │   ├── expert-verification_1751743369833.html
 │   ├── ezra-nehemiah-chanuka (1).md
-│   ├── frontend_design.md
-│   ├── frontend_requirements.md
-│   ├── frontend-stabilization-plan.md
-│   ├── implementation.guide_1751746507008.md
-│   ├── loopholes_1751746507009.md
 │   ├── merged_bill_sponsorship.html
-│   ├── Pasted-sw-js-230-Service-Worker-Navigation-request-failed-checking-cache-TypeError-Failed-to-fetch--1759907703032_1759907703033.txt
-│   ├── shared_core_design (2).md
 │   ├── shared_core_design.md
-│   ├── shared_core_impl_plan.md
-│   ├── shared_core_requirements (2).md
 │   ├── shared_core_requirements.md
-│   ├── shared_core_tasks.md
 │   ├── sponsorbyreal.html
 ├── chanuka_architecture.txt
 ├── chanuka_functionality_analysis.md
+├── Chanuka_Funding_Pitch.md
+├── client-error-analysis.md
+├── client-error-delegation-plan.md
+├── client-errors-analysis.md
+├── client-recovery-action-plan.md
+├── client-recovery-final-status.md
+├── client-recovery-implementation-summary.md
+├── client-recovery-status.md
 ├── database-schema-final.md
-├── features/
-│   ├── best-functionality.md
-│   ├── core-functionality.md
-├── guides/
-│   ├── BACKEND_TESTING_QUICKSTART.md
-│   ├── CLEANUP_SUMMARY.md
-│   ├── CONSISTENCY_REPORT.md
-│   ├── CONSOLIDATION_COMPLETE.md
-│   ├── CONSOLIDATION_MIGRATION_PLAN.md
-│   ├── CONSOLIDATION_PLAN.md
-│   ├── CONSOLIDATION_README.md
-│   ├── CONSOLIDATION_SUMMARY.md
-│   ├── DATABASE_SETUP_GUIDE.md
-│   ├── DEMO_MODE_CONFIGURATION.md
-│   ├── DEPLOYMENT.md
-│   ├── DEPLOYMENT_GUIDE.md
-│   ├── ERROR_MANAGEMENT_MIGRATION_SUMMARY.md
-│   ├── FINAL_CONSOLIDATION_REPORT.md
-│   ├── INFRASTRUCTURE_CONSOLIDATION_PLAN.md
-│   ├── INFRASTRUCTURE_CONSOLIDATION_SUMMARY.md
-│   ├── MEMORY_OPTIMIZATION_GUIDE.md
-│   ├── MIGRATION_GUIDE.md
-│   ├── MIGRATION_VALIDATION_REPORT.md
-│   ├── NAVIGATION_USER_GUIDE.md
-│   ├── TESTING_GUIDE.md
-│   ├── TROUBLESHOOTING_GUIDE.md
-│   ├── user-guide.md
-│   ├── UTILITY_MIGRATION_REPORT.md
 ├── project/
 │   ├── brand-roadmap.md
 │   ├── manifesto.md
@@ -818,7 +772,6 @@ drizzle.config.ts
 false/
 ├── trace.json
 generate-structure-to-file.sh
-Home - Shortcut.lnk
 jest.backend.config.js
 logs/
 ├── app.log
@@ -850,21 +803,24 @@ migration/
 ├── validation/
 │   ├── package.json
 │   ├── validate-migration.js
-NAVIGATION_BUG_FIXES.md
+migration_output.log
 nginx.conf
-OBSERVABILITY_CONSOLIDATION.md
 package.json
 package-lock.json
 performance-budget-report.json
-performance-budget-report.md
 performance-budgets.json
 playwright.config.ts
 playwright-report/
+├── data/
+│   ├── 1acdebbdf3181885f0e8906cfb868af9f0944003.webm
+│   ├── 29682a914488b3d37fd9112dc4454cf7e17cf126.webm
+│   ├── 6b3594aa3bf5c9f478ccad0e46203e4b07bb5b65.webm
+│   ├── b59eb0f7d7aeec3e513a3df83c7c9f28a3e0319a.md
+│   ├── b71a45242576c0c9210b12d06fbff7fb191bd0d9.png
+│   ├── d1aef23511357c6a879e4ac1ffc6141cae63181c.webm
 ├── index.html
 postcss.config.js
-PROJECT_STRUCTURE_REPORT.md
 project-structure-report.json
-Readme1.md
 scripts/
 ├── accessibility/
 │   ├── accessibility-reporter.test.js
@@ -875,7 +831,9 @@ scripts/
 ├── bundle-analysis-plugin.js
 ├── bundle-analyzer.js
 ├── check-table-structure.ts
+├── clean-shared-core-imports.ts
 ├── cleanup-deprecated-folders.ts
+├── cleanup-legacy-adapters.js
 ├── consolidate-sprawl.ts
 ├── database/
 │   ├── check-schema.ts
@@ -898,16 +856,24 @@ scripts/
 │   ├── deploy.sh
 ├── diagnose-503-issues.js
 ├── drop-schema.ts
+├── fix-all-shared-core-imports.ts
 ├── fix-api-response-calls.js
+├── fix-architectural-issues.ts
 ├── fix-failing-tests.ts
 ├── fix-frontend-imports.js
+├── fix-infrastructure-issues.ts
 ├── fix-navigation-tests.ts
 ├── fix-performance-tests.ts
 ├── fix-remaining-api-calls.js
 ├── fix-remaining-test-issues.ts
 ├── fix-server-logger-imports.js
+├── fix-shared-core-imports.ts
 ├── generate-bundle-report.js
+├── identify-deprecated-files.cjs
+├── identify-deprecated-files.js
+├── identify-deprecated-files.ts
 ├── immediate-memory-cleanup.cjs
+├── migrate-api-imports.js
 ├── migrate-codebase-utilities.ts
 ├── migrate-console-logs.ts
 ├── migrate-error-handling.ts
@@ -915,6 +881,7 @@ scripts/
 ├── performance-budget-enforcer.cjs
 ├── performance-trend-analyzer.cjs
 ├── rollback-cleanup.ts
+├── run-adapter-cleanup.js
 ├── run-strategic-tests.js
 ├── seeds/
 │   ├── legislative-seed.ts
@@ -970,6 +937,7 @@ scripts/
 │   ├── verify-user-profile-service.ts
 │   ├── verify-websocket-service.ts
 ├── test-status-summary.ts
+├── update-core-imports.js
 ├── update-core-references.js
 ├── update-test-configuration.ts
 ├── validate-test-config.js
@@ -1088,7 +1056,6 @@ server/
 │   │   │   │   ├── analysis.routes.test.ts
 │   │   │   ├── analysis.routes.ts
 │   ├── analytics/
-│   │   ├── analysis.ts
 │   │   ├── analytics.ts
 │   │   ├── config/
 │   │   │   ├── __tests__/
@@ -1464,23 +1431,16 @@ server/
 │   │   ├── cache.test.ts
 │   │   ├── db-helpers.test.ts
 │   ├── analytics-controller-wrapper.ts
-│   ├── api.ts
 │   ├── api-response.ts
-│   ├── api-response.ts.backup
-│   ├── cache.ts
 │   ├── crypto.ts
 │   ├── db-helpers.ts
 │   ├── db-init.ts
 │   ├── errors.ts
 │   ├── featureFlags.ts
-│   ├── logger.ts
 │   ├── metrics.ts
-│   ├── performance-monitoring-utils.ts
-│   ├── race-condition-prevention.ts
 │   ├── shared-core-fallback.ts
 │   ├── validation.ts
 ├── vite.ts
-SERVICE_AVAILABILITY_SOLUTIONS.md
 shared/
 ├── core/
 │   ├── index.ts
@@ -1505,15 +1465,13 @@ shared/
 │   │   │   │   ├── single-flight-integration.test.ts
 │   │   │   ├── adapters/
 │   │   │   │   ├── ai-cache.ts
+│   │   │   │   ├── browser-adapter.ts
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── legacy/
-│   │   │   │   │   ├── infrastructure-cache-adapter.ts
 │   │   │   │   ├── memory-adapter.ts
 │   │   │   │   ├── multi-tier-adapter.ts
 │   │   │   │   ├── redis-adapter.ts
 │   │   │   ├── ai-cache.ts
-│   │   │   ├── base-adapter.ts
-│   │   │   ├── base-cache-adapter.ts
+│   │   │   ├── cache-factory.ts
 │   │   │   ├── CIRCUIT_BREAKER_IMPLEMENTATION.md
 │   │   │   ├── core/
 │   │   │   │   ├── base-adapter.ts
@@ -1526,16 +1484,16 @@ shared/
 │   │   │   ├── index.ts
 │   │   │   ├── interfaces.ts
 │   │   │   ├── key-generator.ts
-│   │   │   ├── legacy-adapters/
-│   │   │   ├── legacy-adapters.ts
-│   │   │   │   ├── cache-service-adapter.ts
-│   │   │   ├── migration-adapter.ts
 │   │   │   ├── patterns/
 │   │   │   │   ├── index.ts
 │   │   │   ├── README.md
 │   │   │   ├── README-interfaces.md
 │   │   │   ├── single-flight-cache.ts
 │   │   │   ├── types.ts
+│   │   │   ├── utilities/
+│   │   │   │   ├── cache-compressor.ts
+│   │   │   │   ├── cache-tag-manager.ts
+│   │   │   │   ├── cache-warmer.ts
 │   │   │   ├── validation.ts
 │   │   ├── config/
 │   │   │   ├── __tests__/
@@ -1563,10 +1521,6 @@ shared/
 │   │   │   ├── factory.ts
 │   │   │   ├── feature-flags.ts
 │   │   │   ├── index.ts
-│   │   │   ├── legacy-adapters/
-│   │   │   │   ├── auth-adapter.ts
-│   │   │   │   ├── server-middleware-adapter.ts
-│   │   │   ├── migration-adapter.ts
 │   │   │   ├── rate-limit/
 │   │   │   │   ├── provider.ts
 │   │   │   ├── registry.ts
@@ -1574,24 +1528,6 @@ shared/
 │   │   │   ├── unified.ts
 │   │   │   ├── validation/
 │   │   │   │   ├── provider.ts
-│   │   ├── migration/
-│   │   │   ├── __tests__/
-│   │   │   │   ├── unit/
-│   │   │   │   │   ├── adapters/
-│   │   │   │   │   │   ├── BaseAdapter.test.ts
-│   │   │   ├── adapters/
-│   │   │   │   ├── BaseAdapter.ts
-│   │   │   │   ├── CacheAdapter.ts
-│   │   │   ├── feature-flags/
-│   │   │   │   ├── FlagManager.ts
-│   │   │   │   ├── types.ts
-│   │   │   ├── import-migration-helper.ts
-│   │   │   ├── index.ts
-│   │   │   ├── monitoring/
-│   │   │   │   ├── MigrationMetrics.ts
-│   │   │   ├── scripts/
-│   │   │   │   ├── simple-migration.ts
-│   │   │   │   ├── validate-migration.ts
 │   │   ├── modernization/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── orchestrator.test.ts
@@ -1634,9 +1570,6 @@ shared/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── integrations/
 │   │   │   │   │   ├── error-tracking-integration.ts
-│   │   │   │   ├── legacy-adapters/
-│   │   │   │   │   ├── error-handling-adapter.ts
-│   │   │   │   │   ├── errors-adapter.ts
 │   │   │   │   ├── middleware/
 │   │   │   │   │   ├── express-error-middleware.ts
 │   │   │   │   ├── monitoring/
@@ -1665,9 +1598,6 @@ shared/
 │   │   │   │   ├── types.ts
 │   │   │   ├── index.ts
 │   │   │   ├── interfaces.ts
-│   │   │   ├── legacy-adapters/
-│   │   │   ├── legacy-adapters.ts
-│   │   │   │   ├── logging-migration-adapter.ts
 │   │   │   ├── logging/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── logger.ts
@@ -1697,7 +1627,9 @@ shared/
 │   │   ├── performance/
 │   │   │   ├── budgets.ts
 │   │   │   ├── index.ts
+│   │   │   ├── method-timing.ts
 │   │   │   ├── monitoring.ts
+│   │   │   ├── unified-monitoring.ts
 │   │   ├── primitives/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── base-error.test.ts
@@ -1727,7 +1659,6 @@ shared/
 │   │   │   ├── adapters/
 │   │   │   │   ├── fixed-window-adapter.ts
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── legacy-store-adapter.ts
 │   │   │   │   ├── memory-adapter.ts
 │   │   │   │   ├── sliding-window-adapter.ts
 │   │   │   │   ├── token-bucket-adapter.ts
@@ -1788,9 +1719,13 @@ shared/
 │   │   │   ├── validation-types.ts
 │   │   ├── utils/
 │   │   │   ├── api/
+│   │   │   │   ├── circuit-breaker.ts
+│   │   │   │   ├── client.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── interceptors.ts
 │   │   │   ├── api-utils.ts
 │   │   │   ├── async-utils.ts
+│   │   │   ├── browser-logger.test.ts
 │   │   │   ├── browser-logger.ts
 │   │   │   ├── cache-utils.ts
 │   │   │   ├── constants.ts
@@ -1810,7 +1745,6 @@ shared/
 │   │   │   │   ├── image-utils.ts
 │   │   │   ├── index.ts
 │   │   │   ├── loading-utils.ts
-│   │   │   ├── migration.ts
 │   │   │   ├── navigation-utils.ts
 │   │   │   ├── number-utils.ts
 │   │   │   ├── performance-utils.ts
@@ -1840,13 +1774,9 @@ shared/
 │   │   │   │   ├── validation-service.ts
 │   │   │   ├── helpers.ts
 │   │   │   ├── index.ts
-│   │   │   ├── legacy-adapters/
-│   │   │   ├── legacy-adapters.ts
-│   │   │   │   ├── validation-service-adapter.ts
 │   │   │   ├── middleware/
 │   │   │   ├── middleware.ts
 │   │   │   │   ├── index.ts
-│   │   │   ├── migration-validator.ts
 │   │   │   ├── README.md
 │   │   │   ├── sanitization.ts
 │   │   │   ├── schemas/
@@ -1856,19 +1786,6 @@ shared/
 │   │   │   │   ├── property.ts
 │   │   │   ├── types.ts
 │   │   │   ├── validation-service.ts
-│   ├── utilities/
-│   │   ├── api/
-│   │   │   ├── index.ts
-│   │   │   ├── response.ts
-│   │   ├── database/
-│   │   ├── index.ts
-│   │   ├── logging/
-│   │   │   ├── index.ts
-│   │   │   ├── unified-logger.ts
-│   │   ├── performance/
-│   │   │   ├── index.ts
-│   │   │   ├── monitoring.ts
-│   │   ├── validation/
 ├── database/
 │   ├── connection.ts
 │   ├── example-usage.ts
@@ -1900,11 +1817,25 @@ shared/
 src/
 ├── setupTests.ts
 tailwind.config.ts
-TEST_FIXING_COMPLETE_SUMMARY.md
-TEST_STATUS_SUMMARY.md
 test-auth-compile.ts
 test-connection.html
 test-results/
+├── e2e-responsive-test-Respon-3cd32-d-page-should-be-responsive-chromium/
+│   ├── error-context.md
+│   ├── test-failed-1.png
+│   ├── video.webm
+├── e2e-responsive-test-Respon-74e4c-rrect-padding-and-max-width-chromium/
+│   ├── error-context.md
+│   ├── test-failed-1.png
+│   ├── video.webm
+├── e2e-responsive-test-Respon-c61b7-ponsive-with-ResponsiveGrid-chromium/
+│   ├── error-context.md
+│   ├── test-failed-1.png
+│   ├── video.webm
+├── e2e-responsive-test-Respon-ea833-olumns-based-on-screen-size-chromium/
+│   ├── error-context.md
+│   ├── test-failed-1.png
+│   ├── video.webm
 ├── results.json
 ├── results.xml
 tests/
@@ -1915,6 +1846,7 @@ tests/
 ├── e2e/
 │   ├── auth-flow.spec.ts
 │   ├── database-performance-ui.spec.ts
+│   ├── responsive-test.spec.ts
 ├── global-setup.ts
 ├── global-teardown.ts
 ├── integration/
@@ -1929,7 +1861,6 @@ tools/
 ├── validate-schema-congruence.ts
 tsconfig.json
 tsconfig.server.json
-UTILITY_MIGRATION_REPORT.md
 vite.config.ts
 vitest.config.ts
 vitest.frontend.config.ts
@@ -1937,4 +1868,4 @@ vitest.frontend.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-28 10:36:13
+Generated on: 2025-10-30 07:41:34

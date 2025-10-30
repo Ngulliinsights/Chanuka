@@ -1,54 +1,64 @@
-import React, { useState, ReactNode, useEffect, useRef, useCallback, useMemo } from 'react';
-import { 
-  Menu, 
-  X, 
-  Home, 
-  FileText, 
-  Search, 
-  User, 
-  Settings, 
+import React, {
+  useState,
+  ReactNode,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
+import {
+  Menu,
+  X,
+  Home,
+  FileText,
+  Search,
+  User,
+  Settings,
   LogOut,
-  Bell
-} from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { logger } from '../../utils/browser-logger';
-import { MobileTouchHandler, MobileTouchUtils } from '../../utils/mobile-touch-handler';
-import { Button } from '../ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
-import { Badge } from '../ui/badge';
-import { Separator } from '../ui/separator';
-import { useQuery } from '@tanstack/react-query';
-import { Link, useLocation } from 'react-router-dom';
-import NotificationCenter from '../notifications/notification-center';
-import NavigationPreferencesDialog from '../navigation/navigation-preferences-dialog';
-import QuickAccessNav from '../navigation/quick-access-nav';
-import { useNavigationPreferences } from '../../hooks/use-navigation-preferences';
-import { 
-  ResponsiveLayoutProvider, 
-  useResponsiveLayoutContext, 
-  TouchButton, 
-  SafeAreaWrapper 
-} from '../mobile/responsive-layout-manager';
-import { 
-  MobileTabBar, 
-  SwipeableHeader 
-} from '../mobile/mobile-navigation-enhancements';
-import { 
+  Bell,
+} from "lucide-react";
+import { cn } from "../../lib/utils";
+import { logger } from "../../utils/browser-logger";
+import {
+  MobileTouchHandler,
+  MobileTouchUtils,
+} from "../../utils/mobile-touch-handler";
+import { Button } from "../ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
+import { Badge } from "../ui/badge";
+import { Separator } from "../ui/separator";
+import { useQuery } from "@tanstack/react-query";
+import { Link, useLocation } from "react-router-dom";
+import NotificationCenter from "../notifications/notification-center";
+import NavigationPreferencesDialog from "../navigation/navigation-preferences-dialog";
+import QuickAccessNav from "../navigation/quick-access-nav";
+import { useNavigationPreferences } from "../../hooks/use-navigation-preferences";
+import {
+  ResponsiveLayoutProvider,
+  useResponsiveLayoutContext,
+  TouchButton,
+  SafeAreaWrapper,
+} from "../mobile/responsive-layout-manager";
+import {
+  MobileTabBar,
+  SwipeableHeader,
+} from "../mobile/mobile-navigation-enhancements";
+import {
   MobileNavigationProps,
   NavigationItem as LayoutNavigationItem,
   User as LayoutUser,
   LayoutError,
   LayoutRenderError,
   LayoutNavigationError,
-  safeValidateNavigationItem
-} from './index';
+  safeValidateNavigationItem,
+} from "./index";
 
 // Type definitions for better TypeScript safety
 interface User {
   id: string;
   name: string;
   email: string;
-  role: 'public' | 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate';
+  role: "public" | "citizen" | "expert" | "admin" | "journalist" | "advocate";
 }
 
 interface NavigationItem {
@@ -64,48 +74,44 @@ interface AuthResponse {
 
 interface MobileNavigationContentProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   navigationItems: NavigationItem[];
-  user: User | null;
+  user?: User | null | undefined;
   onLogout: () => void;
   className?: string;
   enableSwipeGestures: boolean;
   enableTouchOptimization: boolean;
 }
 
-
-
 // Constants moved outside component to prevent recreation on every render
 const NAVIGATION_ITEMS: LayoutNavigationItem[] = [
   {
-    id: 'home',
-    label: 'Home',
-    href: '/',
-    icon: <Home className="h-5 w-5" />
+    id: "home",
+    label: "Home",
+    href: "/",
+    icon: <Home className="h-5 w-5" />,
   },
   {
-    id: 'bills',
-    label: 'Bills',
-    href: '/bills',
-    icon: <FileText className="h-5 w-5" />
+    id: "bills",
+    label: "Bills",
+    href: "/bills",
+    icon: <FileText className="h-5 w-5" />,
   },
   {
-    id: 'search',
-    label: 'Search',
-    href: '/search',
-    icon: <Search className="h-5 w-5" />
+    id: "search",
+    label: "Search",
+    href: "/search",
+    icon: <Search className="h-5 w-5" />,
   },
   {
-    id: 'dashboard',
-    label: 'Dashboard',
-    href: '/dashboard',
-    icon: <User className="h-5 w-5" />
-  }
+    id: "dashboard",
+    label: "Dashboard",
+    href: "/dashboard",
+    icon: <User className="h-5 w-5" />,
+  },
 ];
 
-
-
-const MobileNavigation: React.FC<MobileNavigationProps> = ({ 
+const MobileNavigation: React.FC<MobileNavigationProps> = ({
   isOpen: controlledIsOpen,
   onClose,
   navigationItems = NAVIGATION_ITEMS,
@@ -113,18 +119,24 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   onLogout,
   className,
   enableSwipeGestures = true,
-  enableTouchOptimization = true
+  enableTouchOptimization = true,
 }) => {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   const [touchOptimized, setTouchOptimized] = useState(false);
-  const [navigationError, setNavigationError] = useState<LayoutError | null>(null);
+  const [navigationError, setNavigationError] = useState<LayoutError | null>(
+    null
+  );
   const location = useLocation();
 
   // Use controlled or internal state
-  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
-  const setIsOpen = controlledIsOpen !== undefined ? (open: boolean) => {
-    if (!open) onClose?.();
-  } : setInternalIsOpen;
+  const isOpen =
+    controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+  const setIsOpen =
+    controlledIsOpen !== undefined
+      ? (open: boolean) => {
+          if (!open) onClose?.();
+        }
+      : setInternalIsOpen;
 
   const headerRef = useRef<HTMLDivElement>(null);
   const bottomNavRef = useRef<HTMLDivElement>(null);
@@ -155,26 +167,26 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   // Memoized API functions to prevent recreation on every render
   const fetchUser = useCallback(async (): Promise<User | null> => {
     if (user) return user; // Use provided user if available
-    
-    const token = localStorage.getItem('token');
+
+    const token = localStorage.getItem("token");
     if (!token) return null;
-    
+
     try {
-      const response = await fetch('/api/auth/verify', {
+      const response = await fetch("/api/auth/verify", {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       if (!response.ok) return null;
-      
+
       const data: AuthResponse = await response.json();
       return data.user;
     } catch (error) {
       const navError = new LayoutNavigationError(
-        'Failed to fetch user data',
-        'user-fetch',
-        '/api/auth/verify',
+        "Failed to fetch user data",
+        "user-fetch",
+        "/api/auth/verify",
         { error: (error as Error).message }
       );
       setNavigationError(navError);
@@ -184,7 +196,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
 
   // Optimized queries with proper error handling (only if user not provided)
   const { data: fetchedUser } = useQuery({
-    queryKey: ['auth', 'user'],
+    queryKey: ["auth", "user"],
     queryFn: fetchUser,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
@@ -197,42 +209,49 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   const handleLogout = useCallback(() => {
     try {
       onLogout?.();
-      localStorage.removeItem('token');
-      window.location.href = '/auth';
+      localStorage.removeItem("token");
+      window.location.href = "/auth";
     } catch (error) {
       const navError = new LayoutNavigationError(
-        'Logout failed',
-        'logout',
-        '/auth',
+        "Logout failed",
+        "logout",
+        "/auth",
         { error: (error as Error).message }
       );
       setNavigationError(navError);
     }
   }, [onLogout]);
 
-  // Memoized path checker to prevent recreation
-  const isActivePath = useCallback((path: string): boolean => {
-    if (path === '/') {
-      return location.pathname === '/';
-    }
-    return location.pathname.startsWith(path);
-  }, [location.pathname]);
-
   // Memoized close handler for sheet
   const handleSheetClose = useCallback(() => {
-    setIsOpen(false);
-  }, []);
+    if (onClose) {
+      onClose();
+    } else {
+      setIsOpen(false);
+    }
+  }, [onClose, setIsOpen]);
+
+  // Memoized path checker to prevent recreation
+  const isActivePath = useCallback(
+    (path: string): boolean => {
+      if (path === "/") {
+        return location.pathname === "/";
+      }
+      return location.pathname.startsWith(path);
+    },
+    [location.pathname]
+  );
 
   // Touch optimization effect with cleanup
   useEffect(() => {
     if (!MobileTouchUtils.isTouchDevice()) return;
-    
+
     setTouchOptimized(true);
-    
+
     // Optimize touch targets for both refs
     const elements = [headerRef.current, bottomNavRef.current].filter(Boolean);
-    
-    elements.forEach(element => {
+
+    elements.forEach((element) => {
       if (element) {
         MobileTouchUtils.preventZoomOnDoubleTap(element);
       }
@@ -249,9 +268,9 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
     });
 
     touchHandler.onSwipe = (swipe) => {
-      if (swipe.direction === 'right' && !isOpen) {
+      if (swipe.direction === "right" && !isOpen) {
         setIsOpen(true);
-      } else if (swipe.direction === 'left' && isOpen) {
+      } else if (swipe.direction === "left" && isOpen) {
         setIsOpen(false);
       }
     };
@@ -264,20 +283,24 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
 
   // Memoized touch-optimized class name
   const touchOptimizedClass = useMemo(
-    () => touchOptimized ? 'min-w-[44px] min-h-[44px]' : '',
+    () => (touchOptimized ? "min-w-[44px] min-h-[44px]" : ""),
     [touchOptimized]
   );
 
   // Memoized header class names
   const headerClassName = useMemo(
-    () => `lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between ${
-      touchOptimized ? 'min-h-[56px]' : ''
-    }`,
+    () =>
+      `lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between ${
+        touchOptimized ? "min-h-[56px]" : ""
+      }`,
     [touchOptimized]
   );
 
   // Memoized navigation items for bottom nav
-  const bottomNavItems = useMemo(() => navigationItems.slice(0, 4), [navigationItems]);
+  const bottomNavItems = useMemo(
+    () => navigationItems.slice(0, 4),
+    [navigationItems]
+  );
 
   // Error boundary rendering
   if (navigationError) {
@@ -285,8 +308,12 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
       <div className={cn("bg-red-50 border-b border-red-200 p-4", className)}>
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-red-600 text-sm font-medium">Navigation Error</div>
-            <div className="text-red-500 text-xs">{navigationError.message}</div>
+            <div className="text-red-600 text-sm font-medium">
+              Navigation Error
+            </div>
+            <div className="text-red-500 text-xs">
+              {navigationError.message}
+            </div>
           </div>
           <button
             onClick={recoverFromError}
@@ -303,7 +330,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   try {
     return (
       <ResponsiveLayoutProvider>
-        <MobileNavigationContent 
+        <MobileNavigationContent
           isOpen={isOpen}
           onClose={onClose}
           navigationItems={navigationItems}
@@ -318,7 +345,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   } catch (error) {
     const renderError = new LayoutRenderError(
       `Mobile navigation render failed: ${(error as Error).message}`,
-      'MobileNavigation'
+      "MobileNavigation"
     );
     setNavigationError(renderError);
     return null;
@@ -333,7 +360,7 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
   onLogout,
   className,
   enableSwipeGestures,
-  enableTouchOptimization
+  enableTouchOptimization,
 }) => {
   const location = useLocation();
   const { touchOptimized, isMobile } = useResponsiveLayoutContext();
@@ -341,22 +368,43 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
   const headerRef = useRef<HTMLDivElement>(null);
   const bottomNavRef = useRef<HTMLDivElement>(null);
 
-  // Memoized path checker to prevent recreation
-  const isActivePath = useCallback((path: string): boolean => {
-    if (path === '/') {
-      return location.pathname === '/';
+  // Memoized close handler for sheet
+  const handleSheetClose = useCallback(() => {
+    if (onClose) {
+      onClose();
     }
-    return location.pathname.startsWith(path);
-  }, [location.pathname]);
+  }, [onClose]);
+
+  // Memoized logout handler
+  const handleLogout = useCallback(() => {
+    try {
+      onLogout?.();
+      localStorage.removeItem("token");
+      window.location.href = "/auth";
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  }, [onLogout]);
+
+  // Memoized path checker to prevent recreation
+  const isActivePath = useCallback(
+    (path: string): boolean => {
+      if (path === "/") {
+        return location.pathname === "/";
+      }
+      return location.pathname.startsWith(path);
+    },
+    [location.pathname]
+  );
 
   // Touch optimization effect with cleanup
   useEffect(() => {
     if (!MobileTouchUtils.isTouchDevice()) return;
-    
+
     // Optimize touch targets for both refs
     const elements = [headerRef.current, bottomNavRef.current].filter(Boolean);
-    
-    elements.forEach(element => {
+
+    elements.forEach((element) => {
       if (element) {
         MobileTouchUtils.preventZoomOnDoubleTap(element);
       }
@@ -373,10 +421,10 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
     });
 
     touchHandler.onSwipe = (swipe) => {
-      if (swipe.direction === 'right' && !isOpen) {
+      if (swipe.direction === "right" && !isOpen) {
         // Can't open from this component, it's controlled by parent
-      } else if (swipe.direction === 'left' && isOpen) {
-        onClose();
+      } else if (swipe.direction === "left" && isOpen) {
+        handleSheetClose();
       }
     };
 
@@ -384,35 +432,38 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
     return () => {
       touchHandler.destroy();
     };
-  }, [isOpen, touchOptimized, onClose]);
+  }, [isOpen, touchOptimized, handleSheetClose]);
 
   // Bottom navigation items for tab bar
-  const bottomNavigationItems = useMemo(() => [
-    {
-      id: 'home',
-      label: 'Home',
-      href: '/',
-      icon: <Home className="h-5 w-5" />
-    },
-    {
-      id: 'bills',
-      label: 'Bills',
-      href: '/bills',
-      icon: <FileText className="h-5 w-5" />
-    },
-    {
-      id: 'search',
-      label: 'Search',
-      href: '/search',
-      icon: <Search className="h-5 w-5" />
-    },
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      href: '/dashboard',
-      icon: <User className="h-5 w-5" />
-    }
-  ], []);
+  const bottomNavigationItems = useMemo(
+    () => [
+      {
+        id: "home",
+        label: "Home",
+        href: "/",
+        icon: <Home className="h-5 w-5" />,
+      },
+      {
+        id: "bills",
+        label: "Bills",
+        href: "/bills",
+        icon: <FileText className="h-5 w-5" />,
+      },
+      {
+        id: "search",
+        label: "Search",
+        href: "/search",
+        icon: <Search className="h-5 w-5" />,
+      },
+      {
+        id: "dashboard",
+        label: "Dashboard",
+        href: "/dashboard",
+        icon: <User className="h-5 w-5" />,
+      },
+    ],
+    []
+  );
 
   // Bottom navigation items with badge support
   const bottomNavItems = useMemo(() => NAVIGATION_ITEMS.slice(0, 4), []);
@@ -424,26 +475,40 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
         title="Navigation"
         leftAction={{
           icon: <Menu className="h-6 w-6" />,
-          onClick: () => {/* Navigation controlled by parent */},
-          label: "Open navigation menu"
+          onClick: () => {
+            /* Navigation controlled by parent */
+          },
+          label: "Open navigation menu",
         }}
         rightActions={[
-          ...(user ? [{
-            icon: <Bell className="h-5 w-5" />,
-            onClick: () => {/* Handle notifications */},
-            label: "Notifications"
-          }] : []),
-          ...(!user ? [{
-            icon: <User className="h-5 w-5" />,
-            onClick: () => window.location.href = '/auth',
-            label: "Sign In"
-          }] : [])
+          ...(user
+            ? [
+                {
+                  icon: <Bell className="h-5 w-5" />,
+                  onClick: () => {
+                    /* Handle notifications */
+                  },
+                  label: "Notifications",
+                },
+              ]
+            : []),
+          ...(!user
+            ? [
+                {
+                  icon: <User className="h-5 w-5" />,
+                  onClick: () => (window.location.href = "/auth"),
+                  label: "Sign In",
+                },
+              ]
+            : []),
         ]}
-        onSwipeRight={() => {/* Navigation controlled by parent */}}
+        onSwipeRight={() => {
+          /* Navigation controlled by parent */
+        }}
       />
 
       {/* Navigation Drawer */}
-      <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <Sheet open={isOpen} onOpenChange={(open) => !open && onClose?.()}>
         <SheetContent side="left" className="w-80">
           <div className="flex flex-col h-full">
             {/* Header */}
@@ -454,9 +519,9 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
                 </div>
                 <span className="font-semibold text-lg">Chanuka</span>
               </div>
-              <TouchButton 
-                variant="ghost" 
-                size="md" 
+              <TouchButton
+                variant="ghost"
+                size="md"
                 onClick={handleSheetClose}
                 aria-label="Close navigation menu"
               >
@@ -475,7 +540,9 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-sm truncate">{user.name}</p>
-                    <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    <p className="text-xs text-gray-500 truncate">
+                      {user.email}
+                    </p>
                     <Badge variant="outline" className="text-xs mt-1">
                       {user.role}
                     </Badge>
@@ -496,11 +563,11 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
               {NAVIGATION_ITEMS.map((item) => {
                 const isActive = isActivePath(item.href);
                 const linkClassName = `flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                  touchOptimized ? 'min-h-[44px]' : ''
+                  touchOptimized ? "min-h-[44px]" : ""
                 } ${
                   isActive
-                    ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                    : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100'
+                    ? "bg-blue-50 text-blue-700 border border-blue-200"
+                    : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
                 }`;
 
                 return (
@@ -515,23 +582,23 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
                     <span className="font-medium">{item.label}</span>
                     {item.badge && item.badge > 0 && (
                       <Badge variant="destructive" className="ml-auto">
-                        {item.badge > 99 ? '99+' : item.badge}
+                        {item.badge > 99 ? "99+" : item.badge}
                       </Badge>
                     )}
                   </Link>
                 );
               })}
 
-              {user?.role === 'admin' && (
+              {user?.role === "admin" && (
                 <>
                   <Separator className="my-4" />
                   <Link
                     to="/admin"
                     onClick={handleSheetClose}
                     className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                      isActivePath('/admin')
-                        ? 'bg-red-50 text-red-700 border border-red-200'
-                        : 'text-gray-700 hover:bg-gray-50'
+                      isActivePath("/admin")
+                        ? "bg-red-50 text-red-700 border border-red-200"
+                        : "text-gray-700 hover:bg-gray-50"
                     }`}
                     aria-label="Navigate to Admin"
                   >
@@ -555,7 +622,7 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
                   <span className="font-medium">Profile</span>
                 </Link>
               )}
-              
+
               <NavigationPreferencesDialog
                 trigger={
                   <TouchButton
@@ -567,7 +634,7 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
                   </TouchButton>
                 }
               />
-              
+
               {user && (
                 <TouchButton
                   variant="ghost"
@@ -594,7 +661,7 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
       />
 
       {/* Bottom Navigation for Mobile */}
-      <div 
+      <div
         ref={bottomNavRef}
         className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 z-50 pb-[max(8px,env(safe-area-inset-bottom))] pl-[max(16px,env(safe-area-inset-left))] pr-[max(16px,env(safe-area-inset-right))]"
       >
@@ -602,11 +669,11 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
           {bottomNavItems.map((item) => {
             const isActive = isActivePath(item.href);
             const linkClassName = `flex flex-col items-center space-y-1 p-2 rounded-lg transition-colors ${
-              touchOptimized ? 'min-w-[44px] min-h-[44px]' : ''
+              touchOptimized ? "min-w-[44px] min-h-[44px]" : ""
             } ${
               isActive
-                ? 'text-blue-600'
-                : 'text-gray-500 hover:text-gray-700 active:text-gray-800'
+                ? "text-blue-600"
+                : "text-gray-500 hover:text-gray-700 active:text-gray-800"
             }`;
 
             return (
@@ -623,7 +690,7 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
                       variant="destructive"
                       className="absolute -top-2 -right-2 h-4 w-4 rounded-full p-0 flex items-center justify-center text-xs"
                     >
-                      {item.badge > 9 ? '9+' : item.badge}
+                      {item.badge > 9 ? "9+" : item.badge}
                     </Badge>
                   )}
                 </div>
@@ -638,4 +705,3 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
 };
 
 export default MobileNavigation;
-

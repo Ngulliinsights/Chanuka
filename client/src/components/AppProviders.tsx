@@ -1,21 +1,41 @@
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { PageErrorBoundary } from './error-handling';
-import { NavigationProvider } from '../contexts/NavigationContext';
-import { ResponsiveNavigationProvider } from '../contexts/ResponsiveNavigationContext';
-import { LoadingProvider } from '../contexts/LoadingContext';
-import { AuthProvider } from '../hooks/use-auth';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { EnhancedErrorBoundary } from './error-handling';
+import { createNavigationProvider } from '../core/navigation/context';
+import { LoadingProvider } from '../core/loading';
+import { AuthProvider, useAuth } from '../hooks/use-auth';
+import { useConnectionAware } from '../hooks/useConnectionAware';
+import { useOnlineStatus } from '../hooks/use-online-status';
+import { assetLoadingManager } from '../utils/asset-loading';
+import { useMediaQuery } from '../hooks/use-mobile';
 import { AccessibilityProvider } from './accessibility/accessibility-manager';
 import { OfflineProvider } from './offline/offline-manager';
 import { ThemeProvider } from '../contexts/ThemeContext';
+import { SimpleErrorBoundary } from './error-handling/SimpleErrorBoundary';
 
 // =============================================================================
 // PROVIDER CONFIGURATION
 // =============================================================================
 
+// Create the React-specific NavigationProvider
+const NavigationProvider = createNavigationProvider(
+  useLocation,
+  useNavigate,
+  useAuth,
+  useMediaQuery
+);
+
+// Create the React-specific LoadingProvider
+const LoadingProviderWithDeps = LoadingProvider(
+  useConnectionAware,
+  useOnlineStatus,
+  assetLoadingManager
+);
+
 interface ProviderConfig {
   name: string;
-  component: React.ComponentType<any>;
+  component: React.ComponentType<any> | React.ReactElement;
   props?: Record<string, any>;
 }
 
@@ -26,20 +46,16 @@ const PROVIDERS: ProviderConfig[] = [
     component: ThemeProvider,
   },
   {
-    name: 'ResponsiveNavigationProvider',
-    component: ResponsiveNavigationProvider,
+    name: 'AuthProvider',
+    component: AuthProvider,
   },
   {
     name: 'NavigationProvider',
     component: NavigationProvider,
   },
   {
-    name: 'AuthProvider',
-    component: AuthProvider,
-  },
-  {
     name: 'LoadingProvider',
-    component: LoadingProvider,
+    component: LoadingProviderWithDeps,
   },
   {
     name: 'AccessibilityProvider',
@@ -50,9 +66,8 @@ const PROVIDERS: ProviderConfig[] = [
     component: OfflineProvider,
   },
   {
-    name: 'PageErrorBoundary',
-    component: PageErrorBoundary,
-    props: { context: 'page' },
+    name: 'SimpleErrorBoundary',
+    component: SimpleErrorBoundary,
   },
   {
     name: 'QueryClientProvider',
@@ -66,9 +81,8 @@ const PROVIDERS: ProviderConfig[] = [
 
 interface ProviderOverrides {
   QueryClientProvider?: React.ComponentType<{ client: QueryClient; children: React.ReactNode }>;
-  PageErrorBoundary?: React.ComponentType<{ context: string; children: React.ReactNode }>;
+  EnhancedErrorBoundary?: React.ComponentType<{ children: React.ReactNode }>;
   NavigationProvider?: React.ComponentType<{ children: React.ReactNode }>;
-  ResponsiveNavigationProvider?: React.ComponentType<{ children: React.ReactNode }>;
   LoadingProvider?: React.ComponentType<{ children: React.ReactNode }>;
   AuthProvider?: React.ComponentType<{ children: React.ReactNode }>;
   AccessibilityProvider?: React.ComponentType<{ children: React.ReactNode }>;
@@ -100,9 +114,9 @@ export function AppProviders({
       );
     }
 
-    if (provider.name === 'PageErrorBoundary') {
+    if (provider.name === 'EnhancedErrorBoundary') {
       return (
-        <Component {...(provider.props || {})}>
+        <Component>
           {acc}
         </Component>
       );

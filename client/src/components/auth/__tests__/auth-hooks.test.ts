@@ -15,7 +15,7 @@ import {
 import { useAuthForm } from '@/hooks/useAuthForm';
 import { usePasswordStrength, usePasswordVisibility, usePasswordValidation } from '@/hooks/usePasswordUtils';
 import { AuthError, AuthValidationError } from '../errors';
-import { AuthMode } from '@shared/types';
+// AuthMode should be defined locally in auth components
 
 // Mock the auth hook
 const mockLogin = vi.fn();

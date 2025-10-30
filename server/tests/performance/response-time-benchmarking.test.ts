@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -19,7 +19,7 @@ import express from 'express';
 import { router as billsRouter } from '../../features/bills/bills-router.ts';
 import { router as sponsorsRouter } from '../../features/bills/sponsors.ts';
 import { router as financialDisclosureRouter } from '../../features/analytics/financial-disclosure/index.js';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 describe('Response Time Benchmarking Tests', () => {
   let app: express.Application;

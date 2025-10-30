@@ -1,8 +1,7 @@
 import { Redis } from 'ioredis';
 import { Pool } from 'pg';
-import { UserProfile } from '../../../shared/types/auth.js';
+import { UserProfile, OAuthProvider, SocialProfile } from '@shared/core/src/types/auth.types.js';
 import { BaseStorage } from './base/BaseStorage.js';
-import { type OAuthProvider, type SocialProfile } from '../../../shared/types/auth.js';
 import type { StorageOptions } from './StorageTypes.js';
 import { logger } from '@shared/core';
 export interface CreateUserData {

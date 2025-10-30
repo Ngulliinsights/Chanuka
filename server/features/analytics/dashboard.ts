@@ -2,8 +2,12 @@ import { database as db } from '@shared/database/connection';
 import { eq, sql, and, desc, count, ilike } from 'drizzle-orm';
 import { bills, analysis, evaluations, departments } from '../../../shared/schema';
 import type { DepartmentStat, RadarDatum } from '../../../shared/schema';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 import { errorTracker } from '../../core/errors/error-tracker.js';
+
+// Security Services
+import { dataPrivacyService } from '../../infrastructure/security/data-privacy-service.js';
+import { inputValidationService } from '../../infrastructure/security/input-validation-service.js';
 
 /**
  * Type definitions for domain entities.
@@ -177,6 +181,8 @@ class DashboardStorageService {
       searchTerm?: string;
       sortBy?: 'createdAt' | 'updatedAt' | 'candidateName';
       sortOrder?: 'asc' | 'desc';
+      requestingUserId?: string;
+      userRole?: string;
     } = {},
   ): Promise<{ candidates: Candidate[]; total: number; hasMore: boolean }> {
     try {
@@ -188,7 +194,22 @@ class DashboardStorageService {
         searchTerm,
         sortBy = 'createdAt',
         sortOrder = 'desc',
+        requestingUserId,
+        userRole = 'citizen',
       } = options;
+
+      // Check data access permissions
+      if (requestingUserId) {
+        const accessCheck = dataPrivacyService.checkDataAccess(
+          requestingUserId,
+          'admin_analytics',
+          { user: { role: userRole } }
+        );
+
+        if (!accessCheck.allowed) {
+          throw new Error(`Access denied: ${accessCheck.reason}`);
+        }
+      }
 
       // Validate input bounds to prevent abuse
       if (limit > 1000) {
@@ -211,9 +232,14 @@ class DashboardStorageService {
       }
       
       if (searchTerm) {
+        // Validate and sanitize search term
+        const searchValidation = inputValidationService.validateSearchQuery(searchTerm);
+        if (!searchValidation.isValid) {
+          throw new Error(`Invalid search term: ${searchValidation.errors[0]?.message}`);
+        }
+        
         // Using ilike for case-insensitive search (PostgreSQL)
-        // If you're using a different database, you might need to adjust this
-        whereConditions.push(ilike(evaluations.candidateName, `%${searchTerm}%`));
+        whereConditions.push(ilike(evaluations.candidateName, `%${searchValidation.data}%`));
       }
 
       // Combine all conditions with AND, or use undefined if no conditions
@@ -257,8 +283,34 @@ class DashboardStorageService {
       const hasMore = results.length > limit;
       const candidates = hasMore ? results.slice(0, limit) : results;
 
+      // Sanitize candidate data for privacy
+      const sanitizedCandidates = candidates.map(candidate => {
+        // Remove or anonymize sensitive information
+        const sanitized = { ...candidate };
+        
+        // If not admin, anonymize candidate names
+        if (userRole !== 'admin') {
+          sanitized.candidateName = `Candidate ${candidate.id}`;
+        }
+        
+        return sanitized;
+      });
+
+      // Audit data access
+      if (requestingUserId) {
+        await dataPrivacyService.auditDataAccess(
+          requestingUserId,
+          'view_candidate_evaluations',
+          'admin_analytics',
+          { 
+            filters: { status, departmentId, searchTerm },
+            resultCount: candidates.length 
+          }
+        );
+      }
+
       return {
-        candidates: candidates as Candidate[],
+        candidates: sanitizedCandidates as Candidate[],
         total: countResult[0]?.count || 0,
         hasMore,
       };

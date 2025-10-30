@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -27,7 +27,7 @@ import realTimeTrackingRouter from '../../features/bills/real-time-tracking.js';
 import engagementAnalyticsRouter from '../../features/analytics/engagement-analytics.js';
 import { router as healthRouter } from '../../infrastructure/monitoring/health.js';
 import { database as db, withTransaction } from '@shared/database/connection.js';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 describe('Comprehensive API Integration Tests', () => {
   let app: express.Application;

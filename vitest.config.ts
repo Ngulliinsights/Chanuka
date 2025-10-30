@@ -64,7 +64,7 @@ export default defineConfig({
       '@server': path.resolve(__dirname, './server'),
       '@shared': path.resolve(__dirname, './shared'),
       '@shared/core': path.resolve(__dirname, './shared/core/src'),
-      '@shared/types': path.resolve(__dirname, './shared/types'),
+
       '@shared/schema': path.resolve(__dirname, './shared/schema'),
     },
   },

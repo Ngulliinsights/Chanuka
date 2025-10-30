@@ -2,37 +2,12 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { Loader2, Wifi, WifiOff, AlertCircle, Clock, X, RefreshCw } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import { useUnifiedLoading } from '../../contexts/UnifiedLoadingContext';
+import { useLoading } from '../../core/loading';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
 import { Card, CardContent } from '../ui/card';
 import { logger } from '../../utils/browser-logger';
 import { GlobalLoadingIndicatorProps } from './types';
-import { 
-  validateLoadingOperation, 
-  safeValidateLoadingOperation,
-  validateLoadingConfig 
-} from './validation';
-import { 
-  LoadingError, 
-  LoadingConfigurationError,
-  LoadingOperationFailedError,
-  getErrorDisplayMessage,
-  getErrorRecoveryStrategy,
-  isRetryableError 
-} from './errors';
-import { useLoadingRecovery } from './hooks/useLoadingRecovery';
-
-export interface GlobalLoadingIndicatorProps {
-  position?: 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'center';
-  showDetails?: boolean;
-  showProgress?: boolean;
-  showConnectionStatus?: boolean;
-  maxVisible?: number;
-  autoHide?: boolean;
-  autoHideDelay?: number;
-  className?: string;
-}
 
 export const GlobalLoadingIndicator: React.FC<GlobalLoadingIndicatorProps> = ({
   position = 'top-right',
@@ -50,7 +25,7 @@ export const GlobalLoadingIndicator: React.FC<GlobalLoadingIndicatorProps> = ({
     retryOperation,
     getOperationsByPriority,
     shouldShowGlobalLoader,
-  } = useUnifiedLoading();
+  } = useLoading();
 
   const [isVisible, setIsVisible] = React.useState(false);
   const [expandedOperations, setExpandedOperations] = React.useState<Set<string>>(new Set());
@@ -326,7 +301,7 @@ export const GlobalLoadingIndicator: React.FC<GlobalLoadingIndicatorProps> = ({
 export const MinimalGlobalLoadingIndicator: React.FC<{
   className?: string;
 }> = ({ className }) => {
-  const { state, shouldShowGlobalLoader } = useUnifiedLoading();
+  const { state, shouldShowGlobalLoader } = useLoading();
   const [isVisible, setIsVisible] = React.useState(false);
 
   React.useEffect(() => {

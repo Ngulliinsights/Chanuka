@@ -17,7 +17,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -30,7 +30,7 @@ import { billStatusMonitorService } from '../features/bills/bill-status-monitor.
 import { userPreferencesService } from '../features/users/domain/user-preferences.js';
 import { database as db, user as users, bill as bills, billEngagement } from '@shared/database/connection.js';
 import { eq } from 'drizzle-orm';
-import { logger } from '@shared/core';
+import { logger  } from '../../shared/core/src/index.js';
 
 // Mock billStatusMonitor
 const billStatusMonitor = {

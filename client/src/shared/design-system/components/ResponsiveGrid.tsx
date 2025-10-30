@@ -8,10 +8,10 @@
  */
 
 import React from 'react';
-import { cn } from '../../lib/utils';
+import { cn } from '../lib/utils';
 import { useResponsive, type ResponsiveValue } from '../responsive';
 
-interface ResponsiveGridProps {
+export interface ResponsiveGridProps {
   children: React.ReactNode;
   className?: string;
   columns?: ResponsiveValue<number> | 'auto';

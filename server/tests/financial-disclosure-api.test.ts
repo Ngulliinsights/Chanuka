@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -18,7 +18,7 @@ import express from 'express';
 import { createFinancialDisclosureRouter } from '../features/analytics/financial-disclosure/index.ts';
 import { FinancialDisclosureMonitoringService } from '../features/analytics/financial-disclosure/monitoring.ts';
 import { financialDisclosureAnalyticsService } from '../features/analytics/services/financial-disclosure.service.js';
-import { logger } from '@shared/core';
+import { logger  } from '../../shared/core/src/index.js';
 
 // Create mock monitoring service for tests
 const mockDependencies = {

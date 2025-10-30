@@ -210,7 +210,7 @@ export const bundleOptimization = {
   ): Promise<T> => {
     try {
       const module = await importFn();
-      return 'default' in module ? module.default : module;
+      return 'default' in (module as any) ? (module as any).default : module as T;
     } catch (error) {
       console.error('Failed to lazy load module:', error);
       throw error;
@@ -238,9 +238,9 @@ export const performanceMonitoring = {
   /**
    * Monitor layout shifts
    */
-  monitorLayoutShifts: (callback: (entries: LayoutShiftEntry[]) => void): PerformanceObserver => {
+  monitorLayoutShifts: (callback: (entries: any[]) => void): PerformanceObserver => {
     const observer = new PerformanceObserver((list) => {
-      const entries = list.getEntries() as LayoutShiftEntry[];
+      const entries = list.getEntries() as any[];
       callback(entries);
     });
     
@@ -262,7 +262,7 @@ export const performanceMonitoring = {
 
     // Track Cumulative Layout Shift
     new PerformanceObserver((list) => {
-      for (const entry of list.getEntries() as LayoutShiftEntry[]) {
+      for (const entry of list.getEntries() as any[]) {
         if (!entry.hadRecentInput) {
           cls += entry.value;
         }

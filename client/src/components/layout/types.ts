@@ -1,4 +1,4 @@
-/**
+ /**
  * Layout component type definitions
  * Following navigation component patterns for consistency
  */
@@ -55,8 +55,8 @@ export interface HeaderAction {
 }
 
 export interface MobileNavigationProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen?: boolean;
+  onClose?: () => void;
   navigationItems?: NavigationItem[];
   user?: User | null;
   onLogout?: () => void;

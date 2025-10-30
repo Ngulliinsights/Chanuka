@@ -4,7 +4,7 @@ import { database as db } from '../../../shared/database/connection';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { performance } from 'perf_hooks';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 export interface TestUser {
   id: string;

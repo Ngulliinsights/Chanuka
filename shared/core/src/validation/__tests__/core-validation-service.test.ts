@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
  */
 
 import { ZodSchema, z } from 'zod';
-import { ValidationError } from '@shared/types';
+import { ValidationError } from '@shared/core/src/observability/error-management/errors/specialized-errors';
 import { ZodValidationService, zodValidationService } from '../adapters/zod-adapter';
 import { CustomValidationService, createCustomSchema } from '../adapters/custom-adapter';
 

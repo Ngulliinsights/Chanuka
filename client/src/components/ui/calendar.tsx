@@ -1,6 +1,6 @@
 import * as React from "react"
 import { ChevronLeft, ChevronRight, AlertCircle } from "lucide-react"
-import { DayPicker } from "react-day-picker"
+import { DayPicker, DateRange } from "react-day-picker"
 import { cn } from '../../lib/utils'
 import { buttonVariants } from './button'
 import { logger } from '../../utils/browser-logger';
@@ -56,8 +56,10 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        Chevron: ({ orientation, ...props }) => {
+          const Icon = orientation === 'left' ? ChevronLeft : ChevronRight;
+          return <Icon className="h-4 w-4" {...props} />;
+        },
       }}
       {...props}
     />
@@ -66,16 +68,20 @@ function Calendar({
 Calendar.displayName = "Calendar"
 
 // Enhanced calendar with date validation
-interface EnhancedCalendarProps extends CalendarProps, DateValidationProps {
+interface EnhancedCalendarProps extends Omit<CalendarProps, 'className' | 'selected' | 'onSelect' | 'disabled'>, DateValidationProps {
   onValidationChange?: (state: ValidationState) => void;
   showValidation?: boolean;
   errorMessage?: string;
+  className?: string;
+  selected?: Date | DateRange;
+  onSelect?: (date: Date | DateRange | undefined) => void;
+  disabled?: boolean | ((date: Date) => boolean) | Date[];
 }
 
 const EnhancedCalendar = React.forwardRef<
-  React.ElementRef<typeof DayPicker>,
+  HTMLDivElement,
   EnhancedCalendarProps
->(({ 
+>(({
   className,
   minDate,
   maxDate,
@@ -88,7 +94,7 @@ const EnhancedCalendar = React.forwardRef<
   selected,
   onSelect,
   disabled,
-  ...props 
+  ...props
 }, ref) => {
   const [validationState, setValidationState] = React.useState<ValidationState>({
     isValid: true,
@@ -96,7 +102,7 @@ const EnhancedCalendar = React.forwardRef<
   });
   const [retryCount, setRetryCount] = React.useState(0);
 
-  const validateSelectedDate = React.useCallback((date: Date | undefined): ValidationState => {
+  const validateSelectedDate = React.useCallback((date: Date | DateRange | undefined): ValidationState => {
     if (!showValidation) {
       return { isValid: true, touched: validationState.touched };
     }
@@ -111,24 +117,73 @@ const EnhancedCalendar = React.forwardRef<
       }
 
       if (date) {
-        // Check if date is in disabled dates
-        if (disabledDates.some(disabledDate => 
-          disabledDate.toDateString() === date.toDateString()
-        )) {
-          return {
-            isValid: false,
-            error: 'This date is not available',
-            touched: validationState.touched
-          };
-        }
+        // Handle DateRange
+        if ('from' in date) {
+          const range = date as DateRange;
+          if (range.from) {
+            // Check if from date is in disabled dates
+            if (disabledDates.some(disabledDate =>
+              disabledDate.toDateString() === range.from!.toDateString()
+            )) {
+              return {
+                isValid: false,
+                error: 'Start date is not available',
+                touched: validationState.touched
+              };
+            }
 
-        const result = safeValidateDate(date, minDate, maxDate);
-        if (!result.success) {
-          return {
-            isValid: false,
-            error: result.error?.message || 'Invalid date selection',
-            touched: validationState.touched
-          };
+            const result = safeValidateDate(range.from, minDate, maxDate);
+            if (!result.success) {
+              return {
+                isValid: false,
+                error: result.error?.message || 'Invalid start date selection',
+                touched: validationState.touched
+              };
+            }
+          }
+          if (range.to) {
+            // Check if to date is in disabled dates
+            if (disabledDates.some(disabledDate =>
+              disabledDate.toDateString() === range.to!.toDateString()
+            )) {
+              return {
+                isValid: false,
+                error: 'End date is not available',
+                touched: validationState.touched
+              };
+            }
+
+            const result = safeValidateDate(range.to, minDate, maxDate);
+            if (!result.success) {
+              return {
+                isValid: false,
+                error: result.error?.message || 'Invalid end date selection',
+                touched: validationState.touched
+              };
+            }
+          }
+        } else {
+          // Handle single Date
+          const singleDate = date as Date;
+          // Check if date is in disabled dates
+          if (disabledDates.some(disabledDate =>
+            disabledDate.toDateString() === singleDate.toDateString()
+          )) {
+            return {
+              isValid: false,
+              error: 'This date is not available',
+              touched: validationState.touched
+            };
+          }
+
+          const result = safeValidateDate(singleDate, minDate, maxDate);
+          if (!result.success) {
+            return {
+              isValid: false,
+              error: result.error?.message || 'Invalid date selection',
+              touched: validationState.touched
+            };
+          }
         }
       }
 
@@ -160,12 +215,12 @@ const EnhancedCalendar = React.forwardRef<
     }
   }, [retryCount]);
 
-  const handleSelect = React.useCallback((date: Date | undefined) => {
+  const handleSelect = React.useCallback((date: Date | DateRange | undefined) => {
     const newValidationState = {
       ...validateSelectedDate(date),
       touched: true
     };
-    
+
     setValidationState(newValidationState);
     onValidationChange?.(newValidationState);
 
@@ -213,9 +268,8 @@ const EnhancedCalendar = React.forwardRef<
   }, [disabled, minDate, maxDate, disabledDates]);
 
   return (
-    <div className="space-y-2">
+    <div ref={ref} className="space-y-2">
       <DayPicker
-        ref={ref}
         showOutsideDays={true}
         className={cn(
           "p-3",
@@ -256,11 +310,14 @@ const EnhancedCalendar = React.forwardRef<
           day_hidden: "invisible",
         }}
         components={{
-          IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-          IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+          Chevron: ({ orientation, ...props }) => {
+            const Icon = orientation === 'left' ? ChevronLeft : ChevronRight;
+            return <Icon className="h-4 w-4" {...props} />;
+          },
         }}
-        selected={selected}
-        onSelect={handleSelect}
+        selected={selected as Date | undefined}
+        onSelect={handleSelect as (date: Date | undefined) => void}
+        mode="single"
         disabled={isDateDisabled}
         {...props}
       />

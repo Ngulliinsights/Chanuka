@@ -13,7 +13,6 @@ rate-limiting/
 ├── adapters/               # Storage adapters
 │   ├── memory-adapter.ts   # In-memory storage
 │   ├── redis-adapter.ts    # Redis storage
-│   ├── legacy-store-adapter.ts # Legacy compatibility
 │   └── index.ts           # Adapter barrel exports
 ├── algorithms/             # Rate limiting algorithms
 │   ├── fixed-window.ts     # Fixed window algorithm

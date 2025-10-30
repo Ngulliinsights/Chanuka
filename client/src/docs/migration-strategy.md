@@ -160,7 +160,7 @@ This document outlines the detailed migration strategy for removing duplicate im
 1. **Create Unified Error System**
    ```typescript
    // client/src/shared/error/index.ts
-   export { ErrorBoundary, PageErrorBoundary } from './components';
+   export { ErrorBoundary, EnhancedErrorBoundary } from './components';
    export { useErrorHandler, useErrorRecovery } from './hooks';
    export { createError, handleError } from './utils';
    export type { AppError, ErrorContext, RecoveryStrategy } from './types';

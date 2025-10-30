@@ -12,9 +12,8 @@ import {
   ApiError,
   FetchOptions,
   apiService,
-  fallbackDataManager,
   getErrorMessage
-} from '../services/api-error-handling';
+} from '../services/apiService';
 
 export interface UseApiOptions extends Omit<FetchOptions, 'method'> {
   enabled?: boolean;
@@ -99,9 +98,9 @@ export function useApiWithFallback<T = any>(
     }
 
     try {
-      // Retrieve fallback data if a key is provided
+      // Retrieve fallback data if a key is provided (simplified for deprecated hook)
       const fallbackData = fallbackKey 
-        ? fallbackDataManager.getFallbackData(fallbackKey) 
+        ? null // Simplified fallback - this hook is deprecated
         : undefined;
       
       const response: ApiResponse<T> = await apiService.get(endpoint, {

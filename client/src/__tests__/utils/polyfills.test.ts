@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { loadPolyfills, loadFetchPolyfill, loadPromisePolyfill, getPolyfillStatus } from '@/$2/polyfills';
+import { loadPolyfills, loadFetchPolyfill, loadPromisePolyfill, getPolyfillStatus } from '../../utils/polyfills';
 import { logger } from '@shared/core';
 
 // Mock feature detector

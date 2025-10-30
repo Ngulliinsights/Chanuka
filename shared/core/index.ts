@@ -50,45 +50,9 @@ export enum ErrorDomain {
   INTEGRATION = 'integration'
 }
 
-// Essential error classes
-export class BaseError extends Error {
-  constructor(
-    message: string,
-    public statusCode: number = 500,
-    public code: string = 'INTERNAL_ERROR'
-  ) {
-    super(message);
-    this.name = 'BaseError';
-  }
-}
-
-export class ValidationError extends BaseError {
-  constructor(message: string) {
-    super(message, 400, 'VALIDATION_ERROR');
-    this.name = 'ValidationError';
-  }
-}
-
-export class NotFoundError extends BaseError {
-  constructor(message: string = 'Resource not found') {
-    super(message, 404, 'NOT_FOUND');
-    this.name = 'NotFoundError';
-  }
-}
-
-export class UnauthorizedError extends BaseError {
-  constructor(message: string = 'Unauthorized') {
-    super(message, 401, 'UNAUTHORIZED');
-    this.name = 'UnauthorizedError';
-  }
-}
-
-export class ForbiddenError extends BaseError {
-  constructor(message: string = 'Forbidden') {
-    super(message, 403, 'FORBIDDEN');
-    this.name = 'ForbiddenError';
-  }
-}
+// Export the full error management system
+export * from './src/observability/error-management/errors/base-error';
+export * from './src/observability/error-management/errors/specialized-errors';
 
 // Essential API response utilities
 export const ApiResponse = {

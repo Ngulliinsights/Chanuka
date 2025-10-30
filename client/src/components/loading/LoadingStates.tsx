@@ -3,12 +3,13 @@ import { Loader2 } from 'lucide-react';
 
 interface LoadingStateManagerProps {
   type: 'page' | 'component' | 'data';
-  state: 'loading' | 'timeout' | 'error';
+  state: 'loading' | 'timeout' | 'error' | 'success' | 'idle';
   message?: string;
   error?: Error;
   timeout?: number;
   className?: string;
   showDetails?: boolean;
+  onRetry?: () => void;
 }
 
 export function LoadingStateManager({
@@ -19,6 +20,7 @@ export function LoadingStateManager({
   timeout,
   className = '',
   showDetails = false,
+  onRetry,
 }: LoadingStateManagerProps) {
   if (state === 'error') {
     return (
@@ -29,10 +31,10 @@ export function LoadingStateManager({
           {error?.message || 'Failed to load content'}
         </p>
         <button
-          onClick={() => window.location.reload()}
+          onClick={onRetry || (() => window.location.reload())}
           className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
         >
-          Reload Page
+          {onRetry ? 'Retry' : 'Reload Page'}
         </button>
         {showDetails && error && (
           <details className="mt-4 text-xs text-gray-500">
@@ -69,6 +71,29 @@ export function LoadingStateManager({
     );
   }
 
+  if (state === 'success') {
+    return (
+      <div className={`flex flex-col items-center justify-center p-8 ${className}`}>
+        <div className="text-green-500 text-xl mb-4">✅</div>
+        <h3 className="text-lg font-semibold text-green-600 mb-2">Success</h3>
+        <p className="text-gray-600 text-center">
+          {message || 'Content loaded successfully'}
+        </p>
+      </div>
+    );
+  }
+
+  if (state === 'idle') {
+    return (
+      <div className={`flex flex-col items-center justify-center p-8 ${className}`}>
+        <div className="text-gray-400 text-xl mb-4">⏸️</div>
+        <p className="text-gray-500 text-center">
+          {message || 'Ready to load'}
+        </p>
+      </div>
+    );
+  }
+
   // Loading state
   return (
     <div className={`flex flex-col items-center justify-center p-8 ${className}`}>
@@ -83,34 +108,34 @@ export function LoadingStateManager({
   );
 }
 
-export function PageLoader() {
+export function PageLoader({ size = 'lg', message = 'Loading page...' }: { size?: 'sm' | 'md' | 'lg', message?: string }) {
   return (
     <LoadingStateManager
       type="page"
       state="loading"
-      message="Loading page..."
+      message={message}
       className="min-h-screen"
     />
   );
 }
 
-export function ComponentLoader() {
+export function ComponentLoader({ size = 'md', message = 'Loading component...' }: { size?: 'sm' | 'md' | 'lg', message?: string }) {
   return (
     <LoadingStateManager
       type="component"
       state="loading"
-      message="Loading component..."
+      message={message}
       className="min-h-[200px]"
     />
   );
 }
 
-export function ConnectionAwareLoader() {
+export function ConnectionAwareLoader({ size = 'md', message = 'Connecting...', showMessage = true }: { size?: 'sm' | 'md' | 'lg', message?: string, showMessage?: boolean }) {
   return (
     <LoadingStateManager
       type="data"
       state="loading"
-      message="Connecting..."
+      message={showMessage ? message : undefined}
       className="min-h-[100px]"
     />
   );

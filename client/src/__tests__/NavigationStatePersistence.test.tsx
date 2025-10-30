@@ -1,28 +1,50 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { NavigationProvider } from '../contexts/NavigationContext';
-import { ResponsiveNavigationProvider } from '../contexts/ResponsiveNavigationContext';
+import { createNavigationProvider } from '../core/navigation/context';
 import AppLayout from '@/components/layout/app-layout';
 import { logger } from '@/utils/browser-logger';
 
 // Mock hooks
+const mockUseAuth = vi.fn(() => ({
+  user: {
+    id: '1',
+    email: 'test@example.com',
+    displayName: 'Test User',
+    role: 'user',
+  },
+  isAuthenticated: true,
+  logout: vi.fn(),
+}));
+
+const mockUseMediaQuery = vi.fn(() => false);
+const mockUseLocation = vi.fn(() => ({ pathname: '/' }));
+const mockUseNavigate = vi.fn(() => vi.fn());
+
 vi.mock('@/hooks/use-auth', () => ({
-  useAuth: () => ({
-    user: {
-      id: '1',
-      email: 'test@example.com',
-      displayName: 'Test User',
-      role: 'user',
-    },
-    isAuthenticated: true,
-    logout: vi.fn(),
-  }),
+  useAuth: mockUseAuth,
 }));
 
 vi.mock('@/hooks/use-mobile', () => ({
-  useMediaQuery: vi.fn(() => false),
+  useMediaQuery: mockUseMediaQuery,
 }));
+
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useLocation: mockUseLocation,
+    useNavigate: mockUseNavigate,
+  };
+});
+
+// Create NavigationProvider
+const NavigationProvider = createNavigationProvider(
+  mockUseLocation,
+  mockUseNavigate,
+  mockUseAuth,
+  mockUseMediaQuery
+);
 
 // Mock localStorage with more detailed tracking
 const localStorageMock = {
@@ -47,11 +69,9 @@ function TestApp({ children }: { children: React.ReactNode }) {
   return (
     <BrowserRouter>
       <NavigationProvider>
-        <ResponsiveNavigationProvider>
-          <AppLayout>
-            {children}
-          </AppLayout>
-        </ResponsiveNavigationProvider>
+        <AppLayout>
+          {children}
+        </AppLayout>
       </NavigationProvider>
     </BrowserRouter>
   );

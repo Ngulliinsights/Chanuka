@@ -17,7 +17,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { logger } from '@shared/core/src/utils/browser-logger';
+import { logger } from '@shared/core';
 
 // Mock performance API
 const mockPerformance = {

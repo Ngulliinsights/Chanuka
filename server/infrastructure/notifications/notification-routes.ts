@@ -5,8 +5,8 @@ import { userPreferencesService } from '../../features/users/domain/user-prefere
 import { notificationChannelService } from './notification-channels.js';
 import { smartNotificationFilterService } from './smart-notification-filter.js';
 import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiValidationError } from '@shared/core/utils/api'-utils";
-import { logger } from '@shared/core';
+import { ApiSuccess, ApiError, ApiValidationError  } from '../../../shared/core/src/utils/api-utils';
+import { logger  } from '../../../shared/core/src/index.js';
 
 export const router = Router();
 
@@ -79,7 +79,7 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
     logger.error('Error getting notifications:', { component: 'Chanuka' }, error);
 
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, error);
+      return ApiValidationError(res, error.errors);
     }
 
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to get notifications' }, 500);
@@ -114,7 +114,7 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Respo
     logger.error('Error creating notification:', { component: 'Chanuka' }, error);
 
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, error);
+      return ApiValidationError(res, error.errors);
     }
 
     return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to create notification' }, 500);
@@ -344,6 +344,12 @@ router.get('/status', async (req: Request, res: Response) => {
 });
 
 export default router;
+
+
+
+
+
+
 
 
 

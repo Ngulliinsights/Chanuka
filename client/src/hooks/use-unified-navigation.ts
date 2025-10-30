@@ -1,5 +1,4 @@
-import { useNavigation } from '../contexts/NavigationContext';
-import { useResponsiveNavigation } from '../contexts/ResponsiveNavigationContext';
+import { useNavigation } from '../core/navigation/context';
 import { useKeyboardFocus } from './use-keyboard-focus';
 import { logger } from '@shared/core';
 
@@ -9,7 +8,6 @@ import { logger } from '@shared/core';
  */
 export function useUnifiedNavigation() {
   const navigation = useNavigation();
-  const responsiveNavigation = useResponsiveNavigation();
   const { isKeyboardUser, getFocusClasses } = useKeyboardFocus();
 
   return {
@@ -22,10 +20,10 @@ export function useUnifiedNavigation() {
     userRole: navigation.userRole,
     preferences: navigation.preferences,
     
-    // Responsive state
-    isMobile: responsiveNavigation.isMobile,
-    sidebarCollapsed: responsiveNavigation.sidebarCollapsed,
-    mounted: responsiveNavigation.mounted,
+    // Responsive state (now included in navigation)
+    isMobile: navigation.isMobile,
+    sidebarCollapsed: navigation.sidebarCollapsed,
+    mounted: navigation.mounted,
     
     // Accessibility state
     isKeyboardUser,
@@ -38,10 +36,10 @@ export function useUnifiedNavigation() {
     updatePreferences: navigation.updatePreferences,
     addToRecentPages: navigation.addToRecentPages,
     
-    // Responsive actions
-    toggleSidebar: responsiveNavigation.toggleSidebar,
-    setSidebarCollapsed: responsiveNavigation.setSidebarCollapsed,
-    isActive: responsiveNavigation.isActive,
+    // Responsive actions (now included in navigation)
+    toggleSidebar: navigation.toggleSidebar,
+    setSidebarCollapsed: navigation.setSidebarCollapsed,
+    isActive: navigation.isActive,
 
     // Accessibility actions
     getFocusClasses,

@@ -2,9 +2,9 @@ import express, { Request, Response } from 'express';
 import { sql } from 'drizzle-orm';
 import { database as db } from '../../../shared/database/connection';
 import { HealthCheckResponse } from '../../types/api.ts';
-import { ApiSuccess, ApiError, ApiResponseWrapper } from '@shared/core/utils/api'";
+import { ApiSuccess, ApiError, ApiResponseWrapper  } from '../../../shared/core/src/utils/api';
 import { errorTracker } from '../../core/errors/error-tracker.js';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 interface SchemaIssue {
   type: string;
   severity: 'critical' | 'warning';
@@ -248,6 +248,12 @@ setupSystemRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
+
+
+
+
+
 
 
 

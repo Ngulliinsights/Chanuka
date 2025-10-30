@@ -189,6 +189,8 @@ export class NavigationStatePersistence {
             favoritePages: [],
             recentlyVisited: [],
             compactMode: false,
+            showBreadcrumbs: true,
+            autoExpand: false,
           },
         };
         localStorage.setItem(

@@ -13,7 +13,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
-import PageErrorBoundary from '../PageErrorBoundary';
+import PageErrorBoundary from '../EnhancedErrorBoundary';
 import { useApiWithFallback } from '../../../hooks/use-api-with-fallback';
 import * as apiErrorHandling from '../../../services/api-error-handling';
 import { logger } from '../../../utils/browser-logger';

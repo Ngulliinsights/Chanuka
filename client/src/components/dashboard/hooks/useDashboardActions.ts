@@ -47,8 +47,8 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
       await new Promise(resolve => setTimeout(resolve, 500));
 
       setActions(prev => [...prev, newAction]);
-    } catch (actionError) {
-      const error = new DashboardActionError('add', actionError.message);
+    } catch (actionError: any) {
+      const error = new DashboardActionError('add', actionError?.message || 'Add action failed');
       setError(error);
       throw error;
     } finally {
@@ -80,8 +80,8 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
       setActions(prev => prev.map(action => 
         action.id === actionId ? updatedAction : action
       ));
-    } catch (actionError) {
-      const error = new DashboardActionError('update', actionError.message, { actionId });
+    } catch (actionError: any) {
+      const error = new DashboardActionError('update', actionError?.message || 'Update action failed', { actionId });
       setError(error);
       throw error;
     } finally {
@@ -92,8 +92,8 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
   const completeAction = useCallback(async (actionId: string) => {
     try {
       await updateAction(actionId, { completed: true });
-    } catch (actionError) {
-      const error = new DashboardActionError('complete', actionError.message, { actionId });
+    } catch (actionError: any) {
+      const error = new DashboardActionError('complete', actionError?.message || 'Complete action failed', { actionId });
       setError(error);
       throw error;
     }
@@ -113,8 +113,8 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
       await new Promise(resolve => setTimeout(resolve, 300));
 
       setActions(prev => prev.filter(action => action.id !== actionId));
-    } catch (actionError) {
-      const error = new DashboardActionError('delete', actionError.message, { actionId });
+    } catch (actionError: any) {
+      const error = new DashboardActionError('delete', actionError?.message || 'Delete action failed', { actionId });
       setError(error);
       throw error;
     } finally {

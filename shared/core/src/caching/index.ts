@@ -125,13 +125,6 @@ export function resetDefaultCache(): void {
   defaultCacheInstance = null;
 }
 
-// Legacy adapters for backward compatibility
-export { 
-  LegacyCacheServiceAdapter, 
-  createLegacyCacheAdapter, 
-  isLegacyCacheService, 
-  migrateLegacyCacheService 
-} from './legacy-adapters/cache-service-adapter.js';
 
 // Cache decorators for method-level caching
 export function Cache(options: {

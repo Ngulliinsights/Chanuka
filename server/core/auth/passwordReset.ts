@@ -2,7 +2,7 @@
 import { database as db } from '../../../shared/database/connection.js';
 // Import specific tables and functions needed from the consolidated schema
 import { user as users, passwordReset as passwordResets } from '../../../shared/schema';
-import { ValidationError } from '../../../shared/types/errors.js';
+import { ValidationError } from '../../../shared/core/src/observability/error-management/errors/specialized-errors.js';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import type { InferSelectModel } from 'drizzle-orm';

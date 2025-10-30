@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -18,7 +18,7 @@ import { MigrationService } from '../infrastructure/database/migration-service.t
 import { DataValidationService } from '../core/validation/data-validation-service.ts';
 import * as fs from 'fs';
 import * as path from 'path';
-import { logger } from '@shared/core';
+import { logger  } from '../../shared/core/src/index.js';
 
 // Mock pool for testing
 const mockPool = {

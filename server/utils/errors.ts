@@ -1,12 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
-import { logger } from '@shared/core';
-import { 
-  BaseError,
+import { logger  } from '../../shared/core/src/index.js';
+import { BaseError,
   ValidationError,
   NotFoundError,
   UnauthorizedError,
   ForbiddenError
-} from '@shared/core/index.js';
+ } from '../../shared/core/src/index.js';
 
 // Simple error domain and severity enums
 export enum ErrorDomain {

@@ -16,7 +16,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { CleanupOrchestrator, FileCategory } from '../orchestrator';
-import { AnalysisType, FindingType } from '@shared/types';
+import { AnalysisType, FindingType } from '@shared/core/src/types';
 import { logger } from '@shared/core/src/observability/logging';
 
 describe('CleanupOrchestrator', () => {

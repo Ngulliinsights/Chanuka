@@ -8,10 +8,10 @@
  */
 
 import React from 'react';
-import { cn } from '../../lib/utils';
+import { cn } from '../lib/utils';
 import { useResponsive } from '../responsive';
 
-interface TouchTargetProps {
+export interface TouchTargetProps {
   children: React.ReactNode;
   className?: string;
   size?: 'small' | 'medium' | 'large';

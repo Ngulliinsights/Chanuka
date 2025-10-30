@@ -79,9 +79,9 @@ export function useDashboardConfig(initialConfig?: Partial<DashboardConfig>): Us
       await new Promise(resolve => setTimeout(resolve, 200));
 
       setConfig(newConfig);
-    } catch (configError) {
+    } catch (configError: any) {
       const error = new DashboardConfigurationError(
-        `Failed to update configuration: ${configError.message}`,
+        `Failed to update configuration: ${configError?.message || 'Update failed'}`,
         { updates, originalConfig: config }
       );
       setError(error);
@@ -107,9 +107,9 @@ export function useDashboardConfig(initialConfig?: Partial<DashboardConfig>): Us
       } catch (error) {
         console.warn('Failed to clear dashboard config from localStorage:', error);
       }
-    } catch (configError) {
+    } catch (configError: any) {
       const error = new DashboardConfigurationError(
-        `Failed to reset configuration: ${configError.message}`
+        `Failed to reset configuration: ${configError?.message || 'Reset failed'}`
       );
       setError(error);
       throw error;
@@ -154,9 +154,9 @@ export function useDashboardConfig(initialConfig?: Partial<DashboardConfig>): Us
       await new Promise(resolve => setTimeout(resolve, 300));
 
       setConfig(importedConfig);
-    } catch (configError) {
+    } catch (configError: any) {
       const error = new DashboardConfigurationError(
-        `Failed to import configuration: ${configError.message}`,
+        `Failed to import configuration: ${configError?.message || 'Import failed'}`,
         { configJson }
       );
       setError(error);

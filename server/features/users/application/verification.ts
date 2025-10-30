@@ -4,9 +4,9 @@ import { eq, desc, sql } from "drizzle-orm";
 import { database as db } from "../../../../shared/database/connection";
 import { verification as expertVerifications, user as users } from "../../../../shared/schema";
 import { VerificationRequest } from "../../../types/api.js";
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from '@shared/core/utils/api'";
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper  } from '../../../../shared/core/src/utils/api';
 import { errorTracker } from '../../../core/errors/error-tracker.js';
-import { logger } from '@shared/core';
+import { logger  } from '../../../../shared/core/src/index.js';
 
 const router = Router();
 
@@ -184,6 +184,12 @@ setupVerificationRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
+
+
+
+
+
 
 
 

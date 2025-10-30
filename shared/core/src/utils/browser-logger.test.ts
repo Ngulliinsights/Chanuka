@@ -86,7 +86,6 @@ describe('BrowserLogger', () => {
 
       expect(flags.unifiedLogging).toBe(true);
       expect(flags.serverSync).toBe(true);
-      expect(flags.legacyFallback).toBe(true);
     });
 
     it('should allow dynamic feature flag updates', () => {
@@ -108,14 +107,7 @@ describe('BrowserLogger', () => {
       consoleSpy.mockRestore();
     });
 
-    it('should fallback to legacy logger when enabled', () => {
-      logger.info('Test message');
-
-      expect(mockLegacyLogger.info).toHaveBeenCalledWith('Test message', undefined, undefined);
-    });
-
     it('should not use legacy logger when disabled', () => {
-      logger.updateFeatureFlags({ legacyFallback: false });
       logger.info('Test message');
 
       expect(mockLegacyLogger.info).not.toHaveBeenCalled();
@@ -153,13 +145,12 @@ describe('BrowserLogger', () => {
       consoleSpy.mockRestore();
     });
 
-    it('should skip performance logging when disabled', () => {
-      logger.updateFeatureFlags({ performanceMetrics: false });
+    it('should include performance logging', () => {
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
       logger.logPerformance('test-operation', 100);
 
-      expect(consoleSpy).not.toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
   });

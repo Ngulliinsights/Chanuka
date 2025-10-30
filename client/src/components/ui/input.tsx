@@ -82,12 +82,15 @@ const EnhancedInput = forwardRef<HTMLInputElement, EnhancedInputProps>(
           };
         }
 
-        if (inputValue && pattern && !pattern.test(inputValue)) {
-          return {
-            isValid: false,
-            error: 'Invalid format',
-            touched: validationState.touched
-          };
+        if (inputValue && pattern) {
+          const regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+          if (!regex.test(inputValue)) {
+            return {
+              isValid: false,
+              error: 'Invalid format',
+              touched: validationState.touched
+            };
+          }
         }
 
         // Custom validation
@@ -252,8 +255,8 @@ const EnhancedInput = forwardRef<HTMLInputElement, EnhancedInputProps>(
       </div>
     );
   }
-)
-EnhancedInput.displayName = "EnhancedInput"
+);
+EnhancedInput.displayName = "EnhancedInput";
 
-export { Input, EnhancedInput }
+export { Input, EnhancedInput };
 

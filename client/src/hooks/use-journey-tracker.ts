@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useNavigation } from '../contexts/NavigationContext';
+import { useNavigation } from '../core/navigation/context';
 import { UserJourneyTracker, JourneyAnalytics, JourneyOptimization } from '../services/UserJourneyTracker';
 import { UserRole, NavigationSection } from '../types/navigation';
 import { logger } from '../utils/browser-logger';

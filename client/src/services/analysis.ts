@@ -1,5 +1,5 @@
 import { logger } from '@shared/core';
-import { apiService, ApiResponse, ApiError } from './apiService'; // <-- Import the new service
+import { apiService, ApiResponse, ApiError } from './apiService';
 
 /**
  * Core interfaces for bill analysis system
@@ -73,7 +73,7 @@ class AnalysisService {
       `/api/bills/${billId}/analysis`,
       {
         // Provide mock data as a fallback on failure
-        fallbackData: this.generateMockAnalysis(billId) 
+        fallbackData: this.generateMockAnalysis(billId)
       }
     );
 

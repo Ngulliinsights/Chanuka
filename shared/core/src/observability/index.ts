@@ -12,7 +12,7 @@ export * from './telemetry';
 export * from './logging';
 
 // Health monitoring
-export * from './health';
+// Removed - module deleted by design during development
 
 // Error management
 export * from './error-management';
@@ -21,6 +21,4 @@ export * from './error-management';
 export * from './metrics';
 export * from './tracing';
 
-// Legacy adapters for backward compatibility
-export * from './legacy-adapters';
 

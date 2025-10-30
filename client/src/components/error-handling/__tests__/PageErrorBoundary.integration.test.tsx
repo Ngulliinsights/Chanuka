@@ -17,7 +17,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
-import PageErrorBoundary from '../PageErrorBoundary';
+import PageErrorBoundary from '../EnhancedErrorBoundary';
 import { logger } from '../../../utils/browser-logger';
 
 // Mock component that can throw different types of errors

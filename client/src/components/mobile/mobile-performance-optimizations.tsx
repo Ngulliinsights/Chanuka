@@ -13,10 +13,8 @@ import React, {
   lazy,
   memo
 } from 'react';
-import { useResponsiveLayoutContext } from './responsive-layout-manager';
 
 // Intersection Observer hook for lazy loading
-import { logger } from '../../utils/browser-logger';
 function useIntersectionObserver(
   elementRef: React.RefObject<Element>,
   options: IntersectionObserverInit = {}
@@ -51,42 +49,6 @@ function useIntersectionObserver(
 
   return { isIntersecting, hasIntersected };
 }
-
-// Lazy loading wrapper component
-interface LazyLoadWrapperProps {
-  children: React.ReactNode;
-  height?: number;
-  className?: string;
-  placeholder?: React.ReactNode;
-  once?: boolean;
-}
-
-export const LazyLoadWrapper = memo(function LazyLoadWrapper({
-  children,
-  height = 200,
-  className = '',
-  placeholder,
-  once = true
-}: LazyLoadWrapperProps) {
-  const elementRef = useRef<HTMLDivElement>(null);
-  const { isIntersecting, hasIntersected } = useIntersectionObserver(elementRef);
-
-  const shouldRender = once ? hasIntersected : isIntersecting;
-
-  const defaultPlaceholder = (
-    <div 
-      className={`animate-pulse bg-gray-200 rounded ${className}`}
-      style={{ height: `${height}px` }}
-    />
-  );
-
-  return (
-    <div ref={elementRef} className={className}>
-      {shouldRender ? children : (placeholder || defaultPlaceholder)}
-    </div>
-  );
-});
-
 // Virtual scrolling component for large lists
 interface VirtualScrollProps<T> {
   items: T[];
@@ -443,13 +405,63 @@ export function MemoizedList<T>({
   );
 }
 
+// Lazy loading wrapper component using intersection observer
+interface LazyLoadWrapperProps {
+  children: React.ReactNode;
+  height?: number;
+  className?: string;
+  fallback?: React.ReactNode;
+  rootMargin?: string;
+  threshold?: number;
+}
+
+export const LazyLoadWrapper = memo(function LazyLoadWrapper({
+  children,
+  height,
+  className = '',
+  fallback,
+  rootMargin = '50px',
+  threshold = 0.1
+}: LazyLoadWrapperProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const { hasIntersected } = useIntersectionObserver(ref, {
+    threshold,
+    rootMargin
+  });
+
+  useEffect(() => {
+    if (hasIntersected) {
+      setIsVisible(true);
+    }
+  }, [hasIntersected]);
+
+  const style = height ? { minHeight: `${height}px` } : {};
+
+  return (
+    <div ref={ref} className={className} style={style}>
+      {isVisible ? (
+        children
+      ) : (
+        fallback || (
+          <div
+            className="animate-pulse bg-gray-200 rounded"
+            style={{ height: height || 200 }}
+          />
+        )
+      )}
+    </div>
+  );
+});
+
 // Bundle splitting utility
 export const createLazyComponent = <T extends React.ComponentType<any>>(
   importFn: () => Promise<{ default: T }>,
   fallback?: React.ReactNode
 ) => {
   const LazyComponent = lazy(importFn);
-  
+
   return (props: React.ComponentProps<T>) => (
     <Suspense fallback={fallback || <div className="animate-pulse bg-gray-200 h-32 rounded" />}>
       <LazyComponent {...props} />
@@ -458,12 +470,12 @@ export const createLazyComponent = <T extends React.ComponentType<any>>(
 };
 
 export default {
-  LazyLoadWrapper,
   VirtualScroll,
   OptimizedImage,
   usePerformanceMonitoring,
   DebouncedInput,
   MemoizedList,
-  createLazyComponent
+  createLazyComponent,
+  LazyLoadWrapper
 };
 

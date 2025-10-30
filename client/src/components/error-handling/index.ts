@@ -1,10 +1,12 @@
-export { default as PageErrorBoundary } from './PageErrorBoundary';
-export type { 
-  ErrorFallbackProps, 
-  ErrorType, 
-  ErrorSeverity, 
-  ErrorContext 
-} from './PageErrorBoundary';
+// Enhanced Error Boundary - Main error boundary component
+export { default as EnhancedErrorBoundary } from './EnhancedErrorBoundary';
+export type {
+  ErrorFallbackProps,
+  EnhancedErrorBoundaryProps,
+  EnhancedErrorBoundaryState
+} from './EnhancedErrorBoundary';
+
+// Error Fallback Components - Specialized fallback UIs
 export { 
   ErrorFallback, 
   ApiErrorFallback, 
@@ -13,23 +15,27 @@ export {
   NetworkErrorFallback,
   CriticalErrorFallback
 } from './ErrorFallback';
-export { ServiceUnavailable } from './ServiceUnavailable';
-export { SimpleErrorBoundary } from './SimpleErrorBoundary';
+
+// Error Recovery Manager - Recovery strategies and management
+export { ErrorRecoveryManager } from './ErrorRecoveryManager';
+
+// Re-export error types from shared core for convenience
 export {
-  withErrorBoundary,
-  withLazyErrorBoundary,
-  createSafeLazyComponent,
-  CriticalSection,
-  useErrorState,
-  ErrorState,
-} from './withErrorBoundary';
-export type { CriticalSectionProps, ErrorStateProps } from './withErrorBoundary';
-export {
-  ErrorRecoveryManager,
-  getDefaultRecoveryStrategies,
-  useErrorRecovery,
-} from './ErrorRecoveryManager';
-export type { RecoveryStrategy, ErrorRecoveryManagerProps } from './ErrorRecoveryManager';
+  BaseError,
+  ErrorDomain,
+  ErrorSeverity,
+  ValidationError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+  NetworkError,
+  ExternalServiceError,
+  ServiceUnavailableError,
+  DatabaseError,
+  CacheError,
+  ConflictError,
+  TooManyRequestsError
+} from '@shared/core';
 
 
 

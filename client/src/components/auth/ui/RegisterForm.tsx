@@ -6,7 +6,7 @@
 import React from 'react';
 import { Mail, Lock, User } from 'lucide-react';
 import { cn } from '../../../lib/utils';
-import { RegisterFormProps } from '../types';
+import { RegisterFormProps, RegisterFormData } from '../types';
 import { useRegisterForm } from '../hooks/useAuthForm';
 import { AuthInput } from './AuthInput';
 import { SubmitButton } from './AuthButton';
@@ -32,16 +32,20 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     onError,
   });
 
+  // Cast formData to RegisterFormData for type safety
+  const registerFormData = formData as RegisterFormData;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (onSubmit) {
       try {
         const result = await onSubmit({
-          email: formData.email,
-          password: formData.password,
-          firstName: formData.firstName!,
-          lastName: formData.lastName!,
+          email: registerFormData.email,
+          password: registerFormData.password,
+          confirmPassword: registerFormData.confirmPassword,
+          firstName: registerFormData.firstName,
+          lastName: registerFormData.lastName,
         });
         
         if (!result.success && result.error) {
@@ -100,7 +104,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           label="First Name"
           type="text"
           placeholder="John"
-          value={formData.firstName || ''}
+          value={registerFormData.firstName || ''}
           onChange={handleInputChange}
           onBlur={handleInputBlur}
           error={errors.firstName}
@@ -114,7 +118,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           label="Last Name"
           type="text"
           placeholder="Doe"
-          value={formData.lastName || ''}
+          value={registerFormData.lastName || ''}
           onChange={handleInputChange}
           onBlur={handleInputBlur}
           error={errors.lastName}
@@ -154,7 +158,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           showPasswordToggle
         />
 
-        {config.ui.showPasswordStrength && formData.password && !errors.password && (
+        {config.ui.showPasswordRequirements && formData.password && !errors.password && (
           <PasswordStrengthIndicator 
             password={formData.password}
             config={config}
@@ -163,7 +167,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
         {!errors.password && !formData.password && (
           <p className="text-xs text-gray-600" data-testid="auth-password-requirements">
-            {config.security.passwordMinLength}+ characters, with uppercase, lowercase, number, and special character.
+            {config.password.minLength}+ characters, with uppercase, lowercase, number, and special character.
           </p>
         )}
       </div>
@@ -173,7 +177,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         label="Confirm Password"
         type="password"
         placeholder="••••••••"
-        value={formData.confirmPassword || ''}
+        value={registerFormData.confirmPassword || ''}
         onChange={handleInputChange}
         onBlur={handleInputBlur}
         error={errors.confirmPassword}
@@ -188,7 +192,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
         loading={currentLoading}
         disabled={currentLoading}
         data-testid="register-submit-button"
-      />
+      >
+        Create Account
+      </SubmitButton>
     </form>
   );
 };

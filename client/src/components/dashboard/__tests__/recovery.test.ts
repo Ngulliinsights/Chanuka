@@ -18,7 +18,8 @@ import {
   DashboardTopicError,
   DashboardErrorType
 } from '../errors';
-import type { DashboardData, DashboardConfig } from '@shared/types';
+import type { DashboardData } from '@shared/core/src/testing';
+// DashboardConfig should be defined locally or imported from appropriate module
 
 describe('Dashboard Recovery', () => {
   const mockData: Partial<DashboardData> = {

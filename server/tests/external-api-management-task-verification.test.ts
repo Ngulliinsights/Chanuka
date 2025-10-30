@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -26,7 +26,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../infrastructure/external-data/index';
 import { APICostMonitoringService } from '@/services/api-cost-monitoring';
-import { logger } from '@shared/core';
+import { logger  } from '../../shared/core/src/index.js';
 
 describe('Task 12.3: External API Management Implementation', () => {
   let apiManager: ExternalAPIManagementService;

@@ -8,14 +8,14 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { ExpertVerificationService, VerificationStatus } from '../domain/ExpertVerificationService';
-import { logger } from '@shared/core';
+import { logger  } from '../../../../shared/core/src/index.js';
 
 describe('ExpertVerificationService', () => {
   let service: ExpertVerificationService;

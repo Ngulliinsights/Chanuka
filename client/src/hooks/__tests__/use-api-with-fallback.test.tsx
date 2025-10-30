@@ -11,8 +11,8 @@ global.fetch = vi.fn(() =>
 
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { useApiWithFallback, useMutation, useApiPost } from '../use-api-with-fallback';
-import * as apiErrorHandling from '@/$2/api-error-handling';
-import { logger } from '@/$2/browser-logger';
+// Note: api-error-handling was intentionally removed - using built-in error handling
+import { logger } from '@shared/core';
 
 // Mock the API service
 vi.mock('@/services/api-error-handling', () => ({

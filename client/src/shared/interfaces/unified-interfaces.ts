@@ -190,7 +190,7 @@ export interface ErrorRecovery {
 export interface UnifiedErrorSystem {
   // Error boundary components
   ErrorBoundary: ComponentType<ErrorBoundaryProps>;
-  PageErrorBoundary: ComponentType<ErrorBoundaryProps>;
+  EnhancedErrorBoundary: ComponentType<ErrorBoundaryProps>;
   ComponentErrorBoundary: ComponentType<ErrorBoundaryProps>;
   
   // Error handling hooks
@@ -557,34 +557,5 @@ export interface AccessibilityFeatures {
 // EXPORT ALL INTERFACES
 // ============================================================================
 
-export type {
-  // Core types
-  Priority,
-  Severity,
-  LoadingType,
-  ErrorType,
-  ConnectionType,
-  
-  // System interfaces
-  UnifiedLoadingSystem,
-  UnifiedErrorSystem,
-  UnifiedFormSystem,
-  UnifiedNavigationSystem,
-  
-  // Component interfaces
-  BaseComponentProps,
-  InteractiveComponentProps,
-  DataComponentProps,
-  
-  // Utility interfaces
-  ConfigurationManager,
-  TestUtilities,
-  MockFactories,
-  PerformanceMonitor,
-  AccessibilityFeatures,
-  
-  // Configuration
-  DesignTokens,
-  ThemeConfig,
-};
+// All types are already exported above, no need for duplicate export block
 

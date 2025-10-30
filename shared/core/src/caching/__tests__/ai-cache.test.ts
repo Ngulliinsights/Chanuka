@@ -32,7 +32,7 @@ import {
   AICacheOptions,
   AICacheEntry
 } from '../ai-cache';
-import { CacheService } from '@shared/types';
+import { CacheService } from '@shared/core/src/types';
 import { logger } from '@shared/core/src/observability/logging';
 
 describe('AI Cache', () => {

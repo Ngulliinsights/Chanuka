@@ -2,8 +2,8 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { authenticateToken, AuthenticatedRequest } from '../../middleware/auth.js';
 import { privacyService, PrivacyPreferences } from './privacy-service.js';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from '@shared/core/utils/api'";
-import { logger } from '@shared/core';
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '../../../shared/core/src/utils/api';
+import { logger  } from '../../../shared/core/src/index.js';
 
 export const router = Router();
 
@@ -556,3 +556,9 @@ router.post('/withdraw-consent', authenticateToken, async (req: AuthenticatedReq
     }, 500, ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
 });
+
+
+
+
+
+

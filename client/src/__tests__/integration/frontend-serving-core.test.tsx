@@ -16,7 +16,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import '@testing-library/jest-dom';
-import { logger } from '@/$2/browser-logger';
+import { logger } from '@shared/core';
 
 // Mock fetch globally
 const mockFetch = vi.fn();

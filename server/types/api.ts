@@ -15,7 +15,7 @@ export type {
   Sponsor,
   Affiliation,
   TransparencyInfo,
-  BillAnalysis,
+  // BillAnalysis, // Moved to server/features/bills/types/analysis.ts
   SentimentAnalysis,
   Expert,
   VerificationTask,
@@ -32,16 +32,20 @@ export type {
   RegisterRequest,
   AuthResponse,
   HealthCheckResponse
-} from '@shared/types/common.js';
+} from './common.js';
+
+// Import analysis types from domain features
+export type { BillAnalysis } from '../features/bills/types/analysis.js';
+export type { SponsorshipAnalysis } from '../features/sponsors/types/analysis.js';
 
 // Legacy types for backward compatibility
 
 // Legacy functions for backward compatibility (deprecated)
 
-import type { ApiResponse, ErrorResponse, ResponseMetadata } from '@shared/types/common.js';
+import type { ApiResponse, ErrorResponse, ResponseMetadata } from './common.js';
 
 /**
- * @deprecated Use ApiResponseWrapper from '@shared/core/utils/api'-response.ts instead.
+ * @deprecated Use ApiResponseWrapper from '@shared/core/src/utils/api-utils.ts instead.
  * This function is kept for backward compatibility but will be removed in a future version.
  */
 export function createApiResponse<T>(
@@ -50,7 +54,7 @@ export function createApiResponse<T>(
   error?: string,
   metadata?: ResponseMetadata
 ): ApiResponse<T> {
-  console.warn('createApiResponse is deprecated. Use ApiResponseWrapper from '@shared/core/utils/api'-response.ts instead.');
+  console.warn('createApiResponse is deprecated. Use ApiResponseWrapper from \'@shared/core/src/utils/api-utils.ts\' instead.');
   return {
     success,
     ...(data !== undefined && { data }),
@@ -65,11 +69,11 @@ export function createApiResponse<T>(
 }
 
 /**
- * @deprecated Use ApiResponseWrapper from '@shared/core/utils/api'-response.ts instead.
+ * @deprecated Use ApiResponseWrapper from '@shared/core/src/utils/api-utils.ts instead.
  * This function is kept for backward compatibility but will be removed in a future version.
  */
 export function createErrorResponse(error: string, code?: string, details?: Record<string, unknown>): ErrorResponse {
-  console.warn('createErrorResponse is deprecated. Use ApiResponseWrapper from '@shared/core/utils/api'-response.ts instead.');
+  console.warn('createErrorResponse is deprecated. Use ApiResponseWrapper from \'@shared/core/src/utils/api-utils.ts\' instead.');
   return {
     error,
     ...(code && { code }),
@@ -77,6 +81,12 @@ export function createErrorResponse(error: string, code?: string, details?: Reco
     timestamp: new Date().toISOString(),
   };
 }
+
+
+
+
+
+
 
 
 

@@ -32,33 +32,87 @@ export function generateBreadcrumbs(path: string): BreadcrumbItem[] {
  */
 export function calculateRelatedPages(path: string, userRole: UserRole): RelatedPage[] {
   const relatedPages: RelatedPage[] = [];
-  
+
   if (path.startsWith('/bills')) {
     relatedPages.push(
-      { title: 'All Bills', path: '/bills', description: 'Browse all legislation' },
-      { title: 'Bill Analysis', path: '/bills/analysis', description: 'Detailed analysis tools' }
+      {
+        pageId: 'bills-all',
+        title: 'All Bills',
+        path: '/bills',
+        description: 'Browse all legislation',
+        category: 'legislative',
+        type: 'parent',
+        weight: 1.0,
+        relevanceScore: 0.9
+      },
+      {
+        pageId: 'bills-analysis',
+        title: 'Bill Analysis',
+        path: '/bills/analysis',
+        description: 'Detailed analysis tools',
+        category: 'legislative',
+        type: 'child',
+        weight: 0.8,
+        relevanceScore: 0.8
+      }
     );
   }
-  
+
   if (path.startsWith('/community')) {
     relatedPages.push(
-      { title: 'Community Input', path: '/community-input', description: 'Public discussions' },
-      { title: 'Expert Verification', path: '/expert-verification', description: 'Expert opinions' }
+      {
+        pageId: 'community-input',
+        title: 'Community Input',
+        path: '/community-input',
+        description: 'Public discussions',
+        category: 'community',
+        type: 'related',
+        weight: 0.9,
+        relevanceScore: 0.85
+      },
+      {
+        pageId: 'expert-verification',
+        title: 'Expert Verification',
+        path: '/expert-verification',
+        description: 'Expert opinions',
+        category: 'community',
+        type: 'related',
+        weight: 0.7,
+        relevanceScore: 0.75
+      }
     );
   }
-  
+
   if (userRole !== 'public') {
     relatedPages.push(
-      { title: 'Dashboard', path: '/dashboard', description: 'Your personal dashboard' }
+      {
+        pageId: 'dashboard',
+        title: 'Dashboard',
+        path: '/dashboard',
+        description: 'Your personal dashboard',
+        category: 'user',
+        type: 'related',
+        weight: 0.95,
+        relevanceScore: 0.9
+      }
     );
   }
-  
+
   if (userRole === 'admin') {
     relatedPages.push(
-      { title: 'Admin Panel', path: '/admin', description: 'System administration' }
+      {
+        pageId: 'admin-panel',
+        title: 'Admin Panel',
+        path: '/admin',
+        description: 'System administration',
+        category: 'admin',
+        type: 'related',
+        weight: 1.0,
+        relevanceScore: 0.95
+      }
     );
   }
-  
+
   return relatedPages;
 }
 
@@ -78,7 +132,7 @@ export function determineNavigationSection(path: string): NavigationSection {
   if (path.startsWith('/profile') || path.startsWith('/auth') || path.startsWith('/onboarding')) {
     return 'user';
   }
-  return 'system';
+  return 'tools';
 }
 
 /**

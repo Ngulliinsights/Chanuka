@@ -1,6 +1,6 @@
 import { GovernmentDataService } from '../../../infrastructure/external-data/government-data-service.js';
 import { DataSource, ApiResponse, BillData, SponsorData } from '../../../infrastructure/external-data/types.js';
-import { logger } from '@shared/core';
+import { logger  } from '../../../../shared/core/src/index.js';
 
 export interface UserGovernmentDataQuery {
   userId: string;

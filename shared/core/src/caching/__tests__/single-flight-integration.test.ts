@@ -22,7 +22,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 
 import { SingleFlightCache } from '../single-flight-cache';
 import { MemoryAdapter } from '../adapters/memory-adapter';
-import type { CacheService } from '@shared/types';
+import type { CacheService } from '@shared/core/src/types';
 import { logger } from '@shared/core/src/observability/logging';
 
 describe('SingleFlightCache Integration', () => {
@@ -58,18 +58,18 @@ describe('SingleFlightCache Integration', () => {
     it('should perform basic cache operations through SingleFlightCache', async () => {
       // Set a value
       await cache.set('test-key', 'test-value', 300);
-      
+
       // Get the value
       const result = await cache.get('test-key');
       expect(result).toBe('test-value');
-      
+
       // Check existence
       const exists = await cache.exists?.('test-key');
       expect(exists).toBe(true);
-      
+
       // Delete the value
       await cache.del('test-key');
-      
+
       // Verify deletion
       const deletedResult = await cache.get('test-key');
       expect(deletedResult).toBeNull();
@@ -82,7 +82,7 @@ describe('SingleFlightCache Integration', () => {
         ['key2', 'value2', 300],
         ['key3', 'value3', 300],
       ]);
-      
+
       // Get multiple values
       const results = await cache.mget?.(['key1', 'key2', 'key3', 'key4']);
       expect(results).toEqual(['value1', 'value2', 'value3', null]);
@@ -94,7 +94,7 @@ describe('SingleFlightCache Integration', () => {
       // Create a failing adapter by overriding the get method
       const originalGet = memoryAdapter.get.bind(memoryAdapter);
       let failureCount = 0;
-      
+
       memoryAdapter.get = async (key: string) => {
         failureCount++;
         if (failureCount <= 3) {
@@ -147,7 +147,7 @@ describe('SingleFlightCache Integration', () => {
       await cache.set('key1', 'value1');
       await cache.get('key1'); // Hit
       await cache.get('key2'); // Miss
-      
+
       const metrics = cache.getMetrics();
       expect(metrics).toBeDefined();
       expect(metrics?.hits).toBeGreaterThan(0);
@@ -156,7 +156,7 @@ describe('SingleFlightCache Integration', () => {
 
     it('should provide health status', async () => {
       const health = await cache.getHealth();
-      
+
       expect(health).toHaveProperty('connected');
       expect(health).toHaveProperty('latency');
       expect(health).toHaveProperty('stats');
@@ -168,7 +168,7 @@ describe('SingleFlightCache Integration', () => {
     it('should prevent duplicate requests to memory adapter', async () => {
       let getCallCount = 0;
       const originalGet = memoryAdapter.get.bind(memoryAdapter);
-      
+
       memoryAdapter.get = async (key: string) => {
         getCallCount++;
         // Simulate some delay
@@ -196,7 +196,7 @@ describe('SingleFlightCache Integration', () => {
     it('should recover from adapter failures', async () => {
       let shouldFail = true;
       const originalGet = memoryAdapter.get.bind(memoryAdapter);
-      
+
       memoryAdapter.get = async (key: string) => {
         if (shouldFail) {
           throw new Error('Temporary failure');

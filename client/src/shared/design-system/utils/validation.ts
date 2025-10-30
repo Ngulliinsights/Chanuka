@@ -232,7 +232,8 @@ export function validateDesignSystem(tokens: {
   // Validate components
   if (tokens.components) {
     tokens.components.forEach(component => {
-      results[`component-${component.name}`] = validateComponent(component);
+      const { name, ...componentData } = component;
+      results[`component-${name}`] = validateComponent(componentData);
     });
   }
 
@@ -248,7 +249,7 @@ export function generateValidationReport(results: Record<string, ValidationResul
 } {
   const details = Object.entries(results).map(([name, result]) => ({
     name,
-    status: result.isValid ? (result.warnings.length > 0 ? 'warning' : 'valid') : 'invalid' as const,
+    status: (result.isValid ? (result.warnings.length > 0 ? 'warning' : 'valid') : 'invalid') as 'valid' | 'invalid' | 'warning',
     issues: [...result.errors, ...result.warnings],
   }));
 

@@ -9,13 +9,12 @@ import {
   DeliveryStatus
 } from '../../domain/services/unified-alert-preference-service';
 import { z } from 'zod';
-import { 
-  ApiSuccess, 
+import { ApiSuccess,
   ApiError,
-  ApiValidationError, 
-  ApiResponseWrapper 
-} from '@shared/core/utils/api'-utils.js";
-import { logger } from '@shared/core';
+  ApiValidationError,
+  ApiResponseWrapper
+ } from '../../../../../shared/core/src/utils/api-utils.js';
+import { logger  } from '../../../../../shared/core/src/index.js';
 
 export const router = Router();
 
@@ -886,3 +885,4 @@ router.post('/backup/import', authenticateToken, async (req: AuthenticatedReques
 });
 
 export default router;
+

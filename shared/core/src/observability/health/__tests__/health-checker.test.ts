@@ -21,7 +21,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 }));
 
 import { HealthChecker } from '../observability/health-checker';
-import type { HealthCheck, HealthResult } from '@shared/types';
+import type { HealthCheck, HealthResult } from '@shared/core/src/types';
 import { logger } from '@shared/core/src/observability/logging';
 
 describe('HealthChecker', () => {

@@ -1,6 +1,6 @@
 import { pool } from "../../../shared/database/connection";
 import { demoDataService } from "../demo-data.js";
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 // Simple database connection status tracking (replaces server/db.js dependency)
 let isDatabaseConnected = false;

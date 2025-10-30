@@ -3,7 +3,7 @@ import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { CoverageAnalyzer } from '@/$2/coverage-analyzer';
 import { exec } from 'child_process';
 import fs from 'fs/promises';
-import { logger } from '@shared/core/index.js';
+import { logger  } from '../../../shared/core/src/index.js';
 
 // Mock dependencies
 vi.mock('child_process');

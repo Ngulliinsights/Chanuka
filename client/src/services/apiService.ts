@@ -2,7 +2,7 @@ import { logger } from '@shared/core';
 import { processRequestInterceptors } from './apiInterceptors'; // <-- Import interceptors
 import { offlineDataManager } from '../utils/offlineDataManager';
 import { backgroundSyncManager } from '../utils/backgroundSyncManager';
-import { cacheInvalidation } from '@shared/core/caching'Invalidation';
+import { cacheInvalidation } from '../utils/cacheInvalidation';
 import { offlineAnalytics } from '../utils/offlineAnalytics';
 import { serviceRecovery } from '../utils/service-recovery';
 

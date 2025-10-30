@@ -1,5 +1,5 @@
 import type { Stakeholder, InsertStakeholder } from '../../../shared/schema';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 /**
  * Represents a voting record for a stakeholder

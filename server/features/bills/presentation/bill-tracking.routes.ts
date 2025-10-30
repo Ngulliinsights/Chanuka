@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js';
-import { ApiSuccess, ApiError, ApiValidationError } from '@shared/core/utils/api'';
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '../../../../shared/core/src/utils/api';
+// cspell:words untracking
 // Correct import path for the new service location
 import { billTrackingService } from '../application/bill-tracking.service.js';
 import { z } from 'zod';
@@ -59,7 +60,7 @@ router.post('/track/:billId', authenticateToken, async (req: AuthenticatedReques
     const billId = parseIntParam(req.params.billId, 'Bill ID');
     const validationResult = trackBillSchema.safeParse(req.body);
     if (!validationResult.success) {
-      return ApiValidationError(res, validationResult.error.errors);
+      return ApiValidationError(res, validationResult.error.errors, ApiResponseWrapper.createMetadata(Date.now(), 'database'));
     }
     const { preferences } = validationResult.data;
 
@@ -90,10 +91,12 @@ router.get('/tracked', authenticateToken, async (req: AuthenticatedRequest, res:
     const category = req.query.category as string | undefined;
     const status = req.query.status as string | undefined;
     // Validate sortBy and sortOrder against allowed values
-    const validSortBy = ['date_tracked', 'last_updated', 'engagement'];
-    const sortBy = validSortBy.includes(req.query.sortBy as string) ? req.query.sortBy as typeof validSortBy[number] : 'date_tracked';
-    const validSortOrder = ['asc', 'desc'];
-    const sortOrder = validSortOrder.includes(req.query.sortOrder as string) ? req.query.sortOrder as typeof validSortOrder[number] : 'desc';
+    const validSortBy = ['date_tracked', 'last_updated', 'engagement'] as const;
+    const sortByValue = req.query.sortBy as string;
+    const sortBy = validSortBy.includes(sortByValue as any) ? sortByValue as 'date_tracked' | 'last_updated' | 'engagement' : 'date_tracked';
+    const validSortOrder = ['asc', 'desc'] as const;
+    const sortOrderValue = req.query.sortOrder as string;
+    const sortOrder = validSortOrder.includes(sortOrderValue as any) ? sortOrderValue as 'asc' | 'desc' : 'desc';
 
 
     const result = await billTrackingService.getUserTrackedBills(req.user!.id, { page, limit, category, status, sortBy, sortOrder });
@@ -109,7 +112,7 @@ router.put('/preferences/:billId', authenticateToken, async (req: AuthenticatedR
     const billId = parseIntParam(req.params.billId, 'Bill ID');
     const validationResult = updatePreferencesSchema.safeParse(req.body);
     if (!validationResult.success) {
-      return ApiValidationError(res, validationResult.error.errors);
+      return ApiValidationError(res, validationResult.error.errors, ApiResponseWrapper.createMetadata(Date.now(), 'database'));
     }
     const preferencesToUpdate = validationResult.data;
 
@@ -136,7 +139,7 @@ router.post('/bulk', authenticateToken, async (req: AuthenticatedRequest, res: R
   try {
     const validationResult = bulkTrackingSchema.safeParse(req.body);
     if (!validationResult.success) {
-      return ApiValidationError(res, validationResult.error.errors);
+      return ApiValidationError(res, validationResult.error.errors, ApiResponseWrapper.createMetadata(Date.now(), 'database'));
     }
     const { billIds, operation, preferences } = validationResult.data;
 
@@ -196,3 +199,9 @@ router.use((err: Error, req: AuthenticatedRequest, res: Response, next: NextFunc
 
 
 export { router as billTrackingRouter }; // Export with a unique name
+
+
+
+
+
+

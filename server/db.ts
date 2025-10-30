@@ -3,7 +3,7 @@ import pg from 'pg';
 const { Pool } = pg;
 import * as schema from "../shared/schema";
 import { databaseFallbackService as fallbackService } from './infrastructure/database/database-fallback.js';
-import { logger } from '@shared/core';
+import { logger  } from '../shared/core/src/index.js';
 
 // Connection state management with clear separation of concerns
 interface DatabaseState {

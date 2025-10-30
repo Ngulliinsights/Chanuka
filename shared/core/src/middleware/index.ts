@@ -27,7 +27,7 @@ export { ErrorHandlerMiddlewareProvider } from './error-handler/provider';
 
 // Enhanced middleware integrations
 export { createUnifiedMiddleware } from './unified';
-export { createMiddlewareChain } from './chain';
+// Middleware chain functionality removed by design during development
 
 // Utility functions
 export { applyMiddleware } from './registry';

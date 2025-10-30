@@ -19,6 +19,9 @@ export interface RegisterFormData {
 
 export type FormData = LoginFormData | RegisterFormData;
 
+// Helper type for all possible form field names
+export type FormFieldName = keyof LoginFormData | keyof RegisterFormData;
+
 export interface ValidationErrors {
   [key: string]: string;
 }
@@ -63,6 +66,7 @@ export interface AuthResponse {
   success: boolean;
   error?: string;
   data?: any;
+  requiresVerification?: boolean;
 }
 
 export interface UseAuthFormResult {
@@ -71,11 +75,14 @@ export interface UseAuthFormResult {
   formData: FormData;
   errors: ValidationErrors;
   loading: boolean;
+  isLoading: boolean; // Alias for loading
   apiResponse: { success?: string; error?: string } | null;
   isValid: boolean;
   attemptCount: number;
   recoveryStrategy: any;
+  recovery: any; // Recovery actions
   showPassword: boolean;
+  actions: any; // Form actions
   
   // Actions
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -108,6 +115,9 @@ export interface UseAuthFormResult {
     disabled: boolean;
     required: boolean;
   };
+  
+  // Config
+  config: AuthConfig;
 }
 
 export interface AuthConfig {
@@ -141,4 +151,29 @@ export interface AuthConfig {
     lockoutDuration: number;
   };
 }
+
+// Additional missing types
+export interface AuthState {
+  user: any | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface LoginFormProps extends AuthFormProps {
+  mode: 'login';
+  onSubmit?: (data: LoginFormData) => Promise<{ success?: string; error?: string }>;
+  loading?: boolean;
+  error?: string;
+}
+
+export interface RegisterFormProps extends AuthFormProps {
+  mode: 'register';
+  onSubmit?: (data: RegisterFormData) => Promise<{ success?: string; error?: string }>;
+  loading?: boolean;
+  error?: string;
+}
+
+// Union type for form data to handle both login and register
+export type AuthFormData = LoginFormData | RegisterFormData;
 

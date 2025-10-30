@@ -15,7 +15,7 @@ import { LoadingStateManager } from "./components/loading/LoadingStates";
 import BrowserCompatibilityChecker from "./components/compatibility/BrowserCompatibilityChecker";
 import PerformanceMetricsCollector from "./components/performance/PerformanceMetricsCollector";
 import { Suspense, useEffect } from "react";
-import { useSimplifiedLoading } from "./hooks/useSimplifiedLoading";
+import { useLoadingOperation } from "./core/loading/hooks";
 import { logger } from './utils/browser-logger';
 import {
   SafeLazyPages,
@@ -82,7 +82,7 @@ const getQueryClient = (): QueryClient => {
 // =============================================================================
 
 function PageLoader() {
-  const { isLoading, error, isTimeout } = useSimplifiedLoading('app-page-loading', {
+  const { isLoading, error, isTimeout } = useLoadingOperation('app-page-loading', {
     timeout: CONFIG.loading.pageTimeout,
     connectionAware: CONFIG.loading.connectionAware,
     showTimeoutWarning: CONFIG.loading.showTimeoutWarning,
@@ -210,7 +210,7 @@ export default function App() {
 
   useEffect(() => {
     if (IS_DEV) {
-      logger.info('App initialized with', { component: 'Chanuka' }, ROUTES.length, "routes");
+      logger.info('App initialized with routes', { component: 'Chanuka', routeCount: ROUTES.length });
     }
   }, []);
 

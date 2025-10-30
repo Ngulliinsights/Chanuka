@@ -1,13 +1,22 @@
 import { Router } from 'express';
-import { db } from '../../../shared/database/connection';
+import { database, withTransaction, getDatabase } from '@shared/database/connection';
 import { billComments, users, userProfiles, bills, billEngagement } from '@shared/schema';
 import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
-import { cacheService } from '@server/infrastructure/cache';
-import { cacheKeys } from '@shared/core/src/caching/key-generator';
-import { getDefaultCache } from '@shared/core/src/caching';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from '@shared/core/utils/api'-response';
-import { logger } from '@shared/core';
-import { AuthenticatedRequest } from '@shared/core/src/types/auth.types';
+import { cacheKeys  } from '../../../shared/core/src/caching/key-generator';
+import { getDefaultCache  } from '../../../shared/core/src/caching';
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '../../../shared/core/src/utils/api-utils';
+import { logger  } from '../../../shared/core/src/index.js';
+import { AuthenticatedRequest  } from '../../../shared/core/src/types/auth.types';
+import { z } from 'zod';
+
+// Security Services
+import { dataPrivacyService } from '../../infrastructure/security/data-privacy-service.js';
+import { inputValidationService } from '../../infrastructure/security/input-validation-service.js';
+import type {
+  UserEngagementMetrics,
+  BillEngagementMetrics,
+  CommentEngagementTrends,
+} from './types';
 
 // Helper function to build time thresholds
 const buildTimeThreshold = (timeframe: string): Date => {
@@ -22,15 +31,8 @@ const authenticateToken = (req: any, res: any, next: any) => {
   req.user = { id: '1', role: 'user' }; // Mock user for now
   next();
 };
-import { z } from 'zod';
-import type {
-  UserEngagementMetrics,
-  BillEngagementMetrics,
-  CommentEngagementTrends,
-  EngagementLeaderboard
-} from './types';
 
-// Additional types for new endpoints
+// Additional types for endpoints
 interface EngagementOverview {
   totalUsers: number;
   totalBills: number;
@@ -71,6 +73,18 @@ class EngagementAnalyticsRouter {
   }
 
   private initializeRoutes(): void {
+    // Add input sanitization middleware
+    this.router.use((req, res, next) => {
+      if (req.query) {
+        Object.keys(req.query).forEach(key => {
+          if (typeof req.query[key] === 'string') {
+            req.query[key] = inputValidationService.sanitizeHtmlInput(req.query[key] as string);
+          }
+        });
+      }
+      next();
+    });
+
     // GET /api/engagement-analytics/overview - Get engagement overview metrics
     this.router.get('/overview', authenticateToken, this.getEngagementOverview.bind(this));
 
@@ -94,10 +108,23 @@ class EngagementAnalyticsRouter {
     const startTime = Date.now();
 
     try {
-      const cacheKey = 'engagement:overview';
+      // Check data access permissions
+      const accessCheck = dataPrivacyService.checkDataAccess(
+        req.user?.id || '',
+        'engagement_analytics',
+        { user: req.user }
+      );
 
-      // Use enhanced cache utility with error handling and metrics
+      if (!accessCheck.allowed) {
+        return ApiError(res, {
+          code: 'ACCESS_DENIED',
+          message: accessCheck.reason || 'Access denied'
+        }, 403, ApiResponseWrapper.createMetadata(startTime, 'auth'));
+      }
+
+      const cacheKey = 'engagement:overview';
       const cacheInstance = getDefaultCache();
+      
       const overview = await cacheInstance.getOrSetCache(
         cacheKey,
         this.ANALYTICS_CACHE_TTL,
@@ -106,18 +133,32 @@ class EngagementAnalyticsRouter {
         }
       );
 
-      return ApiSuccess(res, overview,
+      // Apply privacy restrictions if required
+      let sanitizedOverview = overview;
+      if (accessCheck.restrictions?.includes('anonymize_required')) {
+        sanitizedOverview = this.anonymizeOverviewData(overview);
+      }
+
+      // Audit data access
+      await dataPrivacyService.auditDataAccess(
+        req.user?.id || '',
+        'view_engagement_overview',
+        'engagement_analytics',
+        { restrictions: accessCheck.restrictions }
+      );
+
+      return ApiSuccess(res, sanitizedOverview,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      // Error tracking removed - errorTracker not available
-
       logger.error('Error fetching engagement overview:', {
         component: 'analytics',
         operation: 'getEngagementOverview'
       }, error instanceof Error ? error : { message: String(error) });
 
-      return ApiError(res, 'Failed to fetch engagement overview', 500,
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
+      return ApiError(res, { 
+        code: 'OVERVIEW_FETCH_ERROR', 
+        message: 'Failed to fetch engagement overview' 
+      }, 500, ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   }
 
@@ -135,14 +176,12 @@ class EngagementAnalyticsRouter {
         return ApiValidationError(res, {
           field: 'billId',
           message: 'Bill ID must be a valid number'
-        },
-          ApiResponseWrapper.createMetadata(startTime, 'validation'));
+        }, ApiResponseWrapper.createMetadata(startTime, 'validation'));
       }
 
       const cacheKey = `${cacheKeys.analytics('bill_engagement', billId.toString())}`;
-
-      // Use enhanced cache utility with error handling and metrics
       const cacheInstance = getDefaultCache();
+      
       const metrics = await cacheInstance.getOrSetCache(
         cacheKey,
         this.ANALYTICS_CACHE_TTL,
@@ -155,11 +194,11 @@ class EngagementAnalyticsRouter {
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
       if (error instanceof Error && error.message === 'Bill not found') {
-        return ApiError(res, 'Bill not found', 404,
-          ApiResponseWrapper.createMetadata(startTime, 'database'));
+        return ApiError(res, { 
+          code: 'BILL_NOT_FOUND', 
+          message: 'Bill not found' 
+        }, 404, ApiResponseWrapper.createMetadata(startTime, 'database'));
       }
-
-      // Error tracking removed - errorTracker not available
 
       logger.error('Error fetching bill engagement metrics:', {
         component: 'analytics',
@@ -167,8 +206,10 @@ class EngagementAnalyticsRouter {
         billId: req.params.id
       }, error instanceof Error ? error : { message: String(error) });
 
-      return ApiError(res, 'Failed to fetch bill engagement metrics', 500,
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
+      return ApiError(res, { 
+        code: 'BILL_METRICS_ERROR', 
+        message: 'Failed to fetch bill engagement metrics' 
+      }, 500, ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   }
 
@@ -180,16 +221,29 @@ class EngagementAnalyticsRouter {
 
     try {
       const { id: userId } = req.params;
+      
+      // Check data access permissions for user data
+      const accessCheck = dataPrivacyService.checkDataAccess(
+        req.user?.id || '',
+        'user_profile',
+        { user: req.user, targetUserId: userId }
+      );
+
+      if (!accessCheck.allowed) {
+        return ApiError(res, {
+          code: 'ACCESS_DENIED',
+          message: accessCheck.reason || 'Access denied'
+        }, 403, ApiResponseWrapper.createMetadata(startTime, 'auth'));
+      }
+
       const querySchema = z.object({
         timeframe: z.enum(['7d', '30d', '90d']).optional().default('30d')
       });
 
       const query = querySchema.parse(req.query);
-
       const cacheKey = `${cacheKeys.userProfile(parseInt(userId))}:engagement:${query.timeframe}`;
-
-      // Use enhanced cache utility with error handling and metrics
       const cacheInstance = getDefaultCache();
+      
       const history = await cacheInstance.getOrSetCache(
         cacheKey,
         this.ANALYTICS_CACHE_TTL,
@@ -198,23 +252,33 @@ class EngagementAnalyticsRouter {
         }
       );
 
-      return ApiSuccess(res, history,
+      // Sanitize user data for privacy
+      const sanitizedHistory = this.sanitizeUserEngagementData(history, accessCheck.restrictions);
+
+      // Audit data access
+      await dataPrivacyService.auditDataAccess(
+        req.user?.id || '',
+        'view_user_engagement',
+        `user_profile:${userId}`,
+        { timeframe: query.timeframe, restrictions: accessCheck.restrictions }
+      );
+
+      return ApiSuccess(res, sanitizedHistory,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
       if (error instanceof z.ZodError) {
         return ApiValidationError(res, error.errors.map(err => ({
           field: err.path.join('.'),
           message: err.message
-        })),
-          ApiResponseWrapper.createMetadata(startTime, 'database'));
+        })), ApiResponseWrapper.createMetadata(startTime, 'validation'));
       }
 
       if (error instanceof Error && error.message === 'User not found') {
-        return ApiError(res, 'User not found', 404,
-          ApiResponseWrapper.createMetadata(startTime, 'database'));
+        return ApiError(res, { 
+          code: 'USER_NOT_FOUND', 
+          message: 'User not found' 
+        }, 404, ApiResponseWrapper.createMetadata(startTime, 'database'));
       }
-
-      // Error tracking removed - errorTracker not available
 
       logger.error('Error fetching user engagement history:', {
         component: 'analytics',
@@ -222,8 +286,10 @@ class EngagementAnalyticsRouter {
         userId: req.params.id
       }, error instanceof Error ? error : { message: String(error) });
 
-      return ApiError(res, 'Failed to fetch user engagement history', 500,
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
+      return ApiError(res, { 
+        code: 'USER_HISTORY_ERROR', 
+        message: 'Failed to fetch user engagement history' 
+      }, 500, ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   }
 
@@ -240,11 +306,9 @@ class EngagementAnalyticsRouter {
       });
 
       const query = querySchema.parse(req.query);
-
       const cacheKey = `engagement:trends:${query.period}:${query.days}`;
-
-      // Use enhanced cache utility with error handling and metrics
       const cacheInstance = getDefaultCache();
+      
       const trends = await cacheInstance.getOrSetCache(
         cacheKey,
         this.ANALYTICS_CACHE_TTL,
@@ -260,11 +324,8 @@ class EngagementAnalyticsRouter {
         return ApiValidationError(res, error.errors.map(err => ({
           field: err.path.join('.'),
           message: err.message
-        })),
-          ApiResponseWrapper.createMetadata(startTime, 'database'));
+        })), ApiResponseWrapper.createMetadata(startTime, 'validation'));
       }
-
-      // Error tracking removed - errorTracker not available
 
       logger.error('Error fetching engagement trends:', {
         component: 'analytics',
@@ -272,8 +333,10 @@ class EngagementAnalyticsRouter {
         period: req.query.period
       }, error instanceof Error ? error : { message: String(error) });
 
-      return ApiError(res, 'Failed to fetch engagement trends', 500,
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
+      return ApiError(res, { 
+        code: 'TRENDS_ERROR', 
+        message: 'Failed to fetch engagement trends' 
+      }, 500, ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   }
 
@@ -294,12 +357,14 @@ class EngagementAnalyticsRouter {
       const userId = req.user?.id;
 
       if (!userId) {
-        return ApiError(res, 'User not authenticated', 401,
-          ApiResponseWrapper.createMetadata(startTime, 'auth'));
+        return ApiError(res, { 
+          code: 'AUTH_REQUIRED', 
+          message: 'User not authenticated' 
+        }, 401, ApiResponseWrapper.createMetadata(startTime, 'auth'));
       }
 
       await this.processEngagementEvent({
-        userId,
+        userId: String(userId),
         eventType: eventData.eventType,
         billId: eventData.billId,
         metadata: eventData.metadata
@@ -312,11 +377,8 @@ class EngagementAnalyticsRouter {
         return ApiValidationError(res, error.errors.map(err => ({
           field: err.path.join('.'),
           message: err.message
-        })),
-          ApiResponseWrapper.createMetadata(startTime, 'validation'));
+        })), ApiResponseWrapper.createMetadata(startTime, 'validation'));
       }
-
-      // Error tracking removed - errorTracker not available
 
       logger.error('Error tracking engagement event:', {
         component: 'analytics',
@@ -324,8 +386,10 @@ class EngagementAnalyticsRouter {
         userId: req.user?.id
       }, error instanceof Error ? error : { message: String(error) });
 
-      return ApiError(res, 'Failed to track engagement event', 500,
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
+      return ApiError(res, { 
+        code: 'TRACKING_ERROR', 
+        message: 'Failed to track engagement event' 
+      }, 500, ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
   }
 
@@ -333,6 +397,8 @@ class EngagementAnalyticsRouter {
    * Compute engagement overview metrics
    */
   private async computeEngagementOverview(): Promise<EngagementOverview> {
+    const db = getDatabase('read');
+
     // Get total counts
     const [userStats] = await db
       .select({ count: count(users.id) })
@@ -368,7 +434,7 @@ class EngagementAnalyticsRouter {
       .select({
         billId: billComments.billId,
         billTitle: bills.title,
-        engagementCount: sum(sql`${billComments.upvotes} + ${billComments.downvotes} + 1`) // +1 for comment itself
+        engagementCount: sum(sql`${billComments.upvotes} + ${billComments.downvotes} + 1`)
       })
       .from(billComments)
       .innerJoin(bills, eq(billComments.billId, bills.id))
@@ -413,6 +479,8 @@ class EngagementAnalyticsRouter {
    * Compute bill engagement metrics
    */
   private async computeBillEngagementMetrics(billId: number): Promise<BillEngagementMetrics> {
+    const db = getDatabase('read');
+
     // Get bill information
     const [billInfo] = await db
       .select({
@@ -491,7 +559,8 @@ class EngagementAnalyticsRouter {
    * Compute user engagement history
    */
   private async computeUserEngagementHistory(userId: string, timeframe: '7d' | '30d' | '90d'): Promise<UserEngagementMetrics> {
-    const timeThreshold = buildTimeThreshold(`${timeframe.slice(0, -1)}d`);
+    const db = getDatabase('read');
+    const timeThreshold = buildTimeThreshold(timeframe);
 
     // Get user information
     const [userInfo] = await db
@@ -577,36 +646,37 @@ class EngagementAnalyticsRouter {
    * Compute engagement trends
    */
   private async computeEngagementTrends(period: 'hourly' | 'daily' | 'weekly', days: number): Promise<CommentEngagementTrends[typeof period]> {
+    const db = getDatabase('read');
     const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
-    let groupBy: string;
-    let selectFormat: string;
+    let groupBy: any;
+    let selectFormat: any;
 
     switch (period) {
       case 'hourly':
-        groupBy = 'EXTRACT(HOUR FROM created_at)';
-        selectFormat = 'EXTRACT(HOUR FROM created_at) as period';
+        groupBy = sql`EXTRACT(HOUR FROM ${billComments.createdAt})`;
+        selectFormat = sql<number>`EXTRACT(HOUR FROM ${billComments.createdAt})`;
         break;
       case 'daily':
-        groupBy = 'DATE(created_at)';
-        selectFormat = 'DATE(created_at) as period';
+        groupBy = sql`DATE(${billComments.createdAt})`;
+        selectFormat = sql<string>`DATE(${billComments.createdAt})`;
         break;
       case 'weekly':
-        groupBy = 'DATE_TRUNC(\'week\', created_at)';
-        selectFormat = 'DATE_TRUNC(\'week\', created_at) as period';
+        groupBy = sql`DATE_TRUNC('week', ${billComments.createdAt})`;
+        selectFormat = sql<string>`DATE_TRUNC('week', ${billComments.createdAt})`;
         break;
     }
 
     const trends = await db
       .select({
-        period: sql`${selectFormat}`,
+        period: selectFormat.as('period'),
         comments: count(billComments.id),
         votes: sum(sql`${billComments.upvotes} + ${billComments.downvotes}`)
       })
       .from(billComments)
       .where(sql`${billComments.createdAt} >= ${startDate}`)
-      .groupBy(sql`${groupBy}`)
-      .orderBy(sql`${groupBy}`);
+      .groupBy(groupBy)
+      .orderBy(groupBy);
 
     const formattedTrends = trends.map(trend => ({
       [period === 'hourly' ? 'hour' : period === 'daily' ? 'date' : 'week']:
@@ -622,14 +692,14 @@ class EngagementAnalyticsRouter {
    * Process engagement event
    */
   private async processEngagementEvent(event: EngagementEvent): Promise<void> {
-    const { userId, billId, eventType, metadata } = event;
+    const { userId, billId, eventType } = event;
 
-    // Record the event in engagement tracking
-    if (billId) {
-      // Direct database operations (transaction wrapper not available)
-      try {
-        // Update or create bill engagement record
-        const [existingEngagement] = await db
+    if (!billId) return;
+
+    try {
+      await withTransaction(async (tx) => {
+        // Check for existing engagement
+        const [existingEngagement] = await tx
           .select()
           .from(billEngagement)
           .where(and(
@@ -662,7 +732,7 @@ class EngagementAnalyticsRouter {
             updates.shareCount = sql`${billEngagement.shareCount} + 1`;
           }
 
-          await db
+          await tx
             .update(billEngagement)
             .set(updates)
             .where(and(
@@ -683,20 +753,18 @@ class EngagementAnalyticsRouter {
             updatedAt: new Date()
           };
 
-          await db
-            .insert(billEngagement)
-            .values(newEngagement);
+          await tx.insert(billEngagement).values(newEngagement);
         }
-      } catch (dbError) {
-        logger.error('Database error in processEngagementEvent:', dbError);
-        throw dbError;
-      }
+      });
 
       // Invalidate related caches
       const cacheInstance = getDefaultCache();
       await cacheInstance.del(`${cacheKeys.userProfile(parseInt(userId))}:engagement`);
       await cacheInstance.del(`${cacheKeys.analytics('bill_engagement', billId.toString())}`);
       await cacheInstance.del('engagement:overview');
+    } catch (dbError) {
+      logger.error('Database error in processEngagementEvent:', dbError);
+      throw dbError;
     }
   }
 
@@ -740,6 +808,8 @@ class EngagementAnalyticsRouter {
    * Get peak engagement hour for a bill
    */
   private async getPeakEngagementHour(billId: number): Promise<number> {
+    const db = getDatabase('read');
+    
     const hourlyData = await db
       .select({
         hour: sql<number>`EXTRACT(HOUR FROM ${billComments.createdAt})`,
@@ -752,6 +822,59 @@ class EngagementAnalyticsRouter {
       .limit(1);
 
     return hourlyData[0]?.hour || 12; // Default to noon if no data
+  }
+
+  /**
+   * Anonymize overview data for privacy compliance
+   */
+  private anonymizeOverviewData(overview: EngagementOverview): EngagementOverview {
+    // Remove or generalize potentially identifying information
+    const anonymized = { ...overview };
+    
+    // Generalize user counts to ranges for small numbers
+    if (anonymized.activeUsersToday < 10) {
+      anonymized.activeUsersToday = Math.floor(anonymized.activeUsersToday / 5) * 5;
+    }
+    
+    if (anonymized.activeUsersThisWeek < 50) {
+      anonymized.activeUsersThisWeek = Math.floor(anonymized.activeUsersThisWeek / 10) * 10;
+    }
+
+    // Remove specific bill titles that might be sensitive
+    anonymized.topEngagedBills = anonymized.topEngagedBills.map(bill => ({
+      ...bill,
+      billTitle: bill.billTitle.length > 50 ? 
+        bill.billTitle.substring(0, 50) + '...' : 
+        bill.billTitle
+    }));
+
+    return anonymized;
+  }
+
+  /**
+   * Sanitize user engagement data for privacy
+   */
+  private sanitizeUserEngagementData(history: UserEngagementMetrics, restrictions?: string[]): UserEngagementMetrics {
+    const sanitized = { ...history };
+
+    if (restrictions?.includes('anonymize_required')) {
+      // Remove or hash identifying information
+      sanitized.userId = dataPrivacyService.sanitizeUserData({ id: history.userId }).id;
+      
+      // Generalize metrics for small numbers
+      if (sanitized.totalComments < 10) {
+        sanitized.totalComments = Math.floor(sanitized.totalComments / 5) * 5;
+      }
+      
+      if (sanitized.totalVotes < 20) {
+        sanitized.totalVotes = Math.floor(sanitized.totalVotes / 10) * 10;
+      }
+
+      // Remove specific comment references
+      sanitized.topCommentId = null;
+    }
+
+    return sanitized;
   }
 
   /**

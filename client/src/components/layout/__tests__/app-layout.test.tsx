@@ -4,7 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AppLayout from '../app-layout';
-import { LayoutConfig, LayoutError } from '@shared/types';
+import { LayoutConfig } from '../types';
+import { LayoutError } from '../errors';
 import { LayoutRenderError, LayoutResponsiveError } from '../errors';
 
 // Mock dependencies

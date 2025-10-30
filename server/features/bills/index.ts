@@ -7,3 +7,6 @@ export { router as votingPatternAnalysisRouter } from './voting-pattern-analysis
 export { router as sponsorshipRouter } from './presentation/sponsorship.routes.js';
 export { realTimeTrackingRouter } from './real-time-tracking.js';
 
+// Export analysis types
+export type { BillAnalysis } from './types/analysis.js';
+

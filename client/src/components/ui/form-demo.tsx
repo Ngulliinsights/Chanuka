@@ -14,15 +14,18 @@ import {
   FormSuccessIndicator,
   FormHelpText 
 } from './form-layout';
-import { 
-  EnhancedFormInput, 
-  EnhancedFormTextarea, 
-  EnhancedFormSelect 
+import {
+  EnhancedFormInput,
+  EnhancedFormTextarea,
+  EnhancedFormSelect
 } from './form-field';
-import { 
-  AccessibleForm, 
-  AccessibleFieldset, 
-  ScreenReaderAnnouncement 
+import {
+  AccessibleFieldset,
+  ScreenReaderAnnouncement,
+  useFormKeyboardNavigation,
+  RequiredFieldIndicator,
+  AccessibleErrorSummary,
+  FormSkipLink
 } from './form-accessibility';
 
 interface FormData {
@@ -55,6 +58,9 @@ interface ValidationErrors {
 }
 
 export const FormDemo: React.FC = () => {
+  const formRef = React.useRef<HTMLFormElement>(null);
+  useFormKeyboardNavigation(formRef);
+
   const [currentStep, setCurrentStep] = useState('personal');
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -73,7 +79,7 @@ export const FormDemo: React.FC = () => {
     website: '',
     experience: ''
   });
-  
+
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -280,14 +286,33 @@ export const FormDemo: React.FC = () => {
             currentStep={currentStep}
             onStepClick={handleStepChange}
           />
-          
-          <AccessibleForm
-            title="User Registration"
-            description="Please fill out all required fields to complete your registration."
-            errors={errorList}
+
+          <FormSkipLink targetId="form-content">
+            Skip to form content
+          </FormSkipLink>
+
+          <form
+            ref={formRef}
+            id="user-registration-form"
             onSubmit={handleSubmit}
-            enableKeyboardNavigation
+            noValidate
+            className="space-y-6"
+            role="form"
+            aria-labelledby="form-title"
+            aria-describedby="form-description"
           >
+            <div id="form-title" className="sr-only">User Registration</div>
+            <div id="form-description" className="sr-only">
+              Please fill out all required fields to complete your registration.
+            </div>
+
+            <RequiredFieldIndicator />
+
+            <AccessibleErrorSummary
+              errors={errorList}
+              title="Form contains errors"
+            />
+
             <ScreenReaderAnnouncement message={announcement} />
             
             {/* Personal Information Section */}
@@ -522,7 +547,7 @@ export const FormDemo: React.FC = () => {
                 )}
               </div>
             </div>
-          </AccessibleForm>
+          </form>
         </CardContent>
       </Card>
     </div>

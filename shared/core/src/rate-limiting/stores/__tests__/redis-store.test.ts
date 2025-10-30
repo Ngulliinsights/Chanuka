@@ -24,7 +24,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 import { Redis } from 'ioredis';
 import { RedisRateLimitStore } from '../redis-store';
 import { MemoryRateLimitStore } from '../memory-store';
-import { RateLimitConfig } from '@shared/types';
+import { RateLimitConfig } from '@shared/core/src/types';
 import { logger } from '@shared/core/src/observability/logging';
 
 // Mock Redis for testing

@@ -8,7 +8,7 @@ const commentVotes = commentVote;
 import { eq, and, sql, desc } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
 import { cacheKeys } from '../../../shared/core/src/caching/key-generator';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 import { CACHE_TTL_SHORT } from '../../../shared/core/src/primitives/constants/time.js';
 
 export interface VoteResult {

@@ -15,14 +15,14 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import PageErrorBoundary from '../PageErrorBoundary';
+import PageErrorBoundary from '../EnhancedErrorBoundary';
 import { 
   ChunkErrorFallback, 
   NetworkErrorFallback, 
   CriticalErrorFallback,
   ApiErrorFallback 
 } from '../ErrorFallback';
-import { withErrorBoundary, CriticalSection } from '../withErrorBoundary';
+// Removed withErrorBoundary import as it's been deleted
 import { logger } from '../../../utils/browser-logger';
 
 // Mock components for testing
@@ -256,27 +256,28 @@ describe('Enhanced PageErrorBoundary', () => {
     });
   });
 
-  describe('withErrorBoundary HOC', () => {
-    it('should wrap components with enhanced error boundary', () => {
-      const WrappedComponent = withErrorBoundary(ThrowingComponent, {
-        context: 'component',
-        enableRecovery: true,
-        smartFallback: true,
-      });
-
-      render(<WrappedComponent shouldThrow={true} />);
+  describe('Component wrapping patterns', () => {
+    it('should work with direct component wrapping', () => {
+      render(
+        <EnhancedErrorBoundary 
+          context="component"
+          enableRecovery={true}
+        >
+          <ThrowingComponent shouldThrow={true} />
+        </EnhancedErrorBoundary>
+      );
 
       expect(screen.getByText(/component error|something went wrong/i)).toBeInTheDocument();
     });
 
-    it('should use smart fallback selection', () => {
-      const WrappedComponent = withErrorBoundary(ChunkErrorComponent, {
-        smartFallback: true,
-      });
+    it('should handle chunk loading errors appropriately', () => {
+      render(
+        <EnhancedErrorBoundary fallback={ChunkErrorFallback}>
+          <ChunkErrorComponent shouldThrow={true} />
+        </EnhancedErrorBoundary>
+      );
 
-      render(<WrappedComponent shouldThrow={true} />);
-
-      // Should automatically use appropriate fallback for chunk errors
+      // Should use chunk error fallback for chunk errors
       expect(screen.getByText(/loading error|failed to load/i)).toBeInTheDocument();
     });
   });
