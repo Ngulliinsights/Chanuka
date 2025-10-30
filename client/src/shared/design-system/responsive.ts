@@ -7,6 +7,8 @@
  * Requirements: 9.1, 9.5
  */
 
+import React from 'react';
+
 // Breakpoint definitions following mobile-first approach
 export const breakpoints = {
   // Mobile devices (default, no prefix needed)
@@ -389,7 +391,4 @@ export const useResponsive = () => {
 // Type definitions
 export type Breakpoint = keyof typeof breakpoints;
 export type ResponsiveValue<T> = Partial<Record<Breakpoint, T>>;
-
-// React import for the hook
-import React from 'react';
 

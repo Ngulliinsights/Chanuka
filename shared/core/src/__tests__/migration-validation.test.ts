@@ -108,17 +108,23 @@ describe('Migration Validation', () => {
 
     it('should successfully import legacy adapters', () => {
       const importResults = validationReport.categories.imports;
-      const legacyAdapterImports = importResults.filter(r => 
+      const legacyAdapterImports = importResults.filter(r =>
         r.test.includes('Legacy') && r.test.includes('Adapter')
       );
-      
-      expect(legacyAdapterImports.length).toBeGreaterThan(0);
-      
-      legacyAdapterImports.forEach(result => {
-        if (!result.success) {
-          console.warn(`Legacy adapter import failed: ${result.test} - ${result.message}`);
-        }
-      });
+
+      // Legacy adapters have been removed, so this test should now verify they are gone
+      expect(legacyAdapterImports.length).toBe(0);
+
+      // Verify that attempts to import legacy adapters fail as expected
+      try {
+        await import('../caching/legacy-adapters/cache-service-adapter');
+        fail('Legacy cache adapter should not be importable');
+      } catch (error) {
+        expect(error.message).toContain('Cannot find module');
+      }
+    }).catch(() => {
+      // Async test wrapper for the await import
+    });
     });
 
     it('should have updated application import patterns', () => {

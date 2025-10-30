@@ -2,9 +2,11 @@ import React, { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
-import { LoadingProvider } from '../contexts/LoadingContext';
-import { NavigationProvider } from '../contexts/NavigationContext';
-import { ResponsiveNavigationProvider } from '../contexts/ResponsiveNavigationContext';
+import { LoadingProvider } from '../core/loading/context';
+import { createNavigationProvider } from '../core/navigation/context';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/use-auth';
+import { useMediaQuery } from '../hooks/use-mobile';
 import { AuthProvider } from '../hooks/use-auth';
 import { AccessibilityProvider } from '../components/accessibility/accessibility-manager';
 import { OfflineProvider } from '../components/offline/offline-manager';
@@ -124,6 +126,14 @@ const TestProviders: React.FC<TestProvidersProps> = ({ children, options = {} })
     loadingState,
   } = options;
 
+  // Create NavigationProvider with mocked hooks
+  const NavigationProvider = createNavigationProvider(
+    () => ({ pathname: route }),
+    () => vi.fn(),
+    () => authState || createMockAuthState(),
+    () => false // Mock useMediaQuery to return false (desktop)
+  );
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -132,9 +142,7 @@ const TestProviders: React.FC<TestProvidersProps> = ({ children, options = {} })
             <LoadingProvider>
               <AuthProvider>
                 <NavigationProvider>
-                  <ResponsiveNavigationProvider>
-                    {children}
-                  </ResponsiveNavigationProvider>
+                  {children}
                 </NavigationProvider>
               </AuthProvider>
             </LoadingProvider>

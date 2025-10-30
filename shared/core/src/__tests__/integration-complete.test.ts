@@ -283,19 +283,13 @@ describe('Core Utilities Integration Tests', () => {
     });
 
     it('should handle legacy adapter compatibility', async () => {
-      // Test that legacy adapters work if they exist
+      // Legacy adapters have been removed - this test now verifies clean removal
       try {
-        const { LegacyCacheAdapter } = await import('../utils/migration');
-        const legacyCache = new LegacyCacheAdapter(cache);
-        
-        const result = await legacyCache.set('legacy-test', 'value', { ttl: 60 });
-        expect(result).toBe(true);
-        
-        const value = await legacyCache.get('legacy-test');
-        expect(value).toBe('value');
+        await import('../caching/legacy-adapters/cache-service-adapter');
+        fail('Legacy adapters should not be importable');
       } catch (error) {
-        // Legacy adapters might not be fully implemented, that's ok
-        console.warn('Legacy adapter test skipped:', error);
+        // Expected - legacy adapters have been removed
+        expect(error.message).toContain('Cannot find module');
       }
     });
   });

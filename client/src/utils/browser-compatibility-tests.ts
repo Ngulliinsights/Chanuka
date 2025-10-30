@@ -43,19 +43,19 @@ export class BrowserCompatibilityTester {
 
     // Core JavaScript features
     testResults.push(...await this.testCoreJavaScriptFeatures());
-    
+
     // DOM API features
     testResults.push(...await this.testDOMFeatures());
-    
+
     // CSS features
     testResults.push(...await this.testCSSFeatures());
-    
+
     // Network and storage features
     testResults.push(...await this.testNetworkStorageFeatures());
-    
+
     // Modern web APIs
     testResults.push(...await this.testModernWebAPIs());
-    
+
     // Performance features
     testResults.push(...await this.testPerformanceFeatures());
 
@@ -170,11 +170,11 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'Modern Array Methods',
       () => {
-        return Array.prototype.find && 
-               Array.prototype.includes && 
-               Array.prototype.map && 
+        return !!(Array.prototype.find &&
+               Array.prototype.includes &&
+               Array.prototype.map &&
                Array.prototype.filter &&
-               Array.from;
+               Array.from);
       },
       'high',
       'Modern array methods are used extensively. Update your browser.'
@@ -184,10 +184,10 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'Modern Object Methods',
       () => {
-        return Object.assign && 
-               Object.keys && 
-               Object.values && 
-               Object.entries;
+        return !!(Object.assign &&
+               Object.keys &&
+               Object.values &&
+               Object.entries);
       },
       'high',
       'Modern object methods are required. Update your browser.'
@@ -206,9 +206,9 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'Query Selector APIs',
       () => {
-        return document.querySelector && 
+        return !!(document.querySelector &&
                document.querySelectorAll &&
-               Element.prototype.closest;
+               Element.prototype.closest);
       },
       'critical',
       'Query selector APIs are required for DOM manipulation. Update your browser.'
@@ -218,9 +218,9 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'Modern Event APIs',
       () => {
-        return Element.prototype.addEventListener && 
+        return !!(Element.prototype.addEventListener &&
                Element.prototype.removeEventListener &&
-               typeof CustomEvent === 'function';
+               typeof CustomEvent === 'function');
       },
       'critical',
       'Modern event APIs are essential. Update your browser.'
@@ -230,9 +230,9 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'DOM Manipulation APIs',
       () => {
-        return Element.prototype.remove && 
+        return !!(Element.prototype.remove &&
                Element.prototype.append &&
-               Element.prototype.prepend;
+               Element.prototype.prepend);
       },
       'medium',
       'Modern DOM manipulation methods improve performance. Consider updating.'
@@ -242,8 +242,8 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'Form Validation APIs',
       () => {
-        return HTMLFormElement.prototype.checkValidity &&
-               HTMLInputElement.prototype.setCustomValidity;
+        return !!(HTMLFormElement.prototype.checkValidity &&
+               HTMLInputElement.prototype.setCustomValidity);
       },
       'medium',
       'Form validation APIs enhance user experience. Consider updating.'
@@ -262,7 +262,7 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'CSS Grid Layout',
       () => {
-        return CSS.supports && CSS.supports('display', 'grid');
+        return !!(CSS.supports && CSS.supports('display', 'grid'));
       },
       'high',
       'CSS Grid is used for layout. Update your browser for better design support.'
@@ -272,7 +272,7 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'CSS Flexbox',
       () => {
-        return CSS.supports && CSS.supports('display', 'flex');
+        return !!(CSS.supports && CSS.supports('display', 'flex'));
       },
       'high',
       'CSS Flexbox is essential for responsive design. Update your browser.'
@@ -282,7 +282,7 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'CSS Custom Properties (Variables)',
       () => {
-        return CSS.supports && CSS.supports('--custom-property', 'value');
+        return !!(CSS.supports && CSS.supports('--custom-property', 'value'));
       },
       'medium',
       'CSS variables are used for theming. Consider updating for better styling.'
@@ -292,7 +292,7 @@ export class BrowserCompatibilityTester {
     tests.push(this.createTest(
       'CSS Transforms',
       () => {
-        return CSS.supports && CSS.supports('transform', 'translateX(10px)');
+        return !!(CSS.supports && CSS.supports('transform', 'translateX(10px)'));
       },
       'medium',
       'CSS transforms are used for animations. Consider updating.'
@@ -334,7 +334,7 @@ export class BrowserCompatibilityTester {
     // IndexedDB
     tests.push(this.createTest(
       'IndexedDB',
-      () => 'indexedDB' in window,
+      () => !!('indexedDB' in window),
       'low',
       'IndexedDB enables offline functionality. Consider updating for better features.'
     ));
@@ -408,7 +408,7 @@ export class BrowserCompatibilityTester {
     // Performance API
     tests.push(this.createTest(
       'Performance API',
-      () => 'performance' in window && 'now' in performance,
+      () => !!('performance' in window && 'now' in performance),
       'low',
       'Performance API enables better monitoring. Consider updating.'
     ));
@@ -416,7 +416,7 @@ export class BrowserCompatibilityTester {
     // RequestAnimationFrame
     tests.push(this.createTest(
       'RequestAnimationFrame',
-      () => 'requestAnimationFrame' in window,
+      () => !!('requestAnimationFrame' in window),
       'medium',
       'RequestAnimationFrame improves animation performance. Consider updating.'
     ));
@@ -424,7 +424,7 @@ export class BrowserCompatibilityTester {
     // Page Visibility API
     tests.push(this.createTest(
       'Page Visibility API',
-      () => 'visibilityState' in document,
+      () => !!('visibilityState' in document),
       'low',
       'Page Visibility API optimizes performance. Consider updating.'
     ));

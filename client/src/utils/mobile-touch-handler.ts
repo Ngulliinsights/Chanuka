@@ -313,7 +313,7 @@ export const MobileTouchUtils = {
    * Optimize scrolling performance on mobile
    */
   optimizeScrolling(element: HTMLElement): void {
-    element.style.webkitOverflowScrolling = 'touch';
+    (element.style as any).webkitOverflowScrolling = 'touch';
     element.style.overscrollBehavior = 'contain';
   },
 };

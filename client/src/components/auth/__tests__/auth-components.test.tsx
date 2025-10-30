@@ -25,7 +25,7 @@ import { AuthAlert } from '../ui/AuthAlert';
 import { PasswordStrengthIndicator } from '../ui/PasswordStrengthIndicator';
 
 import { AuthError, AuthValidationError } from '../errors';
-import { AuthInputProps, AuthButtonProps } from '@shared/types';
+// AuthInputProps and AuthButtonProps should be defined locally in auth components
 
 // Mock the auth hook
 vi.mock('@/hooks/use-auth', () => ({

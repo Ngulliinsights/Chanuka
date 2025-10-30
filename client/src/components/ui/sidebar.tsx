@@ -125,7 +125,7 @@ const SidebarProvider = forwardRef<
 
     return (
       <SidebarContext.Provider value={contextValue}>
-        <TooltipProvider delayDuration={0}>
+        <TooltipProvider>
           <div
             style={
               {
@@ -582,8 +582,9 @@ const SidebarMenuButton = forwardRef<
           side="right"
           align="center"
           hidden={state !== "collapsed" || isMobile}
-          {...tooltip}
-        />
+        >
+          {tooltip.children}
+        </TooltipContent>
       </Tooltip>
     )
   }

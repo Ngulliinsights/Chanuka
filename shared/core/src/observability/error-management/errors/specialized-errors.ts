@@ -5,7 +5,7 @@
  * providing a comprehensive set of domain-specific error types.
  */
 
-import { BaseError, ErrorDomain, ErrorSeverity, BaseErrorOptions } from './base-error.js';
+import { BaseError, ErrorDomain, ErrorSeverity, BaseErrorOptions } from './base-error';
 
 /**
  * Validation Error - for input validation failures

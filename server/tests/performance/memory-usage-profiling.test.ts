@@ -8,13 +8,13 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 describe('Memory Usage Profiling for Caching Layer', () => {
   const MEMORY_THRESHOLDS = {

@@ -1,6 +1,6 @@
 // Import the NEW repository for data access
 import { sponsorRepository, SponsorRepository } from '../infrastructure/repositories/sponsor.repository'; // Adjusted path
-import { logger } from '@shared/core';
+import { logger  } from '../../../../shared/core/src/index.js';
 const loggerAny = logger as any;
 import type { Sponsor, SponsorAffiliation, SponsorTransparency, Bill } from '../../../../shared/schema'; // Adjusted path
 // Local helper types used by this service but not exported elsewhere in repo

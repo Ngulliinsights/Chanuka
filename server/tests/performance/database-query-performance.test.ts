@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -16,7 +16,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
 import { database as db, bill as bills, billEngagement, billComment as billComments, sponsor as sponsors } from '@shared/database/connection.js';
 import { eq, sql, desc } from 'drizzle-orm';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 describe('Database Query Performance Tests', () => {
   // Performance thresholds remain conservative but realistic

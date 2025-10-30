@@ -93,12 +93,11 @@ export const AuthInput: React.FC<AuthInputProps> = ({
 };
 
 // Specialized input components
-export const EmailInput: React.FC<Omit<AuthInputProps, 'name' | 'type' | 'icon'>> = (props) => (
+export const EmailInput: React.FC<Omit<AuthInputProps, 'name' | 'type'> & { icon?: React.ComponentType<{ className?: string }> }> = (props) => (
   <AuthInput
     {...props}
     name="email"
     type="email"
-    icon={props.icon}
   />
 );
 

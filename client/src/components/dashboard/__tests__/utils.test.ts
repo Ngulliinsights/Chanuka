@@ -21,7 +21,8 @@ import {
   importDashboardConfig
 } from '@/utils/dashboard-config-utils';
 import { dashboardConstants } from '@/utils/dashboard-constants';
-import type { ActivitySummary, ActionItem, TrackedTopic, DashboardConfig } from '@shared/types';
+// Import dashboard types from appropriate local modules
+// These types should be defined in the dashboard component directory
 
 describe('Dashboard Utilities', () => {
   describe('Dashboard Formatters', () => {

@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -16,7 +16,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach, jest } from '@jest/globals';
 import { database as db, withTransaction, bill as bills, user as users, billComment as billComments, billEngagement, sponsor as sponsors, billSponsorship as billSponsorships } from '@shared/database/connection.js';
 import { eq, and } from 'drizzle-orm';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 describe('Database Transaction Integrity Tests', () => {
   let testUserId: string;

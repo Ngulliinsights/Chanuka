@@ -13,12 +13,13 @@ export { default as TouchTarget } from './TouchTarget';
 export { default as ResponsiveButton } from './ResponsiveButton';
 export { default as ResponsiveInput } from './ResponsiveInput';
 
-export type { default as ResponsiveContainerProps } from './ResponsiveContainer';
-export type { default as ResponsiveGridProps } from './ResponsiveGrid';
-export type { default as ResponsiveStackProps } from './ResponsiveStack';
-export type { default as TouchTargetProps } from './TouchTarget';
-export type { default as ResponsiveButtonProps } from './ResponsiveButton';
-export type { default as ResponsiveInputProps } from './ResponsiveInput';
+// Export component prop types
+export type { ResponsiveContainerProps } from './ResponsiveContainer';
+export type { ResponsiveGridProps } from './ResponsiveGrid';
+export type { ResponsiveStackProps } from './ResponsiveStack';
+export type { TouchTargetProps } from './TouchTarget';
+export type { ResponsiveButtonProps } from './ResponsiveButton';
+export type { ResponsiveInputProps } from './ResponsiveInput';
 
 // Utility functions
 export { buttonUtils } from './button';

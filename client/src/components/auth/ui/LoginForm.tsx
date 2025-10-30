@@ -125,7 +125,9 @@ export const LoginForm: React.FC<LoginFormProps> = ({
         loading={currentLoading}
         disabled={currentLoading}
         data-testid="login-submit-button"
-      />
+      >
+        Sign In
+      </SubmitButton>
     </form>
   );
 };

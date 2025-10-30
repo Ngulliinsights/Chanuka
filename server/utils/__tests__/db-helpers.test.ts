@@ -8,13 +8,13 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
 
 import { buildTimeThreshold, normalizeRowNumbers, groupByTime } from '../db-helpers';
-import { logger } from '@shared/core/src/observability/logging';
+import { logger  } from '../../../shared/core/src/observability/logging';
 
 describe('Database Helpers', () => {
   describe('buildTimeThreshold', () => {

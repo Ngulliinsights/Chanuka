@@ -14,7 +14,8 @@ import AuthenticatedAPI, { APIResponse } from '../utils/authenticated-api';
 import { logger } from '@shared/core';
 
 export interface SafeQueryOptions<T> extends Omit<UseQueryOptions<T>, 'queryFn'> {
-  endpoint: string;
+  endpoint?: string;
+  queryFn?: () => Promise<T>;
   requireAuth?: boolean;
   timeout?: number;
   retries?: number;
@@ -23,20 +24,6 @@ export interface SafeQueryOptions<T> extends Omit<UseQueryOptions<T>, 'queryFn'>
   onSuccess?: (data: T) => void;
 }
 
-/**
- * Enhanced useQuery hook with built-in race condition prevention.
- * 
- * Race conditions occur when multiple requests are in flight and responses arrive
- * out of order. This hook prevents that by canceling previous requests when a new
- * one starts, ensuring only the most recent request's response is used.
- * 
- * Example usage:
- * const { data, isLoading, error, refetchSafely } = useSafeQuery({
- *   queryKey: ['user', userId],
- *   endpoint: `/api/users/${userId}`,
- *   requireAuth: true
- * });
- */
 export function useSafeQuery<T = any>(
   options: SafeQueryOptions<T>
 ): UseQueryResult<T> & {
@@ -98,7 +85,7 @@ export function useSafeQuery<T = any>(
       // Step 4: Make the actual API request based on auth requirements
       if (requireAuth) {
         // Use authenticated API with built-in retry logic
-        result = await AuthenticatedAPI.get<T>(endpoint, {
+        result = await AuthenticatedAPI.get<T>(endpoint!, {
           signal: controller.signal,
           timeout,
           retries,
@@ -107,9 +94,9 @@ export function useSafeQuery<T = any>(
       } else {
         // Use standard fetch for public endpoints with timeout handling
         const timeoutId = setTimeout(() => controller.abort(), timeout);
-        
+
         try {
-          const response = await fetch(endpoint, {
+          const response = await fetch(endpoint!, {
             signal: controller.signal,
             headers: {
               'Content-Type': 'application/json'
@@ -215,6 +202,7 @@ export function useSafeQuery<T = any>(
     isRefetching: isRefetchingRef.current
   };
 }
+
 
 /**
  * Specialized hook for admin-specific queries with enhanced security and longer timeouts.

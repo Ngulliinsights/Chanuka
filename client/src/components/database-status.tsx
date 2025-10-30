@@ -183,7 +183,7 @@ export default function DatabaseStatus({ health, stats, schemaCheck, isLoading }
               ))
             )}
 
-            {schemaCheck?.totalIssues > 0 && (
+            {(schemaCheck?.totalIssues ?? 0) > 0 && (
               <div className="pt-6 border-t border-gray-200">
                 <Button className="w-full" size="lg">
                   <Wand2 className="h-4 w-4 mr-2" />

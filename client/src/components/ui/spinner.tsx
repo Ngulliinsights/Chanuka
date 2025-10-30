@@ -27,3 +27,6 @@ export const LoadingSpinner = ({
   );
 };
 
+// Export as Spinner for backward compatibility
+export const Spinner = LoadingSpinner;
+

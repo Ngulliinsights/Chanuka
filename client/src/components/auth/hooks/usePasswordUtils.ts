@@ -87,24 +87,24 @@ export function usePasswordValidation(password: string, confirmPassword?: string
       return { isValid: false, errors: ['Password is required'] };
     }
 
-    const minLength = config?.security?.passwordMinLength || 8;
+    const minLength = config?.password?.minLength || 8;
     if (password.length < minLength) {
       errors.push(`Password must be at least ${minLength} characters`);
     }
 
-    if (config?.security?.requireUppercase && !/[A-Z]/.test(password)) {
+    if (config?.password?.requireUppercase && !/[A-Z]/.test(password)) {
       errors.push('Password must contain at least one uppercase letter');
     }
 
-    if (config?.security?.requireLowercase && !/[a-z]/.test(password)) {
+    if (config?.password?.requireLowercase && !/[a-z]/.test(password)) {
       errors.push('Password must contain at least one lowercase letter');
     }
 
-    if (config?.security?.requireNumbers && !/\d/.test(password)) {
+    if (config?.password?.requireNumbers && !/\d/.test(password)) {
       errors.push('Password must contain at least one number');
     }
 
-    if (config?.security?.requireSpecialChars && !/[@$!%*?&]/.test(password)) {
+    if (config?.password?.requireSpecialChars && !/[@$!%*?&]/.test(password)) {
       errors.push('Password must contain at least one special character');
     }
 

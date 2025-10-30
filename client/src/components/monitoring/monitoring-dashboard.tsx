@@ -278,7 +278,7 @@ export function MonitoringDashboard() {
                 <div>
                   <div className="font-medium capitalize">{key}</div>
                   <div className="text-sm text-muted-foreground">{check.message}</div>
-                  {check.responseTime && (
+                  {'responseTime' in check && check.responseTime && (
                     <div className="text-xs text-muted-foreground">
                       {check.responseTime.toFixed(0)}ms
                     </div>

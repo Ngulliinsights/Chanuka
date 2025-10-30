@@ -386,8 +386,8 @@ export function SafeAreaWrapper({
   edges = ['top', 'right', 'bottom', 'left']
 }: SafeAreaWrapperProps) {
   const safeAreaClasses = useMemo(() => {
-    const classes = [];
-    
+    const classes: string[] = [];
+
     if (edges.includes('top')) {
       classes.push('pt-[max(12px,env(safe-area-inset-top))]');
     }
@@ -400,7 +400,7 @@ export function SafeAreaWrapper({
     if (edges.includes('left')) {
       classes.push('pl-[max(16px,env(safe-area-inset-left))]');
     }
-    
+
     return classes.join(' ');
   }, [edges]);
 

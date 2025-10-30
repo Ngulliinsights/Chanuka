@@ -1,5 +1,13 @@
 import { Request } from 'express';
 import { logger } from '../../../shared/core/index.js';
+import {
+  ErrorTrackingIntegrationManager,
+  createConsoleIntegration,
+  BaseErrorTrackingIntegration,
+  IntegrationConfig
+} from '../../../shared/core/src/observability/error-management/integrations/error-tracking-integration.js';
+import { BaseError } from '../../../shared/core/src/observability/error-management/errors/base-error.js';
+import { ErrorContext as SharedErrorContext } from '../../../shared/core/src/observability/error-management/types.js';
 
 export interface ErrorContext {
   traceId?: string;
@@ -60,13 +68,30 @@ export interface AlertRule {
     category?: Array<'database' | 'authentication' | 'validation' | 'external_api' | 'system' | 'business_logic'>;
   };
   actions: Array<{
-    type: 'email' | 'webhook' | 'log';
+    type: 'email' | 'webhook' | 'log' | 'external_integration';
     target: string;
     template?: string;
+    integrationName?: string; // For external integrations
   }>;
   enabled: boolean;
   cooldown: number; // Minutes between alerts for same condition
   lastTriggered?: Date;
+}
+
+export interface IntegrationFilter {
+  severity?: Array<'low' | 'medium' | 'high' | 'critical'>;
+  category?: Array<'database' | 'authentication' | 'validation' | 'external_api' | 'system' | 'business_logic'>;
+  minOccurrences?: number;
+  enabled: boolean;
+}
+
+export interface IntegrationStatus {
+  name: string;
+  enabled: boolean;
+  initialized: boolean;
+  lastError?: string;
+  errorCount: number;
+  lastActivity?: Date;
 }
 
 class ErrorTracker {
@@ -79,7 +104,22 @@ class ErrorTracker {
   private cleanupInterval?: NodeJS.Timeout;
   private alertCheckInterval?: NodeJS.Timeout;
 
+  // Integration management
+  private integrationManager: ErrorTrackingIntegrationManager;
+  private integrationFilters: Map<string, IntegrationFilter> = new Map();
+  private integrationStatuses: Map<string, IntegrationStatus> = new Map();
+
   constructor() {
+    // Initialize integration manager
+    this.integrationManager = new ErrorTrackingIntegrationManager();
+
+    // Register console integration by default
+    const consoleIntegration = createConsoleIntegration();
+    this.registerIntegration(consoleIntegration, {
+      severity: ['critical', 'high'],
+      enabled: true
+    });
+
     // Initialize default alert rules
     this.initializeDefaultAlertRules();
 
@@ -95,9 +135,9 @@ class ErrorTracker {
   }
 
   /**
-   * Shutdown method to clean up timers
+   * Shutdown method to clean up timers and integrations
    */
-  shutdown(): void {
+  async shutdown(): Promise<void> {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = undefined;
@@ -106,6 +146,9 @@ class ErrorTracker {
       clearInterval(this.alertCheckInterval);
       this.alertCheckInterval = undefined;
     }
+
+    // Shutdown all integrations
+    await this.integrationManager.shutdownAllIntegrations();
   }
 
   /**
@@ -170,6 +213,9 @@ class ErrorTracker {
 
     // Check if we need to send alerts
     this.checkPatternAlerts(pattern);
+
+    // Forward to external integrations if configured
+    this.forwardToIntegrations(errorMessage, severity, category, context, pattern.occurrences);
 
     // Prevent memory leaks
     if (this.errors.size > this.MAX_ERRORS) {
@@ -366,6 +412,111 @@ class ErrorTracker {
   }
 
   /**
+   * Register external integration
+   */
+  registerIntegration(
+    integration: any,
+    filter: IntegrationFilter,
+    config?: IntegrationConfig
+  ): void {
+    this.integrationManager.registerIntegration(integration);
+    this.integrationFilters.set(integration.name, filter);
+
+    // Initialize status
+    this.integrationStatuses.set(integration.name, {
+      name: integration.name,
+      enabled: filter.enabled,
+      initialized: false,
+      errorCount: 0
+    });
+
+    // Initialize if enabled
+    if (filter.enabled && config) {
+      this.initializeIntegration(integration.name, config).catch(error => {
+        logger.error(`Failed to initialize integration ${integration.name}`, {
+          component: 'ErrorTracker',
+          integration: integration.name,
+          error
+        });
+      });
+    }
+  }
+
+  /**
+   * Unregister external integration
+   */
+  async unregisterIntegration(name: string): Promise<void> {
+    const integration = this.integrationManager.getIntegration(name);
+    if (integration) {
+      await integration.shutdown();
+    }
+
+    this.integrationManager.unregisterIntegration(name);
+    this.integrationFilters.delete(name);
+    this.integrationStatuses.delete(name);
+  }
+
+  /**
+   * Initialize integration
+   */
+  private async initializeIntegration(name: string, config: IntegrationConfig): Promise<void> {
+    const integration = this.integrationManager.getIntegration(name);
+    if (!integration) return;
+
+    try {
+      await integration.initialize(config);
+      const status = this.integrationStatuses.get(name);
+      if (status) {
+        status.initialized = true;
+        status.lastActivity = new Date();
+      }
+    } catch (error) {
+      const status = this.integrationStatuses.get(name);
+      if (status) {
+        status.lastError = error instanceof Error ? error.message : String(error);
+        status.errorCount++;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Update integration filter
+   */
+  updateIntegrationFilter(name: string, filter: Partial<IntegrationFilter>): boolean {
+    const existingFilter = this.integrationFilters.get(name);
+    if (!existingFilter) return false;
+
+    Object.assign(existingFilter, filter);
+    return true;
+  }
+
+  /**
+   * Get integration status
+   */
+  getIntegrationStatus(name: string): IntegrationStatus | null {
+    return this.integrationStatuses.get(name) || null;
+  }
+
+  /**
+   * Get all integration statuses
+   */
+  getAllIntegrationStatuses(): IntegrationStatus[] {
+    return Array.from(this.integrationStatuses.values());
+  }
+
+  /**
+   * Enable/disable integration
+   */
+  setIntegrationEnabled(name: string, enabled: boolean): boolean {
+    const status = this.integrationStatuses.get(name);
+    if (!status) return false;
+
+    status.enabled = enabled;
+    return true;
+  }
+
+  /**
    * Generate error fingerprint for grouping
    */
   private generateFingerprint(message: string, stack?: string, category?: string): string {
@@ -558,7 +709,7 @@ class ErrorTracker {
   /**
    * Trigger alert
    */
-  private triggerAlert(rule: AlertRule, stats: any): void {
+  private async triggerAlert(rule: AlertRule, stats: any): Promise<void> {
     console.warn(`[ErrorTracker] ALERT TRIGGERED: ${rule.name}`, {
       rule: rule.name,
       condition: rule.condition,
@@ -571,14 +722,84 @@ class ErrorTracker {
     });
 
     // Execute alert actions
-    rule.actions.forEach(action => {
+    for (const action of rule.actions) {
       switch (action.type) {
         case 'log':
           console.error(`[ALERT] ${rule.name}: Alert condition met`);
           break;
+        case 'external_integration':
+          if (action.integrationName) {
+            await this.forwardAlertToIntegration(action.integrationName, rule, stats);
+          }
+          break;
         // Add other action types (email, webhook) here
       }
-    });
+    }
+  }
+
+  /**
+   * Forward alert to external integration
+   */
+  private async forwardAlertToIntegration(
+    integrationName: string,
+    rule: AlertRule,
+    stats: any
+  ): Promise<void> {
+    const integration = this.integrationManager.getIntegration(integrationName);
+    if (!integration) {
+      logger.warn(`Integration ${integrationName} not found for alert forwarding`, {
+        component: 'ErrorTracker',
+        integration: integrationName,
+        rule: rule.name
+      });
+      return;
+    }
+
+    try {
+      // Create alert error for integration
+      const alertMessage = `Alert triggered: ${rule.name} - ${JSON.stringify(stats)}`;
+      const baseError = new BaseError(alertMessage, {
+        domain: 'alert' as any,
+        severity: 'high' as any,
+        source: 'error-tracker',
+        correlationId: `alert_${Date.now()}`,
+        context: {
+          ruleName: rule.name,
+          condition: rule.condition,
+          stats,
+          alertType: 'threshold'
+        }
+      });
+
+      const context: SharedErrorContext = {
+        correlationId: `alert_${Date.now()}`,
+        metadata: {
+          ruleName: rule.name,
+          alertType: 'threshold'
+        }
+      };
+
+      await integration.trackError(baseError, context);
+
+      // Update status
+      const status = this.integrationStatuses.get(integrationName);
+      if (status) {
+        status.lastActivity = new Date();
+      }
+    } catch (error) {
+      const status = this.integrationStatuses.get(integrationName);
+      if (status) {
+        status.lastError = error instanceof Error ? error.message : String(error);
+        status.errorCount++;
+      }
+
+      logger.error(`Failed to forward alert to integration ${integrationName}`, {
+        component: 'ErrorTracker',
+        integration: integrationName,
+        rule: rule.name,
+        error
+      });
+    }
   }
 
   /**
@@ -615,6 +836,175 @@ class ErrorTracker {
     });
 
     return sanitized;
+  }
+
+  /**
+   * Forward error to external integrations based on filters
+   */
+  private async forwardToIntegrations(
+    message: string,
+    severity: string,
+    category: string,
+    context: ErrorContext,
+    occurrences: number
+  ): Promise<void> {
+    for (const [integrationName, filter] of Array.from(this.integrationFilters.entries())) {
+      if (!filter.enabled) continue;
+
+      // Check severity filter
+      if (filter.severity && !filter.severity.includes(severity as any)) continue;
+
+      // Check category filter
+      if (filter.category && !filter.category.includes(category as any)) continue;
+
+      // Check minimum occurrences
+      if (filter.minOccurrences && occurrences < filter.minOccurrences) continue;
+
+      // Forward to integration
+      const integration = this.integrationManager.getIntegration(integrationName);
+      if (integration) {
+        try {
+          // Convert to BaseError for integration
+          const baseError = new BaseError(message, {
+            domain: 'system' as any,
+            severity: severity as any,
+            source: category,
+            correlationId: context.traceId,
+            context: {
+              ...context,
+              occurrences,
+              integrationName
+            }
+          });
+
+          const sharedContext: SharedErrorContext = {
+            correlationId: context.traceId,
+            userId: context.userId,
+            metadata: {
+              sessionId: context.traceId,
+              ...context
+            }
+          };
+
+          await integration.trackError(baseError, sharedContext);
+
+          // Update status
+          const status = this.integrationStatuses.get(integrationName);
+          if (status) {
+            status.lastActivity = new Date();
+          }
+        } catch (error) {
+          const status = this.integrationStatuses.get(integrationName);
+          if (status) {
+            status.lastError = error instanceof Error ? error.message : String(error);
+            status.errorCount++;
+          }
+
+          logger.error(`Failed to forward error to integration ${integrationName}`, {
+            component: 'ErrorTracker',
+            integration: integrationName,
+            error
+          });
+        }
+      }
+    }
+  }
+
+  /**
+   * Get combined analytics from internal tracking and external integrations
+   */
+  async getCombinedAnalytics(timeWindow: number = 60): Promise<{
+    internal: any;
+    external: Array<{ integration: string; analytics: any }>;
+    combined: {
+      totalErrors: number;
+      errorRate: number;
+      topIssues: Array<{ source: string; message: string; count: number }>;
+      trends: any;
+    };
+  }> {
+    // Get internal analytics
+    const internalStats = this.getErrorStats(timeWindow);
+
+    // Get external analytics
+    const externalAnalytics: Array<{ integration: string; analytics: any }> = [];
+    for (const integrationName of this.integrationManager.getAllIntegrations().map(i => i.name)) {
+      const integration = this.integrationManager.getIntegration(integrationName);
+      if (integration) {
+        try {
+          const analytics = await integration.getAnalytics();
+          externalAnalytics.push({
+            integration: integrationName,
+            analytics
+          });
+        } catch (error) {
+          logger.warn(`Failed to get analytics from integration ${integrationName}`, {
+            component: 'ErrorTracker',
+            integration: integrationName,
+            error
+          });
+        }
+      }
+    }
+
+    // Combine analytics
+    const combined = this.combineAnalytics(internalStats, externalAnalytics);
+
+    return {
+      internal: internalStats,
+      external: externalAnalytics,
+      combined
+    };
+  }
+
+  /**
+   * Combine internal and external analytics
+   */
+  private combineAnalytics(
+    internal: any,
+    external: Array<{ integration: string; analytics: any }>
+  ): any {
+    // Aggregate total errors
+    let totalErrors = internal.totalErrors;
+    const topIssues: Array<{ source: string; message: string; count: number }> = [];
+
+    // Add internal top patterns
+    internal.topPatterns.forEach((pattern: any) => {
+      topIssues.push({
+        source: 'internal',
+        message: pattern.message,
+        count: pattern.count
+      });
+    });
+
+    // Add external analytics
+    external.forEach(({ integration, analytics }) => {
+      if (analytics.totalErrors) {
+        totalErrors += analytics.totalErrors;
+      }
+
+      // Add external top issues if available
+      if (analytics.topIssues) {
+        analytics.topIssues.forEach((issue: any) => {
+          topIssues.push({
+            source: integration,
+            message: issue.error || issue.title || 'Unknown',
+            count: issue.count || issue.occurrences || 1
+          });
+        });
+      }
+    });
+
+    // Sort and limit top issues
+    topIssues.sort((a, b) => b.count - a.count);
+    topIssues.splice(10); // Keep top 10
+
+    return {
+      totalErrors,
+      errorRate: internal.errorRate, // Use internal rate as primary
+      topIssues,
+      trends: internal.recentTrends // Use internal trends as primary
+    };
   }
 
   /**

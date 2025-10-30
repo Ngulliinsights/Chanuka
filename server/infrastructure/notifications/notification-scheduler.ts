@@ -433,12 +433,12 @@ export class NotificationSchedulerService {
     const allUsers = await db.select({ id: user.id, preferences: user.preferences }).from(user);
     
     return allUsers
-      .map(user => ({
-        userId: user.id,
-        preferences: user.preferences || {}
+      .map(userData => ({
+        userId: userData.id,
+        preferences: userData.preferences || {}
       }))
-      .filter(user => {
-        const prefs = user.preferences as any;
+      .filter(userData => {
+        const prefs = userData.preferences as any;
         return prefs?.billTracking?.advancedSettings?.digestSchedule?.enabled === true;
       });
   }

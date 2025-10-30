@@ -3,8 +3,8 @@
  * Platform-agnostic types for cross-cutting navigation concerns
  */
 
-export type NavigationSection = 'legislative' | 'community' | 'admin' | 'user' | 'system';
-export type UserRole = 'public' | 'user' | 'expert' | 'admin';
+export type NavigationSection = 'legislative' | 'community' | 'tools' | 'user' | 'admin';
+export type UserRole = 'public' | 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate';
 
 export interface BreadcrumbItem {
   label: string;
@@ -13,10 +13,15 @@ export interface BreadcrumbItem {
 }
 
 export interface RelatedPage {
+  pageId: string;
   title: string;
   path: string;
-  description?: string;
-  category?: string;
+  description: string;
+  category: NavigationSection;
+  type?: 'parent' | 'child' | 'sibling' | 'related';
+  weight: number;
+  context?: string;
+  relevanceScore: number;
 }
 
 export interface RecentPage {

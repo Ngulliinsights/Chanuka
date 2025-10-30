@@ -101,7 +101,7 @@ export const responsiveClasses = {
   
   // Responsive text sizes
   text: (sizes: { sm?: string; md?: string; lg?: string; xl?: string }) => {
-    const classes = [];
+    const classes: string[] = [];
     if (sizes.sm) classes.push(`text-${sizes.sm}`);
     if (sizes.md) classes.push(`md:text-${sizes.md}`);
     if (sizes.lg) classes.push(`lg:text-${sizes.lg}`);
@@ -111,7 +111,7 @@ export const responsiveClasses = {
   
   // Responsive spacing
   spacing: (property: 'p' | 'm', sizes: { sm?: string; md?: string; lg?: string }) => {
-    const classes = [];
+    const classes: string[] = [];
     if (sizes.sm) classes.push(`${property}-${sizes.sm}`);
     if (sizes.md) classes.push(`md:${property}-${sizes.md}`);
     if (sizes.lg) classes.push(`lg:${property}-${sizes.lg}`);

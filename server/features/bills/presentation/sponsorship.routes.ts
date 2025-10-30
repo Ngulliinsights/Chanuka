@@ -2,10 +2,10 @@ import express, { Router } from 'express';
 import { readDatabase } from '../../../infrastructure/database/index.ts';
 import { bills, billSponsorships, sponsors, sponsorTransparency, sponsorAffiliations, billSectionConflicts } from '../../../../shared/schema/index.ts';
 import { eq, desc, count, sql, and } from 'drizzle-orm';
-import { asyncHandler } from '../../../../shared/core/src/observability/error-management/middleware/express-error-middleware.js';
-import { SponsorshipAnalysisService } from '../application/sponsorship-analysis.service.ts';
-import { ApiSuccess, ApiError, ApiResponseWrapper } from '@shared/core/utils/api'-utils.js";
-import { logger } from '@shared/core';
+import { asyncHandler } from '../../../../shared/core/src/observability/error-management/middleware/express-error-middleware';
+import { SponsorshipAnalysisService } from '../application/sponsorship-analysis.service';
+import { ApiSuccess, ApiError, ApiResponseWrapper  } from '../../../../shared/core/src/utils/api-utils.js';
+import { logger  } from '../../../../shared/core/src/index.js';
 
 const router = Router();
 
@@ -82,6 +82,12 @@ setupSponsorshipRoutes(router);
 
 // Export both the router and setup function for flexibility
 export { router };
+
+
+
+
+
+
 
 
 

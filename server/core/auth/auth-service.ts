@@ -11,7 +11,7 @@ import { inputValidationService } from '../validation/input-validation-service.j
 import { securityAuditService } from '../../features/security/security-audit-service.js';
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 // Validation schemas
 export const registerSchema = z.object({

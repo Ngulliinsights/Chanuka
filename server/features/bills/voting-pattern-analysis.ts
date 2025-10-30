@@ -2,8 +2,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { VotingPatternAnalysisService } from './services/voting-pattern-analysis-service.js';
 import { authenticateToken } from '../../middleware/auth.js';
 import type { AuthenticatedRequest } from '../../middleware/auth.js';
-import { UnifiedApiResponse } from '@shared/core/utils/api'';
-import { logger } from '@shared/core';
+import { UnifiedApiResponse  } from '../../../shared/core/src/utils/api';
+import { logger  } from '../../../shared/core/src/index.js';
 import { securityAuditService } from '../security/security-audit-service.js';
 
 // Create singleton instance
@@ -243,3 +243,9 @@ router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 export { router };
+
+
+
+
+
+

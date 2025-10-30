@@ -16,7 +16,7 @@ import {
   calculateProgressPercentage,
   createProgress,
 } from '@/utils/loading-utils';
-import { LoadingOperation, LoadingStage } from '@shared/types';
+import { LoadingOperation, LoadingStage } from '@shared/core/src/types';
 import { LOADING_TIMEOUTS, RETRY_DELAYS } from '../constants';
 
 describe('Loading Utils', () => {

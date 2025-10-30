@@ -5,8 +5,8 @@ import {
 import { eq, and, inArray, desc, sql } from 'drizzle-orm';
 // Import the *combined* preference type, NOT the global one directly
 import type { CombinedBillTrackingPreferences } from './notification-orchestrator.js'; // Adjust path if needed
-import { logger } from '@shared/core';
-import { getDefaultCache } from '@shared/core/src/caching';
+import { logger  } from '../../../shared/core/src/index.js';
+import { getDefaultCache  } from '../../../shared/core/src/caching';
 
 // Cache key constants (moved from cache-service.ts)
 const CACHE_KEYS = {
@@ -77,8 +77,85 @@ export class SmartNotificationFilterService {
    * Main filtering method: Determines if a notification should proceed based on various checks.
    */
   async shouldSendNotification(criteria: FilterCriteria): Promise<FilterResult> {
+    return this.applySmartFilter(criteria);
+  }
+
+  /**
+   * Apply smart filter - alias for shouldSendNotification for backward compatibility
+   */
+  async applySmartFilter(criteria: FilterCriteria): Promise<FilterResult> {
+    return this.shouldSendNotification(criteria);
+  }
+
+  /**
+   * Get engagement profile for user
+   */
+  async getEngagementProfileForUser(userId: string): Promise<UserEngagementProfile> {
+    return this.getUserEngagementProfile(userId);
+  }
+
+  /**
+   * Apply smart filter - main filtering method
+   */
+  async shouldSendNotification(criteria: FilterCriteria): Promise<FilterResult> {
     const logContext = { component: 'SmartFilter', userId: criteria.userId, type: criteria.notificationType, billId: criteria.billId };
     logger.debug('Starting smart filtering', logContext);
+
+    try {
+      // Preferences are now passed directly in criteria
+      const preferences = criteria.userPreferences;
+      const smartFiltering = preferences.smartFiltering;
+
+      // 1. Basic Preference Checks (Type Enabled, Quiet Hours)
+      const typeCheck = this.checkNotificationTypeEnabled(criteria, preferences);
+      if (!typeCheck.shouldNotify) {
+        return { ...this.createDefaultResult(criteria), ...typeCheck, confidence: 1.0, shouldNotify: false };
+      }
+
+      const quietHoursCheck = this.checkQuietHours(preferences);
+      if (!quietHoursCheck.shouldNotify && criteria.priority !== 'urgent') { // Urgent bypasses quiet hours
+        return { ...this.createDefaultResult(criteria), ...quietHoursCheck, confidence: 1.0, shouldNotify: false };
+      }
+
+      // 2. If Smart Filtering is disabled, return basic positive result
+      if (!smartFiltering.enabled) {
+        logger.debug('Smart filtering disabled, allowing notification', logContext);
+        return {
+            shouldNotify: true, confidence: 1.0, reasons: ['Smart filtering disabled'],
+            suggestedPriority: criteria.priority,
+            // Use explicitly enabled channels from combined prefs
+            recommendedChannels: this.getEnabledChannels(preferences),
+            // Batch based purely on frequency preference
+            shouldBatch: preferences.alertFrequency !== 'immediate' && criteria.priority !== 'urgent'
+        };
+      }
+
+      // 3. Smart Filtering Checks (run concurrently)
+      // Get engagement profile (cached)
+      const engagementProfile = await this.getUserEngagementProfile(criteria.userId);
+
+      const filterChecks = await Promise.all([
+        this.checkPriorityThreshold(criteria, smartFiltering),
+        // Relevance checks become more important with smart filtering
+        this.checkCategoryRelevance(criteria, smartFiltering, engagementProfile),
+        this.checkKeywordRelevance(criteria, smartFiltering),
+        this.checkSponsorRelevance(criteria, smartFiltering, engagementProfile),
+        this.checkTagRelevance(criteria, smartFiltering, engagementProfile), // Added tag check
+        this.checkInterestBasedRelevance(criteria, smartFiltering) // Check against user's declared interests
+        // Removed checkEngagementHistory & checkTimingRelevance as they mainly influence *how* rather than *if*
+      ]);
+
+      // 4. Combine Results
+      return this.combineFilterResults(filterChecks, criteria, preferences, engagementProfile);
+
+    } catch (error) {
+      logger.error('Error during smart filtering:', logContext, error);
+      // Fail open: Allow notification but log error, use basic channels/priority
+      return {
+        shouldNotify: true, confidence: 0.3, reasons: ['Filtering error occurred - allowing notification'],
+        suggestedPriority: criteria.priority, recommendedChannels: this.getEnabledChannels(criteria.userPreferences), shouldBatch: false
+      };
+    }
 
     try {
       // Preferences are now passed directly in criteria

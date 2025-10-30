@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { useUnifiedLoading } from '../contexts/UnifiedLoadingContext';
+import { useLoading } from '../core/loading';
 import { logger } from '../utils/browser-logger';
 
 export interface RecoveryStrategy {
@@ -104,7 +104,7 @@ export function useErrorRecovery(
   removeStrategy: (strategyId: string) => void;
   resetRecovery: () => void;
 } {
-  const { state, retryOperation, getOperation } = useUnifiedLoading();
+  const { state, retryOperation, getOperation } = useLoading();
   const [recoveryState, setRecoveryState] = useState<RecoveryState>({
     isRecovering: false,
     currentStrategy: null,
@@ -295,7 +295,7 @@ export function useAutoRecovery(
   const { recover, recoveryState } = useErrorRecovery(operationId);
   const autoAttemptsRef = useRef(0);
 
-  const { getOperation } = useUnifiedLoading();
+  const { getOperation } = useLoading();
   const operation = getOperation(operationId);
 
   useEffect(() => {
@@ -334,7 +334,7 @@ export function useAutoRecovery(
  * Hook for predictive error recovery based on patterns
  */
 export function usePredictiveRecovery(operationId: string) {
-  const { state } = useUnifiedLoading();
+  const { state } = useLoading();
   const [predictions, setPredictions] = useState<Array<{
     type: string;
     probability: number;

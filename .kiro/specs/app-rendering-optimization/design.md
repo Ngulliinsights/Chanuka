@@ -236,7 +236,7 @@ const billDetailRelationships = {
 
 **2. Component Error Boundaries:**
 ```typescript
-class PageErrorBoundary extends Component<Props, State> {
+class EnhancedErrorBoundary extends Component<Props, State> {
   static getDerivedStateFromError(error: Error): State {
     return {
       hasError: true,

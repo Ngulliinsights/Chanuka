@@ -1,5 +1,5 @@
 import { unifiedAlertPreferenceService, AlertPreference, AlertType, Priority } from '../../domain/services/unified-alert-preference-service';
-import { logger } from '@shared/core';
+import { logger  } from '../../../../../shared/core/src/index.js';
 import { cacheService } from '../../../../infrastructure/cache';
 
 /**

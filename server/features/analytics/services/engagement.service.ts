@@ -1,17 +1,18 @@
+// cspell:words upvotes Upvotes downvotes Downvotes commenters Commenters
 import { Router } from 'express';
 import { databaseService } from '../../../infrastructure/database/database-service';
 import { database as db } from '../../../../shared/database/connection';
 // FIXED: Import plural table names and correct type references
-import { billComments, commentVotes, users, userProfiles, bills } from '@shared/schema';
+import { billComments, users, userProfiles, bills, commentVotes } from '@shared/schema';
 import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
 // FIXED: Import cacheKeys from the correct location
-import { cache, cacheKeys } from '@shared/core';
+import { cache, cacheKeys  } from '../../../../shared/core/src/index.js';
 import { buildTimeThreshold } from '../../../utils/db-helpers';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js';
-import { ApiSuccessResponse, ApiErrorResponse, ApiValidationErrorResponse } from '@shared/core';
-import { ApiResponseWrapper } from '@shared/core/utils/api'-utils.js';
-import { logger } from '@shared/core';
+import { ApiSuccessResponse, ApiErrorResponse, ApiValidationErrorResponse  } from '../../../../shared/core/src/index.js';
+import { ApiResponseWrapper  } from '../../../../shared/core/src/utils/api-utils.js';
+import { logger  } from '../../../../shared/core/src/index.js';
 import { errorTracker } from '../../../core/errors/error-tracker.js';
 import { z } from 'zod';
 import type {
@@ -652,3 +653,8 @@ router.get('/leaderboard', authenticateToken, async (req: AuthenticatedRequest, 
 });
 
 export default router;
+
+
+
+
+

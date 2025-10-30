@@ -42,8 +42,8 @@ export function determineNavigationSection(path: string): NavigationSection {
     return 'tools';
   }
   
-  // Default to legislative for unknown paths
-  return 'legislative';
+  // Default to tools for unknown paths
+  return 'tools';
 }
 
 /**
@@ -53,11 +53,12 @@ export function getSectionDisplayName(section: NavigationSection): string {
   const sectionNames: Record<NavigationSection, string> = {
     legislative: 'Legislative Data',
     community: 'Community',
+    tools: 'Tools',
     user: 'User Account',
     admin: 'Administration',
-    tools: 'Tools',
+    system: 'System',
   };
-  
+
   return sectionNames[section];
 }
 
@@ -68,11 +69,12 @@ export function getSectionDescription(section: NavigationSection): string {
   const sectionDescriptions: Record<NavigationSection, string> = {
     legislative: 'Browse bills, analysis, and sponsorship information',
     community: 'Community input, discussions, and expert verification',
+    tools: 'Search, discovery, and utility tools',
     user: 'Personal dashboard, profile, and account settings',
     admin: 'Administrative tools and system management',
-    tools: 'Search, discovery, and utility tools',
+    system: 'System utilities and configuration',
   };
-  
+
   return sectionDescriptions[section];
 }
 

@@ -44,6 +44,11 @@ export const colorTokens = {
     700: '#404040',
     800: '#262626',
     900: '#171717',
+    light: '#e5e5e5',
+    medium: '#d4d4d4',
+    dark: '#a3a3a3',
+    emphasis: '#737373',
+    subtle: '#f5f5f5',
   },
 
   // Semantic colors
@@ -103,6 +108,101 @@ export const colorTokens = {
     light: '#e5e5e5',
     medium: '#d4d4d4',
     dark: '#a3a3a3',
+    emphasis: '#737373',
+    subtle: '#f5f5f5',
+  },
+
+  // Surface colors
+  surface: {
+    primary: '#ffffff',
+    secondary: '#f8fafc',
+    elevated: '#ffffff',
+    background: {
+      light: '#ffffff',
+      dark: '#0f172a',
+    },
+    card: {
+      light: '#ffffff',
+      dark: '#1e293b',
+    },
+  },
+
+  // Interactive colors
+  interactive: {
+    primary: '#0ea5e9',
+    secondary: '#64748b',
+    hover: {
+      primary: '#0284c7',
+      light: '#f1f5f9',
+    },
+    pressed: '#0369a1',
+    focus: {
+      ring: '#0ea5e9',
+      background: '#eff6ff',
+    },
+    disabled: {
+      light: '#f5f5f5',
+      text: '#a3a3a3',
+    },
+  },
+
+  // Secondary colors (alias for compatibility)
+  secondary: {
+    50: '#f8fafc',
+    100: '#f1f5f9',
+    200: '#e2e8f0',
+    300: '#cbd5e1',
+    400: '#94a3b8',
+    500: '#64748b',
+    600: '#475569',
+    700: '#334155',
+    800: '#1e293b',
+    900: '#0f172a',
+  },
+
+  // Color combinations for complex components
+  colorCombinations: {
+    error: {
+      background: '#fef2f2',
+      foreground: '#dc2626',
+      border: '#fecaca',
+    },
+    warning: {
+      background: '#fffbeb',
+      foreground: '#d97706',
+      border: '#fed7aa',
+    },
+    success: {
+      background: '#f0fdf4',
+      foreground: '#16a34a',
+      border: '#bbf7d0',
+    },
+    status: {
+      error: {
+        background: '#fef2f2',
+        foreground: '#dc2626',
+        border: '#fecaca',
+        text: '#dc2626',
+      },
+      warning: {
+        background: '#fffbeb',
+        foreground: '#d97706',
+        border: '#fed7aa',
+        text: '#d97706',
+      },
+      success: {
+        background: '#f0fdf4',
+        foreground: '#16a34a',
+        border: '#bbf7d0',
+        text: '#16a34a',
+      },
+      info: {
+        background: '#eff6ff',
+        foreground: '#2563eb',
+        border: '#bfdbfe',
+        text: '#2563eb',
+      },
+    },
   },
 } as const;
 

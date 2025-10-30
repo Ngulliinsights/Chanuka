@@ -31,9 +31,9 @@ const migrationRules: MigrationRule[] = [
   },
   {
     from: "server/utils/api-response",
-    to: "@shared/core/utils/api-utils",
+    to: "@shared/core/src/utils/api-utils",
     pattern: /import\s*\{([^}]+)\}\s*from\s*['"]\.\.\/\.\.\/utils\/api-response['"];?/g,
-    replacement: "import {$1} from '@shared/core/utils/api'-utils';"
+    replacement: "import {$1} from '@shared/core/src/utils/api'-utils';"
   },
   {
     from: "server/utils/cache",

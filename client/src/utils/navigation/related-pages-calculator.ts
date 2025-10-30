@@ -1,4 +1,4 @@
-import { RelatedPage, UserRole, PageRelationship } from '../../types/navigation';
+import { RelatedPage, UserRole } from '../../core/navigation/types';
 import { logger } from '@shared/core';
 
 // Page relationship mapping
@@ -254,11 +254,14 @@ export function calculateRelatedPages(currentPath: string, userRole: UserRole): 
       }
       
       relatedPages.push({
+        pageId: path,
         title,
         path: actualPath,
         description,
-        relevanceScore: relation.weight,
         category: metadata.category,
+        type: relation.type,
+        weight: relation.weight,
+        relevanceScore: relation.weight,
       });
     }
   });

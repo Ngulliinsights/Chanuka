@@ -3,10 +3,10 @@ import { render, screen, act, waitFor } from '@testing-library/react';
 import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { NavigationProvider, useNavigation } from '../NavigationContext';
-import { useResponsiveNavigation } from '../ResponsiveNavigationContext';
-import { NavigationStatePersistence } from '@/$2/navigation/state-persistence';
-import { AuthProvider } from '@/$2/use-auth';
-import { logger } from '@/$2/browser-logger';
+import { useNavigation } from '../../core/navigation/context';
+import { NavigationStatePersistence } from '../../utils/navigation/state-persistence';
+// Note: AuthProvider moved to components/auth
+import { logger } from '@shared/core';
 
 // Mock the auth hook
 vi.mock('@/hooks/use-auth', () => ({

@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { logger } from '../../utils/browser-logger';
 
-interface ErrorRecoveryManagerProps {
+export interface ErrorRecoveryManagerProps {
   children: React.ReactNode;
 }
 

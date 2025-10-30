@@ -7,7 +7,7 @@ import { SearchSuggestionsService } from './SearchSuggestionsService';
 import { SearchAnalytics } from '../domain/SearchAnalytics';
 import { SearchValidator } from '../domain/SearchValidator';
 import { databaseService } from '../../../infrastructure/database/database-service';
-import { logger } from '@shared/core';
+import { logger  } from '../../../../shared/core/src/index.js';
 import type {
   SearchQuery,
   SearchResponseDto,

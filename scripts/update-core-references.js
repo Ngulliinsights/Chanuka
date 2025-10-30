@@ -25,17 +25,17 @@ class CoreReferencesUpdater {
       // Utilities consolidation - utilities/* -> utils/*
       {
         pattern: /from ['"]@shared\/core\/utilities\/api['"]/g,
-        replacement: "from '@shared/core/utils/api-utils'",
+        replacement: "from '@shared/core/src/utils/api-utils'",
         description: 'Update utilities/api to utils/api-utils'
       },
       {
         pattern: /from ['"]@shared\/core\/utilities\/cache['"]/g,
-        replacement: "from '@shared/core/utils/cache-utils'",
+        replacement: "from '@shared/core/src/utils/cache-utils'",
         description: 'Update utilities/cache to utils/cache-utils'
       },
       {
         pattern: /from ['"]@shared\/core\/utilities\/performance['"]/g,
-        replacement: "from '@shared/core/utils/performance-utils'",
+        replacement: "from '@shared/core/src/utils/performance-utils'",
         description: 'Update utilities/performance to utils/performance-utils'
       },
       {
@@ -110,17 +110,17 @@ class CoreReferencesUpdater {
       // Update require statements
       {
         pattern: /require\(['"]@shared\/core\/utilities\/api['"]\)/g,
-        replacement: "require('@shared/core/utils/api-utils')",
+        replacement: "require('@shared/core/src/utils/api-utils')",
         description: 'Update require utilities/api to utils/api-utils'
       },
       {
         pattern: /require\(['"]@shared\/core\/utilities\/cache['"]\)/g,
-        replacement: "require('@shared/core/utils/cache-utils')",
+        replacement: "require('@shared/core/src/utils/cache-utils')",
         description: 'Update require utilities/cache to utils/cache-utils'
       },
       {
         pattern: /require\(['"]@shared\/core\/utilities\/performance['"]\)/g,
-        replacement: "require('@shared/core/utils/performance-utils')",
+        replacement: "require('@shared/core/src/utils/performance-utils')",
         description: 'Update require utilities/performance to utils/performance-utils'
       }
     ];

@@ -22,7 +22,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    logger.error('Error boundary caught an error:', { component: 'Chanuka' }, error, errorInfo);
+    logger.error('Error boundary caught an error:', { component: 'Chanuka', error, errorInfo });
   }
 
   componentDidMount() {

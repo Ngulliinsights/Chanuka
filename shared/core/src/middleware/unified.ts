@@ -12,7 +12,7 @@ import { performance } from 'perf_hooks';
 import { RateLimitMiddleware as rateLimitMiddleware, RateLimitFactory, createRateLimitFactory } from '../rate-limiting';
 import { unifiedErrorHandler } from '../observability/error-management/middleware/express-error-middleware.js';
 import { setupGlobalErrorHandlers } from '../observability/error-management';
-import { createHealthEndpoints } from '../health';
+// Removed - module deleted by design during development
 import { Logger } from '../logging';
 import { ValidationService } from '../validation';
 import { getDefaultCache } from '../cache';

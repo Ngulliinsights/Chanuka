@@ -42,7 +42,7 @@ interface TrackingPreferences {
   amendments: boolean;
 }
 
-const BillTracking = ({ billId }: BillTrackingProps) => {
+const BillTracking = ({ billId }: BillTrackingProps): JSX.Element => {
   const [preferences, setPreferences] = useState<TrackingPreferences>({
     statusChanges: true,
     newComments: false,
@@ -122,7 +122,7 @@ const BillTracking = ({ billId }: BillTrackingProps) => {
   }, [billId]);
 
   const handleTrackingToggle = () => {
-    if (trackingStatus?.data.isTracking) {
+    if ((trackingStatus?.data as any)?.isTracking) {
       untrackBillMutation.mutate();
     } else {
       trackBillMutation.mutate();
@@ -163,9 +163,9 @@ const BillTracking = ({ billId }: BillTrackingProps) => {
             <Button
               onClick={handleTrackingToggle}
               disabled={trackingLoading || trackBillMutation.isPending || untrackBillMutation.isPending}
-              variant={trackingStatus?.data.isTracking ? "default" : "outline"}
+              variant={(trackingStatus?.data as any)?.isTracking ? "default" : "outline"}
             >
-              {trackingStatus?.data.isTracking ? (
+              {(trackingStatus?.data as any)?.isTracking ? (
                 <>
                   <Heart className="h-4 w-4 mr-2 fill-current" />
                   Tracking
@@ -184,7 +184,7 @@ const BillTracking = ({ billId }: BillTrackingProps) => {
             Get notified when there are updates to this bill based on your preferences.
           </p>
           
-          {trackingStatus?.data.isTracking && (
+          {(trackingStatus?.data as any)?.isTracking && (
             <div className="space-y-4">
               <Separator />
               <div>
@@ -242,7 +242,7 @@ const BillTracking = ({ billId }: BillTrackingProps) => {
       </Card>
 
       {/* Engagement Statistics */}
-      {engagementStats?.data && (
+      {engagementStats?.data ? (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
@@ -257,40 +257,40 @@ const BillTracking = ({ billId }: BillTrackingProps) => {
                   <Eye className="h-4 w-4" />
                   <span className="text-sm">Views</span>
                 </div>
-                <p className="text-2xl font-bold">{formatNumber(engagementStats.data.totalViews)}</p>
+                <p className="text-2xl font-bold">{formatNumber((engagementStats.data as { totalViews?: number })?.totalViews || 0)}</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center space-x-1 text-muted-foreground mb-1">
                   <MessageCircle className="h-4 w-4" />
                   <span className="text-sm">Comments</span>
                 </div>
-                <p className="text-2xl font-bold">{formatNumber(engagementStats.data.totalComments)}</p>
+                <p className="text-2xl font-bold">{formatNumber((engagementStats.data as { totalComments?: number })?.totalComments || 0)}</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center space-x-1 text-muted-foreground mb-1">
                   <Share2 className="h-4 w-4" />
                   <span className="text-sm">Shares</span>
                 </div>
-                <p className="text-2xl font-bold">{formatNumber(engagementStats.data.totalShares)}</p>
+                <p className="text-2xl font-bold">{formatNumber((engagementStats.data as { totalShares?: number })?.totalShares || 0)}</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center space-x-1 text-muted-foreground mb-1">
                   <User className="h-4 w-4" />
                   <span className="text-sm">Followers</span>
                 </div>
-                <p className="text-2xl font-bold">{formatNumber(engagementStats.data.uniqueViewers)}</p>
+                <p className="text-2xl font-bold">{formatNumber((engagementStats.data as { uniqueViewers?: number })?.uniqueViewers || 0)}</p>
               </div>
             </div>
             <Separator className="my-4" />
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Engagement Score</span>
               <Badge variant="outline" className="font-mono">
-                {engagementStats.data.engagementScore}
+                {(engagementStats.data as { engagementScore?: number })?.engagementScore || 0}
               </Badge>
             </div>
           </CardContent>
         </Card>
-      )}
+      ) : null}
 
       {/* Quick Actions */}
       <Card>

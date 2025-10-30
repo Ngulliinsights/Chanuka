@@ -213,8 +213,8 @@ export const buttonUtils = {
     return {
       ...baseStyles,
       ...sizeStyles,
-      ...variantStyles,
-      ...stateStyles,
+      ...(variantStyles as any),
+      ...(stateStyles as any),
     };
   },
 

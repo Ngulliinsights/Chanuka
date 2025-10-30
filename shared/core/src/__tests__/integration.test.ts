@@ -18,7 +18,7 @@ import { MiddlewareFactory } from '@shared/core/src/middleware/factory';
 import { Logger } from '@shared/core/src/observability/logging';
 import { CacheService } from '../caching/core/interfaces';
 import { ValidationService } from '../validation/validation-service';
-import { RateLimitStore } from '@shared/types';
+import { RateLimitStore } from '@shared/core/src/types';
 import { HealthChecker } from '../observability/health/health-checker';
 import express from 'express';
 import request from 'supertest';

@@ -145,7 +145,7 @@ interface LoadingOptions {
 interface UnifiedErrorSystem {
   // Error boundary components
   ErrorBoundary: React.ComponentType<ErrorBoundaryProps>;
-  PageErrorBoundary: React.ComponentType<PageErrorBoundaryProps>;
+  EnhancedErrorBoundary: React.ComponentType<PageErrorBoundaryProps>;
   
   // Error handling hooks
   useErrorHandler: () => ErrorHandler;

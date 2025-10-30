@@ -146,6 +146,8 @@ Keyboard Shortcuts:
         loadComplete: Math.round(navigation.loadEventEnd - navigation.navigationStart),
         firstPaint: this.getFirstPaint(),
         firstContentfulPaint: this.getFirstContentfulPaint(),
+        domInteractive: Math.round(navigation.domInteractive - navigation.navigationStart),
+        domComplete: Math.round(navigation.domComplete - navigation.navigationStart),
       } : null,
       resources: resources.length,
       measures: measures.length,

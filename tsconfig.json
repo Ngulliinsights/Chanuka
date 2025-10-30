@@ -48,7 +48,11 @@
       "@/*": ["./client/src/*"],
       "@shared/*": ["./shared/*"],
       "shared/*": ["./shared/*"],
-      "@shared/core": ["./server/utils/shared-core-fallback.ts"]
+      "@shared/core": ["./shared/core/src/index.ts"],
+      "@shared/core/*": ["./shared/core/src/*"],
+      "@shared/schema": ["./shared/schema/index.ts"],
+      "@shared/schema/*": ["./shared/schema/*"],
+
     }
   }
 }

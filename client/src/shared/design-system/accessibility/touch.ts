@@ -3,7 +3,8 @@
  * Ensures adequate touch targets for mobile users
  */
 
-export const touchTargets = {
+// Base touch target sizes
+const baseTouchTargets = {
   // Minimum sizes (WCAG 2.1 AA)
   minimum: {
     width: '44px',
@@ -24,22 +25,26 @@ export const touchTargets = {
     height: '56px',
     spacing: '16px',
   },
+} as const;
 
+export const touchTargets = {
+  ...baseTouchTargets,
+  
   // Context-specific sizes
   context: {
     button: {
-      primary: touchTargets.comfortable,
-      secondary: touchTargets.minimum,
-      icon: touchTargets.comfortable,
+      primary: baseTouchTargets.comfortable,
+      secondary: baseTouchTargets.minimum,
+      icon: baseTouchTargets.comfortable,
     },
     navigation: {
-      item: touchTargets.comfortable,
-      toggle: touchTargets.large,
+      item: baseTouchTargets.comfortable,
+      toggle: baseTouchTargets.large,
     },
     form: {
-      input: { width: '100%', height: touchTargets.comfortable.height },
-      checkbox: touchTargets.comfortable,
-      radio: touchTargets.comfortable,
+      input: { width: '100%', height: baseTouchTargets.comfortable.height },
+      checkbox: baseTouchTargets.comfortable,
+      radio: baseTouchTargets.comfortable,
     },
   },
 } as const;

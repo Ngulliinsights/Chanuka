@@ -26,7 +26,7 @@
 
 - [x] 4. Enhance error boundary implementation
 
-  - Update PageErrorBoundary component to handle more error types
+  - Update EnhancedErrorBoundary component to handle more error types
   - Add component-level error recovery mechanisms
   - Implement error reporting and context collection
   - Create fallback UI components for different error scenarios

@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -17,7 +17,7 @@ import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';
 import { database as db, user as users, userProfile as userProfiles, userInterest as userInterests, billEngagement, notification as notifications, bill as bills } from '@shared/database/connection';
 import { userProfileService } from '../features/users/domain/user-profile.ts';
 import { eq } from 'drizzle-orm';
-import { logger } from '@shared/core';
+import { logger  } from '../../shared/core/src/index.js';
 
 describe('User Profile Service', () => {
   let testUserId: string;

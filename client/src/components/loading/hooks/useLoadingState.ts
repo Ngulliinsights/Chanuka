@@ -109,7 +109,7 @@ export function useLoadingState(options: LoadingStateOptions = {}): UseLoadingSt
     setAutoReset();
   }, [clearAutoReset, debouncedSetState, setAutoReset]);
 
-  const setTimeout = useCallback(() => {
+  const setTimeoutState = useCallback(() => {
     clearAutoReset();
     debouncedSetState('timeout');
     setAutoReset();
@@ -169,7 +169,7 @@ export function useLoadingState(options: LoadingStateOptions = {}): UseLoadingSt
     setLoading,
     setSuccess,
     setError,
-    setTimeout,
+    setTimeout: setTimeoutState,
     setOffline,
     reset,
     
@@ -247,7 +247,7 @@ export function useMultiLoadingState(options: UseMultiLoadingStateOptions = {}):
     updateState(key, 'error', errorObj);
   }, [updateState]);
 
-  const setTimeout = useCallback((key: string) => {
+  const setTimeoutState = useCallback((key: string) => {
     updateState(key, 'timeout');
   }, [updateState]);
 
@@ -312,7 +312,7 @@ export function useMultiLoadingState(options: UseMultiLoadingStateOptions = {}):
     setLoading,
     setSuccess,
     setError,
-    setTimeout,
+    setTimeout: setTimeoutState,
     setOffline,
     reset,
     

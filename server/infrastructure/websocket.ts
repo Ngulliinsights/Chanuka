@@ -5,8 +5,8 @@ import * as jwt from 'jsonwebtoken';
 import { database as db } from '../../shared/database/connection.js';
 import { User, users } from '../../shared/schema/schema.js';
 import { eq } from 'drizzle-orm';
-import { logger } from '@shared/core/src/observability/logging/index.js';
-import { MemoryLeakDetector } from '@shared/core/src/testing/memory-leak-detector.js';
+import { logger  } from '../../shared/core/src/observability/logging/index.js';
+import { MemoryLeakDetector  } from '../../shared/core/src/testing/memory-leak-detector.js';
 
 // ============================================================================
 // TYPE DEFINITIONS

@@ -1,5 +1,5 @@
 import { PageRelationshipService } from '../../services/PageRelationshipService';
-import { RelatedPage, UserRole } from '../../types/navigation';
+import { RelatedPage, UserRole } from '../../core/navigation/types';
 import { logger } from '@shared/core';
 
 /**
@@ -110,7 +110,7 @@ export class PageRelationshipUtils {
    * Get category-based navigation menu
    */
   static getCategoryNavigation(userRole?: UserRole): Record<string, RelatedPage[]> {
-    const categories = ['main', 'legislative', 'community', 'user', 'admin', 'analysis', 'verification'] as const;
+    const categories = ['legislative', 'community', 'tools', 'user', 'admin'] as const;
     const navigation: Record<string, RelatedPage[]> = {};
 
     categories.forEach(category => {

@@ -13,7 +13,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
   createLogger: vi.fn(() => mockLogger),
 }));
 
-import { AssetLoadingManager } from '@/$2/asset-loading';
+import { AssetLoadingManager } from '../../utils/asset-loading';
 import { logger } from '@shared/core';
 
 // Mock DOM APIs

@@ -7,7 +7,7 @@ import {
   type InsertSocialShare
 } from '../../../shared/schema';
 import { eq, desc, sql } from 'drizzle-orm';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 import { BaseStorage } from '../../infrastructure/database/base/BaseStorage.js';
 
 const CACHE_TTL = 3600; // 1 hour in seconds

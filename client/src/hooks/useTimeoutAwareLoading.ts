@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { useUnifiedLoading } from '../contexts/UnifiedLoadingContext';
+import { useLoading } from '../core/loading';
 import { logger } from '../utils/browser-logger';
 
 export interface TimeoutConfig {
@@ -56,7 +56,7 @@ export function useTimeoutAwareLoading<T = any>(
     cancelOperation,
     getOperation,
     state
-  } = useUnifiedLoading();
+  } = useLoading();
 
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<Error | null>(null);

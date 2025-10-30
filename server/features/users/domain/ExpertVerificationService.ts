@@ -1,17 +1,20 @@
-import type { Analysis, Expert, VerificationTask } from '../../../../shared/types/expert';
-import {
+import type { 
+  Analysis, 
+  Expert, 
+  VerificationTask,
   ExtendedExpert,
   ExtendedVerificationTask,
   VerificationStatus,
   NotificationPreferences,
   NotificationChannel,
-  Stakeholder,
   ExpertError
-} from '../../../../shared/types/expert';
+} from '../types/index.js';
+
+import type { Stakeholder } from '../../sponsors/types/index.js';
 
 // Re-export VerificationStatus for test imports
 export { VerificationStatus };
-import { logger } from '@shared/core';
+import { logger  } from '../../../../shared/core/src/index.js';
 
 // Remove duplicate interface definitions since they're imported
 

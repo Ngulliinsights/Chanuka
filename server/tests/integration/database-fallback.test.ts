@@ -10,7 +10,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -20,7 +20,7 @@ import { databaseFallbackService } from '../../infrastructure/database/database-
 import { demoDataService } from '../../infrastructure/demo-data.js';
 import request from 'supertest';
 import { app } from '../../index.js';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 describe('Database Fallback Integration Tests', () => {
   beforeEach(() => {

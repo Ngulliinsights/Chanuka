@@ -57,7 +57,8 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
 
       setTopics(prev => [...prev, newTopic]);
     } catch (topicError) {
-      const error = new DashboardTopicError('add', undefined, topicError.message);
+      const errorMessage = topicError instanceof Error ? topicError.message : 'Failed to add topic';
+      const error = new DashboardTopicError('add', undefined, errorMessage);
       setError(error);
       throw error;
     } finally {
@@ -100,7 +101,8 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
         topic.id === topicId ? updatedTopic : topic
       ));
     } catch (topicError) {
-      const error = new DashboardTopicError('update', topicId, topicError.message);
+      const errorMessage = topicError instanceof Error ? topicError.message : 'Failed to update topic';
+      const error = new DashboardTopicError('update', topicId, errorMessage);
       setError(error);
       throw error;
     } finally {
@@ -123,7 +125,8 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
 
       setTopics(prev => prev.filter(topic => topic.id !== topicId));
     } catch (topicError) {
-      const error = new DashboardTopicError('remove', topicId, topicError.message);
+      const errorMessage = topicError instanceof Error ? topicError.message : 'Failed to remove topic';
+      const error = new DashboardTopicError('remove', topicId, errorMessage);
       setError(error);
       throw error;
     } finally {
@@ -140,7 +143,8 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
 
       await updateTopic(topicId, { isActive: !topic.isActive });
     } catch (topicError) {
-      const error = new DashboardTopicError('toggle', topicId, topicError.message);
+      const errorMessage = topicError instanceof Error ? topicError.message : 'Failed to toggle topic';
+      const error = new DashboardTopicError('toggle', topicId, errorMessage);
       setError(error);
       throw error;
     }

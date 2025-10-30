@@ -2,7 +2,7 @@ import { databaseService } from './database-service.js';
 import { readDatabase } from '@shared/database/connection';
 import * as schema from '@shared/schema';
 import bcrypt from 'bcrypt';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 /**
  * Comprehensive Seed Data Service

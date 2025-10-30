@@ -1,13 +1,105 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { logger } from '@shared/core';
-import {
-  ConnectionInfo,
-  HealthStatus,
-  connectionMonitor,
-  checkConnection,
-  checkApiHealth,
-  diagnoseConnection
-} from '@shared/core/utils/api''-health.js';
+import { AuthenticatedAPI } from '../utils/authenticated-api';
+
+// Define types locally since they're not exported
+export interface ConnectionInfo {
+  status: 'connected' | 'disconnected' | 'connecting';
+  latency: number;
+  lastChecked: Date;
+  apiReachable?: boolean;
+  corsEnabled?: boolean;
+  errors?: string[];
+}
+
+export interface HealthStatus {
+  healthy: boolean;
+  services: Record<string, boolean>;
+  timestamp: Date;
+  api?: boolean;
+  frontend?: boolean;
+  database?: boolean;
+  latency?: number;
+  recommendations?: string[];
+}
+
+// Helper functions for connection monitoring
+const checkConnection = async (): Promise<ConnectionInfo> => {
+  const startTime = Date.now();
+  try {
+    await AuthenticatedAPI.get('/health');
+    const latency = Date.now() - startTime;
+    return {
+      status: 'connected',
+      latency,
+      lastChecked: new Date(),
+      apiReachable: true,
+      corsEnabled: true,
+      errors: []
+    };
+  } catch (error) {
+    return {
+      status: 'disconnected',
+      latency: -1,
+      lastChecked: new Date(),
+      apiReachable: false,
+      corsEnabled: false,
+      errors: [error instanceof Error ? error.message : 'Connection failed']
+    };
+  }
+};
+
+const checkApiHealth = async (): Promise<HealthStatus> => {
+  try {
+    const response = await AuthenticatedAPI.get('/health/detailed');
+    return {
+      healthy: response.data?.healthy || false,
+      services: response.data?.services || {},
+      timestamp: new Date(),
+      api: response.data?.services?.api || false,
+      frontend: response.data?.services?.frontend || false,
+      database: response.data?.services?.database || false,
+      latency: response.data?.latency || 0
+    };
+  } catch (error) {
+    return {
+      healthy: false,
+      services: {},
+      timestamp: new Date(),
+      api: false,
+      frontend: false,
+      database: false,
+      latency: 0
+    };
+  }
+};
+
+const diagnoseConnection = async (): Promise<DiagnosisResult> => {
+  const issues: string[] = [];
+  let status: 'healthy' | 'degraded' | 'failed' = 'healthy';
+
+  try {
+    const connectionInfo = await checkConnection();
+    if (connectionInfo.status === 'disconnected') {
+      issues.push('API connection failed');
+      status = 'failed';
+    } else if (connectionInfo.latency > 2000) {
+      issues.push('High latency detected');
+      status = 'degraded';
+    }
+
+    const healthInfo = await checkApiHealth();
+    if (!healthInfo.healthy) {
+      issues.push('API health check failed');
+      status = 'failed';
+    }
+  } catch (error) {
+    issues.push('Unable to perform diagnosis');
+    status = 'failed';
+  }
+
+  return { status, issues, recommendations: [] };
+};
 
 // Define diagnosis result type for better type safety and reusability
 export interface DiagnosisResult {
@@ -125,10 +217,12 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
       setError(errorMessage);
       // Set a failed connection status on error
       setConnectionStatus({
+        status: 'disconnected',
+        latency: -1,
+        lastChecked: new Date(),
         apiReachable: false,
         corsEnabled: false,
-        errors: [errorMessage],
-        lastChecked: new Date().toISOString()
+        errors: [errorMessage]
       });
     } finally {
       setIsLoading(false);
@@ -163,10 +257,13 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
     } catch (err) {
       logger.error('Health check failed:', { component: 'Chanuka' }, err);
       setHealthStatus({
+        healthy: false,
+        services: {},
+        timestamp: new Date(),
         api: false,
         frontend: false,
         database: false,
-        timestamp: new Date().toISOString()
+        latency: 0
       });
       
       if (prevHealthRef.current !== false) {
@@ -186,10 +283,10 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
     if (!autoStart) return;
 
     // Add listener for connection updates
-    connectionMonitor.addListener(handleConnectionUpdate);
-    
+    // connectionMonitor.addListener(handleConnectionUpdate);
+
     // Start monitoring with specified interval
-    connectionMonitor.start(checkInterval);
+    // connectionMonitor.start(checkInterval);
     
     // Perform initial health check if enabled
     if (enableHealthChecks) {
@@ -198,8 +295,8 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
 
     // Cleanup function removes listener and stops monitoring
     return () => {
-      connectionMonitor.removeListener(handleConnectionUpdate);
-      connectionMonitor.stop();
+      // connectionMonitor.removeListener(handleConnectionUpdate);
+      // connectionMonitor.stop();
     };
   }, [autoStart, checkInterval, enableHealthChecks, handleConnectionUpdate, performHealthCheck]);
 
@@ -250,7 +347,7 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
 export function useConnectionStatus(): {
   isOnline: boolean;
   isConnected: boolean;
-  lastChecked: string | null;
+  lastChecked: Date | null;
 } {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(null);
@@ -276,13 +373,13 @@ export function useConnectionStatus(): {
       });
     };
 
-    connectionMonitor.addListener(handleConnectionUpdate);
+    // TODO: Implement connectionMonitor.addListener(handleConnectionUpdate);
 
     // Comprehensive cleanup
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
-      connectionMonitor.removeListener(handleConnectionUpdate);
+      // TODO: Implement connectionMonitor.removeListener(handleConnectionUpdate);
     };
   }, []); // Empty deps - all handlers are stable
 

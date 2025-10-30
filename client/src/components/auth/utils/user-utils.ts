@@ -108,7 +108,7 @@ export function checkPasswordStrength(password: string, config?: AuthConfig): {
 } {
   let score = 0;
   const feedback: string[] = [];
-  const minLength = config?.security?.passwordMinLength || 8;
+  const minLength = config?.password?.minLength || 8;
   
   // Length scoring
   if (password.length >= minLength) {

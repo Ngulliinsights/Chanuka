@@ -1,5 +1,7 @@
 {
   "dependencies": {
+    "@radix-ui/react-collapsible": "^1.1.12",
+    "@radix-ui/react-tooltip": "^1.2.8",
     "web-vitals": "^5.1.0"
   }
 }

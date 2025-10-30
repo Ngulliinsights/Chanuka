@@ -150,3 +150,50 @@ export const AUTH_ACCESSIBILITY = {
   }
 } as const;
 
+export const DEFAULT_AUTH_CONFIG = {
+  validation: {
+    enabled: true,
+    strict: true,
+    realTimeValidation: true
+  },
+  password: {
+    minLength: 8,
+    requireUppercase: true,
+    requireLowercase: true,
+    requireNumbers: true,
+    requireSpecialChars: true
+  },
+  ui: {
+    showPasswordRequirements: true,
+    enablePasswordToggle: true,
+    autoFocusFirstField: true
+  },
+  security: {
+    sanitizeInput: true,
+    maxAttempts: 3,
+    lockoutDuration: 300000 // 5 minutes
+  }
+};
+
+export const PASSWORD_STRENGTH_LEVELS = {
+  VERY_WEAK: 0,
+  WEAK: 1,
+  FAIR: 2,
+  GOOD: 3,
+  STRONG: 4,
+  VERY_STRONG: 4 // Alias for STRONG
+} as const;
+
+export const PASSWORD_STRENGTH_LABELS = ['Very Weak', 'Weak', 'Fair', 'Good', 'Strong'];
+export const PASSWORD_STRENGTH_COLORS = ['#ff4444', '#ff8800', '#ffaa00', '#88cc00', '#00cc44'];
+
+// Legacy flat config for backward compatibility
+export const passwordMinLength = DEFAULT_AUTH_CONFIG.password.minLength;
+export const requireUppercase = DEFAULT_AUTH_CONFIG.password.requireUppercase;
+export const requireLowercase = DEFAULT_AUTH_CONFIG.password.requireLowercase;
+export const requireNumbers = DEFAULT_AUTH_CONFIG.password.requireNumbers;
+export const requireSpecialChars = DEFAULT_AUTH_CONFIG.password.requireSpecialChars;
+export const maxAttempts = DEFAULT_AUTH_CONFIG.security.maxAttempts;
+export const lockoutDuration = DEFAULT_AUTH_CONFIG.security.lockoutDuration;
+export const sanitizeInput = DEFAULT_AUTH_CONFIG.security.sanitizeInput;
+

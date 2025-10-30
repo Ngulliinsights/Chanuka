@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 import { database as db } from '@shared/database/connection';
 
 /**

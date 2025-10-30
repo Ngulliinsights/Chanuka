@@ -36,14 +36,7 @@ const DEFAULT_CONFIG: DashboardConfig = {
 };
 
 export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardResult {
-  const { 
-    summary, 
-    actionItems, 
-    trackedTopics, 
-    isLoading: billsLoading,
-    error: billsError,
-    refetch: refetchBills 
-  } = useBills();
+  const billsQuery = useBills();
 
   const [dashboardConfig, setDashboardConfig] = useState<DashboardConfig>(() => {
     const configValidation = safeValidateDashboardConfig({ ...DEFAULT_CONFIG, ...config });
@@ -57,7 +50,7 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
 
   // Transform bills data to dashboard data format
   const dashboardData: DashboardData = {
-    summary: summary || {
+    summary: (billsQuery.data as any)?.summary || {
       billsTracked: 0,
       actionsNeeded: 0,
       topicsCount: 0,
@@ -66,37 +59,37 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
       pendingActions: 0,
       lastUpdated: new Date()
     },
-    actionItems: actionItems || [],
-    trackedTopics: trackedTopics || [],
-    isLoading: billsLoading,
-    error: billsError,
+    actionItems: (billsQuery.data as any)?.actionItems || [],
+    trackedTopics: (billsQuery.data as any)?.trackedTopics || [],
+    isLoading: billsQuery.isLoading,
+    error: billsQuery.error,
     lastRefresh
   };
 
   // Validate dashboard data
   useEffect(() => {
-    if (!billsLoading && (summary || actionItems || trackedTopics)) {
+    if (!billsQuery.isLoading && (dashboardData.summary || dashboardData.actionItems || dashboardData.trackedTopics)) {
       try {
         validateDashboardData(dashboardData);
         setError(null);
         setRetryCount(0);
         setLastRefresh(new Date());
-      } catch (validationError) {
+      } catch (validationError: any) {
         const dashboardError = validationError instanceof DashboardError 
           ? validationError 
-          : new DashboardDataFetchError('validation', validationError.message);
+          : new DashboardDataFetchError('validation', validationError?.message || 'Validation failed');
         setError(dashboardError);
       }
     }
-  }, [summary, actionItems, trackedTopics, billsLoading]);
+  }, [billsQuery.data, billsQuery.isLoading]);
 
   // Handle bills error
   useEffect(() => {
-    if (billsError) {
-      const dashboardError = new DashboardDataFetchError('bills-api', billsError.message);
+    if (billsQuery.error) {
+      const dashboardError = new DashboardDataFetchError('bills-api', billsQuery.error.message);
       setError(dashboardError);
     }
-  }, [billsError]);
+  }, [billsQuery.error]);
 
   // Auto-refresh functionality
   useEffect(() => {
@@ -116,15 +109,15 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
   const refresh = useCallback(async () => {
     try {
       setError(null);
-      await refetchBills();
+      await billsQuery.refetch();
       setLastRefresh(new Date());
       setRetryCount(0);
-    } catch (refreshError) {
-      const dashboardError = new DashboardDataFetchError('refresh', refreshError.message);
+    } catch (refreshError: any) {
+      const dashboardError = new DashboardDataFetchError('refresh', refreshError?.message || 'Refresh failed');
       setError(dashboardError);
       setRetryCount(prev => prev + 1);
     }
-  }, [refetchBills]);
+  }, [billsQuery.refetch]);
 
   const reset = useCallback(() => {
     setError(null);
@@ -146,8 +139,8 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
       console.log('Adding topic:', newTopic);
       
       await refresh();
-    } catch (topicError) {
-      const dashboardError = new DashboardTopicError('add', undefined, topicError.message);
+    } catch (topicError: any) {
+      const dashboardError = new DashboardTopicError('add', undefined, topicError?.message || 'Add topic failed');
       setError(dashboardError);
       throw dashboardError;
     }
@@ -159,8 +152,8 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
       console.log('Removing topic:', topicId);
       
       await refresh();
-    } catch (topicError) {
-      const dashboardError = new DashboardTopicError('remove', topicId, topicError.message);
+    } catch (topicError: any) {
+      const dashboardError = new DashboardTopicError('remove', topicId, topicError?.message || 'Remove topic failed');
       setError(dashboardError);
       throw dashboardError;
     }
@@ -172,8 +165,8 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
       console.log('Completing action:', actionId);
       
       await refresh();
-    } catch (actionError) {
-      const dashboardError = new DashboardActionError('complete', actionError.message);
+    } catch (actionError: any) {
+      const dashboardError = new DashboardActionError('complete', actionError?.message || 'Complete action failed');
       setError(dashboardError);
       throw dashboardError;
     }
@@ -194,8 +187,8 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
       console.log('Adding action:', newAction);
       
       await refresh();
-    } catch (actionError) {
-      const dashboardError = new DashboardActionError('add', actionError.message);
+    } catch (actionError: any) {
+      const dashboardError = new DashboardActionError('add', actionError?.message || 'Add action failed');
       setError(dashboardError);
       throw dashboardError;
     }
@@ -208,7 +201,7 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
       data: dashboardData, 
       config: dashboardConfig, 
       retryCount,
-      lastSuccessfulFetch: lastRefresh 
+      lastSuccessfulFetch: lastRefresh || undefined 
     }).canRecover : false,
     
     suggestions: error ? getRecoveryStrategy({ 
@@ -216,7 +209,7 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
       data: dashboardData, 
       config: dashboardConfig, 
       retryCount,
-      lastSuccessfulFetch: lastRefresh 
+      lastSuccessfulFetch: lastRefresh || undefined 
     }).suggestions : [],
     
     recover: async (): Promise<boolean> => {
@@ -227,7 +220,7 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
         data: dashboardData, 
         config: dashboardConfig, 
         retryCount,
-        lastSuccessfulFetch: lastRefresh 
+        lastSuccessfulFetch: lastRefresh || undefined 
       });
       
       const recovered = await executeRecovery(strategy, { 
@@ -235,7 +228,7 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
         data: dashboardData, 
         config: dashboardConfig, 
         retryCount,
-        lastSuccessfulFetch: lastRefresh 
+        lastSuccessfulFetch: lastRefresh || undefined 
       });
       
       if (recovered) {
@@ -249,7 +242,7 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
 
   return {
     data: dashboardData,
-    loading: billsLoading,
+    loading: billsQuery.isLoading,
     error,
     actions: {
       refresh,

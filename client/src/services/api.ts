@@ -106,3 +106,25 @@ class ApiService {
 
 export const api = new ApiService();
 
+// Bills API
+export const billsApi = {
+  getAll: (params?: any) => api.get('/api/bills', { ...params }),
+  getById: (id: string | number) => api.get(`/api/bills/${id}`),
+  getComments: (billId: string | number) => api.get(`/api/bills/${billId}/comments`),
+  getSponsors: (billId: string | number) => api.get(`/api/bills/${billId}/sponsors`),
+  getAnalysis: (billId: string | number) => api.get(`/api/bills/${billId}/analysis`),
+  getCategories: () => api.get('/api/bills/categories'),
+  getStatuses: () => api.get('/api/bills/statuses'),
+  addComment: (billId: string | number, comment: any) => api.post(`/api/bills/${billId}/comments`, comment),
+  recordEngagement: (billId: string | number, engagement: any) => api.post(`/api/bills/${billId}/engagement`, engagement),
+};
+
+// System API
+export const systemApi = {
+  getHealth: () => api.get('/api/system/health'),
+  getStats: () => api.get('/api/system/stats'),
+  getActivity: () => api.get('/api/system/activity'),
+  getSchema: () => api.get('/api/system/schema'),
+  getEnvironment: () => api.get('/api/system/environment'),
+};
+

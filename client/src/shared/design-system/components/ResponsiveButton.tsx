@@ -12,7 +12,7 @@ import { cn } from '../lib/utils';
 import { useResponsive } from '../responsive';
 import { buttonUtils } from './button';
 
-interface ResponsiveButtonProps {
+export interface ResponsiveButtonProps {
   children: React.ReactNode;
   className?: string;
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive';

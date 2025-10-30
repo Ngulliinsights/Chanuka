@@ -21,7 +21,7 @@ vi.mock('@shared/core/src/observability/logging', () => ({
  */
 
 import { SingleFlightCache } from '../single-flight-cache';
-import type { CacheService, CacheMetrics } from '@shared/types';
+import type { CacheService, CacheMetrics } from '@shared/core/src/types';
 import { logger } from '@shared/core/src/observability/logging';
 
 // Mock cache adapter for testing
@@ -160,9 +160,8 @@ describe('SingleFlightCache', () => {
   });
 
   afterEach(() => {
-    cleanup();
     cache.destroy();
-  
+
   });
 
   describe('Single Flight Pattern', () => {

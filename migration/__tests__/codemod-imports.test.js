@@ -62,7 +62,7 @@ const { Validator } = require('shared/core/validation/');
 
     it('should return false when no changes are made', () => {
       const mockContent = `
-import { SomeUtil } from '@shared/core/utils/';
+import { SomeUtil } from '@shared/core/src/utils/';
       `.trim();
 
       fs.readFileSync.mockReturnValue(mockContent);

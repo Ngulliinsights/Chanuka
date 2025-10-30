@@ -8,7 +8,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -21,7 +21,7 @@ import { getEmailService } from '../infrastructure/notifications/email-service';
 import { database as db, user as users, session as sessions, passwordReset as passwordResets } from '@shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import { router as authRouter } from '../core/auth/auth.js';
-import { logger } from '@shared/core';
+import { logger  } from '../../shared/core/src/index.js';
 
 // Create test app
 const app = express();

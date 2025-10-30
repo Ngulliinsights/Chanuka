@@ -14,7 +14,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('@shared/core', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -27,7 +27,7 @@ import { logger } from '@shared/core';
   isBrowserSupported,
   getBrowserWarnings,
   getBrowserRecommendations
-} from '@/$2/browser-compatibility';
+} from '../../utils/browser-compatibility';
 
 // Mock navigator and window objects
 const mockNavigator = {

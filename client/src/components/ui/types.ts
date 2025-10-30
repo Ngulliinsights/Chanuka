@@ -33,11 +33,12 @@ export interface ValidationProps {
 }
 
 // Enhanced input props with validation
-export interface EnhancedInputProps extends ComponentProps<"input">, BaseUIProps, ValidationProps {
+export interface EnhancedInputProps extends Omit<ComponentProps<"input">, 'pattern'>, BaseUIProps, Omit<ValidationProps, 'pattern'> {
   label?: string;
   description?: string;
   errorMessage?: string;
   showValidation?: boolean;
+  pattern?: string | RegExp; // Override pattern to allow both string and RegExp
   onValidationChange?: (state: ValidationState) => void;
 }
 

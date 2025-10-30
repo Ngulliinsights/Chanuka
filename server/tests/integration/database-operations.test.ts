@@ -8,14 +8,14 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
 
 import { describe, it, expect, beforeAll, afterAll, beforeEach, afterEach } from '@jest/globals';
 import { databaseService } from '../../infrastructure/database/database-service.js';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 describe('Database Operations Integration Tests', () => {
   beforeAll(async () => {

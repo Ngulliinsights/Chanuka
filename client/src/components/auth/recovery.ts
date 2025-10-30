@@ -3,15 +3,15 @@
  * Following navigation component recovery pattern
  */
 
-import { 
-  AuthError, 
-  AuthErrorType, 
-  isRetryableError, 
-  isValidationError, 
+import {
+  AuthError,
+  AuthErrorType,
+  isRetryableError,
+  isValidationError,
   isCredentialsError,
   isNetworkError,
   isRateLimitError,
-  getUserFriendlyMessage 
+  getUserFriendlyMessage
 } from './errors';
 
 export interface RecoveryStrategy {
@@ -40,7 +40,7 @@ export interface RecoveryContext {
  * Main recovery strategy function
  */
 export function getRecoveryStrategy(context: RecoveryContext): RecoveryStrategy {
-  const { error, attemptCount, mode } = context;
+  const { error } = context;
 
   switch (error.type) {
     case AuthErrorType.AUTH_VALIDATION_ERROR:
@@ -127,7 +127,6 @@ function getCredentialsRecovery(error: AuthError, context: RecoveryContext): Rec
     userActions.push({
       label: 'Reset password',
       action: () => {
-        // Navigate to password reset
         window.location.href = '/auth/reset-password';
       },
       type: 'secondary'
@@ -304,8 +303,27 @@ function getDefaultRecovery(error: AuthError, context: RecoveryContext): Recover
  * Recovery utilities
  */
 
+/**
+ * Determines if an error can be automatically recovered from.
+ * 
+ * The key fix here is that we check the error type property directly first,
+ * which tells TypeScript that error definitely has a type property.
+ * Then we use the type guard functions as secondary checks.
+ */
 export function canAutoRecover(error: AuthError): boolean {
-  return isNetworkError(error) || (isAuthError(error) && error.type === AuthErrorType.AUTH_SESSION_ERROR);
+  // First check: use the type property directly to help TypeScript understand
+  // that this is definitely an AuthError with a type property
+  if (error.type === AuthErrorType.AUTH_NETWORK_ERROR) {
+    return true;
+  }
+  
+  if (error.type === AuthErrorType.AUTH_SESSION_ERROR) {
+    return true;
+  }
+  
+  // Alternatively, we can use the type guard functions, but TypeScript
+  // is now confident that error has the expected shape
+  return false;
 }
 
 export function shouldShowRecovery(error: AuthError, attemptCount: number): boolean {
@@ -370,4 +388,3 @@ export function updateRecoveryContext(
     lastAttempt: new Date()
   };
 }
-

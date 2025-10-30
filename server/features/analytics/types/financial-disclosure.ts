@@ -91,6 +91,12 @@ export interface TransparencyDashboard {
     score: number;
     riskLevel: 'low' | 'medium' | 'high' | 'critical';
   }>;
+  anomalyStatistics?: {
+    sponsorsWithAnomalies: number;
+    anomaliesBySeverity: Record<'low' | 'medium' | 'high' | 'critical', number>;
+    anomaliesByType: Record<string, number>;
+    averageRiskScore: number;
+  };
 }
 
 export interface SponsorInfo {

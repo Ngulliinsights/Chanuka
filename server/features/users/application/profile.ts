@@ -2,15 +2,14 @@ import { Router } from 'express';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js';
 import { userProfileService } from '../domain/user-profile.js';
 import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper } from '@shared/core/utils/api'-response';
-import { logger } from '@shared/core';
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '../../../../shared/core/src/utils/api-utils';
+import { logger  } from '../../../../shared/core/src/index.js';
 
 export const router = Router();
 
 // ============================================================================
 // Validation Schemas
 // ============================================================================
-// Organized validation schemas for type-safe request handling
 
 const updateProfileSchema = z.object({
   bio: z.string().optional(),
@@ -51,12 +50,27 @@ const engagementSchema = z.object({
 });
 
 // ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Transforms Zod validation errors into our API error format
+ * Each Zod error contains a path array and message, which we convert
+ * to a field string (joined path) and message string
+ */
+function formatZodErrors(zodErrors: z.ZodIssue[]): { field: string; message: string }[] {
+  return zodErrors.map(error => ({
+    field: error.path.join('.') || 'unknown',
+    message: error.message
+  }));
+}
+
+// ============================================================================
 // Current User Profile Routes
 // ============================================================================
 
 /**
  * GET /me - Retrieve the authenticated user's profile
- * Returns complete profile information for the current user
  */
 router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -65,7 +79,6 @@ router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res) => {
     const userId = req.user!.id;
     const profile = await userProfileService.getUserProfile(userId);
     
-    // ApiSuccess takes: (res, data, metadata?)
     return ApiSuccess(
       res, 
       profile, 
@@ -74,14 +87,16 @@ router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res) => {
   } catch (error) {
     logger.error('Error fetching profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
     
-    // ApiError takes only: (res, message, statusCode?) - NO metadata parameter
-    return ApiError(res, 'Failed to fetch profile', 500);
+    // ApiError now requires a structured error object
+    return ApiError(res, {
+      code: 'PROFILE_FETCH_ERROR',
+      message: 'Failed to fetch profile'
+    }, 500);
   }
 });
 
 /**
  * PATCH /me - Update the authenticated user's profile
- * Allows updating bio, expertise, location, organization, and visibility settings
  */
 router.patch('/me', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -99,18 +114,20 @@ router.patch('/me', authenticateToken, async (req: AuthenticatedRequest, res) =>
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      // ApiValidationError takes ONLY: (res, errors) - no metadata parameter
-      return ApiValidationError(res, error.errors);
+      // Transform Zod errors into the expected format before passing to ApiValidationError
+      return ApiValidationError(res, formatZodErrors(error.errors));
     }
     
     logger.error('Error updating profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, 'Failed to update profile', 500);
+    return ApiError(res, {
+      code: 'PROFILE_UPDATE_ERROR',
+      message: 'Failed to update profile'
+    }, 500);
   }
 });
 
 /**
  * PATCH /me/basic - Update basic user information
- * Updates firstName, lastName, or display name
  */
 router.patch('/me/basic', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -128,17 +145,19 @@ router.patch('/me/basic', authenticateToken, async (req: AuthenticatedRequest, r
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, error.errors);
+      return ApiValidationError(res, formatZodErrors(error.errors));
     }
     
     logger.error('Error updating basic info:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, 'Failed to update basic info', 500);
+    return ApiError(res, {
+      code: 'BASIC_INFO_UPDATE_ERROR',
+      message: 'Failed to update basic info'
+    }, 500);
   }
 });
 
 /**
  * PATCH /me/interests - Update user's interests
- * Replaces the current interests array with the provided list
  */
 router.patch('/me/interests', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -156,17 +175,19 @@ router.patch('/me/interests', authenticateToken, async (req: AuthenticatedReques
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, error.errors);
+      return ApiValidationError(res, formatZodErrors(error.errors));
     }
     
     logger.error('Error updating interests:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, 'Failed to update interests', 500);
+    return ApiError(res, {
+      code: 'INTERESTS_UPDATE_ERROR',
+      message: 'Failed to update interests'
+    }, 500);
   }
 });
 
 /**
  * GET /me/complete - Retrieve complete user profile
- * Returns all profile data including preferences, verification, and engagement history
  */
 router.get('/me/complete', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -182,7 +203,10 @@ router.get('/me/complete', authenticateToken, async (req: AuthenticatedRequest, 
     );
   } catch (error) {
     logger.error('Error fetching complete profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, 'Failed to fetch complete profile', 500);
+    return ApiError(res, {
+      code: 'COMPLETE_PROFILE_FETCH_ERROR',
+      message: 'Failed to fetch complete profile'
+    }, 500);
   }
 });
 
@@ -192,7 +216,6 @@ router.get('/me/complete', authenticateToken, async (req: AuthenticatedRequest, 
 
 /**
  * GET /me/preferences - Retrieve user notification and display preferences
- * Returns settings for notifications, language, theme, and bill categories
  */
 router.get('/me/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -208,13 +231,15 @@ router.get('/me/preferences', authenticateToken, async (req: AuthenticatedReques
     );
   } catch (error) {
     logger.error('Error fetching preferences:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, 'Failed to fetch preferences', 500);
+    return ApiError(res, {
+      code: 'PREFERENCES_FETCH_ERROR',
+      message: 'Failed to fetch preferences'
+    }, 500);
   }
 });
 
 /**
  * PATCH /me/preferences - Update user preferences
- * Modifies notification settings, theme, language, and other preferences
  */
 router.patch('/me/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -232,11 +257,14 @@ router.patch('/me/preferences', authenticateToken, async (req: AuthenticatedRequ
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, error.errors);
+      return ApiValidationError(res, formatZodErrors(error.errors));
     }
     
     logger.error('Error updating preferences:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, 'Failed to update preferences', 500);
+    return ApiError(res, {
+      code: 'PREFERENCES_UPDATE_ERROR',
+      message: 'Failed to update preferences'
+    }, 500);
   }
 });
 
@@ -246,7 +274,6 @@ router.patch('/me/preferences', authenticateToken, async (req: AuthenticatedRequ
 
 /**
  * GET /me/verification - Retrieve verification status
- * Returns current verification status and related documents
  */
 router.get('/me/verification', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -262,13 +289,15 @@ router.get('/me/verification', authenticateToken, async (req: AuthenticatedReque
     );
   } catch (error) {
     logger.error('Error fetching verification status:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, 'Failed to fetch verification status', 500);
+    return ApiError(res, {
+      code: 'VERIFICATION_FETCH_ERROR',
+      message: 'Failed to fetch verification status'
+    }, 500);
   }
 });
 
 /**
  * PATCH /me/verification - Update verification status
- * Users can submit verification (pending), admins can approve/reject
  */
 router.patch('/me/verification', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -277,9 +306,12 @@ router.patch('/me/verification', authenticateToken, async (req: AuthenticatedReq
     const userId = req.user!.id;
     const verificationData = updateVerificationSchema.parse(req.body);
     
-    // Authorization: Only admins can change status to verified or rejected
+    // Authorization check: only admins can approve/reject verification
     if (verificationData.verificationStatus !== 'pending' && req.user!.role !== 'admin') {
-      return ApiError(res, 'Insufficient permissions', 403);
+      return ApiError(res, {
+        code: 'INSUFFICIENT_PERMISSIONS',
+        message: 'Only administrators can approve or reject verification'
+      }, 403);
     }
     
     const updatedProfile = await userProfileService.updateUserVerificationStatus(userId, verificationData);
@@ -291,11 +323,14 @@ router.patch('/me/verification', authenticateToken, async (req: AuthenticatedReq
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, error.errors);
+      return ApiValidationError(res, formatZodErrors(error.errors));
     }
     
     logger.error('Error updating verification status:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, 'Failed to update verification status', 500);
+    return ApiError(res, {
+      code: 'VERIFICATION_UPDATE_ERROR',
+      message: 'Failed to update verification status'
+    }, 500);
   }
 });
 
@@ -305,7 +340,6 @@ router.patch('/me/verification', authenticateToken, async (req: AuthenticatedReq
 
 /**
  * GET /me/engagement - Retrieve user's engagement history
- * Returns history of interactions with bills (views, comments, shares)
  */
 router.get('/me/engagement', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -321,13 +355,15 @@ router.get('/me/engagement', authenticateToken, async (req: AuthenticatedRequest
     );
   } catch (error) {
     logger.error('Error fetching engagement history:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, 'Failed to fetch engagement history', 500);
+    return ApiError(res, {
+      code: 'ENGAGEMENT_FETCH_ERROR',
+      message: 'Failed to fetch engagement history'
+    }, 500);
   }
 });
 
 /**
  * POST /me/engagement/:billId - Record user engagement with a bill
- * Tracks when users view, comment on, or share bills
  */
 router.post('/me/engagement/:billId', authenticateToken, async (req: AuthenticatedRequest, res) => {
   const startTime = Date.now();
@@ -336,9 +372,12 @@ router.post('/me/engagement/:billId', authenticateToken, async (req: Authenticat
     const userId = req.user!.id;
     const billId = parseInt(req.params.billId, 10);
     
-    // Validate billId is a valid number
+    // Validate that billId is a proper number
     if (isNaN(billId)) {
-      return ApiError(res, 'Invalid bill ID', 400);
+      return ApiError(res, {
+        code: 'INVALID_BILL_ID',
+        message: 'Bill ID must be a valid number'
+      }, 400);
     }
     
     const { engagementType } = engagementSchema.parse(req.body);
@@ -352,11 +391,14 @@ router.post('/me/engagement/:billId', authenticateToken, async (req: Authenticat
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return ApiValidationError(res, error.errors);
+      return ApiValidationError(res, formatZodErrors(error.errors));
     }
     
     logger.error('Error updating engagement:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, 'Failed to update engagement', 500);
+    return ApiError(res, {
+      code: 'ENGAGEMENT_UPDATE_ERROR',
+      message: 'Failed to update engagement'
+    }, 500);
   }
 });
 
@@ -366,7 +408,6 @@ router.post('/me/engagement/:billId', authenticateToken, async (req: Authenticat
 
 /**
  * GET /search/:query - Search for users by name or username
- * Returns a list of users matching the search query
  */
 router.get('/search/:query', async (req, res) => {
   const startTime = Date.now();
@@ -375,9 +416,12 @@ router.get('/search/:query', async (req, res) => {
     const query = req.params.query;
     const limit = parseInt(req.query.limit as string, 10) || 10;
     
-    // Validate limit is reasonable
+    // Validate limit falls within acceptable range
     if (limit < 1 || limit > 100) {
-      return ApiError(res, 'Limit must be between 1 and 100', 400);
+      return ApiError(res, {
+        code: 'INVALID_LIMIT',
+        message: 'Limit must be between 1 and 100'
+      }, 400);
     }
     
     const users = await userProfileService.searchUsers(query, limit);
@@ -389,14 +433,16 @@ router.get('/search/:query', async (req, res) => {
     );
   } catch (error) {
     logger.error('Error searching users:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, 'User search failed', 500);
+    return ApiError(res, {
+      code: 'USER_SEARCH_ERROR',
+      message: 'User search failed'
+    }, 500);
   }
 });
 
 /**
  * GET /:userId - Retrieve public profile for a specific user
- * Returns publicly visible information only
- * Note: This route must be last to avoid catching other routes
+ * Note: This catch-all route must be last to avoid intercepting other routes
  */
 router.get('/:userId', async (req, res) => {
   const startTime = Date.now();
@@ -412,6 +458,9 @@ router.get('/:userId', async (req, res) => {
     );
   } catch (error) {
     logger.error('Error fetching public profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
-    return ApiError(res, 'Failed to fetch profile', 500);
+    return ApiError(res, {
+      code: 'PUBLIC_PROFILE_FETCH_ERROR',
+      message: 'Failed to fetch profile'
+    }, 500);
   }
 });

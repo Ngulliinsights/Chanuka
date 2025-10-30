@@ -17,7 +17,7 @@ const mockLogger = {
   trace: vi.fn(),
 };
 
-vi.mock('@shared/core/src/observability/logging', () => ({
+vi.mock('../../../shared/core/src/observability/logging', () => ({
   logger: mockLogger,
   createLogger: vi.fn(() => mockLogger),
 }));
@@ -29,7 +29,7 @@ import { createServer } from 'http';
 import path from 'path';
 import fs from 'fs';
 import { setupVite } from '../../vite.js';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 describe('Frontend Serving Integration Tests', () => {
   let app: express.Application;

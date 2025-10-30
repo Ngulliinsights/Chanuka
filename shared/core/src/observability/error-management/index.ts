@@ -30,9 +30,6 @@ export * from './integrations/error-tracking-integration.js';
 // Middleware for different platforms
 export * from './middleware/express-error-middleware.js';
 
-// Legacy adapters for backward compatibility
-export * from './legacy-adapters/error-handling-adapter.js';
-export * from './legacy-adapters/errors-adapter.js';
 
 // Types and interfaces
 export * from './types.js';

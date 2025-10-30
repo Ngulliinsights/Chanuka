@@ -5,7 +5,6 @@
 export { router as analyticsRouter } from './analytics.js';
 export { default as engagementAnalyticsRouter } from './engagement-analytics.js';
 export { simpleTransparencyDashboardService as transparencyDashboardRouter } from './transparency-dashboard.js';
-export { router as analysisRouter } from './analysis.js';
 export { createFinancialDisclosureRouter as financialDisclosureRouter } from './financial-disclosure/index.js';
 
 // Services - Organized exports from services/ folder

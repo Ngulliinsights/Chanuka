@@ -26,8 +26,8 @@ interface RegisterData {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  register: (data: RegisterData) => Promise<{ success: boolean; error?: string; requiresVerification?: boolean }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; data?: any }>;
+  register: (data: RegisterData) => Promise<{ success: boolean; error?: string; requiresVerification?: boolean; data?: any }>;
   logout: () => Promise<void>;
   refreshToken: () => Promise<{ success: boolean; error?: string }>;
   verifyEmail: (token: string) => Promise<{ success: boolean; error?: string }>;
@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; data?: any }> => {
     if (mountedRef.current) {
       setLoading(true);
     }
@@ -169,7 +169,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (data: RegisterData): Promise<{ success: boolean; error?: string; requiresVerification?: boolean }> => {
+  const register = async (data: RegisterData): Promise<{ success: boolean; error?: string; requiresVerification?: boolean; data?: any }> => {
     if (mountedRef.current) {
       setLoading(true);
     }

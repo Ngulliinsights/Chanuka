@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../../../../shared/core/index.js';
-import { trackApiMetric } from '../../../utils/performance-monitoring-utils.js';
+import { performanceMonitor } from '../../../../shared/core/src/performance/index.js';
 import { analyticsConfig } from '../config/analytics.config.js';
 import { AuthenticatedRequest } from '../../../middleware/auth.js';
 
@@ -42,14 +42,19 @@ export function performanceTrackingMiddleware(
       });
     }
 
-    // Track API metrics using existing performance monitoring
-    trackApiMetric(
-      req.method,
-      req.route?.path || req.path,
-      res.statusCode,
-      duration,
-      req.analyticsContext?.userId
-    );
+    // Track API metrics using performance monitor
+    performanceMonitor.recordMetric({
+      name: `api_request_duration`,
+      value: duration,
+      unit: 'ms',
+      metadata: {
+        method: req.method,
+        path: req.route?.path || req.path,
+        statusCode: res.statusCode,
+        userId: req.analyticsContext?.userId,
+        traceId
+      }
+    });
 
     // Add performance headers for debugging
     if (process.env.NODE_ENV === 'development') {
@@ -79,7 +84,17 @@ export function trackAnalyticsOperation(
   };
 
   // Use the performance monitoring utility
-  trackApiMetric('ANALYTICS', operation, 200, duration, metadata?.userId);
+  performanceMonitor.recordMetric({
+    name: `analytics_operation_duration`,
+    value: duration,
+    unit: 'ms',
+    metadata: {
+      operation,
+      component: 'analytics',
+      userId: metadata?.userId,
+      ...metadata
+    }
+  });
 }
 
 /**

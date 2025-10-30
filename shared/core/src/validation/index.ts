@@ -36,10 +36,6 @@ export type {
 } from './types';
 export { ValidationError } from './types';
 
-// Legacy adapters for backward compatibility
-export * from './legacy-adapters';
-export { LegacyValidationService, validationService as legacyValidationService } from './legacy-adapters/validation-service-adapter';
-export type { LegacyValidationRule, LegacyValidationResult, LegacyValidationSchema } from './legacy-adapters/validation-service-adapter';
 
 // ===== UTILITY EXPORTS =====
 // Re-export commonly used Zod types for convenience

@@ -19,7 +19,7 @@ import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import MobileNavigation from '../mobile-navigation';
-import { NavigationItem, User } from '@shared/types';
+import { NavigationItem, User } from '../types';
 
 // Mock dependencies
 vi.mock('@/utils/mobile-touch-handler', () => ({

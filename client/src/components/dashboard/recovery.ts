@@ -68,8 +68,8 @@ function getDataFetchRecoveryStrategy(context: RecoveryContext): RecoveryStrateg
     };
   }
 
-  const hasRecentData = lastSuccessfulFetch && 
-    (Date.now() - lastSuccessfulFetch.getTime()) < 300000; // 5 minutes
+  const hasRecentData = Boolean(lastSuccessfulFetch && 
+    (Date.now() - lastSuccessfulFetch.getTime()) < 300000); // 5 minutes
 
   return {
     canRecover: hasRecentData,

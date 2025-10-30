@@ -6,8 +6,12 @@ import { authenticateToken, requireRole } from '../../middleware/auth.js';
 // TODO: Fix billsService import when available
 // import { billsService } from '../bills/index.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
-import { ApiSuccess, ApiError, ApiForbidden } from '@shared/core/utils/api'';
-import { logger } from '@shared/core';
+import { ApiSuccess, ApiError, ApiForbidden  } from '../../../shared/core/src/utils/api-utils';
+import { logger  } from '../../../shared/core/src/index.js';
+
+// Security Services
+import { secureQueryBuilder } from '../../infrastructure/security/secure-query-builder.js';
+import { inputValidationService, commonSchemas } from '../../infrastructure/security/input-validation-service.js';
 
 // Database & Schema Imports
 import { database as db } from '../../../shared/database/connection';
@@ -35,6 +39,29 @@ const router = Router();
 // Apply authentication and admin-only access control to all routes
 router.use(authenticateToken);
 router.use(requireRole(['admin']));
+
+// Add input validation middleware for all routes
+router.use((req, res, next) => {
+  // Sanitize query parameters
+  if (req.query) {
+    Object.keys(req.query).forEach(key => {
+      if (typeof req.query[key] === 'string') {
+        req.query[key] = inputValidationService.sanitizeHtmlInput(req.query[key] as string);
+      }
+    });
+  }
+  
+  // Sanitize body parameters
+  if (req.body && typeof req.body === 'object') {
+    Object.keys(req.body).forEach(key => {
+      if (typeof req.body[key] === 'string') {
+        req.body[key] = inputValidationService.sanitizeHtmlInput(req.body[key]);
+      }
+    });
+  }
+  
+  next();
+});
 
 // --- Route Handlers ---
 
@@ -175,23 +202,60 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { page = '1', limit = '20', role, search } = req.query;
     
-    // Sanitize and validate pagination parameters
-    const pageNum = Math.max(1, parseInt(page as string));
-    const limitNum = Math.min(100, Math.max(1, parseInt(limit as string))); // Cap at 100 to prevent abuse
-    const offset = (pageNum - 1) * limitNum;
+    // Validate pagination parameters using secure validation
+    const paginationValidation = inputValidationService.validatePaginationParams(
+      page as string, 
+      limit as string
+    );
+    
+    if (!paginationValidation.isValid) {
+      return ApiError(res, {
+        code: 'INVALID_PAGINATION',
+        message: 'Invalid pagination parameters',
+        details: paginationValidation.errors
+      }, 400);
+    }
+    
+    const { page: pageNum, limit: limitNum, offset } = secureQueryBuilder.validatePaginationParams(
+      page as string, 
+      limit as string
+    );
 
-    // Build composable, type-safe query conditions
-    // The 'and' function filters out undefined conditions automatically
+    // Validate and sanitize search parameters
+    let sanitizedSearch: string | undefined;
+    if (search && typeof search === 'string') {
+      const searchValidation = inputValidationService.validateSearchQuery(search);
+      if (!searchValidation.isValid) {
+        return ApiError(res, {
+          code: 'INVALID_SEARCH',
+          message: 'Invalid search query',
+          details: searchValidation.errors
+        }, 400);
+      }
+      sanitizedSearch = searchValidation.data;
+    }
+
+    // Validate role parameter
+    let validatedRole: UserRole | undefined;
+    if (role && typeof role === 'string') {
+      const roleValidation = inputValidationService.validateUserRole(role);
+      if (!roleValidation.isValid) {
+        return ApiError(res, {
+          code: 'INVALID_ROLE',
+          message: 'Invalid role parameter',
+          details: roleValidation.errors
+        }, 400);
+      }
+      validatedRole = roleValidation.data as UserRole;
+    }
+
+    // Build composable, type-safe query conditions using validated inputs
     const conditions = and(
-      role && typeof role === 'string'
-        ? eq(user.role, role as UserRole)
-        : undefined,
-      search && typeof search === 'string'
-        ? or(
-            ilike(user.name, `%${search}%`),
-            ilike(user.email, `%${search}%`)
-          )
-        : undefined
+      validatedRole ? eq(user.role, validatedRole) : undefined,
+      sanitizedSearch ? or(
+        ilike(user.name, secureQueryBuilder.createSafeLikePattern(sanitizedSearch)),
+        ilike(user.email, secureQueryBuilder.createSafeLikePattern(sanitizedSearch))
+      ) : undefined
     );
 
     // Execute both queries in parallel for better performance
@@ -223,8 +287,13 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
     const total = totalResult[0]?.count ?? 0;
     const totalPages = Math.ceil(total / limitNum);
 
+    // Sanitize output data to remove sensitive information
+    const sanitizedUsers = userResults.map(user => 
+      secureQueryBuilder.sanitizeOutput(user)
+    );
+
     return ApiSuccess(res, {
-      users: userResults,
+      users: sanitizedUsers,
       pagination: {
         page: pageNum,
         limit: limitNum,
@@ -257,17 +326,23 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
  * - Uses transaction to ensure user exists before updating
  * - Comprehensive audit logging
  */
-router.put('/users/:id/role', async (req: AuthenticatedRequest, res: Response) => {
+router.put('/users/:id/role', 
+  inputValidationService.createValidationMiddleware(
+    commonSchemas.userUpdate.pick({ role: true }),
+    'body'
+  ),
+  async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params;
   try {
     const { role } = req.body as { role: UserRole };
 
-    // Validate the role against our whitelist
-    if (!role || !USER_ROLES.includes(role)) {
+    // Additional validation for role update
+    const roleValidation = inputValidationService.validateUserRole(role);
+    if (!roleValidation.isValid) {
       return ApiError(res, {
         code: 'INVALID_ROLE',
-        message: `Invalid role. Valid roles are: ${USER_ROLES.join(', ')}`,
-        details: { providedRole: role, validRoles: USER_ROLES }
+        message: 'Invalid role provided',
+        details: roleValidation.errors
       }, 400);
     }
 
@@ -354,12 +429,17 @@ router.put('/users/:id/role', async (req: AuthenticatedRequest, res: Response) =
  * - Atomic transaction for data consistency
  * - Full audit trail
  */
-router.put('/users/:id/status', async (req: AuthenticatedRequest, res: Response) => {
+router.put('/users/:id/status',
+  inputValidationService.createValidationMiddleware(
+    commonSchemas.userUpdate.pick({ isActive: true }),
+    'body'
+  ),
+  async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params;
   try {
     const { isActive } = req.body;
 
-    // Strict type validation for the boolean field
+    // Additional validation already handled by middleware
     if (typeof isActive !== 'boolean') {
       return ApiError(res, {
         code: 'INVALID_STATUS',
@@ -705,3 +785,9 @@ router.get('/logs', async (req: AuthenticatedRequest, res: Response) => {
 });
 
 export { router };
+
+
+
+
+
+

@@ -8,131 +8,8 @@ import { AlertCircle, CheckCircle, Eye, EyeOff, HelpCircle } from 'lucide-react'
 import { cn } from '../../lib/utils';
 import { Button } from './button';
 import { Label } from './label';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@radix-ui/react-tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
 
-// Enhanced form field wrapper with validation states
-interface FormFieldWrapperProps {
-  children: React.ReactNode;
-  label?: string;
-  description?: string;
-  error?: string;
-  success?: string;
-  required?: boolean;
-  optional?: boolean;
-  helpText?: string;
-  className?: string;
-  fieldId?: string;
-}
-
-export const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
-  children,
-  label,
-  description,
-  error,
-  success,
-  required = false,
-  optional = false,
-  helpText,
-  className,
-  fieldId
-}) => {
-  const hasError = Boolean(error);
-  const hasSuccess = Boolean(success) && !hasError;
-  
-  return (
-    <div className={cn('space-y-2', className)}>
-      {label && (
-        <div className="flex items-center space-x-2">
-          <Label 
-            htmlFor={fieldId}
-            className={cn(
-              'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
-              hasError && 'text-destructive',
-              hasSuccess && 'text-green-700'
-            )}
-          >
-            {label}
-            {required && (
-              <span className="text-destructive ml-1" aria-label="required">*</span>
-            )}
-            {optional && !required && (
-              <span className="text-muted-foreground ml-1 text-xs">(optional)</span>
-            )}
-          </Label>
-          
-          {helpText && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="p-0 h-4 w-4"
-                  >
-                    <HelpCircle className="h-3 w-3 text-muted-foreground" />
-                    <span className="sr-only">Help for {label}</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="max-w-xs text-xs">{helpText}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-        </div>
-      )}
-      
-      {description && (
-        <p 
-          id={fieldId ? `${fieldId}-description` : undefined}
-          className="text-sm text-muted-foreground"
-        >
-          {description}
-        </p>
-      )}
-      
-      <div className="relative">
-        {children}
-        
-        {/* Validation status icons */}
-        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
-          {hasError && (
-            <AlertCircle className="h-4 w-4 text-destructive" aria-hidden="true" />
-          )}
-          {hasSuccess && (
-            <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
-          )}
-        </div>
-      </div>
-      
-      {/* Error message */}
-      {hasError && (
-        <div 
-          id={fieldId ? `${fieldId}-error` : undefined}
-          className="flex items-start space-x-2 text-sm text-destructive"
-          role="alert"
-          aria-live="polite"
-        >
-          <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-      
-      {/* Success message */}
-      {hasSuccess && (
-        <div 
-          className="flex items-start space-x-2 text-sm text-green-700"
-          role="status"
-          aria-live="polite"
-        >
-          <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-          <span>{success}</span>
-        </div>
-      )}
-    </div>
-  );
-};
 
 // Enhanced input with validation states
 interface EnhancedFormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -146,7 +23,7 @@ interface EnhancedFormInputProps extends React.InputHTMLAttributes<HTMLInputElem
 }
 
 export const EnhancedFormInput = forwardRef<HTMLInputElement, EnhancedFormInputProps>(
-  ({ 
+  ({
     className,
     type,
     label,
@@ -157,23 +34,25 @@ export const EnhancedFormInput = forwardRef<HTMLInputElement, EnhancedFormInputP
     showPasswordToggle = false,
     onValidationChange,
     id,
-    ...props 
+    ...props
   }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
     const [internalError, setInternalError] = useState<string>();
     const inputRef = useRef<HTMLInputElement>(null);
-    
+
     // Combine refs
-    const combinedRef = useCallback((node: HTMLInputElement) => {
-      inputRef.current = node;
+    const combinedRef = useCallback((node: HTMLInputElement | null) => {
+      if (inputRef.current !== node) {
+        (inputRef as React.MutableRefObject<HTMLInputElement | null>).current = node;
+      }
       if (typeof ref === 'function') {
         ref(node);
       } else if (ref) {
-        ref.current = node;
+        (ref as React.MutableRefObject<HTMLInputElement | null>).current = node;
       }
     }, [ref]);
 
-    const currentType = showPasswordToggle && type === 'password' 
+    const currentType = showPasswordToggle && type === 'password'
       ? (showPassword ? 'text' : 'password')
       : type;
 
@@ -217,15 +96,55 @@ export const EnhancedFormInput = forwardRef<HTMLInputElement, EnhancedFormInputP
     }, []);
 
     return (
-      <FormFieldWrapper
-        label={label}
-        description={description}
-        error={displayError}
-        success={success}
-        required={props.required}
-        helpText={helpText}
-        fieldId={id}
-      >
+      <div className="space-y-2">
+        {label && (
+          <div className="flex items-center space-x-2">
+            <Label
+              htmlFor={id}
+              className={cn(
+                'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+                hasError && 'text-destructive',
+                hasSuccess && 'text-green-700'
+              )}
+            >
+              {label}
+              {props.required && (
+                <span className="text-destructive ml-1" aria-label="required">*</span>
+              )}
+            </Label>
+
+            {helpText && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="p-0 h-4 w-4"
+                    >
+                      <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                      <span className="sr-only">Help for {label}</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs text-xs">{helpText}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+        )}
+
+        {description && (
+          <p
+            id={id ? `${id}-description` : undefined}
+            className="text-sm text-muted-foreground"
+          >
+            {description}
+          </p>
+        )}
+
         <div className="relative">
           <input
             type={currentType}
@@ -238,7 +157,7 @@ export const EnhancedFormInput = forwardRef<HTMLInputElement, EnhancedFormInputP
             )}
             ref={combinedRef}
             id={id}
-            aria-invalid={hasError}
+            aria-invalid={hasError ? 'true' : 'false'}
             aria-describedby={cn(
               description && `${id}-description`,
               hasError && `${id}-error`
@@ -247,7 +166,17 @@ export const EnhancedFormInput = forwardRef<HTMLInputElement, EnhancedFormInputP
             onChange={handleChange}
             onBlur={handleBlur}
           />
-          
+
+          {/* Validation status icons */}
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            {hasError && (
+              <AlertCircle className="h-4 w-4 text-destructive" aria-hidden="true" />
+            )}
+            {hasSuccess && (
+              <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
+            )}
+          </div>
+
           {showPasswordToggle && type === 'password' && (
             <Button
               type="button"
@@ -265,7 +194,32 @@ export const EnhancedFormInput = forwardRef<HTMLInputElement, EnhancedFormInputP
             </Button>
           )}
         </div>
-      </FormFieldWrapper>
+
+        {/* Error message */}
+        {hasError && (
+          <div
+            id={id ? `${id}-error` : undefined}
+            className="flex items-start space-x-2 text-sm text-destructive"
+            role="alert"
+            aria-live="polite"
+          >
+            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <span>{displayError}</span>
+          </div>
+        )}
+
+        {/* Success message */}
+        {hasSuccess && (
+          <div
+            className="flex items-start space-x-2 text-sm text-green-700"
+            role="status"
+            aria-live="polite"
+          >
+            <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <span>{success}</span>
+          </div>
+        )}
+      </div>
     );
   }
 );
@@ -283,7 +237,7 @@ interface EnhancedFormTextareaProps extends React.TextareaHTMLAttributes<HTMLTex
 }
 
 export const EnhancedFormTextarea = forwardRef<HTMLTextAreaElement, EnhancedFormTextareaProps>(
-  ({ 
+  ({
     className,
     label,
     description,
@@ -295,7 +249,7 @@ export const EnhancedFormTextarea = forwardRef<HTMLTextAreaElement, EnhancedForm
     id,
     maxLength,
     value,
-    ...props 
+    ...props
   }, ref) => {
     const [internalError, setInternalError] = useState<string>();
     const [characterCount, setCharacterCount] = useState(0);
@@ -335,15 +289,55 @@ export const EnhancedFormTextarea = forwardRef<HTMLTextAreaElement, EnhancedForm
     }, [props.onBlur, handleValidation]);
 
     return (
-      <FormFieldWrapper
-        label={label}
-        description={description}
-        error={displayError}
-        success={success}
-        required={props.required}
-        helpText={helpText}
-        fieldId={id}
-      >
+      <div className="space-y-2">
+        {label && (
+          <div className="flex items-center space-x-2">
+            <Label
+              htmlFor={id}
+              className={cn(
+                'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+                hasError && 'text-destructive',
+                hasSuccess && 'text-green-700'
+              )}
+            >
+              {label}
+              {props.required && (
+                <span className="text-destructive ml-1" aria-label="required">*</span>
+              )}
+            </Label>
+
+            {helpText && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="p-0 h-4 w-4"
+                    >
+                      <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                      <span className="sr-only">Help for {label}</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs text-xs">{helpText}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+        )}
+
+        {description && (
+          <p
+            id={id ? `${id}-description` : undefined}
+            className="text-sm text-muted-foreground"
+          >
+            {description}
+          </p>
+        )}
+
         <div className="relative">
           <textarea
             className={cn(
@@ -356,7 +350,7 @@ export const EnhancedFormTextarea = forwardRef<HTMLTextAreaElement, EnhancedForm
             id={id}
             maxLength={maxLength}
             value={value}
-            aria-invalid={hasError}
+            aria-invalid={hasError ? 'true' : 'false'}
             aria-describedby={cn(
               description && `${id}-description`,
               hasError && `${id}-error`
@@ -365,7 +359,17 @@ export const EnhancedFormTextarea = forwardRef<HTMLTextAreaElement, EnhancedForm
             onChange={handleChange}
             onBlur={handleBlur}
           />
-          
+
+          {/* Validation status icons */}
+          <div className="absolute right-3 top-3 pointer-events-none">
+            {hasError && (
+              <AlertCircle className="h-4 w-4 text-destructive" aria-hidden="true" />
+            )}
+            {hasSuccess && (
+              <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
+            )}
+          </div>
+
           {showCharacterCount && maxLength && (
             <div className="absolute bottom-2 right-2 text-xs text-muted-foreground bg-background px-1">
               <span className={cn(
@@ -378,7 +382,32 @@ export const EnhancedFormTextarea = forwardRef<HTMLTextAreaElement, EnhancedForm
             </div>
           )}
         </div>
-      </FormFieldWrapper>
+
+        {/* Error message */}
+        {hasError && (
+          <div
+            id={id ? `${id}-error` : undefined}
+            className="flex items-start space-x-2 text-sm text-destructive"
+            role="alert"
+            aria-live="polite"
+          >
+            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <span>{displayError}</span>
+          </div>
+        )}
+
+        {/* Success message */}
+        {hasSuccess && (
+          <div
+            className="flex items-start space-x-2 text-sm text-green-700"
+            role="status"
+            aria-live="polite"
+          >
+            <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <span>{success}</span>
+          </div>
+        )}
+      </div>
     );
   }
 );
@@ -397,7 +426,7 @@ interface EnhancedFormSelectProps extends React.SelectHTMLAttributes<HTMLSelectE
 }
 
 export const EnhancedFormSelect = forwardRef<HTMLSelectElement, EnhancedFormSelectProps>(
-  ({ 
+  ({
     className,
     label,
     description,
@@ -408,7 +437,7 @@ export const EnhancedFormSelect = forwardRef<HTMLSelectElement, EnhancedFormSele
     placeholder = 'Select an option...',
     onValidationChange,
     id,
-    ...props 
+    ...props
   }, ref) => {
     const [internalError, setInternalError] = useState<string>();
 
@@ -438,49 +467,126 @@ export const EnhancedFormSelect = forwardRef<HTMLSelectElement, EnhancedFormSele
     }, [props.onBlur, handleValidation]);
 
     return (
-      <FormFieldWrapper
-        label={label}
-        description={description}
-        error={displayError}
-        success={success}
-        required={props.required}
-        helpText={helpText}
-        fieldId={id}
-      >
-        <select
-          className={cn(
-            'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-            hasError && 'border-destructive focus-visible:ring-destructive',
-            hasSuccess && 'border-green-500 focus-visible:ring-green-500',
-            className
-          )}
-          ref={ref}
-          id={id}
-          aria-invalid={hasError}
-          aria-describedby={cn(
-            description && `${id}-description`,
-            hasError && `${id}-error`
-          )}
-          {...props}
-          onChange={handleChange}
-          onBlur={handleBlur}
-        >
-          {placeholder && (
-            <option value="" disabled>
-              {placeholder}
-            </option>
-          )}
-          {options.map((option) => (
-            <option 
-              key={option.value} 
-              value={option.value}
-              disabled={option.disabled}
+      <div className="space-y-2">
+        {label && (
+          <div className="flex items-center space-x-2">
+            <Label
+              htmlFor={id}
+              className={cn(
+                'text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+                hasError && 'text-destructive',
+                hasSuccess && 'text-green-700'
+              )}
             >
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </FormFieldWrapper>
+              {label}
+              {props.required && (
+                <span className="text-destructive ml-1" aria-label="required">*</span>
+              )}
+            </Label>
+
+            {helpText && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="p-0 h-4 w-4"
+                    >
+                      <HelpCircle className="h-3 w-3 text-muted-foreground" />
+                      <span className="sr-only">Help for {label}</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs text-xs">{helpText}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
+        )}
+
+        {description && (
+          <p
+            id={id ? `${id}-description` : undefined}
+            className="text-sm text-muted-foreground"
+          >
+            {description}
+          </p>
+        )}
+
+        <div className="relative">
+          <select
+            className={cn(
+              'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+              hasError && 'border-destructive focus-visible:ring-destructive',
+              hasSuccess && 'border-green-500 focus-visible:ring-green-500',
+              className
+            )}
+            ref={ref}
+            id={id}
+            aria-invalid={hasError ? 'true' : 'false'}
+            aria-describedby={cn(
+              description && `${id}-description`,
+              hasError && `${id}-error`
+            )}
+            {...props}
+            onChange={handleChange}
+            onBlur={handleBlur}
+          >
+            {placeholder && (
+              <option value="" disabled>
+                {placeholder}
+              </option>
+            )}
+            {options.map((option) => (
+              <option
+                key={option.value}
+                value={option.value}
+                disabled={option.disabled}
+              >
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          {/* Validation status icons */}
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            {hasError && (
+              <AlertCircle className="h-4 w-4 text-destructive" aria-hidden="true" />
+            )}
+            {hasSuccess && (
+              <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
+            )}
+          </div>
+        </div>
+
+        {/* Error message */}
+        {hasError && (
+          <div
+            id={id ? `${id}-error` : undefined}
+            className="flex items-start space-x-2 text-sm text-destructive"
+            role="alert"
+            aria-live="polite"
+          >
+            <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <span>{displayError}</span>
+          </div>
+        )}
+
+        {/* Success message */}
+        {hasSuccess && (
+          <div
+            className="flex items-start space-x-2 text-sm text-green-700"
+            role="status"
+            aria-live="polite"
+          >
+            <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <span>{success}</span>
+          </div>
+        )}
+      </div>
     );
   }
 );

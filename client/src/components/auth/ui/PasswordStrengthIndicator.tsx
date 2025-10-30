@@ -29,8 +29,8 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
   if (!password) return null;
 
   const strengthLevel = Math.min(strength.score, PASSWORD_STRENGTH_LEVELS.VERY_STRONG);
-  const strengthLabel = PASSWORD_STRENGTH_LABELS[strengthLevel as keyof typeof PASSWORD_STRENGTH_LABELS];
-  const strengthColor = PASSWORD_STRENGTH_COLORS[strengthLevel as keyof typeof PASSWORD_STRENGTH_COLORS];
+  const strengthLabel = PASSWORD_STRENGTH_LABELS[strengthLevel] || 'Unknown';
+  const strengthColor = PASSWORD_STRENGTH_COLORS[strengthLevel] || '#gray';
 
   const getStrengthTextColor = () => {
     switch (strengthLevel) {
@@ -65,7 +65,7 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
         </div>
         
         <div className="flex space-x-1">
-          {Array.from({ length: 5 }).map((_, index) => (
+          {Array.from({ length: 5 }, (_, index) => (
             <div
               key={index}
               className={cn(
@@ -80,29 +80,25 @@ export const PasswordStrengthIndicator: React.FC<PasswordStrengthIndicatorProps>
       </div>
 
       {/* Requirements */}
-      {showRequirements && feedback.requirements.length > 0 && (
+      {showRequirements && feedback.length > 0 && (
         <div className="space-y-1">
           <span className="text-xs text-gray-600 dark:text-gray-400">
             Requirements:
           </span>
           <ul className="space-y-1">
-            {feedback.requirements.map((requirement, index) => (
+            {feedback.map((requirement, index) => (
               <li
                 key={index}
                 className={cn(
                   'text-xs flex items-center space-x-2',
-                  requirement.met
-                    ? 'text-green-600 dark:text-green-400'
-                    : 'text-gray-500 dark:text-gray-400'
+                  'text-red-600 dark:text-red-400' // All feedback items are missing requirements
                 )}
               >
                 <span className={cn(
                   'w-1.5 h-1.5 rounded-full flex-shrink-0',
-                  requirement.met
-                    ? 'bg-green-500'
-                    : 'bg-gray-300 dark:bg-gray-600'
+                  'bg-red-500' // All feedback items are missing requirements
                 )} />
-                <span>{requirement.description}</span>
+                <span>{requirement}</span>
               </li>
             ))}
           </ul>

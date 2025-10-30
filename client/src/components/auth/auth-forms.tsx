@@ -14,7 +14,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { useAuthForm } from './hooks/useAuthForm';
-import { FormData } from './types';
+import { FormData, FormFieldName } from './types';
 
 const AuthForm = () => {
   const {
@@ -33,7 +33,7 @@ const AuthForm = () => {
   } = useAuthForm();
 
   const renderInput = (
-    name: keyof FormData,
+    name: FormFieldName,
     label: string,
     type: string,
     placeholder: string,

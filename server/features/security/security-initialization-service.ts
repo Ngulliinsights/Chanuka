@@ -8,7 +8,7 @@ import { tlsConfigService } from './tls-config-service.ts';
 // import { authRateLimit, apiRateLimit } from '../middleware/rate-limiter.ts'; // TODO: Fix missing module
 import https from 'https';
 import fs from 'fs';
-import { logger } from '@shared/core';
+import { logger  } from '../../../shared/core/src/index.js';
 
 /**
  * Security initialization service that sets up all security components

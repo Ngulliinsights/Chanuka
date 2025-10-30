@@ -2,23 +2,25 @@
  * Client Loading Utilities - Helper functions for loading operations
  */
 
-import { LoadingType, LoadingPriority } from './types';
+import { LoadingType, LoadingPriority, LoadingOperation } from './types';
 import { 
-  calculateEstimatedTime as coreCalculateEstimatedTime,
-  getConnectionMultiplier as coreGetConnectionMultiplier,
+  getAdjustedTimeout,
   calculateRetryDelay as coreCalculateRetryDelay,
-  formatLoadingTime as coreFormatLoadingTime,
-  hasOperationTimedOut as coreHasOperationTimedOut,
-  shouldShowTimeoutWarning as coreShowTimeoutWarning
-} from '@shared/core/src/utils/loading-utils';
+  sortOperationsByPriority,
+  filterOperationsByConnection,
+  analyzeLoadingPerformance,
+  createOperationFromScenario
+} from '../../utils/comprehensiveLoading';
 
 // Re-export cross-cutting utilities
-export const calculateEstimatedTime = coreCalculateEstimatedTime;
-export const getConnectionMultiplier = coreGetConnectionMultiplier;
+export const calculateEstimatedTime = (operation: LoadingOperation) => operation.estimatedTime || 5000;
+export const getConnectionMultiplier = (connectionType: string) => connectionType === 'slow' ? 2 : 1;
 export const calculateRetryDelay = coreCalculateRetryDelay;
-export const formatLoadingTime = coreFormatLoadingTime;
-export const hasOperationTimedOut = coreHasOperationTimedOut;
-export const shouldShowTimeoutWarning = coreShowTimeoutWarning;
+export const formatLoadingTime = (ms: number) => `${Math.round(ms / 1000)}s`;
+export const hasOperationTimedOut = (operation: LoadingOperation, currentTime: number) => 
+  currentTime - operation.startTime > (operation.timeout || 10000);
+export const shouldShowTimeoutWarning = (operation: LoadingOperation, currentTime: number) =>
+  currentTime - operation.startTime > (operation.timeout || 10000) * 0.8;
 
 /**
  * Determine if operation should be skipped based on connection and priority

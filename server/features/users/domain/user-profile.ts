@@ -2,11 +2,11 @@ import { database as db } from '@shared/database/connection';
 import { users, userProfiles, userInterests, billEngagement, notifications, billComments, bills } from '@shared/schema/schema';
 import { eq, and, desc, sql, count } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
-import { cacheKeys } from '@shared/core';
+import { cacheKeys  } from '../../../../shared/core/src/index.js';
 import { databaseService } from '../../../infrastructure/database/database-service';
 import { z } from 'zod';
-import { logger } from '@shared/core';
-import { CACHE_KEYS } from '@shared/core';
+import { logger  } from '../../../../shared/core/src/index.js';
+import { CACHE_KEYS  } from '../../../../shared/core/src/index.js';
 
 // Data validation schemas
 const userProfileDataSchema = z.object({
