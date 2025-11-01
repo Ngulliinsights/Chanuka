@@ -331,15 +331,10 @@ class ProjectStructureVerifier {
         [/from\s+['"]\.\.\/\.\.\/client\/src/g, "from '@"],
         [/from\s+['"]client\/src/g, "from '@"],
         
-        // Server imports  
+        // Server imports
         [/from\s+['"]\.\.\/\.\.\/server/g, "from '@server"],
         [/from\s+['"]server\//g, "from '@server/"],
-        
-        // Shared types
-        [/from\s+['"]\.\.\/\.\.\/shared\/types/g, "from '@shared/types"],
-        [/from\s+['"]shared\/types/g, "from '@shared/types"],
       ];
-
       for (const [pattern, replacement] of pathFixes) {
         content = content.replace(pattern, replacement);
       }

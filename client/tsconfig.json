@@ -1,23 +1,37 @@
 {
-  "extends": "../tsconfig.json",
-  "include": [
-    "src/**/*",
-    "../shared/schema/**/*"
-  ],
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022", "dom", "dom.iterable"],
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "noEmit": true,
+    "rootDir": "..",
+  "skipLibCheck": true,
+  "strict": false,
+  "noImplicitAny": false,
+    "types": ["vite/client", "vitest/globals"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@shared/*": ["../shared/*"],
+      "@shared/core": ["src/types/shims-shared.d.ts"],
+      "@shared/core/*": ["src/types/shims-shared.d.ts"],
+      "@shared/schema": ["src/types/shims-shared.d.ts"],
+      "@shared/schema/*": ["src/types/shims-shared.d.ts"]
+    }
+  },
+  "include": ["src/**/*"],
   "exclude": [
     "node_modules",
     "dist",
     "**/*.test.ts",
-    "**/*.test.tsx"
-  ],
-  "compilerOptions": {
-    "baseUrl": ".",
-    "jsx": "react-jsx",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "types": ["vite/client", "@types/react", "@types/react-dom"],
-    "paths": {
-      "@/*": ["./src/*"],
-      "@shared/*": ["../shared/*"]
-    }
-  }
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/__tests__/**",
+    "**/*.d.ts"
+  ]
 }

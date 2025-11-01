@@ -289,7 +289,7 @@ describe('AsyncTestHelper', () => {
         return counter >= 3;
       };
       
-      const result = await AsyncTestHelper.await waitFor(condition, { interval: 10 });
+      const result = await AsyncTestHelper.waitFor(condition, { interval: 10 });
       expect(result).toBe(true);
       expect(counter).toBeGreaterThanOrEqual(3);
     });
@@ -298,7 +298,7 @@ describe('AsyncTestHelper', () => {
       const condition = () => false;
       
       await expect(
-        AsyncTestHelper.await waitFor(condition, { timeout: 100, interval: 10 })
+        AsyncTestHelper.waitFor(condition, { timeout: 100, interval: 10 })
       ).rejects.toThrow('Timeout after 100ms');
     });
   });
@@ -474,10 +474,8 @@ describe('IntegrationTestHelper', () => {
 
   describe('mockFetch', () => {
     afterEach(() => {
-    cleanup();
       vi.restoreAllMocks();
-    
-  });
+    });
 
     it('should mock fetch with response', async () => {
       const mockData = { test: 'data' };

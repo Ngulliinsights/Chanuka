@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-#!/usr/bin/env node
 
 const fs = require('fs');
 const path = require('path');

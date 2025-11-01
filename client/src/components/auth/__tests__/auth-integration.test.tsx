@@ -465,7 +465,7 @@ describe('Auth Integration Workflows', () => {
       await FormTestHelper.clickButton(submitButton);
 
       // Wait for all promises to resolve
-      await AsyncTestHelper.await waitFor(() => resolveCount > 0, { timeout: 200 });
+      await waitFor(() => resolveCount > 0, { timeout: 200 });
 
       // Should only have been called once
       expect(mockAuthService.login).toHaveBeenCalledTimes(1);

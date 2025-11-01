@@ -552,6 +552,7 @@ client/
 │   │   │   ├── api-error-handling.test.ts
 │   │   │   ├── PageRelationshipService.test.ts
 │   │   │   ├── UserJourneyTracker.test.ts
+│   │   │   ├── websocket-client.test.ts
 │   │   ├── analysis.ts
 │   │   ├── api.ts
 │   │   ├── apiInterceptors.ts
@@ -855,6 +856,7 @@ scripts/
 ├── deployment/
 │   ├── deploy.sh
 ├── diagnose-503-issues.js
+├── domain-type-migration-plan.md
 ├── drop-schema.ts
 ├── fix-all-shared-core-imports.ts
 ├── fix-api-response-calls.js
@@ -877,6 +879,7 @@ scripts/
 ├── migrate-codebase-utilities.ts
 ├── migrate-console-logs.ts
 ├── migrate-error-handling.ts
+├── migrate-shared-types.ts
 ├── optimize-memory.js
 ├── performance-budget-enforcer.cjs
 ├── performance-trend-analyzer.cjs
@@ -983,12 +986,25 @@ server/
 │   ├── government-data-integration-implementation.md
 ├── features/
 │   ├── admin/
+│   │   ├── __tests__/
+│   │   │   ├── content-moderation.test.ts
 │   │   ├── admin.ts
 │   │   ├── admin-router.ts
 │   │   ├── content-moderation.ts
 │   │   ├── external-api-dashboard.ts
 │   │   ├── index.ts
+│   │   ├── moderation/
 │   │   ├── moderation.ts
+│   │   │   ├── __tests__/
+│   │   │   │   ├── content-analysis.service.test.ts
+│   │   │   │   ├── moderation-orchestrator.service.test.ts
+│   │   │   ├── content-analysis.service.ts
+│   │   │   ├── index.ts
+│   │   │   ├── moderation-analytics.service.ts
+│   │   │   ├── moderation-decision.service.ts
+│   │   │   ├── moderation-orchestrator.service.ts
+│   │   │   ├── moderation-queue.service.ts
+│   │   │   ├── types.ts
 │   │   ├── system.ts
 │   ├── alert-preferences/
 │   │   ├── alert_system_docs.md
@@ -1037,6 +1053,7 @@ server/
 │   │   │   ├── public-interest-analysis.service.ts
 │   │   │   ├── stakeholder-analysis.service.ts
 │   │   │   ├── transparency-analysis.service.ts
+│   │   ├── architecture-analysis-report.md
 │   │   ├── domain/
 │   │   │   ├── entities/
 │   │   │   │   ├── analysis-result.ts
@@ -1055,13 +1072,29 @@ server/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── analysis.routes.test.ts
 │   │   │   ├── analysis.routes.ts
+│   │   ├── types/
+│   │   │   ├── index.ts
 │   ├── analytics/
 │   │   ├── analytics.ts
 │   │   ├── config/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── analytics.config.test.ts
 │   │   │   ├── analytics.config.ts
+│   │   ├── conflict-detection/
 │   │   ├── conflict-detection.ts
+│   │   │   ├── __tests__/
+│   │   │   │   ├── conflict-detection-engine.service.test.ts
+│   │   │   │   ├── conflict-detection-orchestrator.service.test.ts
+│   │   │   │   ├── conflict-resolution-recommendation.service.test.ts
+│   │   │   │   ├── conflict-severity-analyzer.service.test.ts
+│   │   │   │   ├── stakeholder-analysis.service.test.ts
+│   │   │   ├── conflict-detection-engine.service.ts
+│   │   │   ├── conflict-detection-orchestrator.service.ts
+│   │   │   ├── conflict-resolution-recommendation.service.ts
+│   │   │   ├── conflict-severity-analyzer.service.ts
+│   │   │   ├── index.ts
+│   │   │   ├── stakeholder-analysis.service.ts
+│   │   │   ├── types.ts
 │   │   ├── controllers/
 │   │   │   ├── engagement.controller.ts
 │   │   ├── dashboard.ts
@@ -1075,8 +1108,17 @@ server/
 │   │   ├── engagement-analytics.ts
 │   │   ├── financial-disclosure/
 │   │   │   ├── config.ts
+│   │   │   ├── financial-disclosure-orchestrator.service.ts
 │   │   │   ├── index.ts
 │   │   │   ├── monitoring.ts
+│   │   │   ├── services/
+│   │   │   │   ├── anomaly-detection.service.ts
+│   │   │   │   ├── disclosure-processing.service.ts
+│   │   │   │   ├── disclosure-validation.service.ts
+│   │   │   │   ├── financial-analysis.service.ts
+│   │   │   │   ├── index.ts
+│   │   │   ├── tests/
+│   │   │   │   ├── financial-disclosure-workflow.integration.test.ts
 │   │   │   ├── types.ts
 │   │   ├── index.ts
 │   │   ├── legal-analysis.ts
@@ -1138,6 +1180,8 @@ server/
 │   │   ├── real-time-tracking.ts
 │   │   ├── services/
 │   │   │   ├── voting-pattern-analysis-service.ts
+│   │   ├── types/
+│   │   │   ├── analysis.ts
 │   │   ├── voting-pattern-analysis.ts
 │   │   ├── voting-pattern-analysis-router.ts
 │   ├── community/
@@ -1152,6 +1196,8 @@ server/
 │   │   ├── stakeholder-storage.ts
 │   ├── government-data/
 │   │   ├── routes.ts
+│   ├── infrastructure/
+│   │   ├── cache/
 │   ├── privacy/
 │   │   ├── privacy-routes.ts
 │   │   ├── privacy-scheduler.ts
@@ -1172,6 +1218,9 @@ server/
 │   │   ├── presentation/
 │   │   │   ├── RecommendationController.ts
 │   ├── search/
+│   │   ├── __tests__/
+│   │   │   ├── search-benchmark.ts
+│   │   │   ├── search-performance.test.ts
 │   │   ├── application/
 │   │   │   ├── RelevanceScorer.ts
 │   │   │   ├── SearchService.ts
@@ -1181,6 +1230,9 @@ server/
 │   │   │   ├── search.dto.ts
 │   │   │   ├── SearchAnalytics.ts
 │   │   │   ├── SearchValidator.ts
+│   │   ├── engines/
+│   │   │   ├── suggestion-engine.service.ts
+│   │   │   ├── suggestion-ranking.service.ts
 │   │   ├── index.ts
 │   │   ├── infrastructure/
 │   │   │   ├── SearchCache.ts
@@ -1191,6 +1243,13 @@ server/
 │   │   │   ├── SearchController.ts
 │   │   ├── recommendation.README.md
 │   │   ├── search-index-manager.ts
+│   │   ├── services/
+│   │   │   ├── history-cleanup.service.ts
+│   │   │   ├── query-builder.service.ts
+│   │   ├── types/
+│   │   │   ├── search.types.ts
+│   │   ├── utils/
+│   │   │   ├── parallel-query-executor.ts
 │   ├── search-suggestions.ts
 │   ├── security/
 │   │   ├── encryption-service.ts
@@ -1202,7 +1261,6 @@ server/
 │   │   ├── security-monitoring.ts
 │   │   ├── security-monitoring-service.ts
 │   │   ├── tls-config-service.ts
-│   ├── sidebar.tsx
 │   ├── sponsors/
 │   │   ├── application/
 │   │   │   ├── __tests__/
@@ -1218,6 +1276,9 @@ server/
 │   │   │   ├── __tests__/
 │   │   │   │   ├── sponsors.routes.test.ts
 │   │   │   ├── sponsors.routes.ts
+│   │   ├── types/
+│   │   │   ├── analysis.ts
+│   │   │   ├── index.ts
 │   ├── users/
 │   │   ├── __tests__/
 │   │   │   ├── ExpertVerificationService.test.ts
@@ -1267,6 +1328,8 @@ server/
 │   │   │   │   ├── verification-repository-impl.ts
 │   │   │   ├── user-storage.d.ts
 │   │   │   ├── user-storage.ts
+│   │   ├── types/
+│   │   │   ├── index.ts
 ├── index.ts
 ├── infrastructure/
 │   ├── cache/
@@ -1335,6 +1398,10 @@ server/
 │   │   ├── README.md
 │   │   ├── refactored_summary.md
 │   │   ├── smart-notification-filter.ts
+│   ├── security/
+│   │   ├── data-privacy-service.ts
+│   │   ├── input-validation-service.ts
+│   │   ├── secure-query-builder.ts
 │   ├── websocket.ts
 ├── logs/
 │   ├── app.log
@@ -1343,6 +1410,7 @@ server/
 │   ├── security.log
 ├── middleware/
 │   ├── auth.ts
+│   ├── file-upload-validation.ts
 │   ├── migration-wrapper.ts
 │   ├── privacy-middleware.ts
 │   ├── rate-limiter.ts
@@ -1403,6 +1471,13 @@ server/
 │   ├── privacy-service.test.ts
 │   ├── README.md
 │   ├── real-time-bill-tracking.test.ts
+│   ├── security/
+│   │   ├── comprehensive-validation.test.ts
+│   │   ├── data-privacy-service.test.ts
+│   │   ├── input-validation-service.test.ts
+│   │   ├── secure-query-builder.test.ts
+│   │   ├── security-implementation.test.ts
+│   │   ├── sql-injection-prevention.test.ts
 │   ├── services/
 │   │   ├── database-fallback.integration.test.ts
 │   │   ├── demo-data.test.ts
@@ -1424,6 +1499,7 @@ server/
 │   ├── voting-pattern-analysis.test.ts
 ├── types/
 │   ├── api.ts
+│   ├── common.ts
 │   ├── jest-extensions.d.ts
 │   ├── shared-schema-short.d.ts
 ├── utils/
@@ -1806,14 +1882,6 @@ shared/
 │   ├── searchVectorMigration.ts
 │   ├── types.ts
 │   ├── validation.ts
-├── types/
-│   ├── auth.ts
-│   ├── bill.ts
-│   ├── common.ts
-│   ├── errors.ts
-│   ├── expert.ts
-│   ├── index.ts
-│   ├── legal-analysis.ts
 src/
 ├── setupTests.ts
 tailwind.config.ts
@@ -1868,4 +1936,4 @@ vitest.frontend.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-30 07:41:34
+Generated on: 2025-10-30 22:56:51

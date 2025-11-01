@@ -11,8 +11,8 @@ import {
   type Sponsor, type SponsorAffiliation, type SponsorTransparency, type Bill
 } from '../../../../shared/schema';
 import { eq } from 'drizzle-orm';
-import { getDefaultCache } from '../../../../shared/core/src/index.js';
-import { logger } from '../../../../shared/core/src/index.js';
+import { getDefaultCache } from '../../../../shared/core/src/caching/index.js';
+import { logger } from '../../../../shared/core/index.js';
 import {
   ConflictAnalysis,
   ConflictDetectionError,

@@ -44,11 +44,11 @@ vi.mock('../../utils/metrics', () => mockMetrics);
 vi.mock('../../utils/api-response', () => mockApiResponse);
 
 // Import the mocked modules for type safety
-import * as validation from '@/$2/validation';
-import * as crypto from '@/$2/crypto';
+import * as validation from '../../utils/validation';
+import * as crypto from '../../utils/crypto';
 import * as logger from '@shared/core/src/observability/logging';
-import * as metrics from '@/$2/metrics';
-import * as apiResponse from '@/$2/api-response';
+import * as metrics from '../../utils/metrics';
+import * as apiResponse from '../../utils/api-response';
 
 describe('Validation Utils', () => {
   beforeEach(() => {

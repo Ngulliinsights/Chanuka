@@ -232,7 +232,6 @@ export class Mutex {
  */
 export class Semaphore {
   private permits: number;
-  private readonly maxPermits: number;
   private waiting: Array<() => void> = [];
 
   constructor(permits: number) {
@@ -240,7 +239,6 @@ export class Semaphore {
       throw new Error('Semaphore permits must be a positive integer');
     }
     this.permits = permits;
-    this.maxPermits = permits;
   }
 
   /**

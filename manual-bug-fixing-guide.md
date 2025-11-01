@@ -539,7 +539,7 @@ After applying fixes:
 1. Add imports:
    ```typescript
    import { ApiResponse } from "../../../utils/api-response";
-   import type { Bill } from "../../../../shared/types";
+   import type { Bill } from "../../../types/common";
    ```
 2. Replace `res.json()` with `ApiResponse.success()`
 3. Update database queries to use proper schema references

@@ -1,4 +1,11 @@
-import pino from 'pino';
+// `pino` is an optional runtime dependency; if not available fall back to console-based logger
+let pino: any = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  pino = require('pino');
+} catch (_err) {
+  pino = null;
+}
 import { AsyncLocalStorage } from 'async_hooks';
 import { promises as fs } from 'fs';
 import { stat } from 'fs/promises';

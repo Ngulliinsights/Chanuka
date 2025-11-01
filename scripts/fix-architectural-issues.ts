@@ -493,9 +493,7 @@ export const createDatabaseError = (
         "@shared/core": ["./shared/core/src/index.ts"],
         "@shared/core/*": ["./shared/core/src/*"],
         "@shared/schema": ["./shared/schema/index.ts"],
-        "@shared/schema/*": ["./shared/schema/*"],
-        "@shared/types": ["./shared/types/index.ts"],
-        "@shared/types/*": ["./shared/types/*"]
+        "@shared/schema/*": ["./shared/schema/*"]
       };
 
       for (const [path, mapping] of Object.entries(requiredPaths)) {

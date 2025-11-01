@@ -6,7 +6,7 @@ import { existsSync, mkdirSync, writeFileSync } from 'fs';
 import { mkdir, writeFile } from 'fs/promises';
 import { join, resolve } from 'path';
 import { Pool } from 'pg';
-import { logger } from '@shared/core/src/utils/browser-logger'';
+import { logger } from '@shared/core/src/utils/browser-logger';
 
 // Polyfill AggregateError if not available
 if (typeof AggregateError === 'undefined') {

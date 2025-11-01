@@ -6,7 +6,7 @@ import { assetLoadingManager, setupAssetPreloading } from "./utils/asset-loading
 import { getMobileErrorHandler } from "./utils/mobile-error-handler";
 import { loadPolyfills } from "./utils/polyfills";
 import { logger } from './utils/browser-logger';
-import { performanceMonitor } from '../../shared/core/src/performance/monitoring';
+import { performanceMonitor } from '@shared/core';
 
 /**
  * Application Loading States

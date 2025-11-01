@@ -49,18 +49,22 @@ vi.mock('../../../../shared/database/connection', () => ({
 }));
 
 // Mock shared cache service
-vi.mock('../../../../shared/core/src/index.js', () => ({
-  logger: {
-    error: vi.fn(),
-    warn: vi.fn(),
-    info: vi.fn(),
-    debug: vi.fn()
-  },
+vi.mock('../../../../shared/core/src/caching/index.js', () => ({
   getDefaultCache: vi.fn(() => ({
     get: vi.fn(),
     set: vi.fn(),
     invalidateByPattern: vi.fn()
   }))
+}));
+
+// Mock logger
+vi.mock('../../../../shared/core/index.js', () => ({
+  logger: {
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    debug: vi.fn()
+  }
 }));
 
 describe('ConflictDetectionOrchestratorService', () => {
