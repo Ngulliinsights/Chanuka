@@ -139,7 +139,7 @@ export interface ${pascalName}Props {
   className?: string;
   disabled?: boolean;
   loading?: boolean;
-  error?: ${pascalName}Error | null;
+  error?: ${pascalName}Error;
   onError?: (error: ${pascalName}Error) => void;
   onSuccess?: (data: any) => void;
 }
@@ -185,7 +185,7 @@ export interface Use${pascalName}Options {
 export interface Use${pascalName}Result {
   data: ${pascalName}Data | null;
   loading: boolean;
-  error: ${pascalName}Error | null;
+  error: ${pascalName}Error;
   actions: {
     refresh: () => Promise<void>;
     reset: () => void;

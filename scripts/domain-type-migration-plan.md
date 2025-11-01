@@ -19,7 +19,7 @@
 
 #### Auth Types:
 - `server/features/users/infrastructure/user-storage.d.ts` → `@shared/core/src/types/auth.types`
-- `server/types/api.ts` → Update common type imports
+- `server/types/api.ts` and server/types/common.ts → Update common type imports
 
 #### Configuration Updates:
 - Remove `@shared/types` from vitest.config.ts
@@ -45,9 +45,13 @@
 - Bill analysis types (extensively used, established patterns)
 
 ## 🔄 Migration Order:
-1. Update legal analysis imports
-2. Update expert/verification imports  
-3. Update auth-related imports
-4. Update configuration files
-5. Verify no broken imports
-6. Delete shared/types directory
+1. ✅ Update legal analysis imports
+2. ✅ Update expert/verification imports
+3. ✅ Update auth-related imports
+4. ✅ Update configuration files
+5. ✅ Verify no broken imports
+6. ✅ Delete shared/types directory
+
+## ✅ Migration Status: COMPLETED
+
+The domain-specific type migration has been successfully completed. All types have been moved to their respective feature directories, and the `@shared/types` directory has been removed. Configuration files have been updated to remove references to `@shared/types`.

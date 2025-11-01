@@ -3,11 +3,10 @@
  * Provides real-time performance monitoring and metrics visualization
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { performanceOptimizer, usePerformanceOptimization } from '../../utils/performance-optimizer';
 import { logger } from '../../utils/browser-logger';
-import { performanceMonitor } from '../../../../shared/core/src/performance/monitoring';
-import { cache as getDefaultCache } from '../../../../shared/core/src/utils/cache-utils';
+import { performanceMonitor, cache as getDefaultCache } from '@shared/core';
 
 interface PerformanceMetricsProps {
   showDetails?: boolean;
@@ -61,18 +60,27 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
     try {
       setMetrics(prev => ({ ...prev, isLoading: true }));
 
-      const coreWebVitals = { lcp: 0, fid: 0, cls: 0, fcp: 0, ttfb: 0 }; // Placeholder
-      const bundleMetrics = getBundleMetrics();
-      const cacheMetrics = getDefaultCache.getMetrics();
-      const performanceScore = 85; // Placeholder
-      const recommendations = getLatestRecommendations();
+      // Collect metrics. Many helpers can be async — await them to be safe.
+      const coreWebVitals = { lcp: 0, fid: 0, cls: 0, fcp: 0, ttfb: 0 }; // Placeholder/fallback
+      const bundleMetrics = await Promise.resolve(getBundleMetrics());
+      // Prefer a provided getCacheMetrics; fall back to shared cache if available
+      const cacheMetrics = typeof getCacheMetrics === 'function'
+        ? await Promise.resolve(getCacheMetrics())
+        : (getDefaultCache && typeof getDefaultCache.getMetrics === 'function' ? getDefaultCache.getMetrics() : {});
 
-      const newMetrics = {
+      const performanceScore = 85; // Placeholder — replace with real calc if available
+
+      const recommendationsRaw = await Promise.resolve(getLatestRecommendations());
+      const recommendations = Array.isArray(recommendationsRaw)
+        ? recommendationsRaw
+        : (recommendationsRaw ? [recommendationsRaw] : []);
+
+      const newMetrics: MetricsState = {
         coreWebVitals,
-        bundleMetrics,
-        cacheMetrics,
-        performanceScore,
-        recommendations: recommendations ? [recommendations] : [],
+        bundleMetrics: bundleMetrics ?? null,
+        cacheMetrics: cacheMetrics ?? {},
+        performanceScore: performanceScore ?? 0,
+        recommendations,
         isLoading: false,
         lastUpdated: new Date()
       };
@@ -93,9 +101,10 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
     collectMetrics();
 
     // Set up auto-refresh
-    let interval: NodeJS.Timeout | null = null;
+    // In browser environments setInterval returns a number; use number | null for typing
+    let interval: number | null = null;
     if (autoRefresh) {
-      interval = setInterval(collectMetrics, refreshInterval);
+      interval = window.setInterval(collectMetrics, refreshInterval);
     }
 
     return () => {
@@ -125,7 +134,8 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
   };
 
   const getCoreWebVitalStatus = (metric: string, value?: number): string => {
-    if (!value) return 'text-gray-400';
+    // Treat 0 as a valid numeric value; only null/undefined means missing
+    if (value == null) return 'text-gray-400';
     
     switch (metric) {
       case 'lcp':
@@ -224,8 +234,8 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
                 <div className="bg-gray-50 rounded p-2">
                   <div className="flex justify-between">
                     <span>LCP</span>
-                    <span className={getCoreWebVitalStatus('lcp', metrics.coreWebVitals.lcp)}>
-                      {metrics.coreWebVitals.lcp ? formatTime(metrics.coreWebVitals.lcp) : 'N/A'}
+                      <span className={getCoreWebVitalStatus('lcp', metrics.coreWebVitals.lcp)}>
+                      {typeof metrics.coreWebVitals.lcp === 'number' ? formatTime(metrics.coreWebVitals.lcp) : 'N/A'}
                     </span>
                   </div>
                 </div>
@@ -233,7 +243,7 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
                   <div className="flex justify-between">
                     <span>FID</span>
                     <span className={getCoreWebVitalStatus('fid', metrics.coreWebVitals.fid)}>
-                      {metrics.coreWebVitals.fid ? formatTime(metrics.coreWebVitals.fid) : 'N/A'}
+                      {typeof metrics.coreWebVitals.fid === 'number' ? formatTime(metrics.coreWebVitals.fid) : 'N/A'}
                     </span>
                   </div>
                 </div>
@@ -241,7 +251,7 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
                   <div className="flex justify-between">
                     <span>CLS</span>
                     <span className={getCoreWebVitalStatus('cls', metrics.coreWebVitals.cls)}>
-                      {metrics.coreWebVitals.cls ? metrics.coreWebVitals.cls.toFixed(3) : 'N/A'}
+                      {typeof metrics.coreWebVitals.cls === 'number' ? metrics.coreWebVitals.cls.toFixed(3) : 'N/A'}
                     </span>
                   </div>
                 </div>
@@ -249,7 +259,7 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
                   <div className="flex justify-between">
                     <span>FCP</span>
                     <span className={getCoreWebVitalStatus('fcp', metrics.coreWebVitals.fcp)}>
-                      {metrics.coreWebVitals.fcp ? formatTime(metrics.coreWebVitals.fcp) : 'N/A'}
+                      {typeof metrics.coreWebVitals.fcp === 'number' ? formatTime(metrics.coreWebVitals.fcp) : 'N/A'}
                     </span>
                   </div>
                 </div>
@@ -295,11 +305,11 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-xs font-medium capitalize">{cacheName}</span>
                         <span className="text-xs text-green-600">
-                          {stats.hitRate?.toFixed(1)}% hit rate
+                          {stats.hitRate != null ? `${Number(stats.hitRate).toFixed(1)}% hit rate` : 'N/A'}
                         </span>
                       </div>
                       <div className="text-xs text-gray-600">
-                        {stats.entryCount} entries, {formatBytes(stats.totalSize)}
+                        {stats.entryCount ?? 0} entries, {formatBytes(stats.totalSize ?? 0)}
                       </div>
                     </div>
                   ))}
@@ -321,13 +331,13 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
                         {rec.priority.toUpperCase()} PRIORITY
                       </div>
                       <div className="text-xs space-y-1">
-                        {rec.bundleOptimizations?.map((opt: string, i: number) => (
+                        {Array.isArray(rec.bundleOptimizations) && rec.bundleOptimizations.map((opt: string, i: number) => (
                           <div key={i}>• {opt}</div>
                         ))}
-                        {rec.cacheOptimizations?.map((opt: string, i: number) => (
+                        {Array.isArray(rec.cacheOptimizations) && rec.cacheOptimizations.map((opt: string, i: number) => (
                           <div key={i}>• {opt}</div>
                         ))}
-                        {rec.performanceOptimizations?.map((opt: string, i: number) => (
+                        {Array.isArray(rec.performanceOptimizations) && rec.performanceOptimizations.map((opt: string, i: number) => (
                           <div key={i}>• {opt}</div>
                         ))}
                       </div>
@@ -342,7 +352,8 @@ export const PerformanceMetricsCollector: React.FC<PerformanceMetricsProps> = ({
               <button
                 onClick={() => {
                   const report = performanceOptimizer.exportPerformanceReport();
-                  const blob = new Blob([report], { type: 'application/json' });
+                  const reportString = typeof report === 'string' ? report : JSON.stringify(report, null, 2);
+                  const blob = new Blob([reportString], { type: 'application/json' });
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement('a');
                   a.href = url;

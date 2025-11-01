@@ -11,29 +11,8 @@ import {
   type Sponsor, type SponsorAffiliation, type SponsorTransparency, type Bill
 } from '../../../../shared/schema';
 import { eq, and, sql, desc, gte, lte, count, inArray, like, or } from 'drizzle-orm';
-// Simple logger for conflict detection
-const logger = {
-  error: (message: string, context?: any) => console.error(`[ConflictDetection] ${message}`, context),
-  warn: (message: string, context?: any) => console.warn(`[ConflictDetection] ${message}`, context),
-  info: (message: string, context?: any) => console.info(`[ConflictDetection] ${message}`, context),
-  debug: (message: string, context?: any) => console.debug(`[ConflictDetection] ${message}`, context)
-};
-
-// Simple cache for conflict detection
-const cache = new Map<string, { value: any; expiry: number }>();
-const getCache = () => ({
-  async get(key: string) {
-    const entry = cache.get(key);
-    if (!entry || Date.now() > entry.expiry) {
-      cache.delete(key);
-      return null;
-    }
-    return entry.value;
-  },
-  async set(key: string, value: any, ttlSeconds: number = 3600) {
-    cache.set(key, { value, expiry: Date.now() + (ttlSeconds * 1000) });
-  }
-});
+import { getDefaultCache } from '../../../../shared/core/src/caching/index.js';
+import { logger } from '../../../../shared/core/index.js';
 import {
   FinancialConflict,
   ProfessionalConflict,
@@ -370,8 +349,8 @@ export class ConflictDetectionEngineService {
   ): Promise<number[]> {
     try {
       const cacheKey = `affected_bills:${organization}:${billId || 'all'}`;
-      const cacheInstance = getCache();
-      const cached = await cacheInstance.get(cacheKey);
+      const cache = getDefaultCache();
+      const cached = await cache.get(cacheKey);
       if (cached) return cached;
 
       // Simple implementation - in reality this would be more sophisticated
@@ -387,7 +366,7 @@ export class ConflictDetectionEngineService {
         .limit(10);
 
       const result = bills.map(b => b.id);
-      await cacheInstance.set(cacheKey, result, 1800);
+      await cache.set(cacheKey, result, 1800);
       return result;
     } catch (error) {
       logger.error('Error finding affected bills:', { organization, error });

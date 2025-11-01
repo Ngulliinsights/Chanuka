@@ -21,7 +21,6 @@ export class ValidationError extends BaseError {
 
   // Unified interface properties for compatibility
   public readonly field?: string;
-  public readonly errorId?: string;
 
   constructor(messageOrZodError: string | any, errors?: any[], details?: Record<string, any>) {
     let message: string;
@@ -59,11 +58,10 @@ export class ValidationError extends BaseError {
       severity: ErrorSeverity.LOW,
     });
 
-    this.errors = validationErrors;
+  this.errors = validationErrors;
 
-    // Set unified interface properties for compatibility
-    this.field = validationErrors.length === 1 ? validationErrors[0].field : undefined;
-    this.errorId = details?.errorId;
+  // Set unified interface properties for compatibility
+  this.field = validationErrors.length === 1 ? validationErrors[0].field : undefined;
   }
 }
 

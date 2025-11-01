@@ -1,3 +1,5 @@
+import type { PlainBill } from '../domain/search.dto';
+
 export class RelevanceScorer {
   static score(query: string, bill: PlainBill): number {
     const q = query.toLowerCase();

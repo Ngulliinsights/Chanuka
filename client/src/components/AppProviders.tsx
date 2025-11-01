@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { EnhancedErrorBoundary } from './error-handling';
 import { createNavigationProvider } from '../core/navigation/context';
-import { LoadingProvider } from '../core/loading';
+import { createLoadingProvider } from '../core/loading';
 import { AuthProvider, useAuth } from '../hooks/use-auth';
 import { useConnectionAware } from '../hooks/useConnectionAware';
 import { useOnlineStatus } from '../hooks/use-online-status';
@@ -26,8 +26,8 @@ const NavigationProvider = createNavigationProvider(
   useMediaQuery
 );
 
-// Create the React-specific LoadingProvider
-const LoadingProviderWithDeps = LoadingProvider(
+// Create the React-specific LoadingProvider (inject runtime deps)
+const LoadingProviderWithDeps = createLoadingProvider(
   useConnectionAware,
   useOnlineStatus,
   assetLoadingManager
@@ -88,6 +88,8 @@ interface ProviderOverrides {
   AccessibilityProvider?: React.ComponentType<{ children: React.ReactNode }>;
   OfflineProvider?: React.ComponentType<{ children: React.ReactNode }>;
   ThemeProvider?: React.ComponentType<{ children: React.ReactNode }>;
+  // allow lookup by provider name at runtime when applying overrides
+  [key: string]: React.ComponentType<any> | undefined;
 }
 
 interface AppProvidersProps {

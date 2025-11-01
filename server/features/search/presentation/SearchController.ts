@@ -38,12 +38,12 @@ router.get('/', async (req, res) => {
         searchType: (req.query.searchType as any) ?? 'simple',
       },
     };
-    if (!query.text.trim()) return ApiValidationError(res, 'Query parameter "q" is required');
+  if (!query.text.trim()) return ApiValidationError(res, { field: 'q', message: 'Query parameter "q" is required' });
     const dto = await searchBills(query);
     return ApiSuccess(res, dto);
   } catch (e) {
     logger.error('Search controller error', { error: e });
-    return ApiError(res, (e as Error).message, 500);
+    return ApiError(res, { code: 'INTERNAL_ERROR', message: (e as Error).message }, 500);
   }
 });
 
