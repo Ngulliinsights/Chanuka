@@ -41,7 +41,7 @@ describe('useUnifiedNavigation', () => {
     expect(result.current).toHaveProperty('sidebarCollapsed');
     expect(result.current).toHaveProperty('mounted');
     expect(result.current).toHaveProperty('toggleSidebar');
-    expect(result.current).toHaveProperty('isActive');
+    expect(result.current).toHaveProperty('is_active');
     expect(result.current).toHaveProperty('navigateTo');
   });
 
@@ -64,7 +64,7 @@ describe('useUnifiedNavigation', () => {
 
     // Check that functions are available and callable
     expect(typeof result.current.toggleSidebar).toBe('function');
-    expect(typeof result.current.isActive).toBe('function');
+    expect(typeof result.current.is_active).toBe('function');
     expect(typeof result.current.navigateTo).toBe('function');
     expect(typeof result.current.setSidebarCollapsed).toBe('function');
   });
@@ -74,9 +74,9 @@ describe('useUnifiedNavigation', () => {
       wrapper: TestWrapper,
     });
 
-    // Test isActive function
-    expect(result.current.isActive('/')).toBe(true);
-    expect(result.current.isActive('/dashboard')).toBe(false);
+    // Test is_active function
+    expect(result.current.is_active('/')).toBe(true);
+    expect(result.current.is_active('/dashboard')).toBe(false);
   });
 });
 

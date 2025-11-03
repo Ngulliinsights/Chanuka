@@ -78,22 +78,20 @@ export class IntegrationTests extends EventEmitter {
 
     this.emit('integration:request-pipeline:start');
 
-    try {
-      const testScenarios = [
-        { name: 'normal-request', userId: 'user-123', expectedAllowed: true },
-        { name: 'rate-limited-user', userId: 'flood-user', expectedAllowed: false },
-        { name: 'cached-response', userId: 'cached-user', expectedCached: true }
+    try { const testScenarios = [
+        { name: 'normal-request', user_id: 'user-123', expectedAllowed: true  },
+        { name: 'rate-limited-user', user_id: 'flood-user', expectedAllowed: false  },
+        { name: 'cached-response', user_id: 'cached-user', expectedCached: true  }
       ];
 
       const results: RequestPipelineResult[] = [];
 
-      for (const scenario of testScenarios) {
-        const scenarioStart = performance.now();
-        const { userId, expectedAllowed, expectedCached } = scenario;
-        const cacheKey = `request:${userId}`;
+      for (const scenario of testScenarios) { const scenarioStart = performance.now();
+        const { user_id, expectedAllowed, expectedCached  } = scenario;
+        const cacheKey = `request:${ user_id }`;
 
         // 1. Rate limiting check
-        const rateLimitResult = await rateLimiter!.check(userId, {
+        const rateLimitResult = await rateLimiter!.check(user_id, {
           windowMs: 60000,
           max: expectedAllowed ? 100 : 1,
           message: 'Rate limit exceeded'
@@ -103,15 +101,14 @@ export class IntegrationTests extends EventEmitter {
         let cacheHit = false;
         let data = null;
 
-        if (rateLimitResult.allowed) {
-          data = await cache!.get(cacheKey);
+        if (rateLimitResult.allowed) { data = await cache!.get(cacheKey);
           cacheHit = data !== null;
 
           if (!cacheHit) {
             // Generate and cache data
             data = {
-              userId,
-              data: `generated-data-${Date.now()}`,
+              user_id,
+              data: `generated-data-${Date.now() }`,
               timestamp: Date.now()
             };
             await cache!.set(cacheKey, data, 300);
@@ -119,13 +116,12 @@ export class IntegrationTests extends EventEmitter {
         }
 
         // 3. Log the request
-        logger!.info('Request processed', {
-          userId,
+        logger!.info('Request processed', { user_id,
           rateLimitAllowed: rateLimitResult.allowed,
           cacheHit,
           remainingRequests: rateLimitResult.remaining,
           scenario: scenario.name
-        });
+         });
 
         const scenarioEnd = performance.now();
 
@@ -464,36 +460,31 @@ export class IntegrationTests extends EventEmitter {
 
     this.emit('integration:security-logging:start');
 
-    try {
-      const securityScenarios = [
-        { userId: 'normal-user', requests: 5, expectedBlocked: false },
-        { userId: 'suspicious-user', requests: 150, expectedBlocked: true },
-        { userId: 'admin-user', requests: 10, expectedBlocked: false }
+    try { const securityScenarios = [
+        { user_id: 'normal-user', requests: 5, expectedBlocked: false  },
+        { user_id: 'suspicious-user', requests: 150, expectedBlocked: true  },
+        { user_id: 'admin-user', requests: 10, expectedBlocked: false  }
       ];
 
       const results: SecurityLoggingResult[] = [];
 
-      for (const scenario of securityScenarios) {
-        const { userId, requests, expectedBlocked } = scenario;
+      for (const scenario of securityScenarios) { const { user_id, requests, expectedBlocked  } = scenario;
         let blockedCount = 0;
         let allowedCount = 0;
         let logEntries = 0;
 
         // Make multiple requests
-        for (let i = 0; i < requests; i++) {
-          const result = await rateLimiter!.check(userId, { windowMs: 60000, max: 10, message: 'Rate limit exceeded' });
+        for (let i = 0; i < requests; i++) { const result = await rateLimiter!.check(user_id, { windowMs: 60000, max: 10, message: 'Rate limit exceeded'  });
 
-          if (result.allowed) {
-            allowedCount++;
-            logger!.info('Request allowed', { userId, requestNumber: i, remaining: result.remaining });
-          } else {
-            blockedCount++;
+          if (result.allowed) { allowedCount++;
+            logger!.info('Request allowed', { user_id, requestNumber: i, remaining: result.remaining  });
+          } else { blockedCount++;
             logger!.warn('Request blocked - potential attack', {
-              userId,
+              user_id,
               requestNumber: i,
               retryAfter: result.retryAfter,
               severity: 'medium'
-            });
+             });
           }
           logEntries++;
         }
@@ -501,8 +492,7 @@ export class IntegrationTests extends EventEmitter {
         const actuallyBlocked = blockedCount > 0;
         const success = actuallyBlocked === expectedBlocked;
 
-        results.push({
-          userId,
+        results.push({ user_id,
           totalRequests: requests,
           allowedRequests: allowedCount,
           blockedRequests: blockedCount,
@@ -510,7 +500,7 @@ export class IntegrationTests extends EventEmitter {
           expectedBlocked,
           actuallyBlocked,
           success
-        });
+         });
       }
 
       const success = results.every(r => r.success);
@@ -988,8 +978,7 @@ export interface DataValidationResult {
   success: boolean;
 }
 
-export interface SecurityLoggingResult {
-  userId: string;
+export interface SecurityLoggingResult { user_id: string;
   totalRequests: number;
   allowedRequests: number;
   blockedRequests: number;
@@ -997,7 +986,7 @@ export interface SecurityLoggingResult {
   expectedBlocked: boolean;
   actuallyBlocked: boolean;
   success: boolean;
-}
+ }
 
 export interface ConcurrencyIntegrationResult {
   concurrency: number;

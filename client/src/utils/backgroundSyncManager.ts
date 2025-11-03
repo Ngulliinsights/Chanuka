@@ -110,10 +110,9 @@ class BackgroundSyncManager {
     await this.addOfflineAction(action);
   }
 
-  async queueBillComment(billId: number, comment: any): Promise<void> {
-    await this.queueApiRequest(
+  async queueBillComment(bill_id: number, comment: any): Promise<void> { await this.queueApiRequest(
       'POST',
-      `/api/bills/${billId}/comments`,
+      `/api/bills/${bill_id }/comments`,
       comment,
       'high'
     );
@@ -128,10 +127,9 @@ class BackgroundSyncManager {
     );
   }
 
-  async queueEngagement(billId: number, engagement: any): Promise<void> {
-    await this.queueApiRequest(
+  async queueEngagement(bill_id: number, engagement: any): Promise<void> { await this.queueApiRequest(
       'POST',
-      `/api/bills/${billId}/engagement`,
+      `/api/bills/${bill_id }/engagement`,
       engagement,
       'medium'
     );

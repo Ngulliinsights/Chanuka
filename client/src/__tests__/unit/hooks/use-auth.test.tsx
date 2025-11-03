@@ -206,8 +206,8 @@ describe('useAuth Hook', () => {
         const registerResult = await result.current.register({
           email: 'newuser@example.com',
           password: 'SecurePass123!',
-          firstName: 'New',
-          lastName: 'User',
+          first_name: 'New',
+          last_name: 'User',
           role: 'citizen'
         });
         expect(registerResult.success).toBe(true);
@@ -233,8 +233,8 @@ describe('useAuth Hook', () => {
         const registerResult = await result.current.register({
           email: 'existing@example.com',
           password: 'SecurePass123!',
-          firstName: 'Test',
-          lastName: 'User',
+          first_name: 'Test',
+          last_name: 'User',
           role: 'citizen'
         });
         expect(registerResult.success).toBe(false);

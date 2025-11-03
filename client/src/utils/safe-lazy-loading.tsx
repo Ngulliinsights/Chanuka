@@ -2,17 +2,19 @@ import { lazy, LazyExoticComponent, ComponentType, Suspense } from "react";
 import { logger } from "./browser-logger";
 import { EnhancedErrorBoundary, ChunkErrorFallback } from "../components/error-handling";
 
-// Safe lazy component creation with error handling
+// Safe lazy component creation with error handling and retry mechanism
 function createSafeLazyComponent<P extends object>(
   importFn: () => Promise<{ default: ComponentType<P> }>,
   componentName: string
 ): LazyExoticComponent<ComponentType<P>> {
+  const retryableImport = retryLazyComponentLoad(importFn, 3, 1000, 2);
+
   return lazy(async () => {
     try {
-      const module = await importFn();
+      const module = await retryableImport();
       return module;
     } catch (error) {
-      logger.error(`Failed to load component ${componentName}:`, error);
+      logger.error(`Failed to load component ${componentName} after retries:`, error);
       // Return a fallback component
       return {
         default: (() => (
@@ -278,8 +280,13 @@ export function retryLazyComponentLoad<P extends object>(
       } catch (error) {
         lastError = error as Error;
 
-        // Don't retry on the last attempt
-        if (attempt < maxRetries) {
+        // Check if this is a chunk loading error (network/build issue)
+        const isChunkError = lastError.message.includes('Loading chunk') || 
+                           lastError.message.includes('ChunkLoadError') ||
+                           lastError.name === 'ChunkLoadError';
+
+        // Don't retry on the last attempt or for non-chunk errors
+        if (attempt < maxRetries && (isChunkError || attempt === 0)) {
           const delay = initialDelay * Math.pow(backoffFactor, attempt);
           await new Promise((resolve) => setTimeout(resolve, delay));
 
@@ -292,6 +299,9 @@ export function retryLazyComponentLoad<P extends object>(
               lastError.message
             );
           }
+        } else if (!isChunkError && attempt > 0) {
+          // Break early for non-chunk errors after first retry
+          break;
         }
       }
     }

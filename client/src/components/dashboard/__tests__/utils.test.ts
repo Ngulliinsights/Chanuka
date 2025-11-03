@@ -90,8 +90,8 @@ describe('Dashboard Utilities', () => {
         description: 'This is a very long description that should be truncated when it exceeds the maximum length limit for display purposes in the user interface.',
         priority: 'High',
         dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-        createdAt: new Date('2024-01-10T10:00:00Z'),
-        updatedAt: new Date('2024-01-12T15:30:00Z')
+        created_at: new Date('2024-01-10T10:00:00Z'),
+        updated_at: new Date('2024-01-12T15:30:00Z')
       };
 
       it('should format action item correctly', () => {
@@ -168,8 +168,8 @@ describe('Dashboard Utilities', () => {
         name: 'Healthcare Reform',
         category: 'legislative',
         billCount: 15,
-        isActive: true,
-        createdAt: new Date('2024-01-01T00:00:00Z'),
+        is_active: true,
+        created_at: new Date('2024-01-01T00:00:00Z'),
         description: 'This is a description of the healthcare reform topic that covers various aspects of healthcare policy and legislation.'
       };
 
@@ -185,7 +185,7 @@ describe('Dashboard Utilities', () => {
       });
 
       it('should handle inactive topics', () => {
-        const inactiveTopic = { ...mockTopic, isActive: false };
+        const inactiveTopic = { ...mockTopic, is_active: false };
         const formatted = formatTrackedTopic(inactiveTopic);
 
         expect(formatted.statusText).toBe('Inactive');
@@ -253,8 +253,8 @@ describe('Dashboard Utilities', () => {
             title: 'Test Action',
             description: 'Test Description',
             priority: 'High' as const,
-            createdAt: new Date(),
-            updatedAt: new Date()
+            created_at: new Date(),
+            updated_at: new Date()
           }
         ],
         trackedTopics: [
@@ -263,8 +263,8 @@ describe('Dashboard Utilities', () => {
             name: 'Healthcare',
             category: 'legislative' as const,
             billCount: 5,
-            isActive: true,
-            createdAt: new Date()
+            is_active: true,
+            created_at: new Date()
           }
         ]
       };

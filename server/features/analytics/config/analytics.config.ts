@@ -12,7 +12,7 @@ export interface AnalyticsConfig {
     /** TTL for user engagement metrics in seconds */
     userEngagementTtl: number;
     /** TTL for bill engagement metrics in seconds */
-    billEngagementTtl: number;
+    bill_engagementTtl: number;
     /** TTL for engagement trends in seconds */
     trendsTtl: number;
     /** TTL for leaderboard data in seconds */
@@ -94,7 +94,7 @@ export interface AnalyticsConfig {
 export const analyticsConfigSchema = z.object({
   cache: z.object({
     userEngagementTtl: z.number().int().min(60).max(86400), // 1min to 24hrs
-    billEngagementTtl: z.number().int().min(60).max(86400),
+    bill_engagementTtl: z.number().int().min(60).max(86400),
     trendsTtl: z.number().int().min(60).max(86400),
     leaderboardTtl: z.number().int().min(60).max(86400),
     mlAnalysisTtl: z.number().int().min(60).max(86400),
@@ -145,7 +145,7 @@ export const analyticsConfigSchema = z.object({
 export const defaultAnalyticsConfig: AnalyticsConfig = {
   cache: {
     userEngagementTtl: 1800, // 30 minutes
-    billEngagementTtl: 900,  // 15 minutes
+    bill_engagementTtl: 900,  // 15 minutes
     trendsTtl: 3600,         // 1 hour
     leaderboardTtl: 1800,    // 30 minutes
     mlAnalysisTtl: 7200,     // 2 hours
@@ -201,7 +201,7 @@ export function loadAnalyticsConfig(): AnalyticsConfig {
     config.cache.userEngagementTtl = parseInt(process.env.ANALYTICS_CACHE_USER_ENGAGEMENT_TTL);
   }
   if (process.env.ANALYTICS_CACHE_BILL_ENGAGEMENT_TTL) {
-    config.cache.billEngagementTtl = parseInt(process.env.ANALYTICS_CACHE_BILL_ENGAGEMENT_TTL);
+    config.cache.bill_engagementTtl = parseInt(process.env.ANALYTICS_CACHE_BILL_ENGAGEMENT_TTL);
   }
   if (process.env.ANALYTICS_CACHE_TRENDS_TTL) {
     config.cache.trendsTtl = parseInt(process.env.ANALYTICS_CACHE_TRENDS_TTL);

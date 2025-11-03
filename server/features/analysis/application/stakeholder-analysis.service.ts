@@ -53,10 +53,8 @@ export class StakeholderAnalysisService {
     /**
      * Performs stakeholder analysis using bill content and potentially ML services.
      */
-    async analyzeBill(billId: number): Promise<StakeholderAnalysisResult> {
-         logger.info(`👥 Performing stakeholder analysis for bill ${billId}`);
-        try {
-            const bill = await this.getBillContent(billId);
+    async analyzeBill(bill_id: number): Promise<StakeholderAnalysisResult> { logger.info(`👥 Performing stakeholder analysis for bill ${bill_id }`);
+        try { const bill = await this.getBillContent(bill_id);
             const billContent = bill?.content ?? '';
             const billTitle = bill?.title ?? '';
 
@@ -69,9 +67,8 @@ export class StakeholderAnalysisService {
                     MLAnalysisService.analyzeStakeholderInfluence(billContent),
                     MLAnalysisService.analyzeBeneficiaries(billContent)
                  ]);
-                 logger.debug(`ML analysis results received for bill ${billId}`);
-            } catch (mlError) {
-                 logger.warn(`ML analysis failed for bill ${billId}, using fallback methods. Error: ${mlError}`);
+                 logger.debug(`ML analysis results received for bill ${bill_id }`);
+            } catch (mlError) { logger.warn(`ML analysis failed for bill ${bill_id }, using fallback methods. Error: ${mlError}`);
             }
 
 
@@ -82,20 +79,19 @@ export class StakeholderAnalysisService {
             const social = this.assessSocialImpact(billContent, billTitle);
 
              return { primaryBeneficiaries, negativelyAffected, affectedPopulations, economicImpact: economic, socialImpact: social };
-        } catch (error) {
-            logger.error(`Error during stakeholder analysis for bill ${billId}:`, { component: 'StakeholderAnalysisService'}, error);
-            throw new Error(`Stakeholder analysis failed for bill ${billId}`);
+        } catch (error) { logger.error(`Error during stakeholder analysis for bill ${bill_id }:`, { component: 'StakeholderAnalysisService'}, error);
+            throw new Error(`Stakeholder analysis failed for bill ${ bill_id }`);
         }
     }
 
     /** Fetches required bill content and title */
-    private async getBillContent(billId: number): Promise<Pick<schema.Bill, 'id' | 'content' | 'title'> | null> {
+    private async getBillContent(bill_id: number): Promise<Pick<schema.Bill, 'id' | 'content' | 'title'> | null> {
          const [bill] = await this.db
              .select({ id: schema.bills.id, content: schema.bills.content, title: schema.bills.title })
              .from(schema.bills)
-             .where(eq(schema.bills.id, billId))
+             .where(eq(schema.bills.id, bill_id))
              .limit(1);
-          if (!bill) throw new Error(`Bill ${billId} not found for stakeholder analysis.`);
+          if (!bill) throw new Error(`Bill ${ bill_id } not found for stakeholder analysis.`);
          return bill;
      }
 

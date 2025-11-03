@@ -166,14 +166,14 @@ describe('Database Helpers', () => {
 
   describe('groupByTime', () => {
     const testData = [
-      { id: 1, createdAt: new Date('2024-01-15T10:30:00Z'), value: 10 },
-      { id: 2, createdAt: new Date('2024-01-15T11:45:00Z'), value: 20 },
-      { id: 3, createdAt: new Date('2024-01-16T10:30:00Z'), value: 30 },
-      { id: 4, createdAt: new Date('2024-01-15T10:15:00Z'), value: 40 }
+      { id: 1, created_at: new Date('2024-01-15T10:30:00Z'), value: 10 },
+      { id: 2, created_at: new Date('2024-01-15T11:45:00Z'), value: 20 },
+      { id: 3, created_at: new Date('2024-01-16T10:30:00Z'), value: 30 },
+      { id: 4, created_at: new Date('2024-01-15T10:15:00Z'), value: 40 }
     ];
 
     test('groups by hour correctly', () => {
-      const result = groupByTime(testData, 'createdAt', 'hour');
+      const result = groupByTime(testData, 'created_at', 'hour');
       expect(Object.keys(result)).toHaveLength(3);
       expect(result['2024-01-15T10:00:00Z']).toHaveLength(2); // 10:30 and 10:15
       expect(result['2024-01-15T11:00:00Z']).toHaveLength(1); // 11:45
@@ -181,20 +181,20 @@ describe('Database Helpers', () => {
     });
 
     test('groups by day correctly', () => {
-      const result = groupByTime(testData, 'createdAt', 'day');
+      const result = groupByTime(testData, 'created_at', 'day');
       expect(Object.keys(result)).toHaveLength(2);
       expect(result['2024-01-15']).toHaveLength(3);
       expect(result['2024-01-16']).toHaveLength(1);
     });
 
     test('groups by week correctly', () => {
-      const result = groupByTime(testData, 'createdAt', 'week');
+      const result = groupByTime(testData, 'created_at', 'week');
       expect(Object.keys(result)).toHaveLength(1); // All in same week
       expect(result['2024-01-15']).toHaveLength(4); // Monday of the week (Jan 15 is Monday)
     });
 
     test('groups by month correctly', () => {
-      const result = groupByTime(testData, 'createdAt', 'month');
+      const result = groupByTime(testData, 'created_at', 'month');
       expect(Object.keys(result)).toHaveLength(1);
       expect(result['2024-01']).toHaveLength(4);
     });
@@ -202,16 +202,16 @@ describe('Database Helpers', () => {
     test('handles invalid timestamps gracefully', () => {
       const loggerWarnSpy = vi.spyOn(logger, 'warn').mockImplementation();
       const invalidData = [
-        { id: 1, createdAt: 'invalid', value: 10 }
+        { id: 1, created_at: 'invalid', value: 10 }
       ];
-      const result = groupByTime(invalidData, 'createdAt', 'day');
+      const result = groupByTime(invalidData, 'created_at', 'day');
       expect(Object.keys(result)).toHaveLength(0);
       expect(loggerWarnSpy).toHaveBeenCalled();
       loggerWarnSpy.mockRestore();
     });
 
     test('returns empty object for empty input', () => {
-      const result = groupByTime([], 'createdAt', 'day');
+      const result = groupByTime([], 'created_at', 'day');
       expect(result).toEqual({});
     });
   });

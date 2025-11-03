@@ -178,7 +178,7 @@ describe('InputValidationService', () => {
         'invalid-email',
         '@domain.com',
         'user@',
-        'user..double.dot@domain.com'
+        'users..double.dot@domain.com'
       ];
 
       invalidEmails.forEach(email => {

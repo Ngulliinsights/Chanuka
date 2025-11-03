@@ -11,7 +11,7 @@ import {
   AutocompleteResult,
   SearchContext,
   SearchAnalytics
-} from "../types/search.types";
+} from "./types/search.types";
 import { queryBuilderService } from "../services/query-builder.service";
 import { parallelQueryExecutor, QueryTask } from "../utils/parallel-query-executor";
 import { suggestionRankingService, type RankingContext } from "./suggestion-ranking.service";
@@ -307,27 +307,26 @@ export class SuggestionEngineService {
         title: schema.bills.title,
         status: schema.bills.status,
         category: schema.bills.category,
-        sponsorId: schema.bills.sponsorId
+        sponsor_id: schema.bills.sponsor_id
       })
       .from(schema.bills)
       .where(like(schema.bills.title, searchPattern))
-      .orderBy(desc(schema.bills.updatedAt))
+      .orderBy(desc(schema.bills.updated_at))
       .limit(limit);
 
     // Map database results to SearchSuggestion format with proper metadata
     // Each field in metadata provides context that helps users understand the suggestion
     return results.map(bill => ({
-      term: bill.title,
+      term: bills.title,
       frequency: 1, // Individual bills have frequency of 1
-      score: this.calculateRelevanceScore(bill.title, query),
+      score: this.calculateRelevanceScore(bills.title, query),
       type: 'bill_title',
-      id: `bill-${bill.id}`,
-      metadata: {
-        billId: bill.id,
-        sponsorId: bill.sponsorId,
-        category: bill.category,
-        description: bill.status // Using status as a proxy for quick description
-      }
+      id: `bill-${bills.id}`,
+      metadata: { bill_id: bills.id,
+        sponsor_id: bills.sponsor_id,
+        category: bills.category,
+        description: bills.status // Using status as a proxy for quick description
+       }
     }));
   }
 
@@ -374,12 +373,12 @@ export class SuggestionEngineService {
     const results = await this.db
       .select({
         sponsor: schema.bills.sponsor,
-        sponsorId: schema.bills.sponsorId,
+        sponsor_id: schema.bills.sponsor_id,
         count: count()
       })
       .from(schema.bills)
       .where(like(schema.bills.sponsor, searchPattern))
-      .groupBy(schema.bills.sponsor, schema.bills.sponsorId)
+      .groupBy(schema.bills.sponsor, schema.bills.sponsor_id)
       .orderBy(desc(count()))
       .limit(limit);
 
@@ -389,9 +388,9 @@ export class SuggestionEngineService {
       frequency: result.count,
       score: this.calculateRelevanceScore(result.sponsor, query),
       type: 'sponsor',
-      id: `sponsor-${result.sponsorId}`,
+      id: `sponsor-${result.sponsor_id}`,
       metadata: {
-        sponsorId: result.sponsorId,
+        sponsor_id: result.sponsor_id,
         description: `${result.count} bills sponsored`
       }
     }));
@@ -449,7 +448,7 @@ export class SuggestionEngineService {
         .select({
           category: schema.bills.category,
           sponsor: schema.bills.sponsor,
-          sponsorId: schema.bills.sponsorId,
+          sponsor_id: schema.bills.sponsor_id,
           status: schema.bills.status
         })
         .from(schema.bills)
@@ -468,7 +467,7 @@ export class SuggestionEngineService {
       for (const row of facetData) {
         categoryMap.set(row.category, (categoryMap.get(row.category) || 0) + 1);
         
-        const sponsorData = sponsorMap.get(row.sponsor) || { id: row.sponsorId, count: 0 };
+        const sponsorData = sponsorMap.get(row.sponsor) || { id: row.sponsor_id, count: 0 };
         sponsorData.count += 1;
         sponsorMap.set(row.sponsor, sponsorData);
         
@@ -574,7 +573,7 @@ export class SuggestionEngineService {
           .from(schema.bills)
           .where(
             and(
-              gte(schema.bills.createdAt, startDate),
+              gte(schema.bills.created_at, startDate),
               or(
                 like(schema.bills.title, searchPattern),
                 like(schema.bills.description, searchPattern)

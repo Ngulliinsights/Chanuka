@@ -227,8 +227,8 @@ describe('Auth Integration Workflows', () => {
       // Verify the registration was called
       await waitFor(() => {
         expect(mockAuthService.register).toHaveBeenCalledWith({
-          firstName: 'John',
-          lastName: 'Doe',
+          first_name: 'John',
+          last_name: 'Doe',
           email: 'john@example.com',
           password: 'SecurePass123!',
         });

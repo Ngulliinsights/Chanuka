@@ -228,7 +228,7 @@ describe('AppLayout Component', () => {
       );
 
       const recoverButton = screen.getByText('Recover Layout');
-      await user.click(recoverButton);
+      await users.click(recoverButton);
 
       await waitFor(() => {
         expect(screen.queryByText('Layout Error')).not.toBeInTheDocument();

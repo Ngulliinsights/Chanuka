@@ -15,9 +15,9 @@ export interface MemoryAdapterConfig extends CacheAdapterConfig {
 
 interface CacheEntry {
   value: any;
-  expiresAt?: number;
+  expires_at?: number;
   accessedAt: number;
-  createdAt: number;
+  created_at: number;
 }
 
 export class MemoryAdapter extends BaseCacheAdapter {
@@ -50,7 +50,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
       }
 
       // Check if expired
-      if (entry.expiresAt && Date.now() > entry.expiresAt) {
+      if (entry.expires_at && Date.now() > entry.expires_at) {
         this.cache.delete(formattedKey);
         this.removeFromAccessOrder(formattedKey);
         this.updateMetrics('miss');
@@ -77,9 +77,9 @@ export class MemoryAdapter extends BaseCacheAdapter {
       
       const entry: CacheEntry = {
         value,
-        expiresAt: ttlSeconds ? now + (ttlSeconds * 1000) : undefined,
+        expires_at: ttlSeconds ? now + (ttlSeconds * 1000) : undefined,
         accessedAt: now,
-        createdAt: now
+        created_at: now
       };
 
       // Check if we need to evict entries
@@ -124,7 +124,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
     if (!entry) return false;
     
     // Check if expired
-    if (entry.expiresAt && Date.now() > entry.expiresAt) {
+    if (entry.expires_at && Date.now() > entry.expires_at) {
       this.cache.delete(formattedKey);
       this.removeFromAccessOrder(formattedKey);
       return false;
@@ -138,9 +138,9 @@ export class MemoryAdapter extends BaseCacheAdapter {
     const entry = this.cache.get(formattedKey);
     
     if (!entry) return -2; // Key doesn't exist
-    if (!entry.expiresAt) return -1; // No expiration
+    if (!entry.expires_at) return -1; // No expiration
     
-    const remaining = Math.ceil((entry.expiresAt - Date.now()) / 1000);
+    const remaining = Math.ceil((entry.expires_at - Date.now()) / 1000);
     return Math.max(0, remaining);
   }
 
@@ -252,7 +252,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
     
     // Find expired entries
     for (const [key, entry] of this.cache) {
-      if (entry.expiresAt && now > entry.expiresAt) {
+      if (entry.expires_at && now > entry.expires_at) {
         expiredKeys.push(key);
       }
     }

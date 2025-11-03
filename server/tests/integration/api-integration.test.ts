@@ -85,13 +85,13 @@ describe('Comprehensive API Integration Tests', () => {
         .send({
           email: 'test@example.com',
           password: 'testpassword123',
-          firstName: 'Test',
-          lastName: 'User'
+          first_name: 'Test',
+          last_name: 'User'
         });
 
       if (registerResponse.status === 201) {
         authToken = registerResponse.body.token;
-        testUserId = registerResponse.body.user.id;
+        testUserId = registerResponse.body.users.id;
       } else {
         // Try to login if user already exists
         const loginResponse = await request(app)
@@ -103,7 +103,7 @@ describe('Comprehensive API Integration Tests', () => {
 
         if (loginResponse.status === 200) {
           authToken = loginResponse.body.token;
-          testUserId = loginResponse.body.user.id;
+          testUserId = loginResponse.body.users.id;
         }
       }
     } catch (error) {
@@ -126,14 +126,14 @@ describe('Comprehensive API Integration Tests', () => {
         .send({
           email: uniqueEmail,
           password: 'testpassword123',
-          firstName: 'New',
-          lastName: 'User'
+          first_name: 'New',
+          last_name: 'User'
         });
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('token');
       expect(response.body).toHaveProperty('user');
-      expect(response.body.user.email).toBe(uniqueEmail);
+      expect(response.body.users.email).toBe(uniqueEmail);
     });
 
     it('should login with valid credentials', async () => {
@@ -357,7 +357,7 @@ describe('Comprehensive API Integration Tests', () => {
     it('should create disclosure alert', async () => {
       const alertData = {
         type: 'new_disclosure',
-        sponsorId: 1,
+        sponsor_id: 1,
         description: 'Test alert for integration testing',
         severity: 'info'
       };
@@ -372,7 +372,7 @@ describe('Comprehensive API Integration Tests', () => {
     it('should validate alert data', async () => {
       const invalidAlertData = {
         type: 'invalid_type',
-        sponsorId: 'invalid',
+        sponsor_id: 'invalid',
         description: 'Too short'
       };
 
@@ -476,7 +476,7 @@ describe('Comprehensive API Integration Tests', () => {
         .post('/api/financial-disclosure/alerts')
         .send({
           type: 'new_disclosure',
-          sponsorId: 1,
+          sponsor_id: 1,
           description: largeDescription,
           severity: 'info'
         });
@@ -562,7 +562,7 @@ describe('Comprehensive API Integration Tests', () => {
         .post('/api/financial-disclosure/alerts')
         .send({
           type: 'new_disclosure',
-          sponsorId: 1,
+          sponsor_id: 1,
           description: maliciousInput,
           severity: 'info'
         });
@@ -606,8 +606,8 @@ describe('Comprehensive API Integration Tests', () => {
         .send({
           email: 'invalid-email',
           password: 'testpassword123',
-          firstName: 'Test',
-          lastName: 'User'
+          first_name: 'Test',
+          last_name: 'User'
         });
 
       expect(response.status).toBe(400);
@@ -619,8 +619,8 @@ describe('Comprehensive API Integration Tests', () => {
         .send({
           email: 'test-weak@example.com',
           password: '123',
-          firstName: 'Test',
-          lastName: 'User'
+          first_name: 'Test',
+          last_name: 'User'
         });
 
       // Should either enforce password strength or accept (depending on implementation)

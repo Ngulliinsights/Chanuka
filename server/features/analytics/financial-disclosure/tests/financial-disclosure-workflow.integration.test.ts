@@ -19,32 +19,32 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
   const mockSponsorInfo = {
     id: mockSponsorId,
     name: 'Test Sponsor',
-    isActive: true
+    is_active: true
   };
 
   const mockDisclosures = [
     {
       id: 1,
-      sponsorId: mockSponsorId,
+      sponsor_id: mockSponsorId,
       disclosureType: 'financial',
       description: 'Investment in tech company',
       amount: 500000,
       source: 'TechCorp Inc',
       dateReported: new Date('2024-01-15'),
-      isVerified: true,
+      is_verified: true,
       completenessScore: 85,
       riskLevel: 'medium' as const,
       lastUpdated: new Date('2024-01-15')
     },
     {
       id: 2,
-      sponsorId: mockSponsorId,
+      sponsor_id: mockSponsorId,
       disclosureType: 'business',
       description: 'Board membership',
       amount: 100000,
       source: 'BusinessCorp Ltd',
       dateReported: new Date('2024-02-01'),
-      isVerified: false,
+      is_verified: false,
       completenessScore: 60,
       riskLevel: 'high' as const,
       lastUpdated: new Date('2024-02-01')
@@ -54,10 +54,10 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
   const mockAffiliations = [
     {
       id: 1,
-      sponsorId: mockSponsorId,
+      sponsor_id: mockSponsorId,
       organization: 'Professional Association',
       type: 'professional' as const,
-      isActive: true,
+      is_active: true,
       startDate: '2023-01-01',
       conflictType: null
     }
@@ -98,14 +98,14 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
       const mockDb = require('@shared/database/connection').readDatabase;
       mockDb.select.mockReturnValue(mockDisclosures.map(d => ({
         id: d.id,
-        sponsorId: d.sponsorId,
+        sponsor_id: d.sponsor_id,
         disclosureType: d.disclosureType,
         description: d.description,
         amount: d.amount,
         source: d.source,
         dateReported: d.dateReported,
-        isVerified: d.isVerified,
-        createdAt: d.lastUpdated
+        is_verified: d.is_verified,
+        created_at: d.lastUpdated
       })));
 
       const result = await disclosureProcessingService.getDisclosureData(mockSponsorId);
@@ -113,7 +113,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
       expect(result).toHaveLength(2);
       expect(result[0]).toMatchObject({
         id: 1,
-        sponsorId: mockSponsorId,
+        sponsor_id: mockSponsorId,
         disclosureType: 'financial',
         amount: 500000,
         source: 'TechCorp Inc'
@@ -154,7 +154,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
       const result = await disclosureValidationService.calculateCompletenessScore(mockSponsorId);
 
       expect(result).toMatchObject({
-        sponsorId: mockSponsorId,
+        sponsor_id: mockSponsorId,
         sponsorName: 'Test Sponsor',
         overallScore: expect.any(Number),
         riskAssessment: expect.stringMatching(/^(low|medium|high|critical)$/),
@@ -172,7 +172,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
       const lowQualityDisclosures = [
         {
           ...mockDisclosures[0],
-          isVerified: false,
+          is_verified: false,
           amount: undefined,
           source: undefined
         }
@@ -207,7 +207,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
       const result = await financialAnalysisService.buildRelationshipMap(mockSponsorId);
 
       expect(result).toMatchObject({
-        sponsorId: mockSponsorId,
+        sponsor_id: mockSponsorId,
         sponsorName: 'Test Sponsor',
         relationships: expect.any(Array),
         totalFinancialExposure: expect.any(Number),
@@ -275,7 +275,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
       const result = await anomalyDetectionService.detectAnomalies(mockSponsorId);
 
       expect(result).toMatchObject({
-        sponsorId: mockSponsorId,
+        sponsor_id: mockSponsorId,
         sponsorName: 'Test Sponsor',
         anomalies: expect.any(Array),
         riskScore: expect.any(Number),
@@ -290,7 +290,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
     it('should detect verification gaps', async () => {
       const unverifiedDisclosures = mockDisclosures.map(d => ({
         ...d,
-        isVerified: false,
+        is_verified: false,
         amount: 1500000 // High value
       }));
 
@@ -318,7 +318,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
       // Mock anomaly detection for each sponsor
       vi.spyOn(anomalyDetectionService, 'detectAnomalies')
         .mockResolvedValueOnce({
-          sponsorId: 1,
+          sponsor_id: 1,
           sponsorName: 'Sponsor 1',
           anomalies: [
             {
@@ -335,14 +335,14 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
           detectionDate: new Date()
         })
         .mockResolvedValueOnce({
-          sponsorId: 2,
+          sponsor_id: 2,
           sponsorName: 'Sponsor 2',
           anomalies: [],
           riskScore: 0,
           detectionDate: new Date()
         })
         .mockResolvedValueOnce({
-          sponsorId: 3,
+          sponsor_id: 3,
           sponsorName: 'Sponsor 3',
           anomalies: [
             {
@@ -384,7 +384,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
       // Mock all service dependencies
       vi.spyOn(disclosureValidationService, 'calculateCompletenessScore')
         .mockResolvedValue({
-          sponsorId: mockSponsorId,
+          sponsor_id: mockSponsorId,
           sponsorName: 'Test Sponsor',
           overallScore: 75,
           requiredDisclosures: 6,
@@ -404,7 +404,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
 
       vi.spyOn(financialAnalysisService, 'buildRelationshipMap')
         .mockResolvedValue({
-          sponsorId: mockSponsorId,
+          sponsor_id: mockSponsorId,
           sponsorName: 'Test Sponsor',
           relationships: [],
           totalFinancialExposure: 600000,
@@ -421,7 +421,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
 
       vi.spyOn(anomalyDetectionService, 'detectAnomalies')
         .mockResolvedValue({
-          sponsorId: mockSponsorId,
+          sponsor_id: mockSponsorId,
           sponsorName: 'Test Sponsor',
           anomalies: [],
           riskScore: 25,
@@ -431,7 +431,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
       const result = await financialDisclosureAnalyticsService.performComprehensiveAnalysis(mockSponsorId);
 
       expect(result).toMatchObject({
-        sponsorId: mockSponsorId,
+        sponsor_id: mockSponsorId,
         completenessReport: expect.any(Object),
         relationshipMapping: expect.any(Object),
         anomalyDetection: expect.any(Object),
@@ -470,7 +470,7 @@ describe('Financial Disclosure Workflow Integration Tests', () => {
 
       vi.spyOn(disclosureValidationService, 'calculateCompletenessScore')
         .mockResolvedValue({
-          sponsorId: 1,
+          sponsor_id: 1,
           sponsorName: 'Sponsor 1',
           overallScore: 85,
           requiredDisclosures: 6,

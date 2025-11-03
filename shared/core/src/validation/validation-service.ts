@@ -114,8 +114,8 @@ export class ValidationService {
       version: options.version || '1.0.0',
       description: options.description || '',
       tags: options.tags || [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      created_at: new Date(),
+      updated_at: new Date(),
     };
 
     this.schemaRegistry.set(name, registration);

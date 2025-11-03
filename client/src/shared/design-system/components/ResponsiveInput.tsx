@@ -166,7 +166,7 @@ export const ResponsiveInput = React.forwardRef<HTMLInputElement, ResponsiveInpu
   }
 );
 
-ResponsiveInput.displayName = 'ResponsiveInput';
+ResponsiveInput.display_name = 'ResponsiveInput';
 
 export default ResponsiveInput;
 

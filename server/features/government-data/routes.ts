@@ -15,7 +15,7 @@ import { database as db } from '@shared/database/connection';
 
 // Type definitions for Kenyan legislative structures
 export interface KenyanBill {
-  billNumber: string;              // e.g., "National Assembly Bill No. 15 of 2024"
+  bill_number: string;              // e.g., "National Assembly Bill No. 15 of 2024"
   title: string;                   // Full title of the bill
   shortTitle: string;              // Common reference name
   billType: BillType;              // Category of legislation
@@ -28,7 +28,7 @@ export interface KenyanBill {
   thirdReadingDate?: Date;         // Date of third reading
   status: BillStatus;              // Current stage in legislative process
   summary: string;                 // Brief description of the bill's purpose
-  fullText?: string;               // Complete text if available
+  full_text?: string;               // Complete text if available
   amendments?: Amendment[];         // Any amendments made during process
   votingRecords?: VotingRecord[];  // Records of votes taken
   relatedDocuments?: string[];     // Links to supporting documents
@@ -224,7 +224,7 @@ export class KenyanGovernmentDataIntegrationService {
       
       status.sources.push({
         name: sourceName,
-        displayName: config.name,
+        display_name: config.name,
         enabled: config.enabled,
         status: config.enabled ? 'active' : 'disabled',
         priority: config.priority,
@@ -475,7 +475,7 @@ export class KenyanGovernmentDataIntegrationService {
           }
 
           // Check if bill already exists in database
-          const existingBill = await this.findExistingBill(bill.billNumber);
+          const existingBill = await this.findExistingBill(bills.bill_number);
 
           if (existingBill) {
             // Update existing bill if data has changed
@@ -493,7 +493,7 @@ export class KenyanGovernmentDataIntegrationService {
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
           result.errors.push({
-            itemId: bill.billNumber,
+            itemId: bills.bill_number,
             message: `Failed to process bill: ${errorMessage}`,
             severity: 'medium'
           });
@@ -543,7 +543,7 @@ export class KenyanGovernmentDataIntegrationService {
             continue;
           }
 
-          const existingSponsor = await this.findExistingSponsor(sponsor.id);
+          const existingSponsor = await this.findExistingSponsor(sponsors.id);
 
           if (existingSponsor) {
             const updated = await this.updateSponsor(existingSponsor.id, sponsor);
@@ -559,7 +559,7 @@ export class KenyanGovernmentDataIntegrationService {
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
           result.errors.push({
-            itemId: sponsor.id,
+            itemId: sponsors.id,
             message: `Failed to process sponsor: ${errorMessage}`,
             severity: 'medium'
           });
@@ -588,7 +588,7 @@ export class KenyanGovernmentDataIntegrationService {
     return 0;
   }
 
-  private async findExistingBill(billNumber: string): Promise<any | null> {
+  private async findExistingBill(bill_number: string): Promise<any | null> {
     // Query database for existing bill
     // This is a placeholder - actual implementation would use Prisma
     return null;
@@ -596,25 +596,25 @@ export class KenyanGovernmentDataIntegrationService {
 
   private async createBill(bill: KenyanBill): Promise<void> {
     // Create bill record in database
-    logger.info('Creating bill', { billNumber: bill.billNumber });
+    logger.info('Creating bill', { bill_number: bills.bill_number });
   }
 
   private async updateBill(id: string, bill: KenyanBill): Promise<boolean> {
     // Update bill record in database
-    logger.info('Updating bill', { id, billNumber: bill.billNumber });
+    logger.info('Updating bill', { id, bill_number: bills.bill_number });
     return true;
   }
 
-  private async findExistingSponsor(sponsorId: string): Promise<any | null> {
+  private async findExistingSponsor(sponsor_id: string): Promise<any | null> {
     return null;
   }
 
   private async createSponsor(sponsor: BillSponsor): Promise<void> {
-    logger.info('Creating sponsor', { sponsorId: sponsor.id });
+    logger.info('Creating sponsor', { sponsor_id: sponsors.id });
   }
 
   private async updateSponsor(id: string, sponsor: BillSponsor): Promise<boolean> {
-    logger.info('Updating sponsor', { id, sponsorId: sponsor.id });
+    logger.info('Updating sponsor', { id, sponsor_id: sponsors.id });
     return true;
   }
 
@@ -641,11 +641,11 @@ export class KenyanGovernmentDataIntegrationService {
     ];
 
     for (let i = 0; i < Math.min(count, sampleTitles.length); i++) {
-      const billNumber = i + 1;
+      const bill_number = i + 1;
       const house = Math.random() > 0.5 ? House.NATIONAL_ASSEMBLY : House.SENATE;
       
       bills.push({
-        billNumber: `${house === House.NATIONAL_ASSEMBLY ? 'National Assembly' : 'Senate'} Bill No. ${billNumber} of ${currentYear}`,
+        bill_number: `${house === House.NATIONAL_ASSEMBLY ? 'National Assembly' : 'Senate'} Bill No. ${bill_number} of ${currentYear}`,
         title: sampleTitles[i],
         shortTitle: sampleTitles[i].replace('The ', '').replace(' Bill', ''),
         billType: this.getRandomBillType(),

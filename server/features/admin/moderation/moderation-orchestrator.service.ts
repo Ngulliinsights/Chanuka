@@ -64,8 +64,8 @@ export class ModerationOrchestratorService {
    * Creates a new content report with optional automated analysis
    */
   async createReport(
-    contentType: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
-    contentId: number,
+    content_type: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
+    content_id: number,
     reportType: 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'copyright' | 'other',
     reason: string,
     reportedBy: string,
@@ -81,8 +81,8 @@ export class ModerationOrchestratorService {
     try {
       // Create the report
       const reportResult = await moderationQueueService.createReport(
-        contentType,
-        contentId,
+        content_type,
+        content_id,
         reportType,
         reason,
         reportedBy,
@@ -92,7 +92,7 @@ export class ModerationOrchestratorService {
 
       // Optionally perform content analysis for additional context
       let analysis: ContentAnalysisResult | undefined;
-      if (performAnalysis && (contentType === 'bill' || contentType === 'comment')) {
+      if (performAnalysis && (content_type === 'bill' || content_type === 'comment')) {
         try {
           // We would need to fetch the content first, but for now we'll skip this
           // In a real implementation, we'd fetch the content and analyze it
@@ -124,7 +124,7 @@ export class ModerationOrchestratorService {
    * Analyzes content for policy violations
    */
   async analyzeContent(
-    contentType: 'bill' | 'comment',
+    content_type: 'bill' | 'comment',
     content: string,
     additionalContext?: {
       authorId?: string;
@@ -132,7 +132,7 @@ export class ModerationOrchestratorService {
     }
   ): Promise<ContentAnalysisResult> {
     try {
-      return await contentAnalysisService.analyzeContent(contentType, content, additionalContext);
+      return await contentAnalysisService.analyzeContent(content_type, content, additionalContext);
     } catch (error) {
       logger.error('Error in moderation orchestrator - analyzeContent:', {
         component: 'ModerationOrchestrator',
@@ -201,8 +201,8 @@ export class ModerationOrchestratorService {
    * Retrieves moderation history
    */
   async getModerationHistory(
-    contentType?: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
-    contentId?: number,
+    content_type?: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
+    content_id?: number,
     page = 1,
     limit = 20
   ): Promise<{
@@ -211,8 +211,8 @@ export class ModerationOrchestratorService {
   }> {
     try {
       return await moderationDecisionService.getModerationHistory(
-        contentType,
-        contentId,
+        content_type,
+        content_id,
         page,
         limit
       );
@@ -243,10 +243,10 @@ export class ModerationOrchestratorService {
     moderatorActivity: {
       moderatorId: string;
       moderatorName: string;
-      reviewCount: number;
+      review_count: number;
       averageReviewTime: number;
     }[];
-    contentTypeBreakdown: { contentType: string; count: number }[];
+    content_typeBreakdown: { content_type: string; count: number }[];
     severityBreakdown: { severity: string; count: number }[];
   }> {
     try {
@@ -281,10 +281,10 @@ export class ModerationOrchestratorService {
    * Processes content submission through the moderation pipeline
    */
   async processContentSubmission(
-    contentType: 'bill' | 'comment',
+    content_type: 'bill' | 'comment',
     content: string,
     authorId: string,
-    contentId?: number
+    content_id?: number
   ): Promise<{
     approved: boolean;
     requiresReview: boolean;
@@ -293,14 +293,14 @@ export class ModerationOrchestratorService {
   }> {
     try {
       // Analyze the content
-      const analysis = await this.analyzeContent(contentType, content, { authorId });
+      const analysis = await this.analyzeContent(content_type, content, { authorId });
 
       // Determine if content should be auto-flagged
       if (analysis.shouldFlag) {
         // Create an automated report
         const reportResult = await this.createReport(
-          contentType,
-          contentId || 0, // In real implementation, this would be the actual content ID
+          content_type,
+          content_id || 0, // In real implementation, this would be the actual content ID
           analysis.detectedIssues[0]?.type as any || 'other',
           `Automated detection: ${analysis.detectedIssues.map(i => i.description).join(', ')}`,
           'system',

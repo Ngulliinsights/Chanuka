@@ -53,18 +53,18 @@ describe('ConflictDetectionEngineService', () => {
     const mockDisclosures = [
       {
         id: 1,
-        sponsorId: 123,
+        sponsor_id: 123,
         disclosureType: 'financial',
         amount: '500000',
         source: 'Test Corporation',
-        isVerified: true,
-        createdAt: new Date()
+        is_verified: true,
+        created_at: new Date()
       }
     ];
     const mockAffiliations = [
       {
         id: 1,
-        sponsorId: 123,
+        sponsor_id: 123,
         organization: 'Test Corp',
         role: 'Board Member',
         startDate: new Date(),
@@ -103,12 +103,12 @@ describe('ConflictDetectionEngineService', () => {
       const highValueDisclosures = [
         {
           id: 1,
-          sponsorId: 123,
+          sponsor_id: 123,
           disclosureType: 'financial',
           amount: '15000000', // 15M - should be critical
           source: 'Major Corporation',
-          isVerified: true,
-          createdAt: new Date()
+          is_verified: true,
+          created_at: new Date()
         }
       ];
 
@@ -128,7 +128,7 @@ describe('ConflictDetectionEngineService', () => {
     const mockAffiliations = [
       {
         id: 1,
-        sponsorId: 123,
+        sponsor_id: 123,
         organization: 'Tech Corporation',
         role: 'CEO',
         startDate: new Date(),
@@ -136,7 +136,7 @@ describe('ConflictDetectionEngineService', () => {
       },
       {
         id: 2,
-        sponsorId: 123,
+        sponsor_id: 123,
         organization: 'Advisory Board Inc',
         role: 'Senior Advisor',
         startDate: new Date(),
@@ -162,7 +162,7 @@ describe('ConflictDetectionEngineService', () => {
     it('should categorize roles correctly', async () => {
       const advisorAffiliation = [{
         id: 1,
-        sponsorId: 123,
+        sponsor_id: 123,
         organization: 'Advisory Corp',
         role: 'Senior Advisor',
         startDate: new Date(),
@@ -181,7 +181,7 @@ describe('ConflictDetectionEngineService', () => {
     it('should handle inactive affiliations', async () => {
       const inactiveAffiliation = [{
         id: 1,
-        sponsorId: 123,
+        sponsor_id: 123,
         organization: 'Former Corp',
         role: 'Former CEO',
         startDate: new Date('2020-01-01'),
@@ -193,50 +193,45 @@ describe('ConflictDetectionEngineService', () => {
         inactiveAffiliation
       );
 
-      expect(conflicts[0].isActive).toBe(false);
+      expect(conflicts[0].is_active).toBe(false);
     });
   });
 
   describe('analyzeVotingPatternInconsistencies', () => {
     const mockSponsor = { id: 123, name: 'Test Sponsor' };
 
-    it('should detect party deviation anomalies', async () => {
-      const votingHistory = [
+    it('should detect party deviation anomalies', async () => { const votingHistory = [
         {
           vote: 'yes',
-          billId: 1,
+          bill_id: 1,
           billTitle: 'Test Bill 1',
           billCategory: 'Healthcare',
           partyPosition: 'no'
-        },
-        {
-          vote: 'no',
-          billId: 2,
+         },
+        { vote: 'no',
+          bill_id: 2,
           billTitle: 'Test Bill 2',
           billCategory: 'Education',
           partyPosition: 'yes'
-        },
-        {
-          vote: 'yes',
-          billId: 3,
+         },
+        { vote: 'yes',
+          bill_id: 3,
           billTitle: 'Test Bill 3',
           billCategory: 'Finance',
           partyPosition: 'no'
-        },
-        {
-          vote: 'no',
-          billId: 4,
+         },
+        { vote: 'no',
+          bill_id: 4,
           billTitle: 'Test Bill 4',
           billCategory: 'Agriculture',
           partyPosition: 'yes'
-        },
-        {
-          vote: 'yes',
-          billId: 5,
+         },
+        { vote: 'yes',
+          bill_id: 5,
           billTitle: 'Test Bill 5',
           billCategory: 'Technology',
           partyPosition: 'no'
-        }
+         }
       ];
 
       const anomalies = await service.analyzeVotingPatternInconsistencies(
@@ -251,13 +246,12 @@ describe('ConflictDetectionEngineService', () => {
       expect(partyDeviation).toBeDefined();
     });
 
-    it('should detect pattern inconsistencies', async () => {
-      const votingHistory = [
-        { vote: 'yes', billId: 1, billTitle: 'Healthcare Bill 1', billCategory: 'Healthcare' },
-        { vote: 'no', billId: 2, billTitle: 'Healthcare Bill 2', billCategory: 'Healthcare' },
-        { vote: 'yes', billId: 3, billTitle: 'Healthcare Bill 3', billCategory: 'Healthcare' },
-        { vote: 'no', billId: 4, billTitle: 'Healthcare Bill 4', billCategory: 'Healthcare' },
-        { vote: 'yes', billId: 5, billTitle: 'Healthcare Bill 5', billCategory: 'Healthcare' }
+    it('should detect pattern inconsistencies', async () => { const votingHistory = [
+        { vote: 'yes', bill_id: 1, billTitle: 'Healthcare Bill 1', billCategory: 'Healthcare'  },
+        { vote: 'no', bill_id: 2, billTitle: 'Healthcare Bill 2', billCategory: 'Healthcare'  },
+        { vote: 'yes', bill_id: 3, billTitle: 'Healthcare Bill 3', billCategory: 'Healthcare'  },
+        { vote: 'no', bill_id: 4, billTitle: 'Healthcare Bill 4', billCategory: 'Healthcare'  },
+        { vote: 'yes', bill_id: 5, billTitle: 'Healthcare Bill 5', billCategory: 'Healthcare'  }
       ];
 
       const anomalies = await service.analyzeVotingPatternInconsistencies(
@@ -271,9 +265,8 @@ describe('ConflictDetectionEngineService', () => {
       expect(patternAnomaly).toBeDefined();
     });
 
-    it('should handle insufficient voting data', async () => {
-      const limitedVotingHistory = [
-        { vote: 'yes', billId: 1, billTitle: 'Test Bill', billCategory: 'Test' }
+    it('should handle insufficient voting data', async () => { const limitedVotingHistory = [
+        { vote: 'yes', bill_id: 1, billTitle: 'Test Bill', billCategory: 'Test'  }
       ];
 
       const anomalies = await service.analyzeVotingPatternInconsistencies(
@@ -285,12 +278,11 @@ describe('ConflictDetectionEngineService', () => {
       expect(anomalies.length).toBe(0);
     });
 
-    it('should filter invalid votes', async () => {
-      const mixedVotingHistory = [
-        { vote: 'yes', billId: 1, billTitle: 'Valid Bill', billCategory: 'Test' },
-        { vote: 'invalid', billId: 2, billTitle: 'Invalid Vote' }, // Invalid vote
+    it('should filter invalid votes', async () => { const mixedVotingHistory = [
+        { vote: 'yes', bill_id: 1, billTitle: 'Valid Bill', billCategory: 'Test'  },
+        { vote: 'invalid', bill_id: 2, billTitle: 'Invalid Vote'  }, // Invalid vote
         null, // Null entry
-        { vote: 'no', billId: 3, billTitle: 'Another Valid Bill', billCategory: 'Test' }
+        { vote: 'no', bill_id: 3, billTitle: 'Another Valid Bill', billCategory: 'Test'  }
       ];
 
       const anomalies = await service.analyzeVotingPatternInconsistencies(

@@ -29,22 +29,21 @@ export interface ConflictSummary {
 
 
 // --- Define the final comprehensive analysis result structure ---
-export interface ComprehensiveBillAnalysis {
-    billId: number;
+export interface ComprehensiveBillAnalysis { bill_id: number;
     analysisId: string; // Unique ID for this analysis run
     timestamp: Date;
     constitutionalAnalysis: ConstitutionalAnalysisResult;
     conflictAnalysisSummary: ConflictSummary; // Use the summary type
     stakeholderImpact: StakeholderAnalysisResult;
-    transparencyScore: TransparencyScoreResult;
+    transparency_score: TransparencyScoreResult;
     publicInterestScore: PublicInterestScoreResult;
     recommendedActions: string[];
     overallConfidence: number; // Score 0-100
-}
+ }
 
 /**
  * Orchestrates various analysis services to provide a comprehensive
- * real-time analysis of a legislative bill.
+ * real-time analysis of a legislative bills.
  */
 export class BillComprehensiveAnalysisService {
     private get db() { return readDatabase; }
@@ -52,18 +51,16 @@ export class BillComprehensiveAnalysisService {
     /**
      * Runs all relevant analyses for a given bill ID.
      */
-    async analyzeBill(billId: number): Promise<ComprehensiveBillAnalysis> {
-        const analysisId = `comp_analysis_${billId}_${Date.now()}`;
+    async analyzeBill(bill_id: number): Promise<ComprehensiveBillAnalysis> { const analysisId = `comp_analysis_${bill_id }_${Date.now()}`;
         const timestamp = new Date();
-        logger.info(`🚀 Starting comprehensive analysis for bill ${billId} (ID: ${analysisId})`);
+        logger.info(`🚀 Starting comprehensive analysis for bill ${ bill_id } (ID: ${analysisId})`);
 
-        try {
-            // --- Step 1: Run independent analyses concurrently ---
+        try { // --- Step 1: Run independent analyses concurrently ---
             // Use Promise.allSettled to allow partial results even if one service fails
             const results = await Promise.allSettled([
-                 constitutionalAnalysisService.analyzeBill(billId),
-                 stakeholderAnalysisService.analyzeBill(billId),
-                 this.analyzeSponsorConflictsForBill(billId) // Analyze conflicts related to this bill
+                 constitutionalAnalysisService.analyzeBill(bill_id),
+                 stakeholderAnalysisService.analyzeBill(bill_id),
+                 this.analyzeSponsorConflictsForBill(bill_id) // Analyze conflicts related to this bill
              ]);
 
 
@@ -74,7 +71,7 @@ export class BillComprehensiveAnalysisService {
 
 
             // --- Step 2: Run dependent analyses (require results from step 1) ---
-            const transparency = await transparencyAnalysisService.calculateScore(billId, conflictSummary);
+            const transparency = await transparencyAnalysisService.calculateScore(bill_id, conflictSummary);
             const publicInterest = publicInterestAnalysisService.calculateScore(stakeholder, transparency);
 
             // --- Step 3: Generate recommendations and confidence ---
@@ -85,47 +82,43 @@ export class BillComprehensiveAnalysisService {
             // --- Step 4: Store results (asynchronously, don't block response) ---
             const analysisDataToStore = {
                 analysisId, constitutionalAnalysis: constitutional, conflictAnalysisSummary: conflictSummary,
-                stakeholderImpact: stakeholder, transparencyScore: transparency, publicInterestScore: publicInterest,
+                stakeholderImpact: stakeholder, transparency_score: transparency, publicInterestScore: publicInterest,
                 overallConfidence: confidence, recommendations // Store recommendations too
-            };
-            this.storeAnalysisResults(billId, analysisDataToStore)
-                .catch(err => logger.error(`Failed to store analysis results for bill ${billId} asynchronously:`, { component: 'BillComprehensiveAnalysisService' }, err));
+             };
+            this.storeAnalysisResults(bill_id, analysisDataToStore)
+                .catch(err => logger.error(`Failed to store analysis results for bill ${ bill_id } asynchronously:`, { component: 'BillComprehensiveAnalysisService' }, err));
 
 
             // --- Step 5: Assemble and return the final result ---
-            const finalResult: ComprehensiveBillAnalysis = {
-                billId, analysisId, timestamp, constitutionalAnalysis: constitutional,
+            const finalResult: ComprehensiveBillAnalysis = { bill_id, analysisId, timestamp, constitutionalAnalysis: constitutional,
                 conflictAnalysisSummary: conflictSummary, stakeholderImpact: stakeholder,
-                transparencyScore: transparency, publicInterestScore: publicInterest,
+                transparency_score: transparency, publicInterestScore: publicInterest,
                 recommendedActions: recommendations, overallConfidence: confidence
-            };
+             };
 
-            logger.info(`✅ Comprehensive analysis complete for bill ${billId} (ID: ${analysisId})`);
+            logger.info(`✅ Comprehensive analysis complete for bill ${ bill_id } (ID: ${analysisId})`);
             return finalResult;
 
-        } catch (error) {
-             // Catch errors not handled by Promise.allSettled (e.g., initial DB checks)
-            logger.error(`Critical error during comprehensive analysis orchestration for bill ${billId}:`, { component: 'BillComprehensiveAnalysisService'}, error);
+        } catch (error) { // Catch errors not handled by Promise.allSettled (e.g., initial DB checks)
+            logger.error(`Critical error during comprehensive analysis orchestration for bill ${bill_id }:`, { component: 'BillComprehensiveAnalysisService'}, error);
             // Optionally store a 'failed' analysis record here
-            throw new Error(`Comprehensive analysis orchestration failed for bill ${billId}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            throw new Error(`Comprehensive analysis orchestration failed for bill ${ bill_id }: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     }
 
      /** Analyzes conflicts of interest related to sponsors of a specific bill */
-     private async analyzeSponsorConflictsForBill(billId: number): Promise<ConflictSummary> {
-         logger.debug(`Analyzing sponsor conflicts related to bill ${billId}.`);
+     private async analyzeSponsorConflictsForBill(bill_id: number): Promise<ConflictSummary> { logger.debug(`Analyzing sponsor conflicts related to bill ${bill_id }.`);
          try {
              // 1. Find active sponsors for the bill
-             const billSponsors = await this.db.select({ sponsorId: schema.billSponsorships.sponsorId })
-                 .from(schema.billSponsorships)
-                 .where(and(eq(schema.billSponsorships.billId, billId), eq(schema.billSponsorships.isActive, true)));
+             const billSponsors = await this.db.select({ sponsor_id: schema.bill_sponsorships.sponsor_id })
+                 .from(schema.bill_sponsorships)
+                 .where(and(eq(schema.bill_sponsorships.bill_id, bill_id), eq(schema.bill_sponsorships.is_active, true)));
 
-             const sponsorIds = billSponsors.map(s => s.sponsorId);
-             if (sponsorIds.length === 0) {
-                 logger.info(`No active sponsors found for bill ${billId}, returning low conflict summary.`);
+             const sponsor_ids = billSponsors.map(s => s.sponsor_id);
+             if (sponsor_ids.length === 0) { logger.info(`No active sponsors found for bill ${bill_id }, returning low conflict summary.`);
                  return { overallRisk: 'low', affectedSponsorsCount: 0, totalFinancialExposureEstimate: 0, directConflictCount: 0, indirectConflictCount: 0 };
              }
-             logger.debug(`Found ${sponsorIds.length} sponsors for bill ${billId}: ${sponsorIds.join(', ')}`);
+             logger.debug(`Found ${sponsor_ids.length} sponsors for bill ${ bill_id }: ${sponsor_ids.join(', ')}`);
 
 
              // 2. Detect conflicts for these sponsors (potentially filtering by bill context if service supports it)
@@ -133,20 +126,19 @@ export class BillComprehensiveAnalysisService {
              // Assume detectConflicts returns ConflictDetectionResult[]
              const allConflicts: ConflictDetectionResult[] = [];
              // Run in parallel for efficiency
-             await Promise.all(sponsorIds.map(async (sponsorId) => {
-                 try {
-                     // Pass billId for context if the service method supports it, otherwise it analyzes the sponsor generally
-                     // const sponsorConflicts = await sponsorConflictAnalysisService.detectConflicts(sponsorId, billId);
-                     const sponsorConflicts = await sponsorConflictAnalysisService.detectConflicts(sponsorId); // Assuming general analysis
+             await Promise.all(sponsor_ids.map(async (sponsor_id) => { try {
+                     // Pass bill_id for context if the service method supports it, otherwise it analyzes the sponsor generally
+                     // const sponsorConflicts = await sponsorConflictAnalysisService.detectConflicts(sponsor_id, bill_id);
+                     const sponsorConflicts = await sponsorConflictAnalysisService.detectConflicts(sponsor_id); // Assuming general analysis
                      allConflicts.push(...sponsorConflicts);
-                 } catch (sponsorError) {
-                     logger.error(`Failed to detect conflicts for sponsor ${sponsorId} regarding bill ${billId}:`, { component: 'BillComprehensiveAnalysisService'}, sponsorError);
+                  } catch (sponsorError) {
+                     logger.error(`Failed to detect conflicts for sponsor ${sponsor_id} regarding bill ${ bill_id }:`, { component: 'BillComprehensiveAnalysisService'}, sponsorError);
                  }
              }));
 
 
              // 3. Aggregate results into ConflictSummary
-             const relevantConflicts = allConflicts.filter(c => sponsorIds.includes(c.sponsorId)); // Ensure only relevant sponsors
+             const relevantConflicts = allConflicts.filter(c => sponsor_ids.includes(c.sponsor_id)); // Ensure only relevant sponsors
              const riskLevels = relevantConflicts.map(c => c.severity); // Map severity ('low', 'medium', etc.) to risk
              const overallRisk = this.determineOverallRiskFromSeverity(riskLevels); // Use helper
 
@@ -157,7 +149,7 @@ export class BillComprehensiveAnalysisService {
              const directConflictCount = relevantConflicts.filter(c => c.conflictType === 'financial_direct').length;
              const indirectConflictCount = relevantConflicts.filter(c => c.conflictType === 'financial_indirect' || c.conflictType === 'organizational').length; // Example grouping
 
-             const affectedSponsors = new Set(relevantConflicts.map(c => c.sponsorId));
+             const affectedSponsors = new Set(relevantConflicts.map(c => c.sponsor_id));
 
 
              return {
@@ -169,8 +161,7 @@ export class BillComprehensiveAnalysisService {
                  // relatedConflictDetails: relevantConflicts // Optionally include details
              };
 
-         } catch (error) {
-              logger.error(`Failed to analyze sponsor conflicts for bill ${billId}:`, { component: 'BillComprehensiveAnalysisService'}, error);
+         } catch (error) { logger.error(`Failed to analyze sponsor conflicts for bill ${bill_id }:`, { component: 'BillComprehensiveAnalysisService'}, error);
               return this.getDefaultConflictSummary(error); // Return default on error
          }
      }
@@ -240,37 +231,34 @@ export class BillComprehensiveAnalysisService {
     }
 
     /** Stores the analysis results in the database */
-     private async storeAnalysisResults(billId: number, analysisData: any): Promise<void> {
-         logger.debug(`Storing analysis results for bill ${billId}.`);
-         try {
-             const insertData: schema.InsertAnalysis = {
-                billId,
-                analysisType: 'comprehensive_v1', // Use a versioned type name
+     private async storeAnalysisResults(bill_id: number, analysisData: any): Promise<void> { logger.debug(`Storing analysis results for bill ${bill_id }.`);
+         try { const insertData: schema.InsertAnalysis = {
+                bill_id,
+                analysis_type: 'comprehensive_v1', // Use a versioned type name
                 results: analysisData, // Store the full structured data
                 confidence: analysisData.overallConfidence?.toString() ?? "0", // Store overall confidence
                 // Add model versions if applicable
-                // modelVersion: `const:${constVersion}_stake:${stakeVersion}_transp:${transpVersion}`,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                // Default isApproved to false, requires manual review maybe?
-                 isApproved: false,
+                // model_version: `const:${constVersion }_stake:${stakeVersion}_transp:${transpVersion}`,
+                created_at: new Date(),
+                updated_at: new Date(),
+                // Default is_approved to false, requires manual review maybe?
+                 is_approved: false,
              };
              await this.db.insert(schema.analysis).values(insertData)
                 .onConflictDoUpdate({ // Update if analysis for this bill+type exists
-                    target: [schema.analysis.billId, schema.analysis.analysisType],
+                    target: [schema.analysis.bill_id, schema.analysis.analysis_type],
                     set: {
                         results: analysisData,
                         confidence: analysisData.overallConfidence?.toString() ?? "0",
-                        updatedAt: new Date(),
+                        updated_at: new Date(),
                         // Reset approval status on update? Or keep existing? Depends on workflow.
-                        // isApproved: false,
-                        // approvedBy: null,
+                        // is_approved: false,
+                        // approved_by: null,
                     }
                 });
 
-             logger.info(`Successfully stored/updated analysis results for bill ${billId}`);
-         } catch (error) {
-             logger.error(`Failed to store analysis results for bill ${billId}:`, { component: 'BillComprehensiveAnalysisService' }, error);
+             logger.info(`Successfully stored/updated analysis results for bill ${ bill_id }`);
+         } catch (error) { logger.error(`Failed to store analysis results for bill ${bill_id }:`, { component: 'BillComprehensiveAnalysisService' }, error);
              // Do not re-throw, storing is secondary to providing the analysis result
          }
      }

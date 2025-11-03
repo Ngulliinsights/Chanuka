@@ -128,8 +128,7 @@ export class SentryIntegration extends BaseErrorTrackingIntegration {
         correlationId: error.metadata.correlationId,
         ...this.config.tags
       },
-      extra: {
-        errorId: error.errorId,
+      extra: { errorId: error.errorId,
         code: error.code,
         statusCode: error.statusCode,
         domain: error.metadata.domain,
@@ -139,12 +138,12 @@ export class SentryIntegration extends BaseErrorTrackingIntegration {
         attemptCount: error.metadata.attemptCount,
         retryable: error.metadata.retryable,
         context: error.metadata.context,
-        userId: context?.userId,
+        user_id: context?.user_id,
         sessionId: context?.metadata?.sessionId,
         ...this.config.customData
-      },
+       },
       user: this.config.user || {
-        id: context?.userId
+        id: context?.user_id
       },
       fingerprint: [
         error.code,
@@ -194,8 +193,7 @@ export class RollbarIntegration extends BaseErrorTrackingIntegration {
     });
   }
 
-  protected async doTrackError(error: BaseError, context?: ErrorContext): Promise<void> {
-    const rollbarError = {
+  protected async doTrackError(error: BaseError, context?: ErrorContext): Promise<void> { const rollbarError = {
       level: this.mapSeverityToRollbar(error.metadata.severity),
       custom: {
         errorId: error.errorId,
@@ -204,11 +202,11 @@ export class RollbarIntegration extends BaseErrorTrackingIntegration {
         severity: error.metadata.severity,
         correlationId: error.metadata.correlationId,
         context: error.metadata.context,
-        userId: context?.userId,
+        user_id: context?.user_id,
         sessionId: context?.metadata?.sessionId
-      },
+       },
       person: {
-        id: context?.userId || this.config.user?.id,
+        id: context?.user_id || this.config.user?.id,
         email: this.config.user?.email,
         username: this.config.user?.username
       },
@@ -264,8 +262,7 @@ export class BugsnagIntegration extends BaseErrorTrackingIntegration {
     });
   }
 
-  protected async doTrackError(error: BaseError, context?: ErrorContext): Promise<void> {
-    const bugsnagError = {
+  protected async doTrackError(error: BaseError, context?: ErrorContext): Promise<void> { const bugsnagError = {
       errorClass: error.name,
       errorMessage: error.message,
       stacktrace: error.stack,
@@ -277,12 +274,12 @@ export class BugsnagIntegration extends BaseErrorTrackingIntegration {
         severity: error.metadata.severity,
         correlationId: error.metadata.correlationId,
         context: error.metadata.context,
-        userId: context?.userId,
+        user_id: context?.user_id,
         sessionId: context?.metadata?.sessionId,
         ...this.config.customData
-      },
+       },
       user: {
-        id: context?.userId || this.config.user?.id,
+        id: context?.user_id || this.config.user?.id,
         email: this.config.user?.email,
         name: this.config.user?.username
       },
@@ -335,19 +332,18 @@ export class ConsoleIntegration extends BaseErrorTrackingIntegration {
     });
   }
 
-  protected async doTrackError(error: BaseError, context?: ErrorContext): Promise<void> {
-    const logData = {
+  protected async doTrackError(error: BaseError, context?: ErrorContext): Promise<void> { const logData = {
       errorId: error.errorId,
       message: error.message,
       code: error.code,
       domain: error.metadata.domain,
       severity: error.metadata.severity,
       correlationId: error.metadata.correlationId,
-      userId: context?.userId,
+      user_id: context?.user_id,
       sessionId: context?.metadata?.sessionId,
       stack: error.stack,
       context: error.metadata.context
-    };
+     };
 
     console.group(`🚨 Error Tracked [${this.name.toUpperCase()}]`);
     console.error(error.message, logData);

@@ -172,8 +172,8 @@ describe('Database Operations Integration Tests', () => {
     it('should handle nested transaction operations', async () => {
       const nestedTransactionCallback = async (tx: any) => {
         const step1 = await Promise.resolve({ id: 1, status: 'created' });
-        const step2 = await Promise.resolve({ id: 2, status: 'updated', parentId: step1.id });
-        const step3 = await Promise.resolve({ id: 3, status: 'completed', parentId: step2.id });
+        const step2 = await Promise.resolve({ id: 2, status: 'updated', parent_id: step1.id });
+        const step3 = await Promise.resolve({ id: 3, status: 'completed', parent_id: step2.id });
 
         return {
           steps: [step1, step2, step3],

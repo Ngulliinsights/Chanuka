@@ -175,10 +175,10 @@ export class SecurityMiddleware {
         
         // Log security event
         securityAuditService.logSecurityEvent({
-          eventType: 'input_validation_failure',
+          event_type: 'input_validation_failure',
           severity: 'medium',
-          ipAddress: this.getClientIP(req),
-          userAgent: req.get('User-Agent'),
+          ip_address: this.getClientIP(req),
+          user_agent: req.get('User-Agent'),
           resource: req.path,
           action: req.method,
           success: false,
@@ -215,7 +215,7 @@ export class SecurityMiddleware {
         if (sessionResult.isValid && sessionResult.session) {
           // Attach user info to request
           (req as any).user = {
-            id: sessionResult.session.userId,
+            id: sessionResult.session.user_id,
             email: sessionResult.session.email,
             role: sessionResult.session.role
           };
@@ -228,10 +228,10 @@ export class SecurityMiddleware {
         } else {
           // Log unauthorized access attempt
           await securityAuditService.logSecurityEvent({
-            eventType: 'unauthorized_access_attempt',
+            event_type: 'unauthorized_access_attempt',
             severity: 'medium',
-            ipAddress: this.getClientIP(req),
-            userAgent: req.get('User-Agent'),
+            ip_address: this.getClientIP(req),
+            user_agent: req.get('User-Agent'),
             resource: req.path,
             action: req.method,
             success: false,
@@ -314,10 +314,10 @@ export class SecurityMiddleware {
       for (const pattern of suspiciousPatterns) {
         if (pattern.test(fullUrl) || pattern.test(requestBody)) {
           await securityAuditService.logSecurityEvent({
-            eventType: 'suspicious_request_pattern',
+            event_type: 'suspicious_request_pattern',
             severity: 'high',
-            ipAddress: this.getClientIP(req),
-            userAgent: req.get('User-Agent'),
+            ip_address: this.getClientIP(req),
+            user_agent: req.get('User-Agent'),
             resource: req.path,
             action: req.method,
             success: false,

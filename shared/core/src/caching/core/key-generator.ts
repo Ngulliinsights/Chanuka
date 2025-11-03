@@ -44,8 +44,7 @@ export class CacheKeyGenerator {
   /**
    * Generate trust score cache keys
    */
-  trustScore(userId: string): string {
-    return `trust_score:${userId}`;
+  trustScore(user_id: string): string { return `trust_score:${user_id }`;
   }
 
   /**

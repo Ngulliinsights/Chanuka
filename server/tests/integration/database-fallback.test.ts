@@ -165,8 +165,8 @@ describe('Database Fallback Integration Tests', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveProperty('bill');
-      expect(response.body.data.bill.id).toBe(1);
-      expect(response.body.data.bill.title).toContain('Digital Economy');
+      expect(response.body.data.bills.id).toBe(1);
+      expect(response.body.data.bills.title).toContain('Digital Economy');
       expect(response.body.metadata.source).toBe('fallback');
     });
 
@@ -330,8 +330,8 @@ describe('Database Fallback Integration Tests', () => {
       const sponsors = sponsorsResponse.body.data;
 
       bills.forEach((bill: any) => {
-        if (bill.sponsorId) {
-          const sponsor = sponsors.find((s: any) => s.id === bill.sponsorId);
+        if (bills.sponsor_id) {
+          const sponsor = sponsors.find((s: any) => s.id === bills.sponsor_id);
           expect(sponsor).toBeDefined();
         }
       });
@@ -342,9 +342,9 @@ describe('Database Fallback Integration Tests', () => {
       const bills = response.body.data.bills;
 
       bills.forEach((bill: any) => {
-        expect(new Date(bill.introducedDate)).toBeInstanceOf(Date);
-        expect(new Date(bill.createdAt)).toBeInstanceOf(Date);
-        expect(new Date(bill.updatedAt)).toBeInstanceOf(Date);
+        expect(new Date(bills.introduced_date)).toBeInstanceOf(Date);
+        expect(new Date(bills.created_at)).toBeInstanceOf(Date);
+        expect(new Date(bills.updated_at)).toBeInstanceOf(Date);
       });
     });
 
@@ -353,11 +353,11 @@ describe('Database Fallback Integration Tests', () => {
       const bills = response.body.data.bills;
 
       bills.forEach((bill: any) => {
-        expect(bill.viewCount).toBeGreaterThanOrEqual(0);
-        expect(bill.shareCount).toBeGreaterThanOrEqual(0);
-        if (bill.complexityScore) {
-          expect(bill.complexityScore).toBeGreaterThanOrEqual(1);
-          expect(bill.complexityScore).toBeLessThanOrEqual(10);
+        expect(bills.view_count).toBeGreaterThanOrEqual(0);
+        expect(bills.share_count).toBeGreaterThanOrEqual(0);
+        if (bills.complexity_score) {
+          expect(bills.complexity_score).toBeGreaterThanOrEqual(1);
+          expect(bills.complexity_score).toBeLessThanOrEqual(10);
         }
       });
     });

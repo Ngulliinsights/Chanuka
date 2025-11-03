@@ -47,19 +47,19 @@ const PAGE_RELATIONSHIPS: Record<string, Record<string, { type: 'parent' | 'chil
  */
 export const calculateRelevanceScore = (
   relationship: { type: string; weight: number; context: string },
-  userRole: UserRole,
+  user_role: UserRole,
   preferences: any,
   user: any | null,
   allowedRoles?: UserRole[]
 ): number => {
   try {
     // Validate user role
-    validateUserRole(userRole);
+    validateUserRole(user_role);
 
     let score = relationship.weight;
 
     // Role-based adjustments
-    if (allowedRoles && !allowedRoles.includes(userRole)) {
+    if (allowedRoles && !allowedRoles.includes(user_role)) {
       score *= 0.3; // Significantly reduce score for inaccessible pages
     }
 
@@ -95,14 +95,14 @@ export const calculateRelevanceScore = (
  */
 export const getPageRelationships = (
   currentPath: string,
-  userRole: UserRole,
+  user_role: UserRole,
   user: any | null,
   preferences: any
 ): RelatedPage[] => {
   try {
     // Validate inputs
     validateNavigationPath(currentPath);
-    validateUserRole(userRole);
+    validateUserRole(user_role);
 
     const relationships = PAGE_RELATIONSHIPS[currentPath] || [];
 
@@ -120,7 +120,7 @@ export const getPageRelationships = (
           type: rel.type as 'parent' | 'child' | 'sibling' | 'related',
           weight: rel.weight,
           context: rel.context,
-          relevanceScore: calculateRelevanceScore(rel, userRole, preferences, user, navItem?.allowedRoles)
+          relevanceScore: calculateRelevanceScore(rel, user_role, preferences, user, navItem?.allowedRoles)
         };
 
         // Validate the created related page
@@ -145,13 +145,13 @@ export const getPageRelationships = (
  */
 export const generateBreadcrumbRelationships = (
   currentPath: string,
-  userRole: UserRole,
+  user_role: UserRole,
   user: any | null
 ): RelatedPage[] => {
   try {
     // Validate inputs
     validateNavigationPath(currentPath);
-    validateUserRole(userRole);
+    validateUserRole(user_role);
 
     const breadcrumbs: RelatedPage[] = [];
     const pathSegments = currentPath.split('/').filter(Boolean);

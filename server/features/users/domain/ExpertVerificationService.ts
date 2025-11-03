@@ -76,7 +76,7 @@ export class ExpertVerificationService {
 
   constructor(
     private readonly expertRepo: ExpertRepository = {
-      findQualifiedExperts: async (topic: string) => topic === 'constitutional law' ? [{ id: '1', name: 'Expert', email: 'e@test.com', expertise: [], qualifications: [], verificationStatus: 'verified', reputationScore: 1, isActive: true, createdAt: new Date(), updatedAt: new Date(), topic: [topic], specializations: [], availabilityStatus: 'available' }] : [],
+      findQualifiedExperts: async (topic: string) => topic === 'constitutional law' ? [{ id: '1', name: 'Expert', email: 'e@test.com', expertise: [], qualifications: [], verification_status: 'verified', reputation_score: 1, is_active: true, created_at: new Date(), updated_at: new Date(), topic: [topic], specializations: [], availabilityStatus: 'available' }] : [],
       ping: async () => {}
     },
     private readonly analysisRepo: AnalysisRepository = {
@@ -315,7 +315,7 @@ export class ExpertVerificationService {
       priority: 'medium',
       estimatedDuration: 60,
       complexity: 5,
-      createdAt: new Date(now),
+      created_at: new Date(now),
       processedAt: null,
     };
 

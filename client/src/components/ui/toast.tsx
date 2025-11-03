@@ -21,7 +21,7 @@ const ToastViewport = forwardRef<
     {...props}
   />
 ))
-ToastViewport.displayName = Viewport.displayName
+ToastViewport.display_name = Viewport.display_name
 
 const toastVariants = cva(
   "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full",
@@ -52,7 +52,7 @@ const Toast = forwardRef<
     />
   )
 })
-Toast.displayName = Root.displayName
+Toast.display_name = Root.display_name
 
 const ToastAction = forwardRef<
   ElementRef<typeof Action>,
@@ -67,7 +67,7 @@ const ToastAction = forwardRef<
     {...props}
   />
 ))
-ToastAction.displayName = Action.displayName
+ToastAction.display_name = Action.display_name
 
 const ToastClose = forwardRef<
   ElementRef<typeof Close>,
@@ -85,7 +85,7 @@ const ToastClose = forwardRef<
     <X className="h-4 w-4" />
   </Close>
 ))
-ToastClose.displayName = Close.displayName
+ToastClose.display_name = Close.display_name
 
 const ToastTitle = forwardRef<
   ElementRef<typeof Title>,
@@ -97,7 +97,7 @@ const ToastTitle = forwardRef<
     {...props}
   />
 ))
-ToastTitle.displayName = Title.displayName
+ToastTitle.display_name = Title.display_name
 
 const ToastDescription = forwardRef<
   ElementRef<typeof Description>,
@@ -109,7 +109,7 @@ const ToastDescription = forwardRef<
     {...props}
   />
 ))
-ToastDescription.displayName = Description.displayName
+ToastDescription.display_name = Description.display_name
 
 type ToastProps = ComponentPropsWithoutRef<typeof Toast>
 

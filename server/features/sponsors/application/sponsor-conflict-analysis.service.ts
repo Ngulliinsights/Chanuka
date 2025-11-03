@@ -2,9 +2,9 @@
 import { sponsorRepository, SponsorRepository } from '../infrastructure/repositories/sponsor.repository'; // Adjusted path
 import { logger  } from '../../../../shared/core/src/index.js';
 const loggerAny = logger as any;
-import type { Sponsor, SponsorAffiliation, SponsorTransparency, Bill } from '../../../../shared/schema'; // Adjusted path
+import type { Sponsor, Bill } from '@shared/schema';
 // Local helper types used by this service but not exported elsewhere in repo
-type BillSponsorship = { id?: number; billId: number; role?: string };
+type BillSponsorship = { id?: number; bill_id: number; role?: string  };
 
 interface SponsorWithRelations extends Sponsor {
   affiliations?: SponsorAffiliation[];
@@ -30,7 +30,7 @@ export type ConflictSeverity = 'low' | 'medium' | 'high' | 'critical';
 // Represents a single detected conflict
 export interface ConflictDetectionResult {
   conflictId: string; // Unique ID for this specific conflict instance
-  sponsorId: number;
+  sponsor_id: number;
   conflictType: ConflictType;
   severity: ConflictSeverity;
   description: string; // Human-readable summary
@@ -63,7 +63,7 @@ export interface ConflictNode {
   id: string;
   type: 'sponsor' | 'organization' | 'bill';
   name: string;
-  conflictLevel: ConflictSeverity;
+  conflict_level: ConflictSeverity;
   size: number;
   color: string;
   metadata?: Record<string, any>;
@@ -95,16 +95,15 @@ export interface NetworkMetrics {
   riskDistribution: Record<ConflictSeverity, number>;
 }
 
-export interface ConflictPrediction {
-  billId: number;
+export interface ConflictPrediction { bill_id: number;
   billTitle: string;
   predictedConflictType: ConflictType;
   probability: number;
   riskFactors: string[];
-}
+ }
 
 export interface ConflictTrend {
-  sponsorId: number;
+  sponsor_id: number;
   timeframe: string;
   conflictCount: number;
   severityTrend: 'increasing' | 'decreasing' | 'stable';
@@ -188,17 +187,17 @@ export class SponsorConflictAnalysisService {
   /**
    * Detects all potential conflicts for a specific sponsor or all active sponsors.
    * Orchestrates calls to individual detection algorithms.
-   * @param sponsorId Optional ID to analyze a single sponsor. If omitted, analyzes all active sponsors.
+   * @param sponsor_id Optional ID to analyze a single sponsors. If omitted, analyzes all active sponsors.
    * @returns Array of detected conflicts.
    */
-  async detectConflicts(sponsorId?: number): Promise<ConflictDetectionResult[]> {
-    const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectConflicts', sponsorId };
-    loggerAny.info(`Starting conflict detection for ${sponsorId ? `sponsor ${sponsorId}` : 'all active sponsors'}`, logContext);
+  async detectConflicts(sponsor_id?: number): Promise<ConflictDetectionResult[]> {
+    const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectConflicts', sponsor_id };
+    loggerAny.info(`Starting conflict detection for ${sponsor_id ? `sponsor ${sponsor_id}` : 'all active sponsors'}`, logContext);
 
     try {
       // 1. Get Sponsor(s) and their related data using the Repository
-      const sponsorsToAnalyze = await (sponsorId
-        ? this.getSponsorData([sponsorId])
+      const sponsorsToAnalyze = await (sponsor_id
+        ? this.getSponsorData([sponsor_id])
         : this.getAllActiveSponsorData());
 
       if (sponsorsToAnalyze.length === 0) {
@@ -213,12 +212,12 @@ export class SponsorConflictAnalysisService {
         // Run individual detection algorithms using the SponsorWithRelations shape
         const sponsor = sponsorData as SponsorWithRelations;
         const sponsorConflicts = await Promise.allSettled([
-          this.detectFinancialConflicts(sponsor, sponsor.affiliations || [], sponsor.sponsorships || []),
-          this.detectOrganizationalConflicts(sponsor, sponsor.affiliations || [], sponsor.sponsorships || []),
+          this.detectFinancialConflicts(sponsor, sponsors.affiliations || [], sponsors.sponsorships || []),
+          this.detectOrganizationalConflicts(sponsor, sponsors.affiliations || [], sponsors.sponsorships || []),
           // Voting pattern analysis requires historical voting data - might be separate service or complex query
-          // this.detectVotingPatternConflicts(sponsor, sponsor.affiliations, votingHistory),
-          this.detectTimingConflicts(sponsor, sponsor.affiliations || [], sponsor.sponsorships || []),
-          this.detectDisclosureConflicts(sponsor, sponsor.affiliations || [], sponsor.transparency || [])
+          // this.detectVotingPatternConflicts(sponsor, sponsors.affiliations, votingHistory),
+          this.detectTimingConflicts(sponsor, sponsors.affiliations || [], sponsors.sponsorships || []),
+          this.detectDisclosureConflicts(sponsor, sponsors.affiliations || [], sponsors.transparency || [])
         ]);
 
         // Collect results, logging errors from failed promises
@@ -227,7 +226,7 @@ export class SponsorConflictAnalysisService {
           if (result.status === 'fulfilled') {
             results.push(...result.value);
           } else {
-            loggerAny.error(`Conflict detection algorithm ${index} failed for sponsor ${sponsor.id}`, logContext, result.reason);
+            loggerAny.error(`Conflict detection algorithm ${index} failed for sponsor ${sponsors.id}`, logContext, result.reason);
           }
         });
         return results;
@@ -247,18 +246,18 @@ export class SponsorConflictAnalysisService {
   // These methods remain largely the same as provided previously, ensuring they
   // now call `this.sponsorRepo` for data fetching instead of `sponsorService`.
   // Example modification for generateRiskProfile:
-  async generateRiskProfile(sponsorId: number): Promise<RiskProfile> {
-      const logContext = { component: 'SponsorConflictAnalysisService', operation: 'generateRiskProfile', sponsorId };
+  async generateRiskProfile(sponsor_id: number): Promise<RiskProfile> {
+      const logContext = { component: 'SponsorConflictAnalysisService', operation: 'generateRiskProfile', sponsor_id };
   loggerAny.info(`Generating risk profile`, logContext);
       try {
           // Fetch data using the repository
-          const sponsor = await this.sponsorRepo.findById(sponsorId);
-          if (!sponsor) throw new Error(`Sponsor ${sponsorId} not found`);
+          const sponsor = await this.sponsorRepo.findById(sponsor_id);
+          if (!sponsor) throw new Error(`Sponsor ${sponsor_id} not found`);
 
           // Fetch related data concurrently using repository methods
           const [affiliations, transparency] = await Promise.all([
-              this.sponsorRepo.listAffiliations(sponsorId),
-              this.sponsorRepo.listTransparencyRecords(sponsorId)
+              this.sponsorRepo.listAffiliations(sponsor_id),
+              this.sponsorRepo.listTransparencyRecords(sponsor_id)
           ]);
 
           // Calculate risk components (using methods defined below)
@@ -277,17 +276,15 @@ export class SponsorConflictAnalysisService {
           return { overallScore, level, breakdown, recommendations };
       } catch (error) {
          loggerAny.error('Error generating risk profile', logContext, error);
-       throw new Error(`Risk profile generation failed for sponsor ${sponsorId}: ${this.getErrorMessage(error)}`);
+       throw new Error(`Risk profile generation failed for sponsor ${sponsor_id}: ${this.getErrorMessage(error)}`);
       }
   }
   // --- Implement createConflictMapping and analyzeConflictTrends similarly, replacing data fetches ---
-   async createConflictMapping(billId?: number): Promise<ConflictMapping> {
-     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'createConflictMapping', billId };
+   async createConflictMapping(bill_id?: number): Promise<ConflictMapping> { const logContext = { component: 'SponsorConflictAnalysisService', operation: 'createConflictMapping', bill_id  };
      loggerAny.info('Building conflict mapping', logContext);
-     try {
-       // Detect conflicts (optionally filter by bill)
+     try { // Detect conflicts (optionally filter by bill)
        const allConflicts = await this.detectConflicts();
-       const conflicts = typeof billId === 'number' ? allConflicts.filter(c => c.affectedBills.includes(billId)) : allConflicts;
+       const conflicts = typeof bill_id === 'number' ? allConflicts.filter(c => c.affectedBills.includes(bill_id)) : allConflicts;
 
        // Build nodes and edges
        const nodes = await this.buildConflictNodes(conflicts);
@@ -297,20 +294,20 @@ export class SponsorConflictAnalysisService {
        const clusters = await this.identifyConflictClusters(nodes, edges);
        const metrics = this.calculateNetworkMetrics(nodes, edges);
 
-       loggerAny.info(`Conflict mapping built: ${nodes.length} nodes, ${edges.length} edges`, logContext);
+       loggerAny.info(`Conflict mapping built: ${nodes.length } nodes, ${edges.length} edges`, logContext);
        return { nodes, edges, clusters, metrics };
      } catch (error) {
        loggerAny.error('Error building conflict mapping', logContext, error);
        return { nodes: [], edges: [], clusters: [], metrics: { totalNodes: 0, totalEdges: 0, density: 0, clustering: 0, centralityScores: {}, riskDistribution: { low: 0, medium: 0, high: 0, critical: 0 } } };
      }
    }
-   async analyzeConflictTrends(sponsorId?: number, timeframeMonths: number = 12): Promise<ConflictTrend[]> { /* Minimal implementation */
+   async analyzeConflictTrends(sponsor_id?: number, timeframeMonths: number = 12): Promise<ConflictTrend[]> { /* Minimal implementation */
      // Simple wrapper using getHistoricalConflicts
-     if (!sponsorId) return [];
+     if (!sponsor_id) return [];
      const startDate = new Date(); startDate.setMonth(startDate.getMonth() - timeframeMonths);
-     const history = await this.getHistoricalConflicts(sponsorId, startDate);
+     const history = await this.getHistoricalConflicts(sponsor_id, startDate);
      const metrics = this.calculateTrendMetrics(history, timeframeMonths);
-     return [{ sponsorId, timeframe: `${timeframeMonths}m`, conflictCount: history.length, severityTrend: metrics.severityTrend, riskScore: metrics.riskScore, predictions: await this.generateConflictPredictions(sponsorId) }];
+     return [{ sponsor_id, timeframe: `${timeframeMonths}m`, conflictCount: history.length, severityTrend: metrics.severityTrend, riskScore: metrics.riskScore, predictions: await this.generateConflictPredictions(sponsor_id) }];
    }
 
 
@@ -365,9 +362,9 @@ export class SponsorConflictAnalysisService {
   // ============================================================================
   // TREND & PREDICTION HELPERS
   // ============================================================================
-  private async getHistoricalConflicts(sponsorId: number, startDate: Date): Promise<ConflictDetectionResult[]> {
+  private async getHistoricalConflicts(sponsor_id: number, startDate: Date): Promise<ConflictDetectionResult[]> {
     // For now, simulate by detecting current conflicts and filtering by detectedAt
-    const current = await this.detectConflicts(sponsorId);
+    const current = await this.detectConflicts(sponsor_id);
     return current.filter(c => c.detectedAt >= startDate);
   }
 
@@ -394,12 +391,12 @@ export class SponsorConflictAnalysisService {
     return total / conflicts.length;
   }
 
-  private async generateConflictPredictions(sponsorId: number): Promise<ConflictPrediction[]> {
+  private async generateConflictPredictions(sponsor_id: number): Promise<ConflictPrediction[]> {
     // Very simple predictions: look at sponsor affiliations and upcoming bills
-    const affiliations = await this.sponsorRepo.listAffiliations(sponsorId);
+    const affiliations = await this.sponsorRepo.listAffiliations(sponsor_id);
     const allBills = [] as Array<{ id: number; title?: string }>; // Placeholder - repository method not used here
     const upcoming = allBills.slice(0,5);
-    return upcoming.map(b => ({ billId: b.id, billTitle: b.title || '', predictedConflictType: 'financial_indirect', probability: 0.2, riskFactors: affiliations.slice(0,2).map(a=>a.organization) }));
+    return upcoming.map(b => ({ bill_id: b.id, billTitle: b.title || '', predictedConflictType: 'financial_indirect', probability: 0.2, riskFactors: affiliations.slice(0,2).map(a=>a.organization)  }));
   }
 
   // ============================================================================
@@ -407,30 +404,30 @@ export class SponsorConflictAnalysisService {
   // ============================================================================
 
   /** Fetches a list of sponsors with their relations efficiently. */
-  private async getSponsorData(sponsorIds: number[]): Promise<Array<SponsorWithRelations | null>> {
-      if (sponsorIds.length === 0) return [];
+  private async getSponsorData(sponsor_ids: number[]): Promise<Array<SponsorWithRelations | null>> {
+      if (sponsor_ids.length === 0) return [];
       // Fetch all data concurrently using repository methods
       try {
           const [sponsors, affiliationsMap, transparencyMap, sponsorshipsMap] = await Promise.all([
-              this.sponsorRepo.findByIds(sponsorIds),
-              this.sponsorRepo.findAffiliationsBySponsorIds(sponsorIds), // Fetches map
-              this.sponsorRepo.findTransparencyBySponsorIds(sponsorIds), // Fetches map
+              this.sponsorRepo.findByIds(sponsor_ids),
+              this.sponsorRepo.findAffiliationsBySponsorIds(sponsor_ids), // Fetches map
+              this.sponsorRepo.findTransparencyBySponsorIds(sponsor_ids), // Fetches map
               // Fetch sponsorships initiated BY these sponsors (adjust if different relation needed)
-              Promise.all(sponsorIds.map(id => this.sponsorRepo.listBillSponsorshipsBySponsor(id)))
-                  .then(results => new Map(results.map((spons, i) => [sponsorIds[i], spons]))) // Create map
+              Promise.all(sponsor_ids.map(id => this.sponsorRepo.listBillSponsorshipsBySponsor(id)))
+                  .then(results => new Map(results.map((spons, i) => [sponsor_ids[i], spons]))) // Create map
           ]);
 
           // Combine data for each sponsor
           return sponsors.map(sponsor => ({
               ...sponsor,
-              affiliations: affiliationsMap.get(sponsor.id) || [],
-              transparency: transparencyMap.get(sponsor.id) || [],
-              sponsorships: sponsorshipsMap.get(sponsor.id) || []
+              affiliations: affiliationsMap.get(sponsors.id) || [],
+              transparency: transparencyMap.get(sponsors.id) || [],
+              sponsorships: sponsorshipsMap.get(sponsors.id) || []
           }));
       } catch (error) {
-           loggerAny.error("Failed to fetch bulk sponsor data with relations", { component: 'SponsorConflictAnalysisService', sponsorIds }, error);
+           loggerAny.error("Failed to fetch bulk sponsor data with relations", { component: 'SponsorConflictAnalysisService', sponsor_ids }, error);
            // Return nulls for requested IDs to indicate failure for those specific sponsors
-           return sponsorIds.map(() => null);
+           return sponsor_ids.map(() => null);
       }
   }
 
@@ -438,22 +435,22 @@ export class SponsorConflictAnalysisService {
   /** Fetches all active sponsors and their related data. */
   private async getAllActiveSponsorData(): Promise<SponsorWithRelations[]> {
       try {
-           const activeSponsors = await this.sponsorRepo.list({ isActive: true, limit: 1000 }); // Add reasonable limit
-           const sponsorIds = activeSponsors.map(s => s.id);
+           const activeSponsors = await this.sponsorRepo.list({ is_active: true, limit: 1000 }); // Add reasonable limit
+           const sponsor_ids = activeSponsors.map(s => s.id);
            // Fetch relations in bulk
            const [affiliationsMap, transparencyMap, sponsorshipsMap] = await Promise.all([
-               this.sponsorRepo.findAffiliationsBySponsorIds(sponsorIds),
-               this.sponsorRepo.findTransparencyBySponsorIds(sponsorIds),
-               Promise.all(sponsorIds.map(id => this.sponsorRepo.listBillSponsorshipsBySponsor(id)))
-                  .then(results => new Map(results.map((spons, i) => [sponsorIds[i], spons])))
+               this.sponsorRepo.findAffiliationsBySponsorIds(sponsor_ids),
+               this.sponsorRepo.findTransparencyBySponsorIds(sponsor_ids),
+               Promise.all(sponsor_ids.map(id => this.sponsorRepo.listBillSponsorshipsBySponsor(id)))
+                  .then(results => new Map(results.map((spons, i) => [sponsor_ids[i], spons])))
            ]);
 
            // Combine
            return activeSponsors.map(sponsor => ({
                ...sponsor,
-               affiliations: affiliationsMap.get(sponsor.id) || [],
-               transparency: transparencyMap.get(sponsor.id) || [],
-               sponsorships: sponsorshipsMap.get(sponsor.id) || []
+               affiliations: affiliationsMap.get(sponsors.id) || [],
+               transparency: transparencyMap.get(sponsors.id) || [],
+               sponsorships: sponsorshipsMap.get(sponsors.id) || []
            }));
       } catch (error) {
            loggerAny.error("Failed to fetch all active sponsor data with relations", { component: 'SponsorConflictAnalysisService' }, error);
@@ -467,18 +464,18 @@ export class SponsorConflictAnalysisService {
   // ============================================================================
 
   private async detectFinancialConflicts(sponsor: Sponsor, affiliations: SponsorAffiliation[], sponsorships: BillSponsorship[]): Promise<ConflictDetectionResult[]> {
-     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectFinancialConflicts', sponsorId: sponsor.id };
+     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectFinancialConflicts', sponsor_id: sponsors.id };
   loggerAny.debug("Detecting financial conflicts", logContext);
      const conflicts: ConflictDetectionResult[] = [];
-  const billIds = (sponsorships || []).map(s => s.billId);
-  if (billIds.length === 0) return conflicts;
+  const bill_ids = (sponsorships || []).map(s => s.bill_id);
+  if (bill_ids.length === 0) return conflicts;
 
   const financialAffiliations = (affiliations || []).filter(a => a.type === 'economic' || (a as any).conflictType === 'financial' || (a as any).conflictType === 'financial_direct' || (a as any).conflictType === 'financial_indirect'); // Broader check
 
      for (const affiliation of financialAffiliations) {
          try {
               // Use repository method to find relevant bills
-             const affectedBills = await this.sponsorRepo.findBillsMentioningOrganization(affiliation.organization, billIds);
+             const affectedBills = await this.sponsorRepo.findBillsMentioningOrganization(affiliation.organization, bill_ids);
 
              if (affectedBills.length > 0) {
          const financialImpact = this.estimateFinancialImpact(sponsor, affiliation, affectedBills.length);
@@ -490,12 +487,12 @@ export class SponsorConflictAnalysisService {
          });
 
          conflicts.push({
-           conflictId: `${sponsor.id}-${conflictType}-${affiliation.id || 'na'}-${Date.now()}`,
-           sponsorId: sponsor.id,
+           conflictId: `${sponsors.id}-${conflictType}-${affiliation.id || 'na'}-${Date.now()}`,
+           sponsor_id: sponsors.id,
            conflictType,
            severity,
            description: `Financial affiliation with ${affiliation.organization} mentioned in ${affectedBills.length} bill(s)`,
-           affectedBills: affectedBills.map(b => b.id || b.billId).filter(Boolean) as number[],
+           affectedBills: affectedBills.map(b => b.id || b.bill_id).filter(Boolean) as number[],
            financialImpact,
            detectedAt: new Date(),
            confidence: Math.min(0.9, 0.5 + (financialImpact / (financialImpact + 1000000))),
@@ -512,29 +509,29 @@ export class SponsorConflictAnalysisService {
   }
 
   private async detectOrganizationalConflicts(sponsor: Sponsor, affiliations: SponsorAffiliation[], sponsorships: BillSponsorship[]): Promise<ConflictDetectionResult[]> {
-     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectOrganizationalConflicts', sponsorId: sponsor.id };
+     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectOrganizationalConflicts', sponsor_id: sponsors.id };
   loggerAny.debug("Detecting organizational conflicts", logContext);
      // ... Implementation using this.sponsorRepo.findBillsMentioningOrganization ...
       const conflicts: ConflictDetectionResult[] = [];
-      const billIds = (sponsorships || []).map(s => s.billId);
-      if (billIds.length === 0) return conflicts;
+      const bill_ids = (sponsorships || []).map(s => s.bill_id);
+      if (bill_ids.length === 0) return conflicts;
 
       const leadershipKeywords = ['director', 'board', 'executive', 'chairman', 'ceo', 'president', 'cfo', 'coo'];
       const leadershipRoles = (affiliations || []).filter(a => a.role && leadershipKeywords.some(k => a.role!.toLowerCase().includes(k)));
 
       for (const aff of leadershipRoles) {
         try {
-          const affectedBills = await this.sponsorRepo.findBillsMentioningOrganization(aff.organization, billIds);
+          const affectedBills = await this.sponsorRepo.findBillsMentioningOrganization(aff.organization, bill_ids);
           if (affectedBills.length === 0) continue;
           const financialImpact = this.estimateFinancialImpact(sponsor, aff, affectedBills.length);
           const severity = this.calculateConflictSeverity('organizational', financialImpact, { leadershipRole: true });
           conflicts.push({
-            conflictId: `${sponsor.id}-organizational-${aff.id || 'na'}-${Date.now()}`,
-            sponsorId: sponsor.id,
+            conflictId: `${sponsors.id}-organizational-${aff.id || 'na'}-${Date.now()}`,
+            sponsor_id: sponsors.id,
             conflictType: 'organizational',
             severity,
             description: `Leadership role (${aff.role}) at ${aff.organization} referenced in ${affectedBills.length} bill(s)`,
-            affectedBills: affectedBills.map(b => b.id || b.billId).filter(Boolean) as number[],
+            affectedBills: affectedBills.map(b => b.id || b.bill_id).filter(Boolean) as number[],
             financialImpact,
             detectedAt: new Date(),
             confidence: 0.7,
@@ -550,20 +547,20 @@ export class SponsorConflictAnalysisService {
   }
 
   private async detectTimingConflicts(sponsor: Sponsor, affiliations: SponsorAffiliation[], sponsorships: BillSponsorship[]): Promise<ConflictDetectionResult[]> {
-     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectTimingConflicts', sponsorId: sponsor.id };
+     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectTimingConflicts', sponsor_id: sponsors.id };
   loggerAny.debug("Detecting timing conflicts", logContext);
       const conflicts: ConflictDetectionResult[] = [];
 
       for (const sponsorship of sponsorships) {
         try {
           // Fetch bill details using repository
-          const bill = await this.sponsorRepo.getBill(sponsorship.billId);
-          if (!bill || !bill.introducedDate) continue; // Skip if no bill or date
+          const bill = await this.sponsorRepo.getBill(sponsorship.bill_id);
+          if (!bill || !bills.introduced_date) continue; // Skip if no bill or date
 
           // Filter affiliations with suspicious timing relative to bill introduction
           const suspiciousAffiliations = (affiliations || []).filter(aff => {
             if (!aff.startDate) return false;
-            const billIntroTime = new Date(bill.introducedDate!).getTime();
+            const billIntroTime = new Date(bills.introduced_date!).getTime();
             const affStartTime = new Date(aff.startDate).getTime();
             const daysDiff = Math.abs(affStartTime - billIntroTime) / (1000 * 60 * 60 * 24);
             return daysDiff <= this.conflictThresholds.timing.suspicious_days;
@@ -572,17 +569,17 @@ export class SponsorConflictAnalysisService {
           if (suspiciousAffiliations.length > 0) {
             // Check for very suspicious timing
             const verySuspicious = suspiciousAffiliations.some(aff => {
-              const daysDiff = Math.abs(new Date(aff.startDate!).getTime() - new Date(bill.introducedDate!).getTime()) / (1000 * 60 * 60 * 24);
+              const daysDiff = Math.abs(new Date(aff.startDate!).getTime() - new Date(bills.introduced_date!).getTime()) / (1000 * 60 * 60 * 24);
               return daysDiff <= this.conflictThresholds.timing.very_suspicious_days;
             });
             const severity = verySuspicious ? 'high' : 'medium';
             conflicts.push({
-              conflictId: `${sponsor.id}-timing-${sponsorship.billId}-${Date.now()}`,
-              sponsorId: sponsor.id,
+              conflictId: `${sponsors.id}-timing-${sponsorship.bill_id}-${Date.now()}`,
+              sponsor_id: sponsors.id,
               conflictType: 'timing_suspicious',
               severity,
-              description: `Affiliation start date near bill introduction (${sponsorship.billId})`,
-              affectedBills: [sponsorship.billId],
+              description: `Affiliation start date near bill introduction (${sponsorship.bill_id})`,
+              affectedBills: [sponsorship.bill_id],
               financialImpact: 0,
               detectedAt: new Date(),
               confidence: verySuspicious ? 0.8 : 0.6,
@@ -599,12 +596,12 @@ export class SponsorConflictAnalysisService {
   }
 
   private async detectDisclosureConflicts(sponsor: Sponsor, affiliations: SponsorAffiliation[], transparency: SponsorTransparency[]): Promise<ConflictDetectionResult[]> {
-     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectDisclosureConflicts', sponsorId: sponsor.id };
+     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectDisclosureConflicts', sponsor_id: sponsors.id };
      loggerAny.debug("Detecting disclosure conflicts", logContext);
      const conflicts: ConflictDetectionResult[] = [];
 
      const expectedDisclosures = (affiliations || []).filter(a => a.type === 'economic' || (a as any).conflictType === 'financial').length;
-     const actualDisclosures = (transparency || []).filter(t => (t as any).disclosureType === 'financial' && (t as any).isVerified).length;
+     const actualDisclosures = (transparency || []).filter(t => (t as any).disclosureType === 'financial' && (t as any).is_verified).length;
 
      const completeness = expectedDisclosures > 0 ? actualDisclosures / expectedDisclosures : 1;
 
@@ -612,8 +609,8 @@ export class SponsorConflictAnalysisService {
        const severity: ConflictSeverity = completeness < this.conflictThresholds.disclosure.complete_threshold ? 'high' : 'medium';
        const financialImpact = this.calculateAffiliationRisk(affiliations) * 10000; // rough proxy
        conflicts.push({
-         conflictId: `${sponsor.id}-disclosure-${Date.now()}`,
-         sponsorId: sponsor.id,
+         conflictId: `${sponsors.id}-disclosure-${Date.now()}`,
+         sponsor_id: sponsors.id,
          conflictType: 'disclosure_incomplete',
          severity,
          description: `Disclosure completeness ${Math.round(completeness * 100)}% (${actualDisclosures}/${expectedDisclosures})`,
@@ -634,7 +631,7 @@ export class SponsorConflictAnalysisService {
   // (Implementations are the same as provided previously)
   // ============================================================================
   private calculateFinancialRisk(sponsor: Sponsor): number {
-    const exposure = this.parseNumeric((sponsor as any).financialExposure);
+    const exposure = this.parseNumeric((sponsor as any).financial_exposure);
     if (exposure <= 0) return 0;
     if (exposure < this.conflictThresholds.financial.low) return 10;
     if (exposure < this.conflictThresholds.financial.medium) return 30;
@@ -656,18 +653,18 @@ export class SponsorConflictAnalysisService {
   private calculateTransparencyRisk(transparency: SponsorTransparency[], affiliations: SponsorAffiliation[]): number {
     const expected = (affiliations || []).filter(a => a.type === 'economic' || (a as any).conflictType === 'financial').length;
     if (expected === 0) return 0;
-    const actual = (transparency || []).filter(t => (t as any).disclosureType === 'financial' && (t as any).isVerified).length;
+    const actual = (transparency || []).filter(t => (t as any).disclosureType === 'financial' && (t as any).is_verified).length;
     const completeness = actual / expected;
     return Math.round((1 - completeness) * 100);
   }
 
   private calculateBehavioralRisk(sponsor: Sponsor): number {
-    const votingAlignment = this.parseNumeric((sponsor as any).votingAlignment);
-    if (votingAlignment <= 0) return 10;
-    if (votingAlignment > 95 || votingAlignment < 5) return 90;
-    if (votingAlignment > 90 || votingAlignment < 10) return 70;
-    if (votingAlignment > 85 || votingAlignment < 15) return 50;
-    if (votingAlignment > 80 || votingAlignment < 20) return 30;
+    const voting_alignment = this.parseNumeric((sponsor as any).voting_alignment);
+    if (voting_alignment <= 0) return 10;
+    if (voting_alignment > 95 || voting_alignment < 5) return 90;
+    if (voting_alignment > 90 || voting_alignment < 10) return 70;
+    if (voting_alignment > 85 || voting_alignment < 15) return 50;
+    if (voting_alignment > 80 || voting_alignment < 20) return 30;
     return 10;
   }
 
@@ -700,7 +697,7 @@ export class SponsorConflictAnalysisService {
   }
 
   private estimateFinancialImpact(sponsor: Sponsor, affiliation: SponsorAffiliation, billCount: number): number {
-    const base = Math.max(0, this.parseNumeric((sponsor as any).financialExposure));
+    const base = Math.max(0, this.parseNumeric((sponsor as any).financial_exposure));
     let impact = Math.round((base / 10) * Math.max(1, billCount));
     if (affiliation.type === 'economic') impact *= 2;
     if ((affiliation as any).conflictType === 'financial') impact *= 3;
@@ -732,12 +729,12 @@ export class SponsorConflictAnalysisService {
   // Build nodes representing sponsors, organizations and bills from conflicts
   private async buildConflictNodes(conflicts: ConflictDetectionResult[]): Promise<ConflictNode[]> {
     const nodes: ConflictNode[] = [];
-    const sponsorIds = Array.from(new Set(conflicts.map(c => c.sponsorId)));
+    const sponsor_ids = Array.from(new Set(conflicts.map(c => c.sponsor_id)));
     const sponsorMap = new Map<number, Sponsor>();
 
     // Fetch sponsor details in bulk
     try {
-      const sponsors = await this.sponsorRepo.findByIds(sponsorIds);
+      const sponsors = await this.sponsorRepo.findByIds(sponsor_ids);
       sponsors.forEach(s => sponsorMap.set(s.id, s));
     } catch (e) {
       // if repository fails, we'll still build minimal sponsor nodes from IDs
@@ -759,16 +756,16 @@ export class SponsorConflictAnalysisService {
     }
 
     // Sponsor nodes
-    for (const id of sponsorIds) {
+    for (const id of sponsor_ids) {
       const sponsor = sponsorMap.get(id);
       nodes.push({
         id: `sponsor:${id}`,
         type: 'sponsor',
-        name: sponsor ? `${(sponsor as any).firstName || ''} ${(sponsor as any).lastName || ''}`.trim() || `Sponsor ${id}` : `Sponsor ${id}`,
-        conflictLevel: this.determineRiskLevel(this.calculateWeightedRiskScore({ financialRisk: this.calculateFinancialRisk(sponsor as any), affiliationRisk: 0, transparencyRisk: 0, behavioralRisk: 0 })),
+        name: sponsor ? `${(sponsor as any).first_name || ''} ${(sponsor as any).last_name || ''}`.trim() || `Sponsor ${id}` : `Sponsor ${id}`,
+        conflict_level: this.determineRiskLevel(this.calculateWeightedRiskScore({ financialRisk: this.calculateFinancialRisk(sponsor as any), affiliationRisk: 0, transparencyRisk: 0, behavioralRisk: 0 })),
         size: this.calculateNodeSize('medium'),
         color: this.severityColors.medium,
-        metadata: { sponsorId: id }
+        metadata: { sponsor_id: id }
       });
     }
 
@@ -778,7 +775,7 @@ export class SponsorConflictAnalysisService {
         id: `org:${org}`,
         type: 'organization',
         name: org,
-        conflictLevel: 'medium',
+        conflict_level: 'medium',
         size: this.calculateNodeSize('medium'),
         color: this.severityColors.medium,
         metadata: {}
@@ -786,22 +783,19 @@ export class SponsorConflictAnalysisService {
     }
 
     // Bill nodes
-    for (const billId of Array.from(billSet)) {
-      let title = `Bill ${billId}`;
-      try {
-        const b = await this.sponsorRepo.getBill(billId as number);
+    for (const bill_id of Array.from(billSet)) { let title = `Bill ${bill_id }`;
+      try { const b = await this.sponsorRepo.getBill(bill_id as number);
         if (b && (b as any).title) title = (b as any).title;
-      } catch (e) {
+       } catch (e) {
         // ignore
       }
-      nodes.push({
-        id: `bill:${billId}`,
+      nodes.push({ id: `bill:${bill_id }`,
         type: 'bill',
         name: title,
-        conflictLevel: 'low',
+        conflict_level: 'low',
         size: this.calculateNodeSize('low'),
         color: this.severityColors.low,
-        metadata: { billId }
+        metadata: { bill_id  }
       });
     }
 
@@ -814,7 +808,7 @@ export class SponsorConflictAnalysisService {
     const seen = new Set<string>();
 
     for (const c of conflicts) {
-      const sponsorNode = `sponsor:${c.sponsorId}`;
+      const sponsorNode = `sponsor:${c.sponsor_id}`;
 
       // edges to organizations from evidence
       for (const ev of c.evidence) {
@@ -871,7 +865,7 @@ export class SponsorConflictAnalysisService {
     });
 
     const riskDistribution: Record<ConflictSeverity, number> = { low: 0, medium: 0, high: 0, critical: 0 };
-    nodes.forEach(n => { riskDistribution[n.conflictLevel] = (riskDistribution[n.conflictLevel] || 0) + 1; });
+    nodes.forEach(n => { riskDistribution[n.conflict_level] = (riskDistribution[n.conflict_level] || 0) + 1; });
 
     return { totalNodes, totalEdges, density, clustering, centralityScores, riskDistribution };
   }
@@ -931,7 +925,7 @@ export class SponsorConflictAnalysisService {
     const clusterNodes = nodes.filter(n => cluster.includes(n.id));
     if (clusterNodes.length === 0) return 'low';
     const map = { low: 1, medium: 2, high: 3, critical: 4 } as Record<ConflictSeverity, number>;
-    const avg = clusterNodes.reduce((s, n) => s + map[n.conflictLevel], 0) / clusterNodes.length;
+    const avg = clusterNodes.reduce((s, n) => s + map[n.conflict_level], 0) / clusterNodes.length;
     if (avg >= 3.5) return 'critical';
     if (avg >= 2.5) return 'high';
     if (avg >= 1.5) return 'medium';

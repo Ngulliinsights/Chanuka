@@ -3,7 +3,7 @@
 
 import {
   sponsors, sponsorTransparency, sponsorAffiliations
-} from "@shared/schema";
+} from "@shared/foundation";
 import { eq, desc, and, sql, count } from "drizzle-orm";
 import { readDatabase } from '@shared/database/connection';
 import { cache, logger, NotFoundError, DatabaseError } from '@shared/core';
@@ -31,10 +31,10 @@ export class DisclosureProcessingService {
    * This method adds calculated fields like completeness scores and risk levels
    * to the raw database records, providing a foundation for further analysis.
    */
-  async getDisclosureData(sponsorId?: number): Promise<FinancialDisclosure[]> {
+  async getDisclosureData(sponsor_id?: number): Promise<FinancialDisclosure[]> {
     try {
-      const cacheKey = sponsorId
-        ? this.config.cache.keyPrefixes.disclosures(sponsorId)
+      const cacheKey = sponsor_id
+        ? this.config.cache.keyPrefixes.disclosures(sponsor_id)
         : this.config.cache.keyPrefixes.allDisclosures();
 
       return await cache.getOrSetCache(
@@ -45,20 +45,20 @@ export class DisclosureProcessingService {
           let query = readDatabase
             .select({
               id: sponsorTransparency.id,
-              sponsorId: sponsorTransparency.sponsorId,
+              sponsor_id: sponsorTransparency.sponsor_id,
               disclosureType: sponsorTransparency.disclosureType,
               description: sponsorTransparency.description,
               amount: sponsorTransparency.amount,
               source: sponsorTransparency.source,
               dateReported: sponsorTransparency.dateReported,
-              isVerified: sponsorTransparency.isVerified,
-              createdAt: sponsorTransparency.createdAt
+              is_verified: sponsorTransparency.is_verified,
+              created_at: sponsorTransparency.created_at
             })
             .from(sponsorTransparency)
-            .innerJoin(sponsors, eq(sponsorTransparency.sponsorId, sponsors.id));
+            .innerJoin(sponsors, eq(sponsorTransparency.sponsor_id, sponsors.id));
 
-          if (sponsorId) {
-            query = query.where(eq(sponsorTransparency.sponsorId, sponsorId));
+          if (sponsor_id) {
+            query = query.where(eq(sponsorTransparency.sponsor_id, sponsor_id));
           }
 
           const rawData = await query.orderBy(desc(sponsorTransparency.dateReported));
@@ -68,7 +68,7 @@ export class DisclosureProcessingService {
         }
       );
     } catch (error) {
-      logger.error('Error retrieving disclosure data:', { sponsorId }, error);
+      logger.error('Error retrieving disclosure data:', { sponsor_id }, error);
       throw new DatabaseError('Failed to retrieve disclosure data for analysis');
     }
   }
@@ -76,8 +76,8 @@ export class DisclosureProcessingService {
   /**
    * Retrieves basic sponsor information from the database.
    */
-  async getSponsorBasicInfo(sponsorId: number): Promise<SponsorInfo> {
-    const cacheKey = this.config.cache.keyPrefixes.sponsor(sponsorId);
+  async getSponsorBasicInfo(sponsor_id: number): Promise<SponsorInfo> {
+    const cacheKey = this.config.cache.keyPrefixes.sponsor(sponsor_id);
 
     return await cache.getOrSetCache(
       cacheKey,
@@ -87,14 +87,14 @@ export class DisclosureProcessingService {
           .select({
             id: sponsors.id,
             name: sponsors.name,
-            isActive: sponsors.isActive
+            is_active: sponsors.is_active
           })
           .from(sponsors)
-          .where(eq(sponsors.id, sponsorId))
+          .where(eq(sponsors.id, sponsor_id))
           .limit(1);
 
         if (!result.length) {
-          throw new NotFoundError('Sponsor', sponsorId.toString());
+          throw new NotFoundError('Sponsor', sponsor_id.toString());
         }
 
         return result[0];
@@ -105,14 +105,14 @@ export class DisclosureProcessingService {
   /**
    * Retrieves affiliation records for a sponsor from the database.
    */
-  async getAffiliations(sponsorId: number): Promise<SponsorAffiliation[]> {
+  async getAffiliations(sponsor_id: number): Promise<SponsorAffiliation[]> {
     try {
       return await readDatabase
         .select()
         .from(sponsorAffiliations)
-        .where(eq(sponsorAffiliations.sponsorId, sponsorId));
+        .where(eq(sponsorAffiliations.sponsor_id, sponsor_id));
     } catch (error) {
-      logger.warn('Failed to fetch affiliations:', { sponsorId, error });
+      logger.warn('Failed to fetch affiliations:', { sponsor_id, error });
       return [];
     }
   }
@@ -124,7 +124,7 @@ export class DisclosureProcessingService {
     const result = await readDatabase
       .select({ total: count() })
       .from(sponsors)
-      .where(eq(sponsors.isActive, true));
+      .where(eq(sponsors.is_active, true));
 
     return { total: result[0]?.total || 0 };
   }
@@ -138,7 +138,7 @@ export class DisclosureProcessingService {
       .select({
         disclosureType: sponsorTransparency.disclosureType,
         total: count(),
-        verified: sql<number>`SUM(CASE WHEN ${sponsorTransparency.isVerified} THEN 1 ELSE 0 END)`
+        verified: sql<number>`SUM(CASE WHEN ${sponsorTransparency.is_verified} THEN 1 ELSE 0 END)`
       })
       .from(sponsorTransparency)
       .groupBy(sponsorTransparency.disclosureType);
@@ -171,16 +171,16 @@ export class DisclosureProcessingService {
   private enrichDisclosure(raw: any): FinancialDisclosure {
     return {
       id: raw.id,
-      sponsorId: raw.sponsorId,
+      sponsor_id: raw.sponsor_id,
       disclosureType: raw.disclosureType,
       description: raw.description || '',
       amount: raw.amount ? Number(raw.amount) : undefined,
       source: raw.source || undefined,
       dateReported: new Date(raw.dateReported),
-      isVerified: Boolean(raw.isVerified),
+      is_verified: Boolean(raw.is_verified),
       completenessScore: this.calculateIndividualCompletenessScore(raw),
       riskLevel: this.assessIndividualRiskLevel(raw),
-      lastUpdated: new Date(raw.createdAt || raw.dateReported)
+      lastUpdated: new Date(raw.created_at || raw.dateReported)
     };
   }
 
@@ -190,7 +190,7 @@ export class DisclosureProcessingService {
    */
   private calculateIndividualCompletenessScore(disclosure: any): number {
     let score = 40; // Base score for having a disclosure
-    if (disclosure.isVerified) score += 30;
+    if (disclosure.is_verified) score += 30;
     if (disclosure.amount) score += 20;
     if (disclosure.source) score += 10;
     return Math.min(score, 100);
@@ -202,7 +202,7 @@ export class DisclosureProcessingService {
    */
   private assessIndividualRiskLevel(disclosure: any): FinancialDisclosure['riskLevel'] {
     const amount = Number(disclosure.amount) || 0;
-    const verified = Boolean(disclosure.isVerified);
+    const verified = Boolean(disclosure.is_verified);
 
     // Unverified high-value disclosures are highest risk
     if (!verified && amount > 1_000_000) return 'critical';

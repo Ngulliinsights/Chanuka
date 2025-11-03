@@ -31,7 +31,7 @@ import { logger } from '@shared/core';
 
 // Mock navigator and window objects
 const mockNavigator = {
-  userAgent: '',
+  user_agent: '',
   onLine: true,
   clipboard: {
     writeText: vi.fn()
@@ -250,7 +250,7 @@ describe('BrowserDetector', () => {
 
   describe('Chrome Detection', () => {
     it('should detect Chrome browser', () => {
-      mockNavigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
+      mockNavigator.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
       
       const browserInfo = browserDetector.getBrowserInfo();
       expect(browserInfo.name).toBe('chrome');
@@ -258,14 +258,14 @@ describe('BrowserDetector', () => {
     });
 
     it('should detect supported Chrome version', () => {
-      mockNavigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
+      mockNavigator.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
       
       const browserInfo = browserDetector.getBrowserInfo();
       expect(browserInfo.isSupported).toBe(true);
     });
 
     it('should detect unsupported Chrome version', () => {
-      mockNavigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36';
+      mockNavigator.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36';
       
       const browserInfo = browserDetector.getBrowserInfo();
       expect(browserInfo.isSupported).toBe(false);
@@ -274,7 +274,7 @@ describe('BrowserDetector', () => {
 
   describe('Firefox Detection', () => {
     it('should detect Firefox browser', () => {
-      mockNavigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0';
+      mockNavigator.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0';
       
       const browserInfo = browserDetector.getBrowserInfo();
       expect(browserInfo.name).toBe('firefox');
@@ -282,7 +282,7 @@ describe('BrowserDetector', () => {
     });
 
     it('should detect supported Firefox version', () => {
-      mockNavigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0';
+      mockNavigator.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0';
       
       const browserInfo = browserDetector.getBrowserInfo();
       expect(browserInfo.isSupported).toBe(true);
@@ -291,7 +291,7 @@ describe('BrowserDetector', () => {
 
   describe('Safari Detection', () => {
     it('should detect Safari browser', () => {
-      mockNavigator.userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15';
+      mockNavigator.user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15';
       
       const browserInfo = browserDetector.getBrowserInfo();
       expect(browserInfo.name).toBe('safari');
@@ -301,7 +301,7 @@ describe('BrowserDetector', () => {
 
   describe('Edge Detection', () => {
     it('should detect Edge browser', () => {
-      mockNavigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59';
+      mockNavigator.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59';
       
       const browserInfo = browserDetector.getBrowserInfo();
       expect(browserInfo.name).toBe('edge');
@@ -311,7 +311,7 @@ describe('BrowserDetector', () => {
 
   describe('Unknown Browser Detection', () => {
     it('should handle unknown browsers', () => {
-      mockNavigator.userAgent = 'Unknown Browser/1.0';
+      mockNavigator.user_agent = 'Unknown Browser/1.0';
       
       const browserInfo = browserDetector.getBrowserInfo();
       expect(browserInfo.name).toBe('unknown');
@@ -325,7 +325,7 @@ describe('BrowserDetector', () => {
       global.Promise = undefined as any;
       global.fetch = undefined as any;
       
-      mockNavigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
+      mockNavigator.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
       
       const browserInfo = browserDetector.getBrowserInfo();
       expect(browserInfo.warnings.length).toBeGreaterThan(0);
@@ -333,7 +333,7 @@ describe('BrowserDetector', () => {
     });
 
     it('should generate recommendations for old browsers', () => {
-      mockNavigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36';
+      mockNavigator.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36';
       
       const browserInfo = browserDetector.getBrowserInfo();
       expect(browserInfo.recommendations.length).toBeGreaterThan(0);
@@ -353,7 +353,7 @@ describe('Convenience Functions', () => {
   });
 
   it('should provide browser info through convenience function', () => {
-    mockNavigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
+    mockNavigator.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
     
     const browserInfo = getBrowserInfo();
     expect(browserInfo.name).toBe('chrome');
@@ -361,7 +361,7 @@ describe('Convenience Functions', () => {
   });
 
   it('should provide browser support status through convenience function', () => {
-    mockNavigator.userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
+    mockNavigator.user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
     
     const isSupported = isBrowserSupported();
     expect(typeof isSupported).toBe('boolean');

@@ -275,7 +275,7 @@ VQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC7
    */
   async checkCertificateExpiration(certPath: string): Promise<{
     isValid: boolean;
-    expiresAt?: Date;
+    expires_at?: Date;
     daysUntilExpiry?: number;
     warning?: string;
   }> {
@@ -295,15 +295,15 @@ VQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC7
       // This is a simplified check - in production, use proper certificate parsing
       // For now, assume certificate is valid for 1 year from creation
       const stats = fs.statSync(certPath);
-      const createdAt = stats.birthtime;
-      const expiresAt = new Date(createdAt.getTime() + 365 * 24 * 60 * 60 * 1000);
+      const created_at = stats.birthtime;
+      const expires_at = new Date(created_at.getTime() + 365 * 24 * 60 * 60 * 1000);
       const now = new Date();
-      const daysUntilExpiry = Math.floor((expiresAt.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
+      const daysUntilExpiry = Math.floor((expires_at.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
 
       if (daysUntilExpiry < 0) {
         return { 
           isValid: false, 
-          expiresAt, 
+          expires_at, 
           daysUntilExpiry, 
           warning: 'Certificate has expired' 
         };
@@ -312,13 +312,13 @@ VQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC7
       if (daysUntilExpiry < 30) {
         return { 
           isValid: true, 
-          expiresAt, 
+          expires_at, 
           daysUntilExpiry, 
           warning: `Certificate expires in ${daysUntilExpiry} days` 
         };
       }
 
-      return { isValid: true, expiresAt, daysUntilExpiry };
+      return { isValid: true, expires_at, daysUntilExpiry };
     } catch (error) {
       return { 
         isValid: false, 

@@ -34,8 +34,8 @@ describe('useAuthForm Hook', () => {
         email: '',
         password: '',
         confirmPassword: '',
-        firstName: '',
-        lastName: '',
+        first_name: '',
+        last_name: '',
       });
       expect(result.current.errors).toEqual({});
       expect(result.current.loading).toBe(false);
@@ -215,8 +215,8 @@ describe('useAuthForm Hook', () => {
       expect(mockUseAuth.register).toHaveBeenCalledWith({
         email: registerData.email,
         password: registerData.password,
-        firstName: registerData.firstName,
-        lastName: registerData.lastName
+        first_name: registerData.first_name,
+        last_name: registerData.last_name
       });
       expect(result.current.apiResponse?.success).toBe('Account created successfully!');
       expect(onSuccess).toHaveBeenCalled();
@@ -271,7 +271,7 @@ describe('useAuthForm Hook', () => {
       // Fill and submit form
       await act(() => {
         result.current.handleInputChange(createMockChangeEvent('email', 'test@example.com'));
-        result.current.handleInputChange(createMockChangeEvent('firstName', 'John'));
+        result.current.handleInputChange(createMockChangeEvent('first_name', 'John'));
       });
       
       await act(async () => {
@@ -279,7 +279,7 @@ describe('useAuthForm Hook', () => {
       });
       
       expect(result.current.formData.email).toBe('');
-      expect(result.current.formData.firstName).toBe('');
+      expect(result.current.formData.first_name).toBe('');
     });
   });
 
@@ -458,8 +458,8 @@ describe('useAuthForm Hook', () => {
         email: '',
         password: '',
         confirmPassword: '',
-        firstName: '',
-        lastName: '',
+        first_name: '',
+        last_name: '',
       });
       expect(result.current.errors).toEqual({});
       expect(result.current.apiResponse).toBeNull();

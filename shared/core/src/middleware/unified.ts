@@ -164,7 +164,7 @@ export class UnifiedMiddleware {
           method: req.method,
           url: req.url,
           duration,
-          userAgent: req.get('User-Agent')
+          user_agent: req.get('User-Agent')
         });
       }
     });
@@ -183,7 +183,7 @@ export class UnifiedMiddleware {
         method: req.method,
         url: req.url,
         ip: req.ip,
-        userAgent: req.get('User-Agent'),
+        user_agent: req.get('User-Agent'),
         headers: this.config.logging.includeHeaders ? req.headers : undefined,
         body: this.config.logging.includeBody ? req.body : undefined
       });

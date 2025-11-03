@@ -68,8 +68,8 @@ class StandaloneSecurityTester {
    * Analyze request for security threats
    */
   analyzeRequest(req: any): ThreatDetectionResult {
-    const ipAddress = this.getClientIP(req);
-    const userAgent = req.get('User-Agent') || '';
+    const ip_address = this.getClientIP(req);
+    const user_agent = req.get('User-Agent') || '';
     const url = req.originalUrl || req.url;
     const method = req.method;
     const body = JSON.stringify(req.body || {});
@@ -78,7 +78,7 @@ class StandaloneSecurityTester {
     let riskScore = 0;
 
     // 1. Rate limiting analysis
-    const rateLimitResult = this.analyzeRateLimit(ipAddress);
+    const rateLimitResult = this.analyzeRateLimit(ip_address);
     if (rateLimitResult.isExceeded) {
       detectedThreats.push({
         type: 'rate_limit_exceeded',
@@ -91,7 +91,7 @@ class StandaloneSecurityTester {
     }
 
     // 2. Pattern-based attack detection
-    const patternResults = this.detectAttackPatterns(url, body, userAgent);
+    const patternResults = this.detectAttackPatterns(url, body, user_agent);
     detectedThreats.push(...patternResults);
     riskScore += patternResults.reduce((sum, threat) => {
       return sum + (threat.severity === 'critical' ? 40 : threat.severity === 'high' ? 25 : 15);
@@ -123,7 +123,7 @@ class StandaloneSecurityTester {
     // Determine threat level and recommended action
     const threatLevel = this.calculateThreatLevel(riskScore);
     const recommendedAction = this.determineRecommendedAction(threatLevel, detectedThreats);
-    const isBlocked = recommendedAction === 'block' || this.blockedIPs.has(ipAddress);
+    const isBlocked = recommendedAction === 'block' || this.blockedIPs.has(ip_address);
 
     return {
       isBlocked,
@@ -137,9 +137,9 @@ class StandaloneSecurityTester {
   /**
    * Detect attack patterns in request data
    */
-  private detectAttackPatterns(url: string, body: string, userAgent: string): DetectedThreat[] {
+  private detectAttackPatterns(url: string, body: string, user_agent: string): DetectedThreat[] {
     const threats: DetectedThreat[] = [];
-    const fullContent = `${url} ${body} ${userAgent}`;
+    const fullContent = `${url} ${body} ${user_agent}`;
 
     for (const pattern of attackPatterns) {
       if (pattern.pattern.test(fullContent)) {
@@ -162,7 +162,7 @@ class StandaloneSecurityTester {
   /**
    * Analyze rate limiting patterns
    */
-  private analyzeRateLimit(ipAddress: string): {
+  private analyzeRateLimit(ip_address: string): {
     isExceeded: boolean;
     severity: 'low' | 'medium' | 'high' | 'critical';
     requestCount: number;
@@ -172,10 +172,10 @@ class StandaloneSecurityTester {
     const oneMinute = 60 * 1000;
     
     // Get or create request tracking for this IP
-    let tracking = this.ipRequestCounts.get(ipAddress);
+    let tracking = this.ipRequestCounts.get(ip_address);
     if (!tracking || now - tracking.lastReset > oneMinute) {
       tracking = { count: 0, lastReset: now };
-      this.ipRequestCounts.set(ipAddress, tracking);
+      this.ipRequestCounts.set(ip_address, tracking);
     }
     
     tracking.count++;
@@ -240,24 +240,24 @@ class StandaloneSecurityTester {
   /**
    * Block IP address
    */
-  blockIP(ipAddress: string, reason: string): void {
-    this.blockedIPs.add(ipAddress);
-    console.log(`🚫 IP ${ipAddress} blocked: ${reason}`);
+  blockIP(ip_address: string, reason: string): void {
+    this.blockedIPs.add(ip_address);
+    console.log(`🚫 IP ${ip_address} blocked: ${reason}`);
   }
 
   /**
    * Unblock IP address
    */
-  unblockIP(ipAddress: string): void {
-    this.blockedIPs.delete(ipAddress);
-    console.log(`✅ IP ${ipAddress} unblocked`);
+  unblockIP(ip_address: string): void {
+    this.blockedIPs.delete(ip_address);
+    console.log(`✅ IP ${ip_address} unblocked`);
   }
 
   /**
    * Check if IP is blocked
    */
-  isIPBlocked(ipAddress: string): boolean {
-    return this.blockedIPs.has(ipAddress);
+  isIPBlocked(ip_address: string): boolean {
+    return this.blockedIPs.has(ip_address);
   }
 
   /**

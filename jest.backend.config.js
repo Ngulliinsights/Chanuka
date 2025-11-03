@@ -2,7 +2,7 @@ export default {
   preset: 'ts-jest/presets/default-esm',
   extensionsToTreatAsEsm: ['.ts'],
   testEnvironment: 'node',
-  displayName: 'Backend & Database Tests',
+  display_name: 'Backend & Database Tests',
   roots: ['<rootDir>/server', '<rootDir>/shared'],
   testMatch: [
     '**/server/**/__tests__/**/*.ts',

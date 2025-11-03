@@ -104,22 +104,22 @@ export class ContentModerationService {
    * @deprecated Use moderationOrchestratorService.analyzeContent() instead
    */
   async analyzeContent(
-    contentType: 'bill' | 'comment',
+    content_type: 'bill' | 'comment',
     content: string,
     additionalContext?: {
       authorId?: string;
       relatedContentId?: number;
     }
   ): Promise<ContentAnalysisResult> {
-    return moderationOrchestratorService.analyzeContent(contentType, content, additionalContext);
+    return moderationOrchestratorService.analyzeContent(content_type, content, additionalContext);
   }
 
   /**
    * @deprecated Use moderationOrchestratorService.createReport() instead
    */
   async createReport(
-    contentType: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
-    contentId: number,
+    content_type: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
+    content_id: number,
     reportType: 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'copyright' | 'other',
     reason: string,
     reportedBy: string,
@@ -127,8 +127,8 @@ export class ContentModerationService {
     description?: string
   ): Promise<{ success: boolean; message: string; reportId?: number }> {
     const result = await moderationOrchestratorService.createReport(
-      contentType,
-      contentId,
+      content_type,
+      content_id,
       reportType,
       reason,
       reportedBy,
@@ -160,10 +160,10 @@ export class ContentModerationService {
     moderatorActivity: {
       moderatorId: string;
       moderatorName: string;
-      reviewCount: number;
+      review_count: number;
       averageReviewTime: number;
     }[];
-    contentTypeBreakdown: { contentType: string; count: number }[];
+    content_typeBreakdown: { content_type: string; count: number }[];
     severityBreakdown: { severity: string; count: number }[];
   }> {
     return moderationOrchestratorService.getModerationStats(startDate, endDate);
@@ -180,8 +180,8 @@ export class ContentModerationService {
    * @deprecated Use moderationOrchestratorService.getModerationHistory() instead
    */
   async getModerationHistory(
-    contentType?: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
-    contentId?: number,
+    content_type?: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
+    content_id?: number,
     page = 1,
     limit = 20
   ): Promise<{
@@ -193,7 +193,7 @@ export class ContentModerationService {
       pages: number;
     };
   }> {
-    return moderationOrchestratorService.getModerationHistory(contentType, contentId, page, limit);
+    return moderationOrchestratorService.getModerationHistory(content_type, content_id, page, limit);
   }
 }
 

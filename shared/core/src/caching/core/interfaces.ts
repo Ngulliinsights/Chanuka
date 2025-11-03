@@ -83,7 +83,7 @@ export interface CacheEntry<T = any> {
   key: string;
   value: T;
   ttl?: number;
-  createdAt: number;
+  created_at: number;
   accessedAt: number;
   tags?: string[];
 }

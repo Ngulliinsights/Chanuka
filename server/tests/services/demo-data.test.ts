@@ -63,11 +63,11 @@ describe('DemoDataService', () => {
         expect(bill).toHaveProperty('status');
         expect(bill).toHaveProperty('category');
         expect(bill).toHaveProperty('tags');
-        expect(bill).toHaveProperty('viewCount');
-        expect(bill).toHaveProperty('shareCount');
-        expect(bill).toHaveProperty('introducedDate');
-        expect(bill).toHaveProperty('createdAt');
-        expect(bill).toHaveProperty('updatedAt');
+        expect(bill).toHaveProperty('view_count');
+        expect(bill).toHaveProperty('share_count');
+        expect(bill).toHaveProperty('introduced_date');
+        expect(bill).toHaveProperty('created_at');
+        expect(bill).toHaveProperty('updated_at');
       });
     });
 
@@ -152,7 +152,7 @@ describe('DemoDataService', () => {
         expect(sponsor).toHaveProperty('constituency');
         expect(sponsor).toHaveProperty('email');
         expect(sponsor).toHaveProperty('bio');
-        expect(sponsor).toHaveProperty('createdAt');
+        expect(sponsor).toHaveProperty('created_at');
       });
     });
 
@@ -170,32 +170,30 @@ describe('DemoDataService', () => {
     });
   });
 
-  describe('Comments Data', () => {
-    it('should return comments for existing bills', () => {
+  describe('Comments Data', () => { it('should return comments for existing bills', () => {
       const comments = demoDataService.getBillComments(1);
       
       expect(comments).toHaveLength(2);
       expect(comments[0]).toMatchObject({
-        billId: 1,
+        bill_id: 1,
         commentType: "general"
-      });
+       });
     });
 
-    it('should return comments with required fields', () => {
-      const comments = demoDataService.getBillComments(1);
+    it('should return comments with required fields', () => { const comments = demoDataService.getBillComments(1);
       
       comments.forEach(comment => {
         expect(comment).toHaveProperty('id');
-        expect(comment).toHaveProperty('billId');
-        expect(comment).toHaveProperty('userId');
+        expect(comment).toHaveProperty('bill_id');
+        expect(comment).toHaveProperty('user_id');
         expect(comment).toHaveProperty('content');
         expect(comment).toHaveProperty('commentType');
         expect(comment).toHaveProperty('upvotes');
         expect(comment).toHaveProperty('downvotes');
-        expect(comment).toHaveProperty('isVerified');
-        expect(comment).toHaveProperty('createdAt');
-        expect(comment).toHaveProperty('updatedAt');
-      });
+        expect(comment).toHaveProperty('is_verified');
+        expect(comment).toHaveProperty('created_at');
+        expect(comment).toHaveProperty('updated_at');
+        });
     });
 
     it('should return empty array for bills with no comments', () => {
@@ -207,8 +205,8 @@ describe('DemoDataService', () => {
       const bill1Comments = demoDataService.getBillComments(1);
       const bill2Comments = demoDataService.getBillComments(2);
       
-      expect(bill1Comments.every(c => c.billId === 1)).toBe(true);
-      expect(bill2Comments.every(c => c.billId === 2)).toBe(true);
+      expect(bill1Comments.every(c => c.bill_id === 1)).toBe(true);
+      expect(bill2Comments.every(c => c.bill_id === 2)).toBe(true);
     });
   });
 
@@ -217,10 +215,10 @@ describe('DemoDataService', () => {
       const engagement = demoDataService.getBillEngagement(1);
       
       expect(engagement).toBeDefined();
-      expect(engagement?.billId).toBe(1);
-      expect(engagement).toHaveProperty('viewCount');
-      expect(engagement).toHaveProperty('commentCount');
-      expect(engagement).toHaveProperty('shareCount');
+      expect(engagement?.bill_id).toBe(1);
+      expect(engagement).toHaveProperty('view_count');
+      expect(engagement).toHaveProperty('comment_count');
+      expect(engagement).toHaveProperty('share_count');
     });
 
     it('should return null for non-existent bills', () => {
@@ -234,7 +232,7 @@ describe('DemoDataService', () => {
       const analysis = demoDataService.getBillAnalysis(1);
       
       expect(analysis).toBeDefined();
-      expect(analysis?.billId).toBe(1);
+      expect(analysis?.bill_id).toBe(1);
       expect(analysis).toHaveProperty('complexity');
       expect(analysis).toHaveProperty('transparency');
       expect(analysis).toHaveProperty('conflicts');
@@ -264,7 +262,7 @@ describe('DemoDataService', () => {
       const analysis = demoDataService.getSponsorshipAnalysis(1);
       
       expect(analysis).toBeDefined();
-      expect(analysis?.billId).toBe(1);
+      expect(analysis?.bill_id).toBe(1);
       expect(analysis).toHaveProperty('primarySponsor');
       expect(analysis).toHaveProperty('coSponsors');
       expect(analysis).toHaveProperty('totalFinancialExposure');
@@ -309,8 +307,8 @@ describe('DemoDataService', () => {
       const sponsors = demoDataService.getSponsors();
       
       bills.forEach(bill => {
-        if (bill.sponsorId) {
-          const sponsor = sponsors.find(s => s.id === bill.sponsorId);
+        if (bills.sponsor_id) {
+          const sponsor = sponsors.find(s => s.id === bills.sponsor_id);
           expect(sponsor).toBeDefined();
         }
       });
@@ -320,9 +318,9 @@ describe('DemoDataService', () => {
       const bills = demoDataService.getBills();
       
       bills.forEach(bill => {
-        expect(bill.introducedDate).toBeInstanceOf(Date);
-        expect(bill.createdAt).toBeInstanceOf(Date);
-        expect(bill.updatedAt).toBeInstanceOf(Date);
+        expect(bills.introduced_date).toBeInstanceOf(Date);
+        expect(bills.created_at).toBeInstanceOf(Date);
+        expect(bills.updated_at).toBeInstanceOf(Date);
       });
     });
 
@@ -330,10 +328,10 @@ describe('DemoDataService', () => {
       const bills = demoDataService.getBills();
       
       bills.forEach(bill => {
-        expect(bill.viewCount).toBeGreaterThanOrEqual(0);
-        expect(bill.shareCount).toBeGreaterThanOrEqual(0);
-        expect(bill.complexityScore).toBeGreaterThanOrEqual(1);
-        expect(bill.complexityScore).toBeLessThanOrEqual(10);
+        expect(bills.view_count).toBeGreaterThanOrEqual(0);
+        expect(bills.share_count).toBeGreaterThanOrEqual(0);
+        expect(bills.complexity_score).toBeGreaterThanOrEqual(1);
+        expect(bills.complexity_score).toBeLessThanOrEqual(10);
       });
     });
   });

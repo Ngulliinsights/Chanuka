@@ -122,7 +122,7 @@ describe('Layout Integration Tests', () => {
       );
 
       const toggleButton = screen.getByLabelText('Expand sidebar');
-      await user.click(toggleButton);
+      await users.click(toggleButton);
 
       // Layout should adjust when sidebar is toggled
       expect(onLayoutChange).toHaveBeenCalled();
@@ -141,7 +141,7 @@ describe('Layout Integration Tests', () => {
       );
 
       const searchInput = screen.getByLabelText('Search bills');
-      await user.type(searchInput, 'test query');
+      await users.type(searchInput, 'test query');
 
       expect(onSearchChange).toHaveBeenCalledWith('test query');
     });
@@ -182,7 +182,7 @@ describe('Layout Integration Tests', () => {
       );
 
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       expect(onMenuToggle).toHaveBeenCalledTimes(1);
     });
@@ -207,7 +207,7 @@ describe('Layout Integration Tests', () => {
       );
 
       const actionButton = screen.getByLabelText('Notifications');
-      await user.click(actionButton);
+      await users.click(actionButton);
 
       expect(onActionClick).toHaveBeenCalledTimes(1);
     });
@@ -310,7 +310,7 @@ describe('Layout Integration Tests', () => {
       );
 
       const recoverButton = screen.getByText('Recover Layout');
-      await user.click(recoverButton);
+      await users.click(recoverButton);
 
       await waitFor(() => {
         expect(screen.queryByText('Layout Error')).not.toBeInTheDocument();
@@ -474,12 +474,12 @@ describe('Layout Integration Tests', () => {
 
       // Test search functionality
       const searchInput = screen.getByLabelText('Search bills');
-      await user.type(searchInput, 'test');
+      await users.type(searchInput, 'test');
       expect(onSearchChange).toHaveBeenCalledWith('test');
 
       // Test menu toggle
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
       expect(onMenuToggle).toHaveBeenCalled();
     });
 
@@ -500,7 +500,7 @@ describe('Layout Integration Tests', () => {
       );
 
       const toggleButton = screen.getByLabelText('Expand sidebar');
-      await user.click(toggleButton);
+      await users.click(toggleButton);
 
       expect(onToggle).toHaveBeenCalledTimes(1);
     });

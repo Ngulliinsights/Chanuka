@@ -150,7 +150,7 @@ describe('MobileHeader Component', () => {
       );
 
       const actionButton = screen.getByLabelText('Test Action');
-      await user.click(actionButton);
+      await users.click(actionButton);
 
       expect(onActionClick).toHaveBeenCalledTimes(1);
     });
@@ -209,7 +209,7 @@ describe('MobileHeader Component', () => {
       );
 
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       expect(onMenuToggle).toHaveBeenCalledTimes(1);
     });
@@ -224,7 +224,7 @@ describe('MobileHeader Component', () => {
       );
 
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       // Menu should be visible
       expect(screen.getByRole('navigation')).toBeInTheDocument();
@@ -243,11 +243,11 @@ describe('MobileHeader Component', () => {
 
       // Open menu
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       // Click navigation item
       const navLink = screen.getByText('Dashboard');
-      await user.click(navLink);
+      await users.click(navLink);
 
       // Menu should be closed (navigation should not be visible)
       await waitFor(() => {
@@ -265,7 +265,7 @@ describe('MobileHeader Component', () => {
       );
 
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       expect(screen.getByLabelText('Close menu')).toBeInTheDocument();
     });
@@ -283,7 +283,7 @@ describe('MobileHeader Component', () => {
       );
 
       const searchButton = screen.getByLabelText('Search');
-      await user.click(searchButton);
+      await users.click(searchButton);
 
       expect(onSearchClick).toHaveBeenCalledTimes(1);
     });
@@ -326,7 +326,7 @@ describe('MobileHeader Component', () => {
       );
 
       const recoverButton = screen.getByText('Recover');
-      await user.click(recoverButton);
+      await users.click(recoverButton);
 
       await waitFor(() => {
         expect(screen.queryByText(/Header Error/)).not.toBeInTheDocument();
@@ -346,7 +346,7 @@ describe('MobileHeader Component', () => {
       );
 
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       expect(screen.getByText(/Header Error/)).toBeInTheDocument();
     });
@@ -364,7 +364,7 @@ describe('MobileHeader Component', () => {
       );
 
       const searchButton = screen.getByLabelText('Search');
-      await user.click(searchButton);
+      await users.click(searchButton);
 
       expect(screen.getByText(/Header Error/)).toBeInTheDocument();
     });
@@ -393,7 +393,7 @@ describe('MobileHeader Component', () => {
 
       // Open menu to show navigation
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       const navigation = screen.getByRole('navigation');
       expect(navigation).toHaveAttribute('aria-label', 'Mobile navigation');
@@ -453,7 +453,7 @@ describe('MobileHeader Component', () => {
 
       // Open menu
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       const dashboardLink = screen.getByText('Dashboard');
       expect(dashboardLink).toHaveAttribute('aria-current', 'page');
@@ -470,7 +470,7 @@ describe('MobileHeader Component', () => {
 
       // Open menu
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       expect(screen.getByText('Dashboard')).toBeInTheDocument();
       expect(screen.getByText('Bills')).toBeInTheDocument();

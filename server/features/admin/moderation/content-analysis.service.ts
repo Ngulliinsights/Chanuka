@@ -22,7 +22,7 @@ export class ContentAnalysisService {
    * Analyzes content for policy violations without creating a report
    */
   async analyzeContent(
-    contentType: 'bill' | 'comment',
+    content_type: 'bill' | 'comment',
     content: string,
     additionalContext?: {
       authorId?: string;

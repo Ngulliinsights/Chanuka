@@ -104,8 +104,8 @@ describe('AuthService', () => {
     const validRegistrationData = {
       email: 'test@example.com',
       password: 'SecurePass123!',
-      firstName: 'John',
-      lastName: 'Doe',
+      first_name: 'John',
+      last_name: 'Doe',
       role: 'citizen' as const
     };
 
@@ -136,12 +136,12 @@ describe('AuthService', () => {
       mockDb.returning.mockResolvedValueOnce([{
         id: 'user-id',
         email: validRegistrationData.email,
-        firstName: validRegistrationData.firstName,
-        lastName: validRegistrationData.lastName,
+        first_name: validRegistrationData.first_name,
+        last_name: validRegistrationData.last_name,
         name: 'John Doe',
         role: validRegistrationData.role,
-        verificationStatus: 'pending',
-        isActive: true
+        verification_status: 'pending',
+        is_active: true
       }]);
 
       // Mock JWT generation
@@ -213,13 +213,13 @@ describe('AuthService', () => {
     const mockUser = {
       id: 'user-id',
       email: validLoginData.email,
-      passwordHash: 'hashed-password',
-      firstName: 'John',
-      lastName: 'Doe',
+      password_hash: 'hashed-password',
+      first_name: 'John',
+      last_name: 'Doe',
       name: 'John Doe',
       role: 'citizen',
-      verificationStatus: 'verified',
-      isActive: true
+      verification_status: 'verified',
+      is_active: true
     };
 
     it('should login user successfully', async () => {
@@ -252,7 +252,7 @@ describe('AuthService', () => {
     });
 
     it('should fail login for inactive user', async () => {
-      mockDb.limit.mockResolvedValueOnce([{ ...mockUser, isActive: false }]);
+      mockDb.limit.mockResolvedValueOnce([{ ...mockUser, is_active: false }]);
 
       const result = await authService.login(validLoginData);
 
@@ -281,7 +281,7 @@ describe('AuthService', () => {
 
       expect(mockDb.update).toHaveBeenCalled();
       expect(mockDb.set).toHaveBeenCalledWith(expect.objectContaining({
-        lastLoginAt: expect.any(Date)
+        last_login_at: expect.any(Date)
       }));
     });
   });
@@ -291,12 +291,12 @@ describe('AuthService', () => {
       const mockUser = {
         id: 'user-id',
         email: 'test@example.com',
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         name: 'John Doe',
         role: 'citizen',
-        verificationStatus: 'pending',
-        isActive: true,
+        verification_status: 'pending',
+        is_active: true,
         preferences: {
           emailVerificationToken: 'valid-token',
           emailVerificationExpires: new Date(Date.now() + 24 * 60 * 60 * 1000)
@@ -308,7 +308,7 @@ describe('AuthService', () => {
       const result = await authService.verifyEmail('valid-token');
 
       expect(result.success).toBe(true);
-      expect(result.user?.verificationStatus).toBe('verified');
+      expect(result.user?.verification_status).toBe('verified');
       expect(mockDb.update).toHaveBeenCalled();
     });
 
@@ -345,7 +345,7 @@ describe('AuthService', () => {
 
       expect(result.success).toBe(true);
       expect(mockDb.update).toHaveBeenCalled();
-      expect(mockDb.set).toHaveBeenCalledWith({ isActive: false });
+      expect(mockDb.set).toHaveBeenCalledWith({ is_active: false });
     });
 
     it('should handle logout errors gracefully', async () => {
@@ -358,29 +358,27 @@ describe('AuthService', () => {
     });
   });
 
-  describe('refreshToken', () => {
-    const mockSession = {
+  describe('refreshToken', () => { const mockSession = {
       id: 'session-id',
-      userId: 'user-id',
-      refreshTokenHash: 'mock-hash',
-      isActive: true,
-      refreshTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-    };
+      user_id: 'user-id',
+      refresh_token_hash: 'mock-hash',
+      is_active: true,
+      refresh_token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+     };
 
     const mockUser = {
       id: 'user-id',
       email: 'test@example.com',
-      firstName: 'John',
-      lastName: 'Doe',
+      first_name: 'John',
+      last_name: 'Doe',
       name: 'John Doe',
       role: 'citizen',
-      verificationStatus: 'verified',
-      isActive: true
+      verification_status: 'verified',
+      is_active: true
     };
 
-    it('should refresh token successfully', async () => {
-      // Mock JWT verification
-      mockJwtVerify.mockReturnValue({ userId: 'user-id' });
+    it('should refresh token successfully', async () => { // Mock JWT verification
+      mockJwtVerify.mockReturnValue({ user_id: 'user-id'  });
 
       // Mock database responses
       mockDb.limit
@@ -411,8 +409,7 @@ describe('AuthService', () => {
       expect(result.error).toBe('Token refresh failed');
     });
 
-    it('should fail refresh for non-existent session', async () => {
-      mockJwtVerify.mockReturnValue({ userId: 'user-id' });
+    it('should fail refresh for non-existent session', async () => { mockJwtVerify.mockReturnValue({ user_id: 'user-id'  });
       mockDb.limit.mockResolvedValueOnce([]); // No session found
 
       const result = await authService.refreshToken('valid-refresh-token');
@@ -421,12 +418,11 @@ describe('AuthService', () => {
       expect(result.error).toBe('Invalid refresh token');
     });
 
-    it('should fail refresh for expired token', async () => {
-      (jwt.verify as vi.Mock).mockReturnValue({ userId: 'user-id' });
+    it('should fail refresh for expired token', async () => { (jwt.verify as vi.Mock).mockReturnValue({ user_id: 'user-id'  });
       
       const expiredSession = {
         ...mockSession,
-        refreshTokenExpiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000) // Expired
+        refresh_token_expires_at: new Date(Date.now() - 24 * 60 * 60 * 1000) // Expired
       };
       
       mockDb.limit.mockResolvedValueOnce([expiredSession]);
@@ -439,28 +435,26 @@ describe('AuthService', () => {
     });
   });
 
-  describe('verifyToken', () => {
-    const mockSession = {
+  describe('verifyToken', () => { const mockSession = {
       id: 'session-id',
-      userId: 'user-id',
+      user_id: 'user-id',
       token: 'valid-token',
-      isActive: true,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000)
-    };
+      is_active: true,
+      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000)
+     };
 
     const mockUser = {
       id: 'user-id',
       email: 'test@example.com',
-      firstName: 'John',
-      lastName: 'Doe',
+      first_name: 'John',
+      last_name: 'Doe',
       name: 'John Doe',
       role: 'citizen',
-      verificationStatus: 'verified',
-      isActive: true
+      verification_status: 'verified',
+      is_active: true
     };
 
-    it('should verify token successfully', async () => {
-      mockJwtVerify.mockReturnValue({ userId: 'user-id' });
+    it('should verify token successfully', async () => { mockJwtVerify.mockReturnValue({ user_id: 'user-id'  });
       mockDb.limit
         .mockResolvedValueOnce([mockSession])
         .mockResolvedValueOnce([mockUser]);
@@ -482,8 +476,7 @@ describe('AuthService', () => {
       expect(result.error).toBe('Invalid token');
     });
 
-    it('should fail verification for inactive session', async () => {
-      mockJwtVerify.mockReturnValue({ userId: 'user-id' });
+    it('should fail verification for inactive session', async () => { mockJwtVerify.mockReturnValue({ user_id: 'user-id'  });
       mockDb.limit.mockResolvedValueOnce([]); // No active session
 
       const result = await authService.verifyToken('valid-token');
@@ -492,12 +485,11 @@ describe('AuthService', () => {
       expect(result.error).toBe('Invalid session');
     });
 
-    it('should fail verification for expired session', async () => {
-      mockJwtVerify.mockReturnValue({ userId: 'user-id' });
+    it('should fail verification for expired session', async () => { mockJwtVerify.mockReturnValue({ user_id: 'user-id'  });
 
       const expiredSession = {
         ...mockSession,
-        expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000) // Expired
+        expires_at: new Date(Date.now() - 24 * 60 * 60 * 1000) // Expired
       };
 
       mockDb.limit.mockResolvedValueOnce([expiredSession]);
@@ -509,11 +501,10 @@ describe('AuthService', () => {
       expect(mockDb.update).toHaveBeenCalled(); // Should invalidate session
     });
 
-    it('should fail verification for inactive user', async () => {
-      mockJwtVerify.mockReturnValue({ userId: 'user-id' });
+    it('should fail verification for inactive user', async () => { mockJwtVerify.mockReturnValue({ user_id: 'user-id'  });
       mockDb.limit
         .mockResolvedValueOnce([mockSession])
-        .mockResolvedValueOnce([{ ...mockUser, isActive: false }]);
+        .mockResolvedValueOnce([{ ...mockUser, is_active: false }]);
 
       const result = await authService.verifyToken('valid-token');
 
@@ -527,7 +518,7 @@ describe('AuthService', () => {
       const mockUser = {
         id: 'user-id',
         email: 'test@example.com',
-        firstName: 'John'
+        first_name: 'John'
       };
 
       mockDb.limit.mockResolvedValueOnce([mockUser]);
@@ -552,18 +543,17 @@ describe('AuthService', () => {
     });
   });
 
-  describe('resetPassword', () => {
-    const mockResetRecord = {
+  describe('resetPassword', () => { const mockResetRecord = {
       id: 'reset-id',
-      userId: 'user-id',
+      user_id: 'user-id',
       tokenHash: 'mock-hash',
-      expiresAt: new Date(Date.now() + 60 * 60 * 1000)
-    };
+      expires_at: new Date(Date.now() + 60 * 60 * 1000)
+     };
 
     const mockUser = {
       id: 'user-id',
       email: 'test@example.com',
-      firstName: 'John'
+      first_name: 'John'
     };
 
     it('should reset password successfully', async () => {
@@ -602,7 +592,7 @@ describe('AuthService', () => {
     it('should fail reset for expired token', async () => {
       const expiredResetRecord = {
         ...mockResetRecord,
-        expiresAt: new Date(Date.now() - 60 * 60 * 1000) // Expired
+        expires_at: new Date(Date.now() - 60 * 60 * 1000) // Expired
       };
 
       mockDb.limit.mockResolvedValueOnce([expiredResetRecord]);
@@ -631,7 +621,7 @@ describe('AuthService', () => {
 
       // Should invalidate all sessions for security
       expect(mockDb.update).toHaveBeenCalledWith(
-        expect.objectContaining({ isActive: false })
+        expect.objectContaining({ is_active: false })
       );
     });
   });

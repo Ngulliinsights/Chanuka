@@ -73,7 +73,7 @@ describe('ConflictSeverityAnalyzerService', () => {
           conflictSeverity: 'high',
           affectedBills: [1],
           relationshipStrength: 0.9,
-          isActive: true,
+          is_active: true,
           evidenceStrength: 80,
           detectionMethod: 'affiliation_analysis',
           lastUpdated: new Date()
@@ -155,8 +155,8 @@ describe('ConflictSeverityAnalyzerService', () => {
 
     it('should return higher score for verified disclosures', () => {
       const disclosures = [
-        { isVerified: true, createdAt: new Date(), disclosureType: 'financial' },
-        { isVerified: true, createdAt: new Date(), disclosureType: 'professional' }
+        { is_verified: true, created_at: new Date(), disclosureType: 'financial' },
+        { is_verified: true, created_at: new Date(), disclosureType: 'professional' }
       ];
 
       const score = service.calculateTransparencyScore(disclosures);
@@ -169,10 +169,10 @@ describe('ConflictSeverityAnalyzerService', () => {
       oldDate.setFullYear(oldDate.getFullYear() - 2);
 
       const recentDisclosures = [
-        { isVerified: false, createdAt: recentDate, disclosureType: 'financial' }
+        { is_verified: false, created_at: recentDate, disclosureType: 'financial' }
       ];
       const oldDisclosures = [
-        { isVerified: false, createdAt: oldDate, disclosureType: 'financial' }
+        { is_verified: false, created_at: oldDate, disclosureType: 'financial' }
       ];
 
       const recentScore = service.calculateTransparencyScore(recentDisclosures);
@@ -222,7 +222,7 @@ describe('ConflictSeverityAnalyzerService', () => {
         conflictSeverity: 'high',
         affectedBills: [1, 2],
         relationshipStrength: 0.9, // High relationship strength
-        isActive: true,
+        is_active: true,
         evidenceStrength: 90,
         detectionMethod: 'affiliation_analysis',
         lastUpdated: new Date()

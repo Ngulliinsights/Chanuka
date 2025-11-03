@@ -29,12 +29,12 @@ describe('VotingPatternAnalysisService', () => {
       expect(result).toEqual([]);
     });
 
-    it('should return analysis for all sponsors when no sponsorId provided', async () => {
+    it('should return analysis for all sponsors when no sponsor_id provided', async () => {
       const result = await votingPatternAnalysisService.analyzeVotingPatterns();
       expect(Array.isArray(result)).toBe(true);
       // Each analysis should have the required structure
       result.forEach(analysis => {
-        expect(analysis).toHaveProperty('sponsorId');
+        expect(analysis).toHaveProperty('sponsor_id');
         expect(analysis).toHaveProperty('sponsorName');
         expect(analysis).toHaveProperty('totalVotes');
         expect(analysis).toHaveProperty('votingConsistency');
@@ -53,13 +53,12 @@ describe('VotingPatternAnalysisService', () => {
       expect(result).toEqual([]);
     });
 
-    it('should return predictions with proper structure', async () => {
-      // Test with a potentially existing sponsor ID (1)
+    it('should return predictions with proper structure', async () => { // Test with a potentially existing sponsor ID (1)
       const result = await votingPatternAnalysisService.createVotingPredictions(1);
       expect(Array.isArray(result)).toBe(true);
       
       result.forEach(prediction => {
-        expect(prediction).toHaveProperty('billId');
+        expect(prediction).toHaveProperty('bill_id');
         expect(prediction).toHaveProperty('billTitle');
         expect(prediction).toHaveProperty('predictedVote');
         expect(['yes', 'no', 'abstain']).toContain(prediction.predictedVote);
@@ -71,7 +70,7 @@ describe('VotingPatternAnalysisService', () => {
         expect(Array.isArray(prediction.reasoningFactors)).toBe(true);
         expect(prediction).toHaveProperty('similarBills');
         expect(Array.isArray(prediction.similarBills)).toBe(true);
-      });
+       });
     });
   });
 
@@ -86,8 +85,8 @@ describe('VotingPatternAnalysisService', () => {
       try {
         const result = await votingPatternAnalysisService.buildComparativeAnalysis(1);
         
-        expect(result).toHaveProperty('sponsorId');
-        expect(result.sponsorId).toBe(1);
+        expect(result).toHaveProperty('sponsor_id');
+        expect(result.sponsor_id).toBe(1);
         expect(result).toHaveProperty('comparedWith');
         expect(Array.isArray(result.comparedWith)).toBe(true);
         expect(result).toHaveProperty('alignmentScores');
@@ -116,8 +115,8 @@ describe('VotingPatternAnalysisService', () => {
       try {
         const result = await votingPatternAnalysisService.calculateVotingConsistencyScore(1, 6);
         
-        expect(result).toHaveProperty('sponsorId');
-        expect(result.sponsorId).toBe(1);
+        expect(result).toHaveProperty('sponsor_id');
+        expect(result.sponsor_id).toBe(1);
         expect(result).toHaveProperty('timeframe');
         expect(result.timeframe).toBe('6 months');
         expect(result).toHaveProperty('consistencyTrend');
@@ -168,14 +167,13 @@ describe('VotingPatternAnalysisService', () => {
     });
   });
 
-  describe('Anomaly Detection', () => {
-    it('should detect anomalies with proper structure', async () => {
+  describe('Anomaly Detection', () => { it('should detect anomalies with proper structure', async () => {
       const analyses = await votingPatternAnalysisService.analyzeVotingPatterns();
       
       analyses.forEach(analysis => {
         analysis.anomalies.forEach(anomaly => {
-          expect(anomaly).toHaveProperty('billId');
-          expect(typeof anomaly.billId).toBe('number');
+          expect(anomaly).toHaveProperty('bill_id');
+          expect(typeof anomaly.bill_id).toBe('number');
           expect(anomaly).toHaveProperty('billTitle');
           expect(typeof anomaly.billTitle).toBe('string');
           expect(anomaly).toHaveProperty('expectedVote');
@@ -193,7 +191,7 @@ describe('VotingPatternAnalysisService', () => {
           expect(typeof anomaly.explanation).toBe('string');
           expect(anomaly).toHaveProperty('contextFactors');
           expect(Array.isArray(anomaly.contextFactors)).toBe(true);
-        });
+         });
       });
     });
   });

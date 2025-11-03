@@ -31,7 +31,7 @@ export function useAuth() {
 
       toast({
         title: "Welcome back!",
-        description: `Hello ${data.user.name}`,
+        description: `Hello ${data.users.name}`,
       });
     },
     onError: (error: Error) => {
@@ -100,16 +100,15 @@ export function useUser() {
 /**
  * Hook for user profile operations
  */
-export function useProfile(userId?: string) {
+export function useProfile(user_id?: string) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const profile = useQuery({
-    queryKey: ['profile', userId],
-    queryFn: () => userApi.getProfile(userId),
-    enabled: !!userId || !userId, // Always enabled for current user, conditional for others
+  const profile = useQuery({ queryKey: ['profile', user_id],
+    queryFn: () => userApi.getProfile(user_id),
+    enabled: !!user_id || !user_id, // Always enabled for current user, conditional for others
     staleTime: 10 * 60 * 1000, // 10 minutes
-  });
+   });
 
   const updateProfile = useMutation({
     mutationFn: (data: UpdateProfileData) => userApi.updateProfile(data),
@@ -223,7 +222,7 @@ export function useVerification() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const verificationStatus = useQuery({
+  const verification_status = useQuery({
     queryKey: ['verification'],
     queryFn: () => userApi.getVerificationStatus(),
     staleTime: 15 * 60 * 1000, // 15 minutes
@@ -284,7 +283,7 @@ export function useVerification() {
   });
 
   return {
-    verificationStatus,
+    verification_status,
     submitVerification,
     verifyPhone,
     resendPhoneVerification,
@@ -372,30 +371,27 @@ export function useUserSearch(query: string, enabled = true) {
 /**
  * Hook for individual user lookup
  */
-export function useUserById(userId: string | undefined) {
-  return useQuery({
-    queryKey: ['users', userId],
-    queryFn: () => userApi.getUserById(userId!),
-    enabled: !!userId,
+export function useUserById(user_id: string | undefined) { return useQuery({
+    queryKey: ['users', user_id],
+    queryFn: () => userApi.getUserById(user_id!),
+    enabled: !!user_id,
     staleTime: 10 * 60 * 1000, // 10 minutes
-  });
+   });
 }
 
 /**
  * Hook for user activity and statistics
  */
-export function useUserActivity(userId?: string) {
-  const activity = useQuery({
-    queryKey: ['users', userId, 'activity'],
-    queryFn: () => userApi.getUserActivity(userId),
+export function useUserActivity(user_id?: string) { const activity = useQuery({
+    queryKey: ['users', user_id, 'activity'],
+    queryFn: () => userApi.getUserActivity(user_id),
     staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+   });
 
-  const stats = useQuery({
-    queryKey: ['users', userId, 'stats'],
-    queryFn: () => userApi.getUserStats(userId),
+  const stats = useQuery({ queryKey: ['users', user_id, 'stats'],
+    queryFn: () => userApi.getUserStats(user_id),
     staleTime: 15 * 60 * 1000, // 15 minutes
-  });
+   });
 
   return {
     activity,

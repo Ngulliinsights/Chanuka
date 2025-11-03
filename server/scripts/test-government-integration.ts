@@ -143,7 +143,7 @@ class GovernmentDataIntegrationCLI {
       {
         id: 'C-1',
         title: 'Test Bill 1',
-        billNumber: 'C-1',
+        bill_number: 'C-1',
         status: 'introduced',
         source: 'parliament-ca',
         lastUpdated: new Date().toISOString()
@@ -151,7 +151,7 @@ class GovernmentDataIntegrationCLI {
       {
         id: 'C-2',
         title: '', // Missing title - should fail validation
-        billNumber: 'C-2',
+        bill_number: 'C-2',
         status: 'invalid-status', // Invalid status
         source: 'parliament-ca',
         lastUpdated: new Date().toISOString()
@@ -175,7 +175,7 @@ class GovernmentDataIntegrationCLI {
         data: {
           id: 'C-1',
           title: 'Test Bill',
-          billNumber: 'C-1',
+          bill_number: 'C-1',
           status: 'introduced',
           source: 'parliament-ca'
         },
@@ -185,7 +185,7 @@ class GovernmentDataIntegrationCLI {
         data: {
           id: 'C-1',
           title: 'Test Bill (Different Title)', // Conflict
-          billNumber: 'C-1',
+          bill_number: 'C-1',
           status: 'committee', // Conflict
           source: 'openparliament'
         },

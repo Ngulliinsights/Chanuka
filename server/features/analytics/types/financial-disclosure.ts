@@ -2,27 +2,27 @@
 
 export interface FinancialDisclosure {
   id: number;
-  sponsorId: number;
+  sponsor_id: number;
   disclosureType: string;
   description: string;
   amount?: number;
   source?: string;
   dateReported: Date;
-  isVerified: boolean;
+  is_verified: boolean;
   completenessScore: number;
   riskLevel: 'low' | 'medium' | 'high' | 'critical';
   lastUpdated: Date;
 }
 
 export interface FinancialRelationship {
-  sponsorId: number;
+  sponsor_id: number;
   relatedEntity: string;
   relationshipType: 'investment' | 'ownership' | 'business_partner' | 'employment' | 'family';
   strength: number; // 0-100
   financialValue?: number;
   startDate?: Date;
   endDate?: Date;
-  isActive: boolean;
+  is_active: boolean;
   conflictPotential: 'low' | 'medium' | 'high' | 'critical';
 }
 
@@ -35,7 +35,7 @@ export interface ConflictOfInterest {
 }
 
 export interface RelationshipMapping {
-  sponsorId: number;
+  sponsor_id: number;
   sponsorName: string;
   relationships: FinancialRelationship[];
   totalFinancialExposure: number;
@@ -51,7 +51,7 @@ export interface RelationshipMapping {
 }
 
 export interface CompletenessReport {
-  sponsorId: number;
+  sponsor_id: number;
   sponsorName: string;
   overallScore: number;
   requiredDisclosures: number;
@@ -81,12 +81,12 @@ export interface TransparencyDashboard {
   };
   riskDistribution: Record<'low' | 'medium' | 'high' | 'critical', number>;
   topPerformers: Array<{
-    sponsorId: number;
+    sponsor_id: number;
     sponsorName: string;
     score: number;
   }>;
   needsAttention: Array<{
-    sponsorId: number;
+    sponsor_id: number;
     sponsorName: string;
     score: number;
     riskLevel: 'low' | 'medium' | 'high' | 'critical';
@@ -102,15 +102,15 @@ export interface TransparencyDashboard {
 export interface SponsorInfo {
   id: number;
   name: string;
-  isActive: boolean;
+  is_active: boolean;
 }
 
 export interface SponsorAffiliation {
   id?: number;
-  sponsorId?: number;
+  sponsor_id?: number;
   organization?: string;
   type: 'economic' | 'professional' | 'ownership' | 'family';
-  isActive?: boolean;
+  is_active?: boolean;
   startDate?: string;
   endDate?: string;
   conflictType?: 'financial' | 'ownership' | null;

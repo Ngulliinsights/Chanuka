@@ -6,10 +6,10 @@ export class AlertConditions {
   constructor(
     public readonly billCategories?: string[],
     public readonly billStatuses?: string[],
-    public readonly sponsorIds?: number[],
+    public readonly sponsor_ids?: number[],
     public readonly keywords?: string[],
     public readonly minimumEngagement?: number,
-    public readonly userRoles?: string[],
+    public readonly user_roles?: string[],
     public readonly timeRange?: TimeRange,
     public readonly dayOfWeek?: number[]
   ) {
@@ -71,11 +71,11 @@ export class AlertConditions {
     return status ? this.billStatuses.includes(status) : false;
   }
 
-  matchesSponsor(sponsorId?: number): boolean {
-    if (!this.sponsorIds || this.sponsorIds.length === 0) {
+  matchesSponsor(sponsor_id?: number): boolean {
+    if (!this.sponsor_ids || this.sponsor_ids.length === 0) {
       return true; // No sponsor filter
     }
-    return sponsorId ? this.sponsorIds.includes(sponsorId) : false;
+    return sponsor_id ? this.sponsor_ids.includes(sponsor_id) : false;
   }
 
   matchesKeywords(text?: string): boolean {
@@ -100,11 +100,11 @@ export class AlertConditions {
     return engagementCount ? engagementCount >= this.minimumEngagement : false;
   }
 
-  matchesUserRole(userRole?: string): boolean {
-    if (!this.userRoles || this.userRoles.length === 0) {
+  matchesUserRole(user_role?: string): boolean {
+    if (!this.user_roles || this.user_roles.length === 0) {
       return true; // No role filter
     }
-    return userRole ? this.userRoles.includes(userRole) : false;
+    return user_role ? this.user_roles.includes(user_role) : false;
   }
 
   matchesTimeRange(currentTime?: Date): boolean {
@@ -134,14 +134,14 @@ export class AlertConditions {
   /**
    * Evaluates all conditions against the provided alert data
    */
-  matches(alertData: any, userRole?: string, currentTime?: Date): boolean {
+  matches(alertData: any, user_role?: string, currentTime?: Date): boolean {
     return (
       this.matchesBillCategory(alertData.billCategory) &&
       this.matchesBillStatus(alertData.billStatus) &&
-      this.matchesSponsor(alertData.sponsorId) &&
+      this.matchesSponsor(alertData.sponsor_id) &&
       this.matchesKeywords(alertData.title || alertData.description || alertData.content) &&
       this.matchesEngagement(alertData.engagementCount) &&
-      this.matchesUserRole(userRole) &&
+      this.matchesUserRole(user_role) &&
       this.matchesTimeRange(currentTime) &&
       this.matchesDayOfWeek(currentTime)
     );
@@ -151,10 +151,10 @@ export class AlertConditions {
     return (
       JSON.stringify(this.billCategories) === JSON.stringify(other.billCategories) &&
       JSON.stringify(this.billStatuses) === JSON.stringify(other.billStatuses) &&
-      JSON.stringify(this.sponsorIds) === JSON.stringify(other.sponsorIds) &&
+      JSON.stringify(this.sponsor_ids) === JSON.stringify(other.sponsor_ids) &&
       JSON.stringify(this.keywords) === JSON.stringify(other.keywords) &&
       this.minimumEngagement === other.minimumEngagement &&
-      JSON.stringify(this.userRoles) === JSON.stringify(other.userRoles) &&
+      JSON.stringify(this.user_roles) === JSON.stringify(other.user_roles) &&
       JSON.stringify(this.timeRange) === JSON.stringify(other.timeRange) &&
       JSON.stringify(this.dayOfWeek) === JSON.stringify(other.dayOfWeek)
     );

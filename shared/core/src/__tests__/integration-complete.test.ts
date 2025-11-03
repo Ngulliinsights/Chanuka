@@ -69,17 +69,16 @@ describe('Core Utilities Integration Tests', () => {
     }
   });
 
-  describe('Cross-Module Integration', () => {
-    it('should handle complete request pipeline', async () => {
-      const userId = 'integration-test-user';
+  describe('Cross-Module Integration', () => { it('should handle complete request pipeline', async () => {
+      const user_id = 'integration-test-user';
       const userData = {
         name: 'Test User',
         email: 'test@example.com',
         age: 25
-      };
+       };
 
       // 1. Rate limiting check
-      const rateLimitResult = await rateLimiter.hit(userId, 100, 60000);
+      const rateLimitResult = await rateLimiter.hit(user_id, 100, 60000);
       expect(rateLimitResult.allowed).toBe(true);
       expect(rateLimitResult.remaining).toBeLessThanOrEqual(100);
 
@@ -88,18 +87,17 @@ describe('Core Utilities Integration Tests', () => {
       expect(validatedData).toEqual(userData);
 
       // 3. Cache operations
-      const cacheKey = `user:${userId}`;
+      const cacheKey = `user:${ user_id }`;
       await cache.set(cacheKey, validatedData, 300);
       
       const cachedData = await cache.get(cacheKey);
       expect(cachedData).toEqual(validatedData);
 
       // 4. Logging
-      logger.info('Integration test completed', {
-        userId,
+      logger.info('Integration test completed', { user_id,
         rateLimitRemaining: rateLimitResult.remaining,
         cached: true
-      });
+       });
 
       // 5. Verify metrics are collected
       const cacheMetrics = cache.getMetrics?.();

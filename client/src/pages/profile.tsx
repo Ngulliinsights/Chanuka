@@ -38,7 +38,7 @@ export default function Profile() {
                 </div>
                 <div data-testid="profile-joined">
                   <label className="text-sm font-medium text-slate-500">Joined</label>
-                  <p>{new Date(user?.createdAt || Date.now()).toLocaleDateString() || 'January 15, 2023'}</p>
+                  <p>{new Date(user?.created_at || Date.now()).toLocaleDateString() || 'January 15, 2023'}</p>
                 </div>
               </div>
             </section>

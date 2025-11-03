@@ -44,7 +44,7 @@ const wsServiceContent = fs.readFileSync('server/services/websocket.ts', 'utf8')
 
 const wsFeatures = [
   { name: 'Token-based authentication in connection', pattern: /verifyClient.*token/s },
-  { name: 'Bill subscription management', pattern: /subscribe.*billId/s },
+  { name: 'Bill subscription management', pattern: /subscribe.*bill_id/s },
   { name: 'User preference handling', pattern: /get_preferences|update_preferences/ },
   { name: 'Real-time bill updates', pattern: /broadcastBillUpdate/ },
   { name: 'User notifications', pattern: /sendUserNotification/ },

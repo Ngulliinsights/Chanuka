@@ -23,8 +23,8 @@ describe('Dashboard Validation', () => {
       title: 'Test Action',
       description: 'Test Description',
       priority: 'High' as const,
-      createdAt: new Date(),
-      updatedAt: new Date()
+      created_at: new Date(),
+      updated_at: new Date()
     };
 
     it('should validate a valid action item', () => {
@@ -64,14 +64,13 @@ describe('Dashboard Validation', () => {
       expect(() => validateActionItem(invalidItem)).toThrow(DashboardValidationError);
     });
 
-    it('should validate optional fields', () => {
-      const itemWithOptionals = {
+    it('should validate optional fields', () => { const itemWithOptionals = {
         ...validActionItem,
         dueDate: new Date(),
         category: 'Legislative',
-        billId: 'bill-123',
+        bill_id: 'bill-123',
         completed: true
-      };
+       };
 
       expect(() => validateActionItem(itemWithOptionals)).not.toThrow();
     });
@@ -120,8 +119,8 @@ describe('Dashboard Validation', () => {
       name: 'Healthcare',
       category: 'legislative' as const,
       billCount: 5,
-      isActive: true,
-      createdAt: new Date()
+      is_active: true,
+      created_at: new Date()
     };
 
     it('should validate a valid tracked topic', () => {
@@ -273,8 +272,8 @@ describe('Dashboard Validation', () => {
           title: 'Test Action',
           description: 'Test Description',
           priority: 'High' as const,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          created_at: new Date(),
+          updated_at: new Date()
         };
 
         const result = safeValidateActionItem(validItem);
@@ -300,8 +299,8 @@ describe('Dashboard Validation', () => {
           name: 'Healthcare',
           category: 'legislative' as const,
           billCount: 5,
-          isActive: true,
-          createdAt: new Date()
+          is_active: true,
+          created_at: new Date()
         };
 
         const result = safeValidateTrackedTopic(validTopic);

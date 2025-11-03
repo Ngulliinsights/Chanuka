@@ -5,13 +5,12 @@
  */
 
 import { database as db } from '../../../../shared/database/connection';
-import { 
-  bill, 
-  billComment, 
-  user, 
-  contentReport, 
+import { bill, 
+  comments, 
+  users, 
+  content_report, 
   sponsor 
-} from '../../../../shared/schema';
+ } from '../shared/schema';
 import { eq, count, desc, sql, and, gte, SQL } from 'drizzle-orm';
 import { logger } from '../../../../shared/core/index.js';
 import { ContentModerationFilters, ModerationItem, PaginationInfo } from './types.js';
@@ -47,32 +46,32 @@ export class ModerationQueueService {
       // Fetch reports with all their details
       const queueItems = await db
         .select({
-          id: contentReport.id,
-          contentType: contentReport.contentType,
-          contentId: contentReport.contentId,
-          reportType: contentReport.reportType,
-          severity: contentReport.severity,
-          reason: contentReport.reason,
-          description: contentReport.description,
-          reportedBy: contentReport.reportedBy,
-          autoDetected: contentReport.autoDetected,
-          status: contentReport.status,
-          reviewedBy: contentReport.reviewedBy,
-          reviewedAt: contentReport.reviewedAt,
-          resolutionNotes: contentReport.resolutionNotes,
-          createdAt: contentReport.createdAt,
-          updatedAt: contentReport.updatedAt
+          id: content_report.id,
+          content_type: content_report.content_type,
+          content_id: content_report.content_id,
+          reportType: content_report.reportType,
+          severity: content_report.severity,
+          reason: content_report.reason,
+          description: content_report.description,
+          reportedBy: content_report.reportedBy,
+          autoDetected: content_report.autoDetected,
+          status: content_report.status,
+          reviewedBy: content_report.reviewedBy,
+          reviewedAt: content_report.reviewedAt,
+          resolutionNotes: content_report.resolutionNotes,
+          created_at: content_report.created_at,
+          updated_at: content_report.updated_at
         })
-        .from(contentReport)
+        .from(content_report)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(desc(contentReport.severity), desc(contentReport.createdAt))
+        .orderBy(desc(content_report.severity), desc(content_report.created_at))
         .limit(limit)
         .offset(offset);
 
       // Get total count for pagination
       const countResult = await db
         .select({ count: count() })
-        .from(contentReport)
+        .from(content_report)
         .where(conditions.length > 0 ? and(...conditions) : undefined);
 
       const total = countResult[0]?.count ?? 0;
@@ -81,8 +80,8 @@ export class ModerationQueueService {
       const enhancedItems = await Promise.all(
         queueItems.map(async (item) => {
           const contentDetails = await this.getContentDetails(
-            item.contentType, 
-            item.contentId
+            item.content_type, 
+            item.content_id
           );
           return {
             ...item,
@@ -113,8 +112,8 @@ export class ModerationQueueService {
    * Creates a new content report (flag)
    */
   async createReport(
-    contentType: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
-    contentId: number,
+    content_type: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
+    content_id: number,
     reportType: 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'copyright' | 'other',
     reason: string,
     reportedBy: string,
@@ -125,12 +124,12 @@ export class ModerationQueueService {
       // Check if there's already a pending report for this content
       const [existingReport] = await db
         .select()
-        .from(contentReport)
+        .from(content_report)
         .where(
           and(
-            eq(contentReport.contentType, contentType),
-            eq(contentReport.contentId, contentId),
-            eq(contentReport.status, 'pending')
+            eq(content_report.content_type, content_type),
+            eq(content_report.content_id, content_id),
+            eq(content_report.status, 'pending')
           )
         );
 
@@ -140,15 +139,15 @@ export class ModerationQueueService {
       if (existingReport) {
         // Update existing report instead of creating duplicate
         await db
-          .update(contentReport)
+          .update(content_report)
           .set({
             reason: `${existingReport.reason}; ${reason}`,
             description: description ? 
               `${existingReport.description || ''}; ${description}` : 
               existingReport.description,
-            updatedAt: new Date()
+            updated_at: new Date()
           })
-          .where(eq(contentReport.id, existingReport.id));
+          .where(eq(content_report.id, existingReport.id));
 
         return { 
           success: true, 
@@ -158,10 +157,10 @@ export class ModerationQueueService {
       } else {
         // Create new report
         const [newReport] = await db
-          .insert(contentReport)
+          .insert(content_report)
           .values({
-            contentType,
-            contentId,
+            content_type,
+            content_id,
             reportedBy,
             reportType,
             reason,
@@ -170,7 +169,7 @@ export class ModerationQueueService {
             severity,
             autoDetected
           })
-          .returning({ id: contentReport.id });
+          .returning({ id: content_report.id });
 
         return { 
           success: true, 
@@ -194,16 +193,16 @@ export class ModerationQueueService {
     try {
       const [report] = await db
         .select()
-        .from(contentReport)
-        .where(eq(contentReport.id, reportId));
+        .from(content_report)
+        .where(eq(content_report.id, reportId));
 
       if (!report) {
         return null;
       }
 
       const contentDetails = await this.getContentDetails(
-        report.contentType,
-        report.contentId
+        report.content_type,
+        report.content_id
       );
 
       return {
@@ -227,33 +226,33 @@ export class ModerationQueueService {
 
     if (!filters) return conditions;
 
-    if (filters.contentType) {
-      conditions.push(eq(contentReport.contentType, filters.contentType));
+    if (filters.content_type) {
+      conditions.push(eq(content_report.content_type, filters.content_type));
     }
 
     if (filters.status) {
-      conditions.push(eq(contentReport.status, filters.status));
+      conditions.push(eq(content_report.status, filters.status));
     }
 
     if (filters.severity) {
-      conditions.push(eq(contentReport.severity, filters.severity));
+      conditions.push(eq(content_report.severity, filters.severity));
     }
 
     if (filters.reportType) {
-      conditions.push(eq(contentReport.reportType, filters.reportType));
+      conditions.push(eq(content_report.reportType, filters.reportType));
     }
 
     if (filters.moderator) {
-      conditions.push(eq(contentReport.reviewedBy, filters.moderator));
+      conditions.push(eq(content_report.reviewedBy, filters.moderator));
     }
 
     if (filters.autoDetected !== undefined) {
-      conditions.push(eq(contentReport.autoDetected, filters.autoDetected));
+      conditions.push(eq(content_report.autoDetected, filters.autoDetected));
     }
 
     if (filters.dateRange) {
-      conditions.push(gte(contentReport.createdAt, filters.dateRange.start));
-      conditions.push(sql`${contentReport.createdAt} <= ${filters.dateRange.end}`);
+      conditions.push(gte(content_report.created_at, filters.dateRange.start));
+      conditions.push(sql`${content_report.created_at} <= ${filters.dateRange.end}`);
     }
 
     return conditions;
@@ -263,8 +262,8 @@ export class ModerationQueueService {
    * Fetches the full details of content being moderated
    */
   private async getContentDetails(
-    contentType: string, 
-    contentId: number
+    content_type: string, 
+    content_id: number
   ): Promise<{
     title?: string;
     text: string;
@@ -273,36 +272,36 @@ export class ModerationQueueService {
       name: string;
       email: string;
     };
-    createdAt: Date;
+    created_at: Date;
   }> {
     try {
-      if (contentType === 'bill') {
+      if (content_type === 'bill') {
         const [billData] = await db
           .select({
-            title: bill.title,
-            text: bill.summary,
-            sponsorId: bill.sponsorId,
-            createdAt: bill.createdAt
+            title: bills.title,
+            text: bills.summary,
+            sponsor_id: bills.sponsor_id,
+            created_at: bills.created_at
           })
           .from(bill)
-          .where(eq(bill.id, contentId));
+          .where(eq(bills.id, content_id));
 
         if (!billData) {
           return {
             title: 'Bill not found',
             text: '',
             author: { id: '', name: 'Unknown', email: '' },
-            createdAt: new Date()
+            created_at: new Date()
           };
         }
 
         // Get sponsor details if available
         let sponsorData: { id: number; name: string; email: string | null } | null = null;
-        if (billData.sponsorId) {
+        if (billData.sponsor_id) {
           const sponsorResult = await db
-            .select({ id: sponsor.id, name: sponsor.name, email: sponsor.email })
+            .select({ id: sponsors.id, name: sponsors.name, email: sponsors.email })
             .from(sponsor)
-            .where(eq(sponsor.id, billData.sponsorId));
+            .where(eq(sponsors.id, billData.sponsor_id));
           sponsorData = sponsorResult[0] || null;
         }
 
@@ -316,31 +315,31 @@ export class ModerationQueueService {
                 email: sponsorData.email || '' 
               }
             : { 
-                id: billData.sponsorId?.toString() || '', 
+                id: billData.sponsor_id?.toString() || '', 
                 name: 'Unknown', 
                 email: '' 
               },
-          createdAt: billData.createdAt
+          created_at: billData.created_at
         };
 
-      } else if (contentType === 'comment') {
+      } else if (content_type === 'comment') {
         const [commentData] = await db
           .select({
-            text: billComment.content,
-            authorId: billComment.userId,
-            createdAt: billComment.createdAt,
-            authorName: user.name,
-            authorEmail: user.email
+            text: comments.content,
+            authorId: comments.user_id,
+            created_at: comments.created_at,
+            authorName: users.name,
+            authorEmail: users.email
           })
-          .from(billComment)
-          .innerJoin(user, eq(billComment.userId, user.id))
-          .where(eq(billComment.id, contentId));
+          .from(comments)
+          .innerJoin(user, eq(comments.user_id, users.id))
+          .where(eq(comments.id, content_id));
 
         if (!commentData) {
           return {
             text: 'Comment not found',
             author: { id: '', name: 'Unknown', email: '' },
-            createdAt: new Date()
+            created_at: new Date()
           };
         }
 
@@ -351,7 +350,7 @@ export class ModerationQueueService {
             name: commentData.authorName,
             email: commentData.authorEmail
           },
-          createdAt: commentData.createdAt
+          created_at: commentData.created_at
         };
       }
 
@@ -359,20 +358,20 @@ export class ModerationQueueService {
       return {
         text: 'Content details not available for this type',
         author: { id: '', name: 'System', email: '' },
-        createdAt: new Date()
+        created_at: new Date()
       };
 
     } catch (error) {
       logger.error('Error fetching content details:', {
         component: 'ModerationQueue',
-        contentType,
-        contentId,
+        content_type,
+        content_id,
         error: error instanceof Error ? error.message : String(error)
       });
       return {
         text: 'Error loading content',
         author: { id: '', name: 'Unknown', email: '' },
-        createdAt: new Date()
+        created_at: new Date()
       };
     }
   }

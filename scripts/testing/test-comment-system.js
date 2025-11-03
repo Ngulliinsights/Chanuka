@@ -21,8 +21,8 @@ async function testCommentSystem() {
     // Test 2: Create a new comment (should use fallback)
     logger.info('2. Testing createComment...', { component: 'Chanuka' });
     const newComment = await commentService.createComment({
-      billId: 1,
-      userId: 'test-user-123',
+      bill_id: 1,
+      user_id: 'test-user-123',
       content: 'This is a test comment to verify the system works properly.',
       commentType: 'general'
     });
@@ -56,9 +56,9 @@ async function testCommentSystem() {
       'This is a test comment with some CAPS and multiple exclamation marks!!!'
     );
     console.log(`✅ Content analysis completed:`);
-    console.log(`   Toxicity score: ${analysis.toxicityScore.toFixed(3)}`);
-    console.log(`   Spam score: ${analysis.spamScore.toFixed(3)}`);
-    console.log(`   Sentiment score: ${analysis.sentimentScore.toFixed(3)}`);
+    console.log(`   Toxicity score: ${analysis.toxicity_score.toFixed(3)}`);
+    console.log(`   Spam score: ${analysis.spam_score.toFixed(3)}`);
+    console.log(`   Sentiment score: ${analysis.sentiment_score.toFixed(3)}`);
     console.log(`   Flags: ${analysis.flags.join(', ') || 'None'}\n`);
 
     // Test 6: Flag content

@@ -1,21 +1,20 @@
 // Community feature types
-export interface Comment {
-  id: string;
+export interface Comment { id: string;
   content: string;
   authorId: string;
   authorName: string;
   authorAvatar?: string;
-  billId?: string;
-  parentId?: string;
+  bill_id?: string;
+  parent_id?: string;
   replies?: Comment[];
   votes: number;
   userVote?: 'up' | 'down' | null;
-  createdAt: string;
-  updatedAt?: string;
+  created_at: string;
+  updated_at?: string;
   isEdited: boolean;
   attachments?: Attachment[];
   mentions?: Mention[];
-}
+ }
 
 export interface Attachment {
   id: string;
@@ -26,54 +25,50 @@ export interface Attachment {
   mimeType?: string;
 }
 
-export interface Mention {
-  id: string;
-  userId: string;
+export interface Mention { id: string;
+  user_id: string;
   username: string;
   start: number;
   end: number;
-}
+ }
 
-export interface DiscussionThread {
-  id: string;
+export interface DiscussionThread { id: string;
   title: string;
-  billId?: string;
+  bill_id?: string;
   authorId: string;
   authorName: string;
   content: string;
   tags: string[];
   isSticky: boolean;
   isLocked: boolean;
-  viewCount: number;
+  view_count: number;
   replyCount: number;
   lastReplyAt?: string;
   lastReplyBy?: string;
-  createdAt: string;
-  updatedAt?: string;
+  created_at: string;
+  updated_at?: string;
   participants: ThreadParticipant[];
-}
+ }
 
-export interface ThreadParticipant {
-  userId: string;
+export interface ThreadParticipant { user_id: string;
   username: string;
   avatar?: string;
   joinedAt: string;
   lastSeenAt: string;
   postCount: number;
-}
+ }
 
-export interface SocialShare {
-  id: string;
-  billId?: string;
+export interface SocialShare { id: string;
+  bill_id?: string;
   threadId?: string;
   platform: 'twitter' | 'facebook' | 'linkedin' | 'email';
   url: string;
   title: string;
   description?: string;
   sharedBy: string;
-  sharedAt: string;
+  shared_at: string;
   clickCount: number;
-}
+ }
 
 export interface CommunityStats {
   totalUsers: number;
@@ -85,42 +80,38 @@ export interface CommunityStats {
   recentActivity: ActivityItem[];
 }
 
-export interface Contributor {
-  userId: string;
+export interface Contributor { user_id: string;
   username: string;
   avatar?: string;
-  commentCount: number;
+  comment_count: number;
   threadCount: number;
   reputation: number;
   badge?: string;
-}
+ }
 
-export interface ActivityItem {
-  id: string;
+export interface ActivityItem { id: string;
   type: 'comment' | 'thread' | 'vote' | 'share';
-  userId: string;
+  user_id: string;
   username: string;
-  billId?: string;
+  bill_id?: string;
   threadId?: string;
   content: string;
-  createdAt: string;
-}
+  created_at: string;
+  }
 
 // API request/response types
-export interface CreateCommentRequest {
-  content: string;
-  billId?: string;
-  parentId?: string;
+export interface CreateCommentRequest { content: string;
+  bill_id?: string;
+  parent_id?: string;
   attachments?: File[];
-}
+ }
 
-export interface CreateThreadRequest {
-  title: string;
+export interface CreateThreadRequest { title: string;
   content: string;
-  billId?: string;
+  bill_id?: string;
   tags: string[];
   isSticky?: boolean;
-}
+ }
 
 export interface UpdateCommentRequest {
   content: string;
@@ -128,25 +119,23 @@ export interface UpdateCommentRequest {
 }
 
 export interface VoteRequest {
-  commentId: string;
+  comment_id: string;
   vote: 'up' | 'down' | null;
 }
 
-export interface ShareRequest {
-  billId?: string;
+export interface ShareRequest { bill_id?: string;
   threadId?: string;
   platform: 'twitter' | 'facebook' | 'linkedin' | 'email';
   message?: string;
-}
+ }
 
-export interface CommunityFilters {
-  billId?: string;
+export interface CommunityFilters { bill_id?: string;
   authorId?: string;
   tags?: string[];
   sortBy?: 'newest' | 'oldest' | 'popular' | 'trending';
   limit?: number;
   offset?: number;
-}
+ }
 
 export interface CommentsResponse {
   comments: Comment[];
@@ -161,26 +150,23 @@ export interface ThreadsResponse {
 }
 
 // Real-time event types
-export interface CommentEvent {
-  type: 'comment_created' | 'comment_updated' | 'comment_deleted' | 'vote_changed';
-  commentId: string;
-  billId?: string;
+export interface CommentEvent { type: 'comment_created' | 'comment_updated' | 'comment_deleted' | 'vote_changed';
+  comment_id: string;
+  bill_id?: string;
   data: any;
-}
+ }
 
-export interface ThreadEvent {
-  type: 'thread_created' | 'thread_updated' | 'thread_locked' | 'thread_unlocked';
+export interface ThreadEvent { type: 'thread_created' | 'thread_updated' | 'thread_locked' | 'thread_unlocked';
   threadId: string;
-  billId?: string;
+  bill_id?: string;
   data: any;
-}
+ }
 
-export interface UserEvent {
-  type: 'user_joined' | 'user_left' | 'user_typing';
-  userId: string;
+export interface UserEvent { type: 'user_joined' | 'user_left' | 'user_typing';
+  user_id: string;
   threadId?: string;
   data: any;
-}
+ }
 
 
 

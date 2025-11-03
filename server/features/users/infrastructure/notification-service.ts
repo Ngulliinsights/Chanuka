@@ -1,20 +1,18 @@
 import { notificationService, NotificationData } from '../../../infrastructure/notifications/notification-service.js';
 import { logger } from '../../../../shared/core/index.js';
 
-export interface UserNotificationData extends Omit<NotificationData, 'userId'> {
-  userId: string;
+export interface UserNotificationData extends Omit<NotificationData, 'user_id'> { user_id: string;
+ }
+
+export interface BulkUserNotificationData extends Omit<NotificationData, 'user_id'> {
+  user_ids: string[];
 }
 
-export interface BulkUserNotificationData extends Omit<NotificationData, 'userId'> {
-  userIds: string[];
-}
-
-export interface UserActivityNotification {
-  userId: string;
+export interface UserActivityNotification { user_id: string;
   activityType: 'login' | 'logout' | 'profile_update' | 'verification_submitted' | 'verification_approved' | 'verification_rejected';
   details?: string;
   relatedBillId?: number;
-}
+ }
 
 /**
  * User Notification Service
@@ -37,10 +35,10 @@ export class UserNotificationService {
   async sendUserNotification(data: UserNotificationData): Promise<any> {
     try {
       const notification = await notificationService.createNotification(data);
-      logger.info(`📱 User notification sent to ${data.userId}: ${data.title}`);
+      logger.info(`📱 User notification sent to ${data.user_id}: ${data.title}`);
       return notification;
     } catch (error) {
-      logger.error(`❌ Failed to send notification to user ${data.userId}`, { error });
+      logger.error(`❌ Failed to send notification to user ${data.user_id}`, { error });
       throw error;
     }
   }
@@ -48,9 +46,9 @@ export class UserNotificationService {
   /**
    * Send bulk notifications to multiple users
    */
-  async sendBulkUserNotifications(data: BulkUserNotificationData): Promise<{ success: number; failed: number; errors: Array<{ userId: string; error: string }> }> {
+  async sendBulkUserNotifications(data: BulkUserNotificationData): Promise<{ success: number; failed: number; errors: Array<{ user_id: string; error: string  }> }> {
     try {
-      const result = await notificationService.createBulkNotifications(data.userIds, {
+      const result = await notificationService.createBulkNotifications(data.user_ids, {
         type: data.type,
         title: data.title,
         message: data.message,
@@ -78,17 +76,16 @@ export class UserNotificationService {
    * Send verification status notification
    */
   async sendVerificationStatusNotification(
-    userId: string,
+    user_id: string,
     verificationId: string,
     status: 'submitted' | 'approved' | 'rejected' | 'pending',
     billTitle?: string,
     reason?: string
-  ): Promise<any> {
-    const title = this.getVerificationStatusTitle(status);
+  ): Promise<any> { const title = this.getVerificationStatusTitle(status);
     const message = this.getVerificationStatusMessage(status, billTitle, reason);
 
     return this.sendUserNotification({
-      userId,
+      user_id,
       type: 'verification_status',
       title,
       message,
@@ -97,19 +94,18 @@ export class UserNotificationService {
         status,
         billTitle,
         reason
-      }
+       }
     });
   }
 
   /**
    * Send welcome notification for new users
    */
-  async sendWelcomeNotification(userId: string, userName: string): Promise<any> {
-    return this.sendUserNotification({
-      userId,
+  async sendWelcomeNotification(user_id: string, userName: string): Promise<any> { return this.sendUserNotification({
+      user_id,
       type: 'system_alert',
       title: 'Welcome to Chanuka!',
-      message: `Welcome ${userName}! Your account has been created successfully. Start exploring legislation and participating in civic engagement.`,
+      message: `Welcome ${userName }! Your account has been created successfully. Start exploring legislation and participating in civic engagement.`,
       metadata: {
         welcome: true,
         userName
@@ -121,34 +117,32 @@ export class UserNotificationService {
    * Send account security notification
    */
   async sendSecurityNotification(
-    userId: string,
+    user_id: string,
     securityEvent: 'password_changed' | 'email_changed' | 'login_from_new_device' | 'suspicious_activity',
     details?: string
-  ): Promise<any> {
-    const title = this.getSecurityEventTitle(securityEvent);
+  ): Promise<any> { const title = this.getSecurityEventTitle(securityEvent);
     const message = this.getSecurityEventMessage(securityEvent, details);
 
     return this.sendUserNotification({
-      userId,
+      user_id,
       type: 'system_alert',
       title,
       message,
       metadata: {
         securityEvent,
         details
-      }
+       }
     });
   }
 
   /**
    * Send profile update notification
    */
-  async sendProfileUpdateNotification(userId: string, updatedFields: string[]): Promise<any> {
-    return this.sendUserNotification({
-      userId,
+  async sendProfileUpdateNotification(user_id: string, updatedFields: string[]): Promise<any> { return this.sendUserNotification({
+      user_id,
       type: 'system_alert',
       title: 'Profile Updated',
-      message: `Your profile has been updated. Changes: ${updatedFields.join(', ')}`,
+      message: `Your profile has been updated. Changes: ${updatedFields.join(', ') }`,
       metadata: {
         profileUpdate: true,
         updatedFields
@@ -160,62 +154,55 @@ export class UserNotificationService {
    * Get user notifications with filtering
    */
   async getUserNotifications(
-    userId: string,
+    user_id: string,
     options: {
       limit?: number;
       offset?: number;
       unreadOnly?: boolean;
       type?: string;
     } = {}
-  ): Promise<any[]> {
-    return notificationService.getUserNotifications(userId, options);
-  }
+  ): Promise<any[]> { return notificationService.getUserNotifications(user_id, options);
+   }
 
   /**
    * Mark user notification as read
    */
-  async markNotificationAsRead(userId: string, notificationId: number): Promise<void> {
-    return notificationService.markAsRead(userId, notificationId);
-  }
+  async markNotificationAsRead(user_id: string, notificationId: number): Promise<void> { return notificationService.markAsRead(user_id, notificationId);
+   }
 
   /**
    * Mark all user notifications as read
    */
-  async markAllNotificationsAsRead(userId: string): Promise<void> {
-    return notificationService.markAllAsRead(userId);
-  }
+  async markAllNotificationsAsRead(user_id: string): Promise<void> { return notificationService.markAllAsRead(user_id);
+   }
 
   /**
    * Get unread notification count for user
    */
-  async getUnreadNotificationCount(userId: string): Promise<number> {
-    return notificationService.getUnreadCount(userId);
-  }
+  async getUnreadNotificationCount(user_id: string): Promise<number> { return notificationService.getUnreadCount(user_id);
+   }
 
   /**
    * Delete user notification
    */
-  async deleteNotification(userId: string, notificationId: number): Promise<void> {
-    return notificationService.deleteNotification(userId, notificationId);
-  }
+  async deleteNotification(user_id: string, notificationId: number): Promise<void> { return notificationService.deleteNotification(user_id, notificationId);
+   }
 
   /**
    * Get user notification statistics
    */
-  async getUserNotificationStats(userId: string): Promise<{
+  async getUserNotificationStats(user_id: string): Promise<{
     total: number;
     unread: number;
     byType: Record<string, number>;
     recentActivity: number;
-  }> {
-    return notificationService.getNotificationStats(userId);
-  }
+  }> { return notificationService.getNotificationStats(user_id);
+   }
 
   /**
    * Build activity notification data
    */
-  private buildActivityNotificationData(activity: UserActivityNotification): UserNotificationData {
-    const { userId, activityType, details, relatedBillId } = activity;
+  private buildActivityNotificationData(activity: UserActivityNotification): UserNotificationData { const { user_id, activityType, details, relatedBillId  } = activity;
 
     let title: string;
     let message: string;
@@ -258,8 +245,7 @@ export class UserNotificationService {
         type = 'system_alert';
     }
 
-    return {
-      userId,
+    return { user_id,
       type,
       title,
       message,
@@ -267,7 +253,7 @@ export class UserNotificationService {
       metadata: {
         activityType,
         details
-      }
+       }
     };
   }
 

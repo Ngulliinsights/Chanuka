@@ -50,7 +50,7 @@ export const analyticsApi = {
   /**
    * Get detailed analytics for a specific bill
    */
-  async getBillAnalytics(billId: string, filters?: AnalyticsFilters): Promise<BillAnalytics> {
+  async getBillAnalytics(bill_id: string, filters?: AnalyticsFilters): Promise<BillAnalytics> {
     const params = new URLSearchParams();
 
     if (filters?.dateRange) {
@@ -58,13 +58,13 @@ export const analyticsApi = {
       params.append('endDate', filters.dateRange.end);
     }
 
-    return api.get(`/api/analytics/bills/${billId}?${params.toString()}`);
+    return api.get(`/api/analytics/bills/${ bill_id }?${params.toString()}`);
   },
 
   /**
    * Get engagement report for a bill
    */
-  async getEngagementReport(billId: string, filters?: AnalyticsFilters): Promise<EngagementReport> {
+  async getEngagementReport(bill_id: string, filters?: AnalyticsFilters): Promise<EngagementReport> {
     const params = new URLSearchParams();
 
     if (filters?.dateRange) {
@@ -72,25 +72,23 @@ export const analyticsApi = {
       params.append('endDate', filters.dateRange.end);
     }
 
-    return api.get(`/api/analytics/bills/${billId}/engagement?${params.toString()}`);
+    return api.get(`/api/analytics/bills/${ bill_id }/engagement?${params.toString()}`);
   },
 
   /**
    * Get conflict analysis for a bill
    */
-  async getConflictReport(billId: string): Promise<ConflictReport> {
-    return api.get(`/api/analytics/bills/${billId}/conflicts`);
+  async getConflictReport(bill_id: string): Promise<ConflictReport> { return api.get(`/api/analytics/bills/${bill_id }/conflicts`);
   },
 
   /**
    * Get user activity analytics
    */
-  async getUserActivity(userId?: string, filters?: AnalyticsFilters): Promise<AnalyticsResponse<UserActivity[]>> {
-    const params = new URLSearchParams();
+  async getUserActivity(user_id?: string, filters?: AnalyticsFilters): Promise<AnalyticsResponse<UserActivity[]>> { const params = new URLSearchParams();
 
-    if (userId) {
-      params.append('userId', userId);
-    }
+    if (user_id) {
+      params.append('user_id', user_id);
+     }
 
     if (filters?.dateRange) {
       params.append('startDate', filters.dateRange.start);
@@ -143,8 +141,7 @@ export const analyticsApi = {
   /**
    * Get stakeholder impact analysis
    */
-  async getStakeholderAnalysis(billId?: string): Promise<any> {
-    const endpoint = billId ? `/api/analytics/stakeholders/${billId}` : '/api/analytics/stakeholders';
+  async getStakeholderAnalysis(bill_id?: string): Promise<any> { const endpoint = bill_id ? `/api/analytics/stakeholders/${bill_id }` : '/api/analytics/stakeholders';
     return api.get(endpoint);
   },
 

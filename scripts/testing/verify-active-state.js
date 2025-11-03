@@ -19,7 +19,7 @@ testCases.forEach(({ path, currentPath, expected, description }) => {
   try {
     const result = isNavigationPathActive(path, currentPath);
     const status = result === expected ? '✅ PASS' : '❌ FAIL';
-    console.log(`${status} ${description}: isActive('${path}', '${currentPath}') = ${result} (expected: ${expected})`);
+    console.log(`${status} ${description}: is_active('${path}', '${currentPath}') = ${result} (expected: ${expected})`);
   } catch (error) {
     console.log(`❌ ERROR ${description}: ${error.message}`);
   }

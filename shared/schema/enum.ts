@@ -1,54 +1,157 @@
+// ============================================================================
+// ENUM DEFINITIONS - Shared across all schemas
+// ============================================================================
+
 import { pgEnum } from "drizzle-orm/pg-core";
 
-// ============================================================================
-// ENUMS - Native PostgreSQL enums for type safety across the stack
-// ============================================================================
+// Kenyan Counties (47 counties as per 2010 Constitution)
+export const kenyanCountyEnum = pgEnum('kenyan_county', [
+  'baringo', 'bomet', 'bungoma', 'busia', 'elgeyo_marakwet', 'embu', 'garissa',
+  'homa_bay', 'isiolo', 'kajiado', 'kakamega', 'kericho', 'kiambu', 'kilifi',
+  'kirinyaga', 'kisii', 'kisumu', 'kitui', 'kwale', 'laikipia', 'lamu', 'machakos',
+  'makueni', 'mandera', 'marsabit', 'meru', 'migori', 'mombasa', 'muranga',
+  'nairobi', 'nakuru', 'nandi', 'narok', 'nyamira', 'nyandarua', 'nyeri',
+  'samburu', 'siaya', 'taita_taveta', 'tana_river', 'tharaka_nithi', 'trans_nzoia',
+  'turkana', 'uasin_gishu', 'vihiga', 'wajir', 'west_pokot'
+]);
 
-export const userRoleEnum = pgEnum("user_role", ["citizen", "expert", "admin", "journalist", "advocate"]);
-export const verificationStatusEnum = pgEnum("verification_status", ["pending", "verified", "rejected", "disputed"]);
-export const billStatusEnum = pgEnum("bill_status", ["introduced", "committee", "passed", "failed", "signed"]);
-export const commentTypeEnum = pgEnum("comment_type", ["general", "expert_analysis", "concern", "support"]);
-export const voteTypeEnum = pgEnum("vote_type", ["up", "down"]);
-export const sponsorshipTypeEnum = pgEnum("sponsorship_type", ["primary", "co_sponsor", "supporter"]);
-export const analysisTypeEnum = pgEnum("analysis_type", ["constitutional", "stakeholder", "impact", "complexity"]);
-export const conflictTypeEnum = pgEnum("conflict_type", ["constitutional", "procedural", "contradictory"]);
-export const severityEnum = pgEnum("severity", ["info", "low", "medium", "high", "critical"]);
-export const stakeholderTypeEnum = pgEnum("stakeholder_type", ["business", "ngo", "agency", "individual"]);
-export const affiliationTypeEnum = pgEnum("affiliation_type", ["economic", "professional", "advocacy", "cultural"]);
-export const affiliationConflictTypeEnum = pgEnum("affiliation_conflict_type", ["financial", "ownership", "influence", "representation", "none", "previous"]);
-export const disclosureTypeEnum = pgEnum("disclosure_type", ["financial", "business", "family"]);
-export const moderationContentTypeEnum = pgEnum("moderation_content_type", ["comment", "bill", "user_profile", "sponsor_transparency"]);
-export const flagTypeEnum = pgEnum("flag_type", ["spam", "harassment", "misinformation", "inappropriate", "copyright", "other"]);
+// Parliamentary Chambers
+export const chamberEnum = pgEnum('chamber', [
+  'national_assembly', 'senate', 'county_assembly'
+]);
 
-// --- REFINED: Split moderationStatusEnum for domain-specific contexts ---
+// Political Parties (major parties in Kenya)
+export const partyEnum = pgEnum('party', [
+  'jubilee', 'oda', 'wiper', 'kenya_kwanza', 'azimio', 'independent', 'other'
+]);
 
-// Original enum (for reference, now deprecated by specific enums):
-// export const moderationStatusEnum = pgEnum("moderation_status", ["pending", "in_progress", "reviewed", "resolved", "dismissed", "escalated", "approved", "rejected", "active", "open", "investigating", "contained", "closed"]);
+// Bill Status Lifecycle
+export const billStatusEnum = pgEnum('bill_status', [
+  'drafted', 'introduced', 'first_reading', 'second_reading', 'committee_stage',
+  'report_stage', 'third_reading', 'presidential_assent', 'act_of_parliament',
+  'withdrawn', 'lapsed'
+]);
 
-// NEW: For user-generated content reports (replaces contentFlag/moderationFlag)
-export const reportStatusEnum = pgEnum("report_status", ["pending", "reviewed", "resolved", "dismissed", "escalated"]);
+// User Roles
+export const userRoleEnum = pgEnum('user_role', [
+  'citizen', 'admin', 'moderator', 'expert', 'ambassador', 'organizer'
+]);
 
-// NEW: For security incidents
-export const incidentStatusEnum = pgEnum("incident_status", ["open", "investigating", "contained", "resolved", "closed"]);
+// Verification Status
+export const verificationStatusEnum = pgEnum('verification_status', [
+  'pending', 'verified', 'disputed', 'false', 'outdated'
+]);
 
-// NEW: For compliance checks
-export const complianceStatusEnum = pgEnum("compliance_status", ["pending", "compliant", "non_compliant", "remediating"]);
+// Moderation Status
+export const moderationStatusEnum = pgEnum('moderation_status', [
+  'pending', 'approved', 'rejected', 'flagged', 'under_review'
+]);
 
-// NEW: For the 'evaluation' table in the dashboard
-export const evaluationStatusEnum = pgEnum("evaluation_status", ["pending", "screening", "interviewing", "rejected", "hired"]);
+// Comment Vote Types
+export const commentVoteTypeEnum = pgEnum('comment_vote_type', [
+  'upvote', 'downvote'
+]);
 
-// --- End of refinement ---
+// Bill Vote Types
+export const billVoteTypeEnum = pgEnum('bill_vote_type', [
+  'for', 'against', 'abstain'
+]);
 
-export const moderationActionTypeEnum = pgEnum("moderation_action_type", ["warn", "hide", "delete", "ban_user", "verify", "highlight"]);
-export const securityResultEnum = pgEnum("security_result", ["success", "failure", "blocked"]);
-export const complianceCheckTypeEnum = pgEnum("compliance_check_type", ["gdpr", "ccpa", "sox", "pci_dss", "custom"]);
-export const threatTypeEnum = pgEnum("threat_type", ["malicious_ip", "bot", "scanner"]);
-export const threatSourceEnum = pgEnum("threat_source", ["internal", "external_feed", "manual"]);
-export const regulationStatusEnum = pgEnum("regulation_status", ["proposed", "enacted", "repealed"]);
-export const syncStatusEnum = pgEnum("sync_status", ["pending", "running", "completed", "failed", "cancelled"]);
-export const syncErrorLevelEnum = pgEnum("sync_error_level", ["warning", "error", "critical"]);
-export const conflictResolutionEnum = pgEnum("conflict_resolution", ["pending", "automatic", "manual"]);
-export const notificationTypeEnum = pgEnum("notification_type", ["bill_update", "comment_reply", "verification_status"]);
-export const attackPatternTypeEnum = pgEnum("attack_pattern_type", ["regex", "behavioral", "statistical"]);
-export const securityAlertStatusEnum = pgEnum("security_alert_status", ["active", "acknowledged", "resolved", "dismissed"]);
-export const verificationTypeEnum = pgEnum("verification_type", ["accuracy", "constitutional", "impact", "stakeholder", "community"]);
+// Engagement Types
+export const engagementTypeEnum = pgEnum('engagement_type', [
+  'view', 'comment', 'vote', 'share', 'track', 'report'
+]);
+
+// Notification Types
+export const notificationTypeEnum = pgEnum('notification_type', [
+  'bill_update', 'comment_reply', 'milestone', 'campaign_update', 'moderation_action'
+]);
+
+// Severity Levels
+export const severityEnum = pgEnum('severity', [
+  'low', 'medium', 'high', 'critical'
+]);
+
+// Court Levels
+export const courtLevelEnum = pgEnum('court_level', [
+  'supreme', 'appeal', 'high', 'magistrate', 'tribunal'
+]);
+
+// Campaign Status
+export const campaignStatusEnum = pgEnum('campaign_status', [
+  'draft', 'active', 'paused', 'completed', 'cancelled'
+]);
+
+// Action Types for Advocacy Campaigns
+export const actionTypeEnum = pgEnum('action_type', [
+  'call_mp', 'submit_testimony', 'share_social', 'attend_hearing', 
+  'organize_event', 'petition', 'email_campaign', 'community_meeting'
+]);
+
+// Action Status
+export const actionStatusEnum = pgEnum('action_status', [
+  'active', 'paused', 'completed', 'cancelled', 'archived'
+]);
+
+// Ambassador Status
+export const ambassadorStatusEnum = pgEnum('ambassador_status', [
+  'pending', 'active', 'inactive', 'suspended', 'certified'
+]);
+
+// Session Types for Facilitation
+export const sessionTypeEnum = pgEnum('session_type', [
+  'bill_discussion', 'civic_education', 'registration_drive', 'community_forum',
+  'workshop', 'consultation', 'awareness_campaign'
+]);
+
+// Participation Methods
+export const participationMethodEnum = pgEnum('participation_method', [
+  'sms', 'ussd', 'voice', 'mobile_app', 'web', 'offline', 'hybrid'
+]);
+
+// Additional enums for advanced features
+export const electoralCycleTypeEnum = pgEnum('electoral_cycle_type', [
+  'general', 'by_election', 'referendum', 'local'
+]);
+
+export const disinformationTacticEnum = pgEnum('disinformation_tactic', [
+  'astroturfing', 'bot_networks', 'coordinated_harassment', 
+  'false_narratives', 'deepfakes', 'manipulation'
+]);
+
+export const influenceChannelEnum = pgEnum('influence_channel', [
+  'diplomatic', 'economic', 'cultural', 'military', 'informational', 'technological'
+]);
+
+export const mediaTypeEnum = pgEnum('media_type', [
+  'newspaper', 'tv', 'radio', 'online', 'social_media', 'podcast'
+]);
+
+export const organizationTypeEnum = pgEnum('organization_type', [
+  'ngo', 'cbo', 'faith_based', 'professional_association', 'union', 'think_tank'
+]);
+
+export const riskCategoryEnum = pgEnum('risk_category', [
+  'legislative', 'executive', 'judicial', 'social', 'economic', 'technological', 'international'
+]);
+
+// Export all enums for use in schemas
+export type KenyanCounty = typeof kenyanCountyEnum.enumValues[number];
+export type Chamber = typeof chamberEnum.enumValues[number];
+export type Party = typeof partyEnum.enumValues[number];
+export type BillStatus = typeof billStatusEnum.enumValues[number];
+export type UserRole = typeof userRoleEnum.enumValues[number];
+export type VerificationStatus = typeof verificationStatusEnum.enumValues[number];
+export type ModerationStatus = typeof moderationStatusEnum.enumValues[number];
+export type CommentVoteType = typeof commentVoteTypeEnum.enumValues[number];
+export type BillVoteType = typeof billVoteTypeEnum.enumValues[number];
+export type EngagementType = typeof engagementTypeEnum.enumValues[number];
+export type NotificationType = typeof notificationTypeEnum.enumValues[number];
+export type Severity = typeof severityEnum.enumValues[number];
+export type CourtLevel = typeof courtLevelEnum.enumValues[number];
+export type CampaignStatus = typeof campaignStatusEnum.enumValues[number];
+export type ActionType = typeof actionTypeEnum.enumValues[number];
+export type ActionStatus = typeof actionStatusEnum.enumValues[number];
+export type AmbassadorStatus = typeof ambassadorStatusEnum.enumValues[number];
+export type SessionType = typeof sessionTypeEnum.enumValues[number];
+export type ParticipationMethod = typeof participationMethodEnum.enumValues[number];

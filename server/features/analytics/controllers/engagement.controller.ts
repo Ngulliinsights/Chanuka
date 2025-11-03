@@ -7,9 +7,9 @@ export const getEngagementMetricsSchema = z.object({
   query: z.object({
     startDate: z.string().datetime().optional(),
     endDate: z.string().datetime().optional(),
-    billIds: z.string().transform(val => val.split(',').map(Number)).optional(),
+    bill_ids: z.string().transform(val => val.split(',').map(Number)).optional(),
     categories: z.string().transform(val => val.split(',')).optional(),
-    userIds: z.string().transform(val => val.split(',')).optional(),
+    user_ids: z.string().transform(val => val.split(',')).optional(),
     limit: z.string().transform(val => Math.min(parseInt(val) || 100, 1000)).optional()
   })
 });
@@ -22,13 +22,12 @@ export const getEngagementTrendsSchema = z.object({
   })
 });
 
-export const getBillEngagementSchema = z.object({
-  params: z.object({
-    billId: z.string().transform(val => {
+export const getBillEngagementSchema = z.object({ params: z.object({
+    bill_id: z.string().transform(val => {
       const num = parseInt(val);
       if (isNaN(num)) throw new Error('Invalid bill ID');
       return num;
-    })
+     })
   })
 });
 
@@ -70,7 +69,7 @@ export class EngagementController {
    *           format: date-time
    *         description: End date for metrics (ISO 8601 format)
    *       - in: query
-   *         name: billIds
+   *         name: bill_ids
    *         schema:
    *           type: array
    *           items:
@@ -84,7 +83,7 @@ export class EngagementController {
    *             type: string
    *         description: Filter by bill categories (comma-separated)
    *       - in: query
-   *         name: userIds
+   *         name: user_ids
    *         schema:
    *           type: array
    *           items:
@@ -123,17 +122,17 @@ export class EngagementController {
 
     return {
       totalUsers: leaderboard.topCommenters.length + leaderboard.topVoters.length,
-      totalComments: leaderboard.topCommenters.reduce((sum, user) => sum + user.commentCount, 0),
-      totalVotes: leaderboard.topCommenters.reduce((sum, user) => sum + user.totalVotes, 0),
+      totalComments: leaderboard.topCommenters.reduce((sum, user) => sum + users.comment_count, 0),
+      totalVotes: leaderboard.topCommenters.reduce((sum, user) => sum + users.totalVotes, 0),
       topCategories: [], // Would need implementation
       dateRange: {
         startDate: query.startDate,
         endDate: query.endDate
       },
       filters: {
-        billIds: query.billIds,
+        bill_ids: query.bill_ids,
         categories: query.categories,
-        userIds: query.userIds
+        user_ids: query.user_ids
       }
     };
   }
@@ -188,7 +187,7 @@ export class EngagementController {
   static async getEngagementTrends(input: { body: any; query: z.infer<typeof getEngagementTrendsSchema>['query']; params: any }) {
     const { query } = input;
     // For demonstration, get trends for bill ID 1 (this would need proper implementation)
-    // The existing service method requires a billId, but the route expects global trends
+    // The existing service method requires a bill_id, but the route expects global trends
     const sampleBillId = 1; // This is a placeholder
     const period = query.period === 'monthly' ? 'weekly' : query.period; // Map monthly to weekly
 
@@ -199,7 +198,7 @@ export class EngagementController {
    * Get bill-specific engagement analytics
    */
   static async getBillEngagementAnalytics(input: z.infer<typeof getBillEngagementSchema>['params']) {
-    return await engagementAnalyticsService.getBillEngagementMetrics(input.billId);
+    return await engagementAnalyticsService.getBillEngagementMetrics(input.bill_id);
   }
 
   /**
@@ -207,19 +206,18 @@ export class EngagementController {
    * Note: This method doesn't exist in the service - using leaderboard as approximation
    */
   static async getUserEngagementPatterns(
-    input: { userIds?: string[]; limit?: number },
+    input: { user_ids?: string[]; limit?: number },
     req: AuthenticatedRequest
-  ) {
-    // Use leaderboard data as approximation for user patterns
+  ) { // Use leaderboard data as approximation for user patterns
     const leaderboard = await engagementAnalyticsService.getEngagementLeaderboard('30d', input.limit || 10);
 
     const patterns = leaderboard.topCommenters.map(user => ({
-      userId: user.userId,
-      userName: user.userName,
-      totalEngagements: user.commentCount + user.totalVotes,
+      user_id: users.user_id,
+      userName: users.userName,
+      totalEngagements: users.comment_count + users.totalVotes,
       lastActive: new Date(), // Would need proper implementation
-      engagementScore: user.averageVotes
-    }));
+      engagement_score: users.averageVotes
+     }));
 
     return { patterns, count: patterns.length };
   }
@@ -284,8 +282,8 @@ export class EngagementController {
       format: 'json' | 'csv';
       startDate?: string;
       endDate?: string;
-      billIds?: number[];
-      userIds?: string[];
+      bill_ids?: number[];
+      user_ids?: string[];
     },
     req: AuthenticatedRequest
   ) {
@@ -304,7 +302,7 @@ export class EngagementController {
       const csv = [
         'User ID,Name,Comments,Votes,Avg Votes',
         ...leaderboard.topCommenters.map(user =>
-          `${user.userId},${user.userName},${user.commentCount},${user.totalVotes},${user.averageVotes}`
+          `${users.user_id},${users.userName},${users.comment_count},${users.totalVotes},${users.averageVotes}`
         )
       ].join('\n');
       return csv;
@@ -341,42 +339,39 @@ export class EngagementController {
   /**
    * Get user-specific engagement analytics
    */
-  static async getUserEngagementAnalytics(req: AuthenticatedRequest) {
-    const userId = req.user!.id;
+  static async getUserEngagementAnalytics(req: AuthenticatedRequest) { const user_id = req.user!.id;
 
     try {
       // Try to get user metrics using existing service method
-      const metrics = await engagementAnalyticsService.getUserEngagementMetrics(userId, '30d');
+      const metrics = await engagementAnalyticsService.getUserEngagementMetrics(user_id, '30d');
       return {
         userEngagement: metrics,
-        userId
-      };
-    } catch (error) {
-      // Fallback if user not found
+        user_id
+       };
+    } catch (error) { // Fallback if user not found
       return {
         userEngagement: null,
-        userId,
+        user_id,
         error: 'User metrics not available'
-      };
+       };
     }
   }
 
   /**
    * Get engagement leaderboard
    */
-  static async getEngagementLeaderboard(input: { limit?: number }) {
-    const limit = Math.min(input.limit || 10, 100);
+  static async getEngagementLeaderboard(input: { limit?: number }) { const limit = Math.min(input.limit || 10, 100);
     const leaderboard = await engagementAnalyticsService.getEngagementLeaderboard('30d', limit);
 
     // Transform to expected format
     const transformedLeaderboard = leaderboard.topCommenters.slice(0, limit).map((user, index) => ({
       rank: index + 1,
-      userId: user.userId,
-      userName: user.userName,
-      totalEngagements: user.commentCount,
-      engagementScore: user.averageVotes,
+      user_id: users.user_id,
+      userName: users.userName,
+      totalEngagements: users.comment_count,
+      engagement_score: users.averageVotes,
       lastActive: new Date() // Would need proper implementation
-    }));
+     }));
 
     return {
       leaderboard: transformedLeaderboard,

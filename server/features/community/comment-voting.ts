@@ -1,10 +1,10 @@
 import { databaseService } from '../../infrastructure/database/database-service.js';
 import { database as db } from '../../../shared/database/connection';
-import { billComment, User, commentVote } from '../../../shared/schema';
+import { comments, User, comment_votes } from '../../../shared/schema';
 
 // Alias for backward compatibility
-const billComments = billComment;
-const commentVotes = commentVote;
+const comments = comments;
+const comment_votess = comment_votes;
 import { eq, and, sql, desc } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
 import { cacheKeys } from '../../../shared/core/src/caching/key-generator';
@@ -20,11 +20,11 @@ export interface VoteResult {
 }
 
 export interface CommentEngagementStats {
-  commentId: number;
+  comment_id: number;
   upvotes: number;
   downvotes: number;
   netVotes: number;
-  engagementScore: number;
+  engagement_score: number;
   popularityRank: number;
 }
 
@@ -32,49 +32,48 @@ export interface CommentEngagementStats {
  * Comment Voting and Engagement Service
  * Handles upvotes, downvotes, and engagement analytics
  */
-export class CommentVotingService {
-  private readonly VOTE_CACHE_TTL = CACHE_TTL_SHORT;
+export class CommentVotingService { private readonly VOTE_CACHE_TTL = CACHE_TTL_SHORT;
 
   /**
    * Vote on a comment (upvote or downvote)
    */
-  async voteOnComment(commentId: number, userId: string, voteType: 'up' | 'down'): Promise<VoteResult> {
+  async voteOnComment(comment_id: number, user_id: string, vote_type: 'up' | 'down'): Promise<VoteResult> {
     const result = await databaseService.withFallback(
       async () => {
         // Check if comment exists
         const [comment] = await db
           .select()
-          .from(billComments)
-          .where(eq(billComments.id, commentId))
+          .from(comments)
+          .where(eq(comments.id, comment_id))
           .limit(1);
 
         if (!comment) {
           throw new Error('Comment not found');
-        }
+         }
 
         // Check if user has already voted on this comment
         const [existingVote] = await db
           .select()
-          .from(commentVotes)
+          .from(comment_votess)
           .where(and(
-            eq(commentVotes.commentId, commentId),
-            eq(commentVotes.userId, userId)
+            eq(comment_votess.comment_id, comment_id),
+            eq(comment_votess.user_id, user_id)
           ))
           .limit(1);
 
         let upvoteChange = 0;
         let downvoteChange = 0;
-        let finalVoteType: 'up' | 'down' | null = voteType;
+        let finalVoteType: 'up' | 'down' | null = vote_type;
 
         if (existingVote) {
           // User has already voted
-          if (existingVote.voteType === voteType) {
+          if (existingVote.vote_type === vote_type) {
             // Same vote type - remove the vote (toggle off)
             await db
-              .delete(commentVotes)
-              .where(eq(commentVotes.id, existingVote.id));
+              .delete(comment_votess)
+              .where(eq(comment_votess.id, existingVote.id));
 
-            if (voteType === 'up') {
+            if (vote_type === 'up') {
               upvoteChange = -1;
             } else {
               downvoteChange = -1;
@@ -83,14 +82,14 @@ export class CommentVotingService {
           } else {
             // Different vote type - change the vote
             await db
-              .update(commentVotes)
+              .update(comment_votess)
               .set({
-                voteType,
-                updatedAt: new Date()
+                vote_type,
+                updated_at: new Date()
               })
-              .where(eq(commentVotes.id, existingVote.id));
+              .where(eq(comment_votess.id, existingVote.id));
 
-            if (voteType === 'up') {
+            if (vote_type === 'up') {
               upvoteChange = 1;
               downvoteChange = -1;
             } else {
@@ -98,17 +97,16 @@ export class CommentVotingService {
               downvoteChange = 1;
             }
           }
-        } else {
-          // New vote
+        } else { // New vote
           await db
-            .insert(commentVotes)
+            .insert(comment_votess)
             .values({
-              commentId,
-              userId,
-              voteType
-            });
+              comment_id,
+              user_id,
+              vote_type
+             });
 
-          if (voteType === 'up') {
+          if (vote_type === 'up') {
             upvoteChange = 1;
           } else {
             downvoteChange = 1;
@@ -117,17 +115,17 @@ export class CommentVotingService {
 
         // Update comment vote counts in database
         const [updatedComment] = await db
-          .update(billComments)
+          .update(comments)
           .set({
-            upvotes: sql`${billComments.upvotes} + ${upvoteChange}`,
-            downvotes: sql`${billComments.downvotes} + ${downvoteChange}`,
-            updatedAt: new Date()
+            upvotes: sql`${comments.upvotes} + ${upvoteChange}`,
+            downvotes: sql`${comments.downvotes} + ${downvoteChange}`,
+            updated_at: new Date()
           })
-          .where(eq(billComments.id, commentId))
+          .where(eq(comments.id, comment_id))
           .returning();
 
         // Clear related caches
-        await this.clearVotingCaches(commentId, comment.billId);
+        await this.clearVotingCaches(comment_id, comment.bill_id);
 
         return {
           success: true,
@@ -144,7 +142,7 @@ export class CommentVotingService {
         netVotes: 0,
         userVote: null
       },
-      `voteOnComment:${commentId}:${userId}`
+      `voteOnComment:${comment_id}:${ user_id }`
     );
     return result.data;
   }
@@ -152,22 +150,22 @@ export class CommentVotingService {
   /**
    * Get user's vote on a specific comment
    */
-  async getUserVote(commentId: number, userId: string): Promise<'up' | 'down' | null> {
+  async getUserVote(comment_id: number, user_id: string): Promise<'up' | 'down' | null> {
     const result = await databaseService.withFallback(
       async () => {
         const [vote] = await db
-          .select({ voteType: commentVotes.voteType })
-          .from(commentVotes)
+          .select({ vote_type: comment_votess.vote_type })
+          .from(comment_votess)
           .where(and(
-            eq(commentVotes.commentId, commentId),
-            eq(commentVotes.userId, userId)
+            eq(comment_votess.comment_id, comment_id),
+            eq(comment_votess.user_id, user_id)
           ))
           .limit(1);
 
-        return vote ? vote.voteType as 'up' | 'down' : null;
+        return vote ? vote.vote_type as 'up' | 'down' : null;
       },
       null,
-      `getUserVote:${commentId}:${userId}`
+      `getUserVote:${comment_id}:${ user_id }`
     );
     return result.data;
   }
@@ -175,10 +173,10 @@ export class CommentVotingService {
   /**
    * Get voting statistics for multiple comments
    */
-  async getCommentVotingStats(commentIds: number[]): Promise<Map<number, CommentEngagementStats>> {
+  async getCommentVotingStats(comment_ids: number[]): Promise<Map<number, CommentEngagementStats>> {
     const result = await databaseService.withFallback(
       async () => {
-        const cacheKey = `${CACHE_KEYS.COMMENT_VOTES}:stats:${commentIds.join(',')}`;
+        const cacheKey = `${CACHE_KEYS.COMMENT_VOTES}:stats:${comment_ids.join(',')}`;
         const cached = await cacheService.get(cacheKey);
         if (cached) {
           return new Map(cached);
@@ -186,12 +184,12 @@ export class CommentVotingService {
 
         const comments = await db
           .select({
-            id: billComments.id,
-            upvotes: billComments.upvotes,
-            downvotes: billComments.downvotes
+            id: comments.id,
+            upvotes: comments.upvotes,
+            downvotes: comments.downvotes
           })
-          .from(billComments)
-          .where(sql`${billComments.id} = ANY(${commentIds})`);
+          .from(comments)
+          .where(sql`${comments.id} = ANY(${comment_ids})`);
 
         const statsMap = new Map<number, CommentEngagementStats>();
 
@@ -200,18 +198,18 @@ export class CommentVotingService {
           const totalVotes = comment.upvotes + comment.downvotes;
 
           // Calculate engagement score (weighted by recency and vote ratio)
-          const engagementScore = this.calculateEngagementScore(
+          const engagement_score = this.calculateEngagementScore(
             comment.upvotes,
             comment.downvotes,
             totalVotes
           );
 
           statsMap.set(comment.id, {
-            commentId: comment.id,
+            comment_id: comment.id,
             upvotes: comment.upvotes,
             downvotes: comment.downvotes,
             netVotes,
-            engagementScore,
+            engagement_score,
             popularityRank: index + 1 // This would be calculated based on sorting
           });
         });
@@ -222,7 +220,7 @@ export class CommentVotingService {
         return statsMap;
       },
       new Map(),
-      `getCommentVotingStats:${commentIds.join(',')}`
+      `getCommentVotingStats:${comment_ids.join(',')}`
     );
     return result.data;
   }
@@ -230,15 +228,15 @@ export class CommentVotingService {
   /**
    * Get trending comments based on voting patterns
    */
-  async getTrendingComments(billId: number, timeframe: '1h' | '24h' | '7d' = '24h', limit: number = 10): Promise<{
-    commentId: number;
+  async getTrendingComments(bill_id: number, timeframe: '1h' | '24h' | '7d' = '24h', limit: number = 10): Promise<{
+    comment_id: number;
     netVotes: number;
-    engagementScore: number;
+    engagement_score: number;
     trendingScore: number;
   }[]> {
     const result = await databaseService.withFallback(
       async () => {
-        const cacheKey = `${CACHE_KEYS.COMMENT_VOTES}:trending:${billId}:${timeframe}:${limit}`;
+        const cacheKey = `${CACHE_KEYS.COMMENT_VOTES}:trending:${ bill_id }:${timeframe}:${limit}`;
         const cached = await cacheService.get(cacheKey);
         if (cached) {
           return cached;
@@ -260,38 +258,38 @@ export class CommentVotingService {
 
         const comments = await db
           .select({
-            id: billComments.id,
-            upvotes: billComments.upvotes,
-            downvotes: billComments.downvotes,
-            createdAt: billComments.createdAt,
-            updatedAt: billComments.updatedAt
+            id: comments.id,
+            upvotes: comments.upvotes,
+            downvotes: comments.downvotes,
+            created_at: comments.created_at,
+            updated_at: comments.updated_at
           })
-          .from(billComments)
+          .from(comments)
           .where(and(
-            eq(billComments.billId, billId),
-            sql`${billComments.updatedAt} >= ${timeThreshold}`
+            eq(comments.bill_id, bill_id),
+            sql`${comments.updated_at} >= ${timeThreshold}`
           ))
-          .orderBy(sql`${billComments.upvotes} - ${billComments.downvotes} DESC`)
+          .orderBy(sql`${comments.upvotes} - ${comments.downvotes} DESC`)
           .limit(limit);
 
         const trendingComments = comments.map(comment => {
           const netVotes = comment.upvotes - comment.downvotes;
           const totalVotes = comment.upvotes + comment.downvotes;
-          const engagementScore = this.calculateEngagementScore(
+          const engagement_score = this.calculateEngagementScore(
             comment.upvotes,
             comment.downvotes,
             totalVotes
           );
 
           // Calculate trending score based on recency and engagement
-          const ageInHours = (Date.now() - comment.updatedAt.getTime()) / (1000 * 60 * 60);
+          const ageInHours = (Date.now() - comment.updated_at.getTime()) / (1000 * 60 * 60);
           const recencyMultiplier = Math.max(0.1, 1 - (ageInHours / 24)); // Decay over 24 hours
-          const trendingScore = engagementScore * recencyMultiplier;
+          const trendingScore = engagement_score * recencyMultiplier;
 
           return {
-            commentId: comment.id,
+            comment_id: comment.id,
             netVotes,
-            engagementScore,
+            engagement_score,
             trendingScore
           };
         }).sort((a, b) => b.trendingScore - a.trendingScore);
@@ -300,7 +298,7 @@ export class CommentVotingService {
         return trendingComments;
       },
       [],
-      `getTrendingComments:${billId}:${timeframe}`
+      `getTrendingComments:${ bill_id }:${timeframe}`
     );
     return result.data;
   }
@@ -308,40 +306,37 @@ export class CommentVotingService {
   /**
    * Get user's voting history for comments
    */
-  async getUserVotingHistory(userId: string, limit: number = 50): Promise<{
-    commentId: number;
-    voteType: 'up' | 'down';
+  async getUserVotingHistory(user_id: string, limit: number = 50): Promise<{ comment_id: number;
+    vote_type: 'up' | 'down';
     votedAt: Date;
-    billId: number;
+    bill_id: number;
     billTitle: string;
-  }[]> {
-    const result = await databaseService.withFallback(
+   }[]> { const result = await databaseService.withFallback(
       async () => {
         // Get user's votes from database with comment and bill information
         const userVotes = await db
           .select({
-            commentId: commentVotes.commentId,
-            voteType: commentVotes.voteType,
-            votedAt: commentVotes.updatedAt,
-            billId: billComments.billId,
-            billTitle: sql<string>`(SELECT title FROM bills WHERE id = ${billComments.billId})`
+            comment_id: comment_votess.comment_id,
+            vote_type: comment_votess.vote_type,
+            votedAt: comment_votess.updated_at,
+            bill_id: comments.bill_id,
+            billTitle: sql<string>`(SELECT title FROM bills WHERE id = ${comments.bill_id })`
           })
-          .from(commentVotes)
-          .innerJoin(billComments, eq(commentVotes.commentId, billComments.id))
-          .where(eq(commentVotes.userId, userId))
-          .orderBy(desc(commentVotes.updatedAt))
+          .from(comment_votess)
+          .innerJoin(comments, eq(comment_votess.comment_id, comments.id))
+          .where(eq(comment_votess.user_id, user_id))
+          .orderBy(desc(comment_votess.updated_at))
           .limit(limit);
 
-        return userVotes.map(vote => ({
-          commentId: vote.commentId,
-          voteType: vote.voteType as 'up' | 'down',
+        return userVotes.map(vote => ({ comment_id: vote.comment_id,
+          vote_type: vote.vote_type as 'up' | 'down',
           votedAt: vote.votedAt,
-          billId: vote.billId,
+          bill_id: vote.bill_id,
           billTitle: vote.billTitle || 'Unknown Bill'
-        }));
+         }));
       },
       [],
-      `getUserVotingHistory:${userId}`
+      `getUserVotingHistory:${ user_id }`
     );
     return result.data;
   }
@@ -365,19 +360,19 @@ export class CommentVotingService {
     const wilson = (phat + z * z / (2 * n) - z * Math.sqrt((phat * (1 - phat) + z * z / (4 * n)) / n)) / (1 + z * z / n);
     
     // Combine Wilson score with absolute vote count
-    const engagementScore = wilson * Math.log(totalVotes + 1) + netVotes * 0.1;
+    const engagement_score = wilson * Math.log(totalVotes + 1) + netVotes * 0.1;
     
-    return Math.max(0, engagementScore);
+    return Math.max(0, engagement_score);
   }
 
   /**
    * Clear voting-related caches
    */
-  private async clearVotingCaches(commentId: number, billId: number): Promise<void> {
+  private async clearVotingCaches(comment_id: number, bill_id: number): Promise<void> {
     const patterns = [
       `${CACHE_KEYS.COMMENT_VOTES}:stats:*`,
-      `${CACHE_KEYS.COMMENT_VOTES}:trending:${billId}:*`,
-      `${CACHE_KEYS.BILL_COMMENTS}:${billId}:*`
+      `${CACHE_KEYS.COMMENT_VOTES}:trending:${ bill_id }:*`,
+      `${CACHE_KEYS.BILL_COMMENTS}:${ bill_id }:*`
     ];
 
     for (const pattern of patterns) {
@@ -388,7 +383,7 @@ export class CommentVotingService {
   /**
    * Get vote summary for a bill's comments
    */
-  async getBillCommentVoteSummary(billId: number): Promise<{
+  async getBillCommentVoteSummary(bill_id: number): Promise<{
     totalVotes: number;
     totalUpvotes: number;
     totalDownvotes: number;
@@ -398,7 +393,7 @@ export class CommentVotingService {
   }> {
     const result = await databaseService.withFallback(
       async () => {
-        const cacheKey = `${CACHE_KEYS.COMMENT_VOTES}:summary:${billId}`;
+        const cacheKey = `${CACHE_KEYS.COMMENT_VOTES}:summary:${ bill_id }`;
         const cached = await cacheService.get(cacheKey);
         if (cached) {
           return cached;
@@ -406,42 +401,42 @@ export class CommentVotingService {
 
         const [summary] = await db
           .select({
-            totalUpvotes: sql<number>`SUM(${billComments.upvotes})`,
-            totalDownvotes: sql<number>`SUM(${billComments.downvotes})`,
-            commentCount: sql<number>`COUNT(*)`,
-            maxUpvotes: sql<number>`MAX(${billComments.upvotes})`,
-            maxControversy: sql<number>`MAX(${billComments.upvotes} + ${billComments.downvotes})`
+            totalUpvotes: sql<number>`SUM(${comments.upvotes})`,
+            totalDownvotes: sql<number>`SUM(${comments.downvotes})`,
+            comment_count: sql<number>`COUNT(*)`,
+            maxUpvotes: sql<number>`MAX(${comments.upvotes})`,
+            maxControversy: sql<number>`MAX(${comments.upvotes} + ${comments.downvotes})`
           })
-          .from(billComments)
-          .where(eq(billComments.billId, billId));
+          .from(comments)
+          .where(eq(comments.bill_id, bill_id));
 
         // Get most upvoted comment
         const [mostUpvoted] = await db
-          .select({ id: billComments.id })
-          .from(billComments)
+          .select({ id: comments.id })
+          .from(comments)
           .where(and(
-            eq(billComments.billId, billId),
-            eq(billComments.upvotes, summary.maxUpvotes)
+            eq(comments.bill_id, bill_id),
+            eq(comments.upvotes, summary.maxUpvotes)
           ))
           .limit(1);
 
         // Get most controversial comment (highest total votes)
         const [mostControversial] = await db
           .select({
-            id: billComments.id,
-            totalVotes: sql<number>`${billComments.upvotes} + ${billComments.downvotes}`
+            id: comments.id,
+            totalVotes: sql<number>`${comments.upvotes} + ${comments.downvotes}`
           })
-          .from(billComments)
-          .where(eq(billComments.billId, billId))
-          .orderBy(sql`${billComments.upvotes} + ${billComments.downvotes} DESC`)
+          .from(comments)
+          .where(eq(comments.bill_id, bill_id))
+          .orderBy(sql`${comments.upvotes} + ${comments.downvotes} DESC`)
           .limit(1);
 
         const summaryResult = {
           totalVotes: Number(summary.totalUpvotes) + Number(summary.totalDownvotes),
           totalUpvotes: Number(summary.totalUpvotes),
           totalDownvotes: Number(summary.totalDownvotes),
-          averageEngagement: Number(summary.commentCount) > 0 ?
-            (Number(summary.totalUpvotes) + Number(summary.totalDownvotes)) / Number(summary.commentCount) : 0,
+          averageEngagement: Number(summary.comment_count) > 0 ?
+            (Number(summary.totalUpvotes) + Number(summary.totalDownvotes)) / Number(summary.comment_count) : 0,
           mostUpvotedCommentId: mostUpvoted?.id || null,
           mostControversialCommentId: mostControversial?.id || null
         };
@@ -457,7 +452,7 @@ export class CommentVotingService {
         mostUpvotedCommentId: null,
         mostControversialCommentId: null
       },
-      `getBillCommentVoteSummary:${billId}`
+      `getBillCommentVoteSummary:${ bill_id }`
     );
     return result.data;
   }

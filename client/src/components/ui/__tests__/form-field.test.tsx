@@ -131,8 +131,8 @@ describe('EnhancedFormInput', () => {
     );
     
     const input = screen.getByLabelText('Required Field');
-    await user.click(input);
-    await user.tab(); // Trigger blur
+    await users.click(input);
+    await users.tab(); // Trigger blur
     
     await waitFor(() => {
       expect(screen.getByText('Required Field is required')).toBeInTheDocument();
@@ -153,8 +153,8 @@ describe('EnhancedFormInput', () => {
     );
     
     const input = screen.getByLabelText('Email');
-    await user.click(input);
-    await user.tab(); // Trigger blur
+    await users.click(input);
+    await users.tab(); // Trigger blur
     
     await waitFor(() => {
       expect(screen.getByText('Please enter a valid email address')).toBeInTheDocument();
@@ -180,7 +180,7 @@ describe('EnhancedFormInput', () => {
     
     expect(input).toHaveAttribute('type', 'password');
     
-    await user.click(toggleButton);
+    await users.click(toggleButton);
     
     expect(input).toHaveAttribute('type', 'text');
     expect(screen.getByLabelText('Hide password')).toBeInTheDocument();
@@ -201,7 +201,7 @@ describe('EnhancedFormInput', () => {
     );
     
     const input = screen.getByLabelText('Test');
-    await user.type(input, 'valid input');
+    await users.type(input, 'valid input');
     
     expect(onValidationChange).toHaveBeenCalled();
   });
@@ -264,8 +264,8 @@ describe('EnhancedFormTextarea', () => {
     );
     
     const textarea = screen.getByLabelText('Required Textarea');
-    await user.click(textarea);
-    await user.tab(); // Trigger blur
+    await users.click(textarea);
+    await users.tab(); // Trigger blur
     
     await waitFor(() => {
       expect(screen.getByText('Required Textarea is required')).toBeInTheDocument();
@@ -286,8 +286,8 @@ describe('EnhancedFormTextarea', () => {
     );
     
     const textarea = screen.getByLabelText('Length Textarea');
-    await user.click(textarea);
-    await user.tab(); // Trigger blur
+    await users.click(textarea);
+    await users.tab(); // Trigger blur
     
     await waitFor(() => {
       expect(screen.getByText('Maximum 10 characters allowed')).toBeInTheDocument();
@@ -313,7 +313,7 @@ describe('EnhancedFormTextarea', () => {
     );
     
     const textarea = screen.getByLabelText('Dynamic Textarea');
-    await user.type(textarea, 'Hello');
+    await users.type(textarea, 'Hello');
     
     // Rerender with updated value
     rerender(
@@ -385,8 +385,8 @@ describe('EnhancedFormSelect', () => {
     );
     
     const select = screen.getByLabelText('Required Select');
-    await user.click(select);
-    await user.tab(); // Trigger blur
+    await users.click(select);
+    await users.tab(); // Trigger blur
     
     await waitFor(() => {
       expect(screen.getByText('Required Select is required')).toBeInTheDocument();
@@ -424,7 +424,7 @@ describe('EnhancedFormSelect', () => {
     );
     
     const select = screen.getByLabelText('Callback Select');
-    await user.selectOptions(select, 'option1');
+    await users.selectOptions(select, 'option1');
     
     expect(onValidationChange).toHaveBeenCalled();
   });

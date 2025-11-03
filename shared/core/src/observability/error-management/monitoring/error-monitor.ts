@@ -247,7 +247,7 @@ export class RealTimeErrorMonitor extends EventEmitter implements ErrorMonitor {
     const recoverySuccessRate = 0.75; // This would be calculated from actual recovery attempts
 
     // User impact metrics (simplified)
-    const uniqueUsers = new Set(this.errors.map(e => e.context.userId).filter(Boolean));
+    const uniqueUsers = new Set(this.errors.map(e => e.context.user_id).filter(Boolean));
     const uniqueSessions = new Set(this.errors.map(e => e.context.metadata?.sessionId).filter(Boolean));
 
     return {

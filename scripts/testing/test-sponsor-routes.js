@@ -23,9 +23,9 @@ try {
           role: 'Member of Parliament',
           party: 'Azimio la Umoja',
           constituency: 'Bungoma West',
-          conflictLevel: 'medium',
-          transparencyScore: 85.2,
-          isActive: true
+          conflict_level: 'medium',
+          transparency_score: 85.2,
+          is_active: true
         },
         {
           id: 2,
@@ -33,9 +33,9 @@ try {
           role: 'Member of Parliament',
           party: 'Kenya Kwanza',
           constituency: 'Nominated MP',
-          conflictLevel: 'high',
-          transparencyScore: 62.8,
-          isActive: true
+          conflict_level: 'high',
+          transparency_score: 62.8,
+          is_active: true
         }
       ];
     },
@@ -47,8 +47,8 @@ try {
         role: 'Member of Parliament',
         party: 'Azimio la Umoja',
         constituency: 'Bungoma West',
-        conflictLevel: 'medium',
-        transparencyScore: 85.2,
+        conflict_level: 'medium',
+        transparency_score: 85.2,
         affiliations: [
           {
             id: 1,
@@ -64,21 +64,21 @@ try {
             disclosureType: 'financial',
             description: 'Complete financial disclosure',
             amount: 2500000.00,
-            isVerified: true
+            is_verified: true
           }
         ],
         sponsorships: [
           {
             id: 1,
-            billId: 1,
+            bill_id: 1,
             sponsorshipType: 'primary',
-            isActive: true
+            is_active: true
           }
         ],
         stats: {
           totalBillsSponsored: 3,
           activeBillsSponsored: 2,
-          transparencyScore: 85.2,
+          transparency_score: 85.2,
           conflictRiskLevel: 'medium'
         }
       };
@@ -92,16 +92,16 @@ try {
           role: 'Senator',
           party: 'Independent',
           constituency: 'Nairobi County',
-          conflictLevel: 'low',
-          transparencyScore: 94.7,
-          isActive: true
+          conflict_level: 'low',
+          transparency_score: 94.7,
+          is_active: true
         }
       ];
     },
     
     analyzeSponsorConflicts: async (id) => {
       return {
-        sponsorId: id,
+        sponsor_id: id,
         overallRiskLevel: 'medium',
         financialConflicts: [
           {
@@ -121,8 +121,8 @@ try {
     getSponsorVotingPatterns: async (id) => {
       return [
         {
-          sponsorId: id,
-          billId: 1,
+          sponsor_id: id,
+          bill_id: 1,
           vote: 'yes',
           voteDate: new Date(),
           billCategory: 'Agriculture',
@@ -144,12 +144,12 @@ try {
       return [
         {
           id: 1,
-          sponsorId: id,
+          sponsor_id: id,
           organization: 'Bungoma Agricultural Cooperative',
           role: 'Board Member',
           type: 'economic',
           conflictType: 'financial',
-          isActive: true
+          is_active: true
         }
       ];
     },
@@ -158,12 +158,12 @@ try {
       return [
         {
           id: 1,
-          sponsorId: id,
+          sponsor_id: id,
           disclosureType: 'financial',
           description: 'Complete financial disclosure',
           amount: 2500000.00,
           source: 'Bungoma Agricultural Cooperative',
-          isVerified: true
+          is_verified: true
         }
       ];
     }
@@ -183,23 +183,23 @@ try {
   app.get('/api/sponsors', async (req, res) => {
     try {
       const {
-        party, role, constituency, conflictLevel, isActive,
+        party, role, constituency, conflict_level, is_active,
         limit, offset, sortBy, sortOrder, search
       } = req.query;
 
       let sponsors;
       if (search) {
         sponsors = await mockSponsorService.searchSponsors(search, {
-          party, role, constituency, conflictLevel,
-          isActive: isActive ? isActive === 'true' : undefined,
+          party, role, constituency, conflict_level,
+          is_active: is_active ? is_active === 'true' : undefined,
           limit: limit ? parseInt(limit) : undefined,
           offset: offset ? parseInt(offset) : undefined,
           sortBy, sortOrder
         });
       } else {
         sponsors = await mockSponsorService.getSponsors({
-          party, role, constituency, conflictLevel,
-          isActive: isActive ? isActive === 'true' : undefined,
+          party, role, constituency, conflict_level,
+          is_active: is_active ? is_active === 'true' : undefined,
           limit: limit ? parseInt(limit) : undefined,
           offset: offset ? parseInt(offset) : undefined,
           sortBy, sortOrder

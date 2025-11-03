@@ -41,7 +41,7 @@ describe('PublicInterestAnalysisService', () => {
       expect(result.assessment).toBe('Moderate');
       expect(result.factors.economicScoreNormalized).toBeCloseTo(25);
       expect(result.factors.socialScoreNormalized).toBeCloseTo(69); // Rounded
-      expect(result.factors.transparencyScore).toBe(50);
+      expect(result.factors.transparency_score).toBe(50);
   });
 
 

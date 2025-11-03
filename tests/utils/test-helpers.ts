@@ -113,7 +113,7 @@ export class TestHelpers {
     await page.route(url, route => {
       route.fulfill({
         status: 200,
-        contentType: 'application/json',
+        content_type: 'application/json',
         body: JSON.stringify(response)
       });
     });

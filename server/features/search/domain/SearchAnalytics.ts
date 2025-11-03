@@ -1,8 +1,7 @@
 import type { SearchQuery, SearchResponseDto } from './search.dto';
 
-export interface SearchAnalyticsEvent {
-  id: string;
-  userId?: string;
+export interface SearchAnalyticsEvent { id: string;
+  user_id?: string;
   sessionId: string;
   query: string;
   filters: any;
@@ -10,9 +9,9 @@ export interface SearchAnalyticsEvent {
   clickedResults: number[];
   searchTime: number;
   timestamp: Date;
-  userAgent?: string;
-  ipAddress?: string;
-}
+  user_agent?: string;
+  ip_address?: string;
+ }
 
 export interface SearchMetrics {
   totalSearches: number;
@@ -34,8 +33,7 @@ export interface SearchMetrics {
   };
 }
 
-export class SearchAnalytics {
-  private static readonly MAX_QUERY_LENGTH = 500;
+export class SearchAnalytics { private static readonly MAX_QUERY_LENGTH = 500;
   private static readonly MAX_POPULAR_QUERIES = 100;
 
   /**
@@ -44,25 +42,24 @@ export class SearchAnalytics {
   static async recordSearchEvent(
     query: SearchQuery,
     response: SearchResponseDto,
-    userId?: string,
+    user_id?: string,
     sessionId?: string,
     additionalData?: {
-      userAgent?: string;
-      ipAddress?: string;
-    }
-  ): Promise<SearchAnalyticsEvent> {
-    const event: SearchAnalyticsEvent = {
+      user_agent?: string;
+      ip_address?: string;
+     }
+  ): Promise<SearchAnalyticsEvent> { const event: SearchAnalyticsEvent = {
       id: this.generateEventId(),
-      userId,
+      user_id,
       sessionId: sessionId || this.generateSessionId(),
       query: query.text.substring(0, this.MAX_QUERY_LENGTH),
-      filters: query.filters || {},
+      filters: query.filters || { },
       resultCount: response.results.length,
       clickedResults: [],
       searchTime: response.metadata.searchTime,
       timestamp: new Date(),
-      userAgent: additionalData?.userAgent,
-      ipAddress: additionalData?.ipAddress,
+      user_agent: additionalData?.user_agent,
+      ip_address: additionalData?.ip_address,
     };
 
     // Store event (in a real implementation, this would go to a database)
@@ -76,12 +73,11 @@ export class SearchAnalytics {
    */
   static recordResultClick(
     eventId: string,
-    billId: number,
+    bill_id: number,
     position: number
-  ): void {
-    // In a real implementation, update the event in database
-    this.updateEventClicks(eventId, billId, position);
-  }
+  ): void { // In a real implementation, update the event in database
+    this.updateEventClicks(eventId, bill_id, position);
+   }
 
   /**
    * Get search metrics for a time period
@@ -94,7 +90,7 @@ export class SearchAnalytics {
     const events = await this.getEventsInRange(startDate, endDate);
 
     const totalSearches = events.length;
-    const uniqueUsers = new Set(events.map(e => e.userId).filter(Boolean)).size;
+    const uniqueUsers = new Set(events.map(e => e.user_id).filter(Boolean)).size;
     const averageSearchTime = events.reduce((sum, e) => sum + e.searchTime, 0) / totalSearches || 0;
 
     // Calculate cache hit rate (this would need to be tracked separately)
@@ -193,11 +189,10 @@ export class SearchAnalytics {
 
   private static async updateEventClicks(
     eventId: string,
-    billId: number,
+    bill_id: number,
     position: number
-  ): Promise<void> {
-    // Placeholder - in real implementation, update database
-    console.log(`Recording click on bill ${billId} at position ${position} for event ${eventId}`);
+  ): Promise<void> { // Placeholder - in real implementation, update database
+    console.log(`Recording click on bill ${bill_id } at position ${position} for event ${eventId}`);
   }
 
   private static async getEventsInRange(

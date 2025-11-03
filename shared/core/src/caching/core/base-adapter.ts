@@ -126,13 +126,13 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
   }
 
   // Event system
-  emit(eventType: CacheEventType, data: Omit<CacheEvent, 'type' | 'timestamp'>): boolean {
+  emit(event_type: CacheEventType, data: Omit<CacheEvent, 'type' | 'timestamp'>): boolean {
     const event: CacheEvent = {
-      type: eventType,
+      type: event_type,
       timestamp: Date.now(),
       ...data
     };
-    return super.emit(eventType, event);
+    return super.emit(event_type, event);
   }
 
   // Lifecycle methods

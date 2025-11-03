@@ -98,7 +98,7 @@ describe('ValidationService', () => {
       name: z.string().min(1),
       email: z.string().email(),
       age: z.number().min(0).max(150),
-      isActive: z.boolean(),
+      is_active: z.boolean(),
     });
 
     beforeEach(() => {
@@ -110,7 +110,7 @@ describe('ValidationService', () => {
         name: 'John Doe',
         email: 'john@example.com',
         age: 30,
-        isActive: true,
+        is_active: true,
       };
 
       const result = await validationService.validate(userSchema, validData);
@@ -122,7 +122,7 @@ describe('ValidationService', () => {
         name: '',
         email: 'invalid-email',
         age: -5,
-        isActive: 'not-boolean',
+        is_active: 'not-boolean',
       };
 
       await expect(
@@ -143,7 +143,7 @@ describe('ValidationService', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(ValidationError);
         expect(error.statusCode).toBe(422);
-        expect(error.errors).toHaveLength(4); // name, email, age, isActive
+        expect(error.errors).toHaveLength(4); // name, email, age, is_active
         
         const nameError = error.errors.find(e => e.field === 'name');
         expect(nameError).toBeDefined();
@@ -158,7 +158,7 @@ describe('ValidationService', () => {
     it('should handle missing required fields', async () => {
       const incompleteData = {
         name: 'John Doe',
-        // missing email, age, isActive
+        // missing email, age, is_active
       };
 
       try {
@@ -166,7 +166,7 @@ describe('ValidationService', () => {
         expect.fail('Should have thrown ValidationError');
       } catch (error) {
         expect(error).toBeInstanceOf(ValidationError);
-        expect(error.errors).toHaveLength(3); // email, age, isActive
+        expect(error.errors).toHaveLength(3); // email, age, is_active
       }
     });
 
@@ -175,7 +175,7 @@ describe('ValidationService', () => {
         name: 'John Doe',
         email: 'john@example.com',
         age: 30,
-        isActive: true,
+        is_active: true,
         extraField: 'should be ignored',
       };
 
@@ -340,22 +340,22 @@ describe('ValidationService', () => {
 
     it('should convert string booleans to booleans', async () => {
       const schema = z.object({
-        isActive: z.boolean(),
-        isVerified: z.boolean(),
-        isDeleted: z.boolean(),
+        is_active: z.boolean(),
+        is_verified: z.boolean(),
+        is_deleted: z.boolean(),
       });
 
       const dataWithStringBooleans = {
-        isActive: 'true',
-        isVerified: 'false',
-        isDeleted: '1',
+        is_active: 'true',
+        is_verified: 'false',
+        is_deleted: '1',
       };
 
       const result = await validationService.validate(schema, dataWithStringBooleans);
       
-      expect(result.isActive).toBe(true);
-      expect(result.isVerified).toBe(false);
-      expect(result.isDeleted).toBe(true);
+      expect(result.is_active).toBe(true);
+      expect(result.is_verified).toBe(false);
+      expect(result.is_deleted).toBe(true);
     });
 
     it('should handle nested object preprocessing', async () => {
@@ -381,8 +381,8 @@ describe('ValidationService', () => {
 
       const result = await validationService.validate(schema, dataWithNesting);
       
-      expect(result.user.name).toBe('Jane Doe');
-      expect(result.user.age).toBe(25);
+      expect(result.users.name).toBe('Jane Doe');
+      expect(result.users.age).toBe(25);
       expect(result.settings.notifications).toBe(true);
     });
 

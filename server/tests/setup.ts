@@ -66,8 +66,8 @@ global.testUtils = {
     id: 1,
     email: 'test@example.com',
     name: 'Test User',
-    firstName: 'Test',
-    lastName: 'User',
+    first_name: 'Test',
+    last_name: 'User',
     role: 'citizen'
   },
   
@@ -76,8 +76,8 @@ global.testUtils = {
     id: 2,
     email: 'admin@example.com',
     name: 'Admin User',
-    firstName: 'Admin',
-    lastName: 'User',
+    first_name: 'Admin',
+    last_name: 'User',
     role: 'admin'
   },
 

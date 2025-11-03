@@ -9,8 +9,8 @@ async function testAuthSystem() {
   const testUser = {
     email: `test-${Date.now()}@example.com`,
     password: 'TestPassword123!',
-    firstName: 'Test',
-    lastName: 'User'
+    first_name: 'Test',
+    last_name: 'User'
   };
 
   try {

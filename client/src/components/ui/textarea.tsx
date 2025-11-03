@@ -22,7 +22,7 @@ const Textarea = forwardRef<
     />
   )
 })
-Textarea.displayName = "Textarea"
+Textarea.display_name = "Textarea"
 
 const EnhancedTextarea = forwardRef<HTMLTextAreaElement, EnhancedTextareaProps>(
   ({ 
@@ -249,7 +249,7 @@ const EnhancedTextarea = forwardRef<HTMLTextAreaElement, EnhancedTextareaProps>(
     );
   }
 )
-EnhancedTextarea.displayName = "EnhancedTextarea"
+EnhancedTextarea.display_name = "EnhancedTextarea"
 
 export { Textarea, EnhancedTextarea }
 

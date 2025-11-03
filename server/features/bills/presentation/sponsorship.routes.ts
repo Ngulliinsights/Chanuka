@@ -1,6 +1,6 @@
 import express, { Router } from 'express';
 import { readDatabase } from '../../../infrastructure/database/index.ts';
-import { bills, billSponsorships, sponsors, sponsorTransparency, sponsorAffiliations, billSectionConflicts } from '../../../../shared/schema/index.ts';
+import { bills, bill_sponsorships, sponsors, sponsorTransparency, sponsorAffiliations, billSectionConflicts } from '../../../../shared/schema/index.ts';
 import { eq, desc, count, sql, and } from 'drizzle-orm';
 import { asyncHandler } from '../../../../shared/core/src/observability/error-management/middleware/express-error-middleware';
 import { SponsorshipAnalysisService } from '../application/sponsorship-analysis.service';
@@ -9,16 +9,15 @@ import { logger  } from '../../../../shared/core/src/index.js';
 
 const router = Router();
 
-export function setupSponsorshipRoutes(routerInstance: Router) {
-  const analysisService = new SponsorshipAnalysisService();
+export function setupSponsorshipRoutes(routerInstance: Router) { const analysisService = new SponsorshipAnalysisService();
 
   // Main sponsorship analysis endpoint
-  routerInstance.get('/bills/:billId/sponsorship-analysis', asyncHandler(async (req, res) => {
+  routerInstance.get('/bills/:bill_id/sponsorship-analysis', asyncHandler(async (req, res) => {
     const startTime = Date.now();
     
     try {
-      const { billId } = req.params;
-  const analysis = await analysisService.getComprehensiveAnalysis(parseInt(billId));
+      const { bill_id  } = req.params;
+  const analysis = await analysisService.getComprehensiveAnalysis(parseInt(bill_id));
       return ApiSuccess(res, analysis, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
@@ -29,12 +28,11 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
   }));
 
   // Primary sponsor detailed analysis
-  routerInstance.get('/bills/:billId/sponsorship-analysis/primary-sponsor', asyncHandler(async (req, res) => {
-    const startTime = Date.now();
+  routerInstance.get('/bills/:bill_id/sponsorship-analysis/primary-sponsor', asyncHandler(async (req, res) => { const startTime = Date.now();
     
     try {
-      const { billId } = req.params;
-      const analysis = await analysisService.getPrimarySponsorAnalysis(parseInt(billId));
+      const { bill_id  } = req.params;
+      const analysis = await analysisService.getPrimarySponsorAnalysis(parseInt(bill_id));
       return ApiSuccess(res, analysis, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
@@ -45,12 +43,11 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
   }));
 
   // Co-sponsors analysis
-  routerInstance.get('/bills/:billId/sponsorship-analysis/co-sponsors', asyncHandler(async (req, res) => {
-    const startTime = Date.now();
+  routerInstance.get('/bills/:bill_id/sponsorship-analysis/co-sponsors', asyncHandler(async (req, res) => { const startTime = Date.now();
     
     try {
-      const { billId } = req.params;
-      const analysis = await analysisService.getCoSponsorsAnalysis(parseInt(billId));
+      const { bill_id  } = req.params;
+      const analysis = await analysisService.getCoSponsorsAnalysis(parseInt(bill_id));
       return ApiSuccess(res, analysis, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
@@ -61,12 +58,11 @@ export function setupSponsorshipRoutes(routerInstance: Router) {
   }));
 
   // Financial network analysis
-  routerInstance.get('/bills/:billId/sponsorship-analysis/financial-network', asyncHandler(async (req, res) => {
-    const startTime = Date.now();
+  routerInstance.get('/bills/:bill_id/sponsorship-analysis/financial-network', asyncHandler(async (req, res) => { const startTime = Date.now();
     
     try {
-      const { billId } = req.params;
-      const analysis = await analysisService.getFinancialNetworkAnalysis(parseInt(billId));
+      const { bill_id  } = req.params;
+      const analysis = await analysisService.getFinancialNetworkAnalysis(parseInt(bill_id));
       return ApiSuccess(res, analysis, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {

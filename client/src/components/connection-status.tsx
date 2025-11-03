@@ -188,11 +188,11 @@ export function ConnectionStatus({ showDetails = false, className = '' }: Connec
         )}
 
         {/* Last Checked */}
-        {connectionStatus?.lastChecked && (
+        {connectionStatus?.last_checked && (
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-600">Last Checked</span>
             <span className="text-sm text-gray-500">
-              {new Date(connectionStatus.lastChecked).toLocaleTimeString()}
+              {new Date(connectionStatus.last_checked).toLocaleTimeString()}
             </span>
           </div>
         )}

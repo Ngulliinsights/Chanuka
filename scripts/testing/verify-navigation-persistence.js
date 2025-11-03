@@ -33,7 +33,7 @@ const mockState = {
   currentSection: 'legislative',
   sidebarOpen: true,
   mobileMenuOpen: false,
-  userRole: 'citizen',
+  user_role: 'citizen',
   preferences: {
     defaultLandingPage: '/dashboard',
     favoritePages: ['/bills', '/representatives'],

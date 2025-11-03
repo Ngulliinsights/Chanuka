@@ -57,14 +57,14 @@ async function testTransparencyDashboard() {
     if (report.sponsorAnalysis.length > 0) {
       logger.info('\n👥 Top Sponsors by Transparency Score:', { component: 'Chanuka' });
       report.sponsorAnalysis.slice(0, 5).forEach((sponsor, index) => {
-        console.log(`   ${index + 1}. ${sponsor.sponsorName}`);
-        console.log(`      - Transparency Score: ${sponsor.transparencyScore}%`);
-        console.log(`      - Risk Level: ${sponsor.riskLevel}`);
-        console.log(`      - Disclosure Completeness: ${sponsor.disclosureCompleteness}%`);
-        console.log(`      - Conflict Count: ${sponsor.conflictCount}`);
-        console.log(`      - Financial Exposure: KSh ${sponsor.financialExposure.toLocaleString()}`);
-        if (sponsor.keyFindings.length > 0) {
-          console.log(`      - Key Findings: ${sponsor.keyFindings.join(', ')}`);
+        console.log(`   ${index + 1}. ${sponsors.sponsorName}`);
+        console.log(`      - Transparency Score: ${sponsors.transparency_score}%`);
+        console.log(`      - Risk Level: ${sponsors.riskLevel}`);
+        console.log(`      - Disclosure Completeness: ${sponsors.disclosureCompleteness}%`);
+        console.log(`      - Conflict Count: ${sponsors.conflictCount}`);
+        console.log(`      - Financial Exposure: KSh ${sponsors.financial_exposure.toLocaleString()}`);
+        if (sponsors.keyFindings.length > 0) {
+          console.log(`      - Key Findings: ${sponsors.keyFindings.join(', ')}`);
         }
       });
     }
@@ -151,25 +151,25 @@ async function testTransparencyDashboard() {
 
     // Test with first sponsor from the analysis if available
     if (report.sponsorAnalysis.length > 0) {
-      const testSponsorId = report.sponsorAnalysis[0].sponsorId;
+      const testSponsorId = report.sponsorAnalysis[0].sponsor_id;
       
       try {
-        const transparencyScore = await transparencyDashboardService.calculateTransparencyScore(testSponsorId);
+        const transparency_score = await transparencyDashboardService.calculateTransparencyScore(testSponsorId);
         
         console.log(`✅ Transparency score calculated for sponsor ${testSponsorId}`);
-        console.log(`   - Overall Score: ${transparencyScore.overallScore}%`);
-        console.log(`   - Risk Level: ${transparencyScore.riskLevel}`);
-        console.log(`   - Last Calculated: ${transparencyScore.lastCalculated.toLocaleString()}`);
+        console.log(`   - Overall Score: ${transparency_score.overallScore}%`);
+        console.log(`   - Risk Level: ${transparency_score.riskLevel}`);
+        console.log(`   - Last Calculated: ${transparency_score.lastCalculated.toLocaleString()}`);
         
         logger.info('\n📊 Component Scores:', { component: 'Chanuka' });
-        Object.entries(transparencyScore.componentScores).forEach(([component, score]) => {
+        Object.entries(transparency_score.componentScores).forEach(([component, score]) => {
           const componentName = component.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
           console.log(`   - ${componentName}: ${score}%`);
         });
 
-        if (transparencyScore.recommendations.length > 0) {
+        if (transparency_score.recommendations.length > 0) {
           logger.info('\n💡 Specific Recommendations:', { component: 'Chanuka' });
-          transparencyScore.recommendations.forEach((rec, index) => {
+          transparency_score.recommendations.forEach((rec, index) => {
             console.log(`   ${index + 1}. ${rec}`);
           });
         }
@@ -200,7 +200,7 @@ async function testTransparencyDashboard() {
       logger.info('\n📊 Recent Trend Data:', { component: 'Chanuka' });
       trendAnalysis.trends.slice(-6).forEach((trend, index) => {
         console.log(`   ${trend.period}:`);
-        console.log(`      - Transparency Score: ${trend.transparencyScore}%`);
+        console.log(`      - Transparency Score: ${trend.transparency_score}%`);
         console.log(`      - Risk Level: ${trend.riskLevel}`);
         console.log(`      - Disclosure Count: ${trend.disclosureCount}`);
         console.log(`      - Verification Rate: ${trend.verificationRate}%`);

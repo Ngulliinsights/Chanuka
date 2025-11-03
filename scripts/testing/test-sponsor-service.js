@@ -24,9 +24,9 @@ app.get('/api/sponsors', (req, res) => {
         role: 'Member of Parliament',
         party: 'Azimio la Umoja',
         constituency: 'Bungoma West',
-        conflictLevel: 'medium',
-        transparencyScore: 85.2,
-        isActive: true
+        conflict_level: 'medium',
+        transparency_score: 85.2,
+        is_active: true
       },
       {
         id: 2,
@@ -34,9 +34,9 @@ app.get('/api/sponsors', (req, res) => {
         role: 'Member of Parliament', 
         party: 'Kenya Kwanza',
         constituency: 'Nominated MP',
-        conflictLevel: 'high',
-        transparencyScore: 62.8,
-        isActive: true
+        conflict_level: 'high',
+        transparency_score: 62.8,
+        is_active: true
       }
     ],
     metadata: {
@@ -57,8 +57,8 @@ app.get('/api/sponsors/:id', (req, res) => {
       role: 'Member of Parliament',
       party: 'Azimio la Umoja',
       constituency: 'Bungoma West',
-      conflictLevel: 'medium',
-      transparencyScore: 85.2,
+      conflict_level: 'medium',
+      transparency_score: 85.2,
       affiliations: [
         {
           id: 1,
@@ -74,21 +74,21 @@ app.get('/api/sponsors/:id', (req, res) => {
           disclosureType: 'financial',
           description: 'Complete financial disclosure',
           amount: 2500000.00,
-          isVerified: true
+          is_verified: true
         }
       ],
       sponsorships: [
         {
           id: 1,
-          billId: 1,
+          bill_id: 1,
           sponsorshipType: 'primary',
-          isActive: true
+          is_active: true
         }
       ],
       stats: {
         totalBillsSponsored: 3,
         activeBillsSponsored: 2,
-        transparencyScore: 85.2,
+        transparency_score: 85.2,
         conflictRiskLevel: 'medium'
       }
     }
@@ -99,7 +99,7 @@ app.get('/api/sponsors/:id/conflicts', (req, res) => {
   res.json({
     success: true,
     data: {
-      sponsorId: parseInt(req.params.id),
+      sponsor_id: parseInt(req.params.id),
       overallRiskLevel: 'medium',
       financialConflicts: [
         {

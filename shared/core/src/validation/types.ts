@@ -160,8 +160,8 @@ export interface SchemaRegistration {
   version?: string;
   description?: string;
   tags?: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 /**
@@ -222,16 +222,15 @@ export interface ValidationServiceConfig {
 /**
  * Schema validation context for advanced validation scenarios
  */
-export interface ValidationContext {
-  /** User ID for user-specific validation */
-  userId?: string;
+export interface ValidationContext { /** User ID for user-specific validation */
+  user_id?: string;
   /** Request ID for tracing */
   requestId?: string;
   /** Additional context data */
   metadata?: Record<string, any>;
   /** Validation timestamp */
   timestamp?: Date;
-}
+ }
 
 
 

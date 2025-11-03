@@ -18,34 +18,32 @@ import type {
  * Community API service - handles all community-related API calls
  * Centralizes API endpoints and response handling for the community feature
  */
-export const communityApi = {
-  // Comments endpoints
-  async getComments(billId?: string, filters?: CommunityFilters): Promise<CommentsResponse> {
+export const communityApi = { // Comments endpoints
+  async getComments(bill_id?: string, filters?: CommunityFilters): Promise<CommentsResponse> {
     const params = new URLSearchParams();
 
-    if (billId) params.append('billId', billId);
+    if (bill_id) params.append('bill_id', bill_id);
     if (filters?.authorId) params.append('authorId', filters.authorId);
     if (filters?.sortBy) params.append('sortBy', filters.sortBy);
     if (filters?.limit) params.append('limit', filters.limit.toString());
     if (filters?.offset) params.append('offset', filters.offset.toString());
 
-    return api.get(`/api/community/comments?${params.toString()}`);
+    return api.get(`/api/community/comments?${params.toString() }`);
   },
 
-  async getComment(commentId: string): Promise<Comment> {
-    return api.get(`/api/community/comments/${commentId}`);
+  async getComment(comment_id: string): Promise<Comment> {
+    return api.get(`/api/community/comments/${comment_id}`);
   },
 
-  async createComment(request: CreateCommentRequest): Promise<Comment> {
-    const formData = new FormData();
+  async createComment(request: CreateCommentRequest): Promise<Comment> { const formData = new FormData();
     formData.append('content', request.content);
 
-    if (request.billId) formData.append('billId', request.billId);
-    if (request.parentId) formData.append('parentId', request.parentId);
+    if (request.bill_id) formData.append('bill_id', request.bill_id);
+    if (request.parent_id) formData.append('parent_id', request.parent_id);
 
     if (request.attachments) {
       request.attachments.forEach((file, index) => {
-        formData.append(`attachments[${index}]`, file);
+        formData.append(`attachments[${index }]`, file);
       });
     }
 
@@ -56,7 +54,7 @@ export const communityApi = {
     });
   },
 
-  async updateComment(commentId: string, request: UpdateCommentRequest): Promise<Comment> {
+  async updateComment(comment_id: string, request: UpdateCommentRequest): Promise<Comment> {
     const formData = new FormData();
     formData.append('content', request.content);
 
@@ -66,32 +64,31 @@ export const communityApi = {
       });
     }
 
-    return api.put(`/api/community/comments/${commentId}`, formData, {
+    return api.put(`/api/community/comments/${comment_id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
   },
 
-  async deleteComment(commentId: string): Promise<void> {
-    return api.delete(`/api/community/comments/${commentId}`);
+  async deleteComment(comment_id: string): Promise<void> {
+    return api.delete(`/api/community/comments/${comment_id}`);
   },
 
   async voteOnComment(request: VoteRequest): Promise<Comment> {
-    return api.post(`/api/community/comments/${request.commentId}/vote`, {
+    return api.post(`/api/community/comments/${request.comment_id}/vote`, {
       vote: request.vote
     });
   },
 
   // Discussion threads endpoints
-  async getThreads(filters?: CommunityFilters): Promise<ThreadsResponse> {
-    const params = new URLSearchParams();
+  async getThreads(filters?: CommunityFilters): Promise<ThreadsResponse> { const params = new URLSearchParams();
 
-    if (filters?.billId) params.append('billId', filters.billId);
+    if (filters?.bill_id) params.append('bill_id', filters.bill_id);
     if (filters?.authorId) params.append('authorId', filters.authorId);
     if (filters?.tags?.length) {
       filters.tags.forEach(tag => params.append('tags', tag));
-    }
+     }
     if (filters?.sortBy) params.append('sortBy', filters.sortBy);
     if (filters?.limit) params.append('limit', filters.limit.toString());
     if (filters?.offset) params.append('offset', filters.offset.toString());
@@ -128,12 +125,11 @@ export const communityApi = {
     return api.post('/api/community/share', request);
   },
 
-  async getShares(billId?: string, threadId?: string): Promise<SocialShare[]> {
-    const params = new URLSearchParams();
-    if (billId) params.append('billId', billId);
+  async getShares(bill_id?: string, threadId?: string): Promise<SocialShare[]> { const params = new URLSearchParams();
+    if (bill_id) params.append('bill_id', bill_id);
     if (threadId) params.append('threadId', threadId);
 
-    return api.get(`/api/community/shares?${params.toString()}`);
+    return api.get(`/api/community/shares?${params.toString() }`);
   },
 
   async trackShareClick(shareId: string): Promise<void> {
@@ -167,8 +163,8 @@ export const communityApi = {
   },
 
   // Moderation endpoints (admin only)
-  async moderateComment(commentId: string, action: 'approve' | 'reject' | 'delete', reason?: string): Promise<void> {
-    return api.post(`/api/community/comments/${commentId}/moderate`, {
+  async moderateComment(comment_id: string, action: 'approve' | 'reject' | 'delete', reason?: string): Promise<void> {
+    return api.post(`/api/community/comments/${comment_id}/moderate`, {
       action,
       reason
     });
@@ -186,14 +182,13 @@ export const communityApi = {
     comments: Comment[];
     threads: DiscussionThread[];
     total: number;
-  }> {
-    const params = new URLSearchParams();
+  }> { const params = new URLSearchParams();
     params.append('q', query);
 
-    if (filters?.billId) params.append('billId', filters.billId);
+    if (filters?.bill_id) params.append('bill_id', filters.bill_id);
     if (filters?.limit) params.append('limit', filters.limit.toString());
 
-    return api.get(`/api/community/search?${params.toString()}`);
+    return api.get(`/api/community/search?${params.toString() }`);
   },
 
   async getPopularTags(limit = 20): Promise<{ tag: string; count: number }[]> {

@@ -17,11 +17,10 @@ export interface StorageConfig {
   cacheTTL?: number;
 }
 
-export interface Storage {
-  // Progress-related methods (now aligned with shared/schema types)
-  getUserProgress(userId: string): Promise<UserProgress[]>;
+export interface Storage { // Progress-related methods (now aligned with shared/schema types)
+  getUserProgress(user_id: string): Promise<UserProgress[]>;
   updateUserProgress(progress: InsertUserProgress): Promise<UserProgress>;
-  getProgressByType(userId: string, achievementType: string): Promise<UserProgress[]>;
+  getProgressByType(user_id: string, achievement_type: string): Promise<UserProgress[]>;
 
   // Additional methods from IStorage interface
   getUser(id: string): Promise<User | undefined>;
@@ -29,12 +28,12 @@ export interface Storage {
   getUserBySocialProfile(provider: string, profileId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   linkSocialProfile(
-    userId: string,
-    profile: { platform: string; profileId: string; username: string },
+    user_id: string,
+    profile: { platform: string; profileId: string; username: string  },
   ): Promise<User>;
-  unlinkSocialProfile(userId: string, platform: string): Promise<User>;
-  updateUserReputation(userId: string, change: number): Promise<User>;
-  updateUserLastActive(userId: string): Promise<User>;
+  unlinkSocialProfile(user_id: string, platform: string): Promise<User>;
+  updateUserReputation(user_id: string, change: number): Promise<User>;
+  updateUserLastActive(user_id: string): Promise<User>;
 }
 
 

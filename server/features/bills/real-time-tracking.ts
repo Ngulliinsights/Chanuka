@@ -4,10 +4,10 @@ import type { AuthenticatedRequest } from '../../middleware/auth.js';
 import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError  } from '../../../shared/core/src/utils/api';
 import { logger  } from '../../../shared/core/src/index.js';
 import { webSocketService } from '../../infrastructure/websocket.js';
-// import { billsService } from '../application/bills';
-const billsService = {
+// import { billService } from '../application/bills';
+const billService = {
   getBills: async () => [] as any[],
-  getBill: async (id: number) => ({ id, title: 'Mock Bill', status: 'introduced', updatedAt: new Date(), views: 0, comments: 0 }),
+  getBill: async (id: number) => ({ id, title: 'Mock Bill', status: 'introduced', updated_at: new Date(), views: 0, comments: 0 }),
   incrementBillViews: async (id: number) => ({ id, views: 1 }),
   incrementBillShares: async (id: number) => ({ id, shares: 1 })
 };
@@ -43,13 +43,12 @@ function parseIntParam(value: string, paramName: string): { valid: true; value: 
 /**
  * Centralized error handler for real-time tracking endpoints
  */
-function handleRouteError(res: Response, error: unknown, context: string, userId?: string): void {
-  logger.error(`Error in real-time ${context}:`, {
-    component: 'RealTimeTrackingRouter',
+function handleRouteError(res: Response, error: unknown, context: string, user_id?: string): void {
+  logger.error(`Error in real-time ${context}:`, { component: 'RealTimeTrackingRouter',
     context,
-    userId,
+    user_id,
     errorType: error instanceof Error ? error.constructor.name : 'Unknown'
-  }, error);
+   }, error);
 
   if (error instanceof Error && error.message.includes('not found')) {
     ApiNotFound(res, 'Resource', error.message);
@@ -97,12 +96,12 @@ router.get('/bills', realTimeRateLimit, asyncHandler(async (req, res) => {
 
   try {
     // Get bills with real-time data
-    const bills = await billsService.getBills();
+    const bills = await billService.getBills();
 
     // Apply status filter if provided
     let filteredBills = bills;
     if (status) {
-      filteredBills = bills.filter(bill => bill.status === status);
+      filteredBills = bills.filter(bill => bills.status === status);
     }
 
     // Apply pagination
@@ -123,9 +122,9 @@ router.get('/bills', realTimeRateLimit, asyncHandler(async (req, res) => {
     const billsWithRealTimeData = paginatedBills.map(bill => ({
       ...bill,
       realTimeData: {
-        lastActivity: bill.updatedAt,
-        isActive: new Date(bill.updatedAt).getTime() > Date.now() - (24 * 60 * 60 * 1000), // Active if updated in last 24h
-        subscriberCount: webSocketService.getBillSubscribers(bill.id).length
+        lastActivity: bills.updated_at,
+        is_active: new Date(bills.updated_at).getTime() > Date.now() - (24 * 60 * 60 * 1000), // Active if updated in last 24h
+        subscriberCount: webSocketService.getBillSubscribers(bills.id).length
       }
     }));
 
@@ -165,20 +164,20 @@ router.get('/bills/:id', realTimeRateLimit, asyncHandler(async (req, res) => {
   const { includeSubscribers = 'false', includeActivity = 'true' } = req.query;
 
   try {
-    const bill = await billsService.getBill(idResult.value);
+    const bill = await billService.getBill(idResult.value);
 
     // Get real-time specific data
-    const subscribers = includeSubscribers === 'true' ? webSocketService.getBillSubscribers(bill.id) : [];
-    const subscriberCount = webSocketService.getBillSubscribers(bill.id).length;
+    const subscribers = includeSubscribers === 'true' ? webSocketService.getBillSubscribers(bills.id) : [];
+    const subscriberCount = webSocketService.getBillSubscribers(bills.id).length;
 
     // Get activity data (simplified - would track actual real-time events)
     let activityData: any = undefined;
     if (includeActivity === 'true') {
       activityData = {
-        lastUpdate: bill.updatedAt,
-        isActive: new Date(bill.updatedAt).getTime() > Date.now() - (60 * 60 * 1000), // Active if updated in last hour
-        recentViews: bill.views || 0,
-        recentComments: bill.comments || 0,
+        lastUpdate: bills.updated_at,
+        is_active: new Date(bills.updated_at).getTime() > Date.now() - (60 * 60 * 1000), // Active if updated in last hour
+        recentViews: bills.views || 0,
+        recentComments: bills.comments || 0,
         subscriberCount
       };
     }
@@ -190,7 +189,7 @@ router.get('/bills/:id', realTimeRateLimit, asyncHandler(async (req, res) => {
           subscribers: subscribers.length > 0 ? subscribers : undefined,
           subscriberCount,
           activity: activityData,
-          webSocketChannel: `bill-${bill.id}`
+          webSocketChannel: `bill-${bills.id}`
         }
       },
       timestamp: new Date().toISOString()
@@ -210,14 +209,14 @@ router.get('/bills/:id', realTimeRateLimit, asyncHandler(async (req, res) => {
  * Subscribe to real-time updates for bills
  *
  * Body:
- *   - billIds: array of bill IDs to subscribe to
+ *   - bill_ids: array of bill IDs to subscribe to
  *   - subscriptionTypes: array of subscription types (optional, defaults to all)
  */
 router.post('/subscribe', authenticateToken, subscriptionRateLimit, asyncHandler(async (req, res) => {
-  const { billIds, subscriptionTypes = ['status_change', 'new_comment', 'amendment', 'voting_scheduled'] } = req.body;
+  const { bill_ids, subscriptionTypes = ['status_change', 'new_comment', 'amendment', 'voting_scheduled'] } = req.body;
 
-  if (!Array.isArray(billIds) || billIds.length === 0) {
-    ApiValidationError(res, [{ field: 'billIds', message: 'billIds must be a non-empty array of bill IDs' }]);
+  if (!Array.isArray(bill_ids) || bill_ids.length === 0) {
+    ApiValidationError(res, [{ field: 'bill_ids', message: 'bill_ids must be a non-empty array of bill IDs' }]);
     return;
   }
 
@@ -227,9 +226,9 @@ router.post('/subscribe', authenticateToken, subscriptionRateLimit, asyncHandler
   }
 
   // Validate bill IDs
-  const invalidIds = billIds.filter(id => !Number.isInteger(id) || id <= 0);
+  const invalidIds = bill_ids.filter(id => !Number.isInteger(id) || id <= 0);
   if (invalidIds.length > 0) {
-    ApiValidationError(res, [{ field: 'billIds', message: 'All bill IDs must be positive integers' }]);
+    ApiValidationError(res, [{ field: 'bill_ids', message: 'All bill IDs must be positive integers' }]);
     return;
   }
 
@@ -254,21 +253,20 @@ router.post('/subscribe', authenticateToken, subscriptionRateLimit, asyncHandler
     const currentSubscriptions = webSocketService.getUserSubscriptions(req.user!.id.toString());
 
     // Subscribe to new bills (WebSocket service handles deduplication)
-    const newSubscriptions = billIds.filter(id => !currentSubscriptions.includes(id));
+    const newSubscriptions = bill_ids.filter(id => !currentSubscriptions.includes(id));
 
     // Note: Actual subscription happens via WebSocket, this endpoint just validates and confirms
     // In a full implementation, this might send a subscription command via WebSocket
 
-    logger.info('Real-time subscription request', {
-      component: 'RealTimeTrackingRouter',
-      userId: req.user!.id,
-      billIds: newSubscriptions,
+    logger.info('Real-time subscription request', { component: 'RealTimeTrackingRouter',
+      user_id: req.user!.id,
+      bill_ids: newSubscriptions,
       subscriptionTypes
-    });
+     });
 
     ApiSuccess(res, {
       subscribed: newSubscriptions,
-      alreadySubscribed: billIds.filter(id => currentSubscriptions.includes(id)),
+      alreadySubscribed: bill_ids.filter(id => currentSubscriptions.includes(id)),
       subscriptionTypes,
       message: `Subscribed to ${newSubscriptions.length} new bills`,
       webSocketRequired: true,
@@ -285,23 +283,23 @@ router.post('/subscribe', authenticateToken, subscriptionRateLimit, asyncHandler
  * Unsubscribe from real-time updates
  *
  * Body:
- *   - billIds: array of bill IDs to unsubscribe from (optional - if not provided, unsubscribes from all)
+ *   - bill_ids: array of bill IDs to unsubscribe from (optional - if not provided, unsubscribes from all)
  */
 router.delete('/unsubscribe', authenticateToken, subscriptionRateLimit, asyncHandler(async (req, res) => {
-  const { billIds } = req.body;
+  const { bill_ids } = req.body;
 
-  // If no billIds provided, unsubscribe from all
-  const targetBillIds = billIds || webSocketService.getUserSubscriptions(req.user!.id.toString());
+  // If no bill_ids provided, unsubscribe from all
+  const targetBillIds = bill_ids || webSocketService.getUserSubscriptions(req.user!.id.toString());
 
   if (!Array.isArray(targetBillIds)) {
-    ApiValidationError(res, [{ field: 'billIds', message: 'billIds must be an array of bill IDs' }]);
+    ApiValidationError(res, [{ field: 'bill_ids', message: 'bill_ids must be an array of bill IDs' }]);
     return;
   }
 
   // Validate bill IDs
   const invalidIds = targetBillIds.filter(id => !Number.isInteger(id) || id <= 0);
   if (invalidIds.length > 0) {
-    ApiValidationError(res, [{ field: 'billIds', message: 'All bill IDs must be positive integers' }]);
+    ApiValidationError(res, [{ field: 'bill_ids', message: 'All bill IDs must be positive integers' }]);
     return;
   }
 
@@ -323,11 +321,10 @@ router.delete('/unsubscribe', authenticateToken, subscriptionRateLimit, asyncHan
     // Note: Actual unsubscription happens via WebSocket, this endpoint just validates and confirms
     // In a full implementation, this might send an unsubscription command via WebSocket
 
-    logger.info('Real-time unsubscription request', {
-      component: 'RealTimeTrackingRouter',
-      userId: req.user!.id,
-      billIds: subscriptionsToRemove
-    });
+    logger.info('Real-time unsubscription request', { component: 'RealTimeTrackingRouter',
+      user_id: req.user!.id,
+      bill_ids: subscriptionsToRemove
+     });
 
     ApiSuccess(res, {
       unsubscribed: subscriptionsToRemove,

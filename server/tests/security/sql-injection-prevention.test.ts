@@ -45,7 +45,7 @@ ginal
 ger
     2-bit inte to 3Convert // ash; hash & h hash =        r;
  hash) + c< 5) - ha(hash <hash = (          t(i);
-.charCodeAr = userIdt cha      cons {
+.charCodeAr = user_idt cha      cons {
      i++)rId.length;se < uet i = 0; i  for (l     = 0;
   hash       let  => {
  stringng): striId: Id = (userUser const hash      => {
@@ -114,7 +114,7 @@ siod', 'ses 'sessionI      ,
    n'oke 'access_tcessToken',        'ac  oken',
 h_tresoken', 'ref   'refreshT      
  y', 'salt',', 'keen', 'secret 'tok
-         d_hash',asswor, 'passwordHash'', 'pwordass        'pelds = [
+         d_hash',asswor, 'password_hash'', 'pwordass        'pelds = [
   veFitit sensi  cons   
         ;
    rn dataetuct') r !== 'obje typeof data||data  if (!      ny => {

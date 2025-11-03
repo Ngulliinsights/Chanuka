@@ -928,9 +928,8 @@ export function createTimeoutManager(
  * import { createServiceCompositionOrchestrator, createCircuitBreaker } from './composition';
  *
  * // Define a basic service operation
- * const fetchUserData: ServiceOperation<string, UserData> = async (userId) => {
- *   try {
- *     const response = await fetch(`/api/users/${userId}`);
+ * const fetchUserData: ServiceOperation<string, UserData> = async (user_id) => { *   try {
+ *     const response = await fetch(`/api/users/${user_id }`);
  *     if (!response.ok) {
  *       return err(new BaseError('Failed to fetch user data'));
  *     }

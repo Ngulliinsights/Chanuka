@@ -561,7 +561,7 @@ export const emptyStateUtils = {
   /**
    * Get contextual empty state suggestions
    */
-  getContextualSuggestions: (context: string, userRole?: string): string[] => {
+  getContextualSuggestions: (context: string, user_role?: string): string[] => {
     const suggestions: Record<string, string[]> = {
       dashboard: [
         'Add your first widget to get started',

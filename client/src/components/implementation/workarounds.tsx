@@ -27,16 +27,15 @@ interface Workaround {
   implementationCost?: number;
   timelineEstimate?: number;
   stakeholderSupport: Record<string, string>;
-  createdAt: Date;
+  created_at: Date;
   author: {
     name: string;
     expertise?: string;
   };
 }
 
-interface ImplementationWorkaroundsProps {
-  billId: number;
-}
+interface ImplementationWorkaroundsProps { bill_id: number;
+ }
 
 // Type-safe form state interface
 interface NewWorkaroundForm {
@@ -102,7 +101,7 @@ const isValidPriority = (value: string): value is Priority => {
   return ['low', 'medium', 'high', 'critical'].includes(value);
 };
 
-export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsProps) {
+export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaroundsProps) {
   const [workarounds, setWorkarounds] = useState<Workaround[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -152,7 +151,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
         sort: sortBy,
       });
 
-      const response = await fetch(`/api/bills/${billId}/workarounds?${params}`);
+      const response = await fetch(`/api/bills/${ bill_id }/workarounds?${params}`);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -166,7 +165,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
     } finally {
       setIsLoading(false);
     }
-  }, [billId, filterStatus, sortBy]);
+  }, [bill_id, filterStatus, sortBy]);
 
   useEffect(() => {
     fetchWorkarounds();
@@ -189,7 +188,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
         timelineEstimate: newWorkaround.timelineEstimate ? parseInt(newWorkaround.timelineEstimate) : null,
       };
 
-      const response = await fetch(`/api/bills/${billId}/workarounds`, {
+      const response = await fetch(`/api/bills/${ bill_id }/workarounds`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -211,7 +210,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
     } finally {
       setIsSubmitting(false);
     }
-  }, [isFormValid, newWorkaround, billId, fetchWorkarounds]);
+  }, [isFormValid, newWorkaround, bill_id, fetchWorkarounds]);
 
   // Optimized voting with loading states to prevent double-clicks
   const handleVote = useCallback(async (workaroundId: number, type: VoteType) => {
@@ -360,7 +359,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
         </div>
 
         <span className="text-sm text-gray-500">
-          {new Date(workaround.createdAt).toLocaleDateString()}
+          {new Date(workaround.created_at).toLocaleDateString()}
         </span>
       </div>
     </Card>
@@ -516,7 +515,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">No workarounds yet</h3>
             <p className="text-gray-600 mb-4">
-              Be the first to propose an implementation workaround for this bill.
+              Be the first to propose an implementation workaround for this bills.
             </p>
             <Button onClick={() => setShowCreateDialog(true)}>
               Propose Workaround

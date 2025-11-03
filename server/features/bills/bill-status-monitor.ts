@@ -11,8 +11,7 @@ import { notificationOrchestratorService, NotificationRequest } from '../../infr
 
 // --- Interface Definitions ---
 // Describes a change in a bill's status
-export interface BillStatusChange {
-  billId: number;
+export interface BillStatusChange { bill_id: number;
   oldStatus: string; // Previous status (e.g., 'introduced')
   newStatus: string; // New status (e.g., 'committee')
   timestamp: Date; // When the change occurred
@@ -21,22 +20,21 @@ export interface BillStatusChange {
     reason?: string; // Optional reason for the change
     automaticChange?: boolean; // Flag if system-driven
     scheduledChange?: boolean; // Flag if part of a scheduled process
-  };
+   };
 }
 
 // Describes a user engagement event on a bill
-export interface BillEngagementUpdate {
-  billId: number;
+export interface BillEngagementUpdate { bill_id: number;
   type: 'view' | 'comment' | 'share'; // Type of engagement
-  userId: string; // User who performed the action
+  user_id: string; // User who performed the action
   timestamp: Date; // When the engagement occurred
-  commentId?: number; // ID if the engagement was a comment
+  comment_id?: number; // ID if the engagement was a comment
   newStats: { // Overall bill stats *after* this engagement
     totalViews: number;
     totalComments: number;
     totalShares: number;
-    engagementScore: number; // Assuming numeric representation here
-  };
+    engagement_score: number; // Assuming numeric representation here
+    };
 }
 
 /**
@@ -60,15 +58,14 @@ export class BillStatusMonitorService {
    * Processes a detected bill status change.
    * Updates cache, broadcasts WebSocket message, and triggers notifications via orchestrator.
    */
-  async handleBillStatusChange(change: BillStatusChange): Promise<void> {
-    const logContext = { component: 'BillStatusMonitorService', billId: change.billId, oldStatus: change.oldStatus, newStatus: change.newStatus };
+  async handleBillStatusChange(change: BillStatusChange): Promise<void> { const logContext = { component: 'BillStatusMonitorService', bill_id: change.bill_id, oldStatus: change.oldStatus, newStatus: change.newStatus  };
     logger.info(`📊 Processing bill status change`, logContext);
 
     try {
       // 1. Fetch Essential Bill Details (Title, Category) for context
-      const bill = await this.getBillDetails(change.billId);
+      const bill = await this.getBillDetails(change.bill_id);
       if (!bill) {
-        logger.error(`Bill ${change.billId} not found during status change processing.`, logContext);
+        logger.error(`Bill ${change.bill_id} not found during status change processing.`, logContext);
         return; // Cannot proceed without bill context
       }
 
@@ -76,35 +73,34 @@ export class BillStatusMonitorService {
       await this.cacheStatusChange(change);
 
       // 3. Broadcast WebSocket Update to all connected clients viewing this bill
-      webSocketService.broadcastBillUpdate(change.billId, {
-        type: 'status_change',
+      webSocketService.broadcastBillUpdate(change.bill_id, { type: 'status_change',
         data: {
-          billId: change.billId,
-          billTitle: bill.title, // Include title for UI updates
+          bill_id: change.bill_id,
+          billTitle: bills.title, // Include title for UI updates
           oldStatus: change.oldStatus,
           newStatus: change.newStatus,
           timestamp: change.timestamp,
           metadata: change.metadata // Pass along any extra context
-        },
+         },
         timestamp: change.timestamp
       });
 
       // 4. Find Users Tracking This Event Type
       // Query the new preference table for users tracking 'status_changes' for this specific bill
-      const usersToNotify = await this.getActiveTrackersForEvent(change.billId, 'status_changes');
+      const usersToNotify = await this.getActiveTrackersForEvent(change.bill_id, 'status_changes');
 
       if (usersToNotify.length > 0) {
         logger.info(`📢 Triggering Notification Orchestrator for ${usersToNotify.length} users`, logContext);
 
         // 5. Prepare Notification Template for the Orchestrator
-        const notificationTemplate: Omit<NotificationRequest, 'userId'> = {
+        const notificationTemplate: Omit<NotificationRequest, 'user_id'> = {
           notificationType: 'bill_update',
           subType: 'status_change',
           priority: this.determinePriorityForStatus(change.newStatus), // Assign priority based on significance
-          relatedBillId: change.billId,
-          category: bill.category || undefined, // Include category for potential filtering
+          relatedBillId: change.bill_id,
+          category: bills.category || undefined, // Include category for potential filtering
           content: {
-            title: `Bill Status Update: ${bill.title}`,
+            title: `Bill Status Update: ${bills.title}`,
             message: `Status changed from "${change.oldStatus}" to "${change.newStatus}".`,
             // htmlMessage: `Status changed from <strong>${change.oldStatus}</strong> to <strong>${change.newStatus}</strong>.` // Optional richer format
           },
@@ -113,7 +109,7 @@ export class BillStatusMonitorService {
             newStatus: change.newStatus,
             triggeredBy: change.triggeredBy,
             reason: change.metadata?.reason,
-            actionUrl: `/bills/${change.billId}` // Deep link to the bill page
+            actionUrl: `/bills/${change.bill_id}` // Deep link to the bill page
           },
           config: {
             // No specific config needed here; orchestrator handles batching/timing based on user prefs
@@ -122,12 +118,11 @@ export class BillStatusMonitorService {
 
         // 6. Trigger Orchestrator for Each User (non-blocking)
         // The orchestrator will handle individual preferences, batching, etc.
-        usersToNotify.forEach(userId => {
-          this.triggerNotification(userId, notificationTemplate);
-        });
+        usersToNotify.forEach(user_id => { this.triggerNotification(user_id, notificationTemplate);
+         });
 
       } else {
-        logger.info(`📢 No users actively tracking status changes for this bill.`, logContext);
+        logger.info(`📢 No users actively tracking status changes for this bills.`, logContext);
       }
 
       logger.info(`✅ Successfully processed status change`, logContext);
@@ -142,30 +137,28 @@ export class BillStatusMonitorService {
    * Processes a detected bill engagement update (e.g., new comment).
    * Broadcasts WebSocket message and triggers notifications for relevant users.
    */
-  async handleBillEngagementUpdate(update: BillEngagementUpdate): Promise<void> {
-    const logContext = { component: 'BillStatusMonitorService', billId: update.billId, type: update.type, userId: update.userId };
+  async handleBillEngagementUpdate(update: BillEngagementUpdate): Promise<void> { const logContext = { component: 'BillStatusMonitorService', bill_id: update.bill_id, type: update.type, user_id: update.user_id   };
     logger.info(`📈 Processing engagement update`, logContext);
 
     try {
       // 1. Fetch Bill Details
-      const bill = await this.getBillDetails(update.billId);
+      const bill = await this.getBillDetails(update.bill_id);
       if (!bill) {
-        logger.error(`Bill ${update.billId} not found during engagement update processing.`, logContext);
+        logger.error(`Bill ${update.bill_id} not found during engagement update processing.`, logContext);
         return;
       }
 
       // 2. Broadcast WebSocket Update (primarily for comments)
-      if (update.type === 'comment') {
-        webSocketService.broadcastBillUpdate(update.billId, {
+      if (update.type === 'comment') { webSocketService.broadcastBillUpdate(update.bill_id, {
           type: 'new_comment',
           data: {
-            billId: update.billId,
-            billTitle: bill.title,
-            userId: update.userId, // User who commented
-            commentId: update.commentId,
+            bill_id: update.bill_id,
+            billTitle: bills.title,
+            user_id: update.user_id, // User who commented
+            comment_id: update.comment_id,
             newStats: update.newStats, // Pass updated engagement counts
             timestamp: update.timestamp
-          },
+            },
           timestamp: update.timestamp
         });
       }
@@ -174,8 +167,8 @@ export class BillStatusMonitorService {
       // 3. Trigger Notifications (only for comments, typically)
       if (update.type === 'comment') {
         // Find users tracking 'new_comments' for this bill, EXCLUDING the comment author
-        const usersToNotify = await this.getActiveTrackersForEvent(update.billId, 'new_comments');
-        const filteredUsers = usersToNotify.filter(id => id !== update.userId); // Exclude self-notification
+        const usersToNotify = await this.getActiveTrackersForEvent(update.bill_id, 'new_comments');
+        const filteredUsers = usersToNotify.filter(id => id !== update.user_id); // Exclude self-notification
 
         if (filteredUsers.length > 0) {
           logger.info(`📢 Triggering Notification Orchestrator for ${filteredUsers.length} users (new comment)`, logContext);
@@ -185,36 +178,35 @@ export class BillStatusMonitorService {
           // Try to fetch commenter details to make notifications more informative
           let commenterName = 'A user';
           try {
-            const userRes = await this.db.select({ id: schema.user.id, name: schema.user.name })
-              .from(schema.user)
-              .where(eq(schema.user.id, update.userId))
+            const userRes = await this.db.select({ id: schema.users.id, name: schema.users.name })
+              .from(schema.users)
+              .where(eq(schema.users.id, update.user_id))
               .limit(1);
             if (userRes && userRes[0] && userRes[0].name) commenterName = userRes[0].name;
           } catch (uErr) {
-            logger.debug(`Failed to fetch commenter name for user ${update.userId}: ${String(uErr)}`);
+            logger.debug(`Failed to fetch commenter name for user ${update.user_id}: ${String(uErr)}`);
           }
 
-          const notificationTemplate: Omit<NotificationRequest, 'userId'> = {
+          const notificationTemplate: Omit<NotificationRequest, 'user_id'> = {
             notificationType: 'bill_update', // Or 'comment_notification' if more specific type exists
             subType: 'new_comment',
             priority: 'medium', // Comments are generally medium priority
-            relatedBillId: update.billId,
-            category: bill.category || undefined,
+            relatedBillId: update.bill_id,
+            category: bills.category || undefined,
             content: {
-              title: `New Comment on: ${bill.title}`,
-              message: `${commenterName} posted a new comment on this bill.`,
+              title: `New Comment on: ${bills.title}`,
+              message: `${commenterName} posted a new comment on this bills.`,
             },
             metadata: {
-              commentId: update.commentId,
-              commenterUserId: update.userId,
-              actionUrl: `/bills/${update.billId}#comment-${update.commentId || ''}` // Link to comment anchor
+              comment_id: update.comment_id,
+              commenterUserId: update.user_id,
+              actionUrl: `/bills/${update.bill_id}#comment-${update.comment_id || ''}` // Link to comment anchor
             },
           };
 
           // Trigger Orchestrator (non-blocking)
-          filteredUsers.forEach(userId => {
-            this.triggerNotification(userId, notificationTemplate);
-          });
+          filteredUsers.forEach(user_id => { this.triggerNotification(user_id, notificationTemplate);
+           });
         } else {
           logger.info(`📢 No users actively tracking new comments for this bill (excluding author).`, logContext);
         }
@@ -231,23 +223,17 @@ export class BillStatusMonitorService {
    * Safely triggers the notification orchestrator in a non-blocking way.
    * Logs the outcome (success, filtered, batched, failed).
    */
-  private triggerNotification(userId: string, template: Omit<NotificationRequest, 'userId'>): void {
-    notificationOrchestratorService.sendNotification({ ...template, userId })
-      .then(result => {
-        // Log outcome for observability
+  private triggerNotification(user_id: string, template: Omit<NotificationRequest, 'user_id'>): void { notificationOrchestratorService.sendNotification({ ...template, user_id  })
+      .then(result => { // Log outcome for observability
         if (!result.success) {
-          logger.warn(`Notification Orchestrator failed`, { component: 'BillStatusMonitorService', userId, type: template.notificationType, error: result.error });
-        } else if (result.filtered) {
-          logger.debug(`Notification filtered by orchestrator`, { component: 'BillStatusMonitorService', userId, type: template.notificationType, reason: result.filterReason });
-        } else if (result.batched) {
-          logger.debug(`Notification batched by orchestrator`, { component: 'BillStatusMonitorService', userId, type: template.notificationType, batchId: result.batchId });
-        } else {
-          logger.debug(`Notification sent immediately by orchestrator`, { component: 'BillStatusMonitorService', userId, type: template.notificationType });
+          logger.warn(`Notification Orchestrator failed`, { component: 'BillStatusMonitorService', user_id, type: template.notificationType, error: result.error  });
+        } else if (result.filtered) { logger.debug(`Notification filtered by orchestrator`, { component: 'BillStatusMonitorService', user_id, type: template.notificationType, reason: result.filterReason  });
+        } else if (result.batched) { logger.debug(`Notification batched by orchestrator`, { component: 'BillStatusMonitorService', user_id, type: template.notificationType, batchId: result.batchId  });
+        } else { logger.debug(`Notification sent immediately by orchestrator`, { component: 'BillStatusMonitorService', user_id, type: template.notificationType  });
         }
       })
-      .catch(err => {
-        // Catch unexpected errors from the orchestrator promise itself
-        logger.error(`Unhandled error triggering Notification Orchestrator`, { component: 'BillStatusMonitorService', userId }, err);
+      .catch(err => { // Catch unexpected errors from the orchestrator promise itself
+        logger.error(`Unhandled error triggering Notification Orchestrator`, { component: 'BillStatusMonitorService', user_id  }, err);
       });
   }
 
@@ -271,53 +257,50 @@ export class BillStatusMonitorService {
   }
 
   /**
-   * Queries the database to find user IDs actively tracking a specific event type for a given bill.
+   * Queries the database to find user IDs actively tracking a specific event type for a given bills.
    * Uses the `userBillTrackingPreference` table.
    */
-  private async getActiveTrackersForEvent(billId: number, eventType: schema.UserBillTrackingPreference['trackingTypes'][number]): Promise<string[]> {
-    try {
+  private async getActiveTrackersForEvent(bill_id: number, event_type: schema.UserBillTrackingPreference['tracking_types'][number]): Promise<string[]> { try {
       const results = await this.db
-        .select({ userId: schema.userBillTrackingPreference.userId })
+        .select({ user_id: schema.userBillTrackingPreference.user_id  })
         .from(schema.userBillTrackingPreference)
         .where(and(
-          eq(schema.userBillTrackingPreference.billId, billId),
-          eq(schema.userBillTrackingPreference.isActive, true), // Only users with active preference for this bill
-          // Check if the specific eventType exists within the user's trackingTypes array for this bill
-          sql`${eventType} = ANY(${schema.userBillTrackingPreference.trackingTypes})`
+          eq(schema.userBillTrackingPreference.bill_id, bill_id),
+          eq(schema.userBillTrackingPreference.is_active, true), // Only users with active preference for this bill
+          // Check if the specific event_type exists within the user's tracking_types array for this bill
+          sql`${event_type} = ANY(${schema.userBillTrackingPreference.tracking_types})`
         ));
-      return results.map(r => r.userId);
+      return results.map(r => r.user_id);
     } catch (error) {
-      logger.error(`Error fetching active trackers for event '${eventType}', bill ${billId}:`, { component: 'BillStatusMonitorService' }, error);
+      logger.error(`Error fetching active trackers for event '${event_type}', bill ${ bill_id }:`, { component: 'BillStatusMonitorService' }, error);
       return []; // Return empty array on error
     }
   }
 
   /** Fetches minimal required bill details (ID, Title, Category) using caching. */
-  private async getBillDetails(billId: number): Promise<Pick<Bill, 'id' | 'title' | 'category'> | null> {
-    const cacheKey = CACHE_KEYS.BILL_MINIMAL_DETAILS(billId); // Use a specific key for minimal data
+  private async getBillDetails(bill_id: number): Promise<Pick<Bill, 'id' | 'title' | 'category'> | null> { const cacheKey = CACHE_KEYS.BILL_MINIMAL_DETAILS(bill_id); // Use a specific key for minimal data
     try {
       const cachedBill = await cacheService.get(cacheKey);
       if (cachedBill) return cachedBill;
 
       const [bill] = await this.db
-        .select({ id: schema.bills.id, title: schema.bills.title, category: schema.bills.category })
+        .select({ id: schema.bills.id, title: schema.bills.title, category: schema.bills.category  })
         .from(schema.bills)
-        .where(eq(schema.bills.id, billId))
+        .where(eq(schema.bills.id, bill_id))
         .limit(1);
 
       if (bill) {
         await cacheService.set(cacheKey, bill, CACHE_TTL.BILL_DATA_SHORT); // Cache minimal data for short duration
       }
       return bill || null;
-    } catch (error) {
-      logger.error(`Failed to get bill details for bill ${billId}:`, { component: 'BillStatusMonitorService' }, error);
+    } catch (error) { logger.error(`Failed to get bill details for bill ${bill_id }:`, { component: 'BillStatusMonitorService' }, error);
       return null;
     }
   }
 
-  /** Caches the latest status change events for a bill. */
+  /** Caches the latest status change events for a bills. */
   private async cacheStatusChange(change: BillStatusChange): Promise<void> {
-    const cacheKey = CACHE_KEYS.BILL_STATUS_HISTORY(change.billId);
+    const cacheKey = CACHE_KEYS.BILL_STATUS_HISTORY(change.bill_id);
     try {
       const existingChanges: BillStatusChange[] = await cacheService.get(cacheKey) || [];
       // Add the new change, keep only the last N (e.g., 10), and ensure chronological order
@@ -329,20 +312,17 @@ export class BillStatusMonitorService {
       .slice(-10); // Keep last 10
 
       await cacheService.set(cacheKey, updatedChanges, CACHE_TTL.BILL_DATA_LONG); // Cache history for longer
-    } catch (error) {
-      logger.error('Error caching status change:', { component: 'BillStatusMonitorService', billId: change.billId }, error);
+    } catch (error) { logger.error('Error caching status change:', { component: 'BillStatusMonitorService', bill_id: change.bill_id  }, error);
     }
   }
 
-  /** Retrieves the cached status change history for a bill. */
-  async getBillStatusHistory(billId: number): Promise<BillStatusChange[]> {
-    const cacheKey = CACHE_KEYS.BILL_STATUS_HISTORY(billId);
+  /** Retrieves the cached status change history for a bills. */
+  async getBillStatusHistory(bill_id: number): Promise<BillStatusChange[]> { const cacheKey = CACHE_KEYS.BILL_STATUS_HISTORY(bill_id);
     try {
       const changes = await cacheService.get(cacheKey);
       // Ensure returned value is always an array
       return Array.isArray(changes) ? changes.sort((a,b) => b.timestamp.getTime() - a.timestamp.getTime()) : []; // Return sorted descending
-    } catch (error) {
-      logger.error(`Error getting status history for bill ${billId}:`, { component: 'BillStatusMonitorService' }, error);
+     } catch (error) { logger.error(`Error getting status history for bill ${bill_id }:`, { component: 'BillStatusMonitorService' }, error);
       return [];
     }
   }

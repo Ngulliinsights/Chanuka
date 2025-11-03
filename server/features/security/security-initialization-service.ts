@@ -62,7 +62,7 @@ export class SecurityInitializationService {
 
       // Log security initialization
       await securityAuditService.logSecurityEvent({
-        eventType: 'security_system_initialized',
+        event_type: 'security_system_initialized',
         severity: 'low',
         success: true,
         result: 'success',
@@ -177,7 +177,7 @@ export class SecurityInitializationService {
     // Test audit logging
     try {
       await securityAuditService.logSecurityEvent({
-        eventType: 'security_audit_test',
+        event_type: 'security_audit_test',
         severity: 'low',
         success: true,
         result: 'success',

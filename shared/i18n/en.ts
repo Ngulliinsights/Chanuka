@@ -96,7 +96,7 @@ export const en = {
     summary: 'Summary',
     keyProvisions: 'Key Provisions',
     currentStatus: 'Current Status',
-    fullText: 'Full Text',
+    full_text: 'Full Text',
     relatedBills: 'Related Bills',
     stakeholders: 'Stakeholders',
     supporting: 'Supporting',

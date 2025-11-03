@@ -20,14 +20,14 @@ export interface UseRouteAccessResult {
  */
 export const useRouteAccess = (path: string): UseRouteAccessResult => {
   const { user } = useAuth();
-  const { userRole } = useUnifiedNavigation();
+  const { user_role } = useUnifiedNavigation();
 
   try {
     // Validate the path parameter
     validateNavigationPath(path);
 
     // Validate and convert the context UserRole to our navigation UserRole
-    const contextRole = userRole as string;
+    const contextRole = user_role as string;
     validateUserRole(contextRole);
     const navUserRole: UserRole = contextRole === 'user' ? 'citizen' : contextRole as UserRole;
 

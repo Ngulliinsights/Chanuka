@@ -764,8 +764,7 @@ export class UnifiedLogger implements LoggerChild {
     }
 
     // Build log entry
-    const entry: StoredLogEntry = {
-      timestamp: new Date(),
+    const entry: StoredLogEntry = { timestamp: new Date(),
       level,
       message,
       context: enrichedContext && Object.keys(enrichedContext).length > 0 ? enrichedContext : undefined,
@@ -773,15 +772,15 @@ export class UnifiedLogger implements LoggerChild {
       correlationId: correlationId || this.correlationIdGenerator(),
       traceId: enrichedContext?.traceId as string,
       requestId: enrichedContext?.requestId as string,
-      userId: enrichedContext?.userId as string,
+      user_id: enrichedContext?.user_id as string,
       sessionId: enrichedContext?.sessionId as string,
-      ipAddress: enrichedContext?.ip as string,
-      userAgent: enrichedContext?.userAgent as string,
+      ip_address: enrichedContext?.ip as string,
+      user_agent: enrichedContext?.user_agent as string,
       component: enrichedContext?.component as string,
       operation: enrichedContext?.operation as string,
       duration: enrichedContext?.duration as number,
       error: level === 'error' || level === 'fatal' || level === 'critical' ? normalizeError(metadata?.error) : undefined,
-    };
+     };
 
     // Write to all transports
     for (const transport of this.transports) {
@@ -851,7 +850,7 @@ export class UnifiedLogger implements LoggerChild {
       duration: data.duration,
       method: data.method,
       url: data.url,
-      userAgent: data.userAgent,
+      user_agent: data.user_agent,
       ip: data.ip,
       contentLength: data.contentLength,
       responseTime: data.responseTime,
@@ -888,28 +887,26 @@ export class UnifiedLogger implements LoggerChild {
     const msg = message || `Security event: ${data.event} (${data.severity})`;
     const level = this.mapSecuritySeverity(data.severity);
 
-    this.logInternal(level, msg, {
-      component: 'security',
+    this.logInternal(level, msg, { component: 'security',
       operation: data.event,
-      userId: data.userId,
+      user_id: data.user_id,
       severity: data.severity,
       ip: data.ip,
       sessionId: data.sessionId,
       tags: ['security', 'audit', data.severity],
-    }, { security: data });
+     }, { security: data });
   }
 
   logBusinessEvent(data: BusinessEventLogData, message?: string): void {
     const msg = message || `Business event: ${data.event}`;
-    this.info(msg, {
-      component: 'business',
+    this.info(msg, { component: 'business',
       operation: data.event,
-      entityType: data.entityType,
-      entityId: data.entityId,
-      userId: data.userId,
+      entity_type: data.entity_type,
+      entity_id: data.entity_id,
+      user_id: data.user_id,
       sessionId: data.sessionId,
       tags: ['business-event'],
-    }, { business: data });
+     }, { business: data });
   }
 
   logPerformance(
@@ -1030,19 +1027,18 @@ export class UnifiedLogger implements LoggerChild {
   /**
    * Forwards error logs to error tracker asynchronously.
    */
-  private async forwardToErrorTracker(entry: StoredLogEntry): Promise<void> {
-    if (!this.errorTracker) return;
+  private async forwardToErrorTracker(entry: StoredLogEntry): Promise<void> { if (!this.errorTracker) return;
 
     try {
       await this.errorTracker.trackError(
         entry.message,
         {
           traceId: entry.traceId,
-          userId: entry.userId,
-          ip: entry.ipAddress,
+          user_id: entry.user_id,
+          ip: entry.ip_address,
           url: entry.context?.operation,
           method: entry.context?.component,
-          headers: entry.userAgent ? { 'User-Agent': entry.userAgent } : undefined,
+          headers: entry.user_agent ? { 'User-Agent': entry.user_agent  } : undefined,
           endpoint: entry.context?.operation,
           currentAvg: entry.context?.duration,
         },
@@ -1068,8 +1064,8 @@ export class UnifiedLogger implements LoggerChild {
       if (filters.correlationId && log.correlationId !== filters.correlationId) return false;
       if (filters.traceId && log.traceId !== filters.traceId) return false;
       if (filters.requestId && log.requestId !== filters.requestId) return false;
-      if (filters.userId && log.userId !== filters.userId) return false;
-      if (filters.ipAddress && log.ipAddress !== filters.ipAddress) return false;
+      if (filters.user_id && log.user_id !== filters.user_id) return false;
+      if (filters.ip_address && log.ip_address !== filters.ip_address) return false;
 
       if (filters.timeRange) {
         const { start, end } = filters.timeRange;
@@ -1276,11 +1272,11 @@ export class UnifiedLogger implements LoggerChild {
       'component',
       'operation',
       'duration',
-      'userId',
+      'user_id',
       'traceId',
       'requestId',
-      'ipAddress',
-      'userAgent',
+      'ip_address',
+      'user_agent',
     ];
 
     const lines = [headers.join(',')];
@@ -1294,11 +1290,11 @@ export class UnifiedLogger implements LoggerChild {
         log.component ?? '',
         log.operation ?? '',
         log.duration?.toString() ?? '',
-        log.userId ?? '',
+        log.user_id ?? '',
         log.traceId ?? '',
         log.requestId ?? '',
-        log.ipAddress ?? '',
-        `"${log.userAgent?.replace(/"/g, '""') ?? ''}"`,
+        log.ip_address ?? '',
+        `"${log.user_agent?.replace(/"/g, '""') ?? ''}"`,
       ];
       lines.push(row.join(','));
     }

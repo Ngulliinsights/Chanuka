@@ -20,20 +20,20 @@ const SortOrderEnum = z.enum(['asc', 'desc']);
 
 // --- Zod Schemas for Validation ---
 const basePreferenceSchema = z.object({
-  trackingTypes: z.array(TrackingTypeEnum).optional(),
-  alertFrequency: AlertFrequencyEnum.optional(),
-  alertChannels: z.array(AlertChannelEnum).optional(),
-  isActive: z.boolean().optional() // Keep isActive optional here
+  tracking_types: z.array(TrackingTypeEnum).optional(),
+  alert_frequency: AlertFrequencyEnum.optional(),
+  alert_channels: z.array(AlertChannelEnum).optional(),
+  is_active: z.boolean().optional() // Keep is_active optional here
 });
 
 const trackBillSchema = z.object({
   preferences: basePreferenceSchema.optional()
 });
 
-const updatePreferencesSchema = basePreferenceSchema.omit({ isActive: true }); // Prevent setting isActive via update
+const updatePreferencesSchema = basePreferenceSchema.omit({ is_active: true }); // Prevent setting is_active via update
 
 const bulkTrackingSchema = z.object({
-  billIds: z.array(z.number().int().positive()).min(1).max(100, "Cannot process more than 100 bills at once"),
+  bill_ids: z.array(z.number().int().positive()).min(1).max(100, "Cannot process more than 100 bills at once"),
   operation: z.enum(['track', 'untrack']),
   preferences: basePreferenceSchema.optional() // Only relevant for 'track'
 });
@@ -41,18 +41,16 @@ const bulkTrackingSchema = z.object({
 // --- Interface Definitions ---
 export interface BillTrackingPreference extends schema.UserBillTrackingPreference {} // Use DB type
 
-export interface TrackingAnalytics {
-    userId: string;
+export interface TrackingAnalytics { user_id: string;
     totalTrackedBills: number;
     activeTrackedBills: number;
-    trackingByCategory: Array<{ category: string | null; count: number }>;
+    trackingByCategory: Array<{ category: string | null; count: number  }>;
     trackingByStatus: Array<{ status: string; count: number }>;
-    recentActivity: Array<{
-        billId: number;
+    recentActivity: Array<{ bill_id: number;
         billTitle: string;
         action: 'tracked' | 'untracked' | 'updated_preferences';
         timestamp: Date;
-    }>;
+     }>;
     engagementSummary: {
         totalViews: number;
         totalComments: number;
@@ -61,26 +59,24 @@ export interface TrackingAnalytics {
     };
 }
 
-export interface BulkTrackingOperation {
-  userId: string;
-  billIds: number[];
+export interface BulkTrackingOperation { user_id: string;
+  bill_ids: number[];
   operation: 'track' | 'untrack';
-  preferences?: Partial<Omit<schema.InsertUserBillTrackingPreference, 'userId' | 'billId'>>;
-}
+  preferences?: Partial<Omit<schema.InsertUserBillTrackingPreference, 'user_id' | 'bill_id'>>;
+  }
 
-export interface BulkTrackingResult {
-  successful: number[];
-  failed: Array<{ billId: number; error: string; }>;
+export interface BulkTrackingResult { successful: number[];
+  failed: Array<{ bill_id: number; error: string;  }>;
   summary: { total: number; successful: number; failed: number; };
 }
 
 export interface TrackedBillWithDetails extends schema.Bill {
   trackingPreferences: schema.UserBillTrackingPreference;
   engagement: {
-    viewCount: number;
-    commentCount: number;
-    shareCount: number;
-    engagementScore: number;
+    view_count: number;
+    comment_count: number;
+    share_count: number;
+    engagement_score: number;
     lastEngaged: Date;
   };
   recentUpdates: Array<{
@@ -103,56 +99,52 @@ export class BillTrackingService {
    * Track a bill for a user or update existing preferences if already tracked.
    */
   async trackBill(
-    userId: string,
-    billId: number,
+    user_id: string,
+    bill_id: number,
     preferences?: z.infer<typeof basePreferenceSchema> // Use Zod type for input
-  ): Promise<schema.UserBillTrackingPreference> {
-    logger.info(`📌 Tracking bill ${billId} for user ${userId}`);
-    try {
-      const bill = await this.validateBillExists(billId);
-      if (!bill) throw new Error(`Bill with ID ${billId} not found`);
+  ): Promise<schema.UserBillTrackingPreference> { logger.info(`📌 Tracking bill ${bill_id } for user ${ user_id }`);
+    try { const bill = await this.validateBillExists(bill_id);
+      if (!bill) throw new Error(`Bill with ID ${bill_id } not found`);
 
       const result = await databaseService.withTransaction(async (tx) => {
         const defaultPrefs = {
-          trackingTypes: preferences?.trackingTypes ?? ['status_changes', 'new_comments'],
-          alertFrequency: preferences?.alertFrequency ?? 'immediate',
-          alertChannels: preferences?.alertChannels ?? ['in_app', 'email'],
-          isActive: true, // Always set to active when tracking/re-tracking
+          tracking_types: preferences?.tracking_types ?? ['status_changes', 'new_comments'],
+          alert_frequency: preferences?.alert_frequency ?? 'immediate',
+          alert_channels: preferences?.alert_channels ?? ['in_app', 'email'],
+          is_active: true, // Always set to active when tracking/re-tracking
         };
 
-        const valuesToInsert: schema.InsertUserBillTrackingPreference = { userId, billId, ...defaultPrefs };
-        const valuesToUpdate: Partial<Omit<schema.UserBillTrackingPreference, 'id' | 'userId' | 'billId' | 'createdAt'>> = { ...defaultPrefs, updatedAt: new Date() };
+        const valuesToInsert: schema.InsertUserBillTrackingPreference = { user_id, bill_id, ...defaultPrefs   };
+        const valuesToUpdate: Partial<Omit<schema.UserBillTrackingPreference, 'id' | 'user_id' | 'bill_id' | 'created_at'>> = { ...defaultPrefs, updated_at: new Date() };
 
         const [preference] = await tx
           .insert(schema.userBillTrackingPreference)
           .values(valuesToInsert)
-          .onConflictDoUpdate({ target: [schema.userBillTrackingPreference.userId, schema.userBillTrackingPreference.billId], set: valuesToUpdate })
+          .onConflictDoUpdate({ target: [schema.userBillTrackingPreference.user_id, schema.userBillTrackingPreference.bill_id], set: valuesToUpdate })
           .returning();
 
-        // Ensure billEngagement record exists or update lastEngagedAt
+        // Ensure bill_engagement record exists or update last_engaged_at
         const [existingEngagement] = await tx
-          .select({ id: schema.billEngagement.id })
-          .from(schema.billEngagement)
-          .where(and(eq(schema.billEngagement.billId, billId), eq(schema.billEngagement.userId, userId)));
+          .select({ id: schema.bill_engagement.id })
+          .from(schema.bill_engagement)
+          .where(and(eq(schema.bill_engagement.bill_id, bill_id), eq(schema.bill_engagement.user_id, user_id)));
 
-        if (!existingEngagement) {
-          const engagementToInsert: schema.InsertBillEngagement = {
-            billId, userId, viewCount: 1, commentCount: 0, shareCount: 0, engagementScore: "1", lastEngagedAt: new Date(),
-          };
-          await tx.insert(schema.billEngagement).values(engagementToInsert);
+        if (!existingEngagement) { const engagementToInsert: schema.InsertBillEngagement = {
+            bill_id, user_id, view_count: 1, comment_count: 0, share_count: 0, engagement_score: "1", last_engaged_at: new Date(),
+            };
+          await tx.insert(schema.bill_engagement).values(engagementToInsert);
         } else {
-          await tx.update(schema.billEngagement).set({ lastEngagedAt: new Date(), updatedAt: new Date() }).where(eq(schema.billEngagement.id, existingEngagement.id));
+          await tx.update(schema.bill_engagement).set({ last_engaged_at: new Date(), updated_at: new Date() }).where(eq(schema.bill_engagement.id, existingEngagement.id));
         }
         return preference;
       }, 'trackBill');
 
-      await this.clearUserTrackingCaches(userId, billId);
-      await this.recordTrackingAnalytics(userId, billId, 'tracked', bill.title);
+      await this.clearUserTrackingCaches(user_id, bill_id);
+      await this.recordTrackingAnalytics(user_id, bill_id, 'tracked', bills.title);
       // Consider sending notification via notificationService if needed
-      logger.info(`✅ Successfully tracked bill ${billId} for user ${userId}`);
+      logger.info(`✅ Successfully tracked bill ${ bill_id } for user ${ user_id }`);
       return result.data;
-    } catch (error) {
-      logger.error(`Error tracking bill ${billId} for user ${userId}:`, { component: 'BillTrackingService' }, error);
+    } catch (error) { logger.error(`Error tracking bill ${bill_id } for user ${ user_id }:`, { component: 'BillTrackingService' }, error);
       throw error;
     }
   }
@@ -160,39 +152,34 @@ export class BillTrackingService {
   /**
    * Mark a user's tracking preference for a bill as inactive.
    */
-  async untrackBill(userId: string, billId: number): Promise<void> {
-    logger.info(`📌 Untracking bill ${billId} for user ${userId}`);
-    try {
-      const bill = await this.validateBillExists(billId); // Keep validation
+  async untrackBill(user_id: string, bill_id: number): Promise<void> { logger.info(`📌 Untracking bill ${bill_id } for user ${ user_id }`);
+    try { const bill = await this.validateBillExists(bill_id); // Keep validation
 
       const result = await this.db
         .update(schema.userBillTrackingPreference)
-        .set({ isActive: false, updatedAt: new Date() })
-        .where(and(eq(schema.userBillTrackingPreference.billId, billId), eq(schema.userBillTrackingPreference.userId, userId)))
+        .set({ is_active: false, updated_at: new Date()  })
+        .where(and(eq(schema.userBillTrackingPreference.bill_id, bill_id), eq(schema.userBillTrackingPreference.user_id, user_id)))
         .returning({ id: schema.userBillTrackingPreference.id });
 
-      if (result.length === 0) {
-        logger.warn(`Attempted to untrack bill ${billId} for user ${userId}, but no active preference found.`);
+      if (result.length === 0) { logger.warn(`Attempted to untrack bill ${bill_id } for user ${ user_id }, but no active preference found.`);
         return; // Succeed silently if already untracked or never tracked
       }
 
-      await this.clearUserTrackingCaches(userId, billId);
-      if (bill) {
-        await this.recordTrackingAnalytics(userId, billId, 'untracked', bill.title);
+      await this.clearUserTrackingCaches(user_id, bill_id);
+      if (bill) { await this.recordTrackingAnalytics(user_id, bill_id, 'untracked', bills.title);
         // Consider sending notification
-      }
-      logger.info(`✅ Successfully untracked bill ${billId} for user ${userId}`);
-    } catch (error) {
-      logger.error(`Error untracking bill ${billId} for user ${userId}:`, { component: 'BillTrackingService' }, error);
+        }
+      logger.info(`✅ Successfully untracked bill ${ bill_id } for user ${ user_id }`);
+    } catch (error) { logger.error(`Error untracking bill ${bill_id } for user ${ user_id }:`, { component: 'BillTrackingService' }, error);
       throw error;
     }
   }
 
   /**
-   * Get a paginated list of bills actively tracked by the user.
+   * Get a paginated list of bills actively tracked by the users.
    */
   async getUserTrackedBills(
-    userId: string,
+    user_id: string,
     options: {
       page?: number; limit?: number; category?: string; status?: string;
       sortBy?: z.infer<typeof SortByEnum>; sortOrder?: z.infer<typeof SortOrderEnum>;
@@ -205,7 +192,7 @@ export class BillTrackingService {
     const sortOrder = options.sortOrder ?? 'desc';
 
     const filterKey = `${options.category ?? 'all'}:${options.status ?? 'all'}:${sortBy}:${sortOrder}`;
-  const cacheKey = `user:tracked_bills:${userId}:${page}:${limit}:${filterKey}`;
+  const cacheKey = `user:tracked_bills:${ user_id }:${page}:${limit}:${filterKey}`;
 
     const cachedData = await cacheService.get(cacheKey);
     if (cachedData) {
@@ -214,42 +201,41 @@ export class BillTrackingService {
     }
     logger.debug(`Cache miss for tracked bills: ${cacheKey}`);
 
-    try {
-      const baseConditions = [
-        eq(schema.userBillTrackingPreference.userId, userId),
-        eq(schema.userBillTrackingPreference.isActive, true)
+    try { const baseConditions = [
+        eq(schema.userBillTrackingPreference.user_id, user_id),
+        eq(schema.userBillTrackingPreference.is_active, true)
       ];
       if (options.category) baseConditions.push(eq(schema.bills.category, options.category));
       if (options.status) baseConditions.push(eq(schema.bills.status, options.status));
 
-      const [{ count: total }] = await this.db
+      const [{ count: total  }] = await this.db
         .select({ count: count() })
         .from(schema.userBillTrackingPreference)
-        .innerJoin(schema.bills, eq(schema.userBillTrackingPreference.billId, schema.bills.id))
+        .innerJoin(schema.bills, eq(schema.userBillTrackingPreference.bill_id, schema.bills.id))
         .where(and(...baseConditions));
 
       if (total === 0) return { bills: [], pagination: { page, limit, total: 0, pages: 0 } };
 
       let sortColumn;
       switch (sortBy) {
-        case 'last_updated': sortColumn = schema.bills.updatedAt; break;
-        case 'engagement': sortColumn = schema.billEngagement.engagementScore; break; // Needs join
+        case 'last_updated': sortColumn = schema.bills.updated_at; break;
+        case 'engagement': sortColumn = schema.bill_engagement.engagement_score; break; // Needs join
         case 'date_tracked':
-        default: sortColumn = schema.userBillTrackingPreference.updatedAt;
+        default: sortColumn = schema.userBillTrackingPreference.updated_at;
       }
       const orderFunction = sortOrder === 'asc' ? asc : desc;
 
       const results = await this.db
         .select({
           bill: schema.bills,
-          engagement: schema.billEngagement,
+          engagement: schema.bill_engagement,
           trackingPreferences: schema.userBillTrackingPreference
         })
         .from(schema.userBillTrackingPreference)
-        .innerJoin(schema.bills, eq(schema.userBillTrackingPreference.billId, schema.bills.id))
-        .leftJoin(schema.billEngagement, and(
-          eq(schema.userBillTrackingPreference.billId, schema.billEngagement.billId),
-          eq(schema.userBillTrackingPreference.userId, schema.billEngagement.userId)
+        .innerJoin(schema.bills, eq(schema.userBillTrackingPreference.bill_id, schema.bills.id))
+        .leftJoin(schema.bill_engagement, and(
+          eq(schema.userBillTrackingPreference.bill_id, schema.bill_engagement.bill_id),
+          eq(schema.userBillTrackingPreference.user_id, schema.bill_engagement.user_id)
         ))
         .where(and(...baseConditions))
         .orderBy(orderFunction(sortColumn))
@@ -257,17 +243,17 @@ export class BillTrackingService {
         .offset(offset);
 
       const enhancedBills: TrackedBillWithDetails[] = await Promise.all(results.map(async (res) => {
-        const recentUpdates = await this.getBillRecentUpdates(res.bill.id);
-        const engagementData = res.engagement || { viewCount: 0, commentCount: 0, shareCount: 0, engagementScore: "0", lastEngagedAt: res.trackingPreferences.createdAt };
+        const recentUpdates = await this.getBillRecentUpdates(res.bills.id);
+        const engagement_data = res.engagement || { view_count: 0, comment_count: 0, share_count: 0, engagement_score: "0", last_engaged_at: res.trackingPreferences.created_at };
         return {
           ...(res.bill as schema.Bill),
           trackingPreferences: res.trackingPreferences,
           engagement: {
-            viewCount: engagementData.viewCount,
-            commentCount: engagementData.commentCount,
-            shareCount: engagementData.shareCount,
-            engagementScore: parseFloat(engagementData.engagementScore || '0'),
-            lastEngaged: engagementData.lastEngagedAt || new Date(),
+            view_count: engagement_data.view_count,
+            comment_count: engagement_data.comment_count,
+            share_count: engagement_data.share_count,
+            engagement_score: parseFloat(engagement_data.engagement_score || '0'),
+            lastEngaged: engagement_data.last_engaged_at || new Date(),
           },
           recentUpdates
         };
@@ -279,8 +265,7 @@ export class BillTrackingService {
       };
   await cacheService.set(cacheKey, response, 3600); // 1 hour
       return response;
-    } catch (error) {
-      logger.error(`Error getting tracked bills for user ${userId}:`, { component: 'BillTrackingService' }, error);
+    } catch (error) { logger.error(`Error getting tracked bills for user ${user_id }:`, { component: 'BillTrackingService' }, error);
       return { bills: [], pagination: { page, limit, total: 0, pages: 0 } }; // Return empty on error
     }
   }
@@ -289,36 +274,32 @@ export class BillTrackingService {
    * Update specific tracking preferences for a bill a user is already tracking.
    */
   async updateBillTrackingPreferences(
-    userId: string,
-    billId: number,
+    user_id: string,
+    bill_id: number,
     preferences: z.infer<typeof updatePreferencesSchema> // Use Zod type for input
-  ): Promise<schema.UserBillTrackingPreference> {
-    logger.info(`🔄 Updating tracking preferences for bill ${billId}, user ${userId}`);
-    try {
-      // Input already validated by Zod in the router
-      const updateData: Partial<Omit<schema.UserBillTrackingPreference, 'id' | 'userId' | 'billId' | 'createdAt' | 'isActive'>> = {
+  ): Promise<schema.UserBillTrackingPreference> { logger.info(`🔄 Updating tracking preferences for bill ${bill_id }, user ${ user_id }`);
+    try { // Input already validated by Zod in the router
+      const updateData: Partial<Omit<schema.UserBillTrackingPreference, 'id' | 'user_id' | 'bill_id' | 'created_at' | 'is_active'>> = {
           ...preferences,
-          updatedAt: new Date()
-      };
+          updated_at: new Date()
+        };
 
 
       const [updatedPreference] = await this.db
         .update(schema.userBillTrackingPreference)
         .set(updateData)
-        .where(and(eq(schema.userBillTrackingPreference.userId, userId), eq(schema.userBillTrackingPreference.billId, billId), eq(schema.userBillTrackingPreference.isActive, true))) // Ensure we only update active prefs
+        .where(and(eq(schema.userBillTrackingPreference.user_id, user_id), eq(schema.userBillTrackingPreference.bill_id, bill_id), eq(schema.userBillTrackingPreference.is_active, true))) // Ensure we only update active prefs
         .returning();
 
-      if (!updatedPreference) {
-        throw new Error(`No active tracking preference found for bill ${billId} and user ${userId} to update.`);
+      if (!updatedPreference) { throw new Error(`No active tracking preference found for bill ${bill_id } and user ${ user_id } to update.`);
       }
 
-      await this.clearUserTrackingCaches(userId, billId);
-      await this.recordTrackingAnalytics(userId, billId, 'updated_preferences');
+      await this.clearUserTrackingCaches(user_id, bill_id);
+      await this.recordTrackingAnalytics(user_id, bill_id, 'updated_preferences');
 
-      logger.info(`✅ Updated tracking preferences for bill ${billId} and user ${userId}`);
+      logger.info(`✅ Updated tracking preferences for bill ${ bill_id } and user ${ user_id }`);
       return updatedPreference;
-    } catch (error) {
-      logger.error(`Error updating tracking preferences for bill ${billId} and user ${userId}:`, { component: 'BillTrackingService' }, error);
+    } catch (error) { logger.error(`Error updating tracking preferences for bill ${bill_id } and user ${ user_id }:`, { component: 'BillTrackingService' }, error);
       throw error;
     }
   }
@@ -327,8 +308,8 @@ export class BillTrackingService {
    * Perform bulk track or untrack operations for multiple bills.
    */
   async bulkTrackingOperation(operation: BulkTrackingOperation): Promise<BulkTrackingResult> {
-    logger.info(`📦 Performing bulk ${operation.operation} for user ${operation.userId} on ${operation.billIds.length} bills`);
-    const result: BulkTrackingResult = { successful: [], failed: [], summary: { total: operation.billIds.length, successful: 0, failed: 0 } };
+    logger.info(`📦 Performing bulk ${operation.operation} for user ${operation.user_id} on ${operation.bill_ids.length} bills`);
+    const result: BulkTrackingResult = { successful: [], failed: [], summary: { total: operation.bill_ids.length, successful: 0, failed: 0 } };
 
     // Validate preferences only needed for track operation
     if (operation.operation === 'track' && operation.preferences) {
@@ -340,27 +321,25 @@ export class BillTrackingService {
 
 
     // Consider running operations in parallel batches for performance
-    for (const billId of operation.billIds) {
-      try {
+    for (const bill_id of operation.bill_ids) { try {
         if (operation.operation === 'track') {
-          await this.trackBill(operation.userId, billId, operation.preferences);
-        } else {
-          await this.untrackBill(operation.userId, billId);
-        }
-        result.successful.push(billId);
+          await this.trackBill(operation.user_id, bill_id, operation.preferences);
+         } else { await this.untrackBill(operation.user_id, bill_id);
+         }
+        result.successful.push(bill_id);
         result.summary.successful++;
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
-        logger.error(`Bulk ${operation.operation} failed for bill ${billId}, user ${operation.userId}: ${message}`);
-        result.failed.push({ billId, error: message });
+        logger.error(`Bulk ${operation.operation} failed for bill ${ bill_id }, user ${operation.user_id}: ${message}`);
+        result.failed.push({ bill_id, error: message  });
         result.summary.failed++;
       }
     }
 
     // Clear general user caches after bulk op, specific caches cleared in track/untrack
-    await this.clearUserTrackingCaches(operation.userId);
+    await this.clearUserTrackingCaches(operation.user_id);
 
-    logger.info(`✅ Bulk ${operation.operation} completed for user ${operation.userId}: ${result.summary.successful}/${result.summary.total} successful`);
+    logger.info(`✅ Bulk ${operation.operation} completed for user ${operation.user_id}: ${result.summary.successful}/${result.summary.total} successful`);
     return result;
   }
 
@@ -368,8 +347,7 @@ export class BillTrackingService {
   /**
    * Get analytics related to a user's bill tracking activities.
    */
-  async getUserTrackingAnalytics(userId: string): Promise<TrackingAnalytics> {
-  const cacheKey = `user:tracking_analytics:${userId}`;
+  async getUserTrackingAnalytics(user_id: string): Promise<TrackingAnalytics> { const cacheKey = `user:tracking_analytics:${user_id }`;
      const cachedData = await cacheService.get(cacheKey);
      if (cachedData) {
          logger.debug(`Cache hit for tracking analytics: ${cacheKey}`);
@@ -389,41 +367,40 @@ export class BillTrackingService {
             // Query 1: Total and Active Counts
             this.db.select({
                 totalTrackedBills: count(schema.userBillTrackingPreference.id),
-                activeTrackedBills: count(sql`CASE WHEN ${schema.userBillTrackingPreference.isActive} = true THEN 1 ELSE NULL END`)
-            }).from(schema.userBillTrackingPreference).where(eq(schema.userBillTrackingPreference.userId, userId)),
+                activeTrackedBills: count(sql`CASE WHEN ${schema.userBillTrackingPreference.is_active} = true THEN 1 ELSE NULL END`)
+            }).from(schema.userBillTrackingPreference).where(eq(schema.userBillTrackingPreference.user_id, user_id)),
 
             // Query 2: Tracking by Category (Active Only)
             this.db.select({ category: schema.bills.category, count: count() })
                 .from(schema.userBillTrackingPreference)
-                .innerJoin(schema.bills, eq(schema.userBillTrackingPreference.billId, schema.bills.id))
-                .where(and(eq(schema.userBillTrackingPreference.userId, userId), eq(schema.userBillTrackingPreference.isActive, true)))
+                .innerJoin(schema.bills, eq(schema.userBillTrackingPreference.bill_id, schema.bills.id))
+                .where(and(eq(schema.userBillTrackingPreference.user_id, user_id), eq(schema.userBillTrackingPreference.is_active, true)))
                 .groupBy(schema.bills.category),
 
             // Query 3: Tracking by Status (Active Only)
             this.db.select({ status: schema.bills.status, count: count() })
                 .from(schema.userBillTrackingPreference)
-                .innerJoin(schema.bills, eq(schema.userBillTrackingPreference.billId, schema.bills.id))
-                .where(and(eq(schema.userBillTrackingPreference.userId, userId), eq(schema.userBillTrackingPreference.isActive, true)))
+                .innerJoin(schema.bills, eq(schema.userBillTrackingPreference.bill_id, schema.bills.id))
+                .where(and(eq(schema.userBillTrackingPreference.user_id, user_id), eq(schema.userBillTrackingPreference.is_active, true)))
                 .groupBy(schema.bills.status),
 
             // Query 4: Engagement Summary (Across all user engagements)
             this.db.select({
-                totalViews: sql<number>`COALESCE(SUM(${schema.billEngagement.viewCount}), 0)`,
-                totalComments: sql<number>`COALESCE(SUM(${schema.billEngagement.commentCount}), 0)`,
-                totalShares: sql<number>`COALESCE(SUM(${schema.billEngagement.shareCount}), 0)`,
-                averageEngagementScore: sql<number>`COALESCE(AVG(CAST(${schema.billEngagement.engagementScore} AS DECIMAL)), 0)`
-            }).from(schema.billEngagement).where(eq(schema.billEngagement.userId, userId)),
+                totalViews: sql<number>`COALESCE(SUM(${schema.bill_engagement.view_count}), 0)`,
+                totalComments: sql<number>`COALESCE(SUM(${schema.bill_engagement.comment_count}), 0)`,
+                totalShares: sql<number>`COALESCE(SUM(${schema.bill_engagement.share_count}), 0)`,
+                averageEngagementScore: sql<number>`COALESCE(AVG(CAST(${schema.bill_engagement.engagement_score} AS DECIMAL)), 0)`
+            }).from(schema.bill_engagement).where(eq(schema.bill_engagement.user_id, user_id)),
 
              // Query 5: Recent Activity (Fetch from cache)
-             this.getRecentTrackingActivity(userId)
+             this.getRecentTrackingActivity(user_id)
         ]);
 
 
-        const analyticsData: TrackingAnalytics = {
-            userId,
+        const analyticsData: TrackingAnalytics = { user_id,
             totalTrackedBills: Number(totals[0]?.totalTrackedBills || 0),
             activeTrackedBills: Number(totals[0]?.activeTrackedBills || 0),
-            trackingByCategory: categoryData.map(item => ({ category: item.category || 'Uncategorized', count: Number(item.count) })),
+            trackingByCategory: categoryData.map(item => ({ category: item.category || 'Uncategorized', count: Number(item.count)  })),
             trackingByStatus: statusData.map(item => ({ status: item.status, count: Number(item.count) })),
             recentActivity: recentActivityData,
             engagementSummary: {
@@ -436,21 +413,19 @@ export class BillTrackingService {
 
   await cacheService.set(cacheKey, analyticsData, 3600); // 1 hour
         return analyticsData;
-    } catch (error) {
-      logger.error(`Error getting tracking analytics for user ${userId}:`, { component: 'BillTrackingService' }, error);
+    } catch (error) { logger.error(`Error getting tracking analytics for user ${user_id }:`, { component: 'BillTrackingService' }, error);
       return { // Return default structure on error
-          userId, totalTrackedBills: 0, activeTrackedBills: 0, trackingByCategory: [],
+          user_id, totalTrackedBills: 0, activeTrackedBills: 0, trackingByCategory: [],
           trackingByStatus: [], recentActivity: [],
-          engagementSummary: { totalViews: 0, totalComments: 0, totalShares: 0, averageEngagementScore: 0 }
+          engagementSummary: { totalViews: 0, totalComments: 0, totalShares: 0, averageEngagementScore: 0  }
       };
     }
   }
 
   /**
-   * Check if a user is actively tracking a specific bill.
+   * Check if a user is actively tracking a specific bills.
    */
-  async isUserTrackingBill(userId: string, billId: number): Promise<boolean> {
-  const cacheKey = `user:tracking:${userId}:bill:${billId}`;
+  async isUserTrackingBill(user_id: string, bill_id: number): Promise<boolean> { const cacheKey = `user:tracking:${user_id }:bill:${ bill_id }`;
      const cachedValue = await cacheService.get(cacheKey);
      if (cachedValue !== null && cachedValue !== undefined) {
          logger.debug(`Cache hit for isUserTrackingBill: ${cacheKey}`);
@@ -459,18 +434,17 @@ export class BillTrackingService {
      logger.debug(`Cache miss for isUserTrackingBill: ${cacheKey}`);
 
     try {
-      // Optimize query to just check for existence and isActive status
+      // Optimize query to just check for existence and is_active status
       const [preference] = await this.db
-        .select({ isActive: schema.userBillTrackingPreference.isActive })
+        .select({ is_active: schema.userBillTrackingPreference.is_active })
         .from(schema.userBillTrackingPreference)
-        .where(and(eq(schema.userBillTrackingPreference.userId, userId), eq(schema.userBillTrackingPreference.billId, billId)))
+        .where(and(eq(schema.userBillTrackingPreference.user_id, user_id), eq(schema.userBillTrackingPreference.bill_id, bill_id)))
         .limit(1);
 
-       const isTracking = preference?.isActive ?? false; // Default to false if no record found
+       const isTracking = preference?.is_active ?? false; // Default to false if no record found
   await cacheService.set(cacheKey, isTracking, 300); // 5 minutes
        return isTracking;
-    } catch (error) {
-      logger.error(`Error checking if user ${userId} is tracking bill ${billId}:`, { component: 'BillTrackingService' }, error);
+    } catch (error) { logger.error(`Error checking if user ${user_id } is tracking bill ${ bill_id }:`, { component: 'BillTrackingService' }, error);
       return false; // Return false on error
     }
   }
@@ -478,8 +452,7 @@ export class BillTrackingService {
   /**
    * Recommend bills for tracking based on user interests and untracked popular bills.
    */
-  async getRecommendedBillsForTracking(userId: string, limit: number = 10): Promise<schema.Bill[]> {
-  const cacheKey = `user:recommended_tracking:${userId}:${limit}`;
+  async getRecommendedBillsForTracking(user_id: string, limit: number = 10): Promise<schema.Bill[]> { const cacheKey = `user:recommended_tracking:${user_id }:${limit}`;
     const cachedData = await cacheService.get(cacheKey);
     if (cachedData) {
       logger.debug(`Cache hit for recommended tracking: ${cacheKey}`);
@@ -487,20 +460,19 @@ export class BillTrackingService {
     }
     logger.debug(`Cache miss for recommended tracking: ${cacheKey}`);
 
-    try {
-      // Find bills user is already tracking (active or inactive)
+    try { // Find bills user is already tracking (active or inactive)
       const trackedBillIdsResult = await this.db
-        .select({ billId: schema.userBillTrackingPreference.billId })
+        .select({ bill_id: schema.userBillTrackingPreference.bill_id  })
         .from(schema.userBillTrackingPreference)
-        .where(eq(schema.userBillTrackingPreference.userId, userId));
-      const trackedBillIds = trackedBillIdsResult.map(t => t.billId);
+        .where(eq(schema.userBillTrackingPreference.user_id, user_id));
+      const trackedBillIds = trackedBillIdsResult.map(t => t.bill_id);
 
       // Find user interests
-      const userInterestsResult = await this.db
-        .select({ interest: schema.userInterests.interest })
-        .from(schema.userInterests)
-        .where(eq(schema.userInterests.userId, userId));
-      const interests = userInterestsResult.map(ui => ui.interest.toLowerCase()); // Normalize interests
+      const user_interestsResult = await this.db
+        .select({ interest: schema.user_interests.interest })
+        .from(schema.user_interests)
+        .where(eq(schema.user_interests.user_id, user_id));
+      const interests = user_interestsResult.map(ui => ui.interest.toLowerCase()); // Normalize interests
 
       let recommendations: schema.Bill[] = [];
 
@@ -509,13 +481,13 @@ export class BillTrackingService {
         const interestConditions = or(
           // Match category (case-insensitive)
           ...interests.map(interest => sql`LOWER(${schema.bills.category}) = ${interest}`),
-          // Match tags (assuming tags are stored appropriately, e.g., in billTags table)
+          // Match tags (assuming tags are stored appropriately, e.g., in bill_tags table)
           // This requires a subquery or join depending on your final schema for tags
-          // Example using exists subquery on billTags table:
+          // Example using exists subquery on bill_tags table:
            sql`EXISTS (
-               SELECT 1 FROM ${schema.billTags}
-               WHERE ${schema.billTags.billId} = ${schema.bills.id}
-               AND LOWER(${schema.billTags.tag}) IN ${interests}
+               SELECT 1 FROM ${schema.bill_tags}
+               WHERE ${schema.bill_tags.bill_id} = ${schema.bills.id}
+               AND LOWER(${schema.bill_tags.tag}) IN ${interests}
            )`
         );
 
@@ -525,7 +497,7 @@ export class BillTrackingService {
             interestConditions,
             trackedBillIds.length > 0 ? sql`${schema.bills.id} NOT IN ${trackedBillIds}` : undefined // Exclude tracked
           ))
-          .orderBy(desc(schema.bills.viewCount)) // Prioritize popular within interest
+          .orderBy(desc(schema.bills.view_count)) // Prioritize popular within interest
           .limit(limit);
         recommendations.push(...interestBasedRecs);
       }
@@ -538,13 +510,13 @@ export class BillTrackingService {
           .where(
               trackedBillIds.length > 0 ? sql`${schema.bills.id} NOT IN ${trackedBillIds}` : undefined // Exclude tracked
           )
-          .orderBy(desc(schema.bills.viewCount)) // Order by popularity
+          .orderBy(desc(schema.bills.view_count)) // Order by popularity
           .limit(remainingLimit + recommendations.length); // Fetch slightly more to filter out duplicates
 
          // Add popular bills ensuring no duplicates from interest-based recs
          const currentRecIds = new Set(recommendations.map(r => r.id));
          popularUntracked.forEach(bill => {
-             if (recommendations.length < limit && !currentRecIds.has(bill.id)) {
+             if (recommendations.length < limit && !currentRecIds.has(bills.id)) {
                  recommendations.push(bill);
              }
          });
@@ -553,8 +525,7 @@ export class BillTrackingService {
 
   await cacheService.set(cacheKey, recommendations, 3600); // 1 hour
       return recommendations;
-    } catch (error) {
-      logger.error(`Error getting recommended bills for user ${userId}:`, { component: 'BillTrackingService' }, error);
+    } catch (error) { logger.error(`Error getting recommended bills for user ${user_id }:`, { component: 'BillTrackingService' }, error);
       return []; // Return empty on error
     }
   }
@@ -562,14 +533,12 @@ export class BillTrackingService {
 
   // --- Helper Methods ---
 
-  private async validateBillExists(billId: number): Promise<Pick<Bill, 'id' | 'title'> | null> {
-    if (isNaN(billId) || billId <= 0) throw new Error('Invalid Bill ID provided.');
+  private async validateBillExists(bill_id: number): Promise<Pick<Bill, 'id' | 'title'> | null> { if (isNaN(bill_id) || bill_id <= 0) throw new Error('Invalid Bill ID provided.');
 
-  const cacheKey = `bill:exists:${billId}`; // Simple existence cache
+  const cacheKey = `bill:exists:${bill_id }`; // Simple existence cache
     const cachedExists = await cacheService.get(cacheKey);
     // Return minimal info if exists, null otherwise
-    if (cachedExists !== null && cachedExists !== undefined) {
-        return cachedExists ? ({ id: billId, title: 'Cached Title' } as Pick<Bill, 'id' | 'title'>) : null;
+    if (cachedExists !== null && cachedExists !== undefined) { return cachedExists ? ({ id: bill_id, title: 'Cached Title'  } as Pick<Bill, 'id' | 'title'>) : null;
     }
 
 
@@ -577,29 +546,26 @@ export class BillTrackingService {
       const [bill] = await this.db
         .select({ id: schema.bills.id, title: schema.bills.title }) // Only fetch needed fields
         .from(schema.bills)
-        .where(eq(schema.bills.id, billId))
+        .where(eq(schema.bills.id, bill_id))
         .limit(1);
 
   await cacheService.set(cacheKey, !!bill, 3600); // 1 hour
       return bill || null;
-    } catch (error) {
-      logger.error(`Error validating bill existence for ID ${billId}:`, { component: 'BillTrackingService' }, error);
-      throw new Error(`Database error validating bill existence for ID ${billId}`);
+    } catch (error) { logger.error(`Error validating bill existence for ID ${bill_id }:`, { component: 'BillTrackingService' }, error);
+      throw new Error(`Database error validating bill existence for ID ${ bill_id }`);
     }
   }
 
-  private async clearUserTrackingCaches(userId: string, billId?: number): Promise<void> {
-    // Define patterns/keys more specifically using CACHE_KEYS
+  private async clearUserTrackingCaches(user_id: string, bill_id?: number): Promise<void> { // Define patterns/keys more specifically using CACHE_KEYS
     const patternsToDelete = [
-      `user:tracked_bills:${userId}:*`, // Pattern for paginated results
-      `user:tracking_analytics:${userId}`,
-      `user:recommended_tracking:${userId}:*`, // Pattern for different limits
+      `user:tracked_bills:${user_id }:*`, // Pattern for paginated results
+      `user:tracking_analytics:${ user_id }`,
+      `user:recommended_tracking:${ user_id }:*`, // Pattern for different limits
     ];
-    if (billId) {
-      patternsToDelete.push(`user:tracking:${userId}:bill:${billId}`);
+    if (bill_id) { patternsToDelete.push(`user:tracking:${user_id }:bill:${ bill_id }`);
     }
 
-    logger.debug(`Clearing cache keys/patterns for user ${userId}: ${patternsToDelete.join(', ')}`);
+    logger.debug(`Clearing cache keys/patterns for user ${ user_id }: ${patternsToDelete.join(', ')}`);
     try {
       // Use Promise.all to clear concurrently
     const clearPromises = patternsToDelete.map(async (keyOrPattern) => {
@@ -620,43 +586,42 @@ export class BillTrackingService {
     });
     await Promise.all(clearPromises);
 
-      logger.debug(`Successfully cleared caches for user ${userId}`);
-    } catch (error) {
-      logger.error(`Error clearing cache for user ${userId}:`, { component: 'BillTrackingService' }, error);
+      logger.debug(`Successfully cleared caches for user ${ user_id }`);
+    } catch (error) { logger.error(`Error clearing cache for user ${user_id }:`, { component: 'BillTrackingService' }, error);
       // Log error but don't fail the primary operation
     }
   }
 
-  private async getBillRecentUpdates(billId: number): Promise<TrackedBillWithDetails['recentUpdates']> {
+  private async getBillRecentUpdates(bill_id: number): Promise<TrackedBillWithDetails['recentUpdates']> {
      // Fetch recent status changes from billStatusMonitorService history (if available and reliable)
-     // Or query related tables like analysis, billComments, etc., ordered by date, limit 3-5
+     // Or query related tables like analysis, comments, etc., ordered by date, limit 3-5
      // Example: Query last 3 comments + last status change
      try {
          // Placeholder: Get last status update from bill itself
-         const [bill] = await this.db.select({ status: schema.bills.status, updatedAt: schema.bills.updatedAt })
+         const [bill] = await this.db.select({ status: schema.bills.status, updated_at: schema.bills.updated_at })
              .from(schema.bills)
-             .where(eq(schema.bills.id, billId));
+             .where(eq(schema.bills.id, bill_id));
 
          const updates: TrackedBillWithDetails['recentUpdates'] = [];
          if (bill) {
              updates.push({
                  type: 'status_change', // This is simplified, needs better tracking
-                 timestamp: bill.updatedAt,
-                 description: `Bill status is now "${bill.status}"`
+                 timestamp: bills.updated_at,
+                 description: `Bill status is now "${bills.status}"`
              });
          }
 
          // Add recent comments if needed
-         const comments = await this.db.select({ content: schema.billComments.content, createdAt: schema.billComments.createdAt })
-             .from(schema.billComments)
-             .where(eq(schema.billComments.billId, billId))
-             .orderBy(desc(schema.billComments.createdAt))
+         const comments = await this.db.select({ content: schema.comments.content, created_at: schema.comments.created_at })
+             .from(schema.comments)
+             .where(eq(schema.comments.bill_id, bill_id))
+             .orderBy(desc(schema.comments.created_at))
              .limit(2);
 
          comments.forEach(c => {
              updates.push({
                  type: 'new_comment',
-                 timestamp: c.createdAt,
+                 timestamp: c.created_at,
                  description: `New comment: "${c.content.substring(0, 50)}..."`
              });
          });
@@ -666,17 +631,15 @@ export class BillTrackingService {
 
          return updates.slice(0, 3); // Return top 3 most recent
 
-     } catch (error) {
-         logger.error(`Error getting recent updates for bill ${billId}:`, { component: 'BillTrackingService' }, error);
+     } catch (error) { logger.error(`Error getting recent updates for bill ${bill_id }:`, { component: 'BillTrackingService' }, error);
          return [];
      }
   }
 
 
-  private async getRecentTrackingActivity(userId: string): Promise<TrackingAnalytics['recentActivity']> {
-    // This requires a dedicated activity log table or relying on cache which isn't persistent.
+  private async getRecentTrackingActivity(user_id: string): Promise<TrackingAnalytics['recentActivity']> { // This requires a dedicated activity log table or relying on cache which isn't persistent.
     // For now, return from cache if implemented, otherwise empty.
-    const cacheKey = `tracking_activity:${userId}`;
+    const cacheKey = `tracking_activity:${user_id }`;
     try {
       const activity = await cacheService.get(cacheKey);
       return activity || [];
@@ -686,13 +649,11 @@ export class BillTrackingService {
     }
   }
 
-  private async recordTrackingAnalytics(userId: string, billId: number, action: 'tracked' | 'untracked' | 'updated_preferences', billTitle?: string): Promise<void> {
-    // Persist this to an analytics event log table or use cache for short-term view
-    const cacheKey = `tracking_activity:${userId}`;
-    try {
-        const activityRecord = {
-            billId,
-            billTitle: billTitle || `Bill ${billId}`, // Fetch title if not provided
+  private async recordTrackingAnalytics(user_id: string, bill_id: number, action: 'tracked' | 'untracked' | 'updated_preferences', billTitle?: string): Promise<void> { // Persist this to an analytics event log table or use cache for short-term view
+    const cacheKey = `tracking_activity:${user_id }`;
+    try { const activityRecord = {
+            bill_id,
+            billTitle: billTitle || `Bill ${bill_id }`, // Fetch title if not provided
             action,
             timestamp: new Date()
         };

@@ -199,15 +199,14 @@ export class AIDeduplicationMiddleware {
   /**
    * Default key generator - creates a unique key based on request content
    */
-  private defaultKeyGenerator = (req: Request): string => {
-    const method = req.method;
+  private defaultKeyGenerator = (req: Request): string => { const method = req.method;
     const path = req.path;
     const query = JSON.stringify(req.query, Object.keys(req.query).sort());
     const body = req.body ? JSON.stringify(req.body, Object.keys(req.body).sort()) : '';
-    const userId = (req as any).user?.id || 'anonymous';
+    const user_id = (req as any).user?.id || 'anonymous';
 
     // Create a hash of the request content
-    const content = `${method}:${path}:${query}:${body}:${userId}`;
+    const content = `${method }:${path}:${query}:${body}:${ user_id }`;
     return `ai_dedup:${this.hashString(content)}`;
   }
 
@@ -215,12 +214,11 @@ export class AIDeduplicationMiddleware {
    * Default duplicate handler
    */
   private defaultOnDuplicate = (req: Request, res: Response, originalResult: any): void => {
-    logger.info('AI Request Served from Deduplication', { component: 'Chanuka' }, {
-      path: req.path,
+    logger.info('AI Request Served from Deduplication', { component: 'Chanuka' }, { path: req.path,
       method: req.method,
-      userId: (req as any).user?.id,
+      user_id: (req as any).user?.id,
       ip: req.ip
-    });
+     });
   }
 
   /**
@@ -323,16 +321,15 @@ export function createAIDeduplicationMiddleware(options: DeduplicationOptions = 
 export function createServiceDeduplicationMiddleware(
   service: string,
   options: Omit<DeduplicationOptions, 'keyGenerator'> = {}
-) {
-  return createAIDeduplicationMiddleware({
+) { return createAIDeduplicationMiddleware({
     ...options,
     keyGenerator: (req: Request) => {
       const operation = req.path.split('/').pop() || 'unknown';
       const query = JSON.stringify(req.query, Object.keys(req.query).sort());
       const body = req.body ? JSON.stringify(req.body, Object.keys(req.body).sort()) : '';
-      const userId = (req as any).user?.id || 'anonymous';
+      const user_id = (req as any).user?.id || 'anonymous';
 
-      const content = `${service}:${operation}:${query}:${body}:${userId}`;
+      const content = `${service }:${operation}:${query}:${body}:${ user_id }`;
       const hash = hashString(content);
       return `ai_dedup:${service}:${hash}`;
     }

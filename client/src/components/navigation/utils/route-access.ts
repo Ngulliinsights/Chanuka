@@ -8,13 +8,13 @@ import { NavigationAccessDeniedError, InvalidNavigationPathError } from '../erro
  */
 export const checkRouteAccess = (
   path: string,
-  userRole: UserRole,
+  user_role: UserRole,
   user: any | null
 ): { canAccess: boolean; denialReason: AccessDenialReason | null; requiredRole?: UserRole[] } => {
   try {
     // Validate inputs
     validateNavigationPath(path);
-    validateUserRole(userRole);
+    validateUserRole(user_role);
 
     const navigationItem = findNavigationItemByPath(path);
 
@@ -33,7 +33,7 @@ export const checkRouteAccess = (
     }
 
     // Check admin requirement
-    if (navigationItem.adminOnly && userRole !== 'admin') {
+    if (navigationItem.adminOnly && user_role !== 'admin') {
       return {
         canAccess: false,
         denialReason: 'admin_required',
@@ -42,7 +42,7 @@ export const checkRouteAccess = (
     }
 
     // Check role requirements
-    if (navigationItem.allowedRoles && !navigationItem.allowedRoles.includes(userRole)) {
+    if (navigationItem.allowedRoles && !navigationItem.allowedRoles.includes(user_role)) {
       return {
         canAccess: false,
         denialReason: 'insufficient_role',
@@ -51,7 +51,7 @@ export const checkRouteAccess = (
     }
 
     // Check custom conditions
-    if (navigationItem.condition && !navigationItem.condition(userRole, user)) {
+    if (navigationItem.condition && !navigationItem.condition(user_role, user)) {
       return {
         canAccess: false,
         denialReason: 'custom_condition',
@@ -77,16 +77,16 @@ export const checkRouteAccess = (
  */
 export const getAccessDenialReason = (
   item: NavigationItem | null,
-  userRole: UserRole,
+  user_role: UserRole,
   user: any | null
 ): AccessDenialReason | null => {
   if (!item) return null;
 
   try {
     if (item.requiresAuth && !user) return 'unauthenticated';
-    if (item.adminOnly && userRole !== 'admin') return 'admin_required';
-    if (item.allowedRoles && !item.allowedRoles.includes(userRole)) return 'insufficient_role';
-    if (item.condition && !item.condition(userRole, user)) return 'custom_condition';
+    if (item.adminOnly && user_role !== 'admin') return 'admin_required';
+    if (item.allowedRoles && !item.allowedRoles.includes(user_role)) return 'insufficient_role';
+    if (item.condition && !item.condition(user_role, user)) return 'custom_condition';
 
     return null;
   } catch (error) {

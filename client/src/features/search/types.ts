@@ -16,7 +16,7 @@ export interface SearchFilters {
   };
   categories?: string[];
   sponsors?: string[];
-  userRoles?: string[];
+  user_roles?: string[];
   location?: string;
   tags?: string[];
 }
@@ -32,22 +32,21 @@ export interface SearchResult {
   highlights: SearchHighlight[];
 }
 
-export interface SearchMetadata {
-  billId?: string;
-  userId?: string;
-  commentId?: string;
+export interface SearchMetadata { bill_id?: string;
+  user_id?: string;
+  comment_id?: string;
   threadId?: string;
   authorName?: string;
   authorId?: string;
-  createdAt: string;
-  updatedAt?: string;
+  created_at: string;
+  updated_at?: string;
   tags?: string[];
   status?: string;
   category?: string;
-  viewCount?: number;
-  commentCount?: number;
+  view_count?: number;
+  comment_count?: number;
   voteCount?: number;
-}
+  }
 
 export interface SearchHighlight {
   field: string;
@@ -101,10 +100,10 @@ export interface SavedSearch {
   name: string;
   query: SearchQuery;
   filters: SearchFilters;
-  createdAt: string;
+  created_at: string;
   lastUsed?: string;
   useCount: number;
-  isPublic: boolean;
+  is_public: boolean;
 }
 
 export interface SearchHistory {
@@ -123,7 +122,7 @@ export interface SearchRequest extends SearchQuery {
 export interface SaveSearchRequest {
   name: string;
   query: SearchQuery;
-  isPublic?: boolean;
+  is_public?: boolean;
 }
 
 export interface SearchAnalytics {

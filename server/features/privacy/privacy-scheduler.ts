@@ -125,8 +125,7 @@ class PrivacySchedulerService {
     this.cleanupInProgress = true;
     const startTime = Date.now();
     
-    try {
-      const result = await privacyService.runDataCleanup();
+    try { const result = await privacyService.runDataCleanup();
       
       const totalRecordsDeleted = result.cleanupResults.reduce(
         (total, cleanup) => total + cleanup.recordsDeleted, 
@@ -135,7 +134,7 @@ class PrivacySchedulerService {
 
       // Log the scheduled cleanup
       await auditLogger.log({
-        userId: 'system',
+        user_id: 'system',
         action: 'data.cleanup.scheduled',
         resource: 'system',
         details: {
@@ -144,9 +143,9 @@ class PrivacySchedulerService {
           cleanupResults: result.cleanupResults,
           duration: Date.now() - startTime,
           timestamp: new Date()
-        },
-        ipAddress: 'system',
-        userAgent: 'privacy-scheduler',
+         },
+        ip_address: 'system',
+        user_agent: 'privacy-scheduler',
         severity: 'low'
       });
 
@@ -161,17 +160,16 @@ class PrivacySchedulerService {
       logger.error('❌ Error during scheduled data cleanup:', { component: 'Chanuka' }, { errorMessage: error instanceof Error ? error.message : String(error) });
       
       // Log the error
-      await auditLogger.log({
-        userId: 'system',
+      await auditLogger.log({ user_id: 'system',
         action: 'data.cleanup.failed',
         resource: 'system',
         details: {
           error: error instanceof Error ? error.message : String(error),
           duration: Date.now() - startTime,
           timestamp: new Date()
-        },
-        ipAddress: 'system',
-        userAgent: 'privacy-scheduler',
+         },
+        ip_address: 'system',
+        user_agent: 'privacy-scheduler',
         severity: 'medium'
       });
 
@@ -210,7 +208,7 @@ class PrivacySchedulerService {
       // Generate compliance metrics
       const complianceMetrics = {
         totalPolicies: retentionPolicies.length,
-        activePolicies: retentionPolicies.filter(p => p.isActive).length,
+        activePolicies: retentionPolicies.filter(p => p.is_active).length,
         stalePolicies: stalePolicies.length,
         lastCleanupRuns: retentionPolicies.map(p => ({
           dataType: p.dataType,
@@ -220,8 +218,7 @@ class PrivacySchedulerService {
       };
 
       // Log compliance monitoring results
-      await auditLogger.log({
-        userId: 'system',
+      await auditLogger.log({ user_id: 'system',
         action: 'compliance.monitoring.completed',
         resource: 'system',
         details: {
@@ -229,9 +226,9 @@ class PrivacySchedulerService {
           stalePoliciesCount: stalePolicies.length,
           duration: Date.now() - startTime,
           timestamp: new Date()
-        },
-        ipAddress: 'system',
-        userAgent: 'privacy-scheduler',
+         },
+        ip_address: 'system',
+        user_agent: 'privacy-scheduler',
         severity: 'low'
       });
 
@@ -248,17 +245,16 @@ class PrivacySchedulerService {
       logger.error('❌ Error during compliance monitoring:', { component: 'Chanuka' }, { errorMessage: error instanceof Error ? error.message : String(error) });
       
       // Log the error
-      await auditLogger.log({
-        userId: 'system',
+      await auditLogger.log({ user_id: 'system',
         action: 'compliance.monitoring.failed',
         resource: 'system',
         details: {
           error: error instanceof Error ? error.message : String(error),
           duration: Date.now() - startTime,
           timestamp: new Date()
-        },
-        ipAddress: 'system',
-        userAgent: 'privacy-scheduler',
+         },
+        ip_address: 'system',
+        user_agent: 'privacy-scheduler',
         severity: 'medium'
       });
     } finally {

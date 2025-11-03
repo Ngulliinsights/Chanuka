@@ -299,7 +299,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
             successRate: health.successRate,
             errorRate: health.errorRate,
             uptime: health.uptime,
-            lastChecked: health.lastChecked
+            last_checked: health.last_checked
           },
           usage: sourceMetrics ? {
             totalRequests: sourceMetrics.totalRequests,
@@ -421,21 +421,21 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
    */
   private static transformParliamentBill(bill: any): any {
     return {
-      id: bill.BillId || bill.id,
-      title: bill.Title || bill.LongTitle || bill.title,
-      description: bill.Summary || bill.description,
-      content: bill.FullText || bill.content,
-      summary: bill.ShortSummary || bill.Summary || bill.summary,
-      status: this.mapParliamentStatus(bill.Status || bill.status),
-      billNumber: bill.Number || bill.BillNumber || bill.billNumber,
-      introducedDate: bill.IntroducedDate || bill.introducedDate,
-      lastActionDate: bill.LastActionDate || bill.lastActionDate,
+      id: bills.BillId || bills.id,
+      title: bills.Title || bills.LongTitle || bills.title,
+      description: bills.Summary || bills.description,
+      content: bills.FullText || bills.content,
+      summary: bills.ShortSummary || bills.Summary || bills.summary,
+      status: this.mapParliamentStatus(bills.Status || bills.status),
+      bill_number: bills.Number || bills.BillNumber || bills.bill_number,
+      introduced_date: bills.IntroducedDate || bills.introduced_date,
+      last_action_date: bills.LastActionDate || bills.last_action_date,
       sponsors: this.extractParliamentSponsors(bill),
-      category: bill.Subject || bill.category,
-      tags: this.extractTags(bill.Keywords || bill.tags),
+      category: bills.Subject || bills.category,
+      tags: this.extractTags(bills.Keywords || bills.tags),
       source: 'parliament-ca',
-      sourceUrl: bill.Url || bill.url,
-      lastUpdated: bill.LastModified || bill.updatedAt || new Date().toISOString()
+      sourceUrl: bills.Url || bills.url,
+      lastUpdated: bills.LastModified || bills.updated_at || new Date().toISOString()
     };
   }
 
@@ -452,11 +452,11 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
       email: member.Email || member.email,
       phone: member.Phone || member.phone,
       bio: member.Biography || member.bio,
-      photoUrl: member.PhotoUrl || member.photoUrl,
+      photo_url: member.PhotoUrl || member.photo_url,
       affiliations: this.extractAffiliations(member),
       source: 'parliament-ca',
       sourceUrl: member.Url || member.url,
-      lastUpdated: member.LastModified || member.updatedAt || new Date().toISOString()
+      lastUpdated: member.LastModified || member.updated_at || new Date().toISOString()
     };
   }
 
@@ -487,21 +487,21 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
    */
   private static transformOntarioBill(bill: any): any {
     return {
-      id: bill.bill_id || bill.id,
-      title: bill.title || bill.long_title,
-      description: bill.summary || bill.description,
-      content: bill.full_text || bill.content,
-      summary: bill.short_summary || bill.summary,
-      status: this.mapOntarioStatus(bill.status),
-      billNumber: bill.bill_number || bill.number,
-      introducedDate: bill.introduced_date,
-      lastActionDate: bill.last_action_date,
+      id: bills.bill_id || bills.id,
+      title: bills.title || bills.long_title,
+      description: bills.summary || bills.description,
+      content: bills.full_text || bills.content,
+      summary: bills.short_summary || bills.summary,
+      status: this.mapOntarioStatus(bills.status),
+      bill_number: bills.bill_number || bills.number,
+      introduced_date: bills.introduced_date,
+      last_action_date: bills.last_action_date,
       sponsors: this.extractOntarioSponsors(bill),
-      category: bill.ministry || bill.category,
-      tags: this.extractTags(bill.keywords),
+      category: bills.ministry || bills.category,
+      tags: this.extractTags(bills.keywords),
       source: 'ontario-legislature',
-      sourceUrl: bill.url,
-      lastUpdated: bill.updated_at || new Date().toISOString()
+      sourceUrl: bills.url,
+      lastUpdated: bills.updated_at || new Date().toISOString()
     };
   }
 
@@ -518,7 +518,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
       email: member.email,
       phone: member.phone,
       bio: member.biography,
-      photoUrl: member.photo_url,
+      photo_url: member.photo_url,
       affiliations: this.extractAffiliations(member),
       source: 'ontario-legislature',
       sourceUrl: member.url,
@@ -554,27 +554,27 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
    */
   private static transformOpenParliamentBill(bill: any): any {
     return {
-      id: bill.id,
-      title: bill.name || bill.title,
-      description: bill.summary,
-      content: bill.text,
-      summary: bill.summary,
-      status: this.mapOpenParliamentStatus(bill.status),
-      billNumber: bill.number,
-      introducedDate: bill.introduced,
-      lastActionDate: bill.last_action_date,
-      sponsors: bill.sponsor_politician ? [{
-        id: bill.sponsor_politician.id,
-        name: bill.sponsor_politician.name,
+      id: bills.id,
+      title: bills.name || bills.title,
+      description: bills.summary,
+      content: bills.text,
+      summary: bills.summary,
+      status: this.mapOpenParliamentStatus(bills.status),
+      bill_number: bills.number,
+      introduced_date: bills.introduced,
+      last_action_date: bills.last_action_date,
+      sponsors: bills.sponsor_politician ? [{
+        id: bills.sponsor_politician.id,
+        name: bills.sponsor_politician.name,
         role: 'MP',
-        party: bill.sponsor_politician.party,
+        party: bills.sponsor_politician.party,
         sponsorshipType: 'primary'
       }] : [],
-      category: bill.law_type,
-      tags: this.extractTags(bill.keywords),
+      category: bills.law_type,
+      tags: this.extractTags(bills.keywords),
       source: 'openparliament',
-      sourceUrl: `https://openparliament.ca${bill.url}`,
-      lastUpdated: bill.updated || new Date().toISOString()
+      sourceUrl: `https://openparliament.ca${bills.url}`,
+      lastUpdated: bills.updated || new Date().toISOString()
     };
   }
 
@@ -591,7 +591,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
       email: politician.email,
       phone: politician.phone,
       bio: politician.description,
-      photoUrl: politician.photo_url,
+      photo_url: politician.photo_url,
       affiliations: [],
       source: 'openparliament',
       sourceUrl: `https://openparliament.ca${politician.url}`,
@@ -668,18 +668,18 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   private static extractParliamentSponsors(bill: any): any[] {
     const sponsors: any[] = [];
 
-    if (bill.SponsorMember) {
+    if (bills.SponsorMember) {
       sponsors.push({
-        id: bill.SponsorMember.PersonId,
-        name: `${bill.SponsorMember.FirstName} ${bill.SponsorMember.LastName}`,
+        id: bills.SponsorMember.PersonId,
+        name: `${bills.SponsorMember.FirstName} ${bills.SponsorMember.LastName}`,
         role: 'MP',
-        party: bill.SponsorMember.Party,
+        party: bills.SponsorMember.Party,
         sponsorshipType: 'primary'
       });
     }
 
-    if (bill.CoSponsors && Array.isArray(bill.CoSponsors)) {
-      sponsors.push(...bill.CoSponsors.map((cosponsor: any) => ({
+    if (bills.CoSponsors && Array.isArray(bills.CoSponsors)) {
+      sponsors.push(...bills.CoSponsors.map((cosponsor: any) => ({
         id: cosponsor.PersonId,
         name: `${cosponsor.FirstName} ${cosponsor.LastName}`,
         role: 'MP',
@@ -697,12 +697,12 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
   private static extractOntarioSponsors(bill: any): any[] {
     const sponsors: any[] = [];
 
-    if (bill.sponsor) {
+    if (bills.sponsor) {
       sponsors.push({
-        id: bill.sponsor.id,
-        name: bill.sponsor.name,
+        id: bills.sponsors.id,
+        name: bills.sponsors.name,
         role: 'MPP',
-        party: bill.sponsor.party,
+        party: bills.sponsors.party,
         sponsorshipType: 'primary'
       });
     }
@@ -808,7 +808,7 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
     const BillSchema = z.object({
       id: z.string(),
       title: z.string().min(1),
-      billNumber: z.string().min(1),
+      bill_number: z.string().min(1),
       status: z.string().min(1),
       source: z.string().min(1)
     });

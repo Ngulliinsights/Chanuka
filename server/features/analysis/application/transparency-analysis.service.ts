@@ -30,7 +30,7 @@ export interface TransparencyScoreResult {
 }
 
 /**
- * Service for calculating the transparency score of a bill.
+ * Service for calculating the transparency score of a bills.
  */
 export class TransparencyAnalysisService {
     private get db() { return readDatabase; }
@@ -38,17 +38,15 @@ export class TransparencyAnalysisService {
     /**
      * Calculates the transparency score based on bill data and conflict analysis.
      */
-    async calculateScore(billId: number, conflictAnalysis: ConflictSummary): Promise<TransparencyScoreResult> {
-        logger.info(`📊 Calculating transparency score for bill ${billId}`);
-         try {
-            const bill = await this.getBillDetails(billId); // Fetch more details if needed
+    async calculateScore(bill_id: number, conflictAnalysis: ConflictSummary): Promise<TransparencyScoreResult> { logger.info(`📊 Calculating transparency score for bill ${bill_id }`);
+         try { const bill = await this.getBillDetails(bill_id); // Fetch more details if needed
             if (!bill) {
-                 logger.warn(`Bill ${billId} not found for transparency scoring.`);
+                 logger.warn(`Bill ${bill_id } not found for transparency scoring.`);
                  return { overall: 0, breakdown: { sponsorDisclosure: 0, legislativeProcess: 0, financialConflicts: 0, publicAccessibility: 0 }, grade: 'F' };
              }
 
             // --- Calculate individual components ---
-            const sponsorScore = await this.calculateSponsorDisclosureScore(bill.sponsorId, conflictAnalysis);
+            const sponsorScore = await this.calculateSponsorDisclosureScore(bills.sponsor_id, conflictAnalysis);
             const processScore = this.calculateProcessTransparencyScore(bill); // Pass relevant bill fields
             const conflictScore = this.calculateFinancialConflictScore(conflictAnalysis);
             const accessScore = this.calculatePublicAccessibilityScore(bill); // Pass relevant bill fields
@@ -66,35 +64,34 @@ export class TransparencyAnalysisService {
                 },
                 grade
             };
-         } catch (error) {
-             logger.error(`Error calculating transparency score for bill ${billId}:`, { component: 'TransparencyAnalysisService'}, error);
+         } catch (error) { logger.error(`Error calculating transparency score for bill ${bill_id }:`, { component: 'TransparencyAnalysisService'}, error);
              return { overall: 0, breakdown: { sponsorDisclosure: 0, legislativeProcess: 0, financialConflicts: 0, publicAccessibility: 0 }, grade: 'F' };
          }
     }
 
     /** Fetches bill details relevant for transparency scoring */
-    private async getBillDetails(billId: number): Promise<Pick<schema.Bill, 'id' | 'sponsorId' | 'status'> | null> {
+    private async getBillDetails(bill_id: number): Promise<Pick<schema.Bill, 'id' | 'sponsor_id' | 'status'> | null> {
          // Add fields like committee meeting count, public comment flags, full text URL etc. if available
          const [bill] = await this.db
-             .select({ id: schema.bills.id, sponsorId: schema.bills.sponsorId, status: schema.bills.status })
+             .select({ id: schema.bills.id, sponsor_id: schema.bills.sponsor_id, status: schema.bills.status })
              .from(schema.bills)
-             .where(eq(schema.bills.id, billId))
+             .where(eq(schema.bills.id, bill_id))
              .limit(1);
          return bill;
      }
 
     /** Calculates score based on sponsor's historical transparency and current conflicts */
-    private async calculateSponsorDisclosureScore(sponsorId: number | null, conflictAnalysis: ConflictSummary): Promise<number> {
-        logger.debug(`Calculating sponsor disclosure score (Sponsor ID: ${sponsorId})`);
-        if (!sponsorId) return 50; // Neutral score if no specific sponsor
+    private async calculateSponsorDisclosureScore(sponsor_id: number | null, conflictAnalysis: ConflictSummary): Promise<number> {
+        logger.debug(`Calculating sponsor disclosure score (Sponsor ID: ${sponsor_id})`);
+        if (!sponsor_id) return 50; // Neutral score if no specific sponsor
 
         try {
-            const [sponsor] = await this.db.select({ transparencyScore: schema.sponsors.transparencyScore })
+            const [sponsor] = await this.db.select({ transparency_score: schema.sponsors.transparency_score })
                 .from(schema.sponsors)
-                .where(eq(schema.sponsors.id, sponsorId));
+                .where(eq(schema.sponsors.id, sponsor_id));
 
              // Base score on sponsor's general transparency record
-            let score = parseFloat(sponsor?.transparencyScore || '50'); // Default to 50 if no score
+            let score = parseFloat(sponsor?.transparency_score || '50'); // Default to 50 if no score
 
              // Penalize based on current bill's conflict risk
              const riskPenalties = { low: 0, medium: 10, high: 25, critical: 40 };
@@ -102,7 +99,7 @@ export class TransparencyAnalysisService {
 
             return Math.max(0, Math.min(100, Math.round(score)));
         } catch (error) {
-             logger.error(`Error fetching sponsor data for transparency score (Sponsor ID: ${sponsorId}):`, { component: 'TransparencyAnalysisService'}, error);
+             logger.error(`Error fetching sponsor data for transparency score (Sponsor ID: ${sponsor_id}):`, { component: 'TransparencyAnalysisService'}, error);
              return 30; // Lower score on error
         }
     }
@@ -113,11 +110,11 @@ export class TransparencyAnalysisService {
         // Example: Check if committee hearings held, public comments allowed, amendments tracked
         logger.debug("Calculating legislative process transparency score.");
         let score = 40; // Base score
-        // if (bill.committeeHearingsCount > 0) score += 20;
-        // if (bill.publicCommentPeriodEnabled) score += 20;
-        // if (bill.amendmentsArePublic) score += 15;
+        // if (bills.committeeHearingsCount > 0) score += 20;
+        // if (bills.publicCommentPeriodEnabled) score += 20;
+        // if (bills.amendmentsArePublic) score += 15;
          // Add score based on current status (e.g., more points if passed committee)
-         if (['committee', 'passed', 'signed'].includes(bill.status)) score += 10;
+         if (['committee', 'passed', 'signed'].includes(bills.status)) score += 10;
 
         return Math.min(100, score);
     }
@@ -143,10 +140,10 @@ export class TransparencyAnalysisService {
         logger.debug("Calculating public accessibility score.");
          let score = 40;
          // Assume these fields might exist on the bill object or related data
-         // if (bill.fullTextUrl) score += 25;
-         // if (bill.summary) score += 15;
-         // if (bill.sponsorId) score += 10; // Basic sponsor info available
-         // if (bill.voteRecordsAvailable) score += 10;
+         // if (bills.full_textUrl) score += 25;
+         // if (bills.summary) score += 15;
+         // if (bills.sponsor_id) score += 10; // Basic sponsor info available
+         // if (bills.voteRecordsAvailable) score += 10;
 
         return Math.min(100, score);
      }

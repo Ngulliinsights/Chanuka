@@ -47,7 +47,7 @@ export function MobileTestSuite() {
 
   const collectDeviceInfo = () => {
     const info = {
-      userAgent: navigator.userAgent,
+      user_agent: navigator.user_agent,
       viewport: {
         width: window.innerWidth,
         height: window.innerHeight,
@@ -441,7 +441,7 @@ export function MobileTestSuite() {
 
           <div>
             <h4 className="font-medium mb-2">User Agent</h4>
-            <p className="text-xs text-gray-600 break-all">{deviceInfo.userAgent}</p>
+            <p className="text-xs text-gray-600 break-all">{deviceInfo.user_agent}</p>
           </div>
         </CardContent>
       </Card>

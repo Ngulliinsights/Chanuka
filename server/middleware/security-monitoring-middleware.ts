@@ -47,13 +47,12 @@ export class SecurityMonitoringMiddleware {
         }
 
         // Initialize request context
-        (req as any).securityContext = {
-          requestId,
+        (req as any).securityContext = { requestId,
           startTime,
-          ipAddress: this.getClientIP(req),
-          userAgent: req.get('User-Agent'),
-          userId: (req as any).user?.id
-        };
+          ip_address: this.getClientIP(req),
+          user_agent: req.get('User-Agent'),
+          user_id: (req as any).user?.id
+         };
 
         // Perform threat detection analysis
         if (this.options.enableThreatDetection) {
@@ -78,10 +77,10 @@ export class SecurityMonitoringMiddleware {
         // Log successful security check
         if (this.options.enableAuditLogging) {
           await securityAuditService.logSecurityEvent({
-            eventType: 'request_processed',
+            event_type: 'request_processed',
             severity: 'low',
-            ipAddress: (req as any).securityContext.ipAddress,
-            userAgent: (req as any).securityContext.userAgent,
+            ip_address: (req as any).securityContext.ip_address,
+            user_agent: (req as any).securityContext.user_agent,
             resource: req.path,
             action: req.method,
             result: 'processed',
@@ -90,7 +89,7 @@ export class SecurityMonitoringMiddleware {
               requestId,
               threatLevel: (req as any).securityContext.threatResult?.threatLevel || 'none'
             },
-            userId: (req as any).securityContext.userId
+            user_id: (req as any).securityContext.user_id
           });
         }
 
@@ -103,10 +102,10 @@ export class SecurityMonitoringMiddleware {
         // Log the error but don't block the request
         if (this.options.enableAuditLogging) {
           await securityAuditService.logSecurityEvent({
-            eventType: 'monitoring_error',
+            event_type: 'monitoring_error',
             severity: 'medium',
-            ipAddress: this.getClientIP(req),
-            userAgent: req.get('User-Agent'),
+            ip_address: this.getClientIP(req),
+            user_agent: req.get('User-Agent'),
             resource: req.path,
             action: req.method,
             result: 'error',
@@ -115,7 +114,7 @@ export class SecurityMonitoringMiddleware {
               error: (error as Error).message,
               requestId
             },
-            userId: (req as any).user?.id
+            user_id: (req as any).user?.id
           });
         }
 
@@ -156,10 +155,10 @@ export class SecurityMonitoringMiddleware {
         // Log response details
         if (this.options.enableAuditLogging) {
           await securityAuditService.logSecurityEvent({
-            eventType: 'response_sent',
+            event_type: 'response_sent',
             severity: statusCode >= 500 ? 'high' : statusCode >= 400 ? 'medium' : 'low',
-            ipAddress: securityContext.ipAddress,
-            userAgent: securityContext.userAgent,
+            ip_address: securityContext.ip_address,
+            user_agent: securityContext.user_agent,
             resource: req.path,
             action: req.method,
             result: statusCode < 400 ? 'success' : 'error',
@@ -170,7 +169,7 @@ export class SecurityMonitoringMiddleware {
               requestId: securityContext.requestId,
               threatLevel: securityContext.threatResult?.threatLevel || 'none'
             },
-            userId: securityContext.userId
+            user_id: securityContext.user_id
           });
         }
 
@@ -286,16 +285,16 @@ export class SecurityMonitoringMiddleware {
 
       // Monitor admin endpoints
       const isAdminEndpoint = req.path.startsWith('/api/admin/');
-      const userRole = (req as any).user?.role;
+      const user_role = (req as any).user?.role;
 
-      if (isAdminEndpoint && userRole === 'admin') {
+      if (isAdminEndpoint && user_role === 'admin') {
         const originalJson = res.json;
         res.json = function(body) {
           if (res.statusCode < 400) {
             securityAuditService.logAdminAction(
               `${req.method} ${req.path}`,
               req,
-              (req as any).user.id,
+              (req as any).users.id,
               req.path,
               { 
                 requestBody: req.body,
@@ -317,9 +316,9 @@ export class SecurityMonitoringMiddleware {
    * Handle blocked requests
    */
   private async handleBlockedRequest(req: Request, res: Response, threatResult: any): Promise<void> {
-    const ipAddress = this.getClientIP(req);
+    const ip_address = this.getClientIP(req);
     
-    console.warn(`🚫 Request blocked from ${ipAddress}: ${threatResult.detectedThreats.map((t: any) => t.type).join(', ')}`);
+    console.warn(`🚫 Request blocked from ${ip_address}: ${threatResult.detectedThreats.map((t: any) => t.type).join(', ')}`);
 
     res.status(403).json({
       error: 'Request blocked by security system',
@@ -349,13 +348,13 @@ export class SecurityMonitoringMiddleware {
     * Handle suspicious patterns
     */
    private async handleSuspiciousPattern(req: Request, patternType: string): Promise<void> {
-     const ipAddress = this.getClientIP(req);
+     const ip_address = this.getClientIP(req);
 
      await securityAuditService.logSecurityEvent({
-       eventType: 'suspicious_pattern',
+       event_type: 'suspicious_pattern',
        severity: 'medium',
-       ipAddress,
-       userAgent: req.get('User-Agent'),
+       ip_address,
+       user_agent: req.get('User-Agent'),
        resource: req.path,
        action: req.method,
        result: 'detected',
@@ -365,7 +364,7 @@ export class SecurityMonitoringMiddleware {
          statusCode: (req as any).res?.statusCode,
          timestamp: new Date()
        },
-       userId: (req as any).user?.id
+       user_id: (req as any).user?.id
      });
    }
 

@@ -156,12 +156,11 @@ describe('BaseError', () => {
     });
   });
 
-  describe('serialization', () => {
-    it('should serialize to JSON', () => {
+  describe('serialization', () => { it('should serialize to JSON', () => {
       const error = new TestError('Test error', {
         statusCode: 400,
         code: 'TEST_ERROR',
-        context: { userId: 123 }
+        context: { user_id: 123  }
       });
 
       const json = error.toJSON();
@@ -171,7 +170,7 @@ describe('BaseError', () => {
       expect(json.error.message).toBe('Test error');
       expect(json.error.code).toBe('TEST_ERROR');
       expect(json.error.statusCode).toBe(400);
-      expect(json.error.metadata.context).toEqual({ userId: 123 });
+      expect(json.error.metadata.context).toEqual({ user_id: 123  });
     });
 
     it('should convert to string', () => {
@@ -228,10 +227,9 @@ describe('BaseError', () => {
     });
   });
 
-  describe('safe logging', () => {
-    it('should remove sensitive context for logging', () => {
+  describe('safe logging', () => { it('should remove sensitive context for logging', () => {
       const error = new TestError('Test', {
-        context: { password: 'secret', userId: 123 }
+        context: { password: 'secret', user_id: 123  }
       });
 
       const safeLog = error.toSafeLog();

@@ -15,23 +15,22 @@ import type {
 /**
  * Hook for comments management
  */
-export function useComments(billId?: string, filters?: CommunityFilters) {
-  const queryClient = useQueryClient();
+export function useComments(bill_id?: string, filters?: CommunityFilters) { const queryClient = useQueryClient();
 
   const comments = useQuery({
-    queryKey: ['community', 'comments', billId, filters],
-    queryFn: () => communityApi.getComments(billId, filters),
+    queryKey: ['community', 'comments', bill_id, filters],
+    queryFn: () => communityApi.getComments(bill_id, filters),
     staleTime: 2 * 60 * 1000, // 2 minutes
-  });
+   });
 
   const createComment = useMutation({
     mutationFn: (request: CreateCommentRequest) => communityApi.createComment(request),
     onSuccess: (newComment) => {
       queryClient.invalidateQueries({
-        queryKey: ['community', 'comments', newComment.billId]
+        queryKey: ['community', 'comments', newComment.bill_id]
       });
       queryClient.setQueryData(
-        ['community', 'comments', newComment.billId],
+        ['community', 'comments', newComment.bill_id],
         (old: any) => ({
           ...old,
           comments: [newComment, ...(old?.comments || [])]
@@ -44,11 +43,11 @@ export function useComments(billId?: string, filters?: CommunityFilters) {
   });
 
   const updateComment = useMutation({
-    mutationFn: ({ commentId, request }: { commentId: string; request: UpdateCommentRequest }) =>
-      communityApi.updateComment(commentId, request),
+    mutationFn: ({ comment_id, request }: { comment_id: string; request: UpdateCommentRequest }) =>
+      communityApi.updateComment(comment_id, request),
     onSuccess: (updatedComment) => {
       queryClient.invalidateQueries({
-        queryKey: ['community', 'comments', updatedComment.billId]
+        queryKey: ['community', 'comments', updatedComment.bill_id]
       });
     },
     onError: (error: Error) => {
@@ -57,14 +56,14 @@ export function useComments(billId?: string, filters?: CommunityFilters) {
   });
 
   const deleteComment = useMutation({
-    mutationFn: (commentId: string) => communityApi.deleteComment(commentId),
-    onSuccess: (_, commentId) => {
+    mutationFn: (comment_id: string) => communityApi.deleteComment(comment_id),
+    onSuccess: (_, comment_id) => {
       // Remove from cache
       queryClient.setQueryData(
         ['community', 'comments'],
         (old: any) => ({
           ...old,
-          comments: old?.comments?.filter((c: Comment) => c.id !== commentId) || []
+          comments: old?.comments?.filter((c: Comment) => c.id !== comment_id) || []
         })
       );
     },
@@ -77,7 +76,7 @@ export function useComments(billId?: string, filters?: CommunityFilters) {
     mutationFn: (request: VoteRequest) => communityApi.voteOnComment(request),
     onSuccess: (updatedComment) => {
       queryClient.invalidateQueries({
-        queryKey: ['community', 'comments', updatedComment.billId]
+        queryKey: ['community', 'comments', updatedComment.bill_id]
       });
     },
     onError: (error: Error) => {
@@ -329,7 +328,7 @@ export function useRealtimeCommunity(threadId?: string) {
     isConnected: false,
     connectionStatus: 'disconnected' as const,
     subscribeToThread: (id: string) => {},
-    subscribeToComments: (billId?: string) => {},
+    subscribeToComments: (bill_id?: string) => {},
     unsubscribe: () => {},
   };
 }

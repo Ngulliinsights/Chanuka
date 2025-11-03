@@ -426,7 +426,7 @@ describe('AI Rate Limiter Adapter', () => {
         remaining: 999,
         processingTime: expect.any(Number),
         ip: undefined,
-        userAgent: 'model:gpt-3.5-turbo,operation:completion',
+        user_agent: 'model:gpt-3.5-turbo,operation:completion',
         path: 'cost:0.000200,tokens:100',
         method: 'AI',
       });
@@ -457,7 +457,7 @@ describe('AI Rate Limiter Adapter', () => {
         remaining: 0,
         processingTime: expect.any(Number),
         ip: undefined,
-        userAgent: 'model:gpt-4,operation:default',
+        user_agent: 'model:gpt-4,operation:default',
         path: 'cost:0.003000,tokens:100',
         method: 'AI',
       });

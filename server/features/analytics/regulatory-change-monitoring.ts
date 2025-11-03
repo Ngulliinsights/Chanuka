@@ -28,8 +28,8 @@ interface RegulationData {
   id: string;
   title: string;
   description: string;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
   affectedSectors?: string[];
   requiresCompliance?: boolean;
   complianceDeadline?: Date;
@@ -50,9 +50,9 @@ export interface RegulatoryAlert {
   description: string;
   severity: 'info' | 'warning' | 'critical';
   regulationId?: string;
-  sponsorId?: string;
-  createdAt: Date;
-  expiresAt?: Date;
+  sponsor_id?: string;
+  created_at: Date;
+  expires_at?: Date;
   isResolved: boolean;
   actionRequired: boolean;
   affectedSectors: string[];
@@ -380,7 +380,7 @@ export class RegulatoryChangeMonitoringService {
         filteredAlerts = filteredAlerts.filter(alert => alert.type === filters.type);
       }
 
-      filteredAlerts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      filteredAlerts.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
 
       if (filters?.limit) {
         filteredAlerts = filteredAlerts.slice(0, filters.limit);
@@ -434,8 +434,8 @@ export class RegulatoryChangeMonitoringService {
     severity: RegulatoryAlert['severity'] = 'info',
     options: {
       regulationId?: string;
-      sponsorId?: string;
-      expiresAt?: Date;
+      sponsor_id?: string;
+      expires_at?: Date;
       actionRequired?: boolean;
       affectedSectors?: string[];
       metadata?: Record<string, any>;
@@ -448,9 +448,9 @@ export class RegulatoryChangeMonitoringService {
       description,
       severity,
       regulationId: options.regulationId,
-      sponsorId: options.sponsorId,
-      createdAt: new Date(),
-      expiresAt: options.expiresAt,
+      sponsor_id: options.sponsor_id,
+      created_at: new Date(),
+      expires_at: options.expires_at,
       isResolved: false,
       actionRequired: options.actionRequired ?? (severity === 'critical'),
       affectedSectors: options.affectedSectors ?? [],

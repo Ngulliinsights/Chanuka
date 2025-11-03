@@ -28,8 +28,8 @@ vi.mock('@/hooks/use-bills', () => ({
         title: 'Test Action',
         description: 'Test Description',
         priority: 'High',
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       }
     ],
     trackedTopics: [
@@ -38,8 +38,8 @@ vi.mock('@/hooks/use-bills', () => ({
         name: 'Healthcare',
         category: 'legislative',
         billCount: 5,
-        isActive: true,
-        createdAt: new Date()
+        is_active: true,
+        created_at: new Date()
       }
     ],
     isLoading: false,
@@ -113,7 +113,7 @@ describe('Dashboard Hooks', () => {
           name: 'New Topic',
           category: 'policy',
           billCount: 0,
-          isActive: true,
+          is_active: true,
           description: 'New topic description'
         });
       });
@@ -188,16 +188,16 @@ describe('Dashboard Hooks', () => {
         title: 'Test Action 1',
         description: 'Description 1',
         priority: 'High' as const,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       },
       {
         id: 'action-2',
         title: 'Test Action 2',
         description: 'Description 2',
         priority: 'Low' as const,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       }
     ];
 
@@ -276,8 +276,8 @@ describe('Dashboard Hooks', () => {
           description: 'Description 3',
           priority: 'Medium' as const,
           completed: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          created_at: new Date(),
+          updated_at: new Date()
         }
       ];
 
@@ -318,16 +318,16 @@ describe('Dashboard Hooks', () => {
         name: 'Healthcare',
         category: 'legislative' as const,
         billCount: 5,
-        isActive: true,
-        createdAt: new Date()
+        is_active: true,
+        created_at: new Date()
       },
       {
         id: 'topic-2',
         name: 'Education',
         category: 'policy' as const,
         billCount: 3,
-        isActive: false,
-        createdAt: new Date()
+        is_active: false,
+        created_at: new Date()
       }
     ];
 
@@ -347,7 +347,7 @@ describe('Dashboard Hooks', () => {
           name: 'New Topic',
           category: 'community',
           billCount: 0,
-          isActive: true
+          is_active: true
         });
       });
 
@@ -364,7 +364,7 @@ describe('Dashboard Hooks', () => {
             name: 'Healthcare', // Duplicate name
             category: 'community',
             billCount: 0,
-            isActive: true
+            is_active: true
           });
         } catch (error) {
           expect(error.message).toContain('already exists');
@@ -404,7 +404,7 @@ describe('Dashboard Hooks', () => {
       });
 
       const toggledTopic = result.current.topics.find(t => t.id === 'topic-1');
-      expect(toggledTopic?.isActive).toBe(false); // Was true, now false
+      expect(toggledTopic?.is_active).toBe(false); // Was true, now false
     });
 
     it('should filter topics by category', () => {

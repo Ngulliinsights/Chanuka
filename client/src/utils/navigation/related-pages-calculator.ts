@@ -197,9 +197,9 @@ function normalizePath(path: string): string {
  * Converts a normalized path back to actual path with dynamic values
  */
 function denormalizePath(normalizedPath: string, currentPath: string): string {
-  const billIdMatch = currentPath.match(/\/bills\/([^\/]+)/);
-  if (billIdMatch && normalizedPath.includes(':id')) {
-    return normalizedPath.replace(':id', billIdMatch[1]);
+  const bill_idMatch = currentPath.match(/\/bills\/([^\/]+)/);
+  if (bill_idMatch && normalizedPath.includes(':id')) {
+    return normalizedPath.replace(':id', bill_idMatch[1]);
   }
   return normalizedPath;
 }
@@ -207,15 +207,15 @@ function denormalizePath(normalizedPath: string, currentPath: string): string {
 /**
  * Filters related pages based on user role
  */
-function filterPagesByRole(pages: RelatedPage[], userRole: UserRole): RelatedPage[] {
+function filterPagesByRole(pages: RelatedPage[], user_role: UserRole): RelatedPage[] {
   return pages.filter(page => {
     // Admin pages only for admin users
-    if (page.category === 'admin' && userRole !== 'admin') {
+    if (page.category === 'admin' && user_role !== 'admin') {
       return false;
     }
     
     // User pages only for authenticated users
-    if (page.category === 'user' && userRole === 'public') {
+    if (page.category === 'user' && user_role === 'public') {
       return false;
     }
     
@@ -226,7 +226,7 @@ function filterPagesByRole(pages: RelatedPage[], userRole: UserRole): RelatedPag
 /**
  * Calculates related pages for a given path and user role
  */
-export function calculateRelatedPages(currentPath: string, userRole: UserRole): RelatedPage[] {
+export function calculateRelatedPages(currentPath: string, user_role: UserRole): RelatedPage[] {
   const normalizedPath = normalizePath(currentPath);
   const relationship = pageRelationships[normalizedPath];
   
@@ -237,8 +237,7 @@ export function calculateRelatedPages(currentPath: string, userRole: UserRole): 
   const relatedPages: RelatedPage[] = [];
   
   // Convert relationship data to RelatedPage objects
-  Object.entries(relationship.relatedPages).forEach(([path, relation]) => {
-    const actualPath = denormalizePath(path, currentPath);
+  Object.entries(relationship.relatedPages).forEach(([path, relation]) => { const actualPath = denormalizePath(path, currentPath);
     const metadata = pageMetadata[path];
     
     if (metadata) {
@@ -246,11 +245,11 @@ export function calculateRelatedPages(currentPath: string, userRole: UserRole): 
       let description = metadata.description;
       
       // Replace placeholders in title and description
-      const billIdMatch = currentPath.match(/\/bills\/([^\/]+)/);
-      if (billIdMatch && path.includes(':id')) {
-        const billId = billIdMatch[1];
-        title = title.replace(':id', `Bill ${billId}`);
-        description = description.replace(':id', `Bill ${billId}`);
+      const bill_idMatch = currentPath.match(/\/bills\/([^\/]+)/);
+      if (bill_idMatch && path.includes(':id')) {
+        const bill_id = bill_idMatch[1];
+        title = title.replace(':id', `Bill ${bill_id }`);
+        description = description.replace(':id', `Bill ${ bill_id }`);
       }
       
       relatedPages.push({
@@ -270,7 +269,7 @@ export function calculateRelatedPages(currentPath: string, userRole: UserRole): 
   relatedPages.sort((a, b) => b.relevanceScore - a.relevanceScore);
   
   // Filter by user role
-  const filteredPages = filterPagesByRole(relatedPages, userRole);
+  const filteredPages = filterPagesByRole(relatedPages, user_role);
   
   // Return top 5 most relevant pages
   return filteredPages.slice(0, 5);
@@ -281,10 +280,10 @@ export function calculateRelatedPages(currentPath: string, userRole: UserRole): 
  */
 export function getContextualSuggestions(
   currentPath: string, 
-  userRole: UserRole, 
+  user_role: UserRole, 
   recentPages: string[] = []
 ): RelatedPage[] {
-  const baseRelated = calculateRelatedPages(currentPath, userRole);
+  const baseRelated = calculateRelatedPages(currentPath, user_role);
   
   // Add boost for recently visited pages
   const boostedPages = baseRelated.map(page => {

@@ -71,14 +71,14 @@ export const QuickAccessNav: React.FC<QuickAccessNavProps> = ({
       )}
       <div className="space-y-1">
         {sortedItems.map((item) => {
-          const isActive =
+          const is_active =
             location.pathname === item.href ||
             (item.href !== "/" && location.pathname.startsWith(item.href));
 
           return (
             <Link key={item.id} to={item.href}>
               <Button
-                variant={isActive ? "secondary" : "ghost"}
+                variant={is_active ? "secondary" : "ghost"}
                 className="w-full justify-start h-8 px-2"
                 size="sm"
               >

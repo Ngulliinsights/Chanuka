@@ -39,25 +39,25 @@ async function testTransparencyImplementation() {
     logger.info('=', { component: 'Chanuka' }, .repeat(50));
     
     if (dashboard.topRisks.length > 0) {
-      const testSponsorId = dashboard.topRisks[0].sponsorId;
+      const testSponsorId = dashboard.topRisks[0].sponsor_id;
       
       try {
-        const transparencyScore = await simpleTransparencyDashboardService.calculateTransparencyScore(testSponsorId);
+        const transparency_score = await simpleTransparencyDashboardService.calculateTransparencyScore(testSponsorId);
         
         console.log(`✅ Transparency scoring algorithm tested for sponsor ${testSponsorId}`);
-        console.log(`   - Overall Score: ${transparencyScore.overallScore}%`);
-        console.log(`   - Risk Level: ${transparencyScore.riskLevel}`);
-        console.log(`   - Last Calculated: ${transparencyScore.lastCalculated.toLocaleString()}`);
+        console.log(`   - Overall Score: ${transparency_score.overallScore}%`);
+        console.log(`   - Risk Level: ${transparency_score.riskLevel}`);
+        console.log(`   - Last Calculated: ${transparency_score.lastCalculated.toLocaleString()}`);
         
         logger.info('\n📊 Component Scores (Weighted Algorithm):', { component: 'Chanuka' });
-        Object.entries(transparencyScore.componentScores).forEach(([component, score]) => {
+        Object.entries(transparency_score.componentScores).forEach(([component, score]) => {
           const componentName = component.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
           console.log(`   - ${componentName}: ${score}%`);
         });
 
-        if (transparencyScore.recommendations.length > 0) {
+        if (transparency_score.recommendations.length > 0) {
           logger.info('\n💡 Algorithm-Generated Recommendations:', { component: 'Chanuka' });
-          transparencyScore.recommendations.forEach((rec, index) => {
+          transparency_score.recommendations.forEach((rec, index) => {
             console.log(`   ${index + 1}. ${rec}`);
           });
         }
@@ -95,7 +95,7 @@ async function testTransparencyImplementation() {
       logger.info('\n📊 Historical Tracking Data (Recent 6 months):', { component: 'Chanuka' });
       overallTrends.trends.slice(-6).forEach((trend, index) => {
         console.log(`   ${trend.period}:`);
-        console.log(`      - Transparency Score: ${trend.transparencyScore}%`);
+        console.log(`      - Transparency Score: ${trend.transparency_score}%`);
         console.log(`      - Risk Level: ${trend.riskLevel}`);
         console.log(`      - Disclosure Count: ${trend.disclosureCount}`);
         console.log(`      - Verification Rate: ${trend.verificationRate}%`);
@@ -126,7 +126,7 @@ async function testTransparencyImplementation() {
 
     // Test individual sponsor trends if available
     if (dashboard.topRisks.length > 0) {
-      const testSponsorId = dashboard.topRisks[0].sponsorId;
+      const testSponsorId = dashboard.topRisks[0].sponsor_id;
       
       console.log(`\n👤 Individual Sponsor Trend Analysis (Sponsor ${testSponsorId}):`);
       

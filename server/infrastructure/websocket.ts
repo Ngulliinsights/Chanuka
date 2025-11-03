@@ -3,7 +3,7 @@ import { Server } from 'http';
 import { IncomingMessage } from 'http';
 import * as jwt from 'jsonwebtoken';
 import { database as db } from '../../shared/database/connection.js';
-import { User, users } from '../../shared/schema/schema.js';
+import { User, users } from '../../shared/schema/foundation';
 import { eq } from 'drizzle-orm';
 import { logger  } from '../../shared/core/src/observability/logging/index.js';
 import { MemoryLeakDetector  } from '../../shared/core/src/testing/memory-leak-detector.js';
@@ -12,29 +12,27 @@ import { MemoryLeakDetector  } from '../../shared/core/src/testing/memory-leak-d
 // TYPE DEFINITIONS
 // ============================================================================
 
-interface AuthenticatedWebSocket extends WebSocket {
-  userId?: string;
+interface AuthenticatedWebSocket extends WebSocket { user_id?: string;
   isAlive?: boolean;
   lastPing?: number;
   subscriptions?: Set<number>;
   messageBuffer?: any[];
   flushTimer?: NodeJS.Timeout;
   connectionId?: string;
-}
+ }
 
-interface WebSocketMessage {
-  type: 'subscribe' | 'unsubscribe' | 'ping' | 'pong' | 'auth' |
+interface WebSocketMessage { type: 'subscribe' | 'unsubscribe' | 'ping' | 'pong' | 'auth' |
     'get_preferences' | 'update_preferences' | 'batch_subscribe' | 'batch_unsubscribe';
   data?: {
-    billId?: number;
-    billIds?: number[];
+    bill_id?: number;
+    bill_ids?: number[];
     channel?: string;
     token?: string;
     subscriptionTypes?: Array<'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled'>;
     preferences?: {
       updateFrequency?: 'immediate' | 'hourly' | 'daily';
       notificationTypes?: Array<'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled'>;
-    };
+     };
   };
   messageId?: string;
   timestamp?: number;
@@ -728,27 +726,26 @@ export class WebSocketService {
       const decoded = jwt.verify(
         token, 
         process.env.JWT_SECRET || 'fallback-secret'
-      ) as { userId: string };
+      ) as { user_id: string  };
 
       // Verify user exists in database
        const userRecord = await db
         .select({ id: users.id })
         .from(users)
-        .where(eq(users.id, decoded.userId))
+        .where(eq(users.id, decoded.user_id))
         .limit(1);
 
-      if (userRecord.length === 0) {
-        logger.warn('WebSocket connection rejected: User not found', { 
+      if (userRecord.length === 0) { logger.warn('WebSocket connection rejected: User not found', { 
           component: 'WebSocketService',
-          userId: decoded.userId 
-        });
+          user_id: decoded.user_id 
+         });
         return false;
       }
 
       // Enforce per-user connection limit
-      const userConnections = this.connectionPool.get(decoded.userId);
+      const userConnections = this.connectionPool.get(decoded.user_id);
       if (userConnections && userConnections.connections.length >= RUNTIME_CONFIG.MAX_CONNECTIONS_PER_USER) {
-        logger.warn(`Connection limit exceeded for user ${decoded.userId}`, { 
+        logger.warn(`Connection limit exceeded for user ${decoded.user_id}`, { 
           component: 'WebSocketService',
           currentConnections: userConnections.connections.length,
           limit: RUNTIME_CONFIG.MAX_CONNECTIONS_PER_USER
@@ -756,8 +753,8 @@ export class WebSocketService {
         return false;
       }
 
-      // Attach userId to request for use in connection handler
-      (info.req as any).userId = decoded.userId;
+      // Attach user_id to request for use in connection handler
+      (info.req as any).user_id = decoded.user_id;
       return true;
 
     } catch (error) {
@@ -777,20 +774,19 @@ export class WebSocketService {
    * Handle new WebSocket connection.
    * Sets up connection tracking, event handlers, and sends confirmation.
    */
-  private handleConnection(ws: AuthenticatedWebSocket, request: any): void {
-    const userId = request.userId;
-    if (!userId) {
-      logger.error('Connection without userId - should not happen', { 
+  private handleConnection(ws: AuthenticatedWebSocket, request: any): void { const user_id = request.user_id;
+    if (!user_id) {
+      logger.error('Connection without user_id - should not happen', { 
         component: 'WebSocketService' 
-      });
+       });
       ws.close(1008, 'Authentication required');
       return;
     }
 
-    const connectionId = `${userId}-${this.nextConnectionId++}`;
+    const connectionId = `${ user_id }-${this.nextConnectionId++}`;
     
     // Initialize WebSocket properties
-    ws.userId = userId;
+    ws.user_id = user_id;
     ws.connectionId = connectionId;
     ws.isAlive = true;
     ws.lastPing = Date.now();
@@ -807,34 +803,31 @@ export class WebSocketService {
     this.connectionStats.lastActivity = Date.now();
 
     // Initialize or update connection pool
-    if (!this.connectionPool.has(userId)) {
-      this.connectionPool.set(userId, {
+    if (!this.connectionPool.has(user_id)) { this.connectionPool.set(user_id, {
         connections: [],
         lastActivity: Date.now()
-      });
+       });
     }
-    const pool = this.connectionPool.get(userId)!;
+    const pool = this.connectionPool.get(user_id)!;
     pool.connections.push(ws);
     pool.lastActivity = Date.now();
 
     // Initialize clients set
-    if (!this.clients.has(userId)) {
-      this.clients.set(userId, new Set());
-    }
-    this.clients.get(userId)!.add(ws);
+    if (!this.clients.has(user_id)) { this.clients.set(user_id, new Set());
+     }
+    this.clients.get(user_id)!.add(ws);
 
-    logger.info(`New WebSocket connection ${connectionId} for user: ${userId}`, {
+    logger.info(`New WebSocket connection ${connectionId} for user: ${ user_id }`, {
       component: 'WebSocketService',
       activeConnections: this.connectionStats.activeConnections,
       userConnections: pool.connections.length
     });
 
     // Send connection confirmation with configuration
-    this.sendOptimized(ws, {
-      type: 'connected',
+    this.sendOptimized(ws, { type: 'connected',
       message: 'WebSocket connection established',
       data: {
-        userId,
+        user_id,
         connectionId,
         timestamp: new Date().toISOString(),
         config: {
@@ -842,7 +835,7 @@ export class WebSocketService {
           maxMessageSize: CONFIG.MAX_PAYLOAD,
           supportsBatching: true,
           compressionEnabled: true
-        }
+         }
       }
     });
 
@@ -1088,39 +1081,35 @@ export class WebSocketService {
   // ==========================================================================
 
   /**
-   * Handle subscription request for a single bill.
+   * Handle subscription request for a single bills.
    * Updates subscription indexes for efficient lookups.
    */
-  private async handleSubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
-    const { billId } = message.data || {};
+  private async handleSubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> { const { bill_id  } = message.data || {};
 
-    if (!ws.userId || !billId) {
-      this.sendOptimized(ws, {
+    if (!ws.user_id || !bill_id) { this.sendOptimized(ws, {
         type: 'error',
-        message: billId ? 'Authentication required' : 'Bill ID required'
-      });
+        message: bill_id ? 'Authentication required' : 'Bill ID required'
+       });
       return;
     }
 
-    ws.subscriptions!.add(billId);
+    ws.subscriptions!.add(bill_id);
 
-    if (!this.billSubscriptions.has(billId)) {
-      this.billSubscriptions.set(billId, new Set());
+    if (!this.billSubscriptions.has(bill_id)) { this.billSubscriptions.set(bill_id, new Set());
+     }
+    this.billSubscriptions.get(bill_id)!.add(ws.user_id);
+
+    if (!this.userSubscriptionIndex.has(ws.user_id)) {
+      this.userSubscriptionIndex.set(ws.user_id, new Set());
     }
-    this.billSubscriptions.get(billId)!.add(ws.userId);
+    this.userSubscriptionIndex.get(ws.user_id)!.add(bill_id);
 
-    if (!this.userSubscriptionIndex.has(ws.userId)) {
-      this.userSubscriptionIndex.set(ws.userId, new Set());
-    }
-    this.userSubscriptionIndex.get(ws.userId)!.add(billId);
-
-    logger.debug(`User ${ws.userId} subscribed to bill ${billId}`, {
+    logger.debug(`User ${ws.user_id} subscribed to bill ${ bill_id }`, {
       component: 'WebSocketService'
     });
 
-    this.sendOptimized(ws, {
-      type: 'subscribed',
-      data: { billId, message: `Subscribed to bill ${billId} updates` }
+    this.sendOptimized(ws, { type: 'subscribed',
+      data: { bill_id, message: `Subscribed to bill ${bill_id } updates` }
     });
   }
 
@@ -1129,9 +1118,9 @@ export class WebSocketService {
    * Processes subscriptions efficiently and reports successes/failures.
    */
   private async handleBatchSubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
-    const { billIds } = message.data || {};
+    const { bill_ids } = message.data || {};
 
-    if (!ws.userId || !billIds || !Array.isArray(billIds)) {
+    if (!ws.user_id || !bill_ids || !Array.isArray(bill_ids)) {
       this.sendOptimized(ws, {
         type: 'error',
         message: 'Invalid batch subscription request'
@@ -1142,35 +1131,32 @@ export class WebSocketService {
     const subscribed: number[] = [];
     const failed: number[] = [];
 
-    for (const billId of billIds) {
-      try {
-        if (typeof billId !== 'number' || billId <= 0) {
-          failed.push(billId);
+    for (const bill_id of bill_ids) { try {
+        if (typeof bill_id !== 'number' || bill_id <= 0) {
+          failed.push(bill_id);
           continue;
+         }
+
+        ws.subscriptions!.add(bill_id);
+
+        if (!this.billSubscriptions.has(bill_id)) { this.billSubscriptions.set(bill_id, new Set());
+         }
+        this.billSubscriptions.get(bill_id)!.add(ws.user_id);
+
+        if (!this.userSubscriptionIndex.has(ws.user_id)) {
+          this.userSubscriptionIndex.set(ws.user_id, new Set());
         }
+        this.userSubscriptionIndex.get(ws.user_id)!.add(bill_id);
 
-        ws.subscriptions!.add(billId);
-
-        if (!this.billSubscriptions.has(billId)) {
-          this.billSubscriptions.set(billId, new Set());
-        }
-        this.billSubscriptions.get(billId)!.add(ws.userId);
-
-        if (!this.userSubscriptionIndex.has(ws.userId)) {
-          this.userSubscriptionIndex.set(ws.userId, new Set());
-        }
-        this.userSubscriptionIndex.get(ws.userId)!.add(billId);
-
-        subscribed.push(billId);
-      } catch (error) {
-        logger.error(`Failed to subscribe to bill ${billId}:`, { 
+        subscribed.push(bill_id);
+      } catch (error) { logger.error(`Failed to subscribe to bill ${bill_id }:`, { 
           component: 'WebSocketService' 
         }, error instanceof Error ? error : new Error(String(error)));
-        failed.push(billId);
+        failed.push(bill_id);
       }
     }
 
-    logger.info(`Batch subscription completed for user ${ws.userId}`, {
+    logger.info(`Batch subscription completed for user ${ws.user_id}`, {
       component: 'WebSocketService',
       subscribed: subscribed.length,
       failed: failed.length
@@ -1187,38 +1173,34 @@ export class WebSocketService {
   }
 
   /**
-   * Handle unsubscription request for a single bill.
+   * Handle unsubscription request for a single bills.
    * Cleans up subscription indexes and removes empty sets.
    */
-  private async handleUnsubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
-    const { billId } = message.data || {};
+  private async handleUnsubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> { const { bill_id  } = message.data || {};
 
-    if (!ws.userId || !billId) return;
+    if (!ws.user_id || !bill_id) return;
 
-    ws.subscriptions?.delete(billId);
+    ws.subscriptions?.delete(bill_id);
 
-    if (this.billSubscriptions.has(billId)) {
-      this.billSubscriptions.get(billId)!.delete(ws.userId);
-      if (this.billSubscriptions.get(billId)!.size === 0) {
-        this.billSubscriptions.delete(billId);
-      }
+    if (this.billSubscriptions.has(bill_id)) { this.billSubscriptions.get(bill_id)!.delete(ws.user_id);
+      if (this.billSubscriptions.get(bill_id)!.size === 0) {
+        this.billSubscriptions.delete(bill_id);
+       }
     }
 
-    const userSubs = this.userSubscriptionIndex.get(ws.userId);
-    if (userSubs) {
-      userSubs.delete(billId);
+    const userSubs = this.userSubscriptionIndex.get(ws.user_id);
+    if (userSubs) { userSubs.delete(bill_id);
       if (userSubs.size === 0) {
-        this.userSubscriptionIndex.delete(ws.userId);
-      }
+        this.userSubscriptionIndex.delete(ws.user_id);
+       }
     }
 
-    logger.debug(`User ${ws.userId} unsubscribed from bill ${billId}`, {
+    logger.debug(`User ${ws.user_id} unsubscribed from bill ${ bill_id }`, {
       component: 'WebSocketService'
     });
 
-    this.sendOptimized(ws, {
-      type: 'unsubscribed',
-      data: { billId, message: `Unsubscribed from bill ${billId} updates` }
+    this.sendOptimized(ws, { type: 'unsubscribed',
+      data: { bill_id, message: `Unsubscribed from bill ${bill_id } updates` }
     });
   }
 
@@ -1227,9 +1209,9 @@ export class WebSocketService {
    * Efficiently processes multiple unsubscriptions at once.
    */
   private async handleBatchUnsubscription(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
-    const { billIds } = message.data || {};
+    const { bill_ids } = message.data || {};
 
-    if (!ws.userId || !billIds || !Array.isArray(billIds)) {
+    if (!ws.user_id || !bill_ids || !Array.isArray(bill_ids)) {
       this.sendOptimized(ws, {
         type: 'error',
         message: 'Invalid batch unsubscription request'
@@ -1239,28 +1221,26 @@ export class WebSocketService {
 
     const unsubscribed: number[] = [];
 
-    for (const billId of billIds) {
-      ws.subscriptions?.delete(billId);
+    for (const bill_id of bill_ids) { ws.subscriptions?.delete(bill_id);
 
-      if (this.billSubscriptions.has(billId)) {
-        this.billSubscriptions.get(billId)!.delete(ws.userId);
-        if (this.billSubscriptions.get(billId)!.size === 0) {
-          this.billSubscriptions.delete(billId);
-        }
+      if (this.billSubscriptions.has(bill_id)) {
+        this.billSubscriptions.get(bill_id)!.delete(ws.user_id);
+        if (this.billSubscriptions.get(bill_id)!.size === 0) {
+          this.billSubscriptions.delete(bill_id);
+         }
       }
 
-      const userSubs = this.userSubscriptionIndex.get(ws.userId);
-      if (userSubs) {
-        userSubs.delete(billId);
+      const userSubs = this.userSubscriptionIndex.get(ws.user_id);
+      if (userSubs) { userSubs.delete(bill_id);
         if (userSubs.size === 0) {
-          this.userSubscriptionIndex.delete(ws.userId);
-        }
+          this.userSubscriptionIndex.delete(ws.user_id);
+         }
       }
 
-      unsubscribed.push(billId);
+      unsubscribed.push(bill_id);
     }
 
-    logger.info(`Batch unsubscription completed for user ${ws.userId}`, {
+    logger.info(`Batch unsubscription completed for user ${ws.user_id}`, {
       component: 'WebSocketService',
       unsubscribed: unsubscribed.length
     });
@@ -1279,7 +1259,7 @@ export class WebSocketService {
    * Returns user notification preferences (placeholder for integration).
    */
   private async handleGetPreferences(ws: AuthenticatedWebSocket): Promise<void> {
-    if (!ws.userId) {
+    if (!ws.user_id) {
       this.sendOptimized(ws, {
         type: 'error',
         message: 'Authentication required'
@@ -1299,11 +1279,10 @@ export class WebSocketService {
         data: preferences,
         timestamp: new Date().toISOString()
       });
-    } catch (error) {
-      logger.error('Error getting user preferences:', { 
+    } catch (error) { logger.error('Error getting user preferences:', { 
         component: 'WebSocketService',
-        userId: ws.userId
-      }, error instanceof Error ? error : new Error(String(error)));
+        user_id: ws.user_id
+       }, error instanceof Error ? error : new Error(String(error)));
       
       this.sendOptimized(ws, {
         type: 'error',
@@ -1317,7 +1296,7 @@ export class WebSocketService {
    * Updates user notification preferences (placeholder for integration).
    */
   private async handleUpdatePreferences(ws: AuthenticatedWebSocket, message: WebSocketMessage): Promise<void> {
-    if (!ws.userId) {
+    if (!ws.user_id) {
       this.sendOptimized(ws, {
         type: 'error',
         message: 'Authentication required'
@@ -1347,11 +1326,10 @@ export class WebSocketService {
         message: 'Preferences updated successfully',
         timestamp: new Date().toISOString()
       });
-    } catch (error) {
-      logger.error('Error updating user preferences:', { 
+    } catch (error) { logger.error('Error updating user preferences:', { 
         component: 'WebSocketService',
-        userId: ws.userId
-      }, error instanceof Error ? error : new Error(String(error)));
+        user_id: ws.user_id
+       }, error instanceof Error ? error : new Error(String(error)));
       
       this.sendOptimized(ws, {
         type: 'error',
@@ -1368,17 +1346,16 @@ export class WebSocketService {
    * Handle client disconnection with comprehensive cleanup.
    * Removes all traces of the connection from internal data structures.
    */
-  private handleDisconnection(ws: AuthenticatedWebSocket): void {
-    if (!ws.userId) return;
+  private handleDisconnection(ws: AuthenticatedWebSocket): void { if (!ws.user_id) return;
 
-    const userId = ws.userId;
+    const user_id = ws.user_id;
 
     // Clean up timers and buffers
     try {
       if (ws.flushTimer) {
         clearTimeout(ws.flushTimer);
         ws.flushTimer = undefined;
-      }
+       }
       
       if (ws.messageBuffer && ws.messageBuffer.length > 0) {
         logger.debug(`Clearing ${ws.messageBuffer.length} pending messages for ${ws.connectionId}`, { 
@@ -1393,15 +1370,14 @@ export class WebSocketService {
     }
 
     // Clean up subscriptions
-    try {
-      if (ws.subscriptions) {
-        for (const billId of ws.subscriptions) {
-          const subscribers = this.billSubscriptions.get(billId);
+    try { if (ws.subscriptions) {
+        for (const bill_id of ws.subscriptions) {
+          const subscribers = this.billSubscriptions.get(bill_id);
           if (subscribers) {
-            subscribers.delete(userId);
+            subscribers.delete(user_id);
             if (subscribers.size === 0) {
-              this.billSubscriptions.delete(billId);
-            }
+              this.billSubscriptions.delete(bill_id);
+              }
           }
         }
         ws.subscriptions.clear();
@@ -1414,13 +1390,12 @@ export class WebSocketService {
     }
 
     // Clean up connection pool
-    try {
-      const pool = this.connectionPool.get(userId);
+    try { const pool = this.connectionPool.get(user_id);
       if (pool) {
         pool.connections = pool.connections.filter(conn => conn !== ws);
         if (pool.connections.length === 0) {
-          this.connectionPool.delete(userId);
-        }
+          this.connectionPool.delete(user_id);
+         }
       }
     } catch (error) {
       logger.error('Error cleaning up connection pool:', { 
@@ -1429,13 +1404,12 @@ export class WebSocketService {
     }
 
     // Clean up user subscription index
-    try {
-      const userSubs = this.userSubscriptionIndex.get(userId);
+    try { const userSubs = this.userSubscriptionIndex.get(user_id);
       if (userSubs) {
-        const otherConnections = this.clients.get(userId);
+        const otherConnections = this.clients.get(user_id);
         if (!otherConnections || otherConnections.size <= 1) {
-          this.userSubscriptionIndex.delete(userId);
-        }
+          this.userSubscriptionIndex.delete(user_id);
+         }
       }
     } catch (error) {
       logger.error('Error cleaning up user subscription index:', { 
@@ -1444,13 +1418,12 @@ export class WebSocketService {
     }
 
     // Clean up clients map
-    try {
-      const userClients = this.clients.get(userId);
+    try { const userClients = this.clients.get(user_id);
       if (userClients) {
         userClients.delete(ws);
         if (userClients.size === 0) {
-          this.clients.delete(userId);
-        }
+          this.clients.delete(user_id);
+         }
       }
     } catch (error) {
       logger.error('Error cleaning up clients map:', { 
@@ -1459,7 +1432,7 @@ export class WebSocketService {
     }
 
     // Clear WebSocket properties to help garbage collection
-    ws.userId = undefined;
+    ws.user_id = undefined;
     ws.connectionId = undefined;
     ws.isAlive = undefined;
     ws.lastPing = undefined;
@@ -1533,12 +1506,11 @@ export class WebSocketService {
    * Broadcast bill update to all subscribed users.
    * Uses deduplication to prevent sending duplicate updates.
    */
-  broadcastBillUpdate(billId: number, update: {
+  broadcastBillUpdate(bill_id: number, update: {
     type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled';
     data: any;
     timestamp: Date;
-  }): void {
-    const dedupeKey = `${billId}-${update.type}-${update.timestamp.getTime()}`;
+  }): void { const dedupeKey = `${bill_id }-${update.type}-${update.timestamp.getTime()}`;
 
     // Check for duplicate within dedupe window
     if (this.messageDedupeCache.has(dedupeKey)) {
@@ -1551,27 +1523,24 @@ export class WebSocketService {
 
     this.messageDedupeCache.set(dedupeKey, Date.now());
 
-    this.queueOperation(async () => {
-      const subscribers = this.billSubscriptions.get(billId);
+    this.queueOperation(async () => { const subscribers = this.billSubscriptions.get(bill_id);
       if (!subscribers || subscribers.size === 0) {
         return;
-      }
+       }
 
       this.connectionStats.totalBroadcasts++;
       this.connectionStats.lastActivity = Date.now();
 
-      const message = {
-        type: 'bill_update',
-        billId,
+      const message = { type: 'bill_update',
+        bill_id,
         update,
         timestamp: update.timestamp.toISOString()
-      };
+       };
 
       let successfulDeliveries = 0;
       const subscriberSnapshot = Array.from(subscribers);
 
-      for (const userId of subscriberSnapshot) {
-        const pool = this.connectionPool.get(userId);
+      for (const user_id of subscriberSnapshot) { const pool = this.connectionPool.get(user_id);
         if (pool && pool.connections.length > 0) {
           // Find first active connection for this user
           const activeConnection = pool.connections.find(
@@ -1581,12 +1550,12 @@ export class WebSocketService {
           if (activeConnection) {
             if (this.sendOptimized(activeConnection, message)) {
               successfulDeliveries++;
-            }
+             }
           }
         }
       }
 
-      logger.info(`Broadcast bill ${billId} update: ${successfulDeliveries}/${subscriberSnapshot.length} delivered`, { 
+      logger.info(`Broadcast bill ${ bill_id } update: ${successfulDeliveries}/${subscriberSnapshot.length} delivered`, { 
         component: 'WebSocketService',
         updateType: update.type
       });
@@ -1597,16 +1566,15 @@ export class WebSocketService {
    * Send notification to specific user across all their connections.
    * High priority messages bypass batching for immediate delivery.
    */
-  sendUserNotification(userId: string, notification: {
+  sendUserNotification(user_id: string, notification: {
     type: string;
     title: string;
     message: string;
     data?: any;
-  }): void {
-    this.queueOperation(async () => {
-      const pool = this.connectionPool.get(userId);
+  }): void { this.queueOperation(async () => {
+      const pool = this.connectionPool.get(user_id);
       if (!pool || pool.connections.length === 0) {
-        logger.debug(`No active connections for user ${userId}`, {
+        logger.debug(`No active connections for user ${user_id }`, {
           component: 'WebSocketService'
         });
         return;
@@ -1629,10 +1597,9 @@ export class WebSocketService {
         }
       }
 
-      logger.debug(`User notification sent to ${delivered}/${pool.connections.length} connections`, {
-        component: 'WebSocketService',
-        userId
-      });
+      logger.debug(`User notification sent to ${delivered}/${pool.connections.length} connections`, { component: 'WebSocketService',
+        user_id
+       });
     }, 1); // High priority
   }
 
@@ -1663,7 +1630,7 @@ export class WebSocketService {
       let successfulDeliveries = 0;
       let totalAttempts = 0;
 
-      for (const [userId, pool] of this.connectionPool.entries()) {
+      for (const [user_id, pool] of this.connectionPool.entries()) {
         const activeConnection = pool.connections.find(
           ws => ws.readyState === WebSocket.OPEN
         );
@@ -1673,8 +1640,7 @@ export class WebSocketService {
           try {
             activeConnection.send(JSON.stringify(broadcastMessage));
             successfulDeliveries++;
-          } catch (error) {
-            logger.error(`Failed to broadcast to user ${userId}`, { 
+          } catch (error) { logger.error(`Failed to broadcast to user ${user_id }`, { 
               component: 'WebSocketService' 
             }, error instanceof Error ? error : new Error(String(error)));
             this.connectionStats.droppedMessages++;
@@ -1796,8 +1762,7 @@ export class WebSocketService {
    * Perform memory cleanup to prevent unbounded growth.
    * Implements aggressive cleanup under high memory pressure.
    */
-  private performMemoryCleanup(): void {
-    const memUsage = process.memoryUsage();
+  private performMemoryCleanup(): void { const memUsage = process.memoryUsage();
     const heapUsedPercent = (memUsage.heapUsed / memUsage.heapTotal) * 100;
     const now = Date.now();
 
@@ -1809,12 +1774,12 @@ export class WebSocketService {
 
     // Clean up stale connection pools (1 hour inactivity)
     let stalePools = 0;
-    for (const [userId, pool] of this.connectionPool.entries()) {
+    for (const [user_id, pool] of this.connectionPool.entries()) {
       if (pool.connections.length === 0 && now - pool.lastActivity > 3600000) {
-        this.connectionPool.delete(userId);
+        this.connectionPool.delete(user_id);
         stalePools++;
         cleanedItems++;
-      }
+       }
     }
 
     // Critical memory pressure - aggressive cleanup
@@ -2059,15 +2024,14 @@ export class WebSocketService {
    * Force detailed memory analysis for debugging.
    * Provides breakdown of memory usage by component.
    */
-  forceMemoryAnalysis(): any {
-    const memUsage = process.memoryUsage();
+  forceMemoryAnalysis(): any { const memUsage = process.memoryUsage();
 
     // Estimate memory usage for each component
     let connectionPoolMemory = 0;
-    for (const [userId, pool] of this.connectionPool.entries()) {
-      connectionPoolMemory += userId.length * 2;
+    for (const [user_id, pool] of this.connectionPool.entries()) {
+      connectionPoolMemory += user_id.length * 2;
       connectionPoolMemory += pool.connections.length * 100;
-    }
+     }
 
     let subscriptionMemory = 0;
     for (const [, subscribers] of this.billSubscriptions.entries()) {
@@ -2173,49 +2137,44 @@ export class WebSocketService {
   /**
    * Get user's current subscriptions.
    */
-  getUserSubscriptions(userId: string): number[] {
-    const userSubs = this.userSubscriptionIndex.get(userId);
+  getUserSubscriptions(user_id: string): number[] { const userSubs = this.userSubscriptionIndex.get(user_id);
     return userSubs ? Array.from(userSubs) : [];
-  }
+   }
 
   /**
    * Check if user is currently connected.
    */
-  isUserConnected(userId: string): boolean {
-    const pool = this.connectionPool.get(userId);
+  isUserConnected(user_id: string): boolean { const pool = this.connectionPool.get(user_id);
     if (!pool || pool.connections.length === 0) return false;
     return pool.connections.some(ws => ws.readyState === WebSocket.OPEN);
-  }
+   }
 
   /**
-   * Get number of active connections for a user.
+   * Get number of active connections for a users.
    */
-  getConnectionCount(userId: string): number {
-    const pool = this.connectionPool.get(userId);
+  getConnectionCount(user_id: string): number { const pool = this.connectionPool.get(user_id);
     if (!pool) return 0;
     return pool.connections.filter(ws => ws.readyState === WebSocket.OPEN).length;
-  }
+   }
 
   /**
    * Get all currently connected user IDs.
    */
-  getAllConnectedUsers(): string[] {
-    const connectedUsers: string[] = [];
-    for (const [userId, pool] of this.connectionPool.entries()) {
+  getAllConnectedUsers(): string[] { const connectedUsers: string[] = [];
+    for (const [user_id, pool] of this.connectionPool.entries()) {
       if (pool.connections.some(ws => ws.readyState === WebSocket.OPEN)) {
-        connectedUsers.push(userId);
-      }
+        connectedUsers.push(user_id);
+       }
     }
     return connectedUsers;
   }
 
   /**
-   * Get all user IDs subscribed to a specific bill.
+   * Get all user IDs subscribed to a specific bills.
    */
-  getBillSubscribers(billId: number): string[] {
-    const subscribers = this.billSubscriptions.get(billId);
+  getBillSubscribers(bill_id: number): string[] { const subscribers = this.billSubscriptions.get(bill_id);
     return subscribers ? Array.from(subscribers) : [];
-  }
+   }
 
   // ==========================================================================
   // CLEANUP & SHUTDOWN
@@ -2225,23 +2184,21 @@ export class WebSocketService {
    * Clean up all internal data structures without closing connections.
    * Used during graceful shutdown after connections are closed.
    */
-  cleanup(): void {
-    if (this.isShuttingDown) return;
+  cleanup(): void { if (this.isShuttingDown) return;
 
     this.isShuttingDown = true;
     this.cleanupIntervals();
 
     // Clean up all connection buffers and timers
-    for (const [userId, pool] of this.connectionPool.entries()) {
+    for (const [user_id, pool] of this.connectionPool.entries()) {
       for (const ws of pool.connections) {
         try {
           if (ws.flushTimer) {
             clearTimeout(ws.flushTimer);
             ws.flushTimer = undefined;
-          }
+           }
           ws.messageBuffer = undefined;
-        } catch (error) {
-          logger.error(`Error cleaning up connection for user ${userId}`, { 
+        } catch (error) { logger.error(`Error cleaning up connection for user ${user_id }`, { 
             component: 'WebSocketService' 
           }, error instanceof Error ? error : new Error(String(error)));
         }

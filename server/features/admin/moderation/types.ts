@@ -6,7 +6,7 @@
  * Filters for querying the moderation queue
  */
 export interface ContentModerationFilters {
-  contentType?: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency';
+  content_type?: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency';
   status?: 'pending' | 'reviewed' | 'resolved' | 'dismissed' | 'escalated';
   severity?: 'info' | 'low' | 'medium' | 'high' | 'critical';
   dateRange?: {
@@ -23,8 +23,8 @@ export interface ContentModerationFilters {
  */
 export interface ModerationItem {
   id: number;
-  contentType: 'comment' | 'bill' | 'user_profile' | 'sponsor_transparency';
-  contentId: number;
+  content_type: 'comment' | 'bill' | 'user_profile' | 'sponsor_transparency';
+  content_id: number;
   content: {
     title?: string;
     text: string;
@@ -33,7 +33,7 @@ export interface ModerationItem {
       name: string;
       email: string;
     };
-    createdAt: Date;
+    created_at: Date;
   };
   reportType: 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'copyright' | 'other';
   severity: 'info' | 'low' | 'medium' | 'high' | 'critical';
@@ -45,8 +45,8 @@ export interface ModerationItem {
   reviewedBy?: string | null;
   reviewedAt?: Date | null;
   resolutionNotes?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 /**
@@ -54,13 +54,13 @@ export interface ModerationItem {
  */
 export interface ModerationActionRecord {
   id: number;
-  contentType: string;
-  contentId: number;
+  content_type: string;
+  content_id: number;
   actionType: 'warn' | 'hide' | 'delete' | 'ban_user' | 'verify' | 'highlight';
   reason: string;
   moderatorId: string;
   moderatorName: string;
-  createdAt: Date;
+  created_at: Date;
 }
 
 /**

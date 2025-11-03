@@ -41,36 +41,31 @@ export const billApi = {
   /**
    * Get comments for a specific bill
    */
-  async getComments(billId: string | number): Promise<Comment[]> {
-    return api.get(`/api/bills/${billId}/comments`);
+  async getComments(bill_id: string | number): Promise<Comment[]> { return api.get(`/api/bills/${bill_id }/comments`);
   },
 
   /**
    * Add a comment to a bill
    */
-  async addComment(billId: string | number, comment: CommentPayload): Promise<Comment> {
-    return api.post(`/api/bills/${billId}/comments`, comment);
+  async addComment(bill_id: string | number, comment: CommentPayload): Promise<Comment> { return api.post(`/api/bills/${bill_id }/comments`, comment);
   },
 
   /**
    * Record user engagement with a bill
    */
-  async recordEngagement(billId: string | number, engagement: EngagementPayload): Promise<void> {
-    return api.post(`/api/bills/${billId}/engagement`, engagement);
+  async recordEngagement(bill_id: string | number, engagement: EngagementPayload): Promise<void> { return api.post(`/api/bills/${bill_id }/engagement`, engagement);
   },
 
   /**
    * Get bill sponsors
    */
-  async getSponsors(billId: string | number): Promise<any[]> {
-    return api.get(`/api/bills/${billId}/sponsors`);
+  async getSponsors(bill_id: string | number): Promise<any[]> { return api.get(`/api/bills/${bill_id }/sponsors`);
   },
 
   /**
    * Get bill analysis
    */
-  async getAnalysis(billId: string | number): Promise<any> {
-    return api.get(`/api/bills/${billId}/analysis`);
+  async getAnalysis(bill_id: string | number): Promise<any> { return api.get(`/api/bills/${bill_id }/analysis`);
   },
 
   /**
@@ -90,15 +85,13 @@ export const billApi = {
   /**
    * Track a bill for notifications
    */
-  async trackBill(billId: string | number): Promise<void> {
-    return api.post(`/api/bills/${billId}/track`);
+  async trackBill(bill_id: string | number): Promise<void> { return api.post(`/api/bills/${bill_id }/track`);
   },
 
   /**
    * Untrack a bill
    */
-  async untrackBill(billId: string | number): Promise<void> {
-    return api.delete(`/api/bills/${billId}/track`);
+  async untrackBill(bill_id: string | number): Promise<void> { return api.delete(`/api/bills/${bill_id }/track`);
   }
 };
 

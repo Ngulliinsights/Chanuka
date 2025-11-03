@@ -273,7 +273,7 @@ class OfflineDataManager {
       type,
       data,
       timestamp: Date.now(),
-      userAgent: navigator.userAgent,
+      user_agent: navigator.user_agent,
       url: window.location.href,
     };
 

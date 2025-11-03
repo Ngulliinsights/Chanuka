@@ -41,15 +41,14 @@ export interface ObservabilityConfig {
   };
 }
 
-export interface ObservabilityContext {
-  correlationId: string;
+export interface ObservabilityContext { correlationId: string;
   traceId?: string;
   spanId?: string;
-  userId?: string;
+  user_id?: string;
   sessionId?: string;
   requestId?: string;
   metadata?: Record<string, any>;
-}
+ }
 
 export interface ObservabilityEvent {
   timestamp: Date;

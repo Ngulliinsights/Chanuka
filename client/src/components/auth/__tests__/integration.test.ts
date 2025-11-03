@@ -165,8 +165,8 @@ describe('Auth Component Integration', () => {
       expect(mockUseAuth.register).toHaveBeenCalledWith({
         email: registerData.email,
         password: registerData.password,
-        firstName: registerData.firstName,
-        lastName: registerData.lastName
+        first_name: registerData.first_name,
+        last_name: registerData.last_name
       });
       expect(result.current.apiResponse?.success).toBe('Account created successfully!');
       expect(onSuccess).toHaveBeenCalled();
@@ -335,8 +335,8 @@ describe('Auth Component Integration', () => {
       const formData = {
         email: 'test@example.com',
         password: 'StrongP@ssw0rd123!',
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         confirmPassword: 'StrongP@ssw0rd123!'
       };
       
@@ -362,7 +362,7 @@ describe('Auth Component Integration', () => {
       // Test sanitization of different input types
       const inputs = [
         { name: 'email', value: '  TEST@EXAMPLE.COM  \x00', expected: 'test@example.com' },
-        { name: 'firstName', value: '  John   Doe  \x1F', expected: 'John Doe' },
+        { name: 'first_name', value: '  John   Doe  \x1F', expected: 'John Doe' },
         { name: 'password', value: '  MyP@ss\x00w0rd!  ', expected: 'MyP@ssw0rd!' }
       ];
       
@@ -496,7 +496,7 @@ describe('Auth Component Integration', () => {
       const testCases = [
         { field: 'email', value: 'invalid', expectedError: 'email' },
         { field: 'password', value: 'short', expectedError: 'password' },
-        { field: 'firstName', value: 'J', expectedError: 'name' }
+        { field: 'first_name', value: 'J', expectedError: 'name' }
       ];
       
       testCases.forEach(({ field, value, expectedError }) => {

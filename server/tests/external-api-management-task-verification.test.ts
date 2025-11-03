@@ -86,7 +86,7 @@ describe('Task 12.3: External API Management Implementation', () => {
         expect(status).toHaveProperty('successRate');
         expect(status).toHaveProperty('errorRate');
         expect(status).toHaveProperty('uptime');
-        expect(status).toHaveProperty('lastChecked');
+        expect(status).toHaveProperty('last_checked');
         expect(status).toHaveProperty('downtimeEvents');
         
         expect(['healthy', 'degraded', 'down', 'maintenance']).toContain(status.status);

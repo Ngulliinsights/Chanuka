@@ -217,8 +217,8 @@ function createCacheKey(url: string, options?: RequestInit): string {
 }
 
 async function parseResponse(response: Response): Promise<any> {
-  const contentType = response.headers.get('content-type');
-  if (contentType?.includes('application/json')) {
+  const content_type = response.headers.get('content-type');
+  if (content_type?.includes('application/json')) {
     try {
       return await response.json();
     } catch (error) {
@@ -541,11 +541,9 @@ export const billsApi = {
   async getBillComments(id: number) {
     return apiService.get(`/api/bills/${id}/comments`);
   },
-  async createBillComment(billId: number, comment: any) {
-    return apiService.post(`/api/bills/${billId}/comments`, comment);
+  async createBillComment(bill_id: number, comment: any) { return apiService.post(`/api/bills/${bill_id }/comments`, comment);
   },
-  async recordEngagement(billId: number, engagement: any) {
-    return apiService.post(`/api/bills/${billId}/engagement`, engagement);
+  async recordEngagement(bill_id: number, engagement: any) { return apiService.post(`/api/bills/${bill_id }/engagement`, engagement);
   },
   async getBillCategories() {
     return apiService.get('/api/bills/meta/categories');

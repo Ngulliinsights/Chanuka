@@ -2,15 +2,14 @@ import { useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { defaultApiConfig } from '../config/api.js';
 import { logger } from '@shared/core';
 
-export interface BillUpdate {
-  type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled';
+export interface BillUpdate { type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled';
   data: {
-    billId: number;
+    bill_id: number;
     oldStatus?: string;
     newStatus?: string;
     title?: string;
     [key: string]: any;
-  };
+   };
   timestamp: string;
 }
 
@@ -46,13 +45,13 @@ interface WebSocketEvents {
   connected: { timestamp: string };
   disconnected: { code: number; reason: string };
   error: any;
-  billUpdate: { billId: number; update: BillUpdate; timestamp: string };
+  billUpdate: { bill_id: number; update: BillUpdate; timestamp: string  };
   notification: WebSocketNotification;
   batchedUpdates: WebSocketNotification;
   preferences: UserPreferences;
   preferencesUpdated: UserPreferences;
-  subscribed: { billId: number };
-  unsubscribed: { billId: number };
+  subscribed: { bill_id: number  };
+  unsubscribed: { bill_id: number  };
 }
 
 // Optimization: Add connection state enum for clearer state management
@@ -195,17 +194,16 @@ export class WebSocketClient {
   }
 
   // Optimized message handling with early returns
-  private handleMessage(message: any): void {
-    this.lastPongTime = Date.now();
+  private handleMessage(message: any): void { this.lastPongTime = Date.now();
 
     // Optimization: Use object lookup instead of switch for better performance
     const messageHandlers: Record<string, () => void> = {
       connected: () => this.emit('connected', message.data),
       bill_update: () => this.emit('billUpdate', {
-        billId: message.billId,
+        bill_id: message.bill_id,
         update: message.update,
         timestamp: message.timestamp
-      }),
+       }),
       notification: () => this.emit('notification', message.notification),
       batched_bill_updates: () => this.emit('batchedUpdates', message.notification),
       preferences: () => this.emit('preferences', message.data),
@@ -225,10 +223,9 @@ export class WebSocketClient {
   }
 
   // Optimization: Queue messages when offline instead of throwing
-  subscribeToBill(billId: number, subscriptionTypes?: Array<'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled'>): void {
-    const message = {
+  subscribeToBill(bill_id: number, subscriptionTypes?: Array<'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled'>): void { const message = {
       type: 'subscribe',
-      data: { billId, subscriptionTypes }
+      data: { bill_id, subscriptionTypes  }
     };
 
     if (!this.isConnected()) {
@@ -240,10 +237,9 @@ export class WebSocketClient {
     this.send(message);
   }
 
-  unsubscribeFromBill(billId: number): void {
-    const message = {
+  unsubscribeFromBill(bill_id: number): void { const message = {
       type: 'unsubscribe',
-      data: { billId }
+      data: { bill_id  }
     };
 
     if (!this.isConnected()) {
@@ -568,15 +564,14 @@ export function useWebSocket() {
   }, [updateConnectionState]);
 
   // Optimization: Memoize the returned object to prevent unnecessary re-renders
-  return useMemo(() => ({
-    isConnected,
+  return useMemo(() => ({ isConnected,
     connectionStatus,
     connect: (token: string) => webSocketClient.connect(token),
     disconnect: () => webSocketClient.disconnect(),
-    subscribeToBill: (billId: number, types?: any) => 
-      webSocketClient.subscribeToBill(billId, types),
-    unsubscribeFromBill: (billId: number) => 
-      webSocketClient.unsubscribeFromBill(billId),
+    subscribeToBill: (bill_id: number, types?: any) => 
+      webSocketClient.subscribeToBill(bill_id, types),
+    unsubscribeFromBill: (bill_id: number) => 
+      webSocketClient.unsubscribeFromBill(bill_id),
     getPreferences: () => webSocketClient.getPreferences(),
     updatePreferences: (prefs: any) => 
       webSocketClient.updatePreferences(prefs),
@@ -584,34 +579,33 @@ export function useWebSocket() {
       webSocketClient.on(event, callback),
     off: (event: any, callback: any) => 
       webSocketClient.off(event, callback)
-  }), [isConnected, connectionStatus]);
+   }), [isConnected, connectionStatus]);
 }
 
 // Optimized bill updates hook with deduplication
-export function useBillUpdates(billId?: number) {
-  const [updates, setUpdates] = useState<BillUpdate[]>([]);
+export function useBillUpdates(bill_id?: number) { const [updates, setUpdates] = useState<BillUpdate[]>([]);
   const [notifications, setNotifications] = useState<WebSocketNotification[]>([]);
   
-  const billIdRef = useRef(billId);
-  billIdRef.current = billId;
+  const bill_idRef = useRef(bill_id);
+  bill_idRef.current = bill_id;
 
   useEffect(() => {
     const handleBillUpdate = (data: any) => {
       const update = data.update as BillUpdate;
       
-      if (!billIdRef.current || update.data.billId === billIdRef.current) {
+      if (!bill_idRef.current || update.data.bill_id === bill_idRef.current) {
         setUpdates(prev => {
-          // Optimization: Deduplicate updates based on timestamp and billId
+          // Optimization: Deduplicate updates based on timestamp and bill_id
           const isDuplicate = prev.some(u => 
             u.timestamp === update.timestamp && 
-            u.data.billId === update.data.billId
+            u.data.bill_id === update.data.bill_id
           );
           
           if (isDuplicate) return prev;
           
           const newUpdates = [update, ...prev];
           return newUpdates.slice(0, 50);
-        });
+         });
       }
     };
 

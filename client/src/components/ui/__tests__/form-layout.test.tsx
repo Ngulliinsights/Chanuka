@@ -72,7 +72,7 @@ describe('FormSection', () => {
     
     // Click expand button
     const expandButton = screen.getByRole('button');
-    await user.click(expandButton);
+    await users.click(expandButton);
     
     // Content should now be visible
     expect(screen.getByText('Hidden content')).toBeVisible();
@@ -89,7 +89,7 @@ describe('FormSection', () => {
     );
     
     const toggleButton = screen.getByRole('button');
-    await user.click(toggleButton);
+    await users.click(toggleButton);
     
     expect(onToggle).toHaveBeenCalledWith(false);
   });
@@ -164,7 +164,7 @@ describe('FormStepIndicator', () => {
     );
     
     const step1Button = screen.getByLabelText(/Step 1: Step 1/);
-    await user.click(step1Button);
+    await users.click(step1Button);
     
     expect(onStepClick).toHaveBeenCalledWith('step1');
   });
@@ -206,7 +206,7 @@ describe('FormValidationSummary', () => {
     );
     
     const errorButton = screen.getByText('Personal: Email is required');
-    await user.click(errorButton);
+    await users.click(errorButton);
     
     expect(onErrorClick).toHaveBeenCalledWith('email');
   });
@@ -248,7 +248,7 @@ describe('FormSuccessIndicator', () => {
     );
     
     const button = screen.getByText('Continue');
-    await user.click(button);
+    await users.click(button);
     
     expect(mockAction).toHaveBeenCalled();
   });

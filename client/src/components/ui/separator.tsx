@@ -25,7 +25,7 @@ const Separator = forwardRef<
     />
   )
 )
-Separator.displayName = Root.displayName
+Separator.display_name = Root.display_name
 
 export { Separator }
 

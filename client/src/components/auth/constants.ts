@@ -11,8 +11,8 @@ export const AUTH_FIELD_NAMES = {
   EMAIL: 'email',
   PASSWORD: 'password',
   CONFIRM_PASSWORD: 'confirmPassword',
-  FIRST_NAME: 'firstName',
-  LAST_NAME: 'lastName'
+  FIRST_NAME: 'first_name',
+  LAST_NAME: 'last_name'
 } as const;
 
 export const AUTH_VALIDATION_RULES = {

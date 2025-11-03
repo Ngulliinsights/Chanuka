@@ -57,7 +57,7 @@ describe('SecureQueryBuilder', () => {
         id: '123',
         name: 'John Doe',
         email: 'john@example.com',
-        passwordHash: 'secret123',
+        password_hash: 'secret123',
         token: 'abc123',
         normalField: 'safe data'
       };
@@ -67,7 +67,7 @@ describe('SecureQueryBuilder', () => {
       expect(sanitized.id).toBe('123');
       expect(sanitized.name).toBe('John Doe');
       expect(sanitized.normalField).toBe('safe data');
-      expect(sanitized.passwordHash).toBeUndefined();
+      expect(sanitized.password_hash).toBeUndefined();
       expect(sanitized.token).toBeUndefined();
     });
 
@@ -86,7 +86,7 @@ describe('SecureQueryBuilder', () => {
     it('should handle arrays and nested objects', () => {
       const data = {
         users: [
-          { id: '1', name: 'User 1', passwordHash: 'secret1' },
+          { id: '1', name: 'User 1', password_hash: 'secret1' },
           { id: '2', name: 'User 2', token: 'token123' }
         ],
         metadata: {
@@ -98,7 +98,7 @@ describe('SecureQueryBuilder', () => {
       const sanitized = secureQueryBuilder.sanitizeOutput(data);
       
       expect(sanitized.users).toHaveLength(2);
-      expect(sanitized.users[0].passwordHash).toBeUndefined();
+      expect(sanitized.users[0].password_hash).toBeUndefined();
       expect(sanitized.users[1].token).toBeUndefined();
       expect(sanitized.metadata.count).toBe(2);
       expect(sanitized.metadata.secret).toBeUndefined();

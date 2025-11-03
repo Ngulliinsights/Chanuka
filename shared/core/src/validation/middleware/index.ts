@@ -58,16 +58,15 @@ export function validateRequest(config: RequestValidationConfig) {
       }
 
       // Create validation context
-      const context = {
-        requestId: req.headers['x-request-id'] as string,
-        userId: (req as any).user?.id,
+      const context = { requestId: req.headers['x-request-id'] as string,
+        user_id: (req as any).user?.id,
         timestamp: new Date(),
         metadata: {
           method: req.method,
           path: req.path,
-          userAgent: req.headers['user-agent'],
+          user_agent: req.headers['user-agent'],
           ip: req.ip,
-        },
+         },
       };
 
       const validatedData: any = {};
@@ -324,15 +323,14 @@ export function validateBatch(schema: ZodSchema, options?: any) {
         return;
       }
 
-      const context = {
-        requestId: req.headers['x-request-id'] as string,
-        userId: (req as any).user?.id,
+      const context = { requestId: req.headers['x-request-id'] as string,
+        user_id: (req as any).user?.id,
         timestamp: new Date(),
         metadata: {
           method: req.method,
           path: req.path,
           batchSize: req.body.length,
-        },
+         },
       };
 
       const result = await validationService.validateBatch(
@@ -384,18 +382,17 @@ export function validateFileUpload(
   fileSchema?: ZodSchema,
   metadataSchema?: ZodSchema,
   options?: any
-) {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+) { return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const context = {
         requestId: req.headers['x-request-id'] as string,
-        userId: (req as any).user?.id,
+        user_id: (req as any).user?.id,
         timestamp: new Date(),
         metadata: {
           method: req.method,
           path: req.path,
-          contentType: req.headers['content-type'],
-        },
+          content_type: req.headers['content-type'],
+         },
       };
 
       // Validate file information if present

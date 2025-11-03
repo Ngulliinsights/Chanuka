@@ -9,13 +9,13 @@ export interface PublicInterestScoreResult {
     factors: {
         economicScoreNormalized: number; // Score 0-100
         socialScoreNormalized: number;   // Score 0-100
-        transparencyScore: number;       // Score 0-100
+        transparency_score: number;       // Score 0-100
     };
     assessment: 'Very High' | 'High' | 'Moderate' | 'Low' | 'Very Low'; // Qualitative assessment
 }
 
 /**
- * Service for calculating a Public Interest Score for a bill.
+ * Service for calculating a Public Interest Score for a bills.
  */
 export class PublicInterestAnalysisService {
 
@@ -24,13 +24,13 @@ export class PublicInterestAnalysisService {
      */
     calculateScore(
         stakeholderImpact: StakeholderAnalysisResult,
-        transparencyScore: TransparencyScoreResult
+        transparency_score: TransparencyScoreResult
     ): PublicInterestScoreResult {
         logger.info("⚖️ Calculating public interest score.");
          try {
             const economicScoreNorm = this.normalizeEconomicScore(stakeholderImpact.economicImpact);
             const socialScoreNorm = this.normalizeSocialScore(stakeholderImpact.socialImpact);
-            const transparencyWeight = transparencyScore.overall; // Use the 0-100 score
+            const transparencyWeight = transparency_score.overall; // Use the 0-100 score
 
             // Define weights (can be adjusted based on policy/config)
             const weights = { economic: 0.3, social: 0.4, transparency: 0.3 };
@@ -46,13 +46,13 @@ export class PublicInterestAnalysisService {
                 factors: {
                     economicScoreNormalized: Math.round(economicScoreNorm),
                     socialScoreNormalized: Math.round(socialScoreNorm),
-                    transparencyScore: transparencyScore.overall
+                    transparency_score: transparency_score.overall
                 },
                 assessment: this.getQualitativeAssessment(finalScore)
             };
          } catch (error) {
              logger.error("Error calculating public interest score:", { component: 'PublicInterestAnalysisService' }, error);
-              return { score: 0, factors: { economicScoreNormalized: 0, socialScoreNormalized: 0, transparencyScore: 0 }, assessment: 'Very Low' };
+              return { score: 0, factors: { economicScoreNormalized: 0, socialScoreNormalized: 0, transparency_score: 0 }, assessment: 'Very Low' };
          }
     }
 

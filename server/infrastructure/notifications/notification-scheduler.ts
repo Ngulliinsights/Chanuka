@@ -1,5 +1,5 @@
 import { database as db } from '../../../shared/database/connection';
-import { notification, user, bill, billEngagement } from '../../../shared/schema';
+import { notifications, users, bills, bill_engagement } from '@shared/schema';
 import { eq, and, lt, gte, sql } from 'drizzle-orm';
 import * as cron from 'node-cron';
 import { userPreferencesService, type BillTrackingPreferences } from '../../features/users/domain/user-preferences.js';
@@ -15,40 +15,36 @@ const enhancedNotificationService = {
 type EnhancedNotificationData = any;
 import { logger } from '@shared/core';
 
-export interface ScheduledDigest {
-  userId: string;
+export interface ScheduledDigest { user_id: string;
   frequency: 'daily' | 'weekly' | 'monthly';
   timeOfDay: string;
   dayOfWeek?: number;
   dayOfMonth?: number;
   lastSent?: Date;
   nextScheduled: Date;
-}
+ }
 
-export interface DigestContent {
-  billUpdates: Array<{
-    billId: number;
+export interface DigestContent { billUpdates: Array<{
+    bill_id: number;
     title: string;
     updates: string[];
     priority: 'low' | 'medium' | 'high';
-  }>;
+   }>;
   engagementSummary: {
     totalViews: number;
     totalComments: number;
     newBillsTracked: number;
   };
-  trendingBills: Array<{
-    billId: number;
+  trendingBills: Array<{ bill_id: number;
     title: string;
-    engagementScore: number;
+    engagement_score: number;
     category: string;
-  }>;
-  actionItems: Array<{
-    billId: number;
+   }>;
+  actionItems: Array<{ bill_id: number;
     title: string;
     action: string;
     deadline?: Date;
-  }>;
+   }>;
 }
 
 export class NotificationSchedulerService {
@@ -96,7 +92,7 @@ export class NotificationSchedulerService {
       const usersWithDigests = await this.getUsersWithDigestEnabled();
 
       for (const user of usersWithDigests) {
-        await this.scheduleUserDigest(user.userId, user.preferences.billTracking);
+        await this.scheduleUserDigest(users.user_id, users.preferences.billTracking);
       }
 
       console.log(`Scheduled digest notifications for ${usersWithDigests.length} users`);
@@ -108,16 +104,15 @@ export class NotificationSchedulerService {
   /**
    * Schedule digest for a specific user
    */
-  private async scheduleUserDigest(userId: string, preferences: BillTrackingPreferences): Promise<void> {
+  private async scheduleUserDigest(user_id: string, preferences: BillTrackingPreferences): Promise<void> {
     const { digestSchedule } = preferences.advancedSettings;
     
     if (!digestSchedule.enabled) return;
 
-    const jobId = `digest_${userId}`;
+    const jobId = `digest_${ user_id }`;
     
     // Prevent concurrent updates to the same job
-    if (this.jobUpdateLock.has(jobId)) {
-      console.log(`Job update already in progress for user ${userId}`);
+    if (this.jobUpdateLock.has(jobId)) { console.log(`Job update already in progress for user ${user_id }`);
       return;
     }
     
@@ -133,18 +128,16 @@ export class NotificationSchedulerService {
       }
 
     // Create new scheduled job
-    const job = cron.schedule(cronExpression, async () => {
-      try {
-        await this.sendDigestNotification(userId);
-      } catch (error) {
-        console.error(`Error sending digest for user ${userId}:`, error);
+    const job = cron.schedule(cronExpression, async () => { try {
+        await this.sendDigestNotification(user_id);
+       } catch (error) { console.error(`Error sending digest for user ${user_id }:`, error);
       }
     }, {
       timezone: 'UTC' // TODO: Use user's timezone
     });
 
       this.scheduledJobs.set(jobId, job);
-      console.log(`Scheduled digest for user ${userId} with cron: ${cronExpression}`);
+      console.log(`Scheduled digest for user ${ user_id } with cron: ${cronExpression}`);
     } finally {
       this.jobUpdateLock.delete(jobId);
     }
@@ -153,17 +146,15 @@ export class NotificationSchedulerService {
   /**
    * Send digest notification to user
    */
-  private async sendDigestNotification(userId: string): Promise<void> {
-    try {
-      const digestContent = await this.generateDigestContent(userId);
+  private async sendDigestNotification(user_id: string): Promise<void> { try {
+      const digestContent = await this.generateDigestContent(user_id);
       
       if (this.isDigestEmpty(digestContent)) {
-        console.log(`Skipping empty digest for user ${userId}`);
+        console.log(`Skipping empty digest for user ${user_id }`);
         return;
       }
 
-      const digestData: EnhancedNotificationData = {
-        userId,
+      const digestData: EnhancedNotificationData = { user_id,
         type: 'digest',
         title: this.createDigestTitle(digestContent),
         message: this.createDigestMessage(digestContent),
@@ -172,82 +163,78 @@ export class NotificationSchedulerService {
         metadata: {
           digestContent,
           actionRequired: digestContent.actionItems.length > 0
-        }
+         }
       };
 
       await enhancedNotificationService.createEnhancedNotification(digestData);
       
-      console.log(`Sent digest notification to user ${userId}`);
-    } catch (error) {
-      console.error(`Error generating digest for user ${userId}:`, error);
+      console.log(`Sent digest notification to user ${ user_id }`);
+    } catch (error) { console.error(`Error generating digest for user ${user_id }:`, error);
     }
   }
 
   /**
    * Generate digest content for a user
    */
-  private async generateDigestContent(userId: string): Promise<DigestContent> {
-    const timeframe = await this.getDigestTimeframe(userId);
+  private async generateDigestContent(user_id: string): Promise<DigestContent> { const timeframe = await this.getDigestTimeframe(user_id);
     
     // Get bill updates for user's tracked bills
-    const billUpdates = await this.getBillUpdatesForUser(userId, timeframe);
+    const billUpdates = await this.getBillUpdatesForUser(user_id, timeframe);
     
     // Get engagement summary
-    const engagementSummary = await this.getEngagementSummary(userId, timeframe);
+    const engagementSummary = await this.getEngagementSummary(user_id, timeframe);
     
     // Get trending bills in user's areas of interest
-    const trendingBills = await this.getTrendingBills(userId, 5);
+    const trendingBills = await this.getTrendingBills(user_id, 5);
     
     // Get action items (bills requiring user attention)
-    const actionItems = await this.getActionItems(userId);
+    const actionItems = await this.getActionItems(user_id);
 
     return {
       billUpdates,
       engagementSummary,
       trendingBills,
       actionItems
-    };
+     };
   }
 
   /**
    * Get bill updates for user's tracked bills
    */
   private async getBillUpdatesForUser(
-    userId: string, 
+    user_id: string, 
     timeframe: { start: Date; end: Date }
-  ): Promise<DigestContent['billUpdates']> {
-    try {
+  ): Promise<DigestContent['billUpdates']> { try {
       // Get bills the user is tracking
       const trackedBills = await db
         .select({
-          billId: billEngagement.billId,
+          bill_id: bill_engagement.bill_id,
           billTitle: bills.title,
           billCategory: bills.category
-        })
-        .from(billEngagement)
-        .innerJoin(bills, eq(billEngagement.billId, bills.id))
+         })
+        .from(bill_engagement)
+        .innerJoin(bills, eq(bill_engagement.bill_id, bills.id))
         .where(and(
-          eq(billEngagement.userId, userId),
-          gte(billEngagement.lastEngaged, timeframe.start)
+          eq(bill_engagement.user_id, user_id),
+          gte(bill_engagement.lastEngaged, timeframe.start)
         ));
 
       // For each tracked bill, get recent updates
       const billUpdates = await Promise.all(
-        trackedBills.map(async (bill) => {
-          // This would typically query a bill_updates or bill_history table
+        trackedBills.map(async (bill) => { // This would typically query a bill_updates or bill_history table
           // For now, generate mock updates based on bill activity
-          const updates = await this.getMockBillUpdates(bill.billId, timeframe);
+          const updates = await this.getMockBillUpdates(bills.bill_id, timeframe);
           
           return {
-            billId: bill.billId,
-            title: bill.billTitle,
+            bill_id: bills.bill_id,
+            title: bills.billTitle,
             updates,
             priority: this.calculateUpdatePriority(updates)
-          };
+           };
         })
       );
 
-      return billUpdates.filter(bill => bill.updates.length > 0);
+      return billUpdates.filter(bill => bills.updates.length > 0);
     } catch (error) {
       logger.error('Error getting bill updates for user:', { component: 'Chanuka' }, error);
       return [];
@@ -258,20 +245,20 @@ export class NotificationSchedulerService {
    * Get engagement summary for user
    */
   private async getEngagementSummary(
-    userId: string, 
+    user_id: string, 
     timeframe: { start: Date; end: Date }
   ): Promise<DigestContent['engagementSummary']> {
     try {
       const engagement = await db
         .select({
-          totalViews: sql<number>`SUM(${billEngagement.viewCount})`,
-          totalComments: sql<number>`SUM(${billEngagement.commentCount})`,
-          billsTracked: sql<number>`COUNT(DISTINCT ${billEngagement.billId})`
+          totalViews: sql<number>`SUM(${bill_engagement.view_count})`,
+          totalComments: sql<number>`SUM(${bill_engagement.comment_count})`,
+          billsTracked: sql<number>`COUNT(DISTINCT ${bill_engagement.bill_id})`
         })
-        .from(billEngagement)
+        .from(bill_engagement)
         .where(and(
-          eq(billEngagement.userId, userId),
-          gte(billEngagement.lastEngaged, timeframe.start)
+          eq(bill_engagement.user_id, user_id),
+          gte(bill_engagement.lastEngaged, timeframe.start)
         ));
 
       const result = engagement[0];
@@ -294,10 +281,9 @@ export class NotificationSchedulerService {
   /**
    * Get trending bills based on user interests
    */
-  private async getTrendingBills(userId: string, limit: number): Promise<DigestContent['trendingBills']> {
-    try {
+  private async getTrendingBills(user_id: string, limit: number): Promise<DigestContent['trendingBills']> { try {
       // Get user's areas of interest from their engagement history
-      const userInterests = await this.getUserInterests(userId);
+      const user_interests = await this.getUserInterests(user_id);
       
       // Get trending bills in those categories
       const trendingBills = await db
@@ -305,24 +291,23 @@ export class NotificationSchedulerService {
           id: bills.id,
           title: bills.title,
           category: bills.category,
-          viewCount: bills.viewCount,
-          shareCount: bills.shareCount
-        })
+          view_count: bills.view_count,
+          share_count: bills.share_count
+         })
         .from(bills)
         .where(
-          userInterests.length > 0 
-            ? sql`${bills.category} = ANY(${userInterests})`
+          user_interests.length > 0 
+            ? sql`${bills.category} = ANY(${user_interests})`
             : sql`1=1`
         )
-        .orderBy(sql`(${bills.viewCount} + ${bills.shareCount}) DESC`)
+        .orderBy(sql`(${bills.view_count} + ${bills.share_count}) DESC`)
         .limit(limit);
 
-      return trendingBills.map(bill => ({
-        billId: bill.id,
-        title: bill.title,
-        engagementScore: (bill.viewCount || 0) + (bill.shareCount || 0),
-        category: bill.category || 'Uncategorized'
-      }));
+      return trendingBills.map(bill => ({ bill_id: bills.id,
+        title: bills.title,
+        engagement_score: (bills.view_count || 0) + (bills.share_count || 0),
+        category: bills.category || 'Uncategorized'
+       }));
     } catch (error) {
       logger.error('Error getting trending bills:', { component: 'Chanuka' }, error);
       return [];
@@ -332,7 +317,7 @@ export class NotificationSchedulerService {
   /**
    * Get action items for user
    */
-  private async getActionItems(userId: string): Promise<DigestContent['actionItems']> {
+  private async getActionItems(user_id: string): Promise<DigestContent['actionItems']> {
     try {
       // Get bills that require user attention (voting soon, comments needed, etc.)
       const actionItems = await db
@@ -340,22 +325,21 @@ export class NotificationSchedulerService {
           id: bills.id,
           title: bills.title,
           status: bills.status,
-          lastActionDate: bills.lastActionDate
+          last_action_date: bills.last_action_date
         })
         .from(bills)
-        .innerJoin(billEngagement, eq(bills.id, billEngagement.billId))
+        .innerJoin(bill_engagement, eq(bills.id, bill_engagement.bill_id))
         .where(and(
-          eq(billEngagement.userId, userId),
+          eq(bill_engagement.user_id, user_id),
           sql`${bills.status} IN ('committee', 'voting_scheduled')`
         ))
         .limit(10);
 
-      return actionItems.map(bill => ({
-        billId: bill.id,
-        title: bill.title,
-        action: this.getActionForBillStatus(bill.status),
-        deadline: bill.lastActionDate ? new Date(bill.lastActionDate) : undefined
-      }));
+      return actionItems.map(bill => ({ bill_id: bills.id,
+        title: bills.title,
+        action: this.getActionForBillStatus(bills.status),
+        deadline: bills.last_action_date ? new Date(bills.last_action_date) : undefined
+       }));
     } catch (error) {
       logger.error('Error getting action items:', { component: 'Chanuka' }, error);
       return [];
@@ -399,29 +383,25 @@ export class NotificationSchedulerService {
   /**
    * Update user's digest schedule
    */
-  async updateUserDigestSchedule(userId: string, preferences: BillTrackingPreferences): Promise<void> {
-    await this.scheduleUserDigest(userId, preferences);
-  }
+  async updateUserDigestSchedule(user_id: string, preferences: BillTrackingPreferences): Promise<void> { await this.scheduleUserDigest(user_id, preferences);
+   }
 
   /**
    * Remove user's digest schedule
    */
-  async removeUserDigestSchedule(userId: string): Promise<void> {
-    const jobId = `digest_${userId}`;
+  async removeUserDigestSchedule(user_id: string): Promise<void> { const jobId = `digest_${user_id }`;
     
     // Prevent concurrent updates
-    if (this.jobUpdateLock.has(jobId)) {
-      console.log(`Job update in progress for user ${userId}, skipping removal`);
+    if (this.jobUpdateLock.has(jobId)) { console.log(`Job update in progress for user ${user_id }, skipping removal`);
       return;
     }
     
     this.jobUpdateLock.add(jobId);
     
-    try {
-      if (this.scheduledJobs.has(jobId)) {
+    try { if (this.scheduledJobs.has(jobId)) {
         this.scheduledJobs.get(jobId)?.destroy();
         this.scheduledJobs.delete(jobId);
-        console.log(`Removed digest schedule for user ${userId}`);
+        console.log(`Removed digest schedule for user ${user_id }`);
       }
     } finally {
       this.jobUpdateLock.delete(jobId);
@@ -429,13 +409,12 @@ export class NotificationSchedulerService {
   }
 
   // Helper methods
-  private async getUsersWithDigestEnabled(): Promise<Array<{ userId: string; preferences: any }>> {
-    const allUsers = await db.select({ id: user.id, preferences: user.preferences }).from(user);
+  private async getUsersWithDigestEnabled(): Promise<Array<{ user_id: string; preferences: any  }>> {
+    const allUsers = await db.select({ id: users.id, preferences: users.preferences }).from(user);
     
     return allUsers
-      .map(userData => ({
-        userId: userData.id,
-        preferences: userData.preferences || {}
+      .map(userData => ({ user_id: userData.id,
+        preferences: userData.preferences || { }
       }))
       .filter(userData => {
         const prefs = userData.preferences as any;
@@ -460,8 +439,7 @@ export class NotificationSchedulerService {
     }
   }
 
-  private async getDigestTimeframe(userId: string): Promise<{ start: Date; end: Date }> {
-    const preferences = await userPreferencesService.getUserPreferences(userId);
+  private async getDigestTimeframe(user_id: string): Promise<{ start: Date; end: Date }> { const preferences = await userPreferencesService.getUserPreferences(user_id);
     const frequency = preferences.billTracking.advancedSettings.digestSchedule.frequency;
     
     const end = new Date();
@@ -477,12 +455,12 @@ export class NotificationSchedulerService {
       case 'monthly':
         start.setMonth(start.getMonth() - 1);
         break;
-    }
+     }
     
     return { start, end };
   }
 
-  private async getMockBillUpdates(billId: number, timeframe: { start: Date; end: Date }): Promise<string[]> {
+  private async getMockBillUpdates(bill_id: number, timeframe: { start: Date; end: Date }): Promise<string[]> {
     // This would typically query a bill_updates table
     // For now, return mock updates
     const updates = [
@@ -503,18 +481,18 @@ export class NotificationSchedulerService {
     return 'low';
   }
 
-  private async getUserInterests(userId: string): Promise<string[]> {
+  private async getUserInterests(user_id: string): Promise<string[]> {
     // Get user's most engaged categories
     const interests = await db
       .select({
         category: bills.category,
-        engagement: sql<number>`SUM(${billEngagement.engagementScore})`
+        engagement: sql<number>`SUM(${bill_engagement.engagement_score})`
       })
-      .from(billEngagement)
-      .innerJoin(bills, eq(billEngagement.billId, bills.id))
-      .where(eq(billEngagement.userId, userId))
+      .from(bill_engagement)
+      .innerJoin(bills, eq(bill_engagement.bill_id, bills.id))
+      .where(eq(bill_engagement.user_id, user_id))
       .groupBy(bills.category)
-      .orderBy(sql`SUM(${billEngagement.engagementScore}) DESC`)
+      .orderBy(sql`SUM(${bill_engagement.engagement_score}) DESC`)
       .limit(5);
 
     return interests.map(i => i.category).filter((cat): cat is string => cat !== null);
@@ -535,7 +513,7 @@ export class NotificationSchedulerService {
   }
 
   private createDigestTitle(content: DigestContent): string {
-    const updateCount = content.billUpdates.reduce((sum, bill) => sum + bill.updates.length, 0);
+    const updateCount = content.billUpdates.reduce((sum, bill) => sum + bills.updates.length, 0);
     const actionCount = content.actionItems.length;
     
     if (actionCount > 0) {
@@ -552,7 +530,7 @@ export class NotificationSchedulerService {
     if (content.billUpdates.length > 0) {
       message += 'BILL UPDATES:\n';
       content.billUpdates.forEach(bill => {
-        message += `• ${bill.title} (${bill.updates.length} updates)\n`;
+        message += `• ${bills.title} (${bills.updates.length} updates)\n`;
       });
       message += '\n';
     }
@@ -570,7 +548,7 @@ export class NotificationSchedulerService {
     if (content.trendingBills.length > 0) {
       message += 'TRENDING IN YOUR INTERESTS:\n';
       content.trendingBills.slice(0, 3).forEach(bill => {
-        message += `• ${bill.title} (${bill.category})\n`;
+        message += `• ${bills.title} (${bills.category})\n`;
       });
     }
     

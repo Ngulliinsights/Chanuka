@@ -203,7 +203,7 @@ describe('Layout Integration Tests', () => {
       );
 
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       await waitFor(() => {
         expect(screen.getByRole('navigation')).toBeInTheDocument();
@@ -211,7 +211,7 @@ describe('Layout Integration Tests', () => {
 
       // Close menu by clicking navigation item
       const dashboardLink = screen.getByText('Dashboard');
-      await user.click(dashboardLink);
+      await users.click(dashboardLink);
 
       await waitFor(() => {
         expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
@@ -275,7 +275,7 @@ describe('Layout Integration Tests', () => {
       );
 
       const toggleButton = screen.getByLabelText('Expand sidebar');
-      await user.click(toggleButton);
+      await users.click(toggleButton);
 
       expect(onToggle).toHaveBeenCalledTimes(1);
     });
@@ -292,7 +292,7 @@ describe('Layout Integration Tests', () => {
       );
 
       const searchInput = screen.getByLabelText('Search bills');
-      await user.type(searchInput, 'test query');
+      await users.type(searchInput, 'test query');
 
       expect(onSearchChange).toHaveBeenCalledWith('test query');
     });
@@ -471,7 +471,7 @@ describe('Layout Integration Tests', () => {
       );
 
       const recoverButton = screen.getByText('Recover Layout');
-      await user.click(recoverButton);
+      await users.click(recoverButton);
 
       await waitFor(() => {
         expect(screen.queryByText('Layout Error')).not.toBeInTheDocument();

@@ -116,8 +116,8 @@ export function createCorrelationMiddleware(
       if (context.requestId) {
         res.setHeader('x-request-id', context.requestId);
       }
-      if (context.userId) {
-        res.setHeader('x-user-id', context.userId);
+      if (context.user_id) {
+        res.setHeader('x-user-id', context.user_id);
       }
       if (context.sessionId) {
         res.setHeader('x-session-id', context.sessionId);
@@ -166,25 +166,24 @@ export function createRequestLoggingMiddleware(
     }
 
     // Log incoming request
-    const requestContext: LogContext = {
-      component: 'http',
+    const requestContext: LogContext = { component: 'http',
       operation: 'request',
       correlationId: correlationContext?.correlationId,
       traceId: correlationContext?.traceId,
       requestId: correlationContext?.requestId,
-      userId: correlationContext?.userId,
+      user_id: correlationContext?.user_id,
       sessionId: correlationContext?.sessionId,
       statusCode: undefined,
       duration: undefined,
       tags: ['http', 'request']
-    };
+     };
 
     logger.info(`Incoming ${req.method} ${req.path}`, requestContext, {
       method: req.method,
       path: req.path,
       query: req.query,
       headers: sanitizeHeaders(req.headers),
-      userAgent: req.get('User-Agent'),
+      user_agent: req.get('User-Agent'),
       ip: req.ip
     });
 
@@ -216,7 +215,7 @@ export function createRequestLoggingMiddleware(
         statusCode: res.statusCode,
         duration,
         responseSize: res.get('Content-Length'),
-        contentType: res.get('Content-Type')
+        content_type: res.get('Content-Type')
       });
 
       // Call original end method
@@ -330,8 +329,7 @@ export function createErrorTrackingMiddleware(
     return (err: Error, req: Request, res: Response, next: NextFunction) => next(err);
   }
 
-  return (err: Error, req: Request, res: Response, next: NextFunction): void => {
-    const correlationContext = (req as any).correlationContext as CorrelationContext | undefined;
+  return (err: Error, req: Request, res: Response, next: NextFunction): void => { const correlationContext = (req as any).correlationContext as CorrelationContext | undefined;
 
     const errorContext: LogContext = {
       component: 'http',
@@ -339,11 +337,11 @@ export function createErrorTrackingMiddleware(
       correlationId: correlationContext?.correlationId,
       traceId: correlationContext?.traceId,
       requestId: correlationContext?.requestId,
-      userId: correlationContext?.userId,
+      user_id: correlationContext?.user_id,
       sessionId: correlationContext?.sessionId,
       errorCode: err instanceof BaseError ? err.code : 'UNKNOWN_ERROR',
       tags: ['http', 'error']
-    };
+     };
 
     // Log the error with full context
     logger.error(`Request error: ${err.message}`, errorContext, {

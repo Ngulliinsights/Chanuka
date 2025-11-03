@@ -7,16 +7,15 @@ import { errorTracker } from '../../../core/errors/error-tracker.js';
 /**
  * Request context interface for analytics operations
  */
-export interface RequestContext {
-  /** Unique trace ID for request tracking */
+export interface RequestContext { /** Unique trace ID for request tracking */
   traceId: string;
   /** Timestamp when request was received */
   timestamp: Date;
   /** User ID if authenticated */
-  userId?: string;
+  user_id?: string;
   /** Additional metadata for the request */
   metadata?: Record<string, any>;
-}
+ }
 
 /**
  * Analytics context middleware
@@ -32,8 +31,7 @@ export function analyticsContextMiddleware(
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): void {
-  try {
+): void { try {
     // Check for existing trace ID in request headers
     const existingTraceId = req.headers['x-trace-id'] as string ||
                            req.headers['x-request-id'] as string ||
@@ -46,13 +44,13 @@ export function analyticsContextMiddleware(
     const context: RequestContext = {
       traceId,
       timestamp: new Date(),
-      userId: req.user?.id,
+      user_id: req.user?.id,
       metadata: {
         method: req.method,
         path: req.path,
-        userAgent: req.headers['user-agent'],
+        user_agent: req.headers['user-agent'],
         ip: req.ip || req.connection.remoteAddress
-      }
+       }
     };
 
     // Attach context to request

@@ -1,12 +1,12 @@
 import { databaseService } from '@/services/database-service';
 import { readDatabase } from '@shared/database/connection';
-import { bill, billTag, sponsor, billSponsorship } from '@shared/schema';
+import { bill, bill_tag, sponsor, bill_sponsorship } from '@shared/schema';
 
 // Alias for backward compatibility
 const bills = bill;
-const billTags = billTag;
+const bill_tags = bill_tag;
 const sponsors = sponsor;
-const billSponsorships = billSponsorship;
+const bill_sponsorships = bill_sponsorship;
 import {
   sql,
   and,
@@ -33,7 +33,7 @@ export class SearchRepository {
     offset: number,
     opts?: { includeSnippets?: boolean; includeHighlights?: boolean; searchTerms?: string[] }
   ): Promise<Array<{ bill: PlainBill; rank: number; snippet: string | null }>> {
-    const rankExpr = vector ? sql<number>`ts_rank_cd(${bills.searchVector}, ${vector}, 32)` : sql<number>`0`;
+    const rankExpr = vector ? sql<number>`ts_rank_cd(${bills.search_vector}, ${vector}, 32)` : sql<number>`0`;
     const snippetExpr = opts?.includeSnippets
       ? sql<string>`ts_headline('english',
           coalesce(${bills.content}, ${bills.description}, ${bills.summary}, ''),
@@ -49,7 +49,7 @@ export class SearchRepository {
         snippet: snippetExpr,
       })
       .from(bills)
-      .leftJoin(billTags, sql`${bills.id} = ${billTags.billId}`)
+      .leftJoin(bill_tags, sql`${bills.id} = ${bill_tags.bill_id}`)
       .where(conditions.length ? and(...conditions) : undefined)
       .orderBy(orderBy)
       .limit(limit)
@@ -91,25 +91,25 @@ export class SearchRepository {
           label: sponsors.name,
         })
         .from(bills)
-        .leftJoin(billSponsorships, sql`${bills.id} = ${billSponsorships.billId}`)
-        .leftJoin(sponsors, sql`${billSponsorships.sponsorId} = ${sponsors.id}`)
+        .leftJoin(bill_sponsorships, sql`${bills.id} = ${bill_sponsorships.bill_id}`)
+        .leftJoin(sponsors, sql`${bill_sponsorships.sponsor_id} = ${sponsors.id}`)
         .where(conditions.length ? and(...conditions) : undefined)
         .groupBy(sponsors.id, sponsors.name),
       db
         .select({
           range: sql<string>`case
-            when ${bills.complexityScore} between 0 and 20 then '0-20'
-            when ${bills.complexityScore} between 21 and 40 then '21-40'
-            when ${bills.complexityScore} between 41 and 60 then '41-60'
-            when ${bills.complexityScore} between 61 and 80 then '61-80'
+            when ${bills.complexity_score} between 0 and 20 then '0-20'
+            when ${bills.complexity_score} between 21 and 40 then '21-40'
+            when ${bills.complexity_score} between 41 and 60 then '41-60'
+            when ${bills.complexity_score} between 61 and 80 then '61-80'
             else '81-100'
           end`,
           count: count(),
-          min: sql<number>`min(${bills.complexityScore})`,
-          max: sql<number>`max(${bills.complexityScore})`,
+          min: sql<number>`min(${bills.complexity_score})`,
+          max: sql<number>`max(${bills.complexity_score})`,
         })
         .from(bills)
-        .where(conditions.length ? and(...conditions, sql`${bills.complexityScore} is not null`) : sql`${bills.complexityScore} is not null`)
+        .where(conditions.length ? and(...conditions, sql`${bills.complexity_score} is not null`) : sql`${bills.complexity_score} is not null`)
         .groupBy(sql`range`),
     ]);
     return {

@@ -137,7 +137,7 @@ test.describe('Visual Regression Tests', () => {
       await page.route('**/auth/login', route => {
         route.fulfill({
           status: 500,
-          contentType: 'application/json',
+          content_type: 'application/json',
           body: JSON.stringify({ error: 'Internal server error' })
         });
       });

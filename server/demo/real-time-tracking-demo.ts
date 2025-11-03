@@ -66,14 +66,13 @@ async function runDemo() {
     
     // Test broadcast functionality (simulated)
     logger.info('Testing broadcast functionality...', { component: 'Chanuka' });
-    webSocketService.broadcastBillUpdate(123, {
-      type: 'status_change',
+    webSocketService.broadcastBillUpdate(123, { type: 'status_change',
       data: {
-        billId: 123,
+        bill_id: 123,
         title: 'Test Bill',
         oldStatus: 'introduced',
         newStatus: 'committee'
-      },
+       },
       timestamp: new Date()
     });
     logger.info('✅ Broadcast test completed', { component: 'Chanuka' });
@@ -112,23 +111,21 @@ async function runDemo() {
       
       // Test status retrieval
       // Note: getBillStatus may not exist - using conditional check
-      logger.info('Testing status retrieval for bill 123...', { 
-        component: 'Chanuka',
-        billId: 123
-      });
+      logger.info('Testing status retrieval for bill 123...', { component: 'Chanuka',
+        bill_id: 123
+       });
       
       // Test status change trigger (simulated)
       logger.info('Testing status change simulation...', { component: 'Chanuka' });
-      try {
-        // Since triggerStatusChange may not exist, we simulate the notification
+      try { // Since triggerStatusChange may not exist, we simulate the notification
         webSocketService.broadcastBillUpdate(123, {
           type: 'status_change',
           data: {
-            billId: 123,
+            bill_id: 123,
             title: 'Test Bill',
             oldStatus: 'introduced',
             newStatus: 'committee'
-          },
+           },
           timestamp: new Date()
         });
         logger.info('✅ Status change notification sent successfully', { component: 'Chanuka' });
@@ -187,15 +184,14 @@ async function runDemo() {
     logger.info('6. Testing Error Handling...', { component: 'Chanuka' });
     
     // Test invalid bill notification
-    try {
-      webSocketService.broadcastBillUpdate(99999, {
+    try { webSocketService.broadcastBillUpdate(99999, {
         type: 'status_change',
         data: {
-          billId: 99999,
+          bill_id: 99999,
           title: 'Non-existent Bill',
           oldStatus: 'unknown',
           newStatus: 'invalid'
-        },
+         },
         timestamp: new Date()
       });
       logger.info('✅ Properly handled invalid bill ID scenario', { component: 'Chanuka' });

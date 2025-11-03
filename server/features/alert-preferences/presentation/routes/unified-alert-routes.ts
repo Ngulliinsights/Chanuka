@@ -114,15 +114,14 @@ const handleError = (
  * POST /api/alert-preferences
  * Create a new alert preference with full validation
  */
-router.post('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.post('/', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     const preferenceData = alertPreferenceSchema.parse(req.body);
     
     const preference = await unifiedAlertPreferenceService.createAlertPreference(
-      userId, 
+      user_id, 
       preferenceData
     );
     
@@ -131,7 +130,7 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
       preference, 
       ApiResponseWrapper.createMetadata(startTime, 'database')
     );
-  } catch (error) {
+   } catch (error) {
     return handleError(res, error, 'Failed to create alert preference', startTime);
   }
 });
@@ -140,19 +139,18 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
  * GET /api/alert-preferences
  * Get all alert preferences for the authenticated user
  */
-router.get('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const preferences = await unifiedAlertPreferenceService.getUserAlertPreferences(userId);
+    const user_id = req.user!.id;
+    const preferences = await unifiedAlertPreferenceService.getUserAlertPreferences(user_id);
     
     return ApiSuccess(
       res, 
       { 
         preferences,
         count: preferences.length 
-      }, 
+       }, 
       ApiResponseWrapper.createMetadata(startTime, 'database')
     );
   } catch (error) {
@@ -164,15 +162,14 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res) => {
  * GET /api/alert-preferences/:preferenceId
  * Get a specific alert preference by ID
  */
-router.get('/:preferenceId', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/:preferenceId', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     const preferenceId = req.params.preferenceId;
     
     const preference = await unifiedAlertPreferenceService.getAlertPreference(
-      userId, 
+      user_id, 
       preferenceId
     );
     
@@ -182,7 +179,7 @@ router.get('/:preferenceId', authenticateToken, async (req: AuthenticatedRequest
         {
           code: 'NOT_FOUND',
           message: 'Alert preference not found'
-        },
+         },
         404, 
         ApiResponseWrapper.createMetadata(startTime, 'database')
       );
@@ -202,16 +199,15 @@ router.get('/:preferenceId', authenticateToken, async (req: AuthenticatedRequest
  * PATCH /api/alert-preferences/:preferenceId
  * Update an existing alert preference with partial data
  */
-router.patch('/:preferenceId', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.patch('/:preferenceId', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     const preferenceId = req.params.preferenceId;
     const updates = updatePreferenceSchema.parse(req.body);
     
     const updatedPreference = await unifiedAlertPreferenceService.updateAlertPreference(
-      userId, 
+      user_id, 
       preferenceId, 
       updates
     );
@@ -221,7 +217,7 @@ router.patch('/:preferenceId', authenticateToken, async (req: AuthenticatedReque
       updatedPreference, 
       ApiResponseWrapper.createMetadata(startTime, 'database')
     );
-  } catch (error) {
+   } catch (error) {
     return handleError(res, error, 'Failed to update alert preference', startTime);
   }
 });
@@ -230,21 +226,20 @@ router.patch('/:preferenceId', authenticateToken, async (req: AuthenticatedReque
  * DELETE /api/alert-preferences/:preferenceId
  * Delete an alert preference permanently
  */
-router.delete('/:preferenceId', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.delete('/:preferenceId', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     const preferenceId = req.params.preferenceId;
     
-    await unifiedAlertPreferenceService.deleteAlertPreference(userId, preferenceId);
+    await unifiedAlertPreferenceService.deleteAlertPreference(user_id, preferenceId);
     
     return ApiSuccess(
       res, 
       { 
         success: true, 
         message: 'Alert preference deleted successfully' 
-      }, 
+       }, 
       ApiResponseWrapper.createMetadata(startTime, 'database')
     );
   } catch (error) {
@@ -263,16 +258,15 @@ router.delete('/:preferenceId', authenticateToken, async (req: AuthenticatedRequ
 router.post(
   '/:preferenceId/verify-channel', 
   authenticateToken, 
-  async (req: AuthenticatedRequest, res) => {
-    const startTime = Date.now();
+  async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
     
     try {
-      const userId = req.user!.id;
+      const user_id = req.user!.id;
       const preferenceId = req.params.preferenceId;
-      const { channelType, verificationCode } = verifyChannelSchema.parse(req.body);
+      const { channelType, verificationCode  } = verifyChannelSchema.parse(req.body);
       
       const verified = await unifiedAlertPreferenceService.verifyChannel(
-        userId,
+        user_id,
         preferenceId,
         channelType,
         verificationCode
@@ -313,15 +307,14 @@ router.post(
  * Process and deliver an alert based on user preferences.
  * This is typically called by internal services, not directly by users.
  */
-router.post('/process-alert', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.post('/process-alert', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const { alertType, alertData, priority } = processAlertSchema.parse(req.body);
+    const user_id = req.user!.id;
+    const { alertType, alertData, priority  } = processAlertSchema.parse(req.body);
     
     const deliveryLogs = await unifiedAlertPreferenceService.processAlertDelivery(
-      userId,
+      user_id,
       alertType,
       alertData,
       priority
@@ -348,15 +341,14 @@ router.post('/process-alert', authenticateToken, async (req: AuthenticatedReques
 router.post(
   '/:preferenceId/process-batch',
   authenticateToken,
-  async (req: AuthenticatedRequest, res) => {
-    const startTime = Date.now();
+  async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
     
     try {
-      const userId = req.user!.id;
+      const user_id = req.user!.id;
       const preferenceId = req.params.preferenceId;
       
       const processedCount = await unifiedAlertPreferenceService.processBatchedAlerts(
-        userId,
+        user_id,
         preferenceId
       );
       
@@ -365,7 +357,7 @@ router.post(
         {
           success: true,
           processedCount,
-          message: `Processed ${processedCount} batched alerts`
+          message: `Processed ${processedCount } batched alerts`
         },
         ApiResponseWrapper.createMetadata(startTime, 'database')
       );
@@ -383,21 +375,20 @@ router.post(
  * GET /api/alert-preferences/logs/delivery
  * Get delivery logs with pagination and filtering capabilities
  */
-router.get('/logs/delivery', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/logs/delivery', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     const query = deliveryLogsQuerySchema.parse(req.query);
     
-    const result = await unifiedAlertPreferenceService.getAlertDeliveryLogs(userId, {
+    const result = await unifiedAlertPreferenceService.getAlertDeliveryLogs(user_id, {
       page: query.page,
       limit: query.limit,
       alertType: query.alertType,
       status: query.status,
       startDate: query.startDate ? new Date(query.startDate) : undefined,
       endDate: query.endDate ? new Date(query.endDate) : undefined
-    });
+     });
     
     return ApiSuccess(
       res, 
@@ -413,19 +404,18 @@ router.get('/logs/delivery', authenticateToken, async (req: AuthenticatedRequest
  * GET /api/alert-preferences/analytics/stats
  * Get comprehensive statistics about alert preferences and delivery metrics
  */
-router.get('/analytics/stats', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/analytics/stats', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const stats = await unifiedAlertPreferenceService.getAlertPreferenceStats(userId);
+    const user_id = req.user!.id;
+    const stats = await unifiedAlertPreferenceService.getAlertPreferenceStats(user_id);
     
     return ApiSuccess(
       res, 
       stats, 
       ApiResponseWrapper.createMetadata(startTime, 'database')
     );
-  } catch (error) {
+   } catch (error) {
     return handleError(res, error, 'Failed to fetch alert preference stats', startTime);
   }
 });
@@ -456,7 +446,7 @@ router.post('/test/filtering', authenticateToken, async (req: AuthenticatedReque
       );
     }
     
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     const { alertType, alertData, preferenceId } = req.body;
     
     // Validate required fields
@@ -474,7 +464,7 @@ router.post('/test/filtering', authenticateToken, async (req: AuthenticatedReque
     
     // Get the preference to test against
     const preference = await unifiedAlertPreferenceService.getAlertPreference(
-      userId, 
+      user_id, 
       preferenceId
     );
     
@@ -492,7 +482,7 @@ router.post('/test/filtering', authenticateToken, async (req: AuthenticatedReque
     
     // Process smart filtering without sending actual alerts
     const filteringResult = await unifiedAlertPreferenceService.processSmartFiltering(
-      userId,
+      user_id,
       alertType,
       alertData,
       preference
@@ -522,19 +512,18 @@ router.post('/test/filtering', authenticateToken, async (req: AuthenticatedReque
 router.post(
   '/:preferenceId/test-channel',
   authenticateToken,
-  async (req: AuthenticatedRequest, res) => {
-    const startTime = Date.now();
+  async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
     
     try {
-      const userId = req.user!.id;
+      const user_id = req.user!.id;
       const preferenceId = req.params.preferenceId;
-      const { channelType } = z.object({
+      const { channelType  } = z.object({
         channelType: z.enum(['in_app', 'email', 'push', 'sms', 'webhook'])
       }).parse(req.body);
       
       // Get the preference to verify channel exists and is configured
       const preference = await unifiedAlertPreferenceService.getAlertPreference(
-        userId,
+        user_id,
         preferenceId
       );
       
@@ -580,12 +569,12 @@ router.post(
       const testAlertData = {
         title: `Test ${channelType} Notification`,
         message: `This is a test notification for the ${channelType} channel.`,
-        billId: 0,
+        bill_id: 0,
         timestamp: new Date().toISOString()
       };
       
       const deliveryLogs = await unifiedAlertPreferenceService.processAlertDelivery(
-        userId,
+        user_id,
         'bill_status_change',
         testAlertData,
         'normal'
@@ -684,12 +673,11 @@ router.get('/service/health', async (req, res) => {
  * POST /api/alert-preferences/bulk/update
  * Update multiple preferences at once for efficiency
  */
-router.post('/bulk/update', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.post('/bulk/update', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const { updates } = z.object({
+    const user_id = req.user!.id;
+    const { updates  } = z.object({
       updates: z.array(z.object({
         preferenceId: z.string(),
         data: updatePreferenceSchema
@@ -699,14 +687,13 @@ router.post('/bulk/update', authenticateToken, async (req: AuthenticatedRequest,
     const results: Array<{ success: boolean; preferenceId: string; preference?: any; error?: string }> = [];
 
     // Process each update individually to handle partial failures gracefully
-    for (const update of updates) {
-      try {
+    for (const update of updates) { try {
         const updatedPreference = await unifiedAlertPreferenceService.updateAlertPreference(
-          userId,
+          user_id,
           update.preferenceId,
           update.data
         );
-        results.push({ success: true, preferenceId: update.preferenceId, preference: updatedPreference });
+        results.push({ success: true, preferenceId: update.preferenceId, preference: updatedPreference  });
       } catch (error) {
         results.push({
           success: false,
@@ -740,25 +727,23 @@ router.post('/bulk/update', authenticateToken, async (req: AuthenticatedRequest,
  * POST /api/alert-preferences/bulk/enable
  * Enable or disable multiple preferences at once
  */
-router.post('/bulk/enable', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.post('/bulk/enable', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const { preferenceIds, isActive } = z.object({
+    const user_id = req.user!.id;
+    const { preferenceIds, is_active  } = z.object({
       preferenceIds: z.array(z.string()).min(1),
-      isActive: z.boolean()
+      is_active: z.boolean()
     }).parse(req.body);
     
     const results: Array<{ success: boolean; preferenceId: string; preference?: any; error?: string }> = [];
 
     // Process each preference individually for granular error handling
-    for (const preferenceId of preferenceIds) {
-      try {
+    for (const preferenceId of preferenceIds) { try {
         const updatedPreference = await unifiedAlertPreferenceService.updateAlertPreference(
-          userId,
+          user_id,
           preferenceId,
-          { isActive }
+          { is_active  }
         );
         results.push({ success: true, preferenceId, preference: updatedPreference });
       } catch (error) {
@@ -779,7 +764,7 @@ router.post('/bulk/enable', authenticateToken, async (req: AuthenticatedRequest,
         summary: {
           total: results.length,
           successful: successCount,
-          message: `${successCount} preferences ${isActive ? 'enabled' : 'disabled'}`
+          message: `${successCount} preferences ${is_active ? 'enabled' : 'disabled'}`
         }
       },
       ApiResponseWrapper.createMetadata(startTime, 'database')
@@ -797,19 +782,18 @@ router.post('/bulk/enable', authenticateToken, async (req: AuthenticatedRequest,
  * GET /api/alert-preferences/backup/export
  * Export all user preferences for backup purposes
  */
-router.get('/backup/export', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/backup/export', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const preferences = await unifiedAlertPreferenceService.getUserAlertPreferences(userId);
+    const user_id = req.user!.id;
+    const preferences = await unifiedAlertPreferenceService.getUserAlertPreferences(user_id);
     
     const exportData = {
       version: '2.0.0',
       exportedAt: new Date().toISOString(),
-      userId,
+      user_id,
       preferences
-    };
+     };
     
     return ApiSuccess(
       res,
@@ -825,34 +809,31 @@ router.get('/backup/export', authenticateToken, async (req: AuthenticatedRequest
  * POST /api/alert-preferences/backup/import
  * Import preferences from backup with optional overwrite
  */
-router.post('/backup/import', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.post('/backup/import', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const { preferences, overwrite } = z.object({
+    const user_id = req.user!.id;
+    const { preferences, overwrite  } = z.object({
       preferences: z.array(z.any()),
       overwrite: z.boolean().default(false)
     }).parse(req.body);
     
     // If overwrite is true, delete existing preferences first
-    if (overwrite) {
-      const existingPreferences = await unifiedAlertPreferenceService.getUserAlertPreferences(userId);
+    if (overwrite) { const existingPreferences = await unifiedAlertPreferenceService.getUserAlertPreferences(user_id);
       for (const pref of existingPreferences) {
-        await unifiedAlertPreferenceService.deleteAlertPreference(userId, pref.id);
-      }
+        await unifiedAlertPreferenceService.deleteAlertPreference(user_id, pref.id);
+       }
     }
     
     const results: Array<{ success: boolean; preference?: any; error?: string }> = [];
 
     // Create new preferences from import data
-    for (const preference of preferences) {
-      try {
+    for (const preference of preferences) { try {
         // Remove system-generated fields to create fresh preferences
-        const { id, userId: prefUserId, createdAt, updatedAt, ...preferenceData } = preference;
+        const { id, user_id: prefUserId, created_at, updated_at, ...preferenceData  } = preference;
 
         const newPreference = await unifiedAlertPreferenceService.createAlertPreference(
-          userId,
+          user_id,
           preferenceData
         );
 

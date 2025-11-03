@@ -105,10 +105,10 @@ describe('Auth Validation', () => {
 
     it('should include field name in error', () => {
       try {
-        validateName('J', 'firstName');
+        validateName('J', 'first_name');
       } catch (error) {
         expect(error).toBeInstanceOf(AuthValidationError);
-        expect((error as AuthValidationError).details?.field).toBe('firstName');
+        expect((error as AuthValidationError).details?.field).toBe('first_name');
       }
     });
   });
@@ -145,8 +145,8 @@ describe('Auth Validation', () => {
   describe('validateRegisterData', () => {
     it('should validate correct registration data', () => {
       const validData = {
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         email: 'john@example.com',
         password: 'SecurePass123!',
         confirmPassword: 'SecurePass123!'
@@ -154,14 +154,14 @@ describe('Auth Validation', () => {
       
       expect(() => validateRegisterData(validData)).not.toThrow();
       const result = validateRegisterData(validData);
-      expect(result.firstName).toBe('John');
+      expect(result.first_name).toBe('John');
       expect(result.email).toBe('john@example.com');
     });
 
     it('should reject registration data with mismatched passwords', () => {
       const invalidData = {
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         email: 'john@example.com',
         password: 'SecurePass123!',
         confirmPassword: 'DifferentPass123!'
@@ -172,8 +172,8 @@ describe('Auth Validation', () => {
 
     it('should reject registration data with weak password', () => {
       const invalidData = {
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         email: 'john@example.com',
         password: 'weak',
         confirmPassword: 'weak'
@@ -184,7 +184,7 @@ describe('Auth Validation', () => {
 
     it('should reject registration data with missing fields', () => {
       const incompleteData = {
-        firstName: 'John',
+        first_name: 'John',
         email: 'john@example.com',
         password: 'SecurePass123!',
         confirmPassword: 'SecurePass123!'
@@ -251,9 +251,9 @@ describe('Auth Validation', () => {
     });
 
     it('should validate name fields', () => {
-      expect(validateField('firstName', 'John', 'register')).toBeNull();
-      expect(validateField('lastName', 'Doe', 'register')).toBeNull();
-      expect(validateField('firstName', 'J', 'register')).toBeTruthy();
+      expect(validateField('first_name', 'John', 'register')).toBeNull();
+      expect(validateField('last_name', 'Doe', 'register')).toBeNull();
+      expect(validateField('first_name', 'J', 'register')).toBeTruthy();
     });
 
     it('should validate confirm password field', () => {

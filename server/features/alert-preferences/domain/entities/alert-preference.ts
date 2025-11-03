@@ -9,29 +9,28 @@ import { AlertConditions } from '../value-objects/alert-conditions';
  * Alert Preference Entity
  * Represents a user's alert preference configuration
  */
-export class AlertPreference {
-  constructor(
+export class AlertPreference { constructor(
     public readonly id: string,
-    public readonly userId: string,
+    public readonly user_id: string,
     public readonly name: string,
-    public readonly isActive: boolean,
+    public readonly is_active: boolean,
     public readonly alertTypes: AlertTypeConfig[],
     public readonly channels: AlertChannel[],
     public readonly frequency: FrequencyConfig,
     public readonly smartFiltering: SmartFilteringConfig,
-    public readonly createdAt: Date,
-    public readonly updatedAt: Date,
+    public readonly created_at: Date,
+    public readonly updated_at: Date,
     public readonly description?: string
   ) {
     this.validate();
-  }
+   }
 
   private validate(): void {
     if (!this.id || this.id.trim().length === 0) {
       throw new Error('Alert preference ID is required');
     }
 
-    if (!this.userId || this.userId.trim().length === 0) {
+    if (!this.user_id || this.user_id.trim().length === 0) {
       throw new Error('User ID is required');
     }
 
@@ -57,8 +56,8 @@ export class AlertPreference {
   /**
    * Checks if this preference should trigger for a given alert type
    */
-  shouldTriggerFor(alertType: AlertType, alertData: any, userRole?: string, currentTime?: Date): boolean {
-    if (!this.isActive) {
+  shouldTriggerFor(alertType: AlertType, alertData: any, user_role?: string, currentTime?: Date): boolean {
+    if (!this.is_active) {
       return false;
     }
 
@@ -68,7 +67,7 @@ export class AlertPreference {
     }
 
     // Check conditions if specified
-    if (typeConfig.conditions && !typeConfig.conditions.matches(alertData, userRole, currentTime)) {
+    if (typeConfig.conditions && !typeConfig.conditions.matches(alertData, user_role, currentTime)) {
       return false;
     }
 
@@ -103,14 +102,14 @@ export class AlertPreference {
   update(updates: Partial<AlertPreferenceUpdate>): AlertPreference {
     return new AlertPreference(
       this.id,
-      this.userId,
+      this.user_id,
       updates.name ?? this.name,
-      updates.isActive ?? this.isActive,
+      updates.is_active ?? this.is_active,
       updates.alertTypes ?? this.alertTypes,
       updates.channels ?? this.channels,
       updates.frequency ?? this.frequency,
       updates.smartFiltering ?? this.smartFiltering,
-      this.createdAt,
+      this.created_at,
       new Date(),
       updates.description ?? this.description
     );
@@ -122,10 +121,10 @@ export class AlertPreference {
   equals(other: AlertPreference): boolean {
     return (
       this.id === other.id &&
-      this.userId === other.userId &&
+      this.user_id === other.user_id &&
       this.name === other.name &&
       this.description === other.description &&
-      this.isActive === other.isActive &&
+      this.is_active === other.is_active &&
       this.alertTypesEqual(other.alertTypes) &&
       this.channelsEqual(other.channels) &&
       this.frequency.equals(other.frequency) &&
@@ -184,7 +183,7 @@ export interface AlertTypeConfig {
 export interface AlertPreferenceUpdate {
   name?: string;
   description?: string;
-  isActive?: boolean;
+  is_active?: boolean;
   alertTypes?: AlertTypeConfig[];
   channels?: AlertChannel[];
   frequency?: FrequencyConfig;

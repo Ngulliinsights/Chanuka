@@ -26,12 +26,12 @@ async function verifyBillStatusMonitor() {
       .insert(users)
       .values({
         email: 'test-monitor@example.com',
-        passwordHash: 'hashedpassword',
+        password_hash: 'hashedpassword',
         name: 'Test Monitor User',
-        firstName: 'Test',
-        lastName: 'User',
+        first_name: 'Test',
+        last_name: 'User',
         role: 'citizen',
-        verificationStatus: 'verified'
+        verification_status: 'verified'
       })
       .returning();
     
@@ -43,21 +43,19 @@ async function verifyBillStatusMonitor() {
         description: 'A test bill to verify status change monitoring',
         status: 'introduced',
         category: 'test',
-        billNumber: 'TEST-2024-001',
+        bill_number: 'TEST-2024-001',
         summary: 'Test bill summary'
       })
       .returning();
     
-    logger.info('✅ Test data created:', { component: 'Chanuka' }, {
-      userId: testUser.id,
-      billId: testBill.id
-    });
+    logger.info('✅ Test data created:', { component: 'Chanuka' }, { user_id: testUser.id,
+      bill_id: testBill.id
+      });
 
     // Test 3: Test bill status change handling
     logger.info('3. Testing bill status change handling...', { component: 'Chanuka' });
     
-    await billStatusMonitorService.handleBillStatusChange({
-      billId: testBill.id,
+    await billStatusMonitorService.handleBillStatusChange({ bill_id: testBill.id,
       oldStatus: 'introduced',
       newStatus: 'committee',
       timestamp: new Date(),
@@ -65,7 +63,7 @@ async function verifyBillStatusMonitor() {
       metadata: {
         reason: 'Test status change',
         automaticChange: false
-      }
+       }
     });
     
     logger.info('✅ Bill status change handled successfully', { component: 'Chanuka' });
@@ -73,17 +71,16 @@ async function verifyBillStatusMonitor() {
     // Test 4: Test engagement update handling
     logger.info('4. Testing engagement update handling...', { component: 'Chanuka' });
     
-    await billStatusMonitorService.handleBillEngagementUpdate({
-      billId: testBill.id,
+    await billStatusMonitorService.handleBillEngagementUpdate({ bill_id: testBill.id,
       type: 'comment',
-      userId: testUser.id,
+      user_id: testUser.id,
       timestamp: new Date(),
       newStats: {
         totalViews: 10,
         totalComments: 1,
         totalShares: 0,
-        engagementScore: 5
-      }
+        engagement_score: 5
+        }
     });
     
     logger.info('✅ Engagement update handled successfully', { component: 'Chanuka' });

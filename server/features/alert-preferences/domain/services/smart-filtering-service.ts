@@ -6,12 +6,11 @@ import { Priority } from '../value-objects/priority';
  * Smart Filtering Service
  * Handles intelligent filtering of alerts based on user preferences and behavior
  */
-export class SmartFilteringService {
-  /**
+export class SmartFilteringService { /**
    * Processes smart filtering for an alert
    */
   async processFiltering(
-    userId: string,
+    user_id: string,
     alertType: AlertType,
     alertData: any,
     config: SmartFilteringConfig
@@ -20,46 +19,44 @@ export class SmartFilteringService {
       return {
         shouldSend: true,
         confidence: 1.0
-      };
+       };
     }
 
     // Calculate user interest score
-    const userInterestScore = await this.calculateUserInterestScore(userId, alertData);
+    const user_interestScore = await this.calculateUserInterestScore(user_id, alertData);
 
     // Calculate engagement history score
-    const engagementScore = await this.calculateEngagementHistoryScore(userId, alertData);
+    const engagement_score = await this.calculateEngagementHistoryScore(user_id, alertData);
 
     // Calculate trending score
     const trendingScore = await this.calculateTrendingScore(alertData);
 
     // Calculate overall confidence
     const confidence = config.calculateConfidence(
-      userInterestScore,
-      engagementScore,
+      user_interestScore,
+      engagement_score,
       trendingScore
     );
 
     // Check for duplicates
-    if (config.duplicateFiltering) {
-      const isDuplicate = await this.checkForDuplicate(userId, alertType, alertData);
+    if (config.duplicateFiltering) { const isDuplicate = await this.checkForDuplicate(user_id, alertType, alertData);
       if (isDuplicate) {
         return {
           shouldSend: false,
           filteredReason: 'Duplicate alert detected',
           confidence: 1.0
-        };
+         };
       }
     }
 
     // Check for spam
-    if (config.spamFiltering) {
-      const isSpam = await this.checkForSpam(userId, alertType);
+    if (config.spamFiltering) { const isSpam = await this.checkForSpam(user_id, alertType);
       if (isSpam) {
         return {
           shouldSend: false,
           filteredReason: 'Spam alert detected',
           confidence: 0.9
-        };
+         };
       }
     }
 
@@ -87,15 +84,14 @@ export class SmartFilteringService {
   /**
    * Calculates user interest score based on user's explicit interests
    */
-  private async calculateUserInterestScore(userId: string, alertData: any): Promise<number> {
-    try {
+  private async calculateUserInterestScore(user_id: string, alertData: any): Promise<number> { try {
       // This would integrate with user profile service to get user interests
       // For now, return a default score
-      const userInterests = await this.getUserInterests(userId);
+      const user_interests = await this.getUserInterests(user_id);
 
-      if (userInterests.length === 0) {
+      if (user_interests.length === 0) {
         return 0.5; // Neutral score when no interests defined
-      }
+       }
 
       let matchScore = 0;
       let totalChecks = 0;
@@ -103,7 +99,7 @@ export class SmartFilteringService {
       // Check bill category match
       if (alertData.billCategory) {
         totalChecks++;
-        if (userInterests.some(interest =>
+        if (user_interests.some(interest =>
           interest.toLowerCase() === alertData.billCategory.toLowerCase()
         )) {
           matchScore += 1;
@@ -114,7 +110,7 @@ export class SmartFilteringService {
       if (alertData.keywords && Array.isArray(alertData.keywords)) {
         for (const keyword of alertData.keywords) {
           totalChecks++;
-          if (userInterests.some(interest =>
+          if (user_interests.some(interest =>
             interest.toLowerCase().includes(keyword.toLowerCase()) ||
             keyword.toLowerCase().includes(interest.toLowerCase())
           )) {
@@ -133,15 +129,14 @@ export class SmartFilteringService {
   /**
    * Calculates engagement history score based on past user behavior
    */
-  private async calculateEngagementHistoryScore(userId: string, alertData: any): Promise<number> {
-    try {
+  private async calculateEngagementHistoryScore(user_id: string, alertData: any): Promise<number> { try {
       // This would integrate with engagement tracking service
       // For now, return a default score
-      const engagementHistory = await this.getUserEngagementHistory(userId);
+      const engagementHistory = await this.getUserEngagementHistory(user_id);
 
       if (engagementHistory.totalBillsTracked === 0) {
         return 0.5;
-      }
+       }
 
       if (alertData.billCategory) {
         const categoryEngagement = engagementHistory.topCategories?.find(
@@ -180,21 +175,20 @@ export class SmartFilteringService {
    * Checks for duplicate alerts within a time window
    */
   private async checkForDuplicate(
-    userId: string,
+    user_id: string,
     alertType: AlertType,
     alertData: any
-  ): Promise<boolean> {
-    try {
+  ): Promise<boolean> { try {
       // This would check recent delivery logs for duplicates
       // For now, implement basic duplicate detection
-      const recentAlerts = await this.getRecentAlerts(userId, 24); // Last 24 hours
+      const recentAlerts = await this.getRecentAlerts(user_id, 24); // Last 24 hours
 
       return recentAlerts.some(alert =>
         alert.alertType.equals(alertType) &&
-        alert.metadata?.billId === alertData.billId &&
+        alert.metadata?.bill_id === alertData.bill_id &&
         alert.status !== 'failed'
       );
-    } catch (error) {
+     } catch (error) {
       console.error('Error checking for duplicates:', error);
       return false;
     }
@@ -203,9 +197,8 @@ export class SmartFilteringService {
   /**
    * Checks for spam patterns (too many alerts of same type)
    */
-  private async checkForSpam(userId: string, alertType: AlertType): Promise<boolean> {
-    try {
-      const recentAlerts = await this.getRecentAlerts(userId, 1); // Last hour
+  private async checkForSpam(user_id: string, alertType: AlertType): Promise<boolean> { try {
+      const recentAlerts = await this.getRecentAlerts(user_id, 1); // Last hour
 
       // Simple spam detection: more than 10 alerts of same type per hour
       const sameTypeCount = recentAlerts.filter(alert =>
@@ -213,24 +206,24 @@ export class SmartFilteringService {
       ).length;
 
       return sameTypeCount > 10;
-    } catch (error) {
+     } catch (error) {
       console.error('Error checking for spam:', error);
       return false;
     }
   }
 
   // Placeholder methods - these would be implemented with actual service integrations
-  private async getUserInterests(userId: string): Promise<string[]> {
+  private async getUserInterests(user_id: string): Promise<string[]> {
     // TODO: Integrate with user profile service
     return [];
   }
 
-  private async getUserEngagementHistory(userId: string): Promise<any> {
+  private async getUserEngagementHistory(user_id: string): Promise<any> {
     // TODO: Integrate with engagement tracking service
     return { totalBillsTracked: 0, topCategories: [] };
   }
 
-  private async getRecentAlerts(userId: string, hours: number): Promise<any[]> {
+  private async getRecentAlerts(user_id: string, hours: number): Promise<any[]> {
     // TODO: Integrate with delivery log repository
     return [];
   }

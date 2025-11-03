@@ -3,23 +3,20 @@ import { UserManagementDomainService, ProfileUpdateResult } from '../../domain/s
 import { ProfileDomainService, ProfileValidationResult, ProfileCompletenessScore } from '../../domain/services/profile-domain-service';
 import { UserProfile } from '../../domain/entities/user-profile';
 
-export interface UpdateProfileCommand {
-  userId: string;
+export interface UpdateProfileCommand { user_id: string;
   bio?: string;
   expertise?: string[];
   location?: string;
   organization?: string;
-  isPublic?: boolean;
-}
+  is_public?: boolean;
+ }
 
-export interface GetProfileCommand {
-  userId: string;
-}
+export interface GetProfileCommand { user_id: string;
+ }
 
-export interface UpdateInterestsCommand {
-  userId: string;
+export interface UpdateInterestsCommand { user_id: string;
   interests: string[];
-}
+ }
 
 export interface ProfileManagementResult {
   success: boolean;
@@ -55,13 +52,13 @@ export class ProfileManagementUseCase {
 
       // Update profile through domain service
       const result: ProfileUpdateResult = await this.userManagementService.updateUserProfile(
-        command.userId,
+        command.user_id,
         {
           bio: command.bio,
           expertise: command.expertise,
           location: command.location,
           organization: command.organization,
-          isPublic: command.isPublic
+          is_public: command.is_public
         }
       );
 
@@ -74,7 +71,7 @@ export class ProfileManagementUseCase {
       }
 
       // Log profile update (cross-cutting concern)
-      this.logProfileUpdate(command.userId, 'profile_updated');
+      this.logProfileUpdate(command.user_id, 'profile_updated');
 
       return {
         success: true,
@@ -93,7 +90,7 @@ export class ProfileManagementUseCase {
 
   async getProfile(command: GetProfileCommand): Promise<ProfileManagementResult> {
     try {
-      const userAggregate = await this.userRepository.findUserAggregateById(command.userId);
+      const userAggregate = await this.userRepository.findUserAggregateById(command.user_id);
       if (!userAggregate) {
         return {
           success: false,
@@ -127,7 +124,7 @@ export class ProfileManagementUseCase {
       }
 
       // Update interests through domain service
-      const result = await this.userManagementService.updateUserInterests(command.userId, command.interests);
+      const result = await this.userManagementService.updateUserInterests(command.user_id, command.interests);
 
       if (!result.success) {
         return {
@@ -137,7 +134,7 @@ export class ProfileManagementUseCase {
       }
 
       // Log interests update
-      this.logProfileUpdate(command.userId, 'interests_updated');
+      this.logProfileUpdate(command.user_id, 'interests_updated');
 
       return {
         success: true,
@@ -152,14 +149,13 @@ export class ProfileManagementUseCase {
     }
   }
 
-  async getProfileCompleteness(userId: string): Promise<ProfileCompletenessResult> {
-    try {
-      const userAggregate = await this.userRepository.findUserAggregateById(userId);
+  async getProfileCompleteness(user_id: string): Promise<ProfileCompletenessResult> { try {
+      const userAggregate = await this.userRepository.findUserAggregateById(user_id);
       if (!userAggregate) {
         return {
           success: false,
           errors: ['User not found']
-        };
+         };
       }
 
       const completeness = this.profileService.calculateProfileCompleteness(userAggregate);
@@ -180,14 +176,13 @@ export class ProfileManagementUseCase {
     }
   }
 
-  async validateProfile(userId: string): Promise<{ success: boolean; validation?: ProfileValidationResult; errors: string[] }> {
-    try {
-      const userAggregate = await this.userRepository.findUserAggregateById(userId);
+  async validateProfile(user_id: string): Promise<{ success: boolean; validation?: ProfileValidationResult; errors: string[] }> { try {
+      const userAggregate = await this.userRepository.findUserAggregateById(user_id);
       if (!userAggregate || !userAggregate.profile) {
         return {
           success: false,
           errors: ['Profile not found']
-        };
+         };
       }
 
       const validation = this.profileService.validateProfile(userAggregate.profile);
@@ -209,7 +204,7 @@ export class ProfileManagementUseCase {
   private validateUpdateCommand(command: UpdateProfileCommand): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
-    if (!command.userId || !command.userId.trim()) {
+    if (!command.user_id || !command.user_id.trim()) {
       errors.push('User ID is required');
     }
 
@@ -246,7 +241,7 @@ export class ProfileManagementUseCase {
   private validateInterestsCommand(command: UpdateInterestsCommand): { isValid: boolean; errors: string[] } {
     const errors: string[] = [];
 
-    if (!command.userId || !command.userId.trim()) {
+    if (!command.user_id || !command.user_id.trim()) {
       errors.push('User ID is required');
     }
 
@@ -268,9 +263,9 @@ export class ProfileManagementUseCase {
     };
   }
 
-  private logProfileUpdate(userId: string, action: string): void {
+  private logProfileUpdate(user_id: string, action: string): void {
     // This would typically use a logging service
-    console.log(`Profile ${action} for user: ${userId}`);
+    console.log(`Profile ${action} for user: ${ user_id }`);
   }
 }
 

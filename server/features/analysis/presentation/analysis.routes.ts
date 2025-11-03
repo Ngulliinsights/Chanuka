@@ -24,22 +24,21 @@ function parseIntParam(value: string | undefined, paramName: string): number {
 // --- API Endpoints ---
 
 /**
- * GET /api/analysis/bills/:billId/comprehensive
- * Retrieve the latest comprehensive analysis result for a specific bill.
+ * GET /api/analysis/bills/:bill_id/comprehensive
+ * Retrieve the latest comprehensive analysis result for a specific bills.
  * This endpoint triggers the analysis on-demand. Consider adding caching or
  * directing users to pre-computed results if performance is critical.
  */
-router.get('/bills/:billId/comprehensive', async (req: Request, res: Response, next: NextFunction) => {
-  const startTime = Date.now();
+router.get('/bills/:bill_id/comprehensive', async (req: Request, res: Response, next: NextFunction) => { const startTime = Date.now();
   try {
-    const billId = parseIntParam(req.params.billId, 'Bill ID');
-    logger.info(`Request received for comprehensive analysis of bill ${billId}`);
+    const bill_id = parseIntParam(req.params.bill_id, 'Bill ID');
+    logger.info(`Request received for comprehensive analysis of bill ${bill_id }`);
 
     // Run analysis on-demand
     // For high-traffic systems, consider:
     // 1. Caching the result here with a short TTL.
     // 2. Having a background job compute analyses and storing them, then fetching the stored result.
-    const analysisResult = await billComprehensiveAnalysisService.analyzeBill(billId);
+    const analysisResult = await billComprehensiveAnalysisService.analyzeBill(bill_id);
 
     // Add metadata about the source (live analysis)
     const metadata = { source: 'live_analysis', timestamp: new Date(startTime), durationMs: Date.now() - startTime };
@@ -51,12 +50,12 @@ router.get('/bills/:billId/comprehensive', async (req: Request, res: Response, n
 });
 
 /**
- * POST /api/analysis/bills/:billId/comprehensive/run
- * Manually trigger a new comprehensive analysis run for a specific bill.
+ * POST /api/analysis/bills/:bill_id/comprehensive/run
+ * Manually trigger a new comprehensive analysis run for a specific bills.
  * Useful for admin interfaces or specific events requiring fresh analysis.
  * Requires Authentication (e.g., admin role).
  */
-router.post('/bills/:billId/comprehensive/run', authenticateToken, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+router.post('/bills/:bill_id/comprehensive/run', authenticateToken, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const startTime = Date.now();
     // Example Role Check (adjust role name as needed)
     if (req.user?.role !== 'admin') {
@@ -65,12 +64,11 @@ router.post('/bills/:billId/comprehensive/run', authenticateToken, async (req: A
         return ApiError(res, "Permission denied. Admin role required.", 403);
     }
 
-    try {
-        const billId = parseIntParam(req.params.billId, 'Bill ID');
-        logger.info(`Admin trigger for NEW comprehensive analysis run for bill ${billId} by user ${req.user?.id}`);
+    try { const bill_id = parseIntParam(req.params.bill_id, 'Bill ID');
+        logger.info(`Admin trigger for NEW comprehensive analysis run for bill ${bill_id } by user ${req.user?.id}`);
 
         // Run the analysis (this might take time - consider background job for long analyses)
-        const analysisResult = await billComprehensiveAnalysisService.analyzeBill(billId);
+        const analysisResult = await billComprehensiveAnalysisService.analyzeBill(bill_id);
 
         const metadata = { source: 'manual_trigger', timestamp: new Date(startTime), durationMs: Date.now() - startTime };
         // Use 201 Created as a new analysis run was initiated and completed
@@ -82,13 +80,12 @@ router.post('/bills/:billId/comprehensive/run', authenticateToken, async (req: A
 });
 
 /**
- * GET /api/analysis/bills/:billId/history
+ * GET /api/analysis/bills/:bill_id/history
  * Retrieve historical comprehensive analysis runs for a bill from the repository.
  */
-router.get('/bills/:billId/history', async (req: Request, res: Response, next: NextFunction) => {
-    const startTime = Date.now();
+router.get('/bills/:bill_id/history', async (req: Request, res: Response, next: NextFunction) => { const startTime = Date.now();
     try {
-        const billId = parseIntParam(req.params.billId, 'Bill ID');
+        const bill_id = parseIntParam(req.params.bill_id, 'Bill ID');
         // Validate limit query parameter
         const limitParam = req.query.limit as string | undefined;
         let limit = 10; // Default limit
@@ -96,12 +93,12 @@ router.get('/bills/:billId/history', async (req: Request, res: Response, next: N
              const parsedLimit = parseInt(limitParam, 10);
              if (isNaN(parsedLimit) || parsedLimit <= 0 || parsedLimit > 50) {
                  throw new Error("Invalid 'limit' query parameter: Must be an integer between 1 and 50.");
-             }
+              }
              limit = parsedLimit;
         }
 
 
-        const historyRecords = await analysisRepository.findHistoryByBillId(billId, limit);
+        const historyRecords = await analysisRepository.findHistoryByBillId(bill_id, limit);
 
         // Transform results for frontend consumption, extracting key info from JSONB
         const historyResults = historyRecords.map(record => {
@@ -109,14 +106,14 @@ router.get('/bills/:billId/history', async (req: Request, res: Response, next: N
             return {
                 dbId: record.id, // Include DB record ID
                 analysisId: resultsData?.analysisId,
-                timestamp: record.createdAt, // Use DB creation time
-                version: resultsData?.version || record.analysisType,
+                timestamp: record.created_at, // Use DB creation time
+                version: resultsData?.version || record.analysis_type,
                 overallConfidence: parseFloat(record.confidence ?? '0'),
                 status: resultsData?.status || 'unknown', // Include status if saved
                 // Optionally include a summary of scores
                 scores: {
                     publicInterest: resultsData?.publicInterestScore?.score,
-                    transparency: resultsData?.transparencyScore?.overall,
+                    transparency: resultsData?.transparency_score?.overall,
                     constitutional: resultsData?.constitutionalAnalysis?.constitutionalityScore,
                 },
                 // recommendationsCount: resultsData?.recommendations?.length ?? 0,

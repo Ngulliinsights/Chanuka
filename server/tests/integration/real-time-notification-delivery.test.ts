@@ -35,7 +35,7 @@ import { router as billTrackingRouter } from '../../features/bills/bill-tracking
 // Mock realTimeTrackingRouter
 const realTimeTrackingRouter = express.Router();
 import { router as authRouter } from '../../core/auth/auth.js';
-import { database as db, users, bills, notifications, billEngagement } from '@shared/database/connection.js';
+import { database as db, users, bills, notifications, bill_engagement } from '@shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { logger  } from '../../../shared/core/src/index.js';
@@ -89,8 +89,8 @@ describe('Real-Time Notification Delivery Tests', () => {
       if (token) {
         try {
           const decoded = jwt.verify(token, process.env.JWT_SECRET || 'test-secret') as any;
-          (ws as any).userId = decoded.id;
-          (ws as any).userRole = decoded.role;
+          (ws as any).user_id = decoded.id;
+          (ws as any).user_role = decoded.role;
         } catch (error) {
           ws.close();
           return;
@@ -169,21 +169,21 @@ describe('Real-Time Notification Delivery Tests', () => {
           email: `notification-user1-${Date.now()}@example.com`,
           name: 'Notification Test User 1',
           role: 'citizen',
-          passwordHash: 'hashed-password-1',
-          verificationStatus: 'verified',
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          password_hash: 'hashed-password-1',
+          verification_status: 'verified',
+          is_active: true,
+          created_at: new Date(),
+          updated_at: new Date()
         },
         {
           email: `notification-user2-${Date.now()}@example.com`,
           name: 'Notification Test User 2',
           role: 'citizen',
-          passwordHash: 'hashed-password-2',
-          verificationStatus: 'verified',
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          password_hash: 'hashed-password-2',
+          verification_status: 'verified',
+          is_active: true,
+          created_at: new Date(),
+          updated_at: new Date()
         }
       ];
 
@@ -191,7 +191,7 @@ describe('Real-Time Notification Delivery Tests', () => {
         const user = await db.insert(users).values({
           ...userData,
           role: 'citizen' as const,
-          verificationStatus: 'verified' as const
+          verification_status: 'verified' as const
         }).returning();
         testUsers.push(user[0]);
         
@@ -212,17 +212,17 @@ describe('Real-Time Notification Delivery Tests', () => {
       const testBillData = [
         {
           title: 'Real-Time Notification Test Bill 1',
-          billNumber: `RT-${Date.now()}-1`,
-          introducedDate: new Date(),
+          bill_number: `RT-${Date.now()}-1`,
+          introduced_date: new Date(),
           status: 'introduced',
           summary: 'Test bill for real-time notification testing',
           description: 'This bill is used for testing real-time notifications',
           content: 'Full content of test bill 1...',
           category: 'technology',
           tags: ['test', 'notifications'],
-          viewCount: 0,
-          shareCount: 0,
-          complexityScore: 5,
+          view_count: 0,
+          share_count: 0,
+          complexity_score: 5,
           constitutionalConcerns: { concerns: [], severity: 'low' },
           stakeholderAnalysis: { 
             primary_beneficiaries: ['test users'], 
@@ -232,17 +232,17 @@ describe('Real-Time Notification Delivery Tests', () => {
         },
         {
           title: 'Real-Time Notification Test Bill 2',
-          billNumber: `RT-${Date.now()}-2`,
-          introducedDate: new Date(),
+          bill_number: `RT-${Date.now()}-2`,
+          introduced_date: new Date(),
           status: 'committee',
           summary: 'Second test bill for real-time notification testing',
           description: 'This bill is also used for testing real-time notifications',
           content: 'Full content of test bill 2...',
           category: 'healthcare',
           tags: ['test', 'notifications', 'healthcare'],
-          viewCount: 0,
-          shareCount: 0,
-          complexityScore: 7,
+          view_count: 0,
+          share_count: 0,
+          complexity_score: 7,
           constitutionalConcerns: { concerns: [], severity: 'low' },
           stakeholderAnalysis: { 
             primary_beneficiaries: ['test users'], 
@@ -269,14 +269,14 @@ describe('Real-Time Notification Delivery Tests', () => {
     try {
       // Clean up bills
       for (const bill of testBills) {
-        await db.delete(billEngagement).where(eq(billEngagement.billId, bill.id));
-        await db.delete(bills).where(eq(bills.id, bill.id));
+        await db.delete(bill_engagement).where(eq(bill_engagement.bill_id, bills.id));
+        await db.delete(bills).where(eq(bills.id, bills.id));
       }
       
       // Clean up users
       for (const user of testUsers) {
-        await db.delete(notifications).where(eq(notifications.userId, user.id));
-        await db.delete(users).where(eq(users.id, user.id));
+        await db.delete(notifications).where(eq(notifications.user_id, users.id));
+        await db.delete(users).where(eq(users.id, users.id));
       }
     } catch (error) {
       console.warn('Test data cleanup failed:', error);
@@ -286,7 +286,7 @@ describe('Real-Time Notification Delivery Tests', () => {
   async function cleanupTestNotifications() {
     try {
       for (const user of testUsers) {
-        await db.delete(notifications).where(eq(notifications.userId, user.id));
+        await db.delete(notifications).where(eq(notifications.user_id, users.id));
       }
     } catch (error) {
       console.warn('Notification cleanup failed:', error);
@@ -523,7 +523,7 @@ describe('Real-Time Notification Delivery Tests', () => {
           const notification = await waitForWebSocketMessage(ws, 3000);
           
           expect(notification.type).toBe('bill_status_update');
-          expect(notification.data.billId).toBe(testBills[0].id);
+          expect(notification.data.bill_id).toBe(testBills[0].id);
           expect(notification.data.newStatus).toBe('passed');
         } catch (error) {
           // Notification system might not be fully implemented
@@ -545,7 +545,7 @@ describe('Real-Time Notification Delivery Tests', () => {
       // Create new bill via API
       const newBillData = {
         title: 'New Real-Time Test Bill',
-        billNumber: `NEW-RT-${Date.now()}`,
+        bill_number: `NEW-RT-${Date.now()}`,
         summary: 'New bill for real-time testing',
         description: 'This bill tests new bill notifications',
         category: 'technology',
@@ -586,7 +586,7 @@ describe('Real-Time Notification Delivery Tests', () => {
         .post(`/api/bills/${testBills[0].id}/engage`)
         .set('Authorization', `Bearer ${testTokens[1]}`)
         .send({ 
-          engagementType: 'view',
+          engagement_type: 'view',
           metadata: { source: 'test' }
         });
 
@@ -596,8 +596,8 @@ describe('Real-Time Notification Delivery Tests', () => {
           const notification = await waitForWebSocketMessage(ws1, 3000);
           
           expect(notification.type).toBe('bill_engagement');
-          expect(notification.data.billId).toBe(testBills[0].id);
-          expect(notification.data.engagementType).toBe('view');
+          expect(notification.data.bill_id).toBe(testBills[0].id);
+          expect(notification.data.engagement_type).toBe('view');
         } catch (error) {
           console.warn('Engagement notification not received:', (error as Error).message);
         }
@@ -617,12 +617,11 @@ describe('Real-Time Notification Delivery Tests', () => {
       await waitForWebSocketMessage(ws);
 
       // Create a notification for the user via API
-      const notificationData = {
-        userId: testUsers[0].id,
+      const notificationData = { user_id: testUsers[0].id,
         type: 'bill_alert',
         title: 'Test Notification',
         message: 'This is a test notification for real-time delivery',
-        metadata: { billId: testBills[0].id }
+        metadata: { bill_id: testBills[0].id   }
       };
 
       const createResponse = await request(app)
@@ -662,12 +661,11 @@ describe('Real-Time Notification Delivery Tests', () => {
       await waitForWebSocketMessage(ws2);
 
       // Create notification for user 1 only
-      const notificationData = {
-        userId: testUsers[0].id,
+      const notificationData = { user_id: testUsers[0].id,
         type: 'personal_alert',
         title: 'Personal Notification',
         message: 'This should only go to user 1'
-      };
+       };
 
       const createResponse = await request(app)
         .post('/api/notifications')
@@ -726,10 +724,9 @@ describe('Real-Time Notification Delivery Tests', () => {
           const createResponse = await request(app)
             .post('/api/notifications')
             .set('Authorization', `Bearer ${testTokens[0]}`)
-            .send({
-              userId: testUsers[0].id,
+            .send({ user_id: testUsers[0].id,
               type: notif.type,
-              title: `Test ${notif.type}`,
+              title: `Test ${notif.type }`,
               message: `Test message for ${notif.type}`
             });
 
@@ -784,12 +781,11 @@ describe('Real-Time Notification Delivery Tests', () => {
       await waitForWebSocketMessage(ws);
 
       // Create notification after reconnection
-      const notificationData = {
-        userId: testUsers[0].id,
+      const notificationData = { user_id: testUsers[0].id,
         type: 'reconnection_test',
         title: 'Reconnection Test',
         message: 'This tests notification after reconnection'
-      };
+       };
 
       const createResponse = await request(app)
         .post('/api/notifications')
@@ -821,10 +817,9 @@ describe('Real-Time Notification Delivery Tests', () => {
         return request(app)
           .post('/api/notifications')
           .set('Authorization', `Bearer ${testTokens[0]}`)
-          .send({
-            userId: testUsers[0].id,
+          .send({ user_id: testUsers[0].id,
             type: 'high_frequency_test',
-            title: `Rapid Notification ${index}`,
+            title: `Rapid Notification ${index }`,
             message: `Message ${index}`
           });
       });
@@ -869,10 +864,9 @@ describe('Real-Time Notification Delivery Tests', () => {
         const response = await request(app)
           .post('/api/notifications')
           .set('Authorization', `Bearer ${testTokens[0]}`)
-          .send({
-            userId: testUsers[0].id,
+          .send({ user_id: testUsers[0].id,
             type: 'offline_test',
-            title: `Offline Notification ${i}`,
+            title: `Offline Notification ${i }`,
             message: `Message created while offline ${i}`
           });
         
@@ -930,21 +924,20 @@ describe('Real-Time Notification Delivery Tests', () => {
 
       // Create notifications that should go to different users
       const notifications = [
-        { userId: testUsers[0].id, channels: ['user_notifications'] },
-        { userId: testUsers[1].id, channels: ['user_notifications'] },
-        { billId: testBills[0].id, channels: [`bill_${testBills[0].id}`] }
+        { user_id: testUsers[0].id, channels: ['user_notifications']  },
+        { user_id: testUsers[1].id, channels: ['user_notifications']  },
+        { bill_id: testBills[0].id, channels: [`bill_${testBills[0].id }`] }
       ];
 
       for (const notif of notifications) {
         const response = await request(app)
           .post('/api/notifications')
           .set('Authorization', `Bearer ${testTokens[0]}`)
-          .send({
-            userId: notif.userId || testUsers[0].id,
+          .send({ user_id: notif.user_id || testUsers[0].id,
             type: 'multi_user_test',
             title: 'Multi-user Test',
             message: 'Testing multiple user notifications',
-            metadata: notif.billId ? { billId: notif.billId } : {}
+            metadata: notif.bill_id ? { bill_id: notif.bill_id   } : {}
           });
 
         if (response.status === 201) {
@@ -981,10 +974,9 @@ describe('Real-Time Notification Delivery Tests', () => {
         request(app)
           .post('/api/notifications')
           .set('Authorization', `Bearer ${testTokens[0]}`)
-          .send({
-            userId: testUsers[0].id,
+          .send({ user_id: testUsers[0].id,
             type: 'load_test',
-            title: `Load Test ${index}`,
+            title: `Load Test ${index }`,
             message: `Load testing message ${index}`
           })
       );

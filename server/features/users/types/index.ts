@@ -6,16 +6,15 @@
  */
 
 // Expert and Verification Types (migrated from shared/types/expert.ts)
-export interface Analysis {
-  id: string;
+export interface Analysis { id: string;
   topic: string;
   content: string;
-  billId: number;
-  analysisType: string;
+  bill_id: number;
+  analysis_type: string;
   confidence?: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+  created_at: Date;
+  updated_at: Date;
+ }
 
 export interface Expert {
   id: string;
@@ -23,11 +22,11 @@ export interface Expert {
   email: string;
   expertise: string[];
   qualifications: string[];
-  verificationStatus: 'pending' | 'verified' | 'rejected';
-  reputationScore: number;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  verification_status: 'pending' | 'verified' | 'rejected';
+  reputation_score: number;
+  is_active: boolean;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface ExtendedExpert extends Expert {
@@ -53,7 +52,7 @@ export interface ExtendedVerificationTask extends VerificationTask {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   estimatedDuration: number; // in minutes
   complexity: number; // 1-10 scale
-  createdAt?: Date;
+  created_at?: Date;
   processedAt?: string | null;
 }
 

@@ -128,8 +128,8 @@ describe('API Service', () => {
         const result = await api.register({
           email: 'newuser@example.com',
           password: 'SecurePass123!',
-          firstName: 'New',
-          lastName: 'User',
+          first_name: 'New',
+          last_name: 'User',
           role: 'citizen'
         });
 
@@ -142,8 +142,8 @@ describe('API Service', () => {
           body: JSON.stringify({
             email: 'newuser@example.com',
             password: 'SecurePass123!',
-            firstName: 'New',
-            lastName: 'User',
+            first_name: 'New',
+            last_name: 'User',
             role: 'citizen'
           })
         });
@@ -164,8 +164,8 @@ describe('API Service', () => {
         const result = await api.register({
           email: 'existing@example.com',
           password: 'SecurePass123!',
-          firstName: 'Test',
-          lastName: 'User',
+          first_name: 'Test',
+          last_name: 'User',
           role: 'citizen'
         });
 

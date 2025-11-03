@@ -47,8 +47,8 @@ describe('API Endpoints Integration Tests', () => {
       .send({
         email: `test-${Date.now()}@example.com`,
         password: 'SecureTestPass123!',
-        firstName: 'Test',
-        lastName: 'User',
+        first_name: 'Test',
+        last_name: 'User',
         role: 'citizen'
       });
 
@@ -72,8 +72,8 @@ describe('API Endpoints Integration Tests', () => {
       const userData = {
         email: `newuser-${Date.now()}@example.com`,
         password: 'SecurePass123!',
-        firstName: 'New',
-        lastName: 'User',
+        first_name: 'New',
+        last_name: 'User',
         role: 'citizen'
       };
 
@@ -86,7 +86,7 @@ describe('API Endpoints Integration Tests', () => {
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveProperty('user');
       expect(response.body.data).toHaveProperty('token');
-      expect(response.body.data.user.email).toBe(userData.email);
+      expect(response.body.data.users.email).toBe(userData.email);
     });
 
     it('should login with valid credentials', async () => {
@@ -94,8 +94,8 @@ describe('API Endpoints Integration Tests', () => {
       const userData = {
         email: `logintest-${Date.now()}@example.com`,
         password: 'SecurePass123!',
-        firstName: 'Login',
-        lastName: 'Test',
+        first_name: 'Login',
+        last_name: 'Test',
         role: 'citizen'
       };
 
@@ -210,7 +210,7 @@ describe('API Endpoints Integration Tests', () => {
       // Check that all returned bills have the requested status
       if (response.body.data.length > 0) {
         response.body.data.forEach((bill: any) => {
-          expect(bill.status).toBe('introduced');
+          expect(bills.status).toBe('introduced');
         });
       }
     });
@@ -232,17 +232,16 @@ describe('API Endpoints Integration Tests', () => {
         .get('/api/bills?limit=1')
         .set('Authorization', `Bearer ${authToken}`);
 
-      if (billsResponse.body.data.length > 0) {
-        const billId = billsResponse.body.data[0].id;
+      if (billsResponse.body.data.length > 0) { const bill_id = billsResponse.body.data[0].id;
 
         const response = await request(app)
-          .get(`/api/bills/${billId}`)
+          .get(`/api/bills/${bill_id }`)
           .set('Authorization', `Bearer ${authToken}`)
           .expect('Content-Type', /json/);
 
         expect(response.status).toBe(200);
         expect(response.body.success).toBe(true);
-        expect(response.body.data).toHaveProperty('id', billId);
+        expect(response.body.data).toHaveProperty('id', bill_id);
       }
     });
 
@@ -286,16 +285,16 @@ describe('API Endpoints Integration Tests', () => {
         .set('Authorization', `Bearer ${authToken}`);
 
       if (sponsorsResponse.body.data.length > 0) {
-        const sponsorId = sponsorsResponse.body.data[0].id;
+        const sponsor_id = sponsorsResponse.body.data[0].id;
 
         const response = await request(app)
-          .get(`/api/sponsors/${sponsorId}`)
+          .get(`/api/sponsors/${sponsor_id}`)
           .set('Authorization', `Bearer ${authToken}`)
           .expect('Content-Type', /json/);
 
         expect(response.status).toBe(200);
         expect(response.body.success).toBe(true);
-        expect(response.body.data).toHaveProperty('id', sponsorId);
+        expect(response.body.data).toHaveProperty('id', sponsor_id);
       }
     });
 
@@ -311,7 +310,7 @@ describe('API Endpoints Integration Tests', () => {
       // Check that all returned sponsors have the requested party
       if (response.body.data.length > 0) {
         response.body.data.forEach((sponsor: any) => {
-          expect(sponsor.party).toContain('Liberal');
+          expect(sponsors.party).toContain('Liberal');
         });
       }
     });
@@ -337,10 +336,9 @@ describe('API Endpoints Integration Tests', () => {
         return;
       }
 
-      const commentData = {
-        content: 'This is a test comment about the bill.',
-        billId: testBillId
-      };
+      const commentData = { content: 'This is a test comment about the bills.',
+        bill_id: testBillId
+       };
 
       const response = await request(app)
         .post('/api/comments')
@@ -379,10 +377,9 @@ describe('API Endpoints Integration Tests', () => {
       const response = await request(app)
         .post('/api/comments')
         .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          content: '',
-          billId: testBillId
-        })
+        .send({ content: '',
+          bill_id: testBillId
+         })
         .expect('Content-Type', /json/);
 
       expect([400, 422]).toContain(response.status);
@@ -409,11 +406,10 @@ describe('API Endpoints Integration Tests', () => {
         .get('/api/bills?limit=1')
         .set('Authorization', `Bearer ${authToken}`);
 
-      if (billsResponse.body.data.length > 0) {
-        const billId = billsResponse.body.data[0].id;
+      if (billsResponse.body.data.length > 0) { const bill_id = billsResponse.body.data[0].id;
 
         const response = await request(app)
-          .get(`/api/analytics/bills/${billId}/engagement`)
+          .get(`/api/analytics/bills/${bill_id }/engagement`)
           .set('Authorization', `Bearer ${authToken}`)
           .expect('Content-Type', /json/);
 
@@ -457,8 +453,8 @@ describe('API Endpoints Integration Tests', () => {
         .send({
           email: 'invalid-email-format',
           password: 'SecurePass123!',
-          firstName: 'Test',
-          lastName: 'User',
+          first_name: 'Test',
+          last_name: 'User',
           role: 'citizen'
         })
         .expect('Content-Type', /json/);
@@ -473,8 +469,8 @@ describe('API Endpoints Integration Tests', () => {
         .send({
           email: `weakpass-${Date.now()}@example.com`,
           password: '123', // Weak password
-          firstName: 'Test',
-          lastName: 'User',
+          first_name: 'Test',
+          last_name: 'User',
           role: 'citizen'
         })
         .expect('Content-Type', /json/);

@@ -103,7 +103,7 @@ export const resourceAvailabilityMiddleware = async (req: Request, res: Response
       logger.debug(`Resource not found: ${req.path}`, { 
         requestedPath: req.path,
         checkedPath: filePath,
-        userAgent: req.get('User-Agent')
+        user_agent: req.get('User-Agent')
       });
 
       // Just let it proceed - don't block with 404

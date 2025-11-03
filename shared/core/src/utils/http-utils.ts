@@ -264,13 +264,13 @@ export class HttpClient {
   }
 
   private async parseResponseBody<T>(response: Response): Promise<T> {
-    const contentType = response.headers.get('content-type');
+    const content_type = response.headers.get('content-type');
 
-    if (contentType?.includes('application/json')) {
+    if (content_type?.includes('application/json')) {
       return response.json();
     }
 
-    if (contentType?.includes('text/')) {
+    if (content_type?.includes('text/')) {
       return response.text() as unknown as T;
     }
 
@@ -362,7 +362,7 @@ export function safeEncodeURIComponent(str: string): string {
  * Gets the content type from a file extension.
  */
 export function getContentTypeFromExtension(extension: string): string {
-  const contentTypes: Record<string, string> = {
+  const content_types: Record<string, string> = {
     '.json': 'application/json',
     '.xml': 'application/xml',
     '.txt': 'text/plain',
@@ -379,13 +379,13 @@ export function getContentTypeFromExtension(extension: string): string {
     '.csv': 'text/csv'
   };
 
-  return contentTypes[extension.toLowerCase()] || 'application/octet-stream';
+  return content_types[extension.toLowerCase()] || 'application/octet-stream';
 }
 
 /**
  * Gets the file extension from a content type.
  */
-export function getExtensionFromContentType(contentType: string): string {
+export function getExtensionFromContentType(content_type: string): string {
   const extensions: Record<string, string> = {
     'application/json': '.json',
     'application/xml': '.xml',
@@ -402,7 +402,7 @@ export function getExtensionFromContentType(contentType: string): string {
     'text/csv': '.csv'
   };
 
-  return extensions[contentType.toLowerCase()] || '';
+  return extensions[content_type.toLowerCase()] || '';
 }
 
 // ==================== HTTP Error Classes ====================

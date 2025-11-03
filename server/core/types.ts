@@ -27,13 +27,13 @@ export interface Bill {
   lastUpdated: Date | null;
   votingDate: Date | null;
   stakeholderIds: number[] | null;
-  viewCount?: number;
-  shareCount?: number;
+  view_count?: number;
+  share_count?: number;
   dueDate?: Date | null;
   requiresAction?: boolean | null;
   urgency?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface InsertBill {
@@ -46,14 +46,13 @@ export interface InsertBill {
   proposedDate?: Date | null;
   votingDate?: Date | null;
   stakeholderIds?: number[] | null;
-  viewCount?: number;
-  shareCount?: number;
+  view_count?: number;
+  share_count?: number;
   tags?: string[];
 }
 
 // Stakeholder-related types
-export interface Stakeholder {
-  id: number;
+export interface Stakeholder { id: number;
   name: string;
   email: string | null;
   organization: string | null;
@@ -63,9 +62,9 @@ export interface Stakeholder {
   phone?: string | null;
   office?: string | null;
   metadata?: Record<string, any>;
-  votingHistory?: Array<{ billId: number; vote: 'yes' | 'no' | 'abstain'; date: string }>;
-  createdAt: Date;
-  updatedAt: Date;
+  votingHistory?: Array<{ bill_id: number; vote: 'yes' | 'no' | 'abstain'; date: string  }>;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface InsertStakeholder {
@@ -81,24 +80,22 @@ export interface InsertStakeholder {
 }
 
 // Comment-related types
-export interface BillComment {
-  id: number;
-  billId: number;
-  userId: number;
+export interface BillComment { id: number;
+  bill_id: number;
+  user_id: number;
   content: string;
-  parentId: number | null;
+  parent_id: number | null;
   endorsements: number;
   isHighlighted: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+  created_at: Date;
+  updated_at: Date;
+  }
 
-export interface InsertBillComment {
-  billId: number;
-  userId: number;
+export interface InsertBillComment { bill_id: number;
+  user_id: number;
   content: string;
-  parentId?: number | null;
-}
+  parent_id?: number | null;
+  }
 
 // Progress-related types
 /*
@@ -108,33 +105,31 @@ export interface InsertBillComment {
 */
 
 // Social sharing types
-export interface SocialShare {
-  id: number;
-  billId: number;
-  userId: number;
+export interface SocialShare { id: number;
+  bill_id: number;
+  user_id: number;
   platform: string;
   metadata?: Record<string, any>;
   shareDate?: Date;
   likes?: number;
   shares?: number;
   comments?: number;
-  createdAt: Date;
-}
+  created_at: Date;
+  }
 
-export interface InsertSocialShare {
-  billId: number;
-  userId: number;
+export interface InsertSocialShare { bill_id: number;
+  user_id: number;
   platform: string;
   metadata?: Record<string, any>;
-}
+  }
 
 // Database tables (mock for import compatibility)
 export const users = {};
 export const bills = {};
 export const stakeholders = {};
-export const billComments = {};
-export const userProgress = {};
-export const socialShares = {};
+export const comments = {};
+export const user_progress = {};
+export const social_shares = {};
 
 
 

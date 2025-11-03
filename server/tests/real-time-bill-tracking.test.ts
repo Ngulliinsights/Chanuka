@@ -28,7 +28,7 @@ import jwt from 'jsonwebtoken';
 import { webSocketService } from '../infrastructure/websocket.js';
 import { billStatusMonitorService } from '../features/bills/bill-status-monitor.js';
 import { userPreferencesService } from '../features/users/domain/user-preferences.js';
-import { database as db, user as users, bill as bills, billEngagement } from '@shared/database/connection.js';
+import { database as db, user as users, bill as bills, bill_engagement } from '@shared/database/connection.js';
 import { eq } from 'drizzle-orm';
 import { logger  } from '../../shared/core/src/index.js';
 
@@ -53,7 +53,7 @@ describe('Real-Time Bill Tracking System', () => {
     // Create test user
     const testUser = await db.insert(users).values({
       email: 'test@example.com',
-      passwordHash: 'hashed_password',
+      password_hash: 'hashed_password',
       name: 'Test User',
       role: 'citizen'
     }).returning();
@@ -64,13 +64,13 @@ describe('Real-Time Bill Tracking System', () => {
       title: 'Test Bill for Real-Time Tracking',
       description: 'A test bill to verify real-time tracking functionality',
       status: 'introduced',
-      billNumber: 'TEST-001'
+      bill_number: 'TEST-001'
     }).returning();
     testBillId = testBill[0].id;
 
     // Create auth token
     authToken = jwt.sign(
-      { userId: testUserId },
+      { user_id: testUserId  },
       process.env.JWT_SECRET || 'fallback-secret',
       { expiresIn: '1h' }
     );
@@ -81,7 +81,7 @@ describe('Real-Time Bill Tracking System', () => {
 
   afterAll(async () => {
     // Cleanup test data
-    await db.delete(billEngagement).where(eq(billEngagement.userId, testUserId));
+    await db.delete(bill_engagement).where(eq(bill_engagement.user_id, testUserId));
     await db.delete(bills).where(eq(bills.id, testBillId));
     await db.delete(users).where(eq(users.id, testUserId));
     
@@ -143,7 +143,7 @@ describe('Real-Time Bill Tracking System', () => {
           
           if (message.type === 'connected') {
             expect(message.message).toBe('WebSocket connection established');
-            expect(message.data.userId).toBe(testUserId);
+            expect(message.data.user_id).toBe(testUserId);
             ws.close();
             resolve();
           }
@@ -174,23 +174,21 @@ describe('Real-Time Bill Tracking System', () => {
         const message = JSON.parse(data.toString());
         
         if (message.type === 'subscribed') {
-          expect(message.data.billId).toBe(testBillId);
+          expect(message.data.bill_id).toBe(testBillId);
           expect(message.data.message).toContain(`Subscribed to bill ${testBillId}`);
           done();
         }
       });
 
-      wsClient.send(JSON.stringify({
-        type: 'subscribe',
+      wsClient.send(JSON.stringify({ type: 'subscribe',
         data: {
-          billId: testBillId,
+          bill_id: testBillId,
           subscriptionTypes: ['status_change', 'new_comment']
-        }
+         }
       }));
     });
 
-    it('should allow unsubscribing from bill updates', (done) => {
-      let subscribed = false;
+    it('should allow unsubscribing from bill updates', (done) => { let subscribed = false;
       
       wsClient.on('message', (data) => {
         const message = JSON.parse(data.toString());
@@ -200,19 +198,18 @@ describe('Real-Time Bill Tracking System', () => {
           // Now unsubscribe
           wsClient.send(JSON.stringify({
             type: 'unsubscribe',
-            data: { billId: testBillId }
+            data: { bill_id: testBillId  }
           }));
         } else if (message.type === 'unsubscribed') {
-          expect(message.data.billId).toBe(testBillId);
+          expect(message.data.bill_id).toBe(testBillId);
           expect(message.data.message).toContain(`Unsubscribed from bill ${testBillId}`);
           done();
         }
       });
 
       // First subscribe
-      wsClient.send(JSON.stringify({
-        type: 'subscribe',
-        data: { billId: testBillId }
+      wsClient.send(JSON.stringify({ type: 'subscribe',
+        data: { bill_id: testBillId  }
       }));
     });
   });
@@ -274,11 +271,10 @@ describe('Real-Time Bill Tracking System', () => {
   describe('Real-Time Bill Status Updates', () => {
     beforeEach((done) => {
       wsClient = new WebSocket(`${wsUrl}?token=${authToken}`);
-      wsClient.on('open', () => {
-        // Subscribe to bill updates
+      wsClient.on('open', () => { // Subscribe to bill updates
         wsClient.send(JSON.stringify({
           type: 'subscribe',
-          data: { billId: testBillId }
+          data: { bill_id: testBillId  }
         }));
         done();
       });
@@ -305,7 +301,7 @@ describe('Real-Time Bill Tracking System', () => {
             testMode: true
           });
         } else if (message.type === 'bill_update') {
-          expect(message.billId).toBe(testBillId);
+          expect(message.bill_id).toBe(testBillId);
           expect(message.update.type).toBe('status_change');
           expect(message.update.data.newStatus).toBe('committee');
           expect(message.update.data.oldStatus).toBe('introduced');
@@ -329,8 +325,7 @@ describe('Real-Time Bill Tracking System', () => {
         }
       };
 
-      wsClient.on('message', (data) => {
-        const message = JSON.parse(data.toString());
+      wsClient.on('message', (data) => { const message = JSON.parse(data.toString());
         
         if (message.type === 'subscribed' && !client1Ready) {
           client1Ready = true;
@@ -339,11 +334,11 @@ describe('Real-Time Bill Tracking System', () => {
             webSocketService.broadcastBillUpdate(testBillId, {
               type: 'status_change',
               data: {
-                billId: testBillId,
+                bill_id: testBillId,
                 title: 'Test Bill',
                 oldStatus: 'introduced',
                 newStatus: 'committee'
-              },
+               },
               timestamp: new Date()
             });
           }
@@ -352,15 +347,13 @@ describe('Real-Time Bill Tracking System', () => {
         }
       });
 
-      wsClient2.on('open', () => {
-        wsClient2.send(JSON.stringify({
+      wsClient2.on('open', () => { wsClient2.send(JSON.stringify({
           type: 'subscribe',
-          data: { billId: testBillId }
+          data: { bill_id: testBillId  }
         }));
       });
 
-      wsClient2.on('message', (data) => {
-        const message = JSON.parse(data.toString());
+      wsClient2.on('message', (data) => { const message = JSON.parse(data.toString());
         
         if (message.type === 'subscribed' && !client2Ready) {
           client2Ready = true;
@@ -369,11 +362,11 @@ describe('Real-Time Bill Tracking System', () => {
             webSocketService.broadcastBillUpdate(testBillId, {
               type: 'status_change',
               data: {
-                billId: testBillId,
+                bill_id: testBillId,
                 title: 'Test Bill',
                 oldStatus: 'introduced',
                 newStatus: 'committee'
-              },
+               },
               timestamp: new Date()
             });
           }
@@ -393,14 +386,13 @@ describe('Real-Time Bill Tracking System', () => {
       });
 
       // Create bill engagement to track the bill
-      await db.insert(billEngagement).values({
-        userId: testUserId,
-        billId: testBillId,
-        viewCount: 1,
-        commentCount: 0,
-        shareCount: 0,
-        engagementScore: '1.0'
-      });
+      await db.insert(bill_engagement).values({ user_id: testUserId,
+        bill_id: testBillId,
+        view_count: 1,
+        comment_count: 0,
+        share_count: 0,
+        engagement_score: '1.0'
+        });
 
       // Trigger status change and verify immediate notification
       await billStatusMonitor.triggerStatusChange(testBillId, 'committee', {
@@ -421,14 +413,13 @@ describe('Real-Time Bill Tracking System', () => {
       });
 
       // Create bill engagement
-      await db.insert(billEngagement).values({
-        userId: testUserId,
-        billId: testBillId,
-        viewCount: 1,
-        commentCount: 0,
-        shareCount: 0,
-        engagementScore: '1.0'
-      });
+      await db.insert(bill_engagement).values({ user_id: testUserId,
+        bill_id: testBillId,
+        view_count: 1,
+        comment_count: 0,
+        share_count: 0,
+        engagement_score: '1.0'
+        });
 
       // Trigger status change
       await billStatusMonitor.triggerStatusChange(testBillId, 'committee', {

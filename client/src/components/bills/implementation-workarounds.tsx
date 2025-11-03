@@ -59,7 +59,7 @@ interface ImplementationWorkaround {
     enforcementMechanismSimilarity: number;
   };
 
-  verificationStatus: 'pending' | 'verified' | 'rejected';
+  verification_status: 'pending' | 'verified' | 'rejected';
   alertStatus: 'active' | 'resolved' | 'dismissed';
   publicNotificationSent: boolean;
 
@@ -96,15 +96,14 @@ interface ImplementationWorkaround {
     name: string;
     role: string;
   };
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
-interface ImplementationWorkaroundsProps {
-  billId: string;
-}
+interface ImplementationWorkaroundsProps { bill_id: string;
+ }
 
-export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsProps) {
+export function ImplementationWorkarounds({ bill_id  }: ImplementationWorkaroundsProps) {
   const [workarounds, setWorkarounds] = useState<ImplementationWorkaround[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedWorkaround, setSelectedWorkaround] = useState<ImplementationWorkaround | null>(null);
@@ -113,11 +112,10 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
 
   useEffect(() => {
     fetchWorkarounds();
-  }, [billId]);
+  }, [bill_id]);
 
-  const fetchWorkarounds = async () => {
-    try {
-      const response = await fetch(`/api/bills/${billId}/implementation-workarounds`);
+  const fetchWorkarounds = async () => { try {
+      const response = await fetch(`/api/bills/${bill_id }/implementation-workarounds`);
       if (response.ok) {
         const data = await response.json();
         setWorkarounds(data);
@@ -155,10 +153,9 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          billId,
+        body: JSON.stringify({ bill_id,
           detectionReason: reportReason,
-        }),
+         }),
       });
 
       if (response.ok) {
@@ -341,11 +338,11 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
 
           <div className="space-y-4">
             {workarounds.map((workaround) => (
-              <Card key={workaround.id} className={`border-2 ${getStatusColor(workaround.verificationStatus)}`}>
+              <Card key={workaround.id} className={`border-2 ${getStatusColor(workaround.verification_status)}`}>
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
                     <CardTitle className="text-base flex items-center gap-2">
-                      {getStatusIcon(workaround.verificationStatus)}
+                      {getStatusIcon(workaround.verification_status)}
                       Implementation Workaround Alert
                       {workaround.publicNotificationSent && (
                         <Badge variant="secondary" className="ml-2">
@@ -359,8 +356,8 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
                         {getWorkaroundTypeIcon(workaround.workaroundType)}
                         {getWorkaroundTypeLabel(workaround.workaroundType)}
                       </Badge>
-                      <Badge className={getStatusColor(workaround.verificationStatus)}>
-                        {workaround.verificationStatus.charAt(0).toUpperCase() + workaround.verificationStatus.slice(1)}
+                      <Badge className={getStatusColor(workaround.verification_status)}>
+                        {workaround.verification_status.charAt(0).toUpperCase() + workaround.verification_status.slice(1)}
                       </Badge>
                     </div>
                   </div>
@@ -451,7 +448,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
                       </span>
                       <span className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
-                        Detected: {new Date(workaround.createdAt).toLocaleDateString()}
+                        Detected: {new Date(workaround.created_at).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
@@ -480,7 +477,7 @@ export function ImplementationWorkarounds({ billId }: ImplementationWorkaroundsP
                       View Analysis Details
                     </Button>
 
-                    {workaround.verificationStatus === 'pending' && (
+                    {workaround.verification_status === 'pending' && (
                       <Button 
                         size="sm" 
                         variant="default"

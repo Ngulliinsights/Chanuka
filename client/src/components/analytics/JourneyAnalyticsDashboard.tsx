@@ -74,9 +74,9 @@ export function JourneyAnalyticsDashboard({ className }: JourneyAnalyticsDashboa
     setLoading(true);
     try {
       const { start, end } = getDateRange();
-      const userRole = selectedUserRole === 'all' ? undefined : selectedUserRole;
+      const user_role = selectedUserRole === 'all' ? undefined : selectedUserRole;
       
-      const analyticsData = getAnalytics(start, end, userRole);
+      const analyticsData = getAnalytics(start, end, user_role);
       const optimizationData = getOptimizations(start, end);
       
       setAnalytics(analyticsData);

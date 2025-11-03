@@ -28,7 +28,7 @@ export default function ProjectOverview({ projectId }: ProjectOverviewProps) {
     f.expiryDate && new Date(f.expiryDate) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
   ).length || 0;
 
-  const nextCheckpointDays = currentCheckpoint?.targetDate 
+  const next_checkpointDays = currentCheckpoint?.targetDate 
     ? Math.ceil((new Date(currentCheckpoint.targetDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
     : 0;
 
@@ -90,7 +90,7 @@ export default function ProjectOverview({ projectId }: ProjectOverviewProps) {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-muted-foreground">Next Checkpoint</p>
-            <p className="text-2xl font-bold">{nextCheckpointDays} days</p>
+            <p className="text-2xl font-bold">{next_checkpointDays} days</p>
           </div>
           <div className="p-3 bg-purple-100 rounded-lg">
             <Milestone className="w-6 h-6 text-purple-600" />

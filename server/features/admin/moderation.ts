@@ -24,7 +24,7 @@ const reviewFlagSchema = z.object({
 const moderationFiltersSchema = z.object({
   status: z.enum(['pending', 'approved', 'rejected', 'flagged']).optional(),
   severity: z.enum(['low', 'medium', 'high', 'critical']).optional(),
-  contentType: z.enum(['comment', 'bill']).optional(),
+  content_type: z.enum(['comment', 'bill']).optional(),
   moderator: z.string().optional(),
   dateRange: z.object({
     start: z.string().transform(str => new Date(str)),
@@ -175,7 +175,7 @@ router.post("/analyze", async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
-    const { content, contentType = 'comment' } = req.body;
+    const { content, content_type = 'comment' } = req.body;
 
     // Validate that content is provided and is a non-empty string
     if (!content || typeof content !== 'string' || content.trim().length === 0) {
@@ -184,14 +184,14 @@ router.post("/analyze", async (req: Request, res: Response) => {
     }
 
     // Validate that the content type is one we support
-    if (!['comment', 'bill'].includes(contentType)) {
+    if (!['comment', 'bill'].includes(content_type)) {
       const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
       return ApiResponseWrapper.error(res, "Invalid content type. Must be one of: comment, bill", 400, metadata);
     }
 
     // Run content analysis without persisting the result to the database
     const analysis = await contentModerationService.analyzeContent(
-      contentType as 'comment' | 'bill',
+      content_type as 'comment' | 'bill',
       content
     );
     

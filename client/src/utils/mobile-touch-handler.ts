@@ -29,7 +29,7 @@ export class MobileTouchHandler {
   private currentTouch: TouchPosition | null = null;
   private options: Required<TouchHandlerOptions>;
   private element: HTMLElement;
-  private isActive = false;
+  private is_active = false;
 
   constructor(element: HTMLElement, options: TouchHandlerOptions = {}) {
     this.element = element;
@@ -77,7 +77,7 @@ export class MobileTouchHandler {
       timestamp: Date.now(),
     };
     this.currentTouch = { ...this.startTouch };
-    this.isActive = true;
+    this.is_active = true;
 
     if (this.options.preventScroll) {
       event.preventDefault();
@@ -88,7 +88,7 @@ export class MobileTouchHandler {
   }
 
   private handleTouchMove(event: TouchEvent): void {
-    if (!this.isActive || event.touches.length !== 1) return;
+    if (!this.is_active || event.touches.length !== 1) return;
 
     const touch = event.touches[0];
     this.currentTouch = {
@@ -103,7 +103,7 @@ export class MobileTouchHandler {
   }
 
   private handleTouchEnd(event: TouchEvent): void {
-    if (!this.isActive || !this.startTouch || !this.currentTouch) return;
+    if (!this.is_active || !this.startTouch || !this.currentTouch) return;
 
     const swipe = this.calculateSwipe();
     if (swipe) {
@@ -134,12 +134,12 @@ export class MobileTouchHandler {
         timestamp: Date.now(),
       };
       this.currentTouch = { ...this.startTouch };
-      this.isActive = true;
+      this.is_active = true;
     }
   }
 
   private handlePointerMove(event: PointerEvent): void {
-    if (!this.isActive || event.pointerType !== 'touch') return;
+    if (!this.is_active || event.pointerType !== 'touch') return;
 
     this.currentTouch = {
       x: event.clientX,
@@ -149,7 +149,7 @@ export class MobileTouchHandler {
   }
 
   private handlePointerUp(event: PointerEvent): void {
-    if (!this.isActive || event.pointerType !== 'touch') return;
+    if (!this.is_active || event.pointerType !== 'touch') return;
     this.handleTouchEnd(event as any);
   }
 
@@ -198,7 +198,7 @@ export class MobileTouchHandler {
   private reset(): void {
     this.startTouch = null;
     this.currentTouch = null;
-    this.isActive = false;
+    this.is_active = false;
   }
 
   // Event handlers (to be set by consumers)

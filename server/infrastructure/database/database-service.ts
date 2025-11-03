@@ -1,13 +1,17 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import pg from 'pg';
 const { Pool } = pg;
-import * as schema from "../../../shared/schema/schema.js";
-import { eq, and, or, sql } from 'drizzle-orm';
 import { errorTracker } from '../../core/errors/error-tracker.js';
 import { config } from '../../config/index.js';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger } from '../../../shared/core/src/index.js';
+import { users, bills, sponsors, User, Bill, Sponsor } from '@shared/schema/foundation';
+import { comments, notifications, bill_engagement, bill_tracking_preferences } from '@shared/schema/citizen_participation';
 
-// Database connection configuration with improved typing
+import { repositoryFactory } from './repositories/repository-factory.js';
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
 interface DatabaseConfig {
   host: string;
   port: number;
@@ -20,28 +24,24 @@ interface DatabaseConfig {
   ssl?: boolean | object;
 }
 
-// Enhanced database operation result with additional metadata
 interface DatabaseResult<T> {
   data: T;
   source: 'database' | 'fallback';
   timestamp: Date;
   error?: Error;
-  executionTime?: number; // Track how long operations take
+  executionTime?: number;
 }
 
-// Comprehensive health check result
 interface HealthCheckResult {
   isHealthy: boolean;
   responseTime: number;
   error?: Error;
   timestamp: Date;
-  consecutiveFailures?: number; // Track failure patterns
+  consecutiveFailures?: number;
 }
 
-// Transaction callback with proper typing
 type TransactionCallback<T> = (tx: any) => Promise<T>;
 
-// Configuration options for retry behavior
 interface RetryConfig {
   maxAttempts: number;
   baseDelay: number;
@@ -49,126 +49,249 @@ interface RetryConfig {
   backoffMultiplier: number;
 }
 
+type CircuitBreakerState = 'closed' | 'open' | 'half-open';
+
+interface ConnectionStatus {
+  isConnected: boolean;
+  lastHealthCheck: Date;
+  connectionAttempts: number;
+  consecutiveFailures: number;
+  circuitBreakerState: CircuitBreakerState;
+  poolStats?: {
+    totalCount: number;
+    idleCount: number;
+    waitingCount: number;
+  };
+}
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const DEFAULT_RETRY_CONFIG: RetryConfig = {
+  maxAttempts: 3,
+  baseDelay: 1000,
+  maxDelay: 30000,
+  backoffMultiplier: 2
+};
+
+const CIRCUIT_BREAKER_THRESHOLD = 5;
+const CIRCUIT_BREAKER_TIMEOUT = 60000;
+const HEALTHY_CHECK_INTERVAL = 30000;
+const UNHEALTHY_CHECK_INTERVAL = 10000;
+const CONNECTION_TEST_TIMEOUT = 5000;
+const SLOW_QUERY_THRESHOLD = 3000;
+const SLOW_HEALTH_CHECK_THRESHOLD = 1000;
+const SERIALIZATION_RETRY_DELAY = 100;
+const DRAIN_TIMEOUT = 10000;
+
+// ============================================================================
+// MAIN DATABASE SERVICE CLASS
+// ============================================================================
+
 /**
  * Comprehensive Database Service with advanced connection management
  * 
- * Key optimizations:
- * 1. Exponential backoff with jitter for retry logic
- * 2. Circuit breaker pattern to prevent cascading failures
- * 3. Connection pool monitoring and metrics
- * 4. Graceful degradation with smart fallback strategies
- * 5. Memory-efficient health check scheduling
+ * This service provides robust database connectivity with several key features:
+ * - Exponential backoff with jitter prevents thundering herd problems
+ * - Circuit breaker pattern stops cascading failures
+ * - Health monitoring adapts based on connection state
+ * - Graceful degradation with fallback strategies
+ * - Transaction support with automatic serialization retry
  */
 export class DatabaseService {
+  // Core database connections
   private pool: pg.Pool | undefined;
   private db: any;
+
+  // Connection state tracking
   private isConnected: boolean = false;
   private lastHealthCheck: Date = new Date();
   private connectionAttempts: number = 0;
   private consecutiveFailures: number = 0;
-  private healthCheckInterval: NodeJS.Timeout | null = null;
 
-  // Circuit breaker state management
-  private circuitBreakerState: 'closed' | 'open' | 'half-open' = 'closed';
-  private circuitBreakerThreshold: number = 5; // Open circuit after 5 consecutive failures
-  private circuitBreakerTimeout: number = 60000; // Try to close circuit after 1 minute
+  // Timer references for proper cleanup
+  private healthCheckInterval: NodeJS.Timeout | null = null;
+  private reconnectionTimeout: NodeJS.Timeout | null = null;
+
+  // Circuit breaker implementation
+  private circuitBreakerState: CircuitBreakerState = 'closed';
   private lastCircuitBreakerOpen: Date | null = null;
 
-  // Configurable retry behavior for better control
-  private retryConfig: RetryConfig = {
-    maxAttempts: 3,
-    baseDelay: 1000,
-    maxDelay: 30000, // Cap retry delay at 30 seconds
-    backoffMultiplier: 2
+  // Configurable retry behavior
+  private retryConfig: RetryConfig = { ...DEFAULT_RETRY_CONFIG };
+
+  // Schema for Drizzle ORM
+  private readonly schema = {
+    users,
+    bills,
+    sponsors,
+    comments,
+    notifications,
+    bill_engagement,
+    bill_tracking_preferences
   };
 
-  constructor(config?: Partial<DatabaseConfig>) {
-    // Optimize pool configuration based on environment
-    const poolConfig = this.buildPoolConfig(config);
-    this.pool = new Pool(poolConfig);
-    this.db = drizzle(this.pool, { schema });
-
+  constructor(serviceConfig?: Partial<DatabaseConfig>) {
+    this.initializePool(serviceConfig);
     this.setupConnectionHandlers();
     this.initialize();
   }
 
+  // ==========================================================================
+  // INITIALIZATION METHODS
+  // ==========================================================================
+
   /**
-   * Build optimized pool configuration
-   * Separates configuration logic for better maintainability
+   * Creates the connection pool with optimized configuration
+   * Separates concerns for better testability and maintainability
+   */
+  private initializePool(serviceConfig?: Partial<DatabaseConfig>): void {
+    const poolConfig = this.buildPoolConfig(serviceConfig);
+    this.pool = new Pool(poolConfig);
+    this.db = drizzle(this.pool, { schema: this.schema });
+    this.initializeRepositories();
+  }
+
+  /**
+   * Builds pool configuration with intelligent defaults
+   * Prefers DATABASE_URL for cloud deployments, falls back to individual params
    */
   private buildPoolConfig(serviceConfig?: Partial<DatabaseConfig>): pg.PoolConfig {
     const dbConfig = config.database;
 
-    // Prefer DATABASE_URL for cloud deployments (cleaner and more portable)
+    // Cloud deployment path using connection string
     if (dbConfig.url) {
       return {
         connectionString: dbConfig.url,
-        max: serviceConfig?.max || dbConfig.maxConnections,
-        idleTimeoutMillis: serviceConfig?.idleTimeoutMillis || dbConfig.idleTimeoutMillis,
-        connectionTimeoutMillis: serviceConfig?.connectionTimeoutMillis || dbConfig.connectionTimeoutMillis,
+        max: serviceConfig?.max ?? dbConfig.maxConnections,
+        idleTimeoutMillis: serviceConfig?.idleTimeoutMillis ?? dbConfig.idleTimeoutMillis,
+        connectionTimeoutMillis: serviceConfig?.connectionTimeoutMillis ?? dbConfig.connectionTimeoutMillis,
         ssl: dbConfig.ssl ? { rejectUnauthorized: false } : false,
-        // Add keepalive for long-running connections
         keepAlive: true,
         keepAliveInitialDelayMillis: 10000
       };
     }
 
-    // Fallback to individual parameters for local development
+    // Local development path with individual parameters
     return {
-      host: serviceConfig?.host || dbConfig.host,
-      port: serviceConfig?.port || dbConfig.port,
-      user: serviceConfig?.user || dbConfig.user,
-      password: serviceConfig?.password || dbConfig.password,
-      database: serviceConfig?.database || dbConfig.name,
-      max: serviceConfig?.max || dbConfig.maxConnections,
-      idleTimeoutMillis: serviceConfig?.idleTimeoutMillis || dbConfig.idleTimeoutMillis,
-      connectionTimeoutMillis: serviceConfig?.connectionTimeoutMillis || dbConfig.connectionTimeoutMillis,
-      ssl: serviceConfig?.ssl || (dbConfig.ssl ? { rejectUnauthorized: false } : false),
+      host: serviceConfig?.host ?? dbConfig.host,
+      port: serviceConfig?.port ?? dbConfig.port,
+      user: serviceConfig?.user ?? dbConfig.user,
+      password: serviceConfig?.password ?? dbConfig.password,
+      database: serviceConfig?.database ?? dbConfig.name,
+      max: serviceConfig?.max ?? dbConfig.maxConnections,
+      idleTimeoutMillis: serviceConfig?.idleTimeoutMillis ?? dbConfig.idleTimeoutMillis,
+      connectionTimeoutMillis: serviceConfig?.connectionTimeoutMillis ?? dbConfig.connectionTimeoutMillis,
+      ssl: serviceConfig?.ssl ?? (dbConfig.ssl ? { rejectUnauthorized: false } : false),
       keepAlive: true,
       keepAliveInitialDelayMillis: 10000
     };
   }
 
   /**
-   * Enhanced connection handlers with better error context
+   * Initializes repositories using the repository factory
+   * Creates repositories for all core entities in the schema
+   */
+  private initializeRepositories(): void {
+    // Create repositories for core entities
+    repositoryFactory.createRepository<User>(
+      'users',
+      users,
+      (row: any) => row as User,
+      (entity: User) => entity
+    );
+
+    repositoryFactory.createRepository<Bill>(
+      'bills',
+      bills,
+      (row: any) => row as Bill,
+      (entity: Bill) => entity
+    );
+
+    repositoryFactory.createRepository<Sponsor>(
+      'sponsors',
+      sponsors,
+      (row: any) => row as Sponsor,
+      (entity: Sponsor) => entity
+    );
+
+    repositoryFactory.createRepository<any>(
+      'comments',
+      comments,
+      (row: any) => row,
+      (entity: any) => entity
+    );
+
+    repositoryFactory.createRepository<any>(
+      'notifications',
+      notifications,
+      (row: any) => row,
+      (entity: any) => entity
+    );
+
+    repositoryFactory.createRepository<any>(
+      'bill_engagement',
+      bill_engagement,
+      (row: any) => row,
+      (entity: any) => entity
+    );
+
+    repositoryFactory.createRepository<any>(
+      'bill_tracking_preferences',
+      bill_tracking_preferences,
+      (row: any) => row,
+      (entity: any) => entity
+    );
+
+    logger.info('✅ Repositories initialized successfully', { component: 'Chanuka' });
+  }
+
+  /**
+   * Sets up event listeners for pool lifecycle events
+   * Provides visibility into connection health and issues
    */
   private setupConnectionHandlers(): void {
     if (!this.pool) return;
 
-    this.pool.on('connect', (client) => {
+    this.pool.on('connect', () => {
       logger.info('✅ Database client connected', { component: 'Chanuka' });
-      this.isConnected = true;
-      this.connectionAttempts = 0;
-      this.consecutiveFailures = 0;
-      this.closeCircuitBreaker(); // Reset circuit breaker on successful connection
+      this.handleSuccessfulConnection();
     });
 
-    this.pool.on('error', (err, client) => {
-      errorTracker.trackError(
-        err,
-        {
-          endpoint: 'database_service_pool_error'
-        },
-        'high',
-        'database'
-      );
-      this.isConnected = false;
-      this.incrementFailureCount();
+    this.pool.on('error', (err) => {
+      errorTracker.trackError(err, { endpoint: 'database_service_pool_error' }, 'high', 'database');
+      this.handleConnectionError();
     });
 
-    this.pool.on('remove', (client) => {
+    this.pool.on('remove', () => {
       logger.info('🔄 Database client removed from pool', { component: 'Chanuka' });
-    });
-
-    // Add handler for when a client is acquired from the pool
-    this.pool.on('acquire', (client) => {
-      // Track pool utilization if needed for monitoring
     });
   }
 
   /**
-   * Initialize with non-blocking connection attempt
-   * Prevents startup delays when database is temporarily unavailable
+   * Handles successful connection events
+   * Resets failure counters and circuit breaker state
+   */
+  private handleSuccessfulConnection(): void {
+    this.isConnected = true;
+    this.connectionAttempts = 0;
+    this.consecutiveFailures = 0;
+    this.closeCircuitBreaker();
+  }
+
+  /**
+   * Handles connection errors
+   * Tracks failures and opens circuit breaker if threshold exceeded
+   */
+  private handleConnectionError(): void {
+    this.isConnected = false;
+    this.incrementFailureCount();
+  }
+
+  /**
+   * Performs non-blocking initialization
+   * Allows service to start in degraded mode if database unavailable
    */
   private async initialize(): Promise<void> {
     try {
@@ -176,164 +299,218 @@ export class DatabaseService {
       this.startHealthCheckMonitoring();
       logger.info('✅ Database service initialized successfully', { component: 'Chanuka' });
     } catch (error) {
-      console.warn('⚠️ Initial database connection failed, will retry in background');
+      logger.warn('⚠️ Initial database connection failed, will retry in background', { component: 'Chanuka' });
       this.scheduleReconnection();
-      // Don't throw - allow service to start in degraded mode
     }
   }
 
   /**
-   * Optimized connection test with timeout
+   * Tests database connection with timeout protection
+   * Prevents hanging on unresponsive databases
    */
   private async testConnection(): Promise<void> {
     if (!this.pool) throw new Error('Pool not initialized');
 
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Connection test timeout')), 5000);
+      setTimeout(() => reject(new Error('Connection test timeout')), CONNECTION_TEST_TIMEOUT);
     });
 
-    const connectPromise = (async () => {
-      const client = await this.pool!.connect();
-      try {
-        await client.query('SELECT NOW()');
-        this.isConnected = true;
-      } finally {
-        client.release();
-      }
-    })();
+    const connectPromise = this.attemptConnection();
 
     await Promise.race([connectPromise, timeoutPromise]);
   }
 
   /**
-   * Get current timer status for debugging
+   * Attempts to establish and verify database connection
    */
-  getTimerStatus(): {
-    healthCheckInterval: boolean;
-    reconnectionTimeout: boolean;
-  } {
-    return {
-      healthCheckInterval: this.healthCheckInterval !== null,
-      reconnectionTimeout: this.reconnectionTimeout !== undefined
-    };
+  private async attemptConnection(): Promise<void> {
+    const client = await this.pool!.connect();
+    try {
+      await client.query('SELECT NOW()');
+      this.isConnected = true;
+    } finally {
+      client.release();
+    }
+  }
+
+  // ==========================================================================
+  // HEALTH MONITORING
+  // ==========================================================================
+
+  /**
+   * Starts adaptive health check monitoring
+   * Increases frequency when connection issues detected
+   */
+  private startHealthCheckMonitoring(): void {
+    this.clearHealthCheckInterval();
+
+    const interval = this.isConnected ? HEALTHY_CHECK_INTERVAL : UNHEALTHY_CHECK_INTERVAL;
+    this.healthCheckInterval = setInterval(() => this.performHealthCheck(), interval);
   }
 
   /**
-   * Start health monitoring with adaptive interval
-   * Increases check frequency when issues are detected
+   * Safely clears health check interval
    */
-  private startHealthCheckMonitoring(): void {
-    // Clear existing interval if any
+  private clearHealthCheckInterval(): void {
     if (this.healthCheckInterval) {
       clearInterval(this.healthCheckInterval);
       this.healthCheckInterval = null;
     }
-
-    // Adapt check interval based on connection health
-    const interval = this.isConnected ? 30000 : 10000; // Check more frequently when unhealthy
-
-    this.healthCheckInterval = setInterval(async () => {
-      await this.performHealthCheck();
-    }, interval);
   }
 
   /**
-   * Enhanced health check with circuit breaker integration
+   * Performs health check with circuit breaker integration
+   * Returns detailed health status for monitoring
    */
   private async performHealthCheck(): Promise<HealthCheckResult> {
-    // Skip health check if circuit is open and timeout hasn't elapsed
-    if (this.circuitBreakerState === 'open' && this.lastCircuitBreakerOpen) {
-      const timeSinceOpen = Date.now() - this.lastCircuitBreakerOpen.getTime();
-      if (timeSinceOpen < this.circuitBreakerTimeout) {
-        return {
-          isHealthy: false,
-          responseTime: 0,
-          timestamp: new Date(),
-          consecutiveFailures: this.consecutiveFailures,
-          error: new Error('Circuit breaker is open')
-        };
-      }
-      // Try to transition to half-open state
+    // Fast-fail if circuit breaker is open and hasn't timed out
+    if (this.shouldSkipHealthCheck()) {
+      return this.createCircuitOpenResult();
+    }
+
+    // Transition to half-open state if timeout elapsed
+    if (this.circuitBreakerState === 'open') {
       this.circuitBreakerState = 'half-open';
     }
 
+    return this.executeHealthCheck();
+  }
+
+  /**
+   * Determines if health check should be skipped due to circuit breaker
+   */
+  private shouldSkipHealthCheck(): boolean {
+    if (this.circuitBreakerState !== 'open' || !this.lastCircuitBreakerOpen) {
+      return false;
+    }
+
+    const timeSinceOpen = Date.now() - this.lastCircuitBreakerOpen.getTime();
+    return timeSinceOpen < CIRCUIT_BREAKER_TIMEOUT;
+  }
+
+  /**
+   * Creates result object for when circuit breaker is open
+   */
+  private createCircuitOpenResult(): HealthCheckResult {
+    return {
+      isHealthy: false,
+      responseTime: 0,
+      timestamp: new Date(),
+      consecutiveFailures: this.consecutiveFailures,
+      error: new Error('Circuit breaker is open')
+    };
+  }
+
+  /**
+   * Executes the actual health check query
+   */
+  private async executeHealthCheck(): Promise<HealthCheckResult> {
     const startTime = Date.now();
 
     try {
-      if (!this.pool) throw new Error('Pool not initialized');
-
-      const client = await this.pool!.connect();
-      try {
-        await client.query('SELECT 1');
-        const responseTime = Date.now() - startTime;
-
-        this.lastHealthCheck = new Date();
-        this.isConnected = true;
-        this.consecutiveFailures = 0;
-        this.closeCircuitBreaker();
-
-        // Log slow queries for monitoring
-        if (responseTime > 1000) {
-          console.warn(`⚠️ Slow health check response: ${responseTime}ms`);
-        }
-
-        return {
-          isHealthy: true,
-          responseTime,
-          timestamp: this.lastHealthCheck,
-          consecutiveFailures: 0
-        };
-      } finally {
-        client.release();
-      }
+      const result = await this.performHealthCheckQuery();
+      this.logSlowHealthCheck(result.responseTime);
+      return result;
     } catch (error) {
-      const responseTime = Date.now() - startTime;
-      this.isConnected = false;
-      this.incrementFailureCount();
-
-      errorTracker.trackError(
-        error as Error,
-        {
-          endpoint: 'database_service_health_check'
-        },
-        'medium',
-        'database'
-      );
-
-      // Only schedule reconnection if not already scheduled
-      if (!this.reconnectionTimeout) {
-        this.scheduleReconnection();
-      }
-
-      return {
-        isHealthy: false,
-        responseTime,
-        error: error as Error,
-        timestamp: new Date(),
-        consecutiveFailures: this.consecutiveFailures
-      };
+      return this.handleHealthCheckFailure(error as Error, startTime);
     }
   }
 
   /**
-   * Circuit breaker pattern implementation
-   * Prevents overwhelming a failing database with requests
+   * Performs the health check database query
+   */
+  private async performHealthCheckQuery(): Promise<HealthCheckResult> {
+    if (!this.pool) throw new Error('Pool not initialized');
+
+    const startTime = Date.now();
+    const client = await this.pool.connect();
+
+    try {
+      await client.query('SELECT 1');
+      const responseTime = Date.now() - startTime;
+
+      this.handleHealthCheckSuccess();
+
+      return {
+        isHealthy: true,
+        responseTime,
+        timestamp: this.lastHealthCheck,
+        consecutiveFailures: 0
+      };
+    } finally {
+      client.release();
+    }
+  }
+
+  /**
+   * Handles successful health check
+   */
+  private handleHealthCheckSuccess(): void {
+    this.lastHealthCheck = new Date();
+    this.isConnected = true;
+    this.consecutiveFailures = 0;
+    this.closeCircuitBreaker();
+  }
+
+  /**
+   * Logs warning for slow health checks
+   */
+  private logSlowHealthCheck(responseTime: number): void {
+    if (responseTime > SLOW_HEALTH_CHECK_THRESHOLD) {
+      logger.warn(`⚠️ Slow health check response: ${responseTime}ms`, { component: 'Chanuka' });
+    }
+  }
+
+  /**
+   * Handles health check failures
+   */
+  private handleHealthCheckFailure(error: Error, startTime: number): HealthCheckResult {
+    const responseTime = Date.now() - startTime;
+    this.isConnected = false;
+    this.incrementFailureCount();
+
+    errorTracker.trackError(error, { endpoint: 'database_service_health_check' }, 'medium', 'database');
+
+    if (!this.reconnectionTimeout) {
+      this.scheduleReconnection();
+    }
+
+    return {
+      isHealthy: false,
+      responseTime,
+      error,
+      timestamp: new Date(),
+      consecutiveFailures: this.consecutiveFailures
+    };
+  }
+
+  // ==========================================================================
+  // CIRCUIT BREAKER PATTERN
+  // ==========================================================================
+
+  /**
+   * Increments failure count and opens circuit breaker if threshold reached
    */
   private incrementFailureCount(): void {
     this.consecutiveFailures++;
 
-    if (this.consecutiveFailures >= this.circuitBreakerThreshold &&
-      this.circuitBreakerState === 'closed') {
+    if (this.consecutiveFailures >= CIRCUIT_BREAKER_THRESHOLD && this.circuitBreakerState === 'closed') {
       this.openCircuitBreaker();
     }
   }
 
+  /**
+   * Opens circuit breaker to prevent overwhelming failed database
+   */
   private openCircuitBreaker(): void {
     this.circuitBreakerState = 'open';
     this.lastCircuitBreakerOpen = new Date();
-    console.warn('🔴 Circuit breaker opened - database requests will be blocked temporarily');
+    logger.warn('🔴 Circuit breaker opened - database requests will be blocked temporarily', { component: 'Chanuka' });
   }
 
+  /**
+   * Closes circuit breaker when connection restored
+   */
   private closeCircuitBreaker(): void {
     if (this.circuitBreakerState !== 'closed') {
       this.circuitBreakerState = 'closed';
@@ -342,55 +519,82 @@ export class DatabaseService {
     }
   }
 
+  // ==========================================================================
+  // RECONNECTION LOGIC
+  // ==========================================================================
+
   /**
-   * Optimized reconnection with exponential backoff and jitter
-   * Jitter prevents thundering herd problem when multiple instances reconnect
+   * Schedules reconnection with exponential backoff and jitter
+   * Jitter prevents synchronized retry storms across multiple instances
    */
-  private reconnectionTimeout?: NodeJS.Timeout;
-
   private scheduleReconnection(): void {
-    // Clear any existing reconnection timeout
-    if (this.reconnectionTimeout) {
-      clearTimeout(this.reconnectionTimeout);
-      this.reconnectionTimeout = undefined;
-    }
+    this.clearReconnectionTimeout();
 
-    if (this.connectionAttempts >= this.retryConfig.maxAttempts) {
-      logger.info('🔄 Maximum retry attempts reached, will continue with fallback mode', { component: 'Chanuka' });
+    if (this.hasExceededMaxRetries()) {
+      logger.info('🔄 Maximum retry attempts reached, continuing in fallback mode', { component: 'Chanuka' });
       return;
     }
 
-    // Calculate delay with exponential backoff
-    let delay = this.retryConfig.baseDelay *
-      Math.pow(this.retryConfig.backoffMultiplier, this.connectionAttempts);
-
-    // Cap at maximum delay
-    delay = Math.min(delay, this.retryConfig.maxDelay);
-
-    // Add jitter (random variance of ±25%) to prevent synchronized retries
-    const jitter = delay * 0.25 * (Math.random() * 2 - 1);
-    delay = Math.round(delay + jitter);
-
+    const delay = this.calculateReconnectionDelay();
     this.connectionAttempts++;
 
-    console.log(`🔄 Scheduling reconnection attempt ${this.connectionAttempts}/${this.retryConfig.maxAttempts} in ${delay}ms`);
+    logger.info(`🔄 Scheduling reconnection attempt ${this.connectionAttempts}/${this.retryConfig.maxAttempts} in ${delay}ms`, { component: 'Chanuka' });
 
-    this.reconnectionTimeout = setTimeout(async () => {
-      this.reconnectionTimeout = undefined; // Clear reference before attempting
-
-      try {
-        await this.testConnection();
-        logger.info('✅ Database reconnection successful', { component: 'Chanuka' });
-        this.startHealthCheckMonitoring();
-      } catch (error) {
-        logger.error('❌ Reconnection attempt failed', { component: 'Chanuka', error: (error as Error).message });
-        this.scheduleReconnection(); // Schedule next attempt
-      }
-    }, delay);
+    this.reconnectionTimeout = setTimeout(() => this.attemptReconnection(), delay);
   }
 
   /**
-   * Enhanced fallback execution with performance tracking
+   * Clears pending reconnection timeout
+   */
+  private clearReconnectionTimeout(): void {
+    if (this.reconnectionTimeout) {
+      clearTimeout(this.reconnectionTimeout);
+      this.reconnectionTimeout = null;
+    }
+  }
+
+  /**
+   * Checks if maximum retry attempts exceeded
+   */
+  private hasExceededMaxRetries(): boolean {
+    return this.connectionAttempts >= this.retryConfig.maxAttempts;
+  }
+
+  /**
+   * Calculates delay with exponential backoff and jitter
+   */
+  private calculateReconnectionDelay(): number {
+    let delay = this.retryConfig.baseDelay * Math.pow(this.retryConfig.backoffMultiplier, this.connectionAttempts);
+    delay = Math.min(delay, this.retryConfig.maxDelay);
+
+    // Add jitter (±25%) to prevent thundering herd
+    const jitter = delay * 0.25 * (Math.random() * 2 - 1);
+    return Math.round(delay + jitter);
+  }
+
+  /**
+   * Attempts to reconnect to database
+   */
+  private async attemptReconnection(): Promise<void> {
+    this.reconnectionTimeout = null;
+
+    try {
+      await this.testConnection();
+      logger.info('✅ Database reconnection successful', { component: 'Chanuka' });
+      this.startHealthCheckMonitoring();
+    } catch (error) {
+      logger.error('❌ Reconnection attempt failed', { component: 'Chanuka', error: (error as Error).message });
+      this.scheduleReconnection();
+    }
+  }
+
+  // ==========================================================================
+  // CORE DATABASE OPERATIONS
+  // ==========================================================================
+
+  /**
+   * Executes operation with automatic fallback on failure
+   * Tracks execution time and provides detailed error context
    */
   async withFallback<T>(
     operation: () => Promise<T>,
@@ -402,35 +606,20 @@ export class DatabaseService {
 
     // Fast-fail if circuit breaker is open
     if (this.circuitBreakerState === 'open') {
-      console.log(`⚠️ Circuit breaker open for ${context}, using fallback`);
-      return {
-        data: fallbackData,
-        source: 'fallback',
-        timestamp,
-        executionTime: 0,
-        error: new Error('Circuit breaker is open')
-      };
+      return this.createFallbackResult(fallbackData, timestamp, 0, new Error('Circuit breaker is open'));
     }
 
+    // Use fallback if disconnected (unless in half-open state for testing)
     if (!this.isConnected && this.circuitBreakerState !== 'half-open') {
-      console.log(`⚠️ Database unavailable for ${context}, using fallback data`);
-      return {
-        data: fallbackData,
-        source: 'fallback',
-        timestamp,
-        executionTime: Date.now() - startTime,
-        error: new Error('Database connection unavailable')
-      };
+      logger.warn(`⚠️ Database unavailable for ${context}, using fallback data`, { component: 'Chanuka' });
+      return this.createFallbackResult(fallbackData, timestamp, Date.now() - startTime, new Error('Database connection unavailable'));
     }
 
     try {
       const data = await operation();
       const executionTime = Date.now() - startTime;
 
-      // Log slow operations for performance monitoring
-      if (executionTime > 3000) {
-        console.warn(`⚠️ Slow operation ${context}: ${executionTime}ms`);
-      }
+      this.logSlowOperation(context, executionTime);
 
       return {
         data,
@@ -439,65 +628,83 @@ export class DatabaseService {
         executionTime
       };
     } catch (error) {
-      const executionTime = Date.now() - startTime;
-      errorTracker.trackError(
-        error as Error,
-        {
-          endpoint: `database_service_withFallback_${context}`
-        },
-        'medium',
-        'database'
-      );
-
-      this.isConnected = false;
-      this.incrementFailureCount();
-
-      // Only schedule reconnection if not already scheduled
-      if (!this.reconnectionTimeout) {
-        this.scheduleReconnection();
-      }
-
-      return {
-        data: fallbackData,
-        source: 'fallback',
-        timestamp,
-        executionTime,
-        error: error as Error
-      };
+      return this.handleOperationFailure(error as Error, fallbackData, timestamp, startTime, context);
     }
   }
 
   /**
-   * Transaction execution with automatic retry on serialization failures
+   * Creates fallback result object
+   */
+  private createFallbackResult<T>(
+    fallbackData: T,
+    timestamp: Date,
+    executionTime: number,
+    error: Error
+  ): DatabaseResult<T> {
+    return {
+      data: fallbackData,
+      source: 'fallback',
+      timestamp,
+      executionTime,
+      error
+    };
+  }
+
+  /**
+   * Logs warning for slow operations
+   */
+  private logSlowOperation(context: string, executionTime: number): void {
+    if (executionTime > SLOW_QUERY_THRESHOLD) {
+      logger.warn(`⚠️ Slow operation ${context}: ${executionTime}ms`, { component: 'Chanuka' });
+    }
+  }
+
+  /**
+   * Handles operation failures with appropriate error tracking
+   */
+  private handleOperationFailure<T>(
+    error: Error,
+    fallbackData: T,
+    timestamp: Date,
+    startTime: number,
+    context: string
+  ): DatabaseResult<T> {
+    const executionTime = Date.now() - startTime;
+
+    errorTracker.trackError(error, { endpoint: `database_service_withFallback_${context}` }, 'medium', 'database');
+
+    this.isConnected = false;
+    this.incrementFailureCount();
+
+    if (!this.reconnectionTimeout) {
+      this.scheduleReconnection();
+    }
+
+    return this.createFallbackResult(fallbackData, timestamp, executionTime, error);
+  }
+
+  /**
+   * Executes database transaction with automatic retry on serialization failures
+   * Common in high-concurrency scenarios
    */
   async withTransaction<T>(
     callback: TransactionCallback<T>,
     context: string = 'transaction',
     retryOnSerializationFailure: boolean = true
   ): Promise<DatabaseResult<T>> {
-    const timestamp = new Date();
-    const startTime = Date.now();
-
     if (!this.isConnected) {
       throw new Error(`Database unavailable for transaction: ${context}`);
     }
 
     if (!this.pool) throw new Error('Pool not initialized');
 
-    let attempts = 0;
+    const timestamp = new Date();
+    const startTime = Date.now();
     const maxSerializationRetries = 3;
 
-    while (attempts < maxSerializationRetries) {
-      const client = await this.pool.connect();
-
+    for (let attempts = 0; attempts < maxSerializationRetries; attempts++) {
       try {
-        await client.query('BEGIN');
-
-        const txDb = drizzle(client, { schema });
-        const result = await callback(txDb);
-
-        await client.query('COMMIT');
-
+        const result = await this.executeTransaction(callback);
         const executionTime = Date.now() - startTime;
 
         return {
@@ -507,39 +714,13 @@ export class DatabaseService {
           executionTime
         };
       } catch (error) {
-        await client.query('ROLLBACK');
-
-        // Retry on serialization failures (common in high-concurrency scenarios)
-        const isSerializationError = (error as any).code === '40001' ||
-          (error as any).code === '40P01';
-
-        if (retryOnSerializationFailure && isSerializationError && attempts < maxSerializationRetries - 1) {
-          attempts++;
-          console.warn(`⚠️ Serialization failure in ${context}, retrying (attempt ${attempts})`);
-          client.release();
-          await new Promise(resolve => setTimeout(resolve, 100 * attempts)); // Small delay before retry
+        if (this.shouldRetryTransaction(error as any, retryOnSerializationFailure, attempts, maxSerializationRetries)) {
+          await this.delayBeforeRetry(attempts);
           continue;
         }
 
-        errorTracker.trackError(
-          error as Error,
-          {
-            endpoint: `database_service_transaction_${context}`
-          },
-          'high',
-          'database'
-        );
-
-        // Only schedule reconnection if not already scheduled and this is a connection error
-        if (!this.reconnectionTimeout && (error as any).code && ['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT'].includes((error as any).code)) {
-          this.isConnected = false;
-          this.incrementFailureCount();
-          this.scheduleReconnection();
-        }
-
+        this.handleTransactionError(error as Error, context);
         throw error;
-      } finally {
-        client.release();
       }
     }
 
@@ -547,64 +728,63 @@ export class DatabaseService {
   }
 
   /**
-   * Get comprehensive connection status with pool metrics
+   * Executes single transaction attempt
    */
-  getConnectionStatus(): {
-    isConnected: boolean;
-    lastHealthCheck: Date;
-    connectionAttempts: number;
-    consecutiveFailures: number;
-    circuitBreakerState: string;
-    poolStats: {
-      totalCount: number | undefined;
-      idleCount: number | undefined;
-      waitingCount: number | undefined;
-    } | undefined;
-  } {
-    return {
-      isConnected: this.isConnected,
-      lastHealthCheck: this.lastHealthCheck,
-      connectionAttempts: this.connectionAttempts,
-      consecutiveFailures: this.consecutiveFailures,
-      circuitBreakerState: this.circuitBreakerState,
-      poolStats: this.pool ? {
-        totalCount: this.pool.totalCount,
-        idleCount: this.pool.idleCount,
-        waitingCount: this.pool.waitingCount
-      } : undefined
-    };
+  private async executeTransaction<T>(callback: TransactionCallback<T>): Promise<T> {
+    const client = await this.pool!.connect();
+
+    try {
+      await client.query('BEGIN');
+      const txDb = drizzle(client, { schema: this.schema });
+      const result = await callback(txDb);
+      await client.query('COMMIT');
+      return result;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   }
 
   /**
-   * Get database instance - use sparingly, prefer withFallback
+   * Determines if transaction should be retried
    */
-  getDatabase() {
-    return this.db;
+  private shouldRetryTransaction(
+    error: any,
+    retryOnSerializationFailure: boolean,
+    attempts: number,
+    maxRetries: number
+  ): boolean {
+    const isSerializationError = error.code === '40001' || error.code === '40P01';
+    return retryOnSerializationFailure && isSerializationError && attempts < maxRetries - 1;
   }
 
   /**
-   * Get pool for advanced operations
+   * Delays before retrying transaction
    */
-  getPool() {
-    return this.pool;
+  private async delayBeforeRetry(attempts: number): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, SERIALIZATION_RETRY_DELAY * (attempts + 1)));
   }
 
   /**
-   * Check if service has active timers (for debugging hanging tests)
+   * Handles transaction errors
    */
-  hasActiveTimers(): boolean {
-    return this.healthCheckInterval !== null || this.reconnectionTimeout !== undefined;
+  private handleTransactionError(error: Error, context: string): void {
+    errorTracker.trackError(error, { endpoint: `database_service_transaction_${context}` }, 'high', 'database');
+
+    const errorCode = (error as any).code;
+    const isConnectionError = errorCode && ['ECONNREFUSED', 'ENOTFOUND', 'ETIMEDOUT'].includes(errorCode);
+
+    if (!this.reconnectionTimeout && isConnectionError) {
+      this.isConnected = false;
+      this.incrementFailureCount();
+      this.scheduleReconnection();
+    }
   }
 
   /**
-   * Manual health check trigger
-   */
-  async getHealthStatus(): Promise<HealthCheckResult> {
-    return await this.performHealthCheck();
-  }
-
-  /**
-   * Execute raw SQL with automatic parameterization safety check
+   * Executes raw SQL query with parameterization
    */
   async executeRawQuery<T>(
     query: string,
@@ -630,28 +810,7 @@ export class DatabaseService {
   }
 
   /**
-   * Shutdown method to clean up all timers and resources
-   */
-  shutdown(): void {
-    logger.info('🛑 Shutting down database service...', { component: 'Chanuka' });
-
-    // Clear all timers
-    if (this.healthCheckInterval) {
-      clearInterval(this.healthCheckInterval);
-      this.healthCheckInterval = null;
-    }
-
-    if (this.reconnectionTimeout) {
-      clearTimeout(this.reconnectionTimeout);
-      this.reconnectionTimeout = undefined;
-    }
-
-    // Note: We don't close the pool here as that should be done via close()
-    // This method is for cleaning up timers only
-  }
-
-  /**
-   * Optimized batch execution with parallel processing option
+   * Executes batch operations with optional parallel processing
    */
   async batchExecute<T = any>(
     operations: Array<(tx: any) => Promise<T>>,
@@ -661,160 +820,188 @@ export class DatabaseService {
     return this.withTransaction(
       async (tx) => {
         if (parallel) {
-          // Execute operations in parallel for better performance
-          // Only safe when operations don't depend on each other
-          const results = await Promise.all(operations.map(op => op(tx)));
-          return results;
-        } else {
-          // Sequential execution for dependent operations
-          const results: T[] = [];
-          for (const operation of operations) {
-            const result = await operation(tx);
-            results.push(result);
-          }
-          return results;
+          return Promise.all(operations.map(op => op(tx)));
         }
+
+        const results: T[] = [];
+        for (const operation of operations) {
+          results.push(await operation(tx));
+        }
+        return results;
       },
       context
     );
   }
 
+  // ==========================================================================
+  // PUBLIC API METHODS
+  // ==========================================================================
+
   /**
-   * Graceful shutdown with connection draining
+   * Returns current connection status with pool metrics
    */
-  async close(): Promise<void> {
-    logger.info('🔄 Initiating graceful database shutdown...', { component: 'Chanuka' });
+  getConnectionStatus(): ConnectionStatus {
+    const status: ConnectionStatus = {
+      isConnected: this.isConnected,
+      lastHealthCheck: this.lastHealthCheck,
+      connectionAttempts: this.connectionAttempts,
+      consecutiveFailures: this.consecutiveFailures,
+      circuitBreakerState: this.circuitBreakerState
+    };
 
-    // Clear all timers to prevent hanging
-    if (this.healthCheckInterval) {
-      clearInterval(this.healthCheckInterval);
-      this.healthCheckInterval = null;
+    if (this.pool) {
+      status.poolStats = {
+        totalCount: this.pool.totalCount,
+        idleCount: this.pool.idleCount,
+        waitingCount: this.pool.waitingCount
+      };
     }
 
-    if (this.reconnectionTimeout) {
-      clearTimeout(this.reconnectionTimeout);
-      this.reconnectionTimeout = undefined;
-    }
-
-    try {
-      // Wait for active connections to complete (with timeout)
-      const drainTimeout = 10000; // 10 seconds
-      if (this.pool && this.pool.end) {
-        const drainPromise = this.pool.end() as Promise<void>;
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('Drain timeout')), drainTimeout)
-        );
-
-        await Promise.race([drainPromise, timeoutPromise]);
-        logger.info('✅ Database connections closed gracefully', { component: 'Chanuka' });
-      }
-    } catch (error) {
-      errorTracker.trackError(
-        error as Error,
-        {
-          endpoint: 'database_service_close'
-        },
-        'medium',
-        'database'
-      );
-      // Force close if graceful shutdown fails
-      if (this.pool && this.pool.end) {
-        this.pool.end();
-      }
-    }
+    return status;
   }
 
   /**
-   * Force reconnection with circuit breaker reset
+   * Triggers manual health check
+   */
+  async getHealthStatus(): Promise<HealthCheckResult> {
+    return this.performHealthCheck();
+  }
+
+  /**
+   * Returns Drizzle database instance
+   */
+  getDatabase() {
+    return this.db;
+  }
+
+  /**
+   * Returns connection pool for advanced operations
+   */
+  getPool() {
+    return this.pool;
+  }
+
+  /**
+   * Checks if service has active timers (useful for debugging)
+   */
+  hasActiveTimers(): boolean {
+    return this.healthCheckInterval !== null || this.reconnectionTimeout !== null;
+  }
+
+  /**
+   * Returns timer status for debugging
+   */
+  getTimerStatus(): { healthCheckInterval: boolean; reconnectionTimeout: boolean } {
+    return {
+      healthCheckInterval: this.healthCheckInterval !== null,
+      reconnectionTimeout: this.reconnectionTimeout !== null
+    };
+  }
+
+  /**
+   * Updates retry configuration at runtime
+   */
+  updateRetryConfig(config: Partial<RetryConfig>): void {
+    this.retryConfig = { ...this.retryConfig, ...config };
+    logger.info('🔧 Retry configuration updated', { component: 'Chanuka', config: this.retryConfig });
+  }
+
+  /**
+   * Forces immediate reconnection attempt
    */
   async forceReconnect(): Promise<void> {
     logger.info('🔄 Forcing database reconnection...', { component: 'Chanuka' });
 
-    // Clear any pending reconnection timeout
-    if (this.reconnectionTimeout) {
-      clearTimeout(this.reconnectionTimeout);
-      this.reconnectionTimeout = undefined;
-    }
-
+    this.clearReconnectionTimeout();
     this.isConnected = false;
     this.connectionAttempts = 0;
     this.consecutiveFailures = 0;
     this.closeCircuitBreaker();
+
     await this.initialize();
   }
 
   /**
-   * Update retry configuration dynamically
+   * Performs graceful shutdown with connection draining
    */
-  updateRetryConfig(config: Partial<RetryConfig>): void {
-    this.retryConfig = { ...this.retryConfig, ...config };
-    logger.info('🔧 Retry configuration updated:', { component: 'Chanuka' }, this.retryConfig);
+  async close(): Promise<void> {
+    logger.info('🔄 Initiating graceful database shutdown...', { component: 'Chanuka' });
+
+    this.clearAllTimers();
+
+    if (!this.pool?.end) return;
+
+    try {
+      await this.drainConnectionPool();
+      logger.info('✅ Database connections closed gracefully', { component: 'Chanuka' });
+    } catch (error) {
+      this.handleShutdownError(error as Error);
+    }
   }
 
   /**
-   * Force cleanup of all timers (for testing/debugging)
+   * Clears all active timers
+   */
+  private clearAllTimers(): void {
+    this.clearHealthCheckInterval();
+    this.clearReconnectionTimeout();
+  }
+
+  /**
+   * Drains connection pool with timeout
+   */
+  private async drainConnectionPool(): Promise<void> {
+    const drainPromise = this.pool!.end() as Promise<void>;
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Drain timeout')), DRAIN_TIMEOUT)
+    );
+
+    await Promise.race([drainPromise, timeoutPromise]);
+  }
+
+  /**
+   * Handles errors during shutdown
+   */
+  private handleShutdownError(error: Error): void {
+    errorTracker.trackError(error, { endpoint: 'database_service_close' }, 'medium', 'database');
+
+    if (this.pool?.end) {
+      this.pool.end();
+    }
+  }
+
+  /**
+   * Forces immediate cleanup of all timers (for testing)
    */
   forceCleanupTimers(): void {
-    if (this.healthCheckInterval) {
-      clearInterval(this.healthCheckInterval);
-      this.healthCheckInterval = null;
-    }
-
-    if (this.reconnectionTimeout) {
-      clearTimeout(this.reconnectionTimeout);
-      this.reconnectionTimeout = undefined;
-    }
-
+    this.clearAllTimers();
     logger.info('🧹 Forced cleanup of all timers', { component: 'Chanuka' });
+  }
+
+  /**
+   * Shuts down without closing pool (timer cleanup only)
+   */
+  shutdown(): void {
+    logger.info('🛑 Shutting down database service...', { component: 'Chanuka' });
+    this.clearAllTimers();
   }
 }
 
-// Export singleton instance
+// ============================================================================
+// SINGLETON EXPORT
+// ============================================================================
+
 export const databaseService = new DatabaseService();
 
-// Export types
-export type { DatabaseResult, HealthCheckResult, TransactionCallback, RetryConfig };
+// ============================================================================
+// TYPE EXPORTS
+// ============================================================================
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export type {
+  DatabaseResult,
+  HealthCheckResult,
+  TransactionCallback,
+  RetryConfig,
+  ConnectionStatus,
+  CircuitBreakerState
+};

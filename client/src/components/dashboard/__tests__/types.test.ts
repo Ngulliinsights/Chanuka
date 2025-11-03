@@ -23,35 +23,34 @@ describe('Dashboard Types', () => {
         title: 'Test Action',
         description: 'Test Description',
         priority: 'High',
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       };
 
       expect(actionItem.id).toBeDefined();
       expect(actionItem.title).toBeDefined();
       expect(actionItem.description).toBeDefined();
       expect(actionItem.priority).toBeDefined();
-      expect(actionItem.createdAt).toBeDefined();
-      expect(actionItem.updatedAt).toBeDefined();
+      expect(actionItem.created_at).toBeDefined();
+      expect(actionItem.updated_at).toBeDefined();
     });
 
-    it('should support optional properties', () => {
-      const actionItem: ActionItem = {
+    it('should support optional properties', () => { const actionItem: ActionItem = {
         id: 'action-1',
         title: 'Test Action',
         description: 'Test Description',
         priority: 'High',
         dueDate: new Date(),
         category: 'Legislative',
-        billId: 'bill-123',
+        bill_id: 'bill-123',
         completed: true,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
+        created_at: new Date(),
+        updated_at: new Date()
+       };
 
       expect(actionItem.dueDate).toBeDefined();
       expect(actionItem.category).toBeDefined();
-      expect(actionItem.billId).toBeDefined();
+      expect(actionItem.bill_id).toBeDefined();
       expect(actionItem.completed).toBeDefined();
     });
 
@@ -64,8 +63,8 @@ describe('Dashboard Types', () => {
           title: 'Test Action',
           description: 'Test Description',
           priority,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          created_at: new Date(),
+          updated_at: new Date()
         };
 
         expect(actionItem.priority).toBe(priority);
@@ -102,16 +101,16 @@ describe('Dashboard Types', () => {
         name: 'Healthcare',
         category: 'legislative',
         billCount: 5,
-        isActive: true,
-        createdAt: new Date()
+        is_active: true,
+        created_at: new Date()
       };
 
       expect(topic.id).toBeDefined();
       expect(topic.name).toBeDefined();
       expect(topic.category).toBeDefined();
       expect(typeof topic.billCount).toBe('number');
-      expect(typeof topic.isActive).toBe('boolean');
-      expect(topic.createdAt).toBeInstanceOf(Date);
+      expect(typeof topic.is_active).toBe('boolean');
+      expect(topic.created_at).toBeInstanceOf(Date);
     });
 
     it('should accept valid category values', () => {
@@ -123,8 +122,8 @@ describe('Dashboard Types', () => {
           name: 'Test Topic',
           category,
           billCount: 0,
-          isActive: true,
-          createdAt: new Date()
+          is_active: true,
+          created_at: new Date()
         };
 
         expect(topic.category).toBe(category);
@@ -137,8 +136,8 @@ describe('Dashboard Types', () => {
         name: 'Healthcare',
         category: 'legislative',
         billCount: 5,
-        isActive: true,
-        createdAt: new Date(),
+        is_active: true,
+        created_at: new Date(),
         description: 'Healthcare related bills',
         keywords: ['health', 'medical', 'insurance']
       };

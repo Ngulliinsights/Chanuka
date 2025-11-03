@@ -3,7 +3,7 @@
 // Maintains backward compatibility with the original API
 
 import { readDatabase } from '@shared/database/connection';
-import { sponsors } from "@shared/schema";
+import { sponsors } from "@shared/foundation";
 import { eq, desc } from "drizzle-orm";
 import { cache, logger, DatabaseError } from '@shared/core';
 import { FinancialDisclosureConfig } from './config';
@@ -43,8 +43,8 @@ export class FinancialDisclosureOrchestratorService {
   /**
    * Retrieves financial disclosure data with enrichment and caching.
    */
-  async getDisclosureData(sponsorId?: number): Promise<FinancialDisclosure[]> {
-    return disclosureProcessingService.getDisclosureData(sponsorId);
+  async getDisclosureData(sponsor_id?: number): Promise<FinancialDisclosure[]> {
+    return disclosureProcessingService.getDisclosureData(sponsor_id);
   }
 
   // ============================================================================
@@ -54,8 +54,8 @@ export class FinancialDisclosureOrchestratorService {
   /**
    * Calculates a comprehensive completeness score using multiple dimensions.
    */
-  async calculateCompletenessScore(sponsorId: number): Promise<CompletenessReport> {
-    return disclosureValidationService.calculateCompletenessScore(sponsorId);
+  async calculateCompletenessScore(sponsor_id: number): Promise<CompletenessReport> {
+    return disclosureValidationService.calculateCompletenessScore(sponsor_id);
   }
 
   // ============================================================================
@@ -66,8 +66,8 @@ export class FinancialDisclosureOrchestratorService {
    * Builds a comprehensive relationship map that reveals networks of financial
    * connections and potential conflicts of interest.
    */
-  async buildRelationshipMap(sponsorId: number): Promise<RelationshipMapping> {
-    return financialAnalysisService.buildRelationshipMap(sponsorId);
+  async buildRelationshipMap(sponsor_id: number): Promise<RelationshipMapping> {
+    return financialAnalysisService.buildRelationshipMap(sponsor_id);
   }
 
   // ============================================================================
@@ -127,17 +127,17 @@ export class FinancialDisclosureOrchestratorService {
   /**
    * Performs comprehensive analysis combining completeness, relationships, and anomalies.
    */
-  async performComprehensiveAnalysis(sponsorId: number) {
+  async performComprehensiveAnalysis(sponsor_id: number) {
     try {
       // Execute all analyses in parallel
       const [completeness, relationships, anomalies] = await Promise.all([
-        disclosureValidationService.calculateCompletenessScore(sponsorId),
-        financialAnalysisService.buildRelationshipMap(sponsorId),
-        anomalyDetectionService.detectAnomalies(sponsorId)
+        disclosureValidationService.calculateCompletenessScore(sponsor_id),
+        financialAnalysisService.buildRelationshipMap(sponsor_id),
+        anomalyDetectionService.detectAnomalies(sponsor_id)
       ]);
 
       return {
-        sponsorId,
+        sponsor_id,
         completenessReport: completeness,
         relationshipMapping: relationships,
         anomalyDetection: anomalies,
@@ -145,7 +145,7 @@ export class FinancialDisclosureOrchestratorService {
         analysisDate: new Date()
       };
     } catch (error) {
-      logger.error('Error performing comprehensive analysis:', { sponsorId }, error);
+      logger.error('Error performing comprehensive analysis:', { sponsor_id }, error);
       throw new DatabaseError('Failed to perform comprehensive financial analysis');
     }
   }
@@ -153,8 +153,8 @@ export class FinancialDisclosureOrchestratorService {
   /**
    * Gets enhanced sponsor insights with anomaly detection.
    */
-  async getSponsorInsights(sponsorId: number) {
-    const analysis = await this.performComprehensiveAnalysis(sponsorId);
+  async getSponsorInsights(sponsor_id: number) {
+    const analysis = await this.performComprehensiveAnalysis(sponsor_id);
     
     return {
       ...analysis,
@@ -174,7 +174,7 @@ export class FinancialDisclosureOrchestratorService {
     const activeSponsors = await readDatabase
       .select({ id: sponsors.id })
       .from(sponsors)
-      .where(eq(sponsors.isActive, true))
+      .where(eq(sponsors.is_active, true))
       .limit(100);
 
     const riskCounts = { low: 0, medium: 0, high: 0, critical: 0 };
@@ -182,7 +182,7 @@ export class FinancialDisclosureOrchestratorService {
     // Calculate risk for each sponsor
     for (const sponsor of activeSponsors) {
       try {
-        const report = await disclosureValidationService.calculateCompletenessScore(sponsor.id);
+        const report = await disclosureValidationService.calculateCompletenessScore(sponsors.id);
         riskCounts[report.riskAssessment]++;
       } catch {
         // Skip sponsors that error out during calculation
@@ -200,7 +200,7 @@ export class FinancialDisclosureOrchestratorService {
     const activeSponsors = await readDatabase
       .select({ id: sponsors.id, name: sponsors.name })
       .from(sponsors)
-      .where(eq(sponsors.isActive, true))
+      .where(eq(sponsors.is_active, true))
       .limit(100);
 
     // Calculate completeness reports for all sponsors
@@ -226,7 +226,7 @@ export class FinancialDisclosureOrchestratorService {
       .sort((a, b) => b.overallScore - a.overallScore)
       .slice(0, 5)
       .map(r => ({
-        sponsorId: r.sponsorId,
+        sponsor_id: r.sponsor_id,
         sponsorName: r.sponsorName,
         score: r.overallScore
       }));
@@ -237,7 +237,7 @@ export class FinancialDisclosureOrchestratorService {
       .sort((a, b) => a.overallScore - b.overallScore)
       .slice(0, 10)
       .map(r => ({
-        sponsorId: r.sponsorId,
+        sponsor_id: r.sponsor_id,
         sponsorName: r.sponsorName,
         score: r.overallScore,
         riskLevel: r.riskAssessment

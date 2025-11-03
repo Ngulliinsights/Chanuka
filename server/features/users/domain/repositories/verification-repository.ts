@@ -1,25 +1,24 @@
 import { CitizenVerification, VerificationType } from '../entities/citizen-verification';
 
-export interface VerificationRepository {
-  // Basic CRUD operations
+export interface VerificationRepository { // Basic CRUD operations
   findById(id: string): Promise<CitizenVerification | null>;
-  findByBillId(billId: number): Promise<CitizenVerification[]>;
+  findByBillId(bill_id: number): Promise<CitizenVerification[]>;
   findByCitizenId(citizenId: string): Promise<CitizenVerification[]>;
   save(verification: CitizenVerification): Promise<void>;
   update(verification: CitizenVerification): Promise<void>;
   delete(id: string): Promise<void>;
 
   // Query operations
-  findByType(billId: number, type: VerificationType): Promise<CitizenVerification[]>;
-  findByStatus(billId: number, status: string): Promise<CitizenVerification[]>;
-  findByConfidenceRange(billId: number, min: number, max: number): Promise<CitizenVerification[]>;
+  findByType(bill_id: number, type: VerificationType): Promise<CitizenVerification[]>;
+  findByStatus(bill_id: number, status: string): Promise<CitizenVerification[]>;
+  findByConfidenceRange(bill_id: number, min: number, max: number): Promise<CitizenVerification[]>;
   findRecentVerifications(limit: number): Promise<CitizenVerification[]>;
 
   // Aggregation operations
-  countByBillId(billId: number): Promise<number>;
-  countByStatus(billId: number): Promise<Record<string, number>>;
-  getAverageConfidence(billId: number): Promise<number>;
-  getExpertiseDistribution(billId: number): Promise<Record<string, number>>;
+  countByBillId(bill_id: number): Promise<number>;
+  countByStatus(bill_id: number): Promise<Record<string, number>>;
+  getAverageConfidence(bill_id: number): Promise<number>;
+  getExpertiseDistribution(bill_id: number): Promise<Record<string, number>>;
 
   // Community operations
   findEndorsements(verificationId: string): Promise<string[]>; // Returns citizen IDs
@@ -30,16 +29,16 @@ export interface VerificationRepository {
   removeDispute(verificationId: string, citizenId: string): Promise<void>;
 
   // Fact-checking operations
-  findRelevantVerifications(billId: number, claim: string): Promise<CitizenVerification[]>;
+  findRelevantVerifications(bill_id: number, claim: string): Promise<CitizenVerification[]>;
   getConsensusLevel(verificationId: string): Promise<number>;
   getCommunityConsensus(verificationId: string): Promise<number>;
 
   // Bulk operations
   updateStatusBulk(verificationIds: string[], status: string): Promise<void>;
-  deleteByBillId(billId: number): Promise<void>;
+  deleteByBillId(bill_id: number): Promise<void>;
 
   // Statistics
-  getVerificationStats(billId: number): Promise<{
+  getVerificationStats(bill_id: number): Promise<{
     total: number;
     verified: number;
     disputed: number;
@@ -47,7 +46,7 @@ export interface VerificationRepository {
     needsReview: number;
     averageConfidence: number;
     reliabilityScore: number;
-  }>;
+   }>;
 }
 
 

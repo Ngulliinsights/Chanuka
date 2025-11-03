@@ -184,9 +184,9 @@ export const propertyLegalSchema = z.object({
  * Property verification schema
  */
 export const propertyVerificationSchema = z.object({
-  isVerified: z.boolean().default(false),
+  is_verified: z.boolean().default(false),
   verificationDate: z.coerce.date().optional(),
-  verifiedBy: uuidSchema.optional(),
+  verified_by: uuidSchema.optional(),
   verificationDocuments: z.array(z.string()).optional(),
   inspectionDate: z.coerce.date().optional(),
   inspectionReport: urlSchema.optional(),
@@ -206,12 +206,12 @@ export const propertySchema = propertyBasicSchema
   .merge(propertyVerificationSchema)
   .extend({
     id: uuidSchema.optional(),
-    createdAt: z.coerce.date().optional(),
-    updatedAt: z.coerce.date().optional(),
+    created_at: z.coerce.date().optional(),
+    updated_at: z.coerce.date().optional(),
     listingAgent: uuidSchema.optional(),
     listingDate: z.coerce.date().optional(),
     expirationDate: z.coerce.date().optional(),
-    viewCount: z.number().int().min(0).default(0),
+    view_count: z.number().int().min(0).default(0),
     favoriteCount: z.number().int().min(0).default(0),
     tags: z.array(z.string().max(30)).max(20, 'Too many tags').optional(),
   });

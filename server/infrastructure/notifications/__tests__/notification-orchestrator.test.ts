@@ -17,24 +17,22 @@ describe('NotificationOrchestratorService - basic utilities', () => {
 		await service.cleanup();
 	});
 
-	test('validateRequest rejects missing fields', () => {
-		// Access private method via any cast
+	test('validateRequest rejects missing fields', () => { // Access private method via any cast
 		const validate = (service as any).validateRequest.bind(service) as (req: any) => string | null;
 
-		expect(validate(undefined as any)).toBe('Invalid or missing userId');
+		expect(validate(undefined as any)).toBe('Invalid or missing user_id');
 
-		const missingContent = validate({ userId: 'u1', notificationType: 'bill_update', priority: 'low' });
+		const missingContent = validate({ user_id: 'u1', notificationType: 'bill_update', priority: 'low'  });
 		expect(missingContent).toBe('Invalid or missing content');
 	});
 
-	test('getBatchKey produces expected patterns', () => {
-		const getBatchKey = (service as any).getBatchKey.bind(service) as (userId: string, freq: string) => string;
+	test('getBatchKey produces expected patterns', () => { const getBatchKey = (service as any).getBatchKey.bind(service) as (user_id: string, freq: string) => string;
 
 		const daily = getBatchKey('user-123', 'daily');
 		expect(daily).toMatch(/user-123-daily-/);
 
 		const hourly = getBatchKey('u', 'hourly');
-		expect(hourly).toMatch(/u-hourly-\d{4}-\d{2}-\d{2}-\d{2}/);
+		expect(hourly).toMatch(/u-hourly-\d{4 }-\d{2}-\d{2}-\d{2}/);
 
 		const immediate = getBatchKey('u', 'immediate');
 		expect(immediate).toMatch(/u-immediate-\d{4}-\d{2}-\d{2}-\d{2}-\d{2}/);

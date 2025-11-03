@@ -18,8 +18,7 @@ export function performanceTrackingMiddleware(
   req: AuthenticatedRequest,
   res: any,
   next: NextFunction
-): void {
-  const startTime = Date.now();
+): void { const startTime = Date.now();
   const originalEnd = res.end;
 
   // Override res.end to capture response completion
@@ -36,24 +35,23 @@ export function performanceTrackingMiddleware(
         path: req.path,
         duration,
         threshold: analyticsConfig.performance.slowRequestThreshold,
-        userId: req.analyticsContext?.userId,
-        userAgent: req.headers['user-agent'],
+        user_id: req.analyticsContext?.user_id,
+        user_agent: req.headers['user-agent'],
         statusCode: res.statusCode
-      });
+       });
     }
 
     // Track API metrics using performance monitor
-    performanceMonitor.recordMetric({
-      name: `api_request_duration`,
+    performanceMonitor.recordMetric({ name: `api_request_duration`,
       value: duration,
       unit: 'ms',
       metadata: {
         method: req.method,
         path: req.route?.path || req.path,
         statusCode: res.statusCode,
-        userId: req.analyticsContext?.userId,
+        user_id: req.analyticsContext?.user_id,
         traceId
-      }
+       }
     });
 
     // Add performance headers for debugging
@@ -84,16 +82,15 @@ export function trackAnalyticsOperation(
   };
 
   // Use the performance monitoring utility
-  performanceMonitor.recordMetric({
-    name: `analytics_operation_duration`,
+  performanceMonitor.recordMetric({ name: `analytics_operation_duration`,
     value: duration,
     unit: 'ms',
     metadata: {
       operation,
       component: 'analytics',
-      userId: metadata?.userId,
+      user_id: metadata?.user_id,
       ...metadata
-    }
+     }
   });
 }
 

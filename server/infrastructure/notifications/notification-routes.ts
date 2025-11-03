@@ -47,23 +47,22 @@ const markReadSchema = z.object({
  * Get user notifications with pagination and filtering
  * Consolidated from notifications.ts
  */
-router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated' }, 401);
+router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Response) => { try {
+    const user_id = req.user?.id;
+    if (!user_id) {
+      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated'  }, 401);
     }
 
     const query = notificationQuerySchema.parse(req.query);
 
-    const notifications = await notificationService.getUserNotifications(userId, {
+    const notifications = await notificationService.getUserNotifications(user_id, {
       limit: query.limit,
       offset: query.page ? (query.page - 1) * (query.limit || 20) : 0,
       unreadOnly: query.unreadOnly,
       type: query.type
     });
 
-    const unreadCount = await notificationService.getUnreadCount(userId);
+    const unreadCount = await notificationService.getUnreadCount(user_id);
 
     return ApiSuccess(res, {
       notifications,
@@ -90,23 +89,21 @@ router.get('/', authenticateToken, async (req: AuthenticatedRequest, res: Respon
  * Create a new notification
  * Consolidated from notifications.ts
  */
-router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated' }, 401);
+router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Response) => { try {
+    const user_id = req.user?.id;
+    if (!user_id) {
+      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated'  }, 401);
     }
 
     const notificationData = createNotificationSchema.parse(req.body);
 
-    const notification = await notificationService.createNotification({
-      userId,
+    const notification = await notificationService.createNotification({ user_id,
       type: notificationData.type,
       title: notificationData.title,
       message: notificationData.message,
       relatedBillId: notificationData.relatedBillId,
       metadata: notificationData.metadata
-    });
+     });
 
     return ApiSuccess(res, notification, {}, 201);
 
@@ -125,11 +122,10 @@ router.post('/', authenticateToken, async (req: AuthenticatedRequest, res: Respo
  * Mark notification as read
  * Consolidated from notifications.ts
  */
-router.patch('/:id/read', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated' }, 401);
+router.patch('/:id/read', authenticateToken, async (req: AuthenticatedRequest, res: Response) => { try {
+    const user_id = req.user?.id;
+    if (!user_id) {
+      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated'  }, 401);
     }
 
     const notificationId = parseInt(req.params.id);
@@ -137,7 +133,7 @@ router.patch('/:id/read', authenticateToken, async (req: AuthenticatedRequest, r
       return ApiError(res, { code: 'INVALID_ID', message: 'Invalid notification ID' }, 400);
     }
 
-    await notificationService.markAsRead(userId, notificationId);
+    await notificationService.markAsRead(user_id, notificationId);
 
     return ApiSuccess(res, { message: 'Notification marked as read' });
 
@@ -151,14 +147,13 @@ router.patch('/:id/read', authenticateToken, async (req: AuthenticatedRequest, r
  * Mark all notifications as read
  * Consolidated from notifications.ts
  */
-router.patch('/read-all', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated' }, 401);
+router.patch('/read-all', authenticateToken, async (req: AuthenticatedRequest, res: Response) => { try {
+    const user_id = req.user?.id;
+    if (!user_id) {
+      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated'  }, 401);
     }
 
-    await notificationService.markAllAsRead(userId);
+    await notificationService.markAllAsRead(user_id);
 
     return ApiSuccess(res, { message: 'All notifications marked as read' });
 
@@ -171,11 +166,10 @@ router.patch('/read-all', authenticateToken, async (req: AuthenticatedRequest, r
 /**
  * Delete notification
  */
-router.delete('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated' }, 401);
+router.delete('/:id', authenticateToken, async (req: AuthenticatedRequest, res: Response) => { try {
+    const user_id = req.user?.id;
+    if (!user_id) {
+      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated'  }, 401);
     }
 
     const notificationId = parseInt(req.params.id);
@@ -183,7 +177,7 @@ router.delete('/:id', authenticateToken, async (req: AuthenticatedRequest, res: 
       return ApiError(res, { code: 'INVALID_ID', message: 'Invalid notification ID' }, 400);
     }
 
-    await notificationService.deleteNotification(userId, notificationId);
+    await notificationService.deleteNotification(user_id, notificationId);
 
     return ApiSuccess(res, { message: 'Notification deleted' });
 
@@ -196,14 +190,13 @@ router.delete('/:id', authenticateToken, async (req: AuthenticatedRequest, res: 
 /**
  * Get notification statistics
  */
-router.get('/stats', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated' }, 401);
+router.get('/stats', authenticateToken, async (req: AuthenticatedRequest, res: Response) => { try {
+    const user_id = req.user?.id;
+    if (!user_id) {
+      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated'  }, 401);
     }
 
-    const stats = await notificationService.getNotificationStats(userId);
+    const stats = await notificationService.getNotificationStats(user_id);
 
     return ApiSuccess(res, stats);
 
@@ -219,15 +212,14 @@ router.get('/stats', authenticateToken, async (req: AuthenticatedRequest, res: R
  * Get user's enhanced notification preferences
  * Consolidated from enhanced-notifications.ts
  */
-router.get('/preferences/enhanced', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated' }, 401);
+router.get('/preferences/enhanced', authenticateToken, async (req: AuthenticatedRequest, res: Response) => { try {
+    const user_id = req.user?.id;
+    if (!user_id) {
+      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated'  }, 401);
     }
 
-    const preferences = await userPreferencesService.getUserPreferences(userId);
-    const engagementProfile = await smartNotificationFilterService.getEngagementProfileForUser(userId);
+    const preferences = await userPreferencesService.getUserPreferences(user_id);
+    const engagementProfile = await smartNotificationFilterService.getEngagementProfileForUser(user_id);
 
     return ApiSuccess(res, {
       preferences,
@@ -274,17 +266,16 @@ router.get('/preferences/enhanced', authenticateToken, async (req: Authenticated
  * Update notification channel preferences
  * Consolidated from enhanced-notifications.ts
  */
-router.patch('/preferences/channels', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated' }, 401);
+router.patch('/preferences/channels', authenticateToken, async (req: AuthenticatedRequest, res: Response) => { try {
+    const user_id = req.user?.id;
+    if (!user_id) {
+      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated'  }, 401);
     }
 
     const channelPreferences = req.body;
 
     // Update channel preferences through the user preferences service
-    await userPreferencesService.updateBillTrackingPreferences(userId, { notificationChannels: channelPreferences });
+    await userPreferencesService.updateBillTrackingPreferences(user_id, { notificationChannels: channelPreferences });
 
     return ApiSuccess(res, { message: 'Channel preferences updated successfully' });
 
@@ -298,19 +289,17 @@ router.patch('/preferences/channels', authenticateToken, async (req: Authenticat
  * Test smart notification filter
  * Consolidated from enhanced-notifications.ts
  */
-router.post('/test-filter', authenticateToken, async (req: AuthenticatedRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated' }, 401);
+router.post('/test-filter', authenticateToken, async (req: AuthenticatedRequest, res: Response) => { try {
+    const user_id = req.user?.id;
+    if (!user_id) {
+      return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated'  }, 401);
     }
 
     const filterCriteria = req.body;
 
-    const filterResult = await smartNotificationFilterService.applySmartFilter({
-      ...filterCriteria,
-      userId
-    });
+    const filterResult = await smartNotificationFilterService.applySmartFilter({ ...filterCriteria,
+      user_id
+     });
 
     return ApiSuccess(res, filterResult);
 

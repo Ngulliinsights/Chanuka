@@ -18,7 +18,7 @@ const mockNavigationService = {
   replace: vi.fn(),
   push: vi.fn(),
   getCurrentPath: vi.fn(() => '/'),
-  isActive: vi.fn(() => false),
+  is_active: vi.fn(() => false),
 };
 
 vi.mock('@/components/navigation', () => ({
@@ -373,8 +373,8 @@ describe('End-to-End User Flow Integration Tests', () => {
       const user = userEvent.setup();
       const dashboardButton = screen.getByTestId('nav-dashboard');
       
-      await user.tab();
-      await user.keyboard('{Enter}');
+      await users.tab();
+      await users.keyboard('{Enter}');
       
       // Test that keyboard navigation works
       expect(dashboardButton).toBeInTheDocument();

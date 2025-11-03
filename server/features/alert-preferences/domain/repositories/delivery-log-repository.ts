@@ -3,8 +3,7 @@ import { AlertDeliveryLog } from '../entities/alert-delivery-log';
 /**
  * Repository interface for alert delivery logs
  */
-export interface IDeliveryLogRepository {
-  /**
+export interface IDeliveryLogRepository { /**
    * Saves a delivery log
    */
   save(log: AlertDeliveryLog): Promise<void>;
@@ -13,7 +12,7 @@ export interface IDeliveryLogRepository {
    * Finds delivery logs by user ID with pagination
    */
   findByUserId(
-    userId: string,
+    user_id: string,
     options?: {
       page?: number;
       limit?: number;
@@ -21,7 +20,7 @@ export interface IDeliveryLogRepository {
       status?: string;
       startDate?: Date;
       endDate?: Date;
-    }
+     }
   ): Promise<{
     logs: AlertDeliveryLog[];
     total: number;
@@ -33,12 +32,12 @@ export interface IDeliveryLogRepository {
   /**
    * Finds recent delivery logs within hours
    */
-  findRecentByUserId(userId: string, hours: number): Promise<AlertDeliveryLog[]>;
+  findRecentByUserId(user_id: string, hours: number): Promise<AlertDeliveryLog[]>;
 
   /**
    * Gets delivery statistics for a user
    */
-  getStatsByUserId(userId: string): Promise<{
+  getStatsByUserId(user_id: string): Promise<{
     totalLogs: number;
     successfulDeliveries: number;
     failedDeliveries: number;

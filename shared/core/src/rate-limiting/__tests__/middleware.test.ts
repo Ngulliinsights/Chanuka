@@ -385,7 +385,7 @@ describe('Express Rate Limit Middleware', () => {
         remaining: 4,
         processingTime: expect.any(Number),
         ip: '127.0.0.1',
-        userAgent: undefined,
+        user_agent: undefined,
         path: '/api/test',
         method: 'GET',
       });
@@ -415,7 +415,7 @@ describe('Express Rate Limit Middleware', () => {
         remaining: 0,
         processingTime: expect.any(Number),
         ip: '127.0.0.1',
-        userAgent: undefined,
+        user_agent: undefined,
         path: '/api/test',
         method: 'GET',
       });

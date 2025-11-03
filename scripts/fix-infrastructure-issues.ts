@@ -100,15 +100,14 @@ class InfrastructureFixer {
       return;
     }
 
-    try {
-      let content = readFileSync(notificationFile, 'utf-8');
+    try { let content = readFileSync(notificationFile, 'utf-8');
       let modified = false;
 
       // Fix the specific variable shadowing issue
-      if (content.includes('.map(user => ({') && content.includes('userId: user.id')) {
+      if (content.includes('.map(user => ({') && content.includes('user_id: users.id')) {
         content = content.replace(
-          /\.map\(user => \(\{\s*userId: user\.id,\s*preferences: user\.preferences \|\| \{\}\s*\}\)\)/g,
-          '.map(userData => ({\n        userId: userData.id,\n        preferences: userData.preferences || {}\n      }))'
+          /\.map\(user => \(\{\s*user_id: user\.id,\s*preferences: user\.preferences \|\| \{\ }\s*\}\)\)/g,
+          '.map(userData => ({ \n        user_id: userData.id,\n        preferences: userData.preferences || { }\n      }))'
         );
         
         content = content.replace(

@@ -7,18 +7,17 @@ export type DashboardSection = 'activity' | 'actions' | 'topics' | 'analytics';
 export type ActionPriority = 'High' | 'Medium' | 'Low';
 export type TopicCategory = 'legislative' | 'community' | 'policy' | 'advocacy';
 
-export interface ActionItem {
-  id: string;
+export interface ActionItem { id: string;
   title: string;
   description: string;
   priority: ActionPriority;
   dueDate?: Date;
   category?: string;
-  billId?: string;
+  bill_id?: string;
   completed?: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+  created_at: Date;
+  updated_at: Date;
+ }
 
 export interface ActivitySummary {
   billsTracked: number;
@@ -35,8 +34,8 @@ export interface TrackedTopic {
   name: string;
   category: TopicCategory;
   billCount: number;
-  isActive: boolean;
-  createdAt: Date;
+  is_active: boolean;
+  created_at: Date;
   description?: string;
   keywords?: string[];
 }
@@ -73,10 +72,10 @@ export interface UseDashboardResult {
   actions: {
     refresh: () => Promise<void>;
     reset: () => void;
-    addTopic: (topic: Omit<TrackedTopic, 'id' | 'createdAt'>) => Promise<void>;
+    addTopic: (topic: Omit<TrackedTopic, 'id' | 'created_at'>) => Promise<void>;
     removeTopic: (topicId: string) => Promise<void>;
     completeAction: (actionId: string) => Promise<void>;
-    addAction: (action: Omit<ActionItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+    addAction: (action: Omit<ActionItem, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
   };
   recovery: {
     canRecover: boolean;

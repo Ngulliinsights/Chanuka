@@ -8,20 +8,19 @@ export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal' |
  * Core context interface for structured logging.
  * This gets automatically enriched with async context and request data.
  */
-export interface LogContext {
-  component?: string | undefined;
+export interface LogContext { component?: string | undefined;
   operation?: string | undefined;
   duration?: number | undefined;
   statusCode?: number | undefined;
   errorCode?: string | undefined;
   tags?: string[] | undefined;
-  userId?: string | undefined;
+  user_id?: string | undefined;
   traceId?: string | undefined;
   requestId?: string | undefined;
   sessionId?: string | undefined;
   correlationId?: string | undefined;
   [key: string]: unknown;
-}
+ }
 
 /**
  * Comprehensive metrics tracking for logger performance and usage
@@ -48,7 +47,7 @@ export interface RequestLogData {
   url: string;
   statusCode?: number;
   duration?: number;
-  userAgent?: string;
+  user_agent?: string;
   ip?: string;
   contentLength?: number;
   responseTime?: number;
@@ -72,24 +71,22 @@ export interface CacheOperationLogData {
   ttl?: number;
 }
 
-export interface SecurityEventLogData {
-  event: string;
+export interface SecurityEventLogData { event: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
-  userId?: string;
+  user_id?: string;
   ip?: string;
   details?: Record<string, unknown>;
-  userAgent?: string;
+  user_agent?: string;
   sessionId?: string;
-}
+ }
 
-export interface BusinessEventLogData {
-  event: string;
-  entityType?: string;
-  entityId?: string;
+export interface BusinessEventLogData { event: string;
+  entity_type?: string;
+  entity_id?: string;
   metadata?: Record<string, unknown>;
-  userId?: string;
+  user_id?: string;
   sessionId?: string;
-}
+ }
 
 export interface PerformanceLogData {
   operation: string;
@@ -102,8 +99,7 @@ export interface PerformanceLogData {
 /**
  * Internal log entry for in-memory storage and querying
  */
-export interface StoredLogEntry {
-  timestamp: Date;
+export interface StoredLogEntry { timestamp: Date;
   level: LogLevel;
   message: string;
   context?: LogContext | undefined;
@@ -111,15 +107,15 @@ export interface StoredLogEntry {
   correlationId: string;
   traceId?: string | undefined;
   requestId?: string | undefined;
-  userId?: string | undefined;
+  user_id?: string | undefined;
   sessionId?: string | undefined;
-  ipAddress?: string | undefined;
-  userAgent?: string | undefined;
+  ip_address?: string | undefined;
+  user_agent?: string | undefined;
   component?: string | undefined;
   operation?: string | undefined;
   duration?: number | undefined;
   error?: Record<string, unknown> | undefined;
-}
+ }
 
 /**
  * Query filters for searching stored logs
@@ -132,8 +128,8 @@ export interface LogQueryFilters {
   correlationId?: string;
   traceId?: string;
   requestId?: string;
-  userId?: string;
-  ipAddress?: string;
+  user_id?: string;
+  ip_address?: string;
   limit?: number;
   offset?: number;
   search?: string;
@@ -243,19 +239,18 @@ export interface LoggerChild {
 
 export const logLevelSchema = z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal', 'critical']);
 
-export const logContextSchema = z.object({
-  component: z.string().optional(),
+export const logContextSchema = z.object({ component: z.string().optional(),
   operation: z.string().optional(),
   duration: z.number().optional(),
   statusCode: z.number().optional(),
   errorCode: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  userId: z.string().optional(),
+  user_id: z.string().optional(),
   traceId: z.string().optional(),
   requestId: z.string().optional(),
   sessionId: z.string().optional(),
   correlationId: z.string().optional(),
-}).catchall(z.unknown());
+ }).catchall(z.unknown());
 
 export const loggerOptionsSchema = z.object({
   level: logLevelSchema.optional(),
@@ -290,8 +285,8 @@ export const logQueryFiltersSchema = z.object({
   correlationId: z.string().optional(),
   traceId: z.string().optional(),
   requestId: z.string().optional(),
-  userId: z.string().optional(),
-  ipAddress: z.string().optional(),
+  user_id: z.string().optional(),
+  ip_address: z.string().optional(),
   limit: z.number().min(1).max(10000).optional(),
   offset: z.number().min(0).optional(),
   search: z.string().optional(),

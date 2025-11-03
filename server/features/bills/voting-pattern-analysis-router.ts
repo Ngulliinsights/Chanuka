@@ -24,14 +24,13 @@ function parseIntParam(value: string, paramName: string): { valid: true; value: 
  * Centralized error handler that maps domain errors to appropriate HTTP responses
  * This approach keeps our route handlers clean and maintains consistent error responses
  */
-function handleRouteError(res: Response, error: unknown, context: string, userId?: number): Response {
+function handleRouteError(res: Response, error: unknown, context: string, user_id?: number): Response {
   // Log the error with full context for debugging and monitoring
-  logger.error(`Error in ${context}:`, {
-    component: 'VotingPatternAnalysisRouter',
+  logger.error(`Error in ${context}:`, { component: 'VotingPatternAnalysisRouter',
     context,
-    userId: userId !== undefined ? String(userId) : undefined,
+    user_id: user_id !== undefined ? String(user_id) : undefined,
     errorType: error instanceof Error ? error.constructor.name : 'Unknown'
-  }, error);
+   }, error);
 
   // Map specific errors to appropriate HTTP responses
   if (error instanceof Error && error.message.includes('not found')) {
@@ -84,8 +83,7 @@ router.get('/bills/:id', asyncHandler(async (req, res) => {
     true
   );
 
-  return res.json(UnifiedApiResponse.success({
-    billId: idResult.value,
+  return res.json(UnifiedApiResponse.success({ bill_id: idResult.value,
     votingPatterns: relevantPatterns,
     analysis: {
       totalSponsorsAnalyzed: relevantPatterns.length,
@@ -94,7 +92,7 @@ router.get('/bills/:id', asyncHandler(async (req, res) => {
         : 0,
       message: relevantPatterns.length === 0
         ? 'No voting pattern data available for analysis'
-        : `Analysis based on ${relevantPatterns.length} sponsors with voting records`
+        : `Analysis based on ${relevantPatterns.length } sponsors with voting records`
     }
   }));
 }));
@@ -169,29 +167,29 @@ router.get('/analysis', asyncHandler(async (req, res) => {
  * GET /api/voting-patterns/correlations
  * Analyze correlations between sponsors and voting behavior
  * Query parameters:
- *   - sponsorId: specific sponsor to analyze correlations for (optional)
+ *   - sponsor_id: specific sponsor to analyze correlations for (optional)
  *   - comparisonSponsors: comma-separated list of sponsor IDs to compare with (optional)
  */
 router.get('/correlations', asyncHandler(async (req, res) => {
-  const { sponsorId, comparisonSponsors } = req.query;
+  const { sponsor_id, comparisonSponsors } = req.query;
 
   let targetSponsorId: number;
   let comparisonIds: number[] | undefined;
 
   // Parse target sponsor ID
-  if (sponsorId) {
-    const sponsorIdResult = parseIntParam(sponsorId as string, 'Sponsor ID');
-    if (!sponsorIdResult.valid) {
-      return res.status(400).json(UnifiedApiResponse.validation([{ field: 'sponsorId', message: sponsorIdResult.error }]));
+  if (sponsor_id) {
+    const sponsor_idResult = parseIntParam(sponsor_id as string, 'Sponsor ID');
+    if (!sponsor_idResult.valid) {
+      return res.status(400).json(UnifiedApiResponse.validation([{ field: 'sponsor_id', message: sponsor_idResult.error }]));
     }
-    targetSponsorId = sponsorIdResult.value;
+    targetSponsorId = sponsor_idResult.value;
   } else {
     // If no specific sponsor, use the first active sponsor as example
     const allAnalysis = await votingPatternAnalysisService.analyzeVotingPatterns();
     if (allAnalysis.length === 0) {
       return res.status(404).json(UnifiedApiResponse.notFound('Sponsors', 'No sponsors available for correlation analysis'));
     }
-    targetSponsorId = allAnalysis[0].sponsorId;
+    targetSponsorId = allAnalysis[0].sponsor_id;
   }
 
   // Parse comparison sponsors if provided

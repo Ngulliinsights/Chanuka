@@ -15,19 +15,19 @@ const AlertFrequencyEnum = z.enum(['immediate', 'hourly', 'daily', 'weekly']);
 const AlertChannelEnum = z.enum(['in_app', 'email', 'push', 'sms']);
 
 const basePreferenceSchema = z.object({
-  trackingTypes: z.array(TrackingTypeEnum).optional(),
-  alertFrequency: AlertFrequencyEnum.optional(),
-  alertChannels: z.array(AlertChannelEnum).optional(),
-}); // Removed isActive for input validation
+  tracking_types: z.array(TrackingTypeEnum).optional(),
+  alert_frequency: AlertFrequencyEnum.optional(),
+  alert_channels: z.array(AlertChannelEnum).optional(),
+}); // Removed is_active for input validation
 
 const trackBillSchema = z.object({
   preferences: basePreferenceSchema.optional()
 });
 
-const updatePreferencesSchema = basePreferenceSchema; // Same base, excludes isActive implicitly
+const updatePreferencesSchema = basePreferenceSchema; // Same base, excludes is_active implicitly
 
 const bulkTrackingSchema = z.object({
-  billIds: z.array(z.number().int().positive()).min(1).max(100),
+  bill_ids: z.array(z.number().int().positive()).min(1).max(100),
   operation: z.enum(['track', 'untrack']),
   preferences: basePreferenceSchema.optional()
 });
@@ -54,17 +54,16 @@ function parseOptionalIntParam(value: string | undefined, paramName: string, def
 
 // --- API Endpoints ---
 
-// POST /api/bill-tracking/track/:billId - Track a bill
-router.post('/track/:billId', authenticateToken, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const billId = parseIntParam(req.params.billId, 'Bill ID');
+// POST /api/bill-tracking/track/:bill_id - Track a bill
+router.post('/track/:bill_id', authenticateToken, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => { try {
+    const bill_id = parseIntParam(req.params.bill_id, 'Bill ID');
     const validationResult = trackBillSchema.safeParse(req.body);
     if (!validationResult.success) {
       return ApiValidationError(res, validationResult.error.errors, ApiResponseWrapper.createMetadata(Date.now(), 'database'));
-    }
+     }
     const { preferences } = validationResult.data;
 
-    const result = await billTrackingService.trackBill(req.user!.id, billId, preferences);
+    const result = await billTrackingService.trackBill(req.user!.id, bill_id, preferences);
     return ApiSuccess(res, { message: 'Bill tracked successfully', tracking: result });
   } catch (error) {
     // Pass error to the centralized handler
@@ -72,13 +71,12 @@ router.post('/track/:billId', authenticateToken, async (req: AuthenticatedReques
   }
 });
 
-// DELETE /api/bill-tracking/track/:billId - Untrack a bill
-router.delete('/track/:billId', authenticateToken, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const billId = parseIntParam(req.params.billId, 'Bill ID');
-    await billTrackingService.untrackBill(req.user!.id, billId);
+// DELETE /api/bill-tracking/track/:bill_id - Untrack a bill
+router.delete('/track/:bill_id', authenticateToken, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => { try {
+    const bill_id = parseIntParam(req.params.bill_id, 'Bill ID');
+    await billTrackingService.untrackBill(req.user!.id, bill_id);
     return res.status(204).send(); // No Content response
-  } catch (error) {
+   } catch (error) {
     next(error);
   }
 });
@@ -106,29 +104,27 @@ router.get('/tracked', authenticateToken, async (req: AuthenticatedRequest, res:
   }
 });
 
-// PUT /api/bill-tracking/preferences/:billId - Update preferences for a tracked bill
-router.put('/preferences/:billId', authenticateToken, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const billId = parseIntParam(req.params.billId, 'Bill ID');
+// PUT /api/bill-tracking/preferences/:bill_id - Update preferences for a tracked bill
+router.put('/preferences/:bill_id', authenticateToken, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => { try {
+    const bill_id = parseIntParam(req.params.bill_id, 'Bill ID');
     const validationResult = updatePreferencesSchema.safeParse(req.body);
     if (!validationResult.success) {
       return ApiValidationError(res, validationResult.error.errors, ApiResponseWrapper.createMetadata(Date.now(), 'database'));
-    }
+     }
     const preferencesToUpdate = validationResult.data;
 
-    const result = await billTrackingService.updateBillTrackingPreferences(req.user!.id, billId, preferencesToUpdate);
+    const result = await billTrackingService.updateBillTrackingPreferences(req.user!.id, bill_id, preferencesToUpdate);
     return ApiSuccess(res, { message: 'Tracking preferences updated successfully', preferences: result });
   } catch (error) {
     next(error);
   }
 });
 
-// GET /api/bill-tracking/is-tracking/:billId - Check if user is tracking a bill
-router.get('/is-tracking/:billId', authenticateToken, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  try {
-    const billId = parseIntParam(req.params.billId, 'Bill ID');
-    const isTracking = await billTrackingService.isUserTrackingBill(req.user!.id, billId);
-    return ApiSuccess(res, { isTracking });
+// GET /api/bill-tracking/is-tracking/:bill_id - Check if user is tracking a bill
+router.get('/is-tracking/:bill_id', authenticateToken, async (req: AuthenticatedRequest, res: Response, next: NextFunction) => { try {
+    const bill_id = parseIntParam(req.params.bill_id, 'Bill ID');
+    const isTracking = await billTrackingService.isUserTrackingBill(req.user!.id, bill_id);
+    return ApiSuccess(res, { isTracking  });
   } catch (error) {
     next(error);
   }
@@ -141,14 +137,14 @@ router.post('/bulk', authenticateToken, async (req: AuthenticatedRequest, res: R
     if (!validationResult.success) {
       return ApiValidationError(res, validationResult.error.errors, ApiResponseWrapper.createMetadata(Date.now(), 'database'));
     }
-    const { billIds, operation, preferences } = validationResult.data;
+    const { bill_ids, operation, preferences } = validationResult.data;
 
     if (operation === 'untrack' && preferences && Object.keys(preferences).length > 0) {
         return ApiValidationError(res, "Preferences cannot be set when untracking.");
     }
 
 
-    const result = await billTrackingService.bulkTrackingOperation({ userId: req.user!.id, billIds, operation, preferences });
+    const result = await billTrackingService.bulkTrackingOperation({ user_id: req.user!.id, bill_ids, operation, preferences  });
     return ApiSuccess(res, { message: `Bulk ${operation} operation completed`, result });
   } catch (error) {
     next(error);
@@ -178,7 +174,7 @@ router.get('/recommended', authenticateToken, async (req: AuthenticatedRequest, 
 
 // --- Centralized Error Handler for this Router ---
 router.use((err: Error, req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    logger.error(`Error in Bill Tracking route ${req.method} ${req.originalUrl}:`, { component: 'BillTrackingRoutes', userId: req.user?.id }, err);
+    logger.error(`Error in Bill Tracking route ${req.method} ${req.originalUrl}:`, { component: 'BillTrackingRoutes', user_id: req.user?.id  }, err);
 
     // Handle specific service errors
     if (err.message.includes('not found') || err.message.includes('No active tracking preference found')) {

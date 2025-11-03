@@ -13,7 +13,7 @@ import {
   BillData,
   SponsorData 
 } from './types.js';
-import { conflicts, conflictSources } from '@shared/schema';
+import { data_sources } from '@shared/schema';
 import { eq, and } from 'drizzle-orm';
 import { logger  } from '../../../shared/core/src/index.js';
 
@@ -42,7 +42,7 @@ export class ConflictResolutionService {
         sourceId: 'existing',
         sourceName: 'Database',
         value: this.extractConflictValues(existingBill, conflictFields),
-        timestamp: existingBill.updatedAt || existingBill.createdAt,
+        timestamp: existingBill.updated_at || existingBill.created_at,
         priority: 0.5, // Lower priority for existing data
         confidence: 0.7
       },
@@ -98,7 +98,7 @@ export class ConflictResolutionService {
         sourceId: 'existing',
         sourceName: 'Database',
         value: this.extractConflictValues(existingSponsor, conflictFields),
-        timestamp: existingSponsor.updatedAt || existingSponsor.createdAt,
+        timestamp: existingSponsor.updated_at || existingSponsor.created_at,
         priority: 0.5,
         confidence: 0.7
       },
@@ -312,8 +312,8 @@ export class ConflictResolutionService {
     if (billData.summary && billData.summary.trim()) confidence += 0.1;
     if (billData.content && billData.content.trim()) confidence += 0.1;
     if (billData.sponsors && billData.sponsors.length > 0) confidence += 0.1;
-    if (billData.introducedDate) confidence += 0.05;
-    if (billData.lastActionDate) confidence += 0.05;
+    if (billData.introduced_date) confidence += 0.05;
+    if (billData.last_action_date) confidence += 0.05;
     if (billData.sourceUrl) confidence += 0.1;
     
     return Math.min(confidence, 1.0);
@@ -364,7 +364,7 @@ export class ConflictResolutionService {
         resolvedBy: conflict.resolvedBy,
         resolvedAt: conflict.resolvedAt,
         confidence: conflict.confidence,
-        createdAt: new Date()
+        created_at: new Date()
       });
 
       // Store conflict sources

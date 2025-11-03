@@ -21,8 +21,8 @@ interface Notification {
   message: string;
   relatedBillId?: number;
   billTitle?: string;
-  isRead: boolean;
-  createdAt: string;
+  is_read: boolean;
+  created_at: string;
 }
 
 const NotificationCenter = () => {
@@ -161,10 +161,10 @@ const NotificationCenter = () => {
                     <div
                       key={notification.id}
                       className={`p-3 border-b hover:bg-muted/50 cursor-pointer ${
-                        !notification.isRead ? 'bg-blue-50/50' : ''
+                        !notification.is_read ? 'bg-blue-50/50' : ''
                       }`}
                       onClick={() => {
-                        if (!notification.isRead) {
+                        if (!notification.is_read) {
                           markAsReadMutation.mutate(notification.id);
                         }
                         if (notification.relatedBillId) {
@@ -179,11 +179,11 @@ const NotificationCenter = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
                             <p className={`text-sm font-medium ${
-                              !notification.isRead ? 'text-foreground' : 'text-muted-foreground'
+                              !notification.is_read ? 'text-foreground' : 'text-muted-foreground'
                             }`}>
                               {notification.title}
                             </p>
-                            {!notification.isRead && (
+                            {!notification.is_read && (
                               <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0" />
                             )}
                           </div>
@@ -196,7 +196,7 @@ const NotificationCenter = () => {
                             </p>
                           )}
                           <p className="text-xs text-muted-foreground mt-1">
-                            {formatTimeAgo(notification.createdAt)}
+                            {formatTimeAgo(notification.created_at)}
                           </p>
                         </div>
                       </div>

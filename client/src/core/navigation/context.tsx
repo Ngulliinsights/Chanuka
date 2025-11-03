@@ -20,7 +20,7 @@ const initialState: NavigationState = {
   isMobile: false,
   sidebarCollapsed: false,
   mounted: false,
-  userRole: 'public',
+  user_role: 'public',
   preferences: {
     defaultLandingPage: '/',
     favoritePages: [],
@@ -87,11 +87,11 @@ export function createNavigationProvider(
       });
       
       // Reset user-specific state when user logs out
-      if (!isAuthenticated && state.userRole !== 'public') {
+      if (!isAuthenticated && state.user_role !== 'public') {
         dispatch({ type: 'RESET_USER_SPECIFIC_STATE' });
         NavigationStatePersistence.clearUserSpecificState();
       }
-    }, [user, isAuthenticated, state.userRole]);
+    }, [user, isAuthenticated, state.user_role]);
 
     // Debounced persistence to avoid excessive localStorage writes
     useEffect(() => {
@@ -125,7 +125,7 @@ export function createNavigationProvider(
       // Calculate all navigation data synchronously to ensure consistency
       const section = determineNavigationSection(currentPath);
       const breadcrumbs = generateBreadcrumbs(currentPath);
-      const relatedPages = calculateRelatedPages(currentPath, state.userRole);
+      const relatedPages = calculateRelatedPages(currentPath, state.user_role);
       const pageTitle = document.title || currentPath;
       
       // Dispatch a single batched update to minimize re-renders
@@ -147,7 +147,7 @@ export function createNavigationProvider(
       }, 100);
       
       return () => clearTimeout(timeoutId);
-    }, [location.pathname, state.userRole]);
+    }, [location.pathname, state.user_role]);
 
     // Context value with all functionality
     const contextValue: NavigationContextValue = {
@@ -199,7 +199,7 @@ export function createNavigationProvider(
         dispatch({ type: 'SET_SIDEBAR_COLLAPSED', payload: collapsed });
       },
       
-      isActive: (path: string) => {
+      is_active: (path: string) => {
         return isNavigationPathActive(path, state.currentPath);
       },
     };

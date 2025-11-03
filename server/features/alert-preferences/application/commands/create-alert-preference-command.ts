@@ -8,17 +8,16 @@ import { AlertConditions } from '../../domain/value-objects/alert-conditions';
 /**
  * Command to create a new alert preference
  */
-export class CreateAlertPreferenceCommand {
-  constructor(
-    public readonly userId: string,
+export class CreateAlertPreferenceCommand { constructor(
+    public readonly user_id: string,
     public readonly name: string,
-    public readonly isActive: boolean,
+    public readonly is_active: boolean,
     public readonly alertTypes: AlertTypeConfigCommand[],
     public readonly channels: AlertChannelCommand[],
     public readonly frequency: FrequencyConfigCommand,
     public readonly smartFiltering: SmartFilteringConfigCommand,
     public readonly description?: string
-  ) {}
+  ) { }
 }
 
 /**
@@ -40,10 +39,10 @@ export class AlertConditionsCommand {
   constructor(
     public readonly billCategories?: string[],
     public readonly billStatuses?: string[],
-    public readonly sponsorIds?: number[],
+    public readonly sponsor_ids?: number[],
     public readonly keywords?: string[],
     public readonly minimumEngagement?: number,
-    public readonly userRoles?: string[],
+    public readonly user_roles?: string[],
     public readonly timeRange?: TimeRangeCommand,
     public readonly dayOfWeek?: number[]
   ) {}
@@ -116,7 +115,7 @@ export class FrequencyConfigCommand {
 export class SmartFilteringConfigCommand {
   constructor(
     public readonly enabled: boolean,
-    public readonly userInterestWeight: number,
+    public readonly user_interestWeight: number,
     public readonly engagementHistoryWeight: number,
     public readonly trendingWeight: number,
     public readonly duplicateFiltering: boolean,

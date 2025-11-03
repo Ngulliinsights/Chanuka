@@ -1,6 +1,6 @@
 import { database as db } from '../shared/database/connection';
 import { 
-  billComments,
+  comments,
   type BillComment as Comment, 
   type InsertBillComment
 } from '../../../shared/schema';
@@ -20,21 +20,21 @@ import { logger  } from '../../../shared/core/src/index.js';
  */
 export class CommentStorage extends BaseStorage<Comment> {
   private comments: Map<number, Comment>;
-  private billCommentIndex: Map<number, Set<number>>;
+  private commentsIndex: Map<number, Set<number>>;
   private parentCommentIndex: Map<number, Set<number>>;
   private nextId: number;
 
   // Cache keys for consistent cache management
   private static readonly CACHE_KEYS = {
     comment: (id: number) => `comment:${id}`,
-    billComments: (billId: number) => `bill:${billId}:comments`,
-    commentReplies: (parentId: number) => `comment:${parentId}:replies`,
+    comments: (bill_id: number) => `bill:${ bill_id }:comments`,
+    commentReplies: (parent_id: number) => `comment:${parent_id}:replies`,
   } as const;
 
   constructor() {
     super({ prefix: 'comment' });
     this.comments = new Map();
-    this.billCommentIndex = new Map();
+    this.commentsIndex = new Map();
     this.parentCommentIndex = new Map();
     this.nextId = 1;
   }
@@ -64,7 +64,7 @@ export class CommentStorage extends BaseStorage<Comment> {
    * Centralized sorting logic ensures consistency across all methods.
    */
   private sortCommentsByDate(comments: Comment[]): Comment[] {
-    return comments.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return comments.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
   }
 
   /**
@@ -74,12 +74,12 @@ export class CommentStorage extends BaseStorage<Comment> {
   private buildCacheInvalidationKeys(comment: Comment): string[] {
     const keys = [
       CommentStorage.CACHE_KEYS.comment(comment.id),
-      CommentStorage.CACHE_KEYS.billComments(comment.billId),
+      CommentStorage.CACHE_KEYS.comments(comment.bill_id),
     ];
 
     // Add parent comment's replies cache if this is a reply
-    if (comment.parentCommentId) {
-      keys.push(CommentStorage.CACHE_KEYS.commentReplies(comment.parentCommentId));
+    if (comment.parent_id) {
+      keys.push(CommentStorage.CACHE_KEYS.commentReplies(comment.parent_id));
     }
 
     return keys;
@@ -109,14 +109,13 @@ export class CommentStorage extends BaseStorage<Comment> {
    * Retrieves all comments for a specific bill, sorted by creation date (newest first).
    * Enhanced with better validation and consistent sorting using Drizzle ORM.
    */
-  async getBillComments(billId: number): Promise<Comment[]> {
-    this.validateId(billId, 'bill ID');
+  async getBillComments(bill_id: number): Promise<Comment[]> { this.validateId(bill_id, 'bill ID');
 
-    return this.getCached(CommentStorage.CACHE_KEYS.billComments(billId), async () => {
-      return await db.select().from(billComments)
-        .where(eq(billComments.billId, billId))
-        .orderBy(desc(billComments.createdAt));
-    });
+    return this.getCached(CommentStorage.CACHE_KEYS.comments(bill_id), async () => {
+      return await db.select().from(comments)
+        .where(eq(comments.bill_id, bill_id))
+        .orderBy(desc(comments.created_at));
+     });
   }
 
   /**
@@ -125,23 +124,23 @@ export class CommentStorage extends BaseStorage<Comment> {
    */
   async addComment(comment: InsertBillComment): Promise<Comment> {
     // Validate required fields
-    this.validateId(comment.billId, 'bill ID');
+    this.validateId(comment.bill_id, 'bill ID');
     if (!comment.content || typeof comment.content !== 'string' || comment.content.trim().length === 0) {
       throw new Error('Comment content is required and cannot be empty');
     }
 
     // Validate parent comment exists if specified
-    if (comment.parentCommentId) {
-      this.validateId(comment.parentCommentId, 'parent comment ID');
-      const parentExists = await db.select().from(billComments)
-        .where(eq(billComments.id, comment.parentCommentId));
+    if (comment.parent_id) {
+      this.validateId(comment.parent_id, 'parent comment ID');
+      const parentExists = await db.select().from(comments)
+        .where(eq(comments.id, comment.parent_id));
       if (parentExists.length === 0) {
-        throw new Error(`Parent comment with ID ${comment.parentCommentId} not found`);
+        throw new Error(`Parent comment with ID ${comment.parent_id} not found`);
       }
     }
 
     return this.withTransaction(async (tx) => {
-      const result = await tx.insert(billComments).values({
+      const result = await tx.insert(comments).values({
         ...comment,
         upvotes: comment.upvotes || 0,
         downvotes: comment.downvotes || 0,
@@ -153,15 +152,15 @@ export class CommentStorage extends BaseStorage<Comment> {
       this.comments.set(newComment.id, newComment);
 
       // Update bill index
-      const billCommentsSet = this.billCommentIndex.get(comment.billId) || new Set();
-      billCommentsSet.add(newComment.id);
-      this.billCommentIndex.set(comment.billId, billCommentsSet);
+      const commentsSet = this.commentsIndex.get(comment.bill_id) || new Set();
+      commentsSet.add(newComment.id);
+      this.commentsIndex.set(comment.bill_id, commentsSet);
 
       // Update parent index if this is a reply
-      if (comment.parentCommentId) {
-        const children = this.parentCommentIndex.get(comment.parentCommentId) || new Set();
+      if (comment.parent_id) {
+        const children = this.parentCommentIndex.get(comment.parent_id) || new Set();
         children.add(newComment.id);
-        this.parentCommentIndex.set(comment.parentCommentId, children);
+        this.parentCommentIndex.set(comment.parent_id, children);
       }
 
       // Invalidate relevant caches efficiently
@@ -184,14 +183,14 @@ export class CommentStorage extends BaseStorage<Comment> {
     }
 
     // Prevent updating immutable fields
-    const { id: _, createdAt: __, ...validUpdates } = updates;
+    const { id: _, created_at: __, ...validUpdates } = updates;
 
     // Create updated comment immutably
     const updatedComment: Comment = {
       ...existingComment,
       ...validUpdates,
       id, // Ensure ID cannot be changed
-      updatedAt: new Date(),
+      updated_at: new Date(),
     };
 
     this.comments.set(id, updatedComment);
@@ -206,15 +205,15 @@ export class CommentStorage extends BaseStorage<Comment> {
    * Retrieves all replies to a specific comment, sorted by creation date (newest first).
    * Enhanced with caching and better error handling.
    */
-  async getCommentReplies(parentId: number): Promise<Comment[]> {
-    this.validateId(parentId, 'parent comment ID');
+  async getCommentReplies(parent_id: number): Promise<Comment[]> {
+    this.validateId(parent_id, 'parent comment ID');
 
-    if (!this.comments.has(parentId)) {
-      throw new Error(`Parent comment with ID ${parentId} not found`);
+    if (!this.comments.has(parent_id)) {
+      throw new Error(`Parent comment with ID ${parent_id} not found`);
     }
 
-    return this.getCached(CommentStorage.CACHE_KEYS.commentReplies(parentId), async () => {
-      const replyIds = this.parentCommentIndex.get(parentId) || new Set();
+    return this.getCached(CommentStorage.CACHE_KEYS.commentReplies(parent_id), async () => {
+      const replyIds = this.parentCommentIndex.get(parent_id) || new Set();
       const replies = Array.from(replyIds)
         .map(id => this.comments.get(id))
         .filter((comment): comment is Comment => comment !== undefined);
@@ -227,12 +226,12 @@ export class CommentStorage extends BaseStorage<Comment> {
    * Marks a comment as highlighted.
    * Enhanced with validation and proper cache invalidation.
    */
-  async highlightComment(commentId: number): Promise<Comment> {
-    this.validateId(commentId, 'comment ID');
+  async highlightComment(comment_id: number): Promise<Comment> {
+    this.validateId(comment_id, 'comment ID');
 
-    const comment = this.comments.get(commentId);
+    const comment = this.comments.get(comment_id);
     if (!comment) {
-      throw new Error(`Comment with ID ${commentId} not found`);
+      throw new Error(`Comment with ID ${comment_id} not found`);
     }
 
     // Note: isHighlighted property doesn't exist in our schema, so we'll just return the comment
@@ -241,7 +240,7 @@ export class CommentStorage extends BaseStorage<Comment> {
 
     // This should never happen due to validation above, but TypeScript needs the check
     if (!updatedComment) {
-      throw new Error(`Failed to highlight comment with ID ${commentId}`);
+      throw new Error(`Failed to highlight comment with ID ${comment_id}`);
     }
 
     return updatedComment;
@@ -251,12 +250,12 @@ export class CommentStorage extends BaseStorage<Comment> {
    * Removes highlighting from a comment.
    * Enhanced with validation and proper cache invalidation.
    */
-  async unhighlightComment(commentId: number): Promise<Comment> {
-    this.validateId(commentId, 'comment ID');
+  async unhighlightComment(comment_id: number): Promise<Comment> {
+    this.validateId(comment_id, 'comment ID');
 
-    const comment = this.comments.get(commentId);
+    const comment = this.comments.get(comment_id);
     if (!comment) {
-      throw new Error(`Comment with ID ${commentId} not found`);
+      throw new Error(`Comment with ID ${comment_id} not found`);
     }
 
     // Note: isHighlighted property doesn't exist in our schema, so we'll just return the comment
@@ -265,7 +264,7 @@ export class CommentStorage extends BaseStorage<Comment> {
 
     // This should never happen due to validation above, but TypeScript needs the check
     if (!updatedComment) {
-      throw new Error(`Failed to unhighlight comment with ID ${commentId}`);
+      throw new Error(`Failed to unhighlight comment with ID ${comment_id}`);
     }
 
     return updatedComment;
@@ -291,21 +290,21 @@ export class CommentStorage extends BaseStorage<Comment> {
     this.comments.delete(id);
 
     // Remove from bill index
-    const billComments = this.billCommentIndex.get(comment.billId);
-    if (billComments) {
-      billComments.delete(id);
-      if (billComments.size === 0) {
-        this.billCommentIndex.delete(comment.billId);
+    const comments = this.commentsIndex.get(comment.bill_id);
+    if (comments) {
+      comments.delete(id);
+      if (comments.size === 0) {
+        this.commentsIndex.delete(comment.bill_id);
       }
     }
 
     // Remove from parent index if this is a reply
-    if (comment.parentCommentId) {
-      const siblings = this.parentCommentIndex.get(comment.parentCommentId);
+    if (comment.parent_id) {
+      const siblings = this.parentCommentIndex.get(comment.parent_id);
       if (siblings) {
         siblings.delete(id);
         if (siblings.size === 0) {
-          this.parentCommentIndex.delete(comment.parentCommentId);
+          this.parentCommentIndex.delete(comment.parent_id);
         }
       }
     }
@@ -337,38 +336,36 @@ export class CommentStorage extends BaseStorage<Comment> {
   }
 
   /**
-   * Retrieves all highlighted comments for a specific bill.
+   * Retrieves all highlighted comments for a specific bills.
    * Enhanced with validation and leverages existing caching.
    */
-  async getHighlightedComments(billId: number): Promise<Comment[]> {
-    this.validateId(billId, 'bill ID');
+  async getHighlightedComments(bill_id: number): Promise<Comment[]> { this.validateId(bill_id, 'bill ID');
 
-    const comments = await this.getBillComments(billId);
+    const comments = await this.getBillComments(bill_id);
     // Note: isHighlighted property doesn't exist in our schema
     // In a real implementation, you'd add this field to the schema
     return []; // Return empty array since we can't filter by isHighlighted
-  }
+   }
 
   /**
-   * Gets comment statistics for a bill.
+   * Gets comment statistics for a bills.
    * New method that provides useful metrics without additional storage overhead.
    */
-  async getBillCommentStats(billId: number): Promise<{
+  async getBillCommentStats(bill_id: number): Promise<{
     totalComments: number;
     highlightedComments: number;
     topLevelComments: number;
     replies: number;
-  }> {
-    this.validateId(billId, 'bill ID');
+  }> { this.validateId(bill_id, 'bill ID');
 
-    const comments = await this.getBillComments(billId);
+    const comments = await this.getBillComments(bill_id);
 
     return {
       totalComments: comments.length,
       highlightedComments: 0, // isHighlighted property not in schema
-      topLevelComments: comments.filter(c => !c.parentCommentId).length,
-      replies: comments.filter(c => c.parentCommentId).length,
-    };
+      topLevelComments: comments.filter(c => !c.parent_id).length,
+      replies: comments.filter(c => c.parent_id).length,
+     };
   }
 
   /**

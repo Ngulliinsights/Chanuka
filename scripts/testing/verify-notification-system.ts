@@ -26,12 +26,12 @@ async function verifyNotificationSystem() {
       .insert(users)
       .values({
         email: 'test-notifications@example.com',
-        passwordHash: 'hashedpassword',
+        password_hash: 'hashedpassword',
         name: 'Test Notification User',
-        firstName: 'Test',
-        lastName: 'User',
+        first_name: 'Test',
+        last_name: 'User',
         role: 'citizen',
-        verificationStatus: 'verified'
+        verification_status: 'verified'
       })
       .returning();
     
@@ -43,15 +43,14 @@ async function verifyNotificationSystem() {
         description: 'A test bill to verify notification system',
         status: 'introduced',
         category: 'test',
-        billNumber: 'TEST-NOTIF-2024-001',
+        bill_number: 'TEST-NOTIF-2024-001',
         summary: 'Test bill for notification verification'
       })
       .returning();
     
-    logger.info('✅ Test data created:', { component: 'Chanuka' }, {
-      userId: testUser.id,
-      billId: testBill.id
-    });
+    logger.info('✅ Test data created:', { component: 'Chanuka' }, { user_id: testUser.id,
+      bill_id: testBill.id
+      });
 
     // Test 3: Test notification preferences
     logger.info('3. Testing notification preferences...', { component: 'Chanuka' });
@@ -78,12 +77,11 @@ async function verifyNotificationSystem() {
     // Test 4: Test in-app notification delivery
     logger.info('4. Testing in-app notification delivery...', { component: 'Chanuka' });
     
-    await notificationService.sendNotification({
-      userId: testUser.id,
+    await notificationService.sendNotification({ user_id: testUser.id,
       type: 'test_notification',
       title: 'Test In-App Notification',
       message: 'This is a test in-app notification',
-      data: { testData: true },
+      data: { testData: true  },
       priority: 'normal',
       channels: ['in_app']
     });
@@ -93,17 +91,16 @@ async function verifyNotificationSystem() {
     // Test 5: Test email notification with template
     logger.info('5. Testing email notification with template...', { component: 'Chanuka' });
     
-    await notificationService.sendNotification({
-      userId: testUser.id,
+    await notificationService.sendNotification({ user_id: testUser.id,
       type: 'bill_status_change',
       title: 'Bill Status Update',
       message: 'Test bill status change notification',
       data: {
-        billId: testBill.id,
+        bill_id: testBill.id,
         billTitle: testBill.title,
         oldStatus: 'introduced',
         newStatus: 'committee'
-      },
+        },
       priority: 'normal',
       channels: ['in_app', 'email'],
       templateId: 'bill_status_change',
@@ -154,8 +151,7 @@ async function verifyNotificationSystem() {
     logger.info('9. Testing integration with bill status monitor...', { component: 'Chanuka' });
     
     // Trigger a bill status change through the monitor service
-    await billStatusMonitorService.handleBillStatusChange({
-      billId: testBill.id,
+    await billStatusMonitorService.handleBillStatusChange({ bill_id: testBill.id,
       oldStatus: 'introduced',
       newStatus: 'committee',
       timestamp: new Date(),
@@ -163,7 +159,7 @@ async function verifyNotificationSystem() {
       metadata: {
         reason: 'Test integration with notification system',
         automaticChange: false
-      }
+       }
     });
     
     logger.info('✅ Bill status monitor integration test completed', { component: 'Chanuka' });
@@ -177,11 +173,10 @@ async function verifyNotificationSystem() {
     });
     
     // Send multiple notifications that should be batched
-    for (let i = 0; i < 3; i++) {
-      await notificationService.sendNotification({
-        userId: testUser.id,
+    for (let i = 0; i < 3; i++) { await notificationService.sendNotification({
+        user_id: testUser.id,
         type: 'test_batch_notification',
-        title: `Batch Test Notification ${i + 1}`,
+        title: `Batch Test Notification ${i + 1 }`,
         message: `This is batch test notification number ${i + 1}`,
         data: { batchTest: true, index: i },
         priority: 'normal'

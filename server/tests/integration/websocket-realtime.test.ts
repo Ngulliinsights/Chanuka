@@ -66,8 +66,8 @@ describe('WebSocket and Real-Time Features Integration Tests', () => {
       body: JSON.stringify({
         email: `wstest-${Date.now()}@example.com`,
         password: 'SecureTestPass123!',
-        firstName: 'WebSocket',
-        lastName: 'Test',
+        first_name: 'WebSocket',
+        last_name: 'Test',
         role: 'citizen'
       })
     });
@@ -119,7 +119,7 @@ describe('WebSocket and Real-Time Features Integration Tests', () => {
         
         if (message.type === 'auth_success') {
           expect(message.type).toBe('auth_success');
-          expect(message.userId).toBeDefined();
+          expect(message.user_id).toBeDefined();
           done();
         } else if (message.type === 'auth_error') {
           done(new Error('Authentication failed'));
@@ -204,17 +204,16 @@ describe('WebSocket and Real-Time Features Integration Tests', () => {
           }));
           
           // Simulate a bill update (this would normally come from the system)
-          setTimeout(() => {
-            wsClient.send(JSON.stringify({
+          setTimeout(() => { wsClient.send(JSON.stringify({
               type: 'test_bill_update',
-              billId: 'test-bill-1',
+              bill_id: 'test-bill-1',
               status: 'committee',
               previousStatus: 'introduced'
-            }));
+             }));
           }, 100);
         } else if (message.type === 'bill_update') {
           expect(message.type).toBe('bill_update');
-          expect(message.billId).toBeDefined();
+          expect(message.bill_id).toBeDefined();
           expect(message.status).toBeDefined();
           done();
         }
@@ -237,30 +236,28 @@ describe('WebSocket and Real-Time Features Integration Tests', () => {
 
       let subscriptionConfirmed = false;
 
-      wsClient.on('message', (data) => {
-        const message = JSON.parse(data.toString());
+      wsClient.on('message', (data) => { const message = JSON.parse(data.toString());
         
         if (message.type === 'auth_success') {
           // Subscribe to specific bill
           wsClient.send(JSON.stringify({
             type: 'subscribe',
             channel: 'bill',
-            billId: 'test-bill-123'
-          }));
-        } else if (message.type === 'subscription_confirmed') {
-          expect(message.channel).toBe('bill');
-          expect(message.billId).toBe('test-bill-123');
+            bill_id: 'test-bill-123'
+           }));
+        } else if (message.type === 'subscription_confirmed') { expect(message.channel).toBe('bill');
+          expect(message.bill_id).toBe('test-bill-123');
           subscriptionConfirmed = true;
           
           // Unsubscribe
           wsClient.send(JSON.stringify({
             type: 'unsubscribe',
             channel: 'bill',
-            billId: 'test-bill-123'
-          }));
+            bill_id: 'test-bill-123'
+           }));
         } else if (message.type === 'subscription_removed' && subscriptionConfirmed) {
           expect(message.channel).toBe('bill');
-          expect(message.billId).toBe('test-bill-123');
+          expect(message.bill_id).toBe('test-bill-123');
           done();
         }
       });
@@ -282,31 +279,29 @@ describe('WebSocket and Real-Time Features Integration Tests', () => {
         }));
       });
 
-      wsClient.on('message', (data) => {
-        const message = JSON.parse(data.toString());
+      wsClient.on('message', (data) => { const message = JSON.parse(data.toString());
         
         if (message.type === 'auth_success') {
           // Subscribe to comment updates for a specific bill
           wsClient.send(JSON.stringify({
             type: 'subscribe',
             channel: 'comments',
-            billId: 'test-bill-1'
-          }));
+            bill_id: 'test-bill-1'
+           }));
           
           // Simulate a new comment
-          setTimeout(() => {
-            wsClient.send(JSON.stringify({
+          setTimeout(() => { wsClient.send(JSON.stringify({
               type: 'test_new_comment',
-              billId: 'test-bill-1',
-              commentId: 'comment-123',
+              bill_id: 'test-bill-1',
+              comment_id: 'comment-123',
               content: 'This is a test comment',
               author: 'Test User'
-            }));
+             }));
           }, 100);
         } else if (message.type === 'new_comment') {
           expect(message.type).toBe('new_comment');
-          expect(message.billId).toBe('test-bill-1');
-          expect(message.commentId).toBeDefined();
+          expect(message.bill_id).toBe('test-bill-1');
+          expect(message.comment_id).toBeDefined();
           expect(message.content).toBeDefined();
           done();
         }
@@ -335,14 +330,14 @@ describe('WebSocket and Real-Time Features Integration Tests', () => {
           wsClient.send(JSON.stringify({
             type: 'subscribe',
             channel: 'comment_votes',
-            commentId: 'comment-123'
+            comment_id: 'comment-123'
           }));
           
           // Simulate a vote update
           setTimeout(() => {
             wsClient.send(JSON.stringify({
               type: 'test_vote_update',
-              commentId: 'comment-123',
+              comment_id: 'comment-123',
               upvotes: 5,
               downvotes: 1,
               score: 4
@@ -350,7 +345,7 @@ describe('WebSocket and Real-Time Features Integration Tests', () => {
           }, 100);
         } else if (message.type === 'vote_update') {
           expect(message.type).toBe('vote_update');
-          expect(message.commentId).toBe('comment-123');
+          expect(message.comment_id).toBe('comment-123');
           expect(message.upvotes).toBeDefined();
           expect(message.downvotes).toBeDefined();
           expect(message.score).toBeDefined();
@@ -375,30 +370,28 @@ describe('WebSocket and Real-Time Features Integration Tests', () => {
         }));
       });
 
-      wsClient.on('message', (data) => {
-        const message = JSON.parse(data.toString());
+      wsClient.on('message', (data) => { const message = JSON.parse(data.toString());
         
         if (message.type === 'auth_success') {
           // Subscribe to analytics updates
           wsClient.send(JSON.stringify({
             type: 'subscribe',
             channel: 'analytics',
-            billId: 'test-bill-1'
-          }));
+            bill_id: 'test-bill-1'
+           }));
           
           // Simulate analytics update
-          setTimeout(() => {
-            wsClient.send(JSON.stringify({
+          setTimeout(() => { wsClient.send(JSON.stringify({
               type: 'test_analytics_update',
-              billId: 'test-bill-1',
+              bill_id: 'test-bill-1',
               views: 150,
               comments: 12,
               engagement: 0.75
-            }));
+             }));
           }, 100);
         } else if (message.type === 'analytics_update') {
           expect(message.type).toBe('analytics_update');
-          expect(message.billId).toBe('test-bill-1');
+          expect(message.bill_id).toBe('test-bill-1');
           expect(message.views).toBeDefined();
           expect(message.comments).toBeDefined();
           expect(message.engagement).toBeDefined();

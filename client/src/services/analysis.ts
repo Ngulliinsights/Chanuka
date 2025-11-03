@@ -4,9 +4,8 @@ import { apiService, ApiResponse, ApiError } from './apiService';
 /**
  * Core interfaces for bill analysis system
  */
-export interface BillAnalysis {
-  id: string;
-  billId: number;
+export interface BillAnalysis { id: string;
+  bill_id: number;
   conflictScore: number;
   transparencyRating: number;
   stakeholderAnalysis: StakeholderImpact[];
@@ -14,7 +13,7 @@ export interface BillAnalysis {
   publicBenefit: number;
   corporateInfluence: CorporateConnection[];
   timestamp: Date;
-}
+ }
 
 interface StakeholderImpact {
   group: string;
@@ -58,31 +57,28 @@ class AnalysisService {
   /**
    * Main method to analyze a bill by its ID
    * Fetches analysis from the API service and handles success or fallback.
-   * * @param billId - Unique identifier for the bill to analyze
+   * * @param bill_id - Unique identifier for the bill to analyze
    * @returns Promise resolving to complete bill analysis
-   * @throws ApiError if billId is invalid or API fails without fallback
+   * @throws ApiError if bill_id is invalid or API fails without fallback
    */
-  async analyzeBill(billId: number): Promise<BillAnalysis> {
-    if (!Number.isInteger(billId) || billId <= 0) {
+  async analyzeBill(bill_id: number): Promise<BillAnalysis> { if (!Number.isInteger(bill_id) || bill_id <= 0) {
       // Still good to have input validation
       throw new Error('Invalid bill ID: must be a positive integer');
-    }
+     }
 
     // REFACTORED: Use the centralized apiService
     const response = await apiService.get<BillAnalysis>(
-      `/api/bills/${billId}/analysis`,
-      {
-        // Provide mock data as a fallback on failure
-        fallbackData: this.generateMockAnalysis(billId)
-      }
+      `/api/bills/${ bill_id }/analysis`,
+      { // Provide mock data as a fallback on failure
+        fallbackData: this.generateMockAnalysis(bill_id)
+       }
     );
 
     if (response.success) {
       // Real or cached data was returned
       return this.validateAnalysisData(response.data);
-    } else {
-      // Fallback data was used
-      logger.warn(`Using fallback analysis for bill ${billId}`, {
+    } else { // Fallback data was used
+      logger.warn(`Using fallback analysis for bill ${bill_id }`, {
         component: 'AnalysisService',
         error: response.error.message,
         status: response.error.status
@@ -94,13 +90,12 @@ class AnalysisService {
   /**
    * Validates that the analysis data has all required fields
    */
-  private validateAnalysisData(data: any): BillAnalysis {
-    const required = ['id', 'billId', 'conflictScore', 'transparencyRating'];
+  private validateAnalysisData(data: any): BillAnalysis { const required = ['id', 'bill_id', 'conflictScore', 'transparencyRating'];
     const missing = required.filter(field => !(field in data));
     
     if (missing.length > 0) {
       // This is a critical error, API returned bad data
-      throw new Error(`Invalid analysis data from API: missing fields ${missing.join(', ')}`);
+      throw new Error(`Invalid analysis data from API: missing fields ${missing.join(', ') }`);
     }
     
     return {
@@ -112,33 +107,32 @@ class AnalysisService {
   /**
    * Generates mock analysis data for demonstration or testing
    */
-  private generateMockAnalysis(billId: number): BillAnalysis {
-    const seed = billId * 9301 + 49297;
+  private generateMockAnalysis(bill_id: number): BillAnalysis { const seed = bill_id * 9301 + 49297;
     const seededRandom = () => ((seed * 233280) % 2147483647) / 2147483647;
     
     return {
-      id: `analysis-${billId}-${Date.now()}`,
-      billId,
+      id: `analysis-${bill_id }-${Date.now()}`,
+      bill_id,
       conflictScore: Math.floor(seededRandom() * 100),
       transparencyRating: Math.floor(seededRandom() * 100),
-      stakeholderAnalysis: this.generateMockStakeholders(billId),
-      constitutionalConcerns: this.generateMockConcerns(billId),
+      stakeholderAnalysis: this.generateMockStakeholders(bill_id),
+      constitutionalConcerns: this.generateMockConcerns(bill_id),
       publicBenefit: Math.floor(seededRandom() * 100),
-      corporateInfluence: this.generateMockCorporateInfluence(billId),
+      corporateInfluence: this.generateMockCorporateInfluence(bill_id),
       timestamp: new Date()
     };
   }
 
   // --- Mock data helper functions remain unchanged ---
 
-  private generateMockStakeholders(billId: number): StakeholderImpact[] {
+  private generateMockStakeholders(bill_id: number): StakeholderImpact[] {
     const stakeholderGroups = [
       { group: 'Small Businesses', population: 150000, impact: 'high' as const },
       { group: 'Healthcare Workers', population: 45000, impact: 'medium' as const },
       { group: 'Rural Communities', population: 200000, impact: 'medium' as const },
       { group: 'Tech Sector', population: 85000, impact: 'low' as const }
     ];
-    const count = 2 + (billId % 2);
+    const count = 2 + (bill_id % 2);
     return stakeholderGroups.slice(0, count).map(s => ({
       group: s.group,
       impactLevel: s.impact,
@@ -147,17 +141,16 @@ class AnalysisService {
     }));
   }
 
-  private generateMockConcerns(billId: number): string[] {
-    const concerns = [
+  private generateMockConcerns(bill_id: number): string[] { const concerns = [
       'Potential federalism issues with state authority',
       'Due process considerations in enforcement mechanisms',
       'First Amendment implications for speech regulations',
       'Commerce Clause scope and limitations'
     ];
-    return concerns.slice(0, 1 + (billId % 2));
-  }
+    return concerns.slice(0, 1 + (bill_id % 2));
+   }
 
-  private generateMockCorporateInfluence(billId: number): CorporateConnection[] {
+  private generateMockCorporateInfluence(bill_id: number): CorporateConnection[] {
     const connections: CorporateConnection[] = [
       {
         organization: 'TechCorp Industries',
@@ -172,15 +165,14 @@ class AnalysisService {
         potentialConflict: false
       }
     ];
-    return billId % 2 === 0 ? connections : [connections[0]];
+    return bill_id % 2 === 0 ? connections : [connections[0]];
   }
 
   /**
    * Performs conflict of interest analysis on a bill
    */
-  async getConflictAnalysis(billId: number): Promise<ConflictAnalysisResult> {
-    // This method now benefits from the fallback logic in analyzeBill
-    const analysis = await this.analyzeBill(billId);
+  async getConflictAnalysis(bill_id: number): Promise<ConflictAnalysisResult> { // This method now benefits from the fallback logic in analyzeBill
+    const analysis = await this.analyzeBill(bill_id);
     
     const overallRisk = this.calculateRiskLevel(analysis.conflictScore);
     const conflicts = analysis.corporateInfluence.filter(c => c.potentialConflict);
@@ -190,7 +182,7 @@ class AnalysisService {
       conflicts,
       recommendations: this.generateRecommendations(analysis),
       analysisDate: analysis.timestamp
-    };
+     };
   }
 
   /**
@@ -250,20 +242,20 @@ class AnalysisService {
   /**
    * Batch analysis method for processing multiple bills efficiently
    */
-  async analyzeBills(billIds: number[]): Promise<Map<number, BillAnalysis>> {
+  async analyzeBills(bill_ids: number[]): Promise<Map<number, BillAnalysis>> {
     // Process all bills in parallel
     const analyses = await Promise.allSettled(
-      billIds.map(id => this.analyzeBill(id))
+      bill_ids.map(id => this.analyzeBill(id))
     );
 
     const results = new Map<number, BillAnalysis>();
     
     analyses.forEach((result, index) => {
       if (result.status === 'fulfilled') {
-        results.set(billIds[index], result.value);
+        results.set(bill_ids[index], result.value);
       } else {
         // Log failed analyses but continue processing others
-        logger.error(`Failed to analyze bill ${billIds[index]} in batch`, {
+        logger.error(`Failed to analyze bill ${bill_ids[index]} in batch`, {
           component: 'AnalysisService',
           error: result.reason
         });

@@ -21,22 +21,21 @@ const mockDb = {
 
 // Mock ComprehensiveAnalysis instance
 const mockAnalysisEntity = new ComprehensiveAnalysis(
-    1, // billId
+    1, // bill_id
     `comp_analysis_1_${Date.now()}`, // analysisId
     new Date(), // timestamp
     { constitutionalityScore: 70, concerns: [], precedents: [], riskAssessment: 'low' }, // constitutionalAnalysis
     { overallRisk: 'low', affectedSponsorsCount: 0, totalFinancialExposureEstimate: 0, directConflictCount: 0, indirectConflictCount: 0 }, // conflictAnalysisSummary
     { primaryBeneficiaries: [], negativelyAffected: [], affectedPopulations: [], economicImpact: { estimatedCost: 0, estimatedBenefit: 0, netImpact: 0, timeframe: 'N/A', confidence: 50 }, socialImpact: { equityEffect: 0, accessibilityEffect: 0, publicHealthEffect: 0, environmentalEffect: 0 } }, // stakeholderImpact
-    { overall: 80, grade: 'B', breakdown: { sponsorDisclosure: 80, legislativeProcess: 80, financialConflicts: 80, publicAccessibility: 80 } }, // transparencyScore
-    { score: 75, assessment: 'High', factors: { economicScoreNormalized: 70, socialScoreNormalized: 80, transparencyScore: 80 } }, // publicInterestScore
+    { overall: 80, grade: 'B', breakdown: { sponsorDisclosure: 80, legislativeProcess: 80, financialConflicts: 80, publicAccessibility: 80 } }, // transparency_score
+    { score: 75, assessment: 'High', factors: { economicScoreNormalized: 70, socialScoreNormalized: 80, transparency_score: 80 } }, // publicInterestScore
     ['Recommendation 1'], // recommendedActions
     85 // overallConfidence
 );
 
-const mockDbRecord = {
-    id: 101, billId: 1, analysisType: 'comprehensive_v1.0',
-    results: { analysisId: mockAnalysisEntity.analysisId, /* ... other results */ },
-    confidence: '85', createdAt: new Date(), updatedAt: new Date(), isApproved: false, approvedBy: null
+const mockDbRecord = { id: 101, bill_id: 1, analysis_type: 'comprehensive_v1.0',
+    results: { analysisId: mockAnalysisEntity.analysisId, /* ... other results */  },
+    confidence: '85', created_at: new Date(), updated_at: new Date(), is_approved: false, approved_by: null
 } as schema.Analysis;
 
 
@@ -49,8 +48,7 @@ describe('AnalysisRepositoryImpl', () => {
     repository = analysisRepository; // Or new AnalysisRepositoryImpl()
   });
 
-  describe('save', () => {
-    it('should insert a new analysis record', async () => {
+  describe('save', () => { it('should insert a new analysis record', async () => {
        // Arrange
        mockDb.returning.mockResolvedValueOnce([mockDbRecord]);
 
@@ -60,8 +58,8 @@ describe('AnalysisRepositoryImpl', () => {
       // Assert
       expect(mockDb.insert).toHaveBeenCalledWith(schema.analysis);
       expect(mockDb.values).toHaveBeenCalledWith(expect.objectContaining({
-        billId: mockAnalysisEntity.billId,
-        analysisType: `comprehensive_v${mockAnalysisEntity.version}`,
+        bill_id: mockAnalysisEntity.bill_id,
+        analysis_type: `comprehensive_v${mockAnalysisEntity.version }`,
         results: expect.objectContaining({ analysisId: mockAnalysisEntity.analysisId }),
         confidence: mockAnalysisEntity.overallConfidence.toString(),
       }));
@@ -71,7 +69,7 @@ describe('AnalysisRepositoryImpl', () => {
 
      it('should update an existing analysis record on conflict', async () => {
         // Arrange: Simulate onConflictDoUpdate returning the updated record
-        mockDb.returning.mockResolvedValueOnce([{...mockDbRecord, updatedAt: new Date() }]);
+        mockDb.returning.mockResolvedValueOnce([{...mockDbRecord, updated_at: new Date() }]);
 
         // Act
         const result = await repository.save(mockAnalysisEntity); // Same entity, should trigger update path
@@ -79,14 +77,14 @@ describe('AnalysisRepositoryImpl', () => {
         // Assert
         expect(mockDb.insert).toHaveBeenCalledTimes(1); // Still uses INSERT ... ON CONFLICT
         expect(mockDb.onConflictDoUpdate).toHaveBeenCalledWith(expect.objectContaining({
-            target: [schema.analysis.billId, schema.analysis.analysisType], // Check target columns
+            target: [schema.analysis.bill_id, schema.analysis.analysis_type], // Check target columns
             set: expect.objectContaining({ // Check fields being set on update
                 results: expect.any(Object),
                 confidence: mockAnalysisEntity.overallConfidence.toString(),
-                updatedAt: expect.any(Date),
+                updated_at: expect.any(Date),
             }),
         }));
-        expect(result).toHaveProperty('updatedAt'); // Check if it looks like an updated record
+        expect(result).toHaveProperty('updated_at'); // Check if it looks like an updated record
     });
 
   });
@@ -120,8 +118,7 @@ describe('AnalysisRepositoryImpl', () => {
     });
   });
 
-   describe('recordFailedAnalysis', () => {
-        it('should insert a record with analysisType "comprehensive_failed"', async () => {
+   describe('recordFailedAnalysis', () => { it('should insert a record with analysis_type "comprehensive_failed"', async () => {
             // Arrange
             const error = new Error("ML service timeout");
 
@@ -131,11 +128,11 @@ describe('AnalysisRepositoryImpl', () => {
             // Assert
             expect(mockDb.insert).toHaveBeenCalledWith(schema.analysis);
             expect(mockDb.values).toHaveBeenCalledWith(expect.objectContaining({
-                billId: mockBillId,
-                analysisType: 'comprehensive_failed',
-                results: expect.objectContaining({ error: error.message, stack: error.stack }),
+                bill_id: mockBillId,
+                analysis_type: 'comprehensive_failed',
+                results: expect.objectContaining({ error: error.message, stack: error.stack  }),
                 confidence: "0",
-                isApproved: false,
+                is_approved: false,
             }));
         });
     });

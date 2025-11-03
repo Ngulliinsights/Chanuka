@@ -1,6 +1,6 @@
 import { eq, desc, and, sql, count, ilike, or } from "drizzle-orm";
 import * as schema from "@shared/schema";
-import { SearchContext, QueryOptions } from "../types/search.types";
+import { SearchContext, QueryOptions } from "../engines/types/search.types";
 
 /**
  * Service responsible for building optimized database queries for search operations
@@ -30,11 +30,11 @@ export class QueryBuilderService {
         title: schema.bills.title,
         id: schema.bills.id,
         category: schema.bills.category,
-        viewCount: schema.bills.viewCount
+        view_count: schema.bills.view_count
       },
       from: schema.bills,
       where: and(...conditions),
-      orderBy: desc(schema.bills.viewCount),
+      orderBy: desc(schema.bills.view_count),
       limit: options.limit || 10
     };
   }
@@ -72,19 +72,19 @@ export class QueryBuilderService {
         id: schema.sponsors.id,
         role: schema.sponsors.role,
         party: schema.sponsors.party,
-        sponsorshipCount: count(schema.billSponsorships.id)
+        sponsorshipCount: count(schema.bill_sponsorships.id)
       },
       from: schema.sponsors,
       leftJoin: {
-        table: schema.billSponsorships,
-        on: eq(schema.sponsors.id, schema.billSponsorships.sponsorId)
+        table: schema.bill_sponsorships,
+        on: eq(schema.sponsors.id, schema.bill_sponsorships.sponsor_id)
       },
       where: or(
         ilike(schema.sponsors.name, `${query}%`),
         ilike(schema.sponsors.name, `%${query}%`)
       ),
       groupBy: [schema.sponsors.id, schema.sponsors.name, schema.sponsors.role, schema.sponsors.party],
-      orderBy: desc(count(schema.billSponsorships.id)),
+      orderBy: desc(count(schema.bill_sponsorships.id)),
       limit: options.limit || 10
     };
   }

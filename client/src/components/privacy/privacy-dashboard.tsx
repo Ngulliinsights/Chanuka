@@ -64,7 +64,7 @@ interface PrivacyDashboard {
     dataType: string;
     retentionPeriodDays: number;
     description: string;
-    isActive: boolean;
+    is_active: boolean;
   }>;
   userRights: {
     dataExport: boolean;
@@ -509,11 +509,11 @@ export function PrivacyDashboard() {
                       <p className="text-sm text-gray-600">{policy.description}</p>
                     </div>
                     <div className="text-right">
-                      <Badge variant={policy.isActive ? "default" : "secondary"}>
+                      <Badge variant={policy.is_active ? "default" : "secondary"}>
                         {policy.retentionPeriodDays} days
                       </Badge>
                       <p className="text-xs text-gray-500 mt-1">
-                        {policy.isActive ? 'Active' : 'Inactive'}
+                        {policy.is_active ? 'Active' : 'Inactive'}
                       </p>
                     </div>
                   </div>

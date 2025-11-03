@@ -8,28 +8,26 @@ import { ThumbsUp, ThumbsDown, Reply, MoreVertical, Edit, Trash } from 'lucide-r
 import { useComments } from '../hooks/useCommunity';
 import type { Comment, CreateCommentRequest } from '../types';
 
-interface CommentThreadProps {
-  billId?: string;
+interface CommentThreadProps { bill_id?: string;
   comments: Comment[];
   onCommentUpdate?: () => void;
-}
+ }
 
-export function CommentThread({ billId, comments, onCommentUpdate }: CommentThreadProps) {
+export function CommentThread({ bill_id, comments, onCommentUpdate  }: CommentThreadProps) {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [editingComment, setEditingComment] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [editContent, setEditContent] = useState('');
 
-  const { createComment, updateComment, voteOnComment, deleteComment } = useComments(billId);
+  const { createComment, updateComment, voteOnComment, deleteComment } = useComments(bill_id);
 
-  const handleReply = async (parentId: string) => {
-    if (!replyContent.trim()) return;
+  const handleReply = async (parent_id: string) => { if (!replyContent.trim()) return;
 
     const request: CreateCommentRequest = {
       content: replyContent,
-      billId,
-      parentId,
-    };
+      bill_id,
+      parent_id,
+     };
 
     try {
       await createComment.mutateAsync(request);
@@ -41,12 +39,12 @@ export function CommentThread({ billId, comments, onCommentUpdate }: CommentThre
     }
   };
 
-  const handleEdit = async (commentId: string) => {
+  const handleEdit = async (comment_id: string) => {
     if (!editContent.trim()) return;
 
     try {
       await updateComment.mutateAsync({
-        commentId,
+        comment_id,
         request: { content: editContent }
       });
       setEditContent('');
@@ -57,20 +55,20 @@ export function CommentThread({ billId, comments, onCommentUpdate }: CommentThre
     }
   };
 
-  const handleVote = async (commentId: string, vote: 'up' | 'down' | null) => {
+  const handleVote = async (comment_id: string, vote: 'up' | 'down' | null) => {
     try {
-      await voteOnComment.mutateAsync({ commentId, vote });
+      await voteOnComment.mutateAsync({ comment_id, vote });
       onCommentUpdate?.();
     } catch (error) {
       console.error('Failed to vote:', error);
     }
   };
 
-  const handleDelete = async (commentId: string) => {
+  const handleDelete = async (comment_id: string) => {
     if (!confirm('Are you sure you want to delete this comment?')) return;
 
     try {
-      await deleteComment.mutateAsync(commentId);
+      await deleteComment.mutateAsync(comment_id);
       onCommentUpdate?.();
     } catch (error) {
       console.error('Failed to delete comment:', error);
@@ -97,7 +95,7 @@ export function CommentThread({ billId, comments, onCommentUpdate }: CommentThre
                 <div className="flex items-center space-x-2 mb-1">
                   <span className="font-medium text-sm">{comment.authorName}</span>
                   <span className="text-xs text-muted-foreground">
-                    {new Date(comment.createdAt).toLocaleDateString()}
+                    {new Date(comment.created_at).toLocaleDateString()}
                   </span>
                   {comment.isEdited && (
                     <Badge variant="outline" className="text-xs">Edited</Badge>

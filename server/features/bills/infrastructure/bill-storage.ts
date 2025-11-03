@@ -6,7 +6,7 @@ import { BaseStorage, type StorageConfig } from "../../../infrastructure/databas
 import { readDatabase } from '@shared/database/connection';
 import {
   bill as bills,
-  billTag as billTags,
+  bill_tag as bill_tags,
   type Bill,
   type InsertBill
 } from "../../../../shared/schema";
@@ -85,7 +85,7 @@ export class BillStorage extends BaseStorage<Bill> {
   const result = await readDatabase
           .select()
           .from(bills)
-          .orderBy(desc(bills.createdAt));
+          .orderBy(desc(bills.created_at));
 
         return result;
       },
@@ -122,26 +122,26 @@ export class BillStorage extends BaseStorage<Bill> {
    */
   async createBill(bill: InsertBill): Promise<Bill> {
     // Comprehensive input validation with specific error messages
-    if (!bill.title?.trim()) {
+    if (!bills.title?.trim()) {
       throw new Error("Bill title is required and cannot be empty");
     }
 
     // Handle optional content field safely - content can be null in schema
-    const content = bill.content?.trim() || null;
+    const content = bills.content?.trim() || null;
 
     return this.executeTransaction(async (tx) => {
       const result = await tx
         .insert(bills)
         .values({
           ...bill,
-          title: bill.title.trim(),
+          title: bills.title.trim(),
           content: content,
-          description: bill.description?.trim() || null,
-          status: bill.status || "draft",
-          viewCount: 0,
-          shareCount: 0,
-          commentCount: 0,
-          engagementScore: "0",
+          description: bills.description?.trim() || null,
+          status: bills.status || "draft",
+          view_count: 0,
+          share_count: 0,
+          comment_count: 0,
+          engagement_score: "0",
         })
         .returning();
 
@@ -160,13 +160,11 @@ export class BillStorage extends BaseStorage<Bill> {
    * Provides thread-safe increments for view and share counts using
    * SQL atomic operations to prevent race conditions.
    */
-  async incrementBillViews(billId: number): Promise<Bill> {
-    return this.incrementBillStat(billId, "viewCount");
-  }
+  async incrementBillViews(bill_id: number): Promise<Bill> { return this.incrementBillStat(bill_id, "view_count");
+   }
 
-  async incrementBillShares(billId: number): Promise<Bill> {
-    return this.incrementBillStat(billId, "shareCount");
-  }
+  async incrementBillShares(bill_id: number): Promise<Bill> { return this.incrementBillStat(bill_id, "share_count");
+   }
 
   /**
    * Private method for atomic statistics updates
@@ -175,40 +173,38 @@ export class BillStorage extends BaseStorage<Bill> {
    * while maintaining proper cache invalidation.
    */
   private async incrementBillStat(
-    billId: number,
-    field: "viewCount" | "shareCount"
-  ): Promise<Bill> {
-    if (!Number.isInteger(billId) || billId <= 0) {
+    bill_id: number,
+    field: "view_count" | "share_count"
+  ): Promise<Bill> { if (!Number.isInteger(bill_id) || bill_id <= 0) {
       throw new Error("Invalid bill ID: must be a positive integer");
-    }
+     }
 
-    return this.executeTransaction(async (tx) => {
-      // First check if bill exists for better error messages
+    return this.executeTransaction(async (tx) => { // First check if bill exists for better error messages
       const existingBill = await tx
         .select()
         .from(bills)
-        .where(eq(bills.id, billId));
+        .where(eq(bills.id, bill_id));
 
       if (existingBill.length === 0) {
-        throw new Error(`Bill with ID ${billId} not found`);
+        throw new Error(`Bill with ID ${bill_id } not found`);
       }
 
       // Use atomic SQL increment to prevent race conditions
       const updateData =
-        field === "viewCount"
-          ? { viewCount: sql`${bills.viewCount} + 1`, updatedAt: new Date() }
-          : { shareCount: sql`${bills.shareCount} + 1`, updatedAt: new Date() };
+        field === "view_count"
+          ? { view_count: sql`${bills.view_count} + 1`, updated_at: new Date() }
+          : { share_count: sql`${bills.share_count} + 1`, updated_at: new Date() };
 
       const result = await tx
         .update(bills)
         .set(updateData)
-        .where(eq(bills.id, billId))
+        .where(eq(bills.id, bill_id))
         .returning();
 
       // Targeted cache invalidation for better performance
       await this.invalidateCache([
         CACHE_KEY.ALL_BILLS,
-        CACHE_KEY.BILL_BY_ID(billId),
+        CACHE_KEY.BILL_BY_ID(bill_id),
       ]);
 
       return result[0];
@@ -221,10 +217,9 @@ export class BillStorage extends BaseStorage<Bill> {
    * Provides comprehensive tag operations with proper validation,
    * deduplication, and optimized database queries.
    */
-  async addTagsToBill(billId: number, tags: string[]): Promise<Bill> {
-    if (!Number.isInteger(billId) || billId <= 0) {
+  async addTagsToBill(bill_id: number, tags: string[]): Promise<Bill> { if (!Number.isInteger(bill_id) || bill_id <= 0) {
       throw new Error("Invalid bill ID: must be a positive integer");
-    }
+     }
 
     if (!Array.isArray(tags) || tags.length === 0) {
       throw new Error("Tags array is required and cannot be empty");
@@ -232,31 +227,30 @@ export class BillStorage extends BaseStorage<Bill> {
 
     const cleanTags = this.validateAndCleanTags(tags);
 
-    return this.executeTransaction(async (tx) => {
-      // Check if bill exists first
+    return this.executeTransaction(async (tx) => { // Check if bill exists first
       const existingBill = await tx
         .select()
         .from(bills)
-        .where(eq(bills.id, billId));
+        .where(eq(bills.id, bill_id));
 
       if (existingBill.length === 0) {
-        throw new Error(`Bill with ID ${billId} not found`);
+        throw new Error(`Bill with ID ${bill_id } not found`);
       }
 
       // Insert tags with conflict resolution (ignore duplicates)
-      const tagValues = cleanTags.map((tag) => ({ billId, tag }));
-      await tx.insert(billTags).values(tagValues).onConflictDoNothing();
+      const tagValues = cleanTags.map((tag) => ({ bill_id, tag  }));
+      await tx.insert(bill_tags).values(tagValues).onConflictDoNothing();
 
       // Update bill timestamp to reflect the change
       await tx
         .update(bills)
-        .set({ updatedAt: new Date() })
-        .where(eq(bills.id, billId));
+        .set({ updated_at: new Date() })
+        .where(eq(bills.id, bill_id));
 
       // Enhanced cache invalidation including tag-based caches
       await this.invalidateCache([
         CACHE_KEY.ALL_BILLS,
-        CACHE_KEY.BILL_BY_ID(billId),
+        CACHE_KEY.BILL_BY_ID(bill_id),
         ...CACHE_INVALIDATION.PATTERN_BY_TAGS,
       ]);
 
@@ -270,10 +264,9 @@ export class BillStorage extends BaseStorage<Bill> {
    * Removes specified tags from a bill while maintaining data integrity
    * and cache consistency.
    */
-  async removeTagsFromBill(billId: number, tags: string[]): Promise<Bill | undefined> {
-    if (!Number.isInteger(billId) || billId <= 0) {
+  async removeTagsFromBill(bill_id: number, tags: string[]): Promise<Bill | undefined> { if (!Number.isInteger(bill_id) || bill_id <= 0) {
       throw new Error("Invalid bill ID: must be a positive integer");
-    }
+     }
 
     if (!Array.isArray(tags) || tags.length === 0) {
       throw new Error("Tags array is required and cannot be empty");
@@ -281,29 +274,28 @@ export class BillStorage extends BaseStorage<Bill> {
 
     const cleanTags = this.validateAndCleanTags(tags);
 
-    return this.executeTransaction(async (tx) => {
-      // Remove specified tags efficiently
+    return this.executeTransaction(async (tx) => { // Remove specified tags efficiently
       await tx
-        .delete(billTags)
+        .delete(bill_tags)
         .where(
-          and(eq(billTags.billId, billId), inArray(billTags.tag, cleanTags))
+          and(eq(bill_tags.bill_id, bill_id), inArray(bill_tags.tag, cleanTags))
         );
 
       // Update bill timestamp
       await tx
         .update(bills)
-        .set({ updatedAt: new Date() })
-        .where(eq(bills.id, billId));
+        .set({ updated_at: new Date()  })
+        .where(eq(bills.id, bill_id));
 
       // Enhanced cache invalidation
       await this.invalidateCache([
         CACHE_KEY.ALL_BILLS,
-        CACHE_KEY.BILL_BY_ID(billId),
+        CACHE_KEY.BILL_BY_ID(bill_id),
         ...CACHE_INVALIDATION.PATTERN_BY_TAGS,
       ]);
 
       // Fetch and return the updated bill
-      return this.getBill(billId);
+      return this.getBill(bill_id);
     });
   }
 
@@ -325,26 +317,25 @@ export class BillStorage extends BaseStorage<Bill> {
 
     return this.getCached(
       CACHE_KEY.BILLS_BY_TAGS(cleanTags),
-      async () => {
-        // Get bill IDs that have all the specified tags
-  const billIdsWithTags = await readDatabase
-          .select({ billId: billTags.billId })
-          .from(billTags)
-          .where(inArray(billTags.tag, cleanTags))
-          .groupBy(billTags.billId)
-          .having(sql`COUNT(DISTINCT ${billTags.tag}) = ${cleanTags.length}`);
+      async () => { // Get bill IDs that have all the specified tags
+  const bill_idsWithTags = await readDatabase
+          .select({ bill_id: bill_tags.bill_id  })
+          .from(bill_tags)
+          .where(inArray(bill_tags.tag, cleanTags))
+          .groupBy(bill_tags.bill_id)
+          .having(sql`COUNT(DISTINCT ${bill_tags.tag}) = ${cleanTags.length}`);
 
-        if (billIdsWithTags.length === 0) {
+        if (bill_idsWithTags.length === 0) {
           return [];
         }
 
         // Get the actual bills
-        const billIds = billIdsWithTags.map((row) => row.billId);
+        const bill_ids = bill_idsWithTags.map((row) => row.bill_id);
   return await readDatabase
           .select()
           .from(bills)
-          .where(inArray(bills.id, billIds))
-          .orderBy(desc(bills.createdAt));
+          .where(inArray(bills.id, bill_ids))
+          .orderBy(desc(bills.created_at));
       },
       CACHE_TTL
     );

@@ -40,7 +40,7 @@ interface NavigationItem {
   href: string;
   icon: React.ReactNode;
   badge?: number;
-  isActive?: boolean;
+  is_active?: boolean;
 }
 
 interface MobileTabBarProps {
@@ -77,7 +77,7 @@ export function MobileTabBar({
   const itemsWithActiveState = useMemo(() => {
     return items.map((item) => ({
       ...item,
-      isActive:
+      is_active:
         location.pathname === item.href ||
         (item.href !== "/" && location.pathname.startsWith(item.href)),
     }));
@@ -123,19 +123,19 @@ export function MobileTabBar({
             : "min-w-[50px] min-h-[50px]"
         }
         ${
-          item.isActive
+          item.is_active
             ? "text-blue-600 bg-blue-50"
             : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 active:bg-gray-100"
         }
         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
       `}
       aria-label={`Navigate to ${item.label}`}
-      aria-current={item.isActive ? "page" : undefined}
+      aria-current={item.is_active ? "page" : undefined}
     >
       <div className="relative">
         {React.cloneElement(item.icon as React.ReactElement, {
           className: `h-5 w-5 ${
-            item.isActive ? "text-blue-600" : "text-current"
+            item.is_active ? "text-blue-600" : "text-current"
           }`,
         })}
         {item.badge && item.badge > 0 && (
@@ -146,7 +146,7 @@ export function MobileTabBar({
       </div>
       <span
         className={`text-xs mt-1 font-medium ${
-          item.isActive ? "text-blue-600" : "text-current"
+          item.is_active ? "text-blue-600" : "text-current"
         }`}
       >
         {item.label}
@@ -193,7 +193,7 @@ export function MobileTabBar({
                         flex items-center px-4 py-3 text-sm transition-colors
                         ${touchOptimized ? "min-h-[44px]" : ""}
                         ${
-                          item.isActive
+                          item.is_active
                             ? "text-blue-600 bg-blue-50"
                             : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
                         }

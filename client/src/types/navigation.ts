@@ -1,7 +1,7 @@
 export interface BreadcrumbItem {
   label: string;
   path: string;
-  isActive: boolean;
+  is_active: boolean;
 }
 
 export interface RelatedPage {
@@ -19,7 +19,7 @@ export interface RelatedPage {
 export type NavigationSection = 'legislative' | 'community' | 'user' | 'admin' | 'tools' | 'system';
 
 // Include both 'citizen' and 'user' to remain compatible with different parts
-// of the codebase that use either term for an authenticated regular user.
+// of the codebase that use either term for an authenticated regular users.
 export type UserRole = 'public' | 'citizen' | 'user' | 'expert' | 'admin' | 'journalist' | 'advocate';
 
 export interface NavigationPreferences {
@@ -46,7 +46,7 @@ export interface NavigationState {
   currentSection: NavigationSection;
   sidebarOpen: boolean;
   mobileMenuOpen: boolean;
-  userRole: UserRole;
+  user_role: UserRole;
   preferences: NavigationPreferences;
 }
 
@@ -71,7 +71,7 @@ export interface ResponsiveNavigationState {
 
 export interface ResponsiveNavigationContextValue extends ResponsiveNavigationState {
   toggleSidebar: () => void;
-  isActive: (path: string) => boolean;
+  is_active: (path: string) => boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
 }
 

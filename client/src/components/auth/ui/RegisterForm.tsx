@@ -44,8 +44,8 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
           email: registerFormData.email,
           password: registerFormData.password,
           confirmPassword: registerFormData.confirmPassword,
-          firstName: registerFormData.firstName,
-          lastName: registerFormData.lastName,
+          first_name: registerFormData.first_name,
+          last_name: registerFormData.last_name,
         });
         
         if (!result.success && result.error) {
@@ -100,28 +100,28 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       {/* Name fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" data-testid="auth-name-fields">
         <AuthInput
-          name="firstName"
+          name="first_name"
           label="First Name"
           type="text"
           placeholder="John"
-          value={registerFormData.firstName || ''}
+          value={registerFormData.first_name || ''}
           onChange={handleInputChange}
           onBlur={handleInputBlur}
-          error={errors.firstName}
+          error={errors.first_name}
           disabled={currentLoading}
           required
           icon={User}
         />
 
         <AuthInput
-          name="lastName"
+          name="last_name"
           label="Last Name"
           type="text"
           placeholder="Doe"
-          value={registerFormData.lastName || ''}
+          value={registerFormData.last_name || ''}
           onChange={handleInputChange}
           onBlur={handleInputBlur}
-          error={errors.lastName}
+          error={errors.last_name}
           disabled={currentLoading}
           required
           icon={User}

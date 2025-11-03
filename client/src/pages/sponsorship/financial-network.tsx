@@ -19,9 +19,8 @@ import {
 } from 'lucide-react';
 import { logger } from '../../utils/browser-logger';
 
-interface FinancialNetworkProps {
-  billId?: string;
-}
+interface FinancialNetworkProps { bill_id?: string;
+ }
 
 interface NetworkData {
   totalEntities: number;
@@ -36,15 +35,14 @@ interface NetworkData {
   }>;
 }
 
-export default function FinancialNetworkAnalysis({ billId }: FinancialNetworkProps) {
-  const [networkData, setNetworkData] = useState<NetworkData | null>(null);
+export default function FinancialNetworkAnalysis({ bill_id  }: FinancialNetworkProps) { const [networkData, setNetworkData] = useState<NetworkData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchNetworkData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/bills/${billId}/sponsorship-analysis/financial-network`);
+        const response = await fetch(`/api/bills/${bill_id }/sponsorship-analysis/financial-network`);
 
         if (response.ok) {
           const data = await response.json();
@@ -90,10 +88,10 @@ export default function FinancialNetworkAnalysis({ billId }: FinancialNetworkPro
       }
     };
 
-    if (billId) {
+    if (bill_id) {
       fetchNetworkData();
     }
-  }, [billId]);
+  }, [bill_id]);
 
   if (loading) {
     return (
@@ -120,16 +118,16 @@ export default function FinancialNetworkAnalysis({ billId }: FinancialNetworkPro
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
         <Link to="/" className="hover:text-primary">Home</Link>
         <span>›</span>
-        <Link to={`/bills/${billId}`} className="hover:text-primary">Bills</Link>
+        <Link to={ `/bills/${bill_id }`} className="hover:text-primary">Bills</Link>
         <span>›</span>
-        <Link to={`/bills/${billId}/sponsorship-analysis`} className="hover:text-primary">Sponsorship Analysis</Link>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="hover:text-primary">Sponsorship Analysis</Link>
         <span>›</span>
         <span className="text-foreground">Financial Network</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6">
-        <Link to={`/bills/${billId}/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Analysis Navigation
         </Link>
@@ -471,13 +469,13 @@ export default function FinancialNetworkAnalysis({ billId }: FinancialNetworkPro
 
       {/* Navigation Actions */}
       <div className="flex justify-between items-center">
-        <Link to={`/bills/${billId}/sponsorship-analysis/co-sponsors`}>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis/co-sponsors`}>
           <Button variant="outline">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Previous: Co-Sponsors
           </Button>
         </Link>
-        <Link to={`/bills/${billId}/sponsorship-analysis/methodology`}>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis/methodology`}>
           <Button>
             Next: Methodology
             <ChevronRight className="h-4 w-4 ml-2" />

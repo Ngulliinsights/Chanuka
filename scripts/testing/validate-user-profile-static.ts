@@ -1,5 +1,5 @@
 // Static validation script for User Profile Service (no database required)
-import { userProfileService } from './services/user-profile.js';
+import { user_profileservice } from './services/user-profile.js';
 import { logger } from '@shared/core';
 
 function validateUserProfileService() {
@@ -26,20 +26,20 @@ function validateUserProfileService() {
   let allMethodsExist = true;
   
   requiredMethods.forEach(method => {
-    const exists = typeof userProfileService[method] === 'function';
+    const exists = typeof user_profileservice[method] === 'function';
     console.log(`  ${exists ? '✅' : '❌'} ${method}`);
     if (!exists) allMethodsExist = false;
   });
 
   // Check if service is properly exported
   logger.info('\n🔧 Service Export Validation:', { component: 'Chanuka' });
-  console.log(`  ${userProfileService ? '✅' : '❌'} userProfileService exported`);
-  console.log(`  ${typeof userProfileService === 'object' ? '✅' : '❌'} userProfileService is object`);
+  console.log(`  ${user_profileservice ? '✅' : '❌'} user_profileservice exported`);
+  console.log(`  ${typeof user_profileservice === 'object' ? '✅' : '❌'} user_profileservice is object`);
 
   // Summary
   logger.info('\n📊 Validation Summary:', { component: 'Chanuka' });
   console.log(`  Required Methods: ${requiredMethods.length}`);
-  console.log(`  Implemented Methods: ${requiredMethods.filter(method => typeof userProfileService[method] === 'function').length}`);
+  console.log(`  Implemented Methods: ${requiredMethods.filter(method => typeof user_profileservice[method] === 'function').length}`);
   console.log(`  Status: ${allMethodsExist ? '✅ COMPLETE' : '❌ INCOMPLETE'}`);
 
   if (allMethodsExist) {

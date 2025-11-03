@@ -71,9 +71,8 @@ describe('Error Management System Integration', () => {
       });
 
       // Track the error
-      await errorMonitor.trackError(testError, {
-        userId: 'user123',
-        metadata: { sessionId: 'session456' }
+      await errorMonitor.trackError(testError, { user_id: 'user123',
+        metadata: { sessionId: 'session456'  }
       });
 
       // Add to analytics
@@ -81,9 +80,8 @@ describe('Error Management System Integration', () => {
 
       // Generate user report
       const recoveryOptions = userReporter.generateRecoveryOptions(testError);
-      const report = userReporter.generateReport(testError, {
-        userId: 'user123',
-        metadata: { sessionId: 'session456' }
+      const report = userReporter.generateReport(testError, { user_id: 'user123',
+        metadata: { sessionId: 'session456'  }
       }, recoveryOptions);
 
       // Analyze recovery options
@@ -172,9 +170,8 @@ describe('Error Management System Integration', () => {
         severity: ErrorSeverity.MEDIUM
       });
 
-      const report = userReporter.generateReport(error, {
-        userId: 'user123'
-      });
+      const report = userReporter.generateReport(error, { user_id: 'user123'
+       });
 
       // Submit feedback
       await userReporter.submitFeedback(report.errorId, {
@@ -211,9 +208,8 @@ describe('Error Management System Integration', () => {
       });
 
       // Track error through integration manager
-      await integrationManager.trackErrorToAll(error, {
-        userId: 'test-user',
-        metadata: { sessionId: 'test-session' }
+      await integrationManager.trackErrorToAll(error, { user_id: 'test-user',
+        metadata: { sessionId: 'test-session'  }
       });
 
       // Verify integrations received the error
@@ -322,15 +318,14 @@ describe('Error Management System Integration', () => {
     });
   });
 
-  describe('Error Context Propagation', () => {
-    test('should maintain error context throughout the pipeline', async () => {
+  describe('Error Context Propagation', () => { test('should maintain error context throughout the pipeline', async () => {
       const context = {
-        userId: 'context-user',
+        user_id: 'context-user',
         metadata: {
           sessionId: 'context-session',
           requestId: 'context-request',
           operation: 'test-operation'
-        }
+         }
       };
 
       const error = new BaseError('Context test error', {
@@ -346,7 +341,7 @@ describe('Error Management System Integration', () => {
       const report = userReporter.generateReport(error, context);
 
       // Verify context is preserved
-      expect(report.userId).toBe(context.userId);
+      expect(report.user_id).toBe(context.user_id);
       expect(report.sessionId).toBe(context.metadata.sessionId);
     });
   });

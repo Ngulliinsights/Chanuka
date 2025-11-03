@@ -2,7 +2,7 @@
  * Bill Analysis Types
  * 
  * Domain-specific types for bill complexity, transparency, and sentiment analysis.
- * Migrated from shared/types/bill.ts to maintain proper domain boundaries.
+ * Migrated from shared/types/bills.ts to maintain proper domain boundaries.
  */
 
 import type {
@@ -10,9 +10,8 @@ import type {
   SentimentAnalysis
 } from '../../types/common.js';
 
-export interface BillAnalysis {
-  id: number;
-  billId: number;
+export interface BillAnalysis { id: number;
+  bill_id: number;
   complexity: number;
   transparency: number;
   conflicts: ConflictIndicator[];
@@ -22,5 +21,5 @@ export interface BillAnalysis {
   riskFactors: string[];
   recommendations?: string[];
   lastUpdated: Date;
-  createdAt: Date;
-}
+  created_at: Date;
+ }

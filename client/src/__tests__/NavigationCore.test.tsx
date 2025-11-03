@@ -32,7 +32,7 @@ Object.defineProperty(window, 'localStorage', {
 // Mock browser info objects
 Object.defineProperty(window, 'navigator', {
   value: {
-    userAgent: 'test-user-agent',
+    user_agent: 'test-user-agent',
     platform: 'test-platform',
     language: 'en-US',
     languages: ['en-US', 'en'],

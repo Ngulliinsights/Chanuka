@@ -151,16 +151,16 @@ const TestSidebar = ({
       {user && (
         <div className="border-t p-4">
           <div className="flex items-center gap-3">
-            {user.avatar ? (
-              <img src={user.avatar} alt={user.name} className="h-8 w-8 rounded-full" />
+            {users.avatar ? (
+              <img src={users.avatar} alt={users.name} className="h-8 w-8 rounded-full" />
             ) : (
-              <span>{user.name.charAt(0).toUpperCase()}</span>
+              <span>{users.name.charAt(0).toUpperCase()}</span>
             )}
             {!isCollapsed && (
               <>
                 <div>
-                  <p>{user.name}</p>
-                  <p>{user.email}</p>
+                  <p>{users.name}</p>
+                  <p>{users.email}</p>
                 </div>
                 <button aria-label="User settings">Settings</button>
               </>
@@ -252,7 +252,7 @@ describe('Layout Components Tests', () => {
       );
 
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       expect(onMenuToggle).toHaveBeenCalledTimes(1);
       expect(screen.getByLabelText('Close menu')).toBeInTheDocument();
@@ -268,7 +268,7 @@ describe('Layout Components Tests', () => {
       );
 
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       expect(screen.getByRole('navigation')).toBeInTheDocument();
       expect(screen.getByText('Dashboard')).toBeInTheDocument();
@@ -286,7 +286,7 @@ describe('Layout Components Tests', () => {
       );
 
       const searchButton = screen.getByLabelText('Search');
-      await user.click(searchButton);
+      await users.click(searchButton);
 
       expect(onSearchClick).toHaveBeenCalledTimes(1);
     });
@@ -385,7 +385,7 @@ describe('Layout Components Tests', () => {
       );
 
       const toggleButton = screen.getByLabelText('Collapse sidebar');
-      await user.click(toggleButton);
+      await users.click(toggleButton);
 
       expect(onToggle).toHaveBeenCalledTimes(1);
     });
@@ -412,7 +412,7 @@ describe('Layout Components Tests', () => {
       );
 
       const searchInput = screen.getByLabelText('Search bills');
-      await user.type(searchInput, 'test query');
+      await users.type(searchInput, 'test query');
 
       expect(onSearchChange).toHaveBeenCalledWith('test query');
     });

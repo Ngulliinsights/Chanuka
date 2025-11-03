@@ -1,48 +1,121 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { pool, readDb, writeDb, db } from './pool.ts';
-import * as schema from '../schema';
-import type { PgTransaction } from 'drizzle-orm/pg-core';
-import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres';
-import type { ExtractTablesWithRelations } from 'drizzle-orm';
+import { pool, readDb, writeDb, db } from './pool';
 import { logger } from '../core/index.js';
 
-// Create a more descriptive type alias for transactions to improve code readability
-// Use the actual transaction type from Drizzle ORM
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+/**
+ * Type-safe transaction context used throughout the application.
+ * Provides full IDE support and compile-time type checking for transactions.
+ */
 export type DatabaseTransaction = Parameters<Parameters<typeof writeDatabase.transaction>[0]>[0];
 
-// Export the main database connection with full schema
-export const database = db;
-
-// Export specialized connections for read/write operations
-export const readDatabase = readDb;
-export const writeDatabase = writeDb;
-
-// Export the raw pool for direct SQL queries when needed
-export { pool };
-
-// Export all schema tables and types for easy importing
-export * from '../schema';
-
-// Enhanced operation type that's more explicit about its purpose
+/**
+ * Database operation types for intelligent connection routing.
+ * - 'read': Query operations routed to read replicas
+ * - 'write': Mutation operations routed to primary database
+ * - 'general': Operations routed to default connection
+ */
 export type DatabaseOperation = 'read' | 'write' | 'general';
 
 /**
- * Selects the appropriate database connection based on the operation type.
+ * Configuration for transaction execution behavior.
+ */
+export interface TransactionOptions {
+  /** Maximum retry attempts for transient failures (default: 0) */
+  maxRetries?: number;
+  /** Callback invoked after each failed attempt */
+  onError?: (error: Error, attempt: number) => void;
+  /** Transaction timeout in milliseconds (optional) */
+  timeout?: number;
+  /** Custom delay calculation between retries (defaults to exponential backoff) */
+  retryDelay?: (attempt: number) => number;
+}
+
+/**
+ * Database health check results across all connections.
+ */
+export interface DatabaseHealthStatus {
+  operational: boolean;
+  analytics: boolean;
+  security: boolean;
+  overall: boolean;
+  timestamp: string;
+  latencyMs?: number;
+}
+
+// ============================================================================
+// DATABASE CONNECTIONS
+// ============================================================================
+
+/**
+ * Primary database connection for general operations.
+ * Use when read/write distinction isn't performance-critical.
+ */
+export const database = db as any;
+
+/**
+ * Read-optimized connection routing to replicas in production.
+ * Improves scalability by distributing query load across read replicas.
+ */
+export const readDatabase = readDb;
+
+/**
+ * Write-optimized connection always routing to primary database.
+ * Ensures data consistency for all mutation operations.
+ */
+export const writeDatabase = writeDb;
+
+/**
+ * Specialized connections for multi-tenant architecture.
  * 
- * This function helps optimize database performance by routing read operations
- * to read replicas and write operations to the primary database. The 'general'
- * option provides a fallback for operations where the type isn't known in advance.
+ * Phase One: All connections reference the same database instance.
+ * Phase Two (Future): Each connection will target a dedicated database
+ * optimized for its specific workload characteristics.
+ */
+export const operationalDb = db as any;  // Primary transactional workload
+export const analyticsDb = db as any;    // Read-heavy analytics queries
+export const securityDb = db as any;     // Audit logs and security events
+
+/**
+ * Raw PostgreSQL pool for direct SQL when ORM abstraction is limiting.
+ * Use sparingly and prefer Drizzle ORM for type safety.
+ */
+export { pool };
+
+/**
+ * Re-export all schema definitions for convenient access.
+ */
+export * from '../schema';
+
+// ============================================================================
+// CONNECTION ROUTING
+// ============================================================================
+
+/**
+ * Routes database operations to the optimal connection based on operation type.
  * 
- * @param operation - The type of database operation being performed
- * @returns The appropriate database connection instance
+ * This intelligent routing improves performance by directing read operations to
+ * read replicas and write operations to the primary database. In production
+ * environments with replica sets, this dramatically reduces load on the primary
+ * database and improves overall application scalability.
+ * 
+ * @param operation - Type of database operation ('read', 'write', or 'general')
+ * @returns The appropriate database connection
  * 
  * @example
- * // For read-heavy operations like fetching user data
- * const users = await getDatabase('read').select().from(usersTable);
+ * // Read operations benefit from replica routing
+ * const activeUsers = await getDatabase('read')
+ *   .select()
+ *   .from(usersTable)
+ *   .where(eq(usersTable.active, true));
  * 
  * @example
- * // For write operations like creating records
- * await getDatabase('write').insert(usersTable).values(newUser);
+ * // Write operations always hit primary for consistency
+ * await getDatabase('write')
+ *   .insert(usersTable)
+ *   .values({ name: 'Alice', email: 'alice@example.com' });
  */
 export function getDatabase(operation: DatabaseOperation = 'general') {
   switch (operation) {
@@ -51,171 +124,225 @@ export function getDatabase(operation: DatabaseOperation = 'general') {
     case 'write':
       return writeDatabase;
     case 'general':
-      return database;
     default:
-      // This ensures type safety while providing a sensible fallback
       return database;
   }
 }
 
-/**
- * Configuration options for transaction behavior
- */
-export interface TransactionOptions {
-  /** Maximum number of retry attempts for transient failures */
-  maxRetries?: number;
-  /** Custom error handler for transaction failures */
-  onError?: (error: Error, attempt: number) => void;
-  /** Timeout in milliseconds for the transaction */
-  timeout?: number;
-}
+// ============================================================================
+// TRANSACTION MANAGEMENT
+// ============================================================================
 
 /**
- * Executes a callback within a database transaction with enhanced error handling.
+ * Executes operations within an ACID-compliant database transaction.
  * 
- * This wrapper provides several benefits over raw transactions:
- * - Automatic error logging with contextual information
- * - Optional retry logic for transient failures
- * - Type-safe transaction context
- * - Consistent error handling across your application
+ * This wrapper provides production-ready transaction management with automatic
+ * rollback on errors, configurable retry logic for transient failures, timeout
+ * protection, and comprehensive logging. All operations in the callback execute
+ * atomically—either all succeed or all are rolled back, ensuring data integrity.
  * 
- * The transaction automatically rolls back if any error occurs, ensuring
- * data consistency even when operations fail partway through.
+ * The retry mechanism uses exponential backoff by default, progressively increasing
+ * delay between attempts to avoid overwhelming a struggling database. Only transient
+ * errors (deadlocks, timeouts, connection issues) trigger retries; logical errors
+ * fail immediately.
  * 
- * @param callback - Function containing the database operations to execute
- * @param options - Configuration for transaction behavior
- * @returns The result of the callback function
- * @throws Re-throws any errors after logging and cleanup
+ * @param callback - Function containing atomic database operations
+ * @param options - Transaction behavior configuration
+ * @returns Result from the callback function
+ * @throws Re-throws error after exhausting retries
  * 
  * @example
- * // Simple transaction usage
- * await withTransaction(async (tx) => {
- *   await tx.insert(usersTable).values(newUser);
- *   await tx.insert(profilesTable).values(newProfile);
+ * // Simple transaction ensuring atomicity
+ * const user = await withTransaction(async (tx) => {
+ *   const [newUser] = await tx.insert(usersTable)
+ *     .values({ name: 'Bob', email: 'bob@example.com' })
+ *     .returning();
+ *   
+ *   await tx.insert(profilesTable)
+ *     .values({ userId: newUser.id, bio: 'Software engineer' });
+ *   
+ *   return newUser;
  * });
  * 
  * @example
- * // Transaction with retry logic
+ * // Transaction with retry logic for production resilience
  * await withTransaction(
  *   async (tx) => {
- *     return await tx.select().from(usersTable).where(eq(usersTable.id, userId));
+ *     await tx.update(accountsTable)
+ *       .set({ balance: sql`${accountsTable.balance} - 100` })
+ *       .where(eq(accountsTable.id, accountId));
  *   },
- *   { maxRetries: 3 }
+ *   { 
+ *     maxRetries: 3,
+ *     timeout: 5000,
+ *     onError: (error, attempt) => {
+ *       logger.warn(`Transaction attempt ${attempt} failed`, { error: error.message });
+ *     }
+ *   }
  * );
  */
 export async function withTransaction<T>(
   callback: (tx: DatabaseTransaction) => Promise<T>,
   options: TransactionOptions = {}
 ): Promise<T> {
-  const { maxRetries = 0, onError, timeout } = options;
-  let lastError: Error | null = null;
+  const { 
+    maxRetries = 0, 
+    onError, 
+    timeout,
+    retryDelay = calculateExponentialBackoff
+  } = options;
   
-  // Retry loop for handling transient database failures
+  let lastError: Error | null = null;
+
+  // Attempt transaction with configurable retries
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      // Set up timeout if specified
-      const transactionPromise = writeDatabase.transaction(async (tx) => {
-        return await callback(tx);
-      });
-      
+      const transactionPromise = writeDatabase.transaction(callback);
+
+      // Apply timeout protection if configured
       if (timeout) {
         const timeoutPromise = new Promise<never>((_, reject) => {
-          setTimeout(() => reject(new Error(`Transaction timeout after ${timeout}ms`)), timeout);
+          setTimeout(
+            () => reject(new Error(`Transaction exceeded ${timeout}ms timeout`)), 
+            timeout
+          );
         });
-        
+
         return await Promise.race([transactionPromise, timeoutPromise]);
       }
-      
+
       return await transactionPromise;
-      
+
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      
-      // Determine if this error is worth retrying
-      const isRetryableError = isTransientError(lastError);
-      const shouldRetry = attempt < maxRetries && isRetryableError;
-      
-      // Log comprehensive error information for debugging
-      logger.error('Transaction error:', lastError, {
-        component: 'Chanuka',
+
+      const isRetryable = isTransientError(lastError);
+      const shouldRetry = attempt < maxRetries && isRetryable;
+
+      // Log comprehensive error context for debugging
+      logger.error('Transaction failed', {
+        error: lastError,
+        component: 'DatabaseTransaction',
         attempt: attempt + 1,
         maxRetries: maxRetries + 1,
         willRetry: shouldRetry,
+        isRetryable,
+        errorCode: 'code' in lastError ? (lastError as any).code : undefined,
         timestamp: new Date().toISOString(),
       });
-      
-      // Call custom error handler if provided
+
+      // Invoke custom error handler if provided
       if (onError) {
-        onError(lastError, attempt + 1);
+        try {
+          onError(lastError, attempt + 1);
+        } catch (handlerError) {
+          logger.error('Error handler threw exception', { error: handlerError });
+        }
       }
-      
-      // If we shouldn't retry, throw immediately
+
+      // Fail fast for non-retryable errors or exhausted retries
       if (!shouldRetry) {
         throw lastError;
       }
-      
-      // Wait before retrying with exponential backoff
-      await sleep(Math.min(1000 * Math.pow(2, attempt), 10000));
+
+      // Wait before retry using configured delay strategy
+      const delayMs = retryDelay(attempt);
+      await sleep(delayMs);
     }
   }
-  
-  // This should never be reached, but TypeScript needs it
+
+  // Fallback error if loop completes without success (shouldn't happen)
   throw lastError || new Error('Transaction failed after all retries');
 }
 
 /**
- * Determines if a database error is transient and worth retrying.
+ * Calculates exponential backoff delay with a maximum cap.
+ * Formula: min(1000 × 2^attempt, 10000) milliseconds
  * 
- * Transient errors are temporary conditions like connection timeouts,
- * deadlocks, or serialization failures that might succeed on retry.
- * 
- * @param error - The error to check
- * @returns true if the error is likely transient
+ * Attempt 0: 1 second
+ * Attempt 1: 2 seconds
+ * Attempt 2: 4 seconds
+ * Attempt 3+: 10 seconds (capped)
  */
-function isTransientError(error: Error): boolean {
-  const transientErrorCodes = [
-    '40001', // Serialization failure
-    '40P01', // Deadlock detected
-    '53300', // Too many connections
-    '57P03', // Cannot connect now
-    '08006', // Connection failure
-    '08003', // Connection does not exist
-  ];
-  
-  const errorMessage = error.message.toLowerCase();
-  
-  // Check for PostgreSQL error codes
-  if ('code' in error) {
-    const code = (error as any).code;
-    if (transientErrorCodes.includes(code)) {
-      return true;
-    }
-  }
-  
-  // Check for common transient error patterns in messages
-  return (
-    errorMessage.includes('connection') ||
-    errorMessage.includes('timeout') ||
-    errorMessage.includes('deadlock') ||
-    errorMessage.includes('serialization')
-  );
+function calculateExponentialBackoff(attempt: number): number {
+  const baseDelay = 1000;
+  const maxDelay = 10000;
+  return Math.min(baseDelay * Math.pow(2, attempt), maxDelay);
 }
 
 /**
- * Simple sleep utility for implementing retry delays
+ * Identifies transient database errors suitable for retry.
+ * 
+ * Transient errors represent temporary conditions that may resolve on retry,
+ * such as connection timeouts, deadlocks, or serialization conflicts. This
+ * function distinguishes these from permanent errors like constraint violations
+ * or syntax errors that will never succeed regardless of retries.
+ * 
+ * @param error - Error to classify
+ * @returns true if error is transient and retry-eligible
+ */
+function isTransientError(error: Error): boolean {
+  // PostgreSQL error codes indicating transient conditions
+  const transientCodes = new Set([
+    '40001', // Serialization failure (concurrent transaction conflict)
+    '40P01', // Deadlock detected
+    '53300', // Too many connections
+    '57P03', // Cannot connect now (server starting/stopping)
+    '08006', // Connection failure
+    '08003', // Connection does not exist
+    '08001', // Unable to establish connection
+    '57014', // Query canceled (statement timeout)
+  ]);
+
+  // Check for explicit PostgreSQL error codes
+  if ('code' in error && transientCodes.has((error as any).code)) {
+    return true;
+  }
+
+  // Fallback to pattern matching in error messages
+  const errorMessage = error.message.toLowerCase();
+  const transientPatterns = [
+    'connection',
+    'timeout',
+    'deadlock',
+    'serialization',
+    'lock',
+    'conflict',
+    'temporarily unavailable',
+  ];
+
+  return transientPatterns.some(pattern => errorMessage.includes(pattern));
+}
+
+/**
+ * Promisified setTimeout for implementing async delays.
  */
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// ============================================================================
+// CONVENIENCE WRAPPERS
+// ============================================================================
+
 /**
- * Executes a read-only operation with automatic connection selection.
+ * Executes read-only operations with automatic replica routing.
  * 
- * This is a convenience wrapper that automatically routes queries to
- * the read database, making your code more declarative and easier to understand.
+ * This wrapper makes code more declarative by explicitly signaling read-only
+ * intent. It automatically selects read replicas, improving performance while
+ * serving as self-documenting code that clarifies data access patterns.
  * 
- * @param callback - Function containing the read operations
- * @returns The result of the callback function
+ * @param callback - Function containing read operations
+ * @returns Callback result
+ * 
+ * @example
+ * const recentUsers = await withReadConnection(async (db) => {
+ *   return await db.select()
+ *     .from(usersTable)
+ *     .where(eq(usersTable.status, 'active'))
+ *     .orderBy(desc(usersTable.createdAt))
+ *     .limit(50);
+ * });
  */
 export async function withReadConnection<T>(
   callback: (db: typeof readDatabase) => Promise<T>
@@ -223,46 +350,103 @@ export async function withReadConnection<T>(
   return callback(readDatabase);
 }
 
+// ============================================================================
+// HEALTH MONITORING
+// ============================================================================
 
+/**
+ * Performs comprehensive health check across all database connections.
+ * 
+ * Verifies database responsiveness by executing a lightweight query and measuring
+ * latency. In Phase One, this checks the unified database instance. In Phase Two,
+ * when databases are separated, this will independently verify each specialized
+ * database, providing granular health visibility for monitoring and alerting.
+ * 
+ * @returns Detailed health status with latency metrics
+ * 
+ * @example
+ * const health = await checkDatabaseHealth();
+ * if (!health.overall) {
+ *   logger.error('Database unhealthy', { health });
+ *   await alertOpsTeam(health);
+ * }
+ * 
+ * @example
+ * // Monitor latency for performance degradation
+ * const health = await checkDatabaseHealth();
+ * if (health.latencyMs && health.latencyMs > 1000) {
+ *   logger.warn('Database latency elevated', { latency: health.latencyMs });
+ * }
+ */
+export async function checkDatabaseHealth(): Promise<DatabaseHealthStatus> {
+  const startTime = Date.now();
+  
+  try {
+    // Execute simple query to verify connectivity and responsiveness
+    await database.execute('SELECT 1');
+    const latencyMs = Date.now() - startTime;
 
+    return {
+      operational: true,
+      analytics: true,
+      security: true,
+      overall: true,
+      timestamp: new Date().toISOString(),
+      latencyMs,
+    };
+  } catch (error) {
+    logger.error('Database health check failed', { 
+      error,
+      component: 'DatabaseHealth',
+      timestamp: new Date().toISOString(),
+    });
 
+    return {
+      operational: false,
+      analytics: false,
+      security: false,
+      overall: false,
+      timestamp: new Date().toISOString(),
+    };
+  }
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * Gracefully closes all database connections during shutdown.
+ * 
+ * Essential for clean application termination, ensuring all connections are
+ * properly released and pending operations complete. Prevents connection leaks
+ * and resource exhaustion, particularly important in containerized deployments
+ * where graceful shutdown is critical for zero-downtime deployments.
+ * 
+ * @throws Re-throws errors after logging for shutdown handler awareness
+ * 
+ * @example
+ * // Register shutdown handler for graceful termination
+ * process.on('SIGTERM', async () => {
+ *   logger.info('Received SIGTERM, shutting down gracefully');
+ *   try {
+ *     await closeDatabaseConnections();
+ *     process.exit(0);
+ *   } catch (error) {
+ *     logger.error('Shutdown error', { error });
+ *     process.exit(1);
+ *   }
+ * });
+ */
+export async function closeDatabaseConnections(): Promise<void> {
+  try {
+    await pool.end();
+    logger.info('Database connections closed successfully', {
+      component: 'DatabaseShutdown',
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    logger.error('Failed to close database connections', { 
+      error,
+      component: 'DatabaseShutdown',
+      timestamp: new Date().toISOString(),
+    });
+    throw error;
+  }
+}

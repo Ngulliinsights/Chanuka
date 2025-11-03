@@ -5,7 +5,7 @@ import { User } from '../../domain/entities/user';
 export interface RegisterUserCommand {
   email: string;
   name: string;
-  passwordHash: string;
+  password_hash: string;
   role?: string;
 }
 
@@ -36,7 +36,7 @@ export class UserRegistrationUseCase {
       const result: UserCreationResult = await this.userManagementService.createUser({
         email: command.email,
         name: command.name,
-        passwordHash: command.passwordHash,
+        password_hash: command.password_hash,
         role: command.role || 'citizen'
       });
 
@@ -76,7 +76,7 @@ export class UserRegistrationUseCase {
       errors.push('Name is required');
     }
 
-    if (!command.passwordHash || command.passwordHash.length < 60) {
+    if (!command.password_hash || command.password_hash.length < 60) {
       errors.push('Valid password hash is required');
     }
 
@@ -101,9 +101,8 @@ export class UserRegistrationUseCase {
     };
   }
 
-  private logUserRegistration(userId: string, email: string): void {
-    // This would typically use a logging service
-    console.log(`User registered: ${userId} (${email})`);
+  private logUserRegistration(user_id: string, email: string): void { // This would typically use a logging service
+    console.log(`User registered: ${user_id } (${email})`);
   }
 }
 

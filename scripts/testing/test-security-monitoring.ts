@@ -19,16 +19,16 @@ async function testSecurityMonitoring() {
     // Test 2: Test security audit logging
     logger.info('\n2. Testing security audit logging...', { component: 'Chanuka' });
     await securityAuditService.logSecurityEvent({
-      eventType: 'test_event',
+      event_type: 'test_event',
       severity: 'medium',
-      ipAddress: '192.168.1.100',
-      userAgent: 'Test User Agent',
+      ip_address: '192.168.1.100',
+      user_agent: 'Test User Agent',
       resource: '/test/endpoint',
       action: 'GET',
       success: true,
       details: { testData: 'security monitoring test' },
       riskScore: 25,
-      userId: 'test-user-123'
+      user_id: 'test-user-123'
     });
     logger.info('✅ Security event logged successfully', { component: 'Chanuka' });
 

@@ -14,7 +14,7 @@ export interface RecoveryStrategy {
 export interface NavigationRecoveryContext {
   error: NavigationError;
   path?: string;
-  userRole?: string;
+  user_role?: string;
   user?: any;
   retryCount?: number;
 }
@@ -153,14 +153,14 @@ export function getRecoverySuggestions(error: NavigationError): string[] {
 export function createRecoveryContext(
   error: NavigationError,
   path?: string,
-  userRole?: string,
+  user_role?: string,
   user?: any,
   retryCount = 0
 ): NavigationRecoveryContext {
   return {
     error,
     path,
-    userRole,
+    user_role,
     user,
     retryCount
   };

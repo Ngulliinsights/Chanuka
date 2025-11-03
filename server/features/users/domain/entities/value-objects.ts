@@ -106,7 +106,7 @@ export class VerificationStatus {
     return this._value === other._value;
   }
 
-  isVerified(): boolean {
+  is_verified(): boolean {
     return this._value === 'verified';
   }
 
@@ -125,7 +125,7 @@ export class ExpertiseLevel {
     private readonly _level: string,
     private readonly _credentials: string[],
     private readonly _verifiedCredentials: boolean,
-    private readonly _reputationScore: number
+    private readonly _reputation_score: number
   ) {}
 
   static create(data: {
@@ -133,14 +133,14 @@ export class ExpertiseLevel {
     level: string;
     credentials: string[];
     verifiedCredentials: boolean;
-    reputationScore: number;
+    reputation_score: number;
   }): ExpertiseLevel {
     const schema = z.object({
       domain: z.string().min(1).max(100),
       level: z.enum(['citizen', 'informed', 'professional', 'expert']),
       credentials: z.array(z.string().max(200)).max(10),
       verifiedCredentials: z.boolean(),
-      reputationScore: z.number().min(0).max(100)
+      reputation_score: z.number().min(0).max(100)
     });
 
     const validated = schema.parse(data);
@@ -149,7 +149,7 @@ export class ExpertiseLevel {
       validated.level,
       validated.credentials,
       validated.verifiedCredentials,
-      validated.reputationScore
+      validated.reputation_score
     );
   }
 
@@ -169,8 +169,8 @@ export class ExpertiseLevel {
     return this._verifiedCredentials;
   }
 
-  get reputationScore(): number {
-    return this._reputationScore;
+  get reputation_score(): number {
+    return this._reputation_score;
   }
 
   getWeight(): number {
@@ -188,7 +188,7 @@ export class ExpertiseLevel {
       this._domain === other._domain &&
       this._level === other._level &&
       this._verifiedCredentials === other._verifiedCredentials &&
-      this._reputationScore === other._reputationScore &&
+      this._reputation_score === other._reputation_score &&
       JSON.stringify(this._credentials) === JSON.stringify(other._credentials)
     );
   }

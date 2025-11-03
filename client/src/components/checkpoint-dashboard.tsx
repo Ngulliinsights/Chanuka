@@ -13,8 +13,8 @@ interface Checkpoint {
   name: string;
   description: string;
   status: "completed" | "in_progress" | "failed" | "planned";
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
   targetDate?: string;
   successRate?: number;
   metrics?: {
@@ -162,7 +162,7 @@ export default function CheckpointDashboard({
                           ? "Completed"
                           : "Started"}
                         :{" "}
-                        {new Date(checkpoint.createdAt).toLocaleDateString(
+                        {new Date(checkpoint.created_at).toLocaleDateString(
                           "en-US",
                           {
                             month: "short",

@@ -4,7 +4,7 @@ import {
   pool,
   withTransaction,
   users,
-  userProfiles,
+  user_profiles,
   userSocialProfiles,
   type User,
   type InsertUser,
@@ -27,15 +27,15 @@ export interface SocialProfile {
 
 // Define a type for user data including the password hash
 interface UserWithPasswordHash extends User {
-  passwordHash: string;
+  password_hash: string;
 }
 
 export interface CreateUserData {
   name: string;
   email: string;
   password: string; // This should be the hashed password
-  firstName?: string;
-  lastName?: string;
+  first_name?: string;
+  last_name?: string;
   role?: 'citizen' | 'admin' | 'expert' | 'journalist' | 'advocate';
 }
 
@@ -60,8 +60,7 @@ export class UserStorage extends BaseStorage<User> {
    * Invalidates all cache entries related to a specific user
    * Centralized cache invalidation to ensure we don't miss any patterns
    */
-  private async invalidateUserCache(userId: string, username?: string, email?: string): Promise<void> {
-    const cacheKeys = [`user:${userId}`];
+  private async invalidateUserCache(user_id: string, username?: string, email?: string): Promise<void> { const cacheKeys = [`user:${user_id }`];
 
     if (username) {
       cacheKeys.push(`user:username:${username}`);
@@ -108,7 +107,7 @@ export class UserStorage extends BaseStorage<User> {
     const user = result[0];
     return {
       ...user,
-      passwordHash: user.passwordHash,
+      password_hash: users.password_hash,
     };
   }
 
@@ -117,12 +116,12 @@ export class UserStorage extends BaseStorage<User> {
       const userData = {
         name: data.name,
         email: data.email,
-        passwordHash: data.password, // Already hashed
-        firstName: data.firstName,
-        lastName: data.lastName,
+        password_hash: data.password, // Already hashed
+        first_name: data.first_name,
+        last_name: data.last_name,
         role: data.role || 'citizen',
-        verificationStatus: 'pending' as const,
-        isActive: true,
+        verification_status: 'pending' as const,
+        is_active: true,
       };
 
       const result = await tx.insert(users).values(userData).returning();
@@ -144,7 +143,7 @@ export class UserStorage extends BaseStorage<User> {
       const result = await readDatabase
         .select()
         .from(users)
-        .innerJoin(userSocialProfiles, eq(users.id, userSocialProfiles.userId))
+        .innerJoin(userSocialProfiles, eq(users.id, userSocialProfiles.user_id))
         .where(and(
           eq(userSocialProfiles.provider, provider),
           eq(userSocialProfiles.providerId, profileId)
@@ -155,16 +154,15 @@ export class UserStorage extends BaseStorage<User> {
     });
   }
 
-  async linkSocialProfile(userId: string, profile: SocialProfile): Promise<User> {
-    return withTransaction(async (tx) => {
+  async linkSocialProfile(user_id: string, profile: SocialProfile): Promise<User> { return withTransaction(async (tx) => {
       // Use UPSERT pattern for better reliability
       await tx.insert(userSocialProfiles).values({
-        userId: userId,
+        user_id: user_id,
         provider: profile.provider,
         providerId: profile.id,
         username: profile.name
-      }).onConflictDoUpdate({
-        target: [userSocialProfiles.userId, userSocialProfiles.provider],
+       }).onConflictDoUpdate({
+        target: [userSocialProfiles.user_id, userSocialProfiles.provider],
         set: {
           providerId: profile.id,
           username: profile.name
@@ -173,16 +171,15 @@ export class UserStorage extends BaseStorage<User> {
 
       // Fetch the updated user
       const userResult = await tx.select().from(users)
-        .where(eq(users.id, userId));
+        .where(eq(users.id, user_id));
 
-      if (userResult.length === 0) {
-        throw new Error(`User not found: ${userId}`);
+      if (userResult.length === 0) { throw new Error(`User not found: ${user_id }`);
       }
 
       const user = userResult[0];
 
       // Invalidate cache entries for this user and social profile
-      await this.invalidateUserCache(userId, user.name, user.email);
+      await this.invalidateUserCache(user_id, users.name, users.email);
       await this.invalidateCache([`user:social:${profile.provider}:${profile.id}`]);
 
       return user;
@@ -193,15 +190,15 @@ export class UserStorage extends BaseStorage<User> {
    * Updates user's last login timestamp
    * Useful for tracking user activity without full profile updates
    */
-  async updateLastLogin(userId: string): Promise<void> {
+  async updateLastLogin(user_id: string): Promise<void> {
     await withTransaction(async (tx) => {
       await tx.update(users)
-        .set({ lastLoginAt: new Date() })
-        .where(eq(users.id, userId));
+        .set({ last_login_at: new Date() })
+        .where(eq(users.id, user_id));
     });
 
     // Invalidate cache for this user
-    await this.invalidateCache([`user:${userId}`]);
+    await this.invalidateCache([`user:${ user_id }`]);
   }
 
   /**

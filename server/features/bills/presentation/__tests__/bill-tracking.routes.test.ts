@@ -35,14 +35,13 @@ app.use(express.json()); // Middleware to parse JSON bodies
 app.use('/api/bill-tracking', billTrackingRouter); // Mount the router
 
 // --- Test Suite ---
-describe('Bill Tracking API Routes', () => {
-  const mockUserId = 'mock-user-id';
+describe('Bill Tracking API Routes', () => { const mockUserId = 'mock-user-id';
   const mockBillId = 123;
    const mockPreferenceResult = {
-        id: 1, userId: mockUserId, billId: mockBillId, trackingTypes: ['status_changes'],
-        alertFrequency: 'immediate', alertChannels: ['in_app'], isActive: true,
-        createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
-    };
+        id: 1, user_id: mockUserId, bill_id: mockBillId, tracking_types: ['status_changes'],
+        alert_frequency: 'immediate', alert_channels: ['in_app'], is_active: true,
+        created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+      };
 
 
   beforeEach(() => {
@@ -52,11 +51,11 @@ describe('Bill Tracking API Routes', () => {
 
   // --- Test Cases ---
 
-  describe('POST /api/bill-tracking/track/:billId', () => {
+  describe('POST /api/bill-tracking/track/:bill_id', () => {
     it('should return 200 and tracking info on successful tracking', async () => {
        // Arrange
        (billTrackingService.trackBill as vi.Mock).mockResolvedValue(mockPreferenceResult);
-       const preferences = { alertFrequency: 'daily' };
+       const preferences = { alert_frequency: 'daily' };
 
       // Act
       const response = await request(app)
@@ -71,7 +70,7 @@ describe('Bill Tracking API Routes', () => {
        expect(billTrackingService.trackBill).toHaveBeenCalledWith(mockUserId, mockBillId, preferences);
     });
 
-    it('should return 400 if billId is invalid', async () => {
+    it('should return 400 if bill_id is invalid', async () => {
       // Act
       const response = await request(app).post('/api/bill-tracking/track/invalid');
 
@@ -98,7 +97,7 @@ describe('Bill Tracking API Routes', () => {
 
       it('should return 400 if preferences are invalid', async () => {
         // Arrange
-        const invalidPreferences = { alertFrequency: 'yearly' }; // Invalid value
+        const invalidPreferences = { alert_frequency: 'yearly' }; // Invalid value
 
         // Act
         const response = await request(app)
@@ -115,7 +114,7 @@ describe('Bill Tracking API Routes', () => {
     });
   });
 
-  describe('DELETE /api/bill-tracking/track/:billId', () => {
+  describe('DELETE /api/bill-tracking/track/:bill_id', () => {
     it('should return 204 No Content on successful untracking', async () => {
       // Arrange
       (billTrackingService.untrackBill as vi.Mock).mockResolvedValue(undefined);
@@ -128,7 +127,7 @@ describe('Bill Tracking API Routes', () => {
       expect(billTrackingService.untrackBill).toHaveBeenCalledWith(mockUserId, mockBillId);
     });
 
-    it('should return 400 if billId is invalid', async () => {
+    it('should return 400 if bill_id is invalid', async () => {
        // Act
        const response = await request(app).delete('/api/bill-tracking/track/invalid');
 
@@ -155,7 +154,7 @@ describe('Bill Tracking API Routes', () => {
     });
   });
 
-   describe('GET /api/bill-tracking/is-tracking/:billId', () => {
+   describe('GET /api/bill-tracking/is-tracking/:bill_id', () => {
         it('should return true if user is tracking', async () => {
             (billTrackingService.isUserTrackingBill as vi.Mock).mockResolvedValue(true);
 
@@ -185,7 +184,7 @@ describe('Bill Tracking API Routes', () => {
 
   // Add more integration tests for:
   // - GET /tracked (test pagination, filtering, sorting query params)
-  // - PUT /preferences/:billId (test valid and invalid preference updates)
+  // - PUT /preferences/:bill_id (test valid and invalid preference updates)
   // - POST /bulk (test track/untrack, validation, partial failures)
   // - GET /analytics
   // - GET /recommended

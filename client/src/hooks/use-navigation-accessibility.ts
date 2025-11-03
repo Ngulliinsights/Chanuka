@@ -52,13 +52,13 @@ export function useNavigationAccessibility() {
    */
   const getAriaLabel = useCallback((
     label: string,
-    isActive?: boolean,
+    is_active?: boolean,
     hasSubItems?: boolean,
     badge?: number
   ): string => {
     let ariaLabel = label;
     
-    if (isActive) {
+    if (is_active) {
       ariaLabel += ', current page';
     }
     

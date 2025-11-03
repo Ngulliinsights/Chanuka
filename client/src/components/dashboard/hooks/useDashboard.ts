@@ -125,12 +125,12 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
     setLastRefresh(null);
   }, []);
 
-  const addTopic = useCallback(async (topic: Omit<TrackedTopic, 'id' | 'createdAt'>) => {
+  const addTopic = useCallback(async (topic: Omit<TrackedTopic, 'id' | 'created_at'>) => {
     try {
       const newTopic: TrackedTopic = {
         ...topic,
         id: `topic-${Date.now()}`,
-        createdAt: new Date()
+        created_at: new Date()
       };
       
       validateTrackedTopic(newTopic);
@@ -172,13 +172,13 @@ export function useDashboard(config?: Partial<DashboardConfig>): UseDashboardRes
     }
   }, [refresh]);
 
-  const addAction = useCallback(async (action: Omit<ActionItem, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const addAction = useCallback(async (action: Omit<ActionItem, 'id' | 'created_at' | 'updated_at'>) => {
     try {
       const newAction: ActionItem = {
         ...action,
         id: `action-${Date.now()}`,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       };
       
       validateActionItem(newAction);

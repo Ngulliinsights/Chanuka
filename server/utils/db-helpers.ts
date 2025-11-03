@@ -133,7 +133,7 @@ export function normalizeRowNumbers<T extends Record<string, any>>(rows: T[]): T
  * @returns Grouped data with period keys
  *
  * @example
- * groupByTime([{ createdAt: new Date(), value: 10 }], 'createdAt', 'day')
+ * groupByTime([{ created_at: new Date(), value: 10 }], 'created_at', 'day')
  */
 export function groupByTime<T extends Record<string, any>>(
   data: T[],

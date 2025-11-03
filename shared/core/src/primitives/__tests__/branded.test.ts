@@ -21,13 +21,12 @@ import {
   createPercentage
 } from '../types/branded';
 
-describe('Branded Types', () => {
-  describe('brand function', () => {
+describe('Branded Types', () => { describe('brand function', () => {
     it('should create branded values', () => {
-      const userId = brand('123', 'UserId');
-      expect(userId).toBe('123');
-      expect(isBranded(userId, 'UserId')).toBe(true);
-    });
+      const user_id = brand('123', 'UserId');
+      expect(user_id).toBe('123');
+      expect(isBranded(user_id, 'UserId')).toBe(true);
+     });
 
     it('should unbrand values correctly', () => {
       const branded = brand(42, 'Test');
@@ -36,12 +35,11 @@ describe('Branded Types', () => {
     });
   });
 
-  describe('UserId', () => {
-    it('should create valid UserIds', () => {
-      const userId = createUserId('user123');
-      expect(userId).toBe('user123');
-      expect(isBranded(userId, 'UserId')).toBe(true);
-    });
+  describe('UserId', () => { it('should create valid UserIds', () => {
+      const user_id = createUserId('user123');
+      expect(user_id).toBe('user123');
+      expect(isBranded(user_id, 'UserId')).toBe(true);
+     });
 
     it('should reject empty UserIds', () => {
       expect(() => createUserId('')).toThrow('UserId cannot be empty');
@@ -163,20 +161,19 @@ describe('Branded Types', () => {
     });
   });
 
-  describe('Type safety', () => {
-    it('should prevent mixing different branded types', () => {
-      const userId = createUserId('123');
+  describe('Type safety', () => { it('should prevent mixing different branded types', () => {
+      const user_id = createUserId('123');
       const email = createEmail('test@example.com');
 
       // These should be different types at compile time
-      expect(typeof userId).toBe('string');
+      expect(typeof user_id).toBe('string');
       expect(typeof email).toBe('string');
 
       // But they should not be assignable to each other
       // Note: Runtime test can't catch type errors, but this ensures they are strings
-      expect(userId).toBe('123');
+      expect(user_id).toBe('123');
       expect(email).toBe('test@example.com');
-    });
+     });
   });
 });
 

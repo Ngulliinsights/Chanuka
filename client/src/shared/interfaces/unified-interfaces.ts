@@ -136,15 +136,14 @@ export interface AppError extends Error {
   id: string;
 }
 
-export interface ErrorContext {
-  component?: string;
+export interface ErrorContext { component?: string;
   action?: string;
-  userId?: string;
+  user_id?: string;
   sessionId?: string;
   url?: string;
-  userAgent?: string;
+  user_agent?: string;
   additionalData?: Record<string, any>;
-}
+ }
 
 export interface RecoveryStrategy {
   id: string;

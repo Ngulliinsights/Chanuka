@@ -105,15 +105,14 @@ export class ErrorAnalyticsEngine {
     const recentErrors = this.errors
       .sort((a, b) => b.metadata.timestamp.getTime() - a.metadata.timestamp.getTime())
       .slice(0, 50)
-      .map(error => ({
-        errorId: error.errorId,
+      .map(error => ({ errorId: error.errorId,
         userMessage: error.getUserMessage(),
         technicalDetails: error.message,
         recoveryOptions: [], // Would need to generate these
         timestamp: error.metadata.timestamp,
-        userId: undefined, // Would need user context
+        user_id: undefined, // Would need user context
         sessionId: undefined // Would need session context
-      }));
+       }));
 
     // Top issues with trend analysis
     const topIssues = analytics.topErrorTypes.slice(0, 10).map(type => ({
@@ -372,7 +371,7 @@ export class ErrorAnalyticsEngine {
     // Simplified - would need user/session tracking
     const uniqueUsers = new Set(
       this.errors
-        .map(e => e.metadata.context?.userId)
+        .map(e => e.metadata.context?.user_id)
         .filter(Boolean)
     );
 

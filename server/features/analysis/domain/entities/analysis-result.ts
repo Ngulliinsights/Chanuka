@@ -79,7 +79,7 @@ export interface ConstitutionalConcern {
       factors: {
           economicScoreNormalized: number;
           socialScoreNormalized: number;
-          transparencyScore: number;
+          transparency_score: number;
       };
       assessment: 'Very High' | 'High' | 'Moderate' | 'Low' | 'Very Low';
   }
@@ -96,23 +96,22 @@ export interface ConstitutionalConcern {
   
   
   // --- Comprehensive Analysis (Aggregate Root) ---
-  // This entity represents the complete analysis result for a bill.
-  export class ComprehensiveAnalysis {
-    constructor(
-      public readonly billId: number,
+  // This entity represents the complete analysis result for a bills.
+  export class ComprehensiveAnalysis { constructor(
+      public readonly bill_id: number,
       public readonly analysisId: string,
       public readonly timestamp: Date,
       public constitutionalAnalysis: ConstitutionalAnalysisResult,
       public conflictAnalysisSummary: ConflictSummary,
       public stakeholderImpact: StakeholderAnalysisResult,
-      public transparencyScore: TransparencyScoreResult,
+      public transparency_score: TransparencyScoreResult,
       public publicInterestScore: PublicInterestScoreResult,
       public recommendedActions: string[],
       public overallConfidence: number,
       // Optional: Add versioning or status
       public version: string = '1.0',
       public status: 'completed' | 'failed' | 'in_progress' = 'completed'
-    ) {}
+    ) { }
   
     // Potential business logic methods can go here, e.g.,
     // needsReview(): boolean {

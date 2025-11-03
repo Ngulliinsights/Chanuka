@@ -319,7 +319,7 @@ export async function detectPerformanceRegressions() {
     expectedValue: 10000, // 10k ops/sec
     p95Threshold: 5, // 5ms P95
     regressionThreshold: 20, // 20% degradation threshold
-    createdAt: Date.now(),
+    created_at: Date.now(),
     description: 'Cache operations baseline from production'
   });
 
@@ -327,7 +327,7 @@ export async function detectPerformanceRegressions() {
     expectedValue: 100 * 1024 * 1024, // 100MB
     p95Threshold: 200 * 1024 * 1024, // 200MB P95
     regressionThreshold: 50, // 50% increase threshold
-    createdAt: Date.now(),
+    created_at: Date.now(),
     description: 'Memory usage baseline'
   });
 

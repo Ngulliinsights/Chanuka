@@ -7,16 +7,15 @@ import { IAlertPreferenceRepository } from '../../domain/repositories/alert-pref
 /**
  * Infrastructure implementation of alert preference repository
  */
-export class AlertPreferenceRepositoryImpl implements IAlertPreferenceRepository {
-  async save(preference: AlertPreference): Promise<void> {
-    const userId = preference.userId;
+export class AlertPreferenceRepositoryImpl implements IAlertPreferenceRepository { async save(preference: AlertPreference): Promise<void> {
+    const user_id = preference.user_id;
     const preferenceData = this.serializePreference(preference);
 
     // Get current user preferences
     const [user] = await databaseService.db
-      .select({ preferences: users.preferences })
+      .select({ preferences: users.preferences  })
       .from(users)
-      .where(eq(users.id, userId))
+      .where(eq(users.id, user_id))
       .limit(1);
 
     const currentPreferences = (user?.preferences as any) || {};
@@ -38,28 +37,27 @@ export class AlertPreferenceRepositoryImpl implements IAlertPreferenceRepository
           ...currentPreferences,
           alertPreferences
         },
-        updatedAt: new Date()
+        updated_at: new Date()
       })
-      .where(eq(users.id, userId));
+      .where(eq(users.id, user_id));
   }
 
-  async findByIdAndUserId(id: string, userId: string): Promise<AlertPreference | null> {
-    const preferences = await this.findByUserId(userId);
+  async findByIdAndUserId(id: string, user_id: string): Promise<AlertPreference | null> { const preferences = await this.findByUserId(user_id);
     return preferences.find(p => p.id === id) || null;
-  }
+   }
 
-  async findByUserId(userId: string): Promise<AlertPreference[]> {
+  async findByUserId(user_id: string): Promise<AlertPreference[]> {
     const [user] = await databaseService.db
       .select({ preferences: users.preferences })
       .from(users)
-      .where(eq(users.id, userId))
+      .where(eq(users.id, user_id))
       .limit(1);
 
     if (!user) {
       return [];
     }
 
-    const currentPreferences = (user.preferences as any) || {};
+    const currentPreferences = (users.preferences as any) || {};
     const alertPreferences = currentPreferences.alertPreferences || [];
 
     return alertPreferences.map((p: any) => this.deserializePreference(p));
@@ -69,11 +67,11 @@ export class AlertPreferenceRepositoryImpl implements IAlertPreferenceRepository
     await this.save(preference);
   }
 
-  async delete(id: string, userId: string): Promise<void> {
+  async delete(id: string, user_id: string): Promise<void> {
     const [user] = await databaseService.db
       .select({ preferences: users.preferences })
       .from(users)
-      .where(eq(users.id, userId))
+      .where(eq(users.id, user_id))
       .limit(1);
 
     const currentPreferences = (user?.preferences as any) || {};
@@ -90,23 +88,21 @@ export class AlertPreferenceRepositoryImpl implements IAlertPreferenceRepository
           ...currentPreferences,
           alertPreferences: updatedPreferences
         },
-        updatedAt: new Date()
+        updated_at: new Date()
       })
-      .where(eq(users.id, userId));
+      .where(eq(users.id, user_id));
   }
 
-  async exists(id: string, userId: string): Promise<boolean> {
-    const preference = await this.findByIdAndUserId(id, userId);
+  async exists(id: string, user_id: string): Promise<boolean> { const preference = await this.findByIdAndUserId(id, user_id);
     return preference !== null;
-  }
+   }
 
-  private serializePreference(preference: AlertPreference): any {
-    return {
+  private serializePreference(preference: AlertPreference): any { return {
       id: preference.id,
-      userId: preference.userId,
+      user_id: preference.user_id,
       name: preference.name,
       description: preference.description,
-      isActive: preference.isActive,
+      is_active: preference.is_active,
       alertTypes: preference.alertTypes.map(at => ({
         type: at.type.toString(),
         enabled: at.enabled,
@@ -114,13 +110,13 @@ export class AlertPreferenceRepositoryImpl implements IAlertPreferenceRepository
         conditions: at.conditions ? {
           billCategories: at.conditions.billCategories,
           billStatuses: at.conditions.billStatuses,
-          sponsorIds: at.conditions.sponsorIds,
+          sponsor_ids: at.conditions.sponsor_ids,
           keywords: at.conditions.keywords,
           minimumEngagement: at.conditions.minimumEngagement,
-          userRoles: at.conditions.userRoles,
+          user_roles: at.conditions.user_roles,
           timeRange: at.conditions.timeRange,
           dayOfWeek: at.conditions.dayOfWeek
-        } : undefined
+         } : undefined
       })),
       channels: preference.channels.map(ch => ({
         type: ch.type.toString(),
@@ -137,15 +133,15 @@ export class AlertPreferenceRepositoryImpl implements IAlertPreferenceRepository
       },
       smartFiltering: {
         enabled: preference.smartFiltering.enabled,
-        userInterestWeight: preference.smartFiltering.userInterestWeight,
+        user_interestWeight: preference.smartFiltering.user_interestWeight,
         engagementHistoryWeight: preference.smartFiltering.engagementHistoryWeight,
         trendingWeight: preference.smartFiltering.trendingWeight,
         duplicateFiltering: preference.smartFiltering.duplicateFiltering,
         spamFiltering: preference.smartFiltering.spamFiltering,
         minimumConfidence: preference.smartFiltering.minimumConfidence
       },
-      createdAt: preference.createdAt.toISOString(),
-      updatedAt: preference.updatedAt.toISOString()
+      created_at: preference.created_at.toISOString(),
+      updated_at: preference.updated_at.toISOString()
     };
   }
 

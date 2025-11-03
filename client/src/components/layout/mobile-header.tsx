@@ -209,7 +209,7 @@ export function MobileHeader({
           <div className="bg-card border-b border-border">
             <nav className="px-4 py-2 space-y-1" role="navigation" aria-label="Mobile navigation">
               {DEFAULT_NAVIGATION.map((item) => {
-                const isActive = location === item.href;
+                const is_active = location === item.href;
                 return (
                   <Link
                     key={item.id}
@@ -217,11 +217,11 @@ export function MobileHeader({
                     onClick={() => setIsMenuOpen(false)}
                     className={cn(
                       'block px-3 py-2 rounded-md text-sm font-medium transition-colors',
-                      isActive
+                      is_active
                         ? 'bg-primary text-primary-foreground'
                         : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                     )}
-                    aria-current={isActive ? 'page' : undefined}
+                    aria-current={is_active ? 'page' : undefined}
                   >
                     {item.label}
                   </Link>

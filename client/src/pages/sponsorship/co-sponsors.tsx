@@ -22,9 +22,8 @@ import {
 } from 'lucide-react';
 import { logger } from '../../utils/browser-logger';
 
-interface CoSponsorsProps {
-  billId?: string;
-}
+interface CoSponsorsProps { bill_id?: string;
+ }
 
 interface CoSponsor {
   id: string;
@@ -32,25 +31,24 @@ interface CoSponsor {
   role: string;
   party: string;
   constituency: string;
-  conflictLevel: string;
-  financialExposure: number;
+  conflict_level: string;
+  financial_exposure: number;
   affiliations: Array<{
     organization: string;
     role: string;
     type: string;
   }>;
-  votingAlignment: number;
+  voting_alignment: number;
 }
 
-export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
-  const [coSponsors, setCoSponsors] = useState<CoSponsor[]>([]);
+export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { const [coSponsors, setCoSponsors] = useState<CoSponsor[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCoSponsorsData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/bills/${billId}/sponsorship-analysis/co-sponsors`);
+        const response = await fetch(`/api/bills/${bill_id }/sponsorship-analysis/co-sponsors`);
 
         if (response.ok) {
           const data = await response.json();
@@ -65,13 +63,13 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
               role: "MP - Kisumu East",
               party: "ODM",
               constituency: "Kisumu East",
-              conflictLevel: "high",
-              financialExposure: 2800000,
+              conflict_level: "high",
+              financial_exposure: 2800000,
               affiliations: [
                 { organization: "National Healthcare Alliance", role: "Board Member", type: "governance" },
                 { organization: "Medical Research Foundation", role: "Senior Advisor", type: "advisory" }
               ],
-              votingAlignment: 85
+              voting_alignment: 85
             },
             {
               id: "2",
@@ -79,12 +77,12 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
               role: "MP - Mombasa Central",
               party: "Jubilee",
               constituency: "Mombasa Central",
-              conflictLevel: "low",
-              financialExposure: 0,
+              conflict_level: "low",
+              financial_exposure: 0,
               affiliations: [
                 { organization: "Public Health Institute", role: "Former Research Fellow", type: "academic" }
               ],
-              votingAlignment: 45
+              voting_alignment: 45
             }
           ]);
         }
@@ -97,10 +95,10 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
       }
     };
 
-    if (billId) {
+    if (bill_id) {
       fetchCoSponsorsData();
     }
-  }, [billId]);
+  }, [bill_id]);
 
   const getConflictLevelColor = (level: string) => {
     switch (level) {
@@ -126,10 +124,10 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
     );
   }
 
-  const highRiskSponsors = coSponsors.filter(s => s.conflictLevel === 'high').length;
-  const mediumRiskSponsors = coSponsors.filter(s => s.conflictLevel === 'medium').length;
-  const lowRiskSponsors = coSponsors.filter(s => s.conflictLevel === 'low').length;
-  const totalExposure = coSponsors.reduce((sum, s) => sum + s.financialExposure, 0);
+  const highRiskSponsors = coSponsors.filter(s => s.conflict_level === 'high').length;
+  const mediumRiskSponsors = coSponsors.filter(s => s.conflict_level === 'medium').length;
+  const lowRiskSponsors = coSponsors.filter(s => s.conflict_level === 'low').length;
+  const totalExposure = coSponsors.reduce((sum, s) => sum + s.financial_exposure, 0);
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
@@ -137,16 +135,16 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
         <Link to="/" className="hover:text-primary">Home</Link>
         <span>›</span>
-        <Link to={`/bills/${billId}`} className="hover:text-primary">Bills</Link>
+        <Link to={ `/bills/${bill_id }`} className="hover:text-primary">Bills</Link>
         <span>›</span>
-        <Link to={`/bills/${billId}/sponsorship-analysis`} className="hover:text-primary">Sponsorship Analysis</Link>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="hover:text-primary">Sponsorship Analysis</Link>
         <span>›</span>
         <span className="text-foreground">Co-Sponsors</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6">
-        <Link to={`/bills/${billId}/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Analysis Navigation
         </Link>
@@ -218,45 +216,45 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
             <TabsContent value="overview" className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {coSponsors.map((sponsor) => (
-                  <Card key={sponsor.id} className={`${sponsor.conflictLevel === 'high' ? 'border-red-200' : sponsor.conflictLevel === 'medium' ? 'border-yellow-200' : 'border-green-200'}`}>
+                  <Card key={sponsors.id} className={`${sponsors.conflict_level === 'high' ? 'border-red-200' : sponsors.conflict_level === 'medium' ? 'border-yellow-200' : 'border-green-200'}`}>
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-start gap-3">
                           <Avatar>
                             <AvatarFallback>
-                              {sponsor.name.split(' ').map(n => n[0]).join('')}
+                              {sponsors.name.split(' ').map(n => n[0]).join('')}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <h5 className="font-semibold">{sponsor.name}</h5>
-                            <p className="text-sm text-muted-foreground">{sponsor.role}</p>
-                            <p className="text-xs text-muted-foreground">{sponsor.party}</p>
+                            <h5 className="font-semibold">{sponsors.name}</h5>
+                            <p className="text-sm text-muted-foreground">{sponsors.role}</p>
+                            <p className="text-xs text-muted-foreground">{sponsors.party}</p>
                           </div>
                         </div>
-                        <Badge className={getConflictLevelColor(sponsor.conflictLevel)}>
-                          {sponsor.conflictLevel} Risk
+                        <Badge className={getConflictLevelColor(sponsors.conflict_level)}>
+                          {sponsors.conflict_level} Risk
                         </Badge>
                       </div>
 
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Financial Exposure:</span>
-                          <span className="font-medium">KSh {(sponsor.financialExposure / 1000000).toFixed(1)}M</span>
+                          <span className="font-medium">KSh {(sponsors.financial_exposure / 1000000).toFixed(1)}M</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Industry Alignment:</span>
-                          <span className="font-medium">{sponsor.votingAlignment}%</span>
+                          <span className="font-medium">{sponsors.voting_alignment}%</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Affiliations:</span>
-                          <span className="font-medium">{sponsor.affiliations.length}</span>
+                          <span className="font-medium">{sponsors.affiliations.length}</span>
                         </div>
                       </div>
 
-                      {sponsor.affiliations.length > 0 && (
+                      {sponsors.affiliations.length > 0 && (
                         <div className="mt-3 pt-3 border-t">
                           <h6 className="text-xs font-semibold text-muted-foreground mb-2">Key Affiliations:</h6>
-                          {sponsor.affiliations.slice(0, 2).map((affiliation, index) => (
+                          {sponsors.affiliations.slice(0, 2).map((affiliation, index) => (
                             <div key={index} className="flex items-center gap-2 text-xs mb-1">
                               <Building className="h-3 w-3 text-muted-foreground" />
                               <span className="text-muted-foreground">{affiliation.organization}</span>
@@ -341,18 +339,18 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
               </Card>
 
               <div className="space-y-4">
-                {coSponsors.filter(s => s.conflictLevel === 'high').map((sponsor) => (
-                  <Card key={sponsor.id} className="border-red-200">
+                {coSponsors.filter(s => s.conflict_level === 'high').map((sponsor) => (
+                  <Card key={sponsors.id} className="border-red-200">
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">{sponsor.name} - Critical Conflict</CardTitle>
+                        <CardTitle className="text-lg">{sponsors.name} - Critical Conflict</CardTitle>
                         <Badge className="bg-red-100 text-red-800">Recusal Recommended</Badge>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        <p><strong>Primary Conflict:</strong> {sponsor.affiliations[0]?.organization}</p>
-                        <p><strong>Financial Exposure:</strong> KSh {(sponsor.financialExposure / 1000000).toFixed(2)}M in direct compensation and investments</p>
+                        <p><strong>Primary Conflict:</strong> {sponsors.affiliations[0]?.organization}</p>
+                        <p><strong>Financial Exposure:</strong> KSh {(sponsors.financial_exposure / 1000000).toFixed(2)}M in direct compensation and investments</p>
                         <p><strong>Recommendation:</strong> Immediate recusal from voting and committee deliberations</p>
                       </div>
                     </CardContent>
@@ -431,23 +429,23 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {coSponsors.map((sponsor) => (
-                  <Card key={sponsor.id} className={`${sponsor.conflictLevel === 'high' ? 'border-red-200' : sponsor.conflictLevel === 'medium' ? 'border-yellow-200' : 'border-green-200'}`}>
+                  <Card key={sponsors.id} className={`${sponsors.conflict_level === 'high' ? 'border-red-200' : sponsors.conflict_level === 'medium' ? 'border-yellow-200' : 'border-green-200'}`}>
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
                           <Avatar>
                             <AvatarFallback>
-                              {sponsor.name.split(' ').map(n => n[0]).join('')}
+                              {sponsors.name.split(' ').map(n => n[0]).join('')}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <CardTitle className="text-base">{sponsor.name}</CardTitle>
-                            <p className="text-sm text-muted-foreground">{sponsor.role}</p>
-                            <p className="text-xs text-muted-foreground">{sponsor.party}</p>
+                            <CardTitle className="text-base">{sponsors.name}</CardTitle>
+                            <p className="text-sm text-muted-foreground">{sponsors.role}</p>
+                            <p className="text-xs text-muted-foreground">{sponsors.party}</p>
                           </div>
                         </div>
-                        <Badge className={getConflictLevelColor(sponsor.conflictLevel)}>
-                          {sponsor.conflictLevel} Risk
+                        <Badge className={getConflictLevelColor(sponsors.conflict_level)}>
+                          {sponsors.conflict_level} Risk
                         </Badge>
                       </div>
                     </CardHeader>
@@ -455,24 +453,24 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
                       <div className="space-y-3">
                         <div className="grid grid-cols-3 gap-2 text-center">
                           <div>
-                            <div className="text-lg font-bold">KSh {(sponsor.financialExposure / 1000000).toFixed(1)}M</div>
+                            <div className="text-lg font-bold">KSh {(sponsors.financial_exposure / 1000000).toFixed(1)}M</div>
                             <div className="text-xs text-muted-foreground">Financial Exposure</div>
                           </div>
                           <div>
-                            <div className="text-lg font-bold">{sponsor.votingAlignment}%</div>
+                            <div className="text-lg font-bold">{sponsors.voting_alignment}%</div>
                             <div className="text-xs text-muted-foreground">Industry Alignment</div>
                           </div>
                           <div>
-                            <div className="text-lg font-bold">{sponsor.affiliations.length}</div>
+                            <div className="text-lg font-bold">{sponsors.affiliations.length}</div>
                             <div className="text-xs text-muted-foreground">Board Positions</div>
                           </div>
                         </div>
 
-                        {sponsor.affiliations.length > 0 && (
+                        {sponsors.affiliations.length > 0 && (
                           <div>
                             <h6 className="text-sm font-semibold mb-2">Key Affiliations</h6>
                             <div className="space-y-1">
-                              {sponsor.affiliations.map((affiliation, index) => (
+                              {sponsors.affiliations.map((affiliation, index) => (
                                 <div key={index} className="flex items-center gap-2 text-xs">
                                   <Building className="h-3 w-3 text-muted-foreground" />
                                   <span className="text-muted-foreground">{affiliation.organization} - {affiliation.role}</span>
@@ -502,13 +500,13 @@ export default function CoSponsorsAnalysis({ billId }: CoSponsorsProps) {
 
       {/* Navigation Actions */}
       <div className="flex justify-between items-center">
-        <Link to={`/bills/${billId}/sponsorship-analysis/primary-sponsor`}>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis/primary-sponsor`}>
           <Button variant="outline">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Previous: Primary Sponsor
           </Button>
         </Link>
-        <Link to={`/bills/${billId}/sponsorship-analysis/financial-network`}>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis/financial-network`}>
           <Button>
             Next: Financial Network
             <ChevronRight className="h-4 w-4 ml-2" />

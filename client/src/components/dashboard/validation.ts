@@ -10,18 +10,17 @@ export const ActionPrioritySchema = z.enum(['High', 'Medium', 'Low']);
 export const TopicCategorySchema = z.enum(['legislative', 'community', 'policy', 'advocacy']);
 export const DashboardSectionSchema = z.enum(['activity', 'actions', 'topics', 'analytics']);
 
-export const ActionItemSchema = z.object({
-  id: z.string().min(1, 'Action item ID cannot be empty'),
+export const ActionItemSchema = z.object({ id: z.string().min(1, 'Action item ID cannot be empty'),
   title: z.string().min(1, 'Title cannot be empty').max(200, 'Title too long'),
   description: z.string().min(1, 'Description cannot be empty').max(1000, 'Description too long'),
   priority: ActionPrioritySchema,
   dueDate: z.date().optional(),
   category: z.string().max(100, 'Category too long').optional(),
-  billId: z.string().optional(),
+  bill_id: z.string().optional(),
   completed: z.boolean().optional(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
+  created_at: z.date(),
+  updated_at: z.date(),
+ });
 
 export const ActivitySummarySchema = z.object({
   billsTracked: z.number().int().min(0, 'Bills tracked cannot be negative'),
@@ -38,8 +37,8 @@ export const TrackedTopicSchema = z.object({
   name: z.string().min(1, 'Topic name cannot be empty').max(100, 'Topic name too long'),
   category: TopicCategorySchema,
   billCount: z.number().int().min(0, 'Bill count cannot be negative'),
-  isActive: z.boolean(),
-  createdAt: z.date(),
+  is_active: z.boolean(),
+  created_at: z.date(),
   description: z.string().max(500, 'Description too long').optional(),
   keywords: z.array(z.string().max(50, 'Keyword too long')).optional(),
 });

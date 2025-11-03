@@ -7,17 +7,17 @@ export class DataValidationService {
   // Validation rules for different data types
   private static readonly VALIDATION_RULES = {
     bills: {
-      required: ['title', 'billNumber', 'status'],
+      required: ['title', 'bill_number', 'status'],
       optional: ['description', 'content', 'summary', 'category', 'tags'],
       maxLengths: {
         title: 500,
         description: 2000,
         summary: 1000,
-        billNumber: 50,
+        bill_number: 50,
         category: 100
       },
       statusValues: ['introduced', 'committee', 'passed', 'failed', 'signed'],
-      billNumberPattern: /^[A-Z]{1,3}-?\d{1,4}$/i
+      bill_numberPattern: /^[A-Z]{1,3}-?\d{1,4}$/i
     },
     sponsors: {
       required: ['name', 'role'],
@@ -65,17 +65,17 @@ export class DataValidationService {
     }
 
     // Validate bill status
-    if (bill.status && !this.VALIDATION_RULES.bills.statusValues.includes(bill.status)) {
-      result.warnings.push(`Invalid bill status: ${bill.status}. Expected one of: ${this.VALIDATION_RULES.bills.statusValues.join(', ')}`);
+    if (bills.status && !this.VALIDATION_RULES.bills.statusValues.includes(bills.status)) {
+      result.warnings.push(`Invalid bill status: ${bills.status}. Expected one of: ${this.VALIDATION_RULES.bills.statusValues.join(', ')}`);
     }
 
     // Validate bill number format
-    if (bill.billNumber && !this.VALIDATION_RULES.bills.billNumberPattern.test(bill.billNumber)) {
-      result.warnings.push(`Bill number format may be invalid: ${bill.billNumber}`);
+    if (bills.bill_number && !this.VALIDATION_RULES.bills.bill_numberPattern.test(bills.bill_number)) {
+      result.warnings.push(`Bill number format may be invalid: ${bills.bill_number}`);
     }
 
     // Validate dates
-    const dateValidation = this.validateDates(bill, ['introducedDate', 'lastActionDate']);
+    const dateValidation = this.validateDates(bill, ['introduced_date', 'last_action_date']);
     result.errors.push(...dateValidation.errors);
     result.warnings.push(...dateValidation.warnings);
     if (dateValidation.errors.length > 0) {
@@ -140,19 +140,19 @@ export class DataValidationService {
     }
 
     // Validate role
-    if (sponsor.role && !this.VALIDATION_RULES.sponsors.roleValues.includes(sponsor.role)) {
-      result.warnings.push(`Uncommon role: ${sponsor.role}. Expected one of: ${this.VALIDATION_RULES.sponsors.roleValues.join(', ')}`);
+    if (sponsors.role && !this.VALIDATION_RULES.sponsors.roleValues.includes(sponsors.role)) {
+      result.warnings.push(`Uncommon role: ${sponsors.role}. Expected one of: ${this.VALIDATION_RULES.sponsors.roleValues.join(', ')}`);
     }
 
     // Validate email format
-    if (sponsor.email && !this.isValidEmail(sponsor.email)) {
-      result.errors.push(`Invalid email format: ${sponsor.email}`);
+    if (sponsors.email && !this.isValidEmail(sponsors.email)) {
+      result.errors.push(`Invalid email format: ${sponsors.email}`);
       result.isValid = false;
     }
 
     // Validate phone format
-    if (sponsor.phone && !this.isValidPhone(sponsor.phone)) {
-      result.warnings.push(`Phone number format may be invalid: ${sponsor.phone}`);
+    if (sponsors.phone && !this.isValidPhone(sponsors.phone)) {
+      result.warnings.push(`Phone number format may be invalid: ${sponsors.phone}`);
     }
 
     // Calculate completeness score
@@ -302,7 +302,7 @@ export class DataValidationService {
           errors.push(`Invalid date format for field '${field}': ${data[field]}`);
         } else {
           // Check if date is in the future (warning for introduced dates)
-          if (field === 'introducedDate' && date > new Date()) {
+          if (field === 'introduced_date' && date > new Date()) {
             warnings.push(`Future date for '${field}': ${data[field]}`);
           }
           
@@ -349,9 +349,9 @@ export class DataValidationService {
     let score = 1.0;
     
     // Check for internal consistency issues
-    if (data.introducedDate && data.lastActionDate) {
-      const introduced = new Date(data.introducedDate);
-      const lastAction = new Date(data.lastActionDate);
+    if (data.introduced_date && data.last_action_date) {
+      const introduced = new Date(data.introduced_date);
+      const lastAction = new Date(data.last_action_date);
       
       if (introduced > lastAction) {
         score -= 0.3; // Major consistency issue
@@ -359,8 +359,8 @@ export class DataValidationService {
     }
     
     // Check status consistency with dates
-    if (data.status === 'introduced' && data.lastActionDate) {
-      const daysSinceIntroduction = (new Date().getTime() - new Date(data.lastActionDate).getTime()) / (1000 * 60 * 60 * 24);
+    if (data.status === 'introduced' && data.last_action_date) {
+      const daysSinceIntroduction = (new Date().getTime() - new Date(data.last_action_date).getTime()) / (1000 * 60 * 60 * 24);
       if (daysSinceIntroduction > 365) {
         score -= 0.1; // Minor consistency issue - bill introduced long ago but still shows as introduced
       }
@@ -420,7 +420,7 @@ export class DataValidationService {
       let identifier: string;
       
       if (type === 'bills') {
-        identifier = record.data.billNumber || record.data.id || 'unknown';
+        identifier = record.data.bill_number || record.data.id || 'unknown';
       } else {
         // For sponsors, use name + role as identifier
         identifier = `${record.data.name || 'unknown'}|${record.data.role || 'unknown'}`;

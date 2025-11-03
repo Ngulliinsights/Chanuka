@@ -49,7 +49,7 @@ function TestComponent() {
       <div data-testid="current-path">{navigation.currentPath}</div>
       <div data-testid="sidebar-open">{navigation.sidebarOpen.toString()}</div>
       <div data-testid="sidebar-collapsed">{responsiveNavigation.sidebarCollapsed.toString()}</div>
-      <div data-testid="user-role">{navigation.userRole}</div>
+      <div data-testid="user-role">{navigation.user_role}</div>
       <div data-testid="recent-pages-count">{navigation.preferences.recentlyVisited.length}</div>
       <button 
         data-testid="toggle-sidebar" 

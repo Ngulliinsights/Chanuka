@@ -95,11 +95,11 @@ export function usePerformanceWidget(widgetId: string) {
 export function useEngagementWidget(widgetId: string) {
   const { widget, data, loading, error, refresh } = useWidget(widgetId);
   
-  const engagementData = data as EngagementMetrics | undefined;
+  const engagement_data = data as EngagementMetrics | undefined;
 
   return {
     widget,
-    data: engagementData,
+    data: engagement_data,
     loading,
     error,
     refresh,

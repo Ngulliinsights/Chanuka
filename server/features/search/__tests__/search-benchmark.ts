@@ -8,10 +8,10 @@
  */
 
 import { performance } from 'perf_hooks';
-import { suggestionEngineService } from '../engines/suggestion-engine.service';
+import { suggestionEngineService } from '../engines/suggestion/index.js';
 import { parallelQueryExecutor } from '../utils/parallel-query-executor';
 import { historyCleanupService } from '../services/history-cleanup.service';
-import { suggestionRankingService } from '../engines/suggestion-ranking.service';
+import { suggestionRankingService } from '../engines/suggestion/index.js';
 
 interface BenchmarkResult {
   operation: string;
@@ -152,7 +152,7 @@ class SearchBenchmark {
       term: `suggestion ${i}`,
       type: 'bill_title' as const,
       frequency: Math.floor(Math.random() * 100),
-      metadata: { billId: i }
+      metadata: { bill_id: i  }
     }));
 
     const context = {

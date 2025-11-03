@@ -46,11 +46,10 @@ describe('BillTrackingService', () => {
   const mockUserId = 'user-uuid-123';
   const mockBillId = 101;
   const mockBill = { id: mockBillId, title: 'Test Bill' } as schema.Bill;
-  const mockPreference: schema.UserBillTrackingPreference = {
-      id: 1, userId: mockUserId, billId: mockBillId, trackingTypes: ['status_changes'],
-      alertFrequency: 'immediate', alertChannels: ['in_app'], isActive: true,
-      createdAt: new Date(), updatedAt: new Date(),
-  };
+  const mockPreference: schema.UserBillTrackingPreference = { id: 1, user_id: mockUserId, bill_id: mockBillId, tracking_types: ['status_changes'],
+      alert_frequency: 'immediate', alert_channels: ['in_app'], is_active: true,
+      created_at: new Date(), updated_at: new Date(),
+    };
 
 
   beforeEach(() => {
@@ -111,7 +110,7 @@ describe('BillTrackingService', () => {
       // Assert
        expect(databaseService.withTransaction).toHaveBeenCalledTimes(1);
        expect(mockDb.insert).toHaveBeenCalledWith(schema.userBillTrackingPreference);
-       expect(mockDb.insert).toHaveBeenCalledWith(schema.billEngagement); // Verify engagement insert
+       expect(mockDb.insert).toHaveBeenCalledWith(schema.bill_engagement); // Verify engagement insert
        expect(mockDb.onConflictDoUpdate).toHaveBeenCalled(); // Verify upsert logic
        expect(result).toEqual(mockPreference);
        expect(cacheService.deletePattern).toHaveBeenCalled();
@@ -131,15 +130,15 @@ describe('BillTrackingService', () => {
         });
 
       // Act
-      const result = await service.trackBill(mockUserId, mockBillId, { alertFrequency: 'daily' });
+      const result = await service.trackBill(mockUserId, mockBillId, { alert_frequency: 'daily' });
 
       // Assert
       expect(databaseService.withTransaction).toHaveBeenCalledTimes(1);
       expect(mockDb.insert).toHaveBeenCalledWith(schema.userBillTrackingPreference); // Still called insert (upsert)
        expect(mockDb.onConflictDoUpdate).toHaveBeenCalledWith(expect.objectContaining({
-           set: expect.objectContaining({ alertFrequency: 'daily', isActive: true }), // Verify update data
+           set: expect.objectContaining({ alert_frequency: 'daily', is_active: true }), // Verify update data
        }));
-       expect(mockDb.update).toHaveBeenCalledWith(schema.billEngagement); // Verify engagement UPDATE
+       expect(mockDb.update).toHaveBeenCalledWith(schema.bill_engagement); // Verify engagement UPDATE
        expect(result).toEqual(mockPreference);
     });
 
@@ -158,7 +157,7 @@ describe('BillTrackingService', () => {
   });
 
   describe('untrackBill', () => {
-    it('should set the tracking preference isActive to false', async () => {
+    it('should set the tracking preference is_active to false', async () => {
        // Arrange
        mockDb.returning.mockResolvedValueOnce([{ id: mockPreference.id }]); // Simulate successful update
 
@@ -167,7 +166,7 @@ describe('BillTrackingService', () => {
 
       // Assert
       expect(mockDb.update).toHaveBeenCalledWith(schema.userBillTrackingPreference);
-       expect(mockDb.set).toHaveBeenCalledWith({ isActive: false, updatedAt: expect.any(Date) });
+       expect(mockDb.set).toHaveBeenCalledWith({ is_active: false, updated_at: expect.any(Date) });
        expect(mockDb.where).toHaveBeenCalled(); // Verify where clause was applied
        expect(cacheService.deletePattern).toHaveBeenCalled();
     });
@@ -179,7 +178,7 @@ describe('BillTrackingService', () => {
       // Act & Assert
       await expect(service.untrackBill(mockUserId, mockBillId)).resolves.toBeUndefined();
       expect(mockDb.update).toHaveBeenCalledWith(schema.userBillTrackingPreference);
-       expect(mockDb.set).toHaveBeenCalledWith({ isActive: false, updatedAt: expect.any(Date) });
+       expect(mockDb.set).toHaveBeenCalledWith({ is_active: false, updated_at: expect.any(Date) });
        expect(cacheService.deletePattern).toHaveBeenCalled(); // Cache should still be cleared
     });
   });
@@ -190,7 +189,7 @@ describe('BillTrackingService', () => {
        mockDb.select.mockReturnValueOnce({
            from: vi.fn().mockReturnThis(),
            where: vi.fn().mockReturnThis(),
-           limit: vi.fn().mockResolvedValue([{ isActive: true }]),
+           limit: vi.fn().mockResolvedValue([{ is_active: true }]),
        });
        (cacheService.get as vi.Mock).mockResolvedValue(null); // Cache miss
 
@@ -208,7 +207,7 @@ describe('BillTrackingService', () => {
        mockDb.select.mockReturnValueOnce({
            from: vi.fn().mockReturnThis(),
            where: vi.fn().mockReturnThis(),
-           limit: vi.fn().mockResolvedValue([{ isActive: false }]),
+           limit: vi.fn().mockResolvedValue([{ is_active: false }]),
        });
        (cacheService.get as vi.Mock).mockResolvedValue(null); // Cache miss
 

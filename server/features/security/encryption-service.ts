@@ -203,12 +203,12 @@ export class EncryptionService {
   /**
    * Create secure session tokens with expiration
    */
-  createSessionToken(): { token: string; hash: string; expiresAt: Date } {
+  createSessionToken(): { token: string; hash: string; expires_at: Date } {
     const token = this.generateSecureToken(64);
     const hash = this.hashToken(token);
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    const expires_at = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-    return { token, hash, expiresAt };
+    return { token, hash, expires_at };
   }
 
   /**

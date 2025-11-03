@@ -11,13 +11,13 @@ import { RequiredDisclosureType } from './config';
 export interface FinancialDisclosure {
   // Core fields from database
   id: number;
-  sponsorId: number;
+  sponsor_id: number;
   disclosureType: RequiredDisclosureType;
   description: string;
   amount?: number;
   source?: string;
   dateReported: Date;
-  isVerified: boolean;
+  is_verified: boolean;
   
   // Calculated enrichment fields
   completenessScore: number;  // Individual disclosure quality score (0-100)
@@ -30,14 +30,14 @@ export interface FinancialDisclosure {
  * Used for network analysis and conflict detection.
  */
 export interface FinancialRelationship {
-  sponsorId: number;
+  sponsor_id: number;
   relatedEntity: string;
   relationshipType: 'ownership' | 'employment' | 'investment' | 'family' | 'business_partner';
   strength: number; // 0-100 scale indicating connection strength
   financialValue?: number;
   startDate?: Date;
   endDate?: Date;
-  isActive: boolean;
+  is_active: boolean;
   conflictPotential: 'low' | 'medium' | 'high' | 'critical';
 }
 
@@ -54,11 +54,11 @@ export interface ConflictOfInterest {
 }
 
 /**
- * Comprehensive relationship mapping for a sponsor.
+ * Comprehensive relationship mapping for a sponsors.
  * Provides network view of all financial connections and risks.
  */
 export interface RelationshipMapping {
-  sponsorId: number;
+  sponsor_id: number;
   sponsorName: string;
   relationships: FinancialRelationship[];
   totalFinancialExposure: number;
@@ -74,11 +74,11 @@ export interface RelationshipMapping {
 }
 
 /**
- * Detailed completeness analysis for a sponsor.
+ * Detailed completeness analysis for a sponsors.
  * Multi-dimensional assessment of disclosure quality and compliance.
  */
 export interface CompletenessReport {
-  sponsorId: number;
+  sponsor_id: number;
   sponsorName: string;
   overallScore: number;  // 0-100 composite score
   requiredDisclosures: number;
@@ -117,12 +117,12 @@ export interface TransparencyDashboard {
     critical: number;
   };
   topPerformers: Array<{
-    sponsorId: number;
+    sponsor_id: number;
     sponsorName: string;
     score: number;
   }>;
   needsAttention: Array<{
-    sponsorId: number;
+    sponsor_id: number;
     sponsorName: string;
     score: number;
     riskLevel: string;
@@ -137,11 +137,11 @@ export interface FinancialAlert {
   id: string;
   type: 'new_disclosure' | 'updated_disclosure' | 'missing_disclosure' | 
         'threshold_exceeded' | 'conflict_detected' | 'stale_disclosure';
-  sponsorId: number;
+  sponsor_id: number;
   sponsorName: string;
   description: string;
   severity: 'info' | 'warning' | 'critical';
-  createdAt: Date;
+  created_at: Date;
   isResolved: boolean;
   metadata: Record<string, any>;
 }
@@ -153,7 +153,7 @@ export interface FinancialAlert {
 export interface MonitoringStatus {
   isRunning: boolean;
   lastCheckTime: Date | null;
-  nextCheckTime: Date | null;
+  next_checkTime: Date | null;
   checksPerformed: number;
   alertsGenerated: number;
   errorsEncountered: number;
@@ -166,7 +166,7 @@ export interface MonitoringStatus {
  * Used for quick operational checks without full analytics.
  */
 export interface CompletenessScore {
-  sponsorId: number;
+  sponsor_id: number;
   score: number;
   missingDisclosures: string[];
   totalRequired: number;
@@ -199,7 +199,7 @@ export interface SystemHealthStatus {
 export interface SponsorInfo {
   id: number;
   name: string;
-  isActive: boolean;
+  is_active: boolean;
 }
 
 /**
@@ -207,11 +207,11 @@ export interface SponsorInfo {
  */
 export interface SponsorAffiliation {
   id: number;
-  sponsorId: number;
+  sponsor_id: number;
   organization: string;
   type: 'economic' | 'professional' | 'ownership' | 'family';
   conflictType?: 'ownership' | 'financial' | null;
-  isActive: boolean;
+  is_active: boolean;
   startDate?: Date;
   endDate?: Date;
 }

@@ -1,18 +1,18 @@
-import { Bill, BillComment, Sponsor, Analysis, BillEngagement } from '../../shared/schema';
+import type { Bill, BillComment, Sponsor, BillEngagement } from '@shared/schema';
 // Import analysis types from their respective domain features
 import type { BillAnalysis } from '../features/bills/types/analysis.js';
 import type { SponsorshipAnalysis } from '../features/sponsors/types/analysis.js';
 import { logger  } from '../../shared/core/src/index.js';
 
 // Enhanced types for demo data that match API responses
-interface DemoBill extends Omit<Bill, 'id' | 'sponsorId' | 'commentCount' | 'engagementScore'> {
+interface DemoBill extends Omit<Bill, 'id' | 'sponsor_id' | 'comment_count' | 'engagement_score'> {
   id: number;
-  sponsorId?: number;
-  commentCount?: number;
-  engagementScore?: number;
+  sponsor_id?: number;
+  comment_count?: number;
+  engagement_score?: number;
 }
 
-interface DemoSponsor extends Omit<Sponsor, 'id' | 'updatedAt'> {
+interface DemoSponsor extends Omit<Sponsor, 'id' | 'updated_at'> {
   id: number;
   profileImage?: string;
   socialMedia?: {
@@ -20,21 +20,19 @@ interface DemoSponsor extends Omit<Sponsor, 'id' | 'updatedAt'> {
     facebook?: string;
     linkedin?: string;
   };
-  updatedAt: Date;
+  updated_at: Date;
 }
 
-interface DemoBillComment extends Omit<BillComment, 'id' | 'userId' | 'isDeleted'> {
-  id: number;
-  userId: string;
+interface DemoBillComment extends Omit<BillComment, 'id' | 'user_id' | 'is_deleted'> { id: number;
+  user_id: string;
   isHighlighted?: boolean;
-  isDeleted: boolean;
-}
+  is_deleted: boolean;
+ }
 
-interface DemoBillEngagement extends Omit<BillEngagement, 'id' | 'userId'> {
-  id: number;
-  userId: string;
+interface DemoBillEngagement extends Omit<BillEngagement, 'id' | 'user_id'> { id: number;
+  user_id: string;
   lastViewed?: Date;
-}
+ }
 
 /**
  * Demo Data Service
@@ -98,13 +96,13 @@ export class DemoDataService {
         content: "WHEREAS the digital economy has become integral to Kenya's economic development...\n\nSection 1: Definitions\nFor the purposes of this Act:\n(a) 'digital platform' means any online service that facilitates interactions between users...\n(b) 'personal data' means any information relating to an identified or identifiable natural person...\n\nSection 2: Data Protection Principles\nAll data controllers shall ensure that personal data is:\n(a) processed lawfully, fairly and transparently...\n(b) collected for specified, explicit and legitimate purposes...",
         summary: "This Act establishes comprehensive data protection framework for Kenya's digital economy, requiring platforms to obtain explicit consent for data collection, implement privacy-by-design principles, and face penalties up to 4% of annual turnover for violations.",
         status: "committee_review",
-        billNumber: "HB-2024-001",
-        sponsorId: 1,
+        bill_number: "HB-2024-001",
+        sponsor_id: 1,
         category: "technology",
         tags: ["data protection", "digital economy", "privacy", "technology"],
-        viewCount: 1247,
-        shareCount: 89,
-        complexityScore: 8,
+        view_count: 1247,
+        share_count: 89,
+        complexity_score: 8,
         constitutionalConcerns: {
           concerns: ["Right to privacy", "Freedom of expression"],
           severity: "medium",
@@ -115,10 +113,10 @@ export class DemoDataService {
           opponents: ["Tech companies", "Digital marketers"],
           neutral: ["Small businesses"]
         },
-        introducedDate: new Date("2024-01-15"),
-        lastActionDate: new Date("2024-01-20"),
-        createdAt: new Date("2024-01-15"),
-        updatedAt: new Date("2024-01-20")
+        introduced_date: new Date("2024-01-15"),
+        last_action_date: new Date("2024-01-20"),
+        created_at: new Date("2024-01-15"),
+        updated_at: new Date("2024-01-20")
       },
       {
         id: 2,
@@ -127,13 +125,13 @@ export class DemoDataService {
         content: "WHEREAS Kenya is vulnerable to the adverse effects of climate change...\n\nSection 1: Establishment of Fund\nThere is hereby established a fund to be known as the Climate Change Adaptation Fund...\n\nSection 2: Objects of the Fund\nThe objects of the Fund shall be to:\n(a) finance climate adaptation projects...\n(b) support carbon offset initiatives...\n(c) promote climate resilience in vulnerable communities...",
         summary: "Creates a KES 50 billion national climate fund financed through carbon taxes and international climate finance, targeting adaptation projects in arid and semi-arid lands, coastal protection, and agricultural resilience programs.",
         status: "first_reading",
-        billNumber: "SB-2024-002",
-        sponsorId: 2,
+        bill_number: "SB-2024-002",
+        sponsor_id: 2,
         category: "environment",
         tags: ["climate change", "environment", "adaptation", "carbon offset"],
-        viewCount: 892,
-        shareCount: 156,
-        complexityScore: 7,
+        view_count: 892,
+        share_count: 156,
+        complexity_score: 7,
         constitutionalConcerns: {
           concerns: ["Environmental rights", "Intergenerational equity"],
           severity: "low",
@@ -144,10 +142,10 @@ export class DemoDataService {
           opponents: ["Industrial lobby", "Carbon-intensive industries"],
           neutral: ["Urban populations"]
         },
-        introducedDate: new Date("2024-02-01"),
-        lastActionDate: new Date("2024-02-05"),
-        createdAt: new Date("2024-02-01"),
-        updatedAt: new Date("2024-02-05")
+        introduced_date: new Date("2024-02-01"),
+        last_action_date: new Date("2024-02-05"),
+        created_at: new Date("2024-02-01"),
+        updated_at: new Date("2024-02-05")
       },
       {
         id: 3,
@@ -156,13 +154,13 @@ export class DemoDataService {
         content: "WHEREAS access to healthcare is a fundamental right...\n\nSection 1: Amendment of Principal Act\nThe National Hospital Insurance Fund Act is amended as follows...\n\nSection 2: Expanded Coverage\nThe Fund shall provide coverage for:\n(a) primary healthcare services...\n(b) specialized medical treatment...\n(c) mental health services...\n(d) maternal and child health programs...",
         summary: "Expands NHIF coverage to include mental health, dental care, and specialized treatments while introducing progressive contribution rates based on income levels and establishing quality assurance mechanisms for healthcare providers.",
         status: "second_reading",
-        billNumber: "HB-2024-003",
-        sponsorId: 3,
+        bill_number: "HB-2024-003",
+        sponsor_id: 3,
         category: "healthcare",
         tags: ["healthcare", "NHIF", "universal coverage", "medical insurance"],
-        viewCount: 2156,
-        shareCount: 234,
-        complexityScore: 9,
+        view_count: 2156,
+        share_count: 234,
+        complexity_score: 9,
         constitutionalConcerns: {
           concerns: ["Right to health", "Social security"],
           severity: "low",
@@ -173,10 +171,10 @@ export class DemoDataService {
           opponents: ["Private insurers", "Some employers"],
           neutral: ["General public"]
         },
-        introducedDate: new Date("2024-01-10"),
-        lastActionDate: new Date("2024-02-15"),
-        createdAt: new Date("2024-01-10"),
-        updatedAt: new Date("2024-02-15")
+        introduced_date: new Date("2024-01-10"),
+        last_action_date: new Date("2024-02-15"),
+        created_at: new Date("2024-01-10"),
+        updated_at: new Date("2024-02-15")
       }
     ];
 
@@ -202,19 +200,19 @@ export class DemoDataService {
         email: "s.mwangi@parliament.go.ke",
         phone: "+254-700-123-456",
         bio: "Technology policy expert with 15 years experience in digital governance and data protection advocacy.",
-        photoUrl: "/images/sponsors/sarah-mwangi.jpg",
-        conflictLevel: "low",
-        financialExposure: "15000.00",
-        votingAlignment: "85.00",
-        transparencyScore: "92.50",
-        isActive: true,
+        photo_url: "/images/sponsors/sarah-mwangi.jpg",
+        conflict_level: "low",
+        financial_exposure: "15000.00",
+        voting_alignment: "85.00",
+        transparency_score: "92.50",
+        is_active: true,
         profileImage: "/images/sponsors/sarah-mwangi.jpg",
         socialMedia: {
           twitter: "@SarahMwangiMP",
           facebook: "SarahMwangiOfficial"
         },
-        createdAt: new Date("2023-01-01"),
-        updatedAt: new Date("2024-01-01")
+        created_at: new Date("2023-01-01"),
+        updated_at: new Date("2024-01-01")
       },
       {
         id: 2,
@@ -225,19 +223,19 @@ export class DemoDataService {
         email: "j.kimani@senate.go.ke",
         phone: "+254-700-234-567",
         bio: "Environmental lawyer and climate change advocate with extensive experience in environmental policy and sustainable development.",
-        photoUrl: "/images/sponsors/james-kimani.jpg",
-        conflictLevel: "low",
-        financialExposure: "8000.00",
-        votingAlignment: "78.00",
-        transparencyScore: "88.75",
-        isActive: true,
+        photo_url: "/images/sponsors/james-kimani.jpg",
+        conflict_level: "low",
+        financial_exposure: "8000.00",
+        voting_alignment: "78.00",
+        transparency_score: "88.75",
+        is_active: true,
         profileImage: "/images/sponsors/james-kimani.jpg",
         socialMedia: {
           twitter: "@JamesKimaniSen",
           linkedin: "james-kimani-senator"
         },
-        createdAt: new Date("2023-01-01"),
-        updatedAt: new Date("2024-01-01")
+        created_at: new Date("2023-01-01"),
+        updated_at: new Date("2024-01-01")
       },
       {
         id: 3,
@@ -248,19 +246,19 @@ export class DemoDataService {
         email: "m.wanjiku@parliament.go.ke",
         phone: "+254-700-345-678",
         bio: "Medical doctor and public health specialist with 20 years experience in healthcare policy and universal health coverage advocacy.",
-        photoUrl: "/images/sponsors/mary-wanjiku.jpg",
-        conflictLevel: "medium",
-        financialExposure: "25000.00",
-        votingAlignment: "82.00",
-        transparencyScore: "90.25",
-        isActive: true,
+        photo_url: "/images/sponsors/mary-wanjiku.jpg",
+        conflict_level: "medium",
+        financial_exposure: "25000.00",
+        voting_alignment: "82.00",
+        transparency_score: "90.25",
+        is_active: true,
         profileImage: "/images/sponsors/mary-wanjiku.jpg",
         socialMedia: {
           twitter: "@DrMaryWanjiku",
           facebook: "DrMaryWanjikuMP"
         },
-        createdAt: new Date("2023-01-01"),
-        updatedAt: new Date("2024-01-01")
+        created_at: new Date("2023-01-01"),
+        updated_at: new Date("2024-01-01")
       }
     ];
 
@@ -271,135 +269,127 @@ export class DemoDataService {
    * Get sample bill comments
    * Organized by bill ID for efficient lookup
    */
-  public getBillComments(billId: number): DemoBillComment[] {
-    const allComments: DemoBillComment[] = [
+  public getBillComments(bill_id: number): DemoBillComment[] { const allComments: DemoBillComment[] = [
       {
         id: 1,
-        billId: 1,
-        userId: "user-001",
+        bill_id: 1,
+        user_id: "user-001",
         content: "This bill is crucial for protecting our digital rights. The penalties seem appropriate for the scale of potential violations.",
         commentType: "general" as const,
         upvotes: 15,
         downvotes: 2,
-        parentCommentId: null,
-        isVerified: true,
+        parent_id: null,
+        is_verified: true,
         isHighlighted: false,
-        isDeleted: false,
-        createdAt: new Date("2024-01-16"),
-        updatedAt: new Date("2024-01-16")
-      },
-      {
-        id: 2,
-        billId: 1,
-        userId: "user-002",
+        is_deleted: false,
+        created_at: new Date("2024-01-16"),
+        updated_at: new Date("2024-01-16")
+        },
+      { id: 2,
+        bill_id: 1,
+        user_id: "user-002",
         content: "I'm concerned about the compliance burden on small tech startups. Perhaps a phased implementation would be better?",
         commentType: "concern" as const,
         upvotes: 8,
         downvotes: 1,
-        parentCommentId: null,
-        isVerified: false,
+        parent_id: null,
+        is_verified: false,
         isHighlighted: false,
-        isDeleted: false,
-        createdAt: new Date("2024-01-17"),
-        updatedAt: new Date("2024-01-17")
-      },
-      {
-        id: 3,
-        billId: 2,
-        userId: "user-003",
+        is_deleted: false,
+        created_at: new Date("2024-01-17"),
+        updated_at: new Date("2024-01-17")
+        },
+      { id: 3,
+        bill_id: 2,
+        user_id: "user-003",
         content: "The climate fund is a step in the right direction. We need more funding for adaptation in coastal areas.",
         commentType: "support" as const,
         upvotes: 22,
         downvotes: 0,
-        parentCommentId: null,
-        isVerified: true,
+        parent_id: null,
+        is_verified: true,
         isHighlighted: true,
-        isDeleted: false,
-        createdAt: new Date("2024-02-02"),
-        updatedAt: new Date("2024-02-02")
-      },
-      {
-        id: 4,
-        billId: 3,
-        userId: "user-004",
+        is_deleted: false,
+        created_at: new Date("2024-02-02"),
+        updated_at: new Date("2024-02-02")
+        },
+      { id: 4,
+        bill_id: 3,
+        user_id: "user-004",
         content: "Universal healthcare is essential. The progressive contribution model ensures fairness across income levels.",
         commentType: "support" as const,
         upvotes: 31,
         downvotes: 3,
-        parentCommentId: null,
-        isVerified: true,
+        parent_id: null,
+        is_verified: true,
         isHighlighted: false,
-        isDeleted: false,
-        createdAt: new Date("2024-02-16"),
-        updatedAt: new Date("2024-02-16")
-      }
+        is_deleted: false,
+        created_at: new Date("2024-02-16"),
+        updated_at: new Date("2024-02-16")
+        }
     ];
 
-    return allComments.filter(comment => comment.billId === billId);
+    return allComments.filter(comment => comment.bill_id === bill_id);
   }
 
   /**
    * Get sample bill engagement data
    * Returns engagement metrics for a specific bill
    */
-  public getBillEngagement(billId: number): DemoBillEngagement | null {
-    const allEngagements: DemoBillEngagement[] = [
+  public getBillEngagement(bill_id: number): DemoBillEngagement | null { const allEngagements: DemoBillEngagement[] = [
       {
         id: 1,
-        billId: 1,
-        userId: "user-001",
-        viewCount: 5,
-        commentCount: 2,
-        shareCount: 1,
-        engagementScore: "8.5",
+        bill_id: 1,
+        user_id: "user-001",
+        view_count: 5,
+        comment_count: 2,
+        share_count: 1,
+        engagement_score: "8.5",
         lastViewed: new Date("2024-01-18"),
         lastEngaged: new Date("2024-01-18"),
-        createdAt: new Date("2024-01-16"),
-        updatedAt: new Date("2024-01-18")
-      },
-      {
-        id: 2,
-        billId: 2,
-        userId: "user-002",
-        viewCount: 3,
-        commentCount: 1,
-        shareCount: 2,
-        engagementScore: "6.2",
+        created_at: new Date("2024-01-16"),
+        updated_at: new Date("2024-01-18")
+        },
+      { id: 2,
+        bill_id: 2,
+        user_id: "user-002",
+        view_count: 3,
+        comment_count: 1,
+        share_count: 2,
+        engagement_score: "6.2",
         lastViewed: new Date("2024-02-03"),
         lastEngaged: new Date("2024-02-03"),
-        createdAt: new Date("2024-02-02"),
-        updatedAt: new Date("2024-02-03")
-      },
-      {
-        id: 3,
-        billId: 3,
-        userId: "user-003",
-        viewCount: 7,
-        commentCount: 1,
-        shareCount: 3,
-        engagementScore: "9.1",
+        created_at: new Date("2024-02-02"),
+        updated_at: new Date("2024-02-03")
+        },
+      { id: 3,
+        bill_id: 3,
+        user_id: "user-003",
+        view_count: 7,
+        comment_count: 1,
+        share_count: 3,
+        engagement_score: "9.1",
         lastViewed: new Date("2024-02-17"),
         lastEngaged: new Date("2024-02-17"),
-        createdAt: new Date("2024-02-16"),
-        updatedAt: new Date("2024-02-17")
-      }
+        created_at: new Date("2024-02-16"),
+        updated_at: new Date("2024-02-17")
+        }
     ];
 
-    return allEngagements.find(e => e.billId === billId) || null;
+    return allEngagements.find(e => e.bill_id === bill_id) || null;
   }
 
   /**
    * Get sample bill analysis data
    * Provides complexity, transparency, and conflict analysis
    */
-  public getBillAnalysis(billId: number): BillAnalysis | null {
-    // Helper function to generate unique IDs for analysis records
-    const generateAnalysisId = (billId: number): number => billId + 1000;
+  public getBillAnalysis(bill_id: number): BillAnalysis | null { // Helper function to generate unique IDs for analysis records
+    const generateAnalysisId = (bill_id: number): number => bill_id + 1000;
 
     const allAnalyses: Record<number, BillAnalysis> = {
       1: {
         id: generateAnalysisId(1),
-        billId: 1,
+        bill_id: 1,
         complexity: 8,
         transparency: 7,
         conflicts: [
@@ -408,7 +398,7 @@ export class DemoDataService {
             severity: "medium" as const,
             description: "Potential impact on tech company revenues",
             section: "Section 5: Penalties and Enforcement"
-          },
+           },
           {
             type: "political" as const,
             severity: "low" as const,
@@ -429,12 +419,11 @@ export class DemoDataService {
           "Potential for regulatory overreach",
           "Cross-border data transfer restrictions"
         ],
-        createdAt: new Date("2024-01-15"),
+        created_at: new Date("2024-01-15"),
         lastUpdated: new Date("2024-01-20")
       },
-      2: {
-        id: generateAnalysisId(2),
-        billId: 2,
+      2: { id: generateAnalysisId(2),
+        bill_id: 2,
         complexity: 7,
         transparency: 9,
         conflicts: [
@@ -443,7 +432,7 @@ export class DemoDataService {
             severity: "high" as const,
             description: "Significant funding requirements",
             section: "Section 4: Fund Financing"
-          }
+           }
         ],
         sentiment: {
           positive: 78,
@@ -458,12 +447,11 @@ export class DemoDataService {
           "Implementation capacity challenges",
           "Monitoring and evaluation complexity"
         ],
-        createdAt: new Date("2024-02-01"),
+        created_at: new Date("2024-02-01"),
         lastUpdated: new Date("2024-02-05")
       },
-      3: {
-        id: generateAnalysisId(3),
-        billId: 3,
+      3: { id: generateAnalysisId(3),
+        bill_id: 3,
         complexity: 9,
         transparency: 8,
         conflicts: [
@@ -472,7 +460,7 @@ export class DemoDataService {
             severity: "high" as const,
             description: "Substantial increase in healthcare spending",
             section: "Section 6: Financing Mechanisms"
-          },
+           },
           {
             type: "professional" as const,
             severity: "medium" as const,
@@ -493,22 +481,21 @@ export class DemoDataService {
           "Provider quality assurance challenges",
           "Fiscal sustainability concerns"
         ],
-        createdAt: new Date("2024-01-10"),
+        created_at: new Date("2024-01-10"),
         lastUpdated: new Date("2024-02-15")
       }
     };
 
-    return allAnalyses[billId] || null;
+    return allAnalyses[bill_id] || null;
   }
 
   /**
    * Get sample sponsorship analysis data
    * Provides detailed sponsor conflict and financial analysis
    */
-  public getSponsorshipAnalysis(billId: number): SponsorshipAnalysis | null {
-    const allSponsorshipAnalyses: Record<number, SponsorshipAnalysis> = {
+  public getSponsorshipAnalysis(bill_id: number): SponsorshipAnalysis | null { const allSponsorshipAnalyses: Record<number, SponsorshipAnalysis> = {
       1: {
-        billId: 1,
+        bill_id: 1,
         title: "Digital Economy and Data Protection Act 2024",
         number: "HB-2024-001",
         introduced: new Date("2024-01-15").toISOString(),
@@ -520,26 +507,26 @@ export class DemoDataService {
           party: "Democratic Alliance",
           constituency: "Nairobi Central",
           email: "s.mwangi@parliament.go.ke",
-          conflictLevel: "low" as const,
-          financialExposure: 15000,
+          conflict_level: "low" as const,
+          financial_exposure: 15000,
           affiliations: [
             {
               organization: "Tech Policy Institute",
               role: "Board Member",
               type: "professional" as const,
               conflictType: "minor" as const
-            }
+             }
           ],
-          votingAlignment: 85,
+          voting_alignment: 85,
           transparency: {
             disclosure: "complete" as const,
             lastUpdated: new Date("2024-01-15"),
             publicStatements: 12
           },
           sponsorshipDate: new Date("2024-01-15"),
-          isActive: true,
-          createdAt: new Date("2023-01-01"),
-          updatedAt: new Date("2024-01-15")
+          is_active: true,
+          created_at: new Date("2023-01-01"),
+          updated_at: new Date("2024-01-15")
         },
         coSponsors: [
           {
@@ -549,19 +536,19 @@ export class DemoDataService {
             party: "Progressive Coalition",
             constituency: "Kisumu Central",
             email: "p.ochieng@parliament.go.ke",
-            conflictLevel: "low" as const,
-            financialExposure: 8000,
+            conflict_level: "low" as const,
+            financial_exposure: 8000,
             affiliations: [],
-            votingAlignment: 78,
+            voting_alignment: 78,
             transparency: {
               disclosure: "complete" as const,
               lastUpdated: new Date("2024-01-16"),
               publicStatements: 8
             },
             sponsorshipDate: new Date("2024-01-16"),
-            isActive: true,
-            createdAt: new Date("2023-01-01"),
-            updatedAt: new Date("2024-01-16")
+            is_active: true,
+            created_at: new Date("2023-01-01"),
+            updated_at: new Date("2024-01-16")
           }
         ],
         totalFinancialExposure: 23000,
@@ -570,7 +557,7 @@ export class DemoDataService {
           {
             number: "3",
             title: "Data Processing Requirements",
-            conflictLevel: "medium" as const,
+            conflict_level: "medium" as const,
             affectedSponsors: ["1"],
             description: "Requirements for lawful data processing"
           }
@@ -620,7 +607,7 @@ export class DemoDataService {
       }
     };
 
-    return allSponsorshipAnalyses[billId] || null;
+    return allSponsorshipAnalyses[bill_id] || null;
   }
 
   /**
@@ -664,19 +651,19 @@ export class DemoDataService {
     if (query && query.trim()) {
       const searchTerm = query.toLowerCase().trim();
       bills = bills.filter(bill =>
-        bill.title.toLowerCase().includes(searchTerm) ||
-        bill.description?.toLowerCase().includes(searchTerm) ||
-        bill.summary?.toLowerCase().includes(searchTerm) ||
-        bill.tags?.some(tag => tag.toLowerCase().includes(searchTerm))
+        bills.title.toLowerCase().includes(searchTerm) ||
+        bills.description?.toLowerCase().includes(searchTerm) ||
+        bills.summary?.toLowerCase().includes(searchTerm) ||
+        bills.tags?.some(tag => tag.toLowerCase().includes(searchTerm))
       );
     }
 
     if (filters?.status) {
-      bills = bills.filter(bill => bill.status === filters.status);
+      bills = bills.filter(bill => bills.status === filters.status);
     }
 
     if (filters?.category) {
-      bills = bills.filter(bill => bill.category === filters.category);
+      bills = bills.filter(bill => bills.category === filters.category);
     }
 
     return bills;
@@ -687,7 +674,7 @@ export class DemoDataService {
    * Returns null if bill not found
    */
   public getBill(id: number): DemoBill | null {
-    return this.getBills().find(bill => bill.id === id) || null;
+    return this.getBills().find(bill => bills.id === id) || null;
   }
 
   /**
@@ -702,7 +689,7 @@ export class DemoDataService {
       return null;
     }
     
-    return this.getSponsors().find(sponsor => sponsor.id === numericId) || null;
+    return this.getSponsors().find(sponsor => sponsors.id === numericId) || null;
   }
 
   /**
@@ -735,21 +722,19 @@ export class DemoDataService {
    * Get comprehensive demo data for a bill (includes all related data)
    * Returns a complete dataset for a single bill including comments, engagement, and analysis
    */
-  public getComprehensiveBillData(billId: number) {
-    const bill = this.getBill(billId);
+  public getComprehensiveBillData(bill_id: number) { const bill = this.getBill(bill_id);
     if (!bill) {
-      logger.warn(`Bill with ID ${billId} not found`, { component: 'DemoDataService' });
+      logger.warn(`Bill with ID ${bill_id } not found`, { component: 'DemoDataService' });
       return null;
     }
 
-    return {
-      bill,
-      comments: this.getBillComments(billId),
-      engagement: this.getBillEngagement(billId),
-      analysis: this.getBillAnalysis(billId),
-      sponsorshipAnalysis: this.getSponsorshipAnalysis(billId),
-      sponsor: bill.sponsorId ? this.getSponsor(bill.sponsorId) : null
-    };
+    return { bill,
+      comments: this.getBillComments(bill_id),
+      engagement: this.getBillEngagement(bill_id),
+      analysis: this.getBillAnalysis(bill_id),
+      sponsorshipAnalysis: this.getSponsorshipAnalysis(bill_id),
+      sponsor: bills.sponsor_id ? this.getSponsor(bills.sponsor_id) : null
+     };
   }
 
   /**
@@ -780,11 +765,11 @@ export class DemoDataService {
     try {
       const bills = this.getBills();
       const sponsors = this.getSponsors();
-      const sponsorIds = new Set(sponsors.map(s => s.id));
+      const sponsor_ids = new Set(sponsors.map(s => s.id));
 
       for (const bill of bills) {
-        if (bill.sponsorId && !sponsorIds.has(bill.sponsorId)) {
-          logger.warn(`Bill ${bill.id} references non-existent sponsor ${bill.sponsorId}`, { 
+        if (bills.sponsor_id && !sponsor_ids.has(bills.sponsor_id)) {
+          logger.warn(`Bill ${bills.id} references non-existent sponsor ${bills.sponsor_id}`, { 
             component: 'DemoDataService' 
           });
           return false;
@@ -792,20 +777,20 @@ export class DemoDataService {
       }
 
       for (const bill of bills) {
-        if (!bill.introducedDate || !bill.createdAt || !bill.updatedAt) {
-          logger.warn(`Bill ${bill.id} has invalid dates`, { component: 'DemoDataService' });
+        if (!bills.introduced_date || !bills.created_at || !bills.updated_at) {
+          logger.warn(`Bill ${bills.id} has invalid dates`, { component: 'DemoDataService' });
           return false;
         }
 
-        if (bill.lastActionDate && bill.introducedDate > bill.lastActionDate) {
-          logger.warn(`Bill ${bill.id} has introducedDate after lastActionDate`, { 
+        if (bills.last_action_date && bills.introduced_date > bills.last_action_date) {
+          logger.warn(`Bill ${bills.id} has introduced_date after last_action_date`, { 
             component: 'DemoDataService' 
           });
           return false;
         }
       }
 
-      if (sponsors.length !== sponsorIds.size) {
+      if (sponsors.length !== sponsor_ids.size) {
         logger.warn('Duplicate sponsor IDs detected', { component: 'DemoDataService' });
         return false;
       }

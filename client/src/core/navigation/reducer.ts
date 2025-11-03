@@ -72,12 +72,12 @@ export function navigationReducer(state: NavigationState, action: NavigationActi
       
     case 'SET_USER_ROLE':
       // Avoid unnecessary updates if role hasn't changed
-      if (state.userRole === action.payload) {
+      if (state.user_role === action.payload) {
         return state;
       }
       return {
         ...state,
-        userRole: action.payload,
+        user_role: action.payload,
       };
       
     case 'UPDATE_PREFERENCES':
@@ -103,7 +103,7 @@ export function navigationReducer(state: NavigationState, action: NavigationActi
     case 'RESET_USER_SPECIFIC_STATE':
       return {
         ...state,
-        userRole: 'public',
+        user_role: 'public',
         preferences: {
           defaultLandingPage: '/',
           favoritePages: [],
@@ -120,17 +120,17 @@ export function navigationReducer(state: NavigationState, action: NavigationActi
     case 'SYNC_AUTH_STATE': {
       const { user, isAuthenticated } = action.payload;
       const newUserRole = isAuthenticated && user?.role 
-        ? (user.role as any) 
+        ? (users.role as any) 
         : 'public';
       
       // Avoid unnecessary updates if role hasn't changed
-      if (state.userRole === newUserRole) {
+      if (state.user_role === newUserRole) {
         return state;
       }
       
       return {
         ...state,
-        userRole: newUserRole,
+        user_role: newUserRole,
       };
     }
     

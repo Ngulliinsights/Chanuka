@@ -1,4 +1,4 @@
-import { userProfileService } from './services/user-profile.js';
+import { user_profileservice } from './services/user-profile.js';
 import { db } from '@shared/database/pool.js';
 import { users } from '../shared/schema';
 import { eq } from 'drizzle-orm';
@@ -9,17 +9,17 @@ async function verifyUserProfileService() {
   
   try {
     // Test 1: Create a test user
-    logger.info('1. Creating test user...', { component: 'Chanuka' });
+    logger.info('1. Creating test users...', { component: 'Chanuka' });
     const [testUser] = await db
       .insert(users)
       .values({
         email: 'test-profile@example.com',
-        passwordHash: 'hashedpassword',
+        password_hash: 'hashedpassword',
         name: 'Test Profile User',
-        firstName: 'Test',
-        lastName: 'User',
+        first_name: 'Test',
+        last_name: 'User',
         role: 'citizen',
-        verificationStatus: 'pending'
+        verification_status: 'pending'
       })
       .returning();
     
@@ -27,7 +27,7 @@ async function verifyUserProfileService() {
     
     // Test 2: Get user profile
     logger.info('2. Testing getUserProfile...', { component: 'Chanuka' });
-    const profile = await userProfileService.getUserProfile(testUser.id);
+    const profile = await user_profileservice.getUserProfile(testUser.id);
     logger.info('✅ Profile retrieved:', { component: 'Chanuka' }, {
       id: profile.id,
       name: profile.name,
@@ -36,25 +36,25 @@ async function verifyUserProfileService() {
     
     // Test 3: Update user profile
     logger.info('3. Testing updateUserProfile...', { component: 'Chanuka' });
-    const updatedProfile = await userProfileService.updateUserProfile(testUser.id, {
+    const updatedProfile = await user_profileservice.updateUserProfile(testUser.id, {
       bio: 'Test bio for verification',
       expertise: ['testing', 'verification'],
       location: 'Test City',
       organization: 'Test Organization',
-      isPublic: true
+      is_public: true
     });
     logger.info('✅ Profile updated successfully', { component: 'Chanuka' });
     
     // Test 4: Update user interests
     logger.info('4. Testing updateUserInterests...', { component: 'Chanuka' });
-    const interestsResult = await userProfileService.updateUserInterests(testUser.id, [
+    const interestsResult = await user_profileservice.updateUserInterests(testUser.id, [
       'healthcare', 'education', 'technology'
     ]);
     logger.info('✅ Interests updated:', { component: 'Chanuka' }, interestsResult);
     
     // Test 5: Get user preferences
     logger.info('5. Testing getUserPreferences...', { component: 'Chanuka' });
-    const preferences = await userProfileService.getUserPreferences(testUser.id);
+    const preferences = await user_profileservice.getUserPreferences(testUser.id);
     logger.info('✅ Preferences retrieved:', { component: 'Chanuka' }, {
       emailNotifications: preferences.emailNotifications,
       theme: preferences.theme
@@ -62,7 +62,7 @@ async function verifyUserProfileService() {
     
     // Test 6: Update user preferences
     logger.info('6. Testing updateUserPreferences...', { component: 'Chanuka' });
-    const updatedPreferences = await userProfileService.updateUserPreferences(testUser.id, {
+    const updatedPreferences = await user_profileservice.updateUserPreferences(testUser.id, {
       emailNotifications: false,
       theme: 'dark',
       notificationFrequency: 'daily'
@@ -71,12 +71,12 @@ async function verifyUserProfileService() {
     
     // Test 7: Get verification status
     logger.info('7. Testing getUserVerificationStatus...', { component: 'Chanuka' });
-    const verificationStatus = await userProfileService.getUserVerificationStatus(testUser.id);
-    logger.info('✅ Verification status retrieved:', { component: 'Chanuka' }, verificationStatus.verificationStatus);
+    const verification_status = await user_profileservice.getUserVerificationStatus(testUser.id);
+    logger.info('✅ Verification status retrieved:', { component: 'Chanuka' }, verification_status.verification_status);
     
     // Test 8: Get engagement history
     logger.info('8. Testing getUserEngagementHistory...', { component: 'Chanuka' });
-    const engagementHistory = await userProfileService.getUserEngagementHistory(testUser.id);
+    const engagementHistory = await user_profileservice.getUserEngagementHistory(testUser.id);
     logger.info('✅ Engagement history retrieved:', { component: 'Chanuka' }, {
       totalBillsTracked: engagementHistory.totalBillsTracked,
       totalComments: engagementHistory.totalComments
@@ -84,12 +84,12 @@ async function verifyUserProfileService() {
     
     // Test 9: Get complete user profile
     logger.info('9. Testing getCompleteUserProfile...', { component: 'Chanuka' });
-    const completeProfile = await userProfileService.getCompleteUserProfile(testUser.id);
+    const completeProfile = await user_profileservice.getCompleteUserProfile(testUser.id);
     logger.info('✅ Complete profile retrieved with all sections', { component: 'Chanuka' });
     
     // Test 10: Search users
     logger.info('10. Testing searchUsers...', { component: 'Chanuka' });
-    const searchResults = await userProfileService.searchUsers('Test', 5);
+    const searchResults = await user_profileservice.searchUsers('Test', 5);
     logger.info('✅ User search completed, found:', { component: 'Chanuka' }, searchResults.length, 'users');
     
     // Cleanup

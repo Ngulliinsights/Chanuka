@@ -7,15 +7,15 @@ export const mockUsers = {
   citizen: {
     id: 'user-citizen-1',
     email: 'citizen@example.com',
-    passwordHash: '$2b$12$mockhashedpassword',
-    firstName: 'John',
-    lastName: 'Citizen',
+    password_hash: '$2b$12$mockhashedpassword',
+    first_name: 'John',
+    last_name: 'Citizen',
     name: 'John Citizen',
     role: 'citizen',
-    verificationStatus: 'verified',
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
-    lastLoginAt: new Date('2024-01-15'),
+    verification_status: 'verified',
+    is_active: true,
+    created_at: new Date('2024-01-01'),
+    last_login_at: new Date('2024-01-15'),
     preferences: {
       emailNotifications: true,
       emailVerified: true
@@ -25,15 +25,15 @@ export const mockUsers = {
   expert: {
     id: 'user-expert-1',
     email: 'expert@example.com',
-    passwordHash: '$2b$12$mockhashedpassword',
-    firstName: 'Dr. Jane',
-    lastName: 'Expert',
+    password_hash: '$2b$12$mockhashedpassword',
+    first_name: 'Dr. Jane',
+    last_name: 'Expert',
     name: 'Dr. Jane Expert',
     role: 'expert',
-    verificationStatus: 'verified',
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
-    lastLoginAt: new Date('2024-01-15'),
+    verification_status: 'verified',
+    is_active: true,
+    created_at: new Date('2024-01-01'),
+    last_login_at: new Date('2024-01-15'),
     preferences: {
       emailNotifications: true,
       emailVerified: true
@@ -44,15 +44,15 @@ export const mockUsers = {
   admin: {
     id: 'user-admin-1',
     email: 'admin@example.com',
-    passwordHash: '$2b$12$mockhashedpassword',
-    firstName: 'Admin',
-    lastName: 'User',
+    password_hash: '$2b$12$mockhashedpassword',
+    first_name: 'Admin',
+    last_name: 'User',
     name: 'Admin User',
     role: 'admin',
-    verificationStatus: 'verified',
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
-    lastLoginAt: new Date('2024-01-15'),
+    verification_status: 'verified',
+    is_active: true,
+    created_at: new Date('2024-01-01'),
+    last_login_at: new Date('2024-01-15'),
     preferences: {
       emailNotifications: true,
       emailVerified: true
@@ -62,14 +62,14 @@ export const mockUsers = {
   unverified: {
     id: 'user-unverified-1',
     email: 'unverified@example.com',
-    passwordHash: '$2b$12$mockhashedpassword',
-    firstName: 'Unverified',
-    lastName: 'User',
+    password_hash: '$2b$12$mockhashedpassword',
+    first_name: 'Unverified',
+    last_name: 'User',
     name: 'Unverified User',
     role: 'citizen',
-    verificationStatus: 'pending',
-    isActive: true,
-    createdAt: new Date('2024-01-01'),
+    verification_status: 'pending',
+    is_active: true,
+    created_at: new Date('2024-01-01'),
     preferences: {
       emailNotifications: true,
       emailVerified: false,
@@ -81,14 +81,14 @@ export const mockUsers = {
   inactive: {
     id: 'user-inactive-1',
     email: 'inactive@example.com',
-    passwordHash: '$2b$12$mockhashedpassword',
-    firstName: 'Inactive',
-    lastName: 'User',
+    password_hash: '$2b$12$mockhashedpassword',
+    first_name: 'Inactive',
+    last_name: 'User',
     name: 'Inactive User',
     role: 'citizen',
-    verificationStatus: 'verified',
-    isActive: false,
-    createdAt: new Date('2024-01-01'),
+    verification_status: 'verified',
+    is_active: false,
+    created_at: new Date('2024-01-01'),
     preferences: {
       emailNotifications: false,
       emailVerified: true
@@ -99,15 +99,15 @@ export const mockUsers = {
 export const mockBills = {
   introduced: {
     id: 'bill-1',
-    billNumber: 'C-123',
+    bill_number: 'C-123',
     title: 'An Act to Enhance Digital Privacy Rights',
     summary: 'This bill aims to strengthen digital privacy protections for Canadian citizens.',
     description: 'A comprehensive bill that addresses various aspects of digital privacy including data collection, storage, and user consent requirements.',
     status: 'introduced',
     category: 'technology',
     priority: 'high',
-    introducedDate: new Date('2024-01-15'),
-    lastActionDate: new Date('2024-01-15'),
+    introduced_date: new Date('2024-01-15'),
+    last_action_date: new Date('2024-01-15'),
     lastUpdated: new Date('2024-01-16'),
     content: 'Full bill content would be here...',
     tags: ['privacy', 'digital rights', 'technology'],
@@ -120,15 +120,15 @@ export const mockBills = {
 
   committee: {
     id: 'bill-2',
-    billNumber: 'S-456',
+    bill_number: 'S-456',
     title: 'Healthcare Modernization Act',
     summary: 'Modernizing healthcare systems through technology integration.',
     description: 'This bill proposes updates to healthcare infrastructure and digital health records.',
     status: 'committee',
     category: 'healthcare',
     priority: 'medium',
-    introducedDate: new Date('2023-12-01'),
-    lastActionDate: new Date('2024-01-10'),
+    introduced_date: new Date('2023-12-01'),
+    last_action_date: new Date('2024-01-10'),
     lastUpdated: new Date('2024-01-11'),
     content: 'Full bill content would be here...',
     tags: ['healthcare', 'modernization', 'technology'],
@@ -141,15 +141,15 @@ export const mockBills = {
 
   passed: {
     id: 'bill-3',
-    billNumber: 'C-789',
+    bill_number: 'C-789',
     title: 'Environmental Protection Enhancement Act',
     summary: 'Strengthening environmental protection measures.',
     description: 'This bill introduces new environmental protection standards and enforcement mechanisms.',
     status: 'passed',
     category: 'environment',
     priority: 'high',
-    introducedDate: new Date('2023-10-01'),
-    lastActionDate: new Date('2023-12-15'),
+    introduced_date: new Date('2023-10-01'),
+    last_action_date: new Date('2023-12-15'),
     lastUpdated: new Date('2023-12-16'),
     content: 'Full bill content would be here...',
     tags: ['environment', 'protection', 'climate'],
@@ -162,15 +162,15 @@ export const mockBills = {
 
   failed: {
     id: 'bill-4',
-    billNumber: 'C-999',
+    bill_number: 'C-999',
     title: 'Failed Legislation Example',
     summary: 'An example of failed legislation.',
     description: 'This bill was not passed due to various reasons.',
     status: 'failed',
     category: 'other',
     priority: 'low',
-    introducedDate: new Date('2023-08-01'),
-    lastActionDate: new Date('2023-11-30'),
+    introduced_date: new Date('2023-08-01'),
+    last_action_date: new Date('2023-11-30'),
     lastUpdated: new Date('2023-12-01'),
     content: 'Full bill content would be here...',
     tags: ['failed', 'example'],
@@ -198,7 +198,7 @@ export const mockSponsors = {
       facebook: 'JohnSmithMP'
     },
     committees: ['Technology Committee', 'Privacy Committee'],
-    isActive: true,
+    is_active: true,
     metadata: {
       source: 'parliament-ca',
       confidence: 0.95,
@@ -220,7 +220,7 @@ export const mockSponsors = {
       twitter: '@SenSarahJ'
     },
     committees: ['Healthcare Committee', 'Environment Committee'],
-    isActive: true,
+    is_active: true,
     metadata: {
       source: 'parliament-ca',
       confidence: 0.93,
@@ -244,7 +244,7 @@ export const mockSponsors = {
     },
     committees: ['Cabinet', 'Technology Committee'],
     portfolios: ['Technology', 'Innovation'],
-    isActive: true,
+    is_active: true,
     metadata: {
       source: 'parliament-ca',
       confidence: 0.97,
@@ -253,132 +253,123 @@ export const mockSponsors = {
   }
 };
 
-export const mockSessions = {
-  active: {
+export const mockSessions = { active: {
     id: 'session-1',
-    userId: 'user-citizen-1',
+    user_id: 'user-citizen-1',
     token: 'valid-jwt-token',
-    refreshTokenHash: 'hashed-refresh-token',
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
-    refreshTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-    isActive: true,
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-15'),
+    refresh_token_hash: 'hashed-refresh-token',
+    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
+    refresh_token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+    is_active: true,
+    created_at: new Date('2024-01-15'),
+    updated_at: new Date('2024-01-15'),
     metadata: {
-      userAgent: 'Mozilla/5.0 Test Browser',
-      ipAddress: '127.0.0.1',
+      user_agent: 'Mozilla/5.0 Test Browser',
+      ip_address: '127.0.0.1',
       deviceType: 'desktop'
-    }
+     }
   },
 
-  expired: {
-    id: 'session-2',
-    userId: 'user-citizen-1',
+  expired: { id: 'session-2',
+    user_id: 'user-citizen-1',
     token: 'expired-jwt-token',
-    refreshTokenHash: 'hashed-refresh-token',
-    expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // 24 hours ago
-    refreshTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Still valid refresh
-    isActive: true,
-    createdAt: new Date('2024-01-14'),
-    updatedAt: new Date('2024-01-14'),
+    refresh_token_hash: 'hashed-refresh-token',
+    expires_at: new Date(Date.now() - 24 * 60 * 60 * 1000), // 24 hours ago
+    refresh_token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Still valid refresh
+    is_active: true,
+    created_at: new Date('2024-01-14'),
+    updated_at: new Date('2024-01-14'),
     metadata: {
-      userAgent: 'Mozilla/5.0 Test Browser',
-      ipAddress: '127.0.0.1',
+      user_agent: 'Mozilla/5.0 Test Browser',
+      ip_address: '127.0.0.1',
       deviceType: 'desktop'
-    }
+     }
   },
 
-  inactive: {
-    id: 'session-3',
-    userId: 'user-citizen-1',
+  inactive: { id: 'session-3',
+    user_id: 'user-citizen-1',
     token: 'inactive-jwt-token',
-    refreshTokenHash: 'hashed-refresh-token',
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-    refreshTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-    isActive: false, // Manually deactivated
-    createdAt: new Date('2024-01-13'),
-    updatedAt: new Date('2024-01-14'),
+    refresh_token_hash: 'hashed-refresh-token',
+    expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    refresh_token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    is_active: false, // Manually deactivated
+    created_at: new Date('2024-01-13'),
+    updated_at: new Date('2024-01-14'),
     metadata: {
-      userAgent: 'Mozilla/5.0 Test Browser',
-      ipAddress: '127.0.0.1',
+      user_agent: 'Mozilla/5.0 Test Browser',
+      ip_address: '127.0.0.1',
       deviceType: 'desktop'
-    }
+     }
   }
 };
 
-export const mockPasswordResets = {
-  valid: {
+export const mockPasswordResets = { valid: {
     id: 'reset-1',
-    userId: 'user-citizen-1',
+    user_id: 'user-citizen-1',
     tokenHash: 'hashed-reset-token',
-    expiresAt: new Date(Date.now() + 60 * 60 * 1000), // 1 hour from now
-    createdAt: new Date('2024-01-15'),
+    expires_at: new Date(Date.now() + 60 * 60 * 1000), // 1 hour from now
+    created_at: new Date('2024-01-15'),
     isUsed: false
-  },
+   },
 
-  expired: {
-    id: 'reset-2',
-    userId: 'user-citizen-1',
+  expired: { id: 'reset-2',
+    user_id: 'user-citizen-1',
     tokenHash: 'hashed-expired-token',
-    expiresAt: new Date(Date.now() - 60 * 60 * 1000), // 1 hour ago
-    createdAt: new Date('2024-01-14'),
+    expires_at: new Date(Date.now() - 60 * 60 * 1000), // 1 hour ago
+    created_at: new Date('2024-01-14'),
     isUsed: false
-  },
+   },
 
-  used: {
-    id: 'reset-3',
-    userId: 'user-citizen-1',
+  used: { id: 'reset-3',
+    user_id: 'user-citizen-1',
     tokenHash: 'hashed-used-token',
-    expiresAt: new Date(Date.now() + 60 * 60 * 1000),
-    createdAt: new Date('2024-01-15'),
+    expires_at: new Date(Date.now() + 60 * 60 * 1000),
+    created_at: new Date('2024-01-15'),
     isUsed: true,
     usedAt: new Date('2024-01-15')
-  }
+   }
 };
 
-export const mockComments = {
-  approved: {
+export const mockComments = { approved: {
     id: 'comment-1',
-    billId: 'bill-1',
-    userId: 'user-citizen-1',
-    content: 'This is a thoughtful comment about the bill.',
+    bill_id: 'bill-1',
+    user_id: 'user-citizen-1',
+    content: 'This is a thoughtful comment about the bills.',
     status: 'approved',
     votes: {
       upvotes: 5,
       downvotes: 1,
       score: 4
-    },
-    createdAt: new Date('2024-01-15'),
-    updatedAt: new Date('2024-01-15'),
+      },
+    created_at: new Date('2024-01-15'),
+    updated_at: new Date('2024-01-15'),
     metadata: {
-      ipAddress: '127.0.0.1',
-      userAgent: 'Mozilla/5.0 Test Browser'
+      ip_address: '127.0.0.1',
+      user_agent: 'Mozilla/5.0 Test Browser'
     }
   },
 
-  pending: {
-    id: 'comment-2',
-    billId: 'bill-1',
-    userId: 'user-expert-1',
+  pending: { id: 'comment-2',
+    bill_id: 'bill-1',
+    user_id: 'user-expert-1',
     content: 'This comment is awaiting moderation.',
     status: 'pending',
     votes: {
       upvotes: 0,
       downvotes: 0,
       score: 0
-    },
-    createdAt: new Date('2024-01-16'),
-    updatedAt: new Date('2024-01-16'),
+      },
+    created_at: new Date('2024-01-16'),
+    updated_at: new Date('2024-01-16'),
     metadata: {
-      ipAddress: '192.168.1.1',
-      userAgent: 'Mozilla/5.0 Test Browser'
+      ip_address: '192.168.1.1',
+      user_agent: 'Mozilla/5.0 Test Browser'
     }
   },
 
-  rejected: {
-    id: 'comment-3',
-    billId: 'bill-2',
-    userId: 'user-citizen-1',
+  rejected: { id: 'comment-3',
+    bill_id: 'bill-2',
+    user_id: 'user-citizen-1',
     content: 'This comment was rejected for violating guidelines.',
     status: 'rejected',
     rejectionReason: 'Inappropriate content',
@@ -386,21 +377,20 @@ export const mockComments = {
       upvotes: 0,
       downvotes: 0,
       score: 0
-    },
-    createdAt: new Date('2024-01-14'),
-    updatedAt: new Date('2024-01-15'),
+      },
+    created_at: new Date('2024-01-14'),
+    updated_at: new Date('2024-01-15'),
     moderatedBy: 'user-admin-1',
     moderatedAt: new Date('2024-01-15'),
     metadata: {
-      ipAddress: '127.0.0.1',
-      userAgent: 'Mozilla/5.0 Test Browser'
+      ip_address: '127.0.0.1',
+      user_agent: 'Mozilla/5.0 Test Browser'
     }
   }
 };
 
-export const mockAnalytics = {
-  billEngagement: {
-    billId: 'bill-1',
+export const mockAnalytics = { bill_engagement: {
+    bill_id: 'bill-1',
     views: 1250,
     uniqueViews: 890,
     comments: 45,
@@ -408,7 +398,7 @@ export const mockAnalytics = {
     bookmarks: 67,
     averageTimeSpent: 180, // seconds
     bounceRate: 0.35,
-    engagementScore: 0.78,
+    engagement_score: 0.78,
     demographics: {
       ageGroups: {
         '18-24': 15,
@@ -416,7 +406,7 @@ export const mockAnalytics = {
         '35-44': 25,
         '45-54': 15,
         '55+': 10
-      },
+       },
       regions: {
         'Ontario': 40,
         'Quebec': 25,
@@ -434,7 +424,7 @@ export const mockAnalytics = {
   },
 
   sponsorAnalytics: {
-    sponsorId: 'sponsor-1',
+    sponsor_id: 'sponsor-1',
     billsSponsored: 12,
     billsPassed: 8,
     billsFailed: 2,
@@ -451,46 +441,43 @@ export const mockAnalytics = {
   }
 };
 
-export const mockNotifications = {
-  billUpdate: {
+export const mockNotifications = { billUpdate: {
     id: 'notification-1',
-    userId: 'user-citizen-1',
+    user_id: 'user-citizen-1',
     type: 'bill_update',
     title: 'Bill C-123 Status Update',
     message: 'The Digital Privacy Rights Act has moved to committee stage.',
     data: {
-      billId: 'bill-1',
+      bill_id: 'bill-1',
       oldStatus: 'introduced',
       newStatus: 'committee'
-    },
-    isRead: false,
-    createdAt: new Date('2024-01-16'),
+      },
+    is_read: false,
+    created_at: new Date('2024-01-16'),
     scheduledFor: new Date('2024-01-16'),
     channels: ['email', 'web'],
     priority: 'medium'
   },
 
-  commentReply: {
-    id: 'notification-2',
-    userId: 'user-citizen-1',
+  commentReply: { id: 'notification-2',
+    user_id: 'user-citizen-1',
     type: 'comment_reply',
     title: 'New Reply to Your Comment',
     message: 'Dr. Jane Expert replied to your comment on Bill C-123.',
     data: {
-      commentId: 'comment-1',
+      comment_id: 'comment-1',
       replyId: 'comment-4',
-      billId: 'bill-1'
-    },
-    isRead: false,
-    createdAt: new Date('2024-01-16'),
+      bill_id: 'bill-1'
+      },
+    is_read: false,
+    created_at: new Date('2024-01-16'),
     scheduledFor: new Date('2024-01-16'),
     channels: ['web'],
     priority: 'low'
   },
 
-  systemAlert: {
-    id: 'notification-3',
-    userId: 'user-admin-1',
+  systemAlert: { id: 'notification-3',
+    user_id: 'user-admin-1',
     type: 'system_alert',
     title: 'High Server Load Detected',
     message: 'Server load has exceeded 80% for the past 10 minutes.',
@@ -499,10 +486,10 @@ export const mockNotifications = {
       value: 85.2,
       threshold: 80,
       duration: 600 // seconds
-    },
-    isRead: true,
-    readAt: new Date('2024-01-16'),
-    createdAt: new Date('2024-01-16'),
+     },
+    is_read: true,
+    read_at: new Date('2024-01-16'),
+    created_at: new Date('2024-01-16'),
     scheduledFor: new Date('2024-01-16'),
     channels: ['email', 'sms'],
     priority: 'high'
@@ -521,7 +508,7 @@ export const generateMockBill = (overrides: Partial<typeof mockBills.introduced>
   ...mockBills.introduced,
   ...overrides,
   id: overrides.id || `bill-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-  billNumber: overrides.billNumber || `C-${Math.floor(Math.random() * 9999) + 1}`
+  bill_number: overrides.bill_number || `C-${Math.floor(Math.random() * 9999) + 1}`
 });
 
 export const generateMockSponsor = (overrides: Partial<typeof mockSponsors.mp> = {}) => ({

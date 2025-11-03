@@ -417,7 +417,7 @@ function reportInitializationError(error: Error): void {
       message: error.message,
       stack: error.stack,
       timestamp: new Date().toISOString(),
-      userAgent: navigator.userAgent,
+      user_agent: navigator.user_agent,
       url: window.location.href,
       phase: currentLoadingState.phase,
       localStorage: {
@@ -504,7 +504,7 @@ function showInitializationError(error: Error): void {
               
               <p style="margin: 0 0 8px; font-size: 12px; color: #374151; font-weight: 500;">Environment:</p>
               <pre style="margin: 0; font-size: 10px; color: #6b7280;">Phase: ${currentLoadingState.phase}
-User Agent: ${navigator.userAgent}
+User Agent: ${navigator.user_agent}
 URL: ${window.location.href}
 Timestamp: ${new Date().toISOString()}</pre>
             </div>

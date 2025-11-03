@@ -242,7 +242,7 @@ export class SecureQueryBuilder {
   private isSensitiveField(fieldName: string): boolean {
     const sensitiveFields = [
       'password',
-      'passwordHash',
+      'password_hash',
       'password_hash',
       'token',
       'secret',

@@ -109,7 +109,7 @@ export class ProfileDomainService {
    */
   private calculateBasicInfoCompleteness(user: any): number {
     let score = 0;
-    const fields = ['firstName', 'lastName', 'name'];
+    const fields = ['first_name', 'last_name', 'name'];
 
     fields.forEach(field => {
       if (user[field]) score += 33;
@@ -185,20 +185,19 @@ export class ProfileDomainService {
     expertise: string[];
     location: string;
     organization: string;
-    isPublic: boolean;
-  }>): UserProfile {
-    // Create a new profile with updated values
+    is_public: boolean;
+  }>): UserProfile { // Create a new profile with updated values
     const updatedData = {
-      userId: existingProfile.userId,
+      user_id: existingProfile.user_id,
       bio: updates.bio !== undefined ? (updates.bio.trim() || undefined) : existingProfile.bio?.value,
       expertise: updates.expertise !== undefined ? updates.expertise : existingProfile.expertise,
       location: updates.location !== undefined ? (updates.location.trim() || undefined) : existingProfile.location?.value,
       organization: updates.organization !== undefined ? (updates.organization.trim() || undefined) : existingProfile.organization?.value,
-      reputationScore: existingProfile.reputationScore,
-      isPublic: updates.isPublic !== undefined ? updates.isPublic : existingProfile.isPublic,
-      createdAt: existingProfile.createdAt,
-      updatedAt: new Date()
-    };
+      reputation_score: existingProfile.reputation_score,
+      is_public: updates.is_public !== undefined ? updates.is_public : existingProfile.is_public,
+      created_at: existingProfile.created_at,
+      updated_at: new Date()
+     };
 
     return UserProfile.create(updatedData);
   }
@@ -209,7 +208,7 @@ export class ProfileDomainService {
   calculateReputationFromProfile(userAggregate: UserAggregate): number {
     const completeness = this.calculateProfileCompleteness(userAggregate);
     const verificationBonus = userAggregate.verificationCount * 2;
-    const engagementBonus = userAggregate.engagementScore * 0.5;
+    const engagementBonus = userAggregate.engagement_score * 0.5;
 
     return Math.min(100, Math.round(
       (completeness.overall * 0.4) +
@@ -230,7 +229,7 @@ export class ProfileDomainService {
 
     // Check verification history in this domain
     const domainVerifications = userAggregate.verifications.filter(
-      v => v.expertise.domain === domain && v.isVerified()
+      v => v.expertise.domain === domain && v.is_verified()
     );
 
     const hasDomainVerification = domainVerifications.length >= 3;
@@ -273,13 +272,13 @@ export class ProfileDomainService {
    */
   validateProfileVisibility(userAggregate: UserAggregate): boolean {
     // Users with low reputation should not have public profiles
-    if (userAggregate.reputationScore < 10 && userAggregate.profile?.isPublic) {
+    if (userAggregate.reputation_score < 10 && userAggregate.profile?.is_public) {
       return false;
     }
 
     // Users with incomplete profiles should be warned about public visibility
     const completeness = this.calculateProfileCompleteness(userAggregate);
-    if (completeness.overall < 30 && userAggregate.profile?.isPublic) {
+    if (completeness.overall < 30 && userAggregate.profile?.is_public) {
       return false;
     }
 

@@ -70,7 +70,7 @@ export interface AnalyticsMetrics {
   engagementTrend: 'increasing' | 'decreasing' | 'stable';
   topCategories: Array<{
     category: string;
-    engagementScore: number;
+    engagement_score: number;
     billCount: number;
   }>;
   userSegments: {
@@ -95,22 +95,20 @@ export interface PerformanceMetrics {
   recommendations: string[];
 }
 
-export interface EngagementMetrics {
-  billInteractions: Array<{
-    billId: number;
+export interface EngagementMetrics { billInteractions: Array<{
+    bill_id: number;
     billTitle: string;
     totalEngagement: number;
     viewPattern: {
       peakHours: number[];
       averageSessionDuration: number;
-    };
+     };
   }>;
-  userProfiles: Array<{
-    userId: string;
+  user_profiles: Array<{ user_id: string;
     userName: string;
     engagementLevel: 'high' | 'medium' | 'low';
     totalEngagementScore: number;
-  }>;
+   }>;
   trends: Array<{
     period: string;
     totalEngagement: number;

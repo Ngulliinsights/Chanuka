@@ -13,12 +13,11 @@ export const router = Router();
 // INPUT VALIDATION SCHEMAS
 // ============================================================================
 
-const createCommentSchema = z.object({
-  billId: z.coerce.number().int().positive(),
+const createCommentSchema = z.object({ bill_id: z.coerce.number().int().positive(),
   content: z.string().min(10).max(2000),
   commentType: z.enum(['general', 'expert_analysis', 'concern', 'support']).optional(),
-  parentCommentId: z.coerce.number().int().positive().optional(),
-});
+  parent_id: z.coerce.number().int().positive().optional(),
+ });
 
 const updateCommentSchema = z.object({
   content: z.string().min(10).max(2000).optional(),
@@ -34,12 +33,11 @@ const flagContentSchema = z.object({
   reason: z.string().min(10).max(500),
 });
 
-const createPollSchema = z.object({
-  billId: z.string(),
+const createPollSchema = z.object({ bill_id: z.string(),
   question: z.string().min(5).max(200),
   options: z.array(z.string()).min(2).max(6),
   section: z.string().optional(),
-});
+ });
 
 const pollVoteSchema = z.object({
   optionIndex: z.number().min(0),
@@ -85,14 +83,13 @@ function createErrorResponse(res: any, message: string, statusCode: number, star
 // ============================================================================
 
 /**
- * GET /comments/:billId
+ * GET /comments/:bill_id
  * Retrieves all comments for a specific bill with filtering and sorting options
  */
-router.get("/comments/:billId", async (req, res) => {
-  const startTime = Date.now();
+router.get("/comments/:bill_id", async (req, res) => { const startTime = Date.now();
   
   try {
-    const billId = parseInt(req.params.billId);
+    const bill_id = parseInt(req.params.bill_id);
     const sort = req.query.sort as string || "recent";
     const expertOnly = req.query.expert === "true";
     const commentType = req.query.commentType as string;
@@ -100,12 +97,12 @@ router.get("/comments/:billId", async (req, res) => {
     const offset = parseInt(req.query.offset as string) || 0;
 
     // Validate bill ID parameter
-    if (isNaN(billId)) {
+    if (isNaN(bill_id)) {
       return createErrorResponse(res, "Invalid bill ID", 400, startTime);
-    }
+     }
 
     // Fetch comments with applied filters
-    const result = await commentService.getBillComments(billId, {
+    const result = await commentService.getBillComments(bill_id, {
       sort: sort as any,
       expertOnly,
       commentType,
@@ -124,17 +121,16 @@ router.get("/comments/:billId", async (req, res) => {
  * POST /comments
  * Creates a new comment on a bill (requires authentication)
  */
-router.post("/comments", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.post("/comments", requireAuth, async (req, res) => { const startTime = Date.now();
   
   try {
     const data = req.body;
-    const userId = (req as any).user?.id;
+    const user_id = (req as any).user?.id;
 
     // Verify user authentication
-    if (!userId) {
+    if (!user_id) {
       return createErrorResponse(res, "Authentication required", 401, startTime);
-    }
+     }
     
     // Validate input against schema
     const result = createCommentSchema.safeParse(data);
@@ -144,24 +140,22 @@ router.post("/comments", requireAuth, async (req, res) => {
     }
 
     // Create the comment
-    const comment = await commentService.createComment({
-      billId: result.data.billId,
-      userId,
+    const comment = await commentService.createComment({ bill_id: result.data.bill_id,
+      user_id,
       content: result.data.content,
       commentType: result.data.commentType,
-      parentCommentId: result.data.parentCommentId
-    });
+      parent_id: result.data.parent_id
+      });
 
     // Analyze content for moderation (async, don't block response)
     // Note: Using comment.id after creation rather than before
-    if (comment && typeof comment === 'object' && 'id' in comment) {
-      contentModerationService.flagContent(
+    if (comment && typeof comment === 'object' && 'id' in comment) { contentModerationService.flagContent(
         'comment',
         comment.id as number,
         'spam', // Default flag type for analysis
         'Automated content analysis',
-        userId
-      ).catch(err => logger.error('Content moderation failed:', { component: 'Chanuka' }, err));
+        user_id
+      ).catch(err => logger.error('Content moderation failed:', { component: 'Chanuka'  }, err));
     }
     
     return ApiSuccess(res, comment, 
@@ -179,16 +173,16 @@ router.get("/comments/:id/replies", async (req, res) => {
   const startTime = Date.now();
   
   try {
-    const parentCommentId = parseInt(req.params.id);
+    const parent_id = parseInt(req.params.id);
     const sort = req.query.sort as string || "recent";
     const limit = parseInt(req.query.limit as string) || 10;
     const offset = parseInt(req.query.offset as string) || 0;
 
-    if (isNaN(parentCommentId)) {
+    if (isNaN(parent_id)) {
       return createErrorResponse(res, "Invalid comment ID", 400, startTime);
     }
 
-    const replies = await commentService.getCommentReplies(parentCommentId, {
+    const replies = await commentService.getCommentReplies(parent_id, {
       sort: sort as any,
       limit,
       offset
@@ -205,19 +199,18 @@ router.get("/comments/:id/replies", async (req, res) => {
  * PUT /comments/:id
  * Updates an existing comment (requires authentication and ownership)
  */
-router.put("/comments/:id", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.put("/comments/:id", requireAuth, async (req, res) => { const startTime = Date.now();
   
   try {
-    const commentId = parseInt(req.params.id);
+    const comment_id = parseInt(req.params.id);
     const data = req.body;
-    const userId = (req as any).user?.id;
+    const user_id = (req as any).user?.id;
 
-    if (!userId) {
+    if (!user_id) {
       return createErrorResponse(res, "Authentication required", 401, startTime);
-    }
+     }
 
-    if (isNaN(commentId)) {
+    if (isNaN(comment_id)) {
       return createErrorResponse(res, "Invalid comment ID", 400, startTime);
     }
     
@@ -230,8 +223,8 @@ router.put("/comments/:id", requireAuth, async (req, res) => {
 
     // Update the comment
     const updatedComment = await commentService.updateComment(
-      commentId,
-      userId,
+      comment_id,
+      user_id,
       result.data
     );
     
@@ -246,22 +239,21 @@ router.put("/comments/:id", requireAuth, async (req, res) => {
  * DELETE /comments/:id
  * Deletes a comment (requires authentication and ownership)
  */
-router.delete("/comments/:id", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.delete("/comments/:id", requireAuth, async (req, res) => { const startTime = Date.now();
   
   try {
-    const commentId = parseInt(req.params.id);
-    const userId = (req as any).user?.id;
+    const comment_id = parseInt(req.params.id);
+    const user_id = (req as any).user?.id;
 
-    if (!userId) {
+    if (!user_id) {
       return createErrorResponse(res, "Authentication required", 401, startTime);
-    }
+     }
 
-    if (isNaN(commentId)) {
+    if (isNaN(comment_id)) {
       return createErrorResponse(res, "Invalid comment ID", 400, startTime);
     }
 
-    const success = await commentService.deleteComment(commentId, userId);
+    const success = await commentService.deleteComment(comment_id, user_id);
     
     return ApiSuccess(res, { success }, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -271,20 +263,19 @@ router.delete("/comments/:id", requireAuth, async (req, res) => {
 });
 
 /**
- * GET /comments/:billId/stats
+ * GET /comments/:bill_id/stats
  * Retrieves comment statistics for a specific bill
  */
-router.get("/comments/:billId/stats", async (req, res) => {
-  const startTime = Date.now();
+router.get("/comments/:bill_id/stats", async (req, res) => { const startTime = Date.now();
   
   try {
-    const billId = parseInt(req.params.billId);
+    const bill_id = parseInt(req.params.bill_id);
 
-    if (isNaN(billId)) {
+    if (isNaN(bill_id)) {
       return createErrorResponse(res, "Invalid bill ID", 400, startTime);
-    }
+     }
 
-    const stats = await commentService.getCommentStats(billId);
+    const stats = await commentService.getCommentStats(bill_id);
     
     return ApiSuccess(res, stats, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -294,23 +285,22 @@ router.get("/comments/:billId/stats", async (req, res) => {
 });
 
 /**
- * GET /comments/:billId/trending
+ * GET /comments/:bill_id/trending
  * Retrieves trending comments for a bill based on engagement
  */
-router.get("/comments/:billId/trending", async (req, res) => {
-  const startTime = Date.now();
+router.get("/comments/:bill_id/trending", async (req, res) => { const startTime = Date.now();
   
   try {
-    const billId = parseInt(req.params.billId);
+    const bill_id = parseInt(req.params.bill_id);
     const timeframe = req.query.timeframe as '1h' | '24h' | '7d' || '24h';
     const limit = parseInt(req.query.limit as string) || 10;
 
-    if (isNaN(billId)) {
+    if (isNaN(bill_id)) {
       return createErrorResponse(res, "Invalid bill ID", 400, startTime);
-    }
+     }
 
     const trendingComments = await commentVotingService.getTrendingComments(
-      billId,
+      bill_id,
       timeframe,
       limit
     );
@@ -330,19 +320,18 @@ router.get("/comments/:billId/trending", async (req, res) => {
  * POST /comments/:id/vote
  * Casts a vote (upvote or downvote) on a comment
  */
-router.post("/comments/:id/vote", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.post("/comments/:id/vote", requireAuth, async (req, res) => { const startTime = Date.now();
   
   try {
-    const commentId = parseInt(req.params.id);
+    const comment_id = parseInt(req.params.id);
     const data = req.body;
-    const userId = (req as any).user?.id;
+    const user_id = (req as any).user?.id;
 
-    if (!userId) {
+    if (!user_id) {
       return createErrorResponse(res, "Authentication required", 401, startTime);
-    }
+     }
 
-    if (isNaN(commentId)) {
+    if (isNaN(comment_id)) {
       return createErrorResponse(res, "Invalid comment ID", 400, startTime);
     }
     
@@ -355,8 +344,8 @@ router.post("/comments/:id/vote", requireAuth, async (req, res) => {
     
     // Record the vote
     const voteResult = await commentVotingService.voteOnComment(
-      commentId,
-      userId,
+      comment_id,
+      user_id,
       result.data.type
     );
     
@@ -375,19 +364,18 @@ router.post("/comments/:id/vote", requireAuth, async (req, res) => {
  * POST /comments/:id/flag
  * Flags a comment for moderation review
  */
-router.post("/comments/:id/flag", requireAuth, async (req, res) => {
-  const startTime = Date.now();
+router.post("/comments/:id/flag", requireAuth, async (req, res) => { const startTime = Date.now();
   
   try {
-    const commentId = parseInt(req.params.id);
+    const comment_id = parseInt(req.params.id);
     const data = req.body;
-    const userId = (req as any).user?.id;
+    const user_id = (req as any).user?.id;
 
-    if (!userId) {
+    if (!user_id) {
       return createErrorResponse(res, "Authentication required", 401, startTime);
-    }
+     }
 
-    if (isNaN(commentId)) {
+    if (isNaN(comment_id)) {
       return createErrorResponse(res, "Invalid comment ID", 400, startTime);
     }
     
@@ -401,10 +389,10 @@ router.post("/comments/:id/flag", requireAuth, async (req, res) => {
     // Submit the flag
     const flag = await contentModerationService.flagContent(
       'comment',
-      commentId,
+      comment_id,
       result.data.flagType,
       result.data.reason,
-      userId
+      user_id
     );
     
     // Extract flag ID safely
@@ -497,16 +485,15 @@ router.post("/comments/:id/poll-vote", requireAuth, async (req, res) => {
  * GET /participation/stats
  * Retrieves participation statistics (platform-wide or bill-specific)
  */
-router.get("/participation/stats", async (req, res) => {
-  const startTime = Date.now();
+router.get("/participation/stats", async (req, res) => { const startTime = Date.now();
   
   try {
-    const billId = req.query.billId ? parseInt(req.query.billId as string) : undefined;
+    const bill_id = req.query.bill_id ? parseInt(req.query.bill_id as string) : undefined;
     
-    if (billId && !isNaN(billId)) {
+    if (bill_id && !isNaN(bill_id)) {
       // Get stats for specific bill
-      const billStats = await commentService.getCommentStats(billId);
-      const voteStats = await commentVotingService.getBillCommentVoteSummary(billId);
+      const billStats = await commentService.getCommentStats(bill_id);
+      const voteStats = await commentVotingService.getBillCommentVoteSummary(bill_id);
       
       const stats = {
         totalComments: billStats.totalComments,
@@ -515,7 +502,7 @@ router.get("/participation/stats", async (req, res) => {
         totalVotes: voteStats.totalVotes,
         averageEngagement: billStats.averageEngagement,
         topContributors: billStats.topContributors
-      };
+       };
 
       return ApiSuccess(res, stats, 
         ApiResponseWrapper.createMetadata(startTime, 'database'));

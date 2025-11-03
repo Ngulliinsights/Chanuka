@@ -68,7 +68,7 @@ export interface MetricsRegistry {
 export interface MetricsExporter {
   name: string;
   export(metrics: Metric[]): Promise<void> | void;
-  contentType: string;
+  content_type: string;
 }
 
 // ==================== Prometheus Types ====================

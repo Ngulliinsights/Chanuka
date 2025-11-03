@@ -51,23 +51,22 @@ export class EnhancedConflictDetectionService {
    * @deprecated Use conflictDetectionOrchestratorService.performComprehensiveAnalysis() instead
    */
   async performComprehensiveAnalysis(
-    sponsorId: number,
-    billId?: number
-  ): Promise<ConflictAnalysis> {
-    return conflictDetectionOrchestratorService.performComprehensiveAnalysis(sponsorId, billId);
-  }
+    sponsor_id: number,
+    bill_id?: number
+  ): Promise<ConflictAnalysis> { return conflictDetectionOrchestratorService.performComprehensiveAnalysis(sponsor_id, bill_id);
+   }
 
   /**
    * @deprecated Use conflictDetectionOrchestratorService.invalidateSponsorCache() instead
    */
-  async invalidateSponsorCache(sponsorId: number): Promise<void> {
-    return conflictDetectionOrchestratorService.invalidateSponsorCache(sponsorId);
+  async invalidateSponsorCache(sponsor_id: number): Promise<void> {
+    return conflictDetectionOrchestratorService.invalidateSponsorCache(sponsor_id);
   }
 
   /**
    * @deprecated Use conflictDetectionOrchestratorService.analyzeStakeholders() instead
    */
-  async analyzeStakeholders(billId: number): Promise<{
+  async analyzeStakeholders(bill_id: number): Promise<{
     stakeholders: Stakeholder[];
     conflicts: Array<{
       stakeholder1: Stakeholder;
@@ -76,25 +75,23 @@ export class EnhancedConflictDetectionService {
       severity: 'low' | 'medium' | 'high';
       description: string;
     }>;
-  }> {
-    return conflictDetectionOrchestratorService.analyzeStakeholders(billId);
-  }
+  }> { return conflictDetectionOrchestratorService.analyzeStakeholders(bill_id);
+   }
 
   /**
    * @deprecated Use conflictDetectionOrchestratorService.generateMitigationStrategies() instead
    */
   async generateMitigationStrategies(
-    sponsorId: number,
-    billId?: number
+    sponsor_id: number,
+    bill_id?: number
   ): Promise<Array<{
     conflictId: string;
     strategy: string;
     timeline: string;
     priority: 'low' | 'medium' | 'high' | 'critical';
     stakeholders: string[];
-  }>> {
-    return conflictDetectionOrchestratorService.generateMitigationStrategies(sponsorId, billId);
-  }
+  }>> { return conflictDetectionOrchestratorService.generateMitigationStrategies(sponsor_id, bill_id);
+   }
 }
 
 /**

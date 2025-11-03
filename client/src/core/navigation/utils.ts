@@ -10,7 +10,7 @@ import { BreadcrumbItem, RelatedPage, NavigationSection, UserRole } from './type
 export function generateBreadcrumbs(path: string): BreadcrumbItem[] {
   const segments = path.split('/').filter(Boolean);
   const breadcrumbs: BreadcrumbItem[] = [
-    { label: 'Home', path: '/', isActive: path === '/' }
+    { label: 'Home', path: '/', is_active: path === '/' }
   ];
 
   let currentPath = '';
@@ -20,7 +20,7 @@ export function generateBreadcrumbs(path: string): BreadcrumbItem[] {
     breadcrumbs.push({
       label: segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' '),
       path: currentPath,
-      isActive: isLast
+      is_active: isLast
     });
   });
 
@@ -30,7 +30,7 @@ export function generateBreadcrumbs(path: string): BreadcrumbItem[] {
 /**
  * Calculate related pages based on current path and user role
  */
-export function calculateRelatedPages(path: string, userRole: UserRole): RelatedPage[] {
+export function calculateRelatedPages(path: string, user_role: UserRole): RelatedPage[] {
   const relatedPages: RelatedPage[] = [];
 
   if (path.startsWith('/bills')) {
@@ -83,7 +83,7 @@ export function calculateRelatedPages(path: string, userRole: UserRole): Related
     );
   }
 
-  if (userRole !== 'public') {
+  if (user_role !== 'public') {
     relatedPages.push(
       {
         pageId: 'dashboard',
@@ -98,7 +98,7 @@ export function calculateRelatedPages(path: string, userRole: UserRole): Related
     );
   }
 
-  if (userRole === 'admin') {
+  if (user_role === 'admin') {
     relatedPages.push(
       {
         pageId: 'admin-panel',
@@ -211,23 +211,23 @@ export function requiresRole(path: string, requiredRole: UserRole): boolean {
 /**
  * Get navigation menu items based on user role
  */
-export function getNavigationMenuItems(userRole: UserRole) {
+export function getNavigationMenuItems(user_role: UserRole) {
   const baseItems = [
     { label: 'Home', path: '/', icon: 'home' },
     { label: 'Bills', path: '/bills', icon: 'document' },
     { label: 'Community', path: '/community', icon: 'users' },
   ];
   
-  if (userRole !== 'public') {
+  if (user_role !== 'public') {
     baseItems.push({ label: 'Dashboard', path: '/dashboard', icon: 'dashboard' });
     baseItems.push({ label: 'Profile', path: '/profile', icon: 'user' });
   }
   
-  if (userRole === 'expert' || userRole === 'admin') {
+  if (user_role === 'expert' || user_role === 'admin') {
     baseItems.push({ label: 'Expert Verification', path: '/expert-verification', icon: 'shield' });
   }
   
-  if (userRole === 'admin') {
+  if (user_role === 'admin') {
     baseItems.push({ label: 'Admin', path: '/admin', icon: 'settings' });
   }
   

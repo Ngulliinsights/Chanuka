@@ -1,6 +1,5 @@
-import type { User } from '../../../shared/schema';
+import type { User } from '../../../shared/schema/foundation';
 import { database as db } from '../../../shared/database/connection';
-import { userSocialProfile } from '../../../shared/schema/schema';
 import { logger } from '../../../shared/core';
 
 // Define cache service interface locally if the module doesn't exist
@@ -310,27 +309,24 @@ export class SocialIntegrationService {
    * Links a social profile to a user account
    * Stores the connection for future automated sharing
    */
-  async linkSocialProfile(userId: string, platform: string, accessToken: string): Promise<void> {
-    try {
+  async linkSocialProfile(user_id: string, platform: string, accessToken: string): Promise<void> { try {
       // Fetch user profile information from the social platform
       const profileData = await this.fetchSocialProfile(platform, accessToken);
 
       // Save the social profile connection to database
       await db.insert(userSocialProfile).values({
-        userId: userId as any, // UUID type
+        user_id: user_id as any, // UUID type
         provider: platform,
         providerId: profileData.id,
-      });
+       });
 
       // Log the connection details
-      logger.info('Social profile linked successfully', {
-        userId,
+      logger.info('Social profile linked successfully', { user_id,
         platform,
         profileId: profileData.id,
         username: profileData.username
-      });
-    } catch (error) {
-      logger.error('Failed to link social profile', { userId, platform, error });
+       });
+    } catch (error) { logger.error('Failed to link social profile', { user_id, platform, error  });
       throw error;
     }
   }
@@ -399,8 +395,7 @@ export class SocialIntegrationService {
    * Executes a share action across multiple platforms
    * Distributes content through connected user networks
    */
-  private async executeShareAction(action: CommunityAction): Promise<void> {
-    // Fetch users who have opted in for this type of content
+  private async executeShareAction(action: CommunityAction): Promise<void> { // Fetch users who have opted in for this type of content
     const users: User[] = []; // Would fetch from database in production
 
     // Share across each user's connected social networks
@@ -420,16 +415,15 @@ export class SocialIntegrationService {
             );
 
             logger.info('Content shared to social platform successfully', {
-              userId: user.id,
+              user_id: users.id,
               platform: profile.platform,
-              contentId: action.content.url,
-            });
-          } catch (error) {
-            logger.error('Failed to share content to social platform', {
-              userId: user.id,
+              content_id: action.content.url,
+             });
+          } catch (error) { logger.error('Failed to share content to social platform', {
+              user_id: users.id,
               platform: profile.platform,
               error,
-            });
+             });
           }
         }),
       );

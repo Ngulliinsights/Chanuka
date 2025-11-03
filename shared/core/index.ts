@@ -6,21 +6,38 @@
  * avoiding circular dependencies while maintaining functionality.
  */
 
-// Essential logger - fallback implementation
-export const logger = {
-  debug: (message: string, context?: any, meta?: any) => {
+// Essential logger - type-safe implementation
+interface LogContext {
+  component?: string;
+  userId?: string;
+  requestId?: string;
+  [key: string]: unknown;
+}
+
+interface Logger {
+  debug: (message: string, context?: LogContext, meta?: Record<string, unknown>) => void;
+  info: (message: string, context?: LogContext, meta?: Record<string, unknown>) => void;
+  warn: (message: string, context?: LogContext, meta?: Record<string, unknown>) => void;
+  error: (message: string, context?: LogContext, error?: Error | unknown) => void;
+}
+
+export const logger: Logger = {
+  debug: (message: string, context?: LogContext, meta?: Record<string, unknown>) => {
     if (process.env.NODE_ENV === 'development') {
-      console.debug(`[DEBUG] ${message}`, context || '', meta || '');
+      console.debug(`[DEBUG] ${message}`, context ?? {}, meta ?? {});
     }
   },
-  info: (message: string, context?: any, meta?: any) => {
-    console.info(`[INFO] ${message}`, context || '', meta || '');
+  info: (message: string, context?: LogContext, meta?: Record<string, unknown>) => {
+    console.info(`[INFO] ${message}`, context ?? {}, meta ?? {});
   },
-  warn: (message: string, context?: any, meta?: any) => {
-    console.warn(`[WARN] ${message}`, context || '', meta || '');
+  warn: (message: string, context?: LogContext, meta?: Record<string, unknown>) => {
+    console.warn(`[WARN] ${message}`, context ?? {}, meta ?? {});
   },
-  error: (message: string, context?: any, error?: any) => {
-    console.error(`[ERROR] ${message}`, context || '', error || '');
+  error: (message: string, context?: LogContext, error?: Error | unknown) => {
+    const errorInfo = error instanceof Error 
+      ? { name: error.name, message: error.message, stack: error.stack }
+      : error;
+    console.error(`[ERROR] ${message}`, context ?? {}, errorInfo ?? {});
   }
 };
 
@@ -54,28 +71,48 @@ export enum ErrorDomain {
 export * from './src/observability/error-management/errors/base-error';
 export * from './src/observability/error-management/errors/specialized-errors';
 
-// Essential API response utilities
+// Type-safe API response utilities
+interface ApiSuccessResponse<T = unknown> {
+  success: true;
+  data: T;
+  message: string;
+  timestamp: string;
+}
+
+interface ApiErrorResponse {
+  success: false;
+  error: {
+    message: string;
+    code: string;
+    statusCode: number;
+    details?: Record<string, unknown>;
+  };
+  timestamp: string;
+}
+
+type ApiResponseType<T = unknown> = ApiSuccessResponse<T> | ApiErrorResponse;
+
 export const ApiResponse = {
-  success: (data: any, message = 'Success') => ({
+  success: <T = unknown>(data: T, message = 'Success'): ApiSuccessResponse<T> => ({
     success: true,
     data,
     message,
     timestamp: new Date().toISOString()
   }),
   
-  error: (message: string, code = 'ERROR', statusCode = 500) => ({
+  error: (message: string, code = 'ERROR', statusCode = 500): ApiErrorResponse => ({
     success: false,
     error: { message, code, statusCode },
     timestamp: new Date().toISOString()
   }),
   
-  notFound: (message = 'Resource not found') => ({
+  notFound: (message = 'Resource not found'): ApiErrorResponse => ({
     success: false,
     error: { message, code: 'NOT_FOUND', statusCode: 404 },
     timestamp: new Date().toISOString()
   }),
   
-  validation: (message: string, details?: any) => ({
+  validation: (message: string, details?: Record<string, unknown>): ApiErrorResponse => ({
     success: false,
     error: { message, code: 'VALIDATION_ERROR', statusCode: 400, details },
     timestamp: new Date().toISOString()
@@ -149,30 +186,55 @@ export class ApiValidationError extends ApiError {
 
 export type ApiResponseWrapperType<T = any> = ApiSuccess<T> | ApiError;
 
-// API Response helper functions for Express responses
-export const ApiSuccessResponse = (res: any, data: any, metadata?: any) => {
+// Type-safe API Response helper functions for Express responses
+interface ExpressResponse {
+  status: (code: number) => ExpressResponse;
+  json: (data: unknown) => ExpressResponse;
+}
+
+interface ResponseMetadata {
+  requestId?: string;
+  responseTime?: number;
+  source?: string;
+  [key: string]: unknown;
+}
+
+export const ApiSuccessResponse = <T = unknown>(
+  res: ExpressResponse, 
+  data: T, 
+  metadata?: ResponseMetadata
+): ExpressResponse => {
   return res.status(200).json({
     success: true,
     data,
-    metadata,
+    metadata: metadata ?? {},
     timestamp: new Date().toISOString()
   });
 };
 
-export const ApiErrorResponse = (res: any, message: string, statusCode: number = 500, metadata?: any) => {
+export const ApiErrorResponse = (
+  res: ExpressResponse, 
+  message: string, 
+  statusCode = 500, 
+  metadata?: ResponseMetadata
+): ExpressResponse => {
   return res.status(statusCode).json({
     success: false,
     error: { message, statusCode },
-    metadata,
+    metadata: metadata ?? {},
     timestamp: new Date().toISOString()
   });
 };
 
-export const ApiValidationErrorResponse = (res: any, errors: any, metadata?: any) => {
+export const ApiValidationErrorResponse = (
+  res: ExpressResponse, 
+  errors: Record<string, string[]> | string[], 
+  metadata?: ResponseMetadata
+): ExpressResponse => {
   return res.status(400).json({
     success: false,
     error: { message: 'Validation failed', errors, statusCode: 400 },
-    metadata,
+    metadata: metadata ?? {},
     timestamp: new Date().toISOString()
   });
 };
@@ -240,9 +302,20 @@ export const RateLimit = {
     return true;
   },
   
-  middleware: (limit: number = 100, windowMs: number = 15 * 60 * 1000) => {
-    return (req: any, res: any, next: any) => {
-      const key = req.ip || 'unknown';
+  middleware: (limit = 100, windowMs = 15 * 60 * 1000) => {
+    interface Request {
+      ip?: string;
+    }
+    
+    interface Response {
+      status: (code: number) => Response;
+      json: (data: unknown) => Response;
+    }
+    
+    type NextFunction = () => void;
+    
+    return (req: Request, res: Response, next: NextFunction) => {
+      const key = req.ip ?? 'unknown';
       
       if (!RateLimit.check(key, limit, windowMs)) {
         return res.status(429).json(
@@ -255,18 +328,62 @@ export const RateLimit = {
   }
 };
 
-// Error recovery engine (simplified version for client)
-export const createErrorRecoveryEngine = () => ({
-  suggestRecovery: (error: any) => ({
-    suggestions: ['Try refreshing the page', 'Check your connection'],
-    automatic: false
-  })
+// Type-safe error recovery engine
+interface RecoveryOptions {
+  suggestions: string[];
+  automatic: boolean;
+  retryable?: boolean;
+  severity?: 'low' | 'medium' | 'high' | 'critical';
+}
+
+interface ErrorRecoveryEngine {
+  suggestRecovery: (error: Error | unknown) => RecoveryOptions;
+}
+
+export const createErrorRecoveryEngine = (): ErrorRecoveryEngine => ({
+  suggestRecovery: (error: Error | unknown): RecoveryOptions => {
+    const isNetworkError = error instanceof Error && 
+      (error.message.includes('fetch') || error.message.includes('network'));
+    
+    const isChunkError = error instanceof Error && 
+      error.message.includes('Loading chunk');
+    
+    if (isNetworkError) {
+      return {
+        suggestions: ['Check your internet connection', 'Try again in a moment'],
+        automatic: false,
+        retryable: true,
+        severity: 'medium'
+      };
+    }
+    
+    if (isChunkError) {
+      return {
+        suggestions: ['Refresh the page', 'Clear browser cache'],
+        automatic: false,
+        retryable: true,
+        severity: 'high'
+      };
+    }
+    
+    return {
+      suggestions: ['Try refreshing the page', 'Contact support if the issue persists'],
+      automatic: false,
+      retryable: false,
+      severity: 'medium'
+    };
+  }
 });
 
 export const AutomatedErrorRecoveryEngine = createErrorRecoveryEngine;
 
-// Enhanced Error Boundary (simplified version for client)
-export const EnhancedErrorBoundary = ({ children, fallback }: any) => {
+// Type-safe Enhanced Error Boundary interface
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ComponentType<{ error?: Error; resetError?: () => void }>;
+}
+
+export const EnhancedErrorBoundary = ({ children }: ErrorBoundaryProps) => {
   // This is a simplified version - the full implementation should be in the client
   return children;
 };
@@ -283,11 +400,10 @@ export interface RecoverySuggestion {
 }
 
 // Cache keys for consistent caching across the application
-export const cacheKeys = {
-  USER_PROFILE: (userId: string) => `user:profile:${userId}`,
-  BILL_DETAILS: (billId: number) => `bill:details:${billId}`,
-  BILL_COMMENTS: (billId: number) => `bill:comments:${billId}`,
-  USER_ENGAGEMENT: (userId: string) => `user:engagement:${userId}`,
+export const cacheKeys = { USER_PROFILE: (user_id: string) => `user:profile:${user_id }`,
+  BILL_DETAILS: (bill_id: number) => `bill:details:${ bill_id }`,
+  BILL_COMMENTS: (bill_id: number) => `bill:comments:${ bill_id }`,
+  USER_ENGAGEMENT: (user_id: string) => `user:engagement:${ user_id }`,
   ANALYTICS: (key: string) => `analytics:${key}`
 };
 

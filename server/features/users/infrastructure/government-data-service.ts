@@ -2,12 +2,11 @@ import { GovernmentDataService } from '../../../infrastructure/external-data/gov
 import { DataSource, ApiResponse, BillData, SponsorData } from '../../../infrastructure/external-data/types.js';
 import { logger  } from '../../../../shared/core/src/index.js';
 
-export interface UserGovernmentDataQuery {
-  userId: string;
+export interface UserGovernmentDataQuery { user_id: string;
   queryType: 'bill_search' | 'sponsor_lookup' | 'legislative_tracking' | 'committee_info';
   parameters: Record<string, any>;
   priority?: 'low' | 'medium' | 'high';
-}
+ }
 
 export interface UserGovernmentDataResult {
   success: boolean;
@@ -46,7 +45,7 @@ export class UserGovernmentDataService {
       const cacheKey = this.generateCacheKey(query);
       const cached = this.getCachedResult(cacheKey);
       if (cached) {
-        logger.debug(`📋 Using cached government data for user ${query.userId}`);
+        logger.debug(`📋 Using cached government data for user ${query.user_id}`);
         return cached;
       }
 
@@ -75,11 +74,11 @@ export class UserGovernmentDataService {
         this.cacheResult(cacheKey, result);
       }
 
-      logger.info(`📊 Government data query completed for user ${query.userId}: ${query.queryType}`);
+      logger.info(`📊 Government data query completed for user ${query.user_id}: ${query.queryType}`);
       return result;
 
     } catch (error) {
-      logger.error(`❌ Government data query failed for user ${query.userId}`, { error, query });
+      logger.error(`❌ Government data query failed for user ${query.user_id}`, { error, query });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred',
@@ -202,15 +201,14 @@ export class UserGovernmentDataService {
     const { parameters } = query;
 
     // Track multiple bills if provided
-    const billIds = Array.isArray(parameters.billIds) ? parameters.billIds : [parameters.billId];
+    const bill_ids = Array.isArray(parameters.bill_ids) ? parameters.bill_ids : [parameters.bill_id];
 
-    try {
-      const trackingResults = await Promise.allSettled(
-        billIds.map(async (billId: string) => {
+    try { const trackingResults = await Promise.allSettled(
+        bill_ids.map(async (bill_id: string) => {
           const response = await this.governmentDataService.fetchData(
             parameters.dataSource || 'congress.gov',
             'bills',
-            { billId }
+            { bill_id  }
           );
 
           if (response.success) {
@@ -230,8 +228,8 @@ export class UserGovernmentDataService {
         data: {
           trackedBills: successful,
           total: successful.length,
-          requested: billIds.length,
-          failed: billIds.length - successful.length
+          requested: bill_ids.length,
+          failed: bill_ids.length - successful.length
         },
         source: parameters.dataSource || 'congress.gov',
         cached: false,
@@ -329,7 +327,7 @@ export class UserGovernmentDataService {
    */
   private generateCacheKey(query: UserGovernmentDataQuery): string {
     const params = JSON.stringify(query.parameters);
-    return `user_gov_data_${query.userId}_${query.queryType}_${Buffer.from(params).toString('base64')}`;
+    return `user_gov_data_${query.user_id}_${query.queryType}_${Buffer.from(params).toString('base64')}`;
   }
 
   /**
@@ -392,16 +390,15 @@ export class UserGovernmentDataService {
   /**
    * Clear user-specific cache
    */
-  clearUserCache(userId: string): void {
-    const keysToDelete: string[] = [];
+  clearUserCache(user_id: string): void { const keysToDelete: string[] = [];
     for (const key of this.userQueryCache.keys()) {
-      if (key.startsWith(`user_gov_data_${userId}_`)) {
+      if (key.startsWith(`user_gov_data_${user_id }_`)) {
         keysToDelete.push(key);
       }
     }
 
     keysToDelete.forEach(key => this.userQueryCache.delete(key));
-    logger.info(`🧹 Cleared government data cache for user ${userId}`);
+    logger.info(`🧹 Cleared government data cache for user ${ user_id }`);
   }
 
   /**

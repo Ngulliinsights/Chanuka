@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { logger } from '@shared/core';
 
-interface WebSocketMessage {
-  type: 'connected' | 'subscribed' | 'unsubscribed' | 'bill_update' | 'notification' | 'error' | 'pong';
-  billId?: number;
+interface WebSocketMessage { type: 'connected' | 'subscribed' | 'unsubscribed' | 'bill_update' | 'notification' | 'error' | 'pong';
+  bill_id?: number;
   update?: {
     type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled';
     data: any;
     timestamp: string;
-  };
+   };
   notification?: {
     type: string;
     title: string;
@@ -134,18 +133,16 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   }, [heartbeatInterval, clearTimers, log]);
 
   // Resubscribe to all tracked bills after reconnection
-  const resubscribeToAllBills = useCallback(() => {
-    // Use ref instead of state to get current subscribers without closure issues
-    subscribersRef.current.forEach(billId => {
+  const resubscribeToAllBills = useCallback(() => { // Use ref instead of state to get current subscribers without closure issues
+    subscribersRef.current.forEach(bill_id => {
       if (ws.current?.readyState === WebSocket.OPEN) {
         try {
           ws.current.send(JSON.stringify({ 
             type: 'subscribe', 
-            data: { billId } 
+            data: { bill_id  } 
           }));
-          log(`Resubscribed to bill ${billId}`);
-        } catch (error) {
-          console.error(`Failed to resubscribe to bill ${billId}:`, error);
+          log(`Resubscribed to bill ${ bill_id }`);
+        } catch (error) { console.error(`Failed to resubscribe to bill ${bill_id }:`, error);
         }
       }
     });
@@ -350,29 +347,25 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   }, [log]);
 
   // Subscribe to updates for a specific bill
-  const subscribeToBill = useCallback((billId: number) => {
-    const success = sendMessage({ type: 'subscribe', data: { billId } });
-    if (success) {
-      // Update both ref (for reconnection) and state (for reactivity)
-      subscribersRef.current.add(billId);
-      setSubscribers(prev => new Set(prev).add(billId));
-      log(`Subscribed to bill ${billId}`);
+  const subscribeToBill = useCallback((bill_id: number) => { const success = sendMessage({ type: 'subscribe', data: { bill_id  } });
+    if (success) { // Update both ref (for reconnection) and state (for reactivity)
+      subscribersRef.current.add(bill_id);
+      setSubscribers(prev => new Set(prev).add(bill_id));
+      log(`Subscribed to bill ${bill_id }`);
     }
     return success;
   }, [sendMessage, log]);
 
   // Unsubscribe from updates for a specific bill
-  const unsubscribeFromBill = useCallback((billId: number) => {
-    const success = sendMessage({ type: 'unsubscribe', data: { billId } });
-    if (success) {
-      // Update both ref and state
-      subscribersRef.current.delete(billId);
+  const unsubscribeFromBill = useCallback((bill_id: number) => { const success = sendMessage({ type: 'unsubscribe', data: { bill_id  } });
+    if (success) { // Update both ref and state
+      subscribersRef.current.delete(bill_id);
       setSubscribers(prev => {
         const newSet = new Set(prev);
-        newSet.delete(billId);
+        newSet.delete(bill_id);
         return newSet;
-      });
-      log(`Unsubscribed from bill ${billId}`);
+       });
+      log(`Unsubscribed from bill ${ bill_id }`);
     }
     return success;
   }, [sendMessage, log]);

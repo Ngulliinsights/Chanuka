@@ -172,15 +172,15 @@ describe('Auth Components Accessibility', () => {
       const form = screen.getByRole('form', { name: /register|sign up/i });
       expect(form).toBeInTheDocument();
       
-      const firstNameInput = screen.getByRole('textbox', { name: /first name/i });
-      const lastNameInput = screen.getByRole('textbox', { name: /last name/i });
+      const first_nameInput = screen.getByRole('textbox', { name: /first name/i });
+      const last_nameInput = screen.getByRole('textbox', { name: /last name/i });
       const emailInput = screen.getByRole('textbox', { name: /email address/i });
       const passwordInput = screen.getByLabelText(/^password$/i);
       const confirmPasswordInput = screen.getByLabelText(/confirm password/i);
       const submitButton = screen.getByRole('button', { name: /sign up|register/i });
       
-      expect(firstNameInput).toBeInTheDocument();
-      expect(lastNameInput).toBeInTheDocument();
+      expect(first_nameInput).toBeInTheDocument();
+      expect(last_nameInput).toBeInTheDocument();
       expect(emailInput).toBeInTheDocument();
       expect(passwordInput).toBeInTheDocument();
       expect(confirmPasswordInput).toBeInTheDocument();
@@ -190,13 +190,13 @@ describe('Auth Components Accessibility', () => {
     it('should have proper autocomplete attributes', () => {
       renderWithProviders(<RegisterForm />);
       
-      const firstNameInput = screen.getByLabelText(/first name/i);
-      const lastNameInput = screen.getByLabelText(/last name/i);
+      const first_nameInput = screen.getByLabelText(/first name/i);
+      const last_nameInput = screen.getByLabelText(/last name/i);
       const emailInput = screen.getByLabelText(/email address/i);
       const passwordInput = screen.getByLabelText(/^password$/i);
       
-      expect(firstNameInput).toHaveAttribute('autocomplete', 'given-name');
-      expect(lastNameInput).toHaveAttribute('autocomplete', 'family-name');
+      expect(first_nameInput).toHaveAttribute('autocomplete', 'given-name');
+      expect(last_nameInput).toHaveAttribute('autocomplete', 'family-name');
       expect(emailInput).toHaveAttribute('autocomplete', 'email');
       expect(passwordInput).toHaveAttribute('autocomplete', 'new-password');
     });

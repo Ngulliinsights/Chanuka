@@ -196,22 +196,22 @@ export function AnalyticsDashboard() {
             <CardContent>
               <div className="space-y-4">
                 {topBills.slice(0, 10).map((bill, index) => (
-                  <div key={bill.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div key={bills.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
                       <div className="text-2xl font-bold text-muted-foreground">
                         #{index + 1}
                       </div>
                       <div>
-                        <h3 className="font-medium">{bill.title}</h3>
-                        <p className="text-sm text-muted-foreground">{bill.status}</p>
+                        <h3 className="font-medium">{bills.title}</h3>
+                        <p className="text-sm text-muted-foreground">{bills.status}</p>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-sm font-medium">
-                        {bill.engagement.views} views
+                        {bills.engagement.views} views
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {bill.engagement.comments} comments
+                        {bills.engagement.comments} comments
                       </div>
                     </div>
                   </div>
@@ -228,8 +228,8 @@ export function AnalyticsDashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentActivity.slice(0, 10).map((activity) => (
-                  <div key={activity.userId} className="flex items-center justify-between p-4 border rounded-lg">
+                { recentActivity.slice(0, 10).map((activity) => (
+                  <div key={activity.user_id } className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
                       <div className="font-medium">User Activity</div>
                       <div className="text-sm text-muted-foreground">
@@ -281,7 +281,7 @@ export function AnalyticsDashboard() {
                         <div className="flex items-center space-x-2 mt-2">
                           <Calendar className="h-3 w-3" />
                           <span className="text-xs text-muted-foreground">
-                            {new Date(alert.createdAt).toLocaleString()}
+                            {new Date(alert.created_at).toLocaleString()}
                           </span>
                         </div>
                       </div>

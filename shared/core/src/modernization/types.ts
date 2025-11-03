@@ -332,7 +332,7 @@ export class ModernizationError extends Error {
 }
 
 export class AnalysisError extends ModernizationError {
-  constructor(message: string, public analysisType: AnalysisType, metadata?: Record<string, unknown>) {
+  constructor(message: string, public analysis_type: AnalysisType, metadata?: Record<string, unknown>) {
     super(message, 'ANALYSIS_ERROR', ModernizationPhase.ANALYSIS, true, metadata);
     this.name = 'AnalysisError';
   }

@@ -76,10 +76,9 @@ interface NotificationPreferences {
 }
 
 // These interfaces were in the enhanced file and may be used elsewhere or in future features
-interface EngagementProfile {
-  userId: string;
-  topCategories: Array<{ category: string; score: number }>;
-  topSponsors: Array<{ sponsorId: number; name: string; score: number }>;
+interface EngagementProfile { user_id: string;
+  topCategories: Array<{ category: string; score: number  }>;
+  topSponsors: Array<{ sponsor_id: number; name: string; score: number }>;
   engagementLevel: 'low' | 'medium' | 'high';
   preferredNotificationTimes: Array<{ hour: number; frequency: number }>;
   averageResponseTime: number;

@@ -58,10 +58,9 @@ export function extractCorrelationFromHeaders(headers: Record<string, string | s
       context.requestId = requestId;
     }
 
-    const userId = getHeaderValue(headers, USER_HEADER);
-    if (userId) {
-      context.userId = userId;
-    }
+    const user_id = getHeaderValue(headers, USER_HEADER);
+    if (user_id) { context.user_id = user_id;
+     }
 
     const sessionId = getHeaderValue(headers, SESSION_HEADER);
     if (sessionId) {
@@ -95,8 +94,8 @@ export function injectCorrelationIntoHeaders(
     updatedHeaders[REQUEST_HEADER] = context.requestId;
   }
 
-  if (context.userId) {
-    updatedHeaders[USER_HEADER] = context.userId;
+  if (context.user_id) {
+    updatedHeaders[USER_HEADER] = context.user_id;
   }
 
   if (context.sessionId) {
@@ -133,8 +132,7 @@ export class AsyncCorrelationManager implements CorrelationManager {
   /**
    * Start a new request context with optional header extraction
    */
-  startRequest(context: Partial<CorrelationContext> = {}): CorrelationContext {
-    const correlationId = context.correlationId ?? (this.generateIds ? this.generateCorrelationId() : 'unknown');
+  startRequest(context: Partial<CorrelationContext> = {}): CorrelationContext { const correlationId = context.correlationId ?? (this.generateIds ? this.generateCorrelationId() : 'unknown');
     const traceId = context.traceId ?? (this.generateIds ? this.generateTraceId() : undefined);
     const requestId = context.requestId ?? (this.generateIds ? this.generateRequestId() : undefined);
 
@@ -143,9 +141,9 @@ export class AsyncCorrelationManager implements CorrelationManager {
       traceId,
       requestId,
       spanId: context.spanId,
-      userId: context.userId,
+      user_id: context.user_id,
       sessionId: context.sessionId,
-      metadata: { ...context.metadata }
+      metadata: { ...context.metadata  }
     };
 
     return fullContext;

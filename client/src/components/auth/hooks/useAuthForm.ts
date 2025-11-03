@@ -64,8 +64,8 @@ export function useAuthForm(options: UseAuthFormOptions = {}): UseAuthFormResult
     email: '',
     password: '',
     confirmPassword: '',
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
   };
 
   const [formData, setFormData] = useState<FormData>(initialFormData);
@@ -187,8 +187,8 @@ export function useAuthForm(options: UseAuthFormOptions = {}): UseAuthFormResult
     }
 
     setErrors({});
-    const { email, password, firstName, lastName } = registerResult.data;
-    const authResult = await register({ email, password, firstName, lastName });
+    const { email, password, first_name, last_name } = registerResult.data;
+    const authResult = await register({ email, password, first_name, last_name });
 
     if (authResult.success) {
       setApiResponse({ success: 'Account created!' });
@@ -238,8 +238,8 @@ export function useAuthForm(options: UseAuthFormOptions = {}): UseAuthFormResult
     const hasRequiredFields = mode === 'login' 
       ? formData.email && formData.password
       : formData.email && formData.password && 
-        ('firstName' in formData ? formData.firstName : false) && 
-        ('lastName' in formData ? formData.lastName : false) && 
+        ('first_name' in formData ? formData.first_name : false) && 
+        ('last_name' in formData ? formData.last_name : false) && 
         ('confirmPassword' in formData ? formData.confirmPassword : false);
     
     return !hasErrors && Boolean(hasRequiredFields);

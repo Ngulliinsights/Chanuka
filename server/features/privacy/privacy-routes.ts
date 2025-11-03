@@ -96,16 +96,15 @@ const getClientIP = (req: AuthenticatedRequest): string => {
  * Get user's privacy preferences
  * Returns the current privacy settings for the authenticated user
  */
-router.get('/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const preferences = await privacyService.getPrivacyPreferences(userId);
+    const user_id = req.user!.id;
+    const preferences = await privacyService.getPrivacyPreferences(user_id);
     
     return ApiSuccess(res, preferences, 
       ApiResponseWrapper.createMetadata(startTime, 'database'));
-  } catch (error) {
+   } catch (error) {
     logger.error('Error fetching privacy preferences:', { component: 'Chanuka' }, createErrorDetails(error));
     return ApiError(res, {
       code: 'PRIVACY_PREFERENCES_FETCH_FAILED',
@@ -119,31 +118,30 @@ router.get('/preferences', authenticateToken, async (req: AuthenticatedRequest, 
  * Update user's privacy preferences
  * Allows partial updates - only provided fields will be updated
  */
-router.patch('/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.patch('/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     const parsedData = updatePrivacyPreferencesSchema.parse(req.body);
     
     // Cast to Partial<PrivacyPreferences> to handle the type mismatch
     // This is safe because we're only updating provided fields
     const preferences = parsedData as Partial<PrivacyPreferences>;
     
-    const updatedPreferences = await privacyService.updatePrivacyPreferences(userId, preferences);
+    const updatedPreferences = await privacyService.updatePrivacyPreferences(user_id, preferences);
     
     // TODO: Log the preference update when auditLogger is available
     // await auditLogger.log({
-    //   userId,
+    //   user_id,
     //   action: 'privacy.preferences.updated',
     //   resource: 'user_preferences',
     //   severity: 'low',
     //   details: {
     //     updatedFields: Object.keys(preferences),
     //     timestamp: new Date()
-    //   },
-    //   ipAddress: getClientIP(req),
-    //   userAgent: req.headers['user-agent'] || 'unknown'
+    //    },
+    //   ip_address: getClientIP(req),
+    //   user_agent: req.headers['user-agent'] || 'unknown'
     // });
     
     return ApiSuccess(res, updatedPreferences, 
@@ -166,18 +164,16 @@ router.patch('/preferences', authenticateToken, async (req: AuthenticatedRequest
  * Request user data export (GDPR Article 15 - Right of Access)
  * Generates a complete export of all user data in JSON or CSV format
  */
-router.post('/data-export', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.post('/data-export', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const { format, includeAuditLogs } = dataExportRequestSchema.parse(req.body);
+    const user_id = req.user!.id;
+    const { format, includeAuditLogs  } = dataExportRequestSchema.parse(req.body);
     
-    const exportData = await privacyService.exportUserData(userId, userId);
+    const exportData = await privacyService.exportUserData(user_id, user_id);
     
     // TODO: Log the data export request when auditLogger is available
-    // await auditLogger.log({
-    //   userId,
+    // await auditLogger.log({ //   user_id,
     //   action: 'data.export.requested',
     //   resource: 'user_data',
     //   severity: 'low',
@@ -186,14 +182,13 @@ router.post('/data-export', authenticateToken, async (req: AuthenticatedRequest,
     //     includeAuditLogs,
     //     recordCount: exportData.exportMetadata.totalRecords,
     //     timestamp: new Date()
-    //   },
-    //   ipAddress: getClientIP(req),
-    //   userAgent: req.headers['user-agent'] || 'unknown'
+    //    },
+    //   ip_address: getClientIP(req),
+    //   user_agent: req.headers['user-agent'] || 'unknown'
     // });
     
-    if (format === 'json') {
-      res.setHeader('Content-Type', 'application/json');
-      res.setHeader('Content-Disposition', `attachment; filename="user-data-${userId}-${Date.now()}.json"`);
+    if (format === 'json') { res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', `attachment; filename="user-data-${user_id }-${Date.now()}.json"`);
       return res.json(exportData);
     } else {
       // CSV format - simplified summary version
@@ -205,13 +200,13 @@ router.post('/data-export', authenticateToken, async (req: AuthenticatedRequest,
         `Notifications,${exportData.notifications.length}`,
         `Social Profiles,${exportData.socialProfiles.length}`,
         `Progress Records,${exportData.progress.length}`,
-        `Social Shares,${exportData.socialShares.length}`,
-        `Comment Votes,${exportData.commentVotes.length}`,
+        `Social Shares,${exportData.social_shares.length}`,
+        `Comment Votes,${exportData.comment_votess.length}`,
         `Audit Logs,${exportData.auditLogs.length}`
       ].join('\n');
       
       res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', `attachment; filename="user-data-summary-${userId}-${Date.now()}.csv"`);
+      res.setHeader('Content-Disposition', `attachment; filename="user-data-summary-${ user_id }-${Date.now()}.csv"`);
       return res.send(csvData);
     }
   } catch (error) {
@@ -232,12 +227,11 @@ router.post('/data-export', authenticateToken, async (req: AuthenticatedRequest,
  * Request user data deletion (GDPR Article 17 - Right to Erasure)
  * Permanently deletes user data with optional audit trail preservation
  */
-router.post('/data-deletion', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.post('/data-deletion', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const { confirmDeletion, keepAuditTrail, reason } = dataDeletionRequestSchema.parse(req.body);
+    const user_id = req.user!.id;
+    const { confirmDeletion, keepAuditTrail, reason  } = dataDeletionRequestSchema.parse(req.body);
     
     if (!confirmDeletion) {
       return ApiError(res, {
@@ -248,8 +242,7 @@ router.post('/data-deletion', authenticateToken, async (req: AuthenticatedReques
     }
     
     // TODO: Log the deletion request when auditLogger is available
-    // await auditLogger.log({
-    //   userId,
+    // await auditLogger.log({ //   user_id,
     //   action: 'data.deletion.requested',
     //   resource: 'user_data',
     //   severity: 'high',
@@ -257,12 +250,12 @@ router.post('/data-deletion', authenticateToken, async (req: AuthenticatedReques
     //     keepAuditTrail,
     //     reason: reason || 'User requested data deletion',
     //     timestamp: new Date()
-    //   },
-    //   ipAddress: getClientIP(req),
-    //   userAgent: req.headers['user-agent'] || 'unknown'
+    //    },
+    //   ip_address: getClientIP(req),
+    //   user_agent: req.headers['user-agent'] || 'unknown'
     // });
     
-    const deletionResult = await privacyService.deleteUserData(userId, userId, keepAuditTrail);
+    const deletionResult = await privacyService.deleteUserData(user_id, user_id, keepAuditTrail);
     
     return ApiSuccess(res, {
       message: 'User data has been successfully deleted',
@@ -286,25 +279,24 @@ router.post('/data-deletion', authenticateToken, async (req: AuthenticatedReques
  * Generate GDPR compliance report for user
  * Provides detailed compliance status across all GDPR requirements
  */
-router.get('/gdpr-report', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/gdpr-report', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const complianceReport = await privacyService.generateGDPRComplianceReport(userId);
+    const user_id = req.user!.id;
+    const complianceReport = await privacyService.generateGDPRComplianceReport(user_id);
     
     // TODO: Uncomment when auditLogger is implemented and imported
     // await auditLogger.log({
-    //   userId,
+    //   user_id,
     //   action: 'gdpr.report.generated',
     //   resource: 'compliance_report',
     //   severity: 'low',
     //   details: { 
     //     overallScore: complianceReport.overallComplianceScore,
     //     timestamp: new Date()
-    //   },
-    //   ipAddress: getClientIP(req),
-    //   userAgent: req.headers['user-agent'] || 'unknown'
+    //    },
+    //   ip_address: getClientIP(req),
+    //   user_agent: req.headers['user-agent'] || 'unknown'
     // });
     
     return ApiSuccess(res, complianceReport, 
@@ -345,11 +337,10 @@ router.get('/retention-policies', async (req, res) => {
  * Run data cleanup (admin only)
  * Executes retention policy cleanup across all data types
  */
-router.post('/cleanup', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.post('/cleanup', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     
     // Check if user is admin
     if (req.user!.role !== 'admin') {
@@ -357,14 +348,13 @@ router.post('/cleanup', authenticateToken, async (req: AuthenticatedRequest, res
         code: 'INSUFFICIENT_PERMISSIONS',
         message: 'Insufficient permissions',
         details: 'Only administrators can perform data cleanup operations'
-      }, 403, ApiResponseWrapper.createMetadata(startTime, 'database'));
+       }, 403, ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
     
     const cleanupResult = await privacyService.runDataCleanup();
     
     // TODO: Uncomment when auditLogger is implemented and imported
-    // await auditLogger.log({
-    //   userId,
+    // await auditLogger.log({ //   user_id,
     //   action: 'data.cleanup.executed',
     //   resource: 'system',
     //   severity: 'high',
@@ -372,9 +362,9 @@ router.post('/cleanup', authenticateToken, async (req: AuthenticatedRequest, res
     //     success: cleanupResult.success,
     //     results: cleanupResult.cleanupResults,
     //     timestamp: new Date()
-    //   },
-    //   ipAddress: getClientIP(req),
-    //   userAgent: req.headers['user-agent'] || 'unknown'
+    //    },
+    //   ip_address: getClientIP(req),
+    //   user_agent: req.headers['user-agent'] || 'unknown'
     // });
     
     return ApiSuccess(res, cleanupResult, 
@@ -393,11 +383,10 @@ router.post('/cleanup', authenticateToken, async (req: AuthenticatedRequest, res
  * Update data retention policy (admin only)
  * Modifies retention period for specific data types
  */
-router.patch('/retention-policies', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.patch('/retention-policies', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     
     // Check if user is admin
     if (req.user!.role !== 'admin') {
@@ -405,7 +394,7 @@ router.patch('/retention-policies', authenticateToken, async (req: Authenticated
         code: 'INSUFFICIENT_PERMISSIONS',
         message: 'Insufficient permissions',
         details: 'Only administrators can update retention policies'
-      }, 403, ApiResponseWrapper.createMetadata(startTime, 'database'));
+       }, 403, ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
     
     const { dataType, retentionPeriodDays } = retentionPolicyUpdateSchema.parse(req.body);
@@ -421,8 +410,7 @@ router.patch('/retention-policies', authenticateToken, async (req: Authenticated
     }
     
     // TODO: Uncomment when auditLogger is implemented and imported
-    // await auditLogger.log({
-    //   userId,
+    // await auditLogger.log({ //   user_id,
     //   action: 'retention.policy.updated',
     //   resource: 'system_policy',
     //   severity: 'medium',
@@ -430,9 +418,9 @@ router.patch('/retention-policies', authenticateToken, async (req: Authenticated
     //     dataType,
     //     newRetentionPeriod: retentionPeriodDays,
     //     timestamp: new Date()
-    //   },
-    //   ipAddress: getClientIP(req),
-    //   userAgent: req.headers['user-agent'] || 'unknown'
+    //    },
+    //   ip_address: getClientIP(req),
+    //   user_agent: req.headers['user-agent'] || 'unknown'
     // });
     
     return ApiSuccess(res, { 
@@ -458,16 +446,15 @@ router.patch('/retention-policies', authenticateToken, async (req: Authenticated
  * Get privacy dashboard summary
  * Aggregates all privacy-related information for the user
  */
-router.get('/dashboard', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/dashboard', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     
     // Fetch all dashboard data in parallel for optimal performance
     const [preferences, complianceReport, retentionPolicies] = await Promise.all([
-      privacyService.getPrivacyPreferences(userId),
-      privacyService.generateGDPRComplianceReport(userId),
+      privacyService.getPrivacyPreferences(user_id),
+      privacyService.generateGDPRComplianceReport(user_id),
       Promise.resolve(privacyService.getDataRetentionPolicies())
     ]);
     
@@ -480,7 +467,7 @@ router.get('/dashboard', authenticateToken, async (req: AuthenticatedRequest, re
         dataDeletion: true,
         dataPortability: true,
         consentWithdrawal: true
-      },
+       },
       lastUpdated: new Date()
     };
     
@@ -500,12 +487,11 @@ router.get('/dashboard', authenticateToken, async (req: AuthenticatedRequest, re
  * Consent management - withdraw consent for specific data processing
  * Allows users to opt out of specific data processing activities
  */
-router.post('/withdraw-consent', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.post('/withdraw-consent', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const { processingType } = req.body;
+    const user_id = req.user!.id;
+    const { processingType  } = req.body;
     
     const validProcessingTypes = ['analytics', 'marketing', 'research', 'personalization'] as const;
     
@@ -518,7 +504,7 @@ router.post('/withdraw-consent', authenticateToken, async (req: AuthenticatedReq
     }
     
     // Update privacy preferences to withdraw consent
-    const currentPrefs = await privacyService.getPrivacyPreferences(userId);
+    const currentPrefs = await privacyService.getPrivacyPreferences(user_id);
     const updatedPrefs = {
       dataProcessing: {
         ...currentPrefs.dataProcessing,
@@ -526,20 +512,19 @@ router.post('/withdraw-consent', authenticateToken, async (req: AuthenticatedReq
       }
     };
     
-    await privacyService.updatePrivacyPreferences(userId, updatedPrefs);
+    await privacyService.updatePrivacyPreferences(user_id, updatedPrefs);
     
     // TODO: Uncomment when auditLogger is implemented and imported
-    // await auditLogger.log({
-    //   userId,
+    // await auditLogger.log({ //   user_id,
     //   action: 'consent.withdrawn',
     //   resource: 'user_consent',
     //   severity: 'medium',
     //   details: { 
     //     processingType,
     //     timestamp: new Date()
-    //   },
-    //   ipAddress: getClientIP(req),
-    //   userAgent: req.headers['user-agent'] || 'unknown'
+    //    },
+    //   ip_address: getClientIP(req),
+    //   user_agent: req.headers['user-agent'] || 'unknown'
     // });
     
     return ApiSuccess(res, {

@@ -23,11 +23,10 @@ export interface CollaborativeRecommendationsDto {
   scores: number[];
 }
 
-export interface EngagementTrackingDto {
-  userId: string;
-  billId: number;
-  engagementType: 'view' | 'comment' | 'share';
-}
+export interface EngagementTrackingDto { user_id: string;
+  bill_id: number;
+  engagement_type: 'view' | 'comment' | 'share';
+  }
 
 
 

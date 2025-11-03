@@ -4,16 +4,77 @@
 import React from 'react';
 import { logger } from '@shared/core';
 
+interface PerformanceMetrics {
+  navigation?: {
+    domContentLoaded: number;
+    loadComplete: number;
+    firstPaint: number | null;
+    firstContentfulPaint: number | null;
+    domInteractive: number;
+    domComplete: number;
+  } | null;
+  resources: number;
+  measures: number;
+  memory?: {
+    used: string;
+    total: string;
+    limit: string;
+  } | null;
+}
+
+interface ErrorInfo {
+  type: string;
+  message: string;
+  timestamp: string;
+  stack?: string;
+}
+
+interface BuildInfo {
+  nodeEnv: string;
+  buildTime: string;
+  viteVersion: string;
+  reactVersion: string;
+}
+
+interface BrowserInfo {
+  userAgent: string;
+  language: string;
+  platform: string;
+  cookieEnabled: boolean;
+  onLine: boolean;
+  viewport: {
+    width: number;
+    height: number;
+  };
+  screen: {
+    width: number;
+    height: number;
+    colorDepth: number;
+  };
+}
+
+interface NetworkConnection {
+  effectiveType?: string;
+  downlink?: number;
+  rtt?: number;
+  saveData?: boolean;
+}
+
+interface NetworkInfo {
+  online: boolean;
+  connection: NetworkConnection | null;
+}
+
 interface DebugInfo {
   environment: string;
   timestamp: string;
-  performance: any;
-  errors: any[];
+  performance: PerformanceMetrics;
+  errors: ErrorInfo[];
   hmrStatus: string;
-  devServer: any;
-  buildInfo: any;
-  browserInfo: any;
-  networkInfo: any;
+  devServer: unknown;
+  buildInfo: BuildInfo;
+  browserInfo: BrowserInfo;
+  networkInfo: NetworkInfo;
 }
 
 export class DevelopmentDebugger {
@@ -197,7 +258,7 @@ Keyboard Shortcuts:
 
   private getBrowserInfo(): any {
     return {
-      userAgent: navigator.userAgent,
+      user_agent: navigator.user_agent,
       language: navigator.language,
       platform: navigator.platform,
       cookieEnabled: navigator.cookieEnabled,

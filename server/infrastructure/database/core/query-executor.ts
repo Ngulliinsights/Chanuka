@@ -239,15 +239,15 @@ function calculateBackoffDelay(attempt: number, initialDelay: number, maxDelay: 
 export class TransactionContext {
   public readonly transactionId: string;
   public readonly client: PoolClient;
-  private _isActive: boolean = true;
+  private _is_active: boolean = true;
 
   constructor(client: PoolClient) {
     this.transactionId = crypto.randomUUID();
     this.client = client;
   }
 
-  get isActive(): boolean {
-    return this._isActive;
+  get is_active(): boolean {
+    return this._is_active;
   }
 
   /**
@@ -255,7 +255,7 @@ export class TransactionContext {
    * @internal
    */
   markInactive(): void {
-    this._isActive = false;
+    this._is_active = false;
   }
 }
 

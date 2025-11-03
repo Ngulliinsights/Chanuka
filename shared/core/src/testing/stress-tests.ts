@@ -287,11 +287,10 @@ export class StressTests extends EventEmitter {
         const requestsPerWorker = Math.floor(requests / concurrency);
         const workers = Array(concurrency).fill(null).map(async (_, workerId) => {
           const workerResults = { allowed: 0, blocked: 0, errors: 0 };
-          const userId = `flood-user-${workerId}`;
+          const user_id = `flood-user-${workerId}`;
 
-          for (let i = 0; i < requestsPerWorker; i++) {
-            try {
-              const result = await rateLimiter.check(userId, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
+          for (let i = 0; i < requestsPerWorker; i++) { try {
+              const result = await rateLimiter.check(user_id, { windowMs: 60000, max: 100, message: 'Rate limit exceeded'  });
               if (result.allowed) {
                 workerResults.allowed++;
               } else {
@@ -650,9 +649,8 @@ export class StressTests extends EventEmitter {
           errors: 0
         };
 
-        while (Date.now() < endTime) {
-          try {
-            const userId = `system-stress-user-${workerId}`;
+        while (Date.now() < endTime) { try {
+            const user_id = `system-stress-user-${workerId }`;
             const operation = Math.random();
 
             if (operation < 0.3 && cache) {
@@ -664,9 +662,8 @@ export class StressTests extends EventEmitter {
                 await cache.get(key);
               }
               workerStats.cacheOps++;
-            } else if (operation < 0.6 && rateLimiter) {
-              // Rate limiting checks
-              await rateLimiter.check(userId, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
+            } else if (operation < 0.6 && rateLimiter) { // Rate limiting checks
+              await rateLimiter.check(user_id, { windowMs: 60000, max: 100, message: 'Rate limit exceeded'  });
               workerStats.rateLimitChecks++;
             } else if (logger) {
               // Logging

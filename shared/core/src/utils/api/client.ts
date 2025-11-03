@@ -26,7 +26,7 @@ export interface ApiClientConfig {
         requests: number;
         windowMs: number;
     };
-    userAgent?: string;
+    user_agent?: string;
     headers?: Record<string, string>;
 }
 
@@ -65,12 +65,12 @@ export class ApiClient {
             circuitBreaker: config.circuitBreaker || { enabled: false },
             cache: config.cache || { enabled: false },
             rateLimit: config.rateLimit || { enabled: false, requests: 100, windowMs: 60000 },
-            userAgent: config.userAgent || 'ApiClient/1.0',
+            user_agent: config.user_agent || 'ApiClient/1.0',
             headers: config.headers || {},
         };
 
         this.interceptorManager = createDefaultInterceptors({
-            userAgent: this.config.userAgent,
+            user_agent: this.config.user_agent,
             timeout: this.config.timeout,
             enableLogging: true,
             enableRequestId: true,
@@ -289,11 +289,11 @@ export class ApiClient {
      * Parse response based on content type
      */
     private async parseResponse(response: Response): Promise<any> {
-        const contentType = response.headers.get('content-type');
+        const content_type = response.headers.get('content-type');
 
-        if (contentType?.includes('application/json')) {
+        if (content_type?.includes('application/json')) {
             return response.json();
-        } else if (contentType?.includes('text/')) {
+        } else if (content_type?.includes('text/')) {
             return response.text();
         } else {
             return response.arrayBuffer();
