@@ -24,13 +24,13 @@ import { errorTracker } from '../../../core/errors/error-tracker.js';
 const Schemas = {
   getDisclosures: z.object({
     query: z.object({
-      sponsorId: z.coerce.number().int().positive().optional(),
+      sponsor_id: z.coerce.number().int().positive().optional(),
     })
   }),
   
   bySponsorId: z.object({
     params: z.object({
-      sponsorId: z.coerce.number().int().positive("Sponsor ID must be a positive integer"),
+      sponsor_id: z.coerce.number().int().positive("Sponsor ID must be a positive integer"),
     })
   }),
   
@@ -44,7 +44,7 @@ const Schemas = {
         'conflict_detected',
         'stale_disclosure'
       ]),
-      sponsorId: z.number().int().positive("Sponsor ID must be positive"),
+      sponsor_id: z.number().int().positive("Sponsor ID must be positive"),
       description: z.string().min(10, "Description must be at least 10 characters"),
       severity: z.enum(['info', 'warning', 'critical']),
       metadata: z.record(z.any()).optional()
@@ -53,7 +53,7 @@ const Schemas = {
   
   exportDisclosures: z.object({
     params: z.object({
-      sponsorId: z.coerce.number().int().positive("Sponsor ID must be a positive integer"),
+      sponsor_id: z.coerce.number().int().positive("Sponsor ID must be a positive integer"),
     }),
     query: z.object({
       format: z.enum(['json', 'csv']).default('json')
@@ -62,7 +62,7 @@ const Schemas = {
   
   getAlerts: z.object({
     query: z.object({
-      sponsorId: z.coerce.number().int().positive().optional(),
+      sponsor_id: z.coerce.number().int().positive().optional(),
       severity: z.enum(['info', 'warning', 'critical']).optional(),
       type: z.enum([
         'new_disclosure',
@@ -158,7 +158,7 @@ export function createFinancialDisclosureRouter(
    * Retrieve operational disclosure data with optional sponsor filtering.
    * 
    * Query Parameters:
-   *   - sponsorId (optional): Filter to a specific sponsor
+   *   - sponsor_id (optional): Filter to a specific sponsor
    * 
    * Response: Array of enriched disclosure objects with risk levels
    * 
@@ -172,8 +172,8 @@ export function createFinancialDisclosureRouter(
     validateRequest(Schemas.getDisclosures), 
     async (req, res, next) => {
       try {
-        const sponsorId = req.query.sponsorId ? Number(req.query.sponsorId) : undefined;
-        const data = await monitoringService.collectFinancialDisclosures(sponsorId);
+        const sponsor_id = req.query.sponsor_id ? Number(req.query.sponsor_id) : undefined;
+        const data = await monitoringService.collectFinancialDisclosures(sponsor_id);
         
         // Generate ETag for conditional requests
         const etag = crypto
@@ -197,21 +197,21 @@ export function createFinancialDisclosureRouter(
   );
 
   /**
-   * GET /disclosures/:sponsorId/completeness
+   * GET /disclosures/:sponsor_id/completeness
    * Calculate basic completeness score for operational monitoring.
    * 
    * This is a lightweight endpoint for quick completeness checks.
-   * For detailed analytics, use /analytics/completeness/:sponsorId instead.
+   * For detailed analytics, use /analytics/completeness/:sponsor_id instead.
    * 
    * Response: Simple completeness score with missing disclosure types
    */
   router.get(
-    "/disclosures/:sponsorId/completeness",
+    "/disclosures/:sponsor_id/completeness",
     validateRequest(Schemas.bySponsorId),
     async (req, res, next) => {
       try {
-        const sponsorId = Number(req.params.sponsorId);
-        const completeness = await monitoringService.calculateBasicCompleteness(sponsorId);
+        const sponsor_id = Number(req.params.sponsor_id);
+        const completeness = await monitoringService.calculateBasicCompleteness(sponsor_id);
         ApiSuccess(res, completeness);
       } catch (error) {
         next(error);
@@ -224,7 +224,7 @@ export function createFinancialDisclosureRouter(
    * Retrieve recent alerts with flexible filtering.
    * 
    * Query Parameters:
-   *   - sponsorId (optional): Filter by sponsor
+   *   - sponsor_id (optional): Filter by sponsor
    *   - severity (optional): Filter by severity level
    *   - type (optional): Filter by alert type
    *   - includeResolved (optional): Include resolved alerts
@@ -238,7 +238,7 @@ export function createFinancialDisclosureRouter(
     async (req, res, next) => {
       try {
         const options = {
-          sponsorId: req.query.sponsorId ? Number(req.query.sponsorId) : undefined,
+          sponsor_id: req.query.sponsor_id ? Number(req.query.sponsor_id) : undefined,
           severity: req.query.severity as any,
           type: req.query.type as any,
           includeResolved: req.query.includeResolved === 'true',
@@ -259,7 +259,7 @@ export function createFinancialDisclosureRouter(
    * 
    * Request Body:
    *   - type: Alert type (enum)
-   *   - sponsorId: Sponsor identifier
+   *   - sponsor_id: Sponsor identifier
    *   - description: Alert description (min 10 chars)
    *   - severity: Alert severity level
    *   - metadata (optional): Additional alert data
@@ -276,10 +276,10 @@ export function createFinancialDisclosureRouter(
     validateRequest(Schemas.createAlert), 
     async (req, res, next) => {
       try {
-        const { type, sponsorId, description, severity, metadata } = req.body;
+        const { type, sponsor_id, description, severity, metadata } = req.body;
         const alert = await monitoringService.createManualAlert(
           type, 
-          sponsorId, 
+          sponsor_id, 
           description, 
           severity,
           metadata || {}
@@ -457,7 +457,7 @@ export function createFinancialDisclosureRouter(
   // ============================================================================
 
   /**
-   * GET /analytics/completeness/:sponsorId
+   * GET /analytics/completeness/:sponsor_id
    * Generate comprehensive completeness analysis with recommendations.
    * 
    * This endpoint provides:
@@ -472,12 +472,12 @@ export function createFinancialDisclosureRouter(
    * and should be used for detailed analysis rather than frequent polling.
    */
   router.get(
-    "/analytics/completeness/:sponsorId", 
+    "/analytics/completeness/:sponsor_id", 
     validateRequest(Schemas.bySponsorId), 
     async (req, res, next) => {
       try {
-        const sponsorId = Number(req.params.sponsorId);
-        const report = await analyticsService.calculateCompletenessScore(sponsorId);
+        const sponsor_id = Number(req.params.sponsor_id);
+        const report = await analyticsService.calculateCompletenessScore(sponsor_id);
         
         // Cache for 1 hour due to expensive computation
         res.setHeader('Cache-Control', 'private, max-age=3600');
@@ -489,7 +489,7 @@ export function createFinancialDisclosureRouter(
   );
 
   /**
-   * GET /analytics/relationships/:sponsorId
+   * GET /analytics/relationships/:sponsor_id
    * Generate comprehensive financial relationship mapping.
    * 
    * This endpoint provides:
@@ -506,12 +506,12 @@ export function createFinancialDisclosureRouter(
    *   - Risk assessment and monitoring
    */
   router.get(
-    "/analytics/relationships/:sponsorId", 
+    "/analytics/relationships/:sponsor_id", 
     validateRequest(Schemas.bySponsorId), 
     async (req, res, next) => {
       try {
-        const sponsorId = Number(req.params.sponsorId);
-        const mapping = await analyticsService.buildRelationshipMap(sponsorId);
+        const sponsor_id = Number(req.params.sponsor_id);
+        const mapping = await analyticsService.buildRelationshipMap(sponsor_id);
         
         // Cache for 1 hour due to expensive computation
         res.setHeader('Cache-Control', 'private, max-age=3600');
@@ -559,7 +559,7 @@ export function createFinancialDisclosureRouter(
   // ============================================================================
 
   /**
-   * GET /export/:sponsorId
+   * GET /export/:sponsor_id
    * Export sponsor disclosure data in multiple formats.
    * 
    * Query Parameters:
@@ -576,21 +576,21 @@ export function createFinancialDisclosureRouter(
    *   - Archival and backup
    */
   router.get(
-    "/export/:sponsorId", 
+    "/export/:sponsor_id", 
     validateRequest(Schemas.exportDisclosures), 
     async (req, res, next) => {
       try {
-        const sponsorId = Number(req.params.sponsorId);
+        const sponsor_id = Number(req.params.sponsor_id);
         const format = (req.query.format as 'json' | 'csv') || 'json';
         
-        const data = await monitoringService.exportSponsorDisclosures(sponsorId, format);
+        const data = await monitoringService.exportSponsorDisclosures(sponsor_id, format);
         
         // Set appropriate headers based on export format
         if (format === 'csv') {
           res.setHeader('Content-Type', 'text/csv; charset=utf-8');
           res.setHeader(
             'Content-Disposition', 
-            `attachment; filename="disclosures-${sponsorId}-${Date.now()}.csv"`
+            `attachment; filename="disclosures-${sponsor_id}-${Date.now()}.csv"`
           );
           res.setHeader('Cache-Control', 'private, no-cache');
           res.send(data);

@@ -1,21 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../../../shared/core/index.js';
 
-export interface AuditLogEntry {
-  timestamp: Date;
-  userId?: string;
+export interface AuditLogEntry { timestamp: Date;
+  user_id?: string;
   action: string;
   resource?: string;
   ip: string;
-  userAgent?: string;
+  user_agent?: string;
   method: string;
   path: string;
   statusCode?: number;
   duration?: number;
-}
+ }
 
-export const auditMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const startTime = Date.now();
+export const auditMiddleware = (req: Request, res: Response, next: NextFunction) => { const startTime = Date.now();
   
   // Capture original end method
   const originalEnd = res.end;
@@ -26,11 +24,11 @@ export const auditMiddleware = (req: Request, res: Response, next: NextFunction)
     
     const auditEntry: AuditLogEntry = {
       timestamp: new Date(),
-      userId: (req as any).user?.id,
-      action: `${req.method} ${req.path}`,
+      user_id: (req as any).user?.id,
+      action: `${req.method } ${req.path}`,
       resource: req.path,
       ip: req.ip || req.connection.remoteAddress || 'unknown',
-      userAgent: req.get('User-Agent'),
+      user_agent: req.get('User-Agent'),
       method: req.method,
       path: req.path,
       statusCode: res.statusCode,

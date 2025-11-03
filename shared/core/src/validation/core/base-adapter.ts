@@ -71,8 +71,8 @@ export abstract class BaseValidationAdapter extends EventEmitter implements Vali
       version: schema.version || '1.0.0',
       description: schema.description,
       tags: schema.tags || [],
-      createdAt: new Date(),
-      updatedAt: new Date()
+      created_at: new Date(),
+      updated_at: new Date()
     };
     
     this.schemaRegistry.set(name, registration);
@@ -304,13 +304,13 @@ export abstract class BaseValidationAdapter extends EventEmitter implements Vali
   }
 
   // Event system
-  emit(eventType: ValidationEventType, data: Omit<ValidationEvent, 'type' | 'timestamp'>): boolean {
+  emit(event_type: ValidationEventType, data: Omit<ValidationEvent, 'type' | 'timestamp'>): boolean {
     const event: ValidationEvent = {
-      type: eventType,
+      type: event_type,
       timestamp: Date.now(),
       ...data
     };
-    return super.emit(eventType, event);
+    return super.emit(event_type, event);
   }
 
   // Lifecycle

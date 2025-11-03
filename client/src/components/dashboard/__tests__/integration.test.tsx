@@ -29,8 +29,8 @@ const mockUseBills = {
       description: 'Review the new healthcare legislation',
       priority: 'High',
       dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-      createdAt: new Date('2024-01-10T10:00:00Z'),
-      updatedAt: new Date('2024-01-12T15:30:00Z')
+      created_at: new Date('2024-01-10T10:00:00Z'),
+      updated_at: new Date('2024-01-12T15:30:00Z')
     },
     {
       id: 'action-2',
@@ -38,8 +38,8 @@ const mockUseBills = {
       description: 'Submit public comments on education bill',
       priority: 'Medium',
       completed: true,
-      createdAt: new Date('2024-01-08T09:00:00Z'),
-      updatedAt: new Date('2024-01-14T16:45:00Z')
+      created_at: new Date('2024-01-08T09:00:00Z'),
+      updated_at: new Date('2024-01-14T16:45:00Z')
     }
   ],
   trackedTopics: [
@@ -48,16 +48,16 @@ const mockUseBills = {
       name: 'Healthcare',
       category: 'legislative',
       billCount: 5,
-      isActive: true,
-      createdAt: new Date('2024-01-01T00:00:00Z')
+      is_active: true,
+      created_at: new Date('2024-01-01T00:00:00Z')
     },
     {
       id: 'topic-2',
       name: 'Education',
       category: 'policy',
       billCount: 3,
-      isActive: false,
-      createdAt: new Date('2024-01-02T00:00:00Z')
+      is_active: false,
+      created_at: new Date('2024-01-02T00:00:00Z')
     }
   ],
   isLoading: false,
@@ -125,7 +125,7 @@ describe('Dashboard Integration Tests', () => {
       render(<ActivitySummary />);
 
       const refreshButton = screen.getByRole('button');
-      await user.click(refreshButton);
+      await users.click(refreshButton);
 
       expect(mockUseBills.refetch).toHaveBeenCalled();
     });
@@ -187,7 +187,7 @@ describe('Dashboard Integration Tests', () => {
 
       // Initially, completed actions might be hidden
       const showCompletedButton = screen.getByText(/Show Completed/);
-      await user.click(showCompletedButton);
+      await users.click(showCompletedButton);
 
       // Should show completed action
       expect(screen.getByText('Submit Comments')).toBeInTheDocument();
@@ -198,7 +198,7 @@ describe('Dashboard Integration Tests', () => {
       render(<ActionItems />);
 
       const priorityFilter = screen.getByDisplayValue('All Priorities');
-      await user.selectOptions(priorityFilter, 'High Priority');
+      await users.selectOptions(priorityFilter, 'High Priority');
 
       // Should show only high priority actions
       expect(screen.getByText('Review Healthcare Bill')).toBeInTheDocument();
@@ -215,7 +215,7 @@ describe('Dashboard Integration Tests', () => {
       );
 
       if (actionCompleteButton) {
-        await user.click(actionCompleteButton);
+        await users.click(actionCompleteButton);
         // Should trigger completion action
       }
     });
@@ -233,10 +233,10 @@ describe('Dashboard Integration Tests', () => {
 
       // Filter to show only completed actions, then filter by high priority
       const showCompletedButton = screen.getByText(/Hide Completed|Show Completed/);
-      await user.click(showCompletedButton);
+      await users.click(showCompletedButton);
 
       const priorityFilter = screen.getByDisplayValue('All Priorities');
-      await user.selectOptions(priorityFilter, 'High Priority');
+      await users.selectOptions(priorityFilter, 'High Priority');
 
       // Should show no matches message
       expect(screen.getByText(/No action items match your filters/)).toBeInTheDocument();
@@ -257,7 +257,7 @@ describe('Dashboard Integration Tests', () => {
       render(<TrackedTopics />);
 
       const editButton = screen.getByText('Edit');
-      await user.click(editButton);
+      await users.click(editButton);
 
       expect(screen.getByText('Done')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Enter topic name...')).toBeInTheDocument();
@@ -269,17 +269,17 @@ describe('Dashboard Integration Tests', () => {
 
       // Enter edit mode
       const editButton = screen.getByText('Edit');
-      await user.click(editButton);
+      await users.click(editButton);
 
       // Add new topic
       const topicInput = screen.getByPlaceholderText('Enter topic name...');
-      await user.type(topicInput, 'Climate Change');
+      await users.type(topicInput, 'Climate Change');
 
       const categorySelect = screen.getByDisplayValue('Legislative');
-      await user.selectOptions(categorySelect, 'Policy');
+      await users.selectOptions(categorySelect, 'Policy');
 
       const addButton = screen.getByText('Add');
-      await user.click(addButton);
+      await users.click(addButton);
 
       // Should clear input after adding
       expect(topicInput).toHaveValue('');
@@ -291,10 +291,10 @@ describe('Dashboard Integration Tests', () => {
 
       // Enter edit mode to show search
       const editButton = screen.getByText('Edit');
-      await user.click(editButton);
+      await users.click(editButton);
 
       const searchInput = screen.getByPlaceholderText('Search topics...');
-      await user.type(searchInput, 'health');
+      await users.type(searchInput, 'health');
 
       // Should filter topics based on search
       expect(screen.getByText('Healthcare')).toBeInTheDocument();
@@ -306,10 +306,10 @@ describe('Dashboard Integration Tests', () => {
 
       // Enter edit mode to show filters
       const editButton = screen.getByText('Edit');
-      await user.click(editButton);
+      await users.click(editButton);
 
       const categoryFilter = screen.getByDisplayValue('All Categories');
-      await user.selectOptions(categoryFilter, 'Legislative');
+      await users.selectOptions(categoryFilter, 'Legislative');
 
       // Should show only legislative topics
       expect(screen.getByText('Healthcare')).toBeInTheDocument();
@@ -321,12 +321,12 @@ describe('Dashboard Integration Tests', () => {
 
       // Enter edit mode
       const editButton = screen.getByText('Edit');
-      await user.click(editButton);
+      await users.click(editButton);
 
       // Find and click remove button for a topic
       const removeButtons = screen.getAllByTestId('x');
       if (removeButtons.length > 0) {
-        await user.click(removeButtons[0]);
+        await users.click(removeButtons[0]);
         // Should trigger topic removal
       }
     });
@@ -345,11 +345,11 @@ describe('Dashboard Integration Tests', () => {
 
       // Enter edit mode
       const editButton = screen.getByText('Edit');
-      await user.click(editButton);
+      await users.click(editButton);
 
       // Search for non-existent topic
       const searchInput = screen.getByPlaceholderText('Search topics...');
-      await user.type(searchInput, 'nonexistent');
+      await users.type(searchInput, 'nonexistent');
 
       expect(screen.getByText(/No topics match your filters/)).toBeInTheDocument();
     });
@@ -433,7 +433,7 @@ describe('Dashboard Integration Tests', () => {
       
       // Click each refresh button
       for (const button of refreshButtons) {
-        await user.click(button);
+        await users.click(button);
       }
 
       // Should call refetch for each component
@@ -462,10 +462,10 @@ describe('Dashboard Integration Tests', () => {
       render(<ActionItems />);
 
       // Should be able to tab through interactive elements
-      await user.tab();
+      await users.tab();
       expect(document.activeElement).toBeInTheDocument();
 
-      await user.tab();
+      await users.tab();
       expect(document.activeElement).toBeInTheDocument();
     });
 
@@ -510,8 +510,8 @@ describe('Dashboard Integration Tests', () => {
         title: `Action ${i}`,
         description: `Description ${i}`,
         priority: 'Medium' as const,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       }));
 
       const largeMockUseBills = {

@@ -30,7 +30,7 @@ export class ConflictResolutionRecommendationService {
     financialConflicts: FinancialConflict[],
     professionalConflicts: ProfessionalConflict[],
     votingAnomalies: VotingAnomaly[],
-    transparencyScore: number,
+    transparency_score: number,
     riskLevel: 'low' | 'medium' | 'high' | 'critical'
   ): string[] {
     try {
@@ -46,7 +46,7 @@ export class ConflictResolutionRecommendationService {
       recommendations.push(...this.generateVotingRecommendations(votingAnomalies));
 
       // Transparency recommendations
-      recommendations.push(...this.generateTransparencyRecommendations(transparencyScore));
+      recommendations.push(...this.generateTransparencyRecommendations(transparency_score));
 
       // Risk-level specific recommendations
       recommendations.push(...this.generateRiskLevelRecommendations(riskLevel));
@@ -213,7 +213,7 @@ export class ConflictResolutionRecommendationService {
       return recommendations;
     }
 
-    const activeConflicts = conflicts.filter(c => c.isActive);
+    const activeConflicts = conflicts.filter(c => c.is_active);
     const leadershipRoles = conflicts.filter(c => c.type === 'leadership_role');
     const ownershipStakes = conflicts.filter(c => c.type === 'ownership_stake');
 
@@ -276,19 +276,19 @@ export class ConflictResolutionRecommendationService {
     return recommendations;
   }
 
-  private generateTransparencyRecommendations(transparencyScore: number): string[] {
+  private generateTransparencyRecommendations(transparency_score: number): string[] {
     const recommendations: string[] = [];
 
-    if (transparencyScore >= 0.8) {
+    if (transparency_score >= 0.8) {
       recommendations.push('Maintain excellent transparency standards');
       return recommendations;
     }
 
-    if (transparencyScore < 0.3) {
+    if (transparency_score < 0.3) {
       recommendations.push('Immediately improve disclosure practices across all areas');
       recommendations.push('Implement comprehensive transparency framework');
       recommendations.push('Engage independent transparency auditor');
-    } else if (transparencyScore < 0.6) {
+    } else if (transparency_score < 0.6) {
       recommendations.push('Enhance disclosure completeness and timeliness');
       recommendations.push('Implement regular transparency reviews');
     }

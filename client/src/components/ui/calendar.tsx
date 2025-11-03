@@ -65,7 +65,7 @@ function Calendar({
     />
   )
 }
-Calendar.displayName = "Calendar"
+Calendar.display_name = "Calendar"
 
 // Enhanced calendar with date validation
 interface EnhancedCalendarProps extends Omit<CalendarProps, 'className' | 'selected' | 'onSelect' | 'disabled'>, DateValidationProps {
@@ -331,7 +331,7 @@ const EnhancedCalendar = React.forwardRef<
     </div>
   );
 });
-EnhancedCalendar.displayName = "EnhancedCalendar";
+EnhancedCalendar.display_name = "EnhancedCalendar";
 
 export { Calendar, EnhancedCalendar }
 

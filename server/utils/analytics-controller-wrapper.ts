@@ -170,15 +170,14 @@ export function controllerWrapper<
  * Extended Request interface for analytics context
  * This should be imported where Request types are extended
  */
-declare global {
-  namespace Express {
+declare global { namespace Express {
     interface Request {
       analyticsContext?: {
         traceId: string;
         timestamp: Date;
-        userId?: string;
+        user_id?: string;
         metadata?: Record<string, any>;
-      };
+       };
     }
   }
 }

@@ -69,7 +69,7 @@ export class GovernmentDataService extends EventEmitter {
             syncFrequency: 'daily'
           }
         ],
-        isActive: true,
+        is_active: true,
         priority: 10,
         healthStatus: 'unknown'
       },
@@ -106,7 +106,7 @@ export class GovernmentDataService extends EventEmitter {
             syncFrequency: 'daily'
           }
         ],
-        isActive: true,
+        is_active: true,
         priority: 8,
         healthStatus: 'unknown'
       }
@@ -244,7 +244,7 @@ export class GovernmentDataService extends EventEmitter {
    * Get all active data sources
    */
   async getActiveDataSources(): Promise<DataSource[]> {
-    return Array.from(this.dataSources.values()).filter(source => source.isActive);
+    return Array.from(this.dataSources.values()).filter(source => source.is_active);
   }
 
   /**
@@ -356,7 +356,7 @@ export class GovernmentDataService extends EventEmitter {
    */
   private async performHealthChecks(): Promise<void> {
     for (const [sourceId, dataSource] of this.dataSources) {
-      if (!dataSource.isActive) continue;
+      if (!dataSource.is_active) continue;
 
       try {
         const client = this.apiClients.get(sourceId);
@@ -402,13 +402,13 @@ export class GovernmentDataService extends EventEmitter {
     // This would contain source-specific transformation logic
     // For now, returning a basic transformation
     return {
-      billNumber: rawData.number || rawData.bill_number || 'Unknown',
+      bill_number: rawData.number || rawData.bill_number || 'Unknown',
       title: rawData.title || 'Untitled Bill',
       summary: rawData.summary || rawData.short_title,
       content: rawData.text || rawData.full_text,
       status: rawData.status || 'unknown',
-      introducedDate: new Date(rawData.introduced_date || rawData.date_introduced || Date.now()),
-      lastActionDate: rawData.last_action_date ? new Date(rawData.last_action_date) : undefined,
+      introduced_date: new Date(rawData.introduced_date || rawData.date_introduced || Date.now()),
+      last_action_date: rawData.last_action_date ? new Date(rawData.last_action_date) : undefined,
       sponsors: rawData.sponsors || [],
       committees: rawData.committees || [],
       votes: rawData.votes || [],

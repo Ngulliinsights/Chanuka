@@ -1,6 +1,6 @@
 import { database as db } from '../../../shared/database/connection';
-// TODO: Fix schema imports when available
-// import { users, bills, sponsors, notifications, billComments, billEngagement } from '../../../shared/schema';
+import { users, bills, sponsors } from '@shared/schema/foundation';
+import { notifications, comments, bill_engagement } from '@shared/schema/citizen_participation';
 import { eq } from 'drizzle-orm';
 import jwt from 'jsonwebtoken';
 import { performance } from 'perf_hooks';
@@ -12,15 +12,15 @@ export interface TestUser {
   name: string;
   role: 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate';
   token: string;
-  passwordHash: string;
-  verificationStatus: string;
-  isActive: boolean;
+  password_hash: string;
+  verification_status: string;
+  is_active: boolean;
 }
 
 export interface TestBill {
   id: number;
   title: string;
-  billNumber: string;
+  bill_number: string;
   status: 'introduced' | 'committee' | 'passed' | 'failed' | 'signed';
   category: string;
 }
@@ -54,15 +54,15 @@ export class TestDataManager {
       email: `test-user-${Date.now()}-${Math.random().toString(36).substring(7)}@example.com`,
       name: 'Test User',
       role: 'citizen' as const,
-      passwordHash: 'hashed-password',
-      verificationStatus: 'verified' as const,
-      isActive: true,
-      firstName: 'Test',
-      lastName: 'User',
+      password_hash: 'hashed-password',
+      verification_status: 'verified' as const,
+      is_active: true,
+      first_name: 'Test',
+      last_name: 'User',
       preferences: null,
-      lastLoginAt: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      last_login_at: null,
+      created_at: new Date(),
+      updated_at: new Date(),
       ...userData
     };
 
@@ -75,8 +75,8 @@ export class TestDataManager {
           id: 'test-user-id',
           email: defaultUserData.email,
           role: defaultUserData.role,
-          verificationStatus: defaultUserData.verificationStatus,
-          isActive: defaultUserData.isActive
+          verification_status: defaultUserData.verification_status,
+          is_active: defaultUserData.is_active
         },
         process.env.JWT_SECRET || 'test-secret',
         { expiresIn: '1h' }
@@ -87,9 +87,9 @@ export class TestDataManager {
         email: defaultUserData.email,
         name: defaultUserData.name,
         role: defaultUserData.role,
-        passwordHash: defaultUserData.passwordHash,
-        verificationStatus: defaultUserData.verificationStatus,
-        isActive: defaultUserData.isActive,
+        password_hash: defaultUserData.password_hash,
+        verification_status: defaultUserData.verification_status,
+        is_active: defaultUserData.is_active,
         token
       };
 
@@ -104,17 +104,17 @@ export class TestDataManager {
   async createTestBill(billData: Partial<TestBill> = {}): Promise<TestBill> {
     const defaultBillData = {
       title: `Test Bill ${Date.now()}`,
-      billNumber: `TEST-${Date.now()}`,
-      introducedDate: new Date(),
+      bill_number: `TEST-${Date.now()}`,
+      introduced_date: new Date(),
       status: 'introduced' as const,
       summary: 'Test bill for integration testing',
       description: 'This bill is used for testing purposes',
-      content: 'Full content of test bill...',
+      content: 'Full content of test bills...',
       category: 'technology',
       tags: ['test'],
-      viewCount: 0,
-      shareCount: 0,
-      complexityScore: 5,
+      view_count: 0,
+      share_count: 0,
+      complexity_score: 5,
       constitutionalConcerns: { concerns: [], severity: 'low' },
       stakeholderAnalysis: {
         primary_beneficiaries: ['test users'],
@@ -130,7 +130,7 @@ export class TestDataManager {
       const testBill: TestBill = {
         id: Math.floor(Math.random() * 10000),
         title: defaultBillData.title,
-        billNumber: defaultBillData.billNumber,
+        bill_number: defaultBillData.bill_number,
         status: defaultBillData.status,
         category: defaultBillData.category
       };
@@ -150,9 +150,9 @@ export class TestDataManager {
       constituency: 'Test District',
       email: `sponsor-${Date.now()}@parliament.gov`,
       role: 'sponsor',
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      is_active: true,
+      created_at: new Date(),
+      updated_at: new Date(),
       ...sponsorData
     };
 
@@ -180,9 +180,9 @@ export class TestDataManager {
       type: 'test_notification',
       title: 'Test Notification',
       message: 'This is a test notification',
-      isRead: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      is_read: false,
+      created_at: new Date(),
+      updated_at: new Date(),
       ...notificationData
     };
 
@@ -214,19 +214,19 @@ export class TestDataManager {
 
       // Clean up bill-related data
       // for (const bill of this.createdBills) {
-      //   await db.delete(billComments).where(eq(billComments.billId, bill.id));
-      //   await db.delete(billEngagement).where(eq(billEngagement.billId, bill.id));
-      //   await db.delete(bills).where(eq(bills.id, bill.id));
+      //   await db.delete(comments).where(eq(comments.bill_id, bills.id));
+      //   await db.delete(bill_engagement).where(eq(bill_engagement.bill_id, bills.id));
+      //   await db.delete(bills).where(eq(bills.id, bills.id));
       // }
 
       // Clean up sponsors
       // for (const sponsor of this.createdSponsors) {
-      //   await db.delete(sponsors).where(eq(sponsors.id, sponsor.id));
+      //   await db.delete(sponsors).where(eq(sponsors.id, sponsors.id));
       // }
 
       // Clean up users
       // for (const user of this.createdUsers) {
-      //   await db.delete(users).where(eq(users.id, user.id));
+      //   await db.delete(users).where(eq(users.id, users.id));
       // }
 
       // Reset arrays
@@ -535,13 +535,13 @@ export class MockDataGenerator {
   }
 
   static generateRandomName(): string {
-    const firstNames = ['John', 'Jane', 'Bob', 'Alice', 'Charlie', 'Diana'];
-    const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia'];
+    const first_names = ['John', 'Jane', 'Bob', 'Alice', 'Charlie', 'Diana'];
+    const last_names = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia'];
 
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const first_name = first_names[Math.floor(Math.random() * first_names.length)];
+    const last_name = last_names[Math.floor(Math.random() * last_names.length)];
 
-    return `${firstName} ${lastName}`;
+    return `${first_name} ${last_name}`;
   }
 
   static generateRandomBillTitle(): string {

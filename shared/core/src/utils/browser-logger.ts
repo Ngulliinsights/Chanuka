@@ -29,29 +29,27 @@ export interface FeatureFlags {
 /**
  * Unified logging configuration
  */
-export interface UnifiedLoggerConfig {
-  environment: EnvironmentConfig;
+export interface UnifiedLoggerConfig { environment: EnvironmentConfig;
   featureFlags: FeatureFlags;
   baseUrl?: string;
   sessionId?: string;
-  userId?: string;
+  user_id?: string;
   correlationId?: string;
   enableAutoFlush?: boolean;
   flushIntervalMs?: number;
   maxBufferSize?: number;
   flushBatchSize?: number;
   legacyLogger?: LoggerChild;
-}
+ }
 
 /**
  * Browser-compatible logger that integrates with the server-side observability system.
  * Enhanced with environment detection, unified API, and feature flag migration support.
  */
-export class BrowserLogger implements LoggerChild {
-  private config: UnifiedLoggerConfig;
+export class BrowserLogger implements LoggerChild { private config: UnifiedLoggerConfig;
   private baseUrl: string;
   private sessionId: string;
-  private userId?: string;
+  private user_id?: string;
   private correlationId?: string;
   private buffer: Array<{
     level: LogLevel;
@@ -59,7 +57,7 @@ export class BrowserLogger implements LoggerChild {
     context?: LogContext;
     metadata?: Record<string, unknown>;
     timestamp: Date;
-  }> = [];
+   }> = [];
   private flushInterval?: number;
   private isOnline: boolean = navigator.onLine;
   private maxBufferSize: number = 100;
@@ -73,7 +71,7 @@ export class BrowserLogger implements LoggerChild {
 
     this.baseUrl = config.baseUrl || '/api/logs';
     this.sessionId = config.sessionId || this.generateSessionId();
-    this.userId = config.userId;
+    this.user_id = config.user_id;
     this.correlationId = config.correlationId;
 
     this.maxBufferSize = config.maxBufferSize || 100;
@@ -130,20 +128,19 @@ export class BrowserLogger implements LoggerChild {
         headers: {
           'Content-Type': 'application/json',
           'X-Session-ID': this.sessionId,
-          ...(this.userId && { 'X-User-ID': this.userId }),
+          ...(this.user_id && { 'X-User-ID': this.user_id }),
           ...(this.correlationId && { 'X-Correlation-ID': this.correlationId }),
         },
-        body: JSON.stringify({
-          logs: logs.map(log => ({
+        body: JSON.stringify({ logs: logs.map(log => ({
             ...log,
             timestamp: log.timestamp.toISOString(),
             sessionId: this.sessionId,
-            userId: this.userId,
+            user_id: this.user_id,
             correlationId: this.correlationId,
-            userAgent: navigator.userAgent,
+            user_agent: navigator.user_agent,
             url: window.location.href,
             referrer: document.referrer,
-          })),
+           })),
         }),
         // Use keepalive to ensure logs are sent even if page is unloading
         keepalive: true,
@@ -165,8 +162,7 @@ export class BrowserLogger implements LoggerChild {
   /**
    * Flush buffered logs synchronously (for page unload)
    */
-  private flushSync(): void {
-    if (this.buffer.length === 0 || !this.isOnline) return;
+  private flushSync(): void { if (this.buffer.length === 0 || !this.isOnline) return;
 
     try {
       const logs = this.buffer.splice(0);
@@ -175,12 +171,12 @@ export class BrowserLogger implements LoggerChild {
           ...log,
           timestamp: log.timestamp.toISOString(),
           sessionId: this.sessionId,
-          userId: this.userId,
+          user_id: this.user_id,
           correlationId: this.correlationId,
-          userAgent: navigator.userAgent,
+          user_agent: navigator.user_agent,
           url: window.location.href,
           referrer: document.referrer,
-        })),
+         })),
       }));
     } catch (error) {
       console.warn('Error sending logs via sendBeacon:', error);
@@ -209,14 +205,13 @@ export class BrowserLogger implements LoggerChild {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] ${level.toUpperCase()}`;
 
-    const logData = {
-      message,
+    const logData = { message,
       context,
       metadata,
       sessionId: this.sessionId,
-      userId: this.userId,
+      user_id: this.user_id,
       correlationId: this.correlationId,
-    };
+     };
 
     switch (level) {
       case 'error':
@@ -351,7 +346,7 @@ export class BrowserLogger implements LoggerChild {
       component: 'performance',
       operation,
       duration,
-      userAgent: navigator.userAgent,
+      user_agent: navigator.user_agent,
       url: window.location.href,
       memoryUsage: this.getMemoryUsage(),
       connectionType: this.getConnectionType(),
@@ -369,7 +364,7 @@ export class BrowserLogger implements LoggerChild {
       operation: event,
       element,
       url: window.location.href,
-      userAgent: navigator.userAgent,
+      user_agent: navigator.user_agent,
     }, metadata);
   }
 
@@ -382,7 +377,7 @@ export class BrowserLogger implements LoggerChild {
       operation: 'navigate',
       from,
       to,
-      userAgent: navigator.userAgent,
+      user_agent: navigator.user_agent,
     }, metadata);
   }
 
@@ -430,7 +425,7 @@ export class BrowserLogger implements LoggerChild {
           colno: (errorObj as any).colno,
         },
         browser: {
-          userAgent: navigator.userAgent,
+          user_agent: navigator.user_agent,
           url: window.location.href,
           referrer: document.referrer,
           timestamp: new Date().toISOString(),
@@ -444,9 +439,8 @@ export class BrowserLogger implements LoggerChild {
   /**
    * Update user context
    */
-  setUserId(userId: string): void {
-    this.userId = userId;
-  }
+  setUserId(user_id: string): void { this.user_id = user_id;
+   }
 
   /**
    * Update correlation ID

@@ -118,8 +118,8 @@ const AuthForm = () => {
           <form onSubmit={handleSubmit} className="space-y-4" noValidate data-testid="auth-form">
             {isRegisterMode && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4" data-testid="auth-name-fields">
-                {renderInput('firstName', 'First Name', 'text', 'John', User, 'sm:col-span-1')}
-                {renderInput('lastName', 'Last Name', 'text', 'Doe', User, 'sm:col-span-1')}
+                {renderInput('first_name', 'First Name', 'text', 'John', User, 'sm:col-span-1')}
+                {renderInput('last_name', 'Last Name', 'text', 'Doe', User, 'sm:col-span-1')}
               </div>
             )}
 

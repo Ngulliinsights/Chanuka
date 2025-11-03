@@ -151,7 +151,7 @@ export interface UIErrorContext {
   component: string;
   action: string;
   timestamp: Date;
-  userAgent?: string;
+  user_agent?: string;
   additionalData?: Record<string, any>;
 }
 

@@ -25,10 +25,10 @@ export const initializeApp = asyncErrorHandler(async () => {
 /**
  * Example: Safe read operation
  */
-export const safeReadExample = asyncErrorHandler(async (userId: string) => {
+export const safeReadExample = asyncErrorHandler(async (user_id: string) => {
   // Use read database for read operations
-  const result = await readDatabase.query.user.findFirst({
-    where: (user, { eq }) => eq(user.id, userId),
+  const result = await readDatabase.query.users.findFirst({
+    where: (user, { eq }) => eq(users.id, user_id),
   });
 
   return result;
@@ -52,12 +52,11 @@ export const safeWriteExample = asyncErrorHandler(async (userData: any) => {
 /**
  * Example: Safe raw query execution
  */
-export const safeRawQueryExample = asyncErrorHandler(async (billId: number) => {
-  const result = await executeQuery({
+export const safeRawQueryExample = asyncErrorHandler(async (bill_id: number) => { const result = await executeQuery({
     text: 'SELECT * FROM bills WHERE id = $1',
-    params: [billId],
+    params: [bill_id],
     context: 'fetch-bill-details',
-  });
+   });
 
   return result.rows;
 });

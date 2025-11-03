@@ -191,8 +191,8 @@ describe('PageRelationshipService', () => {
     });
 
     it('should filter pages based on user role', () => {
-      const publicPages = service.getRelatedPages('/bills', { userRole: 'public' });
-      const adminPages = service.getRelatedPages('/bills', { userRole: 'admin' });
+      const publicPages = service.getRelatedPages('/bills', { user_role: 'public' });
+      const adminPages = service.getRelatedPages('/bills', { user_role: 'admin' });
       
       const publicPaths = publicPages.map(p => p.path);
       const adminPaths = adminPages.map(p => p.path);
@@ -207,8 +207,8 @@ describe('PageRelationshipService', () => {
     it('should handle citizen role permissions', () => {
       service.addRelationship('/bills', '/profile', 'related', 0.7, ['citizen', 'admin']);
       
-      const publicPages = service.getRelatedPages('/bills', { userRole: 'public' });
-      const citizenPages = service.getRelatedPages('/bills', { userRole: 'citizen' });
+      const publicPages = service.getRelatedPages('/bills', { user_role: 'public' });
+      const citizenPages = service.getRelatedPages('/bills', { user_role: 'citizen' });
       
       const publicPaths = publicPages.map(p => p.path);
       const citizenPaths = citizenPages.map(p => p.path);
@@ -220,9 +220,9 @@ describe('PageRelationshipService', () => {
     it('should handle multiple role requirements', () => {
       service.addRelationship('/bills', '/special', 'related', 0.8, ['citizen', 'admin']);
       
-      const publicPages = service.getRelatedPages('/bills', { userRole: 'public' });
-      const citizenPages = service.getRelatedPages('/bills', { userRole: 'citizen' });
-      const adminPages = service.getRelatedPages('/bills', { userRole: 'admin' });
+      const publicPages = service.getRelatedPages('/bills', { user_role: 'public' });
+      const citizenPages = service.getRelatedPages('/bills', { user_role: 'citizen' });
+      const adminPages = service.getRelatedPages('/bills', { user_role: 'admin' });
       
       expect(publicPages.map(p => p.path)).not.toContain('/special');
       expect(citizenPages.map(p => p.path)).toContain('/special');

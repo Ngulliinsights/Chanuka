@@ -25,7 +25,7 @@ describe('breadcrumb-generator', () => {
       expect(breadcrumbs[0]).toEqual({
         label: 'Home',
         path: '/',
-        isActive: true,
+        is_active: true,
       });
     });
 
@@ -36,12 +36,12 @@ describe('breadcrumb-generator', () => {
       expect(breadcrumbs[0]).toEqual({
         label: 'Home',
         path: '/',
-        isActive: false,
+        is_active: false,
       });
       expect(breadcrumbs[1]).toEqual({
         label: 'Bills',
         path: '/bills',
-        isActive: true,
+        is_active: true,
       });
     });
 
@@ -52,17 +52,17 @@ describe('breadcrumb-generator', () => {
       expect(breadcrumbs[0]).toEqual({
         label: 'Home',
         path: '/',
-        isActive: false,
+        is_active: false,
       });
       expect(breadcrumbs[1]).toEqual({
         label: 'Bills',
         path: '/bills',
-        isActive: false,
+        is_active: false,
       });
       expect(breadcrumbs[2]).toEqual({
         label: 'Bill Details',
         path: '/bills/123',
-        isActive: true,
+        is_active: true,
       });
     });
 
@@ -73,22 +73,22 @@ describe('breadcrumb-generator', () => {
       expect(breadcrumbs[0]).toEqual({
         label: 'Home',
         path: '/',
-        isActive: false,
+        is_active: false,
       });
       expect(breadcrumbs[1]).toEqual({
         label: 'Bills',
         path: '/bills',
-        isActive: false,
+        is_active: false,
       });
       expect(breadcrumbs[2]).toEqual({
         label: 'Bill Details',
         path: '/bills/456',
-        isActive: false,
+        is_active: false,
       });
       expect(breadcrumbs[3]).toEqual({
         label: 'Analysis',
         path: '/bills/456/analysis',
-        isActive: true,
+        is_active: true,
       });
     });
 
@@ -99,27 +99,27 @@ describe('breadcrumb-generator', () => {
       expect(breadcrumbs[0]).toEqual({
         label: 'Home',
         path: '/',
-        isActive: false,
+        is_active: false,
       });
       expect(breadcrumbs[1]).toEqual({
         label: 'Bills',
         path: '/bills',
-        isActive: false,
+        is_active: false,
       });
       expect(breadcrumbs[2]).toEqual({
         label: 'Bill Details',
         path: '/bills/789',
-        isActive: false,
+        is_active: false,
       });
       expect(breadcrumbs[3]).toEqual({
         label: 'Sponsorship Analysis',
         path: '/bills/789/sponsorship-analysis',
-        isActive: false,
+        is_active: false,
       });
       expect(breadcrumbs[4]).toEqual({
         label: 'Overview',
         path: '/bills/789/sponsorship-analysis/overview',
-        isActive: true,
+        is_active: true,
       });
     });
 
@@ -130,17 +130,17 @@ describe('breadcrumb-generator', () => {
       expect(breadcrumbs[0]).toEqual({
         label: 'Home',
         path: '/',
-        isActive: false,
+        is_active: false,
       });
       expect(breadcrumbs[1]).toEqual({
         label: 'Admin Panel',
         path: '/admin',
-        isActive: false,
+        is_active: false,
       });
       expect(breadcrumbs[2]).toEqual({
         label: 'Database Management',
         path: '/admin/database',
-        isActive: true,
+        is_active: true,
       });
     });
 

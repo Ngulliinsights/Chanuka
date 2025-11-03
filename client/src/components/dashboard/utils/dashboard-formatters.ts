@@ -58,8 +58,8 @@ export function formatActionItem(item: ActionItem): {
     dueDate: dueDateInfo?.text || null,
     dueDateColor: dueDateInfo?.color || 'text-slate-600',
     isOverdue: dueDateInfo?.isOverdue || false,
-    createdText: formatRelativeTime(item.createdAt),
-    updatedText: formatRelativeTime(item.updatedAt)
+    createdText: formatRelativeTime(item.created_at),
+    updatedText: formatRelativeTime(item.updated_at)
   };
 }
 
@@ -81,9 +81,9 @@ export function formatTrackedTopic(topic: TrackedTopic): {
     category: topic.category,
     categoryColor: getCategoryColor(topic.category),
     billCountText: formatBillCount(topic.billCount),
-    statusText: topic.isActive ? 'Active' : 'Inactive',
-    statusColor: topic.isActive ? 'text-green-600' : 'text-slate-400',
-    createdText: formatRelativeTime(topic.createdAt),
+    statusText: topic.is_active ? 'Active' : 'Inactive',
+    statusColor: topic.is_active ? 'text-green-600' : 'text-slate-400',
+    createdText: formatRelativeTime(topic.created_at),
     description: topic.description ? truncateText(topic.description, 150) : ''
   };
 }

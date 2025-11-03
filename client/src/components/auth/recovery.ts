@@ -83,7 +83,7 @@ function getValidationRecovery(error: AuthError, context: RecoveryContext): Reco
     } else {
       suggestions.push('Check that your password is correct');
     }
-  } else if (field === 'firstName' || field === 'lastName') {
+  } else if (field === 'first_name' || field === 'last_name') {
     suggestions.push('Names can only contain letters, hyphens, and apostrophes');
     suggestions.push('Must be between 2-50 characters');
   } else if (field === 'confirmPassword') {

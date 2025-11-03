@@ -383,7 +383,7 @@ describe('API Communication Integration Tests', () => {
 
       expect(mockAuthenticatedApi.get).toHaveBeenCalledWith('/profile');
       expect((response.data as any).success).toBe(true);
-      expect((response.data as any).user.name).toBe('Test User');
+      expect((response.data as any).users.name).toBe('Test User');
     });
 
     test('should handle authentication errors', async () => {

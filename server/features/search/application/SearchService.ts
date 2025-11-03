@@ -3,7 +3,7 @@ import { SearchQueryBuilder } from '../infrastructure/SearchQueryBuilder';
 import { SearchCache } from '../infrastructure/SearchCache';
 import { SearchIndexManager } from '../infrastructure/SearchIndexManager';
 import { RelevanceScorer } from '../domain/RelevanceScorer';
-import { SearchSuggestionsService } from './SearchSuggestionsService';
+import { suggestionEngineService } from '../engines/suggestion/suggestion-engine.service';
 import { SearchAnalytics } from '../domain/SearchAnalytics';
 import { SearchValidator } from '../domain/SearchValidator';
 import { databaseService } from '../../../infrastructure/database/database-service';
@@ -18,7 +18,7 @@ import type {
 const repo = new SearchRepository();
 const cache = new SearchCache();
 const scorer = new RelevanceScorer();
-const suggestionsSvc = new SearchSuggestionsService();
+const suggestionsSvc = suggestionEngineService;
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
@@ -46,7 +46,7 @@ export async function searchBills(query: SearchQuery): Promise<SearchResponseDto
   if (cached) {
     // Record cache hit analytics
     await SearchAnalytics.recordSearchEvent(sanitizedQuery, cached, undefined, undefined, {
-      userAgent: 'cached',
+      user_agent: 'cached',
     }).catch(() => {}); // Fire and forget
     return { ...cached, metadata: { ...cached.metadata, searchTime: Date.now() - start } };
   }
@@ -92,7 +92,9 @@ export async function searchBills(query: SearchQuery): Promise<SearchResponseDto
   /*  5. Suggestions when empty  */
   let suggestions: string[] | undefined;
   if (results.length === 0) {
-    suggestions = await suggestionsSvc.getFallbackSuggestions(text, 5);
+    // Use consolidated suggestion engine for fallback suggestions
+    const fallbackResult = await suggestionsSvc.getAutocompleteSuggestions(text, 5);
+    suggestions = fallbackResult.suggestions.map(s => s.term);
   }
 
   /*  6. Build DTO  */
@@ -100,7 +102,7 @@ export async function searchBills(query: SearchQuery): Promise<SearchResponseDto
     results,
     pagination: { page, limit, total, pages: Math.ceil(total / limit) },
     facets,
-    suggestions,
+    suggestions: suggestions || [],
     metadata: { searchTime: Date.now() - start, source: 'db', queryType: options.searchType ?? 'simple' },
   };
 
@@ -129,7 +131,7 @@ export async function getSearchSuggestions(partial: string, limit = 5) {
   const cached = await cache.getSuggestions<string[]>(sanitizedPartial, sanitizedLimit);
   if (cached) return cached;
 
-  const sugs = await suggestionsSvc.getAutocompleteSuggestions(sanitizedPartial, sanitizedLimit);
+  const sugs = (await suggestionsSvc.getAutocompleteSuggestions(sanitizedPartial, sanitizedLimit)).suggestions.map(s => s.term);
   await cache.setSuggestions(sanitizedPartial, sanitizedLimit, sugs);
 
   // Record analytics for suggestions usage (optional - suggestions are lightweight)

@@ -119,8 +119,8 @@ router.post("/login", authRateLimit, async (req: Request, res: Response) => {
 
     // Log successful login
     await securityAuditService.logAuthEvent('login_success', req, result.user!.id, true, {
-      userRole: result.user!.role,
-      verificationStatus: result.user!.verificationStatus
+      user_role: result.user!.role,
+      verification_status: result.user!.verification_status
     });
 
     return ApiSuccess(res, response, ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -199,8 +199,8 @@ router.post("/refresh", async (req: Request, res: Response) => {
 
     // Log successful login
     await securityAuditService.logAuthEvent('login_success', req, result.user!.id, true, {
-      userRole: result.user!.role,
-      verificationStatus: result.user!.verificationStatus
+      user_role: result.user!.role,
+      verification_status: result.user!.verification_status
     });
 
     return ApiSuccess(res, response, ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -267,10 +267,10 @@ router.post("/forgot-password", passwordResetRateLimit, async (req: Request, res
 
     // Log password reset request
     await securityAuditService.logSecurityEvent({
-      eventType: 'password_reset_request',
+      event_type: 'password_reset_request',
       severity: 'low',
-      ipAddress: getClientIP(req),
-      userAgent: req.get('User-Agent'),
+      ip_address: getClientIP(req),
+      user_agent: req.get('User-Agent'),
       result: 'success',
       success: true,
       details: { emailProvided: true }
@@ -309,10 +309,10 @@ router.post("/reset-password", async (req: Request, res: Response) => {
 
     // Log password reset completion
     await securityAuditService.logSecurityEvent({
-      eventType: 'password_reset',
+      event_type: 'password_reset',
       severity: 'medium',
-      ipAddress: getClientIP(req),
-      userAgent: req.get('User-Agent'),
+      ip_address: getClientIP(req),
+      user_agent: req.get('User-Agent'),
       result: 'success',
       success: true,
       details: { tokenUsed: true }

@@ -6,39 +6,38 @@ export type VerificationStatus = 'pending' | 'verified' | 'disputed' | 'needs_re
 export class CitizenVerification {
   private constructor(
     private readonly _id: string,
-    private readonly _billId: number,
+    private readonly _bill_id: number,
     private readonly _citizenId: string,
-    private readonly _verificationType: VerificationType,
-    private _verificationStatus: VerificationStatus,
+    private readonly _verification_type: VerificationType,
+    private _verification_status: VerificationStatus,
     private _confidence: number,
     private readonly _evidence: Evidence[],
     private readonly _expertise: ExpertiseLevel,
     private readonly _reasoning: string,
-    private readonly _createdAt: Date,
-    private _updatedAt: Date,
+    private readonly _created_at: Date,
+    private _updated_at: Date,
     private _endorsements: number = 0,
     private _disputes: number = 0
   ) {}
 
-  static create(data: {
-    id: string;
-    billId: number;
+  static create(data: { id: string;
+    bill_id: number;
     citizenId: string;
-    verificationType: VerificationType;
-    verificationStatus?: VerificationStatus;
+    verification_type: VerificationType;
+    verification_status?: VerificationStatus;
     confidence?: number;
     evidence: Evidence[];
     expertise: ExpertiseLevel;
     reasoning: string;
-    createdAt?: Date;
-    updatedAt?: Date;
+    created_at?: Date;
+    updated_at?: Date;
     endorsements?: number;
     disputes?: number;
-  }): CitizenVerification {
+   }): CitizenVerification {
     // Calculate initial confidence based on evidence and expertise
     const evidenceScore = data.evidence.reduce((sum, e) => sum + e.getQualityScore(), 0) / data.evidence.length;
     const expertiseWeight = data.expertise.getWeight();
-    const initialConfidence = Math.min(100, (evidenceScore * 50 + expertiseWeight * 30 + data.expertise.reputationScore * 0.2));
+    const initialConfidence = Math.min(100, (evidenceScore * 50 + expertiseWeight * 30 + data.expertise.reputation_score * 0.2));
 
     // Determine initial status
     const initialStatus = initialConfidence > 80 ? 'verified' :
@@ -46,16 +45,16 @@ export class CitizenVerification {
 
     return new CitizenVerification(
       data.id,
-      data.billId,
+      data.bill_id,
       data.citizenId,
-      data.verificationType,
-      data.verificationStatus || initialStatus,
+      data.verification_type,
+      data.verification_status || initialStatus,
       data.confidence || initialConfidence,
       data.evidence,
       data.expertise,
       data.reasoning,
-      data.createdAt ?? new Date(),
-      data.updatedAt ?? new Date(),
+      data.created_at ?? new Date(),
+      data.updated_at ?? new Date(),
       data.endorsements ?? 0,
       data.disputes ?? 0
     );
@@ -66,20 +65,20 @@ export class CitizenVerification {
     return this._id;
   }
 
-  get billId(): number {
-    return this._billId;
+  get bill_id(): number {
+    return this._bill_id;
   }
 
   get citizenId(): string {
     return this._citizenId;
   }
 
-  get verificationType(): VerificationType {
-    return this._verificationType;
+  get verification_type(): VerificationType {
+    return this._verification_type;
   }
 
-  get verificationStatus(): VerificationStatus {
-    return this._verificationStatus;
+  get verification_status(): VerificationStatus {
+    return this._verification_status;
   }
 
   get confidence(): number {
@@ -98,12 +97,12 @@ export class CitizenVerification {
     return this._reasoning;
   }
 
-  get createdAt(): Date {
-    return this._createdAt;
+  get created_at(): Date {
+    return this._created_at;
   }
 
-  get updatedAt(): Date {
-    return this._updatedAt;
+  get updated_at(): Date {
+    return this._updated_at;
   }
 
   get endorsements(): number {
@@ -118,18 +117,18 @@ export class CitizenVerification {
   endorse(): void {
     this._endorsements++;
     this.recalculateConfidence();
-    this._updatedAt = new Date();
+    this._updated_at = new Date();
   }
 
   dispute(): void {
     this._disputes++;
     this.recalculateConfidence();
-    this._updatedAt = new Date();
+    this._updated_at = new Date();
   }
 
   updateStatus(newStatus: VerificationStatus): void {
-    this._verificationStatus = newStatus;
-    this._updatedAt = new Date();
+    this._verification_status = newStatus;
+    this._updated_at = new Date();
   }
 
   private recalculateConfidence(): void {
@@ -141,20 +140,20 @@ export class CitizenVerification {
     ));
   }
 
-  isVerified(): boolean {
-    return this._verificationStatus === 'verified';
+  is_verified(): boolean {
+    return this._verification_status === 'verified';
   }
 
   isDisputed(): boolean {
-    return this._verificationStatus === 'disputed';
+    return this._verification_status === 'disputed';
   }
 
   isPending(): boolean {
-    return this._verificationStatus === 'pending';
+    return this._verification_status === 'pending';
   }
 
   needsReview(): boolean {
-    return this._verificationStatus === 'needs_review';
+    return this._verification_status === 'needs_review';
   }
 
   getConsensusLevel(): number {
@@ -175,13 +174,12 @@ export class CitizenVerification {
     return this._id === other._id;
   }
 
-  toJSON() {
-    return {
+  toJSON() { return {
       id: this._id,
-      billId: this._billId,
+      bill_id: this._bill_id,
       citizenId: this._citizenId,
-      verificationType: this._verificationType,
-      verificationStatus: this._verificationStatus,
+      verification_type: this._verification_type,
+      verification_status: this._verification_status,
       confidence: this._confidence,
       evidence: this._evidence.map(e => ({
         type: e.type,
@@ -191,17 +189,17 @@ export class CitizenVerification {
         relevance: e.relevance,
         description: e.description,
         datePublished: e.datePublished
-      })),
+       })),
       expertise: {
         domain: this._expertise.domain,
         level: this._expertise.level,
         credentials: this._expertise.credentials,
         verifiedCredentials: this._expertise.verifiedCredentials,
-        reputationScore: this._expertise.reputationScore
+        reputation_score: this._expertise.reputation_score
       },
       reasoning: this._reasoning,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt,
+      created_at: this._created_at,
+      updated_at: this._updated_at,
       endorsements: this._endorsements,
       disputes: this._disputes
     };

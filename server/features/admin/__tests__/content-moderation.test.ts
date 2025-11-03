@@ -164,7 +164,7 @@ describe('ContentModerationService (Legacy Wrapper)', () => {
         reportsByType: [],
         actionsByType: [],
         moderatorActivity: [],
-        contentTypeBreakdown: [],
+        content_typeBreakdown: [],
         severityBreakdown: []
       };
       

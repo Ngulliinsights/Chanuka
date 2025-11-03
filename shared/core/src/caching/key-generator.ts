@@ -65,7 +65,7 @@ export class CacheKeys implements CacheKeyGenerator {
     return this.formatKey(`user:username:${username}`);
   }
 
-  userProfile(id: number): string {
+  user_profiles(id: number): string {
     return this.formatKey(`user:profile:${id}`);
   }
 
@@ -84,8 +84,7 @@ export class CacheKeys implements CacheKeyGenerator {
     return this.formatKey(`reviews:property:${propertyId}`);
   }
 
-  reviewsByUser(userId: number): string {
-    return this.formatKey(`reviews:user:${userId}`);
+  reviewsByUser(user_id: number): string { return this.formatKey(`reviews:user:${user_id }`);
   }
 
   reviewStats(propertyId: number): string {
@@ -112,16 +111,14 @@ export class CacheKeys implements CacheKeyGenerator {
   /**
    * Trust and security cache keys
    */
-  trustScore(userId: string): string {
-    return this.formatKey(`trust:score:${userId}`);
+  trustScore(user_id: string): string { return this.formatKey(`trust:score:${user_id }`);
   }
 
   fraudDetection(propertyId: number): string {
     return this.formatKey(`fraud:detection:${propertyId}`);
   }
 
-  riskAssessment(userId: string): string {
-    return this.formatKey(`risk:assessment:${userId}`);
+  riskAssessment(user_id: string): string { return this.formatKey(`risk:assessment:${user_id }`);
   }
 
   securityEvent(eventId: string): string {
@@ -162,8 +159,8 @@ export class CacheKeys implements CacheKeyGenerator {
     return this.formatKey(`analytics:${metric}:${period}`);
   }
 
-  dashboardData(userId: number, dashboard: string): string {
-    return this.formatKey(`dashboard:${dashboard}:${userId}`);
+  dashboardData(user_id: number, dashboard: string): string {
+    return this.formatKey(`dashboard:${dashboard}:${ user_id }`);
   }
 
   reportData(reportId: string): string {
@@ -181,19 +178,16 @@ export class CacheKeys implements CacheKeyGenerator {
     return this.formatKey(`feature:${flagName}`);
   }
 
-  settings(userId: number): string {
-    return this.formatKey(`settings:${userId}`);
+  settings(user_id: number): string { return this.formatKey(`settings:${user_id }`);
   }
 
   /**
    * Notification cache keys
    */
-  notifications(userId: number): string {
-    return this.formatKey(`notifications:${userId}`);
+  notifications(user_id: number): string { return this.formatKey(`notifications:${user_id }`);
   }
 
-  notificationPreferences(userId: number): string {
-    return this.formatKey(`notifications:preferences:${userId}`);
+  notificationPreferences(user_id: number): string { return this.formatKey(`notifications:preferences:${user_id }`);
   }
 
   /**
@@ -278,8 +272,8 @@ export class CacheKeys implements CacheKeyGenerator {
   /**
    * Generate user-specific cache key
    */
-  withUser(baseKey: string, userId: number): string {
-    return `${baseKey}:user:${userId}`;
+  withUser(baseKey: string, user_id: number): string {
+    return `${baseKey}:user:${ user_id }`;
   }
 
   /**

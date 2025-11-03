@@ -14,20 +14,19 @@ import { BaseError } from './error-management';
 
 export type LogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'fatal' | 'critical';
 
-export interface LogContext {
-  component?: string;
+export interface LogContext { component?: string;
   operation?: string;
   duration?: number;
   statusCode?: number;
   errorCode?: string;
   tags?: string[];
-  userId?: string;
+  user_id?: string;
   traceId?: string;
   requestId?: string;
   sessionId?: string;
   correlationId?: string;
   [key: string]: unknown;
-}
+ }
 
 // ==================== Logger Interface ====================
 
@@ -324,15 +323,14 @@ export interface HealthChecker {
 /**
  * Correlation context for request tracing
  */
-export interface CorrelationContext {
-  correlationId: string;
+export interface CorrelationContext { correlationId: string;
   traceId?: string;
   spanId?: string;
-  userId?: string;
+  user_id?: string;
   sessionId?: string;
   requestId?: string;
   metadata?: Record<string, unknown>;
-}
+ }
 
 /**
  * Correlation manager for managing request context

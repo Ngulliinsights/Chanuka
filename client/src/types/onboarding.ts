@@ -4,14 +4,13 @@ export interface OnboardingData {
   expertise: string;
 }
 
-export interface OnboardingAchievement {
-  id: number;
-  userId: number;
-  achievementType: string;
-  achievementValue: number;
+export interface OnboardingAchievement { id: number;
+  user_id: number;
+  achievement_type: string;
+  achievement_value: number;
   description: string;
-  createdAt: Date;
-}
+  created_at: Date;
+ }
 
 export interface OnboardingProgress {
   completedSteps: number;

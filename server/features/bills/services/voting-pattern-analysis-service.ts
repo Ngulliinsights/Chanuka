@@ -6,7 +6,7 @@
 import { logger  } from '../../../../shared/core/src/index.js';
 
 export interface VotingPattern {
-  sponsorId: number;
+  sponsor_id: number;
   sponsorName: string;
   totalVotes: number;
   votingConsistency: number;
@@ -25,12 +25,12 @@ export interface ComparativeAnalysis {
 export class VotingPatternAnalysisService {
   /**
    * Analyze voting patterns for sponsors
-   * @param sponsorId Optional specific sponsor ID to analyze
+   * @param sponsor_id Optional specific sponsor ID to analyze
    * @returns Array of voting pattern analyses
    */
-  async analyzeVotingPatterns(sponsorId?: number): Promise<VotingPattern[]> {
+  async analyzeVotingPatterns(sponsor_id?: number): Promise<VotingPattern[]> {
     try {
-      logger.info('Analyzing voting patterns', { sponsorId });
+      logger.info('Analyzing voting patterns', { sponsor_id });
 
       // Stub implementation - in a real system this would:
       // 1. Query voting records from database
@@ -40,8 +40,8 @@ export class VotingPatternAnalysisService {
 
       const mockPatterns: VotingPattern[] = [
         {
-          sponsorId: sponsorId || 1,
-          sponsorName: `Sponsor ${sponsorId || 1}`,
+          sponsor_id: sponsor_id || 1,
+          sponsorName: `Sponsor ${sponsor_id || 1}`,
           totalVotes: 45,
           votingConsistency: 0.85,
           predictedVotes: [],
@@ -49,13 +49,13 @@ export class VotingPatternAnalysisService {
         }
       ];
 
-      if (sponsorId) {
-        return mockPatterns.filter(p => p.sponsorId === sponsorId);
+      if (sponsor_id) {
+        return mockPatterns.filter(p => p.sponsor_id === sponsor_id);
       }
 
       return mockPatterns;
     } catch (error) {
-      logger.error('Error analyzing voting patterns', { sponsorId }, error);
+      logger.error('Error analyzing voting patterns', { sponsor_id }, error);
       throw error;
     }
   }

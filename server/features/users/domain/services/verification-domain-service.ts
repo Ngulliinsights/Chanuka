@@ -88,21 +88,21 @@ export class VerificationDomainService {
    */
   validateExpertiseForVerificationType(
     expertise: ExpertiseLevel,
-    verificationType: VerificationType
+    verification_type: VerificationType
   ): VerificationValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
 
     // Check if expertise domain is relevant to verification type
-    const relevantDomains = this.getRelevantDomainsForVerificationType(verificationType);
+    const relevantDomains = this.getRelevantDomainsForVerificationType(verification_type);
     if (!relevantDomains.includes(expertise.domain)) {
-      warnings.push(`Expertise in ${expertise.domain} may not be directly relevant to ${verificationType}`);
+      warnings.push(`Expertise in ${expertise.domain} may not be directly relevant to ${verification_type}`);
     }
 
     // Check expertise level requirements
-    const requiredLevel = this.getRequiredExpertiseLevel(verificationType);
+    const requiredLevel = this.getRequiredExpertiseLevel(verification_type);
     if (expertise.level === 'beginner' && requiredLevel !== 'beginner') {
-      errors.push(`${verificationType} requires at least ${requiredLevel} level expertise`);
+      errors.push(`${verification_type} requires at least ${requiredLevel} level expertise`);
     }
 
     // Check verified credentials
@@ -125,8 +125,8 @@ export class VerificationDomainService {
    */
   async processVerification(
     citizenId: string,
-    billId: number,
-    verificationType: VerificationType,
+    bill_id: number,
+    verification_type: VerificationType,
     evidence: Evidence[],
     expertise: ExpertiseLevel,
     reasoning: string
@@ -142,7 +142,7 @@ export class VerificationDomainService {
     warnings.push(...evidenceValidation.warnings);
 
     // Validate expertise
-    const expertiseValidation = this.validateExpertiseForVerificationType(expertise, verificationType);
+    const expertiseValidation = this.validateExpertiseForVerificationType(expertise, verification_type);
     if (!expertiseValidation.isValid) {
       errors.push(...expertiseValidation.errors);
     }
@@ -161,8 +161,7 @@ export class VerificationDomainService {
       return { success: false, errors, warnings };
     }
 
-    try {
-      // Calculate initial confidence
+    try { // Calculate initial confidence
       const evidenceConfidence = evidenceValidation.confidence;
       const expertiseConfidence = expertiseValidation.confidence;
       const initialConfidence = Math.round((evidenceConfidence * 0.6) + (expertiseConfidence * 0.4));
@@ -170,13 +169,13 @@ export class VerificationDomainService {
       // Create verification
       const verification = CitizenVerification.create({
         id: crypto.randomUUID(),
-        billId,
+        bill_id,
         citizenId,
-        verificationType,
+        verification_type,
         evidence,
         expertise,
         reasoning: reasoning.trim()
-      });
+       });
 
       return {
         success: true,
@@ -229,7 +228,7 @@ export class VerificationDomainService {
     const highConfidence = verification.confidence > 80;
     const disputed = communityConsensus < 40;
     const lowExpertise = verification.expertise.level === 'beginner';
-    const criticalType = ['constitutional', 'impact_assessment'].includes(verification.verificationType);
+    const criticalType = ['constitutional', 'impact_assessment'].includes(verification.verification_type);
 
     return (highConfidence && disputed) ||
            (lowExpertise && communityConsensus < 50) ||
@@ -268,7 +267,7 @@ export class VerificationDomainService {
    * Validates verification content for quality and completeness
    */
   validateVerificationContent(
-    verificationType: VerificationType,
+    verification_type: VerificationType,
     evidence: Evidence[],
     reasoning: string
   ): VerificationValidationResult {
@@ -276,7 +275,7 @@ export class VerificationDomainService {
     const warnings: string[] = [];
 
     // Type-specific validation
-    switch (verificationType) {
+    switch (verification_type) {
       case 'fact_check':
         if (evidence.length < 2) {
           errors.push('Fact checking requires at least 2 sources');
@@ -325,7 +324,7 @@ export class VerificationDomainService {
    * Determines verification priority based on bill impact and user expertise
    */
   calculateVerificationPriority(
-    billId: number,
+    bill_id: number,
     userExpertise: ExpertiseLevel,
     billComplexity: number
   ): 'low' | 'medium' | 'high' | 'critical' {
@@ -338,7 +337,7 @@ export class VerificationDomainService {
     priorityScore += userExpertise.getWeight() * 0.3;
 
     // User reputation factor
-    priorityScore += (userExpertise.reputationScore / 100) * 0.3;
+    priorityScore += (userExpertise.reputation_score / 100) * 0.3;
 
     if (priorityScore >= 80) return 'critical';
     if (priorityScore >= 60) return 'high';
@@ -351,19 +350,19 @@ export class VerificationDomainService {
    */
   canUserVerifyBill(
     userAggregate: UserAggregate,
-    billId: number,
-    verificationType: VerificationType
+    bill_id: number,
+    verification_type: VerificationType
   ): { canVerify: boolean; reasons: string[] } {
     const reasons: string[] = [];
 
     // Check user eligibility
-    if (!userAggregate.user.isEligibleForVerification()) {
+    if (!userAggregate.users.isEligibleForVerification()) {
       reasons.push('User is not eligible for verification');
       return { canVerify: false, reasons };
     }
 
     // Check if user already verified this bill
-    const existingVerification = userAggregate.verifications.find(v => v.billId === billId);
+    const existingVerification = userAggregate.verifications.find(v => v.bill_id === bill_id);
     if (existingVerification) {
       reasons.push('User has already verified this bill');
       return { canVerify: false, reasons };
@@ -371,7 +370,7 @@ export class VerificationDomainService {
 
     // Check expertise relevance
     if (userAggregate.profile) {
-      const relevantDomains = this.getRelevantDomainsForVerificationType(verificationType);
+      const relevantDomains = this.getRelevantDomainsForVerificationType(verification_type);
       const hasRelevantExpertise = userAggregate.profile.expertise.some(exp =>
         relevantDomains.includes(exp)
       );
@@ -470,8 +469,8 @@ export class VerificationDomainService {
     // Check for duplicate verifications from same user on same bill
     const duplicate = existingVerifications.find(v =>
       v.citizenId === verification.citizenId &&
-      v.billId === verification.billId &&
-      v.verificationType === verification.verificationType
+      v.bill_id === verification.bill_id &&
+      v.verification_type === verification.verification_type
     );
 
     if (duplicate) {
@@ -480,7 +479,7 @@ export class VerificationDomainService {
 
     // Check verification frequency limits (max 3 per bill per user)
     const userVerificationsForBill = existingVerifications.filter(v =>
-      v.citizenId === verification.citizenId && v.billId === verification.billId
+      v.citizenId === verification.citizenId && v.bill_id === verification.bill_id
     );
 
     if (userVerificationsForBill.length >= 3) {
@@ -489,10 +488,10 @@ export class VerificationDomainService {
 
     // Check minimum time between verifications (prevent spam)
     const recentVerification = userVerificationsForBill
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())[0];
+      .sort((a, b) => b.created_at.getTime() - a.created_at.getTime())[0];
 
     if (recentVerification) {
-      const timeSinceLastVerification = Date.now() - recentVerification.createdAt.getTime();
+      const timeSinceLastVerification = Date.now() - recentVerification.created_at.getTime();
       const minimumInterval = 1000 * 60 * 5; // 5 minutes
 
       if (timeSinceLastVerification < minimumInterval) {

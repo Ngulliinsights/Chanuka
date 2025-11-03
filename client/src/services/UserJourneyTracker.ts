@@ -8,7 +8,7 @@ export interface JourneyStep {
   pageId: string;
   timestamp: Date;
   timeSpent: number; // in milliseconds
-  userRole: UserRole;
+  user_role: UserRole;
   section: NavigationSection;
   referrer?: string;
   exitPoint?: boolean;
@@ -18,10 +18,9 @@ export interface JourneyStep {
 /**
  * Represents a complete user journey session
  */
-export interface UserJourney {
-  sessionId: string;
-  userId?: string;
-  userRole: UserRole;
+export interface UserJourney { sessionId: string;
+  user_id?: string;
+  user_role: UserRole;
   startTime: Date;
   endTime?: Date;
   steps: JourneyStep[];
@@ -30,7 +29,7 @@ export interface UserJourney {
   totalTimeSpent: number;
   bounceRate?: number;
   conversionEvents: string[];
-}
+ }
 
 /**
  * Represents journey analytics data
@@ -55,7 +54,7 @@ export interface PathAnalytics {
   frequency: number;
   averageCompletionTime: number;
   completionRate: number;
-  userRoles: UserRole[];
+  user_roles: UserRole[];
 }
 
 /**
@@ -172,17 +171,16 @@ export class UserJourneyTracker {
   /**
    * Start tracking a new user journey
    */
-  public startJourney(sessionId: string, userId?: string, userRole: UserRole = 'public'): void {
-    const journey: UserJourney = {
+  public startJourney(sessionId: string, user_id?: string, user_role: UserRole = 'public'): void { const journey: UserJourney = {
       sessionId,
-      userId,
-      userRole,
+      user_id,
+      user_role,
       startTime: new Date(),
       steps: [],
       completed: false,
       totalTimeSpent: 0,
       conversionEvents: []
-    };
+     };
 
     this.activeJourneys.set(sessionId, journey);
     this.sessionStartTimes.set(sessionId, new Date());
@@ -220,7 +218,7 @@ export class UserJourneyTracker {
       pageId,
       timestamp: now,
       timeSpent: 0, // Will be calculated when next step is tracked
-      userRole: journey.userRole,
+      user_role: journey.user_role,
       section,
       referrer,
       interactionCount
@@ -291,9 +289,9 @@ export class UserJourneyTracker {
   public getJourneyAnalytics(
     startDate?: Date,
     endDate?: Date,
-    userRole?: UserRole
+    user_role?: UserRole
   ): JourneyAnalytics {
-    const filteredJourneys = this.getFilteredJourneys(startDate, endDate, userRole);
+    const filteredJourneys = this.getFilteredJourneys(startDate, endDate, user_role);
     
     const totalJourneys = filteredJourneys.length;
     const completedJourneys = filteredJourneys.filter(j => j.completed).length;
@@ -320,12 +318,12 @@ export class UserJourneyTracker {
   private getFilteredJourneys(
     startDate?: Date,
     endDate?: Date,
-    userRole?: UserRole
+    user_role?: UserRole
   ): UserJourney[] {
     return Array.from(this.journeys.values()).filter(journey => {
       if (startDate && journey.startTime < startDate) return false;
       if (endDate && journey.startTime > endDate) return false;
-      if (userRole && journey.userRole !== userRole) return false;
+      if (user_role && journey.user_role !== user_role) return false;
       return true;
     });
   }
@@ -338,7 +336,7 @@ export class UserJourneyTracker {
       frequency: number;
       totalTime: number;
       completions: number;
-      userRoles: Set<UserRole>;
+      user_roles: Set<UserRole>;
     }>();
 
     journeys.forEach(journey => {
@@ -351,12 +349,12 @@ export class UserJourneyTracker {
         frequency: 0,
         totalTime: 0,
         completions: 0,
-        userRoles: new Set<UserRole>()
+        user_roles: new Set<UserRole>()
       };
 
       existing.frequency++;
       existing.totalTime += journey.totalTimeSpent;
-      existing.userRoles.add(journey.userRole);
+      existing.user_roles.add(journey.user_role);
       
       if (journey.completed) {
         existing.completions++;
@@ -371,7 +369,7 @@ export class UserJourneyTracker {
         frequency: data.frequency,
         averageCompletionTime: data.frequency > 0 ? data.totalTime / data.frequency : 0,
         completionRate: data.frequency > 0 ? data.completions / data.frequency : 0,
-        userRoles: Array.from(data.userRoles)
+        user_roles: Array.from(data.user_roles)
       }))
       .sort((a, b) => b.frequency - a.frequency)
       .slice(0, 10);
@@ -606,9 +604,8 @@ export class UserJourneyTracker {
   /**
    * Get all journeys for a user
    */
-  public getUserJourneys(userId: string): UserJourney[] {
-    return Array.from(this.journeys.values()).filter(journey => journey.userId === userId);
-  }
+  public getUserJourneys(user_id: string): UserJourney[] { return Array.from(this.journeys.values()).filter(journey => journey.user_id === user_id);
+   }
 
   /**
    * Clear all journey data (for testing)
@@ -632,15 +629,15 @@ export class UserJourneyTracker {
     
     // CSV format
     const headers = [
-      'sessionId', 'userId', 'userRole', 'startTime', 'endTime', 
+      'sessionId', 'user_id', 'user_role', 'startTime', 'endTime', 
       'completed', 'goalAchieved', 'totalTimeSpent', 'stepCount', 
       'conversionEvents', 'bounceRate'
     ];
     
     const rows = journeys.map(journey => [
       journey.sessionId,
-      journey.userId || '',
-      journey.userRole,
+      journey.user_id || '',
+      journey.user_role,
       journey.startTime.toISOString(),
       journey.endTime?.toISOString() || '',
       journey.completed.toString(),

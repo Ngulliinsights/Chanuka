@@ -1,20 +1,18 @@
 // Engagement analytics domain types
 
-export interface UserEngagementMetrics {
-  userId: string;
+export interface UserEngagementMetrics { user_id: string;
   userName: string;
   totalComments: number;
   totalVotes: number;
   averageVotesPerComment: number;
-  engagementScore: number;
+  engagement_score: number;
   topCommentId: number | null;
   topCommentVotes: number;
   participationDays: number;
   expertiseAreas: string[];
-}
+ }
 
-export interface BillEngagementMetrics {
-  billId: number;
+export interface BillEngagementMetrics { bill_id: number;
   billTitle: string;
   totalComments: number;
   totalVotes: number;
@@ -24,7 +22,7 @@ export interface BillEngagementMetrics {
   expertParticipation: number;
   timeToFirstComment: number; // hours
   peakEngagementHour: number;
-}
+ }
 
 export interface CommentEngagementTrends {
   hourly: Array<{ hour: number; comments: number; votes: number }>;
@@ -32,27 +30,24 @@ export interface CommentEngagementTrends {
   weekly: Array<{ week: string; comments: number; votes: number }>;
 }
 
-export interface EngagementLeaderboard {
-  topCommenters: Array<{
-    userId: string;
+export interface EngagementLeaderboard { topCommenters: Array<{
+    user_id: string;
     userName: string;
-    commentCount: number;
+    comment_count: number;
     totalVotes: number;
     averageVotes: number;
-  }>;
-  topVoters: Array<{
-    userId: string;
+   }>;
+  topVoters: Array<{ user_id: string;
     userName: string;
     votesGiven: number;
     votesReceived: number;
     engagementRatio: number;
-  }>;
-  mostEngagedBills: Array<{
-    billId: number;
+   }>;
+  mostEngagedBills: Array<{ bill_id: number;
     billTitle: string;
     totalEngagement: number;
     uniqueUsers: number;
-  }>;
+   }>;
 }
 
 

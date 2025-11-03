@@ -6,8 +6,8 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   role: UserRole;
   trustScore: number;
   password?: string;
@@ -17,11 +17,10 @@ export interface User {
 export type UserRole = 'user' | 'agent' | 'admin';
 
 // Enhanced session interface with proper typing
-export interface CustomSession {
-  userId?: number;
+export interface CustomSession { user_id?: number;
   lastActivity?: string;
   destroy: (callback: (err?: any) => void) => void;
-}
+ }
 
 // Type-safe authenticated request interface
 export interface AuthenticatedRequest extends Omit<Request, 'session'> {
@@ -33,7 +32,7 @@ export interface AuthenticatedRequest extends Omit<Request, 'session'> {
 export interface AuthResult {
   user: Omit<User, 'password'>;
   token?: string;
-  expiresAt?: Date;
+  expires_at?: Date;
 }
 
 // Login request interface
@@ -47,17 +46,16 @@ export interface RegisterRequest {
   username: string;
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
 }
 
 // Session validation result
-export interface SessionValidationResult {
-  valid: boolean;
-  userId?: number;
+export interface SessionValidationResult { valid: boolean;
+  user_id?: number;
   user?: Omit<User, 'password'>;
   error?: string;
-}
+ }
 
 // Authorization context for permission checks
 export interface AuthorizationContext {
@@ -88,11 +86,11 @@ export interface UserProfile {
   username?: string | null;
   email: string;
   role: 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate';
-  displayName?: string | null;
-  avatarUrl?: string | null;
+  display_name?: string | null;
+  avatar_url?: string | null;
   expertise?: string[] | null;
-  createdAt: Date;
-  lastLoginAt?: Date | null;
+  created_at: Date;
+  last_login_at?: Date | null;
 }
 
 export interface OAuthProvider {
@@ -104,20 +102,19 @@ export interface OAuthProvider {
   scope: string[];
 }
 
-export interface SocialProfile {
-  id: string;
-  userId: string;
+export interface SocialProfile { id: string;
+  user_id: string;
   provider: string;
   profileId: string;
   username?: string;
-  displayName?: string;
-  avatarUrl?: string;
+  display_name?: string;
+  avatar_url?: string;
   accessToken?: string;
   refreshToken?: string;
   tokenExpiresAt?: Date;
-  createdAt: Date;
-  updatedAt: Date;
-}
+  created_at: Date;
+  updated_at: Date;
+ }
 
 // Role hierarchy for permission checks
 export const ROLE_HIERARCHY: Record<UserRole, number> = {

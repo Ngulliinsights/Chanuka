@@ -79,11 +79,10 @@ interface AlertPreferences {
   };
 }
 
-interface AlertPreferencesProps {
-  userId?: string;
-}
+interface AlertPreferencesProps { user_id?: string;
+ }
 
-export function AlertPreferences({ userId }: AlertPreferencesProps) {
+export function AlertPreferences({ user_id  }: AlertPreferencesProps) {
   const [preferences, setPreferences] = useState<AlertPreferences | null>(null);
   const [channels, setChannels] = useState<Record<string, NotificationChannel>>({});
   const [categories, setCategories] = useState<string[]>([]);

@@ -549,7 +549,7 @@ export interface PerformanceBaseline {
   expectedValue: number;
   p95Threshold: number;
   regressionThreshold: number; // Percentage
-  createdAt: number;
+  created_at: number;
   description?: string;
 }
 

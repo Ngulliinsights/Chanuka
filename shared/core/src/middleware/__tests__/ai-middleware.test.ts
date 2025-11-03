@@ -101,7 +101,7 @@ describe('AI Middleware', () => {
       expect(mockReq.aiContext?.service).toBe('property-analysis');
       expect(mockReq.aiContext?.operation).toBe('valuation');
       expect(mockReq.aiContext?.requestId).toMatch(/^ai_\d+_[a-z0-9]+$/);
-      expect(mockReq.aiContext?.userId).toBe('user123');
+      expect(mockReq.aiContext?.user_id).toBe('user123');
       expect(mockNext).toHaveBeenCalled();
     });
 
@@ -160,14 +160,13 @@ describe('AI Middleware', () => {
 
       expect(console.log).toHaveBeenCalledWith(
         'AI Request Started',
-        expect.objectContaining({
-          service: 'property-analysis',
+        expect.objectContaining({ service: 'property-analysis',
           operation: 'valuation',
           method: 'POST',
           path: '/ai/property-analysis/valuation',
-          userId: 'user123',
+          user_id: 'user123',
           ip: '127.0.0.1'
-        })
+         })
       );
     });
   });
@@ -180,14 +179,13 @@ describe('AI Middleware', () => {
       };
 
       // Set up AI context
-      mockReq.aiContext = {
-        service: 'property-analysis',
+      mockReq.aiContext = { service: 'property-analysis',
         operation: 'valuation',
         startTime: performance.now() - 100,
         requestId: 'test-request-id',
-        userId: 'user123',
+        user_id: 'user123',
         cached: false
-      };
+       };
 
       const middleware = aiResponseMiddleware(options);
       middleware(mockReq as AIRequest, mockRes as Response, mockNext);
@@ -198,14 +196,13 @@ describe('AI Middleware', () => {
 
       expect(console.log).toHaveBeenCalledWith(
         'AI Request Completed',
-        expect.objectContaining({
-          requestId: 'test-request-id',
+        expect.objectContaining({ requestId: 'test-request-id',
           service: 'property-analysis',
           operation: 'valuation',
           success: true,
           cached: false,
-          userId: 'user123'
-        })
+          user_id: 'user123'
+         })
       );
     });
 
@@ -215,14 +212,13 @@ describe('AI Middleware', () => {
         enableMetrics: true
       };
 
-      mockReq.aiContext = {
-        service: 'property-analysis',
+      mockReq.aiContext = { service: 'property-analysis',
         operation: 'valuation',
         startTime: performance.now() - 50,
         requestId: 'test-request-id',
-        userId: 'user123',
+        user_id: 'user123',
         cached: false
-      };
+       };
 
       const middleware = aiResponseMiddleware(options);
       middleware(mockReq as AIRequest, mockRes as Response, mockNext);
@@ -247,14 +243,13 @@ describe('AI Middleware', () => {
         enableMetrics: false
       };
 
-      mockReq.aiContext = {
-        service: 'property-analysis',
+      mockReq.aiContext = { service: 'property-analysis',
         operation: 'valuation',
         startTime: performance.now() - 50,
         requestId: 'test-request-id',
-        userId: 'user123',
+        user_id: 'user123',
         cached: false
-      };
+       };
 
       const middleware = aiResponseMiddleware(options);
       middleware(mockReq as AIRequest, mockRes as Response, mockNext);

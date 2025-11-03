@@ -1,5 +1,5 @@
 // Simple validation script for User Profile Service
-import { userProfileService } from './services/user-profile.js';
+import { user_profileservice } from './services/user-profile.js';
 import { databaseService } from './services/database-service.js';
 import { logger } from '@shared/core';
 
@@ -35,7 +35,7 @@ async function validateUserProfileService() {
 
     logger.info('\n📋 Checking User Profile Service Methods:', { component: 'Chanuka' });
     methods.forEach(method => {
-      const exists = typeof userProfileService[method] === 'function';
+      const exists = typeof user_profileservice[method] === 'function';
       console.log(`  ${exists ? '✅' : '❌'} ${method}`);
     });
 
@@ -44,7 +44,7 @@ async function validateUserProfileService() {
     
     try {
       // This should handle non-existent user gracefully
-      await userProfileService.getUserProfile('test-user-id');
+      await user_profileservice.getUserProfile('test-user-id');
       logger.info('  ❌ getUserProfile should throw error for non-existent user', { component: 'Chanuka' });
     } catch (error) {
       logger.info('  ✅ getUserProfile properly handles non-existent user', { component: 'Chanuka' });

@@ -13,7 +13,7 @@ export {
 } from '../../../shared/database/connection';
 
 // Database schema and types
-export * from '../../../shared/schema';
+export * from '@shared/schema';
 
 // Server-specific services (keep these)
 export { DatabaseFallbackService } from './database-fallback';

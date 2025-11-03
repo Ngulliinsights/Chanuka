@@ -308,22 +308,22 @@ export function validateFormBatch(
 
   // Name validation (register mode only)
   if (mode === 'register') {
-    if (formData.firstName) {
+    if (formData.first_name) {
       try {
-        validateName(formData.firstName, 'firstName');
+        validateName(formData.first_name, 'first_name');
       } catch (error) {
         if (error instanceof AuthValidationError) {
-          errors.firstName = [error.message];
+          errors.first_name = [error.message];
         }
       }
     }
 
-    if (formData.lastName) {
+    if (formData.last_name) {
       try {
-        validateName(formData.lastName, 'lastName');
+        validateName(formData.last_name, 'last_name');
       } catch (error) {
         if (error instanceof AuthValidationError) {
-          errors.lastName = [error.message];
+          errors.last_name = [error.message];
         }
       }
     }

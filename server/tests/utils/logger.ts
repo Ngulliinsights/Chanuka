@@ -17,7 +17,7 @@ export const logger = {
   }),
   queryLogs: (_filters?: any) => [] as any[],
   logPerformance: (_operation: string, _duration: number, _meta?: any) => {},
-  logSecurity: (_event: string, _userId?: string, _meta?: any) => {},
+  logSecurity: (_event: string, _user_id?: string, _meta?: any) => {},
   logMetric: (_name: string, _value: number, _meta?: any) => {}
 };
 

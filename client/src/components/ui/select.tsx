@@ -35,7 +35,7 @@ const SelectTrigger = forwardRef<
     </Icon>
   </Trigger>
 ))
-SelectTrigger.displayName = Trigger.displayName
+SelectTrigger.display_name = Trigger.display_name
 
 const SelectScrollUpButton = forwardRef<
   ElementRef<typeof ScrollUpButton>,
@@ -52,7 +52,7 @@ const SelectScrollUpButton = forwardRef<
     <ChevronUp className="h-4 w-4" />
   </ScrollUpButton>
 ))
-SelectScrollUpButton.displayName = ScrollUpButton.displayName
+SelectScrollUpButton.display_name = ScrollUpButton.display_name
 
 const SelectScrollDownButton = forwardRef<
   ElementRef<typeof ScrollDownButton>,
@@ -69,7 +69,7 @@ const SelectScrollDownButton = forwardRef<
     <ChevronDown className="h-4 w-4" />
   </ScrollDownButton>
 ))
-SelectScrollDownButton.displayName = ScrollDownButton.displayName
+SelectScrollDownButton.display_name = ScrollDownButton.display_name
 
 const SelectContent = forwardRef<
   ElementRef<typeof Content>,
@@ -101,7 +101,7 @@ const SelectContent = forwardRef<
     </Content>
   </Portal>
 ))
-SelectContent.displayName = Content.displayName
+SelectContent.display_name = Content.display_name
 
 const SelectLabel = forwardRef<
   ElementRef<typeof Label>,
@@ -113,7 +113,7 @@ const SelectLabel = forwardRef<
     {...props}
   />
 ))
-SelectLabel.displayName = Label.displayName
+SelectLabel.display_name = Label.display_name
 
 const SelectItem = forwardRef<
   ElementRef<typeof Item>,
@@ -137,7 +137,7 @@ const SelectItem = forwardRef<
     <ItemText>{children}</ItemText>
   </Item>
 ))
-SelectItem.displayName = Item.displayName
+SelectItem.display_name = Item.display_name
 
 const SelectSeparator = forwardRef<
   ElementRef<typeof Separator>,
@@ -149,7 +149,7 @@ const SelectSeparator = forwardRef<
     {...props}
   />
 ))
-SelectSeparator.displayName = Separator.displayName
+SelectSeparator.display_name = Separator.display_name
 
 // Enhanced select with validation
 const EnhancedSelect = forwardRef<
@@ -329,7 +329,7 @@ const EnhancedSelect = forwardRef<
     </div>
   );
 });
-EnhancedSelect.displayName = "EnhancedSelect";
+EnhancedSelect.display_name = "EnhancedSelect";
 
 export {
   Select,

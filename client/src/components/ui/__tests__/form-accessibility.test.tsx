@@ -185,7 +185,7 @@ describe('AccessibleErrorSummary', () => {
     );
     
     const errorButton = screen.getByText('Email is required');
-    await user.click(errorButton);
+    await users.click(errorButton);
     
     expect(mockField.focus).toHaveBeenCalled();
     expect(mockField.scrollIntoView).toHaveBeenCalledWith({
@@ -327,7 +327,7 @@ describe('useFormKeyboardNavigation', () => {
     expect(input1).toHaveFocus();
     
     // Press arrow down to move to next element
-    await user.keyboard('{ArrowDown}');
+    await users.keyboard('{ArrowDown}');
     expect(select1).toHaveFocus();
   });
 
@@ -345,11 +345,11 @@ describe('useFormKeyboardNavigation', () => {
     expect(textarea1).toHaveFocus();
     
     // Press Ctrl+Home to go to first element
-    await user.keyboard('{Control>}{Home}{/Control}');
+    await users.keyboard('{Control>}{Home}{/Control}');
     expect(input1).toHaveFocus();
     
     // Press Ctrl+End to go to last element
-    await user.keyboard('{Control>}{End}{/Control}');
+    await users.keyboard('{Control>}{End}{/Control}');
     expect(button1).toHaveFocus();
   });
 
@@ -366,7 +366,7 @@ describe('useFormKeyboardNavigation', () => {
     expect(button1).toHaveFocus();
     
     // Press arrow down to wrap to first element
-    await user.keyboard('{ArrowDown}');
+    await users.keyboard('{ArrowDown}');
     expect(input1).toHaveFocus();
   });
 });

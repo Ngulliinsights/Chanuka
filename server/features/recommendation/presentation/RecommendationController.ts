@@ -10,20 +10,18 @@ import { ApiSuccess, ApiError, ApiValidationError  } from '../../../../shared/co
 
 const router = Router();
 
-router.get('/personalized', async (req, res) => {
-  const userId = req.user?.id;
-  if (!userId) return ApiValidationError(res, 'Authenticated user required');
+router.get('/personalized', async (req, res) => { const user_id = req.user?.id;
+  if (!user_id) return ApiValidationError(res, 'Authenticated user required');
   const limit = Math.min(Number(req.query.limit) || 10, 50);
-  const dto = await getPersonalizedRecommendations(userId, limit);
+  const dto = await getPersonalizedRecommendations(user_id, limit);
   return ApiSuccess(res, dto);
-});
+ });
 
-router.get('/similar/:billId', async (req, res) => {
-  const billId = Number(req.params.billId);
+router.get('/similar/:bill_id', async (req, res) => { const bill_id = Number(req.params.bill_id);
   const limit = Math.min(Number(req.query.limit) || 5, 20);
-  const data = await getSimilarBills(billId, limit);
+  const data = await getSimilarBills(bill_id, limit);
   return ApiSuccess(res, data);
-});
+ });
 
 router.get('/trending', async (req, res) => {
   const days = Math.min(Number(req.query.days) || 7, 365);
@@ -32,20 +30,18 @@ router.get('/trending', async (req, res) => {
   return ApiSuccess(res, data);
 });
 
-router.get('/collaborative', async (req, res) => {
-  const userId = req.user?.id;
-  if (!userId) return ApiValidationError(res, 'Authenticated user required');
+router.get('/collaborative', async (req, res) => { const user_id = req.user?.id;
+  if (!user_id) return ApiValidationError(res, 'Authenticated user required');
   const limit = Math.min(Number(req.query.limit) || 10, 50);
-  const dto = await getCollaborativeRecommendations(userId, limit);
+  const dto = await getCollaborativeRecommendations(user_id, limit);
   return ApiSuccess(res, dto);
-});
+ });
 
-router.post('/track-engagement', async (req, res) => {
-  const { billId, engagementType } = req.body;
-  if (!billId || !engagementType) return ApiValidationError(res, 'billId and engagementType required');
-  const userId = req.user?.id;
-  if (!userId) return ApiValidationError(res, 'Authenticated user required');
-  await trackEngagement(userId, Number(billId), engagementType);
+router.post('/track-engagement', async (req, res) => { const { bill_id, engagement_type  } = req.body;
+  if (!bill_id || !engagement_type) return ApiValidationError(res, 'bill_id and engagement_type required');
+  const user_id = req.user?.id;
+  if (!user_id) return ApiValidationError(res, 'Authenticated user required');
+  await trackEngagement(user_id, Number(bill_id), engagement_type);
   return ApiSuccess(res, { ok: true });
 });
 

@@ -21,7 +21,7 @@ export const simpleTransparencyDashboardService = {
     };
   },
 
-  calculateTransparencyScore: async (sponsorId) => {
+  calculateTransparencyScore: async (sponsor_id) => {
     return {
       overallScore: 70,
       componentScores: {
@@ -37,11 +37,11 @@ export const simpleTransparencyDashboardService = {
     };
   },
 
-  analyzeTransparencyTrends: async (sponsorId, timeframe = 'monthly') => {
+  analyzeTransparencyTrends: async (sponsor_id, timeframe = 'monthly') => {
     return {
       trends: [
-        { period: '2024-01', transparencyScore: 65, riskLevel: 'medium', disclosureCount: 4, verificationRate: 70, conflictCount: 3 },
-        { period: '2024-02', transparencyScore: 70, riskLevel: 'medium', disclosureCount: 5, verificationRate: 75, conflictCount: 2 }
+        { period: '2024-01', transparency_score: 65, riskLevel: 'medium', disclosureCount: 4, verificationRate: 70, conflictCount: 3 },
+        { period: '2024-02', transparency_score: 70, riskLevel: 'medium', disclosureCount: 5, verificationRate: 75, conflictCount: 2 }
       ],
       analysis: {
         overallTrend: 'improving',

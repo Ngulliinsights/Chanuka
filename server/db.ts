@@ -94,17 +94,17 @@ async function seedInitialData(db: any): Promise<void> {
     await db.insert(schema.bills).values([
       {
         title: "Digital Rights and Privacy Protection Act",
-        billNumber: "HR-2024-001",
-        introducedDate: new Date('2024-01-15'),
+        bill_number: "HR-2024-001",
+        introduced_date: new Date('2024-01-15'),
         status: "committee",
         summary: "Comprehensive legislation to protect digital privacy rights and regulate data collection by technology companies.",
         description: "This bill establishes fundamental digital rights for citizens and creates oversight mechanisms for data protection.",
         content: "Full text of the Digital Rights and Privacy Protection Act...",
         category: "technology",
         tags: ["privacy", "technology", "digital-rights"],
-        viewCount: 0,
-        shareCount: 0,
-        complexityScore: 7,
+        view_count: 0,
+        share_count: 0,
+        complexity_score: 7,
         constitutionalConcerns: {
           concerns: ["First Amendment implications", "Commerce Clause considerations"],
           severity: "medium"
@@ -117,17 +117,17 @@ async function seedInitialData(db: any): Promise<void> {
       },
       {
         title: "Climate Action and Green Energy Transition Act",
-        billNumber: "S-2024-042",
-        introducedDate: new Date('2024-02-03'),
+        bill_number: "S-2024-042",
+        introduced_date: new Date('2024-02-03'),
         status: "introduced",
         summary: "Legislation to accelerate transition to renewable energy and establish carbon pricing mechanisms.",
         description: "Comprehensive climate action bill with targets for emissions reduction and renewable energy adoption.",
         content: "Full text of the Climate Action and Green Energy Transition Act...",
         category: "environment",
         tags: ["climate", "energy", "environment"],
-        viewCount: 0,
-        shareCount: 0,
-        complexityScore: 9,
+        view_count: 0,
+        share_count: 0,
+        complexity_score: 9,
         constitutionalConcerns: {
           concerns: ["Interstate Commerce regulation", "Federal vs State authority"],
           severity: "low"
@@ -158,7 +158,7 @@ async function initializeFallback(): Promise<void> {
   // shim to reduce TypeScript noise; we'll replace with a proper type once
   // the fallback service contract is finalized.
   const status = (fallbackService.getStatus() as any);
-  logger.info(`✅ Fallback service ready: ${status?.billCount ?? 0} bills, ${status?.userCount ?? 0} users, ${status?.commentCount ?? 0} comments`, { component: 'Chanuka' });
+  logger.info(`✅ Fallback service ready: ${status?.billCount ?? 0} bills, ${status?.userCount ?? 0} users, ${status?.comment_count ?? 0} comments`, { component: 'Chanuka' });
 }
 
 /**
@@ -364,17 +364,17 @@ export { fallbackService };
 export {
   bill as bills,
   user as users,
-  billComment as billComments,
-  userProfile as userProfiles,
-  billEngagement,
+  comments as comments,
+  user_profiles as user_profiles,
+  bill_engagement,
   notification as notifications,
   analysis,
   sponsor as sponsors,
   sponsorAffiliation as sponsorAffiliations,
-  billSponsorship as billSponsorships,
+  bill_sponsorship as bill_sponsorships,
   sponsorTransparency,
   billSectionConflict as billSectionConflicts,
-  userInterest as userInterests
+  user_interest as user_interests
 } from '../shared/schema';
 
 

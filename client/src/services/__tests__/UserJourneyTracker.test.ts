@@ -35,8 +35,8 @@ describe('UserJourneyTracker', () => {
       const journey = tracker.getJourney(mockSessionId);
       expect(journey).toBeDefined();
       expect(journey?.sessionId).toBe(mockSessionId);
-      expect(journey?.userId).toBe(mockUserId);
-      expect(journey?.userRole).toBe('citizen');
+      expect(journey?.user_id).toBe(mockUserId);
+      expect(journey?.user_role).toBe('citizen');
       expect(journey?.completed).toBe(false);
       expect(journey?.steps).toHaveLength(0);
     });
@@ -255,7 +255,7 @@ describe('UserJourneyTracker', () => {
       
       expect(typeof csvData).toBe('string');
       expect(csvData).toContain('sessionId');
-      expect(csvData).toContain('userRole');
+      expect(csvData).toContain('user_role');
       
       const lines = csvData.split('\n');
       expect(lines.length).toBeGreaterThan(1); // Header + at least one data row
@@ -277,8 +277,8 @@ describe('UserJourneyTracker', () => {
       
       expect(user1Journeys).toHaveLength(2);
       expect(user2Journeys).toHaveLength(1);
-      expect(user1Journeys.every(j => j.userId === 'user1')).toBe(true);
-      expect(user2Journeys.every(j => j.userId === 'user2')).toBe(true);
+      expect(user1Journeys.every(j => j.user_id === 'user1')).toBe(true);
+      expect(user2Journeys.every(j => j.user_id === 'user2')).toBe(true);
     });
   });
 

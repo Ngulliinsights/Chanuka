@@ -22,16 +22,15 @@ describe('ExpertVerificationService', () => {
 
   // Helper function to create consistent mock analysis objects
   // This centralizes our test data creation and makes tests more maintainable
-  const createMockAnalysis = (overrides = {}) => ({
-    id: 'analysis-123',
+  const createMockAnalysis = (overrides = {}) => ({ id: 'analysis-123',
     topic: 'constitutional law',
     content: 'Detailed analysis of constitutional implications for proposed legislation',
-    billId: 1,
-    analysisType: 'legal' as const,
-    createdAt: new Date('2024-01-15T10:00:00Z'),
-    updatedAt: new Date('2024-01-15T10:00:00Z'),
+    bill_id: 1,
+    analysis_type: 'legal' as const,
+    created_at: new Date('2024-01-15T10:00:00Z'),
+    updated_at: new Date('2024-01-15T10:00:00Z'),
     ...overrides,
-  });
+   });
 
   beforeEach(() => {
     // Create a fresh instance before each test to ensure test isolation

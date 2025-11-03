@@ -6,7 +6,7 @@ interface VerificationRule {
   id: string;
   name: string;
   description: string;
-  entityType: 'bill' | 'stakeholder' | 'committee' | 'vote' | 'amendment';
+  entity_type: 'bill' | 'stakeholder' | 'committee' | 'vote' | 'amendment';
   requiredFields: string[];
   conditionalChecks?: Array<{
     condition: string;
@@ -17,8 +17,8 @@ interface VerificationRule {
 }
 
 interface VerificationResult {
-  entityId: string;
-  entityType: string;
+  entity_id: string;
+  entity_type: string;
   overallCompleteness: number; // 0-100 percentage
   missingFields: string[];
   incompleteFields: Array<{
@@ -31,7 +31,7 @@ interface VerificationResult {
     fieldsProvided: string[];
     reliability: number; // 0-100 percentage
   }>;
-  verifiedAt: string;
+  verified_at: string;
   recommendations: Array<{
     field: string;
     action: string;
@@ -55,12 +55,12 @@ export class DataCompletenessService {
       id: 'bill-basic-info',
       name: 'Bill Basic Information',
       description: 'Verifies essential information about a bill is present',
-      entityType: 'bill',
+      entity_type: 'bill',
       requiredFields: [
         'title',
-        'billNumber',
+        'bill_number',
         'status',
-        'introducedDate',
+        'introduced_date',
         'summary',
         'primarySponsor',
       ],
@@ -70,8 +70,8 @@ export class DataCompletenessService {
       id: 'bill-content',
       name: 'Bill Content Verification',
       description: 'Verifies the bill text and related content is complete',
-      entityType: 'bill',
-      requiredFields: ['fullText', 'sections', 'amendments'],
+      entity_type: 'bill',
+      requiredFields: ['full_text', 'sections', 'amendments'],
       conditionalChecks: [
         {
           condition: 'status !== "draft"',
@@ -84,7 +84,7 @@ export class DataCompletenessService {
       id: 'stakeholder-info',
       name: 'Stakeholder Information',
       description: 'Verifies stakeholder data is complete',
-      entityType: 'stakeholder',
+      entity_type: 'stakeholder',
       requiredFields: ['name', 'type', 'position', 'influence', 'contactInformation'],
       minimumCompleteness: 80,
     },
@@ -92,35 +92,33 @@ export class DataCompletenessService {
       id: 'committee-info',
       name: 'Committee Information',
       description: 'Verifies committee data is complete',
-      entityType: 'committee',
+      entity_type: 'committee',
       requiredFields: ['name', 'jurisdiction', 'members', 'chairperson', 'meetingSchedule'],
       minimumCompleteness: 85,
     },
-    {
-      id: 'vote-record',
+    { id: 'vote-record',
       name: 'Vote Record Verification',
       description: 'Verifies voting record data is complete',
-      entityType: 'vote',
+      entity_type: 'vote',
       requiredFields: [
         'date',
-        'billId',
+        'bill_id',
         'chamber',
-        'voteType',
+        'vote_type',
         'result',
         'votesFor',
         'votesAgainst',
         'abstentions',
       ],
       minimumCompleteness: 95,
-    },
-    {
-      id: 'amendment-info',
+     },
+    { id: 'amendment-info',
       name: 'Amendment Information',
       description: 'Verifies amendment data is complete',
-      entityType: 'amendment',
+      entity_type: 'amendment',
       requiredFields: [
         'amendmentId',
-        'billId',
+        'bill_id',
         'proposedBy',
         'dateProposed',
         'status',
@@ -128,38 +126,38 @@ export class DataCompletenessService {
         'changeDescription',
       ],
       minimumCompleteness: 90,
-    },
+     },
   ];
 
   /**
    * Verifies the completeness of a specific entity
    */
-  async verifyEntity(entityType: string, entityId: string): Promise<VerificationResult> {
+  async verifyEntity(entity_type: string, entity_id: string): Promise<VerificationResult> {
     // Get applicable rules for this entity type
-    const rules = this.verificationRules.filter(rule => rule.entityType === entityType);
+    const rules = this.verificationRules.filter(rule => rule.entity_type === entity_type);
 
     if (rules.length === 0) {
-      throw new Error(`No verification rules defined for entity type: ${entityType}`);
+      throw new Error(`No verification rules defined for entity type: ${entity_type}`);
     }
 
     // Fetch entity data
-    const entityData = await this.fetchEntityData(entityType, entityId);
+    const entityData = await this.fetchEntityData(entity_type, entity_id);
     if (!entityData) {
-      throw new Error(`Entity not found: ${entityType} ${entityId}`);
+      throw new Error(`Entity not found: ${entity_type} ${entity_id}`);
     }
 
     // Fetch data sources information
-    const dataSources = await this.fetchDataSources(entityType, entityId);
+    const dataSources = await this.fetchDataSources(entity_type, entity_id);
 
     // Initialize verification result
     const result: VerificationResult = {
-      entityId,
-      entityType,
+      entity_id,
+      entity_type,
       overallCompleteness: 0,
       missingFields: [],
       incompleteFields: [],
       dataSources,
-      verifiedAt: new Date().toISOString(),
+      verified_at: new Date().toISOString(),
       recommendations: [],
     };
 
@@ -185,7 +183,7 @@ export class DataCompletenessService {
             field,
             action: 'Collect missing data',
             priority: this.determinePriority(field, rule),
-            potentialSources: this.suggestDataSources(field, entityType),
+            potentialSources: this.suggestDataSources(field, entity_type),
           });
         } else if (this.isFieldIncomplete(field, entityData[field])) {
           // Field exists but is incomplete
@@ -204,7 +202,7 @@ export class DataCompletenessService {
               field,
               action: 'Enhance existing data',
               priority: completeness < 40 ? 'high' : 'medium',
-              potentialSources: this.suggestDataSources(field, entityType),
+              potentialSources: this.suggestDataSources(field, entity_type),
             });
           }
         } else {
@@ -233,7 +231,7 @@ export class DataCompletenessService {
                   field,
                   action: 'Collect conditional data',
                   priority: this.determinePriority(field, rule),
-                  potentialSources: this.suggestDataSources(field, entityType),
+                  potentialSources: this.suggestDataSources(field, entity_type),
                 });
               } else if (this.isFieldIncomplete(field, entityData[field])) {
                 const completeness = this.calculateFieldCompleteness(field, entityData[field]);
@@ -250,7 +248,7 @@ export class DataCompletenessService {
                     field,
                     action: 'Enhance conditional data',
                     priority: completeness < 40 ? 'high' : 'medium',
-                    potentialSources: this.suggestDataSources(field, entityType),
+                    potentialSources: this.suggestDataSources(field, entity_type),
                   });
                 }
               } else {
@@ -275,24 +273,24 @@ export class DataCompletenessService {
   /**
    * Fetches entity data from the appropriate source
    */
-  private async fetchEntityData(entityType: string, entityId: string): Promise<any> {
+  private async fetchEntityData(entity_type: string, entity_id: string): Promise<any> {
     // Define API endpoints for different entity types
     const endpoints: Record<string, string> = {
-      bill: `/api/bills/${entityId}`,
-      stakeholder: `/api/stakeholders/${entityId}`,
-      committee: `/api/committees/${entityId}`,
-      vote: `/api/votes/${entityId}`,
-      amendment: `/api/amendments/${entityId}`,
+      bill: `/api/bills/${entity_id}`,
+      stakeholder: `/api/stakeholders/${entity_id}`,
+      committee: `/api/committees/${entity_id}`,
+      vote: `/api/votes/${entity_id}`,
+      amendment: `/api/amendments/${entity_id}`,
     };
 
-    const endpoint = endpoints[entityType];
+    const endpoint = endpoints[entity_type];
     if (!endpoint) {
-      throw new Error(`Unknown entity type: ${entityType}`);
+      throw new Error(`Unknown entity type: ${entity_type}`);
     }
 
     try {
       // Check cache first
-      const cachedData = await cache.get(`entity:${entityType}:${entityId}`);
+      const cachedData = await cache.get(`entity:${entity_type}:${entity_id}`);
       if (cachedData) {
         return JSON.parse(cachedData);
       }
@@ -302,11 +300,11 @@ export class DataCompletenessService {
       const data = await response.json();
 
       // Cache the result
-      await cache.set(`entity:${entityType}:${entityId}`, JSON.stringify(data), 3600); // 1 hour
+      await cache.set(`entity:${entity_type}:${entity_id}`, JSON.stringify(data), 3600); // 1 hour
 
       return data;
     } catch (error) {
-      logger.error('Failed to fetch entity data', { entityType, entityId, error });
+      logger.error('Failed to fetch entity data', { entity_type, entity_id, error });
       return null;
     }
   }
@@ -315,14 +313,14 @@ export class DataCompletenessService {
    * Fetches information about data sources for this entity
    */
   private async fetchDataSources(
-    entityType: string,
-    entityId: string,
+    entity_type: string,
+    entity_id: string,
   ): Promise<VerificationResult['dataSources']> {
     try {
-      const response = await apiRequest('GET', `/api/data-sources/${entityType}/${entityId}`);
+      const response = await apiRequest('GET', `/api/data-sources/${entity_type}/${entity_id}`);
       return await response.json();
     } catch (error) {
-      logger.error('Failed to fetch data sources', { entityType, entityId, error });
+      logger.error('Failed to fetch data sources', { entity_type, entity_id, error });
       return [];
     }
   }
@@ -346,7 +344,7 @@ export class DataCompletenessService {
     // Field-specific checks
     switch (field) {
       case 'summary':
-      case 'fullText':
+      case 'full_text':
         return typeof value === 'string' && value.length < 100;
 
       case 'sections':
@@ -395,7 +393,7 @@ export class DataCompletenessService {
         // Longer summaries are considered more complete up to a point
         return Math.min(100, Math.max(0, (value.length / 500) * 100));
 
-      case 'fullText':
+      case 'full_text':
         if (typeof value !== 'string') return 0;
         // Longer texts are considered more complete up to a point
         return Math.min(100, Math.max(0, (value.length / 5000) * 100));
@@ -468,7 +466,7 @@ export class DataCompletenessService {
         }
         break;
 
-      case 'introducedDate':
+      case 'introduced_date':
         try {
           const date = new Date(value);
           const now = new Date();
@@ -541,13 +539,13 @@ export class DataCompletenessService {
     // Field-specific priority assignments
     const highPriorityFields = [
       'title',
-      'billNumber',
+      'bill_number',
       'status',
-      'fullText',
+      'full_text',
       'votesFor',
       'votesAgainst',
     ];
-    const mediumPriorityFields = ['summary', 'introducedDate', 'primarySponsor', 'amendments'];
+    const mediumPriorityFields = ['summary', 'introduced_date', 'primarySponsor', 'amendments'];
 
     if (highPriorityFields.includes(field)) {
       return 'high';
@@ -563,15 +561,15 @@ export class DataCompletenessService {
   /**
    * Suggests potential data sources for a specific field
    */
-  private suggestDataSources(field: string, entityType: string): string[] {
+  private suggestDataSources(field: string, entity_type: string): string[] {
     // Field-specific source suggestions
     const fieldSources: Record<string, string[]> = {
       title: ['Official Government Gazette', 'Parliament Website', 'Legislative Database'],
-      billNumber: ['Official Government Gazette', 'Parliament Website', 'Legislative Database'],
+      bill_number: ['Official Government Gazette', 'Parliament Website', 'Legislative Database'],
       status: ['Parliament Website', 'Legislative Tracking System', 'Government Bulletin'],
-      introducedDate: ['Parliament Website', 'Legislative Calendar', 'Government Gazette'],
+      introduced_date: ['Parliament Website', 'Legislative Calendar', 'Government Gazette'],
       summary: ['Parliament Website', 'Legislative Digest', 'Committee Reports'],
-      fullText: ['Official Government Gazette', 'Parliament Website', 'National Archives'],
+      full_text: ['Official Government Gazette', 'Parliament Website', 'National Archives'],
       amendments: ['Committee Records', 'Parliament Website', 'Legislative Database'],
       stakeholders: ['Committee Hearings', 'Public Submissions', 'Lobbying Registry'],
       votes: ['Parliamentary Voting Records', 'Hansard', 'Committee Minutes'],
@@ -589,7 +587,7 @@ export class DataCompletenessService {
 
     // Combine field-specific and entity-specific sources
     const fieldSpecificSources = fieldSources[field] || [];
-    const entitySpecificSources = entitySources[entityType] || [];
+    const entitySpecificSources = entitySources[entity_type] || [];
 
     // Combine and deduplicate
     return Array.from(new Set([...fieldSpecificSources, ...entitySpecificSources]));
@@ -602,14 +600,14 @@ export class DataCompletenessService {
     try {
       await apiRequest('POST', '/internal/verification-results', result);
       logger.info('Stored verification result', {
-        entityType: result.entityType,
-        entityId: result.entityId,
+        entity_type: result.entity_type,
+        entity_id: result.entity_id,
         completeness: result.overallCompleteness,
       });
     } catch (error) {
       logger.error('Failed to store verification result', {
-        entityType: result.entityType,
-        entityId: result.entityId,
+        entity_type: result.entity_type,
+        entity_id: result.entity_id,
         error,
       });
     }
@@ -619,17 +617,17 @@ export class DataCompletenessService {
    * Verifies multiple entities of the same type
    */
   async verifyMultipleEntities(
-    entityType: string,
-    entityIds: string[],
+    entity_type: string,
+    entity_ids: string[],
   ): Promise<VerificationResult[]> {
     const results: VerificationResult[] = [];
 
-    for (const entityId of entityIds) {
+    for (const entity_id of entity_ids) {
       try {
-        const result = await this.verifyEntity(entityType, entityId);
+        const result = await this.verifyEntity(entity_type, entity_id);
         results.push(result);
       } catch (error) {
-        logger.error('Failed to verify entity', { entityType, entityId, error });
+        logger.error('Failed to verify entity', { entity_type, entity_id, error });
       }
     }
 
@@ -639,15 +637,15 @@ export class DataCompletenessService {
   /**
    * Generates a data completeness report for a collection of entities
    */
-  async generateCompletenessReport(entityType: string): Promise<any> {
+  async generateCompletenessReport(entity_type: string): Promise<any> {
     try {
       // Fetch all entities of this type
-      const response = await apiRequest('GET', `/api/${entityType}s`);
+      const response = await apiRequest('GET', `/api/${entity_type}s`);
       const entities = await response.json();
 
       // Verify each entity
-      const entityIds = entities.map((entity: any) => entity.id);
-      const verificationResults = await this.verifyMultipleEntities(entityType, entityIds);
+      const entity_ids = entities.map((entity: any) => entity.id);
+      const verificationResults = await this.verifyMultipleEntities(entity_type, entity_ids);
 
       // Calculate overall statistics
       const totalEntities = verificationResults.length;
@@ -681,7 +679,7 @@ export class DataCompletenessService {
 
       // Generate report
       return {
-        entityType,
+        entity_type,
         totalEntities,
         averageCompleteness,
         completeEntities,
@@ -689,10 +687,10 @@ export class DataCompletenessService {
         incompleteEntities,
         commonMissingFields: commonMissingFields.slice(0, 10), // Top 10 missing fields
         generatedAt: new Date().toISOString(),
-        recommendations: this.generateReportRecommendations(commonMissingFields, entityType),
+        recommendations: this.generateReportRecommendations(commonMissingFields, entity_type),
       };
     } catch (error) {
-      logger.error('Failed to generate completeness report', { entityType, error });
+      logger.error('Failed to generate completeness report', { entity_type, error });
       throw error;
     }
   }
@@ -702,7 +700,7 @@ export class DataCompletenessService {
    */
   private generateReportRecommendations(
     commonMissingFields: Array<{ field: string; count: number; percentage: number }>,
-    entityType: string,
+    entity_type: string,
   ): Array<{
     action: string;
     priority: 'low' | 'medium' | 'high';
@@ -723,16 +721,16 @@ export class DataCompletenessService {
         recommendations.push({
           action: `Implement systematic data collection for "${field}"`,
           priority: 'high',
-          rationale: `Missing in ${Math.round(percentage)}% of ${entityType} records`,
-          potentialSources: this.suggestDataSources(field, entityType),
+          rationale: `Missing in ${Math.round(percentage)}% of ${entity_type} records`,
+          potentialSources: this.suggestDataSources(field, entity_type),
         });
       } else if (percentage >= 20) {
         // Medium priority if missing in 20-50% of entities
         recommendations.push({
           action: `Enhance data collection for "${field}"`,
           priority: 'medium',
-          rationale: `Missing in ${Math.round(percentage)}% of ${entityType} records`,
-          potentialSources: this.suggestDataSources(field, entityType),
+          rationale: `Missing in ${Math.round(percentage)}% of ${entity_type} records`,
+          potentialSources: this.suggestDataSources(field, entity_type),
         });
       }
     }

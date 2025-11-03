@@ -74,41 +74,41 @@ describe('Authentication Flow Validation Tests', () => {
           email: `citizen-${Date.now()}@example.com`,
           name: 'Test Citizen',
           role: 'citizen',
-          passwordHash: 'hashed-password-citizen',
-          verificationStatus: 'verified',
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          password_hash: 'hashed-password-citizen',
+          verification_status: 'verified',
+          is_active: true,
+          created_at: new Date(),
+          updated_at: new Date()
         },
         {
           email: `admin-${Date.now()}@example.com`,
           name: 'Test Admin',
           role: 'admin',
-          passwordHash: 'hashed-password-admin',
-          verificationStatus: 'verified',
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          password_hash: 'hashed-password-admin',
+          verification_status: 'verified',
+          is_active: true,
+          created_at: new Date(),
+          updated_at: new Date()
         },
         {
           email: `unverified-${Date.now()}@example.com`,
           name: 'Test Unverified',
           role: 'citizen',
-          passwordHash: 'hashed-password-unverified',
-          verificationStatus: 'pending',
-          isActive: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          password_hash: 'hashed-password-unverified',
+          verification_status: 'pending',
+          is_active: true,
+          created_at: new Date(),
+          updated_at: new Date()
         },
         {
           email: `inactive-${Date.now()}@example.com`,
           name: 'Test Inactive',
           role: 'citizen',
-          passwordHash: 'hashed-password-inactive',
-          verificationStatus: 'verified',
-          isActive: false,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          password_hash: 'hashed-password-inactive',
+          verification_status: 'verified',
+          is_active: false,
+          created_at: new Date(),
+          updated_at: new Date()
         }
       ];
 
@@ -116,7 +116,7 @@ describe('Authentication Flow Validation Tests', () => {
         const user = await db.insert(users).values({
           ...userData,
           role: 'citizen' as const,
-          verificationStatus: 'verified' as const
+          verification_status: 'verified' as const
         }).returning();
         testUsers.push(user[0]);
         
@@ -126,8 +126,8 @@ describe('Authentication Flow Validation Tests', () => {
             id: user[0].id, 
             email: user[0].email, 
             role: user[0].role,
-            verificationStatus: user[0].verificationStatus,
-            isActive: user[0].isActive
+            verification_status: user[0].verification_status,
+            is_active: user[0].is_active
           },
           process.env.JWT_SECRET || 'test-secret',
           { expiresIn: '1h' }
@@ -157,7 +157,7 @@ describe('Authentication Flow Validation Tests', () => {
   async function cleanupTestAuthData() {
     try {
       for (const user of testUsers) {
-        await db.delete(users).where(eq(users.id, user.id));
+        await db.delete(users).where(eq(users.id, users.id));
       }
     } catch (error) {
       console.warn('Auth test data cleanup failed:', error);
@@ -170,8 +170,8 @@ describe('Authentication Flow Validation Tests', () => {
       const registrationData = {
         email: uniqueEmail,
         password: 'SecurePassword123!',
-        firstName: 'Test',
-        lastName: 'User',
+        first_name: 'Test',
+        last_name: 'User',
         name: 'Test User'
       };
 
@@ -185,8 +185,8 @@ describe('Authentication Flow Validation Tests', () => {
         expect(response.body).toHaveProperty('success', true);
         expect(response.body.data).toHaveProperty('user');
         expect(response.body.data).toHaveProperty('token');
-        expect(response.body.data.user.email).toBe(uniqueEmail);
-        expect(response.body.data.user).not.toHaveProperty('passwordHash');
+        expect(response.body.data.users.email).toBe(uniqueEmail);
+        expect(response.body.data.user).not.toHaveProperty('password_hash');
         
         // Cleanup
         const createdUser = await db.select().from(users).where(eq(users.email, uniqueEmail));
@@ -200,8 +200,8 @@ describe('Authentication Flow Validation Tests', () => {
       const registrationData = {
         email: 'invalid-email-format',
         password: 'SecurePassword123!',
-        firstName: 'Test',
-        lastName: 'User',
+        first_name: 'Test',
+        last_name: 'User',
         name: 'Test User'
       };
 
@@ -218,8 +218,8 @@ describe('Authentication Flow Validation Tests', () => {
       const registrationData = {
         email: `weak-password-${Date.now()}@example.com`,
         password: '123',
-        firstName: 'Test',
-        lastName: 'User',
+        first_name: 'Test',
+        last_name: 'User',
         name: 'Test User'
       };
 
@@ -241,8 +241,8 @@ describe('Authentication Flow Validation Tests', () => {
       const registrationData = {
         email: existingEmail,
         password: 'SecurePassword123!',
-        firstName: 'Duplicate',
-        lastName: 'User',
+        first_name: 'Duplicate',
+        last_name: 'User',
         name: 'Duplicate User'
       };
 
@@ -289,7 +289,7 @@ describe('Authentication Flow Validation Tests', () => {
         expect(response.body).toHaveProperty('success', true);
         expect(response.body.data).toHaveProperty('user');
         expect(response.body.data).toHaveProperty('token');
-        expect(response.body.data.user.email).toBe(testUsers[0].email);
+        expect(response.body.data.users.email).toBe(testUsers[0].email);
       }
     });
 
@@ -324,7 +324,7 @@ describe('Authentication Flow Validation Tests', () => {
     });
 
     it('should reject login for inactive users', async () => {
-      const inactiveUser = testUsers.find(u => !u.isActive);
+      const inactiveUser = testUsers.find(u => !u.is_active);
       if (inactiveUser) {
         const loginData = {
           email: inactiveUser.email,
@@ -375,7 +375,7 @@ describe('Authentication Flow Validation Tests', () => {
       if (response.status === 200) {
         expect(response.body).toHaveProperty('success', true);
         expect(response.body.data).toHaveProperty('user');
-        expect(response.body.data.user.id).toBe(testUsers[0].id);
+        expect(response.body.data.users.id).toBe(testUsers[0].id);
       }
     });
 
@@ -679,15 +679,15 @@ describe('Authentication Flow Validation Tests', () => {
           .send({
             email: `xss-test-${Date.now()}@example.com`,
             password: 'SecurePassword123!',
-            firstName: payload,
-            lastName: 'User',
+            first_name: payload,
+            last_name: 'User',
             name: `${payload} User`
           });
 
         // Should either sanitize or reject
         if (response.status === 201 || response.status === 200) {
-          expect(response.body.data.user.firstName).not.toContain('<script>');
-          expect(response.body.data.user.name).not.toContain('<script>');
+          expect(response.body.data.users.first_name).not.toContain('<script>');
+          expect(response.body.data.users.name).not.toContain('<script>');
           
           // Cleanup if user was created
           const createdUser = await db.select().from(users)
@@ -714,8 +714,8 @@ describe('Authentication Flow Validation Tests', () => {
           .send({
             email: `weak-${Date.now()}-${Math.random()}@example.com`,
             password: weakPassword,
-            firstName: 'Test',
-            lastName: 'User',
+            first_name: 'Test',
+            last_name: 'User',
             name: 'Test User'
           });
 
@@ -749,8 +749,8 @@ describe('Authentication Flow Validation Tests', () => {
         .send({
           email: `${longString}@example.com`,
           password: longString,
-          firstName: longString,
-          lastName: longString,
+          first_name: longString,
+          last_name: longString,
           name: longString
         });
 
@@ -766,8 +766,8 @@ describe('Authentication Flow Validation Tests', () => {
         .send({
           email: `special-${Date.now()}@example.com`,
           password: `Secure${specialChars}123`,
-          firstName: `Test${specialChars}`,
-          lastName: 'User',
+          first_name: `Test${specialChars}`,
+          last_name: 'User',
           name: `Test${specialChars} User`
         });
 

@@ -49,6 +49,8 @@ import { cacheCoordinator } from './infrastructure/cache/index.js';
 import { router as externalApiManagementRouter } from './infrastructure/monitoring/external-api-management.js';
 import { router as externalApiDashboardRouter } from './features/admin/external-api-dashboard.js';
 import coverageRouter from './features/coverage/coverage-routes.js';
+import { constitutionalAnalysisRouter } from './features/constitutional-analysis/presentation/constitutional-analysis-router.js';
+import { argumentIntelligenceRouter } from './features/argument-intelligence/presentation/argument-intelligence-router.js';
 // Import migrated middleware
 import {
   migratedAuthenticateToken,
@@ -99,7 +101,7 @@ const securityMonitoringMiddleware = {
   initializeAll: () => (req: any, res: any, next: any) => {
     logger.debug('Security monitoring', {
       ip: req.ip,
-      userAgent: req.get('User-Agent'),
+      user_agent: req.get('User-Agent'),
       path: req.path,
       method: req.method
     });
@@ -264,7 +266,9 @@ app.get('/api', (req, res) => {
       auth: "/api/auth",
       users: "/api/users",
       verification: "/api/verification",
-      community: "/api/community"
+      community: "/api/community",
+      "constitutional-analysis": "/api/constitutional-analysis",
+      "argument-intelligence": "/api/argument-intelligence"
     }
   });
 });
@@ -403,6 +407,8 @@ app.use('/api/admin/external-api', externalApiDashboardRouter);
 // TODO: Implement security monitoring router
 // app.use('/api/security', securityMonitoringRouter);
 app.use('/api/coverage', coverageRouter);
+app.use('/api/constitutional-analysis', constitutionalAnalysisRouter);
+app.use('/api/argument-intelligence', argumentIntelligenceRouter);
 
 // Swagger API documentation
 // app.use('/api-docs', serveSwagger, setupSwagger);

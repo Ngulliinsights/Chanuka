@@ -18,8 +18,8 @@ export interface AlertRule {
   actions: AlertAction[];
   cooldown: number; // minutes
   lastTriggered?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface AlertAction {
@@ -59,15 +59,15 @@ class AlertingService {
   /**
    * Add a new alert rule
    */
-  addAlertRule(rule: Omit<AlertRule, 'id' | 'createdAt' | 'updatedAt'>): string {
+  addAlertRule(rule: Omit<AlertRule, 'id' | 'created_at' | 'updated_at'>): string {
     const ruleId = `rule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const now = new Date();
     
     const alertRule: AlertRule = {
       ...rule,
       id: ruleId,
-      createdAt: now,
-      updatedAt: now
+      created_at: now,
+      updated_at: now
     };
 
     this.alertRules.set(ruleId, alertRule);
@@ -82,7 +82,7 @@ class AlertingService {
     const rule = this.alertRules.get(ruleId);
     if (!rule) return false;
 
-    Object.assign(rule, updates, { updatedAt: new Date() });
+    Object.assign(rule, updates, { updated_at: new Date() });
     console.log(`[Alerting] Updated alert rule: ${rule.name}`);
     return true;
   }

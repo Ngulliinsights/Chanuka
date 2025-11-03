@@ -24,7 +24,7 @@ export interface StatsDConfig {
 
 export class EnhancedStatsDExporter {
   public readonly name = 'statsd';
-  public readonly contentType = 'text/plain';
+  public readonly content_type = 'text/plain';
 
   private config: Required<StatsDConfig>;
   private buffer: string[] = [];

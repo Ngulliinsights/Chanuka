@@ -9,9 +9,9 @@ export interface User {
   isProfileComplete: boolean;
   roles: string[];
   preferences: UserPreferences;
-  verificationStatus: VerificationStatus;
-  createdAt: string;
-  updatedAt: string;
+  verification_status: VerificationStatus;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface UserProfile {
@@ -25,7 +25,7 @@ export interface UserProfile {
   interests: string[];
   expertise: string[];
   socialLinks: SocialLinks;
-  privacySettings: PrivacySettings;
+  privacy_settings: PrivacySettings;
   notificationPreferences: NotificationPreferences;
 }
 
@@ -45,7 +45,7 @@ export interface VerificationStatus {
   expert: VerificationLevel;
   documents: VerificationDocument[];
   lastVerifiedAt?: string;
-  expiresAt?: string;
+  expires_at?: string;
 }
 
 export interface VerificationDocument {

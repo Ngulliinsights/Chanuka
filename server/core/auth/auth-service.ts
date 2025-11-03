@@ -4,24 +4,24 @@ import * as crypto from 'crypto';
 import { eq, and } from 'drizzle-orm';
 import { readDatabase } from '../../../shared/database/connection.js';
 const db = readDatabase;
-import { user as users, session as sessions, passwordReset as passwordResets, type User } from '../../../shared/schema';
+import { users as users, session as sessions, passwordReset as passwordResets, type User } from '../../../shared/schema';
 import { getEmailService } from '../../infrastructure/notifications/email-service';
 import { encryptionService } from '../../features/security/encryption-service.js';
 import { inputValidationService } from '../validation/input-validation-service.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
 import { Request, Response } from 'express';
 import { z } from 'zod';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger } from '../../../shared/core/src/index.js';
 
 // Validation schemas
 export const registerSchema = z.object({
   email: z.string().email('Invalid email format'),
   password: z.string()
     .min(12, 'Password must be at least 12 characters')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, 
-           'Password must contain uppercase, lowercase, number, and special character'),
-  firstName: z.string().min(1, 'First name is required').max(50),
-  lastName: z.string().min(1, 'Last name is required').max(50),
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+      'Password must contain uppercase, lowercase, number, and special character'),
+  first_name: z.string().min(1, 'First name is required').max(50),
+  last_name: z.string().min(1, 'Last name is required').max(50),
   role: z.enum(['citizen', 'expert', 'journalist', 'advocate']).default('citizen'),
   expertise: z.array(z.string()).optional(),
   organization: z.string().optional()
@@ -40,8 +40,8 @@ export const passwordResetSchema = z.object({
   token: z.string().min(1, 'Reset token is required'),
   password: z.string()
     .min(12, 'Password must be at least 12 characters')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/, 
-           'Password must contain uppercase, lowercase, number, and special character')
+    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/,
+      'Password must contain uppercase, lowercase, number, and special character')
 });
 
 export interface AuthResult {
@@ -49,12 +49,12 @@ export interface AuthResult {
   user?: {
     id: string;
     email: string;
-    firstName: string | null;
-    lastName: string | null;
+    first_name: string | null;
+    last_name: string | null;
     name: string;
     role: string;
-    verificationStatus: string;
-    isActive: boolean | null;
+    verification_status: string;
+    is_active: boolean | null;
   };
   token?: string;
   refreshToken?: string;
@@ -64,11 +64,11 @@ export interface AuthResult {
 
 export interface SessionInfo {
   id: string;
-  userId: string;
+  user_id: string;
   token: string;
   refreshToken: string;
-  expiresAt: Date;
-  refreshTokenExpiresAt: Date;
+  expires_at: Date;
+  refresh_token_expires_at: Date;
 }
 
 export class AuthService {
@@ -129,7 +129,7 @@ export class AuthService {
       }
 
       // Hash password with enhanced security
-      const passwordHash = await encryptionService.hashPassword(validatedData.password);
+      const password_hash = await encryptionService.hashPassword(validatedData.password);
 
       // Generate email verification token
       const verificationToken = crypto.randomBytes(32).toString('hex');
@@ -139,13 +139,13 @@ export class AuthService {
         .insert(users)
         .values({
           email: validatedData.email,
-          passwordHash,
-          firstName: validatedData.firstName,
-          lastName: validatedData.lastName,
-          name: `${validatedData.firstName} ${validatedData.lastName}`.trim(),
+          password_hash,
+          first_name: validatedData.first_name,
+          last_name: validatedData.last_name,
+          name: `${validatedData.first_name} ${validatedData.last_name}`.trim(),
           role: validatedData.role,
-          verificationStatus: 'pending',
-          isActive: true,
+          verification_status: 'pending',
+          is_active: true,
           preferences: {
             emailNotifications: true,
             emailVerificationToken: verificationToken,
@@ -160,7 +160,7 @@ export class AuthService {
         to: validatedData.email,
         subject: 'Verify your email address',
         html: `
-          <h2>Welcome ${validatedData.firstName}!</h2>
+          <h2>Welcome ${validatedData.first_name}!</h2>
           <p>Please verify your email address by clicking the link below:</p>
           <a href="${process.env.BASE_URL || 'http://localhost:3000'}/verify-email?token=${verificationToken}">Verify Email</a>
           <p>This link will expire in 24 hours.</p>
@@ -178,12 +178,12 @@ export class AuthService {
         user: {
           id: newUser[0].id,
           email: newUser[0].email,
-          firstName: newUser[0].firstName,
-          lastName: newUser[0].lastName,
+          first_name: newUser[0].first_name,
+          last_name: newUser[0].last_name,
           name: newUser[0].name,
           role: newUser[0].role,
-          verificationStatus: newUser[0].verificationStatus,
-          isActive: newUser[0].isActive
+          verification_status: newUser[0].verification_status,
+          is_active: newUser[0].is_active
         },
         token,
         refreshToken,
@@ -191,10 +191,10 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Registration error:', { 
+      logger.error('Registration error:', {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-        component: 'Chanuka' 
+        component: 'Chanuka'
       });
       if (error instanceof z.ZodError) {
         return {
@@ -220,7 +220,7 @@ export class AuthService {
         .where(eq(users.preferences, { emailVerificationToken: token }))
         .limit(1);
 
-      if (user.length === 0) {
+      if (users.length === 0) {
         return {
           success: false,
           error: 'Invalid verification token'
@@ -242,7 +242,7 @@ export class AuthService {
       await db
         .update(users)
         .set({
-          verificationStatus: 'verified',
+          verification_status: 'verified',
           preferences: {
             ...preferences,
             emailVerificationToken: null,
@@ -257,20 +257,20 @@ export class AuthService {
         user: {
           id: userData.id,
           email: userData.email,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
           name: userData.name,
           role: userData.role,
-          verificationStatus: 'verified',
-          isActive: userData.isActive
+          verification_status: 'verified',
+          is_active: userData.is_active
         }
       };
 
     } catch (error) {
-      logger.error('Email verification error:', { 
+      logger.error('Email verification error:', {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-        component: 'Chanuka' 
+        component: 'Chanuka'
       });
       return {
         success: false,
@@ -294,7 +294,7 @@ export class AuthService {
         .where(eq(users.email, validatedData.email))
         .limit(1);
 
-      if (user.length === 0) {
+      if (users.length === 0) {
         return {
           success: false,
           error: 'Invalid credentials'
@@ -304,7 +304,7 @@ export class AuthService {
       const userData = user[0];
 
       // Check if user is active
-      if (!userData.isActive) {
+      if (!userData.is_active) {
         return {
           success: false,
           error: 'Account is deactivated'
@@ -312,7 +312,7 @@ export class AuthService {
       }
 
       // Verify password
-      const isValidPassword = await bcrypt.compare(validatedData.password, userData.passwordHash);
+      const isValidPassword = await bcrypt.compare(validatedData.password, userData.password_hash);
       if (!isValidPassword) {
         return {
           success: false,
@@ -323,7 +323,7 @@ export class AuthService {
       // Update last login
       await db
         .update(users)
-        .set({ lastLoginAt: new Date() })
+        .set({ last_login_at: new Date() })
         .where(eq(users.id, userData.id));
 
       // Generate tokens
@@ -337,22 +337,22 @@ export class AuthService {
         user: {
           id: userData.id,
           email: userData.email,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
           name: userData.name,
           role: userData.role,
-          verificationStatus: userData.verificationStatus,
-          isActive: userData.isActive
+          verification_status: userData.verification_status,
+          is_active: userData.is_active
         },
         token,
         refreshToken
       };
 
     } catch (error) {
-      logger.error('Login error:', { 
+      logger.error('Login error:', {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-        component: 'Chanuka' 
+        component: 'Chanuka'
       });
       if (error instanceof z.ZodError) {
         return {
@@ -375,15 +375,15 @@ export class AuthService {
       // Invalidate session
       await db
         .update(sessions)
-        .set({ isActive: false })
+        .set({ is_active: false })
         .where(eq(sessions.token, token));
 
       return { success: true };
     } catch (error) {
-      logger.error('Logout error:', { 
+      logger.error('Logout error:', {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-        component: 'Chanuka' 
+        component: 'Chanuka'
       });
       return {
         success: false,
@@ -405,8 +405,8 @@ export class AuthService {
         .select()
         .from(sessions)
         .where(and(
-          eq(sessions.refreshTokenHash, this.hashToken(refreshToken)),
-          eq(sessions.isActive, true)
+          eq(sessions.refresh_token_hash, this.hashToken(refreshToken)),
+          eq(sessions.is_active, true)
         ))
         .limit(1);
 
@@ -420,11 +420,11 @@ export class AuthService {
       const sessionData = session[0];
 
       // Check if refresh token is expired
-      if (new Date() > sessionData.refreshTokenExpiresAt!) {
+      if (new Date() > sessionData.refresh_token_expires_at!) {
         // Invalidate session
         await db
           .update(sessions)
-          .set({ isActive: false })
+          .set({ is_active: false })
           .where(eq(sessions.id, sessionData.id));
 
         return {
@@ -437,10 +437,10 @@ export class AuthService {
       const user = await db
         .select()
         .from(users)
-        .where(eq(users.id, sessionData.userId))
+        .where(eq(users.id, sessionData.user_id))
         .limit(1);
 
-      if (user.length === 0 || !user[0].isActive) {
+      if (users.length === 0 || !user[0].is_active) {
         return {
           success: false,
           error: 'User not found or inactive'
@@ -460,10 +460,10 @@ export class AuthService {
         .update(sessions)
         .set({
           token: newToken,
-          refreshTokenHash: this.hashToken(newRefreshToken),
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-          refreshTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-          updatedAt: new Date()
+          refresh_token_hash: this.hashToken(newRefreshToken),
+          expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+          refresh_token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+          updated_at: new Date()
         })
         .where(eq(sessions.id, sessionData.id));
 
@@ -472,22 +472,22 @@ export class AuthService {
         user: {
           id: userData.id,
           email: userData.email,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
           name: userData.name,
           role: userData.role,
-          verificationStatus: userData.verificationStatus,
-          isActive: userData.isActive
+          verification_status: userData.verification_status,
+          is_active: userData.is_active
         },
         token: newToken,
         refreshToken: newRefreshToken
       };
 
     } catch (error) {
-      logger.error('Token refresh error:', { 
+      logger.error('Token refresh error:', {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-        component: 'Chanuka' 
+        component: 'Chanuka'
       });
       return {
         success: false,
@@ -510,7 +510,7 @@ export class AuthService {
         .where(eq(users.email, validatedData.email))
         .limit(1);
 
-      if (user.length === 0) {
+      if (users.length === 0) {
         // Don't reveal if email exists or not
         return { success: true };
       }
@@ -525,9 +525,9 @@ export class AuthService {
       await db
         .insert(passwordResets)
         .values({
-          userId: userData.id,
+          user_id: userData.id,
           tokenHash,
-          expiresAt: new Date(Date.now() + 60 * 60 * 1000) // 1 hour
+          expires_at: new Date(Date.now() + 60 * 60 * 1000) // 1 hour
         });
 
       // Send reset email
@@ -537,7 +537,7 @@ export class AuthService {
         subject: 'Password Reset Request',
         html: `
           <h2>Password Reset</h2>
-          <p>Hello ${userData.firstName || 'User'},</p>
+          <p>Hello ${userData.first_name || 'User'},</p>
           <p>You requested a password reset. Click the link below to reset your password:</p>
           <a href="${process.env.BASE_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}">Reset Password</a>
           <p>This link will expire in 1 hour.</p>
@@ -548,10 +548,10 @@ export class AuthService {
       return { success: true };
 
     } catch (error) {
-      logger.error('Password reset request error:', { 
+      logger.error('Password reset request error:', {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-        component: 'Chanuka' 
+        component: 'Chanuka'
       });
       if (error instanceof z.ZodError) {
         return {
@@ -593,7 +593,7 @@ export class AuthService {
       const resetData = resetRecord[0];
 
       // Check if token is expired
-      if (new Date() > resetData.expiresAt) {
+      if (new Date() > resetData.expires_at) {
         // Clean up expired token
         await db
           .delete(passwordResets)
@@ -606,13 +606,13 @@ export class AuthService {
       }
 
       // Hash new password
-      const passwordHash = await bcrypt.hash(validatedData.password, 12);
+      const password_hash = await bcrypt.hash(validatedData.password, 12);
 
       // Update user password
       await db
         .update(users)
-        .set({ passwordHash })
-        .where(eq(users.id, resetData.userId));
+        .set({ password_hash })
+        .where(eq(users.id, resetData.user_id));
 
       // Delete used reset token
       await db
@@ -622,17 +622,17 @@ export class AuthService {
       // Invalidate all user sessions for security
       await db
         .update(sessions)
-        .set({ isActive: false })
-        .where(eq(sessions.userId, resetData.userId));
+        .set({ is_active: false })
+        .where(eq(sessions.user_id, resetData.user_id));
 
       // Get user data for notification
       const user = await db
         .select()
         .from(users)
-        .where(eq(users.id, resetData.userId))
+        .where(eq(users.id, resetData.user_id))
         .limit(1);
 
-      if (user.length > 0) {
+      if (users.length > 0) {
         // Send password change notification
         const emailService = await getEmailService();
         await emailService.sendEmail({
@@ -640,7 +640,7 @@ export class AuthService {
           subject: 'Password Changed Successfully',
           html: `
             <h2>Password Changed</h2>
-            <p>Hello ${user[0].firstName || 'User'},</p>
+            <p>Hello ${user[0].first_name || 'User'},</p>
             <p>Your password has been successfully changed.</p>
             <p>If you didn't make this change, please contact support immediately.</p>
           `
@@ -650,10 +650,10 @@ export class AuthService {
       return { success: true };
 
     } catch (error) {
-      logger.error('Password reset error:', { 
+      logger.error('Password reset error:', {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-        component: 'Chanuka' 
+        component: 'Chanuka'
       });
       if (error instanceof z.ZodError) {
         return {
@@ -681,7 +681,7 @@ export class AuthService {
         .from(sessions)
         .where(and(
           eq(sessions.token, token),
-          eq(sessions.isActive, true)
+          eq(sessions.is_active, true)
         ))
         .limit(1);
 
@@ -693,10 +693,10 @@ export class AuthService {
       }
 
       // Check if session is expired
-      if (new Date() > session[0].expiresAt) {
+      if (new Date() > session[0].expires_at) {
         await db
           .update(sessions)
-          .set({ isActive: false })
+          .set({ is_active: false })
           .where(eq(sessions.id, session[0].id));
 
         return {
@@ -709,10 +709,10 @@ export class AuthService {
       const user = await db
         .select()
         .from(users)
-        .where(eq(users.id, decoded.userId))
+        .where(eq(users.id, decoded.user_id))
         .limit(1);
 
-      if (user.length === 0 || !user[0].isActive) {
+      if (users.length === 0 || !user[0].is_active) {
         return {
           success: false,
           error: 'User not found or inactive'
@@ -726,12 +726,12 @@ export class AuthService {
         user: {
           id: userData.id,
           email: userData.email,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
           name: userData.name,
           role: userData.role,
-          verificationStatus: userData.verificationStatus,
-          isActive: userData.isActive
+          verification_status: userData.verification_status,
+          is_active: userData.is_active
         }
       };
 
@@ -747,15 +747,15 @@ export class AuthService {
   /**
    * Generate JWT and refresh tokens
    */
-  private async generateTokens(userId: string, email: string): Promise<{ token: string; refreshToken: string }> {
+  private async generateTokens(user_id: string, email: string): Promise<{ token: string; refreshToken: string }> {
     const token = jwt.sign(
-      { userId, email },
+      { user_id, email },
       this.jwtSecret,
       { expiresIn: '24h' }
     );
 
     const refreshToken = jwt.sign(
-      { userId, email, type: 'refresh' },
+      { user_id, email, type: 'refresh' },
       this.refreshTokenSecret,
       { expiresIn: '30d' }
     );
@@ -766,17 +766,17 @@ export class AuthService {
   /**
    * Create session record
    */
-  private async createSession(userId: string, token: string, refreshToken: string): Promise<void> {
+  private async createSession(user_id: string, token: string, refreshToken: string): Promise<void> {
     await db
       .insert(sessions)
       .values({
         id: crypto.randomUUID(),
-        userId,
+        user_id,
         token,
-        refreshTokenHash: this.hashToken(refreshToken),
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-        refreshTokenExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-        isActive: true
+        refresh_token_hash: this.hashToken(refreshToken),
+        expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+        refresh_token_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
+        is_active: true
       });
   }
 
@@ -797,9 +797,9 @@ export class AuthService {
       // Clean up expired sessions
       await db
         .update(sessions)
-        .set({ isActive: false })
+        .set({ is_active: false })
         .where(and(
-          eq(sessions.isActive, true),
+          eq(sessions.is_active, true),
           // Sessions where either access token or refresh token is expired
           // and refresh token is also expired (can't be renewed)
         ));
@@ -807,7 +807,7 @@ export class AuthService {
       // Clean up expired password reset tokens
       await db
         .delete(passwordResets)
-        .where(eq(passwordResets.expiresAt, now));
+        .where(eq(passwordResets.expires_at, now));
 
       logger.info('Expired tokens cleaned up successfully', { component: 'Chanuka' });
     } catch (error) {

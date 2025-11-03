@@ -24,17 +24,16 @@ export const checkDataProcessingConsent = (requiredConsent: keyof PrivacyRequest
         return next();
       }
 
-      const userId = req.user.id;
-      const preferences = await privacyService.getPrivacyPreferences(userId);
+      const user_id = req.users.id;
+      const preferences = await privacyService.getPrivacyPreferences(user_id);
       
       // Attach privacy consent to request
       req.privacyConsent = preferences.dataProcessing;
 
       // Check if user has given consent for the required processing
-      if (!preferences.dataProcessing[requiredConsent]) {
-        // Log the consent violation
+      if (!preferences.dataProcessing[requiredConsent]) { // Log the consent violation
         await auditLogger.log({
-          userId,
+          user_id,
           action: 'consent.violation.detected',
           resource: 'data_processing',
           details: {
@@ -42,9 +41,9 @@ export const checkDataProcessingConsent = (requiredConsent: keyof PrivacyRequest
             userConsent: preferences.dataProcessing,
             endpoint: req.originalUrl,
             method: req.method
-          },
-          ipAddress: req.ip || 'unknown',
-          userAgent: req.headers['user-agent'] || 'unknown',
+           },
+          ip_address: req.ip || 'unknown',
+          user_agent: req.headers['user-agent'] || 'unknown',
           severity: 'medium'
         });
 
@@ -77,8 +76,8 @@ export const checkDataSharingConsent = (requiredSharing: 'publicProfile' | 'shar
         return next();
       }
 
-      const userId = req.user.id;
-      const preferences = await privacyService.getPrivacyPreferences(userId);
+      const user_id = req.users.id;
+      const preferences = await privacyService.getPrivacyPreferences(user_id);
 
       // Check if user has given consent for the required sharing
       if (!preferences.dataSharing[requiredSharing]) {
@@ -103,15 +102,14 @@ export const checkDataSharingConsent = (requiredSharing: 'publicProfile' | 'shar
 /**
  * Middleware to log data access for audit purposes
  */
-export const logDataAccess = (dataType: string, sensitivityLevel: 'low' | 'medium' | 'high' = 'medium') => {
-  return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const logDataAccess = (dataType: string, sensitivityLevel: 'low' | 'medium' | 'high' = 'medium') => { return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
-      const userId = req.user?.id || 'anonymous';
+      const user_id = req.user?.id || 'anonymous';
       const startTime = Date.now();
 
       // Log the data access
       await auditLogger.log({
-        userId,
+        user_id,
         action: 'data.accessed',
         resource: dataType,
         details: {
@@ -120,21 +118,20 @@ export const logDataAccess = (dataType: string, sensitivityLevel: 'low' | 'mediu
           sensitivityLevel,
           query: req.query,
           params: req.params
-        },
-        ipAddress: req.ip || 'unknown',
-        userAgent: req.headers['user-agent'] || 'unknown',
+         },
+        ip_address: req.ip || 'unknown',
+        user_agent: req.headers['user-agent'] || 'unknown',
         severity: sensitivityLevel
       });
 
       // Add response time logging
       const originalSend = res.send;
-      res.send = function(data) {
-        const responseTime = Date.now() - startTime;
+      res.send = function(data) { const responseTime = Date.now() - startTime;
         
         // Log response details for high sensitivity data
         if (sensitivityLevel === 'high') {
           auditLogger.log({
-            userId,
+            user_id,
             action: 'data.response.sent',
             resource: dataType,
             details: {
@@ -142,9 +139,9 @@ export const logDataAccess = (dataType: string, sensitivityLevel: 'low' | 'mediu
               responseTime,
               statusCode: res.statusCode,
               dataSize: typeof data === 'string' ? data.length : JSON.stringify(data).length
-            },
-            ipAddress: req.ip || 'unknown',
-            userAgent: req.headers['user-agent'] || 'unknown',
+             },
+            ip_address: req.ip || 'unknown',
+            user_agent: req.headers['user-agent'] || 'unknown',
             severity: 'high'
           }).catch(console.error);
         }
@@ -180,15 +177,14 @@ export const enforceCookieConsent = (cookieType: 'analytics' | 'marketing' | 'pr
             code: 'COOKIE_CONSENT_REQUIRED'
           });
         }
-      } else if (req.user) {
-        // Check user's privacy preferences for authenticated users
-        const userId = req.user.id;
-        const preferences = await privacyService.getPrivacyPreferences(userId);
+      } else if (req.user) { // Check user's privacy preferences for authenticated users
+        const user_id = req.users.id;
+        const preferences = await privacyService.getPrivacyPreferences(user_id);
         
         if (!preferences.cookies[cookieType]) {
           return res.status(403).json({
             error: 'Cookie consent required',
-            message: `This operation requires consent for ${cookieType} cookies`,
+            message: `This operation requires consent for ${cookieType } cookies`,
             cookieType,
             currentConsent: preferences.cookies[cookieType],
             code: 'COOKIE_CONSENT_REQUIRED'
@@ -237,8 +233,8 @@ export const validateDataRetention = async (req: AuthenticatedRequest, res: Resp
       return next();
     }
 
-    const userId = req.user.id;
-    const preferences = await privacyService.getPrivacyPreferences(userId);
+    const user_id = req.users.id;
+    const preferences = await privacyService.getPrivacyPreferences(user_id);
     
     // Add retention preferences to request for use by other middleware/routes
     (req as any).dataRetentionPrefs = preferences.dataRetention;

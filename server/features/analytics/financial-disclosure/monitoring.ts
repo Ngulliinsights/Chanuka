@@ -85,7 +85,7 @@ export class FinancialDisclosureMonitoringService {
   private status: MonitoringStatus = {
     isRunning: false,
     lastCheckTime: null,
-    nextCheckTime: null,
+    next_checkTime: null,
     checksPerformed: 0,
     alertsGenerated: 0,
     errorsEncountered: 0
@@ -134,7 +134,7 @@ export class FinancialDisclosureMonitoringService {
         await this.performMonitoringCycle();
         this.status.checksPerformed++;
         this.status.lastCheckTime = new Date();
-        this.status.nextCheckTime = new Date(
+        this.status.next_checkTime = new Date(
           Date.now() + this.config.monitoring.dailyCheckInterval
         );
       } catch (error) {
@@ -194,7 +194,7 @@ export class FinancialDisclosureMonitoringService {
     }
 
     this.status.isRunning = false;
-    this.status.nextCheckTime = null;
+    this.status.next_checkTime = null;
     
     this.logger.info('Monitoring stopped successfully', {
       checksPerformed: this.status.checksPerformed,
@@ -237,12 +237,12 @@ export class FinancialDisclosureMonitoringService {
    * Retrieves sponsor information with validation and caching.
    * Throws SponsorNotFoundError if the sponsor doesn't exist.
    */
-  async getSponsorInfo(sponsorId: number): Promise<SponsorInfo> {
-    if (!sponsorId || sponsorId <= 0) {
+  async getSponsorInfo(sponsor_id: number): Promise<SponsorInfo> {
+    if (!sponsor_id || sponsor_id <= 0) {
       throw new InvalidInputError('Invalid sponsor ID provided.');
     }
 
-    const cacheKey = this.config.cache.keyPrefixes.sponsor(sponsorId);
+    const cacheKey = this.config.cache.keyPrefixes.sponsor(sponsor_id);
     
     const cached = await this.cache.get<SponsorInfo>(cacheKey);
     if (cached) {
@@ -253,14 +253,14 @@ export class FinancialDisclosureMonitoringService {
       .select({
         id: sponsors.id,
         name: sponsors.name,
-        isActive: sponsors.isActive
+        is_active: sponsors.is_active
       })
       .from(sponsors)
-      .where(eq(sponsors.id, sponsorId))
+      .where(eq(sponsors.id, sponsor_id))
       .limit(1);
 
     if (result.length === 0) {
-      throw new SponsorNotFoundError(`Sponsor with ID ${sponsorId} not found.`);
+      throw new SponsorNotFoundError(`Sponsor with ID ${sponsor_id} not found.`);
     }
 
     const sponsorInfo = result[0];
@@ -272,12 +272,12 @@ export class FinancialDisclosureMonitoringService {
    * Collects all financial disclosures for a sponsor with caching.
    * This is the primary data access method used throughout the service.
    * 
-   * If no sponsorId is provided, returns all disclosures in the system
+   * If no sponsor_id is provided, returns all disclosures in the system
    * (useful for system-wide analysis and dashboard generation).
    */
-  async collectFinancialDisclosures(sponsorId?: number): Promise<FinancialDisclosure[]> {
-    const cacheKey = sponsorId 
-      ? this.config.cache.keyPrefixes.disclosures(sponsorId)
+  async collectFinancialDisclosures(sponsor_id?: number): Promise<FinancialDisclosure[]> {
+    const cacheKey = sponsor_id 
+      ? this.config.cache.keyPrefixes.disclosures(sponsor_id)
       : this.config.cache.keyPrefixes.allDisclosures();
 
     try {
@@ -291,8 +291,8 @@ export class FinancialDisclosureMonitoringService {
         .from(sponsorTransparency)
         .$dynamic();
 
-      if (sponsorId) {
-        query = query.where(eq(sponsorTransparency.sponsorId, sponsorId));
+      if (sponsor_id) {
+        query = query.where(eq(sponsorTransparency.sponsor_id, sponsor_id));
       }
 
       const rawDisclosures = await query.orderBy(
@@ -303,7 +303,7 @@ export class FinancialDisclosureMonitoringService {
       await this.cache.set(cacheKey, disclosures, this.config.cache.ttl.disclosureData);
       return disclosures;
     } catch (error) {
-      this.logger.error('Error collecting financial disclosures', { sponsorId, error });
+      this.logger.error('Error collecting financial disclosures', { sponsor_id, error });
       throw new DatabaseError('Failed to collect financial disclosures.');
     }
   }
@@ -313,8 +313,8 @@ export class FinancialDisclosureMonitoringService {
    * For detailed analytics with temporal trends and recommendations,
    * use the separate analytics service.
    */
-  async calculateBasicCompleteness(sponsorId: number): Promise<CompletenessScore> {
-    const disclosures = await this.collectFinancialDisclosures(sponsorId);
+  async calculateBasicCompleteness(sponsor_id: number): Promise<CompletenessScore> {
+    const disclosures = await this.collectFinancialDisclosures(sponsor_id);
     const presentTypes = new Set(disclosures.map(d => d.disclosureType));
     const missing = this.config.requiredTypes.filter(
       t => !presentTypes.has(t)
@@ -325,7 +325,7 @@ export class FinancialDisclosureMonitoringService {
     const score = Math.round((totalPresent / totalRequired) * 100);
 
     return {
-      sponsorId,
+      sponsor_id,
       score,
       missingDisclosures: [...missing],
       totalRequired,
@@ -338,13 +338,13 @@ export class FinancialDisclosureMonitoringService {
    * Useful for compliance reporting, external audits, and data analysis.
    */
   async exportSponsorDisclosures(
-    sponsorId: number, 
+    sponsor_id: number, 
     format: 'json' | 'csv'
   ): Promise<string> {
     // Verify sponsor exists
-    await this.getSponsorInfo(sponsorId);
+    await this.getSponsorInfo(sponsor_id);
     
-    const disclosures = await this.collectFinancialDisclosures(sponsorId);
+    const disclosures = await this.collectFinancialDisclosures(sponsor_id);
 
     if (format === 'json') {
       return JSON.stringify(disclosures, null, 2);
@@ -353,7 +353,7 @@ export class FinancialDisclosureMonitoringService {
     // Generate CSV with proper escaping
     const headers = [
       'id', 'disclosureType', 'description', 'amount', 
-      'source', 'dateReported', 'isVerified', 'riskLevel'
+      'source', 'dateReported', 'is_verified', 'riskLevel'
     ];
     
     const rows = disclosures.map(d => [
@@ -363,7 +363,7 @@ export class FinancialDisclosureMonitoringService {
       d.amount || '',
       d.source || '',
       d.dateReported.toISOString(),
-      d.isVerified,
+      d.is_verified,
       d.riskLevel
     ].join(','));
 
@@ -380,17 +380,17 @@ export class FinancialDisclosureMonitoringService {
    */
   async createManualAlert(
     type: FinancialAlert['type'],
-    sponsorId: number,
+    sponsor_id: number,
     description: string,
     severity: FinancialAlert['severity'],
     metadata: Record<string, any> = {}
   ): Promise<FinancialAlert> {
-    const sponsor = await this.getSponsorInfo(sponsorId);
+    const sponsor = await this.getSponsorInfo(sponsor_id);
     
     const alert = this.generateAlert(
       type, 
-      sponsor.id, 
-      sponsor.name, 
+      sponsors.id, 
+      sponsors.name, 
       description, 
       severity,
       metadata
@@ -401,7 +401,7 @@ export class FinancialDisclosureMonitoringService {
     
     this.logger.info('Manual alert created', {
       alertId: alert.id,
-      sponsorId,
+      sponsor_id,
       type,
       severity
     });
@@ -414,7 +414,7 @@ export class FinancialDisclosureMonitoringService {
    * Supports filtering by sponsor, severity, type, and resolution status.
    */
   async getRecentAlerts(options?: {
-    sponsorId?: number;
+    sponsor_id?: number;
     severity?: FinancialAlert['severity'];
     type?: FinancialAlert['type'];
     includeResolved?: boolean;
@@ -427,8 +427,8 @@ export class FinancialDisclosureMonitoringService {
       let filtered = allAlerts;
 
       // Apply filters progressively
-      if (options?.sponsorId) {
-        filtered = filtered.filter(a => a.sponsorId === options.sponsorId);
+      if (options?.sponsor_id) {
+        filtered = filtered.filter(a => a.sponsor_id === options.sponsor_id);
       }
 
       if (options?.severity) {
@@ -444,7 +444,7 @@ export class FinancialDisclosureMonitoringService {
       }
 
       // Sort by creation time (newest first)
-      filtered.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      filtered.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
 
       // Apply limit
       const limit = options?.limit || 50;
@@ -479,7 +479,7 @@ export class FinancialDisclosureMonitoringService {
       
       this.logger.info('Alert resolved', { 
         alertId, 
-        sponsorId: alert.sponsorId,
+        sponsor_id: alert.sponsor_id,
         resolution 
       });
     } catch (error) {
@@ -556,7 +556,7 @@ export class FinancialDisclosureMonitoringService {
       const activeSponsors = await this.readDb
         .select({ id: sponsors.id })
         .from(sponsors)
-        .where(eq(sponsors.isActive, true));
+        .where(eq(sponsors.is_active, true));
 
       const totalSponsors = activeSponsors.length;
       const batchSize = this.config.monitoring.batchSize;
@@ -580,10 +580,10 @@ export class FinancialDisclosureMonitoringService {
         this.status.totalBatches = totalBatches;
 
         const batch = activeSponsors.slice(i, i + batchSize);
-        const sponsorIds = batch.map(s => s.id);
+        const sponsor_ids = batch.map(s => s.id);
 
         this.logger.info(`Processing batch ${currentBatch}/${totalBatches}`, {
-          sponsorCount: sponsorIds.length
+          sponsorCount: sponsor_ids.length
         });
 
         // Run all check types in parallel for this batch
@@ -593,10 +593,10 @@ export class FinancialDisclosureMonitoringService {
           missingAlerts,
           staleAlerts
         ] = await Promise.all([
-          this.checkNewDisclosures(sponsorIds),
-          this.checkThresholdViolations(sponsorIds),
-          this.checkMissingDisclosures(sponsorIds),
-          this.checkStaleDisclosures(sponsorIds)
+          this.checkNewDisclosures(sponsor_ids),
+          this.checkThresholdViolations(sponsor_ids),
+          this.checkMissingDisclosures(sponsor_ids),
+          this.checkStaleDisclosures(sponsor_ids)
         ]);
 
         allAlerts.push(
@@ -644,7 +644,7 @@ export class FinancialDisclosureMonitoringService {
    * Detects new disclosures within the configured lookback window.
    * Generates informational or warning alerts based on disclosure amounts.
    */
-  private async checkNewDisclosures(sponsorIds: number[]): Promise<FinancialAlert[]> {
+  private async checkNewDisclosures(sponsor_ids: number[]): Promise<FinancialAlert[]> {
     const alerts: FinancialAlert[] = [];
     const cutoffDate = new Date(
       Date.now() - this.config.monitoring.lookbackWindowHours * 60 * 60 * 1000
@@ -654,19 +654,19 @@ export class FinancialDisclosureMonitoringService {
       const newDisclosures = await this.readDb
         .select({
           id: sponsorTransparency.id,
-          sponsorId: sponsorTransparency.sponsorId,
+          sponsor_id: sponsorTransparency.sponsor_id,
           sponsorName: sponsors.name,
           disclosureType: sponsorTransparency.disclosureType,
           amount: sponsorTransparency.amount,
           source: sponsorTransparency.source,
-          createdAt: sponsorTransparency.createdAt
+          created_at: sponsorTransparency.created_at
         })
         .from(sponsorTransparency)
-        .innerJoin(sponsors, eq(sponsorTransparency.sponsorId, sponsors.id))
+        .innerJoin(sponsors, eq(sponsorTransparency.sponsor_id, sponsors.id))
         .where(
           and(
-            inArray(sponsorTransparency.sponsorId, sponsorIds),
-            gte(sponsorTransparency.createdAt, cutoffDate)
+            inArray(sponsorTransparency.sponsor_id, sponsor_ids),
+            gte(sponsorTransparency.created_at, cutoffDate)
           )
         )
         .limit(1000);
@@ -678,7 +678,7 @@ export class FinancialDisclosureMonitoringService {
         alerts.push(
           this.generateAlert(
             'new_disclosure',
-            disclosure.sponsorId,
+            disclosure.sponsor_id,
             disclosure.sponsorName,
             description,
             severity,
@@ -701,7 +701,7 @@ export class FinancialDisclosureMonitoringService {
    * Identifies disclosures that exceed configured thresholds.
    * These require manual review to ensure compliance and proper categorization.
    */
-  private async checkThresholdViolations(sponsorIds: number[]): Promise<FinancialAlert[]> {
+  private async checkThresholdViolations(sponsor_ids: number[]): Promise<FinancialAlert[]> {
     const alerts: FinancialAlert[] = [];
     const cutoffDate = new Date(
       Date.now() - this.config.monitoring.lookbackWindowHours * 60 * 60 * 1000
@@ -724,18 +724,18 @@ export class FinancialDisclosureMonitoringService {
       const violations = await this.readDb
         .select({
           id: sponsorTransparency.id,
-          sponsorId: sponsorTransparency.sponsorId,
+          sponsor_id: sponsorTransparency.sponsor_id,
           sponsorName: sponsors.name,
           disclosureType: sponsorTransparency.disclosureType,
           amount: sponsorTransparency.amount,
-          createdAt: sponsorTransparency.createdAt
+          created_at: sponsorTransparency.created_at
         })
         .from(sponsorTransparency)
-        .innerJoin(sponsors, eq(sponsorTransparency.sponsorId, sponsors.id))
+        .innerJoin(sponsors, eq(sponsorTransparency.sponsor_id, sponsors.id))
         .where(
           and(
-            inArray(sponsorTransparency.sponsorId, sponsorIds),
-            gte(sponsorTransparency.createdAt, cutoffDate),
+            inArray(sponsorTransparency.sponsor_id, sponsor_ids),
+            gte(sponsorTransparency.created_at, cutoffDate),
             sql`(${sql.join(thresholdConditions, sql` OR `)})`
           )
         )
@@ -752,7 +752,7 @@ export class FinancialDisclosureMonitoringService {
         alerts.push(
           this.generateAlert(
             'threshold_exceeded',
-            violation.sponsorId,
+            violation.sponsor_id,
             violation.sponsorName,
             description,
             'warning',
@@ -776,19 +776,19 @@ export class FinancialDisclosureMonitoringService {
    * Identifies sponsors with missing required disclosures.
    * Severity escalates based on how many disclosures are missing.
    */
-  private async checkMissingDisclosures(sponsorIds: number[]): Promise<FinancialAlert[]> {
+  private async checkMissingDisclosures(sponsor_ids: number[]): Promise<FinancialAlert[]> {
     const alerts: FinancialAlert[] = [];
 
     try {
       // Check completeness for each sponsor
-      for (const sponsorId of sponsorIds) {
+      for (const sponsor_id of sponsor_ids) {
         if (this.isShuttingDown) break;
 
         try {
-          const completeness = await this.calculateBasicCompleteness(sponsorId);
+          const completeness = await this.calculateBasicCompleteness(sponsor_id);
 
           if (completeness.missingDisclosures.length > 0) {
-            const sponsor = await this.getSponsorInfo(sponsorId);
+            const sponsor = await this.getSponsorInfo(sponsor_id);
             
             // Determine severity based on completeness score
             const severity = completeness.score < 50 ? 'critical'
@@ -802,8 +802,8 @@ export class FinancialDisclosureMonitoringService {
             alerts.push(
               this.generateAlert(
                 'missing_disclosure',
-                sponsorId,
-                sponsor.name,
+                sponsor_id,
+                sponsors.name,
                 description,
                 severity,
                 {
@@ -814,7 +814,7 @@ export class FinancialDisclosureMonitoringService {
             );
           }
         } catch (error) {
-          this.logger.error('Error checking completeness for sponsor', { sponsorId, error });
+          this.logger.error('Error checking completeness for sponsor', { sponsor_id, error });
         }
       }
     } catch (error) {
@@ -828,7 +828,7 @@ export class FinancialDisclosureMonitoringService {
    * Identifies sponsors with outdated disclosures.
    * Stale data reduces transparency and may indicate compliance issues.
    */
-  private async checkStaleDisclosures(sponsorIds: number[]): Promise<FinancialAlert[]> {
+  private async checkStaleDisclosures(sponsor_ids: number[]): Promise<FinancialAlert[]> {
     const alerts: FinancialAlert[] = [];
     const staleThreshold = this.config.monitoring.staleThresholdDays;
     const cutoffDate = new Date(
@@ -838,32 +838,32 @@ export class FinancialDisclosureMonitoringService {
     try {
       const staleSponsors = await this.readDb
         .select({
-          sponsorId: sponsors.id,
+          sponsor_id: sponsors.id,
           sponsorName: sponsors.name,
           lastDisclosure: sql<Date>`MAX(${sponsorTransparency.dateReported})`
         })
         .from(sponsors)
         .leftJoin(
           sponsorTransparency, 
-          eq(sponsors.id, sponsorTransparency.sponsorId)
+          eq(sponsors.id, sponsorTransparency.sponsor_id)
         )
         .where(
           and(
-            inArray(sponsors.id, sponsorIds),
-            eq(sponsors.isActive, true)
+            inArray(sponsors.id, sponsor_ids),
+            eq(sponsors.is_active, true)
           )
         )
         .groupBy(sponsors.id, sponsors.name)
         .having(sql`MAX(${sponsorTransparency.dateReported}) < ${cutoffDate} OR MAX(${sponsorTransparency.dateReported}) IS NULL`);
 
       for (const sponsor of staleSponsors) {
-        if (!sponsor.lastDisclosure) {
+        if (!sponsors.lastDisclosure) {
           // No disclosures at all
           alerts.push(
             this.generateAlert(
               'stale_disclosure',
-              sponsor.sponsorId,
-              sponsor.sponsorName,
+              sponsors.sponsor_id,
+              sponsors.sponsorName,
               'No disclosures found for this sponsor',
               'critical',
               { daysSinceUpdate: null, lastUpdateDate: null }
@@ -873,7 +873,7 @@ export class FinancialDisclosureMonitoringService {
         }
 
         const daysSince = Math.floor(
-          (Date.now() - new Date(sponsor.lastDisclosure).getTime()) / 
+          (Date.now() - new Date(sponsors.lastDisclosure).getTime()) / 
           (1000 * 60 * 60 * 24)
         );
 
@@ -882,18 +882,18 @@ export class FinancialDisclosureMonitoringService {
                        : 'info';
 
         const description = `Disclosures not updated in ${daysSince} days ` +
-          `(last update: ${new Date(sponsor.lastDisclosure).toISOString().split('T')[0]})`;
+          `(last update: ${new Date(sponsors.lastDisclosure).toISOString().split('T')[0]})`;
 
         alerts.push(
           this.generateAlert(
             'stale_disclosure',
-            sponsor.sponsorId,
-            sponsor.sponsorName,
+            sponsors.sponsor_id,
+            sponsors.sponsorName,
             description,
             severity,
             {
               daysSinceUpdate: daysSince,
-              lastUpdateDate: sponsor.lastDisclosure
+              lastUpdateDate: sponsors.lastDisclosure
             }
           )
         );
@@ -957,15 +957,14 @@ export class FinancialDisclosureMonitoringService {
    * Creates database notifications for alerts.
    * Uses transactions to ensure atomicity and batch inserts for performance.
    */
-  private async createNotifications(alerts: FinancialAlert[]): Promise<void> {
-    const notificationValues = alerts.map(alert => ({
-      userId: this.config.alerting.adminUserId,
+  private async createNotifications(alerts: FinancialAlert[]): Promise<void> { const notificationValues = alerts.map(alert => ({
+      user_id: this.config.alerting.adminUserId,
       type: 'bill_update' as const, // Use existing notification type
-      title: `[${alert.severity.toUpperCase()}] ${alert.type.replace(/_/g, ' ')}`,
+      title: `[${alert.severity.toUpperCase() }] ${alert.type.replace(/_/g, ' ')}`,
       message: `${alert.sponsorName}: ${alert.description}`,
-      isRead: false,
+      is_read: false,
       metadata: {
-        sponsorId: alert.sponsorId,
+        sponsor_id: alert.sponsor_id,
         alertId: alert.id,
         alertType: alert.type
       }
@@ -1108,16 +1107,16 @@ export class FinancialDisclosureMonitoringService {
   private enhanceDisclosure(raw: any): FinancialDisclosure {
     return {
       id: raw.id,
-      sponsorId: raw.sponsorId,
+      sponsor_id: raw.sponsor_id,
       disclosureType: raw.disclosureType,
       description: raw.description || '',
       amount: raw.amount ? Number(raw.amount) : undefined,
       source: raw.source || undefined,
       dateReported: new Date(raw.dateReported),
-      isVerified: Boolean(raw.isVerified),
+      is_verified: Boolean(raw.is_verified),
       completenessScore: this.calculateIndividualCompletenessScore(raw),
       riskLevel: this.assessDisclosureRisk(raw),
-      lastUpdated: new Date(raw.createdAt || raw.dateReported)
+      lastUpdated: new Date(raw.created_at || raw.dateReported)
     };
   }
 
@@ -1127,7 +1126,7 @@ export class FinancialDisclosureMonitoringService {
    */
   private calculateIndividualCompletenessScore(disclosure: any): number {
     let score = 40; // Base score for having a disclosure
-    if (disclosure.isVerified) score += 30;
+    if (disclosure.is_verified) score += 30;
     if (disclosure.amount) score += 20;
     if (disclosure.source) score += 10;
     return Math.min(score, 100);
@@ -1141,11 +1140,11 @@ export class FinancialDisclosureMonitoringService {
     disclosure: any
   ): 'low' | 'medium' | 'high' | 'critical' {
     const amount = Number(disclosure.amount) || 0;
-    const isVerified = Boolean(disclosure.isVerified);
+    const is_verified = Boolean(disclosure.is_verified);
 
     // Unverified high-value disclosures are critical
-    if (!isVerified && amount > 1_000_000) return 'critical';
-    if (!isVerified && amount > 500_000) return 'high';
+    if (!is_verified && amount > 1_000_000) return 'critical';
+    if (!is_verified && amount > 500_000) return 'high';
 
     // Verified disclosures based on amount
     if (amount > 1_000_000) return 'high';
@@ -1159,20 +1158,20 @@ export class FinancialDisclosureMonitoringService {
    */
   private generateAlert(
     type: FinancialAlert['type'],
-    sponsorId: number,
+    sponsor_id: number,
     sponsorName: string,
     description: string,
     severity: FinancialAlert['severity'],
     metadata: Record<string, any> = {}
   ): FinancialAlert {
     return {
-      id: this.generateAlertId(type, sponsorId),
+      id: this.generateAlertId(type, sponsor_id),
       type,
-      sponsorId,
+      sponsor_id,
       sponsorName,
       description,
       severity,
-      createdAt: new Date(),
+      created_at: new Date(),
       isResolved: false,
       metadata
     };
@@ -1181,10 +1180,10 @@ export class FinancialDisclosureMonitoringService {
   /**
    * Generates a unique alert identifier using timestamp and random string.
    */
-  private generateAlertId(type: string, sponsorId: number): string {
+  private generateAlertId(type: string, sponsor_id: number): string {
     const timestamp = Date.now();
     const random = Math.random().toString(36).substring(2, 9);
-    return `alert_${type}_${sponsorId}_${timestamp}_${random}`;
+    return `alert_${type}_${sponsor_id}_${timestamp}_${random}`;
   }
 
   /**

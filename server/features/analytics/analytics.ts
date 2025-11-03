@@ -31,13 +31,13 @@ const analyticsQuerySchema = z.object({
   query: z.object({
     startDate: z.string().datetime().optional(),
     endDate: z.string().datetime().optional(),
-    billIds: z.string().optional().transform((val) => 
+    bill_ids: z.string().optional().transform((val) => 
       val ? val.split(',').map(Number) : undefined
     ),
     categories: z.string().optional().transform((val) => 
       val ? val.split(',') : undefined
     ),
-    userIds: z.string().optional().transform((val) => 
+    user_ids: z.string().optional().transform((val) => 
       val ? val.split(',') : undefined
     ),
     // Use preprocess to handle the string-to-number conversion before validation
@@ -92,10 +92,10 @@ const exportQuerySchema = z.object({
   format: z.enum(['json', 'csv']),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
-  billIds: z.string().optional().transform((val) => 
+  bill_ids: z.string().optional().transform((val) => 
     val ? val.split(',').map(Number) : undefined
   ),
-  userIds: z.string().optional().transform((val) => 
+  user_ids: z.string().optional().transform((val) => 
     val ? val.split(',') : undefined
   )
 });
@@ -208,7 +208,7 @@ router.get('/engagement/patterns', authenticateToken, async (req: AuthenticatedR
     // Extract the first user ID from the array, or use empty string as fallback
     // In a production system, you might want to validate that a user ID was provided
     const patterns = await engagementAnalyticsService.getUserEngagementMetrics(
-      query.query.userIds?.[0] || '', 
+      query.query.user_ids?.[0] || '', 
       '30d'
     );
 
@@ -238,28 +238,27 @@ router.get('/engagement/patterns', authenticateToken, async (req: AuthenticatedR
 });
 
 /**
- * GET /engagement/bills/:billId
+ * GET /engagement/bills/:bill_id
  * Retrieves detailed engagement analytics for a specific bill
  * 
  * Path parameters require special attention since they come as strings but often
  * represent numeric IDs. We validate early to fail fast, which improves performance
  * by avoiding unnecessary database queries with invalid parameters.
  */
-router.get('/engagement/bills/:billId', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/engagement/bills/:bill_id', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const billId = parseInt(req.params.billId);
+    const bill_id = parseInt(req.params.bill_id);
     
-    if (isNaN(billId)) {
+    if (isNaN(bill_id)) {
       return ApiError(res, 
         createErrorObject('INVALID_PARAMETER', 'Invalid bill ID'), 
         400, 
         ApiResponseWrapper.createMetadata(startTime, 'database')
       );
-    }
+     }
     
-    const analytics = await engagementAnalyticsService.getBillEngagementMetrics(billId);
+    const analytics = await engagementAnalyticsService.getBillEngagementMetrics(bill_id);
     
     return ApiSuccess(res, 
       analytics, 
@@ -463,15 +462,15 @@ router.get('/engagement/export', authenticateToken, async (req: AuthenticatedReq
       [
         'User ID,Name,Comments,Votes,Avg Votes',
         ...leaderboard.topCommenters.map(user =>
-          `${user.userId},${user.userName},${user.commentCount},${user.totalVotes},${user.averageVotes}`
+          `${users.user_id},${users.userName},${users.comment_count},${users.totalVotes},${users.averageVotes}`
         )
       ].join('\n');
     
     // Set appropriate headers to trigger file download in the browser
-    const contentType = query.format === 'json' ? 'application/json' : 'text/csv';
+    const content_type = query.format === 'json' ? 'application/json' : 'text/csv';
     const filename = `engagement_data_${new Date().toISOString().split('T')[0]}.${query.format}`;
     
-    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Type', content_type);
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
     
     return res.send(exportData);
@@ -587,19 +586,18 @@ router.delete('/cache', authenticateToken, async (req: AuthenticatedRequest, res
  * their engagement over time. This creates transparency and can motivate continued
  * participation in the platform.
  */
-router.get('/user/engagement', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/user/engagement', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     
-    const userPattern = await engagementAnalyticsService.getUserEngagementMetrics(userId, '30d');
+    const userPattern = await engagementAnalyticsService.getUserEngagementMetrics(user_id, '30d');
     
     return ApiSuccess(res, 
       { 
         userEngagement: userPattern,
-        userId 
-      }, 
+        user_id 
+       }, 
       ApiResponseWrapper.createMetadata(startTime, 'database')
     );
   } catch (error) {
@@ -624,8 +622,7 @@ router.get('/user/engagement', authenticateToken, async (req: AuthenticatedReque
  * By recognizing top contributors, we create incentives for quality participation
  * while making engagement metrics visible to the community.
  */
-router.get('/engagement/leaderboard', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/engagement/leaderboard', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
     // Parse limit with bounds checking to prevent excessive data retrieval
@@ -635,12 +632,12 @@ router.get('/engagement/leaderboard', authenticateToken, async (req: Authenticat
 
     const leaderboard = leaderboardData.topCommenters.map((user, index) => ({
       rank: index + 1,
-      userId: user.userId,
-      userName: user.userName,
-      totalEngagements: user.commentCount,
-      engagementScore: user.averageVotes,
+      user_id: users.user_id,
+      userName: users.userName,
+      totalEngagements: users.comment_count,
+      engagement_score: users.averageVotes,
       lastActive: new Date() // In production, fetch actual last activity timestamp
-    }));
+     }));
 
     return ApiSuccess(res, 
       {

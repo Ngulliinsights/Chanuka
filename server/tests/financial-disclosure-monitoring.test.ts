@@ -57,7 +57,7 @@ describe('Financial Disclosure Monitoring Service', () => {
       if (disclosures.length > 0) {
         const disclosure = disclosures[0];
         expect(disclosure).toHaveProperty('id');
-        expect(disclosure).toHaveProperty('sponsorId');
+        expect(disclosure).toHaveProperty('sponsor_id');
         expect(disclosure).toHaveProperty('disclosureType');
         expect(disclosure).toHaveProperty('completenessScore');
         expect(disclosure).toHaveProperty('riskLevel');
@@ -65,27 +65,27 @@ describe('Financial Disclosure Monitoring Service', () => {
     });
 
     it('should collect financial disclosures for specific sponsor', async () => {
-      const sponsorId = 1;
-      const disclosures = await financialDisclosureMonitoringService.collectFinancialDisclosures(sponsorId);
+      const sponsor_id = 1;
+      const disclosures = await financialDisclosureMonitoringService.collectFinancialDisclosures(sponsor_id);
       
       expect(Array.isArray(disclosures)).toBe(true);
       // All disclosures should be for the specified sponsor
       disclosures.forEach(disclosure => {
-        expect(disclosure.sponsorId).toBe(sponsorId);
+        expect(disclosure.sponsor_id).toBe(sponsor_id);
       });
     });
 
     it('should cache disclosure data for performance', async () => {
-      const sponsorId = 1;
+      const sponsor_id = 1;
       
       // First call - should fetch from database
       const start1 = Date.now();
-      await financialDisclosureMonitoringService.collectFinancialDisclosures(sponsorId);
+      await financialDisclosureMonitoringService.collectFinancialDisclosures(sponsor_id);
       const time1 = Date.now() - start1;
       
       // Second call - should use cache
       const start2 = Date.now();
-      await financialDisclosureMonitoringService.collectFinancialDisclosures(sponsorId);
+      await financialDisclosureMonitoringService.collectFinancialDisclosures(sponsor_id);
       const time2 = Date.now() - start2;
       
       // Cache should be significantly faster
@@ -104,10 +104,10 @@ describe('Financial Disclosure Monitoring Service', () => {
       
       expect(alert).toHaveProperty('id');
       expect(alert).toHaveProperty('type', 'new_disclosure');
-      expect(alert).toHaveProperty('sponsorId', 1);
+      expect(alert).toHaveProperty('sponsor_id', 1);
       expect(alert).toHaveProperty('description', 'Test alert description');
       expect(alert).toHaveProperty('severity', 'info');
-      expect(alert).toHaveProperty('createdAt');
+      expect(alert).toHaveProperty('created_at');
       expect(alert.isResolved).toBe(false);
     });
 
@@ -119,31 +119,31 @@ describe('Financial Disclosure Monitoring Service', () => {
       alerts.forEach(alert => {
         expect(alert).toHaveProperty('id');
         expect(alert).toHaveProperty('type');
-        expect(alert).toHaveProperty('sponsorId');
+        expect(alert).toHaveProperty('sponsor_id');
         expect(alert).toHaveProperty('severity');
         expect(['info', 'warning', 'critical']).toContain(alert.severity);
       });
     });
 
     it('should get alerts for specific sponsor', async () => {
-      const sponsorId = 1;
-      const alerts = await financialDisclosureMonitoringService.getDisclosureAlerts(sponsorId);
+      const sponsor_id = 1;
+      const alerts = await financialDisclosureMonitoringService.getDisclosureAlerts(sponsor_id);
       
       expect(Array.isArray(alerts)).toBe(true);
       alerts.forEach(alert => {
-        expect(alert.sponsorId).toBe(sponsorId);
+        expect(alert.sponsor_id).toBe(sponsor_id);
       });
     });
 
     it('should filter alerts by type and severity', async () => {
-      const sponsorId = 1;
+      const sponsor_id = 1;
       const filters = {
         type: 'missing_disclosure',
         severity: 'critical',
         limit: 5
       };
       
-      const alerts = await financialDisclosureMonitoringService.getDisclosureAlerts(sponsorId, filters);
+      const alerts = await financialDisclosureMonitoringService.getDisclosureAlerts(sponsor_id, filters);
       
       expect(Array.isArray(alerts)).toBe(true);
       expect(alerts.length).toBeLessThanOrEqual(5);
@@ -156,16 +156,16 @@ describe('Financial Disclosure Monitoring Service', () => {
 
   describe('Financial Relationship Mapping', () => {
     it('should build financial relationship map for sponsor', async () => {
-      const sponsorId = 1;
-      const relationships = await financialDisclosureMonitoringService.buildFinancialRelationshipMap(sponsorId);
+      const sponsor_id = 1;
+      const relationships = await financialDisclosureMonitoringService.buildFinancialRelationshipMap(sponsor_id);
       
       expect(Array.isArray(relationships)).toBe(true);
       relationships.forEach(relationship => {
-        expect(relationship).toHaveProperty('sponsorId', sponsorId);
+        expect(relationship).toHaveProperty('sponsor_id', sponsor_id);
         expect(relationship).toHaveProperty('relatedEntity');
         expect(relationship).toHaveProperty('relationshipType');
         expect(relationship).toHaveProperty('strength');
-        expect(relationship).toHaveProperty('isActive');
+        expect(relationship).toHaveProperty('is_active');
         expect(typeof relationship.strength).toBe('number');
         expect(relationship.strength).toBeGreaterThanOrEqual(0);
         expect(relationship.strength).toBeLessThanOrEqual(100);
@@ -173,16 +173,16 @@ describe('Financial Disclosure Monitoring Service', () => {
     });
 
     it('should cache relationship data', async () => {
-      const sponsorId = 1;
+      const sponsor_id = 1;
       
       // First call
       const start1 = Date.now();
-      await financialDisclosureMonitoringService.buildFinancialRelationshipMap(sponsorId);
+      await financialDisclosureMonitoringService.buildFinancialRelationshipMap(sponsor_id);
       const time1 = Date.now() - start1;
       
       // Second call - should use cache
       const start2 = Date.now();
-      await financialDisclosureMonitoringService.buildFinancialRelationshipMap(sponsorId);
+      await financialDisclosureMonitoringService.buildFinancialRelationshipMap(sponsor_id);
       const time2 = Date.now() - start2;
       
       expect(time2).toBeLessThan(time1);
@@ -191,10 +191,10 @@ describe('Financial Disclosure Monitoring Service', () => {
 
   describe('Disclosure Completeness Scoring', () => {
     it('should calculate completeness score for sponsor', async () => {
-      const sponsorId = 1;
-      const report = await financialDisclosureMonitoringService.calculateDisclosureCompletenessScore(sponsorId);
+      const sponsor_id = 1;
+      const report = await financialDisclosureMonitoringService.calculateDisclosureCompletenessScore(sponsor_id);
       
-      expect(report).toHaveProperty('sponsorId', sponsorId);
+      expect(report).toHaveProperty('sponsor_id', sponsor_id);
       expect(report).toHaveProperty('sponsorName');
       expect(report).toHaveProperty('overallScore');
       expect(report).toHaveProperty('requiredDisclosures');
@@ -211,16 +211,16 @@ describe('Financial Disclosure Monitoring Service', () => {
     });
 
     it('should cache completeness scores', async () => {
-      const sponsorId = 1;
+      const sponsor_id = 1;
       
       // First call
       const start1 = Date.now();
-      await financialDisclosureMonitoringService.calculateDisclosureCompletenessScore(sponsorId);
+      await financialDisclosureMonitoringService.calculateDisclosureCompletenessScore(sponsor_id);
       const time1 = Date.now() - start1;
       
       // Second call - should use cache
       const start2 = Date.now();
-      await financialDisclosureMonitoringService.calculateDisclosureCompletenessScore(sponsorId);
+      await financialDisclosureMonitoringService.calculateDisclosureCompletenessScore(sponsor_id);
       const time2 = Date.now() - start2;
       
       expect(time2).toBeLessThan(time1);

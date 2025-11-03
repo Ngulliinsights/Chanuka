@@ -24,9 +24,9 @@ export class DisclosureValidationService {
   /**
    * Calculates a comprehensive completeness score using multiple dimensions.
    */
-  async calculateCompletenessScore(sponsorId: number): Promise<CompletenessReport> {
+  async calculateCompletenessScore(sponsor_id: number): Promise<CompletenessReport> {
     try {
-      const cacheKey = this.config.cache.keyPrefixes.completeness(sponsorId);
+      const cacheKey = this.config.cache.keyPrefixes.completeness(sponsor_id);
 
       return await cache.getOrSetCache(
         cacheKey,
@@ -34,8 +34,8 @@ export class DisclosureValidationService {
         async () => {
           // Gather all necessary data in parallel for efficiency
           const [sponsorInfo, disclosures] = await Promise.all([
-            disclosureProcessingService.getSponsorBasicInfo(sponsorId),
-            disclosureProcessingService.getDisclosureData(sponsorId)
+            disclosureProcessingService.getSponsorBasicInfo(sponsor_id),
+            disclosureProcessingService.getDisclosureData(sponsor_id)
           ]);
 
           // Calculate the four component metrics that feed into our scoring
@@ -65,7 +65,7 @@ export class DisclosureValidationService {
           );
 
           return {
-            sponsorId,
+            sponsor_id,
             sponsorName: sponsorInfo.name,
             overallScore,
             requiredDisclosures: this.config.requiredTypes.length,
@@ -87,7 +87,7 @@ export class DisclosureValidationService {
         }
       );
     } catch (error) {
-      logger.error('Error calculating completeness score:', { sponsorId }, error);
+      logger.error('Error calculating completeness score:', { sponsor_id }, error);
       throw new DatabaseError('Failed to calculate disclosure completeness');
     }
   }
@@ -108,7 +108,7 @@ export class DisclosureValidationService {
       : 0;
 
     // Metric 2: Verification rate (0-1)
-    const verifiedCount = disclosures.filter(d => d.isVerified).length;
+    const verifiedCount = disclosures.filter(d => d.is_verified).length;
     const verificationScore = disclosures.length > 0
       ? verifiedCount / disclosures.length
       : 0;
@@ -191,7 +191,7 @@ export class DisclosureValidationService {
 
     const weightedScore =
       (metrics.requiredDisclosureScore * weights.requiredDisclosures * 100) +
-      (metrics.verificationScore * weights.verificationStatus * 100) +
+      (metrics.verificationScore * weights.verification_status * 100) +
       (metrics.recencyScore * weights.dataRecency * 100) +
       (metrics.detailScore * weights.detailCompleteness * 100);
 
@@ -242,7 +242,7 @@ export class DisclosureValidationService {
     // Check verification status
     if (metrics.verificationScore < 0.6) {
       const unverifiedHighRisk = disclosures.filter(
-        d => !d.isVerified && (d.riskLevel === 'high' || d.riskLevel === 'critical')
+        d => !d.is_verified && (d.riskLevel === 'high' || d.riskLevel === 'critical')
       ).length;
 
       if (unverifiedHighRisk > 0) {
@@ -250,7 +250,7 @@ export class DisclosureValidationService {
           `Urgent: Verify ${unverifiedHighRisk} high-risk disclosure(s) immediately to reduce compliance risk.`
         );
       } else {
-        const unverifiedCount = disclosures.filter(d => !d.isVerified).length;
+        const unverifiedCount = disclosures.filter(d => !d.is_verified).length;
         recommendations.push(
           `Verify ${unverifiedCount} pending disclosures to improve transparency rating.`
         );

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js';
-import { userProfileService } from '../domain/user-profile.js';
+import { user_profileservice } from '../domain/user-profile.js';
 import { z } from 'zod';
 import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '../../../../shared/core/src/utils/api-utils';
 import { logger  } from '../../../../shared/core/src/index.js';
@@ -16,12 +16,12 @@ const updateProfileSchema = z.object({
   expertise: z.array(z.string()).optional(),
   location: z.string().optional(),
   organization: z.string().optional(),
-  isPublic: z.boolean().optional()
+  is_public: z.boolean().optional()
 });
 
 const updateBasicInfoSchema = z.object({
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
+  first_name: z.string().optional(),
+  last_name: z.string().optional(),
   name: z.string().optional()
 });
 
@@ -40,13 +40,13 @@ const updatePreferencesSchema = z.object({
 });
 
 const updateVerificationSchema = z.object({
-  verificationStatus: z.enum(['pending', 'verified', 'rejected']),
+  verification_status: z.enum(['pending', 'verified', 'rejected']),
   verificationDocuments: z.any().optional(),
   verificationNotes: z.string().optional()
 });
 
 const engagementSchema = z.object({
-  engagementType: z.enum(['view', 'comment', 'share'])
+  engagement_type: z.enum(['view', 'comment', 'share'])
 });
 
 // ============================================================================
@@ -72,19 +72,18 @@ function formatZodErrors(zodErrors: z.ZodIssue[]): { field: string; message: str
 /**
  * GET /me - Retrieve the authenticated user's profile
  */
-router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const profile = await userProfileService.getUserProfile(userId);
+    const user_id = req.user!.id;
+    const profile = await user_profileservice.getUserProfile(user_id);
     
     return ApiSuccess(
       res, 
       profile, 
       ApiResponseWrapper.createMetadata(startTime, 'getUserProfile')
     );
-  } catch (error) {
+   } catch (error) {
     logger.error('Error fetching profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
     
     // ApiError now requires a structured error object
@@ -98,21 +97,20 @@ router.get('/me', authenticateToken, async (req: AuthenticatedRequest, res) => {
 /**
  * PATCH /me - Update the authenticated user's profile
  */
-router.patch('/me', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.patch('/me', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     const profileData = updateProfileSchema.parse(req.body);
 
-    const updatedProfile = await userProfileService.updateUserProfile(userId, profileData);
+    const updatedProfile = await user_profileservice.updateUserProfile(user_id, profileData);
     
     return ApiSuccess(
       res, 
       updatedProfile, 
       ApiResponseWrapper.createMetadata(startTime, 'updateUserProfile')
     );
-  } catch (error) {
+   } catch (error) {
     if (error instanceof z.ZodError) {
       // Transform Zod errors into the expected format before passing to ApiValidationError
       return ApiValidationError(res, formatZodErrors(error.errors));
@@ -129,21 +127,20 @@ router.patch('/me', authenticateToken, async (req: AuthenticatedRequest, res) =>
 /**
  * PATCH /me/basic - Update basic user information
  */
-router.patch('/me/basic', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.patch('/me/basic', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     const basicInfo = updateBasicInfoSchema.parse(req.body);
 
-    const updatedProfile = await userProfileService.updateUserBasicInfo(userId, basicInfo);
+    const updatedProfile = await user_profileservice.updateUserBasicInfo(user_id, basicInfo);
     
     return ApiSuccess(
       res, 
       updatedProfile, 
       ApiResponseWrapper.createMetadata(startTime, 'updateBasicInfo')
     );
-  } catch (error) {
+   } catch (error) {
     if (error instanceof z.ZodError) {
       return ApiValidationError(res, formatZodErrors(error.errors));
     }
@@ -159,14 +156,13 @@ router.patch('/me/basic', authenticateToken, async (req: AuthenticatedRequest, r
 /**
  * PATCH /me/interests - Update user's interests
  */
-router.patch('/me/interests', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.patch('/me/interests', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const { interests } = updateInterestsSchema.parse(req.body);
+    const user_id = req.user!.id;
+    const { interests  } = updateInterestsSchema.parse(req.body);
 
-    await userProfileService.updateUserInterests(userId, interests);
+    await user_profileservice.updateUserInterests(user_id, interests);
     
     return ApiSuccess(
       res, 
@@ -189,19 +185,18 @@ router.patch('/me/interests', authenticateToken, async (req: AuthenticatedReques
 /**
  * GET /me/complete - Retrieve complete user profile
  */
-router.get('/me/complete', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/me/complete', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const completeProfile = await userProfileService.getCompleteUserProfile(userId);
+    const user_id = req.user!.id;
+    const completeProfile = await user_profileservice.getCompleteUserProfile(user_id);
     
     return ApiSuccess(
       res, 
       completeProfile, 
       ApiResponseWrapper.createMetadata(startTime, 'getCompleteProfile')
     );
-  } catch (error) {
+   } catch (error) {
     logger.error('Error fetching complete profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
     return ApiError(res, {
       code: 'COMPLETE_PROFILE_FETCH_ERROR',
@@ -217,19 +212,18 @@ router.get('/me/complete', authenticateToken, async (req: AuthenticatedRequest, 
 /**
  * GET /me/preferences - Retrieve user notification and display preferences
  */
-router.get('/me/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/me/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const preferences = await userProfileService.getUserPreferences(userId);
+    const user_id = req.user!.id;
+    const preferences = await user_profileservice.getUserPreferences(user_id);
     
     return ApiSuccess(
       res, 
       preferences, 
       ApiResponseWrapper.createMetadata(startTime, 'getPreferences')
     );
-  } catch (error) {
+   } catch (error) {
     logger.error('Error fetching preferences:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
     return ApiError(res, {
       code: 'PREFERENCES_FETCH_ERROR',
@@ -241,21 +235,20 @@ router.get('/me/preferences', authenticateToken, async (req: AuthenticatedReques
 /**
  * PATCH /me/preferences - Update user preferences
  */
-router.patch('/me/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.patch('/me/preferences', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
+    const user_id = req.user!.id;
     const preferences = updatePreferencesSchema.parse(req.body);
     
-    const updatedPreferences = await userProfileService.updateUserPreferences(userId, preferences);
+    const updatedPreferences = await user_profileservice.updateUserPreferences(user_id, preferences);
     
     return ApiSuccess(
       res, 
       updatedPreferences, 
       ApiResponseWrapper.createMetadata(startTime, 'updatePreferences')
     );
-  } catch (error) {
+   } catch (error) {
     if (error instanceof z.ZodError) {
       return ApiValidationError(res, formatZodErrors(error.errors));
     }
@@ -275,19 +268,18 @@ router.patch('/me/preferences', authenticateToken, async (req: AuthenticatedRequ
 /**
  * GET /me/verification - Retrieve verification status
  */
-router.get('/me/verification', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/me/verification', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const verificationStatus = await userProfileService.getUserVerificationStatus(userId);
+    const user_id = req.user!.id;
+    const verification_status = await user_profileservice.getUserVerificationStatus(user_id);
     
     return ApiSuccess(
       res, 
-      verificationStatus, 
+      verification_status, 
       ApiResponseWrapper.createMetadata(startTime, 'getVerificationStatus')
     );
-  } catch (error) {
+   } catch (error) {
     logger.error('Error fetching verification status:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
     return ApiError(res, {
       code: 'VERIFICATION_FETCH_ERROR',
@@ -299,22 +291,21 @@ router.get('/me/verification', authenticateToken, async (req: AuthenticatedReque
 /**
  * PATCH /me/verification - Update verification status
  */
-router.patch('/me/verification', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.patch('/me/verification', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const verificationData = updateVerificationSchema.parse(req.body);
+    const user_id = req.user!.id;
+    const verification_data = updateVerificationSchema.parse(req.body);
     
     // Authorization check: only admins can approve/reject verification
-    if (verificationData.verificationStatus !== 'pending' && req.user!.role !== 'admin') {
+    if (verification_data.verification_status !== 'pending' && req.user!.role !== 'admin') {
       return ApiError(res, {
         code: 'INSUFFICIENT_PERMISSIONS',
         message: 'Only administrators can approve or reject verification'
-      }, 403);
+       }, 403);
     }
     
-    const updatedProfile = await userProfileService.updateUserVerificationStatus(userId, verificationData);
+    const updatedProfile = await user_profileservice.updateUserVerificationStatus(user_id, verification_data);
     
     return ApiSuccess(
       res, 
@@ -341,19 +332,18 @@ router.patch('/me/verification', authenticateToken, async (req: AuthenticatedReq
 /**
  * GET /me/engagement - Retrieve user's engagement history
  */
-router.get('/me/engagement', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/me/engagement', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const engagementHistory = await userProfileService.getUserEngagementHistory(userId);
+    const user_id = req.user!.id;
+    const engagementHistory = await user_profileservice.getUserEngagementHistory(user_id);
     
     return ApiSuccess(
       res, 
       engagementHistory, 
       ApiResponseWrapper.createMetadata(startTime, 'getEngagementHistory')
     );
-  } catch (error) {
+   } catch (error) {
     logger.error('Error fetching engagement history:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
     return ApiError(res, {
       code: 'ENGAGEMENT_FETCH_ERROR',
@@ -363,26 +353,25 @@ router.get('/me/engagement', authenticateToken, async (req: AuthenticatedRequest
 });
 
 /**
- * POST /me/engagement/:billId - Record user engagement with a bill
+ * POST /me/engagement/:bill_id - Record user engagement with a bill
  */
-router.post('/me/engagement/:billId', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.post('/me/engagement/:bill_id', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.user!.id;
-    const billId = parseInt(req.params.billId, 10);
+    const user_id = req.user!.id;
+    const bill_id = parseInt(req.params.bill_id, 10);
     
-    // Validate that billId is a proper number
-    if (isNaN(billId)) {
+    // Validate that bill_id is a proper number
+    if (isNaN(bill_id)) {
       return ApiError(res, {
         code: 'INVALID_BILL_ID',
         message: 'Bill ID must be a valid number'
-      }, 400);
+        }, 400);
     }
     
-    const { engagementType } = engagementSchema.parse(req.body);
+    const { engagement_type } = engagementSchema.parse(req.body);
     
-    const result = await userProfileService.updateUserEngagement(userId, billId, engagementType);
+    const result = await user_profileservice.updateUserEngagement(user_id, bill_id, engagement_type);
     
     return ApiSuccess(
       res, 
@@ -424,7 +413,7 @@ router.get('/search/:query', async (req, res) => {
       }, 400);
     }
     
-    const users = await userProfileService.searchUsers(query, limit);
+    const users = await user_profileservice.searchUsers(query, limit);
     
     return ApiSuccess(
       res, 
@@ -441,22 +430,21 @@ router.get('/search/:query', async (req, res) => {
 });
 
 /**
- * GET /:userId - Retrieve public profile for a specific user
+ * GET /:user_id - Retrieve public profile for a specific user
  * Note: This catch-all route must be last to avoid intercepting other routes
  */
-router.get('/:userId', async (req, res) => {
-  const startTime = Date.now();
+router.get('/:user_id', async (req, res) => { const startTime = Date.now();
   
   try {
-    const userId = req.params.userId;
-    const profile = await userProfileService.getUserPublicProfile(userId);
+    const user_id = req.params.user_id;
+    const profile = await user_profileservice.getUserPublicProfile(user_id);
     
     return ApiSuccess(
       res, 
       profile, 
       ApiResponseWrapper.createMetadata(startTime, 'getPublicProfile')
     );
-  } catch (error) {
+   } catch (error) {
     logger.error('Error fetching public profile:', { component: 'profile-routes' }, error as Record<string, any> | undefined);
     return ApiError(res, {
       code: 'PUBLIC_PROFILE_FETCH_ERROR',

@@ -4,9 +4,9 @@
 
 import { AuthConfig } from '../types';
 
-export function formatDisplayName(firstName: string, lastName: string): string {
-  const first = firstName.trim();
-  const last = lastName.trim();
+export function formatDisplayName(first_name: string, last_name: string): string {
+  const first = first_name.trim();
+  const last = last_name.trim();
   
   if (!first && !last) return 'Anonymous User';
   if (!first) return last;
@@ -15,9 +15,9 @@ export function formatDisplayName(firstName: string, lastName: string): string {
   return `${first} ${last}`;
 }
 
-export function generateUserInitials(firstName: string, lastName: string): string {
-  const first = firstName.trim().charAt(0).toUpperCase();
-  const last = lastName.trim().charAt(0).toUpperCase();
+export function generateUserInitials(first_name: string, last_name: string): string {
+  const first = first_name.trim().charAt(0).toUpperCase();
+  const last = last_name.trim().charAt(0).toUpperCase();
   
   if (!first && !last) return 'AU';
   if (!first) return last + last;
@@ -26,8 +26,8 @@ export function generateUserInitials(firstName: string, lastName: string): strin
   return first + last;
 }
 
-export function createUserSlug(firstName: string, lastName: string): string {
-  const name = formatDisplayName(firstName, lastName)
+export function createUserSlug(first_name: string, last_name: string): string {
+  const name = formatDisplayName(first_name, last_name)
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
     .replace(/\s+/g, '-') // Replace spaces with hyphens
@@ -185,8 +185,8 @@ export function isStrongPassword(password: string, config?: AuthConfig): boolean
   return result.isAcceptable && result.score >= 6;
 }
 
-export function generateUsername(firstName: string, lastName: string, suffix?: string): string {
-  const base = `${firstName.toLowerCase()}${lastName.toLowerCase()}`.replace(/[^a-z0-9]/g, '');
+export function generateUsername(first_name: string, last_name: string, suffix?: string): string {
+  const base = `${first_name.toLowerCase()}${last_name.toLowerCase()}`.replace(/[^a-z0-9]/g, '');
   
   if (suffix) {
     return `${base}${suffix}`;

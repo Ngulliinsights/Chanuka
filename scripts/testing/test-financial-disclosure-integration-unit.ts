@@ -11,24 +11,24 @@ import { logger } from '@shared/core';
 // Mock data for testing
 const mockDisclosure = {
   id: 1,
-  sponsorId: 1,
+  sponsor_id: 1,
   disclosureType: 'financial' as const,
   description: 'Investment in technology company',
   amount: 500000,
   source: 'TechCorp Ltd',
   dateReported: new Date('2024-01-15'),
-  isVerified: true,
-  createdAt: new Date('2024-01-15')
+  is_verified: true,
+  created_at: new Date('2024-01-15')
 };
 
 const mockAffiliation = {
   id: 1,
-  sponsorId: 1,
+  sponsor_id: 1,
   organization: 'TechCorp Ltd',
   type: 'economic',
   startDate: new Date('2023-01-01'),
   endDate: null,
-  isActive: true,
+  is_active: true,
   conflictType: 'financial'
 };
 
@@ -80,13 +80,13 @@ async function testFinancialDisclosureIntegrationUnit() {
     
     const mockDisclosureData = {
       id: 1,
-      sponsorId: 1,
+      sponsor_id: 1,
       disclosureType: 'financial' as const,
       description: 'Large investment',
       amount: 1500000,
       source: 'BigCorp',
       dateReported: new Date(),
-      isVerified: true,
+      is_verified: true,
       completenessScore: 85,
       riskLevel: 'medium' as const,
       lastUpdated: new Date(),
@@ -133,7 +133,7 @@ async function testFinancialDisclosureIntegrationUnit() {
         relationshipType: 'investment' as const,
         strength: 60,
         financialValue: 100000,
-        isActive: true,
+        is_active: true,
         conflictPotential: 'medium' as const
       },
       {
@@ -141,7 +141,7 @@ async function testFinancialDisclosureIntegrationUnit() {
         relationshipType: 'investment' as const,
         strength: 80,
         financialValue: 200000,
-        isActive: true,
+        is_active: true,
         conflictPotential: 'high' as const
       }
     ];

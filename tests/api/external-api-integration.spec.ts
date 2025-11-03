@@ -115,7 +115,7 @@ test.describe('External API Integration', () => {
         expect(service).toHaveProperty('name');
         expect(service).toHaveProperty('status');
         expect(service).toHaveProperty('responseTime');
-        expect(service).toHaveProperty('lastChecked');
+        expect(service).toHaveProperty('last_checked');
         expect(['healthy', 'degraded', 'unhealthy']).toContain(service.status);
       }
     });
@@ -144,7 +144,7 @@ test.describe('External API Integration', () => {
         expect(service).toHaveProperty('name');
         expect(service).toHaveProperty('status');
         expect(service).toHaveProperty('responseTime');
-        expect(service).toHaveProperty('lastChecked');
+        expect(service).toHaveProperty('last_checked');
         expect(service).toHaveProperty('endpoint');
         expect(service).toHaveProperty('errorCount');
         expect(service).toHaveProperty('successRate');

@@ -14,8 +14,8 @@ export interface MockUser {
   email: string;
   name: string;
   role: string;
-  isActive: boolean;
-  verificationStatus: string;
+  is_active: boolean;
+  verification_status: string;
 }
 
 export class MockUserFactory {
@@ -25,8 +25,8 @@ export class MockUserFactory {
       email: `test${Math.random().toString(36).substring(7)}@example.com`,
       name: `Test User ${Math.random().toString(36).substring(7)}`,
       role: 'citizen',
-      isActive: true,
-      verificationStatus: 'verified',
+      is_active: true,
+      verification_status: 'verified',
       ...overrides,
     };
   }
@@ -34,8 +34,8 @@ export class MockUserFactory {
   static createMockCitizenUser(overrides: Partial<MockUser> = {}): MockUser {
     return this.createMockUser({
       role: 'citizen',
-      verificationStatus: 'verified',
-      isActive: true,
+      verification_status: 'verified',
+      is_active: true,
       ...overrides,
     });
   }
@@ -101,15 +101,15 @@ export class FormTestHelper {
     const user = userEvent.setup();
     
     if (options.clear) {
-      await user.clear(input);
+      await users.clear(input);
     }
     
-    await user.type(input, value);
+    await users.type(input, value);
   }
 
   static async clickButton(button: HTMLElement): Promise<void> {
     const user = userEvent.setup();
-    await user.click(button);
+    await users.click(button);
   }
 }
 

@@ -1,7 +1,7 @@
 import { engagementAnalyticsService } from './services/engagement-analytics.js';
 import { billService } from './services/bill-service.js';
 import { db } from '@shared/database/pool.js';
-import { users, bills, billEngagement } from '../shared/schema';
+import { users, bills, bill_engagement } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '@shared/core';
 
@@ -23,30 +23,30 @@ async function verifyEngagementAnalytics() {
       .values([
         {
           email: 'analytics-user1@example.com',
-          passwordHash: 'hashedpassword',
+          password_hash: 'hashedpassword',
           name: 'Analytics Test User 1',
-          firstName: 'Analytics',
-          lastName: 'User1',
+          first_name: 'Analytics',
+          last_name: 'User1',
           role: 'citizen',
-          verificationStatus: 'verified'
+          verification_status: 'verified'
         },
         {
           email: 'analytics-user2@example.com',
-          passwordHash: 'hashedpassword',
+          password_hash: 'hashedpassword',
           name: 'Analytics Test User 2',
-          firstName: 'Analytics',
-          lastName: 'User2',
+          first_name: 'Analytics',
+          last_name: 'User2',
           role: 'expert',
-          verificationStatus: 'verified'
+          verification_status: 'verified'
         },
         {
           email: 'analytics-user3@example.com',
-          passwordHash: 'hashedpassword',
+          password_hash: 'hashedpassword',
           name: 'Analytics Test User 3',
-          firstName: 'Analytics',
-          lastName: 'User3',
+          first_name: 'Analytics',
+          last_name: 'User3',
           role: 'citizen',
-          verificationStatus: 'verified'
+          verification_status: 'verified'
         }
       ])
       .returning();
@@ -60,58 +60,57 @@ async function verifyEngagementAnalytics() {
           description: 'Healthcare bill for analytics testing',
           status: 'introduced',
           category: 'healthcare',
-          billNumber: 'HA-2024-001',
+          bill_number: 'HA-2024-001',
           summary: 'Healthcare analytics test bill',
-          viewCount: 100,
-          shareCount: 10
+          view_count: 100,
+          share_count: 10
         },
         {
           title: 'Education Analytics Test Bill',
           description: 'Education bill for analytics testing',
           status: 'committee',
           category: 'education',
-          billNumber: 'EA-2024-002',
+          bill_number: 'EA-2024-002',
           summary: 'Education analytics test bill',
-          viewCount: 150,
-          shareCount: 15
+          view_count: 150,
+          share_count: 15
         },
         {
           title: 'Environment Analytics Test Bill',
           description: 'Environment bill for analytics testing',
           status: 'passed',
           category: 'environment',
-          billNumber: 'ENV-2024-003',
+          bill_number: 'ENV-2024-003',
           summary: 'Environment analytics test bill',
-          viewCount: 200,
-          shareCount: 20
+          view_count: 200,
+          share_count: 20
         }
       ])
       .returning();
     
     // Create test engagement data
-    const engagementData = [];
-    for (let i = 0; i < testUsers.length; i++) {
-      for (let j = 0; j < testBills.length; j++) {
-        engagementData.push({
-          userId: testUsers[i].id,
-          billId: testBills[j].id,
-          viewCount: Math.floor(Math.random() * 20) + 1,
-          commentCount: Math.floor(Math.random() * 5),
-          shareCount: Math.floor(Math.random() * 3),
-          engagementScore: (Math.floor(Math.random() * 50) + 10).toString(),
+    const engagement_data = [];
+    for (let i = 0; i < testUsers.length; i++) { for (let j = 0; j < testBills.length; j++) {
+        engagement_data.push({
+          user_id: testUsers[i].id,
+          bill_id: testBills[j].id,
+          view_count: Math.floor(Math.random() * 20) + 1,
+          comment_count: Math.floor(Math.random() * 5),
+          share_count: Math.floor(Math.random() * 3),
+          engagement_score: (Math.floor(Math.random() * 50) + 10).toString(),
           lastEngaged: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000), // Random time in last week
-          createdAt: new Date(),
-          updatedAt: new Date()
-        });
+          created_at: new Date(),
+          updated_at: new Date()
+          });
       }
     }
     
-    await db.insert(billEngagement).values(engagementData);
+    await db.insert(bill_engagement).values(engagement_data);
     
     logger.info('✅ Test data created:', { component: 'Chanuka' }, {
       users: testUsers.length,
       bills: testBills.length,
-      engagements: engagementData.length
+      engagements: engagement_data.length
     });
 
     // Test 3: Get engagement metrics
@@ -213,7 +212,7 @@ async function verifyEngagementAnalytics() {
       undefined,
       undefined,
       {
-        billIds: [testBills[0].id, testBills[1].id],
+        bill_ids: [testBills[0].id, testBills[1].id],
         categories: ['healthcare', 'education']
       }
     );
@@ -249,16 +248,16 @@ async function verifyEngagementAnalytics() {
 
     // Cleanup test data
     logger.info('🧹 Cleaning up test data...', { component: 'Chanuka' });
-    await db.delete(billEngagement).where(eq(billEngagement.userId, testUsers[0].id));
-    await db.delete(billEngagement).where(eq(billEngagement.userId, testUsers[1].id));
-    await db.delete(billEngagement).where(eq(billEngagement.userId, testUsers[2].id));
+    await db.delete(bill_engagement).where(eq(bill_engagement.user_id, testUsers[0].id));
+    await db.delete(bill_engagement).where(eq(bill_engagement.user_id, testUsers[1].id));
+    await db.delete(bill_engagement).where(eq(bill_engagement.user_id, testUsers[2].id));
     
     for (const bill of testBills) {
-      await db.delete(bills).where(eq(bills.id, bill.id));
+      await db.delete(bills).where(eq(bills.id, bills.id));
     }
     
     for (const user of testUsers) {
-      await db.delete(users).where(eq(users.id, user.id));
+      await db.delete(users).where(eq(users.id, users.id));
     }
     
     logger.info('✅ Test data cleaned up', { component: 'Chanuka' });

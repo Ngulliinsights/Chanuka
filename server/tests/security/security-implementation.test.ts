@@ -81,31 +81,29 @@ describe('Security Implementation', () => {
     });
   });
 
-  describe('Data Privacy', () => {
-    const hashUserId = (userId: string): string => {
+  describe('Data Privacy', () => { const hashUserId = (user_id: string): string => {
       let hash = 0;
-      for (let i = 0; i < userId.length; i++) {
-        const char = userId.charCodeAt(i);
+      for (let i = 0; i < user_id.length; i++) {
+        const char = user_id.charCodeAt(i);
         hash = ((hash << 5) - hash) + char;
         hash = hash & hash;
-      }
+       }
       return `user_${Math.abs(hash).toString(36)}`;
     };
 
-    it('should hash user IDs consistently', () => {
-      const userId = 'user123';
-      const hash1 = hashUserId(userId);
-      const hash2 = hashUserId(userId);
+    it('should hash user IDs consistently', () => { const user_id = 'user123';
+      const hash1 = hashUserId(user_id);
+      const hash2 = hashUserId(user_id);
 
       expect(hash1).toBe(hash2);
       expect(hash1).toMatch(/^user_/);
-      expect(hash1).not.toBe(userId);
-    });
+      expect(hash1).not.toBe(user_id);
+     });
 
     const removeSensitiveFields = (data: any): any => {
       if (!data || typeof data !== 'object') return data;
       
-      const sensitiveFields = ['password', 'passwordHash', 'token', 'secret'];
+      const sensitiveFields = ['password', 'password_hash', 'token', 'secret'];
       const result: any = {};
       
       Object.entries(data).forEach(([key, value]) => {
@@ -124,7 +122,7 @@ describe('Security Implementation', () => {
       const data = {
         id: '123',
         name: 'John',
-        passwordHash: 'secret',
+        password_hash: 'secret',
         token: 'abc123',
         email: 'john@example.com'
       };
@@ -134,7 +132,7 @@ describe('Security Implementation', () => {
       expect(sanitized.id).toBe('123');
       expect(sanitized.name).toBe('John');
       expect(sanitized.email).toBe('john@example.com');
-      expect(sanitized.passwordHash).toBeUndefined();
+      expect(sanitized.password_hash).toBeUndefined();
       expect(sanitized.token).toBeUndefined();
     });
   });

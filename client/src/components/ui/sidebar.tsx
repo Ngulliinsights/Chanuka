@@ -148,7 +148,7 @@ const SidebarProvider = forwardRef<
     )
   }
 )
-SidebarProvider.displayName = "SidebarProvider"
+SidebarProvider.display_name = "SidebarProvider"
 
 const Sidebar = forwardRef<
   HTMLDivElement,
@@ -255,7 +255,7 @@ const Sidebar = forwardRef<
     )
   }
 )
-Sidebar.displayName = "Sidebar"
+Sidebar.display_name = "Sidebar"
 
 const SidebarTrigger = forwardRef<
   ElementRef<typeof Button>,
@@ -281,7 +281,7 @@ const SidebarTrigger = forwardRef<
     </Button>
   )
 })
-SidebarTrigger.displayName = "SidebarTrigger"
+SidebarTrigger.display_name = "SidebarTrigger"
 
 const SidebarRail = forwardRef<
   HTMLButtonElement,
@@ -310,7 +310,7 @@ const SidebarRail = forwardRef<
     />
   )
 })
-SidebarRail.displayName = "SidebarRail"
+SidebarRail.display_name = "SidebarRail"
 
 const SidebarInset = forwardRef<
   HTMLDivElement,
@@ -328,7 +328,7 @@ const SidebarInset = forwardRef<
     />
   )
 })
-SidebarInset.displayName = "SidebarInset"
+SidebarInset.display_name = "SidebarInset"
 
 const SidebarInput = forwardRef<
   ElementRef<typeof Input>,
@@ -346,7 +346,7 @@ const SidebarInput = forwardRef<
     />
   )
 })
-SidebarInput.displayName = "SidebarInput"
+SidebarInput.display_name = "SidebarInput"
 
 const SidebarHeader = forwardRef<
   HTMLDivElement,
@@ -361,7 +361,7 @@ const SidebarHeader = forwardRef<
     />
   )
 })
-SidebarHeader.displayName = "SidebarHeader"
+SidebarHeader.display_name = "SidebarHeader"
 
 const SidebarFooter = forwardRef<
   HTMLDivElement,
@@ -376,7 +376,7 @@ const SidebarFooter = forwardRef<
     />
   )
 })
-SidebarFooter.displayName = "SidebarFooter"
+SidebarFooter.display_name = "SidebarFooter"
 
 const SidebarSeparator = forwardRef<
   ElementRef<typeof Separator>,
@@ -391,7 +391,7 @@ const SidebarSeparator = forwardRef<
     />
   )
 })
-SidebarSeparator.displayName = "SidebarSeparator"
+SidebarSeparator.display_name = "SidebarSeparator"
 
 const SidebarContent = forwardRef<
   HTMLDivElement,
@@ -409,7 +409,7 @@ const SidebarContent = forwardRef<
     />
   )
 })
-SidebarContent.displayName = "SidebarContent"
+SidebarContent.display_name = "SidebarContent"
 
 const SidebarGroup = forwardRef<
   HTMLDivElement,
@@ -424,7 +424,7 @@ const SidebarGroup = forwardRef<
     />
   )
 })
-SidebarGroup.displayName = "SidebarGroup"
+SidebarGroup.display_name = "SidebarGroup"
 
 const SidebarGroupLabel = forwardRef<
   HTMLDivElement,
@@ -445,7 +445,7 @@ const SidebarGroupLabel = forwardRef<
     />
   )
 })
-SidebarGroupLabel.displayName = "SidebarGroupLabel"
+SidebarGroupLabel.display_name = "SidebarGroupLabel"
 
 const SidebarGroupAction = forwardRef<
   HTMLButtonElement,
@@ -468,7 +468,7 @@ const SidebarGroupAction = forwardRef<
     />
   )
 })
-SidebarGroupAction.displayName = "SidebarGroupAction"
+SidebarGroupAction.display_name = "SidebarGroupAction"
 
 const SidebarGroupContent = forwardRef<
   HTMLDivElement,
@@ -481,7 +481,7 @@ const SidebarGroupContent = forwardRef<
     {...props}
   />
 ))
-SidebarGroupContent.displayName = "SidebarGroupContent"
+SidebarGroupContent.display_name = "SidebarGroupContent"
 
 const SidebarMenu = forwardRef<
   HTMLUListElement,
@@ -494,7 +494,7 @@ const SidebarMenu = forwardRef<
     {...props}
   />
 ))
-SidebarMenu.displayName = "SidebarMenu"
+SidebarMenu.display_name = "SidebarMenu"
 
 const SidebarMenuItem = forwardRef<
   HTMLLIElement,
@@ -507,7 +507,7 @@ const SidebarMenuItem = forwardRef<
     {...props}
   />
 ))
-SidebarMenuItem.displayName = "SidebarMenuItem"
+SidebarMenuItem.display_name = "SidebarMenuItem"
 
 const sidebarMenuButtonVariants = cva(
   "peer/menu-button flex w-full items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm outline-none ring-sidebar-ring transition-[width,height,padding] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 group-has-[[data-sidebar=menu-action]]/menu-item:pr-8 aria-disabled:pointer-events-none aria-disabled:opacity-50 data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[state=open]:hover:bg-sidebar-accent data-[state=open]:hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:!size-8 group-data-[collapsible=icon]:!p-2 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0",
@@ -535,14 +535,14 @@ const SidebarMenuButton = forwardRef<
   HTMLButtonElement,
   ComponentProps<"button"> & {
     asChild?: boolean
-    isActive?: boolean
+    is_active?: boolean
     tooltip?: string | ComponentProps<typeof TooltipContent>
   } & VariantProps<typeof sidebarMenuButtonVariants>
 >(
   (
     {
       asChild = false,
-      isActive = false,
+      is_active = false,
       variant = "default",
       size = "default",
       tooltip,
@@ -559,7 +559,7 @@ const SidebarMenuButton = forwardRef<
         ref={ref}
         data-sidebar="menu-button"
         data-size={size}
-        data-active={isActive}
+        data-active={is_active}
         className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
         {...props}
       />
@@ -589,7 +589,7 @@ const SidebarMenuButton = forwardRef<
     )
   }
 )
-SidebarMenuButton.displayName = "SidebarMenuButton"
+SidebarMenuButton.display_name = "SidebarMenuButton"
 
 const SidebarMenuAction = forwardRef<
   HTMLButtonElement,
@@ -620,7 +620,7 @@ const SidebarMenuAction = forwardRef<
     />
   )
 })
-SidebarMenuAction.displayName = "SidebarMenuAction"
+SidebarMenuAction.display_name = "SidebarMenuAction"
 
 const SidebarMenuBadge = forwardRef<
   HTMLDivElement,
@@ -641,7 +641,7 @@ const SidebarMenuBadge = forwardRef<
     {...props}
   />
 ))
-SidebarMenuBadge.displayName = "SidebarMenuBadge"
+SidebarMenuBadge.display_name = "SidebarMenuBadge"
 
 const SidebarMenuSkeleton = forwardRef<
   HTMLDivElement,
@@ -679,7 +679,7 @@ const SidebarMenuSkeleton = forwardRef<
     </div>
   )
 })
-SidebarMenuSkeleton.displayName = "SidebarMenuSkeleton"
+SidebarMenuSkeleton.display_name = "SidebarMenuSkeleton"
 
 const SidebarMenuSub = forwardRef<
   HTMLUListElement,
@@ -696,22 +696,22 @@ const SidebarMenuSub = forwardRef<
     {...props}
   />
 ))
-SidebarMenuSub.displayName = "SidebarMenuSub"
+SidebarMenuSub.display_name = "SidebarMenuSub"
 
 const SidebarMenuSubItem = forwardRef<
   HTMLLIElement,
   ComponentProps<"li">
 >(({ ...props }, ref) => <li ref={ref} {...props} />)
-SidebarMenuSubItem.displayName = "SidebarMenuSubItem"
+SidebarMenuSubItem.display_name = "SidebarMenuSubItem"
 
 const SidebarMenuSubButton = forwardRef<
   HTMLAnchorElement,
   ComponentProps<"a"> & {
     asChild?: boolean
     size?: "sm" | "md"
-    isActive?: boolean
+    is_active?: boolean
   }
->(({ asChild = false, size = "md", isActive, className, ...props }, ref) => {
+>(({ asChild = false, size = "md", is_active, className, ...props }, ref) => {
   const Comp = asChild ? Slot : "a"
 
   return (
@@ -719,7 +719,7 @@ const SidebarMenuSubButton = forwardRef<
       ref={ref}
       data-sidebar="menu-sub-button"
       data-size={size}
-      data-active={isActive}
+      data-active={is_active}
       className={cn(
         "flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground outline-none ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 active:bg-sidebar-accent active:text-sidebar-accent-foreground disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:size-4 [&>svg]:shrink-0 [&>svg]:text-sidebar-accent-foreground",
         "data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground",
@@ -732,7 +732,7 @@ const SidebarMenuSubButton = forwardRef<
     />
   )
 })
-SidebarMenuSubButton.displayName = "SidebarMenuSubButton"
+SidebarMenuSubButton.display_name = "SidebarMenuSubButton"
 
 export {
   Sidebar,

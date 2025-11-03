@@ -2,7 +2,7 @@
  * Sponsorship Analysis Types
  * 
  * Domain-specific types for sponsor conflict analysis, financial exposure, and transparency scoring.
- * Migrated from shared/types/bill.ts to maintain proper domain boundaries.
+ * Migrated from shared/types/bills.ts to maintain proper domain boundaries.
  */
 
 import type {
@@ -14,8 +14,7 @@ import type {
   AnalysisMethodology
 } from '../../types/common.js';
 
-export interface SponsorshipAnalysis {
-  billId: number;
+export interface SponsorshipAnalysis { bill_id: number;
   title: string;
   number: string;
   introduced: string;
@@ -29,4 +28,4 @@ export interface SponsorshipAnalysis {
   timeline: TimelineEvent[];
   implementationWorkarounds?: ImplementationWorkarounds;
   methodology: AnalysisMethodology;
-}
+ }

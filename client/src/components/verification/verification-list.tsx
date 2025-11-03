@@ -6,15 +6,14 @@ import { LoadingSpinner } from '../ui/spinner';
 import { useBills } from '../../hooks/use-bills';
 import { logger } from '../../utils/browser-logger';
 
-interface VerificationItem {
-  id: number;
-  billId: number;
+interface VerificationItem { id: number;
+  bill_id: number;
   billTitle: string;
   claimType: 'constitutional' | 'economic' | 'legal' | 'scientific';
   claimText: string;
   status: 'pending' | 'verified' | 'disputed';
   dateSubmitted: string;
-}
+ }
 
 export const VerificationsList = () => {
   const [items, setItems] = useState<VerificationItem[]>([]);
@@ -22,45 +21,41 @@ export const VerificationsList = () => {
   const [activeFilter, setActiveFilter] = useState<'all' | 'pending' | 'verified' | 'disputed'>('all');
   const { bills } = useBills();
 
-  useEffect(() => {
-    // This would be replaced with an actual API call in production
+  useEffect(() => { // This would be replaced with an actual API call in production
     const mockItems: VerificationItem[] = [
       {
         id: 1,
-        billId: 1,
+        bill_id: 1,
         billTitle: "H.R. 1234: Education Reform Act",
         claimType: 'constitutional',
         claimText: "The federal funding provisions are consistent with South Dakota v. Dole precedent",
         status: 'verified',
         dateSubmitted: "2023-04-15T10:30:00Z"
-      },
-      {
-        id: 2,
-        billId: 1,
+       },
+      { id: 2,
+        bill_id: 1,
         billTitle: "H.R. 1234: Education Reform Act",
         claimType: 'economic',
         claimText: "Implementation costs will be offset by long-term economic benefits",
         status: 'pending',
         dateSubmitted: "2023-04-16T14:20:00Z"
-      },
-      {
-        id: 3,
-        billId: 2,
+       },
+      { id: 3,
+        bill_id: 2,
         billTitle: "S. 789: Healthcare Accessibility Act",
         claimType: 'legal',
         claimText: "New regulations comply with existing HIPAA framework",
         status: 'disputed',
         dateSubmitted: "2023-04-10T09:15:00Z"
-      },
-      {
-        id: 4,
-        billId: 3,
+       },
+      { id: 4,
+        bill_id: 3,
         billTitle: "H.R. 567: Climate Action Plan",
         claimType: 'scientific',
         claimText: "Emission targets align with IPCC recommendations",
         status: 'pending',
         dateSubmitted: "2023-04-18T11:45:00Z"
-      }
+       }
     ];
 
     setTimeout(() => {

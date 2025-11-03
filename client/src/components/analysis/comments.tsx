@@ -37,25 +37,24 @@ const formatDistanceToNow = (date: Date) => {
 import { useBillAnalysis } from '../../hooks/use-bill-analysis';
 import { logger } from '../../utils/browser-logger';
 
-interface Comment {
-  id: number;
-  userId: number;
+interface Comment { id: number;
+  user_id: number;
   username: string;
   userInitials: string;
   expertise?: string;
   content: string;
-  createdAt: Date;
+  created_at: Date;
   endorsements: number;
   // cspell:ignore downvotes upvotes
   downvotes: number;
   upvotes: number;
-  parentId?: number;
+  parent_id?: number;
   verifiedClaims: number;
   isHighlighted: boolean;
   replies?: Comment[];
   pollData?: {
     question: string;
-    options: Array<{ text: string; votes: number }>;
+    options: Array<{ text: string; votes: number  }>;
     totalVotes: number;
     userVote?: number;
   };
@@ -66,18 +65,17 @@ interface Poll {
   options: string[];
 }
 
-interface CommentsProps {
-  comments: Comment[];
+interface CommentsProps { comments: Comment[];
   onAddComment: (content: string, expertise?: string) => Promise<void>;
-  onEndorseComment: (commentId: number) => Promise<void>;
+  onEndorseComment: (comment_id: number) => Promise<void>;
   isAddingComment: boolean;
   isEndorsing: boolean;
   sortOrder: 'newest' | 'oldest' | 'endorsed';
-  billId: number;
+  bill_id: number;
   billSection?: string;
-}
+ }
 
-export function Comments({ comments, onAddComment, onEndorseComment, isAddingComment, isEndorsing, sortOrder, billId, billSection }: CommentsProps) {
+export function Comments({ comments, onAddComment, onEndorseComment, isAddingComment, isEndorsing, sortOrder, bill_id, billSection  }: CommentsProps) {
   const [newComment, setNewComment] = useState('');
   const [newExpertise, setNewExpertise] = useState('');
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
@@ -96,13 +94,13 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
   }, [newComment]);
 
 
-  const toggleCommentExpansion = (commentId: number) => {
+  const toggleCommentExpansion = (comment_id: number) => {
     setExpandedComments(prev => {
       const newSet = new Set(prev);
-      if (newSet.has(commentId)) {
-        newSet.delete(commentId);
+      if (newSet.has(comment_id)) {
+        newSet.delete(comment_id);
       } else {
-        newSet.add(commentId);
+        newSet.add(comment_id);
       }
       return newSet;
     });
@@ -121,11 +119,10 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
     }
   };
 
-  const handleSubmitPoll = async () => {
-    if (!pollData.question.trim() || pollData.options.some(opt => !opt.trim())) return;
+  const handleSubmitPoll = async () => { if (!pollData.question.trim() || pollData.options.some(opt => !opt.trim())) return;
 
     try {
-      const response = await fetch(`/api/bills/${billId}/polls`, {
+      const response = await fetch(`/api/bills/${bill_id }/polls`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -144,9 +141,9 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
     }
   };
 
-  const handleVote = async (commentId: number, type: 'up' | 'down') => {
+  const handleVote = async (comment_id: number, type: 'up' | 'down') => {
     try {
-      const response = await fetch(`/api/comments/${commentId}/vote`, {
+      const response = await fetch(`/api/comments/${comment_id}/vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type }),
@@ -160,9 +157,9 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
     }
   };
 
-  const handlePollVote = async (commentId: number, optionIndex: number) => {
+  const handlePollVote = async (comment_id: number, optionIndex: number) => {
     try {
-      const response = await fetch(`/api/comments/${commentId}/poll-vote`, {
+      const response = await fetch(`/api/comments/${comment_id}/poll-vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ optionIndex }),
@@ -176,16 +173,15 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
     }
   };
 
-  const handleReply = async (parentId: number) => {
-    if (!replyContent.trim()) return;
+  const handleReply = async (parent_id: number) => { if (!replyContent.trim()) return;
 
     try {
-      const response = await fetch(`/api/bills/${billId}/comments`, {
+      const response = await fetch(`/api/bills/${bill_id }/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           content: replyContent,
-          parentId,
+          parent_id,
           section: billSection,
         }),
       });
@@ -200,9 +196,9 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
     }
   };
 
-  const handleHighlight = async (commentId: number) => {
+  const handleHighlight = async (comment_id: number) => {
     try {
-      const response = await fetch(`/api/comments/${commentId}/highlight`, {
+      const response = await fetch(`/api/comments/${comment_id}/highlight`, {
         method: 'POST',
       });
 
@@ -263,7 +259,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
     const displayContent = shouldTruncate && !isExpanded 
       ? getCommentPreview(comment.content) 
       : comment.content;
-    const engagementScore = getEngagementScore(comment);
+    const engagement_score = getEngagementScore(comment);
 
     return (
       <Card key={comment.id} className={`transition-all duration-200 hover:shadow-md ${
@@ -299,7 +295,7 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
                     Featured
                   </Badge>
                 )}
-                {engagementScore > 10 && (
+                {engagement_score > 10 && (
                   <Badge variant="outline" className="text-purple-700 border-purple-300 bg-purple-50">
                     <Users className="w-3 h-3 mr-1" />
                     High Engagement
@@ -308,13 +304,13 @@ export function Comments({ comments, onAddComment, onEndorseComment, isAddingCom
               </div>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-sm text-gray-500">
-                  {formatDistanceToNow(new Date(comment.createdAt))}
+                  {formatDistanceToNow(new Date(comment.created_at))}
                 </span>
-                {engagementScore > 0 && (
+                {engagement_score > 0 && (
                   <>
                     <span className="text-gray-300">•</span>
                     <span className="text-sm text-gray-500">
-                      {engagementScore} engagement points
+                      {engagement_score} engagement points
                     </span>
                   </>
                 )}

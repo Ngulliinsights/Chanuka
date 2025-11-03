@@ -43,7 +43,7 @@ interface APIHealthStatus {
   responseTime: number;
   successRate: number;
   errorRate: number;
-  lastChecked: Date;
+  last_checked: Date;
   uptime: number;
   downtimeEvents: DowntimeEvent[];
   consecutiveFailures: number;
@@ -313,7 +313,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
       // successRate is a proportion (0-1) used throughout update logic
       successRate: 1,
       errorRate: 0,
-      lastChecked: new Date(),
+      last_checked: new Date(),
       uptime: 100,
       downtimeEvents: [],
       consecutiveFailures: 0
@@ -775,7 +775,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
         responseTime: responseTime || 0,
         successRate: success ? 1 : 0,
         errorRate: success ? 0 : 1,
-        lastChecked: new Date(),
+        last_checked: new Date(),
         uptime: 0,
         downtimeEvents: [],
         consecutiveFailures: success ? 0 : 1
@@ -811,7 +811,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
       healthStatus.status = 'down';
     }
 
-    healthStatus.lastChecked = new Date();
+    healthStatus.last_checked = new Date();
 
     this.emit('healthStatusChange', { source, status: healthStatus.status, responseTime });
   }
@@ -828,7 +828,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
         responseTime: 0,
         successRate: 0,
         errorRate: 1,
-        lastChecked: new Date(),
+        last_checked: new Date(),
         uptime: 0,
         downtimeEvents: [],
         consecutiveFailures: 1

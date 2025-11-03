@@ -75,30 +75,30 @@ describe('End-to-End User Workflows', () => {
 
       // Navigate to registration
       const registerLink = screen.getByTestId('register-link');
-      await user.click(registerLink);
+      await users.click(registerLink);
 
       // Fill out registration form
       const emailInput = screen.getByTestId('email-input');
       const passwordInput = screen.getByTestId('password-input');
-      const firstNameInput = screen.getByTestId('first-name-input');
-      const lastNameInput = screen.getByTestId('last-name-input');
+      const first_nameInput = screen.getByTestId('first-name-input');
+      const last_nameInput = screen.getByTestId('last-name-input');
 
-      await user.type(emailInput, 'newuser@example.com');
-      await user.type(passwordInput, 'SecurePass123!');
-      await user.type(firstNameInput, 'New');
-      await user.type(lastNameInput, 'User');
+      await users.type(emailInput, 'newuser@example.com');
+      await users.type(passwordInput, 'SecurePass123!');
+      await users.type(first_nameInput, 'New');
+      await users.type(last_nameInput, 'User');
 
       // Submit registration
       const submitButton = screen.getByTestId('register-submit-btn');
-      await user.click(submitButton);
+      await users.click(submitButton);
 
       // Verify registration success
       await waitFor(() => {
         expect(register).toHaveBeenCalledWith({
           email: 'newuser@example.com',
           password: 'SecurePass123!',
-          firstName: 'New',
-          lastName: 'User',
+          first_name: 'New',
+          last_name: 'User',
           role: 'citizen'
         });
       });
@@ -138,18 +138,18 @@ describe('End-to-End User Workflows', () => {
 
       // Navigate to login
       const loginLink = screen.getByTestId('login-link');
-      await user.click(loginLink);
+      await users.click(loginLink);
 
       // Fill out login form
       const emailInput = screen.getByTestId('email-input');
       const passwordInput = screen.getByTestId('password-input');
 
-      await user.type(emailInput, 'user@example.com');
-      await user.type(passwordInput, 'password123');
+      await users.type(emailInput, 'user@example.com');
+      await users.type(passwordInput, 'password123');
 
       // Submit login
       const submitButton = screen.getByTestId('login-submit-btn');
-      await user.click(submitButton);
+      await users.click(submitButton);
 
       // Verify login success
       await waitFor(() => {
@@ -178,18 +178,18 @@ describe('End-to-End User Workflows', () => {
 
       // Navigate to login
       const loginLink = screen.getByTestId('login-link');
-      await user.click(loginLink);
+      await users.click(loginLink);
 
       // Fill out login form with invalid credentials
       const emailInput = screen.getByTestId('email-input');
       const passwordInput = screen.getByTestId('password-input');
 
-      await user.type(emailInput, 'user@example.com');
-      await user.type(passwordInput, 'wrongpassword');
+      await users.type(emailInput, 'user@example.com');
+      await users.type(passwordInput, 'wrongpassword');
 
       // Submit login
       const submitButton = screen.getByTestId('login-submit-btn');
-      await user.click(submitButton);
+      await users.click(submitButton);
 
       // Should show error message
       await waitFor(() => {
@@ -267,7 +267,7 @@ describe('End-to-End User Workflows', () => {
 
       // Navigate to bills page
       const billsLink = screen.getByTestId('nav-bills');
-      await user.click(billsLink);
+      await users.click(billsLink);
 
       // Wait for bills to load
       await waitFor(() => {
@@ -277,7 +277,7 @@ describe('End-to-End User Workflows', () => {
 
       // Click on first bill to view details
       const billLink = screen.getByText('Digital Privacy Act');
-      await user.click(billLink);
+      await users.click(billLink);
 
       // Verify bill details page
       await waitFor(() => {
@@ -314,14 +314,14 @@ describe('End-to-End User Workflows', () => {
 
       // Navigate to bills page
       const billsLink = screen.getByTestId('nav-bills');
-      await user.click(billsLink);
+      await users.click(billsLink);
 
       // Use search functionality
       const searchInput = screen.getByTestId('bills-search-input');
-      await user.type(searchInput, 'privacy');
+      await users.type(searchInput, 'privacy');
 
       const searchButton = screen.getByTestId('search-submit-btn');
-      await user.click(searchButton);
+      await users.click(searchButton);
 
       // Verify search results
       await waitFor(() => {
@@ -331,7 +331,7 @@ describe('End-to-End User Workflows', () => {
 
       // Apply status filter
       const statusFilter = screen.getByTestId('status-filter');
-      await user.selectOptions(statusFilter, 'introduced');
+      await users.selectOptions(statusFilter, 'introduced');
 
       // Verify filtered results
       await waitFor(() => {
@@ -360,14 +360,14 @@ describe('End-to-End User Workflows', () => {
 
       // Navigate to bills page
       const billsLink = screen.getByTestId('nav-bills');
-      await user.click(billsLink);
+      await users.click(billsLink);
 
       // Search for non-existent term
       const searchInput = screen.getByTestId('bills-search-input');
-      await user.type(searchInput, 'nonexistentterm');
+      await users.type(searchInput, 'nonexistentterm');
 
       const searchButton = screen.getByTestId('search-submit-btn');
-      await user.click(searchButton);
+      await users.click(searchButton);
 
       // Should show no results message
       await waitFor(() => {
@@ -415,7 +415,7 @@ describe('End-to-End User Workflows', () => {
             id: 'comment-1',
             content: 'This is an important bill for privacy rights.',
             author: 'Jane Doe',
-            createdAt: '2024-01-15T10:00:00Z',
+            created_at: '2024-01-15T10:00:00Z',
             votes: { upvotes: 5, downvotes: 1 }
           }
         ]
@@ -428,7 +428,7 @@ describe('End-to-End User Workflows', () => {
           id: 'comment-2',
           content: 'I agree, this bill is very important.',
           author: 'Test User',
-          createdAt: '2024-01-16T10:00:00Z',
+          created_at: '2024-01-16T10:00:00Z',
           votes: { upvotes: 0, downvotes: 0 }
         }
       });
@@ -437,7 +437,7 @@ describe('End-to-End User Workflows', () => {
 
       // Navigate to bill details
       const billsLink = screen.getByTestId('nav-bills');
-      await user.click(billsLink);
+      await users.click(billsLink);
 
       // Assume we're on bill details page
       await waitFor(() => {
@@ -450,17 +450,16 @@ describe('End-to-End User Workflows', () => {
 
       // Add new comment
       const commentInput = screen.getByTestId('comment-input');
-      await user.type(commentInput, 'I agree, this bill is very important.');
+      await users.type(commentInput, 'I agree, this bill is very important.');
 
       const submitButton = screen.getByTestId('comment-submit-btn');
-      await user.click(submitButton);
+      await users.click(submitButton);
 
       // Verify comment creation
-      await waitFor(() => {
-        expect(createComment).toHaveBeenCalledWith({
-          billId: 'bill-1',
+      await waitFor(() => { expect(createComment).toHaveBeenCalledWith({
+          bill_id: 'bill-1',
           content: 'I agree, this bill is very important.'
-        });
+         });
       });
 
       // Should show new comment
@@ -482,10 +481,10 @@ describe('End-to-End User Workflows', () => {
 
       // Assume we're on bill details page
       const commentInput = screen.getByTestId('comment-input');
-      await user.type(commentInput, 'Too short');
+      await users.type(commentInput, 'Too short');
 
       const submitButton = screen.getByTestId('comment-submit-btn');
-      await user.click(submitButton);
+      await users.click(submitButton);
 
       // Should show error message
       await waitFor(() => {
@@ -535,7 +534,7 @@ describe('End-to-End User Workflows', () => {
 
       // Navigate to profile
       const profileLink = screen.getByTestId('nav-profile');
-      await user.click(profileLink);
+      await users.click(profileLink);
 
       // Should show current profile information
       await waitFor(() => {
@@ -545,12 +544,12 @@ describe('End-to-End User Workflows', () => {
 
       // Update name
       const nameInput = screen.getByTestId('name-input');
-      await user.clear(nameInput);
-      await user.type(nameInput, 'Updated User');
+      await users.clear(nameInput);
+      await users.type(nameInput, 'Updated User');
 
       // Save changes
       const saveButton = screen.getByTestId('profile-save-btn');
-      await user.click(saveButton);
+      await users.click(saveButton);
 
       // Verify profile update
       await waitFor(() => {
@@ -579,19 +578,19 @@ describe('End-to-End User Workflows', () => {
 
       // Navigate to settings
       const settingsLink = screen.getByTestId('nav-settings');
-      await user.click(settingsLink);
+      await users.click(settingsLink);
 
       // Toggle email notifications
       const emailToggle = screen.getByTestId('email-notifications-toggle');
-      await user.click(emailToggle);
+      await users.click(emailToggle);
 
       // Update category preferences
       const healthcareCheckbox = screen.getByTestId('healthcare-category-checkbox');
-      await user.click(healthcareCheckbox);
+      await users.click(healthcareCheckbox);
 
       // Save preferences
       const saveButton = screen.getByTestId('preferences-save-btn');
-      await user.click(saveButton);
+      await users.click(saveButton);
 
       // Verify preferences update
       await waitFor(() => {
@@ -631,7 +630,7 @@ describe('End-to-End User Workflows', () => {
       expect(mobileMenuButton).toBeInTheDocument();
 
       // Click mobile menu
-      await user.click(mobileMenuButton);
+      await users.click(mobileMenuButton);
 
       // Mobile navigation menu should open
       await waitFor(() => {
@@ -667,17 +666,17 @@ describe('End-to-End User Workflows', () => {
       renderApp();
 
       // Tab through navigation elements
-      await user.tab();
+      await users.tab();
       expect(screen.getByTestId('nav-home')).toHaveFocus();
 
-      await user.tab();
+      await users.tab();
       expect(screen.getByTestId('nav-bills')).toHaveFocus();
 
-      await user.tab();
+      await users.tab();
       expect(screen.getByTestId('nav-sponsors')).toHaveFocus();
 
       // Enter key should activate focused element
-      await user.keyboard('{Enter}');
+      await users.keyboard('{Enter}');
 
       await waitFor(() => {
         expect(screen.getByText(/sponsors list/i)).toBeInTheDocument();
@@ -715,14 +714,14 @@ describe('End-to-End User Workflows', () => {
 
       // Open modal dialog
       const detailsButton = screen.getByTestId('view-bill-1');
-      await user.click(detailsButton);
+      await users.click(detailsButton);
 
       // Focus should move to modal
       const modal = screen.getByTestId('bill-details-modal');
       expect(modal).toHaveFocus();
 
       // Close modal with Escape key
-      await user.keyboard('{Escape}');
+      await users.keyboard('{Escape}');
 
       // Focus should return to trigger button
       expect(detailsButton).toHaveFocus();
@@ -758,7 +757,7 @@ describe('End-to-End User Workflows', () => {
 
       // Navigate to bills page
       const billsLink = screen.getByTestId('nav-bills');
-      await user.click(billsLink);
+      await users.click(billsLink);
 
       // Wait for bills to load
       await waitFor(() => {
@@ -779,7 +778,7 @@ describe('End-to-End User Workflows', () => {
       const searchButton = screen.getByTestId('search-submit-btn');
       
       for (let i = 0; i < 10; i++) {
-        await user.click(searchButton);
+        await users.click(searchButton);
       }
 
       // Should remain stable
@@ -822,7 +821,7 @@ describe('End-to-End User Workflows', () => {
 
       // Navigate to bills page
       const billsLink = screen.getByTestId('nav-bills');
-      await user.click(billsLink);
+      await users.click(billsLink);
 
       // Should show error message
       await waitFor(() => {
@@ -840,7 +839,7 @@ describe('End-to-End User Workflows', () => {
         pagination: { page: 1, limit: 20, total: 0, totalPages: 0 }
       });
 
-      await user.click(retryButton);
+      await users.click(retryButton);
 
       // Should recover and show content
       await waitFor(() => {

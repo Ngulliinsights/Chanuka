@@ -48,7 +48,7 @@ const TestComponent: React.FC<{
   return (
     <div>
       <div data-testid="current-path">{navigation.currentPath}</div>
-      <div data-testid="user-role">{navigation.userRole}</div>
+      <div data-testid="user-role">{navigation.user_role}</div>
       <div data-testid="sidebar-open">{navigation.sidebarOpen.toString()}</div>
       <div data-testid="mobile-menu-open">{navigation.mobileMenuOpen.toString()}</div>
       <div data-testid="breadcrumbs-count">{navigation.breadcrumbs.length}</div>

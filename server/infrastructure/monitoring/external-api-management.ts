@@ -437,7 +437,7 @@ router.get('/dashboard', asyncHandler(async (req, res) => {
       source: h.source,
       status: h.status,
       responseTime: h.responseTime,
-      lastChecked: h.lastChecked
+      last_checked: h.last_checked
     })),
     topSources: analytics.topPerformingSources.slice(0, 5),
     recentErrors,

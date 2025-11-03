@@ -69,7 +69,7 @@ describe('Auth Recovery System', () => {
       });
 
       it('should provide name validation recovery', () => {
-        const error = new AuthValidationError('Invalid name', 'firstName', 'J');
+        const error = new AuthValidationError('Invalid name', 'first_name', 'J');
         const context = createRecoveryContext(error, 1, {}, 'register');
         
         const strategy = getRecoveryStrategy(context);

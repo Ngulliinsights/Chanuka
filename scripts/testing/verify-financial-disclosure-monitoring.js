@@ -89,10 +89,10 @@ async function verifySystem() {
     
     const requiredEndpoints = [
       'router.get("/disclosures"',
-      'router.get("/relationships/:sponsorId"',
-      'router.get("/completeness/:sponsorId"',
+      'router.get("/relationships/:sponsor_id"',
+      'router.get("/completeness/:sponsor_id"',
       'router.post("/alerts"',
-      'router.get("/alerts/:sponsorId"',
+      'router.get("/alerts/:sponsor_id"',
       'router.get("/dashboard"',
       'router.get("/health"',
       'router.post("/monitoring/start"',

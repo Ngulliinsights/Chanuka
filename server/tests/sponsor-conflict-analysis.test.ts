@@ -103,7 +103,7 @@ describe('SponsorConflictAnalysisService', () => {
       conflicts.forEach((conflict) => {
         // Required fields presence check
         expect(conflict).toHaveProperty('conflictId');
-        expect(conflict).toHaveProperty('sponsorId');
+        expect(conflict).toHaveProperty('sponsor_id');
         expect(conflict).toHaveProperty('conflictType');
         expect(conflict).toHaveProperty('severity');
         expect(conflict).toHaveProperty('description');
@@ -124,7 +124,7 @@ describe('SponsorConflictAnalysisService', () => {
         
         // Additional type validations for data integrity
         expect(typeof conflict.conflictId).toBe('string');
-        expect(typeof conflict.sponsorId).toBe('string');
+        expect(typeof conflict.sponsor_id).toBe('string');
         expect(typeof conflict.description).toBe('string');
         expect(Array.isArray(conflict.affectedBills)).toBe(true);
         expect(typeof conflict.financialImpact).toBe('number');
@@ -166,13 +166,13 @@ describe('SponsorConflictAnalysisService', () => {
         expect(node).toHaveProperty('id');
         expect(node).toHaveProperty('type');
         expect(node).toHaveProperty('name');
-        expect(node).toHaveProperty('conflictLevel');
+        expect(node).toHaveProperty('conflict_level');
         
         // Ensure node type is valid
         expect(VALID_NODE_TYPES).toContain(node.type);
         
         // Ensure conflict level is valid
-        expect(VALID_CONFLICT_LEVELS).toContain(node.conflictLevel);
+        expect(VALID_CONFLICT_LEVELS).toContain(node.conflict_level);
         
         // Validate data types
         expect(typeof node.id).toBe('string');
@@ -243,7 +243,7 @@ describe('SponsorConflictAnalysisService', () => {
       // Validate each trend analysis result
       trends.forEach((trend) => {
         // Required fields for trend analysis
-        expect(trend).toHaveProperty('sponsorId');
+        expect(trend).toHaveProperty('sponsor_id');
         expect(trend).toHaveProperty('timeframe');
         expect(trend).toHaveProperty('conflictCount');
         expect(trend).toHaveProperty('severityTrend');
@@ -261,7 +261,7 @@ describe('SponsorConflictAnalysisService', () => {
         expect(Array.isArray(trend.predictions)).toBe(true);
         
         // Validate data types
-        expect(typeof trend.sponsorId).toBe('string');
+        expect(typeof trend.sponsor_id).toBe('string');
         expect(typeof trend.conflictCount).toBe('number');
         expect(trend.conflictCount).toBeGreaterThanOrEqual(0);
         

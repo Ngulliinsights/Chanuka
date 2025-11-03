@@ -3,7 +3,8 @@ import { Router } from 'express';
 import { databaseService } from '../../../infrastructure/database/database-service';
 import { database as db } from '../../../../shared/database/connection';
 // FIXED: Import plural table names and correct type references
-import { billComments, users, userProfiles, bills, commentVotes } from '@shared/schema';
+import { comments, users, user_profiles, bills, comment_votes } from '@shared/citizen_participation';
+import { bill_engagement } from '@shared/citizen_participation';
 import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
 // FIXED: Import cacheKeys from the correct location
@@ -26,17 +27,16 @@ import type {
  * Engagement Analytics Service
  * Provides detailed analytics on user and content engagement patterns
  */
-export class EngagementAnalyticsService {
-  private readonly ANALYTICS_CACHE_TTL = 1800; // 30 minutes
+export class EngagementAnalyticsService { private readonly ANALYTICS_CACHE_TTL = 1800; // 30 minutes
 
   /**
    * Get comprehensive user engagement metrics
    */
-  async getUserEngagementMetrics(userId: string, timeframe: '7d' | '30d' | '90d' = '30d'): Promise<UserEngagementMetrics> {
+  async getUserEngagementMetrics(user_id: string, timeframe: '7d' | '30d' | '90d' = '30d'): Promise<UserEngagementMetrics> {
     const result = await databaseService.withFallback(
       async () => {
         // FIXED: Use cacheKeys instead of CACHE_KEYS
-        const cacheKey = `${cacheKeys.USER_PROFILE(userId)}:engagement:${timeframe}`;
+        const cacheKey = `${cacheKeys.USER_PROFILE(user_id) }:engagement:${timeframe}`;
 
         // Use enhanced cache utility with error handling and metrics
         return await cache.getOrSetCache(
@@ -50,57 +50,57 @@ export class EngagementAnalyticsService {
             const [userInfo] = await db
               .select({
                 name: users.name,
-                expertise: userProfiles.expertise
+                expertise: user_profiles.expertise
               })
               .from(users)
-              .leftJoin(userProfiles, eq(users.id, userProfiles.userId))
-              .where(eq(users.id, userId))
+              .leftJoin(user_profiles, eq(users.id, user_profiles.user_id))
+              .where(eq(users.id, user_id))
               .limit(1);
 
             if (!userInfo) {
               throw new Error('User not found');
             }
 
-            // Get comment statistics - FIXED: Use billComments (plural)
+            // Get comment statistics - FIXED: Use comments (plural)
             const [commentStats] = await db
               .select({
-                totalComments: count(billComments.id),
+                totalComments: count(comments.id),
                 // cspell:disable-next-line
-                totalVotes: sum(sql`${billComments.upvotes} + ${billComments.downvotes}`),
+                totalVotes: sum(sql`${comments.upvotes} + ${comments.downvotes}`),
                 // cspell:disable-next-line
-                averageVotes: avg(sql`${billComments.upvotes} + ${billComments.downvotes}`)
+                averageVotes: avg(sql`${comments.upvotes} + ${comments.downvotes}`)
               })
-              .from(billComments)
+              .from(comments)
               .where(and(
-                eq(billComments.userId, userId),
-                sql`${billComments.createdAt} >= ${timeThreshold}`
+                eq(comments.user_id, user_id),
+                sql`${comments.created_at} >= ${timeThreshold}`
               ));
 
-            // Get top comment - FIXED: Use billComments (plural)
+            // Get top comment - FIXED: Use comments (plural)
             const [topComment] = await db
               .select({
-                id: billComments.id,
+                id: comments.id,
                 // cspell:disable-next-line
-                votes: sql<number>`${billComments.upvotes} + ${billComments.downvotes}`
+                votes: sql<number>`${comments.upvotes} + ${comments.downvotes}`
               })
-              .from(billComments)
+              .from(comments)
               .where(and(
-                eq(billComments.userId, userId),
-                sql`${billComments.createdAt} >= ${timeThreshold}`
+                eq(comments.user_id, user_id),
+                sql`${comments.created_at} >= ${timeThreshold}`
               ))
               // cspell:disable-next-line
-              .orderBy(sql`${billComments.upvotes} + ${billComments.downvotes} DESC`)
+              .orderBy(sql`${comments.upvotes} + ${comments.downvotes} DESC`)
               .limit(1);
 
-            // Calculate participation days - FIXED: Use billComments (plural)
+            // Calculate participation days - FIXED: Use comments (plural)
             const participationDays = await db
               .select({
-                uniqueDays: sql<number>`COUNT(DISTINCT DATE(${billComments.createdAt}))`
+                uniqueDays: sql<number>`COUNT(DISTINCT DATE(${comments.created_at}))`
               })
-              .from(billComments)
+              .from(comments)
               .where(and(
-                eq(billComments.userId, userId),
-                sql`${billComments.createdAt} >= ${timeThreshold}`
+                eq(comments.user_id, user_id),
+                sql`${comments.created_at} >= ${timeThreshold}`
               ));
 
             // Calculate engagement score
@@ -109,43 +109,41 @@ export class EngagementAnalyticsService {
             const avgVotes = Number(commentStats.averageVotes || 0);
             const days = Number(participationDays[0]?.uniqueDays || 0);
 
-            const engagementScore = this.calculateUserEngagementScore(
+            const engagement_score = this.calculateUserEngagementScore(
               totalComments,
               totalVotes,
               avgVotes,
               days
             );
 
-            const metrics: UserEngagementMetrics = {
-              userId,
+            const metrics: UserEngagementMetrics = { user_id,
               userName: userInfo.name,
               totalComments,
               totalVotes,
               averageVotesPerComment: totalComments > 0 ? totalVotes / totalComments : 0,
-              engagementScore,
+              engagement_score,
               topCommentId: topComment?.id || null,
               topCommentVotes: Number(topComment?.votes || 0),
               participationDays: days,
               expertiseAreas: userInfo.expertise || []
-            };
+             };
 
             return metrics;
           }
         );
       },
-      {
-        userId,
+      { user_id,
         userName: 'Unknown User',
         totalComments: 0,
         totalVotes: 0,
         averageVotesPerComment: 0,
-        engagementScore: 0,
+        engagement_score: 0,
         topCommentId: null,
         topCommentVotes: 0,
         participationDays: 0,
         expertiseAreas: []
-      },
-      `getUserEngagementMetrics:${userId}:${timeframe}`
+       },
+      `getUserEngagementMetrics:${ user_id }:${timeframe}`
     );
 
     return result.data;
@@ -154,11 +152,10 @@ export class EngagementAnalyticsService {
   /**
    * Get comprehensive bill engagement metrics
    */
-  async getBillEngagementMetrics(billId: number): Promise<BillEngagementMetrics> {
-    const result = await databaseService.withFallback(
+  async getBillEngagementMetrics(bill_id: number): Promise<BillEngagementMetrics> { const result = await databaseService.withFallback(
       async () => {
         // FIXED: Use cacheKeys instead of CACHE_KEYS
-        const cacheKey = `${cacheKeys.BILL_DETAILS(billId)}:engagement:metrics`;
+        const cacheKey = `${cacheKeys.BILL_DETAILS(bill_id) }:engagement:metrics`;
 
         return await cache.getOrSetCache(
           cacheKey,
@@ -168,49 +165,49 @@ export class EngagementAnalyticsService {
             const [billInfo] = await db
               .select({
                 title: bills.title,
-                createdAt: bills.createdAt
+                created_at: bills.created_at
               })
               .from(bills)
-              .where(eq(bills.id, billId))
+              .where(eq(bills.id, bill_id))
               .limit(1);
 
             if (!billInfo) {
               throw new Error('Bill not found');
             }
 
-            // Get engagement statistics - FIXED: Use billComments and users (plural)
+            // Get engagement statistics - FIXED: Use comments and users (plural)
             const [engagementStats] = await db
               .select({
-                totalComments: count(billComments.id),
+                totalComments: count(comments.id),
                 // cspell:disable-next-line
-                totalVotes: sum(sql`${billComments.upvotes} + ${billComments.downvotes}`),
-                uniqueParticipants: sql<number>`COUNT(DISTINCT ${billComments.userId})`,
+                totalVotes: sum(sql`${comments.upvotes} + ${comments.downvotes}`),
+                uniqueParticipants: sql<number>`COUNT(DISTINCT ${comments.user_id})`,
                 expertComments: sql<number>`COUNT(CASE WHEN ${users.role} = 'expert' THEN 1 END)`
               })
-              .from(billComments)
-              .leftJoin(users, eq(billComments.userId, users.id))
-              .where(eq(billComments.billId, billId));
+              .from(comments)
+              .leftJoin(users, eq(comments.user_id, users.id))
+              .where(eq(comments.bill_id, bill_id));
 
-            // Get first comment time - FIXED: Use billComments (plural)
+            // Get first comment time - FIXED: Use comments (plural)
             const [firstComment] = await db
               .select({
-                createdAt: billComments.createdAt
+                created_at: comments.created_at
               })
-              .from(billComments)
-              .where(eq(billComments.billId, billId))
-              .orderBy(billComments.createdAt)
+              .from(comments)
+              .where(eq(comments.bill_id, bill_id))
+              .orderBy(comments.created_at)
               .limit(1);
 
-            // Calculate controversy score - FIXED: Use billComments (plural)
+            // Calculate controversy score - FIXED: Use comments (plural)
             const [controversyData] = await db
               .select({
                 // cspell:disable-next-line
-                totalUpvotes: sum(billComments.upvotes),
+                totalUpvotes: sum(comments.upvotes),
                 // cspell:disable-next-line
-                totalDownvotes: sum(billComments.downvotes)
+                totalDownvotes: sum(comments.downvotes)
               })
-              .from(billComments)
-              .where(eq(billComments.billId, billId));
+              .from(comments)
+              .where(eq(comments.bill_id, bill_id));
 
             const totalComments = Number(engagementStats.totalComments || 0);
             const totalVotes = Number(engagementStats.totalVotes || 0);
@@ -222,13 +219,12 @@ export class EngagementAnalyticsService {
             const controversyScore = this.calculateControversyScore(upvotes, downvotes);
 
             const timeToFirstComment = firstComment ?
-              (firstComment.createdAt.getTime() - billInfo.createdAt.getTime()) / (1000 * 60 * 60) : 0;
+              (firstComment.created_at.getTime() - billInfo.created_at.getTime()) / (1000 * 60 * 60) : 0;
 
             // Get peak engagement hour
-            const peakHour = await this.getPeakEngagementHour(billId);
+            const peakHour = await this.getPeakEngagementHour(bill_id);
 
-            const metrics: BillEngagementMetrics = {
-              billId,
+            const metrics: BillEngagementMetrics = { bill_id,
               billTitle: billInfo.title,
               totalComments,
               totalVotes,
@@ -238,14 +234,13 @@ export class EngagementAnalyticsService {
               expertParticipation: totalComments > 0 ? (expertComments / totalComments) * 100 : 0,
               timeToFirstComment,
               peakEngagementHour: peakHour
-            };
+             };
 
             return metrics;
           }
         );
       },
-      {
-        billId,
+      { bill_id,
         billTitle: 'Unknown Bill',
         totalComments: 0,
         totalVotes: 0,
@@ -255,8 +250,8 @@ export class EngagementAnalyticsService {
         expertParticipation: 0,
         timeToFirstComment: 0,
         peakEngagementHour: 12
-      },
-      `getBillEngagementMetrics:${billId}`
+       },
+      `getBillEngagementMetrics:${ bill_id }`
     );
 
     return result.data;
@@ -265,11 +260,10 @@ export class EngagementAnalyticsService {
   /**
    * Get engagement trends over time
    */
-  async getEngagementTrends(billId: number, period: 'hourly' | 'daily' | 'weekly' = 'daily'): Promise<CommentEngagementTrends[typeof period]> {
-    const result = await databaseService.withFallback(
+  async getEngagementTrends(bill_id: number, period: 'hourly' | 'daily' | 'weekly' = 'daily'): Promise<CommentEngagementTrends[typeof period]> { const result = await databaseService.withFallback(
       async () => {
         // FIXED: Use cacheKeys instead of CACHE_KEYS
-        const cacheKey = `${cacheKeys.BILL_DETAILS(billId)}:engagement:trends:${period}`;
+        const cacheKey = `${cacheKeys.BILL_DETAILS(bill_id) }:engagement:trends:${period}`;
 
         return await cache.getOrSetCache(
           cacheKey,
@@ -293,16 +287,16 @@ export class EngagementAnalyticsService {
                 break;
             }
 
-            // FIXED: Use billComments (plural)
+            // FIXED: Use comments (plural)
             const trends = await db
               .select({
                 period: sql`${selectFormat}`,
-                comments: count(billComments.id),
+                comments: count(comments.id),
                 // cspell:disable-next-line
-                votes: sum(sql`${billComments.upvotes} + ${billComments.downvotes}`)
+                votes: sum(sql`${comments.upvotes} + ${comments.downvotes}`)
               })
-              .from(billComments)
-              .where(eq(billComments.billId, billId))
+              .from(comments)
+              .where(eq(comments.bill_id, bill_id))
               .groupBy(sql`${groupBy}`)
               .orderBy(sql`${groupBy}`);
 
@@ -318,7 +312,7 @@ export class EngagementAnalyticsService {
         );
       },
       [],
-      `getEngagementTrends:${billId}:${period}`
+      `getEngagementTrends:${ bill_id }:${period}`
     );
 
     return result.data;
@@ -339,85 +333,79 @@ export class EngagementAnalyticsService {
             // Calculate time threshold using standardized helper
             const timeThreshold = buildTimeThreshold(`${timeframe.slice(0, -1)}d`);
 
-            // Top commenters - FIXED: Use billComments and users (plural)
+            // Top commenters - FIXED: Use comments and users (plural)
             // cspell:disable-next-line
             const topCommenters = await db
-              .select({
-                userId: users.id,
+              .select({ user_id: users.id,
                 userName: users.name,
-                commentCount: count(billComments.id),
+                comment_count: count(comments.id),
                 // cspell:disable-next-line
-                totalVotes: sum(sql`${billComments.upvotes} + ${billComments.downvotes}`),
+                totalVotes: sum(sql`${comments.upvotes } + ${comments.downvotes}`),
                 // cspell:disable-next-line
-                averageVotes: avg(sql`${billComments.upvotes} + ${billComments.downvotes}`)
+                averageVotes: avg(sql`${comments.upvotes} + ${comments.downvotes}`)
               })
-              .from(billComments)
-              .innerJoin(users, eq(billComments.userId, users.id))
-              .where(sql`${billComments.createdAt} >= ${timeThreshold}`)
+              .from(comments)
+              .innerJoin(users, eq(comments.user_id, users.id))
+              .where(sql`${comments.created_at} >= ${timeThreshold}`)
               .groupBy(users.id, users.name)
-              .orderBy(desc(count(billComments.id)))
+              .orderBy(desc(count(comments.id)))
               .limit(limit);
 
-            // Top voters - FIXED: Use commentVotes and users (plural)
+            // Top voters - FIXED: Use comment_votes and users (plural)
             // cspell:disable-next-line
             const topVoters = await db
-              .select({
-                userId: commentVotes.userId,
+              .select({ user_id: comment_votes.user_id,
                 userName: users.name,
-                votesGiven: count(commentVotes.id),
+                votesGiven: count(comment_votes.id),
                 votesReceived: sql<number>`COALESCE((
                   // cspell:disable-next-line
                   SELECT SUM(upvotes + downvotes)
-                  FROM bill_comment
-                  WHERE user_id = ${commentVotes.userId}
+                  FROM comments
+                  WHERE user_id = ${comment_votes.user_id }
                 ), 0)`
               })
-              .from(commentVotes)
-              .innerJoin(users, eq(commentVotes.userId, users.id))
-              .where(sql`${commentVotes.createdAt} >= ${timeThreshold}`)
-              .groupBy(commentVotes.userId, users.name)
-              .orderBy(desc(count(commentVotes.id)))
+              .from(comment_votes)
+              .innerJoin(users, eq(comment_votes.user_id, users.id))
+              .where(sql`${comment_votes.created_at} >= ${timeThreshold}`)
+              .groupBy(comment_votes.user_id, users.name)
+              .orderBy(desc(count(comment_votes.id)))
               .limit(limit);
 
-            // Most engaged bills - FIXED: Use billComments and bills (plural)
+            // Most engaged bills - FIXED: Use comments and bills (plural)
             const mostEngagedBills = await db
-              .select({
-                billId: billComments.billId,
+              .select({ bill_id: comments.bill_id,
                 billTitle: bills.title,
                 // cspell:disable-next-line
-                totalEngagement: sum(sql`${billComments.upvotes} + ${billComments.downvotes}`),
-                uniqueUsers: sql<number>`COUNT(DISTINCT ${billComments.userId})`
+                totalEngagement: sum(sql`${comments.upvotes } + ${comments.downvotes}`),
+                uniqueUsers: sql<number>`COUNT(DISTINCT ${comments.user_id})`
               })
-              .from(billComments)
-              .innerJoin(bills, eq(billComments.billId, bills.id))
-              .where(sql`${billComments.createdAt} >= ${timeThreshold}`)
-              .groupBy(billComments.billId, bills.title)
+              .from(comments)
+              .innerJoin(bills, eq(comments.bill_id, bills.id))
+              .where(sql`${comments.created_at} >= ${timeThreshold}`)
+              .groupBy(comments.bill_id, bills.title)
               // cspell:disable-next-line
-              .orderBy(desc(sum(sql`${billComments.upvotes} + ${billComments.downvotes}`)))
+              .orderBy(desc(sum(sql`${comments.upvotes} + ${comments.downvotes}`)))
               .limit(limit);
 
-            const leaderboard: EngagementLeaderboard = {
-              topCommenters: topCommenters.map(user => ({
-                userId: user.userId,
+            const leaderboard: EngagementLeaderboard = { topCommenters: topCommenters.map(user => ({
+                user_id: user.user_id,
                 userName: user.userName,
-                commentCount: Number(user.commentCount),
+                comment_count: Number(user.comment_count),
                 totalVotes: Number(user.totalVotes || 0),
                 averageVotes: Number(user.averageVotes || 0)
-              })),
-              topVoters: topVoters.map(user => ({
-                userId: user.userId,
+               })),
+              topVoters: topVoters.map(user => ({ user_id: user.user_id,
                 userName: user.userName,
                 votesGiven: Number(user.votesGiven),
                 votesReceived: Number(user.votesReceived),
                 engagementRatio: Number(user.votesReceived) > 0 ?
                   Number(user.votesGiven) / Number(user.votesReceived) : 0
-              })),
-              mostEngagedBills: mostEngagedBills.map(bill => ({
-                billId: bill.billId,
+               })),
+              mostEngagedBills: mostEngagedBills.map(bill => ({ bill_id: bill.bill_id,
                 billTitle: bill.billTitle,
                 totalEngagement: Number(bill.totalEngagement || 0),
                 uniqueUsers: Number(bill.uniqueUsers)
-              }))
+               }))
             };
 
             return leaderboard;
@@ -474,17 +462,17 @@ export class EngagementAnalyticsService {
   /**
    * Get peak engagement hour for a bill
    */
-  private async getPeakEngagementHour(billId: number): Promise<number> {
-    // FIXED: Use billComments (plural)
+  private async getPeakEngagementHour(bill_id: number): Promise<number> {
+    // FIXED: Use comments (plural)
     const hourlyData = await db
       .select({
-        hour: sql<number>`EXTRACT(HOUR FROM ${billComments.createdAt})`,
-        activity: count(billComments.id)
+        hour: sql<number>`EXTRACT(HOUR FROM ${comments.created_at})`,
+        activity: count(comments.id)
       })
-      .from(billComments)
-      .where(eq(billComments.billId, billId))
-      .groupBy(sql`EXTRACT(HOUR FROM ${billComments.createdAt})`)
-      .orderBy(desc(count(billComments.id)))
+      .from(comments)
+      .where(eq(comments.bill_id, bill_id))
+      .groupBy(sql`EXTRACT(HOUR FROM ${comments.created_at})`)
+      .orderBy(desc(count(comments.id)))
       .limit(1);
 
     return hourlyData[0]?.hour || 12; // Default to noon if no data
@@ -498,14 +486,12 @@ const userEngagementQuerySchema = z.object({
   timeframe: z.enum(['7d', '30d', '90d']).optional().default('30d')
 });
 
-const billEngagementQuerySchema = z.object({
-  billId: z.string().transform(val => parseInt(val)).refine(val => !isNaN(val) && val > 0)
-});
+const bill_engagementQuerySchema = z.object({ bill_id: z.string().transform(val => parseInt(val)).refine(val => !isNaN(val) && val > 0)
+ });
 
-const trendsQuerySchema = z.object({
-  billId: z.string().transform(val => parseInt(val)).refine(val => !isNaN(val) && val > 0),
+const trendsQuerySchema = z.object({ bill_id: z.string().transform(val => parseInt(val)).refine(val => !isNaN(val) && val > 0),
   period: z.enum(['hourly', 'daily', 'weekly']).optional().default('daily')
-});
+ });
 
 const leaderboardQuerySchema = z.object({
   timeframe: z.enum(['7d', '30d', '90d']).optional().default('30d'),
@@ -516,14 +502,13 @@ const leaderboardQuerySchema = z.object({
 export const router = Router();
 
 // Get user engagement metrics
-router.get('/user/:userId/metrics', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/user/:user_id/metrics', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
 
   try {
-    const { userId } = req.params;
+    const { user_id  } = req.params;
     const query = userEngagementQuerySchema.parse(req.query);
 
-    const metrics = await engagementAnalyticsService.getUserEngagementMetrics(userId, query.timeframe);
+    const metrics = await engagementAnalyticsService.getUserEngagementMetrics(user_id, query.timeframe);
 
     return ApiSuccessResponse(res, metrics,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -540,12 +525,11 @@ router.get('/user/:userId/metrics', authenticateToken, async (req: Authenticated
       'business_logic'
     );
 
-    logger.error('Error fetching user engagement metrics:', {
-      component: 'analytics',
+    logger.error('Error fetching user engagement metrics:', { component: 'analytics',
       operation: 'getUserEngagementMetrics',
-      userId: req.params.userId,
+      user_id: req.params.user_id,
       timeframe: req.query.timeframe
-    }, error instanceof Error ? error : { message: String(error) });
+     }, error instanceof Error ? error : { message: String(error) });
 
     return ApiErrorResponse(res, 'Failed to fetch user engagement metrics', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -553,14 +537,13 @@ router.get('/user/:userId/metrics', authenticateToken, async (req: Authenticated
 });
 
 // Get bill engagement metrics
-router.get('/bill/:billId/metrics', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/bill/:bill_id/metrics', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
 
   try {
-    const { billId } = req.params;
-    const query = billEngagementQuerySchema.parse({ billId });
+    const { bill_id  } = req.params;
+    const query = bill_engagementQuerySchema.parse({ bill_id  });
 
-    const metrics = await engagementAnalyticsService.getBillEngagementMetrics(query.billId);
+    const metrics = await engagementAnalyticsService.getBillEngagementMetrics(query.bill_id);
 
     return ApiSuccessResponse(res, metrics,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -577,11 +560,10 @@ router.get('/bill/:billId/metrics', authenticateToken, async (req: Authenticated
       'business_logic'
     );
 
-    logger.error('Error fetching bill engagement metrics:', {
-      component: 'analytics',
+    logger.error('Error fetching bill engagement metrics:', { component: 'analytics',
       operation: 'getBillEngagementMetrics',
-      billId: req.params.billId
-    }, error instanceof Error ? error : { message: String(error) });
+      bill_id: req.params.bill_id
+     }, error instanceof Error ? error : { message: String(error) });
 
     return ApiErrorResponse(res, error instanceof Error ? error.message : 'Failed to fetch bill engagement metrics', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -589,14 +571,13 @@ router.get('/bill/:billId/metrics', authenticateToken, async (req: Authenticated
 });
 
 // Get engagement trends
-router.get('/bill/:billId/trends', authenticateToken, async (req: AuthenticatedRequest, res) => {
-  const startTime = Date.now();
+router.get('/bill/:bill_id/trends', authenticateToken, async (req: AuthenticatedRequest, res) => { const startTime = Date.now();
 
   try {
-    const { billId } = req.params;
-    const query = trendsQuerySchema.parse({ billId, ...req.query });
+    const { bill_id  } = req.params;
+    const query = trendsQuerySchema.parse({ bill_id, ...req.query  });
 
-    const trends = await engagementAnalyticsService.getEngagementTrends(query.billId, query.period);
+    const trends = await engagementAnalyticsService.getEngagementTrends(query.bill_id, query.period);
 
     return ApiSuccessResponse(res, trends,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -605,12 +586,11 @@ router.get('/bill/:billId/trends', authenticateToken, async (req: AuthenticatedR
       return ApiValidationErrorResponse(res, error.errors,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    logger.error('Error fetching engagement trends:', {
-      component: 'analytics',
+    logger.error('Error fetching engagement trends:', { component: 'analytics',
       operation: 'getEngagementTrends',
-      billId: req.params.billId,
+      bill_id: req.params.bill_id,
       period: req.query.period
-    }, error instanceof Error ? error : { message: String(error) });
+     }, error instanceof Error ? error : { message: String(error) });
     return ApiErrorResponse(res, 'Failed to fetch engagement trends', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }

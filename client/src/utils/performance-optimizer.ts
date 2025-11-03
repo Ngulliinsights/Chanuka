@@ -211,7 +211,7 @@ class PerformanceOptimizer {
         ...additionalMetrics,
         timestamp: Date.now(),
         url: window.location.href,
-        userAgent: navigator.userAgent
+        user_agent: navigator.user_agent
       });
     }
 
@@ -658,7 +658,7 @@ class PerformanceOptimizer {
           data,
           timestamp: Date.now(),
           url: window.location.href,
-          userAgent: navigator.userAgent
+          user_agent: navigator.user_agent
         })
       }).catch(error => {
         console.warn('Failed to report performance issue:', error);

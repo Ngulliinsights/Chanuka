@@ -2,7 +2,7 @@
 // Handles detection of anomalies and unusual patterns in financial disclosure data
 
 import { readDatabase } from '@shared/database/connection';
-import { sponsors, sponsorTransparency } from "@shared/schema";
+import { sponsors, sponsorTransparency } from "@shared/foundation";
 import { eq, desc, and, sql, count } from "drizzle-orm";
 import { cache, logger, DatabaseError } from '@shared/core';
 import { FinancialDisclosureConfig } from '../config';
@@ -13,7 +13,7 @@ import type {
 } from '../../types/index.js';
 
 export interface AnomalyDetectionResult {
-  sponsorId: number;
+  sponsor_id: number;
   sponsorName: string;
   anomalies: FinancialAnomaly[];
   riskScore: number;
@@ -45,17 +45,17 @@ export class AnomalyDetectionService {
   /**
    * Performs comprehensive anomaly detection for a sponsor's financial disclosures.
    */
-  async detectAnomalies(sponsorId: number): Promise<AnomalyDetectionResult> {
+  async detectAnomalies(sponsor_id: number): Promise<AnomalyDetectionResult> {
     try {
-      const cacheKey = `anomaly_detection_v1_${sponsorId}`;
+      const cacheKey = `anomaly_detection_v1_${sponsor_id}`;
 
       return await cache.getOrSetCache(
         cacheKey,
         this.config.cache.ttl.analyticsReport,
         async () => {
           const [sponsorInfo, disclosures] = await Promise.all([
-            disclosureProcessingService.getSponsorBasicInfo(sponsorId),
-            disclosureProcessingService.getDisclosureData(sponsorId)
+            disclosureProcessingService.getSponsorBasicInfo(sponsor_id),
+            disclosureProcessingService.getDisclosureData(sponsor_id)
           ]);
 
           const anomalies: FinancialAnomaly[] = [];
@@ -71,7 +71,7 @@ export class AnomalyDetectionService {
           const riskScore = this.calculateAnomalyRiskScore(anomalies);
 
           return {
-            sponsorId,
+            sponsor_id,
             sponsorName: sponsorInfo.name,
             anomalies,
             riskScore,
@@ -80,7 +80,7 @@ export class AnomalyDetectionService {
         }
       );
     } catch (error) {
-      logger.error('Error detecting anomalies:', { sponsorId }, error);
+      logger.error('Error detecting anomalies:', { sponsor_id }, error);
       throw new DatabaseError('Failed to detect financial disclosure anomalies');
     }
   }
@@ -183,7 +183,7 @@ export class AnomalyDetectionService {
 
     // Find high-value unverified disclosures
     const highValueUnverified = disclosures.filter(d => 
-      !d.isVerified && 
+      !d.is_verified && 
       d.amount && 
       d.amount > this.config.thresholds.investment
     );
@@ -211,15 +211,15 @@ export class AnomalyDetectionService {
       });
 
     if (recentDisclosures.length >= 5) {
-      const recentVerificationRate = recentDisclosures.filter(d => d.isVerified).length / recentDisclosures.length;
-      const overallVerificationRate = disclosures.filter(d => d.isVerified).length / disclosures.length;
+      const recentVerificationRate = recentDisclosures.filter(d => d.is_verified).length / recentDisclosures.length;
+      const overallVerificationRate = disclosures.filter(d => d.is_verified).length / disclosures.length;
 
       if (recentVerificationRate < overallVerificationRate * 0.7) {
         anomalies.push({
           type: 'verification_gap',
           severity: 'medium',
           description: `Recent verification rate (${Math.round(recentVerificationRate * 100)}%) is significantly lower than historical average (${Math.round(overallVerificationRate * 100)}%).`,
-          affectedDisclosures: recentDisclosures.filter(d => !d.isVerified).map(d => d.id),
+          affectedDisclosures: recentDisclosures.filter(d => !d.is_verified).map(d => d.id),
           detectedValue: recentVerificationRate,
           expectedRange: { min: overallVerificationRate * 0.8, max: 1.0 },
           recommendation: 'Review verification processes and address any bottlenecks in the approval workflow.'
@@ -393,7 +393,7 @@ export class AnomalyDetectionService {
       const activeSponsors = await readDatabase
         .select({ id: sponsors.id })
         .from(sponsors)
-        .where(eq(sponsors.isActive, true))
+        .where(eq(sponsors.is_active, true))
         .limit(50);
 
       const allAnomalies: FinancialAnomaly[] = [];
@@ -403,7 +403,7 @@ export class AnomalyDetectionService {
       // Analyze each sponsor
       for (const sponsor of activeSponsors) {
         try {
-          const result = await this.detectAnomalies(sponsor.id);
+          const result = await this.detectAnomalies(sponsors.id);
           if (result.anomalies.length > 0) {
             sponsorsWithAnomalies++;
             allAnomalies.push(...result.anomalies);

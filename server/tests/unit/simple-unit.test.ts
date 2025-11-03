@@ -92,7 +92,7 @@ describe('Unit Test Suite - Basic Functionality', () => {
     it('should validate bill data structure', () => {
       const validateBill = (bill: any) => {
         const errors: string[] = [];
-        const requiredFields = ['title', 'billNumber', 'status'];
+        const requiredFields = ['title', 'bill_number', 'status'];
 
         for (const field of requiredFields) {
           if (!bill[field]) {
@@ -101,13 +101,13 @@ describe('Unit Test Suite - Basic Functionality', () => {
         }
 
         const validStatuses = ['introduced', 'committee', 'passed', 'failed'];
-        if (bill.status && !validStatuses.includes(bill.status)) {
-          errors.push(`Invalid status: ${bill.status}`);
+        if (bills.status && !validStatuses.includes(bills.status)) {
+          errors.push(`Invalid status: ${bills.status}`);
         }
 
-        const billNumberPattern = /^[CS]-\d{1,4}$/i;
-        if (bill.billNumber && !billNumberPattern.test(bill.billNumber)) {
-          errors.push(`Invalid bill number format: ${bill.billNumber}`);
+        const bill_numberPattern = /^[CS]-\d{1,4}$/i;
+        if (bills.bill_number && !bill_numberPattern.test(bills.bill_number)) {
+          errors.push(`Invalid bill number format: ${bills.bill_number}`);
         }
 
         return {
@@ -119,7 +119,7 @@ describe('Unit Test Suite - Basic Functionality', () => {
 
       const validBill = {
         title: 'Test Bill',
-        billNumber: 'C-123',
+        bill_number: 'C-123',
         status: 'introduced'
       };
 
@@ -135,7 +135,7 @@ describe('Unit Test Suite - Basic Functionality', () => {
 
       const invalidResult = validateBill(invalidBill);
       expect(invalidResult.isValid).toBe(false);
-      expect(invalidResult.errors).toContain('Missing required field: billNumber');
+      expect(invalidResult.errors).toContain('Missing required field: bill_number');
     });
 
     it('should validate sponsor data structure', () => {
@@ -149,13 +149,13 @@ describe('Unit Test Suite - Basic Functionality', () => {
           }
         }
 
-        if (sponsor.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sponsor.email)) {
-          errors.push(`Invalid email format: ${sponsor.email}`);
+        if (sponsors.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sponsors.email)) {
+          errors.push(`Invalid email format: ${sponsors.email}`);
         }
 
         const validRoles = ['MP', 'Senator', 'Minister', 'Premier'];
-        if (sponsor.role && !validRoles.includes(sponsor.role)) {
-          errors.push(`Uncommon role: ${sponsor.role}`);
+        if (sponsors.role && !validRoles.includes(sponsors.role)) {
+          errors.push(`Uncommon role: ${sponsors.role}`);
         }
 
         return {
@@ -291,7 +291,7 @@ describe('Unit Test Suite - Basic Functionality', () => {
 
       // Mock JWT token (header.payload.signature)
       const mockToken = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' })) + '.' +
-                       btoa(JSON.stringify({ userId: '123', exp: Date.now() + 3600, iat: Date.now() })) + '.' +
+                       btoa(JSON.stringify({ user_id: '123', exp: Date.now() + 3600, iat: Date.now()  })) + '.' +
                        'signature';
 
       const result = validateJWTStructure(mockToken);
@@ -303,7 +303,7 @@ describe('Unit Test Suite - Basic Functionality', () => {
     });
 
     it('should validate user roles and permissions', () => {
-      const checkPermissions = (userRole: string, requiredPermission: string) => {
+      const checkPermissions = (user_role: string, requiredPermission: string) => {
         const rolePermissions = {
           admin: ['read', 'write', 'delete', 'manage_users', 'system_config'],
           expert: ['read', 'write', 'create_analysis'],
@@ -311,7 +311,7 @@ describe('Unit Test Suite - Basic Functionality', () => {
           journalist: ['read', 'write', 'export_data']
         };
 
-        const permissions = rolePermissions[userRole as keyof typeof rolePermissions] || [];
+        const permissions = rolePermissions[user_role as keyof typeof rolePermissions] || [];
         return {
           hasPermission: permissions.includes(requiredPermission),
           userPermissions: permissions

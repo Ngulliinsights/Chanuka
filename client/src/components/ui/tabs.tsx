@@ -22,7 +22,7 @@ const TabsList = forwardRef<
     {...props}
   />
 ))
-TabsList.displayName = List.displayName
+TabsList.display_name = List.display_name
 
 const TabsTrigger = forwardRef<
   ElementRef<typeof Trigger>,
@@ -37,7 +37,7 @@ const TabsTrigger = forwardRef<
     {...props}
   />
 ))
-TabsTrigger.displayName = Trigger.displayName
+TabsTrigger.display_name = Trigger.display_name
 
 const TabsContent = forwardRef<
   ElementRef<typeof Content>,
@@ -52,7 +52,7 @@ const TabsContent = forwardRef<
     {...props}
   />
 ))
-TabsContent.displayName = Content.displayName
+TabsContent.display_name = Content.display_name
 
 export { Tabs, TabsList, TabsTrigger, TabsContent }
 

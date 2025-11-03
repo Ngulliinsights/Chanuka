@@ -273,12 +273,12 @@ export class WidgetValidator {
     };
   }
 
-  static validatePermissions(userRole: string, permissions?: string[]): boolean {
+  static validatePermissions(user_role: string, permissions?: string[]): boolean {
     if (!permissions || permissions.length === 0) {
       return true; // No restrictions
     }
 
-    return permissions.includes(userRole);
+    return permissions.includes(user_role);
   }
 }
 

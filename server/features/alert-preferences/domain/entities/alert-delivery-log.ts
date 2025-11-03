@@ -6,10 +6,9 @@ import { ChannelType } from '../value-objects/channel-type';
  * Alert Delivery Log Entity
  * Records the delivery attempts and results for alerts
  */
-export class AlertDeliveryLog {
-  constructor(
+export class AlertDeliveryLog { constructor(
     public readonly id: string,
-    public readonly userId: string,
+    public readonly user_id: string,
     public readonly preferenceId: string,
     public readonly alertType: AlertType,
     public readonly channels: ChannelType[],
@@ -17,19 +16,19 @@ export class AlertDeliveryLog {
     public readonly deliveryAttempts: number,
     public readonly lastAttempt: Date,
     public readonly metadata: DeliveryMetadata,
-    public readonly createdAt: Date,
+    public readonly created_at: Date,
     public readonly deliveredAt?: Date,
     public readonly failureReason?: string
   ) {
     this.validate();
-  }
+   }
 
   private validate(): void {
     if (!this.id || this.id.trim().length === 0) {
       throw new Error('Delivery log ID is required');
     }
 
-    if (!this.userId || this.userId.trim().length === 0) {
+    if (!this.user_id || this.user_id.trim().length === 0) {
       throw new Error('User ID is required');
     }
 
@@ -45,7 +44,7 @@ export class AlertDeliveryLog {
       throw new Error('Delivered date cannot be in the future');
     }
 
-    if (this.createdAt > new Date()) {
+    if (this.created_at > new Date()) {
       throw new Error('Created date cannot be in the future');
     }
   }
@@ -88,7 +87,7 @@ export class AlertDeliveryLog {
 
     return new AlertDeliveryLog(
       this.id,
-      this.userId,
+      this.user_id,
       this.preferenceId,
       this.alertType,
       this.channels,
@@ -96,7 +95,7 @@ export class AlertDeliveryLog {
       newAttempts,
       new Date(),
       this.metadata,
-      this.createdAt,
+      this.created_at,
       deliveredAt,
       failureReason || this.failureReason
     );
@@ -108,7 +107,7 @@ export class AlertDeliveryLog {
   markAsFiltered(reason: string): AlertDeliveryLog {
     return new AlertDeliveryLog(
       this.id,
-      this.userId,
+      this.user_id,
       this.preferenceId,
       this.alertType,
       this.channels,
@@ -119,7 +118,7 @@ export class AlertDeliveryLog {
         ...this.metadata,
         filteredReason: reason
       },
-      this.createdAt,
+      this.created_at,
       undefined,
       undefined
     );
@@ -168,7 +167,7 @@ export class AlertDeliveryLog {
   equals(other: AlertDeliveryLog): boolean {
     return (
       this.id === other.id &&
-      this.userId === other.userId &&
+      this.user_id === other.user_id &&
       this.preferenceId === other.preferenceId &&
       this.alertType.equals(other.alertType) &&
       this.channelsEqual(other.channels) &&
@@ -208,14 +207,13 @@ export enum DeliveryStatus {
 /**
  * Delivery Metadata Interface
  */
-export interface DeliveryMetadata {
-  billId?: number;
-  sponsorId?: number;
+export interface DeliveryMetadata { bill_id?: number;
+  sponsor_id?: number;
   originalPriority: string;
   adjustedPriority?: string;
   filteredReason?: string;
   confidence?: number;
-}
+ }
 
 
 

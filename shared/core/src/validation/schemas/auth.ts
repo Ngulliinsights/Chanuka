@@ -13,8 +13,8 @@ import { isAgeBetween } from '../helpers';
  * User registration schema
  */
 export const userRegistrationSchema = z.object({
-  firstName: nameSchema,
-  lastName: nameSchema,
+  first_name: nameSchema,
+  last_name: nameSchema,
   email: emailSchema,
   password: passwordSchema,
   confirmPassword: z.string(),
@@ -38,8 +38,8 @@ export const userRegistrationSchema = z.object({
  * Admin user registration schema (stricter requirements)
  */
 export const adminRegistrationSchema = z.object({
-  firstName: nameSchema,
-  lastName: nameSchema,
+  first_name: nameSchema,
+  last_name: nameSchema,
   email: emailSchema,
   password: strongPasswordSchema,
   confirmPassword: z.string(),
@@ -205,7 +205,7 @@ export const apiKeyCreationSchema = z.object({
   name: z.string().min(1, 'API key name is required').max(100, 'Name is too long'),
   description: z.string().max(500, 'Description is too long').optional(),
   scopes: z.array(z.string()).min(1, 'At least one scope is required'),
-  expiresAt: z.coerce.date().refine(
+  expires_at: z.coerce.date().refine(
     (date) => date > new Date(),
     { message: 'Expiration date must be in the future' }
   ).optional(),
@@ -215,14 +215,13 @@ export const apiKeyCreationSchema = z.object({
 /**
  * Session management schema
  */
-export const sessionSchema = z.object({
-  userId: z.string().uuid(),
+export const sessionSchema = z.object({ user_id: z.string().uuid(),
   deviceId: z.string().optional(),
-  userAgent: z.string().optional(),
-  ipAddress: z.string().ip().optional(),
-  expiresAt: z.coerce.date(),
-  isActive: z.boolean().default(true),
-});
+  user_agent: z.string().optional(),
+  ip_address: z.string().ip().optional(),
+  expires_at: z.coerce.date(),
+  is_active: z.boolean().default(true),
+ });
 
 /**
  * Role-based access control schema
@@ -231,7 +230,7 @@ export const roleSchema = z.object({
   name: z.string().min(1, 'Role name is required').max(50, 'Role name is too long'),
   description: z.string().max(200, 'Description is too long').optional(),
   permissions: z.array(z.string()).min(1, 'At least one permission is required'),
-  isActive: z.boolean().default(true),
+  is_active: z.boolean().default(true),
 });
 
 /**
@@ -246,9 +245,9 @@ export const permissionSchema = z.object({
 /**
  * User profile update schema
  */
-export const userProfileUpdateSchema = z.object({
-  firstName: nameSchema.optional(),
-  lastName: nameSchema.optional(),
+export const user_profilesUpdateSchema = z.object({
+  first_name: nameSchema.optional(),
+  last_name: nameSchema.optional(),
   phone: phoneSchema.optional(),
   dateOfBirth: z.coerce.date().refine(
     (date) => {
@@ -298,7 +297,7 @@ export const deviceRegistrationSchema = z.object({
   deviceType: z.enum(['mobile', 'tablet', 'desktop', 'other']),
   deviceId: z.string().min(1, 'Device ID is required'),
   publicKey: z.string().min(1, 'Public key is required'),
-  userAgent: z.string().optional(),
+  user_agent: z.string().optional(),
 });
 
 /**
@@ -332,7 +331,7 @@ export const authSchemas = {
   session: sessionSchema,
   role: roleSchema,
   permission: permissionSchema,
-  userProfileUpdate: userProfileUpdateSchema,
+  user_profilesUpdate: user_profilesUpdateSchema,
   accountDeactivation: accountDeactivationSchema,
   securityQuestion: securityQuestionSchema,
   deviceRegistration: deviceRegistrationSchema,

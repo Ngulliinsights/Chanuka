@@ -3,11 +3,11 @@
 export interface AnalysisResult {
   confidence: number; // 0.0 to 1.0
   result: any;
-  analysisType: string;
+  analysis_type: string;
   metadata?: {
     processingTime?: number;
     dataSourcesUsed?: string[];
-    modelVersion?: string;
+    model_version?: string;
     [key: string]: any;
   };
 }

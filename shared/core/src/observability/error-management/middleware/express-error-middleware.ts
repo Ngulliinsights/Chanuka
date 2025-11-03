@@ -53,7 +53,7 @@ export function createErrorMiddleware(options: ErrorMiddlewareOptions = {}) {
           ...baseError.metadata.context,
           requestPath: req.path,
           requestMethod: req.method,
-          userAgent: req.headers['user-agent'],
+          user_agent: req.headers['user-agent'],
           ip: req.ip
         }
       });

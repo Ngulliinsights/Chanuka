@@ -3,11 +3,11 @@ import { sql, eq, and, or, ilike, desc, count } from 'drizzle-orm';
 
 // Local Application Imports
 import { authenticateToken, requireRole } from '../../middleware/auth.js';
-// TODO: Fix billsService import when available
-// import { billsService } from '../bills/index.js';
+// TODO: Fix bil
+//import { billService } from '../bills/application/bill-service.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
-import { ApiSuccess, ApiError, ApiForbidden  } from '../../../shared/core/src/utils/api-utils';
-import { logger  } from '../../../shared/core/src/index.js';
+import { ApiSuccess, ApiError, ApiForbidden } from '../../../shared/core/src/utils/api-utils';
+import { logger } from '../../../shared/core/src/index.js';
 
 // Security Services
 import { secureQueryBuilder } from '../../infrastructure/security/secure-query-builder.js';
@@ -15,7 +15,7 @@ import { inputValidationService, commonSchemas } from '../../infrastructure/secu
 
 // Database & Schema Imports
 import { database as db } from '../../../shared/database/connection';
-import { user, bill } from '../../../shared/schema/schema.js';
+import { users, bills } from '../../../shared/schema/foundation';
 
 // --- Constants and Types ---
 
@@ -50,7 +50,7 @@ router.use((req, res, next) => {
       }
     });
   }
-  
+
   // Sanitize body parameters
   if (req.body && typeof req.body === 'object') {
     Object.keys(req.body).forEach(key => {
@@ -59,7 +59,7 @@ router.use((req, res, next) => {
       }
     });
   }
-  
+
   next();
 });
 
@@ -80,49 +80,49 @@ router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
       db
         .select({
           total: count(),
-          status: bill.status
+          status: bills.status
         })
-        .from(bill)
-        .groupBy(bill.status)
+        .from(bills)
+        .groupBy(bills.status)
         .catch(err => {
-          logger.error('Error fetching bill stats for dashboard', { 
-            component: 'admin-router', 
-            error: err 
+          logger.error('Error fetching bill stats for dashboard', {
+            component: 'admin-router',
+            error: err
           });
           return []; // Graceful degradation - dashboard still works if one metric fails
         }),
 
       // Aggregate user statistics directly in database
-       db
-         .select({
-           total: count(),
-           role: user.role
-         })
-         .from(user)
-         .groupBy(user.role)
-         .catch(err => {
-           logger.error('Error fetching user stats for dashboard', {
-             component: 'admin-router',
-             error: err
-           });
-           return [];
-         }),
+      db
+        .select({
+          total: count(),
+          role: users.role
+        })
+        .from(users)
+        .groupBy(users.role)
+        .catch(err => {
+          logger.error('Error fetching user stats for dashboard', {
+            component: 'admin-router',
+            error: err
+          });
+          return [];
+        }),
 
       // Fetch only the essential fields for recent bills to minimize data transfer
       db
         .select({
-          id: bill.id,
-          title: bill.title,
-          status: bill.status,
-          createdAt: bill.createdAt
+          id: bills.id,
+          title: bills.title,
+          status: bills.status,
+          created_at: bills.created_at
         })
-        .from(bill)
-        .orderBy(desc(bill.createdAt))
+        .from(bills)
+        .orderBy(desc(bills.created_at))
         .limit(10)
         .catch(err => {
-          logger.error('Error fetching recent bills for dashboard', { 
-            component: 'admin-router', 
-            error: err 
+          logger.error('Error fetching recent bills for dashboard', {
+            component: 'admin-router',
+            error: err
           });
           return [];
         }),
@@ -130,19 +130,19 @@ router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
       // Fetch only the essential fields for recent users
       db
         .select({
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          createdAt: user.createdAt
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          role: users.role,
+          created_at: users.created_at
         })
-        .from(user)
-        .orderBy(desc(user.createdAt))
+        .from(users)
+        .orderBy(desc(users.created_at))
         .limit(10)
         .catch(err => {
-          logger.error('Error fetching recent users for dashboard', { 
-            component: 'admin-router', 
-            error: err 
+          logger.error('Error fetching recent users for dashboard', {
+            component: 'admin-router',
+            error: err
           });
           return [];
         }),
@@ -152,23 +152,23 @@ router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
     const stats = {
       bills: {
         total: billStats.reduce((sum, item) => sum + item.total, 0),
-        byStatus: billStats.reduce((acc, item) => { 
-          acc[item.status ?? 'unknown'] = item.total; 
-          return acc; 
+        byStatus: billStats.reduce((acc, item) => {
+          acc[item.status ?? 'unknown'] = item.total;
+          return acc;
         }, {} as Record<string, number>),
         recent: recentBills,
       },
       users: {
         total: userStats.reduce((sum, item) => sum + item.total, 0),
-        byRole: userStats.reduce((acc, item) => { 
-          acc[item.role] = item.total; 
-          return acc; 
+        byRole: userStats.reduce((acc, item) => {
+          acc[item.role] = item.total;
+          return acc;
         }, {} as Record<string, number>),
         recent: recentUsers,
       },
       system: {
-        // TODO: Fix cacheStats when billsService is available
-        // cacheStats: billsService.getCacheStats(),
+        // TODO: Fix cacheStats when billService is available
+        // cacheStats: billService.getCacheStats(),
         cacheStats: { hits: 0, misses: 0, size: 0 },
         uptime: process.uptime(),
         memory: process.memoryUsage(),
@@ -179,9 +179,9 @@ router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
 
     return ApiSuccess(res, stats);
   } catch (error) {
-    logger.error('Admin dashboard critical error', { 
-      component: 'admin-router', 
-      error: error instanceof Error ? error.message : String(error) 
+    logger.error('Admin dashboard critical error', {
+      component: 'admin-router',
+      error: error instanceof Error ? error.message : String(error)
     });
     return ApiError(res, {
       code: 'DASHBOARD_FETCH_ERROR',
@@ -201,13 +201,13 @@ router.get('/dashboard', async (req: AuthenticatedRequest, res: Response) => {
 router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { page = '1', limit = '20', role, search } = req.query;
-    
+
     // Validate pagination parameters using secure validation
     const paginationValidation = inputValidationService.validatePaginationParams(
-      page as string, 
+      page as string,
       limit as string
     );
-    
+
     if (!paginationValidation.isValid) {
       return ApiError(res, {
         code: 'INVALID_PAGINATION',
@@ -215,9 +215,9 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
         details: paginationValidation.errors
       }, 400);
     }
-    
+
     const { page: pageNum, limit: limitNum, offset } = secureQueryBuilder.validatePaginationParams(
-      page as string, 
+      page as string,
       limit as string
     );
 
@@ -251,10 +251,10 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
 
     // Build composable, type-safe query conditions using validated inputs
     const conditions = and(
-      validatedRole ? eq(user.role, validatedRole) : undefined,
+      validatedRole ? eq(users.role, validatedRole) : undefined,
       sanitizedSearch ? or(
-        ilike(user.name, secureQueryBuilder.createSafeLikePattern(sanitizedSearch)),
-        ilike(user.email, secureQueryBuilder.createSafeLikePattern(sanitizedSearch))
+        ilike(users.name, secureQueryBuilder.createSafeLikePattern(sanitizedSearch)),
+        ilike(users.email, secureQueryBuilder.createSafeLikePattern(sanitizedSearch))
       ) : undefined
     );
 
@@ -262,33 +262,33 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
     const [userResults, totalResult] = await Promise.all([
       db
         .select({
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          verificationStatus: user.verificationStatus,
-          isActive: user.isActive,
-          createdAt: user.createdAt,
-          lastLoginAt: user.lastLoginAt,
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          role: users.role,
+          verification_status: users.verification_status,
+          is_active: users.is_active,
+          created_at: users.created_at,
+          last_login_at: users.last_login_at,
         })
-        .from(user)
+        .from(users)
         .where(conditions)
-        .orderBy(desc(user.createdAt))
+        .orderBy(desc(users.created_at))
         .limit(limitNum)
         .offset(offset),
 
       // Count query for pagination - same conditions but just counting
       db
         .select({ count: count() })
-        .from(user)
+        .from(users)
         .where(conditions),
     ]);
-    
+
     const total = totalResult[0]?.count ?? 0;
     const totalPages = Math.ceil(total / limitNum);
 
     // Sanitize output data to remove sensitive information
-    const sanitizedUsers = userResults.map(user => 
+    const sanitizedUsers = userResults.map(user =>
       secureQueryBuilder.sanitizeOutput(user)
     );
 
@@ -304,9 +304,9 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
       },
     });
   } catch (error) {
-    logger.error('Error fetching users list', { 
-      component: 'admin-router', 
-      error: error instanceof Error ? error.message : String(error) 
+    logger.error('Error fetching users list', {
+      component: 'admin-router',
+      error: error instanceof Error ? error.message : String(error)
     });
     return ApiError(res, {
       code: 'USERS_FETCH_ERROR',
@@ -326,98 +326,98 @@ router.get('/users', async (req: AuthenticatedRequest, res: Response) => {
  * - Uses transaction to ensure user exists before updating
  * - Comprehensive audit logging
  */
-router.put('/users/:id/role', 
+router.put('/users/:id/role',
   inputValidationService.createValidationMiddleware(
     commonSchemas.userUpdate.pick({ role: true }),
     'body'
   ),
   async (req: AuthenticatedRequest, res: Response) => {
-  const { id } = req.params;
-  try {
-    const { role } = req.body as { role: UserRole };
+    const { id } = req.params;
+    try {
+      const { role } = req.body as { role: UserRole };
 
-    // Additional validation for role update
-    const roleValidation = inputValidationService.validateUserRole(role);
-    if (!roleValidation.isValid) {
-      return ApiError(res, {
-        code: 'INVALID_ROLE',
-        message: 'Invalid role provided',
-        details: roleValidation.errors
-      }, 400);
-    }
-
-    // Prevent admins from accidentally demoting themselves and losing access
-    if (req.user?.id === id && req.user?.role === 'admin' && role !== 'admin') {
-      return ApiForbidden(res, 'Admins cannot demote their own role.');
-    }
-
-    // Transaction ensures atomicity: either both operations succeed or both roll back
-    const result = await db.transaction(async (tx) => {
-      // First, verify the user exists and get their current role
-      const currentUser = await tx
-        .select({ role: user.role })
-        .from(user)
-        .where(eq(user.id, id))
-        .then(r => r[0]);
-      
-      if (!currentUser) {
-        throw new Error('UserNotFound');
+      // Additional validation for role update
+      const roleValidation = inputValidationService.validateUserRole(role);
+      if (!roleValidation.isValid) {
+        return ApiError(res, {
+          code: 'INVALID_ROLE',
+          message: 'Invalid role provided',
+          details: roleValidation.errors
+        }, 400);
       }
 
-      // Update the role and return the updated user data
-       const updatedUser = await tx
-         .update(user)
-         .set({ role, updatedAt: new Date() })
-         .where(eq(user.id, id))
-         .returning({
-           id: user.id,
-           name: user.name,
-           email: user.email,
-           role: user.role
-         })
-         .then(r => r[0]);
-      
-      return { updatedUser, oldRole: currentUser.role };
-    });
-
-    // Log this admin action for compliance and auditing purposes
-    await securityAuditService.logAdminAction(
-      'update_user_role', 
-      req, 
-      req.user!.id, 
-      `user:${id}`,
-      { 
-        targetUserId: id, 
-        oldRole: result.oldRole, 
-        newRole: role, 
-        adminUserId: req.user!.id 
+      // Prevent admins from accidentally demoting themselves and losing access
+      if (req.user?.id === id && req.user?.role === 'admin' && role !== 'admin') {
+        return ApiForbidden(res, 'Admins cannot demote their own role.');
       }
-    );
 
-    return ApiSuccess(res, { 
-      user: result.updatedUser, 
-      message: 'User role updated successfully' 
-    });
-  } catch (error) {
-    if (error instanceof Error && error.message === 'UserNotFound') {
+      // Transaction ensures atomicity: either both operations succeed or both roll back
+      const result = await db.transaction(async (tx) => {
+        // First, verify the user exists and get their current role
+        const currentUser = await tx
+          .select({ role: users.role })
+          .from(users)
+          .where(eq(users.id, id))
+          .then(r => r[0]);
+
+        if (!currentUser) {
+          throw new Error('UserNotFound');
+        }
+
+        // Update the role and return the updated user data
+        const updatedUser = await tx
+          .update(users)
+          .set({ role, updated_at: new Date() })
+          .where(eq(users.id, id))
+          .returning({
+            id: users.id,
+            name: users.name,
+            email: users.email,
+            role: users.role
+          })
+          .then(r => r[0]);
+
+        return { updatedUser, oldRole: currentUser.role };
+      });
+
+      // Log this admin action for compliance and auditing purposes
+      await securityAuditService.logAdminAction(
+        'update_user_role',
+        req,
+        req.user!.id,
+        `user:${id}`,
+        {
+          targetUserId: id,
+          oldRole: result.oldRole,
+          newRole: role,
+          adminUserId: req.user!.id
+        }
+      );
+
+      return ApiSuccess(res, {
+        user: result.updatedUser,
+        message: 'User role updated successfully'
+      });
+    } catch (error) {
+      if (error instanceof Error && error.message === 'UserNotFound') {
+        return ApiError(res, {
+          code: 'USER_NOT_FOUND',
+          message: 'User not found',
+          details: { user_id: id }
+        }, 404);
+      }
+      logger.error('Error updating user role', {
+        component: 'admin-router',
+        user_id: id,
+        error: error instanceof Error ? error.message : String(error)
+      });
       return ApiError(res, {
-        code: 'USER_NOT_FOUND',
-        message: 'User not found',
-        details: { userId: id }
-      }, 404);
+        code: 'USER_ROLE_UPDATE_ERROR',
+        message: 'Failed to update user role',
+        details: { user_id: id }
+      }, 500);
     }
-    logger.error('Error updating user role', { 
-      component: 'admin-router', 
-      userId: id, 
-      error: error instanceof Error ? error.message : String(error) 
-    });
-    return ApiError(res, {
-      code: 'USER_ROLE_UPDATE_ERROR',
-      message: 'Failed to update user role',
-      details: { userId: id }
-    }, 500);
-  }
-});
+  });
 
 /**
  * PUT /api/admin/users/:id/status
@@ -431,95 +431,95 @@ router.put('/users/:id/role',
  */
 router.put('/users/:id/status',
   inputValidationService.createValidationMiddleware(
-    commonSchemas.userUpdate.pick({ isActive: true }),
+    commonSchemas.userUpdate.pick({ is_active: true }),
     'body'
   ),
   async (req: AuthenticatedRequest, res: Response) => {
-  const { id } = req.params;
-  try {
-    const { isActive } = req.body;
+    const { id } = req.params;
+    try {
+      const { is_active } = req.body;
 
-    // Additional validation already handled by middleware
-    if (typeof isActive !== 'boolean') {
-      return ApiError(res, {
-        code: 'INVALID_STATUS',
-        message: 'The "isActive" field must be a boolean value.',
-        details: { providedValue: isActive, expectedType: 'boolean' }
-      }, 400);
-    }
-
-    // Prevent admins from accidentally locking themselves out
-    if (req.user?.id === id && !isActive) {
-      return ApiForbidden(res, 'You cannot deactivate your own account.');
-    }
-
-    // Transaction ensures we only update if the user exists
-    const result = await db.transaction(async (tx) => {
-      // Get current status for audit logging
-      const currentUser = await tx
-        .select({ isActive: user.isActive })
-        .from(user)
-        .where(eq(user.id, id))
-        .then(r => r[0]);
-      
-      if (!currentUser) {
-        throw new Error('UserNotFound');
+      // Additional validation already handled by middleware
+      if (typeof is_active !== 'boolean') {
+        return ApiError(res, {
+          code: 'INVALID_STATUS',
+          message: 'The "is_active" field must be a boolean value.',
+          details: { providedValue: is_active, expectedType: 'boolean' }
+        }, 400);
       }
 
-      // Update the active status
-       const updatedUser = await tx
-         .update(user)
-         .set({ isActive, updatedAt: new Date() })
-         .where(eq(user.id, id))
-         .returning({
-           id: user.id,
-           name: user.name,
-           email: user.email,
-           isActive: user.isActive
-         })
-         .then(r => r[0]);
-
-      return { updatedUser, oldStatus: currentUser.isActive };
-    });
-
-    // Create audit log entry for compliance tracking
-    await securityAuditService.logAdminAction(
-      'update_user_status', 
-      req, 
-      req.user!.id, 
-      `user:${id}`,
-      { 
-        targetUserId: id, 
-        oldStatus: result.oldStatus, 
-        newStatus: isActive, 
-        adminUserId: req.user!.id 
+      // Prevent admins from accidentally locking themselves out
+      if (req.user?.id === id && !is_active) {
+        return ApiForbidden(res, 'You cannot deactivate your own account.');
       }
-    );
 
-    return ApiSuccess(res, { 
-      user: result.updatedUser, 
-      message: `User account has been ${isActive ? 'activated' : 'deactivated'}.` 
-    });
-  } catch (error) {
-    if (error instanceof Error && error.message === 'UserNotFound') {
+      // Transaction ensures we only update if the user exists
+      const result = await db.transaction(async (tx) => {
+        // Get current status for audit logging
+        const currentUser = await tx
+          .select({ is_active: users.is_active })
+          .from(users)
+          .where(eq(users.id, id))
+          .then(r => r[0]);
+
+        if (!currentUser) {
+          throw new Error('UserNotFound');
+        }
+
+        // Update the active status
+        const updatedUser = await tx
+          .update(users)
+          .set({ is_active, updated_at: new Date() })
+          .where(eq(users.id, id))
+          .returning({
+            id: users.id,
+            name: users.name,
+            email: users.email,
+            is_active: users.is_active
+          })
+          .then(r => r[0]);
+
+        return { updatedUser, oldStatus: currentUser.is_active };
+      });
+
+      // Create audit log entry for compliance tracking
+      await securityAuditService.logAdminAction(
+        'update_user_status',
+        req,
+        req.user!.id,
+        `user:${id}`,
+        {
+          targetUserId: id,
+          oldStatus: result.oldStatus,
+          newStatus: is_active,
+          adminUserId: req.user!.id
+        }
+      );
+
+      return ApiSuccess(res, {
+        user: result.updatedUser,
+        message: `User account has been ${is_active ? 'activated' : 'deactivated'}.`
+      });
+    } catch (error) {
+      if (error instanceof Error && error.message === 'UserNotFound') {
+        return ApiError(res, {
+          code: 'USER_NOT_FOUND',
+          message: 'User not found',
+          details: { user_id: id }
+        }, 404);
+      }
+      logger.error('Error updating user status', {
+        component: 'admin-router',
+        user_id: id,
+        error: error instanceof Error ? error.message : String(error)
+      });
       return ApiError(res, {
-        code: 'USER_NOT_FOUND',
-        message: 'User not found',
-        details: { userId: id }
-      }, 404);
+        code: 'USER_STATUS_UPDATE_ERROR',
+        message: 'Failed to update user status',
+        details: { user_id: id }
+      }, 500);
     }
-    logger.error('Error updating user status', { 
-      component: 'admin-router', 
-      userId: id, 
-      error: error instanceof Error ? error.message : String(error) 
-    });
-    return ApiError(res, {
-      code: 'USER_STATUS_UPDATE_ERROR',
-      message: 'Failed to update user status',
-      details: { userId: id }
-    }, 500);
-  }
-});
+  });
 
 /**
  * GET /api/admin/system/health
@@ -536,12 +536,12 @@ router.get('/system/health', async (req: AuthenticatedRequest, res: Response) =>
       memory: process.memoryUsage(),
       nodeVersion: process.version,
       environment: process.env.NODE_ENV || 'development',
-      database: { 
-        connected: false, 
-        responseTime: 0 
+      database: {
+        connected: false,
+        responseTime: 0
       },
-      // TODO: Fix cache stats when billsService is available
-      // cache: billsService.getCacheStats()
+      // TODO: Fix cache stats when billService is available
+      // cache: billService.getCacheStats()
       cache: { hits: 0, misses: 0, size: 0 }
     };
 
@@ -555,17 +555,17 @@ router.get('/system/health', async (req: AuthenticatedRequest, res: Response) =>
       // Degrade gracefully - system is still partially functional
       health.status = 'degraded';
       health.database.connected = false;
-      logger.error('Database health check failed', { 
-        component: 'admin-router', 
-        error: dbError instanceof Error ? dbError.message : String(dbError) 
+      logger.error('Database health check failed', {
+        component: 'admin-router',
+        error: dbError instanceof Error ? dbError.message : String(dbError)
       });
     }
 
     return ApiSuccess(res, health);
   } catch (error) {
-    logger.error('System health check critical error', { 
-      component: 'admin-router', 
-      error: error instanceof Error ? error.message : String(error) 
+    logger.error('System health check critical error', {
+      component: 'admin-router',
+      error: error instanceof Error ? error.message : String(error)
     });
     return ApiError(res, {
       code: 'HEALTH_CHECK_ERROR',
@@ -584,29 +584,29 @@ router.get('/system/health', async (req: AuthenticatedRequest, res: Response) =>
  */
 router.post('/cache/clear', async (req: AuthenticatedRequest, res: Response) => {
   try {
-    // TODO: Fix clearCache when billsService is available
-    // billsService.clearCache();
+    // TODO: Fix clearCache when billService is available
+    // billService.clearCache();
 
     // Log this admin action for compliance and debugging
     await securityAuditService.logAdminAction(
-      'clear_cache', 
-      req, 
-      req.user!.id, 
+      'clear_cache',
+      req,
+      req.user!.id,
       'system:cache',
-      { 
-        adminUserId: req.user!.id, 
-        cacheType: 'application_cache' 
+      {
+        adminUserId: req.user!.id,
+        cacheType: 'application_cache'
       }
     );
 
-    return ApiSuccess(res, { 
-      message: 'Cache cleared successfully', 
-      timestamp: new Date().toISOString() 
+    return ApiSuccess(res, {
+      message: 'Cache cleared successfully',
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
-    logger.error('Error clearing cache', { 
-      component: 'admin-router', 
-      error: error instanceof Error ? error.message : String(error) 
+    logger.error('Error clearing cache', {
+      component: 'admin-router',
+      error: error instanceof Error ? error.message : String(error)
     });
     return ApiError(res, {
       code: 'CACHE_CLEAR_ERROR',
@@ -688,9 +688,9 @@ router.get('/slow-queries', async (req: AuthenticatedRequest, res: Response) => 
       }
     });
   } catch (error) {
-    logger.error('Error fetching slow queries', { 
-      component: 'admin-router', 
-      error: error instanceof Error ? error.message : String(error) 
+    logger.error('Error fetching slow queries', {
+      component: 'admin-router',
+      error: error instanceof Error ? error.message : String(error)
     });
     return ApiError(res, {
       code: 'SLOW_QUERIES_FETCH_ERROR',
@@ -714,24 +714,24 @@ router.delete('/slow-queries', async (req: AuthenticatedRequest, res: Response) 
 
     // Log the action for audit compliance
     await securityAuditService.logAdminAction(
-      'clear_slow_queries', 
-      req, 
-      req.user!.id, 
+      'clear_slow_queries',
+      req,
+      req.user!.id,
       'system:slow-queries',
-      { 
-        adminUserId: req.user!.id, 
-        action: 'cleared_slow_query_history' 
+      {
+        adminUserId: req.user!.id,
+        action: 'cleared_slow_query_history'
       }
     );
 
-    return ApiSuccess(res, { 
-      message: 'Slow query history cleared successfully', 
-      timestamp: new Date().toISOString() 
+    return ApiSuccess(res, {
+      message: 'Slow query history cleared successfully',
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
-    logger.error('Error clearing slow queries', { 
-      component: 'admin-router', 
-      error: error instanceof Error ? error.message : String(error) 
+    logger.error('Error clearing slow queries', {
+      component: 'admin-router',
+      error: error instanceof Error ? error.message : String(error)
     });
     return ApiError(res, {
       code: 'SLOW_QUERIES_CLEAR_ERROR',
@@ -757,24 +757,24 @@ router.get('/logs', async (req: AuthenticatedRequest, res: Response) => {
     const logs = [{
       timestamp: new Date().toISOString(),
       level: 'info',
-      message: 'Admin logs endpoint accessed by user.',
-      details: { 
-        userId: req.user!.id, 
+      message: 'Admin logs endpoint accessed by users.',
+      details: {
+        user_id: req.user!.id,
         userEmail: req.user!.email,
-        component: 'admin-router' 
+        component: 'admin-router'
       }
     }];
 
     return ApiSuccess(res, {
-      logs, 
-      count: logs.length, 
+      logs,
+      count: logs.length,
       filters: { level, limit: logLimit },
       note: 'This is a placeholder endpoint. Integrate with your production logging backend (e.g., Winston, Pino, Datadog) for real log data.'
     });
   } catch (error) {
-    logger.error('Error fetching logs', { 
-      component: 'admin-router', 
-      error: error instanceof Error ? error.message : String(error) 
+    logger.error('Error fetching logs', {
+      component: 'admin-router',
+      error: error instanceof Error ? error.message : String(error)
     });
     return ApiError(res, {
       code: 'LOGS_FETCH_ERROR',

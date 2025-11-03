@@ -67,8 +67,8 @@ export interface MockUser {
   email: string;
   name: string;
   role: string;
-  isActive: boolean;
-  verificationStatus: string;
+  is_active: boolean;
+  verification_status: string;
 }
 
 export class MockUserFactory {
@@ -78,8 +78,8 @@ export class MockUserFactory {
       email: MockDataGenerator.generateRandomEmail(),
       name: `Test User ${MockDataGenerator.generateRandomString(5)}`,
       role: MockDataGenerator.generateRandomUserRole(),
-      isActive: true,
-      verificationStatus: 'verified',
+      is_active: true,
+      verification_status: 'verified',
       ...overrides,
     };
   }
@@ -91,8 +91,8 @@ export class MockUserFactory {
   static createMockAdminUser(overrides: Partial<MockUser> = {}): MockUser {
     return this.createMockUser({
       role: 'admin',
-      verificationStatus: 'verified',
-      isActive: true,
+      verification_status: 'verified',
+      is_active: true,
       ...overrides,
     });
   }
@@ -100,8 +100,8 @@ export class MockUserFactory {
   static createMockCitizenUser(overrides: Partial<MockUser> = {}): MockUser {
     return this.createMockUser({
       role: 'citizen',
-      verificationStatus: 'verified',
-      isActive: true,
+      verification_status: 'verified',
+      is_active: true,
       ...overrides,
     });
   }
@@ -400,10 +400,10 @@ export class FormTestHelper {
     const user = userEvent.setup();
     
     if (options.clear) {
-      await user.clear(input);
+      await users.clear(input);
     }
     
-    await user.type(input, value);
+    await users.type(input, value);
   }
 
   /**
@@ -414,7 +414,7 @@ export class FormTestHelper {
     value: string
   ): Promise<void> {
     const user = userEvent.setup();
-    await user.selectOptions(select, value);
+    await users.selectOptions(select, value);
   }
 
   /**
@@ -422,7 +422,7 @@ export class FormTestHelper {
    */
   static async clickButton(button: HTMLElement): Promise<void> {
     const user = userEvent.setup();
-    await user.click(button);
+    await users.click(button);
   }
 
   /**
@@ -432,7 +432,7 @@ export class FormTestHelper {
     const user = userEvent.setup();
     const submitButton = form.querySelector('button[type="submit"]') as HTMLElement;
     if (submitButton) {
-      await user.click(submitButton);
+      await users.click(submitButton);
     } else {
       // Fallback: trigger form submission event directly
       form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));

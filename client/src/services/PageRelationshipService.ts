@@ -19,7 +19,7 @@ interface PageMetadata {
 interface BreadcrumbItem {
   label: string;
   path: string;
-  isActive: boolean;
+  is_active: boolean;
 }
 
 interface RelationshipStats {
@@ -199,7 +199,7 @@ export class PageRelationshipService {
    * Get related pages with role-based filtering
    * Optimized to avoid unnecessary object creation
    */
-  public getRelatedPages(pageId: string, userRole?: UserRole): RelatedPage[] {
+  public getRelatedPages(pageId: string, user_role?: UserRole): RelatedPage[] {
     const relationship = this.relationships.get(pageId);
     if (!relationship) {
       return [];
@@ -210,7 +210,7 @@ export class PageRelationshipService {
     // Pre-filter and map in a single pass
     for (const [relatedPageId, relation] of Object.entries(relationship.relatedPages)) {
       // Skip inaccessible pages early
-      if (!this.isPageAccessible(relatedPageId, userRole)) {
+      if (!this.isPageAccessible(relatedPageId, user_role)) {
         continue;
       }
 
@@ -239,9 +239,9 @@ export class PageRelationshipService {
   /**
    * Check page accessibility with optimized admin check
    */
-  private isPageAccessible(pageId: string, userRole?: UserRole): boolean {
+  private isPageAccessible(pageId: string, user_role?: UserRole): boolean {
     // Fast path: admin pages require admin role
-    return !pageId.startsWith('/admin') || userRole === 'admin';
+    return !pageId.startsWith('/admin') || user_role === 'admin';
   }
 
   /**
@@ -296,10 +296,10 @@ export class PageRelationshipService {
   public getContextualSuggestions(
     currentPage: string,
     visitHistory: string[],
-    userRole?: UserRole,
+    user_role?: UserRole,
     maxSuggestions: number = this.DEFAULT_MAX_SUGGESTIONS
   ): RelatedPage[] {
-    const relatedPages = this.getRelatedPages(currentPage, userRole);
+    const relatedPages = this.getRelatedPages(currentPage, user_role);
     
     // Convert visit history to Set for O(1) lookup
     const visitSet = new Set(visitHistory);
@@ -401,12 +401,12 @@ export class PageRelationshipService {
    */
   public getPagesByCategory(
     category: RelatedPage['category'],
-    userRole?: UserRole
+    user_role?: UserRole
   ): RelatedPage[] {
     const pages: RelatedPage[] = [];
     
     for (const [pageId, metadata] of this.pageMetadata.entries()) {
-      if (metadata.category === category && this.isPageAccessible(pageId, userRole)) {
+      if (metadata.category === category && this.isPageAccessible(pageId, user_role)) {
         pages.push({
           pageId,
           path: pageId,
@@ -472,11 +472,11 @@ export class PageRelationshipService {
    */
   public getPersonalizedSuggestions(
     currentPage: string,
-    userRole?: UserRole,
+    user_role?: UserRole,
     recentPages: string[] = [],
     maxSuggestions: number = this.DEFAULT_MAX_SUGGESTIONS
   ): RelatedPage[] {
-    const basePages = this.getRelatedPages(currentPage, userRole);
+    const basePages = this.getRelatedPages(currentPage, user_role);
     const recentSet = new Set(recentPages);
     
     // Calculate final weights in single pass
@@ -518,7 +518,7 @@ export class PageRelationshipService {
         breadcrumbs.push({
           label: metadata.title,
           path: parentPageId,
-          isActive: index === parentChain.length - 1,
+          is_active: index === parentChain.length - 1,
         });
       }
     });
@@ -569,7 +569,7 @@ export class PageRelationshipService {
   /**
    * Get child pages efficiently
    */
-  public getChildPages(parentPageId: string, userRole?: UserRole): RelatedPage[] {
+  public getChildPages(parentPageId: string, user_role?: UserRole): RelatedPage[] {
     const childPages: RelatedPage[] = [];
     
     // Iterate through all relationships to find children
@@ -580,7 +580,7 @@ export class PageRelationshipService {
       if (parentRelation?.type === 'parent') {
         const metadata = this.pageMetadata.get(pageId);
         
-        if (metadata && this.isPageAccessible(pageId, userRole)) {
+        if (metadata && this.isPageAccessible(pageId, user_role)) {
           childPages.push({
             pageId,
             path: pageId,

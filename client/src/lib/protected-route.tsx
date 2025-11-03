@@ -6,7 +6,8 @@ import { Navigate } from "react-router-dom";
 import { logger } from '../utils/browser-logger';
 
 // TEMPORARY: Authentication bypass for preview purposes
-const BYPASS_AUTH = true;
+// Set to false to enable authentication in production
+const BYPASS_AUTH = process.env.NODE_ENV === 'development';
 
 interface ProtectedRouteProps {
   children: ReactNode;

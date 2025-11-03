@@ -20,8 +20,8 @@ export interface BrowserAdapterConfig extends CacheAdapterConfig {
 
 interface CacheEntry {
   value: any;
-  expiresAt?: number;
-  createdAt: number;
+  expires_at?: number;
+  created_at: number;
   accessedAt: number;
   size: number;
 }
@@ -98,7 +98,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
         const db = (event.target as IDBOpenDBRequest).result;
         if (!db.objectStoreNames.contains('cache')) {
           const store = db.createObjectStore('cache', { keyPath: 'key' });
-          store.createIndex('expiresAt', 'expiresAt', { unique: false });
+          store.createIndex('expires_at', 'expires_at', { unique: false });
         }
       };
     });
@@ -131,7 +131,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
         }
 
         // Check expiration
-        if (entry.expiresAt && Date.now() > entry.expiresAt) {
+        if (entry.expires_at && Date.now() > entry.expires_at) {
           await this.delete(key); // Remove expired entry
           this.recordMiss(key);
           return null;
@@ -170,8 +170,8 @@ export class BrowserAdapter extends BaseCacheAdapter {
 
         const entry: CacheEntry = {
           value,
-          expiresAt: validatedTtl > 0 ? now + (validatedTtl * 1000) : undefined,
-          createdAt: now,
+          expires_at: validatedTtl > 0 ? now + (validatedTtl * 1000) : undefined,
+          created_at: now,
           accessedAt: now,
           size,
         };
@@ -240,7 +240,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
       if (!entry) return false;
 
       // Check expiration
-      if (entry.expiresAt && Date.now() > entry.expiresAt) {
+      if (entry.expires_at && Date.now() > entry.expires_at) {
         await this.delete(key); // Clean up expired entry
         return false;
       }
@@ -403,7 +403,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
               const data = this.storage.getItem(key);
               if (data) {
                 const entry: CacheEntry = JSON.parse(data);
-                if (entry.expiresAt && now > entry.expiresAt) {
+                if (entry.expires_at && now > entry.expires_at) {
                   keysToRemove.push(key);
                 }
               }
@@ -551,7 +551,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
 
       const transaction = this.indexedDB.transaction(['cache'], 'readwrite');
       const store = transaction.objectStore('cache');
-      const index = store.index('expiresAt');
+      const index = store.index('expires_at');
       const range = IDBKeyRange.upperBound(now);
       const request = index.openCursor(range);
       let deleted = 0;
@@ -610,7 +610,7 @@ export class BrowserAdapter extends BaseCacheAdapter {
               }
             } catch (error) {
               // Invalid entry, mark for removal
-              entries.push({ key, entry: { value: null, createdAt: 0, accessedAt: 0, size: 0 } });
+              entries.push({ key, entry: { value: null, created_at: 0, accessedAt: 0, size: 0 } });
             }
           }
         }

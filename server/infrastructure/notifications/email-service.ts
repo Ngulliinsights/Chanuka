@@ -67,7 +67,7 @@ export interface EmailMessage {
   attachments?: Array<{
     filename: string;
     content: Buffer | string;
-    contentType?: string;
+    content_type?: string;
   }>;
 }
 
@@ -98,7 +98,7 @@ interface SMTPMailOptions {
   attachments?: Array<{
     filename: string;
     content: Buffer | string;
-    contentType?: string;
+    content_type?: string;
   }>;
 }
 
@@ -110,9 +110,8 @@ interface SMTPSendResult {
 }
 
 // ---------- Legislative Types ----------
-export interface LegislativeInquiry {
-  id: string;
-  billId: string;
+export interface LegislativeInquiry { id: string;
+  bill_id: string;
   billTitle: string;
   userName: string;
   userEmail: string;
@@ -121,7 +120,7 @@ export interface LegislativeInquiry {
   timestamp: Date;
   status: 'new' | 'responded';
   priority: 'low' | 'medium' | 'high';
-}
+ }
 
 export interface EmailInboxMessage {
   id: string;
@@ -131,7 +130,7 @@ export interface EmailInboxMessage {
   subject: string;
   body: string;
   timestamp: Date;
-  isRead?: boolean;
+  is_read?: boolean;
   isImportant?: boolean;
   labels?: string[];
 }
@@ -141,7 +140,7 @@ export interface InquiryClassificationResult {
   priority: 'low' | 'medium' | 'high';
   extractedData: {
     senderPhone?: string;
-    billNumber?: string;
+    bill_number?: string;
   };
   confidence: number;
 }
@@ -188,7 +187,7 @@ export class InquiryClassificationService {
     const billRegex = /Bill\s?(\d+|[A-Z]\d+)/i;
     const billMatch = billRegex.exec(message.body);
     if (billMatch?.[1]) {
-      extractedData.billNumber = billMatch[1];
+      extractedData.bill_number = billMatch[1];
     }
 
     return { inquiryType, priority, extractedData, confidence };
@@ -275,9 +274,9 @@ export class MockEmailService extends BaseEmailService {
         from: 'john.kamau@email.com',
         to: [this.SUPPORT_EMAIL],
         subject: 'Bill Inquiry - Education Reform Bill',
-        body: "Hi, I'm very interested in tracking this bill. Could you provide updates on its progress? I'm particularly concerned about the education sector.",
+        body: "Hi, I'm very interested in tracking this bills. Could you provide updates on its progress? I'm particularly concerned about the education sector.",
         timestamp: new Date(now - 2 * 60 * 60 * 1000),
-        isRead: false,
+        is_read: false,
         isImportant: false,
         labels: ['inquiry', 'bill_inquiry'],
       },
@@ -289,7 +288,7 @@ export class MockEmailService extends BaseEmailService {
         subject: 'Amendment Request - Healthcare Bill',
         body: 'I would like to propose an amendment to this bill regarding mental health services. Please advise on the process.',
         timestamp: new Date(now - 5 * 60 * 60 * 1000),
-        isRead: true,
+        is_read: true,
         isImportant: false,
         labels: ['inquiry', 'amendment_request'],
       },
@@ -299,9 +298,9 @@ export class MockEmailService extends BaseEmailService {
         from: 'm.ochieng@email.com',
         to: [this.SUPPORT_EMAIL],
         subject: 'Legislative Inquiry - Infrastructure Development Act',
-        body: "I'm interested in following this infrastructure bill. When is the next committee hearing?",
+        body: "I'm interested in following this infrastructure bills. When is the next committee hearing?",
         timestamp: new Date(now - 24 * 60 * 60 * 1000),
-        isRead: true,
+        is_read: true,
         isImportant: false,
         labels: ['inquiry', 'legislative', 'replied'],
       },
@@ -313,7 +312,7 @@ export class MockEmailService extends BaseEmailService {
         subject: 'Complaint - Data Accuracy Issues',
         body: "I noticed discrepancies in the bill tracking data. Could you verify the current status?",
         timestamp: new Date(now - 2 * 24 * 60 * 60 * 1000),
-        isRead: true,
+        is_read: true,
         isImportant: false,
         labels: ['inquiry', 'complaint'],
       },
@@ -362,7 +361,7 @@ export class MockEmailService extends BaseEmailService {
   async markAsRead(messageId: string): Promise<void> {
     const msg = this.mockMessages.find(m => m.id === messageId);
     if (msg) {
-      msg.isRead = true;
+      msg.is_read = true;
       logger.debug(`Marked message ${messageId} as read`);
     }
   }
@@ -382,7 +381,7 @@ export class MockEmailService extends BaseEmailService {
       
       return {
         id: `inquiry_${msg.id}`,
-        billId: classification.extractedData.billNumber ?? 'unknown',
+        bill_id: classification.extractedData.bill_number ?? 'unknown',
         billTitle: this.extractBillTitle(msg.subject),
         userName,
         userEmail: msg.from,

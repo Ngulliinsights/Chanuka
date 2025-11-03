@@ -8,7 +8,7 @@ import { logger } from '../utils/browser-logger';
 /**
  * Hook for tracking user journeys and analytics
  */
-export function useJourneyTracker(sessionId?: string, userId?: string) {
+export function useJourneyTracker(sessionId?: string, user_id?: string) {
   const location = useLocation();
   const navigation = useNavigation();
   const tracker = useRef(UserJourneyTracker.getInstance());
@@ -26,9 +26,8 @@ export function useJourneyTracker(sessionId?: string, userId?: string) {
   /**
    * Start tracking the user journey
    */
-  const startJourney = useCallback((userRole: UserRole = 'public') => {
-    tracker.current.startJourney(sessionIdRef.current, userId, userRole);
-  }, [userId]);
+  const startJourney = useCallback((user_role: UserRole = 'public') => { tracker.current.startJourney(sessionIdRef.current, user_id, user_role);
+   }, [user_id]);
 
   /**
    * Track a page visit
@@ -75,9 +74,9 @@ export function useJourneyTracker(sessionId?: string, userId?: string) {
   const getAnalytics = useCallback((
     startDate?: Date,
     endDate?: Date,
-    userRole?: UserRole
+    user_role?: UserRole
   ): JourneyAnalytics => {
-    return tracker.current.getJourneyAnalytics(startDate, endDate, userRole);
+    return tracker.current.getJourneyAnalytics(startDate, endDate, user_role);
   }, []);
 
   /**
@@ -108,7 +107,7 @@ export function useJourneyTracker(sessionId?: string, userId?: string) {
 
     // Start journey if not already started
     if (!tracker.current.getJourney(sessionIdRef.current)) {
-      startJourney(navigation.userRole);
+      startJourney(navigation.user_role);
     }
 
     // Track the page visit
@@ -120,20 +119,20 @@ export function useJourneyTracker(sessionId?: string, userId?: string) {
 
     lastPageRef.current = currentPage;
     pageStartTimeRef.current = new Date();
-  }, [location.pathname, navigation.currentSection, navigation.userRole, startJourney, trackPageVisit]);
+  }, [location.pathname, navigation.currentSection, navigation.user_role, startJourney, trackPageVisit]);
 
   // Track user role changes
   useEffect(() => {
     if (tracker.current.getJourney(sessionIdRef.current)) {
       // Update the journey with new user role
       const journey = tracker.current.getJourney(sessionIdRef.current);
-      if (journey && journey.userRole !== navigation.userRole) {
+      if (journey && journey.user_role !== navigation.user_role) {
         // End current journey and start new one with updated role
         endJourney();
-        startJourney(navigation.userRole);
+        startJourney(navigation.user_role);
       }
     }
-  }, [navigation.userRole, endJourney, startJourney]);
+  }, [navigation.user_role, endJourney, startJourney]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -153,7 +152,7 @@ export function useJourneyTracker(sessionId?: string, userId?: string) {
         endJourney();
       } else {
         // User returned to the page
-        startJourney(navigation.userRole);
+        startJourney(navigation.user_role);
       }
     };
 
@@ -162,7 +161,7 @@ export function useJourneyTracker(sessionId?: string, userId?: string) {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [navigation.userRole, startJourney, endJourney]);
+  }, [navigation.user_role, startJourney, endJourney]);
 
   // Handle beforeunload event
   useEffect(() => {
@@ -208,9 +207,9 @@ export function useJourneyAnalytics() {
   const getAnalytics = useCallback((
     startDate?: Date,
     endDate?: Date,
-    userRole?: UserRole
+    user_role?: UserRole
   ): JourneyAnalytics => {
-    return tracker.current.getJourneyAnalytics(startDate, endDate, userRole);
+    return tracker.current.getJourneyAnalytics(startDate, endDate, user_role);
   }, []);
 
   const getOptimizations = useCallback((

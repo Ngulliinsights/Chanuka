@@ -26,7 +26,7 @@ export interface TestProvidersOptions {
   };
   navigationState?: {
     currentPath?: string;
-    userRole?: 'public' | 'user' | 'expert' | 'admin';
+    user_role?: 'public' | 'user' | 'expert' | 'admin';
   };
   loadingState?: {
     operations?: any[];
@@ -43,12 +43,12 @@ export const createMockUser = (overrides: Partial<any> = {}) => ({
   email: 'test@example.com',
   name: 'Test User',
   username: 'testuser',
-  firstName: 'Test',
-  lastName: 'User',
+  first_name: 'Test',
+  last_name: 'User',
   role: 'citizen',
-  verificationStatus: 'verified',
-  isActive: true,
-  createdAt: '2024-01-01T00:00:00Z',
+  verification_status: 'verified',
+  is_active: true,
+  created_at: '2024-01-01T00:00:00Z',
   reputation: 100,
   expertise: 'general',
   ...overrides,
@@ -61,8 +61,8 @@ export const createMockBill = (overrides: Partial<any> = {}) => ({
   status: 'active',
   category: 'healthcare',
   sponsor: 'Senator Smith',
-  introducedDate: new Date('2024-01-01'),
-  lastActionDate: new Date('2024-01-15'),
+  introduced_date: new Date('2024-01-01'),
+  last_action_date: new Date('2024-01-15'),
   votes: {
     yes: 45,
     no: 30,
@@ -82,12 +82,12 @@ export const createMockAuthState = (overrides: Partial<any> = {}) => ({
 export const createMockNavigationState = (overrides: Partial<any> = {}) => ({
   currentPath: '/',
   previousPath: '/',
-  breadcrumbs: [{ label: 'Home', path: '/', isActive: true }],
+  breadcrumbs: [{ label: 'Home', path: '/', is_active: true }],
   relatedPages: [],
   currentSection: 'legislative',
   sidebarOpen: false,
   mobileMenuOpen: false,
-  userRole: 'public',
+  user_role: 'public',
   preferences: {
     defaultLandingPage: '/',
     favoritePages: [],
@@ -260,12 +260,12 @@ export const setupLoadingState = (operationId: string, type: string = 'api') => 
   },
 });
 
-export const setupNavigationState = (path: string, userRole: string = 'public') => ({
+export const setupNavigationState = (path: string, user_role: string = 'public') => ({
   providers: {
     navigationState: {
       ...createMockNavigationState(),
       currentPath: path,
-      userRole,
+      user_role,
     },
   },
 });

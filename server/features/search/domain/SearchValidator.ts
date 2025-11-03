@@ -86,15 +86,15 @@ export class SearchValidator {
     }
 
     // Validate sponsor IDs
-    if (filters.sponsorId) {
-      if (!Array.isArray(filters.sponsorId)) {
+    if (filters.sponsor_id) {
+      if (!Array.isArray(filters.sponsor_id)) {
         errors.push('Sponsor ID filter must be an array');
       } else {
-        const invalidIds = filters.sponsorId.filter(id => !Number.isInteger(id) || id <= 0);
+        const invalidIds = filters.sponsor_id.filter(id => !Number.isInteger(id) || id <= 0);
         if (invalidIds.length > 0) {
           errors.push('All sponsor IDs must be positive integers');
         }
-        if (filters.sponsorId.length > 50) {
+        if (filters.sponsor_id.length > 50) {
           warnings.push('Sponsor ID filter has many values, this may impact performance');
         }
       }
@@ -284,8 +284,8 @@ export class SearchValidator {
         .slice(0, 20);
     }
 
-    if (filters.sponsorId && Array.isArray(filters.sponsorId)) {
-      sanitized.sponsorId = filters.sponsorId
+    if (filters.sponsor_id && Array.isArray(filters.sponsor_id)) {
+      sanitized.sponsor_id = filters.sponsor_id
         .filter(id => Number.isInteger(id) && id > 0)
         .slice(0, 50);
     }

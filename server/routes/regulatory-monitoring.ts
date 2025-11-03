@@ -154,7 +154,7 @@ router.get(
         regulationId,
         impactCount: impacts.length,
         impacts,
-        analyzedAt: new Date().toISOString()
+        analyzed_at: new Date().toISOString()
       }
     });
   })
@@ -212,7 +212,7 @@ router.get('/impact/batch', asyncHandler(async (req: Request, res: Response) => 
     data: {
       total: results.length,
       results,
-      analyzedAt: new Date().toISOString()
+      analyzed_at: new Date().toISOString()
     }
   });
 }));
@@ -261,7 +261,7 @@ router.get(
         regulationId,
         opportunityCount: opportunities.length,
         opportunities,
-        analyzedAt: new Date().toISOString()
+        analyzed_at: new Date().toISOString()
       }
     });
   })
@@ -314,7 +314,7 @@ router.get('/opportunities/batch', asyncHandler(async (req: Request, res: Respon
       total: totalOpportunities,
       regulationCount: regulationIds.length,
       opportunities: bulkOpportunities,
-      analyzedAt: new Date().toISOString()
+      analyzed_at: new Date().toISOString()
     }
   });
 }));

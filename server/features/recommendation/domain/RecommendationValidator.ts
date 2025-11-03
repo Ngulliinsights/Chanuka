@@ -4,8 +4,7 @@ export interface RecommendationValidationResult {
   warnings: string[];
 }
 
-export class RecommendationValidator {
-  private static readonly MAX_USER_ID_LENGTH = 100;
+export class RecommendationValidator { private static readonly MAX_USER_ID_LENGTH = 100;
   private static readonly MAX_BILL_ID = 999999999;
   private static readonly MAX_LIMIT = 50;
   private static readonly MAX_DAYS = 365;
@@ -14,18 +13,18 @@ export class RecommendationValidator {
    * Validate parameters for personalized recommendations
    */
   static validatePersonalizedRecommendations(
-    userId: string,
+    user_id: string,
     limit?: number
   ): RecommendationValidationResult {
     const errors: string[] = [];
     const warnings: string[] = [];
 
-    // Validate userId
-    if (!userId || typeof userId !== 'string') {
+    // Validate user_id
+    if (!user_id || typeof user_id !== 'string') {
       errors.push('User ID is required and must be a string');
-    } else if (userId.length > this.MAX_USER_ID_LENGTH) {
+     } else if (user_id.length > this.MAX_USER_ID_LENGTH) {
       errors.push(`User ID cannot exceed ${this.MAX_USER_ID_LENGTH} characters`);
-    } else if (!this.isValidUserId(userId)) {
+    } else if (!this.isValidUserId(user_id)) {
       errors.push('Invalid user ID format');
     }
 
@@ -49,18 +48,17 @@ export class RecommendationValidator {
    * Validate parameters for similar bills
    */
   static validateSimilarBills(
-    billId: number,
+    bill_id: number,
     limit?: number
-  ): RecommendationValidationResult {
-    const errors: string[] = [];
+  ): RecommendationValidationResult { const errors: string[] = [];
     const warnings: string[] = [];
 
-    // Validate billId
-    if (billId === undefined || billId === null) {
+    // Validate bill_id
+    if (bill_id === undefined || bill_id === null) {
       errors.push('Bill ID is required');
-    } else if (typeof billId !== 'number' || !Number.isInteger(billId) || billId < 1) {
+     } else if (typeof bill_id !== 'number' || !Number.isInteger(bill_id) || bill_id < 1) {
       errors.push('Bill ID must be a positive integer');
-    } else if (billId > this.MAX_BILL_ID) {
+    } else if (bill_id > this.MAX_BILL_ID) {
       errors.push(`Bill ID cannot exceed ${this.MAX_BILL_ID}`);
     }
 
@@ -121,47 +119,45 @@ export class RecommendationValidator {
    * Validate parameters for collaborative recommendations
    */
   static validateCollaborativeRecommendations(
-    userId: string,
+    user_id: string,
     limit?: number
-  ): RecommendationValidationResult {
-    // Same validation as personalized recommendations
-    return this.validatePersonalizedRecommendations(userId, limit);
-  }
+  ): RecommendationValidationResult { // Same validation as personalized recommendations
+    return this.validatePersonalizedRecommendations(user_id, limit);
+   }
 
   /**
    * Validate parameters for engagement tracking
    */
   static validateEngagementTracking(
-    userId: string,
-    billId: number,
-    engagementType: string
-  ): RecommendationValidationResult {
-    const errors: string[] = [];
+    user_id: string,
+    bill_id: number,
+    engagement_type: string
+  ): RecommendationValidationResult { const errors: string[] = [];
     const warnings: string[] = [];
 
-    // Validate userId
-    if (!userId || typeof userId !== 'string') {
+    // Validate user_id
+    if (!user_id || typeof user_id !== 'string') {
       errors.push('User ID is required and must be a string');
-    } else if (userId.length > this.MAX_USER_ID_LENGTH) {
+     } else if (user_id.length > this.MAX_USER_ID_LENGTH) {
       errors.push(`User ID cannot exceed ${this.MAX_USER_ID_LENGTH} characters`);
-    } else if (!this.isValidUserId(userId)) {
+    } else if (!this.isValidUserId(user_id)) {
       errors.push('Invalid user ID format');
     }
 
-    // Validate billId
-    if (billId === undefined || billId === null) {
+    // Validate bill_id
+    if (bill_id === undefined || bill_id === null) {
       errors.push('Bill ID is required');
-    } else if (typeof billId !== 'number' || !Number.isInteger(billId) || billId < 1) {
+    } else if (typeof bill_id !== 'number' || !Number.isInteger(bill_id) || bill_id < 1) {
       errors.push('Bill ID must be a positive integer');
-    } else if (billId > this.MAX_BILL_ID) {
+    } else if (bill_id > this.MAX_BILL_ID) {
       errors.push(`Bill ID cannot exceed ${this.MAX_BILL_ID}`);
     }
 
-    // Validate engagementType
+    // Validate engagement_type
     const validTypes = ['view', 'comment', 'share'];
-    if (!engagementType || typeof engagementType !== 'string') {
+    if (!engagement_type || typeof engagement_type !== 'string') {
       errors.push('Engagement type is required and must be a string');
-    } else if (!validTypes.includes(engagementType)) {
+    } else if (!validTypes.includes(engagement_type)) {
       errors.push(`Engagement type must be one of: ${validTypes.join(', ')}`);
     }
 
@@ -175,27 +171,25 @@ export class RecommendationValidator {
   /**
    * Sanitize user ID
    */
-  static sanitizeUserId(userId: string): string {
-    if (typeof userId !== 'string') return '';
+  static sanitizeUserId(user_id: string): string { if (typeof user_id !== 'string') return '';
 
-    return userId
+    return user_id
       .trim()
       .substring(0, this.MAX_USER_ID_LENGTH)
       // Remove potentially harmful characters
       .replace(/[<>\"'`;]/g, '');
-  }
+   }
 
   /**
    * Sanitize bill ID
    */
-  static sanitizeBillId(billId: any): number | null {
-    if (typeof billId !== 'number' && typeof billId !== 'string') return null;
+  static sanitizeBillId(bill_id: any): number | null { if (typeof bill_id !== 'number' && typeof bill_id !== 'string') return null;
 
-    const num = typeof billId === 'string' ? parseInt(billId, 10) : billId;
+    const num = typeof bill_id === 'string' ? parseInt(bill_id, 10) : bill_id;
 
     if (!Number.isInteger(num) || num < 1 || num > this.MAX_BILL_ID) {
       return null;
-    }
+     }
 
     return num;
   }
@@ -248,10 +242,9 @@ export class RecommendationValidator {
 
   // Private helper methods
 
-  private static isValidUserId(userId: string): boolean {
-    // Basic validation - should contain only alphanumeric characters, hyphens, and underscores
-    return /^[a-zA-Z0-9_-]+$/.test(userId);
-  }
+  private static isValidUserId(user_id: string): boolean { // Basic validation - should contain only alphanumeric characters, hyphens, and underscores
+    return /^[a-zA-Z0-9_-]+$/.test(user_id);
+   }
 }
 
 

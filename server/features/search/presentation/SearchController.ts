@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
       filters: {
         category: req.query.category ? String(req.query.category).split(',') : undefined,
         status: req.query.status ? String(req.query.status).split(',') : undefined,
-        sponsorId: req.query.sponsorId ? String(req.query.sponsorId).split(',').map(Number) : undefined,
+        sponsor_id: req.query.sponsor_id ? String(req.query.sponsor_id).split(',').map(Number) : undefined,
         dateFrom: req.query.dateFrom ? new Date(String(req.query.dateFrom)) : undefined,
         dateTo: req.query.dateTo ? new Date(String(req.query.dateTo)) : undefined,
         tags: req.query.tags ? String(req.query.tags).split(',') : undefined,

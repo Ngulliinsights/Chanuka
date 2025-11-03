@@ -20,7 +20,7 @@ import {
 } from './types.js';
 import { GovernmentDataService } from './government-data-service.js';
 import { ConflictResolutionService } from './conflict-resolution-service.js';
-import { bills, sponsors, BillSponsorship, syncJobs, syncErrors } from '@shared/schema';
+import { bills, sponsors, bill_cosponsors, sync_jobs, data_sources } from '@shared/schema';
 import { eq, and, gte, desc } from 'drizzle-orm';
 import { logger  } from '../../../shared/core/src/index.js';
 
@@ -236,7 +236,7 @@ export class DataSynchronizationService extends EventEmitter {
         level: 'warning',
         message: `Failed to process record`,
         details: error,
-        recordId: record.id || record.billNumber || 'unknown'
+        recordId: record.id || record.bill_number || 'unknown'
       };
       
       syncJob.errors.push(syncError);
@@ -252,7 +252,7 @@ export class DataSynchronizationService extends EventEmitter {
     const existingBill = await db
       .select()
       .from(bills)
-      .where(eq(bills.billNumber, billData.billNumber))
+      .where(eq(bills.bill_number, billData.bill_number))
       .limit(1);
 
     if (existingBill.length > 0) {
@@ -431,12 +431,11 @@ export class DataSynchronizationService extends EventEmitter {
    */
   private async createBill(billData: BillData): Promise<void> {
     // Implementation would create bill in database
-    console.log(`Creating bill: ${billData.billNumber}`);
+    console.log(`Creating bill: ${billData.bill_number}`);
   }
 
-  private async updateBill(billId: number, billData: BillData): Promise<void> {
-    // Implementation would update bill in database
-    console.log(`Updating bill ID: ${billId}`);
+  private async updateBill(bill_id: number, billData: BillData): Promise<void> { // Implementation would update bill in database
+    console.log(`Updating bill ID: ${bill_id }`);
   }
 
   private async createSponsor(sponsorData: SponsorData): Promise<void> {
@@ -444,14 +443,13 @@ export class DataSynchronizationService extends EventEmitter {
     console.log(`Creating sponsor: ${sponsorData.name}`);
   }
 
-  private async updateSponsor(sponsorId: number, sponsorData: SponsorData): Promise<void> {
+  private async updateSponsor(sponsor_id: number, sponsorData: SponsorData): Promise<void> {
     // Implementation would update sponsor in database
-    console.log(`Updating sponsor ID: ${sponsorId}`);
+    console.log(`Updating sponsor ID: ${sponsor_id}`);
   }
 
-  private async updateBillWithResolution(billId: number, resolution: ConflictResolution): Promise<void> {
-    // Implementation would apply conflict resolution
-    console.log(`Applying resolution for bill ID: ${billId}`);
+  private async updateBillWithResolution(bill_id: number, resolution: ConflictResolution): Promise<void> { // Implementation would apply conflict resolution
+    console.log(`Applying resolution for bill ID: ${bill_id }`);
   }
 
   private async queueForManualReview(resolution: ConflictResolution): Promise<void> {

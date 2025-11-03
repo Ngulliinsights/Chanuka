@@ -79,8 +79,8 @@ describe('useAuthForm Hook', () => {
       email: '',
       password: '',
       confirmPassword: '',
-      firstName: '',
-      lastName: '',
+      first_name: '',
+      last_name: '',
     });
     expect(result.current.errors).toEqual({});
     expect(result.current.loading).toBe(false);
@@ -215,11 +215,11 @@ describe('useAuthForm Hook', () => {
     await act(() => {
       result.current.toggleMode(); // Switch to register mode
 
-      const firstNameEvent = {
-        target: { name: 'firstName', value: 'John' }
+      const first_nameEvent = {
+        target: { name: 'first_name', value: 'John' }
       } as React.ChangeEvent<HTMLInputElement>;
-      const lastNameEvent = {
-        target: { name: 'lastName', value: 'Doe' }
+      const last_nameEvent = {
+        target: { name: 'last_name', value: 'Doe' }
       } as React.ChangeEvent<HTMLInputElement>;
       const emailEvent = {
         target: { name: 'email', value: 'john@example.com' }
@@ -231,8 +231,8 @@ describe('useAuthForm Hook', () => {
         target: { name: 'confirmPassword', value: 'SecurePass123!' }
       } as React.ChangeEvent<HTMLInputElement>;
 
-      result.current.handleInputChange(firstNameEvent);
-      result.current.handleInputChange(lastNameEvent);
+      result.current.handleInputChange(first_nameEvent);
+      result.current.handleInputChange(last_nameEvent);
       result.current.handleInputChange(emailEvent);
       result.current.handleInputChange(passwordEvent);
       result.current.handleInputChange(confirmPasswordEvent);
@@ -244,8 +244,8 @@ describe('useAuthForm Hook', () => {
     });
 
     expect(mockRegister).toHaveBeenCalledWith({
-      firstName: 'John',
-      lastName: 'Doe',
+      first_name: 'John',
+      last_name: 'Doe',
       email: 'john@example.com',
       password: 'SecurePass123!',
     });
@@ -283,11 +283,11 @@ describe('useAuthForm Hook', () => {
     await act(() => {
       result.current.toggleMode(); // Switch to register mode
 
-      const firstNameEvent = {
-        target: { name: 'firstName', value: 'A' }
+      const first_nameEvent = {
+        target: { name: 'first_name', value: 'A' }
       } as React.ChangeEvent<HTMLInputElement>;
-      const lastNameEvent = {
-        target: { name: 'lastName', value: '' }
+      const last_nameEvent = {
+        target: { name: 'last_name', value: '' }
       } as React.ChangeEvent<HTMLInputElement>;
       const emailEvent = {
         target: { name: 'email', value: 'invalid-email' }
@@ -299,8 +299,8 @@ describe('useAuthForm Hook', () => {
         target: { name: 'confirmPassword', value: 'different' }
       } as React.ChangeEvent<HTMLInputElement>;
 
-      result.current.handleInputChange(firstNameEvent);
-      result.current.handleInputChange(lastNameEvent);
+      result.current.handleInputChange(first_nameEvent);
+      result.current.handleInputChange(last_nameEvent);
       result.current.handleInputChange(emailEvent);
       result.current.handleInputChange(passwordEvent);
       result.current.handleInputChange(confirmPasswordEvent);
@@ -311,8 +311,8 @@ describe('useAuthForm Hook', () => {
       await result.current.handleSubmit(event);
     });
 
-    expect(result.current.errors.firstName).toContain('at least 2 characters');
-    expect(result.current.errors.lastName).toBeDefined();
+    expect(result.current.errors.first_name).toContain('at least 2 characters');
+    expect(result.current.errors.last_name).toBeDefined();
     expect(result.current.errors.email).toContain('valid email');
     expect(result.current.errors.password).toBeDefined();
     expect(mockRegister).not.toHaveBeenCalled();

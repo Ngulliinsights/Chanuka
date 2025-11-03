@@ -408,7 +408,7 @@ export class DevelopmentErrorRecovery {
       const errorLog = {
         ...errorInfo,
         timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent,
+        user_agent: navigator.user_agent,
         url: window.location.href,
         devServerInfo: window.__DEV_SERVER__,
         errorCount: this.errorCount,

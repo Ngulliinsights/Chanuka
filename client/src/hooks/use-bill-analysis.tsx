@@ -21,30 +21,28 @@ interface Bill {
   status?: string;
 }
 
-interface CommentPayload {
-  content: string;
+interface CommentPayload { content: string;
   expertise?: string;
-  billId: number;
-  parentId?: number;
+  bill_id: number;
+  parent_id?: number;
   section?: string;
-}
+ }
 
 interface EndorseCommentPayload {
-  commentId: number;
+  comment_id: number;
   endorsements: number;
 }
 
 interface VotePayload {
-  commentId: number;
+  comment_id: number;
   type: 'up' | 'down';
 }
 
-interface PollPayload {
-  billId: number;
+interface PollPayload { bill_id: number;
   question: string;
   options: string[];
   section?: string;
-}
+ }
 
 interface BillAnalysis {
   id: number;
@@ -75,24 +73,23 @@ interface BillAnalysis {
   }>;
 }
 
-interface Comment {
-  id: number;
-  userId: number;
+interface Comment { id: number;
+  user_id: number;
   username: string;
   userInitials: string;
   expertise?: string;
   content: string;
-  createdAt: Date;
+  created_at: Date;
   endorsements: number;
   upvotes: number;
   downvotes: number;
   verifiedClaims: number;
   isHighlighted: boolean;
-  parentId?: number;
+  parent_id?: number;
   replies?: Comment[];
   pollData?: {
     question: string;
-    options: Array<{ text: string; votes: number }>;
+    options: Array<{ text: string; votes: number  }>;
     totalVotes: number;
     userVote?: number;
   };
@@ -119,40 +116,37 @@ const apiRequest = async (method: string, url: string, data?: any) => {
   return response;
 };
 
-export function useBillAnalysis(billId: number) {
+export function useBillAnalysis(bill_id: number) {
   const [analysis, setAnalysis] = useState<BillAnalysis | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
 
   // Fetch bill
-  const { data: billData, isLoading: billLoading } = useQuery({
-    queryKey: ['bill', billId],
+  const { data: billData, isLoading: billLoading } = useQuery({ queryKey: ['bill', bill_id],
     queryFn: async () => {
-      const res = await apiRequest('GET', `/api/bills/${billId}`);
+      const res = await apiRequest('GET', `/api/bills/${bill_id }`);
       return res.json();
     },
-    enabled: !!billId,
+    enabled: !!bill_id,
   });
 
   // Fetch bill analysis
-  const { data: analysisData, isLoading: analysisLoading } = useQuery({
-    queryKey: ['analysis', billId],
+  const { data: analysisData, isLoading: analysisLoading } = useQuery({ queryKey: ['analysis', bill_id],
     queryFn: async () => {
-      const res = await apiRequest('GET', `/api/analysis/bills/${billId}`);
+      const res = await apiRequest('GET', `/api/analysis/bills/${bill_id }`);
       return res.json();
     },
-    enabled: !!billId,
+    enabled: !!bill_id,
   });
 
   // Fetch comments
-  const { data: commentsData, isLoading: commentsLoading } = useQuery({
-    queryKey: ['bills', billId, 'comments'],
+  const { data: commentsData, isLoading: commentsLoading } = useQuery({ queryKey: ['bills', bill_id, 'comments'],
     queryFn: async () => {
-      const res = await apiRequest('GET', `/api/bills/${billId}/comments`);
+      const res = await apiRequest('GET', `/api/bills/${bill_id }/comments`);
       return res.json();
     },
-    enabled: !!billId,
+    enabled: !!bill_id,
   });
 
   useEffect(() => {
@@ -168,34 +162,31 @@ export function useBillAnalysis(billId: number) {
   }, [commentsData]);
 
   // Add comment mutation
-  const addCommentMutation = useMutation({
-    mutationFn: async (payload: CommentPayload) => {
-      const res = await apiRequest('POST', `/api/bills/${billId}/comments`, payload);
+  const addCommentMutation = useMutation({ mutationFn: async (payload: CommentPayload) => {
+      const res = await apiRequest('POST', `/api/bills/${bill_id }/comments`, payload);
       return res.json();
     },
-    onSuccess: (newComment) => {
-      setComments(prev => [newComment, ...prev]);
-      queryClient.invalidateQueries({ queryKey: ['bills', billId, 'comments'] });
+    onSuccess: (newComment) => { setComments(prev => [newComment, ...prev]);
+      queryClient.invalidateQueries({ queryKey: ['bills', bill_id, 'comments']  });
     },
   });
 
   // Vote on comment mutation
   const voteCommentMutation = useMutation({
     mutationFn: async (payload: VotePayload) => {
-      const res = await apiRequest('POST', `/api/comments/${payload.commentId}/vote`, { 
+      const res = await apiRequest('POST', `/api/comments/${payload.comment_id}/vote`, { 
         type: payload.type 
       });
       return res.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bills', billId, 'comments'] });
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['bills', bill_id, 'comments']  });
     },
   });
 
   // Endorse comment mutation
   const endorseCommentMutation = useMutation({
     mutationFn: async (payload: EndorseCommentPayload) => {
-      const res = await apiRequest('POST', `/api/comments/${payload.commentId}/endorse`, { 
+      const res = await apiRequest('POST', `/api/comments/${payload.comment_id}/endorse`, { 
         endorsements: payload.endorsements 
       });
       return res.json();
@@ -208,18 +199,16 @@ export function useBillAnalysis(billId: number) {
             : comment
         )
       );
-      queryClient.invalidateQueries({ queryKey: ['bills', billId, 'comments'] });
+      queryClient.invalidateQueries({ queryKey: ['bills', bill_id, 'comments']  });
     },
   });
 
   // Create poll mutation
-  const createPollMutation = useMutation({
-    mutationFn: async (payload: PollPayload) => {
-      const res = await apiRequest('POST', `/api/bills/${payload.billId}/polls`, payload);
+  const createPollMutation = useMutation({ mutationFn: async (payload: PollPayload) => {
+      const res = await apiRequest('POST', `/api/bills/${payload.bill_id }/polls`, payload);
       return res.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bills', billId, 'comments'] });
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['bills', bill_id, 'comments']  });
     },
   });
 
@@ -243,8 +232,7 @@ export function useBillAnalysis(billId: number) {
     return createPollMutation.mutateAsync(payload);
   }, [createPollMutation]);
 
-  return {
-    bill: billData,
+  return { bill: billData,
     analysis,
     comments,
     isLoading: isLoading || billLoading || analysisLoading || commentsLoading,
@@ -255,65 +243,61 @@ export function useBillAnalysis(billId: number) {
     isAddingComment: addCommentMutation.isPending,
     isEndorsing: endorseCommentMutation.isPending,
     refetch: () => {
-      queryClient.invalidateQueries({ queryKey: ['bills', billId] });
-      queryClient.invalidateQueries({ queryKey: ['analysis', billId] });
+      queryClient.invalidateQueries({ queryKey: ['bills', bill_id]  });
+      queryClient.invalidateQueries({ queryKey: ['analysis', bill_id]  });
     },
   };
 }
 
-export function useSponsorshipAnalysis(billId: string) {
-  return useQuery({
-    queryKey: ['sponsorship-analysis', billId],
+export function useSponsorshipAnalysis(bill_id: string) { return useQuery({
+    queryKey: ['sponsorship-analysis', bill_id],
     queryFn: async () => {
-      const response = await fetch(`/api/sponsorship/bills/${billId}/analysis`);
+      const response = await fetch(`/api/sponsorship/bills/${bill_id }/analysis`);
       if (!response.ok) {
         throw new Error('Failed to fetch sponsorship analysis');
       }
       return response.json();
     },
-    enabled: !!billId,
+    enabled: !!bill_id,
   });
 }
 
-export function usePrimarySponsorAnalysis(billId: string) {
-  return useQuery({
-    queryKey: ['primary-sponsor-analysis', billId],
+export function usePrimarySponsorAnalysis(bill_id: string) { return useQuery({
+    queryKey: ['primary-sponsor-analysis', bill_id],
     queryFn: async () => {
-      const response = await fetch(`/api/sponsorship/bills/${billId}/primary-sponsor`);
+      const response = await fetch(`/api/sponsorship/bills/${bill_id }/primary-sponsor`);
       if (!response.ok) {
         throw new Error('Failed to fetch primary sponsor analysis');
       }
       return response.json();
     },
-    enabled: !!billId,
+    enabled: !!bill_id,
   });
 }
 
-export function useCoSponsorsAnalysis(billId: string) {
-  return useQuery({
-    queryKey: ['co-sponsors-analysis', billId],
+export function useCoSponsorsAnalysis(bill_id: string) { return useQuery({
+    queryKey: ['co-sponsors-analysis', bill_id],
     queryFn: async () => {
-      const response = await fetch(`/api/sponsorship/bills/${billId}/co-sponsors`);
+      const response = await fetch(`/api/sponsorship/bills/${bill_id }/co-sponsors`);
       if (!response.ok) {
         throw new Error('Failed to fetch co-sponsors analysis');
       }
       return response.json();
     },
-    enabled: !!billId,
+    enabled: !!bill_id,
   });
 }
 
-export function useFinancialNetworkAnalysis(billId: string) {
-  return useQuery({
-    queryKey: ['financial-network-analysis', billId],
+export function useFinancialNetworkAnalysis(bill_id: string) { return useQuery({
+    queryKey: ['financial-network-analysis', bill_id],
     queryFn: async () => {
-      const response = await fetch(`/api/sponsorship/bills/${billId}/financial-network`);
+      const response = await fetch(`/api/sponsorship/bills/${bill_id }/financial-network`);
       if (!response.ok) {
         throw new Error('Failed to fetch financial network analysis');
       }
       return response.json();
     },
-    enabled: !!billId,
+    enabled: !!bill_id,
   });
 }
 

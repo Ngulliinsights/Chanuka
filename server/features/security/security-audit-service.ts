@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { database as db } from '../../../shared/database/connection';
-import { securityAuditLog } from '../../../shared/schema';
+import { system_audit_log } from '@shared/schema';
 import { eq, and, gte, lte, desc, sql, count, inArray } from 'drizzle-orm';
 import { logger  } from '../../../shared/core/src/index.js';
 
@@ -17,12 +17,11 @@ import { logger  } from '../../../shared/core/src/index.js';
  * and identify patterns or problems.
  */
 
-export interface SecurityEvent {
-  eventType: string;
+export interface SecurityEvent { event_type: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
-  userId?: string;
-  ipAddress?: string;
-  userAgent?: string;
+  user_id?: string;
+  ip_address?: string;
+  user_agent?: string;
   resource?: string;
   action?: string;
   result?: string;
@@ -30,19 +29,18 @@ export interface SecurityEvent {
   details?: Record<string, any>;
   sessionId?: string;
   timestamp?: Date;
-}
+ }
 
-export interface AuditQueryOptions {
-  userId?: string;
-  ipAddress?: string;
-  eventType?: string;
-  eventTypes?: string[];
+export interface AuditQueryOptions { user_id?: string;
+  ip_address?: string;
+  event_type?: string;
+  event_types?: string[];
   severity?: string;
   startDate?: Date;
   endDate?: Date;
   limit?: number;
   offset?: number;
-}
+ }
 
 export interface AuditReport {
   period: { start: Date; end: Date };
@@ -59,8 +57,7 @@ export interface AuditReport {
 /**
  * Pure audit logging service - records events without judgment or action
  */
-export class SecurityAuditService {
-  /**
+export class SecurityAuditService { /**
    * Core logging method - records any security event to the audit trail
    * This is the foundation method that all other logging methods use
    */
@@ -69,10 +66,10 @@ export class SecurityAuditService {
       // Drizzle insert expects required fields to be non-undefined.
       // Coalesce `result` to a sensible default so the insert signature matches.
       await db.insert(securityAuditLog).values({
-        eventType: event.eventType,
-        userId: event.userId,
-        ipAddress: event.ipAddress,
-        userAgent: event.userAgent,
+        event_type: event.event_type,
+        user_id: event.user_id,
+        ip_address: event.ip_address,
+        user_agent: event.user_agent,
         resource: event.resource,
         action: event.action,
         // Ensure `result` is always a string (Drizzle's types require it)
@@ -81,17 +78,16 @@ export class SecurityAuditService {
         details: event.details,
         sessionId: event.sessionId,
         timestamp: event.timestamp || new Date(),
-      });
+       });
     } catch (error) {
       // Audit logging failures should be logged but should never crash the application
       // This is critical because if audit logging breaks, we don't want to take down
       // the entire system, but we absolutely need to know about it
-      logger.error('CRITICAL: Audit logging failed', { component: 'SecurityAudit' }, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        eventType: event.eventType,
-        userId: event.userId,
+      logger.error('CRITICAL: Audit logging failed', { component: 'SecurityAudit' }, { error: error instanceof Error ? error.message : 'Unknown error',
+        event_type: event.event_type,
+        user_id: event.user_id,
         timestamp: new Date().toISOString()
-      });
+       });
     }
   }
 
@@ -101,24 +97,23 @@ export class SecurityAuditService {
    * target of attackers
    */
   async logAuthEvent(
-    eventType: 'login_attempt' | 'login_success' | 'login_failure' | 'logout' | 
+    event_type: 'login_attempt' | 'login_success' | 'login_failure' | 'logout' | 
               'password_change' | 'password_reset_request' | 'password_reset_complete' |
               'registration_attempt' | 'registration_success' | 'registration_failure',
     req: Request | undefined,
-    userId?: string,
+    user_id?: string,
     success: boolean = true,
     details?: Record<string, any>
-  ): Promise<void> {
-    // Determine severity based on the event type and success status
+  ): Promise<void> { // Determine severity based on the event type and success status
     // Failed authentication attempts get elevated severity for easier monitoring
-    const severity = this.determineAuthSeverity(eventType, success);
+    const severity = this.determineAuthSeverity(event_type, success);
 
     await this.logSecurityEvent({
-      eventType,
+      event_type,
       severity,
-      userId,
-      ipAddress: this.extractClientIP(req),
-      userAgent: req?.get?.('User-Agent') || 'unknown',
+      user_id,
+      ip_address: this.extractClientIP(req),
+      user_agent: req?.get?.('User-Agent') || 'unknown',
       result: success ? 'success' : 'failure',
       success,
       details: {
@@ -127,7 +122,7 @@ export class SecurityAuditService {
         attemptTimestamp: new Date().toISOString(),
         // Include any relevant headers that might help with forensics
         referer: req?.get?.('Referer'),
-      },
+       },
       sessionId: (req as any)?.sessionID || 'unknown',
     });
   }
@@ -141,20 +136,19 @@ export class SecurityAuditService {
     resource: string,
     action: 'read' | 'write' | 'update' | 'delete' | 'export' | 'bulk_read' | 'bulk_export',
     req: Request | undefined,
-    userId?: string,
+    user_id?: string,
     recordCount?: number,
     success: boolean = true,
     details?: Record<string, any>
-  ): Promise<void> {
-    // Data access severity increases with volume and type of operation
+  ): Promise<void> { // Data access severity increases with volume and type of operation
     const severity = this.determineDataAccessSeverity(action, recordCount);
 
     await this.logSecurityEvent({
-      eventType: 'data_access',
+      event_type: 'data_access',
       severity,
-      userId,
-      ipAddress: this.extractClientIP(req),
-      userAgent: req?.get?.('User-Agent') || 'unknown',
+      user_id,
+      ip_address: this.extractClientIP(req),
+      user_agent: req?.get?.('User-Agent') || 'unknown',
       resource,
       action,
       result: success ? 'allowed' : 'denied',
@@ -164,7 +158,7 @@ export class SecurityAuditService {
         ...details,
         // Track data access patterns for compliance reporting
         dataCategory: this.categorizeResource(resource),
-      },
+       },
       sessionId: (req as any)?.sessionID || 'unknown',
     });
   }
@@ -176,16 +170,15 @@ export class SecurityAuditService {
   async logAdminAction(
     action: string,
     req: Request | undefined,
-    userId: string,
+    user_id: string,
     targetResource?: string,
     details?: Record<string, any>
-  ): Promise<void> {
-    await this.logSecurityEvent({
-      eventType: 'admin_action',
+  ): Promise<void> { await this.logSecurityEvent({
+      event_type: 'admin_action',
       severity: 'high', // All admin actions are high severity by default
-      userId,
-      ipAddress: this.extractClientIP(req),
-      userAgent: req?.get?.('User-Agent') || 'unknown',
+      user_id,
+      ip_address: this.extractClientIP(req),
+      user_agent: req?.get?.('User-Agent') || 'unknown',
       resource: targetResource,
       action,
       result: 'executed',
@@ -193,7 +186,7 @@ export class SecurityAuditService {
       details: {
         ...details,
         adminActionType: this.categorizeAdminAction(action),
-      },
+       },
       sessionId: (req as any)?.sessionID || 'unknown',
     });
   }
@@ -204,13 +197,13 @@ export class SecurityAuditService {
    * for understanding how the security system responded to events
    */
   async logSecuritySystemEvent(
-    eventType: string,
+    event_type: string,
     action: string,
     details?: Record<string, any>,
     severity: 'low' | 'medium' | 'high' | 'critical' = 'low'
   ): Promise<void> {
     await this.logSecurityEvent({
-      eventType,
+      event_type,
       severity,
       action,
       result: 'completed',
@@ -237,26 +230,26 @@ export class SecurityAuditService {
       // This avoids TypeScript issues with condition arrays
       const whereConditions: any[] = [];
 
-      if (options.userId) {
-        whereConditions.push(eq(securityAuditLog.userId, options.userId));
+      if (options.user_id) {
+        whereConditions.push(eq(system_audit_log.user_id, options.user_id));
       }
-      if (options.ipAddress) {
-        whereConditions.push(eq(securityAuditLog.ipAddress, options.ipAddress));
+      if (options.ip_address) {
+        whereConditions.push(eq(system_audit_log.ip_address, options.ip_address));
       }
-      if (options.eventType) {
-        whereConditions.push(eq(securityAuditLog.eventType, options.eventType));
+      if (options.event_type) {
+        whereConditions.push(eq(system_audit_log.event_type, options.event_type));
       }
-      if (options.eventTypes && options.eventTypes.length > 0) {
-        whereConditions.push(inArray(securityAuditLog.eventType, options.eventTypes));
+      if (options.event_types && options.event_types.length > 0) {
+        whereConditions.push(inArray(system_audit_log.event_type, options.event_types));
       }
       if (options.severity) {
-        whereConditions.push(eq(securityAuditLog.severity, options.severity));
+        whereConditions.push(eq(system_audit_log.severity, options.severity));
       }
       if (options.startDate) {
-        whereConditions.push(gte(securityAuditLog.createdAt, options.startDate));
+        whereConditions.push(gte(system_audit_log.created_at, options.startDate));
       }
       if (options.endDate) {
-        whereConditions.push(lte(securityAuditLog.createdAt, options.endDate));
+        whereConditions.push(lte(system_audit_log.created_at, options.endDate));
       }
 
       // Apply conditions if any exist
@@ -265,7 +258,7 @@ export class SecurityAuditService {
       }
 
       // Apply ordering and pagination
-      query = query.orderBy(desc(securityAuditLog.createdAt)) as any;
+      query = query.orderBy(desc(system_audit_log.created_at)) as any;
 
       if (options.limit) {
         query = query.limit(options.limit) as any;
@@ -292,20 +285,20 @@ export class SecurityAuditService {
       // Build where conditions inline to avoid TypeScript inference issues
       const whereConditions: any[] = [];
 
-      if (options.userId) {
-        whereConditions.push(eq(securityAuditLog.userId, options.userId));
+      if (options.user_id) {
+        whereConditions.push(eq(securityAuditLog.user_id, options.user_id));
       }
-      if (options.ipAddress) {
-        whereConditions.push(eq(securityAuditLog.ipAddress, options.ipAddress));
+      if (options.ip_address) {
+        whereConditions.push(eq(securityAuditLog.ip_address, options.ip_address));
       }
-      if (options.eventType) {
-        whereConditions.push(eq(securityAuditLog.eventType, options.eventType));
+      if (options.event_type) {
+        whereConditions.push(eq(securityAuditLog.event_type, options.event_type));
       }
       if (options.startDate) {
-        whereConditions.push(gte(securityAuditLog.createdAt, options.startDate));
+        whereConditions.push(gte(securityAuditLog.created_at, options.startDate));
       }
       if (options.endDate) {
-        whereConditions.push(lte(securityAuditLog.createdAt, options.endDate));
+        whereConditions.push(lte(securityAuditLog.created_at, options.endDate));
       }
 
       // Apply where conditions if any exist
@@ -343,14 +336,14 @@ export class SecurityAuditService {
 
       events.forEach(event => {
         // Count by type
-        eventsByType[event.eventType] = (eventsByType[event.eventType] || 0) + 1;
+        eventsByType[event.event_type] = (eventsByType[event.event_type] || 0) + 1;
         
         // Count by severity
         eventsBySeverity[event.severity] = (eventsBySeverity[event.severity] || 0) + 1;
         
         // Track unique users and IPs
-        if (event.userId) uniqueUsers.add(event.userId);
-        if (event.ipAddress) uniqueIPs.add(event.ipAddress);
+        if (event.user_id) uniqueUsers.add(event.user_id);
+        if (event.ip_address) uniqueIPs.add(event.ip_address);
       });
 
       return {
@@ -375,13 +368,13 @@ export class SecurityAuditService {
    * This is a convenience method frequently needed by the monitoring service
    */
   async getRecentFailedLogins(
-    userIdOrIP: string, 
+    user_idOrIP: string, 
     since: Date,
-    matchField: 'userId' | 'ipAddress' = 'userId'
+    matchField: 'user_id' | 'ip_address' = 'user_id'
   ): Promise<any[]> {
     return await this.queryAuditLogs({
-      [matchField]: userIdOrIP,
-      eventType: 'login_failure',
+      [matchField]: user_idOrIP,
+      event_type: 'login_failure',
       startDate: since,
     });
   }
@@ -391,12 +384,11 @@ export class SecurityAuditService {
    * Used by monitoring service to detect data exfiltration attempts
    * (Note: "exfiltration" refers to unauthorized data transfer out of a system)
    */
-  async getRecentDataAccessVolume(userId: string, since: Date): Promise<number> {
-    const events = await this.queryAuditLogs({
-      userId,
-      eventType: 'data_access',
+  async getRecentDataAccessVolume(user_id: string, since: Date): Promise<number> { const events = await this.queryAuditLogs({
+      user_id,
+      event_type: 'data_access',
       startDate: since,
-    });
+     });
 
     // Sum up the record counts from all data access events
     return events.reduce((total, event) => {
@@ -409,14 +401,14 @@ export class SecurityAuditService {
    * Private helper methods for categorization and severity determination
    */
 
-  private determineAuthSeverity(eventType: string, success: boolean): 'low' | 'medium' | 'high' | 'critical' {
+  private determineAuthSeverity(event_type: string, success: boolean): 'low' | 'medium' | 'high' | 'critical' {
     // Failed authentication attempts are medium severity because they could indicate attacks
     if (!success) {
       return 'medium';
     }
 
     // Successful password changes and resets are medium because they're sensitive operations
-    if (eventType.includes('password')) {
+    if (event_type.includes('password')) {
       return 'medium';
     }
 

@@ -19,24 +19,23 @@ export class AlertDeliveryService {
    * Processes alert delivery for a user based on their preferences
    */
   async processAlertDelivery(
-    userId: string,
+    user_id: string,
     alertType: AlertType,
     alertData: any,
     preferences: AlertPreference[],
     originalPriority: Priority = Priority.NORMAL
-  ): Promise<AlertDeliveryLog[]> {
-    const deliveryLogs: AlertDeliveryLog[] = [];
+  ): Promise<AlertDeliveryLog[]> { const deliveryLogs: AlertDeliveryLog[] = [];
 
     for (const preference of preferences) {
       const logs = await this.processPreferenceDelivery(
-        userId,
+        user_id,
         alertType,
         alertData,
         preference,
         originalPriority
       );
       deliveryLogs.push(...logs);
-    }
+     }
 
     return deliveryLogs;
   }
@@ -45,7 +44,7 @@ export class AlertDeliveryService {
    * Processes delivery for a single preference
    */
   private async processPreferenceDelivery(
-    userId: string,
+    user_id: string,
     alertType: AlertType,
     alertData: any,
     preference: AlertPreference,
@@ -54,7 +53,7 @@ export class AlertDeliveryService {
     const logs: AlertDeliveryLog[] = [];
 
     // Skip inactive preferences
-    if (!preference.isActive) {
+    if (!preference.is_active) {
       return logs;
     }
 
@@ -71,16 +70,15 @@ export class AlertDeliveryService {
 
     // Apply smart filtering
     const filteringResult = await this.smartFilteringService.processFiltering(
-      userId,
+      user_id,
       alertType,
       alertData,
       preference.smartFiltering
     );
 
-    if (!filteringResult.shouldSend) {
-      // Log filtered alert
+    if (!filteringResult.shouldSend) { // Log filtered alert
       const log = this.createFilteredLog(
-        userId,
+        user_id,
         preference,
         alertType,
         originalPriority,
@@ -90,7 +88,7 @@ export class AlertDeliveryService {
       logs.push(log);
       await this.deliveryLogRepository.save(log);
       return logs;
-    }
+     }
 
     // Determine final priority
     const finalPriority = filteringResult.adjustedPriority || alertTypeConfig.priority;
@@ -103,17 +101,16 @@ export class AlertDeliveryService {
     }
 
     // Handle delivery based on frequency configuration
-    if (preference.frequency.isBatched() && !finalPriority.equals(Priority.URGENT)) {
-      // Add to batch
-      await this.addToBatch(userId, preference.id, {
+    if (preference.frequency.isBatched() && !finalPriority.equals(Priority.URGENT)) { // Add to batch
+      await this.addToBatch(user_id, preference.id, {
         alertType,
         alertData,
         priority: finalPriority,
         channels: enabledChannels.map(ch => ch.type)
-      });
+       });
 
       const log = this.createPendingLog(
-        userId,
+        user_id,
         preference,
         alertType,
         enabledChannels.map(ch => ch.type),
@@ -124,10 +121,9 @@ export class AlertDeliveryService {
       );
       logs.push(log);
       await this.deliveryLogRepository.save(log);
-    } else {
-      // Immediate delivery
+    } else { // Immediate delivery
       const deliveryResult = await this.deliverImmediately(
-        userId,
+        user_id,
         alertType,
         alertData,
         enabledChannels,
@@ -135,7 +131,7 @@ export class AlertDeliveryService {
       );
 
       const log = this.createDeliveryLog(
-        userId,
+        user_id,
         preference,
         alertType,
         enabledChannels.map(ch => ch.type),
@@ -148,7 +144,7 @@ export class AlertDeliveryService {
       );
       logs.push(log);
       await this.deliveryLogRepository.save(log);
-    }
+     }
 
     return logs;
   }
@@ -157,24 +153,23 @@ export class AlertDeliveryService {
    * Delivers alert immediately across all specified channels
    */
   private async deliverImmediately(
-    userId: string,
+    user_id: string,
     alertType: AlertType,
     alertData: any,
     channels: any[], // AlertChannel[]
     priority: Priority
-  ): Promise<DeliveryResult> {
-    try {
+  ): Promise<DeliveryResult> { try {
       const notificationType = this.mapAlertTypeToNotificationType(alertType);
 
       await this.notificationService.sendMultiChannelNotification({
-        userId,
+        user_id,
         type: notificationType,
         title: alertData.title || this.getDefaultTitle(alertType),
         message: alertData.message || alertData.description || 'You have a new alert',
         priority: this.mapPriorityToNotificationPriority(priority),
-        relatedBillId: alertData.billId,
+        relatedBillId: alertData.bill_id,
         metadata: alertData
-      });
+       });
 
       return { success: true };
     } catch (error) {
@@ -189,35 +184,33 @@ export class AlertDeliveryService {
    * Adds alert to batch for later processing
    */
   private async addToBatch(
-    userId: string,
+    user_id: string,
     preferenceId: string,
     alertData: any
-  ): Promise<void> {
-    // This would integrate with a batch processing service
+  ): Promise<void> { // This would integrate with a batch processing service
     // For now, this is a placeholder
-    console.log(`Adding alert to batch for user ${userId}, preference ${preferenceId}`);
+    console.log(`Adding alert to batch for user ${user_id }, preference ${preferenceId}`);
   }
 
   /**
    * Processes batched alerts for a user
    */
-  async processBatchedAlerts(userId: string, preferenceId: string): Promise<number> {
+  async processBatchedAlerts(user_id: string, preferenceId: string): Promise<number> {
     // This would retrieve and process batched alerts
     // For now, return 0 as placeholder
     return 0;
   }
 
   private createFilteredLog(
-    userId: string,
+    user_id: string,
     preference: AlertPreference,
     alertType: AlertType,
     originalPriority: Priority,
     filteringResult: any,
     alertData: any
-  ): AlertDeliveryLog {
-    return new AlertDeliveryLog(
+  ): AlertDeliveryLog { return new AlertDeliveryLog(
       this.generateLogId(),
-      userId,
+      user_id,
       preference.id,
       alertType,
       [], // No channels for filtered alerts
@@ -228,15 +221,15 @@ export class AlertDeliveryService {
         originalPriority: originalPriority.toString(),
         filteredReason: filteringResult.filteredReason,
         confidence: filteringResult.confidence,
-        billId: alertData?.billId,
-        sponsorId: alertData?.sponsorId
-      },
+        bill_id: alertData?.bill_id,
+        sponsor_id: alertData?.sponsor_id
+        },
       new Date()
     );
   }
 
   private createPendingLog(
-    userId: string,
+    user_id: string,
     preference: AlertPreference,
     alertType: AlertType,
     channels: any[], // ChannelType[]
@@ -244,10 +237,9 @@ export class AlertDeliveryService {
     adjustedPriority: Priority,
     confidence: number,
     alertData: any
-  ): AlertDeliveryLog {
-    return new AlertDeliveryLog(
+  ): AlertDeliveryLog { return new AlertDeliveryLog(
       this.generateLogId(),
-      userId,
+      user_id,
       preference.id,
       alertType,
       channels,
@@ -258,15 +250,15 @@ export class AlertDeliveryService {
         originalPriority: originalPriority.toString(),
         adjustedPriority: adjustedPriority.toString(),
         confidence,
-        billId: alertData?.billId,
-        sponsorId: alertData?.sponsorId
-      },
+        bill_id: alertData?.bill_id,
+        sponsor_id: alertData?.sponsor_id
+        },
       new Date()
     );
   }
 
   private createDeliveryLog(
-    userId: string,
+    user_id: string,
     preference: AlertPreference,
     alertType: AlertType,
     channels: any[], // ChannelType[]
@@ -276,13 +268,12 @@ export class AlertDeliveryService {
     confidence: number,
     alertData: any,
     error?: string
-  ): AlertDeliveryLog {
-    const status = success ? 'sent' : 'failed';
+  ): AlertDeliveryLog { const status = success ? 'sent' : 'failed';
     const deliveredAt = success ? new Date() : undefined;
 
     return new AlertDeliveryLog(
       this.generateLogId(),
-      userId,
+      user_id,
       preference.id,
       alertType,
       channels,
@@ -293,9 +284,9 @@ export class AlertDeliveryService {
         originalPriority: originalPriority.toString(),
         adjustedPriority: adjustedPriority.toString(),
         confidence,
-        billId: alertData?.billId,
-        sponsorId: alertData?.sponsorId
-      },
+        bill_id: alertData?.bill_id,
+        sponsor_id: alertData?.sponsor_id
+        },
       new Date(),
       deliveredAt,
       error
@@ -342,10 +333,9 @@ export interface INotificationService {
   sendMultiChannelNotification(notification: any): Promise<void>;
 }
 
-export interface IDeliveryLogRepository {
-  save(log: AlertDeliveryLog): Promise<void>;
-  findByUserId(userId: string): Promise<AlertDeliveryLog[]>;
-}
+export interface IDeliveryLogRepository { save(log: AlertDeliveryLog): Promise<void>;
+  findByUserId(user_id: string): Promise<AlertDeliveryLog[]>;
+ }
 
 interface DeliveryResult {
   success: boolean;

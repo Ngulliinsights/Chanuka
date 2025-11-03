@@ -16,17 +16,16 @@ export interface SecureSessionOptions {
   path: string;
 }
 
-export interface SessionData {
-  userId: string;
+export interface SessionData { user_id: string;
   email: string;
   role: string;
   loginTime: Date;
   lastActivity: Date;
-  ipAddress: string;
-  userAgent: string;
+  ip_address: string;
+  user_agent: string;
   csrfToken: string;
   fingerprint: string;
-}
+ }
 
 export interface SessionValidationResult {
   isValid: boolean;
@@ -55,12 +54,11 @@ export class SecureSessionService {
    * Create a new secure session
    */
   async createSession(
-    userId: string,
+    user_id: string,
     req: Request,
     res: Response,
     options: Partial<SecureSessionOptions> = {}
-  ): Promise<{ sessionId: string; csrfToken: string }> {
-    try {
+  ): Promise<{ sessionId: string; csrfToken: string }> { try {
       // Generate session ID and CSRF token
       const sessionId = crypto.randomUUID();
       const csrfToken = encryptionService.generateCSRFToken();
@@ -69,33 +67,33 @@ export class SecureSessionService {
       const fingerprint = this.createSessionFingerprint(req);
       
       // Get client info
-      const ipAddress = this.getClientIP(req);
-      const userAgent = req.get('User-Agent') || 'unknown';
+      const ip_address = this.getClientIP(req);
+      const user_agent = req.get('User-Agent') || 'unknown';
 
       // Clean up old sessions for this user
-      await this.cleanupUserSessions(userId);
+      await this.cleanupUserSessions(user_id);
 
       // Create session data
       const sessionData: SessionData = {
-        userId,
+        user_id,
         email: '', // Will be filled from user data
         role: '',  // Will be filled from user data
         loginTime: new Date(),
         lastActivity: new Date(),
-        ipAddress,
-        userAgent,
+        ip_address,
+        user_agent,
         csrfToken,
         fingerprint
-      };
+       };
 
       // Get user data
       const user = await db
         .select()
         .from(users)
-        .where(eq(users.id, userId))
+        .where(eq(users.id, user_id))
         .limit(1);
 
-      if (user.length > 0) {
+      if (users.length > 0) {
         sessionData.email = user[0].email;
         sessionData.role = user[0].role;
       }
@@ -107,13 +105,12 @@ export class SecureSessionService {
       );
 
       // Store session in database
-      await db.insert(sessions).values({
-        id: sessionId,
-        userId,
+      await db.insert(sessions).values({ id: sessionId,
+        user_id,
         token: encryptedSessionData,
-        expiresAt: new Date(Date.now() + (options.maxAge || this.defaultOptions.maxAge)),
-        isActive: true
-      });
+        expires_at: new Date(Date.now() + (options.maxAge || this.defaultOptions.maxAge)),
+        is_active: true
+       });
 
       // Set secure cookie
       const cookieOptions = { ...this.defaultOptions, ...options };
@@ -129,7 +126,7 @@ export class SecureSessionService {
       await securityAuditService.logAuthEvent(
         'login_success',
         req,
-        userId,
+        user_id,
         true,
         { sessionId, fingerprint }
       );
@@ -160,7 +157,7 @@ export class SecureSessionService {
         .from(sessions)
         .where(and(
           eq(sessions.id, sessionId),
-          eq(sessions.isActive, true)
+          eq(sessions.is_active, true)
         ))
         .limit(1);
 
@@ -171,7 +168,7 @@ export class SecureSessionService {
       const session = sessionRecord[0];
 
       // Check if session is expired
-      if (new Date() > session.expiresAt) {
+      if (new Date() > session.expires_at) {
         await this.invalidateSession(sessionId);
         return { isValid: false, error: 'Session expired' };
       }
@@ -188,21 +185,20 @@ export class SecureSessionService {
 
       // Validate session fingerprint
       const currentFingerprint = this.createSessionFingerprint(req);
-      if (sessionData.fingerprint !== currentFingerprint) {
-        await this.invalidateSession(sessionId);
+      if (sessionData.fingerprint !== currentFingerprint) { await this.invalidateSession(sessionId);
         await securityAuditService.logSecurityEvent({
-          eventType: 'session_hijack_attempt',
+          event_type: 'session_hijack_attempt',
           severity: 'high',
-          userId: sessionData.userId,
-          ipAddress: this.getClientIP(req),
-          userAgent: req.get('User-Agent'),
+          user_id: sessionData.user_id,
+          ip_address: this.getClientIP(req),
+          user_agent: req.get('User-Agent'),
           result: 'blocked',
           success: false,
           details: {
             sessionId,
             expectedFingerprint: sessionData.fingerprint,
             actualFingerprint: currentFingerprint
-          }
+           }
         });
         return { isValid: false, error: 'Session fingerprint mismatch' };
       }
@@ -215,21 +211,20 @@ export class SecureSessionService {
       }
 
       // Check for suspicious activity
-      const ipAddress = this.getClientIP(req);
-      if (sessionData.ipAddress !== ipAddress) {
-        await securityAuditService.logSecurityEvent({
-          eventType: 'session_ip_change',
+      const ip_address = this.getClientIP(req);
+      if (sessionData.ip_address !== ip_address) { await securityAuditService.logSecurityEvent({
+          event_type: 'session_ip_change',
           severity: 'medium',
-          userId: sessionData.userId,
-          ipAddress,
-          userAgent: req.get('User-Agent'),
+          user_id: sessionData.user_id,
+          ip_address,
+          user_agent: req.get('User-Agent'),
           result: 'allowed',
           success: true,
           details: {
             sessionId,
-            originalIP: sessionData.ipAddress,
-            newIP: ipAddress
-          }
+            originalIP: sessionData.ip_address,
+            newIP: ip_address
+           }
         });
       }
 
@@ -255,7 +250,7 @@ export class SecureSessionService {
         .update(sessions)
         .set({ 
           token: updatedSessionData,
-          updatedAt: new Date()
+          updated_at: new Date()
         })
         .where(eq(sessions.id, sessionId));
 
@@ -275,8 +270,8 @@ export class SecureSessionService {
       await db
         .update(sessions)
         .set({ 
-          isActive: false,
-          updatedAt: new Date()
+          is_active: false,
+          updated_at: new Date()
         })
         .where(eq(sessions.id, sessionId));
     } catch (error) {
@@ -287,15 +282,15 @@ export class SecureSessionService {
   /**
    * Invalidate all sessions for a user
    */
-  async invalidateAllUserSessions(userId: string): Promise<void> {
+  async invalidateAllUserSessions(user_id: string): Promise<void> {
     try {
       await db
         .update(sessions)
         .set({ 
-          isActive: false,
-          updatedAt: new Date()
+          is_active: false,
+          updated_at: new Date()
         })
-        .where(eq(sessions.userId, userId));
+        .where(eq(sessions.user_id, user_id));
     } catch (error) {
       logger.error('User session invalidation failed:', { component: 'Chanuka' }, error);
     }
@@ -310,10 +305,10 @@ export class SecureSessionService {
       
       await db
         .update(sessions)
-        .set({ isActive: false })
+        .set({ is_active: false })
         .where(and(
-          eq(sessions.isActive, true),
-          lt(sessions.expiresAt, now)
+          eq(sessions.is_active, true),
+          lt(sessions.expires_at, now)
         ));
 
       logger.info('Expired sessions cleaned up', { component: 'Chanuka' });
@@ -325,17 +320,16 @@ export class SecureSessionService {
   /**
    * Clean up old sessions for a user (keep only the most recent ones)
    */
-  private async cleanupUserSessions(userId: string): Promise<void> {
-    try {
+  private async cleanupUserSessions(user_id: string): Promise<void> { try {
       // Get all active sessions for user, ordered by creation time
       const userSessions = await db
         .select()
         .from(sessions)
         .where(and(
-          eq(sessions.userId, userId),
-          eq(sessions.isActive, true)
+          eq(sessions.user_id, user_id),
+          eq(sessions.is_active, true)
         ))
-        .orderBy(sessions.createdAt);
+        .orderBy(sessions.created_at);
 
       // If user has too many sessions, deactivate the oldest ones
       if (userSessions.length >= this.maxSessionsPerUser) {
@@ -343,7 +337,7 @@ export class SecureSessionService {
         
         for (const session of sessionsToDeactivate) {
           await this.invalidateSession(session.id);
-        }
+         }
       }
     } catch (error) {
       logger.error('User session cleanup failed:', { component: 'Chanuka' }, error);
@@ -399,17 +393,17 @@ export class SecureSessionService {
     totalActiveSessions: number;
     sessionsLast24h: number;
     averageSessionDuration: number;
-    topUserAgents: Array<{ userAgent: string; count: number }>;
+    topUserAgents: Array<{ user_agent: string; count: number }>;
   }> {
     try {
       // This would need proper SQL aggregation in production
       const activeSessions = await db
         .select()
         .from(sessions)
-        .where(eq(sessions.isActive, true));
+        .where(eq(sessions.is_active, true));
 
       const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
-      const recentSessions = activeSessions.filter(s => s.createdAt! > last24h);
+      const recentSessions = activeSessions.filter(s => s.created_at! > last24h);
 
       return {
         totalActiveSessions: activeSessions.length,

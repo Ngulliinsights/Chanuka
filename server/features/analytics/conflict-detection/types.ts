@@ -5,22 +5,21 @@
 /**
  * Represents a comprehensive conflict of interest analysis for a sponsor
  */
-export interface ConflictAnalysis {
-  sponsorId: number;
+export interface ConflictAnalysis { sponsor_id: number;
   sponsorName: string;
-  billId?: number;
+  bill_id?: number;
   billTitle?: string;
   overallRiskScore: number;
   riskLevel: 'low' | 'medium' | 'high' | 'critical';
   financialConflicts: FinancialConflict[];
   professionalConflicts: ProfessionalConflict[];
   votingAnomalies: VotingAnomaly[];
-  transparencyScore: number;
+  transparency_score: number;
   transparencyGrade: 'A' | 'B' | 'C' | 'D' | 'F';
   recommendations: string[];
   lastAnalyzed: Date;
   confidence: number;
-}
+ }
 
 /**
  * Represents a financial conflict arising from investments, employment, or family interests
@@ -53,7 +52,7 @@ export interface ProfessionalConflict {
   relationshipStrength: number;
   startDate?: Date;
   endDate?: Date;
-  isActive: boolean;
+  is_active: boolean;
   evidenceStrength: number;
   detectionMethod: 'affiliation_analysis' | 'pattern_matching' | 'disclosure_analysis';
   lastUpdated: Date;
@@ -62,10 +61,9 @@ export interface ProfessionalConflict {
 /**
  * Represents a voting behavior anomaly that could indicate a conflict of interest
  */
-export interface VotingAnomaly {
-  id: string;
+export interface VotingAnomaly { id: string;
   type: 'party_deviation' | 'pattern_inconsistency' | 'financial_correlation' | 'timing_suspicious';
-  billId: number;
+  bill_id: number;
   billTitle: string;
   expectedBehavior: string;
   actualBehavior: string;
@@ -73,7 +71,7 @@ export interface VotingAnomaly {
   contextFactors: string[];
   anomalyScore: number;
   detectionDate: Date;
-}
+ }
 
 /**
  * Configuration for conflict detection thresholds and weights
@@ -115,26 +113,24 @@ export interface Stakeholder {
 /**
  * Stakeholder interest in a bill or issue
  */
-export interface StakeholderInterest {
-  billId?: number;
+export interface StakeholderInterest { bill_id?: number;
   issueArea: string;
   position: 'support' | 'oppose' | 'neutral';
   strength: number;
   financialImpact?: number;
   description: string;
-}
+ }
 
 /**
  * Validated vote data
  */
-export interface ValidatedVote {
-  vote: 'yes' | 'no';
-  billId: number;
+export interface ValidatedVote { vote: 'yes' | 'no';
+  bill_id: number;
   billTitle: string;
   billCategory: string;
   confidence?: number;
   partyPosition?: string;
-}
+ }
 
 /**
  * Category statistics for voting analysis
@@ -148,16 +144,15 @@ export interface CategoryStats {
 /**
  * Custom error class for conflict detection
  */
-export class ConflictDetectionError extends Error {
-  constructor(
+export class ConflictDetectionError extends Error { constructor(
     message: string,
     public readonly code: string,
-    public readonly sponsorId?: number,
-    public readonly billId?: number
+    public readonly sponsor_id?: number,
+    public readonly bill_id?: number
   ) {
     super(message);
     this.name = 'ConflictDetectionError';
-  }
+   }
 }
 
 /**
@@ -168,6 +163,6 @@ export function isValidVote(vote: any): vote is ValidatedVote {
     typeof vote === 'object' &&
     typeof vote.vote === 'string' &&
     (vote.vote === 'yes' || vote.vote === 'no') &&
-    typeof vote.billId === 'number' &&
+    typeof vote.bill_id === 'number' &&
     typeof vote.billTitle === 'string';
 }

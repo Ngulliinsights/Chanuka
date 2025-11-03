@@ -28,7 +28,7 @@ describe('Auth Validation Utilities', () => {
     it('should validate correct email addresses', () => {
       const validEmails = [
         'test@example.com',
-        'user.name@domain.org',
+        'users.name@domain.org',
         'user+tag@example.co.uk',
         'firstname.lastname@company.com'
       ];
@@ -47,7 +47,7 @@ describe('Auth Validation Utilities', () => {
         'invalid-email',
         '@domain.com',
         'user@',
-        'user..name@domain.com',
+        'users..name@domain.com',
         'user@domain',
         'user name@domain.com'
       ];
@@ -191,10 +191,10 @@ describe('Auth Validation Utilities', () => {
 
     it('should provide field-specific error messages', () => {
       try {
-        validateName('A', 'firstName');
+        validateName('A', 'first_name');
       } catch (error) {
         expect(error).toBeInstanceOf(AuthValidationError);
-        expect((error as AuthValidationError).details?.field).toBe('firstName');
+        expect((error as AuthValidationError).details?.field).toBe('first_name');
       }
     });
   });
@@ -217,8 +217,8 @@ describe('Auth Validation Utilities', () => {
 
     it('should validate complete registration data', () => {
       const validRegisterData = {
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         email: 'john@example.com',
         password: 'MyStr0ng!P@ssw0rd',
         confirmPassword: 'MyStr0ng!P@ssw0rd'
@@ -242,8 +242,8 @@ describe('Auth Validation Utilities', () => {
 
     it('should reject registration data with mismatched passwords', () => {
       const mismatchedData = {
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         email: 'john@example.com',
         password: 'MyStr0ng!P@ssw0rd',
         confirmPassword: 'DifferentPassword123!'
@@ -277,12 +277,12 @@ describe('Auth Validation Utilities', () => {
     });
 
     it('should validate individual fields for register mode', () => {
-      expect(validateField('firstName', 'John', 'register')).toBeNull();
-      expect(validateField('lastName', 'Doe', 'register')).toBeNull();
+      expect(validateField('first_name', 'John', 'register')).toBeNull();
+      expect(validateField('last_name', 'Doe', 'register')).toBeNull();
       expect(validateField('email', 'test@example.com', 'register')).toBeNull();
       expect(validateField('password', 'MyStr0ng!P@ssw0rd', 'register')).toBeNull();
 
-      expect(validateField('firstName', 'A', 'register')).toBeTruthy();
+      expect(validateField('first_name', 'A', 'register')).toBeTruthy();
       expect(validateField('password', 'weak', 'register')).toBeTruthy();
     });
 
@@ -347,8 +347,8 @@ describe('Auth Validation Utilities', () => {
 
     it('should validate with RegisterSchema directly', () => {
       const validData = {
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         email: 'john@example.com',
         password: 'MyStr0ng!P@ssw0rd',
         confirmPassword: 'MyStr0ng!P@ssw0rd'
@@ -358,8 +358,8 @@ describe('Auth Validation Utilities', () => {
       expect(result.success).toBe(true);
 
       const invalidResult = RegisterSchema.safeParse({
-        firstName: 'A',
-        lastName: '',
+        first_name: 'A',
+        last_name: '',
         email: 'invalid-email',
         password: 'weak',
         confirmPassword: 'different'

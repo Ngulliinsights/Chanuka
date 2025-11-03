@@ -6,12 +6,12 @@ interface User {
   email: string;
   name: string;
   username: string;
-  firstName: string | null;
-  lastName: string | null;
+  first_name: string | null;
+  last_name: string | null;
   role: string;
-  verificationStatus: string;
-  isActive: boolean | null;
-  createdAt: string;
+  verification_status: string;
+  is_active: boolean | null;
+  created_at: string;
   reputation: number;
   expertise: string;
 }
@@ -19,8 +19,8 @@ interface User {
 interface RegisterData {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   role?: string;
 }
 

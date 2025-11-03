@@ -22,7 +22,7 @@ export interface CloudWatchConfig {
 
 export class EnhancedCloudWatchExporter {
   public readonly name = 'cloudwatch';
-  public readonly contentType = 'application/x-amz-json-1.1';
+  public readonly content_type = 'application/x-amz-json-1.1';
 
   private config: CloudWatchConfig;
   private buffer: Metric[] = [];
@@ -215,7 +215,7 @@ export class EnhancedCloudWatchExporter {
       `https://monitoring.${this.config.region}.amazonaws.com/`;
 
     const headers: Record<string, string> = {
-      'Content-Type': this.contentType,
+      'Content-Type': this.content_type,
       'X-Amz-Target': 'GraniteServiceVersion20100801.PutMetricData',
     };
 

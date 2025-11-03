@@ -172,8 +172,7 @@ function updateConfigFiles(): void {
   }
 }
 
-function createDomainTypeFiles(): void {
-  console.log('\n📁 Creating domain-specific type files...');
+function createDomainTypeFiles(): void { console.log('\n📁 Creating domain-specific type files...');
   
   // Bill analysis types are now split between bills and sponsors features
   console.log('  ✅ BillAnalysis moved to server/features/bills/types/analysis.ts');
@@ -190,12 +189,12 @@ export interface Analysis {
   id: string;
   topic: string;
   content: string;
-  billId: number;
-  analysisType: string;
+  bill_id: number;
+  analysis_type: string;
   confidence?: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+  created_at: Date;
+  updated_at: Date;
+ }
 
 export interface Expert {
   id: string;
@@ -203,11 +202,11 @@ export interface Expert {
   email: string;
   expertise: string[];
   qualifications: string[];
-  verificationStatus: 'pending' | 'verified' | 'rejected';
-  reputationScore: number;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  verification_status: 'pending' | 'verified' | 'rejected';
+  reputation_score: number;
+  is_active: boolean;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface ExtendedExpert extends Expert {
@@ -233,7 +232,7 @@ export interface ExtendedVerificationTask extends VerificationTask {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   estimatedDuration: number;
   complexity: number;
-  createdAt?: Date;
+  created_at?: Date;
   processedAt?: string | null;
 }
 

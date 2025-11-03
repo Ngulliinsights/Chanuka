@@ -41,8 +41,7 @@ export const userApi = {
   },
 
   // Profile endpoints
-  async getProfile(userId?: string): Promise<ProfileResponse> {
-    const endpoint = userId ? `/api/users/${userId}/profile` : '/api/users/profile';
+  async getProfile(user_id?: string): Promise<ProfileResponse> { const endpoint = user_id ? `/api/users/${user_id }/profile` : '/api/users/profile';
     return api.get(endpoint);
   },
 
@@ -124,18 +123,15 @@ export const userApi = {
     return api.get(`/api/users/search?q=${encodeURIComponent(query)}&limit=${limit}`);
   },
 
-  async getUserById(userId: string): Promise<User> {
-    return api.get(`/api/users/${userId}`);
+  async getUserById(user_id: string): Promise<User> { return api.get(`/api/users/${user_id }`);
   },
 
   // Activity and engagement
-  async getUserActivity(userId?: string, limit = 50): Promise<any[]> {
-    const endpoint = userId ? `/api/users/${userId}/activity` : '/api/users/activity';
+  async getUserActivity(user_id?: string, limit = 50): Promise<any[]> { const endpoint = user_id ? `/api/users/${user_id }/activity` : '/api/users/activity';
     return api.get(`${endpoint}?limit=${limit}`);
   },
 
-  async getUserStats(userId?: string): Promise<any> {
-    const endpoint = userId ? `/api/users/${userId}/stats` : '/api/users/stats';
+  async getUserStats(user_id?: string): Promise<any> { const endpoint = user_id ? `/api/users/${user_id }/stats` : '/api/users/stats';
     return api.get(endpoint);
   }
 };

@@ -32,13 +32,13 @@ describe('Authentication System', () => {
   const testUser = {
     email: `test-auth-${Date.now()}@example.com`,
     password: 'TestPassword123!',
-    firstName: 'Test',
-    lastName: 'User'
+    first_name: 'Test',
+    last_name: 'User'
   };
 
   let userToken: string;
   let refreshToken: string;
-  let userId: string;
+  let user_id: string;
 
   beforeEach(async () => {
     // Clean up any existing test data
@@ -58,8 +58,7 @@ describe('Authentication System', () => {
     }
   });
 
-  describe('User Registration', () => {
-    it('should register a new user successfully', async () => {
+  describe('User Registration', () => { it('should register a new user successfully', async () => {
       const response = await request(app)
         .post('/api/auth/register')
         .send(testUser)
@@ -67,9 +66,9 @@ describe('Authentication System', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.user).toBeDefined();
-      expect(response.body.data.user.email).toBe(testUser.email);
-      expect(response.body.data.user.firstName).toBe(testUser.firstName);
-      expect(response.body.data.user.lastName).toBe(testUser.lastName);
+      expect(response.body.data.users.email).toBe(testUser.email);
+      expect(response.body.data.users.first_name).toBe(testUser.first_name);
+      expect(response.body.data.users.last_name).toBe(testUser.last_name);
       expect(response.body.data.token).toBeDefined();
       expect(response.body.data.refreshToken).toBeDefined();
       expect(response.body.data.requiresVerification).toBe(true);
@@ -77,8 +76,8 @@ describe('Authentication System', () => {
       // Store tokens for later tests
       userToken = response.body.data.token;
       refreshToken = response.body.data.refreshToken;
-      userId = response.body.data.user.id;
-    });
+      user_id = response.body.data.users.id;
+     });
 
     it('should reject registration with weak password', async () => {
       const weakPasswordUser = {
@@ -129,18 +128,17 @@ describe('Authentication System', () => {
     });
   });
 
-  describe('User Login', () => {
-    beforeEach(async () => {
+  describe('User Login', () => { beforeEach(async () => {
       // Ensure user exists for login tests
-      if (!userId) {
+      if (!user_id) {
         const registerResponse = await request(app)
           .post('/api/auth/register')
           .send(testUser);
         
         userToken = registerResponse.body.data.token;
         refreshToken = registerResponse.body.data.refreshToken;
-        userId = registerResponse.body.data.user.id;
-      }
+        user_id = registerResponse.body.data.users.id;
+       }
     });
 
     it('should login with valid credentials', async () => {
@@ -154,7 +152,7 @@ describe('Authentication System', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.user).toBeDefined();
-      expect(response.body.data.user.email).toBe(testUser.email);
+      expect(response.body.data.users.email).toBe(testUser.email);
       expect(response.body.data.token).toBeDefined();
       expect(response.body.data.refreshToken).toBeDefined();
     });
@@ -186,8 +184,7 @@ describe('Authentication System', () => {
     });
   });
 
-  describe('Token Verification', () => {
-    beforeEach(async () => {
+  describe('Token Verification', () => { beforeEach(async () => {
       if (!userToken) {
         const registerResponse = await request(app)
           .post('/api/auth/register')
@@ -195,8 +192,8 @@ describe('Authentication System', () => {
         
         userToken = registerResponse.body.data.token;
         refreshToken = registerResponse.body.data.refreshToken;
-        userId = registerResponse.body.data.user.id;
-      }
+        user_id = registerResponse.body.data.users.id;
+       }
     });
 
     it('should verify valid token', async () => {
@@ -207,7 +204,7 @@ describe('Authentication System', () => {
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.user).toBeDefined();
-      expect(response.body.data.user.email).toBe(testUser.email);
+      expect(response.body.data.users.email).toBe(testUser.email);
     });
 
     it('should reject invalid token', async () => {
@@ -229,8 +226,7 @@ describe('Authentication System', () => {
     });
   });
 
-  describe('Token Refresh', () => {
-    beforeEach(async () => {
+  describe('Token Refresh', () => { beforeEach(async () => {
       if (!refreshToken) {
         const registerResponse = await request(app)
           .post('/api/auth/register')
@@ -238,8 +234,8 @@ describe('Authentication System', () => {
         
         userToken = registerResponse.body.data.token;
         refreshToken = registerResponse.body.data.refreshToken;
-        userId = registerResponse.body.data.user.id;
-      }
+        user_id = registerResponse.body.data.users.id;
+       }
     });
 
     it('should refresh token with valid refresh token', async () => {
@@ -269,15 +265,14 @@ describe('Authentication System', () => {
     });
   });
 
-  describe('Password Reset', () => {
-    beforeEach(async () => {
-      if (!userId) {
+  describe('Password Reset', () => { beforeEach(async () => {
+      if (!user_id) {
         const registerResponse = await request(app)
           .post('/api/auth/register')
           .send(testUser);
         
-        userId = registerResponse.body.data.user.id;
-      }
+        user_id = registerResponse.body.data.users.id;
+       }
     });
 
     it('should request password reset', async () => {
@@ -372,8 +367,8 @@ describe('AuthService Unit Tests', () => {
   const testUser = {
     email: `unit-test-${Date.now()}@example.com`,
     password: 'UnitTestPassword123!',
-    firstName: 'Unit',
-    lastName: 'Test',
+    first_name: 'Unit',
+    last_name: 'Test',
     role: 'citizen' as const
   };
 

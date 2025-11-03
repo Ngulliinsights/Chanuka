@@ -30,8 +30,8 @@ import {
 
 interface FormData {
   // Personal Information
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   email: string;
   phone: string;
   
@@ -63,8 +63,8 @@ export const FormDemo: React.FC = () => {
 
   const [currentStep, setCurrentStep] = useState('personal');
   const [formData, setFormData] = useState<FormData>({
-    firstName: '',
-    lastName: '',
+    first_name: '',
+    last_name: '',
     email: '',
     phone: '',
     street: '',
@@ -90,8 +90,8 @@ export const FormDemo: React.FC = () => {
       id: 'personal',
       title: 'Personal Info',
       description: 'Basic personal information',
-      completed: Boolean(formData.firstName && formData.lastName && formData.email),
-      error: Boolean(errors.firstName || errors.lastName || errors.email)
+      completed: Boolean(formData.first_name && formData.last_name && formData.email),
+      error: Boolean(errors.first_name || errors.last_name || errors.email)
     },
     {
       id: 'address',
@@ -118,8 +118,8 @@ export const FormDemo: React.FC = () => {
 
   const validateField = useCallback((name: string, value: string): string | undefined => {
     switch (name) {
-      case 'firstName':
-      case 'lastName':
+      case 'first_name':
+      case 'last_name':
         return !value.trim() ? 'This field is required' : undefined;
       
       case 'email':
@@ -169,7 +169,7 @@ export const FormDemo: React.FC = () => {
     
     switch (stepId) {
       case 'personal':
-        ['firstName', 'lastName', 'email'].forEach(field => {
+        ['first_name', 'last_name', 'email'].forEach(field => {
           const error = validateField(field, formData[field as keyof FormData] as string);
           if (error) stepErrors[field] = error;
         });
@@ -233,7 +233,7 @@ export const FormDemo: React.FC = () => {
     fieldId: field,
     section: steps.find(step => {
       switch (step.id) {
-        case 'personal': return ['firstName', 'lastName', 'email', 'phone'].includes(field);
+        case 'personal': return ['first_name', 'last_name', 'email', 'phone'].includes(field);
         case 'address': return ['street', 'city', 'state', 'zipCode', 'country'].includes(field);
         case 'preferences': return ['contactMethod'].includes(field);
         case 'additional': return ['bio', 'website', 'experience'].includes(field);
@@ -255,7 +255,7 @@ export const FormDemo: React.FC = () => {
                 onClick: () => {
                   setIsSubmitted(false);
                   setFormData({
-                    firstName: '', lastName: '', email: '', phone: '',
+                    first_name: '', last_name: '', email: '', phone: '',
                     street: '', city: '', state: '', zipCode: '', country: '',
                     newsletter: false, contactMethod: '', interests: [],
                     bio: '', website: '', experience: ''
@@ -320,35 +320,35 @@ export const FormDemo: React.FC = () => {
               title="Personal Information"
               description="Basic information about yourself"
               required
-              error={Boolean(errors.firstName || errors.lastName || errors.email)}
-              completed={Boolean(formData.firstName && formData.lastName && formData.email)}
+              error={Boolean(errors.first_name || errors.last_name || errors.email)}
+              completed={Boolean(formData.first_name && formData.last_name && formData.email)}
               collapsible
               defaultOpen={currentStep === 'personal'}
             >
               <FormFieldGroup>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EnhancedFormInput
-                    id="firstName"
+                    id="first_name"
                     label="First Name"
-                    value={formData.firstName}
-                    onChange={(e) => handleFieldChange('firstName', e.target.value)}
+                    value={formData.first_name}
+                    onChange={(e) => handleFieldChange('first_name', e.target.value)}
                     onValidationChange={(isValid, error) => {
-                      if (!isValid && error) handleFieldValidation('firstName', formData.firstName);
+                      if (!isValid && error) handleFieldValidation('first_name', formData.first_name);
                     }}
-                    error={errors.firstName}
+                    error={errors.first_name}
                     required
                     helpText="Enter your legal first name"
                   />
                   
                   <EnhancedFormInput
-                    id="lastName"
+                    id="last_name"
                     label="Last Name"
-                    value={formData.lastName}
-                    onChange={(e) => handleFieldChange('lastName', e.target.value)}
+                    value={formData.last_name}
+                    onChange={(e) => handleFieldChange('last_name', e.target.value)}
                     onValidationChange={(isValid, error) => {
-                      if (!isValid && error) handleFieldValidation('lastName', formData.lastName);
+                      if (!isValid && error) handleFieldValidation('last_name', formData.last_name);
                     }}
-                    error={errors.lastName}
+                    error={errors.last_name}
                     required
                     helpText="Enter your legal last name"
                   />

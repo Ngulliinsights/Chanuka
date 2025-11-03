@@ -210,7 +210,7 @@ export class ConfigurationManager extends EventEmitter {
     }
 
     // Check if user is specifically enabled
-    if (context?.userId && feature.enabledForUsers.includes(context.userId)) {
+    if (context?.user_id && feature.enabledForUsers.includes(context.user_id)) {
       const result = { enabled: true, reason: 'user_targeting' as const, rolloutPercentage: 100 };
       this.emit('feature:evaluated', featureName, result, context);
       return result;
@@ -218,7 +218,7 @@ export class ConfigurationManager extends EventEmitter {
 
     // Check rollout percentage
     if (feature.rolloutPercentage < 100) {
-      const hash = this.hashString(`${featureName}-${context?.userId || context?.sessionId || 'anonymous'}`);
+      const hash = this.hashString(`${featureName}-${context?.user_id || context?.sessionId || 'anonymous'}`);
       const enabled = (hash % 100) < feature.rolloutPercentage;
       const result = {
         enabled,

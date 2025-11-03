@@ -22,8 +22,8 @@ export function createMockLoginData(overrides: Partial<LoginFormData> = {}): Log
 
 export function createMockRegisterData(overrides: Partial<RegisterFormData> = {}): RegisterFormData {
   return {
-    firstName: 'John',
-    lastName: 'Doe',
+    first_name: 'John',
+    last_name: 'Doe',
     email: 'john.doe@example.com',
     password: 'SecurePass123!',
     confirmPassword: 'SecurePass123!',
@@ -62,11 +62,11 @@ export function createMockValidationErrors(fields: string[] = ['email']) {
       case 'password':
         errors.password = 'Password must be at least 8 characters';
         break;
-      case 'firstName':
-        errors.firstName = 'First name is required';
+      case 'first_name':
+        errors.first_name = 'First name is required';
         break;
-      case 'lastName':
-        errors.lastName = 'Last name is required';
+      case 'last_name':
+        errors.last_name = 'Last name is required';
         break;
       case 'confirmPassword':
         errors.confirmPassword = "Passwords don't match";
@@ -90,8 +90,8 @@ export function createMockAuthResponse(success: boolean = true, data?: any) {
         user: {
           id: '1',
           email: 'test@example.com',
-          firstName: 'John',
-          lastName: 'Doe'
+          first_name: 'John',
+          last_name: 'Doe'
         },
         token: 'mock-jwt-token'
       }
@@ -203,18 +203,18 @@ export async function fillRegisterForm(
 ) {
   const mockData = createMockRegisterData(data);
   
-  const firstNameInput = getByTestId('auth-firstName-input') as HTMLInputElement;
-  const lastNameInput = getByTestId('auth-lastName-input') as HTMLInputElement;
+  const first_nameInput = getByTestId('auth-first_name-input') as HTMLInputElement;
+  const last_nameInput = getByTestId('auth-last_name-input') as HTMLInputElement;
   const emailInput = getByTestId('auth-email-input') as HTMLInputElement;
   const passwordInput = getByTestId('auth-password-input') as HTMLInputElement;
   const confirmPasswordInput = getByTestId('auth-confirmPassword-input') as HTMLInputElement;
   
   // Simulate user input
-  firstNameInput.value = mockData.firstName;
-  firstNameInput.dispatchEvent(new Event('change', { bubbles: true }));
+  first_nameInput.value = mockData.first_name;
+  first_nameInput.dispatchEvent(new Event('change', { bubbles: true }));
   
-  lastNameInput.value = mockData.lastName;
-  lastNameInput.dispatchEvent(new Event('change', { bubbles: true }));
+  last_nameInput.value = mockData.last_name;
+  last_nameInput.dispatchEvent(new Event('change', { bubbles: true }));
   
   emailInput.value = mockData.email;
   emailInput.dispatchEvent(new Event('change', { bubbles: true }));
@@ -279,7 +279,7 @@ export function createMockValidationError(field: string, message: string) {
 export const TEST_DATA_SETS = {
   validEmails: [
     'test@example.com',
-    'user.name@domain.co.uk',
+    'users.name@domain.co.uk',
     'user+tag@example.org',
     'firstname.lastname@company.com'
   ],
@@ -288,7 +288,7 @@ export const TEST_DATA_SETS = {
     'invalid-email',
     '@example.com',
     'user@',
-    'user..name@example.com',
+    'users..name@example.com',
     'user@.com'
   ],
   

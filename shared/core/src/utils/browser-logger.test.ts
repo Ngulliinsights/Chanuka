@@ -4,7 +4,7 @@ import { BrowserLogger, detectEnvironment, getDefaultFeatureFlags, createBrowser
 // Mock navigator and window for browser environment
 const mockNavigator = {
   onLine: true,
-  userAgent: 'test-user-agent',
+  user_agent: 'test-user-agent',
   sendBeacon: vi.fn(),
 };
 

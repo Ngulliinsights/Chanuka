@@ -1,14 +1,13 @@
 import type { PlainBill } from './recommendation.dto';
 
-export interface RecommendationContext {
-  userId: string;
-  userInterests: string[];
+export interface RecommendationContext { user_id: string;
+  user_interests: string[];
   engagedBillIds: number[];
   recentActivity: Array<{
-    billId: number;
-    engagementType: 'view' | 'comment' | 'share';
+    bill_id: number;
+    engagement_type: 'view' | 'comment' | 'share';
     timestamp: Date;
-  }>;
+    }>;
 }
 
 export interface RecommendationCandidate {
@@ -48,7 +47,7 @@ export class RecommendationEngine {
 
     // Filter out already engaged bills
     const candidateBills = availableBills.filter(
-      bill => !context.engagedBillIds.includes(bill.id)
+      bill => !context.engagedBillIds.includes(bills.id)
     );
 
     // Score each candidate bill
@@ -85,7 +84,7 @@ export class RecommendationEngine {
     const { limit = 5, minSimilarity = 0.3 } = options;
 
     const similarities = allBills
-      .filter(bill => bill.id !== targetBill.id)
+      .filter(bill => bills.id !== targetBill.id)
       .map(bill => ({
         bill,
         similarityScore: this.calculateBillSimilarity(targetBill, bill),
@@ -102,11 +101,10 @@ export class RecommendationEngine {
    */
   static identifyTrendingBills(
     bills: PlainBill[],
-    engagementData: Array<{
-      billId: number;
-      engagementType: 'view' | 'comment' | 'share';
+    engagement_data: Array<{ bill_id: number;
+      engagement_type: 'view' | 'comment' | 'share';
       timestamp: Date;
-    }>,
+     }>,
     options: {
       days?: number;
       limit?: number;
@@ -121,26 +119,26 @@ export class RecommendationEngine {
     // Calculate trend scores for each bill
     const billTrends = new Map<number, {
       bill: PlainBill;
-      engagements: typeof engagementData;
+      engagements: typeof engagement_data;
       score: number;
     }>();
 
     // Group engagements by bill
-    engagementData
+    engagement_data
       .filter(engagement => engagement.timestamp >= cutoffDate)
       .forEach(engagement => {
-        const bill = bills.find(b => b.id === engagement.billId);
+        const bill = bills.find(b => b.id === engagement.bill_id);
         if (!bill) return;
 
-        if (!billTrends.has(bill.id)) {
-          billTrends.set(bill.id, {
+        if (!billTrends.has(bills.id)) {
+          billTrends.set(bills.id, {
             bill,
             engagements: [],
             score: 0,
           });
         }
 
-        billTrends.get(bill.id)!.engagements.push(engagement);
+        billTrends.get(bills.id)!.engagements.push(engagement);
       });
 
     // Calculate trend scores
@@ -163,19 +161,17 @@ export class RecommendationEngine {
    * Generate collaborative recommendations based on similar users
    */
   static generateCollaborativeRecommendations(
-    userId: string,
-    userEngagementHistory: Array<{
-      billId: number;
-      engagementType: 'view' | 'comment' | 'share';
+    user_id: string,
+    userEngagementHistory: Array<{ bill_id: number;
+      engagement_type: 'view' | 'comment' | 'share';
       timestamp: Date;
-    }>,
-    similarUsersEngagements: Array<{
-      userId: string;
-      billId: number;
-      engagementType: 'view' | 'comment' | 'share';
+     }>,
+    similarUsersEngagements: Array<{ user_id: string;
+      bill_id: number;
+      engagement_type: 'view' | 'comment' | 'share';
       timestamp: Date;
       similarityScore: number;
-    }>,
+      }>,
     availableBills: PlainBill[],
     options: {
       limit?: number;
@@ -186,7 +182,7 @@ export class RecommendationEngine {
 
     // Filter out user's own engaged bills
     const userEngagedBillIds = new Set(
-      userEngagementHistory.map(e => e.billId)
+      userEngagementHistory.map(e => e.bill_id)
     );
 
     // Group similar users' engagements by bill
@@ -198,19 +194,19 @@ export class RecommendationEngine {
     }>();
 
     similarUsersEngagements
-      .filter(e => e.similarityScore >= minSimilarity && !userEngagedBillIds.has(e.billId))
+      .filter(e => e.similarityScore >= minSimilarity && !userEngagedBillIds.has(e.bill_id))
       .forEach(engagement => {
-        const bill = availableBills.find(b => b.id === engagement.billId);
+        const bill = availableBills.find(b => b.id === engagement.bill_id);
         if (!bill) return;
 
-        const existing = billRecommendations.get(bill.id) || {
+        const existing = billRecommendations.get(bills.id) || {
           bill,
           totalScore: 0,
           userCount: 0,
           reasons: [],
         };
 
-        const engagementWeight = this.getEngagementWeight(engagement.engagementType);
+        const engagementWeight = this.getEngagementWeight(engagement.engagement_type);
         existing.totalScore += engagementWeight * engagement.similarityScore;
         existing.userCount += 1;
 
@@ -218,7 +214,7 @@ export class RecommendationEngine {
           existing.reasons = [`Liked by ${existing.userCount} similar user(s)`];
         }
 
-        billRecommendations.set(bill.id, existing);
+        billRecommendations.set(bills.id, existing);
       });
 
     // Convert to final format
@@ -243,7 +239,7 @@ export class RecommendationEngine {
     const reasons: string[] = [];
 
     // Interest-based scoring
-    const interestScore = this.calculateInterestScore(bill, context.userInterests);
+    const interestScore = this.calculateInterestScore(bill, context.user_interests);
     if (interestScore > 0) {
       score += interestScore * this.SCORING_WEIGHTS.INTEREST_MATCH;
       reasons.push('Matches your interests');
@@ -271,22 +267,22 @@ export class RecommendationEngine {
     };
   }
 
-  private static calculateInterestScore(bill: PlainBill, userInterests: string[]): number {
-    if (!userInterests.length) return 0;
+  private static calculateInterestScore(bill: PlainBill, user_interests: string[]): number {
+    if (!user_interests.length) return 0;
 
-    const billTags = bill.tags || [];
-    const billContent = `${bill.title} ${bill.description || ''} ${bill.category || ''}`.toLowerCase();
+    const bill_tags = bills.tags || [];
+    const billContent = `${bills.title} ${bills.description || ''} ${bills.category || ''}`.toLowerCase();
 
     let score = 0;
 
     // Direct tag matches
-    const tagMatches = userInterests.filter(interest =>
-      billTags.some(tag => tag.toLowerCase().includes(interest.toLowerCase()))
+    const tagMatches = user_interests.filter(interest =>
+      bill_tags.some(tag => tag.toLowerCase().includes(interest.toLowerCase()))
     ).length;
     score += tagMatches * 0.5;
 
     // Content matches
-    const contentMatches = userInterests.filter(interest =>
+    const contentMatches = user_interests.filter(interest =>
       billContent.includes(interest.toLowerCase())
     ).length;
     score += contentMatches * 0.3;
@@ -295,18 +291,18 @@ export class RecommendationEngine {
   }
 
   private static calculateRecencyScore(bill: PlainBill, weight: number): number {
-    if (!bill.createdAt) return 0;
+    if (!bills.created_at) return 0;
 
-    const daysSinceCreation = (Date.now() - new Date(bill.createdAt).getTime()) / (1000 * 60 * 60 * 24);
+    const daysSinceCreation = (Date.now() - new Date(bills.created_at).getTime()) / (1000 * 60 * 60 * 24);
     const recencyFactor = Math.exp(-daysSinceCreation / 30); // Exponential decay over 30 days
 
     return recencyFactor * weight;
   }
 
   private static calculatePopularityScore(bill: PlainBill): number {
-    const viewScore = (bill.viewCount || 0) / 1000; // Normalize by expected max
-    const commentScore = (bill.commentCount || 0) / 100;
-    const shareScore = (bill.shareCount || 0) / 50;
+    const viewScore = (bills.view_count || 0) / 1000; // Normalize by expected max
+    const commentScore = (bills.comment_count || 0) / 100;
+    const shareScore = (bills.share_count || 0) / 50;
 
     return Math.min(viewScore + commentScore + shareScore, 1);
   }
@@ -332,7 +328,7 @@ export class RecommendationEngine {
     }
 
     // Sponsor match
-    if (bill1.sponsorId && bill2.sponsorId && bill1.sponsorId === bill2.sponsorId) {
+    if (bill1.sponsor_id && bill2.sponsor_id && bill1.sponsor_id === bill2.sponsor_id) {
       similarity += 0.2;
       reasons.push('Same sponsor');
     }
@@ -365,7 +361,7 @@ export class RecommendationEngine {
   }
 
   private static calculateTrendScore(
-    engagements: Array<{ engagementType: 'view' | 'comment' | 'share'; timestamp: Date }>,
+    engagements: Array<{ engagement_type: 'view' | 'comment' | 'share'; timestamp: Date }>,
     decayFactor: number
   ): number {
     const now = Date.now();
@@ -373,7 +369,7 @@ export class RecommendationEngine {
 
     engagements.forEach(engagement => {
       const ageInHours = (now - engagement.timestamp.getTime()) / (1000 * 60 * 60);
-      const weight = this.getEngagementWeight(engagement.engagementType);
+      const weight = this.getEngagementWeight(engagement.engagement_type);
       const decayedWeight = weight * Math.pow(decayFactor, ageInHours / 24); // Daily decay
       score += decayedWeight;
     });
@@ -416,12 +412,12 @@ export class RecommendationEngine {
     const usedSponsors = new Set<number>();
 
     for (const candidate of candidates) {
-      const category = candidate.bill.category || 'unknown';
-      const sponsorId = candidate.bill.sponsorId;
+      const category = candidate.bills.category || 'unknown';
+      const sponsor_id = candidate.bills.sponsor_id;
 
       // Check diversity constraints
       const categoryUsed = usedCategories.has(category);
-      const sponsorUsed = sponsorId && usedSponsors.has(sponsorId);
+      const sponsorUsed = sponsor_id && usedSponsors.has(sponsor_id);
 
       if (categoryUsed || sponsorUsed) {
         // Apply diversity penalty
@@ -432,8 +428,8 @@ export class RecommendationEngine {
 
       // Track used categories and sponsors
       usedCategories.add(category);
-      if (sponsorId) {
-        usedSponsors.add(sponsorId);
+      if (sponsor_id) {
+        usedSponsors.add(sponsor_id);
       }
     }
 

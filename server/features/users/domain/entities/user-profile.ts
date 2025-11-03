@@ -2,44 +2,43 @@ import { UserBio, UserLocation, Organization, Interest } from './value-objects';
 
 export class UserProfile {
   private constructor(
-    private readonly _userId: string,
+    private readonly _user_id: string,
     private _bio: UserBio | null,
     private _expertise: string[],
     private _location: UserLocation | null,
     private _organization: Organization | null,
-    private _reputationScore: number,
-    private _isPublic: boolean,
-    private readonly _createdAt: Date,
-    private _updatedAt: Date
+    private _reputation_score: number,
+    private _is_public: boolean,
+    private readonly _created_at: Date,
+    private _updated_at: Date
   ) {}
 
-  static create(data: {
-    userId: string;
+  static create(data: { user_id: string;
     bio?: string;
     expertise?: string[];
     location?: string;
     organization?: string;
-    reputationScore?: number;
-    isPublic?: boolean;
-    createdAt?: Date;
-    updatedAt?: Date;
-  }): UserProfile {
+    reputation_score?: number;
+    is_public?: boolean;
+    created_at?: Date;
+    updated_at?: Date;
+   }): UserProfile {
     return new UserProfile(
-      data.userId,
+      data.user_id,
       data.bio ? UserBio.create(data.bio) : null,
       data.expertise || [],
       data.location ? UserLocation.create(data.location) : null,
       data.organization ? Organization.create(data.organization) : null,
-      data.reputationScore ?? 0,
-      data.isPublic ?? true,
-      data.createdAt ?? new Date(),
-      data.updatedAt ?? new Date()
+      data.reputation_score ?? 0,
+      data.is_public ?? true,
+      data.created_at ?? new Date(),
+      data.updated_at ?? new Date()
     );
   }
 
   // Getters
-  get userId(): string {
-    return this._userId;
+  get user_id(): string {
+    return this._user_id;
   }
 
   get bio(): UserBio | null {
@@ -58,37 +57,37 @@ export class UserProfile {
     return this._organization;
   }
 
-  get reputationScore(): number {
-    return this._reputationScore;
+  get reputation_score(): number {
+    return this._reputation_score;
   }
 
-  get isPublic(): boolean {
-    return this._isPublic;
+  get is_public(): boolean {
+    return this._is_public;
   }
 
-  get createdAt(): Date {
-    return this._createdAt;
+  get created_at(): Date {
+    return this._created_at;
   }
 
-  get updatedAt(): Date {
-    return this._updatedAt;
+  get updated_at(): Date {
+    return this._updated_at;
   }
 
   // Business methods
   updateBio(newBio: string): void {
     this._bio = UserBio.create(newBio);
-    this._updatedAt = new Date();
+    this._updated_at = new Date();
   }
 
   clearBio(): void {
     this._bio = null;
-    this._updatedAt = new Date();
+    this._updated_at = new Date();
   }
 
   addExpertise(expertise: string): void {
     if (!this._expertise.includes(expertise)) {
       this._expertise.push(expertise);
-      this._updatedAt = new Date();
+      this._updated_at = new Date();
     }
   }
 
@@ -96,46 +95,46 @@ export class UserProfile {
     const index = this._expertise.indexOf(expertise);
     if (index > -1) {
       this._expertise.splice(index, 1);
-      this._updatedAt = new Date();
+      this._updated_at = new Date();
     }
   }
 
   updateExpertise(expertise: string[]): void {
     this._expertise = [...expertise];
-    this._updatedAt = new Date();
+    this._updated_at = new Date();
   }
 
   updateLocation(newLocation: string): void {
     this._location = UserLocation.create(newLocation);
-    this._updatedAt = new Date();
+    this._updated_at = new Date();
   }
 
   clearLocation(): void {
     this._location = null;
-    this._updatedAt = new Date();
+    this._updated_at = new Date();
   }
 
   updateOrganization(newOrganization: string): void {
     this._organization = Organization.create(newOrganization);
-    this._updatedAt = new Date();
+    this._updated_at = new Date();
   }
 
   clearOrganization(): void {
     this._organization = null;
-    this._updatedAt = new Date();
+    this._updated_at = new Date();
   }
 
   updateReputationScore(newScore: number): void {
     if (newScore < 0 || newScore > 100) {
       throw new Error('Reputation score must be between 0 and 100');
     }
-    this._reputationScore = newScore;
-    this._updatedAt = new Date();
+    this._reputation_score = newScore;
+    this._updated_at = new Date();
   }
 
-  setVisibility(isPublic: boolean): void {
-    this._isPublic = isPublic;
-    this._updatedAt = new Date();
+  setVisibility(is_public: boolean): void {
+    this._is_public = is_public;
+    this._updated_at = new Date();
   }
 
   hasExpertise(expertise: string): boolean {
@@ -151,65 +150,62 @@ export class UserProfile {
   }
 
   equals(other: UserProfile): boolean {
-    return this._userId === other._userId;
+    return this._user_id === other._user_id;
   }
 
-  toJSON() {
-    return {
-      userId: this._userId,
+  toJSON() { return {
+      user_id: this._user_id,
       bio: this._bio?.value || null,
       expertise: this._expertise,
       location: this._location?.value || null,
       organization: this._organization?.value || null,
-      reputationScore: this._reputationScore,
-      isPublic: this._isPublic,
-      createdAt: this._createdAt,
-      updatedAt: this._updatedAt
-    };
+      reputation_score: this._reputation_score,
+      is_public: this._is_public,
+      created_at: this._created_at,
+      updated_at: this._updated_at
+     };
   }
 }
 
 export class UserInterest {
   private constructor(
-    private readonly _userId: string,
+    private readonly _user_id: string,
     private readonly _interest: Interest,
-    private readonly _createdAt: Date
+    private readonly _created_at: Date
   ) {}
 
-  static create(data: {
-    userId: string;
+  static create(data: { user_id: string;
     interest: string;
-    createdAt?: Date;
-  }): UserInterest {
+    created_at?: Date;
+   }): UserInterest {
     return new UserInterest(
-      data.userId,
+      data.user_id,
       Interest.create(data.interest),
-      data.createdAt ?? new Date()
+      data.created_at ?? new Date()
     );
   }
 
-  get userId(): string {
-    return this._userId;
+  get user_id(): string {
+    return this._user_id;
   }
 
   get interest(): Interest {
     return this._interest;
   }
 
-  get createdAt(): Date {
-    return this._createdAt;
+  get created_at(): Date {
+    return this._created_at;
   }
 
   equals(other: UserInterest): boolean {
-    return this._userId === other._userId && this._interest.equals(other._interest);
+    return this._user_id === other._user_id && this._interest.equals(other._interest);
   }
 
-  toJSON() {
-    return {
-      userId: this._userId,
+  toJSON() { return {
+      user_id: this._user_id,
       interest: this._interest.value,
-      createdAt: this._createdAt
-    };
+      created_at: this._created_at
+     };
   }
 }
 

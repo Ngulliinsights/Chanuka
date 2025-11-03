@@ -3,13 +3,13 @@ import request from 'supertest';
 import express, { Express } from 'express';
 import { sponsorsRouter } from '../sponsors.routes'; // Import the NEW router
 // Mock the NEW repository and analysis service
-import { sponsorRepository } from '../../infrastructure/repositories/sponsor.repository';
+import { sponsorRepository } from '../../infrastructure/repositories/sponsors.repository';
 import { sponsorConflictAnalysisService } from '../../application/sponsor-conflict-analysis.service';
 import { authenticateToken } from '@/components/auth'; // Mock auth if needed
 import * as schema from '../../../../../shared/schema';
 
 // --- Mock Dependencies ---
-vi.mock('../../infrastructure/repositories/sponsor.repository');
+vi.mock('../../infrastructure/repositories/sponsors.repository');
 vi.mock('../../application/sponsor-conflict-analysis.service');
 // Mock Auth Middleware (Allow all for testing, add specific checks if needed)
 vi.mock('../../../../middleware/auth', () => ({
@@ -26,13 +26,13 @@ app.use(express.json());
 app.use('/api/sponsors', sponsorsRouter); // Mount the sponsors router
 
 // --- Mock Data ---
-const mockSponsor1: schema.Sponsor = { id: 1, name: 'Alice Adams', role: 'Senator', party: 'Independent', constituency: 'District A', email: 'a@test', phone: null, bio: null, photoUrl: null, conflictLevel: 'low', financialExposure: '10000', votingAlignment: '75', transparencyScore: '80', isActive: true, createdAt: new Date(), updatedAt: new Date() };
-const mockSponsor2: schema.Sponsor = { id: 2, name: 'Bob Brown', role: 'Rep', party: 'Unity', constituency: 'District B', email: 'b@test', phone: null, bio: null, photoUrl: null, conflictLevel: 'medium', financialExposure: '50000', votingAlignment: '60', transparencyScore: '70', isActive: true, createdAt: new Date(), updatedAt: new Date() };
-const mockAffiliation: schema.SponsorAffiliation = { id: 10, sponsorId: 1, organization: 'Org A', type: 'economic', /* ... */ } as schema.SponsorAffiliation;
-const mockTransparency: schema.SponsorTransparency = { id: 20, sponsorId: 1, disclosureType: 'financial', description: 'Stocks', /* ... */ } as schema.SponsorTransparency;
-const mockSponsorship: schema.BillSponsorship = { id: 30, billId: 101, sponsorId: 1, sponsorshipType: 'primary', /* ... */ } as schema.BillSponsorship;
+const mockSponsor1: schema.Sponsor = { id: 1, name: 'Alice Adams', role: 'Senator', party: 'Independent', constituency: 'District A', email: 'a@test', phone: null, bio: null, photo_url: null, conflict_level: 'low', financial_exposure: '10000', voting_alignment: '75', transparency_score: '80', is_active: true, created_at: new Date(), updated_at: new Date() };
+const mockSponsor2: schema.Sponsor = { id: 2, name: 'Bob Brown', role: 'Rep', party: 'Unity', constituency: 'District B', email: 'b@test', phone: null, bio: null, photo_url: null, conflict_level: 'medium', financial_exposure: '50000', voting_alignment: '60', transparency_score: '70', is_active: true, created_at: new Date(), updated_at: new Date() };
+const mockAffiliation: schema.SponsorAffiliation = { id: 10, sponsor_id: 1, organization: 'Org A', type: 'economic', /* ... */ } as schema.SponsorAffiliation;
+const mockTransparency: schema.SponsorTransparency = { id: 20, sponsor_id: 1, disclosureType: 'financial', description: 'Stocks', /* ... */ } as schema.SponsorTransparency;
+const mockSponsorship: schema.BillSponsorship = { id: 30, bill_id: 101, sponsor_id: 1, sponsorshipType: 'primary', /* ... */  } as schema.BillSponsorship;
 const mockSponsorWithRelations: any = { ...mockSponsor1, affiliations: [mockAffiliation], transparency: [mockTransparency], sponsorships: [mockSponsorship] };
-const mockConflictResult: any = { conflictId: 'test-conflict', sponsorId: 1, conflictType: 'financial_direct', severity: 'medium', description: 'Test', affectedBills: [101], financialImpact: 1000, detectedAt: new Date(), confidence: 0.8, evidence: [] };
+const mockConflictResult: any = { conflictId: 'test-conflict', sponsor_id: 1, conflictType: 'financial_direct', severity: 'medium', description: 'Test', affectedBills: [101], financialImpact: 1000, detectedAt: new Date(), confidence: 0.8, evidence: [] };
 const mockRiskProfile: any = { overallScore: 60, level: 'medium', breakdown: {}, recommendations: [] };
 
 describe('Sponsors API Routes', () => {
@@ -46,18 +46,18 @@ describe('Sponsors API Routes', () => {
         (sponsorRepository.findById as vi.Mock).mockResolvedValue(mockSponsor1); // Needed if findByIdWithRelations uses it
         (sponsorRepository.create as vi.Mock).mockResolvedValue({ ...mockSponsor1, id: 3 });
         (sponsorRepository.update as vi.Mock).mockResolvedValue(mockSponsor1);
-        (sponsorRepository.setActiveStatus as vi.Mock).mockResolvedValue({ ...mockSponsor1, isActive: false });
+        (sponsorRepository.setActiveStatus as vi.Mock).mockResolvedValue({ ...mockSponsor1, is_active: false });
         (sponsorRepository.listAffiliations as vi.Mock).mockResolvedValue([mockAffiliation]);
         (sponsorRepository.addAffiliation as vi.Mock).mockResolvedValue({ ...mockAffiliation, id: 11 });
         (sponsorRepository.updateAffiliation as vi.Mock).mockResolvedValue(mockAffiliation);
-        (sponsorRepository.setAffiliationActiveStatus as vi.Mock).mockResolvedValue({ ...mockAffiliation, isActive: false });
+        (sponsorRepository.setAffiliationActiveStatus as vi.Mock).mockResolvedValue({ ...mockAffiliation, is_active: false });
         (sponsorRepository.listTransparencyRecords as vi.Mock).mockResolvedValue([mockTransparency]);
         (sponsorRepository.addTransparencyRecord as vi.Mock).mockResolvedValue({ ...mockTransparency, id: 21 });
         (sponsorRepository.updateTransparencyRecord as vi.Mock).mockResolvedValue(mockTransparency);
-        (sponsorRepository.verifyTransparencyRecord as vi.Mock).mockResolvedValue({ ...mockTransparency, isVerified: true });
+        (sponsorRepository.verifyTransparencyRecord as vi.Mock).mockResolvedValue({ ...mockTransparency, is_verified: true });
         (sponsorRepository.listBillSponsorshipsBySponsor as vi.Mock).mockResolvedValue([mockSponsorship]);
          (sponsorRepository.createBillSponsorship as vi.Mock).mockResolvedValue({ ...mockSponsorship, id: 31 });
-         (sponsorRepository.deactivateBillSponsorship as vi.Mock).mockResolvedValue({ ...mockSponsorship, isActive: false });
+         (sponsorRepository.deactivateBillSponsorship as vi.Mock).mockResolvedValue({ ...mockSponsorship, is_active: false });
          (sponsorRepository.getUniqueParties as vi.Mock).mockResolvedValue(['Independent', 'Unity']);
          (sponsorRepository.getUniqueConstituencies as vi.Mock).mockResolvedValue(['District A', 'District B']);
          (sponsorRepository.getActiveSponsorCount as vi.Mock).mockResolvedValue(2);
@@ -67,7 +67,7 @@ describe('Sponsors API Routes', () => {
         // Reset mocks for analysis service methods
         (sponsorConflictAnalysisService.detectConflicts as vi.Mock).mockResolvedValue([mockConflictResult]);
         (sponsorConflictAnalysisService.generateRiskProfile as vi.Mock).mockResolvedValue(mockRiskProfile);
-        (sponsorConflictAnalysisService.analyzeConflictTrends as vi.Mock).mockResolvedValue([{ sponsorId: 1, conflictCount: 1, severityTrend: 'stable', riskScore: 50, predictions: [] }]);
+        (sponsorConflictAnalysisService.analyzeConflictTrends as vi.Mock).mockResolvedValue([{ sponsor_id: 1, conflictCount: 1, severityTrend: 'stable', riskScore: 50, predictions: [] }]);
          (sponsorConflictAnalysisService.createConflictMapping as vi.Mock).mockResolvedValue({ nodes: [], edges: [], clusters: [], metrics: {} });
     });
 
@@ -79,7 +79,7 @@ describe('Sponsors API Routes', () => {
             expect(response.body.status).toBe('success');
             expect(response.body.data).toHaveLength(2);
             expect(response.body.data[0].name).toBe(mockSponsor1.name);
-            expect(sponsorRepository.list).toHaveBeenCalledWith(expect.objectContaining({ isActive: true })); // Default filter
+            expect(sponsorRepository.list).toHaveBeenCalledWith(expect.objectContaining({ is_active: true })); // Default filter
         });
 
          it('should handle search query parameter', async () => {
@@ -96,7 +96,7 @@ describe('Sponsors API Routes', () => {
               expect(sponsorRepository.list).toHaveBeenCalledWith(expect.objectContaining({
                   party: 'Unity',
                   limit: 10,
-                  isActive: true // Default
+                  is_active: true // Default
               }));
          });
 
@@ -254,7 +254,7 @@ describe('Sponsors API Routes', () => {
              expect(response.status).toBe(200);
              expect(response.body.data).toHaveLength(1);
              expect(response.body.data[0].sponsorshipId).toBe(mockSponsorship.id);
-             expect(response.body.data[0].bill.id).toBe(101);
+             expect(response.body.data[0].bills.id).toBe(101);
              expect(sponsorRepository.listBillSponsorshipsBySponsor).toHaveBeenCalledWith(1, true);
              expect(sponsorRepository.getBillsByIds).toHaveBeenCalledWith([101]);
          });

@@ -11,16 +11,15 @@ export interface CreateUserData {
     role?: 'user' | 'admin' | 'expert';
     socialProfiles?: SocialProfile[];
 }
-export declare class UserStorage extends BaseStorage<UserProfile> {
-    private redis;
+export declare class UserStorage extends BaseStorage<UserProfile> { private redis;
     private pool;
     constructor(redis: Redis, pool: Pool, options?: StorageOptions);
     getUser(id: number): Promise<UserProfile | null>;
     getUserByUsername(username: string): Promise<UserProfile | null>;
     createUser(data: CreateUserData): Promise<UserProfile>;
     getUserBySocialProfile(provider: OAuthProvider, profileId: string): Promise<UserProfile | null>;
-    linkSocialProfile(userId: number, profile: SocialProfile): Promise<UserProfile>;
-}
+    linkSocialProfile(user_id: number, profile: SocialProfile): Promise<UserProfile>;
+ }
 
 
 

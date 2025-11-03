@@ -276,11 +276,10 @@ export const cacheService = {
 };
 
 // Cache keys for consistent caching across the application
-export const cacheKeys = {
-  USER_PROFILE: (userId: string) => `user:profile:${userId}`,
-  BILL_DETAILS: (billId: number) => `bill:details:${billId}`,
-  BILL_COMMENTS: (billId: number) => `bill:comments:${billId}`,
-  USER_ENGAGEMENT: (userId: string) => `user:engagement:${userId}`,
+export const cacheKeys = { USER_PROFILE: (user_id: string) => `user:profile:${user_id }`,
+  BILL_DETAILS: (bill_id: number) => `bill:details:${ bill_id }`,
+  BILL_COMMENTS: (bill_id: number) => `bill:comments:${ bill_id }`,
+  USER_ENGAGEMENT: (user_id: string) => `user:engagement:${ user_id }`,
   ANALYTICS: (key: string) => `analytics:${key}`
 };
 

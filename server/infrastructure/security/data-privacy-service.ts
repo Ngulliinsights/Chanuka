@@ -114,14 +114,13 @@ export class DataPrivacyService {
   /**
    * Check if user has access to specific data types
    */
-  public checkDataAccess(userId: string, dataType: string, requestContext?: any): AccessResult {
-    try {
+  public checkDataAccess(user_id: string, dataType: string, requestContext?: any): AccessResult { try {
       // Define access rules based on data type and user context
       const accessRules = this.getAccessRules(dataType);
       
       // Check if user meets access requirements
-      const userRole = requestContext?.user?.role || 'citizen';
-      const isDataOwner = requestContext?.targetUserId === userId;
+      const user_role = requestContext?.user?.role || 'citizen';
+      const isDataOwner = requestContext?.targetUserId === user_id;
       
       // Apply access rules
       if (accessRules.requiresOwnership && !isDataOwner) {
@@ -129,10 +128,10 @@ export class DataPrivacyService {
           allowed: false,
           reason: 'Data access requires ownership',
           restrictions: ['owner_only']
-        };
+         };
       }
 
-      if (accessRules.minimumRole && !this.hasMinimumRole(userRole, accessRules.minimumRole)) {
+      if (accessRules.minimumRole && !this.hasMinimumRole(user_role, accessRules.minimumRole)) {
         return {
           allowed: false,
           reason: `Insufficient role. Required: ${accessRules.minimumRole}`,
@@ -140,7 +139,7 @@ export class DataPrivacyService {
         };
       }
 
-      if (accessRules.requiresConsent && !this.hasUserConsent(userId, dataType)) {
+      if (accessRules.requiresConsent && !this.hasUserConsent(user_id, dataType)) {
         return {
           allowed: false,
           reason: 'User consent required for this data type',
@@ -161,13 +160,12 @@ export class DataPrivacyService {
         allowed: true,
         restrictions: restrictions.length > 0 ? restrictions : undefined
       };
-    } catch (error) {
-      logger.error('Error checking data access', {
+    } catch (error) { logger.error('Error checking data access', {
         component: 'data-privacy',
-        userId,
+        user_id,
         dataType,
         error: error instanceof Error ? error.message : String(error)
-      });
+       });
 
       // Deny access on error for security
       return {
@@ -181,14 +179,13 @@ export class DataPrivacyService {
    * Audit data access for compliance
    */
   public async auditDataAccess(
-    userId: string,
+    user_id: string,
     action: string,
     resource: string,
     metadata?: any
-  ): Promise<void> {
-    try {
+  ): Promise<void> { try {
       await securityAuditService.logDataAccess(
-        userId,
+        user_id,
         action,
         resource,
         {
@@ -196,23 +193,21 @@ export class DataPrivacyService {
           dataType: this.extractDataType(resource),
           accessLevel: this.determineAccessLevel(action),
           ...metadata
-        }
+         }
       );
 
-      logger.debug('Data access audited', {
-        component: 'data-privacy',
-        userId,
+      logger.debug('Data access audited', { component: 'data-privacy',
+        user_id,
         action,
         resource
-      });
-    } catch (error) {
-      logger.error('Error auditing data access', {
+       });
+    } catch (error) { logger.error('Error auditing data access', {
         component: 'data-privacy',
-        userId,
+        user_id,
         action,
         resource,
         error: error instanceof Error ? error.message : String(error)
-      });
+       });
     }
   }
 
@@ -275,14 +270,13 @@ export class DataPrivacyService {
   /**
    * Hash user ID for analytics while maintaining consistency
    */
-  private hashUserId(userId: string): string {
-    // Use a consistent hash function (in production, use a proper crypto hash)
+  private hashUserId(user_id: string): string { // Use a consistent hash function (in production, use a proper crypto hash)
     let hash = 0;
-    for (let i = 0; i < userId.length; i++) {
-      const char = userId.charCodeAt(i);
+    for (let i = 0; i < user_id.length; i++) {
+      const char = user_id.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash; // Convert to 32-bit integer
-    }
+     }
     return `user_${Math.abs(hash).toString(36)}`;
   }
 
@@ -389,9 +383,9 @@ export class DataPrivacyService {
   /**
    * Check if user has minimum required role
    */
-  private hasMinimumRole(userRole: string, requiredRole: string): boolean {
+  private hasMinimumRole(user_role: string, requiredRole: string): boolean {
     const roleHierarchy = ['citizen', 'expert', 'journalist', 'advocate', 'admin'];
-    const userLevel = roleHierarchy.indexOf(userRole);
+    const userLevel = roleHierarchy.indexOf(user_role);
     const requiredLevel = roleHierarchy.indexOf(requiredRole);
     
     return userLevel >= requiredLevel;
@@ -400,7 +394,7 @@ export class DataPrivacyService {
   /**
    * Check if user has given consent for data type
    */
-  private hasUserConsent(userId: string, dataType: string): boolean {
+  private hasUserConsent(user_id: string, dataType: string): boolean {
     // In a real implementation, this would check a consent database
     // For now, assume consent is given for non-sensitive analytics
     const consentRequiredTypes = ['personal_data', 'location_tracking', 'behavioral_analytics'];

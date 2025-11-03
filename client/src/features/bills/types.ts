@@ -5,8 +5,8 @@ export interface Bill {
   summary: string;
   status: string;
   category: string;
-  introducedDate: string;
-  lastActionDate?: string;
+  introduced_date: string;
+  last_action_date?: string;
   sponsors: Sponsor[];
   comments: Comment[];
   analysis?: BillAnalysis;
@@ -28,9 +28,9 @@ export interface Comment {
   content: string;
   authorId: string;
   authorName: string;
-  createdAt: string;
-  updatedAt?: string;
-  parentId?: string;
+  created_at: string;
+  updated_at?: string;
+  parent_id?: string;
   replies?: Comment[];
   votes?: number;
 }
@@ -62,7 +62,7 @@ export interface EngagementMetrics {
   shares: number;
   comments: number;
   bookmarks: number;
-  lastEngagedAt: string;
+  last_engaged_at: string;
 }
 
 // Query parameters
@@ -73,23 +73,21 @@ export interface BillsQueryParams {
   sponsor?: string;
   limit?: number;
   offset?: number;
-  sortBy?: 'introducedDate' | 'lastActionDate' | 'title';
+  sortBy?: 'introduced_date' | 'last_action_date' | 'title';
   sortOrder?: 'asc' | 'desc';
 }
 
 // Mutation payloads
-export interface CommentPayload {
-  content: string;
+export interface CommentPayload { content: string;
   commentType?: string;
-  userId: string;
-  parentId?: string;
-}
+  user_id: string;
+  parent_id?: string;
+ }
 
-export interface EngagementPayload {
-  userId: string;
-  engagementType: 'view' | 'share' | 'bookmark' | 'comment';
+export interface EngagementPayload { user_id: string;
+  engagement_type: 'view' | 'share' | 'bookmark' | 'comment';
   metadata?: Record<string, any>;
-}
+ }
 
 // API response types
 export interface BillsResponse {

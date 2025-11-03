@@ -23,9 +23,9 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 import { logger } from '@shared/core';
 
 // Mock browser environment
-const mockUserAgent = (userAgent: string) => {
-  Object.defineProperty(navigator, 'userAgent', {
-    value: userAgent,
+const mockUserAgent = (user_agent: string) => {
+  Object.defineProperty(navigator, 'user_agent', {
+    value: user_agent,
     configurable: true
   });
 };
@@ -42,12 +42,12 @@ describe('Browser Compatibility Detection', () => {
   let originalWindow: any;
 
   beforeEach(() => {
-    originalUserAgent = navigator.userAgent;
+    originalUserAgent = navigator.user_agent;
     originalWindow = { ...window };
   });
 
   afterEach(() => {
-    Object.defineProperty(navigator, 'userAgent', {
+    Object.defineProperty(navigator, 'user_agent', {
       value: originalUserAgent,
       configurable: true
     });

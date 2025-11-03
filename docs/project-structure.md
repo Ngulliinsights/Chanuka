@@ -6,8 +6,6 @@ Maximum depth: 7 levels
 .
 client/
 ├── index.html
-├── package.json
-├── package-lock.json
 ├── public/
 │   ├── Chanuka_logo.png
 │   ├── Chanuka_logo.svg
@@ -334,6 +332,8 @@ client/
 │   │   ├── settings/
 │   │   │   ├── alert-preferences.tsx
 │   │   ├── sidebar.tsx
+│   │   ├── system/
+│   │   │   ├── HealthCheck.tsx
 │   │   ├── system-health.tsx
 │   │   ├── transparency/
 │   │   │   ├── ConflictAnalysisDashboard.tsx
@@ -552,7 +552,6 @@ client/
 │   │   │   ├── api-error-handling.test.ts
 │   │   │   ├── PageRelationshipService.test.ts
 │   │   │   ├── UserJourneyTracker.test.ts
-│   │   │   ├── websocket-client.test.ts
 │   │   ├── analysis.ts
 │   │   ├── api.ts
 │   │   ├── apiInterceptors.ts
@@ -666,6 +665,7 @@ client/
 │   ├── types/
 │   │   ├── navigation.ts
 │   │   ├── onboarding.ts
+│   │   ├── shims-shared.d.ts
 │   ├── utils/
 │   │   ├── __tests__/
 │   │   │   ├── safe-lazy-loading.test.tsx
@@ -682,6 +682,7 @@ client/
 │   │   ├── connectionAwareLoading.ts
 │   │   ├── development-debug.ts
 │   │   ├── development-error-recovery.ts
+│   │   ├── env-config.ts
 │   │   ├── mobile-error-handler.ts
 │   │   ├── mobile-touch-handler.ts
 │   │   ├── navigation/
@@ -712,12 +713,13 @@ client/
 │   │   ├── serviceWorker.ts
 │   ├── vite-env.d.ts
 ├── tsconfig.json
+├── validate-fixes.cjs
+├── vite.config.ts
 components.json
 cspell.config.yaml
 docker-compose.yml
 Dockerfile
 docs/
-├── adapter-analysis-report.md
 ├── analysis/
 │   ├── chanuka_implementation_guide.md
 │   ├── codebase-analysis.md
@@ -743,26 +745,19 @@ docs/
 │   ├── shared_core_design.md
 │   ├── shared_core_requirements.md
 │   ├── sponsorbyreal.html
+├── bill conversation.md
 ├── chanuka_architecture.txt
 ├── chanuka_functionality_analysis.md
 ├── Chanuka_Funding_Pitch.md
-├── client-error-analysis.md
-├── client-error-delegation-plan.md
-├── client-errors-analysis.md
-├── client-recovery-action-plan.md
-├── client-recovery-final-status.md
-├── client-recovery-implementation-summary.md
-├── client-recovery-status.md
-├── database-schema-final.md
 ├── project/
 │   ├── brand-roadmap.md
 │   ├── manifesto.md
 │   ├── problem-statement.md
 ├── project-structure.md
-├── strategic-tables-recommendations.md
 drizzle/
 drizzle.config.ts
 ├── 0021_clean_comprehensive_schema.sql
+├── 0022_fix_schema_alignment.sql
 ├── meta/
 │   ├── _journal.json
 │   ├── 0000_snapshot.json
@@ -770,8 +765,6 @@ drizzle.config.ts
 │   ├── 0002_snapshot.json
 │   ├── 0021_snapshot.json
 ├── README.md
-false/
-├── trace.json
 generate-structure-to-file.sh
 jest.backend.config.js
 logs/
@@ -782,7 +775,6 @@ logs/
 ├── logger_files_clean.txt
 ├── performance.log
 ├── security.log
-manual-bug-fixing-guide.md
 migration/
 ├── __tests__/
 │   ├── codemod-imports.test.js
@@ -808,8 +800,6 @@ migration_output.log
 nginx.conf
 package.json
 package-lock.json
-performance-budget-report.json
-performance-budgets.json
 playwright.config.ts
 playwright-report/
 ├── data/
@@ -821,10 +811,10 @@ playwright-report/
 │   ├── d1aef23511357c6a879e4ac1ffc6141cae63181c.webm
 ├── index.html
 postcss.config.js
-project-structure-report.json
 scripts/
 ├── accessibility/
 │   ├── accessibility-reporter.test.js
+├── align-schema.ts
 ├── analyze-bundle.cjs
 ├── audit-codebase-utilities.ts
 ├── audit-error-handling-sprawl.ts
@@ -835,6 +825,8 @@ scripts/
 ├── clean-shared-core-imports.ts
 ├── cleanup-deprecated-folders.ts
 ├── cleanup-legacy-adapters.js
+├── complete-realignment.ts
+├── complete-schema-fix.ts
 ├── consolidate-sprawl.ts
 ├── database/
 │   ├── check-schema.ts
@@ -864,10 +856,12 @@ scripts/
 ├── fix-failing-tests.ts
 ├── fix-frontend-imports.js
 ├── fix-infrastructure-issues.ts
+├── fix-missing-exports.ts
 ├── fix-navigation-tests.ts
 ├── fix-performance-tests.ts
 ├── fix-remaining-api-calls.js
 ├── fix-remaining-test-issues.ts
+├── fix-schema-references.ts
 ├── fix-server-logger-imports.js
 ├── fix-shared-core-imports.ts
 ├── generate-bundle-report.js
@@ -984,6 +978,8 @@ server/
 │   ├── real-time-tracking-demo.ts
 ├── docs/
 │   ├── government-data-integration-implementation.md
+│   ├── schema-import-guide.md
+│   ├── schema-migration-summary.md
 ├── features/
 │   ├── admin/
 │   │   ├── __tests__/
@@ -1219,8 +1215,10 @@ server/
 │   │   │   ├── RecommendationController.ts
 │   ├── search/
 │   │   ├── __tests__/
+│   │   │   ├── basic-test.cjs
 │   │   │   ├── search-benchmark.ts
 │   │   │   ├── search-performance.test.ts
+│   │   │   ├── simple-test.ts
 │   │   ├── application/
 │   │   │   ├── RelevanceScorer.ts
 │   │   │   ├── SearchService.ts
@@ -1233,6 +1231,7 @@ server/
 │   │   ├── engines/
 │   │   │   ├── suggestion-engine.service.ts
 │   │   │   ├── suggestion-ranking.service.ts
+│   │   ├── IMPLEMENTATION_SUMMARY.md
 │   │   ├── index.ts
 │   │   ├── infrastructure/
 │   │   │   ├── SearchCache.ts
@@ -1426,6 +1425,7 @@ server/
 │   ├── migration-runner.ts
 │   ├── test-conflict-analysis.ts
 │   ├── test-government-integration.ts
+│   ├── update-schema-imports.ts
 │   ├── verify-external-api-management.ts
 ├── services/
 │   ├── api-cost-monitoring.ts
@@ -1435,7 +1435,6 @@ server/
 │   ├── schema-validation-demo.ts
 │   ├── schema-validation-test.ts
 ├── simple-race-condition-test.js
-├── simple-server.ts
 ├── test-api.js
 ├── test-db.js
 ├── test-imports.js
@@ -1520,7 +1519,6 @@ server/
 shared/
 ├── core/
 │   ├── index.ts
-│   ├── README.md
 │   ├── src/
 │   │   ├── __tests__/
 │   │   │   ├── integration.test.ts
@@ -1873,20 +1871,44 @@ shared/
 │   ├── en.ts
 ├── schema/
 │   ├── __tests__/
-│   │   ├── schema.ts
-│   │   ├── schema_integration_tests.ts
-│   │   ├── schema_unit_test.ts
+│   │   ├── advocacy_coordination.test.ts
+│   │   ├── argument_intelligence.test.ts
+│   │   ├── citizen_participation.test.ts
+│   │   ├── constitutional_intelligence.test.ts
+│   │   ├── foundation.test.ts
+│   │   ├── impact_measurement.test.ts
+│   │   ├── integrity_operations.test.ts
+│   │   ├── parliamentary_process.test.ts
+│   │   ├── platform_operations.test.ts
+│   │   ├── README.md
+│   │   ├── run_all_tests.ts
+│   │   ├── run_tests.ts
+│   │   ├── setup.ts
+│   │   ├── test_runner.sh
+│   │   ├── transparency_analysis.test.ts
+│   │   ├── universal_access.test.ts
+│   ├── advocacy_coordination.ts
+│   ├── argument_intelligence.ts
+│   ├── citizen_participation.ts
+│   ├── constitutional_intelligence.ts
+│   ├── database_architecture.md
 │   ├── enum.ts
+│   ├── foundation.ts
+│   ├── graph_database_strategy.md
+│   ├── impact_measurement.ts
 │   ├── index.ts
-│   ├── schema.ts
-│   ├── searchVectorMigration.ts
-│   ├── types.ts
-│   ├── validation.ts
-src/
-├── setupTests.ts
+│   ├── integrity_operations.ts
+│   ├── migration_guide.md
+│   ├── parliamentary_process.ts
+│   ├── platform_operations.ts
+│   ├── schema_redesign.md
+│   ├── transparency_analysis.ts
+│   ├── universal_access.ts
+startup-validation.js
 tailwind.config.ts
 test-auth-compile.ts
 test-connection.html
+test-race-prevention.ts
 test-results/
 ├── e2e-responsive-test-Respon-3cd32-d-page-should-be-responsive-chromium/
 │   ├── error-context.md
@@ -1925,8 +1947,6 @@ tests/
 │   ├── test-helpers.ts
 ├── visual/
 │   ├── components.spec.ts
-tools/
-├── validate-schema-congruence.ts
 tsconfig.json
 tsconfig.server.json
 vite.config.ts
@@ -1936,4 +1956,4 @@ vitest.frontend.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-10-30 22:56:51
+Generated on: 2025-11-02 16:42:39

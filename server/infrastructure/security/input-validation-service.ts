@@ -332,7 +332,7 @@ export class InputValidationService {
 // Common validation schemas
 export const commonSchemas = {
   // User role validation
-  userRole: z.enum(['citizen', 'expert', 'admin', 'journalist', 'advocate']),
+  user_role: z.enum(['citizen', 'expert', 'admin', 'journalist', 'advocate']),
   
   // Pagination validation
   pagination: z.object({
@@ -349,15 +349,15 @@ export const commonSchemas = {
   // User update validation
   userUpdate: z.object({
     role: z.enum(['citizen', 'expert', 'admin', 'journalist', 'advocate']).optional(),
-    isActive: z.boolean().optional(),
+    is_active: z.boolean().optional(),
     name: z.string().min(1).max(255).optional(),
     email: z.string().email().optional()
   }),
   
   // Bill comment validation
-  billComment: z.object({
+  comments: z.object({
     content: z.string().min(1).max(5000),
-    parentCommentId: z.number().optional(),
+    parent_id: z.number().optional(),
     commentType: z.enum(['general', 'expert_analysis', 'concern', 'support']).optional()
   }),
   

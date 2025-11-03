@@ -1,5 +1,5 @@
 import { database as db, readDatabase } from '@shared/database/connection';
-import { notifications, users, userBillTrackingPreference, bill } from '../../../shared/schema';
+import { notifications, users, bill_tracking_preferences, bills } from '@shared/schema';
 import { eq, and } from 'drizzle-orm';
 import { smartNotificationFilterService, type FilterCriteria, type FilterResult } from './smart-notification-filter.js';
 import { notificationChannelService, type ChannelDeliveryRequest, type DeliveryResult } from './notification-channels.js';
@@ -32,9 +32,8 @@ import { logger  } from '../../../shared/core/src/index.js';
 // Type Definitions
 // ============================================================================
 
-export interface NotificationRequest {
-  userId: string;
-  billId?: number; // Deprecated in favor of relatedBillId, maintained for backward compatibility
+export interface NotificationRequest { user_id: string;
+  bill_id?: number; // Deprecated in favor of relatedBillId, maintained for backward compatibility
   relatedBillId?: number; // Preferred field name for bill association
   category?: string;
   tags?: string[];
@@ -46,7 +45,7 @@ export interface NotificationRequest {
     title: string;
     message: string;
     htmlMessage?: string;
-  };
+    };
   metadata?: {
     actionUrl?: string;
     relatedBillId?: number;
@@ -60,16 +59,15 @@ export interface NotificationRequest {
   };
 }
 
-export interface NotificationBatch {
-  id: string;
-  userId: string;
+export interface NotificationBatch { id: string;
+  user_id: string;
   notifications: NotificationRequest[];
   scheduledFor: Date;
-  createdAt: Date;
+  created_at: Date;
   status: 'pending' | 'processing' | 'sent' | 'failed';
   retryCount?: number;
   lastError?: string;
-}
+ }
 
 export interface RateLimitState {
   count: number;
@@ -89,13 +87,12 @@ export interface NotificationResult {
   error?: string;
 }
 
-export interface BulkNotificationResult {
-  total: number;
+export interface BulkNotificationResult { total: number;
   sent: number;
   filtered: number;
   batched: number;
   failed: number;
-  errors: Array<{ userId: string; error: string }>;
+  errors: Array<{ user_id: string; error: string  }>;
 }
 
 interface OrchestratorConfig {
@@ -137,8 +134,8 @@ interface ServiceMetrics {
  */
 interface CombinedBillTrackingPreferences extends GlobalBillTrackingPreferences {
   _perBillSettingsApplied?: boolean; // Internal flag indicating per-bill override was used
-  alertFrequency?: GlobalBillTrackingPreferences['updateFrequency']; // Alias for compatibility
-  alertChannels?: Array<'in_app' | 'email' | 'push' | 'sms'>; // Per-bill channel format
+  alert_frequency?: GlobalBillTrackingPreferences['updateFrequency']; // Alias for compatibility
+  alert_channels?: Array<'in_app' | 'email' | 'push' | 'sms'>; // Per-bill channel format
 }
 
 // ============================================================================
@@ -241,13 +238,12 @@ export class NotificationOrchestratorService {
 
     const startTime = Date.now();
 
-    try {
-      logger.info('Processing notification request', {
+    try { logger.info('Processing notification request', {
         component: 'NotificationOrchestrator',
-        userId: request.userId,
+        user_id: request.user_id,
         type: request.notificationType,
         priority: request.priority
-      });
+       });
 
       // Step 1: Validate request structure and required fields
       const validationError = this.validateRequest(request);
@@ -261,14 +257,13 @@ export class NotificationOrchestratorService {
       }
 
       // Step 2: Check rate limits (can be bypassed for critical notifications)
-      if (!request.config?.skipFiltering) {
-        const rateLimitCheck = this.checkRateLimit(request.userId, request.priority);
+      if (!request.config?.skipFiltering) { const rateLimitCheck = this.checkRateLimit(request.user_id, request.priority);
         if (!rateLimitCheck.allowed) {
           logger.warn('Rate limit exceeded', {
             component: 'NotificationOrchestrator',
-            userId: request.userId,
+            user_id: request.user_id,
             reason: rateLimitCheck.reason
-          });
+           });
           return {
             success: false,
             filtered: true,
@@ -280,20 +275,19 @@ export class NotificationOrchestratorService {
 
       // Step 3: Fetch combined preferences (global + per-bill with priority to per-bill)
       // This ensures we respect both user-wide settings and specific bill tracking preferences
-      const billId = request.relatedBillId ?? request.billId; // Support both field names
-      const combinedPreferences = await this.getCombinedPreferences(request.userId, billId);
+      const bill_id = request.relatedBillId ?? request.bill_id; // Support both field names
+      const combinedPreferences = await this.getCombinedPreferences(request.user_id, bill_id);
 
       // Step 4: Apply smart filtering using combined preferences
       // The filter service uses ML/rules to determine notification relevance
       const filterResult = await this.applySmartFiltering(request, combinedPreferences);
       
-      if (!filterResult.shouldNotify) {
-        this.metrics.totalFiltered++;
+      if (!filterResult.shouldNotify) { this.metrics.totalFiltered++;
         logger.info('Notification filtered', {
           component: 'NotificationOrchestrator',
-          userId: request.userId,
+          user_id: request.user_id,
           reasons: filterResult.reasons
-        });
+         });
         return {
           success: true,
           filtered: true,
@@ -323,19 +317,18 @@ export class NotificationOrchestratorService {
       
       // Step 7: Update rate limit counters and record performance metrics
       if (deliveryResult.success) {
-        this.updateRateLimit(request.userId, request.priority);
+        this.updateRateLimit(request.user_id, request.priority);
         this.recordDeliveryTime(Date.now() - startTime);
       }
       
       return deliveryResult;
 
-    } catch (error) {
-      this.metrics.totalFailed++;
+    } catch (error) { this.metrics.totalFailed++;
       logger.error('Error in notification orchestration:', {
         component: 'NotificationOrchestrator',
-        userId: request.userId,
+        user_id: request.user_id,
         error: error instanceof Error ? error.message : String(error)
-      }, error);
+       }, error);
       
       return {
         success: false,
@@ -354,11 +347,11 @@ export class NotificationOrchestratorService {
    * allowing for per-user filtering and preference handling.
    */
   async sendBulkNotification(
-    userIds: string[],
-    notificationTemplate: Omit<NotificationRequest, 'userId'>
+    user_ids: string[],
+    notificationTemplate: Omit<NotificationRequest, 'user_id'>
   ): Promise<BulkNotificationResult> {
     const result: BulkNotificationResult = {
-      total: userIds.length,
+      total: user_ids.length,
       sent: 0,
       filtered: 0,
       batched: 0,
@@ -367,27 +360,26 @@ export class NotificationOrchestratorService {
     };
 
     // Handle empty array gracefully
-    if (userIds.length === 0) {
+    if (user_ids.length === 0) {
       return result;
     }
 
     logger.info('Starting bulk notification', {
       component: 'NotificationOrchestrator',
-      totalUsers: userIds.length,
+      totalUsers: user_ids.length,
       notificationType: notificationTemplate.notificationType
     });
 
     // Process in chunks to avoid overwhelming the system
-    const chunks = this.chunkArray(userIds, this.config.processing.bulkChunkSize);
+    const chunks = this.chunkArray(user_ids, this.config.processing.bulkChunkSize);
 
-    for (const chunk of chunks) {
-      // Use Promise.allSettled to continue processing even if some fail
-      const promises = chunk.map(async (userId) => {
+    for (const chunk of chunks) { // Use Promise.allSettled to continue processing even if some fail
+      const promises = chunk.map(async (user_id) => {
         try {
           const request: NotificationRequest = {
             ...notificationTemplate,
-            userId
-          };
+            user_id
+           };
 
           const notificationResult = await this.sendNotification(request);
 
@@ -400,19 +392,17 @@ export class NotificationOrchestratorService {
             } else {
               result.sent++;
             }
-          } else {
-            result.failed++;
+          } else { result.failed++;
             result.errors.push({
-              userId,
+              user_id,
               error: notificationResult.error || 'Unknown error'
-            });
+             });
           }
-        } catch (error) {
-          result.failed++;
+        } catch (error) { result.failed++;
           result.errors.push({
-            userId,
+            user_id,
             error: error instanceof Error ? error.message : String(error)
-          });
+           });
         }
       });
 
@@ -497,10 +487,9 @@ export class NotificationOrchestratorService {
    * Validate notification request structure and required fields.
    * Returns error message if validation fails, null if valid.
    */
-  private validateRequest(request: NotificationRequest): string | null {
-    if (!request.userId || typeof request.userId !== 'string') {
-      return 'Invalid or missing userId';
-    }
+  private validateRequest(request: NotificationRequest): string | null { if (!request.user_id || typeof request.user_id !== 'string') {
+      return 'Invalid or missing user_id';
+     }
 
     if (!request.notificationType) {
       return 'Missing notification type';
@@ -533,48 +522,47 @@ export class NotificationOrchestratorService {
    * customizing behavior for specific bills they care about deeply.
    */
   private async getCombinedPreferences(
-    userId: string, 
-    billId?: number
-  ): Promise<{ billTracking: CombinedBillTrackingPreferences }> {
-    try {
+    user_id: string, 
+    bill_id?: number
+  ): Promise<{ billTracking: CombinedBillTrackingPreferences }> { try {
       // Fetch global preferences from the user preferences service
-      const globalPrefsContainer = await userPreferencesService.getUserPreferences(userId);
+      const globalPrefsContainer = await userPreferencesService.getUserPreferences(user_id);
       const globalBillPrefs = globalPrefsContainer.billTracking;
 
       // Fetch per-bill preferences if a specific bill is referenced
-      let perBillPrefs: typeof userBillTrackingPreference.$inferSelect | null = null;
-      if (billId) {
+      let perBillPrefs: typeof bill_tracking_preferences.$inferSelect | null = null;
+      if (bill_id) {
         const [result] = await this.db.select()
-          .from(userBillTrackingPreference)
+          .from(bill_tracking_preferences)
           .where(and(
-            eq(userBillTrackingPreference.userId, userId),
-            eq(userBillTrackingPreference.billId, billId)
+            eq(bill_tracking_preferences.user_id, user_id),
+            eq(bill_tracking_preferences.bill_id, bill_id)
           ))
           .limit(1);
         perBillPrefs = result || null;
-      }
+        }
 
       // Merge preferences with per-bill settings taking precedence
-      if (perBillPrefs && perBillPrefs.isActive !== false) {
+      if (perBillPrefs && perBillPrefs.is_active !== false) {
         // Per-bill settings exist and are active - use them to override global settings
         const combined: CombinedBillTrackingPreferences = {
           // Start with global settings as the base
           ...globalBillPrefs,
           
           // Override with per-bill specific settings where they exist
-          trackingTypes: perBillPrefs.trackingTypes ?? globalBillPrefs.trackingTypes,
+          tracking_types: perBillPrefs.tracking_types ?? globalBillPrefs.tracking_types,
           
           // Map alert frequency from per-bill to global format
-          alertFrequency: (perBillPrefs.alertFrequency as GlobalBillTrackingPreferences['updateFrequency']) 
+          alert_frequency: (perBillPrefs.alert_frequency as GlobalBillTrackingPreferences['updateFrequency']) 
             ?? globalBillPrefs.updateFrequency,
-          updateFrequency: (perBillPrefs.alertFrequency as GlobalBillTrackingPreferences['updateFrequency']) 
+          updateFrequency: (perBillPrefs.alert_frequency as GlobalBillTrackingPreferences['updateFrequency']) 
             ?? globalBillPrefs.updateFrequency,
           
           // Merge channel preferences intelligently
-          alertChannels: perBillPrefs.alertChannels ?? [],
+          alert_channels: perBillPrefs.alert_channels ?? [],
           notificationChannels: this.mergeChannels(
             globalBillPrefs.notificationChannels, 
-            perBillPrefs.alertChannels
+            perBillPrefs.alert_channels
           ),
           
           // Keep global settings for features not typically overridden per-bill
@@ -586,15 +574,14 @@ export class NotificationOrchestratorService {
           _perBillSettingsApplied: true
         };
 
-        logger.debug(`Using merged preferences for user ${userId}, bill ${billId}`, {
+        logger.debug(`Using merged preferences for user ${ user_id }, bill ${ bill_id }`, {
           component: 'NotificationOrchestrator',
           hasPerBillOverrides: true
         });
         
         return { billTracking: combined };
-      } else {
-        // No per-bill settings or they're inactive - use global preferences
-        logger.debug(`Using global preferences for user ${userId}, bill ${billId}`, {
+      } else { // No per-bill settings or they're inactive - use global preferences
+        logger.debug(`Using global preferences for user ${user_id }, bill ${ bill_id }`, {
           component: 'NotificationOrchestrator',
           hasPerBillOverrides: false
         });
@@ -602,8 +589,8 @@ export class NotificationOrchestratorService {
         // Create a combined object that maintains type consistency
         const globalCombined: CombinedBillTrackingPreferences = {
           ...globalBillPrefs,
-          alertFrequency: globalBillPrefs.updateFrequency,
-          alertChannels: Object.entries(globalBillPrefs.notificationChannels)
+          alert_frequency: globalBillPrefs.updateFrequency,
+          alert_channels: Object.entries(globalBillPrefs.notificationChannels)
             .filter(([, enabled]) => enabled)
             .map(([channel]) => {
               // Map channel names to per-bill format
@@ -620,8 +607,7 @@ export class NotificationOrchestratorService {
         
         return { billTracking: globalCombined };
       }
-    } catch (error) {
-      logger.error(`Error fetching combined preferences for user ${userId}, bill ${billId}:`, {
+    } catch (error) { logger.error(`Error fetching combined preferences for user ${user_id }, bill ${ bill_id }:`, {
         component: 'NotificationOrchestrator'
       }, error);
       
@@ -632,9 +618,9 @@ export class NotificationOrchestratorService {
         votingSchedule: true,
         amendments: true,
         updateFrequency: 'daily',
-        alertFrequency: 'daily',
+        alert_frequency: 'daily',
         notificationChannels: { inApp: true, email: false, push: false, sms: false },
-        alertChannels: ['in_app'],
+        alert_channels: ['in_app'],
         quietHours: { enabled: false, start: '22:00', end: '08:00' },
         smartFiltering: { enabled: true, priorityThreshold: 'low' },
         advancedSettings: {
@@ -655,7 +641,7 @@ export class NotificationOrchestratorService {
    * Intelligently merge global and per-bill channel settings.
    * 
    * If per-bill channels are specified, they completely override global settings
-   * for that bill. This gives users fine-grained control without complex merging logic.
+   * for that bills. This gives users fine-grained control without complex merging logic.
    */
   private mergeChannels(
     globalChannels: GlobalBillTrackingPreferences['notificationChannels'],
@@ -712,10 +698,9 @@ export class NotificationOrchestratorService {
     }
 
     // Prepare criteria for filter service, including merged preferences
-    const billId = request.relatedBillId ?? request.billId;
-    const filterCriteria: FilterCriteria = {
-      userId: request.userId,
-      billId: billId,
+    const bill_id = request.relatedBillId ?? request.bill_id;
+    const filterCriteria: FilterCriteria = { user_id: request.user_id,
+      bill_id: bill_id,
       category: request.category,
       tags: request.tags,
       sponsorName: request.sponsorName,
@@ -724,16 +709,15 @@ export class NotificationOrchestratorService {
       subType: request.subType,
       content: request.content,
       userPreferences: combinedPrefs.billTracking // Pass merged preferences to filter
-    };
+      };
 
     try {
       return await smartNotificationFilterService.shouldSendNotification(filterCriteria);
-    } catch (error) {
-      // Fail open: if filtering fails, allow notification but log the error
+    } catch (error) { // Fail open: if filtering fails, allow notification but log the error
       logger.error('Smart filtering service error, allowing notification:', {
         component: 'NotificationOrchestrator',
-        userId: request.userId
-      }, error);
+        user_id: request.user_id
+       }, error);
       
       return {
         shouldNotify: true,
@@ -775,7 +759,7 @@ export class NotificationOrchestratorService {
     }
 
     // Rule 3: Check user's preferred update frequency
-    const frequency = combinedPrefs.billTracking.alertFrequency 
+    const frequency = combinedPrefs.billTracking.alert_frequency 
       ?? combinedPrefs.billTracking.updateFrequency;
     if (frequency === 'immediate') {
       return false;
@@ -828,7 +812,7 @@ export class NotificationOrchestratorService {
 
       // Validate we have at least one delivery channel
       if (targetChannels.length === 0) {
-        logger.warn(`No active delivery channels for user ${request.userId}`, {
+        logger.warn(`No active delivery channels for user ${request.user_id}`, {
           component: 'NotificationOrchestrator'
         });
         return {
@@ -842,20 +826,19 @@ export class NotificationOrchestratorService {
       // Execute delivery across all target channels with retry logic
       const deliveryResults: DeliveryResult[] = [];
       const maxRetries = request.config?.retryOnFailure ? this.config.batching.maxRetries : 0;
-      const billId = request.relatedBillId ?? request.billId;
+      const bill_id = request.relatedBillId ?? request.bill_id;
 
-      for (const channel of targetChannels) {
-        const channelRequest: ChannelDeliveryRequest = {
-          userId: request.userId,
+      for (const channel of targetChannels) { const channelRequest: ChannelDeliveryRequest = {
+          user_id: request.user_id,
           channel: channel,
           content: request.content,
           metadata: {
             priority: filterResult.suggestedPriority || request.priority,
-            relatedBillId: billId,
+            relatedBillId: bill_id,
             category: request.category,
             actionUrl: request.metadata?.actionUrl,
             ...request.metadata
-          }
+            }
         };
 
         // Retry loop with exponential backoff
@@ -867,10 +850,9 @@ export class NotificationOrchestratorService {
             result = await notificationChannelService.sendToChannel(channelRequest);
             if (result.success) break; // Success - exit retry loop
           } catch (channelError) {
-            logger.error(`Error sending to channel ${channel} (Attempt ${attempt + 1})`, {
-              component: 'NotificationOrchestrator',
-              userId: request.userId
-            }, channelError);
+            logger.error(`Error sending to channel ${channel} (Attempt ${attempt + 1})`, { component: 'NotificationOrchestrator',
+              user_id: request.user_id
+             }, channelError);
             result = {
               success: false,
               channel: channel,
@@ -882,10 +864,9 @@ export class NotificationOrchestratorService {
           if (attempt <= maxRetries) {
             this.metrics.totalRetried++;
             const delayMs = Math.pow(2, attempt - 1) * 1000; // Exponential backoff: 1s, 2s, 4s
-            logger.warn(`Retrying channel ${channel} delivery in ${delayMs}ms (${attempt}/${maxRetries})`, {
-              component: 'NotificationOrchestrator',
-              userId: request.userId
-            });
+            logger.warn(`Retrying channel ${channel} delivery in ${delayMs}ms (${attempt}/${maxRetries})`, { component: 'NotificationOrchestrator',
+              user_id: request.user_id
+             });
             await this.delay(delayMs);
           }
         }
@@ -908,10 +889,9 @@ export class NotificationOrchestratorService {
         this.metrics.totalFailed++;
       }
 
-      logger.info('Immediate delivery processed', {
-        component: 'NotificationOrchestrator',
-        userId: request.userId,
-        results: deliveryResults.map(r => ({ channel: r.channel, success: r.success })),
+      logger.info('Immediate delivery processed', { component: 'NotificationOrchestrator',
+        user_id: request.user_id,
+        results: deliveryResults.map(r => ({ channel: r.channel, success: r.success  })),
         overallSuccess: anySucceeded
       });
 
@@ -923,11 +903,10 @@ export class NotificationOrchestratorService {
         notificationId: deliveryResults.find(r => r.success)?.messageId
       };
 
-    } catch (error) {
-      logger.error('Unhandled error during immediate delivery:', {
+    } catch (error) { logger.error('Unhandled error during immediate delivery:', {
         component: 'NotificationOrchestrator',
-        userId: request.userId
-      }, error);
+        user_id: request.user_id
+       }, error);
       
       return {
         success: false,
@@ -953,24 +932,23 @@ export class NotificationOrchestratorService {
     request: NotificationRequest,
     filterResult: FilterResult,
     combinedPrefs: { billTracking: CombinedBillTrackingPreferences }
-  ): Promise<string> {
-    // Determine batch frequency from merged preferences
-    const frequency = combinedPrefs.billTracking.alertFrequency 
+  ): Promise<string> { // Determine batch frequency from merged preferences
+    const frequency = combinedPrefs.billTracking.alert_frequency 
       ?? combinedPrefs.billTracking.updateFrequency;
-    const batchKey = this.getBatchKey(request.userId, frequency);
+    const batchKey = this.getBatchKey(request.user_id, frequency);
 
     // Get or create batch
     let batch = this.batches.get(batchKey);
     if (!batch) {
       batch = {
         id: batchKey,
-        userId: request.userId,
+        user_id: request.user_id,
         notifications: [],
         scheduledFor: this.calculateBatchSchedule(frequency),
-        createdAt: new Date(),
+        created_at: new Date(),
         status: 'pending',
         retryCount: 0
-      };
+       };
       this.batches.set(batchKey, batch);
     }
 
@@ -1037,14 +1015,13 @@ export class NotificationOrchestratorService {
       });
 
       // Fetch CURRENT preferences (not cached) for accurate delivery channel selection
-      const currentCombinedPrefs = await this.getCombinedPreferences(batch.userId);
+      const currentCombinedPrefs = await this.getCombinedPreferences(batch.user_id);
 
       // Create digest content from all batched notifications
       const digestContent = this.createDigestContent(batch.notifications);
 
       // Create digest notification request
-      const digestRequest: NotificationRequest = {
-        userId: batch.userId,
+      const digestRequest: NotificationRequest = { user_id: batch.user_id,
         notificationType: 'digest',
         priority: 'medium',
         content: digestContent,
@@ -1052,7 +1029,7 @@ export class NotificationOrchestratorService {
           batchId: batch.id,
           notificationCount: batch.notifications.length,
           hasUrgent: batch.notifications.some(n => n.priority === 'urgent')
-        },
+         },
         config: {
           forceImmediate: true, // Digests are always delivered immediately
           skipFiltering: true // Digests bypass filtering (already filtered)
@@ -1200,9 +1177,8 @@ export class NotificationOrchestratorService {
    * Implements sliding window rate limiting with separate counters for
    * urgent notifications to prevent abuse while allowing critical updates.
    */
-  private checkRateLimit(userId: string, priority: string): { allowed: boolean; reason?: string } {
-    const now = Date.now();
-    let limitState = this.rateLimits.get(userId);
+  private checkRateLimit(user_id: string, priority: string): { allowed: boolean; reason?: string } { const now = Date.now();
+    let limitState = this.rateLimits.get(user_id);
 
     // Initialize or reset if time window expired
     if (!limitState || now > limitState.resetTime) {
@@ -1211,8 +1187,8 @@ export class NotificationOrchestratorService {
         urgentCount: 0,
         resetTime: now + this.config.rateLimiting.windowMs,
         lastNotificationTime: now
-      };
-      this.rateLimits.set(userId, limitState);
+       };
+      this.rateLimits.set(user_id, limitState);
     }
 
     // Check general notification limit
@@ -1237,14 +1213,13 @@ export class NotificationOrchestratorService {
   /**
    * Update rate limit counters after successful delivery.
    */
-  private updateRateLimit(userId: string, priority: string): void {
-    const limitState = this.rateLimits.get(userId);
+  private updateRateLimit(user_id: string, priority: string): void { const limitState = this.rateLimits.get(user_id);
     if (limitState) {
       limitState.count++;
       limitState.lastNotificationTime = Date.now();
       if (priority === 'urgent') {
         limitState.urgentCount++;
-      }
+       }
     }
   }
 
@@ -1344,17 +1319,16 @@ export class NotificationOrchestratorService {
    * Periodically removes expired rate limits and old failed batches
    * to prevent unbounded memory growth.
    */
-  private startCleanupTasks(): void {
-    // Clean expired rate limits
+  private startCleanupTasks(): void { // Clean expired rate limits
     const rateLimitCleanup = setInterval(() => {
       const now = Date.now();
       let cleaned = 0;
       
-      for (const [userId, state] of this.rateLimits.entries()) {
+      for (const [user_id, state] of this.rateLimits.entries()) {
         if (now > state.resetTime) {
-          this.rateLimits.delete(userId);
+          this.rateLimits.delete(user_id);
           cleaned++;
-        }
+         }
       }
       
       if (cleaned > 0) {
@@ -1371,7 +1345,7 @@ export class NotificationOrchestratorService {
       let cleaned = 0;
       
       for (const [batchId, batch] of this.batches.entries()) {
-        if (batch.status === 'failed' && batch.createdAt < cutoffTime) {
+        if (batch.status === 'failed' && batch.created_at < cutoffTime) {
           this.batches.delete(batchId);
           cleaned++;
         }
@@ -1399,23 +1373,22 @@ export class NotificationOrchestratorService {
    * appropriately for the user's preferred delivery frequency.
    */
   private getBatchKey(
-    userId: string, 
+    user_id: string, 
     frequency: GlobalBillTrackingPreferences['updateFrequency']
   ): string {
     const now = new Date();
     const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     const hourStr = String(now.getHours()).padStart(2, '0');
 
-    switch (frequency) {
-      case 'daily':
-        return `${userId}-daily-${dateStr}`;
+    switch (frequency) { case 'daily':
+        return `${user_id }-daily-${dateStr}`;
       case 'hourly':
-        return `${userId}-hourly-${dateStr}-${hourStr}`;
+        return `${ user_id }-hourly-${dateStr}-${hourStr}`;
       case 'immediate':
       default:
         // Create 5-minute windows for immediate notifications to enable debouncing
         const minuteWindow = Math.floor(now.getMinutes() / 5) * 5;
-        return `${userId}-immediate-${dateStr}-${hourStr}-${String(minuteWindow).padStart(2, '0')}`;
+        return `${ user_id }-immediate-${dateStr}-${hourStr}-${String(minuteWindow).padStart(2, '0')}`;
     }
   }
 

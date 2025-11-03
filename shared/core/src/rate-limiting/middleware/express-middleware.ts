@@ -134,7 +134,7 @@ export function createExpressRateLimitMiddleware(options: ExpressRateLimitOption
         remaining: result.remaining,
         processingTime,
         ip: req.ip,
-        userAgent: req.get('User-Agent'),
+        user_agent: req.get('User-Agent'),
         path: req.path,
         method: req.method
       });
@@ -191,13 +191,12 @@ export function createExpressRateLimitMiddleware(options: ExpressRateLimitOption
   };
 }
 
-function defaultKeyGenerator(req: Request): string {
-  // More sophisticated key generation
+function defaultKeyGenerator(req: Request): string { // More sophisticated key generation
   const ip = req.ip || req.connection.remoteAddress || 'unknown';
-  const userId = (req as any).user?.id;
+  const user_id = (req as any).user?.id;
 
-  if (userId) {
-    return `user:${userId}`;
+  if (user_id) {
+    return `user:${user_id }`;
   }
 
   return `ip:${ip}`;

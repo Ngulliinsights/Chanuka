@@ -411,11 +411,11 @@ export class BrowserDetector {
    * Parse user agent string to detect browser
    */
   private parseUserAgent(): { name: string; version: string; majorVersion: number } {
-    const userAgent = navigator.userAgent;
+    const user_agent = navigator.user_agent;
     
     // Internet Explorer (legacy support)
-    if (userAgent.includes('MSIE') || userAgent.includes('Trident/')) {
-      const ieMatch = userAgent.match(/(?:MSIE |rv:)(\d+)\.(\d+)/);
+    if (user_agent.includes('MSIE') || user_agent.includes('Trident/')) {
+      const ieMatch = user_agent.match(/(?:MSIE |rv:)(\d+)\.(\d+)/);
       if (ieMatch) {
         return {
           name: 'ie',
@@ -426,8 +426,8 @@ export class BrowserDetector {
     }
     
     // Edge Legacy (EdgeHTML)
-    if (userAgent.includes('Edge/')) {
-      const match = userAgent.match(/Edge\/(\d+)\.(\d+)/);
+    if (user_agent.includes('Edge/')) {
+      const match = user_agent.match(/Edge\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'edge-legacy',
@@ -438,8 +438,8 @@ export class BrowserDetector {
     }
     
     // Edge (Chromium-based)
-    if (userAgent.includes('Edg/')) {
-      const match = userAgent.match(/Edg\/(\d+)\.(\d+)/);
+    if (user_agent.includes('Edg/')) {
+      const match = user_agent.match(/Edg\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'edge',
@@ -450,8 +450,8 @@ export class BrowserDetector {
     }
     
     // Chrome (must be checked before Safari)
-    if (userAgent.includes('Chrome') && !userAgent.includes('Edg')) {
-      const match = userAgent.match(/Chrome\/(\d+)\.(\d+)/);
+    if (user_agent.includes('Chrome') && !user_agent.includes('Edg')) {
+      const match = user_agent.match(/Chrome\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'chrome',
@@ -462,8 +462,8 @@ export class BrowserDetector {
     }
     
     // Firefox
-    if (userAgent.includes('Firefox')) {
-      const match = userAgent.match(/Firefox\/(\d+)\.(\d+)/);
+    if (user_agent.includes('Firefox')) {
+      const match = user_agent.match(/Firefox\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'firefox',
@@ -474,8 +474,8 @@ export class BrowserDetector {
     }
     
     // Safari (must be checked after Chrome)
-    if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
-      const match = userAgent.match(/Version\/(\d+)\.(\d+)/);
+    if (user_agent.includes('Safari') && !user_agent.includes('Chrome')) {
+      const match = user_agent.match(/Version\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'safari',
@@ -486,8 +486,8 @@ export class BrowserDetector {
     }
     
     // Opera (modern)
-    if (userAgent.includes('OPR/')) {
-      const match = userAgent.match(/OPR\/(\d+)\.(\d+)/);
+    if (user_agent.includes('OPR/')) {
+      const match = user_agent.match(/OPR\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'opera',
@@ -498,8 +498,8 @@ export class BrowserDetector {
     }
     
     // Opera (legacy)
-    if (userAgent.includes('Opera')) {
-      const match = userAgent.match(/Opera[\/\s](\d+)\.(\d+)/);
+    if (user_agent.includes('Opera')) {
+      const match = user_agent.match(/Opera[\/\s](\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'opera',
@@ -510,8 +510,8 @@ export class BrowserDetector {
     }
     
     // Samsung Internet
-    if (userAgent.includes('SamsungBrowser')) {
-      const match = userAgent.match(/SamsungBrowser\/(\d+)\.(\d+)/);
+    if (user_agent.includes('SamsungBrowser')) {
+      const match = user_agent.match(/SamsungBrowser\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'samsung',
@@ -522,8 +522,8 @@ export class BrowserDetector {
     }
     
     // iOS Safari
-    if (userAgent.includes('iPhone') || userAgent.includes('iPad')) {
-      const match = userAgent.match(/OS (\d+)_(\d+)/);
+    if (user_agent.includes('iPhone') || user_agent.includes('iPad')) {
+      const match = user_agent.match(/OS (\d+)_(\d+)/);
       if (match) {
         return {
           name: 'ios',
@@ -534,8 +534,8 @@ export class BrowserDetector {
     }
     
     // Android Chrome
-    if (userAgent.includes('Android')) {
-      const chromeMatch = userAgent.match(/Chrome\/(\d+)\.(\d+)/);
+    if (user_agent.includes('Android')) {
+      const chromeMatch = user_agent.match(/Chrome\/(\d+)\.(\d+)/);
       if (chromeMatch) {
         return {
           name: 'android',
@@ -545,7 +545,7 @@ export class BrowserDetector {
       }
       
       // Android WebView or other Android browsers
-      const androidMatch = userAgent.match(/Android (\d+)\.(\d+)/);
+      const androidMatch = user_agent.match(/Android (\d+)\.(\d+)/);
       if (androidMatch) {
         return {
           name: 'android',
@@ -556,8 +556,8 @@ export class BrowserDetector {
     }
     
     // UC Browser
-    if (userAgent.includes('UCBrowser')) {
-      const match = userAgent.match(/UCBrowser\/(\d+)\.(\d+)/);
+    if (user_agent.includes('UCBrowser')) {
+      const match = user_agent.match(/UCBrowser\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'uc',
@@ -568,8 +568,8 @@ export class BrowserDetector {
     }
     
     // QQ Browser
-    if (userAgent.includes('QQBrowser')) {
-      const match = userAgent.match(/QQBrowser\/(\d+)\.(\d+)/);
+    if (user_agent.includes('QQBrowser')) {
+      const match = user_agent.match(/QQBrowser\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'qq',

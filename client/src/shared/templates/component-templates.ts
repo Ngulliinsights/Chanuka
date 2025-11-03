@@ -1383,9 +1383,9 @@ describe('${this.toCamelCase(componentName)}-utils', () => {
 
   describe('get${pascalName}DisplayName', () => {
     it('should return display name', () => {
-      const displayName = get${pascalName}DisplayName(mockData);
+      const display_name = get${pascalName}DisplayName(mockData);
       
-      expect(displayName).toBe('test-id');
+      expect(display_name).toBe('test-id');
     });
   });
 

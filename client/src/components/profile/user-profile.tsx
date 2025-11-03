@@ -25,47 +25,47 @@ import { logger } from '../../utils/browser-logger';
 interface UserProfile {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   name: string;
   role: string;
-  verificationStatus: string;
-  createdAt: string;
+  verification_status: string;
+  created_at: string;
   profile: {
     bio?: string;
     expertise?: string[];
     location?: string;
     organization?: string;
-    reputationScore: number; // This remains required as it comes from API
-    isPublic: boolean;
+    reputation_score: number; // This remains required as it comes from API
+    is_public: boolean;
   };
   interests: string[];
 }
 
 // Separate interface for editing - this makes optional what users can actually edit
 interface EditableProfileData {
-  firstName?: string;
-  lastName?: string;
+  first_name?: string;
+  last_name?: string;
   profile?: {
     bio?: string;
     expertise?: string[];
     location?: string;
     organization?: string;
-    isPublic?: boolean;
-    // Note: reputationScore is not editable, so we exclude it from edit state
+    is_public?: boolean;
+    // Note: reputation_score is not editable, so we exclude it from edit state
   };
 }
 
 // API update payload interface - defines what can be sent to the server
 interface ProfileUpdatePayload {
-  firstName?: string;
-  lastName?: string;
+  first_name?: string;
+  last_name?: string;
   profile?: {
     bio?: string;
     expertise?: string[];
     location?: string;
     organization?: string;
-    isPublic?: boolean;
+    is_public?: boolean;
   };
 }
 
@@ -168,21 +168,21 @@ const UserProfile: FC = () => {
     
     setIsEditing(true);
     setEditData({
-      firstName: profile.firstName,
-      lastName: profile.lastName,
+      first_name: profile.first_name,
+      last_name: profile.last_name,
       profile: {
         bio: profile.profile?.bio || "",
         location: profile.profile?.location || "",
         organization: profile.profile?.organization || "",
         expertise: profile.profile?.expertise || [],
-        isPublic: profile.profile?.isPublic || false,
+        is_public: profile.profile?.is_public || false,
       },
     });
   };
 
   // Save changes with proper validation
   const handleSave = (): void => {
-    if (!editData.firstName?.trim() || !editData.lastName?.trim()) {
+    if (!editData.first_name?.trim() || !editData.last_name?.trim()) {
       toast({
         title: "Validation Error",
         description: "First name and last name are required.",
@@ -193,14 +193,14 @@ const UserProfile: FC = () => {
 
     // Create the payload, ensuring we only send what's actually changed
     const payload: ProfileUpdatePayload = {
-      firstName: editData.firstName.trim(),
-      lastName: editData.lastName.trim(),
+      first_name: editData.first_name.trim(),
+      last_name: editData.last_name.trim(),
       profile: {
         bio: editData.profile?.bio?.trim() || "",
         location: editData.profile?.location?.trim() || "",
         organization: editData.profile?.organization?.trim() || "",
         expertise: editData.profile?.expertise || [],
-        isPublic: editData.profile?.isPublic || false,
+        is_public: editData.profile?.is_public || false,
       },
     };
 
@@ -359,24 +359,24 @@ const UserProfile: FC = () => {
                     {profile.role}
                   </Badge>
                   <Badge
-                    className={getVerificationColor(profile.verificationStatus)}
+                    className={getVerificationColor(profile.verification_status)}
                   >
-                    {profile.verificationStatus}
+                    {profile.verification_status}
                   </Badge>
-                  {profile.profile?.reputationScore > 0 && (
+                  {profile.profile?.reputation_score > 0 && (
                     <Badge
                       variant="outline"
                       className="flex items-center space-x-1"
                     >
                       <Award className="h-3 w-3" />
-                      <span>{profile.profile.reputationScore}</span>
+                      <span>{profile.profile.reputation_score}</span>
                     </Badge>
                   )}
                 </div>
               </div>
             </div>
             <div className="flex items-center space-x-2">
-              {profile.profile?.isPublic ? (
+              {profile.profile?.is_public ? (
                 <Eye className="h-4 w-4 text-green-600" />
               ) : (
                 <EyeOff className="h-4 w-4 text-gray-400" />
@@ -418,28 +418,28 @@ const UserProfile: FC = () => {
               <>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
+                    <Label htmlFor="first_name">First Name</Label>
                     <Input
-                      id="firstName"
-                      value={editData.firstName || ""}
+                      id="first_name"
+                      value={editData.first_name || ""}
                       onChange={(e) =>
                         setEditData((prev) => ({
                           ...prev,
-                          firstName: e.target.value,
+                          first_name: e.target.value,
                         }))
                       }
                       placeholder="Enter first name"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
+                    <Label htmlFor="last_name">Last Name</Label>
                     <Input
-                      id="lastName"
-                      value={editData.lastName || ""}
+                      id="last_name"
+                      value={editData.last_name || ""}
                       onChange={(e) =>
                         setEditData((prev) => ({
                           ...prev,
-                          lastName: e.target.value,
+                          last_name: e.target.value,
                         }))
                       }
                       placeholder="Enter last name"
@@ -505,16 +505,16 @@ const UserProfile: FC = () => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <Switch
-                    id="isPublic"
-                    checked={editData.profile?.isPublic || false}
+                    id="is_public"
+                    checked={editData.profile?.is_public || false}
                     onCheckedChange={(checked) =>
                       setEditData((prev) => ({
                         ...prev,
-                        profile: { ...prev.profile, isPublic: checked },
+                        profile: { ...prev.profile, is_public: checked },
                       }))
                     }
                   />
-                  <Label htmlFor="isPublic">Make profile public</Label>
+                  <Label htmlFor="is_public">Make profile public</Label>
                 </div>
               </>
             ) : (
@@ -524,7 +524,7 @@ const UserProfile: FC = () => {
                     Full Name
                   </Label>
                   <p className="font-medium">
-                    {profile.firstName} {profile.lastName}
+                    {profile.first_name} {profile.last_name}
                   </p>
                 </div>
                 {profile.profile?.bio && (

@@ -58,14 +58,14 @@ describe('Financial Disclosure API Endpoints', () => {
     });
 
     it('should filter disclosures by sponsor ID', async () => {
-      const sponsorId = 1;
+      const sponsor_id = 1;
       const response = await request(app)
         .get('/api/financial-disclosure/disclosures')
-        .query({ sponsorId })
+        .query({ sponsor_id })
         .expect(200);
 
       expect(response.body.success).toBe(true);
-      expect(response.body.data.sponsorId).toBe(sponsorId);
+      expect(response.body.data.sponsor_id).toBe(sponsor_id);
     });
 
     it('should handle invalid query parameters', async () => {
@@ -78,15 +78,15 @@ describe('Financial Disclosure API Endpoints', () => {
     });
   });
 
-  describe('GET /api/financial-disclosure/relationships/:sponsorId', () => {
+  describe('GET /api/financial-disclosure/relationships/:sponsor_id', () => {
     it('should return financial relationships for valid sponsor', async () => {
-      const sponsorId = 1;
+      const sponsor_id = 1;
       const response = await request(app)
-        .get(`/api/financial-disclosure/relationships/${sponsorId}`)
+        .get(`/api/financial-disclosure/relationships/${sponsor_id}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
-      expect(response.body.data).toHaveProperty('sponsorId', sponsorId);
+      expect(response.body.data).toHaveProperty('sponsor_id', sponsor_id);
       expect(response.body.data).toHaveProperty('relationships');
       expect(response.body.data).toHaveProperty('count');
       expect(Array.isArray(response.body.data.relationships)).toBe(true);
@@ -101,9 +101,9 @@ describe('Financial Disclosure API Endpoints', () => {
     });
 
     it('should respect cache control headers', async () => {
-      const sponsorId = 1;
+      const sponsor_id = 1;
       const response = await request(app)
-        .get(`/api/financial-disclosure/relationships/${sponsorId}`)
+        .get(`/api/financial-disclosure/relationships/${sponsor_id}`)
         .set('Cache-Control', 'no-cache')
         .expect(200);
 
@@ -111,15 +111,15 @@ describe('Financial Disclosure API Endpoints', () => {
     });
   });
 
-  describe('GET /api/financial-disclosure/completeness/:sponsorId', () => {
+  describe('GET /api/financial-disclosure/completeness/:sponsor_id', () => {
     it('should return completeness report for valid sponsor', async () => {
-      const sponsorId = 1;
+      const sponsor_id = 1;
       const response = await request(app)
-        .get(`/api/financial-disclosure/completeness/${sponsorId}`)
+        .get(`/api/financial-disclosure/completeness/${sponsor_id}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
-      expect(response.body.data).toHaveProperty('sponsorId', sponsorId);
+      expect(response.body.data).toHaveProperty('sponsor_id', sponsor_id);
       expect(response.body.data).toHaveProperty('overallScore');
       expect(response.body.data).toHaveProperty('calculatedAt');
     });
@@ -137,7 +137,7 @@ describe('Financial Disclosure API Endpoints', () => {
     it('should create new disclosure alert', async () => {
       const alertData = {
         type: 'new_disclosure',
-        sponsorId: 1,
+        sponsor_id: 1,
         description: 'Test alert description',
         severity: 'info'
       };
@@ -150,13 +150,13 @@ describe('Financial Disclosure API Endpoints', () => {
       expect(response.body.success).toBe(true);
       expect(response.body.data).toHaveProperty('id');
       expect(response.body.data).toHaveProperty('type', alertData.type);
-      expect(response.body.data).toHaveProperty('sponsorId', alertData.sponsorId);
+      expect(response.body.data).toHaveProperty('sponsor_id', alertData.sponsor_id);
     });
 
     it('should validate alert data', async () => {
       const invalidAlertData = {
         type: 'invalid_type',
-        sponsorId: 'invalid',
+        sponsor_id: 'invalid',
         description: 'x', // Too short
         severity: 'invalid_severity'
       };
@@ -170,23 +170,23 @@ describe('Financial Disclosure API Endpoints', () => {
     });
   });
 
-  describe('GET /api/financial-disclosure/alerts/:sponsorId', () => {
+  describe('GET /api/financial-disclosure/alerts/:sponsor_id', () => {
     it('should return alerts for valid sponsor', async () => {
-      const sponsorId = 1;
+      const sponsor_id = 1;
       const response = await request(app)
-        .get(`/api/financial-disclosure/alerts/${sponsorId}`)
+        .get(`/api/financial-disclosure/alerts/${sponsor_id}`)
         .expect(200);
 
       expect(response.body.success).toBe(true);
-      expect(response.body.data).toHaveProperty('sponsorId', sponsorId);
+      expect(response.body.data).toHaveProperty('sponsor_id', sponsor_id);
       expect(response.body.data).toHaveProperty('alerts');
       expect(Array.isArray(response.body.data.alerts)).toBe(true);
     });
 
     it('should filter alerts by type and severity', async () => {
-      const sponsorId = 1;
+      const sponsor_id = 1;
       const response = await request(app)
-        .get(`/api/financial-disclosure/alerts/${sponsorId}`)
+        .get(`/api/financial-disclosure/alerts/${sponsor_id}`)
         .query({ type: 'missing_disclosure', severity: 'critical', limit: 5 })
         .expect(200);
 

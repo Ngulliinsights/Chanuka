@@ -12,7 +12,7 @@ export interface OfflineEvent {
   type: 'page_view' | 'user_action' | 'api_error' | 'sync_error' | 'connection_change' | 'cache_hit' | 'cache_miss' | 'performance_metric' | 'visibility_change';
   timestamp: number;
   data: any;
-  userAgent: string;
+  user_agent: string;
   url: string;
   sessionId: string;
   connectionType?: string;
@@ -80,7 +80,7 @@ class OfflineAnalyticsManager {
       type,
       timestamp: Date.now(),
       data,
-      userAgent: navigator.userAgent,
+      user_agent: navigator.user_agent,
       url: window.location.href,
       sessionId: this.sessionId,
       connectionType: this.getConnectionType(),
@@ -224,7 +224,7 @@ class OfflineAnalyticsManager {
       context,
       timestamp: Date.now(),
       sessionId: this.sessionId,
-      userAgent: navigator.userAgent,
+      user_agent: navigator.user_agent,
       url: window.location.href,
       isOffline: !navigator.onLine,
       connectionType: this.getConnectionType(),

@@ -1,26 +1,24 @@
-import { database as db } from '../shared/database/connection';
-import { users, userProfiles, billComments, notifications, sessions } from '../../../shared/schema';
+import { database as db } from '@shared/database/connection';
+import { users, user_profiles, comments, notifications, sessions } from '@shared/schema';
 import { eq, and, lt } from 'drizzle-orm';
 import { encryptionService } from './encryption-service.js';
 import { securityAuditService } from './security-audit-service.js';
 import { Request } from 'express';
 import { logger  } from '../../../shared/core/src/index.js';
 
-export interface DataExportRequest {
-  userId: string;
+export interface DataExportRequest { user_id: string;
   requestedBy: string;
   dataTypes: string[];
   format: 'json' | 'csv' | 'xml';
   includeDeleted?: boolean;
-}
+ }
 
-export interface DataDeletionRequest {
-  userId: string;
+export interface DataDeletionRequest { user_id: string;
   requestedBy: string;
   deletionType: 'soft' | 'hard';
   reason: string;
   retainAuditLogs?: boolean;
-}
+ }
 
 export interface PrivacyPreferences {
   dataProcessing: {
@@ -61,8 +59,7 @@ export class PrivacyService {
   /**
    * Export user data in requested format
    */
-  async exportUserData(request: DataExportRequest, req: Request): Promise<any> {
-    try {
+  async exportUserData(request: DataExportRequest, req: Request): Promise<any> { try {
       // Log the data export request
       await securityAuditService.logDataAccess(
         'user_data_export',
@@ -77,10 +74,10 @@ export class PrivacyService {
         exportInfo: {
           requestedAt: new Date().toISOString(),
           requestedBy: request.requestedBy,
-          userId: request.userId,
+          user_id: request.user_id,
           format: request.format,
           dataTypes: request.dataTypes,
-        },
+         },
         userData: {},
       };
 
@@ -89,13 +86,13 @@ export class PrivacyService {
         const user = await db
           .select()
           .from(users)
-          .where(eq(users.id, request.userId))
+          .where(eq(users.id, request.user_id))
           .limit(1);
 
         const profile = await db
           .select()
-          .from(userProfiles)
-          .where(eq(userProfiles.userId, request.userId))
+          .from(user_profiles)
+          .where(eq(user_profiles.user_id, request.user_id))
           .limit(1);
 
         userData.userData.profile = user[0] || null;
@@ -114,7 +111,7 @@ export class PrivacyService {
   // Stub for deleting user data - conservative implementation
   async deleteUserData(request: DataDeletionRequest): Promise<boolean> {
     try {
-      logger.info(`Received data deletion request for user ${request.userId}`, { component: 'PrivacyService' });
+      logger.info(`Received data deletion request for user ${request.user_id}`, { component: 'PrivacyService' });
       // Implement deletion logic carefully to respect retention and audit.
       return true;
     } catch (err) {

@@ -20,45 +20,42 @@ import { cacheService } from '../../../../infrastructure/cache';
 /**
  * Migrates legacy alert preferences to the unified system
  * 
- * @param userId - The user ID to migrate
+ * @param user_id - The user ID to migrate
  * @param legacyPreferences - Old preference structure
  * @returns The newly created unified preferences
  */
 export async function migrateLegacyPreferences(
-  userId: string,
+  user_id: string,
   legacyPreferences: any
-): Promise<AlertPreference[]> {
-  try {
+): Promise<AlertPreference[]> { try {
     logger.info('Starting legacy preference migration', {
       component: 'AlertUtilities',
-      userId
-    });
+      user_id
+     });
 
     const migratedPreferences: AlertPreference[] = [];
 
     // Check if legacy preferences exist
-    if (!legacyPreferences || typeof legacyPreferences !== 'object') {
-      logger.warn('No legacy preferences found, creating default', {
+    if (!legacyPreferences || typeof legacyPreferences !== 'object') { logger.warn('No legacy preferences found, creating default', {
         component: 'AlertUtilities',
-        userId
-      });
+        user_id
+       });
       return [];
     }
 
     // Migrate from old "alerts" structure
-    if (legacyPreferences.alerts) {
-      const oldAlerts = legacyPreferences.alerts;
+    if (legacyPreferences.alerts) { const oldAlerts = legacyPreferences.alerts;
       
-      const newPreference = await unifiedAlertPreferenceService.createAlertPreference(userId, {
+      const newPreference = await unifiedAlertPreferenceService.createAlertPreference(user_id, {
         name: 'Migrated Alerts',
         description: 'Automatically migrated from legacy system',
-        isActive: oldAlerts.enabled !== false,
+        is_active: oldAlerts.enabled !== false,
         alertTypes: [
           {
             type: 'bill_status_change',
             enabled: oldAlerts.billStatusChanges !== false,
             priority: 'normal'
-          },
+           },
           {
             type: 'new_comment',
             enabled: oldAlerts.comments !== false,
@@ -85,7 +82,7 @@ export async function migrateLegacyPreferences(
         },
         smartFiltering: {
           enabled: true,
-          userInterestWeight: 0.6,
+          user_interestWeight: 0.6,
           engagementHistoryWeight: 0.3,
           trendingWeight: 0.1,
           duplicateFiltering: true,
@@ -98,14 +95,13 @@ export async function migrateLegacyPreferences(
     }
 
     // Migrate from "advancedAlerts" structure (from document 3)
-    if (legacyPreferences.advancedAlerts) {
-      const advanced = legacyPreferences.advancedAlerts;
+    if (legacyPreferences.advancedAlerts) { const advanced = legacyPreferences.advancedAlerts;
       
       if (advanced.granularSettings) {
-        const newPreference = await unifiedAlertPreferenceService.createAlertPreference(userId, {
+        const newPreference = await unifiedAlertPreferenceService.createAlertPreference(user_id, {
           name: 'Advanced Settings (Migrated)',
           description: 'Migrated from advanced alert settings',
-          isActive: true,
+          is_active: true,
           alertTypes: [
             {
               type: 'bill_status_change',
@@ -113,9 +109,9 @@ export async function migrateLegacyPreferences(
               priority: 'normal',
               conditions: {
                 billCategories: advanced.granularSettings.billStatusChanges?.categories || [],
-                sponsorIds: advanced.granularSettings.billStatusChanges?.sponsors?.map(Number) || [],
+                sponsor_ids: advanced.granularSettings.billStatusChanges?.sponsors?.map(Number) || [],
                 keywords: advanced.granularSettings.billStatusChanges?.customKeywords || []
-              }
+               }
             },
             {
               type: 'voting_scheduled',
@@ -142,18 +138,16 @@ export async function migrateLegacyPreferences(
       }
     }
 
-    logger.info(`Migrated ${migratedPreferences.length} preferences`, {
-      component: 'AlertUtilities',
-      userId
-    });
+    logger.info(`Migrated ${migratedPreferences.length} preferences`, { component: 'AlertUtilities',
+      user_id
+     });
 
     return migratedPreferences;
 
-  } catch (error) {
-    logger.error('Error migrating legacy preferences', {
+  } catch (error) { logger.error('Error migrating legacy preferences', {
       component: 'AlertUtilities',
-      userId
-    }, error);
+      user_id
+     }, error);
     throw error;
   }
 }
@@ -268,7 +262,7 @@ function migrateSmartFiltering(smartFiltering: any): any {
   if (!smartFiltering) {
     return {
       enabled: true,
-      userInterestWeight: 0.6,
+      user_interestWeight: 0.6,
       engagementHistoryWeight: 0.3,
       trendingWeight: 0.1,
       duplicateFiltering: true,
@@ -281,7 +275,7 @@ function migrateSmartFiltering(smartFiltering: any): any {
   
   return {
     enabled: interest.enabled !== false,
-    userInterestWeight: interest.enabled ? 0.6 : 0,
+    user_interestWeight: interest.enabled ? 0.6 : 0,
     engagementHistoryWeight: interest.useEngagementHistory ? 0.3 : 0,
     trendingWeight: 0.1,
     duplicateFiltering: true,
@@ -317,18 +311,17 @@ export async function processAllBatchedAlerts(
     let processed = 0;
     let failed = 0;
 
-    for (const key of batchKeys) {
-      try {
-        // Parse key to get userId and preferenceId
+    for (const key of batchKeys) { try {
+        // Parse key to get user_id and preferenceId
         const parts = key.split(':');
         if (parts.length !== 3) continue;
         
-        const userId = parts[1];
+        const user_id = parts[1];
         const preferenceId = parts[2];
 
         // Get the preference to check interval
         const preference = await unifiedAlertPreferenceService.getAlertPreference(
-          userId,
+          user_id,
           preferenceId
         );
 
@@ -341,17 +334,16 @@ export async function processAllBatchedAlerts(
         // For daily/weekly, check if it's the right time
         if (batchInterval === 'daily' || batchInterval === 'weekly') {
           if (!shouldProcessBatchNow(preference)) continue;
-        }
+         }
 
         // Process the batch
         const count = await unifiedAlertPreferenceService.processBatchedAlerts(
-          userId,
+          user_id,
           preferenceId
         );
 
-        if (count > 0) {
-          processed++;
-          logger.info(`Processed batch for user ${userId}, preference ${preferenceId}`, {
+        if (count > 0) { processed++;
+          logger.info(`Processed batch for user ${user_id }, preference ${preferenceId}`, {
             component: 'AlertUtilities',
             count
           });
@@ -460,7 +452,7 @@ export function generateAlertMessage(
     case 'engagement_milestone':
       return {
         title: `Engagement Milestone: ${alertData.billTitle || 'Tracked Bill'}`,
-        message: `${alertData.billTitle || 'A bill you\'re tracking'} has reached ${alertData.engagementCount || 0} ${alertData.engagementType || 'engagements'}!`
+        message: `${alertData.billTitle || 'A bill you\'re tracking'} has reached ${alertData.engagementCount || 0} ${alertData.engagement_type || 'engagements'}!`
       };
 
     default:
@@ -547,9 +539,8 @@ export function validateAlertData(
   }
 
   // Common validations
-  if (alertData.billId && typeof alertData.billId !== 'number') {
-    errors.push('billId must be a number');
-  }
+  if (alertData.bill_id && typeof alertData.bill_id !== 'number') { errors.push('bill_id must be a number');
+   }
 
   // Type-specific validations
   switch (alertType) {
@@ -577,7 +568,7 @@ export function validateAlertData(
 
     case 'engagement_milestone':
       if (!alertData.engagementCount) errors.push('engagementCount is required');
-      if (!alertData.engagementType) errors.push('engagementType is required');
+      if (!alertData.engagement_type) errors.push('engagement_type is required');
       break;
   }
 
@@ -595,24 +586,23 @@ export function validateAlertData(
  * Generates a comprehensive report for a user's alert activity
  */
 export async function generateUserAlertReport(
-  userId: string,
+  user_id: string,
   days: number = 30
 ): Promise<{
   summary: any;
   topAlertTypes: any[];
   channelPerformance: any[];
   recommendations: string[];
-}> {
-  try {
+}> { try {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const logs = await unifiedAlertPreferenceService.getAlertDeliveryLogs(userId, {
+    const logs = await unifiedAlertPreferenceService.getAlertDeliveryLogs(user_id, {
       startDate,
       limit: 1000
-    });
+     });
 
-    const stats = await unifiedAlertPreferenceService.getAlertPreferenceStats(userId);
+    const stats = await unifiedAlertPreferenceService.getAlertPreferenceStats(user_id);
 
     // Calculate top alert types
     const typeCounts: Record<string, number> = {};
@@ -665,11 +655,10 @@ export async function generateUserAlertReport(
       recommendations
     };
 
-  } catch (error) {
-    logger.error('Error generating user alert report', {
+  } catch (error) { logger.error('Error generating user alert report', {
       component: 'AlertUtilities',
-      userId
-    }, error);
+      user_id
+     }, error);
     throw error;
   }
 }
@@ -681,20 +670,18 @@ export async function generateUserAlertReport(
 /**
  * Cleans up old delivery logs (keeps last 1000 per user)
  */
-export async function cleanupOldDeliveryLogs(userId: string): Promise<number> {
-  try {
+export async function cleanupOldDeliveryLogs(user_id: string): Promise<number> { try {
     // This is handled automatically in the storeDeliveryLog method
     // but can be called manually if needed
     logger.info('Delivery log cleanup is handled automatically', {
       component: 'AlertUtilities',
-      userId
-    });
+      user_id
+     });
     return 0;
-  } catch (error) {
-    logger.error('Error cleaning up delivery logs', {
+  } catch (error) { logger.error('Error cleaning up delivery logs', {
       component: 'AlertUtilities',
-      userId
-    }, error);
+      user_id
+     }, error);
     return 0;
   }
 }

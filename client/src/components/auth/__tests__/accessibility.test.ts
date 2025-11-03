@@ -79,51 +79,51 @@ function TestAuthForm({ mode = 'login' }: { mode?: 'login' | 'register' }) {
             {!isLoginMode && (
               <div data-testid={AUTH_TEST_IDS.NAME_FIELDS}>
                 <div>
-                  <label htmlFor="firstName">
+                  <label htmlFor="first_name">
                     {AUTH_ACCESSIBILITY.LABELS.FIRST_NAME} <span aria-label="required">*</span>
                   </label>
                   <input
-                    id="firstName"
-                    {...getFieldProps('firstName')}
+                    id="first_name"
+                    {...getFieldProps('first_name')}
                     type="text"
                     placeholder="John"
-                    aria-invalid={!!errors.firstName}
-                    aria-describedby={errors.firstName ? 'firstName-error' : undefined}
-                    data-testid="auth-firstName-input"
+                    aria-invalid={!!errors.first_name}
+                    aria-describedby={errors.first_name ? 'first_name-error' : undefined}
+                    data-testid="auth-first_name-input"
                   />
-                  {errors.firstName && (
+                  {errors.first_name && (
                     <div 
-                      id="firstName-error" 
+                      id="first_name-error" 
                       role="alert"
                       aria-live="polite"
-                      data-testid="auth-firstName-error"
+                      data-testid="auth-first_name-error"
                     >
-                      {errors.firstName}
+                      {errors.first_name}
                     </div>
                   )}
                 </div>
 
                 <div>
-                  <label htmlFor="lastName">
+                  <label htmlFor="last_name">
                     {AUTH_ACCESSIBILITY.LABELS.LAST_NAME} <span aria-label="required">*</span>
                   </label>
                   <input
-                    id="lastName"
-                    {...getFieldProps('lastName')}
+                    id="last_name"
+                    {...getFieldProps('last_name')}
                     type="text"
                     placeholder="Doe"
-                    aria-invalid={!!errors.lastName}
-                    aria-describedby={errors.lastName ? 'lastName-error' : undefined}
-                    data-testid="auth-lastName-input"
+                    aria-invalid={!!errors.last_name}
+                    aria-describedby={errors.last_name ? 'last_name-error' : undefined}
+                    data-testid="auth-last_name-input"
                   />
-                  {errors.lastName && (
+                  {errors.last_name && (
                     <div 
-                      id="lastName-error" 
+                      id="last_name-error" 
                       role="alert"
                       aria-live="polite"
-                      data-testid="auth-lastName-error"
+                      data-testid="auth-last_name-error"
                     >
-                      {errors.lastName}
+                      {errors.last_name}
                     </div>
                   )}
                 </div>
@@ -430,15 +430,15 @@ describe('Auth Accessibility', () => {
     it('should support tab navigation in register mode', async () => {
       render(<TestAuthForm mode="register" />);
       
-      const firstNameInput = screen.getByTestId('auth-firstName-input');
-      const lastNameInput = screen.getByTestId('auth-lastName-input');
+      const first_nameInput = screen.getByTestId('auth-first_name-input');
+      const last_nameInput = screen.getByTestId('auth-last_name-input');
       const emailInput = screen.getByTestId('auth-email-input');
       
-      firstNameInput.focus();
-      expect(document.activeElement).toBe(firstNameInput);
+      first_nameInput.focus();
+      expect(document.activeElement).toBe(first_nameInput);
       
       await userEvent.tab();
-      expect(document.activeElement).toBe(lastNameInput);
+      expect(document.activeElement).toBe(last_nameInput);
       
       await userEvent.tab();
       expect(document.activeElement).toBe(emailInput);

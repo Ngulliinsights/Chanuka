@@ -107,15 +107,14 @@ class ArchitecturalFixer {
       return;
     }
 
-    try {
-      let content = readFileSync(notificationFile, 'utf-8');
+    try { let content = readFileSync(notificationFile, 'utf-8');
       let modified = false;
 
       // Fix the variable shadowing in getUsersWithDigestEnabled
-      const oldPattern = /\.map\(user => \(\{\s*userId: user\.id,\s*preferences: user\.preferences \|\| \{\}\s*\}\)\)\s*\.filter\(user => \{/g;
+      const oldPattern = /\.map\(user => \(\{\s*user_id: user\.id,\s*preferences: user\.preferences \|\| \{\ }\s*\}\)\)\s*\.filter\(user => \{ /g;
       const newPattern = `.map(userData => ({
-        userId: userData.id,
-        preferences: userData.preferences || {}
+        user_id: userData.id,
+        preferences: userData.preferences || { }
       }))
       .filter(userData => {`;
 
@@ -165,14 +164,14 @@ class ArchitecturalFixer {
       if (!content.includes('userBillTrackingPreference')) {
         // Add it to the explicit exports
         content = content.replace(
-          'userBillTrackingPreference, socialShare,',
-          'userBillTrackingPreference, socialShare,'
+          'userBillTrackingPreference, social_share,',
+          'userBillTrackingPreference, social_share,'
         );
         
         // Add to plural exports
         content = content.replace(
-          'userBillTrackingPreferences, socialShares,',
-          'userBillTrackingPreferences, socialShares,'
+          'userBillTrackingPreferences, social_shares,',
+          'userBillTrackingPreferences, social_shares,'
         );
         
         modified = true;
@@ -180,8 +179,8 @@ class ArchitecturalFixer {
 
       // Ensure all strategic tables are properly exported
       const strategicTables = [
-        'userProgress', 'contentAnalysis', 'verification', 
-        'stakeholder', 'socialShare'
+        'user_progress', 'contentAnalysis', 'verification', 
+        'stakeholder', 'social_share'
       ];
 
       for (const table of strategicTables) {

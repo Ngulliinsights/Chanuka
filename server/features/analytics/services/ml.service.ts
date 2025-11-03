@@ -1,5 +1,4 @@
-import { database as db } from '../../shared/database/connection';
-import { bills, analysis } from '../../../../shared/schema/schema.js';
+import { database as db } from '../../../../shared/database/connection';
 import { eq, desc } from 'drizzle-orm';
 import { logger  } from '../../../../shared/core/src/index.js';
 import type {
@@ -19,25 +18,25 @@ interface AnalysisError {
 
 export class MLAnalysisService {
   // Public helper method for consistent error handling
-  public static handleAnalysisError(error: unknown, analysisType: string): AnalysisResult {
-    logger.error(`Error in ${analysisType} analysis:`, {
+  public static handleAnalysisError(error: unknown, analysis_type: string): AnalysisResult {
+    logger.error(`Error in ${analysis_type} analysis:`, {
       component: 'analytics',
       operation: 'handleAnalysisError',
-      analysisType
+      analysis_type
     }, error instanceof Error ? error : { message: String(error) });
 
     return {
       confidence: 0.0,
       result: {
         error: true,
-        message: `Analysis temporarily unavailable for ${analysisType}`,
+        message: `Analysis temporarily unavailable for ${analysis_type}`,
         fallbackAvailable: true
       },
-      analysisType,
+      analysis_type,
       metadata: {
         errorOccurred: true,
         errorTime: new Date().toISOString(),
-        analysisType
+        analysis_type
       }
     };
   }
@@ -67,14 +66,14 @@ export class MLAnalysisService {
               name: 'Tech Industry Coalition',
               influence: 'high',
               sentiment: 'positive',
-              engagementScore: 0.92,
+              engagement_score: 0.92,
               recentActivity: 'Increased lobbying activity detected'
             },
             {
               name: 'Consumer Rights Group',
               influence: 'medium',
               sentiment: 'negative',
-              engagementScore: 0.67,
+              engagement_score: 0.67,
               recentActivity: 'Active opposition campaign identified'
             }
           ],
@@ -91,11 +90,11 @@ export class MLAnalysisService {
             emergingConcerns: ['Privacy advocates', 'Regulatory bodies']
           }
         },
-        analysisType: 'stakeholder_influence',
+        analysis_type: 'stakeholder_influence',
         metadata: {
           processingTime: Date.now() - startTime,
           dataSourcesUsed: ['congressional_records', 'lobbying_reports', 'media_analysis'],
-          modelVersion: '2.1.0'
+          model_version: '2.1.0'
         }
       };
 
@@ -155,11 +154,11 @@ export class MLAnalysisService {
             additionalReviewNeeded: true
           }
         },
-        analysisType: 'conflict_detection',
+        analysis_type: 'conflict_detection',
         metadata: {
           processingTime: Date.now() - startTime,
           dataSourcesUsed: ['financial_disclosures', 'investment_records', 'ethics_database'],
-          modelVersion: '1.8.2'
+          model_version: '1.8.2'
         }
       };
 
@@ -209,11 +208,11 @@ export class MLAnalysisService {
             potentialLosers: 'medium'
           }
         },
-        analysisType: 'beneficiary_analysis',
+        analysis_type: 'beneficiary_analysis',
         metadata: {
           processingTime: Date.now() - startTime,
           dataSourcesUsed: ['economic_models', 'industry_reports', 'demographic_data'],
-          modelVersion: '3.0.1'
+          model_version: '3.0.1'
         }
       };
 
@@ -313,12 +312,11 @@ export class MLAnalysisService {
 // Maintain the existing service instance for backward compatibility
 export const mlAnalysisService = new MLAnalysisService();
 
-export async function detectImplementationWorkarounds(billId: string): Promise<ImplementationWorkaroundDetection[]> {
-  try {
+export async function detectImplementationWorkarounds(bill_id: string): Promise<ImplementationWorkaroundDetection[]> { try {
     // Enhanced input validation
-    if (!billId || typeof billId !== 'string' || billId.trim().length === 0) {
+    if (!bill_id || typeof bill_id !== 'string' || bill_id.trim().length === 0) {
       throw new Error('Invalid bill ID provided for workaround detection');
-    }
+     }
 
     // Enhanced mock implementation with more comprehensive data
     return [
@@ -344,17 +342,16 @@ export async function detectImplementationWorkarounds(billId: string): Promise<I
         }
       }
     ];
-  } catch (error) {
-    logger.error('Error in detectImplementationWorkarounds:', {
+  } catch (error) { logger.error('Error in detectImplementationWorkarounds:', {
       component: 'analytics',
       operation: 'detectImplementationWorkarounds',
-      billId
-    }, error instanceof Error ? error : { message: String(error) });
+      bill_id
+     }, error instanceof Error ? error : { message: String(error) });
     return [];
   }
 }
 
-export async function performComprehensiveAnalysis(billId: string): Promise<{
+export async function performComprehensiveAnalysis(bill_id: string): Promise<{
   stakeholderInfluence: AnalysisResult;
   conflictsOfInterest: AnalysisResult;
   beneficiaryAnalysis: AnalysisResult;
@@ -368,21 +365,20 @@ export async function performComprehensiveAnalysis(billId: string): Promise<{
     confidenceLevel: 'low' | 'medium' | 'high';
     dataQuality: 'poor' | 'fair' | 'good' | 'excellent';
   };
-}> {
-  try {
+}> { try {
     const startTime = Date.now();
 
     // Enhanced input validation
-    if (!billId || typeof billId !== 'string' || billId.trim().length === 0) {
+    if (!bill_id || typeof bill_id !== 'string' || bill_id.trim().length === 0) {
       throw new Error('Invalid bill ID provided for comprehensive analysis');
-    }
+     }
 
     // Perform all analyses with enhanced error handling
     const [stakeholderResult, conflictsResult, beneficiaryResult, workaroundsResult] = await Promise.allSettled([
       MLAnalysisService.analyzeStakeholderInfluence(''),
       MLAnalysisService.detectConflictsOfInterest('', {}),
       MLAnalysisService.analyzeBeneficiaries(''),
-      detectImplementationWorkarounds(billId)
+      detectImplementationWorkarounds(bill_id)
     ]);
 
     // Extract results with proper error handling
@@ -436,12 +432,11 @@ export async function performComprehensiveAnalysis(billId: string): Promise<{
         dataQuality: overallScore >= 0.85 ? 'excellent' : overallScore >= 0.7 ? 'good' : overallScore >= 0.5 ? 'fair' : 'poor'
       }
     };
-  } catch (error) {
-    logger.error('Error in comprehensive analysis:', {
+  } catch (error) { logger.error('Error in comprehensive analysis:', {
       component: 'analytics',
       operation: 'performComprehensiveAnalysis',
-      billId
-    }, error instanceof Error ? error : { message: String(error) });
+      bill_id
+     }, error instanceof Error ? error : { message: String(error) });
 
     // Return fallback response with error indication
     return {

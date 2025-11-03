@@ -15,7 +15,7 @@ export interface EnhancedPrometheusConfig extends PrometheusConfig {
 
 export class EnhancedPrometheusExporter {
   public readonly name = 'prometheus';
-  public readonly contentType = 'text/plain; version=0.0.4; charset=utf-8';
+  public readonly content_type = 'text/plain; version=0.0.4; charset=utf-8';
 
   private config: EnhancedPrometheusConfig;
   private buffer: Metric[] = [];
@@ -103,7 +103,7 @@ export class EnhancedPrometheusExporter {
     const url = `${this.config.gatewayUrl}/metrics/job/${this.config.jobName}/instance/${this.config.instance}`;
 
     const headers: Record<string, string> = {
-      'Content-Type': this.contentType,
+      'Content-Type': this.content_type,
       ...this.config.headers,
     };
 

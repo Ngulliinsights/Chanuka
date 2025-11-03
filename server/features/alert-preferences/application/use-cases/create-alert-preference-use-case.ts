@@ -30,9 +30,9 @@ export class CreateAlertPreferenceUseCase {
     // Create the alert preference entity
     const alertPreference = new AlertPreference(
       this.generatePreferenceId(),
-      command.userId,
+      command.user_id,
       command.name,
-      command.isActive,
+      command.is_active,
       alertTypes,
       channels,
       frequency,
@@ -61,10 +61,10 @@ export class CreateAlertPreferenceUseCase {
     return new AlertConditions(
       command.billCategories,
       command.billStatuses,
-      command.sponsorIds,
+      command.sponsor_ids,
       command.keywords,
       command.minimumEngagement,
-      command.userRoles,
+      command.user_roles,
       command.timeRange ? {
         start: command.timeRange.start,
         end: command.timeRange.end
@@ -108,7 +108,7 @@ export class CreateAlertPreferenceUseCase {
   private convertSmartFilteringConfig(command: any): SmartFilteringConfig {
     return new SmartFilteringConfig(
       command.enabled,
-      command.userInterestWeight,
+      command.user_interestWeight,
       command.engagementHistoryWeight,
       command.trendingWeight,
       command.duplicateFiltering,

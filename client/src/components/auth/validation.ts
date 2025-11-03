@@ -41,8 +41,8 @@ export const LoginSchema = z.object({
 });
 
 export const RegisterSchema = z.object({
-  firstName: NameSchema,
-  lastName: NameSchema,
+  first_name: NameSchema,
+  last_name: NameSchema,
   email: EmailSchema,
   password: StrongPasswordSchema,
   confirmPassword: z.string().min(1, 'Please confirm your password'),
@@ -222,8 +222,8 @@ export function validateField(fieldName: string, value: string, mode: 'login' | 
       case 'password':
         validatePassword(value, mode === 'register');
         break;
-      case 'firstName':
-      case 'lastName':
+      case 'first_name':
+      case 'last_name':
         validateName(value, fieldName);
         break;
       case 'confirmPassword':

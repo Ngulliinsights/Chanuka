@@ -36,13 +36,13 @@ export class ConflictSeverityAnalyzerService {
     financialConflicts: FinancialConflict[],
     professionalConflicts: ProfessionalConflict[],
     votingAnomalies: VotingAnomaly[],
-    transparencyScore: number
+    transparency_score: number
   ): number {
     try {
       const financialScore = this.calculateFinancialRiskScore(financialConflicts);
       const professionalScore = this.calculateProfessionalRiskScore(professionalConflicts);
       const votingScore = this.calculateVotingRiskScore(votingAnomalies);
-      const transparencyPenalty = this.calculateTransparencyPenalty(transparencyScore);
+      const transparencyPenalty = this.calculateTransparencyPenalty(transparency_score);
 
       // Weighted combination of risk factors
       const baseScore = (
@@ -66,7 +66,7 @@ export class ConflictSeverityAnalyzerService {
       }
 
       // Low transparency with high conflicts
-      if (transparencyScore < 0.3 && (financialScore > 0.6 || professionalScore > 0.6)) {
+      if (transparency_score < 0.3 && (financialScore > 0.6 || professionalScore > 0.6)) {
         multiplier += 0.1;
       }
 
@@ -109,7 +109,7 @@ export class ConflictSeverityAnalyzerService {
     financialConflicts: FinancialConflict[],
     professionalConflicts: ProfessionalConflict[],
     votingAnomalies: VotingAnomaly[],
-    transparencyScore: number
+    transparency_score: number
   ): number {
     try {
       let confidence = 0.5; // Base confidence
@@ -124,9 +124,9 @@ export class ConflictSeverityAnalyzerService {
       confidence += (verifiedFinancial + verifiedProfessional) * 0.03;
 
       // Higher confidence with good transparency
-      if (transparencyScore > 0.7) {
+      if (transparency_score > 0.7) {
         confidence += 0.1;
-      } else if (transparencyScore < 0.3) {
+      } else if (transparency_score < 0.3) {
         confidence -= 0.1;
       }
 
@@ -154,12 +154,12 @@ export class ConflictSeverityAnalyzerService {
     let score = 0.3; // Base score for having any disclosures
 
     // Points for verified disclosures
-    const verifiedCount = disclosures.filter(d => d.isVerified).length;
+    const verifiedCount = disclosures.filter(d => d.is_verified).length;
     score += (verifiedCount / disclosures.length) * 0.4;
 
     // Points for recent disclosures
     const recentCount = disclosures.filter(d => {
-      const disclosureDate = new Date(d.createdAt);
+      const disclosureDate = new Date(d.created_at);
       const oneYearAgo = new Date();
       oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
       return disclosureDate > oneYearAgo;
@@ -176,11 +176,11 @@ export class ConflictSeverityAnalyzerService {
   /**
    * Calculates transparency grade based on score
    */
-  calculateTransparencyGrade(transparencyScore: number): 'A' | 'B' | 'C' | 'D' | 'F' {
-    if (transparencyScore >= 0.9) return 'A';
-    if (transparencyScore >= 0.8) return 'B';
-    if (transparencyScore >= 0.6) return 'C';
-    if (transparencyScore >= 0.4) return 'D';
+  calculateTransparencyGrade(transparency_score: number): 'A' | 'B' | 'C' | 'D' | 'F' {
+    if (transparency_score >= 0.9) return 'A';
+    if (transparency_score >= 0.8) return 'B';
+    if (transparency_score >= 0.6) return 'C';
+    if (transparency_score >= 0.4) return 'D';
     return 'F';
   }
 
@@ -270,7 +270,7 @@ export class ConflictSeverityAnalyzerService {
       score += conflict.relationshipStrength * 0.15;
 
       // Active vs inactive conflicts
-      if (conflict.isActive) score += 0.05;
+      if (conflict.is_active) score += 0.05;
 
       // Evidence strength
       score += (conflict.evidenceStrength / 100) * 0.1;
@@ -281,7 +281,7 @@ export class ConflictSeverityAnalyzerService {
     }
 
     // Multiple active conflicts
-    const activeConflicts = conflicts.filter(c => c.isActive).length;
+    const activeConflicts = conflicts.filter(c => c.is_active).length;
     if (activeConflicts > 2) score += 0.1;
     if (activeConflicts > 4) score += 0.1;
 
@@ -320,9 +320,9 @@ export class ConflictSeverityAnalyzerService {
     return Math.min(score, 1.0);
   }
 
-  private calculateTransparencyPenalty(transparencyScore: number): number {
+  private calculateTransparencyPenalty(transparency_score: number): number {
     // Convert transparency score to penalty (inverse relationship)
-    return Math.max(0, 1.0 - transparencyScore);
+    return Math.max(0, 1.0 - transparency_score);
   }
 
   private loadConfiguration(): ConflictDetectionConfig {

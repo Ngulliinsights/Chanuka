@@ -3,7 +3,7 @@ import { databaseService } from "../../services/database-service.js";
 import { readDatabase } from '@shared/database/connection';
 import { cacheService } from "../../infrastructure/cache/cache-service.js";
 import { demoDataService } from "../../infrastructure/demo-data.js";
-import * as schema from "../../../shared/schema";
+import * as schema from "@shared/schema";
 import { logger  } from '../../../shared/core/src/index.js';
 
 // Search index health status
@@ -82,23 +82,20 @@ export class SearchIndexManager {
   /**
    * Queue a bill for search index update
    */
-  async queueBillForIndexUpdate(billId: number): Promise<void> {
-    this.indexUpdateQueue.add(billId);
-    console.log(`Bill ${billId} queued for search index update`);
+  async queueBillForIndexUpdate(bill_id: number): Promise<void> { this.indexUpdateQueue.add(bill_id);
+    console.log(`Bill ${bill_id } queued for search index update`);
   }
 
   /**
    * Update search index for a specific bill
    */
-  async updateBillSearchIndex(billId: number): Promise<boolean> {
-    // Check if system is in demo mode
+  async updateBillSearchIndex(bill_id: number): Promise<boolean> { // Check if system is in demo mode
     if (demoDataService.isDemoMode()) {
-      console.log(`🔄 Demo mode: Skipping search index update for bill ${billId}`);
+      console.log(`🔄 Demo mode: Skipping search index update for bill ${bill_id }`);
       return true; // Demo data doesn't need index updates
     }
 
-    try {
-      const result = await databaseService.withFallback(
+    try { const result = await databaseService.withFallback(
         async () => {
           // Update the search vector for the specific bill
           const updateResult = await this.db.execute(sql`
@@ -109,28 +106,25 @@ export class SearchIndexManager {
               setweight(to_tsvector('english', coalesce(description, '')), 'C') ||
               setweight(to_tsvector('english', coalesce(content, '')), 'D'),
               updated_at = NOW()
-            WHERE id = ${billId}
+            WHERE id = ${bill_id }
           `);
 
           return updateResult.rowCount > 0;
         },
         false,
-        `updateBillSearchIndex(${billId})`
+        `updateBillSearchIndex(${ bill_id })`
       );
 
-      if (result.data) {
-        console.log(`✅ Search index updated for bill ${billId}`);
+      if (result.data) { console.log(`✅ Search index updated for bill ${bill_id }`);
         
         // Clear related caches
         await this.clearSearchCaches();
         
         return true;
-      } else {
-        console.warn(`⚠️ No bill found with ID ${billId} for index update`);
+      } else { console.warn(`⚠️ No bill found with ID ${bill_id } for index update`);
         return false;
       }
-    } catch (error) {
-      console.error(`❌ Failed to update search index for bill ${billId}:`, error);
+    } catch (error) { console.error(`❌ Failed to update search index for bill ${bill_id }:`, error);
       return false;
     }
   }
@@ -701,18 +695,17 @@ export class SearchIndexManager {
       this.isProcessingQueue = true;
 
       try {
-        const billIds = Array.from(this.indexUpdateQueue);
+        const bill_ids = Array.from(this.indexUpdateQueue);
         this.indexUpdateQueue.clear();
 
-        console.log(`🔄 Processing ${billIds.length} bills for search index updates`);
+        console.log(`🔄 Processing ${bill_ids.length} bills for search index updates`);
 
         let updated = 0;
-        for (const billId of billIds) {
-          const success = await this.updateBillSearchIndex(billId);
+        for (const bill_id of bill_ids) { const success = await this.updateBillSearchIndex(bill_id);
           if (success) updated++;
-        }
+         }
 
-        console.log(`✅ Updated search indexes for ${updated}/${billIds.length} bills`);
+        console.log(`✅ Updated search indexes for ${updated}/${bill_ids.length} bills`);
       } catch (error) {
         logger.error('Error processing index update queue:', { component: 'Chanuka' }, error);
       } finally {

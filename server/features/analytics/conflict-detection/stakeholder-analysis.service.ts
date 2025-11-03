@@ -7,7 +7,7 @@
 
 import { database as db } from '../../../../shared/database/connection';
 import {
-  bills, sponsors, sponsorAffiliations, billSponsorships,
+  bills, sponsors, sponsorAffiliations, bill_sponsorships,
   type Sponsor, type SponsorAffiliation, type Bill
 } from '../../../../shared/schema';
 import { eq, and, sql, desc, gte, lte, count, inArray, like, or } from 'drizzle-orm';
@@ -30,7 +30,7 @@ export class StakeholderAnalysisService {
    */
   async identifyStakeholders(bill: Bill): Promise<Stakeholder[]> {
     try {
-      const cacheKey = `stakeholders:bill:${bill.id}`;
+      const cacheKey = `stakeholders:bill:${bills.id}`;
       const cache = getDefaultCache();
       const cached = await cache.get(cacheKey);
       if (cached) return cached;
@@ -45,12 +45,11 @@ export class StakeholderAnalysisService {
       await cache.set(cacheKey, stakeholders, 3600);
       
       return stakeholders;
-    } catch (error) {
-      logger.error('Error identifying stakeholders:', {
+    } catch (error) { logger.error('Error identifying stakeholders:', {
         component: 'StakeholderAnalysis',
-        billId: bill.id,
+        bill_id: bills.id,
         error: error instanceof Error ? error.message : String(error)
-      });
+       });
       return [];
     }
   }
@@ -162,20 +161,19 @@ export class StakeholderAnalysisService {
         .select({
           sponsor: sponsors
         })
-        .from(billSponsorships)
-        .innerJoin(sponsors, eq(billSponsorships.sponsorId, sponsors.id))
-        .where(eq(billSponsorships.billId, bill.id));
+        .from(bill_sponsorships)
+        .innerJoin(sponsors, eq(bill_sponsorships.sponsor_id, sponsors.id))
+        .where(eq(bill_sponsorships.bill_id, bills.id));
 
       return billSponsors.map(({ sponsor }) => ({
-        id: `individual_${sponsor.id}`,
-        name: sponsor.name,
+        id: `individual_${sponsors.id}`,
+        name: sponsors.name,
         type: 'individual' as const,
-        interests: [{
-          billId: bill.id,
-          issueArea: bill.category || 'General',
+        interests: [{ bill_id: bills.id,
+          issueArea: bills.category || 'General',
           position: 'support' as const,
           strength: 0.9,
-          description: `Primary sponsor of ${bill.title}`
+          description: `Primary sponsor of ${bills.title }`
         }],
         influence: 0.8,
         transparency: 0.7
@@ -191,19 +189,18 @@ export class StakeholderAnalysisService {
       const stakeholders: Stakeholder[] = [];
 
       // Extract organizations mentioned in bill summary
-      const organizations = this.extractOrganizationsFromText(bill.summary || '');
+      const organizations = this.extractOrganizationsFromText(bills.summary || '');
 
       for (const org of organizations) {
         stakeholders.push({
           id: `organization_${org.toLowerCase().replace(/\s+/g, '_')}`,
           name: org,
           type: 'organization',
-          interests: [{
-            billId: bill.id,
-            issueArea: bill.category || 'General',
+          interests: [{ bill_id: bills.id,
+            issueArea: bills.category || 'General',
             position: 'neutral',
             strength: 0.6,
-            description: `Mentioned in bill ${bill.title}`
+            description: `Mentioned in bill ${bills.title }`
           }],
           influence: 0.6,
           transparency: 0.5
@@ -225,12 +222,11 @@ export class StakeholderAnalysisService {
         id: `industry_${industry.toLowerCase().replace(/\s+/g, '_')}`,
         name: industry,
         type: 'industry' as const,
-        interests: [{
-          billId: bill.id,
-          issueArea: bill.category || 'General',
+        interests: [{ bill_id: bills.id,
+          issueArea: bills.category || 'General',
           position: 'neutral' as const,
           strength: 0.5,
-          description: `Industry potentially affected by ${bill.title}`
+          description: `Industry potentially affected by ${bills.title }`
         }],
         influence: 0.5,
         transparency: 0.4
@@ -260,7 +256,7 @@ export class StakeholderAnalysisService {
     // Find opposing interests
     for (const interest1 of stakeholder1.interests) {
       for (const interest2 of stakeholder2.interests) {
-        if (interest1.billId === interest2.billId && 
+        if (interest1.bill_id === interest2.bill_id && 
             interest1.issueArea === interest2.issueArea) {
           
           if ((interest1.position === 'support' && interest2.position === 'oppose') ||
@@ -325,7 +321,7 @@ export class StakeholderAnalysisService {
   }
 
   private identifyAffectedIndustries(bill: Bill): string[] {
-    const text = (bill.title + ' ' + (bill.summary || '')).toLowerCase();
+    const text = (bills.title + ' ' + (bills.summary || '')).toLowerCase();
     const industries: string[] = [];
 
     const industryKeywords = {

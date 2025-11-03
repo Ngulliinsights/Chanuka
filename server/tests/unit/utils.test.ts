@@ -197,9 +197,9 @@ describe('Validation Utils', () => {
         's-456'
       ];
 
-      validFormats.forEach(billNumber => {
-        mockValidation.validateBillNumber.mockReturnValue({ isValid: true, normalized: billNumber.toUpperCase() });
-        const result = validation.validateBillNumber(billNumber);
+      validFormats.forEach(bill_number => {
+        mockValidation.validateBillNumber.mockReturnValue({ isValid: true, normalized: bill_number.toUpperCase() });
+        const result = validation.validateBillNumber(bill_number);
         expect(result.isValid).toBe(true);
       });
     });
@@ -215,9 +215,9 @@ describe('Validation Utils', () => {
         'CC-123' // Too many letters
       ];
 
-      invalidFormats.forEach(billNumber => {
+      invalidFormats.forEach(bill_number => {
         mockValidation.validateBillNumber.mockReturnValue({ isValid: false, error: 'Invalid format' });
-        const result = validation.validateBillNumber(billNumber);
+        const result = validation.validateBillNumber(bill_number);
         expect(result.isValid).toBe(false);
       });
     });
@@ -349,9 +349,8 @@ describe('Logger Utils', () => {
     });
   });
 
-  describe('structured logging', () => {
-    it('should log with metadata', () => {
-      const metadata = { userId: '123', action: 'login' };
+  describe('structured logging', () => { it('should log with metadata', () => {
+      const metadata = { user_id: '123', action: 'login'  };
       mockLogger.info('User logged in', metadata);
 
       expect(mockLogger.info).toHaveBeenCalledWith('User logged in', metadata);

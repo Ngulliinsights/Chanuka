@@ -3,16 +3,15 @@
  * Handles application-level logging for user operations
  */
 
-export interface LogEntry {
-  timestamp: string;
+export interface LogEntry { timestamp: string;
   level: 'info' | 'warn' | 'error';
   operation: string;
-  userId?: string;
+  user_id?: string;
   targetId?: string;
   details?: Record<string, any>;
   ip?: string;
-  userAgent?: string;
-}
+  user_agent?: string;
+ }
 
 export class LoggingService {
   private static instance: LoggingService;
@@ -32,40 +31,39 @@ export class LoggingService {
 
     // In a real implementation, this would write to a logging system
     // For now, we'll use console.log with structured format
-    console.log(`[${logEntry.level.toUpperCase()}] ${logEntry.operation}`, {
-      userId: logEntry.userId,
+    console.log(`[${logEntry.level.toUpperCase()}] ${logEntry.operation}`, { user_id: logEntry.user_id,
       targetId: logEntry.targetId,
       timestamp: logEntry.timestamp,
       details: logEntry.details,
       ip: logEntry.ip,
-      userAgent: logEntry.userAgent
-    });
+      user_agent: logEntry.user_agent
+     });
   }
 
-  logSecurityEvent(operation: string, userId: string, details: Record<string, any>): void {
+  logSecurityEvent(operation: string, user_id: string, details: Record<string, any>): void {
     this.logUserActivity({
       level: 'warn',
       operation: `security.${operation}`,
-      userId,
+      user_id,
       details
     });
   }
 
-  logAuditEvent(operation: string, userId: string, targetId: string, details?: Record<string, any>): void {
+  logAuditEvent(operation: string, user_id: string, targetId: string, details?: Record<string, any>): void {
     this.logUserActivity({
       level: 'info',
       operation: `audit.${operation}`,
-      userId,
+      user_id,
       targetId,
       details
     });
   }
 
-  logError(operation: string, error: Error, userId?: string, details?: Record<string, any>): void {
+  logError(operation: string, error: Error, user_id?: string, details?: Record<string, any>): void {
     this.logUserActivity({
       level: 'error',
       operation: `error.${operation}`,
-      userId,
+      user_id,
       details: {
         error: error.message,
         stack: error.stack,

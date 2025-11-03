@@ -2,7 +2,7 @@ import { eq, and, desc, sql, inArray } from 'drizzle-orm';
 import { databaseService } from '../../../../infrastructure/database/database-service';
 import { database as db } from '@shared/database/connection';
 import { notificationChannelService } from '../../../../infrastructure/notifications/notification-channels';
-import { userProfileService } from '../../../users/domain/user-profile';
+import { user_profileservice } from '../../../users/domain/user-profile';
 import { cacheService } from '../../../../infrastructure/cache';
 import * as schema from '@shared/schema';
 import { z } from 'zod';
@@ -47,10 +47,10 @@ export interface AlertChannel {
 export interface AlertConditions {
   billCategories?: string[];
   billStatuses?: string[];
-  sponsorIds?: number[];
+  sponsor_ids?: number[];
   keywords?: string[];
   minimumEngagement?: number;
-  userRoles?: string[];
+  user_roles?: string[];
   timeRange?: {
     start: string; // HH:MM
     end: string;
@@ -60,7 +60,7 @@ export interface AlertConditions {
 
 export interface SmartFilteringConfig {
   enabled: boolean;
-  userInterestWeight: number; // 0-1
+  user_interestWeight: number; // 0-1
   engagementHistoryWeight: number; // 0-1
   trendingWeight: number; // 0-1
   duplicateFiltering: boolean;
@@ -75,28 +75,26 @@ export interface FrequencyConfig {
   batchDay?: number; // 0-6 for weekly
 }
 
-export interface AlertPreference {
-  id: string;
-  userId: string;
+export interface AlertPreference { id: string;
+  user_id: string;
   name: string;
   description?: string;
-  isActive: boolean;
+  is_active: boolean;
   alertTypes: Array<{
     type: AlertType;
     enabled: boolean;
     priority: Priority;
     conditions?: AlertConditions;
-  }>;
+   }>;
   channels: AlertChannel[];
   frequency: FrequencyConfig;
   smartFiltering: SmartFilteringConfig;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
-export interface AlertDeliveryLog {
-  id: string;
-  userId: string;
+export interface AlertDeliveryLog { id: string;
+  user_id: string;
   preferenceId: string;
   alertType: AlertType;
   channels: ChannelType[];
@@ -106,14 +104,14 @@ export interface AlertDeliveryLog {
   deliveredAt?: Date;
   failureReason?: string;
   metadata: {
-    billId?: number;
-    sponsorId?: number;
+    bill_id?: number;
+    sponsor_id?: number;
     originalPriority: Priority;
     adjustedPriority?: Priority;
     filteredReason?: string;
     confidence?: number;
-  };
-  createdAt: Date;
+    };
+  created_at: Date;
 }
 
 export interface SmartFilteringResult {
@@ -150,10 +148,10 @@ const alertChannelSchema = z.object({
 const alertConditionsSchema = z.object({
   billCategories: z.array(z.string()).optional(),
   billStatuses: z.array(z.string()).optional(),
-  sponsorIds: z.array(z.number()).optional(),
+  sponsor_ids: z.array(z.number()).optional(),
   keywords: z.array(z.string()).optional(),
   minimumEngagement: z.number().min(0).optional(),
-  userRoles: z.array(z.string()).optional(),
+  user_roles: z.array(z.string()).optional(),
   timeRange: z.object({
     start: z.string().regex(/^\d{2}:\d{2}$/),
     end: z.string().regex(/^\d{2}:\d{2}$/)
@@ -164,7 +162,7 @@ const alertConditionsSchema = z.object({
 export const alertPreferenceSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
-  isActive: z.boolean().default(true),
+  is_active: z.boolean().default(true),
   alertTypes: z.array(z.object({
     type: z.enum(['bill_status_change', 'new_comment', 'amendment', 'voting_scheduled', 'sponsor_update', 'engagement_milestone']),
     enabled: z.boolean(),
@@ -186,7 +184,7 @@ export const alertPreferenceSchema = z.object({
   }, { message: "Batched frequency requires batchInterval" }),
   smartFiltering: z.object({
     enabled: z.boolean(),
-    userInterestWeight: z.number().min(0).max(1),
+    user_interestWeight: z.number().min(0).max(1),
     engagementHistoryWeight: z.number().min(0).max(1),
     trendingWeight: z.number().min(0).max(1),
     duplicateFiltering: z.boolean(),
@@ -218,15 +216,14 @@ export class UnifiedAlertPreferenceService {
 
   /**
    * Creates a new alert preference for a user
-   * @param userId - The user's ID
+   * @param user_id - The user's ID
    * @param preferenceData - The preference configuration
    * @returns The created preference
    */
   async createAlertPreference(
-    userId: string,
-    preferenceData: Omit<AlertPreference, 'id' | 'userId' | 'createdAt' | 'updatedAt'>
-  ): Promise<AlertPreference> {
-    try {
+    user_id: string,
+    preferenceData: Omit<AlertPreference, 'id' | 'user_id' | 'created_at' | 'updated_at'>
+  ): Promise<AlertPreference> { try {
       // Validate the incoming data to ensure it meets all requirements
       alertPreferenceSchema.parse(preferenceData);
 
@@ -234,31 +231,29 @@ export class UnifiedAlertPreferenceService {
       
       const newPreference: AlertPreference = {
         id: preferenceId,
-        userId,
+        user_id,
         ...preferenceData,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
+        created_at: new Date(),
+        updated_at: new Date()
+       };
 
       // Store in database within the user's preferences JSON column
-      await this.storePreferenceInDatabase(userId, newPreference);
+      await this.storePreferenceInDatabase(user_id, newPreference);
       
       // Clear the user's cache so next fetch gets fresh data
-      await this.clearUserPreferenceCache(userId);
+      await this.clearUserPreferenceCache(user_id);
 
-      logger.info(`Alert preference created: ${preferenceId}`, { 
-        component: 'AlertPreferenceService',
-        userId,
+      logger.info(`Alert preference created: ${preferenceId}`, { component: 'AlertPreferenceService',
+        user_id,
         preferenceId 
-      });
+       });
 
       return newPreference;
 
-    } catch (error) {
-      logger.error('Error creating alert preference', { 
+    } catch (error) { logger.error('Error creating alert preference', { 
         component: 'AlertPreferenceService',
-        userId 
-      }, error);
+        user_id 
+       }, error);
       throw error;
     }
   }
@@ -266,38 +261,33 @@ export class UnifiedAlertPreferenceService {
   /**
    * Retrieves all alert preferences for a user with caching
    */
-  async getUserAlertPreferences(userId: string): Promise<AlertPreference[]> {
-    const cacheKey = `user:profile:${userId}:alert_preferences`;
+  async getUserAlertPreferences(user_id: string): Promise<AlertPreference[]> { const cacheKey = `user:profile:${user_id }:alert_preferences`;
 
     // Try fetch from cache first
     try {
       const cached = await cacheService.get(cacheKey);
       if (cached !== null && cached !== undefined) return cached as AlertPreference[];
-    } catch (err) {
-      // If cache read fails, fall through to compute and return
-      logger.warn('Cache read failed for alert preferences', { component: 'AlertPreferenceService', userId, error: err });
+    } catch (err) { // If cache read fails, fall through to compute and return
+      logger.warn('Cache read failed for alert preferences', { component: 'AlertPreferenceService', user_id, error: err  });
     }
 
     // Compute value and set cache
-    const computed = await (async () => {
-      try {
-        const preferences = await this.fetchPreferencesFromDatabase(userId);
+    const computed = await (async () => { try {
+        const preferences = await this.fetchPreferencesFromDatabase(user_id);
         if (preferences.length === 0) {
-          const defaultPref = await this.createDefaultAlertPreference(userId);
+          const defaultPref = await this.createDefaultAlertPreference(user_id);
           return [defaultPref];
-        }
+         }
         return preferences;
-      } catch (error) {
-        logger.error('Error fetching alert preferences', { component: 'AlertPreferenceService', userId }, error);
-        return [await this.createDefaultAlertPreference(userId)];
+      } catch (error) { logger.error('Error fetching alert preferences', { component: 'AlertPreferenceService', user_id  }, error);
+        return [await this.createDefaultAlertPreference(user_id)];
       }
     })();
 
     try {
       // USER_DATA TTL ≈ 1 hour (3600s)
       await cacheService.set(cacheKey, computed, 3600);
-    } catch (err) {
-      logger.warn('Failed to write alert preferences to cache', { component: 'AlertPreferenceService', userId, error: err });
+    } catch (err) { logger.warn('Failed to write alert preferences to cache', { component: 'AlertPreferenceService', user_id, error: err  });
     }
 
     return computed;
@@ -306,24 +296,22 @@ export class UnifiedAlertPreferenceService {
   /**
    * Gets a specific alert preference by ID
    */
-  async getAlertPreference(userId: string, preferenceId: string): Promise<AlertPreference | null> {
-    const preferences = await this.getUserAlertPreferences(userId);
+  async getAlertPreference(user_id: string, preferenceId: string): Promise<AlertPreference | null> { const preferences = await this.getUserAlertPreferences(user_id);
     return preferences.find(p => p.id === preferenceId) || null;
-  }
+   }
 
   /**
    * Updates an existing alert preference
    */
   async updateAlertPreference(
-    userId: string,
+    user_id: string,
     preferenceId: string,
-    updates: Partial<Omit<AlertPreference, 'id' | 'userId' | 'createdAt'>>
-  ): Promise<AlertPreference> {
-    try {
-      const existingPreference = await this.getAlertPreference(userId, preferenceId);
+    updates: Partial<Omit<AlertPreference, 'id' | 'user_id' | 'created_at'>>
+  ): Promise<AlertPreference> { try {
+      const existingPreference = await this.getAlertPreference(user_id, preferenceId);
       
       if (!existingPreference) {
-        throw new Error(`Alert preference ${preferenceId} not found`);
+        throw new Error(`Alert preference ${preferenceId } not found`);
       }
 
       // Validate partial updates
@@ -334,26 +322,24 @@ export class UnifiedAlertPreferenceService {
       const updatedPreference: AlertPreference = {
         ...existingPreference,
         ...updates,
-        updatedAt: new Date()
+        updated_at: new Date()
       };
 
-      await this.updatePreferenceInDatabase(userId, updatedPreference);
-      await this.clearUserPreferenceCache(userId);
+      await this.updatePreferenceInDatabase(user_id, updatedPreference);
+      await this.clearUserPreferenceCache(user_id);
 
-      logger.info(`Alert preference updated: ${preferenceId}`, { 
-        component: 'AlertPreferenceService',
-        userId,
+      logger.info(`Alert preference updated: ${preferenceId}`, { component: 'AlertPreferenceService',
+        user_id,
         preferenceId 
-      });
+       });
 
       return updatedPreference;
 
-    } catch (error) {
-      logger.error('Error updating alert preference', { 
+    } catch (error) { logger.error('Error updating alert preference', { 
         component: 'AlertPreferenceService',
-        userId,
+        user_id,
         preferenceId 
-      }, error);
+       }, error);
       throw error;
     }
   }
@@ -361,29 +347,26 @@ export class UnifiedAlertPreferenceService {
   /**
    * Deletes an alert preference
    */
-  async deleteAlertPreference(userId: string, preferenceId: string): Promise<void> {
-    try {
-      const existingPreference = await this.getAlertPreference(userId, preferenceId);
+  async deleteAlertPreference(user_id: string, preferenceId: string): Promise<void> { try {
+      const existingPreference = await this.getAlertPreference(user_id, preferenceId);
       
       if (!existingPreference) {
-        throw new Error(`Alert preference ${preferenceId} not found`);
+        throw new Error(`Alert preference ${preferenceId } not found`);
       }
 
-      await this.removePreferenceFromDatabase(userId, preferenceId);
-      await this.clearUserPreferenceCache(userId);
+      await this.removePreferenceFromDatabase(user_id, preferenceId);
+      await this.clearUserPreferenceCache(user_id);
 
-      logger.info(`Alert preference deleted: ${preferenceId}`, { 
-        component: 'AlertPreferenceService',
-        userId,
+      logger.info(`Alert preference deleted: ${preferenceId}`, { component: 'AlertPreferenceService',
+        user_id,
         preferenceId 
-      });
+       });
 
-    } catch (error) {
-      logger.error('Error deleting alert preference', { 
+    } catch (error) { logger.error('Error deleting alert preference', { 
         component: 'AlertPreferenceService',
-        userId,
+        user_id,
         preferenceId 
-      }, error);
+       }, error);
       throw error;
     }
   }
@@ -405,7 +388,7 @@ export class UnifiedAlertPreferenceService {
    * @returns A result indicating whether to send and with what priority
    */
   async processSmartFiltering(
-    userId: string,
+    user_id: string,
     alertType: AlertType,
     alertData: any,
     preference: AlertPreference
@@ -424,25 +407,23 @@ export class UnifiedAlertPreferenceService {
       const reasons: string[] = [];
 
       // Calculate user interest score using configured weight
-      if (preference.smartFiltering.userInterestWeight > 0) {
-        const userInterestScore = await this.calculateUserInterestScore(userId, alertData);
-        score += userInterestScore * preference.smartFiltering.userInterestWeight;
-        maxScore += preference.smartFiltering.userInterestWeight;
+      if (preference.smartFiltering.user_interestWeight > 0) { const user_interestScore = await this.calculateUserInterestScore(user_id, alertData);
+        score += user_interestScore * preference.smartFiltering.user_interestWeight;
+        maxScore += preference.smartFiltering.user_interestWeight;
         
-        if (userInterestScore < 0.3) {
+        if (user_interestScore < 0.3) {
           reasons.push('Low relevance to user interests');
-        }
+         }
       }
 
       // Calculate engagement history score
-      if (preference.smartFiltering.engagementHistoryWeight > 0) {
-        const engagementScore = await this.calculateEngagementHistoryScore(userId, alertData);
-        score += engagementScore * preference.smartFiltering.engagementHistoryWeight;
+      if (preference.smartFiltering.engagementHistoryWeight > 0) { const engagement_score = await this.calculateEngagementHistoryScore(user_id, alertData);
+        score += engagement_score * preference.smartFiltering.engagementHistoryWeight;
         maxScore += preference.smartFiltering.engagementHistoryWeight;
         
-        if (engagementScore < 0.2) {
+        if (engagement_score < 0.2) {
           reasons.push('Low engagement with similar content');
-        }
+         }
       }
 
       // Calculate trending score
@@ -453,26 +434,24 @@ export class UnifiedAlertPreferenceService {
       }
 
       // Check for duplicates
-      if (preference.smartFiltering.duplicateFiltering) {
-        const isDuplicate = await this.checkForDuplicateAlert(userId, alertType, alertData);
+      if (preference.smartFiltering.duplicateFiltering) { const isDuplicate = await this.checkForDuplicateAlert(user_id, alertType, alertData);
         if (isDuplicate) {
           return {
             shouldSend: false,
             filteredReason: 'Duplicate alert filtered',
             confidence: 1.0
-          };
+           };
         }
       }
 
       // Check for spam
-      if (preference.smartFiltering.spamFiltering) {
-        const isSpam = await this.checkForSpam(userId, alertType);
+      if (preference.smartFiltering.spamFiltering) { const isSpam = await this.checkForSpam(user_id, alertType);
         if (isSpam) {
           return {
             shouldSend: false,
             filteredReason: 'Spam alert filtered',
             confidence: 0.9
-          };
+           };
         }
       }
 
@@ -497,11 +476,10 @@ export class UnifiedAlertPreferenceService {
         confidence
       };
 
-    } catch (error) {
-      logger.error('Error processing smart filtering', { 
+    } catch (error) { logger.error('Error processing smart filtering', { 
         component: 'AlertPreferenceService',
-        userId 
-      }, error);
+        user_id 
+       }, error);
       // On error, default to sending with medium confidence
       return {
         shouldSend: true,
@@ -525,18 +503,17 @@ export class UnifiedAlertPreferenceService {
    * 5. Logs all delivery attempts
    */
   async processAlertDelivery(
-    userId: string,
+    user_id: string,
     alertType: AlertType,
     alertData: any,
     originalPriority: Priority = 'normal'
-  ): Promise<AlertDeliveryLog[]> {
-    try {
-      const preferences = await this.getUserAlertPreferences(userId);
+  ): Promise<AlertDeliveryLog[]> { try {
+      const preferences = await this.getUserAlertPreferences(user_id);
       const deliveryLogs: AlertDeliveryLog[] = [];
 
       for (const preference of preferences) {
         // Skip inactive preferences
-        if (!preference.isActive) continue;
+        if (!preference.is_active) continue;
 
         // Check if this alert type is enabled
         const alertTypeConfig = preference.alertTypes.find(at => at.type === alertType);
@@ -545,15 +522,14 @@ export class UnifiedAlertPreferenceService {
         // Check if conditions match (if specified)
         if (alertTypeConfig.conditions && !this.matchesConditions(alertData, alertTypeConfig.conditions)) {
           continue;
-        }
+         }
 
         // Apply smart filtering
-        const filteringResult = await this.processSmartFiltering(userId, alertType, alertData, preference);
+        const filteringResult = await this.processSmartFiltering(user_id, alertType, alertData, preference);
         
-        if (!filteringResult.shouldSend) {
-          // Log filtered alert
+        if (!filteringResult.shouldSend) { // Log filtered alert
           const log = this.createDeliveryLog(
-            userId,
+            user_id,
             preference.id,
             alertType,
             [],
@@ -562,9 +538,9 @@ export class UnifiedAlertPreferenceService {
             {
               filteredReason: filteringResult.filteredReason,
               confidence: filteringResult.confidence,
-              billId: alertData.billId,
-              sponsorId: alertData.sponsorId
-            }
+              bill_id: alertData.bill_id,
+              sponsor_id: alertData.sponsor_id
+              }
           );
           
           deliveryLogs.push(log);
@@ -581,35 +557,32 @@ export class UnifiedAlertPreferenceService {
         if (enabledChannels.length === 0) continue;
 
         // Handle batching vs immediate delivery
-        if (preference.frequency.type === 'batched' && finalPriority !== 'urgent') {
-          await this.addToBatch(userId, preference.id, {
+        if (preference.frequency.type === 'batched' && finalPriority !== 'urgent') { await this.addToBatch(user_id, preference.id, {
             alertType,
             alertData,
             priority: finalPriority,
             channels: enabledChannels.map(ch => ch.type)
-          });
+           });
           
           const log = this.createDeliveryLog(
-            userId,
+            user_id,
             preference.id,
             alertType,
             enabledChannels.map(ch => ch.type),
             'pending',
             originalPriority,
-            {
-              adjustedPriority: finalPriority,
+            { adjustedPriority: finalPriority,
               confidence: filteringResult.confidence,
-              billId: alertData.billId,
-              sponsorId: alertData.sponsorId
-            }
+              bill_id: alertData.bill_id,
+              sponsor_id: alertData.sponsor_id
+             }
           );
           
           deliveryLogs.push(log);
           await this.storeDeliveryLog(log);
-        } else {
-          // Immediate delivery
+        } else { // Immediate delivery
           const deliveryResult = await this.deliverImmediateAlert(
-            userId,
+            user_id,
             alertType,
             alertData,
             enabledChannels,
@@ -617,7 +590,7 @@ export class UnifiedAlertPreferenceService {
           );
 
           const log = this.createDeliveryLog(
-            userId,
+            user_id,
             preference.id,
             alertType,
             enabledChannels.map(ch => ch.type),
@@ -626,9 +599,9 @@ export class UnifiedAlertPreferenceService {
             {
               adjustedPriority: finalPriority,
               confidence: filteringResult.confidence,
-              billId: alertData.billId,
-              sponsorId: alertData.sponsorId
-            },
+              bill_id: alertData.bill_id,
+              sponsor_id: alertData.sponsor_id
+              },
             deliveryResult.success ? new Date() : undefined,
             deliveryResult.error
           );
@@ -638,20 +611,18 @@ export class UnifiedAlertPreferenceService {
         }
       }
 
-      logger.info(`Alert delivery processed: ${deliveryLogs.length} logs created`, { 
-        component: 'AlertPreferenceService',
-        userId,
+      logger.info(`Alert delivery processed: ${deliveryLogs.length} logs created`, { component: 'AlertPreferenceService',
+        user_id,
         alertType 
-      });
+       });
 
       return deliveryLogs;
 
-    } catch (error) {
-      logger.error('Error processing alert delivery', { 
+    } catch (error) { logger.error('Error processing alert delivery', { 
         component: 'AlertPreferenceService',
-        userId,
+        user_id,
         alertType 
-      }, error);
+       }, error);
       throw error;
     }
   }
@@ -664,7 +635,7 @@ export class UnifiedAlertPreferenceService {
    * Retrieves delivery logs with pagination and filtering
    */
   async getAlertDeliveryLogs(
-    userId: string,
+    user_id: string,
     options: {
       page?: number;
       limit?: number;
@@ -681,32 +652,31 @@ export class UnifiedAlertPreferenceService {
       total: number;
       pages: number;
     };
-  }> {
-    const page = options.page || 1;
+  }> { const page = options.page || 1;
     const limit = Math.min(options.limit || 20, 100);
 
     try {
-      let allLogs = await this.fetchDeliveryLogsFromDatabase(userId);
+      let allLogs = await this.fetchDeliveryLogsFromDatabase(user_id);
       
       // Apply filters
       if (options.alertType) {
         allLogs = allLogs.filter(log => log.alertType === options.alertType);
-      }
+       }
       
       if (options.status) {
         allLogs = allLogs.filter(log => log.status === options.status);
       }
       
       if (options.startDate) {
-        allLogs = allLogs.filter(log => log.createdAt >= options.startDate!);
+        allLogs = allLogs.filter(log => log.created_at >= options.startDate!);
       }
       
       if (options.endDate) {
-        allLogs = allLogs.filter(log => log.createdAt <= options.endDate!);
+        allLogs = allLogs.filter(log => log.created_at <= options.endDate!);
       }
 
       // Sort by creation date descending
-      allLogs.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      allLogs.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
 
       // Paginate
       const total = allLogs.length;
@@ -723,11 +693,10 @@ export class UnifiedAlertPreferenceService {
         }
       };
 
-    } catch (error) {
-      logger.error('Error fetching delivery logs', { 
+    } catch (error) { logger.error('Error fetching delivery logs', { 
         component: 'AlertPreferenceService',
-        userId 
-      }, error);
+        user_id 
+       }, error);
       return {
         logs: [],
         pagination: { page, limit, total: 0, pages: 0 }
@@ -738,7 +707,7 @@ export class UnifiedAlertPreferenceService {
   /**
    * Gets comprehensive statistics about alert preferences and delivery
    */
-  async getAlertPreferenceStats(userId: string): Promise<{
+  async getAlertPreferenceStats(user_id: string): Promise<{
     totalPreferences: number;
     activePreferences: number;
     deliveryStats: {
@@ -752,27 +721,24 @@ export class UnifiedAlertPreferenceService {
       deliveries: number;
       successRate: number;
     }>;
-  }> {
-    const cacheKey = `user:profile:${userId}:alert_stats`;
+  }> { const cacheKey = `user:profile:${user_id }:alert_stats`;
 
     // Try cache first
     try {
       const cached = await cacheService.get(cacheKey);
       if (cached !== null && cached !== undefined) return cached as any;
-    } catch (err) {
-      logger.warn('Cache read failed for alert stats', { component: 'AlertPreferenceService', userId, error: err });
+    } catch (err) { logger.warn('Cache read failed for alert stats', { component: 'AlertPreferenceService', user_id, error: err  });
     }
 
-    try {
-      const preferences = await this.getUserAlertPreferences(userId);
-      const logs = await this.fetchDeliveryLogsFromDatabase(userId);
+    try { const preferences = await this.getUserAlertPreferences(user_id);
+      const logs = await this.fetchDeliveryLogsFromDatabase(user_id);
 
       const deliveryStats = {
         totalAlerts: logs.length,
         successfulDeliveries: logs.filter(log => log.status === 'sent' || log.status === 'delivered').length,
         failedDeliveries: logs.filter(log => log.status === 'failed').length,
         filteredAlerts: logs.filter(log => log.status === 'filtered').length
-      };
+       };
 
       const channelStats: any = {};
       const channelTypes: ChannelType[] = ['in_app', 'email', 'push', 'sms', 'webhook'];
@@ -790,7 +756,7 @@ export class UnifiedAlertPreferenceService {
 
       const result = {
         totalPreferences: preferences.length,
-        activePreferences: preferences.filter(p => p.isActive).length,
+        activePreferences: preferences.filter(p => p.is_active).length,
         deliveryStats,
         channelStats
       };
@@ -798,13 +764,11 @@ export class UnifiedAlertPreferenceService {
       try {
         // Cache for 1 hour
         await cacheService.set(cacheKey, result, 3600);
-      } catch (err) {
-        logger.warn('Failed to write alert stats to cache', { component: 'AlertPreferenceService', userId, error: err });
+      } catch (err) { logger.warn('Failed to write alert stats to cache', { component: 'AlertPreferenceService', user_id, error: err  });
       }
 
       return result;
-    } catch (error) {
-      logger.error('Error fetching alert stats', { component: 'AlertPreferenceService', userId }, error);
+    } catch (error) { logger.error('Error fetching alert stats', { component: 'AlertPreferenceService', user_id  }, error);
       throw error;
     }
   }
@@ -813,13 +777,12 @@ export class UnifiedAlertPreferenceService {
   // PRIVATE HELPER METHODS
   // ========================================================================
 
-  private async createDefaultAlertPreference(userId: string): Promise<AlertPreference> {
-    const defaultPreference: AlertPreference = {
-      id: `default_${userId}`,
-      userId,
+  private async createDefaultAlertPreference(user_id: string): Promise<AlertPreference> { const defaultPreference: AlertPreference = {
+      id: `default_${user_id }`,
+      user_id,
       name: 'Default Alerts',
       description: 'Default alert preferences for all bill updates',
-      isActive: true,
+      is_active: true,
       alertTypes: [
         {
           type: 'bill_status_change',
@@ -845,44 +808,43 @@ export class UnifiedAlertPreferenceService {
       },
       smartFiltering: {
         enabled: true,
-        userInterestWeight: 0.6,
+        user_interestWeight: 0.6,
         engagementHistoryWeight: 0.3,
         trendingWeight: 0.1,
         duplicateFiltering: true,
         spamFiltering: true,
         minimumConfidence: 0.3
       },
-      createdAt: new Date(),
-      updatedAt: new Date()
+      created_at: new Date(),
+      updated_at: new Date()
     };
 
-    await this.storePreferenceInDatabase(userId, defaultPreference);
+    await this.storePreferenceInDatabase(user_id, defaultPreference);
     return defaultPreference;
   }
 
-  private async calculateUserInterestScore(userId: string, alertData: any): Promise<number> {
-    try {
-      const userProfile = await userProfileService.getUserProfile(userId);
-      const userInterests = userProfile.interests || [];
+  private async calculateUserInterestScore(user_id: string, alertData: any): Promise<number> { try {
+      const user_profiles = await user_profileservice.getUserProfile(user_id);
+      const user_interests = user_profiles.interests || [];
 
-      if (userInterests.length === 0) return 0.5;
+      if (user_interests.length === 0) return 0.5;
 
       let matchScore = 0;
       let totalChecks = 0;
 
       if (alertData.billCategory) {
         totalChecks++;
-        if (userInterests.some(interest => 
+        if (user_interests.some(interest => 
           interest.toLowerCase() === alertData.billCategory.toLowerCase()
         )) {
           matchScore += 1;
-        }
+         }
       }
 
       if (alertData.keywords && Array.isArray(alertData.keywords)) {
         for (const keyword of alertData.keywords) {
           totalChecks++;
-          if (userInterests.some(interest => 
+          if (user_interests.some(interest => 
             interest.toLowerCase().includes(keyword.toLowerCase()) ||
             keyword.toLowerCase().includes(interest.toLowerCase())
           )) {
@@ -893,18 +855,16 @@ export class UnifiedAlertPreferenceService {
 
       return totalChecks > 0 ? Math.min(matchScore / totalChecks, 1.0) : 0.5;
 
-    } catch (error) {
-      logger.error('Error calculating user interest score', { 
+    } catch (error) { logger.error('Error calculating user interest score', { 
         component: 'AlertPreferenceService',
-        userId 
-      }, error);
+        user_id 
+       }, error);
       return 0.5;
     }
   }
 
-  private async calculateEngagementHistoryScore(userId: string, alertData: any): Promise<number> {
-    try {
-      const engagementHistory = await userProfileService.getUserEngagementHistory(userId);
+  private async calculateEngagementHistoryScore(user_id: string, alertData: any): Promise<number> { try {
+      const engagementHistory = await user_profileservice.getUserEngagementHistory(user_id);
       
       if (engagementHistory.totalBillsTracked === 0) return 0.5;
 
@@ -918,16 +878,15 @@ export class UnifiedAlertPreferenceService {
             categoryEngagement.engagementCount / engagementHistory.totalBillsTracked, 
             1.0
           );
-        }
+         }
       }
 
       return 0.5;
 
-    } catch (error) {
-      logger.error('Error calculating engagement history score', { 
+    } catch (error) { logger.error('Error calculating engagement history score', { 
         component: 'AlertPreferenceService',
-        userId 
-      }, error);
+        user_id 
+       }, error);
       return 0.5;
     }
   }
@@ -943,41 +902,37 @@ export class UnifiedAlertPreferenceService {
   }
 
   private async checkForDuplicateAlert(
-    userId: string, 
+    user_id: string, 
     alertType: AlertType, 
     alertData: any
-  ): Promise<boolean> {
-    try {
-      const recentLogs = await this.getRecentDeliveryLogs(userId, 24);
+  ): Promise<boolean> { try {
+      const recentLogs = await this.getRecentDeliveryLogs(user_id, 24);
       
       return recentLogs.some(log => 
         log.alertType === alertType &&
-        log.metadata.billId === alertData.billId &&
+        log.metadata.bill_id === alertData.bill_id &&
         log.status !== 'failed'
       );
 
-    } catch (error) {
-      logger.error('Error checking for duplicate alert', { 
+     } catch (error) { logger.error('Error checking for duplicate alert', { 
         component: 'AlertPreferenceService',
-        userId 
-      }, error);
+        user_id 
+       }, error);
       return false;
     }
   }
 
-  private async checkForSpam(userId: string, alertType: AlertType): Promise<boolean> {
-    try {
-      const recentLogs = await this.getRecentDeliveryLogs(userId, 1);
+  private async checkForSpam(user_id: string, alertType: AlertType): Promise<boolean> { try {
+      const recentLogs = await this.getRecentDeliveryLogs(user_id, 1);
       
       // Simple spam detection: more than 10 alerts of same type in last hour
       const sameTypeCount = recentLogs.filter(log => log.alertType === alertType).length;
       return sameTypeCount > 10;
 
-    } catch (error) {
-      logger.error('Error checking for spam', { 
+     } catch (error) { logger.error('Error checking for spam', { 
         component: 'AlertPreferenceService',
-        userId 
-      }, error);
+        user_id 
+       }, error);
       return false;
     }
   }
@@ -1000,9 +955,9 @@ export class UnifiedAlertPreferenceService {
     }
 
     // Check sponsor IDs
-    if (conditions.sponsorIds && conditions.sponsorIds.length > 0) {
-      if (!alertData.sponsorId || 
-          !conditions.sponsorIds.includes(alertData.sponsorId)) {
+    if (conditions.sponsor_ids && conditions.sponsor_ids.length > 0) {
+      if (!alertData.sponsor_id || 
+          !conditions.sponsor_ids.includes(alertData.sponsor_id)) {
         return false;
       }
     }
@@ -1058,7 +1013,7 @@ export class UnifiedAlertPreferenceService {
   }
 
   private async deliverImmediateAlert(
-    userId: string,
+    user_id: string,
     alertType: AlertType,
     alertData: any,
     channels: AlertChannel[],
@@ -1076,24 +1031,22 @@ export class UnifiedAlertPreferenceService {
 
       const mapped = notificationTypeMap[alertType] || { type: 'system_alert' };
 
-      await notificationChannelService.sendMultiChannelNotification({
-        userId,
+      await notificationChannelService.sendMultiChannelNotification({ user_id,
         type: mapped.type,
         subType: mapped.subType,
         title: alertData.title || this.getDefaultTitle(alertType),
         message: alertData.message || alertData.description || 'You have a new alert',
         priority: priority as any,
-        relatedBillId: (alertData && alertData.billId) || undefined,
+        relatedBillId: (alertData && alertData.bill_id) || undefined,
         metadata: alertData as any
-      });
+       });
 
       return { success: true };
 
-    } catch (error) {
-      logger.error('Error delivering immediate alert', { 
+    } catch (error) { logger.error('Error delivering immediate alert', { 
         component: 'AlertPreferenceService',
-        userId 
-      }, error);
+        user_id 
+       }, error);
       return { 
         success: false, 
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -1114,11 +1067,10 @@ export class UnifiedAlertPreferenceService {
   }
 
   private async addToBatch(
-    userId: string, 
+    user_id: string, 
     preferenceId: string, 
     alertData: any
-  ): Promise<void> {
-    const batchKey = `alert_batch:${userId}:${preferenceId}`;
+  ): Promise<void> { const batchKey = `alert_batch:${user_id }:${preferenceId}`;
     
     try {
       const existingBatch = await cacheService.get(batchKey) || [];
@@ -1128,17 +1080,16 @@ export class UnifiedAlertPreferenceService {
       });
       
   await cacheService.set(batchKey, existingBatch, 7200);
-    } catch (error) {
-      logger.error('Error adding to batch', { 
+    } catch (error) { logger.error('Error adding to batch', { 
         component: 'AlertPreferenceService',
-        userId,
+        user_id,
         preferenceId 
-      }, error);
+       }, error);
     }
   }
 
   private createDeliveryLog(
-    userId: string,
+    user_id: string,
     preferenceId: string,
     alertType: AlertType,
     channels: ChannelType[],
@@ -1150,7 +1101,7 @@ export class UnifiedAlertPreferenceService {
   ): AlertDeliveryLog {
     return {
       id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      userId,
+      user_id,
       preferenceId,
       alertType,
       channels,
@@ -1163,7 +1114,7 @@ export class UnifiedAlertPreferenceService {
         originalPriority,
         ...metadata
       },
-      createdAt: new Date()
+      created_at: new Date()
     };
   }
 
@@ -1179,7 +1130,7 @@ export class UnifiedAlertPreferenceService {
    * Store preference in the database (users.preferences JSON column)
    */
   private async storePreferenceInDatabase(
-    userId: string, 
+    user_id: string, 
     preference: AlertPreference
   ): Promise<void> {
     try {
@@ -1187,7 +1138,7 @@ export class UnifiedAlertPreferenceService {
       const [user] = await this.db
         .select({ preferences: schema.users.preferences })
         .from(schema.users)
-        .where(eq(schema.users.id, userId))
+        .where(eq(schema.users.id, user_id))
         .limit(1);
 
       const currentPreferences = (user?.preferences as any) || {};
@@ -1209,15 +1160,14 @@ export class UnifiedAlertPreferenceService {
             ...currentPreferences,
             alertPreferences
           },
-          updatedAt: new Date()
+          updated_at: new Date()
         })
-        .where(eq(schema.users.id, userId));
+        .where(eq(schema.users.id, user_id));
 
-    } catch (error) {
-      logger.error('Error storing preference in database', { 
+    } catch (error) { logger.error('Error storing preference in database', { 
         component: 'AlertPreferenceService',
-        userId 
-      }, error);
+        user_id 
+       }, error);
       throw error;
     }
   }
@@ -1226,24 +1176,23 @@ export class UnifiedAlertPreferenceService {
    * Update an existing preference in the database
    */
   private async updatePreferenceInDatabase(
-    userId: string, 
+    user_id: string, 
     preference: AlertPreference
-  ): Promise<void> {
-    await this.storePreferenceInDatabase(userId, preference);
-  }
+  ): Promise<void> { await this.storePreferenceInDatabase(user_id, preference);
+   }
 
   /**
    * Remove a preference from the database
    */
   private async removePreferenceFromDatabase(
-    userId: string, 
+    user_id: string, 
     preferenceId: string
   ): Promise<void> {
     try {
       const [user] = await this.db
         .select({ preferences: schema.users.preferences })
         .from(schema.users)
-        .where(eq(schema.users.id, userId))
+        .where(eq(schema.users.id, user_id))
         .limit(1);
 
       const currentPreferences = (user?.preferences as any) || {};
@@ -1260,16 +1209,15 @@ export class UnifiedAlertPreferenceService {
             ...currentPreferences,
             alertPreferences: updatedPreferences
           },
-          updatedAt: new Date()
+          updated_at: new Date()
         })
-        .where(eq(schema.users.id, userId));
+        .where(eq(schema.users.id, user_id));
 
-    } catch (error) {
-      logger.error('Error removing preference from database', { 
+    } catch (error) { logger.error('Error removing preference from database', { 
         component: 'AlertPreferenceService',
-        userId,
+        user_id,
         preferenceId 
-      }, error);
+       }, error);
       throw error;
     }
   }
@@ -1277,33 +1225,32 @@ export class UnifiedAlertPreferenceService {
   /**
    * Fetch all preferences for a user from the database
    */
-  private async fetchPreferencesFromDatabase(userId: string): Promise<AlertPreference[]> {
+  private async fetchPreferencesFromDatabase(user_id: string): Promise<AlertPreference[]> {
     try {
       const [user] = await this.db
         .select({ preferences: schema.users.preferences })
         .from(schema.users)
-        .where(eq(schema.users.id, userId))
+        .where(eq(schema.users.id, user_id))
         .limit(1);
 
       if (!user) {
         return [];
       }
 
-      const currentPreferences = (user.preferences as any) || {};
+      const currentPreferences = (users.preferences as any) || {};
       const alertPreferences = currentPreferences.alertPreferences || [];
       
       // Convert stored data to AlertPreference objects with proper Date types
       return alertPreferences.map((p: any) => ({
         ...p,
-        createdAt: new Date(p.createdAt),
-        updatedAt: new Date(p.updatedAt)
+        created_at: new Date(p.created_at),
+        updated_at: new Date(p.updated_at)
       }));
 
-    } catch (error) {
-      logger.error('Error fetching preferences from database', { 
+    } catch (error) { logger.error('Error fetching preferences from database', { 
         component: 'AlertPreferenceService',
-        userId 
-      }, error);
+        user_id 
+       }, error);
       throw error;
     }
   }
@@ -1317,7 +1264,7 @@ export class UnifiedAlertPreferenceService {
       const [user] = await this.db
         .select({ preferences: schema.users.preferences })
         .from(schema.users)
-        .where(eq(schema.users.id, log.userId))
+        .where(eq(schema.users.id, log.user_id))
         .limit(1);
 
       const currentPreferences = (user?.preferences as any) || {};
@@ -1329,7 +1276,7 @@ export class UnifiedAlertPreferenceService {
       // Keep only the most recent 1000 logs per user
       if (deliveryLogs.length > 1000) {
         deliveryLogs.sort((a: any, b: any) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
         deliveryLogs.splice(1000);
       }
@@ -1343,47 +1290,45 @@ export class UnifiedAlertPreferenceService {
             deliveryLogs
           }
         })
-        .where(eq(schema.users.id, log.userId));
+        .where(eq(schema.users.id, log.user_id));
 
-    } catch (error) {
-      logger.error('Error storing delivery log', { 
+    } catch (error) { logger.error('Error storing delivery log', { 
         component: 'AlertPreferenceService',
-        userId: log.userId 
-      }, error);
+        user_id: log.user_id 
+       }, error);
     }
   }
 
   /**
    * Fetch all delivery logs for a user from the database
    */
-  private async fetchDeliveryLogsFromDatabase(userId: string): Promise<AlertDeliveryLog[]> {
+  private async fetchDeliveryLogsFromDatabase(user_id: string): Promise<AlertDeliveryLog[]> {
     try {
       const [user] = await this.db
         .select({ preferences: schema.users.preferences })
         .from(schema.users)
-        .where(eq(schema.users.id, userId))
+        .where(eq(schema.users.id, user_id))
         .limit(1);
 
       if (!user) {
         return [];
       }
 
-      const currentPreferences = (user.preferences as any) || {};
+      const currentPreferences = (users.preferences as any) || {};
       const deliveryLogs = currentPreferences.deliveryLogs || [];
       
       // Convert to proper types
       return deliveryLogs.map((log: any) => ({
         ...log,
-        createdAt: new Date(log.createdAt),
+        created_at: new Date(log.created_at),
         lastAttempt: new Date(log.lastAttempt),
         deliveredAt: log.deliveredAt ? new Date(log.deliveredAt) : undefined
       }));
 
-    } catch (error) {
-      logger.error('Error fetching delivery logs from database', { 
+    } catch (error) { logger.error('Error fetching delivery logs from database', { 
         component: 'AlertPreferenceService',
-        userId 
-      }, error);
+        user_id 
+       }, error);
       return [];
     }
   }
@@ -1391,20 +1336,18 @@ export class UnifiedAlertPreferenceService {
   /**
    * Get recent delivery logs within specified hours
    */
-  private async getRecentDeliveryLogs(userId: string, hours: number): Promise<AlertDeliveryLog[]> {
-    const allLogs = await this.fetchDeliveryLogsFromDatabase(userId);
+  private async getRecentDeliveryLogs(user_id: string, hours: number): Promise<AlertDeliveryLog[]> { const allLogs = await this.fetchDeliveryLogsFromDatabase(user_id);
     const cutoffTime = new Date(Date.now() - hours * 60 * 60 * 1000);
     
-    return allLogs.filter(log => log.createdAt >= cutoffTime);
-  }
+    return allLogs.filter(log => log.created_at >= cutoffTime);
+   }
 
   /**
    * Clear cached preferences for a user
    */
-  private async clearUserPreferenceCache(userId: string): Promise<void> {
-    const patterns = [
-      `user:profile:${userId}:alert_preferences`,
-      `user:profile:${userId}:alert_stats`
+  private async clearUserPreferenceCache(user_id: string): Promise<void> { const patterns = [
+      `user:profile:${user_id }:alert_preferences`,
+      `user:profile:${ user_id }:alert_stats`
     ];
 
     for (const pattern of patterns) {
@@ -1426,8 +1369,7 @@ export class UnifiedAlertPreferenceService {
    * Process batched alerts for a user
    * This should be called by a scheduled job
    */
-  async processBatchedAlerts(userId: string, preferenceId: string): Promise<number> {
-    const batchKey = `alert_batch:${userId}:${preferenceId}`;
+  async processBatchedAlerts(user_id: string, preferenceId: string): Promise<number> { const batchKey = `alert_batch:${user_id }:${preferenceId}`;
     
     try {
       const batch = await cacheService.get(batchKey);
@@ -1436,14 +1378,13 @@ export class UnifiedAlertPreferenceService {
         return 0;
       }
 
-      const preference = await this.getAlertPreference(userId, preferenceId);
+      const preference = await this.getAlertPreference(user_id, preferenceId);
       
       if (!preference) {
-        logger.warn(`Preference ${preferenceId} not found for batched alerts`, {
-          component: 'AlertPreferenceService',
-          userId,
+        logger.warn(`Preference ${preferenceId} not found for batched alerts`, { component: 'AlertPreferenceService',
+          user_id,
           preferenceId
-        });
+         });
         return 0;
       }
 
@@ -1457,11 +1398,10 @@ export class UnifiedAlertPreferenceService {
       }, {});
 
       // Send batch notification
-      await notificationChannelService.sendMultiChannelNotification({
-        userId,
+      await notificationChannelService.sendMultiChannelNotification({ user_id,
         type: 'digest',
         title: 'Alert Digest',
-        message: `You have ${batch.length} new alerts`,
+        message: `You have ${batch.length } new alerts`,
         priority: 'medium',
         metadata: {
           batch: groupedAlerts,
@@ -1473,20 +1413,18 @@ export class UnifiedAlertPreferenceService {
       // Clear the batch
       await cacheService.delete(batchKey);
 
-      logger.info(`Processed ${batch.length} batched alerts`, {
-        component: 'AlertPreferenceService',
-        userId,
+      logger.info(`Processed ${batch.length} batched alerts`, { component: 'AlertPreferenceService',
+        user_id,
         preferenceId
-      });
+       });
 
       return batch.length;
 
-    } catch (error) {
-      logger.error('Error processing batched alerts', {
+    } catch (error) { logger.error('Error processing batched alerts', {
         component: 'AlertPreferenceService',
-        userId,
+        user_id,
         preferenceId
-      }, error);
+       }, error);
       return 0;
     }
   }
@@ -1495,20 +1433,19 @@ export class UnifiedAlertPreferenceService {
    * Verify a notification channel (email, SMS, etc.)
    */
   async verifyChannel(
-    userId: string,
+    user_id: string,
     preferenceId: string,
     channelType: ChannelType,
     verificationCode: string
-  ): Promise<boolean> {
-    try {
+  ): Promise<boolean> { try {
       // In production, verify the code against a stored verification token
       // For now, we'll assume verification is successful
       
-      const preference = await this.getAlertPreference(userId, preferenceId);
+      const preference = await this.getAlertPreference(user_id, preferenceId);
       
       if (!preference) {
         throw new Error('Preference not found');
-      }
+       }
 
       const channelIndex = preference.channels.findIndex(ch => ch.type === channelType);
       
@@ -1519,25 +1456,23 @@ export class UnifiedAlertPreferenceService {
       // Update the channel's verified status
       preference.channels[channelIndex].config.verified = true;
       
-      await this.updateAlertPreference(userId, preferenceId, {
+      await this.updateAlertPreference(user_id, preferenceId, {
         channels: preference.channels
       });
 
-      logger.info(`Channel ${channelType} verified`, {
-        component: 'AlertPreferenceService',
-        userId,
+      logger.info(`Channel ${channelType} verified`, { component: 'AlertPreferenceService',
+        user_id,
         preferenceId
-      });
+       });
 
       return true;
 
-    } catch (error) {
-      logger.error('Error verifying channel', {
+    } catch (error) { logger.error('Error verifying channel', {
         component: 'AlertPreferenceService',
-        userId,
+        user_id,
         preferenceId,
         channelType
-      }, error);
+       }, error);
       return false;
     }
   }

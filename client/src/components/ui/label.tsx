@@ -20,7 +20,7 @@ const Label = React.forwardRef<
     {...props}
   />
 ))
-Label.displayName = LabelPrimitive.Root.displayName
+Label.display_name = LabelPrimitive.Root.display_name
 
 export { Label }
 

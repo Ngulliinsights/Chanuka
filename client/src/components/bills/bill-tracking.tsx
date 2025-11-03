@@ -27,13 +27,12 @@ interface Bill {
   summary: string;
   status: string;
   category: string;
-  introducedDate: string;
+  introduced_date: string;
   sponsor: string;
 }
 
-interface BillTrackingProps {
-  billId: number;
-}
+interface BillTrackingProps { bill_id: number;
+ }
 
 interface TrackingPreferences {
   statusChanges: boolean;
@@ -42,7 +41,7 @@ interface TrackingPreferences {
   amendments: boolean;
 }
 
-const BillTracking = ({ billId }: BillTrackingProps): JSX.Element => {
+const BillTracking = ({ bill_id  }: BillTrackingProps): JSX.Element => {
   const [preferences, setPreferences] = useState<TrackingPreferences>({
     statusChanges: true,
     newComments: false,
@@ -53,30 +52,26 @@ const BillTracking = ({ billId }: BillTrackingProps): JSX.Element => {
   const queryClient = useQueryClient();
 
   // Check if user is tracking this bill
-  const { data: trackingStatus, isLoading: trackingLoading } = useSafeQuery({
-    queryKey: ['bill-tracking', billId],
-    queryFn: () => AuthenticatedAPI.get(`/api/bill-tracking/${billId}/tracking-status`)
+  const { data: trackingStatus, isLoading: trackingLoading } = useSafeQuery({ queryKey: ['bill-tracking', bill_id],
+    queryFn: () => AuthenticatedAPI.get(`/api/bill-tracking/${bill_id }/tracking-status`)
   });
 
   // Get engagement stats
-  const { data: engagementStats } = useSafeQuery({
-    queryKey: ['bill-engagement', billId],
-    queryFn: () => AuthenticatedAPI.get(`/api/bill-tracking/${billId}/engagement`)
+  const { data: engagementStats } = useSafeQuery({ queryKey: ['bill-engagement', bill_id],
+    queryFn: () => AuthenticatedAPI.get(`/api/bill-tracking/${bill_id }/engagement`)
   });
 
   // Track bill mutation
-  const trackBillMutation = useMutation({
-    mutationFn: async () => {
-      return AuthenticatedAPI.post(`/api/bill-tracking/${billId}/track`, {
+  const trackBillMutation = useMutation({ mutationFn: async () => {
+      return AuthenticatedAPI.post(`/api/bill-tracking/${bill_id }/track`, {
         trackingType: 'follow',
         alertPreferences: preferences
       });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bill-tracking', billId] });
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['bill-tracking', bill_id]  });
       toast({
         title: 'Bill tracking enabled',
-        description: 'You will receive notifications about this bill.'
+        description: 'You will receive notifications about this bills.'
       });
     },
     onError: () => {
@@ -89,15 +84,13 @@ const BillTracking = ({ billId }: BillTrackingProps): JSX.Element => {
   });
 
   // Untrack bill mutation
-  const untrackBillMutation = useMutation({
-    mutationFn: async () => {
-      return AuthenticatedAPI.delete(`/api/bill-tracking/${billId}/track`);
+  const untrackBillMutation = useMutation({ mutationFn: async () => {
+      return AuthenticatedAPI.delete(`/api/bill-tracking/${bill_id }/track`);
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['bill-tracking', billId] });
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['bill-tracking', bill_id]  });
       toast({
         title: 'Bill tracking disabled',
-        description: 'You will no longer receive notifications about this bill.'
+        description: 'You will no longer receive notifications about this bills.'
       });
     },
     onError: () => {
@@ -110,16 +103,15 @@ const BillTracking = ({ billId }: BillTrackingProps): JSX.Element => {
   });
 
   // Record view mutation
-  const recordViewMutation = useMutation({
-    mutationFn: async () => {
-      return AuthenticatedAPI.post(`/api/bill-tracking/${billId}/view`);
+  const recordViewMutation = useMutation({ mutationFn: async () => {
+      return AuthenticatedAPI.post(`/api/bill-tracking/${bill_id }/view`);
     }
   });
 
   // Record view on component mount
   useEffect(() => {
     recordViewMutation.mutate();
-  }, [billId]);
+  }, [bill_id]);
 
   const handleTrackingToggle = () => {
     if ((trackingStatus?.data as any)?.isTracking) {
@@ -285,7 +277,7 @@ const BillTracking = ({ billId }: BillTrackingProps): JSX.Element => {
             <div className="flex items-center justify-between">
               <span className="text-sm text-muted-foreground">Engagement Score</span>
               <Badge variant="outline" className="font-mono">
-                {(engagementStats.data as { engagementScore?: number })?.engagementScore || 0}
+                {(engagementStats.data as { engagement_score?: number })?.engagement_score || 0}
               </Badge>
             </div>
           </CardContent>

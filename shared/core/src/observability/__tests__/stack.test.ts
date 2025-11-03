@@ -44,18 +44,17 @@ describe('AsyncCorrelationManager', () => {
       expect(context.correlationId).toBe(customCorrelationId);
     });
 
-    it('should preserve provided context fields', () => {
-      const inputContext = {
+    it('should preserve provided context fields', () => { const inputContext = {
         correlationId: 'test-corr-id',
-        userId: 'user-123',
+        user_id: 'user-123',
         sessionId: 'session-456',
-        metadata: { key: 'value' }
+        metadata: { key: 'value'  }
       };
       
       const context = correlationManager.startRequest(inputContext);
       
       expect(context.correlationId).toBe(inputContext.correlationId);
-      expect(context.userId).toBe(inputContext.userId);
+      expect(context.user_id).toBe(inputContext.user_id);
       expect(context.sessionId).toBe(inputContext.sessionId);
       expect(context.metadata).toEqual(inputContext.metadata);
     });
@@ -285,7 +284,7 @@ describe('Integration Tests', () => {
     expect(initResult.isSuccess()).toBe(true);
     
     // Test correlation context
-    const context = stack.startRequest({ userId: 'test-user' });
+    const context = stack.startRequest({ user_id: 'test-user'  });
     
     await stack.withContextAsync(context, async () => {
       // Test logger

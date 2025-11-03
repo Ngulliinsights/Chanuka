@@ -251,14 +251,14 @@ export const createRequestIdInterceptor = (): RequestInterceptor => ({
 /**
  * User agent interceptor
  */
-export const createUserAgentInterceptor = (userAgent: string): RequestInterceptor => ({
+export const createUserAgentInterceptor = (user_agent: string): RequestInterceptor => ({
   name: 'user-agent',
   priority: 50,
   intercept: (request) => ({
     ...request,
     headers: {
       ...request.headers,
-      'User-Agent': userAgent,
+      'User-Agent': user_agent,
     },
   }),
 });
@@ -550,7 +550,7 @@ export class InterceptorManager {
 // ==================== Default Interceptor Sets ====================
 
 export const createDefaultInterceptors = (options: {
-  userAgent?: string;
+  user_agent?: string;
   timeout?: number;
   enableLogging?: boolean;
   enableRequestId?: boolean;
@@ -561,8 +561,8 @@ export const createDefaultInterceptors = (options: {
     manager.addRequestInterceptor(createRequestIdInterceptor());
   }
 
-  if (options.userAgent) {
-    manager.addRequestInterceptor(createUserAgentInterceptor(options.userAgent));
+  if (options.user_agent) {
+    manager.addRequestInterceptor(createUserAgentInterceptor(options.user_agent));
   }
 
   if (options.timeout) {

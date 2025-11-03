@@ -25,16 +25,15 @@ export interface UserErrorReporterConfig {
   };
 }
 
-export interface ErrorReportSubmission {
-  errorId: string;
+export interface ErrorReportSubmission { errorId: string;
   userMessage: string;
   technicalDetails?: string;
   recoveryOptions: RecoveryOption[];
-  userId?: string;
+  user_id?: string;
   sessionId?: string;
-  userAgent?: string;
+  user_agent?: string;
   url?: string;
-}
+ }
 
 export class UserErrorReporter {
   private reports: Map<string, UserErrorReport> = new Map();
@@ -57,8 +56,7 @@ export class UserErrorReporter {
     error: BaseError,
     context: ErrorContext = {},
     recoveryOptions: RecoveryOption[] = []
-  ): UserErrorReport {
-    const errorId = error.errorId;
+  ): UserErrorReport { const errorId = error.errorId;
     const userMessage = this.generateUserMessage(error);
     const technicalDetails = this.config.enableTechnicalDetails
       ? this.generateTechnicalDetails(error)
@@ -70,9 +68,9 @@ export class UserErrorReporter {
       technicalDetails,
       recoveryOptions,
       timestamp: new Date(),
-      userId: context.userId,
+      user_id: context.user_id,
       sessionId: context.sessionId
-    };
+     };
 
     // Store the report
     this.reports.set(errorId, report);
@@ -80,12 +78,11 @@ export class UserErrorReporter {
     // Clean up old reports periodically
     this.cleanupOldReports();
 
-    logger.info('Generated user error report', {
-      component: 'UserErrorReporter',
+    logger.info('Generated user error report', { component: 'UserErrorReporter',
       errorId,
-      userId: context.userId,
+      user_id: context.user_id,
       sessionId: context.sessionId || context.metadata?.sessionId
-    });
+     });
 
     return report;
   }
@@ -146,11 +143,10 @@ export class UserErrorReporter {
   /**
    * Get all reports for a user
    */
-  getReportsForUser(userId: string): UserErrorReport[] {
-    return Array.from(this.reports.values())
-      .filter(report => report.userId === userId)
+  getReportsForUser(user_id: string): UserErrorReport[] { return Array.from(this.reports.values())
+      .filter(report => report.user_id === user_id)
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-  }
+   }
 
   /**
    * Get recent reports
@@ -248,15 +244,14 @@ export class UserErrorReporter {
   /**
    * Export reports for analysis
    */
-  exportReports(): ErrorReportSubmission[] {
-    return Array.from(this.reports.values()).map(report => ({
+  exportReports(): ErrorReportSubmission[] { return Array.from(this.reports.values()).map(report => ({
       errorId: report.errorId,
       userMessage: report.userMessage,
       technicalDetails: report.technicalDetails,
       recoveryOptions: report.recoveryOptions || [],
-      userId: report.userId,
+      user_id: report.user_id,
       sessionId: report.sessionId
-    }));
+     }));
   }
 
   /**

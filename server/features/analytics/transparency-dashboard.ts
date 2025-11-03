@@ -19,7 +19,7 @@ export interface TransparencyScoreResult {
 export interface TrendAnalysisResult {
   trends: Array<{
     period: string;
-    transparencyScore: number;
+    transparency_score: number;
     riskLevel: string;
     disclosureCount: number;
     verificationRate: number;
@@ -55,19 +55,19 @@ export class SimpleTransparencyDashboardService {
   /**
    * Implement transparency scoring algorithms
    */
-  async calculateTransparencyScore(sponsorId: number): Promise<TransparencyScoreResult> {
+  async calculateTransparencyScore(sponsor_id: number): Promise<TransparencyScoreResult> {
     try {
-      console.log(`🔄 Calculating transparency score for sponsor ${sponsorId}...`);
+      console.log(`🔄 Calculating transparency score for sponsor ${sponsor_id}...`);
 
       const [completenessReport, relationshipMapping, disclosures, sponsor] = await Promise.all([
-        financialDisclosureAnalyticsService.calculateCompletenessScore(sponsorId),
-        financialDisclosureAnalyticsService.buildRelationshipMap(sponsorId),
-        financialDisclosureAnalyticsService.getDisclosureData(sponsorId),
-        this.getSponsorDetails(sponsorId)
+        financialDisclosureAnalyticsService.calculateCompletenessScore(sponsor_id),
+        financialDisclosureAnalyticsService.buildRelationshipMap(sponsor_id),
+        financialDisclosureAnalyticsService.getDisclosureData(sponsor_id),
+        this.getSponsorDetails(sponsor_id)
       ]);
 
       if (!sponsor) {
-        throw new Error(`Sponsor ${sponsorId} not found`);
+        throw new Error(`Sponsor ${sponsor_id} not found`);
       }
 
       // Calculate component scores using algorithms
@@ -108,12 +108,12 @@ export class SimpleTransparencyDashboardService {
         lastCalculated: new Date()
       };
     } catch (error) {
-      logger.error(`Error calculating transparency score for sponsor ${sponsorId}`, { component: 'transparency-dashboard', sponsorId, error });
+      logger.error(`Error calculating transparency score for sponsor ${sponsor_id}`, { component: 'transparency-dashboard', sponsor_id, error });
       try {
         if ((errorTracker as any)?.trackRequestError) {
           (errorTracker as any).trackRequestError(error instanceof Error ? error : new Error(String(error)), undefined as any, 'medium', 'calculateTransparencyScore');
         } else if ((errorTracker as any)?.capture) {
-          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'transparency-dashboard', sponsorId });
+          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'transparency-dashboard', sponsor_id });
         }
       } catch (reportErr) {
         logger.warn('Failed to report transparency dashboard error to errorTracker', { reportErr });
@@ -126,7 +126,7 @@ export class SimpleTransparencyDashboardService {
    * Create transparency trend analysis and historical tracking
    */
   async analyzeTransparencyTrends(
-    sponsorId?: number,
+    sponsor_id?: number,
     timeframe: 'monthly' | 'quarterly' | 'yearly' = 'monthly'
   ): Promise<TrendAnalysisResult> {
     try {
@@ -136,7 +136,7 @@ export class SimpleTransparencyDashboardService {
       const periods = this.generateTimePeriods(timeframe, 12);
       const trends: Array<{
         period: string;
-        transparencyScore: number;
+        transparency_score: number;
         riskLevel: string;
         disclosureCount: number;
         verificationRate: number;
@@ -148,12 +148,12 @@ export class SimpleTransparencyDashboardService {
         const periodData = await this.calculatePeriodTransparency(
           period.start,
           period.end,
-          sponsorId
+          sponsor_id
         );
         
         trends.push({
           period: period.label,
-          transparencyScore: periodData.averageScore,
+          transparency_score: periodData.averageScore,
           riskLevel: periodData.averageRiskLevel,
           disclosureCount: periodData.disclosureCount,
           verificationRate: periodData.verificationRate,
@@ -188,16 +188,16 @@ export class SimpleTransparencyDashboardService {
         .select({
           id: sponsors.id,
           name: sponsors.name,
-          transparencyScore: sponsors.transparencyScore
+          transparency_score: sponsors.transparency_score
         })
         .from(sponsors)
-        .where(eq(sponsors.isActive, true));
+        .where(eq(sponsors.is_active, true));
 
       // Calculate overall metrics
       const totalSponsors = allSponsors.length;
       const averageTransparencyScore = totalSponsors > 0
         ? Math.round(
-            allSponsors.reduce((sum, s) => sum + (Number(s.transparencyScore) || 0), 0) / totalSponsors
+            allSponsors.reduce((sum, s) => sum + (Number(s.transparency_score) || 0), 0) / totalSponsors
           )
         : 0;
 
@@ -207,14 +207,14 @@ export class SimpleTransparencyDashboardService {
         .from(sponsorTransparency);
 
       const totalDisclosures = allDisclosures.length;
-      const verifiedDisclosures = allDisclosures.filter(d => d.isVerified).length;
+      const verifiedDisclosures = allDisclosures.filter(d => d.is_verified).length;
       const verificationRate = totalDisclosures > 0
         ? Math.round((verifiedDisclosures / totalDisclosures) * 100)
         : 0;
 
       // Calculate risk distribution
       const riskDistribution = allSponsors.reduce((acc, sponsor) => {
-        const score = Number(sponsor.transparencyScore) || 0;
+        const score = Number(sponsors.transparency_score) || 0;
         let riskLevel: string;
         if (score < 50) riskLevel = 'critical';
         else if (score < 70) riskLevel = 'high';
@@ -227,17 +227,17 @@ export class SimpleTransparencyDashboardService {
 
       // Get top risk sponsors for analysis
       const topRisks = allSponsors
-        .filter(s => Number(s.transparencyScore) < 70)
-        .sort((a, b) => (Number(a.transparencyScore) || 0) - (Number(b.transparencyScore) || 0))
+        .filter(s => Number(s.transparency_score) < 70)
+        .sort((a, b) => (Number(a.transparency_score) || 0) - (Number(b.transparency_score) || 0))
         .slice(0, 10)
         .map(s => ({
-          sponsorId: s.id,
+          sponsor_id: s.id,
           sponsorName: s.name,
-          transparencyScore: Number(s.transparencyScore) || 0,
-          riskLevel: Number(s.transparencyScore) < 50 ? 'critical' : 'high',
+          transparency_score: Number(s.transparency_score) || 0,
+          riskLevel: Number(s.transparency_score) < 50 ? 'critical' : 'high',
           disclosureCompleteness: 0,
           conflictCount: 0,
-          financialExposure: 0,
+          financial_exposure: 0,
           lastUpdated: new Date(),
           trends: {
             scoreChange: 0,
@@ -254,7 +254,7 @@ export class SimpleTransparencyDashboardService {
       const recentDisclosures = await readDatabase
         .select({ count: count() })
         .from(sponsorTransparency)
-        .where(gte(sponsorTransparency.createdAt, oneDayAgo));
+        .where(gte(sponsorTransparency.created_at, oneDayAgo));
 
       const dataFreshness = totalDisclosures > 0
         ? Math.round((recentDisclosures[0].count / totalDisclosures) * 100)
@@ -304,11 +304,11 @@ export class SimpleTransparencyDashboardService {
 
   // Private helper methods
 
-  private async getSponsorDetails(sponsorId: number) {
+  private async getSponsorDetails(sponsor_id: number) {
     const sponsor = await readDatabase
       .select()
       .from(sponsors)
-      .where(eq(sponsors.id, sponsorId))
+      .where(eq(sponsors.id, sponsor_id))
       .limit(1);
     
     return sponsor[0] || null;
@@ -316,7 +316,7 @@ export class SimpleTransparencyDashboardService {
 
   private calculateVerificationScore(disclosures: any[]): number {
     if (disclosures.length === 0) return 0;
-    const verifiedCount = disclosures.filter(d => d.isVerified).length;
+    const verifiedCount = disclosures.filter(d => d.is_verified).length;
     return Math.round((verifiedCount / disclosures.length) * 100);
   }
 
@@ -346,9 +346,9 @@ export class SimpleTransparencyDashboardService {
   private calculatePublicAccessibilityScore(sponsor: any, disclosures: any[]): number {
     let score = 50; // Base score
     
-    if (sponsor.bio) score += 10;
-    if (sponsor.email) score += 10;
-    if (sponsor.photoUrl) score += 10;
+    if (sponsors.bio) score += 10;
+    if (sponsors.email) score += 10;
+    if (sponsors.photo_url) score += 10;
     if (disclosures.length > 0) score += 20;
     
     return Math.min(score, 100);
@@ -425,34 +425,34 @@ export class SimpleTransparencyDashboardService {
     return periods;
   }
 
-  private async calculatePeriodTransparency(start: Date, end: Date, sponsorId?: number) {
+  private async calculatePeriodTransparency(start: Date, end: Date, sponsor_id?: number) {
     try {
       // Get sponsors for the period
       let sponsorQuery = readDatabase
         .select({
           id: sponsors.id,
-          transparencyScore: sponsors.transparencyScore
+          transparency_score: sponsors.transparency_score
         })
         .from(sponsors)
         .where(
           and(
-            eq(sponsors.isActive, true),
-            lte(sponsors.createdAt, end)
+            eq(sponsors.is_active, true),
+            lte(sponsors.created_at, end)
           )
         );
 
-      if (sponsorId) {
+      if (sponsor_id) {
         sponsorQuery = readDatabase
           .select({
             id: sponsors.id,
-            transparencyScore: sponsors.transparencyScore
+            transparency_score: sponsors.transparency_score
           })
           .from(sponsors)
           .where(
             and(
-              eq(sponsors.isActive, true),
-              lte(sponsors.createdAt, end),
-              eq(sponsors.id, sponsorId)
+              eq(sponsors.is_active, true),
+              lte(sponsors.created_at, end),
+              eq(sponsors.id, sponsor_id)
             )
           );
       }
@@ -462,7 +462,7 @@ export class SimpleTransparencyDashboardService {
       // Calculate average transparency score
       const averageScore = sponsorsInPeriod.length > 0
         ? Math.round(
-            sponsorsInPeriod.reduce((sum, s) => sum + (Number(s.transparencyScore) || 0), 0) / sponsorsInPeriod.length
+            sponsorsInPeriod.reduce((sum, s) => sum + (Number(s.transparency_score) || 0), 0) / sponsorsInPeriod.length
           )
         : 0;
 
@@ -478,7 +478,7 @@ export class SimpleTransparencyDashboardService {
         );
 
       // Calculate metrics
-      const verifiedDisclosures = disclosures.filter(d => d.isVerified).length;
+      const verifiedDisclosures = disclosures.filter(d => d.is_verified).length;
       const verificationRate = disclosures.length > 0 
         ? Math.round((verifiedDisclosures / disclosures.length) * 100)
         : 0;
@@ -514,7 +514,7 @@ export class SimpleTransparencyDashboardService {
 
   private analyzeTrendPatterns(trends: Array<{
     period: string;
-    transparencyScore: number;
+    transparency_score: number;
     riskLevel: string;
     disclosureCount: number;
     verificationRate: number;
@@ -530,7 +530,7 @@ export class SimpleTransparencyDashboardService {
     }
 
     // Calculate trend direction using algorithm
-    const scores = trends.map(t => t.transparencyScore);
+    const scores = trends.map(t => t.transparency_score);
     const firstHalf = scores.slice(0, Math.floor(scores.length / 2));
     const secondHalf = scores.slice(Math.floor(scores.length / 2));
     
@@ -556,7 +556,7 @@ export class SimpleTransparencyDashboardService {
       const prev = trends[i - 1];
       const curr = trends[i];
       
-      const scoreChange = curr.transparencyScore - prev.transparencyScore;
+      const scoreChange = curr.transparency_score - prev.transparency_score;
       const disclosureChange = curr.disclosureCount - prev.disclosureCount;
       
       if (Math.abs(scoreChange) > 10) {
@@ -588,10 +588,10 @@ export class SimpleTransparencyDashboardService {
       const lastThree = trends.slice(-3);
       const avgChange = lastThree.reduce((sum, trend, index) => {
         if (index === 0) return 0;
-        return sum + (trend.transparencyScore - lastThree[index - 1].transparencyScore);
+        return sum + (trend.transparency_score - lastThree[index - 1].transparency_score);
       }, 0) / 2;
 
-      const lastScore = trends[trends.length - 1].transparencyScore;
+      const lastScore = trends[trends.length - 1].transparency_score;
       
       for (let i = 1; i <= 3; i++) {
         const predictedScore = Math.max(0, Math.min(100, lastScore + (avgChange * i)));

@@ -166,7 +166,7 @@ export function Sidebar({
         {/* Navigation */}
         <nav className="flex-1 space-y-1 px-4" role="navigation" aria-label="Main navigation">
           {navigationItems.map((item) => {
-            const isActive = location.pathname === item.href;
+            const is_active = location.pathname === item.href;
             
             // Skip items that require auth if user is not authenticated
             if (item.requiresAuth && !user) {
@@ -184,13 +184,13 @@ export function Sidebar({
                 to={item.href}
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
-                  isActive
+                  is_active
                     ? 'bg-primary text-primary-foreground shadow-sm'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground',
                   item.disabled && 'opacity-50 cursor-not-allowed',
                   isCollapsed && 'justify-center px-2'
                 )}
-                aria-current={isActive ? 'page' : undefined}
+                aria-current={is_active ? 'page' : undefined}
                 title={isCollapsed ? item.label : undefined}
               >
                 {item.icon}
@@ -217,23 +217,23 @@ export function Sidebar({
               isCollapsed && "justify-center"
             )}>
               <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center flex-shrink-0">
-                {user.avatar ? (
+                {users.avatar ? (
                   <img 
-                    src={user.avatar} 
-                    alt={user.name}
+                    src={users.avatar} 
+                    alt={users.name}
                     className="h-8 w-8 rounded-full object-cover"
                   />
                 ) : (
                   <span className="text-xs font-medium text-accent-foreground">
-                    {user.name.charAt(0).toUpperCase()}
+                    {users.name.charAt(0).toUpperCase()}
                   </span>
                 )}
               </div>
               {!isCollapsed && (
                 <>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                    <p className="text-sm font-medium text-foreground truncate">{users.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{users.email}</p>
                   </div>
                   <Link
                     to="/profile"

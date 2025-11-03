@@ -5,16 +5,16 @@
 declare module '@shared/schema' {
   // Tables
   export const bills: any;
-  export const billTags: any;
-  export const billSponsorships: any;
-  export const billEngagement: any;
-  export const billComments: any;
+  export const bill_tags: any;
+  export const bill_sponsorships: any;
+  export const bill_engagement: any;
+  export const comments: any;
   export const sponsors: any;
   export const sponsorAffiliations: any;
   export const sponsorTransparency: any;
   export const users: any;
-  export const userProfiles: any;
-  export const userInterests: any;
+  export const user_profiles: any;
+  export const user_interests: any;
   export const notifications: any;
   export const analysis: any;
   export const syncJobs: any;

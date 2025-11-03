@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { billsService, BillNotFoundError, CommentNotFoundError, ValidationError } from '../application/bills.js';
+import { billService, BillNotFoundError, CommentNotFoundError, ValidationError } from '../application/bills.js';
 import { authenticateToken } from '../../../middleware/auth.js';
 import type { AuthenticatedRequest } from '../../../middleware/auth.js';
 import { ApiResponse, ApiSuccess, ApiError, ApiNotFound, ApiValidationError } from '../../../../shared/core/src/utils/api-utils.js';
@@ -33,14 +33,13 @@ function parseIntParam(value: string, paramName: string): { valid: true; value: 
  * Centralized error handler that maps domain errors to appropriate HTTP responses
  * This approach keeps our route handlers clean and maintains consistent error responses
  */
-function handleRouteError(res: Response, error: unknown, context: string, userId?: number): void {
+function handleRouteError(res: Response, error: unknown, context: string, user_id?: number): void {
     // Log the error with full context for debugging and monitoring
-    logger.error(`Error in ${context}:`, {
-      component: 'BillsRouter',
+    logger.error(`Error in ${context}:`, { component: 'BillsRouter',
       context,
-      userId: userId !== undefined ? String(userId) : undefined,
+      user_id: user_id !== undefined ? String(user_id) : undefined,
       errorType: error instanceof Error ? error.constructor.name : 'Unknown'
-    }, error);
+     }, error);
 
     // Map domain-specific errors to appropriate HTTP responses
     if (error instanceof BillNotFoundError || error instanceof CommentNotFoundError) {
@@ -103,13 +102,13 @@ router.get('/', asyncHandler(async (req, res) => {
       return ApiValidationError(res, [{ field: 'tags', message: 'At least one valid tag must be provided' }]);
     }
     
-    // billsService currently returns the full set; apply pagination here
-    const all = await billsService.getBillsByTags(tagArray);
+    // billService currently returns the full set; apply pagination here
+    const all = await billService.getBillsByTags(tagArray);
     const start = parsedOffset || 0;
     const end = parsedLimit ? start + parsedLimit : undefined;
     bills = typeof end === 'number' ? all.slice(start, end) : all.slice(start);
   } else {
-    const all = await billsService.getBills();
+    const all = await billService.getBills();
     const start = parsedOffset || 0;
     const end = parsedLimit ? start + parsedLimit : undefined;
     bills = typeof end === 'number' ? all.slice(start, end) : all.slice(start);
@@ -151,7 +150,7 @@ router.get('/:id', asyncHandler(async (req, res) => {
      return ApiValidationError(res, [{ field: 'id', message: (idResult as any).error }]);
    }
 
-  const bill = await billsService.getBill(idResult.value);
+  const bill = await billService.getBill(idResult.value);
 
   // Log data access
   await securityAuditService.logDataAccess(
@@ -165,11 +164,10 @@ router.get('/:id', asyncHandler(async (req, res) => {
 
   // Fire-and-forget pattern for view count: improves performance without sacrificing reliability
   // If the increment fails, we log it but don't block the user's request
-  billsService.incrementBillViews(idResult.value).catch(err =>
-    logger.error('Failed to increment bill views:', {
-      billId: idResult.value,
+  billService.incrementBillViews(idResult.value).catch(err =>
+    logger.error('Failed to increment bill views:', { bill_id: idResult.value,
       component: 'BillsRouter'
-    }, err)
+     }, err)
   );
 
   return ApiSuccess(res, { bill });
@@ -186,18 +184,17 @@ router.post('/', authenticateToken, asyncHandler(async (req, res) => {
   const billData = {
     ...req.body,
     // Default to authenticated user as sponsor, but allow override for admin actions
-    sponsorId: req.body.sponsorId || req.user!.id
+    sponsor_id: req.body.sponsor_id || req.user!.id
   };
 
-  const newBill = await billsService.createBill(billData);
+  const newBill = await billService.createBill(billData);
 
   // Log successful bill creation for audit trail
-  logger.info('Bill created successfully', {
-    component: 'BillsRouter',
-    billId: newBill.id,
-    userId: req.user!.id,
-    sponsorId: billData.sponsorId
-  });
+  logger.info('Bill created successfully', { component: 'BillsRouter',
+    bill_id: newBill.id,
+    user_id: req.user!.id,
+    sponsor_id: billData.sponsor_id
+    });
 
   // Log data access for bill creation
   await securityAuditService.logDataAccess(
@@ -228,7 +225,7 @@ router.post('/:id/share', asyncHandler(async (req, res) => {
      return ApiValidationError(res, [{ field: 'id', message: (idResult as any).error }]);
    }
 
-  const updatedBill = await billsService.incrementBillShares(idResult.value);
+  const updatedBill = await billService.incrementBillShares(idResult.value);
 
   return ApiSuccess(res, {
     bill: updatedBill,
@@ -258,7 +255,7 @@ router.get('/:id/comments', asyncHandler(async (req, res) => {
     return ApiValidationError(res, [{ field: 'sortBy', message: 'sortBy must be one of: recent, popular, endorsements' }]);
   }
 
-  const commentsRaw = await billsService.getBillComments(idResult.value);
+  const commentsRaw = await billService.getBillComments(idResult.value);
 
   // Apply filtering and sorting at the router level since service returns raw comments
   let comments = commentsRaw.slice();
@@ -268,18 +265,17 @@ router.get('/:id/comments', asyncHandler(async (req, res) => {
 
   const sortKey = (sortBy as string) || 'recent';
   if (sortKey === 'recent') {
-    comments.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    comments.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
   } else if (sortKey === 'popular') {
     comments.sort((a: any, b: any) => (b.likes || 0) - (a.likes || 0));
   } else if (sortKey === 'endorsements') {
     comments.sort((a: any, b: any) => (b.endorsements || 0) - (a.endorsements || 0));
   }
 
-  return ApiSuccess(res, {
-    comments,
+  return ApiSuccess(res, { comments,
     count: comments.length,
-    billId: idResult.value,
-    filters: { highlighted: highlighted === 'true', sortBy: sortKey }
+    bill_id: idResult.value,
+    filters: { highlighted: highlighted === 'true', sortBy: sortKey  }
   });
 }));
 
@@ -288,7 +284,7 @@ router.get('/:id/comments', asyncHandler(async (req, res) => {
  * Create a new comment on a bill (requires authentication)
  * 
  * Supports both top-level comments and replies to existing comments
- * The parentCommentId field determines whether this is a reply
+ * The parent_id field determines whether this is a reply
  */
 router.post('/:id/comments', authenticateToken, asyncHandler(async (req, res) => {
    const idResult = parseIntParam(req.params.id, 'Bill ID');
@@ -297,29 +293,27 @@ router.post('/:id/comments', authenticateToken, asyncHandler(async (req, res) =>
    }
 
    // Validate parent comment ID if this is a reply
-   if (req.body.parentCommentId !== undefined) {
-     const parentIdResult = parseIntParam(req.body.parentCommentId.toString(), 'Parent Comment ID');
-     if (!parentIdResult.valid) {
-       return ApiValidationError(res, [{ field: 'parentCommentId', message: (parentIdResult as any).error }]);
+   if (req.body.parent_id !== undefined) {
+     const parent_idResult = parseIntParam(req.body.parent_id.toString(), 'Parent Comment ID');
+     if (!parent_idResult.valid) {
+       return ApiValidationError(res, [{ field: 'parent_id', message: (parent_idResult as any).error }]);
      }
    }
 
-  const commentData = {
-    ...req.body,
-    billId: idResult.value,
-    userId: req.user!.id
-  };
+  const commentData = { ...req.body,
+    bill_id: idResult.value,
+    user_id: req.user!.id
+    };
 
-  const newComment = await billsService.createBillComment(commentData);
+  const newComment = await billService.createBillComment(commentData);
 
   // Log comment creation for moderation and analytics
-  logger.info('Comment created', {
-    component: 'BillsRouter',
-    commentId: newComment.id,
-    billId: idResult.value,
-    userId: req.user!.id,
-    isReply: !!req.body.parentCommentId
-  });
+  logger.info('Comment created', { component: 'BillsRouter',
+    comment_id: newComment.id,
+    bill_id: idResult.value,
+    user_id: req.user!.id,
+    isReply: !!req.body.parent_id
+    });
 
   return ApiSuccess(res, {
     comment: newComment,
@@ -328,37 +322,37 @@ router.post('/:id/comments', authenticateToken, asyncHandler(async (req, res) =>
 }));
 
 /**
- * GET /api/bills/comments/:commentId/replies
+ * GET /api/bills/comments/:comment_id/replies
  * Get all replies to a specific comment (supports nested discussions)
  * 
  * This enables threaded conversations and improves discussion organization
  */
-router.get('/comments/:commentId/replies', asyncHandler(async (req, res) => {
-   const idResult = parseIntParam(req.params.commentId, 'Comment ID');
+router.get('/comments/:comment_id/replies', asyncHandler(async (req, res) => {
+   const idResult = parseIntParam(req.params.comment_id, 'Comment ID');
    if (!idResult.valid) {
-     return ApiValidationError(res, [{ field: 'commentId', message: (idResult as any).error }]);
+     return ApiValidationError(res, [{ field: 'comment_id', message: (idResult as any).error }]);
    }
 
-  const replies = await billsService.getCommentReplies(idResult.value);
+  const replies = await billService.getCommentReplies(idResult.value);
 
   return ApiSuccess(res, {
     replies,
     count: replies.length,
-    parentCommentId: idResult.value
+    parent_id: idResult.value
   });
 }));
 
 /**
- * PUT /api/bills/comments/:commentId/endorsements
+ * PUT /api/bills/comments/:comment_id/endorsements
  * Update endorsement count for a comment (requires authentication)
  * 
  * This endpoint should be idempotent - calling it multiple times with the same
  * endorsement value should not create duplicate endorsements
  */
-router.put('/comments/:commentId/endorsements', authenticateToken, asyncHandler(async (req, res) => {
-   const idResult = parseIntParam(req.params.commentId, 'Comment ID');
+router.put('/comments/:comment_id/endorsements', authenticateToken, asyncHandler(async (req, res) => {
+   const idResult = parseIntParam(req.params.comment_id, 'Comment ID');
    if (!idResult.valid) {
-     return ApiValidationError(res, [{ field: 'commentId', message: (idResult as any).error }]);
+     return ApiValidationError(res, [{ field: 'comment_id', message: (idResult as any).error }]);
    }
 
   const { endorsements } = req.body;
@@ -368,7 +362,7 @@ router.put('/comments/:commentId/endorsements', authenticateToken, asyncHandler(
     return ApiValidationError(res, [{ field: 'endorsements', message: 'Endorsements must be a non-negative integer' }]);
   }
 
-  const updatedComment = await billsService.updateBillCommentEndorsements(
+  const updatedComment = await billService.updateBillCommentEndorsements(
     idResult.value,
     endorsements
   );
@@ -380,16 +374,16 @@ router.put('/comments/:commentId/endorsements', authenticateToken, asyncHandler(
 }));
 
 /**
- * PUT /api/bills/comments/:commentId/highlight
+ * PUT /api/bills/comments/:comment_id/highlight
  * Highlight a comment (requires authentication and appropriate permissions)
  * 
  * Highlighted comments are featured prominently in the UI
  * This is typically restricted to moderators and administrators
  */
-router.put('/comments/:commentId/highlight', authenticateToken, asyncHandler(async (req, res) => {
-   const idResult = parseIntParam(req.params.commentId, 'Comment ID');
+router.put('/comments/:comment_id/highlight', authenticateToken, asyncHandler(async (req, res) => {
+   const idResult = parseIntParam(req.params.comment_id, 'Comment ID');
    if (!idResult.valid) {
-     return ApiValidationError(res, [{ field: 'commentId', message: (idResult as any).error }]);
+     return ApiValidationError(res, [{ field: 'comment_id', message: (idResult as any).error }]);
    }
 
   // Check if user has permission to highlight comments
@@ -398,15 +392,14 @@ router.put('/comments/:commentId/highlight', authenticateToken, asyncHandler(asy
     return ApiError(res, 'Insufficient permissions to highlight comments', 403);
   }
 
-  const updatedComment = await billsService.highlightComment(idResult.value);
+  const updatedComment = await billService.highlightComment(idResult.value);
 
   // Log highlight action for audit trail
-  logger.info('Comment highlighted', {
-    component: 'BillsRouter',
-    commentId: idResult.value,
-    userId: req.user!.id,
-    userRole: req.user!.role
-  });
+  logger.info('Comment highlighted', { component: 'BillsRouter',
+    comment_id: idResult.value,
+    user_id: req.user!.id,
+    user_role: req.user!.role
+   });
 
   return ApiSuccess(res, {
     comment: updatedComment,
@@ -415,26 +408,25 @@ router.put('/comments/:commentId/highlight', authenticateToken, asyncHandler(asy
 }));
 
 /**
- * DELETE /api/bills/comments/:commentId/highlight
+ * DELETE /api/bills/comments/:comment_id/highlight
  * Remove highlight from a comment (requires authentication and appropriate permissions)
  */
-router.delete('/comments/:commentId/highlight', authenticateToken, asyncHandler(async (req, res) => {
-   const idResult = parseIntParam(req.params.commentId, 'Comment ID');
+router.delete('/comments/:comment_id/highlight', authenticateToken, asyncHandler(async (req, res) => {
+   const idResult = parseIntParam(req.params.comment_id, 'Comment ID');
    if (!idResult.valid) {
-     return ApiValidationError(res, [{ field: 'commentId', message: (idResult as any).error }]);
+     return ApiValidationError(res, [{ field: 'comment_id', message: (idResult as any).error }]);
    }
 
   if (req.user!.role !== 'admin' && req.user!.role !== 'moderator') {
     return ApiError(res, 'Insufficient permissions to unhighlight comments', 403);
   }
 
-  const updatedComment = await billsService.unhighlightComment(idResult.value);
+  const updatedComment = await billService.unhighlightComment(idResult.value);
 
-  logger.info('Comment unhighlighted', {
-    component: 'BillsRouter',
-    commentId: idResult.value,
-    userId: req.user!.id
-  });
+  logger.info('Comment unhighlighted', { component: 'BillsRouter',
+    comment_id: idResult.value,
+    user_id: req.user!.id
+   });
 
   return ApiSuccess(res, {
     comment: updatedComment,
@@ -454,7 +446,7 @@ router.get('/cache/stats', authenticateToken, asyncHandler(async (req, res) => {
     return ApiError(res, 'Insufficient permissions', 403);
   }
 
-  const stats = billsService.getCacheStats();
+  const stats = billService.getCacheStats();
 
   return ApiSuccess(res, {
     cacheStats: stats,

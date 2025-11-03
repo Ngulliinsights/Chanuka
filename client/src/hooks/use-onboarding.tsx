@@ -4,8 +4,8 @@ import { useToast } from './use-toast';
 import { logger } from '../utils/browser-logger';
 
 interface OnboardingProgress {
-  achievementType: string;
-  achievementValue: number;
+  achievement_type: string;
+  achievement_value: number;
   description: string;
 }
 

@@ -25,11 +25,11 @@ export class SeedDataService {
 
       // Generate data in dependency order
       const users = await this.createUsers();
-      const userProfiles = await this.createUserProfiles(users);
+      const user_profiles = await this.createUserProfiles(users);
       const sponsors = await this.createSponsors();
       const sponsorAffiliations = await this.createSponsorAffiliations(sponsors);
       const bills = await this.createBills(users);
-      const billSponsorships = await this.createBillSponsorships(bills, sponsors);
+      const bill_sponsorships = await this.createBillSponsorships(bills, sponsors);
       const sponsorTransparency = await this.createSponsorTransparency(sponsors);
       const billSectionConflicts = await this.createBillSectionConflicts(bills, sponsors);
       const analysis = await this.createAnalysis(bills);
@@ -53,17 +53,17 @@ export class SeedDataService {
     
     const tables = [
       schema.notifications,
-      schema.billEngagement,
-      schema.billComments,
+      schema.bill_engagement,
+      schema.comments,
       schema.analysis,
       schema.billSectionConflicts,
       schema.sponsorTransparency,
-      schema.billSponsorships,
+      schema.bill_sponsorships,
       schema.sponsorAffiliations,
       schema.sponsors,
       schema.bills,
-      schema.userProfile,
-      schema.user
+      schema.user_profiles,
+      schema.users
     ];
     // Safely truncate tables in reverse dependency order if DB supports it.
     for (const table of tables) {

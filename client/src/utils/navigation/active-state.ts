@@ -42,17 +42,17 @@ export function isNavigationPathActive(path: string, currentPath: string): boole
 
 /**
  * Get consistent active state styling classes for navigation items
- * @param isActive - Whether the item is currently active
+ * @param is_active - Whether the item is currently active
  * @param variant - The styling variant to use
  * @returns CSS classes string
  */
 export function getActiveStateClasses(
-  isActive: boolean, 
+  is_active: boolean, 
   variant: 'desktop' | 'mobile-drawer' | 'mobile-bottom' = 'desktop'
 ): string {
   const baseClasses = 'transition-all duration-200';
   
-  if (isActive) {
+  if (is_active) {
     const activeClasses = 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm font-semibold';
     
     switch (variant) {
@@ -84,13 +84,13 @@ export function getActiveStateClasses(
 
 /**
  * Get icon styling classes based on active state
- * @param isActive - Whether the item is currently active
+ * @param is_active - Whether the item is currently active
  * @returns CSS classes string for icon styling
  */
-export function getActiveIconClasses(isActive: boolean): string {
+export function getActiveIconClasses(is_active: boolean): string {
   const baseClasses = 'transition-transform duration-200';
   
-  if (isActive) {
+  if (is_active) {
     return `${baseClasses} scale-110 text-blue-600`;
   }
   
@@ -99,13 +99,13 @@ export function getActiveIconClasses(isActive: boolean): string {
 
 /**
  * Get text styling classes based on active state
- * @param isActive - Whether the item is currently active
+ * @param is_active - Whether the item is currently active
  * @returns CSS classes string for text styling
  */
-export function getActiveTextClasses(isActive: boolean): string {
+export function getActiveTextClasses(is_active: boolean): string {
   const baseClasses = 'transition-all duration-200';
   
-  if (isActive) {
+  if (is_active) {
     return `${baseClasses} font-semibold`;
   }
   
@@ -114,19 +114,19 @@ export function getActiveTextClasses(isActive: boolean): string {
 
 /**
  * Get role-specific styling for admin and expert items
- * @param isActive - Whether the item is currently active
+ * @param is_active - Whether the item is currently active
  * @param isAdminOnly - Whether the item is admin-only
  * @param isExpertItem - Whether the item is expert-specific
  * @returns CSS classes string
  */
 export function getRoleBasedActiveClasses(
-  isActive: boolean,
+  is_active: boolean,
   isAdminOnly: boolean = false,
   isExpertItem: boolean = false
 ): string {
   const baseClasses = 'transition-all duration-200 text-left group';
   
-  if (isActive) {
+  if (is_active) {
     return `${baseClasses} bg-blue-50 text-blue-700 border border-blue-200 shadow-sm scale-[1.02] font-semibold`;
   }
   

@@ -604,7 +604,7 @@ import { UnifiedPerformanceMonitor } from '@shared/core/src/utils/performance-ut
 const response = UnifiedApiResponse.success(data);
 
 // Logging
-logger.info('Operation completed', { userId: 123 });
+logger.info('Operation completed', { user_id: 123  });
 
 // Performance monitoring
 const timer = UnifiedPerformanceMonitor.startTimer('operation');

@@ -596,7 +596,7 @@ describe('React Application Initialization Integration Tests', () => {
         message: error.message,
         stack: error.stack,
         timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent,
+        user_agent: navigator.user_agent,
         url: window.location.href,
         phase: 'mounting',
         localStorage: {

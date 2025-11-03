@@ -141,18 +141,17 @@ export class LayoutNavigationError extends LayoutError {
   }
 }
 
-export class LayoutUserError extends LayoutError {
-  constructor(
+export class LayoutUserError extends LayoutError { constructor(
     message: string,
-    userId?: string,
-    userRole?: string,
+    user_id?: string,
+    user_role?: string,
     details?: Record<string, any>
   ) {
     super(
-      `User-related layout error${userId ? ` for user ${userId}` : ''}: ${message}`,
+      `User-related layout error${user_id ? ` for user ${user_id }` : ''}: ${message}`,
       LayoutErrorType.LAYOUT_USER_ERROR,
       403,
-      { userId, userRole, ...details }
+      { user_id, user_role, ...details  }
     );
   }
 }
@@ -258,15 +257,15 @@ export function createLayoutNavigationError(
 }
 
 export function createLayoutUserError(
-  userId: string,
-  userRole: string,
+  user_id: string,
+  user_role: string,
   requiredRole: string,
   action: string
 ): LayoutUserError {
   return new LayoutUserError(
-    `User with role '${userRole}' cannot ${action}. Required role: '${requiredRole}'`,
-    userId,
-    userRole,
+    `User with role '${user_role}' cannot ${action}. Required role: '${requiredRole}'`,
+    user_id,
+    user_role,
     { requiredRole, action }
   );
 }

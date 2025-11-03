@@ -108,13 +108,12 @@ const swaggerOptions = {
             }
           }
         },
-        UserEngagement: {
-          type: 'object',
+        UserEngagement: { type: 'object',
           properties: {
-            userId: { type: 'string' },
+            user_id: { type: 'string'  },
             userName: { type: 'string' },
             totalEngagements: { type: 'number' },
-            engagementScore: { type: 'number' },
+            engagement_score: { type: 'number' },
             lastActive: { type: 'string', format: 'date-time' }
           }
         },

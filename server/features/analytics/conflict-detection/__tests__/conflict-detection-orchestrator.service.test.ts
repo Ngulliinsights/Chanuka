@@ -109,7 +109,7 @@ describe('ConflictDetectionOrchestratorService', () => {
 
       const result = await service.performComprehensiveAnalysis(123);
 
-      expect(result.sponsorId).toBe(123);
+      expect(result.sponsor_id).toBe(123);
       expect(result.sponsorName).toBe('Test Sponsor');
       expect(result.riskLevel).toBe('medium');
     });

@@ -1,6 +1,6 @@
 import { database as db } from '../../shared/database/connection';
 import {
-  userProgress,
+  user_progress,
   type UserProgress,
   type InsertUserProgress
 } from '../../../../shared/schema';
@@ -32,14 +32,13 @@ export class ProgressStorage extends BaseStorage<UserProgress> {
   /**
    * Gets all progress records for a user using Drizzle ORM
    */
-  async getUserProgress(userId: string): Promise<UserProgress[]> {
-    const cacheKey = `${CACHE_PREFIX}${userId}`;
+  async getUserProgress(user_id: string): Promise<UserProgress[]> {
+    const cacheKey = `${CACHE_PREFIX}${ user_id }`;
 
-    return this.getCached(cacheKey, async () => {
-      return await db.select().from(userProgress)
-        .where(eq(userProgress.userId, userId))
-        .orderBy(desc(userProgress.createdAt));
-    });
+    return this.getCached(cacheKey, async () => { return await db.select().from(user_progress)
+        .where(eq(user_progress.user_id, user_id))
+        .orderBy(desc(user_progress.created_at));
+     });
   }
 
   /**
@@ -47,17 +46,17 @@ export class ProgressStorage extends BaseStorage<UserProgress> {
    */
   async updateUserProgress(progress: InsertUserProgress): Promise<UserProgress> {
     return this.withTransaction(async (tx) => {
-      const result = await tx.insert(userProgress).values({
+      const result = await tx.insert(user_progress).values({
         ...progress,
-        unlockedAt: progress.unlockedAt || new Date(),
+        unlocked_at: progress.unlocked_at || new Date(),
       }).returning();
 
       const newProgress = result[0];
 
       // Batch invalidate related caches
-      await this.invalidateCache(`${progress.userId}`);
-      await this.invalidateCache(`achievement:${progress.achievementType}:${progress.userId}`);
-      await this.invalidateCache(`progress_stats:${progress.userId}`);
+      await this.invalidateCache(`${progress.user_id}`);
+      await this.invalidateCache(`achievement:${progress.achievement_type}:${progress.user_id}`);
+      await this.invalidateCache(`progress_stats:${progress.user_id}`);
 
       return newProgress;
     });
@@ -66,18 +65,17 @@ export class ProgressStorage extends BaseStorage<UserProgress> {
   /**
    * Gets progress statistics for a user using Drizzle ORM
    */
-  async getProgressStats(userId: string): Promise<{ type: string; count: number }[]> {
-    const cacheKey = `progress_stats:${userId}`;
+  async getProgressStats(user_id: string): Promise<{ type: string; count: number }[]> { const cacheKey = `progress_stats:${user_id }`;
 
     return this.getCached(cacheKey, async () => {
       const result = await db
         .select({
-          type: userProgress.achievementType,
+          type: user_progress.achievement_type,
           count: sql<number>`COUNT(*)`
         })
-        .from(userProgress)
-        .where(eq(userProgress.userId, userId))
-        .groupBy(userProgress.achievementType);
+        .from(user_progress)
+        .where(eq(user_progress.user_id, user_id))
+        .groupBy(user_progress.achievement_type);
 
       return result.map(row => ({
         type: row.type,

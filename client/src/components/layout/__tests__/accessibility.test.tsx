@@ -184,7 +184,7 @@ describe('Layout Accessibility Tests', () => {
       );
 
       const skipLink = screen.getByText('Skip to main content');
-      await user.click(skipLink);
+      await users.click(skipLink);
 
       const mainContent = screen.getByRole('main');
       expect(document.activeElement).toBe(mainContent);
@@ -296,7 +296,7 @@ describe('Layout Accessibility Tests', () => {
 
       // Test Enter key
       menuButton.focus();
-      await user.keyboard('{Enter}');
+      await users.keyboard('{Enter}');
       expect(onMenuToggle).toHaveBeenCalled();
 
       // Reset mock
@@ -304,7 +304,7 @@ describe('Layout Accessibility Tests', () => {
 
       // Test Space key
       menuButton.focus();
-      await user.keyboard(' ');
+      await users.keyboard(' ');
       expect(onMenuToggle).toHaveBeenCalled();
     });
   });
@@ -384,7 +384,7 @@ describe('Layout Accessibility Tests', () => {
       );
 
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       expect(screen.getByLabelText('Close menu')).toBeInTheDocument();
     });
@@ -401,7 +401,7 @@ describe('Layout Accessibility Tests', () => {
       );
 
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       // Focus should be managed within the opened menu
       await waitFor(() => {
@@ -420,11 +420,11 @@ describe('Layout Accessibility Tests', () => {
       );
 
       const menuButton = screen.getByLabelText('Open menu');
-      await user.click(menuButton);
+      await users.click(menuButton);
 
       // Click a navigation item to close menu
       const dashboardLink = screen.getByText('Dashboard');
-      await user.click(dashboardLink);
+      await users.click(dashboardLink);
 
       // Focus should return to appropriate element
       await waitFor(() => {

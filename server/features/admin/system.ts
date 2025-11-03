@@ -167,13 +167,13 @@ export function setupSystemRoutes(app: express.Router) {
 
       // Check for ID type consistency
       if (tableNames.includes('users')) {
-        const userIdType = await db.execute(sql`
+        const user_idType = await db.execute(sql`
           SELECT data_type FROM information_schema.columns 
           WHERE table_name = 'users' AND column_name = 'id'
         `);
 
-        if (userIdType.rows.length > 0) {
-          const idType = userIdType.rows[0].data_type;
+        if (user_idType.rows.length > 0) {
+          const idType = user_idType.rows[0].data_type;
           if (idType !== 'uuid') {
             issues.push({
               type: 'id_type_inconsistency',

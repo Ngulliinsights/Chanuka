@@ -78,7 +78,7 @@ describe('PageRelationshipUtils', () => {
       const breadcrumbs = PageRelationshipUtils.getContextualBreadcrumbs('/bills/:id/analysis');
       
       expect(breadcrumbs.length).toBeGreaterThan(1);
-      expect(breadcrumbs[breadcrumbs.length - 1].isActive).toBe(true);
+      expect(breadcrumbs[breadcrumbs.length - 1].is_active).toBe(true);
     });
 
     it('should include relationship context', () => {

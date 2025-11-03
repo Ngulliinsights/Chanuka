@@ -516,7 +516,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({
           canRecover, 
           errorType,
           url: window.location.href,
-          userAgent: navigator.userAgent
+          user_agent: navigator.user_agent
         }
       });
 
@@ -540,7 +540,7 @@ Technical Details:
 - Retry Count: ${retryCount}/${maxRetries}
 - Retryable: ${normalizedError.metadata.retryable}
 - URL: ${window.location.href}
-- User Agent: ${navigator.userAgent}
+- User Agent: ${navigator.user_agent}
 
 ${normalizedError.metadata.correlationId ? `Correlation ID: ${normalizedError.metadata.correlationId}\n` : ''}
 ${errorReport.technicalDetails ? `\nStack Trace:\n${errorReport.technicalDetails}` : ''}
@@ -767,7 +767,7 @@ Domain: ${normalizedError.metadata.domain}
 Severity: CRITICAL
 Context: ${props.context}
 URL: ${window.location.href}
-User Agent: ${navigator.userAgent}
+User Agent: ${navigator.user_agent}
 
 ${errorReport.technicalDetails || normalizedError.message}
 
@@ -1287,7 +1287,7 @@ Domain: ${normalizedError.metadata.domain}
 Severity: CRITICAL
 Context: ${props.context}
 URL: ${window.location.href}
-User Agent: ${navigator.userAgent}
+User Agent: ${navigator.user_agent}
 
 ${errorReport.technicalDetails || normalizedError.message}
 

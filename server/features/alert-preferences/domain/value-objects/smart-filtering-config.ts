@@ -5,7 +5,7 @@
 export class SmartFilteringConfig {
   constructor(
     public readonly enabled: boolean,
-    public readonly userInterestWeight: number,
+    public readonly user_interestWeight: number,
     public readonly engagementHistoryWeight: number,
     public readonly trendingWeight: number,
     public readonly duplicateFiltering: boolean,
@@ -16,7 +16,7 @@ export class SmartFilteringConfig {
   }
 
   private validate(): void {
-    if (this.userInterestWeight < 0 || this.userInterestWeight > 1) {
+    if (this.user_interestWeight < 0 || this.user_interestWeight > 1) {
       throw new Error('User interest weight must be between 0 and 1');
     }
 
@@ -28,7 +28,7 @@ export class SmartFilteringConfig {
       throw new Error('Trending weight must be between 0 and 1');
     }
 
-    const totalWeight = this.userInterestWeight + this.engagementHistoryWeight + this.trendingWeight;
+    const totalWeight = this.user_interestWeight + this.engagementHistoryWeight + this.trendingWeight;
     if (Math.abs(totalWeight - 1.0) > 0.001) {
       throw new Error('Weights must sum to 1.0');
     }
@@ -39,8 +39,8 @@ export class SmartFilteringConfig {
   }
 
   calculateConfidence(
-    userInterestScore: number,
-    engagementScore: number,
+    user_interestScore: number,
+    engagement_score: number,
     trendingScore: number
   ): number {
     if (!this.enabled) {
@@ -48,8 +48,8 @@ export class SmartFilteringConfig {
     }
 
     const confidence =
-      userInterestScore * this.userInterestWeight +
-      engagementScore * this.engagementHistoryWeight +
+      user_interestScore * this.user_interestWeight +
+      engagement_score * this.engagementHistoryWeight +
       trendingScore * this.trendingWeight;
 
     return Math.max(0, Math.min(1, confidence)); // Clamp to [0, 1]
@@ -62,7 +62,7 @@ export class SmartFilteringConfig {
   equals(other: SmartFilteringConfig): boolean {
     return (
       this.enabled === other.enabled &&
-      this.userInterestWeight === other.userInterestWeight &&
+      this.user_interestWeight === other.user_interestWeight &&
       this.engagementHistoryWeight === other.engagementHistoryWeight &&
       this.trendingWeight === other.trendingWeight &&
       this.duplicateFiltering === other.duplicateFiltering &&

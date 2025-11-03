@@ -22,14 +22,14 @@ describe('DataValidationService', () => {
     it('should validate a complete bill successfully', () => {
       const validBill = {
         title: 'Test Bill',
-        billNumber: 'C-123',
+        bill_number: 'C-123',
         status: 'introduced',
         description: 'A test bill for validation',
         content: 'Detailed content of the bill',
         summary: 'Test summary',
         category: 'technology',
-        introducedDate: '2024-01-15',
-        lastActionDate: '2024-01-20',
+        introduced_date: '2024-01-15',
+        last_action_date: '2024-01-20',
         lastUpdated: new Date().toISOString()
       };
 
@@ -57,7 +57,7 @@ describe('DataValidationService', () => {
     it('should validate bill number format', () => {
       const billWithInvalidNumber = {
         title: 'Test Bill',
-        billNumber: 'INVALID-FORMAT-123456',
+        bill_number: 'INVALID-FORMAT-123456',
         status: 'introduced'
       };
 
@@ -69,7 +69,7 @@ describe('DataValidationService', () => {
     it('should validate bill status values', () => {
       const billWithInvalidStatus = {
         title: 'Test Bill',
-        billNumber: 'C-123',
+        bill_number: 'C-123',
         status: 'invalid-status'
       };
 
@@ -81,7 +81,7 @@ describe('DataValidationService', () => {
     it('should validate field lengths', () => {
       const billWithLongFields = {
         title: 'x'.repeat(600), // Exceeds max length of 500
-        billNumber: 'C-123',
+        bill_number: 'C-123',
         status: 'introduced'
       };
 
@@ -94,9 +94,9 @@ describe('DataValidationService', () => {
     it('should validate date formats', () => {
       const billWithInvalidDate = {
         title: 'Test Bill',
-        billNumber: 'C-123',
+        bill_number: 'C-123',
         status: 'introduced',
-        introducedDate: 'invalid-date'
+        introduced_date: 'invalid-date'
       };
 
       const result = DataValidationService.validateBill(billWithInvalidDate);
@@ -111,9 +111,9 @@ describe('DataValidationService', () => {
 
       const billWithFutureDate = {
         title: 'Test Bill',
-        billNumber: 'C-123',
+        bill_number: 'C-123',
         status: 'introduced',
-        introducedDate: futureDate.toISOString()
+        introduced_date: futureDate.toISOString()
       };
 
       const result = DataValidationService.validateBill(billWithFutureDate);
@@ -124,10 +124,10 @@ describe('DataValidationService', () => {
     it('should check date consistency', () => {
       const billWithInconsistentDates = {
         title: 'Test Bill',
-        billNumber: 'C-123',
+        bill_number: 'C-123',
         status: 'introduced',
-        introducedDate: '2024-01-20',
-        lastActionDate: '2024-01-15' // Earlier than introduced date
+        introduced_date: '2024-01-20',
+        last_action_date: '2024-01-15' // Earlier than introduced date
       };
 
       const result = DataValidationService.validateBill(billWithInconsistentDates);
@@ -138,14 +138,14 @@ describe('DataValidationService', () => {
     it('should calculate timeliness score based on last updated', () => {
       const recentBill = {
         title: 'Test Bill',
-        billNumber: 'C-123',
+        bill_number: 'C-123',
         status: 'introduced',
         lastUpdated: new Date().toISOString()
       };
 
       const oldBill = {
         title: 'Test Bill',
-        billNumber: 'C-124',
+        bill_number: 'C-124',
         status: 'introduced',
         lastUpdated: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString() // 1 year ago
       };
@@ -242,12 +242,12 @@ describe('DataValidationService', () => {
       const bills = [
         {
           title: 'Valid Bill 1',
-          billNumber: 'C-123',
+          bill_number: 'C-123',
           status: 'introduced'
         },
         {
           title: 'Valid Bill 2',
-          billNumber: 'C-124',
+          bill_number: 'C-124',
           status: 'passed'
         },
         {
@@ -294,7 +294,7 @@ describe('DataValidationService', () => {
       const bills = [
         {
           title: 'Complete Bill',
-          billNumber: 'C-123',
+          bill_number: 'C-123',
           status: 'introduced',
           description: 'Complete description',
           summary: 'Complete summary',
@@ -302,7 +302,7 @@ describe('DataValidationService', () => {
         },
         {
           title: 'Minimal Bill',
-          billNumber: 'C-124',
+          bill_number: 'C-124',
           status: 'introduced'
         }
       ];
@@ -323,7 +323,7 @@ describe('DataValidationService', () => {
       const records = [
         {
           data: {
-            billNumber: 'C-123',
+            bill_number: 'C-123',
             title: 'Original Title',
             status: 'introduced'
           },
@@ -331,7 +331,7 @@ describe('DataValidationService', () => {
         },
         {
           data: {
-            billNumber: 'C-123',
+            bill_number: 'C-123',
             title: 'Different Title', // Conflict
             status: 'committee' // Conflict
           },
@@ -353,7 +353,7 @@ describe('DataValidationService', () => {
       const records = [
         {
           data: {
-            billNumber: 'C-123',
+            bill_number: 'C-123',
             title: 'Same Title',
             status: 'introduced'
           },
@@ -361,7 +361,7 @@ describe('DataValidationService', () => {
         },
         {
           data: {
-            billNumber: 'C-123',
+            bill_number: 'C-123',
             title: 'Same Title',
             status: 'introduced'
           },
@@ -413,14 +413,14 @@ describe('DataValidationService', () => {
       const records = [
         {
           data: {
-            billNumber: 'C-123',
+            bill_number: 'C-123',
             title: 'Government Title'
           },
           source: 'parliament-ca'
         },
         {
           data: {
-            billNumber: 'C-123',
+            bill_number: 'C-123',
             title: 'Third Party Title'
           },
           source: 'openparliament'
@@ -435,11 +435,11 @@ describe('DataValidationService', () => {
     it('should classify conflict severity', () => {
       const recordsLowSeverity = [
         {
-          data: { billNumber: 'C-123', title: 'Title A' },
+          data: { bill_number: 'C-123', title: 'Title A' },
           source: 'source1'
         },
         {
-          data: { billNumber: 'C-123', title: 'Title B' },
+          data: { bill_number: 'C-123', title: 'Title B' },
           source: 'source2'
         }
       ];
@@ -447,7 +447,7 @@ describe('DataValidationService', () => {
       const recordsHighSeverity = [
         {
           data: { 
-            billNumber: 'C-123', 
+            bill_number: 'C-123', 
             title: 'Title A',
             status: 'introduced',
             description: 'Desc A',
@@ -457,7 +457,7 @@ describe('DataValidationService', () => {
         },
         {
           data: { 
-            billNumber: 'C-123', 
+            bill_number: 'C-123', 
             title: 'Title B',
             status: 'passed',
             description: 'Desc B',

@@ -11,19 +11,15 @@ export class RecommendationCache {
     COLLAB: (u: string) => `rec:collab:${hash(u)}`,
   } as const;
 
-  async getPersonal<T>(userId: string): Promise<T | null> {
-    return cacheService.get<T>(this.KEY.PERSONAL(userId));
-  }
-  async setPersonal<T>(userId: string, data: T): Promise<void> {
-    await cacheService.set(this.KEY.PERSONAL(userId), data, CACHE_TTL.RECOMMENDATIONS);
-  }
+  async getPersonal<T>(user_id: string): Promise<T | null> { return cacheService.get<T>(this.KEY.PERSONAL(user_id));
+   }
+  async setPersonal<T>(user_id: string, data: T): Promise<void> { await cacheService.set(this.KEY.PERSONAL(user_id), data, CACHE_TTL.RECOMMENDATIONS);
+   }
 
-  async getSimilar<T>(billId: number): Promise<T | null> {
-    return cacheService.get<T>(this.KEY.SIMILAR(billId));
-  }
-  async setSimilar<T>(billId: number, data: T): Promise<void> {
-    await cacheService.set(this.KEY.SIMILAR(billId), data, CACHE_TTL.RECOMMENDATIONS);
-  }
+  async getSimilar<T>(bill_id: number): Promise<T | null> { return cacheService.get<T>(this.KEY.SIMILAR(bill_id));
+   }
+  async setSimilar<T>(bill_id: number, data: T): Promise<void> { await cacheService.set(this.KEY.SIMILAR(bill_id), data, CACHE_TTL.RECOMMENDATIONS);
+   }
 
   async getTrending<T>(days: number): Promise<T | null> {
     return cacheService.get<T>(this.KEY.TRENDING(days));
@@ -32,19 +28,16 @@ export class RecommendationCache {
     await cacheService.set(this.KEY.TRENDING(days), data, CACHE_TTL.RECOMMENDATIONS);
   }
 
-  async getCollaborative<T>(userId: string): Promise<T | null> {
-    return cacheService.get<T>(this.KEY.COLLAB(userId));
-  }
-  async setCollaborative<T>(userId: string, data: T): Promise<void> {
-    await cacheService.set(this.KEY.COLLAB(userId), data, CACHE_TTL.RECOMMENDATIONS);
-  }
+  async getCollaborative<T>(user_id: string): Promise<T | null> { return cacheService.get<T>(this.KEY.COLLAB(user_id));
+   }
+  async setCollaborative<T>(user_id: string, data: T): Promise<void> { await cacheService.set(this.KEY.COLLAB(user_id), data, CACHE_TTL.RECOMMENDATIONS);
+   }
 
-  async invalidateUser(userId: string): Promise<void> {
-    await Promise.all([
-      cacheService.delete(this.KEY.PERSONAL(userId)),
-      cacheService.delete(this.KEY.COLLAB(userId)),
+  async invalidateUser(user_id: string): Promise<void> { await Promise.all([
+      cacheService.delete(this.KEY.PERSONAL(user_id)),
+      cacheService.delete(this.KEY.COLLAB(user_id)),
     ]);
-  }
+   }
 }
 
 

@@ -27,7 +27,7 @@ const UserProfile: FC = () => {
   const [newInterest, setNewInterest] = useState("");
 
   const { profile: profileQuery, updateProfile } = useProfile();
-  const { verificationStatus } = useVerification();
+  const { verification_status } = useVerification();
 
   const profile = profileQuery.data?.profile;
   const isLoading = profileQuery.isLoading;
@@ -201,8 +201,8 @@ const UserProfile: FC = () => {
                   <Badge className={getRoleColor('user')}>
                     User
                   </Badge>
-                  <Badge className={getVerificationColor(verificationStatus.data?.citizen || 'unverified')}>
-                    {verificationStatus.data?.citizen || 'unverified'}
+                  <Badge className={getVerificationColor(verification_status.data?.citizen || 'unverified')}>
+                    {verification_status.data?.citizen || 'unverified'}
                   </Badge>
                 </div>
               </div>

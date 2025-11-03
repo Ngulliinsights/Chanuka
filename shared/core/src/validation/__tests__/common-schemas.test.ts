@@ -42,7 +42,7 @@ import { logger } from '@shared/core/src/observability/logging';
   usernameSchema,
   slugSchema,
   colorSchema,
-  ipAddressSchema,
+  ip_addressSchema,
   ssnSchema,
   creditCardSchema,
   jwtTokenSchema,
@@ -84,7 +84,7 @@ describe('Common Validation Schemas', () => {
     it('should validate correct email addresses', () => {
       const validEmails = [
         'test@example.com',
-        'user.name@domain.co.uk',
+        'users.name@domain.co.uk',
         'user+tag@example.org',
         'Test@Example.COM', // Should be converted to lowercase
       ];
@@ -468,7 +468,7 @@ describe('Common Validation Schemas', () => {
       ];
 
       validIPs.forEach(ip => {
-        const result = ipAddressSchema.safeParse(ip);
+        const result = ip_addressSchema.safeParse(ip);
         expect(result.success).toBe(true);
       });
     });
@@ -479,7 +479,7 @@ describe('Common Validation Schemas', () => {
       ];
 
       validIPs.forEach(ip => {
-        const result = ipAddressSchema.safeParse(ip);
+        const result = ip_addressSchema.safeParse(ip);
         expect(result.success).toBe(true);
       });
     });
@@ -492,7 +492,7 @@ describe('Common Validation Schemas', () => {
       ];
 
       invalidIPs.forEach(ip => {
-        const result = ipAddressSchema.safeParse(ip);
+        const result = ip_addressSchema.safeParse(ip);
         expect(result.success).toBe(false);
       });
     });
@@ -555,7 +555,7 @@ describe('Common Validation Schemas', () => {
         migrations: [{
           from: '1.0.0',
           to: '2.0.0',
-          migrate: (data) => ({ email: data, isActive: true }),
+          migrate: (data) => ({ email: data, is_active: true }),
         }],
       });
 
@@ -563,12 +563,12 @@ describe('Common Validation Schemas', () => {
         version: '2.0.0',
         schema: z.object({
           email: emailSchema,
-          isActive: z.boolean(),
+          is_active: z.boolean(),
         }),
       });
 
       const migrated = await manager.migrateData('user', '1.0.0', '2.0.0', 'test@example.com');
-      expect(migrated).toEqual({ email: 'test@example.com', isActive: true });
+      expect(migrated).toEqual({ email: 'test@example.com', is_active: true });
     });
   });
 
@@ -890,8 +890,8 @@ describe('Common Validation Schemas', () => {
         name: 'Acme Corporation',
         type: 'corporation' as const,
         email: 'contact@acme.com',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
       };
 
       const result = businessEntitySchemas.organization.safeParse(validOrg);
@@ -901,11 +901,11 @@ describe('Common Validation Schemas', () => {
     it('should validate person schema', () => {
       const validPerson = {
         id: '550e8400-e29b-41d4-a716-446655440000',
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         email: 'john@example.com',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
       };
 
       const result = businessEntitySchemas.person.safeParse(validPerson);
@@ -920,8 +920,8 @@ describe('Common Validation Schemas', () => {
         mimeType: 'application/pdf',
         size: 1024,
         url: 'https://example.com/contract.pdf',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
       };
 
       const result = businessEntitySchemas.document.safeParse(validDoc);
@@ -950,8 +950,8 @@ describe('Common Validation Schemas', () => {
         '1.1.0': {
           schema: z.object({
             id: z.string(),
-            firstName: z.string(),
-            lastName: z.string(),
+            first_name: z.string(),
+            last_name: z.string(),
             email: z.string(),
           }),
           migrations: [{
@@ -961,8 +961,8 @@ describe('Common Validation Schemas', () => {
               const nameParts = data.name.split(' ');
               return {
                 ...data,
-                firstName: nameParts[0] || '',
-                lastName: nameParts.slice(1).join(' ') || '',
+                first_name: nameParts[0] || '',
+                last_name: nameParts.slice(1).join(' ') || '',
               };
             },
           }],
@@ -974,8 +974,8 @@ describe('Common Validation Schemas', () => {
       expect(migratedData).toEqual({
         id: '550e8400-e29b-41d4-a716-446655440000',
         name: 'John Doe',
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         email: 'john@example.com',
       });
     });
@@ -1000,8 +1000,8 @@ describe('Common Validation Schemas', () => {
         '1.1.0': {
           schema: z.object({
             id: z.string(),
-            firstName: z.string(),
-            lastName: z.string(),
+            first_name: z.string(),
+            last_name: z.string(),
             email: z.string(),
           }),
           migrations: [{
@@ -1011,8 +1011,8 @@ describe('Common Validation Schemas', () => {
               const nameParts = data.name.split(' ');
               return {
                 ...data,
-                firstName: nameParts[0] || '',
-                lastName: nameParts.slice(1).join(' ') || '',
+                first_name: nameParts[0] || '',
+                last_name: nameParts.slice(1).join(' ') || '',
               };
             },
           }],
@@ -1020,8 +1020,8 @@ describe('Common Validation Schemas', () => {
         '2.0.0': {
           schema: z.object({
             id: z.string(),
-            firstName: z.string(),
-            lastName: z.string(),
+            first_name: z.string(),
+            last_name: z.string(),
             email: z.string(),
             profile: z.object({}).optional(),
             preferences: z.object({
@@ -1051,8 +1051,8 @@ describe('Common Validation Schemas', () => {
       expect(migratedData).toEqual({
         id: '550e8400-e29b-41d4-a716-446655440000',
         name: 'Jane Smith',
-        firstName: 'Jane',
-        lastName: 'Smith',
+        first_name: 'Jane',
+        last_name: 'Smith',
         email: 'jane@example.com',
         profile: {},
         preferences: {
@@ -1137,7 +1137,7 @@ describe('Common Validation Schemas', () => {
             description: z.string().optional(),
             category: z.string().nullable().optional(),
             tags: z.array(z.string()),
-            isActive: z.boolean(),
+            is_active: z.boolean(),
           }),
           migrations: [{
             from: '1.1.0',
@@ -1145,7 +1145,7 @@ describe('Common Validation Schemas', () => {
             migrate: (data: any) => ({
               ...data,
               tags: [],
-              isActive: true,
+              is_active: true,
             }),
           }],
         },
@@ -1163,7 +1163,7 @@ describe('Common Validation Schemas', () => {
         description: 'A useful widget',
         category: null,
         tags: [],
-        isActive: true,
+        is_active: true,
       });
     });
   });
@@ -1267,7 +1267,7 @@ describe('Common Validation Schemas', () => {
         'dateRange', 'timeRange', 'businessHours', 'pagination', 'fileUpload', 
         'secureFileUpload', 'searchQuery', 'secureSearchQuery', 'coordinate', 
         'geoBounds', 'address', 'money', 'name', 'username', 'slug', 'color',
-        'ipAddress', 'macAddress', 'hostname', 'domain', 'port', 'jwtToken',
+        'ip_address', 'macAddress', 'hostname', 'domain', 'port', 'jwtToken',
         'apiKey', 'hash', 'base64', 'ssn', 'creditCard', 'mimeType', 'semver',
         'timezone', 'languageCode', 'countryCode', 'currencyCode', 'contactInfo',
         'auditTrail', 'entityMetadata', 'organization', 'person', 'document',

@@ -417,10 +417,9 @@ export class PerformanceBenchmarks extends EventEmitter {
     });
   }
 
-  private async benchmarkRateLimitConcurrent(rateLimiter: RateLimitStore): Promise<BenchmarkResult> {
-    return this.runConcurrentBenchmark('rate-limit:concurrent', async () => {
-      const userId = `user:${Math.floor(Math.random() * 1000)}`;
-      await rateLimiter.check(userId, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
+  private async benchmarkRateLimitConcurrent(rateLimiter: RateLimitStore): Promise<BenchmarkResult> { return this.runConcurrentBenchmark('rate-limit:concurrent', async () => {
+      const user_id = `user:${Math.floor(Math.random() * 1000) }`;
+      await rateLimiter.check(user_id, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
     }, {
       concurrency: this.config.concurrency?.rateLimit?.concurrent || 50,
       totalOperations: this.config.iterations?.rateLimit?.concurrent || 10000
@@ -548,14 +547,12 @@ export class PerformanceBenchmarks extends EventEmitter {
     });
   }
 
-  private async benchmarkLoggingContext(logger: UnifiedLogger): Promise<BenchmarkResult> {
-    return this.runBenchmark('logging:context', async () => {
+  private async benchmarkLoggingContext(logger: UnifiedLogger): Promise<BenchmarkResult> { return this.runBenchmark('logging:context', async () => {
       if (logger.withContext) {
-        logger.withContext({ requestId: 'test-123', userId: 'user-456' }, () => {
+        logger.withContext({ requestId: 'test-123', user_id: 'user-456'  }, () => {
           logger.info('Context-aware log message');
         });
-      } else {
-        logger.info('Context-aware log message', { requestId: 'test-123', userId: 'user-456' });
+      } else { logger.info('Context-aware log message', { requestId: 'test-123', user_id: 'user-456'  });
       }
     }, {
       iterations: this.config.iterations?.logging?.context || 5000,
@@ -696,27 +693,24 @@ export class PerformanceBenchmarks extends EventEmitter {
   private async benchmarkFullRequestPipeline(components: BenchmarkComponents): Promise<BenchmarkResult> {
     const { cache, rateLimiter, logger } = components;
 
-    return this.runBenchmark('integration:full-pipeline', async () => {
-      const userId = `user:${Math.floor(Math.random() * 1000)}`;
-      const cacheKey = `data:${userId}`;
+    return this.runBenchmark('integration:full-pipeline', async () => { const user_id = `user:${Math.floor(Math.random() * 1000) }`;
+      const cacheKey = `data:${ user_id }`;
 
       // 1. Rate limiting check
-      const rateLimitResult = await rateLimiter!.check(userId, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
+      const rateLimitResult = await rateLimiter!.check(user_id, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
 
-      if (rateLimitResult.allowed) {
-        // 2. Cache lookup
+      if (rateLimitResult.allowed) { // 2. Cache lookup
         let data = await cache!.get(cacheKey);
 
         if (!data) {
           // 3. Simulate data generation
-          data = { userId, data: 'generated data', timestamp: Date.now() };
+          data = { user_id, data: 'generated data', timestamp: Date.now()  };
           await cache!.set(cacheKey, data, 300);
         }
 
         // 4. Log the operation
-        logger!.info('Request processed', { userId, cached: !!data, rateLimitRemaining: rateLimitResult.remaining });
-      } else {
-        logger!.warn('Rate limit exceeded', { userId, retryAfter: rateLimitResult.retryAfter });
+        logger!.info('Request processed', { user_id, cached: !!data, rateLimitRemaining: rateLimitResult.remaining  });
+      } else { logger!.warn('Rate limit exceeded', { user_id, retryAfter: rateLimitResult.retryAfter  });
       }
     }, {
       iterations: this.config.iterations?.integration?.fullPipeline || 2000,
@@ -759,14 +753,11 @@ export class PerformanceBenchmarks extends EventEmitter {
   private async benchmarkRateLimitLoggingIntegration(components: BenchmarkComponents): Promise<BenchmarkResult> {
     const { rateLimiter, logger } = components;
 
-    return this.runBenchmark('integration:rate-limit-logging', async () => {
-      const userId = `user:${Math.floor(Math.random() * 1000)}`;
-      const result = await rateLimiter!.check(userId, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
+    return this.runBenchmark('integration:rate-limit-logging', async () => { const user_id = `user:${Math.floor(Math.random() * 1000) }`;
+      const result = await rateLimiter!.check(user_id, { windowMs: 60000, max: 100, message: 'Rate limit exceeded' });
 
-      if (result.allowed) {
-        logger!.info('Request allowed', { userId, remaining: result.remaining });
-      } else {
-        logger!.warn('Request blocked', { userId, retryAfter: result.retryAfter });
+      if (result.allowed) { logger!.info('Request allowed', { user_id, remaining: result.remaining  });
+      } else { logger!.warn('Request blocked', { user_id, retryAfter: result.retryAfter  });
       }
     }, {
       iterations: this.config.iterations?.integration?.rateLimitLogging || 5000,

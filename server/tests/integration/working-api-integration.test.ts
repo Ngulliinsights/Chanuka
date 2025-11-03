@@ -71,18 +71,18 @@ describe('Working API Integration Tests', () => {
         {
           email: `test-citizen-${Date.now()}@example.com`,
           name: 'Test Citizen',
-          passwordHash: 'hashed-password-citizen',
+          password_hash: 'hashed-password-citizen',
           role: 'citizen',
-          verificationStatus: 'verified',
-          isActive: true
+          verification_status: 'verified',
+          is_active: true
         },
         {
           email: `test-admin-${Date.now()}@example.com`,
           name: 'Test Admin',
-          passwordHash: 'hashed-password-admin',
+          password_hash: 'hashed-password-admin',
           role: 'admin',
-          verificationStatus: 'verified',
-          isActive: true
+          verification_status: 'verified',
+          is_active: true
         }
       ];
 
@@ -91,7 +91,7 @@ describe('Working API Integration Tests', () => {
           const user = await db.insert(users).values({
             ...userData,
             role: 'citizen' as const,
-            verificationStatus: 'verified' as const
+            verification_status: 'verified' as const
           }).returning();
           testUsers.push(user[0]);
           
@@ -119,7 +119,7 @@ describe('Working API Integration Tests', () => {
           party: 'Test Party',
           constituency: 'Test District 1',
           email: 'sponsor1@parliament.gov',
-          isActive: true
+          is_active: true
         },
         {
           name: 'Test Sponsor 2',
@@ -127,7 +127,7 @@ describe('Working API Integration Tests', () => {
           party: 'Opposition Party',
           constituency: 'Test District 2',
           email: 'sponsor2@parliament.gov',
-          isActive: true
+          is_active: true
         }
       ];
 
@@ -144,43 +144,43 @@ describe('Working API Integration Tests', () => {
       const testBillData = [
         {
           title: 'Integration Test Bill 1',
-          billNumber: `INT-${Date.now()}-1`,
+          bill_number: `INT-${Date.now()}-1`,
           summary: 'Test bill for integration testing',
           description: 'This bill is used for testing API integration',
           content: 'Full content of integration test bill 1...',
           status: 'introduced',
           category: 'technology',
           tags: ['test', 'integration'],
-          viewCount: 0,
-          shareCount: 0,
-          complexityScore: 5,
+          view_count: 0,
+          share_count: 0,
+          complexity_score: 5,
           constitutionalConcerns: { concerns: [], severity: 'low' },
           stakeholderAnalysis: { 
             primary_beneficiaries: ['test users'], 
             potential_opponents: [], 
             economic_impact: 'minimal' 
           },
-          introducedDate: new Date()
+          introduced_date: new Date()
         },
         {
           title: 'Integration Test Bill 2',
-          billNumber: `INT-${Date.now()}-2`,
+          bill_number: `INT-${Date.now()}-2`,
           summary: 'Second test bill for integration testing',
           description: 'This bill is also used for testing API integration',
           content: 'Full content of integration test bill 2...',
           status: 'committee',
           category: 'healthcare',
           tags: ['test', 'integration', 'healthcare'],
-          viewCount: 0,
-          shareCount: 0,
-          complexityScore: 7,
+          view_count: 0,
+          share_count: 0,
+          complexity_score: 7,
           constitutionalConcerns: { concerns: [], severity: 'low' },
           stakeholderAnalysis: { 
             primary_beneficiaries: ['test users'], 
             potential_opponents: [], 
             economic_impact: 'minimal' 
           },
-          introducedDate: new Date()
+          introduced_date: new Date()
         }
       ];
 
@@ -205,17 +205,17 @@ describe('Working API Integration Tests', () => {
     try {
       // Clean up bills
       for (const bill of testBills) {
-        await db.delete(bills).where(eq(bills.id, bill.id));
+        await db.delete(bills).where(eq(bills.id, bills.id));
       }
       
       // Clean up sponsors
       for (const sponsor of testSponsors) {
-        await db.delete(sponsors).where(eq(sponsors.id, sponsor.id));
+        await db.delete(sponsors).where(eq(sponsors.id, sponsors.id));
       }
       
       // Clean up users
       for (const user of testUsers) {
-        await db.delete(users).where(eq(users.id, user.id));
+        await db.delete(users).where(eq(users.id, users.id));
       }
     } catch (error) {
       console.warn('Test data cleanup failed:', error);

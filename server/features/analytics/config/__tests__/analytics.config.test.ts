@@ -165,7 +165,7 @@ describe('Analytics Configuration', () => {
         cache: {
           ...defaultAnalyticsConfig.cache,
           userEngagementTtl: 10,
-          billEngagementTtl: 100000 // Invalid: too high
+          bill_engagementTtl: 100000 // Invalid: too high
         },
         performance: {
           ...defaultAnalyticsConfig.performance,
@@ -177,7 +177,7 @@ describe('Analytics Configuration', () => {
         expect.stringContaining('cache.userEngagementTtl')
       );
       expect(() => validateAnalyticsConfig(invalidConfig)).toThrow(
-        expect.stringContaining('cache.billEngagementTtl')
+        expect.stringContaining('cache.bill_engagementTtl')
       );
       expect(() => validateAnalyticsConfig(invalidConfig)).toThrow(
         expect.stringContaining('performance.slowRequestThreshold')

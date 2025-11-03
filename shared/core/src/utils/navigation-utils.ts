@@ -53,10 +53,10 @@ export function extractPageTitle(path: string): string {
 /**
  * Generate breadcrumbs from a path
  */
-export function generateBreadcrumbs(path: string): Array<{label: string; path: string; isActive?: boolean}> {
+export function generateBreadcrumbs(path: string): Array<{label: string; path: string; is_active?: boolean}> {
   const segments = path.split('/').filter(Boolean);
   const breadcrumbs = [
-    { label: 'Home', path: '/', isActive: path === '/' }
+    { label: 'Home', path: '/', is_active: path === '/' }
   ];
 
   let currentPath = '';
@@ -66,7 +66,7 @@ export function generateBreadcrumbs(path: string): Array<{label: string; path: s
     breadcrumbs.push({
       label: segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' '),
       path: currentPath,
-      isActive: isLast
+      is_active: isLast
     });
   });
 

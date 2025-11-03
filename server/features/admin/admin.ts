@@ -1,5 +1,5 @@
 import { database as db } from '../../../shared/database/connection';
-import { user, bill, billComment, analysis, notification } from '../../../shared/schema';
+import { users, bill, comments, analysis, notification  } from '../../../shared/schema';
 import { eq, count, desc, sql, and, gte } from 'drizzle-orm';
 // import { systemHealthService } from '../../infrastructure/monitoring/system-health.js'; // TODO: Create system health service
 import { alertingService, notificationSchedulerService } from '../../infrastructure/notifications/index.js';
@@ -43,38 +43,38 @@ export class AdminService {
 
       // User statistics
       const [totalUsers] = await db.select({ count: sql<number>`count(*)` }).from(user);
-      const [activeUsers] = await db.select({ count: sql<number>`count(*)` }).from(user).where(eq(user.isActive, true));
-      const [newUsers] = await db.select({ count: sql<number>`count(*)` }).from(user).where(gte(user.createdAt, oneWeekAgo));
+      const [activeUsers] = await db.select({ count: sql<number>`count(*)` }).from(user).where(eq(users.is_active, true));
+      const [newUsers] = await db.select({ count: sql<number>`count(*)` }).from(user).where(gte(users.created_at, oneWeekAgo));
 
       const usersByRole = await db
         .select({
-          role: user.role,
+          role: users.role,
           count: sql<number>`count(*)`
         })
         .from(user)
-        .groupBy(user.role);
+        .groupBy(users.role);
 
       // Bill statistics
        const [totalBills] = await db.select({ count: sql<number>`count(*)` }).from(bill);
-       const [newBills] = await db.select({ count: sql<number>`count(*)` }).from(bill).where(gte(bill.createdAt, oneWeekAgo));
+       const [newBills] = await db.select({ count: sql<number>`count(*)` }).from(bill).where(gte(bills.created_at, oneWeekAgo));
 
        const billsByStatus = await db
          .select({
-           status: bill.status,
+           status: bills.status,
            count: sql<number>`count(*)`
          })
          .from(bill)
-         .groupBy(bill.status);
+         .groupBy(bills.status);
 
       // Engagement statistics
-       const [totalComments] = await db.select({ count: sql<number>`count(*)` }).from(billComment);
+       const [totalComments] = await db.select({ count: sql<number>`count(*)` }).from(comments);
        const [totalAnalyses] = await db.select({ count: sql<number>`count(*)` }).from(analysis);
 
       // Active users (users who have engaged in the last week)
        const [recentlyActiveUsers] = await db
          .select({ count: sql<number>`count(*)` })
          .from(user)
-         .where(gte(user.lastLoginAt, oneWeekAgo));
+         .where(gte(users.last_login_at, oneWeekAgo));
 
       return {
         users: {
@@ -107,11 +107,11 @@ export class AdminService {
       try {
         // Try to get basic stats without system health
         const [totalUsers] = await db.select({ count: sql<number>`count(*)` }).from(user);
-        const [activeUsers] = await db.select({ count: sql<number>`count(*)` }).from(user).where(eq(user.isActive, true));
-        const [newUsers] = await db.select({ count: sql<number>`count(*)` }).from(user).where(gte(user.createdAt, oneWeekAgo));
+        const [activeUsers] = await db.select({ count: sql<number>`count(*)` }).from(user).where(eq(users.is_active, true));
+        const [newUsers] = await db.select({ count: sql<number>`count(*)` }).from(user).where(gte(users.created_at, oneWeekAgo));
         const [totalBills] = await db.select({ count: sql<number>`count(*)` }).from(bill);
-        const [newBills] = await db.select({ count: sql<number>`count(*)` }).from(bill).where(gte(bill.createdAt, oneWeekAgo));
-        const [totalComments] = await db.select({ count: sql<number>`count(*)` }).from(billComment);
+        const [newBills] = await db.select({ count: sql<number>`count(*)` }).from(bill).where(gte(bills.created_at, oneWeekAgo));
+        const [totalComments] = await db.select({ count: sql<number>`count(*)` }).from(comments);
 
         return {
           users: {
@@ -148,32 +148,32 @@ export class AdminService {
       const conditions: any[] = [];
 
       if (filters?.role) {
-        conditions.push(eq(user.role, filters.role));
+        conditions.push(eq(users.role, filters.role));
       }
 
       if (filters?.status === 'active') {
-        conditions.push(eq(user.isActive, true));
+        conditions.push(eq(users.is_active, true));
       } else if (filters?.status === 'inactive') {
-        conditions.push(eq(user.isActive, false));
+        conditions.push(eq(users.is_active, false));
       }
 
       if (filters?.search) {
         const searchTerm = `%${filters.search.toLowerCase()}%`;
         conditions.push(
-          sql`LOWER(${user.name}) LIKE ${searchTerm} OR LOWER(${user.email}) LIKE ${searchTerm}`
+          sql`LOWER(${users.name}) LIKE ${searchTerm} OR LOWER(${users.email}) LIKE ${searchTerm}`
         );
       }
 
       let baseQuery = db
         .select({
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          verificationStatus: user.verificationStatus,
-          isActive: user.isActive,
-          lastLoginAt: user.lastLoginAt,
-          createdAt: user.createdAt
+          id: users.id,
+          email: users.email,
+          name: users.name,
+          role: users.role,
+          verification_status: users.verification_status,
+          is_active: users.is_active,
+          last_login_at: users.last_login_at,
+          created_at: users.created_at
         })
         .from(user);
 
@@ -183,7 +183,7 @@ export class AdminService {
       }
 
       const result = await baseQuery
-        .orderBy(desc(user.createdAt))
+        .orderBy(desc(users.created_at))
         .limit(limit)
         .offset(offset);
 
@@ -209,22 +209,20 @@ export class AdminService {
     }
   }
 
-  async updateUserStatus(userId: string, updates: { isActive?: boolean; role?: string; verificationStatus?: string }) {
-    try {
+  async updateUserStatus(user_id: string, updates: { is_active?: boolean; role?: string; verification_status?: string }) { try {
       await db
         .update(user)
         .set(updates as any)
-        .where(eq(user.id, userId));
+        .where(eq(users.id, user_id));
 
-      return { success: true };
+      return { success: true  };
     } catch (error) {
       logger.error('Error updating user status:', { component: 'Chanuka' }, { error });
       throw error;
     }
   }
 
-  async getSystemLogs(page = 1, limit = 50, level?: string) {
-    try {
+  async getSystemLogs(page = 1, limit = 50, level?: string) { try {
       // This would integrate with your logging system
       // For now, return mock data
       const mockLogs = [
@@ -233,8 +231,8 @@ export class AdminService {
           timestamp: new Date(),
           level: 'info',
           message: 'User login successful',
-          userId: 'user-123',
-          metadata: { ip: '192.168.1.1' }
+          user_id: 'user-123',
+          metadata: { ip: '192.168.1.1'  }
         },
         {
           id: 2,
@@ -260,24 +258,23 @@ export class AdminService {
     }
   }
 
-  async getContentModeration(page = 1, limit = 20) {
-    try {
+  async getContentModeration(page = 1, limit = 20) { try {
       // Get comments that might need moderation
       const flaggedComments = await db
         .select({
-          id: billComment.id,
-          content: billComment.content,
-          userId: billComment.userId,
-          billId: billComment.billId,
-          createdAt: billComment.createdAt,
-          upvotes: billComment.upvotes,
-          downvotes: billComment.downvotes,
-          userName: user.name
-        })
-        .from(billComment)
-        .innerJoin(user, eq(billComment.userId, user.id))
-        .where(sql`${billComment.downvotes} > 5 OR LENGTH(${billComment.content}) > 1000`)
-        .orderBy(desc(billComment.createdAt))
+          id: comments.id,
+          content: comments.content,
+          user_id: comments.user_id,
+          bill_id: comments.bill_id,
+          created_at: comments.created_at,
+          upvotes: comments.upvotes,
+          downvotes: comments.downvotes,
+          userName: users.name
+          })
+        .from(comments)
+        .innerJoin(user, eq(comments.user_id, users.id))
+        .where(sql`${comments.downvotes} > 5 OR LENGTH(${comments.content}) > 1000`)
+        .orderBy(desc(comments.created_at))
         .limit(limit)
         .offset((page - 1) * limit);
 
@@ -295,10 +292,10 @@ export class AdminService {
     }
   }
 
-  async moderateComment(commentId: number, action: 'approve' | 'remove' | 'flag') {
+  async moderateComment(comment_id: number, action: 'approve' | 'remove' | 'flag') {
     try {
       // Implement comment moderation logic
-      console.log(`Moderating comment ${commentId} with action: ${action}`);
+      console.log(`Moderating comment ${comment_id} with action: ${action}`);
       return { success: true };
     } catch (error) {
       logger.error('Error moderating comment:', { component: 'Chanuka' }, { error });

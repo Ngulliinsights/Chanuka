@@ -13,7 +13,7 @@ export interface UseDashboardActionsResult {
   loading: boolean;
   error: DashboardActionError | null;
   operations: {
-    addAction: (action: Omit<ActionItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
+    addAction: (action: Omit<ActionItem, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
     updateAction: (actionId: string, updates: Partial<ActionItem>) => Promise<void>;
     completeAction: (actionId: string) => Promise<void>;
     deleteAction: (actionId: string) => Promise<void>;
@@ -29,7 +29,7 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<DashboardActionError | null>(null);
 
-  const addAction = useCallback(async (actionData: Omit<ActionItem, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const addAction = useCallback(async (actionData: Omit<ActionItem, 'id' | 'created_at' | 'updated_at'>) => {
     setLoading(true);
     setError(null);
 
@@ -37,8 +37,8 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
       const newAction: ActionItem = {
         ...actionData,
         id: `action-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       };
 
       validateActionItem(newAction);
@@ -69,7 +69,7 @@ export function useDashboardActions(initialActions: ActionItem[] = []): UseDashb
       const updatedAction: ActionItem = {
         ...actions[actionIndex],
         ...updates,
-        updatedAt: new Date()
+        updated_at: new Date()
       };
 
       validateActionItem(updatedAction);

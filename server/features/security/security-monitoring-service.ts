@@ -36,8 +36,8 @@ const securityIncidents = pgTable("security_incidents", {
   assignedTo: text("assigned_to"),
   evidence: jsonb("evidence"),
   mitigationSteps: text("mitigation_steps").array(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
 });
 
 const securityAlerts = pgTable("security_alerts", {
@@ -55,24 +55,24 @@ const securityAlerts = pgTable("security_alerts", {
   acknowledgedBy: text("acknowledged_by"),
   resolvedAt: timestamp("resolved_at"),
   resolvedBy: text("resolved_by"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
 });
 
 const complianceChecks = pgTable("compliance_checks", {
   id: serial("id").primaryKey(),
   checkName: text("check_name").notNull().unique(),
-  checkType: text("check_type").notNull(),
+  check_type: text("check_type").notNull(),
   description: text("description"),
   status: text("status").notNull(),
-  lastChecked: timestamp("last_checked").defaultNow(),
-  nextCheck: timestamp("next_check"),
+  last_checked: timestamp("last_checked").defaultNow(),
+  next_check: timestamp("next_check"),
   findings: jsonb("findings"),
   remediation: text("remediation"),
   priority: text("priority").notNull().default("medium"),
   automated: boolean("automated").default(true),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
 });
 
 // Type definitions
@@ -95,7 +95,7 @@ export interface SecurityAlert {
   source: string;
   status: string;
   incidentId?: number;
-  createdAt: Date;
+  created_at: Date;
   metadata?: any;
 }
 
@@ -395,7 +395,7 @@ export class SecurityMonitoringService {
           status: 'acknowledged',
           acknowledgedAt: new Date(),
           acknowledgedBy,
-          updatedAt: new Date(),
+          updated_at: new Date(),
         })
         .where(eq(securityAlerts.id, alertId));
 
@@ -435,7 +435,7 @@ export class SecurityMonitoringService {
           status: 'resolved',
           resolvedAt: new Date(),
           resolvedBy,
-          updatedAt: new Date(),
+          updated_at: new Date(),
         })
         .where(eq(securityAlerts.id, alertId));
 
@@ -480,23 +480,23 @@ export class SecurityMonitoringService {
             .insert(complianceChecks)
             .values({
               checkName,
-              checkType: result.type,
+              check_type: result.type,
               description: result.description,
               status: result.status,
               findings: result.findings,
               remediation: result.remediation,
               priority: result.priority,
-              nextCheck: new Date(Date.now() + 24 * 60 * 60 * 1000),
+              next_check: new Date(Date.now() + 24 * 60 * 60 * 1000),
             })
             .onConflictDoUpdate({
               target: complianceChecks.checkName,
               set: {
                 status: result.status,
-                lastChecked: new Date(),
+                last_checked: new Date(),
                 findings: result.findings,
                 remediation: result.remediation,
-                nextCheck: new Date(Date.now() + 24 * 60 * 60 * 1000),
-                updatedAt: new Date(),
+                next_check: new Date(Date.now() + 24 * 60 * 60 * 1000),
+                updated_at: new Date(),
               },
             });
 
@@ -714,37 +714,37 @@ export class SecurityMonitoringService {
    * Handle a detected threat by creating incident and taking action
    */
   private async handleThreatDetection(req: Request, threatResult: ThreatDetectionResult): Promise<void> {
-    const ipAddress = this.extractClientIP(req);
+    const ip_address = this.extractClientIP(req);
 
     try {
       // Create an incident for this threat
       const incidentId = await this.createIncident({
         incidentType: 'threat_detected',
         severity: threatResult.threatLevel as any,
-        description: `Threat detected from ${ipAddress}: ${threatResult.detectedThreats.map(t => t.type).join(', ')}`,
+        description: `Threat detected from ${ip_address}: ${threatResult.detectedThreats.map(t => t.type).join(', ')}`,
         affectedUsers: [(req as any).user?.id].filter(Boolean),
         detectionMethod: 'intrusion_detection',
         evidence: {
-          ipAddress,
+          ip_address,
           threats: threatResult.detectedThreats,
           riskScore: threatResult.riskScore,
           path: req.path,
           method: req.method,
-          userAgent: req.get('User-Agent'),
+          user_agent: req.get('User-Agent'),
         },
       });
 
       // Auto-block critical threats if configured
       if (threatResult.threatLevel === 'critical' && this.config.actions.autoBlockCriticalThreats) {
         await intrusionDetectionService.blockIP(
-          ipAddress,
+          ip_address,
           `Auto-blocked due to critical threat (Incident #${incidentId})`,
           this.config.actions.autoBlockDuration
         );
 
         logger.warn('🚫 IP auto-blocked due to critical threat', {
           component: 'SecurityMonitoring',
-          ipAddress,
+          ip_address,
           incidentId,
           threats: threatResult.detectedThreats,
         });
@@ -760,7 +760,7 @@ export class SecurityMonitoringService {
   private async detectBruteForceAttacks(since: Date): Promise<void> {
     try {
       const failedLogins = await securityAuditService.queryAuditLogs({
-        eventType: 'login_failure',
+        event_type: 'login_failure',
         startDate: since,
       });
 
@@ -769,22 +769,21 @@ export class SecurityMonitoringService {
       const failuresByIP = new Map<string, number>();
 
       failedLogins.forEach(event => {
-        if (event.userId) {
-          failuresByUser.set(event.userId, (failuresByUser.get(event.userId) || 0) + 1);
+        if (event.user_id) {
+          failuresByUser.set(event.user_id, (failuresByUser.get(event.user_id) || 0) + 1);
         }
-        if (event.ipAddress) {
-          failuresByIP.set(event.ipAddress, (failuresByIP.get(event.ipAddress) || 0) + 1);
+        if (event.ip_address) {
+          failuresByIP.set(event.ip_address, (failuresByIP.get(event.ip_address) || 0) + 1);
         }
       });
 
       // Check for threshold violations
-      for (const [userId, count] of failuresByUser) {
-        if (count >= this.config.thresholds.failedLoginAttempts) {
+      for (const [user_id, count] of failuresByUser) { if (count >= this.config.thresholds.failedLoginAttempts) {
           await this.createIncident({
             incidentType: 'brute_force_attack',
             severity: 'high',
-            description: `Multiple failed login attempts detected for user ${userId} (${count} attempts)`,
-            affectedUsers: [userId],
+            description: `Multiple failed login attempts detected for user ${user_id } (${count} attempts)`,
+            affectedUsers: [user_id],
             detectionMethod: 'automated_pattern_detection',
             evidence: {
               failedAttempts: count,
@@ -794,15 +793,15 @@ export class SecurityMonitoringService {
         }
       }
 
-      for (const [ipAddress, count] of failuresByIP) {
+      for (const [ip_address, count] of failuresByIP) {
         if (count >= this.config.thresholds.failedLoginAttempts) {
           await this.createIncident({
             incidentType: 'brute_force_attack',
             severity: 'high',
-            description: `Multiple failed login attempts from IP ${ipAddress} (${count} attempts)`,
+            description: `Multiple failed login attempts from IP ${ip_address} (${count} attempts)`,
             detectionMethod: 'automated_pattern_detection',
             evidence: {
-              ipAddress,
+              ip_address,
               failedAttempts: count,
               timeWindow: `${this.config.thresholds.failedLoginTimeWindow} minutes`,
             },
@@ -811,7 +810,7 @@ export class SecurityMonitoringService {
           // Consider blocking the IP
           if (count >= this.config.thresholds.failedLoginAttempts * 2) {
             await intrusionDetectionService.blockIP(
-              ipAddress,
+              ip_address,
               `Brute force attack detected (${count} failed attempts)`,
               this.config.actions.autoBlockDuration
             );
@@ -829,7 +828,7 @@ export class SecurityMonitoringService {
   private async detectDataExfiltration(since: Date): Promise<void> {
     try {
       const dataAccessEvents = await securityAuditService.queryAuditLogs({
-        eventType: 'data_access',
+        event_type: 'data_access',
         startDate: since,
       });
 
@@ -837,21 +836,20 @@ export class SecurityMonitoringService {
       const accessByUser = new Map<string, number>();
 
       dataAccessEvents.forEach(event => {
-        if (event.userId) {
+        if (event.user_id) {
           const details = event.details as any;
           const recordCount = details?.recordCount || 0;
-          accessByUser.set(event.userId, (accessByUser.get(event.userId) || 0) + recordCount);
+          accessByUser.set(event.user_id, (accessByUser.get(event.user_id) || 0) + recordCount);
         }
       });
 
       // Check for threshold violations
-      for (const [userId, totalRecords] of accessByUser) {
-        if (totalRecords >= this.config.thresholds.dataAccessVolume) {
+      for (const [user_id, totalRecords] of accessByUser) { if (totalRecords >= this.config.thresholds.dataAccessVolume) {
           await this.createIncident({
             incidentType: 'potential_data_exfiltration',
             severity: 'critical',
-            description: `Unusual high-volume data access detected for user ${userId} (${totalRecords} records)`,
-            affectedUsers: [userId],
+            description: `Unusual high-volume data access detected for user ${user_id } (${totalRecords} records)`,
+            affectedUsers: [user_id],
             detectionMethod: 'automated_pattern_detection',
             evidence: {
               recordsAccessed: totalRecords,
@@ -871,7 +869,7 @@ export class SecurityMonitoringService {
   private async detectPrivilegeEscalation(since: Date): Promise<void> {
     try {
       const adminActions = await securityAuditService.queryAuditLogs({
-        eventType: 'admin_action',
+        event_type: 'admin_action',
         startDate: since,
       });
 
@@ -879,19 +877,18 @@ export class SecurityMonitoringService {
       const actionsByUser = new Map<string, number>();
 
       adminActions.forEach(event => {
-        if (event.userId) {
-          actionsByUser.set(event.userId, (actionsByUser.get(event.userId) || 0) + 1);
+        if (event.user_id) {
+          actionsByUser.set(event.user_id, (actionsByUser.get(event.user_id) || 0) + 1);
         }
       });
 
       // Check for users with unusual admin activity
-      for (const [userId, count] of actionsByUser) {
-        if (count > 20) { // More than 20 admin actions in the time window is suspicious
+      for (const [user_id, count] of actionsByUser) { if (count > 20) { // More than 20 admin actions in the time window is suspicious
           await this.createIncident({
             incidentType: 'suspicious_admin_activity',
             severity: 'high',
-            description: `Unusual volume of administrative actions by user ${userId} (${count} actions)`,
-            affectedUsers: [userId],
+            description: `Unusual volume of administrative actions by user ${user_id } (${count} actions)`,
+            affectedUsers: [user_id],
             detectionMethod: 'automated_pattern_detection',
             evidence: {
               adminActionCount: count,
@@ -930,7 +927,7 @@ export class SecurityMonitoringService {
             .update(securityAlerts)
             .set({
               status: 'escalated',
-              updatedAt: new Date(),
+              updated_at: new Date(),
             })
             .where(eq(securityAlerts.id, alertId));
 
@@ -1039,7 +1036,7 @@ export class SecurityMonitoringService {
     return await db
       .select()
       .from(securityIncidents)
-      .orderBy(desc(securityIncidents.createdAt))
+      .orderBy(desc(securityIncidents.created_at))
       .limit(limit);
   }
 
@@ -1048,7 +1045,7 @@ export class SecurityMonitoringService {
       .select()
       .from(securityAlerts)
       .where(eq(securityAlerts.status, 'active'))
-      .orderBy(desc(securityAlerts.createdAt))
+      .orderBy(desc(securityAlerts.created_at))
       .limit(limit);
 
     return alerts.map(alert => ({
@@ -1060,7 +1057,7 @@ export class SecurityMonitoringService {
       source: alert.source,
       status: alert.status,
       incidentId: alert.incidentId || undefined,
-      createdAt: alert.createdAt!,
+      created_at: alert.created_at!,
       metadata: alert.metadata,
     }));
   }
@@ -1096,7 +1093,7 @@ export class SecurityMonitoringService {
     const incidents = await db
       .select()
       .from(securityIncidents)
-      .where(gte(securityIncidents.createdAt, oneWeekAgo));
+      .where(gte(securityIncidents.created_at, oneWeekAgo));
 
     const typeCounts = new Map<string, number>();
     incidents.forEach(incident => {
@@ -1147,11 +1144,11 @@ export class SecurityMonitoringService {
       .from(securityIncidents)
       .where(
         and(
-          gte(securityIncidents.createdAt, startDate),
-          sql`${securityIncidents.createdAt} <= ${endDate}`
+          gte(securityIncidents.created_at, startDate),
+          sql`${securityIncidents.created_at} <= ${endDate}`
         )
       )
-      .orderBy(desc(securityIncidents.createdAt));
+      .orderBy(desc(securityIncidents.created_at));
   }
 
   private async getAlertsInPeriod(startDate: Date, endDate: Date): Promise<SecurityAlert[]> {
@@ -1160,11 +1157,11 @@ export class SecurityMonitoringService {
       .from(securityAlerts)
       .where(
         and(
-          gte(securityAlerts.createdAt, startDate),
-          sql`${securityAlerts.createdAt} <= ${endDate}`
+          gte(securityAlerts.created_at, startDate),
+          sql`${securityAlerts.created_at} <= ${endDate}`
         )
       )
-      .orderBy(desc(securityAlerts.createdAt));
+      .orderBy(desc(securityAlerts.created_at));
 
     return alerts.map(alert => ({
       id: alert.id,
@@ -1175,7 +1172,7 @@ export class SecurityMonitoringService {
       source: alert.source,
       status: alert.status,
       incidentId: alert.incidentId || undefined,
-      createdAt: alert.createdAt!,
+      created_at: alert.created_at!,
       metadata: alert.metadata,
     }));
   }
@@ -1193,7 +1190,7 @@ export class SecurityMonitoringService {
         name: check.checkName,
         status: check.status,
         priority: check.priority,
-        lastChecked: check.lastChecked,
+        last_checked: check.last_checked,
       })),
     };
   }

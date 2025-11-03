@@ -13,7 +13,7 @@ export class PageRelationshipUtils {
    */
   static getSmartSuggestions(
     currentPage: string,
-    userRole?: UserRole,
+    user_role?: UserRole,
     visitHistory: string[] = [],
     recentPages: string[] = []
   ): RelatedPage[] {
@@ -23,7 +23,7 @@ export class PageRelationshipUtils {
     }
 
     // Get personalized suggestions
-    return this.service.getPersonalizedSuggestions(currentPage, userRole, recentPages);
+    return this.service.getPersonalizedSuggestions(currentPage, user_role, recentPages);
   }
 
   /**
@@ -55,7 +55,7 @@ export class PageRelationshipUtils {
   static getContextualBreadcrumbs(pageId: string): Array<{
     label: string;
     path: string;
-    isActive: boolean;
+    is_active: boolean;
     relationshipContext?: string;
   }> {
     const breadcrumbs = this.service.generateBreadcrumbs(pageId);
@@ -109,12 +109,12 @@ export class PageRelationshipUtils {
   /**
    * Get category-based navigation menu
    */
-  static getCategoryNavigation(userRole?: UserRole): Record<string, RelatedPage[]> {
+  static getCategoryNavigation(user_role?: UserRole): Record<string, RelatedPage[]> {
     const categories = ['legislative', 'community', 'tools', 'user', 'admin'] as const;
     const navigation: Record<string, RelatedPage[]> = {};
 
     categories.forEach(category => {
-      const pages = this.service.getPagesByCategory(category, userRole);
+      const pages = this.service.getPagesByCategory(category, user_role);
       if (pages.length > 0) {
         navigation[category] = pages;
       }

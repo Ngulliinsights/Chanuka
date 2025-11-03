@@ -38,37 +38,34 @@ export function useAnalyticsSummary(filters?: AnalyticsFilters) {
 /**
  * Hook for individual bill analytics
  */
-export function useBillAnalytics(billId: string | undefined, filters?: AnalyticsFilters) {
-  return useQuery({
-    queryKey: ['analytics', 'bill', billId, filters],
-    queryFn: () => analyticsApi.getBillAnalytics(billId!, filters),
-    enabled: !!billId,
+export function useBillAnalytics(bill_id: string | undefined, filters?: AnalyticsFilters) { return useQuery({
+    queryKey: ['analytics', 'bill', bill_id, filters],
+    queryFn: () => analyticsApi.getBillAnalytics(bill_id!, filters),
+    enabled: !!bill_id,
     staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+   });
 }
 
 /**
  * Hook for bill engagement reports
  */
-export function useEngagementReport(billId: string | undefined, filters?: AnalyticsFilters) {
-  return useQuery({
-    queryKey: ['analytics', 'engagement', billId, filters],
-    queryFn: () => analyticsApi.getEngagementReport(billId!, filters),
-    enabled: !!billId,
+export function useEngagementReport(bill_id: string | undefined, filters?: AnalyticsFilters) { return useQuery({
+    queryKey: ['analytics', 'engagement', bill_id, filters],
+    queryFn: () => analyticsApi.getEngagementReport(bill_id!, filters),
+    enabled: !!bill_id,
     staleTime: 15 * 60 * 1000, // 15 minutes
-  });
+   });
 }
 
 /**
  * Hook for conflict analysis reports
  */
-export function useConflictReport(billId: string | undefined) {
-  return useQuery({
-    queryKey: ['analytics', 'conflicts', billId],
-    queryFn: () => analyticsApi.getConflictReport(billId!),
-    enabled: !!billId,
+export function useConflictReport(bill_id: string | undefined) { return useQuery({
+    queryKey: ['analytics', 'conflicts', bill_id],
+    queryFn: () => analyticsApi.getConflictReport(bill_id!),
+    enabled: !!bill_id,
     staleTime: 30 * 60 * 1000, // 30 minutes - conflicts don't change often
-  });
+   });
 }
 
 /**
@@ -85,12 +82,11 @@ export function useTopBills(limit = 10, filters?: AnalyticsFilters) {
 /**
  * Hook for user activity analytics
  */
-export function useUserActivity(userId?: string, filters?: AnalyticsFilters) {
-  return useQuery({
-    queryKey: ['analytics', 'user-activity', userId, filters],
-    queryFn: () => analyticsApi.getUserActivity(userId, filters),
+export function useUserActivity(user_id?: string, filters?: AnalyticsFilters) { return useQuery({
+    queryKey: ['analytics', 'user-activity', user_id, filters],
+    queryFn: () => analyticsApi.getUserActivity(user_id, filters),
     staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+   });
 }
 
 /**
@@ -136,12 +132,11 @@ export function useTrendingTopics(limit = 20) {
 /**
  * Hook for stakeholder analysis
  */
-export function useStakeholderAnalysis(billId?: string) {
-  return useQuery({
-    queryKey: ['analytics', 'stakeholders', billId],
-    queryFn: () => analyticsApi.getStakeholderAnalysis(billId),
+export function useStakeholderAnalysis(bill_id?: string) { return useQuery({
+    queryKey: ['analytics', 'stakeholders', bill_id],
+    queryFn: () => analyticsApi.getStakeholderAnalysis(bill_id),
     staleTime: 30 * 60 * 1000, // 30 minutes
-  });
+   });
 }
 
 /**

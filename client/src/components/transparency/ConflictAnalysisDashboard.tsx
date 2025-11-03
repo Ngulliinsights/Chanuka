@@ -31,7 +31,7 @@ interface ConflictData {
 
 interface ConflictDetectionResult {
   conflictId: string;
-  sponsorId: number;
+  sponsor_id: number;
   conflictType: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   description: string;
@@ -51,7 +51,7 @@ interface DashboardData {
   severityDistribution: Record<string, number>;
   conflictTypeDistribution: Record<string, number>;
   topRiskSponsors: Array<{
-    sponsorId: number;
+    sponsor_id: number;
     riskScore: number;
     conflictCount: number;
     trend: 'increasing' | 'decreasing' | 'stable';
@@ -67,13 +67,12 @@ interface DashboardData {
     decreasingRisk: number;
     stableRisk: number;
   };
-  predictions: Array<{
-    billId: number;
+  predictions: Array<{ bill_id: number;
     billTitle: string;
     predictedConflictType: string;
     probability: number;
     riskFactors: string[];
-  }>;
+   }>;
 }
 
 const ConflictAnalysisDashboard: React.FC = () => {
@@ -313,7 +312,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">
-                      Sponsor ID: {conflict.sponsorId}
+                      Sponsor ID: {conflict.sponsor_id}
                     </CardTitle>
                     <div className="flex items-center space-x-2">
                       <Badge className={getSeverityColor(conflict.severity)}>
@@ -416,21 +415,21 @@ const ConflictAnalysisDashboard: React.FC = () => {
               <CardContent>
                 <div className="space-y-3">
                   {dashboardData.topRiskSponsors.slice(0, 5).map((sponsor, index) => (
-                    <div key={sponsor.sponsorId} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div key={sponsors.sponsor_id} className="flex items-center justify-between p-3 border rounded-lg">
                       <div className="flex items-center space-x-3">
                         <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-semibold">
                           #{index + 1}
                         </div>
                         <div>
-                          <div className="font-medium">Sponsor {sponsor.sponsorId}</div>
+                          <div className="font-medium">Sponsor {sponsors.sponsor_id}</div>
                           <div className="text-sm text-gray-600">
-                            {sponsor.conflictCount} conflicts
+                            {sponsors.conflictCount} conflicts
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
-                        {getTrendIcon(sponsor.trend)}
-                        <span className="font-semibold">{sponsor.riskScore}</span>
+                        {getTrendIcon(sponsors.trend)}
+                        <span className="font-semibold">{sponsors.riskScore}</span>
                       </div>
                     </div>
                   ))}
@@ -450,8 +449,8 @@ const ConflictAnalysisDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {dashboardData.predictions.map((prediction, index) => (
-                  <div key={prediction.billId} className="border rounded-lg p-4">
+                { dashboardData.predictions.map((prediction, index) => (
+                  <div key={prediction.bill_id } className="border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-semibold">{prediction.billTitle}</h4>
                       <div className="flex items-center space-x-2">
@@ -470,7 +469,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
                       </div>
                     </div>
                     <div className="text-sm text-gray-600 mb-2">
-                      Bill ID: {prediction.billId}
+                      Bill ID: { prediction.bill_id }
                     </div>
                     <div className="text-sm">
                       <span className="font-medium">Risk Factors:</span>

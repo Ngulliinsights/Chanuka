@@ -14,7 +14,7 @@ export class NavigationStatePersistence {
         preferences: state.preferences,
         sidebarOpen: state.sidebarOpen,
         sidebarCollapsed: state.sidebarCollapsed,
-        userRole: state.userRole
+        user_role: state.user_role
       };
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(persistableState));
     } catch (error) {

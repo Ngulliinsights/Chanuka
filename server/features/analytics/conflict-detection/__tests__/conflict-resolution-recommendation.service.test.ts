@@ -46,7 +46,7 @@ describe('ConflictResolutionRecommendationService', () => {
         conflictSeverity: 'high',
         affectedBills: [1],
         relationshipStrength: 0.9,
-        isActive: true,
+        is_active: true,
         evidenceStrength: 85,
         detectionMethod: 'affiliation_analysis',
         lastUpdated: new Date()
@@ -54,10 +54,9 @@ describe('ConflictResolutionRecommendationService', () => {
     ];
 
     const mockVotingAnomalies: VotingAnomaly[] = [
-      {
-        id: 'voting1',
+      { id: 'voting1',
         type: 'party_deviation',
-        billId: 1,
+        bill_id: 1,
         billTitle: 'Test Bill',
         expectedBehavior: 'Vote yes',
         actualBehavior: 'Voted no',
@@ -65,7 +64,7 @@ describe('ConflictResolutionRecommendationService', () => {
         contextFactors: ['Healthcare'],
         anomalyScore: 0.8,
         detectionDate: new Date()
-      }
+       }
     ];
 
     it('should generate comprehensive recommendations for critical risk', () => {
@@ -187,7 +186,7 @@ describe('ConflictResolutionRecommendationService', () => {
         conflictSeverity: 'high' as const,
         affectedBills: [1],
         relationshipStrength: 0.9,
-        isActive: true,
+        is_active: true,
         evidenceStrength: 85,
         detectionMethod: 'affiliation_analysis' as const,
         lastUpdated: new Date()
@@ -201,7 +200,7 @@ describe('ConflictResolutionRecommendationService', () => {
         conflictSeverity: 'medium' as const,
         affectedBills: [2],
         relationshipStrength: 0.6,
-        isActive: true,
+        is_active: true,
         evidenceStrength: 70,
         detectionMethod: 'affiliation_analysis' as const,
         lastUpdated: new Date()
@@ -261,7 +260,7 @@ describe('ConflictResolutionRecommendationService', () => {
 
   describe('generateComplianceRecommendations', () => {
     const mockAnalysis: ConflictAnalysis = {
-      sponsorId: 123,
+      sponsor_id: 123,
       sponsorName: 'Test Sponsor',
       overallRiskScore: 0.6,
       riskLevel: 'medium',
@@ -290,14 +289,14 @@ describe('ConflictResolutionRecommendationService', () => {
           conflictSeverity: 'low',
           affectedBills: [1],
           relationshipStrength: 0.5,
-          isActive: true,
+          is_active: true,
           evidenceStrength: 70,
           detectionMethod: 'affiliation_analysis',
           lastUpdated: new Date()
         }
       ],
       votingAnomalies: [],
-      transparencyScore: 0.7,
+      transparency_score: 0.7,
       transparencyGrade: 'B',
       recommendations: [],
       lastAnalyzed: new Date(),

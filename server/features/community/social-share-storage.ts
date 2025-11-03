@@ -1,7 +1,7 @@
 
 import { database as db } from '../shared/database/connection';
 import { 
-  socialShares,
+  social_shares,
   bills,
   type SocialShare, 
   type InsertSocialShare
@@ -30,7 +30,7 @@ export class SocialShareStorage extends BaseStorage<SocialShare> {
 
   async trackSocialShare(share: InsertSocialShare): Promise<SocialShare> {
     return this.withTransaction(async (tx) => {
-      const result = await tx.insert(socialShares).values({
+      const result = await tx.insert(social_shares).values({
         ...share,
         shareDate: share.shareDate || new Date(),
       }).returning();
@@ -39,8 +39,8 @@ export class SocialShareStorage extends BaseStorage<SocialShare> {
 
       // Invalidate relevant caches
       await Promise.all([
-        this.invalidateCache(`socialShareStats:${share.billId}`),
-        this.invalidateCache(`billShares:${share.billId}`),
+        this.invalidateCache(`social_shareStats:${share.bill_id}`),
+        this.invalidateCache(`billShares:${share.bill_id}`),
         this.invalidateCache(`sharesByPlatform:${share.platform}`),
       ]);
 
@@ -48,16 +48,15 @@ export class SocialShareStorage extends BaseStorage<SocialShare> {
     });
   }
 
-  async getSocialShareStats(billId: number): Promise<{ platform: string; count: number }[]> {
-    return this.getCached(`socialShareStats:${billId}`, async () => {
+  async getSocialShareStats(bill_id: number): Promise<{ platform: string; count: number }[]> { return this.getCached(`social_shareStats:${bill_id }`, async () => {
       const result = await db
         .select({
-          platform: socialShares.platform,
+          platform: social_shares.platform,
           count: sql<number>`COUNT(*)`
         })
-        .from(socialShares)
-        .where(eq(socialShares.billId, billId))
-        .groupBy(socialShares.platform);
+        .from(social_shares)
+        .where(eq(social_shares.bill_id, bill_id))
+        .groupBy(social_shares.platform);
 
       return result.map(row => ({
         platform: row.platform,
@@ -67,49 +66,46 @@ export class SocialShareStorage extends BaseStorage<SocialShare> {
   }
 
   async getSharesByPlatform(platform: string): Promise<Map<number, SocialShare[]>> {
-    return this.getCached(`sharesByPlatform:${platform}`, async () => {
-      const result = await db
+    return this.getCached(`sharesByPlatform:${platform}`, async () => { const result = await db
         .select({
-          id: socialShares.id,
-          billId: socialShares.billId,
-          platform: socialShares.platform,
-          userId: socialShares.userId,
-          metadata: socialShares.metadata,
-          shareDate: socialShares.shareDate,
-          likes: socialShares.likes,
-          shares: socialShares.shares,
-          comments: socialShares.comments,
-          createdAt: socialShares.createdAt,
+          id: social_shares.id,
+          bill_id: social_shares.bill_id,
+          platform: social_shares.platform,
+          user_id: social_shares.user_id,
+          metadata: social_shares.metadata,
+          shareDate: social_shares.shareDate,
+          likes: social_shares.likes,
+          shares: social_shares.shares,
+          comments: social_shares.comments,
+          created_at: social_shares.created_at,
           billTitle: bills.title
-        })
-        .from(socialShares)
-        .innerJoin(bills, eq(socialShares.billId, bills.id))
-        .where(eq(socialShares.platform, platform))
-        .orderBy(desc(socialShares.createdAt));
+          })
+        .from(social_shares)
+        .innerJoin(bills, eq(social_shares.bill_id, bills.id))
+        .where(eq(social_shares.platform, platform))
+        .orderBy(desc(social_shares.created_at));
 
       const grouped = new Map<number, SocialShare[]>();
       for (const share of result) {
-        const shares = grouped.get(share.billId) || [];
+        const shares = grouped.get(share.bill_id) || [];
         shares.push(share as SocialShare);
-        grouped.set(share.billId, shares);
+        grouped.set(share.bill_id, shares);
       }
       return grouped;
     });
   }
 
-  async getBillShares(billId: number): Promise<SocialShare[]> {
-    return this.getCached(`billShares:${billId}`, async () => {
-      return await db.select().from(socialShares)
-        .where(eq(socialShares.billId, billId))
-        .orderBy(desc(socialShares.createdAt));
-    });
+  async getBillShares(bill_id: number): Promise<SocialShare[]> { return this.getCached(`billShares:${bill_id }`, async () => { return await db.select().from(social_shares)
+        .where(eq(social_shares.bill_id, bill_id))
+        .orderBy(desc(social_shares.created_at));
+     });
   }
 
   // Optional: Add pagination methods if needed
   async getRecentShares(limit: number = 10): Promise<SocialShare[]> {
     return this.getCached(`recentShares:${limit}`, async () => {
-      return await db.select().from(socialShares)
-        .orderBy(desc(socialShares.createdAt))
+      return await db.select().from(social_shares)
+        .orderBy(desc(social_shares.created_at))
         .limit(limit);
     });
   }

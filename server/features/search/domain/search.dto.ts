@@ -5,7 +5,7 @@ export interface SearchFilters {
   query?: string;
   category?: string[];
   status?: string[];
-  sponsorId?: number[];
+  sponsor_id?: number[];
   dateFrom?: Date;
   dateTo?: Date;
   complexityMin?: number;

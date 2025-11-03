@@ -43,14 +43,14 @@ export class UserAggregate {
 
   // Business methods
   updateProfile(newProfile: UserProfile): void {
-    if (newProfile.userId !== this._user.id) {
+    if (newProfile.user_id !== this._user.id) {
       throw new Error('Profile does not belong to this user');
     }
     this._profile = newProfile;
   }
 
   addInterest(interest: UserInterest): void {
-    if (interest.userId !== this._user.id) {
+    if (interest.user_id !== this._user.id) {
       throw new Error('Interest does not belong to this user');
     }
     if (!this._interests.some(i => i.equals(interest))) {
@@ -64,7 +64,7 @@ export class UserAggregate {
 
   updateInterests(interests: UserInterest[]): void {
     interests.forEach(interest => {
-      if (interest.userId !== this._user.id) {
+      if (interest.user_id !== this._user.id) {
         throw new Error('Interest does not belong to this user');
       }
     });
@@ -87,9 +87,9 @@ export class UserAggregate {
   }
 
   // Computed properties
-  get reputationScore(): number {
-    const baseScore = this._user.reputationScore;
-    const profileBonus = this._profile?.reputationScore || 0;
+  get reputation_score(): number {
+    const baseScore = this._user.reputation_score;
+    const profileBonus = this._profile?.reputation_score || 0;
     const verificationBonus = this._verifications.length * 2;
 
     return Math.min(100, baseScore + profileBonus + verificationBonus);
@@ -109,7 +109,7 @@ export class UserAggregate {
   }
 
   get verifiedVerificationsCount(): number {
-    return this._verifications.filter(v => v.isVerified()).length;
+    return this._verifications.filter(v => v.is_verified()).length;
   }
 
   get averageVerificationConfidence(): number {
@@ -138,21 +138,20 @@ export class UserAggregate {
     return Math.round((completeness / totalFields) * 100);
   }
 
-  get engagementScore(): number {
+  get engagement_score(): number {
     const verificationScore = this.verificationCount * 10;
     const profileScore = this.profileCompleteness;
-    const reputationScore = this.reputationScore;
+    const reputation_score = this.reputation_score;
 
-    return Math.min(100, Math.round((verificationScore + profileScore + reputationScore) / 3));
+    return Math.min(100, Math.round((verificationScore + profileScore + reputation_score) / 3));
   }
 
   // Domain behaviors
-  canVerifyBill(billId: number): boolean {
-    // Check if user has already verified this bill
-    const existingVerification = this._verifications.find(v => v.billId === billId);
+  canVerifyBill(bill_id: number): boolean { // Check if user has already verified this bill
+    const existingVerification = this._verifications.find(v => v.bill_id === bill_id);
     if (existingVerification) {
       return false; // One verification per bill per user
-    }
+     }
 
     // Check eligibility
     return this._user.isEligibleForVerification();
@@ -164,7 +163,7 @@ export class UserAggregate {
       return false; // Cannot endorse own verification
     }
 
-    return this._user.isActive;
+    return this._user.is_active;
   }
 
   canDisputeVerification(verificationId: string): boolean {
@@ -173,7 +172,7 @@ export class UserAggregate {
       return false; // Cannot dispute own verification
     }
 
-    return this._user.isActive && this.reputationScore >= 20;
+    return this._user.is_active && this.reputation_score >= 20;
   }
 
   equals(other: UserAggregate): boolean {
@@ -187,13 +186,13 @@ export class UserAggregate {
       interests: this._interests.map(i => i.toJSON()),
       verifications: this._verifications.map(v => v.toJSON()),
       computed: {
-        reputationScore: this.reputationScore,
+        reputation_score: this.reputation_score,
         expertiseAreas: this.expertiseAreas,
         verificationCount: this.verificationCount,
         verifiedVerificationsCount: this.verifiedVerificationsCount,
         averageVerificationConfidence: this.averageVerificationConfidence,
         profileCompleteness: this.profileCompleteness,
-        engagementScore: this.engagementScore,
+        engagement_score: this.engagement_score,
         isEligibleForAdvancedVerification: this.isEligibleForAdvancedVerification
       }
     };

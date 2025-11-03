@@ -178,8 +178,8 @@ describe('Layout Errors', () => {
       expect(error.type).toBe(LayoutErrorType.LAYOUT_USER_ERROR);
       expect(error.statusCode).toBe(403);
       expect(error.message).toContain('user-123');
-      expect(error.details?.userId).toBe('user-123');
-      expect(error.details?.userRole).toBe('citizen');
+      expect(error.details?.user_id).toBe('user-123');
+      expect(error.details?.user_role).toBe('citizen');
     });
   });
 

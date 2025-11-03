@@ -32,7 +32,7 @@ export interface RateLimitEvent {
   processingTime: number;
   timestamp: number;
   ip?: string;
-  userAgent?: string;
+  user_agent?: string;
   path?: string;
   method?: string;
 }

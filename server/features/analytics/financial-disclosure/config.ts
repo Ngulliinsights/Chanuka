@@ -37,7 +37,7 @@ export const DISCLOSURE_THRESHOLDS: Record<RequiredDisclosureType, number> = {
  */
 export const RISK_THRESHOLDS = {
   // Financial exposure levels (in KSh)
-  financialExposure: {
+  financial_exposure: {
     low: 500_000,      // Below this is low risk
     medium: 2_000_000, // Between low and medium thresholds
     high: 5_000_000    // Above medium is high/critical
@@ -57,7 +57,7 @@ export const RISK_THRESHOLDS = {
  */
 export const COMPLETENESS_WEIGHTS = {
   requiredDisclosures: 0.40,  // Having all required disclosure types
-  verificationStatus: 0.30,   // Proportion of verified disclosures
+  verification_status: 0.30,   // Proportion of verified disclosures
   dataRecency: 0.20,          // How current the information is
   detailCompleteness: 0.10    // Quality and depth of details
 } as const;

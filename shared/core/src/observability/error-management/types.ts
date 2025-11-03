@@ -41,13 +41,12 @@ export interface ErrorRecovery {
 }
 
 // Error context for tracking
-export interface ErrorContext {
-  correlationId?: string;
-  userId?: string;
+export interface ErrorContext { correlationId?: string;
+  user_id?: string;
   requestId?: string;
   operation?: string;
   metadata?: Record<string, any>;
-}
+ }
 
 // Error metrics interface
 export interface ErrorMetrics {
@@ -78,16 +77,15 @@ export interface ErrorAggregation {
 }
 
 // User-facing error reporting
-export interface UserErrorReport {
-  errorId: string;
+export interface UserErrorReport { errorId: string;
   userMessage: string;
   technicalDetails?: string;
   recoveryOptions?: RecoveryOption[];
   feedback?: UserFeedback;
   timestamp: Date;
-  userId?: string;
+  user_id?: string;
   sessionId?: string;
-}
+ }
 
 export interface RecoveryOption {
   id: string;

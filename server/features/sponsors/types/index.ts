@@ -25,8 +25,6 @@ export enum NotificationChannel {
 // Re-export common sponsor types from schema for convenience
 export type {
   Sponsor,
-  SponsorAffiliation,
-  SponsorTransparency
 } from '@shared/schema';
 
 // Re-export sponsor-related types from common types

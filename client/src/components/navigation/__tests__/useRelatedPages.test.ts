@@ -13,7 +13,7 @@ vi.mock('@/hooks/use-auth', () => ({
 // Mock the unified navigation hook
 vi.mock('@/hooks/use-unified-navigation', () => ({
   useUnifiedNavigation: () => ({
-    userRole: 'citizen',
+    user_role: 'citizen',
     preferences: {
       favoritePages: [],
       recentlyVisited: [],
@@ -77,7 +77,7 @@ describe('useRelatedPages', () => {
   it('should handle invalid user roles', () => {
     // Mock invalid user role
     vi.mocked(require('@/hooks/use-unified-navigation').useUnifiedNavigation).mockReturnValue({
-      userRole: 'invalid-role',
+      user_role: 'invalid-role',
       preferences: {
         favoritePages: [],
         recentlyVisited: [],

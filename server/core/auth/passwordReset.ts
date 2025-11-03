@@ -1,7 +1,7 @@
 // services/passwordReset.ts
 import { database as db } from '../../../shared/database/connection.js';
 // Import specific tables and functions needed from the consolidated schema
-import { user as users, passwordReset as passwordResets } from '../../../shared/schema';
+import { users as users, passwordReset as passwordResets  } from '../shared/schema';
 import { ValidationError } from '../../../shared/core/src/observability/error-management/errors/specialized-errors.js';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
@@ -14,32 +14,30 @@ import { logger } from '../../../shared/core/src/index.js';
 // Reset token expiration time in minutes
 const TOKEN_EXPIRY_MINUTES = 60;
 
-interface PasswordResetEntry {
-  id: number;
-  userId: string;
+interface PasswordResetEntry { id: number;
+  user_id: string;
   tokenHash: string;
-  expiresAt: Date;
-  createdAt: Date;
-}
+  expires_at: Date;
+  created_at: Date;
+ }
 type UserEntry = InferSelectModel<typeof users>;
 
 // Define a type for the joined result based on your actual schema structure
-interface JoinedResetResult {
-  password_reset: {
+interface JoinedResetResult { password_reset: {
     id: number;
-    userId: string;
+    user_id: string;
     tokenHash: string;
-    expiresAt: Date;
+    expires_at: Date;
     isUsed: boolean;
-    createdAt: Date;
-  } | null;
+    created_at: Date;
+   } | null;
   user: {
     id: string;
     email: string;
     name: string;
-    isActive: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    is_active: boolean;
+    created_at: Date;
+    updated_at: Date;
     // ...other user fields
   } | null;
 }
@@ -70,12 +68,12 @@ class PasswordResetService {
         id: true,
         email: true,
         name: true,
-        isActive: true,
+        is_active: true,
       },
     });
 
     // If user not found or inactive, silently return to prevent email enumeration
-    if (!user || !user.isActive) {
+    if (!user || !users.is_active) {
       console.warn(`Password reset requested for non-existent or inactive user: ${email}`);
       return;
     }
@@ -86,20 +84,19 @@ class PasswordResetService {
 
     // Store hashed token in database
     const expiryDate = new Date(Date.now() + TOKEN_EXPIRY_MINUTES * 60 * 1000);
-    await db.transaction(async tx => {
-      // Use upsert logic: try to insert, on conflict (userId), update token and expiry
+    await db.transaction(async tx => { // Use upsert logic: try to insert, on conflict (user_id), update token and expiry
       await tx
         .insert(passwordResets)
         .values({
-          userId: user.id,
+          user_id: users.id,
           tokenHash: tokenHash,
-          expiresAt: expiryDate,
-        })
+          expires_at: expiryDate,
+         })
         .onConflictDoUpdate({
-          target: passwordResets.userId,
+          target: passwordResets.user_id,
           set: {
             tokenHash: tokenHash,
-            expiresAt: expiryDate,
+            expires_at: expiryDate,
           },
         });
     });
@@ -107,8 +104,8 @@ class PasswordResetService {
     // Send email with the reset token
     const resetUrl = `http://localhost:${config.server.port}/reset-password?token=${resetToken}`;
 
-    await sendTemplatedEmail('password-reset', user.email, {
-      userName: user.name || user.email,
+    await sendTemplatedEmail('password-reset', users.email, {
+      userName: users.name || users.email,
       resetUrl,
     });
   }
@@ -129,9 +126,9 @@ class PasswordResetService {
     const results = (await db
       .select()
       .from(passwordResets)
-      .where(and(eq(passwordResets.tokenHash, tokenHash), gt(passwordResets.expiresAt, now)))
+      .where(and(eq(passwordResets.tokenHash, tokenHash), gt(passwordResets.expires_at, now)))
       .limit(1)
-      .leftJoin(users, eq(passwordResets.userId, users.id))) as JoinedResetResult[];
+      .leftJoin(users, eq(passwordResets.user_id, users.id))) as JoinedResetResult[];
 
     const result = results[0]; // Get the first result if it exists
 
@@ -151,8 +148,8 @@ class PasswordResetService {
       await tx
         .update(users)
         .set({
-          passwordHash: hashedPassword,
-          updatedAt: now,
+          password_hash: hashedPassword,
+          updated_at: now,
         })
         .where(eq(users.id, userEntry.id));
 
@@ -183,7 +180,7 @@ class PasswordResetService {
     const resetEntries = await db
       .select({ id: passwordResets.id })
       .from(passwordResets)
-      .where(and(eq(passwordResets.tokenHash, tokenHash), gt(passwordResets.expiresAt, now)))
+      .where(and(eq(passwordResets.tokenHash, tokenHash), gt(passwordResets.expires_at, now)))
       .limit(1);
 
     return resetEntries.length > 0;

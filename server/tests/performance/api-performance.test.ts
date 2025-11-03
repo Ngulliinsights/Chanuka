@@ -87,8 +87,8 @@ describe('API Performance Tests', () => {
       const userData = {
         email: `perf-test-${Date.now()}@example.com`,
         password: 'testpassword123',
-        firstName: 'Performance',
-        lastName: 'Test'
+        first_name: 'Performance',
+        last_name: 'Test'
       };
 
       const { response, responseTime } = await testHelpers.measureResponseTime(
@@ -260,7 +260,7 @@ describe('API Performance Tests', () => {
         () => request(app).get('/api/bills?status=committee_review'),
         () => request(app).get('/api/bills?category=environment'),
         () => request(app).get('/api/sponsors/1'),
-        () => request(app).get('/api/financial-disclosure/disclosures?sponsorId=1')
+        () => request(app).get('/api/financial-disclosure/disclosures?sponsor_id=1')
       ];
 
       const startTime = Date.now();

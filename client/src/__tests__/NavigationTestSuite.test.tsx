@@ -24,7 +24,7 @@ const mockUseAuth = vi.fn(() => ({
   user: {
     id: '1',
     email: 'test@example.com',
-    displayName: 'Test User',
+    display_name: 'Test User',
     role: 'user',
   },
   isAuthenticated: true,

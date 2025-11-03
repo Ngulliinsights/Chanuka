@@ -13,22 +13,21 @@ export interface SocialProfile {
 export interface StorageConfig {
     cacheTTL?: number;
 }
-export interface Storage {
-    getUserProgress(userId: string): Promise<UserProgress[]>;
+export interface Storage { getUserProgress(user_id: string): Promise<UserProgress[]>;
     updateUserProgress(progress: InsertUserProgress): Promise<UserProgress>;
-    getProgressByType(userId: string, achievementType: string): Promise<UserProgress[]>;
+    getProgressByType(user_id: string, achievement_type: string): Promise<UserProgress[]>;
     getUser(id: string): Promise<User | undefined>;
     getUserByUsername(username: string): Promise<User | undefined>;
     getUserBySocialProfile(provider: string, profileId: string): Promise<User | undefined>;
     createUser(user: InsertUser): Promise<User>;
-    linkSocialProfile(userId: string, profile: {
+    linkSocialProfile(user_id: string, profile: {
         platform: string;
         profileId: string;
         username: string;
-    }): Promise<User>;
-    unlinkSocialProfile(userId: string, platform: string): Promise<User>;
-    updateUserReputation(userId: string, change: number): Promise<User>;
-    updateUserLastActive(userId: string): Promise<User>;
+     }): Promise<User>;
+    unlinkSocialProfile(user_id: string, platform: string): Promise<User>;
+    updateUserReputation(user_id: string, change: number): Promise<User>;
+    updateUserLastActive(user_id: string): Promise<User>;
 }
 
 

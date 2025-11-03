@@ -5,7 +5,7 @@
  */
 
 import { queryBuilderService } from '../services/query-builder.service.js';
-import { suggestionRankingService } from '../engines/suggestion-ranking.service.js';
+import { suggestionRankingService } from '../engines/suggestion/index.js';
 import { historyCleanupService } from '../services/history-cleanup.service.js';
 import { parallelQueryExecutor } from '../utils/parallel-query-executor.js';
 

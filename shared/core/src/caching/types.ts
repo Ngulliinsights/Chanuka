@@ -87,17 +87,16 @@ export interface CacheOptions {
 }
 
 // Cache key generator interface
-export interface CacheKeyGenerator {
-  property(id: number): string;
+export interface CacheKeyGenerator { property(id: number): string;
   properties(filters: string): string;
   user(id: number): string;
   userByUsername(username: string): string;
   reviews(propertyId: number): string;
   searchResults(query: string): string;
-  trustScore(userId: string): string;
+  trustScore(user_id: string): string;
   fraudDetection(propertyId: number): string;
   apiResponse(endpoint: string, params: string): string;
-}
+ }
 
 // Circuit breaker state for cache operations
 export interface CircuitBreakerState {

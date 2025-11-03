@@ -1,6 +1,6 @@
 import { billTrackingService } from './services/bill-tracking.js';
 import { db } from '@shared/database/pool.js';
-import { users, bills, userInterests } from '../shared/schema';
+import { users, bills, user_interests } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger } from '@shared/core';
 
@@ -21,12 +21,12 @@ async function verifyBillTracking() {
       .insert(users)
       .values({
         email: 'test-tracking@example.com',
-        passwordHash: 'hashedpassword',
+        password_hash: 'hashedpassword',
         name: 'Test Tracking User',
-        firstName: 'Test',
-        lastName: 'User',
+        first_name: 'Test',
+        last_name: 'User',
         role: 'citizen',
-        verificationStatus: 'verified'
+        verification_status: 'verified'
       })
       .returning();
     
@@ -39,7 +39,7 @@ async function verifyBillTracking() {
           description: 'Comprehensive healthcare reform legislation',
           status: 'introduced',
           category: 'healthcare',
-          billNumber: 'HR-2024-100',
+          bill_number: 'HR-2024-100',
           summary: 'Healthcare reform bill for testing'
         },
         {
@@ -47,7 +47,7 @@ async function verifyBillTracking() {
           description: 'Increased funding for public education',
           status: 'committee',
           category: 'education',
-          billNumber: 'S-2024-200',
+          bill_number: 'S-2024-200',
           summary: 'Education funding bill for testing'
         },
         {
@@ -55,7 +55,7 @@ async function verifyBillTracking() {
           description: 'Environmental protection and climate action',
           status: 'passed',
           category: 'environment',
-          billNumber: 'HR-2024-300',
+          bill_number: 'HR-2024-300',
           summary: 'Climate action bill for testing'
         }
       ])
@@ -63,31 +63,29 @@ async function verifyBillTracking() {
     
     // Add user interests
     await db
-      .insert(userInterests)
+      .insert(user_interests)
       .values([
-        { userId: testUser.id, interest: 'healthcare' },
-        { userId: testUser.id, interest: 'education' }
+        { user_id: testUser.id, interest: 'healthcare'  },
+        { user_id: testUser.id, interest: 'education'  }
       ]);
     
-    logger.info('✅ Test data created:', { component: 'Chanuka' }, {
-      userId: testUser.id,
+    logger.info('✅ Test data created:', { component: 'Chanuka' }, { user_id: testUser.id,
       billCount: testBills.length
-    });
+     });
 
     // Test 3: Track a bill
     logger.info('3. Testing bill tracking...', { component: 'Chanuka' });
     
     const trackingPreference = await billTrackingService.trackBill(testUser.id, testBills[0].id, {
-      trackingTypes: ['status_changes', 'new_comments'],
-      alertFrequency: 'immediate',
-      alertChannels: ['in_app', 'email']
+      tracking_types: ['status_changes', 'new_comments'],
+      alert_frequency: 'immediate',
+      alert_channels: ['in_app', 'email']
     });
     
-    logger.info('✅ Bill tracked successfully:', { component: 'Chanuka' }, {
-      billId: trackingPreference.billId,
-      trackingTypes: trackingPreference.trackingTypes,
-      alertFrequency: trackingPreference.alertFrequency
-    });
+    logger.info('✅ Bill tracked successfully:', { component: 'Chanuka' }, { bill_id: trackingPreference.bill_id,
+      tracking_types: trackingPreference.tracking_types,
+      alert_frequency: trackingPreference.alert_frequency
+     });
 
     // Test 4: Check tracking status
     logger.info('4. Testing tracking status check...', { component: 'Chanuka' });
@@ -107,27 +105,26 @@ async function verifyBillTracking() {
       testUser.id,
       testBills[0].id,
       {
-        alertFrequency: 'daily',
-        trackingTypes: ['status_changes', 'new_comments', 'amendments']
+        alert_frequency: 'daily',
+        tracking_types: ['status_changes', 'new_comments', 'amendments']
       }
     );
     
     logger.info('✅ Tracking preferences updated:', { component: 'Chanuka' }, {
-      alertFrequency: updatedPreferences.alertFrequency,
-      trackingTypes: updatedPreferences.trackingTypes
+      alert_frequency: updatedPreferences.alert_frequency,
+      tracking_types: updatedPreferences.tracking_types
     });
 
     // Test 6: Bulk tracking operations
     logger.info('6. Testing bulk tracking operations...', { component: 'Chanuka' });
     
-    const bulkResult = await billTrackingService.bulkTrackingOperation({
-      userId: testUser.id,
-      billIds: [testBills[1].id, testBills[2].id],
+    const bulkResult = await billTrackingService.bulkTrackingOperation({ user_id: testUser.id,
+      bill_ids: [testBills[1].id, testBills[2].id],
       operation: 'track',
       preferences: {
-        alertFrequency: 'hourly',
-        trackingTypes: ['status_changes']
-      }
+        alert_frequency: 'hourly',
+        tracking_types: ['status_changes']
+       }
     });
     
     logger.info('✅ Bulk tracking operation completed:', { component: 'Chanuka' }, {
@@ -186,11 +183,10 @@ async function verifyBillTracking() {
     // Test 11: Test bulk untracking
     logger.info('11. Testing bulk untracking...', { component: 'Chanuka' });
     
-    const bulkUntrackResult = await billTrackingService.bulkTrackingOperation({
-      userId: testUser.id,
-      billIds: [testBills[1].id, testBills[2].id],
+    const bulkUntrackResult = await billTrackingService.bulkTrackingOperation({ user_id: testUser.id,
+      bill_ids: [testBills[1].id, testBills[2].id],
       operation: 'untrack'
-    });
+     });
     
     logger.info('✅ Bulk untracking completed:', { component: 'Chanuka' }, {
       successful: bulkUntrackResult.summary.successful,
@@ -213,9 +209,9 @@ async function verifyBillTracking() {
 
     // Cleanup test data
     logger.info('🧹 Cleaning up test data...', { component: 'Chanuka' });
-    await db.delete(userInterests).where(eq(userInterests.userId, testUser.id));
+    await db.delete(user_interests).where(eq(user_interests.user_id, testUser.id));
     for (const bill of testBills) {
-      await db.delete(bills).where(eq(bills.id, bill.id));
+      await db.delete(bills).where(eq(bills.id, bills.id));
     }
     await db.delete(users).where(eq(users.id, testUser.id));
     logger.info('✅ Test data cleaned up', { component: 'Chanuka' });

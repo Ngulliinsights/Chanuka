@@ -184,7 +184,7 @@ describe('Sidebar Component', () => {
       );
 
       const toggleButton = screen.getByLabelText('Expand sidebar');
-      await user.click(toggleButton);
+      await users.click(toggleButton);
 
       expect(onToggle).toHaveBeenCalledTimes(1);
     });
@@ -233,7 +233,7 @@ describe('Sidebar Component', () => {
       );
 
       const searchInput = screen.getByLabelText('Search bills');
-      await user.type(searchInput, 'test query');
+      await users.type(searchInput, 'test query');
 
       expect(onSearchChange).toHaveBeenCalledWith('test query');
     });
@@ -468,7 +468,7 @@ describe('Sidebar Component', () => {
       );
 
       const recoverButton = screen.getByText('Recover');
-      await user.click(recoverButton);
+      await users.click(recoverButton);
 
       await waitFor(() => {
         expect(screen.queryByText(/Sidebar Error/)).not.toBeInTheDocument();
@@ -488,7 +488,7 @@ describe('Sidebar Component', () => {
       );
 
       const searchInput = screen.getByLabelText('Search bills');
-      await user.type(searchInput, 'test');
+      await users.type(searchInput, 'test');
 
       expect(screen.getByText(/Sidebar Error/)).toBeInTheDocument();
     });
@@ -506,7 +506,7 @@ describe('Sidebar Component', () => {
       );
 
       const toggleButton = screen.getByLabelText('Expand sidebar');
-      await user.click(toggleButton);
+      await users.click(toggleButton);
 
       expect(screen.getByText(/Sidebar Error/)).toBeInTheDocument();
     });

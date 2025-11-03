@@ -6,7 +6,7 @@ import { AuthenticatedAPI } from '../utils/authenticated-api';
 export interface ConnectionInfo {
   status: 'connected' | 'disconnected' | 'connecting';
   latency: number;
-  lastChecked: Date;
+  last_checked: Date;
   apiReachable?: boolean;
   corsEnabled?: boolean;
   errors?: string[];
@@ -32,7 +32,7 @@ const checkConnection = async (): Promise<ConnectionInfo> => {
     return {
       status: 'connected',
       latency,
-      lastChecked: new Date(),
+      last_checked: new Date(),
       apiReachable: true,
       corsEnabled: true,
       errors: []
@@ -41,7 +41,7 @@ const checkConnection = async (): Promise<ConnectionInfo> => {
     return {
       status: 'disconnected',
       latency: -1,
-      lastChecked: new Date(),
+      last_checked: new Date(),
       apiReachable: false,
       corsEnabled: false,
       errors: [error instanceof Error ? error.message : 'Connection failed']
@@ -219,7 +219,7 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
       setConnectionStatus({
         status: 'disconnected',
         latency: -1,
-        lastChecked: new Date(),
+        last_checked: new Date(),
         apiReachable: false,
         corsEnabled: false,
         errors: [errorMessage]
@@ -347,7 +347,7 @@ export function useApiConnection(options: UseApiConnectionOptions = {}): UseApiC
 export function useConnectionStatus(): {
   isOnline: boolean;
   isConnected: boolean;
-  lastChecked: Date | null;
+  last_checked: Date | null;
 } {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(null);
@@ -392,7 +392,7 @@ export function useConnectionStatus(): {
   return {
     isOnline,
     isConnected,
-    lastChecked: connectionInfo?.lastChecked || null
+    last_checked: connectionInfo?.last_checked || null
   };
 }
 

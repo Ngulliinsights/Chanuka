@@ -1,7 +1,8 @@
 import express from 'express';
 import { sponsorRepository, SponsorAffiliationInput, SponsorTransparencyInput } from '../infrastructure/repositories/sponsor.repository';
 import { sponsorConflictAnalysisService } from '../application/sponsor-conflict-analysis.service';
-import { insertSponsorSchema } from '../../../../shared/schema/validation';
+// Note: Validation schemas need to be created in the new schema structure
+// import { insertSponsorSchema } from '@shared/schema/validation';
 import { z } from 'zod';
 import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError  } from '../../../../shared/core/src/utils/api-utils.js';
 import { logger } from '../../../../shared/core/src/observability/logging/index.js';
@@ -73,19 +74,19 @@ function getRequestBody(req: express.Request): RequestBody {
  */
 router.get('/', async (req, res, next) => {
     try {
-        const { party, role, constituency, conflictLevel, isActive, search } = req.query;
+        const { party, role, constituency, conflict_level, is_active, search } = req.query;
         const limit = parseOptionalIntParam(req.query.limit as string, 'limit', 50, 1, 200);
         const offset = parseOptionalIntParam(req.query.offset as string, 'offset', 0, 0);
         const sortBy = req.query.sortBy as any || 'name';
         const sortOrder = req.query.sortOrder as any || 'asc';
-        const isActiveBool = isActive === undefined ? true : isActive === 'true';
+        const is_activeBool = is_active === undefined ? true : is_active === 'true';
 
         const options = {
             party: party as string | undefined,
             role: role as string | undefined,
             constituency: constituency as string | undefined,
-            conflictLevel: conflictLevel as string | undefined,
-            isActive: isActiveBool,
+            conflict_level: conflict_level as string | undefined,
+            is_active: is_activeBool,
             limit,
             offset,
             sortBy,
@@ -227,17 +228,17 @@ router.get('/:id/affiliations', async (req, res, next) => {
  */
 router.post('/:id/affiliations', async (req: express.Request, res, next) => {
     try {
-        const sponsorId = parseIntParam(req.params.id, 'Sponsor ID');
+        const sponsor_id = parseIntParam(req.params.id, 'Sponsor ID');
 
         const affiliationData: SponsorAffiliationInput = {
-            sponsorId,
+            sponsor_id,
             organization: req.body.organization,
             type: req.body.type,
             role: req.body.role,
             conflictType: req.body.conflictType,
             startDate: req.body.startDate ? new Date(req.body.startDate) : undefined,
             endDate: req.body.endDate ? new Date(req.body.endDate) : undefined,
-            isActive: req.body.isActive,
+            is_active: req.body.is_active,
         };
 
         // Validate required fields
@@ -341,16 +342,16 @@ router.get('/:id/transparency', async (req, res, next) => {
  */
 router.post('/:id/transparency', async (req: express.Request, res, next) => {
     try {
-        const sponsorId = parseIntParam(req.params.id, 'Sponsor ID');
+        const sponsor_id = parseIntParam(req.params.id, 'Sponsor ID');
 
         const transparencyData: SponsorTransparencyInput = {
-            sponsorId,
+            sponsor_id,
             disclosureType: req.body.disclosureType,
             description: req.body.description,
             amount: req.body.amount,
             source: req.body.source,
             dateReported: req.body.dateReported ? new Date(req.body.dateReported) : undefined,
-            isVerified: req.body.isVerified,
+            is_verified: req.body.is_verified,
         };
 
         // Validate required fields
@@ -469,7 +470,7 @@ router.get('/:id/conflict-trends', async (req, res, next) => {
 
         // Provide a default response if no trend data exists
         const result = trends.length > 0 ? trends[0] : {
-            sponsorId: id,
+            sponsor_id: id,
             timeframe: `${timeframe} months`,
             conflictCount: 0,
             severityTrend: 'stable',
@@ -492,26 +493,26 @@ router.get('/conflicts/all', async (req, res, next) => {
         const allConflicts = await sponsorConflictAnalysisService.detectConflicts();
 
         // Enrich the response with sponsor metadata
-        const sponsorIds = Array.from(new Set(allConflicts.map(c => c.sponsorId)));
-        const sponsors = await sponsorRepository.findByIds(sponsorIds);
+        const sponsor_ids = Array.from(new Set(allConflicts.map(c => c.sponsor_id)));
+        const sponsors = await sponsorRepository.findByIds(sponsor_ids);
         const sponsorMap = new Map(sponsors.map(s => [s.id, { name: s.name, party: s.party }]));
 
         // Group conflicts by sponsor for better client consumption
         const conflictsBySponsor: Record<number, { sponsorInfo: any; conflicts: any[] }> = {};
         allConflicts.forEach(conflict => {
-            if (!conflictsBySponsor[conflict.sponsorId]) {
-                conflictsBySponsor[conflict.sponsorId] = {
-                    sponsorInfo: sponsorMap.get(conflict.sponsorId) || { name: 'Unknown', party: null },
+            if (!conflictsBySponsor[conflict.sponsor_id]) {
+                conflictsBySponsor[conflict.sponsor_id] = {
+                    sponsorInfo: sponsorMap.get(conflict.sponsor_id) || { name: 'Unknown', party: null },
                     conflicts: []
                 };
             }
-            conflictsBySponsor[conflict.sponsorId].conflicts.push(conflict);
+            conflictsBySponsor[conflict.sponsor_id].conflicts.push(conflict);
         });
 
         return ApiSuccess(res, {
             conflictsBySponsor: Object.values(conflictsBySponsor),
             totalConflicts: allConflicts.length,
-            sponsorsAnalyzed: sponsorIds.length
+            sponsorsAnalyzed: sponsor_ids.length
         });
     } catch (error) {
         next(error);
@@ -522,19 +523,17 @@ router.get('/conflicts/all', async (req, res, next) => {
  * GET /api/sponsors/conflicts/network
  * Generate network visualization data showing conflict relationships
  */
-router.get('/conflicts/network', async (req, res, next) => {
-    try {
-        const billIdParam = req.query.billId as string | undefined;
-        const billId = billIdParam ? parseIntParam(billIdParam, 'Bill ID') : undefined;
+router.get('/conflicts/network', async (req, res, next) => { try {
+        const bill_idParam = req.query.bill_id as string | undefined;
+        const bill_id = bill_idParam ? parseIntParam(bill_idParam, 'Bill ID') : undefined;
 
-        const conflictMapping = await sponsorConflictAnalysisService.createConflictMapping(billId);
+        const conflictMapping = await sponsorConflictAnalysisService.createConflictMapping(bill_id);
         return ApiSuccess(res, conflictMapping);
-    } catch (error) {
-        if (error instanceof Error && error.message.includes('Invalid Bill ID')) {
+     } catch (error) { if (error instanceof Error && error.message.includes('Invalid Bill ID')) {
             return ApiValidationError(res, [{
-                field: 'billId',
+                field: 'bill_id',
                 message: error.message
-            }]);
+             }]);
         }
         next(error);
     }
@@ -554,9 +553,9 @@ router.get('/:id/sponsored-bills', async (req, res, next) => {
         const activeOnly = req.query.activeOnly !== 'false';
 
         const sponsorships = await sponsorRepository.listBillSponsorshipsBySponsor(id, activeOnly);
-        const billIds = sponsorships.map(s => s.billId);
+        const bill_ids = sponsorships.map(s => s.bill_id);
 
-        const bills = await sponsorRepository.getBillsByIds(billIds);
+        const bills = await sponsorRepository.getBillsByIds(bill_ids);
         const billsMap = new Map(bills.map(b => [b.id, b]));
 
         // Combine sponsorship and bill data
@@ -564,8 +563,8 @@ router.get('/:id/sponsored-bills', async (req, res, next) => {
             sponsorshipId: sp.id,
             sponsorshipType: sp.sponsorshipType,
             sponsorshipDate: sp.sponsorshipDate,
-            isActive: sp.isActive,
-            bill: billsMap.get(sp.billId) || { id: sp.billId, title: "Bill details not found" }
+            is_active: sp.is_active,
+            bill: billsMap.get(sp.bill_id) || { id: sp.bill_id, title: "Bill details not found" }
         }));
 
         return ApiSuccess(res, sponsoredBillsData);

@@ -26,7 +26,7 @@ class TestConfigValidator {
 
     this.checkConfigFiles();
     this.checkPackageJsonScripts();
-    this.checkTypeScriptConfigs();
+    this.check_typeScriptConfigs();
     this.checkTestSetupFiles();
     this.checkCoverageDirectories();
     this.checkEnvironmentVariables();
@@ -120,7 +120,7 @@ class TestConfigValidator {
     console.log();
   }
 
-  checkTypeScriptConfigs() {
+  check_typeScriptConfigs() {
     console.log('🔧 Checking TypeScript configurations...');
 
     const tsConfigs = [

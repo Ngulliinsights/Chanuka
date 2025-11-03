@@ -51,7 +51,7 @@ export function useBill(id: string | number | undefined) {
 }
 
 /**
- * Fetches comments associated with a specific bill. Comments are
+ * Fetches comments associated with a specific bills. Comments are
  * displayed in discussion sections and are expected to update as users
  * add new comments, so we keep a shorter staleTime to ensure the
  * conversation feels live and responsive.
@@ -60,33 +60,31 @@ export function useBill(id: string | number | undefined) {
  * separate because comments might be loaded lazily (like in a tab that
  * users have to click) while the bill details load immediately.
  */
-export function useBillComments(billId: string | number | undefined) {
-  return useQuery({
-    queryKey: ['bills', billId, 'comments'],
-    queryFn: () => billApi.getComments(billId!),
-    enabled: !!billId,
+export function useBillComments(bill_id: string | number | undefined) { return useQuery({
+    queryKey: ['bills', bill_id, 'comments'],
+    queryFn: () => billApi.getComments(bill_id!),
+    enabled: !!bill_id,
     staleTime: 2 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
-  });
+   });
 }
 
 /**
  * Fetches the list of legislators who are sponsoring or co-sponsoring
- * a particular bill. Sponsor information is relatively stable once a
+ * a particular bills. Sponsor information is relatively stable once a
  * bill is introduced, though co-sponsors can be added over time.
  *
  * The longer staleTime reflects that this data changes infrequently,
  * and when it does change, a slight delay in showing updates is
  * acceptable. This reduces server load for a common query.
  */
-export function useBillSponsors(billId: string | number | undefined) {
-  return useQuery({
-    queryKey: ['bills', billId, 'sponsors'],
-    queryFn: () => billApi.getSponsors(billId!),
-    enabled: !!billId,
+export function useBillSponsors(bill_id: string | number | undefined) { return useQuery({
+    queryKey: ['bills', bill_id, 'sponsors'],
+    queryFn: () => billApi.getSponsors(bill_id!),
+    enabled: !!bill_id,
     staleTime: 15 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
-  });
+   });
 }
 
 /**
@@ -99,15 +97,14 @@ export function useBillSponsors(billId: string | number | undefined) {
  * quite conservative. The long gcTime means even if users navigate
  * away, the analysis stays in memory for quick access if they return.
  */
-export function useBillAnalysis(billId: string | number | undefined) {
-  return useQuery({
-    queryKey: ['bills', billId, 'analysis'],
-    queryFn: () => billApi.getAnalysis(billId!),
-    enabled: !!billId,
+export function useBillAnalysis(bill_id: string | number | undefined) { return useQuery({
+    queryKey: ['bills', bill_id, 'analysis'],
+    queryFn: () => billApi.getAnalysis(bill_id!),
+    enabled: !!bill_id,
     staleTime: 30 * 60 * 1000,
     gcTime: 60 * 60 * 1000,
     retry: 1,
-  });
+   });
 }
 
 /**
@@ -149,7 +146,7 @@ export function useBillStatuses() {
 }
 
 /**
- * Mutation hook for adding a new comment to a bill. This handles the
+ * Mutation hook for adding a new comment to a bills. This handles the
  * entire lifecycle of posting a comment, including optimistic updates,
  * cache invalidation, and user feedback via toast notifications.
  *
@@ -162,21 +159,19 @@ export function useBillStatuses() {
  * back to a generic message. This helps users understand what went wrong,
  * whether it's a network issue, validation failure, or something else.
  */
-export function useAddBillComment(billId: string | number) {
+export function useAddBillComment(bill_id: string | number) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  return useMutation({
-    mutationFn: (comment: CommentPayload) =>
-      billApi.addComment(billId, comment),
+  return useMutation({ mutationFn: (comment: CommentPayload) =>
+      billApi.addComment(bill_id, comment),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['bills', billId, 'comments']
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['bills', billId]
-      });
+        queryKey: ['bills', bill_id, 'comments']
+       });
+      queryClient.invalidateQueries({ queryKey: ['bills', bill_id]
+       });
 
       toast({
         title: "Comment added",
@@ -209,19 +204,18 @@ export function useAddBillComment(billId: string | number) {
  * retry it automatically. This is appropriate for analytics where it's
  * better to lose a single event than to hammer the server with retries.
  */
-export function useRecordBillEngagement(billId: string | number) {
-  const queryClient = useQueryClient();
+export function useRecordBillEngagement(bill_id: string | number) { const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (engagement: EngagementPayload) =>
-      billApi.recordEngagement(billId, engagement),
+      billApi.recordEngagement(bill_id, engagement),
 
     retry: false,
 
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['bills', billId]
-      });
+        queryKey: ['bills', bill_id]
+       });
     },
 
     onError: (error: Error) => {
@@ -233,24 +227,23 @@ export function useRecordBillEngagement(billId: string | number) {
 /**
  * Mutation hook for tracking/untracking bills for notifications
  */
-export function useTrackBill(billId: string | number) {
+export function useTrackBill(bill_id: string | number) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  return useMutation({
-    mutationFn: (track: boolean) =>
-      track ? billApi.trackBill(billId) : billApi.untrackBill(billId),
+  return useMutation({ mutationFn: (track: boolean) =>
+      track ? billApi.trackBill(bill_id) : billApi.untrackBill(bill_id),
 
     onSuccess: (_, track) => {
       queryClient.invalidateQueries({
-        queryKey: ['bills', billId]
-      });
+        queryKey: ['bills', bill_id]
+       });
 
       toast({
         title: track ? "Bill tracked" : "Bill untracked",
         description: track
           ? "You'll receive notifications about this bill's progress."
-          : "You will no longer receive notifications about this bill.",
+          : "You will no longer receive notifications about this bills.",
       });
     },
 

@@ -14,8 +14,8 @@ const mockDb = {
   limit: vi.fn().mockResolvedValue([]),
 };
 // Mock Bill and Sponsor data
-const mockBill = { id: 1, sponsorId: 10, status: 'committee' } as schema.Bill;
-const mockSponsor = { id: 10, transparencyScore: '85.00' } as schema.Sponsor; // String score
+const mockBill = { id: 1, sponsor_id: 10, status: 'committee' } as schema.Bill;
+const mockSponsor = { id: 10, transparency_score: '85.00' } as schema.Sponsor; // String score
 
 describe('TransparencyAnalysisService', () => {
   let service: TransparencyAnalysisService;
@@ -93,7 +93,7 @@ describe('TransparencyAnalysisService', () => {
    it('should return F grade for very low scores', async () => {
         // Arrange: Simulate conditions leading to low scores
         const worstConflict: ConflictSummary = { overallRisk: 'critical', affectedSponsorsCount: 5, totalFinancialExposureEstimate: 10e6, directConflictCount: 5, indirectConflictCount: 5 };
-        const badSponsor = { ...mockSponsor, transparencyScore: '10.00' };
+        const badSponsor = { ...mockSponsor, transparency_score: '10.00' };
          mockDb.limit
             .mockImplementationOnce(() => ({ limit: vi.fn().mockResolvedValue([mockBill]) })) // getBillDetails
             .mockImplementationOnce(() => ({ limit: vi.fn().mockResolvedValue([badSponsor]) })); // Sponsor score

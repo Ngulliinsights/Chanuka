@@ -14,7 +14,7 @@ vi.mock('../../../shared/core/src/observability/logging', () => ({
 }));
 
 import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
-import { database as db, bill as bills, billEngagement, billComment as billComments, sponsor as sponsors } from '@shared/database/connection.js';
+import { database as db, bill as bills, bill_engagement, comments as comments, sponsor as sponsors } from '@shared/database/connection.js';
 import { eq, sql, desc } from 'drizzle-orm';
 import { logger  } from '../../../shared/core/src/index.js';
 
@@ -64,20 +64,19 @@ describe('Database Query Performance Tests', () => {
 
   describe('Bill Engagement Statistics Queries', () => {
     it('should retrieve engagement stats within performance threshold', async () => {
-      const { result, queryTime } = await measureQueryTime(async () => {
-        // Optimized engagement query using proper aggregations
+      const { result, queryTime } = await measureQueryTime(async () => { // Optimized engagement query using proper aggregations
         return db
           .select({
-            billId: billEngagement.billId,
-            totalViews: sql<number>`COALESCE(SUM(${billEngagement.viewCount}), 0)::int`,
-            totalComments: sql<number>`COUNT(DISTINCT ${billComments.id})::int`,
-            totalShares: sql<number>`COALESCE(SUM(${billEngagement.shareCount}), 0)::int`,
-            uniqueViewers: sql<number>`COUNT(DISTINCT ${billEngagement.userId})::int`
+            bill_id: bill_engagement.bill_id,
+            totalViews: sql<number>`COALESCE(SUM(${bill_engagement.view_count }), 0)::int`,
+            totalComments: sql<number>`COUNT(DISTINCT ${comments.id})::int`,
+            totalShares: sql<number>`COALESCE(SUM(${bill_engagement.share_count}), 0)::int`,
+            uniqueViewers: sql<number>`COUNT(DISTINCT ${bill_engagement.user_id})::int`
           })
-          .from(billEngagement)
-          .leftJoin(billComments, eq(billEngagement.billId, billComments.billId))
-          .groupBy(billEngagement.billId)
-          .orderBy(desc(sql`SUM(${billEngagement.viewCount})`)) // Added ordering for deterministic results
+          .from(bill_engagement)
+          .leftJoin(comments, eq(bill_engagement.bill_id, comments.bill_id))
+          .groupBy(bill_engagement.bill_id)
+          .orderBy(desc(sql`SUM(${bill_engagement.view_count})`)) // Added ordering for deterministic results
           .limit(10);
       });
       
@@ -90,18 +89,17 @@ describe('Database Query Performance Tests', () => {
     });
 
     it('should handle large dataset queries efficiently', async () => {
-      const { result, queryTime } = await measureQueryTime(async () => {
-        // Optimized to reduce data transfer and computation
+      const { result, queryTime } = await measureQueryTime(async () => { // Optimized to reduce data transfer and computation
         return db
           .select({
-            billId: bills.id,
+            bill_id: bills.id,
             title: bills.title,
-            engagementCount: sql<number>`COUNT(${billEngagement.id})::int`
+            engagementCount: sql<number>`COUNT(${bill_engagement.id })::int`
           })
           .from(bills)
-          .leftJoin(billEngagement, eq(bills.id, billEngagement.billId))
+          .leftJoin(bill_engagement, eq(bills.id, bill_engagement.bill_id))
           .groupBy(bills.id, bills.title)
-          .orderBy(desc(sql`COUNT(${billEngagement.id})`)) // Most engaged bills first
+          .orderBy(desc(sql`COUNT(${bill_engagement.id})`)) // Most engaged bills first
           .limit(100);
       });
       
@@ -177,7 +175,7 @@ describe('Database Query Performance Tests', () => {
             billCount: sql<number>`COUNT(${bills.id})::int`
           })
           .from(sponsors)
-          .leftJoin(bills, eq(sponsors.id, bills.sponsorId))
+          .leftJoin(bills, eq(sponsors.id, bills.sponsor_id))
           .groupBy(sponsors.id, sponsors.name)
           .orderBy(desc(sql`COUNT(${bills.id})`)) // Most active sponsors first
           .limit(25);
@@ -193,19 +191,18 @@ describe('Database Query Performance Tests', () => {
 
   describe('Query Optimization Verification', () => {
     it('should avoid N+1 query patterns', async () => {
-      const { result, queryTime } = await measureQueryTime(async () => {
-        // Single optimized query replacing potential N+1 pattern
+      const { result, queryTime } = await measureQueryTime(async () => { // Single optimized query replacing potential N+1 pattern
         // This demonstrates fetching bills with all related data in one query
         return db
           .select({
-            billId: bills.id,
+            bill_id: bills.id,
             billTitle: bills.title,
-            viewCount: sql<number>`COALESCE(SUM(${billEngagement.viewCount}), 0)::int`,
-            commentCount: sql<number>`COUNT(DISTINCT ${billComments.id})::int`
+            view_count: sql<number>`COALESCE(SUM(${bill_engagement.view_count }), 0)::int`,
+            comment_count: sql<number>`COUNT(DISTINCT ${comments.id})::int`
           })
           .from(bills)
-          .leftJoin(billEngagement, eq(bills.id, billEngagement.billId))
-          .leftJoin(billComments, eq(bills.id, billComments.billId))
+          .leftJoin(bill_engagement, eq(bills.id, bill_engagement.bill_id))
+          .leftJoin(comments, eq(bills.id, comments.bill_id))
           .groupBy(bills.id, bills.title)
           .orderBy(bills.id) // Deterministic ordering
           .limit(10);
@@ -218,36 +215,34 @@ describe('Database Query Performance Tests', () => {
       expect(Array.isArray(result)).toBe(true);
       
       // Verify that we're getting aggregated data properly
-      if (result.length > 0) {
-        expect(result[0]).toHaveProperty('billId');
+      if (result.length > 0) { expect(result[0]).toHaveProperty('bill_id');
         expect(result[0]).toHaveProperty('billTitle');
-        expect(result[0]).toHaveProperty('viewCount');
-        expect(result[0]).toHaveProperty('commentCount');
-      }
+        expect(result[0]).toHaveProperty('view_count');
+        expect(result[0]).toHaveProperty('comment_count');
+       }
     });
 
     it('should efficiently retrieve bills with multiple relationships', async () => {
-      const { result, queryTime } = await measureQueryTime(async () => {
-        // Complex query demonstrating efficient multi-join pattern
+      const { result, queryTime } = await measureQueryTime(async () => { // Complex query demonstrating efficient multi-join pattern
         return db
           .select({
-            billId: bills.id,
+            bill_id: bills.id,
             billTitle: bills.title,
             sponsorName: sponsors.name,
             totalEngagement: sql<number>`
-              COALESCE(SUM(${billEngagement.viewCount}), 0) + 
-              COALESCE(SUM(${billEngagement.shareCount}), 0)
+              COALESCE(SUM(${bill_engagement.view_count }), 0) + 
+              COALESCE(SUM(${bill_engagement.share_count}), 0)
             `,
-            commentCount: sql<number>`COUNT(DISTINCT ${billComments.id})::int`
+            comment_count: sql<number>`COUNT(DISTINCT ${comments.id})::int`
           })
           .from(bills)
-          .leftJoin(sponsors, eq(bills.sponsorId, sponsors.id))
-          .leftJoin(billEngagement, eq(bills.id, billEngagement.billId))
-          .leftJoin(billComments, eq(bills.id, billComments.billId))
+          .leftJoin(sponsors, eq(bills.sponsor_id, sponsors.id))
+          .leftJoin(bill_engagement, eq(bills.id, bill_engagement.bill_id))
+          .leftJoin(comments, eq(bills.id, comments.bill_id))
           .groupBy(bills.id, bills.title, sponsors.name)
           .orderBy(desc(sql`
-            COALESCE(SUM(${billEngagement.viewCount}), 0) + 
-            COALESCE(SUM(${billEngagement.shareCount}), 0)
+            COALESCE(SUM(${bill_engagement.view_count}), 0) + 
+            COALESCE(SUM(${bill_engagement.share_count}), 0)
           `))
           .limit(15);
       });

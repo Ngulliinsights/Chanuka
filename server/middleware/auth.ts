@@ -10,10 +10,10 @@ declare global {
       email: string;
       role: string;
       name: string;
-      verificationStatus: string;
-      firstName: string | null;
-      lastName: string | null;
-      isActive: boolean | null;
+      verification_status: string;
+      first_name: string | null;
+      last_name: string | null;
+      is_active: boolean | null;
     }
   }
 }
@@ -52,7 +52,7 @@ export const requireRole = (roles: string[]) => {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    if (!roles.includes(req.user.role)) {
+    if (!roles.includes(req.users.role)) {
       return res.status(403).json({ error: 'Insufficient permissions' });
     }
 

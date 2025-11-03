@@ -428,8 +428,8 @@ export const testUtils = {
     email: 'test@example.com',
     username: 'testuser',
     role: 'user',
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01'),
+    created_at: new Date('2024-01-01'),
+    updated_at: new Date('2024-01-01'),
     ...overrides,
   }),
 
@@ -441,14 +441,13 @@ export const testUtils = {
    * @param overrides - Properties to override in the mock payload
    * @returns A mock JWT payload object
    */
-  createMockTokenPayload: (overrides: Partial<any> = {}) => ({
-    userId: 'test-user-id',
+  createMockTokenPayload: (overrides: Partial<any> = {}) => ({ user_id: 'test-user-id',
     email: 'test@example.com',
     role: 'user',
     iat: Math.floor(Date.now() / 1000),
     exp: Math.floor(Date.now() / 1000) + 3600,
     ...overrides,
-  }),
+   }),
 };
 
 type TestUtilsType = typeof testUtils;

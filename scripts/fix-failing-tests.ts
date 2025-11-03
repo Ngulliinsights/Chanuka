@@ -201,7 +201,7 @@ vi.mock('@shared/core/src/config/manager', () => ({
         // Ensure findBy queries are awaited
         [/(?<!await\s+)screen\.findBy/g, 'await screen.findBy'],
         // Ensure user events are awaited (if using @testing-library/user-event)
-        [/(?<!await\s+)user\.(click|type|hover|focus)/g, 'await user.$1'],
+        [/(?<!await\s+)user\.(click|type|hover|focus)/g, 'await users.$1'],
       ];
 
       for (const [pattern, replacement] of asyncFixes) {

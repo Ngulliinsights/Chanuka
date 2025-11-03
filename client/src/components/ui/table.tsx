@@ -20,7 +20,7 @@ const Table = forwardRef<
     />
   </div>
 ))
-Table.displayName = "Table"
+Table.display_name = "Table"
 
 const TableHeader = forwardRef<
   HTMLTableSectionElement,
@@ -28,7 +28,7 @@ const TableHeader = forwardRef<
 >(({ className, ...props }, ref) => (
   <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
 ))
-TableHeader.displayName = "TableHeader"
+TableHeader.display_name = "TableHeader"
 
 const TableBody = forwardRef<
   HTMLTableSectionElement,
@@ -40,7 +40,7 @@ const TableBody = forwardRef<
     {...props}
   />
 ))
-TableBody.displayName = "TableBody"
+TableBody.display_name = "TableBody"
 
 const TableFooter = forwardRef<
   HTMLTableSectionElement,
@@ -55,7 +55,7 @@ const TableFooter = forwardRef<
     {...props}
   />
 ))
-TableFooter.displayName = "TableFooter"
+TableFooter.display_name = "TableFooter"
 
 const TableRow = forwardRef<
   HTMLTableRowElement,
@@ -70,7 +70,7 @@ const TableRow = forwardRef<
     {...props}
   />
 ))
-TableRow.displayName = "TableRow"
+TableRow.display_name = "TableRow"
 
 const TableHead = forwardRef<
   HTMLTableCellElement,
@@ -85,7 +85,7 @@ const TableHead = forwardRef<
     {...props}
   />
 ))
-TableHead.displayName = "TableHead"
+TableHead.display_name = "TableHead"
 
 const TableCell = forwardRef<
   HTMLTableCellElement,
@@ -97,7 +97,7 @@ const TableCell = forwardRef<
     {...props}
   />
 ))
-TableCell.displayName = "TableCell"
+TableCell.display_name = "TableCell"
 
 const TableCaption = forwardRef<
   HTMLTableCaptionElement,
@@ -109,7 +109,7 @@ const TableCaption = forwardRef<
     {...props}
   />
 ))
-TableCaption.displayName = "TableCaption"
+TableCaption.display_name = "TableCaption"
 
 // Enhanced table with data validation
 interface EnhancedTableProps extends HTMLAttributes<HTMLTableElement>, TableValidationProps {
@@ -263,7 +263,7 @@ const EnhancedTable = forwardRef<HTMLTableElement, EnhancedTableProps>(
     );
   }
 );
-EnhancedTable.displayName = "EnhancedTable";
+EnhancedTable.display_name = "EnhancedTable";
 
 // Enhanced table row with error highlighting
 const EnhancedTableRow = forwardRef<
@@ -288,7 +288,7 @@ const EnhancedTableRow = forwardRef<
     />
   );
 });
-EnhancedTableRow.displayName = "EnhancedTableRow";
+EnhancedTableRow.display_name = "EnhancedTableRow";
 
 // Enhanced table cell with error highlighting
 const EnhancedTableCell = forwardRef<
@@ -321,7 +321,7 @@ const EnhancedTableCell = forwardRef<
     </td>
   );
 });
-EnhancedTableCell.displayName = "EnhancedTableCell";
+EnhancedTableCell.display_name = "EnhancedTableCell";
 
 export {
   Table,

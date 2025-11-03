@@ -6,12 +6,12 @@ import { getEmailService } from '../../infrastructure/notifications/email-servic
 import { pgTable, text, serial, timestamp, jsonb, integer, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, count, desc, eq } from 'drizzle-orm';
 import { logger  } from '../../../shared/core/src/index.js';
-import { securityAuditLog } from '../../../shared/schema';
+import { system_audit_log } from '@shared/schema';
 
 // Threat intelligence table
 const threatIntelligence = pgTable("threat_intelligence", {
   id: serial("id").primaryKey(),
-  ipAddress: text("ip_address").notNull(),
+  ip_address: text("ip_address").notNull(),
   threatType: text("threat_type").notNull(), // malicious_ip, bot, scanner, etc.
   severity: text("severity").notNull(),
   source: text("source").notNull(), // internal, external_feed, manual
@@ -20,7 +20,7 @@ const threatIntelligence = pgTable("threat_intelligence", {
   occurrences: integer("occurrences").default(1),
   blocked: boolean("blocked").default(false),
   metadata: jsonb("metadata"),
-  createdAt: timestamp("created_at").defaultNow(),
+  created_at: timestamp("created_at").defaultNow(),
 });
 
 // Attack patterns table
@@ -34,8 +34,8 @@ const attackPatterns = pgTable("attack_patterns", {
   enabled: boolean("enabled").default(true),
   falsePositiveRate: integer("false_positive_rate").default(0),
   detectionCount: integer("detection_count").default(0),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
 });
 
 export interface ThreatDetectionResult {
@@ -54,8 +54,7 @@ export interface DetectedThreat {
   confidence: number; // 0-100
 }
 
-export interface BehavioralAnomaly {
-  userId: string;
+export interface BehavioralAnomaly { user_id: string;
   anomalyType: string;
   severity: 'low' | 'medium' | 'high' | 'critical';
   description: string;
@@ -63,7 +62,7 @@ export interface BehavioralAnomaly {
   currentValue: number;
   deviationScore: number;
   timeWindow: string;
-}
+ }
 
 /**
  * Advanced intrusion detection and threat monitoring service
@@ -132,8 +131,8 @@ export class IntrusionDetectionService {
    * Analyze incoming request for threats
    */
   async analyzeRequest(req: Request): Promise<ThreatDetectionResult> {
-    const ipAddress = this.getClientIP(req);
-    const userAgent = req.get('User-Agent') || '';
+    const ip_address = this.getClientIP(req);
+    const user_agent = req.get('User-Agent') || '';
     const url = req.originalUrl || req.url;
     const method = req.method;
     const body = JSON.stringify(req.body || {});
@@ -142,12 +141,12 @@ export class IntrusionDetectionService {
     let riskScore = 0;
 
     // 1. Check against threat intelligence
-    const threatIntelResult = await this.checkThreatIntelligence(ipAddress);
+    const threatIntelResult = await this.checkThreatIntelligence(ip_address);
     if (threatIntelResult.isThreat) {
       detectedThreats.push({
         type: 'known_threat_ip',
         severity: threatIntelResult.severity || 'medium',
-        description: `IP address ${ipAddress} is known ${threatIntelResult.threatType}`,
+        description: `IP address ${ip_address} is known ${threatIntelResult.threatType}`,
         evidence: { source: threatIntelResult.source },
         confidence: 95
       });
@@ -155,7 +154,7 @@ export class IntrusionDetectionService {
     }
 
     // 2. Rate limiting analysis
-    const rateLimitResult = this.analyzeRateLimit(ipAddress);
+    const rateLimitResult = this.analyzeRateLimit(ip_address);
     if (rateLimitResult.isExceeded) {
       detectedThreats.push({
         type: 'rate_limit_exceeded',
@@ -168,22 +167,21 @@ export class IntrusionDetectionService {
     }
 
     // 3. Pattern-based attack detection
-    const patternResults = this.detectAttackPatterns(url, body, userAgent);
+    const patternResults = this.detectAttackPatterns(url, body, user_agent);
     detectedThreats.push(...patternResults);
     riskScore += patternResults.reduce((sum, threat) => {
       return sum + (threat.severity === 'critical' ? 40 : threat.severity === 'high' ? 25 : 15);
     }, 0);
 
     // 4. Behavioral analysis (if user is authenticated)
-    const userId = (req as any).user?.id;
-    if (userId) {
-      const behavioralThreats = await this.analyzeBehavioralAnomalies(userId, req);
+    const user_id = (req as any).user?.id;
+    if (user_id) { const behavioralThreats = await this.analyzeBehavioralAnomalies(user_id, req);
       detectedThreats.push(...behavioralThreats);
       riskScore += behavioralThreats.length * 20;
-    }
+     }
 
     // 5. Geographic and temporal analysis
-    const geoTemporal = await this.analyzeGeoTemporalPatterns(ipAddress, userId);
+    const geoTemporal = await this.analyzeGeoTemporalPatterns(ip_address, user_id);
     if (geoTemporal.isAnomalous) {
       detectedThreats.push({
         type: 'geotemporal_anomaly',
@@ -198,15 +196,15 @@ export class IntrusionDetectionService {
     // Determine threat level and recommended action
     const threatLevel = this.calculateThreatLevel(riskScore);
     const recommendedAction = this.determineRecommendedAction(threatLevel, detectedThreats);
-    const isBlocked = recommendedAction === 'block' || this.blockedIPs.has(ipAddress);
+    const isBlocked = recommendedAction === 'block' || this.blockedIPs.has(ip_address);
 
     // Log the analysis
     if (detectedThreats.length > 0) {
       await securityAuditService.logSecurityEvent({
-        eventType: 'threat_detection',
+        event_type: 'threat_detection',
         severity: threatLevel === 'critical' ? 'critical' : threatLevel === 'high' ? 'high' : 'medium',
-        ipAddress,
-        userAgent,
+        ip_address,
+        user_agent,
         resource: url,
         action: method,
         result: isBlocked ? 'blocked' : 'allowed',
@@ -216,7 +214,7 @@ export class IntrusionDetectionService {
           riskScore,
           recommendedAction
         },
-        userId
+        user_id
       });
     }
 
@@ -232,7 +230,7 @@ export class IntrusionDetectionService {
   /**
    * Check IP against threat intelligence database
    */
-  private async checkThreatIntelligence(ipAddress: string): Promise<{
+  private async checkThreatIntelligence(ip_address: string): Promise<{
     isThreat: boolean;
     threatType?: string;
     severity?: 'low' | 'medium' | 'high' | 'critical';
@@ -242,7 +240,7 @@ export class IntrusionDetectionService {
       const threat = await db
         .select()
         .from(threatIntelligence)
-        .where(eq(threatIntelligence.ipAddress, ipAddress))
+        .where(eq(threatIntelligence.ip_address, ip_address))
         .limit(1);
 
       if (threat.length > 0) {
@@ -275,7 +273,7 @@ export class IntrusionDetectionService {
   /**
    * Analyze rate limiting patterns
    */
-  private analyzeRateLimit(ipAddress: string): {
+  private analyzeRateLimit(ip_address: string): {
     isExceeded: boolean;
     severity: 'low' | 'medium' | 'high' | 'critical';
     requestCount: number;
@@ -285,10 +283,10 @@ export class IntrusionDetectionService {
     const oneMinute = 60 * 1000;
     
     // Get or create request tracking for this IP
-    let tracking = this.ipRequestCounts.get(ipAddress);
+    let tracking = this.ipRequestCounts.get(ip_address);
     if (!tracking || now - tracking.lastReset > oneMinute) {
       tracking = { count: 0, lastReset: now };
-      this.ipRequestCounts.set(ipAddress, tracking);
+      this.ipRequestCounts.set(ip_address, tracking);
     }
     
     tracking.count++;
@@ -319,9 +317,9 @@ export class IntrusionDetectionService {
   /**
    * Detect attack patterns in request data
    */
-  private detectAttackPatterns(url: string, body: string, userAgent: string): DetectedThreat[] {
+  private detectAttackPatterns(url: string, body: string, user_agent: string): DetectedThreat[] {
     const threats: DetectedThreat[] = [];
-    const fullContent = `${url} ${body} ${userAgent}`;
+    const fullContent = `${url} ${body} ${user_agent}`;
 
     for (const pattern of this.attackPatterns) {
       if (pattern.pattern.test(fullContent)) {
@@ -365,8 +363,7 @@ export class IntrusionDetectionService {
   /**
    * Analyze behavioral anomalies for authenticated users
    */
-  private async analyzeBehavioralAnomalies(userId: string, req: Request): Promise<DetectedThreat[]> {
-    const threats: DetectedThreat[] = [];
+  private async analyzeBehavioralAnomalies(user_id: string, req: Request): Promise<DetectedThreat[]> { const threats: DetectedThreat[] = [];
     
     try {
       // Get user's historical behavior patterns
@@ -376,8 +373,8 @@ export class IntrusionDetectionService {
         .from(securityAuditLog)
         .where(
           and(
-            eq(securityAuditLog.userId, userId),
-            gte(securityAuditLog.createdAt, oneWeekAgo)
+            eq(system_audit_log.user_id, user_id),
+            gte(system_audit_log.created_at, oneWeekAgo)
           )
         )
         .limit(1000);
@@ -385,7 +382,7 @@ export class IntrusionDetectionService {
       if (userEvents.length < 10) {
         // Not enough data for behavioral analysis
         return threats;
-      }
+       }
 
       // Analyze access patterns
       const currentHour = new Date().getHours();
@@ -443,7 +440,7 @@ export class IntrusionDetectionService {
   /**
    * Analyze geographic and temporal patterns
    */
-  private async analyzeGeoTemporalPatterns(ipAddress: string, userId?: string): Promise<{
+  private async analyzeGeoTemporalPatterns(ip_address: string, user_id?: string): Promise<{
     isAnomalous: boolean;
     severity: 'low' | 'medium' | 'high' | 'critical';
     description: string;
@@ -453,16 +450,16 @@ export class IntrusionDetectionService {
     // This would integrate with IP geolocation services in production
     // For now, we'll do basic analysis based on IP patterns
     
-    const isPrivateIP = this.isPrivateIP(ipAddress);
-    const isTorExit = await this.checkTorExitNode(ipAddress);
-    const isVPN = await this.checkVPNProvider(ipAddress);
+    const isPrivateIP = this.isPrivateIP(ip_address);
+    const isTorExit = await this.checkTorExitNode(ip_address);
+    const isVPN = await this.checkVPNProvider(ip_address);
     
     if (isTorExit) {
       return {
         isAnomalous: true,
         severity: 'high',
         description: 'Access from Tor exit node detected',
-        evidence: { ipAddress, source: 'tor_detection' },
+        evidence: { ip_address, source: 'tor_detection' },
         confidence: 90
       };
     }
@@ -472,7 +469,7 @@ export class IntrusionDetectionService {
         isAnomalous: true,
         severity: 'medium',
         description: 'Access from VPN/proxy detected',
-        evidence: { ipAddress, source: 'vpn_detection' },
+        evidence: { ip_address, source: 'vpn_detection' },
         confidence: 75
       };
     }
@@ -523,19 +520,19 @@ export class IntrusionDetectionService {
   /**
    * Block IP address
    */
-  async blockIP(ipAddress: string, reason: string, duration?: number): Promise<void> {
-    this.blockedIPs.add(ipAddress);
+  async blockIP(ip_address: string, reason: string, duration?: number): Promise<void> {
+    this.blockedIPs.add(ip_address);
     
     // Add to threat intelligence database
     await db.insert(threatIntelligence).values({
-      ipAddress,
+      ip_address,
       threatType: 'blocked_ip',
       severity: 'high',
       source: 'internal',
       blocked: true,
       metadata: { reason, blockedAt: new Date() }
     }).onConflictDoUpdate({
-      target: threatIntelligence.ipAddress,
+      target: threatIntelligence.ip_address,
       set: {
         blocked: true,
         lastSeen: new Date(),
@@ -547,32 +544,32 @@ export class IntrusionDetectionService {
     // Auto-unblock after duration if specified
     if (duration) {
       setTimeout(() => {
-        this.unblockIP(ipAddress);
+        this.unblockIP(ip_address);
       }, duration);
     }
 
-    console.warn(`🚫 IP ${ipAddress} blocked: ${reason}`);
+    console.warn(`🚫 IP ${ip_address} blocked: ${reason}`);
   }
 
   /**
    * Unblock IP address
    */
-  async unblockIP(ipAddress: string): Promise<void> {
-    this.blockedIPs.delete(ipAddress);
+  async unblockIP(ip_address: string): Promise<void> {
+    this.blockedIPs.delete(ip_address);
     
     await db
       .update(threatIntelligence)
       .set({ blocked: false })
-      .where(eq(threatIntelligence.ipAddress, ipAddress));
+      .where(eq(threatIntelligence.ip_address, ip_address));
 
-    console.info(`✅ IP ${ipAddress} unblocked`);
+    console.info(`✅ IP ${ip_address} unblocked`);
   }
 
   /**
    * Check if IP is blocked
    */
-  isIPBlocked(ipAddress: string): boolean {
-    return this.blockedIPs.has(ipAddress);
+  isIPBlocked(ip_address: string): boolean {
+    return this.blockedIPs.has(ip_address);
   }
 
   /**
@@ -617,13 +614,13 @@ export class IntrusionDetectionService {
     return privateRanges.some(range => range.test(ip));
   }
 
-  private async checkTorExitNode(ipAddress: string): Promise<boolean> {
+  private async checkTorExitNode(ip_address: string): Promise<boolean> {
     // In production, this would check against Tor exit node lists
     // For now, return false
     return false;
   }
 
-  private async checkVPNProvider(ipAddress: string): Promise<boolean> {
+  private async checkVPNProvider(ip_address: string): Promise<boolean> {
     // In production, this would check against VPN provider IP ranges
     // For now, return false
     return false;

@@ -35,13 +35,12 @@ export interface ConfigChange {
 }
 
 // Feature flag evaluation context
-export interface FeatureFlagContext {
-  userId?: string;
+export interface FeatureFlagContext { user_id?: string;
   sessionId?: string;
-  ipAddress?: string;
-  userAgent?: string;
+  ip_address?: string;
+  user_agent?: string;
   customAttributes?: Record<string, any>;
-}
+ }
 
 // Feature flag result
 export interface FeatureFlagResult {

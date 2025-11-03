@@ -5,12 +5,11 @@
  */
 
 import { database as db } from '../../../../shared/database/connection';
-import { 
-  billComment, 
-  contentReport, 
-  moderationAction,
-  user
-} from '../../../../shared/schema';
+import { comments, 
+  content_report, 
+  moderation_action,
+  users
+ } from '../shared/schema';
 import { eq, count, desc, sql, and, gte, inArray } from 'drizzle-orm';
 import { logger } from '../../../../shared/core/index.js';
 import { 
@@ -49,8 +48,8 @@ export class ModerationDecisionService {
       // Fetch the report to be reviewed
       const [report] = await db
         .select()
-        .from(contentReport)
-        .where(eq(contentReport.id, reportId));
+        .from(content_report)
+        .where(eq(content_report.id, reportId));
 
       if (!report) {
         return {
@@ -61,21 +60,21 @@ export class ModerationDecisionService {
 
       // Update the report with the review decision
       await db
-        .update(contentReport)
+        .update(content_report)
         .set({
           status: decision === 'resolve' ? 'resolved' : 
                   decision === 'dismiss' ? 'dismissed' : 'escalated',
           reviewedBy: moderatorId,
           reviewedAt: new Date(),
           resolutionNotes: resolutionNotes,
-          updatedAt: new Date()
+          updated_at: new Date()
         })
-        .where(eq(contentReport.id, reportId));
+        .where(eq(content_report.id, reportId));
 
       // Record the moderation action
-      await db.insert(moderationAction).values({
-        contentType: report.contentType,
-        contentId: report.contentId,
+      await db.insert(moderation_action).values({
+        content_type: report.content_type,
+        content_id: report.content_id,
         actionType: actionType,
         reason: resolutionNotes,
         moderatorId: moderatorId,
@@ -85,8 +84,8 @@ export class ModerationDecisionService {
       // Apply the actual moderation action to the content
       if (decision === 'resolve') {
         await this.applyModerationAction(
-          report.contentType,
-          report.contentId,
+          report.content_type,
+          report.content_id,
           report.reportedBy,
           actionType
         );
@@ -131,8 +130,8 @@ export class ModerationDecisionService {
         try {
           const [report] = await db
             .select()
-            .from(contentReport)
-            .where(eq(contentReport.id, reportId));
+            .from(content_report)
+            .where(eq(content_report.id, reportId));
 
           if (!report) {
             failedIds.push(reportId);
@@ -141,7 +140,7 @@ export class ModerationDecisionService {
 
           // Update report status
           await db
-            .update(contentReport)
+            .update(content_report)
             .set({
               status: operation.action === 'resolve' ? 'resolved' :
                       operation.action === 'dismiss' ? 'dismissed' :
@@ -149,15 +148,15 @@ export class ModerationDecisionService {
               reviewedBy: operation.moderatorId,
               reviewedAt: new Date(),
               resolutionNotes: operation.resolutionNotes,
-              updatedAt: new Date()
+              updated_at: new Date()
             })
-            .where(eq(contentReport.id, reportId));
+            .where(eq(content_report.id, reportId));
 
           // Record action
           const actionType = operation.action === 'delete' ? 'delete' : 'hide';
-          await db.insert(moderationAction).values({
-            contentType: report.contentType,
-            contentId: report.contentId,
+          await db.insert(moderation_action).values({
+            content_type: report.content_type,
+            content_id: report.content_id,
             actionType: actionType,
             reason: operation.resolutionNotes,
             moderatorId: operation.moderatorId,
@@ -167,8 +166,8 @@ export class ModerationDecisionService {
           // Apply action to content if resolving
           if (operation.action === 'resolve' || operation.action === 'delete') {
             await this.applyModerationAction(
-              report.contentType,
-              report.contentId,
+              report.content_type,
+              report.content_id,
               report.reportedBy,
               actionType
             );
@@ -209,8 +208,8 @@ export class ModerationDecisionService {
    * Retrieves the complete moderation history for specific content or system-wide
    */
   async getModerationHistory(
-    contentType?: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
-    contentId?: number,
+    content_type?: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
+    content_id?: number,
     page = 1,
     limit = 20
   ): Promise<{
@@ -222,34 +221,34 @@ export class ModerationDecisionService {
 
       const conditions = [];
 
-      if (contentType && contentId) {
-        conditions.push(eq(moderationAction.contentType, contentType));
-        conditions.push(eq(moderationAction.contentId, contentId));
+      if (content_type && content_id) {
+        conditions.push(eq(moderation_action.content_type, content_type));
+        conditions.push(eq(moderation_action.content_id, content_id));
       }
 
       // Fetch actions with moderator details
       const actions = await db
         .select({
-          id: moderationAction.id,
-          contentType: moderationAction.contentType,
-          contentId: moderationAction.contentId,
-          actionType: moderationAction.actionType,
-          reason: moderationAction.reason,
-          moderatorId: moderationAction.moderatorId,
-          moderatorName: user.name,
-          createdAt: moderationAction.createdAt
+          id: moderation_action.id,
+          content_type: moderation_action.content_type,
+          content_id: moderation_action.content_id,
+          actionType: moderation_action.actionType,
+          reason: moderation_action.reason,
+          moderatorId: moderation_action.moderatorId,
+          moderatorName: users.name,
+          created_at: moderation_action.created_at
         })
-        .from(moderationAction)
-        .innerJoin(user, eq(moderationAction.moderatorId, user.id))
+        .from(moderation_action)
+        .innerJoin(user, eq(moderation_action.moderatorId, users.id))
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(desc(moderationAction.createdAt))
+        .orderBy(desc(moderation_action.created_at))
         .limit(limit)
         .offset(offset);
 
       // Get total count for pagination
       const countResult = await db
         .select({ count: count() })
-        .from(moderationAction)
+        .from(moderation_action)
         .where(conditions.length > 0 ? and(...conditions) : undefined);
 
       const total = countResult[0]?.count ?? 0;
@@ -257,13 +256,13 @@ export class ModerationDecisionService {
       return {
         actions: actions.map(action => ({
           id: action.id,
-          contentType: action.contentType,
-          contentId: action.contentId,
+          content_type: action.content_type,
+          content_id: action.content_id,
           actionType: action.actionType,
           reason: action.reason,
           moderatorId: action.moderatorId,
           moderatorName: action.moderatorName,
-          createdAt: action.createdAt
+          created_at: action.created_at
         })),
         pagination: {
           page,
@@ -285,54 +284,54 @@ export class ModerationDecisionService {
    * Applies the moderation action to the actual content
    */
   private async applyModerationAction(
-    contentType: string,
-    contentId: number,
+    content_type: string,
+    content_id: number,
     reportedBy: string,
     actionType: 'warn' | 'hide' | 'delete' | 'ban_user' | 'verify' | 'highlight'
   ): Promise<void> {
     try {
       switch (actionType) {
         case 'delete':
-          if (contentType === 'comment') {
+          if (content_type === 'comment') {
             await db
-              .update(billComment)
+              .update(comments)
               .set({
                 content: '[Content removed by moderator]',
-                isDeleted: true,
-                updatedAt: new Date()
+                is_deleted: true,
+                updated_at: new Date()
               })
-              .where(eq(billComment.id, contentId));
+              .where(eq(comments.id, content_id));
           }
           break;
 
         case 'hide':
-          if (contentType === 'comment') {
+          if (content_type === 'comment') {
             await db
-              .update(billComment)
+              .update(comments)
               .set({ 
                 content: '[Comment hidden by moderator]',
-                isDeleted: true,
-                updatedAt: new Date()
+                is_deleted: true,
+                updated_at: new Date()
               })
-              .where(eq(billComment.id, contentId));
+              .where(eq(comments.id, content_id));
           }
           break;
 
         case 'warn':
-          if (contentType === 'comment') {
+          if (content_type === 'comment') {
             const [comment] = await db
               .select()
-              .from(billComment)
-              .where(eq(billComment.id, contentId));
+              .from(comments)
+              .where(eq(comments.id, content_id));
 
-            if (comment && !comment.isDeleted) {
+            if (comment && !comment.is_deleted) {
               await db
-                .update(billComment)
+                .update(comments)
                 .set({
                   content: `[⚠️ Moderator Warning: This comment was flagged for policy violation]\n\n${comment.content}`,
-                  updatedAt: new Date()
+                  updated_at: new Date()
                 })
-                .where(eq(billComment.id, contentId));
+                .where(eq(comments.id, content_id));
             }
           }
           break;
@@ -343,36 +342,35 @@ export class ModerationDecisionService {
           // 2. Hide/delete all their content
           // 3. Prevent them from posting
           // For now, we just log the action
-          logger.warn('User ban action required:', {
-            component: 'ModerationDecision',
-            userId: reportedBy,
-            contentType,
-            contentId
-          });
+          logger.warn('User ban action required:', { component: 'ModerationDecision',
+            user_id: reportedBy,
+            content_type,
+            content_id
+           });
           
           // Hide the specific content
-          if (contentType === 'comment') {
+          if (content_type === 'comment') {
             await db
-              .update(billComment)
+              .update(comments)
               .set({ 
                 content: '[Content removed - user banned for policy violations]',
-                isDeleted: true,
-                updatedAt: new Date()
+                is_deleted: true,
+                updated_at: new Date()
               })
-              .where(eq(billComment.id, contentId));
+              .where(eq(comments.id, content_id));
           }
           break;
 
         case 'verify':
           // Mark content as verified/endorsed by moderators
-          if (contentType === 'comment') {
+          if (content_type === 'comment') {
             await db
-              .update(billComment)
+              .update(comments)
               .set({ 
-                isVerified: true,
-                updatedAt: new Date()
+                is_verified: true,
+                updated_at: new Date()
               })
-              .where(eq(billComment.id, contentId));
+              .where(eq(comments.id, content_id));
           }
           break;
 
@@ -381,8 +379,8 @@ export class ModerationDecisionService {
           // or increase visibility of quality content
           logger.info('Content highlighted:', {
             component: 'ModerationDecision',
-            contentType,
-            contentId
+            content_type,
+            content_id
           });
           break;
 
@@ -395,8 +393,8 @@ export class ModerationDecisionService {
     } catch (error) {
       logger.error('Error applying moderation action:', {
         component: 'ModerationDecision',
-        contentType,
-        contentId,
+        content_type,
+        content_id,
         actionType,
         error: error instanceof Error ? error.message : String(error)
       });

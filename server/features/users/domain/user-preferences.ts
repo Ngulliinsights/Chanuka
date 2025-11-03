@@ -1,10 +1,10 @@
 import { readDatabase } from '../../../../shared/database/connection';
-import { user } from '../../../../shared/schema'; // Import user table directly
+import { users } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger  } from '../../../../shared/core/src/index.js';
 
 // --- Interface Definitions ---
-// Defines the structure of GLOBAL bill tracking preferences stored within user.preferences.
+// Defines the structure of GLOBAL bill tracking preferences stored within users.preferences.
 // These serve as defaults unless overridden by per-bill settings in userBillTrackingPreference table.
 export interface BillTrackingPreferences {
   // Global defaults for which event types trigger notifications
@@ -31,7 +31,7 @@ export interface BillTrackingPreferences {
   // Global smart filtering settings
   smartFiltering: {
     enabled: boolean;
-    interestBasedFiltering: boolean; // Filter based on userInterest table?
+    interestBasedFiltering: boolean; // Filter based on user_interest table?
     priorityThreshold: 'low' | 'medium' | 'high'; // Minimum priority to receive
     categoryFilters: string[]; // Global list of allowed categories
     keywordFilters: string[]; // Global list of keywords
@@ -59,12 +59,12 @@ export interface BillTrackingPreferences {
     };
   };
    // Add potential aliases used elsewhere for consistency checks, although primary fields should be used
-   alertFrequency?: BillTrackingPreferences['updateFrequency'];
-   alertChannels?: Array<'in_app' | 'email' | 'push' | 'sms'>;
-   trackingTypes?: string[];
+   alert_frequency?: BillTrackingPreferences['updateFrequency'];
+   alert_channels?: Array<'in_app' | 'email' | 'push' | 'sms'>;
+   tracking_types?: string[];
 }
 
-// Defines the overall structure expected within the user.preferences JSONB column.
+// Defines the overall structure expected within the users.preferences JSONB column.
 export interface UserNotificationPreferences {
   billTracking: BillTrackingPreferences; // Global bill tracking defaults
   general: {
@@ -98,7 +98,7 @@ const DEFAULT_PREFERENCES: UserNotificationPreferences = {
 
 
 /**
- * Service for managing GLOBAL user preferences stored in the user.preferences JSONB field.
+ * Service for managing GLOBAL user preferences stored in the users.preferences JSONB field.
  *
  * NOTE: This service deals *only* with the user-wide default settings.
  * Per-bill notification preferences override these global settings and are managed
@@ -112,25 +112,24 @@ export class UserPreferencesService {
    * Retrieves the user's GLOBAL notification preferences.
    * Fetches the JSONB field from the user table and merges it deeply with
    * system defaults to ensure a complete and valid preference object is always returned.
-   * @param userId The ID of the user whose preferences are being fetched. Use 'default' to get system defaults.
+   * @param user_id The ID of the user whose preferences are being fetched. Use 'default' to get system defaults.
    * @returns The user's complete global preferences object. Returns defaults if user not found or on DB error.
    */
-  async getUserPreferences(userId: string): Promise<UserNotificationPreferences> {
-    // Handle request for default preferences explicitly
-    if (userId === 'default') {
-      logger.debug("Returning default global preferences", { component: 'UserPreferencesService' });
+  async getUserPreferences(user_id: string): Promise<UserNotificationPreferences> { // Handle request for default preferences explicitly
+    if (user_id === 'default') {
+      logger.debug("Returning default global preferences", { component: 'UserPreferencesService'  });
       return this.deepClone(DEFAULT_PREFERENCES); // Return a clone
     }
 
-    const logContext = { component: 'UserPreferencesService', userId };
+    const logContext = { component: 'UserPreferencesService', user_id  };
     logger.debug("Fetching global user preferences from DB", logContext);
 
     try {
       // Select only the preferences column for efficiency
       const [userData] = await this.db
-        .select({ preferences: user.preferences })
+        .select({ preferences: users.preferences })
         .from(user)
-        .where(eq(user.id, userId))
+        .where(eq(users.id, user_id))
         .limit(1);
 
       if (!userData) {
@@ -155,26 +154,24 @@ export class UserPreferencesService {
   /**
    * Updates the user's GLOBAL notification preferences in the database.
    * Performs a deep merge of the provided partial updates onto the current settings.
-   * @param userId The ID of the user.
+   * @param user_id The ID of the users.
    * @param preferences Partial preferences object containing only the fields to update.
    * @returns The fully updated and saved global preferences object.
    * @throws Error if the user is not found or the database update fails.
    */
-  async updateUserPreferences(userId: string, preferences: Partial<UserNotificationPreferences>): Promise<UserNotificationPreferences> {
-    const logContext = { component: 'UserPreferencesService', userId };
+  async updateUserPreferences(user_id: string, preferences: Partial<UserNotificationPreferences>): Promise<UserNotificationPreferences> { const logContext = { component: 'UserPreferencesService', user_id  };
     logger.info("Updating global user preferences in DB", logContext);
 
     try {
       // 1. Fetch current preferences directly from DB to avoid race conditions.
       const [currentUser] = await this.db
-        .select({ preferences: user.preferences })
+        .select({ preferences: users.preferences })
         .from(user)
-        .where(eq(user.id, userId))
+        .where(eq(users.id, user_id))
         .limit(1);
 
-      if (!currentUser) {
-        logger.error("User not found during preference update.", logContext);
-        throw new Error(`User not found: ${userId}`);
+      if (!currentUser) { logger.error("User not found during preference update.", logContext);
+        throw new Error(`User not found: ${user_id }`);
       }
 
       // 2. Merge current DB state (merged with defaults) with the provided partial updates.
@@ -189,15 +186,14 @@ export class UserPreferencesService {
         .update(user)
         .set({
           preferences: updatedPrefsObject, // Save the fully merged object
-          updatedAt: new Date()           // Update modification timestamp
+          updated_at: new Date()           // Update modification timestamp
         })
-        .where(eq(user.id, userId))
-        .returning({ preferences: user.preferences }); // Return the updated data from DB
+        .where(eq(users.id, user_id))
+        .returning({ preferences: users.preferences }); // Return the updated data from DB
 
-      if (result.length === 0) {
-        // Should not happen if user was found earlier, but handle defensively.
+      if (result.length === 0) { // Should not happen if user was found earlier, but handle defensively.
         logger.error("DB update affected 0 rows, possible issue.", logContext);
-        throw new Error(`Failed to update preferences for user ${userId} (user might have been deleted concurrently).`);
+        throw new Error(`Failed to update preferences for user ${user_id } (user might have been deleted concurrently).`);
       }
 
       logger.info(`Successfully updated global preferences`, logContext);
@@ -215,19 +211,17 @@ export class UserPreferencesService {
   /**
    * Updates only the GLOBAL bill tracking part (`billTracking` key) of the user's preferences.
    * Note: This does NOT affect per-bill preferences stored in `userBillTrackingPreference` table.
-   * @param userId The ID of the user.
+   * @param user_id The ID of the users.
    * @param preferences Partial global bill tracking preferences to update.
    * @returns The updated global bill tracking preferences object.
    * @throws Error if the update fails.
    */
-  async updateBillTrackingPreferences(userId: string, preferences: Partial<BillTrackingPreferences>): Promise<BillTrackingPreferences> {
-    const logContext = { component: 'UserPreferencesService', userId };
+  async updateBillTrackingPreferences(user_id: string, preferences: Partial<BillTrackingPreferences>): Promise<BillTrackingPreferences> { const logContext = { component: 'UserPreferencesService', user_id  };
     logger.info("Updating global bill tracking preferences specifically", logContext);
-    try {
-      // Delegate to the main update function, nesting the partial update correctly
-      const fullUpdatedPrefs = await this.updateUserPreferences(userId, {
+    try { // Delegate to the main update function, nesting the partial update correctly
+      const fullUpdatedPrefs = await this.updateUserPreferences(user_id, {
         billTracking: preferences // Apply updates only within the billTracking key
-      });
+       });
       // Return just the updated billTracking portion
       return fullUpdatedPrefs.billTracking;
     } catch (error) {
@@ -297,7 +291,7 @@ export class UserPreferencesService {
   // --- Admin/Stat Methods (Keep implementations if needed) ---
 
   /** Batch updates preferences for multiple users (Admin functionality). */
-  async batchUpdatePreferences(updates: Array<{ userId: string; preferences: Partial<UserNotificationPreferences> }>): Promise<{ success: number; failed: number; errors: any[] }> {
+  async batchUpdatePreferences(updates: Array<{ user_id: string; preferences: Partial<UserNotificationPreferences>  }>): Promise<{ success: number; failed: number; errors: any[] }> {
     const logContext = { component: 'UserPreferencesService' };
     logger.info(`Starting batch preference update for ${updates.length} users.`, logContext);
     let success = 0;
@@ -307,12 +301,11 @@ export class UserPreferencesService {
     // Process updates sequentially or in parallel batches
     for (const update of updates) {
         try {
-            await this.updateUserPreferences(update.userId, update.preferences);
+            await this.updateUserPreferences(update.user_id, update.preferences);
             success++;
-        } catch(error) {
-            failed++;
-            errors.push({ userId: update.userId, error: error instanceof Error ? error.message : String(error) });
-            logger.error(`Batch update failed for user ${update.userId}`, logContext, error);
+        } catch(error) { failed++;
+            errors.push({ user_id: update.user_id, error: error instanceof Error ? error.message : String(error)  });
+            logger.error(`Batch update failed for user ${update.user_id}`, logContext, error);
         }
     }
     logger.info(`Batch update completed. Success: ${success}, Failed: ${failed}`, logContext);
@@ -332,7 +325,7 @@ export class UserPreferencesService {
     logger.info("Calculating global preference statistics.", logContext);
     try {
       // Fetch preferences for all users (consider performance for very large user bases)
-      const allUsersPrefs = await this.db.select({ preferences: user.preferences }).from(user);
+      const allUsersPrefs = await this.db.select({ preferences: users.preferences }).from(user);
 
       let immediateBillNotifications = 0;
       let emailBillChannelEnabled = 0;

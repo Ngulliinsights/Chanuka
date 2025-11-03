@@ -9,7 +9,7 @@ export type UserRole = 'public' | 'citizen' | 'expert' | 'admin' | 'journalist' 
 export interface BreadcrumbItem {
   label: string;
   path: string;
-  isActive?: boolean;
+  is_active?: boolean;
 }
 
 export interface RelatedPage {
@@ -56,7 +56,7 @@ export interface NavigationState {
   mounted: boolean;
   
   // User state
-  userRole: UserRole;
+  user_role: UserRole;
   preferences: NavigationPreferences;
 }
 
@@ -98,6 +98,6 @@ export interface NavigationContextValue extends NavigationState {
   toggleSidebar: () => void;
   toggleMobileMenu: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
-  isActive: (path: string) => boolean;
+  is_active: (path: string) => boolean;
 }
 

@@ -33,7 +33,7 @@ export const useRelatedPages = (
     validateUseRelatedPagesOptions(options);
 
     const { user } = useAuth();
-    const { userRole, preferences } = useUnifiedNavigation();
+    const { user_role, preferences } = useUnifiedNavigation();
 
     const {
       maxResults = 5,
@@ -42,7 +42,7 @@ export const useRelatedPages = (
     } = options;
 
     // Validate and convert the context UserRole to our navigation UserRole
-    const contextRole = userRole as string;
+    const contextRole = user_role as string;
     validateUserRole(contextRole);
     const navUserRole: UserRole = contextRole === 'user' ? 'citizen' : contextRole as UserRole;
 

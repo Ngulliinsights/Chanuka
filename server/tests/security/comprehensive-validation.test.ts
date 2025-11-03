@@ -107,23 +107,21 @@ describe('Comprehensive Input Validation', () => {
       expect(result.errors).toHaveLength(3);
     });
 
-    it('should validate bill comment input', () => {
-      const commentSchema = {
+    it('should validate bill comment input', () => { const commentSchema = {
         type: 'object',
-        required: ['content', 'billId'],
+        required: ['content', 'bill_id'],
         properties: {
-          content: { type: 'string', minLength: 1 },
-          billId: { type: 'number' },
-          parentCommentId: { type: 'number' },
+          content: { type: 'string', minLength: 1  },
+          bill_id: { type: 'number' },
+          parent_id: { type: 'number' },
           commentType: { type: 'string', enum: ['general', 'expert_analysis', 'concern', 'support'] }
         }
       };
 
-      const validComment = {
-        content: 'This is a thoughtful comment about the bill.',
-        billId: 123,
+      const validComment = { content: 'This is a thoughtful comment about the bills.',
+        bill_id: 123,
         commentType: 'general'
-      };
+       };
 
       const result = validateApiInput(commentSchema, validComment);
       expect(result.isValid).toBe(true);

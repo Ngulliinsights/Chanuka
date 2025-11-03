@@ -135,16 +135,15 @@ export function createCacheTestScenario(cache: any, name: string = 'cache-test')
  * This simulates multiple users hitting rate limits concurrently, which is
  * representative of real-world API usage patterns
  */
-export function createRateLimitTestScenario(rateLimiter: any, name: string = 'rate-limit-test'): LoadTestScenario {
-  return {
+export function createRateLimitTestScenario(rateLimiter: any, name: string = 'rate-limit-test'): LoadTestScenario { return {
     name,
     description: 'Rate limiting stress test',
     requests: 2000,
     concurrency: 20,
     requestFn: async () => {
       // Simulate a pool of 100 users to test rate limit distribution
-      const userId = `user:${Math.floor(Math.random() * 100)}`;
-      await rateLimiter.hit(userId, 100, 60000);
+      const user_id = `user:${Math.floor(Math.random() * 100) }`;
+      await rateLimiter.hit(user_id, 100, 60000);
     }
   };
 }
@@ -225,20 +224,18 @@ export function createComprehensiveTestSuite(components: {
 
   // Add integration test when multiple components are available
   // This simulates a realistic workflow where components interact
-  if (Object.keys(components).length > 1) {
-    scenarios.push({
+  if (Object.keys(components).length > 1) { scenarios.push({
       name: 'integration-test',
       description: 'Multi-component integration test',
       requests: 1000,
       concurrency: 10,
       requestFn: async () => {
-        const userId = `user:${Math.random()}`;
+        const user_id = `user:${Math.random() }`;
         
         // Rate limiting check - simulate authentication/throttling layer
-        if (components.rateLimiter) {
-          const rateLimitResult = await components.rateLimiter.hit(userId, 100, 60000);
+        if (components.rateLimiter) { const rateLimitResult = await components.rateLimiter.hit(user_id, 100, 60000);
           if (!rateLimitResult.allowed) return;
-        }
+         }
 
         // Validation - ensure data integrity
         if (components.validator) {
@@ -247,18 +244,15 @@ export function createComprehensiveTestSuite(components: {
         }
 
         // Cache operations - simulate data layer
-        if (components.cache) {
-          const cacheKey = `data:${userId}`;
+        if (components.cache) { const cacheKey = `data:${user_id }`;
           let cachedData = await components.cache.get(cacheKey);
-          if (!cachedData) {
-            cachedData = { userId, data: 'generated' };
+          if (!cachedData) { cachedData = { user_id, data: 'generated'  };
             await components.cache.set(cacheKey, cachedData, 300);
           }
         }
 
         // Logging - audit trail
-        if (components.logger) {
-          components.logger.info('Integration test completed', { userId });
+        if (components.logger) { components.logger.info('Integration test completed', { user_id  });
         }
       }
     });
@@ -336,7 +330,7 @@ export function setupCoreMetricsMonitoring(
     expectedValue: 0.8,
     p95Threshold: 0.9,
     regressionThreshold: 10,
-    createdAt: Date.now(),
+    created_at: Date.now(),
     description: 'Cache hit rate should be above 80%'
   });
 
@@ -344,7 +338,7 @@ export function setupCoreMetricsMonitoring(
     expectedValue: 1,
     p95Threshold: 5,
     regressionThreshold: 50,
-    createdAt: Date.now(),
+    created_at: Date.now(),
     description: 'Cache response time should be under 1ms average'
   });
 
@@ -352,7 +346,7 @@ export function setupCoreMetricsMonitoring(
     expectedValue: 2,
     p95Threshold: 10,
     regressionThreshold: 100,
-    createdAt: Date.now(),
+    created_at: Date.now(),
     description: 'Rate limit processing should be under 2ms average'
   });
 }

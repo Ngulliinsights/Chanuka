@@ -2,13 +2,12 @@ import { getEmailService, sendTemplatedEmail, EmailResult } from '../../../infra
 import { logger  } from '../../../../shared/core/src/index.js';
 import { config } from '../../../config/index.js';
 
-export interface UserEmailData {
-  userId: string;
+export interface UserEmailData { user_id: string;
   email: string;
   name: string;
-  firstName?: string;
-  lastName?: string;
-}
+  first_name?: string;
+  last_name?: string;
+ }
 
 export interface WelcomeEmailData extends UserEmailData {
   loginUrl: string;
@@ -66,7 +65,7 @@ export class UserEmailService {
         loginUrl: data.loginUrl
       });
 
-      logger.info(`📧 Welcome email sent to ${data.email} for user ${data.userId}`);
+      logger.info(`📧 Welcome email sent to ${data.email} for user ${data.user_id}`);
       return result;
     } catch (error) {
       logger.error(`❌ Failed to send welcome email to ${data.email}`, { error });
@@ -84,7 +83,7 @@ export class UserEmailService {
         resetUrl: data.resetUrl
       });
 
-      logger.info(`🔐 Password reset email sent to ${data.email} for user ${data.userId}`);
+      logger.info(`🔐 Password reset email sent to ${data.email} for user ${data.user_id}`);
       return result;
     } catch (error) {
       logger.error(`❌ Failed to send password reset email to ${data.email}`, { error });
@@ -104,7 +103,7 @@ export class UserEmailService {
         text: this.generateVerificationEmailText(data)
       });
 
-      logger.info(`✅ Verification email sent to ${data.email} for user ${data.userId}`);
+      logger.info(`✅ Verification email sent to ${data.email} for user ${data.user_id}`);
       return result;
     } catch (error) {
       logger.error(`❌ Failed to send verification email to ${data.email}`, { error });
@@ -124,7 +123,7 @@ export class UserEmailService {
         text: this.generateAccountChangeEmailText(data)
       });
 
-      logger.info(`🔄 Account change notification sent to ${data.email} for user ${data.userId}`);
+      logger.info(`🔄 Account change notification sent to ${data.email} for user ${data.user_id}`);
       return result;
     } catch (error) {
       logger.error(`❌ Failed to send account change notification to ${data.email}`, { error });
@@ -161,7 +160,7 @@ export class UserEmailService {
    * Generate verification email HTML
    */
   private generateVerificationEmailHtml(data: VerificationEmailData): string {
-    const displayName = data.firstName || data.name;
+    const display_name = data.first_name || data.name;
     const frontendUrl = config.server.frontendUrl || 'https://chanuka.gov';
 
     return `
@@ -183,7 +182,7 @@ export class UserEmailService {
     <h1>Verify Your Email Address</h1>
   </div>
   <div class="content">
-    <h2>Hello ${displayName},</h2>
+    <h2>Hello ${display_name},</h2>
     <p>Welcome to Chanuka! To complete your registration and start tracking legislation, please verify your email address.</p>
     <a class="button" href="${data.verificationUrl}">Verify Email Address</a>
     <p style="margin-top: 20px; font-size: 14px; color: #666;">
@@ -203,9 +202,9 @@ export class UserEmailService {
    * Generate verification email text
    */
   private generateVerificationEmailText(data: VerificationEmailData): string {
-    const displayName = data.firstName || data.name;
+    const display_name = data.first_name || data.name;
 
-    return `Hello ${displayName},
+    return `Hello ${display_name},
 
 Welcome to Chanuka! To complete your registration and start tracking legislation, please verify your email address by clicking the link below:
 
@@ -222,7 +221,7 @@ If you didn't create this account, please ignore this email.
    * Generate account change email HTML
    */
   private generateAccountChangeEmailHtml(data: AccountChangeEmailData): string {
-    const displayName = data.firstName || data.name;
+    const display_name = data.first_name || data.name;
 
     return `
 <!DOCTYPE html>
@@ -242,7 +241,7 @@ If you didn't create this account, please ignore this email.
     <h1>Account Change Notification</h1>
   </div>
   <div class="content">
-    <h2>Hello ${displayName},</h2>
+    <h2>Hello ${display_name},</h2>
     <p>This is a notification that your account ${data.changeType} has been changed.</p>
     <div style="background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin: 15px 0;">
       <strong>Change Details:</strong><br>
@@ -261,9 +260,9 @@ If you didn't create this account, please ignore this email.
    * Generate account change email text
    */
   private generateAccountChangeEmailText(data: AccountChangeEmailData): string {
-    const displayName = data.firstName || data.name;
+    const display_name = data.first_name || data.name;
 
-    return `Hello ${displayName},
+    return `Hello ${display_name},
 
 This is a notification that your account ${data.changeType} has been changed.
 

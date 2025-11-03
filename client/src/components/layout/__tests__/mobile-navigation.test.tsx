@@ -377,7 +377,7 @@ describe('MobileNavigation Component', () => {
       // Test tab bar navigation
       const tabBar = screen.getByTestId('mobile-tab-bar');
       const homeButton = screen.getByText('Home');
-      await user.click(homeButton);
+      await users.click(homeButton);
 
       // Navigation would be handled by the tab bar component
     });

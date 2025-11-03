@@ -641,21 +641,20 @@ export const createPaginatedSchema = <T extends z.ZodTypeAny>(itemSchema: T) => 
  * Comprehensive audit trail schema for compliance and security
  * Tracks all significant system events with full context
  */
-export const auditTrailSchema = z.object({
-  id: uuidSchema,
-  entityType: z.string().min(1).max(50),
-  entityId: uuidSchema,
+export const auditTrailSchema = z.object({ id: uuidSchema,
+  entity_type: z.string().min(1).max(50),
+  entity_id: uuidSchema,
   action: z.enum(['create', 'update', 'delete', 'view', 'export']),
-  userId: uuidSchema.optional(),
+  user_id: uuidSchema.optional(),
   userEmail: emailSchema.optional(),
   timestamp: z.coerce.date(),
   changes: z.record(z.string(), z.object({
     from: z.unknown(),
     to: z.unknown(),
-  })).optional(),
+   })).optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
-  ipAddress: z.string().ip().optional(),
-  userAgent: z.string().max(500).optional(),
+  ip_address: z.string().ip().optional(),
+  user_agent: z.string().max(500).optional(),
   sessionId: z.string().optional(),
 });
 

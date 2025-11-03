@@ -10,13 +10,12 @@ export interface MetricData {
   timestamp?: number;
 }
 
-export interface OperationMetrics {
-  operation: string;
+export interface OperationMetrics { operation: string;
   duration: number;
   success: boolean;
-  userId?: string;
+  user_id?: string;
   errorType?: string;
-}
+ }
 
 export class MetricsService {
   private static instance: MetricsService;
@@ -29,11 +28,10 @@ export class MetricsService {
     return MetricsService.instance;
   }
 
-  recordOperationMetrics(metrics: OperationMetrics): void {
-    const baseTags = {
+  recordOperationMetrics(metrics: OperationMetrics): void { const baseTags = {
       operation: metrics.operation,
       success: metrics.success.toString(),
-      ...(metrics.userId && { userId: metrics.userId }),
+      ...(metrics.user_id && { user_id: metrics.user_id  }),
       ...(metrics.errorType && { errorType: metrics.errorType })
     };
 

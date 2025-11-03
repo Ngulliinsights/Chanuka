@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { database as db } from '@shared/database/connection';
-import { bills, sponsors, billSponsorships, sponsorAffiliations } from '@shared/schema';
+import { bills, sponsors, bill_cosponsors, sponsors as sponsorAffiliations } from '@shared/schema';
 import { eq, and, or } from 'drizzle-orm';
 import { logger  } from '../../../shared/core/src/index.js';
 
@@ -26,9 +26,9 @@ const GovernmentBillSchema = z.object({
   content: z.string().optional(),
   summary: z.string().optional(),
   status: z.string(),
-  billNumber: z.string(),
-  introducedDate: z.string().optional(),
-  lastActionDate: z.string().optional(),
+  bill_number: z.string(),
+  introduced_date: z.string().optional(),
+  last_action_date: z.string().optional(),
   sponsors: z.array(z.object({
     id: z.string(),
     name: z.string(),
@@ -52,7 +52,7 @@ const GovernmentSponsorSchema = z.object({
   email: z.string().optional(),
   phone: z.string().optional(),
   bio: z.string().optional(),
-  photoUrl: z.string().optional(),
+  photo_url: z.string().optional(),
   affiliations: z.array(z.object({
     organization: z.string(),
     role: z.string().optional(),
@@ -237,7 +237,7 @@ export class GovernmentDataIntegrationService {
         }
       } catch (error) {
         const err = error instanceof Error ? error : new Error(String(error));
-        result.errors.push(`Failed to process bill ${govBill.billNumber}: ${err.message}`);
+        result.errors.push(`Failed to process bill ${govBill.bill_number}: ${err.message}`);
       }
     }
 
@@ -327,7 +327,7 @@ export class GovernmentDataIntegrationService {
       GovernmentBillSchema.parse(govBill);
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      warnings.push(`Validation failed for bill ${govBill.billNumber}: ${err.message}`);
+      warnings.push(`Validation failed for bill ${govBill.bill_number}: ${err.message}`);
       return { created: false, updated: false, skipped: true, warnings };
     }
 
@@ -338,7 +338,7 @@ export class GovernmentDataIntegrationService {
     // Check if bill already exists
     const existingBill = await db.select()
       .from(bills)
-      .where(eq(bills.billNumber, govBill.billNumber))
+      .where(eq(bills.bill_number, govBill.bill_number))
       .limit(1);
 
     const billData = {
@@ -347,19 +347,19 @@ export class GovernmentDataIntegrationService {
       content: govBill.content || null,
       summary: govBill.summary || null,
       status: this.normalizeBillStatus(govBill.status),
-      billNumber: govBill.billNumber,
+      bill_number: govBill.bill_number,
       category: govBill.category || null,
       tags: govBill.tags || [],
-      introducedDate: govBill.introducedDate ? new Date(govBill.introducedDate) : null,
-      lastActionDate: govBill.lastActionDate ? new Date(govBill.lastActionDate) : null,
-      updatedAt: new Date()
+      introduced_date: govBill.introduced_date ? new Date(govBill.introduced_date) : null,
+      last_action_date: govBill.last_action_date ? new Date(govBill.last_action_date) : null,
+      updated_at: new Date()
     };
 
     if (existingBill.length === 0) {
       // Create new bill
       const [newBill] = await db.insert(bills).values({
         ...billData,
-        createdAt: new Date()
+        created_at: new Date()
       }).returning();
 
       // Process sponsors if provided
@@ -425,9 +425,9 @@ export class GovernmentDataIntegrationService {
       email: govSponsor.email || null,
       phone: govSponsor.phone || null,
       bio: govSponsor.bio || null,
-      photoUrl: govSponsor.photoUrl || null,
-      isActive: true,
-      createdAt: new Date()
+      photo_url: govSponsor.photo_url || null,
+      is_active: true,
+      created_at: new Date()
     };
 
     if (existingSponsor.length === 0) {
@@ -445,7 +445,7 @@ export class GovernmentDataIntegrationService {
       const [updatedSponsor] = await db.update(sponsors)
         .set({
           ...sponsorData,
-          createdAt: existingSponsor[0].createdAt // Preserve original creation date
+          created_at: existingSponsor[0].created_at // Preserve original creation date
         })
         .where(eq(sponsors.id, existingSponsor[0].id))
         .returning();
@@ -462,7 +462,7 @@ export class GovernmentDataIntegrationService {
   /**
    * Process bill sponsors and create sponsorship records
    */
-  private async processBillSponsors(billId: number, billSponsors: GovernmentBill['sponsors']): Promise<void> {
+  private async processBillSponsors(bill_id: number, billSponsors: GovernmentBill['sponsors']): Promise<void> {
     if (!billSponsors) return;
 
     for (const sponsorInfo of billSponsors) {
@@ -474,35 +474,34 @@ export class GovernmentDataIntegrationService {
         .where(eq(sponsors.name, sponsorInfo.name))
         .limit(1);
 
-      if (sponsor.length === 0) {
+      if (sponsors.length === 0) {
         // Create sponsor if doesn't exist
         const [newSponsor] = await db.insert(sponsors).values({
           name: sponsorInfo.name,
           role: sponsorInfo.role || 'Unknown',
           party: sponsorInfo.party || null,
-          isActive: true,
-          createdAt: new Date()
+          is_active: true,
+          created_at: new Date()
         }).returning();
         sponsor = [newSponsor];
       }
 
       // Create or update sponsorship record
       const existingSponsorship = await db.select()
-        .from(billSponsorships)
+        .from(bill_sponsorships)
         .where(and(
-          eq(billSponsorships.billId, billId),
-          eq(billSponsorships.sponsorId, sponsor[0].id)
+          eq(bill_sponsorships.bill_id, bill_id),
+          eq(bill_sponsorships.sponsor_id, sponsor[0].id)
         ))
         .limit(1);
 
-      if (existingSponsorship.length === 0) {
-        await db.insert(billSponsorships).values({
-          billId,
-          sponsorId: sponsor[0].id,
+      if (existingSponsorship.length === 0) { await db.insert(bill_sponsorships).values({
+          bill_id,
+          sponsor_id: sponsor[0].id,
           sponsorshipType: sponsorInfo.sponsorshipType || 'primary',
           sponsorshipDate: new Date(),
-          isActive: true
-        });
+          is_active: true
+         });
       }
     }
   }
@@ -510,14 +509,14 @@ export class GovernmentDataIntegrationService {
   /**
    * Process sponsor affiliations
    */
-  private async processSponsorAffiliations(sponsorId: number, affiliations: GovernmentSponsor['affiliations']): Promise<void> {
+  private async processSponsorAffiliations(sponsor_id: number, affiliations: GovernmentSponsor['affiliations']): Promise<void> {
     if (!affiliations) return;
 
     for (const affiliation of affiliations) {
       const existingAffiliation = await db.select()
         .from(sponsorAffiliations)
         .where(and(
-          eq(sponsorAffiliations.sponsorId, sponsorId),
+          eq(sponsorAffiliations.sponsor_id, sponsor_id),
           eq(sponsorAffiliations.organization, affiliation.organization),
           eq(sponsorAffiliations.type, affiliation.type)
         ))
@@ -525,14 +524,14 @@ export class GovernmentDataIntegrationService {
 
       if (existingAffiliation.length === 0) {
         await db.insert(sponsorAffiliations).values({
-          sponsorId,
+          sponsor_id,
           organization: affiliation.organization,
           role: affiliation.role || null,
           type: affiliation.type,
           startDate: affiliation.startDate ? new Date(affiliation.startDate) : null,
           endDate: affiliation.endDate ? new Date(affiliation.endDate) : null,
-          isActive: !affiliation.endDate,
-          createdAt: new Date()
+          is_active: !affiliation.endDate,
+          created_at: new Date()
         });
       }
     }
@@ -641,15 +640,15 @@ export class GovernmentDataIntegrationService {
     }
 
     return rawData.bills.map((item: any) => ({
-      id: item.id || item.bill_id || item.billId,
+      id: item.id || item.bill_id || item.bill_id,
       title: item.title || item.bill_title,
       description: item.description || item.summary,
       content: item.content || item.full_text,
       summary: item.summary || item.short_summary,
       status: item.status || item.bill_status,
-      billNumber: item.bill_number || item.billNumber || item.number,
-      introducedDate: item.introduced_date || item.introducedDate,
-      lastActionDate: item.last_action_date || item.lastActionDate,
+      bill_number: item.bill_number || item.bill_number || item.number,
+      introduced_date: item.introduced_date || item.introduced_date,
+      last_action_date: item.last_action_date || item.last_action_date,
       sponsors: item.sponsors || [],
       category: item.category || item.subject,
       tags: item.tags || item.keywords || [],
@@ -669,7 +668,7 @@ export class GovernmentDataIntegrationService {
     }
 
     return rawData.sponsors.map((item: any) => ({
-      id: item.id || item.sponsor_id || item.sponsorId,
+      id: item.id || item.sponsor_id || item.sponsor_id,
       name: item.name || item.full_name,
       role: item.role || item.position,
       party: item.party || item.political_party,
@@ -677,7 +676,7 @@ export class GovernmentDataIntegrationService {
       email: item.email || item.contact_email,
       phone: item.phone || item.contact_phone,
       bio: item.bio || item.biography,
-      photoUrl: item.photo_url || item.photoUrl,
+      photo_url: item.photo_url || item.photo_url,
       affiliations: item.affiliations || [],
       source: sourceName,
       sourceUrl: item.url || item.source_url,
@@ -758,8 +757,8 @@ export class GovernmentDataIntegrationService {
 
     // Calculate completeness (percentage of records with all required fields)
     const completeRecords = data.filter(record => {
-      if ('billNumber' in record) {
-        return record.title && record.billNumber && record.status;
+      if ('bill_number' in record) {
+        return record.title && record.bill_number && record.status;
       } else {
         return record.name && record.role;
       }

@@ -22,7 +22,7 @@ vi.mock('../../infrastructure/repositories/analysis-repository-impl');
 const mockDb = {
     select: vi.fn().mockReturnThis(),
     from: vi.fn().mockReturnThis(),
-    where: vi.fn().mockResolvedValue([{ sponsorId: 10 }]), // Mock returning one sponsor
+    where: vi.fn().mockResolvedValue([{ sponsor_id: 10 }]), // Mock returning one sponsor
 };
 
 describe('BillComprehensiveAnalysisService', () => {
@@ -34,10 +34,10 @@ describe('BillComprehensiveAnalysisService', () => {
   const mockStakeholderResult = { primaryBeneficiaries: [], negativelyAffected: [], affectedPopulations: [], economicImpact: { estimatedCost: 100, estimatedBenefit: 150, netImpact: 50, timeframe: 'test', confidence: 80 }, socialImpact: { equityEffect: 10, accessibilityEffect: 20, publicHealthEffect: 5, environmentalEffect: -5 } };
   const mockConflictSummary = { overallRisk: 'low' as const, affectedSponsorsCount: 1, totalFinancialExposureEstimate: 1000, directConflictCount: 0, indirectConflictCount: 0 };
    // Mock conflict detection result (used internally by analyzeSponsorConflictsForBill)
-   const mockConflictDetectionResult = [{ sponsorId: 10, severity: 'low', financialImpact: 1000, conflictType: 'financial_indirect' }];
+   const mockConflictDetectionResult = [{ sponsor_id: 10, severity: 'low', financialImpact: 1000, conflictType: 'financial_indirect' }];
   const mockTransparencyResult = { overall: 75, grade: 'C' as const, breakdown: { sponsorDisclosure: 80, legislativeProcess: 70, financialConflicts: 90, publicAccessibility: 60 } };
-  const mockPublicInterestResult = { score: 65, assessment: 'Moderate' as const, factors: { economicScoreNormalized: 60, socialScoreNormalized: 70, transparencyScore: 75 } };
-  const mockAnalysisRecord = { id: 1, billId: mockBillId, analysisType: 'comprehensive_v1.0', results: {}, confidence: '65', createdAt: new Date(), updatedAt: new Date() } as schema.Analysis;
+  const mockPublicInterestResult = { score: 65, assessment: 'Moderate' as const, factors: { economicScoreNormalized: 60, socialScoreNormalized: 70, transparency_score: 75 } };
+  const mockAnalysisRecord = { id: 1, bill_id: mockBillId, analysis_type: 'comprehensive_v1.0', results: { }, confidence: '65', created_at: new Date(), updated_at: new Date() } as schema.Analysis;
 
 
   beforeEach(() => {
@@ -71,14 +71,14 @@ describe('BillComprehensiveAnalysisService', () => {
   it('should aggregate results from sub-services correctly', async () => {
     const result = await service.analyzeBill(mockBillId);
 
-    expect(result.billId).toBe(mockBillId);
+    expect(result.bill_id).toBe(mockBillId);
     expect(result.analysisId).toMatch(/^comp_analysis_1_\d+$/);
     expect(result.constitutionalAnalysis).toBe(mockConstitutionalResult);
     expect(result.stakeholderImpact).toBe(mockStakeholderResult);
      // Check aggregated conflict summary
      expect(result.conflictAnalysisSummary.overallRisk).toBe('low');
      expect(result.conflictAnalysisSummary.affectedSponsorsCount).toBe(1);
-    expect(result.transparencyScore).toBe(mockTransparencyResult);
+    expect(result.transparency_score).toBe(mockTransparencyResult);
     expect(result.publicInterestScore).toBe(mockPublicInterestResult);
      expect(result.overallConfidence).toBeGreaterThanOrEqual(30);
      expect(result.overallConfidence).toBeLessThanOrEqual(95);
@@ -98,8 +98,7 @@ describe('BillComprehensiveAnalysisService', () => {
     expect(result.recommendedActions).toContain('Low transparency score. Increase public access to documents and process details.');
   });
 
-  it('should save the aggregated analysis results asynchronously', async () => {
-    await service.analyzeBill(mockBillId);
+  it('should save the aggregated analysis results asynchronously', async () => { await service.analyzeBill(mockBillId);
 
     // Check that save was called (it runs async in background, so slight delay might be needed in some test setups)
      // Use process.nextTick or similar if save is truly detached async
@@ -108,12 +107,12 @@ describe('BillComprehensiveAnalysisService', () => {
 
     expect(analysisRepository.save).toHaveBeenCalledTimes(1);
     expect(analysisRepository.save).toHaveBeenCalledWith(expect.objectContaining({
-      billId: mockBillId,
+      bill_id: mockBillId,
       analysisId: expect.stringMatching(/^comp_analysis_1_\d+$/),
       constitutionalAnalysis: mockConstitutionalResult,
-       conflictAnalysisSummary: expect.objectContaining({ overallRisk: 'low' }),
+       conflictAnalysisSummary: expect.objectContaining({ overallRisk: 'low'  }),
       stakeholderImpact: mockStakeholderResult,
-      transparencyScore: mockTransparencyResult,
+      transparency_score: mockTransparencyResult,
       publicInterestScore: mockPublicInterestResult,
        overallConfidence: expect.any(Number),
     }));
@@ -133,7 +132,7 @@ describe('BillComprehensiveAnalysisService', () => {
          });
          // Check that other services were still called and included
          expect(result.stakeholderImpact).toBe(mockStakeholderResult);
-         expect(result.transparencyScore).toBe(mockTransparencyResult);
+         expect(result.transparency_score).toBe(mockTransparencyResult);
          expect(result.publicInterestScore).toBe(mockPublicInterestResult);
          expect(result.overallConfidence).toBeLessThan(70); // Confidence likely reduced
           expect(result.recommendedActions).toContain('High constitutional risk detected. Recommend detailed legal review and possible amendment.'); // Recommendation based on default failure state

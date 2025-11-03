@@ -22,27 +22,26 @@ import {
   AlertTriangle
 } from 'lucide-react';
 
-interface MethodologyProps {
-  billId?: string;
-}
+interface MethodologyProps { bill_id?: string;
+ }
 
-export default function MethodologyPage({ billId }: MethodologyProps) {
+export default function MethodologyPage({ bill_id  }: MethodologyProps) {
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
       {/* Navigation */}
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
         <Link to="/" className="hover:text-primary">Home</Link>
         <span>›</span>
-        <Link to={`/bills/${billId}`} className="hover:text-primary">Bills</Link>
+        <Link to={ `/bills/${bill_id }`} className="hover:text-primary">Bills</Link>
         <span>›</span>
-        <Link to={`/bills/${billId}/sponsorship-analysis`} className="hover:text-primary">Sponsorship Analysis</Link>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="hover:text-primary">Sponsorship Analysis</Link>
         <span>›</span>
         <span className="text-foreground">Methodology</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6">
-        <Link to={`/bills/${billId}/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Analysis Navigation
         </Link>
@@ -443,13 +442,13 @@ export default function MethodologyPage({ billId }: MethodologyProps) {
 
       {/* Navigation Actions */}
       <div className="flex justify-between items-center">
-        <Link to={`/bills/${billId}/sponsorship-analysis/financial-network`}>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis/financial-network`}>
           <Button variant="outline">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Previous: Financial Network
           </Button>
         </Link>
-        <Link to={`/bills/${billId}/sponsorship-analysis`}>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`}>
           <Button>
             Return to Navigation
           </Button>

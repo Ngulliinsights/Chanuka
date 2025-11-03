@@ -28,9 +28,9 @@ export class FinancialAnalysisService {
    * Builds a comprehensive relationship map that reveals networks of financial
    * connections and potential conflicts of interest.
    */
-  async buildRelationshipMap(sponsorId: number): Promise<RelationshipMapping> {
+  async buildRelationshipMap(sponsor_id: number): Promise<RelationshipMapping> {
     try {
-      const cacheKey = this.config.cache.keyPrefixes.relationships(sponsorId);
+      const cacheKey = this.config.cache.keyPrefixes.relationships(sponsor_id);
 
       return await cache.getOrSetCache(
         cacheKey,
@@ -38,19 +38,19 @@ export class FinancialAnalysisService {
         async () => {
           // Gather all relationship data sources in parallel
           const [sponsorInfo, disclosures, affiliations] = await Promise.all([
-            disclosureProcessingService.getSponsorBasicInfo(sponsorId),
-            disclosureProcessingService.getDisclosureData(sponsorId),
-            disclosureProcessingService.getAffiliations(sponsorId)
+            disclosureProcessingService.getSponsorBasicInfo(sponsor_id),
+            disclosureProcessingService.getDisclosureData(sponsor_id),
+            disclosureProcessingService.getAffiliations(sponsor_id)
           ]);
 
           // Build relationships from financial disclosures
           const disclosureRelationships = disclosures
             .filter(d => d.source && d.amount)
-            .map(d => this.mapDisclosureToRelationship(sponsorId, d));
+            .map(d => this.mapDisclosureToRelationship(sponsor_id, d));
 
           // Build relationships from organizational affiliations
           const affiliationRelationships = affiliations
-            .map(a => this.mapAffiliationToRelationship(sponsorId, a));
+            .map(a => this.mapAffiliationToRelationship(sponsor_id, a));
 
           // Combine and deduplicate to handle entities appearing in both sources
           const allRelationships = [...disclosureRelationships, ...affiliationRelationships];
@@ -78,7 +78,7 @@ export class FinancialAnalysisService {
           );
 
           return {
-            sponsorId,
+            sponsor_id,
             sponsorName: sponsorInfo.name,
             relationships: uniqueRelationships,
             totalFinancialExposure,
@@ -90,7 +90,7 @@ export class FinancialAnalysisService {
         }
       );
     } catch (error) {
-      logger.error('Error building relationship map:', { sponsorId }, error);
+      logger.error('Error building relationship map:', { sponsor_id }, error);
       throw new DatabaseError('Failed to build financial relationship map');
     }
   }
@@ -219,7 +219,7 @@ export class FinancialAnalysisService {
    * Converts a financial disclosure into a relationship object for network analysis.
    */
   private mapDisclosureToRelationship(
-    sponsorId: number,
+    sponsor_id: number,
     disclosure: FinancialDisclosure
   ): FinancialRelationship {
     // Map disclosure types to relationship types
@@ -235,12 +235,12 @@ export class FinancialAnalysisService {
     };
 
     return {
-      sponsorId,
+      sponsor_id,
       relatedEntity: disclosure.source!,
       relationshipType: typeMapping[disclosure.disclosureType] || 'investment',
       strength: this.calculateFinancialStrength(disclosure.amount || 0),
       financialValue: disclosure.amount,
-      isActive: true,
+      is_active: true,
       conflictPotential: disclosure.riskLevel
     };
   }
@@ -249,7 +249,7 @@ export class FinancialAnalysisService {
    * Converts an organizational affiliation into a relationship object.
    */
   private mapAffiliationToRelationship(
-    sponsorId: number,
+    sponsor_id: number,
     affiliation: SponsorAffiliation
   ): FinancialRelationship {
     const typeMapping: Record<string, FinancialRelationship['relationshipType']> = {
@@ -260,13 +260,13 @@ export class FinancialAnalysisService {
     };
 
     return {
-      sponsorId,
+      sponsor_id,
       relatedEntity: affiliation.organization || 'Unknown Organization',
       relationshipType: typeMapping[affiliation.type] || 'business_partner',
       strength: this.calculateAffiliationStrength(affiliation),
       startDate: affiliation.startDate ? new Date(affiliation.startDate) : undefined,
       endDate: affiliation.endDate ? new Date(affiliation.endDate) : undefined,
-      isActive: Boolean(affiliation.isActive),
+      is_active: Boolean(affiliation.is_active),
       conflictPotential: this.assessAffiliationConflict(affiliation)
     };
   }
@@ -288,7 +288,7 @@ export class FinancialAnalysisService {
    */
   private calculateAffiliationStrength(affiliation: SponsorAffiliation): number {
     let strength = 50;
-    if (affiliation.isActive) strength += 30;
+    if (affiliation.is_active) strength += 30;
     if (affiliation.conflictType) strength += 20;
     return Math.min(strength, 100);
   }
@@ -315,7 +315,7 @@ export class FinancialAnalysisService {
   ): RelationshipMapping['riskAssessment'] {
     const criticalConflicts = conflicts.filter(c => c.severity === 'critical').length;
     const highConflicts = conflicts.filter(c => c.severity === 'high').length;
-    const thresholds = this.config.riskThresholds.financialExposure;
+    const thresholds = this.config.riskThresholds.financial_exposure;
 
     // Critical conditions
     if (exposure > thresholds.high || criticalConflicts > 0) {

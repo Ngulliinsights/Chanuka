@@ -119,7 +119,7 @@ export const ConfirmPasswordInput: React.FC<Omit<AuthInputProps, 'name' | 'type'
   />
 );
 
-export const NameInput: React.FC<Omit<AuthInputProps, 'type'> & { fieldType: 'firstName' | 'lastName' }> = ({ 
+export const NameInput: React.FC<Omit<AuthInputProps, 'type'> & { fieldType: 'first_name' | 'last_name' }> = ({ 
   fieldType, 
   ...props 
 }) => (

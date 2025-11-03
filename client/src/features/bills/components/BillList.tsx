@@ -123,38 +123,38 @@ export const BillList = ({
             {view === 'card' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {bills.map(bill => (
-                  <BillCard key={bill.id} bill={bill} />
+                  <BillCard key={bills.id} bill={bill} />
                 ))}
               </div>
             ) : (
               <div className="space-y-4">
                 {bills.map(bill => (
-                  <Link key={bill.id} to={`/bills/${bill.id}`}>
+                  <Link key={bills.id} to={`/bills/${bills.id}`}>
                     <Card className="hover:shadow-md transition-shadow cursor-pointer group">
                       <CardHeader className="pb-2">
                         <div className="flex justify-between items-start">
-                          <Badge className={`${getStatusStyle(bill.status)} capitalize`}>
-                            {bill.status}
+                          <Badge className={`${getStatusStyle(bills.status)} capitalize`}>
+                            {bills.status}
                           </Badge>
                           <div className="text-sm text-muted-foreground">
-                            {new Date(bill.introducedDate).toLocaleDateString()}
+                            {new Date(bills.introduced_date).toLocaleDateString()}
                           </div>
                         </div>
                         <CardTitle className="text-xl mt-2 text-primary-700 group-hover:text-primary-800 transition-colors">
-                          {bill.title}
+                          {bills.title}
                         </CardTitle>
                         <CardDescription className="line-clamp-2">
-                          {bill.summary}
+                          {bills.summary}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="pb-4">
                         <div className="text-sm">
-                          {bill.sponsors && bill.sponsors.length > 0 && (
+                          {bills.sponsors && bills.sponsors.length > 0 && (
                             <>
-                              <span className="font-medium">Sponsor:</span> {bill.sponsors[0].name}
-                              {bill.sponsors.length > 1 && (
+                              <span className="font-medium">Sponsor:</span> {bills.sponsors[0].name}
+                              {bills.sponsors.length > 1 && (
                                 <span className="ml-1 text-muted-foreground">
-                                  +{formatCount(bill.sponsors.length - 1, 'cosponsor')}
+                                  +{formatCount(bills.sponsors.length - 1, 'cosponsor')}
                                 </span>
                               )}
                             </>
@@ -163,23 +163,23 @@ export const BillList = ({
                       </CardContent>
                       <CardFooter className="pt-0 border-t flex justify-between text-sm text-muted-foreground">
                         <div className="flex gap-4">
-                          {bill.engagementMetrics && (
+                          {bills.engagementMetrics && (
                             <>
                               <div className="flex items-center">
                                 <span className="mr-1">🔍</span>
-                                <span>{formatCount(bill.engagementMetrics.views, 'view')}</span>
+                                <span>{formatCount(bills.engagementMetrics.views, 'view')}</span>
                               </div>
                               <div className="flex items-center">
                                 <span className="mr-1">💬</span>
-                                <span>{formatCount(bill.comments?.length || 0, 'comment')}</span>
+                                <span>{formatCount(bills.comments?.length || 0, 'comment')}</span>
                               </div>
                             </>
                           )}
                         </div>
-                        {bill.trackingCount && (
+                        {bills.trackingCount && (
                           <div className="flex items-center">
                             <span className="mr-1">👁️</span>
-                            <span>{formatCount(bill.trackingCount, 'tracking')}</span>
+                            <span>{formatCount(bills.trackingCount, 'tracking')}</span>
                           </div>
                         )}
                       </CardFooter>

@@ -19,7 +19,7 @@ interface ConflictNode {
   id: string;
   type: 'sponsor' | 'organization' | 'bill';
   name: string;
-  conflictLevel: 'low' | 'medium' | 'high' | 'critical';
+  conflict_level: 'low' | 'medium' | 'high' | 'critical';
   size: number;
   color: string;
   metadata: Record<string, any>;
@@ -54,17 +54,15 @@ interface ConflictMapping {
   };
 }
 
-interface NetworkVisualizationProps {
-  billId?: number;
-  sponsorId?: number;
+interface NetworkVisualizationProps { bill_id?: number;
+  sponsor_id?: number;
   height?: number;
-}
+ }
 
-const ConflictNetworkVisualization: React.FC<NetworkVisualizationProps> = ({ 
-  billId, 
-  sponsorId, 
+const ConflictNetworkVisualization: React.FC<NetworkVisualizationProps> = ({ bill_id, 
+  sponsor_id, 
   height = 600 
-}) => {
+ }) => {
   const [mapping, setMapping] = useState<ConflictMapping | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,16 +76,15 @@ const ConflictNetworkVisualization: React.FC<NetworkVisualizationProps> = ({
 
   useEffect(() => {
     fetchMappingData();
-  }, [billId, sponsorId]);
+  }, [bill_id, sponsor_id]);
 
-  const fetchMappingData = async () => {
-    try {
+  const fetchMappingData = async () => { try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (billId) params.append('billId', billId.toString());
-      if (sponsorId) params.append('sponsorId', sponsorId.toString());
+      if (bill_id) params.append('bill_id', bill_id.toString());
+      if (sponsor_id) params.append('sponsor_id', sponsor_id.toString());
 
-      const response = await fetch(`/api/sponsor-conflict-analysis/mapping?${params}`);
+      const response = await fetch(`/api/sponsor-conflict-analysis/mapping?${params }`);
       if (!response.ok) {
         throw new Error('Failed to fetch conflict mapping data');
       }
@@ -109,7 +106,7 @@ const ConflictNetworkVisualization: React.FC<NetworkVisualizationProps> = ({
       high: '#FF5722',
       critical: '#D32F2F'
     };
-    return severityColors[node.conflictLevel];
+    return severityColors[node.conflict_level];
   };
 
   const getEdgeColor = (edge: ConflictEdge) => {
@@ -134,7 +131,7 @@ const ConflictNetworkVisualization: React.FC<NetworkVisualizationProps> = ({
       high: 1.5,
       critical: 2
     };
-    return baseSizes[node.type] * severityMultiplier[node.conflictLevel];
+    return baseSizes[node.type] * severityMultiplier[node.conflict_level];
   };
 
   const calculateNodePositions = (nodes: ConflictNode[], edges: ConflictEdge[]) => {
@@ -237,7 +234,7 @@ const ConflictNetworkVisualization: React.FC<NetworkVisualizationProps> = ({
 
   const filteredNodes = filterSeverity === 'all' 
     ? mapping.nodes 
-    : mapping.nodes.filter(n => n.conflictLevel === filterSeverity);
+    : mapping.nodes.filter(n => n.conflict_level === filterSeverity);
   
   const filteredEdges = mapping.edges.filter(e => 
     filteredNodes.some(n => n.id === e.source) && 
@@ -461,7 +458,7 @@ const ConflictNetworkVisualization: React.FC<NetworkVisualizationProps> = ({
                 <div className="flex items-center space-x-2">
                   <div 
                     className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: getNodeColor({ conflictLevel: level } as ConflictNode) }}
+                    style={{ backgroundColor: getNodeColor({ conflict_level: level } as ConflictNode) }}
                   />
                   <span className="capitalize">{level}:</span>
                 </div>
@@ -500,11 +497,11 @@ const ConflictNetworkVisualization: React.FC<NetworkVisualizationProps> = ({
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Selected: {selectedNode.name}</span>
-              <Badge className={`${selectedNode.conflictLevel === 'critical' ? 'bg-red-100 text-red-800' :
-                selectedNode.conflictLevel === 'high' ? 'bg-orange-100 text-orange-800' :
-                selectedNode.conflictLevel === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+              <Badge className={`${selectedNode.conflict_level === 'critical' ? 'bg-red-100 text-red-800' :
+                selectedNode.conflict_level === 'high' ? 'bg-orange-100 text-orange-800' :
+                selectedNode.conflict_level === 'medium' ? 'bg-yellow-100 text-yellow-800' :
                 'bg-green-100 text-green-800'}`}>
-                {selectedNode.conflictLevel.toUpperCase()}
+                {selectedNode.conflict_level.toUpperCase()}
               </Badge>
             </CardTitle>
           </CardHeader>
@@ -514,7 +511,7 @@ const ConflictNetworkVisualization: React.FC<NetworkVisualizationProps> = ({
                 <span className="font-medium">Type:</span> {selectedNode.type}
               </div>
               <div>
-                <span className="font-medium">Conflict Level:</span> {selectedNode.conflictLevel}
+                <span className="font-medium">Conflict Level:</span> {selectedNode.conflict_level}
               </div>
               {selectedNode.metadata.party && (
                 <div>

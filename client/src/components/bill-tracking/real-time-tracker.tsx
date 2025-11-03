@@ -27,15 +27,13 @@ import {
 import { toast } from "sonner";
 import { logger } from '../../utils/browser-logger';
 
-interface RealTimeBillTrackerProps {
-  billId?: number;
+interface RealTimeBillTrackerProps { bill_id?: number;
   userToken?: string;
-}
+ }
 
-export function RealTimeBillTracker({
-  billId,
+export function RealTimeBillTracker({ bill_id,
   userToken,
-}: RealTimeBillTrackerProps) {
+ }: RealTimeBillTrackerProps) {
   const {
     isConnected,
     connectionStatus,
@@ -45,7 +43,7 @@ export function RealTimeBillTracker({
     unsubscribeFromBill,
   } = useWebSocket();
   const { updates, notifications, clearUpdates, clearNotifications } =
-    useBillUpdates(billId);
+    useBillUpdates(bill_id);
 
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [preferences, setPreferences] = useState({
@@ -89,14 +87,12 @@ export function RealTimeBillTracker({
       toast.success("Preferences updated successfully");
     };
 
-    const handleSubscribed = (data: any) => {
-      setIsSubscribed(true);
-      toast.success(`Subscribed to bill ${data.billId} updates`);
+    const handleSubscribed = (data: any) => { setIsSubscribed(true);
+      toast.success(`Subscribed to bill ${data.bill_id } updates`);
     };
 
-    const handleUnsubscribed = (data: any) => {
-      setIsSubscribed(false);
-      toast.info(`Unsubscribed from bill ${data.billId} updates`);
+    const handleUnsubscribed = (data: any) => { setIsSubscribed(false);
+      toast.info(`Unsubscribed from bill ${data.bill_id } updates`);
     };
 
     const handleNotification = (notification: any) => {
@@ -128,21 +124,19 @@ export function RealTimeBillTracker({
     };
   }, []);
 
-  const handleSubscribe = () => {
-    if (billId && isConnected) {
-      subscribeToBill(billId, [
+  const handleSubscribe = () => { if (bill_id && isConnected) {
+      subscribeToBill(bill_id, [
         "status_change",
         "new_comment",
         "amendment",
         "voting_scheduled",
       ]);
-    }
+     }
   };
 
-  const handleUnsubscribe = () => {
-    if (billId && isConnected) {
-      unsubscribeFromBill(billId);
-    }
+  const handleUnsubscribe = () => { if (bill_id && isConnected) {
+      unsubscribeFromBill(bill_id);
+     }
   };
 
   const handleUpdatePreferences = () => {
@@ -190,8 +184,8 @@ export function RealTimeBillTracker({
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">
-                {billId
-                  ? `Tracking Bill #${billId}`
+                { bill_id
+                  ? `Tracking Bill #${bill_id }`
                   : "No specific bill selected"}
               </p>
               <p className="text-xs text-muted-foreground">
@@ -200,9 +194,9 @@ export function RealTimeBillTracker({
               </p>
             </div>
             <div className="flex gap-2">
-              {billId && (
+              { bill_id && (
                 <Button
-                  onClick={isSubscribed ? handleUnsubscribe : handleSubscribe}
+                  onClick={isSubscribed ? handleUnsubscribe : handleSubscribe }
                   disabled={!isConnected}
                   variant={isSubscribed ? "outline" : "default"}
                   size="sm"
@@ -424,7 +418,7 @@ export function RealTimeBillTracker({
                   </div>
                   <div className="text-sm">
                     <p className="font-medium">
-                      {update.data.title || `Bill #${update.data.billId}`}
+                      { update.data.title || `Bill #${update.data.bill_id }`}
                     </p>
                     {update.data.oldStatus && update.data.newStatus && (
                       <p className="text-muted-foreground">

@@ -209,8 +209,8 @@ describe('RegisterForm Component', () => {
 
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledWith({
-        firstName: 'John',
-        lastName: 'Doe',
+        first_name: 'John',
+        last_name: 'Doe',
         email: 'john@example.com',
         password: 'SecurePass123!',
       });
@@ -235,9 +235,9 @@ describe('RegisterForm Component', () => {
   it('should validate name field requirements', async () => {
     renderWithProviders(<RegisterForm {...defaultProps} />);
     
-    const firstNameInput = screen.getByLabelText(/first name/i);
+    const first_nameInput = screen.getByLabelText(/first name/i);
     
-    await FormTestHelper.fillInput(firstNameInput, 'A');
+    await FormTestHelper.fillInput(first_nameInput, 'A');
     await userEvent.tab(); // Trigger blur
     
     await waitFor(() => {

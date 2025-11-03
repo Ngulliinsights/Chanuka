@@ -134,12 +134,12 @@ export function sanitizeInput(input: string): string {
 /**
  * Validate Canadian bill number format
  */
-export function validateBillNumber(billNumber: string): { isValid: boolean; normalized?: string; error?: string } {
-  if (!billNumber || typeof billNumber !== 'string') {
+export function validateBillNumber(bill_number: string): { isValid: boolean; normalized?: string; error?: string } {
+  if (!bill_number || typeof bill_number !== 'string') {
     return { isValid: false, error: 'Bill number is required' };
   }
 
-  const trimmed = billNumber.trim().toUpperCase();
+  const trimmed = bill_number.trim().toUpperCase();
   const billRegex = /^[CS]-\d{1,4}$/;
 
   if (!billRegex.test(trimmed)) {

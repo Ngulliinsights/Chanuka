@@ -28,7 +28,7 @@ export interface ConstitutionalAnalysisResult {
 }
 
 /**
- * Service dedicated to analyzing the constitutional aspects of a bill.
+ * Service dedicated to analyzing the constitutional aspects of a bills.
  */
 export class ConstitutionalAnalysisService {
     private get db() { return readDatabase; }
@@ -45,10 +45,8 @@ export class ConstitutionalAnalysisService {
     /**
      * Performs constitutional analysis on a given bill ID.
      */
-    async analyzeBill(billId: number): Promise<ConstitutionalAnalysisResult> {
-        logger.info(`🏛️ Performing constitutional analysis for bill ${billId}`);
-        try {
-            const bill = await this.getBillContent(billId);
+    async analyzeBill(bill_id: number): Promise<ConstitutionalAnalysisResult> { logger.info(`🏛️ Performing constitutional analysis for bill ${bill_id }`);
+        try { const bill = await this.getBillContent(bill_id);
             const billContent = bill?.content ?? '';
 
             const concerns = this.identifyConstitutionalConcerns(billContent);
@@ -56,21 +54,20 @@ export class ConstitutionalAnalysisService {
             const score = this.calculateConstitutionalityScore(concerns);
             const risk = this.assessConstitutionalRisk(score, concerns);
 
-            return { constitutionalityScore: score, concerns, precedents, riskAssessment: risk };
-        } catch (error) {
-            logger.error(`Error during constitutional analysis for bill ${billId}:`, { component: 'ConstitutionalAnalysisService'}, error);
-            throw new Error(`Constitutional analysis failed for bill ${billId}`);
+            return { constitutionalityScore: score, concerns, precedents, riskAssessment: risk  };
+        } catch (error) { logger.error(`Error during constitutional analysis for bill ${bill_id }:`, { component: 'ConstitutionalAnalysisService'}, error);
+            throw new Error(`Constitutional analysis failed for bill ${ bill_id }`);
         }
     }
 
     /** Fetches required bill content */
-    private async getBillContent(billId: number): Promise<Pick<schema.Bill, 'id' | 'content'> | null> {
+    private async getBillContent(bill_id: number): Promise<Pick<schema.Bill, 'id' | 'content'> | null> {
          const [bill] = await this.db
              .select({ id: schema.bills.id, content: schema.bills.content })
              .from(schema.bills)
-             .where(eq(schema.bills.id, billId))
+             .where(eq(schema.bills.id, bill_id))
              .limit(1);
-         if (!bill) throw new Error(`Bill ${billId} not found for constitutional analysis.`);
+         if (!bill) throw new Error(`Bill ${ bill_id } not found for constitutional analysis.`);
          return bill;
      }
 

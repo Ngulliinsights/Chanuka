@@ -49,16 +49,16 @@ export interface User {
   id: number;
   email: string;
   username?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  displayName?: string | null;
+  first_name?: string | null;
+  last_name?: string | null;
+  display_name?: string | null;
   role: UserRole;
-  avatarUrl?: string | null;
+  avatar_url?: string | null;
   expertise?: string[] | null;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  lastLoginAt?: Date | null;
+  is_active: boolean;
+  created_at: Date;
+  updated_at: Date;
+  last_login_at?: Date | null;
 }
 
 export type UserRole = 'public' | 'citizen' | 'expert' | 'admin' | 'journalist' | 'advocate';
@@ -66,8 +66,8 @@ export type UserRole = 'public' | 'citizen' | 'expert' | 'admin' | 'journalist' 
 export interface UserProfile extends User {
   bio?: string | null;
   interests?: string[] | null;
-  verificationStatus?: 'pending' | 'verified' | 'rejected';
-  reputationScore?: number;
+  verification_status?: 'pending' | 'verified' | 'rejected';
+  reputation_score?: number;
   preferences?: UserPreferences;
 }
 
@@ -84,11 +84,11 @@ export interface Bill {
   id: number;
   title: string;
   number: string;
-  introducedDate: Date;
+  introduced_date: Date;
   status: BillStatus;
   summary?: string | null;
-  fullText?: string | null;
-  transparencyScore?: number;
+  full_text?: string | null;
+  transparency_score?: number;
   conflictIndicators?: ConflictIndicator[];
   sections?: BillSection[];
   sponsors?: Sponsor[];
@@ -96,8 +96,8 @@ export interface Bill {
   committees?: string[];
   tags?: string[];
   sourceUrl?: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export type BillStatus =
@@ -114,7 +114,7 @@ export interface BillSection {
   number: string;
   title: string;
   content?: string;
-  conflictLevel?: 'low' | 'medium' | 'high' | 'critical';
+  conflict_level?: 'low' | 'medium' | 'high' | 'critical';
   affectedSponsors?: string[];
   description?: string;
 }
@@ -124,7 +124,7 @@ export interface ConflictIndicator {
   severity: 'low' | 'medium' | 'high' | 'critical';
   description: string;
   section?: string;
-  sponsorId?: number;
+  sponsor_id?: number;
 }
 
 // ===== SPONSOR TYPES =====
@@ -137,14 +137,14 @@ export interface Sponsor {
   constituency?: string;
   role: 'primary' | 'co-sponsor';
   sponsorshipDate: Date;
-  conflictLevel?: 'low' | 'medium' | 'high' | 'critical';
-  financialExposure?: number;
+  conflict_level?: 'low' | 'medium' | 'high' | 'critical';
+  financial_exposure?: number;
   affiliations?: Affiliation[];
-  votingAlignment?: number;
+  voting_alignment?: number;
   transparency?: TransparencyInfo;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  is_active: boolean;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface Affiliation {
@@ -230,11 +230,11 @@ export interface Expert {
   email: string;
   expertise: string[];
   qualifications: string[];
-  verificationStatus: 'pending' | 'verified' | 'rejected';
-  reputationScore: number;
-  isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  verification_status: 'pending' | 'verified' | 'rejected';
+  reputation_score: number;
+  is_active: boolean;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface VerificationTask {
@@ -249,45 +249,42 @@ export interface VerificationTask {
   priority?: 'low' | 'medium' | 'high' | 'urgent';
 }
 
-export interface VerificationRequest {
-  billId: number;
+export interface VerificationRequest { bill_id: number;
   expertId: number;
-  verificationStatus: string;
+  verification_status: string;
   confidence?: number;
   feedback?: string;
   metadata?: Record<string, unknown>;
-}
+ }
 
 export type VerificationStatus = 'pending' | 'in_progress' | 'approved' | 'rejected' | 'disputed';
 
 // ===== COMMENT TYPES =====
 
-export interface Comment {
-  id: number;
-  billId: number;
-  userId: number;
+export interface Comment { id: number;
+  bill_id: number;
+  user_id: number;
   content: string;
-  parentId?: number;
+  parent_id?: number;
   isExpert: boolean;
-  verificationStatus?: 'pending' | 'verified' | 'rejected';
+  verification_status?: 'pending' | 'verified' | 'rejected';
   upvotes: number;
   downvotes: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
+  created_at: Date;
+  updated_at: Date;
+  }
 
 // ===== NOTIFICATION TYPES =====
 
-export interface Notification {
-  id: number;
-  userId: number;
+export interface Notification { id: number;
+  user_id: number;
   type: NotificationType;
   title: string;
   message: string;
   data?: Record<string, unknown>;
-  isRead: boolean;
-  createdAt: Date;
-}
+  is_read: boolean;
+  created_at: Date;
+ }
 
 export type NotificationType =
   | 'bill_status_change'
@@ -322,15 +319,14 @@ export interface BillFilters {
 
 // ===== ENGAGEMENT TYPES =====
 
-export interface BillEngagement {
-  billId: number;
-  userId: number;
+export interface BillEngagement { bill_id: number;
+  user_id: number;
   views: number;
   comments: number;
   shares: number;
   lastEngaged: Date;
   isTracked: boolean;
-}
+  }
 
 export interface BillEngagementStats {
   totalViews: number;
@@ -351,8 +347,8 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
+  first_name: string;
+  last_name: string;
   role?: UserRole;
 }
 

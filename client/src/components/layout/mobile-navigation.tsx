@@ -232,7 +232,7 @@ const MobileNavigation: React.FC<MobileNavigationProps> = ({
   }, [onClose, setIsOpen]);
 
   // Memoized path checker to prevent recreation
-  const isActivePath = useCallback(
+  const is_activePath = useCallback(
     (path: string): boolean => {
       if (path === "/") {
         return location.pathname === "/";
@@ -387,7 +387,7 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
   }, [onLogout]);
 
   // Memoized path checker to prevent recreation
-  const isActivePath = useCallback(
+  const is_activePath = useCallback(
     (path: string): boolean => {
       if (path === "/") {
         return location.pathname === "/";
@@ -539,12 +539,12 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
                     <User className="h-5 w-5 text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{user.name}</p>
+                    <p className="font-medium text-sm truncate">{users.name}</p>
                     <p className="text-xs text-gray-500 truncate">
-                      {user.email}
+                      {users.email}
                     </p>
                     <Badge variant="outline" className="text-xs mt-1">
-                      {user.role}
+                      {users.role}
                     </Badge>
                   </div>
                 </div>
@@ -561,11 +561,11 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
             {/* Navigation Items */}
             <nav className="flex-1 space-y-2">
               {NAVIGATION_ITEMS.map((item) => {
-                const isActive = isActivePath(item.href);
+                const is_active = is_activePath(item.href);
                 const linkClassName = `flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                   touchOptimized ? "min-h-[44px]" : ""
                 } ${
-                  isActive
+                  is_active
                     ? "bg-blue-50 text-blue-700 border border-blue-200"
                     : "text-gray-700 hover:bg-gray-50 active:bg-gray-100"
                 }`;
@@ -596,7 +596,7 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
                     to="/admin"
                     onClick={handleSheetClose}
                     className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
-                      isActivePath("/admin")
+                      is_activePath("/admin")
                         ? "bg-red-50 text-red-700 border border-red-200"
                         : "text-gray-700 hover:bg-gray-50"
                     }`}
@@ -667,11 +667,11 @@ const MobileNavigationContent: React.FC<MobileNavigationContentProps> = ({
       >
         <div className="flex items-center justify-around">
           {bottomNavItems.map((item) => {
-            const isActive = isActivePath(item.href);
+            const is_active = is_activePath(item.href);
             const linkClassName = `flex flex-col items-center space-y-1 p-2 rounded-lg transition-colors ${
               touchOptimized ? "min-w-[44px] min-h-[44px]" : ""
             } ${
-              isActive
+              is_active
                 ? "text-blue-600"
                 : "text-gray-500 hover:text-gray-700 active:text-gray-800"
             }`;

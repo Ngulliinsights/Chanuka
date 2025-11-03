@@ -15,7 +15,7 @@ export interface DataSource {
     requestsPerDay: number;
   };
   endpoints: ApiEndpoint[];
-  isActive: boolean;
+  is_active: boolean;
   priority: number; // Higher number = higher priority for conflict resolution
   lastSync?: Date;
   healthStatus: 'healthy' | 'degraded' | 'down' | 'unknown';
@@ -150,13 +150,13 @@ export interface ApiResponse<T = any> {
 }
 
 export interface BillData {
-  billNumber: string;
+  bill_number: string;
   title: string;
   summary?: string;
   content?: string;
   status: string;
-  introducedDate: Date;
-  lastActionDate?: Date;
+  introduced_date: Date;
+  last_action_date?: Date;
   sponsors: SponsorData[];
   committees?: string[];
   votes?: VoteData[];
@@ -176,9 +176,8 @@ export interface SponsorData {
   sponsorshipDate: Date;
 }
 
-export interface VoteData {
-  id: string;
-  billId: string;
+export interface VoteData { id: string;
+  bill_id: string;
   date: Date;
   type: 'committee' | 'floor' | 'amendment';
   result: 'passed' | 'failed' | 'tabled';
@@ -187,20 +186,19 @@ export interface VoteData {
     no: number;
     abstain: number;
     present: number;
-  };
+   };
   details?: any;
 }
 
-export interface AmendmentData {
-  id: string;
-  billId: string;
+export interface AmendmentData { id: string;
+  bill_id: string;
   title: string;
   description?: string;
   sponsor: string;
   status: string;
-  introducedDate: Date;
+  introduced_date: Date;
   content?: string;
-}
+ }
 
 export interface DataSourceHealth {
   sourceId: string;

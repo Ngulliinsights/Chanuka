@@ -4,7 +4,7 @@ import { Metric, MetricsExporter, PrometheusConfig, OpenTelemetryConfig } from '
 
 export class PrometheusExporter implements MetricsExporter {
   public readonly name = 'prometheus';
-  public readonly contentType = 'text/plain; version=0.0.4; charset=utf-8';
+  public readonly content_type = 'text/plain; version=0.0.4; charset=utf-8';
 
   private config: Required<PrometheusConfig>;
 
@@ -31,7 +31,7 @@ export class PrometheusExporter implements MetricsExporter {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          'Content-Type': this.contentType,
+          'Content-Type': this.content_type,
           ...this.config.headers,
         },
         body: prometheusFormat,
@@ -83,7 +83,7 @@ export class PrometheusExporter implements MetricsExporter {
 
 export class OpenTelemetryExporter implements MetricsExporter {
   public readonly name = 'opentelemetry';
-  public readonly contentType = 'application/json';
+  public readonly content_type = 'application/json';
 
   private config: Required<OpenTelemetryConfig>;
 
@@ -104,7 +104,7 @@ export class OpenTelemetryExporter implements MetricsExporter {
       const response = await fetch(this.config.endpoint, {
         method: 'POST',
         headers: {
-          'Content-Type': this.contentType,
+          'Content-Type': this.content_type,
           ...this.config.headers,
         },
         body: JSON.stringify(otlpFormat),
@@ -234,7 +234,7 @@ export class OpenTelemetryExporter implements MetricsExporter {
 
 export class ConsoleExporter implements MetricsExporter {
   public readonly name = 'console';
-  public readonly contentType = 'text/plain';
+  public readonly content_type = 'text/plain';
 
   export(metrics: Metric[]): void {
     console.log('=== Metrics Export ===');
@@ -262,7 +262,7 @@ export class ConsoleExporter implements MetricsExporter {
 
 export class JSONExporter implements MetricsExporter {
   public readonly name = 'json';
-  public readonly contentType = 'application/json';
+  public readonly content_type = 'application/json';
 
   export(metrics: Metric[]): void {
     const output = {

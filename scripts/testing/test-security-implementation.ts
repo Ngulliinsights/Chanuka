@@ -115,7 +115,7 @@ async function testSecurityImplementation() {
   totalTests++;
   try {
     await securityAuditService.logSecurityEvent({
-      eventType: 'test_event',
+      event_type: 'test_event',
       severity: 'low',
       success: true,
       details: { test: true }

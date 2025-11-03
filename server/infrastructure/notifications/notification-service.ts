@@ -1,41 +1,38 @@
 import { eq, desc, and, sql, count } from 'drizzle-orm';
 import { database as db } from '../../../shared/database/connection';
-import { notifications, users, bills } from '../../../shared/schema';
+import { notifications, users, bills } from '@shared/schema';
 import { webSocketService } from '../websocket.js';
 import { z } from 'zod';
 import { logger  } from '../../../shared/core/src/index.js';
 
 // Core notification interfaces (consolidated from basic services)
-export interface NotificationData {
-  userId: string;
+export interface NotificationData { user_id: string;
   type: 'verification_status' | 'bill_update' | 'comment_reply' | 'system_alert';
   title: string;
   message: string;
   relatedBillId?: number;
   metadata?: Record<string, any>;
-}
+ }
 
-export interface NotificationHistory {
-  id: number;
-  userId: string;
+export interface NotificationHistory { id: number;
+  user_id: string;
   type: string;
   title: string;
   message: string;
   relatedBillId?: number;
-  isRead: boolean;
-  createdAt: Date;
+  is_read: boolean;
+  created_at: Date;
   billTitle?: string;
-}
+ }
 
 // Validation schemas
-const notificationDataSchema = z.object({
-  userId: z.string(),
+const notificationDataSchema = z.object({ user_id: z.string(),
   type: z.enum(['verification_status', 'bill_update', 'comment_reply', 'system_alert']),
   title: z.string().min(1).max(200),
   message: z.string().min(1).max(1000),
   relatedBillId: z.number().optional(),
   metadata: z.record(z.any()).optional()
-});
+ });
 
 /**
  * Notification Service
@@ -69,28 +66,27 @@ export class NotificationService {
   /**
    * Create a basic notification
    */
-  async createNotification(data: NotificationData): Promise<any> {
-    try {
+  async createNotification(data: NotificationData): Promise<any> { try {
       // Validate input
       const validatedData = notificationDataSchema.parse(data);
 
       const notification = await db
         .insert(notifications)
         .values({
-          userId: validatedData.userId,
+          user_id: validatedData.user_id,
           type: validatedData.type as 'verification_status' | 'bill_update' | 'comment_reply',
           title: validatedData.title,
           message: validatedData.message,
           relatedBillId: validatedData.relatedBillId,
-          isRead: false,
-          createdAt: new Date()
-        })
+          is_read: false,
+          created_at: new Date()
+         })
         .returning();
 
       // Send real-time notification via WebSocket
-      await this.sendRealTimeNotification(validatedData.userId, notification[0]);
+      await this.sendRealTimeNotification(validatedData.user_id, notification[0]);
 
-      logger.info(`📱 Created notification for user ${validatedData.userId}: ${validatedData.title}`);
+      logger.info(`📱 Created notification for user ${validatedData.user_id}: ${validatedData.title}`);
       return notification[0];
 
     } catch (error) {
@@ -103,7 +99,7 @@ export class NotificationService {
    * Get user notifications with pagination and filtering
    */
   async getUserNotifications(
-    userId: string, 
+    user_id: string, 
     options: {
       limit?: number;
       offset?: number;
@@ -115,10 +111,10 @@ export class NotificationService {
       const { limit = 20, offset = 0, unreadOnly = false, type } = options;
 
       // Build query conditions
-      const conditions = [eq(notifications.userId, userId)];
+      const conditions = [eq(notifications.user_id, user_id)];
       
       if (unreadOnly) {
-        conditions.push(eq(notifications.isRead, false));
+        conditions.push(eq(notifications.is_read, false));
       }
       
       if (type) {
@@ -126,36 +122,34 @@ export class NotificationService {
       }
 
       const userNotifications = await db
-        .select({
-          id: notifications.id,
-          userId: notifications.userId,
+        .select({ id: notifications.id,
+          user_id: notifications.user_id,
           type: notifications.type,
           title: notifications.title,
           message: notifications.message,
           relatedBillId: notifications.relatedBillId,
-          isRead: notifications.isRead,
-          createdAt: notifications.createdAt,
+          is_read: notifications.is_read,
+          created_at: notifications.created_at,
           billTitle: bills.title
-        })
+         })
         .from(notifications)
         .leftJoin(bills, eq(notifications.relatedBillId, bills.id))
         .where(and(...conditions))
-        .orderBy(desc(notifications.createdAt))
+        .orderBy(desc(notifications.created_at))
         .limit(Math.min(limit, 100)) // Cap at 100
         .offset(offset);
 
       // Transform null values to match interface expectations
-      return userNotifications.map(notification => ({
-        id: notification.id,
-        userId: notification.userId,
+      return userNotifications.map(notification => ({ id: notification.id,
+        user_id: notification.user_id,
         type: notification.type,
         title: notification.title,
         message: notification.message,
         relatedBillId: notification.relatedBillId ?? undefined,
-        isRead: notification.isRead ?? false,
-        createdAt: notification.createdAt ?? new Date(),
+        is_read: notification.is_read ?? false,
+        created_at: notification.created_at ?? new Date(),
         billTitle: notification.billTitle ?? undefined
-      }));
+       }));
 
     } catch (error) {
       logger.error('Error getting user notifications', { error: error instanceof Error ? error.message : String(error) });
@@ -166,19 +160,19 @@ export class NotificationService {
   /**
    * Mark notification as read
    */
-  async markAsRead(userId: string, notificationId: number): Promise<void> {
+  async markAsRead(user_id: string, notificationId: number): Promise<void> {
     try {
       await db
         .update(notifications)
-        .set({ isRead: true })
+        .set({ is_read: true })
         .where(
           and(
             eq(notifications.id, notificationId),
-            eq(notifications.userId, userId)
+            eq(notifications.user_id, user_id)
           )
         );
 
-      logger.info(`📖 Marked notification ${notificationId} as read for user ${userId}`);
+      logger.info(`📖 Marked notification ${notificationId} as read for user ${ user_id }`);
 
     } catch (error) {
       logger.error('Error marking notification as read', { error: error instanceof Error ? error.message : String(error) });
@@ -189,14 +183,14 @@ export class NotificationService {
   /**
    * Mark all notifications as read for user
    */
-  async markAllAsRead(userId: string): Promise<void> {
+  async markAllAsRead(user_id: string): Promise<void> {
     try {
       await db
         .update(notifications)
-        .set({ isRead: true })
-        .where(eq(notifications.userId, userId));
+        .set({ is_read: true })
+        .where(eq(notifications.user_id, user_id));
 
-      logger.info(`📖 Marked all notifications as read for user ${userId}`);
+      logger.info(`📖 Marked all notifications as read for user ${ user_id }`);
 
     } catch (error) {
       logger.error('Error marking all notifications as read', { error: error instanceof Error ? error.message : String(error) });
@@ -207,15 +201,15 @@ export class NotificationService {
   /**
    * Get unread notification count
    */
-  async getUnreadCount(userId: string): Promise<number> {
+  async getUnreadCount(user_id: string): Promise<number> {
     try {
       const [result] = await db
         .select({ count: count() })
         .from(notifications)
         .where(
           and(
-            eq(notifications.userId, userId),
-            eq(notifications.isRead, false)
+            eq(notifications.user_id, user_id),
+            eq(notifications.is_read, false)
           )
         );
 
@@ -230,18 +224,17 @@ export class NotificationService {
   /**
    * Delete notification
    */
-  async deleteNotification(userId: string, notificationId: number): Promise<void> {
-    try {
+  async deleteNotification(user_id: string, notificationId: number): Promise<void> { try {
       await db
         .delete(notifications)
         .where(
           and(
             eq(notifications.id, notificationId),
-            eq(notifications.userId, userId)
+            eq(notifications.user_id, user_id)
           )
         );
 
-      logger.info(`🗑️ Deleted notification ${notificationId} for user ${userId}`);
+      logger.info(`🗑️ Deleted notification ${notificationId } for user ${ user_id }`);
 
     } catch (error) {
       logger.error('Error deleting notification', { error: error instanceof Error ? error.message : String(error) });
@@ -252,9 +245,8 @@ export class NotificationService {
   /**
    * Send real-time notification via WebSocket
    */
-  private async sendRealTimeNotification(userId: string, notification: any): Promise<void> {
-    try {
-      webSocketService.sendUserNotification(userId, {
+  private async sendRealTimeNotification(user_id: string, notification: any): Promise<void> { try {
+      webSocketService.sendUserNotification(user_id, {
         type: 'notification',
         title: notification.title,
         message: notification.message,
@@ -262,8 +254,8 @@ export class NotificationService {
           id: notification.id,
           type: notification.type,
           relatedBillId: notification.relatedBillId,
-          createdAt: notification.createdAt
-        }
+          created_at: notification.created_at
+         }
       });
     } catch (error) {
       logger.warn('Failed to send real-time notification', { error: error instanceof Error ? error.message : String(error) });
@@ -275,24 +267,21 @@ export class NotificationService {
    * Bulk create notifications for multiple users
    */
   async createBulkNotifications(
-    userIds: string[],
-    notificationData: Omit<NotificationData, 'userId'>
-  ): Promise<{ success: number; failed: number; errors: Array<{ userId: string; error: string }> }> {
-    const results = { success: 0, failed: 0, errors: [] as Array<{ userId: string; error: string }> };
+    user_ids: string[],
+    notificationData: Omit<NotificationData, 'user_id'>
+  ): Promise<{ success: number; failed: number; errors: Array<{ user_id: string; error: string  }> }> { const results = { success: 0, failed: 0, errors: [] as Array<{ user_id: string; error: string  }> };
 
-    for (const userId of userIds) {
-      try {
+    for (const user_id of user_ids) { try {
         await this.createNotification({
           ...notificationData,
-          userId
-        });
+          user_id
+         });
         results.success++;
-      } catch (error) {
-        results.failed++;
+      } catch (error) { results.failed++;
         results.errors.push({
-          userId,
+          user_id,
           error: error instanceof Error ? error.message : 'Unknown error'
-        });
+         });
       }
     }
 
@@ -312,8 +301,8 @@ export class NotificationService {
         .delete(notifications)
         .where(
           and(
-            eq(notifications.isRead, true),
-            sql`${notifications.createdAt} < ${cutoffDate}`
+            eq(notifications.is_read, true),
+            sql`${notifications.created_at} < ${cutoffDate}`
           )
         );
 
@@ -329,28 +318,27 @@ export class NotificationService {
   /**
    * Get notification statistics
    */
-  async getNotificationStats(userId?: string): Promise<{
+  async getNotificationStats(user_id?: string): Promise<{
     total: number;
     unread: number;
     byType: Record<string, number>;
     recentActivity: number;
-  }> {
-    try {
-      const conditions = userId ? [eq(notifications.userId, userId)] : [];
+  }> { try {
+      const conditions = user_id ? [eq(notifications.user_id, user_id)] : [];
 
       // Get total and unread counts
       const [totalResult] = await db
-        .select({ count: count() })
+        .select({ count: count()  })
         .from(notifications)
-        .where(userId ? eq(notifications.userId, userId) : undefined);
+        .where(user_id ? eq(notifications.user_id, user_id) : undefined);
 
       const [unreadResult] = await db
         .select({ count: count() })
         .from(notifications)
         .where(
           and(
-            userId ? eq(notifications.userId, userId) : undefined,
-            eq(notifications.isRead, false)
+            user_id ? eq(notifications.user_id, user_id) : undefined,
+            eq(notifications.is_read, false)
           )
         );
 
@@ -361,7 +349,7 @@ export class NotificationService {
           count: count()
         })
         .from(notifications)
-        .where(userId ? eq(notifications.userId, userId) : undefined)
+        .where(user_id ? eq(notifications.user_id, user_id) : undefined)
         .groupBy(notifications.type);
 
       // Get recent activity (last 24 hours)
@@ -373,8 +361,8 @@ export class NotificationService {
         .from(notifications)
         .where(
           and(
-            userId ? eq(notifications.userId, userId) : undefined,
-            sql`${notifications.createdAt} >= ${yesterday}`
+            user_id ? eq(notifications.user_id, user_id) : undefined,
+            sql`${notifications.created_at} >= ${yesterday}`
           )
         );
 

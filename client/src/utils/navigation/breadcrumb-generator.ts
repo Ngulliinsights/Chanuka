@@ -32,8 +32,8 @@ const routeConfig: Record<string, { label: string; parent?: string }> = {
  */
 function normalizePath(path: string): string {
   // Replace bill IDs with :id placeholder
-  const billIdPattern = /\/bills\/[^\/]+/g;
-  let normalizedPath = path.replace(billIdPattern, '/bills/:id');
+  const bill_idPattern = /\/bills\/[^\/]+/g;
+  let normalizedPath = path.replace(bill_idPattern, '/bills/:id');
   
   // Handle nested bill routes
   if (normalizedPath.includes('/bills/:id/') && !normalizedPath.includes('/sponsorship-analysis/')) {
@@ -51,9 +51,9 @@ function extractDynamicValues(actualPath: string, normalizedPath: string): Recor
   const values: Record<string, string> = {};
   
   // Extract bill ID
-  const billIdMatch = actualPath.match(/\/bills\/([^\/]+)/);
-  if (billIdMatch && normalizedPath.includes(':id')) {
-    values.id = billIdMatch[1];
+  const bill_idMatch = actualPath.match(/\/bills\/([^\/]+)/);
+  if (bill_idMatch && normalizedPath.includes(':id')) {
+    values.id = bill_idMatch[1];
   }
   
   return values;
@@ -89,7 +89,7 @@ export function generateBreadcrumbs(currentPath: string): BreadcrumbItem[] {
     breadcrumbs.push({
       label,
       path: actualPath,
-      isActive: actualPath === currentPath,
+      is_active: actualPath === currentPath,
     });
   }
   

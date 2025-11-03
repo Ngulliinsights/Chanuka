@@ -49,19 +49,19 @@ export const getNavigationItemsBySection = (section: NavigationItem['section']):
  * Gets navigation items accessible to a specific user role
  */
 export const getAccessibleNavigationItems = (
-  userRole: UserRole,
+  user_role: UserRole,
   user: any | null
 ): NavigationItem[] => {
-  if (!userRole) {
+  if (!user_role) {
     return [];
   }
 
   return DEFAULT_NAVIGATION_MAP.filter(item => {
     try {
-      if (item.adminOnly && userRole !== 'admin') return false;
+      if (item.adminOnly && user_role !== 'admin') return false;
       if (item.requiresAuth && !user) return false;
-      if (item.allowedRoles && !item.allowedRoles.includes(userRole)) return false;
-      if (item.condition && !item.condition(userRole, user)) return false;
+      if (item.allowedRoles && !item.allowedRoles.includes(user_role)) return false;
+      if (item.condition && !item.condition(user_role, user)) return false;
       return true;
     } catch (error) {
       // If there's an error in condition evaluation for this item, exclude it

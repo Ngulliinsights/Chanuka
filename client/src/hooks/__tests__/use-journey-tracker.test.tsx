@@ -35,7 +35,7 @@ vi.mock('@/contexts/NavigationContext', () => ({
     currentSection: 'legislative' as const,
     sidebarOpen: false,
     mobileMenuOpen: false,
-    userRole: 'public' as const,
+    user_role: 'public' as const,
     preferences: {
       defaultLandingPage: '/',
       favoritePages: [],
@@ -319,17 +319,16 @@ describe('useJourneyTracker', () => {
       expect(mockTracker.trackStep).toHaveBeenCalled();
     });
 
-    it('should end journey on unmount', () => {
-      mockTracker.getJourney.mockReturnValue({
+    it('should end journey on unmount', () => { mockTracker.getJourney.mockReturnValue({
         sessionId: 'test-session',
-        userId: 'test-user',
-        userRole: 'public',
+        user_id: 'test-user',
+        user_role: 'public',
         startTime: new Date(),
         steps: [],
         completed: false,
         totalTimeSpent: 0,
         conversionEvents: [],
-      });
+       });
 
       const { unmount } = renderHook(() => useJourneyTracker(), { wrapper });
       

@@ -157,7 +157,7 @@ export const FormSection = forwardRef<HTMLDivElement, FormSectionProps>(
     return <div ref={ref}>{sectionContent}</div>;
   }
 );
-FormSection.displayName = 'FormSection';
+FormSection.display_name = 'FormSection';
 
 // Form step indicator for multi-step forms
 interface FormStepIndicatorProps {

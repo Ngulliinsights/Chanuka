@@ -45,13 +45,12 @@ test.describe('Database Performance via API', () => {
       expect(data.data.length).toBeLessThanOrEqual(10);
 
       // Verify data structure
-      if (data.data.length > 0) {
-        const firstItem = data.data[0];
-        expect(firstItem).toHaveProperty('billId');
+      if (data.data.length > 0) { const firstItem = data.data[0];
+        expect(firstItem).toHaveProperty('bill_id');
         expect(firstItem).toHaveProperty('totalViews');
         expect(firstItem).toHaveProperty('totalComments');
         expect(firstItem).toHaveProperty('uniqueViewers');
-      }
+       }
     });
 
     test('should handle large dataset queries efficiently', async ({ request }) => {

@@ -13,12 +13,12 @@ export interface UseDashboardTopicsResult {
   loading: boolean;
   error: DashboardTopicError | null;
   operations: {
-    addTopic: (topic: Omit<TrackedTopic, 'id' | 'createdAt'>) => Promise<void>;
+    addTopic: (topic: Omit<TrackedTopic, 'id' | 'created_at'>) => Promise<void>;
     updateTopic: (topicId: string, updates: Partial<TrackedTopic>) => Promise<void>;
     removeTopic: (topicId: string) => Promise<void>;
     toggleTopicStatus: (topicId: string) => Promise<void>;
     filterByCategory: (category: TopicCategory) => TrackedTopic[];
-    filterByStatus: (isActive: boolean) => TrackedTopic[];
+    filterByStatus: (is_active: boolean) => TrackedTopic[];
     searchTopics: (query: string) => TrackedTopic[];
     sortByBillCount: () => TrackedTopic[];
     sortByName: () => TrackedTopic[];
@@ -30,7 +30,7 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<DashboardTopicError | null>(null);
 
-  const addTopic = useCallback(async (topicData: Omit<TrackedTopic, 'id' | 'createdAt'>) => {
+  const addTopic = useCallback(async (topicData: Omit<TrackedTopic, 'id' | 'created_at'>) => {
     setLoading(true);
     setError(null);
 
@@ -38,7 +38,7 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
       const newTopic: TrackedTopic = {
         ...topicData,
         id: `topic-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        createdAt: new Date()
+        created_at: new Date()
       };
 
       validateTrackedTopic(newTopic);
@@ -141,7 +141,7 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
         throw new Error(`Topic with ID ${topicId} not found`);
       }
 
-      await updateTopic(topicId, { isActive: !topic.isActive });
+      await updateTopic(topicId, { is_active: !topic.is_active });
     } catch (topicError) {
       const errorMessage = topicError instanceof Error ? topicError.message : 'Failed to toggle topic';
       const error = new DashboardTopicError('toggle', topicId, errorMessage);
@@ -154,8 +154,8 @@ export function useDashboardTopics(initialTopics: TrackedTopic[] = []): UseDashb
     return topics.filter(topic => topic.category === category);
   }, [topics]);
 
-  const filterByStatus = useCallback((isActive: boolean): TrackedTopic[] => {
-    return topics.filter(topic => topic.isActive === isActive);
+  const filterByStatus = useCallback((is_active: boolean): TrackedTopic[] => {
+    return topics.filter(topic => topic.is_active === is_active);
   }, [topics]);
 
   const searchTopics = useCallback((query: string): TrackedTopic[] => {

@@ -1,9 +1,9 @@
 import { and, desc, eq, inArray, or, sql, SQL } from 'drizzle-orm';
 import {
-  billEngagement,
+  bill_engagement,
   bills,
-  billTags,
-  userInterests,
+  bill_tags,
+  user_interests,
   type Bill,
 } from '@shared/schema';
 import { readDatabase } from '@shared/database/connection';
@@ -74,19 +74,18 @@ export class RecommendationService {
    * Get user's interests from database with caching
    * Interests are relatively stable data, making them ideal for caching.
    * 
-   * @param userId - The ID of the user
+   * @param user_id - The ID of the user
    * @returns Promise resolving to array of interest strings
    */
-  private async getUserInterests(userId: string): Promise<string[]> {
-    const cacheKey = `user_interests_${userId}`;
+  private async getUserInterests(user_id: string): Promise<string[]> { const cacheKey = `user_interests_${user_id }`;
 
     return this.getCachedData(cacheKey, async () => {
   try {
   const database = readDatabase;
   const interests = await database
-        .select({ interest: userInterests.interest })
-        .from(userInterests)
-        .where(eq(userInterests.userId, userId));
+        .select({ interest: user_interests.interest })
+        .from(user_interests)
+        .where(eq(user_interests.user_id, user_id));
 
         return interests.map((i: { interest: string }) => i.interest);
       } catch (error) {
@@ -100,21 +99,19 @@ export class RecommendationService {
    * Get user's previously engaged bill IDs with caching
    * This helps us avoid recommending bills the user has already seen or interacted with.
    * 
-   * @param userId - The ID of the user
+   * @param user_id - The ID of the user
    * @returns Promise resolving to array of bill IDs
    */
-  private async getUserEngagedBillIds(userId: string): Promise<number[]> {
-    const cacheKey = `user_engaged_bills_${userId}`;
+  private async getUserEngagedBillIds(user_id: string): Promise<number[]> { const cacheKey = `user_engaged_bills_${user_id }`;
 
-    return this.getCachedData(cacheKey, async () => {
-      try {
+    return this.getCachedData(cacheKey, async () => { try {
   const database = readDatabase;
         const userEngagement = await database
-          .select({ billId: billEngagement.billId })
-          .from(billEngagement)
-          .where(eq(billEngagement.userId, userId));
+          .select({ bill_id: bill_engagement.bill_id  })
+          .from(bill_engagement)
+          .where(eq(bill_engagement.user_id, user_id));
 
-        return userEngagement.map((e: { billId: number }) => e.billId);
+        return userEngagement.map((e: { bill_id: number  }) => e.bill_id);
       } catch (error) {
         logger.error('Error getting user engagement:', { component: 'Chanuka' }, error);
         return [];
@@ -139,11 +136,11 @@ export class RecommendationService {
         WHEN ${bills.status} = 'committee' THEN ${this.SCORING_WEIGHTS.STATUS_COMMITTEE}
         ELSE ${this.SCORING_WEIGHTS.STATUS_OTHER}
       END *
-      (COALESCE(${bills.viewCount}, 0) * ${this.SCORING_WEIGHTS.VIEW} +
-       COALESCE(${bills.shareCount}, 0) * ${this.SCORING_WEIGHTS.SHARE} +
+      (COALESCE(${bills.view_count}, 0) * ${this.SCORING_WEIGHTS.VIEW} +
+       COALESCE(${bills.share_count}, 0) * ${this.SCORING_WEIGHTS.SHARE} +
        CASE
-         WHEN ${bills.createdAt} > NOW() - INTERVAL '7 days' THEN 1.2
-         WHEN ${bills.createdAt} > NOW() - INTERVAL '30 days' THEN 1.1
+         WHEN ${bills.created_at} > NOW() - INTERVAL '7 days' THEN 1.2
+         WHEN ${bills.created_at} > NOW() - INTERVAL '30 days' THEN 1.1
          ELSE 1.0
        END)
     `;
@@ -153,30 +150,29 @@ export class RecommendationService {
    * Get personalized bill recommendations for a user
    * Enhanced with domain-driven design and comprehensive validation
    *
-   * @param userId - The ID of the user to get recommendations for
+   * @param user_id - The ID of the user to get recommendations for
    * @param limit - Maximum number of recommendations to return
    * @returns Promise resolving to an array of recommended bills with scores
    */
   async getPersonalizedRecommendations(
-    userId: string,
+    user_id: string,
     limit: number = 10,
-  ): Promise<Array<Bill & { score: number }>> {
-    try {
+  ): Promise<Array<Bill & { score: number }>> { try {
       // Validate input parameters
       const validation = RecommendationValidator.validatePersonalizedRecommendations(
-        userId,
+        user_id,
         limit
       );
       if (!validation.isValid) {
-        throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+        throw new Error(`Validation failed: ${validation.errors.join(', ') }`);
       }
 
       // Sanitize inputs
-      const sanitizedUserId = RecommendationValidator.sanitizeUserId(userId);
+      const sanitizedUserId = RecommendationValidator.sanitizeUserId(user_id);
       const sanitizedLimit = RecommendationValidator.sanitizeLimit(limit);
 
       // Get user's context data
-      const [userInterests, engagedBillIds, recentActivity] = await Promise.all([
+      const [user_interests, engagedBillIds, recentActivity] = await Promise.all([
         this.getUserInterests(sanitizedUserId),
         this.getUserEngagedBillIds(sanitizedUserId),
         this.getRecentUserActivity(sanitizedUserId),
@@ -186,12 +182,11 @@ export class RecommendationService {
       const availableBills = await this.getAvailableBillsForRecommendation();
 
       // Use domain engine for recommendation logic
-      const context: import('../domain/RecommendationEngine').RecommendationContext = {
-        userId: sanitizedUserId,
-        userInterests,
+      const context: import('../domain/RecommendationEngine').RecommendationContext = { user_id: sanitizedUserId,
+        user_interests,
         engagedBillIds,
         recentActivity,
-      };
+       };
 
       const candidates = RecommendationEngine.generateRecommendations(
         context,
@@ -215,23 +210,22 @@ export class RecommendationService {
    * Get similar bills based on content and user engagement patterns
    * Enhanced with domain-driven design and validation
    *
-   * @param billId - The ID of the bill to find similar bills for
+   * @param bill_id - The ID of the bill to find similar bills for
    * @param limit - Maximum number of similar bills to return
    * @returns Promise resolving to an array of similar bills with similarity scores
    */
   async getSimilarBills(
-    billId: number,
+    bill_id: number,
     limit: number = 5,
-  ): Promise<Array<Bill & { similarityScore: number }>> {
-    try {
+  ): Promise<Array<Bill & { similarityScore: number }>> { try {
       // Validate input parameters
-      const validation = RecommendationValidator.validateSimilarBills(billId, limit);
+      const validation = RecommendationValidator.validateSimilarBills(bill_id, limit);
       if (!validation.isValid) {
-        throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+        throw new Error(`Validation failed: ${validation.errors.join(', ') }`);
       }
 
       // Sanitize inputs
-      const sanitizedBillId = RecommendationValidator.sanitizeBillId(billId);
+      const sanitizedBillId = RecommendationValidator.sanitizeBillId(bill_id);
       const sanitizedLimit = RecommendationValidator.sanitizeLimit(limit);
 
       if (!sanitizedBillId) {
@@ -283,7 +277,7 @@ export class RecommendationService {
       const sanitizedLimit = RecommendationValidator.sanitizeLimit(limit);
 
       // Get engagement data for trending calculation
-      const engagementData = await this.getEngagementDataForTrending(sanitizedDays);
+      const engagement_data = await this.getEngagementDataForTrending(sanitizedDays);
 
       // Get available bills
       const availableBills = await this.getAvailableBillsForRecommendation();
@@ -291,7 +285,7 @@ export class RecommendationService {
       // Use domain engine for trending calculation
       const trendingBills = RecommendationEngine.identifyTrendingBills(
         availableBills,
-        engagementData,
+        engagement_data,
         { days: sanitizedDays, limit: sanitizedLimit }
       );
 
@@ -310,31 +304,30 @@ export class RecommendationService {
    * Track user engagement with enhanced validation and domain logic
    * This method ensures data consistency and updates relevant caches
    *
-   * @param userId - The ID of the user
-   * @param billId - The ID of the bill
-   * @param engagementType - Type of engagement ('view', 'comment', 'share')
+   * @param user_id - The ID of the user
+   * @param bill_id - The ID of the bill
+   * @param engagement_type - Type of engagement ('view', 'comment', 'share')
    * @returns Promise resolving to the updated engagement record
    */
   async trackEngagement(
-    userId: string,
-    billId: number,
-    engagementType: 'view' | 'comment' | 'share',
-  ): Promise<any> {
-    try {
+    user_id: string,
+    bill_id: number,
+    engagement_type: 'view' | 'comment' | 'share',
+  ): Promise<any> { try {
       // Validate input parameters
       const validation = RecommendationValidator.validateEngagementTracking(
-        userId,
-        billId,
-        engagementType
+        user_id,
+        bill_id,
+        engagement_type
       );
       if (!validation.isValid) {
-        throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+        throw new Error(`Validation failed: ${validation.errors.join(', ')  }`);
       }
 
       // Sanitize inputs
-      const sanitizedUserId = RecommendationValidator.sanitizeUserId(userId);
-      const sanitizedBillId = RecommendationValidator.sanitizeBillId(billId)!;
-      const sanitizedEngagementType = RecommendationValidator.sanitizeEngagementType(engagementType)!;
+      const sanitizedUserId = RecommendationValidator.sanitizeUserId(user_id);
+      const sanitizedBillId = RecommendationValidator.sanitizeBillId(bill_id)!;
+      const sanitizedEngagementType = RecommendationValidator.sanitizeEngagementType(engagement_type)!;
 
       // Clear relevant caches since engagement is changing
       const cacheKeysToInvalidate = [
@@ -363,14 +356,14 @@ export class RecommendationService {
    * @private
    */
   private calculateEngagementScore(
-    viewCount: number,
-    commentCount: number,
-    shareCount: number,
+    view_count: number,
+    comment_count: number,
+    share_count: number,
   ): number {
     // Add null safety and ensure non-negative values
-    const safeViewCount = Math.max(0, viewCount || 0);
-    const safeCommentCount = Math.max(0, commentCount || 0);
-    const safeShareCount = Math.max(0, shareCount || 0);
+    const safeViewCount = Math.max(0, view_count || 0);
+    const safeCommentCount = Math.max(0, comment_count || 0);
+    const safeShareCount = Math.max(0, share_count || 0);
 
     return (
       safeViewCount * this.SCORING_WEIGHTS.VIEW +
@@ -383,27 +376,26 @@ export class RecommendationService {
    * Get collaborative recommendations based on similar users' engagement
    * Enhanced with domain-driven design and validation
    *
-   * @param userId - The ID of the user to get recommendations for
+   * @param user_id - The ID of the user to get recommendations for
    * @param limit - Maximum number of recommendations to return
    * @returns Promise resolving to an array of recommended bills with scores
    */
   async getCollaborativeRecommendations(
-    userId: string,
+    user_id: string,
     limit: number = 10,
-  ): Promise<Array<Bill & { score: number }>> {
-    try {
+  ): Promise<Array<Bill & { score: number }>> { try {
       // Validate input parameters
-      const validation = RecommendationValidator.validateCollaborativeRecommendations(userId, limit);
+      const validation = RecommendationValidator.validateCollaborativeRecommendations(user_id, limit);
       if (!validation.isValid) {
-        throw new Error(`Validation failed: ${validation.errors.join(', ')}`);
+        throw new Error(`Validation failed: ${validation.errors.join(', ') }`);
       }
 
       // Sanitize inputs
-      const sanitizedUserId = RecommendationValidator.sanitizeUserId(userId);
+      const sanitizedUserId = RecommendationValidator.sanitizeUserId(user_id);
       const sanitizedLimit = RecommendationValidator.sanitizeLimit(limit);
 
       // Get user's interests and engagement history
-      const [userInterests, userEngagedBillIds] = await Promise.all([
+      const [user_interests, userEngagedBillIds] = await Promise.all([
         this.getUserInterests(sanitizedUserId),
         this.getUserEngagedBillIds(sanitizedUserId),
       ]);
@@ -411,7 +403,7 @@ export class RecommendationService {
       // Get similar users and their engagement data
       const similarUsersEngagements = await this.getSimilarUsersEngagements(
         sanitizedUserId,
-        userInterests
+        user_interests
       );
 
       // Get available bills
@@ -444,43 +436,40 @@ export class RecommendationService {
    * 
    * @private
    */
-  private async getRecentUserActivity(userId: string): Promise<Array<{
-    billId: number;
-    engagementType: 'view' | 'comment' | 'share';
+  private async getRecentUserActivity(user_id: string): Promise<Array<{ bill_id: number;
+    engagement_type: 'view' | 'comment' | 'share';
     timestamp: Date;
-  }>> {
-    try {
+   }>> { try {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
   const database = readDatabase;
       const activities = await database
         .select({
-          billId: billEngagement.billId,
+          bill_id: bill_engagement.bill_id,
           // Use sql template without type parameter - Drizzle infers types from context
-          engagementType: sql`CASE
-            WHEN ${billEngagement.viewCount} > 0 THEN 'view'
-            WHEN ${billEngagement.commentCount} > 0 THEN 'comment'
-            WHEN ${billEngagement.shareCount} > 0 THEN 'share'
+          engagement_type: sql`CASE
+            WHEN ${bill_engagement.view_count } > 0 THEN 'view'
+            WHEN ${bill_engagement.comment_count} > 0 THEN 'comment'
+            WHEN ${bill_engagement.share_count} > 0 THEN 'share'
             ELSE 'view'
           END`.as('engagement_type'),
-          timestamp: billEngagement.lastEngaged,
+          timestamp: bill_engagement.lastEngaged,
         })
-        .from(billEngagement)
+        .from(bill_engagement)
         .where(
           and(
-            eq(billEngagement.userId, userId),
-            sql`${billEngagement.lastEngaged} > ${thirtyDaysAgo}`
+            eq(bill_engagement.user_id, user_id),
+            sql`${bill_engagement.lastEngaged} > ${thirtyDaysAgo}`
           )
         )
-        .orderBy(desc(billEngagement.lastEngaged))
+        .orderBy(desc(bill_engagement.lastEngaged))
         .limit(50);
 
-      return activities.map(activity => ({
-        billId: activity.billId,
-        engagementType: activity.engagementType as 'view' | 'comment' | 'share',
+      return activities.map(activity => ({ bill_id: activity.bill_id,
+        engagement_type: activity.engagement_type as 'view' | 'comment' | 'share',
         timestamp: activity.timestamp,
-      }));
+       }));
     } catch (error) {
       logger.error('Error getting recent user activity:', { component: 'Chanuka' }, error);
       return [];
@@ -505,11 +494,11 @@ export class RecommendationService {
         .from(bills)
         .where(
           and(
-            sql`${bills.createdAt} > ${sixMonthsAgo}`,
+            sql`${bills.created_at} > ${sixMonthsAgo}`,
             sql`${bills.status} IN ('introduced', 'committee', 'passed')`
           )
         )
-        .orderBy(desc(bills.createdAt))
+        .orderBy(desc(bills.created_at))
         .limit(1000); // Reasonable limit for recommendation pool
 
       return availableBills.map(bill => ({ ...bill })); // Ensure plain objects
@@ -534,12 +523,10 @@ export class RecommendationService {
    * 
    * @private
    */
-  private async getEngagementDataForTrending(days: number): Promise<Array<{
-    billId: number;
-    engagementType: 'view' | 'comment' | 'share';
+  private async getEngagementDataForTrending(days: number): Promise<Array<{ bill_id: number;
+    engagement_type: 'view' | 'comment' | 'share';
     timestamp: Date;
-  }>> {
-    try {
+   }>> { try {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
 
@@ -547,26 +534,25 @@ export class RecommendationService {
   const database = readDatabase;
       const engagements = await database
         .select({
-          billId: billEngagement.billId,
+          bill_id: bill_engagement.bill_id,
           // Use sql template without type parameter - Drizzle infers the type
-          engagementType: sql`CASE
-            WHEN ${billEngagement.viewCount} > 0 THEN 'view'
-            WHEN ${billEngagement.commentCount} > 0 THEN 'comment'
-            WHEN ${billEngagement.shareCount} > 0 THEN 'share'
+          engagement_type: sql`CASE
+            WHEN ${bill_engagement.view_count } > 0 THEN 'view'
+            WHEN ${bill_engagement.comment_count} > 0 THEN 'comment'
+            WHEN ${bill_engagement.share_count} > 0 THEN 'share'
             ELSE 'view'
           END`.as('engagement_type'),
-          timestamp: billEngagement.lastEngaged,
+          timestamp: bill_engagement.lastEngaged,
         })
-        .from(billEngagement)
-        .where(sql`${billEngagement.lastEngaged} > ${cutoffDate}`)
-        .orderBy(desc(billEngagement.lastEngaged))
+        .from(bill_engagement)
+        .where(sql`${bill_engagement.lastEngaged} > ${cutoffDate}`)
+        .orderBy(desc(bill_engagement.lastEngaged))
         .limit(5000); // Reasonable limit for trending calculation
 
-      return engagements.map(engagement => ({
-        billId: engagement.billId,
-        engagementType: engagement.engagementType as 'view' | 'comment' | 'share',
+      return engagements.map(engagement => ({ bill_id: engagement.bill_id,
+        engagement_type: engagement.engagement_type as 'view' | 'comment' | 'share',
         timestamp: engagement.timestamp,
-      }));
+       }));
     } catch (error) {
       logger.error('Error getting engagement data for trending:', { component: 'Chanuka' }, error);
       return [];
@@ -584,16 +570,14 @@ export class RecommendationService {
    * @private
    */
   private async getSimilarUsersEngagements(
-    userId: string,
+    user_id: string,
     interests: string[]
-  ): Promise<Array<{
-    userId: string;
-    billId: number;
-    engagementType: 'view' | 'comment' | 'share';
+  ): Promise<Array<{ user_id: string;
+    bill_id: number;
+    engagement_type: 'view' | 'comment' | 'share';
     timestamp: Date;
     similarityScore: number;
-  }>> {
-    try {
+    }>> { try {
       if (interests.length === 0) return [];
 
       const minSharedInterests = Math.max(1, Math.floor(interests.length * 0.4));
@@ -602,62 +586,60 @@ export class RecommendationService {
   const database = readDatabase;
       const similarUsers = await database
         .select({
-          userId: userInterests.userId,
+          user_id: user_interests.user_id,
           // Count shared interests without type parameter on sql
-          sharedInterests: sql`COUNT(DISTINCT ${userInterests.interest})`.as('shared_interests'),
+          sharedInterests: sql`COUNT(DISTINCT ${user_interests.interest })`.as('shared_interests'),
         })
-        .from(userInterests)
+        .from(user_interests)
         .where(
           and(
             // Use inArray helper instead of manual SQL join
-            inArray(userInterests.interest, interests),
-            sql`${userInterests.userId} != ${userId}`
+            inArray(user_interests.interest, interests),
+            sql`${user_interests.user_id} != ${ user_id }`
           )
         )
-        .groupBy(userInterests.userId)
-        .having(sql`COUNT(DISTINCT ${userInterests.interest}) >= ${minSharedInterests}`)
-        .orderBy(desc(sql`COUNT(DISTINCT ${userInterests.interest})`))
+        .groupBy(user_interests.user_id)
+        .having(sql`COUNT(DISTINCT ${user_interests.interest}) >= ${minSharedInterests}`)
+        .orderBy(desc(sql`COUNT(DISTINCT ${user_interests.interest})`))
         .limit(50);
 
       if (similarUsers.length === 0) return [];
 
-      const similarUserIds = similarUsers.map(u => u.userId);
+      const similarUserIds = similarUsers.map(u => u.user_id);
       
       // Step 2: Calculate similarity scores in JavaScript (cleaner than complex SQL)
       // This maps each user ID to a score between 0 and 1 based on interest overlap
       const userSimilarityMap = new Map(
         similarUsers.map(u => [
-          u.userId, 
+          u.user_id, 
           Math.min(1.0, Number(u.sharedInterests) / interests.length)
         ])
       );
 
       // Step 3: Get engagement data for similar users
       const engagements = await database
-        .select({
-          userId: billEngagement.userId,
-          billId: billEngagement.billId,
+        .select({ user_id: bill_engagement.user_id,
+          bill_id: bill_engagement.bill_id,
           // Use sql template without type parameter
-          engagementType: sql`CASE
-            WHEN ${billEngagement.viewCount} > 0 THEN 'view'
-            WHEN ${billEngagement.commentCount} > 0 THEN 'comment'
-            WHEN ${billEngagement.shareCount} > 0 THEN 'share'
+          engagement_type: sql`CASE
+            WHEN ${bill_engagement.view_count  } > 0 THEN 'view'
+            WHEN ${bill_engagement.comment_count} > 0 THEN 'comment'
+            WHEN ${bill_engagement.share_count} > 0 THEN 'share'
             ELSE 'view'
           END`.as('engagement_type'),
-          timestamp: billEngagement.lastEngaged,
+          timestamp: bill_engagement.lastEngaged,
         })
-        .from(billEngagement)
-        .where(inArray(billEngagement.userId, similarUserIds))
+        .from(bill_engagement)
+        .where(inArray(bill_engagement.user_id, similarUserIds))
         .limit(1000);
 
       // Step 4: Attach similarity scores to each engagement
-      return engagements.map(e => ({
-        userId: e.userId,
-        billId: e.billId,
-        engagementType: e.engagementType as 'view' | 'comment' | 'share',
+      return engagements.map(e => ({ user_id: e.user_id,
+        bill_id: e.bill_id,
+        engagement_type: e.engagement_type as 'view' | 'comment' | 'share',
         timestamp: e.timestamp,
-        similarityScore: userSimilarityMap.get(e.userId) || 0.5,
-      }));
+        similarityScore: userSimilarityMap.get(e.user_id) || 0.5,
+        }));
     } catch (error) {
       logger.error('Error getting similar users engagements:', { component: 'Chanuka' }, error);
       return [];
@@ -681,20 +663,18 @@ export class RecommendationService {
 // Export functions for backward compatibility
 // These maintain the existing API while using the refactored service class internally
 export async function getPersonalizedRecommendations(
-  userId: string,
+  user_id: string,
   limit: number = 10,
-): Promise<Array<Bill & { score: number }>> {
-  const service = new RecommendationService();
-  return service.getPersonalizedRecommendations(userId, limit);
-}
+): Promise<Array<Bill & { score: number }>> { const service = new RecommendationService();
+  return service.getPersonalizedRecommendations(user_id, limit);
+ }
 
 export async function getSimilarBills(
-  billId: number,
+  bill_id: number,
   limit: number = 5,
-): Promise<Array<Bill & { similarityScore: number }>> {
-  const service = new RecommendationService();
-  return service.getSimilarBills(billId, limit);
-}
+): Promise<Array<Bill & { similarityScore: number }>> { const service = new RecommendationService();
+  return service.getSimilarBills(bill_id, limit);
+ }
 
 export async function getTrendingBills(
   days: number = 7,
@@ -705,21 +685,19 @@ export async function getTrendingBills(
 }
 
 export async function getCollaborativeRecommendations(
-  userId: string,
+  user_id: string,
   limit: number = 10,
-): Promise<Array<Bill & { score: number }>> {
-  const service = new RecommendationService();
-  return service.getCollaborativeRecommendations(userId, limit);
-}
+): Promise<Array<Bill & { score: number }>> { const service = new RecommendationService();
+  return service.getCollaborativeRecommendations(user_id, limit);
+ }
 
 export async function trackEngagement(
-  userId: string,
-  billId: number,
-  engagementType: 'view' | 'comment' | 'share',
-): Promise<any> {
-  const service = new RecommendationService();
-  return service.trackEngagement(userId, billId, engagementType);
-}
+  user_id: string,
+  bill_id: number,
+  engagement_type: 'view' | 'comment' | 'share',
+): Promise<any> { const service = new RecommendationService();
+  return service.trackEngagement(user_id, bill_id, engagement_type);
+  }
 
 
 

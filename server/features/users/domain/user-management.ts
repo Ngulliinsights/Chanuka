@@ -1,4 +1,4 @@
-import { database as db, users, sessions, billComments, notifications } from '../shared/database/connection';
+import { database as db, users, sessions, comments, notifications } from '../shared/database/connection';
 import { eq, count, desc, sql, and, gte, or, inArray } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
 import { logger  } from '../../../../shared/core/src/index.js';
@@ -13,7 +13,7 @@ interface UserProfile {
 export interface UserManagementFilters {
   role?: string;
   status?: 'active' | 'inactive';
-  verificationStatus?: 'pending' | 'verified' | 'rejected';
+  verification_status?: 'pending' | 'verified' | 'rejected';
   search?: string;
   dateRange?: {
     start: Date;
@@ -26,11 +26,11 @@ export interface UserDetails {
   email: string;
   name: string;
   role: string;
-  verificationStatus: string;
-  isActive: boolean;
-  lastLoginAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
+  verification_status: string;
+  is_active: boolean;
+  last_login_at: Date | null;
+  created_at: Date;
+  updated_at: Date;
   profile?: UserProfile;
   stats: {
     commentsCount: number;
@@ -44,18 +44,17 @@ export interface UserDetails {
   };
 }
 
-export interface UserActivityLog {
-  id: string;
-  userId: string;
+export interface UserActivityLog { id: string;
+  user_id: string;
   action: string;
   details: Record<string, unknown>;
   timestamp: Date;
-  ipAddress?: string;
-  userAgent?: string;
-}
+  ip_address?: string;
+  user_agent?: string;
+ }
 
 export interface BulkUserOperation {
-  userIds: string[];
+  user_ids: string[];
   operation: 'activate' | 'deactivate' | 'verify' | 'reject' | 'delete' | 'changeRole';
   parameters?: {
     role?: string;
@@ -123,15 +122,15 @@ export class UserManagementService {
             email: users.email,
             name: users.name,
             role: users.role,
-            verificationStatus: users.verificationStatus,
-            isActive: users.isActive,
-            lastLoginAt: users.lastLoginAt,
-            createdAt: users.createdAt,
-            updatedAt: users.updatedAt
+            verification_status: users.verification_status,
+            is_active: users.is_active,
+            last_login_at: users.last_login_at,
+            created_at: users.created_at,
+            updated_at: users.updated_at
           })
           .from(users)
           .where(whereClause)
-          .orderBy(desc(users.createdAt))
+          .orderBy(desc(users.created_at))
           .limit(limit)
           .offset(offset),
         
@@ -164,7 +163,7 @@ export class UserManagementService {
   /**
    * Retrieves complete details for a specific user including stats and sessions
    */
-  async getUserDetails(userId: string): Promise<UserDetails | null> {
+  async getUserDetails(user_id: string): Promise<UserDetails | null> {
     try {
       const userResult = await db
         .select({
@@ -172,14 +171,14 @@ export class UserManagementService {
           email: users.email,
           name: users.name,
           role: users.role,
-          verificationStatus: users.verificationStatus,
-          isActive: users.isActive,
-          lastLoginAt: users.lastLoginAt,
-          createdAt: users.createdAt,
-          updatedAt: users.updatedAt
+          verification_status: users.verification_status,
+          is_active: users.is_active,
+          last_login_at: users.last_login_at,
+          created_at: users.created_at,
+          updated_at: users.updated_at
         })
         .from(users)
-        .where(eq(users.id, userId))
+        .where(eq(users.id, user_id))
         .limit(1);
 
       const user = userResult[0];
@@ -189,8 +188,8 @@ export class UserManagementService {
 
       // Fetch stats and sessions in parallel for efficiency
       const [stats, sessionInfo] = await Promise.all([
-        this.getUserStats(userId),
-        this.getUserSessions(userId)
+        this.getUserStats(user_id),
+        this.getUserSessions(user_id)
       ]);
 
       return {
@@ -210,35 +209,34 @@ export class UserManagementService {
    * Only updates fields that are provided and exist in the schema
    */
   async updateUser(
-    userId: string, 
+    user_id: string, 
     updates: {
       name?: string;
       email?: string;
       role?: string;
-      verificationStatus?: string;
-      isActive?: boolean;
+      verification_status?: string;
+      is_active?: boolean;
     },
     adminId: string
-  ): Promise<{ success: boolean; message: string }> {
-    try {
+  ): Promise<{ success: boolean; message: string }> { try {
       // Log the update action before making changes for audit trail
       this.logUserActivity({
-        userId: adminId,
+        user_id: adminId,
         action: 'user_update',
         details: {
-          targetUserId: userId,
+          targetUserId: user_id,
           updates,
           timestamp: new Date().toISOString()
-        }
+         }
       });
 
       await db
         .update(users)
         .set({
           ...updates,
-          updatedAt: new Date()
+          updated_at: new Date()
         })
-        .where(eq(users.id, userId));
+        .where(eq(users.id, user_id));
 
       return {
         success: true,
@@ -262,7 +260,7 @@ export class UserManagementService {
     adminId: string
   ): Promise<{ success: boolean; message: string; affectedCount: number }> {
     try {
-      if (operation.userIds.length === 0) {
+      if (operation.user_ids.length === 0) {
         return {
           success: false,
           message: 'No users specified for bulk operation',
@@ -273,13 +271,12 @@ export class UserManagementService {
       const { updateData, operationName } = this.getBulkOperationConfig(operation);
 
       // Log the bulk operation for audit purposes
-      this.logUserActivity({
-        userId: adminId,
+      this.logUserActivity({ user_id: adminId,
         action: 'bulk_user_operation',
         details: {
           operation: operation.operation,
-          userIds: operation.userIds,
-          parameters: operation.parameters ?? {},
+          user_ids: operation.user_ids,
+          parameters: operation.parameters ?? { },
           timestamp: new Date().toISOString()
         }
       });
@@ -288,12 +285,12 @@ export class UserManagementService {
       await db
         .update(users)
         .set(updateData)
-        .where(inArray(users.id, operation.userIds));
+        .where(inArray(users.id, operation.user_ids));
 
       return {
         success: true,
-        message: `${operation.userIds.length} users ${operationName} successfully`,
-        affectedCount: operation.userIds.length
+        message: `${operation.user_ids.length} users ${operationName} successfully`,
+        affectedCount: operation.user_ids.length
       };
     } catch (error) {
       this.handleError('Error performing bulk user operation', error);
@@ -311,7 +308,7 @@ export class UserManagementService {
    * Note: This assumes a password field exists in your schema
    */
   async resetUserPassword(
-    userId: string, 
+    user_id: string, 
     newPassword: string, 
     adminId: string
   ): Promise<{ success: boolean; message: string }> {
@@ -322,20 +319,19 @@ export class UserManagementService {
       await db
         .update(users)
         .set({
-          updatedAt: new Date()
+          updated_at: new Date()
           // Add password field update here if it exists in your schema:
           // password: hashedPassword
         })
-        .where(eq(users.id, userId));
+        .where(eq(users.id, user_id));
 
       // Log password reset without storing the actual password
-      this.logUserActivity({
-        userId: adminId,
+      this.logUserActivity({ user_id: adminId,
         action: 'password_reset',
         details: {
-          targetUserId: userId,
+          targetUserId: user_id,
           timestamp: new Date().toISOString()
-        }
+         }
       });
 
       return {
@@ -356,7 +352,7 @@ export class UserManagementService {
    * Logs are stored in memory with a maximum size limit
    */
   async getUserActivityLogs(
-    userId?: string,
+    user_id?: string,
     page = 1,
     limit = 50
   ): Promise<{
@@ -367,10 +363,9 @@ export class UserManagementService {
       total: number;
       pages: number;
     };
-  }> {
-    try {
-      let filteredLogs = userId 
-        ? this.activityLogs.filter(log => log.userId === userId)
+  }> { try {
+      let filteredLogs = user_id 
+        ? this.activityLogs.filter(log => log.user_id === user_id)
         : [...this.activityLogs];
 
       // Sort by most recent first
@@ -387,7 +382,7 @@ export class UserManagementService {
           limit,
           total,
           pages: Math.ceil(total / limit)
-        }
+         }
       };
     } catch (error) {
       this.handleError('Error fetching user activity logs', error);
@@ -406,8 +401,8 @@ export class UserManagementService {
       // Gather summary statistics in parallel
       const [totalCountResult, activeCountResult, verifiedCountResult] = await Promise.all([
         db.select({ value: count() }).from(users),
-        db.select({ value: count() }).from(users).where(eq(users.isActive, true)),
-        db.select({ value: count() }).from(users).where(eq(users.verificationStatus, 'verified'))
+        db.select({ value: count() }).from(users).where(eq(users.is_active, true)),
+        db.select({ value: count() }).from(users).where(eq(users.verification_status, 'verified'))
       ]);
 
       return {
@@ -435,8 +430,8 @@ export class UserManagementService {
         .select({
           role: users.role,
           total: count(),
-          active: sql<number>`SUM(CASE WHEN ${users.isActive} THEN 1 ELSE 0 END)`,
-          verified: sql<number>`SUM(CASE WHEN ${users.verificationStatus} = 'verified' THEN 1 ELSE 0 END)`
+          active: sql<number>`SUM(CASE WHEN ${users.is_active} THEN 1 ELSE 0 END)`,
+          verified: sql<number>`SUM(CASE WHEN ${users.verification_status} = 'verified' THEN 1 ELSE 0 END)`
         })
         .from(users)
         .groupBy(users.role);
@@ -461,11 +456,11 @@ export class UserManagementService {
     try {
       const verificationStats = await db
         .select({
-          status: users.verificationStatus,
+          status: users.verification_status,
           total: count()
         })
         .from(users)
-        .groupBy(users.verificationStatus);
+        .groupBy(users.verification_status);
 
       return verificationStats.map(stat => ({
         status: stat.status,
@@ -495,13 +490,13 @@ export class UserManagementService {
     }
 
     if (filters?.status === 'active') {
-      conditions.push(eq(users.isActive, true));
+      conditions.push(eq(users.is_active, true));
     } else if (filters?.status === 'inactive') {
-      conditions.push(eq(users.isActive, false));
+      conditions.push(eq(users.is_active, false));
     }
 
-    if (filters?.verificationStatus) {
-      conditions.push(eq(users.verificationStatus, filters.verificationStatus));
+    if (filters?.verification_status) {
+      conditions.push(eq(users.verification_status, filters.verification_status));
     }
 
     if (filters?.search) {
@@ -517,8 +512,8 @@ export class UserManagementService {
     if (filters?.dateRange) {
       conditions.push(
         and(
-          gte(users.createdAt, filters.dateRange.start),
-          sql`${users.createdAt} <= ${filters.dateRange.end}`
+          gte(users.created_at, filters.dateRange.start),
+          sql`${users.created_at} <= ${filters.dateRange.end}`
         )
       );
     }
@@ -534,8 +529,8 @@ export class UserManagementService {
     return Promise.all(
       userList.map(async (user) => {
         const [stats, sessionInfo] = await Promise.all([
-          this.getUserStats(user.id),
-          this.getUserSessions(user.id)
+          this.getUserStats(users.id),
+          this.getUserSessions(users.id)
         ]);
 
         return {
@@ -552,17 +547,17 @@ export class UserManagementService {
    * Retrieves comprehensive statistics for a specific user
    * Includes comment counts, notifications, and last activity
    */
-  private async getUserStats(userId: string) {
+  private async getUserStats(user_id: string) {
     try {
       // Fetch all stats in parallel for better performance
       const [commentsResult, notificationsResult, lastCommentResult] = await Promise.all([
-        db.select({ value: count() }).from(billComments).where(eq(billComments.userId, userId)),
-        db.select({ value: count() }).from(notifications).where(eq(notifications.userId, userId)),
+        db.select({ value: count() }).from(comments).where(eq(comments.user_id, user_id)),
+        db.select({ value: count() }).from(notifications).where(eq(notifications.user_id, user_id)),
         db
-          .select({ createdAt: billComments.createdAt })
-          .from(billComments)
-          .where(eq(billComments.userId, userId))
-          .orderBy(desc(billComments.createdAt))
+          .select({ created_at: comments.created_at })
+          .from(comments)
+          .where(eq(comments.user_id, user_id))
+          .orderBy(desc(comments.created_at))
           .limit(1)
       ]);
 
@@ -570,7 +565,7 @@ export class UserManagementService {
         commentsCount: Number(commentsResult[0]?.value ?? 0),
         billsTracked: 0, // Placeholder for future implementation
         notificationsReceived: Number(notificationsResult[0]?.value ?? 0),
-        lastActivity: lastCommentResult[0]?.createdAt ?? null
+        lastActivity: lastCommentResult[0]?.created_at ?? null
       };
     } catch (error) {
       this.handleError('Error fetching user stats', error);
@@ -582,7 +577,7 @@ export class UserManagementService {
    * Retrieves session information for a user
    * Shows active session count and most recent session
    */
-  private async getUserSessions(userId: string) {
+  private async getUserSessions(user_id: string) {
     try {
       const [activeSessionsResult, lastSessionResult] = await Promise.all([
         db
@@ -590,21 +585,21 @@ export class UserManagementService {
           .from(sessions)
           .where(
             and(
-              eq(sessions.userId, userId),
-              sql`${sessions.expiresAt} > NOW()`
+              eq(sessions.user_id, user_id),
+              sql`${sessions.expires_at} > NOW()`
             )
           ),
         db
-          .select({ createdAt: sessions.createdAt })
+          .select({ created_at: sessions.created_at })
           .from(sessions)
-          .where(eq(sessions.userId, userId))
-          .orderBy(desc(sessions.createdAt))
+          .where(eq(sessions.user_id, user_id))
+          .orderBy(desc(sessions.created_at))
           .limit(1)
       ]);
 
       return {
         active: Number(activeSessionsResult[0]?.value ?? 0),
-        lastSession: lastSessionResult[0]?.createdAt ?? null
+        lastSession: lastSessionResult[0]?.created_at ?? null
       };
     } catch (error) {
       this.handleError('Error fetching user sessions', error);
@@ -620,29 +615,29 @@ export class UserManagementService {
    * Centralizes bulk operation logic for maintainability
    */
   private getBulkOperationConfig(operation: BulkUserOperation): {
-    updateData: Partial<typeof users.$inferInsert> & { updatedAt: Date };
+    updateData: Partial<typeof users.$inferInsert> & { updated_at: Date };
     operationName: string;
   } {
-    const updateData: Partial<typeof users.$inferInsert> & { updatedAt: Date } = { 
-      updatedAt: new Date() 
+    const updateData: Partial<typeof users.$inferInsert> & { updated_at: Date } = { 
+      updated_at: new Date() 
     };
     let operationName = '';
 
     switch (operation.operation) {
       case 'activate':
-        updateData.isActive = true;
+        updateData.is_active = true;
         operationName = 'activated';
         break;
       case 'deactivate':
-        updateData.isActive = false;
+        updateData.is_active = false;
         operationName = 'deactivated';
         break;
       case 'verify':
-        updateData.verificationStatus = 'verified';
+        updateData.verification_status = 'verified';
         operationName = 'verified';
         break;
       case 'reject':
-        updateData.verificationStatus = 'rejected';
+        updateData.verification_status = 'rejected';
         operationName = 'rejected';
         break;
       case 'changeRole':
@@ -653,7 +648,7 @@ export class UserManagementService {
         operationName = `role changed to ${operation.parameters.role}`;
         break;
       case 'delete':
-        updateData.isActive = false;
+        updateData.is_active = false;
         operationName = 'deleted';
         break;
       default:

@@ -18,9 +18,9 @@ export class RelevanceScorer {
     if (!q) return 0;
 
     let score = 0;
-    const title = bill.title?.toLowerCase() || '';
-    const description = bill.description?.toLowerCase() || '';
-    const summary = bill.summary?.toLowerCase() || '';
+    const title = bills.title?.toLowerCase() || '';
+    const description = bills.description?.toLowerCase() || '';
+    const summary = bills.summary?.toLowerCase() || '';
 
     // Title matching
     if (title === q) {
@@ -41,13 +41,13 @@ export class RelevanceScorer {
     }
 
     // Short title bonus
-    if (bill.title && bill.title.length < 50) {
+    if (bills.title && bills.title.length < 50) {
       score += this.WEIGHTS.SHORT_TITLE;
     }
 
     // Recency bonus for newer bills
-    if (bill.createdAt) {
-      const daysSinceCreation = (Date.now() - new Date(bill.createdAt).getTime()) / (1000 * 60 * 60 * 24);
+    if (bills.created_at) {
+      const daysSinceCreation = (Date.now() - new Date(bills.created_at).getTime()) / (1000 * 60 * 60 * 24);
       if (daysSinceCreation < 30) {
         score += this.WEIGHTS.RECENCY_BONUS;
       }
@@ -65,10 +65,10 @@ export class RelevanceScorer {
 
     const highlights: string[] = [];
     const fields = [
-      { name: 'title', value: bill.title },
-      { name: 'summary', value: bill.summary },
-      { name: 'description', value: bill.description },
-      { name: 'content', value: bill.content },
+      { name: 'title', value: bills.title },
+      { name: 'summary', value: bills.summary },
+      { name: 'description', value: bills.description },
+      { name: 'content', value: bills.content },
     ];
 
     for (const field of fields) {
@@ -106,7 +106,7 @@ export class RelevanceScorer {
     }
 
     // Sponsor similarity
-    if (bill1.sponsorId && bill2.sponsorId && bill1.sponsorId === bill2.sponsorId) {
+    if (bill1.sponsor_id && bill2.sponsor_id && bill1.sponsor_id === bill2.sponsor_id) {
       score += 0.1; // 10% weight for same sponsor
     }
 
@@ -125,8 +125,8 @@ export class RelevanceScorer {
     const scored = bills.map(bill => ({
       bill,
       relevanceScore: this.score(query, bill),
-      engagementScore: (bill.viewCount || 0) + (bill.commentCount || 0) * 2 + (bill.shareCount || 0) * 3,
-      dateScore: bill.createdAt ? new Date(bill.createdAt).getTime() : 0,
+      engagement_score: (bills.view_count || 0) + (bills.comment_count || 0) * 2 + (bills.share_count || 0) * 3,
+      dateScore: bills.created_at ? new Date(bills.created_at).getTime() : 0,
     }));
 
     scored.sort((a, b) => {
@@ -140,7 +140,7 @@ export class RelevanceScorer {
           comparison = b.dateScore - a.dateScore;
           break;
         case 'engagement':
-          comparison = b.engagementScore - a.engagementScore;
+          comparison = b.engagement_score - a.engagement_score;
           break;
       }
 

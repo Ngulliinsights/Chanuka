@@ -74,7 +74,7 @@ export const TrackedTopics: React.FC<DashboardComponentProps> = ({
         name: newTopicName.trim(),
         category: newTopicCategory,
         billCount: 0,
-        isActive: true,
+        is_active: true,
         description: `Topic: ${newTopicName.trim()}`
       });
       
@@ -269,7 +269,7 @@ export const TrackedTopics: React.FC<DashboardComponentProps> = ({
                 <div
                   key={topic.id}
                   className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border ${getCategoryColor(topic.category)} ${
-                    !topic.isActive ? 'opacity-50' : ''
+                    !topic.is_active ? 'opacity-50' : ''
                   }`}
                 >
                   <Tag className="h-3 w-3 mr-1" />

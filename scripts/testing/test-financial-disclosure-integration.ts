@@ -23,19 +23,19 @@ async function testFinancialDisclosureIntegration() {
       const sampleDisclosure = allDisclosures[0];
       logger.info('📋 Sample processed disclosure:', { component: 'Chanuka' });
       console.log(`   - ID: ${sampleDisclosure.id}`);
-      console.log(`   - Sponsor: ${sampleDisclosure.sponsorId}`);
+      console.log(`   - Sponsor: ${sampleDisclosure.sponsor_id}`);
       console.log(`   - Type: ${sampleDisclosure.disclosureType}`);
       console.log(`   - Amount: ${sampleDisclosure.amount ? `KSh ${sampleDisclosure.amount.toLocaleString()}` : 'Not specified'}`);
       console.log(`   - Completeness Score: ${sampleDisclosure.completenessScore}%`);
       console.log(`   - Risk Level: ${sampleDisclosure.riskLevel}`);
-      console.log(`   - Verified: ${sampleDisclosure.isVerified ? 'Yes' : 'No'}`);
+      console.log(`   - Verified: ${sampleDisclosure.is_verified ? 'Yes' : 'No'}`);
     }
 
     // Test specific sponsor if available
     if (allDisclosures.length > 0) {
-      const sponsorId = allDisclosures[0].sponsorId;
-      const sponsorDisclosures = await financialDisclosureIntegrationService.processFinancialDisclosureData(sponsorId);
-      console.log(`✅ Processed ${sponsorDisclosures.length} disclosures for sponsor ${sponsorId}`);
+      const sponsor_id = allDisclosures[0].sponsor_id;
+      const sponsorDisclosures = await financialDisclosureIntegrationService.processFinancialDisclosureData(sponsor_id);
+      console.log(`✅ Processed ${sponsorDisclosures.length} disclosures for sponsor ${sponsor_id}`);
     }
 
     logger.info('\n', { component: 'Chanuka' });
@@ -45,10 +45,10 @@ async function testFinancialDisclosureIntegration() {
     logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     if (allDisclosures.length > 0) {
-      const sponsorId = allDisclosures[0].sponsorId;
+      const sponsor_id = allDisclosures[0].sponsor_id;
       
       try {
-        const completenessReport = await financialDisclosureIntegrationService.calculateDisclosureCompletenessScore(sponsorId);
+        const completenessReport = await financialDisclosureIntegrationService.calculateDisclosureCompletenessScore(sponsor_id);
         
         console.log(`✅ Completeness report for sponsor: ${completenessReport.sponsorName}`);
         console.log(`   - Overall Score: ${completenessReport.overallScore}%`);
@@ -65,7 +65,7 @@ async function testFinancialDisclosureIntegration() {
           });
         }
       } catch (error) {
-        console.log(`⚠️  Could not calculate completeness for sponsor ${sponsorId}: ${error}`);
+        console.log(`⚠️  Could not calculate completeness for sponsor ${sponsor_id}: ${error}`);
       }
     } else {
       logger.info('⚠️  No disclosures available for completeness testing', { component: 'Chanuka' });
@@ -78,10 +78,10 @@ async function testFinancialDisclosureIntegration() {
     logger.info('=', { component: 'Chanuka' }, .repeat(50));
 
     if (allDisclosures.length > 0) {
-      const sponsorId = allDisclosures[0].sponsorId;
+      const sponsor_id = allDisclosures[0].sponsor_id;
       
       try {
-        const relationshipMapping = await financialDisclosureIntegrationService.createFinancialRelationshipMapping(sponsorId);
+        const relationshipMapping = await financialDisclosureIntegrationService.createFinancialRelationshipMapping(sponsor_id);
         
         console.log(`✅ Relationship mapping for sponsor: ${relationshipMapping.sponsorName}`);
         console.log(`   - Total Financial Exposure: KSh ${relationshipMapping.totalFinancialExposure.toLocaleString()}`);
@@ -97,7 +97,7 @@ async function testFinancialDisclosureIntegration() {
             console.log(`        - Strength: ${rel.strength}%`);
             console.log(`        - Conflict Potential: ${rel.conflictPotential}`);
             console.log(`        - Financial Value: ${rel.financialValue ? `KSh ${rel.financialValue.toLocaleString()}` : 'Not specified'}`);
-            console.log(`        - Active: ${rel.isActive ? 'Yes' : 'No'}`);
+            console.log(`        - Active: ${rel.is_active ? 'Yes' : 'No'}`);
           });
           
           if (relationshipMapping.relationships.length > 3) {
@@ -105,7 +105,7 @@ async function testFinancialDisclosureIntegration() {
           }
         }
       } catch (error) {
-        console.log(`⚠️  Could not create relationship mapping for sponsor ${sponsorId}: ${error}`);
+        console.log(`⚠️  Could not create relationship mapping for sponsor ${sponsor_id}: ${error}`);
       }
     } else {
       logger.info('⚠️  No disclosures available for relationship mapping testing', { component: 'Chanuka' });
@@ -129,7 +129,7 @@ async function testFinancialDisclosureIntegration() {
           console.log(`      - Sponsor: ${alert.sponsorName}`);
           console.log(`      - Description: ${alert.description}`);
           console.log(`      - Severity: ${alert.severity}`);
-          console.log(`      - Created: ${alert.createdAt.toLocaleString()}`);
+          console.log(`      - Created: ${alert.created_at.toLocaleString()}`);
           console.log(`      - Resolved: ${alert.isResolved ? 'Yes' : 'No'}`);
         });
         

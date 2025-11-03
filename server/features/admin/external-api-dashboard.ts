@@ -96,7 +96,7 @@ router.get('/dashboard', async (req: Request, res: Response) => {
         successRate: h.successRate,
         errorRate: h.errorRate,
         uptime: h.uptime,
-        lastChecked: h.lastChecked,
+        last_checked: h.last_checked,
         // Count downtime events from the last 24 hours
         recentDowntime: h.downtimeEvents
           .filter(event => !event.endTime || (new Date().getTime() - event.startTime.getTime()) < 86400000)
@@ -247,7 +247,7 @@ router.get('/monitoring/realtime', async (req: Request, res: Response) => {
         source: status.source,
         status: status.status,
         responseTime: status.responseTime,
-        lastChecked: status.lastChecked,
+        last_checked: status.last_checked,
         trend: status.successRate >= 95 ? 'stable' : 
                status.successRate >= 80 ? 'degraded' : 'critical'
       })),
@@ -668,7 +668,7 @@ router.get('/metrics/export', async (req: Request, res: Response) => {
         success_rate: health.successRate,
         error_rate: health.errorRate,
         uptime: health.uptime,
-        last_checked: health.lastChecked
+        last_checked: health.last_checked
       }))
     };
 

@@ -1,4 +1,4 @@
-import { SearchSuggestion, SearchContext } from "../types/search.types";
+import { SearchSuggestion, SearchContext } from "../engines/types/search.types";
 
 export interface RankingWeights {
   exactMatch: number;
@@ -98,7 +98,7 @@ export class SuggestionRankingService {
       }
 
       // Sponsor context boost
-      if (context.sponsorId && suggestion.metadata?.sponsorId === context.sponsorId) {
+      if (context.sponsor_id && suggestion.metadata?.sponsor_id === context.sponsor_id) {
         boostedFrequency *= boostFactor;
       }
 
@@ -261,7 +261,7 @@ export class SuggestionRankingService {
       contextScore += weights.contextMatch;
     }
 
-    if (context.sponsorId && suggestion.metadata?.sponsorId === context.sponsorId) {
+    if (context.sponsor_id && suggestion.metadata?.sponsor_id === context.sponsor_id) {
       contextScore += weights.contextMatch;
     }
 
@@ -312,7 +312,7 @@ export class SuggestionRankingService {
       
       // Context features
       context.searchContext.category === suggestion.metadata?.category ? 1 : 0,
-      context.searchContext.sponsorId === suggestion.metadata?.sponsorId ? 1 : 0,
+      context.searchContext.sponsor_id === suggestion.metadata?.sponsor_id ? 1 : 0,
       
       // Length features
       term.length,

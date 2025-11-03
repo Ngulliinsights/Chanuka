@@ -38,8 +38,8 @@ const DropdownMenuSubTrigger = React.forwardRef<
     <ChevronRight className="ml-auto" />
   </DropdownMenuPrimitive.SubTrigger>
 ))
-DropdownMenuSubTrigger.displayName =
-  DropdownMenuPrimitive.SubTrigger.displayName
+DropdownMenuSubTrigger.display_name =
+  DropdownMenuPrimitive.SubTrigger.display_name
 
 const DropdownMenuSubContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.SubContent>,
@@ -54,8 +54,8 @@ const DropdownMenuSubContent = React.forwardRef<
     {...props}
   />
 ))
-DropdownMenuSubContent.displayName =
-  DropdownMenuPrimitive.SubContent.displayName
+DropdownMenuSubContent.display_name =
+  DropdownMenuPrimitive.SubContent.display_name
 
 const DropdownMenuContent = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Content>,
@@ -73,7 +73,7 @@ const DropdownMenuContent = React.forwardRef<
     />
   </DropdownMenuPrimitive.Portal>
 ))
-DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName
+DropdownMenuContent.display_name = DropdownMenuPrimitive.Content.display_name
 
 const DropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
@@ -91,7 +91,7 @@ const DropdownMenuItem = React.forwardRef<
     {...props}
   />
 ))
-DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName
+DropdownMenuItem.display_name = DropdownMenuPrimitive.Item.display_name
 
 const DropdownMenuCheckboxItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.CheckboxItem>,
@@ -114,8 +114,8 @@ const DropdownMenuCheckboxItem = React.forwardRef<
     {children}
   </DropdownMenuPrimitive.CheckboxItem>
 ))
-DropdownMenuCheckboxItem.displayName =
-  DropdownMenuPrimitive.CheckboxItem.displayName
+DropdownMenuCheckboxItem.display_name =
+  DropdownMenuPrimitive.CheckboxItem.display_name
 
 const DropdownMenuRadioItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.RadioItem>,
@@ -137,7 +137,7 @@ const DropdownMenuRadioItem = React.forwardRef<
     {children}
   </DropdownMenuPrimitive.RadioItem>
 ))
-DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName
+DropdownMenuRadioItem.display_name = DropdownMenuPrimitive.RadioItem.display_name
 
 const DropdownMenuLabel = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Label>,
@@ -155,7 +155,7 @@ const DropdownMenuLabel = React.forwardRef<
     {...props}
   />
 ))
-DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName
+DropdownMenuLabel.display_name = DropdownMenuPrimitive.Label.display_name
 
 const DropdownMenuSeparator = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Separator>,
@@ -167,7 +167,7 @@ const DropdownMenuSeparator = React.forwardRef<
     {...props}
   />
 ))
-DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName
+DropdownMenuSeparator.display_name = DropdownMenuPrimitive.Separator.display_name
 
 const DropdownMenuShortcut = ({
   className,
@@ -180,7 +180,7 @@ const DropdownMenuShortcut = ({
     />
   )
 }
-DropdownMenuShortcut.displayName = "DropdownMenuShortcut"
+DropdownMenuShortcut.display_name = "DropdownMenuShortcut"
 
 // Enhanced dropdown menu with error handling
 interface EnhancedDropdownMenuProps {
@@ -249,7 +249,7 @@ const EnhancedDropdownMenu = React.forwardRef<
     </DropdownMenuPrimitive.Root>
   );
 });
-EnhancedDropdownMenu.displayName = "EnhancedDropdownMenu";
+EnhancedDropdownMenu.display_name = "EnhancedDropdownMenu";
 
 // Enhanced dropdown menu item with error handling
 const EnhancedDropdownMenuItem = React.forwardRef<
@@ -302,7 +302,7 @@ const EnhancedDropdownMenuItem = React.forwardRef<
     </DropdownMenuPrimitive.Item>
   );
 });
-EnhancedDropdownMenuItem.displayName = "EnhancedDropdownMenuItem";
+EnhancedDropdownMenuItem.display_name = "EnhancedDropdownMenuItem";
 
 export {
   DropdownMenu,

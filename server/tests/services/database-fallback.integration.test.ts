@@ -204,7 +204,7 @@ describe('Database Fallback Integration Tests', () => {
       expect(health).toMatchObject({
         database: {
           connected: true,
-          lastChecked: expect.any(String),
+          last_checked: expect.any(String),
         },
         demoMode: {
           enabled: false,
@@ -308,7 +308,7 @@ describe('Database Fallback Integration Tests', () => {
       // Mock inconsistent demo data
       const originalGetBills = demoDataService.getBills;
       demoDataService.getBills = vi.fn().mockReturnValue([
-        { id: 1, sponsorId: 999 }, // Non-existent sponsor
+        { id: 1, sponsor_id: 999 }, // Non-existent sponsor
       ]);
 
       mockDatabase.execute.mockRejectedValueOnce(new Error('Database unavailable'));
@@ -460,7 +460,7 @@ describe('Database Fallback Integration Tests', () => {
         title: expect.any(String),
         description: expect.any(String),
         status: expect.any(String),
-        sponsorId: expect.any(Number),
+        sponsor_id: expect.any(Number),
       });
 
       expect(demoSponsor).toMatchObject({
@@ -471,13 +471,12 @@ describe('Database Fallback Integration Tests', () => {
       });
 
       expect(demoComments).toBeInstanceOf(Array);
-      if (demoComments.length > 0) {
-        expect(demoComments[0]).toMatchObject({
+      if (demoComments.length > 0) { expect(demoComments[0]).toMatchObject({
           id: expect.any(Number),
-          billId: expect.any(Number),
+          bill_id: expect.any(Number),
           content: expect.any(String),
-          userId: expect.any(String),
-        });
+          user_id: expect.any(String),
+          });
       }
     });
   });

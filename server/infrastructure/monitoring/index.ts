@@ -187,27 +187,25 @@ export const dbTracer = {
 export const traceDbQuery = dbTracer.traceQuery;
 
 // Audit logger using shared observability
-export const auditLogger = {
-  log: (action: string, userId?: string, metadata?: any) => {
+export const auditLogger = { log: (action: string, user_id?: string, metadata?: any) => {
     logger.info('Audit event', {
       action,
-      userId,
+      user_id,
       metadata,
       component: 'Chanuka',
       audit: true
-    });
+     });
   },
 
-  logDataExport: (userId: string, dataType: string, recordCount: number, requestedBy: string) => {
-    logger.info('Data export audit', {
+  logDataExport: (user_id: string, dataType: string, recordCount: number, requestedBy: string) => { logger.info('Data export audit', {
       action: 'data.export',
-      userId,
+      user_id,
       dataType,
       recordCount,
       requestedBy,
       component: 'Chanuka',
       audit: true
-    });
+     });
   }
 };
 

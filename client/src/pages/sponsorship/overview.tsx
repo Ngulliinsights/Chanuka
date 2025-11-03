@@ -14,9 +14,8 @@ import {
   FileText 
 } from 'lucide-react';
 
-interface OverviewProps {
-   billId: string | undefined;
-}
+interface OverviewProps { bill_id: string | undefined;
+ }
 
 interface AnalysisData {
   title: string;
@@ -25,20 +24,20 @@ interface AnalysisData {
   primarySponsor: {
     name: string;
     party: string;
-    conflictLevel: string;
-    financialExposure: number;
+    conflict_level: string;
+    financial_exposure: number;
   };
   coSponsors: Array<{
     name: string;
-    conflictLevel: string;
-    financialExposure: number;
+    conflict_level: string;
+    financial_exposure: number;
   }>;
   totalFinancialExposure: number;
   industryAlignment: number;
   sections: Array<{
     number: string;
     title: string;
-    conflictLevel: string;
+    conflict_level: string;
   }>;
   analysisMetadata: {
     sponsorCount: number;
@@ -47,8 +46,7 @@ interface AnalysisData {
   };
 }
 
-export default function SponsorshipOverview({ billId }: OverviewProps) {
-  const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
+export default function SponsorshipOverview({ bill_id  }: OverviewProps) { const [analysis, setAnalysis] = useState<AnalysisData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,7 +55,7 @@ export default function SponsorshipOverview({ billId }: OverviewProps) {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`/api/bills/${billId}/sponsorship-analysis`);
+        const response = await fetch(`/api/bills/${bill_id }/sponsorship-analysis`);
         
         if (!response.ok) {
           throw new Error(`Failed to fetch analysis: ${response.status}`);
@@ -73,10 +71,10 @@ export default function SponsorshipOverview({ billId }: OverviewProps) {
       }
     };
 
-    if (billId) {
+    if (bill_id) {
       fetchAnalysisData();
     }
-  }, [billId]);
+  }, [bill_id]);
 
   const getConflictLevelColor = (level: string) => {
     switch (level?.toLowerCase()) {
@@ -131,7 +129,7 @@ export default function SponsorshipOverview({ billId }: OverviewProps) {
         <div className="text-center py-12">
           <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">No Analysis Available</h3>
-          <p className="text-muted-foreground">Sponsorship analysis data is not available for this bill.</p>
+          <p className="text-muted-foreground">Sponsorship analysis data is not available for this bills.</p>
         </div>
       </div>
     );
@@ -143,16 +141,16 @@ export default function SponsorshipOverview({ billId }: OverviewProps) {
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
         <Link to="/" className="hover:text-primary transition-colors">Home</Link>
         <span>›</span>
-        <Link to={`/bills/${billId}`} className="hover:text-primary transition-colors">Bills</Link>
+        <Link to={ `/bills/${bill_id }`} className="hover:text-primary transition-colors">Bills</Link>
         <span>›</span>
-        <Link to={`/bills/${billId}/sponsorship-analysis`} className="hover:text-primary transition-colors">Sponsorship Analysis</Link>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="hover:text-primary transition-colors">Sponsorship Analysis</Link>
         <span>›</span>
         <span className="text-foreground">Overview</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6">
-        <Link to={`/bills/${billId}/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors">
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Analysis Navigation
         </Link>
@@ -238,15 +236,15 @@ export default function SponsorshipOverview({ billId }: OverviewProps) {
               <h3 className="text-lg font-semibold">{analysis.primarySponsor.name}</h3>
               <p className="text-sm text-muted-foreground">{analysis.primarySponsor.party}</p>
               <div className="flex items-center gap-4 mt-2">
-                <Badge className={getConflictLevelColor(analysis.primarySponsor.conflictLevel)}>
-                  {analysis.primarySponsor.conflictLevel.toUpperCase()} RISK
+                <Badge className={getConflictLevelColor(analysis.primarySponsor.conflict_level)}>
+                  {analysis.primarySponsor.conflict_level.toUpperCase()} RISK
                 </Badge>
                 <span className="text-sm text-muted-foreground">
-                  Financial Exposure: ${(analysis.primarySponsor.financialExposure / 1000000).toFixed(1)}M
+                  Financial Exposure: ${(analysis.primarySponsor.financial_exposure / 1000000).toFixed(1)}M
                 </span>
               </div>
             </div>
-            <Link to={`/bills/${billId}/sponsorship-analysis/primary-sponsor`}>
+            <Link to={ `/bills/${bill_id }/sponsorship-analysis/primary-sponsor`}>
               <Button variant="outline">
                 View Details
                 <ChevronRight className="h-4 w-4 ml-1" />
@@ -265,7 +263,7 @@ export default function SponsorshipOverview({ billId }: OverviewProps) {
                 <Users className="h-5 w-5" />
                 Co-Sponsors ({analysis.coSponsors.length})
               </span>
-              <Link to={`/bills/${billId}/sponsorship-analysis/co-sponsors`}>
+              <Link to={ `/bills/${bill_id }/sponsorship-analysis/co-sponsors`}>
                 <Button variant="outline" size="sm">
                   View All
                   <ChevronRight className="h-4 w-4 ml-1" />
@@ -278,13 +276,13 @@ export default function SponsorshipOverview({ billId }: OverviewProps) {
               {analysis.coSponsors.slice(0, 3).map((sponsor, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded">
                   <div>
-                    <span className="font-medium">{sponsor.name}</span>
-                    <Badge className={`ml-2 ${getConflictLevelColor(sponsor.conflictLevel)}`}>
-                      {sponsor.conflictLevel.toUpperCase()}
+                    <span className="font-medium">{sponsors.name}</span>
+                    <Badge className={`ml-2 ${getConflictLevelColor(sponsors.conflict_level)}`}>
+                      {sponsors.conflict_level.toUpperCase()}
                     </Badge>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    ${(sponsor.financialExposure / 1000000).toFixed(1)}M
+                    ${(sponsors.financial_exposure / 1000000).toFixed(1)}M
                   </span>
                 </div>
               ))}
@@ -315,8 +313,8 @@ export default function SponsorshipOverview({ billId }: OverviewProps) {
                     <span className="font-medium">Section {section.number}</span>
                     <p className="text-sm text-muted-foreground">{section.title}</p>
                   </div>
-                  <Badge className={getConflictLevelColor(section.conflictLevel)}>
-                    {section.conflictLevel.toUpperCase()}
+                  <Badge className={getConflictLevelColor(section.conflict_level)}>
+                    {section.conflict_level.toUpperCase()}
                   </Badge>
                 </div>
               ))}
@@ -327,13 +325,13 @@ export default function SponsorshipOverview({ billId }: OverviewProps) {
 
       {/* Navigation Actions */}
       <div className="flex justify-between items-center">
-        <Link to={`/bills/${billId}/sponsorship-analysis`}>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis`}>
           <Button variant="outline">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Navigation
           </Button>
         </Link>
-        <Link to={`/bills/${billId}/sponsorship-analysis/primary-sponsor`}>
+        <Link to={ `/bills/${bill_id }/sponsorship-analysis/primary-sponsor`}>
           <Button>
             Next: Primary Sponsor
             <ChevronRight className="h-4 w-4 ml-2" />

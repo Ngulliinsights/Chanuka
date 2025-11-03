@@ -116,12 +116,11 @@ export interface ValidationErrorDetail {
   context?: Record<string, any>;
 }
 
-export interface ValidationContext {
-  userId?: string;
+export interface ValidationContext { user_id?: string;
   requestId?: string;
   operation?: string;
   metadata?: Record<string, any>;
-}
+ }
 
 /**
  * Represents a cached validation result with timing metadata
@@ -214,12 +213,12 @@ export interface SchemaRegistration {
   version?: string;
   description?: string;
   tags?: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 export interface SchemaRegistry {
-  register(registration: Omit<SchemaRegistration, 'createdAt' | 'updatedAt'>): void;
+  register(registration: Omit<SchemaRegistration, 'created_at' | 'updated_at'>): void;
   get(name: string): SchemaRegistration | undefined;
   list(tags?: string[]): SchemaRegistration[];
   remove(name: string): boolean;

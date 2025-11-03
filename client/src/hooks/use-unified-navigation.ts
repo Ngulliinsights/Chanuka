@@ -17,7 +17,7 @@ export function useUnifiedNavigation() {
     breadcrumbs: navigation.breadcrumbs,
     relatedPages: navigation.relatedPages,
     currentSection: navigation.currentSection,
-    userRole: navigation.userRole,
+    user_role: navigation.user_role,
     preferences: navigation.preferences,
     
     // Responsive state (now included in navigation)
@@ -39,7 +39,7 @@ export function useUnifiedNavigation() {
     // Responsive actions (now included in navigation)
     toggleSidebar: navigation.toggleSidebar,
     setSidebarCollapsed: navigation.setSidebarCollapsed,
-    isActive: navigation.isActive,
+    is_active: navigation.is_active,
 
     // Accessibility actions
     getFocusClasses,

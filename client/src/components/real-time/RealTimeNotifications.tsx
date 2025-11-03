@@ -62,18 +62,16 @@ export function RealTimeNotifications({
         }
       }
 
-      if (message.type === 'bill_update') {
-        const billUpdate: Notification = {
-          id: `bill-${message.billId}-${Date.now()}`,
+      if (message.type === 'bill_update') { const billUpdate: Notification = {
+          id: `bill-${message.bill_id }-${Date.now()}`,
           type: 'bill_status_change',
           title: 'Bill Update',
           message: `Bill status changed: ${message.update?.data?.oldStatus} → ${message.update?.data?.newStatus}`,
           timestamp: new Date(message.timestamp || Date.now()),
-          data: {
-            billId: message.billId,
+          data: { bill_id: message.bill_id,
             updateType: message.update?.type,
             ...message.update?.data
-          },
+           },
           read: false
         };
 

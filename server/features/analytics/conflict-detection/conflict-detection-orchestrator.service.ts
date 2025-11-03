@@ -38,22 +38,22 @@ export class ConflictDetectionOrchestratorService {
    * Performs a comprehensive conflict of interest analysis for a sponsor
    */
   async performComprehensiveAnalysis(
-    sponsorId: number,
-    billId?: number
+    sponsor_id: number,
+    bill_id?: number
   ): Promise<ConflictAnalysis> {
-    const cacheKey = `comprehensive_analysis:${sponsorId}:${billId || 'all'}`;
+    const cacheKey = `comprehensive_analysis:${sponsor_id}:${ bill_id || 'all' }`;
 
     // Clear memoization cache at the start of each new analysis
     this.memoCache.clear();
 
     try {
-      logger.info(`📊 Performing comprehensive analysis for sponsor ${sponsorId}${billId ? ` and bill ${billId}` : ''}`);
+      logger.info(`📊 Performing comprehensive analysis for sponsor ${sponsor_id}${ bill_id ? ` and bill ${bill_id }` : ''}`);
 
       const cache = getDefaultCache();
       const cached = await cache.get(cacheKey);
       if (cached !== null && cached !== undefined) return cached;
 
-      const computed = await this.executeComprehensiveAnalysis(sponsorId, billId);
+      const computed = await this.executeComprehensiveAnalysis(sponsor_id, bill_id);
       
       try {
         await cache.set(cacheKey, computed, 3600);
@@ -63,19 +63,18 @@ export class ConflictDetectionOrchestratorService {
       
       return computed;
     } catch (error) {
-      logger.error(`Comprehensive analysis failed for sponsor ${sponsorId}`, {
-        error,
-        billId,
+      logger.error(`Comprehensive analysis failed for sponsor ${sponsor_id}`, { error,
+        bill_id,
         timestamp: new Date().toISOString()
-      });
-      return this.generateFallbackAnalysis(sponsorId, billId, error);
+       });
+      return this.generateFallbackAnalysis(sponsor_id, bill_id, error);
     }
   }
 
   /**
    * Analyzes stakeholders for a specific bill
    */
-  async analyzeStakeholders(billId: number): Promise<{
+  async analyzeStakeholders(bill_id: number): Promise<{
     stakeholders: Stakeholder[];
     conflicts: Array<{
       stakeholder1: Stakeholder;
@@ -84,15 +83,14 @@ export class ConflictDetectionOrchestratorService {
       severity: 'low' | 'medium' | 'high';
       description: string;
     }>;
-  }> {
-    try {
-      const bill = await this.getBill(billId);
+  }> { try {
+      const bill = await this.getBill(bill_id);
       if (!bill) {
         throw new ConflictDetectionError(
-          `Bill with ID ${billId} not found`,
+          `Bill with ID ${bill_id } not found`,
           'BILL_NOT_FOUND',
           undefined,
-          billId
+          bill_id
         );
       }
 
@@ -100,12 +98,11 @@ export class ConflictDetectionOrchestratorService {
       const conflicts = await stakeholderAnalysisService.identifyStakeholderConflicts(stakeholders);
 
       return { stakeholders, conflicts };
-    } catch (error) {
-      logger.error('Error analyzing stakeholders:', {
+    } catch (error) { logger.error('Error analyzing stakeholders:', {
         component: 'ConflictDetectionOrchestrator',
-        billId,
+        bill_id,
         error: error instanceof Error ? error.message : String(error)
-      });
+       });
       return { stakeholders: [], conflicts: [] };
     }
   }
@@ -113,13 +110,13 @@ export class ConflictDetectionOrchestratorService {
   /**
    * Invalidates all cached data for a specific sponsor
    */
-  async invalidateSponsorCache(sponsorId: number): Promise<void> {
+  async invalidateSponsorCache(sponsor_id: number): Promise<void> {
     try {
       const patterns = [
-        `comprehensive_analysis:${sponsorId}:*`,
-        `voting_anomalies:${sponsorId}`,
-        `professional_conflicts:${sponsorId}:*`,
-        `financial_conflicts:${sponsorId}:*`,
+        `comprehensive_analysis:${sponsor_id}:*`,
+        `voting_anomalies:${sponsor_id}`,
+        `professional_conflicts:${sponsor_id}:*`,
+        `financial_conflicts:${sponsor_id}:*`,
         `stakeholders:*`
       ];
 
@@ -130,12 +127,12 @@ export class ConflictDetectionOrchestratorService {
 
       const failures = results.filter(r => r.status === 'rejected');
       if (failures.length > 0) {
-        logger.warn(`Some cache invalidations failed for sponsor ${sponsorId}`, { failures });
+        logger.warn(`Some cache invalidations failed for sponsor ${sponsor_id}`, { failures });
       }
 
-      logger.info(`Cache invalidated for sponsor ${sponsorId}`);
+      logger.info(`Cache invalidated for sponsor ${sponsor_id}`);
     } catch (error) {
-      logger.error(`Failed to invalidate cache for sponsor ${sponsorId}`, { error });
+      logger.error(`Failed to invalidate cache for sponsor ${sponsor_id}`, { error });
     }
   }
 
@@ -143,30 +140,28 @@ export class ConflictDetectionOrchestratorService {
    * Generates mitigation strategies for conflicts
    */
   async generateMitigationStrategies(
-    sponsorId: number,
-    billId?: number
+    sponsor_id: number,
+    bill_id?: number
   ): Promise<Array<{
     conflictId: string;
     strategy: string;
     timeline: string;
     priority: 'low' | 'medium' | 'high' | 'critical';
     stakeholders: string[];
-  }>> {
-    try {
-      const analysis = await this.performComprehensiveAnalysis(sponsorId, billId);
+  }>> { try {
+      const analysis = await this.performComprehensiveAnalysis(sponsor_id, bill_id);
       const allConflicts = [...analysis.financialConflicts, ...analysis.professionalConflicts];
       
       return conflictResolutionRecommendationService.generateMitigationStrategies(
         allConflicts,
         analysis.riskLevel
       );
-    } catch (error) {
-      logger.error('Error generating mitigation strategies:', {
+     } catch (error) { logger.error('Error generating mitigation strategies:', {
         component: 'ConflictDetectionOrchestrator',
-        sponsorId,
-        billId,
+        sponsor_id,
+        bill_id,
         error: error instanceof Error ? error.message : String(error)
-      });
+       });
       return [];
     }
   }
@@ -174,33 +169,33 @@ export class ConflictDetectionOrchestratorService {
   // Private helper methods
 
   private async executeComprehensiveAnalysis(
-    sponsorId: number,
-    billId?: number
+    sponsor_id: number,
+    bill_id?: number
   ): Promise<ConflictAnalysis> {
     // Fetch all necessary data in parallel for maximum efficiency
     const [sponsor, affiliations, disclosures, votingHistory] = await Promise.all([
-      this.getSponsor(sponsorId),
-      this.getSponsorAffiliations(sponsorId),
-      this.getSponsorDisclosures(sponsorId),
-      this.getVotingHistory(sponsorId),
+      this.getSponsor(sponsor_id),
+      this.getSponsorAffiliations(sponsor_id),
+      this.getSponsorDisclosures(sponsor_id),
+      this.getVotingHistory(sponsor_id),
     ]);
 
     if (!sponsor) {
       throw new ConflictDetectionError(
-        `Sponsor with ID ${sponsorId} not found`,
+        `Sponsor with ID ${sponsor_id} not found`,
         'SPONSOR_NOT_FOUND',
-        sponsorId
+        sponsor_id
       );
     }
 
     // Calculate transparency score early as it's needed for overall risk calculation
-    const transparencyScore = conflictSeverityAnalyzerService.calculateTransparencyScore(disclosures);
-    const transparencyGrade = conflictSeverityAnalyzerService.calculateTransparencyGrade(transparencyScore);
+    const transparency_score = conflictSeverityAnalyzerService.calculateTransparencyScore(disclosures);
+    const transparencyGrade = conflictSeverityAnalyzerService.calculateTransparencyGrade(transparency_score);
 
     // Execute all analysis types in parallel for speed
     const [financialConflicts, professionalConflicts, votingAnomalies] = await Promise.all([
-      conflictDetectionEngineService.analyzeFinancialConflicts(sponsor, disclosures, affiliations, billId),
-      conflictDetectionEngineService.analyzeProfessionalConflicts(sponsor, affiliations, billId),
+      conflictDetectionEngineService.analyzeFinancialConflicts(sponsor, disclosures, affiliations, bill_id),
+      conflictDetectionEngineService.analyzeProfessionalConflicts(sponsor, affiliations, bill_id),
       conflictDetectionEngineService.analyzeVotingPatternInconsistencies(sponsor, votingHistory),
     ]);
 
@@ -209,7 +204,7 @@ export class ConflictDetectionOrchestratorService {
       financialConflicts,
       professionalConflicts,
       votingAnomalies,
-      transparencyScore
+      transparency_score
     );
     const riskLevel = conflictSeverityAnalyzerService.determineRiskLevel(overallRiskScore);
 
@@ -217,119 +212,114 @@ export class ConflictDetectionOrchestratorService {
       financialConflicts,
       professionalConflicts,
       votingAnomalies,
-      transparencyScore
+      transparency_score
     );
 
     const recommendations = conflictResolutionRecommendationService.generateConflictRecommendations(
       financialConflicts,
       professionalConflicts,
       votingAnomalies,
-      transparencyScore,
+      transparency_score,
       riskLevel
     );
 
     // Only fetch bill details if we need them (lazy loading optimization)
-    const billTitle = billId ? (await this.getBill(billId))?.title : undefined;
+    const billTitle = bill_id ? (await this.getBill(bill_id))?.title : undefined;
 
-    return {
-      sponsorId,
-      sponsorName: sponsor.name,
-      billId,
+    return { sponsor_id,
+      sponsorName: sponsors.name,
+      bill_id,
       billTitle,
       overallRiskScore,
       riskLevel,
       financialConflicts,
       professionalConflicts,
       votingAnomalies,
-      transparencyScore,
+      transparency_score,
       transparencyGrade,
       recommendations,
       lastAnalyzed: new Date(),
       confidence,
-    };
+     };
   }
 
-  private async getSponsor(sponsorId: number): Promise<Sponsor | null> {
+  private async getSponsor(sponsor_id: number): Promise<Sponsor | null> {
     try {
       const [sponsor] = await db
         .select()
         .from(sponsors)
-        .where(eq(sponsors.id, sponsorId));
+        .where(eq(sponsors.id, sponsor_id));
       
       return sponsor || null;
     } catch (error) {
-      logger.error('Error fetching sponsor:', { sponsorId, error });
+      logger.error('Error fetching sponsor:', { sponsor_id, error });
       return null;
     }
   }
 
-  private async getSponsorAffiliations(sponsorId: number): Promise<SponsorAffiliation[]> {
+  private async getSponsorAffiliations(sponsor_id: number): Promise<SponsorAffiliation[]> {
     try {
       return await db
         .select()
         .from(sponsorAffiliations)
-        .where(eq(sponsorAffiliations.sponsorId, sponsorId));
+        .where(eq(sponsorAffiliations.sponsor_id, sponsor_id));
     } catch (error) {
-      logger.error('Error fetching sponsor affiliations:', { sponsorId, error });
+      logger.error('Error fetching sponsor affiliations:', { sponsor_id, error });
       return [];
     }
   }
 
-  private async getSponsorDisclosures(sponsorId: number): Promise<SponsorTransparency[]> {
+  private async getSponsorDisclosures(sponsor_id: number): Promise<SponsorTransparency[]> {
     try {
       return await db
         .select()
         .from(sponsorTransparency)
-        .where(eq(sponsorTransparency.sponsorId, sponsorId));
+        .where(eq(sponsorTransparency.sponsor_id, sponsor_id));
     } catch (error) {
-      logger.error('Error fetching sponsor disclosures:', { sponsorId, error });
+      logger.error('Error fetching sponsor disclosures:', { sponsor_id, error });
       return [];
     }
   }
 
-  private async getVotingHistory(sponsorId: number): Promise<any[]> {
+  private async getVotingHistory(sponsor_id: number): Promise<any[]> {
     try {
       // This would be implemented based on your voting history schema
       // For now, return empty array
       return [];
     } catch (error) {
-      logger.error('Error fetching voting history:', { sponsorId, error });
+      logger.error('Error fetching voting history:', { sponsor_id, error });
       return [];
     }
   }
 
-  private async getBill(billId: number): Promise<Bill | null> {
-    try {
+  private async getBill(bill_id: number): Promise<Bill | null> { try {
       const [bill] = await db
         .select()
         .from(bills)
-        .where(eq(bills.id, billId));
+        .where(eq(bills.id, bill_id));
       
       return bill || null;
-    } catch (error) {
-      logger.error('Error fetching bill:', { billId, error });
+     } catch (error) { logger.error('Error fetching bill:', { bill_id, error  });
       return null;
     }
   }
 
   private generateFallbackAnalysis(
-    sponsorId: number,
-    billId?: number,
+    sponsor_id: number,
+    bill_id?: number,
     error?: any
-  ): ConflictAnalysis {
-    logger.warn('Generating fallback analysis due to error', { sponsorId, billId, error });
+  ): ConflictAnalysis { logger.warn('Generating fallback analysis due to error', { sponsor_id, bill_id, error  });
 
-    return {
-      sponsorId,
+    return { sponsor_id,
       sponsorName: 'Unknown Sponsor',
-      billId,
+      bill_id,
       billTitle: undefined,
       overallRiskScore: 0.5,
       riskLevel: 'medium',
       financialConflicts: [],
       professionalConflicts: [],
       votingAnomalies: [],
-      transparencyScore: 0.3,
+      transparency_score: 0.3,
       transparencyGrade: 'D',
       recommendations: [
         'Unable to complete full analysis due to data issues',
@@ -338,7 +328,7 @@ export class ConflictDetectionOrchestratorService {
       ],
       lastAnalyzed: new Date(),
       confidence: 0.1,
-    };
+     };
   }
 }
 

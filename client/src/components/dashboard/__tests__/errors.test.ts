@@ -138,12 +138,11 @@ describe('Dashboard Errors', () => {
       expect(error.details?.reason).toBe('Action item not found');
     });
 
-    it('should create action error with additional details', () => {
-      const details = { actionId: 'action-123', userId: 'user-456' };
+    it('should create action error with additional details', () => { const details = { actionId: 'action-123', user_id: 'user-456'  };
       const error = new DashboardActionError('complete', 'Permission denied', details);
 
       expect(error.details?.actionId).toBe('action-123');
-      expect(error.details?.userId).toBe('user-456');
+      expect(error.details?.user_id).toBe('user-456');
     });
   });
 
@@ -171,12 +170,11 @@ describe('Dashboard Errors', () => {
       expect(error.details?.reason).toBe('Topic name already exists');
     });
 
-    it('should create topic error with additional details', () => {
-      const details = { duplicateName: 'Healthcare', userId: 'user-456' };
+    it('should create topic error with additional details', () => { const details = { duplicateName: 'Healthcare', user_id: 'user-456'  };
       const error = new DashboardTopicError('add', undefined, 'Duplicate name', details);
 
       expect(error.details?.duplicateName).toBe('Healthcare');
-      expect(error.details?.userId).toBe('user-456');
+      expect(error.details?.user_id).toBe('user-456');
     });
   });
 

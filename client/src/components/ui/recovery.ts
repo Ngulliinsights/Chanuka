@@ -18,7 +18,7 @@ export interface RecoveryContext {
   timestamp: Date;
   retryCount: number;
   maxRetries: number;
-  userAgent?: string;
+  user_agent?: string;
   additionalData?: Record<string, any>;
 }
 
@@ -377,7 +377,7 @@ export function createRecoveryContext(
     timestamp: new Date(),
     retryCount,
     maxRetries,
-    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+    user_agent: typeof navigator !== 'undefined' ? navigator.user_agent : undefined,
     additionalData
   };
 }

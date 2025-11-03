@@ -67,7 +67,7 @@ describe('UnifiedLogger', () => {
     it('should handle context and metadata', () => {
       const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
-      testLogger.info('Test message', { component: 'test' }, { userId: '123' });
+      testLogger.info('Test message', { component: 'test' }, { user_id: '123'  });
 
       expect(consoleSpy).toHaveBeenCalled();
       const callArgs = consoleSpy.mock.calls[0];
@@ -77,9 +77,8 @@ describe('UnifiedLogger', () => {
     });
   });
 
-  describe('Context Management', () => {
-    it('should manage async context', async () => {
-      const context = { requestId: 'req-123', userId: 'user-456' };
+  describe('Context Management', () => { it('should manage async context', async () => {
+      const context = { requestId: 'req-123', user_id: 'user-456'  };
 
       await testLogger.withContextAsync(context, async () => {
         const currentContext = testLogger.getContext();

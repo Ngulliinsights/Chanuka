@@ -9,10 +9,9 @@ import {
 import { BaseError } from '../../../shared/core/src/observability/error-management/errors/base-error.js';
 import { ErrorContext as SharedErrorContext } from '../../../shared/core/src/observability/error-management/types.js';
 
-export interface ErrorContext {
-  traceId?: string;
-  userId?: string;
-  userAgent?: string;
+export interface ErrorContext { traceId?: string;
+  user_id?: string;
+  user_agent?: string;
   ip?: string;
   url?: string;
   method?: string;
@@ -24,7 +23,7 @@ export interface ErrorContext {
   currentAvg?: number;
   baselineAvg?: number;
   regressionPercent?: number;
-}
+ }
 
 export interface TrackedError {
   id: string;
@@ -239,11 +238,10 @@ class ErrorTracker {
     req: Request,
     severity: 'low' | 'medium' | 'high' | 'critical' = 'medium',
     category: 'database' | 'authentication' | 'validation' | 'external_api' | 'system' | 'business_logic' = 'system'
-  ): string {
-    const context: ErrorContext = {
+  ): string { const context: ErrorContext = {
       traceId: (req as any).traceId,
-      userId: (req as any).user?.id,
-      userAgent: req.get('User-Agent'),
+      user_id: (req as any).user?.id,
+      user_agent: req.get('User-Agent'),
       ip: req.ip || req.connection.remoteAddress,
       url: req.originalUrl || req.url,
       method: req.method,
@@ -251,7 +249,7 @@ class ErrorTracker {
       body: this.sanitizeBody(req.body),
       query: req.query,
       params: req.params
-    };
+     };
 
     return this.trackError(error, context, severity, category);
   }
@@ -877,13 +875,12 @@ class ErrorTracker {
             }
           });
 
-          const sharedContext: SharedErrorContext = {
-            correlationId: context.traceId,
-            userId: context.userId,
+          const sharedContext: SharedErrorContext = { correlationId: context.traceId,
+            user_id: context.user_id,
             metadata: {
               sessionId: context.traceId,
               ...context
-            }
+             }
           };
 
           await integration.trackError(baseError, sharedContext);

@@ -18,9 +18,9 @@ test.describe('Authentication API', () => {
       expect(response.status()).toBe(201);
       const data = await response.json();
       expect(data.success).toBe(true);
-      expect(data.user.email).toBe(testUser.email);
-      expect(data.user.name).toBe(testUser.name);
-      expect(data.user.password).toBeUndefined(); // Password should not be returned
+      expect(data.users.email).toBe(testUser.email);
+      expect(data.users.name).toBe(testUser.name);
+      expect(data.users.password).toBeUndefined(); // Password should not be returned
     });
 
     test('should reject registration with weak password', async ({ request }) => {
@@ -91,7 +91,7 @@ test.describe('Authentication API', () => {
       const data = await response.json();
       expect(data.success).toBe(true);
       expect(data.token).toBeDefined();
-      expect(data.user.email).toBe(registeredUser.email);
+      expect(data.users.email).toBe(registeredUser.email);
     });
 
     test('should reject login with invalid password', async ({ request }) => {

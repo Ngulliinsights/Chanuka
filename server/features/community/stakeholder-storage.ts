@@ -4,11 +4,10 @@ import { logger  } from '../../../shared/core/src/index.js';
 /**
  * Represents a voting record for a stakeholder
  */
-type Vote = { 
-  billId: number; 
+type Vote = { bill_id: number; 
   vote: "yes" | "no" | "abstain"; 
   date: string 
-};
+ };
 
 /**
  * Manages storage and retrieval of stakeholder data with optimized indexing
@@ -34,8 +33,8 @@ export class StakeholderStorage {
   private deepClone(stakeholder: Stakeholder): Stakeholder {
     return {
       ...stakeholder,
-      createdAt: new Date(stakeholder.createdAt.getTime()), // More efficient than string conversion
-      updatedAt: new Date(stakeholder.updatedAt.getTime()),
+      created_at: new Date(stakeholder.created_at.getTime()), // More efficient than string conversion
+      updated_at: new Date(stakeholder.updated_at.getTime()),
       votingHistory: stakeholder.votingHistory.map(vote => ({ ...vote })), // Deep clone voting records
     };
   }
@@ -135,10 +134,9 @@ export class StakeholderStorage {
   /**
    * Validates voting record data
    */
-  private validateVote(vote: Vote): void {
-    if (!vote.billId || typeof vote.billId !== 'number' || vote.billId <= 0) {
-      throw new Error('Vote billId must be a positive number');
-    }
+  private validateVote(vote: Vote): void { if (!vote.bill_id || typeof vote.bill_id !== 'number' || vote.bill_id <= 0) {
+      throw new Error('Vote bill_id must be a positive number');
+     }
 
     if (!['yes', 'no', 'abstain'].includes(vote.vote)) {
       throw new Error('Vote must be one of: yes, no, abstain');
@@ -233,8 +231,8 @@ export class StakeholderStorage {
     const newStakeholder: Stakeholder = {
       ...sanitizedStakeholder,
       id: this.nextId++,
-      createdAt: now,
-      updatedAt: now,
+      created_at: now,
+      updated_at: now,
       votingHistory: [],
       influence: sanitizedStakeholder.influence ?? 0,
     };
@@ -276,9 +274,9 @@ export class StakeholderStorage {
     const updatedStakeholder: Stakeholder = {
       ...existing,
       ...sanitizedUpdate,
-      updatedAt: new Date(),
+      updated_at: new Date(),
       id: existing.id, // Ensure ID cannot be changed
-      createdAt: existing.createdAt, // Ensure creation date cannot be changed
+      created_at: existing.created_at, // Ensure creation date cannot be changed
       votingHistory: existing.votingHistory, // Preserve voting history
     };
 
@@ -335,15 +333,15 @@ export class StakeholderStorage {
     this.validateVote(vote);
 
     // Check for duplicate votes on the same bill
-    const existingVote = stakeholder.votingHistory.find(v => v.billId === vote.billId);
+    const existingVote = stakeholder.votingHistory.find(v => v.bill_id === vote.bill_id);
     if (existingVote) {
-      throw new Error(`Stakeholder ${id} has already voted on bill ${vote.billId}`);
+      throw new Error(`Stakeholder ${id} has already voted on bill ${vote.bill_id}`);
     }
 
     const updatedStakeholder: Stakeholder = {
       ...stakeholder,
       votingHistory: [...stakeholder.votingHistory, { ...vote }], // Deep clone the vote
-      updatedAt: new Date(),
+      updated_at: new Date(),
     };
 
     this.stakeholders.set(id, updatedStakeholder);
@@ -415,8 +413,8 @@ export class StakeholderStorage {
       const newStakeholder: Stakeholder = {
         ...sanitizedStakeholder,
         id: this.nextId++,
-        createdAt: now,
-        updatedAt: now,
+        created_at: now,
+        updated_at: now,
         votingHistory: [],
       };
 

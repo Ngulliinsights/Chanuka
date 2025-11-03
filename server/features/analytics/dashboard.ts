@@ -1,7 +1,9 @@
 import { database as db } from '@shared/database/connection';
 import { eq, sql, and, desc, count, ilike } from 'drizzle-orm';
-import { bills, analysis, evaluations, departments } from '../../../shared/schema';
-import type { DepartmentStat, RadarDatum } from '../../../shared/schema';
+import { bills } from '../../../shared/schema/foundation';
+import { argumentTable } from '../../../shared/schema/argument_intelligence';
+import { evaluations, departments } from '../../../shared/schema/platform_operations';
+import type { DepartmentStat, RadarDatum } from '../../../shared/schema/platform_operations';
 import { logger  } from '../../../shared/core/src/index.js';
 import { errorTracker } from '../../core/errors/error-tracker.js';
 
@@ -18,8 +20,8 @@ interface Candidate {
   candidateName: string;
   departmentId: number;
   status: string;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
   relation?: any;
   department?: {
     id: number;
@@ -179,10 +181,10 @@ class DashboardStorageService {
       status?: string;
       departmentId?: number;
       searchTerm?: string;
-      sortBy?: 'createdAt' | 'updatedAt' | 'candidateName';
+      sortBy?: 'created_at' | 'updated_at' | 'candidateName';
       sortOrder?: 'asc' | 'desc';
       requestingUserId?: string;
-      userRole?: string;
+      user_role?: string;
     } = {},
   ): Promise<{ candidates: Candidate[]; total: number; hasMore: boolean }> {
     try {
@@ -192,10 +194,10 @@ class DashboardStorageService {
         status,
         departmentId,
         searchTerm,
-        sortBy = 'createdAt',
+        sortBy = 'created_at',
         sortOrder = 'desc',
         requestingUserId,
-        userRole = 'citizen',
+        user_role = 'citizen',
       } = options;
 
       // Check data access permissions
@@ -203,7 +205,7 @@ class DashboardStorageService {
         const accessCheck = dataPrivacyService.checkDataAccess(
           requestingUserId,
           'admin_analytics',
-          { user: { role: userRole } }
+          { user: { role: user_role } }
         );
 
         if (!accessCheck.allowed) {
@@ -289,7 +291,7 @@ class DashboardStorageService {
         const sanitized = { ...candidate };
         
         // If not admin, anonymize candidate names
-        if (userRole !== 'admin') {
+        if (user_role !== 'admin') {
           sanitized.candidateName = `Candidate ${candidate.id}`;
         }
         
@@ -350,8 +352,8 @@ class DashboardStorageService {
       const sanitizedData = {
         ...data,
         candidateName: data.candidateName.trim(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        created_at: new Date(),
+        updated_at: new Date(),
         status: (data.status as ValidStatus) || 'Under Review',
       };
 
@@ -362,7 +364,7 @@ class DashboardStorageService {
         .onConflictDoUpdate({
           target: [evaluations.candidateName, evaluations.departmentId],
           set: {
-            updatedAt: new Date(),
+            updated_at: new Date(),
             ...data,
           },
         })
@@ -430,7 +432,7 @@ class DashboardStorageService {
         .update(evaluations)
         .set({
           status,
-          updatedAt: new Date(),
+          updated_at: new Date(),
         })
         .where(eq(evaluations.id, id))
         .returning({ id: evaluations.id });

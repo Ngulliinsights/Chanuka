@@ -112,36 +112,34 @@ describe('StakeholderAnalysisService', () => {
     });
   });
 
-  describe('analyzeStakeholderInterests', () => {
-    const mockStakeholders: Stakeholder[] = [
+  describe('analyzeStakeholderInterests', () => { const mockStakeholders: Stakeholder[] = [
       {
         id: 'stakeholder1',
         name: 'Healthcare Provider',
         type: 'organization',
         interests: [
           {
-            billId: 123,
+            bill_id: 123,
             issueArea: 'Healthcare',
             position: 'support',
             strength: 0.8,
             description: 'Supports healthcare reform'
-          }
+           }
         ],
         influence: 0.7,
         transparency: 0.6
       },
-      {
-        id: 'stakeholder2',
+      { id: 'stakeholder2',
         name: 'Insurance Company',
         type: 'organization',
         interests: [
           {
-            billId: 123,
+            bill_id: 123,
             issueArea: 'Healthcare',
             position: 'oppose',
             strength: 0.9,
             description: 'Opposes healthcare reform'
-          }
+           }
         ],
         influence: 0.8,
         transparency: 0.5
@@ -257,36 +255,34 @@ describe('StakeholderAnalysisService', () => {
     });
   });
 
-  describe('identifyStakeholderConflicts', () => {
-    const conflictingStakeholders: Stakeholder[] = [
+  describe('identifyStakeholderConflicts', () => { const conflictingStakeholders: Stakeholder[] = [
       {
         id: 'supporter',
         name: 'Bill Supporter',
         type: 'organization',
         interests: [
           {
-            billId: 123,
+            bill_id: 123,
             issueArea: 'Healthcare',
             position: 'support',
             strength: 0.8,
             description: 'Supports the bill'
-          }
+           }
         ],
         influence: 0.7,
         transparency: 0.6
       },
-      {
-        id: 'opponent',
+      { id: 'opponent',
         name: 'Bill Opponent',
         type: 'organization',
         interests: [
           {
-            billId: 123,
+            bill_id: 123,
             issueArea: 'Healthcare',
             position: 'oppose',
             strength: 0.9,
             description: 'Opposes the bill'
-          }
+           }
         ],
         influence: 0.8,
         transparency: 0.5
@@ -312,36 +308,34 @@ describe('StakeholderAnalysisService', () => {
       expect(['low', 'medium', 'high']).toContain(conflict.severity);
     });
 
-    it('should handle stakeholders with no conflicts', async () => {
-      const nonConflictingStakeholders: Stakeholder[] = [
+    it('should handle stakeholders with no conflicts', async () => { const nonConflictingStakeholders: Stakeholder[] = [
         {
           id: 'neutral1',
           name: 'Neutral Party 1',
           type: 'organization',
           interests: [
             {
-              billId: 123,
+              bill_id: 123,
               issueArea: 'Healthcare',
               position: 'neutral',
               strength: 0.5,
               description: 'Neutral position'
-            }
+             }
           ],
           influence: 0.5,
           transparency: 0.5
         },
-        {
-          id: 'neutral2',
+        { id: 'neutral2',
           name: 'Neutral Party 2',
           type: 'organization',
           interests: [
             {
-              billId: 456, // Different bill
+              bill_id: 456, // Different bill
               issueArea: 'Education',
               position: 'support',
               strength: 0.6,
               description: 'Different issue'
-            }
+             }
           ],
           influence: 0.5,
           transparency: 0.5

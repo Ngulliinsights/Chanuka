@@ -338,11 +338,10 @@ async function verifyWebSocketService() {
       component: 'WebSocketVerification' 
     });
     
-    try {
-      // Generate a valid JWT token for testing
+    try { // Generate a valid JWT token for testing
       const testUserId = 'integration-test-user';
       const token = jwt.sign(
-        { userId: testUserId },
+        { user_id: testUserId  },
         process.env.JWT_SECRET || 'fallback-secret',
         { expiresIn: '1h' }
       );
@@ -421,7 +420,7 @@ async function verifyWebSocketService() {
         ws.on('message', (data) => {
           try {
             const message = JSON.parse(data.toString());
-            if (message.type === 'subscribed' && message.data?.billId === 456) {
+            if (message.type === 'subscribed' && message.data?.bill_id === 456) {
               clearTimeout(timeout);
               logger.info('Subscription confirmed', { 
                 component: 'WebSocketVerification' 
@@ -436,9 +435,8 @@ async function verifyWebSocketService() {
         });
         
         // Send subscription message
-        ws.send(JSON.stringify({
-          type: 'subscribe',
-          data: { billId: 456 },
+        ws.send(JSON.stringify({ type: 'subscribe',
+          data: { bill_id: 456  },
           messageId: 'test-sub-1',
           timestamp: Date.now()
         }));

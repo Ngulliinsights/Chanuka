@@ -44,19 +44,19 @@ const mockDb = {
 // --- Mock Data ---
 const mockSponsor1: schema.Sponsor = {
     id: 1, name: 'Alice Adams', role: 'Senator', party: 'Independent', constituency: 'District A',
-    email: 'alice@gov.test', phone: null, bio: null, photoUrl: null, conflictLevel: 'low',
-    financialExposure: '10000', votingAlignment: '75', transparencyScore: '80', isActive: true,
-    createdAt: new Date('2024-01-01'), updatedAt: new Date('2024-10-10')
+    email: 'alice@gov.test', phone: null, bio: null, photo_url: null, conflict_level: 'low',
+    financial_exposure: '10000', voting_alignment: '75', transparency_score: '80', is_active: true,
+    created_at: new Date('2024-01-01'), updated_at: new Date('2024-10-10')
 };
 const mockSponsor2: schema.Sponsor = {
     id: 2, name: 'Bob Brown', role: 'Representative', party: 'Unity', constituency: 'District B',
-    email: 'bob@gov.test', phone: null, bio: null, photoUrl: null, conflictLevel: 'medium',
-    financialExposure: '500000', votingAlignment: '60', transparencyScore: '70', isActive: true,
-    createdAt: new Date('2024-02-01'), updatedAt: new Date('2024-11-11')
+    email: 'bob@gov.test', phone: null, bio: null, photo_url: null, conflict_level: 'medium',
+    financial_exposure: '500000', voting_alignment: '60', transparency_score: '70', is_active: true,
+    created_at: new Date('2024-02-01'), updated_at: new Date('2024-11-11')
 };
-const mockAffiliation1: schema.SponsorAffiliation = { id: 10, sponsorId: 1, organization: 'Org X', role: 'Board Member', type: 'economic', conflictType: 'financial_indirect', startDate: new Date('2023-01-01'), endDate: null, isActive: true, createdAt: new Date(), updatedAt: new Date() };
-const mockTransparency1: schema.SponsorTransparency = { id: 20, sponsorId: 1, disclosureType: 'financial', description: 'Stocks in Org X', amount: '5000', source: 'Self-reported', dateReported: new Date('2024-01-15'), isVerified: true, createdAt: new Date(), updatedAt: new Date() };
-const mockSponsorship1: schema.BillSponsorship = { id: 30, billId: 101, sponsorId: 1, sponsorshipType: 'primary', sponsorshipDate: new Date('2024-03-01'), isActive: true, createdAt: new Date() };
+const mockAffiliation1: schema.SponsorAffiliation = { id: 10, sponsor_id: 1, organization: 'Org X', role: 'Board Member', type: 'economic', conflictType: 'financial_indirect', startDate: new Date('2023-01-01'), endDate: null, is_active: true, created_at: new Date(), updated_at: new Date() };
+const mockTransparency1: schema.SponsorTransparency = { id: 20, sponsor_id: 1, disclosureType: 'financial', description: 'Stocks in Org X', amount: '5000', source: 'Self-reported', dateReported: new Date('2024-01-15'), is_verified: true, created_at: new Date(), updated_at: new Date() };
+const mockSponsorship1: schema.BillSponsorship = { id: 30, bill_id: 101, sponsor_id: 1, sponsorshipType: 'primary', sponsorshipDate: new Date('2024-03-01'), is_active: true, created_at: new Date()  };
 
 
 // --- Test Suite ---
@@ -98,8 +98,8 @@ describe('SponsorRepository', () => {
 
     describe('create', () => {
         it('should insert a sponsor and return the new record', async () => {
-             const input: schema.InsertSponsor = { name: 'New Sponsor', role: 'Senator', party: 'New', financialExposure: 5000 };
-             const expectedOutput = { ...mockSponsor1, id: 3, ...input, financialExposure: '5000', votingAlignment: '0', transparencyScore: '0', isActive: true, createdAt: expect.any(Date), updatedAt: expect.any(Date) };
+             const input: schema.InsertSponsor = { name: 'New Sponsor', role: 'Senator', party: 'New', financial_exposure: 5000 };
+             const expectedOutput = { ...mockSponsor1, id: 3, ...input, financial_exposure: '5000', voting_alignment: '0', transparency_score: '0', is_active: true, created_at: expect.any(Date), updated_at: expect.any(Date) };
              mockDb._mockResult([expectedOutput]);
 
             const newSponsor = await repository.create(input);
@@ -108,10 +108,10 @@ describe('SponsorRepository', () => {
             expect(mockDb.insert).toHaveBeenCalledWith(schema.sponsors);
             expect(mockDb.values).toHaveBeenCalledWith(expect.objectContaining({
                 name: 'New Sponsor',
-                financialExposure: '5000', // Verify string conversion
-                isActive: true, // Verify default
-                createdAt: expect.any(Date),
-                updatedAt: expect.any(Date),
+                financial_exposure: '5000', // Verify string conversion
+                is_active: true, // Verify default
+                created_at: expect.any(Date),
+                updated_at: expect.any(Date),
             }));
              expect(mockDb.returning).toHaveBeenCalled();
         });
@@ -119,8 +119,8 @@ describe('SponsorRepository', () => {
 
     describe('update', () => {
         it('should update a sponsor and return the updated record', async () => {
-             const updateData = { party: 'Updated Party', financialExposure: 12345 };
-             const expectedOutput = { ...mockSponsor1, party: 'Updated Party', financialExposure: '12345', updatedAt: expect.any(Date) };
+             const updateData = { party: 'Updated Party', financial_exposure: 12345 };
+             const expectedOutput = { ...mockSponsor1, party: 'Updated Party', financial_exposure: '12345', updated_at: expect.any(Date) };
              mockDb._mockResult([expectedOutput]);
 
             const updatedSponsor = await repository.update(1, updateData);
@@ -129,8 +129,8 @@ describe('SponsorRepository', () => {
             expect(mockDb.update).toHaveBeenCalledWith(schema.sponsors);
             expect(mockDb.set).toHaveBeenCalledWith(expect.objectContaining({
                 party: 'Updated Party',
-                financialExposure: '12345', // Verify string conversion
-                updatedAt: expect.any(Date),
+                financial_exposure: '12345', // Verify string conversion
+                updated_at: expect.any(Date),
             }));
             expect(mockDb.where).toHaveBeenCalledWith(eq(schema.sponsors.id, 1));
              expect(mockDb.returning).toHaveBeenCalled();

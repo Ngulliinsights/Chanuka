@@ -15,15 +15,14 @@ import { rateLimitMiddleware } from '../rate-limiting/middleware';
 import { RateLimitStore } from '../rate-limiting/types';
 import { logger } from '../observability/logging';
 
-export interface AIRequest extends Request {
-  aiContext?: {
+export interface AIRequest extends Request { aiContext?: {
     service: string;
     operation: string;
     startTime: number;
     requestId: string;
-    userId?: string;
+    user_id?: string;
     cached?: boolean;
-  };
+   };
 }
 
 export interface AIMiddlewareOptions {
@@ -45,8 +44,7 @@ export interface AIMiddlewareOptions {
 /**
  * AI Request Middleware - Handles incoming AI requests
  */
-export function aiRequestMiddleware(options: AIMiddlewareOptions) {
-  return async (req: AIRequest, res: Response, next: NextFunction) => {
+export function aiRequestMiddleware(options: AIMiddlewareOptions) { return async (req: AIRequest, res: Response, next: NextFunction) => {
     const startTime = performance.now();
     const requestId = generateRequestId();
     
@@ -56,9 +54,9 @@ export function aiRequestMiddleware(options: AIMiddlewareOptions) {
       operation: req.path.split('/').pop() || 'unknown',
       startTime,
       requestId,
-      userId: (req as any).user?.id,
+      user_id: (req as any).user?.id,
       cached: false
-    };
+     };
 
     // Security validation
     if (options.enableSecurity !== false) {
@@ -73,16 +71,15 @@ export function aiRequestMiddleware(options: AIMiddlewareOptions) {
     }
 
     // Log request
-    logger.info('AI Request Started', { component: 'Chanuka' }, {
-      requestId,
+    logger.info('AI Request Started', { component: 'Chanuka' }, { requestId,
       service: options.service,
       operation: req.aiContext.operation,
       method: req.method,
       path: req.path,
-      userId: req.aiContext.userId,
+      user_id: req.aiContext.user_id,
       ip: req.ip,
-      userAgent: req.get('User-Agent')
-    });
+      user_agent: req.get('User-Agent')
+     });
 
     next();
   };
@@ -188,23 +185,21 @@ export function aiRateLimitMiddleware(options: AIMiddlewareOptions) {
       ...config,
       keyPrefix: `ai:${options.service}:`
     },
-    keyGenerator: (req: Request) => {
-      const userId = (req as any).user?.id;
+    keyGenerator: (req: Request) => { const user_id = (req as any).user?.id;
       const operation = req.path.split('/').pop() || 'unknown';
       
-      if (userId) {
-        return `user:${userId}:${operation}`;
+      if (user_id) {
+        return `user:${user_id }:${operation}`;
       }
       return `ip:${req.ip}:${operation}`;
     },
-    onLimitReached: (req: Request, res: Response) => {
-      console.warn('AI Rate Limit Exceeded', {
+    onLimitReached: (req: Request, res: Response) => { console.warn('AI Rate Limit Exceeded', {
         service: options.service,
         ip: req.ip,
-        userId: (req as any).user?.id,
+        user_id: (req as any).user?.id,
         path: req.path,
-        userAgent: req.get('User-Agent')
-      });
+        user_agent: req.get('User-Agent')
+       });
     }
   });
 }
@@ -254,8 +249,8 @@ async function validateAIRequest(req: Request): Promise<{
 
   // Validate content type for POST/PUT requests
   if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
-    const contentType = req.get('Content-Type');
-    if (!contentType || !contentType.includes('application/json')) {
+    const content_type = req.get('Content-Type');
+    if (!content_type || !content_type.includes('application/json')) {
       errors.push('Content-Type must be application/json');
     }
   }
@@ -288,8 +283,7 @@ function logAIResponse(
   const duration = performance.now() - req.aiContext.startTime;
   const success = res.statusCode >= 200 && res.statusCode < 300;
 
-  logger.info('AI Request Completed', { component: 'Chanuka' }, {
-    requestId: req.aiContext.requestId,
+  logger.info('AI Request Completed', { component: 'Chanuka' }, { requestId: req.aiContext.requestId,
     service: options.service,
     operation: req.aiContext.operation,
     method: req.method,
@@ -298,10 +292,10 @@ function logAIResponse(
     duration: Math.round(duration),
     success,
     cached: req.aiContext.cached,
-    userId: req.aiContext.userId,
+    user_id: req.aiContext.user_id,
     ip: req.ip,
     responseSize: JSON.stringify(data).length
-  });
+   });
 
   // Record metrics if enabled
   if (options.enableMetrics !== false) {
