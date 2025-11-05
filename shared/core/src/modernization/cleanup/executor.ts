@@ -387,7 +387,7 @@ export class CleanupExecutor {
 
     // Combine sections for markdown files
     if (sections.size > 0) {
-      for (const [section, lines] of sections) {
+      for (const [section, lines] of Array.from(sections)) {
         combinedContent += `\n\n${section}\n\n${lines.join('\n')}`;
       }
     }

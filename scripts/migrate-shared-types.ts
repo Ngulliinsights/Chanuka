@@ -23,40 +23,40 @@ const importMappings: ImportMapping[] = [
   // Error types - use specialized error classes
   {
     from: /from\s+['"]@shared\/types\/errors['"];?/g,
-    to: "from '@shared/core/src/observability/error-management/errors/specialized-errors';",
+    to: "from '@shared/core/observability/error-management/errors/specialized-errors';",
     description: "Error types to specialized error classes"
   },
   {
     from: /from\s+['"]@shared\/types['"].*ValidationError/g,
-    to: "from '@shared/core/src/observability/error-management/errors/specialized-errors';",
+    to: "from '@shared/core/observability/error-management/errors/specialized-errors';",
     description: "ValidationError to specialized class"
   },
   
   // Auth types - use core auth types
   {
     from: /from\s+['"]@shared\/types\/auth['"];?/g,
-    to: "from '@shared/core/src/types/auth.types';",
+    to: "from '@shared/core/types/auth.types';",
     description: "Auth types to core auth types"
   },
   
   // Common types - use core types
   {
     from: /from\s+['"]@shared\/types\/common['"];?/g,
-    to: "from '@shared/core/src/types';",
+    to: "from '@shared/core/types';",
     description: "Common types to core types"
   },
   
   // Generic shared/types imports - use core types
   {
     from: /from\s+['"]@shared\/types['"];?/g,
-    to: "from '@shared/core/src/types';",
+    to: "from '@shared/core/types';",
     description: "Generic shared/types to core types"
   },
   
   // Relative imports to shared/types
   {
     from: /from\s+['"]\.\.\/\.\.\/\.\.\/shared\/types\/([^'"]+)['"];?/g,
-    to: "from '@shared/core/src/types';",
+    to: "from '@shared/core/types';",
     description: "Relative shared/types imports to core types"
   }
 ];
@@ -218,7 +218,7 @@ export interface ExtendedExpert extends Expert {
 
 export interface VerificationTask {
   id: string;
-  analysisId: string;
+  analysis_id: string;
   expertId: string;
   status: VerificationStatus;
   assignedAt: Date;

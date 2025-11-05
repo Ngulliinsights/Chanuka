@@ -173,9 +173,9 @@ export class UserApplicationService {
     return result.verification!;
   }
 
-  async endorseVerification(user_id: string, verificationId: string): Promise<void> { const result = await this.verificationOperationsUseCase.endorseVerification({
+  async endorseVerification(user_id: string, verification_id: string): Promise<void> { const result = await this.verificationOperationsUseCase.endorseVerification({
       user_id,
-      verificationId
+      verification_id
      });
 
     if (!result.success) {
@@ -183,9 +183,9 @@ export class UserApplicationService {
     }
   }
 
-  async disputeVerification(user_id: string, verificationId: string, reason: string): Promise<void> { const result = await this.verificationOperationsUseCase.disputeVerification({
+  async disputeVerification(user_id: string, verification_id: string, reason: string): Promise<void> { const result = await this.verificationOperationsUseCase.disputeVerification({
       user_id,
-      verificationId,
+      verification_id,
       reason
      });
 

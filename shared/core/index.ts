@@ -9,7 +9,7 @@
 // Essential logger - type-safe implementation
 interface LogContext {
   component?: string;
-  userId?: string;
+  user_id?: string;
   requestId?: string;
   [key: string]: unknown;
 }

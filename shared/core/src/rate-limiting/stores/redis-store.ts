@@ -1,5 +1,6 @@
 import { Result, ok, err } from '../../primitives/types/result';
-import { RateLimitData, IRateLimitStore, RateLimitStore, RateLimitOptions, RateLimitResult } from '../types';
+import { RateLimitData, IRateLimitStore, RateLimitStore, RateLimitOptions } from '../types';
+import { RateLimitResult } from '../core/interfaces';
 import Redis from 'ioredis';
 
 export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
@@ -123,7 +124,7 @@ export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
      if (data.isErr() || !data.value || now >= data.value.resetTime) {
        // Reset window
        const newData: RateLimitData = {
-         tokens: options.max - 1,
+         tokens: Math.max(0, options.max - 1),
          lastRefill: now,
          resetTime: now + options.windowMs
        };
@@ -133,11 +134,15 @@ export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
        return {
          allowed: true,
          remaining: newData.tokens,
-         resetAt: new Date(newData.resetTime)
+         resetAt: new Date(newData.resetTime),
+         totalHits: 1,
+         windowStart: now,
+         algorithm: 'fixed-window'
        };
      }
 
      const currentData = data.value;
+     const totalHits = options.max - currentData.tokens + 1;
 
      if (currentData.tokens > 0) {
        currentData.tokens--;
@@ -146,7 +151,10 @@ export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
        return {
          allowed: true,
          remaining: currentData.tokens,
-         resetAt: new Date(currentData.resetTime)
+         resetAt: new Date(currentData.resetTime),
+         totalHits: totalHits,
+         windowStart: currentData.lastRefill,
+         algorithm: 'fixed-window'
        };
      }
 
@@ -154,14 +162,20 @@ export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
        allowed: false,
        remaining: 0,
        resetAt: new Date(currentData.resetTime),
-       retryAfter: Math.ceil((currentData.resetTime - now) / 1000)
+       retryAfter: Math.ceil((currentData.resetTime - now) / 1000),
+       totalHits: totalHits,
+       windowStart: currentData.lastRefill,
+       algorithm: 'fixed-window'
      };
    } catch (error) {
      // Fallback to allow on Redis errors
      return {
        allowed: true,
-       remaining: options.max - 1,
-       resetAt: new Date(now + options.windowMs)
+       remaining: Math.max(0, options.max - 1),
+       resetAt: new Date(now + options.windowMs),
+       totalHits: 1,
+       windowStart: now,
+       algorithm: 'fixed-window'
      };
    }
  }
@@ -171,11 +185,136 @@ export class RedisRateLimitStore implements IRateLimitStore, RateLimitStore {
  }
 
  async cleanup(): Promise<void> {
-   // Redis handles TTL automatically, no cleanup needed
+   try {
+     // Find all rate limit keys and delete expired ones
+     const keys = await this.redis.keys('ratelimit:*');
+     if (keys.length === 0) return;
+
+     const pipeline = this.redis.pipeline();
+     const now = Date.now();
+
+     for (const key of keys) {
+       // Check if the key has expired by getting its TTL
+       const ttl = await this.redis.pttl(key);
+       if (ttl <= 0) {
+         pipeline.del(key);
+       }
+     }
+
+     await pipeline.exec();
+   } catch (error) {
+     console.warn('Redis cleanup failed:', error);
+     // Don't throw - cleanup failures shouldn't break the application
+   }
  }
 
  // Health check method
- healthCheck(): Promise<boolean> {
-   return this.redis.ping().then(() => true).catch(() => false);
+ async healthCheck(): Promise<boolean> {
+   try {
+     await this.redis.ping();
+     return true;
+   } catch (error) {
+     console.warn('Redis health check failed:', error);
+     return false;
+   }
+ }
+
+ // Additional methods for comprehensive rate limiting
+ async getMetrics(): Promise<any> {
+   try {
+     const keys = await this.redis.keys('ratelimit:*');
+     const totalKeys = keys.length;
+
+     // Get basic stats
+     const info = await this.redis.info('stats');
+     const connectedClients = parseInt(info.match(/connected_clients:(\d+)/)?.[1] || '0');
+
+     return {
+       totalKeys,
+       connectedClients,
+       timestamp: Date.now(),
+       storeType: 'redis'
+     };
+   } catch (error) {
+     console.warn('Failed to get Redis metrics:', error);
+     return {
+       totalKeys: 0,
+       connectedClients: 0,
+       timestamp: Date.now(),
+       storeType: 'redis',
+       error: error instanceof Error ? error.message : 'Unknown error'
+     };
+   }
+ }
+
+ async setRateLimit(key: string, limit: number, windowMs: number): Promise<Result<void>> {
+   try {
+     const redisKey = `ratelimit:${key}`;
+     const data: RateLimitData = {
+       tokens: limit,
+       lastRefill: Date.now(),
+       resetTime: Date.now() + windowMs
+     };
+
+     const serialized = JSON.stringify(data);
+     await this.redis.setex(redisKey, Math.ceil(windowMs / 1000), serialized);
+
+     return ok(undefined);
+   } catch (error) {
+     return err(error as Error);
+   }
+ }
+
+ async getRateLimitStatus(key: string): Promise<Result<any>> {
+   try {
+     const data = await this.get(key);
+     if (data.isErr()) {
+       return err(data.error);
+     }
+
+     if (!data.value) {
+       return ok({
+         currentCount: 0,
+         limit: 0,
+         windowStart: 0,
+         windowEnd: 0,
+         remaining: 0
+       });
+     }
+
+     const currentData = data.value;
+     const now = Date.now();
+     const remaining = Math.max(0, currentData.tokens);
+
+     return ok({
+       currentCount: currentData.tokens,
+       limit: currentData.tokens + (now < currentData.resetTime ? 1 : 0), // Estimate limit
+       windowStart: currentData.lastRefill,
+       windowEnd: currentData.resetTime,
+       remaining
+     });
+   } catch (error) {
+     return err(error as Error);
+   }
+ }
+
+ getConnectionInfo(): any {
+   try {
+     const options = (this.redis as any).options || {};
+     return {
+       host: options.host || 'unknown',
+       port: options.port || 6379,
+       status: this.redis.status || 'unknown',
+       connected: this.redis.status === 'ready'
+     };
+   } catch (error) {
+     return {
+       host: 'unknown',
+       port: 6379,
+       status: 'error',
+       connected: false,
+       error: error instanceof Error ? error.message : 'Unknown error'
+     };
+   }
  }
 }

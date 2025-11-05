@@ -184,14 +184,14 @@ export const oauthTokenSchema = z.object({
   redirectUri: z.string().url().optional(),
   clientId: z.string().min(1, 'Client ID is required'),
   clientSecret: z.string().min(1, 'Client secret is required'),
-  refreshToken: z.string().optional(),
+  refresh_token: z.string().optional(),
 }).refine(
   (data) => {
     if (data.grantType === 'authorization_code') {
       return data.code && data.redirectUri;
     }
     if (data.grantType === 'refresh_token') {
-      return data.refreshToken;
+      return data.refresh_token;
     }
     return true;
   },

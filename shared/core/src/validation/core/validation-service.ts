@@ -5,7 +5,7 @@
  * with schema caching, preprocessing, and metrics collection
  */
 
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { logger } from '../../observability/logging/logger';
 import { ValidationError } from '../../observability/error-management/errors/specialized-errors';
 import {
@@ -489,7 +489,7 @@ export abstract class CoreValidationService implements ValidationService {
    */
   private cleanupExpiredCache(): void {
     const now = Date.now();
-    for (const [key, cached] of this.validationCache.entries()) {
+    for (const [key, cached] of Array.from(this.validationCache.entries())) {
       if (now > cached.timestamp + (cached.ttl * 1000)) {
         this.validationCache.delete(key);
       }

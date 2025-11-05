@@ -8,7 +8,7 @@ export interface Campaign {
   id: string;
   title: string;
   description: string;
-  billId: string;
+  bill_id: string;
   organizerId: string;
   organizationName?: string;
   
@@ -23,16 +23,16 @@ export interface Campaign {
   strategy: CampaignStrategy;
   
   // Participation
-  isPublic: boolean;
+  is_public: boolean;
   requiresApproval: boolean;
   maxParticipants?: number;
   participantCount: number;
   
   // Timeline
-  startDate: Date;
-  endDate?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  start_date: Date;
+  end_date?: Date;
+  created_at: Date;
+  updated_at: Date;
   
   // Metrics and tracking
   metrics: CampaignMetrics;
@@ -46,14 +46,14 @@ export interface Campaign {
   };
   
   // Moderation
-  isVerified: boolean;
+  is_verified: boolean;
   moderationNotes?: string;
 }
 
 export interface NewCampaign {
   title: string;
   description: string;
-  billId: string;
+  bill_id: string;
   organizerId: string;
   organizationName?: string;
   category: string;
@@ -61,11 +61,11 @@ export interface NewCampaign {
   targetCounties?: string[];
   objectives: string[];
   strategy: CampaignStrategy;
-  isPublic?: boolean;
+  is_public?: boolean;
   requiresApproval?: boolean;
   maxParticipants?: number;
-  startDate: Date;
-  endDate?: Date;
+  start_date: Date;
+  end_date?: Date;
   resources?: {
     documents?: string[];
     links?: string[];
@@ -80,12 +80,12 @@ export class CampaignEntity {
   get id(): string { return this.campaign.id; }
   get title(): string { return this.campaign.title; }
   get description(): string { return this.campaign.description; }
-  get billId(): string { return this.campaign.billId; }
+  get billId(): string { return this.campaign.bill_id; }
   get organizerId(): string { return this.campaign.organizerId; }
   get status(): Campaign['status'] { return this.campaign.status; }
   get participantCount(): number { return this.campaign.participantCount; }
   get isActive(): boolean { return this.campaign.status === 'active'; }
-  get isPublic(): boolean { return this.campaign.isPublic; }
+  get isPublic(): boolean { return this.campaign.is_public; }
   get requiresApproval(): boolean { return this.campaign.requiresApproval; }
   get maxParticipants(): number | undefined { return this.campaign.maxParticipants; }
   get impactScore(): number { return this.campaign.impactScore; }
@@ -101,11 +101,11 @@ export class CampaignEntity {
   }
 
   isExpired(): boolean {
-    if (!this.campaign.endDate) return false;
-    return new Date() > this.campaign.endDate;
+    if (!this.campaign.end_date) return false;
+    return new Date() > this.campaign.end_date;
   }
 
-  canBeModifiedBy(userId: string): boolean {
+  canBeModifiedBy(user_id: string): boolean {
     return this.campaign.organizerId === userId;
   }
 
@@ -114,18 +114,18 @@ export class CampaignEntity {
       throw new Error('Campaign cannot accept new participants');
     }
     this.campaign.participantCount++;
-    this.campaign.updatedAt = new Date();
+    this.campaign.updated_at = new Date();
   }
 
   removeParticipant(): void {
     if (this.campaign.participantCount > 0) {
       this.campaign.participantCount--;
-      this.campaign.updatedAt = new Date();
+      this.campaign.updated_at = new Date();
     }
   }
 
-  updateStatus(newStatus: Campaign['status'], userId: string): void {
-    if (!this.canBeModifiedBy(userId)) {
+  updateStatus(newStatus: Campaign['status'], user_id: string): void {
+    if (!this.canBeModifiedBy(user_id)) {
       throw new Error('User not authorized to modify campaign');
     }
     
@@ -143,12 +143,12 @@ export class CampaignEntity {
     }
 
     this.campaign.status = newStatus;
-    this.campaign.updatedAt = new Date();
+    this.campaign.updated_at = new Date();
   }
 
   updateMetrics(metrics: Partial<CampaignMetrics>): void {
     this.campaign.metrics = { ...this.campaign.metrics, ...metrics };
-    this.campaign.updatedAt = new Date();
+    this.campaign.updated_at = new Date();
   }
 
   updateImpactScore(score: number): void {
@@ -156,7 +156,7 @@ export class CampaignEntity {
       throw new Error('Impact score must be between 0 and 100');
     }
     this.campaign.impactScore = score;
-    this.campaign.updatedAt = new Date();
+    this.campaign.updated_at = new Date();
   }
 
   toJSON(): Campaign {
@@ -174,11 +174,11 @@ export class CampaignEntity {
       status: 'draft',
       tags: data.tags || [],
       targetCounties: data.targetCounties || [],
-      isPublic: data.isPublic ?? true,
+      is_public: data.is_public ?? true,
       requiresApproval: data.requiresApproval ?? false,
       participantCount: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      created_at: new Date(),
+      updated_at: new Date(),
       metrics: {
         totalParticipants: 0,
         activeParticipants: 0,
@@ -194,7 +194,7 @@ export class CampaignEntity {
       },
       impactScore: 0,
       resources: data.resources || { documents: [], links: [], templates: [] },
-      isVerified: false
+      is_verified: false
     };
 
     return new CampaignEntity(campaign);

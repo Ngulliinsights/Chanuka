@@ -34,7 +34,7 @@ describe('UserJourneyTracker', () => {
       
       const journey = tracker.getJourney(mockSessionId);
       expect(journey).toBeDefined();
-      expect(journey?.sessionId).toBe(mockSessionId);
+      expect(journey?.session_id).toBe(mockSessionId);
       expect(journey?.user_id).toBe(mockUserId);
       expect(journey?.user_role).toBe('citizen');
       expect(journey?.completed).toBe(false);
@@ -254,7 +254,7 @@ describe('UserJourneyTracker', () => {
       const csvData = tracker.exportJourneyData('csv');
       
       expect(typeof csvData).toBe('string');
-      expect(csvData).toContain('sessionId');
+      expect(csvData).toContain('session_id');
       expect(csvData).toContain('user_role');
       
       const lines = csvData.split('\n');
@@ -367,7 +367,7 @@ describe('UserJourneyTracker Singleton', () => {
     const journey = instance2.getJourney('test-session');
     
     expect(journey).toBeDefined();
-    expect(journey?.sessionId).toBe('test-session');
+    expect(journey?.session_id).toBe('test-session');
   });
 });
 

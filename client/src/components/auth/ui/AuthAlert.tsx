@@ -4,8 +4,8 @@
  */
 
 import React from 'react';
-import { CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
-import { cn } from '../../../lib/utils';
+import { CheckCircle as CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Alert, AlertDescription } from '../../ui/alert';
 import { Button } from '../../ui/button';
 

@@ -406,7 +406,7 @@ export function objectDiff(
 
   const allKeys = new Set([...Object.keys(obj1), ...Object.keys(obj2)]);
 
-  for (const key of allKeys) {
+  for (const key of Array.from(allKeys)) {
     const val1 = obj1[key];
     const val2 = obj2[key];
 

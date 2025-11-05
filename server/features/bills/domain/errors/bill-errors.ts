@@ -82,19 +82,19 @@ export class BillErrorFactory {
         );
     }
 
-    static sponsorNotFound(sponsorId: string): BillServiceError {
+    static sponsorNotFound(sponsor_id: string): BillServiceError {
         return new BillServiceError(
             'SPONSOR_NOT_FOUND',
-            `Bill sponsor not found: ${sponsorId}`,
-            { sponsorId }
+            `Bill sponsor not found: ${sponsor_id}`,
+            { sponsor_id }
         );
     }
 
-    static sponsorNotAuthorized(sponsorId: string, role: string): BillServiceError {
+    static sponsorNotAuthorized(sponsor_id: string, role: string): BillServiceError {
         return new BillServiceError(
             'SPONSOR_NOT_AUTHORIZED',
-            `User ${sponsorId} with role '${role}' is not authorized to sponsor bills`,
-            { sponsorId, role }
+            `User ${ sponsor_id } with role '${role}' is not authorized to sponsor bills`,
+            { sponsor_id, role }
         );
     }
 
@@ -106,35 +106,35 @@ export class BillErrorFactory {
         );
     }
 
-    static billNotFound(billId: string): BillServiceError {
+    static billNotFound(bill_id: string): BillServiceError {
         return new BillServiceError(
             'BILL_NOT_FOUND',
-            `Bill not found: ${billId}`,
-            { billId }
+            `Bill not found: ${bill_id}`,
+            { bill_id }
         );
     }
 
-    static userNotAuthorized(userId: string, action: string): BillServiceError {
+    static userNotAuthorized(user_id: string, action: string): BillServiceError {
         return new BillServiceError(
             'USER_NOT_AUTHORIZED',
-            `User ${userId} is not authorized to perform action: ${action}`,
-            { userId, action }
+            `User ${ user_id } is not authorized to perform action: ${action}`,
+            { user_id, action }
         );
     }
 
-    static duplicateVote(billId: string, userId: string): BillServiceError {
+    static duplicateVote(bill_id: string, user_id: string): BillServiceError {
         return new BillServiceError(
             'DUPLICATE_VOTE',
-            `User ${userId} has already voted on bill ${billId}`,
-            { billId, userId }
+            `User ${user_id} has already voted on bill ${ bill_id }`,
+            { bill_id, user_id }
         );
     }
 
-    static billCannotBeModified(billId: string, status: string): BillServiceError {
+    static billCannotBeModified(bill_id: string, status: string): BillServiceError {
         return new BillServiceError(
             'BILL_CANNOT_BE_MODIFIED',
-            `Bill ${billId} with status '${status}' cannot be modified`,
-            { billId, status }
+            `Bill ${ bill_id } with status '${status}' cannot be modified`,
+            { bill_id, status }
         );
     }
 

@@ -111,6 +111,18 @@ describe('LoadTester', () => {
         return 'success';
       });
 
+      const result = await loadTester.runTest(testFunction, {
+        totalRequests: 10,
+        concurrency: 3,
+        timeout: 5000
+      });
+
+      expect(maxConcurrentCalls).toBeLessThanOrEqual(3);
+      expect(result.successfulRequests).toBe(10);
+    });
+  });
+});
+
 
 
 

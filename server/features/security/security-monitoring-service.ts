@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { securityAuditService } from './security-audit-service.js';
 import { intrusionDetectionService, ThreatDetectionResult } from './intrusion-detection-service.js';
-import { database as db } from '../../../shared/database/connection';
+import { database as db } from '@shared/database';
 import { pgTable, text, serial, timestamp, jsonb, boolean } from 'drizzle-orm/pg-core';
 import { sql, and, gte, desc, eq, or, count } from 'drizzle-orm';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 /**
  * SecurityMonitoringService - The Active Intelligence Layer
@@ -231,7 +231,7 @@ export class SecurityMonitoringService {
         isBlocked: false,
         threatLevel: 'none',
         detectedThreats: [],
-        riskScore: 0,
+        risk_score: 0,
         recommendedAction: 'allow',
       };
     }
@@ -560,7 +560,7 @@ export class SecurityMonitoringService {
         recentAlerts,
         complianceScore,
       ] = await Promise.all([
-        securityAuditService.getEventCount({ startDate: yesterday }),
+        securityAuditService.getEventCount({ start_date: yesterday }),
         this.getActiveIncidentCount(),
         this.getActiveAlertCount(),
         this.getCriticalAlertCount(),
@@ -612,13 +612,13 @@ export class SecurityMonitoringService {
   /**
    * Generate a comprehensive security report
    */
-  async generateSecurityReport(startDate: Date, endDate: Date): Promise<any> {
+  async generateSecurityReport(start_date: Date, end_date: Date): Promise<any> {
     try {
       // Gather all report data in parallel
       const [auditReport, incidents, alerts, complianceStatus] = await Promise.all([
-        securityAuditService.generateAuditReport(startDate, endDate),
-        this.getIncidentsInPeriod(startDate, endDate),
-        this.getAlertsInPeriod(startDate, endDate),
+        securityAuditService.generateAuditReport(start_date, end_date),
+        this.getIncidentsInPeriod(start_date, end_date),
+        this.getAlertsInPeriod(start_date, end_date),
         this.getComplianceStatus(),
       ]);
 
@@ -626,7 +626,7 @@ export class SecurityMonitoringService {
       const highSeverityAlerts = alerts.filter(a => a.severity === 'high' || a.severity === 'critical').length;
 
       return {
-        period: { start: startDate, end: endDate },
+        period: { start: start_date, end: end_date },
         executive_summary: {
           total_events: auditReport.summary.totalEvents,
           security_incidents: incidents.length,
@@ -727,7 +727,7 @@ export class SecurityMonitoringService {
         evidence: {
           ip_address,
           threats: threatResult.detectedThreats,
-          riskScore: threatResult.riskScore,
+          risk_score: threatResult.risk_score,
           path: req.path,
           method: req.method,
           user_agent: req.get('User-Agent'),
@@ -761,7 +761,7 @@ export class SecurityMonitoringService {
     try {
       const failedLogins = await securityAuditService.queryAuditLogs({
         event_type: 'login_failure',
-        startDate: since,
+        start_date: since,
       });
 
       // Group by user and IP
@@ -829,7 +829,7 @@ export class SecurityMonitoringService {
     try {
       const dataAccessEvents = await securityAuditService.queryAuditLogs({
         event_type: 'data_access',
-        startDate: since,
+        start_date: since,
       });
 
       // Group by user and sum record counts
@@ -870,7 +870,7 @@ export class SecurityMonitoringService {
     try {
       const adminActions = await securityAuditService.queryAuditLogs({
         event_type: 'admin_action',
-        startDate: since,
+        start_date: since,
       });
 
       // Look for unusual patterns of admin actions
@@ -1138,27 +1138,27 @@ export class SecurityMonitoringService {
     return recommendations;
   }
 
-  private async getIncidentsInPeriod(startDate: Date, endDate: Date): Promise<any[]> {
+  private async getIncidentsInPeriod(start_date: Date, end_date: Date): Promise<any[]> {
     return await db
       .select()
       .from(securityIncidents)
       .where(
         and(
-          gte(securityIncidents.created_at, startDate),
-          sql`${securityIncidents.created_at} <= ${endDate}`
+          gte(securityIncidents.created_at, start_date),
+          sql`${securityIncidents.created_at} <= ${ end_date }`
         )
       )
       .orderBy(desc(securityIncidents.created_at));
   }
 
-  private async getAlertsInPeriod(startDate: Date, endDate: Date): Promise<SecurityAlert[]> {
+  private async getAlertsInPeriod(start_date: Date, end_date: Date): Promise<SecurityAlert[]> {
     const alerts = await db
       .select()
       .from(securityAlerts)
       .where(
         and(
-          gte(securityAlerts.created_at, startDate),
-          sql`${securityAlerts.created_at} <= ${endDate}`
+          gte(securityAlerts.created_at, start_date),
+          sql`${securityAlerts.created_at} <= ${ end_date }`
         )
       )
       .orderBy(desc(securityAlerts.created_at));

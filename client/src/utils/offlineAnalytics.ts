@@ -14,7 +14,7 @@ export interface OfflineEvent {
   data: any;
   userAgent: string;
   url: string;
-  sessionId: string;
+  session_id: string;
   connectionType?: string;
   isOffline: boolean;
 }
@@ -43,13 +43,13 @@ export interface OfflineAnalyticsReport {
 }
 
 class OfflineAnalyticsManager {
-  private sessionId: string;
+  private session_id: string;
   private sessionStart: number;
   private events: OfflineEvent[] = [];
   private isInitialized = false;
 
   constructor() {
-    this.sessionId = this.generateSessionId();
+    this.session_id = this.generateSessionId();
     this.sessionStart = Date.now();
   }
 
@@ -82,7 +82,7 @@ class OfflineAnalyticsManager {
       data,
       userAgent: navigator.userAgent,
       url: window.location.href,
-      sessionId: this.sessionId,
+      session_id: this.session_id,
       connectionType: this.getConnectionType(),
       isOffline: !navigator.onLine,
     };
@@ -223,7 +223,7 @@ class OfflineAnalyticsManager {
       stack: error.stack,
       context,
       timestamp: Date.now(),
-      sessionId: this.sessionId,
+      session_id: this.session_id,
       userAgent: navigator.userAgent,
       url: window.location.href,
       isOffline: !navigator.onLine,
@@ -269,7 +269,7 @@ class OfflineAnalyticsManager {
     this.events = [];
     await offlineDataManager.logOfflineEvent('analytics_cleared', {
       timestamp: Date.now(),
-      sessionId: this.sessionId,
+      session_id: this.session_id,
     });
     logger.info('Analytics cleared', { component: 'OfflineAnalytics' });
   }
@@ -294,7 +294,7 @@ class OfflineAnalyticsManager {
   // Get current session info
   getSessionInfo() {
     return {
-      sessionId: this.sessionId,
+      session_id: this.session_id,
       sessionStart: this.sessionStart,
       eventCount: this.events.length,
       isOffline: !navigator.onLine,

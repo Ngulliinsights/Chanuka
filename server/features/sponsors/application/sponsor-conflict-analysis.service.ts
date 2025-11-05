@@ -1,6 +1,6 @@
 // Import the NEW service for data access
 import { sponsorService } from './sponsor-service-direct';
-import { logger  } from '../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 const loggerAny = logger as any;
 import type { Sponsor, Bill } from '@shared/schema';
 // Local helper types used by this service but not exported elsewhere in repo
@@ -107,7 +107,7 @@ export interface ConflictTrend {
   timeframe: string;
   conflictCount: number;
   severityTrend: 'increasing' | 'decreasing' | 'stable';
-  riskScore: number;
+  risk_score: number;
   predictions: ConflictPrediction[];
 }
 
@@ -304,10 +304,10 @@ export class SponsorConflictAnalysisService {
    async analyzeConflictTrends(sponsor_id?: number, timeframeMonths: number = 12): Promise<ConflictTrend[]> { /* Minimal implementation */
      // Simple wrapper using getHistoricalConflicts
      if (!sponsor_id) return [];
-     const startDate = new Date(); startDate.setMonth(startDate.getMonth() - timeframeMonths);
-     const history = await this.getHistoricalConflicts(sponsor_id, startDate);
+     const start_date = new Date(); startDate.setMonth(start_date.getMonth() - timeframeMonths);
+     const history = await this.getHistoricalConflicts(sponsor_id, start_date);
      const metrics = this.calculateTrendMetrics(history, timeframeMonths);
-     return [{ sponsor_id, timeframe: `${timeframeMonths}m`, conflictCount: history.length, severityTrend: metrics.severityTrend, riskScore: metrics.riskScore, predictions: await this.generateConflictPredictions(sponsor_id) }];
+     return [{ sponsor_id, timeframe: `${timeframeMonths}m`, conflictCount: history.length, severityTrend: metrics.severityTrend, risk_score: metrics.risk_score, predictions: await this.generateConflictPredictions(sponsor_id) }];
    }
 
 
@@ -362,14 +362,14 @@ export class SponsorConflictAnalysisService {
   // ============================================================================
   // TREND & PREDICTION HELPERS
   // ============================================================================
-  private async getHistoricalConflicts(sponsor_id: number, startDate: Date): Promise<ConflictDetectionResult[]> {
+  private async getHistoricalConflicts(sponsor_id: number, start_date: Date): Promise<ConflictDetectionResult[]> {
     // For now, simulate by detecting current conflicts and filtering by detectedAt
     const current = await this.detectConflicts(sponsor_id);
-    return current.filter(c => c.detectedAt >= startDate);
+    return current.filter(c => c.detectedAt >= start_date);
   }
 
-  private calculateTrendMetrics(historicalConflicts: ConflictDetectionResult[], timeframeMonths: number): { severityTrend: 'increasing'|'decreasing'|'stable'; riskScore: number } {
-    if (historicalConflicts.length === 0) return { severityTrend: 'stable', riskScore: 0 };
+  private calculateTrendMetrics(historicalConflicts: ConflictDetectionResult[], timeframeMonths: number): { severityTrend: 'increasing'|'decreasing'|'stable'; risk_score: number } {
+    if (historicalConflicts.length === 0) return { severityTrend: 'stable', risk_score: 0 };
     const cutoffDate = new Date(); cutoffDate.setMonth(cutoffDate.getMonth() - Math.floor(timeframeMonths / 2));
     const recent = historicalConflicts.filter(c => c.detectedAt > cutoffDate);
     const older = historicalConflicts.filter(c => c.detectedAt <= cutoffDate);
@@ -380,8 +380,8 @@ export class SponsorConflictAnalysisService {
     else if (recentAvg < olderAvg - 0.5) severityTrend = 'decreasing';
     const conflictCount = historicalConflicts.length;
     const avgSeverity = this.calculateAverageSeverity(historicalConflicts);
-    const riskScore = Math.min((conflictCount * 10) + (avgSeverity * 20), 100);
-    return { severityTrend, riskScore };
+    const risk_score = Math.min((conflictCount * 10) + (avgSeverity * 20), 100);
+    return { severityTrend, risk_score };
   }
 
   private calculateAverageSeverity(conflicts: ConflictDetectionResult[]): number {
@@ -565,9 +565,9 @@ export class SponsorConflictAnalysisService {
 
           // Filter affiliations with suspicious timing relative to bill introduction
           const suspiciousAffiliations = (affiliations || []).filter(aff => {
-            if (!aff.startDate) return false;
+            if (!aff.start_date) return false;
             const billIntroTime = new Date(bills.introduced_date!).getTime();
-            const affStartTime = new Date(aff.startDate).getTime();
+            const affStartTime = new Date(aff.start_date).getTime();
             const daysDiff = Math.abs(affStartTime - billIntroTime) / (1000 * 60 * 60 * 24);
             return daysDiff <= this.conflictThresholds.timing.suspicious_days;
           });
@@ -575,7 +575,7 @@ export class SponsorConflictAnalysisService {
           if (suspiciousAffiliations.length > 0) {
             // Check for very suspicious timing
             const verySuspicious = suspiciousAffiliations.some(aff => {
-              const daysDiff = Math.abs(new Date(aff.startDate!).getTime() - new Date(bills.introduced_date!).getTime()) / (1000 * 60 * 60 * 24);
+              const daysDiff = Math.abs(new Date(aff.start_date!).getTime() - new Date(bills.introduced_date!).getTime()) / (1000 * 60 * 60 * 24);
               return daysDiff <= this.conflictThresholds.timing.very_suspicious_days;
             });
             const severity = verySuspicious ? 'high' : 'medium';
@@ -712,8 +712,8 @@ export class SponsorConflictAnalysisService {
   }
 
   private isRecentActivity(affiliation: SponsorAffiliation): boolean {
-    if (!affiliation.startDate) return false;
-    const start = new Date(affiliation.startDate).getTime();
+    if (!affiliation.start_date) return false;
+    const start = new Date(affiliation.start_date).getTime();
     const now = Date.now();
     const days = (now - start) / (1000 * 60 * 60 * 24);
     return days <= 90; // recent = within 90 days

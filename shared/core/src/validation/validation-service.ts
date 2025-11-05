@@ -683,7 +683,7 @@ export class ValidationService {
     const expired: string[] = [];
     
     // Identify expired entries
-    for (const [key, cached] of this.validationCache.entries()) {
+    for (const [key, cached] of Array.from(this.validationCache.entries())) {
       if (now - cached.timestamp > cached.ttl * 1000) {
         expired.push(key);
       }

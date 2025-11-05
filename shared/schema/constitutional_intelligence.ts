@@ -6,7 +6,7 @@
 
 import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
-  index, unique, date, smallint, check
+  index, unique, date, smallint
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
@@ -63,7 +63,7 @@ export const constitutional_provisions = pgTable("constitutional_provisions", {
 // CONSTITUTIONAL ANALYSES - AI + Expert Analysis of Bills
 // ============================================================================
 
-export const constitutional_analyses = pgTable("constitutional_analyses", {
+export const constitutional_analyses: any = pgTable("constitutional_analyses", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   

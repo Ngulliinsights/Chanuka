@@ -5,7 +5,7 @@
 import { CampaignEntity, Campaign, NewCampaign } from '../entities/campaign.js';
 // Repository interfaces removed - using direct service calls
 import { CampaignMetrics, CoalitionOpportunity } from '../../types/index.js';
-import { logger } from '../../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 export class CampaignDomainService {
   constructor(
@@ -16,7 +16,7 @@ export class CampaignDomainService {
   async createCampaign(data: NewCampaign, creatorId: string): Promise<Campaign> {
     logger.info('Creating new campaign', { 
       title: data.title, 
-      billId: data.billId, 
+      bill_id: data.bill_id, 
       organizerId: data.organizerId,
       component: 'CampaignDomainService' 
     });
@@ -25,11 +25,11 @@ export class CampaignDomainService {
       throw new Error('User can only create campaigns for themselves');
     }
 
-    if (data.endDate && data.endDate <= data.startDate) {
+    if (data.end_date && data.end_date <= data.start_date) {
       throw new Error('End date must be after start date');
     }
 
-    if (data.startDate < new Date()) {
+    if (data.start_date < new Date()) {
       throw new Error('Start date cannot be in the past');
     }
 
@@ -37,7 +37,7 @@ export class CampaignDomainService {
       throw new Error('Campaign must have at least one objective');
     }
 
-    const existingCampaigns = await this.campaignRepository.findByBillId(data.billId, {
+    const existingCampaigns = await this.campaignRepository.findByBillId(data.bill_id, {
       organizerId: data.organizerId
     });
 
@@ -52,7 +52,7 @@ export class CampaignDomainService {
     const campaign = await this.campaignRepository.create(data);
     
     logger.info('Campaign created successfully', { 
-      campaignId: campaign.id,
+      campaign_id: campaign.id,
       component: 'CampaignDomainService' 
     });
 
@@ -60,26 +60,26 @@ export class CampaignDomainService {
   }
 
   async updateCampaignStatus(
-    campaignId: string, 
+    campaign_id: string, 
     newStatus: Campaign['status'], 
-    userId: string
+    user_id: string
   ): Promise<Campaign> {
-    const campaign = await this.campaignRepository.findById(campaignId);
+    const campaign = await this.campaignRepository.findById(campaign_id);
     if (!campaign) {
       throw new Error('Campaign not found');
     }
 
     const campaignEntity = CampaignEntity.fromData(campaign);
     
-    if (!campaignEntity.canBeModifiedBy(userId)) {
+    if (!campaignEntity.canBeModifiedBy(user_id)) {
       throw new Error('User not authorized to modify this campaign');
     }
 
-    campaignEntity.updateStatus(newStatus, userId);
+    campaignEntity.updateStatus(newStatus, user_id);
 
     const updatedCampaign = await this.campaignRepository.update(
-      campaignId, 
-      { status: newStatus, updatedAt: new Date() }
+      campaign_id, 
+      { status: newStatus, updated_at: new Date() }
     );
 
     if (!updatedCampaign) {
@@ -87,7 +87,7 @@ export class CampaignDomainService {
     }
 
     logger.info('Campaign status updated', { 
-      campaignId, 
+      campaign_id, 
       oldStatus: campaign.status, 
       newStatus,
       component: 'CampaignDomainService' 
@@ -96,8 +96,8 @@ export class CampaignDomainService {
     return updatedCampaign;
   }
 
-  async joinCampaign(campaignId: string, userId: string): Promise<boolean> {
-    const campaign = await this.campaignRepository.findById(campaignId);
+  async joinCampaign(campaign_id: string, user_id: string): Promise<boolean> {
+    const campaign = await this.campaignRepository.findById(campaign_id);
     if (!campaign) {
       throw new Error('Campaign not found');
     }
@@ -108,26 +108,26 @@ export class CampaignDomainService {
       throw new Error('Campaign cannot accept new participants');
     }
 
-    const isAlreadyParticipant = await this.campaignRepository.isParticipant(campaignId, userId);
+    const isAlreadyParticipant = await this.campaignRepository.isParticipant(campaign_id, user_id);
     if (isAlreadyParticipant) {
       throw new Error('User is already a participant in this campaign');
     }
 
-    const success = await this.campaignRepository.addParticipant(campaignId, userId, {
+    const success = await this.campaignRepository.addParticipant(campaign_id, user_id, {
       joinedAt: new Date(),
       role: 'participant'
     });
 
     if (success) {
       campaignEntity.addParticipant();
-      await this.campaignRepository.update(campaignId, {
+      await this.campaignRepository.update(campaign_id, {
         participantCount: campaignEntity.participantCount,
-        updatedAt: new Date()
+        updated_at: new Date()
       });
 
       logger.info('User joined campaign', { 
-        campaignId, 
-        userId,
+        campaign_id, 
+        user_id,
         component: 'CampaignDomainService' 
       });
     }
@@ -138,16 +138,16 @@ export class CampaignDomainService {
   /**
    * Calculate comprehensive campaign impact metrics
    */
-  async calculateCampaignImpact(campaignId: string): Promise<CampaignMetrics> {
+  async calculateCampaignImpact(campaign_id: string): Promise<CampaignMetrics> {
     try {
-      const campaign = await this.campaignRepository.findById(campaignId);
+      const campaign = await this.campaignRepository.findById(campaign_id);
       if (!campaign) {
         throw new Error('Campaign not found');
       }
 
       // Get campaign actions and completions
-      const actions = await this.actionRepository.findByCampaign(campaignId);
-      const participants = await this.campaignRepository.getCampaignParticipants(campaignId);
+      const actions = await this.actionRepository.findByCampaign(campaign_id);
+      const participants = await this.campaignRepository.getCampaignParticipants(campaign_id);
       
       // Calculate action metrics
       const totalActions = actions.length;
@@ -175,11 +175,11 @@ export class CampaignDomainService {
       });
 
       const metrics: CampaignMetrics = {
-        campaignId,
+        campaign_id,
         participantCount: participants.length,
         actionCompletionRate: completionRate,
         totalActionsCompleted: completedActions,
-        engagementScore: retentionRate * 100,
+        engagement_score: retentionRate * 100,
         geographicReach: {
           counties: countiesReached,
           constituencies: constituenciesReached
@@ -189,12 +189,12 @@ export class CampaignDomainService {
       };
 
       // Store metrics for historical tracking
-      await this.campaignRepository.storeMetrics(campaignId, metrics);
+      await this.campaignRepository.storeMetrics(campaign_id, metrics);
 
       return metrics;
 
     } catch (error) {
-      logger.error('Failed to calculate campaign impact', error, { campaignId });
+      logger.error('Failed to calculate campaign impact', error, { campaign_id });
       throw error;
     }
   }
@@ -202,9 +202,9 @@ export class CampaignDomainService {
   /**
    * Identify coalition opportunities with other campaigns
    */
-  async identifyCoalitionOpportunities(campaignId: string): Promise<CoalitionOpportunity[]> {
+  async identifyCoalitionOpportunities(campaign_id: string): Promise<CoalitionOpportunity[]> {
     try {
-      const campaign = await this.campaignRepository.findById(campaignId);
+      const campaign = await this.campaignRepository.findById(campaign_id);
       if (!campaign) {
         throw new Error('Campaign not found');
       }
@@ -212,8 +212,8 @@ export class CampaignDomainService {
       const opportunities: CoalitionOpportunity[] = [];
 
       // Find campaigns on the same bill
-      const sameBillCampaigns = await this.campaignRepository.findByBillId(campaign.billId);
-      const otherCampaigns = sameBillCampaigns.filter(c => c.id !== campaignId);
+      const sameBillCampaigns = await this.campaignRepository.findByBillId(campaign.bill_id);
+      const otherCampaigns = sameBillCampaigns.filter(c => c.id !== campaign_id);
 
       for (const otherCampaign of otherCampaigns) {
         // Check for alignment in objectives
@@ -225,7 +225,7 @@ export class CampaignDomainService {
 
         if (sharedObjectives.length > 0) {
           opportunities.push({
-            campaignId: otherCampaign.id,
+            campaign_id: otherCampaign.id,
             campaignTitle: otherCampaign.title,
             organizerName: otherCampaign.organizerName || 'Unknown',
             alignmentScore: sharedObjectives.length / Math.max(campaign.objectives.length, otherCampaign.objectives.length),
@@ -249,9 +249,9 @@ export class CampaignDomainService {
       // Find campaigns in same geographic area
       const sameCountyCampaigns = await this.campaignRepository.findByCounty(campaign.targetCounties[0]);
       for (const countyCampaign of sameCountyCampaigns) {
-        if (countyCampaign.id !== campaignId && !opportunities.find(o => o.campaignId === countyCampaign.id)) {
+        if (countyCampaign.id !== campaign_id && !opportunities.find(o => o.campaign_id === countyCampaign.id)) {
           opportunities.push({
-            campaignId: countyCampaign.id,
+            campaign_id: countyCampaign.id,
             campaignTitle: countyCampaign.title,
             organizerName: countyCampaign.organizerName || 'Unknown',
             alignmentScore: 0.5, // Geographic alignment
@@ -273,7 +273,7 @@ export class CampaignDomainService {
       return opportunities.sort((a, b) => b.alignmentScore - a.alignmentScore);
 
     } catch (error) {
-      logger.error('Failed to identify coalition opportunities', error, { campaignId });
+      logger.error('Failed to identify coalition opportunities', error, { campaign_id });
       throw error;
     }
   }
@@ -281,14 +281,14 @@ export class CampaignDomainService {
   /**
    * Optimize campaign strategy based on performance data
    */
-  async optimizeCampaignStrategy(campaignId: string): Promise<{
+  async optimizeCampaignStrategy(campaign_id: string): Promise<{
     recommendations: string[];
     priorityActions: string[];
     targetAdjustments: Record<string, any>;
   }> {
     try {
-      const metrics = await this.calculateCampaignImpact(campaignId);
-      const campaign = await this.campaignRepository.findById(campaignId);
+      const metrics = await this.calculateCampaignImpact(campaign_id);
+      const campaign = await this.campaignRepository.findById(campaign_id);
       
       if (!campaign) {
         throw new Error('Campaign not found');
@@ -307,7 +307,7 @@ export class CampaignDomainService {
       }
 
       // Analyze engagement
-      if (metrics.engagementScore < 50) {
+      if (metrics.engagement_score < 50) {
         recommendations.push('Participant engagement is low. Implement strategies to increase interaction and motivation.');
         priorityActions.push('Launch weekly engagement challenges');
         priorityActions.push('Create participant recognition program');
@@ -340,7 +340,7 @@ export class CampaignDomainService {
       };
 
     } catch (error) {
-      logger.error('Failed to optimize campaign strategy', error, { campaignId });
+      logger.error('Failed to optimize campaign strategy', error, { campaign_id });
       throw error;
     }
   }
@@ -348,7 +348,7 @@ export class CampaignDomainService {
   /**
    * Coordinate action assignments based on participant skills and availability
    */
-  async coordinateActionAssignments(campaignId: string): Promise<{
+  async coordinateActionAssignments(campaign_id: string): Promise<{
     assignments: Array<{
       actionId: string;
       assignedTo: string[];
@@ -358,8 +358,8 @@ export class CampaignDomainService {
     overloadedParticipants: string[];
   }> {
     try {
-      const actions = await this.actionRepository.findByCampaign(campaignId, { status: 'active' });
-      const participants = await this.campaignRepository.getCampaignParticipants(campaignId);
+      const actions = await this.actionRepository.findByCampaign(campaign_id, { status: 'active' });
+      const participants = await this.campaignRepository.getCampaignParticipants(campaign_id);
 
       const assignments: Array<{
         actionId: string;
@@ -372,7 +372,7 @@ export class CampaignDomainService {
       // Analyze participant workload
       const participantWorkload = new Map<string, number>();
       participants.forEach(p => {
-        participantWorkload.set(p.userId, p.actionsAssigned || 0);
+        participantWorkload.set(p.user_id, p.actionsAssigned || 0);
       });
 
       // Assign actions based on skills and availability
@@ -383,7 +383,7 @@ export class CampaignDomainService {
             action.requiredSkills.some(skill => p.offeredSkills?.includes(skill));
           
           // Check availability (not overloaded)
-          const currentWorkload = participantWorkload.get(p.userId) || 0;
+          const currentWorkload = participantWorkload.get(p.user_id) || 0;
           const isAvailable = currentWorkload < 5; // Max 5 active actions per participant
 
           // Check geographic relevance
@@ -397,19 +397,19 @@ export class CampaignDomainService {
         if (suitableParticipants.length > 0) {
           // Assign to best matches (up to 3 participants per action)
           const bestMatches = suitableParticipants
-            .sort((a, b) => (b.engagementScore || 0) - (a.engagementScore || 0))
+            .sort((a, b) => (b.engagement_score || 0) - (a.engagement_score || 0))
             .slice(0, 3);
 
           assignments.push({
             actionId: action.id,
-            assignedTo: bestMatches.map(p => p.userId),
+            assignedTo: bestMatches.map(p => p.user_id),
             reasoning: `Assigned based on skill match and engagement score. Skills: ${action.requiredSkills?.join(', ') || 'none required'}`
           });
 
           // Update workload tracking
           bestMatches.forEach(p => {
-            const currentWorkload = participantWorkload.get(p.userId) || 0;
-            participantWorkload.set(p.userId, currentWorkload + 1);
+            const currentWorkload = participantWorkload.get(p.user_id) || 0;
+            participantWorkload.set(p.user_id, currentWorkload + 1);
           });
         } else {
           unassignedActions.push(action.id);
@@ -417,9 +417,9 @@ export class CampaignDomainService {
       }
 
       // Identify overloaded participants
-      participantWorkload.forEach((workload, userId) => {
+      participantWorkload.forEach((workload, user_id) => {
         if (workload > 7) { // Threshold for overload
-          overloadedParticipants.push(userId);
+          overloadedParticipants.push(user_id);
         }
       });
 
@@ -430,7 +430,7 @@ export class CampaignDomainService {
       };
 
     } catch (error) {
-      logger.error('Failed to coordinate action assignments', error, { campaignId });
+      logger.error('Failed to coordinate action assignments', error, { campaign_id });
       throw error;
     }
   }

@@ -10,7 +10,7 @@
  * - Run cross-phase data validation ensuring consistency between error handling and repository layers
  */
 
-import { logger } from '../../../shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 import { performanceMonitor, monitorOperation } from '../monitoring/performance-monitor.js';
 import { 
   AsyncServiceResult, 

@@ -3,8 +3,8 @@
 // ============================================================================
 // Service that determines when constitutional analyses need expert human review
 
-import { logger } from '../../../../shared/core/index.js';
-import { ConstitutionalAnalysis } from '../../../shared/schema/index.js';
+import { logger } from '@shared/core/index.js';
+import { ConstitutionalAnalysis } from '@shared/schema/index.js';
 import { ExpertReviewQueueRepository } from '../infrastructure/repositories/expert-review-queue-repository.js';
 
 export interface ExpertReviewDecision {
@@ -270,8 +270,8 @@ export class ExpertFlaggingService {
     try {
       for (const analysis of analyses) {
         await this.expertQueueRepo.queueForReview({
-          analysisId: analysis.id,
-          billId: analysis.bill_id,
+          analysis_id: analysis.id,
+          bill_id: analysis.bill_id,
           priority: decision.priority,
           complexityScore: decision.complexityScore,
           uncertaintyFlags: decision.uncertaintyFlags,
@@ -379,7 +379,7 @@ export class ExpertFlaggingService {
    * Updates expert review requirements based on system learning
    */
   async updateReviewCriteria(
-    analysisId: string,
+    analysis_id: string,
     expertFeedback: {
       wasReviewNecessary: boolean;
       actualComplexity: number;
@@ -393,7 +393,7 @@ export class ExpertFlaggingService {
       
       logger.info('📈 Updated review criteria based on expert feedback', {
         component: 'ExpertFlagging',
-        analysisId,
+        analysis_id,
         wasNecessary: expertFeedback.wasReviewNecessary,
         actualComplexity: expertFeedback.actualComplexity
       });
@@ -401,7 +401,7 @@ export class ExpertFlaggingService {
     } catch (error) {
       logger.error('Failed to update review criteria', {
         component: 'ExpertFlagging',
-        analysisId,
+        analysis_id,
         error: error instanceof Error ? error.message : String(error)
       });
     }

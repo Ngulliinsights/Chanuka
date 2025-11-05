@@ -6,16 +6,16 @@ import { authenticateToken, requireRole } from '../../middleware/auth.js';
 // TODO: Fix bil
 //import { billService } from '../bills/application/bill-service.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
-import { ApiSuccess, ApiError, ApiForbidden } from '../../../shared/core/src/utils/api-utils';
-import { logger } from '../../../shared/core/src/index.js';
+import { ApiSuccess, ApiError, ApiForbidden } from '@shared/core/utils/api-utils';
+import { logger } from '@shared/core/index.js';
 
 // Security Services
 import { secureQueryBuilder } from '../../infrastructure/security/secure-query-builder.js';
 import { inputValidationService, commonSchemas } from '../../infrastructure/security/input-validation-service.js';
 
 // Database & Schema Imports
-import { database as db } from '../../../shared/database/connection';
-import { users, bills } from '../../../shared/schema/foundation';
+import { database as db } from '@shared/database';
+import { users, bills } from '@shared/schema/foundation';
 
 // --- Constants and Types ---
 

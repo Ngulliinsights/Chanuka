@@ -1,7 +1,7 @@
 import { eq, sql, count, avg, and, desc } from "drizzle-orm";
 import { databaseService } from '../database/database-service';
-import { bills, users, comments, bill_engagement } from "../../../shared/schema/index.js";
-import { logger } from '../../../shared/core';
+import { bills, users, comments, bill_engagement } from '@shared/schema/index.js';
+import { logger } from '@/shared/core';
 import {
   AsyncServiceResult,
   withResultHandling,

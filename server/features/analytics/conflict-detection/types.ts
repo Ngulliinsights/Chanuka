@@ -50,8 +50,8 @@ export interface ProfessionalConflict {
   conflictSeverity: 'low' | 'medium' | 'high' | 'critical';
   affectedBills: number[];
   relationshipStrength: number;
-  startDate?: Date;
-  endDate?: Date;
+  start_date?: Date;
+  end_date?: Date;
   is_active: boolean;
   evidenceStrength: number;
   detectionMethod: 'affiliation_analysis' | 'pattern_matching' | 'disclosure_analysis';

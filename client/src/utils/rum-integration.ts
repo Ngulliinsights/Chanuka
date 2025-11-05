@@ -33,7 +33,7 @@ interface PerformanceMetric {
 
 class RUMService {
   private config: RUMConfig;
-  private sessionId: string;
+  private session_id: string;
   private userId?: string;
   private interactions: UserInteraction[] = [];
   private metrics: PerformanceMetric[] = [];
@@ -41,7 +41,7 @@ class RUMService {
 
   constructor(config: RUMConfig) {
     this.config = config;
-    this.sessionId = this.generateSessionId();
+    this.session_id = this.generateSessionId();
 
     // Only initialize if this session is selected for monitoring
     if (Math.random() <= this.config.sampleRate) {
@@ -85,8 +85,8 @@ class RUMService {
 
   private initializeUserTracking(): void {
     // Generate or retrieve user ID
-    this.userId = localStorage.getItem('rum-user-id') || this.generateUserId();
-    localStorage.setItem('rum-user-id', this.userId);
+    this.user_id = localStorage.getItem('rum-user-id') || this.generateUserId();
+    localStorage.setItem('rum-user-id', this.user_id);
 
     // Track basic user info (anonymized)
     const userInfo = {
@@ -337,8 +337,8 @@ class RUMService {
     if (this.interactions.length === 0 && this.metrics.length === 0) return;
 
     const batch = {
-      sessionId: this.sessionId,
-      userId: this.userId,
+      session_id: this.session_id,
+      user_id: this.user_id,
       interactions: [...this.interactions],
       metrics: [...this.metrics],
       timestamp: Date.now()
@@ -359,7 +359,7 @@ class RUMService {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.config.apiKey}`,
           'X-RUM-Type': type,
-          'X-Session-ID': this.sessionId
+          'X-Session-ID': this.session_id
         },
         body: JSON.stringify(data),
         keepalive: true // Allow sending after page unload
@@ -396,8 +396,8 @@ class RUMService {
     this.trackMetric(name, value, 'custom');
   }
 
-  public setUserId(userId: string): void {
-    this.userId = userId;
+  public setUserId(user_id: string): void {
+    this.user_id = userId;
   }
 
   public destroy(): void {

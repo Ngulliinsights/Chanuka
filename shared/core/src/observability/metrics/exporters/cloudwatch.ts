@@ -1,5 +1,5 @@
 import { Metric } from '../types';
-import { Result, Ok, Err } from '../../../primitives/types/result';
+import { Result, Ok, Err } from '@/primitives/types/result';
 
 // ==================== CloudWatch Configuration ====================
 

@@ -1,17 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Badge } from '../ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Alert, AlertDescription } from '../ui/alert';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import { Button } from "../ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Badge } from "../ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
+import { Alert, AlertDescription } from "../ui/alert";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   LineChart,
   Line,
@@ -19,23 +31,23 @@ import {
   Pie,
   Cell,
   AreaChart,
-  Area
-} from 'recharts';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Users, 
-  Eye, 
-  MessageSquare, 
+  Area,
+} from "recharts";
+import {
+  TrendingUp,
+  TrendingDown,
+  Users,
+  Eye,
+  MessageSquare,
   Share2,
   Activity,
   AlertTriangle,
   Download,
   Filter,
   Calendar,
-  BarChart3
-} from 'lucide-react';
-import { logger } from '../../utils/browser-logger';
+  BarChart3,
+} from "lucide-react";
+import { logger } from "../../utils/browser-logger";
 
 interface EngagementMetrics {
   totalViews: number;
@@ -43,7 +55,7 @@ interface EngagementMetrics {
   totalShares: number;
   uniqueUsers: number;
   averageEngagementScore: number;
-  engagementTrend: 'increasing' | 'decreasing' | 'stable';
+  engagementTrend: "increasing" | "decreasing" | "stable";
   topCategories: Array<{
     category: string;
     engagement_score: number;
@@ -56,7 +68,8 @@ interface EngagementMetrics {
   };
 }
 
-interface BillInteractionPattern { bill_id: number;
+interface BillInteractionPattern {
+  bill_id: number;
   billTitle: string;
   category: string;
   totalEngagement: number;
@@ -64,7 +77,7 @@ interface BillInteractionPattern { bill_id: number;
     peakHours: number[];
     peakDays: string[];
     averageSessionDuration: number;
-   };
+  };
   commentPattern: {
     averageCommentsPerUser: number;
     expertCommentRatio: number;
@@ -76,10 +89,11 @@ interface BillInteractionPattern { bill_id: number;
   };
 }
 
-interface UserEngagementProfile { user_id: string;
+interface UserEngagementProfile {
+  user_id: string;
   userName: string;
   role: string;
-  engagementLevel: 'high' | 'medium' | 'low';
+  engagementLevel: "high" | "medium" | "low";
   totalEngagementScore: number;
   preferredCategories: string[];
   interactionTypes: {
@@ -87,11 +101,11 @@ interface UserEngagementProfile { user_id: string;
     comments: number;
     shares: number;
     bookmarks: number;
-   };
+  };
 }
 
 interface TrendAnalysis {
-  timeframe: 'daily' | 'weekly' | 'monthly';
+  timeframe: "daily" | "weekly" | "monthly";
   period: string;
   metrics: {
     totalEngagement: number;
@@ -101,10 +115,10 @@ interface TrendAnalysis {
     bounceRate: number;
   };
   topTrends: Array<{
-    type: 'bill' | 'category' | 'sponsor' | 'topic';
+    type: "bill" | "category" | "sponsor" | "topic";
     name: string;
     engagementGrowth: number;
-    significance: 'high' | 'medium' | 'low';
+    significance: "high" | "medium" | "low";
   }>;
   comparativePeriod: {
     engagementChange: number;
@@ -119,19 +133,23 @@ interface DashboardData {
   topBills: BillInteractionPattern[];
   topUsers: UserEngagementProfile[];
   alerts: Array<{
-    type: 'spike' | 'drop' | 'anomaly';
+    type: "spike" | "drop" | "anomaly";
     message: string;
-    severity: 'high' | 'medium' | 'low';
+    severity: "high" | "medium" | "low";
     data: any;
   }>;
 }
 
 export function EngagementDashboard() {
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [timeframe, setTimeframe] = useState<'daily' | 'weekly' | 'monthly'>('weekly');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [timeframe, setTimeframe] = useState<"daily" | "weekly" | "monthly">(
+    "weekly"
+  );
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   useEffect(() => {
     loadDashboardData();
@@ -140,20 +158,20 @@ export function EngagementDashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/engagement-analytics/dashboard', {
+      const response = await fetch("/api/engagement-analytics/dashboard", {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
 
       if (response.ok) {
         const data = await response.json();
         setDashboardData(data.data);
       } else {
-        throw new Error('Failed to load dashboard data');
+        throw new Error("Failed to load dashboard data");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
@@ -161,25 +179,30 @@ export function EngagementDashboard() {
 
   const exportData = async (type: string, format: string) => {
     try {
-      const response = await fetch(`/api/engagement-analytics/export?type=${type}&format=${format}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+      const response = await fetch(
+        `/api/engagement-analytics/export?type=${type}&format=${format}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
-      });
+      );
 
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
-        a.download = `engagement-${type}-${new Date().toISOString().split('T')[0]}.${format}`;
+        a.download = `engagement-${type}-${
+          new Date().toISOString().split("T")[0]
+        }.${format}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
       }
     } catch (err) {
-      logger.error('Export failed:', { component: 'Chanuka' }, err);
+      logger.error("Export failed:", { component: "Chanuka" }, err);
     }
   };
 
@@ -212,38 +235,56 @@ export function EngagementDashboard() {
   const { overview, recentTrends, topBills, topUsers, alerts } = dashboardData;
 
   // Prepare chart data
-  const trendChartData = recentTrends.map(trend => ({
-    period: trend.period.split(' to ')[0],
+  const trendChartData = recentTrends.map((trend) => ({
+    period: trend.period.split(" to ")[0],
     engagement: trend.metrics.totalEngagement,
     users: trend.metrics.newUsers + trend.metrics.returningUsers,
-    sessionDuration: trend.metrics.averageSessionDuration
+    sessionDuration: trend.metrics.averageSessionDuration,
   }));
 
-  const categoryChartData = overview.topCategories.map(cat => ({
+  const categoryChartData = overview.topCategories.map((cat) => ({
     name: cat.category,
     engagement: cat.engagement_score,
-    bills: cat.billCount
+    bills: cat.billCount,
   }));
 
   const userSegmentData = [
-    { name: 'Highly Engaged', value: overview.userSegments.highlyEngaged, color: '#10b981' },
-    { name: 'Moderately Engaged', value: overview.userSegments.moderatelyEngaged, color: '#f59e0b' },
-    { name: 'Low Engaged', value: overview.userSegments.lowEngaged, color: '#ef4444' }
+    {
+      name: "Highly Engaged",
+      value: overview.userSegments.highlyEngaged,
+      color: "#10b981",
+    },
+    {
+      name: "Moderately Engaged",
+      value: overview.userSegments.moderatelyEngaged,
+      color: "#f59e0b",
+    },
+    {
+      name: "Low Engaged",
+      value: overview.userSegments.lowEngaged,
+      color: "#ef4444",
+    },
   ];
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case 'increasing': return <TrendingUp className="h-4 w-4 text-green-600" />;
-      case 'decreasing': return <TrendingDown className="h-4 w-4 text-red-600" />;
-      default: return <Activity className="h-4 w-4 text-gray-600" />;
+      case "increasing":
+        return <TrendingUp className="h-4 w-4 text-green-600" />;
+      case "decreasing":
+        return <TrendingDown className="h-4 w-4 text-red-600" />;
+      default:
+        return <Activity className="h-4 w-4 text-gray-600" />;
     }
   };
 
   const getAlertColor = (severity: string) => {
     switch (severity) {
-      case 'high': return 'border-red-200 bg-red-50';
-      case 'medium': return 'border-yellow-200 bg-yellow-50';
-      default: return 'border-blue-200 bg-blue-50';
+      case "high":
+        return "border-red-200 bg-red-50";
+      case "medium":
+        return "border-yellow-200 bg-yellow-50";
+      default:
+        return "border-blue-200 bg-blue-50";
     }
   };
 
@@ -253,10 +294,15 @@ export function EngagementDashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Engagement Analytics</h1>
-          <p className="text-gray-600">Comprehensive insights into legislative engagement patterns</p>
+          <p className="text-gray-600">
+            Comprehensive insights into legislative engagement patterns
+          </p>
         </div>
         <div className="flex gap-2">
-          <Select value={timeframe} onValueChange={(value: any) => setTimeframe(value)}>
+          <Select
+            value={timeframe}
+            onValueChange={(value: any) => setTimeframe(value)}
+          >
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -266,7 +312,10 @@ export function EngagementDashboard() {
               <SelectItem value="monthly">Monthly</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={() => exportData('metrics', 'json')}>
+          <Button
+            variant="outline"
+            onClick={() => exportData("metrics", "json")}
+          >
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
@@ -280,7 +329,8 @@ export function EngagementDashboard() {
             <Alert key={index} className={getAlertColor(alert.severity)}>
               <AlertTriangle className="h-4 w-4" />
               <AlertDescription>
-                <span className="font-medium">{alert.type.toUpperCase()}:</span> {alert.message}
+                <span className="font-medium">{alert.type.toUpperCase()}:</span>{" "}
+                {alert.message}
               </AlertDescription>
             </Alert>
           ))}
@@ -295,7 +345,9 @@ export function EngagementDashboard() {
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{overview.totalViews.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {overview.totalViews.toLocaleString()}
+            </div>
             <div className="flex items-center text-xs text-muted-foreground">
               {getTrendIcon(overview.engagementTrend)}
               <span className="ml-1">{overview.engagementTrend}</span>
@@ -305,13 +357,21 @@ export function EngagementDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Comments</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Comments
+            </CardTitle>
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{overview.totalComments.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {overview.totalComments.toLocaleString()}
+            </div>
             <div className="text-xs text-muted-foreground">
-              Avg: {(overview.totalComments / Math.max(overview.uniqueUsers, 1)).toFixed(1)} per user
+              Avg:{" "}
+              {(
+                overview.totalComments / Math.max(overview.uniqueUsers, 1)
+              ).toFixed(1)}{" "}
+              per user
             </div>
           </CardContent>
         </Card>
@@ -322,9 +382,15 @@ export function EngagementDashboard() {
             <Share2 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{overview.totalShares.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {overview.totalShares.toLocaleString()}
+            </div>
             <div className="text-xs text-muted-foreground">
-              {((overview.totalShares / Math.max(overview.totalViews, 1)) * 100).toFixed(1)}% share rate
+              {(
+                (overview.totalShares / Math.max(overview.totalViews, 1)) *
+                100
+              ).toFixed(1)}
+              % share rate
             </div>
           </CardContent>
         </Card>
@@ -335,7 +401,9 @@ export function EngagementDashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{overview.uniqueUsers.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {overview.uniqueUsers.toLocaleString()}
+            </div>
             <div className="text-xs text-muted-foreground">
               Avg engagement: {overview.averageEngagementScore.toFixed(1)}
             </div>
@@ -367,19 +435,19 @@ export function EngagementDashboard() {
                   <XAxis dataKey="period" />
                   <YAxis />
                   <Tooltip />
-                  <Area 
-                    type="monotone" 
-                    dataKey="engagement" 
-                    stroke="#3b82f6" 
-                    fill="#3b82f6" 
+                  <Area
+                    type="monotone"
+                    dataKey="engagement"
+                    stroke="#3b82f6"
+                    fill="#3b82f6"
                     fillOpacity={0.3}
                     name="Total Engagement"
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="users" 
-                    stroke="#10b981" 
-                    fill="#10b981" 
+                  <Area
+                    type="monotone"
+                    dataKey="users"
+                    stroke="#10b981"
+                    fill="#10b981"
                     fillOpacity={0.3}
                     name="Active Users"
                   />
@@ -392,7 +460,9 @@ export function EngagementDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>User Segments</CardTitle>
-                <CardDescription>Distribution of user engagement levels</CardDescription>
+                <CardDescription>
+                  Distribution of user engagement levels
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={200}>
@@ -415,11 +485,13 @@ export function EngagementDashboard() {
                 <div className="flex justify-center space-x-4 mt-4">
                   {userSegmentData.map((segment, index) => (
                     <div key={index} className="flex items-center">
-                      <div 
-                        className="w-3 h-3 rounded-full mr-2" 
+                      <div
+                        className="w-3 h-3 rounded-full mr-2"
                         style={{ backgroundColor: segment.color }}
                       />
-                      <span className="text-sm">{segment.name}: {segment.value}</span>
+                      <span className="text-sm">
+                        {segment.name}: {segment.value}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -429,18 +501,31 @@ export function EngagementDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Top Trending Topics</CardTitle>
-                <CardDescription>Most engaging topics this period</CardDescription>
+                <CardDescription>
+                  Most engaging topics this period
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {recentTrends[0]?.topTrends.map((trend, index) => (
-                    <div key={index} className="flex items-center justify-between">
+                    <div
+                      key={index}
+                      className="flex items-center justify-between"
+                    >
                       <div>
                         <div className="font-medium">{trend.name}</div>
-                        <div className="text-sm text-gray-500 capitalize">{trend.type}</div>
+                        <div className="text-sm text-gray-500 capitalize">
+                          {trend.type}
+                        </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant={trend.significance === 'high' ? 'default' : 'secondary'}>
+                        <Badge
+                          variant={
+                            trend.significance === "high"
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
                           {trend.significance}
                         </Badge>
                         <span className="text-sm font-medium text-green-600">
@@ -459,26 +544,43 @@ export function EngagementDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Top Performing Bills</CardTitle>
-              <CardDescription>Bills with highest engagement scores</CardDescription>
+              <CardDescription>
+                Bills with highest engagement scores
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                { topBills.slice(0, 10).map((bill, index) => (
-                  <div key={bills.bill_id } className="flex items-center justify-between p-4 border rounded-lg">
+                {topBills.slice(0, 10).map((bill, index) => (
+                  <div
+                    key={bill.bill_id}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
                     <div className="flex-1">
-                      <div className="font-medium">{bills.billTitle}</div>
+                      <div className="font-medium">{bill.billTitle}</div>
                       <div className="text-sm text-gray-500">
-                        Category: {bills.category} • Engagement: {bills.totalEngagement}
+                        Category: {bill.category} • Engagement:{" "}
+                        {bill.totalEngagement}
                       </div>
                       <div className="flex gap-4 mt-2 text-xs text-gray-400">
-                        <span>Peak Hours: {bills.viewPattern.peakHours.join(', ')}</span>
-                        <span>Avg Session: {bills.viewPattern.averageSessionDuration}min</span>
-                        <span>Expert Comments: {(bills.commentPattern.expertCommentRatio * 100).toFixed(0)}%</span>
+                        <span>
+                          Peak Hours: {bill.viewPattern.peakHours.join(", ")}
+                        </span>
+                        <span>
+                          Avg Session: {bill.viewPattern.averageSessionDuration}
+                          min
+                        </span>
+                        <span>
+                          Expert Comments:{" "}
+                          {(
+                            bill.commentPattern.expertCommentRatio * 100
+                          ).toFixed(0)}
+                          %
+                        </span>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-bold">#{index + 1}</div>
-                      <Badge variant="outline">{bills.category}</Badge>
+                      <Badge variant="outline">{bill.category}</Badge>
                     </div>
                   </div>
                 ))}
@@ -491,40 +593,56 @@ export function EngagementDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Most Engaged Users</CardTitle>
-              <CardDescription>Users with highest engagement scores</CardDescription>
+              <CardDescription>
+                Users with highest engagement scores
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                { topUsers.slice(0, 10).map((user, index) => (
-                  <div key={users.user_id } className="flex items-center justify-between p-4 border rounded-lg">
+                {topUsers.slice(0, 10).map((user, index) => (
+                  <div
+                    key={user.user_id}
+                    className="flex items-center justify-between p-4 border rounded-lg"
+                  >
                     <div className="flex-1">
-                      <div className="font-medium">{users.userName}</div>
+                      <div className="font-medium">{user.userName}</div>
                       <div className="text-sm text-gray-500">
-                        Role: {users.role} • Level: {users.engagementLevel}
+                        Role: {user.role} • Level: {user.engagementLevel}
                       </div>
                       <div className="flex gap-4 mt-2 text-xs text-gray-400">
-                        <span>Views: {users.interactionTypes.views}</span>
-                        <span>Comments: {users.interactionTypes.comments}</span>
-                        <span>Shares: {users.interactionTypes.shares}</span>
+                        <span>Views: {user.interactionTypes.views}</span>
+                        <span>Comments: {user.interactionTypes.comments}</span>
+                        <span>Shares: {user.interactionTypes.shares}</span>
                       </div>
                       <div className="flex gap-1 mt-2">
-                        {users.preferredCategories.slice(0, 3).map((category, idx) => (
-                          <Badge key={idx} variant="secondary" className="text-xs">
-                            {category}
-                          </Badge>
-                        ))}
+                        {user.preferredCategories
+                          .slice(0, 3)
+                          .map((category, idx) => (
+                            <Badge
+                              key={idx}
+                              variant="secondary"
+                              className="text-xs"
+                            >
+                              {category}
+                            </Badge>
+                          ))}
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-lg font-bold">#{index + 1}</div>
                       <div className="text-sm text-gray-500">
-                        Score: {users.totalEngagementScore}
+                        Score: {user.totalEngagementScore}
                       </div>
-                      <Badge 
-                        variant={users.engagementLevel === 'high' ? 'default' : 
-                                users.engagementLevel === 'medium' ? 'secondary' : 'outline'}
+                      <Badge
+                        variant={
+                          user.engagementLevel === "high"
+                            ? "default"
+                            : user.engagementLevel === "medium"
+                            ? "secondary"
+                            : "outline"
+                        }
                       >
-                        {users.engagementLevel}
+                        {user.engagementLevel}
                       </Badge>
                     </div>
                   </div>
@@ -547,7 +665,11 @@ export function EngagementDashboard() {
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
-                  <Bar dataKey="engagement" fill="#3b82f6" name="Engagement Score" />
+                  <Bar
+                    dataKey="engagement"
+                    fill="#3b82f6"
+                    name="Engagement Score"
+                  />
                   <Bar dataKey="bills" fill="#10b981" name="Bill Count" />
                 </BarChart>
               </ResponsiveContainer>
@@ -568,13 +690,24 @@ export function EngagementDashboard() {
                     {category.engagement_score.toLocaleString()}
                   </div>
                   <div className="text-sm text-gray-500">
-                    Average per bill: {(category.engagement_score / category.billCount).toFixed(1)}
+                    Average per bill:{" "}
+                    {(category.engagement_score / category.billCount).toFixed(
+                      1
+                    )}
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2 mt-3">
-                    <div 
-                      className="bg-blue-600 h-2 rounded-full" 
-                      style={{ 
-                        width: `${(category.engagement_score / Math.max(...overview.topCategories.map(c => c.engagement_score))) * 100}%` 
+                    <div
+                      className="bg-blue-600 h-2 rounded-full"
+                      style={{
+                        width: `${
+                          (category.engagement_score /
+                            Math.max(
+                              ...overview.topCategories.map(
+                                (c) => c.engagement_score
+                              )
+                            )) *
+                          100
+                        }%`,
                       }}
                     />
                   </div>
@@ -587,4 +720,3 @@ export function EngagementDashboard() {
     </div>
   );
 }
-

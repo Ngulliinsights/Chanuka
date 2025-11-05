@@ -47,7 +47,7 @@ describe('API Service', () => {
               role: 'citizen'
             },
             token: 'auth-token',
-            refreshToken: 'refresh-token'
+            refresh_token: 'refresh-token'
           }
         };
 
@@ -247,14 +247,14 @@ describe('API Service', () => {
       });
     });
 
-    describe('refreshToken', () => {
+    describe('refresh_token', () => {
       it('should refresh token successfully', async () => {
         const mockResponse = {
           success: true,
           data: {
             user: { id: '1', email: 'test@example.com' },
             token: 'new-token',
-            refreshToken: 'new-refresh-token'
+            refresh_token: 'new-refresh-token'
           }
         };
 
@@ -264,7 +264,7 @@ describe('API Service', () => {
           json: () => Promise.resolve(mockResponse)
         });
 
-        const result = await api.refreshToken();
+        const result = await api.refresh_token();
 
         expect(result).toEqual(mockResponse);
         expect(mockFetch).toHaveBeenCalledWith('/api/auth/refresh', {
@@ -273,7 +273,7 @@ describe('API Service', () => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            refreshToken: 'refresh-token'
+            refresh_token: 'refresh-token'
           })
         });
       });
@@ -289,7 +289,7 @@ describe('API Service', () => {
           })
         });
 
-        await expect(api.refreshToken()).rejects.toThrow();
+        await expect(api.refresh_token()).rejects.toThrow();
       });
     });
   });
@@ -659,7 +659,7 @@ describe('API Service', () => {
           ok: true,
           json: () => Promise.resolve({
             success: true,
-            data: { token: 'new-token', refreshToken: 'new-refresh-token' }
+            data: { token: 'new-token', refresh_token: 'new-refresh-token' }
           })
         })
         // Retry succeeds

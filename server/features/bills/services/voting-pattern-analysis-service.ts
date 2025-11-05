@@ -3,7 +3,7 @@
  * Analyzes voting patterns and correlations between sponsors
  */
 
-import { logger  } from '../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 export interface VotingPattern {
   sponsor_id: number;
@@ -67,12 +67,12 @@ export class VotingPatternAnalysisService {
    * @returns Comparative analysis results
    */
   async buildComparativeAnalysis(
-    targetSponsorId: number,
+    target_sponsor_id: number,
     comparisonSponsorIds?: number[]
   ): Promise<ComparativeAnalysis> {
     try {
       logger.info('Building comparative analysis', { 
-        targetSponsorId, 
+        target_sponsor_id, 
         comparisonSponsorIds 
       });
 
@@ -83,7 +83,7 @@ export class VotingPatternAnalysisService {
       // 4. Identify voting blocs and coalitions
 
       const mockAnalysis: ComparativeAnalysis = {
-        targetSponsor: targetSponsorId,
+        targetSponsor: target_sponsor_id,
         alignmentScores: comparisonSponsorIds?.reduce((acc, id) => {
           acc[id] = Math.random() * 0.5 + 0.5; // Random alignment score 0.5-1.0
           return acc;
@@ -103,7 +103,7 @@ export class VotingPatternAnalysisService {
       return mockAnalysis;
     } catch (error) {
       logger.error('Error building comparative analysis', { 
-        targetSponsorId, 
+        target_sponsor_id, 
         comparisonSponsorIds 
       }, error);
       throw error;

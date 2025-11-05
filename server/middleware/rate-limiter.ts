@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { logger  } from '../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 // Create shared rate limit store (using legacy implementation for now)
 const store: RateLimitStore = {};

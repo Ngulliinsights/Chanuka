@@ -1,8 +1,8 @@
-import { readDatabase } from '@shared/database/connection';
-import * as schema from '../../../../shared/schema';
+import { readDatabase } from '@shared/database';
+import * as schema from '@/shared/schema';
 import { eq, and } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/index.js';
-import { databaseService } from '../../../infrastructure/database/database-service.js'; // For storing results
+import { logger } from '@shared/core/index.js';
+import { databaseService } from '@/infrastructure/database/database-service.js'; // For storing results
 
 
 // Import individual analysis services and their result types
@@ -30,7 +30,7 @@ export interface ConflictSummary {
 
 // --- Define the final comprehensive analysis result structure ---
 export interface ComprehensiveBillAnalysis { bill_id: number;
-    analysisId: string; // Unique ID for this analysis run
+    analysis_id: string; // Unique ID for this analysis run
     timestamp: Date;
     constitutionalAnalysis: ConstitutionalAnalysisResult;
     conflictAnalysisSummary: ConflictSummary; // Use the summary type
@@ -51,9 +51,9 @@ export class BillComprehensiveAnalysisService {
     /**
      * Runs all relevant analyses for a given bill ID.
      */
-    async analyzeBill(bill_id: number): Promise<ComprehensiveBillAnalysis> { const analysisId = `comp_analysis_${bill_id }_${Date.now()}`;
+    async analyzeBill(bill_id: number): Promise<ComprehensiveBillAnalysis> { const analysis_id = `comp_analysis_${bill_id }_${Date.now()}`;
         const timestamp = new Date();
-        logger.info(`🚀 Starting comprehensive analysis for bill ${ bill_id } (ID: ${analysisId})`);
+        logger.info(`🚀 Starting comprehensive analysis for bill ${ bill_id } (ID: ${analysis_id})`);
 
         try { // --- Step 1: Run independent analyses concurrently ---
             // Use Promise.allSettled to allow partial results even if one service fails
@@ -81,7 +81,7 @@ export class BillComprehensiveAnalysisService {
 
             // --- Step 4: Store results (asynchronously, don't block response) ---
             const analysisDataToStore = {
-                analysisId, constitutionalAnalysis: constitutional, conflictAnalysisSummary: conflictSummary,
+                analysis_id, constitutionalAnalysis: constitutional, conflictAnalysisSummary: conflictSummary,
                 stakeholderImpact: stakeholder, transparency_score: transparency, publicInterestScore: publicInterest,
                 overallConfidence: confidence, recommendations // Store recommendations too
              };
@@ -90,13 +90,13 @@ export class BillComprehensiveAnalysisService {
 
 
             // --- Step 5: Assemble and return the final result ---
-            const finalResult: ComprehensiveBillAnalysis = { bill_id, analysisId, timestamp, constitutionalAnalysis: constitutional,
+            const finalResult: ComprehensiveBillAnalysis = { bill_id, analysis_id, timestamp, constitutionalAnalysis: constitutional,
                 conflictAnalysisSummary: conflictSummary, stakeholderImpact: stakeholder,
                 transparency_score: transparency, publicInterestScore: publicInterest,
                 recommendedActions: recommendations, overallConfidence: confidence
              };
 
-            logger.info(`✅ Comprehensive analysis complete for bill ${ bill_id } (ID: ${analysisId})`);
+            logger.info(`✅ Comprehensive analysis complete for bill ${ bill_id } (ID: ${analysis_id})`);
             return finalResult;
 
         } catch (error) { // Catch errors not handled by Promise.allSettled (e.g., initial DB checks)

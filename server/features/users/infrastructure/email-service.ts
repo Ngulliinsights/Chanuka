@@ -1,6 +1,6 @@
-import { getEmailService, sendTemplatedEmail, EmailResult } from '../../../infrastructure/notifications/email-service.js';
-import { logger  } from '../../../../shared/core/src/index.js';
-import { config } from '../../../config/index.js';
+import { getEmailService, sendTemplatedEmail, EmailResult } from '@/infrastructure/notifications/email-service.js';
+import { logger  } from '@shared/core/index.js';
+import { config } from '@/config/index.js';
 
 export interface UserEmailData { user_id: string;
   email: string;
@@ -14,12 +14,12 @@ export interface WelcomeEmailData extends UserEmailData {
 }
 
 export interface PasswordResetEmailData extends UserEmailData {
-  resetToken: string;
+  reset_token: string;
   resetUrl: string;
 }
 
 export interface VerificationEmailData extends UserEmailData {
-  verificationToken: string;
+  verification_token: string;
   verificationUrl: string;
 }
 

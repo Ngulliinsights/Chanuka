@@ -5,7 +5,7 @@
 // Replaces PostgreSQL trigram-based fuzzy matching with more flexible scoring
 
 import Fuse from 'fuse.js';
-import { database } from '@shared/database/connection';
+import { database } from '@shared/database';
 import { bills, sponsors, comments, users } from '@shared/schema';
 import { SearchQuery, SearchResult, SearchEngine } from '../types/search.types.js';
 import { sql } from 'drizzle-orm';
@@ -260,9 +260,9 @@ export class FuseSearchEngine implements SearchEngine {
       type: 'comment' as const,
       relevanceScore: (1 - (result.score || 0)) * 100,
       metadata: {
-        billId: result.item.bill_id,
+        bill_id: result.item.bill_id,
         userName: result.item.user_name,
-        createdAt: result.item.created_at
+        created_at: result.item.created_at
       },
       highlights: this.generateHighlights(result.item.content, query.query)
     }));

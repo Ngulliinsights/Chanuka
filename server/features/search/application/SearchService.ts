@@ -6,8 +6,8 @@ import { RelevanceScorer } from '../domain/RelevanceScorer';
 import { suggestionEngineService } from '../engines/suggestion/suggestion-engine.service';
 import { SearchAnalytics } from '../domain/SearchAnalytics';
 import { SearchValidator } from '../domain/SearchValidator';
-import { databaseService } from '../../../infrastructure/database/database-service';
-import { logger  } from '../../../../shared/core/src/index.js';
+import { databaseService } from '@/infrastructure/database/database-service';
+import { logger  } from '@shared/core/index.js';
 import type {
   SearchQuery,
   SearchResponseDto,

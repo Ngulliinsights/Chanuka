@@ -3,7 +3,7 @@ import { ErrorFixer, TypeScriptError, FixResult, CodeChange, ProcessingContext }
 
 /**
  * Fixes database connection import issues in the Chanuka project
- * Handles missing imports from '@shared/database/connection' and database service patterns
+ * Handles missing imports from '@shared/database' and database service patterns
  */
 export class DatabaseConnectionFixer implements ErrorFixer {
   private readonly DATABASE_ERROR_CODES = [

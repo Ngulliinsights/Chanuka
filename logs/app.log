@@ -6073,3 +6073,108 @@
 {"timestamp":"2025-11-04T04:19:43.085Z","level":"info","message":"Old performance data cleaned up","correlationId":"mhk28dbh-da486660","component":"unified-monitoring","remainingMetrics":0}
 {"timestamp":"2025-11-04T04:20:11.495Z","level":"info","message":"Old performance data cleaned up","correlationId":"mhk28z8n-3343c5ec","component":"unified-monitoring","remainingMetrics":0}
 {"timestamp":"2025-11-04T04:21:46.607Z","level":"info","message":"Old performance data cleaned up","correlationId":"mhk2b0mn-b79b3ef7","component":"unified-monitoring","remainingMetrics":0}
+{"timestamp":"2025-11-04T17:00:32.760Z","level":"debug","message":"Debug message","correlationId":"mhktesu0-62b25aca"}
+{"timestamp":"2025-11-04T17:00:32.760Z","level":"info","message":"Info message","correlationId":"mhktesu0-2c06cb28"}
+{"timestamp":"2025-11-04T17:00:32.761Z","level":"warn","message":"Warn message","correlationId":"mhktesu1-7b73189f"}
+{"timestamp":"2025-11-04T17:00:32.761Z","level":"error","message":"Error message","correlationId":"mhktesu1-bbd2d0b7"}
+{"timestamp":"2025-11-04T17:00:32.768Z","level":"debug","message":"Debug message","correlationId":"mhktesu8-2e5b06fd"}
+{"timestamp":"2025-11-04T17:00:32.768Z","level":"info","message":"Info message","correlationId":"mhktesu8-6a20b176"}
+{"timestamp":"2025-11-04T17:00:32.772Z","level":"info","message":"Test message","correlationId":"mhktesuc-5158af1d","component":"test","user_id":"123"}
+{"timestamp":"2025-11-04T17:00:32.777Z","level":"info","message":"Message with context","correlationId":"mhktesuh-bd0ec8c2","requestId":"req-123","user_id":"user-456"}
+{"timestamp":"2025-11-04T17:00:32.787Z","level":"info","message":"Performance: test-operation completed in 0.06ms","correlationId":"mhktesuq-ae7dd33d","component":"performance","operation":"test-operation","duration":0.0572999999858439,"threshold":5000,"exceeded":false,"success":true}
+{"timestamp":"2025-11-04T17:00:32.813Z","level":"info","message":"Performance: async-test completed in 23.10ms","correlationId":"mhktesvh-59010721","component":"performance","operation":"async-test","duration":23.098699999973178,"threshold":5000,"exceeded":false,"success":true}
+{"timestamp":"2025-11-04T17:00:32.818Z","level":"info","message":"Test log entry","correlationId":"mhktesvl-62232329","component":"test"}
+{"timestamp":"2025-11-04T17:00:32.825Z","level":"info","message":"GET /api/test - 200","correlationId":"mhktesvt-3ebed3ed","component":"http","operation":"request","statusCode":200,"duration":150,"method":"GET","url":"/api/test","request":{"method":"GET","url":"/api/test","statusCode":200,"duration":150}}
+{"timestamp":"2025-11-04T17:00:32.821Z","level":"info","message":"Test message","correlationId":"mhktesvp-69631cbc"}
+{"timestamp":"2025-11-04T17:00:32.827Z","level":"debug","message":45,"correlationId":"mhktesvv-9af83b0c","component":"database","operation":"query","database":"SELECT * FROM users"}
+{"timestamp":"2025-11-04T17:00:32.831Z","level":"debug","message":"user:123","correlationId":"mhktesvz-95633699","component":"cache","cache":"get"}
+{"timestamp":"2025-11-04T19:38:37.673Z","level":"debug","message":"Debug message","correlationId":"mhkz23ft-448256bd"}
+{"timestamp":"2025-11-04T19:38:37.673Z","level":"info","message":"Info message","correlationId":"mhkz23ft-15cca021"}
+{"timestamp":"2025-11-04T19:38:37.681Z","level":"debug","message":"Debug message","correlationId":"mhkz23g1-0e1bfd86"}
+{"timestamp":"2025-11-04T19:38:37.674Z","level":"warn","message":"Warn message","correlationId":"mhkz23fu-c34278f4"}
+{"timestamp":"2025-11-04T19:38:37.685Z","level":"info","message":"Test message","correlationId":"mhkz23g5-ec932e88","component":"test","user_id":"123"}
+{"timestamp":"2025-11-04T19:38:37.681Z","level":"info","message":"Info message","correlationId":"mhkz23g1-7a69b168"}
+{"timestamp":"2025-11-04T19:38:37.674Z","level":"error","message":"Error message","correlationId":"mhkz23fu-a9f0e937"}
+{"timestamp":"2025-11-04T19:38:37.697Z","level":"info","message":"Performance: test-operation completed in 0.23ms","correlationId":"mhkz23gh-7a07e008","component":"performance","operation":"test-operation","duration":0.2256000000052154,"threshold":5000,"exceeded":false,"success":true}
+{"timestamp":"2025-11-04T19:38:37.689Z","level":"info","message":"Message with context","correlationId":"mhkz23g9-481c0fd7","requestId":"req-123","user_id":"user-456"}
+{"timestamp":"2025-11-04T19:38:37.723Z","level":"info","message":"Performance: async-test completed in 21.86ms","correlationId":"mhkz23h6-29a30e46","component":"performance","operation":"async-test","duration":21.864900000044145,"threshold":5000,"exceeded":false,"success":true}
+{"timestamp":"2025-11-04T19:38:37.727Z","level":"info","message":"Test log entry","correlationId":"mhkz23hb-ff147566","component":"test"}
+{"timestamp":"2025-11-04T19:38:37.731Z","level":"info","message":"Test message","correlationId":"mhkz23hf-19d0edd3"}
+{"timestamp":"2025-11-04T19:38:37.734Z","level":"info","message":"GET /api/test - 200","correlationId":"mhkz23hi-aa2f4795","component":"http","operation":"request","statusCode":200,"duration":150,"method":"GET","url":"/api/test","request":{"method":"GET","url":"/api/test","statusCode":200,"duration":150}}
+{"timestamp":"2025-11-04T19:38:37.738Z","level":"debug","message":45,"correlationId":"mhkz23hm-ba53882f","component":"database","operation":"query","database":"SELECT * FROM users"}
+{"timestamp":"2025-11-04T19:38:37.742Z","level":"debug","message":"user:123","correlationId":"mhkz23hq-c4eb8740","component":"cache","cache":"get"}
+{"timestamp":"2025-11-04T22:01:12.838Z","level":"debug","message":"Debug message","correlationId":"mhl45gna-34224b4f"}
+{"timestamp":"2025-11-04T22:01:12.849Z","level":"info","message":"Test message","correlationId":"mhl45gnl-7e6ef810","component":"test","user_id":"123"}
+{"timestamp":"2025-11-04T22:01:12.838Z","level":"info","message":"Info message","correlationId":"mhl45gna-50478163"}
+{"timestamp":"2025-11-04T22:01:12.845Z","level":"debug","message":"Debug message","correlationId":"mhl45gnh-e5ee4421"}
+{"timestamp":"2025-11-04T22:01:12.855Z","level":"info","message":"Message with context","correlationId":"mhl45gnr-4ae24c91","requestId":"req-123","user_id":"user-456"}
+{"timestamp":"2025-11-04T22:01:12.839Z","level":"warn","message":"Warn message","correlationId":"mhl45gnb-44d8b0e8"}
+{"timestamp":"2025-11-04T22:01:12.865Z","level":"info","message":"Performance: test-operation completed in 0.07ms","correlationId":"mhl45go1-18e7c7c2","component":"performance","operation":"test-operation","duration":0.06970000034198165,"threshold":5000,"exceeded":false,"success":true}
+{"timestamp":"2025-11-04T22:01:12.839Z","level":"error","message":"Error message","correlationId":"mhl45gnb-558e1b29"}
+{"timestamp":"2025-11-04T22:01:12.879Z","level":"info","message":"Performance: async-test completed in 10.20ms","correlationId":"mhl45gof-5b3b3171","component":"performance","operation":"async-test","duration":10.202900000382215,"threshold":5000,"exceeded":false,"success":true}
+{"timestamp":"2025-11-04T22:01:12.845Z","level":"info","message":"Info message","correlationId":"mhl45gnh-3d2d2b4a"}
+{"timestamp":"2025-11-04T22:01:12.883Z","level":"info","message":"Test log entry","correlationId":"mhl45goj-faadc3d9","component":"test"}
+{"timestamp":"2025-11-04T22:01:12.888Z","level":"info","message":"Test message","correlationId":"mhl45goo-b57964d9"}
+{"timestamp":"2025-11-04T22:01:12.892Z","level":"info","message":"GET /api/test - 200","correlationId":"mhl45gos-7fbffb91","component":"http","operation":"request","statusCode":200,"duration":150,"method":"GET","url":"/api/test","request":{"method":"GET","url":"/api/test","statusCode":200,"duration":150}}
+{"timestamp":"2025-11-04T22:01:12.895Z","level":"debug","message":45,"correlationId":"mhl45gov-b778cedd","component":"database","operation":"query","database":"SELECT * FROM users"}
+{"timestamp":"2025-11-04T22:01:12.898Z","level":"debug","message":"user:123","correlationId":"mhl45goy-bf6866fb","component":"cache","cache":"get"}
+{"timestamp":"2025-11-04T22:37:55.636Z","level":"debug","message":"Debug message","correlationId":"mhl5goc4-37a9590a"}
+{"timestamp":"2025-11-04T22:37:55.636Z","level":"info","message":"Info message","correlationId":"mhl5goc4-2d5e966f"}
+{"timestamp":"2025-11-04T22:37:55.636Z","level":"warn","message":"Warn message","correlationId":"mhl5goc4-454d0cdd"}
+{"timestamp":"2025-11-04T22:37:55.636Z","level":"error","message":"Error message","correlationId":"mhl5goc4-f276062a"}
+{"timestamp":"2025-11-04T22:37:55.641Z","level":"debug","message":"Debug message","correlationId":"mhl5goc9-60dfee53"}
+{"timestamp":"2025-11-04T22:37:55.642Z","level":"info","message":"Info message","correlationId":"mhl5goca-1cf81c7d"}
+{"timestamp":"2025-11-04T22:37:55.645Z","level":"info","message":"Test message","correlationId":"mhl5gocd-3ec5c06f","component":"test","user_id":"123"}
+{"timestamp":"2025-11-04T22:37:55.649Z","level":"info","message":"Message with context","correlationId":"mhl5goch-41c6a901","requestId":"req-123","user_id":"user-456"}
+{"timestamp":"2025-11-04T22:37:55.659Z","level":"info","message":"Performance: test-operation completed in 0.12ms","correlationId":"mhl5gocr-83ba1437","component":"performance","operation":"test-operation","duration":0.11580000002868474,"threshold":5000,"exceeded":false,"success":true}
+{"timestamp":"2025-11-04T22:37:55.688Z","level":"info","message":"Performance: async-test completed in 23.30ms","correlationId":"mhl5godk-a15c1416","component":"performance","operation":"async-test","duration":23.30089999991469,"threshold":5000,"exceeded":false,"success":true}
+{"timestamp":"2025-11-04T22:37:55.694Z","level":"info","message":"Test log entry","correlationId":"mhl5godq-e88ac2a3","component":"test"}
+{"timestamp":"2025-11-04T22:37:55.698Z","level":"info","message":"Test message","correlationId":"mhl5godu-7c254d33"}
+{"timestamp":"2025-11-04T22:37:55.703Z","level":"info","message":"GET /api/test - 200","correlationId":"mhl5godz-6d9202a1","component":"http","operation":"request","statusCode":200,"duration":150,"method":"GET","url":"/api/test","request":{"method":"GET","url":"/api/test","statusCode":200,"duration":150}}
+{"timestamp":"2025-11-04T22:37:55.707Z","level":"debug","message":45,"correlationId":"mhl5goe3-eba015a2","component":"database","operation":"query","database":"SELECT * FROM users"}
+{"timestamp":"2025-11-04T22:37:55.711Z","level":"debug","message":"user:123","correlationId":"mhl5goe7-efa71b1f","component":"cache","cache":"get"}
+{"timestamp":"2025-11-05T04:44:35.914Z","level":"debug","message":"Debug message","correlationId":"mhlik7ux-2956252f"}
+{"timestamp":"2025-11-05T04:44:35.919Z","level":"debug","message":"Debug message","correlationId":"mhlik7v3-d747c002"}
+{"timestamp":"2025-11-05T04:44:35.914Z","level":"info","message":"Info message","correlationId":"mhlik7uy-fb32012d"}
+{"timestamp":"2025-11-05T04:44:35.919Z","level":"info","message":"Info message","correlationId":"mhlik7v3-0f6b8a27"}
+{"timestamp":"2025-11-05T04:44:35.914Z","level":"warn","message":"Warn message","correlationId":"mhlik7uy-e0659bb9"}
+{"timestamp":"2025-11-05T04:44:35.914Z","level":"error","message":"Error message","correlationId":"mhlik7uy-0fc55458"}
+{"timestamp":"2025-11-05T04:44:35.922Z","level":"info","message":"Test message","correlationId":"mhlik7v6-a21428e2","component":"test","user_id":"123"}
+{"timestamp":"2025-11-05T04:44:35.938Z","level":"info","message":"Performance: test-operation completed in 0.06ms","correlationId":"mhlik7vm-0dd091bb","component":"performance","operation":"test-operation","duration":0.060800000093877316,"threshold":5000,"exceeded":false,"success":true}
+{"timestamp":"2025-11-05T04:44:35.927Z","level":"info","message":"Message with context","correlationId":"mhlik7vb-ad95f4b6","requestId":"req-123","user_id":"user-456"}
+{"timestamp":"2025-11-05T04:44:35.971Z","level":"info","message":"Performance: async-test completed in 23.88ms","correlationId":"mhlik7wj-f51cb27e","component":"performance","operation":"async-test","duration":23.875200000125915,"threshold":5000,"exceeded":false,"success":true}
+{"timestamp":"2025-11-05T04:44:35.976Z","level":"info","message":"Test log entry","correlationId":"mhlik7wo-b34c542d","component":"test"}
+{"timestamp":"2025-11-05T04:44:35.981Z","level":"info","message":"Test message","correlationId":"mhlik7wt-c83bf56a"}
+{"timestamp":"2025-11-05T04:44:35.986Z","level":"info","message":"GET /api/test - 200","correlationId":"mhlik7wy-0dddada8","component":"http","operation":"request","statusCode":200,"duration":150,"method":"GET","url":"/api/test","request":{"method":"GET","url":"/api/test","statusCode":200,"duration":150}}
+{"timestamp":"2025-11-05T04:44:35.989Z","level":"debug","message":45,"correlationId":"mhlik7x1-41618295","component":"database","operation":"query","database":"SELECT * FROM users"}
+{"timestamp":"2025-11-05T04:44:35.993Z","level":"debug","message":"user:123","correlationId":"mhlik7x5-ce2fe328","component":"cache","cache":"get"}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"debug","message":"Debug message","correlationId":"mhlseott-594e674b"}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"info","message":"Info message","correlationId":"mhlseott-010697aa"}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"warn","message":"Warn message","correlationId":"mhlseott-ad58a4af"}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"error","message":"Error message","correlationId":"mhlseott-1b56a54a"}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"debug","message":"Debug message","correlationId":"mhlseott-7eea9c0b"}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"info","message":"Info message","correlationId":"mhlseott-2ce77236"}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"info","message":"Test message","correlationId":"mhlseott-ff986b69","component":"test","user_id":"123"}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"info","message":"Message with context","correlationId":"mhlseott-a6d42db7","requestId":"req-123","user_id":"user-456"}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"info","message":"Performance: test-operation completed in 0.00ms","correlationId":"mhlseott-f6ef4d27","component":"performance","operation":"test-operation","duration":0,"threshold":5000,"exceeded":false,"success":true}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"info","message":"Test log entry","correlationId":"mhlseott-41731d82","component":"test"}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"info","message":"Test message","correlationId":"mhlseott-d5113cc6"}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"info","message":"GET /api/test - 200","correlationId":"mhlseott-fb2ae1f6","component":"http","operation":"request","statusCode":200,"duration":150,"method":"GET","url":"/api/test","request":{"method":"GET","url":"/api/test","statusCode":200,"duration":150}}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"debug","message":45,"correlationId":"mhlseott-07b08702","component":"database","operation":"query","database":"SELECT * FROM users"}
+{"timestamp":"2025-11-05T09:20:14.129Z","level":"debug","message":"user:123","correlationId":"mhlseott-33bdaf55","component":"cache","cache":"get"}
+{"timestamp":"2025-11-05T09:20:15.129Z","level":"info","message":"Performance: async-test completed in 1000.00ms","correlationId":"mhlsepll-0df4834c","component":"performance","operation":"async-test","duration":1000,"threshold":5000,"exceeded":false,"success":true}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"debug","message":"Debug message","correlationId":"mhlzg3oi-8f6d743e"}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"info","message":"Info message","correlationId":"mhlzg3oi-b6a7b4e1"}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"warn","message":"Warn message","correlationId":"mhlzg3oi-1829e0c4"}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"error","message":"Error message","correlationId":"mhlzg3oi-881eb32d"}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"debug","message":"Debug message","correlationId":"mhlzg3oi-bed54396"}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"info","message":"Info message","correlationId":"mhlzg3oi-feaff00a"}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"info","message":"Test message","correlationId":"mhlzg3oi-a10acab9","component":"test","user_id":"123"}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"info","message":"Message with context","correlationId":"mhlzg3oi-d30e64cf","requestId":"req-123","user_id":"user-456"}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"info","message":"Performance: test-operation completed in 0.00ms","correlationId":"mhlzg3oi-fecf4b6b","component":"performance","operation":"test-operation","duration":0,"threshold":5000,"exceeded":false,"success":true}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"info","message":"Test log entry","correlationId":"mhlzg3oi-4e098780","component":"test"}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"info","message":"Test message","correlationId":"mhlzg3oi-f7bcee15"}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"info","message":"GET /api/test - 200","correlationId":"mhlzg3oi-facae342","component":"http","operation":"request","statusCode":200,"duration":150,"method":"GET","url":"/api/test","request":{"method":"GET","url":"/api/test","statusCode":200,"duration":150}}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"debug","message":45,"correlationId":"mhlzg3oi-65a0c409","component":"database","operation":"query","database":"SELECT * FROM users"}
+{"timestamp":"2025-11-05T12:37:17.346Z","level":"debug","message":"user:123","correlationId":"mhlzg3oi-5fd3e422","component":"cache","cache":"get"}
+{"timestamp":"2025-11-05T12:37:18.346Z","level":"info","message":"Performance: async-test completed in 1000.00ms","correlationId":"mhlzg4ga-7991d7e6","component":"performance","operation":"async-test","duration":1000,"threshold":5000,"exceeded":false,"success":true}

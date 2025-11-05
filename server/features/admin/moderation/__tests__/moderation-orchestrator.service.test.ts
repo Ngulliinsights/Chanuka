@@ -64,7 +64,7 @@ describe('ModerationOrchestratorService', () => {
 
       expect(result.approved).toBe(true);
       expect(result.requiresReview).toBe(false);
-      expect(result.reportId).toBeUndefined();
+      expect(result.report_id).toBeUndefined();
     });
 
     it('should flag problematic content for review', async () => {
@@ -87,7 +87,7 @@ describe('ModerationOrchestratorService', () => {
       vi.mocked(moderationQueueService.createReport).mockResolvedValue({
         success: true,
         message: 'Report created',
-        reportId: 123
+        report_id: 123
       });
 
       const result = await service.processContentSubmission(
@@ -99,7 +99,7 @@ describe('ModerationOrchestratorService', () => {
 
       expect(result.approved).toBe(false);
       expect(result.requiresReview).toBe(true);
-      expect(result.reportId).toBe(123);
+      expect(result.report_id).toBe(123);
       expect(contentAnalysisService.analyzeContent).toHaveBeenCalledWith(
         'comment',
         'This is harassment content',

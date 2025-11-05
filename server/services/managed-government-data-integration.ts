@@ -1,7 +1,7 @@
 import { GovernmentDataIntegrationService } from '../infrastructure/external-data/government-data-integration.js';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '../infrastructure/external-data/external-api-manager.js';
 import { ExternalAPIErrorHandler } from './external-api-error-handler.js';
-import { logger  } from '../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 import { z } from 'zod';
 
 /**
@@ -722,8 +722,8 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
         organization: member.Party || member.party,
         role: 'Member',
         type: 'political',
-        startDate: member.PartyStartDate || member.party_start_date,
-        endDate: member.PartyEndDate || member.party_end_date
+        start_date: member.PartyStartDate || member.party_start_date,
+        end_date: member.PartyEndDate || member.party_end_date
       });
     }
 
@@ -733,8 +733,8 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
         organization: committee.Name || committee.name,
         role: committee.Role || committee.role || 'Member',
         type: 'professional',
-        startDate: committee.StartDate || committee.start_date,
-        endDate: committee.EndDate || committee.end_date
+        start_date: committee.StartDate || committee.start_date,
+        end_date: committee.EndDate || committee.end_date
       })));
     }
 
@@ -744,8 +744,8 @@ export class ManagedGovernmentDataIntegrationService extends GovernmentDataInteg
         organization: affiliation.Organization || affiliation.organization,
         role: affiliation.Role || affiliation.role,
         type: affiliation.Type || affiliation.type || 'professional',
-        startDate: affiliation.StartDate || affiliation.start_date,
-        endDate: affiliation.EndDate || affiliation.end_date
+        start_date: affiliation.StartDate || affiliation.start_date,
+        end_date: affiliation.EndDate || affiliation.end_date
       })));
     }
 

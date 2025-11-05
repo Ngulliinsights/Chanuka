@@ -114,93 +114,93 @@ describe('ExpertVerificationService', () => {
 
   describe('processVerification', () => {
     it('should process expert approval successfully', async () => {
-      const analysisId = 'analysis-123';
+      const analysis_id = 'analysis-123';
       const expertId = 'expert-123';
       const verdict = VerificationStatus.APPROVED;
 
       // This should complete without throwing any errors
       await expect(
-        service.processVerification(analysisId, expertId, verdict),
+        service.processVerification(analysis_id, expertId, verdict),
       ).resolves.not.toThrow();
     });
 
     it('should process expert rejection successfully', async () => {
       // It's important to test that rejections are handled just as gracefully as approvals
-      const analysisId = 'analysis-123';
+      const analysis_id = 'analysis-123';
       const expertId = 'expert-123';
       const verdict = VerificationStatus.REJECTED;
 
       await expect(
-        service.processVerification(analysisId, expertId, verdict),
+        service.processVerification(analysis_id, expertId, verdict),
       ).resolves.not.toThrow();
     });
 
     it('should handle pending status during verification process', async () => {
       // Testing the intermediate state where verification is in progress
-      const analysisId = 'analysis-123';
+      const analysis_id = 'analysis-123';
       const expertId = 'expert-123';
       const verdict = VerificationStatus.PENDING;
 
       await expect(
-        service.processVerification(analysisId, expertId, verdict),
+        service.processVerification(analysis_id, expertId, verdict),
       ).resolves.not.toThrow();
     });
 
     it('should throw error when analysis ID does not exist', async () => {
-      const analysisId = 'nonexistent-analysis-id';
+      const analysis_id = 'nonexistent-analysis-id';
       const expertId = 'expert-123';
       const verdict = VerificationStatus.APPROVED;
 
       await expect(
-        service.processVerification(analysisId, expertId, verdict)
+        service.processVerification(analysis_id, expertId, verdict)
       ).rejects.toThrow('Analysis not found');
     });
 
     it('should throw error when expert ID is empty string', async () => {
-      const analysisId = 'analysis-123';
+      const analysis_id = 'analysis-123';
       const expertId = '';
       const verdict = VerificationStatus.APPROVED;
 
       await expect(
-        service.processVerification(analysisId, expertId, verdict)
+        service.processVerification(analysis_id, expertId, verdict)
       ).rejects.toThrow('Invalid verification data');
     });
 
     it('should throw error when expert ID is missing (undefined)', async () => {
       // Testing a slightly different edge case where the ID is undefined rather than empty
-      const analysisId = 'analysis-123';
+      const analysis_id = 'analysis-123';
       const expertId = undefined as any;
       const verdict = VerificationStatus.APPROVED;
 
       await expect(
-        service.processVerification(analysisId, expertId, verdict)
+        service.processVerification(analysis_id, expertId, verdict)
       ).rejects.toThrow('Invalid verification data');
     });
 
     it('should throw error when analysis ID is empty string', async () => {
-      const analysisId = '';
+      const analysis_id = '';
       const expertId = 'expert-123';
       const verdict = VerificationStatus.APPROVED;
 
       await expect(
-        service.processVerification(analysisId, expertId, verdict)
+        service.processVerification(analysis_id, expertId, verdict)
       ).rejects.toThrow('Invalid verification data');
     });
 
     it('should handle verification from different experts on same analysis', async () => {
       // This tests whether the system can handle multiple expert opinions
       // which is common in peer review processes
-      const analysisId = 'analysis-123';
+      const analysis_id = 'analysis-123';
       const expertId1 = 'expert-123';
       const expertId2 = 'expert-456';
       const verdict = VerificationStatus.APPROVED;
 
       await expect(
-        service.processVerification(analysisId, expertId1, verdict),
+        service.processVerification(analysis_id, expertId1, verdict),
       ).resolves.not.toThrow();
 
       await expect(
-        service.processVerification(analysisId, expertId2, verdict),
+        service.processVerification(analysis_id, expertId2, verdict),
       ).resolves.not.toThrow();
     });
   });

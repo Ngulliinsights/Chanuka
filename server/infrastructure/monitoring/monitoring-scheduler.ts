@@ -1,4 +1,4 @@
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 export class MonitoringScheduler {
   private intervals: Map<string, NodeJS.Timeout> = new Map();

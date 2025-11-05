@@ -595,8 +595,8 @@ describe('ValidationService', () => {
     it('should provide date range validation', async () => {
       const dateRangeSchema = validationService.getCommonSchema('dateRange');
       const validRange = {
-        startDate: '2023-01-01',
-        endDate: '2023-12-31',
+        start_date: '2023-01-01',
+        end_date: '2023-12-31',
       };
       
       await expect(
@@ -605,8 +605,8 @@ describe('ValidationService', () => {
 
       await expect(
         validationService.validate(dateRangeSchema, {
-          startDate: '2023-12-31',
-          endDate: '2023-01-01', // End before start
+          start_date: '2023-12-31',
+          end_date: '2023-01-01', // End before start
         })
       ).rejects.toThrow(ValidationError);
     });

@@ -15,11 +15,11 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 
 import { MiddlewareConfig } from '../middleware/config';
 import { MiddlewareFactory } from '@shared/core/src/middleware/factory';
-import { Logger } from '@shared/core/src/observability/logging';
-import { CacheService } from '../caching/core/interfaces';
-import { ValidationService } from '../validation/validation-service';
+// import { Logger } from '@shared/core/src/observability/logging'; // Using logger instance instead
+import { CacheInterface } from '../caching/core/interfaces';
+import { ValidationAdapter } from '../validation/core/interfaces';
 import { RateLimitStore } from '@shared/core/src/types';
-import { HealthChecker } from '../observability/health/health-checker';
+import { HealthOrchestrator } from '../observability/health/health-orchestrator';
 import express from 'express';
 import request from 'supertest';
 import { logger } from '@shared/core/src/observability/logging';

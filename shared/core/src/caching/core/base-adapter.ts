@@ -250,7 +250,8 @@ export abstract class BaseCacheAdapter extends EventEmitter implements CacheAdap
       keyCount: 0,
       avgLatency: 0,
       maxLatency: 0,
-      minLatency: Infinity
+      minLatency: Infinity,
+      avgResponseTime: 0
     };
   }
 }

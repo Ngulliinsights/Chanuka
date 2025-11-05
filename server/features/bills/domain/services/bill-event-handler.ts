@@ -1,6 +1,6 @@
 import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '../events/bill-events';
 import { BillNotificationService } from './bill-notification-service';
-import { logger } from '../../../../shared/core/src/index';
+import { logger } from '@shared/core/index';
 
 /**
  * Event handler that connects domain events to notification workflows
@@ -19,7 +19,7 @@ export class BillEventHandler {
       logger.info('Handling bill domain event', {
         component: 'BillEventHandler',
         eventType: event.constructor.name,
-        billId: event.billId
+        bill_id: event.bill_id
       });
 
       switch (event.constructor.name) {
@@ -46,7 +46,7 @@ export class BillEventHandler {
       logger.error('Failed to handle bill domain event', {
         component: 'BillEventHandler',
         eventType: event.constructor.name,
-        billId: event.billId
+        bill_id: event.bill_id
       }, error);
 
       // Don't rethrow - event handling should not break the main flow

@@ -60,7 +60,7 @@ export class ServiceOrchestrator {
   /**
    * Orchestrate bill creation with all related services
    */
-  async orchestrateBillCreation(billData: any, userId: string): Promise<{
+  async orchestrateBillCreation(billData: any, user_id: string): Promise<{
     bill: any;
     searchIndexed: boolean;
     analysisQueued: boolean;
@@ -83,7 +83,7 @@ export class ServiceOrchestrator {
       logger.info('🔄 Starting bill creation orchestration', {
         operationId,
         billTitle: billData.title,
-        userId
+        user_id
       });
 
       // Step 1: Create bill in database
@@ -93,8 +93,8 @@ export class ServiceOrchestrator {
         return {
           id: this.generateId(),
           ...billData,
-          createdBy: userId,
-          createdAt: new Date()
+          createdBy: user_id,
+          created_at: new Date()
         };
       });
 
@@ -108,7 +108,7 @@ export class ServiceOrchestrator {
         operation.results.searchIndexed = true;
       } catch (error) {
         operation.errors.search = error instanceof Error ? error.message : 'Search indexing failed';
-        logger.warn('Search indexing failed for bill', { billId: bill.id, error });
+        logger.warn('Search indexing failed for bill', { bill_id: bill.id, error });
       }
 
       // Step 3: Queue constitutional analysis (async)
@@ -119,7 +119,7 @@ export class ServiceOrchestrator {
         operation.results.analysisQueued = true;
       } catch (error) {
         operation.errors.analysis = error instanceof Error ? error.message : 'Analysis queueing failed';
-        logger.warn('Constitutional analysis queueing failed', { billId: bill.id, error });
+        logger.warn('Constitutional analysis queueing failed', { bill_id: bill.id, error });
       }
 
       // Step 4: Update recommendation models (async)
@@ -130,7 +130,7 @@ export class ServiceOrchestrator {
         operation.results.recommendationsUpdated = true;
       } catch (error) {
         operation.errors.recommendations = error instanceof Error ? error.message : 'Recommendations update failed';
-        logger.warn('Recommendations update failed', { billId: bill.id, error });
+        logger.warn('Recommendations update failed', { bill_id: bill.id, error });
       }
 
       // Step 5: Emit integration event
@@ -138,7 +138,7 @@ export class ServiceOrchestrator {
         eventType: 'bill_created',
         sourceService: 'bills',
         targetServices: ['search', 'constitutional-analysis', 'recommendations', 'notifications'],
-        payload: { bill, userId },
+        payload: { bill, user_id },
         timestamp: new Date(),
         correlationId: operationId
       });
@@ -148,7 +148,7 @@ export class ServiceOrchestrator {
 
       logger.info('✅ Bill creation orchestration completed', {
         operationId,
-        billId: bill.id,
+        bill_id: bill.id,
         duration: operation.endTime.getTime() - operation.startTime.getTime(),
         searchIndexed,
         analysisQueued,
@@ -187,7 +187,7 @@ export class ServiceOrchestrator {
    */
   async orchestrateCampaignCreation(
     campaignData: any, 
-    userId: string,
+    user_id: string,
     campaignService: CampaignDomainService
   ): Promise<{
     campaign: any;
@@ -212,11 +212,11 @@ export class ServiceOrchestrator {
       logger.info('🔄 Starting campaign creation orchestration', {
         operationId,
         campaignTitle: campaignData.title,
-        userId
+        user_id
       });
 
       // Step 1: Create campaign
-      const campaign = await campaignService.createCampaign(campaignData, userId);
+      const campaign = await campaignService.createCampaign(campaignData, user_id);
       operation.results.campaign = campaign;
 
       // Step 2: Create default actions based on campaign type
@@ -256,7 +256,7 @@ export class ServiceOrchestrator {
 
       logger.info('✅ Campaign creation orchestration completed', {
         operationId,
-        campaignId: campaign.id,
+        campaign_id: campaign.id,
         actionsCreated,
         duration: operation.endTime.getTime() - operation.startTime.getTime()
       });
@@ -287,8 +287,8 @@ export class ServiceOrchestrator {
    */
   async orchestrateCommentProcessing(
     commentData: any,
-    userId: string,
-    billId: string
+    user_id: string,
+    bill_id: string
   ): Promise<{
     comment: any;
     argumentsExtracted: number;
@@ -300,8 +300,8 @@ export class ServiceOrchestrator {
     try {
       logger.info('🔄 Starting comment processing orchestration', {
         operationId,
-        billId,
-        userId
+        bill_id,
+        user_id
       });
 
       // Step 1: Create comment
@@ -310,9 +310,9 @@ export class ServiceOrchestrator {
         return {
           id: this.generateId(),
           ...commentData,
-          userId,
-          billId,
-          createdAt: new Date()
+          user_id,
+          bill_id,
+          created_at: new Date()
         };
       });
 
@@ -328,7 +328,7 @@ export class ServiceOrchestrator {
         const extractedArguments = await structureExtractor.extractArguments(
           comment.content,
           {
-            billId,
+            bill_id,
             userContext: {
               county: 'Nairobi', // Would come from user profile
               occupation: 'citizen'
@@ -342,7 +342,7 @@ export class ServiceOrchestrator {
 
         argumentsExtracted = extractedArguments.length;
       } catch (error) {
-        logger.warn('Argument extraction failed', { commentId: comment.id, error });
+        logger.warn('Argument extraction failed', { comment_id: comment.id, error });
       }
 
       // Step 3: Index for search
@@ -351,21 +351,21 @@ export class ServiceOrchestrator {
         await this.indexCommentForSearch(comment);
         searchIndexed = true;
       } catch (error) {
-        logger.warn('Comment search indexing failed', { commentId: comment.id, error });
+        logger.warn('Comment search indexing failed', { comment_id: comment.id, error });
       }
 
       // Step 4: Update recommendations
       let recommendationsUpdated = false;
       try {
-        await this.updateUserRecommendations(userId, comment);
+        await this.updateUserRecommendations(user_id, comment);
         recommendationsUpdated = true;
       } catch (error) {
-        logger.warn('Recommendations update failed', { commentId: comment.id, error });
+        logger.warn('Recommendations update failed', { comment_id: comment.id, error });
       }
 
       logger.info('✅ Comment processing orchestration completed', {
         operationId,
-        commentId: comment.id,
+        comment_id: comment.id,
         argumentsExtracted,
         searchIndexed,
         recommendationsUpdated
@@ -516,19 +516,19 @@ export class ServiceOrchestrator {
 
   private async indexBillForSearch(bill: any): Promise<void> {
     // Index bill in search service
-    logger.debug('Indexing bill for search', { billId: bill.id });
+    logger.debug('Indexing bill for search', { bill_id: bill.id });
     // Implementation would call search service indexing
   }
 
   private async queueConstitutionalAnalysis(bill: any): Promise<void> {
     // Queue bill for constitutional analysis
-    logger.debug('Queueing constitutional analysis', { billId: bill.id });
+    logger.debug('Queueing constitutional analysis', { bill_id: bill.id });
     // Implementation would queue analysis job
   }
 
   private async updateRecommendationModels(bill: any): Promise<void> {
     // Update recommendation models with new bill
-    logger.debug('Updating recommendation models', { billId: bill.id });
+    logger.debug('Updating recommendation models', { bill_id: bill.id });
     // Implementation would update ML models
   }
 
@@ -552,23 +552,23 @@ export class ServiceOrchestrator {
   }
 
   private async indexCampaignForSearch(campaign: any): Promise<void> {
-    logger.debug('Indexing campaign for search', { campaignId: campaign.id });
+    logger.debug('Indexing campaign for search', { campaign_id: campaign.id });
   }
 
   private async notifyPotentialParticipants(campaign: any): Promise<void> {
-    logger.debug('Notifying potential participants', { campaignId: campaign.id });
+    logger.debug('Notifying potential participants', { campaign_id: campaign.id });
   }
 
   private async updateCampaignRecommendations(campaign: any): Promise<void> {
-    logger.debug('Updating campaign recommendations', { campaignId: campaign.id });
+    logger.debug('Updating campaign recommendations', { campaign_id: campaign.id });
   }
 
   private async indexCommentForSearch(comment: any): Promise<void> {
-    logger.debug('Indexing comment for search', { commentId: comment.id });
+    logger.debug('Indexing comment for search', { comment_id: comment.id });
   }
 
-  private async updateUserRecommendations(userId: string, comment: any): Promise<void> {
-    logger.debug('Updating user recommendations', { userId, commentId: comment.id });
+  private async updateUserRecommendations(user_id: string, comment: any): Promise<void> {
+    logger.debug('Updating user recommendations', { user_id, comment_id: comment.id });
   }
 
   private async emitIntegrationEvent(event: IntegrationEvent): Promise<void> {

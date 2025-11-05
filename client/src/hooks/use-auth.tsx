@@ -29,7 +29,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string; data?: any }>;
   register: (data: RegisterData) => Promise<{ success: boolean; error?: string; requiresVerification?: boolean; data?: any }>;
   logout: () => Promise<void>;
-  refreshToken: () => Promise<{ success: boolean; error?: string }>;
+  refresh_token: () => Promise<{ success: boolean; error?: string }>;
   verifyEmail: (token: string) => Promise<{ success: boolean; error?: string }>;
   requestPasswordReset: (email: string) => Promise<{ success: boolean; error?: string }>;
   resetPassword: (token: string, password: string) => Promise<{ success: boolean; error?: string }>;
@@ -104,14 +104,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
         } else {
           localStorage.removeItem('token');
-          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('refresh_token');
           if (mountedRef.current) {
             setUser(null);
           }
         }
       } else {
         localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('refresh_token');
         if (mountedRef.current) {
           setUser(null);
         }
@@ -119,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       logger.error('Token validation failed:', { component: 'Chanuka' }, error);
       localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('refresh_token');
       if (mountedRef.current) {
         setUser(null);
       }
@@ -150,7 +150,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok && result.success) {
         localStorage.setItem('token', result.data.token);
-        localStorage.setItem('refreshToken', result.data.refreshToken);
+        localStorage.setItem('refresh_token', result.data.refresh_token);
         if (mountedRef.current) {
           setUser(result.data.user);
         }
@@ -187,7 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (response.ok && result.success) {
         localStorage.setItem('token', result.data.token);
-        localStorage.setItem('refreshToken', result.data.refreshToken);
+        localStorage.setItem('refresh_token', result.data.refresh_token);
         if (mountedRef.current) {
           setUser(result.data.user);
         }
@@ -225,7 +225,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logger.error('Logout request failed:', { component: 'Chanuka' }, error);
     } finally {
       localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('refresh_token');
       if (mountedRef.current) {
         setUser(null);
       }
@@ -233,10 +233,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const refreshToken = async (): Promise<{ success: boolean; error?: string }> => {
+  const refresh_token = async (): Promise<{ success: boolean; error?: string }> => {
     const abortController = new AbortController();
     try {
-      const refreshTokenValue = localStorage.getItem('refreshToken');
+      const refreshTokenValue = localStorage.getItem('refresh_token');
       if (!refreshTokenValue) {
         return { success: false, error: 'No refresh token available' };
       }
@@ -246,21 +246,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ refreshToken: refreshTokenValue }),
+        body: JSON.stringify({ refresh_token: refreshTokenValue }),
       }, abortController);
 
       const result = await response.json();
 
       if (response.ok && result.success) {
         localStorage.setItem('token', result.data.token);
-        localStorage.setItem('refreshToken', result.data.refreshToken);
+        localStorage.setItem('refresh_token', result.data.refresh_token);
         if (mountedRef.current) {
           setUser(result.data.user);
         }
         return { success: true };
       } else {
         localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('refresh_token');
         if (mountedRef.current) {
           setUser(null);
         }
@@ -269,7 +269,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       logger.error('Token refresh failed:', { component: 'Chanuka' }, error);
       localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('refresh_token');
       if (mountedRef.current) {
         setUser(null);
       }
@@ -371,7 +371,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     login,
     register,
     logout,
-    refreshToken,
+    refresh_token,
     verifyEmail,
     requestPasswordReset,
     resetPassword,

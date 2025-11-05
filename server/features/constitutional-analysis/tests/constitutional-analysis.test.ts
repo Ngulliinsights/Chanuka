@@ -16,7 +16,7 @@ const mockBillContent = `
 `;
 
 const mockAnalysisRequest: AnalysisRequest = {
-  billId: 'test-bill-001',
+  bill_id: 'test-bill-001',
   billTitle: 'Computer Misuse and Cybercrimes (Amendment) Bill 2024',
   billContent: mockBillContent,
   billType: 'amendment',
@@ -66,7 +66,7 @@ describe('Constitutional Analysis Feature', () => {
       const result = await analyzer.analyzeBill(mockAnalysisRequest);
 
       expect(result).toBeDefined();
-      expect(result.billId).toBe(mockAnalysisRequest.billId);
+      expect(result.bill_id).toBe(mockAnalysisRequest.bill_id);
       expect(result.overallRisk).toBeOneOf(['low', 'medium', 'high', 'critical']);
       expect(result.overallConfidence).toBeGreaterThanOrEqual(0);
       expect(result.overallConfidence).toBeLessThanOrEqual(100);
@@ -292,7 +292,7 @@ describe('Constitutional Analysis Feature', () => {
       // Should still complete analysis even if external service fails
       const result = await analyzer.analyzeBill(mockAnalysisRequest);
       expect(result).toBeDefined();
-      expect(result.billId).toBe(mockAnalysisRequest.billId);
+      expect(result.bill_id).toBe(mockAnalysisRequest.bill_id);
     });
   });
 

@@ -1,6 +1,7 @@
 import { logger } from '../core/src/observability/logging';
 import { databaseMonitor } from './monitoring.js';
-import { setupGlobalErrorHandlers } from '../utils/error-handler.js';
+// Note: Global error handlers setup is handled elsewhere
+// import { setupGlobalErrorHandlers } from '../utils/error-handler.js';
 import { monitorPoolHealth } from './pool.js';
 
 /**
@@ -53,10 +54,8 @@ async function performInitialization(): Promise<void> {
   logger.info('Initializing database safety mechanisms...');
 
   try {
-    // Set up global error handlers to prevent crashes
-    // This should be done first to catch any errors during initialization
-    setupGlobalErrorHandlers();
-    logger.info('✓ Global error handlers configured');
+    // Note: Global error handlers are set up elsewhere in the application
+    logger.info('✓ Proceeding with database initialization');
 
     // Perform initial health check with timeout to prevent hanging
     const healthCheckPromise = monitorPoolHealth();

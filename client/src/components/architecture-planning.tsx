@@ -81,7 +81,7 @@ export default function ArchitecturePlanning({ projectId }: ArchitecturePlanning
           <h3 className="font-medium mb-4">Current Component Architecture</h3>
           <div className="space-y-2">
             {components?.map((component) => {
-              const statusColor = getStatusColor(component.status);
+              const statusColor = getStatusColor(component.status || 'planned');
               
               return (
                 <div key={component.id} className="flex items-center justify-between p-3 border border-border rounded-lg">
@@ -93,7 +93,7 @@ export default function ArchitecturePlanning({ projectId }: ArchitecturePlanning
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    {getStatusBadge(component.status)}
+                    {getStatusBadge(component.status || 'planned')}
                     <button className="p-1 hover:bg-accent rounded">
                       <ExternalLink className="w-3 h-3" />
                     </button>

@@ -1,5 +1,5 @@
 import { Metric, MetricsExporter } from '../types';
-import { Result, Ok, Err } from '../../../primitives/types/result';
+import { Result, Ok, Err } from '@/primitives/types/result';
 import * as dgram from 'dgram';
 import * as net from 'net';
 

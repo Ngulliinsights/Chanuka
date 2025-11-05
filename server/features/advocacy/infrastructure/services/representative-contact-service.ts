@@ -7,7 +7,7 @@
 // ============================================================================
 
 import { RepresentativeContact } from '../../types/index.js';
-import { logger } from '../../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 // ============================================================================
 // Configuration Types
@@ -54,7 +54,7 @@ export interface ContactAttempt {
 }
 
 export interface SenderInfo {
-  userId: string;
+  user_id: string;
   name: string;
   email?: string;
   phone?: string;
@@ -224,7 +224,7 @@ export class RepresentativeContactService {
       }
 
       // Check rate limits to prevent spam
-      if (!this.checkRateLimit(senderInfo.userId)) {
+      if (!this.checkRateLimit(senderInfo.user_id)) {
         throw new Error('Rate limit exceeded. Please try again later.');
       }
 
@@ -239,7 +239,7 @@ export class RepresentativeContactService {
       
       attempt.status = success ? 'sent' : 'failed';
 
-      this.updateRateLimit(senderInfo.userId);
+      this.updateRateLimit(senderInfo.user_id);
 
       logger.info('Representative contact attempted', { 
         attemptId: attempt.id,
@@ -465,13 +465,13 @@ Sincerely,
    */
   async getContactHistory(
     representativeId: string,
-    userId?: string
+    user_id?: string
   ): Promise<ContactAttempt[]> {
     try {
       // In production, this would query the database with appropriate filters
       logger.debug('Contact history requested', {
         representativeId,
-        userId,
+        user_id,
         component: 'RepresentativeContactService'
       });
       
@@ -479,7 +479,7 @@ Sincerely,
     } catch (error) {
       logger.error('Failed to get contact history', error, { 
         representativeId,
-        userId,
+        user_id,
         component: 'RepresentativeContactService' 
       });
       return [];
@@ -578,8 +578,8 @@ Sincerely,
     if (!message?.trim()) {
       throw new Error('Message content is required');
     }
-    if (!senderInfo?.userId || !senderInfo?.name) {
-      throw new Error('Sender information (userId and name) is required');
+    if (!senderInfo?.user_id || !senderInfo?.name) {
+      throw new Error('Sender information (user_id and name) is required');
     }
   }
 
@@ -603,12 +603,12 @@ Sincerely,
   // Private Helper Methods - Rate Limiting
   // ==========================================================================
 
-  private checkRateLimit(userId: string): boolean {
+  private checkRateLimit(user_id: string): boolean {
     if (!this.config.rateLimit) {
       return true;
     }
 
-    const tracker = this.contactRateLimits.get(userId);
+    const tracker = this.contactRateLimits.get(user_id);
     if (!tracker) {
       return true;
     }
@@ -626,14 +626,14 @@ Sincerely,
            dailyAttempts < this.config.rateLimit.maxContactsPerDay;
   }
 
-  private updateRateLimit(userId: string): void {
+  private updateRateLimit(user_id: string): void {
     if (!this.config.rateLimit) {
       return;
     }
 
-    const tracker = this.contactRateLimits.get(userId) || { attempts: [] };
+    const tracker = this.contactRateLimits.get(user_id) || { attempts: [] };
     tracker.attempts.push(Date.now());
-    this.contactRateLimits.set(userId, tracker);
+    this.contactRateLimits.set(user_id, tracker);
   }
 
   // ==========================================================================
@@ -771,7 +771,7 @@ Sincerely,
     logger.info('Email prepared for representative', { 
       representativeId: representative.id,
       email: representative.contactInfo.email,
-      senderUserId: senderInfo.userId,
+      senderUserId: senderInfo.user_id,
       component: 'RepresentativeContactService' 
     });
     return true;
@@ -787,7 +787,7 @@ Sincerely,
     logger.info('Phone contact logged for user action', { 
       representativeId: representative.id,
       phone: representative.contactInfo.phone,
-      senderUserId: senderInfo.userId,
+      senderUserId: senderInfo.user_id,
       component: 'RepresentativeContactService' 
     });
     return true;
@@ -803,7 +803,7 @@ Sincerely,
     logger.info('Office visit request created', { 
       representativeId: representative.id,
       office: representative.contactInfo.office,
-      senderUserId: senderInfo.userId,
+      senderUserId: senderInfo.user_id,
       component: 'RepresentativeContactService' 
     });
     return true;
@@ -820,7 +820,7 @@ Sincerely,
     logger.info('Social media message prepared', { 
       representativeId: representative.id,
       platforms,
-      senderUserId: senderInfo.userId,
+      senderUserId: senderInfo.user_id,
       component: 'RepresentativeContactService' 
     });
     return true;

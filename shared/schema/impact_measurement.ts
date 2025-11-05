@@ -539,6 +539,9 @@ export type NewDemographicEquityMetric = typeof demographic_equity_metrics.$infe
 export type DigitalInclusionMetric = typeof digital_inclusion_metrics.$inferSelect;
 export type NewDigitalInclusionMetric = typeof digital_inclusion_metrics.$inferInsert;
 
+// Legacy export alias for backward compatibility
+export const equity_metrics = geographic_equity_metrics;
+
 // ============================================================================
 // PLATFORM PERFORMANCE INDICATORS - High-level KPIs
 // ============================================================================

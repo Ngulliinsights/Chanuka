@@ -90,7 +90,7 @@ describe('API Integration Tests', () => {
         .set('Authorization', authToken)
         .send({ 
           content: 'This is a test comment on the bill',
-          isPublic: true 
+          is_public: true 
         })
         .expect(201);
 
@@ -125,7 +125,7 @@ describe('API Integration Tests', () => {
         .expect(200);
 
       ApiResponseValidator.validateSuccessResponse(metricsResponse);
-      expect(metricsResponse.body.data.metrics.viewCount).toBeGreaterThan(0);
+      expect(metricsResponse.body.data.metrics.view_count).toBeGreaterThan(0);
 
       logger.info('✅ Bill engagement tracking test completed');
     });
@@ -137,13 +137,13 @@ describe('API Integration Tests', () => {
       const campaignData = {
         title: 'API Test Campaign',
         description: 'Testing campaign creation through API',
-        billId: testBill.id,
+        bill_id: testBill.id,
         objectives: ['Test API functionality', 'Validate integration'],
         strategy: { approach: 'API testing' },
         targetCounties: ['Nairobi', 'Mombasa'],
-        startDate: new Date().toISOString(),
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        isPublic: true
+        start_date: new Date().toISOString(),
+        end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        is_public: true
       };
 
       const createResponse = await request(app)
@@ -153,11 +153,11 @@ describe('API Integration Tests', () => {
         .expect(201);
 
       ApiResponseValidator.validateSuccessResponse(createResponse, 201);
-      const campaignId = createResponse.body.data.campaign.id;
+      const campaign_id = createResponse.body.data.campaign.id;
 
       // Get campaign
       const getResponse = await request(app)
-        .get(`/api/campaigns/${campaignId}`)
+        .get(`/api/campaigns/${campaign_id}`)
         .set('Authorization', authToken)
         .expect(200);
 
@@ -166,7 +166,7 @@ describe('API Integration Tests', () => {
 
       // Join campaign
       const joinResponse = await request(app)
-        .post(`/api/campaigns/${campaignId}/join`)
+        .post(`/api/campaigns/${campaign_id}/join`)
         .set('Authorization', authToken)
         .expect(200);
 
@@ -183,7 +183,7 @@ describe('API Integration Tests', () => {
       };
 
       const actionResponse = await request(app)
-        .post(`/api/campaigns/${campaignId}/actions`)
+        .post(`/api/campaigns/${campaign_id}/actions`)
         .set('Authorization', authToken)
         .send(actionData)
         .expect(201);
@@ -211,7 +211,7 @@ describe('API Integration Tests', () => {
 
       // Get campaign metrics
       const metricsResponse = await request(app)
-        .get(`/api/campaigns/${campaignId}/metrics`)
+        .get(`/api/campaigns/${campaign_id}/metrics`)
         .set('Authorization', authToken)
         .expect(200);
 
@@ -226,12 +226,12 @@ describe('API Integration Tests', () => {
       const campaignData = {
         title: 'Analytics Test Campaign',
         description: 'Testing analytics functionality',
-        billId: testBill.id,
+        bill_id: testBill.id,
         objectives: ['Test analytics'],
         strategy: { approach: 'analytics testing' },
         targetCounties: ['Nairobi'],
-        startDate: new Date().toISOString(),
-        isPublic: true
+        start_date: new Date().toISOString(),
+        is_public: true
       };
 
       const createResponse = await request(app)
@@ -240,11 +240,11 @@ describe('API Integration Tests', () => {
         .send(campaignData)
         .expect(201);
 
-      const campaignId = createResponse.body.data.campaign.id;
+      const campaign_id = createResponse.body.data.campaign.id;
 
       // Get campaign analytics
       const analyticsResponse = await request(app)
-        .get(`/api/campaigns/${campaignId}/analytics`)
+        .get(`/api/campaigns/${campaign_id}/analytics`)
         .set('Authorization', authToken)
         .expect(200);
 
@@ -253,7 +253,7 @@ describe('API Integration Tests', () => {
 
       // Get optimization recommendations
       const optimizationResponse = await request(app)
-        .get(`/api/campaigns/${campaignId}/optimization`)
+        .get(`/api/campaigns/${campaign_id}/optimization`)
         .set('Authorization', authToken)
         .expect(200);
 
@@ -262,7 +262,7 @@ describe('API Integration Tests', () => {
 
       // Get coalition opportunities
       const coalitionResponse = await request(app)
-        .get(`/api/campaigns/${campaignId}/coalition-opportunities`)
+        .get(`/api/campaigns/${campaign_id}/coalition-opportunities`)
         .set('Authorization', authToken)
         .expect(200);
 
@@ -389,7 +389,7 @@ describe('API Integration Tests', () => {
         .expect(200);
 
       ApiResponseValidator.validateSuccessResponse(profileResponse);
-      expect(profileResponse.body.data.profile.userId).toBe(testUser.id);
+      expect(profileResponse.body.data.profile.user_id).toBe(testUser.id);
 
       // Update user profile
       const updateData = {
@@ -482,7 +482,7 @@ describe('API Integration Tests', () => {
         const response = await request(app)
           .post(`/api/bills/${testBill.id}/comments`)
           .set('Authorization', authToken)
-          .send({ content: payload, isPublic: true })
+          .send({ content: payload, is_public: true })
           .expect(400); // Should reject malicious input
 
         ApiResponseValidator.validateErrorResponse(response, 400);
@@ -536,12 +536,12 @@ describe('API Integration Tests', () => {
           .send({
             title: `Concurrent Campaign ${i}`,
             description: 'Testing concurrent creation',
-            billId: testBill.id,
+            bill_id: testBill.id,
             objectives: ['Test concurrency'],
             strategy: { approach: 'concurrent testing' },
             targetCounties: ['Nairobi'],
-            startDate: new Date().toISOString(),
-            isPublic: true
+            start_date: new Date().toISOString(),
+            is_public: true
           })
       );
 

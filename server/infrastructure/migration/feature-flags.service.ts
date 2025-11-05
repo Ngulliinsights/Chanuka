@@ -19,7 +19,7 @@ export interface FeatureFlag {
 
 export interface ABTestingMetrics {
   component: string;
-  userId: string;
+  user_id: string;
   cohort: 'control' | 'treatment';
   metrics: {
     responseTime: number;
@@ -65,7 +65,7 @@ export class FeatureFlagsService {
   /**
    * Check if a feature should be enabled for a given user
    */
-  async shouldUseMigration(flagName: string, userId?: string): Promise<boolean> {
+  async shouldUseMigration(flagName: string, user_id?: string): Promise<boolean> {
     const flag = this.flags.get(flagName);
     if (!flag || !flag.enabled) {
       return false;
@@ -77,13 +77,13 @@ export class FeatureFlagsService {
     }
 
     // Check specific user IDs
-    if (flag.conditions?.userIds && userId && flag.conditions.userIds.includes(userId)) {
+    if (flag.conditions?.userIds && user_id && flag.conditions.userIds.includes(user_id)) {
       return true;
     }
 
     // Use percentage-based rollout with user hash for consistency
-    if (userId) {
-      const userHash = this.hashUser(userId);
+    if (user_id) {
+      const userHash = this.hashUser(user_id);
       return userHash % 100 < flag.rolloutPercentage;
     }
 
@@ -119,9 +119,9 @@ export class FeatureFlagsService {
   /**
    * Hash user ID for consistent cohort assignment
    */
-  private hashUser(userId: string): number {
+  private hashUser(user_id: string): number {
     let hash = 0;
-    for (let i = 0; i < userId.length; i++) {
+    for (let i = 0; i < user_id.length; i++) {
       const char = userId.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash; // Convert to 32-bit integer
@@ -132,13 +132,13 @@ export class FeatureFlagsService {
   /**
    * Get user cohort for A/B testing
    */
-  getUserCohort(userId: string, component: string): 'control' | 'treatment' {
-    const cohortKey = `${component}-${userId}`;
+  getUserCohort(user_id: string, component: string): 'control' | 'treatment' {
+    const cohortKey = `${component}-${ user_id }`;
     if (this.userCohorts.has(cohortKey)) {
       return this.userCohorts.get(cohortKey) as 'control' | 'treatment';
     }
 
-    const cohort = this.hashUser(userId) % 2 === 0 ? 'control' : 'treatment';
+    const cohort = this.hashUser(user_id) % 2 === 0 ? 'control' : 'treatment';
     this.userCohorts.set(cohortKey, cohort);
     return cohort;
   }
@@ -150,7 +150,7 @@ export class FeatureFlagsService {
     // In a real implementation, this would store metrics in a database
     // For now, we'll log them for monitoring
     console.log(`[A/B Testing] ${metrics.component} - ${metrics.cohort}:`, {
-      userId: metrics.userId,
+      user_id: metrics.user_id,
       responseTime: metrics.metrics.responseTime,
       errorRate: metrics.metrics.errorRate,
       successRate: metrics.metrics.successRate,

@@ -40,7 +40,7 @@ describe('Dashboard Types', () => {
         title: 'Test Action',
         description: 'Test Description',
         priority: 'High',
-        dueDate: new Date(),
+        due_date: new Date(),
         category: 'Legislative',
         bill_id: 'bill-123',
         completed: true,
@@ -48,7 +48,7 @@ describe('Dashboard Types', () => {
         updated_at: new Date()
        };
 
-      expect(actionItem.dueDate).toBeDefined();
+      expect(actionItem.due_date).toBeDefined();
       expect(actionItem.category).toBeDefined();
       expect(actionItem.bill_id).toBeDefined();
       expect(actionItem.completed).toBeDefined();

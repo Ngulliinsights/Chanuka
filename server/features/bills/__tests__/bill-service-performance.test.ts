@@ -520,12 +520,12 @@ describe('Bills Domain Performance Benchmarks', () => {
     }
   }
 
-  async function getEngagementCount(billId: string): Promise<number> {
+  async function getEngagementCount(bill_id: string): Promise<number> {
     const db = databaseService.getDatabase();
     const [result] = await db
       .select({ count: sql`COUNT(*)` })
       .from(bill_engagement)
-      .where(eq(bill_engagement.bill_id, billId));
+      .where(eq(bill_engagement.bill_id, bill_id));
     
     return Number(result.count);
   }

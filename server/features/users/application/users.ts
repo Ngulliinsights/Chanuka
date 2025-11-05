@@ -4,33 +4,33 @@ import { User } from '../domain/entities/user';
 import { UserProfile, UserInterest } from '../domain/entities/user-profile';
 import { CitizenVerification, VerificationType } from '../domain/entities/citizen-verification';
 import { Evidence, ExpertiseLevel } from '../domain/entities/value-objects';
-import { databaseService } from '../../../infrastructure/database/database-service';
+import { databaseService } from '@/infrastructure/database/database-service';
 import {
   ResultAdapter,
   AsyncServiceResult,
   withResultHandling
-} from '../../../infrastructure/errors/result-adapter.js';
+} from '@/infrastructure/errors/result-adapter.js';
 
 // Domain Events
 export interface UserRegisteredEvent {
   type: 'USER_REGISTERED';
-  userId: string;
+  user_id: string;
   email: string;
   timestamp: Date;
 }
 
 export interface ProfileUpdatedEvent {
   type: 'PROFILE_UPDATED';
-  userId: string;
+  user_id: string;
   changes: string[];
   timestamp: Date;
 }
 
 export interface VerificationSubmittedEvent {
   type: 'VERIFICATION_SUBMITTED';
-  userId: string;
-  verificationId: string;
-  billId: number;
+  user_id: string;
+  verification_id: string;
+  bill_id: number;
   timestamp: Date;
 }
 
@@ -147,14 +147,14 @@ export class UserDomainService {
   /**
    * Update user profile with business rule validation
    */
-  async updateUserProfile(userId: string, updateData: ProfileUpdateData): AsyncServiceResult<UserAggregate> {
+  async updateUserProfile(user_id: string, updateData: ProfileUpdateData): AsyncServiceResult<UserAggregate> {
     return withResultHandling(async () => {
       // Get current aggregate
-      const aggregateResult = await this.userService.findUserAggregateById(userId);
+      const aggregateResult = await this.userService.findUserAggregateById(user_id);
       
       // Check if the result is an error or null
       if (!aggregateResult) {
-        const notFoundResult = ResultAdapter.notFoundError('User', userId, {
+        const notFoundResult = ResultAdapter.notFoundError('User', user_id, {
           service: 'UserDomainService',
           operation: 'updateUserProfile'
         });
@@ -189,7 +189,7 @@ export class UserDomainService {
         if (!profile) {
           // Only include properties that have actual values (not undefined)
           profile = UserProfile.create({
-            user_id: userId,
+            user_id: user_id,
             ...(updateData.bio && { bio: updateData.bio }),
             ...(updateData.expertise && { expertise: updateData.expertise }),
             ...(updateData.location && { location: updateData.location }),
@@ -248,12 +248,12 @@ export class UserDomainService {
   /**
    * Update user interests with validation
    */
-  async updateUserInterests(userId: string, interests: string[]): AsyncServiceResult<UserAggregate> {
+  async updateUserInterests(user_id: string, interests: string[]): AsyncServiceResult<UserAggregate> {
     return withResultHandling(async () => {
       // Get current aggregate
-      const aggregateResult = await this.userService.findUserAggregateById(userId);
+      const aggregateResult = await this.userService.findUserAggregateById(user_id);
       if (!aggregateResult) {
-        const notFoundResult = ResultAdapter.notFoundError('User', userId, {
+        const notFoundResult = ResultAdapter.notFoundError('User', user_id, {
           service: 'UserDomainService',
           operation: 'updateUserInterests'
         });
@@ -278,11 +278,11 @@ export class UserDomainService {
 
       const txResult = await databaseService.withTransaction(async (_tx) => {
         // Clear existing interests
-        await this.userService.deleteAllInterests(userId);
+        await this.userService.deleteAllInterests(user_id);
 
         // Create and save new interests
         const interestEntities = interests.map(interest =>
-          UserInterest.create({ user_id: userId, interest })
+          UserInterest.create({ user_id: user_id, interest })
         );
 
         for (const interest of interestEntities) {
@@ -311,12 +311,12 @@ export class UserDomainService {
   /**
    * Submit citizen verification with eligibility checks
    */
-  async submitVerification(userId: string, verificationData: VerificationSubmissionData): AsyncServiceResult<CitizenVerification> {
+  async submitVerification(user_id: string, verificationData: VerificationSubmissionData): AsyncServiceResult<CitizenVerification> {
     return withResultHandling(async () => {
       // Get user aggregate for eligibility check
-      const aggregateResult = await this.userService.findUserAggregateById(userId);
+      const aggregateResult = await this.userService.findUserAggregateById(user_id);
       if (!aggregateResult) {
-        const notFoundResult = ResultAdapter.notFoundError('User', userId, {
+        const notFoundResult = ResultAdapter.notFoundError('User', user_id, {
           service: 'UserDomainService',
           operation: 'submitVerification'
         });
@@ -358,7 +358,7 @@ export class UserDomainService {
         const verification = CitizenVerification.create({
           id: crypto.randomUUID(),
           bill_id: verificationData.bill_id,
-          citizenId: userId,
+          citizenId: user_id,
           verification_type: verificationData.verification_type,
           evidence: verificationData.evidence,
           expertise: verificationData.expertise,
@@ -382,19 +382,19 @@ export class UserDomainService {
   /**
    * Get user aggregate with all related data
    */
-  async getUserAggregate(userId: string): Promise<UserAggregate | null> {
-    return await this.userService.findUserAggregateById(userId);
+  async getUserAggregate(user_id: string): Promise<UserAggregate | null> {
+    return await this.userService.findUserAggregateById(user_id);
   }
 
   /**
    * Check user verification eligibility
    */
-  async checkVerificationEligibility(userId: string): Promise<{
+  async checkVerificationEligibility(user_id: string): Promise<{
     eligible: boolean;
     reasons: string[];
     reputation_score: number;
   }> {
-    const aggregate = await this.userService.findUserAggregateById(userId);
+    const aggregate = await this.userService.findUserAggregateById(user_id);
     if (!aggregate) {
       return { eligible: false, reasons: ['User not found'], reputation_score: 0 };
     }

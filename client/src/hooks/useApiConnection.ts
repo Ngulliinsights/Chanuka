@@ -498,7 +498,7 @@ export function useConnectionStatus(): {
  * 
  * Usage example:
  * const { execute, isLoading, error, retryCount } = useApiRetry(
- *   () => fetchUserData(userId),
+ *   () => fetchUserData(user_id),
  *   { maxRetries: 3, exponentialBackoff: true }
  * );
  */

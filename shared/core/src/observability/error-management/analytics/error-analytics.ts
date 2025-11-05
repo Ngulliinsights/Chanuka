@@ -111,7 +111,7 @@ export class ErrorAnalyticsEngine {
         recoveryOptions: [], // Would need to generate these
         timestamp: error.metadata.timestamp,
         user_id: undefined, // Would need user context
-        sessionId: undefined // Would need session context
+        session_id: undefined // Would need session context
        }));
 
     // Top issues with trend analysis
@@ -377,7 +377,7 @@ export class ErrorAnalyticsEngine {
 
     const uniqueSessions = new Set(
       this.errors
-        .map(e => e.metadata.context?.sessionId)
+        .map(e => e.metadata.context?.session_id)
         .filter(Boolean)
     );
 

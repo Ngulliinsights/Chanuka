@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { logger } from '../../../../shared/core/index.js';
-import { errorTracker } from '../../../core/errors/error-tracker.js';
+import { logger } from '@shared/core/index.js';
+import { errorTracker } from '@/core/errors/error-tracker.js';
 
 /**
  * Analytics Configuration Interface

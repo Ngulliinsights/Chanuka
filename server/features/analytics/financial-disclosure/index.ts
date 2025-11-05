@@ -5,12 +5,12 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { FinancialDisclosureMonitoringService } from "./monitoring.js";
 import { FinancialDisclosureAnalyticsService } from "../services/financial-disclosure.service.js";
-import { ApiSuccess, ApiError  } from '../../../../shared/core/src/utils/api-utils.js';
+import { ApiSuccess, ApiError  } from '@shared/core/utils/api-utils.js';
 import { z, ZodError } from "zod";
-import { ValidationError as InvalidInputError, SponsorNotFoundError, BaseError } from '../../../utils/errors.js';
+import { ValidationError as InvalidInputError, SponsorNotFoundError, BaseError } from '@/utils/errors.js';
 import * as crypto from 'crypto';
-import { logger } from '../../../../shared/core/src/observability/logging/logger.js';
-import { errorTracker } from '../../../core/errors/error-tracker.js';
+import { logger } from '@shared/core/observability/logging/logger.js';
+import { errorTracker } from '@/core/errors/error-tracker.js';
 
 // ============================================================================
 // API Validation Schemas & Middleware

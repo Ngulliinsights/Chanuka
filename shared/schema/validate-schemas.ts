@@ -42,8 +42,8 @@ Object.entries(schemas).forEach(([name, schema]) => {
     key !== 'default' && 
     !key.includes('Relations') && 
     !key.includes('Enum') &&
-    typeof schema[key] === 'object' &&
-    schema[key]?._.name
+    typeof (schema as any)[key] === 'object' &&
+    (schema as any)[key]?._.name
   ).length;
   
   if (tableCount > 0) {

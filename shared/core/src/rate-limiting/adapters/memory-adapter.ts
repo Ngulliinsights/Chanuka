@@ -10,7 +10,21 @@ export class MemoryAdapter implements RateLimitStore {
   constructor(private store: MemoryRateLimitStore) {}
 
   async check(key: string, config: RateLimitConfig): Promise<RateLimitResult> {
-    return this.store.check(key, config);
+    const result = await this.store.check(key, {
+      windowMs: config.windowMs,
+      max: config.limit,
+      message: config.message,
+      testMax: config.testMax,
+      devMax: config.devMax
+    });
+
+    // Add missing properties to match RateLimitResult interface
+    return {
+      ...result,
+      totalHits: 0, // Not tracked in memory store
+      windowStart: Date.now() - config.windowMs,
+      algorithm: 'fixed-window'
+    };
   }
 
   async reset(key: string): Promise<void> {

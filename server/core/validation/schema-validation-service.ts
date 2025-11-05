@@ -1,11 +1,11 @@
 import { getDbInstance, readDatabase } from '../../infrastructure/database/index.ts';
 import { sql } from 'drizzle-orm';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 import {
   complianceChecks,
   securityAuditLogs,
   threatIntelligence
-} from '../../../shared/schema';
+} from '@/shared/schema';
 
 export interface ValidationResult {
   tableName: string;

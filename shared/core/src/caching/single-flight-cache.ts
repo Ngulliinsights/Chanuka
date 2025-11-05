@@ -523,7 +523,7 @@ export class SingleFlightCache implements CacheService {
       };
 
       const circuitBreakers: Record<string, CircuitBreakerState> = {};
-      for (const [key, state] of this.circuitBreakers.entries()) {
+      for (const [key, state] of Array.from(this.circuitBreakers.entries())) {
         circuitBreakers[key] = state;
       }
 
@@ -593,7 +593,7 @@ export class SingleFlightCache implements CacheService {
    */
   private cleanupFallbackCache(): void {
     const now = Date.now();
-    for (const [key, entry] of this.fallbackCache.entries()) {
+    for (const [key, entry] of Array.from(this.fallbackCache.entries())) {
       if (now - entry.timestamp > entry.ttl * 1000) {
         this.fallbackCache.delete(key);
       }
@@ -649,7 +649,7 @@ export class SingleFlightCache implements CacheService {
     const now = Date.now();
     const resetThreshold = this.options.circuitBreakerTimeout * 2; // Reset after 2x timeout
 
-    for (const [key, circuit] of this.circuitBreakers.entries()) {
+    for (const [key, circuit] of Array.from(this.circuitBreakers.entries())) {
       if (
         circuit.state === 'open' && 
         now - circuit.lastFailure > resetThreshold
@@ -672,7 +672,7 @@ export class SingleFlightCache implements CacheService {
     openCircuitBreakers: string[];
   } {
     const openCircuitBreakers: string[] = [];
-    for (const [key, circuit] of this.circuitBreakers.entries()) {
+    for (const [key, circuit] of Array.from(this.circuitBreakers.entries())) {
       if (circuit.state === 'open') {
         openCircuitBreakers.push(key);
       }
@@ -718,7 +718,7 @@ export class SingleFlightCache implements CacheService {
     let totalResponseCount = 0;
     let totalSlowCalls = 0;
 
-    for (const circuit of this.circuitBreakers.values()) {
+    for (const circuit of Array.from(this.circuitBreakers.values())) {
       switch (circuit.state) {
         case 'open':
           openCount++;

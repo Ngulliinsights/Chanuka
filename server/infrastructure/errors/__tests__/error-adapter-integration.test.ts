@@ -17,7 +17,7 @@ describe('ErrorAdapter Integration', () => {
   const mockContext: Partial<ErrorContext> = {
     service: 'integration-test',
     operation: 'test-operation',
-    userId: 'user-123',
+    user_id: 'user-123',
     requestId: 'req-456'
   };
 
@@ -86,11 +86,11 @@ describe('ErrorAdapter Integration', () => {
   describe('Result Type Integration', () => {
     it('should work with Result type patterns', async () => {
       // Simulate a service method that might fail
-      const simulateUserLookup = async (userId: string) => {
-        if (userId === 'invalid') {
-          return errorAdapter.createNotFoundError('User', userId, mockContext);
+      const simulateUserLookup = async (user_id: string) => {
+        if (user_id === 'invalid') {
+          return errorAdapter.createNotFoundError('User', user_id, mockContext);
         }
-        return { ok: true, value: { id: userId, name: 'Test User' } };
+        return { ok: true, value: { id: user_id, name: 'Test User' } };
       };
 
       // Test success case
@@ -220,7 +220,7 @@ describe('ErrorAdapter Integration', () => {
       const richContext: Partial<ErrorContext> = {
         service: 'user-service',
         operation: 'create-user',
-        userId: 'admin-123',
+        user_id: 'admin-123',
         requestId: 'req-789',
         correlationId: 'corr-456',
         metadata: {
@@ -248,7 +248,7 @@ describe('ErrorAdapter Integration', () => {
         // Check StandardizedError format
         expect(standardizedError.context.service).toBe('user-service');
         expect(standardizedError.context.operation).toBe('create-user');
-        expect(standardizedError.context.userId).toBe('admin-123');
+        expect(standardizedError.context.user_id).toBe('admin-123');
         expect(standardizedError.context.requestId).toBe('req-789');
         expect(standardizedError.context.correlationId).toBe('corr-456');
         expect(standardizedError.context.metadata).toEqual(richContext.metadata);

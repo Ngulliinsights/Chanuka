@@ -14,7 +14,7 @@ export interface DisplayIdentity {
   showLocation: boolean;
   showContactInfo: boolean;
   canDirectMessage: boolean;
-  profileUrl?: string;
+  profileUrl?: string | undefined;
 }
 
 /**

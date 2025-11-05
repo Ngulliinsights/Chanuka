@@ -117,7 +117,7 @@ describe('ContentModerationService (Legacy Wrapper)', () => {
       const mockResult = {
         success: true,
         message: 'Report created',
-        reportId: 456,
+        report_id: 456,
         analysis: undefined
       };
       
@@ -148,14 +148,14 @@ describe('ContentModerationService (Legacy Wrapper)', () => {
       expect(result).toEqual({
         success: true,
         message: 'Report created',
-        reportId: 456
+        report_id: 456
       });
     });
 
     it('should delegate getModerationStats', async () => {
       const { moderationOrchestratorService } = await import('../moderation/moderation-orchestrator.service.js');
-      const startDate = new Date('2024-01-01');
-      const endDate = new Date('2024-01-31');
+      const start_date = new Date('2024-01-01');
+      const end_date = new Date('2024-01-31');
       const mockResult = {
         reportsCreated: 100,
         reportsResolved: 80,
@@ -170,9 +170,9 @@ describe('ContentModerationService (Legacy Wrapper)', () => {
       
       vi.mocked(moderationOrchestratorService.getModerationStats).mockResolvedValue(mockResult);
 
-      const result = await service.getModerationStats(startDate, endDate);
+      const result = await service.getModerationStats(start_date, end_date);
 
-      expect(moderationOrchestratorService.getModerationStats).toHaveBeenCalledWith(startDate, endDate);
+      expect(moderationOrchestratorService.getModerationStats).toHaveBeenCalledWith(start_date, end_date);
       expect(result).toBe(mockResult);
     });
 

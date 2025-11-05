@@ -5,7 +5,7 @@
  */
 
 import { RealMLAnalysisService } from '../services/real-ml.service.js';
-import { featureFlagsService } from '../../../infrastructure/migration/feature-flags.service.js';
+import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 import MLMigrationConfigurator from './configure-ml-migration.js';
 
 async function demonstrateMLMigration() {

@@ -1,6 +1,6 @@
 import { Bill } from '../entities/bill';
 import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '../events/bill-events';
-import { NotificationChannelService } from '../../../infrastructure/notifications/notification-channels';
+import { NotificationChannelService } from '@/infrastructure/notifications/notification-channels';
 // UserRepository interface removed - using direct service calls
 import { logger } from '@shared/core';
 
@@ -21,12 +21,12 @@ export class BillNotificationService {
     try {
       logger.info('Handling bill created event', {
         component: 'BillNotificationService',
-        billId: event.billId,
+        bill_id: event.bill_id,
         billNumber: event.billNumber
       });
 
       // Get stakeholders for the bill
-      const stakeholders = await this.getBillStakeholders(event.billId);
+      const stakeholders = await this.getBillStakeholders(event.bill_id);
 
       // Send notifications to all stakeholders
       const notificationPromises = stakeholders.map(stakeholder =>
@@ -40,8 +40,8 @@ export class BillNotificationService {
           {
             priority: 'medium',
             category: 'bill_created',
-            relatedBillId: parseInt(event.billId),
-            actionUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/bills/${event.billId}`
+            relatedBillId: parseInt(event.bill_id),
+            actionUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/bills/${event.bill_id}`
           }
         )
       );
@@ -50,14 +50,14 @@ export class BillNotificationService {
 
       logger.info('Bill created notifications sent', {
         component: 'BillNotificationService',
-        billId: event.billId,
+        bill_id: event.bill_id,
         stakeholdersCount: stakeholders.length
       });
 
     } catch (error) {
       logger.error('Failed to handle bill created event', {
         component: 'BillNotificationService',
-        billId: event.billId
+        bill_id: event.bill_id
       }, error);
     }
   }
@@ -69,13 +69,13 @@ export class BillNotificationService {
     try {
       logger.info('Handling bill status changed event', {
         component: 'BillNotificationService',
-        billId: event.billId,
+        bill_id: event.bill_id,
         oldStatus: event.oldStatus,
         newStatus: event.newStatus
       });
 
       // Get stakeholders for the bill
-      const stakeholders = await this.getBillStakeholders(event.billId);
+      const stakeholders = await this.getBillStakeholders(event.bill_id);
 
       // Determine notification priority based on status change
       const priority = this.getStatusChangePriority(event.oldStatus, event.newStatus);
@@ -92,8 +92,8 @@ export class BillNotificationService {
           {
             priority,
             category: 'bill_status_changed',
-            relatedBillId: parseInt(event.billId),
-            actionUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/bills/${event.billId}`,
+            relatedBillId: parseInt(event.bill_id),
+            actionUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/bills/${event.bill_id}`,
             oldStatus: event.oldStatus,
             newStatus: event.newStatus
           }
@@ -104,14 +104,14 @@ export class BillNotificationService {
 
       logger.info('Bill status change notifications sent', {
         component: 'BillNotificationService',
-        billId: event.billId,
+        bill_id: event.bill_id,
         stakeholdersCount: stakeholders.length
       });
 
     } catch (error) {
       logger.error('Failed to handle bill status changed event', {
         component: 'BillNotificationService',
-        billId: event.billId
+        bill_id: event.bill_id
       }, error);
     }
   }
@@ -123,7 +123,7 @@ export class BillNotificationService {
     try {
       logger.info('Handling bill updated event', {
         component: 'BillNotificationService',
-        billId: event.billId,
+        bill_id: event.bill_id,
         updateType: event.updateType
       });
 
@@ -133,7 +133,7 @@ export class BillNotificationService {
       }
 
       // Get stakeholders for the bill
-      const stakeholders = await this.getBillStakeholders(event.billId);
+      const stakeholders = await this.getBillStakeholders(event.bill_id);
 
       // Send notifications to stakeholders who track this bill
       const notificationPromises = stakeholders
@@ -149,8 +149,8 @@ export class BillNotificationService {
             {
               priority: 'low',
               category: 'bill_updated',
-              relatedBillId: parseInt(event.billId),
-              actionUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/bills/${event.billId}`,
+              relatedBillId: parseInt(event.bill_id),
+              actionUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/bills/${event.bill_id}`,
               updateType: event.updateType
             }
           )
@@ -160,14 +160,14 @@ export class BillNotificationService {
 
       logger.info('Bill updated notifications sent', {
         component: 'BillNotificationService',
-        billId: event.billId,
+        bill_id: event.bill_id,
         stakeholdersCount: stakeholders.length
       });
 
     } catch (error) {
       logger.error('Failed to handle bill updated event', {
         component: 'BillNotificationService',
-        billId: event.billId
+        bill_id: event.bill_id
       }, error);
     }
   }
@@ -175,7 +175,7 @@ export class BillNotificationService {
   /**
    * Get stakeholders for a bill
    */
-  private async getBillStakeholders(billId: string): Promise<Array<{
+  private async getBillStakeholders(bill_id: string): Promise<Array<{
     id: string;
     role: 'sponsor' | 'tracker' | 'engaged';
     billNumber?: string;
@@ -196,7 +196,7 @@ export class BillNotificationService {
     } catch (error) {
       logger.error('Failed to get bill stakeholders', {
         component: 'BillNotificationService',
-        billId
+        bill_id
       }, error);
       return [];
     }
@@ -269,9 +269,9 @@ export class BillNotificationService {
   /**
    * Send urgent notifications for critical bill events
    */
-  async sendUrgentNotification(billId: string, message: string, stakeholders?: string[]): Promise<void> {
+  async sendUrgentNotification(bill_id: string, message: string, stakeholders?: string[]): Promise<void> {
     try {
-      const targetStakeholders = stakeholders || (await this.getBillStakeholders(billId)).map(s => s.id);
+      const targetStakeholders = stakeholders || (await this.getBillStakeholders(bill_id)).map(s => s.id);
 
       const notificationPromises = targetStakeholders.map(stakeholderId =>
         this.notificationChannelService.sendToMultipleChannels(
@@ -284,8 +284,8 @@ export class BillNotificationService {
           {
             priority: 'urgent',
             category: 'bill_urgent',
-            relatedBillId: parseInt(billId),
-            actionUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/bills/${billId}`
+            relatedBillId: parseInt(bill_id),
+            actionUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/bills/${ bill_id }`
           }
         )
       );
@@ -294,14 +294,14 @@ export class BillNotificationService {
 
       logger.info('Urgent bill notifications sent', {
         component: 'BillNotificationService',
-        billId,
+        bill_id,
         stakeholdersCount: targetStakeholders.length
       });
 
     } catch (error) {
       logger.error('Failed to send urgent bill notification', {
         component: 'BillNotificationService',
-        billId
+        bill_id
       }, error);
     }
   }
@@ -309,8 +309,8 @@ export class BillNotificationService {
   /**
    * Send digest notifications for multiple bill updates
    */
-  async sendDigestNotification(userId: string, billUpdates: Array<{
-    billId: string;
+  async sendDigestNotification(user_id: string, billUpdates: Array<{
+    bill_id: string;
     billNumber: string;
     billTitle: string;
     updateType: string;
@@ -328,7 +328,7 @@ export class BillNotificationService {
       const message = `You have ${summary} in your tracked bills. Check your dashboard for details.`;
 
       await this.notificationChannelService.sendToMultipleChannels(
-        userId,
+        user_id,
         ['inApp', 'email'],
         {
           title: `Bill Digest: ${summary}`,
@@ -339,7 +339,7 @@ export class BillNotificationService {
           category: 'bill_digest',
           actionUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard`,
           billUpdates: billUpdates.map(u => ({
-            billId: u.billId,
+            bill_id: u.bill_id,
             billNumber: u.billNumber,
             updateType: u.updateType,
             timestamp: u.timestamp.toISOString()
@@ -349,14 +349,14 @@ export class BillNotificationService {
 
       logger.info('Bill digest notification sent', {
         component: 'BillNotificationService',
-        userId,
+        user_id,
         updatesCount: billUpdates.length
       });
 
     } catch (error) {
       logger.error('Failed to send bill digest notification', {
         component: 'BillNotificationService',
-        userId
+        user_id
       }, error);
     }
   }

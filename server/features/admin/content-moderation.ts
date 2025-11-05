@@ -8,7 +8,7 @@
  * @deprecated Use moderationOrchestratorService from './moderation/index.js' instead
  */
 
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 import { 
   moderationOrchestratorService,
   ContentModerationFilters,
@@ -67,7 +67,7 @@ export class ContentModerationService {
    * @deprecated Use moderationOrchestratorService.reviewReport() instead
    */
   async reviewReport(
-    reportId: number,
+    report_id: number,
     moderatorId: string,
     decision: 'resolve' | 'dismiss' | 'escalate',
     actionType: 'warn' | 'hide' | 'delete' | 'ban_user' | 'verify' | 'highlight',
@@ -78,7 +78,7 @@ export class ContentModerationService {
     report?: ModerationItem;
   }> {
     return moderationOrchestratorService.reviewReport(
-      reportId,
+      report_id,
       moderatorId,
       decision,
       actionType,
@@ -125,7 +125,7 @@ export class ContentModerationService {
     reportedBy: string,
     autoDetected = false,
     description?: string
-  ): Promise<{ success: boolean; message: string; reportId?: number }> {
+  ): Promise<{ success: boolean; message: string; report_id?: number }> {
     const result = await moderationOrchestratorService.createReport(
       content_type,
       content_id,
@@ -140,7 +140,7 @@ export class ContentModerationService {
     return {
       success: result.success,
       message: result.message,
-      reportId: result.reportId
+      report_id: result.report_id
     };
   }
 
@@ -148,8 +148,8 @@ export class ContentModerationService {
    * @deprecated Use moderationOrchestratorService.getModerationStats() instead
    */
   async getModerationStats(
-    startDate: Date,
-    endDate: Date
+    start_date: Date,
+    end_date: Date
   ): Promise<{
     reportsCreated: number;
     reportsResolved: number;
@@ -166,7 +166,7 @@ export class ContentModerationService {
     content_typeBreakdown: { content_type: string; count: number }[];
     severityBreakdown: { severity: string; count: number }[];
   }> {
-    return moderationOrchestratorService.getModerationStats(startDate, endDate);
+    return moderationOrchestratorService.getModerationStats(start_date, end_date);
   }
 
   /**

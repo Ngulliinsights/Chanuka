@@ -1,5 +1,5 @@
  import { databaseService } from '@/services/database-service';
- import { readDatabase } from '@shared/database/connection';
+ import { readDatabase } from '@shared/database';
 import {
   bill_engagement,
   user_interests,

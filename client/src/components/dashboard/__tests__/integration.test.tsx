@@ -28,7 +28,7 @@ const mockUseBills = {
       title: 'Review Healthcare Bill',
       description: 'Review the new healthcare legislation',
       priority: 'High',
-      dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
+      due_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
       created_at: new Date('2024-01-10T10:00:00Z'),
       updated_at: new Date('2024-01-12T15:30:00Z')
     },

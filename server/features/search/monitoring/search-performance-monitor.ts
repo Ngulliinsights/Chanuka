@@ -5,7 +5,7 @@
  * relevance measurement, and automated alerting for search system validation.
  */
 
-import { logger } from '../../../../shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 import { searchService } from '../application/search-service.js';
 
 export interface SearchMetrics {
@@ -18,7 +18,7 @@ export interface SearchMetrics {
   errorOccurred: boolean;
   errorMessage?: string;
   userAgent?: string;
-  userId?: string;
+  user_id?: string;
 }
 
 export interface AggregatedMetrics {
@@ -153,7 +153,7 @@ export class SearchPerformanceMonitor {
     relevanceScore: number,
     errorOccurred: boolean = false,
     errorMessage?: string,
-    userId?: string
+    user_id?: string
   ): Promise<void> {
     const metrics: SearchMetrics = {
       timestamp: new Date(),
@@ -164,7 +164,7 @@ export class SearchPerformanceMonitor {
       relevanceScore,
       errorOccurred,
       errorMessage,
-      userId
+      user_id
     };
 
     // Store metrics

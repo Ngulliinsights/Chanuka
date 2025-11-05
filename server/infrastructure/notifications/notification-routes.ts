@@ -5,8 +5,8 @@ import { userPreferencesService } from '../../features/users/domain/user-prefere
 import { notificationChannelService } from './notification-channels.js';
 import { smartNotificationFilterService } from './smart-notification-filter.js';
 import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiValidationError  } from '../../../shared/core/src/utils/api-utils';
-import { logger  } from '../../../shared/core/src/index.js';
+import { ApiSuccess, ApiError, ApiValidationError  } from '@shared/core/utils/api-utils';
+import { logger  } from '@shared/core/index.js';
 
 export const router = Router();
 
@@ -27,7 +27,7 @@ const notificationQuerySchema = z.object({
 });
 
 const markReadSchema = z.object({
-  notificationId: z.number()
+  notification_id: z.number()
 });
 
 /**
@@ -128,12 +128,12 @@ router.patch('/:id/read', authenticateToken, async (req: AuthenticatedRequest, r
       return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated'  }, 401);
     }
 
-    const notificationId = parseInt(req.params.id);
-    if (isNaN(notificationId)) {
+    const notification_id = parseInt(req.params.id);
+    if (isNaN(notification_id)) {
       return ApiError(res, { code: 'INVALID_ID', message: 'Invalid notification ID' }, 400);
     }
 
-    await notificationService.markAsRead(user_id, notificationId);
+    await notificationService.markAsRead(user_id, notification_id);
 
     return ApiSuccess(res, { message: 'Notification marked as read' });
 
@@ -172,12 +172,12 @@ router.delete('/:id', authenticateToken, async (req: AuthenticatedRequest, res: 
       return ApiError(res, { code: 'UNAUTHORIZED', message: 'User not authenticated'  }, 401);
     }
 
-    const notificationId = parseInt(req.params.id);
-    if (isNaN(notificationId)) {
+    const notification_id = parseInt(req.params.id);
+    if (isNaN(notification_id)) {
       return ApiError(res, { code: 'INVALID_ID', message: 'Invalid notification ID' }, 400);
     }
 
-    await notificationService.deleteNotification(user_id, notificationId);
+    await notificationService.deleteNotification(user_id, notification_id);
 
     return ApiSuccess(res, { message: 'Notification deleted' });
 

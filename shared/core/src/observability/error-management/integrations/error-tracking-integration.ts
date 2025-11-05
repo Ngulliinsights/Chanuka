@@ -139,7 +139,7 @@ export class SentryIntegration extends BaseErrorTrackingIntegration {
         retryable: error.metadata.retryable,
         context: error.metadata.context,
         user_id: context?.user_id,
-        sessionId: context?.metadata?.sessionId,
+        session_id: context?.metadata?.session_id,
         ...this.config.customData
        },
       user: this.config.user || {
@@ -189,7 +189,7 @@ export class RollbarIntegration extends BaseErrorTrackingIntegration {
   protected async doInitialize(): Promise<void> {
     logger.info('Initializing Rollbar', {
       component: 'RollbarIntegration',
-      accessToken: this.config.apiKey ? 'configured' : 'missing'
+      access_token: this.config.apiKey ? 'configured' : 'missing'
     });
   }
 
@@ -203,7 +203,7 @@ export class RollbarIntegration extends BaseErrorTrackingIntegration {
         correlationId: error.metadata.correlationId,
         context: error.metadata.context,
         user_id: context?.user_id,
-        sessionId: context?.metadata?.sessionId
+        session_id: context?.metadata?.session_id
        },
       person: {
         id: context?.user_id || this.config.user?.id,
@@ -275,7 +275,7 @@ export class BugsnagIntegration extends BaseErrorTrackingIntegration {
         correlationId: error.metadata.correlationId,
         context: error.metadata.context,
         user_id: context?.user_id,
-        sessionId: context?.metadata?.sessionId,
+        session_id: context?.metadata?.session_id,
         ...this.config.customData
        },
       user: {
@@ -340,7 +340,7 @@ export class ConsoleIntegration extends BaseErrorTrackingIntegration {
       severity: error.metadata.severity,
       correlationId: error.metadata.correlationId,
       user_id: context?.user_id,
-      sessionId: context?.metadata?.sessionId,
+      session_id: context?.metadata?.session_id,
       stack: error.stack,
       context: error.metadata.context
      };

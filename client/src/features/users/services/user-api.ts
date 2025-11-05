@@ -1,4 +1,4 @@
-import { api } from '../../../services/api';
+import { api } from '@/services/api';
 import type {
   User,
   UserProfile,
@@ -32,8 +32,8 @@ export const userApi = {
     return api.post('/api/auth/logout');
   },
 
-  async refreshToken(refreshToken: string): Promise<AuthResponse> {
-    return api.post('/api/auth/refresh', { refreshToken });
+  async refreshToken(refresh_token: string): Promise<AuthResponse> {
+    return api.post('/api/auth/refresh', { refresh_token });
   },
 
   async getCurrentUser(): Promise<User> {

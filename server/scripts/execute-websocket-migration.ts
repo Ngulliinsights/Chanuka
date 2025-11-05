@@ -7,7 +7,7 @@
 
 import { WebSocketMigrationDeployer } from './deploy-websocket-migration.js';
 import { validateSocketIOInitialization, validateSocketIOAuthentication, validateSubscriptionManagement, validateMigrationDeployment, validateZeroDowntimeMigration } from './validate-connection-migration.js';
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 import { createServer } from 'http';
 
 interface ExecutionOptions {

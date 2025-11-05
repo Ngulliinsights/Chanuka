@@ -11,9 +11,9 @@ import { Server } from 'http';
 import * as jwt from 'jsonwebtoken';
 import Redis from 'ioredis';
 import { database as db } from '../../shared/database/connection.js';
-import { User, users } from '../../shared/schema/foundation';
+import { User, users } from '@shared/schema/foundation';
 import { eq } from 'drizzle-orm';
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -118,9 +118,9 @@ export class SocketIOService {
    */
   private initializeRedis(): void {
     const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
-    
+
     try {
-      // Create Redis clients for pub/sub
+      // Create Redis clients for pub/sub with enhanced error handling
       this.redisClient = new Redis(redisUrl, {
         maxRetriesPerRequest: 3,
         retryStrategy: (times: number) => Math.min(times * 50, 2000),
@@ -129,6 +129,12 @@ export class SocketIOService {
         keepAlive: 30000,
         family: 4,
         db: 0,
+        // Enhanced connection options for robustness
+        connectTimeout: 10000,
+        commandTimeout: 5000,
+        enableReadyCheck: true,
+        autoResubscribe: true,
+        autoResendUnfulfilledCommands: false,
       });
 
       this.redisSubClient = new Redis(redisUrl, {
@@ -139,6 +145,12 @@ export class SocketIOService {
         keepAlive: 30000,
         family: 4,
         db: 0,
+        // Enhanced connection options for robustness
+        connectTimeout: 10000,
+        commandTimeout: 5000,
+        enableReadyCheck: true,
+        autoResubscribe: true,
+        autoResendUnfulfilledCommands: false,
       });
 
       // Setup Redis event handlers
@@ -151,7 +163,9 @@ export class SocketIOService {
       logger.error('Failed to initialize Redis clients', {
         component: 'SocketIOService'
       }, error instanceof Error ? error : new Error(String(error)));
-      throw error;
+      // Don't throw - allow service to continue without Redis adapter
+      this.redisClient = null;
+      this.redisSubClient = null;
     }
   }
 
@@ -195,7 +209,7 @@ export class SocketIOService {
   /**
    * Initialize the Socket.IO server with Redis adapter
    */
-  initialize(server: Server): void {
+  async initialize(server: Server): Promise<void> {
     if (this.isInitialized) {
       logger.info('Socket.IO service already initialized', {
         component: 'SocketIOService'
@@ -217,7 +231,6 @@ export class SocketIOService {
         pingInterval: 25000,
         maxHttpBufferSize: CONFIG.MAX_PAYLOAD,
         allowEIO3: true,
-        compression: true,
         perMessageDeflate: {
           threshold: 1024,
         }
@@ -226,6 +239,14 @@ export class SocketIOService {
       // Setup Redis adapter if Redis clients are available
       if (this.redisClient && this.redisSubClient) {
         try {
+          // Ensure Redis clients are connected before creating adapter
+          if (this.redisClient.status !== 'ready') {
+            await this.redisClient.connect();
+          }
+          if (this.redisSubClient.status !== 'ready') {
+            await this.redisSubClient.connect();
+          }
+
           this.io.adapter(createAdapter(this.redisClient, this.redisSubClient));
           logger.info('Socket.IO Redis adapter configured', {
             component: 'SocketIOService'
@@ -234,6 +255,9 @@ export class SocketIOService {
           logger.error('Failed to setup Redis adapter, continuing without it', {
             component: 'SocketIOService'
           }, error instanceof Error ? error : new Error(String(error)));
+          // Reset Redis clients on failure to prevent inconsistent state
+          this.redisClient = null;
+          this.redisSubClient = null;
         }
       }
 
@@ -456,7 +480,7 @@ export class SocketIOService {
 
     // Clean up subscriptions
     if (socket.subscriptions) {
-      for (const bill_id of socket.subscriptions) {
+      for (const bill_id of Array.from(socket.subscriptions)) {
         const subscribers = this.billSubscriptions.get(bill_id);
         if (subscribers) {
           subscribers.delete(user_id);
@@ -465,11 +489,11 @@ export class SocketIOService {
           }
         }
       }
-      
+
       // Clean up user subscription index
       const userSubs = this.userSubscriptionIndex.get(user_id);
       if (userSubs && socket.subscriptions.size > 0) {
-        for (const bill_id of socket.subscriptions) {
+        for (const bill_id of Array.from(socket.subscriptions)) {
           userSubs.delete(bill_id);
         }
         if (userSubs.size === 0) {
@@ -822,7 +846,7 @@ export class SocketIOService {
     };
 
     let delivered = 0;
-    for (const socket of userSockets) {
+    for (const socket of Array.from(userSockets)) {
       if (socket.connected) {
         socket.emit('notification', message);
         delivered++;
@@ -925,16 +949,16 @@ export class SocketIOService {
     let cleanedItems = 0;
 
     // Clean up disconnected sockets from clients map
-    for (const [user_id, sockets] of this.clients.entries()) {
+    for (const [user_id, sockets] of Array.from(this.clients.entries())) {
       const connectedSockets = new Set<AuthenticatedSocket>();
-      for (const socket of sockets) {
+      for (const socket of Array.from(sockets)) {
         if (socket.connected) {
           connectedSockets.add(socket);
         } else {
           cleanedItems++;
         }
       }
-      
+
       if (connectedSockets.size === 0) {
         this.clients.delete(user_id);
       } else if (connectedSockets.size !== sockets.size) {
@@ -1153,8 +1177,8 @@ export class SocketIOService {
    */
   getAllConnectedUsers(): string[] {
     const connectedUsers: string[] = [];
-    for (const [user_id, sockets] of this.clients.entries()) {
-      if (Array.from(sockets).some(socket => socket.connected)) {
+    for (const [user_id, sockets] of Array.from(this.clients.entries())) {
+      if (Array.from(sockets).some((socket: AuthenticatedSocket) => socket.connected)) {
         connectedUsers.push(user_id);
       }
     }

@@ -6,7 +6,7 @@
  */
 
 import { EventEmitter } from 'events';
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS

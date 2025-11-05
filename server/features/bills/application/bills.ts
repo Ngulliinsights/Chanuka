@@ -2,15 +2,15 @@ import { Bill, BillNumber, BillTitle, BillSummary } from '../domain/entities/bil
 import { BillDomainService } from '../domain/services/bill-domain-service';
 import { BillNotificationService } from '../domain/services/bill-notification-service';
 import { UserService } from '../../users/application/user-service-direct';
-import { NotificationChannelService } from '../../../infrastructure/notifications/notification-channels';
+import { NotificationChannelService } from '@/infrastructure/notifications/notification-channels';
 import { DomainEventPublisher } from '../domain/events/bill-events';
-import { DatabaseService } from '../../../infrastructure/database/database-service';
+import { DatabaseService } from '@/infrastructure/database/database-service';
 import { BillStatus, BillVoteType } from '@shared/schema';
 import { Result, Ok, Err } from '@shared/core';
 import { BillServiceError } from '../domain/errors/bill-errors';
 import { eq, and, sql } from 'drizzle-orm';
 import { bills } from '@shared/schema/foundation';
-import { databaseService } from '../../../infrastructure/database/database-service';
+import { databaseService } from '@/infrastructure/database/database-service';
 
 /**
  * Application service for bill operations
@@ -36,7 +36,7 @@ export class BillsApplicationService {
     billNumber: string;
     title: string;
     summary?: string;
-    sponsorId: string;
+    sponsor_id: string;
     tags?: string[];
     affectedCounties?: string[];
   }): Promise<Result<Bill, BillServiceError>> {
@@ -67,13 +67,13 @@ export class BillsApplicationService {
           billNumber: BillNumber;
           title: BillTitle;
           summary?: BillSummary;
-          sponsorId: string;
+          sponsor_id: string;
           tags?: string[];
           affectedCounties?: string[];
         } = {
           billNumber,
           title,
-          sponsorId: params.sponsorId
+          sponsor_id: params.sponsor_id
         };
 
         // Only add optional properties if they're actually defined
@@ -106,7 +106,7 @@ export class BillsApplicationService {
    * Updates bill status with validation and notifications
    */
   async updateBillStatus(
-    billId: string,
+    bill_id: string,
     newStatus: BillStatus,
     updatedBy: string
   ): Promise<Result<Bill, BillServiceError>> {
@@ -120,7 +120,7 @@ export class BillsApplicationService {
       // Execute the domain operation within a transaction
       // The result needs to be unwrapped from DatabaseResult to Bill
       const databaseResult = await this.databaseService.withTransaction(async () => {
-        return await domainService.updateBillStatus(billId, newStatus, updatedBy);
+        return await domainService.updateBillStatus(bill_id, newStatus, updatedBy);
       });
 
       // Return the unwrapped Bill entity
@@ -138,8 +138,8 @@ export class BillsApplicationService {
    * Records a vote on a bill
    */
   async recordVote(
-    billId: string,
-    userId: string,
+    bill_id: string,
+    user_id: string,
     voteType: BillVoteType
   ): Promise<Result<Bill, BillServiceError>> {
     try {
@@ -151,7 +151,7 @@ export class BillsApplicationService {
 
       // Execute the vote recording within a transaction
       const databaseResult = await this.databaseService.withTransaction(async () => {
-        return await domainService.recordVote(billId, userId, voteType);
+        return await domainService.recordVote(bill_id, user_id, voteType);
       });
 
       // Unwrap and return the Bill entity
@@ -169,7 +169,7 @@ export class BillsApplicationService {
    * Updates bill content with validation
    */
   async updateBillContent(
-    billId: string,
+    bill_id: string,
     updates: {
       title?: string;
       summary?: string;
@@ -206,7 +206,7 @@ export class BillsApplicationService {
 
       // Execute content update within transaction
       const databaseResult = await this.databaseService.withTransaction(async () => {
-        return await domainService.updateBillContent(billId, updateParams, updatedBy);
+        return await domainService.updateBillContent(bill_id, updateParams, updatedBy);
       });
 
       // Unwrap the database result to get the Bill entity
@@ -224,8 +224,8 @@ export class BillsApplicationService {
    * Records engagement on a bill
    */
   async recordEngagement(
-    billId: string,
-    userId: string,
+    bill_id: string,
+    user_id: string,
     engagementType: 'view' | 'comment' | 'share'
   ): Promise<Result<void, BillServiceError>> {
     try {
@@ -235,7 +235,7 @@ export class BillsApplicationService {
         this.domainEventPublisher
       );
 
-      await domainService.recordEngagement(billId, userId, engagementType);
+      await domainService.recordEngagement(bill_id, user_id, engagementType);
       return new Ok(undefined);
 
     } catch (error) {
@@ -249,12 +249,12 @@ export class BillsApplicationService {
   /**
    * Gets bill by ID with aggregate data
    */
-  async getBillById(billId: string): Promise<Result<any | null, BillServiceError>> {
+  async getBillById(bill_id: string): Promise<Result<any | null, BillServiceError>> {
     try {
       const [bill] = await this.db
         .select()
         .from(bills)
-        .where(eq(bills.id, billId))
+        .where(eq(bills.id, bill_id))
         .limit(1);
 
       return new Ok(bill || null);
@@ -269,7 +269,7 @@ export class BillsApplicationService {
    */
   async getBills(params: {
     status?: BillStatus;
-    sponsorId?: string;
+    sponsor_id?: string;
     limit?: number;
     offset?: number;
   }): Promise<Result<any[], BillServiceError>> {
@@ -280,8 +280,8 @@ export class BillsApplicationService {
         conditions.push(eq(bills.status, params.status));
       }
 
-      if (params.sponsorId) {
-        conditions.push(eq(bills.sponsor_id, params.sponsorId));
+      if (params.sponsor_id) {
+        conditions.push(eq(bills.sponsor_id, params.sponsor_id));
       }
 
       let query = this.db.select().from(bills);
@@ -306,17 +306,17 @@ export class BillsApplicationService {
    * Gets bill with stakeholders and comments (aggregate operation)
    * Note: This version works without bill_engagement, bill_votes, and bill_trackers tables
    */
-  async getBillAggregate(billId: string): Promise<Result<{
+  async getBillAggregate(bill_id: string): Promise<Result<{
     bill: any;
     stakeholders: Array<{ id: string, role: string }>;
-    comments: Array<{ id: string, content: string, userId: string, createdAt: Date }>;
-    votes: Array<{ userId: string, voteType: BillVoteType, createdAt: Date }>;
+    comments: Array<{ id: string, content: string, user_id: string, created_at: Date }>;
+    votes: Array<{ user_id: string, voteType: BillVoteType, created_at: Date }>;
   }, BillServiceError>> {
     try {
       const [bill] = await this.db
         .select()
         .from(bills)
-        .where(eq(bills.id, billId))
+        .where(eq(bills.id, bill_id))
         .limit(1);
 
       if (!bill) {
@@ -394,7 +394,7 @@ export class BillsApplicationService {
 
 // Export singleton instance with dependencies
 import { UserService as UserServiceClass } from '../../users/application/user-service-direct';
-import { notificationChannelService } from '../../../infrastructure/notifications/notification-channels';
+import { notificationChannelService } from '@/infrastructure/notifications/notification-channels';
 import { InMemoryDomainEventPublisher } from '../domain/events/bill-events';
 
 // Create the user service instance

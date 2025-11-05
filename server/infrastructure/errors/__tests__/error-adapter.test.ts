@@ -24,7 +24,7 @@ describe('ErrorAdapter', () => {
   const mockContext: Partial<ErrorContext> = {
     service: 'test-service',
     operation: 'test-operation',
-    userId: 'user-123',
+    user_id: 'user-123',
     requestId: 'req-456',
     correlationId: 'corr-789'
   };
@@ -455,7 +455,7 @@ describe('ErrorAdapter', () => {
 
   describe('Context Handling', () => {
     it('should build complete context with defaults', () => {
-      const partialContext = { userId: 'user-123' };
+      const partialContext = { user_id: 'user-123' };
       const result = adapter.createValidationError(
         [{ field: 'test', message: 'test' }],
         partialContext
@@ -463,7 +463,7 @@ describe('ErrorAdapter', () => {
 
       if (result.isErr()) {
         const context = result.error.data.context;
-        expect(context.userId).toBe('user-123');
+        expect(context.user_id).toBe('user-123');
         expect(context.service).toBe('legislative-platform');
         expect(context.operation).toBe('unknown');
         expect(context.timestamp).toBeInstanceOf(Date);
@@ -472,7 +472,7 @@ describe('ErrorAdapter', () => {
 
     it('should preserve all provided context fields', () => {
       const fullContext: Partial<ErrorContext> = {
-        userId: 'user-123',
+        user_id: 'user-123',
         requestId: 'req-456',
         correlationId: 'corr-789',
         service: 'custom-service',
@@ -487,7 +487,7 @@ describe('ErrorAdapter', () => {
 
       if (result.isErr()) {
         const context = result.error.data.context;
-        expect(context.userId).toBe('user-123');
+        expect(context.user_id).toBe('user-123');
         expect(context.requestId).toBe('req-456');
         expect(context.correlationId).toBe('corr-789');
         expect(context.service).toBe('custom-service');

@@ -4,14 +4,14 @@
  * Handles decision processing, action application, and content modification.
  */
 
-import { database as db } from '../../../../shared/database/connection';
+import { database as db } from '@shared/database';
 import { comments, 
   content_report, 
   moderation_action,
   users
  } from '../shared/schema';
 import { eq, count, desc, sql, and, gte, inArray } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 import { 
   ModerationItem, 
   ModerationActionRecord, 
@@ -34,7 +34,7 @@ export class ModerationDecisionService {
    * Reviews a content report and applies the appropriate moderation action
    */
   async reviewReport(
-    reportId: number,
+    report_id: number,
     moderatorId: string,
     decision: 'resolve' | 'dismiss' | 'escalate',
     actionType: 'warn' | 'hide' | 'delete' | 'ban_user' | 'verify' | 'highlight',
@@ -49,7 +49,7 @@ export class ModerationDecisionService {
       const [report] = await db
         .select()
         .from(content_report)
-        .where(eq(content_report.id, reportId));
+        .where(eq(content_report.id, report_id));
 
       if (!report) {
         return {
@@ -69,7 +69,7 @@ export class ModerationDecisionService {
           resolutionNotes: resolutionNotes,
           updated_at: new Date()
         })
-        .where(eq(content_report.id, reportId));
+        .where(eq(content_report.id, report_id));
 
       // Record the moderation action
       await db.insert(moderation_action).values({
@@ -78,7 +78,7 @@ export class ModerationDecisionService {
         actionType: actionType,
         reason: resolutionNotes,
         moderatorId: moderatorId,
-        reportId: reportId
+        report_id: report_id
       });
 
       // Apply the actual moderation action to the content
@@ -92,7 +92,7 @@ export class ModerationDecisionService {
       }
 
       // Fetch the updated report
-      const updatedReport = await moderationQueueService.getReportById(reportId);
+      const updatedReport = await moderationQueueService.getReportById(report_id);
 
       return {
         success: true,
@@ -126,15 +126,15 @@ export class ModerationDecisionService {
       let processedCount = 0;
       const failedIds: number[] = [];
 
-      for (const reportId of operation.reportIds) {
+      for (const report_id of operation.reportIds) {
         try {
           const [report] = await db
             .select()
             .from(content_report)
-            .where(eq(content_report.id, reportId));
+            .where(eq(content_report.id, report_id));
 
           if (!report) {
-            failedIds.push(reportId);
+            failedIds.push(report_id);
             continue;
           }
 
@@ -150,7 +150,7 @@ export class ModerationDecisionService {
               resolutionNotes: operation.resolutionNotes,
               updated_at: new Date()
             })
-            .where(eq(content_report.id, reportId));
+            .where(eq(content_report.id, report_id));
 
           // Record action
           const actionType = operation.action === 'delete' ? 'delete' : 'hide';
@@ -160,7 +160,7 @@ export class ModerationDecisionService {
             actionType: actionType,
             reason: operation.resolutionNotes,
             moderatorId: operation.moderatorId,
-            reportId: reportId
+            report_id: report_id
           });
 
           // Apply action to content if resolving
@@ -177,10 +177,10 @@ export class ModerationDecisionService {
         } catch (itemError) {
           logger.error('Error processing bulk item:', {
             component: 'ModerationDecision',
-            reportId,
+            report_id,
             error: itemError instanceof Error ? itemError.message : String(itemError)
           });
-          failedIds.push(reportId);
+          failedIds.push(report_id);
         }
       }
 

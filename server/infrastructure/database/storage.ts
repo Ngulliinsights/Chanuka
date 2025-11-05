@@ -15,7 +15,7 @@ import {
   type Evaluation,
 } from '@shared/schema';
 import session from 'express-session';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 // Simple memory store implementation since connect-memorystore is not available
 class SimpleMemoryStore extends session.Store {
   private sessions: Map<string, any> = new Map();
@@ -90,12 +90,12 @@ interface CompetencyMetrics {
 
 export interface IStorage { getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
-  getUserBySocialProfile(provider: string, profileId: string): Promise<User | undefined>;
+  getUserBySocialProfile(provider: string, profile_id: string): Promise<User | undefined>;
   getUserByGoogleId(googleId: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   linkSocialProfile(
     user_id: string,
-    profile: { platform: string; profileId: string; username: string  },
+    profile: { platform: string; profile_id: string; username: string  },
   ): Promise<User>;
   unlinkSocialProfile(user_id: string, platform: string): Promise<User>;
   updateUserReputation(user_id: string, change: number): Promise<User>;
@@ -195,8 +195,8 @@ export class MemStorage implements IStorage {
     return this.usersByUsername.get(username.toLowerCase());
   }
 
-  async getUserBySocialProfile(provider: string, profileId: string): Promise<User | undefined> {
-    const key = `${provider}:${profileId}`;
+  async getUserBySocialProfile(provider: string, profile_id: string): Promise<User | undefined> {
+    const key = `${provider}:${ profile_id }`;
     return this.usersBySocialProfile.get(key);
   }
 
@@ -215,7 +215,7 @@ export class MemStorage implements IStorage {
       role: users.role || 'citizen',
       verification_status: users.verification_status || 'pending',
       preferences: users.preferences || null,
-      is_active: users.is_active !== undefined ? users.is_active : true,
+      is_active: users.is_active !== undefined ? users.is_active: true,
       last_login_at: users.last_login_at || null,
       created_at: new Date(),
       updated_at: new Date(),
@@ -235,7 +235,7 @@ export class MemStorage implements IStorage {
     return newUser;
   }
 
-  async linkSocialProfile(user_id: string, profile: { platform: string; profileId: string; username: string }): Promise<User> { const user = this.users.get(user_id);
+  async linkSocialProfile(user_id: string, profile: { platform: string; profile_id: string; username: string }): Promise<User> { const user = this.users.get(user_id);
     if (!user) {
       logger.warn('Attempted to link social profile for non-existent user', {
         component: 'storage',
@@ -247,7 +247,7 @@ export class MemStorage implements IStorage {
     }
 
     // Create the key for social profile index
-    const key = `${profile.platform}:${profile.profileId}`;
+    const key = `${profile.platform}:${profile.profile_id}`;
 
     // Check if profile is already linked to another user
     const existingUser = this.usersBySocialProfile.get(key);
@@ -268,7 +268,7 @@ export class MemStorage implements IStorage {
     const socialProfile = { id: this.generateUniqueId(new Map()),
       user_id: user_id,
       platform: profile.platform,
-      profileId: profile.profileId,
+      profile_id: profile.profile_id,
       username: profile.username,
       created_at: new Date(),
      };
@@ -892,8 +892,8 @@ export class MemStorage implements IStorage {
   }
 
   // Helper method to create a social profile index key
-  private indexSocialProfile(p: { platform: string; profileId: string; username: string }): string {
-    return `${p.platform}:${p.profileId}`;
+  private indexSocialProfile(p: { platform: string; profile_id: string; username: string }): string {
+    return `${p.platform}:${p.profile_id}`;
   }
 }
 

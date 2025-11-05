@@ -50,7 +50,7 @@ interface ThreatDetectionResult {
   isBlocked: boolean;
   threatLevel: 'none' | 'low' | 'medium' | 'high' | 'critical';
   detectedThreats: DetectedThreat[];
-  riskScore: number;
+  risk_score: number;
   recommendedAction: 'allow' | 'monitor' | 'challenge' | 'block';
 }
 
@@ -75,7 +75,7 @@ class StandaloneSecurityTester {
     const body = JSON.stringify(req.body || {});
     
     const detectedThreats: DetectedThreat[] = [];
-    let riskScore = 0;
+    let risk_score = 0;
 
     // 1. Rate limiting analysis
     const rateLimitResult = this.analyzeRateLimit(ip_address);
@@ -121,7 +121,7 @@ class StandaloneSecurityTester {
     }
 
     // Determine threat level and recommended action
-    const threatLevel = this.calculateThreatLevel(riskScore);
+    const threatLevel = this.calculateThreatLevel(risk_score);
     const recommendedAction = this.determineRecommendedAction(threatLevel, detectedThreats);
     const isBlocked = recommendedAction === 'block' || this.blockedIPs.has(ip_address);
 
@@ -129,7 +129,7 @@ class StandaloneSecurityTester {
       isBlocked,
       threatLevel,
       detectedThreats,
-      riskScore,
+      risk_score,
       recommendedAction
     };
   }
@@ -206,11 +206,11 @@ class StandaloneSecurityTester {
   /**
    * Calculate overall threat level
    */
-  private calculateThreatLevel(riskScore: number): 'none' | 'low' | 'medium' | 'high' | 'critical' {
-    if (riskScore >= this.thresholds.criticalThreatScore) return 'critical';
-    if (riskScore >= this.thresholds.suspiciousPatternScore) return 'high';
-    if (riskScore >= 40) return 'medium';
-    if (riskScore >= 20) return 'low';
+  private calculateThreatLevel(risk_score: number): 'none' | 'low' | 'medium' | 'high' | 'critical' {
+    if (risk_score >= this.thresholds.criticalThreatScore) return 'critical';
+    if (risk_score >= this.thresholds.suspiciousPatternScore) return 'high';
+    if (risk_score >= 40) return 'medium';
+    if (risk_score >= 20) return 'low';
     return 'none';
   }
 
@@ -308,7 +308,7 @@ async function runStandaloneSecurityTests() {
     const xssResult = securityTester.analyzeRequest(xssRequest);
     logger.info('✅ XSS detection completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${xssResult.threatLevel}`);
-    console.log(`   - Risk Score: ${xssResult.riskScore}`);
+    console.log(`   - Risk Score: ${xssResult.risk_score}`);
     console.log(`   - Detected Threats: ${xssResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${xssResult.recommendedAction}`);
 
@@ -324,7 +324,7 @@ async function runStandaloneSecurityTests() {
     const sqlResult = securityTester.analyzeRequest(sqlRequest);
     logger.info('✅ SQL injection detection completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${sqlResult.threatLevel}`);
-    console.log(`   - Risk Score: ${sqlResult.riskScore}`);
+    console.log(`   - Risk Score: ${sqlResult.risk_score}`);
     console.log(`   - Detected Threats: ${sqlResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${sqlResult.recommendedAction}`);
 
@@ -339,7 +339,7 @@ async function runStandaloneSecurityTests() {
     const pathResult = securityTester.analyzeRequest(pathRequest);
     logger.info('✅ Path traversal detection completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${pathResult.threatLevel}`);
-    console.log(`   - Risk Score: ${pathResult.riskScore}`);
+    console.log(`   - Risk Score: ${pathResult.risk_score}`);
     console.log(`   - Detected Threats: ${pathResult.detectedThreats.length}`);
 
     // Test 4: Test rate limiting
@@ -384,7 +384,7 @@ async function runStandaloneSecurityTests() {
     const normalResult = securityTester.analyzeRequest(normalRequest);
     logger.info('✅ Normal request analysis completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${normalResult.threatLevel}`);
-    console.log(`   - Risk Score: ${normalResult.riskScore}`);
+    console.log(`   - Risk Score: ${normalResult.risk_score}`);
     console.log(`   - Detected Threats: ${normalResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${normalResult.recommendedAction}`);
     console.log(`   - Should pass: ${normalResult.recommendedAction === 'allow' ? 'YES' : 'NO'}`);
@@ -404,7 +404,7 @@ async function runStandaloneSecurityTests() {
     const multiResult = securityTester.analyzeRequest(multiAttackRequest);
     logger.info('✅ Multiple attack pattern detection completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${multiResult.threatLevel}`);
-    console.log(`   - Risk Score: ${multiResult.riskScore}`);
+    console.log(`   - Risk Score: ${multiResult.risk_score}`);
     console.log(`   - Detected Threats: ${multiResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${multiResult.recommendedAction}`);
     

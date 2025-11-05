@@ -1,6 +1,6 @@
-import type { User } from '../../../shared/schema/foundation';
-import { database as db } from '../../../shared/database/connection';
-import { logger } from '../../../shared/core';
+import type { User } from '@shared/schema/foundation';
+import { database as db } from '@shared/database';
+import { logger } from '@/shared/core';
 
 // Define cache service interface locally if the module doesn't exist
 interface CacheService {
@@ -309,9 +309,9 @@ export class SocialIntegrationService {
    * Links a social profile to a user account
    * Stores the connection for future automated sharing
    */
-  async linkSocialProfile(user_id: string, platform: string, accessToken: string): Promise<void> { try {
+  async linkSocialProfile(user_id: string, platform: string, access_token: string): Promise<void> { try {
       // Fetch user profile information from the social platform
-      const profileData = await this.fetchSocialProfile(platform, accessToken);
+      const profileData = await this.fetchSocialProfile(platform, access_token);
 
       // Save the social profile connection to database
       await db.insert(userSocialProfile).values({
@@ -323,7 +323,7 @@ export class SocialIntegrationService {
       // Log the connection details
       logger.info('Social profile linked successfully', { user_id,
         platform,
-        profileId: profileData.id,
+        profile_id: profileData.id,
         username: profileData.username
        });
     } catch (error) { logger.error('Failed to link social profile', { user_id, platform, error  });
@@ -335,7 +335,7 @@ export class SocialIntegrationService {
    * Fetches user profile information from social platform
    * Used during the profile linking process
    */
-  private async fetchSocialProfile(platform: string, accessToken: string): Promise<any> {
+  private async fetchSocialProfile(platform: string, access_token: string): Promise<any> {
     // API endpoints for fetching user profile data
     const profileEndpoints: Record<string, string> = {
       twitter: 'https://api.twitter.com/2/users/me',
@@ -345,7 +345,7 @@ export class SocialIntegrationService {
     try {
       const response = await fetch(profileEndpoints[platform.toLowerCase()], {
         headers: {
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${ access_token }`,
         },
       });
 
@@ -410,7 +410,7 @@ export class SocialIntegrationService {
             const optimizedContent = await this.optimizeContent(action.content, profile.platform);
             await this.shareToSocialPlatform(
               profile.platform,
-              profile.accessToken,
+              profile.access_token,
               optimizedContent,
             );
 
@@ -438,7 +438,7 @@ export class SocialIntegrationService {
    */
   private async shareToSocialPlatform(
     platform: string,
-    accessToken: string,
+    access_token: string,
     content: ShareableContent,
   ): Promise<void> {
     // Platform-specific API endpoints for posting content
@@ -475,7 +475,7 @@ export class SocialIntegrationService {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
+          Authorization: `Bearer ${access_token}`,
         },
         body: JSON.stringify(payload),
       });
@@ -574,16 +574,16 @@ export class SocialIntegrationService {
    * Generates social media impact reports
    * Provides analytics on reach, engagement, and sentiment
    */
-  async generateImpactReport(startDate: Date, endDate: Date): Promise<any> {
+  async generateImpactReport(start_date: Date, end_date: Date): Promise<any> {
     // Log report generation (would fetch actual metrics from database in production)
     logger.info('Generating social media impact report', {
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
+      start_date: start_date.toISOString(),
+      end_date: endDate.toISOString(),
     });
 
     // Return structured report data
     return {
-      period: { startDate, endDate },
+      period: { start_date, end_date },
       metrics: {
         totalMentions: 0,
         totalReach: 0,

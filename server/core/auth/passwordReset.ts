@@ -1,15 +1,15 @@
 // services/passwordReset.ts
-import { database as db } from '../../../shared/database/connection.js';
+import { database as db } from '@shared/database/connection.js';
 // Import specific tables and functions needed from the consolidated schema
 import { users as users, passwordReset as passwordResets  } from '../shared/schema';
-import { ValidationError } from '../../../shared/core/src/observability/error-management/errors/specialized-errors.js';
+import { ValidationError } from '@shared/core/observability/error-management/errors/specialized-errors.js';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import type { InferSelectModel } from 'drizzle-orm';
 import { and, eq, gt } from 'drizzle-orm';
 import { config } from '../../config/index.js';
 import { sendTemplatedEmail } from '../../infrastructure/notifications/email-service.js';
-import { logger } from '../../../shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 
 // Reset token expiration time in minutes
 const TOKEN_EXPIRY_MINUTES = 60;
@@ -79,8 +79,8 @@ class PasswordResetService {
     }
 
     // Generate secure token and hash it
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const tokenHash = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const reset_token = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(reset_token).digest('hex');
 
     // Store hashed token in database
     const expiryDate = new Date(Date.now() + TOKEN_EXPIRY_MINUTES * 60 * 1000);
@@ -102,7 +102,7 @@ class PasswordResetService {
     });
 
     // Send email with the reset token
-    const resetUrl = `http://localhost:${config.server.port}/reset-password?token=${resetToken}`;
+    const resetUrl = `http://localhost:${config.server.port}/reset-password?token=${ reset_token }`;
 
     await sendTemplatedEmail('password-reset', users.email, {
       userName: users.name || users.email,

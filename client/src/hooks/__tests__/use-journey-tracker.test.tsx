@@ -92,16 +92,16 @@ describe('useJourneyTracker', () => {
     it('should initialize with a session ID', () => {
       const { result } = renderHook(() => useJourneyTracker(), { wrapper });
       
-      expect(result.current.sessionId).toBeDefined();
-      expect(typeof result.current.sessionId).toBe('string');
-      expect(result.current.sessionId).toMatch(/^session_/);
+      expect(result.current.session_id).toBeDefined();
+      expect(typeof result.current.session_id).toBe('string');
+      expect(result.current.session_id).toMatch(/^session_/);
     });
 
     it('should use provided session ID', () => {
       const customSessionId = 'custom-session-123';
       const { result } = renderHook(() => useJourneyTracker(customSessionId), { wrapper });
       
-      expect(result.current.sessionId).toBe(customSessionId);
+      expect(result.current.session_id).toBe(customSessionId);
     });
 
     it('should start journey on mount', () => {
@@ -320,7 +320,7 @@ describe('useJourneyTracker', () => {
     });
 
     it('should end journey on unmount', () => { mockTracker.getJourney.mockReturnValue({
-        sessionId: 'test-session',
+        session_id: 'test-session',
         user_id: 'test-user',
         user_role: 'public',
         startTime: new Date(),
@@ -369,18 +369,18 @@ describe('useJourneyAnalytics', () => {
   it('should call tracker methods with correct parameters', () => {
     const { result } = renderHook(() => useJourneyAnalytics());
     
-    const startDate = new Date('2023-01-01');
-    const endDate = new Date('2023-12-31');
+    const start_date = new Date('2023-01-01');
+    const end_date = new Date('2023-12-31');
     
     await act(() => {
-      result.current.getAnalytics(startDate, endDate, 'citizen');
-      result.current.getOptimizations(startDate, endDate);
+      result.current.getAnalytics(start_date, end_date, 'citizen');
+      result.current.getOptimizations(start_date, end_date);
       result.current.getGoalCompletionRate('bill_research');
       result.current.exportData('csv');
     });
     
-    expect(mockTracker.getJourneyAnalytics).toHaveBeenCalledWith(startDate, endDate, 'citizen');
-    expect(mockTracker.getOptimizationRecommendations).toHaveBeenCalledWith(startDate, endDate);
+    expect(mockTracker.getJourneyAnalytics).toHaveBeenCalledWith(start_date, end_date, 'citizen');
+    expect(mockTracker.getOptimizationRecommendations).toHaveBeenCalledWith(start_date, end_date);
     expect(mockTracker.getGoalCompletionRate).toHaveBeenCalledWith('bill_research');
     expect(mockTracker.exportJourneyData).toHaveBeenCalledWith('csv');
   });

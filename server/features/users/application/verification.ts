@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { eq, desc, sql } from "drizzle-orm";
-import { database as db } from "../../../../shared/database/connection";
+import { database as db } from '@shared/database';
 import { user_verification, users } from '@shared/schema';
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from '../../../../shared/core/src/utils/api-utils';
-import { errorTracker } from '../../../core/errors/error-tracker.js';
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError, ApiResponseWrapper } from '@shared/core/utils/api-utils';
+import { errorTracker } from '@/core/errors/error-tracker.js';
 
 const router = Router();
 
@@ -162,7 +162,7 @@ export function setupVerificationRoutes() {
     
     try {
       // Verification IDs are UUIDs (strings), not integers
-      const verificationId = req.params.id;
+      const verification_id = req.params.id;
       const { verification_status, claim, reasoning } = req.body;
 
       // Build update object with only provided fields
@@ -190,10 +190,10 @@ export function setupVerificationRoutes() {
       // Perform update using string comparison for UUID
       // If verification_data needs merging, do a two-step read/merge to avoid overwriting other keys
       if (updateData.verification_data) {
-        const [existing] = await db.select({ verification_data: user_verification.verification_data }).from(user_verification).where(eq(user_verification.id, verificationId)).limit(1);
+        const [existing] = await db.select({ verification_data: user_verification.verification_data }).from(user_verification).where(eq(user_verification.id, verification_id)).limit(1);
         const merged = { ...(existing?.verification_data || {}), ...(updateData.verification_data || {}) };
-        await db.update(user_verification).set({ verification_data: merged, ...(updateData.verification_status ? { verification_status: updateData.verification_status } : {}) }).where(eq(user_verification.id, verificationId));
-        const updatedVerification = await db.select().from(user_verification).where(eq(user_verification.id, verificationId)).limit(1);
+        await db.update(user_verification).set({ verification_data: merged, ...(updateData.verification_status ? { verification_status: updateData.verification_status } : {}) }).where(eq(user_verification.id, verification_id));
+        const updatedVerification = await db.select().from(user_verification).where(eq(user_verification.id, verification_id)).limit(1);
         // normalize to array shape like .returning()
         const ret = updatedVerification;
         if (!ret || ret.length === 0) {
@@ -210,7 +210,7 @@ export function setupVerificationRoutes() {
       const updatedVerification = await db
         .update(user_verification)
         .set(updateData)
-        .where(eq(user_verification.id, verificationId))
+        .where(eq(user_verification.id, verification_id))
         .returning();
 
       if (updatedVerification.length === 0) {
@@ -350,7 +350,7 @@ export function setupVerificationRoutes() {
     const startTime = Date.now();
     
     try {
-      const verificationId = req.params.id;
+      const verification_id = req.params.id;
 
       // Soft delete by updating status to 'deleted'
       const deletedVerification = await db
@@ -359,7 +359,7 @@ export function setupVerificationRoutes() {
           verification_status: 'deleted',
           updated_at: new Date()
         })
-        .where(eq(user_verification.id, verificationId))
+        .where(eq(user_verification.id, verification_id))
         .returning();
 
       if (deletedVerification.length === 0) {
@@ -370,7 +370,7 @@ export function setupVerificationRoutes() {
         res, 
         { 
           message: 'Verification deleted successfully',
-          id: verificationId 
+          id: verification_id 
         },
         ApiResponseWrapper.createMetadata(startTime, 'database')
       );

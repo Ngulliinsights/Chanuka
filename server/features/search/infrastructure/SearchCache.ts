@@ -1,4 +1,4 @@
-import { cacheService } from '../../../infrastructure/cache/cache-service.js';
+import { cacheService } from '@/infrastructure/cache/cache-service.js';
 
 // Cache TTL constants
 const CACHE_TTL = {

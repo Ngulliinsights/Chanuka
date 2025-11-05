@@ -1,8 +1,8 @@
 import { Request } from 'express';
-import { database as db } from '../../../shared/database/connection';
+import { database as db } from '@shared/database';
 import { system_audit_log } from '@shared/schema';
 import { eq, and, gte, lte, desc, sql, count, inArray } from 'drizzle-orm';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 /**
  * SecurityAuditService - The System's Black Box Recorder
@@ -27,7 +27,7 @@ export interface SecurityEvent { event_type: string;
   result?: string;
   success: boolean;
   details?: Record<string, any>;
-  sessionId?: string;
+  session_id?: string;
   timestamp?: Date;
  }
 
@@ -36,8 +36,8 @@ export interface AuditQueryOptions { user_id?: string;
   event_type?: string;
   event_types?: string[];
   severity?: string;
-  startDate?: Date;
-  endDate?: Date;
+  start_date?: Date;
+  end_date?: Date;
   limit?: number;
   offset?: number;
  }
@@ -76,7 +76,7 @@ export class SecurityAuditService { /**
         result: event.result ?? (event.success ? 'success' : 'failure'),
         severity: event.severity,
         details: event.details,
-        sessionId: event.sessionId,
+        session_id: event.session_id,
         timestamp: event.timestamp || new Date(),
        });
     } catch (error) {
@@ -123,7 +123,7 @@ export class SecurityAuditService { /**
         // Include any relevant headers that might help with forensics
         referer: req?.get?.('Referer'),
        },
-      sessionId: (req as any)?.sessionID || 'unknown',
+      session_id: (req as any)?.sessionID || 'unknown',
     });
   }
 
@@ -159,7 +159,7 @@ export class SecurityAuditService { /**
         // Track data access patterns for compliance reporting
         dataCategory: this.categorizeResource(resource),
        },
-      sessionId: (req as any)?.sessionID || 'unknown',
+      session_id: (req as any)?.sessionID || 'unknown',
     });
   }
 
@@ -187,7 +187,7 @@ export class SecurityAuditService { /**
         ...details,
         adminActionType: this.categorizeAdminAction(action),
        },
-      sessionId: (req as any)?.sessionID || 'unknown',
+      session_id: (req as any)?.sessionID || 'unknown',
     });
   }
 
@@ -245,11 +245,11 @@ export class SecurityAuditService { /**
       if (options.severity) {
         whereConditions.push(eq(system_audit_log.severity, options.severity));
       }
-      if (options.startDate) {
-        whereConditions.push(gte(system_audit_log.created_at, options.startDate));
+      if (options.start_date) {
+        whereConditions.push(gte(system_audit_log.created_at, options.start_date));
       }
-      if (options.endDate) {
-        whereConditions.push(lte(system_audit_log.created_at, options.endDate));
+      if (options.end_date) {
+        whereConditions.push(lte(system_audit_log.created_at, options.end_date));
       }
 
       // Apply conditions if any exist
@@ -294,11 +294,11 @@ export class SecurityAuditService { /**
       if (options.event_type) {
         whereConditions.push(eq(securityAuditLog.event_type, options.event_type));
       }
-      if (options.startDate) {
-        whereConditions.push(gte(securityAuditLog.created_at, options.startDate));
+      if (options.start_date) {
+        whereConditions.push(gte(securityAuditLog.created_at, options.start_date));
       }
-      if (options.endDate) {
-        whereConditions.push(lte(securityAuditLog.created_at, options.endDate));
+      if (options.end_date) {
+        whereConditions.push(lte(securityAuditLog.created_at, options.end_date));
       }
 
       // Apply where conditions if any exist
@@ -319,12 +319,12 @@ export class SecurityAuditService { /**
    * This provides summary statistics and raw event data for compliance reporting
    * and security analysis
    */
-  async generateAuditReport(startDate: Date, endDate: Date): Promise<AuditReport> {
+  async generateAuditReport(start_date: Date, end_date: Date): Promise<AuditReport> {
     try {
       // Fetch all events in the time period
       const events = await this.queryAuditLogs({
-        startDate,
-        endDate,
+        start_date,
+        end_date,
         limit: 10000, // Reasonable limit for report generation
       });
 
@@ -347,7 +347,7 @@ export class SecurityAuditService { /**
       });
 
       return {
-        period: { start: startDate, end: endDate },
+        period: { start: start_date, end: end_date },
         summary: {
           totalEvents: events.length,
           eventsByType,
@@ -375,7 +375,7 @@ export class SecurityAuditService { /**
     return await this.queryAuditLogs({
       [matchField]: user_idOrIP,
       event_type: 'login_failure',
-      startDate: since,
+      start_date: since,
     });
   }
 
@@ -387,7 +387,7 @@ export class SecurityAuditService { /**
   async getRecentDataAccessVolume(user_id: string, since: Date): Promise<number> { const events = await this.queryAuditLogs({
       user_id,
       event_type: 'data_access',
-      startDate: since,
+      start_date: since,
      });
 
     // Sum up the record counts from all data access events

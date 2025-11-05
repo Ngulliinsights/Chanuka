@@ -133,10 +133,10 @@ export class ABTestingService {
    * 
    * This is the primary entry point for feature flag evaluation during runtime.
    */
-  async shouldUseMigration(component: string, userId: string): Promise<boolean> {
+  async shouldUseMigration(component: string, user_id: string): Promise<boolean> {
     try {
       const flagName = this.getComponentFlagName(component);
-      return await featureFlagsService.shouldUseMigration(flagName, userId);
+      return await featureFlagsService.shouldUseMigration(flagName, user_id);
     } catch (error) {
       console.error(`Error determining migration status for ${component}:`, error);
       // Fail closed - return false to use stable version
@@ -151,13 +151,13 @@ export class ABTestingService {
    * The method automatically determines the user's cohort and updates running statistics
    * for that cohort, enabling real-time monitoring of experiment progress.
    */
-  async trackCohortMetrics(component: string, userId: string, metrics: any): Promise<void> {
+  async trackCohortMetrics(component: string, user_id: string, metrics: any): Promise<void> {
     try {
-      const cohort = featureFlagsService.getUserCohort(userId, component);
+      const cohort = featureFlagsService.getUserCohort(user_id, component);
 
       const abMetrics: ABTestingMetrics = {
         component,
-        userId,
+        user_id,
         cohort,
         metrics: {
           responseTime: metrics.responseTime || 0,
@@ -336,11 +336,11 @@ export class ABTestingService {
    * Records user behavior data for later analysis. This captures qualitative aspects
    * of user experience that complement quantitative performance metrics.
    */
-  async recordUserBehavior(component: string, userId: string, behaviorData: any): Promise<void> {
+  async recordUserBehavior(component: string, user_id: string, behaviorData: any): Promise<void> {
     try {
       const existing = this.userBehaviorData.get(component) || [];
       existing.push({
-        userId,
+        user_id,
         timestamp: new Date(),
         ...behaviorData
       });

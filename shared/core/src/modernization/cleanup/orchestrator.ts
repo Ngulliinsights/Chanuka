@@ -498,7 +498,7 @@ export class CleanupOrchestrator {
         
         // Check for conflicting environment variables
         const envVarPattern = /export\s+(\w+)=/g;
-        const envVars = [...content.matchAll(envVarPattern)].map(match => match[1]);
+        const envVars = Array.from(content.matchAll(envVarPattern)).map(match => match[1]);
         const duplicateVars = envVars.filter((item, index) => envVars.indexOf(item) !== index);
         
         if (duplicateVars.length > 0) {
@@ -710,7 +710,7 @@ export class CleanupOrchestrator {
     const findings: Finding[] = [];
     let findingId = 1;
 
-    for (const [file, category] of categorizedFiles) {
+    for (const [file, category] of Array.from(categorizedFiles)) {
       if (this.shouldRemoveCategory(category)) {
         findings.push({
           id: `finding-${findingId++}`,
@@ -732,7 +732,7 @@ export class CleanupOrchestrator {
     const recommendations: Recommendation[] = [];
     const groupedFindings = this.groupFindingsByType(findings);
 
-    for (const [type, typeFindings] of groupedFindings) {
+    for (const [type, typeFindings] of Array.from(groupedFindings)) {
       recommendations.push({
         id: `rec-${type}-${Date.now()}`,
         title: this.getRecommendationTitle(type),
@@ -768,7 +768,7 @@ export class CleanupOrchestrator {
         buildTime: redundantFiles.length * 2, // seconds estimate
         complexity: Math.floor(redundantFiles.length * 0.1) // complexity points
       },
-      riskScore: this.calculateRiskScore(findings)
+      risk_score: this.calculateRiskScore(findings)
     };
   }
 

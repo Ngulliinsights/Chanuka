@@ -27,7 +27,7 @@ async function testSecurityMonitoring() {
       action: 'GET',
       success: true,
       details: { testData: 'security monitoring test' },
-      riskScore: 25,
+      risk_score: 25,
       user_id: 'test-user-123'
     });
     logger.info('✅ Security event logged successfully', { component: 'Chanuka' });
@@ -57,7 +57,7 @@ async function testSecurityMonitoring() {
     const threatResult = await intrusionDetectionService.analyzeRequest(mockRequest);
     logger.info('✅ Threat detection completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${threatResult.threatLevel}`);
-    console.log(`   - Risk Score: ${threatResult.riskScore}`);
+    console.log(`   - Risk Score: ${threatResult.risk_score}`);
     console.log(`   - Detected Threats: ${threatResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${threatResult.recommendedAction}`);
 
@@ -111,12 +111,12 @@ async function testSecurityMonitoring() {
 
     // Test 8: Test audit report generation
     logger.info('\n8. Testing audit report generation...', { component: 'Chanuka' });
-    const endDate = new Date();
-    const startDate = new Date(endDate.getTime() - 24 * 60 * 60 * 1000); // 24 hours ago
+    const end_date = new Date();
+    const start_date = new Date(end_date.getTime() - 24 * 60 * 60 * 1000); // 24 hours ago
     
-    const auditReport = await securityAuditService.generateAuditReport(startDate, endDate);
+    const auditReport = await securityAuditService.generateAuditReport(start_date, end_date);
     logger.info('✅ Audit report generated', { component: 'Chanuka' });
-    console.log(`   - Period: ${startDate.toISOString()} to ${endDate.toISOString()}`);
+    console.log(`   - Period: ${start_date.toISOString()} to ${end_date.toISOString()}`);
     console.log(`   - Total Events: ${auditReport.summary.totalEvents}`);
     console.log(`   - Total Incidents: ${auditReport.summary.totalIncidents}`);
     console.log(`   - High Risk Events: ${auditReport.summary.highRiskEvents}`);
@@ -124,7 +124,7 @@ async function testSecurityMonitoring() {
 
     // Test 9: Test intrusion detection report
     logger.info('\n9. Testing intrusion detection report...', { component: 'Chanuka' });
-    const intrusionReport = await intrusionDetectionService.generateIntrusionReport(startDate, endDate);
+    const intrusionReport = await intrusionDetectionService.generateIntrusionReport(start_date, end_date);
     logger.info('✅ Intrusion detection report generated', { component: 'Chanuka' });
     console.log(`   - Total Threats: ${intrusionReport.summary.totalThreats}`);
     console.log(`   - Blocked IPs: ${intrusionReport.summary.blockedIPs}`);
@@ -132,7 +132,7 @@ async function testSecurityMonitoring() {
 
     // Test 10: Test comprehensive security report
     logger.info('\n10. Testing comprehensive security report...', { component: 'Chanuka' });
-    const securityReport = await securityMonitoringService.generateSecurityReport(startDate, endDate);
+    const securityReport = await securityMonitoringService.generateSecurityReport(start_date, end_date);
     logger.info('✅ Comprehensive security report generated', { component: 'Chanuka' });
     console.log(`   - Executive Summary:`);
     console.log(`     - Total Events: ${securityReport.executive_summary.total_events}`);

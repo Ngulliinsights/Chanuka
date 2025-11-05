@@ -1,12 +1,12 @@
 import { eq, and, desc, sql, inArray } from 'drizzle-orm';
-import { databaseService } from '../../../../infrastructure/database/database-service';
-import { database as db } from '@shared/database/connection';
-import { notificationChannelService } from '../../../../infrastructure/notifications/notification-channels';
-import { user_profileservice } from '../../../users/domain/user-profile';
-import { cacheService } from '../../../../infrastructure/cache';
+import { databaseService } from '@/infrastructure/database/database-service';
+import { database as db } from '@shared/database';
+import { notificationChannelService } from '@/infrastructure/notifications/notification-channels';
+import { user_profileservice } from '@/users/domain/user-profile';
+import { cacheService } from '@/infrastructure/cache';
 import * as schema from '@shared/schema';
 import { z } from 'zod';
-import { logger  } from '../../../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -30,7 +30,7 @@ export interface AlertChannel {
   config: {
     email?: string;
     pushToken?: string;
-    phoneNumber?: string;
+    phone_number?: string;
     webhookUrl?: string;
     webhookSecret?: string;
     verified: boolean;
@@ -101,23 +101,23 @@ export interface AlertDeliveryLog { id: string;
   status: DeliveryStatus;
   deliveryAttempts: number;
   lastAttempt: Date;
-  deliveredAt?: Date;
-  failureReason?: string;
+  deliveredAt: Date | undefined;
+  failureReason: string | undefined;
   metadata: {
     bill_id?: number;
     sponsor_id?: number;
     originalPriority: Priority;
-    adjustedPriority?: Priority;
-    filteredReason?: string;
-    confidence?: number;
+    adjustedPriority?: Priority | undefined;
+    filteredReason?: string | undefined;
+    confidence?: number | undefined;
     };
   created_at: Date;
 }
 
 export interface SmartFilteringResult {
   shouldSend: boolean;
-  filteredReason?: string;
-  adjustedPriority?: Priority;
+  filteredReason: string | undefined;
+  adjustedPriority: Priority | undefined;
   confidence: number; // 0-1
 }
 
@@ -131,7 +131,7 @@ const alertChannelSchema = z.object({
   config: z.object({
     email: z.string().email().optional(),
     pushToken: z.string().optional(),
-    phoneNumber: z.string().optional(),
+    phone_number: z.string().optional(),
     webhookUrl: z.string().url().optional(),
     webhookSecret: z.string().optional(),
     verified: z.boolean().default(false)
@@ -398,6 +398,8 @@ export class UnifiedAlertPreferenceService {
       if (!preference.smartFiltering.enabled) {
         return {
           shouldSend: true,
+          filteredReason: undefined,
+          adjustedPriority: undefined,
           confidence: 1.0
         };
       }
@@ -439,6 +441,7 @@ export class UnifiedAlertPreferenceService {
           return {
             shouldSend: false,
             filteredReason: 'Duplicate alert filtered',
+            adjustedPriority: undefined,
             confidence: 1.0
            };
         }
@@ -450,6 +453,7 @@ export class UnifiedAlertPreferenceService {
           return {
             shouldSend: false,
             filteredReason: 'Spam alert filtered',
+            adjustedPriority: undefined,
             confidence: 0.9
            };
         }
@@ -472,7 +476,7 @@ export class UnifiedAlertPreferenceService {
       return {
         shouldSend,
         filteredReason: shouldSend ? undefined : reasons.join(', '),
-        adjustedPriority,
+        adjustedPriority: adjustedPriority === undefined ? undefined : adjustedPriority,
         confidence
       };
 
@@ -483,6 +487,8 @@ export class UnifiedAlertPreferenceService {
       // On error, default to sending with medium confidence
       return {
         shouldSend: true,
+        filteredReason: undefined,
+        adjustedPriority: undefined,
         confidence: 0.5
       };
     }
@@ -641,8 +647,8 @@ export class UnifiedAlertPreferenceService {
       limit?: number;
       alertType?: AlertType;
       status?: DeliveryStatus;
-      startDate?: Date;
-      endDate?: Date;
+      start_date?: Date;
+      end_date?: Date;
     } = {}
   ): Promise<{
     logs: AlertDeliveryLog[];
@@ -667,12 +673,12 @@ export class UnifiedAlertPreferenceService {
         allLogs = allLogs.filter(log => log.status === options.status);
       }
       
-      if (options.startDate) {
-        allLogs = allLogs.filter(log => log.created_at >= options.startDate!);
+      if (options.start_date) {
+        allLogs = allLogs.filter(log => log.created_at >= options.start_date!);
       }
       
-      if (options.endDate) {
-        allLogs = allLogs.filter(log => log.created_at <= options.endDate!);
+      if (options.end_date) {
+        allLogs = allLogs.filter(log => log.created_at <= options.end_date!);
       }
 
       // Sort by creation date descending
@@ -1031,7 +1037,7 @@ export class UnifiedAlertPreferenceService {
 
       const mapped = notificationTypeMap[alertType] || { type: 'system_alert' };
 
-      await notificationChannelService.sendMultiChannelNotification({ user_id,
+      await (notificationChannelService as any).sendMultiChannelNotification({ user_id,
         type: mapped.type,
         subType: mapped.subType,
         title: alertData.title || this.getDefaultTitle(alertType),
@@ -1136,7 +1142,7 @@ export class UnifiedAlertPreferenceService {
     try {
       // Fetch current user preferences
       const [user] = await this.db
-        .select({ preferences: schema.users.preferences })
+        .select({ preferences: (schema.users as any).preferences })
         .from(schema.users)
         .where(eq(schema.users.id, user_id))
         .limit(1);
@@ -1190,7 +1196,7 @@ export class UnifiedAlertPreferenceService {
   ): Promise<void> {
     try {
       const [user] = await this.db
-        .select({ preferences: schema.users.preferences })
+        .select({ preferences: (schema.users as any).preferences })
         .from(schema.users)
         .where(eq(schema.users.id, user_id))
         .limit(1);
@@ -1228,7 +1234,7 @@ export class UnifiedAlertPreferenceService {
   private async fetchPreferencesFromDatabase(user_id: string): Promise<AlertPreference[]> {
     try {
       const [user] = await this.db
-        .select({ preferences: schema.users.preferences })
+        .select({ preferences: (schema.users as any).preferences })
         .from(schema.users)
         .where(eq(schema.users.id, user_id))
         .limit(1);
@@ -1237,7 +1243,7 @@ export class UnifiedAlertPreferenceService {
         return [];
       }
 
-      const currentPreferences = (users.preferences as any) || {};
+      const currentPreferences = (user?.preferences as any) || {};
       const alertPreferences = currentPreferences.alertPreferences || [];
       
       // Convert stored data to AlertPreference objects with proper Date types
@@ -1262,7 +1268,7 @@ export class UnifiedAlertPreferenceService {
     try {
       // Store in user preferences under deliveryLogs array
       const [user] = await this.db
-        .select({ preferences: schema.users.preferences })
+        .select({ preferences: (schema.users as any).preferences })
         .from(schema.users)
         .where(eq(schema.users.id, log.user_id))
         .limit(1);
@@ -1305,7 +1311,7 @@ export class UnifiedAlertPreferenceService {
   private async fetchDeliveryLogsFromDatabase(user_id: string): Promise<AlertDeliveryLog[]> {
     try {
       const [user] = await this.db
-        .select({ preferences: schema.users.preferences })
+        .select({ preferences: (schema.users as any).preferences })
         .from(schema.users)
         .where(eq(schema.users.id, user_id))
         .limit(1);
@@ -1314,7 +1320,7 @@ export class UnifiedAlertPreferenceService {
         return [];
       }
 
-      const currentPreferences = (users.preferences as any) || {};
+      const currentPreferences = (user?.preferences as any) || {};
       const deliveryLogs = currentPreferences.deliveryLogs || [];
       
       // Convert to proper types
@@ -1398,11 +1404,11 @@ export class UnifiedAlertPreferenceService {
       }, {});
 
       // Send batch notification
-      await notificationChannelService.sendMultiChannelNotification({ user_id,
+      await (notificationChannelService as any).sendMultiChannelNotification({ user_id,
         type: 'digest',
         title: 'Alert Digest',
         message: `You have ${batch.length } new alerts`,
-        priority: 'medium',
+        priority: 'normal',
         metadata: {
           batch: groupedAlerts,
           preferenceId

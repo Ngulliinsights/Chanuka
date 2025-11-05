@@ -1,9 +1,10 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import pg from 'pg';
+import { Pool, PoolClient } from 'pg';
+import type * as pg from 'pg';
 import * as schema from '../schema';
 import { logger } from '../core/index.js';
 
-const { Pool } = pg;
+// Pool is imported directly above
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -450,8 +451,8 @@ const setupPool = (is_readOnly = false, name = is_readOnly ? 'read' : 'write'): 
       error: err.message,
       detail: pgError.detail,
       code: pgError.code,
-      poolSize: newPool.totalCount,
-      waiting: newPool.waitingCount,
+      poolSize: (newPool as any).totalCount || 0,
+      waiting: (newPool as any).waitingCount || 0,
       circuitBreakerState: circuitBreaker.getState(),
       component: 'DatabasePool',
     });
@@ -493,7 +494,7 @@ const setupPool = (is_readOnly = false, name = is_readOnly ? 'read' : 'write'): 
 
   // Attach enhanced methods to pool instance
   newPool.getMetrics = () =>
-    metricsTracker.getMetrics(newPool.totalCount || 0, newPool.waitingCount || 0);
+    metricsTracker.getMetrics((newPool as any).totalCount || 0, (newPool as any).waitingCount || 0);
   newPool.resetMetrics = () => metricsTracker.reset();
   newPool.trackQuery = (queryDuration: number) => metricsTracker.trackQuery(queryDuration);
   newPool.circuitBreaker = circuitBreaker;
@@ -514,13 +515,13 @@ export const rawWritePool = setupPool(false, 'write');
 export const pool = rawGeneralPool;
 
 // Create type-safe Drizzle ORM instances for each pool
-export const db = drizzle<FullDatabaseSchema>(rawGeneralPool, { 
+export const db = drizzle<FullDatabaseSchema>(rawGeneralPool as any, { 
   schema: validateSchemaType(schema) 
 });
-export const readDb = drizzle<FullDatabaseSchema>(rawReadPool, { 
+export const readDb = drizzle<FullDatabaseSchema>(rawReadPool as any, { 
   schema: validateSchemaType(schema) 
 });
-export const writeDb = drizzle<FullDatabaseSchema>(rawWritePool, { 
+export const writeDb = drizzle<FullDatabaseSchema>(rawWritePool as any, { 
   schema: validateSchemaType(schema) 
 });
 
@@ -702,9 +703,9 @@ export const checkPoolHealth = async (
   poolName: string
 ): Promise<PoolHealthStatus> => {
   try {
-    const maxConnections = pool.options.max || CONFIG.DEFAULT_MAX_POOL_SIZE;
-    const totalConnections = pool.totalCount || 0;
-    const waitingClients = pool.waitingCount || 0;
+    const maxConnections = (pool as any).options?.max || CONFIG.DEFAULT_MAX_POOL_SIZE;
+    const totalConnections = (pool as any).totalCount || 0;
+    const waitingClients = (pool as any).waitingCount || 0;
     const utilizationPercentage = maxConnections > 0 
       ? (totalConnections / maxConnections) * 100 
       : 0;

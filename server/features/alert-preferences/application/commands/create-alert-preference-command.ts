@@ -78,7 +78,7 @@ export class ChannelConfigCommand {
   constructor(
     public readonly email?: string,
     public readonly pushToken?: string,
-    public readonly phoneNumber?: string,
+    public readonly phone_number?: string,
     public readonly webhookUrl?: string,
     public readonly webhookSecret?: string,
     public readonly verified: boolean = false

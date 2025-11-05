@@ -4,7 +4,7 @@
 // Enhanced PostgreSQL full-text search with trigram indexes and caching
 // Replaces basic LIKE queries with proper full-text search capabilities
 
-import { database } from '@shared/database/connection';
+import { database } from '@shared/database';
 import { bills, sponsors, comments } from '@shared/schema';
 import { ilike, or, sql, desc } from 'drizzle-orm';
 import { SearchQuery, SearchResult } from '../types/search.types.js';

@@ -34,7 +34,7 @@ describe('CleanupOrchestrator', () => {
     await fs.writeFile(join(tempDir, 'migrate-test.sh'), '#!/bin/bash\necho "test"');
     await fs.writeFile(join(tempDir, 'test-analysis.md'), '# Analysis');
     await fs.writeFile(join(tempDir, 'debug-script.sh'), '#!/bin/bash\necho "debug"');
-    await fs.writeFile(join(tempDir, 'test-file.js'), 'logger.info('test', { component: 'Chanuka' });');
+    await fs.writeFile(join(tempDir, 'test-file.js'), 'logger.info(\'test\', { component: \'Chanuka\' });');
     await fs.writeFile(join(tempDir, '.env.staging'), 'NODE_ENV=staging');
     
     orchestrator = new CleanupOrchestrator(tempDir);
@@ -112,8 +112,8 @@ describe('CleanupOrchestrator', () => {
       expect(result.metrics.filesAnalyzed).toBeGreaterThan(0);
       expect(result.metrics.issuesFound).toBeGreaterThan(0);
       expect(result.metrics.estimatedSavings.diskSpace).toBeGreaterThan(0);
-      expect(result.metrics.riskScore).toBeGreaterThanOrEqual(0);
-      expect(result.metrics.riskScore).toBeLessThanOrEqual(100);
+      expect(result.metrics.risk_score).toBeGreaterThanOrEqual(0);
+      expect(result.metrics.risk_score).toBeLessThanOrEqual(100);
     });
   });
 

@@ -15,7 +15,7 @@ interface BillStatsProps {
 }
 
 export const BillStats = ({ bill }: BillStatsProps) => {
-  const supportPercentage = bills.supportPercentage || 0;
+  const supportPercentage = bill.supportPercentage || 0;
   const oppositionPercentage = 100 - supportPercentage;
 
   return (
@@ -54,19 +54,19 @@ export const BillStats = ({ bill }: BillStatsProps) => {
             <h3 className="font-medium mb-2">Engagement Metrics</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-2xl font-bold text-primary-600">{bills.views || 0}</p>
+                <p className="text-2xl font-bold text-primary-600">{bill.views || 0}</p>
                 <p className="text-xs text-slate-500">Total Views</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-primary-600">{bills.analyses || 0}</p>
+                <p className="text-2xl font-bold text-primary-600">{bill.analyses || 0}</p>
                 <p className="text-xs text-slate-500">Analyses</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-primary-600">{bills.endorsements || 0}</p>
+                <p className="text-2xl font-bold text-primary-600">{bill.endorsements || 0}</p>
                 <p className="text-xs text-slate-500">Endorsements</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-primary-600">{bills.verifiedClaims || 0}</p>
+                <p className="text-2xl font-bold text-primary-600">{bill.verifiedClaims || 0}</p>
                 <p className="text-xs text-slate-500">Verified Claims</p>
               </div>
             </div>

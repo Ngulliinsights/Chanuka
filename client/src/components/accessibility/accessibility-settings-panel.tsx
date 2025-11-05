@@ -7,13 +7,13 @@ import React, { useState } from 'react';
 import { 
   Settings, 
   Eye, 
-  Type, 
-  Zap, 
+  AlignLeft, 
+  Bolt, 
   Volume2, 
-  Keyboard, 
-  Focus,
-  Contrast,
-  MousePointer
+  KeyboardIcon, 
+  Target,
+  Palette,
+  Mouse
 } from 'lucide-react';
 import { useAccessibility, AccessibleButton, AccessibleFormField } from './accessibility-manager';
 import { logger } from '../../utils/browser-logger';
@@ -149,7 +149,7 @@ export function AccessibilitySettingsPanel({ isOpen, onClose }: AccessibilitySet
             {/* Motion Settings */}
             <section>
               <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                <Zap className="h-5 w-5 mr-2 text-blue-600" />
+                <Bolt className="h-5 w-5 mr-2 text-blue-600" />
                 Motion & Animation
               </h3>
               

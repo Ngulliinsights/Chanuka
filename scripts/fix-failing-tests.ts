@@ -163,9 +163,9 @@ vi.mock('@shared/core/src/config/manager', () => ({
         [/from\s+['"]\.\.\/shared/g, "from '@shared"],
         
         // Fix specific module imports
-        [/from\s+['"].*\/observability\/logging['"](?!\w)/g, "from '@shared/core/src/observability/logging'"],
-        [/from\s+['"].*\/config\/manager['"](?!\w)/g, "from '@shared/core/src/config/manager'"],
-        [/from\s+['"].*\/middleware\/factory['"](?!\w)/g, "from '@shared/core/src/middleware/factory'"],
+        [/from\s+['"].*\/observability\/logging['"](?!\w)/g, "from '@shared/core/observability/logging'"],
+        [/from\s+['"].*\/config\/manager['"](?!\w)/g, "from '@shared/core/config/manager'"],
+        [/from\s+['"].*\/middleware\/factory['"](?!\w)/g, "from '@shared/core/middleware/factory'"],
         
         // Fix testing library imports
         [/from\s+['"]@testing-library\/react-hooks['"](?!\w)/g, "from '@testing-library/react'"],

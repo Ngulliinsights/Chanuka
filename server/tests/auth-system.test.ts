@@ -37,7 +37,7 @@ describe('Authentication System', () => {
   };
 
   let userToken: string;
-  let refreshToken: string;
+  let refresh_token: string;
   let user_id: string;
 
   beforeEach(async () => {
@@ -70,12 +70,12 @@ describe('Authentication System', () => {
       expect(response.body.data.users.first_name).toBe(testUser.first_name);
       expect(response.body.data.users.last_name).toBe(testUser.last_name);
       expect(response.body.data.token).toBeDefined();
-      expect(response.body.data.refreshToken).toBeDefined();
+      expect(response.body.data.refresh_token).toBeDefined();
       expect(response.body.data.requiresVerification).toBe(true);
 
       // Store tokens for later tests
       userToken = response.body.data.token;
-      refreshToken = response.body.data.refreshToken;
+      refresh_token = response.body.data.refresh_token;
       user_id = response.body.data.users.id;
      });
 
@@ -136,7 +136,7 @@ describe('Authentication System', () => {
           .send(testUser);
         
         userToken = registerResponse.body.data.token;
-        refreshToken = registerResponse.body.data.refreshToken;
+        refresh_token = registerResponse.body.data.refresh_token;
         user_id = registerResponse.body.data.users.id;
        }
     });
@@ -154,7 +154,7 @@ describe('Authentication System', () => {
       expect(response.body.data.user).toBeDefined();
       expect(response.body.data.users.email).toBe(testUser.email);
       expect(response.body.data.token).toBeDefined();
-      expect(response.body.data.refreshToken).toBeDefined();
+      expect(response.body.data.refresh_token).toBeDefined();
     });
 
     it('should reject login with invalid password', async () => {
@@ -191,7 +191,7 @@ describe('Authentication System', () => {
           .send(testUser);
         
         userToken = registerResponse.body.data.token;
-        refreshToken = registerResponse.body.data.refreshToken;
+        refresh_token = registerResponse.body.data.refresh_token;
         user_id = registerResponse.body.data.users.id;
        }
     });
@@ -227,13 +227,13 @@ describe('Authentication System', () => {
   });
 
   describe('Token Refresh', () => { beforeEach(async () => {
-      if (!refreshToken) {
+      if (!refresh_token) {
         const registerResponse = await request(app)
           .post('/api/auth/register')
           .send(testUser);
         
         userToken = registerResponse.body.data.token;
-        refreshToken = registerResponse.body.data.refreshToken;
+        refresh_token = registerResponse.body.data.refresh_token;
         user_id = registerResponse.body.data.users.id;
        }
     });
@@ -241,23 +241,23 @@ describe('Authentication System', () => {
     it('should refresh token with valid refresh token', async () => {
       const response = await request(app)
         .post('/api/auth/refresh')
-        .send({ refreshToken })
+        .send({ refresh_token })
         .expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.data.token).toBeDefined();
-      expect(response.body.data.refreshToken).toBeDefined();
+      expect(response.body.data.refresh_token).toBeDefined();
       expect(response.body.data.user).toBeDefined();
 
       // Update tokens for subsequent tests
       userToken = response.body.data.token;
-      refreshToken = response.body.data.refreshToken;
+      refreshToken = response.body.data.refresh_token;
     });
 
     it('should reject invalid refresh token', async () => {
       const response = await request(app)
         .post('/api/auth/refresh')
-        .send({ refreshToken: 'invalid-refresh-token' })
+        .send({ refresh_token: 'invalid-refresh-token' })
         .expect(401);
 
       expect(response.body.success).toBe(false);
@@ -390,7 +390,7 @@ describe('AuthService Unit Tests', () => {
       expect(result.user).toBeDefined();
       expect(result.user!.email).toBe(testUser.email);
       expect(result.token).toBeDefined();
-      expect(result.refreshToken).toBeDefined();
+      expect(result.refresh_token).toBeDefined();
       expect(result.requiresVerification).toBe(true);
     });
 
@@ -433,7 +433,7 @@ describe('AuthService Unit Tests', () => {
       expect(result.success).toBe(true);
       expect(result.user).toBeDefined();
       expect(result.token).toBeDefined();
-      expect(result.refreshToken).toBeDefined();
+      expect(result.refresh_token).toBeDefined();
     });
 
     it('should reject invalid credentials', async () => {
@@ -449,7 +449,7 @@ describe('AuthService Unit Tests', () => {
 
   describe('Token Operations', () => {
     let token: string;
-    let refreshToken: string;
+    let refresh_token: string;
 
     beforeAll(async () => {
       const email = `token-test-${Date.now()}@example.com`;
@@ -460,7 +460,7 @@ describe('AuthService Unit Tests', () => {
       }, mockReq);
 
       token = registerResult.token!;
-      refreshToken = registerResult.refreshToken!;
+      refreshToken = registerResult.refresh_token!;
     });
 
     it('should verify valid token', async () => {
@@ -471,11 +471,11 @@ describe('AuthService Unit Tests', () => {
     });
 
     it('should refresh token', async () => {
-      const result = await authService.refreshToken(refreshToken);
+      const result = await authService.refresh_token(refresh_token);
 
       expect(result.success).toBe(true);
       expect(result.token).toBeDefined();
-      expect(result.refreshToken).toBeDefined();
+      expect(result.refresh_token).toBeDefined();
       expect(result.user).toBeDefined();
     });
 

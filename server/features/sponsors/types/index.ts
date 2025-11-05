@@ -32,4 +32,4 @@ export type {
   Affiliation,
   TransparencyInfo,
   FinancialBreakdown
-} from '@shared/core/src/types';
+} from '@shared/core/types';

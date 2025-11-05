@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import DOMPurify from 'isomorphic-dompurify';
 import { encryptionService } from '../../features/security/encryption-service.js';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 /**
  * Comprehensive input validation and sanitization service

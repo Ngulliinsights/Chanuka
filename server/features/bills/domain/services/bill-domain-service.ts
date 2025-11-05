@@ -1,10 +1,10 @@
 import { Bill, BillNumber, BillTitle, BillSummary } from '../entities/bill';
 // Repository pattern removed - using direct service calls
-import { UserService } from '../../../users/application/user-service-direct';
-import { NotificationService } from '../../../notifications/domain/services/notification-service';
+import { UserService } from '@/users/application/user-service-direct';
+import { NotificationService } from '@/notifications/domain/services/notification-service';
 import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '../events/bill-events';
 import { DomainEventPublisher } from '../events/bill-events';
-import { databaseService } from '../../../../infrastructure/database/database-service';
+import { databaseService } from '@/infrastructure/database/database-service';
 import { BillStatus, BillVoteType } from '@shared/schema';
 import { eq, and, sql, count, desc } from 'drizzle-orm';
 import { bills, bill_engagement, sponsors, users } from '@shared/schema/foundation';
@@ -32,13 +32,13 @@ export class BillDomainService {
     billNumber: BillNumber;
     title: BillTitle;
     summary?: BillSummary;
-    sponsorId: string;
+    sponsor_id: string;
     tags?: string[];
     affectedCounties?: string[];
   }): Promise<Bill> {
     return databaseService.withTransaction(async (tx) => {
       // Business Rule: Validate sponsor exists and is authorized
-      const sponsor = await this.userService.findById(params.sponsorId);
+      const sponsor = await this.userService.findById(params.sponsor_id);
       if (!sponsor) {
         throw new Error('Sponsor not found');
       }
@@ -66,7 +66,7 @@ export class BillDomainService {
           bill_number: params.billNumber.getValue(),
           title: params.title.getValue(),
           summary: params.summary?.getValue(),
-          sponsor_id: params.sponsorId,
+          sponsor_id: params.sponsor_id,
           tags: params.tags,
           affected_counties: params.affectedCounties,
           status: 'drafted',
@@ -94,13 +94,13 @@ export class BillDomainService {
   /**
    * Updates bill status with business rule validation and transaction coordination
    */
-  async updateBillStatus(billId: string, newStatus: BillStatus, updatedBy: string): Promise<any> {
+  async updateBillStatus(bill_id: string, newStatus: BillStatus, updatedBy: string): Promise<any> {
     return databaseService.withTransaction(async (tx) => {
       // Get bill using direct Drizzle query
       const [bill] = await this.db
         .select()
         .from(bills)
-        .where(eq(bills.id, billId))
+        .where(eq(bills.id, bill_id))
         .limit(1);
       
       if (!bill) {
@@ -120,12 +120,12 @@ export class BillDomainService {
           last_action_date: new Date(),
           updated_at: new Date()
         })
-        .where(eq(bills.id, billId))
+        .where(eq(bills.id, bill_id))
         .returning();
 
       // Publish domain event
       await this.eventPublisher.publish(new BillStatusChangedEvent(
-        billId,
+        bill_id,
         oldStatus,
         newStatus,
         updatedBy
@@ -141,12 +141,12 @@ export class BillDomainService {
   /**
    * Records a vote on a bill with validation
    */
-  async recordVote(billId: string, userId: string, voteType: BillVoteType): Promise<any> {
+  async recordVote(bill_id: string, user_id: string, voteType: BillVoteType): Promise<any> {
     // Get bill using direct Drizzle query
     const [bill] = await this.db
       .select()
       .from(bills)
-      .where(eq(bills.id, billId))
+      .where(eq(bills.id, bill_id))
       .limit(1);
     
     if (!bill) {
@@ -154,7 +154,7 @@ export class BillDomainService {
     }
 
     // Business Rule: Validate user can vote
-    const user = await this.userService.findById(userId);
+    const user = await this.userService.findById(user_id);
     if (!user) {
       throw new Error('User not found');
     }
@@ -164,8 +164,8 @@ export class BillDomainService {
       .select()
       .from(bill_votes)
       .where(and(
-        eq(bill_votes.bill_id, billId),
-        eq(bill_votes.user_id, userId)
+        eq(bill_votes.bill_id, bill_id),
+        eq(bill_votes.user_id, user_id)
       ))
       .limit(1);
     
@@ -175,8 +175,8 @@ export class BillDomainService {
 
     // Save the vote using direct Drizzle insert
     await this.db.insert(bill_votes).values({
-      bill_id: billId,
-      user_id: userId,
+      bill_id: bill_id,
+      user_id: user_id,
       vote_type: voteType,
       voted_at: new Date(),
       created_at: new Date(),
@@ -191,14 +191,14 @@ export class BillDomainService {
         [voteCountField]: sql`${bills[voteCountField]} + 1`,
         updated_at: new Date()
       })
-      .where(eq(bills.id, billId))
+      .where(eq(bills.id, bill_id))
       .returning();
 
     // Publish domain event
     await this.eventPublisher.publish(new BillUpdatedEvent(
-      billId,
+      bill_id,
       'vote_recorded',
-      { voteType, userId }
+      { voteType, user_id }
     ));
 
     return updatedBill;
@@ -208,7 +208,7 @@ export class BillDomainService {
    * Updates bill content with validation
    */
   async updateBillContent(
-    billId: string,
+    bill_id: string,
     updates: {
       title?: BillTitle;
       summary?: BillSummary;
@@ -220,7 +220,7 @@ export class BillDomainService {
     const [bill] = await this.db
       .select()
       .from(bills)
-      .where(eq(bills.id, billId))
+      .where(eq(bills.id, bill_id))
       .limit(1);
     
     if (!bill) {
@@ -254,12 +254,12 @@ export class BillDomainService {
     const [updatedBill] = await this.db
       .update(bills)
       .set(updateData)
-      .where(eq(bills.id, billId))
+      .where(eq(bills.id, bill_id))
       .returning();
 
     // Publish domain event
     await this.eventPublisher.publish(new BillUpdatedEvent(
-      billId,
+      bill_id,
       'content_updated',
       { updates, updatedBy }
     ));
@@ -270,12 +270,12 @@ export class BillDomainService {
   /**
    * Records engagement (view, comment, share) on a bill
    */
-  async recordEngagement(billId: string, userId: string, engagementType: 'view' | 'comment' | 'share'): Promise<void> {
+  async recordEngagement(bill_id: string, user_id: string, engagementType: 'view' | 'comment' | 'share'): Promise<void> {
     // Check if bill exists using direct Drizzle query
     const [bill] = await this.db
       .select()
       .from(bills)
-      .where(eq(bills.id, billId))
+      .where(eq(bills.id, bill_id))
       .limit(1);
     
     if (!bill) {
@@ -287,8 +287,8 @@ export class BillDomainService {
       .select()
       .from(bill_engagement)
       .where(and(
-        eq(bill_engagement.bill_id, billId),
-        eq(bill_engagement.user_id, userId)
+        eq(bill_engagement.bill_id, bill_id),
+        eq(bill_engagement.user_id, user_id)
       ))
       .limit(1);
 
@@ -318,8 +318,8 @@ export class BillDomainService {
     } else {
       // Create new engagement
       const engagement_data: any = {
-        bill_id: billId,
-        user_id: userId,
+        bill_id: bill_id,
+        user_id: user_id,
         view_count: engagementType === 'view' ? 1 : 0,
         comment_count: engagementType === 'comment' ? 1 : 0,
         share_count: engagementType === 'share' ? 1 : 0,
@@ -341,19 +341,19 @@ export class BillDomainService {
           [updateField]: sql`${bills[updateField]} + 1`,
           updated_at: new Date()
         })
-        .where(eq(bills.id, billId));
+        .where(eq(bills.id, bill_id));
     }
   }
 
   /**
    * Gets bill with full aggregate data (comments, votes, stakeholders)
    */
-  async getBillAggregate(billId: string) {
+  async getBillAggregate(bill_id: string) {
     // Get bill using direct Drizzle query
     const [bill] = await this.db
       .select()
       .from(bills)
-      .where(eq(bills.id, billId))
+      .where(eq(bills.id, bill_id))
       .limit(1);
     
     if (!bill) {
@@ -365,17 +365,17 @@ export class BillDomainService {
       this.db
         .select()
         .from(bill_votes)
-        .where(eq(bill_votes.bill_id, billId)),
+        .where(eq(bill_votes.bill_id, bill_id)),
       
       this.db
         .select()
         .from(bill_engagement)
-        .where(eq(bill_engagement.bill_id, billId)),
+        .where(eq(bill_engagement.bill_id, bill_id)),
       
       this.db
         .select()
         .from(bill_trackers)
-        .where(eq(bill_trackers.bill_id, billId))
+        .where(eq(bill_trackers.bill_id, bill_id))
     ]);
 
     return {
@@ -389,25 +389,25 @@ export class BillDomainService {
   /**
    * Gets bills with aggregate data for a user (tracked, voted, sponsored, commented)
    */
-  async getUserBillsAggregate(userId: string) {
+  async getUserBillsAggregate(user_id: string) {
     // Get bills the user has interacted with
     const [trackedBills, votedBills, sponsoredBills] = await Promise.all([
       this.db
         .select({ bill: bills })
         .from(bills)
         .innerJoin(bill_trackers, eq(bills.id, bill_trackers.bill_id))
-        .where(eq(bill_trackers.user_id, userId)),
+        .where(eq(bill_trackers.user_id, user_id)),
       
       this.db
         .select({ bill: bills })
         .from(bills)
         .innerJoin(bill_votes, eq(bills.id, bill_votes.bill_id))
-        .where(eq(bill_votes.user_id, userId)),
+        .where(eq(bill_votes.user_id, user_id)),
       
       this.db
         .select()
         .from(bills)
-        .where(eq(bills.sponsor_id, userId))
+        .where(eq(bills.sponsor_id, user_id))
     ]);
 
     return {
@@ -420,12 +420,12 @@ export class BillDomainService {
   /**
    * Adds a user as a bill tracker
    */
-  async addBillTracker(billId: string, userId: string): Promise<void> {
+  async addBillTracker(bill_id: string, user_id: string): Promise<void> {
     // Check if bill exists using direct Drizzle query
     const [bill] = await this.db
       .select()
       .from(bills)
-      .where(eq(bills.id, billId))
+      .where(eq(bills.id, bill_id))
       .limit(1);
     
     if (!bill) {
@@ -437,15 +437,15 @@ export class BillDomainService {
       .select()
       .from(bill_trackers)
       .where(and(
-        eq(bill_trackers.bill_id, billId),
-        eq(bill_trackers.user_id, userId)
+        eq(bill_trackers.bill_id, bill_id),
+        eq(bill_trackers.user_id, user_id)
       ))
       .limit(1);
 
     if (!existingTracker) {
       await this.db.insert(bill_trackers).values({
-        bill_id: billId,
-        user_id: userId,
+        bill_id: bill_id,
+        user_id: user_id,
         created_at: new Date(),
         updated_at: new Date()
       });
@@ -453,36 +453,36 @@ export class BillDomainService {
 
     // Publish domain event
     await this.eventPublisher.publish(new BillUpdatedEvent(
-      billId,
+      bill_id,
       'tracker_added',
-      { userId }
+      { user_id }
     ));
   }
 
   /**
    * Removes a user from bill tracking
    */
-  async removeBillTracker(billId: string, userId: string): Promise<void> {
+  async removeBillTracker(bill_id: string, user_id: string): Promise<void> {
     await this.db
       .delete(bill_trackers)
       .where(and(
-        eq(bill_trackers.bill_id, billId),
-        eq(bill_trackers.user_id, userId)
+        eq(bill_trackers.bill_id, bill_id),
+        eq(bill_trackers.user_id, user_id)
       ));
 
     // Publish domain event
     await this.eventPublisher.publish(new BillUpdatedEvent(
-      billId,
+      bill_id,
       'tracker_removed',
-      { userId }
+      { user_id }
     ));
   }
 
   /**
    * Gets comprehensive bill analytics
    */
-  async getBillAnalytics(billId: string) {
-    const aggregate = await this.getBillAggregate(billId);
+  async getBillAnalytics(bill_id: string) {
+    const aggregate = await this.getBillAggregate(bill_id);
     if (!aggregate) {
       throw new Error('Bill not found');
     }
@@ -509,11 +509,11 @@ export class BillDomainService {
     }, { support: 0, oppose: 0, neutral: 0, questions: 0 });
 
     return {
-      billId,
+      bill_id,
       billNumber: bill.getBillNumber().getValue(),
       title: bill.getTitle().getValue(),
       status: bill.getStatus(),
-      sponsorId: bill.getSponsorId(),
+      sponsor_id: bill.getSponsorId(),
 
       // Engagement metrics
       engagement: {
@@ -550,7 +550,7 @@ export class BillDomainService {
 
       // Time-based metrics
       timeline: {
-        createdAt: bill.getCreatedAt(),
+        created_at: bill.getCreatedAt(),
         lastActivity: this.getLastActivityDate(comments, votes),
         daysActive: Math.floor((Date.now() - bill.getCreatedAt().getTime()) / (1000 * 60 * 60 * 24))
       }
@@ -587,15 +587,15 @@ export class BillDomainService {
     }
 
     // Business Rule: Validate status transitions for each bill
-    for (const billId of billIds) {
+    for (const bill_id of billIds) {
       const [bill] = await this.db
         .select()
         .from(bills)
-        .where(eq(bills.id, billId))
+        .where(eq(bills.id, bill_id))
         .limit(1);
       
       if (!bill) {
-        throw new Error(`Bill ${billId} not found`);
+        throw new Error(`Bill ${bill_id} not found`);
       }
 
       // Validate the status change
@@ -613,9 +613,9 @@ export class BillDomainService {
       .where(sql`${bills.id} = ANY(${billIds})`);
 
     // Publish events for each bill
-    for (const billId of billIds) {
+    for (const bill_id of billIds) {
       await this.eventPublisher.publish(new BillStatusChangedEvent(
-        billId,
+        bill_id,
         'unknown' as any, // We don't know the old status in bulk operations
         newStatus,
         updatedBy
@@ -665,8 +665,8 @@ export class BillDomainService {
   /**
    * Validates permissions for status changes
    */
-  private async validateStatusChangePermission(bill: any, newStatus: BillStatus, userId: string): Promise<void> {
-    const user = await this.userService.findById(userId);
+  private async validateStatusChangePermission(bill: any, newStatus: BillStatus, user_id: string): Promise<void> {
+    const user = await this.userService.findById(user_id);
     if (!user) {
       throw new Error('User not found');
     }
@@ -690,7 +690,7 @@ export class BillDomainService {
     }
 
     // Additional rule: Only the sponsor can withdraw a bill
-    if (newStatus === 'withdrawn' && bill.sponsor_id !== userId) {
+    if (newStatus === 'withdrawn' && bill.sponsor_id !== user_id) {
       throw new Error('Only the bill sponsor can withdraw the bill');
     }
   }
@@ -698,8 +698,8 @@ export class BillDomainService {
   /**
    * Validates permissions for content updates
    */
-  private async validateUpdatePermission(bill: any, userId: string): Promise<void> {
-    const user = await this.userService.findById(userId);
+  private async validateUpdatePermission(bill: any, user_id: string): Promise<void> {
+    const user = await this.userService.findById(user_id);
     if (!user) {
       throw new Error('User not found');
     }
@@ -727,7 +727,7 @@ export class BillDomainService {
 
       for (const stakeholder of stakeholders) {
         await this.notificationService.sendNotification({
-          userId: stakeholder.id,
+          user_id: stakeholder.id,
           type: this.mapEventToNotificationType(eventType),
           title: this.generateNotificationTitle(bill, eventType),
           message: this.generateNotificationMessage(bill, eventType, additionalData),

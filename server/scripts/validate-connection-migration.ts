@@ -8,7 +8,7 @@
  */
 
 import { WebSocketMigrationDeployer, SocketIOWebSocketService } from './deploy-websocket-migration.js';
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 import { createServer } from 'http';
 import { io as SocketIOClient } from 'socket.io-client';
 import * as jwt from 'jsonwebtoken';

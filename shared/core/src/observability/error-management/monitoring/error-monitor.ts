@@ -248,7 +248,7 @@ export class RealTimeErrorMonitor extends EventEmitter implements ErrorMonitor {
 
     // User impact metrics (simplified)
     const uniqueUsers = new Set(this.errors.map(e => e.context.user_id).filter(Boolean));
-    const uniqueSessions = new Set(this.errors.map(e => e.context.metadata?.sessionId).filter(Boolean));
+    const uniqueSessions = new Set(this.errors.map(e => e.context.metadata?.session_id).filter(Boolean));
 
     return {
       totalErrors,

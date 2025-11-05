@@ -1,7 +1,7 @@
-import { readDatabase } from '../../../../shared/database/connection';
-import { databaseService } from '../../../infrastructure/database/database-service';
-import { cacheService } from '../../../infrastructure/cache/cache-service';
-import { logger } from '../../../../shared/core/src/index';
+import { readDatabase } from '@shared/database';
+import { databaseService } from '@/infrastructure/database/database-service';
+import { cacheService } from '@/infrastructure/cache/cache-service';
+import { logger } from '@shared/core/index';
 import * as schema from "@shared/schema";
 import { eq, desc, and, sql, count, like, or, gte } from "drizzle-orm";
 
@@ -578,15 +578,15 @@ export class SuggestionEngineService {
     try {
       // Calculate counts for each date range in parallel
       const countPromises = ranges.map(async (range) => {
-        const startDate = new Date(now);
-        startDate.setDate(startDate.getDate() - range.days);
+        const start_date = new Date(now);
+        startDate.setDate(start_date.getDate() - range.days);
 
         const result = await this.db
           .select({ count: count() })
           .from(schema.bills)
           .where(
             and(
-              gte(schema.bills.created_at, startDate),
+              gte(schema.bills.created_at, start_date),
               or(
                 like(schema.bills.title, searchPattern),
                 like(schema.bills.description, searchPattern)

@@ -817,7 +817,7 @@ export class UnifiedLogger implements LoggerChild {
       traceId: enrichedContext?.traceId as string,
       requestId: enrichedContext?.requestId as string,
       user_id: enrichedContext?.user_id as string,
-      sessionId: enrichedContext?.sessionId as string,
+      session_id: enrichedContext?.session_id as string,
       ip_address: enrichedContext?.ip as string,
       user_agent: enrichedContext?.user_agent as string,
       component: enrichedContext?.component as string,
@@ -936,7 +936,7 @@ export class UnifiedLogger implements LoggerChild {
       user_id: data.user_id,
       severity: data.severity,
       ip: data.ip,
-      sessionId: data.sessionId,
+      session_id: data.session_id,
       tags: ['security', 'audit', data.severity],
      }, { security: data });
   }
@@ -948,7 +948,7 @@ export class UnifiedLogger implements LoggerChild {
       entity_type: data.entity_type,
       entity_id: data.entity_id,
       user_id: data.user_id,
-      sessionId: data.sessionId,
+      session_id: data.session_id,
       tags: ['business-event'],
      }, { business: data });
   }

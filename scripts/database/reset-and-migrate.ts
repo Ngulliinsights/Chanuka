@@ -7,8 +7,8 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
 import pg from 'pg';
-import { config } from '../../server/config/index.js';
-import { logger } from '../../shared/core/src/index.js';
+import { config } from '@server/config/index.js';
+import { logger } from '@shared/core/index.js';
 
 const { Pool } = pg;
 

@@ -15,7 +15,7 @@ import {
   parliamentary_sittings,
   bills
 } from '../foundation';
-import { eq, and, or, inArray } from 'drizzle-orm';
+import { eq, and, or, inArray, sql } from 'drizzle-orm';
 
 describe('Foundation Schema Tests', () => {
   beforeAll(async () => {

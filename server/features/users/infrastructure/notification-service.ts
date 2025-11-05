@@ -1,5 +1,5 @@
-import { notificationService, NotificationData } from '../../../infrastructure/notifications/notification-service.js';
-import { logger } from '../../../../shared/core/index.js';
+import { notificationService, NotificationData } from '@/infrastructure/notifications/notification-service.js';
+import { logger } from '@shared/core/index.js';
 
 export interface UserNotificationData extends Omit<NotificationData, 'user_id'> { user_id: string;
  }
@@ -77,7 +77,7 @@ export class UserNotificationService {
    */
   async sendVerificationStatusNotification(
     user_id: string,
-    verificationId: string,
+    verification_id: string,
     status: 'submitted' | 'approved' | 'rejected' | 'pending',
     billTitle?: string,
     reason?: string
@@ -90,7 +90,7 @@ export class UserNotificationService {
       title,
       message,
       metadata: {
-        verificationId,
+        verification_id,
         status,
         billTitle,
         reason
@@ -167,7 +167,7 @@ export class UserNotificationService {
   /**
    * Mark user notification as read
    */
-  async markNotificationAsRead(user_id: string, notificationId: number): Promise<void> { return notificationService.markAsRead(user_id, notificationId);
+  async markNotificationAsRead(user_id: string, notification_id: number): Promise<void> { return notificationService.markAsRead(user_id, notification_id);
    }
 
   /**
@@ -185,7 +185,7 @@ export class UserNotificationService {
   /**
    * Delete user notification
    */
-  async deleteNotification(user_id: string, notificationId: number): Promise<void> { return notificationService.deleteNotification(user_id, notificationId);
+  async deleteNotification(user_id: string, notification_id: number): Promise<void> { return notificationService.deleteNotification(user_id, notification_id);
    }
 
   /**

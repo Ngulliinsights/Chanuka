@@ -5,9 +5,9 @@
 
 import { Router } from 'express';
 import { z } from 'zod';
-import { logger, ApiResponse } from '../../../../shared/core/index.js';
+import { logger, ApiResponse } from '@shared/core/index.js';
 import { createAnalysisServices } from '../services/constitutional-analysis-factory.js';
-import { ConstitutionalAnalysis } from '../../../../shared/schema/index.js';
+import { ConstitutionalAnalysis } from '@shared/schema/index.js';
 
 // Initialize services using factory
 const services = createAnalysisServices();
@@ -19,7 +19,7 @@ const router = Router();
 // ============================================================================
 
 const analyzeBillSchema = z.object({
-  billId: z.string().uuid('Bill ID must be a valid UUID'),
+  bill_id: z.string().uuid('Bill ID must be a valid UUID'),
   billTitle: z.string().min(1, 'Bill title is required'),
   billContent: z.string().min(10, 'Bill content must be at least 10 characters'),
   billType: z.string().optional(),
@@ -66,11 +66,11 @@ router.post('/analyze', async (req, res) => {
       );
     }
 
-    const { billId, billTitle, billContent, billType, urgentAnalysis } = validation.data;
+    const { bill_id, billTitle, billContent, billType, urgentAnalysis } = validation.data;
 
     // Perform constitutional analysis
     const analysisResult = await services.analyzer.analyzeBill({
-      billId,
+      bill_id,
       billTitle,
       billContent,
       billType,
@@ -79,7 +79,7 @@ router.post('/analyze', async (req, res) => {
 
     logger.info('✅ Constitutional analysis completed successfully', {
       component: 'ConstitutionalAnalysisRouter',
-      billId,
+      bill_id,
       overallRisk: analysisResult.overallRisk,
       analysisCount: analysisResult.analyses.length,
       processingTime: analysisResult.processingTime
@@ -104,25 +104,25 @@ router.post('/analyze', async (req, res) => {
  * GET /api/constitutional-analysis/bills/:billId
  * Get existing constitutional analysis for a bill
  */
-router.get('/bills/:billId', async (req, res) => {
+router.get('/bills/:bill_id', async (req, res) => {
   try {
-    const { billId } = req.params;
+    const { bill_id } = req.params;
 
-    logger.debug(`Getting constitutional analysis for bill ${billId}`, {
+    logger.debug(`Getting constitutional analysis for bill ${bill_id}`, {
       component: 'ConstitutionalAnalysisRouter'
     });
 
     // Validate UUID format
-    if (!z.string().uuid().safeParse(billId).success) {
+    if (!z.string().uuid().safeParse(bill_id).success) {
       return res.status(400).json(
         ApiResponse.validation('Invalid bill ID format', [{ message: 'Bill ID must be a valid UUID' }])
       );
     }
 
-    const analyses = await services.repositories.analyses.findByBillId(billId);
+    const analyses = await services.repositories.analyses.findByBillId(bill_id);
 
     if (analyses.length === 0) {
-      logger.debug(`No constitutional analysis found for bill ${billId}`, {
+      logger.debug(`No constitutional analysis found for bill ${bill_id}`, {
         component: 'ConstitutionalAnalysisRouter'
       });
       return res.status(404).json(
@@ -141,22 +141,22 @@ router.get('/bills/:billId', async (req, res) => {
       lastUpdated: Math.max(...analyses.map(a => a.updated_at.getTime()))
     };
 
-    logger.debug(`Retrieved constitutional analysis for bill ${billId}`, {
+    logger.debug(`Retrieved constitutional analysis for bill ${bill_id}`, {
       component: 'ConstitutionalAnalysisRouter',
       analysisCount: analyses.length,
       overallRisk: summary.overallRisk
     });
 
     res.json(ApiResponse.success({
-      billId,
+      bill_id,
       analyses,
       summary
     }, 'Constitutional analysis retrieved successfully'));
 
   } catch (error) {
-    logger.error(`Failed to get constitutional analysis for bill ${req.params.billId}`, {
+    logger.error(`Failed to get constitutional analysis for bill ${req.params.bill_id}`, {
       component: 'ConstitutionalAnalysisRouter',
-      billId: req.params.billId,
+      bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
     });
 

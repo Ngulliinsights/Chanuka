@@ -1,13 +1,13 @@
 import { Router } from 'express';
-import { database, withTransaction, getDatabase } from '@shared/database/connection';
+import { database, withTransaction, getDatabase } from '@shared/database';
 import { comments, users, user_profiles, bills } from '@shared/foundation';
 import { comments as comments_cp, bill_engagement } from '@shared/citizen_participation';
 import { eq, and, sql, desc, count, sum, avg } from 'drizzle-orm';
-import { cacheKeys  } from '../../../shared/core/src/caching/key-generator';
-import { getDefaultCache  } from '../../../shared/core/src/caching';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '../../../shared/core/src/utils/api-utils';
-import { logger  } from '../../../shared/core/src/index.js';
-import { AuthenticatedRequest  } from '../../../shared/core/src/types/auth.types';
+import { cacheKeys  } from '@shared/core/caching/key-generator';
+import { getDefaultCache  } from '@shared/core/caching';
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api-utils';
+import { logger  } from '@shared/core/index.js';
+import { AuthenticatedRequest  } from '@shared/core/types/auth.types';
 import { z } from 'zod';
 
 // Security Services
@@ -633,7 +633,7 @@ class EngagementAnalyticsRouter {
    */
   private async computeEngagementTrends(period: 'hourly' | 'daily' | 'weekly', days: number): Promise<CommentEngagementTrends[typeof period]> {
     const db = getDatabase('read');
-    const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const start_date = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
     let groupBy: any;
     let selectFormat: any;
@@ -660,7 +660,7 @@ class EngagementAnalyticsRouter {
         votes: sum(sql`${comments.upvotes} + ${comments.downvotes}`)
       })
       .from(comments)
-      .where(sql`${comments.created_at} >= ${startDate}`)
+      .where(sql`${comments.created_at} >= ${start_date}`)
       .groupBy(groupBy)
       .orderBy(groupBy);
 

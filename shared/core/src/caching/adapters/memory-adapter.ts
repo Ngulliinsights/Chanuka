@@ -34,7 +34,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
     this.maxSize = config.maxSize || 10000;
     this.cleanupInterval = config.cleanupInterval || 60000; // 1 minute
     this.enableLRU = config.enableLRU !== false;
-    
+
     this.startCleanupTimer();
   }
 
@@ -42,7 +42,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
     return this.measureLatency(async () => {
       const formattedKey = this.formatKey(key);
       const entry = this.cache.get(formattedKey);
-      
+
       if (!entry) {
         this.updateMetrics('miss');
         this.emit('miss', { key: formattedKey });
@@ -74,7 +74,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
     return this.measureLatency(async () => {
       const formattedKey = this.formatKey(key);
       const now = Date.now();
-      
+
       const entry: CacheEntry = {
         value,
         expires_at: ttlSeconds ? now + (ttlSeconds * 1000) : undefined,
@@ -88,7 +88,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
       }
 
       this.cache.set(formattedKey, entry);
-      
+
       if (this.enableLRU) {
         this.updateAccessOrder(formattedKey);
       }
@@ -120,26 +120,26 @@ export class MemoryAdapter extends BaseCacheAdapter {
   async exists(key: string): Promise<boolean> {
     const formattedKey = this.formatKey(key);
     const entry = this.cache.get(formattedKey);
-    
+
     if (!entry) return false;
-    
+
     // Check if expired
     if (entry.expires_at && Date.now() > entry.expires_at) {
       this.cache.delete(formattedKey);
       this.removeFromAccessOrder(formattedKey);
       return false;
     }
-    
+
     return true;
   }
 
   async ttl(key: string): Promise<number> {
     const formattedKey = this.formatKey(key);
     const entry = this.cache.get(formattedKey);
-    
+
     if (!entry) return -2; // Key doesn't exist
     if (!entry.expires_at) return -1; // No expiration
-    
+
     const remaining = Math.ceil((entry.expires_at - Date.now()) / 1000);
     return Math.max(0, remaining);
   }
@@ -157,9 +157,9 @@ export class MemoryAdapter extends BaseCacheAdapter {
 
   async keys(pattern?: string): Promise<string[]> {
     const keys = Array.from(this.cache.keys());
-    
+
     if (!pattern) return keys;
-    
+
     // Simple pattern matching (supports * wildcard)
     const regex = new RegExp(pattern.replace(/\*/g, '.*'));
     return keys.filter(key => regex.test(key));
@@ -168,26 +168,26 @@ export class MemoryAdapter extends BaseCacheAdapter {
   async invalidateByPattern(pattern: string): Promise<number> {
     const keys = await this.keys(pattern);
     let deleted = 0;
-    
+
     for (const key of keys) {
       if (await this.del(key)) {
         deleted++;
       }
     }
-    
+
     return deleted;
   }
 
   // Override to provide accurate memory usage
   protected getMemoryUsage(): number {
     let totalSize = 0;
-    
-    for (const [key, entry] of this.cache) {
-      totalSize += key.length;
+
+    for (const [key, entry] of Array.from(this.cache)) {
+      totalSize += (key as string).length;
       totalSize += this.estimateSize(entry.value);
       totalSize += 32; // Overhead for entry metadata
     }
-    
+
     return Math.round(totalSize / (1024 * 1024)); // Convert to MB
   }
 
@@ -224,7 +224,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
 
   private async evictLRU(): Promise<void> {
     if (this.accessOrder.length === 0) return;
-    
+
     // Remove least recently used item
     const lruKey = this.accessOrder[0];
     await this.del(lruKey);
@@ -233,7 +233,7 @@ export class MemoryAdapter extends BaseCacheAdapter {
 
   private startCleanupTimer(): void {
     if (this.cleanupTimer) return;
-    
+
     this.cleanupTimer = setInterval(() => {
       this.cleanup();
     }, this.cleanupInterval);
@@ -249,21 +249,21 @@ export class MemoryAdapter extends BaseCacheAdapter {
   private cleanup(): void {
     const now = Date.now();
     const expiredKeys: string[] = [];
-    
+
     // Find expired entries
-    for (const [key, entry] of this.cache) {
+    for (const [key, entry] of Array.from(this.cache)) {
       if (entry.expires_at && now > entry.expires_at) {
         expiredKeys.push(key);
       }
     }
-    
+
     // Remove expired entries
     for (const key of expiredKeys) {
       this.cache.delete(key);
       this.removeFromAccessOrder(key);
       this.emit('expire', { key });
     }
-    
+
     // Update metrics
     this.metrics.keyCount = this.cache.size;
     this.metrics.memoryUsage = this.getMemoryUsage();

@@ -208,13 +208,13 @@ describe('Connection Migration Stability Integration Tests', () => {
       });
 
       vi.spyOn(webSocketService, 'getAllConnectedUsers').mockReturnValue(connectedUsers);
-      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((userId) => {
+      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((user_id) => {
         return userSubscriptions[userId] || [];
       });
       vi.spyOn(webSocketService, 'getConnectionCount').mockReturnValue(1);
 
       // Mock Socket.IO service to return same subscriptions after migration
-      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((userId) => {
+      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((user_id) => {
         return userSubscriptions[userId] || [];
       });
 
@@ -248,13 +248,13 @@ describe('Connection Migration Stability Integration Tests', () => {
       };
 
       vi.spyOn(webSocketService, 'getAllConnectedUsers').mockReturnValue(Object.keys(userSubscriptions));
-      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((userId) => {
+      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((user_id) => {
         return userSubscriptions[userId] || [];
       });
       vi.spyOn(webSocketService, 'getConnectionCount').mockReturnValue(1);
 
       // Mock Socket.IO service to return fewer subscriptions (simulating partial loss)
-      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((userId) => {
+      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((user_id) => {
         const originalSubs = userSubscriptions[userId] || [];
         return originalSubs.slice(0, Math.max(1, originalSubs.length - 1)); // Lose one subscription per user
       });
@@ -482,14 +482,14 @@ describe('Connection Migration Stability Integration Tests', () => {
       };
 
       vi.spyOn(webSocketService, 'getAllConnectedUsers').mockReturnValue(preRollbackUsers);
-      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((userId) => {
+      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((user_id) => {
         return userSubscriptions[userId] || [];
       });
       vi.spyOn(webSocketService, 'getConnectionCount').mockReturnValue(1);
       vi.spyOn(webSocketService, 'isUserConnected').mockReturnValue(true);
 
       vi.spyOn(socketIOService, 'getAllConnectedUsers').mockReturnValue(preRollbackUsers);
-      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((userId) => {
+      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((user_id) => {
         return userSubscriptions[userId] || [];
       });
       vi.spyOn(socketIOService, 'getConnectionCount').mockReturnValue(1);
@@ -552,8 +552,8 @@ describe('Connection Migration Stability Integration Tests', () => {
       const userIds = Array.from({ length: highConnectionCount }, (_, i) => `user${i}`);
 
       vi.spyOn(webSocketService, 'getAllConnectedUsers').mockReturnValue(userIds);
-      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((userId) => {
-        const userIndex = parseInt(userId.replace('user', ''));
+      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((user_id) => {
+        const userIndex = parseInt(user_id.replace('user', ''));
         return [userIndex % 10 + 1, (userIndex % 10) + 2]; // 2 subscriptions per user
       });
       vi.spyOn(webSocketService, 'getConnectionCount').mockReturnValue(1);
@@ -582,8 +582,8 @@ describe('Connection Migration Stability Integration Tests', () => {
         timestamp: new Date().toISOString()
       });
 
-      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((userId) => {
-        const userIndex = parseInt(userId.replace('user', ''));
+      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((user_id) => {
+        const userIndex = parseInt(user_id.replace('user', ''));
         return [userIndex % 10 + 1, (userIndex % 10) + 2]; // Same subscriptions
       });
 
@@ -679,8 +679,8 @@ describe('Connection Migration Stability Integration Tests', () => {
       const userIds = Array.from({ length: highConnectionCount }, (_, i) => `user${i}`);
 
       vi.spyOn(webSocketService, 'getAllConnectedUsers').mockReturnValue(userIds);
-      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((userId) => {
-        const userIndex = parseInt(userId.replace('user', ''));
+      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((user_id) => {
+        const userIndex = parseInt(user_id.replace('user', ''));
         return [userIndex % 5 + 1]; // 1 subscription per user
       });
       vi.spyOn(webSocketService, 'getConnectionCount').mockReturnValue(1);
@@ -710,8 +710,8 @@ describe('Connection Migration Stability Integration Tests', () => {
         timestamp: new Date().toISOString()
       });
 
-      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((userId) => {
-        const userIndex = parseInt(userId.replace('user', ''));
+      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((user_id) => {
+        const userIndex = parseInt(user_id.replace('user', ''));
         return [userIndex % 5 + 1]; // Same subscriptions
       });
 
@@ -869,7 +869,7 @@ describe('Connection Migration Stability Integration Tests', () => {
       };
 
       vi.spyOn(webSocketService, 'getAllConnectedUsers').mockReturnValue(Object.keys(userSubscriptions));
-      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((userId) => {
+      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((user_id) => {
         return userSubscriptions[userId] || [];
       });
       vi.spyOn(webSocketService, 'getConnectionCount').mockReturnValue(2); // Multiple connections per user
@@ -899,10 +899,10 @@ describe('Connection Migration Stability Integration Tests', () => {
       });
 
       // Mock successful subscription restoration with 95% preservation rate
-      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((userId) => {
+      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((user_id) => {
         const originalSubs = userSubscriptions[userId] || [];
         // Simulate 95% preservation (lose 1 subscription for user2 only)
-        if (userId === 'user2') {
+        if (user_id === 'user2') {
           return originalSubs.slice(0, -1); // Lose last subscription
         }
         return originalSubs;
@@ -1008,10 +1008,10 @@ describe('Connection Migration Stability Integration Tests', () => {
       };
 
       vi.spyOn(webSocketService, 'getAllConnectedUsers').mockReturnValue(Object.keys(complexUserSubscriptions));
-      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((userId) => {
+      vi.spyOn(webSocketService, 'getUserSubscriptions').mockImplementation((user_id) => {
         return complexUserSubscriptions[userId] || [];
       });
-      vi.spyOn(webSocketService, 'getConnectionCount').mockImplementation((userId) => {
+      vi.spyOn(webSocketService, 'getConnectionCount').mockImplementation((user_id) => {
         // Simulate different connection counts per user
         const subscriptions = complexUserSubscriptions[userId] || [];
         return Math.max(1, Math.floor(subscriptions.length / 3)); // More subscriptions = more connections
@@ -1042,9 +1042,9 @@ describe('Connection Migration Stability Integration Tests', () => {
       });
 
       // Mock 98% subscription preservation (lose 1 subscription from user1)
-      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((userId) => {
+      vi.spyOn(socketIOService, 'getUserSubscriptions').mockImplementation((user_id) => {
         const originalSubs = complexUserSubscriptions[userId] || [];
-        if (userId === 'user1') {
+        if (user_id === 'user1') {
           return originalSubs.slice(0, -1); // Lose last subscription for user1
         }
         return originalSubs;

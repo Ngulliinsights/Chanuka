@@ -6,8 +6,8 @@ import { performanceTrackingMiddleware } from './middleware/performance-tracking
 import { EngagementController, getEngagementMetricsSchema, getEngagementTrendsSchema } from './controllers/engagement.controller.js';
 import { engagementAnalyticsService } from './services/engagement.service.js';
 import { z } from 'zod';
-import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '../../../shared/core/src/utils/api';
-import { logger  } from '../../../shared/core/src/index.js';
+import { ApiSuccess, ApiError, ApiValidationError, ApiResponseWrapper  } from '@shared/core/utils/api';
+import { logger  } from '@shared/core/index.js';
 
 export const router = Router();
 
@@ -29,8 +29,8 @@ export const router = Router();
  */
 const analyticsQuerySchema = z.object({
   query: z.object({
-    startDate: z.string().datetime().optional(),
-    endDate: z.string().datetime().optional(),
+    start_date: z.string().datetime().optional(),
+    end_date: z.string().datetime().optional(),
     bill_ids: z.string().optional().transform((val) => 
       val ? val.split(',').map(Number) : undefined
     ),
@@ -59,8 +59,8 @@ const analyticsQuerySchema = z.object({
  */
 const trendsQuerySchema = z.object({
   period: z.enum(['daily', 'weekly', 'monthly']),
-  startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional()
+  start_date: z.string().datetime().optional(),
+  end_date: z.string().datetime().optional()
 });
 
 /**
@@ -90,8 +90,8 @@ const comparativeQuerySchema = z.object({
  */
 const exportQuerySchema = z.object({
   format: z.enum(['json', 'csv']),
-  startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional(),
+  start_date: z.string().datetime().optional(),
+  end_date: z.string().datetime().optional(),
   bill_ids: z.string().optional().transform((val) => 
     val ? val.split(',').map(Number) : undefined
   ),

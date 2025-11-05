@@ -3,7 +3,7 @@
 // ============================================================================
 
 import { NotificationPreferences } from '../../types/index.js';
-import { logger } from '../../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 export interface NotificationConfig {
   enableEmail: boolean;
@@ -24,7 +24,7 @@ export interface NotificationMessage {
   priority: 'low' | 'medium' | 'high' | 'urgent';
   channels: ('email' | 'sms' | 'push' | 'ussd')[];
   scheduledAt?: Date;
-  expiresAt?: Date;
+  expires_at?: Date;
   metadata?: Record<string, any>;
 }
 
@@ -90,7 +90,7 @@ export class NotificationService {
   }
 
   createCampaignUpdateNotification(
-    campaignId: string,
+    campaign_id: string,
     campaignTitle: string,
     updateType: string,
     updateDescription: string,
@@ -102,11 +102,11 @@ export class NotificationService {
       type: 'campaign_update',
       title: `Campaign Update: ${campaignTitle}`,
       content: `${updateType}: ${updateDescription}`,
-      actionUrl: `/campaigns/${campaignId}`,
+      actionUrl: `/campaigns/${ campaign_id }`,
       priority: 'medium',
       channels: ['email', 'push'],
       metadata: {
-        campaignId,
+        campaign_id,
         updateType
       }
     };

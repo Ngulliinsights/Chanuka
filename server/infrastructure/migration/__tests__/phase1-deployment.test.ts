@@ -277,12 +277,12 @@ describe('Phase 1 Deployment Integration', () => {
 
     it('should determine user cohorts consistently', async () => {
       const component = 'utilities-concurrency-adapter';
-      const userId = 'test-user-123';
+      const user_id = 'test-user-123';
       
       // Get cohort multiple times - should be consistent
-      const cohort1 = featureFlagsService.getUserCohort(userId, component);
-      const cohort2 = featureFlagsService.getUserCohort(userId, component);
-      const cohort3 = featureFlagsService.getUserCohort(userId, component);
+      const cohort1 = featureFlagsService.getUserCohort(user_id, component);
+      const cohort2 = featureFlagsService.getUserCohort(user_id, component);
+      const cohort3 = featureFlagsService.getUserCohort(user_id, component);
       
       expect(cohort1).toBe(cohort2);
       expect(cohort2).toBe(cohort3);

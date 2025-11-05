@@ -44,7 +44,17 @@ export class HealthCheckOrchestrator {
       enableMetrics: validatedOptions.enableMetrics ?? true,
       enableTracing: validatedOptions.enableTracing ?? false,
       failFast: validatedOptions.failFast ?? false,
-      retryPolicy: validatedOptions.retryPolicy ?? DEFAULT_CONFIG.RETRY_POLICY,
+      retryPolicy: validatedOptions.retryPolicy ? {
+        maxAttempts: validatedOptions.retryPolicy.maxAttempts,
+        backoffMultiplier: validatedOptions.retryPolicy.backoffMultiplier,
+        initialDelay: validatedOptions.retryPolicy.initialDelay,
+        maxDelay: validatedOptions.retryPolicy.maxDelay,
+      } : {
+        maxAttempts: 3,
+        backoffMultiplier: 2,
+        initialDelay: 1000,
+        maxDelay: 10000,
+      },
     };
   }
 

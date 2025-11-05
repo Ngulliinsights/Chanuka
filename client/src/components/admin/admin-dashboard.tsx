@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { 
   Users, 
   FileText, 
-  MessageCircle, 
+  MessageSquare as MessageCircle, 
   TrendingUp, 
   Shield, 
   Settings, 

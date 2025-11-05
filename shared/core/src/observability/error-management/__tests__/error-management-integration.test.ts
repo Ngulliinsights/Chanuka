@@ -72,7 +72,7 @@ describe('Error Management System Integration', () => {
 
       // Track the error
       await errorMonitor.trackError(testError, { user_id: 'user123',
-        metadata: { sessionId: 'session456'  }
+        metadata: { session_id: 'session456'  }
       });
 
       // Add to analytics
@@ -81,7 +81,7 @@ describe('Error Management System Integration', () => {
       // Generate user report
       const recoveryOptions = userReporter.generateRecoveryOptions(testError);
       const report = userReporter.generateReport(testError, { user_id: 'user123',
-        metadata: { sessionId: 'session456'  }
+        metadata: { session_id: 'session456'  }
       }, recoveryOptions);
 
       // Analyze recovery options
@@ -209,7 +209,7 @@ describe('Error Management System Integration', () => {
 
       // Track error through integration manager
       await integrationManager.trackErrorToAll(error, { user_id: 'test-user',
-        metadata: { sessionId: 'test-session'  }
+        metadata: { session_id: 'test-session'  }
       });
 
       // Verify integrations received the error
@@ -322,7 +322,7 @@ describe('Error Management System Integration', () => {
       const context = {
         user_id: 'context-user',
         metadata: {
-          sessionId: 'context-session',
+          session_id: 'context-session',
           requestId: 'context-request',
           operation: 'test-operation'
          }
@@ -342,7 +342,7 @@ describe('Error Management System Integration', () => {
 
       // Verify context is preserved
       expect(report.user_id).toBe(context.user_id);
-      expect(report.sessionId).toBe(context.metadata.sessionId);
+      expect(report.session_id).toBe(context.metadata.session_id);
     });
   });
 });

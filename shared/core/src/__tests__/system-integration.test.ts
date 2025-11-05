@@ -20,7 +20,7 @@ import { MiddlewareFactory } from '@shared/core/src/middleware/factory';
 import express from 'express';
 import request from 'supertest';
 import Redis from 'ioredis';
-import { Logger } from '../logging';
+import { Logger } from '../observability/logging';
 import { logger } from '@shared/core/src/observability/logging';
 
 describe('Core System Integration Tests', () => {

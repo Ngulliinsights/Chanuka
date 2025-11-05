@@ -1,11 +1,11 @@
 import crypto from 'crypto';
 import { Request, Response } from 'express';
-import { database as db } from '../../../shared/database/connection.js';
-import { sessions, users } from '../../../shared/schema';
+import { database as db } from '@shared/database/connection.js';
+import { sessions, users } from '@/shared/schema';
 import { eq, and, lt } from 'drizzle-orm';
 import { encryptionService } from '../../features/security/encryption-service.js';
 import { securityAuditService } from '../../features/security/security-audit-service.js';
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 export interface SecureSessionOptions {
   maxAge: number; // in milliseconds
@@ -58,9 +58,9 @@ export class SecureSessionService {
     req: Request,
     res: Response,
     options: Partial<SecureSessionOptions> = {}
-  ): Promise<{ sessionId: string; csrfToken: string }> { try {
+  ): Promise<{ session_id: string; csrfToken: string }> { try {
       // Generate session ID and CSRF token
-      const sessionId = crypto.randomUUID();
+      const session_id = crypto.randomUUID();
       const csrfToken = encryptionService.generateCSRFToken();
       
       // Create session fingerprint
@@ -105,7 +105,7 @@ export class SecureSessionService {
       );
 
       // Store session in database
-      await db.insert(sessions).values({ id: sessionId,
+      await db.insert(sessions).values({ id: session_id,
         user_id,
         token: encryptedSessionData,
         expires_at: new Date(Date.now() + (options.maxAge || this.defaultOptions.maxAge)),
@@ -114,7 +114,7 @@ export class SecureSessionService {
 
       // Set secure cookie
       const cookieOptions = { ...this.defaultOptions, ...options };
-      res.cookie('sessionId', sessionId, cookieOptions);
+      res.cookie('session_id', session_id, cookieOptions);
       
       // Set CSRF token in separate cookie
       res.cookie('csrfToken', csrfToken, {
@@ -128,10 +128,10 @@ export class SecureSessionService {
         req,
         user_id,
         true,
-        { sessionId, fingerprint }
+        { session_id, fingerprint }
       );
 
-      return { sessionId, csrfToken };
+      return { session_id, csrfToken };
 
     } catch (error) {
       logger.error('Session creation failed:', { component: 'Chanuka' }, error);
@@ -144,10 +144,10 @@ export class SecureSessionService {
    */
   async validateSession(req: Request): Promise<SessionValidationResult> {
     try {
-      const sessionId = req.cookies?.sessionId;
+      const session_id = req.cookies?.session_id;
       const csrfToken = req.cookies?.csrfToken || req.headers['x-csrf-token'];
 
-      if (!sessionId) {
+      if (!session_id) {
         return { isValid: false, error: 'No session ID provided' };
       }
 
@@ -156,7 +156,7 @@ export class SecureSessionService {
         .select()
         .from(sessions)
         .where(and(
-          eq(sessions.id, sessionId),
+          eq(sessions.id, session_id),
           eq(sessions.is_active, true)
         ))
         .limit(1);
@@ -169,7 +169,7 @@ export class SecureSessionService {
 
       // Check if session is expired
       if (new Date() > session.expires_at) {
-        await this.invalidateSession(sessionId);
+        await this.invalidateSession(session_id);
         return { isValid: false, error: 'Session expired' };
       }
 
@@ -179,13 +179,13 @@ export class SecureSessionService {
         const decryptedData = await encryptionService.decryptData(session.token!);
         sessionData = JSON.parse(decryptedData);
       } catch (error) {
-        await this.invalidateSession(sessionId);
+        await this.invalidateSession(session_id);
         return { isValid: false, error: 'Invalid session data' };
       }
 
       // Validate session fingerprint
       const currentFingerprint = this.createSessionFingerprint(req);
-      if (sessionData.fingerprint !== currentFingerprint) { await this.invalidateSession(sessionId);
+      if (sessionData.fingerprint !== currentFingerprint) { await this.invalidateSession(session_id);
         await securityAuditService.logSecurityEvent({
           event_type: 'session_hijack_attempt',
           severity: 'high',
@@ -195,7 +195,7 @@ export class SecureSessionService {
           result: 'blocked',
           success: false,
           details: {
-            sessionId,
+            session_id,
             expectedFingerprint: sessionData.fingerprint,
             actualFingerprint: currentFingerprint
            }
@@ -221,7 +221,7 @@ export class SecureSessionService {
           result: 'allowed',
           success: true,
           details: {
-            sessionId,
+            session_id,
             originalIP: sessionData.ip_address,
             newIP: ip_address
            }
@@ -231,7 +231,7 @@ export class SecureSessionService {
       // Check for inactivity timeout
       const inactivityMinutes = (Date.now() - sessionData.lastActivity.getTime()) / (1000 * 60);
       if (inactivityMinutes > this.maxInactivityMinutes) {
-        await this.invalidateSession(sessionId);
+        await this.invalidateSession(session_id);
         return { 
           isValid: false, 
           error: 'Session expired due to inactivity',
@@ -252,7 +252,7 @@ export class SecureSessionService {
           token: updatedSessionData,
           updated_at: new Date()
         })
-        .where(eq(sessions.id, sessionId));
+        .where(eq(sessions.id, session_id));
 
       return { isValid: true, session: sessionData };
 
@@ -265,7 +265,7 @@ export class SecureSessionService {
   /**
    * Invalidate session
    */
-  async invalidateSession(sessionId: string): Promise<void> {
+  async invalidateSession(session_id: string): Promise<void> {
     try {
       await db
         .update(sessions)
@@ -273,7 +273,7 @@ export class SecureSessionService {
           is_active: false,
           updated_at: new Date()
         })
-        .where(eq(sessions.id, sessionId));
+        .where(eq(sessions.id, session_id));
     } catch (error) {
       logger.error('Session invalidation failed:', { component: 'Chanuka' }, error);
     }

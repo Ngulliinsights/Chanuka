@@ -18,7 +18,7 @@ export interface JourneyStep {
 /**
  * Represents a complete user journey session
  */
-export interface UserJourney { sessionId: string;
+export interface UserJourney { session_id: string;
   user_id?: string;
   user_role: UserRole;
   startTime: Date;
@@ -171,8 +171,8 @@ export class UserJourneyTracker {
   /**
    * Start tracking a new user journey
    */
-  public startJourney(sessionId: string, user_id?: string, user_role: UserRole = 'public'): void { const journey: UserJourney = {
-      sessionId,
+  public startJourney(session_id: string, user_id?: string, user_role: UserRole = 'public'): void { const journey: UserJourney = {
+      session_id,
       user_id,
       user_role,
       startTime: new Date(),
@@ -182,25 +182,25 @@ export class UserJourneyTracker {
       conversionEvents: []
      };
 
-    this.activeJourneys.set(sessionId, journey);
-    this.sessionStartTimes.set(sessionId, new Date());
+    this.activeJourneys.set(session_id, journey);
+    this.sessionStartTimes.set(session_id, new Date());
   }
 
   /**
    * Track a page visit step in the journey
    */
   public trackStep(
-    sessionId: string,
+    session_id: string,
     pageId: string,
     section: NavigationSection,
     referrer?: string,
     interactionCount?: number
   ): void {
-    const journey = this.activeJourneys.get(sessionId);
+    const journey = this.activeJourneys.get(session_id);
     if (!journey) {
       // Auto-start journey if not exists
-      this.startJourney(sessionId);
-      return this.trackStep(sessionId, pageId, section, referrer, interactionCount);
+      this.startJourney(session_id);
+      return this.trackStep(session_id, pageId, section, referrer, interactionCount);
     }
 
     // Calculate time spent on previous page
@@ -227,14 +227,14 @@ export class UserJourneyTracker {
     journey.steps.push(step);
     journey.totalTimeSpent += timeSpent;
 
-    this.pageStartTimes.set(`${sessionId}-${pageId}`, now);
+    this.pageStartTimes.set(`${session_id}-${pageId}`, now);
   }
 
   /**
    * Track a conversion event
    */
-  public trackConversionEvent(sessionId: string, eventName: string): void {
-    const journey = this.activeJourneys.get(sessionId);
+  public trackConversionEvent(session_id: string, eventName: string): void {
+    const journey = this.activeJourneys.get(session_id);
     if (journey && this.conversionEvents.has(eventName)) {
       journey.conversionEvents.push(eventName);
     }
@@ -243,8 +243,8 @@ export class UserJourneyTracker {
   /**
    * Mark a journey as completed
    */
-  public completeJourney(sessionId: string, goalAchieved: boolean = false): void {
-    const journey = this.activeJourneys.get(sessionId);
+  public completeJourney(session_id: string, goalAchieved: boolean = false): void {
+    const journey = this.activeJourneys.get(session_id);
     if (!journey) return;
 
     journey.endTime = new Date();
@@ -263,16 +263,16 @@ export class UserJourneyTracker {
     journey.bounceRate = journey.steps.length <= 1 ? 1 : 0;
 
     // Store completed journey
-    this.journeys.set(sessionId, journey);
-    this.activeJourneys.delete(sessionId);
-    this.sessionStartTimes.delete(sessionId);
+    this.journeys.set(session_id, journey);
+    this.activeJourneys.delete(session_id);
+    this.sessionStartTimes.delete(session_id);
   }
 
   /**
    * End a journey (user left without completing)
    */
-  public endJourney(sessionId: string): void {
-    const journey = this.activeJourneys.get(sessionId);
+  public endJourney(session_id: string): void {
+    const journey = this.activeJourneys.get(session_id);
     if (!journey) return;
 
     // Mark last step as exit point
@@ -280,18 +280,18 @@ export class UserJourneyTracker {
       journey.steps[journey.steps.length - 1].exitPoint = true;
     }
 
-    this.completeJourney(sessionId, false);
+    this.completeJourney(session_id, false);
   }
 
   /**
    * Get journey analytics
    */
   public getJourneyAnalytics(
-    startDate?: Date,
-    endDate?: Date,
+    start_date?: Date,
+    end_date?: Date,
     user_role?: UserRole
   ): JourneyAnalytics {
-    const filteredJourneys = this.getFilteredJourneys(startDate, endDate, user_role);
+    const filteredJourneys = this.getFilteredJourneys(start_date, end_date, user_role);
     
     const totalJourneys = filteredJourneys.length;
     const completedJourneys = filteredJourneys.filter(j => j.completed).length;
@@ -316,13 +316,13 @@ export class UserJourneyTracker {
    * Get filtered journeys based on criteria
    */
   private getFilteredJourneys(
-    startDate?: Date,
-    endDate?: Date,
+    start_date?: Date,
+    end_date?: Date,
     user_role?: UserRole
   ): UserJourney[] {
     return Array.from(this.journeys.values()).filter(journey => {
-      if (startDate && journey.startTime < startDate) return false;
-      if (endDate && journey.startTime > endDate) return false;
+      if (start_date && journey.startTime < start_date) return false;
+      if (end_date && journey.startTime > end_date) return false;
       if (user_role && journey.user_role !== user_role) return false;
       return true;
     });
@@ -528,10 +528,10 @@ export class UserJourneyTracker {
    * Get journey optimization recommendations
    */
   public getOptimizationRecommendations(
-    startDate?: Date,
-    endDate?: Date
+    start_date?: Date,
+    end_date?: Date
   ): JourneyOptimization[] {
-    const analytics = this.getJourneyAnalytics(startDate, endDate);
+    const analytics = this.getJourneyAnalytics(start_date, end_date);
     const recommendations: JourneyOptimization[] = [];
 
     // Analyze drop-off points
@@ -597,8 +597,8 @@ export class UserJourneyTracker {
   /**
    * Get user journey by session ID
    */
-  public getJourney(sessionId: string): UserJourney | undefined {
-    return this.journeys.get(sessionId) || this.activeJourneys.get(sessionId);
+  public getJourney(session_id: string): UserJourney | undefined {
+    return this.journeys.get(session_id) || this.activeJourneys.get(session_id);
   }
 
   /**
@@ -635,7 +635,7 @@ export class UserJourneyTracker {
     ];
     
     const rows = journeys.map(journey => [
-      journey.sessionId,
+      journey.session_id,
       journey.user_id || '',
       journey.user_role,
       journey.startTime.toISOString(),

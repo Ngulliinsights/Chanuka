@@ -12,9 +12,9 @@ import {
   type InsertUserProfile
 } from '../shared/database/connection';
 import { eq, and, or, sql } from 'drizzle-orm';
-import type { StorageConfig } from '../../../infrastructure/database/base/BaseStorage.js';
-import { BaseStorage } from '../../../infrastructure/database/base/BaseStorage.js';
-import { logger  } from '../../../../shared/core/src/index.js';
+import type { StorageConfig } from '@/infrastructure/database/base/BaseStorage.js';
+import { BaseStorage } from '@/infrastructure/database/base/BaseStorage.js';
+import { logger  } from '@shared/core/index.js';
 
 // Additional type definitions needed
 export type OAuthProvider = 'google' | 'github' | 'twitter';
@@ -136,17 +136,17 @@ export class UserStorage extends BaseStorage<User> {
 
   async getUserBySocialProfile(
     provider: OAuthProvider,
-    profileId: string,
+    profile_id: string,
   ): Promise<User | null> {
     // Consider adding caching for frequently accessed social profiles
-    return this.getCached(`user:social:${provider}:${profileId}`, async () => {
+    return this.getCached(`user:social:${provider}:${profile_id}`, async () => {
       const result = await readDatabase
         .select()
         .from(users)
         .innerJoin(userSocialProfiles, eq(users.id, userSocialProfiles.user_id))
         .where(and(
           eq(userSocialProfiles.provider, provider),
-          eq(userSocialProfiles.providerId, profileId)
+          eq(userSocialProfiles.providerId, profile_id)
         ));
 
       if (result.length === 0) return null;

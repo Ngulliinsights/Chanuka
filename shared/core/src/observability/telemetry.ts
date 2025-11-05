@@ -667,7 +667,7 @@ export class UnifiedTelemetryExporter implements TelemetryExporter, TelemetryCol
 
     const metadata: Record<string, unknown> = {};
     if (context.user_id) metadata.user_id = context.user_id;
-    if (context.sessionId) metadata.sessionId = context.sessionId;
+    if (context.session_id) metadata.session_id = context.session_id;
     if (context.requestId) metadata.requestId = context.requestId;
 
     return Object.keys(metadata).length > 0 ? metadata : undefined;

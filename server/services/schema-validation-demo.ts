@@ -1,5 +1,5 @@
 import { schemaValidationService } from '@shared/schema/foundation';
-import { logger  } from '../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 /**
  * Demonstration script showing how to use the SchemaValidationService

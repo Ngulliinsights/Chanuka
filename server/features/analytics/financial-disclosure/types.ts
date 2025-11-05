@@ -35,8 +35,8 @@ export interface FinancialRelationship {
   relationshipType: 'ownership' | 'employment' | 'investment' | 'family' | 'business_partner';
   strength: number; // 0-100 scale indicating connection strength
   financialValue?: number;
-  startDate?: Date;
-  endDate?: Date;
+  start_date?: Date;
+  end_date?: Date;
   is_active: boolean;
   conflictPotential: 'low' | 'medium' | 'high' | 'critical';
 }
@@ -212,8 +212,8 @@ export interface SponsorAffiliation {
   type: 'economic' | 'professional' | 'ownership' | 'family';
   conflictType?: 'ownership' | 'financial' | null;
   is_active: boolean;
-  startDate?: Date;
-  endDate?: Date;
+  start_date?: Date;
+  end_date?: Date;
 }
 
 

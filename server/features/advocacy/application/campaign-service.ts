@@ -7,7 +7,7 @@ import { Campaign, NewCampaign } from '../domain/entities/campaign.js';
 import { CampaignDomainService } from '../domain/services/campaign-domain-service.js';
 import { CampaignFilters, PaginationOptions, CampaignMetrics } from '../types/index.js';
 import { AdvocacyErrors } from '../domain/errors/advocacy-errors.js';
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 export class CampaignService {
   constructor(
@@ -21,7 +21,7 @@ export class CampaignService {
     } catch (error) {
       logger.error('Failed to create campaign', error, { 
         title: data.title,
-        billId: data.billId,
+        bill_id: data.bill_id,
         organizerId: data.organizerId,
         component: 'CampaignService' 
       });
@@ -29,17 +29,17 @@ export class CampaignService {
     }
   }
 
-  async getCampaign(campaignId: string, userId?: string): Promise<Campaign> {
-    const campaign = await this.campaignRepository.findById(campaignId);
+  async getCampaign(campaign_id: string, user_id?: string): Promise<Campaign> {
+    const campaign = await this.campaignRepository.findById(campaign_id);
     if (!campaign) {
-      throw AdvocacyErrors.campaignNotFound(campaignId);
+      throw AdvocacyErrors.campaignNotFound(campaign_id);
     }
 
     // Check access permissions for private campaigns
-    if (!campaign.isPublic && userId !== campaign.organizerId) {
-      const isParticipant = await this.campaignRepository.isParticipant(campaignId, userId || '');
+    if (!campaign.is_public && user_id !== campaign.organizerId) {
+      const isParticipant = await this.campaignRepository.isParticipant(campaign_id, user_id || '');
       if (!isParticipant) {
-        throw AdvocacyErrors.campaignAccessDenied(campaignId, userId || '');
+        throw AdvocacyErrors.campaignAccessDenied(campaign_id, user_id || '');
       }
     }
 
@@ -49,13 +49,13 @@ export class CampaignService {
   async getCampaigns(
     filters?: CampaignFilters, 
     pagination?: PaginationOptions,
-    userId?: string
+    user_id?: string
   ): Promise<Campaign[]> {
     // Apply user-specific filters for private campaigns
     const effectiveFilters = { ...filters };
     
     // If user is not specified, only show public campaigns
-    if (!userId) {
+    if (!user_id) {
       // This would be handled at the repository level with proper SQL filtering
     }
 
@@ -63,27 +63,27 @@ export class CampaignService {
   }
 
   async updateCampaign(
-    campaignId: string, 
+    campaign_id: string, 
     updates: Partial<Campaign>, 
-    userId: string
+    user_id: string
   ): Promise<Campaign> {
-    const campaign = await this.campaignRepository.findById(campaignId);
+    const campaign = await this.campaignRepository.findById(campaign_id);
     if (!campaign) {
-      throw AdvocacyErrors.campaignNotFound(campaignId);
+      throw AdvocacyErrors.campaignNotFound(campaign_id);
     }
 
-    if (campaign.organizerId !== userId) {
-      throw AdvocacyErrors.campaignAccessDenied(campaignId, userId);
+    if (campaign.organizerId !== user_id) {
+      throw AdvocacyErrors.campaignAccessDenied(campaign_id, user_id);
     }
 
     // Validate updates
     if (updates.status && updates.status !== campaign.status) {
-      return await this.campaignDomainService.updateCampaignStatus(campaignId, updates.status, userId);
+      return await this.campaignDomainService.updateCampaignStatus(campaign_id, updates.status, user_id);
     }
 
-    const updatedCampaign = await this.campaignRepository.update(campaignId, {
+    const updatedCampaign = await this.campaignRepository.update(campaign_id, {
       ...updates,
-      updatedAt: new Date()
+      updated_at: new Date()
     });
 
     if (!updatedCampaign) {
@@ -91,7 +91,7 @@ export class CampaignService {
     }
 
     logger.info('Campaign updated', { 
-      campaignId, 
+      campaign_id, 
       updates: Object.keys(updates),
       component: 'CampaignService' 
     });
@@ -99,14 +99,14 @@ export class CampaignService {
     return updatedCampaign;
   }
 
-  async deleteCampaign(campaignId: string, userId: string): Promise<boolean> {
-    const campaign = await this.campaignRepository.findById(campaignId);
+  async deleteCampaign(campaign_id: string, user_id: string): Promise<boolean> {
+    const campaign = await this.campaignRepository.findById(campaign_id);
     if (!campaign) {
-      throw AdvocacyErrors.campaignNotFound(campaignId);
+      throw AdvocacyErrors.campaignNotFound(campaign_id);
     }
 
-    if (campaign.organizerId !== userId) {
-      throw AdvocacyErrors.campaignAccessDenied(campaignId, userId);
+    if (campaign.organizerId !== user_id) {
+      throw AdvocacyErrors.campaignAccessDenied(campaign_id, user_id);
     }
 
     // Only allow deletion of draft campaigns or campaigns with no participants
@@ -114,52 +114,52 @@ export class CampaignService {
       throw AdvocacyErrors.campaignStatus(campaign.status, 'delete');
     }
 
-    const success = await this.campaignRepository.delete(campaignId);
+    const success = await this.campaignRepository.delete(campaign_id);
     
     if (success) {
-      logger.info('Campaign deleted', { campaignId, component: 'CampaignService' });
+      logger.info('Campaign deleted', { campaign_id, component: 'CampaignService' });
     }
 
     return success;
   }
 
-  async joinCampaign(campaignId: string, userId: string): Promise<boolean> {
-    return await this.campaignDomainService.joinCampaign(campaignId, userId);
+  async joinCampaign(campaign_id: string, user_id: string): Promise<boolean> {
+    return await this.campaignDomainService.joinCampaign(campaign_id, user_id);
   }
 
-  async leaveCampaign(campaignId: string, userId: string): Promise<boolean> {
-    return await this.campaignDomainService.leaveCampaign(campaignId, userId);
+  async leaveCampaign(campaign_id: string, user_id: string): Promise<boolean> {
+    return await this.campaignDomainService.leaveCampaign(campaign_id, user_id);
   }
 
-  async getCampaignsByBill(billId: string, filters?: CampaignFilters): Promise<Campaign[]> {
-    return await this.campaignRepository.findByBillId(billId, filters);
+  async getCampaignsByBill(bill_id: string, filters?: CampaignFilters): Promise<Campaign[]> {
+    return await this.campaignRepository.findByBillId(bill_id, filters);
   }
 
-  async getCampaignsByUser(userId: string, filters?: CampaignFilters): Promise<{
+  async getCampaignsByUser(user_id: string, filters?: CampaignFilters): Promise<{
     organized: Campaign[];
     participating: Campaign[];
   }> {
     const [organized, participating] = await Promise.all([
-      this.campaignRepository.findByOrganizer(userId, filters),
-      this.campaignRepository.findByParticipant(userId, filters)
+      this.campaignRepository.findByOrganizer(user_id, filters),
+      this.campaignRepository.findByParticipant(user_id, filters)
     ]);
 
     return { organized, participating };
   }
 
-  async getCampaignMetrics(campaignId: string, userId: string): Promise<CampaignMetrics> {
-    const campaign = await this.getCampaign(campaignId, userId);
-    return await this.campaignDomainService.updateCampaignMetrics(campaignId);
+  async getCampaignMetrics(campaign_id: string, user_id: string): Promise<CampaignMetrics> {
+    const campaign = await this.getCampaign(campaign_id, user_id);
+    return await this.campaignDomainService.updateCampaignMetrics(campaign_id);
   }
 
-  async getCampaignAnalytics(campaignId: string, userId: string): Promise<any> {
-    const campaign = await this.getCampaign(campaignId, userId);
+  async getCampaignAnalytics(campaign_id: string, user_id: string): Promise<any> {
+    const campaign = await this.getCampaign(campaign_id, user_id);
     
-    if (campaign.organizerId !== userId) {
-      throw AdvocacyErrors.campaignAccessDenied(campaignId, userId);
+    if (campaign.organizerId !== user_id) {
+      throw AdvocacyErrors.campaignAccessDenied(campaign_id, user_id);
     }
 
-    return await this.campaignDomainService.getCampaignAnalytics(campaignId);
+    return await this.campaignDomainService.getCampaignAnalytics(campaign_id);
   }
 
   async searchCampaigns(
@@ -174,40 +174,40 @@ export class CampaignService {
     return await this.campaignRepository.findTrending(limit);
   }
 
-  async getRecommendedCampaigns(userId: string, limit: number = 10): Promise<Campaign[]> {
-    return await this.campaignRepository.findRecommended(userId, limit);
+  async getRecommendedCampaigns(user_id: string, limit: number = 10): Promise<Campaign[]> {
+    return await this.campaignRepository.findRecommended(user_id, limit);
   }
 
   async getCampaignParticipants(
-    campaignId: string, 
-    userId: string,
+    campaign_id: string, 
+    user_id: string,
     pagination?: PaginationOptions
   ): Promise<any[]> {
-    const campaign = await this.getCampaign(campaignId, userId);
+    const campaign = await this.getCampaign(campaign_id, user_id);
     
     // Only organizers can see full participant list
-    if (campaign.organizerId !== userId) {
-      throw AdvocacyErrors.campaignAccessDenied(campaignId, userId);
+    if (campaign.organizerId !== user_id) {
+      throw AdvocacyErrors.campaignAccessDenied(campaign_id, user_id);
     }
 
-    return await this.campaignRepository.getParticipants(campaignId, pagination);
+    return await this.campaignRepository.getParticipants(campaign_id, pagination);
   }
 
   async flagCampaignForReview(
-    campaignId: string, 
+    campaign_id: string, 
     reason: string, 
     reporterId: string
   ): Promise<boolean> {
-    const campaign = await this.campaignRepository.findById(campaignId);
+    const campaign = await this.campaignRepository.findById(campaign_id);
     if (!campaign) {
-      throw AdvocacyErrors.campaignNotFound(campaignId);
+      throw AdvocacyErrors.campaignNotFound(campaign_id);
     }
 
-    const success = await this.campaignRepository.flagForReview(campaignId, reason, reporterId);
+    const success = await this.campaignRepository.flagForReview(campaign_id, reason, reporterId);
     
     if (success) {
       logger.info('Campaign flagged for review', { 
-        campaignId, 
+        campaign_id, 
         reason, 
         reporterId,
         component: 'CampaignService' 

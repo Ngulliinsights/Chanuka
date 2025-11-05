@@ -20,8 +20,8 @@ vi.mock('@shared/core/src/observability/logging', () => ({
 }));
 
 import { z } from 'zod';
-import {
 import { logger } from '@shared/core/src/observability/logging';
+import {
   emailSchema,
   passwordSchema,
   strongPasswordSchema,
@@ -271,8 +271,8 @@ describe('Common Validation Schemas', () => {
   describe('Date Range Schema', () => {
     it('should validate correct date ranges', () => {
       const validRange = {
-        startDate: '2023-01-01',
-        endDate: '2023-12-31',
+        start_date: '2023-01-01',
+        end_date: '2023-12-31',
       };
 
       const result = dateRangeSchema.safeParse(validRange);
@@ -281,8 +281,8 @@ describe('Common Validation Schemas', () => {
 
     it('should reject invalid date ranges', () => {
       const invalidRange = {
-        startDate: '2023-12-31',
-        endDate: '2023-01-01',
+        start_date: '2023-12-31',
+        end_date: '2023-01-01',
       };
 
       const result = dateRangeSchema.safeParse(invalidRange);

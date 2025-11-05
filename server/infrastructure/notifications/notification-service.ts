@@ -1,6 +1,6 @@
 import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 import * as admin from 'firebase-admin';
-import { logger } from '../../../shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 import { 
   NotificationChannelService, 
   ChannelDeliveryRequest, 
@@ -124,17 +124,17 @@ export class NotificationService extends NotificationChannelService {
    * Enhanced SMS sending via AWS SNS
    * Overrides the parent class method to use real AWS SNS
    */
-  protected async sendViaAWSSNS(phoneNumber: string, message: string): Promise<string> {
+  protected async sendViaAWSSNS(phone_number: string, message: string): Promise<string> {
     if (!this.snsClient) {
       if (this.config.fallbackToMock) {
-        return super['sendViaAWSSNS'](phoneNumber, message);
+        return super['sendViaAWSSNS'](phone_number, message);
       }
       throw new Error('AWS SNS client not initialized');
     }
 
     try {
       // Validate phone number format (E.164)
-      const cleanPhoneNumber = this.normalizePhoneNumber(phoneNumber);
+      const cleanPhoneNumber = this.normalizePhoneNumber(phone_number);
       
       const command = new PublishCommand({
         Message: message,
@@ -156,14 +156,14 @@ export class NotificationService extends NotificationChannelService {
       logger.info('✅ SMS sent via AWS SNS', {
         component: 'NotificationService',
         messageId: result.MessageId,
-        phoneNumber: this.maskPhoneNumber(cleanPhoneNumber)
+        phone_number: this.maskPhoneNumber(cleanPhoneNumber)
       });
 
       return result.MessageId || `sns-${Date.now()}`;
     } catch (error) {
       logger.error('❌ AWS SNS SMS delivery failed:', {
         component: 'NotificationService',
-        phoneNumber: this.maskPhoneNumber(phoneNumber)
+        phone_number: this.maskPhoneNumber(phone_number)
       }, error);
 
       // Check if error is retryable
@@ -174,7 +174,7 @@ export class NotificationService extends NotificationChannelService {
       // For non-retryable errors, fallback to mock if enabled
       if (this.config.fallbackToMock) {
         logger.warn('⚠️ Falling back to mock SMS due to AWS error', { component: 'NotificationService' });
-        return super['sendViaAWSSNS'](phoneNumber, message);
+        return super['sendViaAWSSNS'](phone_number, message);
       }
 
       throw new Error(`AWS SNS delivery failed: ${error instanceof Error ? error.message : String(error)}`);
@@ -271,7 +271,7 @@ export class NotificationService extends NotificationChannelService {
   /**
    * Normalize phone number to E.164 format
    */
-  private normalizePhoneNumber(phoneNumber: string): string {
+  private normalizePhoneNumber(phone_number: string): string {
     // Remove all non-digit characters
     const digits = phoneNumber.replace(/\D/g, '');
     
@@ -287,16 +287,16 @@ export class NotificationService extends NotificationChannelService {
     }
     
     // For other countries, assume it's already in correct format
-    return phoneNumber.startsWith('+') ? phoneNumber : `+${digits}`;
+    return phoneNumber.startsWith('+') ? phone_number: `+${digits}`;
   }
 
   /**
    * Mask phone number for logging (privacy protection)
    */
-  private maskPhoneNumber(phoneNumber: string): string {
-    if (phoneNumber.length <= 4) return phoneNumber;
+  private maskPhoneNumber(phone_number: string): string {
+    if (phone_number.length <= 4) return phoneNumber;
     const start = phoneNumber.substring(0, 4);
-    const end = phoneNumber.substring(phoneNumber.length - 2);
+    const end = phoneNumber.substring(phone_number.length - 2);
     return `${start}***${end}`;
   }
 

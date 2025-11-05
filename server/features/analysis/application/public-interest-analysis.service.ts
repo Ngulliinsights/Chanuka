@@ -1,4 +1,4 @@
-import { logger } from '../../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 // Import result types from other analysis services
 import type { StakeholderAnalysisResult, EconomicImpact, SocialImpact } from './stakeholder-analysis.service.js';
 import type { TransparencyScoreResult } from './transparency-analysis.service.js';

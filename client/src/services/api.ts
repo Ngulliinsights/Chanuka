@@ -74,7 +74,7 @@ class ApiService {
         if (response.status === 401) {
           // Unauthorized - clear token and redirect to auth
           localStorage.removeItem('token');
-          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('refresh_token');
           if (window.location.pathname !== '/auth') {
             window.location.href = '/auth';
           }

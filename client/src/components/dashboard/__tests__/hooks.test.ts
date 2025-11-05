@@ -293,13 +293,13 @@ describe('Dashboard Hooks', () => {
     it('should sort actions by due date', () => {
       const actionsWithDueDates = mockActions.map((action, index) => ({
         ...action,
-        dueDate: new Date(Date.now() + (index + 1) * 24 * 60 * 60 * 1000) // Different due dates
+        due_date: new Date(Date.now() + (index + 1) * 24 * 60 * 60 * 1000) // Different due dates
       }));
 
       const { result } = renderHook(() => useDashboardActions(actionsWithDueDates));
 
       const sortedActions = result.current.operations.sortByDueDate();
-      expect(sortedActions[0].dueDate!.getTime()).toBeLessThan(sortedActions[1].dueDate!.getTime());
+      expect(sortedActions[0].due_date!.getTime()).toBeLessThan(sortedActions[1].due_date!.getTime());
     });
 
     it('should sort actions by priority', () => {

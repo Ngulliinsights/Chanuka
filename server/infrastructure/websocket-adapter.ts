@@ -9,9 +9,9 @@ import { Server } from 'http';
 import { IncomingMessage } from 'http';
 import * as jwt from 'jsonwebtoken';
 import { database as db } from '../../shared/database/connection.js';
-import { User, users } from '../../shared/schema/foundation';
+import { User, users } from '@shared/schema/foundation';
 import { eq } from 'drizzle-orm';
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 import { webSocketService } from './websocket.js';
 
 interface ConnectionState {

@@ -8,13 +8,13 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import * as Boom from '@hapi/boom';
 import { billService, BillNotFoundError, CommentNotFoundError, ValidationError } from '../application/bills.js';
-import { authenticateToken } from '../../../middleware/auth.js';
-import { asyncErrorHandler } from '../../../middleware/boom-error-middleware.js';
-import type { AuthenticatedRequest } from '../../../middleware/auth.js';
-import { errorAdapter } from '../../../infrastructure/errors/error-adapter.js';
-import { logger } from '../../../../shared/core/src/index.js';
+import { authenticateToken } from '@/middleware/auth.js';
+import { asyncErrorHandler } from '@/middleware/boom-error-middleware.js';
+import type { AuthenticatedRequest } from '@/middleware/auth.js';
+import { errorAdapter } from '@/infrastructure/errors/error-adapter.js';
+import { logger } from '@shared/core/index.js';
 import { securityAuditService } from '../../security/security-audit-service.js';
-import type { Bill, BillComment } from '../../../../shared/schema';
+import type { Bill, BillComment } from '@/shared/schema';
 
 const router = Router();
 
@@ -145,18 +145,18 @@ router.get('/', asyncErrorHandler(async (req: Request, res: Response) => {
  * Retrieve a specific bill by ID and increment its view count
  */
 router.get('/:id', asyncErrorHandler(async (req: Request, res: Response) => {
-  const billId = parseIntParam(req.params.id, 'Bill ID');
+  const bill_id = parseIntParam(req.params.id, 'Bill ID');
 
   let bill;
   try {
-    bill = await billService.getBill(billId);
+    bill = await billService.getBill(bill_id);
   } catch (error) {
     mapDomainErrorToBoom(error);
   }
 
   // Log data access
   await securityAuditService.logDataAccess(
-    `bill:${billId}`,
+    `bill:${bill_id}`,
     'read',
     req,
     (req as any).user?.id,
@@ -165,8 +165,8 @@ router.get('/:id', asyncErrorHandler(async (req: Request, res: Response) => {
   );
 
   // Fire-and-forget pattern for view count
-  billService.incrementBillViews(billId).catch(err =>
-    logger.error('Failed to increment bill views:', { bill_id: billId }, err)
+  billService.incrementBillViews(bill_id).catch(err =>
+    logger.error('Failed to increment bill views:', { bill_id: bill_id }, err)
   );
 
   res.json({
@@ -227,11 +227,11 @@ router.post('/', authenticateToken, asyncErrorHandler(async (req: AuthenticatedR
  * Increment share count for a bill
  */
 router.post('/:id/share', asyncErrorHandler(async (req: Request, res: Response) => {
-  const billId = parseIntParam(req.params.id, 'Bill ID');
+  const bill_id = parseIntParam(req.params.id, 'Bill ID');
 
   let updatedBill;
   try {
-    updatedBill = await billService.incrementBillShares(billId);
+    updatedBill = await billService.incrementBillShares(bill_id);
   } catch (error) {
     mapDomainErrorToBoom(error);
   }
@@ -251,7 +251,7 @@ router.post('/:id/share', asyncErrorHandler(async (req: Request, res: Response) 
  * Retrieve all comments for a specific bill with optional filtering
  */
 router.get('/:id/comments', asyncErrorHandler(async (req: Request, res: Response) => {
-  const billId = parseIntParam(req.params.id, 'Bill ID');
+  const bill_id = parseIntParam(req.params.id, 'Bill ID');
   const { highlighted, sortBy } = req.query;
 
   // Validate query parameters
@@ -261,7 +261,7 @@ router.get('/:id/comments', asyncErrorHandler(async (req: Request, res: Response
 
   let commentsRaw;
   try {
-    commentsRaw = await billService.getBillComments(billId);
+    commentsRaw = await billService.getBillComments(bill_id);
   } catch (error) {
     mapDomainErrorToBoom(error);
   }
@@ -286,7 +286,7 @@ router.get('/:id/comments', asyncErrorHandler(async (req: Request, res: Response
     data: {
       comments,
       count: comments.length,
-      bill_id: billId,
+      bill_id: bill_id,
       filters: { highlighted: highlighted === 'true', sortBy: sortKey }
     }
   });
@@ -301,7 +301,7 @@ router.post('/:id/comments', authenticateToken, asyncErrorHandler(async (req: Au
     throw Boom.unauthorized('Authentication required');
   }
 
-  const billId = parseIntParam(req.params.id, 'Bill ID');
+  const bill_id = parseIntParam(req.params.id, 'Bill ID');
 
   // Validate parent comment ID if this is a reply
   if (req.body.parent_id !== undefined) {
@@ -310,7 +310,7 @@ router.post('/:id/comments', authenticateToken, asyncErrorHandler(async (req: Au
 
   const commentData = {
     ...req.body,
-    bill_id: billId,
+    bill_id: bill_id,
     user_id: req.user.id
   };
 
@@ -324,7 +324,7 @@ router.post('/:id/comments', authenticateToken, asyncErrorHandler(async (req: Au
   // Log comment creation
   logger.info('Comment created', {
     comment_id: newComment.id,
-    bill_id: billId,
+    bill_id: bill_id,
     user_id: req.user.id,
     isReply: !!req.body.parent_id
   });
@@ -343,11 +343,11 @@ router.post('/:id/comments', authenticateToken, asyncErrorHandler(async (req: Au
  * Get all replies to a specific comment
  */
 router.get('/comments/:comment_id/replies', asyncErrorHandler(async (req: Request, res: Response) => {
-  const commentId = parseIntParam(req.params.comment_id, 'Comment ID');
+  const comment_id = parseIntParam(req.params.comment_id, 'Comment ID');
 
   let replies;
   try {
-    replies = await billService.getCommentReplies(commentId);
+    replies = await billService.getCommentReplies(comment_id);
   } catch (error) {
     mapDomainErrorToBoom(error);
   }
@@ -357,7 +357,7 @@ router.get('/comments/:comment_id/replies', asyncErrorHandler(async (req: Reques
     data: {
       replies,
       count: replies.length,
-      parent_id: commentId
+      parent_id: comment_id
     }
   });
 }));
@@ -371,7 +371,7 @@ router.put('/comments/:comment_id/endorsements', authenticateToken, asyncErrorHa
     throw Boom.unauthorized('Authentication required');
   }
 
-  const commentId = parseIntParam(req.params.comment_id, 'Comment ID');
+  const comment_id = parseIntParam(req.params.comment_id, 'Comment ID');
   const { endorsements } = req.body;
 
   // Validate endorsements
@@ -381,7 +381,7 @@ router.put('/comments/:comment_id/endorsements', authenticateToken, asyncErrorHa
 
   let updatedComment;
   try {
-    updatedComment = await billService.updateBillCommentEndorsements(commentId, endorsements);
+    updatedComment = await billService.updateBillCommentEndorsements(comment_id, endorsements);
   } catch (error) {
     mapDomainErrorToBoom(error);
   }
@@ -404,7 +404,7 @@ router.put('/comments/:comment_id/highlight', authenticateToken, asyncErrorHandl
     throw Boom.unauthorized('Authentication required');
   }
 
-  const commentId = parseIntParam(req.params.comment_id, 'Comment ID');
+  const comment_id = parseIntParam(req.params.comment_id, 'Comment ID');
 
   // Check permissions
   if (req.user.role !== 'admin' && req.user.role !== 'moderator') {
@@ -413,14 +413,14 @@ router.put('/comments/:comment_id/highlight', authenticateToken, asyncErrorHandl
 
   let updatedComment;
   try {
-    updatedComment = await billService.highlightComment(commentId);
+    updatedComment = await billService.highlightComment(comment_id);
   } catch (error) {
     mapDomainErrorToBoom(error);
   }
 
   // Log highlight action
   logger.info('Comment highlighted', {
-    comment_id: commentId,
+    comment_id: comment_id,
     user_id: req.user.id,
     user_role: req.user.role
   });
@@ -443,7 +443,7 @@ router.delete('/comments/:comment_id/highlight', authenticateToken, asyncErrorHa
     throw Boom.unauthorized('Authentication required');
   }
 
-  const commentId = parseIntParam(req.params.comment_id, 'Comment ID');
+  const comment_id = parseIntParam(req.params.comment_id, 'Comment ID');
 
   if (req.user.role !== 'admin' && req.user.role !== 'moderator') {
     throw Boom.forbidden('Insufficient permissions to unhighlight comments');
@@ -451,13 +451,13 @@ router.delete('/comments/:comment_id/highlight', authenticateToken, asyncErrorHa
 
   let updatedComment;
   try {
-    updatedComment = await billService.unhighlightComment(commentId);
+    updatedComment = await billService.unhighlightComment(comment_id);
   } catch (error) {
     mapDomainErrorToBoom(error);
   }
 
   logger.info('Comment unhighlighted', {
-    comment_id: commentId,
+    comment_id: comment_id,
     user_id: req.user.id
   });
 

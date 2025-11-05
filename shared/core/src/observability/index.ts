@@ -21,4 +21,33 @@ export * from './error-management';
 export * from './metrics';
 export * from './tracing';
 
+// Re-export specific types to resolve ambiguities
+export type {
+  LogContext,
+  LogLevel,
+  MetricsConfig,
+  Span,
+  SpanContext,
+  SpanKind,
+  SpanOptions,
+  SpanStatus,
+  Tracer,
+  TracingConfig
+} from './interfaces';
+
+export type {
+  DEFAULT_CONFIG as MetricsDefaultConfig
+} from './metrics/types';
+
+export type {
+  SamplingConfig as TelemetrySamplingConfig,
+  SamplingRule as TelemetrySamplingRule
+} from './telemetry';
+
+// Explicit re-exports to resolve naming conflicts
+export { createCorrelationMiddleware } from './middleware';
+export { generateTraceId } from './correlation';
+export { DEFAULT_CONFIG } from './metrics/types';
+export type { SamplingConfig, SamplingRule } from './telemetry';
+
 

@@ -1,13 +1,15 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-  // Relax some strictness temporarily to reduce noise during refactor
+    // Relax some strictness temporarily to reduce noise during refactor
     "noEmit": true,
     "skipLibCheck": true,
-  "strict": true,
+    "strict": true,
     "esModuleInterop": true,
     "allowImportingTsExtensions": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "target": "ES2022",
+    "lib": ["ES2022", "dom", "dom.iterable"]
   },
   "include": [
     "server/**/*.ts",

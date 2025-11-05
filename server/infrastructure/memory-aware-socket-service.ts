@@ -5,7 +5,7 @@
 // Provides automatic memory optimization triggers and connection management
 
 import { EventEmitter } from 'events';
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 import { BatchingService, BatchableMessage } from './batching-service.js';
 
 // cSpell:ignore Batchable BatchableMessage
@@ -40,12 +40,12 @@ export interface OptimizationAction {
 
 export interface ConnectionInfo {
   id: string;
-  userId: string;
+  user_id: string;
   lastActivity: number;
   messageCount: number;
   bufferSize: number;
   priority: number;
-  createdAt: number;
+  created_at: number;
 }
 
 export interface ServiceConfig {
@@ -160,7 +160,7 @@ export class MemoryAwareSocketService extends EventEmitter {
    * Register a new WebSocket connection for monitoring.
    * This adds the connection to our tracking system and initializes its message buffer.
    */
-  registerConnection(connectionId: string, userId: string, priority: number = 1): void {
+  registerConnection(connectionId: string, user_id: string, priority: number = 1): void {
     if (this.isShuttingDown) {
       logger.warn('Cannot register connection during shutdown', {
         component: 'MemoryAwareSocketService',
@@ -171,12 +171,12 @@ export class MemoryAwareSocketService extends EventEmitter {
 
     const connectionInfo: ConnectionInfo = {
       id: connectionId,
-      userId,
+      user_id,
       lastActivity: Date.now(),
       messageCount: 0,
       bufferSize: 0,
       priority: Math.max(1, Math.min(10, priority)), // Clamp priority between 1-10
-      createdAt: Date.now()
+      created_at: Date.now()
     };
 
     this.connections.set(connectionId, connectionInfo);
@@ -185,7 +185,7 @@ export class MemoryAwareSocketService extends EventEmitter {
     logger.debug('Connection registered', {
       component: 'MemoryAwareSocketService',
       connectionId,
-      userId,
+      user_id,
       priority: connectionInfo.priority,
       totalConnections: this.connections.size
     });
@@ -216,7 +216,7 @@ export class MemoryAwareSocketService extends EventEmitter {
     logger.debug('Connection unregistered', {
       component: 'MemoryAwareSocketService',
       connectionId,
-      userId: connection.userId,
+      user_id: connection.user_id,
       totalConnections: this.connections.size
     });
   }

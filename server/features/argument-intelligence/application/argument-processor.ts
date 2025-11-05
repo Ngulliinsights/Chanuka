@@ -3,7 +3,7 @@
 // ============================================================================
 // Main orchestration service for processing citizen comments into structured arguments
 
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 import { StructureExtractorService } from './structure-extractor.js';
 import { ClusteringService } from './clustering-service.js';
 import { EvidenceValidatorService } from './evidence-validator.js';
@@ -14,10 +14,10 @@ import { ArgumentRepository } from '../infrastructure/repositories/argument-repo
 import { BriefRepository } from '../infrastructure/repositories/brief-repository.js';
 
 export interface CommentProcessingRequest {
-  commentId: string;
-  billId: string;
+  comment_id: string;
+  bill_id: string;
   commentText: string;
-  userId: string;
+  user_id: string;
   userDemographics?: {
     county?: string;
     ageGroup?: string;
@@ -27,13 +27,13 @@ export interface CommentProcessingRequest {
   submissionContext?: {
     submissionMethod: 'web' | 'ussd' | 'ambassador' | 'api';
     timestamp: Date;
-    sessionId?: string;
+    session_id?: string;
   };
 }
 
 export interface ArgumentProcessingResult {
-  commentId: string;
-  billId: string;
+  comment_id: string;
+  bill_id: string;
   extractedArguments: ExtractedArgument[];
   identifiedClaims: string[];
   coalitionPotential: CoalitionMatch[];
@@ -64,7 +64,7 @@ export interface CoalitionMatch {
 }
 
 export interface BillArgumentSynthesis {
-  billId: string;
+  bill_id: string;
   majorClaims: SynthesizedClaim[];
   evidenceBase: EvidenceAssessment[];
   stakeholderPositions: StakeholderPosition[];
@@ -120,15 +120,15 @@ export class ArgumentProcessor {
     try {
       logger.info(`🧠 Processing comment for argument extraction`, {
         component: 'ArgumentProcessor',
-        commentId: request.commentId,
-        billId: request.billId
+        comment_id: request.comment_id,
+        bill_id: request.bill_id
       });
 
       // Step 1: Extract argumentative structure from comment
       const extractedArguments = await this.structureExtractor.extractArguments(
         request.commentText,
         {
-          billId: request.billId,
+          bill_id: request.bill_id,
           userContext: request.userDemographics,
           submissionContext: request.submissionContext
         }
@@ -155,12 +155,12 @@ export class ArgumentProcessor {
 
       // Step 6: Trigger bill synthesis update if significant new arguments
       if (this.shouldUpdateBillSynthesis(extractedArguments)) {
-        this.triggerBillSynthesisUpdate(request.billId);
+        this.triggerBillSynthesisUpdate(request.bill_id);
       }
 
       const result: ArgumentProcessingResult = {
-        commentId: request.commentId,
-        billId: request.billId,
+        comment_id: request.comment_id,
+        bill_id: request.bill_id,
         extractedArguments,
         identifiedClaims,
         coalitionPotential,
@@ -169,7 +169,7 @@ export class ArgumentProcessor {
 
       logger.info(`✅ Comment processing completed`, {
         component: 'ArgumentProcessor',
-        commentId: request.commentId,
+        comment_id: request.comment_id,
         argumentsExtracted: extractedArguments.length,
         processingTime: processingMetrics.processingTime
       });
@@ -179,7 +179,7 @@ export class ArgumentProcessor {
     } catch (error) {
       logger.error(`❌ Comment processing failed`, {
         component: 'ArgumentProcessor',
-        commentId: request.commentId,
+        comment_id: request.comment_id,
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
@@ -189,15 +189,15 @@ export class ArgumentProcessor {
   /**
    * Generate comprehensive argument synthesis for a bill
    */
-  async synthesizeBillArguments(billId: string): Promise<BillArgumentSynthesis> {
+  async synthesizeBillArguments(bill_id: string): Promise<BillArgumentSynthesis> {
     try {
       logger.info(`🔄 Synthesizing arguments for bill`, {
         component: 'ArgumentProcessor',
-        billId
+        bill_id
       });
 
       // Step 1: Retrieve all arguments for the bill
-      const billArguments = await this.argumentRepo.getArgumentsByBill(billId);
+      const billArguments = await this.argumentRepo.getArgumentsByBill(bill_id);
 
       // Step 2: Cluster similar arguments
       const clusteredArguments = await this.clusteringService.clusterArguments(billArguments);
@@ -223,7 +223,7 @@ export class ArgumentProcessor {
 
       // Step 8: Generate legislative brief
       const legislativeBrief = await this.briefGenerator.generateBrief({
-        billId,
+        bill_id,
         majorClaims,
         evidenceBase,
         stakeholderPositions: balancedPositions,
@@ -232,7 +232,7 @@ export class ArgumentProcessor {
       });
 
       const synthesis: BillArgumentSynthesis = {
-        billId,
+        bill_id,
         majorClaims,
         evidenceBase,
         stakeholderPositions: balancedPositions,
@@ -247,7 +247,7 @@ export class ArgumentProcessor {
 
       logger.info(`✅ Bill argument synthesis completed`, {
         component: 'ArgumentProcessor',
-        billId,
+        bill_id,
         majorClaims: majorClaims.length,
         stakeholderGroups: balancedPositions.length
       });
@@ -257,7 +257,7 @@ export class ArgumentProcessor {
     } catch (error) {
       logger.error(`❌ Bill argument synthesis failed`, {
         component: 'ArgumentProcessor',
-        billId,
+        bill_id,
         error: error instanceof Error ? error.message : String(error)
       });
       throw error;
@@ -267,15 +267,15 @@ export class ArgumentProcessor {
   /**
    * Get argument map for bill visualization
    */
-  async getArgumentMap(billId: string): Promise<{
+  async getArgumentMap(bill_id: string): Promise<{
     claims: SynthesizedClaim[];
     relationships: ArgumentRelationship[];
     stakeholders: StakeholderPosition[];
     evidenceNetwork: EvidenceNetwork;
   }> {
-    const synthesis = await this.briefRepo.getBillSynthesis(billId);
+    const synthesis = await this.briefRepo.getBillSynthesis(bill_id);
     if (!synthesis) {
-      throw new Error(`No argument synthesis found for bill ${billId}`);
+      throw new Error(`No argument synthesis found for bill ${bill_id}`);
     }
 
     const relationships = await this.identifyArgumentRelationships(synthesis.majorClaims);
@@ -307,9 +307,9 @@ export class ArgumentProcessor {
     for (const argument of arguments) {
       await this.argumentRepo.storeArgument({
         id: argument.id,
-        commentId: request.commentId,
-        billId: request.billId,
-        userId: request.userId,
+        comment_id: request.comment_id,
+        bill_id: request.bill_id,
+        user_id: request.user_id,
         argumentType: argument.type,
         position: argument.position,
         extractedText: argument.text,
@@ -318,7 +318,7 @@ export class ArgumentProcessor {
         affectedGroups: argument.affectedGroups,
         extractionConfidence: argument.confidence,
         evidenceQuality: argument.evidenceQuality,
-        createdAt: new Date()
+        created_at: new Date()
       });
     }
   }
@@ -359,19 +359,19 @@ export class ArgumentProcessor {
     );
   }
 
-  private async triggerBillSynthesisUpdate(billId: string): Promise<void> {
+  private async triggerBillSynthesisUpdate(bill_id: string): Promise<void> {
     // Queue background job to update bill synthesis
     logger.info(`🔄 Queuing bill synthesis update`, {
       component: 'ArgumentProcessor',
-      billId
+      bill_id
     });
     
     // This would typically use a job queue like Bull or Agenda
     setTimeout(() => {
-      this.synthesizeBillArguments(billId).catch(error => {
+      this.synthesizeBillArguments(bill_id).catch(error => {
         logger.error(`Background synthesis update failed`, {
           component: 'ArgumentProcessor',
-          billId,
+          bill_id,
           error: error instanceof Error ? error.message : String(error)
         });
       });
@@ -409,7 +409,7 @@ export class ArgumentProcessor {
       position: this.determineGroupPosition(args),
       keyArguments: this.extractKeyArguments(args),
       evidenceProvided: this.extractEvidence(args),
-      participantCount: new Set(args.map(a => a.userId)).size
+      participantCount: new Set(args.map(a => a.user_id)).size
     }));
   }
 

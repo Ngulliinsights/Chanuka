@@ -18,8 +18,8 @@ export const migrationPhases = pgTable('migration_phases', {
   rolloutPercentage: decimal('rollout_percentage', { precision: 5, scale: 2 }).default('0.00'),
   startTime: timestamp('start_time'),
   completionTime: timestamp('completion_time'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow()
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow()
 });
 
 /**
@@ -36,8 +36,8 @@ export const migrationComponents = pgTable('migration_components', {
   newImplementation: text('new_implementation'),
   startTime: timestamp('start_time'),
   completionTime: timestamp('completion_time'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow()
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow()
 });
 
 /**
@@ -55,7 +55,7 @@ export const dataValidationCheckpoints = pgTable('data_validation_checkpoints', 
   executionTime: integer('execution_time_ms'),
   startTime: timestamp('start_time'),
   completionTime: timestamp('completion_time'),
-  createdAt: timestamp('created_at').defaultNow()
+  created_at: timestamp('created_at').defaultNow()
 });
 
 /**
@@ -69,7 +69,7 @@ export const migrationMetrics = pgTable('migration_metrics', {
   value: decimal('value', { precision: 15, scale: 6 }).notNull(),
   unit: text('unit'), // 'ms', 'percent', 'bytes', etc.
   cohort: text('cohort'), // 'control', 'treatment' for A/B testing
-  userId: text('user_id'), // For user-specific metrics
+  user_id: text('user_id'), // For user-specific metrics
   timestamp: timestamp('timestamp').defaultNow(),
   metadata: jsonb('metadata') // Additional context data
 });
@@ -80,7 +80,7 @@ export const migrationMetrics = pgTable('migration_metrics', {
 export const abTestingCohorts = pgTable('ab_testing_cohorts', {
   id: uuid('id').primaryKey().defaultRandom(),
   componentId: uuid('component_id').references(() => migrationComponents.id),
-  userId: text('user_id').notNull(),
+  user_id: text('user_id').notNull(),
   cohort: text('cohort').notNull(), // 'control' or 'treatment'
   assignedAt: timestamp('assigned_at').defaultNow(),
   userHash: integer('user_hash').notNull(), // Hash used for consistent assignment
@@ -139,7 +139,7 @@ export const alertEvents = pgTable('alert_events', {
   resolved: boolean('resolved').default(false),
   resolvedAt: timestamp('resolved_at'),
   resolvedBy: text('resolved_by'),
-  createdAt: timestamp('created_at').defaultNow(),
+  created_at: timestamp('created_at').defaultNow(),
   metadata: jsonb('metadata')
 });
 
@@ -159,7 +159,7 @@ export const interPhaseValidation = pgTable('inter_phase_validation', {
   executionTime: integer('execution_time_ms'),
   startTime: timestamp('start_time'),
   completionTime: timestamp('completion_time'),
-  createdAt: timestamp('created_at').defaultNow()
+  created_at: timestamp('created_at').defaultNow()
 });
 
 /**
@@ -168,9 +168,9 @@ export const interPhaseValidation = pgTable('inter_phase_validation', {
 export const userBehaviorTracking = pgTable('user_behavior_tracking', {
   id: uuid('id').primaryKey().defaultRandom(),
   componentId: uuid('component_id').references(() => migrationComponents.id),
-  userId: text('user_id').notNull(),
+  user_id: text('user_id').notNull(),
   cohort: text('cohort').notNull(),
-  sessionId: text('session_id'),
+  session_id: text('session_id'),
   eventType: text('event_type').notNull(), // 'page_view', 'task_completion', 'error', 'conversion'
   eventData: jsonb('event_data'),
   conversionValue: decimal('conversion_value', { precision: 10, scale: 2 }),

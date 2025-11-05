@@ -44,7 +44,7 @@ describe('Comprehensive Integration Tests', () => {
           billNumber: 'Bill No. 999 of 2024',
           status: 'introduced',
           chamber: 'National Assembly',
-          sponsorId: testUser.id
+          sponsor_id: testUser.id
         };
 
         const result = await serviceOrchestrator.orchestrateBillCreation(
@@ -62,7 +62,7 @@ describe('Comprehensive Integration Tests', () => {
         performanceMonitor.endOperation(operationId, true);
 
         logger.info('✅ Bill creation orchestration test passed', {
-          billId: result.bill.id,
+          bill_id: result.bill.id,
           searchIndexed: result.searchIndexed,
           analysisQueued: result.analysisQueued,
           recommendationsUpdated: result.recommendationsUpdated
@@ -115,7 +115,7 @@ describe('Comprehensive Integration Tests', () => {
         {
           service: 'user-service',
           operation: 'create-user',
-          userId: 'test-user-123'
+          user_id: 'test-user-123'
         }
       );
 
@@ -297,9 +297,9 @@ describe('Comprehensive Integration Tests', () => {
           const campaign = {
             id: 'test-campaign-' + Date.now(),
             title: 'Transaction Test Campaign',
-            billId: bill.id,
+            bill_id: bill.id,
             organizerId: user.id,
-            createdAt: new Date()
+            created_at: new Date()
           };
 
           return { user, bill, campaign };
@@ -312,9 +312,9 @@ describe('Comprehensive Integration Tests', () => {
         performanceMonitor.endOperation(operationId, true);
 
         logger.info('✅ Database transaction test passed', {
-          userId: result.user.id,
-          billId: result.bill.id,
-          campaignId: result.campaign.id
+          user_id: result.user.id,
+          bill_id: result.bill.id,
+          campaign_id: result.campaign.id
         });
 
       } catch (error) {
@@ -425,8 +425,8 @@ describe('Comprehensive Integration Tests', () => {
         // Step 3: User engagement with bill
         // (This would involve actual API calls in a real test)
         const engagement = {
-          userId: user.id,
-          billId: bill.id,
+          user_id: user.id,
+          bill_id: bill.id,
           engagementType: 'view',
           timestamp: new Date()
         };
@@ -435,18 +435,18 @@ describe('Comprehensive Integration Tests', () => {
         const campaignData = {
           title: 'Journey Test Campaign',
           description: 'Testing complete user journey',
-          billId: bill.id,
+          bill_id: bill.id,
           organizerId: user.id,
           objectives: ['Test user journey', 'Validate integration'],
           strategy: { approach: 'comprehensive testing' },
           targetCounties: ['Nairobi'],
-          startDate: new Date(),
-          isPublic: true
+          start_date: new Date(),
+          is_public: true
         };
 
         // Step 5: Action creation and completion
         const actionData = {
-          campaignId: 'test-campaign-id',
+          campaign_id: 'test-campaign-id',
           actionTitle: 'Journey Test Action',
           actionDescription: 'Testing action in user journey',
           actionType: 'contact_representative',
@@ -460,13 +460,13 @@ describe('Comprehensive Integration Tests', () => {
 
         performanceMonitor.endOperation(workflowId, true, undefined, {
           stepsCompleted: 6,
-          userId: user.id,
-          billId: bill.id
+          user_id: user.id,
+          bill_id: bill.id
         });
 
         logger.info('✅ Complete user journey test passed', {
-          userId: user.id,
-          billId: bill.id,
+          user_id: user.id,
+          bill_id: bill.id,
           workflowSteps: 6
         });
 

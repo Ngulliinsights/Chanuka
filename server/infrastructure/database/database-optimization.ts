@@ -1,7 +1,7 @@
 import { database as db } from '../shared/database/connection';
 import { sql } from 'drizzle-orm';
 import { performanceMonitor } from '../monitoring/performance-monitor.js';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 export interface DatabaseIndex {
   name: string;

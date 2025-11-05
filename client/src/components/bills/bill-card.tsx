@@ -34,42 +34,42 @@ const conflictColors = {
 };
 
 export function BillCard({ bill }: BillCardProps) {
-  const statusColor = statusColors[bills.status as keyof typeof statusColors] || statusColors.introduced;
-  const conflictColor = bills.conflict_level ? conflictColors[bills.conflict_level] : '';
+  const statusColor = statusColors[bill.status as keyof typeof statusColors] || statusColors.introduced;
+  const conflictColor = bill.conflict_level ? conflictColors[bill.conflict_level] : '';
 
   return (
     <Card className="card-enhanced card-hover group">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-lg font-semibold leading-tight group-hover:text-primary transition-colors">
-            <Link to={`/bills/${bills.id}`} className="hover:underline">
-              {bills.title}
+            <Link to={`/bills/${bill.id}`} className="hover:underline">
+              {bill.title}
             </Link>
           </CardTitle>
-          {bills.category && (
+          {bill.category && (
             <Badge variant="secondary" className="text-xs shrink-0">
-              {bills.category}
+              {bill.category}
             </Badge>
           )}
         </div>
       </CardHeader>
       
       <CardContent className="space-y-4">
-        {bills.summary && (
+        {bill.summary && (
           <p className="text-sm text-muted-foreground line-clamp-2">
-            {bills.summary}
+            {bill.summary}
           </p>
         )}
         
         <div className="flex flex-wrap gap-2">
           <Badge className={cn('status-badge', statusColor)}>
-            {bills.status.charAt(0).toUpperCase() + bills.status.slice(1)}
+            {bill.status.charAt(0).toUpperCase() + bill.status.slice(1)}
           </Badge>
           
-          {bills.conflict_level && (
+          {bill.conflict_level && (
             <Badge className={cn('status-indicator', conflictColor)}>
               <AlertCircle className="h-3 w-3 mr-1" />
-              {bills.conflict_level.charAt(0).toUpperCase() + bills.conflict_level.slice(1)} Risk
+              {bill.conflict_level.charAt(0).toUpperCase() + bill.conflict_level.slice(1)} Risk
             </Badge>
           )}
         </div>
@@ -78,19 +78,19 @@ export function BillCard({ bill }: BillCardProps) {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              <span>{new Date(bills.introduced_date).toLocaleDateString()}</span>
+              <span>{new Date(bill.introduced_date).toLocaleDateString()}</span>
             </div>
             
-            {bills.sponsor_count && (
+            {bill.sponsor_count && (
               <div className="flex items-center gap-1">
                 <Users className="h-4 w-4" />
-                <span>{bills.sponsor_count} sponsors</span>
+                <span>{bill.sponsor_count} sponsors</span>
               </div>
             )}
           </div>
           
           <Link 
-            to={`/bills/${bills.id}`}
+            to={`/bills/${bill.id}`}
             className="inline-flex items-center gap-1 text-primary hover:text-primary-dark font-medium transition-colors"
           >
             <TrendingUp className="h-4 w-4" />

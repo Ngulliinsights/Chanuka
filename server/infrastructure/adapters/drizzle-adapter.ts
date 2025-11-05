@@ -13,9 +13,9 @@
  */
 
 import { eq, and, or, sql, desc, asc, count, inArray, SQL } from 'drizzle-orm';
-import { database as db } from '@shared/database/connection';
+import { database as db } from '@shared/database';
 import { databaseService } from '../database/database-service';
-import { logger } from '../../../shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 
 // Type helper to ensure timestamp fields exist
 type WithTimestamps<T> = T & {

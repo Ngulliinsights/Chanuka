@@ -52,7 +52,7 @@ interface DashboardData {
   conflictTypeDistribution: Record<string, number>;
   topRiskSponsors: Array<{
     sponsor_id: number;
-    riskScore: number;
+    risk_score: number;
     conflictCount: number;
     trend: 'increasing' | 'decreasing' | 'stable';
   }>;
@@ -429,7 +429,7 @@ const ConflictAnalysisDashboard: React.FC = () => {
                       </div>
                       <div className="flex items-center space-x-2">
                         {getTrendIcon(sponsors.trend)}
-                        <span className="font-semibold">{sponsors.riskScore}</span>
+                        <span className="font-semibold">{sponsors.risk_score}</span>
                       </div>
                     </div>
                   ))}

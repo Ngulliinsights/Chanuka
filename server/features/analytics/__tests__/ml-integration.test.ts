@@ -186,10 +186,10 @@ describe('ML Service Integration Tests', () => {
       const userIds = Array.from({ length: 20 }, (_, i) => `test-user-${i + 100}`);
 
       // Test multiple users to verify percentage-based routing
-      for (const userId of userIds) {
+      for (const user_id of userIds) {
         const result = await MLServiceAdapter.analyzeStakeholderInfluence(
           testBillContent,
-          userId
+          user_id
         );
         results.push(result.metadata?.serviceUsed);
       }

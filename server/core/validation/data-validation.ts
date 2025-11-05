@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 // Comprehensive data validation service for government data integration
 export class DataValidationService {

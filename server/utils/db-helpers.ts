@@ -1,4 +1,4 @@
-import { logger  } from '../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 /**
  * Database helper utilities for standardized date calculations and result formatting.

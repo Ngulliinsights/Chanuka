@@ -139,7 +139,7 @@ export interface AppError extends Error {
 export interface ErrorContext { component?: string;
   action?: string;
   user_id?: string;
-  sessionId?: string;
+  session_id?: string;
   url?: string;
   user_agent?: string;
   additionalData?: Record<string, any>;

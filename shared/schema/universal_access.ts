@@ -521,3 +521,179 @@ export type NewUssdSession = typeof ussd_sessions.$inferInsert;
 
 export type LocalizedContent = typeof localized_content.$inferSelect;
 export type NewLocalizedContent = typeof localized_content.$inferInsert;
+
+// ============================================================================
+// Accessibility-Specific Tables
+// ============================================================================
+
+/**
+ * Assistive Technology Compatibility tracking
+ */
+export const assistive_technology_compatibility = pgTable('assistive_technology_compatibility', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  technology_name: varchar('technology_name', { length: 255 }).notNull(),
+  technology_type: varchar('technology_type', { length: 100 }).notNull(),
+  platform: varchar('platform', { length: 100 }).notNull(),
+  compatibility_score: integer('compatibility_score').notNull(),
+  browser_compatibility: jsonb('browser_compatibility').notNull(),
+  feature_support: jsonb('feature_support').notNull(),
+  recommendation: varchar('recommendation', { length: 100 }).notNull(),
+  is_active: boolean('is_active').default(true).notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/**
+ * Accessibility Features tracking
+ */
+export const accessibility_features = pgTable('accessibility_features', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  feature_name: varchar('feature_name', { length: 255 }).notNull(),
+  feature_category: varchar('feature_category', { length: 100 }).notNull(),
+  user_impact_score: integer('user_impact_score').notNull(),
+  target_disabilities: jsonb('target_disabilities').notNull(),
+  is_active: boolean('is_active').default(true).notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/**
+ * Accessibility Audits
+ */
+export const accessibility_audits = pgTable('accessibility_audits', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  audit_type: varchar('audit_type', { length: 100 }).notNull(),
+  scope: varchar('scope', { length: 100 }).notNull(),
+  audited_components: jsonb('audited_components').notNull(),
+  audit_methodology: varchar('audit_methodology', { length: 255 }).notNull(),
+  auditor_info: jsonb('auditor_info').notNull(),
+  findings: jsonb('findings').notNull(),
+  recommendations: jsonb('recommendations').notNull(),
+  overall_compliance_score: integer('overall_compliance_score').notNull(),
+  compliance_level: varchar('compliance_level', { length: 50 }).notNull(),
+  audit_date: timestamp('audit_date').notNull(),
+  follow_up_required: boolean('follow_up_required').default(false).notNull(),
+  follow_up_date: timestamp('follow_up_date'),
+  status: varchar('status', { length: 50 }).notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/**
+ * Accessibility Feedback
+ */
+export const accessibility_feedback = pgTable('accessibility_feedback', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  user_id: uuid('user_id').notNull(),
+  feedback_type: varchar('feedback_type', { length: 100 }).notNull(),
+  page_url: varchar('page_url', { length: 500 }).notNull(),
+  component: varchar('component', { length: 255 }).notNull(),
+  issue_category: varchar('issue_category', { length: 100 }).notNull(),
+  severity: varchar('severity', { length: 50 }).notNull(),
+  description: text('description').notNull(),
+  expected_behavior: text('expected_behavior').notNull(),
+  current_behavior: text('current_behavior').notNull(),
+  steps_to_reproduce: jsonb('steps_to_reproduce').notNull(),
+  browser_info: jsonb('browser_info').notNull(),
+  assistive_technology_used: varchar('assistive_technology_used', { length: 255 }),
+  screenshots: jsonb('screenshots'),
+  status: varchar('status', { length: 50 }).notNull(),
+  priority: varchar('priority', { length: 50 }).notNull(),
+  assigned_to: uuid('assigned_to'),
+  resolution_notes: text('resolution_notes'),
+  resolved_at: timestamp('resolved_at'),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/**
+ * Inclusive Design Metrics
+ */
+export const inclusive_design_metrics = pgTable('inclusive_design_metrics', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  measurement_date: timestamp('measurement_date').notNull(),
+  reporting_period: varchar('reporting_period', { length: 50 }).notNull(),
+  user_diversity_metrics: jsonb('user_diversity_metrics').notNull(),
+  accessibility_usage_metrics: jsonb('accessibility_usage_metrics').notNull(),
+  content_accessibility_metrics: jsonb('content_accessibility_metrics').notNull(),
+  technical_compliance_metrics: jsonb('technical_compliance_metrics').notNull(),
+  inclusive_design_score: integer('inclusive_design_score').notNull(),
+  benchmark_comparison: jsonb('benchmark_comparison').notNull(),
+  improvement_recommendations: jsonb('improvement_recommendations').notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/**
+ * User Accessibility Preferences
+ */
+export const user_accessibility_preferences = pgTable('user_accessibility_preferences', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  user_id: uuid('user_id').notNull(),
+  visual_preferences: jsonb('visual_preferences').notNull(),
+  auditory_preferences: jsonb('auditory_preferences').notNull(),
+  motor_preferences: jsonb('motor_preferences').notNull(),
+  cognitive_preferences: jsonb('cognitive_preferences').notNull(),
+  assistive_technology: jsonb('assistive_technology').notNull(),
+  last_used_features: jsonb('last_used_features').notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/**
+ * Alternative Formats
+ */
+export const alternative_formats = pgTable('alternative_formats', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  content_type: varchar('content_type', { length: 100 }).notNull(),
+  content_id: varchar('content_id', { length: 255 }).notNull(),
+  format_type: varchar('format_type', { length: 100 }).notNull(),
+  format_details: jsonb('format_details').notNull(),
+  target_disabilities: jsonb('target_disabilities').notNull(),
+  quality_score: integer('quality_score').notNull(),
+  duration_minutes: integer('duration_minutes'),
+  user_feedback: jsonb('user_feedback'),
+  is_active: boolean('is_active').default(true).notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/**
+ * Offline Content Cache
+ */
+export const offline_content_cache = pgTable('offline_content_cache', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  user_id: uuid('user_id').notNull(),
+  content_type: varchar('content_type', { length: 100 }).notNull(),
+  content_id: varchar('content_id', { length: 255 }).notNull(),
+  content_data: jsonb('content_data').notNull(),
+  metadata: jsonb('metadata').notNull(),
+  cache_timestamp: timestamp('cache_timestamp').defaultNow().notNull(),
+  expiry_timestamp: timestamp('expiry_timestamp').notNull(),
+  access_count: integer('access_count').default(0).notNull(),
+  priority_level: varchar('priority_level', { length: 50 }).notNull(),
+  device_info: jsonb('device_info').notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+});
+
+/**
+ * Offline Sync Queue
+ */
+export const offline_sync_queue = pgTable('offline_sync_queue', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  user_id: uuid('user_id').notNull(),
+  operation_type: varchar('operation_type', { length: 100 }).notNull(),
+  entity_type: varchar('entity_type', { length: 100 }).notNull(),
+  entity_id: varchar('entity_id', { length: 255 }).notNull(),
+  operation_data: jsonb('operation_data').notNull(),
+  original_timestamp: timestamp('original_timestamp').notNull(),
+  sync_attempts: integer('sync_attempts').default(0).notNull(),
+  last_sync_attempt: timestamp('last_sync_attempt'),
+  sync_status: varchar('sync_status', { length: 50 }).default('pending').notNull(),
+  error_details: jsonb('error_details'),
+  priority: varchar('priority', { length: 50 }).notNull(),
+  device_info: jsonb('device_info').notNull(),
+  created_at: timestamp('created_at').defaultNow().notNull(),
+  updated_at: timestamp('updated_at').defaultNow().notNull(),
+});

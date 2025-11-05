@@ -1,5 +1,5 @@
 import { eq, and, lt, sql } from "drizzle-orm";
-import { database as db } from "../../../shared/database/connection";
+import { database as db } from '@shared/database';
 import {
   user,
   user_profiles,
@@ -16,7 +16,7 @@ import {
   system_audit_log
 } from "@shared/schema";
 import { auditLogger } from "../../infrastructure/monitoring/index.js";
-import { logger  } from '../../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 export interface UserDataExport {
   user: {
@@ -157,7 +157,7 @@ export interface DataRetentionPolicy {
 }
 
 export interface GDPRComplianceReport { user_id: string;
-  reportDate: Date;
+  report_date: Date;
   dataProcessingLawfulness: {
     hasValidConsent: boolean;
     consentDate: Date | null;
@@ -919,7 +919,7 @@ class PrivacyService {
       }
 
       return { user_id,
-        reportDate: new Date(),
+        report_date: new Date(),
         dataProcessingLawfulness,
         dataMinimization: {
           dataCollected,

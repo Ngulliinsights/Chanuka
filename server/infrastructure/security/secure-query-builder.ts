@@ -1,6 +1,6 @@
 import { sql, SQL, Placeholder } from 'drizzle-orm';
 import { z } from 'zod';
-import { logger } from '../../../shared/core/src/index.js';
+import { logger } from '@shared/core/index.js';
 
 /**
  * Secure Query Builder Service

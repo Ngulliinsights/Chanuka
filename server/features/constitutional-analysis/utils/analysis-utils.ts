@@ -3,7 +3,7 @@
 // ============================================================================
 // Common utility functions for constitutional analysis
 
-import { ConstitutionalAnalysis, LegalPrecedent } from '../../../shared/schema/index.js';
+import { ConstitutionalAnalysis, LegalPrecedent } from '@shared/schema/index.js';
 
 /**
  * Text processing utilities

@@ -56,7 +56,7 @@ describe('SchemaImportDetector', () => {
     it('should detect missing schema table imports', () => {
       const sourceCode = `
         const user = users.findFirst({
-          where: eq(users.id, userId)
+          where: eq(users.id, user_id)
         });
       `;
 
@@ -114,7 +114,7 @@ describe('SchemaImportDetector', () => {
         
         const user = users.findFirst({
           where: and(
-            eq(users.id, userId),
+            eq(users.id, user_id),
             eq(users.email, email)
           )
         });
@@ -241,7 +241,7 @@ describe('SchemaImportDetector', () => {
         import { users } from '@shared/schema/foundation';
         
         const user = users.findFirst({
-          where: eq(users.id, userId)
+          where: eq(users.id, user_id)
         });
       `;
 

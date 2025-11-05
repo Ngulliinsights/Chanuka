@@ -1,4 +1,4 @@
-import { database as db } from '../../../shared/database/connection';
+import { database as db } from '@shared/database';
 import { notifications, users, bills, bill_engagement } from '@shared/schema';
 import { eq, and, lt, gte, sql } from 'drizzle-orm';
 import * as cron from 'node-cron';

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { securityMonitoringService } from '../features/security/security-monitoring-service.js';
 import { intrusionDetectionService } from '../features/security/intrusion-detection-service.js';
 import { securityAuditService } from '../features/security/security-audit-service.js';
-import { logger  } from '../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 export interface SecurityMonitoringOptions {
   enableThreatDetection: boolean;
@@ -332,7 +332,7 @@ export class SecurityMonitoringMiddleware {
    * Handle challenge requests (e.g., CAPTCHA)
    */
   private async handleChallengeRequest(req: Request, res: Response, threatResult: any): Promise<void> {
-    console.warn(`⚠️ Challenge required for ${this.getClientIP(req)}: Risk score ${threatResult.riskScore}`);
+    console.warn(`⚠️ Challenge required for ${this.getClientIP(req)}: Risk score ${threatResult.risk_score}`);
 
     res.status(429).json({
       error: 'Additional verification required',

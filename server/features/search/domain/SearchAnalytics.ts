@@ -2,7 +2,7 @@ import type { SearchQuery, SearchResponseDto } from './search.dto';
 
 export interface SearchAnalyticsEvent { id: string;
   user_id?: string;
-  sessionId: string;
+  session_id: string;
   query: string;
   filters: any;
   resultCount: number;
@@ -43,7 +43,7 @@ export class SearchAnalytics { private static readonly MAX_QUERY_LENGTH = 500;
     query: SearchQuery,
     response: SearchResponseDto,
     user_id?: string,
-    sessionId?: string,
+    session_id?: string,
     additionalData?: {
       user_agent?: string;
       ip_address?: string;
@@ -51,7 +51,7 @@ export class SearchAnalytics { private static readonly MAX_QUERY_LENGTH = 500;
   ): Promise<SearchAnalyticsEvent> { const event: SearchAnalyticsEvent = {
       id: this.generateEventId(),
       user_id,
-      sessionId: sessionId || this.generateSessionId(),
+      session_id: session_id || this.generateSessionId(),
       query: query.text.substring(0, this.MAX_QUERY_LENGTH),
       filters: query.filters || { },
       resultCount: response.results.length,
@@ -83,11 +83,11 @@ export class SearchAnalytics { private static readonly MAX_QUERY_LENGTH = 500;
    * Get search metrics for a time period
    */
   static async getSearchMetrics(
-    startDate: Date,
-    endDate: Date
+    start_date: Date,
+    end_date: Date
   ): Promise<SearchMetrics> {
     // In a real implementation, query analytics database
-    const events = await this.getEventsInRange(startDate, endDate);
+    const events = await this.getEventsInRange(start_date, end_date);
 
     const totalSearches = events.length;
     const uniqueUsers = new Set(events.map(e => e.user_id).filter(Boolean)).size;
@@ -137,7 +137,7 @@ export class SearchAnalytics { private static readonly MAX_QUERY_LENGTH = 500;
       cacheHitRate,
       popularQueries,
       noResultQueries,
-      timeRange: { start: startDate, end: endDate },
+      timeRange: { start: start_date, end: end_date },
     };
   }
 
@@ -196,8 +196,8 @@ export class SearchAnalytics { private static readonly MAX_QUERY_LENGTH = 500;
   }
 
   private static async getEventsInRange(
-    startDate: Date,
-    endDate: Date
+    start_date: Date,
+    end_date: Date
   ): Promise<SearchAnalyticsEvent[]> {
     // Placeholder - in real implementation, query database
     return [];

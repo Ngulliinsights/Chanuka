@@ -23,7 +23,7 @@ export interface LogContext { component?: string;
   user_id?: string;
   traceId?: string;
   requestId?: string;
-  sessionId?: string;
+  session_id?: string;
   correlationId?: string;
   [key: string]: unknown;
  }
@@ -327,7 +327,7 @@ export interface CorrelationContext { correlationId: string;
   traceId?: string;
   spanId?: string;
   user_id?: string;
-  sessionId?: string;
+  session_id?: string;
   requestId?: string;
   metadata?: Record<string, unknown>;
  }

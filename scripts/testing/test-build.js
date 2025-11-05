@@ -1,6 +1,6 @@
 // Quick test to verify app can build
 import { execSync } from 'child_process';
-import { logger } from '@shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 try {
   logger.info('Testing client build...', { component: 'Chanuka' });

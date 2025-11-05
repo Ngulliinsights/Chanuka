@@ -1,7 +1,7 @@
-import { readDatabase } from '@shared/database/connection';
-import * as schema from '../../../../shared/schema';
+import { readDatabase } from '@shared/database';
+import * as schema from '@/shared/schema';
 import { eq } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 // Assuming ML service exists and is properly typed
 import { MLAnalysisService, MLStakeholderResult, MLBeneficiaryResult } from '../../analytics/services/ml.service.js'; // Adjust path and types
 

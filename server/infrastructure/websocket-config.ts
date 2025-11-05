@@ -6,7 +6,7 @@
 
 import { BatchingService, BatchingConfig } from './batching-service.js';
 import { MemoryAwareSocketService, MemoryThresholds } from './memory-aware-socket-service.js';
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 export interface WebSocketServiceConfig {
   batching: Partial<BatchingConfig>;
@@ -211,13 +211,13 @@ export class WebSocketServiceManager {
   /**
    * Handle connection registration
    */
-  registerConnection(connectionId: string, userId: string): void {
-    this.memoryService.registerConnection(connectionId, userId);
+  registerConnection(connectionId: string, user_id: string): void {
+    this.memoryService.registerConnection(connectionId, user_id);
     
     logger.debug('Connection registered with service manager', {
       component: 'WebSocketServiceManager',
       connectionId,
-      userId
+      user_id
     });
   }
 
@@ -237,11 +237,11 @@ export class WebSocketServiceManager {
    * Queue a message for batched delivery
    */
   queueMessage(
-    userId: string,
+    user_id: string,
     message: any,
     deliveryCallback: (batch: any[]) => Promise<void>
   ): boolean {
-    return this.batchingService.queueMessage(userId, message, deliveryCallback);
+    return this.batchingService.queueMessage(user_id, message, deliveryCallback);
   }
 
   /**

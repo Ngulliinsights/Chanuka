@@ -1,7 +1,7 @@
 // Simple validation script for User Profile Service
 import { user_profileservice } from './services/user-profile.ts';
 import { databaseService } from './services/database-service.ts';
-import { logger } from '@shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 async function validateUserProfileService() {
   logger.info('🔍 Validating User Profile Service Implementation...', { component: 'Chanuka' });

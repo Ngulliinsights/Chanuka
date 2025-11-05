@@ -523,6 +523,10 @@ export const bills = pgTable("bills", {
     sql`${table.engagement_score} >= 0`),
 }));
 
+// Note: bill_tags table removed - use bills.tags array column instead
+// The bills table already has: tags: varchar("tags", { length: 100 }).array()
+// With GIN index: tagsIdx: index("idx_bills_tags").using("gin", table.tags)
+
 // ============================================================================
 // RELATIONSHIPS - Drizzle ORM Relations (Bidirectional)
 // ============================================================================

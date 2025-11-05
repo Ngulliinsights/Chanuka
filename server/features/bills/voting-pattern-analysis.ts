@@ -2,8 +2,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import { VotingPatternAnalysisService } from './services/voting-pattern-analysis-service.js';
 import { authenticateToken } from '../../middleware/auth.js';
 import type { AuthenticatedRequest } from '../../middleware/auth.js';
-import { UnifiedApiResponse  } from '../../../shared/core/src/utils/api';
-import { logger  } from '../../../shared/core/src/index.js';
+import { UnifiedApiResponse  } from '@shared/core/utils/api';
+import { logger  } from '@shared/core/index.js';
 import { securityAuditService } from '../security/security-audit-service.js';
 
 // Create singleton instance
@@ -179,7 +179,7 @@ router.get('/analysis', asyncHandler(async (req, res) => {
 router.get('/correlations', asyncHandler(async (req, res) => {
   const { sponsor_id, comparisonSponsors } = req.query;
 
-  let targetSponsorId: number;
+  let target_sponsor_id: number;
   let comparisonIds: number[] | undefined;
 
   // Parse target sponsor ID
@@ -212,13 +212,13 @@ router.get('/correlations', asyncHandler(async (req, res) => {
   }
 
   const correlations = await votingPatternAnalysisService.buildComparativeAnalysis(
-    targetSponsorId,
+    target_sponsor_id,
     comparisonIds
   );
 
   // Log data access for correlation analysis
   await securityAuditService.logDataAccess(
-    `voting-patterns:correlations:${targetSponsorId}`,
+    `voting-patterns:correlations:${target_sponsor_id}`,
     'read',
     req,
     (req as any).user?.id,
@@ -228,7 +228,7 @@ router.get('/correlations', asyncHandler(async (req, res) => {
 
   return res.json(UnifiedApiResponse.success({
     correlations,
-    message: `Correlation analysis completed for sponsor ${targetSponsorId}`
+    message: `Correlation analysis completed for sponsor ${target_sponsor_id}`
   }));
 }));
 

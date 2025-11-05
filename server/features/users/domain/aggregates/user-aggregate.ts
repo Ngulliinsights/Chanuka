@@ -157,8 +157,8 @@ export class UserAggregate {
     return this._user.isEligibleForVerification();
   }
 
-  canEndorseVerification(verificationId: string): boolean {
-    const verification = this._verifications.find(v => v.id === verificationId);
+  canEndorseVerification(verification_id: string): boolean {
+    const verification = this._verifications.find(v => v.id === verification_id);
     if (verification) {
       return false; // Cannot endorse own verification
     }
@@ -166,8 +166,8 @@ export class UserAggregate {
     return this._user.is_active;
   }
 
-  canDisputeVerification(verificationId: string): boolean {
-    const verification = this._verifications.find(v => v.id === verificationId);
+  canDisputeVerification(verification_id: string): boolean {
+    const verification = this._verifications.find(v => v.id === verification_id);
     if (verification) {
       return false; // Cannot dispute own verification
     }

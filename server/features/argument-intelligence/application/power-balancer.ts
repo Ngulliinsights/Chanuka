@@ -3,7 +3,7 @@
 // ============================================================================
 // Ensures minority voices remain visible and prevents coordinated campaigns from drowning out legitimate concerns
 
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 export interface PowerBalancingResult {
   balancedPositions: BalancedStakeholderPosition[];
@@ -87,7 +87,7 @@ export interface StakeholderPosition {
 export interface ArgumentData {
   id: string;
   text: string;
-  userId: string;
+  user_id: string;
   submissionTime: Date;
   userDemographics?: {
     county?: string;
@@ -97,7 +97,7 @@ export interface ArgumentData {
   };
   submissionContext?: {
     submissionMethod: 'web' | 'ussd' | 'ambassador' | 'api';
-    sessionId?: string;
+    session_id?: string;
     ipAddress?: string;
   };
 }
@@ -189,7 +189,7 @@ export class PowerBalancerService {
         suspiciousPatterns: [{
           pattern: 'duplicate_messages',
           description: 'Multiple users submitted identical or near-identical messages',
-          evidence: duplicateMessages.map(arg => `User ${arg.userId}: "${arg.text.substring(0, 100)}..."`),
+          evidence: duplicateMessages.map(arg => `User ${arg.user_id}: "${arg.text.substring(0, 100)}..."`),
           severity: 'high'
         }],
         confidence: 90,
@@ -227,7 +227,7 @@ export class PowerBalancerService {
         suspiciousPatterns: [{
           pattern: 'bot_behavior',
           description: 'Submissions show patterns consistent with automated generation',
-          evidence: botBehavior.map(arg => `User ${arg.userId}: Suspicious patterns detected`),
+          evidence: botBehavior.map(arg => `User ${arg.user_id}: Suspicious patterns detected`),
           severity: 'high'
         }],
         confidence: 85,
@@ -344,7 +344,7 @@ export class PowerBalancerService {
 
     timeWindows.forEach((args, windowKey) => {
       if (args.length > threshold) {
-        const uniqueUsers = new Set(args.map(a => a.userId)).size;
+        const uniqueUsers = new Set(args.map(a => a.user_id)).size;
         const userToSubmissionRatio = args.length / uniqueUsers;
         
         if (userToSubmissionRatio > 2) { // Multiple submissions per user in short window
@@ -433,7 +433,7 @@ export class PowerBalancerService {
 
   private hasTimingPatterns(arg: ArgumentData, allArgs: ArgumentData[]): boolean {
     // Check if this user has suspicious timing patterns
-    const userArgs = allArgs.filter(a => a.userId === arg.userId);
+    const userArgs = allArgs.filter(a => a.user_id === arg.user_id);
     if (userArgs.length < 2) return false;
 
     // Check for submissions at exact intervals

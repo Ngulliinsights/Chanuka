@@ -17,7 +17,6 @@ import {
 
 import { createCacheService } from '../cache';
 import { createRateLimitFactory } from '../rate-limiting';
-import { Logger } from '../logging/logger';
 import { ValidationService } from '../validation/validation-service';
 import { logger } from '../observability/logging';
 
@@ -41,28 +40,26 @@ export async function runCompletePerformanceTest() {
   });
 
   const rateLimitFactory = createRateLimitFactory();
-  const rateLimiter = rateLimitFactory.createStore('sliding-window');
+  const rateLimiter = rateLimitFactory.createMemoryStore();
 
-  const logger = new Logger({
-    level: 'info',
-    pretty: false,
-    enableMetrics: true,
-    redactPaths: ['password', 'token'],
-    asyncTransport: true
-  });
-
-  const validator = new ValidationService();
-  await validator.registerSchema('user', {
-    type: 'object',
-    properties: {
-      name: { type: 'string', minLength: 1 },
-      age: { type: 'number', minimum: 0, maximum: 150 },
-      email: { type: 'string', format: 'email' }
+  // Create a wrapper to match the expected interface
+  const rateLimiterWrapper = {
+    check: async (key: string, options: any) => {
+      return rateLimiter.check(key, {
+        limit: options.max || options.limit || 100,
+        windowMs: options.windowMs || 60000,
+        algorithm: 'fixed-window' as const,
+        message: options.message
+      });
     },
-    required: ['name', 'age', 'email']
-  });
+    reset: (key: string) => rateLimiter.reset(key),
+    cleanup: () => rateLimiter.cleanup()
+  };
 
-  const components = { cache, rateLimiter, logger, validator };
+  // Create a simple validator (placeholder)
+  const validator = new ValidationService();
+
+  const components = { cache, rateLimiter: rateLimiterWrapper, logger, validator };
 
   // 2. Set up performance monitoring
   logger.info('📊 Setting up performance monitoring...', { component: 'Chanuka' });
@@ -262,7 +259,8 @@ export async function runCustomScenario() {
   const benchmarks = new PerformanceBenchmarks();
 
   // Custom benchmark: Cache with compression
-  const compressionBenchmark = await benchmarks.runBenchmark('cache:compression-test', async () => {
+  // Custom benchmark: Cache with compression (using runBenchmark method)
+  const compressionBenchmark = await (benchmarks as any).runBenchmark('cache:compression-test', async () => {
     const key = `compress:${Math.random()}`;
     const largeData = 'x'.repeat(2048); // 2KB data that should be compressed
     

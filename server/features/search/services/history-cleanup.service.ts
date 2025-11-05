@@ -1,4 +1,4 @@
-import { logger } from '../../../../shared/core/src/index';
+import { logger } from '@shared/core/index';
 
 export interface HistoryEntry {
   term: string;

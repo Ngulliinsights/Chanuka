@@ -95,9 +95,14 @@ export type {
   ObservabilityStack,
   TelemetryData,
   TelemetryExporter,
-  CircuitBreakerMetrics,
+
   HealthCheckResult
 } from '../observability/types';
+
+// Circuit breaker types
+export type {
+  CircuitBreakerMetrics
+} from '../observability/error-management/types';
 
 // Rate limiting types (excluding conflicting RateLimitStore already aliased)
 export type {

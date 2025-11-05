@@ -1,7 +1,7 @@
-import { readDatabase } from '@shared/database/connection';
-import * as schema from '../../../../shared/schema';
+import { readDatabase } from '@shared/database';
+import * as schema from '@/shared/schema';
 import { eq } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 // Import the result type from sponsor conflict analysis
 // Ensure this path is correct based on your final structure
 // Note: ConflictSummary is defined locally in bill-comprehensive-analysis.service.ts, not exported from sponsor-conflict-analysis.service.ts

@@ -27,6 +27,20 @@ export interface TransactionOptions {
 }
 
 /**
+ * Database transaction interface for type-safe transaction operations.
+ */
+export interface DatabaseTransaction {
+  /** Execute a query within the transaction */
+  query<T = any>(sql: string, params?: any[]): Promise<T>;
+  /** Commit the transaction */
+  commit(): Promise<void>;
+  /** Rollback the transaction */
+  rollback(): Promise<void>;
+  /** Check if transaction is still active */
+  isActive(): boolean;
+}
+
+/**
  * Database health check results across all connections.
  */
 export interface DatabaseHealthStatus {
@@ -152,7 +166,7 @@ export function getDatabase(operation: DatabaseOperation = 'general') {
  *     .returning();
  *   
  *   await tx.insert(profilesTable)
- *     .values({ userId: newUser.id, bio: 'Software engineer' });
+ *     .values({ user_id: newUser.id, bio: 'Software engineer' });
  *   
  *   return newUser;
  * });
@@ -333,7 +347,7 @@ function sleep(ms: number): Promise<void> {
  *   return await db.select()
  *     .from(usersTable)
  *     .where(eq(usersTable.status, 'active'))
- *     .orderBy(desc(usersTable.createdAt))
+ *     .orderBy(desc(usersTable.created_at))
  *     .limit(50);
  * });
  */

@@ -19,7 +19,7 @@ describe('SharedCoreUtilityDetector', () => {
       const testCode = `
         function testFunction() {
           logger.info('Test message');
-          logger.error('Error message', { userId: '123' });
+          logger.error('Error message', { user_id: '123' });
         }
       `;
       

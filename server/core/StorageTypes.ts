@@ -1,6 +1,6 @@
 import { QueryResult, QueryResultRow } from 'pg';
 import { InsertUser, User, UserProgress, InsertUserProgress } from './types';
-import { logger  } from '../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 export interface TransactionClient {
   query<T extends QueryResultRow>(queryText: string, values?: any[]): Promise<QueryResult<T>>;
@@ -9,7 +9,7 @@ export interface TransactionClient {
 
 export interface SocialProfile {
   platform: string;
-  profileId: string;
+  profile_id: string;
   username: string;
 }
 
@@ -25,11 +25,11 @@ export interface Storage { // Progress-related methods (now aligned with shared/
   // Additional methods from IStorage interface
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
-  getUserBySocialProfile(provider: string, profileId: string): Promise<User | undefined>;
+  getUserBySocialProfile(provider: string, profile_id: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   linkSocialProfile(
     user_id: string,
-    profile: { platform: string; profileId: string; username: string  },
+    profile: { platform: string; profile_id: string; username: string  },
   ): Promise<User>;
   unlinkSocialProfile(user_id: string, platform: string): Promise<User>;
   updateUserReputation(user_id: string, change: number): Promise<User>;

@@ -5,7 +5,7 @@ import {
   sponsors, sponsorTransparency, sponsorAffiliations
 } from "@shared/foundation";
 import { eq, desc, and, sql, count } from "drizzle-orm";
-import { readDatabase } from '@shared/database/connection';
+import { readDatabase } from '@shared/database';
 import { cache, logger, NotFoundError, DatabaseError } from '@shared/core';
 import { FinancialDisclosureConfig } from '../config';
 import type {

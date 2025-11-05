@@ -26,8 +26,8 @@ const mockAffiliation = {
   sponsor_id: 1,
   organization: 'TechCorp Ltd',
   type: 'economic',
-  startDate: new Date('2023-01-01'),
-  endDate: null,
+  start_date: new Date('2023-01-01'),
+  end_date: null,
   is_active: true,
   conflictType: 'financial'
 };

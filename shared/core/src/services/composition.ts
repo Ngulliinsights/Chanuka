@@ -20,7 +20,7 @@ import { Result, ok, err, isOk, isErr } from '../primitives/types/result';
 import { BaseError, BaseErrorOptions } from '../observability/error-management';
 import { logger, MetricsCollector, Tracer, CorrelationManager } from '../observability';
 import { retry, timeout, delay } from '../utils/async-utils';
-import { ServiceContainer } from '../middleware/factory';
+import { MiddlewareServices } from '../middleware/factory';
 
 // ==================== Core Composition Types ====================
 
@@ -604,7 +604,7 @@ export class ServiceCompositionOrchestrator {
   private readonly timeoutManagers = new Map<string, TimeoutManager>();
 
   constructor(
-    private readonly services: ServiceContainer,
+    private readonly services: MiddlewareServices,
     private readonly correlationManager?: CorrelationManager
   ) {}
 
@@ -870,7 +870,7 @@ export class CompositionError extends BaseError {
  * Create a service composition orchestrator
  */
 export function createServiceCompositionOrchestrator(
-  services: ServiceContainer,
+  services: MiddlewareServices,
   correlationManager?: CorrelationManager
 ): ServiceCompositionOrchestrator {
   return new ServiceCompositionOrchestrator(services, correlationManager);

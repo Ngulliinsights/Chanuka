@@ -18,7 +18,26 @@ export * from './async-utils';
 export * from './data-utils';
 
 // HTTP utilities - request/response handling, client, status codes
-export * from './http-utils';
+// Note: Excluding ApiResponse to avoid conflict with api-utils
+export { 
+  HttpClient, 
+  HttpError, 
+  NetworkError,
+  TimeoutError,
+  HttpRequestOptions,
+  HttpResponse,
+  HttpClientConfig,
+  HTTP_STATUS,
+  createSuccessResponse,
+  createErrorResponse,
+  generateRequestId,
+  buildUrl,
+  parseQueryParams,
+  safeEncodeURIComponent,
+  getContentTypeFromExtension,
+  getExtensionFromContentType,
+  httpClient
+} from './http-utils';
 
 // Security utilities - sanitization, validation, encryption, authentication
 export * from './security-utils';
@@ -65,7 +84,7 @@ export * from './response-helpers';
 
 // Race condition prevention (consider migrating to async-utils)
 // Note: These may conflict with async-utils exports, so use explicit imports if needed
-// export * from '@shared/core/src/utils/async-utils'';
+// export * from '@shared/core/utils/async-utils'';
 
 
 

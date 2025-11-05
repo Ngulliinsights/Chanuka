@@ -84,8 +84,8 @@ const swaggerOptions = {
             dateRange: {
               type: 'object',
               properties: {
-                startDate: { type: 'string', format: 'date-time' },
-                endDate: { type: 'string', format: 'date-time' }
+                start_date: { type: 'string', format: 'date-time' },
+                end_date: { type: 'string', format: 'date-time' }
               }
             }
           }

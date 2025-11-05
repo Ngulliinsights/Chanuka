@@ -4,8 +4,8 @@
  * Configures feature flags for gradual ML service migration rollout
  */
 
-import { featureFlagsService } from '../../../infrastructure/migration/feature-flags.service.js';
-import { logger } from '../../../../shared/core/src/index.js';
+import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
+import { logger } from '@shared/core/index.js';
 
 export interface MLMigrationConfig {
     enabled: boolean;

@@ -47,7 +47,7 @@ export class PerformanceMonitor extends EventEmitter {
   stopMonitoring(metricName: string): void {
     const timer = this.activeMonitors.get(metricName);
     if (timer) {
-      clearInterval(timer);
+      clearTimeout(timer as any);
       this.activeMonitors.delete(metricName);
       this.emit('monitor:stopped', { metricName });
     }
@@ -57,7 +57,7 @@ export class PerformanceMonitor extends EventEmitter {
    * Stop all active monitoring
    */
   stopAllMonitoring(): void {
-    for (const metricName of this.activeMonitors.keys()) {
+    for (const metricName of Array.from(this.activeMonitors.keys())) {
       this.stopMonitoring(metricName);
     }
   }

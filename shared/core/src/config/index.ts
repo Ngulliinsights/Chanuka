@@ -163,7 +163,7 @@ export class ConfigManager extends EventEmitter {
     
     // Check rollout percentage
     if (feature.rolloutPercentage < 100) {
-      const hash = this.hashString(`${featureName}-${context?.user_id || context?.sessionId || 'anonymous'}`);
+      const hash = this.hashString(`${featureName}-${context?.user_id || context?.session_id || 'anonymous'}`);
       const enabled = (hash % 100) < feature.rolloutPercentage;
       const result = { 
         enabled, 
@@ -516,7 +516,7 @@ export class ConfigManager extends EventEmitter {
     const compareObjects = (prev: any, curr: any, path: string = '') => {
       const allKeys = new Set([...Object.keys(prev || {}), ...Object.keys(curr || {})]);
       
-      for (const key of allKeys) {
+      for (const key of Array.from(allKeys)) {
         const currentPath = path ? `${path}.${key}` : key;
         const prevValue = prev?.[key];
         const currValue = curr?.[key];

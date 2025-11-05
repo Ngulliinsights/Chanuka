@@ -20,7 +20,7 @@ const result = await withTransaction(async (tx) => {
   }).returning();
   
   await tx.insert(user_profiles).values({
-    userId: user.id,
+    user_id: user.id,
     bio: 'Software engineer'
   });
   
@@ -45,7 +45,7 @@ const result = await databaseService.withFallback(
 
   // Missing Drizzle ORM imports
   MISSING_DRIZZLE_IMPORTS: `
-import { database } from '@shared/database/connection';
+import { database } from '@shared/database';
 
 // This should trigger: Cannot find name 'eq', 'and', 'desc'
 const users = await database.select()
@@ -54,7 +54,7 @@ const users = await database.select()
     eq(usersTable.active, true),
     eq(usersTable.verified, true)
   ))
-  .orderBy(desc(usersTable.createdAt));
+  .orderBy(desc(usersTable.created_at));
 `,
 
   // Incorrect relative import paths
@@ -74,16 +74,16 @@ const result = await withTransaction(async (tx) => {
 
   // Mixed database patterns (realistic Chanuka usage)
   REALISTIC_CHANUKA_PATTERN: `
-import { database } from '@shared/database/connection';
+import { database } from '@shared/database';
 import { users, bills, bill_engagement } from '@shared/schema';
 
 // Missing: eq, and, desc, count, withTransaction
 export class UserEngagementService {
-  async getUserEngagement(userId: string) {
+  async getUserEngagement(user_id: string) {
     return await withTransaction(async (tx) => {
-      const user = await tx.select()
+      const users = await tx.select()
         .from(users)
-        .where(eq(users.id, userId))
+        .where(eq(users.id, user_id))
         .limit(1);
 
       if (!user.length) {
@@ -91,22 +91,22 @@ export class UserEngagementService {
       }
 
       const engagementStats = await tx.select({
-        billId: bill_engagement.billId,
+        bill_id: bill_engagement.bill_id,
         engagementType: bill_engagement.engagementType,
-        createdAt: bill_engagement.createdAt
+        created_at: bill_engagement.created_at
       })
       .from(bill_engagement)
       .where(and(
-        eq(bill_engagement.userId, userId),
+        eq(bill_engagement.user_id, user_id),
         eq(bill_engagement.active, true)
       ))
-      .orderBy(desc(bill_engagement.createdAt));
+      .orderBy(desc(bill_engagement.created_at));
 
       const totalEngagements = await tx.select({
         count: count()
       })
       .from(bill_engagement)
-      .where(eq(bill_engagement.userId, userId));
+      .where(eq(bill_engagement.user_id, user_id));
 
       return {
         user: user[0],
@@ -120,22 +120,22 @@ export class UserEngagementService {
 
   // Database service with fallback pattern
   DATABASE_SERVICE_FALLBACK: `
-import { readDatabase } from '@shared/database/connection';
+import { readDatabase } from '@shared/database';
 import { bills, sponsors } from '@shared/schema';
 
 // Missing: databaseService, eq, sql
 export class BillAnalyticsService {
-  async getBillAnalytics(billId: string) {
+  async getBillAnalytics(bill_id: string) {
     return await databaseService.withFallback(
       async () => {
         return await readDatabase.select({
-          billId: bills.id,
+          bill_id: bills.id,
           title: bills.title,
           sponsorCount: sql<number>\`count(\${sponsors.id})\`
         })
         .from(bills)
-        .leftJoin(sponsors, eq(bills.id, sponsors.billId))
-        .where(eq(bills.id, billId))
+        .leftJoin(sponsors, eq(bills.id, sponsors.bill_id))
+        .where(eq(bills.id, bill_id))
         .groupBy(bills.id);
       },
       null,
@@ -147,7 +147,7 @@ export class BillAnalyticsService {
 
   // Unused database imports
   UNUSED_DATABASE_IMPORTS: `
-import { database, withTransaction, readDatabase } from '@shared/database/connection';
+import { database, withTransaction, readDatabase } from '@shared/database';
 import { eq, and, or } from 'drizzle-orm';
 import { users } from '@shared/schema';
 
@@ -161,7 +161,7 @@ export async function getActiveUsers() {
 
   // Complex transaction with multiple database operations
   COMPLEX_TRANSACTION_PATTERN: `
-import { writeDatabase } from '@shared/database/connection';
+import { writeDatabase } from '@shared/database';
 import { users, user_profiles, notifications } from '@shared/schema';
 
 // Missing: withTransaction, eq, and, sql
@@ -174,14 +174,14 @@ export class UserRegistrationService {
           email: userData.email,
           name: userData.name,
           active: true,
-          createdAt: sql\`NOW()\`
+          created_at: sql\`NOW()\`
         })
         .returning();
 
       // Create profile
       await tx.insert(user_profiles)
         .values({
-          userId: newUser.id,
+          user_id: newUser.id,
           bio: userData.bio || '',
           preferences: userData.preferences || {}
         });
@@ -189,11 +189,11 @@ export class UserRegistrationService {
       // Create welcome notification
       await tx.insert(notifications)
         .values({
-          userId: newUser.id,
+          user_id: newUser.id,
           type: 'welcome',
           message: 'Welcome to Chanuka!',
           read: false,
-          createdAt: sql\`NOW()\`
+          created_at: sql\`NOW()\`
         });
 
       // Verify user was created
@@ -267,12 +267,12 @@ export class DataAccessService {
 export const EXPECTED_FIXES = {
   // Expected imports for each fixture
   MISSING_DATABASE_IMPORT: [
-    "import { database } from '@shared/database/connection';",
+    "import { database } from '@shared/database';",
     "import { eq } from 'drizzle-orm';"
   ],
 
   MISSING_TRANSACTION_IMPORT: [
-    "import { withTransaction } from '@shared/database/connection';"
+    "import { withTransaction } from '@shared/database';"
   ],
 
   MISSING_DATABASE_SERVICE: [
@@ -285,7 +285,7 @@ export const EXPECTED_FIXES = {
 
   REALISTIC_CHANUKA_PATTERN: [
     "import { eq, and, desc, count, withTransaction } from 'drizzle-orm';",
-    "import { withTransaction } from '@shared/database/connection';"
+    "import { withTransaction } from '@shared/database';"
   ],
 
   DATABASE_SERVICE_FALLBACK: [
@@ -294,17 +294,17 @@ export const EXPECTED_FIXES = {
   ],
 
   COMPLEX_TRANSACTION_PATTERN: [
-    "import { withTransaction } from '@shared/database/connection';",
+    "import { withTransaction } from '@shared/database';",
     "import { eq, and, sql } from 'drizzle-orm';"
   ],
 
   HEALTH_CHECK_PATTERN: [
-    "import { checkDatabaseHealth } from '@shared/database/connection';",
+    "import { checkDatabaseHealth } from '@shared/database';",
     "import { databaseService } from '@shared/database';"
   ],
 
   MULTI_DATABASE_PATTERN: [
-    "import { readDatabase, writeDatabase, operationalDb, analyticsDb } from '@shared/database/connection';",
+    "import { readDatabase, writeDatabase, operationalDb, analyticsDb } from '@shared/database';",
     "import { eq, count } from 'drizzle-orm';"
   ]
 };

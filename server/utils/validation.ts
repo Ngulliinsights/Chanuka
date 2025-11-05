@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { ZodError, z } from 'zod';
-import { ValidationError  } from '../../shared/core/src/index.js';
-import { logger  } from '../../shared/core/src/index.js';
+import { ValidationError  } from '@shared/core/index.js';
+import { logger  } from '@shared/core/index.js';
 import DOMPurify from 'isomorphic-dompurify';
 
 type ZodSchema<T> = z.ZodType<T>;

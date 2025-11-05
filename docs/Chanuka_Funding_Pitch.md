@@ -55,6 +55,6 @@ This funding will leverage existing NGO networks for distribution, maximizing re
 
 ## Call to Action
 
-Join us in transforming Kenya's democratic landscape through the power of culture and technology. Chanuka is not just a platform—it's a movement for inclusive democracy that honors Kenya's artistic soul while building a transparent future. Contact our team at partnerships@chanuka.org to discuss partnership opportunities and secure your role in this groundbreaking initiative. Together, we can celebrate the arts, preserve traditions, and empower citizens for a more vibrant, equitable Kenya.
+Join us in transforming Kenya's democratic landscape through the power of culture and technology. Chanuka is not just a platform—it's a movement for inclusive democracy that honors Kenya's artistic soul while building a transparent future. Contact our team at <partnerships@chanuka.org> to discuss partnership opportunities and secure your role in this groundbreaking initiative. Together, we can celebrate the arts, preserve traditions, and empower citizens for a more vibrant, equitable Kenya.
 
-*For more information, visit [www.chanuka.org](https://www.chanuka.org) or download our full impact report.*
+_For more information, visit [www.chanuka.org](https://www.chanuka.org) or download our full impact report._

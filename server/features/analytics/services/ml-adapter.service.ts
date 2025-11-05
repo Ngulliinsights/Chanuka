@@ -5,8 +5,8 @@
  * Provides seamless migration with A/B testing capabilities
  */
 
-import { logger } from '../../../../shared/core/src/index.js';
-import { featureFlagsService } from '../../../infrastructure/migration/feature-flags.service.js';
+import { logger } from '@shared/core/index.js';
+import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service.js';
 import { MLAnalysisService } from './ml.service.js';
 import { RealMLAnalysisService } from './real-ml.service.js';
 import type {
@@ -39,9 +39,9 @@ export class MLServiceAdapter {
     /**
      * Route stakeholder influence analysis based on feature flag
      */
-    async analyzeStakeholderInfluence(billContent: string, userId?: string): Promise<AnalysisResult> {
+    async analyzeStakeholderInfluence(billContent: string, user_id?: string): Promise<AnalysisResult> {
         const startTime = Date.now();
-        const shouldUseMigration = await featureFlagsService.shouldUseMigration('utilities-ml-service-migration', userId);
+        const shouldUseMigration = await featureFlagsService.shouldUseMigration('utilities-ml-service-migration', user_id);
 
         try {
             let result: AnalysisResult;
@@ -50,7 +50,7 @@ export class MLServiceAdapter {
                 logger.info('Using real ML service for stakeholder influence analysis', {
                     component: 'analytics',
                     operation: 'analyzeStakeholderInfluence',
-                    userId,
+                    user_id,
                     implementation: 'real'
                 });
 
@@ -59,7 +59,7 @@ export class MLServiceAdapter {
                 logger.info('Using mock ML service for stakeholder influence analysis', {
                     component: 'analytics',
                     operation: 'analyzeStakeholderInfluence',
-                    userId,
+                    user_id,
                     implementation: 'mock'
                 });
 
@@ -79,7 +79,7 @@ export class MLServiceAdapter {
             logger.error('Error in ML adapter stakeholder influence analysis:', {
                 component: 'analytics',
                 operation: 'analyzeStakeholderInfluence',
-                userId,
+                user_id,
                 implementation: shouldUseMigration ? 'real' : 'mock'
             }, error instanceof Error ? error : { message: String(error) });
 
@@ -88,7 +88,7 @@ export class MLServiceAdapter {
                 logger.info('Falling back to mock ML service due to error', {
                     component: 'analytics',
                     operation: 'analyzeStakeholderInfluence',
-                    userId
+                    user_id
                 });
                 return await MLAnalysisService.analyzeStakeholderInfluence(billContent);
             }
@@ -100,9 +100,9 @@ export class MLServiceAdapter {
     /**
      * Route conflict detection based on feature flag
      */
-    async detectConflictsOfInterest(billContent: string, sponsorData: any, userId?: string): Promise<AnalysisResult> {
+    async detectConflictsOfInterest(billContent: string, sponsorData: any, user_id?: string): Promise<AnalysisResult> {
         const startTime = Date.now();
-        const shouldUseMigration = await featureFlagsService.shouldUseMigration('utilities-ml-service-migration', userId);
+        const shouldUseMigration = await featureFlagsService.shouldUseMigration('utilities-ml-service-migration', user_id);
 
         try {
             let result: AnalysisResult;
@@ -111,7 +111,7 @@ export class MLServiceAdapter {
                 logger.info('Using real ML service for conflict detection', {
                     component: 'analytics',
                     operation: 'detectConflictsOfInterest',
-                    userId,
+                    user_id,
                     implementation: 'real'
                 });
 
@@ -120,7 +120,7 @@ export class MLServiceAdapter {
                 logger.info('Using mock ML service for conflict detection', {
                     component: 'analytics',
                     operation: 'detectConflictsOfInterest',
-                    userId,
+                    user_id,
                     implementation: 'mock'
                 });
 
@@ -140,7 +140,7 @@ export class MLServiceAdapter {
             logger.error('Error in ML adapter conflict detection:', {
                 component: 'analytics',
                 operation: 'detectConflictsOfInterest',
-                userId,
+                user_id,
                 implementation: shouldUseMigration ? 'real' : 'mock'
             }, error instanceof Error ? error : { message: String(error) });
 
@@ -149,7 +149,7 @@ export class MLServiceAdapter {
                 logger.info('Falling back to mock ML service due to error', {
                     component: 'analytics',
                     operation: 'detectConflictsOfInterest',
-                    userId
+                    user_id
                 });
                 return await MLAnalysisService.detectConflictsOfInterest(billContent, sponsorData);
             }
@@ -161,9 +161,9 @@ export class MLServiceAdapter {
     /**
      * Route beneficiary analysis based on feature flag
      */
-    async analyzeBeneficiaries(billContent: string, userId?: string): Promise<AnalysisResult> {
+    async analyzeBeneficiaries(billContent: string, user_id?: string): Promise<AnalysisResult> {
         const startTime = Date.now();
-        const shouldUseMigration = await featureFlagsService.shouldUseMigration('utilities-ml-service-migration', userId);
+        const shouldUseMigration = await featureFlagsService.shouldUseMigration('utilities-ml-service-migration', user_id);
 
         try {
             let result: AnalysisResult;
@@ -172,7 +172,7 @@ export class MLServiceAdapter {
                 logger.info('Using real ML service for beneficiary analysis', {
                     component: 'analytics',
                     operation: 'analyzeBeneficiaries',
-                    userId,
+                    user_id,
                     implementation: 'real'
                 });
 
@@ -181,7 +181,7 @@ export class MLServiceAdapter {
                 logger.info('Using mock ML service for beneficiary analysis', {
                     component: 'analytics',
                     operation: 'analyzeBeneficiaries',
-                    userId,
+                    user_id,
                     implementation: 'mock'
                 });
 
@@ -201,7 +201,7 @@ export class MLServiceAdapter {
             logger.error('Error in ML adapter beneficiary analysis:', {
                 component: 'analytics',
                 operation: 'analyzeBeneficiaries',
-                userId,
+                user_id,
                 implementation: shouldUseMigration ? 'real' : 'mock'
             }, error instanceof Error ? error : { message: String(error) });
 
@@ -210,7 +210,7 @@ export class MLServiceAdapter {
                 logger.info('Falling back to mock ML service due to error', {
                     component: 'analytics',
                     operation: 'analyzeBeneficiaries',
-                    userId
+                    user_id
                 });
                 return await MLAnalysisService.analyzeBeneficiaries(billContent);
             }
@@ -230,7 +230,7 @@ export class MLServiceAdapter {
             successRate: number;
             timestamp: Date;
         },
-        userId?: string,
+        user_id?: string,
         cohort: 'control' | 'treatment' = 'control'
     ): Promise<void> {
         try {
@@ -238,10 +238,10 @@ export class MLServiceAdapter {
             this.performanceMetrics.set(`${operation}-${Date.now()}`, metrics);
 
             // Record A/B testing metrics if user ID is available
-            if (userId) {
+            if (user_id) {
                 await featureFlagsService.recordMetrics({
                     component: 'ml-service',
-                    userId,
+                    user_id,
                     cohort,
                     metrics: {
                         responseTime: metrics.responseTime,
@@ -285,14 +285,14 @@ export class MLServiceAdapter {
 // Export adapter functions for backward compatibility
 export const mlServiceAdapter = MLServiceAdapter.getInstance();
 
-export async function adaptiveAnalyzeStakeholderInfluence(billContent: string, userId?: string): Promise<AnalysisResult> {
-    return mlServiceAdapter.analyzeStakeholderInfluence(billContent, userId);
+export async function adaptiveAnalyzeStakeholderInfluence(billContent: string, user_id?: string): Promise<AnalysisResult> {
+    return mlServiceAdapter.analyzeStakeholderInfluence(billContent, user_id);
 }
 
-export async function adaptiveDetectConflictsOfInterest(billContent: string, sponsorData: any, userId?: string): Promise<AnalysisResult> {
-    return mlServiceAdapter.detectConflictsOfInterest(billContent, sponsorData, userId);
+export async function adaptiveDetectConflictsOfInterest(billContent: string, sponsorData: any, user_id?: string): Promise<AnalysisResult> {
+    return mlServiceAdapter.detectConflictsOfInterest(billContent, sponsorData, user_id);
 }
 
-export async function adaptiveAnalyzeBeneficiaries(billContent: string, userId?: string): Promise<AnalysisResult> {
-    return mlServiceAdapter.analyzeBeneficiaries(billContent, userId);
+export async function adaptiveAnalyzeBeneficiaries(billContent: string, user_id?: string): Promise<AnalysisResult> {
+    return mlServiceAdapter.analyzeBeneficiaries(billContent, user_id);
 }

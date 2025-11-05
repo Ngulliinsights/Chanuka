@@ -101,6 +101,59 @@ export { IntegrationTests } from './integration-tests';
 // Dependency validation
 export { DependencyValidator } from './dependency-validator';
 
+// Testing abstractions for decoupled testing
+export type {
+  ITestDataFactory,
+  IDatabaseOperations,
+  DatabaseEntity,
+  TestDataConfig,
+  DatabaseOperationResult,
+  DatabaseConfig,
+  QueryOptions,
+  ITransaction,
+  DatabaseSchema,
+  TableSchema,
+  ColumnSchema,
+  ForeignKeySchema,
+  IndexSchema,
+  DatabaseMetrics
+} from './test-data-factory';
+
+export type {
+  ITestHelper,
+  AssertionConfig,
+  CleanupConfig,
+  TestContext,
+  TestResource,
+  DatabaseAssertion,
+  PerformanceResult,
+  PerformanceComparison,
+  SnapshotComparisonConfig,
+  SnapshotComparison,
+  SnapshotDifference,
+  DataIntegrityConstraint,
+  DataIntegrityResult
+} from './schema-agnostic-test-helper';
+
+export type {
+  IServiceContainer,
+  ServiceRegistration,
+  ServiceResolutionOptions,
+  ServiceMetadata,
+  ContainerConfig,
+  MockConfig,
+  ServiceLifecycleHook,
+  ContainerStatistics,
+  ValidationResult,
+  ValidationError,
+  ValidationWarning,
+  DependencyGraph,
+  ITestContainer,
+  TestSuiteConfig,
+  TestConfig,
+  TestExecutionContext
+} from './dependency-injection-container';
+
 // Import types needed for utility functions
 import type { LoadTestScenario, LoadTestSuiteOptions } from './load-tester';
 import type { PerformanceMonitorConfig } from './performance-monitor';

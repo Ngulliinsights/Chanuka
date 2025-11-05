@@ -4,7 +4,7 @@
  * Handles analytics, statistics, and reporting for the moderation system.
  */
 
-import { database as db } from '../../../../shared/database/connection';
+import { database as db } from '@shared/database';
 import { bill, 
   comments, 
   users, 
@@ -12,7 +12,7 @@ import { bill,
   moderation_action
  } from '../shared/schema';
 import { eq, count, desc, sql, and, gte, inArray } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 import { ContentAnalytics } from './types.js';
 
 export class ModerationAnalyticsService {
@@ -29,8 +29,8 @@ export class ModerationAnalyticsService {
    * Retrieves comprehensive moderation statistics for analytics dashboards
    */
   async getModerationStats(
-    startDate: Date,
-    endDate: Date
+    start_date: Date,
+    end_date: Date
   ): Promise<{
     reportsCreated: number;
     reportsResolved: number;
@@ -54,8 +54,8 @@ export class ModerationAnalyticsService {
         .from(content_report)
         .where(
           and(
-            gte(content_report.created_at, startDate),
-            sql`${content_report.created_at} <= ${endDate}`
+            gte(content_report.created_at, start_date),
+            sql`${content_report.created_at} <= ${ end_date }`
           )
         );
 
@@ -67,8 +67,8 @@ export class ModerationAnalyticsService {
           and(
             eq(content_report.status, 'resolved'),
             sql`${content_report.reviewedAt} IS NOT NULL`,
-            gte(content_report.reviewedAt, startDate),
-            sql`${content_report.reviewedAt} <= ${endDate}`
+            gte(content_report.reviewedAt, start_date),
+            sql`${content_report.reviewedAt} <= ${ end_date }`
           )
         );
 
@@ -79,22 +79,22 @@ export class ModerationAnalyticsService {
         .where(eq(content_report.status, 'pending'));
 
       // Calculate average resolution time
-      const averageResolutionTime = await this.calculateAverageResolutionTime(startDate, endDate);
+      const averageResolutionTime = await this.calculateAverageResolutionTime(start_date, end_date);
 
       // Group reports by type
-      const reportsByType = await this.getReportsByType(startDate, endDate);
+      const reportsByType = await this.getReportsByType(start_date, end_date);
 
       // Group moderation actions by type
-      const actionsByType = await this.getActionsByType(startDate, endDate);
+      const actionsByType = await this.getActionsByType(start_date, end_date);
 
       // Get moderator activity
-      const moderatorActivity = await this.getModeratorActivity(startDate, endDate);
+      const moderatorActivity = await this.getModeratorActivity(start_date, end_date);
 
       // Content type breakdown
-      const content_typeBreakdown = await this.getContentTypeBreakdown(startDate, endDate);
+      const content_typeBreakdown = await this.getContentTypeBreakdown(start_date, end_date);
 
       // Severity breakdown
-      const severityBreakdown = await this.getSeverityBreakdown(startDate, endDate);
+      const severityBreakdown = await this.getSeverityBreakdown(start_date, end_date);
 
       return {
         reportsCreated: Number(reportsCreatedResult.count),
@@ -195,7 +195,7 @@ export class ModerationAnalyticsService {
 
   // Private helper methods
 
-  private async calculateAverageResolutionTime(startDate: Date, endDate: Date): Promise<number> {
+  private async calculateAverageResolutionTime(start_date: Date, end_date: Date): Promise<number> {
     const resolvedReports = await db
       .select({
         created_at: content_report.created_at,
@@ -206,8 +206,8 @@ export class ModerationAnalyticsService {
         and(
           eq(content_report.status, 'resolved'),
           sql`${content_report.reviewedAt} IS NOT NULL`,
-          gte(content_report.reviewedAt, startDate),
-          sql`${content_report.reviewedAt} <= ${endDate}`
+          gte(content_report.reviewedAt, start_date),
+          sql`${content_report.reviewedAt} <= ${ end_date }`
         )
       );
 
@@ -220,7 +220,7 @@ export class ModerationAnalyticsService {
       : 0;
   }
 
-  private async getReportsByType(startDate: Date, endDate: Date) {
+  private async getReportsByType(start_date: Date, end_date: Date) {
     const reportsByTypeData = await db
       .select({
         type: content_report.reportType,
@@ -229,8 +229,8 @@ export class ModerationAnalyticsService {
       .from(content_report)
       .where(
         and(
-          gte(content_report.created_at, startDate),
-          sql`${content_report.created_at} <= ${endDate}`
+          gte(content_report.created_at, start_date),
+          sql`${content_report.created_at} <= ${ end_date }`
         )
       )
       .groupBy(content_report.reportType)
@@ -242,7 +242,7 @@ export class ModerationAnalyticsService {
     }));
   }
 
-  private async getActionsByType(startDate: Date, endDate: Date) {
+  private async getActionsByType(start_date: Date, end_date: Date) {
     const actionsByTypeData = await db
       .select({
         type: moderation_action.actionType,
@@ -251,8 +251,8 @@ export class ModerationAnalyticsService {
       .from(moderation_action)
       .where(
         and(
-          gte(moderation_action.created_at, startDate),
-          sql`${moderation_action.created_at} <= ${endDate}`
+          gte(moderation_action.created_at, start_date),
+          sql`${moderation_action.created_at} <= ${ end_date }`
         )
       )
       .groupBy(moderation_action.actionType)
@@ -264,7 +264,7 @@ export class ModerationAnalyticsService {
     }));
   }
 
-  private async getModeratorActivity(startDate: Date, endDate: Date) {
+  private async getModeratorActivity(start_date: Date, end_date: Date) {
     const moderatorActivityData = await db
       .select({
         moderatorId: moderation_action.moderatorId,
@@ -273,8 +273,8 @@ export class ModerationAnalyticsService {
       .from(moderation_action)
       .where(
         and(
-          gte(moderation_action.created_at, startDate),
-          sql`${moderation_action.created_at} <= ${endDate}`
+          gte(moderation_action.created_at, start_date),
+          sql`${moderation_action.created_at} <= ${ end_date }`
         )
       )
       .groupBy(moderation_action.moderatorId)
@@ -303,8 +303,8 @@ export class ModerationAnalyticsService {
             and(
               eq(content_report.reviewedBy, mod.moderatorId),
               sql`${content_report.reviewedAt} IS NOT NULL`,
-              gte(content_report.reviewedAt, startDate),
-              sql`${content_report.reviewedAt} <= ${endDate}`
+              gte(content_report.reviewedAt, start_date),
+              sql`${content_report.reviewedAt} <= ${ end_date }`
             )
           );
 
@@ -326,7 +326,7 @@ export class ModerationAnalyticsService {
     );
   }
 
-  private async getContentTypeBreakdown(startDate: Date, endDate: Date) {
+  private async getContentTypeBreakdown(start_date: Date, end_date: Date) {
     const content_typeBreakdownData = await db
       .select({
         content_type: content_report.content_type,
@@ -335,8 +335,8 @@ export class ModerationAnalyticsService {
       .from(content_report)
       .where(
         and(
-          gte(content_report.created_at, startDate),
-          sql`${content_report.created_at} <= ${endDate}`
+          gte(content_report.created_at, start_date),
+          sql`${content_report.created_at} <= ${ end_date }`
         )
       )
       .groupBy(content_report.content_type);
@@ -347,7 +347,7 @@ export class ModerationAnalyticsService {
     }));
   }
 
-  private async getSeverityBreakdown(startDate: Date, endDate: Date) {
+  private async getSeverityBreakdown(start_date: Date, end_date: Date) {
     const severityBreakdownData = await db
       .select({
         severity: content_report.severity,
@@ -356,8 +356,8 @@ export class ModerationAnalyticsService {
       .from(content_report)
       .where(
         and(
-          gte(content_report.created_at, startDate),
-          sql`${content_report.created_at} <= ${endDate}`
+          gte(content_report.created_at, start_date),
+          sql`${content_report.created_at} <= ${ end_date }`
         )
       )
       .groupBy(content_report.severity);

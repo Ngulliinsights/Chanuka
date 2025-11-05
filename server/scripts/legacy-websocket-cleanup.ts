@@ -9,7 +9,7 @@
 
 import { promises as fs } from 'fs';
 import { join, dirname } from 'path';
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);

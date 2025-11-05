@@ -175,7 +175,7 @@ export class MemoryRateLimitStore implements IRateLimitStore, RateLimitStore {
     const now = Date.now();
     const keysToDelete: string[] = [];
 
-    for (const [key, data] of this.data.entries()) {
+    for (const [key, data] of Array.from(this.data.entries())) {
       if (now >= data.resetTime) {
         keysToDelete.push(key);
       }

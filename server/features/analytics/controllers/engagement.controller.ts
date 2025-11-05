@@ -1,12 +1,12 @@
 import { z } from 'zod';
 import { engagementAnalyticsService } from '../services/engagement.service.js';
-import { AuthenticatedRequest } from '../../../middleware/auth.js';
+import { AuthenticatedRequest } from '@/middleware/auth.js';
 
 // Validation schemas for engagement endpoints
 export const getEngagementMetricsSchema = z.object({
   query: z.object({
-    startDate: z.string().datetime().optional(),
-    endDate: z.string().datetime().optional(),
+    start_date: z.string().datetime().optional(),
+    end_date: z.string().datetime().optional(),
     bill_ids: z.string().transform(val => val.split(',').map(Number)).optional(),
     categories: z.string().transform(val => val.split(',')).optional(),
     user_ids: z.string().transform(val => val.split(',')).optional(),
@@ -17,8 +17,8 @@ export const getEngagementMetricsSchema = z.object({
 export const getEngagementTrendsSchema = z.object({
   query: z.object({
     period: z.enum(['daily', 'weekly', 'monthly']),
-    startDate: z.string().datetime().optional(),
-    endDate: z.string().datetime().optional()
+    start_date: z.string().datetime().optional(),
+    end_date: z.string().datetime().optional()
   })
 });
 
@@ -57,13 +57,13 @@ export class EngagementController {
    *       - bearerAuth: []
    *     parameters:
    *       - in: query
-   *         name: startDate
+   *         name: start_date
    *         schema:
    *           type: string
    *           format: date-time
    *         description: Start date for metrics (ISO 8601 format)
    *       - in: query
-   *         name: endDate
+   *         name: end_date
    *         schema:
    *           type: string
    *           format: date-time
@@ -126,8 +126,8 @@ export class EngagementController {
       totalVotes: leaderboard.topCommenters.reduce((sum, user) => sum + users.totalVotes, 0),
       topCategories: [], // Would need implementation
       dateRange: {
-        startDate: query.startDate,
-        endDate: query.endDate
+        start_date: query.start_date,
+        end_date: query.end_date
       },
       filters: {
         bill_ids: query.bill_ids,
@@ -280,8 +280,8 @@ export class EngagementController {
   static async exportEngagementData(
     input: {
       format: 'json' | 'csv';
-      startDate?: string;
-      endDate?: string;
+      start_date?: string;
+      end_date?: string;
       bill_ids?: number[];
       user_ids?: string[];
     },

@@ -35,7 +35,7 @@ async function testSecurityMonitoringSimple() {
     const threatResult = await intrusionDetectionService.analyzeRequest(mockRequest);
     logger.info('✅ Threat detection completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${threatResult.threatLevel}`);
-    console.log(`   - Risk Score: ${threatResult.riskScore}`);
+    console.log(`   - Risk Score: ${threatResult.risk_score}`);
     console.log(`   - Detected Threats: ${threatResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${threatResult.recommendedAction}`);
     console.log(`   - Is Blocked: ${threatResult.isBlocked}`);
@@ -60,7 +60,7 @@ async function testSecurityMonitoringSimple() {
     const sqlThreatResult = await intrusionDetectionService.analyzeRequest(sqlInjectionRequest);
     logger.info('✅ SQL injection detection completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${sqlThreatResult.threatLevel}`);
-    console.log(`   - Risk Score: ${sqlThreatResult.riskScore}`);
+    console.log(`   - Risk Score: ${sqlThreatResult.risk_score}`);
     console.log(`   - Detected Threats: ${sqlThreatResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${sqlThreatResult.recommendedAction}`);
 
@@ -75,7 +75,7 @@ async function testSecurityMonitoringSimple() {
     const pathThreatResult = await intrusionDetectionService.analyzeRequest(pathTraversalRequest);
     logger.info('✅ Path traversal detection completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${pathThreatResult.threatLevel}`);
-    console.log(`   - Risk Score: ${pathThreatResult.riskScore}`);
+    console.log(`   - Risk Score: ${pathThreatResult.risk_score}`);
     console.log(`   - Detected Threats: ${pathThreatResult.detectedThreats.length}`);
 
     // Test 4: Test rate limiting
@@ -131,7 +131,7 @@ async function testSecurityMonitoringSimple() {
     const normalResult = await intrusionDetectionService.analyzeRequest(normalRequest);
     logger.info('✅ Normal request analysis completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${normalResult.threatLevel}`);
-    console.log(`   - Risk Score: ${normalResult.riskScore}`);
+    console.log(`   - Risk Score: ${normalResult.risk_score}`);
     console.log(`   - Detected Threats: ${normalResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${normalResult.recommendedAction}`);
     console.log(`   - Should pass: ${normalResult.recommendedAction === 'allow' ? 'YES' : 'NO'}`);
@@ -151,7 +151,7 @@ async function testSecurityMonitoringSimple() {
     const multiAttackResult = await intrusionDetectionService.analyzeRequest(multiAttackRequest);
     logger.info('✅ Multiple attack pattern detection completed', { component: 'Chanuka' });
     console.log(`   - Threat Level: ${multiAttackResult.threatLevel}`);
-    console.log(`   - Risk Score: ${multiAttackResult.riskScore}`);
+    console.log(`   - Risk Score: ${multiAttackResult.risk_score}`);
     console.log(`   - Detected Threats: ${multiAttackResult.detectedThreats.length}`);
     console.log(`   - Recommended Action: ${multiAttackResult.recommendedAction}`);
     

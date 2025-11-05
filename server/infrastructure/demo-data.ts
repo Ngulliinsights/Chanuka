@@ -2,7 +2,7 @@ import type { Bill, BillComment, Sponsor, BillEngagement } from '@shared/schema'
 // Import analysis types from their respective domain features
 import type { BillAnalysis } from '../features/bills/types/analysis.js';
 import type { SponsorshipAnalysis } from '../features/sponsors/types/analysis.js';
-import { logger  } from '../../shared/core/src/index.js';
+import { logger  } from '@shared/core/index.js';
 
 // Enhanced types for demo data that match API responses
 interface DemoBill extends Omit<Bill, 'id' | 'sponsor_id' | 'comment_count' | 'engagement_score'> {

@@ -10,7 +10,7 @@ export {
   withReadConnection,
   getDatabase,
   pool
-} from '../../../shared/database/connection';
+} from '@shared/database';
 
 // Database schema and types
 export * from '@shared/schema';
@@ -35,15 +35,15 @@ export * from './config';
 export { databaseOptimizationService as DatabaseOptimizationService } from './database-optimization';
 
 // Legacy compatibility exports
-export { database as DatabaseService } from '../../../shared/database/connection';
-export { pool as ConnectionPoolService } from '../../../shared/database/connection';
+export { database as DatabaseService } from '@shared/database';
+export { pool as ConnectionPoolService } from '@shared/database';
 
 // Re-export database types for convenience
 export type {
   DatabaseTransaction,
   DatabaseOperation,
   TransactionOptions
-} from '../../../shared/database/connection';
+} from '@shared/database';
 
 
 

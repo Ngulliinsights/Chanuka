@@ -5,7 +5,7 @@
  * for the WebSocket to Socket.IO migration.
  */
 
-import { logger } from '../../shared/core/src/observability/logging/index.js';
+import { logger } from '@shared/core/observability/logging/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -125,7 +125,7 @@ export class FeatureFlagService {
   /**
    * Check if a feature is enabled for a specific user
    */
-  isEnabled(flagName: string, userId?: string, context?: any): boolean {
+  isEnabled(flagName: string, user_id?: string, context?: any): boolean {
     const flag = this.flags.get(flagName);
     if (!flag) {
       logger.warn(`Feature flag not found: ${flagName}`, {
@@ -142,8 +142,8 @@ export class FeatureFlagService {
     // Check conditions first
     if (flag.conditions) {
       // Check user ID whitelist
-      if (flag.conditions.userIds && userId) {
-        if (flag.conditions.userIds.includes(userId)) {
+      if (flag.conditions.userIds && user_id) {
+        if (flag.conditions.userIds.includes(user_id)) {
           this.recordMetric(flagName, 'new');
           return true;
         }
@@ -160,7 +160,7 @@ export class FeatureFlagService {
     }
 
     // If no user ID provided, use random percentage
-    if (!userId) {
+    if (!user_id) {
       const random = Math.random() * 100;
       const enabled = random < flag.rolloutPercentage;
       this.recordMetric(flagName, enabled ? 'new' : 'legacy');
@@ -168,7 +168,7 @@ export class FeatureFlagService {
     }
 
     // Use consistent hash-based rollout for user
-    const userHash = this.getUserHash(userId);
+    const userHash = this.getUserHash(user_id);
     const enabled = userHash < flag.rolloutPercentage;
     this.recordMetric(flagName, enabled ? 'new' : 'legacy');
     return enabled;
@@ -177,14 +177,14 @@ export class FeatureFlagService {
   /**
    * Get consistent hash for user (0-99)
    */
-  private getUserHash(userId: string): number {
-    if (this.userHashes.has(userId)) {
-      return this.userHashes.get(userId)!;
+  private getUserHash(user_id: string): number {
+    if (this.userHashes.has(user_id)) {
+      return this.userHashes.get(user_id)!;
     }
 
     // Simple hash function for consistent user bucketing
     let hash = 0;
-    for (let i = 0; i < userId.length; i++) {
+    for (let i = 0; i < user_id.length; i++) {
       const char = userId.charCodeAt(i);
       hash = ((hash << 5) - hash) + char;
       hash = hash & hash; // Convert to 32-bit integer
@@ -192,7 +192,7 @@ export class FeatureFlagService {
     
     // Convert to 0-99 range
     const normalizedHash = Math.abs(hash) % 100;
-    this.userHashes.set(userId, normalizedHash);
+    this.userHashes.set(user_id, normalizedHash);
     return normalizedHash;
   }
 

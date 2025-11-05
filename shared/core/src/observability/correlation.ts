@@ -62,9 +62,9 @@ export function extractCorrelationFromHeaders(headers: Record<string, string | s
     if (user_id) { context.user_id = user_id;
      }
 
-    const sessionId = getHeaderValue(headers, SESSION_HEADER);
-    if (sessionId) {
-      context.sessionId = sessionId;
+    const session_id = getHeaderValue(headers, SESSION_HEADER);
+    if (session_id) {
+      context.session_id = sessionId;
     }
 
     return context;
@@ -98,8 +98,8 @@ export function injectCorrelationIntoHeaders(
     updatedHeaders[USER_HEADER] = context.user_id;
   }
 
-  if (context.sessionId) {
-    updatedHeaders[SESSION_HEADER] = context.sessionId;
+  if (context.session_id) {
+    updatedHeaders[SESSION_HEADER] = context.session_id;
   }
 
   return updatedHeaders;
@@ -142,7 +142,7 @@ export class AsyncCorrelationManager implements CorrelationManager {
       requestId,
       spanId: context.spanId,
       user_id: context.user_id,
-      sessionId: context.sessionId,
+      session_id: context.session_id,
       metadata: { ...context.metadata  }
     };
 

@@ -5,14 +5,14 @@
  * including financial, professional, and voting pattern conflicts.
  */
 
-import { database as db } from '../../../../shared/database/connection';
+import { database as db } from '@shared/database';
 import {
   bills, sponsors, sponsorAffiliations, bill_sponsorships, sponsorTransparency,
   type Sponsor, type SponsorAffiliation, type SponsorTransparency, type Bill
-} from '../../../../shared/schema';
+} from '@/shared/schema';
 import { eq, and, sql, desc, gte, lte, count, inArray, like, or } from 'drizzle-orm';
-import { getDefaultCache } from '../../../../shared/core/src/caching/index.js';
-import { logger } from '../../../../shared/core/index.js';
+import { getDefaultCache } from '@shared/core/caching/index.js';
+import { logger } from '@shared/core/index.js';
 import {
   FinancialConflict,
   ProfessionalConflict,
@@ -97,9 +97,9 @@ export class ConflictDetectionEngineService {
           conflictSeverity,
           affectedBills,
           relationshipStrength: this.calculateRelationshipStrength(affiliation),
-          startDate: affiliation.startDate || undefined,
-          endDate: affiliation.endDate || undefined,
-          is_active: !affiliation.endDate || affiliation.endDate > new Date(),
+          start_date: affiliation.start_date || undefined,
+          end_date: affiliation.end_date || undefined,
+          is_active: !affiliation.end_date || affiliation.end_date > new Date(),
           evidenceStrength: 75,
           detectionMethod: 'affiliation_analysis',
           lastUpdated: new Date()

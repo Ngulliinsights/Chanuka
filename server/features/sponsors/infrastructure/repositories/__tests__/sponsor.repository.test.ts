@@ -1,44 +1,26 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { sponsorRepository, SponsorRepository } from '../sponsor.repository';
-import { readDatabase } from '../../../../../db'; // Adjusted path
-import * as schema from '../../../../../../shared/schema'; // Adjusted path
-import { eq, and, like, or, inArray, desc, asc, sql } from 'drizzle-orm';
+import type { ISponsorRepository } from '../../../../../../../shared/core/src/repositories/interfaces/sponsor-repository.interface';
+import type { IServiceContainer } from '../../../../../../../shared/core/src/testing/dependency-injection-container';
+import type { ITestDataFactory } from '../../../../../../../shared/core/src/testing/test-data-factory';
 
-// --- Mock Dependencies ---
-vi.mock('@shared/database/connection', () => ({ readDatabase: vi.fn() }));
+// Initialize dependency injection container and test data factory
+let container: IServiceContainer;
+let testDataFactory: ITestDataFactory;
+let sponsorRepository: ISponsorRepository;
 
-// Comprehensive Mock DB Object
-const mockDb = {
-    select: vi.fn().mockReturnThis(),
-    selectDistinct: vi.fn().mockReturnThis(), // For unique parties/constituencies
-    from: vi.fn().mockReturnThis(),
-    where: vi.fn().mockReturnThis(),
-    orderBy: vi.fn().mockReturnThis(),
-    limit: vi.fn().mockResolvedValue([]), // Default empty result array
-    offset: vi.fn().mockResolvedValue([]), // Default empty result array
-    insert: vi.fn().mockReturnThis(),
-    values: vi.fn().mockReturnThis(),
-    returning: vi.fn().mockResolvedValue([]), // Default empty returning array
-    update: vi.fn().mockReturnThis(),
-    set: vi.fn().mockReturnThis(),
-    delete: vi.fn().mockReturnThis(),
-    leftJoin: vi.fn().mockReturnThis(), // For relation fetching if needed
-    innerJoin: vi.fn().mockReturnThis(),
-    groupBy: vi.fn().mockReturnThis(),
-    // Mock execution for promise resolution
-    then: vi.fn((resolve) => resolve([])), // Default resolve empty array
-    catch: vi.fn(),
-    // Allow mocking specific query results directly if needed
-    _mockResult: (result: any[]) => {
-        mockDb.limit.mockResolvedValue(result);
-        mockDb.offset.mockResolvedValue(result);
-         // Mock the final promise resolution
-         mockDb.then.mockImplementationOnce((resolve) => resolve(result));
-        // Mock returning for insert/update/delete
-        mockDb.returning.mockResolvedValue(result);
-        return mockDb; // Return self for chaining after mocking
-    }
-};
+// Setup test infrastructure
+beforeAll(async () => {
+  // TODO: Initialize proper container and test data factory
+  container = {} as IServiceContainer;
+  testDataFactory = {} as ITestDataFactory;
+
+  // Get repository from container
+  const repoResult = await container.resolve<ISponsorRepository>('sponsor-repository');
+  if (repoResult.isErr()) {
+    throw new Error(`Failed to resolve sponsor repository: ${repoResult.error.message}`);
+  }
+  sponsorRepository = repoResult.value;
+});
 
 
 // --- Mock Data ---
@@ -54,7 +36,7 @@ const mockSponsor2: schema.Sponsor = {
     financial_exposure: '500000', voting_alignment: '60', transparency_score: '70', is_active: true,
     created_at: new Date('2024-02-01'), updated_at: new Date('2024-11-11')
 };
-const mockAffiliation1: schema.SponsorAffiliation = { id: 10, sponsor_id: 1, organization: 'Org X', role: 'Board Member', type: 'economic', conflictType: 'financial_indirect', startDate: new Date('2023-01-01'), endDate: null, is_active: true, created_at: new Date(), updated_at: new Date() };
+const mockAffiliation1: schema.SponsorAffiliation = { id: 10, sponsor_id: 1, organization: 'Org X', role: 'Board Member', type: 'economic', conflictType: 'financial_indirect', start_date: new Date('2023-01-01'), end_date: null, is_active: true, created_at: new Date(), updated_at: new Date() };
 const mockTransparency1: schema.SponsorTransparency = { id: 20, sponsor_id: 1, disclosureType: 'financial', description: 'Stocks in Org X', amount: '5000', source: 'Self-reported', dateReported: new Date('2024-01-15'), is_verified: true, created_at: new Date(), updated_at: new Date() };
 const mockSponsorship1: schema.BillSponsorship = { id: 30, bill_id: 101, sponsor_id: 1, sponsorshipType: 'primary', sponsorshipDate: new Date('2024-03-01'), is_active: true, created_at: new Date()  };
 

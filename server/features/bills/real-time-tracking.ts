@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { authenticateToken } from '../../middleware/auth.js';
 import type { AuthenticatedRequest } from '../../middleware/auth.js';
-import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError  } from '../../../shared/core/src/utils/api';
-import { logger  } from '../../../shared/core/src/index.js';
+import { ApiSuccess, ApiError, ApiNotFound, ApiValidationError  } from '@shared/core/utils/api';
+import { logger  } from '@shared/core/index.js';
 import { webSocketService } from '../../infrastructure/websocket.js';
 // import { billService } from '../application/bills';
 const billService = {

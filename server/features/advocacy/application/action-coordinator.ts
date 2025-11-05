@@ -6,7 +6,7 @@ import { ActionItem, NewActionItem, ActionItemEntity } from '../domain/entities/
 // Repository interfaces removed - using direct service calls
 import { ActionFilters, PaginationOptions, ActionTemplate } from '../types/index.js';
 import { AdvocacyErrors } from '../domain/errors/advocacy-errors.js';
-import { logger } from '../../../shared/core/index.js';
+import { logger } from '@shared/core/index.js';
 
 export class ActionCoordinator {
   constructor(
@@ -16,34 +16,34 @@ export class ActionCoordinator {
 
   async createAction(data: NewActionItem, creatorId: string): Promise<ActionItem> {
     // Validate campaign exists and user has permission
-    const campaign = await this.campaignRepository.findById(data.campaignId);
+    const campaign = await this.campaignRepository.findById(data.campaign_id);
     if (!campaign) {
-      throw AdvocacyErrors.campaignNotFound(data.campaignId);
+      throw AdvocacyErrors.campaignNotFound(data.campaign_id);
     }
 
     // Check if user is campaign organizer or participant
     const isOrganizer = campaign.organizerId === creatorId;
-    const isParticipant = await this.campaignRepository.isParticipant(data.campaignId, creatorId);
+    const isParticipant = await this.campaignRepository.isParticipant(data.campaign_id, creatorId);
     
     if (!isOrganizer && !isParticipant) {
-      throw AdvocacyErrors.campaignAccessDenied(data.campaignId, creatorId);
+      throw AdvocacyErrors.campaignAccessDenied(data.campaign_id, creatorId);
     }
 
     // Validate action assignment
-    if (data.userId !== creatorId && !isOrganizer) {
+    if (data.user_id !== creatorId && !isOrganizer) {
       throw AdvocacyErrors.unauthorizedAction('assign action to other user', 'action');
     }
 
     // Validate due date
-    if (data.dueDate && data.dueDate <= new Date()) {
-      throw AdvocacyErrors.actionValidation('dueDate', 'Due date must be in the future');
+    if (data.due_date && data.due_date <= new Date()) {
+      throw AdvocacyErrors.actionValidation('due_date', 'Due date must be in the future');
     }
 
     const action = await this.actionRepository.create(data);
     
     logger.info('Action created', { 
       actionId: action.id,
-      campaignId: data.campaignId,
+      campaign_id: data.campaign_id,
       actionType: data.actionType,
       component: 'ActionCoordinator' 
     });
@@ -51,67 +51,67 @@ export class ActionCoordinator {
     return action;
   }
 
-  async getAction(actionId: string, userId: string): Promise<ActionItem> {
+  async getAction(actionId: string, user_id: string): Promise<ActionItem> {
     const action = await this.actionRepository.findById(actionId);
     if (!action) {
       throw AdvocacyErrors.actionNotFound(actionId);
     }
 
     // Check access permissions
-    const campaign = await this.campaignRepository.findById(action.campaignId);
+    const campaign = await this.campaignRepository.findById(action.campaign_id);
     if (!campaign) {
-      throw AdvocacyErrors.campaignNotFound(action.campaignId);
+      throw AdvocacyErrors.campaignNotFound(action.campaign_id);
     }
 
-    const hasAccess = action.userId === userId || 
+    const hasAccess = action.user_id === userId || 
                      campaign.organizerId === userId ||
-                     await this.campaignRepository.isParticipant(action.campaignId, userId);
+                     await this.campaignRepository.isParticipant(action.campaign_id, user_id);
 
     if (!hasAccess) {
-      throw AdvocacyErrors.actionAssignment(actionId, userId);
+      throw AdvocacyErrors.actionAssignment(actionId, user_id);
     }
 
     return action;
   }
 
   async getUserActions(
-    userId: string, 
+    user_id: string, 
     filters?: ActionFilters,
     pagination?: PaginationOptions
   ): Promise<ActionItem[]> {
-    return await this.actionRepository.findByUser(userId, filters);
+    return await this.actionRepository.findByUser(user_id, filters);
   }
 
-  async getUserDashboard(userId: string): Promise<any> {
-    return await this.actionRepository.getUserDashboard(userId);
+  async getUserDashboard(user_id: string): Promise<any> {
+    return await this.actionRepository.getUserDashboard(user_id);
   }
 
   async getCampaignActions(
-    campaignId: string, 
-    userId: string,
+    campaign_id: string, 
+    user_id: string,
     filters?: ActionFilters
   ): Promise<ActionItem[]> {
     // Validate access to campaign
-    const campaign = await this.campaignRepository.findById(campaignId);
+    const campaign = await this.campaignRepository.findById(campaign_id);
     if (!campaign) {
-      throw AdvocacyErrors.campaignNotFound(campaignId);
+      throw AdvocacyErrors.campaignNotFound(campaign_id);
     }
 
     const hasAccess = campaign.organizerId === userId ||
-                     await this.campaignRepository.isParticipant(campaignId, userId);
+                     await this.campaignRepository.isParticipant(campaign_id, user_id);
 
     if (!hasAccess) {
-      throw AdvocacyErrors.campaignAccessDenied(campaignId, userId);
+      throw AdvocacyErrors.campaignAccessDenied(campaign_id, user_id);
     }
 
-    return await this.actionRepository.findByCampaign(campaignId, filters);
+    return await this.actionRepository.findByCampaign(campaign_id, filters);
   }
 
-  async startAction(actionId: string, userId: string): Promise<ActionItem> {
-    const action = await this.getAction(actionId, userId);
+  async startAction(actionId: string, user_id: string): Promise<ActionItem> {
+    const action = await this.getAction(actionId, user_id);
     
-    if (action.userId !== userId) {
-      throw AdvocacyErrors.actionAssignment(actionId, userId);
+    if (action.user_id !== user_id) {
+      throw AdvocacyErrors.actionAssignment(actionId, user_id);
     }
 
     const actionEntity = ActionItemEntity.fromData(action);
@@ -125,7 +125,7 @@ export class ActionCoordinator {
     const updatedAction = await this.actionRepository.update(actionId, {
       status: 'in_progress',
       startedAt: new Date(),
-      updatedAt: new Date()
+      updated_at: new Date()
     });
 
     if (!updatedAction) {
@@ -134,7 +134,7 @@ export class ActionCoordinator {
 
     logger.info('Action started', { 
       actionId, 
-      userId,
+      user_id,
       component: 'ActionCoordinator' 
     });
 
@@ -143,14 +143,14 @@ export class ActionCoordinator {
 
   async completeAction(
     actionId: string, 
-    userId: string,
+    user_id: string,
     outcome?: ActionItem['outcome'],
     actualTimeMinutes?: number
   ): Promise<ActionItem> {
-    const action = await this.getAction(actionId, userId);
+    const action = await this.getAction(actionId, user_id);
     
-    if (action.userId !== userId) {
-      throw AdvocacyErrors.actionAssignment(actionId, userId);
+    if (action.user_id !== user_id) {
+      throw AdvocacyErrors.actionAssignment(actionId, user_id);
     }
 
     const actionEntity = ActionItemEntity.fromData(action);
@@ -164,7 +164,7 @@ export class ActionCoordinator {
     const updatedAction = await this.actionRepository.update(actionId, {
       status: 'completed',
       completedAt: new Date(),
-      updatedAt: new Date(),
+      updated_at: new Date(),
       outcome,
       actualTimeMinutes
     });
@@ -175,7 +175,7 @@ export class ActionCoordinator {
 
     logger.info('Action completed', { 
       actionId, 
-      userId,
+      user_id,
       successful: outcome?.successful,
       component: 'ActionCoordinator' 
     });
@@ -185,13 +185,13 @@ export class ActionCoordinator {
 
   async skipAction(
     actionId: string, 
-    userId: string, 
+    user_id: string, 
     reason?: string
   ): Promise<ActionItem> {
-    const action = await this.getAction(actionId, userId);
+    const action = await this.getAction(actionId, user_id);
     
-    if (action.userId !== userId) {
-      throw AdvocacyErrors.actionAssignment(actionId, userId);
+    if (action.user_id !== user_id) {
+      throw AdvocacyErrors.actionAssignment(actionId, user_id);
     }
 
     const actionEntity = ActionItemEntity.fromData(action);
@@ -204,7 +204,7 @@ export class ActionCoordinator {
 
     const updatedAction = await this.actionRepository.update(actionId, {
       status: 'skipped',
-      updatedAt: new Date(),
+      updated_at: new Date(),
       outcome: reason ? {
         successful: false,
         impactNotes: `Skipped: ${reason}`
@@ -217,7 +217,7 @@ export class ActionCoordinator {
 
     logger.info('Action skipped', { 
       actionId, 
-      userId,
+      user_id,
       reason,
       component: 'ActionCoordinator' 
     });
@@ -227,18 +227,18 @@ export class ActionCoordinator {
 
   async updateActionContent(
     actionId: string,
-    userId: string,
+    user_id: string,
     customizedContent: ActionItem['customizedContent']
   ): Promise<ActionItem> {
-    const action = await this.getAction(actionId, userId);
+    const action = await this.getAction(actionId, user_id);
     
-    if (action.userId !== userId) {
-      throw AdvocacyErrors.actionAssignment(actionId, userId);
+    if (action.user_id !== user_id) {
+      throw AdvocacyErrors.actionAssignment(actionId, user_id);
     }
 
     const updatedAction = await this.actionRepository.update(actionId, {
       customizedContent: { ...action.customizedContent, ...customizedContent },
-      updatedAt: new Date()
+      updated_at: new Date()
     });
 
     if (!updatedAction) {
@@ -250,13 +250,13 @@ export class ActionCoordinator {
 
   async addActionFeedback(
     actionId: string,
-    userId: string,
+    user_id: string,
     feedback: ActionItem['userFeedback']
   ): Promise<ActionItem> {
-    const action = await this.getAction(actionId, userId);
+    const action = await this.getAction(actionId, user_id);
     
-    if (action.userId !== userId) {
-      throw AdvocacyErrors.actionAssignment(actionId, userId);
+    if (action.user_id !== user_id) {
+      throw AdvocacyErrors.actionAssignment(actionId, user_id);
     }
 
     if (action.status !== 'completed') {
@@ -270,7 +270,7 @@ export class ActionCoordinator {
 
     const updatedAction = await this.actionRepository.update(actionId, {
       userFeedback: feedback,
-      updatedAt: new Date()
+      updated_at: new Date()
     });
 
     if (!updatedAction) {
@@ -279,7 +279,7 @@ export class ActionCoordinator {
 
     logger.info('Action feedback added', { 
       actionId, 
-      userId,
+      user_id,
       rating: feedback.rating,
       component: 'ActionCoordinator' 
     });
@@ -313,30 +313,30 @@ export class ActionCoordinator {
   }
 
   async createBulkActions(
-    campaignId: string,
-    actionData: Omit<NewActionItem, 'campaignId'>[],
+    campaign_id: string,
+    actionData: Omit<NewActionItem, 'campaign_id'>[],
     creatorId: string
   ): Promise<ActionItem[]> {
     // Validate campaign access
-    const campaign = await this.campaignRepository.findById(campaignId);
+    const campaign = await this.campaignRepository.findById(campaign_id);
     if (!campaign) {
-      throw AdvocacyErrors.campaignNotFound(campaignId);
+      throw AdvocacyErrors.campaignNotFound(campaign_id);
     }
 
     if (campaign.organizerId !== creatorId) {
-      throw AdvocacyErrors.campaignAccessDenied(campaignId, creatorId);
+      throw AdvocacyErrors.campaignAccessDenied(campaign_id, creatorId);
     }
 
     // Prepare actions with campaign ID
     const actionsToCreate: NewActionItem[] = actionData.map(data => ({
       ...data,
-      campaignId
+      campaign_id
     }));
 
     const actions = await this.actionRepository.createBulkActions(actionsToCreate);
     
     logger.info('Bulk actions created', { 
-      campaignId,
+      campaign_id,
       actionCount: actions.length,
       creatorId,
       component: 'ActionCoordinator' 
@@ -345,46 +345,46 @@ export class ActionCoordinator {
     return actions;
   }
 
-  async getRecommendedActions(userId: string, limit: number = 10): Promise<ActionItem[]> {
-    return await this.actionRepository.getRecommendedActions(userId, limit);
+  async getRecommendedActions(user_id: string, limit: number = 10): Promise<ActionItem[]> {
+    return await this.actionRepository.getRecommendedActions(user_id, limit);
   }
 
-  async getOptimalActionSequence(campaignId: string, userId: string): Promise<ActionItem[]> {
+  async getOptimalActionSequence(campaign_id: string, user_id: string): Promise<ActionItem[]> {
     // Validate access
-    const campaign = await this.campaignRepository.findById(campaignId);
+    const campaign = await this.campaignRepository.findById(campaign_id);
     if (!campaign) {
-      throw AdvocacyErrors.campaignNotFound(campaignId);
+      throw AdvocacyErrors.campaignNotFound(campaign_id);
     }
 
     const hasAccess = campaign.organizerId === userId ||
-                     await this.campaignRepository.isParticipant(campaignId, userId);
+                     await this.campaignRepository.isParticipant(campaign_id, user_id);
 
     if (!hasAccess) {
-      throw AdvocacyErrors.campaignAccessDenied(campaignId, userId);
+      throw AdvocacyErrors.campaignAccessDenied(campaign_id, user_id);
     }
 
-    return await this.actionRepository.getOptimalActionSequence(campaignId, userId);
+    return await this.actionRepository.getOptimalActionSequence(campaign_id, user_id);
   }
 
   async getActionAnalytics(filters?: ActionFilters): Promise<any> {
     return await this.actionRepository.getActionAnalytics(filters);
   }
 
-  async getCampaignActionSummary(campaignId: string, userId: string): Promise<any> {
+  async getCampaignActionSummary(campaign_id: string, user_id: string): Promise<any> {
     // Validate access
-    const campaign = await this.campaignRepository.findById(campaignId);
+    const campaign = await this.campaignRepository.findById(campaign_id);
     if (!campaign) {
-      throw AdvocacyErrors.campaignNotFound(campaignId);
+      throw AdvocacyErrors.campaignNotFound(campaign_id);
     }
 
     const hasAccess = campaign.organizerId === userId ||
-                     await this.campaignRepository.isParticipant(campaignId, userId);
+                     await this.campaignRepository.isParticipant(campaign_id, user_id);
 
     if (!hasAccess) {
-      throw AdvocacyErrors.campaignAccessDenied(campaignId, userId);
+      throw AdvocacyErrors.campaignAccessDenied(campaign_id, user_id);
     }
 
-    return await this.actionRepository.getCampaignActionSummary(campaignId);
+    return await this.actionRepository.getCampaignActionSummary(campaign_id);
   }
 
   async getActionsNeedingReminders(): Promise<ActionItem[]> {

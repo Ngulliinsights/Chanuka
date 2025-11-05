@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticateToken, AuthenticatedRequest } from '../../../../middleware/auth';
+import { authenticateToken, AuthenticatedRequest } from '@/middleware/auth';
 import {
   unifiedAlertPreferenceService,
   alertPreferenceSchema,
@@ -13,8 +13,8 @@ import { ApiSuccess,
   ApiError,
   ApiValidationError,
   ApiResponseWrapper
- } from '../../../../../shared/core/src/utils/api-utils.js';
-import { logger  } from '../../../../../shared/core/src/index.js';
+ } from '@shared/core/utils/api-utils.js';
+import { logger  } from '@shared/core/index.js';
 
 export const router = Router();
 
@@ -36,8 +36,8 @@ const deliveryLogsQuerySchema = z.object({
     'engagement_milestone'
   ]).optional(),
   status: z.enum(['pending', 'sent', 'delivered', 'failed', 'filtered']).optional(),
-  startDate: z.string().datetime().optional(),
-  endDate: z.string().datetime().optional()
+  start_date: z.string().datetime().optional(),
+  end_date: z.string().datetime().optional()
 });
 
 const processAlertSchema = z.object({
@@ -386,8 +386,8 @@ router.get('/logs/delivery', authenticateToken, async (req: AuthenticatedRequest
       limit: query.limit,
       alertType: query.alertType,
       status: query.status,
-      startDate: query.startDate ? new Date(query.startDate) : undefined,
-      endDate: query.endDate ? new Date(query.endDate) : undefined
+      start_date: query.start_date ? new Date(query.start_date) : undefined,
+      end_date: query.end_date ? new Date(query.end_date) : undefined
      });
     
     return ApiSuccess(

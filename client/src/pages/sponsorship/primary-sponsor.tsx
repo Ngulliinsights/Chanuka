@@ -44,7 +44,7 @@ interface SponsorData {
     directConflicts: number;
     indirectConflicts: number;
     totalExposure: number;
-    riskScore: number;
+    risk_score: number;
     conflictDetails: {
       direct: Array<{
         organization: string;
@@ -265,7 +265,7 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
               <div className="flex justify-between items-center">
                 <span>Risk Score:</span>
                 <Badge className={getConflictLevelColor(sponsor.riskProfile.level)}>
-                  {sponsor.conflictAnalysis.riskScore}/100
+                  {sponsor.conflictAnalysis.risk_score}/100
                 </Badge>
               </div>
             </div>
