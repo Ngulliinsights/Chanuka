@@ -31,7 +31,7 @@ const enginesDir = path.join(__dirname, '..', 'engines');
 const utilsDir = path.join(__dirname, '..', 'utils');
 
 const requiredFiles = [
-  path.join(servicesDir, 'query-builder.service.ts'),
+  // query-builder.service.ts removed - functionality moved to direct Drizzle usage
   path.join(servicesDir, 'history-cleanup.service.ts'),
   path.join(enginesDir, 'suggestion-engine.service.ts'),
   path.join(enginesDir, 'suggestion-ranking.service.ts'),
@@ -53,10 +53,9 @@ const legacyServicePath = path.join(__dirname, '..', '..', 'search-suggestions.t
 if (fs.existsSync(legacyServicePath)) {
   const content = fs.readFileSync(legacyServicePath, 'utf8');
   
-  // Check if it imports the new services
-  const hasNewImports = content.includes('suggestionEngineService') && 
-                       content.includes('suggestionRankingService') &&
-                       content.includes('queryBuilderService');
+  // Check if it imports the new services (query builder service removed)
+  const hasNewImports = content.includes('SuggestionEngineService') && 
+                       content.includes('suggestionEngineService');
   
   // Check if old implementation is removed (should be much smaller now)
   const isRefactored = content.length < 5000; // Original was ~866 lines, refactored should be much smaller

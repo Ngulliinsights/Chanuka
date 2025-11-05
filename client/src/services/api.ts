@@ -4,7 +4,8 @@
  */
 
 import { logger } from '../utils/browser-logger';
-import { validationService } from '@shared/core';
+// validationService is exported from the validation sub-module of @shared/core
+import { validationService } from '@shared/core/validation';
 import { ZodSchema } from 'zod';
 import { envConfig } from '../utils/env-config';
 
@@ -183,26 +184,22 @@ export const billsApi = {
   recordEngagement: (bill_id: string | number, engagement: any) => api.post(`/api/bills/${ bill_id }/engagement`, engagement),
 };
 
-// Import schemas for validation
-import {
-  selectBillSchema,
-  selectBillCommentSchema,
-  selectSponsorSchema,
-  selectAnalysisSchema,
-  insertBillCommentSchema
-} from '@shared/schema';
-
-// Bills API with validation
+// Note: Zod validation schemas are not exported from '@shared/schema' in this
+// workspace; the main `shared/schema` package contains DB table definitions
+// and types rather than runtime Zod validation schemas. If you have a
+// separate package that ships Zod schemas (for request/response validation),
+// import them here. For now expose a validation-less wrapper that mirrors
+// the validated API surface but delegates to the plain `billsApi` above.
 export const billsApiValidated = {
-  getAll: (params?: any) => api.get('/api/bills', { ...params }, selectBillSchema.array()),
-  getById: (id: string | number) => api.get(`/api/bills/${id}`, undefined, selectBillSchema),
-  getComments: (bill_id: string | number) => api.get(`/api/bills/${ bill_id }/comments`, undefined, selectBillCommentSchema.array()),
-  getSponsors: (bill_id: string | number) => api.get(`/api/bills/${ bill_id }/sponsors`, undefined, selectSponsorSchema.array()),
-  getAnalysis: (bill_id: string | number) => api.get(`/api/bills/${ bill_id }/analysis`, undefined, selectAnalysisSchema),
-  getCategories: () => api.get('/api/bills/categories'),
-  getStatuses: () => api.get('/api/bills/statuses'),
-  addComment: (bill_id: string | number, comment: any) => api.post(`/api/bills/${ bill_id }/comments`, comment, undefined, selectBillCommentSchema),
-  recordEngagement: (bill_id: string | number, engagement: any) => api.post(`/api/bills/${ bill_id }/engagement`, engagement),
+  getAll: (params?: any) => billsApi.getAll(params),
+  getById: (id: string | number) => billsApi.getById(id),
+  getComments: (bill_id: string | number) => billsApi.getComments(bill_id),
+  getSponsors: (bill_id: string | number) => billsApi.getSponsors(bill_id),
+  getAnalysis: (bill_id: string | number) => billsApi.getAnalysis(bill_id),
+  getCategories: () => billsApi.getCategories(),
+  getStatuses: () => billsApi.getStatuses(),
+  addComment: (bill_id: string | number, comment: any) => billsApi.addComment(bill_id, comment),
+  recordEngagement: (bill_id: string | number, engagement: any) => billsApi.recordEngagement(bill_id, engagement),
 };
 
 // System API

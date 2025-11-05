@@ -3,18 +3,14 @@
 // ============================================================================
 // Tests for campaign management, action coordination, and community organizing
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { testDb, testPool, testUtils, generateTestData } from './setup';
 import {
   campaigns,
-  campaign_actions,
+  action_items,
   campaign_participants,
-  community_ambassadors,
-  ambassador_activities,
-  facilitation_sessions,
-  session_participants,
-  action_outcomes,
-  campaign_analytics
+  action_completions,
+  campaign_impact_metrics
 } from '../advocacy_coordination';
 import { bills, users } from '../foundation';
 import { eq, and, or, sql, count, sum } from 'drizzle-orm';

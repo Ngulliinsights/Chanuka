@@ -48,3 +48,11 @@
 {"timestamp":"2025-10-21T17:23:02.320Z","level":"error","message":"Migration process failed:","correlationId":"mh0u1sts-c4859bf0","component":"Chanuka","error":{"error":"connection is insecure (try using `sslmode=require`)","type":"string"}}
 {"timestamp":"2025-10-21T18:21:27.052Z","level":"error","message":"Migration process failed:","correlationId":"mh0w4x3g-13e5c695","component":"Chanuka","error":{"error":"connection is insecure (try using `sslmode=require`)","type":"string"}}
 {"timestamp":"2025-10-21T18:22:41.963Z","level":"error","message":"Migration process failed:","correlationId":"mh0w6iwb-3b0dd13a","component":"Chanuka","error":{"error":"connection is insecure (try using `sslmode=require`)","type":"string"}}
+{"timestamp":"2025-11-03T20:42:21.030Z","level":"error","message":"Error message","correlationId":"mhjlw6w6-302604cb"}
+{"timestamp":"2025-11-03T20:55:48.246Z","level":"error","message":"Error message","correlationId":"mhjmdhqu-6e288057"}
+{"timestamp":"2025-11-03T20:56:28.149Z","level":"error","message":"Error message","correlationId":"mhjmecj9-92eacc89"}
+{"timestamp":"2025-11-03T21:02:21.435Z","level":"error","message":"Error message","correlationId":"mhjmlx4r-c99368d6"}
+{"timestamp":"2025-11-03T22:54:40.530Z","level":"error","message":"Error:","correlationId":"mhjqmd1u-c0e5047e","component":"Chanuka","error":{"message":"role \"Access Granted\" does not exist","name":"error","stack":"error: role \"Access Granted\" does not exist\n    at c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\node_modules\\pg-pool\\index.js:45:11\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async dropAndRecreateSchema (c:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\scripts\\drop-schema.ts:11:5)"}}
+{"timestamp":"2025-11-03T23:16:46.508Z","level":"error","message":"❌ Reconnection attempt failed","correlationId":"mhjres6k-b498e73a","component":"Chanuka","error":"Connection test timeout"}
+{"timestamp":"2025-11-03T23:16:53.714Z","level":"error","message":"❌ Reconnection attempt failed","correlationId":"mhjrexqq-216a3286","component":"Chanuka","error":"Connection test timeout"}
+{"timestamp":"2025-11-03T23:17:02.235Z","level":"error","message":"❌ Reconnection attempt failed","correlationId":"mhjrf4bf-49348a74","component":"Chanuka","error":"Connection test timeout"}

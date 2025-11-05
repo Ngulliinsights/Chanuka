@@ -312,6 +312,15 @@ export class MLAnalysisService {
 // Maintain the existing service instance for backward compatibility
 export const mlAnalysisService = new MLAnalysisService();
 
+// Re-export adapter functions for seamless migration
+export { 
+  adaptiveAnalyzeStakeholderInfluence,
+  adaptiveDetectConflictsOfInterest,
+  adaptiveAnalyzeBeneficiaries,
+  MLServiceAdapter,
+  mlServiceAdapter
+} from './ml-adapter.service.js';
+
 export async function detectImplementationWorkarounds(bill_id: string): Promise<ImplementationWorkaroundDetection[]> { try {
     // Enhanced input validation
     if (!bill_id || typeof bill_id !== 'string' || bill_id.trim().length === 0) {

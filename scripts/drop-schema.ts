@@ -1,12 +1,12 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import { pool } from './shared/database/pool.js';
-import { logger } from '@shared/core';
+import { pool } from '../shared/database/pool.js';
+import { logger } from '../shared/core/src/observability/logging';
 
 async function dropAndRecreateSchema() {
   try {
-    logger.info('DATABASE_URL:', { component: 'Chanuka' }, process.env.DATABASE_URL);
+    logger.info('DATABASE_URL:', { component: 'Chanuka', url: process.env.DATABASE_URL });
     logger.info('Testing connection...', { component: 'Chanuka' });
     await pool.query('SELECT 1');
     logger.info('Connection successful.', { component: 'Chanuka' });

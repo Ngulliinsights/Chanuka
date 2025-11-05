@@ -6,8 +6,7 @@
  */
 
 import { EventEmitter } from 'events';
-import chokidar from 'chokidar';
-import dotenvExpand from 'dotenv-expand';
+import * as chokidar from 'chokidar';
 import { config as dotenvConfig } from 'dotenv';
 import { existsSync, readFileSync, watchFile } from 'fs';
 import { resolve } from 'path';

@@ -220,6 +220,27 @@ export interface LogTransport {
 }
 
 /**
+ * Main logger interface
+ */
+export interface Logger {
+  trace(message: string, context?: LogContext, metadata?: Record<string, unknown>): void;
+  debug(message: string, context?: LogContext, metadata?: Record<string, unknown>): void;
+  info(message: string, context?: LogContext, metadata?: Record<string, unknown>): void;
+  warn(message: string, context?: LogContext, metadata?: Record<string, unknown>): void;
+  error(message: string, context?: LogContext, metadata?: Record<string, unknown>): void;
+  fatal(message: string, context?: LogContext, metadata?: Record<string, unknown>): void;
+  critical(message: string, context?: LogContext, metadata?: Record<string, unknown>): void;
+  child(bindings: Record<string, unknown>): LoggerChild;
+  withContext<T>(context: LogContext, fn: () => T): T;
+  withContextAsync<T>(context: LogContext, fn: () => Promise<T>): Promise<T>;
+  getMetrics(): LogMetrics;
+  queryLogs(filters: LogQueryFilters): StoredLogEntry[];
+  getAggregation(timeRange?: { start: Date; end: Date }): LogAggregation;
+  flush(): Promise<void>;
+  close(): Promise<void>;
+}
+
+/**
  * Logger child context for scoped logging
  */
 export interface LoggerChild {

@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction } from 'express';
 // Import the NEW comprehensive analysis service
 import { billComprehensiveAnalysisService } from '../application/bill-comprehensive-analysis.service.js';
 // Import repository for fetching historical data
-import { analysisRepository } from '../infrastructure/repositories/analysis-repository-impl.js';
+import { analysisService } from '../application/analysis-service-direct.js';
 import { authenticateToken, AuthenticatedRequest } from '../../../middleware/auth.js'; // Use if auth needed
 import { ApiSuccess, ApiError, ApiValidationError  } from '../../../../shared/core/src/utils/api';
 import { logger  } from '../../../../shared/core/src/index.js';
@@ -98,7 +98,8 @@ router.get('/bills/:bill_id/history', async (req: Request, res: Response, next: 
         }
 
 
-        const historyRecords = await analysisRepository.findHistoryByBillId(bill_id, limit);
+        // Use the new analysis service for historical data
+        const historyRecords = await analysisService.findLatestAnalysisByBillId(bill_id);
 
         // Transform results for frontend consumption, extracting key info from JSONB
         const historyResults = historyRecords.map(record => {

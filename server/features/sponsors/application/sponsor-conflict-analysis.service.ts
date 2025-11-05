@@ -1,5 +1,5 @@
-// Import the NEW repository for data access
-import { sponsorRepository, SponsorRepository } from '../infrastructure/repositories/sponsor.repository'; // Adjusted path
+// Import the NEW service for data access
+import { sponsorService } from './sponsor-service-direct';
 import { logger  } from '../../../../shared/core/src/index.js';
 const loggerAny = logger as any;
 import type { Sponsor, Bill } from '@shared/schema';
@@ -129,11 +129,11 @@ export interface RiskProfile {
  *
  * Contains the algorithms and logic for detecting, scoring, and analyzing
  * potential conflicts of interest for legislative sponsors.
- * Relies on the SponsorRepository for data fetching. Contains NO direct DB queries.
+ * Relies on the SponsorService for data fetching. Contains NO direct DB queries.
  */
 export class SponsorConflictAnalysisService {
-  // Inject repository dependency (using the singleton instance for simplicity)
-  private sponsorRepo: SponsorRepository = sponsorRepository;
+  // Inject service dependency (using the singleton instance for simplicity)
+  private sponsorService = sponsorService;
 
   // --- Configuration --- (Keep thresholds, colors, weights as defined previously)
   private readonly conflictThresholds = {
@@ -244,20 +244,20 @@ export class SponsorConflictAnalysisService {
 
   // --- createConflictMapping, analyzeConflictTrends, generateRiskProfile ---
   // These methods remain largely the same as provided previously, ensuring they
-  // now call `this.sponsorRepo` for data fetching instead of `sponsorService`.
+  // now call `this.sponsorService` for data fetching.
   // Example modification for generateRiskProfile:
   async generateRiskProfile(sponsor_id: number): Promise<RiskProfile> {
       const logContext = { component: 'SponsorConflictAnalysisService', operation: 'generateRiskProfile', sponsor_id };
   loggerAny.info(`Generating risk profile`, logContext);
       try {
           // Fetch data using the repository
-          const sponsor = await this.sponsorRepo.findById(sponsor_id);
+          const sponsor = await this.sponsorService.findById(sponsor_id);
           if (!sponsor) throw new Error(`Sponsor ${sponsor_id} not found`);
 
           // Fetch related data concurrently using repository methods
           const [affiliations, transparency] = await Promise.all([
-              this.sponsorRepo.listAffiliations(sponsor_id),
-              this.sponsorRepo.listTransparencyRecords(sponsor_id)
+              this.sponsorService.listAffiliations(sponsor_id),
+              this.sponsorService.listTransparencyRecords(sponsor_id)
           ]);
 
           // Calculate risk components (using methods defined below)
@@ -393,7 +393,7 @@ export class SponsorConflictAnalysisService {
 
   private async generateConflictPredictions(sponsor_id: number): Promise<ConflictPrediction[]> {
     // Very simple predictions: look at sponsor affiliations and upcoming bills
-    const affiliations = await this.sponsorRepo.listAffiliations(sponsor_id);
+    const affiliations = await this.sponsorService.listAffiliations(sponsor_id);
     const allBills = [] as Array<{ id: number; title?: string }>; // Placeholder - repository method not used here
     const upcoming = allBills.slice(0,5);
     return upcoming.map(b => ({ bill_id: b.id, billTitle: b.title || '', predictedConflictType: 'financial_indirect', probability: 0.2, riskFactors: affiliations.slice(0,2).map(a=>a.organization)  }));
@@ -409,11 +409,13 @@ export class SponsorConflictAnalysisService {
       // Fetch all data concurrently using repository methods
       try {
           const [sponsors, affiliationsMap, transparencyMap, sponsorshipsMap] = await Promise.all([
-              this.sponsorRepo.findByIds(sponsor_ids),
-              this.sponsorRepo.findAffiliationsBySponsorIds(sponsor_ids), // Fetches map
-              this.sponsorRepo.findTransparencyBySponsorIds(sponsor_ids), // Fetches map
-              // Fetch sponsorships initiated BY these sponsors (adjust if different relation needed)
-              Promise.all(sponsor_ids.map(id => this.sponsorRepo.listBillSponsorshipsBySponsor(id)))
+              this.sponsorService.findByIds(sponsor_ids),
+              // TODO: Implement bulk affiliation fetching
+              new Map(), // this.sponsorService.findAffiliationsBySponsorIds(sponsor_ids),
+              // TODO: Implement bulk transparency fetching  
+              new Map(), // this.sponsorService.findTransparencyBySponsorIds(sponsor_ids),
+              // Fetch sponsorships initiated BY these sponsors
+              Promise.all(sponsor_ids.map(id => this.sponsorService.listBillSponsorshipsBySponsor(id)))
                   .then(results => new Map(results.map((spons, i) => [sponsor_ids[i], spons]))) // Create map
           ]);
 
@@ -435,13 +437,14 @@ export class SponsorConflictAnalysisService {
   /** Fetches all active sponsors and their related data. */
   private async getAllActiveSponsorData(): Promise<SponsorWithRelations[]> {
       try {
-           const activeSponsors = await this.sponsorRepo.list({ is_active: true, limit: 1000 }); // Add reasonable limit
+           const activeSponsors = await this.sponsorService.list({ is_active: true, limit: 1000 }); // Add reasonable limit
            const sponsor_ids = activeSponsors.map(s => s.id);
            // Fetch relations in bulk
            const [affiliationsMap, transparencyMap, sponsorshipsMap] = await Promise.all([
-               this.sponsorRepo.findAffiliationsBySponsorIds(sponsor_ids),
-               this.sponsorRepo.findTransparencyBySponsorIds(sponsor_ids),
-               Promise.all(sponsor_ids.map(id => this.sponsorRepo.listBillSponsorshipsBySponsor(id)))
+               // TODO: Implement bulk operations
+               new Map(), // this.sponsorService.findAffiliationsBySponsorIds(sponsor_ids),
+               new Map(), // this.sponsorService.findTransparencyBySponsorIds(sponsor_ids),
+               Promise.all(sponsor_ids.map(id => this.sponsorService.listBillSponsorshipsBySponsor(id)))
                   .then(results => new Map(results.map((spons, i) => [sponsor_ids[i], spons])))
            ]);
 
@@ -475,7 +478,8 @@ export class SponsorConflictAnalysisService {
      for (const affiliation of financialAffiliations) {
          try {
               // Use repository method to find relevant bills
-             const affectedBills = await this.sponsorRepo.findBillsMentioningOrganization(affiliation.organization, bill_ids);
+             // TODO: Implement findBillsMentioningOrganization
+             const affectedBills = []; // await this.sponsorService.findBillsMentioningOrganization(affiliation.organization, bill_ids);
 
              if (affectedBills.length > 0) {
          const financialImpact = this.estimateFinancialImpact(sponsor, affiliation, affectedBills.length);
@@ -511,7 +515,7 @@ export class SponsorConflictAnalysisService {
   private async detectOrganizationalConflicts(sponsor: Sponsor, affiliations: SponsorAffiliation[], sponsorships: BillSponsorship[]): Promise<ConflictDetectionResult[]> {
      const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectOrganizationalConflicts', sponsor_id: sponsors.id };
   loggerAny.debug("Detecting organizational conflicts", logContext);
-     // ... Implementation using this.sponsorRepo.findBillsMentioningOrganization ...
+     // ... Implementation using this.sponsorService.findBillsMentioningOrganization ...
       const conflicts: ConflictDetectionResult[] = [];
       const bill_ids = (sponsorships || []).map(s => s.bill_id);
       if (bill_ids.length === 0) return conflicts;
@@ -521,7 +525,8 @@ export class SponsorConflictAnalysisService {
 
       for (const aff of leadershipRoles) {
         try {
-          const affectedBills = await this.sponsorRepo.findBillsMentioningOrganization(aff.organization, bill_ids);
+          // TODO: Implement findBillsMentioningOrganization
+          const affectedBills = []; // await this.sponsorService.findBillsMentioningOrganization(aff.organization, bill_ids);
           if (affectedBills.length === 0) continue;
           const financialImpact = this.estimateFinancialImpact(sponsor, aff, affectedBills.length);
           const severity = this.calculateConflictSeverity('organizational', financialImpact, { leadershipRole: true });
@@ -554,7 +559,8 @@ export class SponsorConflictAnalysisService {
       for (const sponsorship of sponsorships) {
         try {
           // Fetch bill details using repository
-          const bill = await this.sponsorRepo.getBill(sponsorship.bill_id);
+          // TODO: Implement getBill method
+          const bill = null; // await this.sponsorService.getBill(sponsorship.bill_id);
           if (!bill || !bills.introduced_date) continue; // Skip if no bill or date
 
           // Filter affiliations with suspicious timing relative to bill introduction
@@ -734,7 +740,7 @@ export class SponsorConflictAnalysisService {
 
     // Fetch sponsor details in bulk
     try {
-      const sponsors = await this.sponsorRepo.findByIds(sponsor_ids);
+      const sponsors = await this.sponsorService.findByIds(sponsor_ids);
       sponsors.forEach(s => sponsorMap.set(s.id, s));
     } catch (e) {
       // if repository fails, we'll still build minimal sponsor nodes from IDs
@@ -784,7 +790,9 @@ export class SponsorConflictAnalysisService {
 
     // Bill nodes
     for (const bill_id of Array.from(billSet)) { let title = `Bill ${bill_id }`;
-      try { const b = await this.sponsorRepo.getBill(bill_id as number);
+      try { 
+        // TODO: Implement getBill method
+        const b = null; // await this.sponsorService.getBill(bill_id as number);
         if (b && (b as any).title) title = (b as any).title;
        } catch (e) {
         // ignore

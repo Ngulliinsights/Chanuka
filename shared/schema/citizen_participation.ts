@@ -182,22 +182,29 @@ export const bill_engagement = pgTable("bill_engagement", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  
+
   // Engagement type: "view", "share", "download", "bookmark", "print"
   engagement_type: engagementTypeEnum("engagement_type").notNull(),
-  
+
   // Flexible storage for type-specific metadata
   engagement_value: jsonb("engagement_value").default(sql`'{}'::jsonb`).notNull(),
-  
+
   // Geographic context for engagement analysis
   user_county: kenyanCountyEnum("user_county"),
   user_constituency: varchar("user_constituency", { length: 100 }),
-  
+
   // Session analytics
   session_duration_seconds: integer("session_duration_seconds"),
   device_type: varchar("device_type", { length: 50 }),
-  
+
+  // Engagement metrics
+  view_count: integer("view_count").notNull().default(0),
+  comment_count: integer("comment_count").notNull().default(0),
+  share_count: integer("share_count").notNull().default(0),
+  engagement_score: numeric("engagement_score", { precision: 10, scale: 2 }).notNull().default(sql`0`),
+
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
   // Track unique engagement types per user per bill
   billUserTypeUnique: unique("bill_engagement_bill_user_type_unique")
@@ -318,26 +325,93 @@ export const alert_preferences = pgTable("alert_preferences", {
   campaign_alerts: boolean("campaign_alerts").notNull().default(true),
   system_alerts: boolean("system_alerts").notNull().default(true),
   
-  // Channel preferences
+  // Channel preferences with consent tracking
   email_notifications: boolean("email_notifications").notNull().default(true),
   sms_notifications: boolean("sms_notifications").notNull().default(false),
   push_notifications: boolean("push_notifications").notNull().default(true),
+  whatsapp_notifications: boolean("whatsapp_notifications").notNull().default(false),
   
-  // Batching and timing: "none", "daily", "weekly"
+  // Contact method verification status
+  email_verified: boolean("email_verified").notNull().default(false),
+  phone_verified: boolean("phone_verified").notNull().default(false),
+  
+  // Batching and timing: "immediate", "hourly", "daily", "weekly"
   digest_frequency: varchar("digest_frequency", { length: 20 }).notNull().default("daily"),
   
-  // Quiet hours stored as {"start": "22:00", "end": "08:00"}
-  quiet_hours: jsonb("quiet_hours").default(sql`'{}'::jsonb`).notNull(),
+  // Quiet hours stored as {"start": "22:00", "end": "08:00", "timezone": "Africa/Nairobi"}
+  quiet_hours: jsonb("quiet_hours").default(sql`'{"start": "22:00", "end": "08:00"}'::jsonb`).notNull(),
   
   // Geographic interest areas
   county_alerts: kenyanCountyEnum("county_alerts").array(),
   constituency_alerts: varchar("constituency_alerts", { length: 100 }).array(),
+  
+  // Language and accessibility preferences for notifications
+  notification_language: varchar("notification_language", { length: 10 }).notNull().default('en'),
+  accessibility_format: varchar("accessibility_format", { length: 50 }), // "plain_text", "high_contrast", "audio"
   
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
   // One preference record per user
   userUnique: unique("alert_preferences_user_unique").on(table.user_id),
+  
+  // Indexes for notification delivery queries
+  emailVerifiedIdx: index("idx_alert_preferences_email_verified")
+    .on(table.email_verified, table.email_notifications)
+    .where(sql`${table.email_verified} = true AND ${table.email_notifications} = true`),
+  phoneVerifiedIdx: index("idx_alert_preferences_phone_verified")
+    .on(table.phone_verified, table.sms_notifications)
+    .where(sql`${table.phone_verified} = true AND ${table.sms_notifications} = true`),
+}));
+
+// ============================================================================
+// USER CONTACT METHODS - Multiple verified contact methods per user
+// ============================================================================
+
+export const user_contact_methods = pgTable("user_contact_methods", {
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+  user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  
+  // Contact method details
+  contact_type: varchar("contact_type", { length: 20 }).notNull(), // "email", "phone", "whatsapp"
+  contact_value: varchar("contact_value", { length: 320 }).notNull(), // Email or phone number
+  
+  // Verification status
+  is_verified: boolean("is_verified").notNull().default(false),
+  verification_code: varchar("verification_code", { length: 10 }),
+  verification_expires_at: timestamp("verification_expires_at", { withTimezone: true }),
+  verified_at: timestamp("verified_at", { withTimezone: true }),
+  
+  // Usage preferences
+  is_primary: boolean("is_primary").notNull().default(false),
+  is_active: boolean("is_active").notNull().default(true),
+  
+  // Delivery tracking
+  last_used_at: timestamp("last_used_at", { withTimezone: true }),
+  delivery_failures: integer("delivery_failures").notNull().default(0),
+  
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => ({
+  // Unique contact method per user
+  userContactUnique: unique("user_contact_methods_user_contact_unique")
+    .on(table.user_id, table.contact_type, table.contact_value),
+  
+  // Only one primary contact method per type per user (using partial index)
+  userTypePrimaryIdx: index("idx_user_contact_methods_user_type_primary")
+    .on(table.user_id, table.contact_type)
+    .where(sql`${table.is_primary} = true`),
+  
+  // Indexes for contact method lookups
+  contactValueIdx: index("idx_user_contact_methods_contact_value").on(table.contact_value),
+  userVerifiedIdx: index("idx_user_contact_methods_user_verified")
+    .on(table.user_id, table.is_verified, table.is_active)
+    .where(sql`${table.is_verified} = true AND ${table.is_active} = true`),
+  
+  // Index for verification code lookups
+  verificationCodeIdx: index("idx_user_contact_methods_verification_code")
+    .on(table.verification_code)
+    .where(sql`${table.verification_code} IS NOT NULL`),
 }));
 
 // ============================================================================
@@ -444,6 +518,13 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
 export const alertPreferencesRelations = relations(alert_preferences, ({ one }) => ({
   user: one(users, {
     fields: [alert_preferences.user_id],
+    references: [users.id],
+  }),
+}));
+
+export const userContactMethodsRelations = relations(user_contact_methods, ({ one }) => ({
+  user: one(users, {
+    fields: [user_contact_methods.user_id],
     references: [users.id],
   }),
 }));

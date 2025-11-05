@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import { Logger } from '../logging';
 import { logger } from '../observability/logging';
 import {
   ProgressState,
@@ -17,12 +16,12 @@ export interface ProgressTrackerOptions {
     persistState: boolean;
     notifications: boolean;
   };
-  logger: Logger;
+  logger: any;
 }
 
 export class ProgressTracker extends EventEmitter {
   private readonly config: ProgressTrackerOptions['config'];
-  private readonly logger: Logger;
+  private readonly logger: typeof logger;
   private currentState: ProgressState | null = null;
   private taskProgress: Map<string, number> = new Map();
   private phaseStartTimes: Map<ModernizationPhase, Date> = new Map();
@@ -70,12 +69,12 @@ export class ProgressTracker extends EventEmitter {
     };
 
     this.taskProgress.set(taskId, 0);
-    this.logger.info({ 
-      taskId, 
-      phase, 
+    this.logger.info('Progress tracking initialized', {
+      taskId,
+      phase,
       totalSteps,
-      estimatedDuration 
-    }, 'Progress tracking initialized');
+      estimatedDuration
+    });
 
     this.emit('progress:initialized', this.currentState);
   }
@@ -116,11 +115,14 @@ export class ProgressTracker extends EventEmitter {
       // Update metrics
       this.updateMetrics();
 
-      this.logger.debug({ 
-        taskId, 
-        progress: clampedProgress,
-        currentStep 
-      }, 'Task progress updated');
+      this.logger.debug(
+        'Task progress updated',
+        {
+          taskId,
+          progress: clampedProgress,
+          currentStep
+        }
+      );
 
       this.emit('progress:updated', this.currentState);
     }
@@ -145,12 +147,15 @@ export class ProgressTracker extends EventEmitter {
     this.updateMetrics();
     this.updateEstimatedCompletion();
 
-    this.logger.info({ 
-      stepName, 
-      stepsCompleted: this.currentState.stepsCompleted,
-      totalSteps: this.currentState.totalSteps,
-      overallProgress: this.currentState.overallProgress 
-    }, 'Step completed');
+    this.logger.info(
+      'Step completed',
+      {
+        stepName,
+        stepsCompleted: this.currentState.stepsCompleted,
+        totalSteps: this.currentState.totalSteps,
+        overallProgress: this.currentState.overallProgress
+      }
+    );
 
     this.emit('step:completed', {
       stepName,
@@ -174,11 +179,14 @@ export class ProgressTracker extends EventEmitter {
       this.currentState.currentStep = currentStep;
     }
 
-    this.logger.info({ 
-      previousPhase, 
-      newPhase: phase,
-      currentStep 
-    }, 'Phase updated');
+    this.logger.info(
+      'Phase updated',
+      {
+        previousPhase,
+        newPhase: phase,
+        currentStep
+      }
+    );
 
     this.emit('phase:changed', {
       previousPhase,
@@ -217,7 +225,7 @@ export class ProgressTracker extends EventEmitter {
     this.phaseStartTimes.clear();
     this.stepDurations = [];
 
-    this.logger.info({}, 'Progress tracking reset');
+    this.logger.info('Progress tracking reset', {});
     this.emit('progress:reset');
   }
 
@@ -233,12 +241,15 @@ export class ProgressTracker extends EventEmitter {
     const finalState = { ...this.currentState };
     const duration = Date.now() - this.currentState.startTime.getTime();
 
-    this.logger.info({ 
-      taskId: this.currentState.taskId,
-      status,
-      finalProgress: this.currentState.overallProgress,
-      duration 
-    }, 'Progress tracking finalized');
+    this.logger.info(
+      'Progress tracking finalized',
+      {
+        taskId: this.currentState.taskId,
+        status,
+        finalProgress: this.currentState.overallProgress,
+        duration
+      }
+    );
 
     this.emit('progress:finalized', {
       state: finalState,
@@ -296,7 +307,7 @@ export class ProgressTracker extends EventEmitter {
       this.resourceMonitor = undefined;
     }
 
-    this.logger.info({}, 'Progress tracking stopped');
+    this.logger.info('Progress tracking stopped', {});
   }
 
   private initializeMetrics(): ProgressMetrics {
@@ -407,15 +418,18 @@ export class ProgressTracker extends EventEmitter {
         stepDurations: this.stepDurations
       };
 
-      this.logger.debug({ 
-        taskId: state.taskId,
-        status,
-        progress: state.overallProgress 
-      }, 'Progress state persisted');
+      this.logger.debug(
+        'Progress state persisted',
+        {
+          taskId: state.taskId,
+          status,
+          progress: state.overallProgress
+        }
+      );
 
       // Could save to .modernization-progress.json or similar
     } catch (error) {
-      this.logger.error(error, 'Failed to persist progress state');
+      this.logger.error('Failed to persist progress state', { error });
     }
   }
 
@@ -425,10 +439,10 @@ export class ProgressTracker extends EventEmitter {
   public async loadPersistedState(taskId: string): Promise<ProgressState | null> {
     try {
       // In a real implementation, this would load from a file or database
-      this.logger.debug({ taskId }, 'Loading persisted state');
+      this.logger.debug('Loading persisted state', { taskId });
       return null; // No persisted state found
     } catch (error) {
-      this.logger.error(error, 'Failed to load persisted state');
+      this.logger.error('Failed to load persisted state', { error });
       return null;
     }
   }

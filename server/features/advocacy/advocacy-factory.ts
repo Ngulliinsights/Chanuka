@@ -7,8 +7,7 @@ import { ActionCoordinator } from './application/action-coordinator.js';
 import { CoalitionBuilder } from './application/coalition-builder.js';
 import { ImpactTracker } from './application/impact-tracker.js';
 import { CampaignDomainService } from './domain/services/campaign-domain-service.js';
-import { CampaignRepositoryImpl } from './infrastructure/repositories/campaign-repository-impl.js';
-import { ActionRepositoryImpl } from './infrastructure/repositories/action-repository-impl.js';
+// Repository implementations removed - using direct service calls
 import { NotificationService } from './infrastructure/services/notification-service.js';
 import { RepresentativeContactService } from './infrastructure/services/representative-contact-service.js';
 import { InMemoryAdvocacyEventPublisher } from './domain/events/advocacy-events.js';

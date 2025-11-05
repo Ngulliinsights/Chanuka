@@ -29,7 +29,8 @@ export interface FeatureFlags {
 /**
  * Unified logging configuration
  */
-export interface UnifiedLoggerConfig { environment: EnvironmentConfig;
+export interface UnifiedLoggerConfig {
+  environment: EnvironmentConfig;
   featureFlags: FeatureFlags;
   baseUrl?: string;
   sessionId?: string;
@@ -40,30 +41,31 @@ export interface UnifiedLoggerConfig { environment: EnvironmentConfig;
   maxBufferSize?: number;
   flushBatchSize?: number;
   legacyLogger?: LoggerChild;
- }
+}
 
 /**
  * Browser-compatible logger that integrates with the server-side observability system.
  * Enhanced with environment detection, unified API, and feature flag migration support.
  */
-export class BrowserLogger implements LoggerChild { private config: UnifiedLoggerConfig;
+export class BrowserLogger implements LoggerChild {
+  private config: UnifiedLoggerConfig;
   private baseUrl: string;
   private sessionId: string;
-  private user_id?: string;
-  private correlationId?: string;
+  private user_id: string | undefined;
+  private correlationId: string | undefined;
   private buffer: Array<{
     level: LogLevel;
     message: string;
     context?: LogContext;
     metadata?: Record<string, unknown>;
     timestamp: Date;
-   }> = [];
+  }> = [];
   private flushInterval?: number;
-  private isOnline: boolean = navigator.onLine;
+  private isOnline: boolean = typeof navigator !== 'undefined' ? navigator.onLine : true;
   private maxBufferSize: number = 100;
   private flushBatchSize: number = 10;
   private flushIntervalMs: number = 30000; // 30 seconds
-  private legacyLogger?: LoggerChild;
+  private legacyLogger: LoggerChild | undefined;
 
   constructor(config: UnifiedLoggerConfig) {
     this.config = config;
@@ -78,29 +80,37 @@ export class BrowserLogger implements LoggerChild { private config: UnifiedLogge
     this.flushBatchSize = config.flushBatchSize || 10;
     this.flushIntervalMs = config.flushIntervalMs || 30000;
 
-    // Listen for online/offline events
-    window.addEventListener('online', () => {
+    // Check if running in browser environment
+    if (typeof window !== 'undefined') {
+      this.isOnline = navigator.onLine;
+
+      // Listen for online/offline events
+      window.addEventListener('online', () => {
+        this.isOnline = true;
+        this.flush(); // Flush buffered logs when coming back online
+      });
+
+      window.addEventListener('offline', () => {
+        this.isOnline = false;
+      });
+
+      // Set up periodic flush if enabled and feature flag allows
+      if (config.enableAutoFlush !== false && config.featureFlags.serverSync) {
+        this.flushInterval = window.setInterval(() => {
+          if (this.isOnline) {
+            this.flush();
+          }
+        }, this.flushIntervalMs);
+      }
+
+      // Flush logs on page unload
+      window.addEventListener('beforeunload', () => {
+        this.flushSync();
+      });
+    } else {
+      // Node.js environment - assume always online
       this.isOnline = true;
-      this.flush(); // Flush buffered logs when coming back online
-    });
-
-    window.addEventListener('offline', () => {
-      this.isOnline = false;
-    });
-
-    // Set up periodic flush if enabled and feature flag allows
-    if (config.enableAutoFlush !== false && config.featureFlags.serverSync) {
-      this.flushInterval = window.setInterval(() => {
-        if (this.isOnline) {
-          this.flush();
-        }
-      }, this.flushIntervalMs);
     }
-
-    // Flush logs on page unload
-    window.addEventListener('beforeunload', () => {
-      this.flushSync();
-    });
   }
 
   /**
@@ -131,16 +141,17 @@ export class BrowserLogger implements LoggerChild { private config: UnifiedLogge
           ...(this.user_id && { 'X-User-ID': this.user_id }),
           ...(this.correlationId && { 'X-Correlation-ID': this.correlationId }),
         },
-        body: JSON.stringify({ logs: logs.map(log => ({
+        body: JSON.stringify({
+          logs: logs.map(log => ({
             ...log,
             timestamp: log.timestamp.toISOString(),
             sessionId: this.sessionId,
             user_id: this.user_id,
             correlationId: this.correlationId,
-            user_agent: navigator.user_agent,
+            user_agent: navigator.userAgent,
             url: window.location.href,
             referrer: document.referrer,
-           })),
+          })),
         }),
         // Use keepalive to ensure logs are sent even if page is unloading
         keepalive: true,
@@ -162,7 +173,8 @@ export class BrowserLogger implements LoggerChild { private config: UnifiedLogge
   /**
    * Flush buffered logs synchronously (for page unload)
    */
-  private flushSync(): void { if (this.buffer.length === 0 || !this.isOnline) return;
+  private flushSync(): void {
+    if (this.buffer.length === 0 || !this.isOnline) return;
 
     try {
       const logs = this.buffer.splice(0);
@@ -173,10 +185,10 @@ export class BrowserLogger implements LoggerChild { private config: UnifiedLogge
           sessionId: this.sessionId,
           user_id: this.user_id,
           correlationId: this.correlationId,
-          user_agent: navigator.user_agent,
+          user_agent: navigator.userAgent,
           url: window.location.href,
           referrer: document.referrer,
-         })),
+        })),
       }));
     } catch (error) {
       console.warn('Error sending logs via sendBeacon:', error);
@@ -205,13 +217,14 @@ export class BrowserLogger implements LoggerChild { private config: UnifiedLogge
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] ${level.toUpperCase()}`;
 
-    const logData = { message,
+    const logData = {
+      message,
       context,
       metadata,
       sessionId: this.sessionId,
       user_id: this.user_id,
       correlationId: this.correlationId,
-     };
+    };
 
     switch (level) {
       case 'error':
@@ -346,7 +359,7 @@ export class BrowserLogger implements LoggerChild { private config: UnifiedLogge
       component: 'performance',
       operation,
       duration,
-      user_agent: navigator.user_agent,
+      user_agent: navigator.userAgent,
       url: window.location.href,
       memoryUsage: this.getMemoryUsage(),
       connectionType: this.getConnectionType(),
@@ -364,7 +377,7 @@ export class BrowserLogger implements LoggerChild { private config: UnifiedLogge
       operation: event,
       element,
       url: window.location.href,
-      user_agent: navigator.user_agent,
+      user_agent: navigator.userAgent,
     }, metadata);
   }
 
@@ -377,7 +390,7 @@ export class BrowserLogger implements LoggerChild { private config: UnifiedLogge
       operation: 'navigate',
       from,
       to,
-      user_agent: navigator.user_agent,
+      user_agent: navigator.userAgent,
     }, metadata);
   }
 
@@ -425,7 +438,7 @@ export class BrowserLogger implements LoggerChild { private config: UnifiedLogge
           colno: (errorObj as any).colno,
         },
         browser: {
-          user_agent: navigator.user_agent,
+          user_agent: navigator.userAgent,
           url: window.location.href,
           referrer: document.referrer,
           timestamp: new Date().toISOString(),
@@ -439,8 +452,9 @@ export class BrowserLogger implements LoggerChild { private config: UnifiedLogge
   /**
    * Update user context
    */
-  setUserId(user_id: string): void { this.user_id = user_id;
-   }
+  setUserId(user_id: string): void {
+    this.user_id = user_id;
+  }
 
   /**
    * Update correlation ID

@@ -1,42 +1,59 @@
 /**
- * Browser Compatibility Utilities
+ * Browser Compatibility Utilities - Optimized Edition
  * 
- * This module provides comprehensive browser compatibility detection,
- * polyfills, and fallback mechanisms for the Chanuka Legislative Platform.
+ * Provides comprehensive browser compatibility detection, feature testing,
+ * and user guidance for the Chanuka Legislative Platform.
+ * 
+ * Key optimizations:
+ * - Lazy evaluation with intelligent caching
+ * - Reduced memory footprint through shared constants
+ * - Enhanced SSR/test environment safety
+ * - Improved type safety and documentation
  */
 
-// Browser information interface
+/**
+ * Defines comprehensive browser information including identification,
+ * version data, support status, and feature availability matrix
+ */
 export interface BrowserInfo {
   name: string;
   version: string;
   majorVersion: number;
   isSupported: boolean;
-  features: {
-    es6: boolean;
-    fetch: boolean;
-    promises: boolean;
-    localStorage: boolean;
-    sessionStorage: boolean;
-    webWorkers: boolean;
-    serviceWorkers: boolean;
-    intersectionObserver: boolean;
-    resizeObserver: boolean;
-    customElements: boolean;
-    shadowDOM: boolean;
-    modules: boolean;
-    asyncAwait: boolean;
-    webGL: boolean;
-    webRTC: boolean;
-    geolocation: boolean;
-    notifications: boolean;
-    fullscreen: boolean;
-    clipboard: boolean;
-  };
+  features: FeatureSet;
   warnings: string[];
   recommendations: string[];
 }
 
-// Minimum browser version requirements
+/**
+ * Complete feature detection matrix covering modern web capabilities
+ */
+export interface FeatureSet {
+  es6: boolean;
+  fetch: boolean;
+  promises: boolean;
+  localStorage: boolean;
+  sessionStorage: boolean;
+  webWorkers: boolean;
+  serviceWorkers: boolean;
+  intersectionObserver: boolean;
+  resizeObserver: boolean;
+  customElements: boolean;
+  shadowDOM: boolean;
+  modules: boolean;
+  asyncAwait: boolean;
+  webGL: boolean;
+  webRTC: boolean;
+  geolocation: boolean;
+  notifications: boolean;
+  fullscreen: boolean;
+  clipboard: boolean;
+}
+
+/**
+ * Minimum browser versions required for full platform functionality.
+ * These represent tested, stable releases supporting all critical features.
+ */
 const MINIMUM_VERSIONS = {
   chrome: 70,
   firefox: 65,
@@ -46,13 +63,58 @@ const MINIMUM_VERSIONS = {
   samsung: 10,
   ios: 12,
   android: 70,
-  ie: 11 // Internet Explorer (deprecated but still checked)
-};
+  ie: 11
+} as const;
 
-// Feature detection utilities
+/**
+ * Critical features that must be present for basic functionality.
+ * Used to generate meaningful warnings when absent.
+ */
+const CRITICAL_FEATURES: ReadonlyArray<keyof FeatureSet> = [
+  'es6',
+  'fetch',
+  'promises',
+  'localStorage',
+  'modules'
+] as const;
+
+/**
+ * Safe environment check ensuring feature detection only runs in browser contexts.
+ * Prevents ReferenceErrors in SSR, Node test runners, or other non-browser environments.
+ */
+function isBrowserEnv(): boolean {
+  return (
+    typeof window !== 'undefined' && 
+    typeof document !== 'undefined' && 
+    typeof navigator !== 'undefined'
+  );
+}
+
+/**
+ * Checks if running in a test environment where certain features should be skipped
+ */
+function isTestEnv(): boolean {
+  return (
+    typeof process !== 'undefined' && 
+    process.env?.NODE_ENV === 'test'
+  );
+}
+
+/**
+ * FeatureDetector performs runtime detection of browser capabilities using
+ * a singleton pattern with lazy evaluation for optimal performance.
+ * 
+ * Each detection method follows a consistent pattern:
+ * 1. Check cache to avoid redundant work
+ * 2. Verify environment safety
+ * 3. Perform actual feature test
+ * 4. Cache and return result
+ */
 export class FeatureDetector {
   private static instance: FeatureDetector;
-  private detectedFeatures: Partial<BrowserInfo['features']> = {};
+  private cache: Partial<FeatureSet> = {};
+
+  private constructor() {}
 
   static getInstance(): FeatureDetector {
     if (!FeatureDetector.instance) {
@@ -62,315 +124,297 @@ export class FeatureDetector {
   }
 
   /**
-   * Detect if ES6 features are supported
+   * Tests ES6 support by attempting to execute key ES6 syntax patterns.
+   * Uses Function constructor for safe syntax testing without eval.
    */
   detectES6Support(): boolean {
-    if (this.detectedFeatures.es6 !== undefined) {
-      return this.detectedFeatures.es6;
-    }
+    if (this.cache.es6 !== undefined) return this.cache.es6;
 
     try {
-      // Test arrow functions - safer detection
-      const arrowTest = new Function('return () => {}');
-      arrowTest();
+      // Test comprehensive ES6 feature set in a single evaluation
+      new Function(`
+        return (() => {
+          let x = 1;
+          const y = 2;
+          const [a, b] = [1, 2];
+          const {c} = {c: 3};
+          const str = \`template \${x} literal\`;
+          class Test {}
+          return a + b + c + x + y;
+        })();
+      `)();
       
-      // Test let/const - safer detection
-      const letConstTest = new Function('let x = 1; const y = 2; return x + y;');
-      letConstTest();
-      
-      // Test template literals - safer detection
-      const templateTest = new Function('const x = 1; return `template ${x} literal`;');
-      templateTest();
-      
-      // Test destructuring - safer detection
-      const destructureTest = new Function('const [a, b] = [1, 2]; const {c} = {c: 3}; return a + b + c;');
-      destructureTest();
-      
-      // Test classes - safer detection
-      const classTest = new Function('class Test {} return Test;');
-      classTest();
-      
-      this.detectedFeatures.es6 = true;
-      return true;
+      this.cache.es6 = true;
     } catch {
-      this.detectedFeatures.es6 = false;
-      return false;
+      this.cache.es6 = false;
     }
+    
+    return this.cache.es6;
   }
 
   /**
-   * Detect fetch API support
+   * Checks for modern Fetch API availability including related constructors
    */
   detectFetchSupport(): boolean {
-    if (this.detectedFeatures.fetch !== undefined) {
-      return this.detectedFeatures.fetch;
-    }
+    if (this.cache.fetch !== undefined) return this.cache.fetch;
 
-    this.detectedFeatures.fetch = typeof fetch === 'function' && 
-                                  typeof Request === 'function' && 
-                                  typeof Response === 'function';
-    return this.detectedFeatures.fetch;
+    this.cache.fetch = 
+      typeof fetch === 'function' && 
+      typeof Request === 'function' && 
+      typeof Response === 'function' &&
+      typeof Headers === 'function';
+    
+    return this.cache.fetch;
   }
 
   /**
-   * Detect Promise support
+   * Verifies Promise support including essential methods for async operations
    */
   detectPromiseSupport(): boolean {
-    if (this.detectedFeatures.promises !== undefined) {
-      return this.detectedFeatures.promises;
-    }
+    if (this.cache.promises !== undefined) return this.cache.promises;
 
-    this.detectedFeatures.promises = typeof Promise === 'function' &&
-                                    typeof Promise.resolve === 'function' &&
-                                    typeof Promise.reject === 'function' &&
-                                    typeof Promise.all === 'function';
-    return this.detectedFeatures.promises;
+    this.cache.promises = 
+      typeof Promise === 'function' &&
+      typeof Promise.resolve === 'function' &&
+      typeof Promise.reject === 'function' &&
+      typeof Promise.all === 'function' &&
+      typeof Promise.race === 'function';
+    
+    return this.cache.promises;
   }
 
   /**
-   * Detect localStorage support
+   * Tests localStorage with actual read/write operations to catch browsers
+   * where the API exists but is disabled (such as private/incognito mode)
    */
   detectLocalStorageSupport(): boolean {
-    if (this.detectedFeatures.localStorage !== undefined) {
-      return this.detectedFeatures.localStorage;
+    if (this.cache.localStorage !== undefined) return this.cache.localStorage;
+
+    if (!isBrowserEnv() || typeof localStorage === 'undefined') {
+      this.cache.localStorage = false;
+      return false;
     }
 
     try {
-      const testKey = '__test_localStorage__';
+      const testKey = '__compat_test_ls__';
       localStorage.setItem(testKey, 'test');
+      const retrieved = localStorage.getItem(testKey);
       localStorage.removeItem(testKey);
-      this.detectedFeatures.localStorage = true;
-      return true;
+      this.cache.localStorage = retrieved === 'test';
     } catch {
-      this.detectedFeatures.localStorage = false;
-      return false;
+      this.cache.localStorage = false;
     }
+    
+    return this.cache.localStorage;
   }
 
   /**
-   * Detect sessionStorage support
+   * Tests sessionStorage with actual operations, similar to localStorage verification
    */
   detectSessionStorageSupport(): boolean {
-    if (this.detectedFeatures.sessionStorage !== undefined) {
-      return this.detectedFeatures.sessionStorage;
+    if (this.cache.sessionStorage !== undefined) return this.cache.sessionStorage;
+
+    if (!isBrowserEnv() || typeof sessionStorage === 'undefined') {
+      this.cache.sessionStorage = false;
+      return false;
     }
 
     try {
-      const testKey = '__test_sessionStorage__';
+      const testKey = '__compat_test_ss__';
       sessionStorage.setItem(testKey, 'test');
+      const retrieved = sessionStorage.getItem(testKey);
       sessionStorage.removeItem(testKey);
-      this.detectedFeatures.sessionStorage = true;
-      return true;
+      this.cache.sessionStorage = retrieved === 'test';
     } catch {
-      this.detectedFeatures.sessionStorage = false;
+      this.cache.sessionStorage = false;
+    }
+    
+    return this.cache.sessionStorage;
+  }
+
+  detectWebWorkersSupport(): boolean {
+    if (this.cache.webWorkers !== undefined) return this.cache.webWorkers;
+    
+    this.cache.webWorkers = isBrowserEnv() && typeof Worker === 'function';
+    return this.cache.webWorkers;
+  }
+
+  detectServiceWorkersSupport(): boolean {
+    if (this.cache.serviceWorkers !== undefined) return this.cache.serviceWorkers;
+    
+    this.cache.serviceWorkers = isBrowserEnv() && 'serviceWorker' in navigator;
+    return this.cache.serviceWorkers;
+  }
+
+  detectIntersectionObserverSupport(): boolean {
+    if (this.cache.intersectionObserver !== undefined) return this.cache.intersectionObserver;
+    
+    this.cache.intersectionObserver = isBrowserEnv() && 'IntersectionObserver' in window;
+    return this.cache.intersectionObserver;
+  }
+
+  detectResizeObserverSupport(): boolean {
+    if (this.cache.resizeObserver !== undefined) return this.cache.resizeObserver;
+    
+    this.cache.resizeObserver = isBrowserEnv() && 'ResizeObserver' in window;
+    return this.cache.resizeObserver;
+  }
+
+  detectCustomElementsSupport(): boolean {
+    if (this.cache.customElements !== undefined) return this.cache.customElements;
+    
+    this.cache.customElements = isBrowserEnv() && 'customElements' in window;
+    return this.cache.customElements;
+  }
+
+  detectShadowDOMSupport(): boolean {
+    if (this.cache.shadowDOM !== undefined) return this.cache.shadowDOM;
+
+    this.cache.shadowDOM = 
+      isBrowserEnv() && 
+      typeof Element !== 'undefined' && 
+      Element.prototype !== undefined &&
+      'attachShadow' in Element.prototype;
+    
+    return this.cache.shadowDOM;
+  }
+
+  detectModulesSupport(): boolean {
+    if (this.cache.modules !== undefined) return this.cache.modules;
+
+    if (!isBrowserEnv()) {
+      this.cache.modules = false;
       return false;
     }
-  }
 
-  /**
-   * Detect Web Workers support
-   */
-  detectWebWorkersSupport(): boolean {
-    if (this.detectedFeatures.webWorkers !== undefined) {
-      return this.detectedFeatures.webWorkers;
-    }
-
-    this.detectedFeatures.webWorkers = typeof Worker === 'function';
-    return this.detectedFeatures.webWorkers;
-  }
-
-  /**
-   * Detect Service Workers support
-   */
-  detectServiceWorkersSupport(): boolean {
-    if (this.detectedFeatures.serviceWorkers !== undefined) {
-      return this.detectedFeatures.serviceWorkers;
-    }
-
-    this.detectedFeatures.serviceWorkers = 'serviceWorker' in navigator;
-    return this.detectedFeatures.serviceWorkers;
-  }
-
-  /**
-   * Detect Intersection Observer support
-   */
-  detectIntersectionObserverSupport(): boolean {
-    if (this.detectedFeatures.intersectionObserver !== undefined) {
-      return this.detectedFeatures.intersectionObserver;
-    }
-
-    this.detectedFeatures.intersectionObserver = 'IntersectionObserver' in window;
-    return this.detectedFeatures.intersectionObserver;
-  }
-
-  /**
-   * Detect Resize Observer support
-   */
-  detectResizeObserverSupport(): boolean {
-    if (this.detectedFeatures.resizeObserver !== undefined) {
-      return this.detectedFeatures.resizeObserver;
-    }
-
-    this.detectedFeatures.resizeObserver = 'ResizeObserver' in window;
-    return this.detectedFeatures.resizeObserver;
-  }
-
-  /**
-   * Detect Custom Elements support
-   */
-  detectCustomElementsSupport(): boolean {
-    if (this.detectedFeatures.customElements !== undefined) {
-      return this.detectedFeatures.customElements;
-    }
-
-    this.detectedFeatures.customElements = 'customElements' in window;
-    return this.detectedFeatures.customElements;
-  }
-
-  /**
-   * Detect Shadow DOM support
-   */
-  detectShadowDOMSupport(): boolean {
-    if (this.detectedFeatures.shadowDOM !== undefined) {
-      return this.detectedFeatures.shadowDOM;
-    }
-
-    this.detectedFeatures.shadowDOM = 'attachShadow' in Element.prototype;
-    return this.detectedFeatures.shadowDOM;
-  }
-
-  /**
-   * Detect ES Modules support
-   */
-  detectModulesSupport(): boolean {
-    if (this.detectedFeatures.modules !== undefined) {
-      return this.detectedFeatures.modules;
-    }
-
-    // Check for script type="module" support
+    // The noModule attribute exists only in browsers that support ES modules
     const script = document.createElement('script');
-    this.detectedFeatures.modules = 'noModule' in script;
-    return this.detectedFeatures.modules;
+    this.cache.modules = 'noModule' in script;
+    return this.cache.modules;
   }
 
   /**
-   * Detect async/await support
+   * Tests async/await syntax support through safe function construction
    */
   detectAsyncAwaitSupport(): boolean {
-    if (this.detectedFeatures.asyncAwait !== undefined) {
-      return this.detectedFeatures.asyncAwait;
-    }
+    if (this.cache.asyncAwait !== undefined) return this.cache.asyncAwait;
 
     try {
-      const asyncTest = new Function('return async function test() { await Promise.resolve(); }');
-      asyncTest();
-      this.detectedFeatures.asyncAwait = true;
-      return true;
+      new Function('return (async function() { await Promise.resolve(); })();')();
+      this.cache.asyncAwait = true;
     } catch {
-      this.detectedFeatures.asyncAwait = false;
-      return false;
+      this.cache.asyncAwait = false;
     }
+    
+    return this.cache.asyncAwait;
   }
 
   /**
-   * Detect WebGL support
+   * Tests WebGL by attempting to create a rendering context.
+   * Gracefully handles test environments where canvas may not exist.
    */
   detectWebGLSupport(): boolean {
-    if (this.detectedFeatures.webGL !== undefined) {
-      return this.detectedFeatures.webGL;
+    if (this.cache.webGL !== undefined) return this.cache.webGL;
+
+    // Skip in non-browser or test environments to avoid errors
+    if (!isBrowserEnv() || isTestEnv()) {
+      this.cache.webGL = false;
+      return false;
     }
 
     try {
-      // Check if we're in a test environment
-      if (typeof process !== 'undefined' && process.env?.NODE_ENV === 'test') {
-        this.detectedFeatures.webGL = false;
-        return false;
-      }
-
       const canvas = document.createElement('canvas');
-      const context = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      this.detectedFeatures.webGL = !!context;
-      return this.detectedFeatures.webGL;
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      this.cache.webGL = !!gl;
+      
+      // Clean up context to prevent memory leaks
+      if (gl && typeof (gl as any).getExtension === 'function') {
+        const loseContext = (gl as any).getExtension('WEBGL_lose_context');
+        if (loseContext) loseContext.loseContext();
+      }
     } catch {
-      this.detectedFeatures.webGL = false;
-      return false;
+      this.cache.webGL = false;
     }
+    
+    return this.cache.webGL;
   }
 
   /**
-   * Detect WebRTC support
+   * Checks for WebRTC support across different vendor implementations
    */
   detectWebRTCSupport(): boolean {
-    if (this.detectedFeatures.webRTC !== undefined) {
-      return this.detectedFeatures.webRTC;
+    if (this.cache.webRTC !== undefined) return this.cache.webRTC;
+
+    if (!isBrowserEnv()) {
+      this.cache.webRTC = false;
+      return false;
     }
 
-    this.detectedFeatures.webRTC = !!(
-      window.RTCPeerConnection ||
+    this.cache.webRTC = !!(
+      (window as any).RTCPeerConnection ||
       (window as any).webkitRTCPeerConnection ||
       (window as any).mozRTCPeerConnection
     );
-    return this.detectedFeatures.webRTC;
+    
+    return this.cache.webRTC;
   }
 
-  /**
-   * Detect Geolocation support
-   */
   detectGeolocationSupport(): boolean {
-    if (this.detectedFeatures.geolocation !== undefined) {
-      return this.detectedFeatures.geolocation;
-    }
-
-    this.detectedFeatures.geolocation = 'geolocation' in navigator;
-    return this.detectedFeatures.geolocation;
+    if (this.cache.geolocation !== undefined) return this.cache.geolocation;
+    
+    this.cache.geolocation = isBrowserEnv() && 'geolocation' in navigator;
+    return this.cache.geolocation;
   }
 
-  /**
-   * Detect Notifications support
-   */
   detectNotificationsSupport(): boolean {
-    if (this.detectedFeatures.notifications !== undefined) {
-      return this.detectedFeatures.notifications;
-    }
-
-    this.detectedFeatures.notifications = 'Notification' in window;
-    return this.detectedFeatures.notifications;
+    if (this.cache.notifications !== undefined) return this.cache.notifications;
+    
+    this.cache.notifications = isBrowserEnv() && 'Notification' in window;
+    return this.cache.notifications;
   }
 
   /**
-   * Detect Fullscreen API support
+   * Checks for Fullscreen API across vendor prefixes
    */
   detectFullscreenSupport(): boolean {
-    if (this.detectedFeatures.fullscreen !== undefined) {
-      return this.detectedFeatures.fullscreen;
+    if (this.cache.fullscreen !== undefined) return this.cache.fullscreen;
+
+    if (!isBrowserEnv()) {
+      this.cache.fullscreen = false;
+      return false;
     }
 
-    const element = document.documentElement;
-    this.detectedFeatures.fullscreen = !!(
-      element.requestFullscreen ||
-      (element as any).webkitRequestFullscreen ||
-      (element as any).mozRequestFullScreen ||
-      (element as any).msRequestFullscreen
+    const elem = document.documentElement;
+    this.cache.fullscreen = !!(
+      (elem as any).requestFullscreen ||
+      (elem as any).webkitRequestFullscreen ||
+      (elem as any).mozRequestFullScreen ||
+      (elem as any).msRequestFullscreen
     );
-    return this.detectedFeatures.fullscreen;
+    
+    return this.cache.fullscreen;
   }
 
   /**
-   * Detect Clipboard API support
+   * Verifies modern Clipboard API availability (async clipboard, not execCommand)
    */
   detectClipboardSupport(): boolean {
-    if (this.detectedFeatures.clipboard !== undefined) {
-      return this.detectedFeatures.clipboard;
-    }
+    if (this.cache.clipboard !== undefined) return this.cache.clipboard;
 
-    this.detectedFeatures.clipboard = !!(navigator.clipboard && navigator.clipboard.writeText);
-    return this.detectedFeatures.clipboard;
+    this.cache.clipboard = 
+      isBrowserEnv() && 
+      !!navigator.clipboard && 
+      typeof navigator.clipboard.writeText === 'function' &&
+      typeof navigator.clipboard.readText === 'function';
+    
+    return this.cache.clipboard;
   }
 
   /**
-   * Get all detected features
+   * Executes all feature detection tests and returns complete feature set.
+   * Triggers all lazy evaluations and caches results for future calls.
    */
-  getAllFeatures(): BrowserInfo['features'] {
+  getAllFeatures(): FeatureSet {
     return {
       es6: this.detectES6Support(),
       fetch: this.detectFetchSupport(),
@@ -393,12 +437,25 @@ export class FeatureDetector {
       clipboard: this.detectClipboardSupport()
     };
   }
+
+  /**
+   * Clears the feature detection cache, forcing re-evaluation on next access.
+   * Useful for testing or when browser capabilities may have changed.
+   */
+  clearCache(): void {
+    this.cache = {};
+  }
 }
 
-// Browser detection utilities
+/**
+ * BrowserDetector identifies the browser and version from user agent strings,
+ * combines this with feature detection, and provides comprehensive compatibility reporting.
+ */
 export class BrowserDetector {
   private static instance: BrowserDetector;
-  private browserInfo: BrowserInfo | null = null;
+  private cachedInfo: BrowserInfo | null = null;
+
+  private constructor() {}
 
   static getInstance(): BrowserDetector {
     if (!BrowserDetector.instance) {
@@ -408,266 +465,278 @@ export class BrowserDetector {
   }
 
   /**
-   * Parse user agent string to detect browser
+   * Parses user agent string to identify browser name and version.
+   * Detection order is critical: Edge before Chrome, Chrome before Safari, etc.
+   * to avoid misidentification due to overlapping UA strings.
    */
   private parseUserAgent(): { name: string; version: string; majorVersion: number } {
-    const user_agent = navigator.user_agent;
+    // Safe fallback for non-browser environments
+    if (!isBrowserEnv()) {
+      return { name: 'unknown', version: '0.0', majorVersion: 0 };
+    }
+
+    const ua = navigator.userAgent;
     
-    // Internet Explorer (legacy support)
-    if (user_agent.includes('MSIE') || user_agent.includes('Trident/')) {
-      const ieMatch = user_agent.match(/(?:MSIE |rv:)(\d+)\.(\d+)/);
-      if (ieMatch) {
+    // Internet Explorer (IE11 and legacy versions)
+    if (ua.includes('MSIE') || ua.includes('Trident/')) {
+      const match = ua.match(/(?:MSIE |rv:)(\d+)\.(\d+)/);
+      if (match) {
         return {
           name: 'ie',
-          version: `${ieMatch[1]}.${ieMatch[2]}`,
-          majorVersion: parseInt(ieMatch[1])
+          version: `${match[1]}.${match[2]}`,
+          majorVersion: parseInt(match[1], 10)
         };
       }
     }
     
-    // Edge Legacy (EdgeHTML)
-    if (user_agent.includes('Edge/')) {
-      const match = user_agent.match(/Edge\/(\d+)\.(\d+)/);
+    // Edge Legacy (EdgeHTML-based, pre-Chromium)
+    if (ua.includes('Edge/')) {
+      const match = ua.match(/Edge\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'edge-legacy',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1])
+          majorVersion: parseInt(match[1], 10)
         };
       }
     }
     
-    // Edge (Chromium-based)
-    if (user_agent.includes('Edg/')) {
-      const match = user_agent.match(/Edg\/(\d+)\.(\d+)/);
+    // Modern Edge (Chromium-based)
+    if (ua.includes('Edg/')) {
+      const match = ua.match(/Edg\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'edge',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1])
+          majorVersion: parseInt(match[1], 10)
         };
       }
     }
     
-    // Chrome (must be checked before Safari)
-    if (user_agent.includes('Chrome') && !user_agent.includes('Edg')) {
-      const match = user_agent.match(/Chrome\/(\d+)\.(\d+)/);
+    // Chrome (must precede Safari check due to UA overlap)
+    if (ua.includes('Chrome') && !ua.includes('Edg')) {
+      const match = ua.match(/Chrome\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'chrome',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1])
+          majorVersion: parseInt(match[1], 10)
         };
       }
     }
     
     // Firefox
-    if (user_agent.includes('Firefox')) {
-      const match = user_agent.match(/Firefox\/(\d+)\.(\d+)/);
+    if (ua.includes('Firefox')) {
+      const match = ua.match(/Firefox\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'firefox',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1])
+          majorVersion: parseInt(match[1], 10)
         };
       }
     }
     
-    // Safari (must be checked after Chrome)
-    if (user_agent.includes('Safari') && !user_agent.includes('Chrome')) {
-      const match = user_agent.match(/Version\/(\d+)\.(\d+)/);
+    // Safari (must follow Chrome check)
+    if (ua.includes('Safari') && !ua.includes('Chrome')) {
+      const match = ua.match(/Version\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'safari',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1])
+          majorVersion: parseInt(match[1], 10)
         };
       }
     }
     
-    // Opera (modern)
-    if (user_agent.includes('OPR/')) {
-      const match = user_agent.match(/OPR\/(\d+)\.(\d+)/);
+    // Opera (modern, Chromium-based)
+    if (ua.includes('OPR/')) {
+      const match = ua.match(/OPR\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'opera',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1])
+          majorVersion: parseInt(match[1], 10)
         };
       }
     }
     
-    // Opera (legacy)
-    if (user_agent.includes('Opera')) {
-      const match = user_agent.match(/Opera[\/\s](\d+)\.(\d+)/);
-      if (match) {
-        return {
-          name: 'opera',
-          version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1])
-        };
-      }
-    }
-    
-    // Samsung Internet
-    if (user_agent.includes('SamsungBrowser')) {
-      const match = user_agent.match(/SamsungBrowser\/(\d+)\.(\d+)/);
+    // Samsung Internet Browser
+    if (ua.includes('SamsungBrowser')) {
+      const match = ua.match(/SamsungBrowser\/(\d+)\.(\d+)/);
       if (match) {
         return {
           name: 'samsung',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1])
+          majorVersion: parseInt(match[1], 10)
         };
       }
     }
     
-    // iOS Safari
-    if (user_agent.includes('iPhone') || user_agent.includes('iPad')) {
-      const match = user_agent.match(/OS (\d+)_(\d+)/);
+    // iOS Safari (mobile)
+    if (ua.includes('iPhone') || ua.includes('iPad')) {
+      const match = ua.match(/OS (\d+)_(\d+)/);
       if (match) {
         return {
           name: 'ios',
           version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1])
+          majorVersion: parseInt(match[1], 10)
         };
       }
     }
     
-    // Android Chrome
-    if (user_agent.includes('Android')) {
-      const chromeMatch = user_agent.match(/Chrome\/(\d+)\.(\d+)/);
+    // Android Chrome or WebView
+    if (ua.includes('Android')) {
+      const chromeMatch = ua.match(/Chrome\/(\d+)\.(\d+)/);
       if (chromeMatch) {
         return {
           name: 'android',
           version: `${chromeMatch[1]}.${chromeMatch[2]}`,
-          majorVersion: parseInt(chromeMatch[1])
+          majorVersion: parseInt(chromeMatch[1], 10)
         };
       }
       
-      // Android WebView or other Android browsers
-      const androidMatch = user_agent.match(/Android (\d+)\.(\d+)/);
+      const androidMatch = ua.match(/Android (\d+)\.(\d+)/);
       if (androidMatch) {
         return {
           name: 'android',
           version: `${androidMatch[1]}.${androidMatch[2]}`,
-          majorVersion: parseInt(androidMatch[1])
+          majorVersion: parseInt(androidMatch[1], 10)
         };
       }
     }
     
-    // UC Browser
-    if (user_agent.includes('UCBrowser')) {
-      const match = user_agent.match(/UCBrowser\/(\d+)\.(\d+)/);
-      if (match) {
-        return {
-          name: 'uc',
-          version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1])
-        };
-      }
-    }
-    
-    // QQ Browser
-    if (user_agent.includes('QQBrowser')) {
-      const match = user_agent.match(/QQBrowser\/(\d+)\.(\d+)/);
-      if (match) {
-        return {
-          name: 'qq',
-          version: `${match[1]}.${match[2]}`,
-          majorVersion: parseInt(match[1])
-        };
-      }
-    }
-    
-    // Unknown browser
-    return {
-      name: 'unknown',
-      version: '0.0',
-      majorVersion: 0
-    };
+    // Unrecognized browser fallback
+    return { name: 'unknown', version: '0.0', majorVersion: 0 };
   }
 
   /**
-   * Check if browser version meets minimum requirements
+   * Determines if detected browser meets minimum version requirements
    */
   private checkBrowserSupport(name: string, majorVersion: number): boolean {
     const minVersion = MINIMUM_VERSIONS[name as keyof typeof MINIMUM_VERSIONS];
-    return minVersion ? majorVersion >= minVersion : false;
+    return minVersion !== undefined && majorVersion >= minVersion;
   }
 
   /**
-   * Generate warnings for unsupported features
+   * Generates user-facing warnings about missing critical features
    */
-  private generateWarnings(features: BrowserInfo['features'], browserName: string): string[] {
+  private generateWarnings(features: FeatureSet, browserName: string): string[] {
     const warnings: string[] = [];
     
+    // Check each critical feature and generate specific warnings
     if (!features.es6) {
-      warnings.push('ES6 features are not supported. The application may not function correctly.');
+      warnings.push('ES6 support is missing. Core application features will not function.');
     }
     
     if (!features.fetch) {
-      warnings.push('Fetch API is not supported. Network requests may fail.');
+      warnings.push('Fetch API is unavailable. Network operations will fail.');
     }
     
     if (!features.promises) {
-      warnings.push('Promises are not supported. Asynchronous operations may fail.');
+      warnings.push('Promise support is missing. Asynchronous operations cannot execute.');
     }
     
     if (!features.localStorage) {
-      warnings.push('Local storage is not available. User preferences cannot be saved.');
+      warnings.push('Local storage is unavailable. Settings and preferences cannot be saved.');
+    }
+    
+    if (!features.sessionStorage) {
+      warnings.push('Session storage is unavailable. Temporary data cannot be preserved.');
     }
     
     if (!features.serviceWorkers) {
-      warnings.push('Service workers are not supported. Offline functionality is not available.');
+      warnings.push('Service workers are unsupported. Offline functionality is not available.');
     }
     
     if (!features.modules) {
-      warnings.push('ES modules are not supported. The application may not load properly.');
+      warnings.push('ES module support is missing. The application may fail to load.');
     }
     
     if (browserName === 'unknown') {
-      warnings.push('Your browser is not recognized. Some features may not work correctly.');
+      warnings.push('Browser not recognized. Compatibility cannot be guaranteed.');
+    }
+    
+    if (browserName === 'ie') {
+      warnings.push('Internet Explorer is no longer supported. Please switch to a modern browser.');
     }
     
     return warnings;
   }
 
   /**
-   * Generate recommendations for better experience
+   * Generates actionable recommendations for improving user experience
    */
-  private generateRecommendations(features: BrowserInfo['features'], browserName: string, majorVersion: number): string[] {
+  private generateRecommendations(
+    features: FeatureSet, 
+    browserName: string, 
+    majorVersion: number
+  ): string[] {
     const recommendations: string[] = [];
     
+    // Check version against minimum requirements
     const minVersion = MINIMUM_VERSIONS[browserName as keyof typeof MINIMUM_VERSIONS];
-    if (minVersion && majorVersion < minVersion) {
-      recommendations.push(`Please update your browser to version ${minVersion} or higher for the best experience.`);
+    if (minVersion !== undefined && majorVersion < minVersion) {
+      recommendations.push(
+        `Please update ${this.formatBrowserName(browserName)} to version ${minVersion} or higher for optimal performance.`
+      );
     }
     
+    // Recommend updates for missing modern features
     if (!features.intersectionObserver) {
-      recommendations.push('Consider updating your browser for better performance with lazy loading.');
+      recommendations.push('Update your browser to enable improved lazy loading and scroll performance.');
     }
     
     if (!features.resizeObserver) {
-      recommendations.push('Update your browser for improved responsive design features.');
+      recommendations.push('A browser update would enable enhanced responsive design features.');
     }
     
     if (!features.webGL) {
-      recommendations.push('WebGL support would improve chart and visualization performance.');
+      recommendations.push('WebGL support would significantly improve chart and visualization rendering.');
     }
     
-    if (browserName === 'unknown') {
-      recommendations.push('For the best experience, please use Chrome, Firefox, Safari, or Edge.');
+    if (!features.clipboard) {
+      recommendations.push('Modern clipboard API support would improve copy-paste functionality.');
+    }
+    
+    // Suggest mainstream browsers for unknown or legacy browsers
+    if (browserName === 'unknown' || browserName === 'ie' || browserName === 'edge-legacy') {
+      recommendations.push(
+        'For the best experience, we recommend Chrome 70+, Firefox 65+, Safari 12+, or Edge 79+.'
+      );
     }
     
     return recommendations;
   }
 
   /**
-   * Get comprehensive browser information
+   * Formats browser name for user-facing messages
+   */
+  private formatBrowserName(name: string): string {
+    const nameMap: Record<string, string> = {
+      chrome: 'Chrome',
+      firefox: 'Firefox',
+      safari: 'Safari',
+      edge: 'Edge',
+      'edge-legacy': 'Edge Legacy',
+      opera: 'Opera',
+      samsung: 'Samsung Internet',
+      ios: 'iOS Safari',
+      android: 'Android Chrome',
+      ie: 'Internet Explorer',
+      unknown: 'your browser'
+    };
+    
+    return nameMap[name] || name;
+  }
+
+  /**
+   * Returns complete browser information including features, warnings, and recommendations.
+   * Results are cached after first call to optimize performance.
    */
   getBrowserInfo(): BrowserInfo {
-    if (this.browserInfo) {
-      return this.browserInfo;
+    if (this.cachedInfo) {
+      return this.cachedInfo;
     }
 
     const { name, version, majorVersion } = this.parseUserAgent();
@@ -677,7 +746,7 @@ export class BrowserDetector {
     const warnings = this.generateWarnings(features, name);
     const recommendations = this.generateRecommendations(features, name, majorVersion);
 
-    this.browserInfo = {
+    this.cachedInfo = {
       name,
       version,
       majorVersion,
@@ -687,36 +756,50 @@ export class BrowserDetector {
       recommendations
     };
 
-    return this.browserInfo;
+    return this.cachedInfo;
   }
 
   /**
-   * Check if current browser is supported
+   * Quick check if browser meets minimum requirements
    */
   isBrowserSupported(): boolean {
     return this.getBrowserInfo().isSupported;
   }
 
   /**
-   * Get browser warnings
+   * Returns array of warning messages for unsupported features
    */
   getBrowserWarnings(): string[] {
     return this.getBrowserInfo().warnings;
   }
 
   /**
-   * Get browser recommendations
+   * Returns array of recommendations for improving compatibility
    */
   getBrowserRecommendations(): string[] {
     return this.getBrowserInfo().recommendations;
   }
+
+  /**
+   * Checks if a specific feature is supported
+   */
+  hasFeature(feature: keyof FeatureSet): boolean {
+    return this.getBrowserInfo().features[feature];
+  }
+
+  /**
+   * Clears cached browser information, forcing fresh detection on next access
+   */
+  clearCache(): void {
+    this.cachedInfo = null;
+  }
 }
 
-// Export singleton instances
+// Export singleton instances for convenient global access
 export const browserDetector = BrowserDetector.getInstance();
 export const featureDetector = FeatureDetector.getInstance();
 
-// Convenience functions
+// Convenience functions that delegate to singleton instances
 export function getBrowserInfo(): BrowserInfo {
   return browserDetector.getBrowserInfo();
 }
@@ -733,46 +816,6 @@ export function getBrowserRecommendations(): string[] {
   return browserDetector.getBrowserRecommendations();
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export function hasFeature(feature: keyof FeatureSet): boolean {
+  return browserDetector.hasFeature(feature);
+}

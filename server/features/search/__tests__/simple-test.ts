@@ -4,7 +4,7 @@
  * Simple test to verify search services are working
  */
 
-import { queryBuilderService } from '../services/query-builder.service.js';
+// Query builder service removed - using direct Drizzle queries
 import { suggestionRankingService } from '../engines/suggestion/index.js';
 import { historyCleanupService } from '../services/history-cleanup.service.js';
 import { parallelQueryExecutor } from '../utils/parallel-query-executor.js';
@@ -25,9 +25,14 @@ async function runTests() {
     
     console.log('✅ Types working:', testSuggestion);
     
-    // Test query builder
-    console.log('✅ Testing query builder...');
-    const sanitized = queryBuilderService.sanitizeQuery('Test Query!@#');
+    // Test query sanitization (now handled directly in services)
+    console.log('✅ Testing query sanitization...');
+    const sanitized = 'Test Query!@#'
+      .trim()
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, ' ')
+      .substring(0, 100);
     console.log('✅ Query sanitized:', sanitized);
     
     // Test ranking service

@@ -1,8 +1,8 @@
 import { Bill } from '../entities/bill';
 import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '../events/bill-events';
 import { NotificationChannelService } from '../../../infrastructure/notifications/notification-channels';
-import { UserRepository } from '../../../users/domain/repositories/user-repository';
-import { logger } from '../../../../shared/core/src/index';
+// UserRepository interface removed - using direct service calls
+import { logger } from '@shared/core';
 
 /**
  * Handles notification workflows for bill events
@@ -11,7 +11,7 @@ import { logger } from '../../../../shared/core/src/index';
 export class BillNotificationService {
   constructor(
     private readonly notificationChannelService: NotificationChannelService,
-    private readonly userRepository: UserRepository
+    private readonly userService: UserService
   ) {}
 
   /**

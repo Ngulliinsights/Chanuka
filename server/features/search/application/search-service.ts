@@ -3,9 +3,10 @@
 // ============================================================================
 // Comprehensive search with multiple engines, fallbacks, and performance optimization
 
-import { logger } from '../../../shared/core/index.js';
-import { cache } from '../../../shared/core/index.js';
-import { repositoryFactory } from '../../../infrastructure/database/repositories/repository-factory.js';
+import { logger, cache } from '../../../shared/core/index.js';
+import { database } from '@shared/database/connection';
+import { bills, sponsors } from '@shared/schema';
+import { sql } from 'drizzle-orm';
 import {
   SearchQuery,
   SearchResult,
@@ -14,7 +15,7 @@ import {
   ParsedSearchSyntax,
   SearchQualityScore
 } from '../engines/types/search.types.js';
-import { PostgreSQLFullTextEngine, FuzzyMatchingEngine, SimpleMatchingEngine } from '../engines/core/index.js';
+import { PostgreSQLFullTextEngine, FuzzyMatchingEngine, SimpleMatchingEngine, FuseSearchEngine } from '../engines/core/index.js';
 
 // ============================================================================
 // Search Service Implementation
@@ -42,11 +43,13 @@ export class SearchService {
   private readonly ENGINE_COOLDOWN = 5 * 60 * 1000; // 5 minutes
 
   private postgresqlEngine: PostgreSQLFullTextEngine;
+  private fuseEngine: FuseSearchEngine;
   private fuzzyEngine: FuzzyMatchingEngine;
   private simpleEngine: SimpleMatchingEngine;
 
   constructor() {
     this.postgresqlEngine = new PostgreSQLFullTextEngine();
+    this.fuseEngine = new FuseSearchEngine();
     this.fuzzyEngine = new FuzzyMatchingEngine();
     this.simpleEngine = new SimpleMatchingEngine();
     this.initializeSearchEngines();
@@ -59,20 +62,26 @@ export class SearchService {
   private initializeSearchEngines(): void {
     this.searchEngines.push(
       {
-        name: 'postgresql-fulltext',
+        name: 'fuse-search',
         priority: 1,
+        isAvailable: true,
+        search: (query: SearchQuery) => this.fuseEngine.search(query)
+      },
+      {
+        name: 'postgresql-fulltext',
+        priority: 2,
         isAvailable: true,
         search: (query: SearchQuery) => this.postgresqlEngine.search(query)
       },
       {
         name: 'fuzzy-matching',
-        priority: 2,
+        priority: 3,
         isAvailable: true,
         search: (query: SearchQuery) => this.fuzzyEngine.search(query)
       },
       {
         name: 'simple-matching',
-        priority: 3,
+        priority: 4,
         isAvailable: true,
         search: (query: SearchQuery) => this.simpleEngine.search(query)
       }
@@ -227,16 +236,36 @@ export class SearchService {
    * Get bill title suggestions for autocomplete.
    */
   private async getBillSuggestions(pattern: string, limit: number): Promise<string[]> {
-    const searchRepository = repositoryFactory.getSearchRepository();
-    return searchRepository.getBillSuggestions(pattern, limit);
+    try {
+      const results = await database
+        .select({ title: bills.title })
+        .from(bills)
+        .where(sql`${bills.title} ILIKE ${`%${pattern}%`}`)
+        .limit(limit);
+      
+      return results.map(r => r.title).filter(Boolean);
+    } catch (error) {
+      logger.error('Failed to get bill suggestions', { error: (error as Error).message });
+      return [];
+    }
   }
 
   /**
    * Get sponsor name suggestions for autocomplete.
    */
   private async getSponsorSuggestions(pattern: string, limit: number): Promise<string[]> {
-    const searchRepository = repositoryFactory.getSearchRepository();
-    return searchRepository.getSponsorSuggestions(pattern, limit);
+    try {
+      const results = await database
+        .select({ name: sponsors.name })
+        .from(sponsors)
+        .where(sql`${sponsors.name} ILIKE ${`%${pattern}%`}`)
+        .limit(limit);
+      
+      return results.map(r => r.name).filter(Boolean);
+    } catch (error) {
+      logger.error('Failed to get sponsor suggestions', { error: (error as Error).message });
+      return [];
+    }
   }
 
   /**

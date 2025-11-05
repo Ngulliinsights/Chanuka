@@ -1,5 +1,5 @@
 import { readDatabase } from '../../../../shared/database/connection';
-import { users } from '@shared/schema';
+import { user_profiles } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 import { logger  } from '../../../../shared/core/src/index.js';
 
@@ -84,7 +84,8 @@ const DEFAULT_PREFERENCES: UserNotificationPreferences = {
     statusChanges: true, newComments: true, votingSchedule: true, amendments: false,
     updateFrequency: 'daily',
     notificationChannels: { inApp: true, email: true, push: false, sms: false },
-    quietHours: { enabled: false, startTime: '22:00', endTime: '07:00', timezone: undefined }, // Timezone undefined initially
+  // Omit timezone when unset to satisfy exactOptionalPropertyTypes
+  quietHours: { enabled: false, startTime: '22:00', endTime: '07:00' },
     smartFiltering: { enabled: false, interestBasedFiltering: true, priorityThreshold: 'medium', categoryFilters: [], keywordFilters: [], sponsorFilters: [] },
     advancedSettings: {
       digestSchedule: { enabled: true, frequency: 'daily', timeOfDay: '08:00' },
@@ -127,9 +128,9 @@ export class UserPreferencesService {
     try {
       // Select only the preferences column for efficiency
       const [userData] = await this.db
-        .select({ preferences: users.preferences })
-        .from(user)
-        .where(eq(users.id, user_id))
+        .select({ preferences: user_profiles.preferences })
+        .from(user_profiles)
+        .where(eq(user_profiles.user_id, user_id))
         .limit(1);
 
       if (!userData) {
@@ -165,9 +166,9 @@ export class UserPreferencesService {
     try {
       // 1. Fetch current preferences directly from DB to avoid race conditions.
       const [currentUser] = await this.db
-        .select({ preferences: users.preferences })
-        .from(user)
-        .where(eq(users.id, user_id))
+        .select({ preferences: user_profiles.preferences })
+        .from(user_profiles)
+        .where(eq(user_profiles.user_id, user_id))
         .limit(1);
 
       if (!currentUser) { logger.error("User not found during preference update.", logContext);
@@ -183,13 +184,13 @@ export class UserPreferencesService {
 
       // 4. Perform the database update.
       const result = await this.db
-        .update(user)
+        .update(user_profiles)
         .set({
           preferences: updatedPrefsObject, // Save the fully merged object
           updated_at: new Date()           // Update modification timestamp
         })
-        .where(eq(users.id, user_id))
-        .returning({ preferences: users.preferences }); // Return the updated data from DB
+        .where(eq(user_profiles.user_id, user_id))
+        .returning({ preferences: user_profiles.preferences }); // Return the updated data from DB
 
       if (result.length === 0) { // Should not happen if user was found earlier, but handle defensively.
         logger.error("DB update affected 0 rows, possible issue.", logContext);
@@ -219,9 +220,11 @@ export class UserPreferencesService {
   async updateBillTrackingPreferences(user_id: string, preferences: Partial<BillTrackingPreferences>): Promise<BillTrackingPreferences> { const logContext = { component: 'UserPreferencesService', user_id  };
     logger.info("Updating global bill tracking preferences specifically", logContext);
     try { // Delegate to the main update function, nesting the partial update correctly
+      // Merge the provided partial bill-tracking prefs onto system defaults
+      const mergedBillTracking = this.deepMerge(this.deepClone(DEFAULT_PREFERENCES.billTracking), preferences);
       const fullUpdatedPrefs = await this.updateUserPreferences(user_id, {
-        billTracking: preferences // Apply updates only within the billTracking key
-       });
+        billTracking: mergedBillTracking
+      });
       // Return just the updated billTracking portion
       return fullUpdatedPrefs.billTracking;
     } catch (error) {
@@ -325,7 +328,7 @@ export class UserPreferencesService {
     logger.info("Calculating global preference statistics.", logContext);
     try {
       // Fetch preferences for all users (consider performance for very large user bases)
-      const allUsersPrefs = await this.db.select({ preferences: users.preferences }).from(user);
+  const allUsersPrefs = await this.db.select({ preferences: user_profiles.preferences }).from(user_profiles);
 
       let immediateBillNotifications = 0;
       let emailBillChannelEnabled = 0;

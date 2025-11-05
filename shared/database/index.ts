@@ -14,7 +14,7 @@ export { withTransaction, withReadConnection } from './connection';
 export { checkDatabaseHealth, closeDatabaseConnections } from './connection';
 
 // Re-export schema
-export * from '../types';
+export * from '../schema';
 
 // Re-export types
 export type { DatabaseTransaction, DatabaseOperation, TransactionOptions } from './connection';

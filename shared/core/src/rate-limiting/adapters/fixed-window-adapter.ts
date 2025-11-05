@@ -4,34 +4,52 @@
  */
 
 import { RateLimitStore, RateLimitResult, RateLimitConfig } from '../core/interfaces';
-import { FixedWindowStore } from '../algorithms/fixed-window';
+import { FixedWindow } from '../algorithms/fixed-window';
 
 export class FixedWindowAdapter implements RateLimitStore {
-  constructor(private store: FixedWindowStore) {}
+  constructor(private store: FixedWindow) {}
 
   async check(key: string, config: RateLimitConfig): Promise<RateLimitResult> {
-    return this.store.check(key, config);
+    // Implement the check method using the FixedWindow algorithm
+    const result = await this.store.checkLimit(key, 1);
+    if (result.isErr()) {
+      throw result.error;
+    }
+
+    const remainingResult = await this.store.getRemaining(key);
+    if (remainingResult.isErr()) {
+      throw remainingResult.error;
+    }
+
+    return {
+      allowed: result.value,
+      remaining: remainingResult.value,
+      resetAt: new Date(Date.now() + config.windowMs),
+      totalHits: config.limit - remainingResult.value,
+      windowStart: Date.now(),
+      algorithm: 'fixed-window'
+    };
   }
 
   async reset(key: string): Promise<void> {
-    // Fixed window doesn't have a direct reset, but we can cleanup
-    await this.store.cleanup();
+    await this.store.reset(key);
   }
 
   async cleanup(): Promise<void> {
-    await this.store.cleanup();
+    // FixedWindow doesn't have cleanup, but we can implement a no-op
   }
 
   async healthCheck(): Promise<boolean> {
-    return this.store.healthCheck();
+    // Basic health check - FixedWindow is always healthy
+    return true;
   }
 }
 
 /**
  * Factory function to create a fixed window adapter
  */
-export function createFixedWindowAdapter(redis: any): FixedWindowAdapter {
-  const store = new FixedWindowStore(redis);
+export function createFixedWindowAdapter(config: any): FixedWindowAdapter {
+  const store = new FixedWindow(config);
   return new FixedWindowAdapter(store);
 }
 

@@ -41,18 +41,6 @@ export {
 
 // Observability module (primary for observability-related exports)
 export type {
-  ObservabilityConfig,
-  ObservabilityContext,
-  ObservabilityEvent,
-  ObservabilityProvider,
-  ObservabilityMiddleware,
-  ObservabilityStack,
-  TelemetryData,
-  TelemetryExporter,
-  CircuitBreakerMetrics,
-  HealthCheckResult,
-  HealthStatus as ObservabilityHealthStatus,
-  RetryOptions,
   LogLevel,
   LogContext,
   LogMetrics,
@@ -72,10 +60,6 @@ export type {
   LoggerChild
 } from './observability/types';
 export {
-  CircuitBreaker,
-  NetworkError,
-  generateRequestId,
-  retry,
   UnifiedLogger,
   logger
 } from './observability';
@@ -133,6 +117,28 @@ export {
 
 // Utils module (primary for utility-related exports)
 export * from './utils';
+
+// Concurrency utilities (migration support)
+export type {
+  RaceConditionPreventionOptions
+} from './utils/concurrency-adapter';
+export {
+  Mutex,
+  Semaphore,
+  ConcurrencyAdapter,
+  globalMutex,
+  apiMutex,
+  cacheMutex,
+  apiSemaphore,
+  fileSemaphore,
+  concurrencyAdapter,
+  cleanup
+} from './utils/concurrency-adapter';
+export {
+  ConcurrencyMigrationRouter,
+  getConcurrencyRouter,
+  setConcurrencyRouter
+} from './utils/concurrency-migration-router';
 
 // Performance module (primary for performance-related exports)
 export type {
@@ -210,11 +216,12 @@ export const FEATURES = {
   MODERNIZATION_INFRASTRUCTURE: true,
 } as const;
 
+// Logger is already exported from the main shared/core/index.ts file
+
 // Default export for convenience
 export default {
   configManager,
   getConfig,
-  logger,
   VERSION,
   FEATURES,
 };

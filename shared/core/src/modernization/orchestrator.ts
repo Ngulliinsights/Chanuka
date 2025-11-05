@@ -1,9 +1,9 @@
 import { EventEmitter } from 'events';
-import { Logger } from '../logging';
+import { UnifiedLogger } from '../observability/logging';
 import { 
-  ModernizationTask, 
-  ModernizationPhase, 
-  TaskStatus, 
+  ModernizationTask,
+  ModernizationPhase,
+  TaskStatus,
   ModernizationConfig,
   ModernizationConfigSchema,
   ModernizationError,
@@ -16,17 +16,23 @@ import { AnalysisEngine } from './analysis';
 import { BackupManager } from './backup';
 import { ProgressTracker } from './progress';
 import { ValidationFramework } from './validation';
-import { logger } from '../observability/logging';
+// Lightweight logger interface matching project's meta-first logging usage
+type LoggerLike = {
+  info: (meta: unknown, message?: string) => void;
+  error: (err: unknown, message?: string) => void;
+  debug?: (meta: unknown, message?: string) => void;
+  child: (bindings: Record<string, unknown>) => LoggerLike;
+};
 
 export interface ModernizationOrchestratorOptions {
   config?: Partial<ModernizationConfig>;
-  logger?: Logger;
+  logger?: LoggerLike;
   workingDirectory?: string;
 }
 
 export class ModernizationOrchestrator extends EventEmitter {
   private readonly config: ModernizationConfig;
-  private readonly logger: Logger;
+  private readonly logger: LoggerLike;
   private readonly workingDirectory: string;
   private readonly analysisEngine: AnalysisEngine;
   private readonly backupManager: BackupManager;
@@ -36,36 +42,68 @@ export class ModernizationOrchestrator extends EventEmitter {
   private tasks: Map<string, ModernizationTask> = new Map();
   private currentPhase: ModernizationPhase = ModernizationPhase.ANALYSIS;
   private isRunning: boolean = false;
-  private abortController?: AbortController;
+  private abortController: AbortController | undefined;
 
   constructor(options: ModernizationOrchestratorOptions = {}) {
     super();
     
-    this.config = ModernizationConfigSchema.parse(options.config || {});
-    this.logger = options.logger || new Logger({ name: 'ModernizationOrchestrator' });
+  this.config = ModernizationConfigSchema.parse(options.config ?? {});
+  this.logger = options.logger || (new UnifiedLogger({ name: 'ModernizationOrchestrator' }) as unknown as LoggerLike);
     this.workingDirectory = options.workingDirectory || process.cwd();
     
     // Initialize components
     this.analysisEngine = new AnalysisEngine({
-      config: this.config.analysis,
+      config: {
+        enabled: this.config.analysis.enabled,
+        types: this.config.analysis.types,
+        parallel: this.config.analysis.parallel,
+        timeout: this.config.analysis.timeout
+      },
       logger: this.logger.child({ component: 'AnalysisEngine' }),
       workingDirectory: this.workingDirectory
     });
-    
+
     this.backupManager = new BackupManager({
-      config: this.config.backup,
+      config: {
+        enabled: this.config.backup.enabled,
+        strategy: this.config.backup.strategy,
+        scope: this.config.backup.scope,
+        retention: {
+          maxBackups: this.config.backup.retention.maxBackups,
+          maxAge: this.config.backup.retention.maxAge,
+          autoCleanup: this.config.backup.retention.autoCleanup
+        },
+        verification: {
+          enabled: this.config.backup.verification.enabled,
+          checksumValidation: this.config.backup.verification.checksumValidation,
+          integrityCheck: this.config.backup.verification.integrityCheck,
+          restoreTest: this.config.backup.verification.restoreTest
+        }
+      },
       logger: this.logger.child({ component: 'BackupManager' }),
       workingDirectory: this.workingDirectory
     });
-    
+
     this.progressTracker = new ProgressTracker({
-      config: this.config.progress,
-      logger: this.logger.child({ component: 'ProgressTracker' })
+      config: {
+        enabled: this.config.progress.enabled,
+        updateInterval: this.config.progress.updateInterval,
+        persistState: this.config.progress.persistState,
+        notifications: this.config.progress.notifications
+      },
+      logger: this.logger as any
     });
-    
+
     this.validationFramework = new ValidationFramework({
-      config: this.config.validation,
-      logger: this.logger.child({ component: 'ValidationFramework' }),
+      config: {
+        enabled: this.config.validation.enabled,
+        preExecution: this.config.validation.preExecution,
+        postExecution: this.config.validation.postExecution,
+        continuous: this.config.validation.continuous,
+        failFast: this.config.validation.failFast,
+        types: this.config.validation.types
+      },
+      logger: this.logger as any,
       workingDirectory: this.workingDirectory
     });
     
@@ -137,7 +175,7 @@ export class ModernizationOrchestrator extends EventEmitter {
   public addTask(task: ModernizationTask): void {
     this.validateTask(task);
     this.tasks.set(task.id, task);
-    this.logger.debug({ name: task.name, phase: task.phase }, `Task added: ${task.id}`);
+    this.logger.debug?.({ name: task.name, phase: task.phase }, `Task added: ${task.id}`);
   }
 
   /**
@@ -146,7 +184,7 @@ export class ModernizationOrchestrator extends EventEmitter {
   public removeTask(taskId: string): boolean {
     const removed = this.tasks.delete(taskId);
     if (removed) {
-      this.logger.debug({}, `Task removed: ${taskId}`);
+      this.logger.debug?.({}, `Task removed: ${taskId}`);
     }
     return removed;
   }
@@ -312,7 +350,7 @@ export class ModernizationOrchestrator extends EventEmitter {
       });
 
     if (phaseTasks.length === 0) {
-      this.logger.debug({}, `No tasks found for phase: ${phase}`);
+      this.logger.debug?.({}, `No tasks found for phase: ${phase}`);
       this.emit('phase:completed', phase);
       return;
     }
@@ -443,7 +481,6 @@ export class ModernizationOrchestrator extends EventEmitter {
   }
 
   private async executeTasksInParallel(tasks: ModernizationTask[]): Promise<void> {
-    const semaphore = new Array(this.config.execution.maxConcurrency).fill(null);
     const taskQueue = [...tasks];
     const executing = new Set<Promise<void>>();
 

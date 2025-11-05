@@ -1,24 +1,23 @@
-import { UserRepository } from '../domain/repositories/user-repository';
-import { VerificationRepository } from '../domain/repositories/verification-repository';
-import { VerificationDomainService } from '../domain/services/verification-domain-service';
+import { UserService } from './user-service-direct';
+// Repository pattern removed - using direct service calls
+import { UserVerificationDomainService } from '../domain/services/user-verification-domain-service';
 import { ProfileDomainService, ProfileValidationResult, ProfileCompletenessScore } from '../domain/services/profile-domain-service';
 import { UserAggregate } from '../domain/aggregates/user-aggregate';
 import { User } from '../domain/entities/user';
 import { UserProfile, UserInterest } from '../domain/entities/user-profile';
 import { CitizenVerification } from '../domain/entities/citizen-verification';
 import { Evidence, ExpertiseLevel } from '../domain/entities/value-objects';
+import { UserManagementDomainService } from '../domain/services/user-management-domain-service';
 
 // Import use cases
 import {
   UserRegistrationUseCase,
   ProfileManagementUseCase,
-  VerificationOperationsUseCase,
+  VerificationOperationsUseCase
+} from './use-cases';
+import type {
   RegisterUserCommand,
-  UpdateProfileCommand,
-  SubmitVerificationCommand,
-  EndorseVerificationCommand,
-  DisputeVerificationCommand,
-  PerformFactCheckCommand
+  UpdateProfileCommand
 } from './use-cases';
 
 export interface UserProfileData {
@@ -49,33 +48,28 @@ export interface UserSearchResult {
 
 export class UserApplicationService {
   constructor(
-    private userRepository: UserRepository,
-    private verificationRepository: VerificationRepository,
-    private verificationDomainService: VerificationDomainService,
+    private userService: UserService,
+    // Repository pattern removed - using direct service calls
+    private userVerificationDomainService: UserVerificationDomainService,
     private profileDomainService: ProfileDomainService
   ) {
     // Initialize use cases
+    // UserRegistrationUseCase expects a UserManagementDomainService instance
     this.userRegistrationUseCase = new UserRegistrationUseCase(
-      this.userRepository,
-      new (require('../domain/services/user-management-domain-service').UserManagementDomainService)(
-        this.userRepository,
-        this.profileDomainService
-      )
+      new UserManagementDomainService(this.profileDomainService, this.userService)
     );
 
+    // ProfileManagementUseCase expects (userManagementService, profileService, userService)
     this.profileManagementUseCase = new ProfileManagementUseCase(
-      this.userRepository,
-      new (require('../domain/services/user-management-domain-service').UserManagementDomainService)(
-        this.userRepository,
-        this.profileDomainService
-      ),
-      this.profileDomainService
+      new UserManagementDomainService(this.profileDomainService, this.userService),
+      this.profileDomainService,
+      this.userService
     );
 
+    // VerificationOperationsUseCase updated to use direct service calls instead of repository pattern
     this.verificationOperationsUseCase = new VerificationOperationsUseCase(
-      this.userRepository,
-      this.verificationRepository,
-      this.verificationDomainService
+      this.userService,
+      this.userVerificationDomainService as any
     );
   }
 
@@ -88,20 +82,21 @@ export class UserApplicationService {
     return await this.userRegistrationUseCase.execute(command);
   }
 
-  async getUserById(user_id: string): Promise<User | null> { return await this.userRepository.findById(user_id);
+  async getUserById(user_id: string): Promise<User | null> { return await this.userService.findById(user_id);
    }
 
-  async getUserAggregate(user_id: string): Promise<UserAggregate | null> { return await this.userRepository.findUserAggregateById(user_id);
+  async getUserAggregate(user_id: string): Promise<UserAggregate | null> { return await this.userService.findUserAggregateById(user_id);
    }
 
-  async updateUserProfile(user_id: string, profileData: UserProfileData): Promise<UserProfile> { const result = await this.profileManagementUseCase.updateProfile({
-      user_id,
-      bio: profileData.bio,
-      expertise: profileData.expertise,
-      location: profileData.location,
-      organization: profileData.organization,
-      is_public: profileData.is_public
-     });
+  async updateUserProfile(user_id: string, profileData: UserProfileData): Promise<UserProfile> {
+    const cmd: Partial<UpdateProfileCommand> & { user_id: string } = { user_id };
+    if (profileData.bio !== undefined) cmd.bio = profileData.bio;
+    if (profileData.expertise !== undefined) cmd.expertise = profileData.expertise;
+    if (profileData.location !== undefined) cmd.location = profileData.location;
+    if (profileData.organization !== undefined) cmd.organization = profileData.organization;
+    if (profileData.is_public !== undefined) cmd.is_public = profileData.is_public;
+
+    const result = await this.profileManagementUseCase.updateProfile(cmd as UpdateProfileCommand);
 
     if (!result.success) {
       throw new Error(result.errors.join(', '));
@@ -110,13 +105,13 @@ export class UserApplicationService {
     return result.profile!;
   }
 
-  async updateUserInterests(user_id: string, interests: string[]): Promise<void> { const userAggregate = await this.userRepository.findUserAggregateById(user_id);
+  async updateUserInterests(user_id: string, interests: string[]): Promise<void> { const userAggregate = await this.userService.findUserAggregateById(user_id);
     if (!userAggregate) {
       throw new Error('User not found');
      }
 
     // Remove existing interests
-    await this.userRepository.deleteAllInterests(user_id);
+    await this.userService.deleteAllInterests(user_id);
 
     // Add new interests
     const interestEntities = interests.map(interest =>
@@ -124,11 +119,11 @@ export class UserApplicationService {
     );
 
     for (const interest of interestEntities) {
-      await this.userRepository.saveInterest(interest);
+      await this.userService.saveInterest(interest);
     }
   }
 
-  async getUserProfileCompleteness(user_id: string): Promise<ProfileCompletenessScore> { const userAggregate = await this.userRepository.findUserAggregateById(user_id);
+  async getUserProfileCompleteness(user_id: string): Promise<ProfileCompletenessScore> { const userAggregate = await this.userService.findUserAggregateById(user_id);
     if (!userAggregate) {
       throw new Error('User not found');
      }
@@ -136,7 +131,7 @@ export class UserApplicationService {
     return this.profileDomainService.calculateProfileCompleteness(userAggregate);
   }
 
-  async validateUserProfile(user_id: string): Promise<ProfileValidationResult> { const userAggregate = await this.userRepository.findUserAggregateById(user_id);
+  async validateUserProfile(user_id: string): Promise<ProfileValidationResult> { const userAggregate = await this.userService.findUserAggregateById(user_id);
     if (!userAggregate || !userAggregate.profile) {
       return {
         isValid: false,
@@ -149,14 +144,14 @@ export class UserApplicationService {
   }
 
   async searchUsers(query: string, limit = 10): Promise<UserSearchResult[]> {
-    const users = await this.userRepository.searchUsers(query, limit);
+    const users = await this.userService.searchUsers(query, limit);
 
     return users.map(user => ({
-      id: users.id,
-      name: users.name.value,
-      role: users.role.value,
-      verification_status: users.verification_status.value,
-      reputation_score: users.reputation_score
+      id: user.id,
+      name: typeof user.name === 'string' ? user.name : (user.name as any).toString(),
+      role: typeof user.role === 'string' ? user.role : (user.role as any).toString(),
+      verification_status: typeof user.verification_status === 'string' ? user.verification_status : (user.verification_status as any).toString(),
+      reputation_score: user.reputation_score
     }));
   }
 
@@ -218,7 +213,7 @@ export class UserApplicationService {
     endorsementRate: number;
     expertiseAreas: string[];
     reputation_score: number;
-  }> { const userAggregate = await this.userRepository.findUserAggregateById(user_id);
+  }> { const userAggregate = await this.userService.findUserAggregateById(user_id);
     if (!userAggregate) {
       throw new Error('User not found');
      }
@@ -237,7 +232,7 @@ export class UserApplicationService {
     };
   }
 
-  async getProfileSuggestions(user_id: string): Promise<string[]> { const userAggregate = await this.userRepository.findUserAggregateById(user_id);
+  async getProfileSuggestions(user_id: string): Promise<string[]> { const userAggregate = await this.userService.findUserAggregateById(user_id);
     if (!userAggregate) {
       throw new Error('User not found');
      }
@@ -245,7 +240,7 @@ export class UserApplicationService {
     return this.profileDomainService.suggestProfileImprovements(userAggregate);
   }
 
-  async getRecommendedInterests(user_id: string): Promise<string[]> { const userAggregate = await this.userRepository.findUserAggregateById(user_id);
+  async getRecommendedInterests(user_id: string): Promise<string[]> { const userAggregate = await this.userService.findUserAggregateById(user_id);
     if (!userAggregate) {
       throw new Error('User not found');
      }

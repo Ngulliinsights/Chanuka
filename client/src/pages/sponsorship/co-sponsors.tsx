@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { logger } from '../../utils/browser-logger';
 
-interface CoSponsorsProps { bill_id?: string;
+interface CosponsorProps { bill_id?: string;
  }
 
 interface CoSponsor {
@@ -41,22 +41,22 @@ interface CoSponsor {
   voting_alignment: number;
 }
 
-export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { const [coSponsors, setCoSponsors] = useState<CoSponsor[]>([]);
+export default function CosponsorAnalysis({ bill_id  }: CosponsorProps) { const [cosponsor, setCosponsor] = useState<CoSponsor[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCoSponsorsData = async () => {
+    const fetchCosponsorData = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/bills/${bill_id }/sponsorship-analysis/co-sponsors`);
+        const response = await fetch(`/api/bills/${bill_id }/sponsorhip-analysis/co-sponsor`);
 
         if (response.ok) {
           const data = await response.json();
-          setCoSponsors(data.coSponsors || []);
+          setCosponsor(data.cosponsor || []);
         } else {
-          logger.error('Failed to fetch co-sponsors data', { component: 'Chanuka' });
+          logger.error('Failed to fetch co-sponsor data', { component: 'Chanuka' });
           // Fallback to mock data if API fails
-          setCoSponsors([
+          setCosponsor([
             {
               id: "1",
               name: "Hon. Sarah Odhiambo",
@@ -87,16 +87,16 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
           ]);
         }
       } catch (error) {
-        logger.error('Error fetching co-sponsors data:', { component: 'Chanuka' }, error);
+        logger.error('Error fetching co-sponsor data:', { component: 'Chanuka' }, error);
         // Fallback to mock data on error
-        setCoSponsors([]);
+        setCosponsor([]);
       } finally {
         setLoading(false);
       }
     };
 
     if (bill_id) {
-      fetchCoSponsorsData();
+      fetchCosponsorData();
     }
   }, [bill_id]);
 
@@ -118,16 +118,16 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading co-sponsors analysis...</p>
+          <p className="text-muted-foreground">Loading co-sponsor analysis...</p>
         </div>
       </div>
     );
   }
 
-  const highRiskSponsors = coSponsors.filter(s => s.conflict_level === 'high').length;
-  const mediumRiskSponsors = coSponsors.filter(s => s.conflict_level === 'medium').length;
-  const lowRiskSponsors = coSponsors.filter(s => s.conflict_level === 'low').length;
-  const totalExposure = coSponsors.reduce((sum, s) => sum + s.financial_exposure, 0);
+  const highRisksponsor = cosponsor.filter(s => s.conflict_level === 'high').length;
+  const mediumRisksponsor = cosponsor.filter(s => s.conflict_level === 'medium').length;
+  const lowRisksponsor = cosponsor.filter(s => s.conflict_level === 'low').length;
+  const totalExposure = cosponsor.reduce((sum, s) => sum + s.financial_exposure, 0);
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-7xl">
@@ -137,20 +137,20 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
         <span>›</span>
         <Link to={ `/bills/${bill_id }`} className="hover:text-primary">Bills</Link>
         <span>›</span>
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="hover:text-primary">Sponsorship Analysis</Link>
+        <Link to={ `/bills/${bill_id }/sponsorhip-analysis`} className="hover:text-primary">sponsorhip Analysis</Link>
         <span>›</span>
-        <span className="text-foreground">Co-Sponsors</span>
+        <span className="text-foreground">Co-sponsor</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6">
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
+        <Link to={ `/bills/${bill_id }/sponsorhip-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Analysis Navigation
         </Link>
 
-        <h1 className="text-3xl font-bold text-foreground mb-2">Co-Sponsors Conflict Analysis</h1>
-        <p className="text-muted-foreground">Comprehensive analysis of all {coSponsors.length} co-sponsors</p>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Co-sponsor Conflict Analysis</h1>
+        <p className="text-muted-foreground">Comprehensive analysis of all {cosponsor.length} co-sponsor</p>
       </div>
 
       {/* Summary Stats */}
@@ -158,21 +158,21 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
-            Co-Sponsors Summary
+            Co-sponsor Summary
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
-              <div className="text-2xl font-bold text-red-600">{highRiskSponsors}</div>
+              <div className="text-2xl font-bold text-red-600">{highRisksponsor}</div>
               <div className="text-sm text-red-700">High Conflict Risk</div>
             </div>
             <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-              <div className="text-2xl font-bold text-yellow-600">{mediumRiskSponsors}</div>
+              <div className="text-2xl font-bold text-yellow-600">{mediumRisksponsor}</div>
               <div className="text-sm text-yellow-700">Medium Risk</div>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-              <div className="text-2xl font-bold text-green-600">{lowRiskSponsors}</div>
+              <div className="text-2xl font-bold text-green-600">{lowRisksponsor}</div>
               <div className="text-sm text-green-700">Low Risk</div>
             </div>
             <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
@@ -185,11 +185,11 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
         </CardContent>
       </Card>
 
-      {/* Co-Sponsors Detailed Analysis with Subtabs */}
+      {/* Co-sponsor Detailed Analysis with Subtabs */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>Co-Sponsors Conflict Analysis Dashboard</CardTitle>
-          <p className="text-muted-foreground">Comprehensive analysis of all {coSponsors.length} co-sponsors examining financial interests, voting patterns, and potential conflicts</p>
+          <CardTitle>Co-sponsor Conflict Analysis Dashboard</CardTitle>
+          <p className="text-muted-foreground">Comprehensive analysis of all {cosponsor.length} co-sponsor examining financial interests, voting patterns, and potential conflicts</p>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="overview" className="w-full">
@@ -215,46 +215,46 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
             {/* Overview Tab */}
             <TabsContent value="overview" className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {coSponsors.map((sponsor) => (
-                  <Card key={sponsors.id} className={`${sponsors.conflict_level === 'high' ? 'border-red-200' : sponsors.conflict_level === 'medium' ? 'border-yellow-200' : 'border-green-200'}`}>
+                {cosponsor.map((sponsor) => (
+                  <Card key={sponsor.id} className={`${sponsor.conflict_level === 'high' ? 'border-red-200' : sponsor.conflict_level === 'medium' ? 'border-yellow-200' : 'border-green-200'}`}>
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex items-start gap-3">
                           <Avatar>
                             <AvatarFallback>
-                              {sponsors.name.split(' ').map(n => n[0]).join('')}
+                              {sponsor.name.split(' ').map(n => n[0]).join('')}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <h5 className="font-semibold">{sponsors.name}</h5>
-                            <p className="text-sm text-muted-foreground">{sponsors.role}</p>
-                            <p className="text-xs text-muted-foreground">{sponsors.party}</p>
+                            <h5 className="font-semibold">{sponsor.name}</h5>
+                            <p className="text-sm text-muted-foreground">{sponsor.role}</p>
+                            <p className="text-xs text-muted-foreground">{sponsor.party}</p>
                           </div>
                         </div>
-                        <Badge className={getConflictLevelColor(sponsors.conflict_level)}>
-                          {sponsors.conflict_level} Risk
+                        <Badge className={getConflictLevelColor(sponsor.conflict_level)}>
+                          {sponsor.conflict_level} Risk
                         </Badge>
                       </div>
 
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Financial Exposure:</span>
-                          <span className="font-medium">KSh {(sponsors.financial_exposure / 1000000).toFixed(1)}M</span>
+                          <span className="font-medium">KSh {(sponsor.financial_exposure / 1000000).toFixed(1)}M</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Industry Alignment:</span>
-                          <span className="font-medium">{sponsors.voting_alignment}%</span>
+                          <span className="font-medium">{sponsor.voting_alignment}%</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Affiliations:</span>
-                          <span className="font-medium">{sponsors.affiliations.length}</span>
+                          <span className="font-medium">{sponsor.affiliations.length}</span>
                         </div>
                       </div>
 
-                      {sponsors.affiliations.length > 0 && (
+                      {sponsor.affiliations.length > 0 && (
                         <div className="mt-3 pt-3 border-t">
                           <h6 className="text-xs font-semibold text-muted-foreground mb-2">Key Affiliations:</h6>
-                          {sponsors.affiliations.slice(0, 2).map((affiliation, index) => (
+                          {sponsor.affiliations.slice(0, 2).map((affiliation, index) => (
                             <div key={index} className="flex items-center gap-2 text-xs mb-1">
                               <Building className="h-3 w-3 text-muted-foreground" />
                               <span className="text-muted-foreground">{affiliation.organization}</span>
@@ -284,20 +284,20 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
                     <div className="p-4 bg-blue-50 border border-blue-200 rounded">
                       <h5 className="font-semibold text-blue-800 mb-2">Shared Corporate Connections</h5>
                       <p className="text-sm text-blue-700">
-                        Seven sponsors maintain direct or indirect ties to overlapping healthcare companies, 
+                        Seven sponsor maintain direct or indirect ties to overlapping healthcare companies, 
                         indicating potential coordinated industry influence across legislative positions.
                       </p>
                     </div>
                     <div className="p-4 bg-yellow-50 border border-yellow-200 rounded">
                       <h5 className="font-semibold text-yellow-800 mb-2">Campaign Contribution Patterns</h5>
                       <p className="text-sm text-yellow-700">
-                        Ten of twelve sponsors (83%) received campaign funding from companies directly affected by this legislation.
+                        Ten of twelve sponsor (83%) received campaign funding from companies directly affected by this legislation.
                       </p>
                     </div>
                     <div className="p-4 bg-red-50 border border-red-200 rounded">
                       <h5 className="font-semibold text-red-800 mb-2">Investment Timing Concerns</h5>
                       <p className="text-sm text-red-700">
-                        Five sponsors acquired healthcare investments within six months of bill introduction.
+                        Five sponsor acquired healthcare investments within six months of bill introduction.
                       </p>
                     </div>
                   </div>
@@ -315,21 +315,21 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <Card className="border-red-200">
                       <CardContent className="p-4 text-center">
-                        <div className="text-3xl font-bold text-red-600 mb-2">{highRiskSponsors}</div>
+                        <div className="text-3xl font-bold text-red-600 mb-2">{highRisksponsor}</div>
                         <div className="text-sm text-red-700 mb-2">Critical Conflicts</div>
                         <p className="text-xs text-muted-foreground">Direct financial benefits exceeding KSh 1M</p>
                       </CardContent>
                     </Card>
                     <Card className="border-yellow-200">
                       <CardContent className="p-4 text-center">
-                        <div className="text-3xl font-bold text-yellow-600 mb-2">{mediumRiskSponsors}</div>
+                        <div className="text-3xl font-bold text-yellow-600 mb-2">{mediumRisksponsor}</div>
                         <div className="text-sm text-yellow-700 mb-2">High Risk</div>
                         <p className="text-xs text-muted-foreground">Significant industry relationships</p>
                       </CardContent>
                     </Card>
                     <Card className="border-green-200">
                       <CardContent className="p-4 text-center">
-                        <div className="text-3xl font-bold text-green-600 mb-2">{lowRiskSponsors}</div>
+                        <div className="text-3xl font-bold text-green-600 mb-2">{lowRisksponsor}</div>
                         <div className="text-sm text-green-700 mb-2">Medium Risk</div>
                         <p className="text-xs text-muted-foreground">Minor conflicts requiring disclosure</p>
                       </CardContent>
@@ -339,18 +339,18 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
               </Card>
 
               <div className="space-y-4">
-                {coSponsors.filter(s => s.conflict_level === 'high').map((sponsor) => (
-                  <Card key={sponsors.id} className="border-red-200">
+                {cosponsor.filter(s => s.conflict_level === 'high').map((sponsor) => (
+                  <Card key={sponsor.id} className="border-red-200">
                     <CardHeader>
                       <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">{sponsors.name} - Critical Conflict</CardTitle>
+                        <CardTitle className="text-lg">{sponsor.name} - Critical Conflict</CardTitle>
                         <Badge className="bg-red-100 text-red-800">Recusal Recommended</Badge>
                       </div>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-2">
-                        <p><strong>Primary Conflict:</strong> {sponsors.affiliations[0]?.organization}</p>
-                        <p><strong>Financial Exposure:</strong> KSh {(sponsors.financial_exposure / 1000000).toFixed(2)}M in direct compensation and investments</p>
+                        <p><strong>Primary Conflict:</strong> {sponsor.affiliations[0]?.organization}</p>
+                        <p><strong>Financial Exposure:</strong> KSh {(sponsor.financial_exposure / 1000000).toFixed(2)}M in direct compensation and investments</p>
                         <p><strong>Recommendation:</strong> Immediate recusal from voting and committee deliberations</p>
                       </div>
                     </CardContent>
@@ -371,14 +371,14 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
                       <CardContent className="p-4 text-center">
                         <div className="text-3xl font-bold text-blue-600 mb-2">73%</div>
                         <div className="text-sm text-blue-700 mb-2">Average Industry Alignment</div>
-                        <p className="text-xs text-muted-foreground">Across all co-sponsors on healthcare votes (2022-2024)</p>
+                        <p className="text-xs text-muted-foreground">Across all co-sponsor on healthcare votes (2022-2024)</p>
                       </CardContent>
                     </Card>
                     <Card>
                       <CardContent className="p-4 text-center">
                         <div className="text-3xl font-bold text-red-600 mb-2">89%</div>
-                        <div className="text-sm text-red-700 mb-2">High-Conflict Sponsors Alignment</div>
-                        <p className="text-xs text-muted-foreground">Sponsors with significant financial interests</p>
+                        <div className="text-sm text-red-700 mb-2">High-Conflict sponsor Alignment</div>
+                        <p className="text-xs text-muted-foreground">sponsor with significant financial interests</p>
                       </CardContent>
                     </Card>
                   </div>
@@ -395,7 +395,7 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
                       <div className="flex justify-between items-start">
                         <div>
                           <h6 className="font-semibold">Healthcare Pricing Transparency Act (March 2024)</h6>
-                          <p className="text-sm text-muted-foreground">8 co-sponsors voted Against</p>
+                          <p className="text-sm text-muted-foreground">8 co-sponsor voted Against</p>
                         </div>
                         <Badge className="bg-red-100 text-red-800">Industry Aligned</Badge>
                       </div>
@@ -404,7 +404,7 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
                       <div className="flex justify-between items-start">
                         <div>
                           <h6 className="font-semibold">Pharmaceutical Import Regulations (November 2023)</h6>
-                          <p className="text-sm text-muted-foreground">10 co-sponsors voted For</p>
+                          <p className="text-sm text-muted-foreground">10 co-sponsor voted For</p>
                         </div>
                         <Badge className="bg-yellow-100 text-yellow-800">Industry Aligned</Badge>
                       </div>
@@ -428,24 +428,24 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {coSponsors.map((sponsor) => (
-                  <Card key={sponsors.id} className={`${sponsors.conflict_level === 'high' ? 'border-red-200' : sponsors.conflict_level === 'medium' ? 'border-yellow-200' : 'border-green-200'}`}>
+                {cosponsor.map((sponsor) => (
+                  <Card key={sponsor.id} className={`${sponsor.conflict_level === 'high' ? 'border-red-200' : sponsor.conflict_level === 'medium' ? 'border-yellow-200' : 'border-green-200'}`}>
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
                           <Avatar>
                             <AvatarFallback>
-                              {sponsors.name.split(' ').map(n => n[0]).join('')}
+                              {sponsor.name.split(' ').map(n => n[0]).join('')}
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            <CardTitle className="text-base">{sponsors.name}</CardTitle>
-                            <p className="text-sm text-muted-foreground">{sponsors.role}</p>
-                            <p className="text-xs text-muted-foreground">{sponsors.party}</p>
+                            <CardTitle className="text-base">{sponsor.name}</CardTitle>
+                            <p className="text-sm text-muted-foreground">{sponsor.role}</p>
+                            <p className="text-xs text-muted-foreground">{sponsor.party}</p>
                           </div>
                         </div>
-                        <Badge className={getConflictLevelColor(sponsors.conflict_level)}>
-                          {sponsors.conflict_level} Risk
+                        <Badge className={getConflictLevelColor(sponsor.conflict_level)}>
+                          {sponsor.conflict_level} Risk
                         </Badge>
                       </div>
                     </CardHeader>
@@ -453,24 +453,24 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
                       <div className="space-y-3">
                         <div className="grid grid-cols-3 gap-2 text-center">
                           <div>
-                            <div className="text-lg font-bold">KSh {(sponsors.financial_exposure / 1000000).toFixed(1)}M</div>
+                            <div className="text-lg font-bold">KSh {(sponsor.financial_exposure / 1000000).toFixed(1)}M</div>
                             <div className="text-xs text-muted-foreground">Financial Exposure</div>
                           </div>
                           <div>
-                            <div className="text-lg font-bold">{sponsors.voting_alignment}%</div>
+                            <div className="text-lg font-bold">{sponsor.voting_alignment}%</div>
                             <div className="text-xs text-muted-foreground">Industry Alignment</div>
                           </div>
                           <div>
-                            <div className="text-lg font-bold">{sponsors.affiliations.length}</div>
+                            <div className="text-lg font-bold">{sponsor.affiliations.length}</div>
                             <div className="text-xs text-muted-foreground">Board Positions</div>
                           </div>
                         </div>
 
-                        {sponsors.affiliations.length > 0 && (
+                        {sponsor.affiliations.length > 0 && (
                           <div>
                             <h6 className="text-sm font-semibold mb-2">Key Affiliations</h6>
                             <div className="space-y-1">
-                              {sponsors.affiliations.map((affiliation, index) => (
+                              {sponsor.affiliations.map((affiliation, index) => (
                                 <div key={index} className="flex items-center gap-2 text-xs">
                                   <Building className="h-3 w-3 text-muted-foreground" />
                                   <span className="text-muted-foreground">{affiliation.organization} - {affiliation.role}</span>
@@ -500,13 +500,13 @@ export default function CoSponsorsAnalysis({ bill_id  }: CoSponsorsProps) { cons
 
       {/* Navigation Actions */}
       <div className="flex justify-between items-center">
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis/primary-sponsor`}>
+        <Link to={ `/bills/${bill_id }/sponsorhip-analysis/primary-sponsor`}>
           <Button variant="outline">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Previous: Primary Sponsor
           </Button>
         </Link>
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis/financial-network`}>
+        <Link to={ `/bills/${bill_id }/sponsorhip-analysis/financial-network`}>
           <Button>
             Next: Financial Network
             <ChevronRight className="h-4 w-4 ml-2" />

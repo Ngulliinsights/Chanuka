@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import type { Bill, BillsQueryParams } from '../types';
 
 interface BillListProps {
-  bills: Bill[];
+  bill: Bill[];
   isLoading: boolean;
   error: Error | null;
   title?: string;
@@ -20,10 +20,10 @@ interface BillListProps {
 }
 
 export const BillList = ({
-  bills,
+  bill,
   isLoading,
   error,
-  title = "Bills",
+  title = "bill",
   onLoadMore,
   hasMore = false,
   filters = {},
@@ -60,7 +60,7 @@ export const BillList = ({
       <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
         <div className="flex items-center mb-2">
           <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
-          <h3 className="font-semibold">Error Loading Bills</h3>
+          <h3 className="font-semibold">Error Loading bill</h3>
         </div>
         <p className="text-sm pl-7">{error.message}</p>
         <Button
@@ -81,7 +81,7 @@ export const BillList = ({
         <div>
           <h2 className="text-2xl font-semibold">{title}</h2>
           <p className="text-muted-foreground text-sm mt-1">
-            Displaying {formatCount(bills.length, 'bill')}
+            Displaying {formatCount(bill.length, 'bill')}
           </p>
         </div>
 
@@ -89,20 +89,20 @@ export const BillList = ({
           {/* Filter dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" aria-label="Filter bills">
+              <Button variant="outline" size="sm" aria-label="Filter bill">
                 <Filter className="mr-2 h-4 w-4" />
                 <span>Filters</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem onClick={() => onFiltersChange?.({ ...filters, status: 'introduced' })}>
-                Introduced Bills
+                Introduced bill
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onFiltersChange?.({ ...filters, status: 'committee' })}>
                 In Committee
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onFiltersChange?.({ ...filters, status: 'passed' })}>
-                Passed Bills
+                Passed bill
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onFiltersChange?.({})}>
                 Clear Filters
@@ -116,45 +116,45 @@ export const BillList = ({
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-64 text-muted-foreground">
             <Loader2 className="h-10 w-10 animate-spin mb-4" />
-            <p>Loading bills...</p>
+            <p>Loading bill...</p>
           </div>
-        ) : bills.length > 0 ? (
+        ) : bill.length > 0 ? (
           <>
             {view === 'card' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {bills.map(bill => (
-                  <BillCard key={bills.id} bill={bill} />
+                {bill.map(bill => (
+                  <BillCard key={bill.id} bill={bill} />
                 ))}
               </div>
             ) : (
               <div className="space-y-4">
-                {bills.map(bill => (
-                  <Link key={bills.id} to={`/bills/${bills.id}`}>
+                {bill.map(bill => (
+                  <Link key={bill.id} to={`/bill/${bill.id}`}>
                     <Card className="hover:shadow-md transition-shadow cursor-pointer group">
                       <CardHeader className="pb-2">
                         <div className="flex justify-between items-start">
-                          <Badge className={`${getStatusStyle(bills.status)} capitalize`}>
-                            {bills.status}
+                          <Badge className={`${getStatusStyle(bill.status)} capitalize`}>
+                            {bill.status}
                           </Badge>
                           <div className="text-sm text-muted-foreground">
-                            {new Date(bills.introduced_date).toLocaleDateString()}
+                            {new Date(bill.introduced_date).toLocaleDateString()}
                           </div>
                         </div>
                         <CardTitle className="text-xl mt-2 text-primary-700 group-hover:text-primary-800 transition-colors">
-                          {bills.title}
+                          {bill.title}
                         </CardTitle>
                         <CardDescription className="line-clamp-2">
-                          {bills.summary}
+                          {bill.summary}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="pb-4">
                         <div className="text-sm">
-                          {bills.sponsors && bills.sponsors.length > 0 && (
+                          {bill.sponsors && bill.sponsors.length > 0 && (
                             <>
-                              <span className="font-medium">Sponsor:</span> {bills.sponsors[0].name}
-                              {bills.sponsors.length > 1 && (
+                              <span className="font-medium">Sponsor:</span> {bill.sponsors[0].name}
+                              {bill.sponsors.length > 1 && (
                                 <span className="ml-1 text-muted-foreground">
-                                  +{formatCount(bills.sponsors.length - 1, 'cosponsor')}
+                                  +{formatCount(bill.sponsors.length - 1, 'cosponsor')}
                                 </span>
                               )}
                             </>
@@ -163,23 +163,23 @@ export const BillList = ({
                       </CardContent>
                       <CardFooter className="pt-0 border-t flex justify-between text-sm text-muted-foreground">
                         <div className="flex gap-4">
-                          {bills.engagementMetrics && (
+                          {bill.engagementMetrics && (
                             <>
                               <div className="flex items-center">
                                 <span className="mr-1">🔍</span>
-                                <span>{formatCount(bills.engagementMetrics.views, 'view')}</span>
+                                <span>{formatCount(bill.engagementMetrics.views, 'view')}</span>
                               </div>
                               <div className="flex items-center">
                                 <span className="mr-1">💬</span>
-                                <span>{formatCount(bills.comments?.length || 0, 'comment')}</span>
+                                <span>{formatCount(bill.comments?.length || 0, 'comment')}</span>
                               </div>
                             </>
                           )}
                         </div>
-                        {bills.trackingCount && (
+                        {bill.trackingCount && (
                           <div className="flex items-center">
                             <span className="mr-1">👁️</span>
-                            <span>{formatCount(bills.trackingCount, 'tracking')}</span>
+                            <span>{formatCount(bill.trackingCount, 'tracking')}</span>
                           </div>
                         )}
                       </CardFooter>
@@ -196,7 +196,7 @@ export const BillList = ({
                   onClick={onLoadMore}
                   className="min-w-[150px]"
                 >
-                  Load More Bills
+                  Load More bill
                 </Button>
               </div>
             )}
@@ -204,7 +204,7 @@ export const BillList = ({
         ) : (
           <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
             <div className="text-gray-500 mb-2">
-              No bills found
+              No bill found
             </div>
             <Button
               variant="outline"

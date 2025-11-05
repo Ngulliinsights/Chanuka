@@ -10,7 +10,20 @@ if (!process.env.DATABASE_URL) {
 
 export default defineConfig({
   out: "./drizzle",
-  schema: "./shared/schema",
+  schema: [
+    "./shared/schema/foundation.ts",
+    "./shared/schema/citizen_participation.ts", 
+    "./shared/schema/parliamentary_process.ts",
+    "./shared/schema/constitutional_intelligence.ts",
+    "./shared/schema/argument_intelligence.ts",
+    "./shared/schema/advocacy_coordination.ts",
+    "./shared/schema/universal_access.ts",
+    "./shared/schema/transparency_analysis.ts",
+    "./shared/schema/impact_measurement.ts",
+    "./shared/schema/integrity_operations.ts",
+    "./shared/schema/platform_operations.ts",
+    "./shared/schema/enum.ts"
+  ],
   dialect: "postgresql",
   dbCredentials: {
     url: process.env.DATABASE_URL,

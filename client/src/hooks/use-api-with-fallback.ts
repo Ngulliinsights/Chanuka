@@ -118,12 +118,13 @@ export function useApiWithFallback<T = any>(
         setFromFallback(response.fromFallback || false);
         // Use ref to get latest callback without re-running effect
         onSuccessRef.current?.(response.data);
-      } else if (response.fromFallback) {
+      } else if (!response.success && response.fromFallback) {
         // Fallback data is available even though request failed
-        setData(response.data);
+        // Narrow to error-variant by checking success === false and fromFallback === true
+        setData(response.data as T | null);
         setFromFallback(true);
         setError(response.error || null);
-        onErrorRef.current?.(response.error!);
+        if (response.error) onErrorRef.current?.(response.error);
       }
     } catch (err) {
       // Only handle error if we're still mounted and it's not an abort
@@ -304,7 +305,12 @@ export function useMutation<TData = any, TVariables = any>(
         onSuccessRef.current?.(response.data, variables);
         return response.data;
       } else {
-        resultError = response.error!;
+        // Ensure we safely access the error field — ApiResponse is a union where
+        // only some variants include `error`. Fall back to a generic ApiError
+        // if none is provided to satisfy the type system.
+        const maybeError = (response as any).error as ApiError | undefined;
+        const safeError: ApiError = maybeError ?? ({ name: 'ApiError', message: 'Unknown API error', timestamp: new Date().toISOString() } as ApiError);
+        resultError = safeError;
         setError(resultError);
         onErrorRef.current?.(resultError, variables);
         throw resultError;

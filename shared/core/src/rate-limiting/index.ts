@@ -4,8 +4,9 @@ export * from './adapters';
 export * from './middleware';
 
 // Specific exports for backward compatibility
-export { RateLimitMiddleware } from './middleware';
-export const rateLimitMiddleware = RateLimitMiddleware;
+export { createRateLimitMiddleware as RateLimitMiddleware } from './middleware';
+import { createExpressRateLimitMiddleware } from './middleware';
+export const rateLimitMiddleware = createExpressRateLimitMiddleware;
 
 // Legacy exports for backward compatibility - be specific to avoid conflicts
 export type { 

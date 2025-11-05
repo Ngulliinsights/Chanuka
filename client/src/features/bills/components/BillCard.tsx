@@ -24,8 +24,8 @@ const conflictColors = {
 };
 
 export function BillCard({ bill }: BillCardProps) {
-  const statusColor = statusColors[bills.status as keyof typeof statusColors] || statusColors.introduced;
-  const hasConflicts = bills.sponsors?.some(sponsor => sponsors.conflictOfInterest && sponsors.conflictOfInterest.length > 0);
+  const statusColor = statusColors[bill.status as keyof typeof statusColors] || statusColors.introduced;
+  const hasConflicts = bill.sponsors?.some(sponsor => sponsor.conflictOfInterest && sponsor.conflictOfInterest.length > 0);
   const conflict_level = hasConflicts ? 'high' : 'low';
 
   return (
@@ -33,28 +33,28 @@ export function BillCard({ bill }: BillCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="text-lg font-semibold leading-tight group-hover:text-primary transition-colors">
-            <Link to={`/bills/${bills.id}`} className="hover:underline">
-              {bills.title}
+            <Link to={`/bills/${bill.id}`} className="hover:underline">
+              {bill.title}
             </Link>
           </CardTitle>
-          {bills.category && (
+          {bill.category && (
             <Badge variant="secondary" className="text-xs shrink-0">
-              {bills.category}
+              {bill.category}
             </Badge>
           )}
         </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {bills.summary && (
+        {bill.summary && (
           <p className="text-sm text-muted-foreground line-clamp-2">
-            {bills.summary}
+            {bill.summary}
           </p>
         )}
 
         <div className="flex flex-wrap gap-2">
           <Badge className={cn('status-badge', statusColor)}>
-            {bills.status.charAt(0).toUpperCase() + bills.status.slice(1)}
+            {bill.status.charAt(0).toUpperCase() + bill.status.slice(1)}
           </Badge>
 
           {hasConflicts && (
@@ -69,19 +69,19 @@ export function BillCard({ bill }: BillCardProps) {
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1">
               <Calendar className="h-4 w-4" />
-              <span>{new Date(bills.introduced_date).toLocaleDateString()}</span>
+              <span>{new Date(bill.introduced_date).toLocaleDateString()}</span>
             </div>
 
-            {bills.sponsors && bills.sponsors.length > 0 && (
+            {bill.sponsors && bill.sponsors.length > 0 && (
               <div className="flex items-center gap-1">
                 <Users className="h-4 w-4" />
-                <span>{bills.sponsors.length} sponsors</span>
+                <span>{bill.sponsors.length} sponsors</span>
               </div>
             )}
           </div>
 
           <Link
-            to={`/bills/${bills.id}`}
+            to={`/bills/${bill.id}`}
             className="inline-flex items-center gap-1 text-primary hover:text-primary-dark font-medium transition-colors"
           >
             <TrendingUp className="h-4 w-4" />

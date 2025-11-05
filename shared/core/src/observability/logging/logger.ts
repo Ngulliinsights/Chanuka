@@ -6,13 +6,51 @@ try {
 } catch (_err) {
   pino = null;
 }
-import { AsyncLocalStorage } from 'async_hooks';
-import { promises as fs } from 'fs';
-import { stat } from 'fs/promises';
-import fsSync from 'fs';
-import path from 'path';
-import crypto from 'crypto';
-import { performance } from 'perf_hooks';
+
+// Conditionally import Node.js specific modules only when not in browser
+let AsyncLocalStorage: any = null;
+let fs: any = null;
+let fsSync: any = null;
+let path: any = null;
+let crypto: any = null;
+let perf_hooks: any = null;
+
+const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
+
+if (isNode) {
+  try {
+    AsyncLocalStorage = require('async_hooks').AsyncLocalStorage;
+    fs = require('fs').promises;
+    fsSync = require('fs');
+    path = require('path');
+    crypto = require('crypto');
+    perf_hooks = require('perf_hooks');
+  } catch (_err) {
+    // Fallback if modules not available
+  }
+} else {
+  // Browser-compatible fallback for AsyncLocalStorage
+  AsyncLocalStorage = class BrowserAsyncLocalStorage<T> {
+    private store: T | undefined;
+
+    run<R>(store: T, callback: () => R): R {
+      const previousStore = this.store;
+      this.store = store;
+      try {
+        return callback();
+      } finally {
+        this.store = previousStore;
+      }
+    }
+
+    getStore(): T | undefined {
+      return this.store;
+    }
+  };
+
+  // Browser-compatible fallbacks for other Node.js modules
+  perf_hooks = { performance: globalThis.performance };
+}
 
 import {
   LogLevel,
@@ -159,10 +197,13 @@ function calculatePercentile(sortedValues: number[], percentile: number): number
  * Generate unique correlation ID efficiently using base36 encoding.
  */
 function generateCorrelationId(): string {
-  const timestamp = Date.now().toString(36);
-  const random = crypto.randomBytes(4).toString('hex').substring(0, 8);
-  return `${timestamp}-${random}`;
-}
+   const timestamp = Date.now().toString(36);
+   // Use crypto if available (Node.js), otherwise fallback to Math.random for browser
+   const random = crypto && crypto.randomBytes
+     ? crypto.randomBytes(4).toString('hex').substring(0, 8)
+     : Math.random().toString(36).substring(2, 10);
+   return `${timestamp}-${random}`;
+ }
 
 // ==================== Circular Buffer Implementation ====================
 
@@ -257,8 +298,9 @@ export function createLogRotationManager(config: LogRotationConfig): LogRotation
   const maxSizeBytes = parseSize(config.maxFileSize);
 
   async function shouldRotate(filePath: string): Promise<boolean> {
+    if (!fs || !fs.stat) return false;
     try {
-      const stats = await stat(filePath);
+      const stats = await fs.stat(filePath);
       return stats.size >= maxSizeBytes;
     } catch {
       return false; // File doesn't exist or can't be accessed
@@ -325,7 +367,7 @@ export function createLogRotationManager(config: LogRotationConfig): LogRotation
   }
 
   function stopAllRotationChecks(): void {
-    for (const interval of intervals.values()) {
+    for (const interval of Array.from(intervals.values())) {
       clearInterval(interval);
     }
     intervals.clear();
@@ -399,13 +441,13 @@ class FileTransport implements LogTransport {
   level: LogLevel;
   private filePath: string;
   private rotationManager?: LogRotationManager;
-  private writeStream?: fsSync.WriteStream;
+  private writeStream?: any;
 
   constructor(level: LogLevel, filePath: string, rotationConfig?: LogRotationConfig) {
     this.level = level;
     this.filePath = filePath;
 
-    if (rotationConfig) {
+    if (rotationConfig && fsSync && fsSync.createWriteStream) {
       this.rotationManager = createLogRotationManager(rotationConfig);
       this.rotationManager.setupRotationCheck(filePath);
     }
@@ -414,7 +456,9 @@ class FileTransport implements LogTransport {
   }
 
   private initializeWriteStream(): void {
-    this.writeStream = fsSync.createWriteStream(this.filePath, { flags: 'a' });
+    if (fsSync && fsSync.createWriteStream) {
+      this.writeStream = fsSync.createWriteStream(this.filePath, { flags: 'a' });
+    }
   }
 
   write(entry: StoredLogEntry): void {
@@ -466,7 +510,7 @@ class FileTransport implements LogTransport {
  * - Automatic timer cleanup to prevent memory leaks
  */
 export class UnifiedLogger implements LoggerChild {
-  private asyncLocalStorage: AsyncLocalStorage<LogContext>;
+  private asyncLocalStorage: any;
   private transports: LogTransport[] = [];
 
   // In-memory storage with circular buffer
@@ -558,8 +602,8 @@ export class UnifiedLogger implements LoggerChild {
       this.transports.push(new ConsoleTransport(this.config.level));
     }
 
-    // File transports for persistence
-    if (this.config.asyncTransport !== false) {
+    // File transports for persistence (only in Node.js environment)
+    if (this.config.asyncTransport !== false && isNode && path && fsSync) {
       const logDir = this.config.logDirectory || './logs';
 
       // General application logs
@@ -619,7 +663,7 @@ export class UnifiedLogger implements LoggerChild {
       const now = Date.now();
       const staleTimers: string[] = [];
 
-      for (const [name, timer] of this.performanceTimers.entries()) {
+      for (const [name, timer] of Array.from(this.performanceTimers.entries())) {
         if (now - timer.timestamp > DEFAULT_CONFIG.MAX_TIMER_AGE_MS) {
           staleTimers.push(name);
         }

@@ -9,7 +9,7 @@ import {
   MetricType,
 } from './types';
 import { Result, Ok, Err } from '../../primitives/types/result';
-import { AsyncCorrelationManager } from '../stack';
+import { AsyncCorrelationManager } from '../stack.js';
 
 // ==================== Enhanced Metric Implementations ====================
 

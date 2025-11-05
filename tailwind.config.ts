@@ -8,49 +8,42 @@ export default {
   // Content paths for Tailwind to scan for classes - expanded for comprehensive purging
   content: [
     "./client/**/*.{js,jsx,ts,tsx,html}",
-    "./shared/**/*.{js,jsx,ts,tsx}" // Include shared components for design system preservation
+    "./shared/**/*.{js,jsx,ts,tsx}", // Include shared components for design system preservation
+    "./index.html" // Include root HTML file
   ],
 
-  // Purge configuration for production builds - removes unused CSS classes
-  purge: {
-    enabled: process.env.NODE_ENV === 'production',
-    content: [
-      "./client/**/*.{js,jsx,ts,tsx,html}",
-      "./shared/**/*.{js,jsx,ts,tsx}"
-    ],
-    // Preserve design system classes and common utilities
-    safelist: [
-      // Common responsive utilities
-      /^grid-cols-/,
-      /^col-span-/,
-      /^flex-/,
-      /^justify-/,
-      /^items-/,
-      /^space-/,
-      /^p-/,
-      /^m-/,
-      /^text-/,
-      /^bg-/,
-      /^border-/,
-      /^rounded-/,
-      /^shadow-/,
-      // Design system colors
-      /^bg-(primary|secondary|accent|muted|destructive|success|warning|danger|info)/,
-      /^text-(primary|secondary|accent|muted|destructive|success|warning|danger|info)/,
-      /^border-(primary|secondary|accent|muted|destructive|success|warning|danger|info)/,
-      // Animation classes
-      /^animate-/,
-      // Custom utilities
-      'card-enhanced',
-      'card-hover',
-      'btn-enhanced',
-      'status-indicator',
-      'verification-meter',
-      'risk-low',
-      'risk-medium',
-      'risk-high'
-    ]
-  },
+  // Safelist to preserve design system classes and common utilities
+  safelist: [
+    // Common responsive utilities
+    { pattern: /^grid-cols-/ },
+    { pattern: /^col-span-/ },
+    { pattern: /^flex-/ },
+    { pattern: /^justify-/ },
+    { pattern: /^items-/ },
+    { pattern: /^space-/ },
+    { pattern: /^p-/ },
+    { pattern: /^m-/ },
+    { pattern: /^text-/ },
+    { pattern: /^bg-/ },
+    { pattern: /^border-/ },
+    { pattern: /^rounded-/ },
+    { pattern: /^shadow-/ },
+    // Design system colors
+    { pattern: /^bg-(primary|secondary|accent|muted|destructive|success|warning|danger|info)/ },
+    { pattern: /^text-(primary|secondary|accent|muted|destructive|success|warning|danger|info)/ },
+    { pattern: /^border-(primary|secondary|accent|muted|destructive|success|warning|danger|info)/ },
+    // Animation classes
+    { pattern: /^animate-/ },
+    // Custom utilities
+    'card-enhanced',
+    'card-hover',
+    'btn-enhanced',
+    'status-indicator',
+    'verification-meter',
+    'risk-low',
+    'risk-medium',
+    'risk-high'
+  ],
 
   theme: {
     // Custom responsive breakpoints following mobile-first approach

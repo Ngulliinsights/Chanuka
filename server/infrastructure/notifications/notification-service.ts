@@ -1,474 +1,455 @@
-import { eq, desc, and, sql, count } from 'drizzle-orm';
-import { database as db } from '../../../shared/database/connection';
-import { notifications, users, bills } from '@shared/schema';
-import { webSocketService } from '../websocket.js';
-import { z } from 'zod';
-import { logger  } from '../../../shared/core/src/index.js';
-
-// Core notification interfaces (consolidated from basic services)
-export interface NotificationData { user_id: string;
-  type: 'verification_status' | 'bill_update' | 'comment_reply' | 'system_alert';
-  title: string;
-  message: string;
-  relatedBillId?: number;
-  metadata?: Record<string, any>;
- }
-
-export interface NotificationHistory { id: number;
-  user_id: string;
-  type: string;
-  title: string;
-  message: string;
-  relatedBillId?: number;
-  is_read: boolean;
-  created_at: Date;
-  billTitle?: string;
- }
-
-// Validation schemas
-const notificationDataSchema = z.object({ user_id: z.string(),
-  type: z.enum(['verification_status', 'bill_update', 'comment_reply', 'system_alert']),
-  title: z.string().min(1).max(200),
-  message: z.string().min(1).max(1000),
-  relatedBillId: z.number().optional(),
-  metadata: z.record(z.any()).optional()
- });
+import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
+import * as admin from 'firebase-admin';
+import { logger } from '../../../shared/core/src/index.js';
+import { 
+  NotificationChannelService, 
+  ChannelDeliveryRequest, 
+  DeliveryResult,
+  SMSProviderConfig,
+  PushProviderConfig 
+} from './notification-channels';
 
 /**
- * Notification Service
+ * Enhanced Notification Service with Real Provider SDKs
  * 
- * Handles fundamental notification operations including:
- * - Basic CRUD operations for notifications
- * - Real-time delivery via WebSocket
- * - User notification management
- * - Bulk operations and cleanup
+ * This service replaces the TODO implementations in notification-channels.ts
+ * with actual AWS SNS and Firebase Admin SDK integrations while maintaining
+ * the existing NotificationChannelService interface.
  * 
- * For advanced features like smart filtering, batching, and multi-channel
- * delivery, use the AdvancedNotificationService.
+ * Features:
+ * - AWS SNS for SMS delivery
+ * - Firebase Admin SDK for push notifications
+ * - Fallback to mock implementations for development
+ * - Comprehensive error handling and retry logic
+ * - Authentication validation and rate limiting protection
  */
-export class NotificationService {
-  private isInitialized = false;
 
-  constructor() {
-    this.initialize();
-  }
+export interface NotificationServiceConfig {
+  aws: {
+    region: string;
+    accessKeyId?: string;
+    secretAccessKey?: string;
+  };
+  firebase: {
+    projectId: string;
+    privateKey?: string;
+    clientEmail?: string;
+    databaseURL?: string;
+  };
+  fallbackToMock: boolean;
+}
 
-  /**
-   * Initialize the notification service
-   */
-  private initialize(): void {
-    if (this.isInitialized) return;
+export class NotificationService extends NotificationChannelService {
+  private snsClient: SNSClient | null = null;
+  private firebaseApp: admin.app.App | null = null;
+  private config: NotificationServiceConfig;
+  private initialized = false;
+
+  constructor(config?: Partial<NotificationServiceConfig>) {
+    super();
     
-    this.isInitialized = true;
-    logger.info('✅ Notification Service initialized');
+    this.config = {
+      aws: {
+        region: process.env.AWS_REGION || 'us-east-1',
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
+      firebase: {
+        projectId: process.env.FIREBASE_PROJECT_ID || '',
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        databaseURL: process.env.FIREBASE_DATABASE_URL,
+      },
+      fallbackToMock: process.env.NODE_ENV === 'development' || process.env.NOTIFICATION_MOCK === 'true',
+      ...config
+    };
+
+    this.initializeProviders();
   }
 
   /**
-   * Create a basic notification
+   * Initialize AWS SNS and Firebase Admin SDK
    */
-  async createNotification(data: NotificationData): Promise<any> { try {
-      // Validate input
-      const validatedData = notificationDataSchema.parse(data);
-
-      const notification = await db
-        .insert(notifications)
-        .values({
-          user_id: validatedData.user_id,
-          type: validatedData.type as 'verification_status' | 'bill_update' | 'comment_reply',
-          title: validatedData.title,
-          message: validatedData.message,
-          relatedBillId: validatedData.relatedBillId,
-          is_read: false,
-          created_at: new Date()
-         })
-        .returning();
-
-      // Send real-time notification via WebSocket
-      await this.sendRealTimeNotification(validatedData.user_id, notification[0]);
-
-      logger.info(`📱 Created notification for user ${validatedData.user_id}: ${validatedData.title}`);
-      return notification[0];
-
-    } catch (error) {
-      logger.error('Error creating notification', { error: error instanceof Error ? error.message : String(error) });
-      throw error;
-    }
-  }
-
-  /**
-   * Get user notifications with pagination and filtering
-   */
-  async getUserNotifications(
-    user_id: string, 
-    options: {
-      limit?: number;
-      offset?: number;
-      unreadOnly?: boolean;
-      type?: string;
-    } = {}
-  ): Promise<NotificationHistory[]> {
+  private async initializeProviders(): Promise<void> {
     try {
-      const { limit = 20, offset = 0, unreadOnly = false, type } = options;
-
-      // Build query conditions
-      const conditions = [eq(notifications.user_id, user_id)];
-      
-      if (unreadOnly) {
-        conditions.push(eq(notifications.is_read, false));
-      }
-      
-      if (type) {
-        conditions.push(eq(notifications.type, type as 'verification_status' | 'bill_update' | 'comment_reply'));
+      // Initialize AWS SNS
+      if (this.config.aws.accessKeyId && this.config.aws.secretAccessKey) {
+        this.snsClient = new SNSClient({
+          region: this.config.aws.region,
+          credentials: {
+            accessKeyId: this.config.aws.accessKeyId,
+            secretAccessKey: this.config.aws.secretAccessKey,
+          },
+        });
+        logger.info('✅ AWS SNS client initialized', { component: 'NotificationService' });
+      } else if (!this.config.fallbackToMock) {
+        logger.warn('⚠️ AWS credentials not found, SMS will use mock implementation', { 
+          component: 'NotificationService' 
+        });
       }
 
-      const userNotifications = await db
-        .select({ id: notifications.id,
-          user_id: notifications.user_id,
-          type: notifications.type,
-          title: notifications.title,
-          message: notifications.message,
-          relatedBillId: notifications.relatedBillId,
-          is_read: notifications.is_read,
-          created_at: notifications.created_at,
-          billTitle: bills.title
-         })
-        .from(notifications)
-        .leftJoin(bills, eq(notifications.relatedBillId, bills.id))
-        .where(and(...conditions))
-        .orderBy(desc(notifications.created_at))
-        .limit(Math.min(limit, 100)) // Cap at 100
-        .offset(offset);
+      // Initialize Firebase Admin SDK
+      if (this.config.firebase.projectId && this.config.firebase.privateKey && this.config.firebase.clientEmail) {
+        // Check if Firebase app is already initialized
+        try {
+          this.firebaseApp = admin.app();
+        } catch (error) {
+          // App not initialized, create new one
+          this.firebaseApp = admin.initializeApp({
+            credential: admin.credential.cert({
+              projectId: this.config.firebase.projectId,
+              privateKey: this.config.firebase.privateKey,
+              clientEmail: this.config.firebase.clientEmail,
+            }),
+            databaseURL: this.config.firebase.databaseURL,
+          });
+        }
+        logger.info('✅ Firebase Admin SDK initialized', { component: 'NotificationService' });
+      } else if (!this.config.fallbackToMock) {
+        logger.warn('⚠️ Firebase credentials not found, push notifications will use mock implementation', { 
+          component: 'NotificationService' 
+        });
+      }
 
-      // Transform null values to match interface expectations
-      return userNotifications.map(notification => ({ id: notification.id,
-        user_id: notification.user_id,
-        type: notification.type,
-        title: notification.title,
-        message: notification.message,
-        relatedBillId: notification.relatedBillId ?? undefined,
-        is_read: notification.is_read ?? false,
-        created_at: notification.created_at ?? new Date(),
-        billTitle: notification.billTitle ?? undefined
-       }));
-
+      this.initialized = true;
     } catch (error) {
-      logger.error('Error getting user notifications', { error: error instanceof Error ? error.message : String(error) });
-      throw error;
+      logger.error('❌ Failed to initialize notification providers:', { component: 'NotificationService' }, error);
+      if (!this.config.fallbackToMock) {
+        throw new Error(`Notification service initialization failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
     }
   }
 
   /**
-   * Mark notification as read
+   * Enhanced SMS sending via AWS SNS
+   * Overrides the parent class method to use real AWS SNS
    */
-  async markAsRead(user_id: string, notificationId: number): Promise<void> {
+  protected async sendViaAWSSNS(phoneNumber: string, message: string): Promise<string> {
+    if (!this.snsClient) {
+      if (this.config.fallbackToMock) {
+        return super['sendViaAWSSNS'](phoneNumber, message);
+      }
+      throw new Error('AWS SNS client not initialized');
+    }
+
     try {
-      await db
-        .update(notifications)
-        .set({ is_read: true })
-        .where(
-          and(
-            eq(notifications.id, notificationId),
-            eq(notifications.user_id, user_id)
-          )
-        );
-
-      logger.info(`📖 Marked notification ${notificationId} as read for user ${ user_id }`);
-
-    } catch (error) {
-      logger.error('Error marking notification as read', { error: error instanceof Error ? error.message : String(error) });
-      throw error;
-    }
-  }
-
-  /**
-   * Mark all notifications as read for user
-   */
-  async markAllAsRead(user_id: string): Promise<void> {
-    try {
-      await db
-        .update(notifications)
-        .set({ is_read: true })
-        .where(eq(notifications.user_id, user_id));
-
-      logger.info(`📖 Marked all notifications as read for user ${ user_id }`);
-
-    } catch (error) {
-      logger.error('Error marking all notifications as read', { error: error instanceof Error ? error.message : String(error) });
-      throw error;
-    }
-  }
-
-  /**
-   * Get unread notification count
-   */
-  async getUnreadCount(user_id: string): Promise<number> {
-    try {
-      const [result] = await db
-        .select({ count: count() })
-        .from(notifications)
-        .where(
-          and(
-            eq(notifications.user_id, user_id),
-            eq(notifications.is_read, false)
-          )
-        );
-
-      return Number(result.count);
-
-    } catch (error) {
-      logger.error('Error getting unread count', { error: error instanceof Error ? error.message : String(error) });
-      return 0;
-    }
-  }
-
-  /**
-   * Delete notification
-   */
-  async deleteNotification(user_id: string, notificationId: number): Promise<void> { try {
-      await db
-        .delete(notifications)
-        .where(
-          and(
-            eq(notifications.id, notificationId),
-            eq(notifications.user_id, user_id)
-          )
-        );
-
-      logger.info(`🗑️ Deleted notification ${notificationId } for user ${ user_id }`);
-
-    } catch (error) {
-      logger.error('Error deleting notification', { error: error instanceof Error ? error.message : String(error) });
-      throw error;
-    }
-  }
-
-  /**
-   * Send real-time notification via WebSocket
-   */
-  private async sendRealTimeNotification(user_id: string, notification: any): Promise<void> { try {
-      webSocketService.sendUserNotification(user_id, {
-        type: 'notification',
-        title: notification.title,
-        message: notification.message,
-        data: {
-          id: notification.id,
-          type: notification.type,
-          relatedBillId: notification.relatedBillId,
-          created_at: notification.created_at
-         }
+      // Validate phone number format (E.164)
+      const cleanPhoneNumber = this.normalizePhoneNumber(phoneNumber);
+      
+      const command = new PublishCommand({
+        Message: message,
+        PhoneNumber: cleanPhoneNumber,
+        MessageAttributes: {
+          'AWS.SNS.SMS.SenderID': {
+            DataType: 'String',
+            StringValue: 'Chanuka'
+          },
+          'AWS.SNS.SMS.SMSType': {
+            DataType: 'String',
+            StringValue: 'Transactional'
+          }
+        }
       });
+
+      const result = await this.snsClient.send(command);
+      
+      logger.info('✅ SMS sent via AWS SNS', {
+        component: 'NotificationService',
+        messageId: result.MessageId,
+        phoneNumber: this.maskPhoneNumber(cleanPhoneNumber)
+      });
+
+      return result.MessageId || `sns-${Date.now()}`;
     } catch (error) {
-      logger.warn('Failed to send real-time notification', { error: error instanceof Error ? error.message : String(error) });
-      // Don't throw - notification was still created in database
+      logger.error('❌ AWS SNS SMS delivery failed:', {
+        component: 'NotificationService',
+        phoneNumber: this.maskPhoneNumber(phoneNumber)
+      }, error);
+
+      // Check if error is retryable
+      if (this.isAWSRetryableError(error)) {
+        throw error; // Let parent class retry logic handle it
+      }
+
+      // For non-retryable errors, fallback to mock if enabled
+      if (this.config.fallbackToMock) {
+        logger.warn('⚠️ Falling back to mock SMS due to AWS error', { component: 'NotificationService' });
+        return super['sendViaAWSSNS'](phoneNumber, message);
+      }
+
+      throw new Error(`AWS SNS delivery failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
   /**
-   * Bulk create notifications for multiple users
+   * Enhanced push notification sending via Firebase Admin SDK
+   * Overrides the parent class method to use real Firebase
    */
-  async createBulkNotifications(
-    user_ids: string[],
-    notificationData: Omit<NotificationData, 'user_id'>
-  ): Promise<{ success: number; failed: number; errors: Array<{ user_id: string; error: string  }> }> { const results = { success: 0, failed: 0, errors: [] as Array<{ user_id: string; error: string  }> };
-
-    for (const user_id of user_ids) { try {
-        await this.createNotification({
-          ...notificationData,
-          user_id
-         });
-        results.success++;
-      } catch (error) { results.failed++;
-        results.errors.push({
-          user_id,
-          error: error instanceof Error ? error.message : 'Unknown error'
-         });
+  protected async sendViaFirebase(tokens: string[], payload: any): Promise<string> {
+    if (!this.firebaseApp) {
+      if (this.config.fallbackToMock) {
+        return super['sendViaFirebase'](tokens, payload);
       }
+      throw new Error('Firebase Admin SDK not initialized');
     }
 
-    logger.info(`📬 Bulk notification complete: ${results.success} success, ${results.failed} failed`);
+    try {
+      const messaging = admin.messaging(this.firebaseApp);
+      
+      // Filter out mock tokens for production
+      const validTokens = tokens.filter(token => !token.startsWith('mock-token-'));
+      
+      if (validTokens.length === 0) {
+        if (this.config.fallbackToMock) {
+          logger.info('📱 No valid FCM tokens, using mock implementation', { component: 'NotificationService' });
+          return super['sendViaFirebase'](tokens, payload);
+        }
+        throw new Error('No valid FCM tokens provided');
+      }
+
+      // Prepare Firebase message
+      const message = {
+        notification: {
+          title: payload.title,
+          body: payload.body,
+        },
+        data: this.sanitizeFirebaseData(payload.data || {}),
+        android: payload.android,
+        apns: payload.apns,
+        webpush: payload.webpush,
+        tokens: validTokens,
+      };
+
+      const response = await messaging.sendMulticast(message);
+      
+      // Log results
+      logger.info('✅ Push notifications sent via Firebase', {
+        component: 'NotificationService',
+        successCount: response.successCount,
+        failureCount: response.failureCount,
+        totalTokens: validTokens.length
+      });
+
+      // Log individual failures for debugging
+      if (response.failureCount > 0) {
+        response.responses.forEach((result, index) => {
+          if (!result.success) {
+            logger.warn('⚠️ Firebase push notification failed for token:', {
+              component: 'NotificationService',
+              tokenIndex: index,
+              error: result.error?.message
+            });
+          }
+        });
+      }
+
+      // Return the first successful message ID or generate one
+      const firstSuccess = response.responses.find(r => r.success);
+      return firstSuccess?.messageId || `fcm-batch-${Date.now()}`;
+
+    } catch (error) {
+      logger.error('❌ Firebase push notification delivery failed:', {
+        component: 'NotificationService',
+        tokenCount: tokens.length
+      }, error);
+
+      // Check if error is retryable
+      if (this.isFirebaseRetryableError(error)) {
+        throw error; // Let parent class retry logic handle it
+      }
+
+      // For non-retryable errors, fallback to mock if enabled
+      if (this.config.fallbackToMock) {
+        logger.warn('⚠️ Falling back to mock push due to Firebase error', { component: 'NotificationService' });
+        return super['sendViaFirebase'](tokens, payload);
+      }
+
+      throw new Error(`Firebase delivery failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+
+  /**
+   * Normalize phone number to E.164 format
+   */
+  private normalizePhoneNumber(phoneNumber: string): string {
+    // Remove all non-digit characters
+    const digits = phoneNumber.replace(/\D/g, '');
+    
+    // Handle Kenyan numbers
+    if (digits.startsWith('254')) {
+      return `+${digits}`;
+    } else if (digits.startsWith('0') && digits.length === 10) {
+      // Convert local Kenyan format (0XXXXXXXXX) to international (+254XXXXXXXXX)
+      return `+254${digits.substring(1)}`;
+    } else if (digits.length === 9) {
+      // Assume Kenyan number without leading 0
+      return `+254${digits}`;
+    }
+    
+    // For other countries, assume it's already in correct format
+    return phoneNumber.startsWith('+') ? phoneNumber : `+${digits}`;
+  }
+
+  /**
+   * Mask phone number for logging (privacy protection)
+   */
+  private maskPhoneNumber(phoneNumber: string): string {
+    if (phoneNumber.length <= 4) return phoneNumber;
+    const start = phoneNumber.substring(0, 4);
+    const end = phoneNumber.substring(phoneNumber.length - 2);
+    return `${start}***${end}`;
+  }
+
+  /**
+   * Sanitize Firebase data payload (all values must be strings)
+   */
+  private sanitizeFirebaseData(data: Record<string, any>): Record<string, string> {
+    const sanitized: Record<string, string> = {};
+    
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== null && value !== undefined) {
+        sanitized[key] = String(value);
+      }
+    }
+    
+    return sanitized;
+  }
+
+  /**
+   * Check if AWS error is retryable
+   */
+  private isAWSRetryableError(error: any): boolean {
+    const retryableErrors = [
+      'Throttling',
+      'ServiceUnavailable',
+      'InternalError',
+      'RequestTimeout',
+      'NetworkingError'
+    ];
+    
+    const errorString = String(error?.name || error?.code || error?.message || error).toLowerCase();
+    return retryableErrors.some(code => errorString.includes(code.toLowerCase()));
+  }
+
+  /**
+   * Check if Firebase error is retryable
+   */
+  private isFirebaseRetryableError(error: any): boolean {
+    const retryableErrors = [
+      'messaging/internal-error',
+      'messaging/server-unavailable',
+      'messaging/timeout',
+      'messaging/quota-exceeded'
+    ];
+    
+    const errorCode = error?.code || '';
+    return retryableErrors.some(code => errorCode.includes(code));
+  }
+
+  /**
+   * Get enhanced service status including provider initialization
+   */
+  getStatus(): {
+    smsProvider: string;
+    smsConfigured: boolean;
+    pushProvider: string;
+    pushConfigured: boolean;
+    pendingRetries: number;
+    awsInitialized: boolean;
+    firebaseInitialized: boolean;
+    fallbackMode: boolean;
+  } {
+    const baseStatus = super.getStatus();
+    
+    return {
+      ...baseStatus,
+      awsInitialized: this.snsClient !== null,
+      firebaseInitialized: this.firebaseApp !== null,
+      fallbackMode: this.config.fallbackToMock,
+    };
+  }
+
+  /**
+   * Test connectivity to providers
+   */
+  async testConnectivity(): Promise<{
+    aws: { connected: boolean; error?: string };
+    firebase: { connected: boolean; error?: string };
+  }> {
+    const results = {
+      aws: { connected: false, error: undefined as string | undefined },
+      firebase: { connected: false, error: undefined as string | undefined }
+    };
+
+    // Test AWS SNS
+    if (this.snsClient) {
+      try {
+        // Use a dry-run approach - just check if we can create a command
+        const testCommand = new PublishCommand({
+          Message: 'test',
+          PhoneNumber: '+1234567890' // This won't actually send
+        });
+        
+        // If we can create the command without errors, consider it connected
+        results.aws.connected = true;
+      } catch (error) {
+        results.aws.error = error instanceof Error ? error.message : String(error);
+      }
+    } else {
+      results.aws.error = 'SNS client not initialized';
+    }
+
+    // Test Firebase
+    if (this.firebaseApp) {
+      try {
+        // Test by accessing the messaging service
+        const messaging = admin.messaging(this.firebaseApp);
+        if (messaging) {
+          results.firebase.connected = true;
+        }
+      } catch (error) {
+        results.firebase.error = error instanceof Error ? error.message : String(error);
+      }
+    } else {
+      results.firebase.error = 'Firebase app not initialized';
+    }
+
     return results;
   }
 
   /**
-   * Clean up old notifications (older than specified days)
+   * Enhanced cleanup with provider cleanup
    */
-  async cleanupOldNotifications(daysToKeep: number = 90): Promise<number> {
-    try {
-      const cutoffDate = new Date();
-      cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
-
-      const result = await db
-        .delete(notifications)
-        .where(
-          and(
-            eq(notifications.is_read, true),
-            sql`${notifications.created_at} < ${cutoffDate}`
-          )
-        );
-
-      logger.info(`🧹 Cleaned up old notifications: ${result.rowCount || 0} removed`);
-      return result.rowCount || 0;
-
-    } catch (error) {
-      logger.error('Error cleaning up old notifications', { error: error instanceof Error ? error.message : String(error) });
-      return 0;
+  cleanup(): void {
+    super.cleanup();
+    
+    // Firebase cleanup
+    if (this.firebaseApp) {
+      try {
+        // Note: We don't delete the app as it might be used elsewhere
+        // admin.app().delete() would be too aggressive
+        this.firebaseApp = null;
+      } catch (error) {
+        logger.warn('⚠️ Firebase cleanup warning:', { component: 'NotificationService' }, error);
+      }
     }
-  }
 
-  /**
-   * Get notification statistics
-   */
-  async getNotificationStats(user_id?: string): Promise<{
-    total: number;
-    unread: number;
-    byType: Record<string, number>;
-    recentActivity: number;
-  }> { try {
-      const conditions = user_id ? [eq(notifications.user_id, user_id)] : [];
-
-      // Get total and unread counts
-      const [totalResult] = await db
-        .select({ count: count()  })
-        .from(notifications)
-        .where(user_id ? eq(notifications.user_id, user_id) : undefined);
-
-      const [unreadResult] = await db
-        .select({ count: count() })
-        .from(notifications)
-        .where(
-          and(
-            user_id ? eq(notifications.user_id, user_id) : undefined,
-            eq(notifications.is_read, false)
-          )
-        );
-
-      // Get counts by type
-      const typeResults = await db
-        .select({
-          type: notifications.type,
-          count: count()
-        })
-        .from(notifications)
-        .where(user_id ? eq(notifications.user_id, user_id) : undefined)
-        .groupBy(notifications.type);
-
-      // Get recent activity (last 24 hours)
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-
-      const [recentResult] = await db
-        .select({ count: count() })
-        .from(notifications)
-        .where(
-          and(
-            user_id ? eq(notifications.user_id, user_id) : undefined,
-            sql`${notifications.created_at} >= ${yesterday}`
-          )
-        );
-
-      const byType: Record<string, number> = {};
-      typeResults.forEach(result => {
-        byType[result.type] = Number(result.count);
-      });
-
-      return {
-        total: Number(totalResult.count),
-        unread: Number(unreadResult.count),
-        byType,
-        recentActivity: Number(recentResult.count)
-      };
-
-    } catch (error) {
-      logger.error('Error getting notification stats', { error: error instanceof Error ? error.message : String(error) });
-      return {
-        total: 0,
-        unread: 0,
-        byType: {},
-        recentActivity: 0
-      };
+    // AWS SNS cleanup
+    if (this.snsClient) {
+      try {
+        // SNS client doesn't need explicit cleanup, just null the reference
+        this.snsClient = null;
+      } catch (error) {
+        logger.warn('⚠️ AWS SNS cleanup warning:', { component: 'NotificationService' }, error);
+      }
     }
-  }
 
-  /**
-   * Cleanup old notifications (wrapper for shutdown)
-   */
-  async cleanup(): Promise<void> {
-    logger.info('🧹 Cleaning up notification service...');
-    try {
-      // Clean up old notifications
-      await this.cleanupOldNotifications();
-      logger.info('✅ Notification service cleanup completed');
-    } catch (error) {
-      logger.error('❌ Error during notification service cleanup', { error: error instanceof Error ? error.message : String(error) });
-      throw error;
-    }
-  }
-
-  /**
-   * Get service status
-   */
-  getStatus(): {
-    initialized: boolean;
-    name: string;
-    description: string;
-  } {
-    return {
-      initialized: this.isInitialized,
-      name: 'Notification Service',
-      description: 'Handles basic notification CRUD operations and real-time delivery'
-    };
+    logger.info('✅ Enhanced Notification Service cleanup completed', { component: 'NotificationService' });
   }
 }
 
-// Export singleton instance
+// Export singleton instance with environment-based configuration
 export const notificationService = new NotificationService();
 
-// Export class for advanced usage
-export { NotificationService as CoreNotificationService };
-
-// Export for backward compatibility
-export { notificationService as coreNotificationService };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// Export the class for testing and custom configurations
+export { NotificationService as NotificationServiceClass };

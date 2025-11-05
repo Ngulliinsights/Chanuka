@@ -1,8 +1,8 @@
-import { UserRepository } from '../../domain/repositories/user-repository';
-import { VerificationRepository } from '../../domain/repositories/verification-repository';
-import { VerificationDomainService, VerificationProcessingResult } from '../../domain/services/verification-domain-service';
+// Repository interfaces removed - using direct service calls
+import { UserVerificationDomainService, VerificationCreationResult, VerificationUpdateResult } from '../../domain/services/user-verification-domain-service';
 import { CitizenVerification, VerificationType } from '../../domain/entities/citizen-verification';
 import { Evidence, ExpertiseLevel } from '../../domain/entities/value-objects';
+import { UserService } from '../user-service-direct';
 
 export interface SubmitVerificationCommand { user_id: string;
   bill_id: number;
@@ -36,9 +36,8 @@ export interface VerificationOperationResult {
 
 export class VerificationOperationsUseCase {
   constructor(
-    private userRepository: UserRepository,
-    private verificationRepository: VerificationRepository,
-    private verificationDomainService: VerificationDomainService
+    private userService: UserService,
+    private verificationDomainService: UserVerificationDomainService
   ) {}
 
   async submitVerification(command: SubmitVerificationCommand): Promise<VerificationOperationResult> {
@@ -53,29 +52,11 @@ export class VerificationOperationsUseCase {
       }
 
       // Get user aggregate
-      const userAggregate = await this.userRepository.findUserAggregateById(command.user_id);
+      const userAggregate = await this.userService.findUserAggregateById(command.user_id);
       if (!userAggregate) {
         return {
           success: false,
           errors: ['User not found']
-        };
-      }
-
-      // Process verification through domain service
-      const processingResult: VerificationProcessingResult = await this.verificationDomainService.processVerification(
-        command.user_id,
-        command.bill_id,
-        command.verification_type,
-        command.evidence,
-        command.expertise,
-        command.reasoning
-      );
-
-      if (!processingResult.success) {
-        return {
-          success: false,
-          errors: processingResult.errors,
-          warnings: processingResult.warnings
         };
       }
 
@@ -87,15 +68,38 @@ export class VerificationOperationsUseCase {
         };
       }
 
-      const verification = processingResult.verification!;
+      // Create verification through domain service
+      const creationResult: VerificationCreationResult = await this.verificationDomainService.createVerification({
+        citizenId: command.user_id,
+        bill_id: command.bill_id,
+        verification_type: command.verification_type,
+        evidence: command.evidence.map(e => ({
+          type: e.type,
+          source: e.source,
+          url: e.url,
+          credibility: e.credibility,
+          relevance: e.relevance,
+          description: e.description,
+          datePublished: e.datePublished
+        })),
+        expertise: {
+          domain: command.expertise.domain,
+          level: command.expertise.level,
+          credentials: command.expertise.credentials,
+          verifiedCredentials: command.expertise.verifiedCredentials,
+          reputation_score: command.expertise.reputation_score
+        },
+        reasoning: command.reasoning
+      });
 
-      // Save verification
-      await this.verificationRepository.save(verification);
+      if (!creationResult.success) {
+        return {
+          success: false,
+          errors: creationResult.errors
+        };
+      }
 
-      // Update user reputation based on verification confidence
-      const newReputation = Math.min(100, userAggregate.reputation_score + Math.floor(verification.confidence / 10));
-      userAggregate.users.updateReputationScore(newReputation);
-      await this.userRepository.update(userAggregate.user);
+      const verification = creationResult.verification!;
 
       // Log verification submission (cross-cutting concern)
       this.logVerificationActivity(command.user_id, 'verification_submitted', verification.id);
@@ -125,36 +129,32 @@ export class VerificationOperationsUseCase {
         };
       }
 
-      const userAggregate = await this.userRepository.findUserAggregateById(command.user_id);
-      const verification = await this.verificationRepository.findById(command.verificationId);
-
-      if (!userAggregate || !verification) {
+      const userAggregate = await this.userService.findUserAggregateById(command.user_id);
+      if (!userAggregate) {
         return {
           success: false,
-          errors: ['User or verification not found']
+          errors: ['User not found']
         };
       }
 
-      // Basic validation: user cannot endorse their own verification
-      if (verification.citizenId === command.user_id) {
+      // Endorse verification through domain service
+      const endorseResult = await this.verificationDomainService.endorseVerification(
+        command.verificationId,
+        command.user_id
+      );
+
+      if (!endorseResult.success) {
         return {
           success: false,
-          errors: ['Users cannot endorse their own verifications']
+          errors: endorseResult.errors
         };
       }
-
-      await this.verificationRepository.addEndorsement(command.verificationId, command.user_id);
-
-      // Update verification confidence through endorsement
-      verification.endorse();
-      await this.verificationRepository.update(verification);
 
       // Log endorsement
       this.logVerificationActivity(command.user_id, 'verification_endorsed', command.verificationId);
 
       return {
         success: true,
-        verification,
         errors: []
       };
     } catch (error) {
@@ -177,43 +177,33 @@ export class VerificationOperationsUseCase {
         };
       }
 
-      const userAggregate = await this.userRepository.findUserAggregateById(command.user_id);
-      const verification = await this.verificationRepository.findById(command.verificationId);
-
-      if (!userAggregate || !verification) {
+      const userAggregate = await this.userService.findUserAggregateById(command.user_id);
+      if (!userAggregate) {
         return {
           success: false,
-          errors: ['User or verification not found']
+          errors: ['User not found']
         };
       }
 
-      // Basic validation: user cannot dispute their own verification
-      if (verification.citizenId === command.user_id) {
+      // Dispute verification through domain service
+      const disputeResult = await this.verificationDomainService.disputeVerification(
+        command.verificationId,
+        command.user_id,
+        command.reason
+      );
+
+      if (!disputeResult.success) {
         return {
           success: false,
-          errors: ['Users cannot dispute their own verifications']
+          errors: disputeResult.errors
         };
       }
-
-      await this.verificationRepository.addDispute(command.verificationId, command.user_id, command.reason);
-
-      // Update verification confidence through dispute
-      verification.dispute();
-
-      // Check if verification should be escalated for review (simple logic)
-      const consensusLevel = verification.getConsensusLevel();
-      if (consensusLevel < 30) {
-        verification.updateStatus('needs_review');
-      }
-
-      await this.verificationRepository.update(verification);
 
       // Log dispute
       this.logVerificationActivity(command.user_id, 'verification_disputed', command.verificationId);
 
       return {
         success: true,
-        verification,
         errors: []
       };
     } catch (error) {
@@ -236,20 +226,19 @@ export class VerificationOperationsUseCase {
         };
       }
 
-      const relevantVerifications = await this.verificationRepository.findRelevantVerifications(
-        command.bill_id,
-        command.claim
-      );
+      // Get bill verification statistics through domain service
+      const billStats = await this.verificationDomainService.getBillVerificationStats(command.bill_id);
 
-      // Simple fact check implementation - aggregate verification results
-      const factCheckResults = relevantVerifications.map(verification => ({
-        verificationId: verification.id,
-        confidence: verification.confidence,
-        consensusLevel: verification.getConsensusLevel(),
-        verification_type: verification.verification_type,
-        citizenId: verification.citizenId,
-        reasoning: verification.reasoning
-      }));
+      // Simple fact check implementation - use aggregated statistics
+      const factCheckResults = [{
+        bill_id: command.bill_id,
+        claim: command.claim,
+        totalVerifications: billStats.totalVerifications,
+        verifiedCount: billStats.verifiedCount,
+        disputedCount: billStats.disputedCount,
+        averageConfidence: billStats.averageConfidence,
+        topContributors: billStats.topContributors.slice(0, 3) // Top 3 contributors
+      }];
 
       // Log fact check operation
       this.logVerificationActivity('system', 'fact_check_performed', `bill_${command.bill_id}`);

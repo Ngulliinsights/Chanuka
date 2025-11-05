@@ -1,4 +1,4 @@
-import { UserRepository } from '../../domain/repositories/user-repository';
+// UserRepository interface removed - using direct service calls
 import { UserManagementDomainService, UserCreationResult } from '../../domain/services/user-management-domain-service';
 import { User } from '../../domain/entities/user';
 
@@ -17,7 +17,7 @@ export interface RegisterUserResult {
 
 export class UserRegistrationUseCase {
   constructor(
-    private userRepository: UserRepository,
+    // UserRepository removed - using direct service calls
     private userManagementService: UserManagementDomainService
   ) {}
 

@@ -1,532 +1,421 @@
 // ============================================================================
-// PARLIAMENTARY PROCESS SCHEMA - OPTIMIZED
+// PARLIAMENTARY PROCESS SCHEMA - CRITICAL MISSING DOMAIN
 // ============================================================================
-// Tracks legislative workflow: sessions, readings, amendments, and public participation
+// Legislative procedures, bill readings, amendments, and committee processes
+// This schema tracks the formal parliamentary workflow required by Kenya's Constitution
 
 import {
-  pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
-  index, uniqueIndex, date, primaryKey
+  pgTable, text, integer, boolean, timestamp, jsonb, uuid, varchar,
+  index, unique, date, smallint, check
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 
-import {
-  kenyanCountyEnum,
-  chamberEnum,
-  billStatusEnum
-} from "./enum";
-
-import {
-  bills,
-  sponsors,
-  committees,
-  parliamentary_sessions,
-  parliamentary_sittings
-} from "./foundation";
+import { bills, sponsors, committees, parliamentary_sessions } from "./foundation";
 
 // ============================================================================
-// BILL COMMITTEE ASSIGNMENTS
+// BILL COMMITTEE ASSIGNMENTS - Track committee responsibility for bills
 // ============================================================================
-// Tracks which committees review which bills, including hearing schedules
-// and committee recommendations throughout the review process
 
 export const bill_committee_assignments = pgTable("bill_committee_assignments", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   committee_id: uuid("committee_id").notNull().references(() => committees.id, { onDelete: "cascade" }),
-  
-  // Assignment metadata
-  assignment_date: date("assignment_date").notNull(),
+
+  // Assignment details
+  assignment_type: varchar("assignment_type", { length: 50 }).notNull(), // "primary", "secondary", "joint"
+  assigned_date: date("assigned_date").notNull().default(sql`CURRENT_DATE`),
   assignment_reason: text("assignment_reason"),
-  priority_level: varchar("priority_level", { length: 20 }).notNull().default("normal"), // urgent, high, normal, low
-  
-  // Review workflow tracking
-  review_status: varchar("review_status", { length: 50 }).notNull().default("assigned"), // assigned, in_progress, completed, deferred
-  review_start_date: date("review_start_date"),
-  review_completion_date: date("review_completion_date"),
-  
-  // Public hearing coordination
-  public_hearing_scheduled: boolean("public_hearing_scheduled").notNull().default(false),
-  public_hearing_date: date("public_hearing_date"),
-  public_hearing_venue: varchar("public_hearing_venue", { length: 255 }),
-  
-  // Committee outputs
-  committee_report_url: varchar("committee_report_url", { length: 500 }),
-  committee_report_summary: text("committee_report_summary"),
-  committee_recommendations: jsonb("committee_recommendations").$type<Array<{
-    recommendation: string;
-    priority: string;
-    rationale?: string;
-  }>>().default(sql`'[]'::jsonb`),
-  
-  // Amendment statistics (denormalized for quick access)
-  amendments_proposed: integer("amendments_proposed").notNull().default(0),
-  amendments_adopted: integer("amendments_adopted").notNull().default(0),
-  
-  created_at: timestamp("created_at").notNull().default(sql`now()`),
-  updated_at: timestamp("updated_at").notNull().default(sql`now()`),
+
+  // Committee work status
+  status: varchar("status", { length: 30 }).notNull().default("assigned"), // "assigned", "reviewing", "report_pending", "completed"
+  expected_report_date: date("expected_report_date"),
+  actual_report_date: date("actual_report_date"),
+
+  // Committee report
+  report_url: varchar("report_url", { length: 500 }),
+  report_summary: text("report_summary"),
+  committee_recommendation: varchar("committee_recommendation", { length: 50 }), // "approve", "reject", "amend"
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  // Ensure each bill-committee pairing is unique
-  billCommitteeUnique: uniqueIndex("bill_committee_assignments_bill_committee_idx")
-    .on(table.bill_id, table.committee_id),
-  // Optimized indexes for common query patterns
-  billIdx: index("bill_committee_assignments_bill_idx").on(table.bill_id),
-  committeeIdx: index("bill_committee_assignments_committee_idx").on(table.committee_id),
-  // Composite index for date-based queries filtered by status
-  statusDateIdx: index("bill_committee_assignments_status_date_idx")
-    .on(table.review_status, table.assignment_date),
-  // Support queries for upcoming hearings
-  hearingDateIdx: index("bill_committee_assignments_hearing_date_idx")
-    .on(table.public_hearing_date)
-    .where(sql`${table.public_hearing_scheduled} = true`),
+  // One primary assignment per bill - using partial unique index instead
+  billAssignmentIdx: index("idx_bill_committee_assignments_bill_assignment")
+    .on(table.bill_id, table.assignment_type, table.status),
+
+  // Committee workload queries
+  committeeStatusIdx: index("idx_bill_committee_assignments_committee_status")
+    .on(table.committee_id, table.status, table.assigned_date),
 }));
 
 // ============================================================================
-// BILL AMENDMENTS
+// BILL AMENDMENTS - Track proposed changes to bills
 // ============================================================================
-// Comprehensive tracking of proposed changes to bills, including voting records
-// and public engagement metrics for each amendment
 
 export const bill_amendments = pgTable("bill_amendments", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
-  
+
   // Amendment identification
   amendment_number: varchar("amendment_number", { length: 50 }).notNull(),
   amendment_title: varchar("amendment_title", { length: 500 }),
-  
-  // Proposer details
-  proposer_id: uuid("proposer_id").references(() => sponsors.id, { onDelete: "set null" }),
-  proposer_type: varchar("proposer_type", { length: 50 }).notNull().default("sponsor"), // sponsor, committee, citizen, government
-  
-  // Amendment content and context
-  section_to_amend: varchar("section_to_amend", { length: 100 }),
+
+  // Amendment content
+  section_affected: varchar("section_affected", { length: 100 }),
+  amendment_type: varchar("amendment_type", { length: 30 }).notNull(), // "insertion", "deletion", "substitution", "new_clause"
   original_text: text("original_text"),
   proposed_text: text("proposed_text").notNull(),
   amendment_rationale: text("amendment_rationale"),
-  
-  // Lifecycle status
-  status: varchar("status", { length: 50 }).notNull().default("proposed"), // proposed, under_review, adopted, rejected, withdrawn
-  
-  // Committee-level voting (if applicable)
-  committee_vote_for: integer("committee_vote_for").notNull().default(0),
-  committee_vote_against: integer("committee_vote_against").notNull().default(0),
-  committee_vote_abstain: integer("committee_vote_abstain").notNull().default(0),
-  
-  // House-level voting
-  house_vote_for: integer("house_vote_for").notNull().default(0),
-  house_vote_against: integer("house_vote_against").notNull().default(0),
-  house_vote_abstain: integer("house_vote_abstain").notNull().default(0),
-  
-  // Timeline milestones
-  proposed_date: date("proposed_date").notNull(),
-  committee_decision_date: date("committee_decision_date"),
-  house_decision_date: date("house_decision_date"),
-  
-  // Impact analysis
-  impact_assessment: text("impact_assessment"),
-  constitutional_implications: jsonb("constitutional_implications").$type<{
-    articles_affected?: string[];
-    compliance_status?: string;
-    legal_opinion?: string;
-  }>().default(sql`'{}'::jsonb`),
-  
-  // Public engagement metrics
-  public_support_count: integer("public_support_count").notNull().default(0),
-  public_oppose_count: integer("public_oppose_count").notNull().default(0),
-  
-  created_at: timestamp("created_at").notNull().default(sql`now()`),
-  updated_at: timestamp("updated_at").notNull().default(sql`now()`),
+
+  // Amendment source
+  proposed_by_id: uuid("proposed_by_id").references(() => sponsors.id, { onDelete: "set null" }),
+  proposed_by_committee_id: uuid("proposed_by_committee_id").references(() => committees.id, { onDelete: "set null" }),
+  proposed_date: date("proposed_date").notNull().default(sql`CURRENT_DATE`),
+
+  // Amendment status
+  status: varchar("status", { length: 30 }).notNull().default("proposed"), // "proposed", "debated", "approved", "rejected", "withdrawn"
+  voting_date: date("voting_date"),
+  votes_for: integer("votes_for").notNull().default(0),
+  votes_against: integer("votes_against").notNull().default(0),
+  votes_abstain: integer("votes_abstain").notNull().default(0),
+
+  // Impact assessment
+  constitutional_implications: text("constitutional_implications"),
+  financial_implications: text("financial_implications"),
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  billIdx: index("bill_amendments_bill_idx").on(table.bill_id),
-  proposerIdx: index("bill_amendments_proposer_idx").on(table.proposer_id),
-  // Composite index for filtering by bill and status together
-  billStatusIdx: index("bill_amendments_bill_status_idx")
-    .on(table.bill_id, table.status),
-  // Support chronological queries
-  proposedDateIdx: index("bill_amendments_proposed_date_idx").on(table.proposed_date),
-  // Unique constraint on amendment numbers within each bill
-  amendmentNumberUnique: uniqueIndex("bill_amendments_bill_number_idx")
+  // Unique amendment number per bill
+  billAmendmentNumberUnique: unique("bill_amendments_bill_amendment_number_unique")
     .on(table.bill_id, table.amendment_number),
+
+  // Amendment status tracking
+  billStatusIdx: index("idx_bill_amendments_bill_status")
+    .on(table.bill_id, table.status, table.proposed_date),
+
+  // Sponsor amendment tracking
+  proposedByIdx: index("idx_bill_amendments_proposed_by")
+    .on(table.proposed_by_id, table.status)
+    .where(sql`${table.proposed_by_id} IS NOT NULL`),
 }));
 
 // ============================================================================
-// BILL VERSIONS
+// BILL VERSIONS - Track bill text changes over time
 // ============================================================================
-// Maintains version history as bills evolve through amendments and revisions
-// Enables comparison between versions and tracks the current authoritative text
 
 export const bill_versions = pgTable("bill_versions", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
-  
-  // Version metadata
-  version_number: integer("version_number").notNull(),
-  version_date: date("version_date").notNull(),
-  version_type: varchar("version_type", { length: 50 }).notNull(), // original, committee_amended, house_amended, final, enrolled
-  
-  // Document content
-  title: varchar("title", { length: 500 }).notNull(),
-  summary: text("summary"),
+
+  // Version identification
+  version_number: varchar("version_number", { length: 20 }).notNull(),
+  version_name: varchar("version_name", { length: 100 }), // "First Reading", "Committee Version", "Final"
+
+  // Version content
   full_text: text("full_text").notNull(),
-  
-  // Change tracking
-  changes_summary: text("changes_summary"),
-  amendments_incorporated: uuid("amendments_incorporated").array().default(sql`ARRAY[]::uuid[]`),
-  
-  // Source attribution
-  version_source: varchar("version_source", { length: 100 }).notNull(), // sponsor, committee, house_vote, presidential_assent
-  source_document_url: varchar("source_document_url", { length: 500 }),
-  
-  // Version control
+  summary_of_changes: text("summary_of_changes"),
+
+  // Version metadata
+  created_by_stage: varchar("created_by_stage", { length: 50 }), // "introduction", "committee", "amendment", "final"
   is_current_version: boolean("is_current_version").notNull().default(false),
-  publication_status: varchar("publication_status", { length: 50 }).notNull().default("draft"), // draft, published, archived
-  
-  created_at: timestamp("created_at").notNull().default(sql`now()`),
-  updated_at: timestamp("updated_at").notNull().default(sql`now()`),
+
+  // Document references
+  document_url: varchar("document_url", { length: 500 }),
+  document_hash: varchar("document_hash", { length: 64 }), // SHA-256 for integrity
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  // Enforce unique version numbers per bill
-  billVersionUnique: uniqueIndex("bill_versions_bill_version_idx")
+  // Unique version number per bill
+  billVersionNumberUnique: unique("bill_versions_bill_version_number_unique")
     .on(table.bill_id, table.version_number),
-  billIdx: index("bill_versions_bill_idx").on(table.bill_id),
-  versionDateIdx: index("bill_versions_date_idx").on(table.version_date),
-  // Partial index for quickly finding the current version
-  currentVersionIdx: index("bill_versions_current_idx")
+
+  // Current version tracking - using partial index instead
+  billCurrentVersionIdx: index("idx_bill_versions_bill_current_version")
     .on(table.bill_id, table.is_current_version)
     .where(sql`${table.is_current_version} = true`),
+
+  // Version chronology
+  billVersionIdx: index("idx_bill_versions_bill_version")
+    .on(table.bill_id, table.created_at),
 }));
 
 // ============================================================================
-// BILL READINGS
+// BILL READINGS - Track formal parliamentary readings
 // ============================================================================
-// Records each formal reading stage in parliament, including debate details
-// and voting outcomes that determine a bill's progression
 
 export const bill_readings = pgTable("bill_readings", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
-  
-  // Reading specification
-  reading_number: integer("reading_number").notNull(), // 1, 2, 3
-  reading_type: varchar("reading_type", { length: 50 }).notNull(), // first, second, third, reconsideration
-  
-  // Parliamentary context
-  parliamentary_session_id: uuid("parliamentary_session_id").references(() => parliamentary_sessions.id),
-  sitting_id: uuid("sitting_id").references(() => parliamentary_sittings.id),
-  
-  // Reading results
+  session_id: uuid("session_id").references(() => parliamentary_sessions.id, { onDelete: "set null" }),
+
+  // Reading details
+  reading_number: smallint("reading_number").notNull(), // 1, 2, or 3
   reading_date: date("reading_date").notNull(),
-  reading_outcome: varchar("reading_outcome", { length: 50 }).notNull(), // passed, rejected, deferred, withdrawn
-  
-  // Voting tallies
-  vote_for: integer("vote_for").notNull().default(0),
-  vote_against: integer("vote_against").notNull().default(0),
-  vote_abstain: integer("vote_abstain").notNull().default(0),
-  total_present: integer("total_present").notNull().default(0),
-  
-  // Debate documentation
-  debate_duration_minutes: integer("debate_duration_minutes"),
-  key_debate_points: text("key_debate_points").array().default(sql`ARRAY[]::text[]`),
+  reading_stage: varchar("reading_stage", { length: 50 }), // "first_reading", "second_reading", "committee_stage", "third_reading"
+
+  // Reading outcome
+  outcome: varchar("outcome", { length: 30 }), // "passed", "rejected", "deferred", "withdrawn"
+  votes_for: integer("votes_for"),
+  votes_against: integer("votes_against"),
+  votes_abstain: integer("votes_abstain"),
+
+  // Reading content
+  debate_summary: text("debate_summary"),
+  key_speakers: varchar("key_speakers", { length: 100 }).array(),
   hansard_reference: varchar("hansard_reference", { length: 100 }),
-  
-  // Forward planning
-  next_action_required: varchar("next_action_required", { length: 100 }),
-  next_scheduled_date: date("next_scheduled_date"),
-  
-  created_at: timestamp("created_at").notNull().default(sql`now()`),
-  updated_at: timestamp("updated_at").notNull().default(sql`now()`),
+
+  // Next steps
+  next_reading_scheduled: date("next_reading_scheduled"),
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  // Ensure only one record per reading stage per bill
-  billReadingUnique: uniqueIndex("bill_readings_bill_reading_idx")
+  // One reading per number per bill
+  billReadingNumberUnique: unique("bill_readings_bill_reading_number_unique")
     .on(table.bill_id, table.reading_number),
-  billIdx: index("bill_readings_bill_idx").on(table.bill_id),
-  // Support chronological and outcome-based queries
-  readingDateIdx: index("bill_readings_date_idx").on(table.reading_date),
-  outcomeIdx: index("bill_readings_outcome_idx").on(table.reading_outcome),
-  // Link to parliamentary sessions for session-based reporting
-  sessionIdx: index("bill_readings_session_idx").on(table.parliamentary_session_id),
+
+  // Reading chronology
+  billReadingDateIdx: index("idx_bill_readings_bill_reading_date")
+    .on(table.bill_id, table.reading_date),
+
+  // Session readings
+  sessionReadingIdx: index("idx_bill_readings_session_reading")
+    .on(table.session_id, table.reading_date)
+    .where(sql`${table.session_id} IS NOT NULL`),
+
+  // Validate reading number
+  readingNumberCheck: check("bill_readings_reading_number_check",
+    sql`${table.reading_number} >= 1 AND ${table.reading_number} <= 3`),
 }));
 
 // ============================================================================
-// PARLIAMENTARY VOTES
+// PARLIAMENTARY VOTES - Individual MP voting records
 // ============================================================================
-// Individual voting records for each sponsor on bills and amendments
-// Enables transparency and accountability tracking
 
 export const parliamentary_votes = pgTable("parliamentary_votes", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   sponsor_id: uuid("sponsor_id").notNull().references(() => sponsors.id, { onDelete: "cascade" }),
-  
+
   // Vote context
-  vote_type: varchar("vote_type", { length: 50 }).notNull(), // reading, amendment, procedural, final_passage
-  reading_number: integer("reading_number"),
-  amendment_id: uuid("amendment_id").references(() => bill_amendments.id, { onDelete: "set null" }),
-  
-  // Vote position
-  vote_position: varchar("vote_position", { length: 20 }).notNull(), // for, against, abstain, absent, paired
-  vote_weight: integer("vote_weight").notNull().default(1),
-  
-  // Public explanation
-  vote_explanation: text("vote_explanation"),
-  public_statement_url: varchar("public_statement_url", { length: 500 }),
-  
-  // Session linkage
-  parliamentary_session_id: uuid("parliamentary_session_id").references(() => parliamentary_sessions.id),
-  sitting_id: uuid("sitting_id").references(() => parliamentary_sittings.id),
-  
+  vote_stage: varchar("vote_stage", { length: 50 }).notNull(), // "second_reading", "third_reading", "amendment_vote"
   vote_date: date("vote_date").notNull(),
-  
-  created_at: timestamp("created_at").notNull().default(sql`now()`),
-  updated_at: timestamp("updated_at").notNull().default(sql`now()`),
+  amendment_id: uuid("amendment_id").references(() => bill_amendments.id, { onDelete: "set null" }),
+
+  // Vote details
+  vote_choice: varchar("vote_choice", { length: 20 }).notNull(), // "yes", "no", "abstain", "absent"
+  vote_explanation: text("vote_explanation"),
+
+  // Voting session metadata
+  session_id: uuid("session_id").references(() => parliamentary_sessions.id, { onDelete: "set null" }),
+  hansard_reference: varchar("hansard_reference", { length: 100 }),
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  // Prevent duplicate votes from same sponsor on same matter
-  billSponsorVoteUnique: uniqueIndex("parliamentary_votes_unique_idx")
-    .on(table.bill_id, table.sponsor_id, table.vote_type, table.reading_number, table.amendment_id),
-  // Support queries by bill, sponsor, and date
-  billIdx: index("parliamentary_votes_bill_idx").on(table.bill_id),
-  sponsorIdx: index("parliamentary_votes_sponsor_idx").on(table.sponsor_id),
-  voteDateIdx: index("parliamentary_votes_date_idx").on(table.vote_date),
-  // Composite index for sponsor voting analysis
-  sponsorPositionIdx: index("parliamentary_votes_sponsor_position_idx")
-    .on(table.sponsor_id, table.vote_position),
-  amendmentIdx: index("parliamentary_votes_amendment_idx").on(table.amendment_id),
+  // One vote per MP per bill per stage
+  sponsorBillStageUnique: unique("parliamentary_votes_sponsor_bill_stage_unique")
+    .on(table.sponsor_id, table.bill_id, table.vote_stage, table.amendment_id),
+
+  // Bill voting analysis
+  billStageVoteIdx: index("idx_parliamentary_votes_bill_stage_vote")
+    .on(table.bill_id, table.vote_stage, table.vote_choice),
+
+  // MP voting record
+  sponsorVoteIdx: index("idx_parliamentary_votes_sponsor_vote")
+    .on(table.sponsor_id, table.vote_date, table.vote_choice),
 }));
 
 // ============================================================================
-// BILL COSPONSORS
+// BILL COSPONSORS - Track bill co-sponsorship
 // ============================================================================
-// Tracks sponsorship relationships, distinguishing between primary sponsors
-// and supporting cosponsors
 
 export const bill_cosponsors = pgTable("bill_cosponsors", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
   sponsor_id: uuid("sponsor_id").notNull().references(() => sponsors.id, { onDelete: "cascade" }),
-  
-  // Sponsorship role
-  sponsorship_role: varchar("sponsorship_role", { length: 50 }).notNull().default("cosponsor"), // primary, cosponsor, supporter
-  sponsorship_order: integer("sponsorship_order").notNull().default(1), // For display ordering
-  
-  // Timeline
-  joined_date: date("joined_date").notNull(),
-  withdrawal_date: date("withdrawal_date"),
-  is_active: boolean("is_active").notNull().default(true),
-  
-  // Motivation and contribution
+
+  // Co-sponsorship details
+  cosponsor_type: varchar("cosponsor_type", { length: 30 }).notNull().default("supporting"), // "supporting", "lead", "secondary"
+  joined_date: date("joined_date").notNull().default(sql`CURRENT_DATE`),
+
+  // Co-sponsor contribution
   contribution_description: text("contribution_description"),
-  constituency_interest: text("constituency_interest"),
-  
-  created_at: timestamp("created_at").notNull().default(sql`now()`),
-  updated_at: timestamp("updated_at").notNull().default(sql`now()`),
+  public_statement: text("public_statement"),
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  // Each sponsor can only have one role per bill
-  billSponsorUnique: uniqueIndex("bill_cosponsors_bill_sponsor_idx")
+  // One co-sponsorship per MP per bill
+  billSponsorUnique: unique("bill_cosponsors_bill_sponsor_unique")
     .on(table.bill_id, table.sponsor_id),
-  billIdx: index("bill_cosponsors_bill_idx").on(table.bill_id),
-  sponsorIdx: index("bill_cosponsors_sponsor_idx").on(table.sponsor_id),
-  // Filter active cosponsors efficiently
-  activeIdx: index("bill_cosponsors_active_idx")
-    .on(table.bill_id, table.is_active)
-    .where(sql`${table.is_active} = true`),
-  roleIdx: index("bill_cosponsors_role_idx").on(table.sponsorship_role),
+
+  // Bill co-sponsor queries
+  billCosponsorIdx: index("idx_bill_cosponsors_bill_cosponsor")
+    .on(table.bill_id, table.cosponsor_type, table.joined_date),
+
+  // MP co-sponsorship activity
+  sponsorActivityIdx: index("idx_bill_cosponsors_sponsor_activity")
+    .on(table.sponsor_id, table.joined_date),
 }));
 
 // ============================================================================
-// PUBLIC PARTICIPATION EVENTS
+// PUBLIC PARTICIPATION EVENTS - Constitutional Article 118 Compliance
 // ============================================================================
-// Schedules and tracks public engagement opportunities like hearings,
-// consultations, and town halls
 
 export const public_participation_events = pgTable("public_participation_events", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
-  
-  // Event identification
-  event_type: varchar("event_type", { length: 100 }).notNull(), // public_hearing, consultation, town_hall, stakeholder_forum
+
+  // Event details
+  event_type: varchar("event_type", { length: 50 }).notNull(), // "public_hearing", "stakeholder_forum", "county_consultation"
   event_title: varchar("event_title", { length: 500 }).notNull(),
   event_description: text("event_description"),
-  
-  // Scheduling details
+
+  // Event logistics
   event_date: date("event_date").notNull(),
-  event_time: varchar("event_time", { length: 50 }), // Start time
-  duration_hours: numeric("duration_hours", { precision: 3, scale: 1 }),
-  
-  // Location information
-  venue_name: varchar("venue_name", { length: 255 }),
-  venue_address: text("venue_address"),
-  county: kenyanCountyEnum("county"),
-  constituency: varchar("constituency", { length: 100 }),
-  
-  // Accessibility features
-  accessibility_info: text("accessibility_info"),
-  language_support: varchar("language_support", { length: 100 }).array().default(sql`ARRAY[]::varchar[]`), // Languages available
-  
-  // Organizing body
-  organizing_committee_id: uuid("organizing_committee_id").references(() => committees.id),
-  organizing_office: varchar("organizing_office", { length: 255 }),
-  
-  // Registration requirements
-  registration_required: boolean("registration_required").notNull().default(true),
+  event_time: varchar("event_time", { length: 20 }),
+  venue: varchar("venue", { length: 300 }),
+  county: varchar("county", { length: 50 }),
+
+  // Participation details
+  expected_participants: integer("expected_participants"),
+  actual_participants: integer("actual_participants"),
+  registration_required: boolean("registration_required").notNull().default(false),
   registration_deadline: date("registration_deadline"),
-  max_participants: integer("max_participants"),
-  registration_url: varchar("registration_url", { length: 500 }),
-  
-  // Event lifecycle
-  event_status: varchar("event_status", { length: 50 }).notNull().default("scheduled"), // scheduled, ongoing, completed, cancelled, postponed
-  actual_attendance: integer("actual_attendance"),
-  event_outcomes: text("event_outcomes"),
-  
-  // Digital access
-  livestream_url: varchar("livestream_url", { length: 500 }),
-  recording_url: varchar("recording_url", { length: 500 }),
-  event_photos: varchar("event_photos", { length: 500 }).array().default(sql`ARRAY[]::varchar[]`),
-  
-  created_at: timestamp("created_at").notNull().default(sql`now()`),
-  updated_at: timestamp("updated_at").notNull().default(sql`now()`),
+
+  // Event outcomes
+  event_status: varchar("event_status", { length: 30 }).notNull().default("scheduled"), // "scheduled", "completed", "cancelled", "postponed"
+  summary_report_url: varchar("summary_report_url", { length: 500 }),
+  key_outcomes: text("key_outcomes"),
+
+  // Organizing committee
+  organizing_committee_id: uuid("organizing_committee_id").references(() => committees.id, { onDelete: "set null" }),
+  contact_person: varchar("contact_person", { length: 200 }),
+  contact_email: varchar("contact_email", { length: 320 }),
+  contact_phone: varchar("contact_phone", { length: 20 }),
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  billIdx: index("public_participation_events_bill_idx").on(table.bill_id),
-  // Support location-based and date-based queries
-  eventDateIdx: index("public_participation_events_date_idx").on(table.event_date),
-  countyIdx: index("public_participation_events_county_idx").on(table.county),
-  // Filter by status for active event management
-  statusIdx: index("public_participation_events_status_idx").on(table.event_status),
-  // Composite index for upcoming events
-  upcomingEventsIdx: index("public_participation_events_upcoming_idx")
-    .on(table.event_status, table.event_date)
-    .where(sql`${table.event_status} IN ('scheduled', 'ongoing')`),
-  committeeIdx: index("public_participation_events_committee_idx").on(table.organizing_committee_id),
+  // Event scheduling queries
+  eventDateStatusIdx: index("idx_public_participation_events_event_date_status")
+    .on(table.event_date, table.event_status),
+
+  // Bill participation tracking
+  billEventIdx: index("idx_public_participation_events_bill_event")
+    .on(table.bill_id, table.event_date, table.event_status),
+
+  // County participation queries
+  countyEventIdx: index("idx_public_participation_events_county_event")
+    .on(table.county, table.event_date)
+    .where(sql`${table.county} IS NOT NULL`),
 }));
 
 // ============================================================================
-// PUBLIC SUBMISSIONS
+// PUBLIC SUBMISSIONS - Citizen input during public participation
 // ============================================================================
-// Formal written or oral submissions from citizens and organizations
-// regarding pending legislation
 
 export const public_submissions = pgTable("public_submissions", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
-  
-  // Submission details
-  submission_type: varchar("submission_type", { length: 100 }).notNull(), // written, oral, petition, memorandum, technical_brief
-  submission_title: varchar("submission_title", { length: 500 }).notNull(),
-  submission_content: text("submission_content").notNull(),
-  
-  // Submitter identification
-  submitter_type: varchar("submitter_type", { length: 50 }).notNull(), // individual, organization, coalition, government_agency
-  submitter_name: varchar("submitter_name", { length: 255 }).notNull(),
+  event_id: uuid("event_id").references(() => public_participation_events.id, { onDelete: "set null" }),
+
+  // Submitter information
+  submitter_name: varchar("submitter_name", { length: 200 }),
+  submitter_organization: varchar("submitter_organization", { length: 300 }),
+  submitter_type: varchar("submitter_type", { length: 50 }), // "individual", "organization", "government_agency", "expert"
   submitter_contact: jsonb("submitter_contact").$type<{
     email?: string;
     phone?: string;
     address?: string;
   }>().default(sql`'{}'::jsonb`),
-  
-  // Organization context (if applicable)
-  organization_name: varchar("organization_name", { length: 255 }),
-  organization_type: varchar("organization_type", { length: 100 }), // ngo, professional_body, trade_union, business_association
-  organization_representation: text("organization_representation"), // Who they represent
-  
+
+  // Submission content
+  submission_title: varchar("submission_title", { length: 500 }),
+  submission_text: text("submission_text").notNull(),
+  position: varchar("position", { length: 20 }), // "support", "oppose", "amend", "neutral"
+
   // Submission metadata
-  submission_date: date("submission_date").notNull(),
-  submission_method: varchar("submission_method", { length: 50 }).notNull(), // email, physical, online_portal, in_person
-  
-  // Target audience
-  target_committee_id: uuid("target_committee_id").references(() => committees.id),
-  
-  // Submission content analysis
-  key_recommendations: text("key_recommendations").array().default(sql`ARRAY[]::text[]`),
-  supporting_documents: varchar("supporting_documents", { length: 500 }).array().default(sql`ARRAY[]::varchar[]`),
-  
-  // Committee response and incorporation
+  submission_method: varchar("submission_method", { length: 30 }).notNull(), // "online", "email", "physical", "verbal"
+  submission_date: date("submission_date").notNull().default(sql`CURRENT_DATE`),
+
+  // Processing status
+  review_status: varchar("review_status", { length: 30 }).notNull().default("received"), // "received", "under_review", "acknowledged", "incorporated"
   committee_response: text("committee_response"),
-  response_date: date("response_date"),
-  incorporation_status: varchar("incorporation_status", { length: 50 }).default("pending"), // pending, reviewed, incorporated, rejected, acknowledged
-  
-  // Visibility and consent
-  is_public: boolean("is_public").notNull().default(true),
-  publication_consent: boolean("publication_consent").notNull().default(true),
-  
-  created_at: timestamp("created_at").notNull().default(sql`now()`),
-  updated_at: timestamp("updated_at").notNull().default(sql`now()`),
+
+  // Document attachments
+  supporting_documents: varchar("supporting_documents", { length: 500 }).array(),
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  billIdx: index("public_submissions_bill_idx").on(table.bill_id),
-  submissionDateIdx: index("public_submissions_date_idx").on(table.submission_date),
-  submitterTypeIdx: index("public_submissions_submitter_type_idx").on(table.submitter_type),
-  committeeIdx: index("public_submissions_committee_idx").on(table.target_committee_id),
-  // Support filtering by incorporation status for committee review
-  incorporationStatusIdx: index("public_submissions_incorporation_idx")
-    .on(table.target_committee_id, table.incorporation_status),
-  // Filter public submissions efficiently
-  publicVisibilityIdx: index("public_submissions_public_idx")
-    .on(table.is_public)
-    .where(sql`${table.is_public} = true`),
+  // Bill submission tracking
+  billSubmissionIdx: index("idx_public_submissions_bill_submission")
+    .on(table.bill_id, table.submission_date, table.review_status),
+
+  // Event submission tracking
+  eventSubmissionIdx: index("idx_public_submissions_event_submission")
+    .on(table.event_id, table.submission_date)
+    .where(sql`${table.event_id} IS NOT NULL`),
+
+  // Review queue management
+  reviewStatusIdx: index("idx_public_submissions_review_status")
+    .on(table.review_status, table.submission_date),
 }));
 
 // ============================================================================
-// PUBLIC HEARINGS
+// PUBLIC HEARINGS - Formal hearing sessions
 // ============================================================================
-// Detailed records of public hearing sessions, including attendance,
-// presentations, and outcomes
 
 export const public_hearings = pgTable("public_hearings", {
   id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
-  participation_event_id: uuid("participation_event_id").notNull()
-    .references(() => public_participation_events.id, { onDelete: "cascade" }),
-  
+  bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
+  event_id: uuid("event_id").references(() => public_participation_events.id, { onDelete: "set null" }),
+
   // Hearing details
-  hearing_title: varchar("hearing_title", { length: 500 }),
-  hearing_purpose: text("hearing_purpose"),
-  
-  // Committee and officials present
-  presiding_official: varchar("presiding_official", { length: 255 }),
-  committee_members_present: uuid("committee_members_present").array().default(sql`ARRAY[]::uuid[]`),
-  
-  // Participation metrics
-  registered_attendees: integer("registered_attendees"),
-  actual_attendees: integer("actual_attendees"),
-  public_presentations: integer("public_presentations").notNull().default(0),
-  
-  // Hearing format and structure
-  hearing_format: varchar("hearing_format", { length: 100 }).notNull().default("standard"), // standard, panel, roundtable, workshop
-  time_allocation: jsonb("time_allocation").$type<{
-    presentation_minutes?: number;
-    qa_minutes?: number;
-    total_minutes?: number;
-  }>().default(sql`'{}'::jsonb`),
-  
-  // Documentation
-  hearing_minutes_url: varchar("hearing_minutes_url", { length: 500 }),
-  presentations_received: integer("presentations_received").notNull().default(0),
-  
-  // Outcomes and analysis
-  key_issues_raised: text("key_issues_raised").array().default(sql`ARRAY[]::text[]`),
-  committee_conclusions: text("committee_conclusions"),
-  follow_up_actions: jsonb("follow_up_actions").$type<Array<{
-    action: string;
-    responsible_party?: string;
-    deadline?: string;
-    status?: string;
-  }>>().default(sql`'[]'::jsonb`),
-  
-  // Evaluation metrics
-  hearing_effectiveness: varchar("hearing_effectiveness", { length: 50 }), // highly_effective, effective, moderately_effective, ineffective
-  participant_satisfaction: numeric("participant_satisfaction", { precision: 3, scale: 2 }), // 0.00 to 5.00 rating
-  
-  created_at: timestamp("created_at").notNull().default(sql`now()`),
-  updated_at: timestamp("updated_at").notNull().default(sql`now()`),
+  hearing_title: varchar("hearing_title", { length: 500 }).notNull(),
+  hearing_date: date("hearing_date").notNull(),
+  start_time: varchar("start_time", { length: 10 }),
+  end_time: varchar("end_time", { length: 10 }),
+
+  // Hearing logistics
+  venue: varchar("venue", { length: 300 }),
+  presiding_committee_id: uuid("presiding_committee_id").references(() => committees.id, { onDelete: "set null" }),
+  chairperson_id: uuid("chairperson_id").references(() => sponsors.id, { onDelete: "set null" }),
+
+  // Hearing participants
+  invited_speakers: jsonb("invited_speakers").notNull().default(sql`'[]'::jsonb`),
+  public_speakers: jsonb("public_speakers").notNull().default(sql`'[]'::jsonb`),
+
+  // Hearing outcomes
+  hearing_status: varchar("hearing_status", { length: 30 }).notNull().default("scheduled"), // "scheduled", "in_progress", "completed", "cancelled"
+  transcript_url: varchar("transcript_url", { length: 500 }),
+  video_url: varchar("video_url", { length: 500 }),
+  summary_report: text("summary_report"),
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  eventIdx: index("public_hearings_event_idx").on(table.participation_event_id),
-  presidingOfficialIdx: index("public_hearings_presiding_idx").on(table.presiding_official),
+  // Hearing scheduling
+  hearingDateStatusIdx: index("idx_public_hearings_hearing_date_status")
+    .on(table.hearing_date, table.hearing_status),
+
+  // Bill hearing tracking
+  billHearingIdx: index("idx_public_hearings_bill_hearing")
+    .on(table.bill_id, table.hearing_date),
+
+  // Committee hearing workload
+  committeeHearingIdx: index("idx_public_hearings_committee_hearing")
+    .on(table.presiding_committee_id, table.hearing_date)
+    .where(sql`${table.presiding_committee_id} IS NOT NULL`),
 }));
 
 // ============================================================================
 // RELATIONSHIPS
 // ============================================================================
-// These relationships enable Drizzle ORM to automatically join tables
-// and provide type-safe nested queries
 
-export const billCommitteeAssignmentsRelations = relations(bill_committee_assignments, ({ one, many }) => ({
+export const billCommitteeAssignmentsRelations = relations(bill_committee_assignments, ({ one }) => ({
   bill: one(bills, {
     fields: [bill_committee_assignments.bill_id],
     references: [bills.id],
@@ -542,11 +431,15 @@ export const billAmendmentsRelations = relations(bill_amendments, ({ one, many }
     fields: [bill_amendments.bill_id],
     references: [bills.id],
   }),
-  proposer: one(sponsors, {
-    fields: [bill_amendments.proposer_id],
+  proposedBy: one(sponsors, {
+    fields: [bill_amendments.proposed_by_id],
     references: [sponsors.id],
   }),
-  parliamentaryVotes: many(parliamentary_votes),
+  proposedByCommittee: one(committees, {
+    fields: [bill_amendments.proposed_by_committee_id],
+    references: [committees.id],
+  }),
+  votes: many(parliamentary_votes),
 }));
 
 export const billVersionsRelations = relations(bill_versions, ({ one }) => ({
@@ -561,13 +454,9 @@ export const billReadingsRelations = relations(bill_readings, ({ one }) => ({
     fields: [bill_readings.bill_id],
     references: [bills.id],
   }),
-  parliamentarySession: one(parliamentary_sessions, {
-    fields: [bill_readings.parliamentary_session_id],
+  session: one(parliamentary_sessions, {
+    fields: [bill_readings.session_id],
     references: [parliamentary_sessions.id],
-  }),
-  sitting: one(parliamentary_sittings, {
-    fields: [bill_readings.sitting_id],
-    references: [parliamentary_sittings.id],
   }),
 }));
 
@@ -584,13 +473,9 @@ export const parliamentaryVotesRelations = relations(parliamentary_votes, ({ one
     fields: [parliamentary_votes.amendment_id],
     references: [bill_amendments.id],
   }),
-  parliamentarySession: one(parliamentary_sessions, {
-    fields: [parliamentary_votes.parliamentary_session_id],
+  session: one(parliamentary_sessions, {
+    fields: [parliamentary_votes.session_id],
     references: [parliamentary_sessions.id],
-  }),
-  sitting: one(parliamentary_sittings, {
-    fields: [parliamentary_votes.sitting_id],
-    references: [parliamentary_sittings.id],
   }),
 }));
 
@@ -614,7 +499,8 @@ export const publicParticipationEventsRelations = relations(public_participation
     fields: [public_participation_events.organizing_committee_id],
     references: [committees.id],
   }),
-  publicHearings: many(public_hearings),
+  submissions: many(public_submissions),
+  hearings: many(public_hearings),
 }));
 
 export const publicSubmissionsRelations = relations(public_submissions, ({ one }) => ({
@@ -622,15 +508,58 @@ export const publicSubmissionsRelations = relations(public_submissions, ({ one }
     fields: [public_submissions.bill_id],
     references: [bills.id],
   }),
-  targetCommittee: one(committees, {
-    fields: [public_submissions.target_committee_id],
-    references: [committees.id],
+  event: one(public_participation_events, {
+    fields: [public_submissions.event_id],
+    references: [public_participation_events.id],
   }),
 }));
 
 export const publicHearingsRelations = relations(public_hearings, ({ one }) => ({
-  participationEvent: one(public_participation_events, {
-    fields: [public_hearings.participation_event_id],
+  bill: one(bills, {
+    fields: [public_hearings.bill_id],
+    references: [bills.id],
+  }),
+  event: one(public_participation_events, {
+    fields: [public_hearings.event_id],
     references: [public_participation_events.id],
   }),
+  presidingCommittee: one(committees, {
+    fields: [public_hearings.presiding_committee_id],
+    references: [committees.id],
+  }),
+  chairperson: one(sponsors, {
+    fields: [public_hearings.chairperson_id],
+    references: [sponsors.id],
+  }),
 }));
+
+// ============================================================================
+// TYPE EXPORTS
+// ============================================================================
+
+export type BillCommitteeAssignment = typeof bill_committee_assignments.$inferSelect;
+export type NewBillCommitteeAssignment = typeof bill_committee_assignments.$inferInsert;
+
+export type BillAmendment = typeof bill_amendments.$inferSelect;
+export type NewBillAmendment = typeof bill_amendments.$inferInsert;
+
+export type BillVersion = typeof bill_versions.$inferSelect;
+export type NewBillVersion = typeof bill_versions.$inferInsert;
+
+export type BillReading = typeof bill_readings.$inferSelect;
+export type NewBillReading = typeof bill_readings.$inferInsert;
+
+export type ParliamentaryVote = typeof parliamentary_votes.$inferSelect;
+export type NewParliamentaryVote = typeof parliamentary_votes.$inferInsert;
+
+export type BillCosponsor = typeof bill_cosponsors.$inferSelect;
+export type NewBillCosponsor = typeof bill_cosponsors.$inferInsert;
+
+export type PublicParticipationEvent = typeof public_participation_events.$inferSelect;
+export type NewPublicParticipationEvent = typeof public_participation_events.$inferInsert;
+
+export type PublicSubmission = typeof public_submissions.$inferSelect;
+export type NewPublicSubmission = typeof public_submissions.$inferInsert;
+
+export type PublicHearing = typeof public_hearings.$inferSelect;
+export type NewPublicHearing = typeof public_hearings.$inferInsert;

@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import { logger } from '../observability/logging/logger';
+import { logger } from '../observability/logging';
 import {
   ValidationResult,
   ValidationScope,
@@ -22,13 +22,13 @@ export interface ValidationFrameworkOptions {
     failFast: boolean;
     types: ValidationType[];
   };
-  logger: Logger;
+  logger: typeof logger;
   workingDirectory: string;
 }
 
 export class ValidationFramework extends EventEmitter {
   private readonly config: ValidationFrameworkOptions['config'];
-  private readonly logger: Logger;
+  private readonly logger: typeof logger;
   private readonly workingDirectory: string;
   private validationHistory: ValidationResult[] = [];
   private continuousValidation?: NodeJS.Timeout;
@@ -48,7 +48,7 @@ export class ValidationFramework extends EventEmitter {
    * Validate before task execution
    */
   public async validatePreExecution(task?: ModernizationTask): Promise<ValidationResult> {
-    this.logger.info({ taskId: task?.id }, 'Starting pre-execution validation');
+    this.logger.info('Starting pre-execution validation', { taskId: task?.id });
 
     const result = await this.runValidation(
       ValidationScope.PRE_EXECUTION,
@@ -64,7 +64,7 @@ export class ValidationFramework extends EventEmitter {
    * Validate after task execution
    */
   public async validatePostExecution(task?: ModernizationTask): Promise<ValidationResult> {
-    this.logger.info({ taskId: task?.id }, 'Starting post-execution validation');
+    this.logger.info('Starting post-execution validation', { taskId: task?.id });
 
     const result = await this.runValidation(
       ValidationScope.POST_EXECUTION,
@@ -80,7 +80,7 @@ export class ValidationFramework extends EventEmitter {
    * Validate rollback operation
    */
   public async validateRollback(): Promise<ValidationResult> {
-    this.logger.info({}, 'Starting rollback validation');
+    this.logger.info('Starting rollback validation', {});
 
     const result = await this.runValidation(
       ValidationScope.ROLLBACK,
@@ -95,7 +95,7 @@ export class ValidationFramework extends EventEmitter {
    * Run continuous validation
    */
   public async runContinuousValidation(): Promise<ValidationResult> {
-    this.logger.debug({}, 'Running continuous validation');
+    this.logger.debug('Running continuous validation', {});
 
     const result = await this.runValidation(
       ValidationScope.CONTINUOUS,
@@ -130,7 +130,7 @@ export class ValidationFramework extends EventEmitter {
     if (this.continuousValidation) {
       clearInterval(this.continuousValidation);
       this.continuousValidation = undefined;
-      this.logger.info({}, 'Continuous validation stopped');
+      this.logger.info('Continuous validation stopped', {});
     }
   }
 
@@ -182,7 +182,7 @@ export class ValidationFramework extends EventEmitter {
             criticalIssues.push(failedCheck.message);
           }
 
-          this.logger.error(error, `Validation check failed: ${validationType}`);
+          this.logger.error(`Validation check failed: ${validationType}`, { error });
 
           if (this.config.failFast) {
             break;
@@ -204,13 +204,13 @@ export class ValidationFramework extends EventEmitter {
       this.validationHistory.push(result);
 
       const duration = Date.now() - startTime;
-      this.logger.info({
+      this.logger.info('Validation completed', {
         validationId,
         scope,
         status: overallStatus,
         checksCount: checks.length,
         duration
-      }, 'Validation completed');
+      });
 
       return result;
 
@@ -574,11 +574,11 @@ export class ValidationFramework extends EventEmitter {
       try {
         await this.runContinuousValidation();
       } catch (error) {
-        this.logger.error(error, 'Continuous validation error');
+        this.logger.error('Continuous validation error', { error });
       }
     }, 30000); // Run every 30 seconds
 
-    this.logger.info({}, 'Continuous validation started');
+    this.logger.info('Continuous validation started', {});
   }
 
   private getValidationName(type: ValidationType): string {

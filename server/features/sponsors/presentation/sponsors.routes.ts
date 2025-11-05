@@ -1,5 +1,5 @@
 import express from 'express';
-import { sponsorRepository, SponsorAffiliationInput, SponsorTransparencyInput } from '../infrastructure/repositories/sponsor.repository';
+import { sponsorService, SponsorAffiliationInput, SponsorTransparencyInput } from '../application/sponsor-service-direct';
 import { sponsorConflictAnalysisService } from '../application/sponsor-conflict-analysis.service';
 // Note: Validation schemas need to be created in the new schema structure
 // import { insertSponsorSchema } from '@shared/schema/validation';
@@ -94,8 +94,8 @@ router.get('/', async (req, res, next) => {
         };
 
         const sponsors = search
-            ? await sponsorRepository.search(search as string, options)
-            : await sponsorRepository.list(options);
+            ? await sponsorService.search(search as string, options)
+            : await sponsorService.list(options);
 
         return ApiSuccess(res, sponsors);
     } catch (error) {
@@ -110,7 +110,7 @@ router.get('/', async (req, res, next) => {
 router.get('/:id', async (req, res, next) => {
     try {
         const id = parseIntParam(req.params.id, 'Sponsor ID');
-        const sponsor = await sponsorRepository.findByIdWithRelations(id);
+        const sponsor = await sponsorService.findByIdWithRelations(id);
 
         if (!sponsor) {
             return ApiNotFound(res, `Sponsor with ID ${id} not found.`);
@@ -137,7 +137,7 @@ router.post('/', async (req: express.Request, res, next) => {
         }
 
         const sponsorData = validationResult.data;
-        const newSponsor = await sponsorRepository.create(sponsorData);
+        const newSponsor = await sponsorService.create(sponsorData);
 
         // Success response with 201 status wrapped in metadata object
         return ApiSuccess(res, newSponsor, undefined, 201);
@@ -170,7 +170,7 @@ router.put('/:id', async (req: express.Request, res, next) => {
         }
 
         const updateData = getRequestBody(req);
-        const updatedSponsor = await sponsorRepository.update(id, updateData);
+        const updatedSponsor = await sponsorService.update(id, updateData);
 
         if (!updatedSponsor) {
             return ApiNotFound(res, `Sponsor with ID ${id} not found.`);
@@ -189,7 +189,7 @@ router.put('/:id', async (req: express.Request, res, next) => {
 router.delete('/:id', async (req: express.Request, res, next) => {
     try {
         const id = parseIntParam(req.params.id, 'Sponsor ID');
-        const deactivatedSponsor = await sponsorRepository.setActiveStatus(id, false);
+        const deactivatedSponsor = await sponsorService.setActiveStatus(id, false);
 
         if (!deactivatedSponsor) {
             return ApiNotFound(res, `Sponsor with ID ${id} not found.`);
@@ -214,7 +214,7 @@ router.get('/:id/affiliations', async (req, res, next) => {
     try {
         const id = parseIntParam(req.params.id, 'Sponsor ID');
         const activeOnly = req.query.activeOnly !== 'false';
-        const affiliations = await sponsorRepository.listAffiliations(id, activeOnly);
+        const affiliations = await sponsorService.listAffiliations(id, activeOnly);
 
         return ApiSuccess(res, affiliations);
     } catch (error) {
@@ -252,7 +252,7 @@ router.post('/:id/affiliations', async (req: express.Request, res, next) => {
             ));
         }
 
-        const newAffiliation = await sponsorRepository.addAffiliation(affiliationData);
+        const newAffiliation = await sponsorService.addAffiliation(affiliationData);
         return ApiSuccess(res, newAffiliation, undefined, 201);
     } catch (error) {
         next(error);
@@ -280,7 +280,7 @@ router.put('/:id/affiliations/:affiliationId', async (req: express.Request, res,
         if (updateData.startDate) updateData.startDate = new Date(updateData.startDate);
         if (updateData.endDate) updateData.endDate = new Date(updateData.endDate);
 
-        const updatedAffiliation = await sponsorRepository.updateAffiliation(affiliationId, updateData);
+        const updatedAffiliation = await sponsorService.updateAffiliation(affiliationId, updateData);
 
         if (!updatedAffiliation) {
             return ApiNotFound(res, `Affiliation with ID ${affiliationId} not found.`);
@@ -301,7 +301,7 @@ router.delete('/:id/affiliations/:affiliationId', async (req: express.Request, r
         const affiliationId = parseIntParam(req.params.affiliationId, 'Affiliation ID');
         const endDate = req.body.endDate ? new Date(req.body.endDate) : undefined;
 
-        const deactivatedAffiliation = await sponsorRepository.setAffiliationActiveStatus(
+        const deactivatedAffiliation = await sponsorService.setAffiliationActiveStatus(
             affiliationId,
             false,
             endDate
@@ -328,7 +328,7 @@ router.delete('/:id/affiliations/:affiliationId', async (req: express.Request, r
 router.get('/:id/transparency', async (req, res, next) => {
     try {
         const id = parseIntParam(req.params.id, 'Sponsor ID');
-        const records = await sponsorRepository.listTransparencyRecords(id);
+        const records = await sponsorService.listTransparencyRecords(id);
 
         return ApiSuccess(res, records);
     } catch (error) {
@@ -365,7 +365,7 @@ router.post('/:id/transparency', async (req: express.Request, res, next) => {
             ));
         }
 
-        const newRecord = await sponsorRepository.addTransparencyRecord(transparencyData);
+        const newRecord = await sponsorService.addTransparencyRecord(transparencyData);
         return ApiSuccess(res, newRecord, undefined, 201);
     } catch (error) {
         next(error);
@@ -392,7 +392,7 @@ router.put('/:id/transparency/:transparencyId', async (req: express.Request, res
             updateData.dateReported = new Date(updateData.dateReported);
         }
 
-        const updatedRecord = await sponsorRepository.updateTransparencyRecord(transparencyId, updateData);
+        const updatedRecord = await sponsorService.updateTransparencyRecord(transparencyId, updateData);
 
         if (!updatedRecord) {
             return ApiNotFound(res, `Transparency record with ID ${transparencyId} not found.`);
@@ -411,7 +411,7 @@ router.put('/:id/transparency/:transparencyId', async (req: express.Request, res
 router.post('/:id/transparency/:transparencyId/verify', async (req: express.Request, res, next) => {
     try {
         const transparencyId = parseIntParam(req.params.transparencyId, 'Transparency ID');
-        const verifiedRecord = await sponsorRepository.verifyTransparencyRecord(transparencyId);
+        const verifiedRecord = await sponsorService.verifyTransparencyRecord(transparencyId);
 
         if (!verifiedRecord) {
             return ApiNotFound(res, `Transparency record with ID ${transparencyId} not found.`);
@@ -494,7 +494,7 @@ router.get('/conflicts/all', async (req, res, next) => {
 
         // Enrich the response with sponsor metadata
         const sponsor_ids = Array.from(new Set(allConflicts.map(c => c.sponsor_id)));
-        const sponsors = await sponsorRepository.findByIds(sponsor_ids);
+        const sponsors = await sponsorService.findByIds(sponsor_ids);
         const sponsorMap = new Map(sponsors.map(s => [s.id, { name: s.name, party: s.party }]));
 
         // Group conflicts by sponsor for better client consumption
@@ -552,10 +552,10 @@ router.get('/:id/sponsored-bills', async (req, res, next) => {
         const id = parseIntParam(req.params.id, 'Sponsor ID');
         const activeOnly = req.query.activeOnly !== 'false';
 
-        const sponsorships = await sponsorRepository.listBillSponsorshipsBySponsor(id, activeOnly);
+        const sponsorships = await sponsorService.listBillSponsorshipsBySponsor(id, activeOnly);
         const bill_ids = sponsorships.map(s => s.bill_id);
 
-        const bills = await sponsorRepository.getBillsByIds(bill_ids);
+        const bills = await sponsorService.getBillsByIds(bill_ids);
         const billsMap = new Map(bills.map(b => [b.id, b]));
 
         // Combine sponsorship and bill data
@@ -583,7 +583,7 @@ router.get('/:id/sponsored-bills', async (req, res, next) => {
  */
 router.get('/meta/parties', async (req, res, next) => {
     try {
-        const parties = await sponsorRepository.getUniqueParties();
+        const parties = await sponsorService.getUniqueParties();
         return ApiSuccess(res, { parties });
     } catch (error) {
         next(error);
@@ -596,7 +596,7 @@ router.get('/meta/parties', async (req, res, next) => {
  */
 router.get('/meta/constituencies', async (req, res, next) => {
     try {
-        const constituencies = await sponsorRepository.getUniqueConstituencies();
+        const constituencies = await sponsorService.getUniqueConstituencies();
         return ApiSuccess(res, { constituencies });
     } catch (error) {
         next(error);
@@ -610,9 +610,9 @@ router.get('/meta/constituencies', async (req, res, next) => {
 router.get('/meta/stats', async (req, res, next) => {
     try {
         const [activeCount, parties, constituencies] = await Promise.all([
-            sponsorRepository.getActiveSponsorCount(),
-            sponsorRepository.getUniqueParties(),
-            sponsorRepository.getUniqueConstituencies(),
+            sponsorService.getActiveSponsorCount(),
+            sponsorService.getUniqueParties(),
+            sponsorService.getUniqueConstituencies(),
         ]);
 
         return ApiSuccess(res, {

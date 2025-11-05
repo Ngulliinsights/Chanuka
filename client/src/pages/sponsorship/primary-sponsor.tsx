@@ -89,7 +89,7 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`/api/bills/${bill_id }/sponsorship-analysis/primary-sponsor`);
+        const response = await fetch(`/api/bills/${bill_id }/sponsorhip-analysis/primary-sponsor`);
 
         if (!response.ok) {
           throw new Error(`Failed to fetch primary sponsor data: ${response.status}`);
@@ -195,20 +195,20 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
         <span>›</span>
         <Link to={ `/bills/${bill_id }`} className="hover:text-primary transition-colors">Bills</Link>
         <span>›</span>
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="hover:text-primary transition-colors">Sponsorship Analysis</Link>
+        <Link to={ `/bills/${bill_id }/sponsorhip-analysis`} className="hover:text-primary transition-colors">sponsorhip Analysis</Link>
         <span>›</span>
         <span className="text-foreground">Primary Sponsor</span>
       </nav>
 
       {/* Header */}
       <div className="mb-6">
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors">
+        <Link to={ `/bills/${bill_id }/sponsorhip-analysis`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-4 transition-colors">
           <ArrowLeft className="h-4 w-4 mr-1" />
           Back to Analysis Navigation
         </Link>
 
         <h1 className="text-3xl font-bold text-foreground mb-2">
-          {sponsors.sponsors.name} - Primary Sponsor Analysis
+          {sponsor.sponsor.name} - Primary Sponsor Analysis
         </h1>
         <p className="text-muted-foreground">Comprehensive analysis of potential conflicts and transparency measures</p>
       </div>
@@ -221,25 +221,25 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-lg font-semibold mb-2">{sponsors.sponsors.name}</h3>
+              <h3 className="text-lg font-semibold mb-2">{sponsor.sponsor.name}</h3>
               <div className="space-y-2">
-                <p><span className="font-medium">Role:</span> {sponsors.sponsors.role}</p>
-                <p><span className="font-medium">Party:</span> {sponsors.sponsors.party}</p>
-                <p><span className="font-medium">Constituency:</span> {sponsors.sponsors.constituency}</p>
+                <p><span className="font-medium">Role:</span> {sponsor.sponsor.role}</p>
+                <p><span className="font-medium">Party:</span> {sponsor.sponsor.party}</p>
+                <p><span className="font-medium">Constituency:</span> {sponsor.sponsor.constituency}</p>
               </div>
             </div>
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <span className="font-medium">Risk Level:</span>
-                {getRiskIndicator(sponsors.sponsors.conflict_level)}
-                <Badge className={getConflictLevelColor(sponsors.sponsors.conflict_level)}>
-                  {sponsors.sponsors.conflict_level.toUpperCase()}
+                {getRiskIndicator(sponsor.sponsor.conflict_level)}
+                <Badge className={getConflictLevelColor(sponsor.sponsor.conflict_level)}>
+                  {sponsor.sponsor.conflict_level.toUpperCase()}
                 </Badge>
               </div>
               <div className="flex items-center gap-2">
                 <DollarSign className="h-4 w-4 text-green-600" />
                 <span className="font-medium">Financial Exposure:</span>
-                <span>${(sponsors.sponsors.financial_exposure / 1000000).toFixed(1)}M</span>
+                <span>${(sponsor.sponsor.financial_exposure / 1000000).toFixed(1)}M</span>
               </div>
             </div>
           </div>
@@ -256,16 +256,16 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span>Direct Conflicts:</span>
-                <Badge variant="destructive">{sponsors.conflictAnalysis.directConflicts}</Badge>
+                <Badge variant="destructive">{sponsor.conflictAnalysis.directConflicts}</Badge>
               </div>
               <div className="flex justify-between items-center">
                 <span>Indirect Conflicts:</span>
-                <Badge variant="secondary">{sponsors.conflictAnalysis.indirectConflicts}</Badge>
+                <Badge variant="secondary">{sponsor.conflictAnalysis.indirectConflicts}</Badge>
               </div>
               <div className="flex justify-between items-center">
                 <span>Risk Score:</span>
-                <Badge className={getConflictLevelColor(sponsors.riskProfile.level)}>
-                  {sponsors.conflictAnalysis.riskScore}/100
+                <Badge className={getConflictLevelColor(sponsor.riskProfile.level)}>
+                  {sponsor.conflictAnalysis.riskScore}/100
                 </Badge>
               </div>
             </div>
@@ -280,16 +280,16 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span>Disclosure Level:</span>
-                <Badge variant="outline">{sponsors.sponsors.transparency.disclosure}</Badge>
+                <Badge variant="outline">{sponsor.sponsor.transparency.disclosure}</Badge>
               </div>
               <div className="flex justify-between items-center">
                 <span>Public Statements:</span>
-                <span>{sponsors.sponsors.transparency.publicStatements}</span>
+                <span>{sponsor.sponsor.transparency.publicStatements}</span>
               </div>
               <div className="flex justify-between items-center">
                 <span>Last Updated:</span>
                 <span className="text-sm text-muted-foreground">
-                  {new Date(sponsors.sponsors.transparency.lastUpdated).toLocaleDateString()}
+                  {new Date(sponsor.sponsor.transparency.lastUpdated).toLocaleDateString()}
                 </span>
               </div>
             </div>
@@ -298,7 +298,7 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
       </div>
 
       {/* Affiliations */}
-      {sponsors.sponsors.affiliations.length > 0 && (
+      {sponsor.sponsor.affiliations.length > 0 && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -308,7 +308,7 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {sponsors.sponsors.affiliations.map((affiliation, index) => (
+              {sponsor.sponsor.affiliations.map((affiliation, index) => (
                 <div key={index} className="flex items-center justify-between p-3 border rounded">
                   <div>
                     <span className="font-medium">{affiliation.organization}</span>
@@ -340,7 +340,7 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
             <div>
               <h4 className="font-medium mb-3">Affected Sections</h4>
               <div className="space-y-2">
-                {sponsors.billImpact.affectedSections.map((section, index) => (
+                {sponsor.billImpact.affectedSections.map((section, index) => (
                   <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
                     <div>
                       <span className="font-medium">Section {section.section}</span>
@@ -358,16 +358,16 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Benefit Estimate:</span>
-                  <span className="font-medium">${sponsors.billImpact.benefitEstimate.toLocaleString()}</span>
+                  <span className="font-medium">${sponsor.billImpact.benefitEstimate.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Alignment Score:</span>
-                  <span className="font-medium">{sponsors.billImpact.alignmentScore}%</span>
+                  <span className="font-medium">{sponsor.billImpact.alignmentScore}%</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Potential Influence:</span>
-                  <Badge className={getConflictLevelColor(sponsors.billImpact.potentialInfluence)}>
-                    {sponsors.billImpact.potentialInfluence.toUpperCase()}
+                  <Badge className={getConflictLevelColor(sponsor.billImpact.potentialInfluence)}>
+                    {sponsor.billImpact.potentialInfluence.toUpperCase()}
                   </Badge>
                 </div>
               </div>
@@ -377,7 +377,7 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
       </Card>
 
       {/* Recommendations */}
-      {sponsors.recommendations.length > 0 && (
+      {sponsor.recommendations.length > 0 && (
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -387,7 +387,7 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {sponsors.recommendations.map((recommendation, index) => (
+              {sponsor.recommendations.map((recommendation, index) => (
                 <li key={index} className="flex items-start gap-2">
                   <span className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
                   <span>{recommendation}</span>
@@ -400,15 +400,15 @@ export default function PrimarySponsorAnalysis({ bill_id  }: PrimarySponsorProps
 
       {/* Navigation Actions */}
       <div className="flex justify-between items-center">
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis/overview`}>
+        <Link to={ `/bills/${bill_id }/sponsorhip-analysis/overview`}>
           <Button variant="outline">
             <ChevronLeft className="h-4 w-4 mr-2" />
             Previous: Overview
           </Button>
         </Link>
-        <Link to={ `/bills/${bill_id }/sponsorship-analysis/co-sponsors`}>
+        <Link to={ `/bills/${bill_id }/sponsorhip-analysis/co-sponsor`}>
           <Button>
-            Next: Co-Sponsors
+            Next: Co-sponsor
             <ChevronRight className="h-4 w-4 ml-2" />
           </Button>
         </Link>

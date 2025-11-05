@@ -1,15 +1,16 @@
 import { Bill, BillNumber, BillTitle, BillSummary } from '../domain/entities/bill';
-import { BillRepository } from '../domain/repositories/bill-repository';
 import { BillDomainService } from '../domain/services/bill-domain-service';
 import { BillNotificationService } from '../domain/services/bill-notification-service';
-import { BillEventHandler } from '../domain/services/bill-event-handler';
-import { UserRepository } from '../../users/domain/repositories/user-repository';
-import { NotificationChannelService } from '../../infrastructure/notifications/notification-channels';
-import { DomainEventPublisher } from '../../infrastructure/events/domain-event-publisher';
-import { DatabaseService } from '../../infrastructure/database/database-service';
+import { UserService } from '../../users/application/user-service-direct';
+import { NotificationChannelService } from '../../../infrastructure/notifications/notification-channels';
+import { DomainEventPublisher } from '../domain/events/bill-events';
+import { DatabaseService } from '../../../infrastructure/database/database-service';
 import { BillStatus, BillVoteType } from '@shared/schema';
-import { Result, Ok, Err } from '../../../shared/core/src/primitives/result';
+import { Result, Ok, Err } from '@shared/core';
 import { BillServiceError } from '../domain/errors/bill-errors';
+import { eq, and, sql } from 'drizzle-orm';
+import { bills } from '@shared/schema/foundation';
+import { databaseService } from '../../../infrastructure/database/database-service';
 
 /**
  * Application service for bill operations
@@ -18,12 +19,15 @@ import { BillServiceError } from '../domain/errors/bill-errors';
  */
 export class BillsApplicationService {
   constructor(
-    private readonly billRepository: BillRepository,
-    private readonly userRepository: UserRepository,
+    private readonly userService: UserService,
     private readonly notificationChannelService: NotificationChannelService,
     private readonly domainEventPublisher: DomainEventPublisher,
     private readonly databaseService: DatabaseService
-  ) {}
+  ) { }
+
+  private get db() {
+    return databaseService.getDatabase();
+  }
 
   /**
    * Creates a new bill with business rule validation
@@ -37,53 +41,64 @@ export class BillsApplicationService {
     affectedCounties?: string[];
   }): Promise<Result<Bill, BillServiceError>> {
     try {
-      // Validate input parameters
-      const billNumberResult = BillNumber.create(params.billNumber);
-      if (billNumberResult.isErr()) {
-        return Err(new BillServiceError('INVALID_BILL_NUMBER', billNumberResult.error.message));
-      }
-
-      const titleResult = BillTitle.create(params.title);
-      if (titleResult.isErr()) {
-        return Err(new BillServiceError('INVALID_TITLE', titleResult.error.message));
-      }
-
-      let summary: BillSummary | undefined;
+      // Validate input parameters using value object constructors
+      // If BillNumber doesn't have a create method, instantiate directly
+      const billNumber = new BillNumber(params.billNumber);
+      const title = new BillTitle(params.title);
+      
+      // Handle optional summary - only create if provided
+      let summary: BillSummary | undefined = undefined;
       if (params.summary) {
-        const summaryResult = BillSummary.create(params.summary);
-        if (summaryResult.isErr()) {
-          return Err(new BillServiceError('INVALID_SUMMARY', summaryResult.error.message));
-        }
-        summary = summaryResult.value;
+        summary = new BillSummary(params.summary);
       }
 
       // Create domain service for business logic
       const domainService = new BillDomainService(
-        this.billRepository,
-        this.userRepository,
-        new BillNotificationService(this.notificationChannelService, this.userRepository),
+        this.userService,
+        new BillNotificationService(this.notificationChannelService, this.userService),
         this.domainEventPublisher
       );
 
       // Execute business logic within transaction
-      const result = await this.databaseService.withTransaction(async () => {
-        return await domainService.createBill({
-          billNumber: billNumberResult.value,
-          title: titleResult.value,
-          summary,
-          sponsorId: params.sponsorId,
-          tags: params.tags,
-          affectedCounties: params.affectedCounties
-        });
+      // The transaction returns a DatabaseResult, so we need to await it and extract the value
+      const databaseResult = await this.databaseService.withTransaction(async () => {
+        // Build the params object conditionally to satisfy exactOptionalPropertyTypes
+        const createParams: {
+          billNumber: BillNumber;
+          title: BillTitle;
+          summary?: BillSummary;
+          sponsorId: string;
+          tags?: string[];
+          affectedCounties?: string[];
+        } = {
+          billNumber,
+          title,
+          sponsorId: params.sponsorId
+        };
+
+        // Only add optional properties if they're actually defined
+        if (summary !== undefined) {
+          createParams.summary = summary;
+        }
+        if (params.tags !== undefined) {
+          createParams.tags = params.tags;
+        }
+        if (params.affectedCounties !== undefined) {
+          createParams.affectedCounties = params.affectedCounties;
+        }
+
+        return await domainService.createBill(createParams);
       });
 
-      return Ok(result);
+      // Extract the Bill entity from the database result
+      // The withTransaction returns a DatabaseResult, we need to unwrap it
+      return new Ok(databaseResult.data);
 
     } catch (error) {
       if (error instanceof BillServiceError) {
-        return Err(error);
+        return new Err(error);
       }
-      return Err(new BillServiceError('CREATE_FAILED', error instanceof Error ? error.message : 'Unknown error'));
+      return new Err(new BillServiceError('CREATE_FAILED', error instanceof Error ? error.message : 'Unknown error'));
     }
   }
 
@@ -97,23 +112,25 @@ export class BillsApplicationService {
   ): Promise<Result<Bill, BillServiceError>> {
     try {
       const domainService = new BillDomainService(
-        this.billRepository,
-        this.userRepository,
-        new BillNotificationService(this.notificationChannelService, this.userRepository),
+        this.userService,
+        new BillNotificationService(this.notificationChannelService, this.userService),
         this.domainEventPublisher
       );
 
-      const result = await this.databaseService.withTransaction(async () => {
+      // Execute the domain operation within a transaction
+      // The result needs to be unwrapped from DatabaseResult to Bill
+      const databaseResult = await this.databaseService.withTransaction(async () => {
         return await domainService.updateBillStatus(billId, newStatus, updatedBy);
       });
 
-      return Ok(result);
+      // Return the unwrapped Bill entity
+      return new Ok(databaseResult.data);
 
     } catch (error) {
       if (error instanceof BillServiceError) {
-        return Err(error);
+        return new Err(error);
       }
-      return Err(new BillServiceError('STATUS_UPDATE_FAILED', error instanceof Error ? error.message : 'Unknown error'));
+      return new Err(new BillServiceError('STATUS_UPDATE_FAILED', error instanceof Error ? error.message : 'Unknown error'));
     }
   }
 
@@ -127,23 +144,24 @@ export class BillsApplicationService {
   ): Promise<Result<Bill, BillServiceError>> {
     try {
       const domainService = new BillDomainService(
-        this.billRepository,
-        this.userRepository,
-        new BillNotificationService(this.notificationChannelService, this.userRepository),
+        this.userService,
+        new BillNotificationService(this.notificationChannelService, this.userService),
         this.domainEventPublisher
       );
 
-      const result = await this.databaseService.withTransaction(async () => {
+      // Execute the vote recording within a transaction
+      const databaseResult = await this.databaseService.withTransaction(async () => {
         return await domainService.recordVote(billId, userId, voteType);
       });
 
-      return Ok(result);
+      // Unwrap and return the Bill entity
+      return new Ok(databaseResult.data);
 
     } catch (error) {
       if (error instanceof BillServiceError) {
-        return Err(error);
+        return new Err(error);
       }
-      return Err(new BillServiceError('VOTE_RECORD_FAILED', error instanceof Error ? error.message : 'Unknown error'));
+      return new Err(new BillServiceError('VOTE_RECORD_FAILED', error instanceof Error ? error.message : 'Unknown error'));
     }
   }
 
@@ -160,47 +178,45 @@ export class BillsApplicationService {
     updatedBy: string
   ): Promise<Result<Bill, BillServiceError>> {
     try {
-      // Validate input parameters
-      let title: BillTitle | undefined;
-      if (updates.title) {
-        const titleResult = BillTitle.create(updates.title);
-        if (titleResult.isErr()) {
-          return Err(new BillServiceError('INVALID_TITLE', titleResult.error.message));
-        }
-        title = titleResult.value;
+      // Validate input parameters and build the update object conditionally
+      const updateParams: {
+        title?: BillTitle;
+        summary?: BillSummary;
+        tags?: string[];
+      } = {};
+
+      // Only add properties if they're actually defined
+      if (updates.title !== undefined) {
+        updateParams.title = new BillTitle(updates.title);
       }
 
-      let summary: BillSummary | undefined;
-      if (updates.summary) {
-        const summaryResult = BillSummary.create(updates.summary);
-        if (summaryResult.isErr()) {
-          return Err(new BillServiceError('INVALID_SUMMARY', summaryResult.error.message));
-        }
-        summary = summaryResult.value;
+      if (updates.summary !== undefined) {
+        updateParams.summary = new BillSummary(updates.summary);
+      }
+
+      if (updates.tags !== undefined) {
+        updateParams.tags = updates.tags;
       }
 
       const domainService = new BillDomainService(
-        this.billRepository,
-        this.userRepository,
-        new BillNotificationService(this.notificationChannelService, this.userRepository),
+        this.userService,
+        new BillNotificationService(this.notificationChannelService, this.userService),
         this.domainEventPublisher
       );
 
-      const result = await this.databaseService.withTransaction(async () => {
-        return await domainService.updateBillContent(billId, {
-          title,
-          summary,
-          tags: updates.tags
-        }, updatedBy);
+      // Execute content update within transaction
+      const databaseResult = await this.databaseService.withTransaction(async () => {
+        return await domainService.updateBillContent(billId, updateParams, updatedBy);
       });
 
-      return Ok(result);
+      // Unwrap the database result to get the Bill entity
+      return new Ok(databaseResult.data);
 
     } catch (error) {
       if (error instanceof BillServiceError) {
-        return Err(error);
+        return new Err(error);
       }
-      return Err(new BillServiceError('CONTENT_UPDATE_FAILED', error instanceof Error ? error.message : 'Unknown error'));
+      return new Err(new BillServiceError('CONTENT_UPDATE_FAILED', error instanceof Error ? error.message : 'Unknown error'));
     }
   }
 
@@ -214,33 +230,37 @@ export class BillsApplicationService {
   ): Promise<Result<void, BillServiceError>> {
     try {
       const domainService = new BillDomainService(
-        this.billRepository,
-        this.userRepository,
-        new BillNotificationService(this.notificationChannelService, this.userRepository),
+        this.userService,
+        new BillNotificationService(this.notificationChannelService, this.userService),
         this.domainEventPublisher
       );
 
       await domainService.recordEngagement(billId, userId, engagementType);
-      return Ok(undefined);
+      return new Ok(undefined);
 
     } catch (error) {
       if (error instanceof BillServiceError) {
-        return Err(error);
+        return new Err(error);
       }
-      return Err(new BillServiceError('ENGAGEMENT_RECORD_FAILED', error instanceof Error ? error.message : 'Unknown error'));
+      return new Err(new BillServiceError('ENGAGEMENT_RECORD_FAILED', error instanceof Error ? error.message : 'Unknown error'));
     }
   }
 
   /**
    * Gets bill by ID with aggregate data
    */
-  async getBillById(billId: string): Promise<Result<Bill | null, BillServiceError>> {
+  async getBillById(billId: string): Promise<Result<any | null, BillServiceError>> {
     try {
-      const bill = await this.billRepository.findById(billId);
-      return Ok(bill);
+      const [bill] = await this.db
+        .select()
+        .from(bills)
+        .where(eq(bills.id, billId))
+        .limit(1);
+
+      return new Ok(bill || null);
 
     } catch (error) {
-      return Err(new BillServiceError('BILL_NOT_FOUND', error instanceof Error ? error.message : 'Bill not found'));
+      return new Err(new BillServiceError('BILL_NOT_FOUND', error instanceof Error ? error.message : 'Bill not found'));
     }
   }
 
@@ -252,52 +272,74 @@ export class BillsApplicationService {
     sponsorId?: string;
     limit?: number;
     offset?: number;
-  }): Promise<Result<Bill[], BillServiceError>> {
+  }): Promise<Result<any[], BillServiceError>> {
     try {
-      const bills = await this.billRepository.findMany({
-        status: params.status,
-        sponsorId: params.sponsorId,
-        limit: params.limit || 20,
-        offset: params.offset || 0
-      });
+      const conditions: any[] = [];
 
-      return Ok(bills);
+      if (params.status) {
+        conditions.push(eq(bills.status, params.status));
+      }
+
+      if (params.sponsorId) {
+        conditions.push(eq(bills.sponsor_id, params.sponsorId));
+      }
+
+      let query = this.db.select().from(bills);
+
+      if (conditions.length > 0) {
+        query = query.where(and(...conditions)) as any;
+      }
+
+      const result = await query
+        .limit(params.limit || 20)
+        .offset(params.offset || 0)
+        .orderBy(sql`${bills.updated_at} DESC`);
+
+      return new Ok(result);
 
     } catch (error) {
-      return Err(new BillServiceError('BILLS_FETCH_FAILED', error instanceof Error ? error.message : 'Failed to fetch bills'));
+      return new Err(new BillServiceError('BILLS_FETCH_FAILED', error instanceof Error ? error.message : 'Failed to fetch bills'));
     }
   }
 
   /**
    * Gets bill with stakeholders and comments (aggregate operation)
+   * Note: This version works without bill_engagement, bill_votes, and bill_trackers tables
    */
   async getBillAggregate(billId: string): Promise<Result<{
-    bill: Bill;
-    stakeholders: Array<{id: string, role: string}>;
-    comments: Array<{id: string, content: string, userId: string, createdAt: Date}>;
-    votes: Array<{userId: string, voteType: BillVoteType, createdAt: Date}>;
+    bill: any;
+    stakeholders: Array<{ id: string, role: string }>;
+    comments: Array<{ id: string, content: string, userId: string, createdAt: Date }>;
+    votes: Array<{ userId: string, voteType: BillVoteType, createdAt: Date }>;
   }, BillServiceError>> {
     try {
-      const bill = await this.billRepository.findById(billId);
+      const [bill] = await this.db
+        .select()
+        .from(bills)
+        .where(eq(bills.id, billId))
+        .limit(1);
+
       if (!bill) {
-        return Err(new BillServiceError('BILL_NOT_FOUND', 'Bill not found'));
+        return new Err(new BillServiceError('BILL_NOT_FOUND', 'Bill not found'));
       }
 
-      const [stakeholders, comments, votes] = await Promise.all([
-        this.billRepository.findBillStakeholders(billId),
-        this.billRepository.findBillComments(billId),
-        this.billRepository.findBillVotes(billId)
-      ]);
+      // Build stakeholders list from available data
+      const stakeholders: Array<{ id: string, role: string }> = [];
 
-      return Ok({
+      if (bill.sponsor_id) {
+        stakeholders.push({ id: bill.sponsor_id, role: 'sponsor' });
+      }
+
+      // Return the aggregate with empty arrays for features not yet implemented
+      return new Ok({
         bill,
         stakeholders,
-        comments,
-        votes
+        comments: [], // Will be populated when comments table is available
+        votes: [] // Will be populated when bill_votes table is available
       });
 
     } catch (error) {
-      return Err(new BillServiceError('AGGREGATE_FETCH_FAILED', error instanceof Error ? error.message : 'Failed to fetch bill aggregate'));
+      return new Err(new BillServiceError('AGGREGATE_FETCH_FAILED', error instanceof Error ? error.message : 'Failed to fetch bill aggregate'));
     }
   }
 
@@ -306,30 +348,64 @@ export class BillsApplicationService {
    */
   async getBillStatistics(): Promise<Result<{
     totalBills: number;
-    billsByStatus: Array<{status: BillStatus, count: number}>;
+    billsByStatus: Array<{ status: BillStatus, count: number }>;
     recentActivity: number;
   }, BillServiceError>> {
     try {
-      const stats = await this.billRepository.getBillStatistics();
-      return Ok(stats);
+      // Get total bills count
+      const [totalResult] = await this.db
+        .select({ count: sql<number>`COUNT(*)` })
+        .from(bills);
+
+      // Get bills by status
+      const statusResults = await this.db
+        .select({
+          status: bills.status,
+          count: sql<number>`COUNT(*)`
+        })
+        .from(bills)
+        .groupBy(bills.status);
+
+      // Get recent activity (last 7 days)
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      const [recentActivityResult] = await this.db
+        .select({ count: sql<number>`COUNT(*)` })
+        .from(bills)
+        .where(sql`${bills.updated_at} >= ${sevenDaysAgo}`);
+
+      const stats = {
+        totalBills: Number(totalResult.count),
+        billsByStatus: statusResults.map((r: { status: BillStatus; count: number }) => ({
+          status: r.status,
+          count: Number(r.count)
+        })),
+        recentActivity: Number(recentActivityResult.count)
+      };
+
+      return new Ok(stats);
 
     } catch (error) {
-      return Err(new BillServiceError('STATISTICS_FETCH_FAILED', error instanceof Error ? error.message : 'Failed to fetch statistics'));
+      return new Err(new BillServiceError('STATISTICS_FETCH_FAILED', error instanceof Error ? error.message : 'Failed to fetch statistics'));
     }
   }
 }
 
 // Export singleton instance with dependencies
-// Note: In a real application, these would be injected via DI container
-import { billRepository } from '../infrastructure/repositories/bill-repository-impl';
-import { userRepository } from '../../users/infrastructure/repositories/user-repository-impl';
-import { notificationChannelService } from '../../infrastructure/notifications/notification-channels';
-import { domainEventPublisher } from '../../infrastructure/events/domain-event-publisher';
-import { databaseService } from '../../infrastructure/database/database-service';
+import { UserService as UserServiceClass } from '../../users/application/user-service-direct';
+import { notificationChannelService } from '../../../infrastructure/notifications/notification-channels';
+import { InMemoryDomainEventPublisher } from '../domain/events/bill-events';
 
+// Create the user service instance
+const userServiceInstance = new UserServiceClass();
+
+// Create the domain event publisher
+const domainEventPublisher = new InMemoryDomainEventPublisher();
+
+// Create and export the singleton instance
 export const billsApplicationService = new BillsApplicationService(
-  billRepository,
-  userRepository,
+  userServiceInstance,
   notificationChannelService,
   domainEventPublisher,
   databaseService

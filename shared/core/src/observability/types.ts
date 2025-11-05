@@ -6,11 +6,75 @@
  */
 
 // Re-export all types from sub-modules for convenience
-export * from './logging/types';
-export * from './health/types';
-export * from './error-management/types';
-export * from './metrics/types';
-export * from './tracing/types';
+export type {
+  LogLevel,
+  LogContext,
+  LogMetrics,
+  RequestLogData,
+  DatabaseQueryLogData,
+  CacheOperationLogData,
+  SecurityEventLogData,
+  BusinessEventLogData,
+  PerformanceLogData,
+  StoredLogEntry,
+  LogQueryFilters,
+  LogAggregation,
+  LogRotationConfig,
+  LoggerOptions,
+  ErrorTrackerInterface,
+  LogTransport,
+  Logger,
+  LoggerChild
+} from './logging/types';
+export type {
+  HealthStatus,
+  HealthCheck,
+  HealthCheckResult,
+  HealthReport,
+  HealthCheckOptions,
+  HealthOrchestratorOptions,
+  HealthMetrics
+} from './health/types';
+export type {
+  ErrorHandler as ErrorHandlerInterface,
+  ErrorReporter,
+  ErrorRecovery,
+  ErrorContext,
+  ErrorMetrics,
+  ErrorAggregation,
+  UserErrorReport,
+  RecoveryOption,
+  UserFeedback,
+  ErrorAnalytics,
+  ErrorMonitor,
+  ErrorRecoveryEngine,
+  RecoverySuggestion,
+  ErrorBoundaryConfig,
+  ErrorTrackingIntegration,
+  ErrorDashboardData
+} from './error-management/types';
+export type {
+  Counter,
+  Gauge,
+  Histogram,
+  Summary,
+  AnyMetric,
+  Metric,
+  MetricValue,
+  MetricsRegistry,
+  MetricType
+} from './metrics/types';
+export type {
+  Tracer,
+  Span,
+  SpanContext,
+  SpanKind,
+  SpanOptions,
+  SpanStatus,
+  TracingConfig,
+  SamplingConfig,
+  SamplingRule
+} from './tracing/types';
 
 // Core observability interfaces
 export interface ObservabilityConfig {

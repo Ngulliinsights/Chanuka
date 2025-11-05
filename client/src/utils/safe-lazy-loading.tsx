@@ -1,6 +1,9 @@
 import { lazy, LazyExoticComponent, ComponentType, Suspense } from "react";
 import { logger } from "./browser-logger";
-import { EnhancedErrorBoundary, ChunkErrorFallback } from "../components/error-handling";
+import {
+  EnhancedErrorBoundary,
+  ChunkErrorFallback,
+} from "../components/error-handling";
 
 // Safe lazy component creation with error handling and retry mechanism
 function createSafeLazyComponent<P extends object>(
@@ -14,7 +17,10 @@ function createSafeLazyComponent<P extends object>(
       const module = await retryableImport();
       return module;
     } catch (error) {
-      logger.error(`Failed to load component ${componentName} after retries:`, error);
+      logger.error(
+        `Failed to load component ${componentName} after retries:`,
+        error
+      );
       // Return a fallback component
       return {
         default: (() => (
@@ -27,7 +33,7 @@ function createSafeLazyComponent<P extends object>(
               Reload Page
             </button>
           </div>
-        )) as ComponentType<P>
+        )) as ComponentType<P>,
       };
     }
   });
@@ -57,7 +63,8 @@ export function createSafeLazyPage<P extends object = {}>(
   } = options;
 
   const importFn = (() =>
-    /* @vite-ignore */ import(path as any)) as () => Promise<{
+    // @vite-ignore
+    import(path as any)) as () => Promise<{
     default: ComponentType<P>;
   }>;
   const component = createSafeLazyComponent(importFn, pageName);
@@ -90,9 +97,8 @@ export function createNamedExportLazy<P extends object = {}>(
 ): LazyExoticComponent<ComponentType<P>> {
   // This wrapper ensures proper type inference by explicitly typing the return
   const moduleImport = (() =>
-    /* @vite-ignore */ import(path as any)) as () => Promise<
-    Record<string, any>
-  >;
+    // @vite-ignore
+    import(path as any)) as () => Promise<Record<string, any>>;
   const typedImport = async (): Promise<{ default: ComponentType<P> }> => {
     const module = await moduleImport();
     const Component = module[exportName] as ComponentType<P>;
@@ -281,9 +287,10 @@ export function retryLazyComponentLoad<P extends object>(
         lastError = error as Error;
 
         // Check if this is a chunk loading error (network/build issue)
-        const isChunkError = lastError.message.includes('Loading chunk') || 
-                           lastError.message.includes('ChunkLoadError') ||
-                           lastError.name === 'ChunkLoadError';
+        const isChunkError =
+          lastError.message.includes("Loading chunk") ||
+          lastError.message.includes("ChunkLoadError") ||
+          lastError.name === "ChunkLoadError";
 
         // Don't retry on the last attempt or for non-chunk errors
         if (attempt < maxRetries && (isChunkError || attempt === 0)) {
@@ -356,7 +363,9 @@ export function createLazyComponentBatch<T extends Record<string, string>>(
 
   return Object.entries(importMap).reduce(
     (batch, [componentName, importPath]) => {
-      const importFn = () => /* @vite-ignore */ import(importPath);
+      const importFn = () =>
+        // @vite-ignore
+        import(importPath);
 
       const lazyComponent = enableRetry
         ? createRetryableLazyComponent(importFn, componentName, retryOptions)

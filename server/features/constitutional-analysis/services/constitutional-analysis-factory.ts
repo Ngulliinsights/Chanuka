@@ -8,10 +8,7 @@ import { ConstitutionalAnalyzer } from '../application/constitutional-analyzer.j
 import { ProvisionMatcherService } from '../application/provision-matcher.js';
 import { PrecedentFinderService } from '../application/precedent-finder.js';
 import { ExpertFlaggingService } from '../application/expert-flagging-service.js';
-import { ConstitutionalProvisionsRepository } from '../infrastructure/repositories/constitutional-provisions-repository.js';
-import { LegalPrecedentsRepository } from '../infrastructure/repositories/legal-precedents-repository.js';
-import { ConstitutionalAnalysesRepository } from '../infrastructure/repositories/constitutional-analyses-repository.js';
-import { ExpertReviewQueueRepository } from '../infrastructure/repositories/expert-review-queue-repository.js';
+import { constitutionalAnalysisServiceComplete } from '../application/constitutional-analysis-service-complete.js';
 import { LegalDatabaseClient } from '../infrastructure/external/legal-database-client.js';
 import { AnalysisConfiguration } from '../types/index.js';
 
@@ -115,11 +112,11 @@ export class ConstitutionalAnalysisFactory {
    * Create provision matcher service
    */
   createProvisionMatcher(
-    provisionsRepo?: ConstitutionalProvisionsRepository,
     legalDbClient?: LegalDatabaseClient
   ): ProvisionMatcherService {
     return new ProvisionMatcherService(
-      provisionsRepo || this.createProvisionsRepository()
+      constitutionalAnalysisServiceComplete,
+      legalDbClient || this.createLegalDatabaseClient()
     );
   }
 
@@ -127,52 +124,24 @@ export class ConstitutionalAnalysisFactory {
    * Create precedent finder service
    */
   createPrecedentFinder(
-    precedentsRepo?: LegalPrecedentsRepository,
     legalDbClient?: LegalDatabaseClient
   ): PrecedentFinderService {
     return new PrecedentFinderService(
-      precedentsRepo || this.createPrecedentsRepository()
+      constitutionalAnalysisServiceComplete,
+      legalDbClient || this.createLegalDatabaseClient()
     );
   }
 
   /**
    * Create expert flagging service
    */
-  createExpertFlagger(
-    expertReviewRepo?: ExpertReviewQueueRepository
-  ): ExpertFlaggingService {
+  createExpertFlagger(): ExpertFlaggingService {
     return new ExpertFlaggingService(
-      expertReviewRepo || this.createExpertReviewRepository()
+      constitutionalAnalysisServiceComplete
     );
   }
 
-  /**
-   * Create constitutional provisions repository
-   */
-  createProvisionsRepository(): ConstitutionalProvisionsRepository {
-    return new ConstitutionalProvisionsRepository();
-  }
-
-  /**
-   * Create legal precedents repository
-   */
-  createPrecedentsRepository(): LegalPrecedentsRepository {
-    return new LegalPrecedentsRepository();
-  }
-
-  /**
-   * Create constitutional analyses repository
-   */
-  createAnalysesRepository(): ConstitutionalAnalysesRepository {
-    return new ConstitutionalAnalysesRepository();
-  }
-
-  /**
-   * Create expert review queue repository
-   */
-  createExpertReviewRepository(): ExpertReviewQueueRepository {
-    return new ExpertReviewQueueRepository();
-  }
+  // Repository creation methods removed - using consolidated service instead
 
   /**
    * Create legal database client

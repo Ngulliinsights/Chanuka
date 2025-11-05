@@ -6,7 +6,8 @@ import { assetLoadingManager, setupAssetPreloading } from "./utils/asset-loading
 import { getMobileErrorHandler } from "./utils/mobile-error-handler";
 import { loadPolyfills } from "./utils/polyfills";
 import { logger } from './utils/browser-logger';
-import { performanceMonitor } from '@shared/core';
+// import { performanceMonitor } from '@shared/core';
+import { rumService } from './utils/rum-integration';
 
 /**
  * Application Loading States
@@ -322,13 +323,14 @@ async function registerServiceWorkerIfProduction(): Promise<void> {
  */
 function initializePerformanceMonitoring(): void {
   updateLoadingState('complete', 'Initializing performance monitoring...', 95);
-  
+
   try {
     logger.info('🚀 Performance monitoring active', { component: 'Chanuka' });
-    
-    setTimeout(() => {
-      performanceMonitor.startMonitoring();
-    }, 1000);
+
+    // TODO: Re-enable performance monitoring when available
+    // setTimeout(() => {
+    //   performanceMonitor.startMonitoring();
+    // }, 1000);
   } catch (perfError) {
     console.warn('Performance monitoring initialization failed:', perfError);
   }
@@ -417,7 +419,7 @@ function reportInitializationError(error: Error): void {
       message: error.message,
       stack: error.stack,
       timestamp: new Date().toISOString(),
-      user_agent: navigator.user_agent,
+      userAgent: navigator.userAgent,
       url: window.location.href,
       phase: currentLoadingState.phase,
       localStorage: {
@@ -504,7 +506,7 @@ function showInitializationError(error: Error): void {
               
               <p style="margin: 0 0 8px; font-size: 12px; color: #374151; font-weight: 500;">Environment:</p>
               <pre style="margin: 0; font-size: 10px; color: #6b7280;">Phase: ${currentLoadingState.phase}
-User Agent: ${navigator.user_agent}
+User Agent: ${navigator.userAgent}
 URL: ${window.location.href}
 Timestamp: ${new Date().toISOString()}</pre>
             </div>

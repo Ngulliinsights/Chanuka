@@ -5,7 +5,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import { Result, ok, err } from '../../primitives/types/result';
-import { logger } from '../../logging/logger';
+import { logger } from '../../observability/logging/logger';
 import { getMetricsCollector } from '../metrics';
 import { IRateLimitStore, RateLimitOptions, RateLimitResult, RateLimitHeaders } from '../types';
 

@@ -12,7 +12,7 @@ import {
   SearchContext,
   SearchAnalytics
 } from "./types/search.types";
-import { queryBuilderService } from "../services/query-builder.service";
+// Query builder service removed - using direct Drizzle queries
 import { parallelQueryExecutor, QueryTask } from "../utils/parallel-query-executor";
 import { suggestionRankingService, type RankingContext } from "./suggestion-ranking.service";
 
@@ -109,6 +109,19 @@ export class SuggestionEngineService {
   private lastCleanup: number = Date.now();
 
   /**
+   * Sanitize and validate search query
+   * Migrated from QueryBuilderService to use direct implementation
+   */
+  private sanitizeQuery(query: string): string {
+    return query
+      .trim()
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '') // Remove special characters except hyphens
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .substring(0, 100); // Limit length
+  }
+
+  /**
    * Get autocomplete suggestions with optimized parallel queries
    * This is the main entry point for autocomplete functionality.
    * It coordinates multiple data sources and combines them intelligently.
@@ -124,7 +137,7 @@ export class SuggestionEngineService {
     includeMetadata: boolean = true
   ): Promise<AutocompleteResult> {
     // Sanitize input to prevent SQL injection and validate minimum query length
-    const sanitizedQuery = queryBuilderService.sanitizeQuery(partialQuery);
+    const sanitizedQuery = this.sanitizeQuery(partialQuery);
     if (sanitizedQuery.length < CONFIG.MIN_QUERY_LENGTH) {
       return this.getEmptyAutocompleteResult();
     }

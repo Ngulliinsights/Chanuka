@@ -1,24 +1,29 @@
 import { Bill, BillNumber, BillTitle, BillSummary } from '../entities/bill';
-import { BillRepository } from '../repositories/bill-repository';
-import { UserRepository } from '../../../users/domain/repositories/user-repository';
+// Repository pattern removed - using direct service calls
+import { UserService } from '../../../users/application/user-service-direct';
 import { NotificationService } from '../../../notifications/domain/services/notification-service';
 import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '../events/bill-events';
-import { DomainEventPublisher } from '../../../../infrastructure/events/domain-event-publisher';
+import { DomainEventPublisher } from '../events/bill-events';
 import { databaseService } from '../../../../infrastructure/database/database-service';
 import { BillStatus, BillVoteType } from '@shared/schema';
+import { eq, and, sql, count, desc } from 'drizzle-orm';
+import { bills, bill_engagement, sponsors, users } from '@shared/schema/foundation';
+import { bill_votes, bill_trackers } from '@shared/schema/citizen_participation';
 
 /**
  * Business rules and validation logic for bill operations
- * Coordinates complex operations across multiple repositories
+ * Uses direct Drizzle ORM queries for improved performance
  */
 export class BillDomainService {
   constructor(
-    private readonly billRepository: BillRepository,
-    private readonly userRepository: UserRepository,
+    private readonly userService: UserService,
     private readonly notificationService: NotificationService,
-    private readonly eventPublisher: DomainEventPublisher,
-    private readonly databaseService: DatabaseService
+    private readonly eventPublisher: DomainEventPublisher
   ) { }
+
+  private get db() {
+    return databaseService.getDatabase();
+  }
 
   /**
    * Creates a new bill with business rule validation and transaction coordination
@@ -33,7 +38,7 @@ export class BillDomainService {
   }): Promise<Bill> {
     return databaseService.withTransaction(async (tx) => {
       // Business Rule: Validate sponsor exists and is authorized
-      const sponsor = await this.userRepository.findById(params.sponsorId);
+      const sponsor = await this.userService.findById(params.sponsorId);
       if (!sponsor) {
         throw new Error('Sponsor not found');
       }
@@ -43,31 +48,40 @@ export class BillDomainService {
         throw new Error('Only legislators can sponsor bills');
       }
 
-      // Business Rule: Check for duplicate bill numbers
-      const existingBill = await this.billRepository.findByBillNumber(params.billNumber.getValue());
+      // Business Rule: Check for duplicate bill numbers using direct Drizzle query
+      const [existingBill] = await this.db
+        .select()
+        .from(bills)
+        .where(eq(bills.bill_number, params.billNumber.getValue()))
+        .limit(1);
+      
       if (existingBill) {
         throw new Error('Bill number already exists');
       }
 
-      // Create the bill
-      const bill = Bill.create({
-        billNumber: params.billNumber,
-        title: params.title,
-        summary: params.summary,
-        sponsorId: params.sponsorId,
-        tags: params.tags,
-        affectedCounties: params.affectedCounties
-      });
-
-      // Save to repository within transaction
-      const savedBill = await this.billRepository.save(bill);
+      // Create the bill using direct Drizzle insert
+      const [savedBill] = await this.db
+        .insert(bills)
+        .values({
+          bill_number: params.billNumber.getValue(),
+          title: params.title.getValue(),
+          summary: params.summary?.getValue(),
+          sponsor_id: params.sponsorId,
+          tags: params.tags,
+          affected_counties: params.affectedCounties,
+          status: 'drafted',
+          chamber: 'national_assembly', // Default chamber
+          created_at: new Date(),
+          updated_at: new Date()
+        })
+        .returning();
 
       // Publish domain event
       await this.eventPublisher.publish(new BillCreatedEvent(
-        savedBill.getId(),
-        savedBill.getBillNumber().getValue(),
-        savedBill.getTitle().getValue(),
-        savedBill.getSponsorId()!
+        savedBill.id,
+        savedBill.bill_number,
+        savedBill.title,
+        savedBill.sponsor_id!
       ));
 
       // Send notifications to stakeholders (outside transaction for performance)
@@ -80,26 +94,34 @@ export class BillDomainService {
   /**
    * Updates bill status with business rule validation and transaction coordination
    */
-  async updateBillStatus(billId: string, newStatus: BillStatus, updatedBy: string): Promise<Bill> {
+  async updateBillStatus(billId: string, newStatus: BillStatus, updatedBy: string): Promise<any> {
     return databaseService.withTransaction(async (tx) => {
-      const bill = await this.billRepository.findById(billId);
+      // Get bill using direct Drizzle query
+      const [bill] = await this.db
+        .select()
+        .from(bills)
+        .where(eq(bills.id, billId))
+        .limit(1);
+      
       if (!bill) {
         throw new Error('Bill not found');
-      }
-
-      // Business Rule: Only active bills can have status changes
-      if (!bill.isActive()) {
-        throw new Error('Cannot update status of inactive bill');
       }
 
       // Business Rule: Validate user permissions for status changes
       await this.validateStatusChangePermission(bill, newStatus, updatedBy);
 
-      const oldStatus = bill.getStatus();
-      bill.updateStatus(newStatus);
+      const oldStatus = bill.status;
 
-      // Save updated bill within transaction
-      const updatedBill = await this.billRepository.save(bill);
+      // Update bill status using direct Drizzle query
+      const [updatedBill] = await this.db
+        .update(bills)
+        .set({
+          status: newStatus,
+          last_action_date: new Date(),
+          updated_at: new Date()
+        })
+        .where(eq(bills.id, billId))
+        .returning();
 
       // Publish domain event
       await this.eventPublisher.publish(new BillStatusChangedEvent(
@@ -119,35 +141,58 @@ export class BillDomainService {
   /**
    * Records a vote on a bill with validation
    */
-  async recordVote(billId: string, userId: string, voteType: BillVoteType): Promise<Bill> {
-    const bill = await this.billRepository.findById(billId);
+  async recordVote(billId: string, userId: string, voteType: BillVoteType): Promise<any> {
+    // Get bill using direct Drizzle query
+    const [bill] = await this.db
+      .select()
+      .from(bills)
+      .where(eq(bills.id, billId))
+      .limit(1);
+    
     if (!bill) {
       throw new Error('Bill not found');
     }
 
-    // Business Rule: Only active bills can receive votes
-    if (!bill.isActive()) {
-      throw new Error('Cannot vote on inactive bill');
-    }
-
     // Business Rule: Validate user can vote
-    const user = await this.userRepository.findById(userId);
+    const user = await this.userService.findById(userId);
     if (!user) {
       throw new Error('User not found');
     }
 
-    // Business Rule: Check if user has already voted
-    const existingVote = await this.billRepository.findVote(billId, userId);
+    // Business Rule: Check if user has already voted using direct query
+    const [existingVote] = await this.db
+      .select()
+      .from(bill_votes)
+      .where(and(
+        eq(bill_votes.bill_id, billId),
+        eq(bill_votes.user_id, userId)
+      ))
+      .limit(1);
+    
     if (existingVote) {
       throw new Error('User has already voted on this bill');
     }
 
-    // Record the vote
-    bill.recordVote(voteType);
-    const updatedBill = await this.billRepository.save(bill);
+    // Save the vote using direct Drizzle insert
+    await this.db.insert(bill_votes).values({
+      bill_id: billId,
+      user_id: userId,
+      vote_type: voteType,
+      voted_at: new Date(),
+      created_at: new Date(),
+      updated_at: new Date()
+    });
 
-    // Save the vote
-    await this.billRepository.saveVote(billId, userId, voteType);
+    // Update bill vote counts
+    const voteCountField = voteType === 'support' ? 'vote_count_for' : 'vote_count_against';
+    const [updatedBill] = await this.db
+      .update(bills)
+      .set({
+        [voteCountField]: sql`${bills[voteCountField]} + 1`,
+        updated_at: new Date()
+      })
+      .where(eq(bills.id, billId))
+      .returning();
 
     // Publish domain event
     await this.eventPublisher.publish(new BillUpdatedEvent(
@@ -170,34 +215,47 @@ export class BillDomainService {
       tags?: string[];
     },
     updatedBy: string
-  ): Promise<Bill> {
-    const bill = await this.billRepository.findById(billId);
+  ): Promise<any> {
+    // Get bill using direct Drizzle query
+    const [bill] = await this.db
+      .select()
+      .from(bills)
+      .where(eq(bills.id, billId))
+      .limit(1);
+    
     if (!bill) {
       throw new Error('Bill not found');
     }
 
-    // Business Rule: Only modifiable bills can be updated
-    if (!bill.canBeModified()) {
+    // Business Rule: Only modifiable bills can be updated (drafted or introduced)
+    if (!['drafted', 'introduced'].includes(bill.status)) {
       throw new Error('Bill cannot be modified');
     }
 
     // Business Rule: Validate update permissions
     await this.validateUpdatePermission(bill, updatedBy);
 
-    // Apply updates
+    // Prepare updates
+    const updateData: any = {
+      updated_at: new Date()
+    };
+
     if (updates.title) {
-      bill.updateTitle(updates.title);
+      updateData.title = updates.title.getValue();
     }
     if (updates.summary) {
-      bill.updateSummary(updates.summary);
+      updateData.summary = updates.summary.getValue();
     }
     if (updates.tags) {
-      // Remove existing tags and add new ones
-      bill.getTags().forEach(tag => bill.removeTag(tag));
-      updates.tags.forEach(tag => bill.addTag(tag));
+      updateData.tags = updates.tags;
     }
 
-    const updatedBill = await this.billRepository.save(bill);
+    // Update bill using direct Drizzle query
+    const [updatedBill] = await this.db
+      .update(bills)
+      .set(updateData)
+      .where(eq(bills.id, billId))
+      .returning();
 
     // Publish domain event
     await this.eventPublisher.publish(new BillUpdatedEvent(
@@ -213,48 +271,185 @@ export class BillDomainService {
    * Records engagement (view, comment, share) on a bill
    */
   async recordEngagement(billId: string, userId: string, engagementType: 'view' | 'comment' | 'share'): Promise<void> {
-    const bill = await this.billRepository.findById(billId);
+    // Check if bill exists using direct Drizzle query
+    const [bill] = await this.db
+      .select()
+      .from(bills)
+      .where(eq(bills.id, billId))
+      .limit(1);
+    
     if (!bill) {
       throw new Error('Bill not found');
     }
 
-    // Record engagement
-    bill.recordEngagement(engagementType);
-    await this.billRepository.save(bill);
+    // Check if engagement already exists
+    const [existingEngagement] = await this.db
+      .select()
+      .from(bill_engagement)
+      .where(and(
+        eq(bill_engagement.bill_id, billId),
+        eq(bill_engagement.user_id, userId)
+      ))
+      .limit(1);
 
-    // Save engagement record
-    await this.billRepository.saveEngagement(billId, userId, engagementType);
+    if (existingEngagement) {
+      // Update existing engagement
+      const updates: any = {
+        lastEngaged: new Date(),
+        updated_at: new Date()
+      };
+
+      switch (engagementType) {
+        case 'view':
+          updates.view_count = sql`${bill_engagement.view_count} + 1`;
+          break;
+        case 'comment':
+          updates.comment_count = sql`${bill_engagement.comment_count} + 1`;
+          break;
+        case 'share':
+          updates.share_count = sql`${bill_engagement.share_count} + 1`;
+          break;
+      }
+
+      await this.db
+        .update(bill_engagement)
+        .set(updates)
+        .where(eq(bill_engagement.id, existingEngagement.id));
+    } else {
+      // Create new engagement
+      const engagement_data: any = {
+        bill_id: billId,
+        user_id: userId,
+        view_count: engagementType === 'view' ? 1 : 0,
+        comment_count: engagementType === 'comment' ? 1 : 0,
+        share_count: engagementType === 'share' ? 1 : 0,
+        engagement_score: "1",
+        lastEngaged: new Date(),
+        created_at: new Date(),
+        updated_at: new Date()
+      };
+
+      await this.db.insert(bill_engagement).values(engagement_data);
+    }
+
+    // Update bill-level counters
+    if (engagementType === 'view' || engagementType === 'share') {
+      const updateField = engagementType === 'view' ? 'view_count' : 'share_count';
+      await this.db
+        .update(bills)
+        .set({
+          [updateField]: sql`${bills[updateField]} + 1`,
+          updated_at: new Date()
+        })
+        .where(eq(bills.id, billId));
+    }
   }
 
   /**
    * Gets bill with full aggregate data (comments, votes, stakeholders)
    */
   async getBillAggregate(billId: string) {
-    return await this.billRepository.findBillAggregate(billId);
+    // Get bill using direct Drizzle query
+    const [bill] = await this.db
+      .select()
+      .from(bills)
+      .where(eq(bills.id, billId))
+      .limit(1);
+    
+    if (!bill) {
+      return null;
+    }
+
+    // Get related data in parallel
+    const [votes, engagement, trackers] = await Promise.all([
+      this.db
+        .select()
+        .from(bill_votes)
+        .where(eq(bill_votes.bill_id, billId)),
+      
+      this.db
+        .select()
+        .from(bill_engagement)
+        .where(eq(bill_engagement.bill_id, billId)),
+      
+      this.db
+        .select()
+        .from(bill_trackers)
+        .where(eq(bill_trackers.bill_id, billId))
+    ]);
+
+    return {
+      bill,
+      votes,
+      engagement,
+      trackers
+    };
   }
 
   /**
    * Gets bills with aggregate data for a user (tracked, voted, sponsored, commented)
    */
   async getUserBillsAggregate(userId: string) {
-    return await this.billRepository.findUserBillsAggregate(userId);
+    // Get bills the user has interacted with
+    const [trackedBills, votedBills, sponsoredBills] = await Promise.all([
+      this.db
+        .select({ bill: bills })
+        .from(bills)
+        .innerJoin(bill_trackers, eq(bills.id, bill_trackers.bill_id))
+        .where(eq(bill_trackers.user_id, userId)),
+      
+      this.db
+        .select({ bill: bills })
+        .from(bills)
+        .innerJoin(bill_votes, eq(bills.id, bill_votes.bill_id))
+        .where(eq(bill_votes.user_id, userId)),
+      
+      this.db
+        .select()
+        .from(bills)
+        .where(eq(bills.sponsor_id, userId))
+    ]);
+
+    return {
+      tracked: trackedBills.map(b => b.bill),
+      voted: votedBills.map(b => b.bill),
+      sponsored: sponsoredBills
+    };
   }
 
   /**
    * Adds a user as a bill tracker
    */
   async addBillTracker(billId: string, userId: string): Promise<void> {
-    const bill = await this.billRepository.findById(billId);
+    // Check if bill exists using direct Drizzle query
+    const [bill] = await this.db
+      .select()
+      .from(bills)
+      .where(eq(bills.id, billId))
+      .limit(1);
+    
     if (!bill) {
       throw new Error('Bill not found');
     }
 
-    // Business Rule: Only active bills can be tracked
-    if (!bill.isActive()) {
-      throw new Error('Cannot track inactive bill');
-    }
+    // Check if already tracking
+    const [existingTracker] = await this.db
+      .select()
+      .from(bill_trackers)
+      .where(and(
+        eq(bill_trackers.bill_id, billId),
+        eq(bill_trackers.user_id, userId)
+      ))
+      .limit(1);
 
-    await this.billRepository.addBillTracker(billId, userId);
+    if (!existingTracker) {
+      await this.db.insert(bill_trackers).values({
+        bill_id: billId,
+        user_id: userId,
+        created_at: new Date(),
+        updated_at: new Date()
+      });
+    }
 
     // Publish domain event
     await this.eventPublisher.publish(new BillUpdatedEvent(
@@ -268,7 +463,12 @@ export class BillDomainService {
    * Removes a user from bill tracking
    */
   async removeBillTracker(billId: string, userId: string): Promise<void> {
-    await this.billRepository.removeBillTracker(billId, userId);
+    await this.db
+      .delete(bill_trackers)
+      .where(and(
+        eq(bill_trackers.bill_id, billId),
+        eq(bill_trackers.user_id, userId)
+      ));
 
     // Publish domain event
     await this.eventPublisher.publish(new BillUpdatedEvent(
@@ -290,7 +490,7 @@ export class BillDomainService {
     const { bill, comments, votes, engagement } = aggregate;
 
     // Calculate engagement rate
-    const totalUsers = await this.userRepository.count();
+    const totalUsers = await this.userService.countUsers();
     const engagementRate = totalUsers > 0 ? (engagement.totalEngagedUsers / totalUsers) * 100 : 0;
 
     // Calculate support ratio
@@ -360,8 +560,20 @@ export class BillDomainService {
   /**
    * Gets bills requiring stakeholder attention based on business rules
    */
-  async getBillsRequiringAttention(): Promise<Bill[]> {
-    return await this.billRepository.findRequiringAttention();
+  async getBillsRequiringAttention(): Promise<any[]> {
+    // Bills requiring attention: stalled for >30 days, high engagement but no recent action
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    return await this.db
+      .select()
+      .from(bills)
+      .where(and(
+        sql`${bills.last_action_date} < ${thirtyDaysAgo}`,
+        sql`${bills.engagement_score} > 100`,
+        sql`${bills.status} IN ('committee', 'second_reading')`
+      ))
+      .orderBy(desc(bills.engagement_score));
   }
 
   /**
@@ -369,14 +581,19 @@ export class BillDomainService {
    */
   async bulkUpdateBillStatuses(billIds: string[], newStatus: BillStatus, updatedBy: string): Promise<void> {
     // Business Rule: Validate user permissions for bulk operations
-    const user = await this.userRepository.findById(updatedBy);
+    const user = await this.userService.findById(updatedBy);
     if (!user || !['admin', 'clerk'].includes(user.role)) {
       throw new Error('Insufficient permissions for bulk operations');
     }
 
     // Business Rule: Validate status transitions for each bill
     for (const billId of billIds) {
-      const bill = await this.billRepository.findById(billId);
+      const [bill] = await this.db
+        .select()
+        .from(bills)
+        .where(eq(bills.id, billId))
+        .limit(1);
+      
       if (!bill) {
         throw new Error(`Bill ${billId} not found`);
       }
@@ -385,8 +602,15 @@ export class BillDomainService {
       await this.validateStatusChangePermission(bill, newStatus, updatedBy);
     }
 
-    // Perform bulk update
-    await this.billRepository.bulkUpdateStatus(billIds, newStatus);
+    // Perform bulk update using direct Drizzle query
+    await this.db
+      .update(bills)
+      .set({
+        status: newStatus,
+        last_action_date: new Date(),
+        updated_at: new Date()
+      })
+      .where(sql`${bills.id} = ANY(${billIds})`);
 
     // Publish events for each bill
     for (const billId of billIds) {
@@ -441,8 +665,8 @@ export class BillDomainService {
   /**
    * Validates permissions for status changes
    */
-  private async validateStatusChangePermission(bill: Bill, newStatus: BillStatus, userId: string): Promise<void> {
-    const user = await this.userRepository.findById(userId);
+  private async validateStatusChangePermission(bill: any, newStatus: BillStatus, userId: string): Promise<void> {
+    const user = await this.userService.findById(userId);
     if (!user) {
       throw new Error('User not found');
     }
@@ -466,7 +690,7 @@ export class BillDomainService {
     }
 
     // Additional rule: Only the sponsor can withdraw a bill
-    if (newStatus === 'withdrawn' && bill.getSponsorId() !== userId) {
+    if (newStatus === 'withdrawn' && bill.sponsor_id !== userId) {
       throw new Error('Only the bill sponsor can withdraw the bill');
     }
   }
@@ -474,15 +698,15 @@ export class BillDomainService {
   /**
    * Validates permissions for content updates
    */
-  private async validateUpdatePermission(bill: Bill, userId: string): Promise<void> {
-    const user = await this.userRepository.findById(userId);
+  private async validateUpdatePermission(bill: any, userId: string): Promise<void> {
+    const user = await this.userService.findById(userId);
     if (!user) {
       throw new Error('User not found');
     }
 
     // Business Rule: Only sponsor or authorized personnel can update bill content
     const allowedRoles = ['senator', 'mp', 'governor', 'clerk', 'admin'];
-    const isSponsor = bill.getSponsorId() === userId;
+    const isSponsor = bill.sponsor_id === userId;
     const hasPermission = allowedRoles.includes(user.role) || isSponsor;
 
     if (!hasPermission) {
@@ -525,27 +749,35 @@ export class BillDomainService {
   /**
    * Gets all stakeholders for a bill (sponsor, trackers, interested parties)
    */
-  private async getBillStakeholders(bill: Bill): Promise<Array<{ id: string, role: string }>> {
+  private async getBillStakeholders(bill: any): Promise<Array<{ id: string, role: string }>> {
     const stakeholders = new Map<string, { id: string, role: string }>();
 
     // Add sponsor
-    if (bill.getSponsorId()) {
-      const sponsor = await this.userRepository.findById(bill.getSponsorId()!);
+    if (bill.sponsor_id) {
+      const sponsor = await this.userService.findById(bill.sponsor_id);
       if (sponsor) {
         stakeholders.set(sponsor.id, { id: sponsor.id, role: 'sponsor' });
       }
     }
 
-    // Add users tracking this bill
-    const trackers = await this.billRepository.findBillTrackers(bill.getId());
+    // Add users tracking this bill using direct Drizzle query
+    const trackers = await this.db
+      .select({ user_id: bill_trackers.user_id })
+      .from(bill_trackers)
+      .where(eq(bill_trackers.bill_id, bill.id));
+    
     for (const tracker of trackers) {
-      stakeholders.set(tracker.id, { id: tracker.id, role: 'tracker' });
+      stakeholders.set(tracker.user_id, { id: tracker.user_id, role: 'tracker' });
     }
 
-    // Add users who have engaged with the bill
-    const engagedUsers = await this.billRepository.findEngagedUsers(bill.getId());
+    // Add users who have engaged with the bill using direct Drizzle query
+    const engagedUsers = await this.db
+      .select({ user_id: bill_engagement.user_id })
+      .from(bill_engagement)
+      .where(eq(bill_engagement.bill_id, bill.id));
+    
     for (const user of engagedUsers) {
-      stakeholders.set(user.id, { id: user.id, role: 'engaged' });
+      stakeholders.set(user.user_id, { id: user.user_id, role: 'engaged' });
     }
 
     return Array.from(stakeholders.values());
@@ -561,8 +793,8 @@ export class BillDomainService {
     return mapping[eventType] || 'bill_notification';
   }
 
-  private generateNotificationTitle(bill: Bill, eventType: string): string {
-    const billNumber = bill.getBillNumber().getValue();
+  private generateNotificationTitle(bill: any, eventType: string): string {
+    const billNumber = bill.bill_number;
     const titles: Record<string, string> = {
       'created': `New Bill Introduced: ${billNumber}`,
       'status_changed': `Bill Status Changed: ${billNumber}`,
@@ -572,8 +804,8 @@ export class BillDomainService {
     return titles[eventType] || `Bill Notification: ${billNumber}`;
   }
 
-  private generateNotificationMessage(bill: Bill, eventType: string, additionalData?: any): string {
-    const billTitle = bill.getTitle().getValue();
+  private generateNotificationMessage(bill: any, eventType: string, additionalData?: any): string {
+    const billTitle = bill.title;
 
     switch (eventType) {
       case 'created':

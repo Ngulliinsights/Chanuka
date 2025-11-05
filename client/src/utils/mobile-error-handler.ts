@@ -5,7 +5,7 @@ import { logger } from './browser-logger';
  */
 
 export interface MobileErrorContext {
-  user_agent: string;
+  userAgent: string;
   viewport: {
     width: number;
     height: number;
@@ -412,7 +412,7 @@ export class MobileErrorHandler {
     const connection = (navigator as any).connection || {};
     
     return {
-      user_agent: navigator.user_agent,
+      userAgent: navigator.userAgent,
       viewport: this.getViewportInfo(),
       connection: {
         effectiveType: connection.effectiveType,

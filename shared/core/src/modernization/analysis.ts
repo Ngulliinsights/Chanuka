@@ -1,20 +1,15 @@
 import { EventEmitter } from 'events';
 import { promises as fs } from 'fs';
 import * as path from 'path';
-import { Logger } from '../logging';
-import { logger } from '../observability/logging';
-import {
-  AnalysisResult,
-  AnalysisType,
-  Finding,
-  FindingType,
-  FindingSeverity,
-  Recommendation,
-  RecommendedAction,
-  TaskPriority,
-  AnalysisMetrics,
-  AnalysisError
-} from './types';
+// Use lightweight logger interface to avoid coupling to a specific runtime signature used across the codebase
+type LoggerLike = {
+  info: (meta: unknown, message?: string) => void;
+  error: (err: unknown, message?: string) => void;
+  debug?: (meta: unknown, message?: string) => void;
+};
+
+import type { AnalysisResult, Finding, Recommendation } from './types';
+import { AnalysisType, FindingType, FindingSeverity, RecommendedAction, TaskPriority, AnalysisError } from './types';
 
 export interface AnalysisEngineOptions {
   config: {
@@ -23,13 +18,13 @@ export interface AnalysisEngineOptions {
     parallel: boolean;
     timeout: number;
   };
-  logger: Logger;
+  logger: LoggerLike;
   workingDirectory: string;
 }
 
 export class AnalysisEngine extends EventEmitter {
   private readonly config: AnalysisEngineOptions['config'];
-  private readonly logger: Logger;
+  private readonly logger: LoggerLike;
   private readonly workingDirectory: string;
 
   constructor(options: AnalysisEngineOptions) {
@@ -43,9 +38,9 @@ export class AnalysisEngine extends EventEmitter {
    * Run comprehensive analysis across all enabled types
    */
   public async runComprehensiveAnalysis(): Promise<AnalysisResult[]> {
-    this.logger.info({ 
+    this.logger.info({
       types: this.config.types,
-      parallel: this.config.parallel 
+      parallel: this.config.parallel
     }, 'Starting comprehensive analysis');
 
     const results: AnalysisResult[] = [];
@@ -68,7 +63,8 @@ export class AnalysisEngine extends EventEmitter {
           const result = await this.runAnalysis(type);
           results.push(result);
         } catch (error) {
-          this.logger.error(`Analysis failed for type ${type}:`, error);
+          const message = error instanceof Error ? error.message : String(error);
+          this.logger.error({ type, message }, 'Analysis failed');
           this.emit('analysis:error', error);
         }
       }
@@ -92,7 +88,7 @@ export class AnalysisEngine extends EventEmitter {
 
     const startTime = Date.now();
     
-    try {
+  try {
       let result: AnalysisResult;
       
       switch (type) {
@@ -125,11 +121,12 @@ export class AnalysisEngine extends EventEmitter {
       this.emit('analysis:completed', result);
       return result;
       
-    } catch (error) {
-      const analysisError = error instanceof AnalysisError 
-        ? error 
-        : new AnalysisError(`Analysis failed for ${type}: ${error.message}`, type);
-      
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      const analysisError = error instanceof AnalysisError
+        ? error
+        : new AnalysisError(`Analysis failed for ${type}: ${message}`, type);
+
       this.emit('analysis:error', analysisError);
       throw analysisError;
     }
@@ -165,8 +162,9 @@ export class AnalysisEngine extends EventEmitter {
       // Generate recommendations based on findings
       recommendations.push(...this.generateCleanupRecommendations(findings));
 
-    } catch (error) {
-      throw new AnalysisError(`Root directory analysis failed: ${error.message}`, AnalysisType.ROOT_DIRECTORY_CLEANUP);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new AnalysisError(`Root directory analysis failed: ${message}`, AnalysisType.ROOT_DIRECTORY_CLEANUP);
     }
 
     return {
@@ -299,7 +297,7 @@ export class AnalysisEngine extends EventEmitter {
           }
         };
       }
-    } catch (error) {
+    } catch (_error) {
       // Directory might be inaccessible, skip analysis
       return null;
     }
@@ -325,9 +323,9 @@ export class AnalysisEngine extends EventEmitter {
       // Analyze current AI integration state
       const hasAiDependencies = await this.checkAiDependencies();
       const hasAiConfig = await this.checkAiConfiguration();
-      const hasAiServices = await this.checkAiServices();
+  const hasAiServices = await this.checkAiServices();
 
-      if (!hasAiDependencies) {
+  if (!hasAiDependencies) {
         findings.push({
           id: 'missing-ai-deps',
           type: FindingType.MISSING_INTEGRATION,
@@ -375,8 +373,33 @@ export class AnalysisEngine extends EventEmitter {
         });
       }
 
-    } catch (error) {
-      throw new AnalysisError(`AI integration analysis failed: ${error.message}`, AnalysisType.AI_INTEGRATION);
+      if (!hasAiServices) {
+        findings.push({
+          id: 'missing-ai-services',
+          type: FindingType.MISSING_INTEGRATION,
+          severity: FindingSeverity.MEDIUM,
+          description: 'No AI service implementations found in the codebase',
+          location: this.workingDirectory,
+          impact: 'No runtime hooks for AI providers',
+          effort: 10,
+          metadata: { category: 'missing-services' }
+        });
+
+        recommendations.push({
+          id: 'implement-ai-services',
+          title: 'Implement AI Service Stubs',
+          description: 'Create service wrappers to interact with AI providers',
+          action: RecommendedAction.CONFIGURE,
+          priority: TaskPriority.MEDIUM,
+          estimatedEffort: 20,
+          benefits: ['Enables AI integrations', 'Standardized service interface'],
+          risks: ['Service costs', 'Complexity']
+        });
+      }
+
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new AnalysisError(`AI integration analysis failed: ${message}`, AnalysisType.AI_INTEGRATION);
     }
 
     return {
@@ -434,8 +457,9 @@ export class AnalysisEngine extends EventEmitter {
         });
       }
 
-    } catch (error) {
-      throw new AnalysisError(`Utilities migration analysis failed: ${error.message}`, AnalysisType.UTILITIES_MIGRATION);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new AnalysisError(`Utilities migration analysis failed: ${message}`, AnalysisType.UTILITIES_MIGRATION);
     }
 
     return {
@@ -501,8 +525,9 @@ export class AnalysisEngine extends EventEmitter {
         });
       }
 
-    } catch (error) {
-      throw new AnalysisError(`Dependency analysis failed: ${error.message}`, AnalysisType.DEPENDENCY_ANALYSIS);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new AnalysisError(`Dependency analysis failed: ${message}`, AnalysisType.DEPENDENCY_ANALYSIS);
     }
 
     return {
@@ -550,8 +575,9 @@ export class AnalysisEngine extends EventEmitter {
         });
       }
 
-    } catch (error) {
-      throw new AnalysisError(`Performance analysis failed: ${error.message}`, AnalysisType.PERFORMANCE_ANALYSIS);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new AnalysisError(`Performance analysis failed: ${message}`, AnalysisType.PERFORMANCE_ANALYSIS);
     }
 
     return {
@@ -640,6 +666,8 @@ export class AnalysisEngine extends EventEmitter {
   // Placeholder implementations for complex analysis methods
   private async searchForPatterns(patterns: string[]): Promise<string[]> {
     // Simplified implementation - would use proper file search
+    // Reference patterns to avoid unused-parameter lint warning
+    void patterns;
     return [];
   }
 
@@ -694,32 +722,32 @@ export class AnalysisEngine extends EventEmitter {
     return false;
   }
 
-  private async findUtilityFiles(patterns: string[]): Promise<string[]> {
+  private async findUtilityFiles(_patterns: string[]): Promise<string[]> {
     // Simplified implementation
     return [];
   }
 
-  private async findDuplicateUtilities(files: string[]): Promise<Finding[]> {
+  private async findDuplicateUtilities(_files: string[]): Promise<Finding[]> {
     // Simplified implementation
     return [];
   }
 
-  private async findScatteredUtilities(files: string[]): Promise<Finding[]> {
+  private async findScatteredUtilities(_files: string[]): Promise<Finding[]> {
     // Simplified implementation
     return [];
   }
 
-  private async checkOutdatedDependencies(deps: Record<string, string>): Promise<Finding[]> {
+  private async checkOutdatedDependencies(_deps: Record<string, string>): Promise<Finding[]> {
     // Simplified implementation
     return [];
   }
 
-  private async checkUnusedDependencies(deps: Record<string, string>): Promise<Finding[]> {
+  private async checkUnusedDependencies(_deps: Record<string, string>): Promise<Finding[]> {
     // Simplified implementation
     return [];
   }
 
-  private async checkVulnerableDependencies(deps: Record<string, string>): Promise<Finding[]> {
+  private async checkVulnerableDependencies(_deps: Record<string, string>): Promise<Finding[]> {
     // Simplified implementation
     return [];
   }

@@ -1,8 +1,9 @@
 import { User } from '../entities/user';
 import { UserProfile, UserInterest } from '../entities/user-profile';
-import { UserAggregate } from '../aggregates/user-aggregate';
-import { UserRepository } from '../repositories/user-repository';
+ 
+// UserRepository interface removed - using direct service calls
 import { ProfileDomainService } from './profile-domain-service';
+import { UserService } from '../../application/user-service-direct';
 
 export interface UserCreationResult {
   success: boolean;
@@ -25,8 +26,9 @@ export interface ProfileUpdateResult {
 
 export class UserManagementDomainService {
   constructor(
-    private userRepository: UserRepository,
-    private profileService: ProfileDomainService
+    // UserRepository removed - using direct service calls
+    private profileService: ProfileDomainService,
+    private userService: UserService
   ) {}
 
   /**
@@ -41,7 +43,7 @@ export class UserManagementDomainService {
     const errors: string[] = [];
 
     // Validate email uniqueness
-    const existingUser = await this.userRepository.findByEmail(userData.email);
+    const existingUser = await this.userService.findByEmail(userData.email);
     if (existingUser) {
       errors.push('Email address is already in use');
     }
@@ -67,16 +69,26 @@ export class UserManagementDomainService {
     }
 
     try {
-      const user = User.create({
+      const createPayload: {
+        id: string;
+        email: string;
+        name: string;
+        role?: string;
+      } = {
         id: crypto.randomUUID(),
         email: userData.email,
-        name: userData.name.trim(),
-        role: userData.role
-      });
+        name: userData.name.trim()
+      };
 
-      // Attach password_hash temporarily so repository can use it for DB insert
+      if (userData.role !== undefined) {
+        createPayload.role = userData.role;
+      }
+
+      const user = User.create(createPayload);
+
+      // Attach password_hash temporarily so service can use it for DB insert
       (user as any).password_hash = userData.password_hash;
-      await this.userRepository.save(user, userData.password_hash);
+      await this.userService.save(user, userData.password_hash);
       return { success: true, user, errors: [] };
     } catch (error) {
       return {
@@ -93,16 +105,17 @@ export class UserManagementDomainService {
     email?: string;
     name?: string;
     role?: string;
-  }): Promise<UserUpdateResult> { const errors: string[] = [];
+  }): Promise<UserUpdateResult> {
+    const errors: string[] = [];
 
-    const user = await this.userRepository.findById(user_id);
+    const user = await this.userService.findById(user_id);
     if (!user) {
       return { success: false, errors: ['User not found']  };
     }
 
     // Validate email uniqueness if changing email
-    if (updates.email && updates.email !== users.email.value) {
-      const existingUser = await this.userRepository.findByEmail(updates.email);
+    if (updates.email && updates.email !== user.email.value) {
+      const existingUser = await this.userService.findByEmail(updates.email);
       if (existingUser) {
         errors.push('Email address is already in use');
       }
@@ -124,18 +137,18 @@ export class UserManagementDomainService {
 
     try {
       if (updates.email) {
-        users.updateEmail(updates.email);
+        user.updateEmail(updates.email);
       }
 
       if (updates.name) {
-        users.updateName(updates.name.trim());
+        user.updateName(updates.name.trim());
       }
 
       if (updates.role) {
-        users.changeRole(updates.role);
+        user.changeRole(updates.role);
       }
 
-      await this.userRepository.update(user);
+      await this.userService.update(user);
       return { success: true, user, errors: [] };
     } catch (error) {
       return {
@@ -154,21 +167,33 @@ export class UserManagementDomainService {
     location?: string;
     organization?: string;
     is_public?: boolean;
-  }): Promise<ProfileUpdateResult> { const userAggregate = await this.userRepository.findUserAggregateById(user_id);
+  }): Promise<ProfileUpdateResult> {
+    const userAggregate = await this.userService.findUserAggregateById(user_id);
     if (!userAggregate) {
       return { success: false, errors: ['User not found'], warnings: []  };
     }
 
     // Get existing profile or create new one
     let profile = userAggregate.profile;
-    if (!profile) { profile = UserProfile.create({
+    if (!profile) {
+      const profilePayload: {
+        user_id: string;
+        bio?: string;
+        expertise?: string[];
+        location?: string;
+        organization?: string;
+        is_public?: boolean;
+      } = {
         user_id,
-        bio: profileUpdates.bio,
         expertise: profileUpdates.expertise || [],
-        location: profileUpdates.location,
-        organization: profileUpdates.organization,
         is_public: profileUpdates.is_public ?? true
-       });
+      };
+
+      if (profileUpdates.bio !== undefined) profilePayload.bio = profileUpdates.bio;
+      if (profileUpdates.location !== undefined) profilePayload.location = profileUpdates.location;
+      if (profileUpdates.organization !== undefined) profilePayload.organization = profileUpdates.organization;
+
+      profile = UserProfile.create(profilePayload);
     } else {
       profile = this.profileService.mergeProfileUpdates(profile, profileUpdates);
     }
@@ -195,11 +220,11 @@ export class UserManagementDomainService {
       }
 
       // Save profile
-      const existingProfile = await this.userRepository.findProfileByUserId(user_id);
+      const existingProfile = await this.userService.findProfileByUserId(user_id);
       if (existingProfile) {
-        await this.userRepository.updateProfile(profile);
+        await this.userService.updateProfile(profile);
       } else {
-        await this.userRepository.saveProfile(profile);
+        await this.userService.saveProfile(profile);
       }
 
       return {
@@ -220,16 +245,18 @@ export class UserManagementDomainService {
   /**
    * Manages user interests
    */
-  async updateUserInterests(user_id: string, interests: string[]): Promise<{ success: boolean; errors: string[] }> { const userAggregate = await this.userRepository.findUserAggregateById(user_id);
+  async updateUserInterests(user_id: string, interests: string[]): Promise<{ success: boolean; errors: string[] }> {
+    const userAggregate = await this.userService.findUserAggregateById(user_id);
     if (!userAggregate) {
       return { success: false, errors: ['User not found']  };
     }
 
     // Create interest entities
     const interestEntities = interests.map(interest =>
-      UserInterest.create({ user_id,
+      UserInterest.create({
+        user_id,
         interest: interest.trim()
-       })
+      })
     );
 
     // Validate interests
@@ -238,11 +265,12 @@ export class UserManagementDomainService {
       return { success: false, errors: validation.errors };
     }
 
-    try { // Clear existing interests and add new ones
-      await this.userRepository.deleteAllInterests(user_id);
+    try {
+      // Clear existing interests and add new ones
+      await this.userService.deleteAllInterests(user_id);
       for (const interest of interestEntities) {
-        await this.userRepository.saveInterest(interest);
-       }
+        await this.userService.saveInterest(interest);
+      }
 
       return { success: true, errors: [] };
     } catch (error) {
@@ -256,18 +284,20 @@ export class UserManagementDomainService {
   /**
    * Deactivates a user account
    */
-  async deactivateUser(user_id: string): Promise<{ success: boolean; errors: string[] }> { const user = await this.userRepository.findById(user_id);
+  async deactivateUser(user_id: string): Promise<{ success: boolean; errors: string[] }> {
+    const user = await this.userService.findById(user_id);
     if (!user) {
-      return { success: false, errors: ['User not found']  };
+      return { success: false, errors: ['User not found'] };
     }
 
-    if (!users.is_active) {
+    if (!user.is_active) {
       return { success: false, errors: ['User is already deactivated'] };
     }
 
-    try { // Note: User entity doesn't have a deactivate method, so we'll need to handle this differently
-      // For now, we'll assume the repository handles deactivation
-      await this.userRepository.delete(user_id);
+    try {
+      // Note: User entity doesn't have a deactivate method, so we'll need to handle this differently
+      // For now, we'll assume the service handles deactivation
+      await this.userService.delete(user_id);
       return { success: true, errors: []  };
     } catch (error) {
       return {
@@ -291,9 +321,9 @@ export class UserManagementDomainService {
       usersByRole,
       usersByVerificationStatus
     ] = await Promise.all([
-      this.userRepository.countUsers(),
-      this.userRepository.countUsersByRole(),
-      this.userRepository.countUsersByVerificationStatus()
+      this.userService.countUsers(),
+      this.userService.countUsersByRole(),
+      this.userService.countUsersByVerificationStatus()
     ]);
 
     // For active users, we'll count users that are not deleted (simplified)
@@ -316,22 +346,22 @@ export class UserManagementDomainService {
     minReputation?: number;
     maxReputation?: number;
   }, limit = 20): Promise<User[]> {
-    let users = await this.userRepository.searchUsers(query, limit);
+    let users = await this.userService.searchUsers(query, limit);
 
     // Apply additional filters
     if (filters) {
       if (filters.role) {
-        users = users.filter(user => users.role.value === filters.role);
+        users = users.filter(user => user.role.value === filters.role);
       }
 
       if (filters.verification_status) {
-        users = users.filter(user => users.verification_status.value === filters.verification_status);
+        users = users.filter(user => user.verification_status.value === filters.verification_status);
       }
 
       if (filters.minReputation || filters.maxReputation) {
         const min = filters.minReputation || 0;
         const max = filters.maxReputation || 100;
-        users = users.filter(user => users.reputation_score >= min && users.reputation_score <= max);
+        users = users.filter(user => user.reputation_score >= min && user.reputation_score <= max);
       }
     }
 

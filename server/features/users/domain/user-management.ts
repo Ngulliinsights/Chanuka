@@ -1,7 +1,7 @@
-import { database as db, users, sessions, comments, notifications } from '../shared/database/connection';
-import { eq, count, desc, sql, and, gte, or, inArray } from 'drizzle-orm';
+import { database as db, users, sessions, comments, notifications } from '@shared/database/connection';
+import { eq, count, desc, sql, and, gte, inArray } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
-import { logger  } from '../../../../shared/core/src/index.js';
+import { logger } from '../../../../shared/core/src/index.js';
 
 // Type definitions for better code clarity and type safety
 interface UserProfile {
@@ -11,9 +11,8 @@ interface UserProfile {
 }
 
 export interface UserManagementFilters {
-  role?: string;
+  role?: 'citizen' | 'expert' | 'admin' | 'moderator' | 'ambassador' | 'organizer';
   status?: 'active' | 'inactive';
-  verification_status?: 'pending' | 'verified' | 'rejected';
   search?: string;
   dateRange?: {
     start: Date;
@@ -24,9 +23,7 @@ export interface UserManagementFilters {
 export interface UserDetails {
   id: string;
   email: string;
-  name: string;
   role: string;
-  verification_status: string;
   is_active: boolean;
   last_login_at: Date | null;
   created_at: Date;
@@ -44,20 +41,21 @@ export interface UserDetails {
   };
 }
 
-export interface UserActivityLog { id: string;
+export interface UserActivityLog {
+  id: string;
   user_id: string;
   action: string;
   details: Record<string, unknown>;
   timestamp: Date;
   ip_address?: string;
   user_agent?: string;
- }
+}
 
 export interface BulkUserOperation {
   user_ids: string[];
-  operation: 'activate' | 'deactivate' | 'verify' | 'reject' | 'delete' | 'changeRole';
+  operation: 'activate' | 'deactivate' | 'delete' | 'changeRole';
   parameters?: {
-    role?: string;
+    role?: 'citizen' | 'expert' | 'admin' | 'moderator' | 'ambassador' | 'organizer';
     reason?: string;
   };
 }
@@ -67,7 +65,6 @@ export interface UserExportData {
   summary: {
     totalUsers: number;
     activeUsers: number;
-    verifiedUsers: number;
     exportDate: Date;
   };
 }
@@ -83,7 +80,6 @@ export class UserManagementService {
   private activityLogs: UserActivityLog[] = [];
   private logIdCounter = 1;
 
-  // Private constructor ensures singleton pattern
   private constructor() {}
 
   public static getInstance(): UserManagementService {
@@ -94,12 +90,13 @@ export class UserManagementService {
   }
 
   /**
-   * Retrieves a paginated list of users with optional filtering
-   * This method builds dynamic query conditions based on the provided filters
+   * Retrieves a paginated list of users with optional filtering.
+   * This method builds dynamic query conditions based on the provided filters,
+   * then executes both the data fetch and count query in parallel for optimal performance.
    */
   async getUserList(
-    page = 1, 
-    limit = DEFAULT_PAGE_SIZE, 
+    page = 1,
+    limit = DEFAULT_PAGE_SIZE,
     filters?: UserManagementFilters
   ): Promise<{
     users: UserDetails[];
@@ -113,16 +110,14 @@ export class UserManagementService {
     try {
       const offset = (page - 1) * limit;
       const whereClause = this.buildFilterConditions(filters);
-      
-      // Run both queries in parallel for better performance
+
+      // Execute both queries in parallel to minimize database round trips
       const [userList, countResult] = await Promise.all([
         db
           .select({
             id: users.id,
             email: users.email,
-            name: users.name,
             role: users.role,
-            verification_status: users.verification_status,
             is_active: users.is_active,
             last_login_at: users.last_login_at,
             created_at: users.created_at,
@@ -133,16 +128,16 @@ export class UserManagementService {
           .orderBy(desc(users.created_at))
           .limit(limit)
           .offset(offset),
-        
+
         db
           .select({ value: count() })
           .from(users)
           .where(whereClause)
       ]);
-      
+
       const total = Number(countResult[0]?.value ?? 0);
 
-      // Enhance users with their stats and session info in parallel
+      // Enrich each user with their statistics and session information
       const enhancedUsers = await this.enrichUsersWithDetails(userList);
 
       return {
@@ -161,7 +156,8 @@ export class UserManagementService {
   }
 
   /**
-   * Retrieves complete details for a specific user including stats and sessions
+   * Retrieves complete details for a specific user including their activity stats
+   * and current session information. Returns null if the user doesn't exist.
    */
   async getUserDetails(user_id: string): Promise<UserDetails | null> {
     try {
@@ -169,9 +165,7 @@ export class UserManagementService {
         .select({
           id: users.id,
           email: users.email,
-          name: users.name,
           role: users.role,
-          verification_status: users.verification_status,
           is_active: users.is_active,
           last_login_at: users.last_login_at,
           created_at: users.created_at,
@@ -186,7 +180,7 @@ export class UserManagementService {
         return null;
       }
 
-      // Fetch stats and sessions in parallel for efficiency
+      // Fetch related data in parallel for better performance
       const [stats, sessionInfo] = await Promise.all([
         this.getUserStats(user_id),
         this.getUserSessions(user_id)
@@ -205,21 +199,20 @@ export class UserManagementService {
   }
 
   /**
-   * Updates user information with audit logging
-   * Only updates fields that are provided and exist in the schema
+   * Updates user information with comprehensive audit logging.
+   * Only the provided fields will be updated, leaving others unchanged.
    */
   async updateUser(
-    user_id: string, 
+    user_id: string,
     updates: {
-      name?: string;
       email?: string;
-      role?: string;
-      verification_status?: string;
+      role?: 'citizen' | 'expert' | 'admin' | 'moderator' | 'ambassador' | 'organizer';
       is_active?: boolean;
     },
     adminId: string
-  ): Promise<{ success: boolean; message: string }> { try {
-      // Log the update action before making changes for audit trail
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      // Create an audit trail before making changes
       this.logUserActivity({
         user_id: adminId,
         action: 'user_update',
@@ -227,7 +220,7 @@ export class UserManagementService {
           targetUserId: user_id,
           updates,
           timestamp: new Date().toISOString()
-         }
+        }
       });
 
       await db
@@ -252,8 +245,8 @@ export class UserManagementService {
   }
 
   /**
-   * Performs bulk operations on multiple users efficiently
-   * Supports various operations like activate, deactivate, verify, etc.
+   * Performs bulk operations on multiple users efficiently in a single transaction.
+   * Supports activation, deactivation, role changes, and soft deletion.
    */
   async bulkUpdateUsers(
     operation: BulkUserOperation,
@@ -270,18 +263,19 @@ export class UserManagementService {
 
       const { updateData, operationName } = this.getBulkOperationConfig(operation);
 
-      // Log the bulk operation for audit purposes
-      this.logUserActivity({ user_id: adminId,
+      // Log the bulk operation with full details for audit compliance
+      this.logUserActivity({
+        user_id: adminId,
         action: 'bulk_user_operation',
         details: {
           operation: operation.operation,
           user_ids: operation.user_ids,
-          parameters: operation.parameters ?? { },
+          parameters: operation.parameters ?? {},
           timestamp: new Date().toISOString()
         }
       });
 
-      // Perform the bulk update in a single database operation
+      // Execute the update for all specified users in one database operation
       await db
         .update(users)
         .set(updateData)
@@ -304,34 +298,36 @@ export class UserManagementService {
   }
 
   /**
-   * Resets a user's password with secure hashing
-   * Note: This assumes a password field exists in your schema
+   * Resets a user's password with bcrypt hashing for security.
+   * Note: This implementation assumes your schema has a password_hash field.
+   * Adjust the field name to match your actual schema.
    */
   async resetUserPassword(
-    user_id: string, 
-    newPassword: string, 
+    user_id: string,
+    newPassword: string,
     adminId: string
   ): Promise<{ success: boolean; message: string }> {
     try {
-      // Hash the password with a secure number of rounds
+      // Hash the password using bcrypt with a secure number of rounds
       const hashedPassword = await bcrypt.hash(newPassword, BCRYPT_ROUNDS);
 
+      // Update the user's password in the database
       await db
         .update(users)
         .set({
+          password_hash: hashedPassword,
           updated_at: new Date()
-          // Add password field update here if it exists in your schema:
-          // password: hashedPassword
         })
         .where(eq(users.id, user_id));
 
-      // Log password reset without storing the actual password
-      this.logUserActivity({ user_id: adminId,
+      // Log the password reset without exposing the actual password
+      this.logUserActivity({
+        user_id: adminId,
         action: 'password_reset',
         details: {
           targetUserId: user_id,
           timestamp: new Date().toISOString()
-         }
+        }
       });
 
       return {
@@ -348,8 +344,8 @@ export class UserManagementService {
   }
 
   /**
-   * Retrieves activity logs with optional filtering by user
-   * Logs are stored in memory with a maximum size limit
+   * Retrieves activity logs with optional filtering by user.
+   * Logs are stored in memory and automatically pruned when they exceed the maximum size.
    */
   async getUserActivityLogs(
     user_id?: string,
@@ -363,12 +359,14 @@ export class UserManagementService {
       total: number;
       pages: number;
     };
-  }> { try {
-      let filteredLogs = user_id 
+  }> {
+    try {
+      // Filter logs by user if specified, otherwise return all logs
+      let filteredLogs = user_id
         ? this.activityLogs.filter(log => log.user_id === user_id)
         : [...this.activityLogs];
 
-      // Sort by most recent first
+      // Sort chronologically with most recent first
       filteredLogs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
       const total = filteredLogs.length;
@@ -382,7 +380,7 @@ export class UserManagementService {
           limit,
           total,
           pages: Math.ceil(total / limit)
-         }
+        }
       };
     } catch (error) {
       this.handleError('Error fetching user activity logs', error);
@@ -391,18 +389,17 @@ export class UserManagementService {
   }
 
   /**
-   * Exports user data with summary statistics
-   * Uses a high limit to retrieve all matching users for export
+   * Exports user data with summary statistics for reporting purposes.
+   * Uses a high limit to retrieve all matching users within reasonable bounds.
    */
   async exportUserData(filters?: UserManagementFilters): Promise<UserExportData> {
     try {
       const { users: userList } = await this.getUserList(1, MAX_EXPORT_LIMIT, filters);
 
-      // Gather summary statistics in parallel
-      const [totalCountResult, activeCountResult, verifiedCountResult] = await Promise.all([
+      // Calculate summary statistics in parallel for efficiency
+      const [totalCountResult, activeCountResult] = await Promise.all([
         db.select({ value: count() }).from(users),
-        db.select({ value: count() }).from(users).where(eq(users.is_active, true)),
-        db.select({ value: count() }).from(users).where(eq(users.verification_status, 'verified'))
+        db.select({ value: count() }).from(users).where(eq(users.is_active, true))
       ]);
 
       return {
@@ -410,7 +407,6 @@ export class UserManagementService {
         summary: {
           totalUsers: Number(totalCountResult[0]?.value ?? 0),
           activeUsers: Number(activeCountResult[0]?.value ?? 0),
-          verifiedUsers: Number(verifiedCountResult[0]?.value ?? 0),
           exportDate: new Date()
         }
       };
@@ -421,8 +417,8 @@ export class UserManagementService {
   }
 
   /**
-   * Retrieves statistics grouped by user role
-   * Useful for dashboard analytics and reporting
+   * Retrieves statistics grouped by user role for dashboard analytics.
+   * This helps administrators understand the distribution of user types.
    */
   async getUserRoleStatistics() {
     try {
@@ -430,17 +426,15 @@ export class UserManagementService {
         .select({
           role: users.role,
           total: count(),
-          active: sql<number>`SUM(CASE WHEN ${users.is_active} THEN 1 ELSE 0 END)`,
-          verified: sql<number>`SUM(CASE WHEN ${users.verification_status} = 'verified' THEN 1 ELSE 0 END)`
+          active: sql<number>`SUM(CASE WHEN ${users.is_active} THEN 1 ELSE 0 END)`
         })
         .from(users)
         .groupBy(users.role);
 
-      return roleStats.map(stat => ({
+      return roleStats.map((stat: { role: string; total: number; active: number }) => ({
         role: stat.role,
         total: Number(stat.total),
-        active: Number(stat.active),
-        verified: Number(stat.verified)
+        active: Number(stat.active)
       }));
     } catch (error) {
       this.handleError('Error fetching user role statistics', error);
@@ -448,44 +442,17 @@ export class UserManagementService {
     }
   }
 
-  /**
-   * Retrieves statistics grouped by verification status
-   * Helps track the verification pipeline
-   */
-  async getUserVerificationStatistics() {
-    try {
-      const verificationStats = await db
-        .select({
-          status: users.verification_status,
-          total: count()
-        })
-        .from(users)
-        .groupBy(users.verification_status);
-
-      return verificationStats.map(stat => ({
-        status: stat.status,
-        count: Number(stat.total)
-      }));
-    } catch (error) {
-      this.handleError('Error fetching user verification statistics', error);
-      throw error;
-    }
-  }
-
-  // Private helper methods for cleaner code organization
+  // Private helper methods for internal operations
 
   /**
-   * Builds filter conditions dynamically based on provided filters
-   * This centralizes the filtering logic for reusability
-   * 
-   * Note: We use type assertion for the conditions array because Drizzle's
-   * type system can be overly strict when mixing different SQL expression types
+   * Builds dynamic filter conditions for database queries.
+   * This centralizes filtering logic to ensure consistency across different operations.
    */
   private buildFilterConditions(filters?: UserManagementFilters) {
-    // Type assertion helps TypeScript understand we're building valid SQL conditions
     const conditions: any[] = [];
 
     if (filters?.role) {
+      // Cast the role string to the proper enum type for type safety
       conditions.push(eq(users.role, filters.role));
     }
 
@@ -495,18 +462,10 @@ export class UserManagementService {
       conditions.push(eq(users.is_active, false));
     }
 
-    if (filters?.verification_status) {
-      conditions.push(eq(users.verification_status, filters.verification_status));
-    }
-
     if (filters?.search) {
+      // Perform case-insensitive search across email field
       const searchTerm = `%${filters.search.toLowerCase()}%`;
-      conditions.push(
-        or(
-          sql`LOWER(${users.name}) LIKE ${searchTerm}`,
-          sql`LOWER(${users.email}) LIKE ${searchTerm}`
-        )
-      );
+      conditions.push(sql`LOWER(${users.email}) LIKE ${searchTerm}`);
     }
 
     if (filters?.dateRange) {
@@ -522,15 +481,16 @@ export class UserManagementService {
   }
 
   /**
-   * Enriches basic user data with stats and session information
-   * Uses parallel processing for optimal performance
+   * Enriches basic user data with comprehensive stats and session information.
+   * Uses parallel processing to fetch related data efficiently.
    */
   private async enrichUsersWithDetails(userList: any[]): Promise<UserDetails[]> {
     return Promise.all(
       userList.map(async (user) => {
+        // Fetch stats and sessions in parallel for each user
         const [stats, sessionInfo] = await Promise.all([
-          this.getUserStats(users.id),
-          this.getUserSessions(users.id)
+          this.getUserStats(user.id),
+          this.getUserSessions(user.id)
         ]);
 
         return {
@@ -544,12 +504,12 @@ export class UserManagementService {
   }
 
   /**
-   * Retrieves comprehensive statistics for a specific user
-   * Includes comment counts, notifications, and last activity
+   * Retrieves comprehensive activity statistics for a specific user.
+   * Includes comment count, notifications, and most recent activity timestamp.
    */
   private async getUserStats(user_id: string) {
     try {
-      // Fetch all stats in parallel for better performance
+      // Execute all stat queries in parallel to minimize latency
       const [commentsResult, notificationsResult, lastCommentResult] = await Promise.all([
         db.select({ value: count() }).from(comments).where(eq(comments.user_id, user_id)),
         db.select({ value: count() }).from(notifications).where(eq(notifications.user_id, user_id)),
@@ -563,7 +523,7 @@ export class UserManagementService {
 
       return {
         commentsCount: Number(commentsResult[0]?.value ?? 0),
-        billsTracked: 0, // Placeholder for future implementation
+        billsTracked: 0, // Placeholder for future implementation when bill tracking is added
         notificationsReceived: Number(notificationsResult[0]?.value ?? 0),
         lastActivity: lastCommentResult[0]?.created_at ?? null
       };
@@ -574,8 +534,8 @@ export class UserManagementService {
   }
 
   /**
-   * Retrieves session information for a user
-   * Shows active session count and most recent session
+   * Retrieves session information showing active sessions and most recent login.
+   * Active sessions are those whose expiration time is still in the future.
    */
   private async getUserSessions(user_id: string) {
     try {
@@ -611,15 +571,15 @@ export class UserManagementService {
   }
 
   /**
-   * Configures the update data and operation name for bulk operations
-   * Centralizes bulk operation logic for maintainability
+   * Configures the update data and operation name for bulk operations.
+   * This mapping ensures consistent behavior across all bulk operation types.
    */
   private getBulkOperationConfig(operation: BulkUserOperation): {
     updateData: Partial<typeof users.$inferInsert> & { updated_at: Date };
     operationName: string;
   } {
-    const updateData: Partial<typeof users.$inferInsert> & { updated_at: Date } = { 
-      updated_at: new Date() 
+    const updateData: any = {
+      updated_at: new Date()
     };
     let operationName = '';
 
@@ -632,14 +592,6 @@ export class UserManagementService {
         updateData.is_active = false;
         operationName = 'deactivated';
         break;
-      case 'verify':
-        updateData.verification_status = 'verified';
-        operationName = 'verified';
-        break;
-      case 'reject':
-        updateData.verification_status = 'rejected';
-        operationName = 'rejected';
-        break;
       case 'changeRole':
         if (!operation.parameters?.role) {
           throw new Error('Role parameter required for role change operation');
@@ -648,6 +600,7 @@ export class UserManagementService {
         operationName = `role changed to ${operation.parameters.role}`;
         break;
       case 'delete':
+        // Soft delete by marking as inactive
         updateData.is_active = false;
         operationName = 'deleted';
         break;
@@ -659,8 +612,8 @@ export class UserManagementService {
   }
 
   /**
-   * Logs user activity to in-memory storage with automatic size management
-   * Keeps only the most recent logs based on configured maximum
+   * Logs user activity to in-memory storage with automatic pruning.
+   * Keeps only the most recent logs based on the configured maximum size.
    */
   private logUserActivity(activity: Omit<UserActivityLog, 'id' | 'timestamp'>) {
     const log: UserActivityLog = {
@@ -671,14 +624,14 @@ export class UserManagementService {
 
     this.activityLogs.push(log);
 
-    // Automatically prune old logs to prevent memory issues
+    // Prune oldest logs when we exceed the maximum size
     if (this.activityLogs.length > ACTIVITY_LOG_MAX_SIZE) {
       this.activityLogs.shift();
     }
   }
 
   /**
-   * Centralized error handling for consistent logging
+   * Centralized error handling for consistent logging across the service.
    */
   private handleError(message: string, error: unknown): void {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -686,7 +639,7 @@ export class UserManagementService {
   }
 
   /**
-   * Returns default user stats when fetching fails
+   * Returns default user stats when fetching fails to ensure graceful degradation.
    */
   private getDefaultUserStats() {
     return {
@@ -698,43 +651,5 @@ export class UserManagementService {
   }
 }
 
-// Export singleton instance for easy consumption
+// Export singleton instance for easy consumption throughout the application
 export const userManagementService = UserManagementService.getInstance();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

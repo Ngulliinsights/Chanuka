@@ -3,7 +3,7 @@ export * from './backup';
 export * from './progress';
 export * from './validation';
 export * from './analysis';
-export * from './cleanup';
+export type { BackupResult } from './cleanup';
 export * from './types';
 
 
