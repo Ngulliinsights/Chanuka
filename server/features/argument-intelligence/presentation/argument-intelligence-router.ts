@@ -12,8 +12,7 @@ import { CoalitionFinderService } from '../application/coalition-finder.js';
 import { EvidenceValidatorService } from '../application/evidence-validator.js';
 import { BriefGeneratorService } from '../application/brief-generator.js';
 import { PowerBalancerService } from '../application/power-balancer.js';
-import { ArgumentRepository } from '../infrastructure/repositories/argument-repository.js';
-import { BriefRepository } from '../infrastructure/repositories/brief-repository.js';
+import { argumentIntelligenceService } from '../application/argument-intelligence-service.js';
 import { SentenceClassifier } from '../infrastructure/nlp/sentence-classifier.js';
 import { EntityExtractor } from '../infrastructure/nlp/entity-extractor.js';
 import { SimilarityCalculator } from '../infrastructure/nlp/similarity-calculator.js';
@@ -31,8 +30,7 @@ const coalitionFinder = new CoalitionFinderService(similarityCalculator);
 const evidenceValidator = new EvidenceValidatorService();
 const briefGenerator = new BriefGeneratorService();
 const powerBalancer = new PowerBalancerService();
-const argumentRepo = new ArgumentRepository(db);
-const briefRepo = new BriefRepository(db);
+// Repository pattern replaced with consolidated service
 
 const argumentProcessor = new ArgumentProcessor(
   structureExtractor,
@@ -41,8 +39,7 @@ const argumentProcessor = new ArgumentProcessor(
   coalitionFinder,
   briefGenerator,
   powerBalancer,
-  argumentRepo,
-  briefRepo
+  argumentIntelligenceService
 );
 
 // ============================================================================
@@ -218,20 +215,20 @@ router.get('/argument-map/:billId', async (req, res) => {
  */
 router.post('/cluster-arguments', async (req, res) => {
   try {
-    const { arguments, config } = req.body;
+    const { arguments: args, config } = req.body;
 
-    if (!arguments || !Array.isArray(arguments)) {
+    if (!args || !Array.isArray(args)) {
       return res.status(400).json({
         error: 'Invalid arguments array provided'
       });
     }
 
-    const clusteringResult = await clusteringService.clusterArguments(arguments, config);
+    const clusteringResult = await clusteringService.clusterArguments(args, config);
 
     res.json({
       success: true,
       data: clusteringResult,
-      message: `Formed ${clusteringResult.clusters.length} clusters from ${arguments.length} arguments`
+      message: `Formed ${clusteringResult.clusters.length} clusters from ${args.length} arguments`
     });
 
   } catch (error) {
@@ -253,9 +250,9 @@ router.post('/cluster-arguments', async (req, res) => {
  */
 router.post('/find-similar', async (req, res) => {
   try {
-    const { query, arguments, threshold } = req.body;
+    const { query, arguments: args, threshold } = req.body;
 
-    if (!query || !arguments) {
+    if (!query || !args) {
       return res.status(400).json({
         error: 'Missing required fields',
         required: ['query', 'arguments']
@@ -264,7 +261,7 @@ router.post('/find-similar', async (req, res) => {
 
     const similarArguments = await clusteringService.findSimilarArguments(
       query,
-      arguments,
+      args,
       threshold || 0.6
     );
 
@@ -300,15 +297,15 @@ router.post('/find-similar', async (req, res) => {
  */
 router.post('/find-coalitions', async (req, res) => {
   try {
-    const { arguments, userDemographics } = req.body;
+    const { arguments: args, userDemographics } = req.body;
 
-    if (!arguments || !Array.isArray(arguments)) {
+    if (!args || !Array.isArray(args)) {
       return res.status(400).json({
         error: 'Invalid arguments array provided'
       });
     }
 
-    const coalitions = await coalitionFinder.findPotentialCoalitions(arguments, userDemographics);
+    const coalitions = await coalitionFinder.findPotentialCoalitions(args, userDemographics);
 
     res.json({
       success: true,
@@ -340,9 +337,9 @@ router.get('/coalition-opportunities/:billId', async (req, res) => {
   try {
     const { billId } = req.params;
 
-    // Get stakeholder profiles from arguments
-    const arguments = await argumentRepo.getArgumentsByBill(billId);
-    const stakeholderProfiles = await coalitionFinder.buildStakeholderProfiles(arguments);
+    // Get stakeholder profiles from args
+    const args = await argumentRepo.getArgumentsByBill(billId);
+    const stakeholderProfiles = await coalitionFinder.buildStakeholderProfiles(args);
 
     const opportunities = await coalitionFinder.discoverCoalitionOpportunities(billId, stakeholderProfiles);
 
@@ -416,8 +413,8 @@ router.get('/evidence-assessment/:billId', async (req, res) => {
   try {
     const { billId } = req.params;
 
-    const arguments = await argumentRepo.getArgumentsByBill(billId);
-    const assessment = await evidenceValidator.assessEvidenceBase(arguments);
+    const args = await argumentRepo.getArgumentsByBill(billId);
+    const assessment = await evidenceValidator.assessEvidenceBase(args);
 
     res.json({
       success: true,
@@ -586,15 +583,15 @@ router.post('/balance-voices', async (req, res) => {
  */
 router.post('/detect-astroturfing', async (req, res) => {
   try {
-    const { argumentData } = req.body;
+    const { argumentData: args } = req.body;
 
-    if (!argumentData || !Array.isArray(argumentData)) {
+    if (!args || !Array.isArray(args)) {
       return res.status(400).json({
         error: 'Invalid argument data provided'
       });
     }
 
-    const campaigns = await powerBalancer.detectAstroturfing(argumentData);
+    const campaigns = await powerBalancer.detectAstroturfing(args);
 
     res.json({
       success: true,
@@ -649,13 +646,13 @@ router.get('/arguments/:billId', async (req, res) => {
       sortOrder: sortOrder as any
     };
 
-    const arguments = await argumentRepo.getArgumentsByBill(billId, options);
+    const args = await argumentRepo.getArgumentsByBill(billId, options);
 
     res.json({
       success: true,
       data: {
-        arguments,
-        count: arguments.length,
+        arguments: args,
+        count: args.length,
         pagination: {
           limit: options.limit,
           offset: options.offset
@@ -691,7 +688,7 @@ router.get('/search', async (req, res) => {
       });
     }
 
-    const arguments = await argumentRepo.searchArgumentsByText(
+    const args = await argumentRepo.searchArgumentsByText(
       query as string,
       billId as string,
       parseInt(limit as string)
@@ -701,8 +698,8 @@ router.get('/search', async (req, res) => {
       success: true,
       data: {
         query,
-        arguments,
-        count: arguments.length
+        arguments: args,
+        count: args.length
       }
     });
 

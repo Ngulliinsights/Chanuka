@@ -3,7 +3,7 @@
 // ============================================================================
 // End-to-end API integration tests covering all major features
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import { app } from '../../index.js';
 import { TestDataManager, ApiResponseValidator, SecurityTestHelper } from '../../tests/utils/test-helpers.js';

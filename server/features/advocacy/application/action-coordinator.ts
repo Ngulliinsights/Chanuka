@@ -3,8 +3,7 @@
 // ============================================================================
 
 import { ActionItem, NewActionItem, ActionItemEntity } from '../domain/entities/action-item.js';
-import { IActionRepository } from '../domain/repositories/action-repository.js';
-import { ICampaignRepository } from '../domain/repositories/campaign-repository.js';
+// Repository interfaces removed - using direct service calls
 import { ActionFilters, PaginationOptions, ActionTemplate } from '../types/index.js';
 import { AdvocacyErrors } from '../domain/errors/advocacy-errors.js';
 import { logger } from '../../../shared/core/index.js';

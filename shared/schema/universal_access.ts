@@ -1,483 +1,426 @@
 // ============================================================================
-// UNIVERSAL ACCESS SCHEMA - OPTIMIZED
+// UNIVERSAL ACCESS SCHEMA - CRITICAL MISSING DOMAIN
 // ============================================================================
-// Offline engagement and community facilitation infrastructure
-// Optimized for performance, data integrity, and scalability
+// Offline engagement, community facilitation, and multi-modal access
+// This schema ensures the platform serves all Kenyans, not just the digitally connected
 
 import {
   pgTable, text, integer, boolean, timestamp, jsonb, numeric, uuid, varchar,
-  index, uniqueIndex, date, check
+  index, unique, date, check
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { relations } from "drizzle-orm";
 
-import {
-  kenyanCountyEnum,
-  ambassadorStatusEnum,
-  sessionTypeEnum,
-  participationMethodEnum
-} from "./enum";
-
-import { users, bills } from "./foundation";
-import { comments } from "./citizen_participation";
+import { bills, users } from "./foundation";
+import { kenyanCountyEnum } from "./enum";
 
 // ============================================================================
 // AMBASSADORS - Community facilitators for offline engagement
 // ============================================================================
 
 export const ambassadors = pgTable("ambassadors", {
-  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
   user_id: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  
-  // Ambassador identification - code follows pattern: COUNTY-YYYY-NNNN
-  ambassador_code: varchar("ambassador_code", { length: 20 }).unique().notNull(),
-  display_name: varchar("display_name", { length: 255 }).notNull(),
-  
-  // Geographic coverage - primary_county required, additional counties optional
-  primary_county: kenyanCountyEnum("primary_county").notNull(),
-  coverage_counties: kenyanCountyEnum("coverage_counties").array(),
-  primary_constituency: varchar("primary_constituency", { length: 100 }),
-  coverage_constituencies: varchar("coverage_constituencies", { length: 100 }).array(),
-  
-  // Languages and accessibility - at least one language required
-  languages_spoken: varchar("languages_spoken", { length: 50 }).array().notNull(),
-  accessibility_accommodations: varchar("accessibility_accommodations", { length: 100 }).array(),
-  
-  // Skills and expertise - helps match ambassadors to session types
-  areas_of_expertise: varchar("areas_of_expertise", { length: 100 }).array(),
-  professional_background: text("professional_background"),
-  
+
+  // Ambassador identification
+  ambassador_code: varchar("ambassador_code", { length: 20 }).notNull().unique(),
+  display_name: varchar("display_name", { length: 200 }).notNull(),
+
   // Contact and availability - at least one contact method required
   contact_phone: varchar("contact_phone", { length: 50 }),
   contact_email: varchar("contact_email", { length: 255 }),
   preferred_contact_method: varchar("preferred_contact_method", { length: 50 }).notNull(),
-  
-  // Availability schedule stores weekly availability as JSON
-  availability_schedule: jsonb("availability_schedule").default(sql`'{}'::jsonb`).notNull(),
-  max_sessions_per_month: integer("max_sessions_per_month").notNull().default(4),
-  
-  // Ambassador status and verification - verification_date set when status becomes 'active'
-  status: ambassadorStatusEnum("status").notNull().default("pending"),
-  verification_date: timestamp("verification_date"),
-  verified_by: uuid("verified_by").references(() => users.id, { onDelete: "set null" }),
-  
-  // Training and capacity - certification_level increases with completed sessions
+
+  // Geographic coverage
+  primary_county: kenyanCountyEnum("primary_county").notNull(),
+  primary_constituency: varchar("primary_constituency", { length: 100 }),
+  coverage_areas: varchar("coverage_areas", { length: 100 }).array(),
+
+  // Ambassador profile
+  background: text("background"),
+  languages_spoken: varchar("languages_spoken", { length: 50 }).array(),
+  specializations: varchar("specializations", { length: 100 }).array(), // "youth", "women", "disability", "rural"
+
+  // Capabilities and equipment
+  has_smartphone: boolean("has_smartphone").notNull().default(false),
+  has_laptop: boolean("has_laptop").notNull().default(false),
+  connectivity_level: varchar("connectivity_level", { length: 50 }), // "good", "intermittent", "poor"
+
+  // Ambassador status
+  status: varchar("status", { length: 30 }).notNull().default("pending"), // "pending", "active", "inactive", "suspended"
+  verification_status: varchar("verification_status", { length: 30 }).notNull().default("unverified"), // "unverified", "verified", "background_checked"
+
+  // Training and certification
   training_completed: boolean("training_completed").notNull().default(false),
-  training_completion_date: timestamp("training_completion_date"),
-  certification_level: varchar("certification_level", { length: 50 }).default("level_1"),
-  
-  // Performance metrics - automatically updated from session data
+  training_completion_date: date("training_completion_date"),
+  certification_level: varchar("certification_level", { length: 30 }), // "basic", "intermediate", "advanced"
+
+  // Performance metrics
   sessions_conducted: integer("sessions_conducted").notNull().default(0),
-  total_participants_reached: integer("total_participants_reached").notNull().default(0),
-  average_session_rating: numeric("average_session_rating", { precision: 3, scale: 2 }),
-  
-  // Compensation and support - tier determines reimbursement rates
-  compensation_tier: varchar("compensation_tier", { length: 50 }).default("standard"),
-  support_resources: jsonb("support_resources").default(sql`'{}'::jsonb`).notNull(),
-  
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  people_reached: integer("people_reached").notNull().default(0),
+  last_activity_date: date("last_activity_date"),
+
+  // Onboarding and management
+  recruited_by_id: uuid("recruited_by_id").references(() => users.id, { onDelete: "set null" }),
+  onboarding_date: date("onboarding_date").notNull().default(sql`CURRENT_DATE`),
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  // Unique constraints
-  userIdx: uniqueIndex("idx_ambassadors_user").on(table.user_id),
-  codeIdx: uniqueIndex("idx_ambassadors_code").on(table.ambassador_code),
-  
-  // Query optimization indexes - most common filters first
-  statusCountyIdx: index("idx_ambassadors_status_county").on(table.status, table.primary_county),
-  primaryCountyIdx: index("idx_ambassadors_primary_county").on(table.primary_county),
-  statusIdx: index("idx_ambassadors_status").on(table.status),
-  verifiedByIdx: index("idx_ambassadors_verified_by").on(table.verified_by),
-  
-  // Composite index for ambassador search and assignment
-  certificationStatusIdx: index("idx_ambassadors_cert_status").on(table.certification_level, table.status),
-  
-  // Data integrity constraints
-  sessionsNonNegative: check("chk_ambassadors_sessions_non_negative", 
-    sql`${table.sessions_conducted} >= 0`),
-  participantsNonNegative: check("chk_ambassadors_participants_non_negative",
-    sql`${table.total_participants_reached} >= 0`),
-  ratingInRange: check("chk_ambassadors_rating_range",
-    sql`${table.average_session_rating} IS NULL OR (${table.average_session_rating} >= 0 AND ${table.average_session_rating} <= 5)`),
-  maxSessionsPositive: check("chk_ambassadors_max_sessions_positive",
-    sql`${table.max_sessions_per_month} > 0`),
-  verificationLogic: check("chk_ambassadors_verification_logic",
-    sql`(${table.status} = 'active' AND ${table.verification_date} IS NOT NULL AND ${table.verified_by} IS NOT NULL) OR (${table.status} != 'active')`),
+  // Ambassador lookup and management
+  statusCountyIdx: index("idx_ambassadors_status_county")
+    .on(table.status, table.primary_county)
+    .where(sql`${table.status} = 'active'`),
+
+  // Geographic coverage queries
+  coverageAreasIdx: index("idx_ambassadors_coverage_areas")
+    .using("gin", table.coverage_areas),
+
+  // Performance tracking
+  activityPerformanceIdx: index("idx_ambassadors_activity_performance")
+    .on(table.last_activity_date, table.sessions_conducted, table.people_reached),
+
+  // Training status
+  trainingStatusIdx: index("idx_ambassadors_training_status")
+    .on(table.training_completed, table.certification_level),
+
+  // Contact method validation
+  contactMethodCheck: check("ambassadors_contact_method_check",
+    sql`${table.contact_phone} IS NOT NULL OR ${table.contact_email} IS NOT NULL`),
 }));
 
 // ============================================================================
-// COMMUNITIES - Geographic and demographic communities served
+// COMMUNITIES - Geographic and demographic community definitions
 // ============================================================================
 
 export const communities = pgTable("communities", {
-  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
-  
-  // Community identification - type determines required fields
-  community_name: varchar("community_name", { length: 255 }).notNull(),
-  community_type: varchar("community_type", { length: 50 }).notNull(),
-  
-  // Geographic details - county required for geographic communities
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+
+  // Community identification
+  name: varchar("name", { length: 300 }).notNull(),
+  community_type: varchar("community_type", { length: 50 }).notNull(), // "geographic", "demographic", "interest_based", "institutional"
+
+  // Geographic definition
   county: kenyanCountyEnum("county"),
   constituency: varchar("constituency", { length: 100 }),
   ward: varchar("ward", { length: 100 }),
-  location_description: text("location_description"),
-  
-  // Demographics - helps target appropriate content and ambassadors
-  population_estimate: integer("population_estimate"),
-  demographic_profile: jsonb("demographic_profile").default(sql`'{}'::jsonb`),
-  
-  // Access and infrastructure - critical for planning session format
-  internet_connectivity: varchar("internet_connectivity", { length: 50 }).default("low"),
-  mobile_penetration: varchar("mobile_penetration", { length: 50 }).default("medium"),
-  electricity_access: varchar("electricity_access", { length: 50 }).default("partial"),
-  
-  // Languages and communication - determines content localization needs
-  primary_languages: varchar("primary_languages", { length: 50 }).array().notNull(),
-  preferred_communication: varchar("preferred_communication", { length: 100 }).array(),
-  
-  // Community leadership - key for session planning and follow-up
-  community_leaders: jsonb("community_leaders").default(sql`'[]'::jsonb`).notNull(),
-  trusted_messengers: jsonb("trusted_messengers").default(sql`'[]'::jsonb`).notNull(),
-  
-  // Engagement history - tracks previous sessions and outcomes
-  previous_engagement: jsonb("previous_engagement").default(sql`'[]'::jsonb`).notNull(),
-  engagement_readiness: varchar("engagement_readiness", { length: 50 }).notNull().default("unknown"),
-  
-  // Accessibility needs - ensures inclusive session planning
-  special_accommodation_needs: varchar("special_accommodation_needs", { length: 100 }).array(),
-  
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  sub_location: varchar("sub_location", { length: 100 }),
+
+  // Community characteristics
+  estimated_population: integer("estimated_population"),
+  primary_language: varchar("primary_language", { length: 50 }),
+  secondary_languages: varchar("secondary_languages", { length: 50 }).array(),
+
+  // Access characteristics
+  internet_penetration: numeric("internet_penetration", { precision: 5, scale: 2 }), // Percentage 0-100
+  smartphone_penetration: numeric("smartphone_penetration", { precision: 5, scale: 2 }),
+  literacy_rate: numeric("literacy_rate", { precision: 5, scale: 2 }),
+
+  // Community needs and interests
+  primary_concerns: varchar("primary_concerns", { length: 100 }).array(),
+  engagement_preferences: jsonb("engagement_preferences").notNull().default(sql`'{}'::jsonb`),
+
+  // Community leadership
+  traditional_leaders: jsonb("traditional_leaders").notNull().default(sql`'[]'::jsonb`),
+  community_groups: jsonb("community_groups").notNull().default(sql`'[]'::jsonb`),
+
+  // Assigned ambassadors
+  primary_ambassador_id: uuid("primary_ambassador_id").references(() => ambassadors.id, { onDelete: "set null" }),
+  secondary_ambassadors: uuid("secondary_ambassadors").array(),
+
+  // Community status
+  is_active: boolean("is_active").notNull().default(true),
+  last_engagement_date: date("last_engagement_date"),
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  // Search and filtering indexes
-  nameIdx: index("idx_communities_name").on(table.community_name),
-  typeCountyIdx: index("idx_communities_type_county").on(table.community_type, table.county),
-  countyIdx: index("idx_communities_county").on(table.county),
-  typeIdx: index("idx_communities_type").on(table.community_type),
-  constituencyIdx: index("idx_communities_constituency").on(table.constituency),
-  
-  // Full-text search on community name
-  nameTextIdx: index("idx_communities_name_text").using("gin", sql`to_tsvector('english', ${table.community_name})`),
-  
-  // Data validation
-  populationPositive: check("chk_communities_population_positive",
-    sql`${table.population_estimate} IS NULL OR ${table.population_estimate} > 0`),
-  validConnectivity: check("chk_communities_connectivity",
-    sql`${table.internet_connectivity} IN ('high', 'medium', 'low', 'none')`),
+  // Geographic community queries
+  countyConstituencyIdx: index("idx_communities_county_constituency")
+    .on(table.county, table.constituency, table.is_active)
+    .where(sql`${table.is_active} = true`),
+
+  // Ambassador assignment queries
+  primaryAmbassadorIdx: index("idx_communities_primary_ambassador")
+    .on(table.primary_ambassador_id, table.is_active)
+    .where(sql`${table.primary_ambassador_id} IS NOT NULL AND ${table.is_active} = true`),
+
+  // Community characteristics
+  accessCharacteristicsIdx: index("idx_communities_access_characteristics")
+    .on(table.internet_penetration, table.smartphone_penetration),
+
+  // Engagement tracking
+  lastEngagementIdx: index("idx_communities_last_engagement")
+    .on(table.last_engagement_date, table.is_active)
+    .where(sql`${table.is_active} = true`),
 }));
 
 // ============================================================================
-// FACILITATION SESSIONS - Offline community engagement events
+// FACILITATION SESSIONS - Offline community engagement sessions
 // ============================================================================
 
 export const facilitation_sessions = pgTable("facilitation_sessions", {
-  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
-  
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+
   // Session identification
-  session_title: varchar("session_title", { length: 500 }).notNull(),
-  session_type: sessionTypeEnum("session_type").notNull(),
-  
-  // Organizing ambassador - cascade delete if ambassador removed
+  session_code: varchar("session_code", { length: 30 }).notNull().unique(),
+  session_title: varchar("session_title", { length: 500 }),
+
+  // Session organization
   ambassador_id: uuid("ambassador_id").notNull().references(() => ambassadors.id, { onDelete: "cascade" }),
-  
-  // Target community and bills - preserve sessions if community deleted
   community_id: uuid("community_id").references(() => communities.id, { onDelete: "set null" }),
-  target_bills: uuid("target_bills").array(),
-  
-  // Session logistics - scheduled_date and time are required for planning
-  scheduled_date: date("scheduled_date").notNull(),
-  scheduled_time: varchar("scheduled_time", { length: 50 }).notNull(),
-  duration_minutes: integer("duration_minutes").notNull().default(120),
-  
-  // Venue information - physical location details
-  venue_name: varchar("venue_name", { length: 255 }).notNull(),
-  venue_address: text("venue_address"),
-  venue_type: varchar("venue_type", { length: 50 }).default("community_hall"),
-  
-  // Geographic context - denormalized for faster queries
-  county: kenyanCountyEnum("county").notNull(),
-  constituency: varchar("constituency", { length: 100 }),
-  ward: varchar("ward", { length: 100 }),
-  
-  // Accessibility and accommodations - tracked for reporting and compliance
-  accessibility_features: varchar("accessibility_features", { length: 100 }).array(),
-  materials_provided: varchar("materials_provided", { length: 100 }).array(),
-  
-  // Session content and format - detailed agenda in JSON structure
-  session_agenda: jsonb("session_agenda").default(sql`'[]'::jsonb`).notNull(),
-  discussion_topics: text("discussion_topics").array(),
-  educational_materials: jsonb("educational_materials").default(sql`'{}'::jsonb`).notNull(),
-  
-  // Participation tracking - expected helps with planning, actual for reporting
-  expected_participants: integer("expected_participants").notNull().default(20),
+
+  // Session logistics
+  session_date: date("session_date").notNull(),
+  start_time: varchar("start_time", { length: 10 }),
+  end_time: varchar("end_time", { length: 10 }),
+  venue: varchar("venue", { length: 300 }),
+  venue_type: varchar("venue_type", { length: 50 }), // "community_center", "school", "church", "market", "home"
+
+  // Session content
+  bills_discussed: uuid("bills_discussed").array(),
+  primary_bill_id: uuid("primary_bill_id").references(() => bills.id, { onDelete: "set null" }),
+  session_agenda: text("session_agenda"),
+  materials_used: varchar("materials_used", { length: 100 }).array(),
+
+  // Participation details
+  planned_participants: integer("planned_participants"),
   actual_participants: integer("actual_participants"),
-  participant_demographics: jsonb("participant_demographics").default(sql`'{}'::jsonb`),
-  
-  // Session outcomes - status drives workflow and notifications
-  session_status: varchar("session_status", { length: 50 }).notNull().default("scheduled"),
-  completion_notes: text("completion_notes"),
-  
-  // Feedback and evaluation - collected post-session for quality improvement
-  participant_feedback: jsonb("participant_feedback").default(sql`'[]'::jsonb`).notNull(),
-  session_rating: numeric("session_rating", { precision: 3, scale: 2 }),
-  improvement_suggestions: text("improvement_suggestions"),
-  
-  // Follow-up actions - critical for sustained community engagement
-  follow_up_required: boolean("follow_up_required").notNull().default(false),
-  follow_up_actions: jsonb("follow_up_actions").default(sql`'[]'::jsonb`).notNull(),
-  
-  // Resources and costs - for budgeting and reimbursement
-  resources_used: jsonb("resources_used").default(sql`'{}'::jsonb`).notNull(),
-  session_cost: numeric("session_cost", { precision: 10, scale: 2 }),
-  
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  participant_demographics: jsonb("participant_demographics").notNull().default(sql`'{}'::jsonb`),
+
+  // Session format and methods
+  session_format: varchar("session_format", { length: 50 }), // "presentation", "discussion", "workshop", "town_hall"
+  participation_methods: varchar("participation_methods", { length: 50 }).array(), // "verbal", "written", "voting", "drawing"
+  language_used: varchar("language_used", { length: 50 }),
+
+  // Session outcomes
+  session_status: varchar("session_status", { length: 30 }).notNull().default("planned"), // "planned", "completed", "cancelled", "postponed"
+  key_outcomes: text("key_outcomes"),
+  action_items_generated: text("action_items_generated"),
+  follow_up_needed: boolean("follow_up_needed").notNull().default(false),
+
+  // Data collection
+  feedback_collected: integer("feedback_collected").notNull().default(0),
+  photos_taken: integer("photos_taken").notNull().default(0),
+  audio_recorded: boolean("audio_recorded").notNull().default(false),
+
+  // Sync status for offline-first design
+  sync_status: varchar("sync_status", { length: 20 }).notNull().default("synced"), // "pending", "synced", "conflict"
+  last_synced_at: timestamp("last_synced_at", { withTimezone: true }),
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  // High-traffic query indexes
-  ambassadorStatusIdx: index("idx_facilitation_ambassador_status").on(table.ambassador_id, table.session_status),
-  ambassadorIdx: index("idx_facilitation_sessions_ambassador").on(table.ambassador_id),
-  communityIdx: index("idx_facilitation_sessions_community").on(table.community_id),
-  
-  // Date-based queries for scheduling and reporting
-  dateStatusIdx: index("idx_facilitation_date_status").on(table.scheduled_date, table.session_status),
-  scheduledDateIdx: index("idx_facilitation_sessions_scheduled_date").on(table.scheduled_date),
-  
-  // Geographic filtering
-  countyStatusIdx: index("idx_facilitation_county_status").on(table.county, table.session_status),
-  countyIdx: index("idx_facilitation_sessions_county").on(table.county),
-  
-  // Status and type for dashboard queries
-  statusIdx: index("idx_facilitation_sessions_status").on(table.session_status),
-  sessionTypeIdx: index("idx_facilitation_sessions_type").on(table.session_type),
-  
-  // Data integrity constraints
-  durationPositive: check("chk_facilitation_duration_positive",
-    sql`${table.duration_minutes} > 0`),
-  expectedParticipantsPositive: check("chk_facilitation_expected_positive",
-    sql`${table.expected_participants} > 0`),
-  actualParticipantsNonNegative: check("chk_facilitation_actual_non_negative",
-    sql`${table.actual_participants} IS NULL OR ${table.actual_participants} >= 0`),
-  ratingInRange: check("chk_facilitation_rating_range",
-    sql`${table.session_rating} IS NULL OR (${table.session_rating} >= 0 AND ${table.session_rating} <= 5)`),
-  validStatus: check("chk_facilitation_valid_status",
-    sql`${table.session_status} IN ('scheduled', 'completed', 'cancelled', 'postponed', 'in_progress')`),
-  completionLogic: check("chk_facilitation_completion_logic",
-    sql`(${table.session_status} = 'completed' AND ${table.actual_participants} IS NOT NULL) OR (${table.session_status} != 'completed')`),
+  // Ambassador session tracking
+  ambassadorDateIdx: index("idx_facilitation_sessions_ambassador_date")
+    .on(table.ambassador_id, table.session_date, table.session_status),
+
+  // Community engagement tracking
+  communityDateIdx: index("idx_facilitation_sessions_community_date")
+    .on(table.community_id, table.session_date)
+    .where(sql`${table.community_id} IS NOT NULL`),
+
+  // Bill discussion tracking
+  billDiscussionIdx: index("idx_facilitation_sessions_bill_discussion")
+    .using("gin", table.bills_discussed),
+
+  // Sync queue management
+  syncStatusIdx: index("idx_facilitation_sessions_sync_status")
+    .on(table.sync_status, table.last_synced_at)
+    .where(sql`${table.sync_status} != 'synced'`),
 }));
 
 // ============================================================================
-// OFFLINE SUBMISSIONS - Feedback collected during offline sessions
+// OFFLINE SUBMISSIONS - Citizen input collected offline
 // ============================================================================
 
 export const offline_submissions = pgTable("offline_submissions", {
-  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
-  
-  // Link to session - cascade delete when session removed
-  session_id: uuid("session_id").notNull().references(() => facilitation_sessions.id, { onDelete: "cascade" }),
-  
-  // Participant information - anonymized identifier for tracking without PII
-  participant_id: varchar("participant_id", { length: 100 }),
-  participant_consent: boolean("participant_consent").notNull().default(true),
-  
-  // Submission content - type determines processing workflow
-  submission_type: varchar("submission_type", { length: 50 }).notNull(),
-  submission_content: text("submission_content").notNull(),
-  
-  // Target bills/topics - enables aggregation by legislation
-  related_bills: uuid("related_bills").array(),
-  topic_tags: text("topic_tags").array(),
-  
-  // Position and sentiment - for analysis and reporting
-  position: varchar("position", { length: 20 }),
-  sentiment_score: numeric("sentiment_score", { precision: 3, scale: 2 }),
-  
-  // Demographics - optional with explicit consent for analysis
-  participant_age_range: varchar("participant_age_range", { length: 20 }),
-  participant_gender: varchar("participant_gender", { length: 20 }),
-  participant_occupation: varchar("participant_occupation", { length: 100 }),
-  participant_county: kenyanCountyEnum("participant_county"),
-  
-  // Translation and processing - handles multi-language submissions
-  original_language: varchar("original_language", { length: 50 }).notNull(),
-  translated_content: text("translated_content"),
-  translation_confidence: numeric("translation_confidence", { precision: 3, scale: 2 }),
-  
-  // Processing status - tracks integration into main system
-  processing_status: varchar("processing_status", { length: 50 }).notNull().default("pending"),
-  entered_into_system: boolean("entered_into_system").notNull().default(false),
-  system_comment_id: uuid("system_comment_id").references(() => comments.id, { onDelete: "set null" }),
-  
-  // Metadata - tracks who recorded the submission
-  submission_method: varchar("submission_method", { length: 50 }).notNull().default("verbal"),
-  recorded_by: uuid("recorded_by").notNull().references(() => users.id, { onDelete: "cascade" }),
-  
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+
+  // Submission context
+  session_id: uuid("session_id").references(() => facilitation_sessions.id, { onDelete: "set null" }),
+  bill_id: uuid("bill_id").notNull().references(() => bills.id, { onDelete: "cascade" }),
+  collected_by_id: uuid("collected_by_id").notNull().references(() => ambassadors.id, { onDelete: "cascade" }),
+
+  // Participant information (anonymized)
+  participant_code: varchar("participant_code", { length: 20 }), // Anonymous identifier
+  participant_demographics: jsonb("participant_demographics").$type<{
+    age_range?: string;
+    gender?: string;
+    education_level?: string;
+    occupation?: string;
+    county?: string;
+    constituency?: string;
+  }>().notNull().default(sql`'{}'::jsonb`),
+
+  // Submission content
+  submission_text: text("submission_text").notNull(),
+  submission_language: varchar("submission_language", { length: 50 }),
+  position: varchar("position", { length: 20 }), // "support", "oppose", "neutral", "question"
+
+  // Collection method
+  collection_method: varchar("collection_method", { length: 30 }).notNull(), // "verbal_transcribed", "written", "audio_recorded", "drawing"
+  original_format: varchar("original_format", { length: 30 }), // "swahili", "english", "local_language", "visual"
+
+  // Quality and verification
+  transcription_quality: varchar("transcription_quality", { length: 20 }), // "high", "medium", "low", "needs_review"
+  verified_by_participant: boolean("verified_by_participant").notNull().default(false),
+
+  // Processing status
+  processing_status: varchar("processing_status", { length: 30 }).notNull().default("collected"), // "collected", "transcribed", "translated", "processed"
+  needs_translation: boolean("needs_translation").notNull().default(false),
+  translated_text: text("translated_text"),
+
+  // Attachments and media
+  audio_file_path: varchar("audio_file_path", { length: 500 }),
+  photo_file_paths: varchar("photo_file_paths", { length: 500 }).array(),
+
+  // Sync and integration
+  sync_status: varchar("sync_status", { length: 20 }).notNull().default("pending"), // "pending", "synced", "error"
+  integrated_with_online: boolean("integrated_with_online").notNull().default(false),
+  online_comment_id: uuid("online_comment_id"), // Link to comments table if integrated
+
+  collected_at: timestamp("collected_at", { withTimezone: true }).notNull().defaultNow(),
+  synced_at: timestamp("synced_at", { withTimezone: true }),
 }, (table) => ({
-  // Processing workflow indexes
-  processingStatusIdx: index("idx_offline_submissions_processing_status").on(table.processing_status),
-  statusSessionIdx: index("idx_offline_submissions_status_session").on(table.processing_status, table.session_id),
-  
-  // Session-based queries
-  sessionIdx: index("idx_offline_submissions_session").on(table.session_id),
-  
-  // Integration tracking
-  enteredIntoSystemIdx: index("idx_offline_submissions_entered").on(table.entered_into_system),
-  
-  // Analysis indexes
-  positionIdx: index("idx_offline_submissions_position").on(table.position),
-  participantCountyIdx: index("idx_offline_submissions_county").on(table.participant_county),
-  submissionTypeIdx: index("idx_offline_submissions_type").on(table.submission_type),
-  
-  // GIN index for array searches on related bills and tags
-  relatedBillsIdx: index("idx_offline_submissions_bills").using("gin", table.related_bills),
-  topicTagsIdx: index("idx_offline_submissions_tags").using("gin", table.topic_tags),
-  
-  // Data validation
-  validSubmissionType: check("chk_offline_valid_submission_type",
-    sql`${table.submission_type} IN ('comment', 'vote', 'question', 'concern', 'suggestion')`),
-  validPosition: check("chk_offline_valid_position",
-    sql`${table.position} IS NULL OR ${table.position} IN ('support', 'oppose', 'neutral')`),
-  sentimentInRange: check("chk_offline_sentiment_range",
-    sql`${table.sentiment_score} IS NULL OR (${table.sentiment_score} >= -1 AND ${table.sentiment_score} <= 1)`),
-  translationConfidenceRange: check("chk_offline_translation_confidence",
-    sql`${table.translation_confidence} IS NULL OR (${table.translation_confidence} >= 0 AND ${table.translation_confidence} <= 1)`),
+  // Session submissions
+  sessionCollectedIdx: index("idx_offline_submissions_session_collected")
+    .on(table.session_id, table.collected_at)
+    .where(sql`${table.session_id} IS NOT NULL`),
+
+  // Bill submissions
+  billPositionIdx: index("idx_offline_submissions_bill_position")
+    .on(table.bill_id, table.position, table.collected_at),
+
+  // Processing queue
+  processingStatusIdx: index("idx_offline_submissions_processing_status")
+    .on(table.processing_status, table.needs_translation, table.collected_at),
+
+  // Sync queue
+  syncStatusIdx: index("idx_offline_submissions_sync_status")
+    .on(table.sync_status, table.collected_at)
+    .where(sql`${table.sync_status} != 'synced'`),
+
+  // Ambassador collection tracking
+  collectedByIdx: index("idx_offline_submissions_collected_by")
+    .on(table.collected_by_id, table.collected_at),
 }));
 
 // ============================================================================
-// USSD SESSIONS - Mobile-based engagement for low-connectivity areas
+// USSD SESSIONS - Feature phone access sessions
 // ============================================================================
 
 export const ussd_sessions = pgTable("ussd_sessions", {
-  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
-  
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+
   // Session identification - session_id is network-provided unique identifier
   session_id: varchar("session_id", { length: 100 }).unique().notNull(),
   phone_number: varchar("phone_number", { length: 20 }).notNull(),
-  
+  user_id: uuid("user_id").references(() => users.id, { onDelete: "set null" }), // If user is registered
+
   // Session flow - current_menu tracks navigation state
   current_menu: varchar("current_menu", { length: 100 }).notNull().default("main"),
-  session_data: jsonb("session_data").default(sql`'{}'::jsonb`).notNull(),
-  
-  // User context - location from mobile network operator
-  user_location: varchar("user_location", { length: 100 }),
-  language_preference: varchar("language_preference", { length: 50 }).notNull().default("english"),
-  
-  // Engagement tracking - links session to specific legislation
-  bill_context: uuid("bill_context").references(() => bills.id, { onDelete: "set null" }),
-  participation_method: participationMethodEnum("participation_method"),
-  
-  // Session state - active sessions are periodically cleaned up
+  menu_history: varchar("menu_history", { length: 100 }).array(),
+  session_data: jsonb("session_data").notNull().default(sql`'{}'::jsonb`),
+
+  // Session status
   session_active: boolean("session_active").notNull().default(true),
-  last_interaction_at: timestamp("last_interaction_at").notNull().defaultNow(),
-  session_duration_seconds: integer("session_duration_seconds"),
-  
-  // Collected data - stores user responses throughout session
-  collected_responses: jsonb("collected_responses").default(sql`'{}'::jsonb`).notNull(),
-  response_count: integer("response_count").notNull().default(0),
-  
-  // Completion tracking
-  session_completed: boolean("session_completed").notNull().default(false),
-  completion_at: timestamp("completion_at"),
-  
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  session_start: timestamp("session_start", { withTimezone: true }).notNull().defaultNow(),
+  session_end: timestamp("session_end", { withTimezone: true }),
+  last_interaction: timestamp("last_interaction", { withTimezone: true }).notNull().defaultNow(),
+
+  // Usage tracking
+  menus_visited: integer("menus_visited").notNull().default(1),
+  actions_performed: integer("actions_performed").notNull().default(0),
+  bills_viewed: uuid("bills_viewed").array(),
+
+  // Location and context
+  county: kenyanCountyEnum("county"), // Inferred from phone area code if possible
+  telecom_provider: varchar("telecom_provider", { length: 100 }), // "Safaricom", "Airtel", etc.
+
+  // Session outcome
+  session_outcome: varchar("session_outcome", { length: 50 }), // "completed", "timeout", "user_exit", "error"
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  // Unique constraint on external session ID
-  sessionIdIdx: uniqueIndex("idx_ussd_sessions_session_id").on(table.session_id),
-  
-  // User tracking and rate limiting
+  // Session management
+  sessionIdIdx: unique("idx_ussd_sessions_session_id").on(table.session_id),
   phoneNumberIdx: index("idx_ussd_sessions_phone_number").on(table.phone_number),
   phoneActiveIdx: index("idx_ussd_sessions_phone_active").on(table.phone_number, table.session_active),
-  
+
+  // User tracking and rate limiting
+  userSessionIdx: index("idx_ussd_sessions_user_session")
+    .on(table.user_id, table.session_start)
+    .where(sql`${table.user_id} IS NOT NULL`),
+
   // Bill engagement tracking
-  billContextIdx: index("idx_ussd_sessions_bill_context").on(table.bill_context),
-  
-  // Session cleanup and monitoring
-  lastInteractionIdx: index("idx_ussd_sessions_last_interaction").on(table.last_interaction_at),
-  sessionActiveIdx: index("idx_ussd_sessions_active").on(table.session_active),
-  activeInteractionIdx: index("idx_ussd_active_interaction").on(table.session_active, table.last_interaction_at),
-  
-  // Data validation
-  responseCountNonNegative: check("chk_ussd_response_count_non_negative",
-    sql`${table.response_count} >= 0`),
-  durationNonNegative: check("chk_ussd_duration_non_negative",
-    sql`${table.session_duration_seconds} IS NULL OR ${table.session_duration_seconds} >= 0`),
-  completionLogic: check("chk_ussd_completion_logic",
-    sql`(${table.session_completed} = true AND ${table.completion_at} IS NOT NULL) OR (${table.session_completed} = false)`),
+  billsViewedIdx: index("idx_ussd_sessions_bills_viewed")
+    .using("gin", table.bills_viewed),
+
+  // Analytics and monitoring
+  outcomeProviderIdx: index("idx_ussd_sessions_outcome_provider")
+    .on(table.session_outcome, table.telecom_provider, table.session_start),
 }));
 
 // ============================================================================
-// LOCALIZED CONTENT - Content adapted for specific communities
+// LOCALIZED CONTENT - Multi-language and culturally adapted content
 // ============================================================================
 
 export const localized_content = pgTable("localized_content", {
-  id: uuid("id").primaryKey().default(sql`uuid_generate_v4()`),
-  
-  // Content identification - links to original source material
-  content_type: varchar("content_type", { length: 50 }).notNull(),
-  original_content_id: uuid("original_content_id"),
-  
-  // Localization target - community takes precedence over county
-  target_community_id: uuid("target_community_id").references(() => communities.id, { onDelete: "cascade" }),
-  target_county: kenyanCountyEnum("target_county"),
-  target_languages: varchar("target_languages", { length: 50 }).array().notNull(),
-  
-  // Localized content - adapted for cultural context
-  localized_title: varchar("localized_title", { length: 500 }).notNull(),
-  localized_content: text("localized_content").notNull(),
-  cultural_context: jsonb("cultural_context").default(sql`'{}'::jsonb`).notNull(),
-  
-  // Localization metadata - tracks creation method and quality
-  localization_method: varchar("localization_method", { length: 100 }).notNull(),
-  localization_confidence: numeric("localization_confidence", { precision: 3, scale: 2 }),
-  
-  // Review and validation - community input ensures cultural appropriateness
-  community_reviewed: boolean("community_reviewed").notNull().default(false),
-  community_review_date: timestamp("community_review_date"),
-  community_feedback: text("community_feedback"),
-  
-  // Usage tracking - helps prioritize content updates
+  id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+
+  // Content identification
+  content_type: varchar("content_type", { length: 50 }).notNull(), // "bill_summary", "constitutional_analysis", "help_text", "menu_item"
+  source_id: uuid("source_id").notNull(), // ID of the source content (bill, analysis, etc.)
+  content_key: varchar("content_key", { length: 100 }).notNull(), // Unique identifier for this content piece
+
+  // Localization details
+  language_code: varchar("language_code", { length: 10 }).notNull(), // ISO 639-1 codes
+  country_code: varchar("country_code", { length: 5 }).notNull().default("KE"),
+  cultural_context: varchar("cultural_context", { length: 50 }), // "urban", "rural", "youth", "elderly"
+
+  // Content versions
+  original_text: text("original_text").notNull(),
+  localized_text: text("localized_text").notNull(),
+  simplified_text: text("simplified_text"), // For low literacy audiences
+  audio_url: varchar("audio_url", { length: 500 }), // Text-to-speech or human recording
+
+  // Translation metadata
+  translation_method: varchar("translation_method", { length: 30 }).notNull(), // "human", "machine", "hybrid", "community"
+  translator_id: uuid("translator_id").references(() => users.id, { onDelete: "set null" }),
+  translation_quality: varchar("translation_quality", { length: 20 }), // "draft", "reviewed", "approved", "native_speaker"
+
+  // Content adaptation
+  reading_level: varchar("reading_level", { length: 20 }), // "basic", "intermediate", "advanced"
+  cultural_adaptations: text("cultural_adaptations"), // Notes on cultural modifications made
+
+  // Usage and feedback
   usage_count: integer("usage_count").notNull().default(0),
-  last_used_at: timestamp("last_used_at"),
-  
-  // Content metadata
-  created_by: uuid("created_by").notNull().references(() => users.id, { onDelete: "cascade" }),
-  reviewed_by: uuid("reviewed_by").references(() => users.id, { onDelete: "set null" }),
-  
-  created_at: timestamp("created_at").notNull().defaultNow(),
-  updated_at: timestamp("updated_at").notNull().defaultNow(),
+  feedback_score: numeric("feedback_score", { precision: 3, scale: 2 }), // Average user rating
+  needs_update: boolean("needs_update").notNull().default(false),
+
+  // Version control
+  version_number: integer("version_number").notNull().default(1),
+  superseded_by: uuid("superseded_by"),
+
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => ({
-  // Content discovery indexes
-  contentTypeIdx: index("idx_localized_content_type").on(table.content_type),
-  typeCountyIdx: index("idx_localized_content_type_county").on(table.content_type, table.target_county),
-  communityIdx: index("idx_localized_content_community").on(table.target_community_id),
-  countyIdx: index("idx_localized_content_county").on(table.target_county),
-  
-  // Language filtering with GIN index for array containment
-  languageIdx: index("idx_localized_content_language").using("gin", table.target_languages),
-  
-  // Quality and review tracking
-  communityReviewedIdx: index("idx_localized_content_reviewed").on(table.community_reviewed),
-  reviewStatusIdx: index("idx_localized_content_review_status").on(table.community_reviewed, table.target_county),
-  
+  // Content lookup
+  contentLanguageIdx: index("idx_localized_content_content_language")
+    .on(table.content_type, table.source_id, table.language_code),
+
+  // Translation workflow
+  translationQualityIdx: index("idx_localized_content_translation_quality")
+    .on(table.translation_method, table.translation_quality, table.needs_update),
+
+  // Cultural adaptation queries
+  culturalContextIdx: index("idx_localized_content_cultural_context")
+    .on(table.cultural_context, table.reading_level, table.language_code),
+
   // Usage analytics
-  usageIdx: index("idx_localized_content_usage").on(table.usage_count),
-  createdByIdx: index("idx_localized_content_created_by").on(table.created_by),
-  
-  // Full-text search on localized content
-  contentTextIdx: index("idx_localized_content_text").using("gin", sql`to_tsvector('english', ${table.localized_content})`),
-  
-  // Data validation
-  validContentType: check("chk_localized_valid_content_type",
-    sql`${table.content_type} IN ('bill_summary', 'civic_education', 'how_to_guide', 'faq', 'announcement')`),
-  validLocalizationMethod: check("chk_localized_valid_method",
-    sql`${table.localization_method} IN ('human_translation', 'community_adaptation', 'ai_localization', 'hybrid')`),
-  confidenceInRange: check("chk_localized_confidence_range",
-    sql`${table.localization_confidence} IS NULL OR (${table.localization_confidence} >= 0 AND ${table.localization_confidence} <= 1)`),
-  usageCountNonNegative: check("chk_localized_usage_non_negative",
-    sql`${table.usage_count} >= 0`),
-  reviewLogic: check("chk_localized_review_logic",
-    sql`(${table.community_reviewed} = true AND ${table.community_review_date} IS NOT NULL) OR (${table.community_reviewed} = false)`),
+  usageCountIdx: index("idx_localized_content_usage_count")
+    .on(table.usage_count, table.feedback_score),
 }));
 
 // ============================================================================
@@ -485,84 +428,96 @@ export const localized_content = pgTable("localized_content", {
 // ============================================================================
 
 export const ambassadorsRelations = relations(ambassadors, ({ one, many }) => ({
-  // Each ambassador belongs to one user account
   user: one(users, {
     fields: [ambassadors.user_id],
     references: [users.id],
   }),
-  // Tracks who verified this ambassador (admin user)
-  verifiedBy: one(users, {
-    fields: [ambassadors.verified_by],
+  recruitedBy: one(users, {
+    fields: [ambassadors.recruited_by_id],
     references: [users.id],
-    relationName: "verifier",
+    relationName: "recruiter",
   }),
-  // One ambassador can conduct many sessions
+  primaryCommunities: many(communities),
   sessions: many(facilitation_sessions),
+  offlineSubmissions: many(offline_submissions),
 }));
 
-export const communitiesRelations = relations(communities, ({ many }) => ({
-  // One community can have many facilitation sessions
+export const communitiesRelations = relations(communities, ({ one, many }) => ({
+  primaryAmbassador: one(ambassadors, {
+    fields: [communities.primary_ambassador_id],
+    references: [ambassadors.id],
+  }),
   sessions: many(facilitation_sessions),
-  // One community can have many pieces of localized content
-  localizedContent: many(localized_content),
 }));
 
 export const facilitationSessionsRelations = relations(facilitation_sessions, ({ one, many }) => ({
-  // Each session is led by one ambassador
   ambassador: one(ambassadors, {
     fields: [facilitation_sessions.ambassador_id],
     references: [ambassadors.id],
   }),
-  // Each session targets one community (optional)
   community: one(communities, {
     fields: [facilitation_sessions.community_id],
     references: [communities.id],
   }),
-  // One session can generate many offline submissions
+  primaryBill: one(bills, {
+    fields: [facilitation_sessions.primary_bill_id],
+    references: [bills.id],
+  }),
   offlineSubmissions: many(offline_submissions),
 }));
 
 export const offlineSubmissionsRelations = relations(offline_submissions, ({ one }) => ({
-  // Each submission belongs to one facilitation session
   session: one(facilitation_sessions, {
     fields: [offline_submissions.session_id],
     references: [facilitation_sessions.id],
   }),
-  // Tracks which user (ambassador) recorded this submission
-  recordedBy: one(users, {
-    fields: [offline_submissions.recorded_by],
-    references: [users.id],
+  bill: one(bills, {
+    fields: [offline_submissions.bill_id],
+    references: [bills.id],
   }),
-  // Links to the system comment if submission was entered digitally
-  systemComment: one(comments, {
-    fields: [offline_submissions.system_comment_id],
-    references: [comments.id],
+  collectedBy: one(ambassadors, {
+    fields: [offline_submissions.collected_by_id],
+    references: [ambassadors.id],
   }),
 }));
 
 export const ussdSessionsRelations = relations(ussd_sessions, ({ one }) => ({
-  // Links USSD session to a specific bill being discussed
-  billContext: one(bills, {
-    fields: [ussd_sessions.bill_context],
-    references: [bills.id],
+  user: one(users, {
+    fields: [ussd_sessions.user_id],
+    references: [users.id],
   }),
 }));
 
 export const localizedContentRelations = relations(localized_content, ({ one }) => ({
-  // Content is targeted at one community (optional)
-  targetCommunity: one(communities, {
-    fields: [localized_content.target_community_id],
-    references: [communities.id],
-  }),
-  // Content is created by one user
-  createdBy: one(users, {
-    fields: [localized_content.created_by],
+  translator: one(users, {
+    fields: [localized_content.translator_id],
     references: [users.id],
   }),
-  // Content is reviewed by one user (optional)
-  reviewedBy: one(users, {
-    fields: [localized_content.reviewed_by],
-    references: [users.id],
-    relationName: "reviewer",
+  supersededBy: one(localized_content, {
+    fields: [localized_content.superseded_by],
+    references: [localized_content.id],
+    relationName: "supersession",
   }),
 }));
+
+// ============================================================================
+// TYPE EXPORTS
+// ============================================================================
+
+export type Ambassador = typeof ambassadors.$inferSelect;
+export type NewAmbassador = typeof ambassadors.$inferInsert;
+
+export type Community = typeof communities.$inferSelect;
+export type NewCommunity = typeof communities.$inferInsert;
+
+export type FacilitationSession = typeof facilitation_sessions.$inferSelect;
+export type NewFacilitationSession = typeof facilitation_sessions.$inferInsert;
+
+export type OfflineSubmission = typeof offline_submissions.$inferSelect;
+export type NewOfflineSubmission = typeof offline_submissions.$inferInsert;
+
+export type UssdSession = typeof ussd_sessions.$inferSelect;
+export type NewUssdSession = typeof ussd_sessions.$inferInsert;
+
+export type LocalizedContent = typeof localized_content.$inferSelect;
+export type NewLocalizedContent = typeof localized_content.$inferInsert;

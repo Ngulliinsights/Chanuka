@@ -72,6 +72,29 @@ declare module '@shared/core/*' {
   export default anyExport;
 }
 
+// Provide a lightweight declaration for the validation sub-module so client
+// code can import validation helpers without pulling full shared types.
+declare module '@shared/core/validation' {
+  import { ZodSchema } from 'zod';
+
+  export interface ValidationService {
+    validate<T>(schema: ZodSchema<T>, data: unknown): Promise<T>;
+    validateSafe<T>(schema: ZodSchema<T>, data: unknown): Promise<{ success: boolean; data?: T; error?: any }>;
+    validateBatch(...args: any[]): Promise<any>;
+    registerSchema(name: string, schema: ZodSchema<any>): void;
+    getSchema(name: string): ZodSchema<any> | undefined;
+  }
+
+  export const validationService: ValidationService;
+  export const validate: typeof validationService.validate;
+  export const validateSafe: typeof validationService.validateSafe;
+  export const validateBatch: typeof validationService.validateBatch;
+  export const registerSchema: typeof validationService.registerSchema;
+  export const getSchema: typeof validationService.getSchema;
+
+  export default validationService;
+}
+
 declare module '@shared/schema' {
   export interface ArchitectureComponent {
     id: string | number;

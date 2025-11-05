@@ -55,14 +55,15 @@ Successfully refactored the monolithic `search-suggestions.ts` service (866 line
   - Popular terms extraction with decay factors
   - History export/import for persistence
 
-#### `QueryBuilderService` (`services/query-builder.service.ts`)
-- **Purpose**: Optimized database query construction
-- **Features**:
-  - Parameterized query building for security
-  - Context-aware filtering
-  - Full-text search query optimization
-  - Input sanitization and validation
-  - Spell correction query support
+#### ~~`QueryBuilderService`~~ (MIGRATED)
+- **Status**: ✅ **MIGRATED TO DIRECT DRIZZLE USAGE**
+- **Migration**: Query builder abstraction layer removed in favor of direct Drizzle ORM usage
+- **Features Preserved**:
+  - Parameterized query building for security (now in individual services)
+  - Context-aware filtering (maintained in suggestion engines)
+  - Full-text search query optimization (direct SQL in services)
+  - Input sanitization and validation (moved to SuggestionEngineService)
+  - Spell correction query support (direct SQL execution)
 
 #### `ParallelQueryExecutor` (`utils/parallel-query-executor.ts`)
 - **Purpose**: Concurrent query execution with resilience

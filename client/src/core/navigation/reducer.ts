@@ -120,7 +120,7 @@ export function navigationReducer(state: NavigationState, action: NavigationActi
     case 'SYNC_AUTH_STATE': {
       const { user, isAuthenticated } = action.payload;
       const newUserRole = isAuthenticated && user?.role 
-        ? (users.role as any) 
+        ? (user.role as any) 
         : 'public';
       
       // Avoid unnecessary updates if role hasn't changed

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 // Mock logger
 const mockLogger = {
   info: vi.fn(),
@@ -72,8 +72,8 @@ describe('Core Utilities Integration Tests', () => {
       cache: { enabled: true, priority: 30 },
       validation: { enabled: true, priority: 40 },
       rateLimit: { enabled: true, priority: 50 },
-      health: { 
-        enabled: true, 
+      health: {
+        enabled: true,
         priority: 60,
         config: {
           endpoint: '/health',

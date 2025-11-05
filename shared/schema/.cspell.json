@@ -1,0 +1,19 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "USSD",
+    "ussd",
+    "Safaricom",
+    "Airtel",
+    "whistleblower",
+    "Ussd"
+  ],
+  "ignoreWords": [
+    "USSD",
+    "ussd", 
+    "Safaricom",
+    "Airtel",
+    "whistleblower"
+  ]
+}

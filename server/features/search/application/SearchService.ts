@@ -1,4 +1,4 @@
-import { SearchRepository } from '../infrastructure/SearchRepository';
+import { searchService } from './search-service-direct.js';
 import { SearchQueryBuilder } from '../infrastructure/SearchQueryBuilder';
 import { SearchCache } from '../infrastructure/SearchCache';
 import { SearchIndexManager } from '../infrastructure/SearchIndexManager';
@@ -15,7 +15,7 @@ import type {
   PlainBill,
 } from '../domain/search.dto';
 
-const repo = new SearchRepository();
+// Repository pattern replaced with direct service
 const cache = new SearchCache();
 const scorer = new RelevanceScorer();
 const suggestionsSvc = suggestionEngineService;

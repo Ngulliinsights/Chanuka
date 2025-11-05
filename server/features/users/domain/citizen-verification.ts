@@ -1,8 +1,7 @@
 
 import { database as db } from '@shared/database/connection';
-import { users, user_verification, bills } from '@shared/schema';
-import { eq, and, desc, count, sql } from 'drizzle-orm';
-import { logger } from '../../../../shared/core/src/index.js';
+import { users, user_verification } from '@shared/schema';
+import { eq, desc, sql } from 'drizzle-orm';
 
 export interface CitizenVerification {
   id: string;
@@ -181,7 +180,7 @@ export class CitizenVerificationService {
   async performFactCheck(
     bill_id: number,
     claim: string,
-    requesterId?: string
+    _requesterId?: string
   ): Promise<FactCheckResult[]> { // Find relevant verifications for this claim
     const relevantVerifications = await this.findRelevantVerifications(bill_id, claim);
 
@@ -213,8 +212,7 @@ export class CitizenVerificationService {
     disputeRate: number;
     expertiseAreas: string[];
   }> {
-    const citizen = await this.getCitizenData(citizenId);
-    const verifications = await this.getCitizenVerifications(citizenId);
+  const verifications = await this.getCitizenVerifications(citizenId);
 
     const verificationCount = verifications.length;
     const averageConfidence = verificationCount > 0
@@ -286,7 +284,7 @@ export class CitizenVerificationService {
   }
 
   private calculateInitialConfidence(
-    evidence: Evidence[],
+    _evidence: Evidence[],
     expertise: ExpertiseLevel,
     evidenceScore: number
   ): number {
@@ -313,20 +311,26 @@ export class CitizenVerificationService {
   }
 
   private async storeVerification(verification: CitizenVerification): Promise<void> {
+    // Map our domain model into the shared user_verification table.
+    // We store bill-specific fields inside verification_data JSONB to avoid schema mismatch.
     await db.insert(user_verification).values({
       id: verification.id,
-      bill_id: verification.bill_id,
-      citizenId: verification.citizenId,
+      user_id: verification.citizenId,
       verification_type: verification.verification_type,
       verification_status: verification.verification_status,
-      confidence: verification.confidence,
-      evidence: verification.evidence,
-      expertise: verification.expertise,
-      reasoning: verification.reasoning,
-      endorsements: 0,
-      disputes: 0,
+      // Store structured domain fields inside verification_data JSONB
+      verification_data: {
+        bill_id: verification.bill_id,
+        confidence: verification.confidence,
+        evidence: verification.evidence,
+        expertise: verification.expertise,
+        reasoning: verification.reasoning,
+        endorsements: 0,
+        disputes: 0,
+      },
+      verification_notes: verification.reasoning,
       created_at: new Date(),
-      updated_at: new Date()
+      updated_at: new Date(),
     });
   }
 
@@ -343,85 +347,116 @@ export class CitizenVerificationService {
       .where(eq(users.id, citizenId));
   }
 
-  private async checkExistingEndorsement(verificationId: string, citizenId: string): Promise<boolean> {
+  private async checkExistingEndorsement(_verificationId: string, _citizenId: string): Promise<boolean> {
     // This would check a separate endorsements table in a real implementation
     // For now, returning false as placeholder
     return false;
   }
 
-  private async recordEndorsement(verificationId: string, citizenId: string): Promise<void> {
-    // Record endorsement and update count
+  private async recordEndorsement(verificationId: string, _citizenId: string): Promise<void> {
+    // Increment endorsements counter stored in verification_data JSONB
+    const row = await db.select().from(user_verification).where(eq(user_verification.id, verificationId));
+    const existing = row[0];
+    if (!existing) return;
+    const data = (existing as any).verification_data || {};
+    const endorsements = (data.endorsements || 0) + 1;
+    data.endorsements = endorsements;
+
     await db
       .update(user_verification)
-      .set({
-        endorsements: sql`endorsements + 1`,
-        updated_at: new Date()
-      })
+      .set({ verification_data: data, updated_at: new Date() })
       .where(eq(user_verification.id, verificationId));
   }
 
   private async recordDispute(
     verificationId: string,
-    citizenId: string,
-    reason: string,
+    _citizenId: string,
+    _reason: string,
     counterEvidence?: Evidence[]
   ): Promise<void> {
     // Record dispute and update count
+    const row = await db.select().from(user_verification).where(eq(user_verification.id, verificationId));
+    const existing = row[0];
+    if (!existing) return;
+    const data = (existing as any).verification_data || {};
+    const disputes = (data.disputes || 0) + 1;
+    data.disputes = disputes;
+    // Optionally append counterEvidence into verification_data
+    if (counterEvidence && counterEvidence.length) {
+      data.counterEvidence = (data.counterEvidence || []).concat(counterEvidence);
+    }
+
     await db
       .update(user_verification)
-      .set({
-        disputes: sql`disputes + 1`,
-        updated_at: new Date()
-      })
+      .set({ verification_data: data, updated_at: new Date() })
       .where(eq(user_verification.id, verificationId));
   }
 
   private async recalculateVerificationConfidence(verificationId: string): Promise<void> {
-    // Get current verification data
-    const verification = await this.getVerificationById(verificationId);
-    if (!verification) return;
+    const row = await db.select().from(user_verification).where(eq(user_verification.id, verificationId));
+    const existing = row[0];
+    if (!existing) return;
+    const data = (existing as any).verification_data || {};
 
-    // Factor in community endorsements
-    const communityWeight = Math.min(verification.endorsements * 2, 20);
-    const disputePenalty = Math.min(verification.disputes * 5, 25);
+    const endorsements = data.endorsements || 0;
+    const disputes = data.disputes || 0;
 
-    const newConfidence = Math.max(0, Math.min(100,
-      verification.confidence + communityWeight - disputePenalty
-    ));
+    const communityWeight = Math.min(endorsements * 2, 20);
+    const disputePenalty = Math.min(disputes * 5, 25);
+
+    const prevConfidence = data.confidence ?? 50;
+    const newConfidence = Math.max(0, Math.min(100, prevConfidence + communityWeight - disputePenalty));
+
+    data.confidence = newConfidence;
 
     await db
       .update(user_verification)
-      .set({
-        confidence: newConfidence,
-        updated_at: new Date()
-      })
+      .set({ verification_data: data, updated_at: new Date() })
       .where(eq(user_verification.id, verificationId));
   }
 
   private async updateVerificationStatus(verificationId: string): Promise<void> {
-    const verification = await this.getVerificationById(verificationId);
-    if (!verification) return;
+    const row = await db.select().from(user_verification).where(eq(user_verification.id, verificationId));
+    const existing = row[0];
+    if (!existing) return;
+    const data = (existing as any).verification_data || {};
 
-    // Update status based on dispute threshold
-    if (verification.disputes > verification.endorsements && verification.disputes > 3) {
+    if ((data.disputes || 0) > (data.endorsements || 0) && (data.disputes || 0) > 3) {
       await db
         .update(user_verification)
-        .set({
-          verification_status: 'disputed',
-          updated_at: new Date()
-        })
+        .set({ verification_status: 'disputed', updated_at: new Date() })
         .where(eq(user_verification.id, verificationId));
     }
   }
 
   private async getBillVerifications(bill_id: number): Promise<CitizenVerification[]> {
+    // The shared schema stores bill-specific data inside verification_data (jsonb).
+    // Use a SQL predicate to extract bill_id from the jsonb field.
     const results = await db
       .select()
       .from(user_verification)
-      .where(eq(user_verification.bill_id, bill_id))
+      .where(sql`(user_verification.verification_data->>'bill_id')::int = ${bill_id}`)
       .orderBy(desc(user_verification.created_at));
 
-    return results;
+    // Map DB rows into domain shape by pulling data out of verification_data
+    return results.map((r: any) => {
+      const data = (r as any).verification_data || {};
+      return {
+        id: r.id,
+        bill_id: data.bill_id,
+        citizenId: r.user_id,
+        verification_type: r.verification_type,
+        verification_status: r.verification_status,
+        confidence: data.confidence ?? 0,
+        evidence: data.evidence || [],
+        expertise: data.expertise || { domain: '', level: 'citizen', credentials: [], verifiedCredentials: false, reputation_score: 0 },
+        reasoning: data.reasoning || (r.verification_notes as string) || '',
+        created_at: r.created_at,
+        updated_at: r.updated_at,
+        endorsements: data.endorsements || 0,
+        disputes: data.disputes || 0,
+      } as CitizenVerification;
+    });
   }
 
   private calculateExpertiseDistribution(verifications: CitizenVerification[]): Record<string, number> {
@@ -517,23 +552,33 @@ export class CitizenVerificationService {
     return 'unverifiable';
   }
 
-  private async getCitizenData(citizenId: string) {
-    const result = await db
-      .select()
-      .from(users)
-      .where(eq(users.id, citizenId));
-
-    return result[0];
-  }
+  // getCitizenData removed: helper was unused. Use DB queries directly where needed.
 
   private async getCitizenVerifications(citizenId: string): Promise<CitizenVerification[]> {
     const results = await db
       .select()
       .from(user_verification)
-      .where(eq(user_verification.citizenId, citizenId))
+      .where(eq(user_verification.user_id, citizenId))
       .orderBy(desc(user_verification.created_at));
 
-    return results;
+    return results.map((r: any) => {
+      const data = (r as any).verification_data || {};
+      return {
+        id: r.id,
+        bill_id: data.bill_id,
+        citizenId: r.user_id,
+        verification_type: r.verification_type,
+        verification_status: r.verification_status,
+        confidence: data.confidence ?? 0,
+        evidence: data.evidence || [],
+        expertise: data.expertise || { domain: '', level: 'citizen', credentials: [], verifiedCredentials: false, reputation_score: 0 },
+        reasoning: data.reasoning || (r.verification_notes as string) || '',
+        created_at: r.created_at,
+        updated_at: r.updated_at,
+        endorsements: data.endorsements || 0,
+        disputes: data.disputes || 0,
+      } as CitizenVerification;
+    });
   }
 
   private async getVerificationById(verificationId: string): Promise<CitizenVerification | null> {

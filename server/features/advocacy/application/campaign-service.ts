@@ -3,7 +3,7 @@
 // ============================================================================
 
 import { Campaign, NewCampaign } from '../domain/entities/campaign.js';
-import { ICampaignRepository } from '../domain/repositories/campaign-repository.js';
+// Repository interface removed - using direct service calls
 import { CampaignDomainService } from '../domain/services/campaign-domain-service.js';
 import { CampaignFilters, PaginationOptions, CampaignMetrics } from '../types/index.js';
 import { AdvocacyErrors } from '../domain/errors/advocacy-errors.js';

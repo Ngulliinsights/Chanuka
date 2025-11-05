@@ -477,14 +477,6 @@ export class StructureExtractorService {
 
     return Math.min(score, 100);
   }
-      logger.error(`❌ Argument extraction failed`, {
-        component: 'StructureExtractor',
-        billId: context.billId,
-        error: error instanceof Error ? error.message : String(error)
-      });
-      throw error;
-    }
-  }
 
   /**
    * Extract argument chains showing logical flow

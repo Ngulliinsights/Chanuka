@@ -1,6 +1,6 @@
 import { UserProfile, UserInterest } from '../entities/user-profile';
 import { UserAggregate } from '../aggregates/user-aggregate';
-import { UserBio, UserLocation, Organization, Interest } from '../entities/value-objects';
+// value-objects imports intentionally omitted because they're not used in this service implementation
 
 export interface ProfileValidationResult {
   isValid: boolean;
@@ -187,19 +187,45 @@ export class ProfileDomainService {
     organization: string;
     is_public: boolean;
   }>): UserProfile { // Create a new profile with updated values
-    const updatedData = {
-      user_id: existingProfile.user_id,
-      bio: updates.bio !== undefined ? (updates.bio.trim() || undefined) : existingProfile.bio?.value,
-      expertise: updates.expertise !== undefined ? updates.expertise : existingProfile.expertise,
-      location: updates.location !== undefined ? (updates.location.trim() || undefined) : existingProfile.location?.value,
-      organization: updates.organization !== undefined ? (updates.organization.trim() || undefined) : existingProfile.organization?.value,
-      reputation_score: existingProfile.reputation_score,
-      is_public: updates.is_public !== undefined ? updates.is_public : existingProfile.is_public,
-      created_at: existingProfile.created_at,
-      updated_at: new Date()
-     };
+    // Build the payload so no property is assigned `undefined` (exactOptionalPropertyTypes)
+    const updatedData: Record<string, any> = { user_id: existingProfile.user_id };
 
-    return UserProfile.create(updatedData);
+    if (updates.bio !== undefined) {
+      // allow empty string to clear the bio (UserProfile.create treats falsy as null)
+      updatedData.bio = updates.bio.trim();
+    } else if (existingProfile.bio) {
+      updatedData.bio = existingProfile.bio.value;
+    }
+
+    if (updates.expertise !== undefined) {
+      updatedData.expertise = updates.expertise;
+    } else {
+      updatedData.expertise = existingProfile.expertise;
+    }
+
+    if (updates.location !== undefined) {
+      updatedData.location = updates.location.trim();
+    } else if (existingProfile.location) {
+      updatedData.location = existingProfile.location.value;
+    }
+
+    if (updates.organization !== undefined) {
+      updatedData.organization = updates.organization.trim();
+    } else if (existingProfile.organization) {
+      updatedData.organization = existingProfile.organization.value;
+    }
+
+    updatedData.reputation_score = existingProfile.reputation_score;
+    if (updates.is_public !== undefined) {
+      updatedData.is_public = updates.is_public;
+    } else {
+      updatedData.is_public = existingProfile.is_public;
+    }
+
+    updatedData.created_at = existingProfile.created_at;
+    updatedData.updated_at = new Date();
+
+    return UserProfile.create(updatedData as any);
   }
 
   /**

@@ -37,6 +37,14 @@ export const userRoleEnum = pgEnum('user_role', [
   'citizen', 'admin', 'moderator', 'expert', 'ambassador', 'organizer'
 ]);
 
+// Anonymity Levels
+export const anonymityLevelEnum = pgEnum('anonymity_level', [
+  'public',        // Full name and details visible
+  'pseudonymous',  // Display name only, no real name
+  'anonymous',     // Auto-generated anonymous ID only
+  'private'        // Participation tracked but not visible publicly
+]);
+
 // Verification Status
 export const verificationStatusEnum = pgEnum('verification_status', [
   'pending', 'verified', 'disputed', 'false', 'outdated'

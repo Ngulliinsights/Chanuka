@@ -1,7 +1,5 @@
 {
-  "id": "0021_clean_comprehensive_schema",
-  "prevId": "",
-  "version": "6",
+  "version": "7",
   "dialect": "postgresql",
   "tables": {
     "users": {
@@ -62,17 +60,28 @@
       "uniqueConstraints": {
         "users_email_unique": {
           "name": "users_email_unique",
-          "nullsNotDistinct": false,
-          "columns": ["email"]
+          "columns": [
+            "email"
+          ],
+          "nullsNotDistinct": false
         }
-      }
+      },
+      "policies": {},
+      "isRLSEnabled": false,
+      "checkConstraints": {}
     }
   },
   "enums": {},
   "schemas": {},
   "_meta": {
-    "columns": {},
     "schemas": {},
-    "tables": {}
-  }
+    "tables": {},
+    "columns": {}
+  },
+  "id": "0021_clean_comprehensive_schema",
+  "prevId": "",
+  "sequences": {},
+  "policies": {},
+  "views": {},
+  "roles": {}
 }

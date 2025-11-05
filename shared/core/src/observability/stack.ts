@@ -24,8 +24,6 @@ import {
 } from './interfaces';
 import { TelemetryIntegration, TelemetryConfig, createTelemetryIntegration, createDefaultTelemetryConfig } from './telemetry';
 import { AsyncCorrelationManager } from './correlation';
-import { E } from 'vitest/dist/chunks/environment.d.cL3nLXbE.js';
-import { ok } from 'assert';
 
 // ==================== Correlation Manager Implementation ====================
 
@@ -36,22 +34,19 @@ import { ok } from 'assert';
 
 export class ObservabilityError extends BaseError {
   constructor(message: string, cause?: Error) {
-    super(message, 500, 'OBSERVABILITY_ERROR', { cause }, false);
+    super(message, { code: 'OBSERVABILITY_ERROR', ...(cause && { cause }) });
   }
 }
 
 export class ObservabilityInitializationError extends ObservabilityError {
   constructor(component: string, cause?: Error) {
     super(`Failed to initialize observability component: ${component}`, cause);
-    this.errorCode = 'OBSERVABILITY_INIT_ERROR';
   }
 }
 
 export class ObservabilityConfigurationError extends ObservabilityError {
   constructor(message: string, config?: unknown) {
     super(`Observability configuration error: ${message}`, undefined);
-    this.errorCode = 'OBSERVABILITY_CONFIG_ERROR';
-    this.metadata = { config };
   }
 }
 
@@ -91,7 +86,7 @@ export class ObservabilityStack {
       // Initialize metrics collector
       if (this.config.metrics?.enabled !== false) {
         const metricsResult = await this.initializeMetrics();
-        if (metricsResult.isError()) {
+        if (metricsResult.isErr()) {
           return metricsResult;
         }
       }
@@ -99,7 +94,7 @@ export class ObservabilityStack {
       // Initialize tracer
       if (this.config.tracing?.enabled !== false) {
         const tracingResult = await this.initializeTracing();
-        if (tracingResult.isError()) {
+        if (tracingResult.isErr()) {
           return tracingResult;
         }
       }
@@ -107,7 +102,7 @@ export class ObservabilityStack {
       // Initialize logger (depends on metrics and tracing for instrumentation)
       if (this.config.logging !== undefined) {
         const loggingResult = await this.initializeLogging();
-        if (loggingResult.isError()) {
+        if (loggingResult.isErr()) {
           return loggingResult;
         }
       }

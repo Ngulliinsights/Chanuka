@@ -6,8 +6,7 @@
 // Domain exports
 export * from './domain/entities/campaign.js';
 export * from './domain/entities/action-item.js';
-export * from './domain/repositories/campaign-repository.js';
-export * from './domain/repositories/action-repository.js';
+// Repository interfaces removed
 export * from './domain/services/campaign-domain-service.js';
 export * from './domain/events/advocacy-events.js';
 export * from './domain/errors/advocacy-errors.js';
@@ -19,8 +18,7 @@ export * from './application/coalition-builder.js';
 export * from './application/impact-tracker.js';
 
 // Infrastructure exports
-export * from './infrastructure/repositories/campaign-repository-impl.js';
-export * from './infrastructure/repositories/action-repository-impl.js';
+// Repository implementations removed
 export * from './infrastructure/services/notification-service.js';
 export * from './infrastructure/services/representative-contact-service.js';
 

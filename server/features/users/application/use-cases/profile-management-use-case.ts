@@ -1,7 +1,8 @@
-import { UserRepository } from '../../domain/repositories/user-repository';
+// UserRepository interface removed - using direct service calls
 import { UserManagementDomainService, ProfileUpdateResult } from '../../domain/services/user-management-domain-service';
 import { ProfileDomainService, ProfileValidationResult, ProfileCompletenessScore } from '../../domain/services/profile-domain-service';
 import { UserProfile } from '../../domain/entities/user-profile';
+import { UserService } from '../user-service-direct';
 
 export interface UpdateProfileCommand { user_id: string;
   bio?: string;
@@ -34,9 +35,10 @@ export interface ProfileCompletenessResult {
 
 export class ProfileManagementUseCase {
   constructor(
-    private userRepository: UserRepository,
+    // UserRepository removed - using direct service calls
     private userManagementService: UserManagementDomainService,
-    private profileService: ProfileDomainService
+    private profileService: ProfileDomainService,
+    private userService: UserService
   ) {}
 
   async updateProfile(command: UpdateProfileCommand): Promise<ProfileManagementResult> {
@@ -90,7 +92,7 @@ export class ProfileManagementUseCase {
 
   async getProfile(command: GetProfileCommand): Promise<ProfileManagementResult> {
     try {
-      const userAggregate = await this.userRepository.findUserAggregateById(command.user_id);
+      const userAggregate = await this.userService.findUserAggregateById(command.user_id);
       if (!userAggregate) {
         return {
           success: false,
@@ -149,13 +151,14 @@ export class ProfileManagementUseCase {
     }
   }
 
-  async getProfileCompleteness(user_id: string): Promise<ProfileCompletenessResult> { try {
-      const userAggregate = await this.userRepository.findUserAggregateById(user_id);
+  async getProfileCompleteness(user_id: string): Promise<ProfileCompletenessResult> {
+    try {
+      const userAggregate = await this.userService.findUserAggregateById(user_id);
       if (!userAggregate) {
         return {
           success: false,
           errors: ['User not found']
-         };
+        };
       }
 
       const completeness = this.profileService.calculateProfileCompleteness(userAggregate);
@@ -176,13 +179,14 @@ export class ProfileManagementUseCase {
     }
   }
 
-  async validateProfile(user_id: string): Promise<{ success: boolean; validation?: ProfileValidationResult; errors: string[] }> { try {
-      const userAggregate = await this.userRepository.findUserAggregateById(user_id);
+  async validateProfile(user_id: string): Promise<{ success: boolean; validation?: ProfileValidationResult; errors: string[] }> {
+    try {
+      const userAggregate = await this.userService.findUserAggregateById(user_id);
       if (!userAggregate || !userAggregate.profile) {
         return {
           success: false,
           errors: ['Profile not found']
-         };
+        };
       }
 
       const validation = this.profileService.validateProfile(userAggregate.profile);

@@ -8,7 +8,6 @@ import { eq, and, desc, asc, sql, count, isNull, or, inArray } from 'drizzle-orm
 import { cacheService } from '../../infrastructure/cache/cache-service';
 import { cacheKeys } from '../../../shared/core/src/caching/key-generator';
 import { logger } from '../../../shared/core';
-import { commentRepository } from './infrastructure/repositories/comment-repository-impl';
 
 // Types for comment operations
 export interface CommentWithUser {
@@ -105,7 +104,8 @@ export class CommentService {
     comments: CommentWithUser[];
     totalCount: number;
     hasMore: boolean;
-  }> { // Generate a stable cache key that properly serializes filters
+  }> {
+    // Generate a stable cache key that properly serializes filters
     const cacheKey = this.generateCacheKey('bill_comments', bill_id, filters);
 
     // Check cache first
@@ -114,13 +114,44 @@ export class CommentService {
       return cached;
     }
 
-    // Use repository pattern
-    const result = await commentRepository.findByBillId(bill_id, filters);
+    // Direct Drizzle usage instead of repository
+    const result = await databaseService.withFallback(
+      async () => {
+        const {
+          sort = 'recent',
+          commentType,
+          expertOnly = false,
+          parent_id,
+          limit = 20,
+          offset = 0
+        } = filters;
+
+        const safeLimit = Math.min(limit, 100);
+        const conditions = this.buildQueryConditions(bill_id, { commentType, expertOnly, parent_id });
+
+        const query = this.buildCommentQuery(conditions, sort);
+        const results = await query.limit(safeLimit + 1).offset(offset);
+
+        const hasMore = results.length > safeLimit;
+        const comments = results.slice(0, safeLimit);
+
+        const totalCount = await this.getTotalCount(bill_id, conditions);
+        const transformedComments = await this.transformCommentsWithReplies(comments, parent_id);
+
+        return {
+          comments: transformedComments,
+          totalCount,
+          hasMore
+        };
+      },
+      { comments: [], totalCount: 0, hasMore: false },
+      `findCommentsByBillId:${bill_id}`
+    );
 
     // Cache the result with error handling
-    await this.safeCacheSet(cacheKey, result, this.COMMENT_CACHE_TTL);
+    await this.safeCacheSet(cacheKey, result.data, this.COMMENT_CACHE_TTL);
 
-    return result;
+    return result.data;
   }
 
   /**
@@ -406,15 +437,44 @@ export class CommentService {
       await this.validateParentComment(data.parent_id, data.bill_id);
     }
 
-    // Use repository pattern
-    const comment = await commentRepository.create(data);
+    // Direct Drizzle usage instead of repository
+    const comment = await databaseService.withFallback(
+      async () => {
+        const [newComment] = await db
+          .insert(comments)
+          .values({
+            bill_id: data.bill_id,
+            user_id: data.user_id,
+            content: data.content.trim(),
+            commentType: data.commentType || 'general',
+            parent_id: data.parent_id || null,
+            upvotes: 0,
+            downvotes: 0,
+            is_verified: false
+          })
+          .returning();
+
+        const userInfo = await this.getUserInfo(data.user_id);
+
+        return {
+          ...newComment,
+          user: userInfo.user,
+          user_profiles: userInfo.user_profiles,
+          replies: [],
+          replyCount: 0,
+          netVotes: 0
+        };
+      },
+      this.createFallbackComment(data),
+      `createComment:${data.bill_id}`
+    );
 
     // Clear related caches asynchronously
     this.clearCommentCaches(data.bill_id).catch(error =>
       logger.error('Error clearing caches', { bill_id: data.bill_id, error })
     );
 
-    return comment;
+    return comment.data;
   }
 
   /**
@@ -498,15 +558,48 @@ export class CommentService {
       data.content = trimmedContent;
     }
 
-    // Use repository pattern
-    const updatedComment = await commentRepository.update(comment_id, user_id, data);
+    // Direct Drizzle usage instead of repository
+    const updatedComment = await databaseService.withFallback(
+      async () => {
+        if (data.content !== undefined) {
+          data.content = data.content.trim();
+        }
+
+        const [updatedComment] = await db
+          .update(comments)
+          .set({
+            ...data,
+            updated_at: new Date()
+          })
+          .where(and(eq(comments.id, comment_id), eq(comments.user_id, user_id)))
+          .returning();
+
+        if (!updatedComment) {
+          throw new Error('Comment not found or access denied');
+        }
+
+        const userInfo = await this.getUserInfo(user_id);
+        const replyCount = await this.getReplyCount(comment_id);
+
+        return {
+          ...updatedComment,
+          user: userInfo.user,
+          user_profiles: userInfo.user_profiles,
+          replies: [],
+          replyCount,
+          netVotes: updatedComment.upvotes - updatedComment.downvotes
+        };
+      },
+      null as any,
+      `updateComment:${comment_id}`
+    );
 
     // Clear caches asynchronously
-    this.clearCommentCaches(updatedComment.bill_id).catch(error =>
+    this.clearCommentCaches(updatedComment.data.bill_id).catch(error =>
       logger.error('Error clearing caches', { error })
     );
 
-    return updatedComment;
+    return updatedComment.data;
   }
 
   /**
@@ -534,37 +627,106 @@ export class CommentService {
    */
   async deleteComment(comment_id: number, user_id: string): Promise<boolean> {
     // Get comment first to know which bill to clear cache for
-    const comment = await commentRepository.findById(comment_id);
+    const comment = await this.findCommentById(comment_id);
     if (!comment) return false;
 
-    // Use repository pattern
-    const deleted = await commentRepository.delete(comment_id, user_id);
+    // Direct Drizzle usage instead of repository
+    const deleted = await databaseService.withFallback(
+      async () => {
+        const result = await db
+          .delete(comments)
+          .where(and(eq(comments.id, comment_id), eq(comments.user_id, user_id)));
 
-    if (deleted) {
+        return result.rowCount > 0;
+      },
+      false,
+      `deleteComment:${comment_id}`
+    );
+
+    if (deleted.data) {
       // Clear caches asynchronously
       this.clearCommentCaches(comment.bill_id).catch(error =>
         logger.error('Error clearing caches', { error })
       );
     }
 
-    return deleted;
+    return deleted.data;
+  }
+
+  /**
+   * Find comment by ID
+   */
+  async findCommentById(id: number): Promise<CommentWithUser | null> {
+    const result = await databaseService.withFallback(
+      async () => {
+        const [comment] = await db
+          .select({
+            comment: {
+              id: comments.id,
+              bill_id: comments.bill_id,
+              user_id: comments.user_id,
+              content: comments.content,
+              commentType: comments.commentType,
+              is_verified: comments.is_verified,
+              parent_id: comments.parent_id,
+              upvotes: comments.upvotes,
+              downvotes: comments.downvotes,
+              created_at: comments.created_at,
+              updated_at: comments.updated_at
+            },
+            user: {
+              id: users.id,
+              name: users.name,
+              role: users.role,
+              verification_status: users.verification_status
+            },
+            user_profiles: {
+              expertise: user_profiles.expertise,
+              organization: user_profiles.organization,
+              reputation_score: user_profiles.reputation_score
+            }
+          })
+          .from(comments)
+          .innerJoin(users, eq(comments.user_id, users.id))
+          .leftJoin(user_profiles, eq(users.id, user_profiles.user_id))
+          .where(eq(comments.id, id));
+
+        if (!comment) return null;
+
+        const replyCount = await this.getReplyCount(id);
+
+        return {
+          ...comment.comment,
+          user: comment.user,
+          user_profiles: comment.user_profiles,
+          replies: [],
+          replyCount,
+          netVotes: comment.comment.upvotes - comment.comment.downvotes
+        };
+      },
+      null,
+      `findCommentById:${id}`
+    );
+    return result.data;
   }
 
   /**
    * Get reply count for a single comment
    */
   private async getReplyCount(comment_id: number): Promise<number> {
-    try {
-      const [{ count: replyCount }] = await db
-        .select({ count: count() })
-        .from(comments)
-        .where(eq(comments.parent_id, comment_id));
+    const result = await databaseService.withFallback(
+      async () => {
+        const [{ count: replyCount }] = await db
+          .select({ count: count() })
+          .from(comments)
+          .where(eq(comments.parent_id, comment_id));
 
-      return Number(replyCount);
-    } catch (error) {
-      logger.error('Error getting reply count', { comment_id, error });
-      return 0;
-    }
+        return Number(replyCount);
+      },
+      0,
+      `getReplyCount:${comment_id}`
+    );
+    return result.data;
   }
 
   /**
@@ -577,11 +739,73 @@ export class CommentService {
       return cached;
     }
 
-    // Use repository pattern
-    const stats = await commentRepository.getStats(bill_id);
+    // Direct Drizzle usage instead of repository
+    const stats = await databaseService.withFallback(
+      async () => {
+        const [totalCommentsResult] = await db
+          .select({ count: count() })
+          .from(comments)
+          .where(eq(comments.bill_id, bill_id));
 
-    await this.safeCacheSet(cacheKey, stats, this.COMMENT_CACHE_TTL);
-    return stats;
+        const [expertCommentsResult] = await db
+          .select({ count: count() })
+          .from(comments)
+          .innerJoin(users, eq(comments.user_id, users.id))
+          .where(and(
+            eq(comments.bill_id, bill_id),
+            eq(users.role, 'expert')
+          ));
+
+        const [verifiedCommentsResult] = await db
+          .select({ count: count() })
+          .from(comments)
+          .where(and(
+            eq(comments.bill_id, bill_id),
+            eq(comments.is_verified, true)
+          ));
+
+        const topContributors = await db
+          .select({
+            user_id: users.id,
+            userName: users.name,
+            comment_count: count(comments.id),
+            totalVotes: sql<number>`SUM(${comments.upvotes} - ${comments.downvotes})`
+          })
+          .from(comments)
+          .innerJoin(users, eq(comments.user_id, users.id))
+          .where(eq(comments.bill_id, bill_id))
+          .groupBy(users.id, users.name)
+          .orderBy(desc(count(comments.id)))
+          .limit(5);
+
+        const totalComments = Number(totalCommentsResult.count);
+        const contributors = topContributors.map(c => ({
+          user_id: c.user_id,
+          userName: c.userName,
+          comment_count: Number(c.comment_count),
+          totalVotes: Number(c.totalVotes)
+        }));
+
+        return {
+          totalComments,
+          expertComments: Number(expertCommentsResult.count),
+          verifiedComments: Number(verifiedCommentsResult.count),
+          averageEngagement: totalComments > 0 ? contributors.reduce((sum, c) => sum + c.totalVotes, 0) / totalComments : 0,
+          topContributors: contributors
+        };
+      },
+      {
+        totalComments: 0,
+        expertComments: 0,
+        verifiedComments: 0,
+        averageEngagement: 0,
+        topContributors: []
+      },
+      `getCommentStats:${bill_id}`
+    );
+
+    await this.safeCacheSet(cacheKey, stats.data, this.COMMENT_CACHE_TTL);
+    return stats.data;
   }
 
   /**

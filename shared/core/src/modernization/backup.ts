@@ -2,19 +2,22 @@ import { EventEmitter } from 'events';
 import { promises as fs } from 'fs';
 import * as path from 'path';
 import * as crypto from 'crypto';
-import { Logger } from '../logging';
-import { logger } from '../observability/logging';
-import {
+// Use type-only imports for modernization types to avoid runtime import errors
+import type {
   BackupPlan,
-  BackupScope,
-  BackupStrategy,
   BackupResult,
-  BackupStatus,
-  BackupMetadata,
   RetentionPolicy,
   VerificationConfig,
-  BackupError
 } from './types';
+import { BackupStrategy, BackupStatus, BackupError, BackupScope } from './types';
+
+// Lightweight logger interface used by the BackupManager. Keep intentionally small to reduce runtime
+// coupling on a specific logging implementation.
+type LoggerLike = {
+  info: (meta: unknown, message?: string) => void;
+  error: (err: unknown, message?: string) => void;
+  debug?: (meta: unknown, message?: string) => void;
+};
 
 export interface BackupManagerOptions {
   config: {
@@ -24,13 +27,13 @@ export interface BackupManagerOptions {
     retention: RetentionPolicy;
     verification: VerificationConfig;
   };
-  logger: Logger;
+  logger: LoggerLike;
   workingDirectory: string;
 }
 
 export class BackupManager extends EventEmitter {
   private readonly config: BackupManagerOptions['config'];
-  private readonly logger: Logger;
+  private readonly logger: LoggerLike;
   private readonly workingDirectory: string;
   private readonly backupDirectory: string;
   private activePlans: Map<string, BackupPlan> = new Map();
@@ -47,12 +50,12 @@ export class BackupManager extends EventEmitter {
   /**
    * Create a backup based on the configured strategy
    */
-  public async createBackup(customScope?: string[]): Promise<BackupResult> {
+  public async createBackup(): Promise<BackupResult> {
     if (!this.config.enabled) {
       throw new BackupError('Backup is disabled in configuration', 'BACKUP_DISABLED');
     }
 
-    const plan = await this.createBackupPlan(customScope);
+  const plan = await this.createBackupPlan();
     this.activePlans.set(plan.id, plan);
 
     this.logger.info({ 
@@ -63,7 +66,7 @@ export class BackupManager extends EventEmitter {
     
     this.emit('backup:started', plan.id);
 
-    try {
+  try {
       // Ensure backup directory exists
       await this.ensureBackupDirectory();
 
@@ -104,11 +107,12 @@ export class BackupManager extends EventEmitter {
       this.emit('backup:completed', result);
       return result;
 
-    } catch (error) {
-      const backupError = error instanceof BackupError 
-        ? error 
-        : new BackupError(`Backup creation failed: ${error.message}`, 'CREATION_FAILED');
-      
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      const backupError = error instanceof BackupError
+        ? error
+        : new BackupError(`Backup creation failed: ${message}`, 'CREATION_FAILED');
+
       this.logger.error(backupError, 'Backup creation failed');
       this.emit('backup:error', backupError);
       throw backupError;
@@ -138,7 +142,7 @@ export class BackupManager extends EventEmitter {
       location: backup.location 
     }, 'Starting backup restoration');
 
-    try {
+  try {
       switch (this.getBackupStrategy(backup)) {
         case BackupStrategy.FILE_COPY:
           await this.restoreFromFileCopy(backup);
@@ -159,11 +163,12 @@ export class BackupManager extends EventEmitter {
       this.logger.info({ backupId: backup.id }, 'Backup restoration completed');
       this.emit('restore:completed', backup);
 
-    } catch (error) {
-      const restoreError = error instanceof BackupError 
-        ? error 
-        : new BackupError(`Backup restoration failed: ${error.message}`, 'RESTORATION_FAILED');
-      
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      const restoreError = error instanceof BackupError
+        ? error
+        : new BackupError(`Backup restoration failed: ${message}`, 'RESTORATION_FAILED');
+
       this.logger.error(restoreError, 'Backup restoration failed');
       this.emit('restore:error', restoreError);
       throw restoreError;
@@ -185,8 +190,8 @@ export class BackupManager extends EventEmitter {
       b => b.status === BackupStatus.VERIFIED || b.status === BackupStatus.CREATED
     );
     
-    return validBackups.length > 0 
-      ? validBackups.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0]
+    return validBackups.length > 0
+      ? validBackups.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0]!
       : null;
   }
 
@@ -199,7 +204,7 @@ export class BackupManager extends EventEmitter {
       return false;
     }
 
-    const backup = this.backupHistory[backupIndex];
+  const backup = this.backupHistory[backupIndex] as BackupResult;
     
     try {
       // Remove backup files
@@ -212,15 +217,14 @@ export class BackupManager extends EventEmitter {
       this.emit('backup:deleted', backupId);
       
       return true;
-    } catch (error) {
-      this.logger.error(error, `Failed to delete backup ${backupId}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error({ message }, `Failed to delete backup ${backupId}`);
       return false;
     }
   }
 
-  private async createBackupPlan(customScope?: string[]): Promise<BackupPlan> {
-    const scope = customScope || await this.determineBackupScope();
-    
+  private async createBackupPlan(): Promise<BackupPlan> {
     return {
       id: `backup-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`,
       timestamp: new Date(),
@@ -231,31 +235,14 @@ export class BackupManager extends EventEmitter {
     };
   }
 
-  private async determineBackupScope(): Promise<string[]> {
-    const scope: string[] = [];
-
-    switch (this.config.scope) {
-      case BackupScope.FULL:
-        scope.push(this.workingDirectory);
-        break;
-      case BackupScope.INCREMENTAL:
-        // For incremental, we'd track changes since last backup
-        scope.push(...await this.getChangedFiles());
-        break;
-      case BackupScope.SELECTIVE:
-        // Backup only critical files and directories
-        scope.push(...await this.getCriticalFiles());
-        break;
-    }
-
-    return scope;
-  }
+  // determineBackupScope removed - not currently used. Keep simple scope handling in plan.
 
   private async ensureBackupDirectory(): Promise<void> {
     try {
       await fs.mkdir(this.backupDirectory, { recursive: true });
-    } catch (error) {
-      throw new BackupError(`Failed to create backup directory: ${error.message}`, 'DIRECTORY_CREATION_FAILED');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new BackupError(`Failed to create backup directory: ${message}`, 'DIRECTORY_CREATION_FAILED');
     }
   }
 
@@ -288,8 +275,9 @@ export class BackupManager extends EventEmitter {
           totalSize += stats.size;
           filesBackedUp++;
           
-        } catch (error) {
-          errors.push(`Failed to backup ${filePath}: ${error.message}`);
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : String(error);
+          errors.push(`Failed to backup ${filePath}: ${message}`);
         }
       }
 
@@ -312,8 +300,9 @@ export class BackupManager extends EventEmitter {
         }
       };
 
-    } catch (error) {
-      throw new BackupError(`File copy backup failed: ${error.message}`, 'FILE_COPY_FAILED');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new BackupError(`File copy backup failed: ${message}`, 'FILE_COPY_FAILED');
     }
   }
 
@@ -347,8 +336,9 @@ export class BackupManager extends EventEmitter {
         }
       };
 
-    } catch (error) {
-      throw new BackupError(`Git stash backup failed: ${error.message}`, 'GIT_STASH_FAILED');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new BackupError(`Git stash backup failed: ${message}`, 'GIT_STASH_FAILED');
     }
   }
 
@@ -386,8 +376,9 @@ export class BackupManager extends EventEmitter {
         }
       };
 
-    } catch (error) {
-      throw new BackupError(`Archive backup failed: ${error.message}`, 'ARCHIVE_FAILED');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new BackupError(`Archive backup failed: ${message}`, 'ARCHIVE_FAILED');
     }
   }
 
@@ -425,8 +416,9 @@ export class BackupManager extends EventEmitter {
         }
       };
 
-    } catch (error) {
-      throw new BackupError(`Snapshot backup failed: ${error.message}`, 'SNAPSHOT_FAILED');
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new BackupError(`Snapshot backup failed: ${message}`, 'SNAPSHOT_FAILED');
     }
   }
 
@@ -459,9 +451,10 @@ export class BackupManager extends EventEmitter {
       backup.status = BackupStatus.VERIFIED;
       this.logger.info({ backupId: backup.id }, 'Backup verification completed');
 
-    } catch (error) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       backup.status = BackupStatus.CORRUPTED;
-      throw new BackupError(`Backup verification failed: ${error.message}`, 'VERIFICATION_FAILED');
+      throw new BackupError(`Backup verification failed: ${message}`, 'VERIFICATION_FAILED');
     }
   }
 
@@ -513,8 +506,16 @@ export class BackupManager extends EventEmitter {
   }
 
   private async getFilesToBackup(plan: BackupPlan): Promise<string[]> {
-    // Simplified implementation
-    return await this.getCriticalFiles();
+    // Choose files based on plan scope
+    switch (plan.scope) {
+      case BackupScope.FULL:
+        return [this.workingDirectory];
+      case BackupScope.INCREMENTAL:
+        return await this.getChangedFiles();
+      case BackupScope.SELECTIVE:
+      default:
+        return await this.getCriticalFiles();
+    }
   }
 
   private async calculateTotalSize(files: string[]): Promise<number> {
@@ -568,7 +569,7 @@ export class BackupManager extends EventEmitter {
 
   private async performRestoreTest(backup: BackupResult): Promise<void> {
     // Would perform a test restore to a temporary location
-    this.logger.debug({ backupId: backup.id }, 'Restore test completed');
+  this.logger.debug?.({ backupId: backup.id }, 'Restore test completed');
   }
 
   private async removeBackupFiles(backup: BackupResult): Promise<void> {
@@ -580,7 +581,8 @@ export class BackupManager extends EventEmitter {
         await fs.unlink(backup.location);
       }
     } catch (error) {
-      throw new BackupError(`Failed to remove backup files: ${error.message}`, 'CLEANUP_FAILED');
+      const message = error instanceof Error ? error.message : String(error);
+      throw new BackupError(`Failed to remove backup files: ${message}`, 'CLEANUP_FAILED');
     }
   }
 

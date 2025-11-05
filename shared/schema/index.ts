@@ -56,6 +56,7 @@ export {
   bill_tracking_preferences,
   notifications,
   alert_preferences,
+  user_contact_methods,
   sessionsRelations,
   commentsRelations,
   commentVotesRelations,
@@ -63,7 +64,42 @@ export {
   billEngagementRelations,
   billTrackingPreferencesRelations,
   notificationsRelations,
-  alertPreferencesRelations
+  alertPreferencesRelations,
+  userContactMethodsRelations
+} from "./citizen_participation";
+
+// ============================================================================
+// SCHEMA OBJECT - For backward compatibility
+// ============================================================================
+import { users as usersTable, user_profiles as userProfilesTable, sponsors as sponsorsTable, committees as committeesTable, committee_members as committeeMembersTable, parliamentary_sessions as parliamentarySessionsTable, parliamentary_sittings as parliamentarySittingsTable, bills as billsTable } from "./foundation";
+import { bill_engagement as billEngagementTable, comments as commentsTable } from "./citizen_participation";
+
+export const schema = {
+  users: usersTable,
+  user_profiles: userProfilesTable,
+  sponsors: sponsorsTable,
+  committees: committeesTable,
+  committee_members: committeeMembersTable,
+  parliamentary_sessions: parliamentarySessionsTable,
+  parliamentary_sittings: parliamentarySittingsTable,
+  bills: billsTable,
+  bill_engagement: billEngagementTable,
+  comments: commentsTable
+};
+
+// ============================================================================
+// CITIZEN PARTICIPATION SCHEMA (Table Aliases)
+// ============================================================================
+export {
+  sessions as sessionsTable,
+  comments as commentsTable,
+  comment_votes as commentVotesTable,
+  bill_votes as billVotesTable,
+  bill_engagement as billEngagementTable,
+  bill_tracking_preferences as billTrackingPreferencesTable,
+  notifications as notificationsTable,
+  alert_preferences as alertPreferencesTable,
+  user_contact_methods as userContactMethodsTable
 } from "./citizen_participation";
 
 // ============================================================================
@@ -133,11 +169,13 @@ export {
   campaign_participants,
   action_completions,
   campaign_impact_metrics,
+  coalition_relationships,
   campaignsRelations,
   actionItemsRelations,
   campaignParticipantsRelations,
   actionCompletionsRelations,
-  campaignImpactMetricsRelations
+  campaignImpactMetricsRelations,
+  coalitionRelationshipsRelations
 } from "./advocacy_coordination";
 
 // ============================================================================
@@ -157,6 +195,47 @@ export {
   ussdSessionsRelations,
   localizedContentRelations
 } from "./universal_access";
+
+// ============================================================================
+// TRANSPARENCY ANALYSIS SCHEMA
+// ============================================================================
+export {
+  corporate_entities,
+  financial_interests,
+  lobbying_activities,
+  bill_financial_conflicts,
+  cross_sector_ownership,
+  regulatory_capture_indicators,
+  corporateEntitiesRelations,
+  financialInterestsRelations,
+  lobbyingActivitiesRelations,
+  billFinancialConflictsRelations,
+  crossSectorOwnershipRelations,
+  regulatoryCaptureIndicatorsRelations
+} from "./transparency_analysis";
+
+// ============================================================================
+// IMPACT MEASUREMENT SCHEMA
+// ============================================================================
+export {
+  participation_cohorts,
+  legislative_outcomes,
+  bill_implementation,
+  attribution_assessments,
+  success_stories,
+  geographic_equity_metrics,
+  demographic_equity_metrics,
+  digital_inclusion_metrics,
+  platform_performance_indicators,
+  legislative_impact_indicators,
+  civic_engagement_indicators,
+  financial_sustainability_indicators,
+  participationCohortsRelations,
+  legislativeOutcomesRelations,
+  billImplementationRelations,
+  attributionAssessmentsRelations,
+  successStoriesRelations
+} from "./impact_measurement";
 
 // ============================================================================
 // INTEGRITY OPERATIONS SCHEMA
@@ -201,38 +280,6 @@ export {
   userEngagementSummaryRelations,
   contentPerformanceRelations
 } from "./platform_operations";
-
-// ============================================================================
-// TRANSPARENCY ANALYSIS SCHEMA
-// ============================================================================
-export {
-  corporate_entities,
-  financial_interests,
-  lobbying_activities,
-  bill_financial_conflicts,
-  cross_sector_ownership,
-  regulatory_capture_indicators,
-  corporateEntitiesRelations,
-  financialInterestsRelations,
-  lobbyingActivitiesRelations,
-  billFinancialConflictsRelations,
-  crossSectorOwnershipRelations,
-  regulatoryCaptureIndicatorsRelations
-} from "./transparency_analysis";
-
-// ============================================================================
-// IMPACT MEASUREMENT SCHEMA
-// ============================================================================
-export {
-  participation_cohorts,
-  legislative_outcomes,
-  attribution_assessments,
-  success_stories,
-  participationCohortsRelations,
-  legislativeOutcomesRelations,
-  attributionAssessmentsRelations,
-  successStoriesRelations
-} from "./impact_measurement";
 
 // ============================================================================
 // TYPE EXPORTS

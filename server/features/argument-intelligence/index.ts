@@ -12,9 +12,8 @@ export { EvidenceValidatorService } from './application/evidence-validator.js';
 export { BriefGeneratorService } from './application/brief-generator.js';
 export { PowerBalancerService } from './application/power-balancer.js';
 
-// Infrastructure - Repositories
-export { ArgumentRepository } from './infrastructure/repositories/argument-repository.js';
-export { BriefRepository } from './infrastructure/repositories/brief-repository.js';
+// Application - Consolidated Service
+export { argumentIntelligenceService } from './application/argument-intelligence-service.js';
 
 // Infrastructure - NLP
 export { SentenceClassifier } from './infrastructure/nlp/sentence-classifier.js';
@@ -79,14 +78,12 @@ export type {
 } from './application/power-balancer.js';
 
 export type {
-  StoredArgument,
-  ArgumentQueryOptions,
-  ArgumentStatistics
-} from './infrastructure/repositories/argument-repository.js';
-
-export type {
+  BillArgumentSynthesis,
+  SynthesizedClaim,
+  EvidenceAssessment,
+  StakeholderPosition,
   StoredBrief
-} from './infrastructure/repositories/brief-repository.js';
+} from './application/argument-intelligence-service.js';
 
 export type {
   ClassificationResult,

@@ -1,6 +1,6 @@
 // Domain exports
 export { Notification } from './domain/entities/notification';
-export type { NotificationRepository } from './domain/repositories/notification-repository';
+// NotificationRepository interface removed
 
 // Infrastructure exports
-export { NotificationRepositoryImpl } from './infrastructure/repositories/notification-repository-impl';
+// NotificationRepositoryImpl removed

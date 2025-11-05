@@ -31,7 +31,7 @@ export function useAuth() {
 
       toast({
         title: "Welcome back!",
-        description: `Hello ${data.users.name}`,
+        description: `Hello ${data.user.name}`,
       });
     },
     onError: (error: Error) => {

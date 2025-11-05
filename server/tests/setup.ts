@@ -1,5 +1,5 @@
-import { beforeAll, afterAll, beforeEach, afterEach, jest, expect } from '@jest/globals';
-import { logger  } from '../../shared/core/src/index.js';
+import { vi } from 'vitest';
+import { logger } from '../../shared/core/src/index.js';
 
 // Global test setup
 beforeAll(async () => {
@@ -16,16 +16,15 @@ beforeAll(async () => {
       error: console.error
     };
     
-    console.log = jest.fn();
-    console.warn = jest.fn();
-    console.error = jest.fn();
+    console.log = vi.fn();
+    console.warn = vi.fn();
+    console.error = vi.fn();
     
     // Store original console methods for debugging
     global.originalConsole = originalConsole;
   }
 
-  // Set test timeouts
-  jest.setTimeout(30000); // 30 seconds for integration tests
+  // Test timeout is configured in vitest config
 });
 
 afterAll(async () => {
@@ -44,7 +43,7 @@ afterAll(async () => {
 
 beforeEach(() => {
   // Reset any mocks before each test
-  jest.clearAllMocks();
+  vi.clearAllMocks();
   
   // Reset any global state
   if (global.testState) {

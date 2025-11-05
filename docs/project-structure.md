@@ -736,6 +736,7 @@ docs/
 │   │   ├── unified-code-analysis.md
 │   │   ├── unified-code-analysis-v2.md
 │   │   ├── unified-coding.md
+├── bill conversation.md
 ├── chanuka/
 │   ├── community-input_1751743369833.html
 │   ├── dashboard_1751743369900.html
@@ -745,10 +746,11 @@ docs/
 │   ├── shared_core_design.md
 │   ├── shared_core_requirements.md
 │   ├── sponsorbyreal.html
-├── bill conversation.md
 ├── chanuka_architecture.txt
 ├── chanuka_functionality_analysis.md
 ├── Chanuka_Funding_Pitch.md
+├── DIGITAL LAW 2018.pdf
+├── DIGITAL LAW AMENDMENTS AMENDMENTS (2025).pdf
 ├── project/
 │   ├── brand-roadmap.md
 │   ├── manifesto.md
@@ -850,6 +852,7 @@ scripts/
 ├── diagnose-503-issues.js
 ├── domain-type-migration-plan.md
 ├── drop-schema.ts
+├── dynamic-path-updater.js
 ├── fix-all-shared-core-imports.ts
 ├── fix-api-response-calls.js
 ├── fix-architectural-issues.ts
@@ -869,6 +872,7 @@ scripts/
 ├── identify-deprecated-files.js
 ├── identify-deprecated-files.ts
 ├── immediate-memory-cleanup.cjs
+├── import-resolution-monitor.js
 ├── migrate-api-imports.js
 ├── migrate-codebase-utilities.ts
 ├── migrate-console-logs.ts
@@ -934,14 +938,85 @@ scripts/
 │   ├── verify-user-profile-service.ts
 │   ├── verify-websocket-service.ts
 ├── test-status-summary.ts
+├── typescript-fixer/
+│   ├── jest.config.js
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── README.md
+│   ├── src/
+│   │   ├── analyzers/
+│   │   │   ├── database-pattern-detector.ts
+│   │   │   ├── drizzle-pattern-detector.ts
+│   │   │   ├── import-path-resolver.ts
+│   │   │   ├── project-analyzer.ts
+│   │   │   ├── schema-import-detector.ts
+│   │   │   ├── schema-parser.ts
+│   │   │   ├── schema-table-analyzer.ts
+│   │   │   ├── shared-core-utility-detector.ts
+│   │   ├── cli.ts
+│   │   ├── core/
+│   │   │   ├── error-extractor.ts
+│   │   │   ├── typescript-program-loader.ts
+│   │   ├── fixers/
+│   │   │   ├── api-response-fixer.ts
+│   │   │   ├── database-connection-fixer.ts
+│   │   │   ├── exact-optional-property-fixer.ts
+│   │   │   ├── shared-core-import-fixer.ts
+│   │   │   ├── unused-variable-cleaner.ts
+│   │   ├── formatters/
+│   │   │   ├── error-message-formatter.ts
+│   │   ├── index.ts
+│   │   ├── types/
+│   │   │   ├── core.ts
+│   │   ├── validators/
+│   │   │   ├── api-parameter-validator.ts
+│   ├── tests/
+│   │   ├── analyzers/
+│   │   │   ├── database-pattern-detector.test.ts
+│   │   │   ├── drizzle-pattern-detector.test.ts
+│   │   │   ├── import-path-resolver.test.ts
+│   │   │   ├── project-analyzer.test.ts
+│   │   │   ├── schema-import-detector.test.ts
+│   │   │   ├── schema-parser.test.ts
+│   │   │   ├── schema-table-analyzer.test.ts
+│   │   │   ├── shared-core-utility-detector.test.ts
+│   │   ├── fixers/
+│   │   │   ├── api-response-fixer.test.ts
+│   │   │   ├── database-connection-fixer.test.ts
+│   │   │   ├── exact-optional-property-fixer.test.ts
+│   │   │   ├── shared-core-import-fixer.test.ts
+│   │   │   ├── unused-variable-cleaner.test.ts
+│   │   ├── fixtures/
+│   │   │   ├── chanuka-edge-case-patterns.ts
+│   │   │   ├── chanuka-shared-core-patterns.ts
+│   │   │   ├── chanuka-unused-patterns.ts
+│   │   │   ├── chanuka-validation-patterns.ts
+│   │   │   ├── database-patterns.ts
+│   │   │   ├── sample-chanuka-file.ts
+│   │   ├── formatters/
+│   │   │   ├── error-message-formatter.test.ts
+│   │   ├── global.d.ts
+│   │   ├── integration/
+│   │   │   ├── database-connection-integration.test.ts
+│   │   │   ├── exact-optional-property-integration.test.ts
+│   │   ├── setup.ts
+│   │   ├── validators/
+│   │   │   ├── api-parameter-validator.test.ts
+│   ├── tsconfig.json
 ├── update-core-imports.js
 ├── update-core-references.js
 ├── update-test-configuration.ts
+├── validate-imports.js
 ├── validate-test-config.js
 ├── verify-and-fix-project-structure.ts
 ├── verify-cleanup.ts
 ├── verify-project-structure.ts
 server/
+├── __tests__/
+│   ├── integration/
+│   │   ├── advocacy-integration.test.ts
+│   │   ├── api-integration.test.ts
+│   │   ├── comprehensive-integration.test.ts
 ├── comprehensive-race-condition-test.js
 ├── config/
 │   ├── development.ts
@@ -1002,6 +1077,38 @@ server/
 │   │   │   ├── moderation-queue.service.ts
 │   │   │   ├── types.ts
 │   │   ├── system.ts
+│   ├── advocacy/
+│   │   ├── advocacy-factory.ts
+│   │   ├── application/
+│   │   │   ├── action-coordinator.ts
+│   │   │   ├── campaign-service.ts
+│   │   │   ├── coalition-builder.ts
+│   │   │   ├── impact-tracker.ts
+│   │   ├── config/
+│   │   │   ├── advocacy-config.ts
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   │   ├── action-item.ts
+│   │   │   │   ├── campaign.ts
+│   │   │   ├── errors/
+│   │   │   │   ├── advocacy-errors.ts
+│   │   │   ├── events/
+│   │   │   │   ├── advocacy-events.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── action-repository.ts
+│   │   │   │   ├── campaign-repository.ts
+│   │   │   ├── services/
+│   │   │   │   ├── campaign-domain-service.ts
+│   │   ├── index.ts
+│   │   ├── infrastructure/
+│   │   │   ├── repositories/
+│   │   │   │   ├── action-repository-impl.ts
+│   │   │   │   ├── campaign-repository-impl.ts
+│   │   │   ├── services/
+│   │   │   │   ├── notification-service.ts
+│   │   │   │   ├── representative-contact-service.ts
+│   │   ├── types/
+│   │   │   ├── index.ts
 │   ├── alert-preferences/
 │   │   ├── alert_system_docs.md
 │   │   ├── application/
@@ -1146,6 +1253,29 @@ server/
 │   │   │   ├── index.ts
 │   │   │   ├── ml.ts
 │   │   │   ├── progress-storage.d.ts
+│   ├── argument-intelligence/
+│   │   ├── application/
+│   │   │   ├── argument-processor.ts
+│   │   │   ├── brief-generator.ts
+│   │   │   ├── clustering-service.ts
+│   │   │   ├── coalition-finder.ts
+│   │   │   ├── evidence-validator.ts
+│   │   │   ├── power-balancer.ts
+│   │   │   ├── structure-extractor.ts
+│   │   ├── IMPLEMENTATION_STATUS.md
+│   │   ├── index.ts
+│   │   ├── infrastructure/
+│   │   │   ├── nlp/
+│   │   │   │   ├── entity-extractor.ts
+│   │   │   │   ├── sentence-classifier.ts
+│   │   │   │   ├── similarity-calculator.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── argument-repository.ts
+│   │   │   │   ├── brief-repository.ts
+│   │   ├── presentation/
+│   │   │   ├── argument-intelligence-router.ts
+│   │   ├── tests/
+│   │   │   ├── argument-intelligence.test.ts
 │   ├── bills/
 │   │   ├── application/
 │   │   │   ├── __tests__/
@@ -1159,12 +1289,26 @@ server/
 │   │   ├── bill.js
 │   │   ├── bill-status-monitor.ts
 │   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   │   ├── bill.ts
+│   │   │   ├── errors/
+│   │   │   │   ├── bill-errors.ts
+│   │   │   ├── events/
+│   │   │   │   ├── bill-events.ts
 │   │   │   ├── index.ts
 │   │   │   ├── LegislativeStorageTypes.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── bill-repository.ts
+│   │   │   ├── services/
+│   │   │   │   ├── bill-domain-service.ts
+│   │   │   │   ├── bill-event-handler.ts
+│   │   │   │   ├── bill-notification-service.ts
 │   │   ├── index.ts
 │   │   ├── infrastructure/
 │   │   │   ├── bill-storage.ts
 │   │   │   ├── index.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── bill-repository-impl.ts
 │   │   ├── legislative-storage.ts
 │   │   ├── presentation/
 │   │   │   ├── __tests__/
@@ -1185,15 +1329,72 @@ server/
 │   │   ├── comment-storage.ts
 │   │   ├── comment-voting.ts
 │   │   ├── community.ts
+│   │   ├── domain/
+│   │   │   ├── repositories/
+│   │   │   │   ├── comment-repository.ts
 │   │   ├── index.ts
+│   │   ├── infrastructure/
+│   │   │   ├── repositories/
+│   │   │   │   ├── comment-repository-impl.ts
 │   │   ├── social-integration.ts
 │   │   ├── social-share-storage.d.ts
 │   │   ├── social-share-storage.ts
 │   │   ├── stakeholder-storage.ts
+│   ├── constitutional-analysis/
+│   │   ├── application/
+│   │   │   ├── constitutional-analyzer.ts
+│   │   │   ├── expert-flagging-service.ts
+│   │   │   ├── precedent-finder.ts
+│   │   │   ├── provision-matcher.ts
+│   │   ├── config/
+│   │   │   ├── analysis-config.ts
+│   │   ├── demo/
+│   │   │   ├── constitutional-analysis-demo.ts
+│   │   ├── index.ts
+│   │   ├── infrastructure/
+│   │   │   ├── external/
+│   │   │   │   ├── legal-database-client.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── constitutional-analyses-repository.ts
+│   │   │   │   ├── constitutional-provisions-repository.ts
+│   │   │   │   ├── expert-review-queue-repository.ts
+│   │   │   │   ├── legal-precedents-repository.ts
+│   │   ├── presentation/
+│   │   │   ├── constitutional-analysis-router.ts
+│   │   ├── README.md
+│   │   ├── scripts/
+│   │   │   ├── populate-sample-data.ts
+│   │   ├── services/
+│   │   │   ├── constitutional-analysis-factory.ts
+│   │   ├── test-router.ts
+│   │   ├── tests/
+│   │   │   ├── constitutional-analysis.test.ts
+│   │   ├── types/
+│   │   │   ├── index.ts
+│   │   ├── utils/
+│   │   │   ├── analysis-utils.ts
+│   ├── constitutional-intelligence/
+│   │   ├── application/
+│   │   │   ├── constitutional-analysis.service.ts
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   │   ├── constitutional-provision.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── constitutional-repository.ts
 │   ├── government-data/
 │   │   ├── routes.ts
-│   ├── infrastructure/
-│   │   ├── cache/
+│   │   ├── services/
+│   │   │   ├── government-data-integration.service.ts
+│   ├── notifications/
+│   │   ├── domain/
+│   │   │   ├── entities/
+│   │   │   │   ├── notification.ts
+│   │   │   ├── repositories/
+│   │   │   │   ├── notification-repository.ts
+│   │   ├── index.ts
+│   │   ├── infrastructure/
+│   │   │   ├── repositories/
+│   │   │   │   ├── notification-repository-impl.ts
 │   ├── privacy/
 │   │   ├── privacy-routes.ts
 │   │   ├── privacy-scheduler.ts
@@ -1220,17 +1421,30 @@ server/
 │   │   │   ├── search-performance.test.ts
 │   │   │   ├── simple-test.ts
 │   │   ├── application/
-│   │   │   ├── RelevanceScorer.ts
+│   │   │   ├── search-service.ts
 │   │   │   ├── SearchService.ts
-│   │   │   ├── SearchSuggestionsService.ts
 │   │   ├── domain/
 │   │   │   ├── RelevanceScorer.ts
 │   │   │   ├── search.dto.ts
 │   │   │   ├── SearchAnalytics.ts
 │   │   │   ├── SearchValidator.ts
+│   │   │   ├── types/
 │   │   ├── engines/
+│   │   │   ├── core/
+│   │   │   │   ├── fuzzy-matching.engine.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── postgresql-fulltext.engine.ts
+│   │   │   │   ├── simple-matching.engine.ts
+│   │   │   ├── index.ts
+│   │   │   ├── suggestion/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── suggestion-engine.service.ts
+│   │   │   │   ├── suggestion-ranking.service.ts
 │   │   │   ├── suggestion-engine.service.ts
 │   │   │   ├── suggestion-ranking.service.ts
+│   │   │   ├── types/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── search.types.ts
 │   │   ├── IMPLEMENTATION_SUMMARY.md
 │   │   ├── index.ts
 │   │   ├── infrastructure/
@@ -1244,9 +1458,8 @@ server/
 │   │   ├── search-index-manager.ts
 │   │   ├── services/
 │   │   │   ├── history-cleanup.service.ts
-│   │   │   ├── query-builder.service.ts
+│   │   │   ├── ~~query-builder.service.ts~~ (MIGRATED TO DIRECT DRIZZLE)
 │   │   ├── types/
-│   │   │   ├── search.types.ts
 │   │   ├── utils/
 │   │   │   ├── parallel-query-executor.ts
 │   ├── search-suggestions.ts
@@ -1361,11 +1574,20 @@ server/
 │   │   ├── index.d.ts
 │   │   ├── index.ts
 │   │   ├── migration-service.ts
+│   │   ├── repositories/
+│   │   │   ├── base-repository.ts
+│   │   │   ├── generic-repository.ts
+│   │   │   ├── index.ts
+│   │   │   ├── repository-factory.ts
+│   │   │   ├── search-repository.ts
+│   │   │   ├── search-repository-impl.ts
 │   │   ├── schema.sql
 │   │   ├── seed-data-service.ts
 │   │   ├── storage.ts
 │   │   ├── unified-storage.ts
 │   ├── demo-data.ts
+│   ├── errors/
+│   │   ├── error-standardization.ts
 │   ├── external-data/
 │   │   ├── conflict-resolution-service.ts
 │   │   ├── data-synchronization-service.ts
@@ -1375,6 +1597,8 @@ server/
 │   │   ├── index.ts
 │   │   ├── types.ts
 │   ├── index.ts
+│   ├── integration/
+│   │   ├── service-orchestrator.ts
 │   ├── monitoring/
 │   │   ├── audit-log.ts
 │   │   ├── external-api-management.ts
@@ -1956,4 +2180,4 @@ vitest.frontend.config.ts
 
 **Excluded directories:** `.git`, `node_modules`, `dist`, `build`, `coverage`, `tmp`, `temp`, `__pycache__`, `vendor`, and all hidden files/directories
 
-Generated on: 2025-11-02 16:42:39
+Generated on: 2025-11-03 21:28:16

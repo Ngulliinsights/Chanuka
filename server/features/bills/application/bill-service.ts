@@ -1,16 +1,22 @@
-import { eq, desc, and, sql, count, like, or } from "drizzle-orm";
+// cSpell:ignore upvotes downvotes
+import { eq, desc, and, sql, count, or, inArray } from "drizzle-orm";
 import { databaseService } from '../../../infrastructure/database/database-service';
-import { bills, sponsors, Bill, InsertBill } from "../../../../shared/schema/foundation.js";
-import { bill_engagement, comments, BillEngagement } from "../../../../shared/schema/citizen_participation.js";
-import { schema } from "../../../../shared/schema/index.js";
+import { bills, sponsors, Bill } from "../../../../shared/schema/foundation.js";
+import { bill_engagement, comments } from "../../../../shared/schema/citizen_participation.js";
 import { logger } from '../../../../shared/core';
-import { billRepository } from '../infrastructure/repositories/bill-repository-impl';
+import {
+  AsyncServiceResult,
+  withResultHandling
+} from '../../../infrastructure/errors/result-adapter.js';
 
-// Simple cache service mock for now
+// Define InsertBill type locally since it's not exported from schema
+type InsertBill = typeof bills.$inferInsert;
+
+// Simple cache service implementation
 const cacheService = {
-  get: async (key: string) => null,
-  set: async (key: string, value: any, ttl?: number) => { },
-  delete: async (key: string) => { },
+  get: async (_key: string) => null,
+  set: async (_key: string, _value: any, _ttl?: number) => { },
+  delete: async (_key: string) => { },
   clear: async () => { }
 };
 
@@ -35,15 +41,13 @@ const CACHE_TTL = {
   BILL_DETAILS: 3600,
   STATIC_DATA: 7200
 };
-// Logger is imported above
-import { billStorage } from '../infrastructure/bill-storage.js';
 
 // Types for bill operations
 export interface BillFilters {
   status?: string;
   category?: string;
   search?: string;
-  sponsor_id?: number;
+  sponsor_id?: string; // UUID string
   tags?: string[];
   dateFrom?: Date;
   dateTo?: Date;
@@ -56,7 +60,7 @@ export interface PaginationOptions {
   sortOrder?: 'asc' | 'desc';
 }
 
-// Fixed: Properly extend Bill type to include all its properties
+// Extended Bill interface that properly types all fields including engagement
 export interface BillWithEngagement extends Bill {
   engagement?: {
     totalViews: number;
@@ -66,19 +70,18 @@ export interface BillWithEngagement extends Bill {
     totalEngagements: number;
   };
   recentComments?: Array<{
-    id: number;
+    id: string;
     content: string;
     commentType: string | null;
     upvotes: number;
     downvotes: number;
-    created_at: Date;
+    created_at: string;
     user_id: string;
     is_verified: boolean;
   }>;
   sponsorInfo?: {
-    id: number;
+    id: string;
     name: string;
-    role: string;
     party?: string | null;
   };
 }
@@ -105,6 +108,16 @@ export interface BillStats {
   recentActivity: number;
 }
 
+// Type definition for engagement query results
+interface EngagementQueryResult {
+  bill_id: string;
+  totalViews: number;
+  totalComments: number;
+  totalShares: number;
+  uniqueViewers: number;
+  totalEngagements: number;
+}
+
 /**
  * Comprehensive Bill Service with database operations and fallback handling
  * 
@@ -126,17 +139,26 @@ export class BillService {
    * This ensures the application remains functional even during outages.
    */
   private getFallbackBills(): BillWithEngagement[] {
-    return [
+    const now = new Date();
+    const twentyDaysAgo = new Date(now.getTime() - 20 * 24 * 60 * 60 * 1000);
+    
+    const fallback: any[] = [
       {
-        id: 1,
+        id: "550e8400-e29b-41d4-a716-446655440001",
         title: "Digital Economy and Data Protection Act 2024",
         summary: "Comprehensive legislation to regulate digital platforms and protect citizen data privacy rights.",
-        status: "committee",
+        status: "committee_stage",
         category: "technology",
-        introduced_date: new Date("2024-01-15"),
+        introduced_date: "2024-01-15",
         bill_number: "HR-2024-001",
-        description: "This bill establishes fundamental digital rights for citizens and creates oversight mechanisms for data protection.",
-        content: "Full text of the Digital Economy and Data Protection Act...",
+        full_text: "Full text of the Digital Economy and Data Protection Act...",
+        sponsor_id: null,
+        tags: ["technology", "privacy", "digital rights"],
+        last_action_date: "2024-01-20",
+        created_at: twentyDaysAgo, // Date object as expected by Bill type
+        updated_at: now, // Date object as expected by Bill type
+  comment_count: 45,
+        search_vector: null,
         view_count: 1250,
         share_count: 89,
         engagement_score: "156",
@@ -150,12 +172,7 @@ export class BillService {
           potential_opponents: ["tech companies", "data brokers"],
           economic_impact: "moderate"
         },
-        sponsor_id: null,
-        last_action_date: new Date("2024-01-20"),
-        created_at: new Date("2024-01-15"),
-        updated_at: new Date("2024-01-20"),
-        comment_countCached: 0,
-        search_vector: null,
+        argument_synthesis_status: "pending",
         engagement: {
           totalViews: 1250,
           totalComments: 45,
@@ -163,402 +180,738 @@ export class BillService {
           uniqueViewers: 892,
           totalEngagements: 156
         }
-      },
-      {
-        id: 2,
-        title: "Climate Change Adaptation Fund Bill 2024",
-        summary: "Establishes a national fund for climate adaptation projects and carbon offset programs.",
-        status: "introduced",
-        category: "environment",
-        introduced_date: new Date("2024-02-01"),
-        bill_number: "S-2024-042",
-        description: "Comprehensive climate action bill with targets for emissions reduction and renewable energy adoption.",
-        content: "Full text of the Climate Change Adaptation Fund Bill...",
-        view_count: 2100,
-        share_count: 156,
-        engagement_score: "234",
-        complexity_score: 9,
-        constitutionalConcerns: {
-          concerns: ["Interstate Commerce regulation", "Federal vs State authority"],
-          severity: "low"
-        },
-        stakeholderAnalysis: {
-          primary_beneficiaries: ["environmental groups", "renewable energy sector"],
-          potential_opponents: ["fossil fuel industry", "traditional utilities"],
-          economic_impact: "significant"
-        },
-        sponsor_id: null,
-        last_action_date: new Date("2024-02-05"),
-        created_at: new Date("2024-02-01"),
-        updated_at: new Date("2024-02-05"),
-        comment_countCached: 0,
-        search_vector: null,
-        engagement: {
-          totalViews: 2100,
-          totalComments: 78,
-          totalShares: 156,
-          uniqueViewers: 1456,
-          totalEngagements: 234
-        }
       }
     ];
+
+    return fallback as BillWithEngagement[];
   }
 
   /**
    * Retrieves all bills with advanced filtering, pagination, and sorting capabilities.
    * Results are cached to improve performance for repeated queries.
-   * 
-   * @param filters - Optional filters for status, category, search terms, etc.
-   * @param pagination - Pagination and sorting options
-   * @returns Paginated bill response with metadata
    */
   async getAllBills(
     filters: BillFilters = {},
     pagination: PaginationOptions = { page: 1, limit: 10 }
-  ): Promise<PaginatedBillResponse> {
-    // Generate a unique cache key based on filters and pagination settings
-    const cacheKey = `${CACHE_KEYS.BILL_SEARCH}_${filters.search || 'all'}_${JSON.stringify({ ...filters, ...pagination })}`;
+  ): AsyncServiceResult<PaginatedBillResponse> {
+    return withResultHandling(async () => {
+      const cacheKey = `${CACHE_KEYS.BILL_SEARCH}_${filters.search || 'all'}_${JSON.stringify({ ...filters, ...pagination })}`;
 
-    // Check cache first for performance optimization
-    const cachedResult = await cacheService.get(cacheKey);
-    if (cachedResult && typeof cachedResult === 'object') {
-      return {
-        ...(cachedResult as any),
-        metadata: {
-          source: 'database',
-          timestamp: new Date(),
-          cacheHit: true
+      const cachedResult = await cacheService.get(cacheKey);
+      if (cachedResult && typeof cachedResult === 'object') {
+        return {
+          ...(cachedResult as any),
+          metadata: {
+            source: 'database' as const,
+            timestamp: new Date(),
+            cacheHit: true
+          }
+        };
+      }
+
+      const offset = (pagination.page - 1) * pagination.limit;
+
+      try {
+        const conditions: any[] = [];
+
+        // Build filter conditions with proper type handling
+        if (filters.status) {
+          conditions.push(eq(bills.status, filters.status as any));
         }
-      };
-    }
 
-    // Use repository pattern for database operations
-    const billsData = await billRepository.findAll(filters, pagination);
+        if (filters.category) {
+          conditions.push(eq(bills.category, filters.category));
+        }
 
-    // Get total count separately for pagination
-    const allBills = await billRepository.findAll(filters, { page: 1, limit: 10000 }); // Large limit to get all
-    const total = allBills.length;
+        if (filters.sponsor_id) {
+          conditions.push(eq(bills.sponsor_id, filters.sponsor_id));
+        }
 
-    // Enhance bills with engagement statistics
-    const enhancedBills = await this.enhanceBillsWithEngagement(billsData);
+        if (filters.search) {
+          const searchTerm = `%${filters.search.toLowerCase()}%`;
+          conditions.push(
+            or(
+              sql`LOWER(${bills.title}) LIKE ${searchTerm}`,
+              sql`LOWER(${bills.summary}) LIKE ${searchTerm}`,
+              sql`LOWER(${bills.full_text}) LIKE ${searchTerm}`,
+              sql`LOWER(${bills.bill_number}) LIKE ${searchTerm}`
+            )
+          );
+        }
 
-    const result = {
-      bills: enhancedBills,
-      pagination: {
-        page: pagination.page,
-        limit: pagination.limit,
-        total,
-        pages: Math.ceil(total / pagination.limit)
+        if (filters.dateFrom) {
+          conditions.push(sql`${bills.introduced_date} >= ${filters.dateFrom.toISOString()}`);
+        }
+
+        if (filters.dateTo) {
+          conditions.push(sql`${bills.introduced_date} <= ${filters.dateTo.toISOString()}`);
+        }
+
+        if (filters.tags && filters.tags.length > 0) {
+          conditions.push(sql`${bills.tags} && ${filters.tags}`);
+        }
+
+        let query = this.db.select().from(bills);
+
+        if (conditions.length > 0) {
+          query = query.where(and(...conditions));
+        }
+
+        const sortColumn = this.getSortColumn(pagination.sortBy);
+        if (pagination.sortOrder === 'asc') {
+          query = query.orderBy(sortColumn) as any;
+        } else {
+          query = query.orderBy(desc(sortColumn)) as any;
+        }
+
+        const billsData = await query.limit(pagination.limit).offset(offset);
+
+        let countQuery = this.db.select({ count: count() }).from(bills);
+        if (conditions.length > 0) {
+          countQuery = countQuery.where(and(...conditions));
+        }
+        const [{ count: total }] = await countQuery;
+
+        const enhancedBills = await this.enhanceBillsWithEngagement(billsData);
+
+        const result = {
+          bills: enhancedBills,
+          pagination: {
+            page: pagination.page,
+            limit: pagination.limit,
+            total: Number(total),
+            pages: Math.ceil(Number(total) / pagination.limit)
+          }
+        };
+
+        await cacheService.set(cacheKey, result, CACHE_TTL.SEARCH_RESULTS);
+
+        return {
+          ...result,
+          metadata: {
+            source: 'database' as const,
+            timestamp: new Date(),
+            cacheHit: false
+          }
+        };
+      } catch (error) {
+        logger.warn('Database error in getAllBills, returning fallback data', { component: 'BillService' }, error as any);
+        const fallback = this.getFallbackBills();
+        const total = fallback.length;
+        const paged = fallback.slice(offset, offset + pagination.limit);
+
+        const result = {
+          bills: paged,
+          pagination: {
+            page: pagination.page,
+            limit: pagination.limit,
+            total,
+            pages: Math.max(1, Math.ceil(total / pagination.limit))
+          }
+        };
+
+        return {
+          ...result,
+          metadata: {
+            source: 'fallback' as const,
+            timestamp: new Date(),
+            cacheHit: false
+          }
+        };
       }
-    };
-
-    // Cache successful results
-    await cacheService.set(cacheKey, result, CACHE_TTL.SEARCH_RESULTS);
-
-    return {
-      ...result,
-      metadata: {
-        source: 'database',
-        timestamp: new Date(),
-        cacheHit: false
-      }
-    };
+    }, { service: 'BillService', operation: 'getAllBills' });
   }
 
   /**
    * Retrieves a specific bill by ID with complete engagement data,
    * recent comments, and sponsor information.
-   * 
-   * @param id - The unique bill identifier
-   * @returns Complete bill data or null if not found
    */
-  async getBillById(id: number): Promise<BillWithEngagement | null> {
-    const cacheKey = `${CACHE_KEYS.BILL_DETAILS}_${id}`;
+  async getBillById(id: string): AsyncServiceResult<BillWithEngagement | null> {
+    return withResultHandling(async () => {
+      const cacheKey = `${CACHE_KEYS.BILL_DETAILS}_${id}`;
 
-    // Check cache for performance
-    const cachedResult = await cacheService.get(cacheKey);
-    if (cachedResult) {
-      return cachedResult;
-    }
+      const cachedResult = await cacheService.get(cacheKey);
+      if (cachedResult) {
+        return cachedResult;
+      }
 
-    // Use repository pattern
-    const bill = await billRepository.findById(id);
-    if (!bill) {
-      return null;
-    }
+      let bill: any = null;
+      try {
+        const [fetchedBill] = await this.db
+          .select()
+          .from(bills)
+          .where(eq(bills.id, id))
+          .limit(1);
 
-    // Get engagement stats using repository
-    const engagementStats = await billRepository.getEngagementStats(id);
+        bill = fetchedBill || null;
 
-    // Fetch the 5 most recent comments for preview (still using direct query for now)
-    const recentComments = await this.db
-      .select({
-        id: comments.id,
-        content: comments.content,
-        commentType: comments.commentType,
-        upvotes: comments.upvotes,
-        downvotes: comments.downvotes,
-        created_at: comments.created_at,
-        user_id: comments.user_id,
-        is_verified: comments.is_verified
-      })
-      .from(comments)
-      .where(eq(comments.bill_id, id))
-      .orderBy(desc(comments.created_at))
-      .limit(5);
+        if (!bill) {
+          // If not found in DB, try fallback data
+          const fallback = this.getFallbackBills();
+          const fb = fallback.find(b => b.id === id) || null;
+          if (fb) {
+            await cacheService.set(cacheKey, fb, CACHE_TTL.BILL_DETAILS);
+          }
+          return fb;
+        }
+      } catch (error) {
+        logger.warn('Database error in getBillById, attempting fallback', { component: 'BillService' }, error as any);
+        const fallback = this.getFallbackBills();
+        const fb = fallback.find(b => b.id === id) || null;
+        if (fb) {
+          await cacheService.set(cacheKey, fb, CACHE_TTL.BILL_DETAILS);
+        }
+        return fb;
+      }
 
-    // Get sponsor details if the bill has a sponsor
-    let sponsorInfo: {
-      id: number;
-      name: string;
-      role: string;
-      party?: string | null;
-    } | null = null;
-    if (bill.sponsor_id) {
-      const [sponsor] = await this.db
+      // Get engagement stats using proper type annotations
+      const engagementStats = await this.db
         .select({
-          id: sponsors.id,
-          name: sponsors.name,
-          role: sponsors.role,
-          party: sponsors.party
+          totalViews: sql<number>`COALESCE(COUNT(*) FILTER (WHERE ${bill_engagement.engagement_type} = 'view'), 0)`,
+          totalComments: sql<number>`COALESCE(COUNT(*) FILTER (WHERE ${bill_engagement.engagement_type} = 'comment'), 0)`,
+          totalShares: sql<number>`COALESCE(COUNT(*) FILTER (WHERE ${bill_engagement.engagement_type} = 'share'), 0)`,
+          uniqueViewers: sql<number>`COUNT(DISTINCT ${bill_engagement.user_id})`,
+          totalEngagements: sql<number>`COUNT(${bill_engagement.id})`
         })
-        .from(sponsors)
-        .where(eq(sponsors.id, bill.sponsor_id));
+        .from(bill_engagement)
+        .where(eq(bill_engagement.bill_id, id));
 
-      sponsorInfo = sponsor ? {
-        id: sponsor.id,
-        name: sponsor.name,
-        role: sponsor.role,
-        party: sponsor.party
-      } : null;
-    }
+      const processedEngagementStats = {
+        totalViews: Number(engagementStats[0]?.totalViews) || 0,
+        totalComments: Number(engagementStats[0]?.totalComments) || 0,
+        totalShares: Number(engagementStats[0]?.totalShares) || 0,
+        uniqueViewers: Number(engagementStats[0]?.uniqueViewers) || 0,
+        totalEngagements: Number(engagementStats[0]?.totalEngagements) || 0
+      };
 
-    // Combine all data into a comprehensive bill object
-    const result = {
-      ...bill,
-      engagement: engagementStats,
-      recentComments,
-      sponsorInfo
-    };
+      const recentComments = await this.db
+        .select({
+          id: comments.id,
+          content: comments.content,
+          commentType: comments.commentType,
+          upvotes: comments.upvotes,
+          downvotes: comments.downvotes,
+          created_at: comments.created_at,
+          user_id: comments.user_id,
+          is_verified: comments.is_verified
+        })
+        .from(comments)
+        .where(eq(comments.bill_id, id))
+        .orderBy(desc(comments.created_at))
+        .limit(5);
 
-    // Cache the result for faster subsequent access
-    await cacheService.set(cacheKey, result, CACHE_TTL.BILL_DETAILS);
+      let sponsorInfo: {
+        id: string;
+        name: string;
+        party?: string | null;
+      } | null = null;
 
-    return result;
+      if (bill.sponsor_id) {
+        const [sponsor] = await this.db
+          .select({
+            id: sponsors.id,
+            name: sponsors.name,
+            party: sponsors.party
+          })
+          .from(sponsors)
+          .where(eq(sponsors.id, bill.sponsor_id));
+
+        sponsorInfo = sponsor ? {
+          id: sponsor.id,
+          name: sponsor.name,
+          party: sponsor.party
+        } : null;
+      }
+
+      const result: BillWithEngagement = {
+        ...bill,
+        engagement: processedEngagementStats,
+        recentComments,
+        sponsorInfo
+      };
+
+      await cacheService.set(cacheKey, result, CACHE_TTL.BILL_DETAILS);
+
+      return result;
+    }, { service: 'BillService', operation: 'getBillById' });
   }
 
   /**
    * Creates a new bill in the database with initial engagement tracking.
-   * This operation is wrapped in a transaction to ensure data consistency.
-   * 
-   * @param billData - The bill data to insert
-   * @returns The newly created bill
    */
-  async createBill(billData: InsertBill): Promise<Bill> {
-    // Use repository pattern
-    const newBill = await billRepository.create(billData);
+  async createBill(billData: InsertBill): AsyncServiceResult<Bill> {
+    return withResultHandling(async () => {
+      if (!billData.title || !billData.summary) {
+        throw new Error('Title and summary are required for bill creation');
+      }
 
-    // Clear caches to reflect the new bill
-    await this.clearBillCaches();
+      const result = await databaseService.withTransaction(
+        async (tx) => {
+          const [newBill] = await tx
+            .insert(bills)
+            .values({
+              ...billData,
+              created_at: new Date(),
+              updated_at: new Date()
+            })
+            .returning();
+          return newBill;
+        },
+        'createBill'
+      );
 
-    return newBill;
+      await this.clearBillCaches();
+
+      return result.data;
+    }, { service: 'BillService', operation: 'createBill' });
   }
 
   /**
    * Updates an existing bill with new data.
-   * Clears relevant caches and can trigger search index updates.
-   * 
-   * @param id - The bill ID to update
-   * @param updates - Partial bill data to update
-   * @returns The updated bill or null if not found
    */
-  async updateBill(id: number, updates: Partial<InsertBill>): Promise<Bill | null> {
-    // Use repository pattern
-    const updatedBill = await billRepository.update(id, updates);
+  async updateBill(id: string, updates: Partial<InsertBill>): AsyncServiceResult<Bill | null> {
+    return withResultHandling(async () => {
+      const result = await databaseService.withTransaction(
+        async (tx) => {
+          const [updatedBill] = await tx
+            .update(bills)
+            .set({
+              ...updates,
+              updated_at: new Date()
+            })
+            .where(eq(bills.id, id))
+            .returning();
 
-    if (updatedBill) {
-      // Invalidate caches for this specific bill
-      await this.clearBillCaches(id);
-    }
+          return updatedBill || null;
+        },
+        'updateBill'
+      );
 
-    return updatedBill;
+      if (result.data) {
+        await this.clearBillCaches(id);
+      }
+
+      return result.data;
+    }, { service: 'BillService', operation: 'updateBill' });
   }
 
   /**
    * Updates bill status with audit trail and real-time notifications.
-   * This method includes status change detection to avoid unnecessary updates
-   * and triggers notifications to relevant stakeholders.
-   * 
-   * @param id - The bill ID
-   * @param newStatus - The new status to set
-   * @param user_id - Optional user ID who triggered the change
    */
-  async updateBillStatus(id: number, newStatus: string, user_id?: string): Promise<void> {
-    // Retrieve current status before making changes
-    const [currentBill] = await this.db
-      .select({ status: schema.bills.status })
-      .from(schema.bills)
-      .where(eq(schema.bills.id, id))
-      .limit(1);
+  async updateBillStatus(id: string, newStatus: string, user_id?: string): AsyncServiceResult<void> {
+    return withResultHandling(async () => {
+      if (!newStatus || typeof newStatus !== 'string') {
+        throw new Error('Valid status is required');
+      }
 
-    if (!currentBill) {
-      throw new Error(`Bill with ID ${id} not found`);
-    }
+      const [currentBill] = await this.db
+        .select({ status: bills.status })
+        .from(bills)
+        .where(eq(bills.id, id))
+        .limit(1);
 
-    const oldStatus = currentBill.status;
+      if (!currentBill) {
+        throw new Error(`Bill with ID ${id} not found`);
+      }
 
-    // Skip update if status hasn't actually changed
-    if (oldStatus === newStatus) {
-      console.log(`Bill ${id} status unchanged (${newStatus}), skipping update`);
-      return;
-    }
+      const oldStatus = currentBill.status;
 
-    // Update status within a transaction
-    await databaseService.withTransaction(
-      async (tx) => {
-        await tx
-          .update(schema.bills)
-          .set({
-            status: newStatus,
-            last_action_date: new Date(),
-            updated_at: new Date()
-          })
-          .where(eq(schema.bills.id, id));
+      if (oldStatus === newStatus) {
+        logger.info(`Bill ${id} status unchanged (${newStatus}), skipping update`, { component: 'BillService' });
+        return;
+      }
 
-        // Clear affected caches
-        await this.clearBillCaches(id);
-      },
-      'updateBillStatus'
-    );
+      await databaseService.withTransaction(
+        async (tx) => {
+          await tx
+            .update(bills)
+            .set({
+              status: newStatus as any,
+              last_action_date: new Date().toISOString(),
+              updated_at: new Date()
+            })
+            .where(eq(bills.id, id));
 
-    // Trigger real-time notification system (non-blocking)
-    try {
-      const { billStatusMonitorService } = await import('../bill-status-monitor');
-      await billStatusMonitorService.handleBillStatusChange({
-        bill_id: id,
-        oldStatus,
-        newStatus,
-        timestamp: new Date(),
-        triggeredBy: user_id,
-        metadata: {
-          automaticChange: !user_id,
-          reason: 'Manual status update'
-        }
-      });
-    } catch (error) {
-      // Log error but don't fail the status update
-      logger.error('Error triggering status change notification:', { component: 'BillService' }, error as any);
-    }
+          await this.clearBillCaches(id);
+        },
+        'updateBillStatus'
+      );
+
+      // Trigger real-time notification - note: bill_id is string (UUID)
+      try {
+        const { billStatusMonitorService } = await import('../bill-status-monitor');
+        await billStatusMonitorService.handleBillStatusChange({
+          bill_id: id, // String UUID, matching the interface expectation
+          oldStatus,
+          newStatus,
+          timestamp: new Date(),
+          triggeredBy: user_id || 'system',
+          metadata: {
+            automaticChange: !user_id,
+            reason: 'Manual status update'
+          }
+        });
+      } catch (error) {
+        logger.error('Error triggering status change notification:', { component: 'BillService' }, error as any);
+      }
+    }, { service: 'BillService', operation: 'updateBillStatus' });
   }
 
   /**
    * Retrieves comprehensive statistics about all bills in the system.
-   * This includes total counts, distribution by status and category,
-   * and recent activity metrics.
-   * 
-   * @returns Bill statistics object
    */
-  async getBillStats(): Promise<BillStats> {
-    const cacheKey = CACHE_KEYS.BILL_STATS;
+  async getBillStats(): AsyncServiceResult<BillStats> {
+    return withResultHandling(async () => {
+      const cacheKey = CACHE_KEYS.BILL_STATS;
 
-    // Check cache first
-    const cachedResult = await cacheService.get(cacheKey);
-    if (cachedResult) {
-      return cachedResult;
-    }
+      const cachedResult = await cacheService.get(cacheKey);
+      if (cachedResult) {
+        return cachedResult;
+      }
 
-    // Use repository pattern
-    const stats = await billRepository.getStats();
+      const [totalResult] = await this.db
+        .select({ count: count() })
+        .from(bills);
 
-    // Cache statistics data
-    await cacheService.set(cacheKey, stats, CACHE_TTL.STATIC_DATA);
+      // Explicitly type the aggregation results to avoid implicit any
+      const statusResults = await this.db
+        .select({
+          status: bills.status,
+          count: count()
+        })
+        .from(bills)
+        .groupBy(bills.status);
 
-    return stats;
+      const categoryResults = await this.db
+        .select({
+          category: bills.category,
+          count: count()
+        })
+        .from(bills)
+        .where(sql`${bills.category} IS NOT NULL`)
+        .groupBy(bills.category);
+
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      const [recentActivityResult] = await this.db
+        .select({ count: count() })
+        .from(bills)
+        .where(sql`${bills.updated_at} >= ${sevenDaysAgo}`);
+
+      const stats = {
+        totalBills: Number(totalResult.count),
+        billsByStatus: statusResults.map((r: { status: string; count: number }) => ({ 
+          status: r.status, 
+          count: Number(r.count) 
+        })),
+        billsByCategory: categoryResults.map((r: { category: string | null; count: number }) => ({ 
+          category: r.category || 'uncategorized', 
+          count: Number(r.count) 
+        })),
+        recentActivity: Number(recentActivityResult.count)
+      };
+
+      await cacheService.set(cacheKey, stats, CACHE_TTL.STATIC_DATA);
+
+      return stats;
+    }, { service: 'BillService', operation: 'getBillStats' });
   }
 
   /**
    * Records user engagement with a bill (views, comments, shares).
-   * This method maintains per-user engagement tracking and triggers
-   * real-time notifications for significant engagement events.
-   * 
-   * @param bill_id - The bill being engaged with
-   * @param user_id - The user performing the engagement
-   * @param engagement_type - Type of engagement: 'view', 'comment', or 'share'
    */
   async recordEngagement(
-    bill_id: number,
+    bill_id: string,
     user_id: string,
     engagement_type: 'view' | 'comment' | 'share'
-  ): Promise<void> {
-    // Use repository pattern
-    await billRepository.recordEngagement(bill_id, user_id, engagement_type);
-
-    // Invalidate caches
-    await this.clearBillCaches(bill_id);
-
-    // Trigger real-time notifications for comments and shares (not views to reduce noise)
-    if (engagement_type === 'comment' || engagement_type === 'share') {
-      try {
-        const { billStatusMonitorService } = await import('../bill-status-monitor');
-        await billStatusMonitorService.handleBillEngagementUpdate({
-          bill_id,
-          type: engagement_type,
-          user_id,
-          timestamp: new Date(),
-          newStats: {} // Simplified - repository handles the stats
-        });
-      } catch (error) {
-        logger.error('Error triggering engagement notification:', { component: 'BillService' }, error as any);
-        // Don't fail the engagement recording if notification fails
+  ): AsyncServiceResult<void> {
+    return withResultHandling(async () => {
+      if (!bill_id || !user_id || !engagement_type) {
+        throw new Error('Bill ID, user ID, and engagement type are required');
       }
-    }
+
+      const validEngagementTypes = ['view', 'comment', 'share'];
+      if (!validEngagementTypes.includes(engagement_type)) {
+        throw new Error(`Invalid engagement type: ${engagement_type}`);
+      }
+
+      try {
+        const [existingEngagement] = await this.db
+          .select()
+          .from(bill_engagement)
+          .where(
+            and(
+              eq(bill_engagement.bill_id, bill_id),
+              eq(bill_engagement.user_id, user_id)
+            )
+          );
+
+        if (existingEngagement) {
+          await this.db
+            .update(bill_engagement)
+            .set({
+              lastEngaged: new Date().toISOString(),
+              updated_at: new Date()
+            })
+            .where(eq(bill_engagement.id, existingEngagement.id));
+        } else {
+          await this.db.insert(bill_engagement).values({
+            bill_id: bill_id,
+            user_id: user_id,
+            engagement_type: engagement_type,
+            engagement_score: "1",
+            lastEngaged: new Date().toISOString(),
+            created_at: new Date(),
+            updated_at: new Date()
+          });
+        }
+
+        // Update bill-level counters
+        if (engagement_type === 'view') {
+          await this.db
+            .update(bills)
+            .set({
+              view_count: sql`${bills.view_count} + 1`,
+              updated_at: new Date()
+            })
+            .where(eq(bills.id, bill_id));
+        } else if (engagement_type === 'share') {
+          await this.db
+            .update(bills)
+            .set({
+              share_count: sql`${bills.share_count} + 1`,
+              updated_at: new Date()
+            })
+            .where(eq(bills.id, bill_id));
+        }
+      } catch (error) {
+        throw error;
+      }
+
+      await this.clearBillCaches(bill_id);
+
+      if (engagement_type === 'comment' || engagement_type === 'share') {
+        try {
+          const { billStatusMonitorService } = await import('../bill-status-monitor');
+          await billStatusMonitorService.handleBillEngagementUpdate({
+            bill_id, // String UUID, matching the interface expectation
+            type: engagement_type,
+            user_id,
+            timestamp: new Date(),
+            newStats: {
+              totalViews: 0,
+              totalComments: 0,
+              totalShares: 0,
+              engagement_score: 0
+            }
+          });
+        } catch (error) {
+          logger.error('Error triggering engagement notification:', { component: 'BillService' }, error as any);
+        }
+      }
+    }, { service: 'BillService', operation: 'recordEngagement' });
   }
 
   // Helper methods
 
-  /**
-   * Maps sort options to actual database columns for query building.
-   */
+  async deleteBill(id: string): AsyncServiceResult<boolean> {
+    return withResultHandling(async () => {
+      const result = await databaseService.withTransaction(
+        async (tx) => {
+          const deleteResult = await tx
+            .delete(bills)
+            .where(eq(bills.id, id));
+
+          return deleteResult.rowCount > 0;
+        },
+        'deleteBill'
+      );
+
+      if (result.data) {
+        await this.clearBillCaches(id);
+      }
+
+      return result.data;
+    }, { service: 'BillService', operation: 'deleteBill' });
+  }
+
+  async searchBills(query: string, filters?: BillFilters): AsyncServiceResult<Bill[]> {
+    return withResultHandling(async () => {
+      const searchTerm = `%${query.toLowerCase()}%`;
+      const conditions = [
+        or(
+          sql`LOWER(${bills.title}) LIKE ${searchTerm}`,
+          sql`LOWER(${bills.summary}) LIKE ${searchTerm}`,
+          sql`LOWER(${bills.full_text}) LIKE ${searchTerm}`,
+          sql`LOWER(${bills.bill_number}) LIKE ${searchTerm}`
+        )
+      ];
+
+      if (filters?.status) {
+        conditions.push(eq(bills.status, filters.status as any));
+      }
+
+      if (filters?.category) {
+        conditions.push(eq(bills.category, filters.category));
+      }
+
+      if (filters?.sponsor_id) {
+        conditions.push(eq(bills.sponsor_id, filters.sponsor_id));
+      }
+
+      if (filters?.tags && filters.tags.length > 0) {
+        conditions.push(sql`${bills.tags} && ${filters.tags}`);
+      }
+
+      const result = await this.db
+        .select()
+        .from(bills)
+        .where(and(...conditions))
+        .limit(50)
+        .orderBy(desc(bills.updated_at));
+
+      return result;
+    }, { service: 'BillService', operation: 'searchBills' });
+  }
+
+  async getBillsByStatus(status: string): AsyncServiceResult<Bill[]> {
+    return withResultHandling(async () => {
+      const result = await this.db
+        .select()
+        .from(bills)
+        .where(eq(bills.status, status as any))
+        .orderBy(desc(bills.updated_at));
+
+      return result;
+    }, { service: 'BillService', operation: 'getBillsByStatus' });
+  }
+
+  async getBillsByCategory(category: string): AsyncServiceResult<Bill[]> {
+    return withResultHandling(async () => {
+      const result = await this.db
+        .select()
+        .from(bills)
+        .where(eq(bills.category, category))
+        .orderBy(desc(bills.updated_at));
+
+      return result;
+    }, { service: 'BillService', operation: 'getBillsByCategory' });
+  }
+
+  async getBillsBySponsor(sponsorId: string): AsyncServiceResult<Bill[]> {
+    return withResultHandling(async () => {
+      const result = await this.db
+        .select()
+        .from(bills)
+        .where(eq(bills.sponsor_id, sponsorId))
+        .orderBy(desc(bills.updated_at));
+
+      return result;
+    }, { service: 'BillService', operation: 'getBillsBySponsor' });
+  }
+
+  async getBillsByIds(ids: string[]): AsyncServiceResult<Bill[]> {
+    return withResultHandling(async () => {
+      if (ids.length === 0) return [];
+
+      const result = await this.db
+        .select()
+        .from(bills)
+        .where(inArray(bills.id, ids))
+        .orderBy(desc(bills.updated_at));
+
+      return result;
+    }, { service: 'BillService', operation: 'getBillsByIds' });
+  }
+
+  async countBills(filters: BillFilters = {}): AsyncServiceResult<number> {
+    return withResultHandling(async () => {
+      const conditions: any[] = [];
+
+      if (filters.status) {
+        conditions.push(eq(bills.status, filters.status as any));
+      }
+
+      if (filters.category) {
+        conditions.push(eq(bills.category, filters.category));
+      }
+
+      if (filters.sponsor_id) {
+        conditions.push(eq(bills.sponsor_id, filters.sponsor_id));
+      }
+
+      if (filters.search) {
+        const searchTerm = `%${filters.search.toLowerCase()}%`;
+        conditions.push(
+          or(
+            sql`LOWER(${bills.title}) LIKE ${searchTerm}`,
+            sql`LOWER(${bills.summary}) LIKE ${searchTerm}`,
+            sql`LOWER(${bills.full_text}) LIKE ${searchTerm}`,
+            sql`LOWER(${bills.bill_number}) LIKE ${searchTerm}`
+          )
+        );
+      }
+
+      if (filters.tags && filters.tags.length > 0) {
+        conditions.push(sql`${bills.tags} && ${filters.tags}`);
+      }
+
+      let query = this.db.select({ count: count() }).from(bills);
+
+      if (conditions.length > 0) {
+        query = query.where(and(...conditions));
+      }
+
+      const result = await query;
+      return Number(result[0]?.count || 0);
+    }, { service: 'BillService', operation: 'countBills' });
+  }
+
   private getSortColumn(sortBy?: string) {
     switch (sortBy) {
       case 'title':
-        return schema.bills.title;
+        return bills.title;
       case 'status':
-        return schema.bills.status;
+        return bills.status;
       case 'engagement':
-        return schema.bills.view_count;
+        return bills.view_count;
       case 'date':
       default:
-        return schema.bills.introduced_date;
+        return bills.introduced_date;
     }
   }
 
-  /**
-   * Enhances a list of bills with aggregated engagement statistics.
-   * Uses a single optimized query to fetch engagement data for all bills.
-   */
-  private async enhanceBillsWithEngagement(bills: Bill[]): Promise<BillWithEngagement[]> {
-    if (bills.length === 0) return [];
+  private async enhanceBillsWithEngagement(billsList: Bill[]): Promise<BillWithEngagement[]> {
+    if (billsList.length === 0) return [];
 
     try {
-      // Fetch engagement data for all bills in one query
-      const bill_ids = bills.map(b => b.id);
+      const bill_ids = billsList.map(b => b.id);
+      
+      // Query engagement data with explicit typing
       const engagement_data = await this.db
         .select({
-          bill_id: schema.bill_engagement.bill_id,
-          totalViews: sql`SUM(${schema.bill_engagement.view_count})`,
-          totalComments: sql`SUM(${schema.bill_engagement.comment_count})`,
-          totalShares: sql`SUM(${schema.bill_engagement.share_count})`,
-          uniqueViewers: sql`COUNT(DISTINCT ${schema.bill_engagement.user_id})`,
-          totalEngagements: sql`COUNT(${schema.bill_engagement.id})`
+          bill_id: bill_engagement.bill_id,
+          totalViews: sql<number>`COUNT(*) FILTER (WHERE ${bill_engagement.engagement_type} = 'view')`,
+          totalComments: sql<number>`COUNT(*) FILTER (WHERE ${bill_engagement.engagement_type} = 'comment')`,
+          totalShares: sql<number>`COUNT(*) FILTER (WHERE ${bill_engagement.engagement_type} = 'share')`,
+          uniqueViewers: sql<number>`COUNT(DISTINCT ${bill_engagement.user_id})`,
+          totalEngagements: sql<number>`COUNT(${bill_engagement.id})`
         })
-        .from(schema.bill_engagement)
-        .where(sql`${schema.bill_engagement.bill_id} = ANY(${bill_ids})`)
-        .groupBy(schema.bill_engagement.bill_id);
+        .from(bill_engagement)
+        .where(inArray(bill_engagement.bill_id, bill_ids))
+        .groupBy(bill_engagement.bill_id);
 
-      // Create efficient lookup map for O(1) access
-      const engagementMap = new Map();
-      engagement_data.forEach(eng => {
+      // Create a type-safe map for engagement data
+      const engagementMap = new Map<string, {
+        totalViews: number;
+        totalComments: number;
+        totalShares: number;
+        uniqueViewers: number;
+        totalEngagements: number;
+      }>();
+      
+      engagement_data.forEach((eng: EngagementQueryResult) => {
         engagementMap.set(eng.bill_id, {
           totalViews: Number(eng.totalViews) || 0,
           totalComments: Number(eng.totalComments) || 0,
@@ -568,132 +921,35 @@ export class BillService {
         });
       });
 
-      // Merge engagement data with bills
-      return bills.map(bill => ({
+      return billsList.map(bill => ({
         ...bill,
-        engagement: engagementMap.get(bills.id) || {
-          totalViews: bills.view_count || 0,
+        engagement: engagementMap.get(bill.id) || {
+          totalViews: bill.view_count || 0,
           totalComments: 0,
-          totalShares: bills.share_count || 0,
+          totalShares: bill.share_count || 0,
           uniqueViewers: 0,
           totalEngagements: 0
         }
       }));
     } catch (error) {
       logger.error('Error enhancing bills with engagement:', { component: 'BillService' }, error as any);
-      // Return bills without engagement enhancement on error
-      return bills.map(bill => ({ ...bill }));
+      return billsList.map(bill => ({ ...bill }));
     }
   }
 
-  /**
-   * Applies filters and pagination to fallback data when database is unavailable.
-   */
-  private getFallbackBillsResponse(
-    filters: BillFilters,
-    pagination: PaginationOptions
-  ): PaginatedBillResponse {
-    let filteredBills = [...this.getFallbackBills()];
-
-    // Apply status filter
-    if (filters.status) {
-      filteredBills = filteredBills.filter(bill => bills.status === filters.status);
-    }
-
-    // Apply category filter
-    if (filters.category) {
-      filteredBills = filteredBills.filter(bill => bills.category === filters.category);
-    }
-
-    // Apply search filter across multiple text fields
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      filteredBills = filteredBills.filter(bill =>
-        bills.title.toLowerCase().includes(searchTerm) ||
-        bills.summary?.toLowerCase().includes(searchTerm) ||
-        bills.description?.toLowerCase().includes(searchTerm)
-      );
-    }
-
-    // Apply pagination
-    const offset = (pagination.page - 1) * pagination.limit;
-    const paginatedBills = filteredBills.slice(offset, offset + pagination.limit);
-
-    return {
-      bills: paginatedBills,
-      pagination: {
-        page: pagination.page,
-        limit: pagination.limit,
-        total: filteredBills.length,
-        pages: Math.ceil(filteredBills.length / pagination.limit)
-      }
-    };
-  }
-
-  /**
-   * Clears all caches related to bills to ensure data consistency.
-   * Can clear specific bill caches or general statistics caches.
-   * 
-   * @param bill_id - Optional specific bill ID to clear cache for
-   */
-  private async clearBillCaches(bill_id?: number): Promise<void> {
+  private async clearBillCaches(bill_id?: string): Promise<void> {
     try {
-      // Clear general statistic caches
       await cacheService.delete(CACHE_KEYS.BILL_STATS);
       await cacheService.delete(CACHE_KEYS.BILL_CATEGORIES);
       await cacheService.delete(CACHE_KEYS.BILL_STATUSES);
 
-      // Clear specific bill cache if provided
       if (bill_id) {
         await cacheService.delete(`${CACHE_KEYS.BILL_DETAILS}_${bill_id}`);
       }
-
-      // Note: Search result caches rely on TTL expiration
-      // Pattern-based cache deletion could be implemented for more aggressive clearing
     } catch (error) {
       logger.error('Error clearing bill caches:', { component: 'BillService' }, error as any);
-      // Don't throw - cache clearing failure shouldn't break the operation
     }
   }
 }
 
-// Export singleton instance for application-wide use
 export const billService = new BillService();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

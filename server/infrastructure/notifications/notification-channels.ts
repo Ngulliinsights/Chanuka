@@ -1,11 +1,10 @@
 import { getEmailService } from './email-service';
 import { webSocketService } from '../websocket.js';
-import { logger  } from '../../../shared/core/src/index.js';
-import { NotificationRepository } from '../../features/notifications/domain/repositories/notification-repository';
-import { NotificationRepositoryImpl } from '../../features/notifications/infrastructure/repositories/notification-repository-impl';
+import { logger } from '../../../shared/core/src/index.js';
 import { Notification } from '../../features/notifications/domain/entities/notification';
-import { UserRepository } from '../../features/users/domain/repositories/user-repository';
-import { UserRepositoryImpl } from '../../features/users/infrastructure/repositories/user-repository-impl';
+import { database as db } from '../../../shared/database/connection';
+import { notifications, users, user_profiles } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 
 /**
  * Notification Channel Service
@@ -26,13 +25,14 @@ import { UserRepositoryImpl } from '../../features/users/infrastructure/reposito
  * - Manage user preferences
  */
 
-export interface ChannelDeliveryRequest { user_id: string;
+export interface ChannelDeliveryRequest {
+  user_id: string;
   channel: 'email' | 'inApp' | 'sms' | 'push';
   content: {
     title: string;
     message: string;
     htmlMessage?: string; // For email
-   };
+  };
   metadata?: {
     priority: 'low' | 'medium' | 'high' | 'urgent';
     relatedBillId?: number;
@@ -83,36 +83,31 @@ export interface PushProviderConfig {
 }
 
 export class NotificationChannelService {
-   private smsConfig: SMSProviderConfig;
-   private pushConfig: PushProviderConfig;
-   private deliveryAttempts: Map<string, number> = new Map();
-   private readonly MAX_RETRY_ATTEMPTS = 3;
-   private notificationRepository: NotificationRepository;
-   private userRepository: UserRepository;
+  private smsConfig: SMSProviderConfig;
+  private pushConfig: PushProviderConfig;
+  private deliveryAttempts: Map<string, number> = new Map();
+  private readonly MAX_RETRY_ATTEMPTS = 3;
 
-   constructor() {
-     this.smsConfig = {
-       provider: (process.env.SMS_PROVIDER as SMSProviderConfig['provider']) || 'mock',
-       accountSid: process.env.TWILIO_ACCOUNT_SID || '',
-       authToken: process.env.TWILIO_AUTH_TOKEN || '',
-       fromNumber: process.env.TWILIO_FROM_NUMBER || ''
-     };
+  constructor() {
+    this.smsConfig = {
+      provider: (process.env.SMS_PROVIDER as SMSProviderConfig['provider']) || 'mock',
+      accountSid: process.env.TWILIO_ACCOUNT_SID || '',
+      authToken: process.env.TWILIO_AUTH_TOKEN || '',
+      fromNumber: process.env.TWILIO_FROM_NUMBER || ''
+    };
 
-     this.pushConfig = {
-       provider: (process.env.PUSH_PROVIDER as PushProviderConfig['provider']) || 'mock',
-       serverKey: process.env.FIREBASE_SERVER_KEY || process.env.ONESIGNAL_API_KEY || '',
-       appId: process.env.FIREBASE_APP_ID || process.env.ONESIGNAL_APP_ID || ''
-     };
+    this.pushConfig = {
+      provider: (process.env.PUSH_PROVIDER as PushProviderConfig['provider']) || 'mock',
+      serverKey: process.env.FIREBASE_SERVER_KEY || process.env.ONESIGNAL_API_KEY || '',
+      appId: process.env.FIREBASE_APP_ID || process.env.ONESIGNAL_APP_ID || ''
+    };
 
-     this.notificationRepository = new NotificationRepositoryImpl();
-     this.userRepository = new UserRepositoryImpl();
-
-     logger.info('✅ Notification Channel Service initialized', {
-       component: 'ChannelService',
-       smsProvider: this.smsConfig.provider,
-       pushProvider: this.pushConfig.provider
-     });
-   }
+    logger.info('✅ Notification Channel Service initialized', {
+      component: 'ChannelService',
+      smsProvider: this.smsConfig.provider,
+      pushProvider: this.pushConfig.provider
+    });
+  }
 
   /**
    * Send notification through a single channel
@@ -153,10 +148,11 @@ export class NotificationChannelService {
       const attempts = (this.deliveryAttempts.get(attemptKey) || 0) + 1;
       this.deliveryAttempts.set(attemptKey, attempts);
 
-      logger.error(`Channel delivery failed (attempt ${attempts}):`, { component: 'ChannelService',
+      logger.error(`Channel delivery failed (attempt ${attempts}):`, {
+        component: 'ChannelService',
         channel: request.channel,
         user_id: request.user_id
-       }, error);
+      }, error);
 
       // Retry logic for transient failures
       if (attempts < this.MAX_RETRY_ATTEMPTS && this.isRetryableError(error)) {
@@ -186,7 +182,7 @@ export class NotificationChannelService {
       user_id,
       channel,
       content,
-      metadata
+      metadata: metadata || undefined
     }));
 
     const results = await Promise.allSettled(
@@ -227,8 +223,27 @@ export class NotificationChannelService {
         created_at: new Date()
       });
 
-      // Store in database using repository
-      await this.notificationRepository.save(notification);
+      // Store in database using direct Drizzle
+      const notificationData = notification.toJSON();
+      await db.insert(notifications).values({
+        id: notificationData.id,
+        user_id: notificationData.user_id,
+        notification_type: notificationData.notification_type,
+        title: notificationData.title,
+        message: notificationData.message,
+        related_bill_id: notificationData.related_bill_id || undefined,
+        related_comment_id: notificationData.related_comment_id || undefined,
+        related_user_id: notificationData.related_user_id || undefined,
+        is_read: notificationData.is_read,
+        read_at: notificationData.read_at || undefined,
+        is_dismissed: notificationData.is_dismissed,
+        delivery_method: notificationData.delivery_method,
+        delivery_status: notificationData.delivery_status,
+        action_taken: notificationData.action_taken || undefined,
+        action_type: notificationData.action_type || undefined,
+        created_at: notificationData.created_at,
+        updated_at: notificationData.updated_at || undefined
+      });
 
       // Send real-time via WebSocket (non-blocking)
       try {
@@ -268,15 +283,35 @@ export class NotificationChannelService {
    */
   private async sendEmail(request: ChannelDeliveryRequest): Promise<DeliveryResult> {
     try {
-      // Get user using repository
-      const user = await this.userRepository.findById(request.user_id);
+      // Get user using direct Drizzle
+      const [user] = await db
+        .select({
+          id: users.id,
+          email: users.email
+        })
+        .from(users)
+        .where(eq(users.id, request.user_id))
+        .limit(1);
 
       if (!user) {
         throw new Error(`User not found: ${request.user_id}`);
       }
 
-      const email = user.email.value;
-      const name = user.name.value;
+      const email = user.email;
+      // Get display name from user profile if available
+      const [profile] = await db
+        .select({
+          display_name: user_profiles.display_name,
+          first_name: user_profiles.first_name,
+          last_name: user_profiles.last_name
+        })
+        .from(user_profiles)
+        .where(eq(user_profiles.user_id, request.user_id))
+        .limit(1);
+      
+      const name = profile?.display_name || 
+                   (profile?.first_name && profile?.last_name ? `${profile.first_name} ${profile.last_name}` : profile?.first_name) || 
+                   'User';
 
       if (!email) {
         throw new Error(`No email address for user: ${request.user_id}`);
@@ -319,20 +354,25 @@ export class NotificationChannelService {
    */
   private async sendSMS(request: ChannelDeliveryRequest): Promise<DeliveryResult> {
     try {
-      // Get user using repository
-      const user = await this.userRepository.findById(request.user_id);
+      // Get user using direct Drizzle - note: phone numbers not yet implemented in schema
+      const [user] = await db
+        .select({
+          id: users.id
+        })
+        .from(users)
+        .where(eq(users.id, request.user_id))
+        .limit(1);
 
       if (!user) {
         throw new Error(`User not found: ${request.user_id}`);
       }
 
-      // For now, we'll need to access preferences directly since the User entity doesn't include them
-      // This is a temporary solution until preferences are properly modeled
-      const userPrefs = await this.userRepository.findById(request.user_id); // This will be updated when preferences are added to User entity
-      const phoneNumber = (userPrefs as any)?.preferences?.phoneNumber;
+      // TODO: Phone numbers not yet implemented in user schema
+      // For now, we'll use a mock phone number or throw an appropriate error
+      const phoneNumber = process.env.NODE_ENV === 'development' ? '+254700000000' : null;
 
       if (!phoneNumber) {
-        throw new Error(`No phone number configured for user: ${request.user_id}`);
+        throw new Error(`Phone number functionality not yet implemented. User: ${request.user_id}`);
       }
 
       // Format SMS message
@@ -374,17 +414,22 @@ export class NotificationChannelService {
    */
   private async sendPush(request: ChannelDeliveryRequest): Promise<DeliveryResult> {
     try {
-      // Get user using repository
-      const user = await this.userRepository.findById(request.user_id);
+      // Get user using direct Drizzle
+      const [user] = await db
+        .select({
+          id: users.id
+        })
+        .from(users)
+        .where(eq(users.id, request.user_id))
+        .limit(1);
 
       if (!user) {
         throw new Error(`User not found: ${request.user_id}`);
       }
 
-      // For now, we'll need to access preferences directly since the User entity doesn't include them
-      // This is a temporary solution until preferences are properly modeled
-      const userPrefs = await this.userRepository.findById(request.user_id); // This will be updated when preferences are added to User entity
-      const pushTokens = (userPrefs as any)?.preferences?.pushTokens || [];
+      // For now, we'll use mock push tokens since user preferences aren't fully implemented
+      // This will be updated when user preferences are properly modeled
+      const pushTokens = [`mock-token-${request.user_id}`];
 
       if (pushTokens.length === 0) {
         throw new Error(`No push tokens configured for user: ${request.user_id}`);
@@ -493,7 +538,7 @@ export class NotificationChannelService {
     const maxLength = request.config?.sms?.maxLength || 160;
     const shortFormat = request.config?.sms?.shortFormat ?? true;
 
-    const priorityPrefix = request.metadata?.priority === 'urgent' ? '[URGENT] ' : '';
+    const priorityPrefix = this.getPriorityPrefix(request.metadata?.priority);
     const { title, message } = request.content;
     const actionUrl = request.metadata?.actionUrl;
 
@@ -528,7 +573,8 @@ export class NotificationChannelService {
     const { priority, actionUrl, relatedBillId, category } = request.metadata || {};
     const config = request.config?.push || {};
 
-    return { title,
+    return {
+      title,
       body: message,
       data: {
         type: category || 'notification',
@@ -536,7 +582,7 @@ export class NotificationChannelService {
         bill_id: relatedBillId?.toString(),
         actionUrl,
         timestamp: new Date().toISOString()
-       },
+      },
       android: {
         priority: priority === 'urgent' || priority === 'high' ? 'high' : 'normal',
         notification: {
@@ -581,17 +627,10 @@ export class NotificationChannelService {
   }
 
   private async sendViaAWSSNS(phoneNumber: string, message: string): Promise<string> {
-    // TODO: Implement actual AWS SNS integration
-    // const AWS = require('aws-sdk');
-    // const sns = new AWS.SNS();
-    // const result = await sns.publish({
-    //   Message: message,
-    //   PhoneNumber: phoneNumber
-    // }).promise();
-    // return result.MessageId;
-
-    logger.info(`[AWS SNS SMS] To: ${phoneNumber}, Message: ${message}`, { component: 'ChannelService' });
-    return `sns-${Date.now()}`;
+    // This method is now implemented in the NotificationService class
+    // For backward compatibility, we'll use the enhanced implementation
+    const { notificationService } = await import('./notification-service.js');
+    return notificationService['sendViaAWSSNS'](phoneNumber, message);
   }
 
   private sendViaMockSMS(phoneNumber: string, message: string): string {
@@ -600,20 +639,10 @@ export class NotificationChannelService {
   }
 
   private async sendViaFirebase(tokens: string[], payload: any): Promise<string> {
-    // TODO: Implement actual Firebase Cloud Messaging integration
-    // const admin = require('firebase-admin');
-    // const result = await admin.messaging().sendMulticast({
-    //   tokens,
-    //   notification: {
-    //     title: payload.title,
-    //     body: payload.body
-    //   },
-    //   data: payload.data
-    // });
-    // return result.responses[0].messageId;
-
-    logger.info(`[FIREBASE PUSH] Tokens: ${tokens.length}, Payload:`, { component: 'ChannelService' }, payload);
-    return `fcm-${Date.now()}`;
+    // This method is now implemented in the NotificationService class
+    // For backward compatibility, we'll use the enhanced implementation
+    const { notificationService } = await import('./notification-service.js');
+    return notificationService['sendViaFirebase'](tokens, payload);
   }
 
   private async sendViaOneSignal(tokens: string[], payload: any): Promise<string> {

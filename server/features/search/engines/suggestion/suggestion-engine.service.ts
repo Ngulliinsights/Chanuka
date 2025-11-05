@@ -1,7 +1,7 @@
 import { readDatabase } from '@shared/database/connection';
-import { databaseService } from '../../../infrastructure/database/database-service';
-import { cacheService } from '../../../infrastructure/cache/cache-service';
-import { logger } from '../../../../shared/core/src/index';
+import { databaseService } from '../../../infrastructure/database/database-service.js';
+import { cacheService } from '../../../infrastructure/cache/cache-service.js';
+import { logger } from '../../../../shared/core/src/index.js';
 import * as schema from "@shared/schema";
 import { eq, desc, and, sql, count, like, or, gte } from "drizzle-orm";
 
@@ -12,7 +12,7 @@ import {
   SearchContext,
   SearchAnalytics
 } from "./types/search.types";
-import { queryBuilderService } from "../services/query-builder.service";
+// Query builder service removed - using direct Drizzle queries
 import { parallelQueryExecutor, QueryTask } from "../utils/parallel-query-executor";
 import { suggestionRankingService, type RankingContext } from "./suggestion-ranking.service";
 
@@ -124,7 +124,7 @@ export class SuggestionEngineService {
     includeMetadata: boolean = true
   ): Promise<AutocompleteResult> {
     // Sanitize input to prevent SQL injection and validate minimum query length
-    const sanitizedQuery = queryBuilderService.sanitizeQuery(partialQuery);
+    const sanitizedQuery = this.sanitizeQuery(partialQuery);
     if (sanitizedQuery.length < CONFIG.MIN_QUERY_LENGTH) {
       return this.getEmptyAutocompleteResult();
     }
@@ -868,6 +868,19 @@ export class SuggestionEngineService {
         remainingTerms: this.popularTerms.size
       });
     }
+  }
+
+  /**
+   * Sanitize and validate search query
+   * Migrated from QueryBuilderService to use direct implementation
+   */
+  private sanitizeQuery(query: string): string {
+    return query
+      .trim()
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '') // Remove special characters except hyphens
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .substring(0, 100); // Limit length
   }
 
   /**

@@ -4,10 +4,7 @@ const { Pool } = pg;
 import { errorTracker } from '../../core/errors/error-tracker.js';
 import { config } from '../../config/index.js';
 import { logger } from '../../../shared/core/src/index.js';
-import { users, bills, sponsors, User, Bill, Sponsor } from '@shared/schema/foundation';
-import { comments, notifications, bill_engagement, bill_tracking_preferences } from '@shared/schema/citizen_participation';
-
-import { repositoryFactory } from './repositories/repository-factory.js';
+import { users, bills, sponsors, User, Bill, Sponsor, comments, notifications, bill_engagement, bill_tracking_preferences } from '../../../shared/schema/index.js';
 // ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
@@ -150,7 +147,6 @@ export class DatabaseService {
     const poolConfig = this.buildPoolConfig(serviceConfig);
     this.pool = new Pool(poolConfig);
     this.db = drizzle(this.pool, { schema: this.schema });
-    this.initializeRepositories();
   }
 
   /**
@@ -189,63 +185,7 @@ export class DatabaseService {
     };
   }
 
-  /**
-   * Initializes repositories using the repository factory
-   * Creates repositories for all core entities in the schema
-   */
-  private initializeRepositories(): void {
-    // Create repositories for core entities
-    repositoryFactory.createRepository<User>(
-      'users',
-      users,
-      (row: any) => row as User,
-      (entity: User) => entity
-    );
 
-    repositoryFactory.createRepository<Bill>(
-      'bills',
-      bills,
-      (row: any) => row as Bill,
-      (entity: Bill) => entity
-    );
-
-    repositoryFactory.createRepository<Sponsor>(
-      'sponsors',
-      sponsors,
-      (row: any) => row as Sponsor,
-      (entity: Sponsor) => entity
-    );
-
-    repositoryFactory.createRepository<any>(
-      'comments',
-      comments,
-      (row: any) => row,
-      (entity: any) => entity
-    );
-
-    repositoryFactory.createRepository<any>(
-      'notifications',
-      notifications,
-      (row: any) => row,
-      (entity: any) => entity
-    );
-
-    repositoryFactory.createRepository<any>(
-      'bill_engagement',
-      bill_engagement,
-      (row: any) => row,
-      (entity: any) => entity
-    );
-
-    repositoryFactory.createRepository<any>(
-      'bill_tracking_preferences',
-      bill_tracking_preferences,
-      (row: any) => row,
-      (entity: any) => entity
-    );
-
-    logger.info('✅ Repositories initialized successfully', { component: 'Chanuka' });
-  }
 
   /**
    * Sets up event listeners for pool lifecycle events

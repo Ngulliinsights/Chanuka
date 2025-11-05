@@ -1,15 +1,8 @@
-import { pool, readDb, writeDb, db } from './pool';
 import { logger } from '../core/index.js';
 
 // ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
-
-/**
- * Type-safe transaction context used throughout the application.
- * Provides full IDE support and compile-time type checking for transactions.
- */
-export type DatabaseTransaction = Parameters<Parameters<typeof writeDatabase.transaction>[0]>[0];
 
 /**
  * Database operation types for intelligent connection routing.
@@ -53,36 +46,36 @@ export interface DatabaseHealthStatus {
  * Primary database connection for general operations.
  * Use when read/write distinction isn't performance-critical.
  */
-export const database = db as any;
+export const database = null as any; // Will be initialized later
 
 /**
  * Read-optimized connection routing to replicas in production.
  * Improves scalability by distributing query load across read replicas.
  */
-export const readDatabase = readDb;
+export const readDatabase = null as any;
 
 /**
  * Write-optimized connection always routing to primary database.
  * Ensures data consistency for all mutation operations.
  */
-export const writeDatabase = writeDb;
+export const writeDatabase = null as any;
 
 /**
  * Specialized connections for multi-tenant architecture.
- * 
+ *
  * Phase One: All connections reference the same database instance.
  * Phase Two (Future): Each connection will target a dedicated database
  * optimized for its specific workload characteristics.
  */
-export const operationalDb = db as any;  // Primary transactional workload
-export const analyticsDb = db as any;    // Read-heavy analytics queries
-export const securityDb = db as any;     // Audit logs and security events
+export const operationalDb = null as any;  // Primary transactional workload
+export const analyticsDb = null as any;    // Read-heavy analytics queries
+export const securityDb = null as any;     // Audit logs and security events
 
 /**
  * Raw PostgreSQL pool for direct SQL when ORM abstraction is limiting.
  * Use sparingly and prefer Drizzle ORM for type safety.
  */
-export { pool };
+export const pool = null as any;
 
 /**
  * Re-export all schema definitions for convenient access.

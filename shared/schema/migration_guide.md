@@ -2,502 +2,250 @@
 
 ## Overview
 
-This guide provides step-by-step instructions for migrating from the current unified schema to the new domain-organized schema architecture.
-
-## Pre-Migration Checklist
-
-### 1. Backup Current Database
-
-```sql
--- Create full database backup
-pg_dump -h localhost -U postgres kenya_legislative_platform > backup_$(date +%Y%m%d_%H%M%S).sql
-
--- Verify backup integrity
-pg_restore --list backup_*.sql
-```
-
-### 2. Set Up New Schema Structure
-
-```sql
--- Create new schemas
-CREATE SCHEMA IF NOT EXISTS foundation;
-CREATE SCHEMA IF NOT EXISTS citizen_participation;
-CREATE SCHEMA IF NOT EXISTS parliamentary_process;
-CREATE SCHEMA IF NOT EXISTS constitutional_intelligence;
-CREATE SCHEMA IF NOT EXISTS argument_intelligence;
-CREATE SCHEMA IF NOT EXISTS advocacy_coordination;
-CREATE SCHEMA IF NOT EXISTS universal_access;
-CREATE SCHEMA IF NOT EXISTS integrity_operations;
-CREATE SCHEMA IF NOT EXISTS platform_operations;
-```
-
-### 3. Install Required Extensions
-
-```sql
--- Enable required PostgreSQL extensions
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS "pg_trgm";
-CREATE EXTENSION IF NOT EXISTS "pg_stat_statements";
-```
+This guide helps you migrate from the old schema structure to the new comprehensive domain-driven architecture with all critical gaps addressed.
 
 ## Migration Steps
 
-### Step 1: Foundation Schema Migration
+### 1. Backup Current Database
+```bash
+# Create a backup before migration
+pg_dump your_database_name > backup_before_migration.sql
+```
 
-#### Migrate Users and Profiles
+### 2. Generate Migration Files
+
+The new schema includes 7 major domains with 51+ new tables. You'll need to generate migration files for:
+
+#### Core Enhancements:
+- Enhanced `user_profiles` table with contact information
+- New `user_contact_methods` table
+- Enhanced `alert_preferences` table
+
+#### New Domain Tables:
+
+**Parliamentary Process Domain (9 tables):**
+- `bill_committee_assignments`
+- `bill_amendments` 
+- `bill_versions`
+- `bill_readings`
+- `parliamentary_votes`
+- `bill_cosponsors`
+- `public_participation_events`
+- `public_submissions`
+- `public_hearings`
+
+**Constitutional Intelligence Domain (5 tables):**
+- `constitutional_provisions`
+- `constitutional_analyses`
+- `legal_precedents`
+- `expert_review_queue`
+- `analysis_audit_trail`
+
+**Argument Intelligence Domain (6 tables):**
+- `arguments`
+- `claims`
+- `evidence`
+- `argument_relationships`
+- `legislative_briefs`
+- `synthesis_jobs`
+
+**Advocacy Coordination Domain (6 tables):**
+- `campaigns`
+- `action_items`
+- `campaign_participants`
+- `action_completions`
+- `campaign_impact_metrics`
+- `coalition_relationships`
+
+**Universal Access Domain (6 tables):**
+- `ambassadors`
+- `communities`
+- `facilitation_sessions`
+- `offline_submissions`
+- `ussd_sessions`
+- `localized_content`
+
+**Transparency Analysis Domain (6 tables):**
+- `corporate_entities`
+- `financial_interests`
+- `lobbying_activities`
+- `bill_financial_conflicts`
+- `cross_sector_ownership`
+- `regulatory_capture_indicators`
+
+**Impact Measurement Domain (12 tables):**
+- `participation_cohorts`
+- `legislative_outcomes`
+- `bill_implementation`
+- `attribution_assessments`
+- `success_stories`
+- `geographic_equity_metrics`
+- `demographic_equity_metrics`
+- `digital_inclusion_metrics`
+- `platform_performance_indicators`
+- `legislative_impact_indicators`
+- `civic_engagement_indicators`
+- `financial_sustainability_indicators`
+
+### 3. Using Drizzle Kit
+
+If you're using Drizzle Kit for migrations:
+
+```bash
+# Generate migration files
+npx drizzle-kit generate:pg
+
+# Apply migrations
+npx drizzle-kit push:pg
+```
+
+### 4. Manual Migration Script
+
+If you need to create migrations manually, here's the order:
 
 ```sql
--- Create users table in foundation schema
-CREATE TABLE foundation.users AS
-SELECT * FROM public.users;
+-- 1. First, add new enums (if not already present)
+-- 2. Enhance existing tables (user_profiles, alert_preferences)
+-- 3. Create new tables in dependency order:
+--    - Foundation tables first
+--    - Then tables that reference foundation tables
+--    - Finally, cross-reference tables
 
--- Create user_profiles table in foundation schema
-CREATE TABLE foundation.user_profiles AS
-SELECT * FROM public.user_profiles;
+-- Example for user_profiles enhancement:
+ALTER TABLE user_profiles 
+ADD COLUMN phone_number VARCHAR(20),
+ADD COLUMN phone_verified BOOLEAN DEFAULT false,
+ADD COLUMN phone_verification_code VARCHAR(10),
+ADD COLUMN phone_verification_expires_at TIMESTAMP WITH TIME ZONE,
+ADD COLUMN email_notifications_consent BOOLEAN DEFAULT true,
+ADD COLUMN sms_notifications_consent BOOLEAN DEFAULT false,
+ADD COLUMN marketing_consent BOOLEAN DEFAULT false,
+ADD COLUMN data_processing_consent BOOLEAN DEFAULT true,
+ADD COLUMN consent_date TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+ADD COLUMN preferred_language VARCHAR(10) DEFAULT 'en',
+ADD COLUMN timezone VARCHAR(50) DEFAULT 'Africa/Nairobi',
+ADD COLUMN accessibility_needs JSONB DEFAULT '{}',
+ADD COLUMN emergency_contact_name VARCHAR(200),
+ADD COLUMN emergency_contact_phone VARCHAR(20),
+ADD COLUMN emergency_contact_relationship VARCHAR(50);
 
--- Update foreign key relationships
-ALTER TABLE foundation.user_profiles
-ADD CONSTRAINT fk_user_profiles_users
-FOREIGN KEY (user_id) REFERENCES foundation.users(id);
+-- Add indexes
+CREATE INDEX idx_user_profiles_phone_number ON user_profiles(phone_number) WHERE phone_number IS NOT NULL;
+CREATE INDEX idx_user_profiles_phone_verified ON user_profiles(phone_verified, phone_number) WHERE phone_verified = true AND phone_number IS NOT NULL;
 ```
 
-#### Migrate Legislative Entities
+### 5. Data Migration Considerations
 
+#### Contact Information Migration:
+- Existing users will have NULL phone numbers initially
+- You may want to prompt users to add phone numbers on next login
+- Set default consent values based on your privacy policy
+
+#### Localization Migration:
+- Set default language to 'en' for existing users
+- Set default timezone to 'Africa/Nairobi'
+- Accessibility needs will be empty JSON objects initially
+
+#### New Domain Data:
+- Most new domain tables will start empty
+- You may want to seed some initial data:
+  - Constitutional provisions from Kenya's Constitution
+  - Basic corporate entities for major companies
+  - Initial participation cohorts for analysis
+
+### 6. Post-Migration Steps
+
+#### Verify Data Integrity:
 ```sql
--- Migrate sponsors
-CREATE TABLE foundation.sponsors AS
-SELECT * FROM public.sponsors;
-
--- Migrate committees
-CREATE TABLE foundation.committees AS
-SELECT * FROM public.committees;
-
--- Migrate committee members
-CREATE TABLE foundation.committee_members AS
-SELECT * FROM public.committee_members;
-
--- Migrate parliamentary sessions
-CREATE TABLE foundation.parliamentary_sessions AS
-SELECT * FROM public.parliamentary_sessions;
-
--- Migrate parliamentary sittings
-CREATE TABLE foundation.parliamentary_sittings AS
-SELECT * FROM public.parliamentary_sittings;
-
--- Migrate bills
-CREATE TABLE foundation.bills AS
-SELECT * FROM public.bills;
-
--- Update foreign key relationships
-ALTER TABLE foundation.parliamentary_sittings
-ADD CONSTRAINT fk_sittings_sessions
-FOREIGN KEY (session_id) REFERENCES foundation.parliamentary_sessions(id);
-
-ALTER TABLE foundation.bills
-ADD CONSTRAINT fk_bills_sponsors
-FOREIGN KEY (sponsor_id) REFERENCES foundation.sponsors(id);
+-- Check that all foreign key relationships are valid
+-- Verify that indexes were created properly
+-- Test that new enum values work correctly
 ```
 
-### Step 2: Citizen Participation Migration
+#### Update Application Code:
+- Update service layer to use new contact methods
+- Implement phone verification workflows
+- Add support for new domains in your API endpoints
+- Update frontend to handle new features
 
-#### Migrate Sessions and Comments
-
+#### Seed Initial Data:
 ```sql
--- Migrate sessions
-CREATE TABLE citizen_participation.sessions AS
-SELECT * FROM public.sessions;
-
--- Migrate comments
-CREATE TABLE citizen_participation.comments AS
-SELECT * FROM public.comments;
-
--- Migrate comment votes
-CREATE TABLE citizen_participation.comment_votes AS
-SELECT * FROM public.comment_votes;
-
--- Migrate bill votes
-CREATE TABLE citizen_participation.bill_votes AS
-SELECT * FROM public.bill_votes;
-
--- Migrate bill engagement
-CREATE TABLE citizen_participation.bill_engagement AS
-SELECT * FROM public.bill_engagement;
-
--- Update foreign key relationships
-ALTER TABLE citizen_participation.sessions
-ADD CONSTRAINT fk_sessions_users
-FOREIGN KEY (user_id) REFERENCES foundation.users(id);
-
-ALTER TABLE citizen_participation.comments
-ADD CONSTRAINT fk_comments_bills
-FOREIGN KEY (bill_id) REFERENCES foundation.bills(id),
-ADD CONSTRAINT fk_comments_users
-FOREIGN KEY (user_id) REFERENCES foundation.users(id);
-
-ALTER TABLE citizen_participation.comment_votes
-ADD CONSTRAINT fk_comment_votes_comments
-FOREIGN KEY (comment_id) REFERENCES citizen_participation.comments(id),
-ADD CONSTRAINT fk_comment_votes_users
-FOREIGN KEY (user_id) REFERENCES foundation.users(id);
-
-ALTER TABLE citizen_participation.bill_votes
-ADD CONSTRAINT fk_bill_votes_bills
-FOREIGN KEY (bill_id) REFERENCES foundation.bills(id),
-ADD CONSTRAINT fk_bill_votes_users
-FOREIGN KEY (user_id) REFERENCES foundation.users(id);
+-- Add Kenya's constitutional provisions
+-- Create initial participation cohorts
+-- Set up basic corporate entities
+-- Configure initial localized content
 ```
 
-### Step 3: Parliamentary Process Migration
+### 7. Rollback Plan
 
-#### Migrate Process Tables
+If you need to rollback:
 
-```sql
--- Migrate bill committee assignments
-CREATE TABLE parliamentary_process.bill_committee_assignments AS
-SELECT * FROM public.bill_committee_assignments;
-
--- Migrate bill amendments
-CREATE TABLE parliamentary_process.bill_amendments AS
-SELECT * FROM public.bill_amendments;
-
--- Migrate bill versions
-CREATE TABLE parliamentary_process.bill_versions AS
-SELECT * FROM public.bill_versions;
-
--- Migrate bill readings
-CREATE TABLE parliamentary_process.bill_readings AS
-SELECT * FROM public.bill_readings;
-
--- Migrate parliamentary votes
-CREATE TABLE parliamentary_process.parliamentary_votes AS
-SELECT * FROM public.parliamentary_votes;
-
--- Migrate bill cosponsors
-CREATE TABLE parliamentary_process.bill_cosponsors AS
-SELECT * FROM public.bill_cosponsors;
-
--- Update foreign key relationships
-ALTER TABLE parliamentary_process.bill_committee_assignments
-ADD CONSTRAINT fk_bill_committee_assignments_bills
-FOREIGN KEY (bill_id) REFERENCES foundation.bills(id),
-ADD CONSTRAINT fk_bill_committee_assignments_committees
-FOREIGN KEY (committee_id) REFERENCES foundation.committees(id);
-
-ALTER TABLE parliamentary_process.bill_amendments
-ADD CONSTRAINT fk_bill_amendments_bills
-FOREIGN KEY (bill_id) REFERENCES foundation.bills(id),
-ADD CONSTRAINT fk_bill_amendments_proposers
-FOREIGN KEY (proposer_id) REFERENCES foundation.sponsors(id);
-
-ALTER TABLE parliamentary_process.parliamentary_votes
-ADD CONSTRAINT fk_parliamentary_votes_bills
-FOREIGN KEY (bill_id) REFERENCES foundation.bills(id),
-ADD CONSTRAINT fk_parliamentary_votes_sponsors
-FOREIGN KEY (sponsor_id) REFERENCES foundation.sponsors(id);
-
-ALTER TABLE parliamentary_process.bill_cosponsors
-ADD CONSTRAINT fk_bill_cosponsors_bills
-FOREIGN KEY (bill_id) REFERENCES foundation.bills(id),
-ADD CONSTRAINT fk_bill_cosponsors_sponsors
-FOREIGN KEY (sponsor_id) REFERENCES foundation.sponsors(id);
+```bash
+# Restore from backup
+psql your_database_name < backup_before_migration.sql
 ```
 
-### Step 4: New Schema Implementation
+Or create a rollback migration that:
+- Drops new tables in reverse dependency order
+- Removes new columns from existing tables
+- Drops new indexes and constraints
 
-#### Create Constitutional Intelligence Tables
+### 8. Testing Checklist
 
-```sql
--- Create constitutional provisions table
-CREATE TABLE constitutional_intelligence.constitutional_provisions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    chapter_number INTEGER,
-    chapter_title VARCHAR(255),
-    part_number INTEGER,
-    part_title VARCHAR(255),
-    article_number INTEGER NOT NULL,
-    article_title VARCHAR(255) NOT NULL,
-    section_number VARCHAR(20),
-    subsection_number VARCHAR(20),
-    provision_text TEXT NOT NULL,
-    provision_summary TEXT,
-    parent_provision_id UUID REFERENCES constitutional_intelligence.constitutional_provisions(id),
-    hierarchy_path VARCHAR(100),
-    rights_category VARCHAR(100),
-    keywords TEXT[],
-    related_provisions UUID[],
-    search_vector TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
-);
+After migration, verify:
 
--- Create constitutional analyses table
-CREATE TABLE constitutional_intelligence.constitutional_analyses (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    bill_id UUID NOT NULL REFERENCES foundation.bills(id) ON DELETE CASCADE,
-    provision_id UUID NOT NULL REFERENCES constitutional_intelligence.constitutional_provisions(id),
-    analysis_type VARCHAR(50) NOT NULL,
-    confidence_level NUMERIC(3,2) NOT NULL,
-    analysis_text TEXT NOT NULL,
-    reasoning_chain JSONB,
-    supporting_precedents UUID[],
-    constitutional_risk VARCHAR(20) NOT NULL,
-    risk_explanation TEXT,
-    requires_expert_review BOOLEAN NOT NULL DEFAULT FALSE,
-    expert_reviewed BOOLEAN NOT NULL DEFAULT FALSE,
-    expert_review_date TIMESTAMP,
-    expert_notes TEXT,
-    analysis_method VARCHAR(100) NOT NULL,
-    analysis_version VARCHAR(50),
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
-);
-```
+- [ ] All existing functionality still works
+- [ ] New contact methods can be added and verified
+- [ ] Notification preferences are respected
+- [ ] New domain tables accept data correctly
+- [ ] All foreign key relationships work
+- [ ] Indexes improve query performance as expected
+- [ ] Enum values are accepted correctly
 
-#### Create Argument Intelligence Tables
+### 9. Performance Considerations
 
-```sql
--- Create arguments table
-CREATE TABLE argument_intelligence.arguments (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    comment_id UUID NOT NULL REFERENCES citizen_participation.comments(id) ON DELETE CASCADE,
-    bill_id UUID NOT NULL REFERENCES foundation.bills(id) ON DELETE CASCADE,
-    argument_type VARCHAR(50) NOT NULL,
-    position VARCHAR(20) NOT NULL,
-    extracted_text TEXT NOT NULL,
-    normalized_text TEXT,
-    topic_tags TEXT[],
-    affected_groups TEXT[],
-    extraction_confidence NUMERIC(3,2) NOT NULL,
-    coherence_score NUMERIC(3,2),
-    evidence_quality VARCHAR(20),
-    parent_argument_id UUID REFERENCES argument_intelligence.arguments(id),
-    claim_id UUID REFERENCES argument_intelligence.claims(id),
-    extraction_method VARCHAR(100) NOT NULL,
-    extraction_timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
-    created_at TIMESTAMP NOT NULL DEFAULT NOW()
-);
+The new schema includes comprehensive indexing, but monitor:
 
--- Create claims table
-CREATE TABLE argument_intelligence.claims (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    bill_id UUID NOT NULL REFERENCES foundation.bills(id) ON DELETE CASCADE,
-    claim_text TEXT NOT NULL,
-    claim_summary VARCHAR(500),
-    position VARCHAR(20) NOT NULL,
-    argument_cluster_size INTEGER NOT NULL DEFAULT 1,
-    source_arguments UUID[],
-    expressing_users_count INTEGER NOT NULL DEFAULT 0,
-    counties_represented kenyan_county[],
-    demographic_spread JSONB,
-    supporting_evidence_count INTEGER NOT NULL DEFAULT 0,
-    evidence_quality_avg NUMERIC(3,2),
-    expert_endorsements INTEGER NOT NULL DEFAULT 0,
-    importance_score NUMERIC(5,2) NOT NULL DEFAULT 0,
-    novelty_score NUMERIC(3,2),
-    claim_category VARCHAR(100),
-    affected_provisions UUID[],
-    fact_check_status verification_status NOT NULL DEFAULT 'pending',
-    fact_check_notes TEXT,
-    fact_check_sources TEXT[],
-    included_in_briefs INTEGER NOT NULL DEFAULT 0,
-    legislative_response TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
-);
-```
+- Query performance on large tables
+- Index usage and effectiveness
+- JSONB query performance
+- Array column query performance
 
-### Step 5: Data Validation and Testing
+Consider:
+- Partitioning large tables by date
+- Materialized views for complex analytics
+- Read replicas for reporting queries
 
-#### Validate Migration Integrity
+### 10. Security Considerations
 
-```sql
--- Check row counts match
-SELECT 'users' as table_name, COUNT(*) as row_count FROM foundation.users
-UNION ALL
-SELECT 'user_profiles', COUNT(*) FROM foundation.user_profiles
-UNION ALL
-SELECT 'sponsors', COUNT(*) FROM foundation.sponsors
-UNION ALL
-SELECT 'bills', COUNT(*) FROM foundation.bills
-ORDER BY table_name;
+The new schema includes sensitive data:
 
--- Compare with original counts
-SELECT 'public.users' as table_name, COUNT(*) as row_count FROM public.users
-UNION ALL
-SELECT 'public.user_profiles', COUNT(*) FROM public.user_profiles
-UNION ALL
-SELECT 'public.sponsors', COUNT(*) FROM public.sponsors
-UNION ALL
-SELECT 'public.bills', COUNT(*) FROM public.bills
-ORDER BY table_name;
-```
+- Phone numbers and contact information
+- Financial interests and conflicts
+- Lobbying activities
+- User consent and privacy settings
 
-#### Test Foreign Key Relationships
+Ensure:
+- Proper access controls are in place
+- Sensitive data is encrypted at rest
+- Audit trails are enabled
+- GDPR compliance is maintained
 
-```sql
--- Test bill-sponsor relationship
-SELECT COUNT(*) as bills_with_sponsors
-FROM foundation.bills b
-JOIN foundation.sponsors s ON b.sponsor_id = s.id
-WHERE b.sponsor_id IS NOT NULL;
+## Troubleshooting
 
--- Test comment-bill relationship
-SELECT COUNT(*) as comments_with_bills
-FROM citizen_participation.comments c
-JOIN foundation.bills b ON c.bill_id = b.id;
-```
+### Common Issues:
 
-### Step 6: Application Updates
+1. **Foreign Key Violations**: Ensure parent tables exist before creating child tables
+2. **Enum Value Errors**: Make sure all enum values are defined before using them
+3. **Index Creation Failures**: Check for duplicate index names or invalid WHERE clauses
+4. **JSONB Issues**: Ensure JSONB columns have valid default values
 
-#### Update Database Connection Configuration
+### Getting Help:
 
-```typescript
-// Update database connection strings
-const databaseConfig = {
-  foundation: {
-    host: process.env.FOUNDATION_DB_HOST,
-    port: process.env.FOUNDATION_DB_PORT,
-    database: process.env.FOUNDATION_DB_NAME,
-    user: process.env.FOUNDATION_DB_USER,
-    password: process.env.FOUNDATION_DB_PASSWORD,
-  },
-  citizenParticipation: {
-    host: process.env.CITIZEN_PARTICIPATION_DB_HOST,
-    port: process.env.CITIZEN_PARTICIPATION_DB_PORT,
-    database: process.env.CITIZEN_PARTICIPATION_DB_NAME,
-    user: process.env.CITIZEN_PARTICIPATION_DB_USER,
-    password: process.env.CITIZEN_PARTICIPATION_DB_PASSWORD,
-  },
-  // ... other schemas
-};
-```
+If you encounter issues:
+1. Check the PostgreSQL logs for detailed error messages
+2. Verify that all dependencies are in place
+3. Test migrations on a copy of production data first
+4. Consider running migrations in smaller batches for large datasets
 
-#### Update ORM Mappings
-
-```typescript
-// Update Drizzle ORM schema imports
-import { users, user_profiles, bills, comments, comment_votes } from "./schema";
-
-// Update query builders to use new schema organization
-const userWithProfile = await db
-  .select()
-  .from(users)
-  .leftJoin(user_profiles, eq(users.id, user_profiles.user_id))
-  .where(eq(users.id, userId));
-```
-
-## Post-Migration Verification
-
-### 1. Data Integrity Checks
-
-```sql
--- Verify no orphaned records
-SELECT 'orphaned_comments' as check_name, COUNT(*) as issue_count
-FROM citizen_participation.comments c
-LEFT JOIN foundation.bills b ON c.bill_id = b.id
-WHERE b.id IS NULL
-
-UNION ALL
-
-SELECT 'orphaned_votes', COUNT(*)
-FROM citizen_participation.bill_votes v
-LEFT JOIN foundation.bills b ON v.bill_id = b.id
-WHERE b.id IS NULL
-
-UNION ALL
-
-SELECT 'orphaned_sessions', COUNT(*)
-FROM citizen_participation.sessions s
-LEFT JOIN foundation.users u ON s.user_id = u.id
-WHERE u.id IS NULL;
-```
-
-### 2. Performance Testing
-
-```sql
--- Test query performance on new schema
-EXPLAIN ANALYZE
-SELECT b.*, COUNT(c.id) as comment_count
-FROM foundation.bills b
-LEFT JOIN citizen_participation.comments c ON b.id = c.bill_id
-WHERE b.status = 'introduced'
-GROUP BY b.id
-ORDER BY comment_count DESC
-LIMIT 10;
-```
-
-### 3. Application Testing
-
-- Test user registration and authentication
-- Test bill viewing and commenting
-- Test voting functionality
-- Test notification systems
-- Test moderation workflows
-
-## Rollback Plan
-
-If migration issues are encountered:
-
-1. **Immediate Rollback**
-
-   ```sql
-   -- Restore from backup
-   pg_restore -h localhost -U postgres -d kenya_legislative_platform backup_*.sql
-   ```
-
-2. **Gradual Rollback**
-
-   ```sql
-   -- Drop new schema tables
-   DROP SCHEMA foundation CASCADE;
-   DROP SCHEMA citizen_participation CASCADE;
-   -- ... other schemas
-   ```
-
-3. **Application Rollback**
-   - Revert to previous application version
-   - Update database connection configuration
-   - Clear application caches
-
-## Best Practices
-
-### 1. Migration Execution
-
-- Run migrations during low-traffic periods
-- Use database transactions for atomic operations
-- Implement idempotent migration scripts
-- Test migrations in staging environment first
-
-### 2. Monitoring
-
-- Monitor database performance during migration
-- Track migration progress and completion times
-- Set up alerts for migration failures
-- Log all migration activities
-
-### 3. Validation
-
-- Verify data integrity after each migration step
-- Test application functionality after migration
-- Validate performance metrics
-- Confirm user experience remains intact
-
-## Support and Troubleshooting
-
-### Common Issues
-
-1. **Foreign Key Violations**: Check data integrity before migration
-2. **Performance Degradation**: Optimize indexes and queries
-3. **Application Errors**: Update ORM mappings and queries
-4. **Data Loss**: Ensure backups are complete and tested
-
-### Getting Help
-
-- Review migration logs for specific error messages
-- Test individual migration steps in isolation
-- Consult database architecture documentation
-- Contact development team for complex issues
-
-## Conclusion
-
-This migration guide provides a structured approach to transitioning from the current unified schema to the new domain-organized architecture. Following these steps will ensure data integrity, minimize downtime, and maintain application functionality throughout the migration process.
+This migration represents a major architectural upgrade that transforms the platform from a basic bill tracker to a comprehensive civic engagement platform. Take time to test thoroughly and plan for user communication about new features.

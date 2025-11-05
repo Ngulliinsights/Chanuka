@@ -1,28 +1,35 @@
 import { performance } from 'perf_hooks';
-import { logger } from '../observability/logging';
 
 export class LoadTester {
-  constructor(private readonly config: LoadTestConfig = {}) {}
-
   /**
    * Create a comprehensive load test suite
    */
   async createLoadTestSuite(options: LoadTestSuiteOptions): Promise<LoadTestSuite> {
     const startTime = performance.now();
-    const results: LoadTestResults[] = [];
+    // Explicitly type the results array with the extended type
+    const results: Array<LoadTestResults & { scenarioName: string; description?: string }> = [];
 
     for (const scenario of options.scenarios) {
-      const scenarioResult = await this.simulateLoad({
+      // Build the options object conditionally to avoid passing undefined
+      const loadOptions: SimulateLoadOptions = {
         totalRequests: scenario.requests,
         concurrency: scenario.concurrency,
         requestFn: scenario.requestFn,
-        delayBetweenBatches: scenario.delayBetweenBatches
-      });
+        // Only include delayBetweenBatches if it's actually defined
+        ...(scenario.delayBetweenBatches !== undefined && { 
+          delayBetweenBatches: scenario.delayBetweenBatches 
+        })
+      };
 
+      const scenarioResult = await this.simulateLoad(loadOptions);
+
+      // Create the extended result object, conditionally including description
+      // This ensures we don't set description to undefined, but omit it entirely if not present
       results.push({
         ...scenarioResult,
         scenarioName: scenario.name,
-        description: scenario.description
+        // Only include description if it has a value (not undefined)
+        ...(scenario.description !== undefined && { description: scenario.description })
       });
     }
 
@@ -54,7 +61,8 @@ export class LoadTester {
       );
       results.push(...batchResults);
 
-      if (options.delayBetweenBatches) {
+      // Only delay if the property exists
+      if (options.delayBetweenBatches !== undefined) {
         await this.delay(options.delayBetweenBatches);
       }
     }
@@ -68,7 +76,8 @@ export class LoadTester {
     
     for (const pattern of failurePatterns) {
       await this.executeFailurePattern(pattern);
-      if (options.delayBetweenFailures) {
+      // Only delay if the property exists and has a value
+      if (options.delayBetweenFailures !== undefined) {
         await this.delay(options.delayBetweenFailures);
       }
     }
@@ -133,7 +142,7 @@ export class LoadTester {
   private async executeFailurePattern(pattern: FailurePattern): Promise<void> {
     switch (pattern.type) {
       case 'latency':
-        // Simulate network latency
+        // Simulate network latency - magnitude is guaranteed to be a number
         await this.injectNetworkLatency(pattern.magnitude, pattern.duration);
         break;
       case 'error':
@@ -170,9 +179,16 @@ export class LoadTester {
   }
 
   private calculatePercentile(values: number[], percentile: number): number {
+    if (values.length === 0) {
+      return 0;
+    }
+
     const sorted = [...values].sort((a, b) => a - b);
-    const index = Math.ceil((percentile / 100) * sorted.length) - 1;
-    return sorted[index];
+    // Calculate index and clamp to valid range to ensure a number is always returned
+    let index = Math.ceil((percentile / 100) * sorted.length) - 1;
+    if (index < 0) index = 0;
+    if (index >= sorted.length) index = sorted.length - 1;
+    return sorted[index]!;
   }
 
   private async delay(ms: number): Promise<void> {
@@ -229,12 +245,12 @@ export class LoadTester {
 
     while (Date.now() - startTime < duration) {
       if (Math.random() < targetUsage) {
-        // Busy loop
+        // Busy loop to consume CPU
         for (let i = 0; i < 1000000; i++) {
           Math.random();
         }
       } else {
-        // Sleep
+        // Sleep to reduce CPU usage
         this.delay(10);
       }
     }
@@ -254,7 +270,7 @@ export class LoadTester {
   }
 }
 
-interface LoadTestConfig {
+export interface LoadTestConfig {
   maxConcurrency?: number;
   maxDuration?: number;
   failureThreshold?: number;
@@ -327,7 +343,6 @@ interface ResourceFailurePattern {
   percentage: number;
 }
 
-// Additional interfaces for load test suite
 export interface LoadTestScenario {
   name: string;
   description?: string;
@@ -344,7 +359,7 @@ export interface LoadTestSuiteOptions {
 export interface LoadTestSuite {
   timestamp: Date;
   totalDurationMs: number;
-  scenarios: (LoadTestResults & { scenarioName: string; description?: string })[];
+  scenarios: Array<LoadTestResults & { scenarioName: string; description?: string }>;
   summary: {
     totalScenarios: number;
     totalRequests: number;
@@ -354,48 +369,3 @@ export interface LoadTestSuite {
     averageResponseTime: number;
   };
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,8 +1,12 @@
+// Repository interfaces removed - using direct Drizzle queries
 import { CitizenVerification, VerificationType } from '../entities/citizen-verification';
+import { Evidence, ExpertiseLevel } from '../entities/value-objects';
 import { UserAggregate } from '../aggregates/user-aggregate';
-import { UserRepository } from '../repositories/user-repository';
-import { VerificationRepository } from '../repositories/verification-repository';
 import { ProfileDomainService } from './profile-domain-service';
+import { UserService } from '../../application/user-service-direct';
+import { database as db } from '@shared/database/connection';
+import { user_verification } from '@shared/schema';
+import { eq, sql, desc } from 'drizzle-orm';
 
 export interface VerificationCreationResult {
   success: boolean;
@@ -23,32 +27,57 @@ export interface VerificationValidationResult {
   warnings: string[];
 }
 
+// Define proper types for evidence to ensure type safety
+interface EvidenceData {
+  type: string;
+  source: string;
+  url?: string;
+  credibility: number;
+  relevance: number;
+  description: string;
+  datePublished?: Date;
+}
+
+// Define contributor statistics type
+interface ContributorStats {
+  count: number;
+  totalConfidence: number;
+}
+
 export class UserVerificationDomainService {
   constructor(
-    private userRepository: UserRepository,
-    private verificationRepository: VerificationRepository,
-    private profileService: ProfileDomainService
-  ) {}
+    private profileService: ProfileDomainService,
+    private userService: UserService
+  ) { }
 
   /**
-   * Creates a new citizen verification with validation
+   * Creates a new citizen verification with validation.
+   * This method performs comprehensive checks including user eligibility,
+   * domain expertise, evidence quality, and reasoning adequacy.
    */
-  async createVerification(verification_data: { citizenId: string;
+  async createVerification(verification_data: {
+    citizenId: string;
     bill_id: number;
     verification_type: VerificationType;
-    evidence: any[];
-    expertise: any;
+    evidence: EvidenceData[];
+    expertise: {
+      domain: string;
+      level: string;
+      credentials: string[];
+      verifiedCredentials: boolean;
+      reputation_score: number;
+    };
     reasoning: string;
-   }): Promise<VerificationCreationResult> {
+  }): Promise<VerificationCreationResult> {
     const errors: string[] = [];
 
     // Validate user exists and is eligible
-    const userAggregate = await this.userRepository.findUserAggregateById(verification_data.citizenId);
+    const userAggregate = await this.userService.findUserAggregateById(verification_data.citizenId);
     if (!userAggregate) {
       return { success: false, errors: ['User not found'] };
     }
 
-    if (!userAggregate.users.isEligibleForVerification()) {
+    if (!userAggregate.user.isEligibleForVerification()) {
       errors.push('User is not eligible for verification (insufficient reputation or inactive status)');
     }
 
@@ -74,22 +103,83 @@ export class UserVerificationDomainService {
       return { success: false, errors };
     }
 
-    try { const verification = CitizenVerification.create({
+    try {
+      // Convert evidence data to Evidence value objects
+      const evidenceObjects = verification_data.evidence.map(e => {
+        const evidenceData: {
+          type: string;
+          source: string;
+          credibility: number;
+          relevance: number;
+          description: string;
+          url?: string;
+          datePublished?: Date;
+        } = {
+          type: e.type,
+          source: e.source,
+          credibility: e.credibility,
+          relevance: e.relevance,
+          description: e.description,
+        };
+        if (e.url !== undefined) {
+          evidenceData.url = e.url;
+        }
+        if (e.datePublished !== undefined) {
+          evidenceData.datePublished = e.datePublished;
+        }
+        return Evidence.create(evidenceData);
+      });
+
+      // Create ExpertiseLevel value object
+      const expertiseLevel = ExpertiseLevel.create(verification_data.expertise);
+
+      const verification = CitizenVerification.create({
         id: crypto.randomUUID(),
         bill_id: verification_data.bill_id,
         citizenId: verification_data.citizenId,
         verification_type: verification_data.verification_type,
-        evidence: verification_data.evidence,
-        expertise: verification_data.expertise,
+        evidence: evidenceObjects,
+        expertise: expertiseLevel,
         reasoning: verification_data.reasoning.trim()
-       });
+      });
 
-      await this.verificationRepository.save(verification);
+      // Store verification directly in user_verification table
+      await db.insert(user_verification).values({
+        id: verification.id,
+        user_id: verification.citizenId,
+        verification_type: verification.verification_type,
+        verification_data: {
+          bill_id: verification.bill_id,
+          claim: '',
+          evidence: verification.evidence.map(e => ({
+            type: e.type,
+            source: e.source,
+            url: e.url || '',
+            credibility: e.credibility,
+            relevance: e.relevance,
+            description: e.description,
+            datePublished: e.datePublished || new Date()
+          })),
+          expertise: {
+            domain: verification.expertise.domain,
+            level: verification.expertise.level,
+            credentials: verification.expertise.credentials,
+            verifiedCredentials: verification.expertise.verifiedCredentials,
+            reputation_score: verification.expertise.reputation_score
+          },
+          reasoning: verification.reasoning,
+          endorsements: [],
+          disputes: [],
+          confidence: verification.confidence,
+          verification_status: verification.verification_status
+        },
+        verification_status: 'pending'
+      });
 
       // Update user reputation based on verification
       const newReputation = this.calculateReputationAfterVerification(userAggregate, verification);
-      userAggregate.users.updateReputationScore(newReputation);
-      await this.userRepository.update(userAggregate.user);
+      userAggregate.user.updateReputationScore(newReputation);
+      await this.userService.update(userAggregate.user);
 
       return { success: true, verification, errors: [] };
     } catch (error) {
@@ -101,32 +191,40 @@ export class UserVerificationDomainService {
   }
 
   /**
-   * Updates an existing verification
+   * Updates an existing verification.
+   * Note: This method currently uses the verificationService to fetch and update.
+   * You may need to add these methods to CitizenVerificationService.
    */
   async updateVerification(
     verificationId: string,
     citizenId: string,
     updates: {
-      evidence?: any[];
+      evidence?: EvidenceData[];
       reasoning?: string;
     }
   ): Promise<VerificationUpdateResult> {
-    const verification = await this.verificationRepository.findById(verificationId);
-    if (!verification) {
+    // Get verification from database
+    const verificationRow = await db
+      .select()
+      .from(user_verification)
+      .where(eq(user_verification.id, verificationId))
+      .limit(1);
+
+    if (!verificationRow.length) {
       return { success: false, errors: ['Verification not found'] };
     }
 
-    if (verification.citizenId !== citizenId) {
+    const verificationData = verificationRow[0].verification_data as any;
+    if (verificationData.citizenId !== citizenId) {
       return { success: false, errors: ['Unauthorized to update this verification'] };
     }
 
-    if (verification.is_verified()) {
+    if (verificationData.verification_status === 'verified') {
       return { success: false, errors: ['Cannot update a verified verification'] };
     }
 
     const errors: string[] = [];
 
-    // Validate updates
     if (updates.evidence && updates.evidence.length === 0) {
       errors.push('At least one piece of evidence is required');
     }
@@ -139,25 +237,62 @@ export class UserVerificationDomainService {
       return { success: false, errors };
     }
 
-    try { // Update verification (this would need to be implemented in the entity)
-      // For now, we'll recreate it
-      const updatedVerification = CitizenVerification.create({
-        id: verification.id,
-        bill_id: verification.bill_id,
-        citizenId: verification.citizenId,
-        verification_type: verification.verification_type,
-        verification_status: verification.verification_status,
-        confidence: verification.confidence,
-        evidence: updates.evidence || verification.evidence,
-        expertise: verification.expertise,
-        reasoning: updates.reasoning || verification.reasoning,
-        endorsements: verification.endorsements,
-        disputes: verification.disputes,
-        created_at: verification.created_at,
-        updated_at: new Date()
-       });
+    try {
+      // Convert evidence data if provided
+      const updatedEvidence = updates.evidence
+        ? updates.evidence.map(e => {
+          const evidenceData: {
+            type: string;
+            source: string;
+            credibility: number;
+            relevance: number;
+            description: string;
+            url?: string;
+            datePublished?: Date;
+          } = {
+            type: e.type,
+            source: e.source,
+            credibility: e.credibility,
+            relevance: e.relevance,
+            description: e.description,
+          };
+          if (e.url !== undefined) {
+            evidenceData.url = e.url;
+          }
+          if (e.datePublished !== undefined) {
+            evidenceData.datePublished = e.datePublished;
+          }
+          return evidenceData;
+        })
+        : verificationData.evidence;
 
-      await this.verificationRepository.update(updatedVerification);
+      const updatedData = {
+        ...verificationData,
+        evidence: updatedEvidence,
+        reasoning: updates.reasoning || verificationData.reasoning,
+        updated_at: new Date()
+      };
+
+      await db
+        .update(user_verification)
+        .set({ verification_data: updatedData, updated_at: new Date() })
+        .where(eq(user_verification.id, verificationId));
+
+      const updatedVerification = CitizenVerification.create({
+        id: verificationRow[0].id,
+        bill_id: verificationData.bill_id,
+        citizenId: verificationData.citizenId,
+        verification_type: verificationRow[0].verification_type,
+        verification_status: verificationData.verification_status,
+        confidence: verificationData.confidence,
+        evidence: updatedData.evidence,
+        expertise: verificationData.expertise,
+        reasoning: updatedData.reasoning,
+        endorsements: verificationData.endorsements || [],
+        disputes: verificationData.disputes || [],
+        created_at: verificationRow[0].created_at,
+        updated_at: new Date()
+      });
 
       return { success: true, verification: updatedVerification, errors: [] };
     } catch (error) {
@@ -169,27 +304,43 @@ export class UserVerificationDomainService {
   }
 
   /**
-   * Adds an endorsement to a verification
+   * Adds an endorsement to a verification.
+   * Implements business rules: users cannot endorse their own verifications
+   * or endorse the same verification multiple times.
    */
   async endorseVerification(verificationId: string, endorserId: string): Promise<{ success: boolean; errors: string[] }> {
-    const verification = await this.verificationRepository.findById(verificationId);
-    if (!verification) {
+    const verificationRow = await db
+      .select()
+      .from(user_verification)
+      .where(eq(user_verification.id, verificationId))
+      .limit(1);
+
+    if (!verificationRow.length) {
       return { success: false, errors: ['Verification not found'] };
     }
 
+    const verificationData = verificationRow[0].verification_data as any;
+    const endorsements = verificationData.endorsements || [];
+
     // Check if user already endorsed
-    const endorsements = await this.verificationRepository.findEndorsements(verificationId);
     if (endorsements.includes(endorserId)) {
       return { success: false, errors: ['Already endorsed this verification'] };
     }
 
-    // Check if user is trying to endorse their own verification
-    if (verification.citizenId === endorserId) {
+    if (verificationData.citizenId === endorserId) {
       return { success: false, errors: ['Cannot endorse your own verification'] };
     }
 
     try {
-      await this.verificationRepository.addEndorsement(verificationId, endorserId);
+      const updatedEndorsements = [...endorsements, endorserId];
+      await db
+        .update(user_verification)
+        .set({
+          verification_data: { ...verificationData, endorsements: updatedEndorsements },
+          updated_at: new Date()
+        })
+        .where(eq(user_verification.id, verificationId));
+
       return { success: true, errors: [] };
     } catch (error) {
       return {
@@ -200,31 +351,47 @@ export class UserVerificationDomainService {
   }
 
   /**
-   * Adds a dispute to a verification
+   * Adds a dispute to a verification with a required reason.
+   * Disputes help maintain verification quality through community oversight.
    */
   async disputeVerification(
     verificationId: string,
     disputerId: string,
     reason: string
   ): Promise<{ success: boolean; errors: string[] }> {
-    const verification = await this.verificationRepository.findById(verificationId);
-    if (!verification) {
+    const verificationRow = await db
+      .select()
+      .from(user_verification)
+      .where(eq(user_verification.id, verificationId))
+      .limit(1);
+
+    if (!verificationRow.length) {
       return { success: false, errors: ['Verification not found'] };
     }
 
-    // Check if user already disputed
-    const disputes = await this.verificationRepository.findDisputes(verificationId);
-    if (disputes.includes(disputerId)) {
+    const verificationData = verificationRow[0].verification_data as any;
+    const disputes = verificationData.disputes || [];
+
+    if (disputes.some((d: any) => d.userId === disputerId)) {
       return { success: false, errors: ['Already disputed this verification'] };
     }
 
-    // Validate reason
     if (!reason || reason.trim().length < 10) {
       return { success: false, errors: ['Dispute reason must be at least 10 characters long'] };
     }
 
     try {
-      await this.verificationRepository.addDispute(verificationId, disputerId, reason);
+      const newDispute = { userId: disputerId, reason: reason.trim(), timestamp: new Date() };
+      const updatedDisputes = [...disputes, newDispute];
+
+      await db
+        .update(user_verification)
+        .set({
+          verification_data: { ...verificationData, disputes: updatedDisputes },
+          updated_at: new Date()
+        })
+        .where(eq(user_verification.id, verificationId));
+
       return { success: true, errors: [] };
     } catch (error) {
       return {
@@ -235,11 +402,17 @@ export class UserVerificationDomainService {
   }
 
   /**
-   * Validates a verification for approval
+   * Validates a verification for approval based on multiple criteria:
+   * evidence quality, expertise level, community consensus, and dispute ratio.
    */
   async validateVerificationForApproval(verificationId: string): Promise<VerificationValidationResult> {
-    const verification = await this.verificationRepository.findById(verificationId);
-    if (!verification) {
+    const verificationRow = await db
+      .select()
+      .from(user_verification)
+      .where(eq(user_verification.id, verificationId))
+      .limit(1);
+
+    if (!verificationRow.length) {
       return {
         isValid: false,
         confidence: 0,
@@ -248,33 +421,54 @@ export class UserVerificationDomainService {
       };
     }
 
+    const verificationData = verificationRow[0].verification_data as any;
+    const verification = CitizenVerification.create({
+      id: verificationRow[0].id,
+      bill_id: verificationData.bill_id,
+      citizenId: verificationData.citizenId,
+      verification_type: verificationRow[0].verification_type,
+      verification_status: verificationData.verification_status,
+      confidence: verificationData.confidence,
+      evidence: verificationData.evidence,
+      expertise: verificationData.expertise,
+      reasoning: verificationData.reasoning,
+      endorsements: verificationData.endorsements || [],
+      disputes: verificationData.disputes || [],
+      created_at: verificationRow[0].created_at,
+      updated_at: verificationRow[0].updated_at
+    });
+
     const errors: string[] = [];
     const warnings: string[] = [];
 
-    // Check evidence quality
-    const evidenceQuality = verification.evidence.reduce((sum, e) => sum + (e.credibility || 0), 0) / verification.evidence.length;
+    // Check evidence quality - type the parameters explicitly
+    const evidenceQuality = verification.evidence.reduce(
+      (sum: number, e: Evidence) => sum + (e.credibility || 0),
+      0
+    ) / verification.evidence.length;
+
     if (evidenceQuality < 0.5) {
       errors.push('Evidence quality is too low for approval');
     }
 
-    // Check expertise level
     if (verification.expertise.level === 'beginner') {
       warnings.push('Expertise level is beginner - consider requiring higher expertise');
     }
 
     // Check community consensus
-    const consensusLevel = await this.verificationRepository.getConsensusLevel(verificationId);
+    const endorsements = verificationData.endorsements || [];
+    const disputes = verificationData.disputes || [];
+    const consensusLevel = endorsements.length > 0 ? (endorsements.length / (endorsements.length + disputes.length)) * 100 : 0;
+
     if (consensusLevel < 60) {
       warnings.push('Community consensus is below 60%');
     }
 
     // Check for disputes
-    const disputes = await this.verificationRepository.findDisputes(verificationId);
-    if (disputes.length > verification.endorsements) {
+    if (disputes.length > endorsements.length) {
       errors.push('More disputes than endorsements');
     }
 
-    // Calculate final confidence
     const finalConfidence = this.calculateFinalConfidence(verification, consensusLevel, evidenceQuality);
 
     return {
@@ -286,21 +480,58 @@ export class UserVerificationDomainService {
   }
 
   /**
-   * Gets verification statistics for a bill
+   * Gets comprehensive verification statistics for a bill,
+   * including top contributors ranked by verification count.
    */
-  async getBillVerificationStats(bill_id: number): Promise<{ totalVerifications: number;
+  async getBillVerificationStats(bill_id: number): Promise<{
+    totalVerifications: number;
     verifiedCount: number;
     disputedCount: number;
     pendingCount: number;
     averageConfidence: number;
-    topContributors: Array<{ user_id: string; verificationCount: number; averageConfidence: number  }>;
-  }> { const stats = await this.verificationRepository.getVerificationStats(bill_id);
+    topContributors: Array<{
+      user_id: string;
+      verificationCount: number;
+      averageConfidence: number;
+    }>;
+  }> {
+    const verificationRows = await db
+      .select()
+      .from(user_verification)
+      .where(sql`(user_verification.verification_data->>'bill_id')::int = ${bill_id}`)
+      .orderBy(desc(user_verification.created_at));
 
-    // Get top contributors (simplified - would need more complex query in real implementation)
-    const verifications = await this.verificationRepository.findByBillId(bill_id);
-    const contributorStats = new Map<string, { count: number; totalConfidence: number  }>();
+    const verifications = verificationRows.map((row: any) => {
+      const data = row.verification_data as any;
+      return CitizenVerification.create({
+        id: row.id,
+        bill_id: data.bill_id,
+        citizenId: data.citizenId,
+        verification_type: row.verification_type,
+        verification_status: data.verification_status,
+        confidence: data.confidence,
+        evidence: data.evidence,
+        expertise: data.expertise,
+        reasoning: data.reasoning,
+        endorsements: data.endorsements || [],
+        disputes: data.disputes || [],
+        created_at: row.created_at,
+        updated_at: row.updated_at
+      });
+    });
 
-    verifications.forEach(v => {
+    // Calculate statistics from the verifications array
+    const verifiedCount = verifications.filter((v: CitizenVerification) => v.is_verified()).length;
+    const disputedCount = verifications.filter((v: CitizenVerification) => v.isDisputed()).length;
+    const pendingCount = verifications.length - verifiedCount - disputedCount;
+    const averageConfidence = verifications.length > 0
+      ? verifications.reduce((sum: number, v: CitizenVerification) => sum + v.confidence, 0) / verifications.length
+      : 0;
+
+    // Build contributor statistics
+    const contributorStats = new Map<string, ContributorStats>();
+
+    verifications.forEach((v: CitizenVerification) => {
       const existing = contributorStats.get(v.citizenId) || { count: 0, totalConfidence: 0 };
       contributorStats.set(v.citizenId, {
         count: existing.count + 1,
@@ -309,25 +540,27 @@ export class UserVerificationDomainService {
     });
 
     const topContributors = Array.from(contributorStats.entries())
-      .map(([user_id, stats]) => ({ user_id,
+      .map(([user_id, stats]) => ({
+        user_id,
         verificationCount: stats.count,
         averageConfidence: stats.totalConfidence / stats.count
-       }))
+      }))
       .sort((a, b) => b.verificationCount - a.verificationCount)
       .slice(0, 10);
 
     return {
-      totalVerifications: stats.total,
-      verifiedCount: stats.verified,
-      disputedCount: stats.disputed,
-      pendingCount: stats.pending,
-      averageConfidence: stats.averageConfidence,
+      totalVerifications: verifications.length,
+      verifiedCount,
+      disputedCount,
+      pendingCount,
+      averageConfidence,
       topContributors
     };
   }
 
   /**
-   * Gets user verification history and performance
+   * Gets a comprehensive profile of a user's verification activity,
+   * including their expertise domains and reputation earned.
    */
   async getUserVerificationProfile(user_id: string): Promise<{
     totalVerifications: number;
@@ -336,22 +569,49 @@ export class UserVerificationDomainService {
     averageConfidence: number;
     expertiseDomains: string[];
     reputationFromVerifications: number;
-  }> { const verifications = await this.verificationRepository.findByCitizenId(user_id);
+  }> {
+    const verificationRows = await db
+      .select()
+      .from(user_verification)
+      .where(eq(user_verification.user_id, user_id))
+      .orderBy(desc(user_verification.created_at));
 
-    const verifiedCount = verifications.filter(v => v.is_verified()).length;
-    const disputedCount = verifications.filter(v => v.isDisputed()).length;
+    const verifications = verificationRows.map((row: any) => {
+      const data = row.verification_data as any;
+      return CitizenVerification.create({
+        id: row.id,
+        bill_id: data.bill_id,
+        citizenId: data.citizenId,
+        verification_type: row.verification_type,
+        verification_status: data.verification_status,
+        confidence: data.confidence,
+        evidence: data.evidence,
+        expertise: data.expertise,
+        reasoning: data.reasoning,
+        endorsements: data.endorsements || [],
+        disputes: data.disputes || [],
+        created_at: row.created_at,
+        updated_at: row.updated_at
+      });
+    });
+
+    const verifiedCount = verifications.filter((v: CitizenVerification) => v.is_verified()).length;
+    const disputedCount = verifications.filter((v: CitizenVerification) => v.isDisputed()).length;
     const averageConfidence = verifications.length > 0
-      ? verifications.reduce((sum, v) => sum + v.confidence, 0) / verifications.length
+      ? verifications.reduce((sum: number, v: CitizenVerification) => sum + v.confidence, 0) / verifications.length
       : 0;
 
-    const expertiseDomains = [...new Set(
-      verifications.map(v => v.expertise.domain).filter(Boolean)
-    )];
+    // Extract unique expertise domains and ensure proper typing
+    const expertiseDomains: string[] = [...new Set(
+      verifications
+        .map((v: CitizenVerification) => v.expertise.domain)
+        .filter((domain: string | undefined): domain is string => Boolean(domain))
+    )] as string[];
 
-    // Calculate reputation gained from verifications
+    // Calculate reputation gained from verified contributions
     const reputationFromVerifications = verifications
-      .filter(v => v.is_verified())
-      .reduce((sum, v) => sum + Math.floor(v.confidence / 10), 0);
+      .filter((v: CitizenVerification) => v.is_verified())
+      .reduce((sum: number, v: CitizenVerification) => sum + Math.floor(v.confidence / 10), 0);
 
     return {
       totalVerifications: verifications.length,
@@ -360,22 +620,29 @@ export class UserVerificationDomainService {
       averageConfidence,
       expertiseDomains,
       reputationFromVerifications
-     };
+    };
   }
 
   /**
-   * Calculates reputation score after verification creation/update
+   * Calculates the new reputation score after a verification is created.
+   * Combines base reputation with verification quality and expertise bonuses.
    */
-  private calculateReputationAfterVerification(userAggregate: UserAggregate, verification: CitizenVerification): number {
-    const baseReputation = userAggregate.users.reputation_score;
+  private calculateReputationAfterVerification(
+    userAggregate: UserAggregate,
+    verification: CitizenVerification
+  ): number {
+    // Fixed: Changed 'users' to 'user' to match the UserAggregate structure
+    const baseReputation = userAggregate.user.reputation_score;
     const verificationBonus = verification.is_verified() ? Math.floor(verification.confidence / 10) : 0;
     const expertiseBonus = verification.expertise.reputation_score * 0.1;
 
+    // Ensure reputation stays within valid bounds (0-100)
     return Math.min(100, Math.max(0, baseReputation + verificationBonus + expertiseBonus));
   }
 
   /**
-   * Calculates final confidence for verification validation
+   * Calculates a weighted final confidence score considering multiple factors:
+   * verification confidence (40%), evidence quality (30%), expertise (20%), and consensus (10%).
    */
   private calculateFinalConfidence(
     verification: CitizenVerification,
@@ -393,40 +660,3 @@ export class UserVerificationDomainService {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

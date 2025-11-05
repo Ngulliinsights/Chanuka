@@ -1,4 +1,4 @@
-import { sponsorRepository } from '../../sponsors/infrastructure/repositories/sponsor.repository.js';
+import { sponsorService } from '../../sponsors/application/sponsor-service-direct.js';
 import { sponsorConflictAnalysisService } from '../../sponsors/application/sponsor-conflict-analysis.service.js';
 import { readDatabase } from '@shared/database/connection';
 // Backwards-compatible proxy so existing code using `db.select()` etc. keeps working
@@ -127,7 +127,7 @@ export class SponsorshipAnalysisService { // Industry categorization for financi
        }
 
       // Get bill information
-      const bill = await sponsorRepository.getBill(bill_id);
+      const bill = await sponsorService.getBillsByIds([bill_id]).then(bills => bills[0]);
       if (!bill) { throw new NotFoundError(`Bill with ID ${bill_id } not found`);
       }
 

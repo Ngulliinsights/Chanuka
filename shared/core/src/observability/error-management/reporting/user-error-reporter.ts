@@ -81,7 +81,7 @@ export class UserErrorReporter {
     logger.info('Generated user error report', { component: 'UserErrorReporter',
       errorId,
       user_id: context.user_id,
-      sessionId: context.sessionId || context.metadata?.sessionId
+      sessionId: context.sessionId
      });
 
     return report;

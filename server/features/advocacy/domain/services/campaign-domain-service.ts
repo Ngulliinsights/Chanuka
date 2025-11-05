@@ -3,8 +3,7 @@
 // ============================================================================
 
 import { CampaignEntity, Campaign, NewCampaign } from '../entities/campaign.js';
-import { ICampaignRepository } from '../repositories/campaign-repository.js';
-import { IActionRepository } from '../repositories/action-repository.js';
+// Repository interfaces removed - using direct service calls
 import { CampaignMetrics, CoalitionOpportunity } from '../../types/index.js';
 import { logger } from '../../../../shared/core/index.js';
 

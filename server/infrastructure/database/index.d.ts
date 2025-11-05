@@ -12,23 +12,7 @@ export interface CacheProvider {
     set<T>(key: string, value: T, ttl: number): Promise<void>;
     invalidate(pattern: string): Promise<void>;
 }
-interface Repository<T> {
-    getById(id: number): Promise<T | null>;
-    update?(entity: T): Promise<void>;
-    create?(entity: Partial<T>): Promise<T>;
-    delete?(id: number): Promise<void>;
-}
-export declare class BillRepository implements Repository<Bill> {
-    private readonly db;
-    constructor(pool: Pool);
-    getById(id: number): Promise<Bill | null>;
-    update(bill: Bill): Promise<void>;
-}
-export declare class StakeholderRepository implements Repository<Stakeholder> {
-    private readonly db;
-    constructor(pool: Pool);
-    getById(id: number): Promise<Stakeholder | null>;
-}
+// Repository interfaces and classes removed - using direct Drizzle ORM
 export interface Storage {
     redis: Redis;
     pool: Pool;

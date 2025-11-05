@@ -3,7 +3,7 @@
 // ============================================================================
 // Tests for core legislative entities: users, sponsors, bills, committees
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { testDb, testPool, testUtils, generateTestData } from './setup';
 import {
   users,
@@ -14,7 +14,7 @@ import {
   parliamentary_sessions,
   parliamentary_sittings,
   bills
-} from './foundation';
+} from '../foundation';
 import { eq, and, or, inArray } from 'drizzle-orm';
 
 describe('Foundation Schema Tests', () => {
@@ -33,7 +33,7 @@ describe('Foundation Schema Tests', () => {
   describe('Users Table', () => {
     it('should create a user with required fields', async () => {
       const testUser = generateTestData.user();
-      
+
       const [insertedUser] = await testDb
         .insert(users)
         .values(testUser)
@@ -51,13 +51,13 @@ describe('Foundation Schema Tests', () => {
 
     it('should enforce unique email constraint', async () => {
       const testUser = generateTestData.user();
-      
+
       // Insert first user
       await testDb.insert(users).values(testUser);
 
       // Try to insert same email again
       const duplicateUser = generateTestData.user({ email: testUser.email });
-      
+
       await expect(
         testDb.insert(users).values(duplicateUser)
       ).rejects.toThrow();
@@ -65,7 +65,7 @@ describe('Foundation Schema Tests', () => {
 
     it('should handle user role defaults correctly', async () => {
       const testUser = generateTestData.user({ role: undefined });
-      
+
       const [insertedUser] = await testDb
         .insert(users)
         .values(testUser)
@@ -159,7 +159,7 @@ describe('Foundation Schema Tests', () => {
   describe('Sponsors Table', () => {
     it('should create a sponsor with all fields', async () => {
       const testSponsor = generateTestData.sponsor();
-      
+
       const [insertedSponsor] = await testDb
         .insert(sponsors)
         .values(testSponsor)
@@ -349,8 +349,8 @@ describe('Foundation Schema Tests', () => {
 
       await testDb.insert(bills).values(testBill);
 
-      const duplicateBill = generateTestData.bill({ 
-        bill_number: testBill.bill_number 
+      const duplicateBill = generateTestData.bill({
+        bill_number: testBill.bill_number
       });
 
       await expect(
@@ -495,8 +495,8 @@ describe('Foundation Schema Tests', () => {
   describe('Indexes and Performance', () => {
     it('should use indexes for common queries', async () => {
       // Insert test data
-      const usersData = Array.from({ length: 100 }, (_, i) => 
-        generateTestData.user({ 
+      const usersData = Array.from({ length: 100 }, (_, i) =>
+        generateTestData.user({
           email: `user${i}@example.com`,
           county: i % 2 === 0 ? 'nairobi' : 'kiambu'
         })
@@ -517,7 +517,7 @@ describe('Foundation Schema Tests', () => {
     });
 
     it('should handle bulk operations efficiently', async () => {
-      const billsData = Array.from({ length: 1000 }, (_, i) => 
+      const billsData = Array.from({ length: 1000 }, (_, i) =>
         generateTestData.bill({
           bill_number: `Bill ${i} of 2024`,
           title: `Test Bill ${i}`

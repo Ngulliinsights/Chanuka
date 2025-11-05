@@ -3,7 +3,7 @@
 // ============================================================================
 // End-to-end validation of all system integrations and cross-service operations
 
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { serviceOrchestrator } from '../../infrastructure/integration/service-orchestrator.js';
 import { performanceMonitor } from '../../infrastructure/monitoring/performance-monitor.js';
 import { errorHandler } from '../../infrastructure/errors/error-standardization.js';

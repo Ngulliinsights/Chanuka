@@ -14,6 +14,7 @@ export interface CacheService {
   mget?<T>(keys: string[]): Promise<(T | null)[]>;
   mset?<T>(entries: [string, T, number?][]): Promise<void>;
   getMetrics?(): CacheMetrics;
+  getHealth?(): Promise<CacheHealthStatus>;
   exists?(key: string): Promise<boolean>;
   ttl?(key: string): Promise<number>;
   clear?(): Promise<void>;

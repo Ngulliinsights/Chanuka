@@ -15,12 +15,16 @@ import { LoadingStateManager } from "./components/loading/LoadingStates";
 import BrowserCompatibilityChecker from "./components/compatibility/BrowserCompatibilityChecker";
 import PerformanceMetricsCollector from "./components/performance/PerformanceMetricsCollector";
 import { Suspense, useEffect } from "react";
+import { lazy } from "react";
 import { useLoadingOperation } from "./core/loading/hooks";
 import { logger } from './utils/browser-logger';
 import {
   SafeLazyPages,
   SafeLazySponsorshipPages,
 } from "./utils/safe-lazy-loading";
+
+// Import test page for design system verification
+const DesignSystemTestPage = lazy(() => import('./pages/design-system-test'));
 import { SimpleErrorBoundary } from "./components/error-handling/SimpleErrorBoundary";
 
 // =============================================================================
@@ -142,6 +146,7 @@ const ROUTES = [
   { path: "/search", element: <SafeLazyPages.SearchPage />, id: "search" },
   { path: "/admin", element: <SafeLazyPages.AdminPage />, id: "admin" },
   { path: "/admin/database", element: <SafeLazyPages.DatabaseManager />, id: "database-manager" },
+  { path: "/design-system-test", element: <DesignSystemTestPage />, id: "design-system-test" },
   { path: "*", element: <SafeLazyPages.NotFound />, id: "not-found" },
 ] as const;
 

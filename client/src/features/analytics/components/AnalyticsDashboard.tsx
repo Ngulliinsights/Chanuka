@@ -196,22 +196,22 @@ export function AnalyticsDashboard() {
             <CardContent>
               <div className="space-y-4">
                 {topBills.slice(0, 10).map((bill, index) => (
-                  <div key={bills.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div key={bill.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
                       <div className="text-2xl font-bold text-muted-foreground">
                         #{index + 1}
                       </div>
                       <div>
-                        <h3 className="font-medium">{bills.title}</h3>
-                        <p className="text-sm text-muted-foreground">{bills.status}</p>
+                        <h3 className="font-medium">{bill.title}</h3>
+                        <p className="text-sm text-muted-foreground">{bill.status}</p>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-sm font-medium">
-                        {bills.engagement.views} views
+                        {bill.engagement.views} views
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {bills.engagement.comments} comments
+                        {bill.engagement.comments} comments
                       </div>
                     </div>
                   </div>

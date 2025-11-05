@@ -77,12 +77,23 @@ class AnalysisService {
     if (response.success) {
       // Real or cached data was returned
       return this.validateAnalysisData(response.data);
-    } else { // Fallback data was used
+    } else {
+      // Fallback data was used. ApiResponse is a union where `error` only
+      // exists on certain variants, so narrow before accessing it.
+      let errMessage: string | undefined;
+      let errStatus: number | undefined;
+
+      if (!response.success && 'error' in response && response.error) {
+        errMessage = response.error.message;
+        errStatus = response.error.status;
+      }
+
       logger.warn(`Using fallback analysis for bill ${bill_id }`, {
         component: 'AnalysisService',
-        error: response.error.message,
-        status: response.error.status
+        error: errMessage,
+        status: errStatus
       });
+
       return response.data; // This is the mock data
     }
   }

@@ -5,7 +5,6 @@
  */
 
 import { ZodError, ZodSchema } from 'zod';
-import { logger } from '../observability/logging';
 
 /**
  * Detailed validation error information for a specific field
@@ -28,9 +27,9 @@ export class ValidationError extends Error {
   public readonly isOperational = true;
 
   // Unified interface properties for compatibility
-  public readonly field?: string;
-  public readonly code?: string;
-  public readonly errorId?: string;
+  public readonly field: string | undefined;
+  public readonly code: string | undefined;
+  public readonly errorId: string | undefined;
 
   constructor(zodErrorOrMessage: ZodError | string, customErrors?: ValidationErrorDetail[]) {
     let errors: ValidationErrorDetail[];
@@ -54,7 +53,11 @@ export class ValidationError extends Error {
     this.errors = errors;
 
     // Set unified interface properties for compatibility
-    this.field = errors.length === 1 ? errors[0].field : undefined;
+    if (errors.length === 1) {
+      this.field = errors[0]?.field;
+    } else {
+      this.field = undefined;
+    }
     this.code = 'VALIDATION_ERROR';
     this.errorId = undefined; // Can be set via customErrors if needed
 
@@ -226,11 +229,13 @@ export interface ValidationContext { /** User ID for user-specific validation */
   user_id?: string;
   /** Request ID for tracing */
   requestId?: string;
+  /** Schema name for tracking and analytics */
+  schemaName?: string;
   /** Additional context data */
   metadata?: Record<string, any>;
   /** Validation timestamp */
   timestamp?: Date;
- }
+}
 
 
 

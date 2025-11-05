@@ -1,12 +1,11 @@
 import { database as db } from '@shared/database/connection';
-import { users, user_profiles, user_interests, bill_engagement, notifications, comments, bills } from '@shared/schema';
+import { users, user_profiles, bill_engagement, notifications, comments, bills, user_verification } from '@shared/schema';
 import { eq, and, desc, sql, count } from 'drizzle-orm';
 import { cacheService } from '@server/infrastructure/cache';
-import { cacheKeys  } from '../../../../shared/core/src/index.js';
+import { cacheKeys  } from '../../../../shared/core/index.js';
 import { databaseService } from '../../../infrastructure/database/database-service';
 import { z } from 'zod';
-import { logger  } from '../../../../shared/core/src/index.js';
-import { CACHE_KEYS  } from '../../../../shared/core/src/index.js';
+import { logger  } from '../../../../shared/core/index.js';
 
 // Data validation schemas
 const user_profilesDataSchema = z.object({
@@ -42,11 +41,11 @@ const userVerificationDataSchema = z.object({
 });
 
 export interface UserProfileData {
-  bio?: string;
-  expertise?: string[];
-  location?: string;
-  organization?: string;
-  is_public?: boolean;
+  bio?: string | undefined;
+  expertise?: string[] | undefined;
+  location?: string | undefined;
+  organization?: string | undefined;
+  is_public?: boolean | undefined;
 }
 
 export interface UserInterestData {
@@ -54,19 +53,19 @@ export interface UserInterestData {
 }
 
 export interface UserPreferences {
-  emailNotifications?: boolean;
-  pushNotifications?: boolean;
-  smsNotifications?: boolean;
-  notificationFrequency?: 'immediate' | 'daily' | 'weekly';
-  billCategories?: string[];
-  language?: string;
-  theme?: 'light' | 'dark' | 'auto';
+  emailNotifications?: boolean | undefined;
+  pushNotifications?: boolean | undefined;
+  smsNotifications?: boolean | undefined;
+  notificationFrequency?: 'immediate' | 'daily' | 'weekly' | undefined;
+  billCategories?: string[] | undefined;
+  language?: string | undefined;
+  theme?: 'light' | 'dark' | 'auto' | undefined;
 }
 
 export interface UserVerificationData {
   verification_status: 'pending' | 'verified' | 'rejected';
-  verificationDocuments?: any;
-  verificationNotes?: string;
+  verificationDocuments?: any | undefined;
+  verificationNotes?: string | undefined;
 }
 
 export interface UserEngagementHistory { totalBillsTracked: number;
@@ -87,7 +86,7 @@ export interface UserEngagementHistory { totalBillsTracked: number;
 export class UserProfileService {
   // Data validation and sanitization methods
   private validateAndSanitizeProfileData(data: UserProfileData): UserProfileData {
-    const validated = user_profilesDataSchema.parse(data);
+  const validated = user_profilesDataSchema.parse(data);
     
     // Additional sanitization
     if (validated.bio) {
@@ -103,7 +102,7 @@ export class UserProfileService {
       validated.expertise = validated.expertise.map(exp => exp.trim()).filter(exp => exp.length > 0);
     }
     
-    return validated;
+  return validated;
   }
 
   private validateAndSanitizeBasicInfo(data: { first_name?: string; last_name?: string; name?: string }) {
@@ -179,39 +178,34 @@ export class UserProfileService {
             .select({
               id: users.id,
               email: users.email,
-              first_name: users.first_name,
-              last_name: users.last_name,
-              name: users.name,
               role: users.role,
-              verification_status: users.verification_status,
               created_at: users.created_at,
               profile: {
+                first_name: user_profiles.first_name,
+                last_name: user_profiles.last_name,
+                display_name: user_profiles.display_name,
                 bio: user_profiles.bio,
-                expertise: user_profiles.expertise,
-                location: user_profiles.location,
-                organization: user_profiles.organization,
-                reputation_score: user_profiles.reputation_score,
-                is_public: user_profiles.is_public
+                website: user_profiles.website,
+                avatar_url: user_profiles.avatar_url,
+                preferences: user_profiles.preferences
                }
             })
             .from(users)
             .leftJoin(user_profiles, eq(users.id, user_profiles.user_id))
-            .where(eq(users.id, user_id))
+            .where(eq(users.id, sanitizedUserId))
             .limit(1);
 
           if (!user) {
             throw new Error('User not found');
           }
 
-          // Get user interests
-          const interests = await db
-            .select({ interest: user_interests.interest })
-            .from(user_interests)
-            .where(eq(user_interests.user_id, user_id));
+          // Derive interests from stored preferences (if present)
+          const prefs = user.profile?.preferences || {};
+          const interests = Array.isArray(prefs?.interests) ? prefs.interests : [];
 
           return {
             ...user,
-            interests: interests.map(i => i.interest)
+            interests
           };
         },
         // Fallback data for when database is unavailable
@@ -252,50 +246,67 @@ export class UserProfileService {
   async updateUserProfile(user_id: string, profileData: UserProfileData) { const sanitizedUserId = this.sanitizeUserId(user_id);
     const sanitizedProfileData = this.validateAndSanitizeProfileData(profileData);
     
+    // Prepare fallback data (may use cached profile if available)
+    const fallbackProfileData = await (async () => {
+      const cached = await cacheService.get(cacheKeys.USER_PROFILE(sanitizedUserId));
+      if (cached) {
+        return {
+          ...cached,
+          profile: { ...cached.profile, ...profileData }
+        };
+      }
+      throw new Error('Cannot update profile: database unavailable and no cached data');
+    })();
+
     const result = await databaseService.withFallback(
       async () => {
         // Check if profile exists
         const existingProfile = await db
           .select()
           .from(user_profiles)
-          .where(eq(user_profiles.user_id, user_id))
+          .where(eq(user_profiles.user_id, sanitizedUserId))
           .limit(1);
+
+        // Build a payload with only defined fields to satisfy exactOptionalPropertyTypes
+        const profilePayload: Record<string, any> = {};
+        if (sanitizedProfileData.bio !== undefined) profilePayload.bio = sanitizedProfileData.bio;
+        if (sanitizedProfileData.location !== undefined) profilePayload.location = sanitizedProfileData.location;
+        if (sanitizedProfileData.organization !== undefined) profilePayload.website = sanitizedProfileData.organization; // store organization in website field when present
+        if (sanitizedProfileData.expertise !== undefined) {
+          // Store expertise inside preferences to avoid schema mismatch
+          profilePayload.preferences = { ...(existingProfile[0]?.preferences || {}), expertise: sanitizedProfileData.expertise };
+        }
 
         if (existingProfile.length === 0) {
           // Create new profile
           await db
             .insert(user_profiles)
             .values({
-              user_id,
-              ...profileData,
+              user_id: sanitizedUserId,
+              ...profilePayload,
               created_at: new Date()
-             });
+            });
         } else { // Update existing profile
+          // Always update updated_at
+          profilePayload.updated_at = new Date();
           await db
             .update(user_profiles)
-            .set(profileData)
-            .where(eq(user_profiles.user_id, user_id));
+            .set(profilePayload)
+            .where(eq(user_profiles.user_id, sanitizedUserId));
          }
 
         // Invalidate cache after update
-        cacheService.delete(cacheKeys.USER_PROFILE(user_id));
-        
-        return await this.getUserProfile(user_id);
+        await cacheService.delete(cacheKeys.USER_PROFILE(sanitizedUserId));
+
+        return await this.getUserProfile(sanitizedUserId);
       },
-      // Fallback: return updated profile data merged with existing cached data
-      (() => { const cachedProfile = cacheService.get(cacheKeys.USER_PROFILE(user_id));
-        if (cachedProfile) {
-          return {
-            ...cachedProfile,
-            profile: { ...cachedProfile.profile, ...profileData  }
-          };
-        }
-        throw new Error('Cannot update profile: database unavailable and no cached data');
-      })(),
-      `updateUserProfile:${ user_id }`
+      // Fallback: already computed above
+      fallbackProfileData,
+      `updateUserProfile:${ sanitizedUserId }`
     );
 
-    if (result.source === 'fallback') { console.warn(`Using fallback data for user profile update: ${user_id }`);
+    if (result.source === 'fallback') {
+      console.warn(`Using fallback data for user profile update: ${sanitizedUserId}`);
     }
 
     return result.data;
@@ -306,35 +317,32 @@ export class UserProfileService {
     
     const result = await databaseService.withFallback(
       async () => {
-        // Remove existing interests
-        await db
-          .delete(user_interests)
-          .where(eq(user_interests.user_id, user_id));
+          // Persist interests into user_profiles.preferences.interests (JSONB)
+          const [row] = await db
+            .select({ preferences: user_profiles.preferences })
+            .from(user_profiles)
+            .where(eq(user_profiles.user_id, sanitizedUserId))
+            .limit(1);
 
-        // Add new interests
-        if (interests.length > 0) {
+          const existingPrefs = row?.preferences || {};
+          const newPrefs = { ...existingPrefs, interests: sanitizedInterests };
+
           await db
-            .insert(user_interests)
-            .values(
-              interests.map(interest => ({
-                user_id,
-                interest,
-                created_at: new Date()
-               }))
-            );
-        }
+            .update(user_profiles)
+            .set({ preferences: newPrefs, updated_at: new Date() })
+            .where(eq(user_profiles.user_id, sanitizedUserId));
 
-        // Invalidate cache after update
-        cacheService.delete(cacheKeys.USER_PROFILE(user_id));
+          // Invalidate cache after update
+          cacheService.delete(cacheKeys.USER_PROFILE(sanitizedUserId));
 
-        return { success: true };
+          return { success: true };
       },
       // Fallback: simulate success but warn about database unavailability
       { success: false },
-      `updateUserInterests:${ user_id }`
+      `updateUserInterests:${ sanitizedUserId }`
     );
 
-    if (result.source === 'fallback') { console.warn(`Cannot update user interests: database unavailable for user ${user_id }`);
+  if (result.source === 'fallback') { console.warn(`Cannot update user interests: database unavailable for user ${sanitizedUserId }`);
     }
 
     return result.data;
@@ -345,33 +353,37 @@ export class UserProfileService {
     
     const result = await databaseService.withFallback(
       async () => {
+        // Persist basic profile fields into user_profiles (name/display)
+        const profileUpdates: Record<string, any> = {};
+        if (sanitizedData.first_name !== undefined) profileUpdates.first_name = sanitizedData.first_name;
+        if (sanitizedData.last_name !== undefined) profileUpdates.last_name = sanitizedData.last_name;
+        if (sanitizedData.name !== undefined) profileUpdates.display_name = sanitizedData.name;
+
+        profileUpdates.updated_at = new Date();
+
         await db
-          .update(users)
-          .set({
-            ...data,
-            updated_at: new Date()
-           })
-          .where(eq(users.id, user_id));
+          .update(user_profiles)
+          .set(profileUpdates)
+          .where(eq(user_profiles.user_id, sanitizedUserId));
 
         // Invalidate cache after update
-        cacheService.delete(cacheKeys.USER_PROFILE(user_id));
+        cacheService.delete(cacheKeys.USER_PROFILE(sanitizedUserId));
 
-        return await this.getUserProfile(user_id);
+        return await this.getUserProfile(sanitizedUserId);
       },
-      // Fallback: return updated basic info merged with cached data
-      (() => { const cachedProfile = cacheService.get(cacheKeys.USER_PROFILE(user_id));
+      // Fallback: try to use cached profile merged with provided data
+      await (async () => {
+        const cachedProfile = await cacheService.get(cacheKeys.USER_PROFILE(sanitizedUserId));
         if (cachedProfile) {
-          return {
-            ...cachedProfile,
-            ...data
-           };
+          return { ...cachedProfile, ...data };
         }
         throw new Error('Cannot update basic info: database unavailable and no cached data');
       })(),
-      `updateUserBasicInfo:${ user_id }`
+      `updateUserBasicInfo:${ sanitizedUserId }`
     );
 
-    if (result.source === 'fallback') { console.warn(`Using fallback data for user basic info update: ${user_id }`);
+    if (result.source === 'fallback') {
+      console.warn(`Using fallback data for user basic info update: ${sanitizedUserId}`);
     }
 
     return result.data;
@@ -407,24 +419,26 @@ export class UserProfileService {
       const results = await db
         .select({
           id: users.id,
-          name: users.name,
+          display_name: user_profiles.display_name,
           role: users.role,
-          verification_status: users.verification_status,
-          organization: user_profiles.organization,
-          expertise: user_profiles.expertise,
-          reputation_score: user_profiles.reputation_score
+          website: user_profiles.website,
+          preferences: user_profiles.preferences
         })
         .from(users)
         .leftJoin(user_profiles, eq(users.id, user_profiles.user_id))
         .where(
-          and(
-            eq(user_profiles.is_public, true),
-            sql`LOWER(${users.name}) LIKE ${searchTerm} OR LOWER(${user_profiles.organization}) LIKE ${searchTerm}`
-          )
+          sql`LOWER(COALESCE(${user_profiles.display_name}, '')) LIKE ${searchTerm} OR LOWER(COALESCE(${user_profiles.website}, '')) LIKE ${searchTerm}`
         )
         .limit(limit);
 
-      return results;
+      return results.map((r: any) => ({
+        id: r.id,
+        name: r.display_name || null,
+        role: r.role,
+        organization: r.website || null,
+        expertise: Array.isArray(r.preferences?.expertise) ? r.preferences.expertise : [],
+        reputation_score: typeof r.preferences?.reputation_score === 'number' ? r.preferences.reputation_score : 0
+      }));
     } catch (error) {
       logger.error('Error searching users:', { component: 'Chanuka', error });
       return [];
@@ -432,22 +446,20 @@ export class UserProfileService {
   }
 
   // User Preference Management
-  async getUserPreferences(user_id: string): Promise<UserPreferences> { const cacheKey = `${cacheKeys.USER_PROFILE(user_id) }:preferences`;
+  async getUserPreferences(user_id: string): Promise<UserPreferences> {
+    const sanitizedUserId = this.sanitizeUserId(user_id);
+    const cacheKey = `${cacheKeys.USER_PROFILE(sanitizedUserId)}:preferences`;
 
     const cached = await cacheService.get(cacheKey);
     if (cached !== null && cached !== undefined) return cached;
     const computed = await (async () => {
       const result = await databaseService.withFallback(
         async () => {
-          const [user] = await db
-            .select({ preferences: users.preferences })
-            .from(users)
-            .where(eq(users.id, user_id))
+          const [row] = await db
+            .select({ preferences: user_profiles.preferences })
+            .from(user_profiles)
+            .where(eq(user_profiles.user_id, sanitizedUserId))
             .limit(1);
-
-          if (!user) {
-            throw new Error('User not found');
-          }
 
           // Return default preferences if none exist
           const defaultPreferences: UserPreferences = {
@@ -460,7 +472,7 @@ export class UserProfileService {
             theme: 'auto'
           };
 
-          return { ...defaultPreferences, ...(users.preferences as UserPreferences || {}) };
+          return { ...defaultPreferences, ...(row?.preferences as UserPreferences || {}) };
         },
         // Fallback: return default preferences
         {
@@ -472,10 +484,10 @@ export class UserProfileService {
           language: 'en',
           theme: 'auto'
         },
-        `getUserPreferences:${ user_id }`
+        `getUserPreferences:${ sanitizedUserId }`
       );
 
-      if (result.source === 'fallback') { console.warn(`Using fallback preferences for user: ${user_id }`);
+      if (result.source === 'fallback') { console.warn(`Using fallback preferences for user: ${sanitizedUserId}`);
       }
 
       return result.data;
@@ -491,28 +503,27 @@ export class UserProfileService {
   async updateUserPreferences(user_id: string, preferences: Partial<UserPreferences>) { const sanitizedUserId = this.sanitizeUserId(user_id);
     const sanitizedPreferences = this.validateAndSanitizePreferences(preferences);
     
-    const result = await databaseService.withFallback(
+      const result = await databaseService.withFallback(
       async () => {
-        // Get current preferences
-        const currentPreferences = await this.getUserPreferences(user_id);
-        const updatedPreferences = { ...currentPreferences, ...preferences  };
+  // Get current preferences
+  const currentPreferences = await this.getUserPreferences(sanitizedUserId);
+  // Use sanitized preferences when merging to ensure cleaned/validated values are persisted
+  const updatedPreferences = { ...currentPreferences, ...(sanitizedPreferences as Partial<UserPreferences>) };
 
         await db
-          .update(users)
-          .set({
-            preferences: updatedPreferences,
-            updated_at: new Date()
-          })
-          .where(eq(users.id, user_id));
+          .update(user_profiles)
+          .set({ preferences: updatedPreferences, updated_at: new Date() })
+          .where(eq(user_profiles.user_id, sanitizedUserId));
 
         // Invalidate cache after update
-        cacheService.delete(`${ cacheKeys.USER_PROFILE(user_id) }:preferences`);
-        cacheService.delete(cacheKeys.USER_PROFILE(user_id));
+        cacheService.delete(`${ cacheKeys.USER_PROFILE(sanitizedUserId) }:preferences`);
+        cacheService.delete(cacheKeys.USER_PROFILE(sanitizedUserId));
 
         return updatedPreferences;
       },
       // Fallback: return merged preferences but warn about database unavailability
-      (() => { const currentPreferences = cacheService.get(`${cacheKeys.USER_PROFILE(user_id) }:preferences`) || {
+      await (async () => {
+        const currentPreferences = (await cacheService.get(`${cacheKeys.USER_PROFILE(sanitizedUserId)}:preferences`)) || {
           emailNotifications: true,
           pushNotifications: true,
           smsNotifications: false,
@@ -523,10 +534,10 @@ export class UserProfileService {
         };
         return { ...currentPreferences, ...preferences };
       })(),
-      `updateUserPreferences:${ user_id }`
+  `updateUserPreferences:${ sanitizedUserId }`
     );
 
-    if (result.source === 'fallback') { console.warn(`Cannot update user preferences: database unavailable for user ${user_id }`);
+  if (result.source === 'fallback') { console.warn(`Cannot update user preferences: database unavailable for user ${sanitizedUserId }`);
     }
 
     return result.data;
@@ -535,104 +546,87 @@ export class UserProfileService {
   // User Verification Status Handling
   async updateUserVerificationStatus(user_id: string, verification_data: UserVerificationData) { const sanitizedUserId = this.sanitizeUserId(user_id);
     const sanitizedVerificationData = this.validateAndSanitizeVerificationData(verification_data);
-    
+
     const result = await databaseService.withFallback(
       async () => {
         await databaseService.withTransaction(async (tx) => {
-          // Update user verification status
+          // Store verification record in user_verification table (JSONB for domain data)
           await tx
-            .update(users)
-            .set({
-              verification_status: verification_data.verification_status,
+            .insert(user_verification)
+            .values({
+              user_id: sanitizedUserId,
+              verification_type: 'identity',
+              verification_data: sanitizedVerificationData as any,
+              verification_documents: Array.isArray((sanitizedVerificationData as any).verificationDocuments) ? (sanitizedVerificationData as any).verificationDocuments : undefined,
+              verification_status: sanitizedVerificationData.verification_status,
+              submitted_at: new Date(),
+              created_at: new Date(),
               updated_at: new Date()
-             })
-            .where(eq(users.id, user_id));
-
-          // Update profile with verification documents if provided
-          if (verification_data.verificationDocuments) { const existingProfile = await tx
-              .select()
-              .from(user_profiles)
-              .where(eq(user_profiles.user_id, user_id))
-              .limit(1);
-
-            if (existingProfile.length === 0) {
-              await tx
-                .insert(user_profiles)
-                .values({
-                  user_id,
-                  verificationDocuments: verification_data.verificationDocuments,
-                  created_at: new Date()
-                 });
-            } else {
-              await tx
-                .update(user_profiles)
-                .set({
-                  verificationDocuments: verification_data.verificationDocuments
-                })
-                .where(eq(user_profiles.user_id, user_id));
-            }
-          }
+            });
 
           // Create notification for status change
           await tx
             .insert(notifications)
-            .values({ user_id,
+            .values({
+              user_id: sanitizedUserId,
               type: 'verification_status',
               title: 'Verification Status Updated',
-              message: `Your verification status has been updated to: ${verification_data.verification_status }`,
+              message: `Your verification status has been updated to: ${sanitizedVerificationData.verification_status}`,
               created_at: new Date()
             });
         }, 'updateUserVerificationStatus');
 
         // Invalidate cache after update
-        cacheService.delete(cacheKeys.USER_PROFILE(user_id));
+        cacheService.delete(cacheKeys.USER_PROFILE(sanitizedUserId));
 
-        return await this.getUserProfile(user_id);
+        return await this.getUserProfile(sanitizedUserId);
       },
       // Fallback: return updated verification status merged with cached data
-      (() => { const cachedProfile = cacheService.get(cacheKeys.USER_PROFILE(user_id));
+      await (async () => {
+        const cachedProfile = await cacheService.get(cacheKeys.USER_PROFILE(sanitizedUserId));
         if (cachedProfile) {
-          return {
-            ...cachedProfile,
-            verification_status: verification_data.verification_status
-           };
+          return { ...cachedProfile, verification_status: sanitizedVerificationData.verification_status };
         }
         throw new Error('Cannot update verification status: database unavailable and no cached data');
       })(),
-      `updateUserVerificationStatus:${ user_id }`
+      `updateUserVerificationStatus:${ sanitizedUserId }`
     );
 
-    if (result.source === 'fallback') { console.warn(`Cannot update user verification status: database unavailable for user ${user_id }`);
+    if (result.source === 'fallback') { console.warn(`Cannot update user verification status: database unavailable for user ${sanitizedUserId }`);
     }
 
     return result.data;
   }
 
-  async getUserVerificationStatus(user_id: string) { const cacheKey = `${cacheKeys.USER_PROFILE(user_id) }:verification`;
+  async getUserVerificationStatus(user_id: string) { const sanitizedUserId = this.sanitizeUserId(user_id);
+
+    const cacheKey = `${cacheKeys.USER_PROFILE(sanitizedUserId) }:verification`;
 
     const cached = await cacheService.get(cacheKey);
     if (cached !== null && cached !== undefined) return cached;
     const computed = await (async () => {
       const result = await databaseService.withFallback(
         async () => {
-          const [user] = await db
+          const [row] = await db
             .select({
-              verification_status: users.verification_status,
-              verificationDocuments: user_profiles.verificationDocuments
+              verification_data: user_verification.verification_data,
+              verification_status: user_verification.verification_status,
+              verification_documents: user_verification.verification_documents
             })
-            .from(users)
-            .leftJoin(user_profiles, eq(users.id, user_profiles.user_id))
-            .where(eq(users.id, user_id))
+            .from(user_verification)
+            .where(eq(user_verification.user_id, sanitizedUserId))
+            .orderBy(desc(user_verification.submitted_at))
             .limit(1);
 
-          if (!user) {
-            throw new Error('User not found');
+          if (!row) {
+            throw new Error('User verification record not found');
           }
 
+          const status = row.verification_status as string;
           return {
-            verification_status: users.verification_status,
-            verificationDocuments: users.verificationDocuments,
-            canSubmitDocuments: users.verification_status === 'pending' || users.verification_status === 'rejected'
+            verification_status: status,
+            verificationDocuments: row.verification_documents || null,
+            canSubmitDocuments: status === 'pending' || status === 'rejected'
           };
         },
         // Fallback: return default verification status
@@ -641,10 +635,10 @@ export class UserProfileService {
           verificationDocuments: null,
           canSubmitDocuments: true
         },
-        `getUserVerificationStatus:${ user_id }`
+        `getUserVerificationStatus:${ sanitizedUserId }`
       );
 
-      if (result.source === 'fallback') { console.warn(`Using fallback verification status for user: ${user_id }`);
+      if (result.source === 'fallback') { console.warn(`Using fallback verification status for user: ${sanitizedUserId }`);
       }
 
       return result.data;
@@ -658,7 +652,9 @@ export class UserProfileService {
   }
 
   // User Engagement History Tracking
-  async getUserEngagementHistory(user_id: string): Promise<UserEngagementHistory> { const cacheKey = `${cacheKeys.USER_PROFILE(user_id) }:engagement`;
+  async getUserEngagementHistory(user_id: string): Promise<UserEngagementHistory> {
+    const sanitizedUserId = this.sanitizeUserId(user_id);
+    const cacheKey = `${cacheKeys.USER_PROFILE(sanitizedUserId)}:engagement`;
 
     const cached = await cacheService.get(cacheKey);
     if (cached !== null && cached !== undefined) return cached;
@@ -672,7 +668,7 @@ export class UserProfileService {
               totalEngagementScore: sql`COALESCE(SUM(${bill_engagement.engagement_score}), 0)`
             })
             .from(bill_engagement)
-            .where(eq(bill_engagement.user_id, user_id));
+            .where(eq(bill_engagement.user_id, sanitizedUserId));
 
           // Get comment count
           const [commentStats] = await db
@@ -680,19 +676,19 @@ export class UserProfileService {
               totalComments: count(comments.id)
             })
             .from(comments)
-            .where(eq(comments.user_id, user_id));
+            .where(eq(comments.user_id, sanitizedUserId));
 
           // Get recent activity
-          const recentEngagement = await db
-            .select({ bill_id: bill_engagement.bill_id,
-              billTitle: bills.title,
-              last_engaged_at: bill_engagement.last_engaged_at,
-              engagement_score: bill_engagement.engagement_score
-             })
+      const recentEngagement = await db
+        .select({ bill_id: bill_engagement.bill_id,
+          billTitle: bills.title,
+          last_engaged_at: bill_engagement.updated_at,
+          engagement_score: bill_engagement.engagement_score
+         })
             .from(bill_engagement)
             .innerJoin(bills, eq(bill_engagement.bill_id, bills.id))
-            .where(eq(bill_engagement.user_id, user_id))
-            .orderBy(desc(bill_engagement.last_engaged_at))
+            .where(eq(bill_engagement.user_id, sanitizedUserId))
+        .orderBy(desc(bill_engagement.updated_at))
             .limit(10);
 
           const recentComments = await db
@@ -708,12 +704,12 @@ export class UserProfileService {
 
           // Combine and sort recent activity
           const recentActivity = [
-            ...recentEngagement.map(item => ({ type: 'track' as const,
+            ...recentEngagement.map((item: any) => ({ type: 'track' as const,
               bill_id: item.bill_id,
               billTitle: item.billTitle,
               timestamp: item.last_engaged_at || new Date()
              })),
-            ...recentComments.map(item => ({ type: 'comment' as const,
+            ...recentComments.map((item: any) => ({ type: 'comment' as const,
               bill_id: item.bill_id,
               billTitle: item.billTitle,
               timestamp: item.created_at || new Date()
@@ -731,7 +727,7 @@ export class UserProfileService {
             .from(bill_engagement)
             .innerJoin(bills, eq(bill_engagement.bill_id, bills.id))
             .where(and(
-              eq(bill_engagement.user_id, user_id),
+              eq(bill_engagement.user_id, sanitizedUserId),
               sql`${bills.category} IS NOT NULL`
             ))
             .groupBy(bills.category)
@@ -743,7 +739,7 @@ export class UserProfileService {
             totalComments: Number(commentStats?.totalComments || 0),
             totalEngagementScore: Number(engagementStats?.totalEngagementScore || 0),
             recentActivity,
-            topCategories: topCategories.map(cat => ({
+            topCategories: topCategories.map((cat: any) => ({
               category: cat.category || 'Unknown',
               engagementCount: Number(cat.engagementCount)
             }))
@@ -757,10 +753,10 @@ export class UserProfileService {
           recentActivity: [],
           topCategories: []
         },
-        `getUserEngagementHistory:${ user_id }`
+        `getUserEngagementHistory:${ sanitizedUserId }`
       );
 
-      if (result.source === 'fallback') { console.warn(`Using fallback engagement history for user: ${user_id }`);
+      if (result.source === 'fallback') { console.warn(`Using fallback engagement history for user: ${sanitizedUserId}`);
       }
 
       return result.data;
@@ -773,7 +769,11 @@ export class UserProfileService {
     return computed;
   }
 
-  async updateUserEngagement(user_id: string, bill_id: number, engagement_type: 'view' | 'comment' | 'share') { const result = await databaseService.withFallback(
+  async updateUserEngagement(user_id: string, bill_id: string, engagement_type: 'view' | 'comment' | 'share') {
+    const sanitizedUserId = this.sanitizeUserId(user_id);
+    const sanitizedBillId = typeof bill_id === 'string' ? bill_id.trim() : bill_id as any;
+
+    const result = await databaseService.withFallback(
       async () => {
         await databaseService.withTransaction(async (tx) => {
           // Check if engagement record exists
@@ -781,8 +781,8 @@ export class UserProfileService {
             .select()
             .from(bill_engagement)
             .where(and(
-              eq(bill_engagement.user_id, user_id),
-              eq(bill_engagement.bill_id, bill_id)
+              eq(bill_engagement.user_id, sanitizedUserId),
+              eq(bill_engagement.bill_id, sanitizedBillId)
             ))
             .limit(1);
 
@@ -812,13 +812,13 @@ export class UserProfileService {
               .update(bill_engagement)
               .set(updates)
               .where(and(
-                eq(bill_engagement.user_id, user_id),
-                eq(bill_engagement.bill_id, bill_id)
-              ));
+                  eq(bill_engagement.user_id, sanitizedUserId),
+                  eq(bill_engagement.bill_id, sanitizedBillId)
+                ));
           } else { // Create new engagement record
             const newEngagement: any = {
-               user_id,
-               bill_id,
+                 user_id: sanitizedUserId,
+                 bill_id: sanitizedBillId,
                view_count: engagement_type === 'view' ? 1 : 0,
                comment_count: engagement_type === 'comment' ? 1 : 0,
                share_count: engagement_type === 'share' ? 1 : 0,
@@ -835,16 +835,15 @@ export class UserProfileService {
         }, 'updateUserEngagement');
 
         // Invalidate engagement cache after update
-        cacheService.delete(`${ cacheKeys.USER_PROFILE(user_id) }:engagement`);
+        await cacheService.delete(`${ cacheKeys.USER_PROFILE(sanitizedUserId) }:engagement`);
 
         return { success: true };
       },
       // Fallback: simulate success but warn about database unavailability
       { success: false },
-      `updateUserEngagement:${ user_id }:${ bill_id }`
+      `updateUserEngagement:${ sanitizedUserId }:${ sanitizedBillId }`
     );
-
-    if (result.source === 'fallback') { console.warn(`Cannot update user engagement: database unavailable for user ${user_id }, bill ${ bill_id }`);
+    if (result.source === 'fallback') { console.warn(`Cannot update user engagement: database unavailable for user ${sanitizedUserId}, bill ${sanitizedBillId}`);
     }
 
     return result.data;

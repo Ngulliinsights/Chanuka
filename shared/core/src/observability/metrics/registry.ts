@@ -136,7 +136,7 @@ export class HistogramMetric implements Histogram {
   constructor(
     public readonly name: string,
     public readonly help: string,
-    buckets: number[] = DEFAULT_CONFIG.HISTOGRAM_BUCKETS,
+    buckets: readonly number[] = DEFAULT_CONFIG.HISTOGRAM_BUCKETS,
     public readonly labels: Record<string, string> = {}
   ) {
     this.buckets = [...buckets].sort((a, b) => a - b);
@@ -225,7 +225,7 @@ export class SummaryMetric implements Summary {
   constructor(
     public readonly name: string,
     public readonly help: string,
-    quantiles: number[] = DEFAULT_CONFIG.SUMMARY_QUANTILES,
+    quantiles: readonly number[] = DEFAULT_CONFIG.SUMMARY_QUANTILES,
     public readonly labels: Record<string, string> = {}
   ) {
     this.quantiles = [...quantiles].sort((a, b) => a - b);
@@ -362,7 +362,7 @@ export function createGauge(
 export function createHistogram(
   name: string,
   help: string,
-  buckets: number[] = DEFAULT_CONFIG.HISTOGRAM_BUCKETS,
+  buckets: readonly number[] = DEFAULT_CONFIG.HISTOGRAM_BUCKETS,
   labels: Record<string, string> = {}
 ): Histogram {
   return new HistogramMetric(name, help, buckets, labels);
@@ -371,7 +371,7 @@ export function createHistogram(
 export function createSummary(
   name: string,
   help: string,
-  quantiles: number[] = DEFAULT_CONFIG.SUMMARY_QUANTILES,
+  quantiles: readonly number[] = DEFAULT_CONFIG.SUMMARY_QUANTILES,
   labels: Record<string, string> = {}
 ): Summary {
   return new SummaryMetric(name, help, quantiles, labels);

@@ -1,19 +1,37 @@
 {
   "compilerOptions": {
+    // Language and Environment
     "target": "ES2022",
-    "module": "ES2022",
-    "lib": ["ES2022", "dom", "dom.iterable"],
-    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "jsx": "react-jsx",
+    
+    // Module Resolution
+    "module": "ES2022",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    
+    // Type Checking
+    "strict": true,
+    "noImplicitAny": false,
+    "skipLibCheck": true,
     "allowJs": true,
+    
+    // Emit
     "noEmit": true,
+    "isolatedModules": true,
+    
+    // Interop Constraints
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    
+    // Project Structure
     "rootDir": "..",
-  "skipLibCheck": true,
-  "strict": false,
-  "noImplicitAny": false,
-    "types": ["vite/client", "vitest/globals"],
     "baseUrl": ".",
+  "ignoreDeprecations": "6.0",
+    
+    // Path Mappings
     "paths": {
       "@/*": ["src/*"],
       "@shared/*": ["../shared/*"],
@@ -21,9 +39,17 @@
       "@shared/core/*": ["src/types/shims-shared.d.ts"],
       "@shared/schema": ["src/types/shims-shared.d.ts"],
       "@shared/schema/*": ["src/types/shims-shared.d.ts"]
-    }
+    },
+    
+    // Type Definitions
+    "types": ["vite/client", "vitest/globals"]
   },
-  "include": ["src/**/*"],
+  
+  "include": [
+    "src/**/*",
+    "src/types/shims-shared.d.ts"
+  ],
+  
   "exclude": [
     "node_modules",
     "dist",
@@ -31,7 +57,6 @@
     "**/*.test.tsx",
     "**/*.spec.ts",
     "**/*.spec.tsx",
-    "**/__tests__/**",
-    "**/*.d.ts"
+    "**/__tests__/**"
   ]
 }

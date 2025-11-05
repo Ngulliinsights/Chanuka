@@ -11,8 +11,8 @@ export * from './errors/specialized-errors.js';
 
 // Error handlers and processing
 export * from './handlers/error-handler-chain.js';
-export * from './handlers/error-boundary.js';
-export * from './handlers/enhanced-error-boundary.js';
+export * from './handlers/error-boundary';
+export * from './handlers/enhanced-error-boundary';
 
 // Error patterns and resilience
 export * from './patterns/circuit-breaker.js';
@@ -32,7 +32,24 @@ export * from './middleware/express-error-middleware.js';
 
 
 // Types and interfaces
-export * from './types.js';
+export type {
+  ErrorHandler as ErrorHandlerInterface,
+  ErrorReporter,
+  ErrorRecovery,
+  ErrorContext,
+  ErrorMetrics,
+  ErrorAggregation,
+  UserErrorReport,
+  RecoveryOption,
+  UserFeedback,
+  ErrorAnalytics,
+  ErrorMonitor,
+  ErrorRecoveryEngine,
+  RecoverySuggestion,
+  ErrorBoundaryConfig,
+  ErrorTrackingIntegration,
+  ErrorDashboardData
+} from './types';
 
 // Default exports for common use cases
 export { BaseError } from './errors/base-error.js';
@@ -49,7 +66,7 @@ export {
   createConsoleIntegration,
   createIntegrationManager
 } from './integrations/error-tracking-integration.js';
-export { EnhancedErrorBoundary, withEnhancedErrorBoundary } from './handlers/enhanced-error-boundary.js';
+export { EnhancedErrorBoundary, withEnhancedErrorBoundary } from './handlers/enhanced-error-boundary';
 
 // Global error handlers setup
 export function setupGlobalErrorHandlers() {

@@ -8,6 +8,13 @@
       "when": 1761512944688,
       "tag": "0021_clean_comprehensive_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1762254108685,
+      "tag": "20251104110148_soft_captain_marvel",
+      "breakpoints": true
     }
   ]
 }

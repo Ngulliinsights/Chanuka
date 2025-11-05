@@ -2,8 +2,7 @@
 // ADVOCACY COORDINATION - Coalition Builder Service
 // ============================================================================
 
-import { ICampaignRepository } from '../domain/repositories/campaign-repository.js';
-import { IActionRepository } from '../domain/repositories/action-repository.js';
+// Repository interfaces removed - using direct service calls
 import { AdvocacyEventPublisher, CoalitionOpportunityIdentifiedEvent, CoalitionFormedEvent } from '../domain/events/advocacy-events.js';
 import { CoalitionOpportunity } from '../types/index.js';
 import { AdvocacyErrors } from '../domain/errors/advocacy-errors.js';
